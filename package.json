@@ -1,0 +1,36 @@
+{
+  "name": "client-sdk",
+  "version": "0.0.1",
+  "main": "dist/client-sdk.cjs.js",
+  "module": "dist/client-sdk.esm.js",
+  "browser": "dist/client-sdk.umd.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "devDependencies": {
+    "@babel/core": "7.4.0",
+    "@babel/preset-env": "7.4.2",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-jest": "24.5.0",
+    "jest": "24.5.0",
+    "live-server": "^1.2.1",
+    "rollup": "1.7.0",
+    "rollup-plugin-babel": "4.3.2",
+    "rollup-plugin-commonjs": "9.2.1",
+    "rollup-plugin-node-resolve": "4.0.1",
+    "concurrently": "^4.1.0"
+  },
+  "scripts": {
+    "prepare": "yarn build",
+    "build": "rollup -c",
+    "watch": "rollup -c -w",
+    "server": "live-server --port=7000 -q --open=./example",
+    "start": "concurrently \"yarn:watch\" \"yarn:server\"",
+    "test": "jest"
+  },
+  "files": [
+    "dist"
+  ]
+}

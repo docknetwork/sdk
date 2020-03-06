@@ -7,3 +7,6 @@ yarn build
 
 ## Run example
 yarn && yarn start
+
+## Lint
+yarn lint --fix

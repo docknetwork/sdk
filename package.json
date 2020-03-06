@@ -23,6 +23,7 @@
     "concurrently": "^4.1.0"
   },
   "scripts": {
+    "lint": "eslint src",
     "prepare": "yarn build",
     "build": "rollup -c",
     "watch": "rollup -c -w",

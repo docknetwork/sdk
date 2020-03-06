@@ -1,11 +1,11 @@
 class DockSDK {
-  constructor() {
+    constructor() {
 
-  }
+    }
 
-  foo() {
-    return 'bar';
-  }
+    foo() {
+        return 'bar';
+    }
 }
 
 export default DockSDK;

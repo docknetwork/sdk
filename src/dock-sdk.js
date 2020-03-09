@@ -1,3 +1,5 @@
+import DID from './modules/did';
+
 class DockSDK {
   /**
    * Skeleton constructor, does nothing yet
@@ -5,16 +7,17 @@ class DockSDK {
    * @param {string} address - WebSocket Address
    */
   constructor(address) {
-
+    this.address = address;
   }
 
   /**
    * Returns a string.
-   * @return {string} The bar value.
+   * @return {string} The address value.
    */
   foo() {
-    return 'bar';
+    return this.address;
   }
 }
 
+export const DIDModule = DID;
 export default DockSDK;

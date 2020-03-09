@@ -5,7 +5,7 @@ import babel from 'rollup-plugin-babel'
 
 export default [
   {
-    input: 'src/main.js',
+    input: 'src/umd.js',
     output: {
       name: 'index',
       file: pkg.browser,

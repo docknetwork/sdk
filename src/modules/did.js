@@ -14,6 +14,10 @@ class DIDModule {
       public_key: publicKey
     });
   }
+
+  get(did) {
+    return this.api.query.didModule.dIDs(did);
+  }
 }
 
 export default DIDModule;

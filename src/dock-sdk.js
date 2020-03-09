@@ -59,6 +59,8 @@ class DockSDK {
   }
 
   // Helper function to send transaction
+  // TODO: refactor into a promise not oncomplete callback and fix error handling
+  // throw a promise error if transaction failed
   async sendTransaction(account, transfer, onComplete) {
     const unsub = await transfer
       .signAndSend(account, ({events = [], status}) => {

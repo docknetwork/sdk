@@ -90,8 +90,6 @@ async function connectToNode() {
   console.log('nodeName', nodeName)
   console.log('nodeVersion', nodeVersion)
 
-  console.log('did module', api.tx.didModule);
-
   // https://polkadot.js.org/apps/#/toolbox/hash
   const did = '0x2bb29852687a7cbff311dc26e674e78113e21402c93d3e097df8093d2d9d6bbd'; // my hashed data
   const detail = {

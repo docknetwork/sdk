@@ -1,10 +1,18 @@
+// TODO: document this file properly
 class DIDModule {
+  constructor(api) {
+    this.api = api;
+  }
+
   /**
-   * Returns a string.
-   * @return {string} The foo value.
+   * Creates a new DID
+   * @return {string} The extrinsic to sign and send.
    */
-  foo() {
-    return 'did';
+  new(did, controller, publicKey) {
+    return this.api.tx.didModule.new(did, {
+      controller,
+      public_key: publicKey
+    });
   }
 }
 

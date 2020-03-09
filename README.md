@@ -21,3 +21,10 @@ Running dev node:
 ```
 ./target/release/dock-testnet --base-path /tmp/alice --chain local --alice --port 30333 --ws-port 9944 --rpc-port 9933 --telemetry-url ws://telemetry.polkadot.io:1024 --validator --dev
 ```
+
+## Basic SDK example
+
+Simply run
+```
+yarn start-node-example
+```

@@ -10,8 +10,10 @@
     "url": ""
   },
   "devDependencies": {
-    "@babel/core": "7.4.0",
-    "@babel/preset-env": "7.4.2",
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.7",
+    "@babel/node": "^7.8.7",
+    "@babel/preset-env": "^7.8.7",
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "24.5.0",
     "concurrently": "^4.1.0",
@@ -31,7 +33,8 @@
     "server": "live-server --port=7000 -q --open=./example",
     "start": "concurrently \"yarn:watch\" \"yarn:server\"",
     "test": "jest",
-    "docs": "jsdoc src -r -c .jsdoc -d docs"
+    "docs": "jsdoc src -r -c .jsdoc -d docs",
+    "start-node-example": "npx babel-node example/index.js"
   },
   "files": [
     "dist"

@@ -31,4 +31,4 @@ yarn start-node-example
 ```
 
 ## Build status
-![Build Status](https://github.com/docknetwork/client-sdk/workflows/Node.js%20CI/badge.svg "Build Status")
+![Build Status](https://github.com/docknetwork/client-sdk/workflows/CI/badge.svg "Build Status")

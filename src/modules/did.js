@@ -94,9 +94,7 @@ class DIDModule {
           publicKeyBase58
         }];
 
-        const authentication = publicKey.map(key => {
-          return key.id;
-        });
+        const authentication = publicKey.map(key => key.id);
 
         return {
           '@context': ['https://www.w3.org/ns/did/v1'],

@@ -2,9 +2,15 @@
 
 Currently very early in-dev, prototype and skeleton.
 
+## Documentation
+
+Early documentation available at: https://docknetwork.github.io/client-sdk/
+
 ## Build
 - Run `npm install` or `yarn install` to install the dependencies
 - yarn build
+
+![Build Status](https://github.com/docknetwork/client-sdk/workflows/CI/badge.svg "Build Status")
 
 ## Run example
 yarn && yarn start
@@ -29,6 +35,3 @@ Simply run
 ```
 yarn start-node-example
 ```
-
-## Build status
-![Build Status](https://github.com/docknetwork/client-sdk/workflows/CI/badge.svg "Build Status")

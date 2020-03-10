@@ -65,27 +65,28 @@ class DockSDK {
   async sendTransaction(account, transfer, onComplete) {
     const unsub = await transfer
       .signAndSend(account, ({events = [], status}) => {
-        console.log(`Current status is ${status.type}`, status);
+        // console.log(`Current status is ${status.type}`, status);
 
         if (status.isFinalized) {
-          console.log(
-            `Transaction included at blockHash ${status.asFinalized}`
-          );
+          // console.log(
+          //   `Transaction included at blockHash ${status.asFinalized}`
+          // );
 
           // Loop through Vec<EventRecord> to display all events
-          events.forEach(({phase, event: {data, method, section}}) => {
-            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-          });
+          // events.forEach(({phase, event: {data, method, section}}) => {
+          // console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+          // });
 
           unsub();
 
           if (onComplete) {
-            onComplete();
+            onComplete(events);
           }
         }
       })
       .catch(error => {
-        console.error('error', error);
+        throw 'error ' + error;
+        // console.error('error', error);
       });
   }
 }

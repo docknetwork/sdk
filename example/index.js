@@ -13,7 +13,7 @@ async function onDIDCreated() {
 
   // Check if DID exists
   const result = await dock.did.get(did)
-  console.log('DID:', result && result);
+  console.log('DID:', result);
   process.exit();
 }
 

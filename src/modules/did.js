@@ -3,19 +3,39 @@
 const DockDIDQualifier = 'did:dock';
 
 class DIDModule {
+  /**
+   * Creates a new instance of DIDModule and sets the api
+   * @constructor
+   * @param {object} api - PolkadotJS API Reference
+   */
   constructor(api) {
     this.api = api;
   }
 
   /**
    * Creates a new DID
-   * @return {string} The extrinsic to sign and send.
+   * @return {Extrinsic} The extrinsic to sign and send.
    */
-  new(did, controller, publicKey) {
+  new(did, controller, public_key) {
     return this.api.tx.didModule.new(did, {
       controller,
-      public_key: publicKey
+      public_key,
     });
+  }
+
+  /**
+   * Updates a DID
+   * @return {Extrinsic} The extrinsic to sign and send.
+   */
+  updateKey(did, controller, public_key, signature) {
+    const keyUpdate = {
+      did,
+      controller,
+      public_key,
+      last_modified_in_block: 0,
+    };
+
+    return this.api.tx.didModule.updateKey(keyUpdate, signature);
   }
 
   /**

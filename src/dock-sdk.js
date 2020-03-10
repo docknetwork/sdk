@@ -1,37 +1,38 @@
-import {ApiPromise, WsProvider, Keyring} from '@polkadot/api';
+import {ApiPromise, WsProvider} from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 
 import DID from './modules/did';
 
 // Define custom types
+// TODO: split types into separate file
 const types = {
-  "DID": "[u8;32]",
-  "Bytes32": {
-    "value": "[u8;32]"
+  'DID': '[u8;32]',
+  'Bytes32': {
+    'value': '[u8;32]'
   },
-  "Bytes33": {
-    "value": "[u8;33]"
+  'Bytes33': {
+    'value': '[u8;33]'
   },
-  "PublicKey": {
-    "_enum": {
-      "Sr25519": "Bytes32",
-      "Ed25519": "Bytes32",
-      "Secp256k1": "Bytes33"
+  'PublicKey': {
+    '_enum': {
+      'Sr25519': 'Bytes32',
+      'Ed25519': 'Bytes32',
+      'Secp256k1': 'Bytes33'
     }
   },
-  "KeyDetail": {
-    "controller": "DID",
-    "public_key": "PublicKey"
+  'KeyDetail': {
+    'controller': 'DID',
+    'public_key': 'PublicKey'
   },
-  "KeyUpdate": {
-    "did": "DID",
-    "public_key": "PublicKey",
-    "controller": "Option<DID>",
-    "last_modified_in_block": "u64"
+  'KeyUpdate': {
+    'did': 'DID',
+    'public_key': 'PublicKey',
+    'controller': 'Option<DID>',
+    'last_modified_in_block': 'u64'
   },
-  "DIDRemoval": {
-    "did": "DID",
-    "last_modified_in_block": "u64"
+  'DIDRemoval': {
+    'did': 'DID',
+    'last_modified_in_block': 'u64'
   }
 };
 
@@ -83,9 +84,9 @@ class DockSDK {
           }
         }
       })
-    .catch(error => {
-      console.error('error', error)
-    });
+      .catch(error => {
+        console.error('error', error);
+      });
   }
 }
 

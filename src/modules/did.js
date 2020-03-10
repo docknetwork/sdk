@@ -1,7 +1,6 @@
-// TODO: document this file properly
-
 const DockDIDQualifier = 'did:dock';
 
+/** Class to create, update and destroy DIDs */
 class DIDModule {
   /**
    * Creates a new instance of DIDModule and sets the api
@@ -14,6 +13,9 @@ class DIDModule {
 
   /**
    * Creates a new DID
+   * @param {string} did - DID
+   * @param {string} controller - DID Controller
+   * @param {PublicKey} public_key - DID Creator Public Key
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   new(did, controller, public_key) {
@@ -25,6 +27,10 @@ class DIDModule {
 
   /**
    * Updates a DID
+   * @param {string} did - DID
+   * @param {string} controller - DID Controller
+   * @param {PublicKey} public_key - DID Creator Public Key
+   * @param {string} signature - DID Creator signature
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   updateKey(did, controller, public_key, signature) {
@@ -40,6 +46,8 @@ class DIDModule {
 
   /**
    * Removes a DID
+   * @param {string} did - DID
+   * @param {string} signature - DID Creator signature
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   remove(did, signature) {
@@ -51,6 +59,7 @@ class DIDModule {
 
   /**
    * Gets a DID
+   * @param {string} did - DID
    * @return {object} The DID.
    */
   async get(did) {

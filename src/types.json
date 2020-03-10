@@ -1,0 +1,30 @@
+{
+  "DID": "[u8;32]",
+  "Bytes32": {
+    "value": "[u8;32]"
+  },
+  "Bytes33": {
+    "value": "[u8;33]"
+  },
+  "PublicKey": {
+    "_enum": {
+      "Sr25519": "Bytes32",
+      "Ed25519": "Bytes32",
+      "Secp256k1": "Bytes33"
+    }
+  },
+  "KeyDetail": {
+    "controller": "DID",
+    "public_key": "PublicKey"
+  },
+  "KeyUpdate": {
+    "did": "DID",
+    "public_key": "PublicKey",
+    "controller": "Option<DID>",
+    "last_modified_in_block": "u64"
+  },
+  "DIDRemoval": {
+    "did": "DID",
+    "last_modified_in_block": "u64"
+  }
+}

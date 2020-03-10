@@ -38,6 +38,7 @@
     "dist"
   ],
   "dependencies": {
-    "@polkadot/api": "^1.5.1"
+    "@polkadot/api": "^1.5.1",
+    "rollup-plugin-json": "^4.0.0"
   }
 }

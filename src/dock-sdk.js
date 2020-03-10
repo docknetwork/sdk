@@ -2,40 +2,9 @@ import {ApiPromise, WsProvider} from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 
 import DID from './modules/did';
+import types from './types.json';
 
-// Define custom types
-// TODO: split types into separate file
-const types = {
-  'DID': '[u8;32]',
-  'Bytes32': {
-    'value': '[u8;32]'
-  },
-  'Bytes33': {
-    'value': '[u8;33]'
-  },
-  'PublicKey': {
-    '_enum': {
-      'Sr25519': 'Bytes32',
-      'Ed25519': 'Bytes32',
-      'Secp256k1': 'Bytes33'
-    }
-  },
-  'KeyDetail': {
-    'controller': 'DID',
-    'public_key': 'PublicKey'
-  },
-  'KeyUpdate': {
-    'did': 'DID',
-    'public_key': 'PublicKey',
-    'controller': 'Option<DID>',
-    'last_modified_in_block': 'u64'
-  },
-  'DIDRemoval': {
-    'did': 'DID',
-    'last_modified_in_block': 'u64'
-  }
-};
-
+/** Helper class to interact with the Dock chain */
 class DockSDK {
   /**
    * Skeleton constructor, does nothing yet
@@ -49,6 +18,8 @@ class DockSDK {
   async init() {
     const provider = new WsProvider(this.address);
 
+    console.log('typestypestypes', types)
+
     this.api = await ApiPromise.create({
       provider,
       types,
@@ -59,10 +30,15 @@ class DockSDK {
     return cryptoWaitReady();
   }
 
-  // Helper function to send transaction
-  // TODO: refactor into a promise not oncomplete callback and fix error handling
-  // throw a promise error if transaction failed
+  /**
+   * Helper function to send transaction
+   * @param {Account} account - Keyring Account
+   * @param {Extrinsic} transfer - Extrinsic to send
+   * @param {function} onComplete - On complete callback, temporary
+   * @return {Extrinsic} The extrinsic to sign and send.
+   */
   async sendTransaction(account, transfer, onComplete) {
+    // TODO: refactor into a promise not oncomplete callback and fix error handling, throw a promise error if transaction failed
     const unsub = await transfer
       .signAndSend(account, ({events = [], status}) => {
         // console.log(`Current status is ${status.type}`, status);

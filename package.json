@@ -7,7 +7,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/docknetwork/client-sdk"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
@@ -20,7 +20,6 @@
     "eslint": "^6.8.0",
     "jest": "24.5.0",
     "jsdoc": "^3.6.3",
-    "live-server": "^1.2.1",
     "rollup": "1.7.0",
     "rollup-plugin-babel": "4.3.2",
     "rollup-plugin-commonjs": "9.2.1",
@@ -31,8 +30,6 @@
     "prepare": "yarn build",
     "build": "rollup -c",
     "watch": "rollup -c -w",
-    "server": "live-server --port=7000 -q --open=./example",
-    "start": "concurrently \"yarn:watch\" \"yarn:server\"",
     "test": "jest",
     "docs": "jsdoc src -r -c .jsdoc -d docs",
     "start-node-example": "npx babel-node example/index.js"

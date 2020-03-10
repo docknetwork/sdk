@@ -3,7 +3,8 @@
 Currently very early in-dev, prototype and skeleton.
 
 ## Build
-yarn build
+- Run `npm install` or `yarn install` to install the dependencies
+- yarn build
 
 ## Run example
 yarn && yarn start

@@ -39,6 +39,17 @@ class DIDModule {
   }
 
   /**
+   * Removes a DID
+   * @return {Extrinsic} The extrinsic to sign and send.
+   */
+  remove(did, signature) {
+    return this.api.tx.didModule.remove({
+      did,
+      last_modified_in_block: 0,
+    }, signature);
+  }
+
+  /**
    * Gets a DID
    * @return {object} The DID.
    */

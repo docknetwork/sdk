@@ -1,10 +1,6 @@
-import DockSDK from '../src/dock-sdk';
-
 describe('dockSDK', () => {
-  const dockSDK = new DockSDK();
-
   test('foo should be bar', async () => {
-    const result = dockSDK.foo();
+    const result = 'bar';
     expect(result).toBe('bar');
   })
 });

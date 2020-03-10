@@ -18,8 +18,6 @@ class DockSDK {
   async init() {
     const provider = new WsProvider(this.address);
 
-    console.log('typestypestypes', types)
-
     this.api = await ApiPromise.create({
       provider,
       types,

@@ -1,6 +1,6 @@
 # Dock Client SDK
 
-Currently very early in-dev, prototype and skeleton.
+Currently very early in-dev.
 
 ## Build
 - Run `npm install` or `yarn install` to install the dependencies

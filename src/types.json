@@ -1,10 +1,16 @@
 {
-  "DID": "[u8;32]",
+  "Did": "[u8;32]",
   "Bytes32": {
     "value": "[u8;32]"
   },
   "Bytes33": {
     "value": "[u8;33]"
+  },
+  "Bytes64": {
+    "value": "[u8;64]"
+  },
+  "Bytes65": {
+    "value": "[u8;65]"
   },
   "PublicKey": {
     "_enum": {
@@ -13,18 +19,25 @@
       "Secp256k1": "Bytes33"
     }
   },
+  "Signature": {
+    "_enum": {
+      "Sr25519": "Bytes64",
+      "Ed25519": "Bytes64",
+      "Secp256k1": "Bytes65"
+    }
+  },
   "KeyDetail": {
-    "controller": "DID",
+    "controller": "Did",
     "public_key": "PublicKey"
   },
   "KeyUpdate": {
-    "did": "DID",
+    "did": "Did",
     "public_key": "PublicKey",
-    "controller": "Option<DID>",
+    "controller": "Option<Did>",
     "last_modified_in_block": "u64"
   },
-  "DIDRemoval": {
-    "did": "DID",
+  "DidRemoval": {
+    "did": "Did",
     "last_modified_in_block": "u64"
   }
 }

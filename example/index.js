@@ -29,6 +29,7 @@ async function onConnected() {
     Secp256k1: undefined,
   };
 
+
   console.log('Submitting new DID', did, controller, publicKey);
 
   const transaction = dock.did.new(did, controller, publicKey);

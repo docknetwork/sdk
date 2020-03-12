@@ -1,9 +1,9 @@
 {
-  "name": "client-sdk",
+  "name": "dock-client-sdk",
   "version": "0.0.1",
-  "main": "dist/client-sdk.cjs.js",
-  "module": "dist/client-sdk.esm.js",
-  "browser": "dist/client-sdk.umd.js",
+  "main": "dist/dock-client-sdk.cjs.js",
+  "module": "dist/dock-client-sdk.esm.js",
+  "browser": "dist/dock-client-sdk.umd.js",
   "license": "MIT",
   "repository": {
     "type": "git",

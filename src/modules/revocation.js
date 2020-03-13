@@ -60,6 +60,7 @@ class RevocationModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   getRevocationRegistry(revRegID) {
+    // TODO: likely needs api query
     return this.module.getRevocationRegistry(revRegID);
   }
 
@@ -70,6 +71,7 @@ class RevocationModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   getRevocationStatus(revRegID, credentialID) {
+    // TODO: likely needs api query
     return this.module.getRevocationStatus(revRegID, credentialID);
   }
 }

@@ -10,6 +10,17 @@ class RevocationModule {
   }
 
   /**
+   * Creating a revocation registry
+   * @param {string} origin - The origin
+   * @param {string} id - is the unique id of the registry. The function will check whether `id` is already taken or not.
+   * @param {RevRegistry} registry - Will serialized `registry` and update the map `rev_registries` with `id` -> `(registry, last updated block number)
+   * @return {Extrinsic} The extrinsic to sign and send.
+   */
+  new(origin, id, registry) {
+    
+  }
+
+  /**
    * Revoke credentials
    * @param {string} origin - The origin
    * @param {Revoke} to_revoke - contains the credentials to be revoked

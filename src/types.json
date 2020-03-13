@@ -18,8 +18,7 @@
       "Ed25519": "Bytes32",
       "Secp256k1": "Bytes33"
     }
-  },
-  "Signature": {
+  },"CustomSignature": { 
     "_enum": {
       "Sr25519": "Bytes64",
       "Ed25519": "Bytes64",

@@ -31,8 +31,8 @@ class DockSDK {
       }
     });
 
-    this.did = new DIDModule(this.api);
-    this.revocation = new RevocationModule(this.api);
+    this._did = new DIDModule(this.api);
+    this._revocation = new RevocationModule(this.api);
 
     return cryptoWaitReady();
   }
@@ -71,6 +71,22 @@ class DockSDK {
         throw 'error ' + error;
         // console.error('error', error);
       });
+  }
+
+  /**
+   * Gets the SDK's DID module
+   * @return {DIDModule} The module to use
+   */
+  get did() {
+    return this._did;
+  }
+
+  /**
+   * Gets the SDK's revocation module
+   * @return {RevocationModule} The module to use
+   */
+  get revocation() {
+    return this._revocation;
   }
 }
 

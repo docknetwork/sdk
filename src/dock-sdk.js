@@ -32,6 +32,7 @@ class DockSDK {
     });
 
     this.did = new DIDModule(this.api);
+    this.revocation = new RevocationModule(this.api);
 
     return cryptoWaitReady();
   }

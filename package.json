@@ -39,6 +39,9 @@
     "dist"
   ],
   "dependencies": {
-    "@polkadot/api": "^1.6.2"
+    "axios": "^0.18.1",
+    "ecdsa-secp256k1-signature-2019": "^1.0.0",
+    "@polkadot/api": "^1.6.2",
+    "vc-js": "^0.4.1"
   }
 }

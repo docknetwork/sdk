@@ -64,12 +64,10 @@ class DIDModule {
    */
   async get(did) {
     // TODO: Convert DID and pk to base58
-    const resp = await this.api.query.didModule.dIDs(did);
+    const resp = await this.api.query.didModule.dids(did);
     if (resp) {
-      const detail = resp[0];
-      const lastModifiedBlockNo = resp[1];
-
-      if (lastModifiedBlockNo) {
+      if (resp.isSome) {
+        const detail = resp.unwrap()[0];
         // Create the fully qualified DID like "did:dock:..."
         const id = `${DockDIDQualifier}:${did}`;
 

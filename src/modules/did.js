@@ -9,6 +9,7 @@ class DIDModule {
    */
   constructor(api) {
     this.api = api;
+    this.module = api.tx.didModule;
   }
 
   /**
@@ -19,7 +20,7 @@ class DIDModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   new(did, controller, public_key) {
-    return this.api.tx.didModule.new(did, {
+    return this.module.new(did, {
       controller,
       public_key,
     });
@@ -41,7 +42,7 @@ class DIDModule {
       last_modified_in_block: 0,
     };
 
-    return this.api.tx.didModule.updateKey(keyUpdate, signature);
+    return this.module.updateKey(keyUpdate, signature);
   }
 
   /**
@@ -51,7 +52,7 @@ class DIDModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   remove(did, signature) {
-    return this.api.tx.didModule.remove({
+    return this.module.remove({
       did,
       last_modified_in_block: 0,
     }, signature);

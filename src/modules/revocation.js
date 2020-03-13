@@ -7,6 +7,7 @@ class RevocationModule {
    */
   constructor(api) {
     this.api = api;
+    this.module = api.tx.revocationModule;
   }
 
   /**
@@ -17,7 +18,7 @@ class RevocationModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   new(origin, id, registry) {
-    return this.api.tx.revocationModule.new(origin, id, registry);
+    return this.module.new(origin, id, registry);
   }
 
   /**
@@ -28,7 +29,7 @@ class RevocationModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   revoke(origin, toRevoke, controllers) {
-    return this.api.tx.revocationModule.revoke(origin, toRevoke, controllers);
+    return this.module.revoke(origin, toRevoke, controllers);
   }
 
   /**
@@ -39,7 +40,7 @@ class RevocationModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   unrevoke(origin, toUnrevoke, controllers) {
-    return this.api.tx.revocationModule.unrevoke(origin, toUnrevoke, controllers);
+    return this.module.unrevoke(origin, toUnrevoke, controllers);
   }
 
   /**
@@ -50,7 +51,7 @@ class RevocationModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   remove(origin, toRemove, controllers) {
-    return this.api.tx.revocationModule.remove(origin, toRemove, controllers);
+    return this.module.remove(origin, toRemove, controllers);
   }
 
   /**
@@ -59,7 +60,7 @@ class RevocationModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   getRevocationRegistry(revRegID) {
-    return this.api.tx.revocationModule.getRevocationRegistry(revRegID);
+    return this.module.getRevocationRegistry(revRegID);
   }
 
   /**
@@ -69,7 +70,7 @@ class RevocationModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   getRevocationStatus(revRegID, credentialID) {
-    return this.api.tx.revocationModule.getRevocationStatus(revRegID, credentialID);
+    return this.module.getRevocationStatus(revRegID, credentialID);
   }
 }
 

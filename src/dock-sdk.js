@@ -1,7 +1,8 @@
 import {ApiPromise, WsProvider} from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 
-import DID from './modules/did';
+import RevocationModule from './modules/did';
+import DIDModule from './modules/did';
 import types from './types.json';
 
 /** Helper class to interact with the Dock chain */
@@ -30,7 +31,8 @@ class DockSDK {
       }
     });
 
-    this.did = new DID(this.api);
+    this._did = new DIDModule(this.api);
+    this._revocation = new RevocationModule(this.api);
 
     return cryptoWaitReady();
   }
@@ -70,7 +72,22 @@ class DockSDK {
         // console.error('error', error);
       });
   }
+
+  /**
+   * Gets the SDK's DID module
+   * @return {DIDModule} The module to use
+   */
+  get did() {
+    return this._did;
+  }
+
+  /**
+   * Gets the SDK's revocation module
+   * @return {RevocationModule} The module to use
+   */
+  get revocation() {
+    return this._revocation;
+  }
 }
 
-export const DIDModule = DID;
 export default DockSDK;

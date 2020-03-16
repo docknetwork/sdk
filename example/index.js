@@ -2,17 +2,17 @@
 import {Keyring} from '@polkadot/api';
 
 // Import Dock SDK
-import DockSDK, {DIDModule} from '../src/dock-sdk';
+import DockSDK from '../src/dock-sdk';
 
 // Initialise Dock SDK
 const dock = new DockSDK('ws://127.0.0.1:9944');
-const did = '0x2bb29852687a7cbff311dc26e67451332bb29852687a7cbff311dc26e6745133';
+const didIdentifier = '0x2bb29852687a7cbff311dc26e67451332bb29852687a7cbff311dc26e6745133';
 
 async function onDIDCreated() {
   console.log('Transaction finalized.');
 
   // Check if DID exists
-  const result = await dock.did.get(did);
+  const result = await dock.did.get(didIdentifier);
   console.log('DID:', result);
   process.exit();
 }
@@ -28,9 +28,9 @@ async function onConnected() {
   };
 
 
-  console.log('Submitting new DID', did, controller, publicKey);
+  console.log('Submitting new DID', didIdentifier, controller, publicKey);
 
-  const transaction = dock.did.new(did, controller, publicKey);
+  const transaction = dock.did.new(didIdentifier, controller, publicKey);
   dock.sendTransaction(account, transaction, onDIDCreated);
 }
 

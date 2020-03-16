@@ -16,11 +16,11 @@ class DockSDK {
     this.address = address;
   }
 
-  async init() {
-    const provider = new WsProvider(this.address);
+  async init(address) {
+    this.address = address || this.address;
 
     this.api = await ApiPromise.create({
-      provider,
+      provider: new WsProvider(this.address),
       types,
       typesAlias: {
         // Renaming types of `didModule`
@@ -90,4 +90,9 @@ class DockSDK {
   }
 }
 
-export default DockSDK;
+export default new DockSDK();
+export {
+  DockSDK,
+  DIDModule,
+  RevocationModule,
+};

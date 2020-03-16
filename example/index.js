@@ -2,10 +2,9 @@
 import {Keyring} from '@polkadot/api';
 
 // Import Dock SDK
-import DockSDK from '../src/dock-sdk';
+import dock from '../src/dock-sdk';
 
 // Initialise Dock SDK
-const dock = new DockSDK('ws://127.0.0.1:9944');
 const didIdentifier = '0x2bb29852687a7cbff311dc26e67451332bb29852687a7cbff311dc26e6745133';
 
 async function onDIDCreated() {
@@ -35,5 +34,5 @@ async function onConnected() {
 }
 
 // Connect to the node and start working with it
-dock.init()
+dock.init('ws://127.0.0.1:9944')
   .then(onConnected);

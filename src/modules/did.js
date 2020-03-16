@@ -13,7 +13,7 @@ class DIDModule {
   }
 
   /**
-   * Creates a new DID
+   * Creates a new DID on the Dock chain.
    * @param {string} did - DID
    * @param {string} controller - DID Controller
    * @param {PublicKey} public_key - DID Creator Public Key
@@ -27,7 +27,7 @@ class DIDModule {
   }
 
   /**
-   * Updates a DID
+   * Updates the details of an already registered DID on the Dock chain.
    * @param {string} did - DID
    * @param {string} controller - DID Controller
    * @param {PublicKey} public_key - DID Creator Public Key
@@ -46,7 +46,7 @@ class DIDModule {
   }
 
   /**
-   * Removes a DID
+   * Removes an already registered DID on the Dock chain.
    * @param {string} did - DID
    * @param {string} signature - DID Creator signature
    * @return {Extrinsic} The extrinsic to sign and send.
@@ -59,7 +59,7 @@ class DIDModule {
   }
 
   /**
-   * Gets a DID
+   * Gets a DID from the Dock chain and create a DID document according to W3C spec.
    * @param {string} did - DID
    * @return {object} The DID.
    */

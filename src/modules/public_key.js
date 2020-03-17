@@ -19,7 +19,7 @@ class PublicKey {
   /**
    * @return {PublicKey} The correct PublicKey enum variant. The extending class should implement it.
    */
-  asEnum() {
+  toJSON() {
     throw 'Not implemented. The extending class should implement it';
   }
 }
@@ -34,7 +34,7 @@ class PublicKeySr25519 extends PublicKey {
   /**
    * @return {PublicKeySr25519} The PublicKey enum variant Sr25519.
    */
-  asEnum() {
+  toJSON() {
     return {
       Sr25519: this.value,
     };
@@ -51,7 +51,7 @@ class PublicKeyEd25519 extends PublicKey {
   /**
    * @return {PublicKeySr25519} The PublicKey enum variant Ed25519.
    */
-  asEnum() {
+  toJSON() {
     return {
       Ed25519: this.value,
     };
@@ -68,7 +68,7 @@ class PublicKeySecp256k1 extends PublicKey {
   /**
    * @return {PublicKeySr25519} The PublicKey enum variant Secp256k1.
    */
-  asEnum() {
+  toJSON() {
     return {
       Secp256k1: this.value,
     };

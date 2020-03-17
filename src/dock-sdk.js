@@ -1,7 +1,7 @@
 import {ApiPromise, WsProvider} from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 
-import {PublicKey} from './modules/common';
+import {PublicKey, PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from './modules/public_key';
 import RevocationModule from './modules/revocation';
 import DIDModule from './modules/did';
 import types from './types.json';
@@ -96,5 +96,8 @@ export {
   DockSDK,
   DIDModule,
   RevocationModule,
-  PublicKey
+  PublicKey,
+  PublicKeySr25519,
+  PublicKeyEd25519,
+  PublicKeySecp256k1
 };

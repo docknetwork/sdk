@@ -63,7 +63,7 @@ class DIDModule {
    * @param {string} did - DID
    * @return {string} The DID identifer.
    */
-  getID(did) {
+  getFullyQualifiedDID(did) {
     return `${DockDIDQualifier}:${did}`;
   }
 
@@ -78,7 +78,7 @@ class DIDModule {
     if (resp) {
       if (resp.isSome) {
         const detail = resp.unwrap()[0];
-        const id = this.getID(did);
+        const id = this.getFullyQualifiedDID(did);
 
         // Determine the type of the public key
         // TODO: move to publickey getType method once abstraction exists

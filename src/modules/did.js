@@ -35,9 +35,9 @@ class DIDModule {
   /**
    * Updates the details of an already registered DID on the Dock chain.
    * @param {string} did - DID
-   * @param {string} controller - DID Controller
-   * @param {PublicKey} public_key - DID Creator Public Key
-   * @param {string} signature - DID Creator signature
+   * @param {string} controller - The new key's controller
+   * @param {PublicKey} public_key -The new public key
+   * @param {Signature} signature - Signature from existing key
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   updateKey(did, controller, public_key, signature) {
@@ -54,7 +54,7 @@ class DIDModule {
   /**
    * Removes an already registered DID on the Dock chain.
    * @param {string} did - DID
-   * @param {string} signature - DID Creator signature
+   * @param {Signature} signature - Signature from existing key
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   remove(did, signature) {

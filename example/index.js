@@ -3,6 +3,7 @@ import {Keyring} from '@polkadot/api';
 
 // Import Dock SDK
 import dock from '../src/dock-sdk';
+import {PublicKey} from '../src/dock-sdk';
 
 // Initialise Dock SDK
 const didIdentifier = '0x2bb29852687a7cbff311dc26e67451332bb29852687a7cbff311dc26e6745133';
@@ -22,9 +23,7 @@ async function onConnected() {
   const account = keyring.addFromUri('//Alice', {name: 'Alice'});
 
   const controller = '0x6666666666666666666666666666666666666666666666666666666666666666';
-  const publicKey = {
-    Sr25519: '0x9999999999999999999999999999999999999999999999999999999999999999',
-  };
+  const publicKey = PublicKey.newSr25519('0x9999999999999999999999999999999999999999999999999999999999999999');
 
 
   console.log('Submitting new DID', didIdentifier, controller, publicKey);

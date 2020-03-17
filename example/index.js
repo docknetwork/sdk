@@ -11,8 +11,8 @@ async function onDIDCreated() {
   console.log('Transaction finalized.');
 
   // Check if DID exists
-  const result = await dock.did.get(didIdentifier);
-  console.log('DID:', result);
+  const result = await dock.did.getDocument(didIdentifier);
+  console.log('DID Document:', JSON.stringify(result, true, 2));
   process.exit();
 }
 
@@ -35,4 +35,4 @@ async function onConnected() {
 
 // Connect to the node and start working with it
 dock.init('ws://127.0.0.1:9944')
-  .then(onConnected);
+  .then(onDIDCreated);

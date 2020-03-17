@@ -59,20 +59,29 @@ class DIDModule {
   }
 
   /**
+   * Create the fully qualified DID like "did:dock:..."
+   * @param {string} did - DID
+   * @return {string} The DID identifer.
+   */
+  getID(did) {
+    return `${DockDIDQualifier}:${did}`;
+  }
+
+  /**
    * Gets a DID from the Dock chain and create a DID document according to W3C spec.
    * @param {string} did - DID
    * @return {object} The DID.
    */
-  async get(did) {
+  async getDocument(did) {
     // TODO: Convert DID and pk to base58
     const resp = await this.api.query.didModule.dids(did);
     if (resp) {
       if (resp.isSome) {
         const detail = resp.unwrap()[0];
-        // Create the fully qualified DID like "did:dock:..."
-        const id = `${DockDIDQualifier}:${did}`;
+        const id = this.getID(did);
 
         // Determine the type of the public key
+        // TODO: move to publickey getType method once abstraction exists
         let type, publicKeyBase58;
         if (detail.public_key.isSr25519) {
           type = 'Sr25519VerificationKey2018';
@@ -86,20 +95,26 @@ class DIDModule {
         }
 
         // The DID has only one key as of now.
-        const publicKey = [{
-          'id': `${id}#keys-1`,
+        const authentication = [{
+          id: `${id}#keys-1`,
           type,
-          'controller': `${DockDIDQualifier}:${detail.controller}`,
-          publicKeyBase58
+          controller: `${DockDIDQualifier}:${detail.controller}`,
+          publicKeyBase58,
+          publicKeyPem: "-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n",
         }];
 
-        const authentication = publicKey.map(key => key.id);
+        const service = [{
+          id: `${id}#vcs`,
+          type: "VerifiableCredentialService",
+          serviceEndpoint: "https://dock.io/vc/"
+        }];
 
+        // TODO: ensure matching full spec https://www.w3.org/TR/did-core/
         return {
-          '@context': ['https://www.w3.org/ns/did/v1'],
+          '@context': 'https://www.w3.org/ns/did/v1',
           id,
-          publicKey,
-          authentication
+          authentication,
+          service,
         };
       } else {
         throw 'Could not find DID: ' + did;

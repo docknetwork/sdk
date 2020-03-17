@@ -1,10 +1,16 @@
 import {ApiPromise, WsProvider} from '@polkadot/api';
-import { cryptoWaitReady } from '@polkadot/util-crypto';
+import {cryptoWaitReady} from '@polkadot/util-crypto';
 
-import {PublicKey, PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from './public-key';
 import RevocationModule from './modules/revocation';
 import DIDModule from './modules/did';
 import types from './types.json';
+
+import {
+  PublicKey,
+  PublicKeySr25519,
+  PublicKeyEd25519,
+  PublicKeySecp256k1
+} from './public-key';
 
 /** Helper class to interact with the Dock chain */
 class DockSDK {
@@ -17,6 +23,11 @@ class DockSDK {
     this.address = address;
   }
 
+  /**
+   * Initialises the SDK and connects to the node
+   * @param {Account} address - Optional WebSocket address
+   * @return {Promise} Promise for when SDK is ready for use
+   */
   async init(address) {
     this.address = address || this.address;
 

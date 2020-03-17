@@ -109,7 +109,6 @@ class DIDModule {
           serviceEndpoint: "https://dock.io/vc/"
         }];
 
-        // TODO: ensure matching full spec https://www.w3.org/TR/did-core/
         return {
           '@context': 'https://www.w3.org/ns/did/v1',
           id,

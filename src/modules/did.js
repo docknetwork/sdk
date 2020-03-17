@@ -1,5 +1,11 @@
 const DockDIDQualifier = 'did:dock';
 
+const signatureHeaders = {
+  Sr25519VerificationKey2018: 'Sr25519SignatureAuthentication2018',
+  Ed25519VerificationKey2018: 'Ed25519SignatureAuthentication2018',
+  EcdsaSecp256k1VerificationKey2019: 'EcdsaSecp256k1SignatureAuthentication2019',
+};
+
 /** Class to create, update and destroy DIDs */
 class DIDModule {
   /**
@@ -59,20 +65,29 @@ class DIDModule {
   }
 
   /**
+   * Create the fully qualified DID like "did:dock:..."
+   * @param {string} did - DID
+   * @return {string} The DID identifer.
+   */
+  getFullyQualifiedDID(did) {
+    return `${DockDIDQualifier}:${did}`;
+  }
+
+  /**
    * Gets a DID from the Dock chain and create a DID document according to W3C spec.
    * @param {string} did - DID
    * @return {object} The DID.
    */
-  async get(did) {
+  async getDocument(did) {
     // TODO: Convert DID and pk to base58
     const resp = await this.api.query.didModule.dids(did);
     if (resp) {
       if (resp.isSome) {
         const detail = resp.unwrap()[0];
-        // Create the fully qualified DID like "did:dock:..."
-        const id = `${DockDIDQualifier}:${did}`;
+        const id = this.getFullyQualifiedDID(did);
 
         // Determine the type of the public key
+        // TODO: move to publickey getType method once abstraction exists
         let type, publicKeyBase58;
         if (detail.public_key.isSr25519) {
           type = 'Sr25519VerificationKey2018';
@@ -86,20 +101,36 @@ class DIDModule {
         }
 
         // The DID has only one key as of now.
-        const publicKey = [{
-          'id': `${id}#keys-1`,
+        const publicKey = {
+          id: `${id}#keys-1`,
           type,
-          'controller': `${DockDIDQualifier}:${detail.controller}`,
-          publicKeyBase58
-        }];
+          controller: `${DockDIDQualifier}:${detail.controller}`,
+          publicKeyBase58,
+          // publicKeyPem: '-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n', // TODO: add proper value
+        };
 
-        const authentication = publicKey.map(key => key.id);
+        // Set keys and authentication reference
+        const publicKeys = [publicKey];
+        const authentication = publicKeys.map(key => {
+          return {
+            type: signatureHeaders[key.type],
+            publicKey: [key.id]
+          };
+        });
+
+        // TODO: setup proper service when we have it
+        // const service = [{
+        //   id: `${id}#vcs`,
+        //   type: 'VerifiableCredentialService',
+        //   serviceEndpoint: 'https://dock.io/vc/'
+        // }];
 
         return {
-          '@context': ['https://www.w3.org/ns/did/v1'],
+          '@context': 'https://www.w3.org/ns/did/v1',
           id,
-          publicKey,
-          authentication
+          authentication,
+          publicKey: publicKeys
+          // service,
         };
       } else {
         throw 'Could not find DID: ' + did;

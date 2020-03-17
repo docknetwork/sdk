@@ -1,3 +1,5 @@
+import {isHexWithGivenByteSize} from './utils';
+
 class PublicKey {
   
   /**
@@ -6,7 +8,9 @@ class PublicKey {
    * @return {PublicKey} The PublicKey enum variant Sr25519.
    */
   static newSr25519(value) {
-    // TODO: Validate size of value
+    if (!isHexWithGivenByteSize(value, 32)) {
+      throw 'Public key must be 32 bytes';
+    }
     return {
       Sr25519: value,
     };
@@ -18,7 +22,9 @@ class PublicKey {
    * @return {PublicKey} The PublicKey enum variant Ed25519.
    */
   static newEd25519(value) {
-    // TODO: Validate size of value
+    if (!isHexWithGivenByteSize(value, 32)) {
+      throw 'Public key must be 32 bytes';
+    }
     return {
       Ed25519: value,
     };
@@ -30,7 +36,9 @@ class PublicKey {
    * @return {PublicKey} The PublicKey enum variant Secp256k1.
    */
   static newSecp256k1(value) {
-    // TODO: Validate size of value
+    if (!isHexWithGivenByteSize(value, 33)) {
+      throw 'Public key must be 33 bytes';
+    }
     return {
       Secp256k1: value,
     };

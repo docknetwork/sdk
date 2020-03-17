@@ -1,0 +1,3 @@
+class Signature {
+  // TODO:
+}

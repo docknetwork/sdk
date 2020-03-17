@@ -95,14 +95,15 @@ class DIDModule {
         }
 
         // The DID has only one key as of now.
-        const authentication = [{
+        const publicKey = {
           id: `${id}#keys-1`,
           type,
           controller: `${DockDIDQualifier}:${detail.controller}`,
           publicKeyBase58,
           publicKeyPem: '-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n', // TODO: add proper value
-        }];
+        };
 
+        const authentication = [publicKey];
         const service = [{
           id: `${id}#vcs`,
           type: 'VerifiableCredentialService',

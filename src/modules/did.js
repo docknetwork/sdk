@@ -104,17 +104,19 @@ class DIDModule {
         };
 
         const authentication = [publicKey];
-        const service = [{
-          id: `${id}#vcs`,
-          type: 'VerifiableCredentialService',
-          serviceEndpoint: 'https://dock.io/vc/' // TODO: setup proper service when we have it
-        }];
+
+        // TODO: setup proper service when we have it
+        // const service = [{
+        //   id: `${id}#vcs`,
+        //   type: 'VerifiableCredentialService',
+        //   serviceEndpoint: 'https://dock.io/vc/'
+        // }];
 
         return {
           '@context': 'https://www.w3.org/ns/did/v1',
           id,
           authentication,
-          service,
+          // service,
         };
       } else {
         throw 'Could not find DID: ' + did;

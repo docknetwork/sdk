@@ -100,13 +100,13 @@ class DIDModule {
           type,
           controller: `${DockDIDQualifier}:${detail.controller}`,
           publicKeyBase58,
-          publicKeyPem: "-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n",
+          publicKeyPem: '-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n', // TODO: add proper value
         }];
 
         const service = [{
           id: `${id}#vcs`,
-          type: "VerifiableCredentialService",
-          serviceEndpoint: "https://dock.io/vc/"
+          type: 'VerifiableCredentialService',
+          serviceEndpoint: 'https://dock.io/vc/' // TODO: setup proper service when we have it
         }];
 
         return {

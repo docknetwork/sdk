@@ -1,9 +1,6 @@
-const DockDIDQualifier = 'did:dock';
-// Byte size of the Dock DID identifier, i.e. the `DockDIDQualifier` is not counted.
-const DockDIDByteSize = 32;
-
 import {isHexWithGivenByteSize} from '../utils';
 
+const DockDIDQualifier = 'did:dock';
 const signatureHeaders = {
   Sr25519VerificationKey2018: 'Sr25519SignatureAuthentication2018',
   Ed25519VerificationKey2018: 'Ed25519SignatureAuthentication2018',
@@ -16,6 +13,8 @@ const signatureHeaders = {
  * @return {null} Throws exception if invalid identifier
  */
 function validateDockDIDIdentifier(did) {
+  // Byte size of the Dock DID identifier, i.e. the `DockDIDQualifier` is not counted.
+  const DockDIDByteSize = 32;
   if (!isHexWithGivenByteSize(did, DockDIDByteSize)) {
     throw `DID identifier must be ${DockDIDByteSize} bytes`;
   }

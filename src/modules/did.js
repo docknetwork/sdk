@@ -1,5 +1,11 @@
 const DockDIDQualifier = 'did:dock';
 
+const signatureHeaders = {
+  Sr25519VerificationKey2018: 'Sr25519SignatureAuthentication2018',
+  Ed25519VerificationKey2018: 'Ed25519SignatureAuthentication2018',
+  EcdsaSecp256k1VerificationKey2019: 'EcdsaSecp256k1SignatureAuthentication2019',
+};
+
 /** Class to create, update and destroy DIDs */
 class DIDModule {
   /**
@@ -100,10 +106,17 @@ class DIDModule {
           type,
           controller: `${DockDIDQualifier}:${detail.controller}`,
           publicKeyBase58,
-          publicKeyPem: '-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n', // TODO: add proper value
+          // publicKeyPem: '-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n', // TODO: add proper value
         };
 
-        const authentication = [publicKey];
+        // Set keys and authentication reference
+        const publicKeys = [publicKey];
+        const authentication = publicKeys.map(key => {
+          return {
+            type: signatureHeaders[key.type],
+            publicKey: [key.id]
+          };
+        });
 
         // TODO: setup proper service when we have it
         // const service = [{
@@ -116,6 +129,7 @@ class DIDModule {
           '@context': 'https://www.w3.org/ns/did/v1',
           id,
           authentication,
+          publicKey: publicKeys
           // service,
         };
       } else {

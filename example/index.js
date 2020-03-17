@@ -35,4 +35,4 @@ async function onConnected() {
 
 // Connect to the node and start working with it
 dock.init('ws://127.0.0.1:9944')
-  .then(onDIDCreated);
+  .then(onConnected);

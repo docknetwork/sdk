@@ -2,7 +2,7 @@ const DockDIDQualifier = 'did:dock';
 // Byte size of the Dock DID identifier, i.e. the `DockDIDQualifier` is not counted.
 const DockDIDByteSize = 32;
 
-import {isHexWithGivenByteSize} from './utils';
+import {isHexWithGivenByteSize} from '../utils';
 
 const signatureHeaders = {
   Sr25519VerificationKey2018: 'Sr25519SignatureAuthentication2018',

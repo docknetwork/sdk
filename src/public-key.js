@@ -1,9 +1,9 @@
 import {isHexWithGivenByteSize} from './utils';
 
 class PublicKey {
-  
+
   /**
-   * Creates a new PublicKey object. Validates the given value. Currently supported key 
+   * Creates a new PublicKey object. Validates the given value. Currently supported key
    * types only require validating the byte size.
    * @param {string} value - Value of the public key. This is validated
    * @return {PublicKey} The PublicKey object if the given value is valid.
@@ -13,8 +13,9 @@ class PublicKey {
     this.value = value;
   }
 
-  /* Check that the given public key has the expected byte size. Assumes the public key is in hex.
-  */
+  /**
+   * Check that the given public key has the expected byte size. Assumes the public key is in hex.
+   */
   validateByteSize(value, expectedByteSize) {
     if (!isHexWithGivenByteSize(value, expectedByteSize)) {
       throw `Public key must be ${expectedByteSize} bytes`;
@@ -22,7 +23,7 @@ class PublicKey {
   }
 
   /**
-   * @return {PublicKey} The correct PublicKey enum variant. The extending class should implement it.
+   * @return {PublicKey} The correct PublicKey JSON variant. The extending class should implement it.
    */
   toJSON() {
     throw 'Not implemented. The extending class should implement it';
@@ -31,11 +32,11 @@ class PublicKey {
 
 class PublicKeySr25519 extends PublicKey {
   constructor(value) {
-    super(value, 32); 
+    super(value, 32);
   }
 
   /**
-   * @return {PublicKeySr25519} The PublicKey enum variant Sr25519.
+   * @return {PublicKeySr25519} The PublicKey JSON variant Sr25519.
    */
   toJSON() {
     return {
@@ -46,11 +47,11 @@ class PublicKeySr25519 extends PublicKey {
 
 class PublicKeyEd25519 extends PublicKey {
   constructor(value) {
-    super(value, 32); 
+    super(value, 32);
   }
 
   /**
-   * @return {PublicKeySr25519} The PublicKey enum variant Ed25519.
+   * @return {PublicKeyEd25519} The PublicKey JSON variant Ed25519.
    */
   toJSON() {
     return {
@@ -61,11 +62,11 @@ class PublicKeyEd25519 extends PublicKey {
 
 class PublicKeySecp256k1 extends PublicKey {
   constructor(value) {
-    super(value, 33); 
+    super(value, 33);
   }
 
   /**
-   * @return {PublicKeySr25519} The PublicKey enum variant Secp256k1.
+   * @return {PublicKeySecp256k1} The PublicKey JSON variant Secp256k1.
    */
   toJSON() {
     return {

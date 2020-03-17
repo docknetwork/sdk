@@ -1,7 +1,8 @@
 import {ApiPromise, WsProvider} from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 
-import RevocationModule from './modules/did';
+import {PublicKey} from './modules/common';
+import RevocationModule from './modules/revocation';
 import DIDModule from './modules/did';
 import types from './types.json';
 
@@ -95,4 +96,5 @@ export {
   DockSDK,
   DIDModule,
   RevocationModule,
+  PublicKey
 };

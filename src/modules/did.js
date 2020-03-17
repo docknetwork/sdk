@@ -35,7 +35,7 @@ class DIDModule {
     DIDModule.validateDockDIDIdentifier(controller);
     return this.module.new(did, {
       controller,
-      public_key,
+      public_key: public_key.asEnum(),
     });
   }
 

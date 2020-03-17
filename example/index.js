@@ -28,7 +28,7 @@ async function onConnected() {
 
   console.log('Submitting new DID', didIdentifier, controller, publicKey);
 
-  const transaction = dock.did.new(didIdentifier, controller, publicKey.asEnum());
+  const transaction = dock.did.new(didIdentifier, controller, publicKey);
   dock.sendTransaction(account, transaction, onDIDCreated);
 }
 

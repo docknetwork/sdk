@@ -1,19 +1,24 @@
 import {isHexWithGivenByteSize} from './utils';
 
-const Sr25519ByteSize = 32;
-const Ed25519ByteSize = 32;
-const Secp256k1ByteSize = 33;
-
 class PublicKey {
   
   /**
-   * Creates a new PublicKey object.
+   * Creates a new PublicKey object. Validates the given value. Currently supported key 
+   * types only require validating the byte size.
    * @param {string} value - Value of the public key. This is validated
    * @return {PublicKey} The PublicKey object if the given value is valid.
    */
-  constructor(value) {
-    this.validate(value);
+  constructor(value, expectedByteSize) {
+    this.validateByteSize(value, expectedByteSize);
     this.value = value;
+  }
+
+  /* Check that the given public key has the expected byte size. Assumes the public key is in hex.
+  */
+  validateByteSize(value, expectedByteSize) {
+    if (!isHexWithGivenByteSize(value, expectedByteSize)) {
+      throw `Public key must be ${expectedByteSize} bytes`;
+    }
   }
 
   /**
@@ -25,10 +30,8 @@ class PublicKey {
 }
 
 class PublicKeySr25519 extends PublicKey {
-  validate(value) {
-    if (!isHexWithGivenByteSize(value, Sr25519ByteSize)) {
-      throw `Public key must be ${Sr25519ByteSize} bytes`;
-    }
+  constructor(value) {
+    super(value, 32); 
   }
 
   /**
@@ -42,10 +45,8 @@ class PublicKeySr25519 extends PublicKey {
 }
 
 class PublicKeyEd25519 extends PublicKey {
-  validate(value) {
-    if (!isHexWithGivenByteSize(value, Ed25519ByteSize)) {
-      throw `Public key must be ${Ed25519ByteSize} bytes`;
-    }
+  constructor(value) {
+    super(value, 32); 
   }
 
   /**
@@ -59,10 +60,8 @@ class PublicKeyEd25519 extends PublicKey {
 }
 
 class PublicKeySecp256k1 extends PublicKey {
-  validate(value) {
-    if (!isHexWithGivenByteSize(value, Secp256k1ByteSize)) {
-      throw `Public key must be ${Secp256k1ByteSize} bytes`;
-    }
+  constructor(value) {
+    super(value, 33); 
   }
 
   /**

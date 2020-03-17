@@ -10,6 +10,17 @@ const signatureHeaders = {
   EcdsaSecp256k1VerificationKey2019: 'EcdsaSecp256k1SignatureAuthentication2019',
 };
 
+/**
+ * Check if the given identifier is 32 byte hex
+ * @param {identifier} identifier - The identifier to check.
+ * @return {null} Throws exception if invalid identifier
+ */
+function validateDockDIDIdentifier(did) {
+  if (!isHexWithGivenByteSize(did, DockDIDByteSize)) {
+    throw `DID identifier must be ${DockDIDByteSize} bytes`;
+  }
+}
+
 /** Class to create, update and destroy DIDs */
 class DIDModule {
   /**
@@ -31,8 +42,8 @@ class DIDModule {
    */
   new(did, controller, public_key) {
     // Controller and did should be valid Dock DIDs
-    DIDModule.validateDockDIDIdentifier(did);
-    DIDModule.validateDockDIDIdentifier(controller);
+    validateDockDIDIdentifier(did);
+    validateDockDIDIdentifier(controller);
     return this.module.new(did, {
       controller,
       public_key: public_key.toJSON(),
@@ -48,9 +59,9 @@ class DIDModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   updateKey(did, signature, public_key, controller) {
-    DIDModule.validateDockDIDIdentifier(did);
+    validateDockDIDIdentifier(did);
     if (controller) {
-      DIDModule.validateDockDIDIdentifier(controller);
+      validateDockDIDIdentifier(controller);
     }
     const keyUpdate = {
       did,
@@ -69,7 +80,7 @@ class DIDModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   remove(did, signature) {
-    DIDModule.validateDockDIDIdentifier(did);
+    validateDockDIDIdentifier(did);
     return this.module.remove({
       did,
       last_modified_in_block: 0,
@@ -149,17 +160,6 @@ class DIDModule {
       }
     } else {
       throw 'Got null response';
-    }
-  }
-
-  /**
-   * Check if the given identifier is 32 byte hex
-   * @param {identifier} identifier - The identifier to check.
-   * @return {null} Throws exception if invalid identifier
-   */
-  static validateDockDIDIdentifier(did) {
-    if (!isHexWithGivenByteSize(did, DockDIDByteSize)) {
-      throw `DID identifier must be ${DockDIDByteSize} bytes`;
     }
   }
 }

@@ -15,6 +15,13 @@ class PublicKey {
     this.validate(value);
     this.value = value;
   }
+
+  /**
+   * @return {PublicKey} The correct PublicKey enum variant. The extending class should implement it.
+   */
+  asEnum() {
+    throw 'Not implemented. The extending class should implement it';
+  }
 }
 
 class PublicKeySr25519 extends PublicKey {
@@ -25,7 +32,7 @@ class PublicKeySr25519 extends PublicKey {
   }
 
   /**
-   * @return {PublicKey} The PublicKey enum variant Sr25519.
+   * @return {PublicKeySr25519} The PublicKey enum variant Sr25519.
    */
   asEnum() {
     return {
@@ -42,7 +49,7 @@ class PublicKeyEd25519 extends PublicKey {
   }
 
   /**
-   * @return {PublicKey} The PublicKey enum variant Ed25519.
+   * @return {PublicKeySr25519} The PublicKey enum variant Ed25519.
    */
   asEnum() {
     return {
@@ -59,7 +66,7 @@ class PublicKeySecp256k1 extends PublicKey {
   }
 
   /**
-   * @return {PublicKey} The PublicKey enum variant Secp256k1.
+   * @return {PublicKeySr25519} The PublicKey enum variant Secp256k1.
    */
   asEnum() {
     return {

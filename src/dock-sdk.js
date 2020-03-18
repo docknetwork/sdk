@@ -58,7 +58,6 @@ class DockSDK {
     this.account = account;
   }
 
-
   /**
    * Gets the current account used to sign transactions
    * @return {Account} PolkadotJS Keyring account
@@ -66,10 +65,22 @@ class DockSDK {
   getAccount() {
     // If no account use Alice, dev purposes, temporary
     if (!this.account) {
-      const keyring = new Keyring({type: 'sr25519'});
-      this.account = keyring.addFromUri('//Alice', {name: 'Alice'});
+      this.account = this.keyring.addFromUri('//Alice', {name: 'Alice'});
     }
     return this.account;
+  }
+
+
+  /**
+   * Gets the keyring
+   * @return {Keyring} PolkadotJS Keyring
+   */
+  get keyring() {
+    if (!this._keyring) {
+      this._keyring = new Keyring({type: 'sr25519'});
+    }
+
+    return this._keyring;
   }
 
   /**

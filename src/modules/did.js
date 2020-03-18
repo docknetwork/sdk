@@ -103,7 +103,8 @@ class DIDModule {
   async getDocument(did) {
     // TODO: Convert DID and pk to base58
 
-    const [detail, _] = await this.getDetail(did);  // eslint-disable-line no-unused-vars
+    const detail = await this.getDetail(did)[0];
+
     const id = this.getFullyQualifiedDID(did);
 
     // Determine the type of the public key

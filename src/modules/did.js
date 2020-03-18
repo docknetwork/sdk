@@ -103,7 +103,7 @@ class DIDModule {
   async getDocument(did) {
     // TODO: Convert DID and pk to base58
 
-    const detail = await this.getDetail(did)[0];
+    const detail = (await this.getDetail(did))[0];
 
     const id = this.getFullyQualifiedDID(did);
 

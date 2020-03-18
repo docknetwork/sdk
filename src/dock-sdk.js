@@ -1,4 +1,4 @@
-import {ApiPromise, WsProvider} from '@polkadot/api';
+import {ApiPromise, WsProvider, Keyring} from '@polkadot/api';
 import {cryptoWaitReady} from '@polkadot/util-crypto';
 
 import RevocationModule from './modules/revocation';
@@ -50,13 +50,36 @@ class DockSDK {
   }
 
   /**
+   * Sets the account used to sign transactions
+   * @param {Account} account - PolkadotJS Keyring account
+   * @param {function} onComplete - On complete callback, temporary
+   */
+  setAccount(account) {
+    this.account = account;
+  }
+
+
+  /**
+   * Gets the current account used to sign transactions
+   * @return {Account} PolkadotJS Keyring account
+   */
+  getAccount() {
+    // If no account use Alice, dev purposes, temporary
+    if (!this.account) {
+      const keyring = new Keyring({type: 'sr25519'});
+      this.account = keyring.addFromUri('//Alice', {name: 'Alice'});
+    }
+    return this.account;
+  }
+
+  /**
    * Helper function to send transaction
-   * @param {Account} account - Keyring Account
    * @param {Extrinsic} extrinsic - Extrinsic to send
    * @param {function} onComplete - On complete callback, temporary
-   * @return {null} 
+   * @return {Promise}
    */
-  async sendTransaction(account, extrinsic, onComplete) {
+  async sendTransaction(extrinsic, onComplete) {
+    const account = this.getAccount();
     // TODO: refactor into a promise not oncomplete callback and fix error handling, throw a promise error if transaction failed
     const unsub = await extrinsic
       .signAndSend(account, ({events = [], status}) => {

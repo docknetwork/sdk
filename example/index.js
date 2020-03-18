@@ -1,6 +1,3 @@
-// Import PolkadotJS keyring
-import {Keyring} from '@polkadot/api';
-
 // Import crypto utils
 import {randomAsHex} from '@polkadot/util-crypto';
 
@@ -22,17 +19,13 @@ async function onDIDCreated() {
 
 // Called when connected to the node
 async function onConnected() {
-  const keyring = new Keyring({type: 'sr25519'});
-  const account = keyring.addFromUri('//Alice', {name: 'Alice'});
-  
   const controller = randomAsHex(32);
   const publicKey = new PublicKeySr25519('0x9999999999999999999999999999999999999999999999999999999999999999');
-
 
   console.log('Submitting new DID', didIdentifier, controller, publicKey);
 
   const transaction = dock.did.new(didIdentifier, controller, publicKey);
-  dock.sendTransaction(account, transaction, onDIDCreated);
+  dock.sendTransaction(transaction, onDIDCreated);
 }
 
 // // Initialise Dock SDK, connect to the node and start working with it

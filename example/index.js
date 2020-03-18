@@ -25,7 +25,11 @@ async function onConnected() {
   console.log('Submitting new DID', didIdentifier, controller, publicKey);
 
   const transaction = dock.did.new(didIdentifier, controller, publicKey);
-  dock.sendTransaction(transaction, onDIDCreated);
+  dock.sendTransaction(transaction)
+    .then(onDIDCreated)
+    .catch(error => {
+      console.error('Error when sending transaction!', error);
+    });
 }
 
 // // Initialise Dock SDK, connect to the node and start working with it

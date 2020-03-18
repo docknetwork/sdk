@@ -36,16 +36,16 @@ class DIDModule {
    * Creates a new DID on the Dock chain.
    * @param {string} did - The new DID
    * @param {string} controller - The DID of the public key's controller
-   * @param {PublicKey} public_key - A public key associated with the DID
+   * @param {PublicKey} publicKey - A public key associated with the DID
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  new(did, controller, public_key) {
+  new(did, controller, publicKey) {
     // Controller and did should be valid Dock DIDs
     validateDockDIDIdentifier(did);
     validateDockDIDIdentifier(controller);
     return this.module.new(did, {
       controller,
-      public_key: public_key.toJSON(),
+      public_key: publicKey.toJSON(),
     });
   }
 
@@ -53,11 +53,11 @@ class DIDModule {
    * Updates the details of an already registered DID on the Dock chain.
    * @param {string} did - DID
    * @param {Signature} signature - Signature from existing key
-   * @param {PublicKey} public_key -The new public key
+   * @param {PublicKey} publicKey -The new public key
    * @param {optional string} controller - The new key's controller
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  updateKey(did, signature, public_key, controller) {
+  updateKey(did, signature, publicKey, controller) {
     validateDockDIDIdentifier(did);
     if (controller) {
       validateDockDIDIdentifier(controller);
@@ -65,7 +65,7 @@ class DIDModule {
     const keyUpdate = {
       did,
       controller,
-      public_key,
+      public_key: publicKey.toJSON(),
       last_modified_in_block: 0,
     };
 

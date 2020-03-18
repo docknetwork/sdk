@@ -29,6 +29,10 @@ class DockSDK {
    * @return {Promise} Promise for when SDK is ready for use
    */
   async init(address) {
+    if (this.api) {
+      throw new Error('API is already connected');
+    }
+
     this.address = address || this.address;
 
     this.api = await ApiPromise.create({

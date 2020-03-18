@@ -173,12 +173,12 @@ class DIDModule {
       throw 'Could not find DID: ' + did;
     }
 
-    const resp_tuple = resp.unwrap();
-    if (resp_tuple.length != 2) {
-      throw 'Needed 2 items in response but got' + resp_tuple.length;
+    const respTuple = resp.unwrap();
+    if (respTuple.length != 2) {
+      throw 'Needed 2 items in response but got' + respTuple.length;
     }
 
-    return [resp_tuple[0], resp_tuple[1]];
+    return [respTuple[0], respTuple[1].toNumber()];
   }
 }
 

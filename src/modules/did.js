@@ -102,8 +102,8 @@ class DIDModule {
    */
   async getDocument(did) {
     // TODO: Convert DID and pk to base58
-    
-    const [detail, _] = await this.getDetail(did);
+
+    const [detail, _] = await this.getDetail(did);  // eslint-disable-line no-unused-vars
     const id = this.getFullyQualifiedDID(did);
 
     // Determine the type of the public key
@@ -155,15 +155,15 @@ class DIDModule {
   }
 
   /**
-   * Gets the key detail and block number in which the DID was last modified from 
-   * the chain and return them. It will throw error if the DID does not exist on 
+   * Gets the key detail and block number in which the DID was last modified from
+   * the chain and return them. It will throw error if the DID does not exist on
    * chain or chain returns null response.
    * @param {string} did - DID
-   * @return {array} A 2 element array with first 
+   * @return {array} A 2 element array with first
    */
   async getDetail(did) {
     const resp = await this.api.query.didModule.dids(did);
-    
+
     if (!resp) {
       throw 'Got null response';
     }
@@ -171,7 +171,7 @@ class DIDModule {
     if (resp.isNone) {
       throw 'Could not find DID: ' + did;
     }
-    
+
     const resp_tuple = resp.unwrap();
     if (resp_tuple.length != 2) {
       throw 'Needed 2 items in response but got' + resp_tuple.length;

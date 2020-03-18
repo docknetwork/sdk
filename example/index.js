@@ -18,16 +18,20 @@ async function onDIDCreated() {
 }
 
 // Called when connected to the node
-async function onConnected() {
+function onConnected() {
   const controller = randomAsHex(32);
   const publicKey = new PublicKeySr25519('0x9999999999999999999999999999999999999999999999999999999999999999');
 
   console.log('Submitting new DID', didIdentifier, controller, publicKey);
 
   const transaction = dock.did.new(didIdentifier, controller, publicKey);
-  dock.sendTransaction(transaction, onDIDCreated);
+  return dock.sendTransaction(transaction);
 }
 
 // // Initialise Dock SDK, connect to the node and start working with it
 dock.init('ws://127.0.0.1:9944')
-  .then(onConnected);
+  .then(onConnected)
+  .then(onDIDCreated)
+  .catch(error => {
+    console.error('Error occured somewhere, it was caught!', error);
+  });

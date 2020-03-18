@@ -86,37 +86,31 @@ class DockSDK {
   /**
    * Helper function to send transaction
    * @param {Extrinsic} extrinsic - Extrinsic to send
-   * @param {function} onComplete - On complete callback, temporary
+   * @param {bool} shouldUnsubscribe - Should we automatically unsubscribe from the transaction after its finalized
    * @return {Promise}
    */
-  async sendTransaction(extrinsic, onComplete) {
-    const account = this.getAccount();
-    // TODO: refactor into a promise not oncomplete callback and fix error handling, throw a promise error if transaction failed
-    const unsub = await extrinsic
-      .signAndSend(account, ({events = [], status}) => {
-        // console.log(`Current status is ${status.type}`, status);
-
-        if (status.isFinalized) {
-          // console.log(
-          //   `Transaction included at blockHash ${status.asFinalized}`
-          // );
-
-          // Loop through Vec<EventRecord> to display all events
-          // events.forEach(({phase, event: {data, method, section}}) => {
-          // console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-          // });
-
-          unsub();
-
-          if (onComplete) {
-            onComplete(events);
-          }
-        }
-      })
-      .catch(error => {
-        throw 'error ' + error;
-        // console.error('error', error);
-      });
+  async sendTransaction(extrinsic, shouldUnsubscribe = true) {
+    return new Promise((resolve, reject) => {
+      const account = this.getAccount();
+      let unsubFunc = null;
+      try {
+        extrinsic
+          .signAndSend(account, ({events = [], status}) => {
+            if (status.isFinalized) {
+              if (shouldUnsubscribe && unsubFunc) {
+                unsubFunc();
+              }
+              resolve(events, status);
+            }
+          })
+          .catch(error => reject(error))
+          .then(unsub => {
+            unsubFunc = unsub;
+          });
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 
   /**

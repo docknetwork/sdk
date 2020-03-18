@@ -32,20 +32,21 @@ async function postDIDKeyUpdated() {
   const account = globalKeyring.addFromUri('//Bob', {name: 'Bob'});
 
   // Get DID details. This call will fail if DID is not written already
-  const last_modified_in_block = await dock.did.getDetail(didIdentifier)[1];
+  const resp = await dock.did.getDetail(didIdentifier);
+  const last_modified_in_block = resp[1];
 
-  //const keyring = new Keyring();
   // Sign key update with this key pair as this is the current key of the DID
   const currentPair = globalKeyring.addFromUri(firstKeySeed, null, 'sr25519');
 
   const serializedDIDRemoval = dock.did.getSerializedDIDRemoval(didIdentifier, last_modified_in_block);
   console.log(last_modified_in_block);
   const signature = new SignatureSr25519(u8aToHex(currentPair.sign(serializedDIDRemoval)));
-  //const signature = new SignatureSr25519('0xd0b107896083ff8235d8fdab35247203e03f65c5e67c2df9204a1a0ce4658f78d0b107896083ff8235d8fdab35247203e03f65c5e67c2df9204a1a0ce4658f78');
 
   const transaction = dock.did.remove(didIdentifier, signature, last_modified_in_block);
-  console.log(transaction);
-  dock.sendTransaction(account, transaction, onDIDCreated);
+  dock.sendTransaction(account, transaction, async function () {
+    await onDIDCreated();
+    process.exit();
+  });
 
   //process.exit();
 }
@@ -54,18 +55,17 @@ async function postDIDKeyUpdated() {
 async function postDIDWritten() {
   console.log('Updating key now.');
 
-  const keyring2 = new Keyring();
-  const account = keyring2.addFromUri('//Bob', {name: 'Bob'});
+  const account = globalKeyring.addFromUri('//Bob', {name: 'Bob'});
 
   // Get DID details. This call will fail if DID is not written already
-  const [detail, last_modified_in_block] = await dock.did.getDetail(didIdentifier);
+  const last_modified_in_block = await dock.did.getDetail(didIdentifier)[1];
 
-  const keyring = new Keyring();
+  //const keyring = new Keyring();
   // Sign key update with this key pair as this is the current key of the DID
-  const currentPair = keyring.addFromUri(firstKeySeed, null, 'sr25519');
+  const currentPair = globalKeyring.addFromUri(firstKeySeed, null, 'sr25519');
 
   // Update DID key to the following
-  const newPair = keyring.addFromUri(secondKeySeed, null, 'sr25519');
+  const newPair = globalKeyring.addFromUri(secondKeySeed, null, 'sr25519');
   const newPk = new PublicKeyEd25519(u8aToHex(newPair.publicKey));
   const newController = randomAsHex(32);
 
@@ -75,8 +75,8 @@ async function postDIDWritten() {
   console.log('Submitting key update');
 
   const transaction = dock.did.updateKey(didIdentifier, signature, newPk, last_modified_in_block, newController);
-  console.log(transaction);
-  dock.sendTransaction(account, transaction, onDIDCreated);
+  //console.log(transaction);
+  dock.sendTransaction(account, transaction, postDIDKeyUpdated);
 }
 
 async function onDIDCreated() {
@@ -85,7 +85,7 @@ async function onDIDCreated() {
   // Check if DID exists
   const result = await dock.did.getDocument(didIdentifier);
   console.log('DID Document:', JSON.stringify(result, true, 2));
-  await postDIDKeyUpdated();
+  await postDIDWritten();
 }
 
 // Called when connected to the node

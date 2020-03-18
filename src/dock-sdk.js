@@ -52,13 +52,13 @@ class DockSDK {
   /**
    * Helper function to send transaction
    * @param {Account} account - Keyring Account
-   * @param {Extrinsic} transfer - Extrinsic to send
+   * @param {Extrinsic} extrinsic - Extrinsic to send
    * @param {function} onComplete - On complete callback, temporary
-   * @return {Extrinsic} The extrinsic to sign and send.
+   * @return {null} 
    */
-  async sendTransaction(account, transfer, onComplete) {
+  async sendTransaction(account, extrinsic, onComplete) {
     // TODO: refactor into a promise not oncomplete callback and fix error handling, throw a promise error if transaction failed
-    const unsub = await transfer
+    const unsub = await extrinsic
       .signAndSend(account, ({events = [], status}) => {
         // console.log(`Current status is ${status.type}`, status);
 

@@ -102,64 +102,82 @@ class DIDModule {
    */
   async getDocument(did) {
     // TODO: Convert DID and pk to base58
-    const resp = await this.api.query.didModule.dids(did);
-    if (resp) {
-      if (resp.isSome) {
-        const detail = resp.unwrap()[0];
-        const id = this.getFullyQualifiedDID(did);
+    
+    const [detail, _] = await this.getDetail(did);
+    const id = this.getFullyQualifiedDID(did);
 
-        // Determine the type of the public key
-        // TODO: move to publickey getType method once abstraction exists
-        let type, publicKeyBase58;
-        if (detail.public_key.isSr25519) {
-          type = 'Sr25519VerificationKey2018';
-          publicKeyBase58 = detail.public_key.asSr25519;
-        } else if (detail.public_key.isEd25519) {
-          type = 'Ed25519VerificationKey2018';
-          publicKeyBase58 = detail.public_key.asEd25519;
-        } else {
-          type = 'EcdsaSecp256k1VerificationKey2019';
-          publicKeyBase58 = detail.public_key.asSecp256K1;
-        }
-
-        // The DID has only one key as of now.
-        const publicKey = {
-          id: `${id}#keys-1`,
-          type,
-          controller: `${DockDIDQualifier}:${detail.controller}`,
-          publicKeyBase58,
-          // publicKeyPem: '-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n', // TODO: add proper value
-        };
-
-        // Set keys and authentication reference
-        const publicKeys = [publicKey];
-        const authentication = publicKeys.map(key => {
-          return {
-            type: signatureHeaders[key.type],
-            publicKey: [key.id]
-          };
-        });
-
-        // TODO: setup proper service when we have it
-        // const service = [{
-        //   id: `${id}#vcs`,
-        //   type: 'VerifiableCredentialService',
-        //   serviceEndpoint: 'https://dock.io/vc/'
-        // }];
-
-        return {
-          '@context': 'https://www.w3.org/ns/did/v1',
-          id,
-          authentication,
-          publicKey: publicKeys
-          // service,
-        };
-      } else {
-        throw 'Could not find DID: ' + did;
-      }
+    // Determine the type of the public key
+    // TODO: move to publickey getType method once abstraction exists
+    let type, publicKeyBase58;
+    if (detail.public_key.isSr25519) {
+      type = 'Sr25519VerificationKey2018';
+      publicKeyBase58 = detail.public_key.asSr25519;
+    } else if (detail.public_key.isEd25519) {
+      type = 'Ed25519VerificationKey2018';
+      publicKeyBase58 = detail.public_key.asEd25519;
     } else {
+      type = 'EcdsaSecp256k1VerificationKey2019';
+      publicKeyBase58 = detail.public_key.asSecp256K1;
+    }
+
+    // The DID has only one key as of now.
+    const publicKey = {
+      id: `${id}#keys-1`,
+      type,
+      controller: `${DockDIDQualifier}:${detail.controller}`,
+      publicKeyBase58,
+      // publicKeyPem: '-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n', // TODO: add proper value
+    };
+
+    // Set keys and authentication reference
+    const publicKeys = [publicKey];
+    const authentication = publicKeys.map(key => {
+      return {
+        type: signatureHeaders[key.type],
+        publicKey: [key.id]
+      };
+    });
+
+    // TODO: setup proper service when we have it
+    // const service = [{
+    //   id: `${id}#vcs`,
+    //   type: 'VerifiableCredentialService',
+    //   serviceEndpoint: 'https://dock.io/vc/'
+    // }];
+
+    return {
+      '@context': 'https://www.w3.org/ns/did/v1',
+      id,
+      authentication,
+      publicKey: publicKeys
+      // service,
+    };
+  }
+
+  /**
+   * Gets the key detail and block number in which the DID was last modified from 
+   * the chain and return them. It will throw error if the DID does not exist on 
+   * chain or chain returns null response.
+   * @param {string} did - DID
+   * @return {array} A 2 element array with first 
+   */
+  async getDetail(did) {
+    const resp = await this.api.query.didModule.dids(did);
+    
+    if (!resp) {
       throw 'Got null response';
     }
+
+    if (resp.isNone) {
+      throw 'Could not find DID: ' + did;
+    }
+    
+    const resp_tuple = resp.unwrap();
+    if (resp_tuple.length != 2) {
+      throw 'Needed 2 items in response but got' + resp_tuple.length;
+    }
+
+    return [resp_tuple[0], resp_tuple[1]];
   }
 }
 

@@ -1,8 +1,10 @@
 import dock from '../dist/client-sdk.cjs';
 
+const address = 'ws://34.217.96.186:9944';
+
 describe('Dock SDK', () => {
   test('Can connect to node', async () => {
-    await dock.init();
+    await dock.init(address);
     expect(!!dock.api).toBe(true);
   });
 

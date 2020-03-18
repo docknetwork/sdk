@@ -1,6 +1,4 @@
-import { createType } from '@polkadot/types';
-
-import {isHexWithGivenByteSize} from '../utils';
+import {isHexWithGivenByteSize, getBytesForStateChange} from '../utils';
 
 const DockDIDQualifier = 'did:dock';
 const signatureHeaders = {
@@ -181,22 +179,35 @@ class DIDModule {
   }
 
   /**
-   * Prepare a `KeyUpdate` for signing. It takes the fields of a `KeyUpdate`, wraps it in the `StateChange` enum
+   * Prepare a `KeyUpdate` for signing. It takes the fields of a `KeyUpdate`, wraps it in the `StateChange` enum and
+   * serializes it to bytes.
+   * @param {string} did - DID
+   * @param {PublicKey} publicKey - The new public key
+   * @param {number} last_modified_in_block - The block number when the DID was last modified.
+   * @param {string} controller - Controller DID
+   * @return {array} An array of Uint8
    */
-  getSerializedKeyUpdate(did, public_key, last_modified_in_block, controller) {
+  getSerializedKeyUpdate(did, publicKey, last_modified_in_block, controller) {
     const keyUpdate = {
       did,
-      public_key: public_key.toJSON(),
+      public_key: publicKey.toJSON(),
       controller,
       last_modified_in_block
     };
     const stateChange = {
       KeyUpdate: keyUpdate
     };
-    const sc = this.api.createType('StateChange', stateChange);
-    return sc.toU8a();
+
+    return getBytesForStateChange(this.api, stateChange);
   }
 
+  /**
+   * Prepare a `DidRemoval` for signing. It takes the fields of a `DidRemoval`, wraps it in the `StateChange` enum and
+   * serializes it to bytes.
+   * @param {string} did - DID
+   * @param {number} last_modified_in_block - The block number when the DID was last modified.
+   * @return {array} An array of Uint8
+   */
   getSerializedDIDRemoval(did, last_modified_in_block) {
     const remove = {
       did,
@@ -205,8 +216,8 @@ class DIDModule {
     const stateChange = {
       DidRemoval: remove
     };
-    const sc = this.api.createType('StateChange', stateChange);
-    return sc.toU8a();
+
+    return getBytesForStateChange(this.api, stateChange);
   }
 }
 

@@ -3,7 +3,7 @@ import {isHexWithGivenByteSize} from './utils';
 class Signature {
 
   /**
-   * Creates a new Signature object. Validates the given value. Currently supported signature
+   * Creates a new DidSignature object. Validates the given value. Currently supported signature
    * types only require validating the byte size.
    * @param {string} value - Value of the signature. This is validated
    * @return {Signature} The Signature object if the given value is valid.
@@ -23,7 +23,7 @@ class Signature {
   }
 
   /**
-   * @return {Signature} The correct Signature JSON variant. The extending class should implement it.
+   * @return {DidSignature} The correct DidSignature JSON variant. The extending class should implement it.
    */
   toJSON() {
     throw 'Not implemented. The extending class should implement it';
@@ -35,6 +35,9 @@ class SignatureSr25519 extends Signature {
     super(value, 64);
   }
 
+  /**
+   * @return {SignatureSr25519} The DidSignature JSON variant Sr25519.
+   */
   toJSON() {
     return {
       Sr25519: this.value,
@@ -47,6 +50,9 @@ class SignatureEd25519 extends Signature {
     super(value, 64);
   }
 
+  /**
+   * @return {SignatureEd25519} The DidSignature JSON variant Ed25519.
+   */
   toJSON() {
     return {
       Ed25519: this.value,

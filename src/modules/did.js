@@ -186,14 +186,14 @@ class DIDModule {
   getSerializedKeyUpdate(did, public_key, last_modified_in_block, controller) {
     const keyUpdate = {
       did,
-      public_key,
+      public_key: public_key.toJSON(),
       controller,
       last_modified_in_block
     };
     const stateChange = {
       KeyUpdate: keyUpdate
     };
-    const sc = this.api.registry.createType('StateChange', stateChange);
+    const sc = this.api.createType('StateChange', stateChange);
     return sc.toU8a();
   }
 
@@ -205,7 +205,7 @@ class DIDModule {
     const stateChange = {
       DidRemoval: remove
     };
-    const sc = this.api.registry.createType('StateChange', stateChange);
+    const sc = this.api.createType('StateChange', stateChange);
     return sc.toU8a();
   }
 }

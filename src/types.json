@@ -34,11 +34,11 @@
     "did": "Did",
     "public_key": "PublicKey",
     "controller": "Option<Did>",
-    "last_modified_in_block": "u64"
+    "last_modified_in_block": "BlockNumber"
   },
   "DidRemoval": {
     "did": "Did",
-    "last_modified_in_block": "u64"
+    "last_modified_in_block": "BlockNumber"
   },
   "StateChange": {
     "_enum": {

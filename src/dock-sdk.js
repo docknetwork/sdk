@@ -53,6 +53,11 @@ class DockSDK {
     return cryptoWaitReady();
   }
 
+  async disconnect() {
+    // TODO: proper d/c
+    delete this.api;
+  }
+
   /**
    * Sets the account used to sign transactions
    * @param {Account} account - PolkadotJS Keyring account

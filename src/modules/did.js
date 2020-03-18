@@ -102,13 +102,10 @@ class DIDModule {
    */
   async getDocument(did) {
     // TODO: Convert DID and pk to base58
-
     const detail = (await this.getDetail(did))[0];
-
     const id = this.getFullyQualifiedDID(did);
 
     // Determine the type of the public key
-    // TODO: move to publickey getType method once abstraction exists
     let type, publicKeyBase58;
     if (detail.public_key.isSr25519) {
       type = 'Sr25519VerificationKey2018';

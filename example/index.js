@@ -59,15 +59,13 @@ async function updateDIDKey() {
 async function getDIDDoc() {
   console.log('Getting DID now.');
   // Check if DID exists
-  return dock.did.getDocument(didIdentifier).then(function (result) {
-    console.log('DID Document:', JSON.stringify(result, true, 2));
-  }).catch(error => {
-    console.error('Error occured somewhere, it was caught!', error);
-  });
+  const result = await dock.did.getDocument(didIdentifier);
+  console.log('DID Document:', JSON.stringify(result, true, 2));
+  return result;
 }
 
 // Called when connected to the node
-async function createNewDID() {
+function createNewDID() {
   const controller = randomAsHex(32);
 
   // Generate keys for the DID.

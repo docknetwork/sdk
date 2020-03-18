@@ -1,5 +1,6 @@
 import {isHexWithGivenByteSize} from './utils';
 
+/** Class representing a PublicKey. This class should always be extended (abstract class in some languages) */
 class PublicKey {
 
   /**
@@ -18,7 +19,7 @@ class PublicKey {
    */
   validateByteSize(value, expectedByteSize) {
     if (!isHexWithGivenByteSize(value, expectedByteSize)) {
-      throw `Public key must be ${expectedByteSize} bytes`;
+      throw new Error(`Public key must be ${expectedByteSize} bytes`);
     }
   }
 
@@ -30,6 +31,7 @@ class PublicKey {
   }
 }
 
+/** Class representing a Sr25519 PublicKey */
 class PublicKeySr25519 extends PublicKey {
   constructor(value) {
     super(value, 32);
@@ -45,6 +47,7 @@ class PublicKeySr25519 extends PublicKey {
   }
 }
 
+/** Class representing a Ed25519 PublicKey */
 class PublicKeyEd25519 extends PublicKey {
   constructor(value) {
     super(value, 32);
@@ -60,6 +63,7 @@ class PublicKeyEd25519 extends PublicKey {
   }
 }
 
+/** Class representing a compressed Secp256k1 PublicKey */
 class PublicKeySecp256k1 extends PublicKey {
   constructor(value) {
     super(value, 33);

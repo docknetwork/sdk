@@ -54,7 +54,7 @@ class DIDModule {
    * @param {string} did - DID
    * @param {Signature} signature - Signature from existing key
    * @param {PublicKey} publicKey -The new public key
-   * @param {optional string} controller - The new key's controller
+   * @param {string} controller - Optional, The new key's controller
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   updateKey(did, signature, publicKey, controller) {

@@ -1,3 +1,5 @@
+import { createType } from '@polkadot/types';
+
 import {isHexWithGivenByteSize} from '../utils';
 
 const DockDIDQualifier = 'did:dock';
@@ -57,7 +59,7 @@ class DIDModule {
    * @param {string} controller - Optional, The new key's controller
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  updateKey(did, signature, publicKey, controller) {
+  updateKey(did, signature, publicKey, last_modified_in_block, controller) {
     validateDockDIDIdentifier(did);
     if (controller) {
       validateDockDIDIdentifier(controller);
@@ -66,10 +68,10 @@ class DIDModule {
       did,
       controller,
       public_key: publicKey.toJSON(),
-      last_modified_in_block: 0,
+      last_modified_in_block,
     };
 
-    return this.module.updateKey(keyUpdate, signature);
+    return this.module.updateKey(keyUpdate, signature.toJSON());
   }
 
   /**
@@ -78,12 +80,12 @@ class DIDModule {
    * @param {Signature} signature - Signature from existing key
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  remove(did, signature) {
+  remove(did, signature, last_modified_in_block) {
     validateDockDIDIdentifier(did);
     return this.module.remove({
       did,
-      last_modified_in_block: 0,
-    }, signature);
+      last_modified_in_block,
+    }, signature.toJSON());
   }
 
   /**
@@ -176,6 +178,35 @@ class DIDModule {
     }
 
     return [respTuple[0], respTuple[1].toNumber()];
+  }
+
+  /**
+   * Prepare a `KeyUpdate` for signing. It takes the fields of a `KeyUpdate`, wraps it in the `StateChange` enum
+   */
+  getSerializedKeyUpdate(did, public_key, last_modified_in_block, controller) {
+    const keyUpdate = {
+      did,
+      public_key,
+      controller,
+      last_modified_in_block
+    };
+    const stateChange = {
+      KeyUpdate: keyUpdate
+    };
+    const sc = this.api.registry.createType('StateChange', stateChange);
+    return sc.toU8a();
+  }
+
+  getSerializedDIDRemoval(did, last_modified_in_block) {
+    const remove = {
+      did,
+      last_modified_in_block
+    };
+    const stateChange = {
+      DidRemoval: remove
+    };
+    const sc = this.api.registry.createType('StateChange', stateChange);
+    return sc.toU8a();
   }
 }
 

@@ -1,5 +1,6 @@
 import {isHexWithGivenByteSize} from './utils';
 
+/** Class representing a Signature. This class should always be extended (abstract class in some languages) */
 class Signature {
 
   /**
@@ -18,7 +19,7 @@ class Signature {
    */
   validateByteSize(value, expectedByteSize) {
     if (!isHexWithGivenByteSize(value, expectedByteSize)) {
-      throw `Signature must be ${expectedByteSize} bytes`;
+      throw new Error(`Signature must be ${expectedByteSize} bytes`);
     }
   }
 
@@ -30,6 +31,7 @@ class Signature {
   }
 }
 
+/** Class representing a Ed25519 Signature */
 class SignatureSr25519 extends Signature {
   constructor(value) {
     super(value, 64);
@@ -45,6 +47,7 @@ class SignatureSr25519 extends Signature {
   }
 }
 
+/** Class representing a Ed25519 Signature */
 class SignatureEd25519 extends Signature {
   constructor(value) {
     super(value, 64);

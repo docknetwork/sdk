@@ -2,7 +2,7 @@
    * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
    * @param {number/string} value - Hexadecimal value
    * @param {number} byteSize - Expected byte size of the input.
-   * @return {bool} True if hex (with given size) else false
+   * @return {Boolean} True if hex (with given size) else false
    */
 function isHexWithGivenByteSize(value, byteSize) {
   var match = value.match(/^0x([0-9a-f]+$)/i);
@@ -19,6 +19,18 @@ function isHexWithGivenByteSize(value, byteSize) {
   }
 }
 
+/**
+ * Helper function to return bytes of a `StateChange` enum. Updates like key change, DID removal, revocation, etc
+ * require the change to be wrapped in `StateChange` before serializing for signing.
+ * @param {ApiPromise} api - Promise API from polkadot-js
+ * @param {object} stateChange - A representation of a `StateChange` enum variant
+ * @return {array} An array of Uint8
+ */
+function getBytesForStateChange(api, stateChange) {
+  return api.createType('StateChange', stateChange).toU8a();
+}
+
 export {
-  isHexWithGivenByteSize
+  isHexWithGivenByteSize,
+  getBytesForStateChange
 };

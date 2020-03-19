@@ -1,8 +1,8 @@
 import {DockSDK} from '../src/dock-sdk';
-import {FULL_NODE_ENDPOINT} from './test-constants';
+import {FullNodeEndpoint} from './test-constants';
 
 describe('Dock SDK', () => {
-  const dock = new DockSDK(FULL_NODE_ENDPOINT);
+  const dock = new DockSDK(FullNodeEndpoint);
 
   test('Can connect to node', async () => {
     await dock.init();

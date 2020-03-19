@@ -1,4 +1,4 @@
-import {FULL_NODE_ENDPOINT, TEST_KEYRING_OPTS, TEST_ACCOUNT} from './test-constants';
+import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from './test-constants';
 import {randomAsHex} from '@polkadot/util-crypto';
 import {u8aToHex} from '@polkadot/util';
 
@@ -9,31 +9,40 @@ import dock, {
   SignatureSr25519,
   SignatureEd25519
 } from '../src/dock-sdk';
+import {Keyring} from '@polkadot/api';
 
 describe('DID Module', () => {
-  const dock = new DockSDK(FULL_NODE_ENDPOINT);
+  const dock = new DockSDK(FullNodeEndpoint);
+
+  // Generate a random DID
+  const didIdentifier = randomAsHex(32);
+
+  // Generate key with this seed. The key type is Sr25519
+  const seed = randomAsHex(32);
+
+  beforeAll(async (done) => {
+    await dock.init();
+    // Do whatever you need to do
+    done();
+  });
 
   test('Can connect to node', async () => {
-    await dock.init();
+    //await dock.init();
     expect(!!dock.api).toBe(true);
   });
 
   test('Has keyring and account', async () => {
-    await dock.setKeyring(null, TEST_KEYRING_OPTS);
-    await dock.setAccount(null, TEST_ACCOUNT.uri, TEST_ACCOUNT.options);
-    expect(dock.hasKeyring()).toBe(true);
-    expect(dock.hasAccount()).toBe(true);
+    const keyring = new Keyring(TestKeyringOpts);
+    dock.setKeyring(keyring);
+    const account = dock.keyring.addFromUri(TestAccount.uri, TestAccount.options);
+    dock.setAccount(account);
+    expect(!!dock.keyring).toBe(true);
+    expect(!!dock.account).toBe(true);
   });
 
   test('Can create a DID', async () => {
-    // Generate a random DID
-    const didIdentifier = randomAsHex(32);
-
-    // Generate key with this seed. The key type is Sr25519
-    const seed = randomAsHex(32);
     const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
     const publicKey = new PublicKeySr25519(u8aToHex(pair.publicKey));
-
     // controller is same as DID
     const transaction = dock.did.new(didIdentifier, didIdentifier, publicKey);
     const result = await dock.sendTransaction(transaction);

@@ -83,7 +83,6 @@ describe('DID Module', () => {
   // TODO: Uncomment the `beforeAll` and unskip the tests once a node is deployed.
   /*beforeAll(async (done) => {
     await dock.init();
-    // Do whatever you need to do
     done();
   });*/
 

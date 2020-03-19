@@ -18,7 +18,8 @@
       "Ed25519": "Bytes32",
       "Secp256k1": "Bytes33"
     }
-  },"CustomSignature": { 
+  },
+  "DidSignature": {
     "_enum": {
       "Sr25519": "Bytes64",
       "Ed25519": "Bytes64",
@@ -33,10 +34,16 @@
     "did": "Did",
     "public_key": "PublicKey",
     "controller": "Option<Did>",
-    "last_modified_in_block": "u64"
+    "last_modified_in_block": "BlockNumber"
   },
   "DidRemoval": {
     "did": "Did",
-    "last_modified_in_block": "u64"
+    "last_modified_in_block": "BlockNumber"
+  },
+  "StateChange": {
+    "_enum": {
+      "KeyUpdate": "KeyUpdate",
+      "DidRemoval": "DidRemoval"
+    }
   }
 }

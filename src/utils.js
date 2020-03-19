@@ -7,12 +7,12 @@
 function isHexWithGivenByteSize(value, byteSize) {
   var match = value.match(/^0x([0-9a-f]+$)/i);
   if (match && match.length > 1) {
-    if (byteSize == 0) {
+    if (byteSize) {
       // 2 hex digits make a byte
       return match[1].length == (2 * byteSize);
     } else {
-      // Don't care about byte size of the match
-      return true;
+      // Don't care about byte size of the match but it must be full byte
+      return (match[1].length % 2) == 0;
     }
   } else {
     return false;

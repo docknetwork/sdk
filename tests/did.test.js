@@ -20,18 +20,19 @@ describe('DID Module', () => {
   // Generate key with this seed. The key type is Sr25519
   const seed = randomAsHex(32);
 
-  beforeAll(async (done) => {
+  // TODO: Uncomment the `beforeAll` and unskip the tests once a node is deployed.
+  /*beforeAll(async (done) => {
     await dock.init();
     // Do whatever you need to do
     done();
-  });
+  });*/
 
-  test('Can connect to node', async () => {
+  test.skip('Can connect to node', async () => {
     //await dock.init();
     expect(!!dock.api).toBe(true);
   });
 
-  test('Has keyring and account', async () => {
+  test.skip('Has keyring and account', async () => {
     const keyring = new Keyring(TestKeyringOpts);
     dock.keyring = keyring;
     const account = dock.keyring.addFromUri(TestAccount.uri, TestAccount.options);
@@ -40,7 +41,7 @@ describe('DID Module', () => {
     expect(!!dock.account).toBe(true);
   });
 
-  test('Can create a DID', async () => {
+  test.skip('Can create a DID', async () => {
     const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
     const publicKey = new PublicKeySr25519(u8aToHex(pair.publicKey));
     // controller is same as DID

@@ -1,9 +1,11 @@
-import dock from '../dist/client-sdk.cjs';
+import {DockSDK} from '../dist/client-sdk.cjs';
 import address from './node-address';
 
 describe('Dock SDK', () => {
+  const dock = new DockSDK(address);
+
   test('Can connect to node', async () => {
-    await dock.init(address);
+    await dock.init();
     expect(!!dock.api).toBe(true);
   });
 

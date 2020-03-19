@@ -9,10 +9,10 @@ function isHexWithGivenByteSize(value, byteSize) {
   if (match && match.length > 1) {
     if (byteSize) {
       // 2 hex digits make a byte
-      return match[1].length == (2 * byteSize);
+      return match[1].length === (2 * byteSize);
     } else {
       // Don't care about byte size of the match but it must be full byte
-      return (match[1].length % 2) == 0;
+      return (match[1].length % 2) === 0;
     }
   } else {
     return false;

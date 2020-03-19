@@ -65,23 +65,11 @@ class DockSDK {
   }
 
   /**
-   * Check if the SDK has been given an account to send transactions
-   * @returns {boolean}
-   */
-  hasAccount() {
-    return !!this.account;
-  }
-
-  /**
    * Sets the account used to sign transactions
    * @param {Account} account - PolkadotJS Keyring account
    */
-  async setAccount(account, uri, options) {
-    if (account) {
-      this.account = account;
-    } else {
-      this.account = this.keyring.addFromUri(uri, options);
-    }
+  setAccount(account) {
+    this.account = account;
   }
 
   /**
@@ -91,7 +79,6 @@ class DockSDK {
   getAccount() {
     return this.account;
   }
-
 
   /**
    * Check if the SDK has been given a keyring to sign
@@ -105,19 +92,18 @@ class DockSDK {
    * Sets the keyring
    * @param {keyring} keyring - PolkadotJS Keyring
    */
-  async setKeyring(keyring, options) {
-    if (keyring) {
-      this._keyring = keyring;
-    } else {
-      this._keyring = new Keyring(options);
-    }
+  setKeyring(keyring) {
+    this._keyring = keyring;
   }
 
-  /** TODO: Its name is inconsistent with other methods. It should be getKeyring
+  /**
    * Gets the keyring
    * @return {Keyring} PolkadotJS Keyring
    */
   get keyring() {
+    if (!this._keyring) {
+      this._keyring = new Keyring({type: 'sr25519'});
+    }
     return this._keyring;
   }
 

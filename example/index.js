@@ -9,6 +9,7 @@ import dock, {
   SignatureSr25519,
   SignatureEd25519
 } from '../src/dock-sdk';
+import {Keyring} from '@polkadot/api';
 
 const fullNodeWsRPCEndpoint = 'ws://127.0.0.1:9944';
 
@@ -87,9 +88,13 @@ function createNewDID() {
 // Initialise Dock SDK, connect to the node and start working with it
 // It will create a new DID with a key, then update the key to another one and then remove the DID
 dock.init(fullNodeWsRPCEndpoint)
-  .then(() => dock.setKeyring(null, {type: 'sr25519'}))
-  .then(() => dock.setAccount(null, '//Alice', {name: 'Alice'}))
-  .then(createNewDID)
+  .then(() => {
+    const keyring = new Keyring({type: 'sr25519'});
+    dock.setKeyring(keyring);
+    const account = dock.keyring.addFromUri('//Alice', {name: 'Alice'});
+    dock.setAccount(account);
+    return createNewDID();
+  })
   .then(getDIDDoc)
   .then(updateDIDKey)
   .then(getDIDDoc)

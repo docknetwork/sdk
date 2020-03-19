@@ -36,9 +36,21 @@ describe('DID Module', () => {
     expect(!!result).toBe(true);
   }, 30000);
 
-  test('Get DID document', async () => {
+  test('Can get a DID document', async () => {
     // const result = await dock.did.getDocument(didIdentifier);
     // console.log('DID Document:', JSON.stringify(result, true, 2));
+    const result = true; // disabled temporarily because cant connect to node and submit txs
+    expect(!!result).toBe(true);
+  });
+
+  test('Can update a DID Key', async () => {
+    // TODO
+    const result = true; // disabled temporarily because cant connect to node and submit txs
+    expect(!!result).toBe(true);
+  });
+
+  test('Can remove a DID', async () => {
+    // TODO
     const result = true; // disabled temporarily because cant connect to node and submit txs
     expect(!!result).toBe(true);
   });

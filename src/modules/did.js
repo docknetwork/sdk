@@ -12,10 +12,10 @@ const signatureHeaders = {
  * @param {identifier} identifier - The identifier to check.
  * @return {null} Throws exception if invalid identifier
  */
-function validateDockDIDIdentifier(did) {
+function validateDockDIDIdentifier(identifier) {
   // Byte size of the Dock DID identifier, i.e. the `DockDIDQualifier` is not counted.
   const DockDIDByteSize = 32;
-  if (!isHexWithGivenByteSize(did, DockDIDByteSize)) {
+  if (!isHexWithGivenByteSize(identifier, DockDIDByteSize)) {
     throw new Error(`DID identifier must be ${DockDIDByteSize} bytes`);
   }
 }

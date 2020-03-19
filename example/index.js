@@ -10,6 +10,8 @@ import dock, {
   SignatureEd25519
 } from '../src/dock-sdk';
 
+const fullNodeWsRPCEndpoint = 'ws://127.0.0.1:9944';
+
 // Generate a random DID
 const didIdentifier = randomAsHex(32);
 
@@ -84,7 +86,9 @@ function createNewDID() {
 
 // Initialise Dock SDK, connect to the node and start working with it
 // It will create a new DID with a key, then update the key to another one and then remove the DID
-dock.init('ws://127.0.0.1:9944')
+dock.init(fullNodeWsRPCEndpoint)
+  .then(() => dock.setKeyring(null, {type: 'sr25519'}))
+  .then(() => dock.setAccount(null, '//Alice', {name: 'Alice'}))
   .then(createNewDID)
   .then(getDIDDoc)
   .then(updateDIDKey)
@@ -92,5 +96,5 @@ dock.init('ws://127.0.0.1:9944')
   .then(removeDID)
   .then(getDIDDoc)
   .catch(error => {
-    console.error('Error occured somewhere, it was caught!', error);
+    console.error('Error occurred somewhere, it was caught!', error);
   });

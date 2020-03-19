@@ -1,6 +1,6 @@
 /**
    * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
-   * @param {number/string} value - Hexadecimal value
+   * @param {string} value - Hexadecimal value
    * @param {number} byteSize - Expected byte size of the input.
    * @return {Boolean} True if hex (with given size) else false
    */
@@ -19,7 +19,7 @@ function isHexWithGivenByteSize(value, byteSize) {
   }
 }
 
-/**
+/** // TODO: Error handling when `stateChange` is not registered
  * Helper function to return bytes of a `StateChange` enum. Updates like key change, DID removal, revocation, etc
  * require the change to be wrapped in `StateChange` before serializing for signing.
  * @param {ApiPromise} api - Promise API from polkadot-js

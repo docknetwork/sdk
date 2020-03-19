@@ -89,8 +89,6 @@ function createNewDID() {
 // It will create a new DID with a key, then update the key to another one and then remove the DID
 dock.init(fullNodeWsRPCEndpoint)
   .then(() => {
-    const keyring = new Keyring({type: 'sr25519'});
-    dock.setKeyring(keyring);
     const account = dock.keyring.addFromUri('//Alice', {name: 'Alice'});
     dock.setAccount(account);
     return createNewDID();

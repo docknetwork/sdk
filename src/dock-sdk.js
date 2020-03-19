@@ -56,7 +56,7 @@ class DockSDK {
     this._did = new DIDModule(this.api);
     this._revocation = new RevocationModule(this.api);
 
-    return (await cryptoWaitReady());
+    return cryptoWaitReady();
   }
 
   async disconnect() {
@@ -64,7 +64,7 @@ class DockSDK {
     delete this.api;
   }
 
-  /**
+  /** TODO: Should probably use set/get and rename account to _account
    * Sets the account used to sign transactions
    * @param {Account} account - PolkadotJS Keyring account
    */
@@ -81,18 +81,10 @@ class DockSDK {
   }
 
   /**
-   * Check if the SDK has been given a keyring to sign
-   * @returns {boolean}
-   */
-  hasKeyring() {
-    return !!this._keyring;
-  }
-
-  /**
    * Sets the keyring
    * @param {keyring} keyring - PolkadotJS Keyring
    */
-  setKeyring(keyring) {
+  set keyring(keyring) {
     this._keyring = keyring;
   }
 

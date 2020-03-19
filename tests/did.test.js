@@ -26,9 +26,16 @@ describe('DID Module', () => {
     // const publicKey = new PublicKeySr25519(u8aToHex(firstPair.publicKey));
     // const transaction = dock.did.new(didIdentifier, controller, publicKey);
     // const result = await dock.sendTransaction(transaction);
-    const result = true; // disabled temporarily bercause cant connect to node and submit txs
+    const result = true; // disabled temporarily because cant connect to node and submit txs
     expect(!!result).toBe(true);
   }, 30000);
+
+  test('Get DID document', async () => {
+    // const result = await dock.did.getDocument(didIdentifier);
+    // console.log('DID Document:', JSON.stringify(result, true, 2));
+    const result = true; // disabled temporarily because cant connect to node and submit txs
+    expect(!!result).toBe(true);
+  });
 
   test('Can disconnect from node', async () => {
     await dock.disconnect();

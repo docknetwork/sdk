@@ -27,14 +27,13 @@ describe('DID Module', () => {
     done();
   });*/
 
-  test.skip('Can connect to node', async () => {
+  test.skip('Can connect to node', () => {
     //await dock.init();
     expect(!!dock.api).toBe(true);
   });
 
-  test.skip('Has keyring and account', async () => {
-    const keyring = new Keyring(TestKeyringOpts);
-    dock.keyring = keyring;
+  test.skip('Has keyring and account', () => {
+    dock.keyring = new Keyring(TestKeyringOpts);
     const account = dock.keyring.addFromUri(TestAccount.uri, TestAccount.options);
     dock.setAccount(account);
     expect(!!dock.keyring).toBe(true);
@@ -50,20 +49,20 @@ describe('DID Module', () => {
     expect(!!result).toBe(true);
   }, 30000);
 
-  test('Can get a DID document', async () => {
+  test('Can get a DID document', () => {
     // const result = await dock.did.getDocument(didIdentifier);
     // console.log('DID Document:', JSON.stringify(result, true, 2));
     const result = true; // disabled temporarily because cant connect to node and submit txs
     expect(!!result).toBe(true);
   });
 
-  test('Can update a DID Key', async () => {
+  test('Can update a DID Key', () => {
     // TODO
     const result = true; // disabled temporarily because cant connect to node and submit txs
     expect(!!result).toBe(true);
   });
 
-  test('Can remove a DID', async () => {
+  test('Can remove a DID', () => {
     // TODO
     const result = true; // disabled temporarily because cant connect to node and submit txs
     expect(!!result).toBe(true);

@@ -1,3 +1,5 @@
+import {u8aToHex} from '@polkadot/util';
+
 import {isHexWithGivenByteSize} from './utils';
 
 /** Class representing a Signature. This class should always be extended (abstract class in some languages) */
@@ -24,7 +26,18 @@ class Signature {
   }
 
   /**
-   * @return {DidSignature} The correct DidSignature JSON variant. The extending class should implement it.
+   * Signs the given message and wraps it in the Signature
+   * @param {array} message - The message to sign as bytearry
+   * @param {Pair} signingPair -The pair containing the signing key
+   * @returns {Signature}
+   */
+  static sign(message, signingPair) {
+    // Use of `this` is legal in static methods, https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#Boxing_with_prototype_and_static_methods
+    return new this(u8aToHex(signingPair.sign(message)));
+  }
+
+  /**
+   * @return {Object} The correct DidSignature JSON variant. The extending class should implement it.
    */
   toJSON() {
     throw new Error('Not implemented. The extending class should implement it');
@@ -38,7 +51,7 @@ class SignatureSr25519 extends Signature {
   }
 
   /**
-   * @return {SignatureSr25519} The DidSignature JSON variant Sr25519.
+   * @return {Object} The DidSignature JSON variant Sr25519.
    */
   toJSON() {
     return {
@@ -54,7 +67,7 @@ class SignatureEd25519 extends Signature {
   }
 
   /**
-   * @return {SignatureEd25519} The DidSignature JSON variant Ed25519.
+   * @return {Object} The DidSignature JSON variant Ed25519.
    */
   toJSON() {
     return {

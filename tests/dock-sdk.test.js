@@ -1,4 +1,4 @@
-import {DockSDK} from '../dist/client-sdk.cjs';
+import {DockSDK} from '../src/dock-sdk';
 import address from './node-address';
 
 describe('Dock SDK', () => {

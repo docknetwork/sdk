@@ -9,7 +9,7 @@ import {
   PublicKeyEd25519,
   SignatureSr25519,
   SignatureEd25519
-} from '../dist/client-sdk.cjs';
+} from '../src/dock-sdk';
 
 describe('DID Module', () => {
   const dock = new DockSDK(address);

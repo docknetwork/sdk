@@ -39,6 +39,6 @@
     "dist"
   ],
   "dependencies": {
-    "@polkadot/api": "^1.6.2"
+    "@polkadot/api": "^1.7.1"
   }
 }

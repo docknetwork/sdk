@@ -1,9 +1,8 @@
-import address from './node-address';
-
+import {FULL_NODE_ENDPOINT, TEST_KEYRING_OPTS, TEST_ACCOUNT} from './test-constants';
 import {randomAsHex} from '@polkadot/util-crypto';
 import {u8aToHex} from '@polkadot/util';
 
-import {
+import dock, {
   DockSDK,
   PublicKeySr25519,
   PublicKeyEd25519,
@@ -12,27 +11,32 @@ import {
 } from '../src/dock-sdk';
 
 describe('DID Module', () => {
-  const dock = new DockSDK(address);
-
-  // Generate a random DID
-  const didIdentifier = randomAsHex(32);
-
-  // Generate first key with this seed. The key type is Sr25519
-  const firstKeySeed = randomAsHex(32);
+  const dock = new DockSDK(FULL_NODE_ENDPOINT);
 
   test('Can connect to node', async () => {
     await dock.init();
     expect(!!dock.api).toBe(true);
   });
 
+  test('Has keyring and account', async () => {
+    await dock.setKeyring(null, TEST_KEYRING_OPTS);
+    await dock.setAccount(null, TEST_ACCOUNT.uri, TEST_ACCOUNT.options);
+    expect(dock.hasKeyring()).toBe(true);
+    expect(dock.hasAccount()).toBe(true);
+  });
+
   test('Can create a DID', async () => {
-    // Generate keys for the DID.
-    // const controller = randomAsHex(32);
-    // const firstPair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
-    // const publicKey = new PublicKeySr25519(u8aToHex(firstPair.publicKey));
-    // const transaction = dock.did.new(didIdentifier, controller, publicKey);
-    // const result = await dock.sendTransaction(transaction);
-    const result = true; // disabled temporarily because cant connect to node and submit txs
+    // Generate a random DID
+    const didIdentifier = randomAsHex(32);
+
+    // Generate key with this seed. The key type is Sr25519
+    const seed = randomAsHex(32);
+    const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
+    const publicKey = new PublicKeySr25519(u8aToHex(pair.publicKey));
+
+    // controller is same as DID
+    const transaction = dock.did.new(didIdentifier, didIdentifier, publicKey);
+    const result = await dock.sendTransaction(transaction);
     expect(!!result).toBe(true);
   }, 30000);
 

@@ -2,7 +2,7 @@ import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from './test-constants';
 import {randomAsHex} from '@polkadot/util-crypto';
 import {u8aToHex} from '@polkadot/util';
 
-import dock, {
+import {
   DockSDK,
   PublicKeySr25519,
   PublicKeyEd25519,
@@ -33,7 +33,7 @@ describe('DID Module', () => {
 
   test('Has keyring and account', async () => {
     const keyring = new Keyring(TestKeyringOpts);
-    dock.setKeyring(keyring);
+    dock.keyring = keyring;
     const account = dock.keyring.addFromUri(TestAccount.uri, TestAccount.options);
     dock.setAccount(account);
     expect(!!dock.keyring).toBe(true);

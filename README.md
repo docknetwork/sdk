@@ -3,13 +3,13 @@
 Currently very early in-dev.
 
 ## Build
-- Run `npm install` or `yarn install` to install the dependencies
-- yarn build
+- Run `yarn` to install the dependencies
+- Run `yarn build` to create a distribution version
 
 ![Build Status](https://github.com/docknetwork/client-sdk/workflows/CI/badge.svg "Build Status")
 
 ## Run example
-`yarn && yarn start`
+`yarn start-node-example`
 
 ## Lint
 `yarn lint --fix`

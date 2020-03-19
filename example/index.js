@@ -3,8 +3,12 @@ import {randomAsHex} from '@polkadot/util-crypto';
 import {u8aToHex} from '@polkadot/util';
 
 // Import Dock SDK
-import dock from '../src/dock-sdk';
-import {PublicKeySr25519, PublicKeyEd25519, SignatureSr25519, SignatureEd25519} from '../src/dock-sdk';
+import dock, {
+  PublicKeySr25519,
+  PublicKeyEd25519,
+  SignatureSr25519,
+  SignatureEd25519
+} from '../src/dock-sdk';
 
 // Generate a random DID
 const didIdentifier = randomAsHex(32);

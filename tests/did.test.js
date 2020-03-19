@@ -1,9 +1,15 @@
-import {DockSDK, PublicKeySr25519} from '../dist/client-sdk.cjs';
-// import {PublicKeySr25519, PublicKeyEd25519, SignatureSr25519, SignatureEd25519} from '../src/dock-sdk';
 import address from './node-address';
 
 import {randomAsHex} from '@polkadot/util-crypto';
 import {u8aToHex} from '@polkadot/util';
+
+import {
+  DockSDK,
+  PublicKeySr25519,
+  PublicKeyEd25519,
+  SignatureSr25519,
+  SignatureEd25519
+} from '../dist/client-sdk.cjs';
 
 describe('DID Module', () => {
   const dock = new DockSDK(address);

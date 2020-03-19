@@ -16,7 +16,7 @@ function validateDockDIDIdentifier(did) {
   // Byte size of the Dock DID identifier, i.e. the `DockDIDQualifier` is not counted.
   const DockDIDByteSize = 32;
   if (!isHexWithGivenByteSize(did, DockDIDByteSize)) {
-    throw `DID identifier must be ${DockDIDByteSize} bytes`;
+    throw new Error(`DID identifier must be ${DockDIDByteSize} bytes`);
   }
 }
 
@@ -161,21 +161,21 @@ class DIDModule {
    */
   async getDetail(did) {
     const resp = await this.api.query.didModule.dids(did);
+    if (resp) {
+      if (resp.isNone) {
+        throw new Error('Could not find DID: ' + did);
+      }
 
-    if (!resp) {
-      throw 'Got null response';
+      const respTuple = resp.unwrap();
+      if (respTuple.length === 2) {
+        return [
+          respTuple[0],
+          respTuple[1].toNumber()
+        ];
+      } else {
+        throw new Error('Needed 2 items in response but got' + respTuple.length);
+      }
     }
-
-    if (resp.isNone) {
-      throw 'Could not find DID: ' + did;
-    }
-
-    const respTuple = resp.unwrap();
-    if (respTuple.length != 2) {
-      throw 'Needed 2 items in response but got' + respTuple.length;
-    }
-
-    return [respTuple[0], respTuple[1].toNumber()];
   }
 
   /**

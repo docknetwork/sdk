@@ -27,7 +27,7 @@ class PublicKey {
    * @return {PublicKey} The correct PublicKey JSON variant. The extending class should implement it.
    */
   toJSON() {
-    throw 'Not implemented. The extending class should implement it';
+    throw new Error('Not implemented. The extending class should implement it');
   }
 }
 

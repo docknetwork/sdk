@@ -27,7 +27,7 @@ class Signature {
    * @return {DidSignature} The correct DidSignature JSON variant. The extending class should implement it.
    */
   toJSON() {
-    throw 'Not implemented. The extending class should implement it';
+    throw new Error('Not implemented. The extending class should implement it');
   }
 }
 

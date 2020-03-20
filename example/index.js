@@ -31,7 +31,7 @@ async function removeDID() {
   const currentPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
 
   const serializedDIDRemoval = dock.did.getSerializedDIDRemoval(didIdentifier, last_modified_in_block);
-  const signature = SignatureEd25519.sign(serializedDIDRemoval, currentPair);
+  const signature = new SignatureEd25519(serializedDIDRemoval, currentPair);
 
   const transaction = dock.did.remove(didIdentifier, signature, last_modified_in_block);
   return dock.sendTransaction(transaction);
@@ -52,7 +52,7 @@ async function updateDIDKey() {
   const newController = randomAsHex(32);
 
   const serializedKeyUpdate = dock.did.getSerializedKeyUpdate(didIdentifier, newPk, last_modified_in_block, newController);
-  const signature = SignatureSr25519.sign(serializedKeyUpdate, currentPair);
+  const signature = new SignatureSr25519(serializedKeyUpdate, currentPair);
 
   const transaction = dock.did.updateKey(didIdentifier, signature, newPk, last_modified_in_block, newController);
   return dock.sendTransaction(transaction);

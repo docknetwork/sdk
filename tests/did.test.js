@@ -13,8 +13,6 @@ import {validateDockDIDIdentifier, getHexIdentifierFromDID, DockDIDQualifier} fr
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from './test-constants';
 
 
-//const {} = privates;
-
 describe('DID utilities', () => {
   test('On input as 40 byte hex, validateDockDIDIdentifier throws error', () => {
     expect(() => validateDockDIDIdentifier(randomAsHex(40))).toThrow(/DID identifier must be 32 bytes/);

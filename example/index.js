@@ -48,7 +48,7 @@ async function updateDIDKey() {
 
   // Update DID key to the following
   const newPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
-  const newPk = PublicKeyEd25519.fromPair(newPair);
+  const newPk = PublicKeyEd25519.fromKeyringPair(newPair);
   const newController = randomAsHex(32);
 
   const serializedKeyUpdate = dock.did.getSerializedKeyUpdate(didIdentifier, newPk, last_modified_in_block, newController);
@@ -72,7 +72,7 @@ function createNewDID() {
 
   // Generate keys for the DID.
   const firstPair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
-  const publicKey = PublicKeySr25519.fromPair(firstPair);
+  const publicKey = PublicKeySr25519.fromKeyringPair(firstPair);
 
   console.log('Submitting new DID', didIdentifier, controller, publicKey);
 

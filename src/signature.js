@@ -28,7 +28,7 @@ class Signature {
   /**
    * Signs the given message and wraps it in the Signature
    * @param {array} message - The message to sign as bytearry
-   * @param {Pair} signingPair -The pair containing the signing key
+   * @param {KeyringPair} signingPair -The pair containing the signing key
    * @returns {Signature}
    */
   static sign(message, signingPair) {

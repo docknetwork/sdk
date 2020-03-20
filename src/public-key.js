@@ -26,10 +26,10 @@ class PublicKey {
 
   /**
    * Extracts the public key from a pair
-   * @param pair
+   * @param {KeyringPair} pair
    * @returns {PublicKey}
    */
-  static fromPair(pair) {
+  static fromKeyringPair(pair) {
     // Use of `this` is legal in static methods, https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#Boxing_with_prototype_and_static_methods
     return new this(u8aToHex(pair.publicKey));
   }

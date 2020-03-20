@@ -39,3 +39,6 @@ Simply run
 ```
 yarn start-node-example
 ```
+
+## JSON types
+The types on Substrate node should be reflected in [types.json](./src/types.json)

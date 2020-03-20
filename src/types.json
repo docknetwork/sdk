@@ -40,10 +40,41 @@
     "did": "Did",
     "last_modified_in_block": "BlockNumber"
   },
+  "RegistryId": "[u8;32]",
+  "RevokeId": "[u8;32]",
+  "Registry": {
+    "policy": "Policy",
+    "add_only": "bool"
+  },
+  "Revoke": {
+    "registry_id": "RegistryId",
+    "revoke_ids": "BTreeSet<RevokeId>",
+    "last_modified": "BlockNumber"
+  },
+  "UnRevoke": {
+    "registry_id": "RegistryId",
+    "revoke_ids": "BTreeSet<RevokeId>",
+    "last_modified": "BlockNumber"
+  },
+  "RemoveRegistry": {
+    "registry_id": "RegistryId",
+    "last_modified": "BlockNumber"
+  },
+  "PAuth": "BTreeMap<Did, Signature>",
+  "Policy": {
+    "_enum": {
+      "OneOf": {
+        "controllers": "BTreeSet<Did>"
+      }
+    }
+  },
   "StateChange": {
     "_enum": {
       "KeyUpdate": "KeyUpdate",
-      "DidRemoval": "DidRemoval"
+      "DidRemoval": "DidRemoval",
+      "Revoke": "Revoke",
+      "UnRevoke": "UnRevoke",
+      "RemoveRegistry": "RemoveRegistry"
     }
   }
 }

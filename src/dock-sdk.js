@@ -4,6 +4,7 @@ import {cryptoWaitReady} from '@polkadot/util-crypto';
 import RevocationModule from './modules/revocation';
 import DIDModule from './modules/did';
 import types from './types.json';
+import VerifiableCredential from './modules/vc';
 
 import {
   PublicKey,
@@ -55,6 +56,7 @@ class DockSDK {
 
     this._did = new DIDModule(this.api);
     this._revocation = new RevocationModule(this.api);
+    this._vc = new VerifiableCredential();
 
     return cryptoWaitReady();
   }
@@ -143,6 +145,14 @@ class DockSDK {
   get revocation() {
     return this._revocation;
   }
+
+  /**
+   * Gets the SDK's Verifiable Credential module
+   * @return {VerifiableCredential} The module to use
+   */
+  get vc() {
+    return this._vc;
+  }
 }
 
 export default new DockSDK();
@@ -156,5 +166,6 @@ export {
   PublicKeySecp256k1,
   Signature,
   SignatureSr25519,
-  SignatureEd25519
+  SignatureEd25519,
+  VerifiableCredential
 };

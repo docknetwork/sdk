@@ -1,10 +1,8 @@
 import {encodeAddress, decodeAddress} from '@polkadot/util-crypto';
 import {u8aToHex} from '@polkadot/util';
 
-import {isHexWithGivenByteSize, getBytesForStateChange} from '../utils';
-
-const DockDIDQualifier = 'did:dock:';
-const DockDIDByteSize = 32;
+import {getBytesForStateChange} from '../utils';
+import {validateDockDIDIdentifier, getHexIdentifierFromDID, DockDIDQualifier} from '../utils/did';
 
 const signatureHeaders = {
   Sr25519VerificationKey2018: 'Sr25519SignatureAuthentication2018',
@@ -12,50 +10,8 @@ const signatureHeaders = {
   EcdsaSecp256k1VerificationKey2019: 'EcdsaSecp256k1SignatureAuthentication2019',
 };
 
-/**
- * Check if the given identifier is 32 byte hex
- * @param {identifier} identifier - The identifier to check.
- * @return {null} Throws exception if invalid identifier
- */
-function validateDockDIDIdentifier(identifier) {
-  // Byte size of the Dock DID identifier, i.e. the `DockDIDQualifier` is not counted.
-  if (!isHexWithGivenByteSize(identifier, DockDIDByteSize)) {
-    throw new Error(`DID identifier must be ${DockDIDByteSize} bytes`);
-  }
-}
-
-/**
- * Gets the hexadecimal value of the given DID.
- * @param {string} did -  The DID can be passed as fully qualified DID like `dock:did:<SS58 string>` or
- * a 32 byte hex string
- * @return {string} Returns the hexadecimal representation of the DID.
- */
-function getHexIdentifierFromDID(did) {
-  if (did.startsWith(DockDIDQualifier)) {
-    // Fully qualified DID. Remove the qualifier
-    let ss58Did = did.slice(DockDIDQualifier.length);
-    try {
-      const hex = u8aToHex(decodeAddress(ss58Did));
-      // 2 characters for `0x` and 2*byte size of DID
-      if (hex.length !== (2 + 2*DockDIDByteSize)) {
-        throw new Error('Unexpected byte size');
-      }
-      return hex;
-    } catch (e) {
-      throw new Error(`Invalid SS58 DID ${did}. ${e}`);
-    }
-  } else {
-    try {
-      // Check if hex and of correct size and return the hex value if successful.
-      validateDockDIDIdentifier(did);
-      return did;
-    } catch (e) {
-      // Cannot parse as hex
-      throw new Error(`Invalid hexadecimal DID ${did}. ${e}`);
-    }
-  }
-}
-
+// TODO: Make the signature of `new`, `updateKey` and `remove` methods same as the Substrate Node.
+// Also the above mentioned methods should take both hex and fully qualified DIDs.
 /** Class to create, update and destroy DIDs */
 class DIDModule {
   /**
@@ -138,10 +94,10 @@ class DIDModule {
    * @return {object} The DID document.
    */
   async getDocument(did) {
-    let hexDid = getHexIdentifierFromDID(did);
-    const detail = (await this.getDetail(hexDid))[0];
+    let hexId = getHexIdentifierFromDID(did);
+    const detail = (await this.getDetail(hexId))[0];
     // If given DID was in hex, encode to SS58 and then construct fully qualified DID else the DID was already fully qualified
-    const id = (did === hexDid) ? this.getFullyQualifiedDID(encodeAddress(hexDid)) : did;
+    const id = (did === hexId) ? this.getFullyQualifiedDID(encodeAddress(hexId)) : did;
 
     // Determine the type of the public key
     let type, publicKeyBase58;
@@ -261,8 +217,3 @@ class DIDModule {
 
 export default DIDModule;
 
-export {
-  validateDockDIDIdentifier,
-  getHexIdentifierFromDID,
-  DockDIDQualifier
-};

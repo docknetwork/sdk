@@ -44,13 +44,6 @@ class DockSDK {
     this.api = await ApiPromise.create({
       provider: new WsProvider(this.address),
       types,
-      /*typesAlias: {
-        // Renaming types of `didModule`
-        didModule: {
-          // `CustomSignature` is called `Signature` in the Node runtime. The renaming is to prevent conflict with the existing type called `Signature`.
-          Signature: 'CustomSignature'
-        }
-      }*/
     });
 
     this._did = new DIDModule(this.api);

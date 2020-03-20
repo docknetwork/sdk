@@ -1,6 +1,11 @@
+import {encodeAddress, decodeAddress} from '@polkadot/util-crypto';
+import {u8aToHex} from '@polkadot/util';
+
 import {isHexWithGivenByteSize, getBytesForStateChange} from '../utils';
 
-const DockDIDQualifier = 'did:dock';
+const DockDIDQualifier = 'did:dock:';
+const DockDIDByteSize = 32;
+
 const signatureHeaders = {
   Sr25519VerificationKey2018: 'Sr25519SignatureAuthentication2018',
   Ed25519VerificationKey2018: 'Ed25519SignatureAuthentication2018',
@@ -14,9 +19,40 @@ const signatureHeaders = {
  */
 function validateDockDIDIdentifier(identifier) {
   // Byte size of the Dock DID identifier, i.e. the `DockDIDQualifier` is not counted.
-  const DockDIDByteSize = 32;
   if (!isHexWithGivenByteSize(identifier, DockDIDByteSize)) {
     throw new Error(`DID identifier must be ${DockDIDByteSize} bytes`);
+  }
+}
+
+/**
+ * Gets the hexadecimal value of the given DID.
+ * @param {string} did -  The DID can be passed as fully qualified DID like `dock:did:<SS58 string>` or
+ * a 32 byte hex string
+ * @return {string} Returns the hexadecimal representation of the DID.
+ */
+function getHexIdentifierFromDID(did) {
+  if (did.startsWith(DockDIDQualifier)) {
+    // Fully qualified DID. Remove the qualifier
+    let ss58Did = did.slice(DockDIDQualifier.length);
+    try {
+      const hex = u8aToHex(decodeAddress(ss58Did));
+      // 2 characters for `0x` and 2*byte size of DID
+      if (hex.length !== (2 + 2*DockDIDByteSize)) {
+        throw new Error('Unexpected byte size');
+      }
+      return hex;
+    } catch (e) {
+      throw new Error(`Invalid SS58 DID ${did}. ${e}`);
+    }
+  } else {
+    try {
+      // Check if hex and of correct size and return the hex value if successful.
+      validateDockDIDIdentifier(did);
+      return did;
+    } catch (e) {
+      // Cannot parse as hex
+      throw new Error(`Invalid hexadecimal DID ${did}. ${e}`);
+    }
   }
 }
 
@@ -92,18 +128,20 @@ class DIDModule {
    * @return {string} The DID identifer.
    */
   getFullyQualifiedDID(did) {
-    return `${DockDIDQualifier}:${did}`;
+    return `${DockDIDQualifier}${did}`;
   }
 
   /**
    * Gets a DID from the Dock chain and create a DID document according to W3C spec.
-   * @param {string} did - DID
+   * @param {string} did - The DID can be passed as fully qualified DID like `dock:did:<SS58 string>` or
+   * a 32 byte hex string
    * @return {object} The DID document.
    */
   async getDocument(did) {
-    // TODO: Convert DID and pk to base58
-    const detail = (await this.getDetail(did))[0];
-    const id = this.getFullyQualifiedDID(did);
+    let hexDid = getHexIdentifierFromDID(did);
+    const detail = (await this.getDetail(hexDid))[0];
+    // If given DID was in hex, encode to SS58 and then construct fully qualified DID else the DID was already fully qualified
+    const id = (did === hexDid) ? this.getFullyQualifiedDID(encodeAddress(hexDid)) : did;
 
     // Determine the type of the public key
     let type, publicKeyBase58;
@@ -122,7 +160,7 @@ class DIDModule {
     const publicKey = {
       id: `${id}#keys-1`,
       type,
-      controller: `${DockDIDQualifier}:${detail.controller}`,
+      controller: `${DockDIDQualifier}${detail.controller}`,
       publicKeyBase58,
       // publicKeyPem: '-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n', // TODO: add proper value
     };
@@ -222,3 +260,11 @@ class DIDModule {
 }
 
 export default DIDModule;
+
+// Exporting private functions to test.
+// Consider: Should a package like rewire be used instead?
+export const privates = {
+  validateDockDIDIdentifier: validateDockDIDIdentifier,
+  getHexIdentifierFromDID: getHexIdentifierFromDID,
+  DockDIDQualifier: DockDIDQualifier
+};

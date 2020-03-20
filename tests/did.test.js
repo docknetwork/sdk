@@ -1,5 +1,5 @@
 import {Keyring} from '@polkadot/api';
-import {randomAsHex, encodeAddress, decodeAddress} from '@polkadot/util-crypto';
+import {randomAsHex, encodeAddress} from '@polkadot/util-crypto';
 import {u8aToHex} from '@polkadot/util';
 
 import {
@@ -9,21 +9,13 @@ import {
   SignatureSr25519,
   SignatureEd25519
 } from '../src/dock-sdk';
-
+import {validateDockDIDIdentifier, getHexIdentifierFromDID, DockDIDQualifier} from '../src/modules/did';
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from './test-constants';
-import {privates} from '../src/modules/did';
 
-const {validateDockDIDIdentifier, getHexIdentifierFromDID, DockDIDQualifier} = privates;
 
-describe('DID Module', () => {
-  const dock = new DockSDK(FullNodeEndpoint);
+//const {} = privates;
 
-  // Generate a random DID
-  const didIdentifier = randomAsHex(32);
-
-  // Generate key with this seed.
-  const seed = randomAsHex(32);
-
+describe('DID utilities', () => {
   test('On input as 40 byte hex, validateDockDIDIdentifier throws error', () => {
     expect(validateDockDIDIdentifier.bind(null, randomAsHex(40))).toThrow(/DID identifier must be 32 bytes/);
   });
@@ -79,6 +71,16 @@ describe('DID Module', () => {
     // Without the qualifier, the function tries to parse as hex
     expect(getHexIdentifierFromDID.bind(null, did)).toThrow(/Invalid SS58/);
   });
+});
+
+describe('DID Module', () => {
+  const dock = new DockSDK(FullNodeEndpoint);
+
+  // Generate a random DID
+  const didIdentifier = randomAsHex(32);
+
+  // Generate key with this seed.
+  const seed = randomAsHex(32);
 
   // TODO: Uncomment the `beforeAll` and unskip the tests once a node is deployed.
   /*beforeAll(async (done) => {

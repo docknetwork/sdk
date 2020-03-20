@@ -17,20 +17,20 @@ import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from './test-constants';
 
 describe('DID utilities', () => {
   test('On input as 40 byte hex, validateDockDIDIdentifier throws error', () => {
-    expect(validateDockDIDIdentifier.bind(null, randomAsHex(40))).toThrow(/DID identifier must be 32 bytes/);
+    expect(() => validateDockDIDIdentifier(randomAsHex(40))).toThrow(/DID identifier must be 32 bytes/);
   });
 
   test('On input as 30 byte hex, validateDockDIDIdentifier throws error', () => {
-    expect(validateDockDIDIdentifier.bind(null, randomAsHex(30))).toThrow(/DID identifier must be 32 bytes/);
+    expect(() => validateDockDIDIdentifier(randomAsHex(30))).toThrow(/DID identifier must be 32 bytes/);
   });
 
   test('On input as 32 byte hex, validateDockDIDIdentifier does not throw error', () => {
-    expect(validateDockDIDIdentifier.bind(null, randomAsHex(32))).not.toThrow();
+    expect(() => validateDockDIDIdentifier(randomAsHex(32))).not.toThrow();
   });
 
   test('On input as 33 byte hex, getHexIdentifierFromDID throws error', () => {
     const hex = randomAsHex(33);
-    expect(getHexIdentifierFromDID.bind(null, hex)).toThrow(/Invalid hex/);
+    expect(() => getHexIdentifierFromDID(hex)).toThrow(/Invalid hex/);
   });
 
   test('On input as 32 byte hex, getHexIdentifierFromDID returns the input', () => {
@@ -42,13 +42,13 @@ describe('DID utilities', () => {
     const hex = randomAsHex(32);
     const id = encodeAddress(hex);
     // Without the qualifier, the function tries to parse as hex
-    expect(getHexIdentifierFromDID.bind(null, id)).toThrow(/Invalid hex/);
+    expect(() => getHexIdentifierFromDID(id)).toThrow(/Invalid hex/);
   });
 
   test('On input invalid SS58 but with qualifier, getHexIdentifierFromDID throws error', () => {
     const did = `${DockDIDQualifier}oO12`;
     // Without the qualifier, the function tries to parse as hex
-    expect(getHexIdentifierFromDID.bind(null, did)).toThrow(/Invalid SS58/);
+    expect(() => getHexIdentifierFromDID(did)).toThrow(/Invalid SS58/);
   });
 
   test('On input fully qualified Dock DID, getHexIdentifierFromDID returns valid hex representation', () => {
@@ -62,14 +62,14 @@ describe('DID utilities', () => {
     const hex = randomAsHex(8);
     const did = `${DockDIDQualifier}${encodeAddress(hex)}`;
     // Without the qualifier, the function tries to parse as hex
-    expect(getHexIdentifierFromDID.bind(null, did)).toThrow(/Invalid SS58/);
+    expect(() => getHexIdentifierFromDID(did)).toThrow(/Invalid SS58/);
   });
 
   test('On input valid SS58 and with qualifier but larger than 32 bytes, getHexIdentifierFromDID throws error', () => {
     const ss58 = encodeAddress(randomAsHex(32));
     const did = `${DockDIDQualifier}${ss58}${ss58}`;
     // Without the qualifier, the function tries to parse as hex
-    expect(getHexIdentifierFromDID.bind(null, did)).toThrow(/Invalid SS58/);
+    expect(() => getHexIdentifierFromDID(did)).toThrow(/Invalid SS58/);
   });
 });
 

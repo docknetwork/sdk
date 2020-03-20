@@ -261,10 +261,8 @@ class DIDModule {
 
 export default DIDModule;
 
-// Exporting private functions to test.
-// Consider: Should a package like rewire be used instead?
-export const privates = {
-  validateDockDIDIdentifier: validateDockDIDIdentifier,
-  getHexIdentifierFromDID: getHexIdentifierFromDID,
-  DockDIDQualifier: DockDIDQualifier
+export {
+  validateDockDIDIdentifier,
+  getHexIdentifierFromDID,
+  DockDIDQualifier
 };

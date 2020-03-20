@@ -9,7 +9,7 @@ import {
   SignatureSr25519,
   SignatureEd25519
 } from '../src/dock-sdk';
-import {validateDockDIDIdentifier, getHexIdentifierFromDID, DockDIDQualifier} from '../src/modules/did';
+import {validateDockDIDIdentifier, getHexIdentifierFromDID, DockDIDQualifier} from '../src/utils/did';
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from './test-constants';
 
 

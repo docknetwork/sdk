@@ -1,5 +1,5 @@
-import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from './test-constants';
-import {randomAsHex} from '@polkadot/util-crypto';
+import {Keyring} from '@polkadot/api';
+import {randomAsHex, encodeAddress, decodeAddress} from '@polkadot/util-crypto';
 import {u8aToHex} from '@polkadot/util';
 
 import {
@@ -9,7 +9,11 @@ import {
   SignatureSr25519,
   SignatureEd25519
 } from '../src/dock-sdk';
-import {Keyring} from '@polkadot/api';
+
+import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from './test-constants';
+import {privates} from '../src/modules/did';
+
+const {validateDockDIDIdentifier, getHexIdentifierFromDID, DockDIDQualifier} = privates;
 
 describe('DID Module', () => {
   const dock = new DockSDK(FullNodeEndpoint);
@@ -17,8 +21,64 @@ describe('DID Module', () => {
   // Generate a random DID
   const didIdentifier = randomAsHex(32);
 
-  // Generate key with this seed. The key type is Sr25519
+  // Generate key with this seed.
   const seed = randomAsHex(32);
+
+  test('On input as 40 byte hex, validateDockDIDIdentifier throws error', () => {
+    expect(validateDockDIDIdentifier.bind(null, randomAsHex(40))).toThrow(/DID identifier must be 32 bytes/);
+  });
+
+  test('On input as 30 byte hex, validateDockDIDIdentifier throws error', () => {
+    expect(validateDockDIDIdentifier.bind(null, randomAsHex(30))).toThrow(/DID identifier must be 32 bytes/);
+  });
+
+  test('On input as 32 byte hex, validateDockDIDIdentifier does not throw error', () => {
+    expect(validateDockDIDIdentifier.bind(null, randomAsHex(32))).not.toThrow();
+  });
+
+  test('On input as 33 byte hex, getHexIdentifierFromDID throws error', () => {
+    const hex = randomAsHex(33);
+    expect(getHexIdentifierFromDID.bind(null, hex)).toThrow(/Invalid hex/);
+  });
+
+  test('On input as 32 byte hex, getHexIdentifierFromDID returns the input', () => {
+    const hex = randomAsHex(32);
+    expect(getHexIdentifierFromDID(hex)).toBe(hex);
+  });
+
+  test('On input valid SS58 but without qualifier, getHexIdentifierFromDID throws error', () => {
+    const hex = randomAsHex(32);
+    const id = encodeAddress(hex);
+    // Without the qualifier, the function tries to parse as hex
+    expect(getHexIdentifierFromDID.bind(null, id)).toThrow(/Invalid hex/);
+  });
+
+  test('On input invalid SS58 but with qualifier, getHexIdentifierFromDID throws error', () => {
+    const did = `${DockDIDQualifier}oO12`;
+    // Without the qualifier, the function tries to parse as hex
+    expect(getHexIdentifierFromDID.bind(null, did)).toThrow(/Invalid SS58/);
+  });
+
+  test('On input fully qualified Dock DID, getHexIdentifierFromDID returns valid hex representation', () => {
+    // create a valid DID
+    const hex = randomAsHex(32);
+    const did = `${DockDIDQualifier}${encodeAddress(hex)}`;
+    expect(getHexIdentifierFromDID(did)).toBe(hex);
+  });
+
+  test('On input valid SS58 and with qualifier but smaller than 32 bytes, getHexIdentifierFromDID throws error', () => {
+    const hex = randomAsHex(8);
+    const did = `${DockDIDQualifier}${encodeAddress(hex)}`;
+    // Without the qualifier, the function tries to parse as hex
+    expect(getHexIdentifierFromDID.bind(null, did)).toThrow(/Invalid SS58/);
+  });
+
+  test('On input valid SS58 and with qualifier but larger than 32 bytes, getHexIdentifierFromDID throws error', () => {
+    const ss58 = encodeAddress(randomAsHex(32));
+    const did = `${DockDIDQualifier}${ss58}${ss58}`;
+    // Without the qualifier, the function tries to parse as hex
+    expect(getHexIdentifierFromDID.bind(null, did)).toThrow(/Invalid SS58/);
+  });
 
   // TODO: Uncomment the `beforeAll` and unskip the tests once a node is deployed.
   /*beforeAll(async (done) => {

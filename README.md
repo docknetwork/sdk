@@ -29,9 +29,16 @@ Running dev node:
 ./target/release/dock-testnet --base-path /tmp/alice --chain local --alice --port 30333 --ws-port 9944 --rpc-port 9933 --telemetry-url ws://telemetry.polkadot.io:1024 --validator --dev
 ```
 
+## Test
+- Run all tests with `yarn test`
+- Run a single test module with `yarn test <module name or prefix>`
+
 ## Basic SDK example
 
 Simply run
 ```
 yarn start-node-example
 ```
+
+## JSON types
+The types on Substrate node should be reflected in [types.json](./src/types.json)

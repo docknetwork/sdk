@@ -1,6 +1,5 @@
 // Import some utils from Polkadot JS
 import {randomAsHex} from '@polkadot/util-crypto';
-import {u8aToHex} from '@polkadot/util';
 
 // Import Dock SDK
 import dock, {
@@ -10,6 +9,8 @@ import dock, {
   SignatureEd25519
 } from '../src/dock-sdk';
 
+const fullNodeWsRPCEndpoint = 'ws://127.0.0.1:9944';
+
 // Generate a random DID
 const didIdentifier = randomAsHex(32);
 
@@ -18,9 +19,6 @@ const firstKeySeed = randomAsHex(32);
 
 // Generate second key (for update) with this seed. The key type is Ed25519
 const secondKeySeed = randomAsHex(32);
-
-// TODO: Better to change the names of the following functions to the actions that they do and
-// not when the need to be done. We can document the order of their execution here.
 
 // This function assumes the DID has been written.
 async function removeDID() {
@@ -33,7 +31,7 @@ async function removeDID() {
   const currentPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
 
   const serializedDIDRemoval = dock.did.getSerializedDIDRemoval(didIdentifier, last_modified_in_block);
-  const signature = new SignatureEd25519(u8aToHex(currentPair.sign(serializedDIDRemoval)));
+  const signature = new SignatureEd25519(serializedDIDRemoval, currentPair);
 
   const transaction = dock.did.remove(didIdentifier, signature, last_modified_in_block);
   return dock.sendTransaction(transaction);
@@ -50,11 +48,11 @@ async function updateDIDKey() {
 
   // Update DID key to the following
   const newPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
-  const newPk = new PublicKeyEd25519(u8aToHex(newPair.publicKey));
+  const newPk = PublicKeyEd25519.fromKeyringPair(newPair);
   const newController = randomAsHex(32);
 
   const serializedKeyUpdate = dock.did.getSerializedKeyUpdate(didIdentifier, newPk, last_modified_in_block, newController);
-  const signature = new SignatureSr25519(u8aToHex(currentPair.sign(serializedKeyUpdate)));
+  const signature = new SignatureSr25519(serializedKeyUpdate, currentPair);
 
   const transaction = dock.did.updateKey(didIdentifier, signature, newPk, last_modified_in_block, newController);
   return dock.sendTransaction(transaction);
@@ -74,7 +72,7 @@ function createNewDID() {
 
   // Generate keys for the DID.
   const firstPair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
-  const publicKey = new PublicKeySr25519(u8aToHex(firstPair.publicKey));
+  const publicKey = PublicKeySr25519.fromKeyringPair(firstPair);
 
   console.log('Submitting new DID', didIdentifier, controller, publicKey);
 
@@ -84,13 +82,17 @@ function createNewDID() {
 
 // Initialise Dock SDK, connect to the node and start working with it
 // It will create a new DID with a key, then update the key to another one and then remove the DID
-dock.init('ws://127.0.0.1:9944')
-  .then(createNewDID)
+dock.init(fullNodeWsRPCEndpoint)
+  .then(() => {
+    const account = dock.keyring.addFromUri('//Alice', {name: 'Alice'});
+    dock.setAccount(account);
+    return createNewDID();
+  })
   .then(getDIDDoc)
   .then(updateDIDKey)
   .then(getDIDDoc)
   .then(removeDID)
   .then(getDIDDoc)
   .catch(error => {
-    console.error('Error occured somewhere, it was caught!', error);
+    console.error('Error occurred somewhere, it was caught!', error);
   });

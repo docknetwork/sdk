@@ -41,7 +41,7 @@
   "dependencies": {
     "axios": "^0.18.1",
     "ecdsa-secp256k1-signature-2019": "^1.0.0",
-    "@polkadot/api": "^1.6.2",
+    "@polkadot/api": "^1.7.1",
     "vc-js": "^0.4.1"
   }
 }

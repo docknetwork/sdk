@@ -1,3 +1,4 @@
+import {u8aToHex} from '@polkadot/util';
 import {isHexWithGivenByteSize} from './utils';
 
 /** Class representing a PublicKey. This class should always be extended (abstract class in some languages) */
@@ -24,7 +25,17 @@ class PublicKey {
   }
 
   /**
-   * @return {PublicKey} The correct PublicKey JSON variant. The extending class should implement it.
+   * Extracts the public key from a pair
+   * @param {KeyringPair} pair
+   * @returns {PublicKey}
+   */
+  static fromKeyringPair(pair) {
+    // Use of `this` is legal in static methods, https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#Boxing_with_prototype_and_static_methods
+    return new this(u8aToHex(pair.publicKey));
+  }
+
+  /**
+   * @return {Object} The correct PublicKey JSON variant. The extending class should implement it.
    */
   toJSON() {
     throw new Error('Not implemented. The extending class should implement it');
@@ -38,7 +49,7 @@ class PublicKeySr25519 extends PublicKey {
   }
 
   /**
-   * @return {PublicKeySr25519} The PublicKey JSON variant Sr25519.
+   * @return {Object} The PublicKey JSON variant Sr25519.
    */
   toJSON() {
     return {
@@ -54,7 +65,7 @@ class PublicKeyEd25519 extends PublicKey {
   }
 
   /**
-   * @return {PublicKeyEd25519} The PublicKey JSON variant Ed25519.
+   * @return {Object} The PublicKey JSON variant Ed25519.
    */
   toJSON() {
     return {
@@ -70,7 +81,7 @@ class PublicKeySecp256k1 extends PublicKey {
   }
 
   /**
-   * @return {PublicKeySecp256k1} The PublicKey JSON variant Secp256k1.
+   * @return {Object} The PublicKey JSON variant Secp256k1.
    */
   toJSON() {
     return {

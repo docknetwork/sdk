@@ -1,7 +1,18 @@
+import {u8aToHex} from '@polkadot/util';
+
 import {isHexWithGivenByteSize} from './utils';
 
 /** Class representing a Signature. This class should always be extended (abstract class in some languages) */
 class Signature {
+  /**
+   * Signs the given message and wraps it in the Signature
+   * @param {array} message - The message to sign as bytearray
+   * @param {KeyringPair} signingPair -The pair containing the signing key
+   * @returns {Signature}
+   */
+  constructor(message, signingPair) {
+    this.value = u8aToHex(signingPair.sign(message));
+  }
 
   /**
    * Creates a new DidSignature object. Validates the given value. Currently supported signature
@@ -9,9 +20,10 @@ class Signature {
    * @param {string} value - Value of the signature. This is validated
    * @return {Signature} The Signature object if the given value is valid.
    */
-  constructor(value, expectedByteSize) {
+  fromHex(value, expectedByteSize) {
     this.validateByteSize(value, expectedByteSize);
-    this.value = value;
+    let sig = Object.create(this.prototype);
+    sig.value = value;
   }
 
   /**
@@ -24,7 +36,7 @@ class Signature {
   }
 
   /**
-   * @return {DidSignature} The correct DidSignature JSON variant. The extending class should implement it.
+   * @return {Object} The correct DidSignature JSON variant. The extending class should implement it.
    */
   toJSON() {
     throw new Error('Not implemented. The extending class should implement it');
@@ -33,12 +45,17 @@ class Signature {
 
 /** Class representing a Ed25519 Signature */
 class SignatureSr25519 extends Signature {
-  constructor(value) {
-    super(value, 64);
+  /**
+   * Create SignatureSr25519 from given hex string
+   * @param {string} value - Hex string
+   * @returns {Signature}
+   */
+  fromHex(value) {
+    return super.fromHex(value, 64);
   }
 
   /**
-   * @return {SignatureSr25519} The DidSignature JSON variant Sr25519.
+   * @return {Object} The DidSignature JSON variant Sr25519.
    */
   toJSON() {
     return {
@@ -49,12 +66,17 @@ class SignatureSr25519 extends Signature {
 
 /** Class representing a Ed25519 Signature */
 class SignatureEd25519 extends Signature {
-  constructor(value) {
-    super(value, 64);
+  /**
+   * Create SignatureEd25519 from given hex string
+   * @param {string} value - Hex string
+   * @returns {Signature}
+   */
+  fromHex(value) {
+    return super.fromHex(value, 64);
   }
 
   /**
-   * @return {SignatureEd25519} The DidSignature JSON variant Ed25519.
+   * @return {Object} The DidSignature JSON variant Ed25519.
    */
   toJSON() {
     return {

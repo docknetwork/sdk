@@ -1,23 +1,24 @@
 import {DockSDK} from '../src/dock-sdk';
-import address from './node-address';
+import {FullNodeEndpoint} from './test-constants';
 
 describe('Dock SDK', () => {
-  const dock = new DockSDK(address);
+  const dock = new DockSDK(FullNodeEndpoint);
 
-  test('Can connect to node', async () => {
+  // TODO: Unskip the tests once a node is deployed.
+  test.skip('Can connect to node', async () => {
     await dock.init();
     expect(!!dock.api).toBe(true);
   });
 
-  test('Has DID Module', () => {
+  test.skip('Has DID Module', () => {
     expect(!!dock.did).toBe(true);
   });
 
-  test('Has Revocation Module', () => {
+  test.skip('Has Revocation Module', () => {
     expect(!!dock.revocation).toBe(true);
   });
 
-  test('Can disconnect from node', async () => {
+  test.skip('Can disconnect from node', async () => {
     await dock.disconnect();
     expect(!!dock.api).toBe(false);
   });

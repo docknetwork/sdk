@@ -24,7 +24,7 @@ class DockSDK {
   /**
    * Skeleton constructor, does nothing yet
    * @constructor
-   * @param {string} address - WebSocket Address
+   * @param {string} address - WebSocket RPC endpoint
    */
   constructor(address) {
     this.address = address;
@@ -66,10 +66,9 @@ class DockSDK {
     delete this.api;
   }
 
-  /**
+  /** TODO: Should probably use set/get and rename account to _account
    * Sets the account used to sign transactions
    * @param {Account} account - PolkadotJS Keyring account
-   * @param {function} onComplete - On complete callback, temporary
    */
   setAccount(account) {
     this.account = account;
@@ -80,13 +79,16 @@ class DockSDK {
    * @return {Account} PolkadotJS Keyring account
    */
   getAccount() {
-    // If no account use Alice, dev purposes, temporary
-    if (!this.account) {
-      this.account = this.keyring.addFromUri('//Alice', {name: 'Alice'});
-    }
     return this.account;
   }
 
+  /**
+   * Sets the keyring
+   * @param {keyring} keyring - PolkadotJS Keyring
+   */
+  set keyring(keyring) {
+    this._keyring = keyring;
+  }
 
   /**
    * Gets the keyring
@@ -96,7 +98,6 @@ class DockSDK {
     if (!this._keyring) {
       this._keyring = new Keyring({type: 'sr25519'});
     }
-
     return this._keyring;
   }
 

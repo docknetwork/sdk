@@ -1,9 +1,7 @@
-import {
-  isHexWithGivenByteSize
-} from '../src/utils';
+import {isHexWithGivenByteSize} from '../src/utils/misc';
 
 describe('Utils SDK', () => {
-  
+
   test('isHexWithGivenByteSize rejects strings not starting with 0x', () => {
     expect(isHexWithGivenByteSize('12')).toBe(false);
   });

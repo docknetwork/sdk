@@ -1,6 +1,6 @@
 import {u8aToHex} from '@polkadot/util';
 
-import {isHexWithGivenByteSize} from './utils';
+import {isHexWithGivenByteSize} from './utils/misc';
 
 /** Class representing a Signature. This class should always be extended (abstract class in some languages) */
 class Signature {

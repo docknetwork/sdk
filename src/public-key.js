@@ -1,5 +1,5 @@
 import {u8aToHex} from '@polkadot/util';
-import {isHexWithGivenByteSize} from './utils';
+import {isHexWithGivenByteSize} from './utils/misc';
 
 /** Class representing a PublicKey. This class should always be extended (abstract class in some languages) */
 class PublicKey {
@@ -25,8 +25,10 @@ class PublicKey {
   }
 
   /**
-   * Extracts the public key from a pair
-   * @param {KeyringPair} pair
+   * Extracts the public key from a pair. Assumes the KeyringPair is of the correct type. The `type` is intentionally not
+   * inspected to follow dependency inversion principle.
+   * generate the instance correct subclass
+   * @param {KeyringPair} A polkadot-js KeyringPair.
    * @returns {PublicKey}
    */
   static fromKeyringPair(pair) {

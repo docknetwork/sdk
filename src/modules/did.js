@@ -1,8 +1,8 @@
 import {encodeAddress, decodeAddress} from '@polkadot/util-crypto';
 import {u8aToHex} from '@polkadot/util';
 
-import {getBytesForStateChange} from '../utils';
 import {validateDockDIDIdentifier, getHexIdentifierFromDID, DockDIDQualifier} from '../utils/did';
+import {getBytesForStateChange} from '../utils/misc';
 
 const signatureHeaders = {
   Sr25519VerificationKey2018: 'Sr25519SignatureAuthentication2018',
@@ -43,39 +43,22 @@ class DIDModule {
 
   /**
    * Updates the details of an already registered DID on the Dock chain.
-   * @param {string} did - DID
+   * @param {object} keyUpdate - `KeyUpdate` as expected by the Substrate node
    * @param {Signature} signature - Signature from existing key
-   * @param {PublicKey} publicKey -The new public key
-   * @param {string} controller - Optional, The new key's controller
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  updateKey(did, signature, publicKey, last_modified_in_block, controller) {
-    validateDockDIDIdentifier(did);
-    if (controller) {
-      validateDockDIDIdentifier(controller);
-    }
-    const keyUpdate = {
-      did,
-      controller,
-      public_key: publicKey.toJSON(),
-      last_modified_in_block,
-    };
-
+  updateKey(keyUpdate, signature) {
     return this.module.updateKey(keyUpdate, signature.toJSON());
   }
 
   /**
    * Removes an already registered DID on the Dock chain.
-   * @param {string} did - DID
+   * @param {object} didRemoval - `DidRemoval` as expected by the Substrate node
    * @param {Signature} signature - Signature from existing key
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  remove(did, signature, last_modified_in_block) {
-    validateDockDIDIdentifier(did);
-    return this.module.remove({
-      did,
-      last_modified_in_block,
-    }, signature.toJSON());
+  remove(didRemoval, signature) {
+    return this.module.remove(didRemoval, signature.toJSON());
   }
 
   /**
@@ -150,14 +133,14 @@ class DIDModule {
    * Gets the key detail and block number in which the DID was last modified from
    * the chain and return them. It will throw error if the DID does not exist on
    * chain or chain returns null response.
-   * @param {string} did - DID
+   * @param {string} didIdentifier - DID identifier as hex
    * @return {array} A 2 element array with first
    */
-  async getDetail(did) {
-    const resp = await this.api.query.didModule.dids(did);
+  async getDetail(didIdentifier) {
+    const resp = await this.api.query.didModule.dids(didIdentifier);
     if (resp) {
       if (resp.isNone) {
-        throw new Error('Could not find DID: ' + did);
+        throw new Error('Could not find DID: ' + didIdentifier);
       }
 
       const respTuple = resp.unwrap();
@@ -173,6 +156,43 @@ class DIDModule {
   }
 
   /**
+   * Gets the block number in which the DID was last modified from
+   * the chain and return it. It will throw error if the DID does not exist on
+   * chain or chain returns null response.
+   * @param {string} didIdentifier - DID identifier as hex
+   * @return {array} A 2 element array with first
+   */
+  async getBlockNoForLastChangeToDID(didIdentifier) {
+    return (await this.getDetail(didIdentifier))[1];
+  }
+
+  /**
+   * Serializes a `KeyUpdate` for signing.
+   * @param keyUpdate
+   * @returns {Array}
+   */
+  getSerializedKeyUpdate(keyUpdate) {
+    const stateChange = {
+      KeyUpdate: keyUpdate
+    };
+
+    return getBytesForStateChange(this.api, stateChange);
+  }
+
+  /**
+   * Serializes a `DidRemoval` for signing.
+   * @param didRemoval
+   * @returns {Array}
+   */
+  getSerializedDIDRemoval(didRemoval) {
+    const stateChange = {
+      DidRemoval: didRemoval
+    };
+
+    return getBytesForStateChange(this.api, stateChange);
+  }
+
+  /*/!**
    * Prepare a `KeyUpdate` for signing. It takes the fields of a `KeyUpdate`, wraps it in the `StateChange` enum and
    * serializes it to bytes.
    * @param {string} did - DID
@@ -180,7 +200,7 @@ class DIDModule {
    * @param {number} last_modified_in_block - The block number when the DID was last modified.
    * @param {string} controller - Controller DID
    * @return {array} An array of Uint8
-   */
+   *!/
   getSerializedKeyUpdate(did, publicKey, last_modified_in_block, controller) {
     const keyUpdate = {
       did,
@@ -193,15 +213,15 @@ class DIDModule {
     };
 
     return getBytesForStateChange(this.api, stateChange);
-  }
+  }*/
 
-  /**
+  /*/!**
    * Prepare a `DidRemoval` for signing. It takes the fields of a `DidRemoval`, wraps it in the `StateChange` enum and
    * serializes it to bytes.
    * @param {string} did - DID
    * @param {number} last_modified_in_block - The block number when the DID was last modified.
    * @return {array} An array of Uint8
-   */
+   *!/
   getSerializedDIDRemoval(did, last_modified_in_block) {
     const remove = {
       did,
@@ -212,7 +232,7 @@ class DIDModule {
     };
 
     return getBytesForStateChange(this.api, stateChange);
-  }
+  }*/
 }
 
 export default DIDModule;

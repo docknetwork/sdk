@@ -4,7 +4,7 @@
 import {u8aToHex} from '@polkadot/util';
 import {randomAsHex, encodeAddress, decodeAddress} from '@polkadot/util-crypto';
 
-import {isHexWithGivenByteSize, getCorrectPublicKeyFromKeyringPair, getCorrectSignatureFromKeyringPair} from './misc';
+import {isHexWithGivenByteSize, getCorrectSignatureFromKeyringPair} from './misc';
 
 const DockDIDQualifier = 'did:dock:';
 const DockDIDByteSize = 32;
@@ -65,12 +65,26 @@ function createNewDockDID() {
 }
 
 /**
+ * Returns a `KeyDetail` as expected by the Substrate node
+ * @param {PublicKey} publicKey - The public key for the DID. The Keyring is intentionally avoided here as it may not be
+ * accessible always, like in case of hardware wallet
+ * @param {string} controller - Full DID or hex identifier of the controller of the public key
+ * @returns {object} - The object has structure and keys with same names as expected by the Substrate node
+ */
+function createKeyDetail(publicKey, controller) {
+  return {
+    public_key: publicKey.toJSON(),
+    controller: getHexIdentifierFromDID(controller)
+  };
+}
+
+/**
  * Create and return a `KeyUpdate` as expected by the Substrate node. Signing is intentionally kept separate as the
  * JS code may not have access to the signing key like in case of hardware wallet.
- * @param {module} didModule - The did module
+ * @param {DIDModule} didModule - The did module
  * @param {string} did - Full DID or hex identifier to update
- * @param {PublicKey} newPublicKey - The new public key for the DID
- * @param {string} newController - Full DID or hex identifier of the controller of the public. Is optional and must
+ * @param {PublicKey} newPublicKey - The new public key for the DID. The
+ * @param {string} newController - Full DID or hex identifier of the controller of the public key. Is optional and must
  * only be passed when controller is to be updated.
  * @returns {object} The object has structure and keys with same names as expected by the Substrate node
  */
@@ -87,19 +101,19 @@ async function createKeyUpdate(didModule, did, newPublicKey, newController) {
 }
 
 /** Sign the given `KeyUpdate` and returns the signature
- * @param {module} didModule - The did module
+ * @param {DIDModule} didModule - The did module
  * @param {object} keyUpdate - `KeyUpdate` as expected by the Substrate node
  * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * @returns {Signature}
  */
 function signKeyUpdate(didModule, keyUpdate, currentKeyPair) {
   const serializedKeyUpdate = didModule.getSerializedKeyUpdate(keyUpdate);
-  return getCorrectSignatureFromKeyringPair(serializedKeyUpdate, currentKeyPair);
+  return getCorrectSignatureFromKeyringPair(currentKeyPair, serializedKeyUpdate);
 }
 
 /**
  * Create a `KeyUpdate` as expected by the Substrate node and signs it. Return the `KeyUpdate` object and the signature
- * @param {module} didModule - The did module
+ * @param {DIDModule} didModule - The did module
  * @param {string} did - Full DID or hex identifier to update
  * @param {PublicKey} newPublicKey - The new public key for the DID
  * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID
@@ -108,7 +122,7 @@ function signKeyUpdate(didModule, keyUpdate, currentKeyPair) {
  * @returns {array} A 2 element array where the first element is the `KeyUpdate` and the second is the signature
  */
 async function createSignedKeyUpdate(didModule, did, newPublicKey, currentKeyPair, newController) {
-  const keyUpdate = createKeyUpdate(didModule, did, newPublicKey, newController);
+  const keyUpdate = await createKeyUpdate(didModule, did, newPublicKey, newController);
   const signature = signKeyUpdate(didModule, keyUpdate, currentKeyPair);
   return [keyUpdate, signature];
 }
@@ -139,7 +153,7 @@ async function createDidRemoval(didModule, did) {
  */
 function signDidRemoval(didModule, didRemoval, currentKeyPair) {
   const serializedDIDRemoval = didModule.getSerializedDIDRemoval(didRemoval);
-  return getCorrectSignatureFromKeyringPair(serializedDIDRemoval, currentKeyPair);
+  return getCorrectSignatureFromKeyringPair(currentKeyPair, serializedDIDRemoval);
 }
 
 /**
@@ -150,7 +164,7 @@ function signDidRemoval(didModule, didRemoval, currentKeyPair) {
  * @returns {array} A 2 element array where the first element is the `DidRemoval` and the second is the signature
  */
 async function createSignedDidRemoval(didModule, did, currentKeyPair) {
-  const didRemoval = createDidRemoval(didModule, did);
+  const didRemoval = await createDidRemoval(didModule, did);
   const signature = signDidRemoval(didModule, didRemoval, currentKeyPair);
   return [didRemoval, signature];
 }
@@ -160,6 +174,7 @@ export {
   getHexIdentifierFromDID,
   DockDIDQualifier,
   createNewDockDID,
+  createKeyDetail,
   createKeyUpdate,
   signKeyUpdate,
   createSignedKeyUpdate,

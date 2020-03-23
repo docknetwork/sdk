@@ -1,7 +1,6 @@
-import {encodeAddress, decodeAddress} from '@polkadot/util-crypto';
-import {u8aToHex} from '@polkadot/util';
+import {encodeAddress} from '@polkadot/util-crypto';
 
-import {validateDockDIDIdentifier, getHexIdentifierFromDID, DockDIDQualifier} from '../utils/did';
+import {getHexIdentifierFromDID, DockDIDQualifier} from '../utils/did';
 import {getBytesForStateChange} from '../utils/misc';
 
 const signatureHeaders = {
@@ -10,8 +9,6 @@ const signatureHeaders = {
   EcdsaSecp256k1VerificationKey2019: 'EcdsaSecp256k1SignatureAuthentication2019',
 };
 
-// TODO: Make the signature of `new`, `updateKey` and `remove` methods same as the Substrate Node.
-// Also the above mentioned methods should take both hex and fully qualified DIDs.
 /** Class to create, update and destroy DIDs */
 class DIDModule {
   /**
@@ -26,19 +23,13 @@ class DIDModule {
 
   /**
    * Creates a new DID on the Dock chain.
-   * @param {string} did - The new DID
-   * @param {string} controller - The DID of the public key's controller
-   * @param {PublicKey} publicKey - A public key associated with the DID
+   * @param {string} did - The new DID. Can be a full DID or hex identifier
+   * @param {object} keyDetail - `KeyDetail` as expected by the Substrate node
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  new(did, controller, publicKey) {
-    // Controller and did should be valid Dock DIDs
-    validateDockDIDIdentifier(did);
-    validateDockDIDIdentifier(controller);
-    return this.module.new(did, {
-      controller,
-      public_key: publicKey.toJSON(),
-    });
+  new(did, keyDetail) {
+    let hexId = getHexIdentifierFromDID(did);
+    return this.module.new(hexId, keyDetail);
   }
 
   /**
@@ -133,7 +124,8 @@ class DIDModule {
    * Gets the key detail and block number in which the DID was last modified from
    * the chain and return them. It will throw error if the DID does not exist on
    * chain or chain returns null response.
-   * @param {string} didIdentifier - DID identifier as hex
+   * @param {string} didIdentifier - DID identifier as hex. Not accepting full DID intentionally for efficiency as these
+   * methods are used internally
    * @return {array} A 2 element array with first
    */
   async getDetail(didIdentifier) {
@@ -159,7 +151,8 @@ class DIDModule {
    * Gets the block number in which the DID was last modified from
    * the chain and return it. It will throw error if the DID does not exist on
    * chain or chain returns null response.
-   * @param {string} didIdentifier - DID identifier as hex
+   * @param {string} didIdentifier - DID identifier as hex. Not accepting full DID intentionally for efficiency as these
+   * methods are used internally
    * @return {array} A 2 element array with first
    */
   async getBlockNoForLastChangeToDID(didIdentifier) {
@@ -168,8 +161,8 @@ class DIDModule {
 
   /**
    * Serializes a `KeyUpdate` for signing.
-   * @param keyUpdate
-   * @returns {Array}
+   * @param {object} keyUpdate - `KeyUpdate` as expected by the Substrate node
+   * @returns {Array} An array of Uint8
    */
   getSerializedKeyUpdate(keyUpdate) {
     const stateChange = {
@@ -181,8 +174,8 @@ class DIDModule {
 
   /**
    * Serializes a `DidRemoval` for signing.
-   * @param didRemoval
-   * @returns {Array}
+   * @param {object} didRemoval - `DidRemoval` as expected by the Substrate node
+   * @returns {Array} An array of Uint8
    */
   getSerializedDIDRemoval(didRemoval) {
     const stateChange = {
@@ -191,48 +184,6 @@ class DIDModule {
 
     return getBytesForStateChange(this.api, stateChange);
   }
-
-  /*/!**
-   * Prepare a `KeyUpdate` for signing. It takes the fields of a `KeyUpdate`, wraps it in the `StateChange` enum and
-   * serializes it to bytes.
-   * @param {string} did - DID
-   * @param {PublicKey} publicKey - The new public key
-   * @param {number} last_modified_in_block - The block number when the DID was last modified.
-   * @param {string} controller - Controller DID
-   * @return {array} An array of Uint8
-   *!/
-  getSerializedKeyUpdate(did, publicKey, last_modified_in_block, controller) {
-    const keyUpdate = {
-      did,
-      public_key: publicKey.toJSON(),
-      controller,
-      last_modified_in_block
-    };
-    const stateChange = {
-      KeyUpdate: keyUpdate
-    };
-
-    return getBytesForStateChange(this.api, stateChange);
-  }*/
-
-  /*/!**
-   * Prepare a `DidRemoval` for signing. It takes the fields of a `DidRemoval`, wraps it in the `StateChange` enum and
-   * serializes it to bytes.
-   * @param {string} did - DID
-   * @param {number} last_modified_in_block - The block number when the DID was last modified.
-   * @return {array} An array of Uint8
-   *!/
-  getSerializedDIDRemoval(did, last_modified_in_block) {
-    const remove = {
-      did,
-      last_modified_in_block
-    };
-    const stateChange = {
-      DidRemoval: remove
-    };
-
-    return getBytesForStateChange(this.api, stateChange);
-  }*/
 }
 
 export default DIDModule;

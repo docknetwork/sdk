@@ -5,14 +5,14 @@ import {randomAsHex} from '@polkadot/util-crypto';
 import dock, {
   PublicKeySr25519,
   PublicKeyEd25519,
-  SignatureSr25519,
-  SignatureEd25519
 } from '../src/dock-sdk';
+import {createNewDockDID, createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval} from '../src/utils/did';
+import {getCorrectPublicKeyFromKeyringPair} from '../src/utils/misc';
 
 const fullNodeWsRPCEndpoint = 'ws://127.0.0.1:9944';
 
-// Generate a random DID
-const didIdentifier = randomAsHex(32);
+// DID will be generated randomly
+const dockDID = createNewDockDID();
 
 // Generate first key with this seed. The key type is Sr25519
 const firstKeySeed = randomAsHex(32);
@@ -24,16 +24,12 @@ const secondKeySeed = randomAsHex(32);
 async function removeDID() {
   console.log('Removing DID now.');
 
-  // Get DID details. This call will fail if DID is not written already
-  const last_modified_in_block = (await dock.did.getDetail(didIdentifier))[1];
-
   // Sign key update with this key pair as this is the current key of the DID
   const currentPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
 
-  const serializedDIDRemoval = dock.did.getSerializedDIDRemoval(didIdentifier, last_modified_in_block);
-  const signature = new SignatureEd25519(serializedDIDRemoval, currentPair);
+  const [didRemoval, signature] = await createSignedDidRemoval(dock.did, dockDID, currentPair);
 
-  const transaction = dock.did.remove(didIdentifier, signature, last_modified_in_block);
+  const transaction = dock.did.remove(didRemoval, signature);
   return dock.sendTransaction(transaction);
 }
 
@@ -41,42 +37,41 @@ async function removeDID() {
 async function updateDIDKey() {
   console.log('Updating key now.');
 
-  // Get DID details. This call will fail if DID is not written already
-  const last_modified_in_block = (await dock.did.getDetail(didIdentifier))[1];
   // Sign key update with this key pair as this is the current key of the DID
   const currentPair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
 
   // Update DID key to the following
   const newPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
-  const newPk = PublicKeyEd25519.fromKeyringPair(newPair);
+  // the following function will figure out the correct PublicKey type from the `type` property of `newPair`
+  const newPk = getCorrectPublicKeyFromKeyringPair(newPair);
+
   const newController = randomAsHex(32);
 
-  const serializedKeyUpdate = dock.did.getSerializedKeyUpdate(didIdentifier, newPk, last_modified_in_block, newController);
-  const signature = new SignatureSr25519(serializedKeyUpdate, currentPair);
-
-  const transaction = dock.did.updateKey(didIdentifier, signature, newPk, last_modified_in_block, newController);
+  const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, dockDID, newPk, currentPair, newController);
+  const transaction = dock.did.updateKey(keyUpdate, signature);
   return dock.sendTransaction(transaction);
 }
 
 async function getDIDDoc() {
   console.log('Getting DID now.');
   // Check if DID exists
-  const result = await dock.did.getDocument(didIdentifier);
+  const result = await dock.did.getDocument(dockDID);
   console.log('DID Document:', JSON.stringify(result, true, 2));
   return result;
 }
 
 // Called when connected to the node
-function createNewDID() {
-  const controller = randomAsHex(32);
-
+function registerNewDID() {
   // Generate keys for the DID.
   const firstPair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
   const publicKey = PublicKeySr25519.fromKeyringPair(firstPair);
 
-  console.log('Submitting new DID', didIdentifier, controller, publicKey);
+  // The controller is same as the DID
+  const keyDetail = createKeyDetail(publicKey, dockDID);
 
-  const transaction = dock.did.new(didIdentifier, controller, publicKey);
+  console.log('Submitting new DID', dockDID, publicKey);
+
+  const transaction = dock.did.new(dockDID, keyDetail);
   return dock.sendTransaction(transaction);
 }
 
@@ -86,13 +81,22 @@ dock.init(fullNodeWsRPCEndpoint)
   .then(() => {
     const account = dock.keyring.addFromUri('//Alice', {name: 'Alice'});
     dock.setAccount(account);
-    return createNewDID();
+    return registerNewDID();
   })
   .then(getDIDDoc)
   .then(updateDIDKey)
   .then(getDIDDoc)
   .then(removeDID)
-  .then(getDIDDoc)
+  .then(async () => {
+    try {
+      await dock.did.getDocument(dockDID);
+      throw new Error('The call to get the DID document should have failed but did not fail. This means the remove DID call has not worked.')
+    } catch (e) {
+      // The call to get the DID document has failed since the DID has been removed
+      console.log('Example ran successfully');
+      process.exit(0);
+    }
+  })
   .catch(error => {
     console.error('Error occurred somewhere, it was caught!', error);
   });

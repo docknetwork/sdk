@@ -12,6 +12,8 @@ import {
 } from '../src/utils/did';
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from './test-constants';
 import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
+import {PublicKeyEd25519} from '../src/public-key';
+import {SignatureEd25519, SignatureSr25519} from '../src/signature';
 
 
 describe('DID utilities', () => {
@@ -113,20 +115,20 @@ describe('DID Module', () => {
     const transaction = dock.did.new(dockDID, keyDetail);
     const result = await dock.sendTransaction(transaction);
     if (result) {
-      const document = await dock.did.getDocument(didIdentifier);
+      const document = await dock.did.getDocument(dockDID);
       expect(!!document).toBe(true);
     }
   }, 30000);
 
   test.skip('Can get a DID document', async () => {
-    const result = await dock.did.getDocument(didIdentifier);
+    const result = await dock.did.getDocument(dockDID);
     console.log('DID Document:', JSON.stringify(result, true, 2));
     expect(!!result).toBe(true);
   }, 10000);
 
   test.skip('Can update a DID key', async () => {
     // Get DID details. This call will fail if DID is not written already
-    const last_modified_in_block = (await dock.did.getDetail(didIdentifier))[1];
+    const last_modified_in_block = (await dock.did.getDetail(dockDID))[1];
     // Sign key update with this key pair as this is the current key of the DID
     const currentPair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
 
@@ -135,28 +137,28 @@ describe('DID Module', () => {
     const newPk = PublicKeyEd25519.fromKeyringPair(newPair);
     const newController = randomAsHex(32);
 
-    const serializedKeyUpdate = dock.did.getSerializedKeyUpdate(didIdentifier, newPk, last_modified_in_block, newController);
+    const serializedKeyUpdate = dock.did.getSerializedKeyUpdate(dockDID, newPk, last_modified_in_block, newController);
     const signature = new SignatureSr25519(serializedKeyUpdate, currentPair);
 
-    const transaction = dock.did.updateKey(didIdentifier, signature, newPk, last_modified_in_block, newController);
+    const transaction = dock.did.updateKey(dockDID, signature, newPk, last_modified_in_block, newController);
     const result = await dock.sendTransaction(transaction);
     expect(!!result).toBe(true);
   }, 30000);
 
   test.skip('Can remove a DID', async () => {
     // Get DID details. This call will fail if DID is not written already
-    const last_modified_in_block = (await dock.did.getDetail(didIdentifier))[1];
+    const last_modified_in_block = (await dock.did.getDetail(dockDID))[1];
 
     // Sign key update with this key pair as this is the current key of the DID
     const currentPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
 
-    const serializedDIDRemoval = dock.did.getSerializedDIDRemoval(didIdentifier, last_modified_in_block);
+    const serializedDIDRemoval = dock.did.getSerializedDIDRemoval(dockDID, last_modified_in_block);
     const signature = new SignatureEd25519(serializedDIDRemoval, currentPair);
 
-    const transaction = dock.did.remove(didIdentifier, signature, last_modified_in_block);
+    const transaction = dock.did.remove(dockDID, signature, last_modified_in_block);
     const result = await dock.sendTransaction(transaction);
     if (result) {
-      await expect(dock.did.getDocument(didIdentifier)).rejects.toThrow(/Could not find DID/);
+      await expect(dock.did.getDocument(dockDID)).rejects.toThrow(/Could not find DID/);
     }
   }, 30000);
 

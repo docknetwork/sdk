@@ -1,16 +1,17 @@
 import {Keyring} from '@polkadot/api';
 import {randomAsHex, encodeAddress} from '@polkadot/util-crypto';
-import {u8aToHex} from '@polkadot/util';
+
+import {DockSDK} from '../src/dock-sdk';
 
 import {
-  DockSDK,
-  PublicKeySr25519,
-  PublicKeyEd25519,
-  SignatureSr25519,
-  SignatureEd25519
-} from '../src/dock-sdk';
-import {validateDockDIDIdentifier, getHexIdentifierFromDID, DockDIDQualifier} from '../src/utils/did';
+  validateDockDIDIdentifier,
+  getHexIdentifierFromDID,
+  DockDIDQualifier,
+  createNewDockDID,
+  createKeyDetail
+} from '../src/utils/did';
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from './test-constants';
+import {getCorrectPublicKeyFromKeyringPair} from '../src/utils/misc';
 
 
 describe('DID utilities', () => {
@@ -75,7 +76,7 @@ describe('DID Module', () => {
   const dock = new DockSDK(FullNodeEndpoint);
 
   // Generate a random DID
-  const didIdentifier = randomAsHex(32);
+  const dockDID = createNewDockDID();
 
   // Generate first key with this seed. The key type is Sr25519
   const firstKeySeed = randomAsHex(32);
@@ -103,10 +104,13 @@ describe('DID Module', () => {
   });
 
   test.skip('Can create a DID', async () => {
-    const pair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
-    const publicKey = new PublicKeySr25519(u8aToHex(pair.publicKey));
-    // controller is same as DID
-    const transaction = dock.did.new(didIdentifier, didIdentifier, publicKey);
+    const pair = dock.keyring.addFromUri(firstKeySeed);
+    const publicKey = getCorrectPublicKeyFromKeyringPair(pair);
+
+    // The controller is same as the DID
+    const keyDetail = createKeyDetail(publicKey, dockDID);
+
+    const transaction = dock.did.new(dockDID, keyDetail);
     const result = await dock.sendTransaction(transaction);
     if (result) {
       const document = await dock.did.getDocument(didIdentifier);

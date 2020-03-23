@@ -39,6 +39,8 @@
     "dist"
   ],
   "dependencies": {
-    "@polkadot/api": "^1.8.1"
+    "@polkadot/api": "^1.8.1",
+    "did-resolver": "^1.1.0",
+    "ethr-did-resolver": "^2.2.0"
   }
 }

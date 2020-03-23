@@ -1,7 +1,8 @@
-import VerifiableCredential from '../src/modules/vc.js';
+import VerifiableCredential from '../src/modules/vc';
+
+const vc = new VerifiableCredential();
 
 describe('Verifiable Credential Issuing', () => {
-  let vc = new VerifiableCredential();
   const sample_unsigned_cred = {
     '@context': [
       'https://www.w3.org/2018/credentials/v1',

@@ -1,7 +1,7 @@
 /*!
  * Copyright (c) 2019 Digital Bazaar, Inc. All rights reserved.
  */
-module.exports = {
+export default {
   '@context': [
     {
     '@version': 1.1

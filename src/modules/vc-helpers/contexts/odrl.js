@@ -1,7 +1,7 @@
 /*!
  * Copyright (c) 2019 Digital Bazaar, Inc. All rights reserved.
  */
-module.exports = {
+export default {
   '@context': {
     'odrl':    'http://www.w3.org/ns/odrl/2/',
     'rdf':     'http://www.w3.org/1999/02/22-rdf-syntax-ns#',

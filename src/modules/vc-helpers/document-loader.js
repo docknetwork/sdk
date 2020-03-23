@@ -1,12 +1,7 @@
-/*
- * Copyright (c) 2019 Digital Bazaar, Inc. All rights reserved.
-*/
-'use strict';
-
 const axios = require('axios');
 const testContext = require('../vc-helpers/contexts');
 
-module.exports = async url => {
+export default async function(url) {
   const context = testContext.get(url);
   if(context) {
     return {

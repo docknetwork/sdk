@@ -134,6 +134,9 @@ class DockSDK {
    * @return {DIDModule} The module to use
    */
   get did() {
+    if (!this._did) {
+      throw new Error('Unable to get DID module, SDK is not initialised');
+    }
     return this._did;
   }
 
@@ -142,6 +145,9 @@ class DockSDK {
    * @return {RevocationModule} The module to use
    */
   get revocation() {
+    if (!this._revocation) {
+      throw new Error('Unable to get revocation module, SDK is not initialised');
+    }
     return this._revocation;
   }
 }

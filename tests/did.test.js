@@ -77,14 +77,17 @@ describe('DID Module', () => {
   // Generate a random DID
   const didIdentifier = randomAsHex(32);
 
-  // Generate key with this seed.
-  const seed = randomAsHex(32);
+  // Generate first key with this seed. The key type is Sr25519
+  const firstKeySeed = randomAsHex(32);
+
+  // Generate second key (for update) with this seed. The key type is Ed25519
+  const secondKeySeed = randomAsHex(32);
 
   // TODO: Uncomment the `beforeAll` and unskip the tests once a node is deployed.
-  /*beforeAll(async (done) => {
-    await dock.init();
-    done();
-  });*/
+  // beforeAll(async (done) => {
+  //   await dock.init();
+  //   done();
+  // });
 
   test.skip('Can connect to node', () => {
     //await dock.init();
@@ -100,34 +103,60 @@ describe('DID Module', () => {
   });
 
   test.skip('Can create a DID', async () => {
-    const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
+    const pair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
     const publicKey = new PublicKeySr25519(u8aToHex(pair.publicKey));
     // controller is same as DID
     const transaction = dock.did.new(didIdentifier, didIdentifier, publicKey);
     const result = await dock.sendTransaction(transaction);
+    if (result) {
+      const document = await dock.did.getDocument(didIdentifier);
+      expect(!!document).toBe(true);
+    }
+  }, 30000);
+
+  test.skip('Can get a DID document', async () => {
+    const result = await dock.did.getDocument(didIdentifier);
+    console.log('DID Document:', JSON.stringify(result, true, 2));
+    expect(!!result).toBe(true);
+  }, 10000);
+
+  test.skip('Can update a DID key', async () => {
+    // Get DID details. This call will fail if DID is not written already
+    const last_modified_in_block = (await dock.did.getDetail(didIdentifier))[1];
+    // Sign key update with this key pair as this is the current key of the DID
+    const currentPair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
+
+    // Update DID key to the following
+    const newPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
+    const newPk = PublicKeyEd25519.fromKeyringPair(newPair);
+    const newController = randomAsHex(32);
+
+    const serializedKeyUpdate = dock.did.getSerializedKeyUpdate(didIdentifier, newPk, last_modified_in_block, newController);
+    const signature = new SignatureSr25519(serializedKeyUpdate, currentPair);
+
+    const transaction = dock.did.updateKey(didIdentifier, signature, newPk, last_modified_in_block, newController);
+    const result = await dock.sendTransaction(transaction);
     expect(!!result).toBe(true);
   }, 30000);
 
-  test('Can get a DID document', () => {
-    // const result = await dock.did.getDocument(didIdentifier);
-    // console.log('DID Document:', JSON.stringify(result, true, 2));
-    const result = true; // disabled temporarily because cant connect to node and submit txs
-    expect(!!result).toBe(true);
-  });
+  test.skip('Can remove a DID', async () => {
+    // Get DID details. This call will fail if DID is not written already
+    const last_modified_in_block = (await dock.did.getDetail(didIdentifier))[1];
 
-  test('Can update a DID Key', () => {
-    // TODO
-    const result = true; // disabled temporarily because cant connect to node and submit txs
-    expect(!!result).toBe(true);
-  });
+    // Sign key update with this key pair as this is the current key of the DID
+    const currentPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
 
-  test('Can remove a DID', () => {
-    // TODO
-    const result = true; // disabled temporarily because cant connect to node and submit txs
-    expect(!!result).toBe(true);
-  });
+    const serializedDIDRemoval = dock.did.getSerializedDIDRemoval(didIdentifier, last_modified_in_block);
+    const signature = new SignatureEd25519(serializedDIDRemoval, currentPair);
 
-  test('Can disconnect from node', async () => {
+    const transaction = dock.did.remove(didIdentifier, signature, last_modified_in_block);
+    const result = await dock.sendTransaction(transaction);
+    if (result) {
+      await expect(dock.did.getDocument(didIdentifier)).rejects.toThrow(/Could not find DID/);
+    }
+  }, 30000);
+
+  test.skip('Can disconnect from node', async () => {
     await dock.disconnect();
     expect(!!dock.api).toBe(false);
   });

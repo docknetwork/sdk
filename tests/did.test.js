@@ -11,7 +11,7 @@ import {
   createKeyDetail
 } from '../src/utils/did';
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from './test-constants';
-import {getCorrectPublicKeyFromKeyringPair} from '../src/utils/misc';
+import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
 
 
 describe('DID utilities', () => {
@@ -105,7 +105,7 @@ describe('DID Module', () => {
 
   test.skip('Can create a DID', async () => {
     const pair = dock.keyring.addFromUri(firstKeySeed);
-    const publicKey = getCorrectPublicKeyFromKeyringPair(pair);
+    const publicKey = getPublicKeyFromKeyringPair(pair);
 
     // The controller is same as the DID
     const keyDetail = createKeyDetail(publicKey, dockDID);

@@ -7,7 +7,7 @@ import dock, {
   PublicKeyEd25519,
 } from '../src/dock-sdk';
 import {createNewDockDID, createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval} from '../src/utils/did';
-import {getCorrectPublicKeyFromKeyringPair} from '../src/utils/misc';
+import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
 
 const fullNodeWsRPCEndpoint = 'ws://127.0.0.1:9944';
 
@@ -43,7 +43,7 @@ async function updateDIDKey() {
   // Update DID key to the following
   const newPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
   // the following function will figure out the correct PublicKey type from the `type` property of `newPair`
-  const newPk = getCorrectPublicKeyFromKeyringPair(newPair);
+  const newPk = getPublicKeyFromKeyringPair(newPair);
 
   const newController = randomAsHex(32);
 

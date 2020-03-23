@@ -2,8 +2,8 @@ import {cryptoWaitReady, randomAsHex} from '@polkadot/util-crypto';
 import {Keyring} from '@polkadot/api';
 
 import {
-  getCorrectPublicKeyFromKeyringPair,
-  getCorrectSignatureFromKeyringPair,
+  getPublicKeyFromKeyringPair,
+  getSignatureFromKeyringPair,
   isHexWithGivenByteSize
 } from '../src/utils/misc';
 import {PublicKeyEd25519, PublicKeySr25519} from '../src/public-key';
@@ -56,20 +56,20 @@ describe('Testing public key and signature instantiation from keyring', () => {
     // polkadot-js as it should not allow to create such pair
     let keyring = new Keyring();
     let badPair = keyring.addFromUri(randomAsHex(32), null, 'ee25519');
-    expect(() => getCorrectPublicKeyFromKeyringPair(badPair)).toThrow('Only ed25519 and sr25519 keys supported as of now');
+    expect(() => getPublicKeyFromKeyringPair(badPair)).toThrow('Only ed25519 and sr25519 keys supported as of now');
   });
 
   test('getCorrectPublicKeyFromKeyringPair returns correct public key from ed25519 pair', () => {
     let keyring = new Keyring();
     let pair = keyring.addFromUri(randomAsHex(32), null, 'ed25519');
-    const pk = getCorrectPublicKeyFromKeyringPair(pair);
+    const pk = getPublicKeyFromKeyringPair(pair);
     expect(pk instanceof PublicKeyEd25519).toBe(true);
   });
 
   test('getCorrectPublicKeyFromKeyringPair returns correct public key from sr25519 pair', () => {
     let keyring = new Keyring();
     let pair = keyring.addFromUri(randomAsHex(32), null, 'sr25519');
-    const pk = getCorrectPublicKeyFromKeyringPair(pair);
+    const pk = getPublicKeyFromKeyringPair(pair);
     expect(pk instanceof PublicKeySr25519).toBe(true);
   });
 
@@ -78,20 +78,20 @@ describe('Testing public key and signature instantiation from keyring', () => {
     // polkadot-js as it should not allow to create such pair
     let keyring = new Keyring();
     let badPair = keyring.addFromUri(randomAsHex(32), null, 'ee25519');
-    expect(() => getCorrectSignatureFromKeyringPair(badPair, [1, 2])).toThrow('Only ed25519 and sr25519 keys supported as of now');
+    expect(() => getSignatureFromKeyringPair(badPair, [1, 2])).toThrow('Only ed25519 and sr25519 keys supported as of now');
   });
 
   test('getCorrectSignatureFromKeyringPair returns correct signature from ed25519 pair', () => {
     let keyring = new Keyring();
     let pair = keyring.addFromUri(randomAsHex(32), null, 'ed25519');
-    const sig = getCorrectSignatureFromKeyringPair(pair, [1, 2]);
+    const sig = getSignatureFromKeyringPair(pair, [1, 2]);
     expect(sig instanceof SignatureEd25519).toBe(true);
   });
 
   test('getCorrectSignatureFromKeyringPair returns correct signature from sr25519 pair', () => {
     let keyring = new Keyring();
     let pair = keyring.addFromUri(randomAsHex(32), null, 'sr25519');
-    const sig = getCorrectSignatureFromKeyringPair(pair, [1, 2]);
+    const sig = getSignatureFromKeyringPair(pair, [1, 2]);
     expect(sig instanceof SignatureSr25519).toBe(true);
   });
 });

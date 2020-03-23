@@ -4,7 +4,7 @@
 import {u8aToHex} from '@polkadot/util';
 import {randomAsHex, encodeAddress, decodeAddress} from '@polkadot/util-crypto';
 
-import {isHexWithGivenByteSize, getCorrectSignatureFromKeyringPair} from './misc';
+import {isHexWithGivenByteSize, getSignatureFromKeyringPair} from './misc';
 
 const DockDIDQualifier = 'did:dock:';
 const DockDIDByteSize = 32;
@@ -108,7 +108,7 @@ async function createKeyUpdate(didModule, did, newPublicKey, newController) {
  */
 function signKeyUpdate(didModule, keyUpdate, currentKeyPair) {
   const serializedKeyUpdate = didModule.getSerializedKeyUpdate(keyUpdate);
-  return getCorrectSignatureFromKeyringPair(currentKeyPair, serializedKeyUpdate);
+  return getSignatureFromKeyringPair(currentKeyPair, serializedKeyUpdate);
 }
 
 /**
@@ -153,7 +153,7 @@ async function createDidRemoval(didModule, did) {
  */
 function signDidRemoval(didModule, didRemoval, currentKeyPair) {
   const serializedDIDRemoval = didModule.getSerializedDIDRemoval(didRemoval);
-  return getCorrectSignatureFromKeyringPair(currentKeyPair, serializedDIDRemoval);
+  return getSignatureFromKeyringPair(currentKeyPair, serializedDIDRemoval);
 }
 
 /**

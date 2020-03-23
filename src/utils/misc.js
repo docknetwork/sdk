@@ -38,7 +38,7 @@ function getBytesForStateChange(api, stateChange) {
  * @param {KeyringPair} pair - A polkadot-js KeyringPair.
  * @return {PublicKey} An instance of the correct subclass of PublicKey
  */
-function getCorrectPublicKeyFromKeyringPair(pair) {
+function getPublicKeyFromKeyringPair(pair) {
   if (pair.type !== 'ed25519' && pair.type !== 'sr25519') {
     throw new Error('Only ed25519 and sr25519 keys supported as of now');
   }
@@ -51,7 +51,7 @@ function getCorrectPublicKeyFromKeyringPair(pair) {
  * @param {array} message - an array of bytes (Uint8)
  * @returns {Signature} An instance of the correct subclass of Signature
  */
-function getCorrectSignatureFromKeyringPair(pair, message) {
+function getSignatureFromKeyringPair(pair, message) {
   if (pair.type !== 'ed25519' && pair.type !== 'sr25519') {
     throw new Error('Only ed25519 and sr25519 keys supported as of now');
   }
@@ -60,6 +60,6 @@ function getCorrectSignatureFromKeyringPair(pair, message) {
 
 export {isHexWithGivenByteSize,
   getBytesForStateChange,
-  getCorrectPublicKeyFromKeyringPair,
-  getCorrectSignatureFromKeyringPair
+  getPublicKeyFromKeyringPair,
+  getSignatureFromKeyringPair
 };

@@ -40,5 +40,10 @@ Run example to create a new DID, register it, update its key and remove the DID.
 yarn dock-did-example
 ```
 
+Run example to resolve DID
+```
+yarn did-resolver
+```
+
 ## JSON types
 The types on Substrate node should be reflected in [types.json](./src/types.json)

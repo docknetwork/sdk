@@ -33,7 +33,8 @@
     "watch": "rollup -c -w",
     "test": "jest",
     "docs": "jsdoc src -r -c .jsdoc -d docs",
-    "dock-did-example": "npx babel-node example/dock-did.js"
+    "dock-did-example": "npx babel-node example/dock-did.js",
+    "did-resolver": "npx babel-node example/resolver.js"
   },
   "files": [
     "dist"

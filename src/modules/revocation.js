@@ -7,72 +7,75 @@ class RevocationModule {
    */
   constructor(api) {
     this.api = api;
-    this.module = api.tx.revocationModule;
+    this.module = api.tx.revoke;
   }
 
   /**
    * Creating a revocation registry
-   * @param {string} origin - The origin
-   * @param {string} id - is the unique id of the registry. The function will check whether `id` is already taken or not.
-   * @param {RevRegistry} registry - Will serialized `registry` and update the map `rev_registries` with `id` -> `(registry, last updated block number)
+   * @param {RegistryId} id - is the unique id of the registry. The function will check whether `id` is already taken or not.
+   * @param {Registry} registry - Will serialized `registry` and update the map `rev_registries` with `id` -> `(registry, last updated block number)
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  new(origin, id, registry) {
-    return this.module.new(origin, id, registry);
-  }
-
-  /**
-   * Revoke credentials
-   * @param {string} origin - The origin
-   * @param {Revoke} toRevoke - contains the credentials to be revoked
-   * @param {Array} controllers - contains the `(DID, signature)`s of the controllers who are allowing these revocations. Each tuple contains the controller and its signature.
-   * @return {Extrinsic} The extrinsic to sign and send.
-   */
-  revoke(origin, toRevoke, controllers) {
-    return this.module.revoke(origin, toRevoke, controllers);
-  }
-
-  /**
-   * Unrevoke credentials
-   * @param {string} origin - The origin
-   * @param {Unrevoke} toUnrevoke - contains the credentials to be revoked
-   * @param {Array} controllers - contains the `(DID, signature)`s of the controllers who are allowing these unrevocations. Each tuple contains the controller and its signature.
-   * @return {Extrinsic} The extrinsic to sign and send.
-   */
-  unrevoke(origin, toUnrevoke, controllers) {
-    return this.module.unrevoke(origin, toUnrevoke, controllers);
+  newRegistry(id, registry) {
+    console.log('new revocation', id, registry.toJSON())
+    return this.module.newRegistry(id, registry);
   }
 
   /**
    * Deleting revocation registry
-   * @param {string} origin - The origin
-   * @param {RemoveRegistry} toRemove - contains the registry to remove
-   * @param {Array} controllers - contains the `(DID, signature)`s of the controllers who are allowing this removal. Each tuple contains the controller and its signature
+   * @param {RemoveRegistry} removal - contains the registry to remove
+   * @param {PAuth} proof - The proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  remove(origin, toRemove, controllers) {
-    return this.module.remove(origin, toRemove, controllers);
+  removeRegistry(removal, proof) {
+    return this.module.removeRegistry(origin, toRemove, controllers);
+  }
+
+  /**
+   * Revoke credentials
+   * @param {Revoke} revoke - contains the credentials to be revoked
+   * @param {PAuth} proof - The proof
+   * @return {Extrinsic} The extrinsic to sign and send.
+   */
+  revoke(revoke, proof) {
+    return this.module.revoke(revoke, proof);
+  }
+
+  /**
+   * Unrevoke credentials
+   * @param {UnRevoke} unrevoke - contains the credentials to be revoked
+   * @param {PAuth} proof - The proof
+   * @return {Extrinsic} The extrinsic to sign and send.
+   */
+  unrevoke(unrevoke, proof) {
+    return this.module.unrevoke(unrevoke, proof);
   }
 
   /**
    * The read-only call get_revocation_registry is used to get details of the revocation registry like controllers, policy and type. If the registry is not present, None is returned.
-   * @param {string} revRegID - Revocation registry ID
+   * @param {RegistryId} registryID - Revocation registry ID
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  getRevocationRegistry(revRegID) {
-    // TODO: likely needs api query
-    return this.module.getRevocationRegistry(revRegID);
+  async getRevocationRegistry(registryID) {
+    const resp = await this.api.query.revoke.registries(registryID);
+    if (resp && !resp.isNone) {
+      return resp;
+    }
+    throw new Error('Could not find revocation registry: ' + registryID);
   }
 
   /**
    * The read-only call get_revocation_status is used to check whether a credential is revoked or not and does not consume any tokens. If
-   * @param {string} revRegID - Revocation registry ID
-   * @param {string} credentialID - Credential ID
+   * @param {RegistryId} registryID - Revocation registry ID
+   * @param {RevokeId} revokeId - Credential ID
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  getRevocationStatus(revRegID, credentialID) {
-    // TODO: likely needs api query
-    return this.module.getRevocationStatus(revRegID, credentialID);
+  async getRevocationStatus(registryID, revokeID) {
+    const resp = await this.api.query.revoke.revocations(registryID, revokeID);
+    if (resp && !resp.isNone) {
+      return resp;
+    }
+    throw new Error('Could not find revocation status: ' + registryID + ' for ' + revokeID);
   }
 }
 

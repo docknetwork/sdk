@@ -146,7 +146,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line30">line 30</a>
+        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line19">line 19</a>
     </li></ul></dd>
     
 
@@ -202,7 +202,169 @@
     
 
     
-    <h4 class="name" id="getDetail"><span class="type-signature">(async) </span>getDetail<span class="signature">(did)</span><span class="type-signature"> &rarr; {array}</span></h4>
+    <h4 class="name" id="getBlockNoForLastChangeToDID"><span class="type-signature">(async) </span>getBlockNoForLastChangeToDID<span class="signature">(didIdentifier)</span><span class="type-signature"> &rarr; {array}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Gets the block number in which the DID was last modified from
+the chain and return it. It will throw error if the DID does not exist on
+chain or chain returns null response.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>didIdentifier</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">DID identifier as hex. Not accepting full DID intentionally for efficiency as these
+methods are used internally</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line158">line 158</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A 2 element array with first
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getDetail"><span class="type-signature">(async) </span>getDetail<span class="signature">(didIdentifier)</span><span class="type-signature"> &rarr; {array}</span></h4>
     
 
     
@@ -248,7 +410,7 @@ chain or chain returns null response.
 
         <tr>
             
-                <td class="name"><code>did</code></td>
+                <td class="name"><code>didIdentifier</code></td>
             
 
             <td class="type">
@@ -264,7 +426,8 @@ chain or chain returns null response.
 
             
 
-            <td class="description last">DID</td>
+            <td class="description last">DID identifier as hex. Not accepting full DID intentionally for efficiency as these
+methods are used internally</td>
         </tr>
 
     
@@ -305,7 +468,7 @@ chain or chain returns null response.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line162">line 162</a>
+        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line131">line 131</a>
     </li></ul></dd>
     
 
@@ -423,7 +586,8 @@ chain or chain returns null response.
 
             
 
-            <td class="description last">DID</td>
+            <td class="description last">The DID can be passed as fully qualified DID like `dock:did:<SS58 string>` or
+a 32 byte hex string</td>
         </tr>
 
     
@@ -464,7 +628,7 @@ chain or chain returns null response.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line103">line 103</a>
+        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line70">line 70</a>
     </li></ul></dd>
     
 
@@ -623,7 +787,7 @@ chain or chain returns null response.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line94">line 94</a>
+        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line60">line 60</a>
     </li></ul></dd>
     
 
@@ -681,7 +845,325 @@ chain or chain returns null response.
     
 
     
-    <h4 class="name" id="new"><span class="type-signature"></span>new<span class="signature">(did, controller, publicKey)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
+    <h4 class="name" id="getSerializedDIDRemoval"><span class="type-signature"></span>getSerializedDIDRemoval<span class="signature">(didRemoval)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Serializes a `DidRemoval` for signing.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>didRemoval</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">`DidRemoval` as expected by the Substrate node</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line180">line 180</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    An array of Uint8
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getSerializedKeyUpdate"><span class="type-signature"></span>getSerializedKeyUpdate<span class="signature">(keyUpdate)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Serializes a `KeyUpdate` for signing.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>keyUpdate</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">`KeyUpdate` as expected by the Substrate node</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line167">line 167</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    An array of Uint8
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="new"><span class="type-signature"></span>new<span class="signature">(did, keyDetail)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
     
 
     
@@ -741,20 +1223,20 @@ chain or chain returns null response.
 
             
 
-            <td class="description last">The new DID</td>
+            <td class="description last">The new DID. Can be a full DID or hex identifier</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>controller</code></td>
+                <td class="name"><code>keyDetail</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">object</span>
 
 
             
@@ -764,30 +1246,7 @@ chain or chain returns null response.
 
             
 
-            <td class="description last">The DID of the public key's controller</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>publicKey</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="PublicKey.html">PublicKey</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">A public key associated with the DID</td>
+            <td class="description last">`KeyDetail` as expected by the Substrate node</td>
         </tr>
 
     
@@ -828,7 +1287,7 @@ chain or chain returns null response.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line42">line 42</a>
+        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line30">line 30</a>
     </li></ul></dd>
     
 
@@ -886,7 +1345,7 @@ chain or chain returns null response.
     
 
     
-    <h4 class="name" id="remove"><span class="type-signature"></span>remove<span class="signature">(did, signature)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
+    <h4 class="name" id="remove"><span class="type-signature"></span>remove<span class="signature">(didRemoval, signature)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
     
 
     
@@ -930,13 +1389,13 @@ chain or chain returns null response.
 
         <tr>
             
-                <td class="name"><code>did</code></td>
+                <td class="name"><code>didRemoval</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">object</span>
 
 
             
@@ -946,7 +1405,7 @@ chain or chain returns null response.
 
             
 
-            <td class="description last">DID</td>
+            <td class="description last">`DidRemoval` as expected by the Substrate node</td>
         </tr>
 
     
@@ -959,7 +1418,7 @@ chain or chain returns null response.
             <td class="type">
             
                 
-<span class="param-type">Signature</span>
+<span class="param-type"><a href="Signature.html">Signature</a></span>
 
 
             
@@ -1010,7 +1469,7 @@ chain or chain returns null response.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line81">line 81</a>
+        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line51">line 51</a>
     </li></ul></dd>
     
 
@@ -1068,7 +1527,7 @@ chain or chain returns null response.
     
 
     
-    <h4 class="name" id="updateKey"><span class="type-signature"></span>updateKey<span class="signature">(did, signature, publicKey, controller)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
+    <h4 class="name" id="updateKey"><span class="type-signature"></span>updateKey<span class="signature">(keyUpdate, signature)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
     
 
     
@@ -1112,13 +1571,13 @@ chain or chain returns null response.
 
         <tr>
             
-                <td class="name"><code>did</code></td>
+                <td class="name"><code>keyUpdate</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">object</span>
 
 
             
@@ -1128,7 +1587,7 @@ chain or chain returns null response.
 
             
 
-            <td class="description last">DID</td>
+            <td class="description last">`KeyUpdate` as expected by the Substrate node</td>
         </tr>
 
     
@@ -1141,7 +1600,7 @@ chain or chain returns null response.
             <td class="type">
             
                 
-<span class="param-type">Signature</span>
+<span class="param-type"><a href="Signature.html">Signature</a></span>
 
 
             
@@ -1152,52 +1611,6 @@ chain or chain returns null response.
             
 
             <td class="description last">Signature from existing key</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>publicKey</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="PublicKey.html">PublicKey</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The new public key</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>controller</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Optional, The new key's controller</td>
         </tr>
 
     
@@ -1238,7 +1651,7 @@ chain or chain returns null response.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line60">line 60</a>
+        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line41">line 41</a>
     </li></ul></dd>
     
 
@@ -1306,13 +1719,13 @@ chain or chain returns null response.
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockSDK.html">DockSDK</a></li><li><a href="PublicKey.html">PublicKey</a></li><li><a href="RevocationModule.html">RevocationModule</a></li></ul><h3>Global</h3><ul><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#validateDockDIDIdentifier">validateDockDIDIdentifier</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockSDK.html">DockSDK</a></li><li><a href="PublicKey.html">PublicKey</a></li><li><a href="PublicKeyEd25519.html">PublicKeyEd25519</a></li><li><a href="PublicKeySecp256k1.html">PublicKeySecp256k1</a></li><li><a href="PublicKeySr25519.html">PublicKeySr25519</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="Signature.html">Signature</a></li><li><a href="SignatureEd25519.html">SignatureEd25519</a></li><li><a href="SignatureSr25519.html">SignatureSr25519</a></li></ul><h3>Global</h3><ul><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#validateDockDIDIdentifier">validateDockDIDIdentifier</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Wed Mar 18 2020 20:57:50 GMT+0000 (Greenwich Mean Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Tue Mar 24 2020 00:15:04 GMT+0000 (Greenwich Mean Time)
 </footer>
 
 <script> prettyPrint(); </script>

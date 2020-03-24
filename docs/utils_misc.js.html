@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: public-key.js</title>
+    <title>JSDoc: Source: utils/misc.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: public-key.js</h1>
+    <h1 class="page-title">Source: utils/misc.js</h1>
 
     
 
@@ -26,106 +26,70 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import {u8aToHex} from '@polkadot/util';
-import {isHexWithGivenByteSize} from './utils/misc';
+            <pre class="prettyprint source linenums"><code>import {PublicKeyEd25519, PublicKeySr25519} from '../public-key';
+import {SignatureEd25519, SignatureSr25519} from '../signature';
 
-/** Class representing a PublicKey. This class should always be extended (abstract class in some languages) */
-class PublicKey {
-
-  /**
-   * Creates a new PublicKey object. Validates the given value. Currently supported key
-   * types only require validating the byte size.
-   * @param {string} value - Value of the public key. This is validated
-   * @return {PublicKey} The PublicKey object if the given value is valid.
-   */
-  constructor(value, expectedByteSize) {
-    this.validateByteSize(value, expectedByteSize);
-    this.value = value;
-  }
-
-  /**
-   * Check that the given public key has the expected byte size. Assumes the public key is in hex.
-   */
-  validateByteSize(value, expectedByteSize) {
-    if (!isHexWithGivenByteSize(value, expectedByteSize)) {
-      throw new Error(`Public key must be ${expectedByteSize} bytes`);
+/**
+ * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
+ * @param {string} value - Hexadecimal value
+ * @param {number} byteSize - Expected byte size of the input.
+ * @return {Boolean} True if hex (with given size) else false
+ */
+function isHexWithGivenByteSize(value, byteSize) {
+  const match = value.match(/^0x([0-9a-f]+$)/i);
+  if (match &amp;&amp; match.length > 1) {
+    if (byteSize) {
+      // 2 hex digits make a byte
+      return match[1].length === (2 * byteSize);
+    } else {
+      // Don't care about byte size of the match but it must be full byte
+      return (match[1].length % 2) === 0;
     }
-  }
-
-  /**
-   * Extracts the public key from a pair. Assumes the KeyringPair is of the correct type. The `type` is intentionally not
-   * inspected to follow dependency inversion principle.
-   * generate the instance correct subclass
-   * @param {KeyringPair} A polkadot-js KeyringPair.
-   * @returns {PublicKey}
-   */
-  static fromKeyringPair(pair) {
-    // Use of `this` is legal in static methods, https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#Boxing_with_prototype_and_static_methods
-    return new this(u8aToHex(pair.publicKey));
-  }
-
-  /**
-   * @return {Object} The correct PublicKey JSON variant. The extending class should implement it.
-   */
-  toJSON() {
-    throw new Error('Not implemented. The extending class should implement it');
+  } else {
+    return false;
   }
 }
 
-/** Class representing a Sr25519 PublicKey */
-class PublicKeySr25519 extends PublicKey {
-  constructor(value) {
-    super(value, 32);
-  }
-
-  /**
-   * @return {Object} The PublicKey JSON variant Sr25519.
-   */
-  toJSON() {
-    return {
-      Sr25519: this.value,
-    };
-  }
+/** // TODO: Error handling when `stateChange` is not registered
+ * Helper function to return bytes of a `StateChange` enum. Updates like key change, DID removal, revocation, etc
+ * require the change to be wrapped in `StateChange` before serializing for signing.
+ * @param {ApiPromise} api - Promise API from polkadot-js
+ * @param {object} stateChange - A representation of a `StateChange` enum variant
+ * @return {array} An array of Uint8
+ */
+function getBytesForStateChange(api, stateChange) {
+  return api.createType('StateChange', stateChange).toU8a();
 }
 
-/** Class representing a Ed25519 PublicKey */
-class PublicKeyEd25519 extends PublicKey {
-  constructor(value) {
-    super(value, 32);
+/**
+ * Inspect the `type` of the `KeyringPair` to generate the correct kind of PublicKey.
+ * @param {KeyringPair} pair - A polkadot-js KeyringPair.
+ * @return {PublicKey} An instance of the correct subclass of PublicKey
+ */
+function getPublicKeyFromKeyringPair(pair) {
+  if (pair.type !== 'ed25519' &amp;&amp; pair.type !== 'sr25519') {
+    throw new Error('Only ed25519 and sr25519 keys supported as of now');
   }
-
-  /**
-   * @return {Object} The PublicKey JSON variant Ed25519.
-   */
-  toJSON() {
-    return {
-      Ed25519: this.value,
-    };
-  }
+  return pair.type === 'ed25519' ? PublicKeyEd25519.fromKeyringPair(pair) : PublicKeySr25519.fromKeyringPair(pair);
 }
 
-/** Class representing a compressed Secp256k1 PublicKey */
-class PublicKeySecp256k1 extends PublicKey {
-  constructor(value) {
-    super(value, 33);
+/**
+ * Inspect the `type` of the `KeyringPair` to generate the correct kind of Signature.
+ * @param {KeyringPair} pair - A polkadot-js KeyringPair.
+ * @param {array} message - an array of bytes (Uint8)
+ * @returns {Signature} An instance of the correct subclass of Signature
+ */
+function getSignatureFromKeyringPair(pair, message) {
+  if (pair.type !== 'ed25519' &amp;&amp; pair.type !== 'sr25519') {
+    throw new Error('Only ed25519 and sr25519 keys supported as of now');
   }
-
-  /**
-   * @return {Object} The PublicKey JSON variant Secp256k1.
-   */
-  toJSON() {
-    return {
-      Secp256k1: this.value,
-    };
-  }
+  return pair.type === 'ed25519' ? new SignatureEd25519(message, pair) : new SignatureSr25519(message, pair);
 }
 
-
-export {
-  PublicKey,
-  PublicKeySr25519,
-  PublicKeyEd25519,
-  PublicKeySecp256k1
+export {isHexWithGivenByteSize,
+  getBytesForStateChange,
+  getPublicKeyFromKeyringPair,
+  getSignatureFromKeyringPair
 };
 </code></pre>
         </article>

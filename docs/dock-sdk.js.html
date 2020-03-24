@@ -40,12 +40,18 @@ import {
   PublicKeySecp256k1
 } from './public-key';
 
+import {
+  Signature,
+  SignatureSr25519,
+  SignatureEd25519
+} from './signature';
+
 /** Helper class to interact with the Dock chain */
 class DockSDK {
   /**
    * Skeleton constructor, does nothing yet
    * @constructor
-   * @param {string} address - WebSocket Address
+   * @param {string} address - WebSocket RPC endpoint
    */
   constructor(address) {
     this.address = address;
@@ -66,13 +72,6 @@ class DockSDK {
     this.api = await ApiPromise.create({
       provider: new WsProvider(this.address),
       types,
-      typesAlias: {
-        // Renaming types of `didModule`
-        didModule: {
-          // `CustomSignature` is called `Signature` in the Node runtime. The renaming is to prevent conflict with the existing type called `Signature`.
-          Signature: 'CustomSignature'
-        }
-      }
     });
 
     this._did = new DIDModule(this.api);
@@ -86,10 +85,13 @@ class DockSDK {
     delete this.api;
   }
 
-  /**
+  isConnected() {
+    return !!this.api;
+  }
+
+  /** TODO: Should probably use set/get and rename account to _account
    * Sets the account used to sign transactions
    * @param {Account} account - PolkadotJS Keyring account
-   * @param {function} onComplete - On complete callback, temporary
    */
   setAccount(account) {
     this.account = account;
@@ -100,13 +102,16 @@ class DockSDK {
    * @return {Account} PolkadotJS Keyring account
    */
   getAccount() {
-    // If no account use Alice, dev purposes, temporary
-    if (!this.account) {
-      this.account = this.keyring.addFromUri('//Alice', {name: 'Alice'});
-    }
     return this.account;
   }
 
+  /**
+   * Sets the keyring
+   * @param {keyring} keyring - PolkadotJS Keyring
+   */
+  set keyring(keyring) {
+    this._keyring = keyring;
+  }
 
   /**
    * Gets the keyring
@@ -116,7 +121,6 @@ class DockSDK {
     if (!this._keyring) {
       this._keyring = new Keyring({type: 'sr25519'});
     }
-
     return this._keyring;
   }
 
@@ -155,6 +159,9 @@ class DockSDK {
    * @return {DIDModule} The module to use
    */
   get did() {
+    if (!this._did) {
+      throw new Error('Unable to get DID module, SDK is not initialised');
+    }
     return this._did;
   }
 
@@ -163,6 +170,9 @@ class DockSDK {
    * @return {RevocationModule} The module to use
    */
   get revocation() {
+    if (!this._revocation) {
+      throw new Error('Unable to get revocation module, SDK is not initialised');
+    }
     return this._revocation;
   }
 }
@@ -175,7 +185,10 @@ export {
   PublicKey,
   PublicKeySr25519,
   PublicKeyEd25519,
-  PublicKeySecp256k1
+  PublicKeySecp256k1,
+  Signature,
+  SignatureSr25519,
+  SignatureEd25519
 };
 </code></pre>
         </article>
@@ -187,13 +200,13 @@ export {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockSDK.html">DockSDK</a></li><li><a href="PublicKey.html">PublicKey</a></li><li><a href="RevocationModule.html">RevocationModule</a></li></ul><h3>Global</h3><ul><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#validateDockDIDIdentifier">validateDockDIDIdentifier</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockSDK.html">DockSDK</a></li><li><a href="PublicKey.html">PublicKey</a></li><li><a href="PublicKeyEd25519.html">PublicKeyEd25519</a></li><li><a href="PublicKeySecp256k1.html">PublicKeySecp256k1</a></li><li><a href="PublicKeySr25519.html">PublicKeySr25519</a></li><li><a href="Resolver.html">Resolver</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="Signature.html">Signature</a></li><li><a href="SignatureEd25519.html">SignatureEd25519</a></li><li><a href="SignatureSr25519.html">SignatureSr25519</a></li></ul><h3>Global</h3><ul><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getResolver">getResolver</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Wed Mar 18 2020 20:57:50 GMT+0000 (Greenwich Mean Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Tue Mar 24 2020 22:00:36 GMT+0000 (Greenwich Mean Time)
 </footer>
 
 <script> prettyPrint(); </script>

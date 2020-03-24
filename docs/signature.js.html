@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: public-key.js</title>
+    <title>JSDoc: Source: signature.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: public-key.js</h1>
+    <h1 class="page-title">Source: signature.js</h1>
 
     
 
@@ -27,59 +27,63 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>import {u8aToHex} from '@polkadot/util';
+
 import {isHexWithGivenByteSize} from './utils/misc';
 
-/** Class representing a PublicKey. This class should always be extended (abstract class in some languages) */
-class PublicKey {
-
+/** Class representing a Signature. This class should always be extended (abstract class in some languages) */
+class Signature {
   /**
-   * Creates a new PublicKey object. Validates the given value. Currently supported key
-   * types only require validating the byte size.
-   * @param {string} value - Value of the public key. This is validated
-   * @return {PublicKey} The PublicKey object if the given value is valid.
+   * Signs the given message and wraps it in the Signature
+   * @param {array} message - The message to sign as bytearray
+   * @param {KeyringPair} signingPair -The pair containing the signing key
+   * @returns {Signature}
    */
-  constructor(value, expectedByteSize) {
-    this.validateByteSize(value, expectedByteSize);
-    this.value = value;
+  constructor(message, signingPair) {
+    this.value = u8aToHex(signingPair.sign(message));
   }
 
   /**
-   * Check that the given public key has the expected byte size. Assumes the public key is in hex.
+   * Creates a new DidSignature object. Validates the given value. Currently supported signature
+   * types only require validating the byte size.
+   * @param {string} value - Value of the signature. This is validated
+   * @return {Signature} The Signature object if the given value is valid.
+   */
+  fromHex(value, expectedByteSize) {
+    this.validateByteSize(value, expectedByteSize);
+    let sig = Object.create(this.prototype);
+    sig.value = value;
+  }
+
+  /**
+   * Check that the given signature has the expected byte size. Assumes the signature is in hex.
    */
   validateByteSize(value, expectedByteSize) {
     if (!isHexWithGivenByteSize(value, expectedByteSize)) {
-      throw new Error(`Public key must be ${expectedByteSize} bytes`);
+      throw new Error(`Signature must be ${expectedByteSize} bytes`);
     }
   }
 
   /**
-   * Extracts the public key from a pair. Assumes the KeyringPair is of the correct type. The `type` is intentionally not
-   * inspected to follow dependency inversion principle.
-   * generate the instance correct subclass
-   * @param {KeyringPair} A polkadot-js KeyringPair.
-   * @returns {PublicKey}
-   */
-  static fromKeyringPair(pair) {
-    // Use of `this` is legal in static methods, https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#Boxing_with_prototype_and_static_methods
-    return new this(u8aToHex(pair.publicKey));
-  }
-
-  /**
-   * @return {Object} The correct PublicKey JSON variant. The extending class should implement it.
+   * @return {Object} The correct DidSignature JSON variant. The extending class should implement it.
    */
   toJSON() {
     throw new Error('Not implemented. The extending class should implement it');
   }
 }
 
-/** Class representing a Sr25519 PublicKey */
-class PublicKeySr25519 extends PublicKey {
-  constructor(value) {
-    super(value, 32);
+/** Class representing a Ed25519 Signature */
+class SignatureSr25519 extends Signature {
+  /**
+   * Create SignatureSr25519 from given hex string
+   * @param {string} value - Hex string
+   * @returns {Signature}
+   */
+  fromHex(value) {
+    return super.fromHex(value, 64);
   }
 
   /**
-   * @return {Object} The PublicKey JSON variant Sr25519.
+   * @return {Object} The DidSignature JSON variant Sr25519.
    */
   toJSON() {
     return {
@@ -88,14 +92,19 @@ class PublicKeySr25519 extends PublicKey {
   }
 }
 
-/** Class representing a Ed25519 PublicKey */
-class PublicKeyEd25519 extends PublicKey {
-  constructor(value) {
-    super(value, 32);
+/** Class representing a Ed25519 Signature */
+class SignatureEd25519 extends Signature {
+  /**
+   * Create SignatureEd25519 from given hex string
+   * @param {string} value - Hex string
+   * @returns {Signature}
+   */
+  fromHex(value) {
+    return super.fromHex(value, 64);
   }
 
   /**
-   * @return {Object} The PublicKey JSON variant Ed25519.
+   * @return {Object} The DidSignature JSON variant Ed25519.
    */
   toJSON() {
     return {
@@ -104,28 +113,10 @@ class PublicKeyEd25519 extends PublicKey {
   }
 }
 
-/** Class representing a compressed Secp256k1 PublicKey */
-class PublicKeySecp256k1 extends PublicKey {
-  constructor(value) {
-    super(value, 33);
-  }
-
-  /**
-   * @return {Object} The PublicKey JSON variant Secp256k1.
-   */
-  toJSON() {
-    return {
-      Secp256k1: this.value,
-    };
-  }
-}
-
-
 export {
-  PublicKey,
-  PublicKeySr25519,
-  PublicKeyEd25519,
-  PublicKeySecp256k1
+  Signature,
+  SignatureSr25519,
+  SignatureEd25519
 };
 </code></pre>
         </article>

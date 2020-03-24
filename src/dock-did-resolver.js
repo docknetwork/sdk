@@ -21,7 +21,7 @@ function getResolver(fullNodeWsRPCEndpoint) {
     validateDockDIDSS58Identifier(parsed.id);
 
     // Initialize the SDK if it has not been initialized before.
-    if (!dock.isConnected()) {
+    if (!dock.isInitialized()) {
       await dock.init(fullNodeWsRPCEndpoint);
     }
     return dock.did.getDocument(parsed.did);

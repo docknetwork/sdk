@@ -57,7 +57,7 @@ class DockSDK {
     delete this.api;
   }
 
-  isConnected() {
+  isInitialized() {
     return !!this.api;
   }
 

@@ -6,7 +6,8 @@ import {randomAsHex, encodeAddress, decodeAddress} from '@polkadot/util-crypto';
 
 import {isHexWithGivenByteSize, getSignatureFromKeyringPair} from './misc';
 
-const DockDIDQualifier = 'did:dock:';
+const DockDIDMethod = 'dock';
+const DockDIDQualifier = `did:${DockDIDMethod}:`;
 const DockDIDByteSize = 32;
 
 /**
@@ -14,10 +15,24 @@ const DockDIDByteSize = 32;
  * @param {identifier} identifier - The identifier to check.
  * @return {null} Throws exception if invalid identifier
  */
-function validateDockDIDIdentifier(identifier) {
+function validateDockDIDHexIdentifier(identifier) {
   // Byte size of the Dock DID identifier, i.e. the `DockDIDQualifier` is not counted.
   if (!isHexWithGivenByteSize(identifier, DockDIDByteSize)) {
     throw new Error(`DID identifier must be ${DockDIDByteSize} bytes`);
+  }
+}
+
+/**
+ * Check if the given identifier is 32 byte valid SS58 string
+ * @param {identifier} identifier - The identifier to check.
+ * @return {null} Throws exception if invalid identifier
+ */
+function validateDockDIDSS58Identifier(identifier) {
+  // base58-check regex
+  const regex = new RegExp(/^[5KL][1-9A-HJ-NP-Za-km-z]{47}$/);
+  const matches = regex.exec(identifier);
+  if (!matches) {
+    throw new Error('The identifier must be 32 bytes and valid SS58 string');
   }
 }
 
@@ -44,7 +59,7 @@ function getHexIdentifierFromDID(did) {
   } else {
     try {
       // Check if hex and of correct size and return the hex value if successful.
-      validateDockDIDIdentifier(did);
+      validateDockDIDHexIdentifier(did);
       return did;
     } catch (e) {
       // Cannot parse as hex
@@ -170,8 +185,10 @@ async function createSignedDidRemoval(didModule, did, currentKeyPair) {
 }
 
 export {
-  validateDockDIDIdentifier,
+  validateDockDIDHexIdentifier,
+  validateDockDIDSS58Identifier,
   getHexIdentifierFromDID,
+  DockDIDMethod,
   DockDIDQualifier,
   createNewDockDID,
   createKeyDetail,

@@ -74,15 +74,6 @@ function registerNewDID() {
   return dock.sendTransaction(transaction);
 }
 
-// import { Resolver } from 'did-resolver';
-// import ethr from 'ethr-did-resolver';
-//
-// const ethrResolver = ethr.getResolver();
-//
-// const resolver = new Resolver(ethrResolver);
-//
-// resolver.resolve('did:uport:2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX/some/path#fragment=123').then(doc => console.log(doc));
-
 // Initialise Dock SDK, connect to the node and start working with it
 // It will create a new DID with a key, then update the key to another one and then remove the DID
 dock.init(fullNodeWsRPCEndpoint)

@@ -33,11 +33,11 @@ Running dev node:
 - Run all tests with `yarn test`
 - Run a single test module with `yarn test <module name or prefix>`
 
-## Basic SDK example
+## Basic SDK examples
 
-Simply run
+Run example to create a new DID, register it, update its key and remove the DID.
 ```
-yarn start-node-example
+yarn dock-did-example
 ```
 
 ## JSON types

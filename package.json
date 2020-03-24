@@ -33,12 +33,13 @@
     "watch": "rollup -c -w",
     "test": "jest",
     "docs": "jsdoc src -r -c .jsdoc -d docs",
-    "start-node-example": "npx babel-node example/index.js"
+    "dock-did-example": "npx babel-node example/dock-did.js"
   },
   "files": [
     "dist"
   ],
   "dependencies": {
+    "@kiltprotocol/sdk-js": "^0.18.0",
     "@polkadot/api": "^1.8.1",
     "did-resolver": "^1.1.0",
     "ethr-did-resolver": "^2.2.0"

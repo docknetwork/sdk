@@ -187,4 +187,3 @@ class DIDModule {
 }
 
 export default DIDModule;
-

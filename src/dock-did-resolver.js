@@ -7,8 +7,6 @@ import {validateDockDIDSS58Identifier, DockDIDMethod} from './utils/did';
  * @returns {object} An object with one key which the Dock DID method
  */
 function getResolver(fullNodeWsRPCEndpoint) {
-  // This is initialized the first time when `resolve` is called.
-  let sdk;
 
   async function resolve (did, parsed) {
     if (parsed.method != DockDIDMethod) {
@@ -17,12 +15,13 @@ function getResolver(fullNodeWsRPCEndpoint) {
     validateDockDIDSS58Identifier(parsed.id);
 
     // Initialize the SDK if it has not been initialized before.
-    if (!sdk) {
-      sdk = await dock.init(fullNodeWsRPCEndpoint);
-    } else {
-      return await sdk.did.getDocument(parsed.id);
+    if (!dock.isConnected()) {
+      await dock.init(fullNodeWsRPCEndpoint);
     }
+    return dock.did.getDocument(parsed.did);
   }
 
   return { [DockDIDMethod]: resolve };
 }
+
+export {getResolver};

@@ -1,6 +1,8 @@
 import { Resolver, parse } from 'did-resolver';
 import ethr from 'ethr-did-resolver';
 
+// TODO: This is WIP
+
 function ethrResolve() {
   const providerConfig = {
     networks: [
@@ -60,7 +62,7 @@ dock.init(fullNodeWsRPCEndpoint)
   .then(() => {
     const account = dock.keyring.addFromUri('//Alice', {name: 'Alice'});
     dock.setAccount(account);
-    registerNewDID();
+    return registerNewDID();
   }).then(getDIDDoc);
 
 

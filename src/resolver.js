@@ -1,6 +1,6 @@
 import { Resolver } from 'did-resolver';
 import ethr from 'ethr-did-resolver';
-import {connect} from '@kiltprotocol/sdk-js';
+//import {connect} from '@kiltprotocol/sdk-js';
 
 import {getResolver} from './dock-did-resolver';
 
@@ -41,6 +41,6 @@ class Resolver {
   }
 
   async resolveKiltDid(did) {
-
+    throw new Error('Unimplemented for now')
   }
 }

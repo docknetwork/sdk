@@ -4,7 +4,8 @@ import {randomAsHex, encodeAddress} from '@polkadot/util-crypto';
 import {DockSDK} from '../src/dock-sdk';
 
 import {
-  validateDockDIDIdentifier,
+  validateDockDIDHexIdentifier,
+  validateDockDIDSS58Identifier,
   getHexIdentifierFromDID,
   DockDIDQualifier,
   createNewDockDID,
@@ -18,15 +19,15 @@ import {SignatureEd25519, SignatureSr25519} from '../src/signature';
 
 describe('DID utilities', () => {
   test('On input as 40 byte hex, validateDockDIDIdentifier throws error', () => {
-    expect(() => validateDockDIDIdentifier(randomAsHex(40))).toThrow(/DID identifier must be 32 bytes/);
+    expect(() => validateDockDIDHexIdentifier(randomAsHex(40))).toThrow(/DID identifier must be 32 bytes/);
   });
 
   test('On input as 30 byte hex, validateDockDIDIdentifier throws error', () => {
-    expect(() => validateDockDIDIdentifier(randomAsHex(30))).toThrow(/DID identifier must be 32 bytes/);
+    expect(() => validateDockDIDHexIdentifier(randomAsHex(30))).toThrow(/DID identifier must be 32 bytes/);
   });
 
   test('On input as 32 byte hex, validateDockDIDIdentifier does not throw error', () => {
-    expect(() => validateDockDIDIdentifier(randomAsHex(32))).not.toThrow();
+    expect(() => validateDockDIDHexIdentifier(randomAsHex(32))).not.toThrow();
   });
 
   test('On input as 33 byte hex, getHexIdentifierFromDID throws error', () => {
@@ -71,6 +72,22 @@ describe('DID utilities', () => {
     const did = `${DockDIDQualifier}${ss58}${ss58}`;
     // Without the qualifier, the function tries to parse as hex
     expect(() => getHexIdentifierFromDID(did)).toThrow(/Invalid SS58/);
+  });
+
+  test('On input valid SS58 identifier but smaller than 32 bytes, validateDockDIDSS58Identifier throws error', () => {
+    const ss58 = encodeAddress(randomAsHex(8));
+    expect(() => validateDockDIDSS58Identifier(ss58)).toThrow(/The identifier must be 32 bytes and valid SS58 string/);
+  });
+
+  test('On input valid SS58 identifier but larger than 32 bytes, validateDockDIDSS58Identifier throws error', () => {
+    const ss58 = encodeAddress(randomAsHex(32));
+    const did = `${ss58}${ss58}`;
+    expect(() => validateDockDIDSS58Identifier(did)).toThrow(/The identifier must be 32 bytes and valid SS58 string/);
+  });
+
+  test('On input valid SS58 identifier, validateDockDIDSS58Identifier does not throw error', () => {
+    const ss58 = encodeAddress(randomAsHex(32));
+    expect(() => validateDockDIDSS58Identifier(ss58)).not.toThrow();
   });
 });
 

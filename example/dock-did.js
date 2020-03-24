@@ -4,12 +4,15 @@ import {randomAsHex} from '@polkadot/util-crypto';
 // Import Dock SDK
 import dock, {
   PublicKeySr25519,
-  PublicKeyEd25519,
 } from '../src/dock-sdk';
 import {createNewDockDID, createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval} from '../src/utils/did';
 import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
 
+// The following can be tweaked depending on where the node is running and what
+// account is to be used for sending the transaction.
 const fullNodeWsRPCEndpoint = 'ws://127.0.0.1:9944';
+const accountUri = '//Alice';
+const accountMetadata = {name: 'Alice'};
 
 // DID will be generated randomly
 const dockDID = createNewDockDID();
@@ -79,7 +82,7 @@ function registerNewDID() {
 // It will create a new DID with a key, then update the key to another one and then remove the DID
 dock.init(fullNodeWsRPCEndpoint)
   .then(() => {
-    const account = dock.keyring.addFromUri('//Alice', {name: 'Alice'});
+    const account = dock.keyring.addFromUri(accountUri, accountMetadata);
     dock.setAccount(account);
     return registerNewDID();
   })

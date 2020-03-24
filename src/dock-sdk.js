@@ -57,6 +57,10 @@ class DockSDK {
     delete this.api;
   }
 
+  isInitialized() {
+    return !!this.api;
+  }
+
   /** TODO: Should probably use set/get and rename account to _account
    * Sets the account used to sign transactions
    * @param {Account} account - PolkadotJS Keyring account

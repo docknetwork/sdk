@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: utils/misc.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: utils/misc.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {PublicKeyEd25519, PublicKeySr25519} from '../public-key';
+import {SignatureEd25519, SignatureSr25519} from '../signature';
+
+/**
+ * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
+ * @param {string} value - Hexadecimal value
+ * @param {number} byteSize - Expected byte size of the input.
+ * @return {Boolean} True if hex (with given size) else false
+ */
+function isHexWithGivenByteSize(value, byteSize) {
+  const match = value.match(/^0x([0-9a-f]+$)/i);
+  if (match &amp;&amp; match.length > 1) {
+    if (byteSize) {
+      // 2 hex digits make a byte
+      return match[1].length === (2 * byteSize);
+    } else {
+      // Don't care about byte size of the match but it must be full byte
+      return (match[1].length % 2) === 0;
+    }
+  } else {
+    return false;
+  }
+}
+
+/** // TODO: Error handling when `stateChange` is not registered
+ * Helper function to return bytes of a `StateChange` enum. Updates like key change, DID removal, revocation, etc
+ * require the change to be wrapped in `StateChange` before serializing for signing.
+ * @param {ApiPromise} api - Promise API from polkadot-js
+ * @param {object} stateChange - A representation of a `StateChange` enum variant
+ * @return {array} An array of Uint8
+ */
+function getBytesForStateChange(api, stateChange) {
+  return api.createType('StateChange', stateChange).toU8a();
+}
+
+/**
+ * Inspect the `type` of the `KeyringPair` to generate the correct kind of PublicKey.
+ * @param {KeyringPair} pair - A polkadot-js KeyringPair.
+ * @return {PublicKey} An instance of the correct subclass of PublicKey
+ */
+function getPublicKeyFromKeyringPair(pair) {
+  if (pair.type !== 'ed25519' &amp;&amp; pair.type !== 'sr25519') {
+    throw new Error('Only ed25519 and sr25519 keys supported as of now');
+  }
+  return pair.type === 'ed25519' ? PublicKeyEd25519.fromKeyringPair(pair) : PublicKeySr25519.fromKeyringPair(pair);
+}
+
+/**
+ * Inspect the `type` of the `KeyringPair` to generate the correct kind of Signature.
+ * @param {KeyringPair} pair - A polkadot-js KeyringPair.
+ * @param {array} message - an array of bytes (Uint8)
+ * @returns {Signature} An instance of the correct subclass of Signature
+ */
+function getSignatureFromKeyringPair(pair, message) {
+  if (pair.type !== 'ed25519' &amp;&amp; pair.type !== 'sr25519') {
+    throw new Error('Only ed25519 and sr25519 keys supported as of now');
+  }
+  return pair.type === 'ed25519' ? new SignatureEd25519(message, pair) : new SignatureSr25519(message, pair);
+}
+
+export {isHexWithGivenByteSize,
+  getBytesForStateChange,
+  getPublicKeyFromKeyringPair,
+  getSignatureFromKeyringPair
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockSDK.html">DockSDK</a></li><li><a href="PublicKey.html">PublicKey</a></li><li><a href="PublicKeyEd25519.html">PublicKeyEd25519</a></li><li><a href="PublicKeySecp256k1.html">PublicKeySecp256k1</a></li><li><a href="PublicKeySr25519.html">PublicKeySr25519</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="Signature.html">Signature</a></li><li><a href="SignatureEd25519.html">SignatureEd25519</a></li><li><a href="SignatureSr25519.html">SignatureSr25519</a></li></ul><h3>Global</h3><ul><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#validateDockDIDIdentifier">validateDockDIDIdentifier</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Tue Mar 24 2020 00:15:04 GMT+0000 (Greenwich Mean Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

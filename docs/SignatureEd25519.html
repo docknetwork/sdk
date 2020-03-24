@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: PublicKey</title>
+    <title>JSDoc: Class: SignatureEd25519</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: PublicKey</h1>
+    <h1 class="page-title">Class: SignatureEd25519</h1>
 
     
 
@@ -28,9 +28,9 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>PublicKey<span class="signature">(value)</span><span class="type-signature"> &rarr; {<a href="PublicKey.html">PublicKey</a>}</span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>SignatureEd25519<span class="signature">()</span><span class="type-signature"></span></h2>
         
-            <div class="class-description">Class representing a PublicKey. This class should always be extended (abstract class in some languages)</div>
+            <div class="class-description">Class representing a Ed25519 Signature</div>
         
     
 </header>
@@ -45,7 +45,111 @@
     
 
     
-    <h4 class="name" id="PublicKey"><span class="type-signature"></span>new PublicKey<span class="signature">(value)</span><span class="type-signature"> &rarr; {<a href="PublicKey.html">PublicKey</a>}</span></h4>
+    <h4 class="name" id="SignatureEd25519"><span class="type-signature"></span>new SignatureEd25519<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="signature.js.html">signature.js</a>, <a href="signature.js.html#line68">line 68</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="fromHex"><span class="type-signature"></span>fromHex<span class="signature">(value)</span><span class="type-signature"> &rarr; {<a href="Signature.html">Signature</a>}</span></h4>
     
 
     
@@ -53,8 +157,7 @@
 
 
 <div class="description">
-    Creates a new PublicKey object. Validates the given value. Currently supported key
-types only require validating the byte size.
+    Create SignatureEd25519 from given hex string
 </div>
 
 
@@ -106,7 +209,7 @@ types only require validating the byte size.
 
             
 
-            <td class="description last">Value of the public key. This is validated</td>
+            <td class="description last">Hex string</td>
         </tr>
 
     
@@ -147,188 +250,7 @@ types only require validating the byte size.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="public-key.js.html">public-key.js</a>, <a href="public-key.js.html#line13">line 13</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    The PublicKey object if the given value is valid.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="PublicKey.html">PublicKey</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".fromKeyringPair"><span class="type-signature">(static) </span>fromKeyringPair<span class="signature">(A)</span><span class="type-signature"> &rarr; {<a href="PublicKey.html">PublicKey</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Extracts the public key from a pair. Assumes the KeyringPair is of the correct type. The `type` is intentionally not
-inspected to follow dependency inversion principle.
-generate the instance correct subclass
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>A</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">KeyringPair</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">polkadot-js KeyringPair.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="public-key.js.html">public-key.js</a>, <a href="public-key.js.html#line34">line 34</a>
+        <a href="signature.js.html">signature.js</a>, <a href="signature.js.html#line74">line 74</a>
     </li></ul></dd>
     
 
@@ -364,7 +286,7 @@ generate the instance correct subclass
     </dt>
     <dd>
         
-<span class="param-type"><a href="PublicKey.html">PublicKey</a></span>
+<span class="param-type"><a href="Signature.html">Signature</a></span>
 
 
     </dd>
@@ -430,7 +352,7 @@ generate the instance correct subclass
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="public-key.js.html">public-key.js</a>, <a href="public-key.js.html#line42">line 42</a>
+        <a href="signature.js.html">signature.js</a>, <a href="signature.js.html#line81">line 81</a>
     </li></ul></dd>
     
 
@@ -459,7 +381,7 @@ generate the instance correct subclass
 
         
 <div class="param-desc">
-    The correct PublicKey JSON variant. The extending class should implement it.
+    The DidSignature JSON variant Ed25519.
 </div>
 
 
@@ -477,94 +399,6 @@ generate the instance correct subclass
 </dl>
 
     
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="validateByteSize"><span class="type-signature"></span>validateByteSize<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Check that the given public key has the expected byte size. Assumes the public key is in hex.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="public-key.js.html">public-key.js</a>, <a href="public-key.js.html#line21">line 21</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

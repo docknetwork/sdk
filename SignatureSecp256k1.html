@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: SignatureSr25519</title>
+    <title>JSDoc: Class: SignatureSecp256k1</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: SignatureSr25519</h1>
+    <h1 class="page-title">Class: SignatureSecp256k1</h1>
 
     
 
@@ -28,9 +28,9 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>SignatureSr25519<span class="signature">(message, signingPair)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>SignatureSecp256k1<span class="signature">(message, signingPair)</span><span class="type-signature"></span></h2>
         
-            <div class="class-description">Class representing a Sr25519 Signature</div>
+            <div class="class-description">Class representing a Secp256k1 Signature</div>
         
     
 </header>
@@ -45,7 +45,7 @@
     
 
     
-    <h4 class="name" id="SignatureSr25519"><span class="type-signature"></span>new SignatureSr25519<span class="signature">(message, signingPair)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="SignatureSecp256k1"><span class="type-signature"></span>new SignatureSecp256k1<span class="signature">(message, signingPair)</span><span class="type-signature"></span></h4>
     
 
     
@@ -53,7 +53,7 @@
 
 
 <div class="description">
-    Generate a Sr25519 signature using Polkadot-js
+    Generate an Ecdsa signature over Secp256k1 curve using elliptic library
 </div>
 
 
@@ -128,7 +128,7 @@
 
             
 
-            <td class="description last">The pair from Polkadot-js containing the signing key</td>
+            <td class="description last">The pair from elliptic containing the signing key</td>
         </tr>
 
     
@@ -169,7 +169,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="signature.js.html">signature.js</a>, <a href="signature.js.html#line52">line 52</a>
+        <a href="signature.js.html">signature.js</a>, <a href="signature.js.html#line112">line 112</a>
     </li></ul></dd>
     
 
@@ -233,7 +233,7 @@
 
 
 <div class="description">
-    Create SignatureSr25519 from given hex string
+    Create SignatureSecp256k1 from given hex string
 </div>
 
 
@@ -326,7 +326,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="signature.js.html">signature.js</a>, <a href="signature.js.html#line61">line 61</a>
+        <a href="signature.js.html">signature.js</a>, <a href="signature.js.html#line130">line 130</a>
     </li></ul></dd>
     
 
@@ -428,7 +428,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="signature.js.html">signature.js</a>, <a href="signature.js.html#line68">line 68</a>
+        <a href="signature.js.html">signature.js</a>, <a href="signature.js.html#line137">line 137</a>
     </li></ul></dd>
     
 
@@ -457,7 +457,7 @@
 
         
 <div class="param-desc">
-    The DidSignature JSON variant Sr25519.
+    The DidSignature JSON variant Secp256k1.
 </div>
 
 

@@ -60,7 +60,7 @@
     "registry_id": "RegistryId",
     "last_modified": "BlockNumber"
   },
-  "PAuth": "BTreeMap<Did, Signature>",
+  "PAuth": "BTreeMap<Did, DidSignature>",
   "Policy": {
     "_enum": {
       "OneOf": {

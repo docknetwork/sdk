@@ -1,7 +1,7 @@
 import {ec as EC} from 'elliptic';
 
-import {PublicKeyEd25519, PublicKeySr25519} from '../public-key';
-import {SignatureEd25519, SignatureSr25519} from '../signature';
+import {PublicKeyEd25519, PublicKeySr25519, PublicKeySecp256k1} from '../public-key';
+import {SignatureEd25519, SignatureSr25519, SignatureSecp256k1} from '../signature';
 
 const secp256k1Curve = new EC('secp256k1');
 
@@ -37,21 +37,44 @@ function getBytesForStateChange(api, stateChange) {
   return api.createType('StateChange', stateChange).toU8a();
 }
 
+/**
+ * Generate keypair for Ecdsa over Secp256k1
+ * @param {array} seed - A byte array
+ * @returns {Keypair} A keypair
+ */
 function generateEcdsaSecp256k1Keypair(seed) {
   return secp256k1Curve.genKeyPair({entropy: seed});
 }
 
-function verifyEcdsaSecp256k1Sig(message, signature, publicKey) {
-  const pk = publicKey.value.slice(2);
-  const sig = { r: signature.value.slice(0, 64), s: signature.value.slice(64, 128) };
-  const recoveryParam = parseInt(signature.value.slice(128, 130), 16);
-  return secp256k1Curve.verify(message, sig, recoveryParam, secp256k1Curve.keyFromPublic(pk, 'hex'));
+/**
+ * Verify a given signature on a given message
+ * @param {array} message - Bytes of message
+ * @param {SignatureSecp256k1} signature to verify
+ * @returns {boolean} True when signature is valid, false otherwise
+ */
+function verifyEcdsaSecp256k1Sig(message, signature) {
+  // Remove the leading `0x`
+  const sigHex = signature.value.slice(2);
+  // Break it in 2 chunks of 32 bytes each
+  const sig = { r: sigHex.slice(0, 64), s: sigHex.slice(64, 128) };
+  // Get hex value for last byte
+  const recoveryParam = parseInt(sigHex.slice(128, 130), 16);
+  // Recover pubkey from message
+  const pub = secp256k1Curve.recoverPubKey(message, sig, recoveryParam, 'hex');
+  return secp256k1Curve.verify(message, sig, pub);
 }
 
+/**
+ * Return the type of signature from a given keypair
+ * @param {object} pair - Can be a keypair from polkadot-js or elliptic library.
+ * @returns {string|*} For now, it can be ed25519 or sr25519 or secp256k1 or an error
+ */
 function getKeyPairType(pair) {
   if (pair.type && (pair.type === 'ed25519' || pair.type === 'sr25519')) {
+    // Polkadot-js keyring has type field with value either 'ed25519' or 'sr25519'
     return pair.type;
-  } else if (pair.ec && pair.priv && pair.pub) {
+  } else if (pair.ec && pair.priv) {
+    // elliptic library's pair has `ec`, `priv` and `pub`. There is not a cleaner way to detect that
     return 'secp256k1';
   } else {
     throw new Error('Only ed25519, sr25519 and secp256k1 keys supported as of now');
@@ -64,10 +87,16 @@ function getKeyPairType(pair) {
  * @return {PublicKey} An instance of the correct subclass of PublicKey
  */
 function getPublicKeyFromKeyringPair(pair) {
-  if (pair.type !== 'ed25519' && pair.type !== 'sr25519') {
-    throw new Error('Only ed25519 and sr25519 keys supported as of now');
+  const type = getKeyPairType(pair);
+  let cls;
+  if (type === 'ed25519') {
+    cls = PublicKeyEd25519;
+  } else if (type === 'sr25519') {
+    cls = PublicKeySr25519;
+  } else {
+    cls = PublicKeySecp256k1;
   }
-  return pair.type === 'ed25519' ? PublicKeyEd25519.fromKeyringPair(pair) : PublicKeySr25519.fromKeyringPair(pair);
+  return cls.fromKeyringPair(pair);
 }
 
 /**
@@ -77,10 +106,16 @@ function getPublicKeyFromKeyringPair(pair) {
  * @returns {Signature} An instance of the correct subclass of Signature
  */
 function getSignatureFromKeyringPair(pair, message) {
-  if (pair.type !== 'ed25519' && pair.type !== 'sr25519') {
-    throw new Error('Only ed25519 and sr25519 keys supported as of now');
+  const type = getKeyPairType(pair);
+  let cls;
+  if (type === 'ed25519') {
+    cls = SignatureEd25519;
+  } else if (type === 'sr25519') {
+    cls = SignatureSr25519;
+  } else {
+    cls = SignatureSecp256k1;
   }
-  return pair.type === 'ed25519' ? new SignatureEd25519(message, pair) : new SignatureSr25519(message, pair);
+  return new cls(message, pair);
 }
 
 export {

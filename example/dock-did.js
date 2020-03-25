@@ -1,30 +1,5 @@
 // Import some utils from Polkadot JS
 import {randomAsHex} from '@polkadot/util-crypto';
-import {ec as EC} from 'elliptic';
-import {hexToU8a} from '@polkadot/util';
-
-var ec = new EC('secp256k1');
-
-// Generate keys
-var key = ec.genKeyPair({entropy: randomAsHex(32)});
-console.log(key);
-console.log(key.ec);
-console.log(Object.getOwnPropertyNames(key));
-console.log(key.getPublic());
-console.log(key.getPublic(true, 'hex'));
-console.log(hexToU8a('0x' + key.getPublic(true, 'hex')));
-var msgHash = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
-
-var sig = key.sign(msgHash, { canonical: true });
-
-const r = sig.r.toString('hex', 32); // MUST SPECIFY 32 BYTES TO KEEP LEADING ZEROS
-const s = sig.s.toString('hex', 32);
-const i = sig.recoveryParam.toString(16).padStart(2, '0');
-console.log(r + s + i);
-
-console.log(key.verify(msgHash, sig));
-console.log(ec.verify(msgHash, sig, ec.keyFromPublic(key.getPublic(true, 'hex'), 'hex')));
-console.log(sig);
 
 // Import Dock SDK
 import dock, {

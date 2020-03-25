@@ -103,7 +103,7 @@ describe('Testing public key and signature instantiation from keyring', () => {
   });
 
   test('getCorrectSignatureFromKeyringPair returns correct signature from secp256k1 pair', () => {
-    const pair = generateEcdsaSecp256k1Keypair();
+    const pair = generateEcdsaSecp256k1Keypair(randomAsHex(32));
     const sig = getSignatureFromKeyringPair(pair, [1, 2]);
     expect(sig instanceof SignatureSecp256k1).toBe(true);
   });

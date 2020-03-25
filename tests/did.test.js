@@ -9,12 +9,11 @@ import {
   getHexIdentifierFromDID,
   DockDIDQualifier,
   createNewDockDID,
-  createKeyDetail
+  createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval
 } from '../src/utils/did';
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from './test-constants';
-import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
+import {generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair} from '../src/utils/misc';
 import {PublicKeyEd25519} from '../src/public-key';
-import {SignatureEd25519, SignatureSr25519} from '../src/signature';
 
 
 describe('DID utilities', () => {
@@ -104,17 +103,17 @@ describe('DID Module', () => {
   const secondKeySeed = randomAsHex(32);
 
   // TODO: Uncomment the `beforeAll` and unskip the tests once a node is deployed.
-  // beforeAll(async (done) => {
-  //   await dock.init();
-  //   done();
-  // });
+  beforeAll(async (done) => {
+    await dock.init();
+    done();
+  });
 
-  test.skip('Can connect to node', () => {
+  test('Can connect to node', () => {
     //await dock.init();
     expect(!!dock.api).toBe(true);
   });
 
-  test.skip('Has keyring and account', () => {
+  test('Has keyring and account', () => {
     dock.keyring = new Keyring(TestKeyringOpts);
     const account = dock.keyring.addFromUri(TestAccount.uri, TestAccount.options);
     dock.setAccount(account);
@@ -122,7 +121,7 @@ describe('DID Module', () => {
     expect(!!dock.account).toBe(true);
   });
 
-  test.skip('Can create a DID', async () => {
+  test('Can create a DID', async () => {
     const pair = dock.keyring.addFromUri(firstKeySeed);
     const publicKey = getPublicKeyFromKeyringPair(pair);
 
@@ -137,15 +136,13 @@ describe('DID Module', () => {
     }
   }, 30000);
 
-  test.skip('Can get a DID document', async () => {
+  test('Can get a DID document', async () => {
     const result = await dock.did.getDocument(dockDID);
     console.log('DID Document:', JSON.stringify(result, true, 2));
     expect(!!result).toBe(true);
   }, 10000);
 
-  test.skip('Can update a DID key', async () => {
-    // Get DID details. This call will fail if DID is not written already
-    const last_modified_in_block = (await dock.did.getDetail(dockDID))[1];
+  test('Can update a DID key to ed25519 key', async () => {
     // Sign key update with this key pair as this is the current key of the DID
     const currentPair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
 
@@ -154,25 +151,20 @@ describe('DID Module', () => {
     const newPk = PublicKeyEd25519.fromKeyringPair(newPair);
     const newController = randomAsHex(32);
 
-    const serializedKeyUpdate = dock.did.getSerializedKeyUpdate(dockDID, newPk, last_modified_in_block, newController);
-    const signature = new SignatureSr25519(serializedKeyUpdate, currentPair);
+    const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, dockDID, newPk, currentPair, newController);
 
-    const transaction = dock.did.updateKey(dockDID, signature, newPk, last_modified_in_block, newController);
+    const transaction = dock.did.updateKey(keyUpdate, signature);
     const result = await dock.sendTransaction(transaction);
     expect(!!result).toBe(true);
   }, 30000);
 
-  test.skip('Can remove a DID', async () => {
-    // Get DID details. This call will fail if DID is not written already
-    const last_modified_in_block = (await dock.did.getDetail(dockDID))[1];
-
+  test('Can remove a DID', async () => {
     // Sign key update with this key pair as this is the current key of the DID
     const currentPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
 
-    const serializedDIDRemoval = dock.did.getSerializedDIDRemoval(dockDID, last_modified_in_block);
-    const signature = new SignatureEd25519(serializedDIDRemoval, currentPair);
+    const [didRemoval, signature] = await createSignedDidRemoval(dock.did, dockDID, currentPair);
 
-    const transaction = dock.did.remove(dockDID, signature, last_modified_in_block);
+    const transaction = dock.did.remove(didRemoval, signature);
     const result = await dock.sendTransaction(transaction);
     if (result) {
       await expect(dock.did.getDocument(dockDID)).rejects.toThrow(/Could not find DID/);

@@ -42,7 +42,7 @@ yarn dock-did-example
 
 Run example to resolve DID
 ```
-yarn did-resolver
+yarn did-resolver-example
 ```
 
 ## JSON types

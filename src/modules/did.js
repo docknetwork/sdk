@@ -28,7 +28,7 @@ class DIDModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   new(did, keyDetail) {
-    let hexId = getHexIdentifierFromDID(did);
+    const hexId = getHexIdentifierFromDID(did);
     return this.module.new(hexId, keyDetail);
   }
 
@@ -68,7 +68,7 @@ class DIDModule {
    * @return {object} The DID document.
    */
   async getDocument(did) {
-    let hexId = getHexIdentifierFromDID(did);
+    const hexId = getHexIdentifierFromDID(did);
     const detail = (await this.getDetail(hexId))[0];
     // If given DID was in hex, encode to SS58 and then construct fully qualified DID else the DID was already fully qualified
     const id = (did === hexId) ? this.getFullyQualifiedDID(encodeAddress(hexId)) : did;

@@ -49,7 +49,7 @@ async function resolveDockDID() {
  * @returns {Promise<void>}
  */
 async function resolveEthrDIDAndDockDID() {
-  let resolver = new Resolver(fullNodeWsRPCEndpoint, ethereumProviderConfig);
+  const resolver = new Resolver(fullNodeWsRPCEndpoint, ethereumProviderConfig);
   resolver.init();
   console.log('Resolving ethereum DID', ethrDid);
   console.log(await resolver.resolve(ethrDid));

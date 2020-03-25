@@ -28,7 +28,7 @@ class Resolver {
    * Initialize the resolvers of each network
    */
   init() {
-    let resolvers = {};
+    const resolvers = {};
     if (this.resolverConfigs.dock) {
       resolvers.dock = getResolver(this.resolverConfigs.dock.provider)[DockDIDMethod];
     }

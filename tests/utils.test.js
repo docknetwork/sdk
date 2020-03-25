@@ -54,21 +54,21 @@ describe('Testing public key and signature instantiation from keyring', () => {
   test('getCorrectPublicKeyFromKeyringPair throws error on unknown public key type', () => {
     // Create a keypair of type 'ee25519' which is not supported as of now. Moreover this seems like a bug in
     // polkadot-js as it should not allow to create such pair
-    let keyring = new Keyring();
-    let badPair = keyring.addFromUri(randomAsHex(32), null, 'ee25519');
+    const keyring = new Keyring();
+    const badPair = keyring.addFromUri(randomAsHex(32), null, 'ee25519');
     expect(() => getPublicKeyFromKeyringPair(badPair)).toThrow('Only ed25519 and sr25519 keys supported as of now');
   });
 
   test('getCorrectPublicKeyFromKeyringPair returns correct public key from ed25519 pair', () => {
-    let keyring = new Keyring();
-    let pair = keyring.addFromUri(randomAsHex(32), null, 'ed25519');
+    const keyring = new Keyring();
+    const pair = keyring.addFromUri(randomAsHex(32), null, 'ed25519');
     const pk = getPublicKeyFromKeyringPair(pair);
     expect(pk instanceof PublicKeyEd25519).toBe(true);
   });
 
   test('getCorrectPublicKeyFromKeyringPair returns correct public key from sr25519 pair', () => {
-    let keyring = new Keyring();
-    let pair = keyring.addFromUri(randomAsHex(32), null, 'sr25519');
+    const keyring = new Keyring();
+    const pair = keyring.addFromUri(randomAsHex(32), null, 'sr25519');
     const pk = getPublicKeyFromKeyringPair(pair);
     expect(pk instanceof PublicKeySr25519).toBe(true);
   });
@@ -76,21 +76,21 @@ describe('Testing public key and signature instantiation from keyring', () => {
   test('getCorrectSignatureFromKeyringPair throws error on unknown public key type', () => {
     // Create a keypair of type 'ee25519' which is not supported as of now. Moreover this seems like a bug in
     // polkadot-js as it should not allow to create such pair
-    let keyring = new Keyring();
-    let badPair = keyring.addFromUri(randomAsHex(32), null, 'ee25519');
+    const keyring = new Keyring();
+    const badPair = keyring.addFromUri(randomAsHex(32), null, 'ee25519');
     expect(() => getSignatureFromKeyringPair(badPair, [1, 2])).toThrow('Only ed25519 and sr25519 keys supported as of now');
   });
 
   test('getCorrectSignatureFromKeyringPair returns correct signature from ed25519 pair', () => {
-    let keyring = new Keyring();
-    let pair = keyring.addFromUri(randomAsHex(32), null, 'ed25519');
+    const keyring = new Keyring();
+    const pair = keyring.addFromUri(randomAsHex(32), null, 'ed25519');
     const sig = getSignatureFromKeyringPair(pair, [1, 2]);
     expect(sig instanceof SignatureEd25519).toBe(true);
   });
 
   test('getCorrectSignatureFromKeyringPair returns correct signature from sr25519 pair', () => {
-    let keyring = new Keyring();
-    let pair = keyring.addFromUri(randomAsHex(32), null, 'sr25519');
+    const keyring = new Keyring();
+    const pair = keyring.addFromUri(randomAsHex(32), null, 'sr25519');
     const sig = getSignatureFromKeyringPair(pair, [1, 2]);
     expect(sig instanceof SignatureSr25519).toBe(true);
   });

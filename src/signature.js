@@ -22,7 +22,7 @@ class Signature {
    */
   fromHex(value, expectedByteSize) {
     this.validateByteSize(value, expectedByteSize);
-    let sig = Object.create(this.prototype);
+    const sig = Object.create(this.prototype);
     sig.value = value;
   }
 

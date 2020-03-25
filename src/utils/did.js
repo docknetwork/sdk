@@ -45,7 +45,7 @@ function validateDockDIDSS58Identifier(identifier) {
 function getHexIdentifierFromDID(did) {
   if (did.startsWith(DockDIDQualifier)) {
     // Fully qualified DID. Remove the qualifier
-    let ss58Did = did.slice(DockDIDQualifier.length);
+    const ss58Did = did.slice(DockDIDQualifier.length);
     try {
       const hex = u8aToHex(decodeAddress(ss58Did));
       // 2 characters for `0x` and 2*byte size of DID

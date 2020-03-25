@@ -1,5 +1,9 @@
+import {ec as EC} from 'elliptic';
+
 import {PublicKeyEd25519, PublicKeySr25519} from '../public-key';
 import {SignatureEd25519, SignatureSr25519} from '../signature';
+
+const secp256k1Curve = new EC('secp256k1');
 
 /**
  * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
@@ -33,6 +37,27 @@ function getBytesForStateChange(api, stateChange) {
   return api.createType('StateChange', stateChange).toU8a();
 }
 
+function generateEcdsaSecp256k1Keypair(seed) {
+  return secp256k1Curve.genKeyPair({entropy: seed});
+}
+
+function verifyEcdsaSecp256k1Sig(message, signature, publicKey) {
+  const pk = publicKey.value.slice(2);
+  const sig = { r: signature.value.slice(0, 64), s: signature.value.slice(64, 128) };
+  const recoveryParam = parseInt(signature.value.slice(128, 130), 16);
+  return secp256k1Curve.verify(message, sig, recoveryParam, secp256k1Curve.keyFromPublic(pk, 'hex'));
+}
+
+function getKeyPairType(pair) {
+  if (pair.type && (pair.type === 'ed25519' || pair.type === 'sr25519')) {
+    return pair.type;
+  } else if (pair.ec && pair.priv && pair.pub) {
+    return 'secp256k1';
+  } else {
+    throw new Error('Only ed25519, sr25519 and secp256k1 keys supported as of now');
+  }
+}
+
 /**
  * Inspect the `type` of the `KeyringPair` to generate the correct kind of PublicKey.
  * @param {KeyringPair} pair - A polkadot-js KeyringPair.
@@ -58,8 +83,11 @@ function getSignatureFromKeyringPair(pair, message) {
   return pair.type === 'ed25519' ? new SignatureEd25519(message, pair) : new SignatureSr25519(message, pair);
 }
 
-export {isHexWithGivenByteSize,
+export {
+  isHexWithGivenByteSize,
   getBytesForStateChange,
+  generateEcdsaSecp256k1Keypair,
+  verifyEcdsaSecp256k1Sig,
   getPublicKeyFromKeyringPair,
   getSignatureFromKeyringPair
 };

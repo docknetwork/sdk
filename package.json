@@ -34,7 +34,7 @@
     "test": "jest",
     "docs": "jsdoc src -r -c .jsdoc -d docs",
     "dock-did-example": "npx babel-node example/dock-did.js",
-    "did-resolver": "npx babel-node example/resolver.js"
+    "did-resolver-example": "npx babel-node example/resolver.js"
   },
   "files": [
     "dist"
@@ -42,6 +42,7 @@
   "dependencies": {
     "@polkadot/api": "^1.8.1",
     "did-resolver": "^1.1.0",
+    "elliptic": "^6.5.2",
     "ethr-did-resolver": "^2.2.0"
   }
 }

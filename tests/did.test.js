@@ -103,17 +103,17 @@ describe('DID Module', () => {
   const secondKeySeed = randomAsHex(32);
 
   // TODO: Uncomment the `beforeAll` and unskip the tests once a node is deployed.
-  beforeAll(async (done) => {
+  /*beforeAll(async (done) => {
     await dock.init();
     done();
-  });
+  });*/
 
-  test('Can connect to node', () => {
+  test.skip('Can connect to node', () => {
     //await dock.init();
     expect(!!dock.api).toBe(true);
   });
 
-  test('Has keyring and account', () => {
+  test.skip('Has keyring and account', () => {
     dock.keyring = new Keyring(TestKeyringOpts);
     const account = dock.keyring.addFromUri(TestAccount.uri, TestAccount.options);
     dock.setAccount(account);
@@ -121,7 +121,7 @@ describe('DID Module', () => {
     expect(!!dock.account).toBe(true);
   });
 
-  test('Can create a DID', async () => {
+  test.skip('Can create a DID', async () => {
     const pair = dock.keyring.addFromUri(firstKeySeed);
     const publicKey = getPublicKeyFromKeyringPair(pair);
 
@@ -136,13 +136,13 @@ describe('DID Module', () => {
     }
   }, 30000);
 
-  test('Can get a DID document', async () => {
+  test.skip('Can get a DID document', async () => {
     const result = await dock.did.getDocument(dockDID);
     console.log('DID Document:', JSON.stringify(result, true, 2));
     expect(!!result).toBe(true);
   }, 10000);
 
-  test('Can update a DID key to ed25519 key', async () => {
+  test.skip('Can update a DID key to ed25519 key', async () => {
     // Sign key update with this key pair as this is the current key of the DID
     const currentPair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
 
@@ -158,7 +158,7 @@ describe('DID Module', () => {
     expect(!!result).toBe(true);
   }, 30000);
 
-  test('Can remove a DID', async () => {
+  test.skip('Can remove a DID', async () => {
     // Sign key update with this key pair as this is the current key of the DID
     const currentPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
 

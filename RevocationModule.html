@@ -202,7 +202,7 @@
     
 
     
-    <h4 class="name" id="getRevocationRegistry"><span class="type-signature"></span>getRevocationRegistry<span class="signature">(revRegID)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
+    <h4 class="name" id="getRevocationRegistry"><span class="type-signature">(async) </span>getRevocationRegistry<span class="signature">(registryID)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
     
 
     
@@ -246,13 +246,13 @@
 
         <tr>
             
-                <td class="name"><code>revRegID</code></td>
+                <td class="name"><code>registryID</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">RegistryId</span>
 
 
             
@@ -303,7 +303,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line62">line 62</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line59">line 59</a>
     </li></ul></dd>
     
 
@@ -361,7 +361,7 @@
     
 
     
-    <h4 class="name" id="getRevocationStatus"><span class="type-signature"></span>getRevocationStatus<span class="signature">(revRegID, credentialID)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
+    <h4 class="name" id="getRevocationStatus"><span class="type-signature">(async) </span>getRevocationStatus<span class="signature">(registryID, revokeId)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
     
 
     
@@ -405,13 +405,13 @@
 
         <tr>
             
-                <td class="name"><code>revRegID</code></td>
+                <td class="name"><code>registryID</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">RegistryId</span>
 
 
             
@@ -428,13 +428,13 @@
 
         <tr>
             
-                <td class="name"><code>credentialID</code></td>
+                <td class="name"><code>revokeId</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">RevokeId</span>
 
 
             
@@ -543,7 +543,7 @@
     
 
     
-    <h4 class="name" id="new"><span class="type-signature"></span>new<span class="signature">(origin, id, registry)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
+    <h4 class="name" id="newRegistry"><span class="type-signature"></span>newRegistry<span class="signature">(id, registry)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
     
 
     
@@ -587,36 +587,13 @@
 
         <tr>
             
-                <td class="name"><code>origin</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The origin</td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>id</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">RegistryId</span>
 
 
             
@@ -639,7 +616,7 @@
             <td class="type">
             
                 
-<span class="param-type">RevRegistry</span>
+<span class="param-type">Registry</span>
 
 
             
@@ -690,7 +667,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line20">line 20</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line19">line 19</a>
     </li></ul></dd>
     
 
@@ -748,7 +725,7 @@
     
 
     
-    <h4 class="name" id="remove"><span class="type-signature"></span>remove<span class="signature">(origin, toRemove, controllers)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
+    <h4 class="name" id="removeRegistry"><span class="type-signature"></span>removeRegistry<span class="signature">(removal, proof)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
     
 
     
@@ -792,30 +769,7 @@
 
         <tr>
             
-                <td class="name"><code>origin</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The origin</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>toRemove</code></td>
+                <td class="name"><code>removal</code></td>
             
 
             <td class="type">
@@ -838,13 +792,13 @@
 
         <tr>
             
-                <td class="name"><code>controllers</code></td>
+                <td class="name"><code>proof</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Array</span>
+<span class="param-type">PAuth</span>
 
 
             
@@ -854,7 +808,7 @@
 
             
 
-            <td class="description last">contains the `(DID, signature)`s of the controllers who are allowing this removal. Each tuple contains the controller and its signature</td>
+            <td class="description last">The proof</td>
         </tr>
 
     
@@ -895,7 +849,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line53">line 53</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line30">line 30</a>
     </li></ul></dd>
     
 
@@ -953,7 +907,7 @@
     
 
     
-    <h4 class="name" id="revoke"><span class="type-signature"></span>revoke<span class="signature">(origin, toRevoke, controllers)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
+    <h4 class="name" id="revoke"><span class="type-signature"></span>revoke<span class="signature">(revoke, proof)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
     
 
     
@@ -997,30 +951,7 @@
 
         <tr>
             
-                <td class="name"><code>origin</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The origin</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>toRevoke</code></td>
+                <td class="name"><code>revoke</code></td>
             
 
             <td class="type">
@@ -1043,13 +974,13 @@
 
         <tr>
             
-                <td class="name"><code>controllers</code></td>
+                <td class="name"><code>proof</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Array</span>
+<span class="param-type">PAuth</span>
 
 
             
@@ -1059,7 +990,7 @@
 
             
 
-            <td class="description last">contains the `(DID, signature)`s of the controllers who are allowing these revocations. Each tuple contains the controller and its signature.</td>
+            <td class="description last">The proof</td>
         </tr>
 
     
@@ -1100,7 +1031,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line31">line 31</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line40">line 40</a>
     </li></ul></dd>
     
 
@@ -1158,7 +1089,7 @@
     
 
     
-    <h4 class="name" id="unrevoke"><span class="type-signature"></span>unrevoke<span class="signature">(origin, toUnrevoke, controllers)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
+    <h4 class="name" id="unrevoke"><span class="type-signature"></span>unrevoke<span class="signature">(unrevoke, proof)</span><span class="type-signature"> &rarr; {Extrinsic}</span></h4>
     
 
     
@@ -1202,36 +1133,13 @@
 
         <tr>
             
-                <td class="name"><code>origin</code></td>
+                <td class="name"><code>unrevoke</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The origin</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>toUnrevoke</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Unrevoke</span>
+<span class="param-type">UnRevoke</span>
 
 
             
@@ -1248,13 +1156,13 @@
 
         <tr>
             
-                <td class="name"><code>controllers</code></td>
+                <td class="name"><code>proof</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Array</span>
+<span class="param-type">PAuth</span>
 
 
             
@@ -1264,7 +1172,7 @@
 
             
 
-            <td class="description last">contains the `(DID, signature)`s of the controllers who are allowing these unrevocations. Each tuple contains the controller and its signature.</td>
+            <td class="description last">The proof</td>
         </tr>
 
     
@@ -1305,7 +1213,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line42">line 42</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line50">line 50</a>
     </li></ul></dd>
     
 
@@ -1379,7 +1287,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Mar 26 2020 14:24:01 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Mar 26 2020 21:18:01 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

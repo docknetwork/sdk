@@ -17,7 +17,7 @@ class RevocationModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   newRegistry(id, registry) {
-    console.log('new revocation', id, registry.toJSON())
+    // console.log('new revocation', id, registry.toJSON());
     return this.module.newRegistry(id, registry);
   }
 
@@ -28,7 +28,7 @@ class RevocationModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   removeRegistry(removal, proof) {
-    return this.module.removeRegistry(origin, toRemove, controllers);
+    return this.module.removeRegistry(removal, proof);
   }
 
   /**

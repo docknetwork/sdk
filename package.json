@@ -34,7 +34,8 @@
     "test": "jest",
     "docs": "jsdoc src -r -c .jsdoc -d docs",
     "dock-did-example": "npx babel-node example/dock-did.js",
-    "did-resolver-example": "npx babel-node example/resolver.js"
+    "did-resolver-example": "npx babel-node example/resolver.js",
+    "dev-node": "./submodules/dock-substrate/scripts/run_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all"
   },
   "files": [
     "dist"

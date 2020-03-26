@@ -1,6 +1,12 @@
 import {DockSDK} from '../src/dock-sdk';
 import {FullNodeEndpoint} from './test-constants';
 
+describe('Config on NodeJS environment', () => {
+  test('Is running in NodeJS environment', () => {
+    expect(typeof window !== 'undefined').toBeFalsy();
+  });
+});
+
 describe('Dock SDK', () => {
   const dock = new DockSDK(FullNodeEndpoint);
 

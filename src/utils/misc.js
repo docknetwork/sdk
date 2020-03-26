@@ -49,19 +49,21 @@ function generateEcdsaSecp256k1Keypair(seed) {
 /**
  * Verify a given signature on a given message
  * @param {array} message - Bytes of message
- * @param {SignatureSecp256k1} signature to verify
+ * @param {SignatureSecp256k1} signature - signature to verify
+ * @param {PublicKeySecp256k1} publicKey - Secp256k1 public key for verification
  * @returns {boolean} True when signature is valid, false otherwise
  */
-function verifyEcdsaSecp256k1Sig(message, signature) {
+function verifyEcdsaSecp256k1Sig(message, signature, publicKey) {
   // Remove the leading `0x`
   const sigHex = signature.value.slice(2);
   // Break it in 2 chunks of 32 bytes each
   const sig = { r: sigHex.slice(0, 64), s: sigHex.slice(64, 128) };
-  // Get hex value for last byte
-  const recoveryParam = parseInt(sigHex.slice(128, 130), 16);
-  // Recover pubkey from message
-  const pub = secp256k1Curve.recoverPubKey(message, sig, recoveryParam, 'hex');
-  return secp256k1Curve.verify(message, sig, pub);
+  // Remove the leading `0x`
+  const pkHex = publicKey.value.slice(2);
+  // Generate public key object. Not extracting the public key for signature as the verifier
+  // should always know what public key is being used.
+  const pk = secp256k1Curve.keyFromPublic(pkHex, 'hex');
+  return secp256k1Curve.verify(message, sig, pk);
 }
 
 /**

@@ -1,5 +1,5 @@
-import {DockSDK} from '../src/dock-sdk';
-import {FullNodeEndpoint} from './test-constants';
+import {DockSDK} from '../../src/dock-sdk';
+import {FullNodeEndpoint} from '../test-constants';
 
 describe('Config on NodeJS environment', () => {
   test('Is running in NodeJS environment', () => {

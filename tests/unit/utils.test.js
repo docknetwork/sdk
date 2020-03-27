@@ -6,9 +6,9 @@ import {
   getPublicKeyFromKeyringPair,
   getSignatureFromKeyringPair,
   isHexWithGivenByteSize, verifyEcdsaSecp256k1Sig
-} from '../src/utils/misc';
-import {PublicKeyEd25519, PublicKeySr25519, PublicKeySecp256k1} from '../src/public-key';
-import {SignatureEd25519, SignatureSr25519, SignatureSecp256k1} from '../src/signature';
+} from '../../src/utils/misc';
+import {PublicKeyEd25519, PublicKeySr25519, PublicKeySecp256k1} from '../../src/public-key';
+import {SignatureEd25519, SignatureSr25519, SignatureSecp256k1} from '../../src/signature';
 
 describe('Testing isHexWithGivenByteSize', () => {
 

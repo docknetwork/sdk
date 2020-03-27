@@ -1,4 +1,4 @@
-import {DockAPI} from '../../src/dock-sdk';
+import {DockAPI} from '../../src/api';
 import {FullNodeEndpoint} from '../test-constants';
 
 describe('Config on NodeJS environment', () => {

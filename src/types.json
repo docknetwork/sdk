@@ -34,11 +34,11 @@
     "did": "dock::did::Did",
     "public_key": "dock::did::PublicKey",
     "controller": "Option<dock::did::Did>",
-    "last_modified_in_block": "u64"
+    "last_modified_in_block": "BlockNumber"
   },
   "dock::did::DidRemoval": {
     "did": "dock::did::Did",
-    "last_modified_in_block": "u64"
+    "last_modified_in_block": "BlockNumber"
   },
   "dock::revoke::RegistryId": "[u8;32]",
   "dock::revoke::RevokeId": "[u8;32]",

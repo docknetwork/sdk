@@ -34,7 +34,7 @@ function isHexWithGivenByteSize(value, byteSize) {
  * @return {array} An array of Uint8
  */
 function getBytesForStateChange(api, stateChange) {
-  return api.createType('StateChange', stateChange).toU8a();
+  return api.createType('dock::StateChange', stateChange).toU8a();
 }
 
 /**

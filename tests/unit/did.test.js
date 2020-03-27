@@ -1,4 +1,3 @@
-import {Keyring} from '@polkadot/api';
 import {randomAsHex, encodeAddress} from '@polkadot/util-crypto';
 
 import {
@@ -6,12 +5,7 @@ import {
   validateDockDIDSS58Identifier,
   getHexIdentifierFromDID,
   DockDIDQualifier,
-  createNewDockDID,
-  createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval
 } from '../../src/utils/did';
-import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
-import {generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair} from '../../src/utils/misc';
-import {PublicKeyEd25519} from '../../src/public-key';
 
 describe('DID utilities', () => {
   test('On input as 40 byte hex, validateDockDIDIdentifier throws error', () => {

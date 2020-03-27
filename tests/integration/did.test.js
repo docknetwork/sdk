@@ -1,18 +1,14 @@
 import {Keyring} from '@polkadot/api';
-import {randomAsHex, encodeAddress} from '@polkadot/util-crypto';
+import {randomAsHex} from '@polkadot/util-crypto';
 
 import {DockSDK} from '../../src/dock-sdk';
 
 import {
-  validateDockDIDHexIdentifier,
-  validateDockDIDSS58Identifier,
-  getHexIdentifierFromDID,
-  DockDIDQualifier,
   createNewDockDID,
   createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval
 } from '../../src/utils/did';
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
-import {generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair} from '../../src/utils/misc';
+import {getPublicKeyFromKeyringPair} from '../../src/utils/misc';
 import {PublicKeyEd25519} from '../../src/public-key';
 
 describe('DID Module', () => {

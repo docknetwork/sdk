@@ -10,16 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          ssh-key: |
-            -----BEGIN OPENSSH PRIVATE KEY-----
-            b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
-            QyNTUxOQAAACCV9tdU6dz3i59Ci7wK/tkxDYuT4VaQGrdsjK0VWTTUnwAAAIiRdoAVkXaA
-            FQAAAAtzc2gtZWQyNTUxOQAAACCV9tdU6dz3i59Ci7wK/tkxDYuT4VaQGrdsjK0VWTTUnw
-            AAAEDFsHlAeii7Aeaivs4Fm26Sk7gr/UGcJCjYy909y19a5pX211Tp3PeLn0KLvAr+2TEN
-            i5PhVpAat2yMrRVZNNSfAAAABWFAbG1y
-            -----END OPENSSH PRIVATE KEY-----
-          submodules: true
+      - run: ./scripts/checkout_submodule
       - uses: borales/actions-yarn@v2.0.0
         with:
           cmd: install # will run `yarn install` command

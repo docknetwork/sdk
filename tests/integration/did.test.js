@@ -1,7 +1,7 @@
 import {Keyring} from '@polkadot/api';
 import {randomAsHex} from '@polkadot/util-crypto';
 
-import {DockSDK} from '../../src/dock-sdk';
+import {DockAPI} from '../../src/dock-sdk';
 
 import {
   createNewDockDID,
@@ -12,7 +12,7 @@ import {getPublicKeyFromKeyringPair} from '../../src/utils/misc';
 import {PublicKeyEd25519} from '../../src/public-key';
 
 describe('DID Module', () => {
-  const dock = new DockSDK(FullNodeEndpoint);
+  const dock = new DockAPI(FullNodeEndpoint);
 
   // Generate a random DID
   const dockDID = createNewDockDID();

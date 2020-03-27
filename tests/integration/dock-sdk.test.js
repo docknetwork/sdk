@@ -1,4 +1,4 @@
-import {DockSDK} from '../../src/dock-sdk';
+import {DockAPI} from '../../src/dock-sdk';
 import {FullNodeEndpoint} from '../test-constants';
 
 describe('Config on NodeJS environment', () => {
@@ -7,8 +7,8 @@ describe('Config on NodeJS environment', () => {
   });
 });
 
-describe('Dock SDK', () => {
-  const dock = new DockSDK(FullNodeEndpoint);
+describe('Dock API', () => {
+  const dock = new DockAPI(FullNodeEndpoint);
 
   test('Can connect to node', async () => {
     await dock.init();

@@ -1,4 +1,4 @@
-import dock from './dock-sdk';
+import dock from './api';
 import {validateDockDIDSS58Identifier, DockDIDMethod} from './utils/did';
 
 /**

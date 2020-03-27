@@ -1,7 +1,7 @@
 import {Keyring} from '@polkadot/api';
 import {randomAsHex} from '@polkadot/util-crypto';
 
-import {DockAPI} from '../../src/dock-sdk';
+import {DockAPI} from '../../src/api';
 
 import {
   createNewDockDID,

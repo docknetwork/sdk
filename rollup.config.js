@@ -25,7 +25,7 @@ export default [
     plugins: [
       json()
     ],
-    input: 'src/dock-sdk.js',
+    input: 'src/api.js',
     external: [],
     output: [
       { file: pkg.main, format: 'cjs' },

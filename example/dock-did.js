@@ -1,7 +1,7 @@
 // Import some utils from Polkadot JS
 import {randomAsHex} from '@polkadot/util-crypto';
 
-// Import Dock SDK
+// Import Dock API
 import dock, {
   PublicKeySr25519,
 } from '../src/dock-sdk';
@@ -80,7 +80,7 @@ function registerNewDID() {
   return dock.sendTransaction(transaction);
 }
 
-// Initialise Dock SDK, connect to the node and start working with it
+// Initialise Dock API, connect to the node and start working with it
 // It will create a new DID with a key, then update the key to another one and then remove the DID
 dock.init(fullNodeWsRPCEndpoint)
   .then(() => {

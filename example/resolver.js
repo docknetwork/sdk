@@ -1,7 +1,7 @@
 import {randomAsHex} from '@polkadot/util-crypto';
 import { Resolver as DIFResolver} from 'did-resolver';
 
-// Import Dock SDK
+// Import Dock API
 import dock from '../src/dock-sdk';
 import {createNewDockDID, createKeyDetail} from '../src/utils/did';
 import {getPublicKeyFromKeyringPair} from '../src/utils/misc';

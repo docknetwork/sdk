@@ -19,7 +19,7 @@ import {
 } from './signature';
 
 /** Helper class to interact with the Dock chain */
-class DockSDK {
+class DockAPI {
   /**
    * Skeleton constructor, does nothing yet
    * @constructor
@@ -149,9 +149,9 @@ class DockSDK {
   }
 }
 
-export default new DockSDK();
+export default new DockAPI();
 export {
-  DockSDK,
+  DockAPI,
   DIDModule,
   RevocationModule,
   PublicKey,

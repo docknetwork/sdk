@@ -31,10 +31,13 @@
     "prepare": "yarn build",
     "build": "rollup -c",
     "watch": "rollup -c -w",
-    "test": "jest",
+    "test": "jest --env=node",
     "docs": "jsdoc src -r -c .jsdoc -d docs",
     "dock-did-example": "npx babel-node example/dock-did.js",
     "did-resolver-example": "npx babel-node example/resolver.js"
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "files": [
     "dist"

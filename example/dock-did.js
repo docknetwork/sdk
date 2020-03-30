@@ -1,10 +1,10 @@
 // Import some utils from Polkadot JS
 import {randomAsHex} from '@polkadot/util-crypto';
 
-// Import Dock SDK
+// Import Dock API
 import dock, {
   PublicKeySr25519,
-} from '../src/dock-sdk';
+} from '../src/api';
 import {createNewDockDID, createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval} from '../src/utils/did';
 import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
 
@@ -52,7 +52,9 @@ async function updateDIDKey() {
 
   const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, dockDID, newPk, currentPair, newController);
   const transaction = dock.did.updateKey(keyUpdate, signature);
-  return dock.sendTransaction(transaction);
+  await dock.sendTransaction(transaction);
+
+  await getDIDDoc();
 }
 
 async function getDIDDoc() {
@@ -78,7 +80,7 @@ function registerNewDID() {
   return dock.sendTransaction(transaction);
 }
 
-// Initialise Dock SDK, connect to the node and start working with it
+// Initialise Dock API, connect to the node and start working with it
 // It will create a new DID with a key, then update the key to another one and then remove the DID
 dock.init(fullNodeWsRPCEndpoint)
   .then(() => {

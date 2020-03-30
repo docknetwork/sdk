@@ -30,7 +30,8 @@ Running dev node:
 ```
 
 ## Test
-- Run all tests with `yarn test`
+- Run unit tests with `yarn test`
+- Run e2e integrations tests with `yarn test-integration` (required node to be running)
 - Run a single test module with `yarn test <module name or prefix>`
 
 ## Basic SDK examples
@@ -42,7 +43,7 @@ yarn dock-did-example
 
 Run example to resolve DID
 ```
-yarn did-resolver
+yarn did-resolver-example
 ```
 
 ## JSON types

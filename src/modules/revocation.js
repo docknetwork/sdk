@@ -1,3 +1,5 @@
+import {getBytesForStateChange} from '../utils/misc';
+
 /** Class to create, update and destroy revocations */
 class RevocationModule {
   /**
@@ -17,7 +19,6 @@ class RevocationModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   newRegistry(id, registry) {
-    // console.log('new revocation', id, registry.toJSON());
     return this.module.newRegistry(id, registry.toJSON());
   }
 
@@ -27,11 +28,8 @@ class RevocationModule {
    * @param {PAuth} proof - The proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  removeRegistry(registryID, lastModified, proof) {
-    return this.module.removeRegistry({
-      registry_id: registryID,
-      last_modified: lastModified,
-    }, proof);
+  removeRegistry(removal, proof) {
+    return this.module.removeRegistry(removal, proof);
   }
 
   /**
@@ -65,22 +63,22 @@ class RevocationModule {
   }
 
   async getRegistryDetail(registryID) {
-   const resp = await this.api.query.revoke.registries(registryID);
-   if (resp) {
-     if (resp.isNone) {
-       throw new Error('Could not find revocation registry: ' + registryID);
-     }
+    const resp = await this.api.query.revoke.registries(registryID);
+    if (resp) {
+      if (resp.isNone) {
+        throw new Error('Could not find revocation registry: ' + registryID);
+      }
 
-     const respTuple = resp.unwrap();
-     if (respTuple.length === 2) {
-       return [
-         respTuple[0],
-         respTuple[1].toNumber()
-       ];
-     } else {
-       throw new Error('Needed 2 items in response but got' + respTuple.length);
-     }
-   }
+      const respTuple = resp.unwrap();
+      if (respTuple.length === 2) {
+        return [
+          respTuple[0],
+          respTuple[1].toNumber()
+        ];
+      } else {
+        throw new Error('Needed 2 items in response but got' + respTuple.length);
+      }
+    }
   }
 
   /**
@@ -95,6 +93,14 @@ class RevocationModule {
       return resp;
     }
     throw new Error('Could not find revocation status: ' + registryID + ' for ' + revokeID);
+  }
+
+  getSerializedRemoveRegistry(removeReg) {
+    const stateChange = {
+      RemoveRegistry: removeReg
+    };
+
+    return getBytesForStateChange(this.api, stateChange);
   }
 }
 

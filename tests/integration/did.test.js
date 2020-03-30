@@ -29,8 +29,7 @@ describe('DID Module', () => {
   });
 
   test('Can connect to node', () => {
-    //await dock.init();
-    expect(!!dock.api).toBe(true);
+
   });
 
   test('Has keyring and account', () => {

@@ -50,10 +50,9 @@ describe('DID Module', () => {
 
     const transaction = dock.did.new(dockDID, keyDetail);
     const result = await dock.sendTransaction(transaction);
-    if (result) {
-      const document = await dock.did.getDocument(dockDID);
-      expect(!!document).toBe(true);
-    }
+    expect(!!result).toBe(true);
+    const document = await dock.did.getDocument(dockDID);
+    expect(!!document).toBe(true);
   }, 30000);
 
   test('Can get a DID document', async () => {

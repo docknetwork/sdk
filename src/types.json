@@ -63,9 +63,7 @@
   "dock::revoke::PAuth": "BTreeMap<dock::did::Did, dock::did::DidSignature>",
   "dock::revoke::Policy": {
     "_enum": {
-      "OneOf": {
-        "controllers": "BTreeSet<dock::did::Did>"
-      }
+      "OneOf": "BTreeSet<dock::did::Did>"
     }
   },
   "dock::StateChange": {

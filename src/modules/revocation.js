@@ -18,7 +18,7 @@ class RevocationModule {
    */
   newRegistry(id, registry) {
     // console.log('new revocation', id, registry.toJSON());
-    return this.module.newRegistry(id, registry);
+    return this.module.newRegistry(id, registry.toJSON());
   }
 
   /**
@@ -27,8 +27,11 @@ class RevocationModule {
    * @param {PAuth} proof - The proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  removeRegistry(removal, proof) {
-    return this.module.removeRegistry(removal, proof);
+  removeRegistry(registryID, lastModified, proof) {
+    return this.module.removeRegistry({
+      registry_id: registryID,
+      last_modified: lastModified,
+    }, proof);
   }
 
   /**
@@ -57,11 +60,27 @@ class RevocationModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   async getRevocationRegistry(registryID) {
-    const resp = await this.api.query.revoke.registries(registryID);
-    if (resp && !resp.isNone) {
-      return resp;
-    }
-    throw new Error('Could not find revocation registry: ' + registryID);
+    const detail = await this.getRegistryDetail(registryID);
+    return detail[0];
+  }
+
+  async getRegistryDetail(registryID) {
+   const resp = await this.api.query.revoke.registries(registryID);
+   if (resp) {
+     if (resp.isNone) {
+       throw new Error('Could not find revocation registry: ' + registryID);
+     }
+
+     const respTuple = resp.unwrap();
+     if (respTuple.length === 2) {
+       return [
+         respTuple[0],
+         respTuple[1].toNumber()
+       ];
+     } else {
+       throw new Error('Needed 2 items in response but got' + respTuple.length);
+     }
+   }
   }
 
   /**

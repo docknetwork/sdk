@@ -106,6 +106,14 @@ class RevocationModule {
     return getBytesForStateChange(this.api, stateChange);
   }
 
+  serializedUnrevoke(revoke) {
+    const stateChange = {
+      Unrevoke: revoke
+    };
+
+    return getBytesForStateChange(this.api, stateChange);
+  }
+
   getSerializedRemoveRegistry(removeReg) {
     const stateChange = {
       RemoveRegistry: removeReg

@@ -24,6 +24,10 @@ describe('Revocation Module', () => {
   const controllerDID = randomAsHex(32);
   const controllerSeed = randomAsHex(32);
 
+  const revokeID = randomAsHex(32);
+  const revokeIds = new Set();
+  revokeIds.add(revokeID);
+
   // TODO: Uncomment the `beforeAll` and unskip the tests once a node is deployed.
   beforeAll(async (done) => {
     await dock.init();
@@ -68,9 +72,6 @@ describe('Revocation Module', () => {
 
     const lastModified = registryDetail[1];
 
-    const revokeIds = new Set();
-    revokeIds.add(randomAsHex(32));
-
     const revoke = {
       registry_id: registryID,
       revoke_ids: revokeIds,
@@ -86,7 +87,31 @@ describe('Revocation Module', () => {
 
     const transaction = dock.revocation.revoke(revoke, pAuth);
     const result = await dock.sendTransaction(transaction);
-    expect(!!result).toBe(true);
+    expect(!!result).toBe(true); // TODO: expect promise to resolve
+  }, 30000);
+
+  test('Can unrevoke', async () => {
+    const registryDetail = await dock.revocation.getRegistryDetail(registryID);
+    expect(!!registryDetail).toBe(true);
+
+    const lastModified = registryDetail[1];
+
+    const unrevoke = {
+      registry_id: registryID,
+      revoke_ids: revokeIds,
+      last_modified: lastModified
+    };
+
+    const serializedUnrevoke = dock.revocation.serializedUnrevoke(unrevoke);
+    const pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
+    const sig = getSignatureFromKeyringPair(pair, serializedUnrevoke);
+
+    const pAuth = new Map();
+    pAuth.set(controllerDID, sig.toJSON());
+
+    const transaction = dock.revocation.unrevoke(unrevoke, pAuth);
+    const result = await dock.sendTransaction(transaction);
+    expect(!!result).toBe(true); // TODO: expect promise to resolve
   }, 30000);
 
   test('Can remove a registry', async () => {

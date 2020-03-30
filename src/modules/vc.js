@@ -1,10 +1,10 @@
 /** Class to sign and verify Verifiable Credentials */
 
 import documentLoader from './vc-helpers/document-loader';
-import {issue, verify} from 'vc-js';
+import {issue, verifyCredential} from 'vc-js';
 const {Ed25519KeyPair, suites: {Ed25519Signature2018, JwsLinkedDataSignature}} = require('jsonld-signatures');
 
-// START HACK TO GET FAUSTO'S CODE WORKING WITH TESTS, COPIED FROM ecdsa-secp256k1-signature-2019 and secp256k1-key-pair PACKAGES
+// START HACK TO GET VC CODE WORKING WITH TESTS, COPIED FROM ecdsa-secp256k1-signature-2019 and secp256k1-key-pair PACKAGES
 // TEMPORARY
 const crypto = require('crypto');
 const forge = require('node-forge');
@@ -340,7 +340,7 @@ class VerifiableCredential {
     return await issue({
       credential,
       suite,
-      documentLoader,
+      documentLoader
     });
   }
 
@@ -350,10 +350,10 @@ class VerifiableCredential {
    * @return {object} verification result.
    */
   async verify (credential) {
-    return await verify({
+    return await verifyCredential({
       credential,
-      suite: [Ed25519Signature2018(), EcdsaSepc256k1Signature2019()],
-      documentLoader,
+      suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019()],
+      documentLoader: documentLoader
     });
   }
 }

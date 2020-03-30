@@ -25,28 +25,32 @@ describe('Verifiable Credential Issuing', () => {
   };
 
   test('Issuing should return an object with a proof.', async () => {
-    expect(
-      vc.issue(sample_key, sample_unsigned_cred)
-    ).toEqual(expect.objectContaining(
-      {
-        id: 'https://example.com/credentials/1872',
-        type: [
-          'VerifiableCredential',
-          'AlumniCredential'
-        ],
-        issuanceDate: '2020-03-18T19:23:24Z',
-        credentialSubject: {
-          id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
-          alumniOf: 'Example University'
-        },
-        issuer: 'https://gist.githubusercontent.com/faustow/3b48e353a9d5146e05a9c344e02c8c6f/raw',
-        proof: expect.objectContaining(
-          expect.anything()
-        )
-      }
-    )
+    const credential = await vc.issue(sample_key, sample_unsigned_cred);
+    expect(credential).toMatchObject(
+      expect.objectContaining(
+        {
+          id: 'https://example.com/credentials/1872',
+          type: [
+            'VerifiableCredential',
+            'AlumniCredential'
+          ],
+          issuanceDate: '2020-03-18T19:23:24Z',
+          credentialSubject: {
+            id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+            alumniOf: 'Example University'
+          },
+          issuer: 'https://gist.githubusercontent.com/faustow/3b48e353a9d5146e05a9c344e02c8c6f/raw',
+          proof: expect.objectContaining({
+            type: 'EcdsaSecp256k1Signature2019',
+            created: expect.anything(),
+            jws: expect.anything(),
+            proofPurpose: 'assertionMethod',
+            verificationMethod: 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw'
+          })
+        }
+      )
     );
-  });
+  }, 30000);
 });
 
 describe('Verifiable Credential Verification', () => {
@@ -68,21 +72,35 @@ describe('Verifiable Credential Verification', () => {
     issuer: 'https://gist.githubusercontent.com/faustow/3b48e353a9d5146e05a9c344e02c8c6f/raw',
     proof: {
       type: 'EcdsaSecp256k1Signature2019',
-      created: '2020-03-18T20:46:44Z',
-      jws: 'eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEYCIQDk3JyM_ygoM39SVg1CKX7p70CJwSRoQTk2c3Pnx7QscgIhAKLUtcsh_Ydae5JfiOqV-XcF4nIKh77WdI_4HAQKh1wX',
+      created: '2020-03-27T17:44:28Z',
+      jws: 'eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEQCIAS8ZNVYIni3oShb0TFz4SMAybJcz3HkQPaTdz9OSszoAiA01w9ZkS4Zx5HEZk45QzxbqOr8eRlgMdhgFsFs1FnyMQ',
       proofPurpose: 'assertionMethod',
       verificationMethod: 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw'
     }
   };
 
   test('The sample signed credential should pass verification.', async () => {
-    expect(
-      vc.verify(sample_signed_cred)
-    ).toEqual(expect.objectContaining(
-      {
-        verified: true
-      }
+    const result = await vc.verify(sample_signed_cred);
+    console.log(result)
+    expect(result).toMatchObject(
+      expect.objectContaining(
+        {
+          "results": [
+            {
+              "proof": {
+                "@context": "https://w3id.org/security/v2",
+                "created": "2020-03-27T17:44:28Z",
+                "jws": expect.anything(),
+                "proofPurpose": "assertionMethod",
+                "type": "EcdsaSecp256k1Signature2019",
+                "verificationMethod": "https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw"
+              },
+              "verified": true
+            }
+          ],
+          "verified": true
+        }
       )
-    );
-  });
+    )
+  }, 30000);
 });

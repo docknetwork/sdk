@@ -2,7 +2,7 @@ const axios = require('axios');
 const testContext = require('../vc-helpers/contexts');
 
 export default async function(url) {
-  const context = testContext.get(url);
+  const context = testContext[url];
   if(context) {
     return {
       contextUrl: null,

@@ -1,12 +1,10 @@
 import {Keyring} from '@polkadot/api';
-import {randomAsHex, encodeAddress} from '@polkadot/util-crypto';
+import {randomAsHex} from '@polkadot/util-crypto';
 
-import dock, {DockAPI, PublicKeySr25519} from '../../src/api';
+import {DockAPI, PublicKeySr25519} from '../../src/api';
 
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
-import {getPublicKeyFromKeyringPair, getSignatureFromKeyringPair} from '../../src/utils/misc';
-import {PublicKeyEd25519} from '../../src/public-key';
-import {SignatureEd25519, SignatureSr25519} from '../../src/signature';
+import {getSignatureFromKeyringPair} from '../../src/utils/misc';
 
 import  {
   RevokeRegistry,
@@ -136,8 +134,7 @@ describe('Revocation Module', () => {
     await expect(dock.revocation.getRegistryDetail(registryID)).rejects.toThrow(/Could not find revocation registry/);
   }, 30000);
 
-
-  test.skip('Can create a registry with multiple controllers', async () => {
+  test('Can create a registry with multiple controllers', async () => {
     const registryID = randomAsHex(32); // TODO: ensure random values arent same as in other tests?
     const controllers = new Set();
 

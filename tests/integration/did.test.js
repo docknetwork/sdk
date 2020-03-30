@@ -28,10 +28,6 @@ describe('DID Module', () => {
     done();
   });
 
-  test('Can connect to node', () => {
-
-  });
-
   test('Has keyring and account', () => {
     dock.keyring = new Keyring(TestKeyringOpts);
     const account = dock.keyring.addFromUri(TestAccount.uri, TestAccount.options);

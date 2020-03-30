@@ -20,7 +20,7 @@ import {
 } from './signature';
 
 /** Helper class to interact with the Dock chain */
-class DockSDK {
+class DockAPI {
   /**
    * Skeleton constructor, does nothing yet
    * @constructor
@@ -45,13 +45,6 @@ class DockSDK {
     this.api = await ApiPromise.create({
       provider: new WsProvider(this.address),
       types,
-      /*typesAlias: {
-        // Renaming types of `didModule`
-        didModule: {
-          // `CustomSignature` is called `Signature` in the Node runtime. The renaming is to prevent conflict with the existing type called `Signature`.
-          Signature: 'CustomSignature'
-        }
-      }*/
     });
 
     this._did = new DIDModule(this.api);
@@ -64,6 +57,10 @@ class DockSDK {
   async disconnect() {
     // TODO: proper d/c
     delete this.api;
+  }
+
+  isInitialized() {
+    return !!this.api;
   }
 
   /** TODO: Should probably use set/get and rename account to _account
@@ -136,6 +133,9 @@ class DockSDK {
    * @return {DIDModule} The module to use
    */
   get did() {
+    if (!this._did) {
+      throw new Error('Unable to get DID module, SDK is not initialised');
+    }
     return this._did;
   }
 
@@ -144,6 +144,9 @@ class DockSDK {
    * @return {RevocationModule} The module to use
    */
   get revocation() {
+    if (!this._revocation) {
+      throw new Error('Unable to get revocation module, SDK is not initialised');
+    }
     return this._revocation;
   }
 
@@ -156,9 +159,9 @@ class DockSDK {
   }
 }
 
-export default new DockSDK();
+export default new DockAPI();
 export {
-  DockSDK,
+  DockAPI,
   DIDModule,
   RevocationModule,
   PublicKey,

@@ -1,5 +1,6 @@
 import {u8aToHex} from '@polkadot/util';
-import {isHexWithGivenByteSize} from './utils';
+
+import {isHexWithGivenByteSize} from './utils/misc';
 
 /** Class representing a PublicKey. This class should always be extended (abstract class in some languages) */
 class PublicKey {
@@ -25,8 +26,10 @@ class PublicKey {
   }
 
   /**
-   * Extracts the public key from a pair
-   * @param {KeyringPair} pair
+   * Extracts the public key from a pair. Assumes the KeyringPair is of the correct type. The `type` is intentionally not
+   * inspected to follow dependency inversion principle.
+   * generate the instance correct subclass
+   * @param {KeyringPair} A polkadot-js KeyringPair.
    * @returns {PublicKey}
    */
   static fromKeyringPair(pair) {
@@ -88,8 +91,20 @@ class PublicKeySecp256k1 extends PublicKey {
       Secp256k1: this.value,
     };
   }
-}
 
+  /**
+   * Returns a compressed public key for Secp256k1 curve. The name is intentionally kept same with the base class to
+   * keep the API uniform
+   * @param {KeyPair} pair - A KeyPair from elliptic library
+   * @returns {PublicKeySecp256k1}
+   */
+  static fromKeyringPair(pair) {
+    // `true` is for compressed
+    const pk = pair.getPublic(true, 'hex');
+    // `pk` is hex but does not contain the leading `0x`
+    return new this('0x' + pk);
+  }
+}
 
 export {
   PublicKey,

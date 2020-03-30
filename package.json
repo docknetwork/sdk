@@ -18,6 +18,7 @@
     "babel-jest": "24.5.0",
     "concurrently": "^4.1.0",
     "eslint": "^6.8.0",
+    "eslint-plugin-jest": "^23.8.2",
     "jest": "24.5.0",
     "jsdoc": "^3.6.3",
     "rollup": "1.7.0",
@@ -27,13 +28,18 @@
     "rollup-plugin-node-resolve": "4.0.1"
   },
   "scripts": {
-    "lint": "eslint src",
+    "lint": "eslint src && eslint tests",
     "prepare": "yarn build",
     "build": "rollup -c",
     "watch": "rollup -c -w",
-    "test": "jest",
+    "test": "jest --verbose ./tests/unit",
+    "test-integration": "jest --verbose ./tests/integration",
     "docs": "jsdoc src -r -c .jsdoc -d docs",
-    "start-node-example": "npx babel-node example/index.js"
+    "dock-did-example": "npx babel-node example/dock-did.js",
+    "did-resolver-example": "npx babel-node example/resolver.js"
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "files": [
     "dist"
@@ -41,7 +47,10 @@
   "dependencies": {
     "axios": "^0.18.1",
     "ecdsa-secp256k1-signature-2019": "^1.0.0",
-    "@polkadot/api": "^1.7.1",
-    "vc-js": "^0.5.0"
+    "@polkadot/api": "^1.8.1",
+    "vc-js": "^0.5.0",
+    "did-resolver": "^1.1.0",
+    "elliptic": "^6.5.2",
+    "ethr-did-resolver": "^2.2.0"
   }
 }

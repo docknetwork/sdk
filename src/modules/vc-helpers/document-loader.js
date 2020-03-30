@@ -1,5 +1,5 @@
-const axios = require('axios');
-const testContext = require('../vc-helpers/contexts');
+import axios from 'axios';
+import testContext from './contexts/index';
 
 export default async function(url) {
   const context = testContext[url];
@@ -16,4 +16,4 @@ export default async function(url) {
     document,
     documentUrl: url,
   };
-};
+}

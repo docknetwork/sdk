@@ -2,15 +2,20 @@
 
 import documentLoader from './vc-helpers/document-loader';
 import {issue, verifyCredential} from 'vc-js';
-const {Ed25519KeyPair, suites: {Ed25519Signature2018, JwsLinkedDataSignature}} = require('jsonld-signatures');
+import {Ed25519KeyPair, suites} from 'jsonld-signatures';
+const {Ed25519Signature2018, JwsLinkedDataSignature} = suites;
+
+
+
 
 // START HACK TO GET VC CODE WORKING WITH TESTS, COPIED FROM ecdsa-secp256k1-signature-2019 and secp256k1-key-pair PACKAGES
 // TEMPORARY
-const crypto = require('crypto');
-const forge = require('node-forge');
+import crypto from 'crypto';
+import forge from 'node-forge';
 const {util: {binary: {base58}}} = forge;
-const ec = new (require('elliptic')).ec('secp256k1');
-const util = require('secp256k1-key-pair/lib/util');
+import elliptic from 'elliptic';
+const ec = (elliptic).ec('secp256k1');
+import util from 'secp256k1-key-pair/lib/util';
 
 class Secp256k1KeyPair {
   /**
@@ -153,7 +158,7 @@ class Secp256k1KeyPair {
       fingerprintBuffer = util.base58Decode({
         decode: base58.decode,
         keyMaterial: fingerprint.slice(1),
-        type: `fingerprint's`
+        type: 'fingerprint\'s'
       });
     } catch(e) {
       return {error: e, valid: false};
@@ -310,7 +315,7 @@ class EcdsaSepc256k1Signature2019 extends JwsLinkedDataSignature {
       proof, date, useNativeCanonize});
     this.requiredKeyType = 'EcdsaSecp256k1VerificationKey2019';
   }
-};
+}
 
 // END PACKAGE HACK
 

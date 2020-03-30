@@ -81,26 +81,25 @@ describe('Verifiable Credential Verification', () => {
 
   test('The sample signed credential should pass verification.', async () => {
     const result = await vc.verify(sample_signed_cred);
-    console.log(result)
     expect(result).toMatchObject(
       expect.objectContaining(
         {
-          "results": [
+          'results': [
             {
-              "proof": {
-                "@context": "https://w3id.org/security/v2",
-                "created": "2020-03-27T17:44:28Z",
-                "jws": expect.anything(),
-                "proofPurpose": "assertionMethod",
-                "type": "EcdsaSecp256k1Signature2019",
-                "verificationMethod": "https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw"
+              'proof': {
+                '@context': 'https://w3id.org/security/v2',
+                'created': '2020-03-27T17:44:28Z',
+                'jws': expect.anything(),
+                'proofPurpose': 'assertionMethod',
+                'type': 'EcdsaSecp256k1Signature2019',
+                'verificationMethod': 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw'
               },
-              "verified": true
+              'verified': true
             }
           ],
-          "verified": true
+          'verified': true
         }
       )
-    )
+    );
   }, 30000);
 });

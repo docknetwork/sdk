@@ -4,7 +4,7 @@
 export default {
   '@context': [
     {
-    '@version': 1.1
+      '@version': 1.1
     },
     'https://www.w3.org/ns/odrl.jsonld',
     {
@@ -36,4 +36,4 @@ export default {
       'verifier': {'@id': 'ex:verifier', '@type': '@id'},
     }
   ]
-}
+};

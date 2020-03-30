@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [ '10.x', '8.x' ] # todo, see if we can test on "latest"
+        node: [ '12.x', '10.x', '8.x' ]
     steps:
       - uses: actions/checkout@v2
       - run: ./scripts/checkout_submodule

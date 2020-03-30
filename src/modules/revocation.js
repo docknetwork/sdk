@@ -95,6 +95,17 @@ class RevocationModule {
     throw new Error('Could not find revocation status: ' + registryID + ' for ' + revokeID);
   }
 
+  getSerializedRevoke(revoke) {
+    // TODO: not happy with each module having methods to do this
+    // can do a utility like getStateChange(api, 'Revoke', change)
+    // internally construct stateChange object like below
+    const stateChange = {
+      Revoke: revoke
+    };
+
+    return getBytesForStateChange(this.api, stateChange);
+  }
+
   getSerializedRemoveRegistry(removeReg) {
     const stateChange = {
       RemoveRegistry: removeReg

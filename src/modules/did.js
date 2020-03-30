@@ -35,7 +35,7 @@ class DIDModule {
   /**
    * Updates the details of an already registered DID on the Dock chain.
    * @param {object} keyUpdate - `KeyUpdate` as expected by the Substrate node
-   * @param {Signature} signature - Signature from existing key
+   * @param {DidSignature} signature - Signature from existing key
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   updateKey(keyUpdate, signature) {
@@ -45,7 +45,7 @@ class DIDModule {
   /**
    * Removes an already registered DID on the Dock chain.
    * @param {object} didRemoval - `DidRemoval` as expected by the Substrate node
-   * @param {Signature} signature - Signature from existing key
+   * @param {DidSignature} signature - Signature from existing key
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   remove(didRemoval, signature) {

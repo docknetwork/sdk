@@ -1,3 +1,5 @@
+import {getBytesForStateChange} from '../utils/misc';
+
 /** Class to create, update and destroy revocations */
 class RevocationModule {
   /**
@@ -17,8 +19,7 @@ class RevocationModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   newRegistry(id, registry) {
-    // console.log('new revocation', id, registry.toJSON());
-    return this.module.newRegistry(id, registry);
+    return this.module.newRegistry(id, registry.toJSON());
   }
 
   /**
@@ -57,11 +58,27 @@ class RevocationModule {
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   async getRevocationRegistry(registryID) {
+    const detail = await this.getRegistryDetail(registryID);
+    return detail[0];
+  }
+
+  async getRegistryDetail(registryID) {
     const resp = await this.api.query.revoke.registries(registryID);
-    if (resp && !resp.isNone) {
-      return resp;
+    if (resp) {
+      if (resp.isNone) {
+        throw new Error('Could not find revocation registry: ' + registryID);
+      }
+
+      const respTuple = resp.unwrap();
+      if (respTuple.length === 2) {
+        return [
+          respTuple[0],
+          respTuple[1].toNumber()
+        ];
+      } else {
+        throw new Error('Needed 2 items in response but got' + respTuple.length);
+      }
     }
-    throw new Error('Could not find revocation registry: ' + registryID);
   }
 
   /**
@@ -72,10 +89,36 @@ class RevocationModule {
    */
   async getRevocationStatus(registryID, revokeID) {
     const resp = await this.api.query.revoke.revocations(registryID, revokeID);
-    if (resp && !resp.isNone) {
-      return resp;
+    if (resp) {
+      return !resp.isNone;
     }
-    throw new Error('Could not find revocation status: ' + registryID + ' for ' + revokeID);
+  }
+
+  getSerializedRevoke(revoke) {
+    // TODO: not happy with each module having methods to do this
+    // can do a utility like getStateChange(api, 'Revoke', change)
+    // internally construct stateChange object like below
+    const stateChange = {
+      Revoke: revoke
+    };
+
+    return getBytesForStateChange(this.api, stateChange);
+  }
+
+  serializedUnrevoke(revoke) {
+    const stateChange = {
+      Unrevoke: revoke
+    };
+
+    return getBytesForStateChange(this.api, stateChange);
+  }
+
+  getSerializedRemoveRegistry(removeReg) {
+    const stateChange = {
+      RemoveRegistry: removeReg
+    };
+
+    return getBytesForStateChange(this.api, stateChange);
   }
 }
 

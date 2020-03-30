@@ -89,10 +89,9 @@ class RevocationModule {
    */
   async getRevocationStatus(registryID, revokeID) {
     const resp = await this.api.query.revoke.revocations(registryID, revokeID);
-    if (resp && !resp.isNone) {
-      return resp;
+    if (resp) {
+      return !resp.isNone;
     }
-    throw new Error('Could not find revocation status: ' + registryID + ' for ' + revokeID);
   }
 
   getSerializedRevoke(revoke) {

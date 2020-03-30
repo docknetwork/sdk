@@ -86,6 +86,9 @@ describe('Revocation Module', () => {
     const transaction = dock.revocation.revoke(revoke, pAuth);
     const result = await dock.sendTransaction(transaction);
     expect(!!result).toBe(true); // TODO: expect promise to resolve
+
+    const revocationStatus = await dock.revocation.getRevocationStatus(registryID, revokeID);
+    expect(revocationStatus).toBe(true);
   }, 30000);
 
   test('Can unrevoke', async () => {
@@ -110,45 +113,48 @@ describe('Revocation Module', () => {
     const transaction = dock.revocation.unrevoke(unrevoke, pAuth);
     const result = await dock.sendTransaction(transaction);
     expect(!!result).toBe(true); // TODO: expect promise to resolve
+
+    const revocationStatus = await dock.revocation.getRevocationStatus(registryID, revokeID);
+    expect(revocationStatus).toBe(false);
   }, 30000);
-
-  test('Can remove a registry', async () => {
-    const registryDetail = await dock.revocation.getRegistryDetail(registryID);
-    expect(!!registryDetail).toBe(true);
-
-    const lastModified = registryDetail[1];
-    const remReg = {
-      registry_id: registryID,
-      last_modified: lastModified
-    };
-    const serializedRemReg = dock.revocation.getSerializedRemoveRegistry(remReg);
-    const pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
-    const sig = getSignatureFromKeyringPair(pair, serializedRemReg);
-
-    const pAuth = new Map();
-    pAuth.set(controllerDID, sig.toJSON());
-
-    const transaction = dock.revocation.removeRegistry(remReg, pAuth);
-    const result = await dock.sendTransaction(transaction);
-    expect(!!result).toBe(true);
-    await expect(dock.revocation.getRegistryDetail(registryID)).rejects.toThrow(/Could not find revocation registry/);
-  }, 30000);
-
-  test('Can create a registry with multiple controllers', async () => {
-    const registryID = randomAsHex(32); // TODO: ensure random values arent same as in other tests?
-    const controllers = new Set();
-
-    // TODO: ensure random values arent same as in other tests?
-    controllers.add(randomAsHex(32));
-    controllers.add(randomAsHex(32));
-
-    const policy = new RevokePolicy(controllers);
-    const registry = new RevokeRegistry(policy, false);
-
-    const transaction = dock.revocation.newRegistry(registryID, registry);
-    const result = await dock.sendTransaction(transaction);
-    expect(!!result).toBe(true);
-    const reg = await dock.revocation.getRevocationRegistry(registryID);
-    expect(!!reg).toBe(true);
-  }, 30000);
+  //
+  // test('Can remove a registry', async () => {
+  //   const registryDetail = await dock.revocation.getRegistryDetail(registryID);
+  //   expect(!!registryDetail).toBe(true);
+  //
+  //   const lastModified = registryDetail[1];
+  //   const remReg = {
+  //     registry_id: registryID,
+  //     last_modified: lastModified
+  //   };
+  //   const serializedRemReg = dock.revocation.getSerializedRemoveRegistry(remReg);
+  //   const pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
+  //   const sig = getSignatureFromKeyringPair(pair, serializedRemReg);
+  //
+  //   const pAuth = new Map();
+  //   pAuth.set(controllerDID, sig.toJSON());
+  //
+  //   const transaction = dock.revocation.removeRegistry(remReg, pAuth);
+  //   const result = await dock.sendTransaction(transaction);
+  //   expect(!!result).toBe(true);
+  //   await expect(dock.revocation.getRegistryDetail(registryID)).rejects.toThrow(/Could not find revocation registry/);
+  // }, 30000);
+  //
+  // test('Can create a registry with multiple controllers', async () => {
+  //   const registryID = randomAsHex(32); // TODO: ensure random values arent same as in other tests?
+  //   const controllers = new Set();
+  //
+  //   // TODO: ensure random values arent same as in other tests?
+  //   controllers.add(randomAsHex(32));
+  //   controllers.add(randomAsHex(32));
+  //
+  //   const policy = new RevokePolicy(controllers);
+  //   const registry = new RevokeRegistry(policy, false);
+  //
+  //   const transaction = dock.revocation.newRegistry(registryID, registry);
+  //   const result = await dock.sendTransaction(transaction);
+  //   expect(!!result).toBe(true);
+  //   const reg = await dock.revocation.getRevocationRegistry(registryID);
+  //   expect(!!reg).toBe(true);
+  // }, 30000);
 });

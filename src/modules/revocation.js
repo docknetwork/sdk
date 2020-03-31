@@ -108,7 +108,7 @@ class RevocationModule {
    * @param {object} unrevoke - `Unrevoke` as expected by the Substrate node
    * @returns {Array} An array of Uint8
    */
-  serializedUnrevoke(unrevoke) {
+  getSerializedUnrevoke(unrevoke) {
     return getStateChange(this.api, 'Unrevoke', unrevoke);
   }
 

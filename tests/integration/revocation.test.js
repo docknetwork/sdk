@@ -103,7 +103,7 @@ describe('Revocation Module', () => {
       last_modified: lastModified
     };
 
-    const serializedUnrevoke = dock.revocation.serializedUnrevoke(unrevoke);
+    const serializedUnrevoke = dock.revocation.getSerializedUnrevoke(unrevoke);
     const pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
     const sig = getSignatureFromKeyringPair(pair, serializedUnrevoke);
 

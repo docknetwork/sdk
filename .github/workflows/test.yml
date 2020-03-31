@@ -3,7 +3,7 @@ name: CI
 on: [push]
 jobs:
   build:
-    name: Test
+    name: Build and Tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -15,7 +15,6 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: yarn install
-      - run: yarn lint
       - run: yarn build
       - run: yarn test
       - run: yarn test-with-node

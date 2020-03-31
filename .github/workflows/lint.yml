@@ -1,0 +1,15 @@
+name: Linting
+on: [push]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2 # If you're using actions/checkout@v2 you must set persist-credentials to false in most cases for the deployment to work correctly.
+        with:
+          persist-credentials: false
+
+      - name: Install and Lint # Only need to install eslint package here and then run lint script
+        run: |
+          npm install eslint eslint-plugin-jest
+          npm run lint

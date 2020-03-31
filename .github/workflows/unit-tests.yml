@@ -9,5 +9,5 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-      - run: yarn install # TODO: install only required packages
+      - run: yarn install jest
       - run: yarn test

@@ -33,7 +33,7 @@
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "test": "jest --verbose ./tests/unit",
-    "test-integration": "NODE_ENV=production jest  --forceExit --verbose --runInBand ./tests/integration",
+    "test-integration": "NODE_ENV=production jest --forceExit --verbose --runInBand ./tests/integration",
     "docs": "jsdoc src -r -c .jsdoc -d docs",
     "dock-did-example": "npx babel-node example/dock-did.js",
     "did-resolver-example": "npx babel-node example/resolver.js",
@@ -44,7 +44,8 @@
     "testEnvironment": "node"
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "dependencies": {
     "@polkadot/api": "^1.8.1",

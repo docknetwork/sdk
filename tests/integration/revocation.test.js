@@ -19,13 +19,13 @@ describe('Revocation Module', () => {
 
   // Create a new controller DID, the DID will be registered on the network and own the registry
   const controllerDID = randomAsHex(32);
+  const controllerDIDTwo = randomAsHex(32);
   const controllerSeed = randomAsHex(32);
 
   const revokeID = randomAsHex(32);
   const revokeIds = new Set();
   revokeIds.add(revokeID);
 
-  // TODO: Uncomment the `beforeAll` and unskip the tests once a node is deployed.
   beforeAll(async (done) => {
     await dock.init({
       keyring: TestKeyringOpts,
@@ -42,9 +42,13 @@ describe('Revocation Module', () => {
 
     // The controller is same as the DID
     const keyDetail = createKeyDetail(publicKey, controllerDID);
-
     const transaction = dock.did.new(controllerDID, keyDetail);
     await dock.sendTransaction(transaction);
+
+    // Create secondary DID
+    const keyDetailTwo = createKeyDetail(publicKey, controllerDIDTwo);
+    const transactionTwo = dock.did.new(controllerDIDTwo, keyDetailTwo);
+    await dock.sendTransaction(transactionTwo);
     done();
   }, 30000);
 
@@ -56,9 +60,6 @@ describe('Revocation Module', () => {
     const controllers = new Set();
     controllers.add(controllerDID);
 
-    // we used to init treeset before but doesnt seem needed
-    // const controllersTreeSet = new BTreeSet(dock.api.registry, String, controllers);
-    // const policy = new RevokePolicy(controllersTreeSet);
     const policy = new RevokePolicy(controllers);
     const registry = new RevokeRegistry(policy, false);
 
@@ -145,14 +146,12 @@ describe('Revocation Module', () => {
     await expect(dock.revocation.getRegistryDetail(registryID)).rejects.toThrow(/Could not find revocation registry/);
   }, 30000);
 
-  // TODO: fix badproof
-  test.skip('Can create a registry with multiple controllers', async () => {
-    const registryID = randomAsHex(32); // TODO: ensure random values arent same as in other tests?
+  test('Can create a registry with multiple controllers', async () => {
     const controllers = new Set();
+    controllers.add(controllerDID);
+    controllers.add(controllerDIDTwo);
 
-    // TODO: ensure random values arent same as in other tests?
-    controllers.add(randomAsHex(32));
-    controllers.add(randomAsHex(32));
+    const registryID = randomAsHex(32);
 
     const policy = new RevokePolicy(controllers);
     const registry = new RevokeRegistry(policy, false);

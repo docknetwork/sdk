@@ -1,4 +1,3 @@
-import {Keyring} from '@polkadot/api';
 import {randomAsHex} from '@polkadot/util-crypto';
 
 import {DockAPI, PublicKeySr25519} from '../../src/api';

@@ -1,0 +1,3 @@
+[submodule "submodules/dock-substrate"]
+	path = submodules/dock-substrate
+	url = git@github.com:docknetwork/dock-substrate.git

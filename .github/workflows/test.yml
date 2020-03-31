@@ -1,9 +1,8 @@
-name: CI
+name: Build and Integration Tests
 
 on: [push]
 jobs:
   build:
-    name: Build and Integration Tests
     runs-on: ubuntu-latest
     strategy:
       matrix:

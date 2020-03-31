@@ -30,9 +30,19 @@ Running dev node:
 ```
 
 ## Test
-- Run unit tests with `yarn test`
-- Run e2e integrations tests with `yarn test-integration` (required node to be running)
-- Run a single test module with `yarn test <module name or prefix>`
+
+Run unit tests with `yarn test`.
+
+Run e2e integrations tests with `yarn test-integration` (required node to be running)
+
+You can run tests against a temporary node in docker like so:
+
+```
+./scripts/checkout_submodule
+yarn test-with-node
+```
+
+Run a single test module with `yarn test <module name or prefix>`.
 
 ## Basic SDK examples
 

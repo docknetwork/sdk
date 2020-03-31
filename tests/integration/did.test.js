@@ -28,11 +28,6 @@ describe('DID Module', () => {
     done();
   });
 
-  test('Can connect to node', () => {
-    //await dock.init();
-    expect(!!dock.api).toBe(true);
-  });
-
   test('Has keyring and account', () => {
     dock.keyring = new Keyring(TestKeyringOpts);
     const account = dock.keyring.addFromUri(TestAccount.uri, TestAccount.options);
@@ -50,10 +45,9 @@ describe('DID Module', () => {
 
     const transaction = dock.did.new(dockDID, keyDetail);
     const result = await dock.sendTransaction(transaction);
-    if (result) {
-      const document = await dock.did.getDocument(dockDID);
-      expect(!!document).toBe(true);
-    }
+    expect(!!result).toBe(true);
+    const document = await dock.did.getDocument(dockDID);
+    expect(!!document).toBe(true);
   }, 30000);
 
   test('Can get a DID document', async () => {

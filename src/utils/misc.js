@@ -11,7 +11,7 @@ const secp256k1Curve = new EC('secp256k1');
  * @param {number} byteSize - Expected byte size of the input.
  * @return {Boolean} True if hex (with given size) else false
  */
-function isHexWithGivenByteSize(value, byteSize) {
+export function isHexWithGivenByteSize(value, byteSize) {
   const match = value.match(/^0x([0-9a-f]+$)/i);
   if (match && match.length > 1) {
     if (byteSize) {
@@ -33,8 +33,14 @@ function isHexWithGivenByteSize(value, byteSize) {
  * @param {object} stateChange - A representation of a `StateChange` enum variant
  * @return {array} An array of Uint8
  */
-function getBytesForStateChange(api, stateChange) {
+export function getBytesForStateChange(api, stateChange) {
   return api.createType('dock::StateChange', stateChange).toU8a();
+}
+
+export function getStateChange(api, name, value) {
+  const stateChange = {};
+  stateChange[name] = value;
+  return getBytesForStateChange(api, stateChange);
 }
 
 /**
@@ -42,7 +48,7 @@ function getBytesForStateChange(api, stateChange) {
  * @param {array} seed - A byte array
  * @returns {Keypair} A keypair
  */
-function generateEcdsaSecp256k1Keypair(seed) {
+export function generateEcdsaSecp256k1Keypair(seed) {
   return secp256k1Curve.genKeyPair({entropy: seed});
 }
 
@@ -53,7 +59,7 @@ function generateEcdsaSecp256k1Keypair(seed) {
  * @param {PublicKeySecp256k1} publicKey - Secp256k1 public key for verification
  * @returns {boolean} True when signature is valid, false otherwise
  */
-function verifyEcdsaSecp256k1Sig(message, signature, publicKey) {
+export function verifyEcdsaSecp256k1Sig(message, signature, publicKey) {
   // Remove the leading `0x`
   const sigHex = signature.value.slice(2);
   // Break it in 2 chunks of 32 bytes each
@@ -71,7 +77,7 @@ function verifyEcdsaSecp256k1Sig(message, signature, publicKey) {
  * @param {object} pair - Can be a keypair from polkadot-js or elliptic library.
  * @returns {string|*} For now, it can be ed25519 or sr25519 or secp256k1 or an error
  */
-function getKeyPairType(pair) {
+export function getKeyPairType(pair) {
   if (pair.type && (pair.type === 'ed25519' || pair.type === 'sr25519')) {
     // Polkadot-js keyring has type field with value either 'ed25519' or 'sr25519'
     return pair.type;
@@ -88,7 +94,7 @@ function getKeyPairType(pair) {
  * @param {KeyringPair} pair - A polkadot-js KeyringPair.
  * @return {PublicKey} An instance of the correct subclass of PublicKey
  */
-function getPublicKeyFromKeyringPair(pair) {
+export function getPublicKeyFromKeyringPair(pair) {
   const type = getKeyPairType(pair);
   let cls;
   if (type === 'ed25519') {
@@ -107,7 +113,7 @@ function getPublicKeyFromKeyringPair(pair) {
  * @param {array} message - an array of bytes (Uint8)
  * @returns {Signature} An instance of the correct subclass of Signature
  */
-function getSignatureFromKeyringPair(pair, message) {
+export function getSignatureFromKeyringPair(pair, message) {
   const type = getKeyPairType(pair);
   let cls;
   if (type === 'ed25519') {
@@ -119,12 +125,3 @@ function getSignatureFromKeyringPair(pair, message) {
   }
   return new cls(message, pair);
 }
-
-export {
-  isHexWithGivenByteSize,
-  getBytesForStateChange,
-  generateEcdsaSecp256k1Keypair,
-  verifyEcdsaSecp256k1Sig,
-  getPublicKeyFromKeyringPair,
-  getSignatureFromKeyringPair
-};

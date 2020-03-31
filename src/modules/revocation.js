@@ -1,4 +1,4 @@
-import {getBytesForStateChange} from '../utils/misc';
+import {getStateChange} from '../utils/misc';
 
 /** Class to create, update and destroy revocations */
 class RevocationModule {
@@ -94,31 +94,31 @@ class RevocationModule {
     }
   }
 
+  /**
+   * Serializes a `Revoke` for signing.
+   * @param {object} revoke - `Revoke` as expected by the Substrate node
+   * @returns {Array} An array of Uint8
+   */
   getSerializedRevoke(revoke) {
-    // TODO: not happy with each module having methods to do this
-    // can do a utility like getStateChange(api, 'Revoke', change)
-    // internally construct stateChange object like below
-    const stateChange = {
-      Revoke: revoke
-    };
-
-    return getBytesForStateChange(this.api, stateChange);
+    return getStateChange(this.api, 'Revoke', revoke);
   }
 
-  serializedUnrevoke(revoke) {
-    const stateChange = {
-      Unrevoke: revoke
-    };
-
-    return getBytesForStateChange(this.api, stateChange);
+  /**
+   * Serializes a `Unrevoke` for signing.
+   * @param {object} unrevoke - `Unrevoke` as expected by the Substrate node
+   * @returns {Array} An array of Uint8
+   */
+  serializedUnrevoke(unrevoke) {
+    return getStateChange(this.api, 'Unrevoke', unrevoke);
   }
 
+  /**
+   * Serializes a `RemoveRegistry` for signing.
+   * @param {object} removeReg - `RemoveRegistry` as expected by the Substrate node
+   * @returns {Array} An array of Uint8
+   */
   getSerializedRemoveRegistry(removeReg) {
-    const stateChange = {
-      RemoveRegistry: removeReg
-    };
-
-    return getBytesForStateChange(this.api, stateChange);
+    return getStateChange(this.api, 'RemoveRegistry', removeReg);
   }
 }
 

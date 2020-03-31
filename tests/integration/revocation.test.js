@@ -3,11 +3,9 @@ import {randomAsHex} from '@polkadot/util-crypto';
 import {DockAPI, PublicKeySr25519} from '../../src/api';
 
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
-import {getSignatureFromKeyringPair} from '../../src/utils/misc';
 
 import  {
-  RevokeRegistry,
-  RevokePolicy,
+  OneOfPolicy,
 } from '../../src/utils/revocation';
 import {createKeyDetail} from '../../src/utils/did';
 
@@ -22,6 +20,10 @@ describe('Revocation Module', () => {
   const controllerDIDTwo = randomAsHex(32);
   const controllerSeed = randomAsHex(32);
 
+  // Create a pAuth proof map (did, signature)
+  const pAuth = new Map();
+
+  // Create revoke IDs
   const revokeID = randomAsHex(32);
   const revokeIds = new Set();
   revokeIds.add(revokeID);
@@ -39,6 +41,7 @@ describe('Revocation Module', () => {
     // The DID should be written before any test begins
     const pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
     const publicKey = PublicKeySr25519.fromKeyringPair(pair);
+    pAuth.set(controllerDID, pair);
 
     // The controller is same as the DID
     const keyDetail = createKeyDetail(publicKey, controllerDID);
@@ -60,10 +63,8 @@ describe('Revocation Module', () => {
     const controllers = new Set();
     controllers.add(controllerDID);
 
-    const policy = new RevokePolicy(controllers);
-    const registry = new RevokeRegistry(policy, false);
-
-    const transaction = dock.revocation.newRegistry(registryID, registry);
+    const policy = new OneOfPolicy(controllers);
+    const transaction = dock.revocation.newRegistry(registryID, policy, false);
     const result = await dock.sendTransaction(transaction);
     expect(!!result).toBe(true);
     const reg = await dock.revocation.getRevocationRegistry(registryID);
@@ -75,21 +76,7 @@ describe('Revocation Module', () => {
     expect(!!registryDetail).toBe(true);
 
     const lastModified = registryDetail[1];
-
-    const revoke = {
-      registry_id: registryID,
-      revoke_ids: revokeIds,
-      last_modified: lastModified
-    };
-
-    const serializedRevoke = dock.revocation.getSerializedRevoke(revoke);
-    const pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
-    const sig = getSignatureFromKeyringPair(pair, serializedRevoke);
-
-    const pAuth = new Map();
-    pAuth.set(controllerDID, sig.toJSON());
-
-    const transaction = dock.revocation.revoke(revoke, pAuth);
+    const transaction = dock.revocation.revoke(registryID, revokeIds, lastModified, pAuth);
     const result = await dock.sendTransaction(transaction);
     expect(!!result).toBe(true); // TODO: expect promise to resolve
 
@@ -102,21 +89,7 @@ describe('Revocation Module', () => {
     expect(!!registryDetail).toBe(true);
 
     const lastModified = registryDetail[1];
-
-    const unrevoke = {
-      registry_id: registryID,
-      revoke_ids: revokeIds,
-      last_modified: lastModified
-    };
-
-    const serializedUnrevoke = dock.revocation.getSerializedUnrevoke(unrevoke);
-    const pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
-    const sig = getSignatureFromKeyringPair(pair, serializedUnrevoke);
-
-    const pAuth = new Map();
-    pAuth.set(controllerDID, sig.toJSON());
-
-    const transaction = dock.revocation.unrevoke(unrevoke, pAuth);
+    const transaction = dock.revocation.unrevoke(registryID, revokeIds, lastModified, pAuth);
     const result = await dock.sendTransaction(transaction);
     expect(!!result).toBe(true); // TODO: expect promise to resolve
 
@@ -129,24 +102,12 @@ describe('Revocation Module', () => {
     expect(!!registryDetail).toBe(true);
 
     const lastModified = registryDetail[1];
-    const remReg = {
-      registry_id: registryID,
-      last_modified: lastModified
-    };
-    const serializedRemReg = dock.revocation.getSerializedRemoveRegistry(remReg);
-    const pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
-    const sig = getSignatureFromKeyringPair(pair, serializedRemReg);
-
-    const pAuth = new Map();
-    pAuth.set(controllerDID, sig.toJSON());
-
-    const transaction = dock.revocation.removeRegistry(remReg, pAuth);
+    const transaction = dock.revocation.removeRegistry(registryID, lastModified, pAuth);
     const result = await dock.sendTransaction(transaction);
     expect(!!result).toBe(true);
     await expect(dock.revocation.getRegistryDetail(registryID)).rejects.toThrow(/Could not find revocation registry/);
   }, 30000);
 
-  // TODO: this test is flaky, sometimes passes, sometimes doesnt, skipped for now
   test.skip('Can create a registry with multiple controllers', async () => {
     const controllers = new Set();
     controllers.add(controllerDID);
@@ -154,10 +115,8 @@ describe('Revocation Module', () => {
 
     const registryID = randomAsHex(32);
 
-    const policy = new RevokePolicy(controllers);
-    const registry = new RevokeRegistry(policy, false);
-
-    const transaction = dock.revocation.newRegistry(registryID, registry);
+    const policy = new OneOfPolicy(controllers);
+    const transaction = dock.revocation.newRegistry(registryID, policy, false);
     const result = await dock.sendTransaction(transaction);
     expect(!!result).toBe(true);
     const reg = await dock.revocation.getRevocationRegistry(registryID);

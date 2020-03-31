@@ -1,4 +1,16 @@
-import {getStateChange} from '../utils/misc';
+import {
+  getStateChange,
+  getSignatureFromKeyringPair
+} from '../utils/misc';
+
+function signProof(controllerProofs, message) {
+  const proof = new Map();
+  controllerProofs.forEach((pair, key) => {
+    const sig = getSignatureFromKeyringPair(pair, message);
+    proof.set(key, sig.toJSON());
+  });
+  return proof;
+}
 
 /** Class to create, update and destroy revocations */
 class RevocationModule {
@@ -18,8 +30,11 @@ class RevocationModule {
    * @param {Registry} registry - Will serialized `registry` and update the map `rev_registries` with `id` -> `(registry, last updated block number)
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  newRegistry(id, registry) {
-    return this.module.newRegistry(id, registry.toJSON());
+  newRegistry(id, policy, addOnly) {
+    return this.module.newRegistry(id, {
+      policy: policy.toJSON ? policy.toJSON() : policy,
+      add_only: addOnly,
+    });
   }
 
   /**
@@ -28,7 +43,14 @@ class RevocationModule {
    * @param {PAuth} proof - The proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  removeRegistry(removal, proof) {
+  removeRegistry(registryID, lastModified, controllerProofs) {
+    const removal = {
+      registry_id: registryID,
+      last_modified: lastModified
+    };
+
+    const serializedRemoval = this.getSerializedRemoveRegistry(removal);
+    const proof = signProof(controllerProofs, serializedRemoval);
     return this.module.removeRegistry(removal, proof);
   }
 
@@ -38,7 +60,15 @@ class RevocationModule {
    * @param {PAuth} proof - The proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  revoke(revoke, proof) {
+  revoke(registryID, revokeIds, lastModified, controllerProofs) {
+    const revoke = {
+      registry_id: registryID,
+      revoke_ids: revokeIds,
+      last_modified: lastModified
+    };
+
+    const serializedRevoke = this.getSerializedRevoke(revoke);
+    const proof = signProof(controllerProofs, serializedRevoke);
     return this.module.revoke(revoke, proof);
   }
 
@@ -48,7 +78,15 @@ class RevocationModule {
    * @param {PAuth} proof - The proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  unrevoke(unrevoke, proof) {
+  unrevoke(registryID, revokeIds, lastModified, controllerProofs) {
+    const unrevoke = {
+      registry_id: registryID,
+      revoke_ids: revokeIds,
+      last_modified: lastModified
+    };
+
+    const serializedRevoke = this.getSerializedUnrevoke(unrevoke);
+    const proof = signProof(controllerProofs, serializedRevoke);
     return this.module.unrevoke(unrevoke, proof);
   }
 

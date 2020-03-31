@@ -36,7 +36,7 @@ class DockAPI {
    */
   async init({address, keyring} = {}) {
     if (this.api) {
-      return;
+      throw new Error('API is already connected');
     }
 
     this.address = address || this.address;

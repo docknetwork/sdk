@@ -57,7 +57,9 @@ async function resolveEthrDIDAndDockDID() {
   console.log(await resolver.resolve(dockDID));
 }
 
-dock.init(fullNodeWsRPCEndpoint)
+dock.init({
+  address: fullNodeWsRPCEndpoint
+})
   .then(() => {
     const account = dock.keyring.addFromUri(accountUri, accountMetadata);
     dock.setAccount(account);
@@ -71,5 +73,3 @@ dock.init(fullNodeWsRPCEndpoint)
   .catch(error => {
     console.error('Error occurred somewhere, it was caught!', error);
   });
-
-

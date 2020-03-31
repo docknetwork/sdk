@@ -82,7 +82,9 @@ function registerNewDID() {
 
 // Initialise Dock API, connect to the node and start working with it
 // It will create a new DID with a key, then update the key to another one and then remove the DID
-dock.init(fullNodeWsRPCEndpoint)
+dock.init({
+  address: fullNodeWsRPCEndpoint
+})
   .then(() => {
     const account = dock.keyring.addFromUri(accountUri, accountMetadata);
     dock.setAccount(account);

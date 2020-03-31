@@ -1,6 +1,6 @@
-import VerifiableCredential from '../src/modules/vc';
+import VerifiableCredentialModule from '../src/modules/vc';
 
-const vc = new VerifiableCredential();
+const vc = new VerifiableCredentialModule();
 
 describe('Verifiable Credential Issuing', () => {
   const sample_unsigned_cred = {
@@ -24,7 +24,7 @@ describe('Verifiable Credential Issuing', () => {
     publicKeyBase58: 'zXwDsGkuq5gTLVMnb3jGUaW8vvzAjfZfNuJmP2PkZGJy'
   };
 
-  test('Issuing should return an object with a proof.', async () => {
+  test('Issuing should return an object with a proof, and it must pass validation.', async () => {
     const credential = await vc.issue(sample_key, sample_unsigned_cred);
     expect(credential).toMatchObject(
       expect.objectContaining(
@@ -47,6 +47,20 @@ describe('Verifiable Credential Issuing', () => {
             proofPurpose: 'assertionMethod',
             verificationMethod: 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw'
           })
+        }
+      )
+    );
+    const result = await vc.verify(credential);
+    expect(result).toMatchObject(
+      expect.objectContaining(
+        {
+          'results': [
+            {
+              'proof': expect.anything(),
+              'verified': true
+            }
+          ],
+          'verified': true
         }
       )
     );

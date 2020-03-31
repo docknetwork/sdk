@@ -1,5 +1,5 @@
 import credentialsContext from 'credentials-context';
-import vc_examples_v1 from './vc-examples-v1';
+import vc_examples_v1 from './vcExamplesV1';
 import odrl from './odrl';
 import schema from './schema.json';
 

@@ -8,10 +8,12 @@ describe('Config on NodeJS environment', () => {
 });
 
 describe('Dock API', () => {
-  const dock = new DockAPI(FullNodeEndpoint);
+  const dock = new DockAPI();
 
   test('Can connect to node', async () => {
-    await dock.init();
+    await dock.init({
+      address: FullNodeEndpoint
+    });
     expect(!!dock.api).toBe(true);
   });
 

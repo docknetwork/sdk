@@ -1,4 +1,3 @@
-import {Keyring} from '@polkadot/api';
 import {randomAsHex} from '@polkadot/util-crypto';
 
 import {DockAPI} from '../../src/api';
@@ -12,7 +11,7 @@ import {getPublicKeyFromKeyringPair} from '../../src/utils/misc';
 import {PublicKeyEd25519} from '../../src/public-key';
 
 describe('DID Module', () => {
-  const dock = new DockAPI(FullNodeEndpoint);
+  const dock = new DockAPI();
 
   // Generate a random DID
   const dockDID = createNewDockDID();
@@ -24,12 +23,18 @@ describe('DID Module', () => {
   const secondKeySeed = randomAsHex(32);
 
   beforeAll(async (done) => {
-    await dock.init();
+    await dock.init({
+      keyring: TestKeyringOpts,
+      address: FullNodeEndpoint,
+    });
     done();
   });
 
+  afterAll(async () => {
+    await dock.disconnect();
+  }, 30000);
+
   test('Has keyring and account', () => {
-    dock.keyring = new Keyring(TestKeyringOpts);
     const account = dock.keyring.addFromUri(TestAccount.uri, TestAccount.options);
     dock.setAccount(account);
     expect(!!dock.keyring).toBe(true);
@@ -52,7 +57,6 @@ describe('DID Module', () => {
 
   test('Can get a DID document', async () => {
     const result = await dock.did.getDocument(dockDID);
-    console.log('DID Document:', JSON.stringify(result, true, 2));
     expect(!!result).toBe(true);
   }, 10000);
 

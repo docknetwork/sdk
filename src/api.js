@@ -34,7 +34,7 @@ class DockAPI {
    * @param {Account} address - Optional WebSocket address
    * @return {Promise} Promise for when SDK is ready for use
    */
-  async init(address) {
+  async init({address, keyring} = {}) {
     if (this.api) {
       throw new Error('API is already connected');
     }
@@ -49,12 +49,22 @@ class DockAPI {
     this._did = new DIDModule(this.api);
     this._revocation = new RevocationModule(this.api);
 
-    return cryptoWaitReady();
+    await cryptoWaitReady();
+
+    if (!this._keyring || keyring) {
+      this._keyring = new Keyring(keyring || {type: 'sr25519'});
+    }
+
+    return this.api;
   }
 
   async disconnect() {
-    // TODO: proper d/c
-    delete this.api;
+    if (this.api) {
+      await this.api.disconnect();
+      delete this.api;
+      delete this._did;
+      delete this._revocation;
+    }
   }
 
   isInitialized() {
@@ -90,9 +100,6 @@ class DockAPI {
    * @return {Keyring} PolkadotJS Keyring
    */
   get keyring() {
-    if (!this._keyring) {
-      this._keyring = new Keyring({type: 'sr25519'});
-    }
     return this._keyring;
   }
 

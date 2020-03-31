@@ -22,7 +22,9 @@ function getResolver(fullNodeWsRPCEndpoint) {
 
     // Initialize the SDK if it has not been initialized before.
     if (!dock.isInitialized()) {
-      await dock.init(fullNodeWsRPCEndpoint);
+      await dock.init({
+        address: fullNodeWsRPCEndpoint
+      });
     }
     return dock.did.getDocument(parsed.did);
   }

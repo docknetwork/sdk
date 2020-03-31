@@ -1,7 +1,7 @@
 import {encodeAddress} from '@polkadot/util-crypto';
 
 import {getHexIdentifierFromDID, DockDIDQualifier} from '../utils/did';
-import {getBytesForStateChange} from '../utils/misc';
+import {getStateChange} from '../utils/misc';
 
 const signatureHeaders = {
   Sr25519VerificationKey2018: 'Sr25519SignatureAuthentication2018',
@@ -165,11 +165,7 @@ class DIDModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedKeyUpdate(keyUpdate) {
-    const stateChange = {
-      KeyUpdate: keyUpdate
-    };
-
-    return getBytesForStateChange(this.api, stateChange);
+    return getStateChange(this.api, 'KeyUpdate', keyUpdate);
   }
 
   /**
@@ -178,11 +174,7 @@ class DIDModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedDIDRemoval(didRemoval) {
-    const stateChange = {
-      DidRemoval: didRemoval
-    };
-
-    return getBytesForStateChange(this.api, stateChange);
+    return getStateChange(this.api, 'DidRemoval', didRemoval);
   }
 }
 

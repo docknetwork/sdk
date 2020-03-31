@@ -8,16 +8,12 @@ describe('Config on NodeJS environment', () => {
 });
 
 describe('Dock API', () => {
-  const dock = new DockAPI(FullNodeEndpoint);
-
-  beforeAll(async (done) => {
-    await dock.init({
-      keyring: TestKeyringOpts
-    });
-    done();
-  }, 30000);
+  const dock = new DockAPI();
 
   test('Can connect to node', async () => {
+    await dock.init({
+      address: FullNodeEndpoint
+    });
     expect(!!dock.api).toBe(true);
   });
 
@@ -33,8 +29,4 @@ describe('Dock API', () => {
     await dock.disconnect();
     expect(!!dock.api).toBe(false);
   });
-
-  afterAll(async () => {
-    await dock.disconnect();
-  }, 30000);
 });

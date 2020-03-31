@@ -13,7 +13,7 @@ import  {
 import {createKeyDetail} from '../../src/utils/did';
 
 describe('Revocation Module', () => {
-  const dock = new DockAPI(FullNodeEndpoint);
+  const dock = new DockAPI();
 
   // Create a random registry id
   const registryID = randomAsHex(32);
@@ -26,9 +26,11 @@ describe('Revocation Module', () => {
   const revokeIds = new Set();
   revokeIds.add(revokeID);
 
+  // TODO: Uncomment the `beforeAll` and unskip the tests once a node is deployed.
   beforeAll(async (done) => {
     await dock.init({
-      keyring: TestKeyringOpts
+      keyring: TestKeyringOpts,
+      address: FullNodeEndpoint,
     });
 
     // The keyring should be initialized before any test begins as this suite is testing revocation

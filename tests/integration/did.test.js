@@ -12,7 +12,7 @@ import {getPublicKeyFromKeyringPair} from '../../src/utils/misc';
 import {PublicKeyEd25519} from '../../src/public-key';
 
 describe('DID Module', () => {
-  const dock = new DockAPI(FullNodeEndpoint);
+  const dock = new DockAPI();
 
   // Generate a random DID
   const dockDID = createNewDockDID();
@@ -25,7 +25,8 @@ describe('DID Module', () => {
 
   beforeAll(async (done) => {
     await dock.init({
-      keyring: TestKeyringOpts
+      keyring: TestKeyringOpts,
+      address: FullNodeEndpoint,
     });
     done();
   });
@@ -57,7 +58,6 @@ describe('DID Module', () => {
 
   test('Can get a DID document', async () => {
     const result = await dock.did.getDocument(dockDID);
-    console.log('DID Document:', JSON.stringify(result, true, 2));
     expect(!!result).toBe(true);
   }, 10000);
 

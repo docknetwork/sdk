@@ -140,7 +140,7 @@ describe('Revocation Module', () => {
     await expect(dock.revocation.getRegistryDetail(registryID)).rejects.toThrow(/Could not find revocation registry/);
   }, 30000);
 
-  test('Can create a registry with multiple controllers', async () => {
+  test.skip('Can create a registry with multiple controllers', async () => {
     const registryID = randomAsHex(32); // TODO: ensure random values arent same as in other tests?
     const controllers = new Set();
 

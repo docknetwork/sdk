@@ -9,5 +9,5 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-      - run: yarn install jest
+      - run: yarn add jest
       - run: yarn test

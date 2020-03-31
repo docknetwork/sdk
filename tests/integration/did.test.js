@@ -24,12 +24,17 @@ describe('DID Module', () => {
   const secondKeySeed = randomAsHex(32);
 
   beforeAll(async (done) => {
-    await dock.init();
+    await dock.init({
+      keyring: TestKeyringOpts
+    });
     done();
   });
 
+  afterAll(async () => {
+    await dock.disconnect();
+  }, 30000);
+
   test('Has keyring and account', () => {
-    dock.keyring = new Keyring(TestKeyringOpts);
     const account = dock.keyring.addFromUri(TestAccount.uri, TestAccount.options);
     dock.setAccount(account);
     expect(!!dock.keyring).toBe(true);

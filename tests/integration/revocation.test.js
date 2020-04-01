@@ -4,12 +4,10 @@ import {DockAPI, PublicKeySr25519} from '../../src/api';
 
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
 
-import  {
-  OneOfPolicy,
-} from '../../src/utils/revocation';
 import {createKeyDetail} from '../../src/utils/did';
 
-import {
+import  {
+  OneOfPolicy,
   KeyPairProof,
 } from '../../src/utils/revocation';
 
@@ -52,6 +50,8 @@ describe('Revocation Module', () => {
     // The DID should be written before any test begins
     const pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
     const publicKey = PublicKeySr25519.fromKeyringPair(pair);
+
+    // Set our controller DID and assoicated keypair as proof
     proof.set(controllerDID, pair);
 
     // The controller is same as the DID

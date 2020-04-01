@@ -20,8 +20,8 @@ describe('Revocation Module', () => {
   const controllerDIDTwo = randomAsHex(32);
   const controllerSeed = randomAsHex(32);
 
-  // Create a pAuth proof map (did, signature)
-  const pAuth = new Map();
+  // Create a didPairs proof map (did, pair)
+  const didPairs = new Map();
 
   // Create revoke IDs
   const revokeID = randomAsHex(32);
@@ -41,7 +41,7 @@ describe('Revocation Module', () => {
     // The DID should be written before any test begins
     const pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
     const publicKey = PublicKeySr25519.fromKeyringPair(pair);
-    pAuth.set(controllerDID, pair);
+    didPairs.set(controllerDID, pair);
 
     // The controller is same as the DID
     const keyDetail = createKeyDetail(publicKey, controllerDID);
@@ -76,7 +76,7 @@ describe('Revocation Module', () => {
     expect(!!registryDetail).toBe(true);
 
     const lastModified = registryDetail[1];
-    const transaction = dock.revocation.revoke(registryID, revokeIds, lastModified, pAuth);
+    const transaction = dock.revocation.revoke(registryID, revokeIds, lastModified, didPairs);
     const result = await dock.sendTransaction(transaction);
     expect(!!result).toBe(true); // TODO: expect promise to resolve
 
@@ -89,7 +89,7 @@ describe('Revocation Module', () => {
     expect(!!registryDetail).toBe(true);
 
     const lastModified = registryDetail[1];
-    const transaction = dock.revocation.unrevoke(registryID, revokeIds, lastModified, pAuth);
+    const transaction = dock.revocation.unrevoke(registryID, revokeIds, lastModified, didPairs);
     const result = await dock.sendTransaction(transaction);
     expect(!!result).toBe(true); // TODO: expect promise to resolve
 
@@ -102,7 +102,7 @@ describe('Revocation Module', () => {
     expect(!!registryDetail).toBe(true);
 
     const lastModified = registryDetail[1];
-    const transaction = dock.revocation.removeRegistry(registryID, lastModified, pAuth);
+    const transaction = dock.revocation.removeRegistry(registryID, lastModified, didPairs);
     const result = await dock.sendTransaction(transaction);
     expect(!!result).toBe(true);
     await expect(dock.revocation.getRegistryDetail(registryID)).rejects.toThrow(/Could not find revocation registry/);

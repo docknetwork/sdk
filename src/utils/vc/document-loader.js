@@ -1,5 +1,5 @@
 import axios from 'axios';
-import testContext from './contexts/index';
+import testContext from './contexts';
 
 export default async function(url) {
   const context = testContext[url];

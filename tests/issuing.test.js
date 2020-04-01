@@ -1,5 +1,5 @@
 import VerifiableCredentialModule from '../src/modules/vc';
-import {EcdsaSepc256k1Signature2019, Secp256k1KeyPair} from '../src/modules/vc-helpers/temp-signatures';
+import {EcdsaSepc256k1Signature2019, Secp256k1KeyPair} from '../src/utils/vc/temp-signatures';
 
 const vc = new VerifiableCredentialModule();
 const sample_unsigned_cred = {

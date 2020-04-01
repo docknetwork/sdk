@@ -1,14 +1,14 @@
 import credentialsContext from 'credentials-context';
-import vc_examples_v1 from './vcExamplesV1';
-import odrl from './odrl';
-import schema from './schema.json';
 
+import vcExamplesV1 from './contexts/vc-examples-v1';
+import odrl from './contexts/odrl';
+import schema from './contexts/schema.json';
 
 export default new Map([
   ...credentialsContext.contexts,
   [
     'https://www.w3.org/2018/credentials/examples/v1',
-    vc_examples_v1
+    vcExamplesV1
   ],
   [
     'https://www.w3.org/ns/odrl.jsonld',

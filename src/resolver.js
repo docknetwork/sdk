@@ -25,7 +25,7 @@ class Resolver {
       // Remove trailing slash if any and append the string `/1.0/identifiers/`
       this.universalResolverUrl = `${universalResolverUrl.replace(/\/$/, '')}/1.0/identifiers/`;
     }
-    this.providers = {};
+    this.providers = providers;
   }
 
   /***

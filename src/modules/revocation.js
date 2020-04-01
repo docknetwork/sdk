@@ -3,11 +3,11 @@ import {
   getSignatureFromKeyringPair
 } from '../utils/misc';
 
-function signProof(controllerProofs, message) {
+function getProofFromPairs(didPairs, message) {
   const proof = new Map();
-  controllerProofs.forEach((pair, key) => {
+  didPairs.forEach((pair, did) => {
     const sig = getSignatureFromKeyringPair(pair, message);
-    proof.set(key, sig.toJSON());
+    proof.set(did, sig.toJSON());
   });
   return proof;
 }
@@ -43,14 +43,14 @@ class RevocationModule {
    * @param {PAuth} proof - The proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  removeRegistry(registryID, lastModified, controllerProofs) {
+  removeRegistry(registryID, lastModified, didPairs) {
     const removal = {
       registry_id: registryID,
       last_modified: lastModified
     };
 
     const serializedRemoval = this.getSerializedRemoveRegistry(removal);
-    const proof = signProof(controllerProofs, serializedRemoval);
+    const proof = getProofFromPairs(didPairs, serializedRemoval); // TODO: expose getProofFromPairs and pass proof as parameter
     return this.module.removeRegistry(removal, proof);
   }
 
@@ -60,7 +60,7 @@ class RevocationModule {
    * @param {PAuth} proof - The proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  revoke(registryID, revokeIds, lastModified, controllerProofs) {
+  revoke(registryID, revokeIds, lastModified, didPairs) {
     const revoke = {
       registry_id: registryID,
       revoke_ids: revokeIds,
@@ -68,7 +68,7 @@ class RevocationModule {
     };
 
     const serializedRevoke = this.getSerializedRevoke(revoke);
-    const proof = signProof(controllerProofs, serializedRevoke);
+    const proof = getProofFromPairs(didPairs, serializedRevoke);
     return this.module.revoke(revoke, proof);
   }
 
@@ -78,7 +78,7 @@ class RevocationModule {
    * @param {PAuth} proof - The proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  unrevoke(registryID, revokeIds, lastModified, controllerProofs) {
+  unrevoke(registryID, revokeIds, lastModified, didPairs) {
     const unrevoke = {
       registry_id: registryID,
       revoke_ids: revokeIds,
@@ -86,7 +86,7 @@ class RevocationModule {
     };
 
     const serializedRevoke = this.getSerializedUnrevoke(unrevoke);
-    const proof = signProof(controllerProofs, serializedRevoke);
+    const proof = getProofFromPairs(didPairs, serializedRevoke);
     return this.module.unrevoke(unrevoke, proof);
   }
 

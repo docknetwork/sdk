@@ -90,7 +90,7 @@ const sample_presentation_proof = {
 
 describe('Verifiable Credential Issuing', () => {
   test('Issuing should return an object with a proof, and it must pass validation.', async () => {
-    const credential = await vc.issue(sample_key, sample_unsigned_cred);
+    const credential = await vc.issueCredential(sample_key, sample_unsigned_cred);
     expect(credential).toMatchObject(
       expect.objectContaining(
         {
@@ -115,7 +115,7 @@ describe('Verifiable Credential Issuing', () => {
         }
       )
     );
-    const result = await vc.verify(credential);
+    const result = await vc.verifyCredential(credential);
     expect(result).toMatchObject(
       expect.objectContaining(
         {
@@ -134,7 +134,7 @@ describe('Verifiable Credential Issuing', () => {
 
 describe('Verifiable Credential Verification', () => {
   test('The sample signed credential should pass verification.', async () => {
-    const result = await vc.verify(sample_signed_cred);
+    const result = await vc.verifyCredential(sample_signed_cred);
     expect(result).toMatchObject(
       expect.objectContaining(
         {
@@ -170,7 +170,7 @@ describe('Verifiable Presentation Creation', () => {
     expect(presentation).toMatchObject(sample_unsigned_pres);
   }, 30000);
 
-  test('A verifiable presentation should be contain a proof once signed.', async () => {
+  test('A verifiable presentation should contain a proof once signed, and it should pass verification.', async () => {
     const signed_vp = await vc.signPresentation(
       sample_unsigned_pres,
       sample_key,
@@ -181,6 +181,39 @@ describe('Verifiable Presentation Creation', () => {
       {
         ...sample_unsigned_pres,
         ...sample_presentation_proof
+      }
+    );
+    const results = await vc.verifyPresentation(
+      signed_vp,
+      'some_challenge',
+      'some_domain'
+    );
+    expect(results).toMatchObject(
+      {
+        presentationResult: {
+          verified: true,
+          results: [
+            {
+              proof: {
+                '@context': 'https://w3id.org/security/v2',
+                type: 'EcdsaSecp256k1Signature2019',
+                created: expect.anything(),
+                challenge: 'some_challenge',
+                domain: 'some_domain',
+                jws: expect.anything(),
+                proofPurpose: 'authentication',
+                verificationMethod: 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw'
+              },
+              verified: true
+            }
+          ]
+        },
+        verified: true,
+        credentialResults: [
+          { verified: true, results: expect.anything() },
+          { verified: true, results: expect.anything() }
+        ],
+        error: undefined
       }
     );
   }, 30000);

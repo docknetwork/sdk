@@ -1,5 +1,5 @@
 import documentLoader from '../utils/vc/document-loader';
-import {issue, verifyCredential, createPresentation, signPresentation} from 'vc-js';
+import {issue, verifyCredential, createPresentation, signPresentation, verify} from 'vc-js';
 import {Ed25519KeyPair, suites} from 'jsonld-signatures';
 const {Ed25519Signature2018} = suites;
 import {EcdsaSepc256k1Signature2019, Secp256k1KeyPair} from '../utils/vc/temp-signatures';
@@ -10,7 +10,7 @@ class VerifiableCredentialModule {
 
   /**
    * Get signature suite from a keyDoc
-   * @param {object} keyDoc - key document
+   * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
    * @returns {EcdsaSepc256k1Signature2019|Ed25519Signature2018} - signature suite.
    */
   getSuiteFromKeyDoc(keyDoc) {
@@ -30,7 +30,7 @@ class VerifiableCredentialModule {
    * @param {object} credential - verifiable credential to be signed.
    * @return {object} The signed credential object.
    */
-  async issue (keyDoc, credential) {
+  async issueCredential (keyDoc, credential) {
     const suite = this.getSuiteFromKeyDoc(keyDoc);
     credential.issuer = keyDoc.controller;
     return await issue({
@@ -41,11 +41,11 @@ class VerifiableCredentialModule {
   }
 
   /**
-   * Verify a Verifiable credential
+   * Verify a Verifiable Credential
    * @param {object} credential - verifiable credential to be verified.
    * @return {object} verification result.
    */
-  async verify (credential) {
+  async verifyCredential (credential) {
     return await verifyCredential({
       credential,
       suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019()],
@@ -71,18 +71,37 @@ class VerifiableCredentialModule {
   /**
    * Sign a Verifiable Presentation
    * @param {object} presentation - the one to be signed
-   * @param {object} suite - passed in to sign()
+   * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
    * @param {string} challenge - proof challenge Required.
    * @param {string} domain - proof domain (optional)
    * @return {Promise<{VerifiablePresentation}>} A VerifiablePresentation with a proof.
    */
   async signPresentation (presentation, keyDoc, challenge, domain) {
+    // TODO: support other purposes than the default of "authentication"
     const suite = this.getSuiteFromKeyDoc(keyDoc);
     return signPresentation({
       presentation: presentation,
       suite: suite,
       domain: domain,
       challenge: challenge,
+      documentLoader: documentLoader
+    });
+  }
+
+  /**
+   * Verify a Verifiable Presentation
+   * @param {object} presentation - verifiable credential to be verified.
+   * @param {string} challenge - proof challenge Required.
+   * @param {string} domain - proof domain (optional)
+   * @return {object} verification result.
+   */
+  async verifyPresentation (presentation, challenge, domain) {
+    // TODO: support other purposes than the default of "authentication"
+    return await verify({
+      presentation,
+      suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019()],
+      challenge: challenge,
+      domain: domain,
       documentLoader: documentLoader
     });
   }

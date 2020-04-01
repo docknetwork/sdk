@@ -1,4 +1,6 @@
-import {getStateChange} from '../utils/misc';
+import {
+  getStateChange,
+} from '../utils/misc';
 
 /** Class to create, update and destroy revocations */
 class RevocationModule {
@@ -15,41 +17,73 @@ class RevocationModule {
   /**
    * Creating a revocation registry
    * @param {RegistryId} id - is the unique id of the registry. The function will check whether `id` is already taken or not.
-   * @param {Registry} registry - Will serialized `registry` and update the map `rev_registries` with `id` -> `(registry, last updated block number)
+   * @param {Policy} policy - The registry policy
+   * @param {bool} addOnly - true: credentials can be revoked, but not un-revoked, false: credentials can be revoked and un-revoked
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  newRegistry(id, registry) {
-    return this.module.newRegistry(id, registry.toJSON());
+  newRegistry(id, policy, addOnly) {
+    return this.module.newRegistry(id, {
+      policy: policy.toJSON(),
+      add_only: addOnly,
+    });
   }
 
   /**
    * Deleting revocation registry
-   * @param {RemoveRegistry} removal - contains the registry to remove
-   * @param {PAuth} proof - The proof
+   * @param {RegistryId} registryID - contains the registry to remove
+   * @param {BlockNumber} lastModified - contains the registry to remove
+   * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  removeRegistry(removal, proof) {
-    return this.module.removeRegistry(removal, proof);
+  removeRegistry(registryID, lastModified, didKeys) {
+    const removal = {
+      registry_id: registryID,
+      last_modified: lastModified
+    };
+
+    const serializedRemoval = this.getSerializedRemoveRegistry(removal);
+    const signedProof = didKeys.getSignatures(serializedRemoval);
+    return this.module.removeRegistry(removal, signedProof);
   }
 
   /**
    * Revoke credentials
-   * @param {Revoke} revoke - contains the credentials to be revoked
-   * @param {PAuth} proof - The proof
+   * @param {RegistryId} registryID - contains the registry to remove
+   * @param {Set} revokeIds - revoke id list
+   * @param {BlockNumber} lastModified - contains the registry to remove
+   * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  revoke(revoke, proof) {
-    return this.module.revoke(revoke, proof);
+  revoke(registryID, revokeIds, lastModified, didKeys) {
+    const revoke = {
+      registry_id: registryID,
+      revoke_ids: revokeIds,
+      last_modified: lastModified
+    };
+
+    const serializedRevoke = this.getSerializedRevoke(revoke);
+    const signedProof = didKeys.getSignatures(serializedRevoke);
+    return this.module.revoke(revoke, signedProof);
   }
 
   /**
    * Unrevoke credentials
-   * @param {UnRevoke} unrevoke - contains the credentials to be revoked
-   * @param {PAuth} proof - The proof
+   * @param {RegistryId} registryID - contains the registry to remove
+   * @param {Set} revokeIds - revoke id list
+   * @param {BlockNumber} lastModified - contains the registry to remove
+   * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  unrevoke(unrevoke, proof) {
-    return this.module.unrevoke(unrevoke, proof);
+  unrevoke(registryID, revokeIds, lastModified, didKeys) {
+    const unrevoke = {
+      registry_id: registryID,
+      revoke_ids: revokeIds,
+      last_modified: lastModified
+    };
+
+    const serializedUnrevoke = this.getSerializedUnrevoke(unrevoke);
+    const signedProof = didKeys.getSignatures(serializedUnrevoke);
+    return this.module.unrevoke(unrevoke, signedProof);
   }
 
   /**
@@ -87,7 +121,7 @@ class RevocationModule {
    * @param {RevokeId} revokeId - Credential ID
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  async getRevocationStatus(registryID, revokeID) {
+  async getIsRevoked(registryID, revokeID) {
     const resp = await this.api.query.revoke.revocations(registryID, revokeID);
     if (resp) {
       return !resp.isNone;

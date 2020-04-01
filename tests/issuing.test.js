@@ -1,5 +1,4 @@
 import VerifiableCredentialModule from '../src/modules/vc';
-import {EcdsaSepc256k1Signature2019, Secp256k1KeyPair} from '../src/utils/vc/temp-signatures';
 
 const vc = new VerifiableCredentialModule();
 const sample_unsigned_cred = {
@@ -172,10 +171,9 @@ describe('Verifiable Presentation Creation', () => {
   }, 30000);
 
   test('A verifiable presentation should be contain a proof once signed.', async () => {
-    const suite = new EcdsaSepc256k1Signature2019({key: new Secp256k1KeyPair(sample_key)});
     const signed_vp = await vc.signPresentation(
       sample_unsigned_pres,
-      suite,
+      sample_key,
       'some_challenge',
       'some_domain',
     );

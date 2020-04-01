@@ -7,6 +7,23 @@ import {EcdsaSepc256k1Signature2019, Secp256k1KeyPair} from '../utils/vc/temp-si
 
 /** Class to sign and verify Verifiable Credentials */
 class VerifiableCredentialModule {
+
+  /**
+   * Get signature suite from a keyDoc
+   * @param {object} keyDoc - key document
+   * @returns {EcdsaSepc256k1Signature2019|Ed25519Signature2018} - signature suite.
+   */
+  getSuiteFromKeyDoc(keyDoc) {
+    switch(keyDoc.type) {
+    case 'EcdsaSecp256k1VerificationKey2019':
+      return new EcdsaSepc256k1Signature2019({key: new Secp256k1KeyPair(keyDoc)});
+    case 'Ed25519VerificationKey2018':
+      return new Ed25519Signature2018({key: new Ed25519KeyPair(keyDoc)});
+    default:
+      throw new Error(`Unknown key type ${keyDoc.type}.`);
+    }
+  }
+
   /**
    * Issue a Verifiable credential
    * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
@@ -14,21 +31,8 @@ class VerifiableCredentialModule {
    * @return {object} The signed credential object.
    */
   async issue (keyDoc, credential) {
-    const {controller: issuer, type} = keyDoc;
-
-    let suite;
-    switch(type) {
-    case 'EcdsaSecp256k1VerificationKey2019':
-      suite = new EcdsaSepc256k1Signature2019({key: new Secp256k1KeyPair(keyDoc)});
-      break;
-    case 'Ed25519VerificationKey2018':
-      suite = new Ed25519Signature2018({key: new Ed25519KeyPair(keyDoc)});
-      break;
-    default:
-      throw new Error(`Unknown key type ${type}.`);
-    }
-
-    credential.issuer = issuer;
+    const suite = this.getSuiteFromKeyDoc(keyDoc);
+    credential.issuer = keyDoc.controller;
     return await issue({
       credential,
       suite,
@@ -70,11 +74,10 @@ class VerifiableCredentialModule {
    * @param {object} suite - passed in to sign()
    * @param {string} challenge - proof challenge Required.
    * @param {string} domain - proof domain (optional)
-   * @return {Promise<{VerifiablePresentation}>} A VerifiablePresentation with
-   *   a proof.
+   * @return {Promise<{VerifiablePresentation}>} A VerifiablePresentation with a proof.
    */
-  async signPresentation (presentation, suite, challenge, domain) {
-
+  async signPresentation (presentation, keyDoc, challenge, domain) {
+    const suite = this.getSuiteFromKeyDoc(keyDoc);
     return signPresentation({
       presentation: presentation,
       suite: suite,

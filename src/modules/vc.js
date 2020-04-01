@@ -1,5 +1,5 @@
 import documentLoader from './vc-helpers/document-loader';
-import {issue, verifyCredential} from 'vc-js';
+import {issue, verifyCredential, createPresentation} from 'vc-js';
 import {Ed25519KeyPair, suites} from 'jsonld-signatures';
 const {Ed25519Signature2018} = suites;
 import {EcdsaSepc256k1Signature2019, Secp256k1KeyPair} from './vc-helpers/temp-signatures';
@@ -46,6 +46,21 @@ class VerifiableCredentialModule {
       credential,
       suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019()],
       documentLoader: documentLoader
+    });
+  }
+
+  /**
+   * Create an unsigned Verifiable presentation
+   * @param {object|Array<object>} credential - verifiable credential (or an array of them) to be bundled as a presentation.
+   * @param {string} id - optional verifiable presentation id to use
+   * @param {string} holder - optional presentation holder url
+   * @return {object} verifiable presentation.
+   */
+  async createPresentation (credential, id, holder) {
+    return createPresentation({
+      verifiableCredential: credential,
+      id: id,
+      holder: holder
     });
   }
 }

@@ -32,17 +32,17 @@ class RevocationModule {
    * Deleting revocation registry
    * @param {RegistryId} registryID - contains the registry to remove
    * @param {BlockNumber} lastModified - contains the registry to remove
-   * @param {Proof} proof - The proof
+   * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  removeRegistry(registryID, lastModified, proof) {
+  removeRegistry(registryID, lastModified, didKeys) {
     const removal = {
       registry_id: registryID,
       last_modified: lastModified
     };
 
     const serializedRemoval = this.getSerializedRemoveRegistry(removal);
-    const signedProof = proof.sign(serializedRemoval);
+    const signedProof = didKeys.getSignatures(serializedRemoval);
     return this.module.removeRegistry(removal, signedProof);
   }
 
@@ -51,10 +51,10 @@ class RevocationModule {
    * @param {RegistryId} registryID - contains the registry to remove
    * @param {Set} revokeIds - revoke id list
    * @param {BlockNumber} lastModified - contains the registry to remove
-   * @param {Proof} proof - The proof
+   * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  revoke(registryID, revokeIds, lastModified, proof) {
+  revoke(registryID, revokeIds, lastModified, didKeys) {
     const revoke = {
       registry_id: registryID,
       revoke_ids: revokeIds,
@@ -62,7 +62,7 @@ class RevocationModule {
     };
 
     const serializedRevoke = this.getSerializedRevoke(revoke);
-    const signedProof = proof.sign(serializedRevoke);
+    const signedProof = didKeys.getSignatures(serializedRevoke);
     return this.module.revoke(revoke, signedProof);
   }
 
@@ -71,10 +71,10 @@ class RevocationModule {
    * @param {RegistryId} registryID - contains the registry to remove
    * @param {Set} revokeIds - revoke id list
    * @param {BlockNumber} lastModified - contains the registry to remove
-   * @param {Proof} proof - The proof
+   * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  unrevoke(registryID, revokeIds, lastModified, proof) {
+  unrevoke(registryID, revokeIds, lastModified, didKeys) {
     const unrevoke = {
       registry_id: registryID,
       revoke_ids: revokeIds,
@@ -82,7 +82,7 @@ class RevocationModule {
     };
 
     const serializedUnrevoke = this.getSerializedUnrevoke(unrevoke);
-    const signedProof = proof.sign(serializedUnrevoke);
+    const signedProof = didKeys.getSignatures(serializedUnrevoke);
     return this.module.unrevoke(unrevoke, signedProof);
   }
 
@@ -121,7 +121,7 @@ class RevocationModule {
    * @param {RevokeId} revokeId - Credential ID
    * @return {Extrinsic} The extrinsic to sign and send.
    */
-  async getRevocationStatus(registryID, revokeID) {
+  async getIsRevoked(registryID, revokeID) {
     const resp = await this.api.query.revoke.revocations(registryID, revokeID);
     if (resp) {
       return !resp.isNone;

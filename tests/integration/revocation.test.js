@@ -8,7 +8,7 @@ import {createKeyDetail} from '../../src/utils/did';
 
 import  {
   OneOfPolicy,
-  KeyPairProof,
+  KeyringPairDidKeys,
 } from '../../src/utils/revocation';
 
 describe('Revocation Module', () => {
@@ -23,7 +23,7 @@ describe('Revocation Module', () => {
   const controllerSeed = randomAsHex(32);
 
   // Create a did/keypair proof map
-  const proof = new KeyPairProof();
+  const didKeys = new KeyringPairDidKeys();
 
   // Create a list of controllers
   const controllers = new Set();
@@ -51,8 +51,8 @@ describe('Revocation Module', () => {
     const pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
     const publicKey = PublicKeySr25519.fromKeyringPair(pair);
 
-    // Set our controller DID and assoicated keypair as proof
-    proof.set(controllerDID, pair);
+    // Set our controller DID and assoicated keypair to be used for generating proof
+    didKeys.set(controllerDID, pair);
 
     // The controller is same as the DID
     const keyDetail = createKeyDetail(publicKey, controllerDID);
@@ -82,10 +82,10 @@ describe('Revocation Module', () => {
     expect(!!registryDetail).toBe(true);
 
     const lastModified = registryDetail[1];
-    const transaction = dock.revocation.revoke(registryID, revokeIds, lastModified, proof);
+    const transaction = dock.revocation.revoke(registryID, revokeIds, lastModified, didKeys);
     await expect(dock.sendTransaction(transaction)).resolves.toBeDefined();
 
-    const revocationStatus = await dock.revocation.getRevocationStatus(registryID, revokeID);
+    const revocationStatus = await dock.revocation.getIsRevoked(registryID, revokeID);
     expect(revocationStatus).toBe(true);
   }, 30000);
 
@@ -94,10 +94,10 @@ describe('Revocation Module', () => {
     expect(!!registryDetail).toBe(true);
 
     const lastModified = registryDetail[1];
-    const transaction = dock.revocation.unrevoke(registryID, revokeIds, lastModified, proof);
+    const transaction = dock.revocation.unrevoke(registryID, revokeIds, lastModified, didKeys);
     await expect(dock.sendTransaction(transaction)).resolves.toBeDefined();
 
-    const revocationStatus = await dock.revocation.getRevocationStatus(registryID, revokeID);
+    const revocationStatus = await dock.revocation.getIsRevoked(registryID, revokeID);
     expect(revocationStatus).toBe(false);
   }, 30000);
 
@@ -106,7 +106,7 @@ describe('Revocation Module', () => {
     expect(!!registryDetail).toBe(true);
 
     const lastModified = registryDetail[1];
-    const transaction = dock.revocation.removeRegistry(registryID, lastModified, proof);
+    const transaction = dock.revocation.removeRegistry(registryID, lastModified, didKeys);
     await expect(dock.sendTransaction(transaction)).resolves.toBeDefined();
     await expect(dock.revocation.getRegistryDetail(registryID)).rejects.toThrow(/Could not find revocation registry/);
   }, 30000);
@@ -123,10 +123,10 @@ describe('Revocation Module', () => {
     expect(!!registryDetail).toBe(true);
 
     const lastModified = registryDetail[1];
-    const transaction = dock.revocation.revoke(registryID, revokeIds, lastModified, proof);
+    const transaction = dock.revocation.revoke(registryID, revokeIds, lastModified, didKeys);
     await expect(dock.sendTransaction(transaction)).resolves.toBeDefined();
 
-    const revocationStatus = await dock.revocation.getRevocationStatus(registryID, revokeID);
+    const revocationStatus = await dock.revocation.getIsRevoked(registryID, revokeID);
     expect(revocationStatus).toBe(true);
   }, 30000);
 
@@ -135,10 +135,10 @@ describe('Revocation Module', () => {
     expect(!!registryDetail).toBe(true);
 
     const lastModified = registryDetail[1];
-    const transaction = dock.revocation.unrevoke(registryID, revokeIds, lastModified, proof);
+    const transaction = dock.revocation.unrevoke(registryID, revokeIds, lastModified, didKeys);
     await expect(dock.sendTransaction(transaction)).resolves.toBeDefined();
 
-    const revocationStatus = await dock.revocation.getRevocationStatus(registryID, revokeID);
+    const revocationStatus = await dock.revocation.getIsRevoked(registryID, revokeID);
     expect(revocationStatus).toBe(true);
   }, 30000);
 
@@ -147,7 +147,7 @@ describe('Revocation Module', () => {
     expect(!!registryDetail).toBe(true);
 
     const lastModified = registryDetail[1];
-    const transaction = dock.revocation.removeRegistry(registryID, lastModified, proof);
+    const transaction = dock.revocation.removeRegistry(registryID, lastModified, didKeys);
     await expect(dock.sendTransaction(transaction)).resolves.toBeDefined();
     await expect(dock.revocation.getRegistryDetail(registryID)).resolves.toBeDefined();
   }, 30000);

@@ -14,7 +14,7 @@ class OneOfPolicy {
   }
 }
 
-class Proof {
+class DidKeys {
   constructor(map) {
     this.map = map || new Map();
   }
@@ -27,17 +27,17 @@ class Proof {
     return this.map;
   }
 
-  sign() {
-    throw new Error('Sign method must be implemented in child class!');
+  getSignatures() {
+    throw new Error('getSignatures method must be implemented in child class!');
   }
 }
 
-class KeyPairProof extends Proof {
+class KeyringPairDidKeys extends DidKeys {
   constructor(map) {
     super(map);
   }
 
-  sign(message) {
+  getSignatures(message) {
     const signedProofs = new Map();
     this.map.forEach((pair, did) => {
       const sig = getSignatureFromKeyringPair(pair, message);
@@ -49,6 +49,6 @@ class KeyPairProof extends Proof {
 
 export {
   OneOfPolicy,
-  Proof,
-  KeyPairProof,
+  DidKeys,
+  KeyringPairDidKeys,
 };

@@ -21,10 +21,14 @@ const ethereumProviderConfig = {
   ]
 };
 
+const universalResolverUrl = 'http://localhost:8080';
+
 // Create a new Dock DID
 const dockDID = createNewDockDID();
 // This DID was randomly picked from the publicly available examples out there
 const ethrDid = 'did:ethr:0xabcabc03e98e0dc2b855be647c39abe984193675';
+// This DID was randomly picked from the publicly available example at universal resolver repo
+const workdayDID = 'did:work:2UUHQCd4psvkPLZGnWY33L';
 
 /**
  * Register a new Dock DID and then resolve using the Dock DID resolver
@@ -45,16 +49,28 @@ async function resolveDockDID() {
 }
 
 /**
- * Resolve an ethereum and dock DID using a single resolver
+ * Resolve several DID methods using a single resolver
  * @returns {Promise<void>}
  */
-async function resolveEthrDIDAndDockDID() {
-  const resolver = new Resolver(fullNodeWsRPCEndpoint, ethereumProviderConfig);
+async function resolveSeveralDIDMethodsUsingResolver() {
+  // Register providers for Dock and Ethereum.
+  const providers = {
+    'dock': fullNodeWsRPCEndpoint,
+    'ethr': ethereumProviderConfig,
+  };
+
+  const resolver = new Resolver(providers, universalResolverUrl);
   resolver.init();
+
   console.log('Resolving ethereum DID', ethrDid);
   console.log(await resolver.resolve(ethrDid));
+
   console.log('Resolving Dock DID', dockDID);
   console.log(await resolver.resolve(dockDID));
+
+  // There is no provider registered for Workday. Universal resolver will be queried
+  console.log('Resolving Workday DID', workdayDID);
+  console.log(await resolver.resolve(workdayDID));
 }
 
 dock.init({
@@ -65,7 +81,7 @@ dock.init({
     dock.setAccount(account);
     return resolveDockDID();
   })
-  .then(resolveEthrDIDAndDockDID)
+  .then(resolveSeveralDIDMethodsUsingResolver)
   .then(async () => {
     console.log('Example ran successfully');
     process.exit(0);

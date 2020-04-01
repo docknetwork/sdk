@@ -13,7 +13,7 @@ class VerifiableCredentialModule {
    * @param {object} credential - verifiable credential to be signed.
    * @return {object} The signed credential object.
    */
-  async issue (keyDoc, credential) {
+  async issue(keyDoc, credential) {
     const {controller: issuer, type} = keyDoc;
 
     let suite;
@@ -41,7 +41,7 @@ class VerifiableCredentialModule {
    * @param {object} credential - verifiable credential to be verified.
    * @return {object} verification result.
    */
-  async verify (credential) {
+  async verify(credential) {
     return await verifyCredential({
       credential,
       suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019()],

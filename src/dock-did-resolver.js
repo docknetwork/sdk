@@ -14,7 +14,7 @@ function getResolver(fullNodeWsRPCEndpoint) {
    * @param {object} parsed - Object containing the full DID, the identifier, method
    * @returns {object} An object with only 1 key as the Dock DID method and the value as the resolve function
    */
-  async function resolve (did, parsed) {
+  async function resolve(did, parsed) {
     if (parsed.method != DockDIDMethod) {
       throw new Error(`Found unknown method ${parsed.method}. Can only parse method ${DockDIDMethod}.`);
     }

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: dock-did-resolver.js</title>
+    <title>JSDoc: Source: modules/vc.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: dock-did-resolver.js</h1>
+    <h1 class="page-title">Source: modules/vc.js</h1>
 
     
 
@@ -26,41 +26,59 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import dock from './api';
-import {validateDockDIDSS58Identifier, DockDIDMethod} from './utils/did';
+            <pre class="prettyprint source linenums"><code>import documentLoader from './vc-helpers/document-loader';
+import {issue, verifyCredential} from 'vc-js';
+import {Ed25519KeyPair, suites} from 'jsonld-signatures';
+const {Ed25519Signature2018} = suites;
+import {EcdsaSepc256k1Signature2019, Secp256k1KeyPair} from './vc-helpers/temp-signatures';
 
-/**
- * Returns a resolver object. This is how it is supposed to work with the DID resolver here https://github.com/decentralized-identity/did-resolver.
- * @param {string} fullNodeWsRPCEndpoint - The endpoint where a full node is running
- * @returns {object} An object with one key which the Dock DID method
- */
-function getResolver(fullNodeWsRPCEndpoint) {
 
+/** Class to sign and verify Verifiable Credentials */
+class VerifiableCredentialModule {
   /**
-   * Resolve a Dock DID. The DID is expected to be a fully qualified DID.
-   * @param {string} did - The full DID
-   * @param {object} parsed - Object containing the full DID, the identifier, method
-   * @returns {object} An object with only 1 key as the Dock DID method and the value as the resolve function
+   * Issue a Verifiable credential
+   * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
+   * @param {object} credential - verifiable credential to be signed.
+   * @return {object} The signed credential object.
    */
-  async function resolve (did, parsed) {
-    if (parsed.method != DockDIDMethod) {
-      throw new Error(`Found unknown method ${parsed.method}. Can only parse method ${DockDIDMethod}.`);
-    }
-    validateDockDIDSS58Identifier(parsed.id);
+  async issue (keyDoc, credential) {
+    const {controller: issuer, type} = keyDoc;
 
-    // Initialize the SDK if it has not been initialized before.
-    if (!dock.isInitialized()) {
-      await dock.init({
-        address: fullNodeWsRPCEndpoint
-      });
+    let suite;
+    switch(type) {
+    case 'EcdsaSecp256k1VerificationKey2019':
+      suite = new EcdsaSepc256k1Signature2019({key: new Secp256k1KeyPair(keyDoc)});
+      break;
+    case 'Ed25519VerificationKey2018':
+      suite = new Ed25519Signature2018({key: new Ed25519KeyPair(keyDoc)});
+      break;
+    default:
+      throw new Error(`Unknown key type ${type}.`);
     }
-    return dock.did.getDocument(parsed.did);
+
+    credential.issuer = issuer;
+    return await issue({
+      credential,
+      suite,
+      documentLoader
+    });
   }
 
-  return { [DockDIDMethod]: resolve };
+  /**
+   * Verify a Verifiable credential
+   * @param {object} credential - verifiable credential to be verified.
+   * @return {object} verification result.
+   */
+  async verify (credential) {
+    return await verifyCredential({
+      credential,
+      suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019()],
+      documentLoader: documentLoader
+    });
+  }
 }
 
-export {getResolver};
+export default VerifiableCredentialModule;
 </code></pre>
         </article>
     </section>

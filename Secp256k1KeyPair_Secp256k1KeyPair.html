@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: SignatureSecp256k1</title>
+    <title>JSDoc: Class: Secp256k1KeyPair</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: SignatureSecp256k1</h1>
+    <h1 class="page-title">Class: Secp256k1KeyPair</h1>
 
     
 
@@ -28,9 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>SignatureSecp256k1<span class="signature">(message, signingPair)</span><span class="type-signature"></span></h2>
-        
-            <div class="class-description">Class representing a Secp256k1 Signature</div>
+        <h2><span class="attribs"><span class="type-signature"></span></span>Secp256k1KeyPair<span class="signature">(options)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -41,20 +39,14 @@
         
 
     
-    <h2>Constructor</h2>
+
+    
+    <h4 class="name" id="Secp256k1KeyPair"><span class="type-signature"></span>new Secp256k1KeyPair<span class="signature">(options)</span><span class="type-signature"></span></h4>
     
 
     
-    <h4 class="name" id="SignatureSecp256k1"><span class="type-signature"></span>new SignatureSecp256k1<span class="signature">(message, signingPair)</span><span class="type-signature"></span></h4>
-    
-
-    
 
 
-
-<div class="description">
-    Generate an Ecdsa signature over Secp256k1 curve using elliptic library
-</div>
 
 
 
@@ -89,13 +81,13 @@
 
         <tr>
             
-                <td class="name"><code>message</code></td>
+                <td class="name"><code>options</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">array</span>
+<span class="param-type">KeyPairOptions</span>
 
 
             
@@ -105,20 +97,62 @@
 
             
 
-            <td class="description last">The message to sign as bytearray</td>
+            <td class="description last">The options to use.
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The key ID.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>signingPair</code></td>
+                <td class="name"><code>controller</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">KeyringPair</span>
+<span class="param-type">string</span>
 
 
             
@@ -128,7 +162,60 @@
 
             
 
-            <td class="description last">The pair from elliptic containing the signing key</td>
+            <td class="description last">The key controller.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>publicKeyBase58</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The Base58 encoded Public Key.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>privateKeyBase58</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The Base58 Private Key.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
@@ -169,7 +256,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="signature.js.html">signature.js</a>, <a href="signature.js.html#line112">line 112</a>
+        <a href="modules_vc-helpers_temp-signatures.js.html">modules/vc-helpers/temp-signatures.js</a>, <a href="modules_vc-helpers_temp-signatures.js.html#line20">line 20</a>
     </li></ul></dd>
     
 
@@ -216,271 +303,6 @@
 
     
 
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="fromHex"><span class="type-signature"></span>fromHex<span class="signature">(value)</span><span class="type-signature"> &rarr; {<a href="Signature.html">Signature</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Create SignatureSecp256k1 from given hex string
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>value</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Hex string</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="signature.js.html">signature.js</a>, <a href="signature.js.html#line130">line 130</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="Signature.html">Signature</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="toJSON"><span class="type-signature"></span>toJSON<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="signature.js.html">signature.js</a>, <a href="signature.js.html#line137">line 137</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    The DidSignature JSON variant Secp256k1.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
     
 
     

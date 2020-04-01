@@ -17,7 +17,8 @@ class RevocationModule {
   /**
    * Creating a revocation registry
    * @param {RegistryId} id - is the unique id of the registry. The function will check whether `id` is already taken or not.
-   * @param {Registry} registry - Will serialized `registry` and update the map `rev_registries` with `id` -> `(registry, last updated block number)
+   * @param {Policy} policy - The registry policy
+   * @param {bool} addOnly - true: credentials can be revoked, but not un-revoked, false: credentials can be revoked and un-revoked
    * @return {Extrinsic} The extrinsic to sign and send.
    */
   newRegistry(id, policy, addOnly) {
@@ -29,7 +30,8 @@ class RevocationModule {
 
   /**
    * Deleting revocation registry
-   * @param {RemoveRegistry} removal - contains the registry to remove
+   * @param {RegistryId} registryID - contains the registry to remove
+   * @param {BlockNumber} lastModified - contains the registry to remove
    * @param {Proof} proof - The proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */
@@ -46,7 +48,9 @@ class RevocationModule {
 
   /**
    * Revoke credentials
-   * @param {Revoke} revoke - contains the credentials to be revoked
+   * @param {RegistryId} registryID - contains the registry to remove
+   * @param {Set} revokeIds - revoke id list
+   * @param {BlockNumber} lastModified - contains the registry to remove
    * @param {Proof} proof - The proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */
@@ -64,7 +68,9 @@ class RevocationModule {
 
   /**
    * Unrevoke credentials
-   * @param {UnRevoke} unrevoke - contains the credentials to be revoked
+   * @param {RegistryId} registryID - contains the registry to remove
+   * @param {Set} revokeIds - revoke id list
+   * @param {BlockNumber} lastModified - contains the registry to remove
    * @param {Proof} proof - The proof
    * @return {Extrinsic} The extrinsic to sign and send.
    */

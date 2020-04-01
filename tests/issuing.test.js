@@ -1,4 +1,5 @@
 import VerifiableCredentialModule from '../src/modules/vc';
+import {EcdsaSepc256k1Signature2019, Secp256k1KeyPair} from '../src/modules/vc-helpers/temp-signatures';
 
 const vc = new VerifiableCredentialModule();
 const sample_unsigned_cred = {
@@ -75,6 +76,17 @@ const sample_unsigned_pres = {
   verifiableCredential: presentation_credentials,
   id: vp_id,
   holder: vp_holder
+};
+const sample_presentation_proof = {
+  proof: {
+    type: 'EcdsaSecp256k1Signature2019',
+    created: expect.anything(),
+    challenge: 'some_challenge',
+    domain: 'some_domain',
+    jws: expect.anything(),
+    proofPurpose: 'authentication',
+    verificationMethod: 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw'
+  }
 };
 
 describe('Verifiable Credential Issuing', () => {
@@ -157,5 +169,21 @@ describe('Verifiable Presentation Creation', () => {
       vp_holder
     );
     expect(presentation).toMatchObject(sample_unsigned_pres);
+  }, 30000);
+
+  test('A verifiable presentation should be contain a proof once signed.', async () => {
+    const suite = new EcdsaSepc256k1Signature2019({key: new Secp256k1KeyPair(sample_key)});
+    const signed_vp = await vc.signPresentation(
+      sample_unsigned_pres,
+      suite,
+      'some_challenge',
+      'some_domain',
+    );
+    expect(signed_vp).toMatchObject(
+      {
+        ...sample_unsigned_pres,
+        ...sample_presentation_proof
+      }
+    );
   }, 30000);
 });

@@ -27,6 +27,13 @@ describe('Revocation Module', () => {
   // Create a did/keypair proof map
   const proof = new KeyPairProof();
 
+  // Create a list of controllers
+  const controllers = new Set();
+  controllers.add(controllerDID);
+
+  // Create a registry policy
+  const policy = new OneOfPolicy(controllers);
+
   // Create revoke IDs
   const revokeID = randomAsHex(32);
   const revokeIds = new Set();
@@ -63,18 +70,14 @@ describe('Revocation Module', () => {
     await dock.disconnect();
   }, 30000);
 
-  test('Can create a registry', async () => {
-    const controllers = new Set();
-    controllers.add(controllerDID);
-
-    const policy = new OneOfPolicy(controllers);
+  test('Can create a registry with a OneOf policy', async () => {
     const transaction = dock.revocation.newRegistry(registryID, policy, false);
     await expect(dock.sendTransaction(transaction)).resolves.toBeDefined();
     const reg = await dock.revocation.getRevocationRegistry(registryID);
     expect(!!reg).toBe(true);
   }, 30000);
 
-  test('Can revoke', async () => {
+  test('Can revoke from a registry', async () => {
     const registryDetail = await dock.revocation.getRegistryDetail(registryID);
     expect(!!registryDetail).toBe(true);
 
@@ -86,7 +89,7 @@ describe('Revocation Module', () => {
     expect(revocationStatus).toBe(true);
   }, 30000);
 
-  test('Can unrevoke', async () => {
+  test('Can unrevoke from a registry', async () => {
     const registryDetail = await dock.revocation.getRegistryDetail(registryID);
     expect(!!registryDetail).toBe(true);
 
@@ -108,12 +111,52 @@ describe('Revocation Module', () => {
     await expect(dock.revocation.getRegistryDetail(registryID)).rejects.toThrow(/Could not find revocation registry/);
   }, 30000);
 
+  test('Can create an add only registry', async () => {
+    const transaction = dock.revocation.newRegistry(registryID, policy, true);
+    await expect(dock.sendTransaction(transaction)).resolves.toBeDefined();
+    const reg = await dock.revocation.getRevocationRegistry(registryID);
+    expect(!!reg).toBe(true);
+  }, 30000);
+
+  test('Can revoke from an add only registry', async () => {
+    const registryDetail = await dock.revocation.getRegistryDetail(registryID);
+    expect(!!registryDetail).toBe(true);
+
+    const lastModified = registryDetail[1];
+    const transaction = dock.revocation.revoke(registryID, revokeIds, lastModified, proof);
+    await expect(dock.sendTransaction(transaction)).resolves.toBeDefined();
+
+    const revocationStatus = await dock.revocation.getRevocationStatus(registryID, revokeID);
+    expect(revocationStatus).toBe(true);
+  }, 30000);
+
+  test('Can not unrevoke from an add only registry', async () => {
+    const registryDetail = await dock.revocation.getRegistryDetail(registryID);
+    expect(!!registryDetail).toBe(true);
+
+    const lastModified = registryDetail[1];
+    const transaction = dock.revocation.unrevoke(registryID, revokeIds, lastModified, proof);
+    await expect(dock.sendTransaction(transaction)).resolves.toBeDefined();
+
+    const revocationStatus = await dock.revocation.getRevocationStatus(registryID, revokeID);
+    expect(revocationStatus).toBe(true);
+  }, 30000);
+
+  test('Can not remove an add only registry', async () => {
+    const registryDetail = await dock.revocation.getRegistryDetail(registryID);
+    expect(!!registryDetail).toBe(true);
+
+    const lastModified = registryDetail[1];
+    const transaction = dock.revocation.removeRegistry(registryID, lastModified, proof);
+    await expect(dock.sendTransaction(transaction)).resolves.toBeDefined();
+    await expect(dock.revocation.getRegistryDetail(registryID)).resolves.toBeDefined();
+  }, 30000);
+
   test.skip('Can create a registry with multiple controllers', async () => {
+    const registryID = randomAsHex(32);
     const controllers = new Set();
     controllers.add(controllerDID);
     controllers.add(controllerDIDTwo);
-
-    const registryID = randomAsHex(32);
 
     const policy = new OneOfPolicy(controllers);
     const transaction = dock.revocation.newRegistry(registryID, policy, false);

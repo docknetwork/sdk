@@ -32,7 +32,7 @@ class RevocationModule {
    */
   newRegistry(id, policy, addOnly) {
     return this.module.newRegistry(id, {
-      policy: policy.toJSON ? policy.toJSON() : policy,
+      policy: policy.toJSON(),
       add_only: addOnly,
     });
   }

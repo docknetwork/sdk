@@ -21,11 +21,7 @@ class Resolver {
   constructor(providers, universalResolverUrl) {
     // If `universalResolverUrl` is passed, ensure that it is a URL
     if (universalResolverUrl) {
-      try {
-        new URL(universalResolverUrl);
-      } catch (e) {
-        throw new Error('Invalid URL given for universal resolver. Parsing resulted in the following error', e);
-      }
+      new URL(universalResolverUrl);
       // Remove trailing slash if any and append the string `/1.0/identifiers/`
       this.universalResolverUrl = `${universalResolverUrl.replace(/\/$/, '')}/1.0/identifiers/`;
     }

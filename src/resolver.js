@@ -9,6 +9,8 @@ import {getResolver} from './dock-did-resolver';
 
 const EthrDIDMethod = 'ethr';
 
+const supportedDIDMethods = [DockDIDMethod, EthrDIDMethod];
+
 /** Class representing a DID Resolver which can resolve DID from various networks */
 class Resolver {
   /**
@@ -25,7 +27,20 @@ class Resolver {
       // Remove trailing slash if any and append the string `/1.0/identifiers/`
       this.universalResolverUrl = `${universalResolverUrl.replace(/\/$/, '')}/1.0/identifiers/`;
     }
-    this.providers = providers;
+    this.providers = {};
+    for (const method in providers) {
+      // XXX: Only 2 DID methods now so including array. A better alternative would be to make `supportedDIDMethods` a set and check for set
+      // difference of Object.keys(providers) and supportedDIDMethods
+      if (supportedDIDMethods.includes(method)) {
+        this.providers[method] = providers[method];
+      } else {
+        let msg = `DID method ${method} is not supported natively.`;
+        if (universalResolverUrl) {
+          msg += ' Will be looked up through the universal resolver.';
+        }
+        console.warn(msg);
+      }
+    }
   }
 
   /***

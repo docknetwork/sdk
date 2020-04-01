@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Resolver<span class="signature">(dockFullNodeWsRpcUrl, ethrProviderConfig)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>Resolver<span class="signature">(providers, universalResolverUrl)</span><span class="type-signature"></span></h2>
         
             <div class="class-description">Class representing a DID Resolver which can resolve DID from various networks</div>
         
@@ -45,7 +45,7 @@
     
 
     
-    <h4 class="name" id="Resolver"><span class="type-signature"></span>new Resolver<span class="signature">(dockFullNodeWsRpcUrl, ethrProviderConfig)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Resolver"><span class="type-signature"></span>new Resolver<span class="signature">(providers, universalResolverUrl)</span><span class="type-signature"></span></h4>
     
 
     
@@ -53,8 +53,9 @@
 
 
 <div class="description">
-    DID resolver class, currently supporting only Dock and Ethereum DID. Takes the provider as argument.
-The providers can be passed only during construction to keep the code less.
+    DID resolver class, currently supporting only Dock and Ethereum DID natively and optionally allows to pass URL for the
+universal resolver.
+The providers can be passed only during construction to keep the code minimal.
 </div>
 
 
@@ -90,30 +91,7 @@ The providers can be passed only during construction to keep the code less.
 
         <tr>
             
-                <td class="name"><code>dockFullNodeWsRpcUrl</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Websocket RPC endpoint of a Dock full node</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>ethrProviderConfig</code></td>
+                <td class="name"><code>providers</code></td>
             
 
             <td class="type">
@@ -129,7 +107,30 @@ The providers can be passed only during construction to keep the code less.
 
             
 
-            <td class="description last">A provide config specifying the network.</td>
+            <td class="description last">An object with keys as the DID method and value as the provider config specifying the network.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>universalResolverUrl</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The HTTP URL for the universal resolver. This is optional</td>
         </tr>
 
     
@@ -170,7 +171,7 @@ The providers can be passed only during construction to keep the code less.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="resolver.js.html">resolver.js</a>, <a href="resolver.js.html#line17">line 17</a>
+        <a href="resolver.js.html">resolver.js</a>, <a href="resolver.js.html#line21">line 21</a>
     </li></ul></dd>
     
 
@@ -226,7 +227,7 @@ The providers can be passed only during construction to keep the code less.
     
 
     
-    <h4 class="name" id="resolve"><span class="type-signature">(async) </span>resolve<span class="signature">(did)</span><span class="type-signature"> &rarr; {Promise.&lt;(DIDDocument|null)>}</span></h4>
+    <h4 class="name" id="getFromUniversalResolver"><span class="type-signature">(async) </span>getFromUniversalResolver<span class="signature">(did)</span><span class="type-signature"> &rarr; {Promise.&lt;(Error|*)>}</span></h4>
     
 
     
@@ -234,7 +235,7 @@ The providers can be passed only during construction to keep the code less.
 
 
 <div class="description">
-    Resolve the given DID
+    Try to fetch the DID from the universal resolver.
 </div>
 
 
@@ -286,7 +287,7 @@ The providers can be passed only during construction to keep the code less.
 
             
 
-            <td class="description last">A full DID (with method)</td>
+            <td class="description last">A full DID (with method, like did:dock:5....)</td>
         </tr>
 
     
@@ -327,7 +328,163 @@ The providers can be passed only during construction to keep the code less.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="resolver.js.html">resolver.js</a>, <a href="resolver.js.html#line46">line 46</a>
+        <a href="resolver.js.html">resolver.js</a>, <a href="resolver.js.html#line66">line 66</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;(Error|*)></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="resolve"><span class="type-signature">(async) </span>resolve<span class="signature">(did)</span><span class="type-signature"> &rarr; {Promise.&lt;(DIDDocument|null)>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Resolve the given DID with either the registered providers or try to fetch from the universal resolver
+if available.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>did</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A full DID (with method, like did:dock:5....)</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="resolver.js.html">resolver.js</a>, <a href="resolver.js.html#line51">line 51</a>
     </li></ul></dd>
     
 
@@ -401,7 +558,7 @@ The providers can be passed only during construction to keep the code less.
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Wed Apr 01 2020 16:22:50 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Wed Apr 01 2020 17:44:25 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

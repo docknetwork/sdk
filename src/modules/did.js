@@ -98,13 +98,16 @@ class DIDModule {
 
     // Set keys and authentication reference
     const publicKeys = [publicKey];
-    const authentication = publicKeys.map(key => {
-      return {
-        type: signatureHeaders[key.type],
-        publicKey: [key.id]
-      };
-    });
 
+    // Set `proofPurpose`s. Check the DID spec for details on `proofPurpose`
+
+    // Set the `proofPurpose` authentication. As there is only one key, this will serve for authentication `proofPurpose`
+    const authentication = [publicKey.id];
+
+    // Set the `proofPurpose` assertionMethod
+    // Explicitly cloning the authentication object as there is only one key supported as of now.
+    // With multiple key support, the key creation will determine the proof purpose
+    const assertionMethod = [...authentication];
     // TODO: setup proper service when we have it
     // const service = [{
     //   id: `${id}#vcs`,
@@ -116,6 +119,7 @@ class DIDModule {
       '@context': 'https://www.w3.org/ns/did/v1',
       id,
       authentication,
+      assertionMethod,
       publicKey: publicKeys
       // service,
     };

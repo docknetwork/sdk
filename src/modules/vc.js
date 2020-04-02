@@ -36,8 +36,7 @@ class VerifiableCredentialModule {
     credential.issuer = keyDoc.controller;
     return await issue({
       credential,
-      suite,
-      documentLoader
+      suite
     });
   }
 
@@ -46,11 +45,11 @@ class VerifiableCredentialModule {
    * @param {object} credential - verifiable credential to be verified.
    * @return {object} verification result.
    */
-  async verifyCredential(credential) {
+  async verifyCredential(credential, resolver) {
     return await verifyCredential({
       credential,
       suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019()],
-      documentLoader: documentLoader
+      documentLoader: documentLoader(resolver)
     });
   }
 

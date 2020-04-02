@@ -162,7 +162,7 @@ describe('Verifiable Presentation Creation', () => {
 
 
   test('A proper verifiable presentation should be created from two valid sample credentials.', async () => {
-    const presentation = await vc.createPresentation(
+    const presentation = vc.createPresentation(
       presentation_credentials,
       vp_id,
       vp_holder

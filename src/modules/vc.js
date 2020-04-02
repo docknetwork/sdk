@@ -60,11 +60,11 @@ class VerifiableCredentialModule {
    * @param {string} holder - optional presentation holder url
    * @return {object} verifiable presentation.
    */
-  async createPresentation (credential, id, holder) {
+  createPresentation (verifiableCredential, id, holder) {
     return createPresentation({
-      verifiableCredential: credential,
-      id: id,
-      holder: holder
+      verifiableCredential,
+      id,
+      holder
     });
   }
 
@@ -79,12 +79,12 @@ class VerifiableCredentialModule {
   async signPresentation (presentation, keyDoc, challenge, domain) {
     // TODO: support other purposes than the default of "authentication"
     const suite = this.getSuiteFromKeyDoc(keyDoc);
-    return signPresentation({
-      presentation: presentation,
-      suite: suite,
-      domain: domain,
-      challenge: challenge,
-      documentLoader: documentLoader
+    return await signPresentation({
+      presentation,
+      suite,
+      domain,
+      challenge,
+      documentLoader
     });
   }
 
@@ -100,9 +100,9 @@ class VerifiableCredentialModule {
     return await verify({
       presentation,
       suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019()],
-      challenge: challenge,
-      domain: domain,
-      documentLoader: documentLoader
+      challenge,
+      domain,
+      documentLoader
     });
   }
 }

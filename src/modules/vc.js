@@ -84,8 +84,7 @@ class VerifiableCredentialModule {
       presentation,
       suite,
       domain,
-      challenge,
-      documentLoader: documentLoader()
+      challenge
     });
   }
 
@@ -94,16 +93,17 @@ class VerifiableCredentialModule {
    * @param {object} presentation - verifiable credential to be verified.
    * @param {string} challenge - proof challenge Required.
    * @param {string} domain - proof domain (optional)
+   * @param {object} resolver - Resolver to resolve the issuer DID (optional)
    * @return {object} verification result.
    */
-  async verifyPresentation(presentation, challenge, domain) {
+  async verifyPresentation(presentation, challenge, domain, resolver) {
     // TODO: support other purposes than the default of "authentication"
     return await verify({
       presentation,
       suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019()],
       challenge,
       domain,
-      documentLoader: documentLoader()
+      documentLoader: documentLoader(resolver)
     });
   }
 }

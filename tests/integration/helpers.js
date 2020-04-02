@@ -5,11 +5,10 @@ import {getPublicKeyFromKeyringPair} from '../../src/utils/misc';
  * Registers a new DID on dock chain, keeps the controller same as the DID
  * @param dockAPI
  * @param did
- * @param seedForKey
  * @param pair
  * @returns {Promise<void>}
  */
-async function registerNewDID(dockAPI, did, seedForKey, pair) {
+async function registerNewDID(dockAPI, did, pair) {
   const publicKey = getPublicKeyFromKeyringPair(pair);
 
   // The controller is same as the DID

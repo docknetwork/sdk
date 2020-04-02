@@ -30,7 +30,7 @@ class VerifiableCredentialModule {
    * @param {object} credential - verifiable credential to be signed.
    * @return {object} The signed credential object.
    */
-  async issueCredential (keyDoc, credential) {
+  async issueCredential(keyDoc, credential) {
     const suite = this.getSuiteFromKeyDoc(keyDoc);
     credential.issuer = keyDoc.controller;
     return await issue({
@@ -45,7 +45,7 @@ class VerifiableCredentialModule {
    * @param {object} credential - verifiable credential to be verified.
    * @return {object} verification result.
    */
-  async verifyCredential (credential) {
+  async verifyCredential(credential) {
     return await verifyCredential({
       credential,
       suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019()],
@@ -60,7 +60,7 @@ class VerifiableCredentialModule {
    * @param {string} holder - optional presentation holder url
    * @return {object} verifiable presentation.
    */
-  createPresentation (verifiableCredential, id, holder) {
+  createPresentation(verifiableCredential, id, holder) {
     return createPresentation({
       verifiableCredential,
       id,
@@ -76,7 +76,7 @@ class VerifiableCredentialModule {
    * @param {string} domain - proof domain (optional)
    * @return {Promise<{VerifiablePresentation}>} A VerifiablePresentation with a proof.
    */
-  async signPresentation (presentation, keyDoc, challenge, domain) {
+  async signPresentation(presentation, keyDoc, challenge, domain) {
     // TODO: support other purposes than the default of "authentication"
     const suite = this.getSuiteFromKeyDoc(keyDoc);
     return await signPresentation({
@@ -95,7 +95,7 @@ class VerifiableCredentialModule {
    * @param {string} domain - proof domain (optional)
    * @return {object} verification result.
    */
-  async verifyPresentation (presentation, challenge, domain) {
+  async verifyPresentation(presentation, challenge, domain) {
     // TODO: support other purposes than the default of "authentication"
     return await verify({
       presentation,

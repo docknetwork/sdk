@@ -43,6 +43,7 @@ class VerifiableCredentialModule {
   /**
    * Verify a Verifiable Credential
    * @param {object} credential - verifiable credential to be verified.
+   * @param {object} resolver - Resolver for DIDs.
    * @return {object} verification result.
    */
   async verifyCredential(credential, resolver) {
@@ -84,7 +85,7 @@ class VerifiableCredentialModule {
       suite,
       domain,
       challenge,
-      documentLoader
+      documentLoader: documentLoader()
     });
   }
 
@@ -102,7 +103,7 @@ class VerifiableCredentialModule {
       suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019()],
       challenge,
       domain,
-      documentLoader
+      documentLoader: documentLoader()
     });
   }
 }

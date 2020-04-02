@@ -1,4 +1,5 @@
 import {encodeAddress} from '@polkadot/util-crypto';
+import b58 from 'bs58';
 
 import {getHexIdentifierFromDID, DockDIDQualifier} from '../utils/did';
 import {getStateChange} from '../utils/misc';
@@ -74,24 +75,24 @@ class DIDModule {
     const id = (did === hexId) ? this.getFullyQualifiedDID(encodeAddress(hexId)) : did;
 
     // Determine the type of the public key
-    let type, publicKeyBase58;
+    let type, publicKeyRaw;
     if (detail.public_key.isSr25519) {
       type = 'Sr25519VerificationKey2018';
-      publicKeyBase58 = detail.public_key.asSr25519;
+      publicKeyRaw = detail.public_key.asSr25519;
     } else if (detail.public_key.isEd25519) {
       type = 'Ed25519VerificationKey2018';
-      publicKeyBase58 = detail.public_key.asEd25519;
+      publicKeyRaw = detail.public_key.asEd25519;
     } else {
       type = 'EcdsaSecp256k1VerificationKey2019';
-      publicKeyBase58 = detail.public_key.asSecp256K1;
+      publicKeyRaw = detail.public_key.asSecp256K1;
     }
 
     // The DID has only one key as of now.
     const publicKey = {
       id: `${id}#keys-1`,
       type,
-      controller: `${DockDIDQualifier}${detail.controller}`,
-      publicKeyBase58,
+      controller: this.getFullyQualifiedDID(encodeAddress(detail.controller)),
+      publicKeyBase58: b58.encode(publicKeyRaw.value),
       // publicKeyPem: '-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n', // TODO: add proper value
     };
 

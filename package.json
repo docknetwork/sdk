@@ -53,7 +53,6 @@
     "@polkadot/api": "^1.8.1",
     "vc-js": "^0.5.0",
     "did-resolver": "^1.1.0",
-    "elliptic": "^6.5.2",
-    "ethr-did-resolver": "^2.2.0"
+    "elliptic": "^6.5.2"
   }
 }

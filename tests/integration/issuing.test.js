@@ -80,7 +80,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID with ed2551
       privateKeyBase58: issuerKeyPair.privateKey,
       publicKeyBase58: issuerKeyPair.publicKey
     };
-    const credential = await vc.issue(issuerKey, unsignedCred, resolver);
+    const credential = await vc.issueCredential(issuerKey, unsignedCred);
     expect(credential).toMatchObject(
       expect.objectContaining(
         {
@@ -105,7 +105,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID with ed2551
       )
     );
 
-    const result = await vc.verify(credential, resolver);
+    const result = await vc.verifyCredential(credential, resolver);
     expect(result).toMatchObject(
       expect.objectContaining(
         {

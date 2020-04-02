@@ -12,18 +12,39 @@ import {Resolver} from '../../src/resolver';
 
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
 import {registerNewDID} from './helpers';
+import {generateEcdsaSecp256k1Keypair} from '../../src/utils/misc';
 
 const vc = new VerifiableCredentialModule();
 
-const issuerDID = createNewDockDID();
-// seed used for issuer keys
-const issuerKeySeed = randomAsHex(32);
+// 1st issuer's DID.
+const issuer1DID = createNewDockDID();
+// seed used for 1st issuer keys
+const issuer1KeySeed = randomAsHex(32);
+
+// 2nd issuer's DID.
+const issuer2DID = createNewDockDID();
+// seed used for 2nd issuer keys
+const issuer2KeySeed = randomAsHex(32);
 
 const holderDID = createNewDockDID();
 
 const credId = randomAsHex(32);
 
-describe('Verifiable Credential issuance where issuer has a Dock DID with ed25519 key', () => {
+const unsignedCred = {
+  '@context': [
+    'https://www.w3.org/2018/credentials/v1',
+    'https://www.w3.org/2018/credentials/examples/v1'
+  ],
+  id: credId,
+  type: ['VerifiableCredential', 'AlumniCredential'],
+  issuanceDate: '2020-03-18T19:23:24Z',
+  credentialSubject: {
+    id: holderDID,
+    alumniOf: 'Example University'
+  }
+};
+
+describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
   const dock = new DockAPI();
   let resolver;
 
@@ -38,8 +59,11 @@ describe('Verifiable Credential issuance where issuer has a Dock DID with ed2551
     dock.setAccount(account);
 
     // The DID should be written before any test begins
-    const pair = dock.keyring.addFromUri(issuerKeySeed, null, 'ed25519');
-    await registerNewDID(dock, issuerDID, issuerKeySeed, pair);
+    const pair1 = dock.keyring.addFromUri(issuer1KeySeed, null, 'ed25519');
+    await registerNewDID(dock, issuer1DID, pair1);
+
+    /*const pair2 = generateEcdsaSecp256k1Keypair(issuer2KeySeed);
+    await registerNewDID(dock, issuer2DID, pair2);*/
 
     const providers = {
       'dock': FullNodeEndpoint,
@@ -55,27 +79,13 @@ describe('Verifiable Credential issuance where issuer has a Dock DID with ed2551
     await dock.disconnect();
   }, 30000);
 
-  const unsignedCred = {
-    '@context': [
-      'https://www.w3.org/2018/credentials/v1',
-      'https://www.w3.org/2018/credentials/examples/v1'
-    ],
-    id: credId,
-    type: ['VerifiableCredential', 'AlumniCredential'],
-    issuanceDate: '2020-03-18T19:23:24Z',
-    credentialSubject: {
-      id: holderDID,
-      alumniOf: 'Example University'
-    }
-  };
 
-
-  test('Issue a verifiable credential and verify it', async () => {
-    const seedAsBytes = hexToU8a(issuerKeySeed);
+  test('Issue a verifiable credential with ed25519 key and verify it', async () => {
+    const seedAsBytes = hexToU8a(issuer1KeySeed);
     const issuerKeyPair = await Ed25519KeyPair.generate({seed: seedAsBytes});
     const issuerKey = {
-      id: `${issuerDID}#keys-1`,
-      controller: issuerDID,
+      id: `${issuer1DID}#keys-1`,
+      controller: issuer1DID,
       type: 'Ed25519VerificationKey2018',
       privateKeyBase58: issuerKeyPair.privateKey,
       publicKeyBase58: issuerKeyPair.publicKey
@@ -94,7 +104,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID with ed2551
             id: holderDID,
             alumniOf: 'Example University'
           },
-          issuer: issuerDID,
+          issuer: issuer1DID,
           proof: expect.objectContaining({
             type: 'Ed25519Signature2018',
             jws: expect.anything(),

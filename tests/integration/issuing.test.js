@@ -8,12 +8,12 @@ import {
 
 import VerifiableCredentialModule from '../../src/modules/vc';
 import {DockAPI} from '../../src/api';
-import {Resolver} from '../../src/resolver';
+import Resolver from '../../src/resolver';
 
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
-import {registerNewDID} from './helpers';
+import {registerNewDIDUsingPair} from './helpers';
 import {generateEcdsaSecp256k1Keypair} from '../../src/utils/misc';
-import {Secp256k1KeyPair} from '../../src/utils/vc/temp-signatures';
+import Secp256k1KeyPair  from 'secp256k1-key-pair';
 
 const vc = new VerifiableCredentialModule();
 
@@ -116,11 +116,11 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
 
     // DID with ed25519 key
     const pair1 = dock.keyring.addFromUri(issuer1KeySeed, null, 'ed25519');
-    await registerNewDID(dock, issuer1DID, pair1);
+    await registerNewDIDUsingPair(dock, issuer1DID, pair1);
 
     // DID with secp key
     const pair2 = generateEcdsaSecp256k1Keypair(issuer2KeyPers, issuer2KeyEntropy);
-    await registerNewDID(dock, issuer2DID, pair2);
+    await registerNewDIDUsingPair(dock, issuer2DID, pair2);
 
     const providers = {
       'dock': FullNodeEndpoint,
@@ -153,7 +153,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
         getProofMatcherDoc()
       )
     );
-  }, 35000);
+  }, 40000);
 
   test('Issue a verifiable credential with secp256k1 key and verify it', async () => {
     const issuerKeyPair = await Secp256k1KeyPair.generate({pers: issuer2KeyPers, entropy: issuer2KeyEntropy});
@@ -170,5 +170,5 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
         getProofMatcherDoc()
       )
     );
-  }, 35000);
+  }, 40000);
 });

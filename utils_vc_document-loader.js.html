@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: utils/vc/signatures.js</title>
+    <title>JSDoc: Source: utils/vc/document-loader.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: utils/vc/signatures.js</h1>
+    <h1 class="page-title">Source: utils/vc/document-loader.js</h1>
 
     
 
@@ -26,43 +26,47 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import Secp256k1KeyPair from 'secp256k1-key-pair';
-import {suites} from 'jsonld-signatures';
+            <pre class="prettyprint source linenums"><code>import axios from 'axios';
+import testContext from './contexts';
 
-// TODO: use this package https://github.com/digitalbazaar/ecdsa-secp256k1-signature-2019
-// once this PR is merged: https://github.com/digitalbazaar/secp256k1-key-pair/pull/8
-export class EcdsaSepc256k1Signature2019 extends suites.JwsLinkedDataSignature {
+/**
+ * Takes a resolver and returns a function that returns a document or throws an error when the document
+ * cannot be found.
+ * @param resolver - The resolver is optional but should be passed when DIDs need to be resolved.
+ * @returns {function(*=): {documentUrl: *, document: null}}
+ */
+export default function(resolver) {
+
   /**
-   * @param type {string} Provided by subclass.
-   *
-   * One of these parameters is required to use a suite for signing:
-   *
-   * @param [creator] {string} A key id URL to the paired public key.
-   * @param [verificationMethod] {string} A key id URL to the paired public key.
-   *
-   * This parameter is required for signing:
-   *
-   * @param [signer] {function} an optional signer.
-   *
-   * Advanced optional parameters and overrides:
-   *
-   * @param [proof] {object} a JSON-LD document with options to use for
-   *   the `proof` node (e.g. any other custom fields can be provided here
-   *   using a context different from security-v2).
-   * @param [date] {string|Date} signing date to use if not passed.
-   * @param [key] {LDKeyPair} an optional crypto-ld KeyPair.
-   * @param [useNativeCanonize] {boolean} true to use a native canonize
-   *   algorithm.
+   * Resolve a URI. If the URI is a DID, then the resolver is used to resolve it.
+   * Else, the hardcoded contexts are used to resolve the URI and if that fails
+   * it will be fetched using an HTTP client
+   * @param uri
+   * @returns {Promise&lt;{documentUrl: *, document: *}>}
    */
-  constructor({
-    signer, key, creator, verificationMethod, proof, date, useNativeCanonize
-  } = {}) {
-    super({
-      type: 'EcdsaSecp256k1Signature2019', alg: 'ES256K',
-      LDKeyClass: Secp256k1KeyPair, creator, verificationMethod, signer, key,
-      proof, date, useNativeCanonize});
-    this.requiredKeyType = 'EcdsaSecp256k1VerificationKey2019';
+  async function loadDocument(uri) {
+    let document;
+
+    if (resolver &amp;&amp; uri.startsWith('did:')) {
+      // Try to resolve a DID and throw if cannot resolve
+      document = await resolver.resolve(uri);
+    } else {
+      const context = testContext[uri];
+      if(context) {
+        document = context;
+      } else {
+        const {data: doc} = await axios.get(uri);
+        document = doc;
+      }
+    }
+
+    return {
+      documentUrl: uri,
+      document: document
+    };
   }
+
+  return loadDocument;
 }
 </code></pre>
         </article>

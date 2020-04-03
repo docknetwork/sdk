@@ -1,6 +1,8 @@
 import Secp256k1KeyPair from 'secp256k1-key-pair';
 import {suites} from 'jsonld-signatures';
 
+// TODO: use this package https://github.com/digitalbazaar/ecdsa-secp256k1-signature-2019
+// once this PR is merged: https://github.com/digitalbazaar/secp256k1-key-pair/pull/8
 export class EcdsaSepc256k1Signature2019 extends suites.JwsLinkedDataSignature {
   /**
    * @param type {string} Provided by subclass.

@@ -2,9 +2,8 @@ import {u8aToHex} from '@polkadot/util';
 
 import {isHexWithGivenByteSize} from './utils/misc';
 
-/** Class representing a PublicKey. This class should always be extended (abstract class in some languages) */
-class PublicKey {
-
+/** Class representing a PublicKey. This export class should always be extended (abstract export class in some languages) */
+export class PublicKey {
   /**
    * Creates a new PublicKey object. Validates the given value. Currently supported key
    * types only require validating the byte size.
@@ -38,15 +37,15 @@ class PublicKey {
   }
 
   /**
-   * @return {Object} The correct PublicKey JSON variant. The extending class should implement it.
+   * @return {Object} The correct PublicKey JSON variant. The extending export class should implement it.
    */
   toJSON() {
-    throw new Error('Not implemented. The extending class should implement it');
+    throw new Error('Not implemented. The extending export class should implement it');
   }
 }
 
 /** Class representing a Sr25519 PublicKey */
-class PublicKeySr25519 extends PublicKey {
+export class PublicKeySr25519 extends PublicKey {
   constructor(value) {
     super(value, 32);
   }
@@ -62,7 +61,7 @@ class PublicKeySr25519 extends PublicKey {
 }
 
 /** Class representing a Ed25519 PublicKey */
-class PublicKeyEd25519 extends PublicKey {
+export class PublicKeyEd25519 extends PublicKey {
   constructor(value) {
     super(value, 32);
   }
@@ -78,7 +77,7 @@ class PublicKeyEd25519 extends PublicKey {
 }
 
 /** Class representing a compressed Secp256k1 PublicKey */
-class PublicKeySecp256k1 extends PublicKey {
+export class PublicKeySecp256k1 extends PublicKey {
   constructor(value) {
     super(value, 33);
   }
@@ -93,7 +92,7 @@ class PublicKeySecp256k1 extends PublicKey {
   }
 
   /**
-   * Returns a compressed public key for Secp256k1 curve. The name is intentionally kept same with the base class to
+   * Returns a compressed public key for Secp256k1 curve. The name is intentionally kept same with the base export class to
    * keep the API uniform
    * @param {KeyPair} pair - A KeyPair from elliptic library
    * @returns {PublicKeySecp256k1}
@@ -105,10 +104,3 @@ class PublicKeySecp256k1 extends PublicKey {
     return new this('0x' + pk);
   }
 }
-
-export {
-  PublicKey,
-  PublicKeySr25519,
-  PublicKeyEd25519,
-  PublicKeySecp256k1
-};

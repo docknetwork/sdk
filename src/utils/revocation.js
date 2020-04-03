@@ -2,7 +2,7 @@ import {
   getSignatureFromKeyringPair
 } from './misc';
 
-class OneOfPolicy {
+export class OneOfPolicy {
   constructor(controllers) {
     this.controllers = controllers;
   }
@@ -14,7 +14,7 @@ class OneOfPolicy {
   }
 }
 
-class DidKeys {
+export class DidKeys {
   constructor(map) {
     this.map = map || new Map();
   }
@@ -32,7 +32,7 @@ class DidKeys {
   }
 }
 
-class KeyringPairDidKeys extends DidKeys {
+export class KeyringPairDidKeys extends DidKeys {
   constructor(map) {
     super(map);
   }
@@ -46,9 +46,3 @@ class KeyringPairDidKeys extends DidKeys {
     return signedProofs;
   }
 }
-
-export {
-  OneOfPolicy,
-  DidKeys,
-  KeyringPairDidKeys,
-};

@@ -28,15 +28,17 @@ class VerifiableCredentialModule {
   /**
    * Issue a Verifiable credential
    * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
-   * @param {object} credential - verifiable credential to be signed.
+   * @param {object} credential - Credential to be signed.
    * @return {object} The signed credential object.
    */
   async issueCredential(keyDoc, credential) {
     const suite = this.getSuiteFromKeyDoc(keyDoc);
-    credential.issuer = keyDoc.controller;
+    // The following code (including `issue` method) will modify the passed credential so clone it.
+    const cred = {...credential};
+    cred.issuer = keyDoc.controller;
     return await issue({
-      credential,
-      suite
+      suite,
+      credential: cred
     });
   }
 

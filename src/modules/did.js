@@ -1,7 +1,8 @@
 import {encodeAddress} from '@polkadot/util-crypto';
-
+import {NoDID} from '../err.js';
 import {getHexIdentifierFromDID, DockDIDQualifier} from '../utils/did';
 import {getStateChange} from '../utils/misc';
+import {validateDockDIDHexIdentifier} from '../utils/did';
 
 const signatureHeaders = {
   Sr25519VerificationKey2018: 'Sr25519SignatureAuthentication2018',
@@ -63,13 +64,23 @@ class DIDModule {
 
   /**
    * Gets a DID from the Dock chain and create a DID document according to W3C spec.
+   * Throws NoDID if the DID does not exist on chain.
    * @param {string} did - The DID can be passed as fully qualified DID like `dock:did:<SS58 string>` or
    * a 32 byte hex string
    * @return {object} The DID document.
    */
   async getDocument(did) {
     const hexId = getHexIdentifierFromDID(did);
-    const detail = (await this.getDetail(hexId))[0];
+    let detail;
+    try {
+      detail = (await this.getDetail(hexId))[0];
+    } catch(e) {
+      if (e instanceof NoDID) {
+        // Supplied DID may be non-hex format. Convert back to the user supplied form.
+        e = new NoDID(did);
+      }
+      throw e;
+    }
     // If given DID was in hex, encode to SS58 and then construct fully qualified DID else the DID was already fully qualified
     const id = (did === hexId) ? this.getFullyQualifiedDID(encodeAddress(hexId)) : did;
 
@@ -122,17 +133,18 @@ class DIDModule {
 
   /**
    * Gets the key detail and block number in which the DID was last modified from
-   * the chain and return them. It will throw error if the DID does not exist on
-   * chain or chain returns null response.
+   * the chain and return them. It will throw NoDID if the DID does not exist on
+   * chain.
    * @param {string} didIdentifier - DID identifier as hex. Not accepting full DID intentionally for efficiency as these
    * methods are used internally
    * @return {array} A 2 element array with first
    */
   async getDetail(didIdentifier) {
+    validateDockDIDHexIdentifier(didIdentifier);
     const resp = await this.api.query.didModule.dids(didIdentifier);
     if (resp) {
       if (resp.isNone) {
-        throw new Error('Could not find DID: ' + didIdentifier);
+        throw new NoDID(`dock:did:${didIdentifier}`);
       }
 
       const respTuple = resp.unwrap();

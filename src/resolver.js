@@ -1,13 +1,18 @@
 import {parse as parse_did} from 'did-resolver';
 import {validateDockDIDSS58Identifier} from './utils/did';
 import axios from 'axios';
+import {NoDID} from './err';
 
-// A Resolver is simply a function taking a did uri as an argument and returning a Promise of an
-// optional DID document.
+// A Resolver is simply a function taking a did uri as an argument and returning a Promise of a
+// DID document.
 //
 // In typescript we would say:
 //
-// type Resolver = (did: string) => Promise<null | DIDDocument>
+// ```
+// type Resolver = (did: string) => Promise<DIDDocument>
+// ```
+//
+// If the lookup is successful but the document does not exist, Resolvers must throw NoDID.
 
 /**
  * Create a Resolver which delegates to the appropriate child Resolver according to an index.
@@ -22,7 +27,7 @@ function multiResolver(index, catchAll) {
    * Resolve the given DID with either the registered providers or try to fetch from the universal resolver
    * if available.
    * @param {string} did - A full DID (with method, like did:dock:5....)
-   * @returns {Promise<DIDDocument | null>} Returns a promise to the DID document
+   * @returns {Promise<DIDDocument>} Returns a promise to the DID document
    */
   async function resolve(did) {
     const method = parse_did(did).method;

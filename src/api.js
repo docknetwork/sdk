@@ -5,6 +5,7 @@ import RevocationModule from './modules/revocation';
 import DIDModule from './modules/did';
 import types from './types.json';
 import VerifiableCredentialModule from './modules/vc';
+import err from './err';
 
 import {
   PublicKey,
@@ -178,5 +179,6 @@ export {
   Signature,
   SignatureSr25519,
   SignatureEd25519,
-  VerifiableCredentialModule
+  VerifiableCredentialModule,
+  err,
 };

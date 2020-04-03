@@ -2,7 +2,8 @@ import documentLoader from '../utils/vc/document-loader';
 import {issue, verifyCredential, createPresentation, signPresentation, verify} from 'vc-js';
 import {Ed25519KeyPair, suites} from 'jsonld-signatures';
 const {Ed25519Signature2018} = suites;
-import {EcdsaSepc256k1Signature2019, Secp256k1KeyPair} from '../utils/vc/temp-signatures';
+import Secp256k1KeyPair from 'secp256k1-key-pair';
+import {EcdsaSepc256k1Signature2019} from '../utils/vc/signatures';
 
 
 /** Class to sign and verify Verifiable Credentials */

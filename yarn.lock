@@ -5163,6 +5163,13 @@ secp256k1-key-pair@^1.0.0:
     elliptic "^6.5.0"
     node-forge "^0.8.5"
 
+"secp256k1-key-pair@https://github.com/SamHellawell/secp256k1-key-pair":
+  version "1.1.1-0"
+  resolved "https://github.com/SamHellawell/secp256k1-key-pair#da66af97da3944b864406ebe5a8aec96cb6152a5"
+  dependencies:
+    elliptic "^6.5.0"
+    node-forge "^0.8.5"
+
 security-context@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/security-context/-/security-context-4.0.0.tgz#e73f5d22bee9c7699a02eaaced359d001dc948e9"

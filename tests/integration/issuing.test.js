@@ -70,13 +70,13 @@ function getIssuerKeyDoc(did, keypair, typ) {
  * @param sigType
  * @returns {{issuanceDate: string, credentialSubject: {alumniOf: string, id: *}, id: *, proof: AsymmetricMatcher, type: [string, string], issuer: string}}
  */
-function getCredMatcherDoc(cred, issuerKeyId, sigType) {
+function getCredMatcherDoc(cred, issuer, issuerKeyId, sigType) {
   return {
     id: cred.id,
     type: cred.type,
     issuanceDate: cred.issuanceDate,
     credentialSubject: cred.credentialSubject,
-    issuer: cred.issuer,
+    issuer: issuer,
     proof: expect.objectContaining({
       type: sigType,
       jws: expect.anything(),
@@ -140,12 +140,10 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
   test('Issue a verifiable credential with ed25519 key and verify it', async () => {
     const issuerKeyPair = await Ed25519KeyPair.generate({seed: hexToU8a(issuer1KeySeed)});
     const issuerKey = getIssuerKeyDoc(issuer1DID, issuerKeyPair, 'Ed25519VerificationKey2018');
-    console.log('00', issuerKey);
-    const credential = await vc.issueCredential(issuerKey, {...unsignedCred});
-    console.log('00', credential);
+    const credential = await vc.issueCredential(issuerKey, unsignedCred);
     expect(credential).toMatchObject(
       expect.objectContaining(
-        getCredMatcherDoc(unsignedCred, issuerKey.id, 'Ed25519Signature2018')
+        getCredMatcherDoc(unsignedCred, issuer1DID, issuerKey.id, 'Ed25519Signature2018')
       )
     );
 
@@ -160,12 +158,10 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
   test('Issue a verifiable credential with secp256k1 key and verify it', async () => {
     const issuerKeyPair = await Secp256k1KeyPair.generate({pers: issuer2KeyPers, entropy: issuer2KeyEntropy});
     const issuerKey = getIssuerKeyDoc(issuer2DID, issuerKeyPair, 'EcdsaSecp256k1VerificationKey2019');
-    console.log('11', issuerKey);
-    const credential = await vc.issueCredential(issuerKey, {...unsignedCred});
-    console.log('11', credential);
+    const credential = await vc.issueCredential(issuerKey, unsignedCred);
     expect(credential).toMatchObject(
       expect.objectContaining(
-        getCredMatcherDoc(unsignedCred, issuerKey.id, 'EcdsaSecp256k1Signature2019')
+        getCredMatcherDoc(unsignedCred, issuer2DID, issuerKey.id, 'EcdsaSecp256k1Signature2019')
       )
     );
     const result = await vc.verifyCredential(credential, resolver);

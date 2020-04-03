@@ -5165,7 +5165,7 @@ secp256k1-key-pair@^1.0.0:
 
 "secp256k1-key-pair@https://github.com/SamHellawell/secp256k1-key-pair":
   version "1.1.1-0"
-  resolved "https://github.com/SamHellawell/secp256k1-key-pair#319ce02e0366503aea0c87c49e8073fe7ae5f357"
+  resolved "https://github.com/SamHellawell/secp256k1-key-pair#da66af97da3944b864406ebe5a8aec96cb6152a5"
   dependencies:
     elliptic "^6.5.0"
     node-forge "^0.8.5"

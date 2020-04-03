@@ -4,6 +4,7 @@ import {createNewDockDID, createKeyDetail} from '../src/utils/did';
 import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
 import {multiResolver, universalResolver, dockResolver} from '../src/resolver';
 import ethr from 'ethr-did-resolver';
+import {parse as parse_did} from 'did-resolver';
 
 const fullNodeWsRPCEndpoint = 'ws://127.0.0.1:9944';
 const universalResolverUrl = 'http://localhost:8080';
@@ -44,9 +45,10 @@ async function connect(addr) {
 
 async function main() {
   const dock = await connect(fullNodeWsRPCEndpoint);
+  const ethres = ethr.getResolver(ethereumProviderConfig).ethr;
   const providers = {
     'dock': dockResolver(dock),
-    'ethr': ethr.getResolver(ethereumProviderConfig).ethr,
+    'ethr': did => ethres(did, parse_did(did)),
   };
   const resolve = multiResolver(providers, universalResolver(universalResolverUrl));
 

@@ -2,6 +2,13 @@ import {parse as parse_did} from 'did-resolver';
 import {validateDockDIDSS58Identifier} from './utils/did';
 import axios from 'axios';
 
+// A Resolver is simply a function taking a did uri as an argument and returning a Promise of an
+// optional DID document.
+//
+// In typescript we would say:
+//
+// type Resolver = (did: string) => Promise<null | DIDDocument>
+
 /**
  * Create a Resolver which delegates to the appropriate child Resolver according to an index.
  *
@@ -18,9 +25,9 @@ function multiResolver(index, catchAll) {
    * @returns {Promise<DIDDocument | null>} Returns a promise to the DID document
    */
   async function resolve(did) {
-    const pdid = parse_did(did);
-    if (pdid.method in index) {
-      return await index[pdid.method](did, pdid);
+    const method = parse_did(did).method;
+    if (method in index) {
+      return await index[method](did);
     } else if (catchAll !== undefined) {
       return await catchAll(did);
     } else {
@@ -37,7 +44,7 @@ function multiResolver(index, catchAll) {
  * adapter has type
  * [DIDResolver](https://github.com/decentralized-identity/did-resolver/blob/02bdaf1687151bb934b10093042e576ed54b229c/src/resolver.ts#L73).
  *
- * @param {string} url - address of a instance.
+ * @param {string} url - address of an instance of universal-resolver.
  * @returns {Promise<DIDResolver>}
  */
 function universalResolver(url) {

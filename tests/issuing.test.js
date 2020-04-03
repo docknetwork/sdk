@@ -1,4 +1,4 @@
-import VerifiableCredentialModule from '../src/modules/vc';
+import VerifiableCredentialModule, {VerifiableCredential} from '../src/modules/vc';
 
 const vc = new VerifiableCredentialModule();
 const sample_unsigned_cred = {
@@ -215,6 +215,117 @@ describe('Verifiable Presentation Creation', () => {
         ],
         error: undefined
       }
+    );
+  }, 30000);
+});
+
+describe('Verifiable Credential incremental creation', () => {
+  test('VC creation with only id should be possible, yet bring default values', async () => {
+    let credential = new VerifiableCredential('blabla');
+    expect(credential.id).toBe('blabla');
+    expect(credential.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1'
+    ]);
+    expect(credential.type).toEqual(['VerifiableCredential']);
+    expect(credential.subject).toEqual({id: undefined});
+    expect(credential.issuanceDate).toEqual(expect.anything());
+  });
+
+  test('JSON representation of a VC should bring the proper keys', async () => {
+    let credential = new VerifiableCredential('blabla');
+    expect(credential.toJSON()).toEqual(
+      {
+        '@context':[
+          'https://www.w3.org/2018/credentials/v1',
+          'https://www.w3.org/2018/credentials/examples/v1',
+        ],
+        'id':'blabla',
+        'type':[
+          'VerifiableCredential',
+        ],
+        'credentialSubject':{
+          'id': undefined
+        },
+        'issuanceDate':expect.anything(),
+      }
+    );
+  });
+
+  test('VC creation with all fields in options should be possible', async () => {
+    const options = {
+      context: ['context_1, context_2'],
+      type: ['type_1, type_2'],
+      subject: {id: 'some_id', alumniOf:'some_teacher'},
+      issuanceDate: '2020-03-18T19:23:24Z',
+    };
+    let credential = new VerifiableCredential('blabla', options);
+    expect(credential.id).toBe('blabla');
+    expect(credential.context).toEqual(options.context);
+    expect(credential.type).toEqual(options.type);
+    expect(credential.subject).toEqual(options.subject);
+    expect(credential.issuanceDate).toEqual(options.issuanceDate);
+  });
+
+  test('Incremental VC creation should be possible', async () => {
+    let credential = new VerifiableCredential('blabla');
+    expect(credential.id).toBe('blabla');
+
+    credential.addContext('some_context');
+    expect(credential.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+      'some_context'
+    ]);
+    credential.addType('some_type');
+    expect(credential.type).toEqual([
+      'VerifiableCredential',
+      'some_type'
+    ]);
+    credential.setSubject({id: 'some_subject_id'});
+    expect(credential.subject).toEqual({id: 'some_subject_id'});
+    credential.setIssuanceDate('2020-03-18T19:23:24Z');
+    expect(credential.issuanceDate).toEqual('2020-03-18T19:23:24Z');
+    credential.setExpirationDate('2021-03-18T19:23:24Z');
+    expect(credential.expirationDate).toEqual('2021-03-18T19:23:24Z');
+  });
+
+  test('Issuing an incrementally-created VC should return an object with a proof, and it must pass validation.', async () => {
+    let unsigned_credential = new VerifiableCredential(
+      'https://example.com/credentials/1872',
+      {
+        context: [
+          'https://www.w3.org/2018/credentials/v1',
+          'https://www.w3.org/2018/credentials/examples/v1'
+        ],
+        type: ['VerifiableCredential', 'AlumniCredential'],
+        issuanceDate: '2020-03-18T19:23:24Z',
+        subject: {
+          id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+          alumniOf: 'Example University'
+        }
+      }
+    );
+    const signed_credential = await unsigned_credential.sign(sample_key);
+    expect(signed_credential).toMatchObject(
+      expect.objectContaining({
+        proof: expect.anything()
+      }
+      )
+    );
+    const result = await signed_credential.verify();
+    expect(result).toMatchObject(
+      expect.objectContaining(
+        {
+          'results': [
+            {
+              'proof': expect.anything(),
+              'verified': true
+            }
+          ],
+          'verified': true
+        }
+      )
     );
   }, 30000);
 });

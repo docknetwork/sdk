@@ -8,7 +8,7 @@ import {getPublicKeyFromKeyringPair} from '../../src/utils/misc';
  * @param pair
  * @returns {Promise<void>}
  */
-async function registerNewDID(dockAPI, did, pair) {
+export async function registerNewDIDUsingPair(dockAPI, did, pair) {
   const publicKey = getPublicKeyFromKeyringPair(pair);
 
   // The controller is same as the DID
@@ -16,7 +16,3 @@ async function registerNewDID(dockAPI, did, pair) {
   const transaction = dockAPI.did.new(did, keyDetail);
   return await dockAPI.sendTransaction(transaction);
 }
-
-export {
-  registerNewDID
-};

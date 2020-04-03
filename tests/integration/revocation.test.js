@@ -1,15 +1,14 @@
 import {randomAsHex} from '@polkadot/util-crypto';
 
-import {DockAPI, PublicKeySr25519} from '../../src/api';
+import {DockAPI} from '../../src/api';
 
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
-
-import {createKeyDetail} from '../../src/utils/did';
 
 import  {
   OneOfPolicy,
   KeyringPairDidKeys,
 } from '../../src/utils/revocation';
+import {registerNewDIDUsingPair} from './helpers';
 
 describe('Revocation Module', () => {
   const dock = new DockAPI();
@@ -49,20 +48,15 @@ describe('Revocation Module', () => {
 
     // The DID should be written before any test begins
     const pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
-    const publicKey = PublicKeySr25519.fromKeyringPair(pair);
 
-    // Set our controller DID and assoicated keypair to be used for generating proof
+    // Set our controller DID and associated keypair to be used for generating proof
     didKeys.set(controllerDID, pair);
 
     // The controller is same as the DID
-    const keyDetail = createKeyDetail(publicKey, controllerDID);
-    const transaction = dock.did.new(controllerDID, keyDetail);
-    await dock.sendTransaction(transaction);
+    await registerNewDIDUsingPair(dock, controllerDID, pair);
 
     // Create secondary DID
-    const keyDetailTwo = createKeyDetail(publicKey, controllerDIDTwo);
-    const transactionTwo = dock.did.new(controllerDIDTwo, keyDetailTwo);
-    await dock.sendTransaction(transactionTwo);
+    await registerNewDIDUsingPair(dock, controllerDIDTwo, pair);
     done();
   }, 30000);
 

@@ -6,8 +6,7 @@ import {validateDockDIDSS58Identifier, DockDIDMethod} from './utils/did';
  * @param {string} fullNodeWsRPCEndpoint - The endpoint where a full node is running
  * @returns {object} An object with one key which the Dock DID method
  */
-function getResolver(fullNodeWsRPCEndpoint) {
-
+export function getResolver(fullNodeWsRPCEndpoint) {
   /**
    * Resolve a Dock DID. The DID is expected to be a fully qualified DID.
    * @param {string} did - The full DID
@@ -31,5 +30,3 @@ function getResolver(fullNodeWsRPCEndpoint) {
 
   return { [DockDIDMethod]: resolve };
 }
-
-export {getResolver};

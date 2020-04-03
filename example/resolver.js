@@ -6,7 +6,7 @@ import dock from '../src/api';
 import {createNewDockDID, createKeyDetail} from '../src/utils/did';
 import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
 import {getResolver as dockResolver} from '../src/dock-did-resolver';
-import {Resolver} from '../src/resolver';
+import Resolver from '../src/resolver';
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.

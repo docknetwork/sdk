@@ -34,16 +34,16 @@ import {randomAsHex, encodeAddress, decodeAddress} from '@polkadot/util-crypto';
 
 import {isHexWithGivenByteSize, getSignatureFromKeyringPair} from './misc';
 
-const DockDIDMethod = 'dock';
-const DockDIDQualifier = `did:${DockDIDMethod}:`;
-const DockDIDByteSize = 32;
+export const DockDIDMethod = 'dock';
+export const DockDIDQualifier = `did:${DockDIDMethod}:`;
+export const DockDIDByteSize = 32;
 
 /**
  * Check if the given identifier is 32 byte hex
  * @param {identifier} identifier - The identifier to check.
  * @return {null} Throws exception if invalid identifier
  */
-function validateDockDIDHexIdentifier(identifier) {
+export function validateDockDIDHexIdentifier(identifier) {
   // Byte size of the Dock DID identifier, i.e. the `DockDIDQualifier` is not counted.
   if (!isHexWithGivenByteSize(identifier, DockDIDByteSize)) {
     throw new Error(`DID identifier must be ${DockDIDByteSize} bytes`);
@@ -55,7 +55,7 @@ function validateDockDIDHexIdentifier(identifier) {
  * @param {identifier} identifier - The identifier to check.
  * @return {null} Throws exception if invalid identifier
  */
-function validateDockDIDSS58Identifier(identifier) {
+export function validateDockDIDSS58Identifier(identifier) {
   // base58-check regex
   const regex = new RegExp(/^[5KL][1-9A-HJ-NP-Za-km-z]{47}$/);
   const matches = regex.exec(identifier);
@@ -70,7 +70,7 @@ function validateDockDIDSS58Identifier(identifier) {
  * a 32 byte hex string
  * @return {string} Returns the hexadecimal representation of the DID.
  */
-function getHexIdentifierFromDID(did) {
+export function getHexIdentifierFromDID(did) {
   if (did.startsWith(DockDIDQualifier)) {
     // Fully qualified DID. Remove the qualifier
     const ss58Did = did.slice(DockDIDQualifier.length);
@@ -101,7 +101,7 @@ function getHexIdentifierFromDID(did) {
  * Create and return a fully qualified Dock DID, i.e. "did:dock:&lt;SS58 string>"
  * @returns {string} - The DID
  */
-function createNewDockDID() {
+export function createNewDockDID() {
   const hexId = randomAsHex(DockDIDByteSize);
   const ss58Id = encodeAddress(hexId);
   return `${DockDIDQualifier}${ss58Id}`;
@@ -114,7 +114,7 @@ function createNewDockDID() {
  * @param {string} controller - Full DID or hex identifier of the controller of the public key
  * @returns {object} - The object has structure and keys with same names as expected by the Substrate node
  */
-function createKeyDetail(publicKey, controller) {
+export function createKeyDetail(publicKey, controller) {
   return {
     public_key: publicKey.toJSON(),
     controller: getHexIdentifierFromDID(controller)
@@ -131,7 +131,7 @@ function createKeyDetail(publicKey, controller) {
  * only be passed when controller is to be updated.
  * @returns {object} The object has structure and keys with same names as expected by the Substrate node
  */
-async function createKeyUpdate(didModule, did, newPublicKey, newController) {
+export async function createKeyUpdate(didModule, did, newPublicKey, newController) {
   const hexId = getHexIdentifierFromDID(did);
   const last_modified_in_block = await didModule.getBlockNoForLastChangeToDID(hexId);
 
@@ -149,7 +149,7 @@ async function createKeyUpdate(didModule, did, newPublicKey, newController) {
  * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * @returns {Signature}
  */
-function signKeyUpdate(didModule, keyUpdate, currentKeyPair) {
+export function signKeyUpdate(didModule, keyUpdate, currentKeyPair) {
   const serializedKeyUpdate = didModule.getSerializedKeyUpdate(keyUpdate);
   return getSignatureFromKeyringPair(currentKeyPair, serializedKeyUpdate);
 }
@@ -164,7 +164,7 @@ function signKeyUpdate(didModule, keyUpdate, currentKeyPair) {
  * only be passed when controller is to be updated
  * @returns {array} A 2 element array where the first element is the `KeyUpdate` and the second is the signature
  */
-async function createSignedKeyUpdate(didModule, did, newPublicKey, currentKeyPair, newController) {
+export async function createSignedKeyUpdate(didModule, did, newPublicKey, currentKeyPair, newController) {
   const keyUpdate = await createKeyUpdate(didModule, did, newPublicKey, newController);
   const signature = signKeyUpdate(didModule, keyUpdate, currentKeyPair);
   return [keyUpdate, signature];
@@ -177,7 +177,7 @@ async function createSignedKeyUpdate(didModule, did, newPublicKey, currentKeyPai
  * @param {string} did - Full DID or hex identifier to update
  * @returns {object} The object has structure and keys with same names as expected by the Substrate node
  */
-async function createDidRemoval(didModule, did) {
+export async function createDidRemoval(didModule, did) {
   const hexId = getHexIdentifierFromDID(did);
   const last_modified_in_block = await didModule.getBlockNoForLastChangeToDID(hexId);
 
@@ -194,7 +194,7 @@ async function createDidRemoval(didModule, did) {
  * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * @returns {Signature}
  */
-function signDidRemoval(didModule, didRemoval, currentKeyPair) {
+export function signDidRemoval(didModule, didRemoval, currentKeyPair) {
   const serializedDIDRemoval = didModule.getSerializedDIDRemoval(didRemoval);
   return getSignatureFromKeyringPair(currentKeyPair, serializedDIDRemoval);
 }
@@ -206,27 +206,11 @@ function signDidRemoval(didModule, didRemoval, currentKeyPair) {
  * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * @returns {array} A 2 element array where the first element is the `DidRemoval` and the second is the signature
  */
-async function createSignedDidRemoval(didModule, did, currentKeyPair) {
+export async function createSignedDidRemoval(didModule, did, currentKeyPair) {
   const didRemoval = await createDidRemoval(didModule, did);
   const signature = signDidRemoval(didModule, didRemoval, currentKeyPair);
   return [didRemoval, signature];
 }
-
-export {
-  validateDockDIDHexIdentifier,
-  validateDockDIDSS58Identifier,
-  getHexIdentifierFromDID,
-  DockDIDMethod,
-  DockDIDQualifier,
-  createNewDockDID,
-  createKeyDetail,
-  createKeyUpdate,
-  signKeyUpdate,
-  createSignedKeyUpdate,
-  createDidRemoval,
-  signDidRemoval,
-  createSignedDidRemoval
-};
 </code></pre>
         </article>
     </section>
@@ -237,13 +221,13 @@ export {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="EcdsaSepc256k1Signature2019_EcdsaSepc256k1Signature2019.html">EcdsaSepc256k1Signature2019</a></li><li><a href="PublicKey.html">PublicKey</a></li><li><a href="PublicKeyEd25519.html">PublicKeyEd25519</a></li><li><a href="PublicKeySecp256k1.html">PublicKeySecp256k1</a></li><li><a href="PublicKeySr25519.html">PublicKeySr25519</a></li><li><a href="Resolver.html">Resolver</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="Secp256k1KeyPair_Secp256k1KeyPair.html">Secp256k1KeyPair</a></li><li><a href="Signature.html">Signature</a></li><li><a href="SignatureEd25519.html">SignatureEd25519</a></li><li><a href="SignatureSecp256k1.html">SignatureSecp256k1</a></li><li><a href="SignatureSr25519.html">SignatureSr25519</a></li><li><a href="VerifiableCredentialModule.html">VerifiableCredentialModule</a></li></ul><h3>Global</h3><ul><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getResolver">getResolver</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="EcdsaSepc256k1Signature2019_EcdsaSepc256k1Signature2019.html">EcdsaSepc256k1Signature2019</a></li><li><a href="module.exports.html">exports</a></li><li><a href="PublicKey.html">PublicKey</a></li><li><a href="PublicKeyEd25519.html">PublicKeyEd25519</a></li><li><a href="PublicKeySecp256k1.html">PublicKeySecp256k1</a></li><li><a href="PublicKeySr25519.html">PublicKeySr25519</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="Secp256k1KeyPair_Secp256k1KeyPair.html">Secp256k1KeyPair</a></li><li><a href="Signature.html">Signature</a></li><li><a href="SignatureEd25519.html">SignatureEd25519</a></li><li><a href="SignatureSecp256k1.html">SignatureSecp256k1</a></li><li><a href="SignatureSr25519.html">SignatureSr25519</a></li><li><a href="VerifiableCredentialModule.html">VerifiableCredentialModule</a></li></ul><h3>Global</h3><ul><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getFromUniversalResolver">getFromUniversalResolver</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getResolver">getResolver</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Apr 02 2020 19:05:11 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Fri Apr 03 2020 15:45:25 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

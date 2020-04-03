@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: SignatureSr25519</title>
+    <title>JSDoc: Class: exports</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: SignatureSr25519</h1>
+    <h1 class="page-title">Class: exports</h1>
 
     
 
@@ -28,9 +28,9 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>SignatureSr25519<span class="signature">(message, signingPair)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>exports<span class="signature">(providers, universalResolverUrl)</span><span class="type-signature"></span></h2>
         
-            <div class="class-description">Class representing a Sr25519 Signature</div>
+            <div class="class-description">Class representing a DID Resolver which can resolve DID from various networks</div>
         
     
 </header>
@@ -45,7 +45,7 @@
     
 
     
-    <h4 class="name" id="SignatureSr25519"><span class="type-signature"></span>new SignatureSr25519<span class="signature">(message, signingPair)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="exports"><span class="type-signature"></span>new exports<span class="signature">(providers, universalResolverUrl)</span><span class="type-signature"></span></h4>
     
 
     
@@ -53,7 +53,9 @@
 
 
 <div class="description">
-    Generate a Sr25519 signature using Polkadot-js
+    DID resolver class, currently supporting only Dock and Ethereum DID natively and optionally allows to pass URL for the
+universal resolver.
+The providers can be passed only during construction to keep the code minimal.
 </div>
 
 
@@ -89,13 +91,13 @@
 
         <tr>
             
-                <td class="name"><code>message</code></td>
+                <td class="name"><code>providers</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">array</span>
+<span class="param-type">object</span>
 
 
             
@@ -105,20 +107,20 @@
 
             
 
-            <td class="description last">The message to sign as bytearray</td>
+            <td class="description last">An object with keys as the DID method and value as the provider config specifying the network.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>signingPair</code></td>
+                <td class="name"><code>universalResolverUrl</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">KeyringPair</span>
+<span class="param-type">string</span>
 
 
             
@@ -128,7 +130,7 @@
 
             
 
-            <td class="description last">The pair from Polkadot-js containing the signing key</td>
+            <td class="description last">The HTTP URL for the universal resolver. This is optional</td>
         </tr>
 
     
@@ -169,7 +171,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="signature.js.html">signature.js</a>, <a href="signature.js.html#line52">line 52</a>
+        <a href="resolver.js.html">resolver.js</a>, <a href="resolver.js.html#line23">line 23</a>
     </li></ul></dd>
     
 
@@ -207,13 +209,6 @@
     
 
     
-        <h3 class="subsection-title">Classes</h3>
-
-        <dl>
-            <dt><a href="SignatureSr25519.html">SignatureSr25519</a></dt>
-            <dd></dd>
-        </dl>
-    
 
     
 
@@ -223,271 +218,6 @@
 
     
 
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="fromHex"><span class="type-signature"></span>fromHex<span class="signature">(value)</span><span class="type-signature"> &rarr; {<a href="Signature.html">Signature</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Create SignatureSr25519 from given hex string
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>value</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Hex string</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="signature.js.html">signature.js</a>, <a href="signature.js.html#line61">line 61</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="Signature.html">Signature</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="toJSON"><span class="type-signature"></span>toJSON<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="signature.js.html">signature.js</a>, <a href="signature.js.html#line68">line 68</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    The DidSignature JSON variant Sr25519.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
     
 
     

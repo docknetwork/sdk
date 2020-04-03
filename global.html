@@ -104,7 +104,7 @@
     
 
     
-    <h4 class="name" id="createDidRemoval"><span class="type-signature">(async) </span>createDidRemoval<span class="signature">(didModule, did)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    <h4 class="name" id="createDidRemoval"><span class="type-signature"></span>createDidRemoval<span class="signature">(didModule, did)</span><span class="type-signature"> &rarr; {object}</span></h4>
     
 
     
@@ -470,7 +470,7 @@ accessible always, like in case of hardware wallet</td>
     
 
     
-    <h4 class="name" id="createKeyUpdate"><span class="type-signature">(async) </span>createKeyUpdate<span class="signature">(didModule, did, newPublicKey, newController)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    <h4 class="name" id="createKeyUpdate"><span class="type-signature"></span>createKeyUpdate<span class="signature">(didModule, did, newPublicKey, newController)</span><span class="type-signature"> &rarr; {object}</span></h4>
     
 
     
@@ -810,7 +810,7 @@ only be passed when controller is to be updated.</td>
     
 
     
-    <h4 class="name" id="createSignedDidRemoval"><span class="type-signature">(async) </span>createSignedDidRemoval<span class="signature">(didModule, did, currentKeyPair)</span><span class="type-signature"> &rarr; {array}</span></h4>
+    <h4 class="name" id="createSignedDidRemoval"><span class="type-signature"></span>createSignedDidRemoval<span class="signature">(didModule, did, currentKeyPair)</span><span class="type-signature"> &rarr; {array}</span></h4>
     
 
     
@@ -1015,7 +1015,7 @@ only be passed when controller is to be updated.</td>
     
 
     
-    <h4 class="name" id="createSignedKeyUpdate"><span class="type-signature">(async) </span>createSignedKeyUpdate<span class="signature">(didModule, did, newPublicKey, currentKeyPair)</span><span class="type-signature"> &rarr; {array}</span></h4>
+    <h4 class="name" id="createSignedKeyUpdate"><span class="type-signature"></span>createSignedKeyUpdate<span class="signature">(didModule, did, newPublicKey, currentKeyPair)</span><span class="type-signature"> &rarr; {array}</span></h4>
     
 
     
@@ -1571,6 +1571,161 @@ require the change to be wrapped in `StateChange` before serializing for signing
     <dd>
         
 <span class="param-type">array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getFromUniversalResolver"><span class="type-signature">(async) </span>getFromUniversalResolver<span class="signature">(did)</span><span class="type-signature"> &rarr; {Promise.&lt;(Error|*)>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Try to fetch the DID from the universal resolver.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>did</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A full DID (with method, like did:dock:5....)</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="resolver.js.html">resolver.js</a>, <a href="resolver.js.html#line81">line 81</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;(Error|*)></span>
 
 
     </dd>
@@ -2592,6 +2747,166 @@ a 32 byte hex string</td>
     
 
     
+    <h4 class="name" id="resolve"><span class="type-signature">(async) </span>resolve<span class="signature">(did)</span><span class="type-signature"> &rarr; {Promise.&lt;(DIDDocument|null)>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Resolve the given DID with either the registered providers or try to fetch from the universal resolver
+if available.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>did</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A full DID (with method, like did:dock:5....)</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="resolver.js.html">resolver.js</a>, <a href="resolver.js.html#line66">line 66</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns a promise to the DID document
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;(DIDDocument|null)></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="signDidRemoval"><span class="type-signature"></span>signDidRemoval<span class="signature">(didModule, didRemoval, currentKeyPair)</span><span class="type-signature"> &rarr; {<a href="Signature.html">Signature</a>}</span></h4>
     
 
@@ -3527,13 +3842,13 @@ a 32 byte hex string</td>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="EcdsaSepc256k1Signature2019_EcdsaSepc256k1Signature2019.html">EcdsaSepc256k1Signature2019</a></li><li><a href="PublicKey.html">PublicKey</a></li><li><a href="PublicKeyEd25519.html">PublicKeyEd25519</a></li><li><a href="PublicKeySecp256k1.html">PublicKeySecp256k1</a></li><li><a href="PublicKeySr25519.html">PublicKeySr25519</a></li><li><a href="Resolver.html">Resolver</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="Secp256k1KeyPair_Secp256k1KeyPair.html">Secp256k1KeyPair</a></li><li><a href="Signature.html">Signature</a></li><li><a href="SignatureEd25519.html">SignatureEd25519</a></li><li><a href="SignatureSecp256k1.html">SignatureSecp256k1</a></li><li><a href="SignatureSr25519.html">SignatureSr25519</a></li><li><a href="VerifiableCredentialModule.html">VerifiableCredentialModule</a></li></ul><h3>Global</h3><ul><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getResolver">getResolver</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="EcdsaSepc256k1Signature2019_EcdsaSepc256k1Signature2019.html">EcdsaSepc256k1Signature2019</a></li><li><a href="module.exports.html">exports</a></li><li><a href="PublicKey.html">PublicKey</a></li><li><a href="PublicKeyEd25519.html">PublicKeyEd25519</a></li><li><a href="PublicKeySecp256k1.html">PublicKeySecp256k1</a></li><li><a href="PublicKeySr25519.html">PublicKeySr25519</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="Secp256k1KeyPair_Secp256k1KeyPair.html">Secp256k1KeyPair</a></li><li><a href="Signature.html">Signature</a></li><li><a href="SignatureEd25519.html">SignatureEd25519</a></li><li><a href="SignatureSecp256k1.html">SignatureSecp256k1</a></li><li><a href="SignatureSr25519.html">SignatureSr25519</a></li><li><a href="VerifiableCredentialModule.html">VerifiableCredentialModule</a></li></ul><h3>Global</h3><ul><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getFromUniversalResolver">getFromUniversalResolver</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getResolver">getResolver</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Apr 02 2020 19:05:11 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Fri Apr 03 2020 15:45:25 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

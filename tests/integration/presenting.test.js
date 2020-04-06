@@ -10,45 +10,43 @@ import {DockAPI} from '../../src/api';
 import Resolver from '../../src/resolver';
 
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
-import {getUnsignedCred, registerNewDIDUsingPair} from './helpers';
-import {generateEcdsaSecp256k1Keypair} from '../../src/utils/misc';
-import Secp256k1KeyPair from 'secp256k1-key-pair';
-import {getKeyDoc} from '../../src/utils/vc/helpers';
-import {
-  createPresentation,
-  issueCredential,
-  isVerifiedCredential,
-  signPresentation,
-  verifyPresentation
-} from '../../src/utils/vc';
+import {getKeyDoc, registerNewDIDUsingPair} from './helpers';
 
-// Issuer's DID.
-const issuerDID = createNewDockDID();
-// seed used for issuer keys
-const issuerKeySeed = randomAsHex(32);
+const vc = new VerifiableCredentialModule();
+
+// 1st issuer's DID.
+const issuer1DID = createNewDockDID();
+// seed used for 1st issuer keys
+const issuer1KeySeed = randomAsHex(32);
 
 const holder1DID = createNewDockDID();
-// seed used for 1st holder keys
+// seed used for 1st issuer keys
 const holder1KeySeed = randomAsHex(32);
 
-const holder2DID = createNewDockDID();
-// entropy used for 2nd holder keys
-const holder2KeyPers = 'holder2';
-const holder2KeyEntropy = randomAsHex(32);
+const credId = randomAsHex(32);
 
-const holder3DID = createNewDockDID();
-// seed used for 3rd holder keys
-const holder3KeySeed = randomAsHex(32);
+function getUnsignedCred(credId, holderDID) {
+  return {
+    '@context': [
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+      // Following URL is for Sr25519 Signature and verification key. This is not a real URL but resolves to a context
+      // because of the mapping defined in `contexts.js`
+      'https://www.dock.io/2020/credentials/context/sr25519',
+    ],
+    id: credId,
+    type: ['VerifiableCredential', 'AlumniCredential'],
+    issuanceDate: '2020-03-18T19:23:24Z',
+    credentialSubject: {
+      id: holderDID,
+      alumniOf: 'Example University'
+    }
+  };
+}
 
-const credId1 = randomAsHex(32);
-const credId2 = randomAsHex(32);
-const credId3 = randomAsHex(32);
-const credId4 = randomAsHex(32);
+let unsignedCred = getUnsignedCred(credId, holder1DID);
 
-let cred1;
-let cred2;
-let cred3;
-let cred4;
+let credEd25519;
 
 describe('Verifiable Presentation where both issuer and holder have a Dock DID', () => {
   const dock = new DockAPI();
@@ -67,8 +65,8 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     // The DIDs should be written before any test begins
 
     // Register issuer DID with ed25519 key
-    const pair1 = dock.keyring.addFromUri(issuerKeySeed, null, 'ed25519');
-    await registerNewDIDUsingPair(dock, issuerDID, pair1);
+    const pair1 = dock.keyring.addFromUri(issuer1KeySeed, null, 'ed25519');
+    await registerNewDIDUsingPair(dock, issuer1DID, pair1);
 
     // Register holder DID with ed25519 key
     const pair2 = dock.keyring.addFromUri(holder1KeySeed, null, 'ed25519');
@@ -204,28 +202,30 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       expect.objectContaining(
         {
           type: [ 'VerifiablePresentation' ],
-          verifiableCredential: [cred3, cred4],
+          verifiableCredential: [credEd25519],
           id: presId,
         }
       )
     );
 
-    const signedPres = await signPresentation(
+    const holderKey = getKeyDoc(holder1DID, await Ed25519KeyPair.generate({seed: hexToU8a(holder1KeySeed)}), 'Ed25519VerificationKey2018');
+
+    const signedPres = await vc.signPresentation(
       presentation,
-      holder3Key,
+      holderKey,
       chal,
       domain,
-      resolver,
+      resolver
     );
 
     expect(signedPres).toMatchObject(
       expect.objectContaining(
         {
           type: [ 'VerifiablePresentation' ],
-          verifiableCredential: [cred3, cred4],
+          verifiableCredential: [credEd25519],
           id: presId,
           proof: expect.objectContaining({
-            type: 'Sr25519Signature2020',
+            type: 'Ed25519Signature2018',
             challenge: chal,
             domain: domain,
             proofPurpose: 'authentication',
@@ -234,20 +234,16 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       )
     );
 
-    const result = await verifyPresentation(
+    const result = await vc.verifyPresentation(
       signedPres,
       chal,
       domain,
-      resolver,
+      resolver
     );
 
-    // Verifier checks that both credential and presentation are correct.
     expect(result.verified).toBe(true);
     expect(result.presentationResult.verified).toBe(true);
-    expect(result.credentialResults.length).toBe(2);
+    expect(result.credentialResults.length).toBe(1);
     expect(result.credentialResults[0].verified).toBe(true);
-    expect(result.credentialResults[1].verified).toBe(true);
-
-  }, 60000);
-
+  }, 30000);
 });

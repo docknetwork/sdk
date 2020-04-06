@@ -27,6 +27,7 @@ export default function(resolver) {
       if(context) {
         document = context;
       } else {
+        console.log('trying to fetch uri', uri);
         const {data: doc} = await axios.get(uri);
         document = doc;
       }

@@ -10,7 +10,7 @@ import {DockAPI} from '../../src/api';
 import Resolver from '../../src/resolver';
 
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
-import {registerNewDIDUsingPair} from './helpers';
+import {getKeyDoc, registerNewDIDUsingPair} from './helpers';
 import {generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair} from '../../src/utils/misc';
 import Secp256k1KeyPair  from 'secp256k1-key-pair';
 import {issueCredential, verifyCredential} from '../../src/utils/vc';
@@ -38,8 +38,6 @@ const credId = randomAsHex(32);
 const unsignedCred = {
   '@context': [
     'https://www.w3.org/2018/credentials/v1',
-    // Following URL is for Sr25519 Signature and verification key
-    'https://gist.githubusercontent.com/lovesh/4e2b49c9d6588dedcff46aaa6f1a1cad/raw',
     'https://www.w3.org/2018/credentials/examples/v1',
   ],
   id: credId,
@@ -50,23 +48,6 @@ const unsignedCred = {
     alumniOf: 'Example University'
   }
 };
-
-/**
- * Test helper to get the issuer key doc
- * @param did
- * @param keypair
- * @param typ
- * @returns {{publicKeyBase58: *, controller: *, id: string, type: *, privateKeyBase58: (string|KeyObject|T2|Buffer|CryptoKey)}}
- */
-function getIssuerKeyDoc(did, keypair, typ) {
-  return {
-    id: `${did}#keys-1`,
-    controller: did,
-    type: typ,
-    privateKeyBase58: keypair.privateKey,
-    publicKeyBase58: keypair.publicKey
-  };
-}
 
 /**
  * Test helper to get the matching doc as per the cred
@@ -128,6 +109,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
     const pair2 = generateEcdsaSecp256k1Keypair(issuer2KeyPers, issuer2KeyEntropy);
     await registerNewDIDUsingPair(dock, issuer2DID, pair2);
 
+    // DID with sr25519 key
     const pair3 = dock.keyring.addFromUri(issuer3KeySeed, null, 'sr25519');
     await registerNewDIDUsingPair(dock, issuer3DID, pair3);
 
@@ -147,16 +129,15 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
 
 
   test('Issue a verifiable credential with ed25519 key and verify it', async () => {
-    const issuerKeyPair = await Ed25519KeyPair.generate({seed: hexToU8a(issuer1KeySeed)});
-    const issuerKey = getIssuerKeyDoc(issuer1DID, issuerKeyPair, 'Ed25519VerificationKey2018');
-    const credential = await issueCredential(issuerKey, unsignedCred);
+    const issuerKey = getKeyDoc(issuer1DID, await Ed25519KeyPair.generate({seed: hexToU8a(issuer1KeySeed)}), 'Ed25519VerificationKey2018');
+    const credential = await vc.issueCredential(issuerKey, unsignedCred);
     expect(credential).toMatchObject(
       expect.objectContaining(
         getCredMatcherDoc(unsignedCred, issuer1DID, issuerKey.id, 'Ed25519Signature2018')
       )
     );
 
-    const result = await verifyCredential(credential, resolver);
+    const result = await vc.verifyCredential(credential, resolver);
     expect(result).toMatchObject(
       expect.objectContaining(
         getProofMatcherDoc()
@@ -165,16 +146,15 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
   }, 40000);
 
   test('Issue a verifiable credential with secp256k1 key and verify it', async () => {
-    const issuerKeyPair = await Secp256k1KeyPair.generate({pers: issuer2KeyPers, entropy: issuer2KeyEntropy});
-    const issuerKey = getIssuerKeyDoc(issuer2DID, issuerKeyPair, 'EcdsaSecp256k1VerificationKey2019');
-    const credential = await issueCredential(issuerKey, unsignedCred);
+    const issuerKey = getKeyDoc(issuer2DID, await Secp256k1KeyPair.generate({pers: issuer2KeyPers, entropy: issuer2KeyEntropy}), 'EcdsaSecp256k1VerificationKey2019');
+    const credential = await vc.issueCredential(issuerKey, unsignedCred);
     console.log(credential);
     expect(credential).toMatchObject(
       expect.objectContaining(
         getCredMatcherDoc(unsignedCred, issuer2DID, issuerKey.id, 'EcdsaSecp256k1Signature2019')
       )
     );
-    const result = await verifyCredential(credential, resolver);
+    const result = await vc.verifyCredential(credential, resolver);
     expect(result).toMatchObject(
       expect.objectContaining(
         getProofMatcherDoc()
@@ -183,14 +163,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
   }, 40000);
 
   test('Issue a verifiable credential with sr25519 key and verify it', async () => {
-    const issuerKeyPair = dock.keyring.addFromUri(issuer3KeySeed, null, 'sr25519');
-    const issuerKey = {
-      id: `${issuer3DID}#keys-1`,
-      controller: issuer3DID,
-      type: 'Sr25519VerificationKey2020',
-      keypair: issuerKeyPair,
-      publicKey: getPublicKeyFromKeyringPair(issuerKeyPair)
-    };
+    const issuerKey = getKeyDoc(issuer3DID, dock.keyring.addFromUri(issuer3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
     const credential = await vc.issueCredential(issuerKey, unsignedCred, false);
 
     expect(credential).toMatchObject(

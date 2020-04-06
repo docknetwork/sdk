@@ -71,7 +71,7 @@ class DIDModule {
     // Determine the type of the public key
     let type, publicKeyRaw;
     if (detail.public_key.isSr25519) {
-      type = 'Sr25519VerificationKey2018';
+      type = 'Sr25519VerificationKey2020';
       publicKeyRaw = detail.public_key.asSr25519;
     } else if (detail.public_key.isEd25519) {
       type = 'Ed25519VerificationKey2018';

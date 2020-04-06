@@ -1,6 +1,13 @@
-import VerifiableCredentialModule, {VerifiableCredential} from '../src/modules/vc';
+import {
+  issueCredential,
+  verifyCredential,
+  createPresentation,
+  verifyPresentation,
+  signPresentation
+} from '../src/utils/vc';
+import VerifiableCredential from '../src/verifiable-credential';
 
-const vc = new VerifiableCredentialModule();
+//TODO: clean up these fixtures
 const sample_unsigned_cred = {
   '@context': [
     'https://www.w3.org/2018/credentials/v1',
@@ -90,7 +97,7 @@ const sample_presentation_proof = {
 
 describe('Verifiable Credential Issuing', () => {
   test('Issuing should return an object with a proof, and it must pass validation.', async () => {
-    const credential = await vc.issueCredential(sample_key, sample_unsigned_cred);
+    const credential = await issueCredential(sample_key, sample_unsigned_cred);
     expect(credential).toMatchObject(
       expect.objectContaining(
         {
@@ -115,7 +122,7 @@ describe('Verifiable Credential Issuing', () => {
         }
       )
     );
-    const result = await vc.verifyCredential(credential);
+    const result = await verifyCredential(credential);
     expect(result).toMatchObject(
       expect.objectContaining(
         {
@@ -134,7 +141,7 @@ describe('Verifiable Credential Issuing', () => {
 
 describe('Verifiable Credential Verification', () => {
   test('The sample signed credential should pass verification.', async () => {
-    const result = await vc.verifyCredential(sample_signed_cred);
+    const result = await verifyCredential(sample_signed_cred);
     expect(result).toMatchObject(
       expect.objectContaining(
         {
@@ -162,7 +169,7 @@ describe('Verifiable Presentation Creation', () => {
 
 
   test('A proper verifiable presentation should be created from two valid sample credentials.', async () => {
-    const presentation = vc.createPresentation(
+    const presentation = createPresentation(
       presentation_credentials,
       vp_id,
       vp_holder
@@ -171,7 +178,7 @@ describe('Verifiable Presentation Creation', () => {
   }, 30000);
 
   test('A verifiable presentation should contain a proof once signed, and it should pass verification.', async () => {
-    const signed_vp = await vc.signPresentation(
+    const signed_vp = await signPresentation(
       sample_unsigned_pres,
       sample_key,
       'some_challenge',
@@ -183,7 +190,7 @@ describe('Verifiable Presentation Creation', () => {
         ...sample_presentation_proof
       }
     );
-    const results = await vc.verifyPresentation(
+    const results = await verifyPresentation(
       signed_vp,
       'some_challenge',
       'some_domain'
@@ -228,7 +235,7 @@ describe('Verifiable Credential incremental creation', () => {
       'https://www.w3.org/2018/credentials/examples/v1'
     ]);
     expect(credential.type).toEqual(['VerifiableCredential']);
-    expect(credential.subject).toEqual({id: undefined});
+    expect(credential.subject).toEqual({id: null});
     expect(credential.issuanceDate).toEqual(expect.anything());
   });
 
@@ -245,7 +252,7 @@ describe('Verifiable Credential incremental creation', () => {
           'VerifiableCredential',
         ],
         'credentialSubject':{
-          'id': undefined
+          'id': null
         },
         'issuanceDate':expect.anything(),
       }

@@ -6,7 +6,6 @@ import {
   createNewDockDID
 } from '../../src/utils/did';
 
-import VerifiableCredentialModule from '../../src/modules/vc';
 import {DockAPI} from '../../src/api';
 import Resolver from '../../src/resolver';
 
@@ -15,7 +14,6 @@ import {registerNewDIDUsingPair} from './helpers';
 import {generateEcdsaSecp256k1Keypair} from '../../src/utils/misc';
 import Secp256k1KeyPair  from 'secp256k1-key-pair';
 
-const vc = new VerifiableCredentialModule();
 
 // 1st issuer's DID.
 const issuer1DID = createNewDockDID();

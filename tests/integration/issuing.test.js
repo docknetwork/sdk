@@ -23,12 +23,12 @@ const issuer1KeySeed = randomAsHex(32);
 
 // 2nd issuer's DID.
 const issuer2DID = createNewDockDID();
-// seed used for 2nd issuer keys
+// entropy used for 2nd issuer keys
 const issuer2KeyPers = 'issuer2';
 const issuer2KeyEntropy = randomAsHex(32);
 
 const issuer3DID = createNewDockDID();
-// seed used for 3nd issuer keys
+// seed used for 3rd issuer keys
 const issuer3KeySeed = randomAsHex(32);
 
 const holderDID = createNewDockDID();

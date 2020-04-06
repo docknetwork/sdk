@@ -23,10 +23,11 @@ export default function(resolver) {
       // Try to resolve a DID and throw if cannot resolve
       document = await resolver.resolve(uri);
     } else {
-      const context = testContext[uri];
+      const context = testContext.get(uri);
       if(context) {
         document = context;
       } else {
+        console.log('trying to fetch uri', uri);
         const {data: doc} = await axios.get(uri);
         document = doc;
       }

@@ -168,6 +168,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
     const issuerKeyPair = await Secp256k1KeyPair.generate({pers: issuer2KeyPers, entropy: issuer2KeyEntropy});
     const issuerKey = getIssuerKeyDoc(issuer2DID, issuerKeyPair, 'EcdsaSecp256k1VerificationKey2019');
     const credential = await issueCredential(issuerKey, unsignedCred);
+    console.log(credential);
     expect(credential).toMatchObject(
       expect.objectContaining(
         getCredMatcherDoc(unsignedCred, issuer2DID, issuerKey.id, 'EcdsaSecp256k1Signature2019')
@@ -190,27 +191,15 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
       keypair: issuerKeyPair,
       publicKey: getPublicKeyFromKeyringPair(issuerKeyPair)
     };
-    const credential = await vc.issueCredential(issuerKey, unsignedCred);
-    console.log(credential);
-
-    // XXX: Temporary fix.
-    // TODO: Add Sr25519Signature2020 to acceptable security contexts
-    expect(credential.proof.type).toBe('/Sr25519Signature2020');
-    credential.proof = {
-      type: 'Sr25519Signature2020',
-      created: credential.proof['dct:created']['@value'],
-      jws: credential.proof['https://w3id.org/security#jws'],
-      proofPurpose: 'assertionMethod',
-      verificationMethod: credential.proof['https://w3id.org/security#verificationMethod']['id']
-    };
+    const credential = await vc.issueCredential(issuerKey, unsignedCred, false);
 
     expect(credential).toMatchObject(
       expect.objectContaining(
         getCredMatcherDoc(unsignedCred, issuer3DID, issuerKey.id, 'Sr25519Signature2020')
       )
     );
-    const result = await vc.verifyCredential(credential, resolver);
-    console.log(result);
+    const result = await vc.verifyCredential(credential, resolver, false);
+
     expect(result).toMatchObject(
       expect.objectContaining(
         getProofMatcherDoc()

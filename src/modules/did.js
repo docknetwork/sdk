@@ -4,12 +4,6 @@ import b58 from 'bs58';
 import {getHexIdentifierFromDID, DockDIDQualifier} from '../utils/did';
 import {getStateChange} from '../utils/misc';
 
-const signatureHeaders = {
-  Sr25519VerificationKey2018: 'Sr25519SignatureAuthentication2018',
-  Ed25519VerificationKey2018: 'Ed25519SignatureAuthentication2018',
-  EcdsaSecp256k1VerificationKey2019: 'EcdsaSecp256k1SignatureAuthentication2019',
-};
-
 /** Class to create, update and destroy DIDs */
 class DIDModule {
   /**
@@ -98,13 +92,16 @@ class DIDModule {
 
     // Set keys and authentication reference
     const publicKeys = [publicKey];
-    const authentication = publicKeys.map(key => {
-      return {
-        type: signatureHeaders[key.type],
-        publicKey: [key.id]
-      };
-    });
 
+    // Set `proofPurpose`s. Check the DID spec for details on `proofPurpose`
+
+    // Set the `proofPurpose` authentication. As there is only one key, this will serve for authentication `proofPurpose`
+    const authentication = [publicKey.id];
+
+    // Set the `proofPurpose` assertionMethod
+    // Explicitly cloning the authentication object as there is only one key supported as of now.
+    // With multiple key support, the key creation will determine the proof purpose
+    const assertionMethod = [...authentication];
     // TODO: setup proper service when we have it
     // const service = [{
     //   id: `${id}#vcs`,
@@ -116,6 +113,7 @@ class DIDModule {
       '@context': 'https://www.w3.org/ns/did/v1',
       id,
       authentication,
+      assertionMethod,
       publicKey: publicKeys
       // service,
     };

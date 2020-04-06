@@ -2,7 +2,8 @@ import documentLoader from '../utils/vc/document-loader';
 import {issue, verifyCredential, createPresentation, signPresentation, verify} from 'vc-js';
 import {Ed25519KeyPair, suites} from 'jsonld-signatures';
 const {Ed25519Signature2018} = suites;
-import {EcdsaSepc256k1Signature2019, Secp256k1KeyPair} from '../utils/vc/temp-signatures';
+import Secp256k1KeyPair from 'secp256k1-key-pair';
+import {EcdsaSepc256k1Signature2019} from '../utils/vc/signatures';
 
 
 /** Class to sign and verify Verifiable Credentials */
@@ -26,29 +27,31 @@ class VerifiableCredentialModule {
   /**
    * Issue a Verifiable credential
    * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
-   * @param {object} credential - verifiable credential to be signed.
+   * @param {object} credential - Credential to be signed.
    * @return {object} The signed credential object.
    */
   async issueCredential(keyDoc, credential) {
     const suite = this.getSuiteFromKeyDoc(keyDoc);
-    credential.issuer = keyDoc.controller;
+    // The following code (including `issue` method) will modify the passed credential so clone it.
+    const cred = {...credential};
+    cred.issuer = keyDoc.controller;
     return await issue({
-      credential,
       suite,
-      documentLoader
+      credential: cred
     });
   }
 
   /**
    * Verify a Verifiable Credential
    * @param {object} credential - verifiable credential to be verified.
+   * @param {object} resolver - Resolver for DIDs.
    * @return {object} verification result.
    */
-  async verifyCredential(credential) {
+  async verifyCredential(credential, resolver) {
     return await verifyCredential({
       credential,
       suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019()],
-      documentLoader: documentLoader
+      documentLoader: documentLoader(resolver)
     });
   }
 
@@ -82,8 +85,7 @@ class VerifiableCredentialModule {
       presentation,
       suite,
       domain,
-      challenge,
-      documentLoader
+      challenge
     });
   }
 
@@ -92,16 +94,17 @@ class VerifiableCredentialModule {
    * @param {object} presentation - verifiable credential to be verified.
    * @param {string} challenge - proof challenge Required.
    * @param {string} domain - proof domain (optional)
+   * @param {object} resolver - Resolver to resolve the issuer DID (optional)
    * @return {object} verification result.
    */
-  async verifyPresentation(presentation, challenge, domain) {
+  async verifyPresentation(presentation, challenge, domain, resolver) {
     // TODO: support other purposes than the default of "authentication"
     return await verify({
       presentation,
       suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019()],
       challenge,
       domain,
-      documentLoader
+      documentLoader: documentLoader(resolver)
     });
   }
 

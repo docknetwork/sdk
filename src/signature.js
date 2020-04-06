@@ -2,8 +2,8 @@ import {u8aToHex} from '@polkadot/util';
 
 import {isHexWithGivenByteSize} from './utils/misc';
 
-/** Class representing a Signature. This class should always be extended (abstract class in some languages) */
-class Signature {
+/** Class representing a Signature. This export class should always be extended (abstract export class in some languages) */
+export class Signature {
   /**
    * Creates a new DidSignature object. Validates the given value. Currently supported signature
    * types only require validating the byte size.
@@ -35,15 +35,15 @@ class Signature {
     this.value = u8aToHex(signingPair.sign(message));
   }
   /**
-   * @return {Object} The correct DidSignature JSON variant. The extending class should implement it.
+   * @return {Object} The correct DidSignature JSON variant. The extending export class should implement it.
    */
   toJSON() {
-    throw new Error('Not implemented. The extending class should implement it');
+    throw new Error('Not implemented. The extending export class should implement it');
   }
 }
 
 /** Class representing a Sr25519 Signature */
-class SignatureSr25519 extends Signature {
+export class SignatureSr25519 extends Signature {
   /**
    * Generate a Sr25519 signature using Polkadot-js
    * @param {array} message - The message to sign as bytearray
@@ -73,7 +73,7 @@ class SignatureSr25519 extends Signature {
 }
 
 /** Class representing a Ed25519 Signature */
-class SignatureEd25519 extends Signature {
+export class SignatureEd25519 extends Signature {
   /**
    * Generate a Ed25519 signature using Polkadot-js
    * @param {array} message - The message to sign as bytearray
@@ -103,7 +103,7 @@ class SignatureEd25519 extends Signature {
 }
 
 /** Class representing a Secp256k1 Signature */
-class SignatureSecp256k1 extends Signature {
+export class SignatureSecp256k1 extends Signature {
   /**
    * Generate an Ecdsa signature over Secp256k1 curve using elliptic library
    * @param {array} message - The message to sign as bytearray
@@ -140,10 +140,3 @@ class SignatureSecp256k1 extends Signature {
     };
   }
 }
-
-export {
-  Signature,
-  SignatureSr25519,
-  SignatureEd25519,
-  SignatureSecp256k1
-};

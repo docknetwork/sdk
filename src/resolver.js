@@ -12,7 +12,7 @@ const EthrDIDMethod = 'ethr';
 const supportedDIDMethods = [DockDIDMethod, EthrDIDMethod];
 
 /** Class representing a DID Resolver which can resolve DID from various networks */
-class Resolver {
+export default class Resolver {
   /**
    * DID resolver class, currently supporting only Dock and Ethereum DID natively and optionally allows to pass URL for the
    * universal resolver.
@@ -93,7 +93,3 @@ class Resolver {
     }
   }
 }
-
-export {
-  Resolver
-};

@@ -175,8 +175,6 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
       )
     );
 
-    console.log(credential);
-
     const result = await vc.verifyCredential(credential, resolver, true);
 
     expect(result).toMatchObject(

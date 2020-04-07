@@ -3921,10 +3921,9 @@ jsonld-signatures@^4.4.0:
     security-context "^4.0.0"
     serialize-error "^4.1.0"
 
-jsonld-signatures@^5.0.0:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/jsonld-signatures/-/jsonld-signatures-5.0.1.tgz#0678f0fb06c31cab0f0fa2acd97b8f70f6abae04"
-  integrity sha512-O+cCcuGXj5HnzMZOAvZgTalkGHwYeAueuIPxA4nBVerpxQVwyAZkC6WCWzGV3TyCDTIypboh8y9VTkJdlMFdOg==
+"jsonld-signatures@https://github.com/docknetwork/jsonld-signatures#avoid-extendContextLoader":
+  version "5.0.2-0"
+  resolved "https://github.com/docknetwork/jsonld-signatures#416082535cac1f0a2a36bd0b665faca5fc479584"
   dependencies:
     base64url "^3.0.1"
     crypto-ld "^3.7.0"
@@ -5872,10 +5871,9 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
 
-vc-js@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/vc-js/-/vc-js-0.5.0.tgz#e14697a035d52782e85ced10793f621bf1f2dfde"
-  integrity sha512-ge66+guw0ezYdA7u71PjRuoKkHtt+u4dBmWT7HgIOeTHniHRtlobSeq2c+2YncYFyvDyVMLOCyiYhCiz3Augog==
+"vc-js@https://github.com/docknetwork/vc-js#avoid-extendContextLoader":
+  version "0.5.1-0"
+  resolved "https://github.com/docknetwork/vc-js#98ad8eac68bbc58ad26584dc8aae2ce710fcf320"
   dependencies:
     commander "^2.20.3"
     credentials-context "^1.0.0"
@@ -5883,7 +5881,7 @@ vc-js@^0.5.0:
     fs-extra "^8.1.0"
     get-stdin "^7.0.0"
     jsonld "^2.0.2"
-    jsonld-signatures "^5.0.0"
+    jsonld-signatures "https://github.com/docknetwork/jsonld-signatures#avoid-extendContextLoader"
     supports-color "^7.1.0"
 
 verror@1.10.0:

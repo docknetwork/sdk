@@ -1,14 +1,10 @@
 import {encodeAddress} from '@polkadot/util-crypto';
-import {NoDID} from '../err.js';
+import {NoDID} from '../err.js'; // TODO: cleanup this
+import b58 from 'bs58';
+
 import {getHexIdentifierFromDID, DockDIDQualifier} from '../utils/did';
 import {getStateChange} from '../utils/misc';
 import {validateDockDIDHexIdentifier} from '../utils/did';
-
-const signatureHeaders = {
-  Sr25519VerificationKey2018: 'Sr25519SignatureAuthentication2018',
-  Ed25519VerificationKey2018: 'Ed25519SignatureAuthentication2018',
-  EcdsaSecp256k1VerificationKey2019: 'EcdsaSecp256k1SignatureAuthentication2019',
-};
 
 /** Class to create, update and destroy DIDs */
 class DIDModule {
@@ -85,36 +81,39 @@ class DIDModule {
     const id = (did === hexId) ? this.getFullyQualifiedDID(encodeAddress(hexId)) : did;
 
     // Determine the type of the public key
-    let type, publicKeyBase58;
+    let type, publicKeyRaw;
     if (detail.public_key.isSr25519) {
       type = 'Sr25519VerificationKey2018';
-      publicKeyBase58 = detail.public_key.asSr25519;
+      publicKeyRaw = detail.public_key.asSr25519;
     } else if (detail.public_key.isEd25519) {
       type = 'Ed25519VerificationKey2018';
-      publicKeyBase58 = detail.public_key.asEd25519;
+      publicKeyRaw = detail.public_key.asEd25519;
     } else {
       type = 'EcdsaSecp256k1VerificationKey2019';
-      publicKeyBase58 = detail.public_key.asSecp256K1;
+      publicKeyRaw = detail.public_key.asSecp256K1;
     }
 
     // The DID has only one key as of now.
     const publicKey = {
       id: `${id}#keys-1`,
       type,
-      controller: `${DockDIDQualifier}${detail.controller}`,
-      publicKeyBase58,
+      controller: this.getFullyQualifiedDID(encodeAddress(detail.controller)),
+      publicKeyBase58: b58.encode(publicKeyRaw.value),
       // publicKeyPem: '-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n', // TODO: add proper value
     };
 
     // Set keys and authentication reference
     const publicKeys = [publicKey];
-    const authentication = publicKeys.map(key => {
-      return {
-        type: signatureHeaders[key.type],
-        publicKey: [key.id]
-      };
-    });
 
+    // Set `proofPurpose`s. Check the DID spec for details on `proofPurpose`
+
+    // Set the `proofPurpose` authentication. As there is only one key, this will serve for authentication `proofPurpose`
+    const authentication = [publicKey.id];
+
+    // Set the `proofPurpose` assertionMethod
+    // Explicitly cloning the authentication object as there is only one key supported as of now.
+    // With multiple key support, the key creation will determine the proof purpose
+    const assertionMethod = [...authentication];
     // TODO: setup proper service when we have it
     // const service = [{
     //   id: `${id}#vcs`,
@@ -126,6 +125,7 @@ class DIDModule {
       '@context': 'https://www.w3.org/ns/did/v1',
       id,
       authentication,
+      assertionMethod,
       publicKey: publicKeys
       // service,
     };

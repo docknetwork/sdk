@@ -44,12 +44,13 @@ export function getStateChange(api, name, value) {
 }
 
 /**
- * Generate keypair for Ecdsa over Secp256k1
- * @param {array} seed - A byte array
+ * Generate keypair for Ecdsa over Secp256k1. Explicitly denying other options to keep the API simple
+ * @param {string} pers - A string
+ * @param {array} entropy - A byte array or hex string
  * @returns {Keypair} A keypair
  */
-export function generateEcdsaSecp256k1Keypair(seed) {
-  return secp256k1Curve.genKeyPair({entropy: seed});
+export function generateEcdsaSecp256k1Keypair(pers, entropy) {
+  return secp256k1Curve.genKeyPair({pers, entropy});
 }
 
 /**

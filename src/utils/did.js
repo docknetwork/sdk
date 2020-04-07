@@ -6,16 +6,16 @@ import {randomAsHex, encodeAddress, decodeAddress} from '@polkadot/util-crypto';
 
 import {isHexWithGivenByteSize, getSignatureFromKeyringPair} from './misc';
 
-const DockDIDMethod = 'dock';
-const DockDIDQualifier = `did:${DockDIDMethod}:`;
-const DockDIDByteSize = 32;
+export const DockDIDMethod = 'dock';
+export const DockDIDQualifier = `did:${DockDIDMethod}:`;
+export const DockDIDByteSize = 32;
 
 /**
  * Check if the given identifier is 32 byte hex
  * @param {identifier} identifier - The identifier to check.
  * @return {null} Throws exception if invalid identifier
  */
-function validateDockDIDHexIdentifier(identifier) {
+export function validateDockDIDHexIdentifier(identifier) {
   // Byte size of the Dock DID identifier, i.e. the `DockDIDQualifier` is not counted.
   if (!isHexWithGivenByteSize(identifier, DockDIDByteSize)) {
     throw new Error(`DID identifier must be ${DockDIDByteSize} bytes`);
@@ -27,7 +27,7 @@ function validateDockDIDHexIdentifier(identifier) {
  * @param {identifier} identifier - The identifier to check.
  * @return {null} Throws exception if invalid identifier
  */
-function validateDockDIDSS58Identifier(identifier) {
+export function validateDockDIDSS58Identifier(identifier) {
   // base58-check regex
   const regex = new RegExp(/^[5KL][1-9A-HJ-NP-Za-km-z]{47}$/);
   const matches = regex.exec(identifier);
@@ -42,7 +42,7 @@ function validateDockDIDSS58Identifier(identifier) {
  * a 32 byte hex string
  * @return {string} Returns the hexadecimal representation of the DID.
  */
-function getHexIdentifierFromDID(did) {
+export function getHexIdentifierFromDID(did) {
   if (did.startsWith(DockDIDQualifier)) {
     // Fully qualified DID. Remove the qualifier
     const ss58Did = did.slice(DockDIDQualifier.length);
@@ -73,7 +73,7 @@ function getHexIdentifierFromDID(did) {
  * Create and return a fully qualified Dock DID, i.e. "did:dock:<SS58 string>"
  * @returns {string} - The DID
  */
-function createNewDockDID() {
+export function createNewDockDID() {
   const hexId = randomAsHex(DockDIDByteSize);
   const ss58Id = encodeAddress(hexId);
   return `${DockDIDQualifier}${ss58Id}`;
@@ -86,7 +86,7 @@ function createNewDockDID() {
  * @param {string} controller - Full DID or hex identifier of the controller of the public key
  * @returns {object} - The object has structure and keys with same names as expected by the Substrate node
  */
-function createKeyDetail(publicKey, controller) {
+export function createKeyDetail(publicKey, controller) {
   return {
     public_key: publicKey.toJSON(),
     controller: getHexIdentifierFromDID(controller)
@@ -103,7 +103,7 @@ function createKeyDetail(publicKey, controller) {
  * only be passed when controller is to be updated.
  * @returns {object} The object has structure and keys with same names as expected by the Substrate node
  */
-async function createKeyUpdate(didModule, did, newPublicKey, newController) {
+export async function createKeyUpdate(didModule, did, newPublicKey, newController) {
   const hexId = getHexIdentifierFromDID(did);
   const last_modified_in_block = await didModule.getBlockNoForLastChangeToDID(hexId);
 
@@ -121,7 +121,7 @@ async function createKeyUpdate(didModule, did, newPublicKey, newController) {
  * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * @returns {Signature}
  */
-function signKeyUpdate(didModule, keyUpdate, currentKeyPair) {
+export function signKeyUpdate(didModule, keyUpdate, currentKeyPair) {
   const serializedKeyUpdate = didModule.getSerializedKeyUpdate(keyUpdate);
   return getSignatureFromKeyringPair(currentKeyPair, serializedKeyUpdate);
 }
@@ -136,7 +136,7 @@ function signKeyUpdate(didModule, keyUpdate, currentKeyPair) {
  * only be passed when controller is to be updated
  * @returns {array} A 2 element array where the first element is the `KeyUpdate` and the second is the signature
  */
-async function createSignedKeyUpdate(didModule, did, newPublicKey, currentKeyPair, newController) {
+export async function createSignedKeyUpdate(didModule, did, newPublicKey, currentKeyPair, newController) {
   const keyUpdate = await createKeyUpdate(didModule, did, newPublicKey, newController);
   const signature = signKeyUpdate(didModule, keyUpdate, currentKeyPair);
   return [keyUpdate, signature];
@@ -149,7 +149,7 @@ async function createSignedKeyUpdate(didModule, did, newPublicKey, currentKeyPai
  * @param {string} did - Full DID or hex identifier to update
  * @returns {object} The object has structure and keys with same names as expected by the Substrate node
  */
-async function createDidRemoval(didModule, did) {
+export async function createDidRemoval(didModule, did) {
   const hexId = getHexIdentifierFromDID(did);
   const last_modified_in_block = await didModule.getBlockNoForLastChangeToDID(hexId);
 
@@ -166,7 +166,7 @@ async function createDidRemoval(didModule, did) {
  * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * @returns {Signature}
  */
-function signDidRemoval(didModule, didRemoval, currentKeyPair) {
+export function signDidRemoval(didModule, didRemoval, currentKeyPair) {
   const serializedDIDRemoval = didModule.getSerializedDIDRemoval(didRemoval);
   return getSignatureFromKeyringPair(currentKeyPair, serializedDIDRemoval);
 }
@@ -178,24 +178,8 @@ function signDidRemoval(didModule, didRemoval, currentKeyPair) {
  * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * @returns {array} A 2 element array where the first element is the `DidRemoval` and the second is the signature
  */
-async function createSignedDidRemoval(didModule, did, currentKeyPair) {
+export async function createSignedDidRemoval(didModule, did, currentKeyPair) {
   const didRemoval = await createDidRemoval(didModule, did);
   const signature = signDidRemoval(didModule, didRemoval, currentKeyPair);
   return [didRemoval, signature];
 }
-
-export {
-  validateDockDIDHexIdentifier,
-  validateDockDIDSS58Identifier,
-  getHexIdentifierFromDID,
-  DockDIDMethod,
-  DockDIDQualifier,
-  createNewDockDID,
-  createKeyDetail,
-  createKeyUpdate,
-  signKeyUpdate,
-  createSignedKeyUpdate,
-  createDidRemoval,
-  signDidRemoval,
-  createSignedDidRemoval
-};

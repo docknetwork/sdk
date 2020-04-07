@@ -1,18 +1,8 @@
-class RevokeRegistry {
-  constructor(policy, addOnly = false) {
-    this.policy = policy;
-    this.addOnly = addOnly;
-  }
+import {
+  getSignatureFromKeyringPair
+} from './misc';
 
-  toJSON() {
-    return {
-      policy: this.policy.toJSON(),
-      add_only: this.addOnly,
-    };
-  }
-}
-
-class RevokePolicy {
+export class OneOfPolicy {
   constructor(controllers) {
     this.controllers = controllers;
   }
@@ -24,7 +14,35 @@ class RevokePolicy {
   }
 }
 
-export {
-  RevokeRegistry,
-  RevokePolicy,
-};
+export class DidKeys {
+  constructor(map) {
+    this.map = map || new Map();
+  }
+
+  set(key, value) {
+    this.map.set(key, value);
+  }
+
+  toMap() {
+    return this.map;
+  }
+
+  getSignatures() {
+    throw new Error('getSignatures method must be implemented in child class!');
+  }
+}
+
+export class KeyringPairDidKeys extends DidKeys {
+  constructor(map) {
+    super(map);
+  }
+
+  getSignatures(message) {
+    const signedProofs = new Map();
+    this.map.forEach((pair, did) => {
+      const sig = getSignatureFromKeyringPair(pair, message);
+      signedProofs.set(did, sig.toJSON());
+    });
+    return signedProofs;
+  }
+}

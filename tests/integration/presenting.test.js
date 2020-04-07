@@ -10,9 +10,10 @@ import {DockAPI} from '../../src/api';
 import Resolver from '../../src/resolver';
 
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
-import {getKeyDoc, registerNewDIDUsingPair} from './helpers';
+import {registerNewDIDUsingPair} from './helpers';
 import {generateEcdsaSecp256k1Keypair} from '../../src/utils/misc';
 import Secp256k1KeyPair from 'secp256k1-key-pair';
+import {getKeyDoc} from '../../src/utils/vc/helpers';
 
 // Issuer's DID.
 const issuerDID = createNewDockDID();
@@ -133,7 +134,6 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
         presId
       );
 
-      console.log('presentation is', presentation);
       expect(presentation).toMatchObject(
         expect.objectContaining(
           {
@@ -153,7 +153,6 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
         //sigType !== 'Sr25519Signature2020'
       );
 
-      console.log('signedPres is', signedPres);
       expect(signedPres).toMatchObject(
         expect.objectContaining(
           {
@@ -182,6 +181,75 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       expect(result.presentationResult.verified).toBe(true);
       expect(result.credentialResults.length).toBe(1);
       expect(result.credentialResults[0].verified).toBe(true);
+
     }
-  }, 40000);
+  }, 70000);
+
+  test('Holder creates a verifiable presentation with 2 credentials and verifier verifies it', async () => {
+    const holder3Key = getKeyDoc(holder3DID, dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
+
+    const res = await vc.isVerifiedCredential(cred3, resolver);
+    expect(res).toBe(true);
+    const res1 = await vc.isVerifiedCredential(cred4, resolver);
+    expect(res1).toBe(true);
+
+    const presId = randomAsHex(32);
+    const chal = randomAsHex(32);
+    const domain = 'test domain';
+
+    const presentation = vc.createPresentation(
+      [cred3, cred4],
+      presId
+    );
+
+    expect(presentation).toMatchObject(
+      expect.objectContaining(
+        {
+          type: [ 'VerifiablePresentation' ],
+          verifiableCredential: [cred3, cred4],
+          id: presId,
+        }
+      )
+    );
+
+    const signedPres = await vc.signPresentation(
+      presentation,
+      holder3Key,
+      chal,
+      domain,
+      resolver,
+    );
+
+    expect(signedPres).toMatchObject(
+      expect.objectContaining(
+        {
+          type: [ 'VerifiablePresentation' ],
+          verifiableCredential: [cred3, cred4],
+          id: presId,
+          proof: expect.objectContaining({
+            type: 'Sr25519Signature2020',
+            challenge: chal,
+            domain: domain,
+            proofPurpose: 'authentication',
+          })
+        }
+      )
+    );
+
+    const result = await verifyPresentation(
+      signedPres,
+      chal,
+      domain,
+      resolver,
+    );
+
+    // Verifier checks that both credential and presentation are correct.
+    expect(result.verified).toBe(true);
+    expect(result.presentationResult.verified).toBe(true);
+    expect(result.credentialResults.length).toBe(2);
+    expect(result.credentialResults[0].verified).toBe(true);
+    expect(result.credentialResults[1].verified).toBe(true);
+
+  }, 60000);
+
 });

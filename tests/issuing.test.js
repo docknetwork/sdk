@@ -230,12 +230,8 @@ describe('Verifiable Credential incremental creation', () => {
   test('VC creation with only id should be possible, yet bring default values', async () => {
     let credential = new VerifiableCredential('blabla');
     expect(credential.id).toBe('blabla');
-    expect(credential.context).toEqual([
-      'https://www.w3.org/2018/credentials/v1',
-      'https://www.w3.org/2018/credentials/examples/v1'
-    ]);
+    expect(credential.context).toEqual(['https://www.w3.org/2018/credentials/v1']);
     expect(credential.type).toEqual(['VerifiableCredential']);
-    expect(credential.subject).toEqual({id: null});
     expect(credential.issuanceDate).toEqual(expect.anything());
   });
 
@@ -243,54 +239,31 @@ describe('Verifiable Credential incremental creation', () => {
     let credential = new VerifiableCredential('blabla');
     expect(credential.toJSON()).toEqual(
       {
-        '@context':[
-          'https://www.w3.org/2018/credentials/v1',
-          'https://www.w3.org/2018/credentials/examples/v1',
-        ],
+        '@context':['https://www.w3.org/2018/credentials/v1'],
         'id':'blabla',
-        'type':[
-          'VerifiableCredential',
-        ],
-        'credentialSubject':{
-          'id': null
-        },
+        'credentialSubject':[],
+        'type':['VerifiableCredential',],
         'issuanceDate':expect.anything(),
       }
     );
-  });
-
-  test('VC creation with all fields in options should be possible', async () => {
-    const options = {
-      context: ['context_1, context_2'],
-      type: ['type_1, type_2'],
-      subject: {id: 'some_id', alumniOf:'some_teacher'},
-      issuanceDate: '2020-03-18T19:23:24Z',
-    };
-    let credential = new VerifiableCredential('blabla', options);
-    expect(credential.id).toBe('blabla');
-    expect(credential.context).toEqual(options.context);
-    expect(credential.type).toEqual(options.type);
-    expect(credential.subject).toEqual(options.subject);
-    expect(credential.issuanceDate).toEqual(options.issuanceDate);
   });
 
   test('Incremental VC creation should be possible', async () => {
     let credential = new VerifiableCredential('blabla');
     expect(credential.id).toBe('blabla');
 
-    credential.addContext('some_context');
+    credential.addContext('https://www.w3.org/2018/credentials/examples/v1');
     expect(credential.context).toEqual([
       'https://www.w3.org/2018/credentials/v1',
-      'https://www.w3.org/2018/credentials/examples/v1',
-      'some_context'
+      'https://www.w3.org/2018/credentials/examples/v1'
     ]);
     credential.addType('some_type');
     expect(credential.type).toEqual([
       'VerifiableCredential',
       'some_type'
     ]);
-    credential.setSubject({id: 'some_subject_id'});
-    expect(credential.subject).toEqual({id: 'some_subject_id'});
+    credential.addSubject({id: 'some_subject_id'});
+    expect(credential.subject).toEqual([{id: 'some_subject_id'}]);
     credential.setStatus({id: 'some_status_id', type: 'CredentialStatusList2017'});
     expect(credential.status).toEqual({id: 'some_status_id', type: 'CredentialStatusList2017'});
     credential.setIssuanceDate('2020-03-18T19:23:24Z');
@@ -309,17 +282,12 @@ describe('Verifiable Credential incremental creation', () => {
       credential.addContext(123);
     }).toThrowError('needs to be a string.');
 
-    let credWithWrongContext = new VerifiableCredential('blabla', {context: ['something']});
-    expect(() => {
-      credWithWrongContext.addContext('something_else');
-    }).toThrowError('needs to be first in the list of contexts.');
-
     expect(() => {
       credential.addType(123);
     }).toThrowError('needs to be a string.');
 
     expect(() => {
-      credential.setSubject({some: 'value'});
+      credential.addSubject({some: 'value'});
     }).toThrowError('"credentialSubject" must include an id.');
 
     expect(() => {
@@ -345,10 +313,6 @@ describe('Verifiable Credential incremental creation', () => {
     let unsigned_credential = new VerifiableCredential(
       'https://example.com/credentials/1872',
       {
-        context: [
-          'https://www.w3.org/2018/credentials/v1',
-          'https://www.w3.org/2018/credentials/examples/v1'
-        ],
         type: ['VerifiableCredential', 'AlumniCredential'],
         issuanceDate: '2020-03-18T19:23:24Z',
         subject: {
@@ -357,6 +321,7 @@ describe('Verifiable Credential incremental creation', () => {
         }
       }
     );
+    unsigned_credential.addContext('https://www.w3.org/2018/credentials/examples/v1');
     const signed_credential = await unsigned_credential.sign(sample_key);
     expect(signed_credential).toMatchObject(
       expect.objectContaining({

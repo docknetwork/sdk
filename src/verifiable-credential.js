@@ -6,12 +6,10 @@ import {
 } from './utils/vc';
 import vcjs from 'vc-js';
 
-const DEFAULT_CONTEXTS = [
-  'https://www.w3.org/2018/credentials/v1',
-  'https://www.w3.org/2018/credentials/examples/v1'
+const DEFAULT_CONTEXT = [
+  'https://www.w3.org/2018/credentials/v1'
 ];
 const DEFAULT_TYPE = ['VerifiableCredential'];
-const DEFAULT_SUBJECT = {id: null};
 
 /**
  * Representation of a Verifiable Credential.
@@ -20,47 +18,31 @@ class VerifiableCredential {
   /**
    * Create a new Verifiable Credential instance.
    * @param {string} id - id of the credential
-   * @param {array} context - context of the credential
-   * @param {array} type - type of the credential
-   * @param {object} subject - subject of the credential
-   * @param {string} issuanceDate - issuanceDate of the credential
-   * @param {string} expirationDate - expirationDate of the credential
    */
-  constructor(
-    id,
-    {
-      context = DEFAULT_CONTEXTS,
-      type = DEFAULT_TYPE,
-      subject = DEFAULT_SUBJECT,
-      issuanceDate = new Date().toISOString(),
-    } = {}
-  ) {
+  constructor(id) {
     this.ensureString(id);
     this.id = id;
-    this.context = context;
-    this.type = type;
-    this.subject = subject;
-    this.issuanceDate = issuanceDate;
+
+    this.context = DEFAULT_CONTEXT;
+    this.type = DEFAULT_TYPE;
+    this.subject = [];
+    this.setIssuanceDate(new Date().toISOString());
   }
 
   /**
    * Add a context to this Credential's context array
-   * @param {str} context - Array of contexts for the credential
+   * @param {str} context - Context to add to the credential context array
    * @returns {VerifiableCredential}
    */
   addContext(context) {
-    this.ensureString(context);
+    this.ensureUrl(context);
     this.context.push(context);
-
-    if(this.context[0] !== DEFAULT_CONTEXTS[0]) {
-      throw new Error(`${DEFAULT_CONTEXTS[0]} needs to be first in the list of contexts.`);
-    }
     return this;
   }
 
   /**
    * Add a type to this Credential's type array
-   * @param {str} type - Array of types for the credential
+   * @param {str} type - Type to add to the credential type array
    * @returns {VerifiableCredential}
    */
   addType(type) {
@@ -70,16 +52,13 @@ class VerifiableCredential {
   }
 
   /**
-   * Set a subject for this Credential
+   * Add a subject to this Credential
    * @param {object} subject -  Subject of the credential
    * @returns {VerifiableCredential}
    */
-  setSubject(subject) {
-    this.ensureObject(subject);
-    if(!subject.id){
-      throw new Error('"credentialSubject" must include an id.');
-    }
-    this.subject = subject;
+  addSubject(subject) {
+    this.ensureObjectWithId(subject, 'credentialSubject');
+    this.subject.push(subject);
     return this;
   }
 
@@ -89,10 +68,7 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   setStatus(status) {
-    this.ensureObject(status);
-    if(!status.id){
-      throw new Error('"credentialStatus" must include an id.');
-    }
+    this.ensureObjectWithId(status, 'credentialStatus');
     if(!status.type){
       throw new Error('"credentialStatus" must include a type.');
     }
@@ -144,16 +120,37 @@ class VerifiableCredential {
   }
 
   /**
+   * Fail if the given value isn't an object
+   * @param value
+   */
+  ensureObjectWithId(value, name){
+    this.ensureObject(value);
+    if(!value.id){
+      throw new Error(`"${name}" must include an id.`);
+    }
+  }
+
+  /**
    * Fail if the given datetime isn't valid.
    * @param datetime
    */
   ensureValidDatetime(datetime){
     if(!vcjs.dateRegex.test(datetime)) {
-      throw new Error(
-        `${datetime} needs to be a valid datetime.`);
+      throw new Error(`${datetime} needs to be a valid datetime.`);
     }
   }
-
+  ensureUrl(url) {
+    this.ensureString(url);
+    var pattern = new RegExp('^(https?:\\/\\/)?'+
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+
+      '((\\d{1,3}\\.){3}\\d{1,3}))'+
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+
+      '(\\?[;&a-z\\d%_.~+=-]*)?'+
+      '(\\#[-a-z\\d_]*)?$','i');
+    if (!pattern.test(url)){
+      throw new Error(`${url} needs to be a valid URL.`);
+    }
+  }
   /**
    * Define the JSON representation of a Verifiable Credential.
    * @returns {any}

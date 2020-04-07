@@ -56,6 +56,6 @@
     "elliptic": "^6.5.2",
     "ethr-did-resolver": "^2.2.0",
     "secp256k1-key-pair": "https://github.com/SamHellawell/secp256k1-key-pair",
-    "vc-js": "^0.5.0"
+    "vc-js": "https://github.com/docknetwork/vc-js#avoid-extendContextLoader"
   }
 }

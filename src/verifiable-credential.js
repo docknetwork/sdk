@@ -1,4 +1,10 @@
-import {ensureObject, ensureString, ensureValidDatetime, issueCredential, verifyCredential} from './utils/vc';
+import {
+  isObject,
+  isString,
+  issueCredential,
+  verifyCredential
+} from './utils/vc';
+import vcjs from 'vc-js';
 
 const DEFAULT_CONTEXTS = [
   'https://www.w3.org/2018/credentials/v1',
@@ -29,7 +35,7 @@ class VerifiableCredential {
       issuanceDate = new Date().toISOString(),
     } = {}
   ) {
-    ensureString(id);
+    this.ensureString(id);
     this.id = id;
     this.context = context;
     this.type = type;
@@ -43,7 +49,7 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   addContext(context) {
-    ensureString(context);
+    this.ensureString(context);
     this.context.push(context);
 
     if(this.context[0] !== DEFAULT_CONTEXTS[0]) {
@@ -58,7 +64,7 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   addType(type) {
-    ensureString(type);
+    this.ensureString(type);
     this.type.push(type);
     return this;
   }
@@ -69,7 +75,7 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   setSubject(subject) {
-    ensureObject(subject);
+    this.ensureObject(subject);
     if(!subject.id){
       throw new Error('"credentialSubject" must include an id.');
     }
@@ -83,7 +89,7 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   setStatus(status) {
-    ensureObject(status);
+    this.ensureObject(status);
     if(!status.id){
       throw new Error('"credentialStatus" must include an id.');
     }
@@ -100,7 +106,7 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   setIssuanceDate(issuanceDate) {
-    ensureValidDatetime(issuanceDate);
+    this.ensureValidDatetime(issuanceDate);
     this.issuanceDate = issuanceDate;
     return this;
   }
@@ -111,9 +117,41 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   setExpirationDate(expirationDate) {
-    ensureValidDatetime(expirationDate);
+    this.ensureValidDatetime(expirationDate);
     this.expirationDate = expirationDate;
     return this;
+  }
+
+
+  /**
+   * Fail if the given value isn't a string
+   * @param value
+   */
+  ensureString(value){
+    if (!isString(value)){
+      throw new Error(`${value} needs to be a string.`);
+    }
+  }
+
+  /**
+   * Fail if the given value isn't an object
+   * @param value
+   */
+  ensureObject(value){
+    if (!isObject(value)){
+      throw new Error(`${value} needs to be an object.`);
+    }
+  }
+
+  /**
+   * Fail if the given datetime isn't valid.
+   * @param datetime
+   */
+  ensureValidDatetime(datetime){
+    if(!vcjs.dateRegex.test(datetime)) {
+      throw new Error(
+        `${datetime} needs to be a valid datetime.`);
+    }
   }
 
   /**
@@ -149,7 +187,7 @@ class VerifiableCredential {
    * @returns {Promise<{object}>}
    */
   async verify() {
-    if (! this.proof) {
+    if (!this.proof) {
       throw new Error('The current VC has no proof.');
     }
     return await verifyCredential(this.toJSON());

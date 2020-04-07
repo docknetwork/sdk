@@ -10,10 +10,11 @@ import {DockAPI} from '../../src/api';
 import Resolver from '../../src/resolver';
 
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
-import {getKeyDoc, registerNewDIDUsingPair} from './helpers';
+import {registerNewDIDUsingPair} from './helpers';
 import {generateEcdsaSecp256k1Keypair} from '../../src/utils/misc';
 import Secp256k1KeyPair  from 'secp256k1-key-pair';
 import {issueCredential, verifyCredential} from '../../src/utils/vc';
+import {getKeyDoc} from '../../src/utils/vc/helpers';
 
 
 // 1st issuer's DID.

@@ -4,7 +4,8 @@
 import {u8aToHex} from '@polkadot/util';
 import {randomAsHex, encodeAddress, decodeAddress} from '@polkadot/util-crypto';
 
-import {isHexWithGivenByteSize, getSignatureFromKeyringPair} from './misc';
+import {getSignatureFromKeyringPair} from './misc';
+import {isHexWithGivenByteSize} from './codec';
 
 export const DockDIDMethod = 'dock';
 export const DockDIDQualifier = `did:${DockDIDMethod}:`;

@@ -10,7 +10,7 @@ import {DockAPI} from '../../src/api';
 import Resolver from '../../src/resolver';
 
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
-import {registerNewDIDUsingPair} from './helpers';
+import {getUnsignedCred, registerNewDIDUsingPair} from './helpers';
 import {generateEcdsaSecp256k1Keypair} from '../../src/utils/misc';
 import Secp256k1KeyPair  from 'secp256k1-key-pair';
 import {issueCredential, verifyCredential} from '../../src/utils/vc';
@@ -36,22 +36,7 @@ const holderDID = createNewDockDID();
 
 const credId = randomAsHex(32);
 
-const unsignedCred = {
-  '@context': [
-    'https://www.w3.org/2018/credentials/v1',
-    'https://www.w3.org/2018/credentials/examples/v1',
-    // Following URL is for Sr25519 Signature and verification key. This is not a real URL but resolves to a context
-    // because of the mapping defined in `contexts.js`
-    //'https://www.dock.io/2020/credentials/context/sr25519',
-  ],
-  id: credId,
-  type: ['VerifiableCredential', 'AlumniCredential'],
-  issuanceDate: '2020-03-18T19:23:24Z',
-  credentialSubject: {
-    id: holderDID,
-    alumniOf: 'Example University'
-  }
-};
+const unsignedCred = getUnsignedCred(credId, holderDID);
 
 /**
  * Test helper to get the matching doc as per the cred

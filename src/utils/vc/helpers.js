@@ -1,6 +1,8 @@
 import {getPublicKeyFromKeyringPair} from '../misc';
 
-/**
+/** TODO: A better approach is to declare objects for each key and sig type in custom_crypto.js and avoid passing
+ * private keys since its better not to avoid dealing with private keys and they might not be always available. However,
+ * to save time now, its avoided.
  * Helper to get the key doc in a format needed for vc.js.
  * @param {string} did - DID in fully qualified form
  * @param {object} keypair - Either the keypair is part of the key doc or if the keys are extractable, they are extracted

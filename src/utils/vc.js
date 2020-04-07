@@ -111,4 +111,51 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
 }
 
 
+/**
+ * Return true if the given value is a string.
+ * @param value
+ * @returns {boolean}
+ */
+export function isString(value) {
+  return typeof value === 'string' || value instanceof String;
+}
 
+/**
+ * Return true if a value is an object
+ * @param value
+ * @returns {boolean}
+ */
+export function isObject(value) {
+  return value && typeof value === 'object' && value.constructor === Object;
+}
+
+/**
+ * Fail if the given value isn't a string
+ * @param value
+ */
+export function ensureString(value){
+  if (! isString(value)){
+    throw new Error(`${value} needs to be a string.`);
+  }
+}
+
+/**
+ * Fail if the given value isn't an object
+ * @param value
+ */
+export function ensureObject(value){
+  if (! isObject(value)){
+    throw new Error(`${value} needs to be an object.`);
+  }
+}
+
+/**
+ * Fail if the given datetime isn't valid.
+ * @param datetime
+ */
+export function ensureValidDatetime(datetime){
+  if(! vcjs.dateRegex.test(datetime)) {
+    throw new Error(
+      `${datetime} needs to be a valid datetime.`);
+  }
+}

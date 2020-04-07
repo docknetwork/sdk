@@ -1,4 +1,4 @@
-import {issueCredential, verifyCredential} from './utils/vc';
+import {ensureObject, ensureString, ensureValidDatetime, issueCredential, verifyCredential} from './utils/vc';
 
 const DEFAULT_CONTEXTS = [
   'https://www.w3.org/2018/credentials/v1',
@@ -29,30 +29,36 @@ class VerifiableCredential {
       issuanceDate = new Date().toISOString(),
     } = {}
   ) {
+    ensureString(id);
     this.id = id;
     this.context = context;
     this.type = type;
     this.subject = subject;
     this.issuanceDate = issuanceDate;
-
   }
 
   /**
    * Add a context to this Credential's context array
-   * @param {array} context - Array of contexts for the credential
+   * @param {str} context - Array of contexts for the credential
    * @returns {VerifiableCredential}
    */
   addContext(context) {
+    ensureString(context);
     this.context.push(context);
+
+    if(this.context[0] !== DEFAULT_CONTEXTS[0]) {
+      throw new Error(`${DEFAULT_CONTEXTS[0]} needs to be first in the list of contexts.`);
+    }
     return this;
   }
 
   /**
    * Add a type to this Credential's type array
-   * @param {array} type - Array of types for the credential
+   * @param {str} type - Array of types for the credential
    * @returns {VerifiableCredential}
    */
   addType(type) {
+    ensureString(type);
     this.type.push(type);
     return this;
   }
@@ -63,7 +69,28 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   setSubject(subject) {
+    ensureObject(subject);
+    if(!subject.id){
+      throw new Error('"credentialSubject" must include an id.');
+    }
     this.subject = subject;
+    return this;
+  }
+
+  /**
+   * Set a status for this Credential
+   * @param {object} status -  Status of the credential
+   * @returns {VerifiableCredential}
+   */
+  setStatus(status) {
+    ensureObject(status);
+    if(!status.id){
+      throw new Error('"credentialStatus" must include an id.');
+    }
+    if(!status.type){
+      throw new Error('"credentialStatus" must include a type.');
+    }
+    this.status = status;
     return this;
   }
 
@@ -73,6 +100,7 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   setIssuanceDate(issuanceDate) {
+    ensureValidDatetime(issuanceDate);
     this.issuanceDate = issuanceDate;
     return this;
   }
@@ -83,6 +111,7 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   setExpirationDate(expirationDate) {
+    ensureValidDatetime(expirationDate);
     this.expirationDate = expirationDate;
     return this;
   }
@@ -120,7 +149,7 @@ class VerifiableCredential {
    * @returns {Promise<{object}>}
    */
   async verify() {
-    if (!this.proof) {
+    if (! this.proof) {
       throw new Error('The current VC has no proof.');
     }
     return await verifyCredential(this.toJSON());

@@ -291,10 +291,54 @@ describe('Verifiable Credential incremental creation', () => {
     ]);
     credential.setSubject({id: 'some_subject_id'});
     expect(credential.subject).toEqual({id: 'some_subject_id'});
+    credential.setStatus({id: 'some_status_id', type: 'CredentialStatusList2017'});
+    expect(credential.status).toEqual({id: 'some_status_id', type: 'CredentialStatusList2017'});
     credential.setIssuanceDate('2020-03-18T19:23:24Z');
     expect(credential.issuanceDate).toEqual('2020-03-18T19:23:24Z');
     credential.setExpirationDate('2021-03-18T19:23:24Z');
     expect(credential.expirationDate).toEqual('2021-03-18T19:23:24Z');
+  });
+
+  test('Incremental VC creations runs basic validation', async () => {
+    expect(() => {
+      new VerifiableCredential({key: 'value'});
+    }).toThrowError('needs to be a string.');
+
+    let credential = new VerifiableCredential('blabla');
+    expect(() => {
+      credential.addContext(123);
+    }).toThrowError('needs to be a string.');
+
+    let credWithWrongContext = new VerifiableCredential('blabla', {context: ['something']});
+    expect(() => {
+      credWithWrongContext.addContext('something_else');
+    }).toThrowError('needs to be first in the list of contexts.');
+
+    expect(() => {
+      credential.addType(123);
+    }).toThrowError('needs to be a string.');
+
+    expect(() => {
+      credential.setSubject({some: 'value'});
+    }).toThrowError('"credentialSubject" must include an id.');
+
+    expect(() => {
+      credential.setStatus({some: 'value', type: 'something'});
+    }).toThrowError('"credentialStatus" must include an id.');
+    expect(() => {
+      credential.setStatus({id: 'value', some: 'value'});
+    }).toThrowError('"credentialStatus" must include a type.');
+
+    expect(() => {
+      credential.setIssuanceDate('2020');
+    }).toThrowError('needs to be a valid datetime.');
+
+    expect(() => {
+      credential.setExpirationDate('2020');
+    }).toThrowError('needs to be a valid datetime.');
+
+    await expect(credential.verify()).rejects.toThrowError('The current VC has no proof.');
+
   });
 
   test('Issuing an incrementally-created VC should return an object with a proof, and it must pass validation.', async () => {

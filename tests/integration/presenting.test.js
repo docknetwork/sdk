@@ -42,7 +42,7 @@ function getUnsignedCred(credId, holderDID) {
       'https://www.w3.org/2018/credentials/examples/v1',
       // Following URL is for Sr25519 Signature and verification key. This is not a real URL but resolves to a context
       // because of the mapping defined in `contexts.js`
-      'https://www.dock.io/2020/credentials/context/sr25519',
+      //'https://www.dock.io/2020/credentials/context/sr25519',
     ],
     id: credId,
     type: ['VerifiableCredential', 'AlumniCredential'],
@@ -107,7 +107,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     cred1 = await vc.issueCredential(issuerKeyDoc, getUnsignedCred(credId1, holder1DID));
     cred2 = await vc.issueCredential(issuerKeyDoc, getUnsignedCred(credId2, holder2DID));
     cred3 = await vc.issueCredential(issuerKeyDoc, getUnsignedCred(credId3, holder3DID));
-
+    console.log('cred3 is', cred3);
     done();
   }, 70000);
 
@@ -124,6 +124,9 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       const cred = elem[0];
       const sigType = elem[1];
       const holderKey = elem[2];
+
+      const res = await vc.verifyCredential(cred, resolver);
+      console.log(res);
 
       const presId = randomAsHex(32);
       const chal = randomAsHex(32);
@@ -150,7 +153,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
         chal,
         domain,
         resolver,
-        sigType !== 'Sr25519Signature2020'
+        //sigType !== 'Sr25519Signature2020'
       );
 
       console.log('signedPres is', signedPres);
@@ -175,10 +178,9 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
         chal,
         domain,
         resolver,
-        sigType !== 'Sr25519Signature2020'
+        //sigType !== 'Sr25519Signature2020'
       );
 
-      console.dir(result, { depth: null });
       expect(result.verified).toBe(true);
       expect(result.presentationResult.verified).toBe(true);
       expect(result.credentialResults.length).toBe(1);

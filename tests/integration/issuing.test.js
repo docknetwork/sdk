@@ -11,7 +11,7 @@ import Resolver from '../../src/resolver';
 
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
 import {getKeyDoc, registerNewDIDUsingPair} from './helpers';
-import {generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair} from '../../src/utils/misc';
+import {generateEcdsaSecp256k1Keypair} from '../../src/utils/misc';
 import Secp256k1KeyPair  from 'secp256k1-key-pair';
 import {issueCredential, verifyCredential} from '../../src/utils/vc';
 
@@ -39,6 +39,9 @@ const unsignedCred = {
   '@context': [
     'https://www.w3.org/2018/credentials/v1',
     'https://www.w3.org/2018/credentials/examples/v1',
+    // Following URL is for Sr25519 Signature and verification key. This is not a real URL but resolves to a context
+    // because of the mapping defined in `contexts.js`
+    //'https://www.dock.io/2020/credentials/context/sr25519',
   ],
   id: credId,
   type: ['VerifiableCredential', 'AlumniCredential'],
@@ -143,7 +146,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
         getProofMatcherDoc()
       )
     );
-  }, 40000);
+  }, 30000);
 
   test('Issue a verifiable credential with secp256k1 key and verify it', async () => {
     const issuerKey = getKeyDoc(issuer2DID, await Secp256k1KeyPair.generate({pers: issuer2KeyPers, entropy: issuer2KeyEntropy}), 'EcdsaSecp256k1VerificationKey2019');
@@ -160,23 +163,26 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
         getProofMatcherDoc()
       )
     );
-  }, 40000);
+  }, 30000);
 
   test('Issue a verifiable credential with sr25519 key and verify it', async () => {
     const issuerKey = getKeyDoc(issuer3DID, dock.keyring.addFromUri(issuer3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
-    const credential = await vc.issueCredential(issuerKey, unsignedCred, false);
+    const credential = await vc.issueCredential(issuerKey, unsignedCred, true);
 
     expect(credential).toMatchObject(
       expect.objectContaining(
         getCredMatcherDoc(unsignedCred, issuer3DID, issuerKey.id, 'Sr25519Signature2020')
       )
     );
-    const result = await vc.verifyCredential(credential, resolver, false);
+
+    console.log(credential);
+
+    const result = await vc.verifyCredential(credential, resolver, true);
 
     expect(result).toMatchObject(
       expect.objectContaining(
         getProofMatcherDoc()
       )
     );
-  }, 40000);
+  }, 30000);
 });

@@ -4,7 +4,6 @@ import {cryptoWaitReady} from '@polkadot/util-crypto';
 import RevocationModule from './modules/revocation';
 import DIDModule from './modules/did';
 import types from './types.json';
-import VerifiableCredentialModule from './modules/vc';
 import err from './err';
 
 import {
@@ -50,7 +49,6 @@ class DockAPI {
 
     this._did = new DIDModule(this.api);
     this._revocation = new RevocationModule(this.api);
-    this._vc = new VerifiableCredentialModule();
 
     await cryptoWaitReady();
 
@@ -158,13 +156,6 @@ class DockAPI {
     return this._revocation;
   }
 
-  /**
-   * Gets the SDK's Verifiable Credential module
-   * @return {VerifiableCredentialModule} The module to use
-   */
-  get vc() {
-    return this._vc;
-  }
 }
 
 export default new DockAPI();
@@ -179,6 +170,5 @@ export {
   Signature,
   SignatureSr25519,
   SignatureEd25519,
-  VerifiableCredentialModule,
   err,
 };

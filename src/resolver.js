@@ -1,5 +1,5 @@
 // andrews work:
-import {parse as parse_did} from 'did-resolver';
+import {parse} from 'did-resolver';
 import {validateDockDIDSS58Identifier} from './utils/did';
 import axios from 'axios';
 import {NoDID} from './err';
@@ -31,7 +31,7 @@ function multiResolver(index, catchAll) {
    * @returns {Promise<DIDDocument>} Returns a promise to the DID document
    */
   async function resolve(did) {
-    const method = parse_did(did).method;
+    const method = parse(did).method;
     if (method in index) {
       return await index[method](did);
     } else if (catchAll !== undefined) {
@@ -93,7 +93,7 @@ function dockResolver(dock) {
    * @returns {DIDDocument}
    */
   async function resolve(did) {
-    const parsed = parse_did(did);
+    const parsed = parse(did);
     console.assert(
       parsed.method === method_name,
       `resolver for ${method_name} does not support the ${parsed.method} did method.`

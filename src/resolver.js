@@ -1,10 +1,9 @@
 import {parse as parse_did} from 'did-resolver';
 import {validateDockDIDSS58Identifier} from './utils/did';
 import axios from 'axios';
-import {NoDID} from './err';
 
 export class DIDResolver {
-  async resolve(did) {
+  async resolve() {
     throw new Error('Resolving not implemented in base class, please extend.');
   }
 }

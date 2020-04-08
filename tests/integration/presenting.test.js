@@ -52,7 +52,7 @@ let cred4;
 
 describe('Verifiable Presentation where both issuer and holder have a Dock DID', () => {
   const dock = new DockAPI();
-  let resolver;
+  const resolver = new DockResolver(dock);
 
   beforeAll(async (done) => {
     await dock.init({
@@ -81,12 +81,6 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     // Register holder DID with sr25519 key
     const pair4 = dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519');
     await registerNewDIDUsingPair(dock, holder3DID, pair4);
-
-    const providers = {
-      'dock': FullNodeEndpoint,
-    };
-
-    resolver = new DockResolver(dock);
 
     const issuerKey = await Ed25519KeyPair.generate({seed: hexToU8a(issuerKeySeed)});
     const issuerKeyDoc = getKeyDoc(issuerDID, issuerKey, 'Ed25519VerificationKey2018');

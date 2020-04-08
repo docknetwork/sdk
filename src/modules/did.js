@@ -1,10 +1,21 @@
 import {encodeAddress} from '@polkadot/util-crypto';
-import {NoDID} from '../err.js'; // TODO: cleanup this
 import b58 from 'bs58';
 
 import {getHexIdentifierFromDID, DockDIDQualifier} from '../utils/did';
 import {getStateChange} from '../utils/misc';
 import {validateDockDIDHexIdentifier} from '../utils/did';
+
+/**
+ * Error thrown when a DID document lookup was successful, but the did in question does not exist.
+ * This is different from a network error.
+ */
+export class NoDIDError extends Error {
+  constructor(did) {
+    super(`DID (${did}) does not exist`);
+    this.name = 'NoDIDError';
+    this.did = did;
+  }
+}
 
 /** Class to create, update and destroy DIDs */
 class DIDModule {
@@ -67,16 +78,8 @@ class DIDModule {
    */
   async getDocument(did) {
     const hexId = getHexIdentifierFromDID(did);
-    let detail;
-    try {
-      detail = (await this.getDetail(hexId))[0];
-    } catch(e) {
-      if (e instanceof NoDID) {
-        // Supplied DID may be non-hex format. Convert back to the user supplied form.
-        e = new NoDID(did);
-      }
-      throw e;
-    }
+    const detail = (await this.getDetail(hexId))[0];
+
     // If given DID was in hex, encode to SS58 and then construct fully qualified DID else the DID was already fully qualified
     const id = (did === hexId) ? this.getFullyQualifiedDID(encodeAddress(hexId)) : did;
 
@@ -144,7 +147,7 @@ class DIDModule {
     const resp = await this.api.query.didModule.dids(didIdentifier);
     if (resp) {
       if (resp.isNone) {
-        throw new NoDID(`dock:did:${didIdentifier}`);
+        throw new NoDIDError(`dock:did:${didIdentifier}`);
       }
 
       const respTuple = resp.unwrap();

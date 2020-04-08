@@ -101,7 +101,7 @@ class RevocationModule {
    * Get detail of the registry. Its a 2 element array where the first element is the registry's policy and add_only
    * status and second is the block number where the registry was last modified.
    * @param registryID
-   * @returns {Promise<(*|number)[]>}
+   * @returns {Promise<array>}
    */
   async getRegistryDetail(registryID) {
     const resp = await this.api.query.revoke.registries(registryID);
@@ -140,6 +140,47 @@ class RevocationModule {
    */
   async getBlockNoForLastChangeToRegistry(registryId) {
     return (await this.getRegistryDetail(registryId))[1];
+  }
+
+  /**
+   * Internal helper to avoid code duplication while updating the revocation registry by revoking or unrevoking a credential.
+   * @param updateFunc - A function that's called in the context of `dockAPI.revocation` to send an extrinsic. Is either
+   * `dockAPI.revocation.revoke` or `dockAPI.revocation.unrevoke`
+   * @param dockAPI
+   * @param {DidKeys} didKeys - The map of DID and keypair to sign the update
+   * @param registryId - The registry id being updated
+   * @param revId - The revocation id being revoked or unrevoked
+   * @returns {Promise<void>}
+   */
+  async updateRevReg(updateFunc, didKeys, registryId, revId) {
+    const lastModified = await this.getBlockNoForLastChangeToRegistry(registryId);
+    const revokeIds = new Set();
+    revokeIds.add(revId);
+    return updateFunc.bind(this)(registryId, revokeIds, lastModified, didKeys);
+  }
+
+  /**
+   * TODO: Use the spread operator to accept multiple revocation ids
+   * Revoke a single credential
+   * @param {DidKeys} didKeys - The map of DID and keypair to sign the update
+   * @param registryId - The registry id being updated
+   * @param revId - The revocation id that is being revoked
+   * @returns {Promise<void>}
+   */
+  async revokeCredential(didKeys, registryId, revId) {
+    return this.updateRevReg(this.revoke, didKeys, registryId, revId);
+  }
+
+  /**
+   * TODO: Use the spread operator to accept multiple revocation ids
+   * Unrevoke a single credential
+   * @param {DidKeys} didKeys - The map of DID and keypair to sign the update
+   * @param registryId - The registry id being updated
+   * @param revId - The revocation id that is being unrevoked
+   * @returns {Promise<void>}
+   */
+  async unrevokeCredential(didKeys, registryId, revId) {
+    return this.updateRevReg(this.unrevoke, didKeys, registryId, revId);
   }
 
   /**

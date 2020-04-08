@@ -124,14 +124,14 @@ class DockAPI {
             }
           })
           .catch(error => {
-            console.log('sendTransaction had error', error);
+            console.error('sendTransaction had error', error);
             reject(error);
           })
           .then(unsub => {
             unsubFunc = unsub;
           });
       } catch (error) {
-        console.log('sendTransaction had error', error);
+        console.error('sendTransaction had error', error);
         reject(error);
       }
     });

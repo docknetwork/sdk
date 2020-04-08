@@ -9,7 +9,7 @@ import didV1Context from './contexts/did-v1-updated';
 import credV1Context from './contexts/credential-v1-updated';
 
 // Lookup of following URLs will lead to loading data from the context directory, this is done as the Sr25519 keys are not
-// supported in any W3C standard and vc-js has them stored locally
+// supported in any W3C standard and vc-js has them stored locally. This is a temporary solution.
 export default new Map([
   ...credentialsContext.contexts,
   [

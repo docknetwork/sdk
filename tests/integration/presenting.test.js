@@ -43,10 +43,12 @@ const holder3KeySeed = randomAsHex(32);
 const credId1 = randomAsHex(32);
 const credId2 = randomAsHex(32);
 const credId3 = randomAsHex(32);
+const credId4 = randomAsHex(32);
 
 let cred1;
 let cred2;
 let cred3;
+let cred4;
 
 describe('Verifiable Presentation where both issuer and holder have a Dock DID', () => {
   const dock = new DockAPI();

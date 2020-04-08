@@ -4,7 +4,13 @@ import {Ed25519KeyPair} from 'jsonld-signatures';
 
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
 import {DockAPI} from '../../src/api';
-import VerifiableCredentialModule, {DockRevRegQualifier, RevRegType} from '../../src/modules/vc';
+import {
+  createPresentation,
+  DockRevRegQualifier, getDockRevIdFromCredential, issueCredential,
+  RevRegType,
+  signPresentation, verifyCredential,
+  verifyPresentation
+} from '../../src/utils/vc';
 import Resolver from '../../src/resolver';
 
 import {
@@ -17,8 +23,6 @@ import {
 } from './helpers';
 import {getKeyDoc} from '../../src/utils/vc/helpers';
 import {createNewDockDID} from '../../src/utils/did';
-
-const vc = new VerifiableCredentialModule();
 
 const credId = 'A large credential id with size > 32 bytes';
 let resolver;
@@ -85,7 +89,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     // Issuer issues the credential with a given registry id for revocation
     addRevRegIdToCred(unsignedCred, registryId);
     issuerKey = getKeyDoc(issuerDID, await Ed25519KeyPair.generate({seed: hexToU8a(issuerSeed)}), 'Ed25519VerificationKey2018');
-    credential = await vc.issueCredential(issuerKey, unsignedCred);
+    credential = await issueCredential(issuerKey, unsignedCred);
 
     done();
   }, 30000);
@@ -96,15 +100,15 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
   test('Issuer can issue a revocable credential and holder can verify it successfully when it is not revoked else the verification fails', async () => {
     // The credential verification should pass as the credential has not been revoked.
-    const result = await vc.verifyCredential(credential, resolver, true, {'dock': dockAPI});
+    const result = await verifyCredential(credential, resolver, true, {'dock': dockAPI});
     expect(result.verified).toBe(true);
 
     // Revoke the credential
-    const revId = VerifiableCredentialModule.getDockRevIdFromCredential(credential);
+    const revId = getDockRevIdFromCredential(credential);
     await revokeCredential(dockAPI, didKeys, registryId, revId);
 
     // The credential verification should fail as the credential has been revoked.
-    const result1 = await vc.verifyCredential(credential, resolver, true, {'dock': dockAPI});
+    const result1 = await verifyCredential(credential, resolver, true, {'dock': dockAPI});
     expect(result1.verified).toBe(false);
     expect(result1.error).toBe('Revocation check failed');
 
@@ -113,7 +117,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
   test('Holder can create a presentation and verifier can verify it successfully when it is not revoked else the verification fails', async () => {
     // The previous test revokes credential so unrevoke it. Its fine if the previous test is not run as unrevoking does not
     // throw error if the credential is not revoked.
-    const revId = VerifiableCredentialModule.getDockRevIdFromCredential(credential);
+    const revId = getDockRevIdFromCredential(credential);
     await unrevokeCredential(dockAPI, didKeys, registryId, revId);
 
     const holderKey = getKeyDoc(holderDID, await Ed25519KeyPair.generate({seed: hexToU8a(holderSeed)}), 'Ed25519VerificationKey2018');
@@ -122,11 +126,11 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     const presId = randomAsHex(32);
     const chal = randomAsHex(32);
     const domain = 'test domain';
-    const presentation = vc.createPresentation(
+    const presentation = createPresentation(
       credential,
       presId
     );
-    const signedPres = await vc.signPresentation(
+    const signedPres = await signPresentation(
       presentation,
       holderKey,
       chal,
@@ -135,7 +139,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     );
 
     // As the credential is unrevoked, the presentation should verify successfully.
-    const result = await vc.verifyPresentation(
+    const result = await verifyPresentation(
       signedPres,
       chal,
       domain,
@@ -149,7 +153,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     await revokeCredential(dockAPI, didKeys, registryId, revId);
 
     // As the credential is revoked, the presentation should verify successfully.
-    const result1 = await vc.verifyPresentation(
+    const result1 = await verifyPresentation(
       signedPres,
       chal,
       domain,

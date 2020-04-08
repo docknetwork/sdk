@@ -2,7 +2,7 @@ import {randomAsHex} from '@polkadot/util-crypto';
 import {DockAPI} from '../src/api';
 import {createNewDockDID, createKeyDetail} from '../src/utils/did';
 import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
-import {MultiResolver, UniversalResolver, DockResolver, multiResolver, universalResolver, dockResolver} from '../src/resolver';
+import {MultiResolver, UniversalResolver, DockResolver} from '../src/resolver';
 import ethr from 'ethr-did-resolver';
 import {parse as parse_did} from 'did-resolver';
 

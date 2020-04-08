@@ -7,7 +7,7 @@ import {
 } from '../../src/utils/did';
 
 import {DockAPI} from '../../src/api';
-import Resolver from '../../src/resolver';
+import {DockResolver} from '../../src/resolver';
 
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
 import {getUnsignedCred, registerNewDIDUsingPair} from './helpers';
@@ -86,8 +86,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       'dock': FullNodeEndpoint,
     };
 
-    resolver = new Resolver(providers);
-    resolver.init();
+    resolver = new DockResolver(dock);
 
     const issuerKey = await Ed25519KeyPair.generate({seed: hexToU8a(issuerKeySeed)});
     const issuerKeyDoc = getKeyDoc(issuerDID, issuerKey, 'Ed25519VerificationKey2018');

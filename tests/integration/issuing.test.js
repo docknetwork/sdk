@@ -7,6 +7,7 @@ import {
 } from '../../src/utils/did';
 
 import {DockAPI} from '../../src/api';
+import {DockResolver} from '../../src/resolver';
 
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
 import {getUnsignedCred, registerNewDIDUsingPair} from './helpers';
@@ -14,9 +15,6 @@ import {generateEcdsaSecp256k1Keypair} from '../../src/utils/misc';
 import Secp256k1KeyPair  from 'secp256k1-key-pair';
 import {issueCredential, verifyCredential} from '../../src/utils/vc';
 import {getKeyDoc} from '../../src/utils/vc/helpers';
-
-// TODO: update test when moved to classes
-import {multiResolver, universalResolver, dockResolver} from '../../src/resolver';
 
 // 1st issuer's DID.
 const issuer1DID = createNewDockDID();
@@ -77,7 +75,7 @@ function getProofMatcherDoc() {
 
 describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
   const dock = new DockAPI();
-  let resolver;
+  const resolver = new DockResolver(dock);
 
   beforeAll(async (done) => {
     await dock.init({
@@ -98,18 +96,6 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
     // DID with secp key
     const pair2 = generateEcdsaSecp256k1Keypair(issuer2KeyPers, issuer2KeyEntropy);
     await registerNewDIDUsingPair(dock, issuer2DID, pair2);
-
-
-    const universalResolverUrl = 'http://localhost:8080';
-    const providers = {
-      'dock': dockResolver(dock),
-    };
-
-    // TODO: think using classes was better idea for this, because here we get resolver.resolver if not a function
-    // rather do like new MultiResolver(), new DockResolver(), and call .resolve by passing these objects as resolver
-    resolver = {
-      resolve: multiResolver(providers, universalResolver(universalResolverUrl))
-    };
 
     done();
   }, 30000);

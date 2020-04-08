@@ -49,7 +49,7 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
 /**
  * Verify a Verifiable Credential. Returns the verification status and error in an object
  * @param {object} credential - verifiable credential to be verified.
- * @param {object} resolver - Resolver for DIDs.
+ * @param {Resolver} resolver - Resolver for DIDs.
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
  * @return {object} verification result.
  */
@@ -65,9 +65,9 @@ export async function verifyCredential(credential, resolver, compactProof = true
 /**
  * Check that credential is verified, i.e. the credential has VCDM compliant structure and the `proof`
  * (signature by issuer) is correct.
- * @param credential
- * @param resolver
- * @param {Boolean} compactProof - Whether to complact the JSON-LD or not.
+ * @param {object} credential - verifiable credential to be verified.
+ * @param {Resolver} resolver - Resolver for DIDs.
+ * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
  * @returns {Promise<boolean>} Returns promise that resolves to true if verified
  */
 export async function isVerifiedCredential(credential, resolver, compactProof = true) {
@@ -82,7 +82,7 @@ export async function isVerifiedCredential(credential, resolver, compactProof = 
  * @param {string} holder - optional presentation holder url
  * @return {object} verifiable presentation.
  */
-export async function createPresentation(verifiableCredential, id, holder) {
+export function createPresentation(verifiableCredential, id, holder) {
   return vcjs.createPresentation({
     verifiableCredential,
     id,
@@ -96,7 +96,7 @@ export async function createPresentation(verifiableCredential, id, holder) {
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
  * @param {string} challenge - proof challenge Required.
  * @param {string} domain - proof domain (optional)
- * @param {object} resolver - Resolver for DIDs.
+ * @param {Resolver} resolver - Resolver for DIDs.
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
  * @return {Promise<{VerifiablePresentation}>} A VerifiablePresentation with a proof.
  */
@@ -118,7 +118,7 @@ export async function signPresentation(presentation, keyDoc, challenge, domain, 
  * @param {object} presentation - verifiable credential to be verified.
  * @param {string} challenge - proof challenge Required.
  * @param {string} domain - proof domain (optional)
- * @param {object} resolver - Resolver to resolve the issuer DID (optional)
+ * @param {Resolver} resolver - Resolver to resolve the issuer DID (optional)
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
  * @return {object} verification result.
  */
@@ -137,11 +137,11 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
 /**
  * Check that presentation is verified, i.e. the presentation and credentials have VCDM compliant structure and
  * the `proof` (signature by holder) is correct.
- * @param presentation
- * @param challenge
- * @param domain
- * @param resolver
- * @param compactProof
+ * @param {object} presentation - verifiable credential to be verified.
+ * @param {string} challenge - proof challenge Required.
+ * @param {string} domain - proof domain (optional)
+ * @param {Resolver} resolver - Resolver to resolve the issuer DID (optional)
+ * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
  * @returns {Promise<boolean>}
  */
 export async function isVerifiedPresentation(presentation, challenge, domain, resolver, compactProof = true) {

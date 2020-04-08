@@ -145,7 +145,7 @@ class DIDModule {
   }
 
   /**
-   * Gets the block number in which the DID was last modified from
+   * Gets the block number in which the DID was last modified in
    * the chain and return it. It will throw error if the DID does not exist on
    * chain or chain returns null response.
    * @param {string} didIdentifier - DID identifier as hex. Not accepting full DID intentionally for efficiency as these

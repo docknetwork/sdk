@@ -87,15 +87,22 @@ class RevocationModule {
   }
 
   /**
-   * The read-only call get_revocation_registry is used to get details of the revocation registry like controllers, policy and type. If the registry is not present, None is returned.
+   * The read-only call get_revocation_registry is used to get data of the revocation registry like controllers, policy and type.
+   * If the registry is not present, None is returned.
    * @param {RegistryId} registryID - Revocation registry ID
-   * @return {Extrinsic} The extrinsic to sign and send.
+   * @return {Promise} A promise to registry data
    */
   async getRevocationRegistry(registryID) {
     const detail = await this.getRegistryDetail(registryID);
     return detail[0];
   }
 
+  /**
+   * Get detail of the registry. Its a 2 element array where the first element is the registry's policy and add_only
+   * status and second is the block number where the registry was last modified.
+   * @param registryID
+   * @returns {Promise<(*|number)[]>}
+   */
   async getRegistryDetail(registryID) {
     const resp = await this.api.query.revoke.registries(registryID);
     if (resp.isNone) {
@@ -115,13 +122,24 @@ class RevocationModule {
 
   /**
    * The read-only call get_revocation_status is used to check whether a credential is revoked or not and does not consume any tokens. If
-   * @param {RegistryId} registryID - Revocation registry ID
-   * @param {RevokeId} revokeId - Credential ID
-   * @return {Extrinsic} The extrinsic to sign and send.
+   * @param {RegistryId} registryId - Revocation registry ID
+   * @param {RevokeId} revokeId - Revocation id. This is set as the hash of the credential id.
+   * @return {Promise<Boolean>} Returns a promise to true if credential is revoked else to false.
    */
-  async getIsRevoked(registryID, revokeID) {
-    const resp = await this.api.query.revoke.revocations(registryID, revokeID);
+  async getIsRevoked(registryId, revokeId) {
+    const resp = await this.api.query.revoke.revocations(registryId, revokeId);
     return !resp.isNone;
+  }
+
+  /**
+   * Gets the block number in which the registry was last modified in the chain
+   * and return it. Throws error if the registry with given id does not exist on
+   * chain or chain returns null response.
+   * @param registryId
+   * @returns {Promise<*|number>}
+   */
+  async getBlockNoForLastChangeToRegistry(registryId) {
+    return (await this.getRegistryDetail(registryId))[1];
   }
 
   /**

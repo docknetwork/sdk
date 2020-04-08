@@ -97,6 +97,10 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
     const pair2 = generateEcdsaSecp256k1Keypair(issuer2KeyPers, issuer2KeyEntropy);
     await registerNewDIDUsingPair(dock, issuer2DID, pair2);
 
+    // DID with sr25519 key
+    const pair3 = dock.keyring.addFromUri(issuer3KeySeed, null, 'sr25519');
+    await registerNewDIDUsingPair(dock, issuer3DID, pair3);
+
     done();
   }, 30000);
 

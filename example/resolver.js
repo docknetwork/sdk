@@ -1,10 +1,9 @@
 import {randomAsHex} from '@polkadot/util-crypto';
 import {DockAPI} from '../src/api';
-import {createNewDockDID, createKeyDetail} from '../src/utils/did';
+import {createNewDockDID, createKeyDetail, NoDIDError} from '../src/utils/did';
 import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
 import {DIDResolver, MultiResolver, UniversalResolver, DockResolver} from '../src/resolver';
 import ethr from 'ethr-did-resolver';
-import {parse as parse_did} from 'did-resolver';
 
 const fullNodeWsRPCEndpoint = 'ws://127.0.0.1:9944';
 const universalResolverUrl = 'http://localhost:8080';
@@ -27,7 +26,12 @@ class EtherResolver extends DIDResolver {
   }
 
   async resolve(did) {
-    return this.ethres(did, parse_did(did));
+    const parsed = this.parseDid(did);
+    try {
+      return await this.ethres(did, parsed);
+    } catch (e) {
+      throw new NoDIDError(did);
+    }
   }
 }
 

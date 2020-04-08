@@ -32,6 +32,7 @@ describe('Testing isHexWithGivenByteSize', () => {
   test('isHexWithGivenByteSize rejects strings not matching expected byte size', () => {
     expect(isHexWithGivenByteSize('0x12', 2)).toBe(false);
     expect(isHexWithGivenByteSize('0x1234', 1)).toBe(false);
+    expect(isHexWithGivenByteSize('0x1234', 0)).toBe(false);
   });
 
   test('isHexWithGivenByteSize accepts correct hex string with full bytes', () => {

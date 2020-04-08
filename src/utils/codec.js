@@ -7,7 +7,8 @@
 export function isHexWithGivenByteSize(value, byteSize) {
   const match = value.match(/^0x([0-9a-f]+$)/i);
   if (match && match.length > 1) {
-    if (byteSize) {
+    if (byteSize !== undefined) {
+      // If `byteSize` is not a positive integer type, then check will fail
       // 2 hex digits make a byte
       return match[1].length === (2 * byteSize);
     } else {

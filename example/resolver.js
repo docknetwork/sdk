@@ -2,7 +2,7 @@ import {randomAsHex} from '@polkadot/util-crypto';
 import {DockAPI} from '../src/api';
 import {createNewDockDID, createKeyDetail} from '../src/utils/did';
 import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
-import {MultiResolver, UniversalResolver, DockResolver} from '../src/resolver';
+import {DIDResolver, MultiResolver, UniversalResolver, DockResolver} from '../src/resolver';
 import ethr from 'ethr-did-resolver';
 import {parse as parse_did} from 'did-resolver';
 
@@ -18,6 +18,18 @@ const ethereumProviderConfig = {
 };
 
 const dock = new DockAPI();
+
+// Custom resolver class
+class EtherResolver extends DIDResolver {
+  constructor(config) {
+    super();
+    this.ethres = ethr.getResolver(config).ethr;
+  }
+
+  async resolve(did) {
+    return this.ethres(did, parse_did(did));
+  }
+}
 
 /**
  * Generate and register a new Dock DID return the DID
@@ -47,10 +59,9 @@ async function main() {
 
   console.log('Creating DID providers...');
 
-  const ethres = ethr.getResolver(ethereumProviderConfig).ethr;
   const providers = {
     'dock': new DockResolver(dock), // Provider as class
-    'ethr': did => ethres(did, parse_did(did)), // Provider as function
+    'ethr': new EtherResolver(ethereumProviderConfig), // Custom provider
   };
 
   const resolver = new MultiResolver(providers, new UniversalResolver(universalResolverUrl));

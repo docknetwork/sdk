@@ -14,6 +14,13 @@ import {getUnsignedCred, registerNewDIDUsingPair} from './helpers';
 import {generateEcdsaSecp256k1Keypair} from '../../src/utils/misc';
 import Secp256k1KeyPair from 'secp256k1-key-pair';
 import {getKeyDoc} from '../../src/utils/vc/helpers';
+import {
+  createPresentation,
+  issueCredential,
+  isVerifiedCredential,
+  signPresentation,
+  verifyPresentation
+} from '../../src/utils/vc';
 
 // Issuer's DID.
 const issuerDID = createNewDockDID();
@@ -83,10 +90,18 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     const issuerKey = await Ed25519KeyPair.generate({seed: hexToU8a(issuerKeySeed)});
     const issuerKeyDoc = getKeyDoc(issuerDID, issuerKey, 'Ed25519VerificationKey2018');
 
-    cred1 = await vc.issueCredential(issuerKeyDoc, getUnsignedCred(credId1, holder1DID));
-    cred2 = await vc.issueCredential(issuerKeyDoc, getUnsignedCred(credId2, holder2DID));
-    cred3 = await vc.issueCredential(issuerKeyDoc, getUnsignedCred(credId3, holder3DID));
-    console.log('cred3 is', cred3);
+    // Issuer issues credential with id `credId1` to holder with DID `holder1DID`
+    cred1 = await issueCredential(issuerKeyDoc, getUnsignedCred(credId1, holder1DID));
+
+    // Issuer issues credential with id `credId2` to holder with DID `holder2DID`
+    cred2 = await issueCredential(issuerKeyDoc, getUnsignedCred(credId2, holder2DID));
+
+    // Issuer issues credential with id `credId3` to holder with DID `holder3DID`
+    cred3 = await issueCredential(issuerKeyDoc, getUnsignedCred(credId3, holder3DID));
+
+    // Issuer issues credential with id `credId4` to holder with DID `holder3DID`
+    cred4 = await issueCredential(issuerKeyDoc, getUnsignedCred(credId4, holder3DID));
+
     done();
   }, 70000);
 
@@ -104,13 +119,13 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       const sigType = elem[1];
       const holderKey = elem[2];
 
-      const res = await vc.verifyCredential(cred, resolver);
-      console.log(res);
+      const res = await isVerifiedCredential(cred, resolver);
+      expect(res).toBe(true);
 
       const presId = randomAsHex(32);
       const chal = randomAsHex(32);
       const domain = 'test domain';
-      const presentation = vc.createPresentation(
+      const presentation = createPresentation(
         cred,
         presId
       );
@@ -125,13 +140,12 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
         )
       );
 
-      const signedPres = await vc.signPresentation(
+      const signedPres = await signPresentation(
         presentation,
         holderKey,
         chal,
         domain,
         resolver,
-        //sigType !== 'Sr25519Signature2020'
       );
 
       expect(signedPres).toMatchObject(
@@ -150,12 +164,11 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
         )
       );
 
-      const result = await vc.verifyPresentation(
+      const result = await verifyPresentation(
         signedPres,
         chal,
         domain,
-        resolver,
-        //sigType !== 'Sr25519Signature2020'
+        resolver
       );
 
       expect(result.verified).toBe(true);
@@ -169,16 +182,16 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
   test('Holder creates a verifiable presentation with 2 credentials and verifier verifies it', async () => {
     const holder3Key = getKeyDoc(holder3DID, dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
 
-    const res = await vc.isVerifiedCredential(cred3, resolver);
+    const res = await isVerifiedCredential(cred3, resolver);
     expect(res).toBe(true);
-    const res1 = await vc.isVerifiedCredential(cred4, resolver);
+    const res1 = await isVerifiedCredential(cred4, resolver);
     expect(res1).toBe(true);
 
     const presId = randomAsHex(32);
     const chal = randomAsHex(32);
     const domain = 'test domain';
 
-    const presentation = vc.createPresentation(
+    const presentation = createPresentation(
       [cred3, cred4],
       presId
     );
@@ -193,7 +206,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       )
     );
 
-    const signedPres = await vc.signPresentation(
+    const signedPres = await signPresentation(
       presentation,
       holder3Key,
       chal,

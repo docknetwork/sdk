@@ -1,8 +1,17 @@
-import documentLoader from './vc/document-loader';
 import vcjs from 'vc-js';
 import {Ed25519KeyPair, suites} from 'jsonld-signatures';
 import Secp256k1KeyPair from 'secp256k1-key-pair';
 import {EcdsaSepc256k1Signature2019, Sr25519Signature2020} from './vc/custom_crypto';
+import { blake2AsHex } from '@polkadot/util-crypto';
+
+import documentLoader from './vc/document-loader';
+import {isHexWithGivenByteSize} from './codec';
+import {RevEntryByteSize, RevRegIdByteSize} from './revocation';
+
+// XXX: Does it make sense to have a revocation registry type for Dock like below and eliminate the need for `rev_reg:dock:`?
+//export const RevRegType = 'DockRevocationRegistry2020';
+export const RevRegType = 'CredentialStatusList2017';
+export const DockRevRegQualifier = 'rev_reg:dock:';
 
 const {Ed25519Signature2018} = suites;
 
@@ -49,17 +58,30 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
 /**
  * Verify a Verifiable Credential. Returns the verification status and error in an object
  * @param {object} credential - verifiable credential to be verified.
- * @param {Resolver} resolver - Resolver for DIDs.
+ * @param {object} resolver - Resolver for DIDs.
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
- * @return {object} verification result.
+ * @param {object} revocationAPI - API needed to check revocation status. For now, the object specifies the type as key
+ * and the value as the API, but the structure can change as we support more APIs. Only Dock is supported as of now.
+ * @return {object} verification result. The returned object will have a key `verified`which is true if the
+ * credential is not revoked and false otherwise. The `error` will describe the error if any.
  */
-export async function verifyCredential(credential, resolver, compactProof = true) {
-  return await vcjs.verifyCredential({
+export async function verifyCredential(credential, resolver, compactProof = true, revocationAPI) {
+  const credVer = await vcjs.verifyCredential({
     credential,
     suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
     documentLoader: documentLoader(resolver),
     compactProof
   });
+
+  // Check for revocation only if the credential is verified and revocation API is provided.
+  if (credVer.verified && revocationAPI) {
+    const revResult = await checkRevocationStatus(credential, revocationAPI);
+    // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
+    if (!revResult.verified) {
+      return revResult;
+    }
+  }
+  return credVer;
 }
 
 /**
@@ -68,10 +90,12 @@ export async function verifyCredential(credential, resolver, compactProof = true
  * @param {object} credential - verifiable credential to be verified.
  * @param {Resolver} resolver - Resolver for DIDs.
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
+ * @param {object} revocationAPI - API needed to check revocation status. For now, the object specifies the type as key
+ * and the value as the API, but the structure can change as we support more APIs. Only Dock is supported as of now.
  * @returns {Promise<boolean>} Returns promise that resolves to true if verified
  */
-export async function isVerifiedCredential(credential, resolver, compactProof = true) {
-  const result = await verifyCredential(credential, resolver, compactProof);
+export async function isVerifiedCredential(credential, resolver, compactProof = true, revocationAPI) {
+  const result = await verifyCredential(credential, resolver, compactProof, revocationAPI);
   return result.verified;
 }
 
@@ -120,11 +144,13 @@ export async function signPresentation(presentation, keyDoc, challenge, domain, 
  * @param {string} domain - proof domain (optional)
  * @param {Resolver} resolver - Resolver to resolve the issuer DID (optional)
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
+ * @param {object} revocationAPI - API needed to check revocation status. For now, the object specifies the type as key
+ * and the value as the API, but the structure can change as we support more APIs. Only Dock is supported as of now.
  * @return {object} verification result.
  */
-export async function verifyPresentation(presentation, challenge, domain, resolver, compactProof = true) {
+export async function verifyPresentation(presentation, challenge, domain, resolver, compactProof = true, revocationAPI) {
   // TODO: support other purposes than the default of "authentication"
-  return await vcjs.verify({
+  const presVer = await vcjs.verify({
     presentation,
     suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
     challenge,
@@ -132,7 +158,21 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
     documentLoader: documentLoader(resolver),
     compactProof
   });
+
+  // Check for revocation only if the credential is verified and revocation API is provided.
+  if (presVer.verified && revocationAPI) {
+    for (let credential of presentation.verifiableCredential) {
+      const res = checkRevocationStatus(credential, revocationAPI);
+      // Return error for the first credential that does not pass revocation check.
+      if (!res.verified) {
+        return res;
+      }
+    }
+    // If all credentials pass the revocation check, the let the result of presentation verification be returned.
+  }
+  return presVer;
 }
+
 
 /**
  * Check that presentation is verified, i.e. the presentation and credentials have VCDM compliant structure and
@@ -142,12 +182,66 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
  * @param {string} domain - proof domain (optional)
  * @param {Resolver} resolver - Resolver to resolve the issuer DID (optional)
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
+ * @param {object} revocationAPI - API needed to check revocation status. For now, the object specifies the type as key
+ * and the value as the API, but the structure can change as we support more APIs. Only Dock is supported as of now.
  * @returns {Promise<boolean>}
  */
-export async function isVerifiedPresentation(presentation, challenge, domain, resolver, compactProof = true) {
-  const result = await verifyPresentation(presentation, challenge, domain, compactProof);
+export async function isVerifiedPresentation(presentation, challenge, domain, resolver, compactProof = true, revocationAPI) {
+  const result = await verifyPresentation(presentation, challenge, domain, compactProof, revocationAPI);
   return result.verified;
 }
+
+/**
+ * Check if the credential is revoked or not.
+ * @param credential
+ * @param revocationAPI
+ * @returns {Promise<{verified: boolean}|{verified: boolean, error: string}>} The returned object will have a key `verified`
+ * which is true if the credential is not revoked and false otherwise. The `error` will describe the error if any.
+ */
+export async function checkRevocationStatus(credential, revocationAPI) {
+  if (!revocationAPI['dock']) {
+    throw new Error('Only Dock revocation support is present as of now.');
+  } else {
+    if (!hasDockRevocation(credential)) {
+      return {verified: false, error: 'The credential status does not have the format required by Dock'};
+    }
+    const dockAPI = revocationAPI['dock'];
+    const regId = credential.credentialStatus.id.slice(DockRevRegQualifier.length);
+    // Hash credential id to get revocation id
+    const revId = getDockRevIdFromCredential(credential);
+    const revocationStatus = await dockAPI.revocation.getIsRevoked(regId, revId);
+    if (revocationStatus) {
+      return {verified: false, error: 'Revocation check failed'};
+    } else {
+      return {verified: true};
+    }
+  }
+}
+
+/**
+ * Generate the revocation id of a credential usable by Dock. It hashes the credential id to get the
+ * revocation id
+ * @param credential
+ * @returns {*}
+ */
+export function getDockRevIdFromCredential(credential) {
+  // The hash outputs the same number of bytes as required by Dock
+  return blake2AsHex(credential.id, RevEntryByteSize * 8);
+}
+
+/**
+ * Check if credential has Dock specific revocation
+ * @param credential
+ * @returns {Boolean}
+ */
+export function hasDockRevocation(credential) {
+  return credential.credentialStatus &&
+    (credential.credentialStatus.type === RevRegType) &&
+    credential.credentialStatus.id.startsWith(DockRevRegQualifier) &&
+    isHexWithGivenByteSize(credential.credentialStatus.id.slice(DockRevRegQualifier.length), RevRegIdByteSize);
+}
+
+
 
 /**
  * Return true if the given value is a string.

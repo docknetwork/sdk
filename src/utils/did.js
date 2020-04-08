@@ -12,6 +12,18 @@ export const DockDIDQualifier = `did:${DockDIDMethod}:`;
 export const DockDIDByteSize = 32;
 
 /**
+ * Error thrown when a DID document lookup was successful, but the did in question does not exist.
+ * This is different from a network error.
+ */
+export class NoDIDError extends Error {
+  constructor(did) {
+    super(`DID (${did}) does not exist`);
+    this.name = 'NoDIDError';
+    this.did = did;
+  }
+}
+
+/**
  * Check if the given identifier is 32 byte hex
  * @param {identifier} identifier - The identifier to check.
  * @return {null} Throws exception if invalid identifier

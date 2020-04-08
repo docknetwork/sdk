@@ -19,7 +19,7 @@ const ethereumProviderConfig = {
 
 const dock = new DockAPI();
 
-// Custom resolver class
+// Custom ethereum resolver class
 class EtherResolver extends DIDResolver {
   constructor(config) {
     super();

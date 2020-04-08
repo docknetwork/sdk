@@ -1,10 +1,14 @@
-import {parse as parse_did} from 'did-resolver';
-import {validateDockDIDSS58Identifier} from './utils/did';
+import {parse} from 'did-resolver';
+import {validateDockDIDSS58Identifier, NoDIDError} from './utils/did';
 import axios from 'axios';
 
 export class DIDResolver {
   async resolve() {
     throw new Error('Resolving not implemented in base class, please extend.');
+  }
+
+  parseDid(did) {
+    return parse(did);
   }
 }
 
@@ -29,7 +33,7 @@ export class DockResolver extends DIDResolver {
 
     console.assert(this.dock.isInitialized());
 
-    const parsed = parse_did(did);
+    const parsed = this.parseDid(did);
 
     console.assert(
       parsed.method === method_name,
@@ -37,45 +41,8 @@ export class DockResolver extends DIDResolver {
     );
 
     validateDockDIDSS58Identifier(parsed.id);
-    return this.dock.did.getDocument(parsed.did);
-  }
-}
 
-export class MultiResolver extends DIDResolver {
-  /**
-   * Create a Resolver which delegates to the appropriate child Resolver according to an index.
-   *
-   * @param {object} index - A map from DID method name to child Resolver.
-   * @param {Resolver | null} catchAll - An optional fallback to use when index does not specify an
-   * implementation for the requested method.
-   * @returns {Resolver}
-   */
-  constructor(providers, catchAll) {
-    super();
-    this.providers = providers;
-    this.catchAll = catchAll;
-  }
-
-  /**
-   * Resolve the given DID with either the registered providers or try to fetch from the universal resolver
-   * if available.
-   * @param {string} did - A full DID (with method, like did:dock:5....)
-   * @returns {Promise<DIDDocument>} Returns a promise to the DID document
-   */
-  async resolve(did) {
-    const method = parse_did(did).method;
-    if (method in this.providers) {
-      const provider = this.providers[method];
-      return await this.getResolveMethod(provider)(did);
-    } else if (this.catchAll) {
-      return await this.getResolveMethod(this.catchAll)(did);
-    } else {
-      throw new Error('No resolver for did', did);
-    }
-  }
-
-  getResolveMethod(provider) {
-    return provider.resolve ? provider.resolve.bind(provider) : provider;
+    return await this.dock.did.getDocument(parsed.did);
   }
 }
 
@@ -107,8 +74,47 @@ export class UniversalResolver extends DIDResolver {
     // We let that error propagate to the caller.
     let resp = await axios.get(`${this.idUrl}${did}`);
     if (resp.data === undefined || resp.data.didDocument == undefined) {
-      throw new Error('Universal resolver returned invalid DID', did);
+      throw new NoDIDError(did);
     }
     return resp.data.didDocument;
+  }
+}
+
+export class MultiResolver extends DIDResolver {
+  /**
+   * Create a Resolver which delegates to the appropriate child Resolver according to an index.
+   *
+   * @param {object} index - A map from DID method name to child Resolver.
+   * @param {Resolver | null} catchAll - An optional fallback to use when index does not specify an
+   * implementation for the requested method.
+   * @returns {Resolver}
+   */
+  constructor(providers, catchAll) {
+    super();
+    this.providers = providers;
+    this.catchAll = catchAll;
+  }
+
+  /**
+   * Resolve the given DID with either the registered providers or try to fetch from the universal resolver
+   * if available.
+   * @param {string} did - A full DID (with method, like did:dock:5....)
+   * @returns {Promise<DIDDocument>} Returns a promise to the DID document
+   */
+  async resolve(did) {
+    const method = this.parseDid(did).method;
+    const provider = this.providers[method];
+
+    if (provider) {
+      return await this.getResolveMethod(provider)(did);
+    } else if (this.catchAll) {
+      return await this.getResolveMethod(this.catchAll)(did);
+    } else {
+      throw new Error('No provider found for DID', did);
+    }
+  }
+
+  getResolveMethod(provider) {
+    return provider.resolve ? provider.resolve.bind(provider) : provider;
   }
 }

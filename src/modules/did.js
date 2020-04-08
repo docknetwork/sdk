@@ -3,19 +3,7 @@ import b58 from 'bs58';
 
 import {getHexIdentifierFromDID, DockDIDQualifier} from '../utils/did';
 import {getStateChange} from '../utils/misc';
-import {validateDockDIDHexIdentifier} from '../utils/did';
-
-/**
- * Error thrown when a DID document lookup was successful, but the did in question does not exist.
- * This is different from a network error.
- */
-export class NoDIDError extends Error {
-  constructor(did) {
-    super(`DID (${did}) does not exist`);
-    this.name = 'NoDIDError';
-    this.did = did;
-  }
-}
+import {NoDIDError, validateDockDIDHexIdentifier} from '../utils/did';
 
 /** Class to create, update and destroy DIDs */
 class DIDModule {

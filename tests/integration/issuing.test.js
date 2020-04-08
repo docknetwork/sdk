@@ -15,6 +15,7 @@ import Secp256k1KeyPair  from 'secp256k1-key-pair';
 import {issueCredential, verifyCredential} from '../../src/utils/vc';
 import {getKeyDoc} from '../../src/utils/vc/helpers';
 
+// TODO: update test when moved to classes
 import {multiResolver, universalResolver, dockResolver} from '../../src/resolver';
 
 // 1st issuer's DID.

@@ -1,8 +1,8 @@
+// TODO: redo this test
 import {randomAsHex} from '@polkadot/util-crypto';
 import {DockAPI} from '../../src/api';
 import {createNewDockDID, createKeyDetail} from '../../src/utils/did';
 import {getPublicKeyFromKeyringPair} from '../../src/utils/misc';
-import {multiResolver, universalResolver, dockResolver} from '../../src/resolver';
 import {NoDID} from '../../src/err';
 import ethr from 'ethr-did-resolver';
 import {parse as parse_did} from 'did-resolver';

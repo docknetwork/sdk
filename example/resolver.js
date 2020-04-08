@@ -2,7 +2,7 @@ import {randomAsHex} from '@polkadot/util-crypto';
 import {DockAPI} from '../src/api';
 import {createNewDockDID, createKeyDetail} from '../src/utils/did';
 import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
-import {multiResolver, universalResolver, dockResolver} from '../src/resolver';
+import {MultiResolver, UniversalResolver, DockResolver, multiResolver, universalResolver, dockResolver} from '../src/resolver';
 import ethr from 'ethr-did-resolver';
 import {parse as parse_did} from 'did-resolver';
 
@@ -16,6 +16,8 @@ const ethereumProviderConfig = {
     },
   ]
 };
+
+const dock = new DockAPI();
 
 /**
  * Generate and register a new Dock DID return the DID
@@ -36,23 +38,24 @@ async function createDockDID(dock) {
   return dockDID;
 }
 
-// connect to a dock node
-async function connect(address) {
-  const dock = new DockAPI();
-  await dock.init({
-    address
-  });
-  return dock;
-}
-
 async function main() {
-  const dock = await connect(fullNodeWsRPCEndpoint);
+  console.log('Connecting to the node...');
+
+  await dock.init({
+    address: fullNodeWsRPCEndpoint
+  });
+
+  console.log('Creating DID providers...');
+
   const ethres = ethr.getResolver(ethereumProviderConfig).ethr;
   const providers = {
-    'dock': dockResolver(dock),
-    'ethr': did => ethres(did, parse_did(did)),
+    'dock': new DockResolver(dock), // Provider as class
+    'ethr': did => ethres(did, parse_did(did)), // Provider as function
   };
-  const resolve = multiResolver(providers, universalResolver(universalResolverUrl));
+
+  const resolver = new MultiResolver(providers, new UniversalResolver(universalResolverUrl));
+
+  console.log('Building DIDs list...');
 
   const didsToTest = [
     'did:ethr:0xabcabc03e98e0dc2b855be647c39abe984193675',
@@ -75,18 +78,17 @@ async function main() {
     await createDockDID(dock),
   ];
 
-  await Promise.all(
-    didsToTest.map(async did => {
-      console.log('resolving did', did)
-      console.log({[did]: await resolve(did)});
-    })
-  );
+  console.log('Resolving', didsToTest.length, 'dids...');
+
+  return Promise.all(didsToTest.map(async did => {
+    const document = await resolver.resolve(did);
+    console.log('Resolved DID', did, document)
+  }));
 }
 
-main().then(
-  _ => process.exit(0),
-  e => {
-    console.error(e);
+main()
+  .then(() => process.exit(0))
+  .catch(error => {
+    console.error(error);
     process.exit(1);
-  },
-);
+  });

@@ -16,3 +16,25 @@ export async function registerNewDIDUsingPair(dockAPI, did, pair) {
   const transaction = dockAPI.did.new(did, keyDetail);
   return await dockAPI.sendTransaction(transaction);
 }
+
+/**
+ * Test helper to get an unsigned cred with given credential id and holder DID
+ * @param credId - Credential id
+ * @param holderDID - Holder DID
+ * @returns {{issuanceDate: string, credentialSubject: {alumniOf: string, id: *}, id: *, type: [string, string], '@context': [string, string]}}
+ */
+export function getUnsignedCred(credId, holderDID) {
+  return {
+    '@context': [
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+    ],
+    id: credId,
+    type: ['VerifiableCredential', 'AlumniCredential'],
+    issuanceDate: '2020-03-18T19:23:24Z',
+    credentialSubject: {
+      id: holderDID,
+      alumniOf: 'Example University'
+    }
+  };
+}

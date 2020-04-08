@@ -5,10 +5,11 @@ import {
   generateEcdsaSecp256k1Keypair,
   getPublicKeyFromKeyringPair,
   getSignatureFromKeyringPair,
-  isHexWithGivenByteSize, verifyEcdsaSecp256k1Sig
+  verifyEcdsaSecp256k1Sig
 } from '../../src/utils/misc';
 import {PublicKeyEd25519, PublicKeySr25519, PublicKeySecp256k1} from '../../src/public-key';
 import {SignatureEd25519, SignatureSr25519, SignatureSecp256k1} from '../../src/signature';
+import {isHexWithGivenByteSize} from '../../src/utils/codec';
 
 describe('Testing isHexWithGivenByteSize', () => {
 
@@ -31,6 +32,7 @@ describe('Testing isHexWithGivenByteSize', () => {
   test('isHexWithGivenByteSize rejects strings not matching expected byte size', () => {
     expect(isHexWithGivenByteSize('0x12', 2)).toBe(false);
     expect(isHexWithGivenByteSize('0x1234', 1)).toBe(false);
+    expect(isHexWithGivenByteSize('0x1234', 0)).toBe(false);
   });
 
   test('isHexWithGivenByteSize accepts correct hex string with full bytes', () => {

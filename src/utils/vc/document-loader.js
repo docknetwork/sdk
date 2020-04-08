@@ -4,7 +4,7 @@ import testContext from './contexts';
 /**
  * Takes a resolver and returns a function that returns a document or throws an error when the document
  * cannot be found.
- * @param resolver - The resolver is optional but should be passed when DIDs need to be resolved.
+ * @param {Resolver} resolver - The resolver is optional but should be passed when DIDs need to be resolved.
  * @returns {function(*=): {documentUrl: *, document: null}}
  */
 export default function(resolver) {
@@ -23,7 +23,7 @@ export default function(resolver) {
       // Try to resolve a DID and throw if cannot resolve
       document = await resolver.resolve(uri);
     } else {
-      const context = testContext[uri];
+      const context = testContext.get(uri);
       if(context) {
         document = context;
       } else {

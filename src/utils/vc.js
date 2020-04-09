@@ -61,6 +61,7 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
  * @param {object} resolver - Resolver for DIDs.
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
  * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
+ * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
  * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
  * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
@@ -93,6 +94,7 @@ export async function verifyCredential(credential, resolver, compactProof = true
  * @param {Resolver} resolver - Resolver for DIDs.
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
  * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
+ * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
  * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
  * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
@@ -149,6 +151,7 @@ export async function signPresentation(presentation, keyDoc, challenge, domain, 
  * @param {Resolver} resolver - Resolver to resolve the issuer DID (optional)
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
  * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
+ * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
  * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
  * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
@@ -193,6 +196,7 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
  * @param {Resolver} resolver - Resolver to resolve the issuer DID (optional)
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
  * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
+ * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
  * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
  * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
@@ -262,6 +266,7 @@ export function hasDockRevocation(credential) {
  * structure of this field but only the truthyness of this field. The intention is to check whether the credential h
  * had a `credentialStatus` field.
  * @param {boolean} forceRevocationCheck - Whether to force the revocation check.
+ * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
  * @param {object} revocationAPI - See above verification methods for details on this parameter
  * @returns {boolean} - Whether to check for revocation or not.
  */

@@ -6,6 +6,7 @@ import {
   signPresentation
 } from '../src/utils/vc';
 import VerifiableCredential from '../src/verifiable-credential';
+import VerifiablePresentation from '../src/verifiable-presentation';
 
 //TODO: clean up these fixtures
 const sample_unsigned_cred = {
@@ -73,8 +74,8 @@ const sample_signed_cred_2 = {
     verificationMethod: 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw'
   }
 };
-const vp_id = 'some_vp_id';
-const vp_holder = 'some_vp_holder';
+const vp_id = 'https://example.com/credentials/12345';
+const vp_holder = 'https://example.com/credentials/1234567890';
 const presentation_credentials = [sample_signed_cred, sample_signed_cred_2];
 const sample_unsigned_pres = {
   '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
@@ -165,9 +166,7 @@ describe('Verifiable Credential Verification', () => {
   }, 30000);
 });
 
-describe('Verifiable Presentation Creation', () => {
-
-
+describe('Verifiable Presentation creation', () => {
   test('A proper verifiable presentation should be created from two valid sample credentials.', async () => {
     const presentation = createPresentation(
       presentation_credentials,
@@ -310,17 +309,7 @@ describe('Verifiable Credential incremental creation', () => {
   });
 
   test('Issuing an incrementally-created VC should return an object with a proof, and it must pass validation.', async () => {
-    let unsigned_credential = new VerifiableCredential(
-      'https://example.com/credentials/1872',
-      {
-        type: ['VerifiableCredential', 'AlumniCredential'],
-        issuanceDate: '2020-03-18T19:23:24Z',
-        subject: {
-          id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
-          alumniOf: 'Example University'
-        }
-      }
-    );
+    let unsigned_credential = new VerifiableCredential('https://example.com/credentials/1872');
     unsigned_credential.addContext('https://www.w3.org/2018/credentials/examples/v1');
     const signed_credential = await unsigned_credential.sign(sample_key);
     expect(signed_credential).toMatchObject(
@@ -344,4 +333,135 @@ describe('Verifiable Credential incremental creation', () => {
       )
     );
   }, 30000);
+});
+
+describe('Verifiable Presentation incremental creation', () => {
+  test('VP creation with only id should be possible, yet bring default values', async () => {
+    let vp = new VerifiablePresentation('blabla');
+    expect(vp.id).toBe('blabla');
+    expect(vp.context).toEqual(['https://www.w3.org/2018/credentials/v1']);
+    expect(vp.type).toEqual(['VerifiablePresentation']);
+    expect(vp.credentials).toEqual([]);
+  });
+
+  test('The JSON representation of a VP should bring the proper keys', async () => {
+    let vp = new VerifiablePresentation('blabla');
+    expect(vp.toJSON()).toEqual(
+      {
+        '@context':['https://www.w3.org/2018/credentials/v1'],
+        'id':'blabla',
+        'verifiableCredential':[],
+        'type':['VerifiablePresentation'],
+      }
+    );
+  });
+
+  test('Incremental VP creation should be possible', async () => {
+    let vp = new VerifiablePresentation('blabla');
+    expect(vp.id).toBe('blabla');
+
+    vp.addContext('https://www.w3.org/2018/credentials/examples/v1');
+    expect(vp.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1'
+    ]);
+    vp.addType('some_type');
+    expect(vp.type).toEqual([
+      'VerifiablePresentation',
+      'some_type'
+    ]);
+    vp.addCredential({id: 'some_credential_id'});
+    expect(vp.credentials).toEqual([{id: 'some_credential_id'}]);
+  });
+
+  test('Incremental VP creations runs basic validation', async () => {
+    expect(() => {
+      new VerifiablePresentation({key: 'value'});
+    }).toThrowError('needs to be a string.');
+
+    let vp = new VerifiablePresentation('blabla');
+    expect(() => {
+      vp.addContext(123);
+    }).toThrowError('needs to be a string.');
+
+    expect(() => {
+      vp.addType(123);
+    }).toThrowError('needs to be a string.');
+
+    expect(() => {
+      vp.addCredential({some: 'value'});
+    }).toThrowError('"credential" must include an id.');
+
+    await expect(vp.verify()).rejects.toThrowError('The current VP has no proof.');
+
+  });
+
+  test('Incremental VP creation from external VCs should be possible', async () => {
+    let vp = new VerifiablePresentation(vp_id);
+    vp.addCredential(sample_signed_cred);
+    expect(vp.credentials).toEqual([sample_signed_cred]);
+    await vp.sign(
+      sample_key,
+      'some_challenge',
+      'some_domain',
+    );
+    expect(vp.proof).toMatchObject({type: 'EcdsaSecp256k1Signature2019'});
+    expect(vp.proof).toMatchObject({created: expect.anything()});
+    expect(vp.proof).toMatchObject({challenge: 'some_challenge'});
+    expect(vp.proof).toMatchObject({domain: 'some_domain'});
+    expect(vp.proof).toMatchObject({jws: expect.anything()});
+    expect(vp.proof).toMatchObject({proofPurpose: 'authentication'});
+    expect(vp.proof).toMatchObject({verificationMethod: expect.anything()});
+
+    const results = await vp.verify(
+      'some_challenge',
+      'some_domain'
+    );
+    expect(results.presentationResult).toMatchObject({verified: true});
+    expect(results.presentationResult.results[0]).toMatchObject({verified: true});
+    expect(results.presentationResult.results[0]).toMatchObject({proof: expect.anything()});
+    expect(results.credentialResults[0]).toMatchObject({verified: true});
+    expect(results.credentialResults[0]).toMatchObject({results: expect.anything()});
+  });
+
+
+  test('Issuing an incrementally-created VP from an incrementally created VC should return an object with a proof, and it must pass validation.', async () => {
+    let vc = new VerifiableCredential('https://example.com/credentials/1872');
+    vc.addContext('https://www.w3.org/2018/credentials/examples/v1');
+    vc.addType('AlumniCredential');
+    vc.addSubject({
+      id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+      alumniOf: 'Example University'
+    });
+    await vc.sign(sample_key);
+    const vc_verification_result = await vc.verify();
+    expect(vc_verification_result).toMatchObject({'verified': true});
+
+    let vp = new VerifiablePresentation(vp_id);
+    vp.setHolder(vp_holder);
+    vp.addCredential(vc);
+    await vp.sign(
+      sample_key,
+      'some_challenge',
+      'some_domain',
+    );
+    expect(vp.proof).toMatchObject({type: 'EcdsaSecp256k1Signature2019'});
+    expect(vp.proof).toMatchObject({created: expect.anything()});
+    expect(vp.proof).toMatchObject({challenge: 'some_challenge'});
+    expect(vp.proof).toMatchObject({domain: 'some_domain'});
+    expect(vp.proof).toMatchObject({jws: expect.anything()});
+    expect(vp.proof).toMatchObject({proofPurpose: 'authentication'});
+    expect(vp.proof).toMatchObject({verificationMethod: expect.anything()});
+
+    const results = await vp.verify(
+      'some_challenge',
+      'some_domain'
+    );
+    expect(results.presentationResult).toMatchObject({verified: true});
+    expect(results.presentationResult.results[0]).toMatchObject({verified: true});
+    expect(results.presentationResult.results[0]).toMatchObject({proof: expect.anything()});
+    expect(results.credentialResults[0]).toMatchObject({verified: true});
+    expect(results.credentialResults[0]).toMatchObject({results: expect.anything()});
+  }, 30000);
+
 });

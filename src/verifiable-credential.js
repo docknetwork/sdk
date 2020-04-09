@@ -139,6 +139,12 @@ class VerifiableCredential {
       throw new Error(`${datetime} needs to be a valid datetime.`);
     }
   }
+
+  /**
+   * Fail if the given string isn't a URL
+   * @param url
+   */
+  //TODO: change this to URI
   ensureUrl(url) {
     this.ensureString(url);
     var pattern = new RegExp('^(https?:\\/\\/)?'+
@@ -151,6 +157,7 @@ class VerifiableCredential {
       throw new Error(`${url} needs to be a valid URL.`);
     }
   }
+
   /**
    * Define the JSON representation of a Verifiable Credential.
    * @returns {any}

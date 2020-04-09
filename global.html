@@ -104,6 +104,179 @@
     
 
     
+    <h4 class="name" id="checkRevocationStatus"><span class="type-signature"></span>checkRevocationStatus<span class="signature">(credential, revocationAPI)</span><span class="type-signature"> &rarr; {Promise.&lt;({verified: boolean}|{verified: boolean, error: string})>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Check if the credential is revoked or not.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>credential</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>revocationAPI</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line219">line 219</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The returned object will have a key `verified`
+which is true if the credential is not revoked and false otherwise. The `error` will describe the error if any.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;({verified: boolean}|{verified: boolean, error: string})></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="createDidRemoval"><span class="type-signature"></span>createDidRemoval<span class="signature">(didModule, did)</span><span class="type-signature"> &rarr; {object}</span></h4>
     
 
@@ -960,7 +1133,7 @@ only be passed when controller is to be updated.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line85">line 85</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line115">line 115</a>
     </li></ul></dd>
     
 
@@ -1802,6 +1975,157 @@ require the change to be wrapped in `StateChange` before serializing for signing
     <dd>
         
 <span class="param-type">array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getDockRevIdFromCredential"><span class="type-signature"></span>getDockRevIdFromCredential<span class="signature">(credential)</span><span class="type-signature"> &rarr; {*}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Generate the revocation id of a credential usable by Dock. It hashes the credential id to get the
+revocation id
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>credential</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line245">line 245</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
 
 
     </dd>
@@ -3102,7 +3426,7 @@ and keypair is not made part of the key doc.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line16">line 16</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line25">line 25</a>
     </li></ul></dd>
     
 
@@ -3149,6 +3473,156 @@ and keypair is not made part of the key doc.</td>
 |
 
 <span class="param-type"><a href="Sr25519Signature2020.html">Sr25519Signature2020</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="hasDockRevocation"><span class="type-signature"></span>hasDockRevocation<span class="signature">(credential)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Check if credential has Dock specific revocation
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>credential</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line255">line 255</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
 
 
     </dd>
@@ -3444,7 +3918,7 @@ and keypair is not made part of the key doc.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line166">line 166</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line291">line 291</a>
     </li></ul></dd>
     
 
@@ -3472,6 +3946,215 @@ and keypair is not made part of the key doc.</td>
 <h5>Returns:</h5>
 
         
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="isRevocationCheckNeeded"><span class="type-signature"></span>isRevocationCheckNeeded<span class="signature">(credStatus, forceRevocationCheck, revocationAPI)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Checks if the revocation check is needed. Will return true if `forceRevocationCheck` is true else will check the
+truthyness of revocationAPI. Will return true even if revocationAPI is an empty object.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>credStatus</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The `credentialStatus` field in a credential. Does not care about the correct
+structure of this field but only the truthyness of this field. The intention is to check whether the credential h
+had a `credentialStatus` field.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>forceRevocationCheck</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Whether to force the revocation check.
+Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>revocationAPI</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">See above verification methods for details on this parameter</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line273">line 273</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    - Whether to check for revocation or not.
+</div>
+
 
 
 <dl>
@@ -3594,7 +4277,7 @@ and keypair is not made part of the key doc.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line157">line 157</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line282">line 282</a>
     </li></ul></dd>
     
 
@@ -3795,7 +4478,7 @@ and keypair is not made part of the key doc.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line36">line 36</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line45">line 45</a>
     </li></ul></dd>
     
 
@@ -3853,7 +4536,7 @@ and keypair is not made part of the key doc.</td>
     
 
     
-    <h4 class="name" id="isVerifiedCredential"><span class="type-signature"></span>isVerifiedCredential<span class="signature">(credential, resolver, compactProof)</span><span class="type-signature"> &rarr; {Promise.&lt;boolean>}</span></h4>
+    <h4 class="name" id="isVerifiedCredential"><span class="type-signature"></span>isVerifiedCredential<span class="signature">(credential, resolver, compactProof, forceRevocationCheck, revocationAPI)</span><span class="type-signature"> &rarr; {Promise.&lt;boolean>}</span></h4>
     
 
     
@@ -3964,6 +4647,55 @@ and keypair is not made part of the key doc.</td>
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>forceRevocationCheck</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Whether to force revocation check or not.
+Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>revocationAPI</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An object representing a map. "revocation type -> revocation API". The API is used to check
+revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
+as we support more APIs there are more details associated with each API. Only Dock is supported as of now.</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -4001,7 +4733,7 @@ and keypair is not made part of the key doc.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line73">line 73</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line103">line 103</a>
     </li></ul></dd>
     
 
@@ -4030,7 +4762,7 @@ and keypair is not made part of the key doc.</td>
 
         
 <div class="param-desc">
-    Returns promise that resolves to true if verified
+    Returns promise that resolves to true if credential is valid and not revoked and false otherwise
 </div>
 
 
@@ -4059,7 +4791,7 @@ and keypair is not made part of the key doc.</td>
     
 
     
-    <h4 class="name" id="isVerifiedPresentation"><span class="type-signature"></span>isVerifiedPresentation<span class="signature">(presentation, challenge, domain, resolver, compactProof)</span><span class="type-signature"> &rarr; {Promise.&lt;boolean>}</span></h4>
+    <h4 class="name" id="isVerifiedPresentation"><span class="type-signature"></span>isVerifiedPresentation<span class="signature">(presentation, challenge, domain, resolver, compactProof, forceRevocationCheck, revocationAPI)</span><span class="type-signature"> &rarr; {Promise.&lt;boolean>}</span></h4>
     
 
     
@@ -4216,6 +4948,55 @@ the `proof` (signature by holder) is correct.
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>forceRevocationCheck</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Whether to force revocation check or not.
+Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>revocationAPI</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An object representing a map. "revocation type -> revocation API". The API is used to check
+revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
+as we support more APIs there are more details associated with each API. Only Dock is supported as of now.</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -4253,7 +5034,7 @@ the `proof` (signature by holder) is correct.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line147">line 147</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line207">line 207</a>
     </li></ul></dd>
     
 
@@ -4281,6 +5062,12 @@ the `proof` (signature by holder) is correct.
 <h5>Returns:</h5>
 
         
+<div class="param-desc">
+    - Returns promise that resolves to true if the
+presentation is valid and all the credentials are valid and not revoked and false otherwise. The `error` will
+describe the error if any.
+</div>
+
 
 
 <dl>
@@ -5085,7 +5872,7 @@ if available.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line103">line 103</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line133">line 133</a>
     </li></ul></dd>
     
 
@@ -5461,7 +6248,7 @@ if available.
     
 
     
-    <h4 class="name" id="verifyCredential"><span class="type-signature"></span>verifyCredential<span class="signature">(credential, resolver, compactProof)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    <h4 class="name" id="verifyCredential"><span class="type-signature"></span>verifyCredential<span class="signature">(credential, resolver, compactProof, forceRevocationCheck, revocationAPI)</span><span class="type-signature"> &rarr; {object}</span></h4>
     
 
     
@@ -5534,7 +6321,7 @@ if available.
             <td class="type">
             
                 
-<span class="param-type">Resolver</span>
+<span class="param-type">object</span>
 
 
             
@@ -5568,6 +6355,55 @@ if available.
             
 
             <td class="description last">Whether to compact the JSON-LD or not.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>forceRevocationCheck</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Whether to force revocation check or not.
+Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>revocationAPI</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An object representing a map. "revocation type -> revocation API". The API is used to check
+revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
+as we support more APIs there are more details associated with each API. Only Dock is supported as of now.</td>
         </tr>
 
     
@@ -5608,7 +6444,7 @@ if available.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line56">line 56</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line71">line 71</a>
     </li></ul></dd>
     
 
@@ -5637,7 +6473,8 @@ if available.
 
         
 <div class="param-desc">
-    verification result.
+    verification result. The returned object will have a key `verified` which is true if the
+credential is valid and not revoked and false otherwise. The `error` will describe the error if any.
 </div>
 
 
@@ -5871,7 +6708,7 @@ if available.
     
 
     
-    <h4 class="name" id="verifyPresentation"><span class="type-signature"></span>verifyPresentation<span class="signature">(presentation, challenge, domain, resolver, compactProof)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    <h4 class="name" id="verifyPresentation"><span class="type-signature"></span>verifyPresentation<span class="signature">(presentation, challenge, domain, resolver, compactProof, forceRevocationCheck, revocationAPI)</span><span class="type-signature"> &rarr; {object}</span></h4>
     
 
     
@@ -6027,6 +6864,55 @@ if available.
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>forceRevocationCheck</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Whether to force revocation check or not.
+Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>revocationAPI</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An object representing a map. "revocation type -> revocation API". The API is used to check
+revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
+as we support more APIs there are more details associated with each API. Only Dock is supported as of now.</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -6064,7 +6950,7 @@ if available.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line125">line 125</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line162">line 162</a>
     </li></ul></dd>
     
 
@@ -6093,7 +6979,9 @@ if available.
 
         
 <div class="param-desc">
-    verification result.
+    verification result. The returned object will have a key `verified` which is true if the
+presentation is valid and all the credentials are valid and not revoked and false otherwise. The `error` will
+describe the error if any.
 </div>
 
 
@@ -6132,13 +7020,13 @@ if available.
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="EcdsaSepc256k1Signature2019_EcdsaSepc256k1Signature2019.html">EcdsaSepc256k1Signature2019</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="PublicKey.html">PublicKey</a></li><li><a href="PublicKeyEd25519.html">PublicKeyEd25519</a></li><li><a href="PublicKeySecp256k1.html">PublicKeySecp256k1</a></li><li><a href="PublicKeySr25519.html">PublicKeySr25519</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="Signature.html">Signature</a></li><li><a href="SignatureEd25519.html">SignatureEd25519</a></li><li><a href="SignatureSecp256k1.html">SignatureSecp256k1</a></li><li><a href="SignatureSr25519.html">SignatureSr25519</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li></ul><h3>Global</h3><ul><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createPresentation">createPresentation</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getFromUniversalResolver">getFromUniversalResolver</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getKeyDoc">getKeyDoc</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getResolver">getResolver</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="EcdsaSepc256k1Signature2019_EcdsaSepc256k1Signature2019.html">EcdsaSepc256k1Signature2019</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="PublicKey.html">PublicKey</a></li><li><a href="PublicKeyEd25519.html">PublicKeyEd25519</a></li><li><a href="PublicKeySecp256k1.html">PublicKeySecp256k1</a></li><li><a href="PublicKeySr25519.html">PublicKeySr25519</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="Signature.html">Signature</a></li><li><a href="SignatureEd25519.html">SignatureEd25519</a></li><li><a href="SignatureSecp256k1.html">SignatureSecp256k1</a></li><li><a href="SignatureSr25519.html">SignatureSr25519</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createPresentation">createPresentation</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getFromUniversalResolver">getFromUniversalResolver</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getKeyDoc">getKeyDoc</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getResolver">getResolver</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Thu Apr 09 2020 21:57:16 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Thu Apr 09 2020 22:25:01 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

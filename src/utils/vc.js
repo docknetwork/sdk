@@ -11,7 +11,7 @@ import {RevEntryByteSize, RevRegIdByteSize} from './revocation';
 // XXX: Does it make sense to have a revocation registry type for Dock like below and eliminate the need for `rev_reg:dock:`?
 //export const RevRegType = 'DockRevocationRegistry2020';
 export const RevRegType = 'CredentialStatusList2017';
-export const DockRevRegQualifier = 'rev_reg:dock:';
+export const DockRevRegQualifier = 'rev-reg:dock:';
 
 const {Ed25519Signature2018} = suites;
 
@@ -60,12 +60,14 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
  * @param {object} credential - verifiable credential to be verified.
  * @param {object} resolver - Resolver for DIDs.
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
- * @param {object} revocationAPI - API needed to check revocation status. For now, the object specifies the type as key
- * and the value as the API, but the structure can change as we support more APIs. Only Dock is supported as of now.
- * @return {object} verification result. The returned object will have a key `verified`which is true if the
- * credential is not revoked and false otherwise. The `error` will describe the error if any.
+ * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
+ * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
+ * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
+ * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+ * @return {object} verification result. The returned object will have a key `verified` which is true if the
+ * credential is valid and not revoked and false otherwise. The `error` will describe the error if any.
  */
-export async function verifyCredential(credential, resolver, compactProof = true, revocationAPI) {
+export async function verifyCredential(credential, resolver, compactProof = true, forceRevocationCheck = true, revocationAPI) {
   const credVer = await vcjs.verifyCredential({
     credential,
     suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
@@ -73,8 +75,8 @@ export async function verifyCredential(credential, resolver, compactProof = true
     compactProof
   });
 
-  // Check for revocation only if the credential is verified and revocation API is provided.
-  if (credVer.verified && revocationAPI) {
+  // Check for revocation only if the credential is verified and revocation check is needed.
+  if (credVer.verified && isRevocationCheckNeeded(credential.credentialStatus, forceRevocationCheck, revocationAPI)) {
     const revResult = await checkRevocationStatus(credential, revocationAPI);
     // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
     if (!revResult.verified) {
@@ -90,12 +92,14 @@ export async function verifyCredential(credential, resolver, compactProof = true
  * @param {object} credential - verifiable credential to be verified.
  * @param {Resolver} resolver - Resolver for DIDs.
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
- * @param {object} revocationAPI - API needed to check revocation status. For now, the object specifies the type as key
- * and the value as the API, but the structure can change as we support more APIs. Only Dock is supported as of now.
- * @returns {Promise<boolean>} Returns promise that resolves to true if verified
+ * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
+ * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
+ * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
+ * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+ * @returns {Promise<boolean>} Returns promise that resolves to true if credential is valid and not revoked and false otherwise
  */
-export async function isVerifiedCredential(credential, resolver, compactProof = true, revocationAPI) {
-  const result = await verifyCredential(credential, resolver, compactProof, revocationAPI);
+export async function isVerifiedCredential(credential, resolver, compactProof = true, forceRevocationCheck = true, revocationAPI) {
+  const result = await verifyCredential(credential, resolver, compactProof, forceRevocationCheck, revocationAPI);
   return result.verified;
 }
 
@@ -144,11 +148,15 @@ export async function signPresentation(presentation, keyDoc, challenge, domain, 
  * @param {string} domain - proof domain (optional)
  * @param {Resolver} resolver - Resolver to resolve the issuer DID (optional)
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
- * @param {object} revocationAPI - API needed to check revocation status. For now, the object specifies the type as key
- * and the value as the API, but the structure can change as we support more APIs. Only Dock is supported as of now.
- * @return {object} verification result.
+ * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
+ * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
+ * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
+ * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+ * @return {object} verification result. The returned object will have a key `verified` which is true if the
+ * presentation is valid and all the credentials are valid and not revoked and false otherwise. The `error` will
+ * describe the error if any.
  */
-export async function verifyPresentation(presentation, challenge, domain, resolver, compactProof = true, revocationAPI) {
+export async function verifyPresentation(presentation, challenge, domain, resolver, compactProof = true, forceRevocationCheck = true, revocationAPI) {
   // TODO: support other purposes than the default of "authentication"
   const presVer = await vcjs.verify({
     presentation,
@@ -159,13 +167,15 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
     compactProof
   });
 
-  // Check for revocation only if the credential is verified and revocation API is provided.
-  if (presVer.verified && revocationAPI) {
+  if (presVer.verified) {
     for (let credential of presentation.verifiableCredential) {
-      const res = checkRevocationStatus(credential, revocationAPI);
-      // Return error for the first credential that does not pass revocation check.
-      if (!res.verified) {
-        return res;
+      // Check for revocation only if the presentation is verified and revocation check is needed.
+      if (isRevocationCheckNeeded(credential.credentialStatus, forceRevocationCheck, revocationAPI)) {
+        const res = checkRevocationStatus(credential, revocationAPI);
+        // Return error for the first credential that does not pass revocation check.
+        if (!res.verified) {
+          return res;
+        }
       }
     }
     // If all credentials pass the revocation check, the let the result of presentation verification be returned.
@@ -182,12 +192,16 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
  * @param {string} domain - proof domain (optional)
  * @param {Resolver} resolver - Resolver to resolve the issuer DID (optional)
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
- * @param {object} revocationAPI - API needed to check revocation status. For now, the object specifies the type as key
- * and the value as the API, but the structure can change as we support more APIs. Only Dock is supported as of now.
- * @returns {Promise<boolean>}
+ * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
+ * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
+ * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
+ * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+ * @returns {Promise<boolean>} - Returns promise that resolves to true if the
+ * presentation is valid and all the credentials are valid and not revoked and false otherwise. The `error` will
+ * describe the error if any.
  */
-export async function isVerifiedPresentation(presentation, challenge, domain, resolver, compactProof = true, revocationAPI) {
-  const result = await verifyPresentation(presentation, challenge, domain, compactProof, revocationAPI);
+export async function isVerifiedPresentation(presentation, challenge, domain, resolver, compactProof = true, forceRevocationCheck = true, revocationAPI) {
+  const result = await verifyPresentation(presentation, challenge, domain, compactProof, forceRevocationCheck, revocationAPI);
   return result.verified;
 }
 
@@ -241,7 +255,19 @@ export function hasDockRevocation(credential) {
     isHexWithGivenByteSize(credential.credentialStatus.id.slice(DockRevRegQualifier.length), RevRegIdByteSize);
 }
 
-
+/**
+ * Checks if the revocation check is needed. Will return true if `forceRevocationCheck` is true else will check the
+ * truthyness of revocationAPI. Will return true even if revocationAPI is an empty object.
+ * @param {object} credStatus - The `credentialStatus` field in a credential. Does not care about the correct
+ * structure of this field but only the truthyness of this field. The intention is to check whether the credential h
+ * had a `credentialStatus` field.
+ * @param {boolean} forceRevocationCheck - Whether to force the revocation check.
+ * @param {object} revocationAPI - See above verification methods for details on this parameter
+ * @returns {boolean} - Whether to check for revocation or not.
+ */
+export function isRevocationCheckNeeded(credStatus, forceRevocationCheck, revocationAPI) {
+  return !!credStatus && (forceRevocationCheck || !!revocationAPI);
+}
 
 /**
  * Return true if the given value is a string.

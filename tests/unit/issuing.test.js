@@ -392,7 +392,7 @@ describe('Verifiable Presentation incremental creation', () => {
       vp.addCredential({some: 'value'});
     }).toThrowError('"credential" must include an id.');
 
-    await expect(vp.verify()).rejects.toThrowError('The current VP has no proof.');
+    await expect(vp.verify()).rejects.toThrowError('The current VerifiablePresentation has no proof.');
 
   });
 

@@ -181,7 +181,7 @@ class VerifiablePresentation {
    */
   async verify(challenge, domain, resolver, compactProof = true) {
     if (!this.proof) {
-      throw new Error('The current VP has no proof.');
+      throw new Error('The current VerifiablePresentation has no proof.');
     }
     return await verifyPresentation(
       this.toJSON(),

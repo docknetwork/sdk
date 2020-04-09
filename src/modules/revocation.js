@@ -98,20 +98,18 @@ class RevocationModule {
 
   async getRegistryDetail(registryID) {
     const resp = await this.api.query.revoke.registries(registryID);
-    if (resp) {
-      if (resp.isNone) {
-        throw new Error('Could not find revocation registry: ' + registryID);
-      }
+    if (resp.isNone) {
+      throw new Error('Could not find revocation registry: ' + registryID);
+    }
 
-      const respTuple = resp.unwrap();
-      if (respTuple.length === 2) {
-        return [
-          respTuple[0],
-          respTuple[1].toNumber()
-        ];
-      } else {
-        throw new Error('Needed 2 items in response but got' + respTuple.length);
-      }
+    const respTuple = resp.unwrap();
+    if (respTuple.length === 2) {
+      return [
+        respTuple[0],
+        respTuple[1].toNumber()
+      ];
+    } else {
+      throw new Error('Needed 2 items in response but got' + respTuple.length);
     }
   }
 
@@ -123,9 +121,7 @@ class RevocationModule {
    */
   async getIsRevoked(registryID, revokeID) {
     const resp = await this.api.query.revoke.revocations(registryID, revokeID);
-    if (resp) {
-      return !resp.isNone;
-    }
+    return !resp.isNone;
   }
 
   /**

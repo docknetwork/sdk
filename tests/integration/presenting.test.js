@@ -184,9 +184,9 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
   test('Holder creates a verifiable presentation with 2 credentials and verifier verifies it', async () => {
     const holder3Key = getKeyDoc(holder3DID, dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
 
-    const res = await isVerifiedCredential(cred3, resolver);
+    const res = await isVerifiedCredential(cred3, resolver, true, false);
     expect(res).toBe(true);
-    const res1 = await isVerifiedCredential(cred4, resolver);
+    const res1 = await isVerifiedCredential(cred4, resolver, true, false);
     expect(res1).toBe(true);
 
     const presId = randomAsHex(32);
@@ -236,7 +236,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       signedPres,
       chal,
       domain,
-      resolver,
+      resolver
     );
 
     // Verifier checks that both credential and presentation are correct.

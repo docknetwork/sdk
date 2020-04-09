@@ -4,9 +4,9 @@ import {
   createPresentation,
   verifyPresentation,
   signPresentation
-} from '../src/utils/vc';
-import VerifiableCredential from '../src/verifiable-credential';
-import VerifiablePresentation from '../src/verifiable-presentation';
+} from '../../src/utils/vc';
+import VerifiableCredential from '../../src/verifiable-credential';
+import VerifiablePresentation from '../../src/verifiable-presentation';
 
 //TODO: clean up these fixtures
 const sample_unsigned_cred = {

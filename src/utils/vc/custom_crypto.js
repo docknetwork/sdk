@@ -1,7 +1,6 @@
 import Secp256k1KeyPair from 'secp256k1-key-pair';
 import {suites} from 'jsonld-signatures';
 import {schnorrkelVerify} from '@polkadot/util-crypto/schnorrkel';
-import {hexToU8a} from '@polkadot/util';
 import b58 from 'bs58';
 
 
@@ -63,7 +62,7 @@ export class Sr25519VerificationKey2020 {
 
   /**
    * Construct the verifier factory that has the verify method using the current public key
-   * @returns {{verify({data?: *, signature?: *}): Promise<*>}}
+   * @returns {Promise<verify>}
    */
   verifier() {
     return Sr25519VerificationKey2020.verifierFactory(this.publicKey);
@@ -72,7 +71,7 @@ export class Sr25519VerificationKey2020 {
   /**
    * Verifier factory that returns the object with the verify method
    * @param publicKey
-   * @returns {{verify({data?: *, signature?: *}): Promise<*>}|*}
+   * @returns {Promise<verify>}
    */
   static verifierFactory(publicKey) {
     return {
@@ -95,25 +94,12 @@ export class Sr25519Signature2020 extends suites.JwsLinkedDataSignature {
   /**
    * Generate object with `sign` method
    * @param keypair
-   * @returns {{sign({data?: *}): Promise<*>}|*}
+   * @returns {Promise<sign>}
    */
   static signerFactory(keypair) {
     return {
       async sign({data}) {
         return keypair.sign(data);
-      }
-    };
-  }
-
-  /**
-   * Generate object with `verify` method
-   * @param publicKey
-   * @returns {{verify({data?: *, signature?: *}): Promise<*>}|*}
-   */
-  static verifierFactory(publicKey) {
-    return {
-      async verify({data, signature}) {
-        return schnorrkelVerify(data, signature, hexToU8a(publicKey.value));
       }
     };
   }

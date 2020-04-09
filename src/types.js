@@ -1,4 +1,4 @@
-{
+export default {
   "dock::did::Did": "[u8;32]",
   "Bytes32": {
     "value": "[u8;32]"

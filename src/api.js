@@ -3,7 +3,7 @@ import {cryptoWaitReady} from '@polkadot/util-crypto';
 
 import RevocationModule from './modules/revocation';
 import DIDModule from './modules/did';
-import types from './types.json';
+import types from './types';
 
 import {
   PublicKey,

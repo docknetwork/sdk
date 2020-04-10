@@ -1,10 +1,12 @@
 import {
+  ensureObject,
+  ensureObjectWithId,
+  ensureString,
+  ensureUrl,
   isObject,
-  isString,
   signPresentation,
   verifyPresentation
 } from './utils/vc';
-import vcjs from 'vc-js';
 import VerifiableCredential from './verifiable-credential';
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
@@ -20,7 +22,7 @@ class VerifiablePresentation {
    * @returns {VerifiablePresentation}
    */
   constructor(id) {
-    this.ensureString(id);
+    ensureString(id);
     this.id = id;
 
     this.context = [DEFAULT_CONTEXT];
@@ -34,10 +36,10 @@ class VerifiablePresentation {
    * @returns {VerifiablePresentation}
    */
   addContext(context) {
-    if (isString(context)){
-      this.ensureUrl(context);
+    if (!isObject(context)){
+      ensureUrl(context);
     } else {
-      this.ensureObject(context);
+      ensureObject(context);
     }
     this.context.push(context);
     return this;
@@ -49,7 +51,7 @@ class VerifiablePresentation {
    * @returns {VerifiablePresentation}
    */
   addType(type) {
-    this.ensureString(type);
+    ensureString(type);
     this.type.push(type);
     return this;
   }
@@ -60,7 +62,7 @@ class VerifiablePresentation {
    * @returns {VerifiablePresentation}
    */
   setHolder(holder) {
-    this.ensureUrl(holder);
+    ensureUrl(holder);
     this.holder = holder;
     return this;
   }
@@ -74,68 +76,9 @@ class VerifiablePresentation {
     if (credential && credential instanceof VerifiableCredential){
       credential = credential.toJSON();
     }
-    this.ensureObjectWithId(credential, 'credential');
+    ensureObjectWithId(credential, 'credential');
     this.credentials.push(credential);
     return this;
-  }
-
-  /**
-   * Fail if the given value isn't a string
-   * @param value
-   */
-  ensureString(value){
-    if (!isString(value)){
-      throw new Error(`${value} needs to be a string.`);
-    }
-  }
-
-  /**
-   * Fail if the given value isn't an object
-   * @param value
-   */
-  ensureObject(value){
-    if (!isObject(value)){
-      throw new Error(`${value} needs to be an object.`);
-    }
-  }
-
-  /**
-   * Fail if the given value isn't an object
-   * @param value
-   */
-  ensureObjectWithId(value, name){
-    this.ensureObject(value);
-    if(!value.id){
-      throw new Error(`"${name}" must include an id.`);
-    }
-  }
-
-  /**
-   * Fail if the given datetime isn't valid.
-   * @param datetime
-   */
-  ensureValidDatetime(datetime){
-    if(!vcjs.dateRegex.test(datetime)) {
-      throw new Error(`${datetime} needs to be a valid datetime.`);
-    }
-  }
-
-  /**
-   * Fail if the given string isn't a URL
-   * @param url
-   */
-  //TODO: change this to URI
-  ensureUrl(url) {
-    this.ensureString(url);
-    var pattern = new RegExp('^(https?:\\/\\/)?'+
-      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+
-      '((\\d{1,3}\\.){3}\\d{1,3}))'+
-      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+
-      '(\\?[;&a-z\\d%_.~+=-]*)?'+
-      '(\\#[-a-z\\d_]*)?$','i');
-    if (!pattern.test(url)){
-      throw new Error(`${url} needs to be a valid URL.`);
-    }
   }
 
   /**

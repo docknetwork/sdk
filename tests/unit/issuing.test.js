@@ -402,7 +402,7 @@ describe('Verifiable Presentation incremental creation', () => {
     let vp = new VerifiablePresentation('blabla');
     expect(() => {
       vp.addContext(123);
-    }).toThrowError('needs to be an object.');
+    }).toThrowError('needs to be a string.');
     expect(() => {
       vp.addContext('123');
     }).toThrowError('needs to be a valid URL.');

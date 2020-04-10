@@ -1,10 +1,13 @@
 import {
+  ensureObject,
+  ensureObjectWithId,
+  ensureString,
+  ensureUrl,
+  ensureValidDatetime,
   isObject,
-  isString,
   issueCredential,
   verifyCredential
 } from './utils/vc';
-import vcjs from 'vc-js';
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiableCredential';
@@ -18,7 +21,7 @@ class VerifiableCredential {
    * @param {string} id - id of the credential
    */
   constructor(id) {
-    this.ensureString(id);
+    ensureString(id);
     this.id = id;
 
     this.context = [DEFAULT_CONTEXT];
@@ -34,9 +37,9 @@ class VerifiableCredential {
    */
   addContext(context) {
     if (!isObject(context)){
-      this.ensureUrl(context);
+      ensureUrl(context);
     } else {
-      this.ensureObject(context);
+      ensureObject(context);
     }
     this.context.push(context);
     return this;
@@ -48,7 +51,7 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   addType(type) {
-    this.ensureString(type);
+    ensureString(type);
     this.type.push(type);
     return this;
   }
@@ -59,7 +62,7 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   addSubject(subject) {
-    this.ensureObjectWithId(subject, 'credentialSubject');
+    ensureObjectWithId(subject, 'credentialSubject');
     this.subject.push(subject);
     return this;
   }
@@ -70,7 +73,7 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   setStatus(status) {
-    this.ensureObjectWithId(status, 'credentialStatus');
+    ensureObjectWithId(status, 'credentialStatus');
     if(!status.type){
       throw new Error('"credentialStatus" must include a type.');
     }
@@ -84,7 +87,7 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   setIssuanceDate(issuanceDate) {
-    this.ensureValidDatetime(issuanceDate);
+    ensureValidDatetime(issuanceDate);
     this.issuanceDate = issuanceDate;
     return this;
   }
@@ -95,70 +98,9 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   setExpirationDate(expirationDate) {
-    this.ensureValidDatetime(expirationDate);
+    ensureValidDatetime(expirationDate);
     this.expirationDate = expirationDate;
     return this;
-  }
-
-
-  /**
-   * Fail if the given value isn't a string
-   * @param value
-   */
-  ensureString(value){
-    if (!isString(value)){
-      throw new Error(`${value} needs to be a string.`);
-    }
-  }
-
-  /**
-   * Fail if the given value isn't an object
-   * @param value
-   */
-  ensureObject(value){
-    if (!isObject(value)){
-      throw new Error(`${value} needs to be an object.`);
-    }
-  }
-
-  /**
-   * Fail if the given value isn't an object
-   * @param value
-   * @param {string} name - Name of the object. Used in constructing error.
-   */
-  ensureObjectWithId(value, name){
-    this.ensureObject(value);
-    if(!value.id){
-      throw new Error(`"${name}" must include an id.`);
-    }
-  }
-
-  /**
-   * Fail if the given datetime isn't valid.
-   * @param datetime
-   */
-  ensureValidDatetime(datetime){
-    if(!vcjs.dateRegex.test(datetime)) {
-      throw new Error(`${datetime} needs to be a valid datetime.`);
-    }
-  }
-
-  /**
-   * Fail if the given string isn't a URL
-   * @param url
-   */
-  //TODO: change this to URI
-  ensureUrl(url) {
-    this.ensureString(url);
-    var pattern = new RegExp('^(https?:\\/\\/)?'+
-      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+
-      '((\\d{1,3}\\.){3}\\d{1,3}))'+
-      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+
-      '(\\?[;&a-z\\d%_.~+=-]*)?'+
-      '(\\#[-a-z\\d_]*)?$','i');
-    if (!pattern.test(url)){
-      throw new Error(`${url} needs to be a valid URL.`);
-    }
   }
 
   /**

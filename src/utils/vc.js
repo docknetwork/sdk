@@ -291,3 +291,64 @@ export function isString(value) {
 export function isObject(value) {
   return value && typeof value === 'object' && value.constructor === Object;
 }
+
+
+/**
+ * Fail if the given value isn't a string
+ * @param value
+ */
+export function ensureString(value){
+  if (!isString(value)){
+    throw new Error(`${value} needs to be a string.`);
+  }
+}
+
+/**
+ * Fail if the given value isn't an object
+ * @param value
+ */
+export function ensureObject(value){
+  if (!isObject(value)){
+    throw new Error(`${value} needs to be an object.`);
+  }
+}
+
+/**
+ * Fail if the given value isn't an object
+ * @param value
+ * @param {string} name - Name of the object. Used in constructing error.
+ */
+export function ensureObjectWithId(value, name){
+  ensureObject(value);
+  if(!value.id){
+    throw new Error(`"${name}" must include an id.`);
+  }
+}
+/**
+ * Fail if the given datetime isn't valid.
+ * @param datetime
+ */
+export function ensureValidDatetime(datetime){
+  if(!vcjs.dateRegex.test(datetime)) {
+    throw new Error(`${datetime} needs to be a valid datetime.`);
+  }
+}
+
+
+/**
+ * Fail if the given string isn't a URL
+ * @param url
+ */
+//TODO: change this to URI
+export function ensureUrl(url) {
+  ensureString(url);
+  var pattern = new RegExp('^(https?:\\/\\/)?'+
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+
+    '((\\d{1,3}\\.){3}\\d{1,3}))'+
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+
+    '(\\?[;&a-z\\d%_.~+=-]*)?'+
+    '(\\#[-a-z\\d_]*)?$','i');
+  if (!pattern.test(url)){
+    throw new Error(`${url} needs to be a valid URL.`);
+  }
+}

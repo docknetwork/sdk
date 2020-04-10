@@ -88,4 +88,5 @@ dock.init({
   })
   .catch(error => {
     console.error('Error occurred somewhere, it was caught!', error);
+    process.exit(1);
   });

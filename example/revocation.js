@@ -70,11 +70,11 @@ async function revoke() {
 async function main() {
   console.log('Connected to node, creating account...');
 
-  // The keyring should be initialized before any test begins as this suite is testing revocation
+  // We need an account to sign transactions with
   const account = dock.keyring.addFromUri(accountUri, accountMetadata);
   dock.setAccount(account);
 
-  // The DID should be written before any test begins
+  // The DID should be written before creating a registry
   const pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
 
   // Set our controller DID and associated keypair to be used for generating proof

@@ -101,7 +101,6 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
   }, 70000);
 
   test('Holder creates a verifiable presentation with single credential and verifier verifies it', async () => {
-    // Generate keys for 3 holders where each has a different kind of key.
     const holder1Key = getKeyDoc(holder1DID, await Ed25519KeyPair.generate({seed: hexToU8a(holder1KeySeed)}), 'Ed25519VerificationKey2018');
     const holder2Key = getKeyDoc(holder2DID, await Secp256k1KeyPair.generate({pers: holder2KeyPers, entropy: holder2KeyEntropy}), 'EcdsaSecp256k1VerificationKey2019');
     const holder3Key = getKeyDoc(holder3DID, dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
@@ -141,7 +140,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
         holderKey,
         chal,
         domain,
-        resolver
+        resolver,
       );
 
       expect(signedPres).toMatchObject(
@@ -167,7 +166,6 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
         resolver
       );
 
-      // Verifier checks that both credential and presentation are correct.
       expect(result.verified).toBe(true);
       expect(result.presentationResult.verified).toBe(true);
       expect(result.credentialResults.length).toBe(1);
@@ -179,9 +177,9 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
   test('Holder creates a verifiable presentation with 2 credentials and verifier verifies it', async () => {
     const holder3Key = getKeyDoc(holder3DID, dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
 
-    const res = await isVerifiedCredential(cred3, resolver);
+    const res = await isVerifiedCredential(cred3, resolver, true, false);
     expect(res).toBe(true);
-    const res1 = await isVerifiedCredential(cred4, resolver);
+    const res1 = await isVerifiedCredential(cred4, resolver, true, false);
     expect(res1).toBe(true);
 
     const presId = randomAsHex(32);
@@ -231,7 +229,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       signedPres,
       chal,
       domain,
-      resolver,
+      resolver
     );
 
     // Verifier checks that both credential and presentation are correct.

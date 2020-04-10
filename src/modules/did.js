@@ -133,25 +133,23 @@ class DIDModule {
   async getDetail(didIdentifier) {
     validateDockDIDHexIdentifier(didIdentifier);
     const resp = await this.api.query.didModule.dids(didIdentifier);
-    if (resp) {
-      if (resp.isNone) {
-        throw new NoDIDError(`dock:did:${didIdentifier}`);
-      }
+    if (resp.isNone) {
+      throw new NoDIDError(`dock:did:${didIdentifier}`);
+    }
 
-      const respTuple = resp.unwrap();
-      if (respTuple.length === 2) {
-        return [
-          respTuple[0],
-          respTuple[1].toNumber()
-        ];
-      } else {
-        throw new Error('Needed 2 items in response but got' + respTuple.length);
-      }
+    const respTuple = resp.unwrap();
+    if (respTuple.length === 2) {
+      return [
+        respTuple[0],
+        respTuple[1].toNumber()
+      ];
+    } else {
+      throw new Error('Needed 2 items in response but got' + respTuple.length);
     }
   }
 
   /**
-   * Gets the block number in which the DID was last modified from
+   * Gets the block number in which the DID was last modified in
    * the chain and return it. It will throw error if the DID does not exist on
    * chain or chain returns null response.
    * @param {string} didIdentifier - DID identifier as hex. Not accepting full DID intentionally for efficiency as these

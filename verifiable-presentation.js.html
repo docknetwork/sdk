@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: verifiable-credential.js</title>
+    <title>JSDoc: Source: verifiable-presentation.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: verifiable-credential.js</h1>
+    <h1 class="page-title">Source: verifiable-presentation.js</h1>
 
     
 
@@ -29,21 +29,23 @@
             <pre class="prettyprint source linenums"><code>import {
   isObject,
   isString,
-  issueCredential,
-  verifyCredential
+  signPresentation,
+  verifyPresentation
 } from './utils/vc';
 import vcjs from 'vc-js';
+import VerifiableCredential from './verifiable-credential';
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
-const DEFAULT_TYPE = 'VerifiableCredential';
+const DEFAULT_TYPE = 'VerifiablePresentation';
 
 /**
- * Representation of a Verifiable Credential.
+ * Representation of a Verifiable Presentation.
  */
-class VerifiableCredential {
+class VerifiablePresentation {
   /**
-   * Create a new Verifiable Credential instance.
-   * @param {string} id - id of the credential
+   * Create a new Verifiable Presentation instance.
+   * @param {string} id - id of the presentation
+   * @returns {VerifiablePresentation}
    */
   constructor(id) {
     this.ensureString(id);
@@ -51,17 +53,16 @@ class VerifiableCredential {
 
     this.context = [DEFAULT_CONTEXT];
     this.type = [DEFAULT_TYPE];
-    this.subject = [];
-    this.setIssuanceDate(new Date().toISOString());
+    this.credentials = [];
   }
 
   /**
-   * Add a context to this Credential's context array
-   * @param {str|object} context - Context to add to the credential context array
-   * @returns {VerifiableCredential}
+   * Add a context to this Presentation's context array
+   * @param {str|object} context - Context to add to the presentation context array
+   * @returns {VerifiablePresentation}
    */
   addContext(context) {
-    if (!isObject(context)){
+    if (isString(context)){
       this.ensureUrl(context);
     } else {
       this.ensureObject(context);
@@ -71,9 +72,9 @@ class VerifiableCredential {
   }
 
   /**
-   * Add a type to this Credential's type array
-   * @param {str} type - Type to add to the credential type array
-   * @returns {VerifiableCredential}
+   * Add a type to this Presentation's type array
+   * @param {str} type - Type to add to the presentation type array
+   * @returns {VerifiablePresentation}
    */
   addType(type) {
     this.ensureString(type);
@@ -82,52 +83,29 @@ class VerifiableCredential {
   }
 
   /**
-   * Add a subject to this Credential
-   * @param {object} subject -  Subject of the credential
-   * @returns {VerifiableCredential}
+   * Set a holder for this Presentation
+   * @param {str} holder - Holder to add to the presentation
+   * @returns {VerifiablePresentation}
    */
-  addSubject(subject) {
-    this.ensureObjectWithId(subject, 'credentialSubject');
-    this.subject.push(subject);
+  setHolder(holder) {
+    this.ensureUrl(holder);
+    this.holder = holder;
     return this;
   }
 
   /**
-   * Set a status for this Credential
-   * @param {object} status -  Status of the credential
-   * @returns {VerifiableCredential}
+   * Add a Verifiable Credential to this Presentation
+   * @param {object} credential -  Verifiable Credential for the presentation
+   * @returns {VerifiablePresentation}
    */
-  setStatus(status) {
-    this.ensureObjectWithId(status, 'credentialStatus');
-    if(!status.type){
-      throw new Error('"credentialStatus" must include a type.');
+  addCredential(credential) {
+    if (credential &amp;&amp; credential instanceof VerifiableCredential){
+      credential = credential.toJSON();
     }
-    this.status = status;
+    this.ensureObjectWithId(credential, 'credential');
+    this.credentials.push(credential);
     return this;
   }
-
-  /**
-   * Set a issuance date for this Credential
-   * @param {string} issuanceDate -  issuanceDate of the credential
-   * @returns {VerifiableCredential}
-   */
-  setIssuanceDate(issuanceDate) {
-    this.ensureValidDatetime(issuanceDate);
-    this.issuanceDate = issuanceDate;
-    return this;
-  }
-
-  /**
-   * Set a expiration date for this Credential
-   * @param {object} expirationDate -  expirationDate of the credential
-   * @returns {VerifiableCredential}
-   */
-  setExpirationDate(expirationDate) {
-    this.ensureValidDatetime(expirationDate);
-    this.expirationDate = expirationDate;
-    return this;
-  }
-
 
   /**
    * Fail if the given value isn't a string
@@ -152,7 +130,6 @@ class VerifiableCredential {
   /**
    * Fail if the given value isn't an object
    * @param value
-   * @param {string} name - Name of the object. Used in constructing error.
    */
   ensureObjectWithId(value, name){
     this.ensureObject(value);
@@ -190,62 +167,64 @@ class VerifiableCredential {
   }
 
   /**
-   * Define the JSON representation of a Verifiable Credential.
+   * Define the JSON representation of a Verifiable Presentation.
    * @returns {any}
    */
   toJSON() {
-    const {context, subject, status, ...rest} = this;
-    const credJson = {
-      '@context': context,
-      'credentialSubject': subject
-    };
-    if (status) {
-      credJson['credentialStatus'] = status;
-    }
+    const {context, credentials, ...rest} = this;
     return {
-      ...credJson,
+      '@context': context,
+      'verifiableCredential': credentials,
       ...rest
     };
   }
 
   /**
-   * Sign a Verifiable Credential using the provided keyDoc
+   * Sign a Verifiable Presentation using the provided keyDoc
    * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
+   * @param {string} challenge - proof challenge Required.
+   * @param {string} domain - proof domain (optional)
+   * @param {Resolver} resolver - Resolver for DIDs.
    * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
    * @returns {Promise&lt;{object}>}
    */
-  async sign(keyDoc, compactProof = true) {
-    let signed_vc = await issueCredential(
-      keyDoc,
+  async sign(keyDoc, challenge, domain, resolver, compactProof = true) {
+    let signed_vp = await signPresentation(
       this.toJSON(),
+      keyDoc,
+      challenge,
+      domain,
+      resolver,
       compactProof
     );
-    this.proof = signed_vc.proof;
-    this.issuer = signed_vc.issuer;
+    this.proof = signed_vp.proof;
     return this;
   }
 
   /**
-   * Verify a Verifiable Credential
-   * @param {object} resolver - Resolver for DIDs.
+   * Verify a Verifiable Presentation
+   * @param {string} challenge - proof challenge Required.
+   * @param {string} domain - proof domain (optional)
+   * @param {Resolver} resolver - Resolver to resolve the issuer DID (optional)
    * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
-   * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
-   * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
-   * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
-   * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
-   * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
-   * @returns {Promise&lt;{object}>}
+   * @returns {Promise&lt;{object}>} - verification result.
    */
-  async verify(resolver, compactProof = true, forceRevocationCheck = true, revocationAPI) {
+  async verify(challenge, domain, resolver, compactProof = true) {
     if (!this.proof) {
-      throw new Error('The current Verifiable Credential has no proof.');
+      throw new Error('The current VerifiablePresentation has no proof.');
     }
-    return await verifyCredential(this.toJSON(), resolver, compactProof, forceRevocationCheck, revocationAPI);
+    return await verifyPresentation(
+      this.toJSON(),
+      challenge,
+      domain,
+      resolver,
+      compactProof
+    );
   }
 
 }
 
-export default VerifiableCredential;
+export default VerifiablePresentation;
 </code></pre>
         </article>
     </section>

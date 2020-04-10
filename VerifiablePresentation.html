@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: VerifiableCredential</title>
+    <title>JSDoc: Class: VerifiablePresentation</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: VerifiableCredential</h1>
+    <h1 class="page-title">Class: VerifiablePresentation</h1>
 
     
 
@@ -28,9 +28,9 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>VerifiableCredential<span class="signature">(id)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>VerifiablePresentation<span class="signature">(id)</span><span class="type-signature"> &rarr; {<a href="VerifiablePresentation.html">VerifiablePresentation</a>}</span></h2>
         
-            <div class="class-description">Representation of a Verifiable Credential.</div>
+            <div class="class-description">Representation of a Verifiable Presentation.</div>
         
     
 </header>
@@ -45,7 +45,7 @@
     
 
     
-    <h4 class="name" id="VerifiableCredential"><span class="type-signature"></span>new VerifiableCredential<span class="signature">(id)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="VerifiablePresentation"><span class="type-signature"></span>new VerifiablePresentation<span class="signature">(id)</span><span class="type-signature"> &rarr; {<a href="VerifiablePresentation.html">VerifiablePresentation</a>}</span></h4>
     
 
     
@@ -53,7 +53,7 @@
 
 
 <div class="description">
-    Create a new Verifiable Credential instance.
+    Create a new Verifiable Presentation instance.
 </div>
 
 
@@ -105,7 +105,7 @@
 
             
 
-            <td class="description last">id of the credential</td>
+            <td class="description last">id of the presentation</td>
         </tr>
 
     
@@ -146,7 +146,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-credential.js.html">verifiable-credential.js</a>, <a href="verifiable-credential.js.html#line20">line 20</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line22">line 22</a>
     </li></ul></dd>
     
 
@@ -171,6 +171,24 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="VerifiablePresentation.html">VerifiablePresentation</a></span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -202,7 +220,7 @@
     
 
     
-    <h4 class="name" id="addContext"><span class="type-signature"></span>addContext<span class="signature">(context)</span><span class="type-signature"> &rarr; {<a href="VerifiableCredential.html">VerifiableCredential</a>}</span></h4>
+    <h4 class="name" id="addContext"><span class="type-signature"></span>addContext<span class="signature">(context)</span><span class="type-signature"> &rarr; {<a href="VerifiablePresentation.html">VerifiablePresentation</a>}</span></h4>
     
 
     
@@ -210,7 +228,7 @@
 
 
 <div class="description">
-    Add a context to this Credential's context array
+    Add a context to this Presentation's context array
 </div>
 
 
@@ -265,7 +283,7 @@
 
             
 
-            <td class="description last">Context to add to the credential context array</td>
+            <td class="description last">Context to add to the presentation context array</td>
         </tr>
 
     
@@ -306,7 +324,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-credential.js.html">verifiable-credential.js</a>, <a href="verifiable-credential.js.html#line35">line 35</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line36">line 36</a>
     </li></ul></dd>
     
 
@@ -342,7 +360,7 @@
     </dt>
     <dd>
         
-<span class="param-type"><a href="VerifiableCredential.html">VerifiableCredential</a></span>
+<span class="param-type"><a href="VerifiablePresentation.html">VerifiablePresentation</a></span>
 
 
     </dd>
@@ -360,7 +378,7 @@
     
 
     
-    <h4 class="name" id="addSubject"><span class="type-signature"></span>addSubject<span class="signature">(subject)</span><span class="type-signature"> &rarr; {<a href="VerifiableCredential.html">VerifiableCredential</a>}</span></h4>
+    <h4 class="name" id="addCredential"><span class="type-signature"></span>addCredential<span class="signature">(credential)</span><span class="type-signature"> &rarr; {<a href="VerifiablePresentation.html">VerifiablePresentation</a>}</span></h4>
     
 
     
@@ -368,7 +386,7 @@
 
 
 <div class="description">
-    Add a subject to this Credential
+    Add a Verifiable Credential to this Presentation
 </div>
 
 
@@ -404,7 +422,7 @@
 
         <tr>
             
-                <td class="name"><code>subject</code></td>
+                <td class="name"><code>credential</code></td>
             
 
             <td class="type">
@@ -420,7 +438,7 @@
 
             
 
-            <td class="description last">Subject of the credential</td>
+            <td class="description last">Verifiable Credential for the presentation</td>
         </tr>
 
     
@@ -461,7 +479,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-credential.js.html">verifiable-credential.js</a>, <a href="verifiable-credential.js.html#line61">line 61</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line73">line 73</a>
     </li></ul></dd>
     
 
@@ -497,7 +515,7 @@
     </dt>
     <dd>
         
-<span class="param-type"><a href="VerifiableCredential.html">VerifiableCredential</a></span>
+<span class="param-type"><a href="VerifiablePresentation.html">VerifiablePresentation</a></span>
 
 
     </dd>
@@ -515,7 +533,7 @@
     
 
     
-    <h4 class="name" id="addType"><span class="type-signature"></span>addType<span class="signature">(type)</span><span class="type-signature"> &rarr; {<a href="VerifiableCredential.html">VerifiableCredential</a>}</span></h4>
+    <h4 class="name" id="addType"><span class="type-signature"></span>addType<span class="signature">(type)</span><span class="type-signature"> &rarr; {<a href="VerifiablePresentation.html">VerifiablePresentation</a>}</span></h4>
     
 
     
@@ -523,7 +541,7 @@
 
 
 <div class="description">
-    Add a type to this Credential's type array
+    Add a type to this Presentation's type array
 </div>
 
 
@@ -575,7 +593,7 @@
 
             
 
-            <td class="description last">Type to add to the credential type array</td>
+            <td class="description last">Type to add to the presentation type array</td>
         </tr>
 
     
@@ -616,7 +634,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-credential.js.html">verifiable-credential.js</a>, <a href="verifiable-credential.js.html#line50">line 50</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line51">line 51</a>
     </li></ul></dd>
     
 
@@ -652,7 +670,7 @@
     </dt>
     <dd>
         
-<span class="param-type"><a href="VerifiableCredential.html">VerifiableCredential</a></span>
+<span class="param-type"><a href="VerifiablePresentation.html">VerifiablePresentation</a></span>
 
 
     </dd>
@@ -766,7 +784,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-credential.js.html">verifiable-credential.js</a>, <a href="verifiable-credential.js.html#line118">line 118</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line96">line 96</a>
     </li></ul></dd>
     
 
@@ -802,7 +820,7 @@
     
 
     
-    <h4 class="name" id="ensureObjectWithId"><span class="type-signature"></span>ensureObjectWithId<span class="signature">(value, name)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="ensureObjectWithId"><span class="type-signature"></span>ensureObjectWithId<span class="signature">(value)</span><span class="type-signature"></span></h4>
     
 
     
@@ -861,29 +879,6 @@
         </tr>
 
     
-
-        <tr>
-            
-                <td class="name"><code>name</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Name of the object. Used in constructing error.</td>
-        </tr>
-
-    
     </tbody>
 </table>
 
@@ -921,7 +916,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-credential.js.html">verifiable-credential.js</a>, <a href="verifiable-credential.js.html#line129">line 129</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line106">line 106</a>
     </li></ul></dd>
     
 
@@ -1053,7 +1048,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-credential.js.html">verifiable-credential.js</a>, <a href="verifiable-credential.js.html#line108">line 108</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line86">line 86</a>
     </li></ul></dd>
     
 
@@ -1185,7 +1180,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-credential.js.html">verifiable-credential.js</a>, <a href="verifiable-credential.js.html#line151">line 151</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line128">line 128</a>
     </li></ul></dd>
     
 
@@ -1317,7 +1312,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-credential.js.html">verifiable-credential.js</a>, <a href="verifiable-credential.js.html#line140">line 140</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line117">line 117</a>
     </li></ul></dd>
     
 
@@ -1353,7 +1348,7 @@
     
 
     
-    <h4 class="name" id="setExpirationDate"><span class="type-signature"></span>setExpirationDate<span class="signature">(expirationDate)</span><span class="type-signature"> &rarr; {<a href="VerifiableCredential.html">VerifiableCredential</a>}</span></h4>
+    <h4 class="name" id="setHolder"><span class="type-signature"></span>setHolder<span class="signature">(holder)</span><span class="type-signature"> &rarr; {<a href="VerifiablePresentation.html">VerifiablePresentation</a>}</span></h4>
     
 
     
@@ -1361,7 +1356,7 @@
 
 
 <div class="description">
-    Set a expiration date for this Credential
+    Set a holder for this Presentation
 </div>
 
 
@@ -1397,13 +1392,13 @@
 
         <tr>
             
-                <td class="name"><code>expirationDate</code></td>
+                <td class="name"><code>holder</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">str</span>
 
 
             
@@ -1413,7 +1408,7 @@
 
             
 
-            <td class="description last">expirationDate of the credential</td>
+            <td class="description last">Holder to add to the presentation</td>
         </tr>
 
     
@@ -1454,7 +1449,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-credential.js.html">verifiable-credential.js</a>, <a href="verifiable-credential.js.html#line97">line 97</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line62">line 62</a>
     </li></ul></dd>
     
 
@@ -1490,7 +1485,7 @@
     </dt>
     <dd>
         
-<span class="param-type"><a href="VerifiableCredential.html">VerifiableCredential</a></span>
+<span class="param-type"><a href="VerifiablePresentation.html">VerifiablePresentation</a></span>
 
 
     </dd>
@@ -1508,7 +1503,7 @@
     
 
     
-    <h4 class="name" id="setIssuanceDate"><span class="type-signature"></span>setIssuanceDate<span class="signature">(issuanceDate)</span><span class="type-signature"> &rarr; {<a href="VerifiableCredential.html">VerifiableCredential</a>}</span></h4>
+    <h4 class="name" id="sign"><span class="type-signature">(async) </span>sign<span class="signature">(keyDoc, challenge, domain, resolver, compactProof)</span><span class="type-signature"> &rarr; {Promise.&lt;{object}>}</span></h4>
     
 
     
@@ -1516,317 +1511,7 @@
 
 
 <div class="description">
-    Set a issuance date for this Credential
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>issuanceDate</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">issuanceDate of the credential</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-credential.js.html">verifiable-credential.js</a>, <a href="verifiable-credential.js.html#line86">line 86</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="VerifiableCredential.html">VerifiableCredential</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="setStatus"><span class="type-signature"></span>setStatus<span class="signature">(status)</span><span class="type-signature"> &rarr; {<a href="VerifiableCredential.html">VerifiableCredential</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Set a status for this Credential
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>status</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Status of the credential</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-credential.js.html">verifiable-credential.js</a>, <a href="verifiable-credential.js.html#line72">line 72</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="VerifiableCredential.html">VerifiableCredential</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="sign"><span class="type-signature">(async) </span>sign<span class="signature">(keyDoc, compactProof)</span><span class="type-signature"> &rarr; {Promise.&lt;{object}>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Sign a Verifiable Credential using the provided keyDoc
+    Sign a Verifiable Presentation using the provided keyDoc
 </div>
 
 
@@ -1891,6 +1576,87 @@
 
         <tr>
             
+                <td class="name"><code>challenge</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">proof challenge Required.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>domain</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">proof domain (optional)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>resolver</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Resolver</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Resolver for DIDs.</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>compactProof</code></td>
             
 
@@ -1954,7 +1720,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-credential.js.html">verifiable-credential.js</a>, <a href="verifiable-credential.js.html#line189">line 189</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line163">line 163</a>
     </li></ul></dd>
     
 
@@ -2016,7 +1782,7 @@
 
 
 <div class="description">
-    Define the JSON representation of a Verifiable Credential.
+    Define the JSON representation of a Verifiable Presentation.
 </div>
 
 
@@ -2060,7 +1826,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-credential.js.html">verifiable-credential.js</a>, <a href="verifiable-credential.js.html#line168">line 168</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line145">line 145</a>
     </li></ul></dd>
     
 
@@ -2114,7 +1880,7 @@
     
 
     
-    <h4 class="name" id="verify"><span class="type-signature">(async) </span>verify<span class="signature">(resolver, compactProof, forceRevocationCheck, revocationAPI)</span><span class="type-signature"> &rarr; {Promise.&lt;{object}>}</span></h4>
+    <h4 class="name" id="verify"><span class="type-signature">(async) </span>verify<span class="signature">(challenge, domain, resolver, compactProof)</span><span class="type-signature"> &rarr; {Promise.&lt;{object}>}</span></h4>
     
 
     
@@ -2122,7 +1888,7 @@
 
 
 <div class="description">
-    Verify a Verifiable Credential
+    Verify a Verifiable Presentation
 </div>
 
 
@@ -2160,13 +1926,13 @@
 
         <tr>
             
-                <td class="name"><code>resolver</code></td>
+                <td class="name"><code>challenge</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">string</span>
 
 
             
@@ -2180,7 +1946,61 @@
                 </td>
             
 
-            <td class="description last">Resolver for DIDs.</td>
+            <td class="description last">proof challenge Required.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>domain</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">proof domain (optional)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>resolver</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Resolver</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Resolver to resolve the issuer DID (optional)</td>
         </tr>
 
     
@@ -2210,65 +2030,6 @@
             
 
             <td class="description last">Whether to compact the JSON-LD or not.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>forceRevocationCheck</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-                <td class="default">
-                
-                    true
-                
-                </td>
-            
-
-            <td class="description last">Whether to force revocation check or not.
-Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>revocationAPI</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last">An object representing a map. "revocation type -> revocation API". The API is used to check
-revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
-as we support more APIs there are more details associated with each API. Only Dock is supported as of now.</td>
         </tr>
 
     
@@ -2309,7 +2070,7 @@ as we support more APIs there are more details associated with each API. Only Do
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-credential.js.html">verifiable-credential.js</a>, <a href="verifiable-credential.js.html#line211">line 211</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line184">line 184</a>
     </li></ul></dd>
     
 
@@ -2337,6 +2098,10 @@ as we support more APIs there are more details associated with each API. Only Do
 <h5>Returns:</h5>
 
         
+<div class="param-desc">
+    - verification result.
+</div>
+
 
 
 <dl>

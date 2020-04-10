@@ -318,7 +318,7 @@ describe('Verifiable Credential incremental creation', () => {
       credential.setExpirationDate('2020');
     }).toThrowError('needs to be a valid datetime.');
 
-    await expect(credential.verify()).rejects.toThrowError('The current VC has no proof.');
+    await expect(credential.verify()).rejects.toThrowError('The current Verifiable Credential has no proof.');
 
   });
 

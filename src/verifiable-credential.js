@@ -124,6 +124,7 @@ class VerifiableCredential {
   /**
    * Fail if the given value isn't an object
    * @param value
+   * @param {string} name - Name of the object. Used in constructing error.
    */
   ensureObjectWithId(value, name){
     this.ensureObject(value);
@@ -165,10 +166,16 @@ class VerifiableCredential {
    * @returns {any}
    */
   toJSON() {
-    const {context, subject, ...rest} = this;
-    return {
+    const {context, subject, status, ...rest} = this;
+    const credJson = {
       '@context': context,
-      'credentialSubject': subject,
+      'credentialSubject': subject
+    };
+    if (status) {
+      credJson['credentialStatus'] = status;
+    }
+    return {
+      ...credJson,
       ...rest
     };
   }
@@ -176,12 +183,14 @@ class VerifiableCredential {
   /**
    * Sign a Verifiable Credential using the provided keyDoc
    * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
+   * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
    * @returns {Promise<{object}>}
    */
-  async sign(keyDoc) {
+  async sign(keyDoc, compactProof = true) {
     let signed_vc = await issueCredential(
       keyDoc,
-      this.toJSON()
+      this.toJSON(),
+      compactProof
     );
     this.proof = signed_vc.proof;
     this.issuer = signed_vc.issuer;
@@ -190,13 +199,20 @@ class VerifiableCredential {
 
   /**
    * Verify a Verifiable Credential
+   * @param {object} resolver - Resolver for DIDs.
+   * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
+   * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
+   * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
+   * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
+   * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
+   * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
    * @returns {Promise<{object}>}
    */
-  async verify() {
+  async verify(resolver, compactProof = true, forceRevocationCheck = true, revocationAPI) {
     if (!this.proof) {
-      throw new Error('The current VC has no proof.');
+      throw new Error('The current Verifiable Credential has no proof.');
     }
-    return await verifyCredential(this.toJSON());
+    return await verifyCredential(this.toJSON(), resolver, compactProof, forceRevocationCheck, revocationAPI);
   }
 
 }

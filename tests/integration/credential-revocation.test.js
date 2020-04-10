@@ -11,7 +11,7 @@ import {
   signPresentation, verifyCredential,
   verifyPresentation
 } from '../../src/utils/vc';
-import Resolver from '../../src/resolver';
+import {DockResolver} from '../../src/resolver';
 
 import {
   KeyringPairDidKeys, OneOfPolicy
@@ -24,7 +24,7 @@ import {getKeyDoc} from '../../src/utils/vc/helpers';
 import {createNewDockDID} from '../../src/utils/did';
 
 const credId = 'A large credential id with size > 32 bytes';
-let resolver;
+const resolver = new DockResolver(dock);
 
 function addRevRegIdToCred(cred, regId) {
   cred.credentialStatus = {
@@ -81,12 +81,6 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
     // Set our owner DID and associated keypair to be used for generating proof
     didKeys.set(issuerDID, pair);
-
-    const providers = {
-      'dock': FullNodeEndpoint,
-    };
-    resolver = new Resolver(providers);
-    resolver.init();
 
     const unsignedCred = getUnsignedCred(credId, holderDID);
 
@@ -174,4 +168,3 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
   }, 40000);
 });
-

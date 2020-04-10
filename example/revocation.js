@@ -129,5 +129,5 @@ dock.init({
   .then(main)
   .catch(error => {
     console.error('Error occurred somewhere, it was caught!', error);
-    process.exit(0);
+    process.exit(1);
   });

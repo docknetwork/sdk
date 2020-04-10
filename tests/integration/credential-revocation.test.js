@@ -24,7 +24,6 @@ import {getKeyDoc} from '../../src/utils/vc/helpers';
 import {createNewDockDID} from '../../src/utils/did';
 
 const credId = 'A large credential id with size > 32 bytes';
-const resolver = new DockResolver(dock);
 
 function addRevRegIdToCred(cred, regId) {
   cred.credentialStatus = {
@@ -35,6 +34,7 @@ function addRevRegIdToCred(cred, regId) {
 
 describe('Credential revocation with issuer as the revocation authority', () => {
   const dockAPI = new DockAPI(FullNodeEndpoint);
+  const resolver = new DockResolver(dockAPI);
 
   // Create a random registry id
   const registryId = randomAsHex(32);

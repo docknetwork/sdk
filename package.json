@@ -48,7 +48,7 @@
     "src"
   ],
   "dependencies": {
-    "@polkadot/api": "^1.8.1",
+    "@polkadot/api": "^1.9.1",
     "axios": "^0.19.2",
     "bs58": "^4.0.1",
     "did-resolver": "^1.1.0",

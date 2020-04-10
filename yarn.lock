@@ -955,7 +955,7 @@
     memoizee "^0.4.14"
     rxjs "^6.5.4"
 
-"@polkadot/api@1.9.1", "@polkadot/api@^1.9.1":
+"@polkadot/api@1.9.1":
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/@polkadot/api/-/api-1.9.1.tgz#10956c3c07bf6ba132f94722bd4bc23d536a7296"
   integrity sha512-dJlWvpilZCVdRgZ2HsG6fwkNGuHomfqHfjMMPPz1yLdnMybWpsWYxK5cYfYZ3Y9EI0KSv0W+ZU0o6LnQyE/lAA==

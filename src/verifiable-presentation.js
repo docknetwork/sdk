@@ -2,7 +2,7 @@ import {
   ensureObject,
   ensureObjectWithId,
   ensureString,
-  ensureUrl,
+  ensureURI,
   isObject,
   signPresentation,
   verifyPresentation
@@ -37,7 +37,7 @@ class VerifiablePresentation {
    */
   addContext(context) {
     if (!isObject(context)){
-      ensureUrl(context);
+      ensureURI(context);
     } else {
       ensureObject(context);
     }
@@ -62,7 +62,7 @@ class VerifiablePresentation {
    * @returns {VerifiablePresentation}
    */
   setHolder(holder) {
-    ensureUrl(holder);
+    ensureURI(holder);
     this.holder = holder;
     return this;
   }

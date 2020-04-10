@@ -405,7 +405,7 @@ describe('Verifiable Presentation incremental creation', () => {
     }).toThrowError('needs to be a string.');
     expect(() => {
       vp.addContext('123');
-    }).toThrowError('needs to be a valid URL.');
+    }).toThrowError('needs to be a valid URI.');
 
     expect(() => {
       vp.addType(123);

@@ -2,7 +2,7 @@ import {
   ensureObject,
   ensureObjectWithId,
   ensureString,
-  ensureUrl,
+  ensureURI,
   ensureValidDatetime,
   isObject,
   issueCredential,
@@ -37,7 +37,7 @@ class VerifiableCredential {
    */
   addContext(context) {
     if (!isObject(context)){
-      ensureUrl(context);
+      ensureURI(context);
     } else {
       ensureObject(context);
     }

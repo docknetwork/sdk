@@ -340,15 +340,10 @@ export function ensureValidDatetime(datetime){
  * @param url
  */
 //TODO: change this to URI
-export function ensureUrl(url) {
+export function ensureURI(url) {
   ensureString(url);
-  var pattern = new RegExp('^(https?:\\/\\/)?'+
-    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+
-    '((\\d{1,3}\\.){3}\\d{1,3}))'+
-    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+
-    '(\\?[;&a-z\\d%_.~+=-]*)?'+
-    '(\\#[-a-z\\d_]*)?$','i');
+  var pattern = new RegExp('\\w+:(\\/?\\/?)[^\\s]+');
   if (!pattern.test(url)){
-    throw new Error(`${url} needs to be a valid URL.`);
+    throw new Error(`${url} needs to be a valid URI.`);
   }
 }

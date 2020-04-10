@@ -265,7 +265,7 @@ describe('Verifiable Credential incremental creation', () => {
     credential.addSubject({id: 'some_subject_id'});
     expect(credential.subject).toEqual([{id: 'some_subject_id'}]);
     credential.setStatus({id: 'some_status_id', type: 'CredentialStatusList2017'});
-    expect(credential.credentialStatus).toEqual({id: 'some_status_id', type: 'CredentialStatusList2017'});
+    expect(credential.status).toEqual({id: 'some_status_id', type: 'CredentialStatusList2017'});
     credential.setIssuanceDate('2020-03-18T19:23:24Z');
     expect(credential.issuanceDate).toEqual('2020-03-18T19:23:24Z');
     credential.setExpirationDate('2021-03-18T19:23:24Z');

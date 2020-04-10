@@ -72,7 +72,7 @@ class VerifiableCredential {
     if(!status.type){
       throw new Error('"credentialStatus" must include a type.');
     }
-    this.credentialStatus = status;
+    this.status = status;
     return this;
   }
 
@@ -157,10 +157,16 @@ class VerifiableCredential {
    * @returns {any}
    */
   toJSON() {
-    const {context, subject, ...rest} = this;
-    return {
+    const {context, subject, status, ...rest} = this;
+    const credJson = {
       '@context': context,
-      'credentialSubject': subject,
+      'credentialSubject': subject
+    };
+    if (status) {
+      credJson['credentialStatus'] = status;
+    }
+    return {
+      ...credJson,
       ...rest
     };
   }

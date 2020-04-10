@@ -8,93 +8,74 @@ import {
 import VerifiableCredential from '../../src/verifiable-credential';
 import VerifiablePresentation from '../../src/verifiable-presentation';
 
-//TODO: clean up these fixtures
-const sample_unsigned_cred = {
-  '@context': [
-    'https://www.w3.org/2018/credentials/v1',
-    'https://www.w3.org/2018/credentials/examples/v1'
-  ],
-  id: 'https://example.com/credentials/1872',
-  type: ['VerifiableCredential', 'AlumniCredential'],
-  issuanceDate: '2020-03-18T19:23:24Z',
-  credentialSubject: {
-    id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
-    alumniOf: 'Example University'
+function getSampleCredential(signed=false){
+  let cred = {
+    '@context': [
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1'
+    ],
+    id: 'https://example.com/credentials/1872',
+    type: ['VerifiableCredential', 'AlumniCredential'],
+    issuanceDate: '2010-01-01T19:23:24Z',
+    credentialSubject: {
+      id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+      alumniOf: 'Example University'
+    }
+  };
+  if (signed) {
+    cred = {
+      ...cred,
+      issuer: 'https://gist.githubusercontent.com/faustow/3b48e353a9d5146e05a9c344e02c8c6f/raw',
+      proof: {
+        type: 'EcdsaSecp256k1Signature2019',
+        created: '2020-03-27T17:44:28Z',
+        jws: 'eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEQCIAS8ZNVYIni3oShb0TFz4SMAybJcz3HkQPaTdz9OSszoAiA01w9ZkS4Zx5HEZk45QzxbqOr8eRlgMdhgFsFs1FnyMQ',
+        proofPurpose: 'assertionMethod',
+        verificationMethod: 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw'
+      }
+    };
   }
-};
-const sample_key = {
-  id: 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw',
-  controller: 'https://gist.githubusercontent.com/faustow/3b48e353a9d5146e05a9c344e02c8c6f/raw',
-  type: 'EcdsaSecp256k1VerificationKey2019',
-  privateKeyBase58: 'D1HHZntuEUXuQm56VeHv1Ae1c4Rd1mdVeamm2BPKom3y',
-  publicKeyBase58: 'zXwDsGkuq5gTLVMnb3jGUaW8vvzAjfZfNuJmP2PkZGJy'
-};
-const sample_signed_cred = {
-  '@context': [
-    'https://www.w3.org/2018/credentials/v1',
-    'https://www.w3.org/2018/credentials/examples/v1'
-  ],
-  id: 'https://example.com/credentials/1872',
-  type: [
-    'VerifiableCredential',
-    'AlumniCredential'
-  ],
-  issuanceDate: '2010-01-01T19:23:24Z',
-  credentialSubject: {
-    id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
-    alumniOf: 'Example University'
-  },
-  issuer: 'https://gist.githubusercontent.com/faustow/3b48e353a9d5146e05a9c344e02c8c6f/raw',
-  proof: {
-    type: 'EcdsaSecp256k1Signature2019',
-    created: '2020-03-27T17:44:28Z',
-    jws: 'eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEQCIAS8ZNVYIni3oShb0TFz4SMAybJcz3HkQPaTdz9OSszoAiA01w9ZkS4Zx5HEZk45QzxbqOr8eRlgMdhgFsFs1FnyMQ',
-    proofPurpose: 'assertionMethod',
-    verificationMethod: 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw'
+  return cred;
+}
+
+function getSamplePres(signed=false){
+  let vp = {
+    '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
+    type: [ 'VerifiablePresentation' ],
+    verifiableCredential: presentation_credentials,
+    id: vp_id,
+    holder: vp_holder
+  };
+  if (signed){
+    vp = {
+      ...vp,
+      proof: {
+        type: 'EcdsaSecp256k1Signature2019',
+        created: expect.anything(),
+        challenge: 'some_challenge',
+        domain: 'some_domain',
+        jws: expect.anything(),
+        proofPurpose: 'authentication',
+        verificationMethod: 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw'
+      }
+    };
   }
-};
-const sample_signed_cred_2 = {
-  '@context': [
-    'https://www.w3.org/2018/credentials/v1',
-    'https://www.w3.org/2018/credentials/examples/v1'
-  ],
-  id: 'https://example.com/credentials/12345',
-  type: [ 'VerifiableCredential', 'AlumniCredential' ],
-  issuanceDate: '2020-03-18T19:23:24Z',
-  credentialSubject: {
-    id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
-    alumniOf: 'Chalmers University of Technology'
-  },
-  issuer: 'https://gist.githubusercontent.com/faustow/3b48e353a9d5146e05a9c344e02c8c6f/raw',
-  proof: {
-    type: 'EcdsaSecp256k1Signature2019',
-    created: '2020-03-31T22:36:43Z',
-    jws: 'eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEQCICMZbCslyGWpLA_zbOmUHzIvGf7RPU0l3SumBSuV5LjpAiB_3gHChW_1AIwf3bdnC_g7HLZSwcCIJxUpoir4FUhfsQ',
-    proofPurpose: 'assertionMethod',
-    verificationMethod: 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw'
-  }
-};
+  return vp;
+}
+
+function getSampleKey() {
+  return {
+    id: 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw',
+    controller: 'https://gist.githubusercontent.com/faustow/3b48e353a9d5146e05a9c344e02c8c6f/raw',
+    type: 'EcdsaSecp256k1VerificationKey2019',
+    privateKeyBase58: 'D1HHZntuEUXuQm56VeHv1Ae1c4Rd1mdVeamm2BPKom3y',
+    publicKeyBase58: 'zXwDsGkuq5gTLVMnb3jGUaW8vvzAjfZfNuJmP2PkZGJy'
+  };
+}
 const vp_id = 'https://example.com/credentials/12345';
 const vp_holder = 'https://example.com/credentials/1234567890';
-const presentation_credentials = [sample_signed_cred, sample_signed_cred_2];
-const sample_unsigned_pres = {
-  '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
-  type: [ 'VerifiablePresentation' ],
-  verifiableCredential: presentation_credentials,
-  id: vp_id,
-  holder: vp_holder
-};
-const sample_presentation_proof = {
-  proof: {
-    type: 'EcdsaSecp256k1Signature2019',
-    created: expect.anything(),
-    challenge: 'some_challenge',
-    domain: 'some_domain',
-    jws: expect.anything(),
-    proofPurpose: 'authentication',
-    verificationMethod: 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw'
-  }
-};
+const presentation_credentials = [getSampleCredential(true), getSampleCredential(true)];
+
 const fake_context = {
   '@context': {
     '@protected': true,
@@ -106,11 +87,11 @@ const fake_context = {
 
 describe('Verifiable Credential Issuing', () => {
   test('Issuing should return an object with a proof, and it must pass validation.', async () => {
-    const credential = await issueCredential(sample_key, sample_unsigned_cred);
+    const credential = await issueCredential(getSampleKey(), getSampleCredential());
     expect(credential.id).toBe('https://example.com/credentials/1872');
     expect(credential.type).toContain('VerifiableCredential');
     expect(credential.type).toContain('AlumniCredential');
-    expect(credential.issuanceDate).toBe('2020-03-18T19:23:24Z');
+    expect(credential.issuanceDate).toBe('2010-01-01T19:23:24Z');
     expect(credential.credentialSubject.id).toBe('did:example:ebfeb1f712ebc6f1c276e12ec21');
     expect(credential.credentialSubject.alumniOf).toBe('Example University');
     expect(credential.issuer).toBe('https://gist.githubusercontent.com/faustow/3b48e353a9d5146e05a9c344e02c8c6f/raw');
@@ -130,7 +111,7 @@ describe('Verifiable Credential Issuing', () => {
 
 describe('Verifiable Credential Verification', () => {
   test('The sample signed credential should pass verification.', async () => {
-    const result = await verifyCredential(sample_signed_cred);
+    const result = await verifyCredential(getSampleCredential(true));
     expect(result.verified).toBe(true);
     expect(result.results[0].proof['@context']).toBe('https://w3id.org/security/v2');
     expect(result.results[0].proof.created).toBeDefined();
@@ -149,22 +130,17 @@ describe('Verifiable Presentation creation', () => {
       vp_id,
       vp_holder
     );
-    expect(presentation).toMatchObject(sample_unsigned_pres);
+    expect(presentation).toMatchObject(getSamplePres());
   }, 30000);
 
   test('A verifiable presentation should contain a proof once signed, and it should pass verification.', async () => {
     const signed_vp = await signPresentation(
-      sample_unsigned_pres,
-      sample_key,
+      getSamplePres(),
+      getSampleKey(),
       'some_challenge',
       'some_domain',
     );
-    expect(signed_vp).toMatchObject(
-      {
-        ...sample_unsigned_pres,
-        ...sample_presentation_proof
-      }
-    );
+    expect(signed_vp).toMatchObject(getSamplePres(true));
     const results = await verifyPresentation(
       signed_vp,
       'some_challenge',
@@ -280,7 +256,7 @@ describe('Verifiable Credential incremental creation', () => {
   test('Issuing an incrementally-created VC should return an object with a proof, and it must pass validation.', async () => {
     let unsigned_credential = new VerifiableCredential('https://example.com/credentials/1872');
     unsigned_credential.addContext('https://www.w3.org/2018/credentials/examples/v1');
-    const signed_credential = await unsigned_credential.sign(sample_key);
+    const signed_credential = await unsigned_credential.sign(getSampleKey());
     expect(signed_credential.proof).toBeDefined();
     const result = await signed_credential.verify();
     expect(result.verified).toBe(true);
@@ -358,10 +334,10 @@ describe('Verifiable Presentation incremental creation', () => {
 
   test('Incremental VP creation from external VCs should be possible', async () => {
     let vp = new VerifiablePresentation(vp_id);
-    vp.addCredential(sample_signed_cred);
-    expect(vp.credentials).toEqual([sample_signed_cred]);
+    vp.addCredential(getSampleCredential(true));
+    expect(vp.credentials).toEqual([getSampleCredential(true)]);
     await vp.sign(
-      sample_key,
+      getSampleKey(),
       'some_challenge',
       'some_domain',
     );
@@ -393,7 +369,7 @@ describe('Verifiable Presentation incremental creation', () => {
       id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
       alumniOf: 'Example University'
     });
-    await vc.sign(sample_key);
+    await vc.sign(getSampleKey());
     const vc_verification_result = await vc.verify();
     expect(vc_verification_result).toMatchObject({'verified': true});
 
@@ -401,7 +377,7 @@ describe('Verifiable Presentation incremental creation', () => {
     vp.setHolder(vp_holder);
     vp.addCredential(vc);
     await vp.sign(
-      sample_key,
+      getSampleKey(),
       'some_challenge',
       'some_domain',
     );

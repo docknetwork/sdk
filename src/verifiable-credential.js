@@ -6,10 +6,8 @@ import {
 } from './utils/vc';
 import vcjs from 'vc-js';
 
-const DEFAULT_CONTEXT = [
-  'https://www.w3.org/2018/credentials/v1'
-];
-const DEFAULT_TYPE = ['VerifiableCredential'];
+const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
+const DEFAULT_TYPE = 'VerifiableCredential';
 
 /**
  * Representation of a Verifiable Credential.
@@ -23,19 +21,23 @@ class VerifiableCredential {
     this.ensureString(id);
     this.id = id;
 
-    this.context = DEFAULT_CONTEXT;
-    this.type = DEFAULT_TYPE;
+    this.context = [DEFAULT_CONTEXT];
+    this.type = [DEFAULT_TYPE];
     this.subject = [];
     this.setIssuanceDate(new Date().toISOString());
   }
 
   /**
    * Add a context to this Credential's context array
-   * @param {str} context - Context to add to the credential context array
+   * @param {str|object} context - Context to add to the credential context array
    * @returns {VerifiableCredential}
    */
   addContext(context) {
-    this.ensureUrl(context);
+    if (!isObject(context)){
+      this.ensureUrl(context);
+    } else {
+      this.ensureObject(context);
+    }
     this.context.push(context);
     return this;
   }

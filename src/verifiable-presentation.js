@@ -7,10 +7,8 @@ import {
 import vcjs from 'vc-js';
 import VerifiableCredential from './verifiable-credential';
 
-const DEFAULT_CONTEXT = [
-  'https://www.w3.org/2018/credentials/v1'
-];
-const DEFAULT_TYPE = ['VerifiablePresentation'];
+const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
+const DEFAULT_TYPE = 'VerifiablePresentation';
 
 /**
  * Representation of a Verifiable Presentation.
@@ -25,18 +23,22 @@ class VerifiablePresentation {
     this.ensureString(id);
     this.id = id;
 
-    this.context = DEFAULT_CONTEXT;
-    this.type = DEFAULT_TYPE;
+    this.context = [DEFAULT_CONTEXT];
+    this.type = [DEFAULT_TYPE];
     this.credentials = [];
   }
 
   /**
    * Add a context to this Presentation's context array
-   * @param {str} context - Context to add to the presentation context array
+   * @param {str|object} context - Context to add to the presentation context array
    * @returns {VerifiablePresentation}
    */
   addContext(context) {
-    this.ensureUrl(context);
+    if (isString(context)){
+      this.ensureUrl(context);
+    } else {
+      this.ensureObject(context);
+    }
     this.context.push(context);
     return this;
   }

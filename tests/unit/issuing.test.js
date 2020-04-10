@@ -95,6 +95,14 @@ const sample_presentation_proof = {
     verificationMethod: 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw'
   }
 };
+const fake_context = {
+  '@context': {
+    '@protected': true,
+
+    'id': '@id',
+    'type': '@type',
+  }
+};
 
 describe('Verifiable Credential Issuing', () => {
   test('Issuing should return an object with a proof, and it must pass validation.', async () => {
@@ -234,6 +242,12 @@ describe('Verifiable Credential incremental creation', () => {
     expect(credential.issuanceDate).toEqual(expect.anything());
   });
 
+  test('VC creation with an object context should be possible', async () => {
+    let credential = new VerifiableCredential('blabla');
+    credential.addContext(fake_context);
+    expect(credential.context).toEqual(['https://www.w3.org/2018/credentials/v1', fake_context]);
+  });
+
   test('JSON representation of a VC should bring the proper keys', async () => {
     let credential = new VerifiableCredential('blabla');
     expect(credential.toJSON()).toEqual(
@@ -344,6 +358,12 @@ describe('Verifiable Presentation incremental creation', () => {
     expect(vp.credentials).toEqual([]);
   });
 
+  test('VP creation with an object context should be possible', async () => {
+    let vp = new VerifiablePresentation('blabla');
+    vp.addContext(fake_context);
+    expect(vp.context).toEqual(['https://www.w3.org/2018/credentials/v1', fake_context]);
+  });
+
   test('The JSON representation of a VP should bring the proper keys', async () => {
     let vp = new VerifiablePresentation('blabla');
     expect(vp.toJSON()).toEqual(
@@ -382,7 +402,10 @@ describe('Verifiable Presentation incremental creation', () => {
     let vp = new VerifiablePresentation('blabla');
     expect(() => {
       vp.addContext(123);
-    }).toThrowError('needs to be a string.');
+    }).toThrowError('needs to be an object.');
+    expect(() => {
+      vp.addContext('123');
+    }).toThrowError('needs to be a valid URL.');
 
     expect(() => {
       vp.addType(123);

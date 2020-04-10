@@ -10,11 +10,10 @@ import {DockAPI} from '../../src/api';
 import Resolver from '../../src/resolver';
 
 import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
-import {getUnsignedCred, registerNewDIDUsingPair} from './helpers';
+import {getKeyDoc, getUnsignedCred, registerNewDIDUsingPair} from './helpers';
 import {generateEcdsaSecp256k1Keypair} from '../../src/utils/misc';
 import Secp256k1KeyPair  from 'secp256k1-key-pair';
 import {issueCredential, verifyCredential} from '../../src/utils/vc';
-import {getKeyDoc} from '../../src/utils/vc/helpers';
 
 
 // 1st issuer's DID.
@@ -137,7 +136,6 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
   test('Issue a verifiable credential with secp256k1 key and verify it', async () => {
     const issuerKey = getKeyDoc(issuer2DID, await Secp256k1KeyPair.generate({pers: issuer2KeyPers, entropy: issuer2KeyEntropy}), 'EcdsaSecp256k1VerificationKey2019');
     const credential = await issueCredential(issuerKey, unsignedCred);
-    console.log(credential);
     expect(credential).toMatchObject(
       expect.objectContaining(
         getCredMatcherDoc(unsignedCred, issuer2DID, issuerKey.id, 'EcdsaSecp256k1Signature2019')
@@ -161,7 +159,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
       )
     );
 
-    const result = await verifyCredential(credential, resolver, true);
+    const result = await verifyCredential(credential, resolver);
 
     expect(result).toMatchObject(
       expect.objectContaining(

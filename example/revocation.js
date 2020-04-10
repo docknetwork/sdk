@@ -1,7 +1,7 @@
 import {randomAsHex} from '@polkadot/util-crypto';
 
 import dock from '../src/api';
-import {createKeyDetail} from '../src/utils/did';
+import {createNewDockDID, createKeyDetail} from '../src/utils/did';
 import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
 
 import  {
@@ -19,7 +19,7 @@ const accountMetadata = {name: 'Alice'};
 const registryID = randomAsHex(32);
 
 // Create a new controller DID, the DID will be registered on the network and own the registry
-const controllerDID = randomAsHex(32);
+const controllerDID = createNewDockDID();
 const controllerSeed = randomAsHex(32);
 
 // Create a did/keypair proof map
@@ -38,7 +38,7 @@ const revokeIds = new Set();
 revokeIds.add(revokeID);
 
 async function createRegistry() {
-  console.log('Creating a registry with policy type:', policy.constructor.name);
+  console.log(`Creating a registry with owner DID (${controllerDID}) with policy type:`, policy.constructor.name);
   await dock.sendTransaction(dock.revocation.newRegistry(registryID, policy, false));
   console.log('Created registry');
 }
@@ -78,9 +78,8 @@ async function main() {
   const pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
 
   // Set our controller DID and associated keypair to be used for generating proof
+  console.log(`Creating controller DID (${controllerDID}) using sr25519 pair from seed (${controllerSeed})...`);
   didKeys.set(controllerDID, pair);
-
-  console.log('Creating controller DID using pair...');
 
   // The controller is same as the DID
   const publicKey = getPublicKeyFromKeyringPair(pair);

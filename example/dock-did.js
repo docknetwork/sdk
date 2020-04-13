@@ -51,8 +51,6 @@ async function updateDIDKey() {
   const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, dockDID, newPk, currentPair, newController);
   const transaction = dock.did.updateKey(keyUpdate, signature);
   await dock.sendTransaction(transaction);
-
-  await getDIDDoc();
 }
 
 async function getDIDDoc() {

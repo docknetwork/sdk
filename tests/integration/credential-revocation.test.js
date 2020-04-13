@@ -2,7 +2,7 @@ import {randomAsHex} from '@polkadot/util-crypto';
 import { hexToU8a } from '@polkadot/util';
 import {Ed25519KeyPair} from 'jsonld-signatures';
 
-import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
+import {FullNodeEndpoint, TestKeyringOpts, TestAccountURI} from '../test-constants';
 import {DockAPI} from '../../src/api';
 import {
   createPresentation,
@@ -60,7 +60,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     });
 
     // The keyring should be initialized before any test begins as this suite is testing revocation
-    const account = dockAPI.keyring.addFromUri(TestAccount.uri, TestAccount.options);
+    const account = dockAPI.keyring.addFromUri(TestAccountURI);
     dockAPI.setAccount(account);
 
     // Register issuer DID
@@ -104,7 +104,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
   test('Issuer can issue a revocable credential and holder can verify it successfully when it is not revoked else the verification fails', async () => {
     // The credential verification should pass as the credential has not been revoked.
-    const result = await verifyCredential(credential, resolver, true, false, {'dock': dockAPI});
+    const result = await verifyCredential(credential, resolver, true, true, {'dock': dockAPI});
     expect(result.verified).toBe(true);
 
     // Revoke the credential
@@ -113,7 +113,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     await dockAPI.sendTransaction(t1);
 
     // The credential verification should fail as the credential has been revoked.
-    const result1 = await verifyCredential(credential, resolver, true, false, {'dock': dockAPI});
+    const result1 = await verifyCredential(credential, resolver, true, true, {'dock': dockAPI});
     expect(result1.verified).toBe(false);
     expect(result1.error).toBe('Revocation check failed');
 

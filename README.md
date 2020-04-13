@@ -61,5 +61,15 @@ Run example to resolve DID
 yarn did-resolver-example
 ```
 
+Run example to see revocation
+```
+yarn revocation-example
+```
+
+Run example to see verifiable credentials
+```
+yarn vcdm-example
+```
+
 ## JSON types
 The types on Substrate node should be reflected in [types.json](./src/types.json)

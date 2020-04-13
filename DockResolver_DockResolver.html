@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: utils/vc/custom_crypto.js</title>
+    <title>JSDoc: Class: DockResolver</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,124 +17,182 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: utils/vc/custom_crypto.js</h1>
+    <h1 class="page-title">Class: DockResolver</h1>
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>import Secp256k1KeyPair from 'secp256k1-key-pair';
-import {suites} from 'jsonld-signatures';
-import {schnorrkelVerify} from '@polkadot/util-crypto/schnorrkel';
-import b58 from 'bs58';
+        <h2><span class="attribs"><span class="type-signature"></span></span>DockResolver<span class="signature">(DockAPI)</span><span class="type-signature"></span></h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+
+    
+    <h4 class="name" id="DockResolver"><span class="type-signature"></span>new DockResolver<span class="signature">(DockAPI)</span><span class="type-signature"></span></h4>
+    
+
+    
 
 
-// TODO: use this package https://github.com/digitalbazaar/ecdsa-secp256k1-signature-2019
-// once this PR is merged: https://github.com/digitalbazaar/secp256k1-key-pair/pull/8
-export class EcdsaSepc256k1Signature2019 extends suites.JwsLinkedDataSignature {
-  /**
-   * @param type {string} Provided by subclass.
-   *
-   * One of these parameters is required to use a suite for signing:
-   *
-   * @param [creator] {string} A key id URL to the paired public key.
-   * @param [verificationMethod] {string} A key id URL to the paired public key.
-   *
-   * This parameter is required for signing:
-   *
-   * @param [signer] {function} an optional signer.
-   *
-   * Advanced optional parameters and overrides:
-   *
-   * @param [proof] {object} a JSON-LD document with options to use for
-   *   the `proof` node (e.g. any other custom fields can be provided here
-   *   using a context different from security-v2).
-   * @param [date] {string|Date} signing date to use if not passed.
-   * @param [key] {LDKeyPair} an optional crypto-ld KeyPair.
-   * @param [useNativeCanonize] {boolean} true to use a native canonize
-   *   algorithm.
-   */
-  constructor({
-    signer, key, creator, verificationMethod, proof, date, useNativeCanonize
-  } = {}) {
-    super({
-      type: 'EcdsaSecp256k1Signature2019', alg: 'ES256K',
-      LDKeyClass: Secp256k1KeyPair, creator, verificationMethod, signer, key,
-      proof, date, useNativeCanonize});
-    this.requiredKeyType = 'EcdsaSecp256k1VerificationKey2019';
-  }
-}
 
-const Sr25519VerKeyName = 'Sr25519VerificationKey2020';
-const Sr25519SigName = 'Sr25519Signature2020';
 
-export class Sr25519VerificationKey2020 {
-  constructor(publicKey) {
-    this.publicKey = [...publicKey];
-  }
 
-  /**
-   * Construct the public key object from the verification method
-   * @param verificationMethod
-   * @returns {Sr25519VerificationKey2020}
-   */
-  static from(verificationMethod) {
-    if (verificationMethod.type !== Sr25519VerKeyName &amp;&amp; !verificationMethod.publicKeyBase58) {
-      throw new Error('verification method should have type Sr25519VerificationKey2020 and have the base58 public key');
-    }
-    return new this(b58.decode(verificationMethod.publicKeyBase58));
-  }
 
-  /**
-   * Construct the verifier factory that has the verify method using the current public key
-   * @returns {Promise&lt;verify>}
-   */
-  verifier() {
-    return Sr25519VerificationKey2020.verifierFactory(this.publicKey);
-  }
 
-  /**
-   * Verifier factory that returns the object with the verify method
-   * @param publicKey
-   * @returns {Promise&lt;verify>}
-   */
-  static verifierFactory(publicKey) {
-    return {
-      async verify({data, signature}) {
-        return schnorrkelVerify(data, signature, publicKey);
-      }
-    };
-  }
-}
 
-export class Sr25519Signature2020 extends suites.JwsLinkedDataSignature {
-  constructor({
-    keypair, verificationMethod
-  } = {}) {
-    super({
-      type: Sr25519SigName, alg: 'EdDSA', LDKeyClass: Sr25519VerificationKey2020, verificationMethod: verificationMethod, signer: Sr25519Signature2020.signerFactory(keypair)});
-    this.requiredKeyType = Sr25519VerKeyName;
-  }
 
-  /**
-   * Generate object with `sign` method
-   * @param keypair
-   * @returns {Promise&lt;sign>}
-   */
-  static signerFactory(keypair) {
-    return {
-      async sign({data}) {
-        return keypair.sign(data);
-      }
-    };
-  }
-}
-</code></pre>
-        </article>
-    </section>
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>DockAPI</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">dock</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An initialized connection to a dock full-node.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="resolver.js.html">resolver.js</a>, <a href="resolver.js.html#line20">line 20</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

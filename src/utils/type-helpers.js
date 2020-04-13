@@ -49,7 +49,7 @@ export function ensureObjectWithId(value, name) {
 
 /**
  * Fail if the given value isn't an object with the given key as property
- * @param {objet} value - object to check
+ * @param {object} value - object to check
  * @param {string} name - Name of the object. Used in constructing error.
  * @param {string} key - Property to look for
  */

@@ -1,5 +1,5 @@
 {
-  "dock::did::Did": "[u8;32]",
+  "Did": "[u8;32]",
   "Bytes32": {
     "value": "[u8;32]"
   },
@@ -12,67 +12,67 @@
   "Bytes65": {
     "value": "[u8;65]"
   },
-  "dock::did::PublicKey": {
+  "PublicKey": {
     "_enum": {
       "Sr25519": "Bytes32",
       "Ed25519": "Bytes32",
       "Secp256k1": "Bytes33"
     }
   },
-  "dock::did::DidSignature": {
+  "DidSignature": {
     "_enum": {
       "Sr25519": "Bytes64",
       "Ed25519": "Bytes64",
       "Secp256k1": "Bytes65"
     }
   },
-  "dock::did::KeyDetail": {
-    "controller": "dock::did::Did",
-    "public_key": "dock::did::PublicKey"
+  "KeyDetail": {
+    "controller": "Did",
+    "public_key": "PublicKey"
   },
-  "dock::did::KeyUpdate": {
-    "did": "dock::did::Did",
-    "public_key": "dock::did::PublicKey",
-    "controller": "Option<dock::did::Did>",
+  "KeyUpdate": {
+    "did": "Did",
+    "public_key": "PublicKey",
+    "controller": "Option<Did>",
     "last_modified_in_block": "BlockNumber"
   },
-  "dock::did::DidRemoval": {
-    "did": "dock::did::Did",
+  "DidRemoval": {
+    "did": "Did",
     "last_modified_in_block": "BlockNumber"
   },
-  "dock::revoke::RegistryId": "[u8;32]",
-  "dock::revoke::RevokeId": "[u8;32]",
-  "dock::revoke::Registry": {
-    "policy": "dock::revoke::Policy",
+  "RegistryId": "[u8;32]",
+  "RevokeId": "[u8;32]",
+  "Registry": {
+    "policy": "Policy",
     "add_only": "bool"
   },
-  "dock::revoke::Revoke": {
-    "registry_id": "dock::revoke::RegistryId",
-    "revoke_ids": "BTreeSet<dock::revoke::RevokeId>",
+  "Revoke": {
+    "registry_id": "RegistryId",
+    "revoke_ids": "BTreeSet<RevokeId>",
     "last_modified": "BlockNumber"
   },
-  "dock::revoke::UnRevoke": {
-    "registry_id": "dock::revoke::RegistryId",
-    "revoke_ids": "BTreeSet<dock::revoke::RevokeId>",
+  "UnRevoke": {
+    "registry_id": "RegistryId",
+    "revoke_ids": "BTreeSet<RevokeId>",
     "last_modified": "BlockNumber"
   },
-  "dock::revoke::RemoveRegistry": {
-    "registry_id": "dock::revoke::RegistryId",
+  "RemoveRegistry": {
+    "registry_id": "RegistryId",
     "last_modified": "BlockNumber"
   },
-  "dock::revoke::PAuth": "BTreeMap<dock::did::Did, dock::did::DidSignature>",
-  "dock::revoke::Policy": {
+  "PAuth": "BTreeMap<Did, DidSignature>",
+  "Policy": {
     "_enum": {
-      "OneOf": "BTreeSet<dock::did::Did>"
+      "OneOf": "BTreeSet<Did>"
     }
   },
-  "dock::StateChange": {
+  "StateChange": {
     "_enum": {
-      "KeyUpdate": "dock::did::KeyUpdate",
-      "DidRemoval": "dock::did::DidRemoval",
-      "Revoke": "dock::revoke::Revoke",
-      "UnRevoke": "dock::revoke::UnRevoke",
-      "RemoveRegistry": "dock::revoke::RemoveRegistry"
+      "KeyUpdate": "KeyUpdate",
+      "DidRemoval": "DidRemoval",
+      "Revoke": "Revoke",
+      "UnRevoke": "UnRevoke",
+      "RemoveRegistry": "RemoveRegistry"
     }
   }
 }

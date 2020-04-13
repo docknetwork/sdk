@@ -2,7 +2,7 @@ import {randomAsHex} from '@polkadot/util-crypto';
 
 import {DockAPI} from '../../src/api';
 
-import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
+import {FullNodeEndpoint, TestKeyringOpts, TestAccountURI} from '../test-constants';
 
 import  {
   OneOfPolicy,
@@ -43,7 +43,7 @@ describe('Revocation Module', () => {
     });
 
     // The keyring should be initialized before any test begins as this suite is testing revocation
-    const account = dock.keyring.addFromUri(TestAccount.uri, TestAccount.options);
+    const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
 
     // The DID should be written before any test begins

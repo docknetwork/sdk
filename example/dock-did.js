@@ -10,9 +10,7 @@ import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
-const fullNodeWsRPCEndpoint = 'ws://127.0.0.1:9944';
-const accountUri = '//Alice';
-const accountMetadata = {name: 'Alice'};
+import {FullNodeEndpoint, TestAccountURI} from '../tests/test-constants';
 
 // DID will be generated randomly
 const dockDID = createNewDockDID();
@@ -83,10 +81,10 @@ function registerNewDID() {
 // Initialise Dock API, connect to the node and start working with it
 // It will create a new DID with a key, then update the key to another one and then remove the DID
 dock.init({
-  address: fullNodeWsRPCEndpoint
+  address: FullNodeEndpoint
 })
   .then(() => {
-    const account = dock.keyring.addFromUri(accountUri, accountMetadata);
+    const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
     return registerNewDID();
   })

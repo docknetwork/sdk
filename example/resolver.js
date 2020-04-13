@@ -10,9 +10,7 @@ import Resolver from '../src/resolver';
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
-const fullNodeWsRPCEndpoint = 'ws://127.0.0.1:9944';
-const accountUri = '//Alice';
-const accountMetadata = {name: 'Alice'};
+import {FullNodeEndpoint, TestAccountURI} from '../tests/test-constants';
 
 // Infura's Ethereum provider for the main net
 const ethereumProviderConfig = {
@@ -55,7 +53,7 @@ async function resolveDockDID() {
 async function resolveSeveralDIDMethodsUsingResolver() {
   // Register providers for Dock and Ethereum.
   const providers = {
-    'dock': fullNodeWsRPCEndpoint,
+    'dock': FullNodeEndpoint,
     'ethr': ethereumProviderConfig,
   };
 
@@ -74,10 +72,10 @@ async function resolveSeveralDIDMethodsUsingResolver() {
 }
 
 dock.init({
-  address: fullNodeWsRPCEndpoint
+  address: FullNodeEndpoint
 })
   .then(() => {
-    const account = dock.keyring.addFromUri(accountUri, accountMetadata);
+    const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
     return resolveDockDID();
   })

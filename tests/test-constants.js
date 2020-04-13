@@ -13,9 +13,7 @@ const DefaultTestAccountURI = '//Alice';
  * @returns {string|*}
  */
 function fromEnv(varName, defaultVal) {
-  // eslint-disable-next-line no-undef
   if (varName in process.env) {
-    // eslint-disable-next-line no-undef
     return process.env[varName];
   } else if (defaultVal !== undefined) {
     return defaultVal;

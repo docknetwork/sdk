@@ -51,8 +51,6 @@ async function updateDIDKey() {
   const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, dockDID, newPk, currentPair, newController);
   const transaction = dock.did.updateKey(keyUpdate, signature);
   await dock.sendTransaction(transaction);
-
-  await getDIDDoc();
 }
 
 async function getDIDDoc() {
@@ -99,7 +97,6 @@ dock.init({
     } catch (e) {
       // The call to get the DID document has failed since the DID has been removed
       console.log('Example ran successfully');
-      // eslint-disable-next-line no-undef
       process.exit(0);
     }
   })

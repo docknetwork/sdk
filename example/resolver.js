@@ -48,7 +48,7 @@ class EtherResolver extends DIDResolver {
 async function createDockDID(dock) {
   const account = dock.keyring.addFromUri(TestAccountURI);
   dock.setAccount(account);
-  
+
   const dockDID = createNewDockDID();
   const pair = dock.keyring.addFromUri(randomAsHex(32), null, 'sr25519');
   const publicKey = getPublicKeyFromKeyringPair(pair);
@@ -109,11 +109,9 @@ async function main() {
 main()
   .then(() => {
     console.log('Example ran successfully');
-    // eslint-disable-next-line no-undef
     process.exit(0);
   })
   .catch(error => {
     console.error('Error occurred somewhere, it was caught!', error);
-    // eslint-disable-next-line no-undef
     process.exit(1);
   });

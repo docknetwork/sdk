@@ -1,5 +1,8 @@
 module.exports = {
   "plugins": ["jest"],
+  "globals": {
+    "process": "readonly"
+  },
   "env": {
     "browser": true,
     "es6": true

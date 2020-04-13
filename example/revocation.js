@@ -11,9 +11,7 @@ import  {
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
-const fullNodeWsRPCEndpoint = 'ws://127.0.0.1:9944';
-const accountUri = '//Alice';
-const accountMetadata = {name: 'Alice'};
+import {FullNodeEndpoint, TestAccountURI} from '../tests/test-constants';
 
 // Create a random registry id
 const registryID = randomAsHex(32);
@@ -71,7 +69,7 @@ async function main() {
   console.log('Connected to node, creating account...');
 
   // We need an account to sign transactions with
-  const account = dock.keyring.addFromUri(accountUri, accountMetadata);
+  const account = dock.keyring.addFromUri(TestAccountURI);
   dock.setAccount(account);
 
   // The DID should be written before creating a registry
@@ -118,15 +116,17 @@ async function main() {
   await dock.disconnect();
 
   // Exit
+  // eslint-disable-next-line no-undef
   process.exit(0);
 }
 
 // Initialise Dock API, connect to the node and start working with it
 dock.init({
-  address: fullNodeWsRPCEndpoint
+  address: FullNodeEndpoint
 })
   .then(main)
   .catch(error => {
     console.error('Error occurred somewhere, it was caught!', error);
+    // eslint-disable-next-line no-undef
     process.exit(1);
   });

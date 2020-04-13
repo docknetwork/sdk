@@ -17,6 +17,7 @@
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "24.5.0",
     "concurrently": "^4.1.0",
+    "dotenv": "^8.2.0",
     "eslint": "^6.8.0",
     "eslint-plugin-jest": "^23.8.2",
     "jest": "24.5.0",
@@ -28,7 +29,7 @@
     "rollup-plugin-node-resolve": "4.0.1"
   },
   "scripts": {
-    "lint": "eslint src && eslint tests",
+    "lint": "eslint src && eslint tests && eslint example",
     "prepare": "yarn build",
     "build": "rollup -c",
     "watch": "rollup -c -w",

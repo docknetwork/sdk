@@ -232,11 +232,11 @@ describe('Verifiable Credential incremental creation', () => {
 
     expect(() => {
       credential.addSubject({some: 'value'});
-    }).toThrowError('"credentialSubject" must include an id.');
+    }).toThrowError('"credentialSubject" must include the \'id\' property.');
 
     expect(() => {
       credential.setStatus({some: 'value', type: 'something'});
-    }).toThrowError('"credentialStatus" must include an id.');
+    }).toThrowError('"credentialStatus" must include the \'id\' property.');
     expect(() => {
       credential.setStatus({id: 'value', some: 'value'});
     }).toThrowError('"credentialStatus" must include a type.');
@@ -326,7 +326,7 @@ describe('Verifiable Presentation incremental creation', () => {
 
     expect(() => {
       vp.addCredential({some: 'value'});
-    }).toThrowError('"credential" must include an id.');
+    }).toThrowError('"credential" must include the \'id\' property.');
 
     await expect(vp.verify()).rejects.toThrowError('The current VerifiablePresentation has no proof.');
 

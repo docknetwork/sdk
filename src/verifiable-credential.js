@@ -1,10 +1,8 @@
 import {
-  ensureObject,
   ensureObjectWithId,
+  ensureObjectWithKeyOrURI,
   ensureString,
-  ensureURI,
   ensureValidDatetime,
-  isObject,
   issueCredential,
   verifyCredential
 } from './utils/vc';
@@ -36,11 +34,7 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   addContext(context) {
-    if (!isObject(context)){
-      ensureURI(context);
-    } else {
-      ensureObject(context);
-    }
+    ensureObjectWithKeyOrURI(context, '@context', 'context');
     this.context.push(context);
     return this;
   }

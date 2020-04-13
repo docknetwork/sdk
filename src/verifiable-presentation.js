@@ -1,9 +1,8 @@
 import {
-  ensureObject,
   ensureObjectWithId,
+  ensureObjectWithKeyOrURI,
   ensureString,
   ensureURI,
-  isObject,
   signPresentation,
   verifyPresentation
 } from './utils/vc';
@@ -36,11 +35,7 @@ class VerifiablePresentation {
    * @returns {VerifiablePresentation}
    */
   addContext(context) {
-    if (!isObject(context)){
-      ensureURI(context);
-    } else {
-      ensureObject(context);
-    }
+    ensureObjectWithKeyOrURI(context, '@context', 'context');
     this.context.push(context);
     return this;
   }

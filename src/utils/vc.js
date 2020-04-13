@@ -314,14 +314,24 @@ export function ensureObject(value){
 }
 
 /**
- * Fail if the given value isn't an object
+ * Fail if the given value isn't an object with id property
  * @param value
  * @param {string} name - Name of the object. Used in constructing error.
  */
 export function ensureObjectWithId(value, name){
+  ensureObjectWithKey(value, 'id', name);
+}
+
+/**
+ * Fail if the given value isn't an object with the given key as property
+ * @param {objet} value - object to check
+ * @param {string} name - Name of the object. Used in constructing error.
+ * @param {string} key - Property to look for
+ */
+export function ensureObjectWithKey(value, key, name){
   ensureObject(value);
-  if(!value.id){
-    throw new Error(`"${name}" must include an id.`);
+  if(!(key in value)){
+    throw new Error(`"${name}" must include the '${key}' property.`);
   }
 }
 /**
@@ -336,14 +346,25 @@ export function ensureValidDatetime(datetime){
 
 
 /**
- * Fail if the given string isn't a URL
- * @param url
+ * Fail if the given string isn't a URI
+ * @param uri
  */
-//TODO: change this to URI
-export function ensureURI(url) {
-  ensureString(url);
-  var pattern = new RegExp('\\w+:(\\/?\\/?)[^\\s]+');
-  if (!pattern.test(url)){
-    throw new Error(`${url} needs to be a valid URI.`);
+export function ensureURI(uri) {
+  ensureString(uri);
+  var pattern = new RegExp('^\\w+:\\/?\\/?[^\\s]+$');
+  if (!pattern.test(uri)){
+    throw new Error(`${uri} needs to be a valid URI.`);
+  }
+}
+
+/**
+ * If an object is given, fail if it doesn't have an id property. Else fail if it isn't an URI
+ * @param value
+ */
+export function ensureObjectWithKeyOrURI(value, key, name) {
+  if (!isObject(value)){
+    ensureURI(value);
+  } else {
+    ensureObjectWithKey(value, key, name);
   }
 }

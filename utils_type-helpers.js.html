@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: exports</title>
+    <title>JSDoc: Source: utils/type-helpers.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,371 +17,113 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: exports</h1>
-
-    
-
-
-
-
-<section>
-
-<header>
-    
-        <h2><span class="attribs"><span class="type-signature"></span></span>exports<span class="signature">(providers, universalResolverUrl)</span><span class="type-signature"></span></h2>
-        
-            <div class="class-description">Class representing a DID Resolver which can resolve DID from various networks</div>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-
-    
-    <h2>Constructor</h2>
-    
-
-    
-    <h4 class="name" id=".exports"><span class="type-signature"></span>new exports<span class="signature">(providers, universalResolverUrl)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    DID resolver class, currently supporting only Dock and Ethereum DID natively and optionally allows to pass URL for the
-universal resolver.
-The providers can be passed only during construction to keep the code minimal.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>providers</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">An object with keys as the DID method and value as the provider config specifying the network.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>universalResolverUrl</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The HTTP URL for the universal resolver. This is optional</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="resolver.js.html">resolver.js</a>, <a href="resolver.js.html#line23">line 23</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="~loadDocument"><span class="type-signature">(async, inner) </span>loadDocument<span class="signature">(uri)</span><span class="type-signature"> &rarr; {Promise.&lt;{documentUrl: *, document: *}>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Resolve a URI. If the URI is a DID, then the resolver is used to resolve it.
-Else, the hardcoded contexts are used to resolve the URI and if that fails
-it will be fetched using an HTTP client
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>uri</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_document-loader.js.html">utils/vc/document-loader.js</a>, <a href="utils_vc_document-loader.js.html#line19">line 19</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Promise.&lt;{documentUrl: *, document: *}></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-    
-
-    
-
-    
-</article>
-
-</section>
+    <h1 class="page-title">Source: utils/type-helpers.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import vcjs from 'vc-js';
+
+/**
+ * Return true if the given value is a string.
+ * @param value
+ * @returns {boolean}
+ */
+export function isString(value) {
+  return typeof value === 'string' || value instanceof String;
+}
+
+/**
+ * Return true if a value is an object
+ * @param value
+ * @returns {boolean}
+ */
+export function isObject(value) {
+  return value &amp;&amp; typeof value === 'object' &amp;&amp; value.constructor === Object;
+}
+
+/**
+ * Fail if the given value isn't a string
+ * @param value
+ */
+export function ensureString(value) {
+  if (!isString(value)) {
+    throw new Error(`${value} needs to be a string.`);
+  }
+}
+
+/**
+ * Fail if the given value isn't an object
+ * @param value
+ */
+export function ensureObject(value) {
+  if (!isObject(value)) {
+    throw new Error(`${value} needs to be an object.`);
+  }
+}
+
+/**
+ * Fail if the given value isn't an object with id property
+ * @param value
+ * @param {string} name - Name of the object. Used in constructing error.
+ */
+export function ensureObjectWithId(value, name) {
+  ensureObjectWithKey(value, 'id', name);
+}
+
+/**
+ * Fail if the given value isn't an object with the given key as property
+ * @param {object} value - object to check
+ * @param {string} name - Name of the object. Used in constructing error.
+ * @param {string} key - Property to look for
+ */
+export function ensureObjectWithKey(value, key, name) {
+  ensureObject(value);
+  if (!(key in value)) {
+    throw new Error(`"${name}" must include the '${key}' property.`);
+  }
+}
+
+/**
+ * Fail if the given datetime isn't valid.
+ * @param datetime
+ */
+export function ensureValidDatetime(datetime) {
+  if (!vcjs.dateRegex.test(datetime)) {
+    throw new Error(`${datetime} needs to be a valid datetime.`);
+  }
+}
+
+/**
+ * If an object is given, fail if it doesn't have an id property. Else fail if it isn't an URI
+ * @param value
+ */
+export function ensureObjectWithKeyOrURI(value, key, name) {
+  if (!isObject(value)) {
+    ensureURI(value);
+  } else {
+    ensureObjectWithKey(value, key, name);
+  }
+}
+
+/**
+ * Fail if the given string isn't a URI
+ * @param uri
+ */
+export function ensureURI(uri) {
+  ensureString(uri);
+  var pattern = new RegExp('^\\w+:\\/?\\/?[^\\s]+$');
+  if (!pattern.test(uri)) {
+    throw new Error(`${uri} needs to be a valid URI.`);
+  }
+}
+</code></pre>
+        </article>
+    </section>
 
 
 

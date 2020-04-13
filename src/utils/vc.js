@@ -237,6 +237,15 @@ export async function checkRevocationStatus(credential, revocationAPI) {
 }
 
 /**
+ * Return `credentialStatus` according to W3C spec when the revocation status is checked on Dock
+ * @param registryId - Revocation registry id
+ * @returns {{id: string, type: string}}
+ */
+export function buildDockCredentialStatus(registryId) {
+  return {id: `${DockRevRegQualifier}${registryId}`, type: RevRegType};
+}
+
+/**
  * Generate the revocation id of a credential usable by Dock. It hashes the credential id to get the
  * revocation id
  * @param credential

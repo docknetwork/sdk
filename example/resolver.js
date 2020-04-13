@@ -5,8 +5,13 @@ import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
 import {DIDResolver, MultiResolver, UniversalResolver, DockResolver} from '../src/resolver';
 import ethr from 'ethr-did-resolver';
 
-const fullNodeWsRPCEndpoint = 'ws://127.0.0.1:9944';
+// The following can be tweaked depending on where the node is running and what
+// account is to be used for sending the transaction.
+import {FullNodeEndpoint, TestAccountURI} from '../tests/test-constants';
+
 const universalResolverUrl = 'http://localhost:8080';
+
+// Infura's Ethereum provider for the main net
 const ethereumProviderConfig = {
   networks: [
     {
@@ -41,9 +46,9 @@ class EtherResolver extends DIDResolver {
  * @returns {Promise<string>}
  */
 async function createDockDID(dock) {
-  const account = dock.keyring.addFromUri('//Alice', {name: 'Alice'});
+  const account = dock.keyring.addFromUri(TestAccountURI);
   dock.setAccount(account);
-
+  
   const dockDID = createNewDockDID();
   const pair = dock.keyring.addFromUri(randomAsHex(32), null, 'sr25519');
   const publicKey = getPublicKeyFromKeyringPair(pair);
@@ -58,7 +63,7 @@ async function main() {
   console.log('Connecting to the node...');
 
   await dock.init({
-    address: fullNodeWsRPCEndpoint
+    address: FullNodeEndpoint
   });
 
   console.log('Creating DID providers...');
@@ -102,8 +107,13 @@ async function main() {
 }
 
 main()
-  .then(() => process.exit(0))
+  .then(() => {
+    console.log('Example ran successfully');
+    // eslint-disable-next-line no-undef
+    process.exit(0);
+  })
   .catch(error => {
     console.error('Error occurred somewhere, it was caught!', error);
+    // eslint-disable-next-line no-undef
     process.exit(1);
   });

@@ -6,7 +6,7 @@ import {
   createNewDockDID,
   createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval
 } from '../../src/utils/did';
-import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
+import {FullNodeEndpoint, TestKeyringOpts, TestAccountURI} from '../test-constants';
 import {getPublicKeyFromKeyringPair} from '../../src/utils/misc';
 import {PublicKeyEd25519} from '../../src/public-key';
 
@@ -35,7 +35,7 @@ describe('DID Module', () => {
   }, 30000);
 
   test('Has keyring and account', () => {
-    const account = dock.keyring.addFromUri(TestAccount.uri, TestAccount.options);
+    const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
     expect(!!dock.keyring).toBe(true);
     expect(!!dock.account).toBe(true);

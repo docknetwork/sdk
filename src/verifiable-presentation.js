@@ -1,11 +1,9 @@
 import {
-  isObject,
-  isString,
   signPresentation,
   verifyPresentation
 } from './utils/vc';
-import vcjs from 'vc-js';
 import VerifiableCredential from './verifiable-credential';
+import {ensureObjectWithId, ensureObjectWithKeyOrURI, ensureString, ensureURI} from './utils/type-helpers';
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiablePresentation';
@@ -20,7 +18,7 @@ class VerifiablePresentation {
    * @returns {VerifiablePresentation}
    */
   constructor(id) {
-    this.ensureString(id);
+    ensureString(id);
     this.id = id;
 
     this.context = [DEFAULT_CONTEXT];
@@ -34,11 +32,7 @@ class VerifiablePresentation {
    * @returns {VerifiablePresentation}
    */
   addContext(context) {
-    if (isString(context)){
-      this.ensureUrl(context);
-    } else {
-      this.ensureObject(context);
-    }
+    ensureObjectWithKeyOrURI(context, '@context', 'context');
     this.context.push(context);
     return this;
   }
@@ -49,7 +43,7 @@ class VerifiablePresentation {
    * @returns {VerifiablePresentation}
    */
   addType(type) {
-    this.ensureString(type);
+    ensureString(type);
     this.type.push(type);
     return this;
   }
@@ -60,7 +54,7 @@ class VerifiablePresentation {
    * @returns {VerifiablePresentation}
    */
   setHolder(holder) {
-    this.ensureUrl(holder);
+    ensureURI(holder);
     this.holder = holder;
     return this;
   }
@@ -74,68 +68,9 @@ class VerifiablePresentation {
     if (credential && credential instanceof VerifiableCredential){
       credential = credential.toJSON();
     }
-    this.ensureObjectWithId(credential, 'credential');
+    ensureObjectWithId(credential, 'credential');
     this.credentials.push(credential);
     return this;
-  }
-
-  /**
-   * Fail if the given value isn't a string
-   * @param value
-   */
-  ensureString(value){
-    if (!isString(value)){
-      throw new Error(`${value} needs to be a string.`);
-    }
-  }
-
-  /**
-   * Fail if the given value isn't an object
-   * @param value
-   */
-  ensureObject(value){
-    if (!isObject(value)){
-      throw new Error(`${value} needs to be an object.`);
-    }
-  }
-
-  /**
-   * Fail if the given value isn't an object
-   * @param value
-   */
-  ensureObjectWithId(value, name){
-    this.ensureObject(value);
-    if(!value.id){
-      throw new Error(`"${name}" must include an id.`);
-    }
-  }
-
-  /**
-   * Fail if the given datetime isn't valid.
-   * @param datetime
-   */
-  ensureValidDatetime(datetime){
-    if(!vcjs.dateRegex.test(datetime)) {
-      throw new Error(`${datetime} needs to be a valid datetime.`);
-    }
-  }
-
-  /**
-   * Fail if the given string isn't a URL
-   * @param url
-   */
-  //TODO: change this to URI
-  ensureUrl(url) {
-    this.ensureString(url);
-    var pattern = new RegExp('^(https?:\\/\\/)?'+
-      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+
-      '((\\d{1,3}\\.){3}\\d{1,3}))'+
-      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+
-      '(\\?[;&a-z\\d%_.~+=-]*)?'+
-      '(\\#[-a-z\\d_]*)?$','i');
-    if (!pattern.test(url)){
-      throw new Error(`${url} needs to be a valid URL.`);
-    }
   }
 
   /**
@@ -179,9 +114,14 @@ class VerifiablePresentation {
    * @param {string} domain - proof domain (optional)
    * @param {Resolver} resolver - Resolver to resolve the issuer DID (optional)
    * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
+   * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
+   * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
+   * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
+   * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
+   * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
    * @returns {Promise<{object}>} - verification result.
    */
-  async verify(challenge, domain, resolver, compactProof = true) {
+  async verify(challenge, domain, resolver, compactProof = true, forceRevocationCheck = true, revocationAPI) {
     if (!this.proof) {
       throw new Error('The current VerifiablePresentation has no proof.');
     }
@@ -190,7 +130,9 @@ class VerifiablePresentation {
       challenge,
       domain,
       resolver,
-      compactProof
+      compactProof,
+      forceRevocationCheck,
+      revocationAPI
     );
   }
 

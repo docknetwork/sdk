@@ -42,9 +42,9 @@ function getSamplePres(signed=false){
   let vp = {
     '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
     type: [ 'VerifiablePresentation' ],
-    verifiableCredential: presentation_credentials,
-    id: vp_id,
-    holder: vp_holder
+    verifiableCredential: presentationCredentials,
+    id: vpId,
+    holder: vpHolder
   };
   if (signed){
     vp = {
@@ -72,11 +72,11 @@ function getSampleKey() {
     publicKeyBase58: 'zXwDsGkuq5gTLVMnb3jGUaW8vvzAjfZfNuJmP2PkZGJy'
   };
 }
-const vp_id = 'https://example.com/credentials/12345';
-const vp_holder = 'https://example.com/credentials/1234567890';
-const presentation_credentials = [getSampleCredential(true), getSampleCredential(true)];
+const vpId = 'https://example.com/credentials/12345';
+const vpHolder = 'https://example.com/credentials/1234567890';
+const presentationCredentials = [getSampleCredential(true), getSampleCredential(true)];
 
-const fake_context = {
+const fakeContext = {
   '@context': {
     '@protected': true,
 
@@ -126,23 +126,23 @@ describe('Verifiable Credential Verification', () => {
 describe('Verifiable Presentation creation', () => {
   test('A proper verifiable presentation should be created from two valid sample credentials.', async () => {
     const presentation = createPresentation(
-      presentation_credentials,
-      vp_id,
-      vp_holder
+      presentationCredentials,
+      vpId,
+      vpHolder
     );
     expect(presentation).toMatchObject(getSamplePres());
   }, 30000);
 
   test('A verifiable presentation should contain a proof once signed, and it should pass verification.', async () => {
-    const signed_vp = await signPresentation(
+    const signedVp = await signPresentation(
       getSamplePres(),
       getSampleKey(),
       'some_challenge',
       'some_domain',
     );
-    expect(signed_vp).toMatchObject(getSamplePres(true));
+    expect(signedVp).toMatchObject(getSamplePres(true));
     const results = await verifyPresentation(
-      signed_vp,
+      signedVp,
       'some_challenge',
       'some_domain'
     );
@@ -178,8 +178,8 @@ describe('Verifiable Credential incremental creation', () => {
 
   test('VC creation with an object context should be possible', async () => {
     let credential = new VerifiableCredential('blabla');
-    credential.addContext(fake_context);
-    expect(credential.context).toEqual(['https://www.w3.org/2018/credentials/v1', fake_context]);
+    credential.addContext(fakeContext);
+    expect(credential.context).toEqual(['https://www.w3.org/2018/credentials/v1', fakeContext]);
   });
 
   test('JSON representation of a VC should bring the proper keys', async () => {
@@ -254,11 +254,11 @@ describe('Verifiable Credential incremental creation', () => {
   });
 
   test('Issuing an incrementally-created VC should return an object with a proof, and it must pass validation.', async () => {
-    let unsigned_credential = new VerifiableCredential('https://example.com/credentials/1872');
-    unsigned_credential.addContext('https://www.w3.org/2018/credentials/examples/v1');
-    const signed_credential = await unsigned_credential.sign(getSampleKey());
-    expect(signed_credential.proof).toBeDefined();
-    const result = await signed_credential.verify();
+    let unsignedCredential = new VerifiableCredential('https://example.com/credentials/1872');
+    unsignedCredential.addContext('https://www.w3.org/2018/credentials/examples/v1');
+    const signedCredential = await unsignedCredential.sign(getSampleKey());
+    expect(signedCredential.proof).toBeDefined();
+    const result = await signedCredential.verify();
     expect(result.verified).toBe(true);
     expect(result.results[0].proof).toBeDefined();
     expect(result.results[0].verified).toBe(true);
@@ -276,8 +276,8 @@ describe('Verifiable Presentation incremental creation', () => {
 
   test('VP creation with an object context should be possible', async () => {
     let vp = new VerifiablePresentation('blabla');
-    vp.addContext(fake_context);
-    expect(vp.context).toEqual(['https://www.w3.org/2018/credentials/v1', fake_context]);
+    vp.addContext(fakeContext);
+    expect(vp.context).toEqual(['https://www.w3.org/2018/credentials/v1', fakeContext]);
   });
 
   test('The JSON representation of a VP should bring the proper keys', async () => {
@@ -333,7 +333,7 @@ describe('Verifiable Presentation incremental creation', () => {
   });
 
   test('Incremental VP creation from external VCs should be possible', async () => {
-    let vp = new VerifiablePresentation(vp_id);
+    let vp = new VerifiablePresentation(vpId);
     vp.addCredential(getSampleCredential(true));
     expect(vp.credentials).toEqual([getSampleCredential(true)]);
     await vp.sign(
@@ -370,11 +370,11 @@ describe('Verifiable Presentation incremental creation', () => {
       alumniOf: 'Example University'
     });
     await vc.sign(getSampleKey());
-    const vc_verification_result = await vc.verify();
-    expect(vc_verification_result).toMatchObject({'verified': true});
+    const vcVerificationResult = await vc.verify();
+    expect(vcVerificationResult).toMatchObject({'verified': true});
 
-    let vp = new VerifiablePresentation(vp_id);
-    vp.setHolder(vp_holder);
+    let vp = new VerifiablePresentation(vpId);
+    vp.setHolder(vpHolder);
     vp.addCredential(vc);
     await vp.sign(
       getSampleKey(),

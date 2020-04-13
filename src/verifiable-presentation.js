@@ -1,12 +1,9 @@
 import {
-  ensureObjectWithId,
-  ensureObjectWithKeyOrURI,
-  ensureString,
-  ensureURI,
   signPresentation,
   verifyPresentation
 } from './utils/vc';
 import VerifiableCredential from './verifiable-credential';
+import {ensureObjectWithId, ensureObjectWithKeyOrURI, ensureString, ensureURI} from './utils/type-helpers';
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiablePresentation';

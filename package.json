@@ -39,8 +39,8 @@
     "dock-did-example": "npx babel-node example/dock-did.js",
     "did-resolver-example": "npx babel-node example/resolver.js",
     "revocation-example": "npx babel-node example/revocation.js",
-    "dev-node": "./submodules/dock-substrate/scripts/run_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
-    "test-with-node": "./submodules/dock-substrate/scripts/with_docker_test_node yarn test-integration"
+    "dev-node": "./scripts/run_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
+    "test-with-node": "./scripts/with_docker_test_node yarn test-integration"
   },
   "jest": {
     "testEnvironment": "node"

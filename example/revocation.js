@@ -116,6 +116,7 @@ async function main() {
   await dock.disconnect();
 
   // Exit
+  // eslint-disable-next-line no-undef
   process.exit(0);
 }
 
@@ -126,5 +127,6 @@ dock.init({
   .then(main)
   .catch(error => {
     console.error('Error occurred somewhere, it was caught!', error);
+    // eslint-disable-next-line no-undef
     process.exit(1);
   });

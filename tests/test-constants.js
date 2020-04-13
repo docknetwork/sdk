@@ -6,6 +6,12 @@ const DefaultFullNodeEndpoint = 'ws://localhost:9944';
 const DefaultTestKeyringType = 'sr25519';
 const DefaultTestAccountURI = '//Alice';
 
+/**
+ * Read variable from environment or use the default value
+ * @param varName - The variable name to read from environment variable
+ * @param defaultVal - The default value if the variable is not found in environment.
+ * @returns {string|*}
+ */
 function fromEnv(varName, defaultVal) {
   // eslint-disable-next-line no-undef
   if (varName in process.env) {

@@ -95,10 +95,11 @@ dock.init({
   .then(async () => {
     try {
       await dock.did.getDocument(dockDID);
-      throw new Error('The call to get the DID document should have failed but did not fail. This means the remove DID call has not worked.')
+      throw new Error('The call to get the DID document should have failed but did not fail. This means the remove DID call has not worked.');
     } catch (e) {
       // The call to get the DID document has failed since the DID has been removed
       console.log('Example ran successfully');
+      // eslint-disable-next-line no-undef
       process.exit(0);
     }
   })

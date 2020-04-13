@@ -7,14 +7,13 @@ import {
 } from '../../src/utils/did';
 
 import {DockAPI} from '../../src/api';
-import Resolver from '../../src/resolver';
+import {DockResolver} from '../../src/resolver';
 
 import {FullNodeEndpoint, TestKeyringOpts, TestAccountURI} from '../test-constants';
 import {getKeyDoc, getUnsignedCred, registerNewDIDUsingPair} from './helpers';
 import {generateEcdsaSecp256k1Keypair} from '../../src/utils/misc';
 import Secp256k1KeyPair  from 'secp256k1-key-pair';
 import {issueCredential, verifyCredential} from '../../src/utils/vc';
-
 
 // 1st issuer's DID.
 const issuer1DID = createNewDockDID();
@@ -75,7 +74,7 @@ function getProofMatcherDoc() {
 
 describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
   const dock = new DockAPI();
-  let resolver;
+  const resolver = new DockResolver(dock);
 
   beforeAll(async (done) => {
     await dock.init({
@@ -100,13 +99,6 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
     // DID with sr25519 key
     const pair3 = dock.keyring.addFromUri(issuer3KeySeed, null, 'sr25519');
     await registerNewDIDUsingPair(dock, issuer3DID, pair3);
-
-    const providers = {
-      'dock': FullNodeEndpoint,
-    };
-
-    resolver = new Resolver(providers);
-    resolver.init();
 
     done();
   }, 30000);

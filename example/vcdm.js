@@ -9,7 +9,7 @@ import {registerNewDIDUsingPair} from '../tests/integration/helpers';
 import {OneOfPolicy} from '../src/utils/revocation';
 import {FullNodeEndpoint, TestAccountURI} from '../tests/test-constants';
 import {getKeyDoc} from '../src/utils/vc/helpers';
-import Resolver from '../src/resolver';
+import {DockResolver} from '../src/resolver';
 import {DockRevRegQualifier, RevRegType} from '../src/utils/vc';
 
 // Both issuer and holder have DIDs
@@ -30,7 +30,7 @@ const credentialStatus = {id: `${DockRevRegQualifier}${registryId}`, type: RevRe
 const credentialIssuanceDate = '2020-03-18T19:23:24Z';
 const credentialExpirationDate = '2021-03-18T19:23:24Z';
 
-let resolver;
+const resolver = new DockResolver(dock);
 
 /**
  * Register issuer and holder DIDs
@@ -41,10 +41,12 @@ async function setup() {
   dock.setAccount(account);
 
   // Register issuer DID
+  console.log('Registering issuer DID...');
   const pair = dock.keyring.addFromUri(issuerSeed, null, 'ed25519');
   await registerNewDIDUsingPair(dock, issuerDID, pair);
 
   // Register holder DID
+  console.log('Registering holder DID...');
   const pair1 = dock.keyring.addFromUri(holderSeed, null, 'ed25519');
   await registerNewDIDUsingPair(dock, holderDID, pair1);
 
@@ -53,16 +55,11 @@ async function setup() {
   policy.addOwner(issuerDID);
 
   // Add a new revocation registry with above policy
+  console.log('Creating registry...');
   const transaction = dock.revocation.newRegistry(registryId, policy, false);
   await dock.sendTransaction(transaction);
 
   console.log('Issuer has created registry with id', registryId);
-
-  const providers = {
-    'dock': FullNodeEndpoint,
-  };
-  resolver = new Resolver(providers);
-  resolver.init();
 }
 
 async function main() {

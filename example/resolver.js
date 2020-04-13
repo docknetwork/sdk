@@ -102,7 +102,7 @@ async function main() {
 
   return Promise.all(didsToTest.map(async did => {
     const document = await resolver.resolve(did);
-    console.log('Resolved DID', did, document)
+    console.log('Resolved DID', did, document);
   }));
 }
 

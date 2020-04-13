@@ -87,6 +87,9 @@ export class MultiResolver extends DIDResolver {
    * Create a Resolver which delegates to the appropriate child Resolver according to an index.
    * @constructor
    * @param {object} index - A map from DID method name to child Resolver.
+   *     Child Resolvers must either inherit from DIDResolver, or be an async function
+   *     from DID string to DIDDocument which throws NoDIDError when and only
+   *     when the did in question does not exist.
    * @param {Resolver | null} catchAll - An optional fallback to use when index does not specify an
    * implementation for the requested method.
    */

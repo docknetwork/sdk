@@ -97,7 +97,6 @@ dock.init({
     } catch (e) {
       // The call to get the DID document has failed since the DID has been removed
       console.log('Example ran successfully');
-      // eslint-disable-next-line no-undef
       process.exit(0);
     }
   })

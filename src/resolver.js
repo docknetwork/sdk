@@ -15,7 +15,7 @@ export class DIDResolver {
 export class DockResolver extends DIDResolver {
   /**
    * @param {dock} DockAPI - An initialized connection to a dock full-node.
-   * @returns {Resolver}
+   * @constructor
    */
   constructor(dock) {
     super();
@@ -46,16 +46,15 @@ export class DockResolver extends DIDResolver {
   }
 }
 
-/**
- * Create an adapter to a
- * [universal-resolver](https://github.com/decentralized-identity/universal-resolver) instance. The
- * adapter has type
- * [DIDResolver](https://github.com/decentralized-identity/did-resolver/blob/02bdaf1687151bb934b10093042e576ed54b229c/src/resolver.ts#L73).
- *
- * @param {string} url - address of an instance of universal-resolver.
- * @returns {Promise<DIDResolver>}
- */
 export class UniversalResolver extends DIDResolver {
+  /**
+   * Create an adapter to a
+   * [universal-resolver](https://github.com/decentralized-identity/universal-resolver) instance. The
+   * adapter has type
+   * [DIDResolver](https://github.com/decentralized-identity/did-resolver/blob/02bdaf1687151bb934b10093042e576ed54b229c/src/resolver.ts#L73).
+   * @constructor
+   * @param {string} url - address of an instance of universal-resolver.
+   */
   constructor(url) {
     super();
     this.url = new URL(url);
@@ -70,24 +69,26 @@ export class UniversalResolver extends DIDResolver {
    * @returns {Promise<DIDDocument>}
    */
   async resolve(did) {
-    // The resolver will return a 404 and 500 sometimes when the DID is not found.
-    // We let that error propagate to the caller.
-    let resp = await axios.get(`${this.idUrl}${did}`);
-    if (resp.data === undefined || resp.data.didDocument == undefined) {
-      throw new NoDIDError(did);
+    try {
+      let resp = await axios.get(`${this.idUrl}${did}`);
+      return resp.data.didDocument;
+    } catch (error) {
+      if (error.isAxiosError && error.response.data.match(/DID not found/g)) {
+        throw new NoDIDError(did);
+      }
+
+      throw error;
     }
-    return resp.data.didDocument;
   }
 }
 
 export class MultiResolver extends DIDResolver {
   /**
    * Create a Resolver which delegates to the appropriate child Resolver according to an index.
-   *
+   * @constructor
    * @param {object} index - A map from DID method name to child Resolver.
    * @param {Resolver | null} catchAll - An optional fallback to use when index does not specify an
    * implementation for the requested method.
-   * @returns {Resolver}
    */
   constructor(providers, catchAll) {
     super();

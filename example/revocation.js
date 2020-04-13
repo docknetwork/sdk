@@ -14,7 +14,7 @@ import  {
 import {FullNodeEndpoint, TestAccountURI} from '../tests/test-constants';
 
 // Create a random registry id
-const registryID = randomAsHex(32);
+const registryId = randomAsHex(32);
 
 // Create a new controller DID, the DID will be registered on the network and own the registry
 const controllerDID = createNewDockDID();
@@ -31,38 +31,36 @@ controllers.add(controllerDID);
 const policy = new OneOfPolicy(controllers);
 
 // Create revoke IDs
-const revokeID = randomAsHex(32);
+const revokeId = randomAsHex(32);
 const revokeIds = new Set();
-revokeIds.add(revokeID);
+revokeIds.add(revokeId);
 
 async function createRegistry() {
   console.log(`Creating a registry with owner DID (${controllerDID}) with policy type:`, policy.constructor.name);
-  await dock.sendTransaction(dock.revocation.newRegistry(registryID, policy, false));
+  await dock.sendTransaction(dock.revocation.newRegistry(registryId, policy, false));
   console.log('Created registry');
 }
 
 async function removeRegistry() {
   console.log('Removing registry...');
 
-  const registryDetail = await dock.revocation.getRegistryDetail(registryID);
+  const registryDetail = await dock.revocation.getRegistryDetail(registryId);
   const lastModified = registryDetail[1];
-  await dock.sendTransaction(dock.revocation.removeRegistry(registryID, lastModified, didKeys));
+  await dock.sendTransaction(dock.revocation.removeRegistry(registryId, lastModified, didKeys));
 
   console.log('Registry removed. All done.');
 }
 
 async function unrevoke() {
-  const registryDetail = await dock.revocation.getRegistryDetail(registryID);
-  const lastModified = registryDetail[1];
-  await dock.sendTransaction(dock.revocation.unrevoke(registryID, revokeIds, lastModified, didKeys));
+  console.log('Trying to undo the revocation (unrevoke) of id:', revokeId);
+  const extrinsic = await dock.revocation.unrevokeCredential(didKeys, registryId, revokeId);
+  await dock.sendTransaction(extrinsic);
 }
 
 async function revoke() {
-  console.log('Revoking ids:', revokeIds);
-
-  const registryDetail = await dock.revocation.getRegistryDetail(registryID);
-  const lastModified = registryDetail[1];
-  await dock.sendTransaction(dock.revocation.revoke(registryID, revokeIds, lastModified, didKeys));
+  console.log('Trying to revoke id:', revokeId);
+  const extrinsic = await dock.revocation.revokeCredential(didKeys, registryId, revokeId);
+  await dock.sendTransaction(extrinsic);
 }
 
 async function main() {
@@ -91,7 +89,7 @@ async function main() {
   await revoke();
 
   // Check if revocation was a sucess
-  const isRevoked = await dock.revocation.getIsRevoked(registryID, revokeID);
+  const isRevoked = await dock.revocation.getIsRevoked(registryId, revokeId);
   if (isRevoked) {
     console.log('Revocation success. Trying to unrevoke...');
 
@@ -99,7 +97,7 @@ async function main() {
     await unrevoke();
 
     // Check if unrevoke worked
-    const isRevoked = await dock.revocation.getIsRevoked(registryID, revokeID);
+    const isRevoked = await dock.revocation.getIsRevoked(registryId, revokeId);
     if (!isRevoked) {
       console.log('Unrevoke success!');
     } else {

@@ -10,7 +10,7 @@ import {OneOfPolicy} from '../src/utils/revocation';
 import {FullNodeEndpoint, TestAccountURI} from '../tests/test-constants';
 import {getKeyDoc} from '../src/utils/vc/helpers';
 import {DockResolver} from '../src/resolver';
-import {DockRevRegQualifier, RevRegType} from '../src/utils/vc';
+import {buildDockCredentialStatus} from '../src/utils/vc';
 
 // Both issuer and holder have DIDs
 const issuerDID = createNewDockDID();
@@ -26,7 +26,7 @@ const credentialId = 'auniquecredentialid';
 const credentialContext = 'https://www.w3.org/2018/credentials/examples/v1';
 const credentialType = 'AlumniCredential';
 const credentialSubject = {id: holderDID, alumniOf: 'Example University'};
-const credentialStatus = {id: `${DockRevRegQualifier}${registryId}`, type: RevRegType};
+const credentialStatus = buildDockCredentialStatus(registryId);
 const credentialIssuanceDate = '2020-03-18T19:23:24Z';
 const credentialExpirationDate = '2021-03-18T19:23:24Z';
 
@@ -78,6 +78,7 @@ async function main() {
     console.log('Credential created:', credential);
 
     // Sign the credential to get the proof
+    console.log('Issuer will sign the credential now');
     const issuerKey = getKeyDoc(issuerDID, await Ed25519KeyPair.generate({seed: hexToU8a(issuerSeed)}), 'Ed25519VerificationKey2018');
     const signedCredential = await credential.sign(issuerKey);
     console.log('Credential signed, verifying...');

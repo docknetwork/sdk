@@ -8,9 +8,6 @@ Currently very early in-dev.
 
 ![Build Status](https://github.com/docknetwork/client-sdk/workflows/CI/badge.svg "Build Status")
 
-## Run example
-`yarn start-node-example`
-
 ## Lint
 `yarn lint --fix`
 
@@ -21,8 +18,6 @@ Early documentation available at: https://docknetwork.github.io/client-sdk/
 ## Connecting
 
 Use dock substrate node: https://github.com/docknetwork/dock-substrate
-
-Needs types from developer.json (https://github.com/docknetwork/dock-substrate/blob/did/developer.json)
 
 Running dev node:
 ```

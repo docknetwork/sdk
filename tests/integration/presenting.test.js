@@ -9,7 +9,7 @@ import {
 import {DockAPI} from '../../src/api';
 import Resolver from '../../src/resolver';
 
-import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
+import {FullNodeEndpoint, TestKeyringOpts, TestAccountURI} from '../test-constants';
 import {getUnsignedCred, registerNewDIDUsingPair} from './helpers';
 import {generateEcdsaSecp256k1Keypair} from '../../src/utils/misc';
 import Secp256k1KeyPair from 'secp256k1-key-pair';
@@ -61,7 +61,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     });
 
     // The keyring should be initialized before any test begins as this suite is testing revocation
-    const account = dock.keyring.addFromUri(TestAccount.uri, TestAccount.options);
+    const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
 
     // The DIDs should be written before any test begins

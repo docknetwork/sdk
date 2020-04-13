@@ -10,9 +10,7 @@ import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
-const fullNodeWsRPCEndpoint = 'ws://127.0.0.1:9944';
-const accountUri = '//Alice';
-const accountMetadata = {name: 'Alice'};
+import {FullNodeEndpoint, TestAccountURI} from '../tests/test-constants';
 
 // DID will be generated randomly
 const dockDID = createNewDockDID();
@@ -83,10 +81,10 @@ function registerNewDID() {
 // Initialise Dock API, connect to the node and start working with it
 // It will create a new DID with a key, then update the key to another one and then remove the DID
 dock.init({
-  address: fullNodeWsRPCEndpoint
+  address: FullNodeEndpoint
 })
   .then(() => {
-    const account = dock.keyring.addFromUri(accountUri, accountMetadata);
+    const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
     return registerNewDID();
   })
@@ -97,10 +95,11 @@ dock.init({
   .then(async () => {
     try {
       await dock.did.getDocument(dockDID);
-      throw new Error('The call to get the DID document should have failed but did not fail. This means the remove DID call has not worked.')
+      throw new Error('The call to get the DID document should have failed but did not fail. This means the remove DID call has not worked.');
     } catch (e) {
       // The call to get the DID document has failed since the DID has been removed
       console.log('Example ran successfully');
+      // eslint-disable-next-line no-undef
       process.exit(0);
     }
   })

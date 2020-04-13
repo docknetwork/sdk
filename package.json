@@ -17,6 +17,7 @@
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "24.5.0",
     "concurrently": "^4.1.0",
+    "dotenv": "^8.2.0",
     "eslint": "^6.8.0",
     "eslint-plugin-jest": "^23.8.2",
     "jest": "24.5.0",
@@ -28,7 +29,7 @@
     "rollup-plugin-node-resolve": "4.0.1"
   },
   "scripts": {
-    "lint": "eslint src && eslint tests",
+    "lint": "eslint src && eslint tests && eslint example",
     "prepare": "yarn build",
     "build": "rollup -c",
     "watch": "rollup -c -w",
@@ -37,6 +38,7 @@
     "docs": "jsdoc src -r -c .jsdoc -d docs",
     "dock-did-example": "npx babel-node example/dock-did.js",
     "did-resolver-example": "npx babel-node example/resolver.js",
+    "revocation-example": "npx babel-node example/revocation.js",
     "dev-node": "./submodules/dock-substrate/scripts/run_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
     "test-with-node": "./submodules/dock-substrate/scripts/with_docker_test_node yarn test-integration"
   },
@@ -48,7 +50,7 @@
     "src"
   ],
   "dependencies": {
-    "@polkadot/api": "^1.8.1",
+    "@polkadot/api": "1.9.1",
     "axios": "^0.19.2",
     "bs58": "^4.0.1",
     "did-resolver": "^1.1.0",

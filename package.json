@@ -26,7 +26,8 @@
     "rollup-plugin-babel": "4.3.2",
     "rollup-plugin-commonjs": "9.2.1",
     "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-node-resolve": "4.0.1"
+    "rollup-plugin-node-resolve": "4.0.1",
+    "ethr-did-resolver": "^2.2.0"
   },
   "scripts": {
     "lint": "eslint src && eslint tests && eslint example",
@@ -39,6 +40,7 @@
     "dock-did-example": "npx babel-node example/dock-did.js",
     "did-resolver-example": "npx babel-node example/resolver.js",
     "revocation-example": "npx babel-node example/revocation.js",
+    "vcdm-example": "npx babel-node example/vcdm.js",
     "dev-node": "./scripts/run_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
     "test-with-node": "./scripts/with_docker_test_node yarn test-integration"
   },

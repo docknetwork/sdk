@@ -85,7 +85,7 @@ describe('DID Module', () => {
     const transaction = dock.did.remove(didRemoval, signature);
     const result = await dock.sendTransaction(transaction);
     if (result) {
-      await expect(dock.did.getDocument(dockDID)).rejects.toThrow(/Could not find DID/);
+      await expect(dock.did.getDocument(dockDID)).rejects.toThrow(/does not exist/);
     }
   }, 30000);
 });

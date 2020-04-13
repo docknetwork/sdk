@@ -2,7 +2,7 @@ import vcjs from 'vc-js';
 import {Ed25519KeyPair, suites} from 'jsonld-signatures';
 import Secp256k1KeyPair from 'secp256k1-key-pair';
 import {EcdsaSepc256k1Signature2019, Sr25519Signature2020} from './vc/custom_crypto';
-import { blake2AsHex } from '@polkadot/util-crypto';
+import {blake2AsHex} from '@polkadot/util-crypto';
 
 import documentLoader from './vc/document-loader';
 import {isHexWithGivenByteSize} from './codec';
@@ -274,20 +274,4 @@ export function isRevocationCheckNeeded(credStatus, forceRevocationCheck, revoca
   return !!credStatus && (forceRevocationCheck || !!revocationAPI);
 }
 
-/**
- * Return true if the given value is a string.
- * @param value
- * @returns {boolean}
- */
-export function isString(value) {
-  return typeof value === 'string' || value instanceof String;
-}
 
-/**
- * Return true if a value is an object
- * @param value
- * @returns {boolean}
- */
-export function isObject(value) {
-  return value && typeof value === 'object' && value.constructor === Object;
-}

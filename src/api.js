@@ -172,5 +172,5 @@ export {
   PublicKeySecp256k1,
   Signature,
   SignatureSr25519,
-  SignatureEd25519
+  SignatureEd25519,
 };

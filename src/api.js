@@ -1,5 +1,5 @@
-import {ApiPromise, WsProvider, Keyring} from '@polkadot/api';
-import {cryptoWaitReady} from '@polkadot/util-crypto';
+import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
+import { cryptoWaitReady } from '@polkadot/util-crypto';
 
 import RevocationModule from './modules/revocation';
 import DIDModule from './modules/did';
@@ -9,13 +9,13 @@ import {
   PublicKey,
   PublicKeySr25519,
   PublicKeyEd25519,
-  PublicKeySecp256k1
+  PublicKeySecp256k1,
 } from './public-key';
 
 import {
   Signature,
   SignatureSr25519,
-  SignatureEd25519
+  SignatureEd25519,
 } from './signature';
 
 /** Helper class to interact with the Dock chain */
@@ -34,7 +34,7 @@ class DockAPI {
    * @param {Account} address - Optional WebSocket address
    * @return {Promise} Promise for when SDK is ready for use
    */
-  async init({address, keyring} = {}) {
+  async init({ address, keyring } = {}) {
     if (this.api) {
       throw new Error('API is already connected');
     }
@@ -52,7 +52,7 @@ class DockAPI {
     await cryptoWaitReady();
 
     if (!this._keyring || keyring) {
-      this._keyring = new Keyring(keyring || {type: 'sr25519'});
+      this._keyring = new Keyring(keyring || { type: 'sr25519' });
     }
 
     return this.api;
@@ -115,7 +115,7 @@ class DockAPI {
       let unsubFunc = null;
       try {
         extrinsic
-          .signAndSend(account, ({events = [], status}) => {
+          .signAndSend(account, ({ events = [], status }) => {
             if (status.isFinalized) {
               if (shouldUnsubscribe && unsubFunc) {
                 unsubFunc();
@@ -123,11 +123,11 @@ class DockAPI {
               resolve(events, status);
             }
           })
-          .catch(error => {
+          .catch((error) => {
             console.error('sendTransaction had error', error);
             reject(error);
           })
-          .then(unsub => {
+          .then((unsub) => {
             unsubFunc = unsub;
           });
       } catch (error) {
@@ -158,7 +158,6 @@ class DockAPI {
     }
     return this._revocation;
   }
-
 }
 
 export default new DockAPI();

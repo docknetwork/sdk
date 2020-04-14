@@ -1,9 +1,11 @@
 import {
   signPresentation,
-  verifyPresentation
+  verifyPresentation,
 } from './utils/vc';
 import VerifiableCredential from './verifiable-credential';
-import {ensureObjectWithId, ensureObjectWithKeyOrURI, ensureString, ensureURI} from './utils/type-helpers';
+import {
+  ensureObjectWithId, ensureObjectWithKeyOrURI, ensureString, ensureURI,
+} from './utils/type-helpers';
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiablePresentation';
@@ -65,7 +67,7 @@ class VerifiablePresentation {
    * @returns {VerifiablePresentation}
    */
   addCredential(credential) {
-    if (credential && credential instanceof VerifiableCredential){
+    if (credential && credential instanceof VerifiableCredential) {
       credential = credential.toJSON();
     }
     ensureObjectWithId(credential, 'credential');
@@ -78,11 +80,11 @@ class VerifiablePresentation {
    * @returns {any}
    */
   toJSON() {
-    const {context, credentials, ...rest} = this;
+    const { context, credentials, ...rest } = this;
     return {
       '@context': context,
-      'verifiableCredential': credentials,
-      ...rest
+      verifiableCredential: credentials,
+      ...rest,
     };
   }
 
@@ -96,13 +98,13 @@ class VerifiablePresentation {
    * @returns {Promise<{object}>}
    */
   async sign(keyDoc, challenge, domain, resolver, compactProof = true) {
-    let signed_vp = await signPresentation(
+    const signed_vp = await signPresentation(
       this.toJSON(),
       keyDoc,
       challenge,
       domain,
       resolver,
-      compactProof
+      compactProof,
     );
     this.proof = signed_vp.proof;
     return this;
@@ -132,10 +134,9 @@ class VerifiablePresentation {
       resolver,
       compactProof,
       forceRevocationCheck,
-      revocationAPI
+      revocationAPI,
     );
   }
-
 }
 
 export default VerifiablePresentation;

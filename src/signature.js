@@ -1,6 +1,6 @@
-import {u8aToHex} from '@polkadot/util';
+import { u8aToHex } from '@polkadot/util';
 
-import {isHexWithGivenByteSize} from './utils/codec';
+import { isHexWithGivenByteSize } from './utils/codec';
 
 /** Class representing a Signature. This export class should always be extended (abstract export class in some languages) */
 export class Signature {
@@ -34,6 +34,7 @@ export class Signature {
   fromPolkadotJSKeyringPair(message, signingPair) {
     this.value = u8aToHex(signingPair.sign(message));
   }
+
   /**
    * @return {Object} The correct DidSignature JSON variant. The extending export class should implement it.
    */
@@ -119,7 +120,7 @@ export class SignatureSecp256k1 extends Signature {
     const s = sig.s.toString('hex', 32);
     const i = sig.recoveryParam.toString(16).padStart(2, '0');
     // Make it proper hex
-    this.value = '0x' + r + s + i;
+    this.value = `0x${r}${s}${i}`;
   }
 
   /**

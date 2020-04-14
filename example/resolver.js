@@ -1,13 +1,15 @@
-import {randomAsHex} from '@polkadot/util-crypto';
-import {DockAPI} from '../src/api';
-import {createNewDockDID, createKeyDetail, NoDIDError} from '../src/utils/did';
-import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
-import {DIDResolver, MultiResolver, UniversalResolver, DockResolver} from '../src/resolver';
+import { randomAsHex } from '@polkadot/util-crypto';
 import ethr from 'ethr-did-resolver';
+import { DockAPI } from '../src/api';
+import { createNewDockDID, createKeyDetail, NoDIDError } from '../src/utils/did';
+import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
+import {
+  DIDResolver, MultiResolver, UniversalResolver, DockResolver,
+} from '../src/resolver';
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
-import {FullNodeEndpoint, TestAccountURI} from '../tests/test-constants';
+import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 
 const universalResolverUrl = 'http://localhost:8080';
 
@@ -18,7 +20,7 @@ const ethereumProviderConfig = {
       name: 'mainnet',
       rpcUrl: 'https://mainnet.infura.io/v3/05f321c3606e44599c54dbc92510e6a9',
     },
-  ]
+  ],
 };
 
 const dock = new DockAPI();
@@ -63,14 +65,14 @@ async function main() {
   console.log('Connecting to the node...');
 
   await dock.init({
-    address: FullNodeEndpoint
+    address: FullNodeEndpoint,
   });
 
   console.log('Creating DID providers...');
 
   const providers = {
-    'dock': new DockResolver(dock), // Provider as class
-    'ethr': new EtherResolver(ethereumProviderConfig), // Custom provider
+    dock: new DockResolver(dock), // Provider as class
+    ethr: new EtherResolver(ethereumProviderConfig), // Custom provider
   };
 
   const resolver = new MultiResolver(providers, new UniversalResolver(universalResolverUrl));
@@ -100,7 +102,7 @@ async function main() {
 
   console.log('Resolving', didsToTest.length, 'dids...');
 
-  return Promise.all(didsToTest.map(async did => {
+  return Promise.all(didsToTest.map(async (did) => {
     const document = await resolver.resolve(did);
     console.log('Resolved DID', did, document);
   }));
@@ -111,7 +113,7 @@ main()
     console.log('Example ran successfully');
     process.exit(0);
   })
-  .catch(error => {
+  .catch((error) => {
     console.error('Error occurred somewhere, it was caught!', error);
     process.exit(1);
   });

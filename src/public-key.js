@@ -1,6 +1,6 @@
-import {u8aToHex} from '@polkadot/util';
+import { u8aToHex } from '@polkadot/util';
 
-import {isHexWithGivenByteSize} from './utils/codec';
+import { isHexWithGivenByteSize } from './utils/codec';
 
 /** Class representing a PublicKey. This export class should always be extended (abstract export class in some languages) */
 export class PublicKey {
@@ -101,6 +101,6 @@ export class PublicKeySecp256k1 extends PublicKey {
     // `true` is for compressed
     const pk = pair.getPublic(true, 'hex');
     // `pk` is hex but does not contain the leading `0x`
-    return new this('0x' + pk);
+    return new this(`0x${pk}`);
   }
 }

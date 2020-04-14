@@ -1,6 +1,6 @@
-import {parse} from 'did-resolver';
-import {validateDockDIDSS58Identifier, NoDIDError} from './utils/did';
+import { parse } from 'did-resolver';
 import axios from 'axios';
+import { validateDockDIDSS58Identifier, NoDIDError } from './utils/did';
 
 export class DIDResolver {
   async resolve() {
@@ -37,7 +37,7 @@ export class DockResolver extends DIDResolver {
 
     console.assert(
       parsed.method === method_name,
-      `resolver for ${method_name} does not support the ${parsed.method} did method.`
+      `resolver for ${method_name} does not support the ${parsed.method} did method.`,
     );
 
     validateDockDIDSS58Identifier(parsed.id);
@@ -70,7 +70,7 @@ export class UniversalResolver extends DIDResolver {
    */
   async resolve(did) {
     try {
-      let resp = await axios.get(`${this.idUrl}${did}`);
+      const resp = await axios.get(`${this.idUrl}${did}`);
       return resp.data.didDocument;
     } catch (error) {
       if (error.isAxiosError && error.response.data.match(/DID not found/g)) {
@@ -106,16 +106,15 @@ export class MultiResolver extends DIDResolver {
    * @returns {Promise<DIDDocument>} Returns a promise to the DID document
    */
   async resolve(did) {
-    const method = this.parseDid(did).method;
+    const { method } = this.parseDid(did);
     const provider = this.providers[method];
 
     if (provider) {
       return await this.getResolveMethod(provider)(did);
-    } else if (this.catchAll) {
+    } if (this.catchAll) {
       return await this.getResolveMethod(this.catchAll)(did);
-    } else {
-      throw new Error('No provider found for DID', did);
     }
+    throw new Error('No provider found for DID', did);
   }
 
   getResolveMethod(provider) {

@@ -62,7 +62,7 @@ describe('Revocation Module', () => {
 
   afterAll(async () => {
     await dock.disconnect();
-  }, 30000);
+  }, 10000);
 
   test('Can create a registry with a OneOf policy', async () => {
     const transaction = dock.revocation.newRegistry(registryID, policy, false);

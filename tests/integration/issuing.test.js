@@ -1,6 +1,4 @@
 import {randomAsHex} from '@polkadot/util-crypto';
-import {Ed25519KeyPair} from 'jsonld-signatures';
-import { hexToU8a } from '@polkadot/util';
 
 import {
   createNewDockDID
@@ -105,11 +103,11 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
 
   afterAll(async () => {
     await dock.disconnect();
-  }, 30000);
+  }, 10000);
 
 
   test('Issue a verifiable credential with ed25519 key and verify it', async () => {
-    const issuerKey = getKeyDoc(issuer1DID, await Ed25519KeyPair.generate({seed: hexToU8a(issuer1KeySeed)}), 'Ed25519VerificationKey2018');
+    const issuerKey = getKeyDoc(issuer1DID, dock.keyring.addFromUri(issuer1KeySeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
     const credential = await issueCredential(issuerKey, unsignedCred);
     expect(credential).toMatchObject(
       expect.objectContaining(

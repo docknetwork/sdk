@@ -32,7 +32,7 @@ describe('DID Module', () => {
 
   afterAll(async () => {
     await dock.disconnect();
-  }, 30000);
+  }, 10000);
 
   test('Has keyring and account', () => {
     const account = dock.keyring.addFromUri(TestAccountURI);

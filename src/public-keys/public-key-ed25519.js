@@ -1,4 +1,4 @@
-import PublicKey from './public-keys/public-key';
+import PublicKey from './public-key';
 
 /** Class representing a Ed25519 PublicKey */
 export default class PublicKeyEd25519 extends PublicKey {

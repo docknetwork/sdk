@@ -1,4 +1,4 @@
-import PublicKey from './public-keys/public-key';
+import PublicKey from './public-key';
 
 /** Class representing a compressed Secp256k1 PublicKey */
 export default class PublicKeySecp256k1 extends PublicKey {

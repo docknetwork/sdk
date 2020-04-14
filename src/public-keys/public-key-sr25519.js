@@ -1,4 +1,4 @@
-import PublicKey from './public-keys/public-key';
+import PublicKey from './public-key';
 
 /** Class representing a Sr25519 PublicKey */
 export default class PublicKeySr25519 extends PublicKey {

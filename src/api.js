@@ -10,7 +10,7 @@ import {
   PublicKeySr25519,
   PublicKeyEd25519,
   PublicKeySecp256k1,
-} from './public-key';
+} from './public-keys';
 
 import {
   Signature,

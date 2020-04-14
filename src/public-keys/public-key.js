@@ -1,9 +1,8 @@
 import { u8aToHex } from '@polkadot/util';
-
 import { isHexWithGivenByteSize } from './utils/codec';
 
 /** Class representing a PublicKey. This export class should always be extended (abstract export class in some languages) */
-export class PublicKey {
+export default class PublicKey {
   /**
    * Creates a new PublicKey object. Validates the given value. Currently supported key
    * types only require validating the byte size.
@@ -41,66 +40,5 @@ export class PublicKey {
    */
   toJSON() {
     throw new Error('Not implemented. The extending export class should implement it');
-  }
-}
-
-/** Class representing a Sr25519 PublicKey */
-export class PublicKeySr25519 extends PublicKey {
-  constructor(value) {
-    super(value, 32);
-  }
-
-  /**
-   * @return {Object} The PublicKey JSON variant Sr25519.
-   */
-  toJSON() {
-    return {
-      Sr25519: this.value,
-    };
-  }
-}
-
-/** Class representing a Ed25519 PublicKey */
-export class PublicKeyEd25519 extends PublicKey {
-  constructor(value) {
-    super(value, 32);
-  }
-
-  /**
-   * @return {Object} The PublicKey JSON variant Ed25519.
-   */
-  toJSON() {
-    return {
-      Ed25519: this.value,
-    };
-  }
-}
-
-/** Class representing a compressed Secp256k1 PublicKey */
-export class PublicKeySecp256k1 extends PublicKey {
-  constructor(value) {
-    super(value, 33);
-  }
-
-  /**
-   * @return {Object} The PublicKey JSON variant Secp256k1.
-   */
-  toJSON() {
-    return {
-      Secp256k1: this.value,
-    };
-  }
-
-  /**
-   * Returns a compressed public key for Secp256k1 curve. The name is intentionally kept same with the base export class to
-   * keep the API uniform
-   * @param {KeyPair} pair - A KeyPair from elliptic library
-   * @returns {PublicKeySecp256k1}
-   */
-  static fromKeyringPair(pair) {
-    // `true` is for compressed
-    const pk = pair.getPublic(true, 'hex');
-    // `pk` is hex but does not contain the leading `0x`
-    return new this(`0x${pk}`);
   }
 }

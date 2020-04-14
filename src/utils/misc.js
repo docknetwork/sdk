@@ -1,6 +1,6 @@
 import {ec as EC} from 'elliptic';
 
-import {PublicKeyEd25519, PublicKeySecp256k1, PublicKeySr25519} from '../public-key';
+import {PublicKeyEd25519, PublicKeySecp256k1, PublicKeySr25519} from '../public-keys';
 import {SignatureEd25519, SignatureSecp256k1, SignatureSr25519} from '../signatures';
 
 const secp256k1Curve = new EC('secp256k1');

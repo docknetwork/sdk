@@ -8,7 +8,7 @@ import {
 } from '../../src/utils/did';
 import {FullNodeEndpoint, TestKeyringOpts, TestAccountURI} from '../test-constants';
 import {getPublicKeyFromKeyringPair} from '../../src/utils/misc';
-import {PublicKeyEd25519} from '../../src/public-key';
+import {PublicKeyEd25519} from '../../src/public-keys';
 
 describe('DID Module', () => {
   const dock = new DockAPI();

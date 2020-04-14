@@ -7,7 +7,7 @@ import {
   getSignatureFromKeyringPair,
   verifyEcdsaSecp256k1Sig
 } from '../../src/utils/misc';
-import {PublicKeyEd25519, PublicKeySr25519, PublicKeySecp256k1} from '../../src/public-key';
+import {PublicKeyEd25519, PublicKeySr25519, PublicKeySecp256k1} from '../../src/public-keys';
 import {SignatureEd25519, SignatureSr25519, SignatureSecp256k1} from '../../src/signatures';
 import {isHexWithGivenByteSize} from '../../src/utils/codec';
 

@@ -13,6 +13,7 @@ module.exports = {
     "sourceType": "module"
   },
   "rules": {
+    "class-methods-use-this": "off",
     "no-plusplus": "off",
     "max-len": "off"
   }

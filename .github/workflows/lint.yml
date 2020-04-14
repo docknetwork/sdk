@@ -9,8 +9,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install, lint and generate docs # Only need to install eslint and jsdoc packages here and then run lint and jsdoc scripts. Not uploading the docs.
+      - name: Install, lint and generate docs # Install packages, run lint and jsdoc scripts. Not uploading the docs.
         run: |
-          npm install eslint eslint-plugin-jest jsdoc
-          npm run lint
-          npm run docs
+          yarn install --frozen-lockfile
+          yarn lint
+          yarn docs

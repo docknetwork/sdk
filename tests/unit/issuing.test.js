@@ -7,6 +7,10 @@ import {
 } from '../../src/utils/vc';
 import VerifiableCredential from '../../src/verifiable-credential';
 import VerifiablePresentation from '../../src/verifiable-presentation';
+import {generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair} from '../../src/utils/misc';
+
+const controllerUrl = 'https://gist.githubusercontent.com/lovesh/312d407e3a16be0e7d5e43169e824958/raw';
+const keyUrl = 'https://gist.githubusercontent.com/lovesh/67bdfd354cfaf4fb853df4d6713f4610/raw';
 
 function getSampleCredential(signed=false){
   let cred = {
@@ -25,13 +29,13 @@ function getSampleCredential(signed=false){
   if (signed) {
     cred = {
       ...cred,
-      issuer: 'https://gist.githubusercontent.com/faustow/3b48e353a9d5146e05a9c344e02c8c6f/raw',
+      issuer: controllerUrl,
       proof: {
         type: 'EcdsaSecp256k1Signature2019',
         created: '2020-03-27T17:44:28Z',
-        jws: 'eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEQCIAS8ZNVYIni3oShb0TFz4SMAybJcz3HkQPaTdz9OSszoAiA01w9ZkS4Zx5HEZk45QzxbqOr8eRlgMdhgFsFs1FnyMQ',
+        jws: 'eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEQCIFVvlifheEKjPz7PjTCgDa2DKtUqUVOvI9sCMDYxC6yMAiAGPFST3eCj7zYeGmfXcEKaLyPAAu2nPgzL_NPZLkdCfw',
         proofPurpose: 'assertionMethod',
-        verificationMethod: 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw'
+        verificationMethod: keyUrl
       }
     };
   }
@@ -56,20 +60,22 @@ function getSamplePres(signed=false){
         domain: 'some_domain',
         jws: expect.anything(),
         proofPurpose: 'authentication',
-        verificationMethod: 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw'
+        verificationMethod: keyUrl
       }
     };
   }
   return vp;
 }
 
+const keypair = generateEcdsaSecp256k1Keypair('issuer', 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
+
 function getSampleKey() {
   return {
-    id: 'https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw',
-    controller: 'https://gist.githubusercontent.com/faustow/3b48e353a9d5146e05a9c344e02c8c6f/raw',
+    id: keyUrl,
+    controller: controllerUrl,
     type: 'EcdsaSecp256k1VerificationKey2019',
-    privateKeyBase58: 'D1HHZntuEUXuQm56VeHv1Ae1c4Rd1mdVeamm2BPKom3y',
-    publicKeyBase58: 'zXwDsGkuq5gTLVMnb3jGUaW8vvzAjfZfNuJmP2PkZGJy'
+    keypair: keypair,
+    publicKey: getPublicKeyFromKeyringPair(keypair)
   };
 }
 const vpId = 'https://example.com/credentials/12345';
@@ -79,7 +85,6 @@ const presentationCredentials = [getSampleCredential(true), getSampleCredential(
 const fakeContext = {
   '@context': {
     '@protected': true,
-
     'id': '@id',
     'type': '@type',
   }
@@ -94,12 +99,12 @@ describe('Verifiable Credential Issuing', () => {
     expect(credential.issuanceDate).toBe('2010-01-01T19:23:24Z');
     expect(credential.credentialSubject.id).toBe('did:example:ebfeb1f712ebc6f1c276e12ec21');
     expect(credential.credentialSubject.alumniOf).toBe('Example University');
-    expect(credential.issuer).toBe('https://gist.githubusercontent.com/faustow/3b48e353a9d5146e05a9c344e02c8c6f/raw');
+    expect(credential.issuer).toBe(controllerUrl);
     expect(credential.proof.type).toBe('EcdsaSecp256k1Signature2019');
     expect(credential.proof.created).toBeDefined();
     expect(credential.proof.jws).toBeDefined();
     expect(credential.proof.proofPurpose).toBe('assertionMethod');
-    expect(credential.proof.verificationMethod).toBe('https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw');
+    expect(credential.proof.verificationMethod).toBe(keyUrl);
 
     const result = await verifyCredential(credential);
     expect(result.verified).toBe(true);
@@ -118,7 +123,7 @@ describe('Verifiable Credential Verification', () => {
     expect(result.results[0].proof.jws).toBeDefined();
     expect(result.results[0].proof.proofPurpose).toBe('assertionMethod');
     expect(result.results[0].proof.type).toBe('EcdsaSecp256k1Signature2019');
-    expect(result.results[0].proof.verificationMethod).toBe('https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw');
+    expect(result.results[0].proof.verificationMethod).toBe(keyUrl);
     expect(result.results[0].verified).toBe(true);
   }, 30000);
 });
@@ -156,7 +161,7 @@ describe('Verifiable Presentation creation', () => {
     expect(results.presentationResult.results[0].proof.domain).toBe('some_domain');
     expect(results.presentationResult.results[0].proof.jws).toBeDefined();
     expect(results.presentationResult.results[0].proof.proofPurpose).toBe('authentication');
-    expect(results.presentationResult.results[0].proof.verificationMethod).toBe('https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw');
+    expect(results.presentationResult.results[0].proof.verificationMethod).toBe(keyUrl);
     expect(results.presentationResult.results[0].verified).toBe(true);
     expect(results.verified).toBe(true);
     expect(results.credentialResults[0].verified).toBe(true);
@@ -353,12 +358,13 @@ describe('Verifiable Presentation incremental creation', () => {
       'some_challenge',
       'some_domain'
     );
+
     expect(results.presentationResult).toMatchObject({verified: true});
     expect(results.presentationResult.results[0]).toMatchObject({verified: true});
     expect(results.presentationResult.results[0]).toMatchObject({proof: expect.anything()});
     expect(results.credentialResults[0]).toMatchObject({verified: true});
     expect(results.credentialResults[0]).toMatchObject({results: expect.anything()});
-  });
+  }, 20000);
 
 
   test('Issuing an incrementally-created VP from an incrementally created VC should return an object with a proof, and it must pass validation.', async () => {

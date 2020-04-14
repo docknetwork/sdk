@@ -1,5 +1,7 @@
 import {suites} from 'jsonld-signatures';
 import {schnorrkelVerify} from '@polkadot/util-crypto/schnorrkel';
+import {signatureVerify} from '@polkadot/util-crypto/signature';
+import { u8aToHex } from '@polkadot/util';
 import {ec as EC} from 'elliptic';
 import { sha256 } from 'js-sha256';
 
@@ -69,6 +71,72 @@ export class EcdsaSepc256k1Signature2019 extends suites.JwsLinkedDataSignature {
       async sign({data}) {
         const hash = sha256.digest(data);
         return new Uint8Array(keypair.sign(hash).toDER());
+      }
+    };
+  }
+}
+
+export const Ed25519VerKeyName = 'Ed25519VerificationKey2018';
+const Ed25519SigName = 'Ed25519Signature2018';
+
+export class Ed25519VerificationKey2018 {
+  constructor(publicKey) {
+    this.publicKey = [...publicKey];
+  }
+
+  /**
+   * Construct the public key object from the verification method
+   * @param verificationMethod
+   * @returns {Ed25519VerificationKey2018}
+   */
+  static from(verificationMethod) {
+    if (verificationMethod.type !== Ed25519VerKeyName && !verificationMethod.publicKeyBase58) {
+      throw new Error('verification method should have type Sr25519VerificationKey2020 and have the base58 public key');
+    }
+    return new this(b58.decode(verificationMethod.publicKeyBase58));
+  }
+
+  /**
+   * Construct the verifier factory that has the verify method using the current public key
+   * @returns {Promise<verify>}
+   */
+  verifier() {
+    return Ed25519VerificationKey2018.verifierFactory(this.publicKey);
+  }
+
+  /**
+   * Verifier factory that returns the object with the verify method
+   * @param publicKey
+   * @returns {Promise<verify>}
+   */
+  static verifierFactory(publicKey) {
+    return {
+      async verify({data, signature}) {
+        const pk = u8aToHex(publicKey);
+        return signatureVerify(data, signature, pk).isValid;
+      }
+    };
+  }
+}
+
+export class Ed25519Signature2018 extends suites.JwsLinkedDataSignature {
+  constructor({
+    keypair, verificationMethod
+  } = {}) {
+    super({
+      type: Ed25519SigName, alg: 'EdDSA', LDKeyClass: Ed25519VerificationKey2018, verificationMethod: verificationMethod, signer: Ed25519Signature2018.signerFactory(keypair)});
+    this.requiredKeyType = Ed25519VerKeyName;
+  }
+
+  /**
+   * Generate object with `sign` method
+   * @param keypair
+   * @returns {Promise<sign>}
+   */
+  static signerFactory(keypair) {
+    return {
+      async sign({data}) {
+        return keypair.sign(data);
       }
     };
   }

@@ -124,13 +124,13 @@ class VerifiableCredential {
    * @returns {Promise<{object}>}
    */
   async sign(keyDoc, compactProof = true) {
-    const signed_vc = await issueCredential(
+    const signedVC = await issueCredential(
       keyDoc,
       this.toJSON(),
       compactProof,
     );
-    this.proof = signed_vc.proof;
-    this.issuer = signed_vc.issuer;
+    this.proof = signedVC.proof;
+    this.issuer = signedVC.issuer;
     return this;
   }
 
@@ -149,7 +149,7 @@ class VerifiableCredential {
     if (!this.proof) {
       throw new Error('The current Verifiable Credential has no proof.');
     }
-    return await verifyCredential(this.toJSON(), resolver, compactProof, forceRevocationCheck, revocationAPI);
+    return verifyCredential(this.toJSON(), resolver, compactProof, forceRevocationCheck, revocationAPI);
   }
 }
 

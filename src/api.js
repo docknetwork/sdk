@@ -16,7 +16,7 @@ import {
   Signature,
   SignatureSr25519,
   SignatureEd25519,
-} from './signature';
+} from './signatures';
 
 /** Helper class to interact with the Dock chain */
 class DockAPI {

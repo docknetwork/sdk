@@ -30,7 +30,7 @@
     "ethr-did-resolver": "^2.2.0"
   },
   "scripts": {
-    "lint": "eslint src && eslint tests && eslint example",
+    "lint": "eslint \"{src,tests,example}/**.js\"",
     "prepare": "yarn build",
     "build": "rollup -c",
     "watch": "rollup -c -w",

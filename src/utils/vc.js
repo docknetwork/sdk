@@ -1,6 +1,5 @@
 import vcjs from 'vc-js';
 import {Ed25519KeyPair, suites} from 'jsonld-signatures';
-import Secp256k1KeyPair from 'secp256k1-key-pair';
 import {EcdsaSepc256k1Signature2019, Sr25519Signature2020} from './vc/custom_crypto';
 import {blake2AsHex} from '@polkadot/util-crypto';
 
@@ -25,7 +24,7 @@ const {Ed25519Signature2018} = suites;
 export function getSuiteFromKeyDoc(keyDoc) {
   switch(keyDoc.type) {
   case 'EcdsaSecp256k1VerificationKey2019':
-    return new EcdsaSepc256k1Signature2019({key: new Secp256k1KeyPair(keyDoc)});
+    return new EcdsaSepc256k1Signature2019({keypair: keyDoc.keypair, publicKey: keyDoc.publicKey, verificationMethod: keyDoc.id});
   case 'Ed25519VerificationKey2018':
     return new Ed25519Signature2018({key: new Ed25519KeyPair(keyDoc)});
   case 'Sr25519VerificationKey2020':

@@ -1,5 +1,5 @@
 import { u8aToHex } from '@polkadot/util';
-import { isHexWithGivenByteSize } from './utils/codec';
+import { isHexWithGivenByteSize } from '../utils/codec';
 
 /** Class representing a PublicKey. This export class should always be extended (abstract export class in some languages) */
 export default class PublicKey {

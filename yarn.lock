@@ -4036,6 +4036,18 @@ jsonld-signatures@^4.4.0:
     security-context "^4.0.0"
     serialize-error "^4.1.0"
 
+jsonld-signatures@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/jsonld-signatures/-/jsonld-signatures-5.0.1.tgz#0678f0fb06c31cab0f0fa2acd97b8f70f6abae04"
+  integrity sha512-O+cCcuGXj5HnzMZOAvZgTalkGHwYeAueuIPxA4nBVerpxQVwyAZkC6WCWzGV3TyCDTIypboh8y9VTkJdlMFdOg==
+  dependencies:
+    base64url "^3.0.1"
+    crypto-ld "^3.7.0"
+    jsonld "^2.0.2"
+    node-forge "^0.9.1"
+    security-context "^4.0.0"
+    serialize-error "^5.0.0"
+
 "jsonld-signatures@https://github.com/docknetwork/jsonld-signatures#avoid-extendContextLoader":
   version "5.0.2-0"
   resolved "https://github.com/docknetwork/jsonld-signatures#416082535cac1f0a2a36bd0b665faca5fc479584"

@@ -97,8 +97,8 @@ async function main() {
     await unrevoke();
 
     // Check if unrevoke worked
-    const isRevoked = await dock.revocation.getIsRevoked(registryId, revokeId);
-    if (!isRevoked) {
+    const isUnrevoked = !(await dock.revocation.getIsRevoked(registryId, revokeId));
+    if (isUnrevoked) {
       console.log('Unrevoke success!');
     } else {
       console.error('Unable to unrevoke, something went wrong.');

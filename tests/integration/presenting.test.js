@@ -12,7 +12,6 @@ import {DockResolver} from '../../src/resolver';
 import {FullNodeEndpoint, TestKeyringOpts, TestAccountURI} from '../test-constants';
 import {getUnsignedCred, registerNewDIDUsingPair} from './helpers';
 import {generateEcdsaSecp256k1Keypair} from '../../src/utils/misc';
-import Secp256k1KeyPair from 'secp256k1-key-pair';
 import {getKeyDoc} from '../../src/utils/vc/helpers';
 import {
   createPresentation,
@@ -102,7 +101,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
 
   test('Holder creates a verifiable presentation with single credential and verifier verifies it', async () => {
     const holder1Key = getKeyDoc(holder1DID, await Ed25519KeyPair.generate({seed: hexToU8a(holder1KeySeed)}), 'Ed25519VerificationKey2018');
-    const holder2Key = getKeyDoc(holder2DID, await Secp256k1KeyPair.generate({pers: holder2KeyPers, entropy: holder2KeyEntropy}), 'EcdsaSecp256k1VerificationKey2019');
+    const holder2Key = getKeyDoc(holder2DID, generateEcdsaSecp256k1Keypair(holder2KeyPers, holder2KeyEntropy), 'EcdsaSecp256k1VerificationKey2019');
     const holder3Key = getKeyDoc(holder3DID, dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
 
     for (const elem of [

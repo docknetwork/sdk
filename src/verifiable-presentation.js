@@ -67,11 +67,12 @@ class VerifiablePresentation {
    * @returns {VerifiablePresentation}
    */
   addCredential(credential) {
-    if (credential && credential instanceof VerifiableCredential) {
-      credential = credential.toJSON();
+    let cred = credential;
+    if (credential instanceof VerifiableCredential) {
+      cred = credential.toJSON();
     }
-    ensureObjectWithId(credential, 'credential');
-    this.credentials.push(credential);
+    ensureObjectWithId(cred, 'credential');
+    this.credentials.push(cred);
     return this;
   }
 
@@ -90,7 +91,7 @@ class VerifiablePresentation {
 
   /**
    * Sign a Verifiable Presentation using the provided keyDoc
-   * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
+   * @param {object} keyDoc - document with `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
    * @param {string} challenge - proof challenge Required.
    * @param {string} domain - proof domain (optional)
    * @param {Resolver} resolver - Resolver for DIDs.
@@ -98,7 +99,7 @@ class VerifiablePresentation {
    * @returns {Promise<{object}>}
    */
   async sign(keyDoc, challenge, domain, resolver, compactProof = true) {
-    const signed_vp = await signPresentation(
+    const signedVP = await signPresentation(
       this.toJSON(),
       keyDoc,
       challenge,
@@ -106,7 +107,7 @@ class VerifiablePresentation {
       resolver,
       compactProof,
     );
-    this.proof = signed_vp.proof;
+    this.proof = signedVP.proof;
     return this;
   }
 
@@ -127,7 +128,8 @@ class VerifiablePresentation {
     if (!this.proof) {
       throw new Error('The current VerifiablePresentation has no proof.');
     }
-    return await verifyPresentation(
+
+    return verifyPresentation(
       this.toJSON(),
       challenge,
       domain,

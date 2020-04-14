@@ -1,3 +1,7 @@
+// TODO: fix this test failing
+    // ✕ Issue a verifiable credential with ed25519 key and verify it (936ms)
+    // ✕ Issue a verifiable credential with secp256k1 key and verify it (1396ms)
+    // ✕ Issue a verifiable credential with sr25519 key and verify it (878ms)
 import {randomAsHex} from '@polkadot/util-crypto';
 import {Ed25519KeyPair} from 'jsonld-signatures';
 import { hexToU8a } from '@polkadot/util';

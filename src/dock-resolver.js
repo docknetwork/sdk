@@ -26,7 +26,7 @@ export default class DockResolver extends DIDResolver {
         validateDockDIDSS58Identifier(parsed.id);
         return this.dock.did.getDocument(parsed.did);
       }
-      throw new Error(`resolver for ${methodName} does not support the ${parsed.method} did method.`);
+      throw new Error(`Resolver for ${methodName} does not support the ${parsed.method} did method.`);
     } else {
       throw new Error('DockAPI not connected');
     }

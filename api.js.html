@@ -26,8 +26,8 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import {ApiPromise, WsProvider, Keyring} from '@polkadot/api';
-import {cryptoWaitReady} from '@polkadot/util-crypto';
+            <pre class="prettyprint source linenums"><code>import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
+import { cryptoWaitReady } from '@polkadot/util-crypto';
 
 import RevocationModule from './modules/revocation';
 import DIDModule from './modules/did';
@@ -37,14 +37,14 @@ import {
   PublicKey,
   PublicKeySr25519,
   PublicKeyEd25519,
-  PublicKeySecp256k1
-} from './public-key';
+  PublicKeySecp256k1,
+} from './public-keys';
 
 import {
   Signature,
   SignatureSr25519,
-  SignatureEd25519
-} from './signature';
+  SignatureEd25519,
+} from './signatures';
 
 /** Helper class to interact with the Dock chain */
 class DockAPI {
@@ -62,7 +62,7 @@ class DockAPI {
    * @param {Account} address - Optional WebSocket address
    * @return {Promise} Promise for when SDK is ready for use
    */
-  async init({address, keyring} = {}) {
+  async init({ address, keyring } = {}) {
     if (this.api) {
       throw new Error('API is already connected');
     }
@@ -74,13 +74,13 @@ class DockAPI {
       types,
     });
 
-    this._did = new DIDModule(this.api);
-    this._revocation = new RevocationModule(this.api);
+    this.didModule = new DIDModule(this.api);
+    this.revocationModule = new RevocationModule(this.api);
 
     await cryptoWaitReady();
 
-    if (!this._keyring || keyring) {
-      this._keyring = new Keyring(keyring || {type: 'sr25519'});
+    if (!this.keyring || keyring) {
+      this.keyring = new Keyring(keyring || { type: 'sr25519' });
     }
 
     return this.api;
@@ -90,8 +90,8 @@ class DockAPI {
     if (this.api) {
       await this.api.disconnect();
       delete this.api;
-      delete this._did;
-      delete this._revocation;
+      delete this.didModule;
+      delete this.revocationModule;
     }
   }
 
@@ -116,50 +116,32 @@ class DockAPI {
   }
 
   /**
-   * Sets the keyring
-   * @param {keyring} keyring - PolkadotJS Keyring
-   */
-  set keyring(keyring) {
-    this._keyring = keyring;
-  }
-
-  /**
-   * Gets the keyring
-   * @return {Keyring} PolkadotJS Keyring
-   */
-  get keyring() {
-    return this._keyring;
-  }
-
-  /**
    * Helper function to send transaction
    * @param {Extrinsic} extrinsic - Extrinsic to send
-   * @param {bool} shouldUnsubscribe - Should we automatically unsubscribe from the transaction after its finalized
+   * @param {bool} unsub - Should we unsubscribe from the transaction after its finalized
    * @return {Promise}
    */
-  async sendTransaction(extrinsic, shouldUnsubscribe = true) {
+  async sendTransaction(extrinsic, unsubscribe = true) {
     return new Promise((resolve, reject) => {
       const account = this.getAccount();
       let unsubFunc = null;
       try {
         extrinsic
-          .signAndSend(account, ({events = [], status}) => {
+          .signAndSend(account, ({ events = [], status }) => {
             if (status.isFinalized) {
-              if (shouldUnsubscribe &amp;&amp; unsubFunc) {
+              if (unsubscribe &amp;&amp; unsubFunc) {
                 unsubFunc();
               }
               resolve(events, status);
             }
           })
-          .catch(error => {
-            console.error('sendTransaction had error', error);
+          .catch((error) => {
             reject(error);
           })
-          .then(unsub => {
+          .then((unsub) => {
             unsubFunc = unsub;
           });
       } catch (error) {
-        console.error('sendTransaction had error', error);
         reject(error);
       }
     });
@@ -170,10 +152,10 @@ class DockAPI {
    * @return {DIDModule} The module to use
    */
   get did() {
-    if (!this._did) {
+    if (!this.didModule) {
       throw new Error('Unable to get DID module, SDK is not initialised');
     }
-    return this._did;
+    return this.didModule;
   }
 
   /**
@@ -181,12 +163,11 @@ class DockAPI {
    * @return {RevocationModule} The module to use
    */
   get revocation() {
-    if (!this._revocation) {
+    if (!this.revocationModule) {
       throw new Error('Unable to get revocation module, SDK is not initialised');
     }
-    return this._revocation;
+    return this.revocationModule;
   }
-
 }
 
 export default new DockAPI();
@@ -212,13 +193,13 @@ export {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="DockResolver_DockResolver.html">DockResolver</a></li><li><a href="MultiResolver_MultiResolver.html">MultiResolver</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="PublicKey.html">PublicKey</a></li><li><a href="PublicKeyEd25519.html">PublicKeyEd25519</a></li><li><a href="PublicKeySecp256k1.html">PublicKeySecp256k1</a></li><li><a href="PublicKeySr25519.html">PublicKeySr25519</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="Signature.html">Signature</a></li><li><a href="SignatureEd25519.html">SignatureEd25519</a></li><li><a href="SignatureSecp256k1.html">SignatureSecp256k1</a></li><li><a href="SignatureSr25519.html">SignatureSr25519</a></li><li><a href="UniversalResolver_UniversalResolver.html">UniversalResolver</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="VerifiablePresentation.html">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createPresentation">createPresentation</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureObjectWithKeyOrURI">ensureObjectWithKeyOrURI</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getKeyDoc">getKeyDoc</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="VerifiablePresentation.html">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createPresentation">createPresentation</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureObjectWithKeyOrURI">ensureObjectWithKeyOrURI</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getKeyDoc">getKeyDoc</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Wed Apr 15 2020 10:49:22 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Wed Apr 15 2020 21:12:08 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

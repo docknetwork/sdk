@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: verifiable-credential.js</title>
+    <title>JSDoc: Source: public-keys/public-key-sr25519.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: verifiable-credential.js</h1>
+    <h1 class="page-title">Source: public-keys/public-key-sr25519.js</h1>
 
     
 
@@ -26,162 +26,23 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import {
-  issueCredential,
-  verifyCredential,
-} from './utils/vc';
-import {
-  ensureObjectWithId, ensureObjectWithKeyOrURI, ensureString, ensureValidDatetime,
-} from './utils/type-helpers';
+            <pre class="prettyprint source linenums"><code>import PublicKey from './public-key';
 
-const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
-const DEFAULT_TYPE = 'VerifiableCredential';
-
-/**
- * Representation of a Verifiable Credential.
- */
-class VerifiableCredential {
-  /**
-   * Create a new Verifiable Credential instance.
-   * @param {string} id - id of the credential
-   */
-  constructor(id) {
-    ensureString(id);
-    this.id = id;
-
-    this.context = [DEFAULT_CONTEXT];
-    this.type = [DEFAULT_TYPE];
-    this.subject = [];
-    this.setIssuanceDate(new Date().toISOString());
+/** Class representing a Sr25519 PublicKey */
+export default class PublicKeySr25519 extends PublicKey {
+  constructor(value) {
+    super(value, 32);
   }
 
   /**
-   * Add a context to this Credential's context array
-   * @param {str|object} context - Context to add to the credential context array
-   * @returns {VerifiableCredential}
-   */
-  addContext(context) {
-    ensureObjectWithKeyOrURI(context, '@context', 'context');
-    this.context.push(context);
-    return this;
-  }
-
-  /**
-   * Add a type to this Credential's type array
-   * @param {str} type - Type to add to the credential type array
-   * @returns {VerifiableCredential}
-   */
-  addType(type) {
-    ensureString(type);
-    this.type.push(type);
-    return this;
-  }
-
-  /**
-   * Add a subject to this Credential
-   * @param {object} subject -  Subject of the credential
-   * @returns {VerifiableCredential}
-   */
-  addSubject(subject) {
-    ensureObjectWithId(subject, 'credentialSubject');
-    this.subject.push(subject);
-    return this;
-  }
-
-  /**
-   * Set a status for this Credential
-   * @param {object} status -  Status of the credential
-   * @returns {VerifiableCredential}
-   */
-  setStatus(status) {
-    ensureObjectWithId(status, 'credentialStatus');
-    if (!status.type) {
-      throw new Error('"credentialStatus" must include a type.');
-    }
-    this.status = status;
-    return this;
-  }
-
-  /**
-   * Set a issuance date for this Credential
-   * @param {string} issuanceDate -  issuanceDate of the credential
-   * @returns {VerifiableCredential}
-   */
-  setIssuanceDate(issuanceDate) {
-    ensureValidDatetime(issuanceDate);
-    this.issuanceDate = issuanceDate;
-    return this;
-  }
-
-  /**
-   * Set a expiration date for this Credential
-   * @param {object} expirationDate -  expirationDate of the credential
-   * @returns {VerifiableCredential}
-   */
-  setExpirationDate(expirationDate) {
-    ensureValidDatetime(expirationDate);
-    this.expirationDate = expirationDate;
-    return this;
-  }
-
-  /**
-   * Define the JSON representation of a Verifiable Credential.
-   * @returns {any}
+   * @return {Object} The PublicKey JSON variant Sr25519.
    */
   toJSON() {
-    const {
-      context, subject, status, ...rest
-    } = this;
-    const credJson = {
-      '@context': context,
-      credentialSubject: subject,
-    };
-    if (status) {
-      credJson.credentialStatus = status;
-    }
     return {
-      ...credJson,
-      ...rest,
+      Sr25519: this.value,
     };
-  }
-
-  /**
-   * Sign a Verifiable Credential using the provided keyDoc
-   * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
-   * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
-   * @returns {Promise&lt;{object}>}
-   */
-  async sign(keyDoc, compactProof = true) {
-    const signedVC = await issueCredential(
-      keyDoc,
-      this.toJSON(),
-      compactProof,
-    );
-    this.proof = signedVC.proof;
-    this.issuer = signedVC.issuer;
-    return this;
-  }
-
-  /**
-   * Verify a Verifiable Credential
-   * @param {object} resolver - Resolver for DIDs.
-   * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
-   * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
-   * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
-   * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
-   * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
-   * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
-   * @returns {Promise&lt;{object}>}
-   */
-  async verify(resolver, compactProof = true, forceRevocationCheck = true, revocationAPI) {
-    if (!this.proof) {
-      throw new Error('The current Verifiable Credential has no proof.');
-    }
-    return verifyCredential(this.toJSON(), resolver, compactProof, forceRevocationCheck, revocationAPI);
   }
 }
-
-export default VerifiableCredential;
 </code></pre>
         </article>
     </section>

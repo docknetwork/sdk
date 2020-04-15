@@ -3886,6 +3886,11 @@ jest@24.5.0:
     import-local "^2.0.0"
     jest-cli "^24.5.0"
 
+js-sha256@^0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/js-sha256/-/js-sha256-0.9.0.tgz#0b89ac166583e91ef9123644bd3c5334ce9d0966"
+  integrity sha512-sga3MHh9sgQN2+pJ9VYZ+1LPwXOxuBJBA5nrR5/ofPfuiJBE2hnjsaN8se8JznOmGLN2p49Pe5U/ttafcs/apA==
+
 js-sha3@0.5.5:
   version "0.5.5"
   resolved "https://registry.yarnpkg.com/js-sha3/-/js-sha3-0.5.5.tgz#baf0c0e8c54ad5903447df96ade7a4a1bca79a4a"
@@ -5392,13 +5397,6 @@ secp256k1-key-pair@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/secp256k1-key-pair/-/secp256k1-key-pair-1.1.0.tgz#91bbb2ec294621f1bd9e0e7bff5219a4d91e72d8"
   integrity sha512-XoNof6yZ4hiT3/dt+Nj7maWIqVyYIja1Z6Kv7nE5UQerdTLsoIuqyjlCT/bYItwb5k4Lni8IVyZvpi5GGeuXLQ==
-  dependencies:
-    elliptic "^6.5.0"
-    node-forge "^0.8.5"
-
-"secp256k1-key-pair@https://github.com/SamHellawell/secp256k1-key-pair":
-  version "1.1.1-0"
-  resolved "https://github.com/SamHellawell/secp256k1-key-pair#da66af97da3944b864406ebe5a8aec96cb6152a5"
   dependencies:
     elliptic "^6.5.0"
     node-forge "^0.8.5"

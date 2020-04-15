@@ -1,16 +1,15 @@
-import { randomAsHex } from '@polkadot/util-crypto';
-import { hexToU8a } from '@polkadot/util';
-import { Ed25519KeyPair } from 'jsonld-signatures';
+import {randomAsHex} from '@polkadot/util-crypto';
 
 import dock from '../src/api';
 import VerifiableCredential from '../src/verifiable-credential';
-import { createNewDockDID } from '../src/utils/did';
-import { registerNewDIDUsingPair } from '../tests/integration/helpers';
-import { OneOfPolicy } from '../src/utils/revocation';
-import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
-import { getKeyDoc } from '../src/utils/vc/helpers';
-import { DockResolver } from '../src/resolver';
-import { buildDockCredentialStatus } from '../src/utils/vc';
+import VerifiablePresentation from '../src/verifiable-presentation';
+import {createNewDockDID} from '../src/utils/did';
+import {registerNewDIDUsingPair} from '../tests/integration/helpers';
+import {OneOfPolicy} from '../src/utils/revocation';
+import {FullNodeEndpoint, TestAccountURI} from '../tests/test-constants';
+import {getKeyDoc} from '../src/utils/vc/helpers';
+import {DockResolver} from '../src/resolver';
+import {buildDockCredentialStatus} from '../src/utils/vc';
 
 // Both issuer and holder have DIDs
 const issuerDID = createNewDockDID();
@@ -25,10 +24,14 @@ const registryId = randomAsHex(32);
 const credentialId = 'auniquecredentialid';
 const credentialContext = 'https://www.w3.org/2018/credentials/examples/v1';
 const credentialType = 'AlumniCredential';
-const credentialSubject = { id: holderDID, alumniOf: 'Example University' };
+const credentialSubject = {id: holderDID, alumniOf: 'Example University'};
 const credentialStatus = buildDockCredentialStatus(registryId);
 const credentialIssuanceDate = '2020-03-18T19:23:24Z';
 const credentialExpirationDate = '2021-03-18T19:23:24Z';
+
+const presentationId = 'my-presentation-id';
+const challenge = randomAsHex(32);
+const domain = 'example domain';
 
 const resolver = new DockResolver(dock);
 
@@ -75,23 +78,43 @@ async function main() {
     credential.setIssuanceDate(credentialIssuanceDate);
     credential.setExpirationDate(credentialExpirationDate);
 
-    console.log('Credential created:', credential);
+    console.log('Credential created:', credential.toJSON());
 
     // Sign the credential to get the proof
     console.log('Issuer will sign the credential now');
-    const issuerKey = getKeyDoc(issuerDID, await Ed25519KeyPair.generate({ seed: hexToU8a(issuerSeed) }), 'Ed25519VerificationKey2018');
+    const issuerKey = getKeyDoc(issuerDID, dock.keyring.addFromUri(issuerSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
     const signedCredential = await credential.sign(issuerKey);
     console.log('Credential signed, verifying...');
 
     // Verify the credential
-    const verifyResult = await signedCredential.verify(resolver, true, true, { dock });
+    const verifyResult = await signedCredential.verify(resolver, true, true, {'dock': dock});
     if (verifyResult.verified) {
       console.log('Credential has been verified! Result:', verifyResult);
+
+      console.log('Holder creating presentation...');
+
+      const presentation = new VerifiablePresentation(presentationId);
+      presentation.addCredential(credential);
+
+      console.log('Holder signing presentation', presentation.toJSON());
+      const holderKey = getKeyDoc(holderDID, dock.keyring.addFromUri(holderSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
+      await presentation.sign(holderKey, challenge, domain, resolver);
+      console.log('Signed presentation', presentation.toJSON());
+
+      const ver = await presentation.verify(challenge, domain, resolver, true, false);
+      if (ver.verified) {
+        console.log('Presentation has been verified! Result:', ver);
+      } else {
+        console.error('Presentation could not be verified!. Got error', ver.error);
+        process.exit(1);
+      }
     } else {
-      console.error('Credential could not be verified!');
+      console.error('Credential could not be verified!. Got error', verifyResult.error);
+      process.exit(1);
     }
   } catch (e) {
     console.error('Error creating credential', e);
+    process.exit(1);
   }
 
   // Exit
@@ -99,10 +122,10 @@ async function main() {
 }
 
 dock.init({
-  address: FullNodeEndpoint,
+  address: FullNodeEndpoint
 })
   .then(main)
-  .catch((error) => {
+  .catch(error => {
     console.error('Error occurred somewhere, it was caught!', error);
     process.exit(1);
   });

@@ -3,6 +3,6 @@ This is an [mdBook](https://github.com/rust-lang/mdBook). See it [rendered here]
 While editing, you can view changes live with auto-reload. Use the `mdbook` command.
 
 ```bash
-cd client-sdk/book
+cd client-sdk/tutorials
 mdbook serve -o
 ```

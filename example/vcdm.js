@@ -21,7 +21,7 @@ const holderSeed = randomAsHex(32);
 const registryId = randomAsHex(32);
 
 // Sample credential data
-const credentialId = 'auniquecredentialid';
+const credentialId = 'http://example.edu/credentials/1986';
 const credentialContext = 'https://www.w3.org/2018/credentials/examples/v1';
 const credentialType = 'AlumniCredential';
 const credentialSubject = { id: holderDID, alumniOf: 'Example University' };
@@ -29,7 +29,7 @@ const credentialStatus = buildDockCredentialStatus(registryId);
 const credentialIssuanceDate = '2020-03-18T19:23:24Z';
 const credentialExpirationDate = '2021-03-18T19:23:24Z';
 
-const presentationId = 'my-presentation-id';
+const presentationId = 'http://example.edu/credentials/2803';
 const challenge = randomAsHex(32);
 const domain = 'example domain';
 

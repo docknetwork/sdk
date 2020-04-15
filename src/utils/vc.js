@@ -1,8 +1,11 @@
 import vcjs from 'vc-js';
-import {Ed25519KeyPair, suites} from 'jsonld-signatures';
-import Secp256k1KeyPair from 'secp256k1-key-pair';
-import {EcdsaSepc256k1Signature2019, Sr25519Signature2020} from './vc/custom_crypto';
-import { blake2AsHex } from '@polkadot/util-crypto';
+import {
+  EcdsaSepc256k1Signature2019,
+  Sr25519Signature2020,
+  Ed25519Signature2018,
+  Sr25519VerKeyName, Ed25519VerKeyName, EcdsaSecp256k1VerKeyName
+} from './vc/custom_crypto';
+import {blake2AsHex} from '@polkadot/util-crypto';
 
 import documentLoader from './vc/document-loader';
 import {isHexWithGivenByteSize} from './codec';
@@ -13,7 +16,7 @@ import {RevEntryByteSize, RevRegIdByteSize} from './revocation';
 export const RevRegType = 'CredentialStatusList2017';
 export const DockRevRegQualifier = 'rev-reg:dock:';
 
-const {Ed25519Signature2018} = suites;
+//const {Ed25519Signature2018} = suites;
 
 //TODO: discuss whether we still want to allow usage of the signing functionality outside of credentials created with
 // our VerifiableCredential class.
@@ -23,16 +26,21 @@ const {Ed25519Signature2018} = suites;
  * @returns {EcdsaSepc256k1Signature2019|Ed25519Signature2018|Sr25519Signature2020} - signature suite.
  */
 export function getSuiteFromKeyDoc(keyDoc) {
+  let cls;
   switch(keyDoc.type) {
-  case 'EcdsaSecp256k1VerificationKey2019':
-    return new EcdsaSepc256k1Signature2019({key: new Secp256k1KeyPair(keyDoc)});
-  case 'Ed25519VerificationKey2018':
-    return new Ed25519Signature2018({key: new Ed25519KeyPair(keyDoc)});
-  case 'Sr25519VerificationKey2020':
-    return new Sr25519Signature2020({keypair: keyDoc.keypair, publicKey: keyDoc.publicKey, verificationMethod: keyDoc.id});
+  case EcdsaSecp256k1VerKeyName:
+    cls = EcdsaSepc256k1Signature2019;
+    break;
+  case Ed25519VerKeyName:
+    cls = Ed25519Signature2018;
+    break;
+  case Sr25519VerKeyName:
+    cls = Sr25519Signature2020;
+    break;
   default:
     throw new Error(`Unknown key type ${keyDoc.type}.`);
   }
+  return new cls({keypair: keyDoc.keypair, publicKey: keyDoc.publicKey, verificationMethod: keyDoc.id});
 }
 
 /**
@@ -237,6 +245,15 @@ export async function checkRevocationStatus(credential, revocationAPI) {
 }
 
 /**
+ * Return `credentialStatus` according to W3C spec when the revocation status is checked on Dock
+ * @param registryId - Revocation registry id
+ * @returns {{id: string, type: string}}
+ */
+export function buildDockCredentialStatus(registryId) {
+  return {id: `${DockRevRegQualifier}${registryId}`, type: RevRegType};
+}
+
+/**
  * Generate the revocation id of a credential usable by Dock. It hashes the credential id to get the
  * revocation id
  * @param credential
@@ -274,20 +291,4 @@ export function isRevocationCheckNeeded(credStatus, forceRevocationCheck, revoca
   return !!credStatus && (forceRevocationCheck || !!revocationAPI);
 }
 
-/**
- * Return true if the given value is a string.
- * @param value
- * @returns {boolean}
- */
-export function isString(value) {
-  return typeof value === 'string' || value instanceof String;
-}
 
-/**
- * Return true if a value is an object
- * @param value
- * @returns {boolean}
- */
-export function isObject(value) {
-  return value && typeof value === 'object' && value.constructor === Object;
-}

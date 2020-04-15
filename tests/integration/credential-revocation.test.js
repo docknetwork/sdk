@@ -1,8 +1,6 @@
 import {randomAsHex} from '@polkadot/util-crypto';
-import { hexToU8a } from '@polkadot/util';
-import {Ed25519KeyPair} from 'jsonld-signatures';
 
-import {FullNodeEndpoint, TestKeyringOpts, TestAccount} from '../test-constants';
+import {FullNodeEndpoint, TestKeyringOpts, TestAccountURI} from '../test-constants';
 import {DockAPI} from '../../src/api';
 import {
   createPresentation,
@@ -11,7 +9,7 @@ import {
   signPresentation, verifyCredential,
   verifyPresentation
 } from '../../src/utils/vc';
-import Resolver from '../../src/resolver';
+import {DockResolver} from '../../src/resolver';
 
 import {
   KeyringPairDidKeys, OneOfPolicy
@@ -24,7 +22,6 @@ import {getKeyDoc} from '../../src/utils/vc/helpers';
 import {createNewDockDID} from '../../src/utils/did';
 
 const credId = 'A large credential id with size > 32 bytes';
-let resolver;
 
 function addRevRegIdToCred(cred, regId) {
   cred.credentialStatus = {
@@ -35,6 +32,7 @@ function addRevRegIdToCred(cred, regId) {
 
 describe('Credential revocation with issuer as the revocation authority', () => {
   const dockAPI = new DockAPI(FullNodeEndpoint);
+  const resolver = new DockResolver(dockAPI);
 
   // Create a random registry id
   const registryId = randomAsHex(32);
@@ -60,7 +58,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     });
 
     // The keyring should be initialized before any test begins as this suite is testing revocation
-    const account = dockAPI.keyring.addFromUri(TestAccount.uri, TestAccount.options);
+    const account = dockAPI.keyring.addFromUri(TestAccountURI);
     dockAPI.setAccount(account);
 
     // Register issuer DID
@@ -82,17 +80,12 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     // Set our owner DID and associated keypair to be used for generating proof
     didKeys.set(issuerDID, pair);
 
-    const providers = {
-      'dock': FullNodeEndpoint,
-    };
-    resolver = new Resolver(providers);
-    resolver.init();
-
     const unsignedCred = getUnsignedCred(credId, holderDID);
 
     // Issuer issues the credential with a given registry id for revocation
     addRevRegIdToCred(unsignedCred, registryId);
-    issuerKey = getKeyDoc(issuerDID, await Ed25519KeyPair.generate({seed: hexToU8a(issuerSeed)}), 'Ed25519VerificationKey2018');
+
+    issuerKey = getKeyDoc(issuerDID, dockAPI.keyring.addFromUri(issuerSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
     credential = await issueCredential(issuerKey, unsignedCred);
 
     done();
@@ -100,11 +93,11 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
   afterAll(async () => {
     await dockAPI.disconnect();
-  }, 30000);
+  }, 10000);
 
   test('Issuer can issue a revocable credential and holder can verify it successfully when it is not revoked else the verification fails', async () => {
     // The credential verification should pass as the credential has not been revoked.
-    const result = await verifyCredential(credential, resolver, true, false, {'dock': dockAPI});
+    const result = await verifyCredential(credential, resolver, true, true, {'dock': dockAPI});
     expect(result.verified).toBe(true);
 
     // Revoke the credential
@@ -113,7 +106,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     await dockAPI.sendTransaction(t1);
 
     // The credential verification should fail as the credential has been revoked.
-    const result1 = await verifyCredential(credential, resolver, true, false, {'dock': dockAPI});
+    const result1 = await verifyCredential(credential, resolver, true, true, {'dock': dockAPI});
     expect(result1.verified).toBe(false);
     expect(result1.error).toBe('Revocation check failed');
 
@@ -126,7 +119,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     const t2 = await dockAPI.revocation.unrevokeCredential(didKeys, registryId, revId);
     await dockAPI.sendTransaction(t2);
 
-    const holderKey = getKeyDoc(holderDID, await Ed25519KeyPair.generate({seed: hexToU8a(holderSeed)}), 'Ed25519VerificationKey2018');
+    const holderKey = getKeyDoc(holderDID, dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
 
     // Create presentation for unrevoked credential
     const presId = randomAsHex(32);
@@ -174,4 +167,3 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
   }, 40000);
 });
-

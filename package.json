@@ -20,6 +20,7 @@
     "dotenv": "^8.2.0",
     "eslint": "^6.8.0",
     "eslint-plugin-jest": "^23.8.2",
+    "ethr-did-resolver": "^2.2.0",
     "jest": "24.5.0",
     "jsdoc": "^3.6.3",
     "rollup": "1.7.0",
@@ -39,8 +40,9 @@
     "dock-did-example": "npx babel-node example/dock-did.js",
     "did-resolver-example": "npx babel-node example/resolver.js",
     "revocation-example": "npx babel-node example/revocation.js",
-    "dev-node": "./submodules/dock-substrate/scripts/run_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
-    "test-with-node": "./submodules/dock-substrate/scripts/with_docker_test_node yarn test-integration"
+    "vcdm-example": "npx babel-node example/vcdm.js",
+    "dev-node": "./scripts/run_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
+    "test-with-node": "./scripts/with_docker_test_node yarn test-integration"
   },
   "jest": {
     "testEnvironment": "node"
@@ -57,7 +59,7 @@
     "ecdsa-secp256k1-signature-2019": "^1.0.0",
     "elliptic": "^6.5.2",
     "ethr-did-resolver": "^2.2.0",
-    "secp256k1-key-pair": "https://github.com/SamHellawell/secp256k1-key-pair",
+    "js-sha256": "^0.9.0",
     "vc-js": "https://github.com/docknetwork/vc-js#avoid-extendContextLoader"
   }
 }

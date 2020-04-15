@@ -32,7 +32,7 @@ describe('DID Module', () => {
 
   afterAll(async () => {
     await dock.disconnect();
-  }, 30000);
+  }, 10000);
 
   test('Has keyring and account', () => {
     const account = dock.keyring.addFromUri(TestAccountURI);
@@ -85,7 +85,7 @@ describe('DID Module', () => {
     const transaction = dock.did.remove(didRemoval, signature);
     const result = await dock.sendTransaction(transaction);
     if (result) {
-      await expect(dock.did.getDocument(dockDID)).rejects.toThrow(/Could not find DID/);
+      await expect(dock.did.getDocument(dockDID)).rejects.toThrow(/does not exist/);
     }
   }, 30000);
 });

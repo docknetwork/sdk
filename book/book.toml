@@ -1,0 +1,6 @@
+[book]
+authors = ["Andrew Dirksen", "Fausto Woelflin", "Sam Hellawell", "Lovesh Harchandani"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Dock Client Tutorial"

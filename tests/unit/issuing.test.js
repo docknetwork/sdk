@@ -11,6 +11,7 @@ import {generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair} from '../../
 
 const controllerUrl = 'https://gist.githubusercontent.com/lovesh/312d407e3a16be0e7d5e43169e824958/raw';
 const keyUrl = 'https://gist.githubusercontent.com/lovesh/67bdfd354cfaf4fb853df4d6713f4610/raw';
+const issuanceDate = '2020-04-15T09:05:35Z';
 
 function getSampleCredential(signed=false){
   let cred = {
@@ -20,7 +21,7 @@ function getSampleCredential(signed=false){
     ],
     id: 'https://example.com/credentials/1872',
     type: ['VerifiableCredential', 'AlumniCredential'],
-    issuanceDate: '2010-01-01T19:23:24Z',
+    issuanceDate: issuanceDate,
     credentialSubject: {
       id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
       alumniOf: 'Example University'
@@ -32,8 +33,8 @@ function getSampleCredential(signed=false){
       issuer: controllerUrl,
       proof: {
         type: 'EcdsaSecp256k1Signature2019',
-        created: '2020-03-27T17:44:28Z',
-        jws: 'eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEQCIFVvlifheEKjPz7PjTCgDa2DKtUqUVOvI9sCMDYxC6yMAiAGPFST3eCj7zYeGmfXcEKaLyPAAu2nPgzL_NPZLkdCfw',
+        created: '2020-04-15T09:22:48Z',
+        jws: 'eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEQCIHiIBMBw1szt6Y_ksb0rRiEZuAkG3BNXdt6UC_LpFlOfAiAkQktaxOPtfuiTXMsWRv92qvwFubs4Sn5hH4E_arwohA',
         proofPurpose: 'assertionMethod',
         verificationMethod: keyUrl
       }
@@ -96,7 +97,7 @@ describe('Verifiable Credential Issuing', () => {
     expect(credential.id).toBe('https://example.com/credentials/1872');
     expect(credential.type).toContain('VerifiableCredential');
     expect(credential.type).toContain('AlumniCredential');
-    expect(credential.issuanceDate).toBe('2010-01-01T19:23:24Z');
+    expect(credential.issuanceDate).toBe(issuanceDate);
     expect(credential.credentialSubject.id).toBe('did:example:ebfeb1f712ebc6f1c276e12ec21');
     expect(credential.credentialSubject.alumniOf).toBe('Example University');
     expect(credential.issuer).toBe(controllerUrl);
@@ -116,7 +117,8 @@ describe('Verifiable Credential Issuing', () => {
 
 describe('Verifiable Credential Verification', () => {
   test('The sample signed credential should pass verification.', async () => {
-    const result = await verifyCredential(getSampleCredential(true));
+    const signedCred = getSampleCredential(true);
+    const result = await verifyCredential(signedCred);
     expect(result.verified).toBe(true);
     expect(result.results[0].proof['@context']).toBe('https://w3id.org/security/v2');
     expect(result.results[0].proof.created).toBeDefined();

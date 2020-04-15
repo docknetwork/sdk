@@ -1,15 +1,15 @@
-import {randomAsHex} from '@polkadot/util-crypto';
+import { randomAsHex } from '@polkadot/util-crypto';
 
 import dock from '../src/api';
 import VerifiableCredential from '../src/verifiable-credential';
 import VerifiablePresentation from '../src/verifiable-presentation';
-import {createNewDockDID} from '../src/utils/did';
-import {registerNewDIDUsingPair} from '../tests/integration/helpers';
-import {OneOfPolicy} from '../src/utils/revocation';
-import {FullNodeEndpoint, TestAccountURI} from '../tests/test-constants';
-import {getKeyDoc} from '../src/utils/vc/helpers';
-import {DockResolver} from '../src/resolver';
-import {buildDockCredentialStatus} from '../src/utils/vc';
+import { createNewDockDID } from '../src/utils/did';
+import { registerNewDIDUsingPair } from '../tests/integration/helpers';
+import { OneOfPolicy } from '../src/utils/revocation';
+import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
+import { getKeyDoc } from '../src/utils/vc/helpers';
+import { DockResolver } from '../src/resolver';
+import { buildDockCredentialStatus } from '../src/utils/vc';
 
 // Both issuer and holder have DIDs
 const issuerDID = createNewDockDID();
@@ -24,7 +24,7 @@ const registryId = randomAsHex(32);
 const credentialId = 'auniquecredentialid';
 const credentialContext = 'https://www.w3.org/2018/credentials/examples/v1';
 const credentialType = 'AlumniCredential';
-const credentialSubject = {id: holderDID, alumniOf: 'Example University'};
+const credentialSubject = { id: holderDID, alumniOf: 'Example University' };
 const credentialStatus = buildDockCredentialStatus(registryId);
 const credentialIssuanceDate = '2020-03-18T19:23:24Z';
 const credentialExpirationDate = '2021-03-18T19:23:24Z';
@@ -87,7 +87,7 @@ async function main() {
     console.log('Credential signed, verifying...');
 
     // Verify the credential
-    const verifyResult = await signedCredential.verify(resolver, true, true, {'dock': dock});
+    const verifyResult = await signedCredential.verify(resolver, true, true, { dock });
     if (verifyResult.verified) {
       console.log('Credential has been verified! Result:', verifyResult);
 
@@ -122,10 +122,10 @@ async function main() {
 }
 
 dock.init({
-  address: FullNodeEndpoint
+  address: FullNodeEndpoint,
 })
   .then(main)
-  .catch(error => {
+  .catch((error) => {
     console.error('Error occurred somewhere, it was caught!', error);
     process.exit(1);
   });

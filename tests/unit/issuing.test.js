@@ -356,7 +356,6 @@ describe('Verifiable Presentation incremental creation', () => {
     expect(vp.proof).toMatchObject({proofPurpose: 'authentication'});
     expect(vp.proof).toMatchObject({verificationMethod: expect.anything()});
 
-    // TODO: fix test is hanging here
     const results = await vp.verify(
       'some_challenge',
       'some_domain'

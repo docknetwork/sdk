@@ -1,17 +1,17 @@
-import {randomAsHex} from '@polkadot/util-crypto';
+import { randomAsHex } from '@polkadot/util-crypto';
 
 import dock from '../src/api';
-import {createNewDockDID, createKeyDetail} from '../src/utils/did';
-import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
+import { createNewDockDID, createKeyDetail } from '../src/utils/did';
+import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 
-import  {
+import {
   OneOfPolicy,
   KeyringPairDidKeys,
 } from '../src/utils/revocation';
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
-import {FullNodeEndpoint, TestAccountURI} from '../tests/test-constants';
+import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 
 // Create a random registry id
 const registryId = randomAsHex(32);
@@ -97,8 +97,8 @@ async function main() {
     await unrevoke();
 
     // Check if unrevoke worked
-    const isRevoked = await dock.revocation.getIsRevoked(registryId, revokeId);
-    if (!isRevoked) {
+    const isUnrevoked = !(await dock.revocation.getIsRevoked(registryId, revokeId));
+    if (isUnrevoked) {
       console.log('Unrevoke success!');
     } else {
       console.error('Unable to unrevoke, something went wrong.');
@@ -119,10 +119,10 @@ async function main() {
 
 // Initialise Dock API, connect to the node and start working with it
 dock.init({
-  address: FullNodeEndpoint
+  address: FullNodeEndpoint,
 })
   .then(main)
-  .catch(error => {
+  .catch((error) => {
     console.error('Error occurred somewhere, it was caught!', error);
     process.exit(1);
   });

@@ -1,16 +1,18 @@
 // Import some utils from Polkadot JS
-import {randomAsHex} from '@polkadot/util-crypto';
+import { randomAsHex } from '@polkadot/util-crypto';
 
 // Import Dock API
 import dock, {
   PublicKeySr25519,
 } from '../src/api';
-import {createNewDockDID, createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval} from '../src/utils/did';
-import {getPublicKeyFromKeyringPair} from '../src/utils/misc';
+import {
+  createNewDockDID, createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval,
+} from '../src/utils/did';
+import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
-import {FullNodeEndpoint, TestAccountURI} from '../tests/test-constants';
+import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 
 // DID will be generated randomly
 const dockDID = createNewDockDID();
@@ -79,7 +81,7 @@ function registerNewDID() {
 // Initialise Dock API, connect to the node and start working with it
 // It will create a new DID with a key, then update the key to another one and then remove the DID
 dock.init({
-  address: FullNodeEndpoint
+  address: FullNodeEndpoint,
 })
   .then(() => {
     const account = dock.keyring.addFromUri(TestAccountURI);
@@ -100,6 +102,6 @@ dock.init({
       process.exit(0);
     }
   })
-  .catch(error => {
+  .catch((error) => {
     console.error('Error occurred somewhere, it was caught!', error);
   });

@@ -11,6 +11,6 @@ jobs:
 
       - name: Install, lint and generate docs # Install packages, run lint and jsdoc scripts. Not uploading the docs.
         run: |
-          yarn install --frozen-lockfile
+          yarn install --frozen-lockfile --ignore-scripts
           yarn lint
           yarn docs

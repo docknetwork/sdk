@@ -9,7 +9,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --frozen-lockfile --ignore-scripts
       - run: yarn build
       - run: yarn test
       - run: yarn test-with-node

@@ -1,5 +1,5 @@
-import {ApiPromise, WsProvider, Keyring} from '@polkadot/api';
-import {cryptoWaitReady} from '@polkadot/util-crypto';
+import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
+import { cryptoWaitReady } from '@polkadot/util-crypto';
 
 import RevocationModule from './modules/revocation';
 import DIDModule from './modules/did';
@@ -9,14 +9,14 @@ import {
   PublicKey,
   PublicKeySr25519,
   PublicKeyEd25519,
-  PublicKeySecp256k1
-} from './public-key';
+  PublicKeySecp256k1,
+} from './public-keys';
 
 import {
   Signature,
   SignatureSr25519,
-  SignatureEd25519
-} from './signature';
+  SignatureEd25519,
+} from './signatures';
 
 /** Helper class to interact with the Dock chain */
 class DockAPI {
@@ -34,7 +34,7 @@ class DockAPI {
    * @param {Account} address - Optional WebSocket address
    * @return {Promise} Promise for when SDK is ready for use
    */
-  async init({address, keyring} = {}) {
+  async init({ address, keyring } = {}) {
     if (this.api) {
       throw new Error('API is already connected');
     }
@@ -46,13 +46,13 @@ class DockAPI {
       types,
     });
 
-    this._did = new DIDModule(this.api);
-    this._revocation = new RevocationModule(this.api);
+    this.didModule = new DIDModule(this.api);
+    this.revocationModule = new RevocationModule(this.api);
 
     await cryptoWaitReady();
 
-    if (!this._keyring || keyring) {
-      this._keyring = new Keyring(keyring || {type: 'sr25519'});
+    if (!this.keyring || keyring) {
+      this.keyring = new Keyring(keyring || { type: 'sr25519' });
     }
 
     return this.api;
@@ -62,8 +62,8 @@ class DockAPI {
     if (this.api) {
       await this.api.disconnect();
       delete this.api;
-      delete this._did;
-      delete this._revocation;
+      delete this.didModule;
+      delete this.revocationModule;
     }
   }
 
@@ -88,50 +88,32 @@ class DockAPI {
   }
 
   /**
-   * Sets the keyring
-   * @param {keyring} keyring - PolkadotJS Keyring
-   */
-  set keyring(keyring) {
-    this._keyring = keyring;
-  }
-
-  /**
-   * Gets the keyring
-   * @return {Keyring} PolkadotJS Keyring
-   */
-  get keyring() {
-    return this._keyring;
-  }
-
-  /**
    * Helper function to send transaction
    * @param {Extrinsic} extrinsic - Extrinsic to send
-   * @param {bool} shouldUnsubscribe - Should we automatically unsubscribe from the transaction after its finalized
+   * @param {bool} unsub - Should we unsubscribe from the transaction after its finalized
    * @return {Promise}
    */
-  async sendTransaction(extrinsic, shouldUnsubscribe = true) {
+  async sendTransaction(extrinsic, unsubscribe = true) {
     return new Promise((resolve, reject) => {
       const account = this.getAccount();
       let unsubFunc = null;
       try {
         extrinsic
-          .signAndSend(account, ({events = [], status}) => {
+          .signAndSend(account, ({ events = [], status }) => {
             if (status.isFinalized) {
-              if (shouldUnsubscribe && unsubFunc) {
+              if (unsubscribe && unsubFunc) {
                 unsubFunc();
               }
               resolve(events, status);
             }
           })
-          .catch(error => {
-            console.error('sendTransaction had error', error);
+          .catch((error) => {
             reject(error);
           })
-          .then(unsub => {
+          .then((unsub) => {
             unsubFunc = unsub;
           });
       } catch (error) {
-        console.error('sendTransaction had error', error);
         reject(error);
       }
     });
@@ -142,10 +124,10 @@ class DockAPI {
    * @return {DIDModule} The module to use
    */
   get did() {
-    if (!this._did) {
+    if (!this.didModule) {
       throw new Error('Unable to get DID module, SDK is not initialised');
     }
-    return this._did;
+    return this.didModule;
   }
 
   /**
@@ -153,12 +135,11 @@ class DockAPI {
    * @return {RevocationModule} The module to use
    */
   get revocation() {
-    if (!this._revocation) {
+    if (!this.revocationModule) {
       throw new Error('Unable to get revocation module, SDK is not initialised');
     }
-    return this._revocation;
+    return this.revocationModule;
   }
-
 }
 
 export default new DockAPI();

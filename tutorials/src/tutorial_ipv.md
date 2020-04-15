@@ -153,7 +153,7 @@ Once done, your `vc` object will have a new `proof` field:
 
 ### Verifying a Verifiable Credential
 Once your Verifiable Credential has been signed you can proceed to verify it with the `verify` method. If you've used DIDs you need to pass a `resolver` for them. You can also use the booleans `compactProof` (to compact the JSON-LD) and `forceRevocationCheck` (to force revocation check). Please beware that setting `forceRevocationCheck` to false can allow false positives when verifying revocable credentials.
-If revocation checks are enabled, you can pass a `revocationAPI` param that accepts an object describing the API to use for this check. No params are required for the simplest cases:
+If your credential has uses the `status` field, you can pass a `revocationAPI` param that accepts an object describing the API to use for the revocation check. No params are required for the simplest cases:
 ```javascript
 >   const result = await vc.verify()
 >   result
@@ -291,7 +291,7 @@ Once done, your `vp` object will have a new `proof` field:
 ### Verifying a Verifiable Presentation
 Once your Verifiable Presentation has been signed you can proceed to verify it with the `verify` method.
 If you've used DIDs you need to pass a `resolver` for them. You can also use the booleans `compactProof` (to compact the JSON-LD) and `forceRevocationCheck` (to force revocation check). Please beware that setting `forceRevocationCheck` to false can allow false positives when verifying revocable credentials.
-If revocation checks are enabled, you can pass a `revocationAPI` param that accepts an object describing the API to use for this check.
+If your credential has uses the `status` field, you can pass a `revocationAPI` param that accepts an object describing the API to use for the revocation check.
 For the simplest cases you only need a `challenge` string and possibly a `domain` string:
 ```javascript
 >   const results = await vp.verify('some_challenge', 'some_domain');

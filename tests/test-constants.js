@@ -15,7 +15,8 @@ const DefaultTestAccountURI = '//Alice';
 function fromEnv(varName, defaultVal) {
   if (varName in process.env) {
     return process.env[varName];
-  } if (defaultVal !== undefined) {
+  }
+  if (defaultVal !== undefined) {
     return defaultVal;
   }
   throw new Error(`Environment variable "${varName}" not defined`);

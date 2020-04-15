@@ -1,8 +1,8 @@
 import { parse } from 'did-resolver';
 
 export default class DIDResolver {
-  constructor() {
-    this.parseDid = parse;
+  parseDid(did) {
+    return parse(did);
   }
 
   async resolve() {

@@ -3,7 +3,7 @@ import DIDResolver from './did-resolver';
 
 export default class DockResolver extends DIDResolver {
   /**
-   * @param {dock} DockAPI - An initialized connection to a dock full-node.
+   * @param {DockAPI} dock - An initialized connection to a dock full-node.
    * @constructor
    */
   constructor(dock) {

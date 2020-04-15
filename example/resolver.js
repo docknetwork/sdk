@@ -44,7 +44,6 @@ class EtherResolver extends DIDResolver {
 
 /**
  * Generate and register a new Dock DID return the DID
- * @param {dock} DockAPI - An initialized connection to a dock full-node.
  * @returns {Promise<string>}
  */
 async function createDockDID() {

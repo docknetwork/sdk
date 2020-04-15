@@ -15,13 +15,13 @@ const DefaultTestAccountURI = '//Alice';
 function fromEnv(varName, defaultVal) {
   if (varName in process.env) {
     return process.env[varName];
-  } else if (defaultVal !== undefined) {
-    return defaultVal;
-  } else {
-    throw new Error(`Environment variable "${varName}" not defined`);
   }
+  if (defaultVal !== undefined) {
+    return defaultVal;
+  }
+  throw new Error(`Environment variable "${varName}" not defined`);
 }
 
 export const FullNodeEndpoint = fromEnv('FullNodeEndpoint', DefaultFullNodeEndpoint);
-export const TestKeyringOpts = {type: fromEnv('TestKeyringType', DefaultTestKeyringType)};
+export const TestKeyringOpts = { type: fromEnv('TestKeyringType', DefaultTestKeyringType) };
 export const TestAccountURI = fromEnv('TestAccountURI', DefaultTestAccountURI);

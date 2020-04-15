@@ -63,6 +63,7 @@ function getProofMatcherDoc() {
     'results': [
       {
         'proof': expect.anything(),
+        'purposeResult': expect.anything(),
         'verified': true
       }
     ],

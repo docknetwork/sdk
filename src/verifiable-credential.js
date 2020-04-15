@@ -1,13 +1,13 @@
 import {
   issueCredential,
-  verifyCredential
+  verifyCredential,
 } from './utils/vc';
 import {
   ensureObjectWithId,
   ensureObjectWithKeyOrURI,
   ensureString,
   ensureURI,
-  ensureValidDatetime
+  ensureValidDatetime,
 } from './utils/type-helpers';
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
@@ -71,7 +71,7 @@ class VerifiableCredential {
    */
   setStatus(status) {
     ensureObjectWithId(status, 'credentialStatus');
-    if(!status.type){
+    if (!status.type) {
       throw new Error('"credentialStatus" must include a type.');
     }
     this.status = status;
@@ -105,17 +105,19 @@ class VerifiableCredential {
    * @returns {any}
    */
   toJSON() {
-    const {context, subject, status, ...rest} = this;
+    const {
+      context, subject, status, ...rest
+    } = this;
     const credJson = {
       '@context': context,
-      'credentialSubject': subject
+      credentialSubject: subject,
     };
     if (status) {
-      credJson['credentialStatus'] = status;
+      credJson.credentialStatus = status;
     }
     return {
       ...credJson,
-      ...rest
+      ...rest,
     };
   }
 
@@ -126,13 +128,13 @@ class VerifiableCredential {
    * @returns {Promise<{object}>}
    */
   async sign(keyDoc, compactProof = true) {
-    let signed_vc = await issueCredential(
+    const signedVC = await issueCredential(
       keyDoc,
       this.toJSON(),
-      compactProof
+      compactProof,
     );
-    this.proof = signed_vc.proof;
-    this.issuer = signed_vc.issuer;
+    this.proof = signedVC.proof;
+    this.issuer = signedVC.issuer;
     return this;
   }
 
@@ -151,9 +153,8 @@ class VerifiableCredential {
     if (!this.proof) {
       throw new Error('The current Verifiable Credential has no proof.');
     }
-    return await verifyCredential(this.toJSON(), resolver, compactProof, forceRevocationCheck, revocationAPI);
+    return verifyCredential(this.toJSON(), resolver, compactProof, forceRevocationCheck, revocationAPI);
   }
-
 }
 
 export default VerifiableCredential;

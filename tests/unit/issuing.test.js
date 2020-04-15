@@ -82,7 +82,7 @@ function getSampleKey() {
 const vpId = 'https://example.com/credentials/12345';
 const vpHolder = 'https://example.com/credentials/1234567890';
 const presentationCredentials = [getSampleCredential(true), getSampleCredential(true)];
-
+const sampleId = 'http://example.edu/credentials/2803';
 const fakeContext = {
   '@context': {
     '@protected': true,
@@ -176,32 +176,32 @@ describe('Verifiable Presentation creation', () => {
 
 describe('Verifiable Credential incremental creation', () => {
   test('VC creation with only id should be possible, yet bring default values', async () => {
-    let credential = new VerifiableCredential('blabla');
-    expect(credential.id).toBe('blabla');
+    let credential = new VerifiableCredential(sampleId);
+    expect(credential.id).toBe(sampleId);
     expect(credential.context).toEqual(['https://www.w3.org/2018/credentials/v1']);
     expect(credential.type).toEqual(['VerifiableCredential']);
     expect(credential.issuanceDate).toEqual(expect.anything());
   });
 
   test('VC creation with an object context should be possible', async () => {
-    let credential = new VerifiableCredential('blabla');
+    let credential = new VerifiableCredential(sampleId);
     credential.addContext(fakeContext);
     expect(credential.context).toEqual(['https://www.w3.org/2018/credentials/v1', fakeContext]);
   });
 
   test('JSON representation of a VC should bring the proper keys', async () => {
-    let credential = new VerifiableCredential('blabla');
+    let credential = new VerifiableCredential(sampleId);
     const credentialJSON = credential.toJSON();
     expect(credentialJSON['@context']).toContain('https://www.w3.org/2018/credentials/v1');
-    expect(credentialJSON.id).toBe('blabla');
+    expect(credentialJSON.id).toBe(sampleId);
     expect(credentialJSON.credentialSubject).toEqual([]);
     expect(credentialJSON.type).toEqual(['VerifiableCredential']);
     expect(credentialJSON.issuanceDate).toBeDefined();
   });
 
   test('Incremental VC creation should be possible', async () => {
-    let credential = new VerifiableCredential('blabla');
-    expect(credential.id).toBe('blabla');
+    let credential = new VerifiableCredential(sampleId);
+    expect(credential.id).toBe(sampleId);
 
     credential.addContext('https://www.w3.org/2018/credentials/examples/v1');
     expect(credential.context).toEqual([
@@ -228,7 +228,7 @@ describe('Verifiable Credential incremental creation', () => {
       new VerifiableCredential({key: 'value'});
     }).toThrowError('needs to be a string.');
 
-    let credential = new VerifiableCredential('blabla');
+    let credential = new VerifiableCredential(sampleId);
     expect(() => {
       credential.addContext(123);
     }).toThrowError('needs to be a string.');
@@ -274,31 +274,31 @@ describe('Verifiable Credential incremental creation', () => {
 
 describe('Verifiable Presentation incremental creation', () => {
   test('VP creation with only id should be possible, yet bring default values', async () => {
-    let vp = new VerifiablePresentation('blabla');
-    expect(vp.id).toBe('blabla');
+    let vp = new VerifiablePresentation(sampleId);
+    expect(vp.id).toBe(sampleId);
     expect(vp.context).toEqual(['https://www.w3.org/2018/credentials/v1']);
     expect(vp.type).toEqual(['VerifiablePresentation']);
     expect(vp.credentials).toEqual([]);
   });
 
   test('VP creation with an object context should be possible', async () => {
-    let vp = new VerifiablePresentation('blabla');
+    let vp = new VerifiablePresentation(sampleId);
     vp.addContext(fakeContext);
     expect(vp.context).toEqual(['https://www.w3.org/2018/credentials/v1', fakeContext]);
   });
 
   test('The JSON representation of a VP should bring the proper keys', async () => {
-    let vp = new VerifiablePresentation('blabla');
+    let vp = new VerifiablePresentation(sampleId);
     const vpJSON = vp.toJSON();
     expect(vpJSON['@context']).toContain('https://www.w3.org/2018/credentials/v1');
-    expect(vpJSON.id).toBe('blabla');
+    expect(vpJSON.id).toBe(sampleId);
     expect(vpJSON.type).toEqual(['VerifiablePresentation']);
     expect(vpJSON.verifiableCredential).toEqual([]);
   });
 
   test('Incremental VP creation should be possible', async () => {
-    let vp = new VerifiablePresentation('blabla');
-    expect(vp.id).toBe('blabla');
+    let vp = new VerifiablePresentation(sampleId);
+    expect(vp.id).toBe(sampleId);
 
     vp.addContext('https://www.w3.org/2018/credentials/examples/v1');
     expect(vp.context).toEqual([
@@ -319,7 +319,7 @@ describe('Verifiable Presentation incremental creation', () => {
       new VerifiablePresentation({key: 'value'});
     }).toThrowError('needs to be a string.');
 
-    let vp = new VerifiablePresentation('blabla');
+    let vp = new VerifiablePresentation(sampleId);
     expect(() => {
       vp.addContext(123);
     }).toThrowError('needs to be a string.');

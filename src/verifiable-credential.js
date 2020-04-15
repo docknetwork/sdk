@@ -2,7 +2,13 @@ import {
   issueCredential,
   verifyCredential
 } from './utils/vc';
-import {ensureObjectWithId, ensureObjectWithKeyOrURI, ensureString, ensureValidDatetime} from './utils/type-helpers';
+import {
+  ensureObjectWithId,
+  ensureObjectWithKeyOrURI,
+  ensureString,
+  ensureURI,
+  ensureValidDatetime
+} from './utils/type-helpers';
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiableCredential';
@@ -16,7 +22,7 @@ class VerifiableCredential {
    * @param {string} id - id of the credential
    */
   constructor(id) {
-    ensureString(id);
+    ensureURI(id);
     this.id = id;
 
     this.context = [DEFAULT_CONTEXT];

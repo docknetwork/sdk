@@ -45,7 +45,7 @@ Once the credential is initialized, you can sequentially call the different meth
 ### Building a Verifiable Credential
 The first step to build a Verifiable Credential is to initialize it, we can do that using the `VerifiableCredential` class constructor which takes a `credentialId` as sole argument:
 ```javascript
-    let vc = new VerifiableCredential('someIdForYourCredential');
+let vc = new VerifiableCredential('http://example.edu/credentials/2803');
 ```
 You now have an unsigned Verifiable Credential in the `vc` variable!
 This Credential isn't signed since we only just initialized it. It brings however some useful defaults to make your life easier.
@@ -71,7 +71,7 @@ This can be achieved by calling the `toJSON()` method on it:
 <-   {
        "@context": [ "https://www.w3.org/2018/credentials/v1" ],
        "credentialSubject": [],
-       "id": "someIdForYourCredential",
+       "id": "http://example.edu/credentials/2803",
        "type": [
          "VerifiableCredential"
        ],
@@ -196,7 +196,7 @@ Once the presentation is initialized, you can sequentially call the different me
 ### Building a Verifiable Presentation
 The first step to build a Verifiable Presentation is to initialize it, we can do that using the `VerifiablePresentation` class constructor which takes an `id` as sole argument:
 ```javascript
-    let vp = new VerifiablePresentation('someIdForYourPresentation');
+let vp = new VerifiablePresentation('http://example.edu/credentials/1986');
 ```
 You now have an unsigned Verifiable Presentation in the `vp` variable!
 This Presentation isn't signed since we only just initialized it. It brings however some useful defaults to make your life easier.
@@ -218,7 +218,7 @@ This can be achieved by calling the `toJSON()` method on it:
 >    vp.toJSON()
 <-   {
        "@context": [ "https://www.w3.org/2018/credentials/v1" ],
-       "id": "someIdForYourPresentation",
+       "id": "http://example.edu/credentials/1986",
        "type": [
          "VerifiablePresentation"
        ],

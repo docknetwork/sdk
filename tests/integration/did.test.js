@@ -1,14 +1,14 @@
-import {randomAsHex} from '@polkadot/util-crypto';
+import { randomAsHex } from '@polkadot/util-crypto';
 
-import {DockAPI} from '../../src/api';
+import { DockAPI } from '../../src/api';
 
 import {
   createNewDockDID,
-  createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval
+  createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval,
 } from '../../src/utils/did';
-import {FullNodeEndpoint, TestKeyringOpts, TestAccountURI} from '../test-constants';
-import {getPublicKeyFromKeyringPair} from '../../src/utils/misc';
-import {PublicKeyEd25519} from '../../src/public-keys';
+import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
+import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
+import { PublicKeyEd25519 } from '../../src/public-keys';
 
 describe('DID Module', () => {
   const dock = new DockAPI();

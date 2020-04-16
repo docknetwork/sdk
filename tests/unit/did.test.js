@@ -1,4 +1,4 @@
-import {randomAsHex, encodeAddress} from '@polkadot/util-crypto';
+import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
 
 import {
   validateDockDIDHexIdentifier,

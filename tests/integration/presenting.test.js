@@ -1,22 +1,22 @@
-import {randomAsHex} from '@polkadot/util-crypto';
+import { randomAsHex } from '@polkadot/util-crypto';
 
 import {
-  createNewDockDID
+  createNewDockDID,
 } from '../../src/utils/did';
 
-import {DockAPI} from '../../src/api';
-import {DockResolver} from '../../src/resolver';
+import { DockAPI } from '../../src/api';
+import { DockResolver } from '../../src/resolver';
 
-import {FullNodeEndpoint, TestKeyringOpts, TestAccountURI} from '../test-constants';
-import {getUnsignedCred, registerNewDIDUsingPair} from './helpers';
-import {generateEcdsaSecp256k1Keypair} from '../../src/utils/misc';
-import {getKeyDoc} from '../../src/utils/vc/helpers';
+import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
+import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
+import { generateEcdsaSecp256k1Keypair } from '../../src/utils/misc';
+import getKeyDoc from '../../src/utils/vc/helpers';
 import {
   createPresentation,
   issueCredential,
   isVerifiedCredential,
   signPresentation,
-  verifyPresentation
+  verifyPresentation,
 } from '../../src/utils/vc';
 
 // Issuer's DID.
@@ -122,17 +122,17 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       const domain = 'test domain';
       const presentation = createPresentation(
         cred,
-        presId
+        presId,
       );
 
       expect(presentation).toMatchObject(
         expect.objectContaining(
           {
-            type: [ 'VerifiablePresentation' ],
+            type: ['VerifiablePresentation'],
             verifiableCredential: [cred],
             id: presId,
-          }
-        )
+          },
+        ),
       );
 
       const signedPres = await signPresentation(
@@ -146,31 +146,30 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       expect(signedPres).toMatchObject(
         expect.objectContaining(
           {
-            type: [ 'VerifiablePresentation' ],
+            type: ['VerifiablePresentation'],
             verifiableCredential: [cred],
             id: presId,
             proof: expect.objectContaining({
               type: sigType,
               challenge: chal,
-              domain: domain,
+              domain,
               proofPurpose: 'authentication',
-            })
-          }
-        )
+            }),
+          },
+        ),
       );
 
       const result = await verifyPresentation(
         signedPres,
         chal,
         domain,
-        resolver
+        resolver,
       );
 
       expect(result.verified).toBe(true);
       expect(result.presentationResult.verified).toBe(true);
       expect(result.credentialResults.length).toBe(1);
       expect(result.credentialResults[0].verified).toBe(true);
-
     }
   }, 70000);
 
@@ -188,17 +187,17 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
 
     const presentation = createPresentation(
       [cred3, cred4],
-      presId
+      presId,
     );
 
     expect(presentation).toMatchObject(
       expect.objectContaining(
         {
-          type: [ 'VerifiablePresentation' ],
+          type: ['VerifiablePresentation'],
           verifiableCredential: [cred3, cred4],
           id: presId,
-        }
-      )
+        },
+      ),
     );
 
     const signedPres = await signPresentation(
@@ -212,24 +211,24 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     expect(signedPres).toMatchObject(
       expect.objectContaining(
         {
-          type: [ 'VerifiablePresentation' ],
+          type: ['VerifiablePresentation'],
           verifiableCredential: [cred3, cred4],
           id: presId,
           proof: expect.objectContaining({
             type: 'Sr25519Signature2020',
             challenge: chal,
-            domain: domain,
+            domain,
             proofPurpose: 'authentication',
-          })
-        }
-      )
+          }),
+        },
+      ),
     );
 
     const result = await verifyPresentation(
       signedPres,
       chal,
       domain,
-      resolver
+      resolver,
     );
 
     // Verifier checks that both credential and presentation are correct.
@@ -238,7 +237,5 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     expect(result.credentialResults.length).toBe(2);
     expect(result.credentialResults[0].verified).toBe(true);
     expect(result.credentialResults[1].verified).toBe(true);
-
   }, 60000);
-
 });

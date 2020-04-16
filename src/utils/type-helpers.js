@@ -39,12 +39,15 @@ export function ensureObject(value) {
 }
 
 /**
- * Fail if the given value isn't an object with id property
- * @param value
- * @param {string} name - Name of the object. Used in constructing error.
+ * Fail if the given string isn't a URI
+ * @param uri
  */
-export function ensureObjectWithId(value, name) {
-  ensureObjectWithKey(value, 'id', name);
+export function ensureURI(uri) {
+  ensureString(uri);
+  const pattern = new RegExp('^\\w+:\\/?\\/?[^\\s]+$');
+  if (!pattern.test(uri)) {
+    throw new Error(`${uri} needs to be a valid URI.`);
+  }
 }
 
 /**
@@ -58,6 +61,15 @@ export function ensureObjectWithKey(value, key, name) {
   if (!(key in value)) {
     throw new Error(`"${name}" must include the '${key}' property.`);
   }
+}
+
+/**
+ * Fail if the given value isn't an object with id property
+ * @param value
+ * @param {string} name - Name of the object. Used in constructing error.
+ */
+export function ensureObjectWithId(value, name) {
+  ensureObjectWithKey(value, 'id', name);
 }
 
 /**
@@ -79,17 +91,5 @@ export function ensureObjectWithKeyOrURI(value, key, name) {
     ensureURI(value);
   } else {
     ensureObjectWithKey(value, key, name);
-  }
-}
-
-/**
- * Fail if the given string isn't a URI
- * @param uri
- */
-export function ensureURI(uri) {
-  ensureString(uri);
-  var pattern = new RegExp('^\\w+:\\/?\\/?[^\\s]+$');
-  if (!pattern.test(uri)) {
-    throw new Error(`${uri} needs to be a valid URI.`);
   }
 }

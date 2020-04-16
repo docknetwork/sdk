@@ -32,7 +32,7 @@
     "rollup-plugin-node-resolve": "4.0.1"
   },
   "scripts": {
-    "lint": "eslint \"{src,tests,example}/**.js\"",
+    "lint": "eslint \"{src,example}/**/*.js\"",
     "prepare": "yarn build",
     "build": "rollup -c",
     "watch": "rollup -c -w",
@@ -59,12 +59,13 @@
     "@polkadot/util-crypto": "2.8.1",
     "axios": "^0.19.2",
     "bs58": "^4.0.1",
+    "credentials-context": "^1.0.0",
     "did-resolver": "^1.1.0",
     "ecdsa-secp256k1-signature-2019": "^1.0.0",
     "elliptic": "^6.5.2",
     "ethr-did-resolver": "^2.2.0",
-    "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures#avoid-extendContextLoader",
     "js-sha256": "^0.9.0",
+    "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures#avoid-extendContextLoader",
     "vc-js": "https://github.com/docknetwork/vc-js#avoid-extendContextLoader"
   }
 }

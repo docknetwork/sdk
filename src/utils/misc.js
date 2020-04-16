@@ -1,7 +1,7 @@
-import {ec as EC} from 'elliptic';
+import { ec as EC } from 'elliptic';
 
-import {PublicKeyEd25519, PublicKeySecp256k1, PublicKeySr25519} from '../public-keys';
-import {SignatureEd25519, SignatureSecp256k1, SignatureSr25519} from '../signatures';
+import { PublicKeyEd25519, PublicKeySecp256k1, PublicKeySr25519 } from '../public-keys';
+import { SignatureEd25519, SignatureSecp256k1, SignatureSr25519 } from '../signatures';
 
 const secp256k1Curve = new EC('secp256k1');
 
@@ -29,7 +29,7 @@ export function getStateChange(api, name, value) {
  * @returns {Keypair} A keypair
  */
 export function generateEcdsaSecp256k1Keypair(pers, entropy) {
-  return secp256k1Curve.genKeyPair({pers, entropy});
+  return secp256k1Curve.genKeyPair({ pers, entropy });
 }
 
 /**
@@ -61,12 +61,12 @@ export function getKeyPairType(pair) {
   if (pair.type && (pair.type === 'ed25519' || pair.type === 'sr25519')) {
     // Polkadot-js keyring has type field with value either 'ed25519' or 'sr25519'
     return pair.type;
-  } else if (pair.ec && pair.priv) {
+  }
+  if (pair.ec && pair.priv) {
     // elliptic library's pair has `ec`, `priv` and `pub`. There is not a cleaner way to detect that
     return 'secp256k1';
-  } else {
-    throw new Error('Only ed25519, sr25519 and secp256k1 keys supported as of now');
   }
+  throw new Error('Only ed25519, sr25519 and secp256k1 keys supported as of now');
 }
 
 /**
@@ -76,15 +76,15 @@ export function getKeyPairType(pair) {
  */
 export function getPublicKeyFromKeyringPair(pair) {
   const type = getKeyPairType(pair);
-  let cls;
+  let Cls;
   if (type === 'ed25519') {
-    cls = PublicKeyEd25519;
+    Cls = PublicKeyEd25519;
   } else if (type === 'sr25519') {
-    cls = PublicKeySr25519;
+    Cls = PublicKeySr25519;
   } else {
-    cls = PublicKeySecp256k1;
+    Cls = PublicKeySecp256k1;
   }
-  return cls.fromKeyringPair(pair);
+  return Cls.fromKeyringPair(pair);
 }
 
 /**
@@ -95,13 +95,13 @@ export function getPublicKeyFromKeyringPair(pair) {
  */
 export function getSignatureFromKeyringPair(pair, message) {
   const type = getKeyPairType(pair);
-  let cls;
+  let Cls;
   if (type === 'ed25519') {
-    cls = SignatureEd25519;
+    Cls = SignatureEd25519;
   } else if (type === 'sr25519') {
-    cls = SignatureSr25519;
+    Cls = SignatureSr25519;
   } else {
-    cls = SignatureSecp256k1;
+    Cls = SignatureSecp256k1;
   }
-  return new cls(message, pair);
+  return new Cls(message, pair);
 }

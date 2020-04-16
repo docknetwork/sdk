@@ -1,5 +1,5 @@
-import {DockAPI} from '../../src/api';
-import {FullNodeEndpoint} from '../test-constants';
+import { DockAPI } from '../../src/api';
+import { FullNodeEndpoint } from '../test-constants';
 
 describe('Config on NodeJS environment', () => {
   test('Is running in NodeJS environment', () => {
@@ -12,7 +12,7 @@ describe('Dock API', () => {
 
   test('Can connect to node', async () => {
     await dock.init({
-      address: FullNodeEndpoint
+      address: FullNodeEndpoint,
     });
     expect(!!dock.api).toBe(true);
   });

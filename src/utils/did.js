@@ -1,11 +1,11 @@
 // This file will be turned to a folder and will have files like `did/dock.js` and `did/ethr.js`
 
 // Import some utils from Polkadot JS
-import {u8aToHex} from '@polkadot/util';
-import {randomAsHex, encodeAddress, decodeAddress} from '@polkadot/util-crypto';
+import { u8aToHex } from '@polkadot/util';
+import { randomAsHex, encodeAddress, decodeAddress } from '@polkadot/util-crypto';
 
-import {getSignatureFromKeyringPair} from './misc';
-import {isHexWithGivenByteSize} from './codec';
+import { getSignatureFromKeyringPair } from './misc';
+import { isHexWithGivenByteSize } from './codec';
 
 export const DockDIDMethod = 'dock';
 export const DockDIDQualifier = `did:${DockDIDMethod}:`;
@@ -62,7 +62,7 @@ export function getHexIdentifierFromDID(did) {
     try {
       const hex = u8aToHex(decodeAddress(ss58Did));
       // 2 characters for `0x` and 2*byte size of DID
-      if (hex.length !== (2 + 2*DockDIDByteSize)) {
+      if (hex.length !== (2 + 2 * DockDIDByteSize)) {
         throw new Error('Unexpected byte size');
       }
       return hex;
@@ -102,7 +102,7 @@ export function createNewDockDID() {
 export function createKeyDetail(publicKey, controller) {
   return {
     public_key: publicKey.toJSON(),
-    controller: getHexIdentifierFromDID(controller)
+    controller: getHexIdentifierFromDID(controller),
   };
 }
 
@@ -118,13 +118,11 @@ export function createKeyDetail(publicKey, controller) {
  */
 export async function createKeyUpdate(didModule, did, newPublicKey, newController) {
   const hexId = getHexIdentifierFromDID(did);
-  const last_modified_in_block = await didModule.getBlockNoForLastChangeToDID(hexId);
-
   return {
     did: hexId,
     public_key: newPublicKey.toJSON(),
     controller: getHexIdentifierFromDID(newController),
-    last_modified_in_block,
+    last_modified_in_block: await didModule.getBlockNoForLastChangeToDID(hexId),
   };
 }
 
@@ -164,11 +162,9 @@ export async function createSignedKeyUpdate(didModule, did, newPublicKey, curren
  */
 export async function createDidRemoval(didModule, did) {
   const hexId = getHexIdentifierFromDID(did);
-  const last_modified_in_block = await didModule.getBlockNoForLastChangeToDID(hexId);
-
   return {
     did: hexId,
-    last_modified_in_block,
+    last_modified_in_block: await didModule.getBlockNoForLastChangeToDID(hexId),
   };
 }
 

@@ -14,30 +14,30 @@ export default new Map([
   ...credentialsContext.contexts,
   [
     'https://www.w3.org/2018/credentials/v1',
-    credV1Context
+    credV1Context,
   ],
   [
     'https://www.w3.org/2018/credentials/examples/v1',
-    vcExamplesV1
+    vcExamplesV1,
   ],
   [
     'https://www.w3.org/ns/odrl.jsonld',
-    odrl
+    odrl,
   ],
   [
     'http://schema.org',
-    schema
+    schema,
   ],
   [
     'https://www.dock.io/2020/credentials/context/sr25519',
-    sr25519Context
+    sr25519Context,
   ],
   [
     'https://w3id.org/security/v2',
-    secContext
+    secContext,
   ],
   [
     'https://www.w3.org/ns/did/v1',
-    didV1Context
-  ]
+    didV1Context,
+  ],
 ]);

@@ -1,5 +1,5 @@
-import {createKeyDetail} from '../../src/utils/did';
-import {getPublicKeyFromKeyringPair} from '../../src/utils/misc';
+import { createKeyDetail } from '../../src/utils/did';
+import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 
 /**
  * Registers a new DID on dock chain, keeps the controller same as the DID
@@ -14,7 +14,7 @@ export async function registerNewDIDUsingPair(dockAPI, did, pair) {
   // The controller is same as the DID
   const keyDetail = createKeyDetail(publicKey, did);
   const transaction = dockAPI.did.new(did, keyDetail);
-  return await dockAPI.sendTransaction(transaction);
+  return dockAPI.sendTransaction(transaction);
 }
 
 /**
@@ -34,7 +34,7 @@ export function getUnsignedCred(credId, holderDID) {
     issuanceDate: '2020-03-18T19:23:24Z',
     credentialSubject: {
       id: holderDID,
-      alumniOf: 'Example University'
-    }
+      alumniOf: 'Example University',
+    },
   };
 }

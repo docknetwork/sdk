@@ -1,3 +1,4 @@
+/* eslint import/prefer-default-export: 0 */
 /**
  * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
  * @param {string} value - Hexadecimal value

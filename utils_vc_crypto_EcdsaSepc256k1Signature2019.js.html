@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: signatures/signature-secp256k1.js</title>
+    <title>JSDoc: Source: utils/vc/crypto/EcdsaSepc256k1Signature2019.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: signatures/signature-secp256k1.js</h1>
+    <h1 class="page-title">Source: utils/vc/crypto/EcdsaSepc256k1Signature2019.js</h1>
 
     
 
@@ -26,43 +26,36 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import Signature from './signature';
+            <pre class="prettyprint source linenums"><code>import { suites } from 'jsonld-signatures';
+import { sha256 } from 'js-sha256';
+import { EcdsaSecp256k1SigName, EcdsaSecp256k1VerKeyName } from './constants';
+import EcdsaSecp256k1VerificationKey2019 from './EcdsaSecp256k1VerificationKey2019';
 
-/** Class representing a Secp256k1 Signature */
-export default class SignatureSecp256k1 extends Signature {
-  /**
-   * Generate an Ecdsa signature over Secp256k1 curve using elliptic library
-   * @param {array} message - The message to sign as bytearray
-   * @param {KeyringPair} signingPair -The pair from elliptic containing the signing key
-   */
-  constructor(message, signingPair) {
-    super();
-    // Generate the signature
-    const sig = signingPair.sign(message, { canonical: true });
-
-    // The signature is recoverable in 65-byte { R | S | index } format
-    const r = sig.r.toString('hex', 32);
-    const s = sig.s.toString('hex', 32);
-    const i = sig.recoveryParam.toString(16).padStart(2, '0');
-    // Make it proper hex
-    this.value = `0x${r}${s}${i}`;
+export default class EcdsaSepc256k1Signature2019 extends suites.JwsLinkedDataSignature {
+  constructor({
+    keypair, verificationMethod,
+  } = {}) {
+    super({
+      type: EcdsaSecp256k1SigName,
+      alg: 'ES256K',
+      LDKeyClass: EcdsaSecp256k1VerificationKey2019,
+      verificationMethod,
+      signer: EcdsaSepc256k1Signature2019.signerFactory(keypair),
+    });
+    this.requiredKeyType = EcdsaSecp256k1VerKeyName;
   }
 
   /**
-   * Create SignatureSecp256k1 from given hex string
-   * @param {string} value - Hex string
-   * @returns {Signature}
+   * Generate object with `sign` method
+   * @param keypair
+   * @returns {Promise&lt;sign>}
    */
-  fromHex(value) {
-    return super.fromHex(value, 65);
-  }
-
-  /**
-   * @return {Object} The DidSignature JSON variant Secp256k1.
-   */
-  toJSON() {
+  static signerFactory(keypair) {
     return {
-      Secp256k1: this.value,
+      async sign({ data }) {
+        const hash = sha256.digest(data);
+        return new Uint8Array(keypair.sign(hash).toDER());
+      },
     };
   }
 }

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: signatures/signature-secp256k1.js</title>
+    <title>JSDoc: Source: utils/vc/crypto/Sr25519VerificationKey2020.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: signatures/signature-secp256k1.js</h1>
+    <h1 class="page-title">Source: utils/vc/crypto/Sr25519VerificationKey2020.js</h1>
 
     
 
@@ -26,43 +26,45 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import Signature from './signature';
+            <pre class="prettyprint source linenums"><code>import b58 from 'bs58';
+import { schnorrkelVerify } from '@polkadot/util-crypto/schnorrkel';
+import { Sr25519VerKeyName } from './constants';
 
-/** Class representing a Secp256k1 Signature */
-export default class SignatureSecp256k1 extends Signature {
-  /**
-   * Generate an Ecdsa signature over Secp256k1 curve using elliptic library
-   * @param {array} message - The message to sign as bytearray
-   * @param {KeyringPair} signingPair -The pair from elliptic containing the signing key
-   */
-  constructor(message, signingPair) {
-    super();
-    // Generate the signature
-    const sig = signingPair.sign(message, { canonical: true });
-
-    // The signature is recoverable in 65-byte { R | S | index } format
-    const r = sig.r.toString('hex', 32);
-    const s = sig.s.toString('hex', 32);
-    const i = sig.recoveryParam.toString(16).padStart(2, '0');
-    // Make it proper hex
-    this.value = `0x${r}${s}${i}`;
+export default class Sr25519VerificationKey2020 {
+  constructor(publicKey) {
+    this.publicKey = [...publicKey];
   }
 
   /**
-   * Create SignatureSecp256k1 from given hex string
-   * @param {string} value - Hex string
-   * @returns {Signature}
+   * Construct the public key object from the verification method
+   * @param verificationMethod
+   * @returns {Sr25519VerificationKey2020}
    */
-  fromHex(value) {
-    return super.fromHex(value, 65);
+  static from(verificationMethod) {
+    if (verificationMethod.type !== Sr25519VerKeyName &amp;&amp; !verificationMethod.publicKeyBase58) {
+      throw new Error('verification method should have type Sr25519VerificationKey2020 and have the base58 public key');
+    }
+    return new this(b58.decode(verificationMethod.publicKeyBase58));
   }
 
   /**
-   * @return {Object} The DidSignature JSON variant Secp256k1.
+   * Construct the verifier factory that has the verify method using the current public key
+   * @returns {Promise&lt;verify>}
    */
-  toJSON() {
+  verifier() {
+    return Sr25519VerificationKey2020.verifierFactory(this.publicKey);
+  }
+
+  /**
+   * Verifier factory that returns the object with the verify method
+   * @param publicKey
+   * @returns {Promise&lt;verify>}
+   */
+  static verifierFactory(publicKey) {
     return {
-      Secp256k1: this.value,
+      async verify({ data, signature }) {
+        return schnorrkelVerify(data, signature, publicKey);
+      },
     };
   }
 }

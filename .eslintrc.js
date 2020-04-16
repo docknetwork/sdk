@@ -13,6 +13,7 @@ module.exports = {
     "sourceType": "module"
   },
   "rules": {
+    "no-use-before-define": ["error", { "functions": false, "classes": true, "variables": true }],
     "class-methods-use-this": "off",
     "no-plusplus": "off",
     "max-len": "off"

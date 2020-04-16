@@ -240,16 +240,20 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
   });
 
   if (presVer.verified) {
-    for (const credential of presentation.verifiableCredential) {
+    const credentials = presentation.verifiableCredential;
+    for (let i = 0; i < credentials.length; i++) {
+      const credential = credentials[i];
       // Check for revocation only if the presentation is verified and revocation check is needed.
       if (isRevocationCheckNeeded(credential.credentialStatus, forceRevocationCheck, revocationAPI)) {
         const res = checkRevocationStatus(credential, revocationAPI);
+
         // Return error for the first credential that does not pass revocation check.
         if (!res.verified) {
           return res;
         }
       }
     }
+
     // If all credentials pass the revocation check, the let the result of presentation verification be returned.
   }
   return presVer;

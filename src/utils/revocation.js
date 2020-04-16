@@ -1,7 +1,7 @@
 import {
-  getSignatureFromKeyringPair
+  getSignatureFromKeyringPair,
 } from './misc';
-import {getHexIdentifierFromDID} from './did';
+import { getHexIdentifierFromDID } from './did';
 
 // The revocation registry has id with the byte size `RevRegIdByteSize`
 export const RevRegIdByteSize = 32;
@@ -29,7 +29,7 @@ export class OneOfPolicy {
   toJSON() {
     return {
       // Convert each onwer DID to hex identifier if not already
-      OneOf: new Set([...this.controllers].map(getHexIdentifierFromDID))
+      OneOf: new Set([...this.controllers].map(getHexIdentifierFromDID)),
     };
   }
 }
@@ -55,9 +55,9 @@ export class DidKeys {
 
 // Abstraction over a map of DID -> Keyring
 export class KeyringPairDidKeys extends DidKeys {
-  constructor(map) {
+  /* constructor(map) {
     super(map);
-  }
+  } */
 
   /**
    * Create a map of DID -> Signatures. This is used for authentication of the update

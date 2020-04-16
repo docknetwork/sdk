@@ -1,24 +1,21 @@
 import vcjs from 'vc-js';
-import {
-  EcdsaSepc256k1Signature2019,
-  Sr25519Signature2020,
-  Ed25519Signature2018,
-  Sr25519VerKeyName, Ed25519VerKeyName, EcdsaSecp256k1VerKeyName
-} from './vc/custom_crypto';
-import {blake2AsHex} from '@polkadot/util-crypto';
+import { blake2AsHex } from '@polkadot/util-crypto';
 
 import documentLoader from './vc/document-loader';
-import {isHexWithGivenByteSize} from './codec';
-import {RevEntryByteSize, RevRegIdByteSize} from './revocation';
+import { isHexWithGivenByteSize } from './codec';
+import { RevEntryByteSize, RevRegIdByteSize } from './revocation';
+import {
+  EcdsaSecp256k1VerKeyName, Ed25519VerKeyName, Sr25519VerKeyName, EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
+} from './vc/custom_crypto';
 
 // XXX: Does it make sense to have a revocation registry type for Dock like below and eliminate the need for `rev_reg:dock:`?
-//export const RevRegType = 'DockRevocationRegistry2020';
+// export const RevRegType = 'DockRevocationRegistry2020';
 export const RevRegType = 'CredentialStatusList2017';
 export const DockRevRegQualifier = 'rev-reg:dock:';
 
-//const {Ed25519Signature2018} = suites;
+// const {Ed25519Signature2018} = suites;
 
-//TODO: discuss whether we still want to allow usage of the signing functionality outside of credentials created with
+// TODO: discuss whether we still want to allow usage of the signing functionality outside of credentials created with
 // our VerifiableCredential class.
 /**
  * Get signature suite from a keyDoc
@@ -26,21 +23,85 @@ export const DockRevRegQualifier = 'rev-reg:dock:';
  * @returns {EcdsaSepc256k1Signature2019|Ed25519Signature2018|Sr25519Signature2020} - signature suite.
  */
 export function getSuiteFromKeyDoc(keyDoc) {
-  let cls;
-  switch(keyDoc.type) {
-  case EcdsaSecp256k1VerKeyName:
-    cls = EcdsaSepc256k1Signature2019;
-    break;
-  case Ed25519VerKeyName:
-    cls = Ed25519Signature2018;
-    break;
-  case Sr25519VerKeyName:
-    cls = Sr25519Signature2020;
-    break;
-  default:
-    throw new Error(`Unknown key type ${keyDoc.type}.`);
+  let Cls;
+  switch (keyDoc.type) {
+    case EcdsaSecp256k1VerKeyName:
+      Cls = EcdsaSepc256k1Signature2019;
+      break;
+    case Ed25519VerKeyName:
+      Cls = Ed25519Signature2018;
+      break;
+    case Sr25519VerKeyName:
+      Cls = Sr25519Signature2020;
+      break;
+    default:
+      throw new Error(`Unknown key type ${keyDoc.type}.`);
   }
-  return new cls({keypair: keyDoc.keypair, publicKey: keyDoc.publicKey, verificationMethod: keyDoc.id});
+  return new Cls({ keypair: keyDoc.keypair, publicKey: keyDoc.publicKey, verificationMethod: keyDoc.id });
+}
+
+/**
+ * Check if credential has Dock specific revocation
+ * @param credential
+ * @returns {Boolean}
+ */
+export function hasDockRevocation(credential) {
+  return credential.credentialStatus
+    && (credential.credentialStatus.type === RevRegType)
+    && credential.credentialStatus.id.startsWith(DockRevRegQualifier)
+    && isHexWithGivenByteSize(credential.credentialStatus.id.slice(DockRevRegQualifier.length), RevRegIdByteSize);
+}
+
+/**
+ * Checks if the revocation check is needed. Will return true if `forceRevocationCheck` is true else will check the
+ * truthyness of revocationAPI. Will return true even if revocationAPI is an empty object.
+ * @param {object} credStatus - The `credentialStatus` field in a credential. Does not care about the correct
+ * structure of this field but only the truthyness of this field. The intention is to check whether the credential h
+ * had a `credentialStatus` field.
+ * @param {boolean} forceRevocationCheck - Whether to force the revocation check.
+ * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
+ * @param {object} revocationAPI - See above verification methods for details on this parameter
+ * @returns {boolean} - Whether to check for revocation or not.
+ */
+export function isRevocationCheckNeeded(credStatus, forceRevocationCheck, revocationAPI) {
+  return !!credStatus && (forceRevocationCheck || !!revocationAPI);
+}
+
+/**
+ * Generate the revocation id of a credential usable by Dock. It hashes the credential id to get the
+ * revocation id
+ * @param credential
+ * @returns {*}
+ */
+export function getDockRevIdFromCredential(credential) {
+  // The hash outputs the same number of bytes as required by Dock
+  return blake2AsHex(credential.id, RevEntryByteSize * 8);
+}
+
+/**
+ * Check if the credential is revoked or not.
+ * @param credential
+ * @param revocationAPI
+ * @returns {Promise<{verified: boolean}|{verified: boolean, error: string}>} The returned object will have a key `verified`
+ * which is true if the credential is not revoked and false otherwise. The `error` will describe the error if any.
+ */
+export async function checkRevocationStatus(credential, revocationAPI) {
+  if (!revocationAPI.dock) {
+    throw new Error('Only Dock revocation support is present as of now.');
+  } else {
+    if (!hasDockRevocation(credential)) {
+      return { verified: false, error: 'The credential status does not have the format required by Dock' };
+    }
+    const dockAPI = revocationAPI.dock;
+    const regId = credential.credentialStatus.id.slice(DockRevRegQualifier.length);
+    // Hash credential id to get revocation id
+    const revId = getDockRevIdFromCredential(credential);
+    const revocationStatus = await dockAPI.revocation.getIsRevoked(regId, revId);
+    if (revocationStatus) {
+      return { verified: false, error: 'Revocation check failed' };
+    }
+    return { verified: true };
+  }
 }
 
 /**
@@ -53,13 +114,13 @@ export function getSuiteFromKeyDoc(keyDoc) {
 export async function issueCredential(keyDoc, credential, compactProof = true) {
   const suite = getSuiteFromKeyDoc(keyDoc);
   // The following code (including `issue` method) will modify the passed credential so clone it.
-  const cred = {...credential};
+  const cred = { ...credential };
   cred.issuer = keyDoc.controller;
-  return await vcjs.issue({
+  return vcjs.issue({
     suite,
     credential: cred,
     documentLoader: documentLoader(),
-    compactProof
+    compactProof,
   });
 }
 
@@ -81,7 +142,7 @@ export async function verifyCredential(credential, resolver, compactProof = true
     credential,
     suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
     documentLoader: documentLoader(resolver),
-    compactProof
+    compactProof,
   });
 
   // Check for revocation only if the credential is verified and revocation check is needed.
@@ -124,7 +185,7 @@ export function createPresentation(verifiableCredential, id, holder) {
   return vcjs.createPresentation({
     verifiableCredential,
     id,
-    holder
+    holder,
   });
 }
 
@@ -141,13 +202,13 @@ export function createPresentation(verifiableCredential, id, holder) {
 export async function signPresentation(presentation, keyDoc, challenge, domain, resolver, compactProof = true) {
   // TODO: support other purposes than the default of "authentication"
   const suite = getSuiteFromKeyDoc(keyDoc);
-  return await vcjs.signPresentation({
+  return vcjs.signPresentation({
     presentation,
     suite,
     domain,
     challenge,
     compactProof,
-    documentLoader: documentLoader(resolver)
+    documentLoader: documentLoader(resolver),
   });
 }
 
@@ -175,11 +236,11 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
     challenge,
     domain,
     documentLoader: documentLoader(resolver),
-    compactProof
+    compactProof,
   });
 
   if (presVer.verified) {
-    for (let credential of presentation.verifiableCredential) {
+    for (const credential of presentation.verifiableCredential) {
       // Check for revocation only if the presentation is verified and revocation check is needed.
       if (isRevocationCheckNeeded(credential.credentialStatus, forceRevocationCheck, revocationAPI)) {
         const res = checkRevocationStatus(credential, revocationAPI);
@@ -218,77 +279,10 @@ export async function isVerifiedPresentation(presentation, challenge, domain, re
 }
 
 /**
- * Check if the credential is revoked or not.
- * @param credential
- * @param revocationAPI
- * @returns {Promise<{verified: boolean}|{verified: boolean, error: string}>} The returned object will have a key `verified`
- * which is true if the credential is not revoked and false otherwise. The `error` will describe the error if any.
- */
-export async function checkRevocationStatus(credential, revocationAPI) {
-  if (!revocationAPI['dock']) {
-    throw new Error('Only Dock revocation support is present as of now.');
-  } else {
-    if (!hasDockRevocation(credential)) {
-      return {verified: false, error: 'The credential status does not have the format required by Dock'};
-    }
-    const dockAPI = revocationAPI['dock'];
-    const regId = credential.credentialStatus.id.slice(DockRevRegQualifier.length);
-    // Hash credential id to get revocation id
-    const revId = getDockRevIdFromCredential(credential);
-    const revocationStatus = await dockAPI.revocation.getIsRevoked(regId, revId);
-    if (revocationStatus) {
-      return {verified: false, error: 'Revocation check failed'};
-    } else {
-      return {verified: true};
-    }
-  }
-}
-
-/**
  * Return `credentialStatus` according to W3C spec when the revocation status is checked on Dock
  * @param registryId - Revocation registry id
  * @returns {{id: string, type: string}}
  */
 export function buildDockCredentialStatus(registryId) {
-  return {id: `${DockRevRegQualifier}${registryId}`, type: RevRegType};
+  return { id: `${DockRevRegQualifier}${registryId}`, type: RevRegType };
 }
-
-/**
- * Generate the revocation id of a credential usable by Dock. It hashes the credential id to get the
- * revocation id
- * @param credential
- * @returns {*}
- */
-export function getDockRevIdFromCredential(credential) {
-  // The hash outputs the same number of bytes as required by Dock
-  return blake2AsHex(credential.id, RevEntryByteSize * 8);
-}
-
-/**
- * Check if credential has Dock specific revocation
- * @param credential
- * @returns {Boolean}
- */
-export function hasDockRevocation(credential) {
-  return credential.credentialStatus &&
-    (credential.credentialStatus.type === RevRegType) &&
-    credential.credentialStatus.id.startsWith(DockRevRegQualifier) &&
-    isHexWithGivenByteSize(credential.credentialStatus.id.slice(DockRevRegQualifier.length), RevRegIdByteSize);
-}
-
-/**
- * Checks if the revocation check is needed. Will return true if `forceRevocationCheck` is true else will check the
- * truthyness of revocationAPI. Will return true even if revocationAPI is an empty object.
- * @param {object} credStatus - The `credentialStatus` field in a credential. Does not care about the correct
- * structure of this field but only the truthyness of this field. The intention is to check whether the credential h
- * had a `credentialStatus` field.
- * @param {boolean} forceRevocationCheck - Whether to force the revocation check.
- * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
- * @param {object} revocationAPI - See above verification methods for details on this parameter
- * @returns {boolean} - Whether to check for revocation or not.
- */
-export function isRevocationCheckNeeded(credStatus, forceRevocationCheck, revocationAPI) {
-  return !!credStatus && (forceRevocationCheck || !!revocationAPI);
-}
-
-

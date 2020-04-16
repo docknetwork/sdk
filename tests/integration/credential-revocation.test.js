@@ -1,32 +1,32 @@
-import {randomAsHex} from '@polkadot/util-crypto';
+import { randomAsHex } from '@polkadot/util-crypto';
 
-import {FullNodeEndpoint, TestKeyringOpts, TestAccountURI} from '../test-constants';
-import {DockAPI} from '../../src/api';
+import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
+import { DockAPI } from '../../src/api';
 import {
   createPresentation,
   DockRevRegQualifier, getDockRevIdFromCredential, issueCredential,
   RevRegType,
   signPresentation, verifyCredential,
-  verifyPresentation
+  verifyPresentation,
 } from '../../src/utils/vc';
-import {DockResolver} from '../../src/resolver';
+import { DockResolver } from '../../src/resolver';
 
 import {
-  KeyringPairDidKeys, OneOfPolicy
+  KeyringPairDidKeys, OneOfPolicy,
 } from '../../src/utils/revocation';
 import {
   getUnsignedCred,
-  registerNewDIDUsingPair
+  registerNewDIDUsingPair,
 } from './helpers';
-import {getKeyDoc} from '../../src/utils/vc/helpers';
-import {createNewDockDID} from '../../src/utils/did';
+import getKeyDoc from '../../src/utils/vc/helpers';
+import { createNewDockDID } from '../../src/utils/did';
 
 const credId = 'A large credential id with size > 32 bytes';
 
 function addRevRegIdToCred(cred, regId) {
   cred.credentialStatus = {
     id: `${DockRevRegQualifier}${regId}`,
-    type: RevRegType
+    type: RevRegType,
   };
 }
 
@@ -97,7 +97,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
   test('Issuer can issue a revocable credential and holder can verify it successfully when it is not revoked else the verification fails', async () => {
     // The credential verification should pass as the credential has not been revoked.
-    const result = await verifyCredential(credential, resolver, true, true, {'dock': dockAPI});
+    const result = await verifyCredential(credential, resolver, true, true, { dock: dockAPI });
     expect(result.verified).toBe(true);
 
     // Revoke the credential
@@ -106,10 +106,9 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     await dockAPI.sendTransaction(t1);
 
     // The credential verification should fail as the credential has been revoked.
-    const result1 = await verifyCredential(credential, resolver, true, true, {'dock': dockAPI});
+    const result1 = await verifyCredential(credential, resolver, true, true, { dock: dockAPI });
     expect(result1.verified).toBe(false);
     expect(result1.error).toBe('Revocation check failed');
-
   }, 40000);
 
   test('Holder can create a presentation and verifier can verify it successfully when it is not revoked else the verification fails', async () => {
@@ -127,7 +126,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     const domain = 'test domain';
     const presentation = createPresentation(
       credential,
-      presId
+      presId,
     );
     const signedPres = await signPresentation(
       presentation,
@@ -145,7 +144,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
       resolver,
       true,
       false,
-      {'dock': dockAPI}
+      { dock: dockAPI },
     );
     expect(result.verified).toBe(true);
 
@@ -161,9 +160,8 @@ describe('Credential revocation with issuer as the revocation authority', () => 
       resolver,
       true,
       false,
-      {'dock': dockAPI}
+      { dock: dockAPI },
     );
     expect(result1.verified).toBe(false);
-
   }, 40000);
 });

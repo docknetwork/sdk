@@ -1,9 +1,11 @@
-import {encodeAddress} from '@polkadot/util-crypto';
+import { encodeAddress } from '@polkadot/util-crypto';
 import b58 from 'bs58';
 
-import {getHexIdentifierFromDID, DockDIDQualifier} from '../utils/did';
-import {getStateChange} from '../utils/misc';
-import {NoDIDError, validateDockDIDHexIdentifier} from '../utils/did';
+import {
+  getHexIdentifierFromDID, DockDIDQualifier, NoDIDError, validateDockDIDHexIdentifier,
+} from '../utils/did';
+import { getStateChange } from '../utils/misc';
+
 
 /** Class to create, update and destroy DIDs */
 class DIDModule {
@@ -72,7 +74,8 @@ class DIDModule {
     const id = (did === hexId) ? this.getFullyQualifiedDID(encodeAddress(hexId)) : did;
 
     // Determine the type of the public key
-    let type, publicKeyRaw;
+    let type; let
+      publicKeyRaw;
     if (detail.public_key.isSr25519) {
       type = 'Sr25519VerificationKey2020';
       publicKeyRaw = detail.public_key.asSr25519;
@@ -117,7 +120,7 @@ class DIDModule {
       id,
       authentication,
       assertionMethod,
-      publicKey: publicKeys
+      publicKey: publicKeys,
       // service,
     };
   }
@@ -141,11 +144,10 @@ class DIDModule {
     if (respTuple.length === 2) {
       return [
         respTuple[0],
-        respTuple[1].toNumber()
+        respTuple[1].toNumber(),
       ];
-    } else {
-      throw new Error('Needed 2 items in response but got' + respTuple.length);
     }
+    throw new Error(`Needed 2 items in response but got${respTuple.length}`);
   }
 
   /**

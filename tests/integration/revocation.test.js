@@ -1,14 +1,14 @@
-import {randomAsHex} from '@polkadot/util-crypto';
+import { randomAsHex } from '@polkadot/util-crypto';
 
-import {DockAPI} from '../../src/api';
+import { DockAPI } from '../../src/api';
 
-import {FullNodeEndpoint, TestKeyringOpts, TestAccountURI} from '../test-constants';
+import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 
-import  {
+import {
   OneOfPolicy,
   KeyringPairDidKeys,
 } from '../../src/utils/revocation';
-import {registerNewDIDUsingPair} from './helpers';
+import { registerNewDIDUsingPair } from './helpers';
 
 describe('Revocation Module', () => {
   const dock = new DockAPI();

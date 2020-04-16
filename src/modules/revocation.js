@@ -38,7 +38,7 @@ class RevocationModule {
   removeRegistry(registryID, lastModified, didKeys) {
     const removal = {
       registry_id: registryID,
-      last_modified: lastModified
+      last_modified: lastModified,
     };
 
     const serializedRemoval = this.getSerializedRemoveRegistry(removal);
@@ -58,7 +58,7 @@ class RevocationModule {
     const revoke = {
       registry_id: registryID,
       revoke_ids: revokeIds,
-      last_modified: lastModified
+      last_modified: lastModified,
     };
 
     const serializedRevoke = this.getSerializedRevoke(revoke);
@@ -78,7 +78,7 @@ class RevocationModule {
     const unrevoke = {
       registry_id: registryID,
       revoke_ids: revokeIds,
-      last_modified: lastModified
+      last_modified: lastModified,
     };
 
     const serializedUnrevoke = this.getSerializedUnrevoke(unrevoke);
@@ -106,18 +106,17 @@ class RevocationModule {
   async getRegistryDetail(registryID) {
     const resp = await this.api.query.revoke.registries(registryID);
     if (resp.isNone) {
-      throw new Error('Could not find revocation registry: ' + registryID);
+      throw new Error(`Could not find revocation registry: ${registryID}`);
     }
 
     const respTuple = resp.unwrap();
     if (respTuple.length === 2) {
       return [
         respTuple[0],
-        respTuple[1].toNumber()
+        respTuple[1].toNumber(),
       ];
-    } else {
-      throw new Error('Needed 2 items in response but got' + respTuple.length);
     }
+    throw new Error(`Needed 2 items in response but got${respTuple.length}`);
   }
 
   /**

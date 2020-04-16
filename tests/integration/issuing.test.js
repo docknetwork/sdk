@@ -1,17 +1,17 @@
-import {randomAsHex} from '@polkadot/util-crypto';
+import { randomAsHex } from '@polkadot/util-crypto';
 
 import {
-  createNewDockDID
+  createNewDockDID,
 } from '../../src/utils/did';
 
-import {DockAPI} from '../../src/api';
-import {DockResolver} from '../../src/resolver';
+import { DockAPI } from '../../src/api';
+import { DockResolver } from '../../src/resolver';
 
-import {FullNodeEndpoint, TestKeyringOpts, TestAccountURI} from '../test-constants';
-import {getUnsignedCred, registerNewDIDUsingPair} from './helpers';
-import {generateEcdsaSecp256k1Keypair} from '../../src/utils/misc';
-import {issueCredential, verifyCredential} from '../../src/utils/vc';
-import {getKeyDoc} from '../../src/utils/vc/helpers';
+import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
+import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
+import { generateEcdsaSecp256k1Keypair } from '../../src/utils/misc';
+import { issueCredential, verifyCredential } from '../../src/utils/vc';
+import getKeyDoc from '../../src/utils/vc/helpers';
 
 // 1st issuer's DID.
 const issuer1DID = createNewDockDID();
@@ -48,26 +48,26 @@ function getCredMatcherDoc(cred, issuer, issuerKeyId, sigType) {
     type: cred.type,
     issuanceDate: cred.issuanceDate,
     credentialSubject: cred.credentialSubject,
-    issuer: issuer,
+    issuer,
     proof: expect.objectContaining({
       type: sigType,
       jws: expect.anything(),
       proofPurpose: 'assertionMethod',
-      verificationMethod: issuerKeyId
-    })
+      verificationMethod: issuerKeyId,
+    }),
   };
 }
 
 function getProofMatcherDoc() {
   return {
-    'results': [
+    results: [
       {
-        'proof': expect.anything(),
-        'purposeResult': expect.anything(),
-        'verified': true
-      }
+        proof: expect.anything(),
+        purposeResult: expect.anything(),
+        verified: true,
+      },
     ],
-    'verified': true
+    verified: true,
   };
 }
 
@@ -112,15 +112,15 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
     const credential = await issueCredential(issuerKey, unsignedCred);
     expect(credential).toMatchObject(
       expect.objectContaining(
-        getCredMatcherDoc(unsignedCred, issuer1DID, issuerKey.id, 'Ed25519Signature2018')
-      )
+        getCredMatcherDoc(unsignedCred, issuer1DID, issuerKey.id, 'Ed25519Signature2018'),
+      ),
     );
 
     const result = await verifyCredential(credential, resolver);
     expect(result).toMatchObject(
       expect.objectContaining(
-        getProofMatcherDoc()
-      )
+        getProofMatcherDoc(),
+      ),
     );
   }, 30000);
 
@@ -129,14 +129,14 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
     const credential = await issueCredential(issuerKey, unsignedCred);
     expect(credential).toMatchObject(
       expect.objectContaining(
-        getCredMatcherDoc(unsignedCred, issuer2DID, issuerKey.id, 'EcdsaSecp256k1Signature2019')
-      )
+        getCredMatcherDoc(unsignedCred, issuer2DID, issuerKey.id, 'EcdsaSecp256k1Signature2019'),
+      ),
     );
     const result = await verifyCredential(credential, resolver);
     expect(result).toMatchObject(
       expect.objectContaining(
-        getProofMatcherDoc()
-      )
+        getProofMatcherDoc(),
+      ),
     );
   }, 30000);
 
@@ -146,16 +146,16 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
 
     expect(credential).toMatchObject(
       expect.objectContaining(
-        getCredMatcherDoc(unsignedCred, issuer3DID, issuerKey.id, 'Sr25519Signature2020')
-      )
+        getCredMatcherDoc(unsignedCred, issuer3DID, issuerKey.id, 'Sr25519Signature2020'),
+      ),
     );
 
     const result = await verifyCredential(credential, resolver);
 
     expect(result).toMatchObject(
       expect.objectContaining(
-        getProofMatcherDoc()
-      )
+        getProofMatcherDoc(),
+      ),
     );
   }, 30000);
 });

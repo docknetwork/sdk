@@ -7,8 +7,7 @@ import testContext from './contexts';
  * @param {Resolver} resolver - The resolver is optional but should be passed when DIDs need to be resolved.
  * @returns {function(*=): {documentUrl: *, document: null}}
  */
-export default function(resolver) {
-
+export default function (resolver) {
   /**
    * Resolve a URI. If the URI is a DID, then the resolver is used to resolve it.
    * Else, the hardcoded contexts are used to resolve the URI and if that fails
@@ -24,17 +23,17 @@ export default function(resolver) {
       document = await resolver.resolve(uri);
     } else {
       const context = testContext.get(uri);
-      if(context) {
+      if (context) {
         document = context;
       } else {
-        const {data: doc} = await axios.get(uri);
+        const { data: doc } = await axios.get(uri);
         document = doc;
       }
     }
 
     return {
       documentUrl: uri,
-      document: document
+      document,
     };
   }
 

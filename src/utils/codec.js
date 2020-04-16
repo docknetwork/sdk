@@ -11,11 +11,9 @@ export function isHexWithGivenByteSize(value, byteSize) {
       // If `byteSize` is not a positive integer type, then check will fail
       // 2 hex digits make a byte
       return match[1].length === (2 * byteSize);
-    } else {
-      // Don't care about byte size of the match but it must be full byte
-      return (match[1].length % 2) === 0;
     }
-  } else {
-    return false;
+    // Don't care about byte size of the match but it must be full byte
+    return (match[1].length % 2) === 0;
   }
+  return false;
 }

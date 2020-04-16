@@ -32,7 +32,7 @@
     "rollup-plugin-node-resolve": "4.0.1"
   },
   "scripts": {
-    "lint": "eslint \"{src,tests,example}/**.js\"",
+    "lint": "eslint \"{src,example}/**/*.js\"",
     "prepare": "yarn build",
     "build": "rollup -c",
     "watch": "rollup -c -w",

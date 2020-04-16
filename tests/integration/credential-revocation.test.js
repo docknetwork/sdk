@@ -24,10 +24,12 @@ import { createNewDockDID } from '../../src/utils/did';
 const credId = 'A large credential id with size > 32 bytes';
 
 function addRevRegIdToCred(cred, regId) {
-  cred.credentialStatus = {
+  const newCred = { ...cred };
+  newCred.credentialStatus = {
     id: `${DockRevRegQualifier}${regId}`,
     type: RevRegType,
   };
+  return newCred;
 }
 
 describe('Credential revocation with issuer as the revocation authority', () => {
@@ -80,10 +82,10 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     // Set our owner DID and associated keypair to be used for generating proof
     didKeys.set(issuerDID, pair);
 
-    const unsignedCred = getUnsignedCred(credId, holderDID);
+    let unsignedCred = getUnsignedCred(credId, holderDID);
 
     // Issuer issues the credential with a given registry id for revocation
-    addRevRegIdToCred(unsignedCred, registryId);
+    unsignedCred = addRevRegIdToCred(unsignedCred, registryId);
 
     issuerKey = getKeyDoc(issuerDID, dockAPI.keyring.addFromUri(issuerSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
     credential = await issueCredential(issuerKey, unsignedCred);

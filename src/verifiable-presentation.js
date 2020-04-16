@@ -20,7 +20,7 @@ class VerifiablePresentation {
    * @returns {VerifiablePresentation}
    */
   constructor(id) {
-    ensureString(id);
+    ensureURI(id);
     this.id = id;
 
     this.context = [DEFAULT_CONTEXT];

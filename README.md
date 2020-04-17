@@ -13,7 +13,8 @@ Currently very early in-dev.
 
 ## Documentation
 
-Early documentation available at: https://docknetwork.github.io/client-sdk/
+Early documentation available at: https://docknetwork.github.io/client-sdk/docs/
+Tutorials at: https://docknetwork.github.io/client-sdk/tutorials/
 
 ## Connecting
 

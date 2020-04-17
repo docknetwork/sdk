@@ -1,6 +1,6 @@
 node_modules
 dist
-docs
+out
 npm-debug.log
 yarn-error.log
 package-lock.json

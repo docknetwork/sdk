@@ -1,0 +1,525 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Dock Client Tutorial</title>
+        
+        <meta name="robots" content="noindex" />
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_rdf.html"><strong aria-hidden="true">2.1.</strong> RDF/json-ld</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> VCDM/VP</a></li><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.3.</strong> DID</a></li></ol></li><li class="chapter-item expanded "><a href="tutorial.html"><strong aria-hidden="true">3.</strong> Tutorial</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Dock Client Tutorial</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#introduction" id="introduction">Introduction</a></h1>
+<h1><a class="header" href="#concepts" id="concepts">Concepts</a></h1>
+<h1><a class="header" href="#verifiable-credentials" id="verifiable-credentials">Verifiable Credentials</a></h1>
+<p>Credentials are a part of our daily lives: driver's licenses are used to assert that we are capable of operating a motor vehicle, university degrees can be used to assert our level of education, and government-issued passports enable us to travel between countries. These credentials provide benefits to us when used in the physical world, but their use on the Web continues to be elusive.</p>
+<p>Currently it is difficult to express education qualifications, healthcare data, financial account details, and other sorts of third-party verified machine-readable personal information on the Web. The difficulty of expressing digital credentials on the Web makes it challenging to receive the same benefits through the Web that physical credentials provide us in the physical world.</p>
+<p>The <a href="https://www.w3.org/TR/vc-data-model/">VCDM specification</a> specification provides a standard way to express credentials on the Web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.</p>
+<h1><a class="header" href="#tutorial" id="tutorial">Tutorial</a></h1>
+<h1><a class="header" href="#verifiable-credentials-and-verifiable-presentations-issuing-signing-and-verification" id="verifiable-credentials-and-verifiable-presentations-issuing-signing-and-verification">Verifiable Credentials and Verifiable Presentations: issuing, signing and verification</a></h1>
+<h2><a class="header" href="#todo" id="todo">TODO:</a></h2>
+<ul>
+<li>how should we refer to the sdk in the docs? <code>client-sdk</code> doesn't sound very appealing, maybe we want to give it a name?</li>
+<li>add section about keyDoc creation</li>
+<li>add section about DID integration</li>
+<li>The intro was 99% taken from the VCDM spec. Do we need more than this ?</li>
+<li>which folder should these docs go into? <code>docs</code> is being gitignored so the built ones don't get added by mistake.</li>
+</ul>
+<h2><a class="header" href="#table-of-contents" id="table-of-contents">Table of contents</a></h2>
+<ul>
+<li><a href="tutorial_ipv.html#incremental-creation-and-verification-of-verifiable-credentials">Incremental creation and verification of VC</a>
+<ul>
+<li><a href="tutorial_ipv.html#building-a-verifiable-credential">Building a Verifiable Credential</a>
+<ul>
+<li><a href="tutorial_ipv.html#adding-a-context">Adding a Context</a></li>
+<li><a href="tutorial_ipv.html#adding-a-type">Adding a Type</a></li>
+<li><a href="tutorial_ipv.html#adding-a-subject">Adding a Subject</a></li>
+<li><a href="tutorial_ipv.html#setting-a-status">Setting a Status</a></li>
+<li><a href="tutorial_ipv.html#setting-the-issuance-date">Setting the Issuance Date</a></li>
+<li><a href="tutorial_ipv.html#setting-an-expiration-date">Setting an Expiration Date</a></li>
+</ul>
+</li>
+<li><a href="tutorial_ipv.html#signing-a-verifiable-credential">Signing a Verifiable Credential</a></li>
+<li><a href="tutorial_ipv.html#verifying-a-verifiable-credential">Verifying a Verifiable Credential</a></li>
+</ul>
+</li>
+<li><a href="tutorial_ipv.html#incremental-creation-and-verification-of-verifiable-presentations">Incremental creation and verification of VP</a>
+<ul>
+<li><a href="tutorial_ipv.html#building-a-verifiable-presentation">Building a Verifiable Presentation</a>
+<ul>
+<li><a href="tutorial_ipv.html#adding-a-context">Adding a Context</a></li>
+<li><a href="tutorial_ipv.html#adding-a-type">Adding a Type</a></li>
+<li><a href="tutorial_ipv.html#setting-a-holder">Setting a Holder</a></li>
+<li><a href="tutorial_ipv.html#adding-a-verifiable-credential">Adding a Verifiable Credential</a></li>
+</ul>
+</li>
+<li><a href="tutorial_ipv.html#signing-a-verifiable-presentation">Signing a Verifiable Presentation</a></li>
+<li><a href="tutorial_ipv.html#verifying-a-verifiable-presentation">Verifying a Verifiable Presentation</a></li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2><a class="header" href="#incremental-creation-and-verification-of-verifiable-credentials" id="incremental-creation-and-verification-of-verifiable-credentials">Incremental creation and verification of Verifiable Credentials</a></h2>
+<p>The <code>client-sdk</code> exposes a <code>VerifiableCredential</code> class that is useful to incrementally create valid Verifiable Credentials of any type, sign them and verify them.
+Once the credential is initialized, you can sequentially call the different methods provided by the class to add contexts, types, issuance dates and everything else.</p>
+<h3><a class="header" href="#building-a-verifiable-credential" id="building-a-verifiable-credential">Building a Verifiable Credential</a></h3>
+<p>The first step to build a Verifiable Credential is to initialize it, we can do that using the <code>VerifiableCredential</code> class constructor which takes a <code>credentialId</code> as sole argument:</p>
+<pre><code class="language-javascript">let vc = new VerifiableCredential('http://example.edu/credentials/2803');
+</code></pre>
+<p>You now have an unsigned Verifiable Credential in the <code>vc</code> variable!
+This Credential isn't signed since we only just initialized it. It brings however some useful defaults to make your life easier.</p>
+<pre><code class="language-javascript">&gt;    vc.context
+&lt;-   [&quot;https://www.w3.org/2018/credentials/v1&quot;]
+&gt;    vc.issuanceDate
+&lt;-   &quot;2020-04-14T14:48:48.486Z&quot;
+&gt;    vc.type
+&lt;-   [&quot;VerifiableCredential&quot;]
+&gt;    vc.subject
+&lt;-   []
+</code></pre>
+<p>The default <code>context</code> is an array with <code>&quot;https://www.w3.org/2018/credentials/v1&quot;</code> as first element. This is required by the VCDMv1 specs so having it as default helps ensure your Verifiable Credentials will be valid in the end.
+A similar approach was taken on the <code>type</code> property, where the default is an array with <code>&quot;VerifiableCredential&quot;</code> already populated. This is also required by the specs.
+The <code>subject</code> property is required to exist, so this is already initialized for you as well although it is empty for now.
+Finally the <code>issuanceDate</code> is also set to the moment you initialized the <code>VerifiableCredential</code> object. You can change this later if desired but it helps having it in the right format from the get go.</p>
+<p>We could also have checked those defaults more easily by checking the Verifiable Credential's JSON representation.
+This can be achieved by calling the <code>toJSON()</code> method on it:</p>
+<pre><code class="language-javascript">&gt;    vc.toJSON()
+&lt;-   {
+       &quot;@context&quot;: [ &quot;https://www.w3.org/2018/credentials/v1&quot; ],
+       &quot;credentialSubject&quot;: [],
+       &quot;id&quot;: &quot;http://example.edu/credentials/2803&quot;,
+       &quot;type&quot;: [
+         &quot;VerifiableCredential&quot;
+       ],
+       &quot;issuanceDate&quot;: &quot;2020-04-14T14:48:48.486Z&quot;
+     }
+</code></pre>
+<p>An interesting thing to note here is the transformation happening to some of the root level keys in the JSON representation of a <code>VerifiableCredential</code> object. For example <code>context</code> gets transformed into <code>@context</code> and <code>subject</code> into <code>credentialSubject</code>. This is to ensure compliance with the Verifiable Credential Data Model specs while at the same time providing you with a clean interface to the <code>VerifiableCredential</code> class in your code.</p>
+<p>Once your Verifiable Credential has been initialized, you can proceed to use the rest of the building functions to define it completely before finally signing it.</p>
+<h4><a class="header" href="#adding-a-context" id="adding-a-context">Adding a Context</a></h4>
+<p>A context can be added with the <code>addContext</code> method. It accepts a single argument <code>context</code> which can either be a string (in which case it needs to be a valid URI), or an object (in which case it needs to be a valid context object with a <code>@context</code> field):</p>
+<pre><code class="language-javascript">&gt;   vc.addContext('https://www.w3.org/2018/credentials/examples/v1')
+&gt;   vc.context
+&lt;-  [
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1'
+    ])
+</code></pre>
+<h4><a class="header" href="#adding-a-type" id="adding-a-type">Adding a Type</a></h4>
+<p>A type can be added with the <code>addType</code> function. It accepts a single argument <code>type</code> that needs to be a string:</p>
+<pre><code class="language-javascript">&gt;   vc.addType('AlumniCredential')
+&gt;   vc.type
+&lt;-  [
+      'VerifiableCredential',
+      'AlumniCredential'
+    ]
+</code></pre>
+<h4><a class="header" href="#adding-a-subject" id="adding-a-subject">Adding a Subject</a></h4>
+<p>A subject can be added with the <code>addSubject</code> function. It accepts a single argument <code>subject</code> that needs to be an object with an <code>id</code> property:</p>
+<pre><code class="language-javascript">&gt;   vc.addSubject({ id: 'did:dock:123qwe123qwe123qwe', alumniOf: 'Example University' })
+&gt;   vc.subject
+&lt;-  {id: 'did:dock:123qwe123qwe123qwe', alumniOf: 'Example University'}
+</code></pre>
+<h4><a class="header" href="#setting-a-status" id="setting-a-status">Setting a Status</a></h4>
+<p>A status can be set with the <code>setStatus</code> function. It accepts a single argument <code>status</code> that needs to be an object with an <code>id</code> property:</p>
+<pre><code class="language-javascript">&gt;   vc.setStatus({ id: &quot;https://example.edu/status/24&quot;, type: &quot;CredentialStatusList2017&quot; })
+&gt;   vc.status
+&lt;-  {
+        &quot;id&quot;: &quot;https://example.edu/status/24&quot;,
+        &quot;type&quot;: &quot;CredentialStatusList2017&quot;
+    }
+</code></pre>
+<h4><a class="header" href="#setting-the-issuance-date" id="setting-the-issuance-date">Setting the Issuance Date</a></h4>
+<p>The issuance date is set by default to the datetime you first initialize your <code>VerifiableCredential</code> object. This means that you don't necessarily need to call this method to achieve a valid Verifiable Credential (which are required to have an issuanceDate property).
+However, if you need to change this date you can use the <code>setIssuanceDate</code> method. It takes a single argument <code>issuanceDate</code> that needs to be a string with a valid ISO formatted datetime:</p>
+<pre><code class="language-javascript">&gt;   vc.issuanceDate
+&lt;-  &quot;2020-04-14T14:48:48.486Z&quot;
+&gt;   vc.setIssuanceDate(&quot;2019-01-01T14:48:48.486Z&quot;)
+&gt;   vc.issuanceDate
+&lt;-  &quot;2019-01-01T14:48:48.486Z&quot;
+</code></pre>
+<h4><a class="header" href="#setting-an-expiration-date" id="setting-an-expiration-date">Setting an Expiration Date</a></h4>
+<p>An expiration date is not set by default as it isn't required by the specs. If you wish to set one, you can use the <code>setExpirationDate</code> method. It takes a single argument <code>expirationDate</code> that needs to be a string with a valid ISO formatted datetime:</p>
+<pre><code class="language-javascript">&gt;   vc.setExpirationDate(&quot;2029-01-01T14:48:48.486Z&quot;)
+&gt;   vc.expirationDate
+&lt;-  &quot;2029-01-01T14:48:48.486Z&quot;
+</code></pre>
+<h3><a class="header" href="#signing-a-verifiable-credential" id="signing-a-verifiable-credential">Signing a Verifiable Credential</a></h3>
+<p>Once you've crafted your Verifiable Credential it is time to sign it. This can be achieved with the <code>sign</code> method. It requires a <code>keyDoc</code> parameter (an object with the params and keys you'll use for signing) and it also accepts a boolean <code>compactProof</code> that determines whether you want to compact the JSON-LD or not:</p>
+<pre><code class="language-javascript">&gt;   await vc.sign(keyDoc)
+</code></pre>
+<p>Please note that signing is an async process.
+Once done, your <code>vc</code> object will have a new <code>proof</code> field:</p>
+<pre><code class="language-javascript">&gt;   vc.proof
+&lt;-  {
+        type: &quot;EcdsaSecp256k1Signature2019&quot;,
+        created: &quot;2020-04-14T14:48:48.486Z&quot;,
+        jws: &quot;eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEQCIAS8ZNVYIni3oShb0TFz4SMAybJcz3HkQPaTdz9OSszoAiA01w9ZkS4Zx5HEZk45QzxbqOr8eRlgMdhgFsFs1FnyMQ&quot;,
+        proofPurpose: &quot;assertionMethod&quot;,
+        verificationMethod: &quot;https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw&quot;
+    }
+</code></pre>
+<h3><a class="header" href="#verifying-a-verifiable-credential" id="verifying-a-verifiable-credential">Verifying a Verifiable Credential</a></h3>
+<p>Once your Verifiable Credential has been signed you can proceed to verify it with the <code>verify</code> method. If you've used DIDs you need to pass a <code>resolver</code> for them. You can also use the booleans <code>compactProof</code> (to compact the JSON-LD) and <code>forceRevocationCheck</code> (to force revocation check). Please beware that setting <code>forceRevocationCheck</code> to false can allow false positives when verifying revocable credentials.
+If your credential has uses the <code>status</code> field, you can pass a <code>revocationAPI</code> param that accepts an object describing the API to use for the revocation check. No params are required for the simplest cases:</p>
+<pre><code class="language-javascript">&gt;   const result = await vc.verify()
+&gt;   result
+&lt;-  {
+      verified: true,
+      results: [
+        {
+          proof: [
+            {
+                '@context': 'https://w3id.org/security/v2',
+                type: &quot;EcdsaSecp256k1Signature2019&quot;,
+                created: &quot;2020-04-14T14:48:48.486Z&quot;,
+                jws: &quot;eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEQCIAS8ZNVYIni3oShb0TFz4SMAybJcz3HkQPaTdz9OSszoAiA01w9ZkS4Zx5HEZk45QzxbqOr8eRlgMdhgFsFs1FnyMQ&quot;,
+                proofPurpose: &quot;assertionMethod&quot;,
+                verificationMethod: &quot;https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw&quot;
+            }
+          ],
+          verified: true
+        }
+      ]
+    }
+</code></pre>
+<p>Please note that the verification is an async process that returns an object when the promise resolves. A boolean value for the entire verification process can be checked at the root level <code>verified</code> property.</p>
+<hr />
+<h2><a class="header" href="#incremental-creation-and-verification-of-verifiable-presentations" id="incremental-creation-and-verification-of-verifiable-presentations">Incremental creation and verification of Verifiable Presentations</a></h2>
+<p>The <code>client-sdk</code> exposes a <code>VerifiablePresentation</code> class that is useful to incrementally create valid Verifiable Presentations of any type, sign them and verify them.
+Once the presentation is initialized, you can sequentially call the different methods provided by the class to add <code>contexts</code>, <code>types</code>, <code>holders</code> and <code>credentials</code>.</p>
+<h3><a class="header" href="#building-a-verifiable-presentation" id="building-a-verifiable-presentation">Building a Verifiable Presentation</a></h3>
+<p>The first step to build a Verifiable Presentation is to initialize it, we can do that using the <code>VerifiablePresentation</code> class constructor which takes an <code>id</code> as sole argument:</p>
+<pre><code class="language-javascript">let vp = new VerifiablePresentation('http://example.edu/credentials/1986');
+</code></pre>
+<p>You now have an unsigned Verifiable Presentation in the <code>vp</code> variable!
+This Presentation isn't signed since we only just initialized it. It brings however some useful defaults to make your life easier.</p>
+<pre><code class="language-javascript">&gt;    vp.context
+&lt;-   [&quot;https://www.w3.org/2018/credentials/v1&quot;]
+&gt;    vp.type
+&lt;-   [&quot;VerifiablePresentation&quot;]
+&gt;    vp.credentials
+&lt;-   []
+</code></pre>
+<p>The default <code>context</code> is an array with <code>&quot;https://www.w3.org/2018/credentials/v1&quot;</code> as first element. This is required by the VCDMv1 specs so having it as default helps ensure your Verifiable Presentations will be valid in the end.
+A similar approach was taken on the <code>type</code> property, where the default is an array with <code>&quot;VerifiablePresentation&quot;</code> already populated. This is also required by the specs.
+The <code>credentials</code> property is required to exist, so this is already initialized for you as well although it is empty for now.</p>
+<p>We could also have checked those defaults more easily by checking the Verifiable Presentation's JSON representation.
+This can be achieved by calling the <code>toJSON()</code> method on it:</p>
+<pre><code class="language-javascript">&gt;    vp.toJSON()
+&lt;-   {
+       &quot;@context&quot;: [ &quot;https://www.w3.org/2018/credentials/v1&quot; ],
+       &quot;id&quot;: &quot;http://example.edu/credentials/1986&quot;,
+       &quot;type&quot;: [
+         &quot;VerifiablePresentation&quot;
+       ],
+       &quot;verifiableCredential&quot;: [],
+     }
+</code></pre>
+<p>An interesting thing to note here is the transformation happening to some of the root level keys in the JSON representation of a <code>VerifiablePresentation</code> object. For example <code>context</code> gets transformed into <code>@context</code> and <code>credentials</code> into <code>verifiableCredential</code>. This is to ensure compliance with the Verifiable Credentials Data Model specs while at the same time providing you with a clean interface to the <code>VerifiablePresentation</code> class in your code.</p>
+<p>Once your Verifiable Presentation has been initialized, you can proceed to use the rest of the building functions to define it completely before finally signing it.</p>
+<h4><a class="header" href="#adding-a-context-1" id="adding-a-context-1">Adding a Context</a></h4>
+<p>A context can be added with the <code>addContext</code> method. It accepts a single argument <code>context</code> which can either be a string (in which case it needs to be a valid URI), or an object (in which case it needs to be a valid context object with a <code>@context</code> field):</p>
+<pre><code class="language-javascript">&gt;   vp.addContext('https://www.w3.org/2018/credentials/examples/v1')
+&gt;   vp.context
+&lt;-  [
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1'
+    ])
+</code></pre>
+<h4><a class="header" href="#adding-a-type-1" id="adding-a-type-1">Adding a Type</a></h4>
+<p>A type can be added with the <code>addType</code> function. It accepts a single argument <code>type</code> that needs to be a string:</p>
+<pre><code class="language-javascript">&gt;   vp.addType('CredentialManagerPresentation')
+&gt;   vp.type
+&lt;-  [
+      'VerifiablePresentation',
+      'CredentialManagerPresentation'
+    ]
+</code></pre>
+<h4><a class="header" href="#setting-a-holder" id="setting-a-holder">Setting a Holder</a></h4>
+<p>Setting a Holder is optional and it can be achieved using the <code>setHolder</code> method. It accepts a single argument <code>type</code> that needs to be a string (a URI for the entity that is generating the presentation):</p>
+<pre><code class="language-javascript">&gt;   vp.setHolder('https://example.com/credentials/1234567890');
+&gt;   vp.holder
+&lt;-  'https://example.com/credentials/1234567890'
+</code></pre>
+<h4><a class="header" href="#adding-a-verifiable-credential" id="adding-a-verifiable-credential">Adding a Verifiable Credential</a></h4>
+<p>Your Verifiable Presentations can contain one or more Verifiable Credentials inside.
+Adding a Verifiable Credential can be achieved using the <code>addCredential</code> method. It accepts a single argument <code>credential</code> that needs to be an object (a valid, signed Verifiable Credential):</p>
+<pre><code class="language-javascript">&gt;   vp.addCredential(vc);
+&gt;   vp.credentials
+&lt;-  [
+      {...}
+    ]
+</code></pre>
+<p>Please note that the example was truncated to enhance readability.</p>
+<h3><a class="header" href="#signing-a-verifiable-presentation" id="signing-a-verifiable-presentation">Signing a Verifiable Presentation</a></h3>
+<p>Once you've crafted your Verifiable Presentation and added your Verifiable Credentials to it, it is time to sign it.
+This can be achieved with the <code>sign</code> method. It requires a <code>keyDoc</code> parameter (an object with the params and keys you'll use for signing), and a <code>challenge</code> string for the proof. It also accepts a <code>domain</code> string for the proof, a <code>resolver</code> in case you're using DIDs and a boolean <code>compactProof</code> that determines whether you want to compact the JSON-LD or not:</p>
+<pre><code class="language-javascript">&gt;   await vp.sign(
+          keyDoc,
+          'some_challenge',
+          'some_domain',
+        );
+</code></pre>
+<p>Please note that signing is an async process.
+Once done, your <code>vp</code> object will have a new <code>proof</code> field:</p>
+<pre><code class="language-javascript">&gt;   vp.proof
+&lt;-  {
+      &quot;type&quot;: &quot;EcdsaSecp256k1Signature2019&quot;,
+      &quot;created&quot;: &quot;2020-04-14T20:57:01Z&quot;,
+      &quot;challenge&quot;: &quot;some_challenge&quot;,
+      &quot;domain&quot;: &quot;some_domain&quot;,
+      &quot;jws&quot;: &quot;eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEUCIQCTTpivdcTKFDNdmzqe3l0nV6UjXgv0XvzCge--CTAV6wIgWfLqn_62U8jHkNSujrHFRmJ_ULj19b5rsNtjum09vbg&quot;,
+      &quot;proofPurpose&quot;: &quot;authentication&quot;,
+      &quot;verificationMethod&quot;: &quot;https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw&quot;
+    }
+</code></pre>
+<h3><a class="header" href="#verifying-a-verifiable-presentation" id="verifying-a-verifiable-presentation">Verifying a Verifiable Presentation</a></h3>
+<p>Once your Verifiable Presentation has been signed you can proceed to verify it with the <code>verify</code> method.
+If you've used DIDs you need to pass a <code>resolver</code> for them. You can also use the booleans <code>compactProof</code> (to compact the JSON-LD) and <code>forceRevocationCheck</code> (to force revocation check). Please beware that setting <code>forceRevocationCheck</code> to false can allow false positives when verifying revocable credentials.
+If your credential has uses the <code>status</code> field, you can pass a <code>revocationAPI</code> param that accepts an object describing the API to use for the revocation check.
+For the simplest cases you only need a <code>challenge</code> string and possibly a <code>domain</code> string:</p>
+<pre><code class="language-javascript">&gt;   const results = await vp.verify('some_challenge', 'some_domain');
+&gt;   results
+&lt;-  {
+      &quot;presentationResult&quot;: {
+        &quot;verified&quot;: true,
+        &quot;results&quot;: [
+          {
+            &quot;proof&quot;: {
+              &quot;@context&quot;: &quot;https://w3id.org/security/v2&quot;,
+              &quot;type&quot;: &quot;EcdsaSecp256k1Signature2019&quot;,
+              &quot;created&quot;: &quot;2020-04-14T20:57:01Z&quot;,
+              &quot;challenge&quot;: &quot;some_challenge&quot;,
+              &quot;domain&quot;: &quot;some_domain&quot;,
+              &quot;jws&quot;: &quot;eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEUCIQCTTpivdcTKFDNdmzqe3l0nV6UjXgv0XvzCge--CTAV6wIgWfLqn_62U8jHkNSujrHFRmJ_ULj19b5rsNtjum09vbg&quot;,
+              &quot;proofPurpose&quot;: &quot;authentication&quot;,
+              &quot;verificationMethod&quot;: &quot;https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw&quot;
+            },
+            &quot;verified&quot;: true
+          }
+        ]
+      },
+      &quot;verified&quot;: true,
+      &quot;credentialResults&quot;: [
+        {
+          &quot;verified&quot;: true,
+          &quot;results&quot;: [
+            {
+              &quot;proof&quot;: {
+                &quot;@context&quot;: &quot;https://w3id.org/security/v2&quot;,
+                &quot;type&quot;: &quot;EcdsaSecp256k1Signature2019&quot;,
+                &quot;created&quot;: &quot;2020-04-14T20:49:00Z&quot;,
+                &quot;jws&quot;: &quot;eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEUCIQCCCRuJbSUPePpOfkxsMJeQAqpydOFYWsA4cGiQRAR_QQIgehRZh8XE24hV0TPl5bMS6sNeKtC5rwZGfmflfY0eS-Y&quot;,
+                &quot;proofPurpose&quot;: &quot;assertionMethod&quot;,
+                &quot;verificationMethod&quot;: &quot;https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw&quot;
+              },
+              &quot;verified&quot;: true
+            }
+          ]
+        }
+      ]
+    }
+</code></pre>
+<p>Please note that the verification is an async process that returns an object when the promise resolves. This object contains separate results for the verification processes of the included Verifiable Credentials and the overall Verifiable Presentation. A boolean value for the entire verification process can be checked at the root level <code>verified</code> property.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+        
+        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+        
+        
+
+    </body>
+</html>

@@ -30,7 +30,8 @@ An example Dock DID.
 ```
 did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW
 ```
-Above DID has method `dock` and the DID identifier is `5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW`
+Above DID has method `dock` and the DID identifier is `5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW`. Dock DID identifiers
+are 32 bytes in size.
 
 An example DID Document
 ```
@@ -57,3 +58,9 @@ Note that Dock DIDs support only one key as of now. The key is present in the `p
 is referred to using its `id` in `authentication` and `assertionMethod` sections. The above document states that the DID
 `did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW` authenticates with public key under `publicKey` and also when
 it attests to some fact (becomes issuer), it uses that key.
+Another thing to keep in mind is that the keys associated with the Dock DID are independent of the keys used to send the
+transaction on chain and pay fees. Eg. Alice might not have any tokens to write anything on chain but can still create a
+DID and corresponding key and ask Bob who has tokens to register the DID on chain. Even though Bob wrote the DID on chain,
+he cannot update or remove it since only Alice has the keys associated with that DID. Similarly, when Alice wants to update
+the DID (public key or controller), it can create the update, sign it and send it to Carol this time to send the update on
+chain.

@@ -6,7 +6,7 @@ import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 
 import {
   OneOfPolicy,
-  KeyringPairDidKeys,
+  KeyringPairDidKeys, createRandomRegistryId,
 } from '../src/utils/revocation';
 
 // The following can be tweaked depending on where the node is running and what
@@ -14,7 +14,7 @@ import {
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 
 // Create a random registry id
-const registryId = randomAsHex(32);
+const registryId = createRandomRegistryId();
 
 // Create a new controller DID, the DID will be registered on the network and own the registry
 const controllerDID = createNewDockDID();
@@ -44,8 +44,7 @@ async function createRegistry() {
 async function removeRegistry() {
   console.log('Removing registry...');
 
-  const registryDetail = await dock.revocation.getRegistryDetail(registryId);
-  const lastModified = registryDetail[1];
+  const lastModified = await dock.revocation.getBlockNoForLastChangeToRegistry(registryId);
   await dock.sendTransaction(dock.revocation.removeRegistry(registryId, lastModified, didKeys));
 
   console.log('Registry removed. All done.');

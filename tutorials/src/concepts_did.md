@@ -57,7 +57,10 @@ An example DID Document
 Note that Dock DIDs support only one key as of now. The key is present in the `publicKey` section. Note how that public key
 is referred to using its `id` in `authentication` and `assertionMethod` sections. The above document states that the DID
 `did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW` authenticates with public key under `publicKey` and also when
-it attests to some fact (becomes issuer), it uses that key.
+it attests to some fact (becomes issuer), it uses that key. As there is only one public key supported for a DID, that
+public key is used for both `authentication` and `assertionMethod`. When support for multiple keys is added, the DID can
+specify which key(s) needs to be used for `authentication` and which ones for `assertionMethod`.
+
 Another thing to keep in mind is that the keys associated with the Dock DID are independent of the keys used to send the
 transaction on chain and pay fees. Eg. Alice might not have any tokens to write anything on chain but can still create a
 DID and corresponding key and ask Bob who has tokens to register the DID on chain. Even though Bob wrote the DID on chain,

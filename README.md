@@ -2,19 +2,43 @@
 
 Currently very early in-dev.
 
-## Build
-- Run `yarn` to install the dependencies
-- Run `yarn build` to create a distribution version
+## Install or build
+- Run `yarn add <package name>` or `npm install <package name>` to install the package from npm
+- When building from source:
+    - Run `yarn` to install the dependencies
+    - Run `yarn build` to create a distribution version.
 
 ![Build Status](https://github.com/docknetwork/client-sdk/workflows/CI/badge.svg "Build Status")
 
-## Lint
-`yarn lint --fix`
-
 ## Documentation
 
-Early documentation available at: https://docknetwork.github.io/client-sdk/reference/
-Tutorials at: https://docknetwork.github.io/client-sdk/tutorials/
+The documentation is hosted [here](https://docknetwork.github.io/client-sdk/reference) and is generated from markdown present over [here](./tutorials/src).
+Files prefixed with `concepts` describe the concepts are files prefixed with `tutorials` have a tutorial on using the
+API.
+Tutorials at: https://docknetwork.github.io/client-sdk/tutorials
+
+## Examples
+The example scripts present in [example directory](./example) are meant to demonstrate a complete feature. The following
+commands demonstrate different features.
+- Run example to create a new DID, register it, update its key and remove the DID.
+    ```
+    yarn dock-did-example
+    ```
+
+- Run example to resolve DID
+    ```
+    yarn did-resolver-example
+    ```
+
+- Run example to see revocation
+    ```
+    yarn revocation-example
+    ```
+
+- Run example to see verifiable credentials
+    ```
+    yarn vcdm-example
+    ```
 
 ## Connecting
 
@@ -45,27 +69,8 @@ yarn test-with-node
 
 Run a single test module with `yarn test <module name or prefix>`.
 
-## Basic SDK examples
-
-Run example to create a new DID, register it, update its key and remove the DID.
-```
-yarn dock-did-example
-```
-
-Run example to resolve DID
-```
-yarn did-resolver-example
-```
-
-Run example to see revocation
-```
-yarn revocation-example
-```
-
-Run example to see verifiable credentials
-```
-yarn vcdm-example
-```
+## Lint
+`yarn lint --fix`
 
 ## JSON types
 The types on Substrate node should be reflected in [types.json](./src/types.json)

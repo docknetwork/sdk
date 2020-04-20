@@ -11,7 +11,7 @@ import {
 // account is to be used for sending the transaction.
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 
-const universalResolverUrl = 'http://localhost:8080';
+const universalResolverUrl = 'https://uniresolver.io';
 
 // Infura's Ethereum provider for the main net
 const ethereumProviderConfig = {
@@ -67,14 +67,14 @@ async function main() {
     address: FullNodeEndpoint,
   });
 
-  console.log('Creating DID providers...');
+  console.log('Creating DID resolvers...');
 
-  const providers = {
-    dock: new DockResolver(dock), // Provider as class
-    ethr: new EtherResolver(ethereumProviderConfig), // Custom provider
+  const resolvers = {
+    dock: new DockResolver(dock), // Prebuilt resolver
+    ethr: new EtherResolver(ethereumProviderConfig), // Custom resolver
   };
 
-  const resolver = new MultiResolver(providers, new UniversalResolver(universalResolverUrl));
+  const resolver = new MultiResolver(resolvers, new UniversalResolver(universalResolverUrl));
 
   console.log('Building DIDs list...');
 

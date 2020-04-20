@@ -14,8 +14,16 @@ jobs:
 
       - name: Install and Build 🔧 # Only need to install jsdoc package here and then run docs script
         run: |
-          npm install jsdoc
-          npm run docs
+          yarn install --frozen-lockfile --ignore-scripts
+          yarn docs
+
+      - name: Setup mdBook
+        uses: peaceiris/actions-mdbook@v1
+        with:
+          mdbook-version: 'latest'
+
+      - name: Generate mdBook
+        run: yarn mdbook
 
       - name: Install SSH Client 🔑
         uses: webfactory/ssh-agent@v0.2.0
@@ -27,4 +35,4 @@ jobs:
         with:
           SSH: true
           BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: docs # The folder the action should deploy.
+          FOLDER: out # The folder the action should deploy.

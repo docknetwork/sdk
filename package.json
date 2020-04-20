@@ -1,13 +1,13 @@
 {
-  "name": "client-sdk",
+  "name": "sdk",
   "version": "0.0.1",
-  "main": "dist/client-sdk.cjs.js",
-  "module": "dist/client-sdk.esm.js",
-  "browser": "dist/client-sdk.umd.js",
+  "main": "dist/sdk.cjs.js",
+  "module": "dist/sdk.esm.js",
+  "browser": "dist/sdk.umd.js",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/docknetwork/client-sdk"
+    "url": "https://github.com/docknetwork/sdk"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
@@ -38,13 +38,14 @@
     "watch": "rollup -c -w",
     "test": "jest --verbose ./tests/unit",
     "test-integration": "NODE_ENV=production jest --forceExit --verbose --runInBand ./tests/integration",
-    "docs": "jsdoc src -r -c .jsdoc -d docs",
+    "docs": "mkdir out && touch out/.nojekyll && jsdoc src -r -c .jsdoc -d out/reference",
     "dock-did-example": "npx babel-node example/dock-did.js",
     "did-resolver-example": "npx babel-node example/resolver.js",
     "revocation-example": "npx babel-node example/revocation.js",
     "vcdm-example": "npx babel-node example/vcdm.js",
     "dev-node": "./scripts/run_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
-    "test-with-node": "./scripts/with_docker_test_node yarn test-integration"
+    "test-with-node": "./scripts/with_docker_test_node yarn test-integration",
+    "mdbook": "mdbook build tutorials --dest-dir ../out/tutorials"
   },
   "jest": {
     "testEnvironment": "node"

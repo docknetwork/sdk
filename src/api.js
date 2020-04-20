@@ -32,6 +32,7 @@ class DockAPI {
   /**
    * Initialises the SDK and connects to the node
    * @param {Account} address - Optional WebSocket address
+   * @param keyring - Polkadot-js keyring
    * @return {Promise} Promise for when SDK is ready for use
    */
   async init({ address, keyring } = {}) {

@@ -13,9 +13,10 @@ Currently very early in-dev.
 ## Documentation
 
 The documentation is hosted [here](https://docknetwork.github.io/client-sdk/reference) and is generated from markdown present over [here](./tutorials/src).
-Files prefixed with `concepts` describe the concepts are files prefixed with `tutorials` have a tutorial on using the
+Files prefixed with `concepts` describe the concepts and files prefixed with `tutorials` have a tutorial on using the
 API.
-Tutorials at: https://docknetwork.github.io/client-sdk/tutorials
+
+Tutorials are hosted at: https://docknetwork.github.io/client-sdk/tutorials
 
 ## Examples
 The example scripts present in [example directory](./example) are meant to demonstrate a complete feature. The following

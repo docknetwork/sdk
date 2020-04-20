@@ -14,7 +14,7 @@ DIDs of those methods.
 The resolver for Dock DIDs `DockResolver` connects to the Dock blockchain to get the DID details. The resolver is
 constructed by passing it a Dock API object so that it can connect to a Dock node. This is how you resolve a Dock DID:
 ```js
-import { DockResolver } from '@dock/sdk/resolver';
+import { DockResolver } from '@docknetwork/sdk/resolver';
 
 // Assuming the presence of Dock API object `dock`
 const dockResolver = new DockResolver(dock);
@@ -29,7 +29,7 @@ library [ethr-did-resolver](https://github.com/decentralized-identity/ethr-did-r
 as configuration. The example below uses Infura to get access to an Ethereum node and read the DID off Ethereum.
 
 ```js
-import { DIDResolver } from '@dock/sdk/resolver';
+import { DIDResolver } from '@docknetwork/sdk/resolver';
 import ethr from 'ethr-did-resolver';
 
 // Infura's Ethereum provider for the main net.
@@ -71,7 +71,7 @@ To resolve DIDs using the [Universal Resolver](https://uniresolver.io), use the 
 of the universal resolver and assumes the universal resolver from this [codebase](https://github.com/decentralized-identity/universal-resolver)
 is running at the URL.
 ```js
-import { UniversalResolver } from '@dock/sdk/resolver';
+import { UniversalResolver } from '@docknetwork/sdk/resolver';
 
 // Change the resolver URL to something else in case you cannot use the resolver at https://uniresolver.io
 const universalResolverUrl = 'https://uniresolver.io';
@@ -87,7 +87,7 @@ resolvers of various DID methods. The `MultiResolver` also accepts a `UniversalR
 is used when a DID for an unknown method needs to be resolved. The `resolvers` object below has resolvers for DID methods
 `dock` and `ethr`. For resolving DID of any other method, the given `UniversalResolver` object will be used.
 ```js
-import { MultiResolver } from '@dock/sdk/resolver';
+import { MultiResolver } from '@docknetwork/sdk/resolver';
 
 
 const resolvers = {

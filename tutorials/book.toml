@@ -3,4 +3,4 @@ authors = ["Andrew Dirksen", "Fausto Woelflin", "Sam Hellawell", "Lovesh Harchan
 language = "en"
 multilingual = false
 src = "src"
-title = "Dock Client Tutorial"
+title = "Dock SDK Tutorial"

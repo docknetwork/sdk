@@ -16,7 +16,7 @@ about this.
 ## DID creation
 Create a new random DID.
 ```js
-import {createNewDockDID} from 'sdk/utils/did';
+import {createNewDockDID} from '@dock/sdk/utils/did';
 
 const did = createNewDockDID();
 ```
@@ -28,7 +28,7 @@ Dock supports 3 kinds of public keys, Sr25519, Ed25519 and EcdsaSecp256k1. These
 through 3 classes, `PublicKeySr25519`, `PublicKeyEd25519` and `PublicKeySecp256k1` respectively. These 3 classes
 extend from the same class called `PublicKey`. These can be instantiated directly by passing them as hex encoded bytes
 ```js
-import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from 'sdk/api';
+import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from '@dock/sdk/api';
 
 const pk1 = new PublicKeySr25519(bytesAsHex);
 const pk2 = new PublicKeyEd25519(bytesAsHex);
@@ -37,7 +37,7 @@ const pk3 = new PublicKeySecp256k1(bytesAsHex);
 
 Or they can be created by first creating a keyring
 ```js
-import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from 'sdk/api';
+import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from '@dock/sdk/api';
 
 // Assuming you had a keyring, you can create keypairs or used already created keypairs
 const pair1 = keyring.addFromUri(secretUri, someMetadata, 'ed25519');
@@ -51,7 +51,7 @@ const pk2 = PublicKeySr25519.fromKeyringPair(pair2);
 Polkadot-js keyring does not support ECDSA with secp256k1 so there is a function `generateEcdsaSecp256k1Keypair` that
 takes some entropy and generate a keypair.
 ```js
-import { generateEcdsaSecp256k1Keypair } from 'sdk/utils/misc';
+import { generateEcdsaSecp256k1Keypair } from '@dock/sdk/utils/misc';
 // The pers and entropy are optional but must be used when keys need to be deterministic
 const pair3 = generateEcdsaSecp256k1Keypair(pers, entropy);
 const pk3 = PublicKeySecp256k1.fromKeyringPair(pair3);
@@ -60,7 +60,7 @@ const pk3 = PublicKeySecp256k1.fromKeyringPair(pair3);
 Or you can directly pass any of the above keypairs in the function `getPublicKeyFromKeyringPair` and it will return an
 object of the proper child class of `PublicKey`
 ```js
-import { getPublicKeyFromKeyringPair } from 'sdk/utils/misc';
+import { getPublicKeyFromKeyringPair } from '@dock/sdk/utils/misc';
 const publicKey = getPublicKeyFromKeyringPair(pair);
 ```
 
@@ -71,7 +71,7 @@ independent of the key used for sending the transaction and paying the fees.
 the controller. The controller is the DID that controls the public key and this can be the same as the DID being
 registered.
     ```js
-    import {createKeyDetail} from 'sdk/utils/did';
+    import {createKeyDetail} from '@dock/sdk/utils/did';
     const keyDetail = createKeyDetail(publicKey, did);
     ```
 1. Now submit the transaction using a `DockAPI` object and the newly created DID `did` and `keyDetail`.
@@ -98,14 +98,14 @@ The public key or the controller of an on-chain DID can be updated by preparing 
     ```
 1. The caller might directly create a signed key update
     ```js
-    import {createSignedKeyUpdate} from 'sdk/utils/did';
+    import {createSignedKeyUpdate} from '@dock/sdk/utils/did';
     // If you do not wish to update the controller, don't pass `newController`
     const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, did, newPk, currentPair, newController);
     ```
 1. In some cases the caller might not have the keypair like a hardware wallet or a remote signer, in that case, the caller
 creates the key update message bytes with `createKeyUpdate` to pass to the signer and get the signature
     ```js
-    import {createKeyUpdate} from 'sdk/utils/did';
+    import {createKeyUpdate} from '@dock/sdk/utils/did';
     const keyUpdate = await createKeyUpdate(dock.did, did, newPk, newController);
     const signature = // Get the signature on `keyUpdate`
     ```
@@ -124,13 +124,13 @@ A DID can be removing from the chain by sending the corresponding message signed
     ```
 1. The caller might directly create a signed message
     ```js
-    import {createSignedDidRemoval} from 'sdk/utils/did';
+    import {createSignedDidRemoval} from '@dock/sdk/utils/did';
     const [didRemoval, signature] = await createSignedDidRemoval(dock.did, dockDID, currentPair);
     ```
 1. As mentioned above, in some cases the caller might not have the keypair, then he creates the removal message bytes
 with `createKeyUpdate` to pass to the signer and get the signature
     ```js
-    import {createDidRemoval} from 'sdk/utils/did';
+    import {createDidRemoval} from '@dock/sdk/utils/did';
     const didRemoval = await createDidRemoval(dock.did, did);
     const signature = // Get the signature on `didRemoval`
     ```

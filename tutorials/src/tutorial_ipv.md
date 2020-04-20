@@ -1,7 +1,6 @@
 # Verifiable Credentials and Verifiable Presentations: issuing, signing and verification
 
 ## TODO:
-- how should we refer to the sdk in the docs? `client-sdk` doesn't sound very appealing, maybe we want to give it a name?
 - add section about keyDoc creation
 - add section about DID integration
 - The intro was 99% taken from the VCDM spec. Do we need more than this ?

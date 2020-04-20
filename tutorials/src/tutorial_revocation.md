@@ -14,7 +14,7 @@ nor the "add-only" flag can be updated post the creation of the registry for now
 To create a registry, first a `Policy` object needs to be created for which a DID is needed. It is advised that the DID
 is registered on chain first (else someone can look at the registry a register the DID, thus controlling the registry).
 ```js
-import {OneOfPolicy} from 'sdk/utils/revocation';
+import {OneOfPolicy} from '@dock/sdk/utils/revocation';
 const policy = new OneOfPolicy();
 policy.addOwner(ownerDID);
 
@@ -24,7 +24,7 @@ const policy = new OneOfPolicy([ownerDID]);
 
 Now create a random registry id. The registry id supposed to be unique among all registries on chain.
 ```js
-import {createRandomRegistryId} from 'sdk/utils/revocation';
+import {createRandomRegistryId} from '@dock/sdk/utils/revocation';
 const registryId = createRandomRegistryId();
 ```
 

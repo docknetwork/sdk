@@ -11,12 +11,11 @@ Currently very early in-dev.
 ![Build Status](https://github.com/docknetwork/client-sdk/workflows/CI/badge.svg "Build Status")
 
 ## Documentation
+Have a look at the [concepts and tutorials](https://docknetwork.github.io/client-sdk/tutorials). These are generated from markdown
+present over [here](./tutorials/src). Files prefixed with `concepts` describe the concepts and files prefixed with
+`tutorials` have a tutorial on using the API.
+Checkout the [API reference](https://docknetwork.github.io/client-sdk/reference)
 
-The documentation is hosted [here](https://docknetwork.github.io/client-sdk/reference) and is generated from markdown present over [here](./tutorials/src).
-Files prefixed with `concepts` describe the concepts and files prefixed with `tutorials` have a tutorial on using the
-API.
-
-Tutorials are hosted at: https://docknetwork.github.io/client-sdk/tutorials
 
 ## Examples
 The example scripts present in [example directory](./example) are meant to demonstrate a complete feature. The following
@@ -42,8 +41,7 @@ commands demonstrate different features.
     ```
 
 ## Connecting
-
-Use dock substrate node: https://github.com/docknetwork/dock-substrate
+Use Dock's substrate node: https://github.com/docknetwork/dock-substrate
 
 Running dev node:
 ```

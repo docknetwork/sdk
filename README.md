@@ -3,7 +3,7 @@
 Currently very early in-dev.
 
 ## Install or build
-- Run `yarn add <package name>` or `npm install <package name>` to install the package from npm
+- Run `yarn add @docknetwork/sdk` or `npm install @docknetwork/sdk` to install the package from npm
 - When building from source:
     - Run `yarn` to install the dependencies
     - Run `yarn build` to create a distribution version.
@@ -11,10 +11,10 @@ Currently very early in-dev.
 ![Build Status](https://github.com/docknetwork/client-sdk/workflows/CI/badge.svg "Build Status")
 
 ## Documentation
-Have a look at the [concepts and tutorials](https://docknetwork.github.io/client-sdk/tutorials). These are generated from markdown
+Have a look at the [concepts and tutorials](https://docknetwork.github.io/sdk/tutorials). These are generated from markdown
 present over [here](./tutorials/src). Files prefixed with `concepts` describe the concepts and files prefixed with
 `tutorials` have a tutorial on using the API.
-Checkout the [API reference](https://docknetwork.github.io/client-sdk/reference)
+Checkout the [API reference](https://docknetwork.github.io/sdk/reference)
 
 
 ## Examples

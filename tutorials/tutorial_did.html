@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>DID - Dock Client Tutorial</title>
+        <title>DID - Dock SDK Tutorial</title>
         
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
@@ -81,7 +81,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_rdf.html"><strong aria-hidden="true">2.1.</strong> RDF/json-ld</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> VCDM/VP</a></li><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.3.</strong> DID</a></li></ol></li><li class="chapter-item expanded "><a href="tutorial.html"><strong aria-hidden="true">3.</strong> Tutorial</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html" class="active"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> VCDM/VP</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorial</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html" class="active"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -113,7 +113,7 @@
                         
                     </div>
 
-                    <h1 class="menu-title">Dock Client Tutorial</h1>
+                    <h1 class="menu-title">Dock SDK Tutorial</h1>
 
                     <div class="right-buttons">
                         <a href="print.html" title="Print this book" aria-label="Print this book">
@@ -161,7 +161,7 @@ number changes, thus giving replay protection. This detail however is hidden in 
 about this.</p>
 <h2><a class="header" href="#did-creation" id="did-creation">DID creation</a></h2>
 <p>Create a new random DID.</p>
-<pre><code class="language-js">import {createNewDockDID} from '@dock/sdk/utils/did';
+<pre><code class="language-js">import {createNewDockDID} from '@docknetwork/sdk/utils/did';
 
 const did = createNewDockDID();
 </code></pre>
@@ -170,14 +170,14 @@ const did = createNewDockDID();
 <p>Dock supports 3 kinds of public keys, Sr25519, Ed25519 and EcdsaSecp256k1. These public keys are supported
 through 3 classes, <code>PublicKeySr25519</code>, <code>PublicKeyEd25519</code> and <code>PublicKeySecp256k1</code> respectively. These 3 classes
 extend from the same class called <code>PublicKey</code>. These can be instantiated directly by passing them as hex encoded bytes</p>
-<pre><code class="language-js">import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from '@dock/sdk/api';
+<pre><code class="language-js">import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from '@docknetwork/sdk/api';
 
 const pk1 = new PublicKeySr25519(bytesAsHex);
 const pk2 = new PublicKeyEd25519(bytesAsHex);
 const pk3 = new PublicKeySecp256k1(bytesAsHex);
 </code></pre>
 <p>Or they can be created by first creating a keyring</p>
-<pre><code class="language-js">import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from '@dock/sdk/api';
+<pre><code class="language-js">import {PublicKeySr25519, PublicKeyEd25519} from '@docknetwork/sdk/api';
 
 // Assuming you had a keyring, you can create keypairs or used already created keypairs
 const pair1 = keyring.addFromUri(secretUri, someMetadata, 'ed25519');
@@ -189,14 +189,15 @@ const pk2 = PublicKeySr25519.fromKeyringPair(pair2);
 </code></pre>
 <p>Polkadot-js keyring does not support ECDSA with secp256k1 so there is a function <code>generateEcdsaSecp256k1Keypair</code> that
 takes some entropy and generate a keypair.</p>
-<pre><code class="language-js">import { generateEcdsaSecp256k1Keypair } from '@dock/sdk/utils/misc';
+<pre><code class="language-js">import { generateEcdsaSecp256k1Keypair } from '@docknetwork/sdk/utils/misc';
+import {PublicKeySecp256k1} from '@docknetwork/sdk/api';
 // The pers and entropy are optional but must be used when keys need to be deterministic
 const pair3 = generateEcdsaSecp256k1Keypair(pers, entropy);
 const pk3 = PublicKeySecp256k1.fromKeyringPair(pair3);
 </code></pre>
 <p>Or you can directly pass any of the above keypairs in the function <code>getPublicKeyFromKeyringPair</code> and it will return an
 object of the proper child class of <code>PublicKey</code></p>
-<pre><code class="language-js">import { getPublicKeyFromKeyringPair } from '@dock/sdk/utils/misc';
+<pre><code class="language-js">import { getPublicKeyFromKeyringPair } from '@docknetwork/sdk/utils/misc';
 const publicKey = getPublicKeyFromKeyringPair(pair);
 </code></pre>
 <h2><a class="header" href="#registering-a-new-did-on-chain" id="registering-a-new-did-on-chain">Registering a new DID on chain</a></h2>
@@ -206,7 +207,7 @@ with DID is independent of the key used for sending the transaction and paying t
 <li>First create a key detail object. The first argument of this function is a <code>PublicKey</code> and the second argument is
 the controller. The controller is the DID that controls the public key and this can be the same as the DID being
 registered.
-<pre><code class="language-js">import {createKeyDetail} from '@dock/sdk/utils/did';
+<pre><code class="language-js">import {createKeyDetail} from '@docknetwork/sdk/utils/did';
 const keyDetail = createKeyDetail(publicKey, did);
 </code></pre>
 </li>
@@ -231,14 +232,14 @@ const newPk = // Using any of the above methods
 </code></pre>
 </li>
 <li>The caller might directly create a signed key update
-<pre><code class="language-js">import {createSignedKeyUpdate} from '@dock/sdk/utils/did';
+<pre><code class="language-js">import {createSignedKeyUpdate} from '@docknetwork/sdk/utils/did';
 // If you do not wish to update the controller, don't pass `newController`
 const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, did, newPk, currentPair, newController);
 </code></pre>
 </li>
 <li>In some cases the caller might not have the keypair like a hardware wallet or a remote signer, in that case, the caller
 creates the key update message bytes with <code>createKeyUpdate</code> to pass to the signer and get the signature
-<pre><code class="language-js">import {createKeyUpdate} from '@dock/sdk/utils/did';
+<pre><code class="language-js">import {createKeyUpdate} from '@docknetwork/sdk/utils/did';
 const keyUpdate = await createKeyUpdate(dock.did, did, newPk, newController);
 const signature = // Get the signature on `keyUpdate`
 </code></pre>
@@ -258,13 +259,13 @@ const currentPair = dock.keyring.addFromUri(secretUri, null, 'sr25519');
 </code></pre>
 </li>
 <li>The caller might directly create a signed message
-<pre><code class="language-js">import {createSignedDidRemoval} from '@dock/sdk/utils/did';
+<pre><code class="language-js">import {createSignedDidRemoval} from '@docknetwork/sdk/utils/did';
 const [didRemoval, signature] = await createSignedDidRemoval(dock.did, dockDID, currentPair);
 </code></pre>
 </li>
 <li>As mentioned above, in some cases the caller might not have the keypair, then he creates the removal message bytes
 with <code>createKeyUpdate</code> to pass to the signer and get the signature
-<pre><code class="language-js">import {createDidRemoval} from '@dock/sdk/utils/did';
+<pre><code class="language-js">import {createDidRemoval} from '@docknetwork/sdk/utils/did';
 const didRemoval = await createDidRemoval(dock.did, did);
 const signature = // Get the signature on `didRemoval`
 </code></pre>
@@ -284,7 +285,7 @@ in the data model and not associated with the DID in the chain-state.</p>
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="tutorial.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="tutorials.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
@@ -302,7 +303,7 @@ in the data model and not associated with the DID in the chain-state.</p>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="tutorial.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="tutorials.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 

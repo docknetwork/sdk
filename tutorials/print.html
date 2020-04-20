@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Dock Client Tutorial</title>
+        <title>Dock SDK Tutorial</title>
         
         <meta name="robots" content="noindex" />
         
@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_rdf.html"><strong aria-hidden="true">2.1.</strong> RDF/json-ld</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> VCDM/VP</a></li><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.3.</strong> DID</a></li></ol></li><li class="chapter-item expanded "><a href="tutorial.html"><strong aria-hidden="true">3.</strong> Tutorial</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> VCDM/VP</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorial</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -115,7 +115,7 @@
                         
                     </div>
 
-                    <h1 class="menu-title">Dock Client Tutorial</h1>
+                    <h1 class="menu-title">Dock SDK Tutorial</h1>
 
                     <div class="right-buttons">
                         <a href="print.html" title="Print this book" aria-label="Print this book">
@@ -149,53 +149,59 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#introduction" id="introduction">Introduction</a></h1>
+                        <h1><a class="header" href="#dock-sdk" id="dock-sdk">Dock SDK</a></h1>
+<h2><a class="header" href="#introduction" id="introduction">Introduction</a></h2>
+<p><a href="https://dock.io">Dock</a> is a blockchain built using <a href="https://www.parity.io/substrate/">Substrate</a> and uses <a href="https://github.com/polkadot-js/">polkadot-js</a>
+for interacting with the chain. The current version of Dock supports creating and managing DIDs compliant with the
+<a href="https://www.w3.org/TR/did-core">W3C spec</a> and verifiable credentials compliant with the
+<a href="https://www.w3.org/TR/vc-data-model/">Verifiable Credentials Data Model 1.0</a>. This SDK is meant to build client-side or server side javascript applications.</p>
+<h2><a class="header" href="#installation" id="installation">Installation</a></h2>
+<ul>
+<li>Install from npm with <code>npm install @docknetwork/sdk</code> or <code>yarn add @docknetwork/sdk</code></li>
+<li>Or clone from github and run
+<ol>
+<li><code>yarn install</code></li>
+<li><code>yarn build</code></li>
+</ol>
+</li>
+</ul>
+<h2><a class="header" href="#usage" id="usage">Usage</a></h2>
+<p>Once the SDK has been installed, import the Dock API object as</p>
+<pre><code class="language-js">import { DockAPI } from '@docknetwork/sdk/api';
+</code></pre>
+<p>To construct the API object</p>
+<pre><code class="language-js">const dock = new DockAPI();
+</code></pre>
+<p>To make the API object connect to the node call <code>init</code> method. This method accepts the Websocket RPC endpoint of the node is
+needed. Say you have it in <code>rpcEndpoint</code>. It also accepts a Polkadot-js keyring as well.</p>
+<pre><code class="language-js">await dock.init(rpcEndpoint, keyring);
+</code></pre>
+<p>To disconnect from the node</p>
+<pre><code class="language-js">await dock.disconnect();
+</code></pre>
+<p>To set the account used in sending the transaction and pay fees, call <code>setAccount</code> with the polkadot-js <code>account</code></p>
+<pre><code class="language-js">// the `account` object might have been generated as
+const account = dock.keyring.addFromUri(secretURI);
+// Set the account to pay fees for transactions
+dock.setAccount(account);
+</code></pre>
+<p>To get the account, call <code>getAccount</code></p>
+<pre><code class="language-js">dock.getAccount();
+</code></pre>
+<p>To send a transaction, use the <code>sendTransaction</code> on the <code>DockAPI</code> object</p>
+<pre><code class="language-js">const res = await dock.sendTransaction(transaction);
+</code></pre>
+<p>For interacting with the DID module, i.e. creating, updating and removing them, get the <code>didModule</code> with <code>did</code> getter</p>
+<pre><code class="language-js">const didModule = dock.did;
+</code></pre>
+<p>Similarly, for the revocation module, get the <code>revocationModule</code> with <code>revocation</code> getter</p>
+<pre><code class="language-js">const revocationModule = dock.revocation;
+</code></pre>
 <h1><a class="header" href="#concepts" id="concepts">Concepts</a></h1>
 <ol>
 <li><a href="./concepts_did.html">DID</a></li>
 <li><a href="./concepts_vcdm.html">Verifiable credentials</a></li>
 </ol>
-<h1><a class="header" href="#verifiable-credentials" id="verifiable-credentials">Verifiable Credentials</a></h1>
-<p>Credentials are a part of our daily lives: driver's licenses are used to assert that we are capable of operating a motor vehicle, university degrees can be used to assert our level of education, and government-issued passports enable us to travel between countries. These credentials provide benefits to us when used in the physical world, but their use on the Web continues to be elusive.</p>
-<p>Currently it is difficult to express education qualifications, healthcare data, financial account details, and other sorts of third-party verified machine-readable personal information on the Web. The difficulty of expressing digital credentials on the Web makes it challenging to receive the same benefits through the Web that physical credentials provide us in the physical world.</p>
-<p>The <a href="https://www.w3.org/TR/vc-data-model/">Verifiable Credentials Data Model 1.0 (VCDM)</a> specification provides a standard way to express credentials on the Web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.</p>
-<h2><a class="header" href="#participants-and-workflow" id="participants-and-workflow">Participants and workflow</a></h2>
-<ul>
-<li>Credentials are issued by an entity called the <strong>issuer</strong>.</li>
-<li><strong>Issuer</strong> issues the credential about a <strong>subject</strong> by signing the credential with his key. If the credential is revocable,
-the issuer must specify how and from where revocation status must be checked. It is not necessary that revocation is managed by
-the issuer, the issuer might designate a different authority for revocation.</li>
-<li><strong>Issuer</strong> gives the credential to the <strong>holder</strong>. The <strong>holder</strong> might be the same as the <strong>subject</strong>.</li>
-<li>A service provider or anyone willing to check if the <strong>holder</strong> possesses certain credentials requests a <strong>presentation</strong> about those
-credentials. This entity requesting the <strong>presentation</strong> is called the <strong>verifier</strong>. To protect against replay attacks, (a
-verifier receiving the presentation and replaying the same presentation at some other verifier), a verifier must supply a
-challenge that must be embedded in the presentation.</li>
-<li><strong>Holder</strong> creates a <strong>presentation</strong> for the required credentials. The <strong>presentation</strong> must indicate which
-credentials it is about and must be signed by the <strong>holder</strong> of the credentials.</li>
-<li><strong>Verifier</strong> on receiving the presentation verifies the validity of each credential in the <strong>presentation</strong>. This includes
-checking correctness of the data model of the credential, the authenticity by verifying the issuer's signature and revocation
-status if the credential is revocable. It then checks whether the presentation contains the signature from the
-<strong>holder</strong> on the presentation which also includes his given challenge.</li>
-</ul>
-<h2><a class="header" href="#issuing" id="issuing">Issuing</a></h2>
-<p>To issue a verifiable credential, the issuer needs to have a public key that is accessible by the holder and verifier to verify the
-signature (in <code>proof</code>) in the credential. Though the VCDM spec does not mandate it, an issuer in Dock must have a DID on chain.
-This DID is present in the credential in the <code>issuer</code> field.</p>
-<h2><a class="header" href="#revocation" id="revocation">Revocation</a></h2>
-<p>If the credential is revocable, the issuer must specify how the revocation check must be done in the <code>credentialStatus</code> field.
-On Dock, credential revocation is managed with a revocation registry. There can be multiple registries on chain and each
-registry has a unique id. It is advised that the revocation authority creates a new registry for each credential type.
-While issuing the credential, issuer embeds the revocation registry's id in the credential in the <code>credentialStatus</code> field.
-To revoke a credential, the revocation authority (might be same as the issuer), puts a hash of the credential id in the revocation registry.
-To check the revocation status of a credential, hash the credential id and query the registry id specified in the credential.</p>
-<p>The revocation of a credential can be undone if the revocation registry supports undoing. Moreover, currently, each registry is
-controlled by a single DID so that DID can revoke a credential or undo the revocation. In future, Dock will support controlling
-the registry with mulitple DIDs and in different fashions, like any one of the controller DIDs could revoke or a threshold is needed,
-etc. To learn more about revocation registries, refer the corresponding section of the documentation.</p>
-<h2><a class="header" href="#presentation" id="presentation">Presentation</a></h2>
-<p>The holder while creating the presentation signs it with his private key. For the verifier to verify this signature, he
-must know the holder's public key. One way to achieve this is to make the holder have a DID too so that the verifier can look
-up the DID on chain and learn the public key.</p>
 <h1><a class="header" href="#w3c-did" id="w3c-did">W3C DID</a></h1>
 <p>DID stands for Decentralized IDentifiers. DIDs are meant to be globally unique identifiers that allow their owner to
 prove cryptographic control over them. The owner(s) of the DID is called the <code>controller</code>. The identifiers are not just assignable
@@ -257,7 +263,48 @@ DID and corresponding key and ask Bob who has tokens to register the DID on chai
 he cannot update or remove it since only Alice has the keys associated with that DID. Similarly, when Alice wants to update
 the DID (public key or controller), it can create the update, sign it and send it to Carol this time to send the update on
 chain.</p>
-<h1><a class="header" href="#tutorial" id="tutorial">Tutorial</a></h1>
+<h1><a class="header" href="#verifiable-credentials" id="verifiable-credentials">Verifiable Credentials</a></h1>
+<p>Credentials are a part of our daily lives: driver's licenses are used to assert that we are capable of operating a motor vehicle, university degrees can be used to assert our level of education, and government-issued passports enable us to travel between countries. These credentials provide benefits to us when used in the physical world, but their use on the Web continues to be elusive.</p>
+<p>Currently it is difficult to express education qualifications, healthcare data, financial account details, and other sorts of third-party verified machine-readable personal information on the Web. The difficulty of expressing digital credentials on the Web makes it challenging to receive the same benefits through the Web that physical credentials provide us in the physical world.</p>
+<p>The <a href="https://www.w3.org/TR/vc-data-model/">Verifiable Credentials Data Model 1.0 (VCDM)</a> specification provides a standard way to express credentials on the Web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.</p>
+<h2><a class="header" href="#participants-and-workflow" id="participants-and-workflow">Participants and workflow</a></h2>
+<ul>
+<li>Credentials are issued by an entity called the <strong>issuer</strong>.</li>
+<li><strong>Issuer</strong> issues the credential about a <strong>subject</strong> by signing the credential with his key. If the credential is revocable,
+the issuer must specify how and from where revocation status must be checked. It is not necessary that revocation is managed by
+the issuer, the issuer might designate a different authority for revocation.</li>
+<li><strong>Issuer</strong> gives the credential to the <strong>holder</strong>. The <strong>holder</strong> might be the same as the <strong>subject</strong>.</li>
+<li>A service provider or anyone willing to check if the <strong>holder</strong> possesses certain credentials requests a <strong>presentation</strong> about those
+credentials. This entity requesting the <strong>presentation</strong> is called the <strong>verifier</strong>. To protect against replay attacks, (a
+verifier receiving the presentation and replaying the same presentation at some other verifier), a verifier must supply a
+challenge that must be embedded in the presentation.</li>
+<li><strong>Holder</strong> creates a <strong>presentation</strong> for the required credentials. The <strong>presentation</strong> must indicate which
+credentials it is about and must be signed by the <strong>holder</strong> of the credentials.</li>
+<li><strong>Verifier</strong> on receiving the presentation verifies the validity of each credential in the <strong>presentation</strong>. This includes
+checking correctness of the data model of the credential, the authenticity by verifying the issuer's signature and revocation
+status if the credential is revocable. It then checks whether the presentation contains the signature from the
+<strong>holder</strong> on the presentation which also includes his given challenge.</li>
+</ul>
+<h2><a class="header" href="#issuing" id="issuing">Issuing</a></h2>
+<p>To issue a verifiable credential, the issuer needs to have a public key that is accessible by the holder and verifier to verify the
+signature (in <code>proof</code>) in the credential. Though the VCDM spec does not mandate it, an issuer in Dock must have a DID on chain.
+This DID is present in the credential in the <code>issuer</code> field.</p>
+<h2><a class="header" href="#revocation" id="revocation">Revocation</a></h2>
+<p>If the credential is revocable, the issuer must specify how the revocation check must be done in the <code>credentialStatus</code> field.
+On Dock, credential revocation is managed with a revocation registry. There can be multiple registries on chain and each
+registry has a unique id. It is advised that the revocation authority creates a new registry for each credential type.
+While issuing the credential, issuer embeds the revocation registry's id in the credential in the <code>credentialStatus</code> field.
+To revoke a credential, the revocation authority (might be same as the issuer), puts a hash of the credential id in the revocation registry.
+To check the revocation status of a credential, hash the credential id and query the registry id specified in the credential.</p>
+<p>The revocation of a credential can be undone if the revocation registry supports undoing. Moreover, currently, each registry is
+controlled by a single DID so that DID can revoke a credential or undo the revocation. In future, Dock will support controlling
+the registry with mulitple DIDs and in different fashions, like any one of the controller DIDs could revoke or a threshold is needed,
+etc. To learn more about revocation registries, refer the corresponding section of the documentation.</p>
+<h2><a class="header" href="#presentation" id="presentation">Presentation</a></h2>
+<p>The holder while creating the presentation signs it with his private key. For the verifier to verify this signature, he
+must know the holder's public key. One way to achieve this is to make the holder have a DID too so that the verifier can look
+up the DID on chain and learn the public key.</p>
+<h1><a class="header" href="#tutorials" id="tutorials">Tutorials</a></h1>
 <ol>
 <li><a href="./tutorial_did.html">DID</a></li>
 <li><a href="./tutorial_revocation.html">Revocation</a></li>
@@ -277,7 +324,7 @@ number changes, thus giving replay protection. This detail however is hidden in 
 about this.</p>
 <h2><a class="header" href="#did-creation" id="did-creation">DID creation</a></h2>
 <p>Create a new random DID.</p>
-<pre><code class="language-js">import {createNewDockDID} from '@dock/sdk/utils/did';
+<pre><code class="language-js">import {createNewDockDID} from '@docknetwork/sdk/utils/did';
 
 const did = createNewDockDID();
 </code></pre>
@@ -286,14 +333,14 @@ const did = createNewDockDID();
 <p>Dock supports 3 kinds of public keys, Sr25519, Ed25519 and EcdsaSecp256k1. These public keys are supported
 through 3 classes, <code>PublicKeySr25519</code>, <code>PublicKeyEd25519</code> and <code>PublicKeySecp256k1</code> respectively. These 3 classes
 extend from the same class called <code>PublicKey</code>. These can be instantiated directly by passing them as hex encoded bytes</p>
-<pre><code class="language-js">import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from '@dock/sdk/api';
+<pre><code class="language-js">import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from '@docknetwork/sdk/api';
 
 const pk1 = new PublicKeySr25519(bytesAsHex);
 const pk2 = new PublicKeyEd25519(bytesAsHex);
 const pk3 = new PublicKeySecp256k1(bytesAsHex);
 </code></pre>
 <p>Or they can be created by first creating a keyring</p>
-<pre><code class="language-js">import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from '@dock/sdk/api';
+<pre><code class="language-js">import {PublicKeySr25519, PublicKeyEd25519} from '@docknetwork/sdk/api';
 
 // Assuming you had a keyring, you can create keypairs or used already created keypairs
 const pair1 = keyring.addFromUri(secretUri, someMetadata, 'ed25519');
@@ -305,14 +352,15 @@ const pk2 = PublicKeySr25519.fromKeyringPair(pair2);
 </code></pre>
 <p>Polkadot-js keyring does not support ECDSA with secp256k1 so there is a function <code>generateEcdsaSecp256k1Keypair</code> that
 takes some entropy and generate a keypair.</p>
-<pre><code class="language-js">import { generateEcdsaSecp256k1Keypair } from '@dock/sdk/utils/misc';
+<pre><code class="language-js">import { generateEcdsaSecp256k1Keypair } from '@docknetwork/sdk/utils/misc';
+import {PublicKeySecp256k1} from '@docknetwork/sdk/api';
 // The pers and entropy are optional but must be used when keys need to be deterministic
 const pair3 = generateEcdsaSecp256k1Keypair(pers, entropy);
 const pk3 = PublicKeySecp256k1.fromKeyringPair(pair3);
 </code></pre>
 <p>Or you can directly pass any of the above keypairs in the function <code>getPublicKeyFromKeyringPair</code> and it will return an
 object of the proper child class of <code>PublicKey</code></p>
-<pre><code class="language-js">import { getPublicKeyFromKeyringPair } from '@dock/sdk/utils/misc';
+<pre><code class="language-js">import { getPublicKeyFromKeyringPair } from '@docknetwork/sdk/utils/misc';
 const publicKey = getPublicKeyFromKeyringPair(pair);
 </code></pre>
 <h2><a class="header" href="#registering-a-new-did-on-chain" id="registering-a-new-did-on-chain">Registering a new DID on chain</a></h2>
@@ -322,7 +370,7 @@ with DID is independent of the key used for sending the transaction and paying t
 <li>First create a key detail object. The first argument of this function is a <code>PublicKey</code> and the second argument is
 the controller. The controller is the DID that controls the public key and this can be the same as the DID being
 registered.
-<pre><code class="language-js">import {createKeyDetail} from '@dock/sdk/utils/did';
+<pre><code class="language-js">import {createKeyDetail} from '@docknetwork/sdk/utils/did';
 const keyDetail = createKeyDetail(publicKey, did);
 </code></pre>
 </li>
@@ -347,14 +395,14 @@ const newPk = // Using any of the above methods
 </code></pre>
 </li>
 <li>The caller might directly create a signed key update
-<pre><code class="language-js">import {createSignedKeyUpdate} from '@dock/sdk/utils/did';
+<pre><code class="language-js">import {createSignedKeyUpdate} from '@docknetwork/sdk/utils/did';
 // If you do not wish to update the controller, don't pass `newController`
 const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, did, newPk, currentPair, newController);
 </code></pre>
 </li>
 <li>In some cases the caller might not have the keypair like a hardware wallet or a remote signer, in that case, the caller
 creates the key update message bytes with <code>createKeyUpdate</code> to pass to the signer and get the signature
-<pre><code class="language-js">import {createKeyUpdate} from '@dock/sdk/utils/did';
+<pre><code class="language-js">import {createKeyUpdate} from '@docknetwork/sdk/utils/did';
 const keyUpdate = await createKeyUpdate(dock.did, did, newPk, newController);
 const signature = // Get the signature on `keyUpdate`
 </code></pre>
@@ -374,13 +422,13 @@ const currentPair = dock.keyring.addFromUri(secretUri, null, 'sr25519');
 </code></pre>
 </li>
 <li>The caller might directly create a signed message
-<pre><code class="language-js">import {createSignedDidRemoval} from '@dock/sdk/utils/did';
+<pre><code class="language-js">import {createSignedDidRemoval} from '@docknetwork/sdk/utils/did';
 const [didRemoval, signature] = await createSignedDidRemoval(dock.did, dockDID, currentPair);
 </code></pre>
 </li>
 <li>As mentioned above, in some cases the caller might not have the keypair, then he creates the removal message bytes
 with <code>createKeyUpdate</code> to pass to the signer and get the signature
-<pre><code class="language-js">import {createDidRemoval} from '@dock/sdk/utils/did';
+<pre><code class="language-js">import {createDidRemoval} from '@docknetwork/sdk/utils/did';
 const didRemoval = await createDidRemoval(dock.did, did);
 const signature = // Get the signature on `didRemoval`
 </code></pre>
@@ -406,7 +454,7 @@ DIDs of those methods.</p>
 <h2><a class="header" href="#dock-resolver" id="dock-resolver">Dock resolver</a></h2>
 <p>The resolver for Dock DIDs <code>DockResolver</code> connects to the Dock blockchain to get the DID details. The resolver is
 constructed by passing it a Dock API object so that it can connect to a Dock node. This is how you resolve a Dock DID:</p>
-<pre><code class="language-js">import { DockResolver } from '@dock/sdk/resolver';
+<pre><code class="language-js">import { DockResolver } from '@docknetwork/sdk/resolver';
 
 // Assuming the presence of Dock API object `dock`
 const dockResolver = new DockResolver(dock);
@@ -418,7 +466,7 @@ const didDocument = dockResolver.resolve('dock:did:5D.....');
 <code>DIDResolver</code> class to create a custom resolver. Following is an example to build a custom Ethereum resolver. It uses the
 library <a href="https://github.com/decentralized-identity/ethr-did-resolver">ethr-did-resolver</a> and accepts a provider information
 as configuration. The example below uses Infura to get access to an Ethereum node and read the DID off Ethereum.</p>
-<pre><code class="language-js">import { DIDResolver } from '@dock/sdk/resolver';
+<pre><code class="language-js">import { DIDResolver } from '@docknetwork/sdk/resolver';
 import ethr from 'ethr-did-resolver';
 
 // Infura's Ethereum provider for the main net.
@@ -458,7 +506,7 @@ const didDocument = ethResolver.resolve('did:ethr:0x6f....');
 <p>To resolve DIDs using the <a href="https://uniresolver.io">Universal Resolver</a>, use the <code>UniversalResolver</code>. It needs the URL
 of the universal resolver and assumes the universal resolver from this <a href="https://github.com/decentralized-identity/universal-resolver">codebase</a>
 is running at the URL.</p>
-<pre><code class="language-js">import { UniversalResolver } from '@dock/sdk/resolver';
+<pre><code class="language-js">import { UniversalResolver } from '@docknetwork/sdk/resolver';
 
 // Change the resolver URL to something else in case you cannot use the resolver at https://uniresolver.io
 const universalResolverUrl = 'https://uniresolver.io';
@@ -472,7 +520,7 @@ const didDocument = universalResolver.resolve('did:btcr:xk....');
 resolvers of various DID methods. The <code>MultiResolver</code> also accepts a <code>UniversalResolver</code> as an optional parameter which
 is used when a DID for an unknown method needs to be resolved. The <code>resolvers</code> object below has resolvers for DID methods
 <code>dock</code> and <code>ethr</code>. For resolving DID of any other method, the given <code>UniversalResolver</code> object will be used.</p>
-<pre><code class="language-js">import { MultiResolver } from '@dock/sdk/resolver';
+<pre><code class="language-js">import { MultiResolver } from '@docknetwork/sdk/resolver';
 
 
 const resolvers = {
@@ -821,7 +869,7 @@ nor the &quot;add-only&quot; flag can be updated post the creation of the regist
 <h2><a class="header" href="#registry-creation" id="registry-creation">Registry creation</a></h2>
 <p>To create a registry, first a <code>Policy</code> object needs to be created for which a DID is needed. It is advised that the DID
 is registered on chain first (else someone can look at the registry a register the DID, thus controlling the registry).</p>
-<pre><code class="language-js">import {OneOfPolicy} from '@dock/sdk/utils/revocation';
+<pre><code class="language-js">import {OneOfPolicy} from '@docknetwork/sdk/utils/revocation';
 const policy = new OneOfPolicy();
 policy.addOwner(ownerDID);
 
@@ -829,7 +877,7 @@ policy.addOwner(ownerDID);
 const policy = new OneOfPolicy([ownerDID]);
 </code></pre>
 <p>Now create a random registry id. The registry id supposed to be unique among all registries on chain.</p>
-<pre><code class="language-js">import {createRandomRegistryId} from '@dock/sdk/utils/revocation';
+<pre><code class="language-js">import {createRandomRegistryId} from '@docknetwork/sdk/utils/revocation';
 const registryId = createRandomRegistryId();
 </code></pre>
 <p>Now send the transaction to create a registry on-chain using <code>dock.revocation.newRegistry</code>. This method accepts the registry id,

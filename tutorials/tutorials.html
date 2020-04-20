@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>VCDM/VP - Dock SDK Tutorial</title>
+        <title>Tutorial - Dock SDK Tutorial</title>
         
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
@@ -81,7 +81,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html" class="active"><strong aria-hidden="true">2.2.</strong> VCDM/VP</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorial</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> VCDM/VP</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html" class="active"><strong aria-hidden="true">3.</strong> Tutorial</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -147,60 +147,25 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#verifiable-credentials" id="verifiable-credentials">Verifiable Credentials</a></h1>
-<p>Credentials are a part of our daily lives: driver's licenses are used to assert that we are capable of operating a motor vehicle, university degrees can be used to assert our level of education, and government-issued passports enable us to travel between countries. These credentials provide benefits to us when used in the physical world, but their use on the Web continues to be elusive.</p>
-<p>Currently it is difficult to express education qualifications, healthcare data, financial account details, and other sorts of third-party verified machine-readable personal information on the Web. The difficulty of expressing digital credentials on the Web makes it challenging to receive the same benefits through the Web that physical credentials provide us in the physical world.</p>
-<p>The <a href="https://www.w3.org/TR/vc-data-model/">Verifiable Credentials Data Model 1.0 (VCDM)</a> specification provides a standard way to express credentials on the Web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.</p>
-<h2><a class="header" href="#participants-and-workflow" id="participants-and-workflow">Participants and workflow</a></h2>
-<ul>
-<li>Credentials are issued by an entity called the <strong>issuer</strong>.</li>
-<li><strong>Issuer</strong> issues the credential about a <strong>subject</strong> by signing the credential with his key. If the credential is revocable,
-the issuer must specify how and from where revocation status must be checked. It is not necessary that revocation is managed by
-the issuer, the issuer might designate a different authority for revocation.</li>
-<li><strong>Issuer</strong> gives the credential to the <strong>holder</strong>. The <strong>holder</strong> might be the same as the <strong>subject</strong>.</li>
-<li>A service provider or anyone willing to check if the <strong>holder</strong> possesses certain credentials requests a <strong>presentation</strong> about those
-credentials. This entity requesting the <strong>presentation</strong> is called the <strong>verifier</strong>. To protect against replay attacks, (a
-verifier receiving the presentation and replaying the same presentation at some other verifier), a verifier must supply a
-challenge that must be embedded in the presentation.</li>
-<li><strong>Holder</strong> creates a <strong>presentation</strong> for the required credentials. The <strong>presentation</strong> must indicate which
-credentials it is about and must be signed by the <strong>holder</strong> of the credentials.</li>
-<li><strong>Verifier</strong> on receiving the presentation verifies the validity of each credential in the <strong>presentation</strong>. This includes
-checking correctness of the data model of the credential, the authenticity by verifying the issuer's signature and revocation
-status if the credential is revocable. It then checks whether the presentation contains the signature from the
-<strong>holder</strong> on the presentation which also includes his given challenge.</li>
-</ul>
-<h2><a class="header" href="#issuing" id="issuing">Issuing</a></h2>
-<p>To issue a verifiable credential, the issuer needs to have a public key that is accessible by the holder and verifier to verify the
-signature (in <code>proof</code>) in the credential. Though the VCDM spec does not mandate it, an issuer in Dock must have a DID on chain.
-This DID is present in the credential in the <code>issuer</code> field.</p>
-<h2><a class="header" href="#revocation" id="revocation">Revocation</a></h2>
-<p>If the credential is revocable, the issuer must specify how the revocation check must be done in the <code>credentialStatus</code> field.
-On Dock, credential revocation is managed with a revocation registry. There can be multiple registries on chain and each
-registry has a unique id. It is advised that the revocation authority creates a new registry for each credential type.
-While issuing the credential, issuer embeds the revocation registry's id in the credential in the <code>credentialStatus</code> field.
-To revoke a credential, the revocation authority (might be same as the issuer), puts a hash of the credential id in the revocation registry.
-To check the revocation status of a credential, hash the credential id and query the registry id specified in the credential.</p>
-<p>The revocation of a credential can be undone if the revocation registry supports undoing. Moreover, currently, each registry is
-controlled by a single DID so that DID can revoke a credential or undo the revocation. In future, Dock will support controlling
-the registry with mulitple DIDs and in different fashions, like any one of the controller DIDs could revoke or a threshold is needed,
-etc. To learn more about revocation registries, refer the corresponding section of the documentation.</p>
-<h2><a class="header" href="#presentation" id="presentation">Presentation</a></h2>
-<p>The holder while creating the presentation signs it with his private key. For the verifier to verify this signature, he
-must know the holder's public key. One way to achieve this is to make the holder have a DID too so that the verifier can look
-up the DID on chain and learn the public key.</p>
+                        <h1><a class="header" href="#tutorials" id="tutorials">Tutorials</a></h1>
+<ol>
+<li><a href="./tutorial_did.html">DID</a></li>
+<li><a href="./tutorial_revocation.html">Revocation</a></li>
+<li><a href="./tutorial_ipv.html">Verifiable credentials</a></li>
+</ol>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="concepts_did.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="concepts_vcdm.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="tutorials.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="tutorial_did.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -212,13 +177,13 @@ up the DID on chain and learn the public key.</p>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="concepts_did.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="concepts_vcdm.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a rel="next" href="tutorials.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="tutorial_did.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

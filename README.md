@@ -1,6 +1,6 @@
 # Dock Client SDK
 
-Currently very early in-dev.
+A JavaScript SDK built ontop of PolkadotJS for interaction with the Dock Substrate node and testnet.
 
 ## Install or build
 - Run `yarn add <package name>` or `npm install <package name>` to install the package from npm

@@ -1,13 +1,13 @@
 {
-  "name": "client-sdk",
+  "name": "sdk",
   "version": "0.0.1",
-  "main": "dist/client-sdk.cjs.js",
-  "module": "dist/client-sdk.esm.js",
-  "browser": "dist/client-sdk.umd.js",
+  "main": "dist/sdk.cjs.js",
+  "module": "dist/sdk.esm.js",
+  "browser": "dist/sdk.umd.js",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/docknetwork/client-sdk"
+    "url": "https://github.com/docknetwork/sdk"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",

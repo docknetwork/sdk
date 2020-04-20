@@ -65,8 +65,8 @@ const publicKey = getPublicKeyFromKeyringPair(pair);
 ```
 
 ## Registering a new DID on chain
-Now that you have a DID and a public key, a new DID can be registered. Note that this public key associated with DID is
-independent of the key used for sending the transaction and paying the fees.
+Now that you have a DID and a public key, the DID can be registered on the Dock chain. Note that this public key associated
+with DID is independent of the key used for sending the transaction and paying the fees.
 1. First create a key detail object. The first argument of this function is a `PublicKey` and the second argument is
 the controller. The controller is the DID that controls the public key and this can be the same as the DID being
 registered.

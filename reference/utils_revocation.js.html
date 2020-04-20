@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: public-keys/public-key-ed25519.js</title>
+    <title>JSDoc: Source: utils/revocation.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: public-keys/public-key-ed25519.js</h1>
+    <h1 class="page-title">Source: utils/revocation.js</h1>
 
     
 
@@ -26,23 +26,30 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import PublicKey from './public-key';
+            <pre class="prettyprint source linenums"><code>import { randomAsHex } from '@polkadot/util-crypto';
 
-/** Class representing a Ed25519 PublicKey */
-export default class PublicKeyEd25519 extends PublicKey {
-  constructor(value) {
-    super(value, 32);
-  }
+import KeyringPairDidKeys from './revocation/keyring-pair-did-keys';
+import OneOfPolicy from './revocation/one-of-policy';
+import DidKeys from './revocation/did-keys';
 
-  /**
-   * @return {Object} The PublicKey JSON variant Ed25519.
-   */
-  toJSON() {
-    return {
-      Ed25519: this.value,
-    };
-  }
+// The revocation registry has id with the byte size `RevRegIdByteSize`
+export const RevRegIdByteSize = 32;
+// Each entry in revocation registry has byte size `RevEntryByteSize`
+export const RevEntryByteSize = 32;
+
+/**
+ * Generate a random revocation registry id.
+ * @returns {string} The id as a hex string
+ */
+export function createRandomRegistryId() {
+  return randomAsHex(RevRegIdByteSize);
 }
+
+export {
+  DidKeys,
+  KeyringPairDidKeys,
+  OneOfPolicy,
+};
 </code></pre>
         </article>
     </section>

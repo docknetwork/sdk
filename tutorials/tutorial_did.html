@@ -147,7 +147,138 @@
 
                 <div id="content" class="content">
                     <main>
-                        
+                        <h1><a class="header" href="#did" id="did">DID</a></h1>
+<p>If you are not familiar with DIDs, you can get a conceptual overview <a href="./concepts_did.html">here</a>.</p>
+<h2><a class="header" href="#overview" id="overview">Overview</a></h2>
+<p>DIDs in Dock are created by choosing a 32 byte unique (on Dock chain) identifier along with a public key. The public key
+can be changed by providing a signature with the currently active key. The DID can also be removed by providing a signature
+with the currently active key. As of now, a DID can have only one key at a time.
+The chain-state stores a few things for a DID, the current public key, the controller and the block number when the DID was
+last updated, so in the beginning the block number would be the one where the DID was created, when a DID's key is updated,
+that block number is changed to the one in which the key got updated. This is done for replay protection as every
+update (or removal) to the DID must include the last block number where the DID was updated and after each update the block
+number changes, thus giving replay protection. This detail however is hidden in the API so the caller should not have to worry
+about this.</p>
+<h2><a class="header" href="#did-creation" id="did-creation">DID creation</a></h2>
+<p>Create a new random DID.</p>
+<pre><code class="language-js">import {createNewDockDID} from '@dock/sdk/utils/did';
+
+const did = createNewDockDID();
+</code></pre>
+<p>The DID is not yet registered on the chain. Before the DID can be registered, a public key needs to created as well.</p>
+<h2><a class="header" href="#public-key-creation" id="public-key-creation">Public key creation</a></h2>
+<p>Dock supports 3 kinds of public keys, Sr25519, Ed25519 and EcdsaSecp256k1. These public keys are supported
+through 3 classes, <code>PublicKeySr25519</code>, <code>PublicKeyEd25519</code> and <code>PublicKeySecp256k1</code> respectively. These 3 classes
+extend from the same class called <code>PublicKey</code>. These can be instantiated directly by passing them as hex encoded bytes</p>
+<pre><code class="language-js">import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from '@dock/sdk/api';
+
+const pk1 = new PublicKeySr25519(bytesAsHex);
+const pk2 = new PublicKeyEd25519(bytesAsHex);
+const pk3 = new PublicKeySecp256k1(bytesAsHex);
+</code></pre>
+<p>Or they can be created by first creating a keyring</p>
+<pre><code class="language-js">import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from '@dock/sdk/api';
+
+// Assuming you had a keyring, you can create keypairs or used already created keypairs
+const pair1 = keyring.addFromUri(secretUri, someMetadata, 'ed25519');
+const pk1 = PublicKeyEd25519.fromKeyringPair(pair1);
+
+const pair2 = keyring.addFromUri(secretUri2, someMetadata, 'sr25519');
+const pk2 = PublicKeySr25519.fromKeyringPair(pair2);
+
+</code></pre>
+<p>Polkadot-js keyring does not support ECDSA with secp256k1 so there is a function <code>generateEcdsaSecp256k1Keypair</code> that
+takes some entropy and generate a keypair.</p>
+<pre><code class="language-js">import { generateEcdsaSecp256k1Keypair } from '@dock/sdk/utils/misc';
+// The pers and entropy are optional but must be used when keys need to be deterministic
+const pair3 = generateEcdsaSecp256k1Keypair(pers, entropy);
+const pk3 = PublicKeySecp256k1.fromKeyringPair(pair3);
+</code></pre>
+<p>Or you can directly pass any of the above keypairs in the function <code>getPublicKeyFromKeyringPair</code> and it will return an
+object of the proper child class of <code>PublicKey</code></p>
+<pre><code class="language-js">import { getPublicKeyFromKeyringPair } from '@dock/sdk/utils/misc';
+const publicKey = getPublicKeyFromKeyringPair(pair);
+</code></pre>
+<h2><a class="header" href="#registering-a-new-did-on-chain" id="registering-a-new-did-on-chain">Registering a new DID on chain</a></h2>
+<p>Now that you have a DID and a public key, the DID can be registered on the Dock chain. Note that this public key associated
+with DID is independent of the key used for sending the transaction and paying the fees.</p>
+<ol>
+<li>First create a key detail object. The first argument of this function is a <code>PublicKey</code> and the second argument is
+the controller. The controller is the DID that controls the public key and this can be the same as the DID being
+registered.
+<pre><code class="language-js">import {createKeyDetail} from '@dock/sdk/utils/did';
+const keyDetail = createKeyDetail(publicKey, did);
+</code></pre>
+</li>
+<li>Now submit the transaction using a <code>DockAPI</code> object and the newly created DID <code>did</code> and <code>keyDetail</code>.
+<pre><code class="language-js">const transaction = dock.did.new(did, keyDetail);
+// Send the transaction to the chain
+await dock.sendTransaction(transaction);
+</code></pre>
+</li>
+</ol>
+<h2><a class="header" href="#fetching-a-did-from-chain" id="fetching-a-did-from-chain">Fetching a DID from chain</a></h2>
+<p>To get a DID document, use <code>getDocument</code>
+<code>js const result = await dock.did.getDocument(did); </code>
+To get more</p>
+<h2><a class="header" href="#updating-an-existing-did-on-chain" id="updating-an-existing-did-on-chain">Updating an existing DID on chain</a></h2>
+<p>The public key or the controller of an on-chain DID can be updated by preparing a signed key update.</p>
+<ol>
+<li>Create a new public key and fetch the current keypair to sign the key update message
+<pre><code class="language-js">// the current pair, its a sr25519 in this example
+const currentPair = dock.keyring.addFromUri(secretUri, null, 'sr25519');
+const newPk = // Using any of the above methods
+</code></pre>
+</li>
+<li>The caller might directly create a signed key update
+<pre><code class="language-js">import {createSignedKeyUpdate} from '@dock/sdk/utils/did';
+// If you do not wish to update the controller, don't pass `newController`
+const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, did, newPk, currentPair, newController);
+</code></pre>
+</li>
+<li>In some cases the caller might not have the keypair like a hardware wallet or a remote signer, in that case, the caller
+creates the key update message bytes with <code>createKeyUpdate</code> to pass to the signer and get the signature
+<pre><code class="language-js">import {createKeyUpdate} from '@dock/sdk/utils/did';
+const keyUpdate = await createKeyUpdate(dock.did, did, newPk, newController);
+const signature = // Get the signature on `keyUpdate`
+</code></pre>
+</li>
+<li>Now send the key update message with the signature to the chain in a transaction
+<pre><code class="language-js">const transaction = dock.did.updateKey(keyUpdate, signature);
+await dock.sendTransaction(transaction);
+</code></pre>
+</li>
+</ol>
+<h2><a class="header" href="#updating-an-existing-did-on-chain-1" id="updating-an-existing-did-on-chain-1">Updating an existing DID on chain</a></h2>
+<p>A DID can be removing from the chain by sending the corresponding message signed with the current key.</p>
+<ol>
+<li>Fetch the current keypair to sign the DID removal message
+<pre><code class="language-js">// the current pair, its a sr25519 in this example
+const currentPair = dock.keyring.addFromUri(secretUri, null, 'sr25519');
+</code></pre>
+</li>
+<li>The caller might directly create a signed message
+<pre><code class="language-js">import {createSignedDidRemoval} from '@dock/sdk/utils/did';
+const [didRemoval, signature] = await createSignedDidRemoval(dock.did, dockDID, currentPair);
+</code></pre>
+</li>
+<li>As mentioned above, in some cases the caller might not have the keypair, then he creates the removal message bytes
+with <code>createKeyUpdate</code> to pass to the signer and get the signature
+<pre><code class="language-js">import {createDidRemoval} from '@dock/sdk/utils/did';
+const didRemoval = await createDidRemoval(dock.did, did);
+const signature = // Get the signature on `didRemoval`
+</code></pre>
+</li>
+<li>Now send the message with the signature to the chain in a transaction
+<pre><code class="language-js">const transaction = dock.did.remove(didRemoval, signature);
+await dock.sendTransaction(transaction);
+</code></pre>
+</li>
+</ol>
+<p>Note that they accounts used to send the transactions are independent of the keys associated with the DID. So the DID could
+have been created with one account, updated with another account and removed with another account. The accounts are not relevant
+in the data model and not associated with the DID in the chain-state.</p>
+
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

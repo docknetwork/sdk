@@ -151,15 +151,252 @@
                     <main>
                         <h1><a class="header" href="#introduction" id="introduction">Introduction</a></h1>
 <h1><a class="header" href="#concepts" id="concepts">Concepts</a></h1>
+<ol>
+<li><a href="./concepts_did.html">DID</a></li>
+<li><a href="./concepts_vcdm.html">Verifiable credentials</a></li>
+</ol>
 <h1><a class="header" href="#verifiable-credentials" id="verifiable-credentials">Verifiable Credentials</a></h1>
 <p>Credentials are a part of our daily lives: driver's licenses are used to assert that we are capable of operating a motor vehicle, university degrees can be used to assert our level of education, and government-issued passports enable us to travel between countries. These credentials provide benefits to us when used in the physical world, but their use on the Web continues to be elusive.</p>
 <p>Currently it is difficult to express education qualifications, healthcare data, financial account details, and other sorts of third-party verified machine-readable personal information on the Web. The difficulty of expressing digital credentials on the Web makes it challenging to receive the same benefits through the Web that physical credentials provide us in the physical world.</p>
-<p>The <a href="https://www.w3.org/TR/vc-data-model/">VCDM specification</a> specification provides a standard way to express credentials on the Web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.</p>
+<p>The <a href="https://www.w3.org/TR/vc-data-model/">Verifiable Credentials Data Model 1.0 (VCDM)</a> specification provides a standard way to express credentials on the Web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.</p>
+<h2><a class="header" href="#participants-and-workflow" id="participants-and-workflow">Participants and workflow</a></h2>
+<ul>
+<li>Credentials are issued by an entity called the <strong>issuer</strong>.</li>
+<li><strong>Issuer</strong> issues the credential about a <strong>subject</strong> by signing the credential with his key. If the credential is revocable,
+the issuer must specify how and from where revocation status must be checked. It is not necessary that revocation is managed by
+the issuer, the issuer might designate a different authority for revocation.</li>
+<li><strong>Issuer</strong> gives the credential to the <strong>holder</strong>. The <strong>holder</strong> might be the same as the <strong>subject</strong>.</li>
+<li>A service provider or anyone willing to check if the <strong>holder</strong> possesses certain credentials requests a <strong>presentation</strong> about those
+credentials. This entity requesting the <strong>presentation</strong> is called the <strong>verifier</strong>. To protect against replay attacks, (a
+verifier receiving the presentation and replaying the same presentation at some other verifier), a verifier must supply a
+challenge that must be embedded in the presentation.</li>
+<li><strong>Holder</strong> creates a <strong>presentation</strong> for the required credentials. The <strong>presentation</strong> must indicate which
+credentials it is about and must be signed by the <strong>holder</strong> of the credentials.</li>
+<li><strong>Verifier</strong> on receiving the presentation verifies the validity of each credential in the <strong>presentation</strong>. This includes
+checking correctness of the data model of the credential, the authenticity by verifying the issuer's signature and revocation
+status if the credential is revocable. It then checks whether the presentation contains the signature from the
+<strong>holder</strong> on the presentation which also includes his given challenge.</li>
+</ul>
+<h2><a class="header" href="#issuing" id="issuing">Issuing</a></h2>
+<p>To issue a verifiable credential, the issuer needs to have a public key that is accessible by the holder and verifier to verify the
+signature (in <code>proof</code>) in the credential. Though the VCDM spec does not mandate it, an issuer in Dock must have a DID on chain.
+This DID is present in the credential in the <code>issuer</code> field.</p>
+<h2><a class="header" href="#revocation" id="revocation">Revocation</a></h2>
+<p>If the credential is revocable, the issuer must specify how the revocation check must be done in the <code>credentialStatus</code> field.
+On Dock, credential revocation is managed with a revocation registry. There can be multiple registries on chain and each
+registry has a unique id. It is advised that the revocation authority creates a new registry for each credential type.
+While issuing the credential, issuer embeds the revocation registry's id in the credential in the <code>credentialStatus</code> field.
+To revoke a credential, the revocation authority (might be same as the issuer), puts a hash of the credential id in the revocation registry.
+To check the revocation status of a credential, hash the credential id and query the registry id specified in the credential.</p>
+<p>The revocation of a credential can be undone if the revocation registry supports undoing. Moreover, currently, each registry is
+controlled by a single DID so that DID can revoke a credential or undo the revocation. In future, Dock will support controlling
+the registry with mulitple DIDs and in different fashions, like any one of the controller DIDs could revoke or a threshold is needed,
+etc. To learn more about revocation registries, refer the corresponding section of the documentation.</p>
+<h2><a class="header" href="#presentation" id="presentation">Presentation</a></h2>
+<p>The holder while creating the presentation signs it with his private key. For the verifier to verify this signature, he
+must know the holder's public key. One way to achieve this is to make the holder have a DID too so that the verifier can look
+up the DID on chain and learn the public key.</p>
+<h1><a class="header" href="#w3c-did" id="w3c-did">W3C DID</a></h1>
+<p>DID stands for Decentralized IDentifiers. DIDs are meant to be globally unique identifiers that allow their owner to
+prove cryptographic control over them. The owner(s) of the DID is called the <code>controller</code>. The identifiers are not just assignable
+to humans but to anything. Quoting the <a href="https://www.w3.org/TR/did-core/">DID spec</a>,</p>
+<blockquote>
+<p>A DID identifies any subject (e.g., a person, organization, thing, data model, abstract entity, etc.) that the controller
+of the DID decides that it identifies.</p>
+</blockquote>
+<p>DIDs differ from public keys in that DIDs are persistent, i.e. a public key has to be changed if the private key is stolen/lost
+or the cryptographic scheme of the public key is no longer considered safe. This is not the case with DIDs, they can remain
+unchanged even when the associated cryptographic material changes. Moreover, a DID can have multiple keys and any of its
+keys can be rotated. Additionally, depending on the scheme, public keys can be quite large (several hundred bytes in RSA)
+whereas a unique identifier can be much smaller.</p>
+<p>Each DID is associated with a <code>DID Document</code> that specifies the subject, the public keys, the authentication mechanisms usable
+by the subject, authorizations the subject has given to others, service endpoints to communicate with the subject, etc,
+for all properties that can be put in the DID Document, refer <a href="https://www.w3.org/TR/did-core/#core-properties">this section of the spec</a>.
+DIDs and their associated DID Documents are stored on the DID registry which is a term used for the centralized on decentralized
+database persisting the DID and its Document.</p>
+<p>The process of discovering the DID Document for a DID is called DID resolution and the tool (library or a service) is called DID
+resolver. To resolve the DID, the resolver first needs to check on which registry the DID is hosted and then decide whether it
+is capable or willing to lookup that registry. The registry is indicated by the <code>DID method</code> of that DID. In addition to the
+registry, the method also specifies other details of that DID like the supported operations, crypto, etc. Each DID method
+defines its own specification, Docks's DID method spec is <a href="https://github.com/docknetwork/dock-did-driver">here</a>. In case of
+Dock, the registry is the Dock blockchain and the method is <code>dock</code>.</p>
+<p>An example Dock DID.</p>
+<pre><code>did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW
+</code></pre>
+<p>Above DID has method <code>dock</code> and the DID identifier is <code>5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW</code>. Dock DID identifiers
+are 32 bytes in size.</p>
+<p>An example DID Document</p>
+<pre><code>{
+  &quot;@context&quot;: &quot;https://www.w3.org/ns/did/v1&quot;,
+  &quot;id&quot;: &quot;did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW&quot;,
+  &quot;authentication&quot;: [
+    &quot;did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW#keys-1&quot;
+  ],
+  &quot;assertionMethod&quot;: [
+    &quot;did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW#keys-1&quot;
+  ],
+  &quot;publicKey&quot;: [
+    {
+      &quot;id&quot;: &quot;did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW#keys-1&quot;,
+      &quot;type&quot;: &quot;Sr25519VerificationKey2020&quot;,
+      &quot;controller&quot;: &quot;did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW&quot;,
+      &quot;publicKeyBase58&quot;: &quot;8bEsU4JWBVVFQCdd8du7Txo6L3JHdJYQByHBqzL1WXwy&quot;
+    }
+  ]
+}
+</code></pre>
+<p>Note that Dock DIDs support only one key as of now. The key is present in the <code>publicKey</code> section. Note how that public key
+is referred to using its <code>id</code> in <code>authentication</code> and <code>assertionMethod</code> sections. The above document states that the DID
+<code>did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW</code> authenticates with public key under <code>publicKey</code> and also when
+it attests to some fact (becomes issuer), it uses that key. As there is only one public key supported for a DID, that
+public key is used for both <code>authentication</code> and <code>assertionMethod</code>. When support for multiple keys is added, the DID can
+specify which key(s) needs to be used for <code>authentication</code> and which ones for <code>assertionMethod</code>.</p>
+<p>Another thing to keep in mind is that the keys associated with the Dock DID are independent of the keys used to send the
+transaction on chain and pay fees. Eg. Alice might not have any tokens to write anything on chain but can still create a
+DID and corresponding key and ask Bob who has tokens to register the DID on chain. Even though Bob wrote the DID on chain,
+he cannot update or remove it since only Alice has the keys associated with that DID. Similarly, when Alice wants to update
+the DID (public key or controller), it can create the update, sign it and send it to Carol this time to send the update on
+chain.</p>
 <h1><a class="header" href="#tutorial" id="tutorial">Tutorial</a></h1>
+<ol>
+<li><a href="./tutorial_did.html">DID</a></li>
+<li><a href="./tutorial_revocation.html">Revocation</a></li>
+<li><a href="./tutorial_ipv.html">Verifiable credentials</a></li>
+</ol>
+<h1><a class="header" href="#did" id="did">DID</a></h1>
+<p>If you are not familiar with DIDs, you can get a conceptual overview <a href="./concepts_did.html">here</a>.</p>
+<h2><a class="header" href="#overview" id="overview">Overview</a></h2>
+<p>DIDs in Dock are created by choosing a 32 byte unique (on Dock chain) identifier along with a public key. The public key
+can be changed by providing a signature with the currently active key. The DID can also be removed by providing a signature
+with the currently active key. As of now, a DID can have only one key at a time.
+The chain-state stores a few things for a DID, the current public key, the controller and the block number when the DID was
+last updated, so in the beginning the block number would be the one where the DID was created, when a DID's key is updated,
+that block number is changed to the one in which the key got updated. This is done for replay protection as every
+update (or removal) to the DID must include the last block number where the DID was updated and after each update the block
+number changes, thus giving replay protection. This detail however is hidden in the API so the caller should not have to worry
+about this.</p>
+<h2><a class="header" href="#did-creation" id="did-creation">DID creation</a></h2>
+<p>Create a new random DID.</p>
+<pre><code class="language-js">import {createNewDockDID} from '@dock/sdk/utils/did';
+
+const did = createNewDockDID();
+</code></pre>
+<p>The DID is not yet registered on the chain. Before the DID can be registered, a public key needs to created as well.</p>
+<h2><a class="header" href="#public-key-creation" id="public-key-creation">Public key creation</a></h2>
+<p>Dock supports 3 kinds of public keys, Sr25519, Ed25519 and EcdsaSecp256k1. These public keys are supported
+through 3 classes, <code>PublicKeySr25519</code>, <code>PublicKeyEd25519</code> and <code>PublicKeySecp256k1</code> respectively. These 3 classes
+extend from the same class called <code>PublicKey</code>. These can be instantiated directly by passing them as hex encoded bytes</p>
+<pre><code class="language-js">import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from '@dock/sdk/api';
+
+const pk1 = new PublicKeySr25519(bytesAsHex);
+const pk2 = new PublicKeyEd25519(bytesAsHex);
+const pk3 = new PublicKeySecp256k1(bytesAsHex);
+</code></pre>
+<p>Or they can be created by first creating a keyring</p>
+<pre><code class="language-js">import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from '@dock/sdk/api';
+
+// Assuming you had a keyring, you can create keypairs or used already created keypairs
+const pair1 = keyring.addFromUri(secretUri, someMetadata, 'ed25519');
+const pk1 = PublicKeyEd25519.fromKeyringPair(pair1);
+
+const pair2 = keyring.addFromUri(secretUri2, someMetadata, 'sr25519');
+const pk2 = PublicKeySr25519.fromKeyringPair(pair2);
+
+</code></pre>
+<p>Polkadot-js keyring does not support ECDSA with secp256k1 so there is a function <code>generateEcdsaSecp256k1Keypair</code> that
+takes some entropy and generate a keypair.</p>
+<pre><code class="language-js">import { generateEcdsaSecp256k1Keypair } from '@dock/sdk/utils/misc';
+// The pers and entropy are optional but must be used when keys need to be deterministic
+const pair3 = generateEcdsaSecp256k1Keypair(pers, entropy);
+const pk3 = PublicKeySecp256k1.fromKeyringPair(pair3);
+</code></pre>
+<p>Or you can directly pass any of the above keypairs in the function <code>getPublicKeyFromKeyringPair</code> and it will return an
+object of the proper child class of <code>PublicKey</code></p>
+<pre><code class="language-js">import { getPublicKeyFromKeyringPair } from '@dock/sdk/utils/misc';
+const publicKey = getPublicKeyFromKeyringPair(pair);
+</code></pre>
+<h2><a class="header" href="#registering-a-new-did-on-chain" id="registering-a-new-did-on-chain">Registering a new DID on chain</a></h2>
+<p>Now that you have a DID and a public key, the DID can be registered on the Dock chain. Note that this public key associated
+with DID is independent of the key used for sending the transaction and paying the fees.</p>
+<ol>
+<li>First create a key detail object. The first argument of this function is a <code>PublicKey</code> and the second argument is
+the controller. The controller is the DID that controls the public key and this can be the same as the DID being
+registered.
+<pre><code class="language-js">import {createKeyDetail} from '@dock/sdk/utils/did';
+const keyDetail = createKeyDetail(publicKey, did);
+</code></pre>
+</li>
+<li>Now submit the transaction using a <code>DockAPI</code> object and the newly created DID <code>did</code> and <code>keyDetail</code>.
+<pre><code class="language-js">const transaction = dock.did.new(did, keyDetail);
+// Send the transaction to the chain
+await dock.sendTransaction(transaction);
+</code></pre>
+</li>
+</ol>
+<h2><a class="header" href="#fetching-a-did-from-chain" id="fetching-a-did-from-chain">Fetching a DID from chain</a></h2>
+<p>To get a DID document, use <code>getDocument</code>
+<code>js const result = await dock.did.getDocument(did); </code>
+To get more</p>
+<h2><a class="header" href="#updating-an-existing-did-on-chain" id="updating-an-existing-did-on-chain">Updating an existing DID on chain</a></h2>
+<p>The public key or the controller of an on-chain DID can be updated by preparing a signed key update.</p>
+<ol>
+<li>Create a new public key and fetch the current keypair to sign the key update message
+<pre><code class="language-js">// the current pair, its a sr25519 in this example
+const currentPair = dock.keyring.addFromUri(secretUri, null, 'sr25519');
+const newPk = // Using any of the above methods
+</code></pre>
+</li>
+<li>The caller might directly create a signed key update
+<pre><code class="language-js">import {createSignedKeyUpdate} from '@dock/sdk/utils/did';
+// If you do not wish to update the controller, don't pass `newController`
+const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, did, newPk, currentPair, newController);
+</code></pre>
+</li>
+<li>In some cases the caller might not have the keypair like a hardware wallet or a remote signer, in that case, the caller
+creates the key update message bytes with <code>createKeyUpdate</code> to pass to the signer and get the signature
+<pre><code class="language-js">import {createKeyUpdate} from '@dock/sdk/utils/did';
+const keyUpdate = await createKeyUpdate(dock.did, did, newPk, newController);
+const signature = // Get the signature on `keyUpdate`
+</code></pre>
+</li>
+<li>Now send the key update message with the signature to the chain in a transaction
+<pre><code class="language-js">const transaction = dock.did.updateKey(keyUpdate, signature);
+await dock.sendTransaction(transaction);
+</code></pre>
+</li>
+</ol>
+<h2><a class="header" href="#updating-an-existing-did-on-chain-1" id="updating-an-existing-did-on-chain-1">Updating an existing DID on chain</a></h2>
+<p>A DID can be removing from the chain by sending the corresponding message signed with the current key.</p>
+<ol>
+<li>Fetch the current keypair to sign the DID removal message
+<pre><code class="language-js">// the current pair, its a sr25519 in this example
+const currentPair = dock.keyring.addFromUri(secretUri, null, 'sr25519');
+</code></pre>
+</li>
+<li>The caller might directly create a signed message
+<pre><code class="language-js">import {createSignedDidRemoval} from '@dock/sdk/utils/did';
+const [didRemoval, signature] = await createSignedDidRemoval(dock.did, dockDID, currentPair);
+</code></pre>
+</li>
+<li>As mentioned above, in some cases the caller might not have the keypair, then he creates the removal message bytes
+with <code>createKeyUpdate</code> to pass to the signer and get the signature
+<pre><code class="language-js">import {createDidRemoval} from '@dock/sdk/utils/did';
+const didRemoval = await createDidRemoval(dock.did, did);
+const signature = // Get the signature on `didRemoval`
+</code></pre>
+</li>
+<li>Now send the message with the signature to the chain in a transaction
+<pre><code class="language-js">const transaction = dock.did.remove(didRemoval, signature);
+await dock.sendTransaction(transaction);
+</code></pre>
+</li>
+</ol>
+<p>Note that they accounts used to send the transactions are independent of the keys associated with the DID. So the DID could
+have been created with one account, updated with another account and removed with another account. The accounts are not relevant
+in the data model and not associated with the DID in the chain-state.</p>
 <h1><a class="header" href="#verifiable-credentials-and-verifiable-presentations-issuing-signing-and-verification" id="verifiable-credentials-and-verifiable-presentations-issuing-signing-and-verification">Verifiable Credentials and Verifiable Presentations: issuing, signing and verification</a></h1>
 <h2><a class="header" href="#todo" id="todo">TODO:</a></h2>
 <ul>
-<li>how should we refer to the sdk in the docs? <code>client-sdk</code> doesn't sound very appealing, maybe we want to give it a name?</li>
 <li>add section about keyDoc creation</li>
 <li>add section about DID integration</li>
 <li>The intro was 99% taken from the VCDM spec. Do we need more than this ?</li>
@@ -462,6 +699,76 @@ For the simplest cases you only need a <code>challenge</code> string and possibl
     }
 </code></pre>
 <p>Please note that the verification is an async process that returns an object when the promise resolves. This object contains separate results for the verification processes of the included Verifiable Credentials and the overall Verifiable Presentation. A boolean value for the entire verification process can be checked at the root level <code>verified</code> property.</p>
+<h1><a class="header" href="#revocation-1" id="revocation-1">Revocation</a></h1>
+<h2><a class="header" href="#overview-1" id="overview-1">Overview</a></h2>
+<p>Credential revocation is managed with on-chain revocation registries. To revoke a credential, its id (or hash of its id) must be
+added to the credential. It is advised to have one revocation registry per credential type. Each registry has a unique id and
+an associated policy. The policy determines who can update the revocation registry. The registry also has an &quot;add-only&quot; flag specifying
+whether an id once added to the registry can be removed (leading to undoing the revocation) or not.
+Similar to the replay protection mechanism for DIDs, for each registry, the last modified block number is kept which is updated
+each time a credential is revoked or unrevoked.
+For now, only one policy is supported which is that each registry is owned by a single DID. Also, neither the policy
+nor the &quot;add-only&quot; flag can be updated post the creation of the registry for now.</p>
+<h2><a class="header" href="#registry-creation" id="registry-creation">Registry creation</a></h2>
+<p>To create a registry, first a <code>Policy</code> object needs to be created for which a DID is needed. It is advised that the DID
+is registered on chain first (else someone can look at the registry a register the DID, thus controlling the registry).</p>
+<pre><code class="language-js">import {OneOfPolicy} from '@dock/sdk/utils/revocation';
+const policy = new OneOfPolicy();
+policy.addOwner(ownerDID);
+
+// Or in a single step
+const policy = new OneOfPolicy([ownerDID]);
+</code></pre>
+<p>Now create a random registry id. The registry id supposed to be unique among all registries on chain.</p>
+<pre><code class="language-js">import {createRandomRegistryId} from '@dock/sdk/utils/revocation';
+const registryId = createRandomRegistryId();
+</code></pre>
+<p>Now send the transaction to create a registry on-chain using <code>dock.revocation.newRegistry</code>. This method accepts the registry id,
+the policy object and a boolean that specifies whether the registry is add-only or not meaning that whether undoing revocations
+is allowed or not. Ifs <code>true</code>, it makes the registry add-only meaning that undoing revocations is not allowed, if <code>false</code>,
+undoing is allowed.</p>
+<pre><code class="language-js">// Setting the last argument to false to allow unrevoking the credential (undoing revocation)
+const transaction = dock.revocation.newRegistry(registryId, policy, false);
+await dock.sendTransaction(transaction);
+</code></pre>
+<h2><a class="header" href="#revoking-a-credential" id="revoking-a-credential">Revoking a credential</a></h2>
+<p>Revoking a credential requires a signature from the owner of the registry. For that, fetch the owner's DID and pair and
+create a map</p>
+<pre><code class="language-js">const didKeys = new KeyringPairDidKeys();
+didKeys.set(ownerDID, ownerKeypair);
+</code></pre>
+<p>Now get the registry id, <code>registryId</code> and the revocation id (the hash of credential id), <code>revokeId</code> and send the transaction on chain.
+Revoking an already revoked credential has no effect.</p>
+<pre><code class="language-js">const transaction = await dock.revocation.revokeCredential(didKeys, registryId, revokeId);
+await dock.sendTransaction(transaction);
+</code></pre>
+<p>Revoking multiple ids in a single transaction is possible but with a lower level method <code>dock.revocation.revoke</code>.</p>
+<h2><a class="header" href="#undoing-a-revocation" id="undoing-a-revocation">Undoing a revocation</a></h2>
+<p>Similar to revocation, undoing the revocation also requires a signature from the owner of the registry. As before, fetch
+the owner's DID and pair and create a map</p>
+<pre><code class="language-js">const didKeys = new KeyringPairDidKeys();
+didKeys.set(ownerDID, ownerKeypair);
+</code></pre>
+<p>Now get the registry id, <code>registryId</code> and the revocation id to undo, <code>revokeId</code> and send the transaction on chain.
+Unrevoking an unrevoked credential has no effect.</p>
+<pre><code class="language-js">const transaction = await dock.revocation.unrevokeCredential(didKeys, registryId, revokeId);
+await dock.sendTransaction(transaction);
+</code></pre>
+<p>Undoing revocation for multiple ids in a single transaction is possible but with a lower level method <code>dock.revocation.unrevoke</code>.</p>
+<h2><a class="header" href="#checking-the-revocation-status" id="checking-the-revocation-status">Checking the revocation status</a></h2>
+<p>To check an id is revoked or not, call <code>dock.revocation.getIsRevoked</code> with the registry id and revocation id. Returns <code>true</code>
+if revoked else <code>false</code>.</p>
+<pre><code class="language-js">const isRevoked = await dock.revocation.getIsRevoked(registryId, revokeId);
+</code></pre>
+<h2><a class="header" href="#fetching-the-registry-details" id="fetching-the-registry-details">Fetching the registry details</a></h2>
+<p>To get the details of the registry like policy, add-only status and block number when it was last updated, use <code>dock.revocation.getRegistryDetail</code></p>
+<h2><a class="header" href="#removing-the-registry" id="removing-the-registry">Removing the registry</a></h2>
+<p>A registry can be deleted leading to all the corresponding revocation ids being deleted as well. This requires the signature
+from owner like other updates. Use the <code>dock.revocation.removeRegistry</code> method to remove a registry.</p>
+<pre><code class="language-js">const lastModified = await dock.revocation.getBlockNoForLastChangeToRegistry(registryId);
+const transaction = dock.revocation.removeRegistry(registryId, lastModified, didKeys);
+await dock.sendTransaction(transaction);
+</code></pre>
 
                     </main>
 

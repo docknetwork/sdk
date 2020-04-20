@@ -394,6 +394,100 @@ await dock.sendTransaction(transaction);
 <p>Note that they accounts used to send the transactions are independent of the keys associated with the DID. So the DID could
 have been created with one account, updated with another account and removed with another account. The accounts are not relevant
 in the data model and not associated with the DID in the chain-state.</p>
+<h1><a class="header" href="#did-resolver" id="did-resolver">DID resolver</a></h1>
+<p>The process of learning the DID Document of a DID is called DID resolution and tool that does the resolution is called the
+resolver. Resolution involves looking at the DID method and then fetching the DID Document from the registry, the registry
+might be a centralized database or a blockchain. The SDK supports resolving Dock DIDs natively.
+For other DIDs, resolving the DID through the <a href="https://uniresolver.io">Universal Resolver</a> is supported.</p>
+<p>Each resolver should extend the class <code>DIDResolver</code> and implement the <code>resolve</code> method that accepts a DID and returns the
+DID document. There is another class called <code>MultiResolver</code> that can accept several types of resolvers (objects of subclasses
+of <code>DIDResolver</code>) and once the <code>MultiResolver</code> is initialized with the resolvers of different DID methods, it can resolve
+DIDs of those methods.</p>
+<h2><a class="header" href="#dock-resolver" id="dock-resolver">Dock resolver</a></h2>
+<p>The resolver for Dock DIDs <code>DockResolver</code> connects to the Dock blockchain to get the DID details. The resolver is
+constructed by passing it a Dock API object so that it can connect to a Dock node. This is how you resolve a Dock DID:</p>
+<pre><code class="language-js">import { DockResolver } from '@dock/sdk/resolver';
+
+// Assuming the presence of Dock API object `dock`
+const dockResolver = new DockResolver(dock);
+// Say you had a DID `dock:did:5D.....`
+const didDocument = dockResolver.resolve('dock:did:5D.....');
+</code></pre>
+<h2><a class="header" href="#creating-a-resolver-class-for-a-different-method" id="creating-a-resolver-class-for-a-different-method">Creating a resolver class for a different method</a></h2>
+<p>If you want to resolve DIDs other than Dock and do not have/want access to the universal resolver, you can extend the
+<code>DIDResolver</code> class to create a custom resolver. Following is an example to build a custom Ethereum resolver. It uses the
+library <a href="https://github.com/decentralized-identity/ethr-did-resolver">ethr-did-resolver</a> and accepts a provider information
+as configuration. The example below uses Infura to get access to an Ethereum node and read the DID off Ethereum.</p>
+<pre><code class="language-js">import { DIDResolver } from '@dock/sdk/resolver';
+import ethr from 'ethr-did-resolver';
+
+// Infura's Ethereum provider for the main net.
+const ethereumProviderConfig = {
+  networks: [
+    {
+      name: 'mainnet',
+      rpcUrl: 'https://mainnet.infura.io/v3/blahblahtoken',
+    },
+  ],
+};
+
+// Custom ethereum resolver class
+class EtherResolver extends DIDResolver {
+  constructor(config) {
+    super();
+    this.ethres = ethr.getResolver(config).ethr;
+  }
+
+  async resolve(did) {
+    const parsed = this.parseDid(did);
+    try {
+      return await this.ethres(did, parsed);
+    } catch (e) {
+      throw new NoDIDError(did);
+    }
+  }
+}
+
+// Construct the resolver
+const ethResolver = new EtherResolver(ethereumProviderConfig);
+
+// Say you had a DID `did:ethr:0x6f....`
+const didDocument = ethResolver.resolve('did:ethr:0x6f....');
+</code></pre>
+<h2><a class="header" href="#universal-resolver" id="universal-resolver">Universal resolver</a></h2>
+<p>To resolve DIDs using the <a href="https://uniresolver.io">Universal Resolver</a>, use the <code>UniversalResolver</code>. It needs the URL
+of the universal resolver and assumes the universal resolver from this <a href="https://github.com/decentralized-identity/universal-resolver">codebase</a>
+is running at the URL.</p>
+<pre><code class="language-js">import { UniversalResolver } from '@dock/sdk/resolver';
+
+// Change the resolver URL to something else in case you cannot use the resolver at https://uniresolver.io
+const universalResolverUrl = 'https://uniresolver.io';
+const universalResolver = new UniversalResolver(universalResolverUrl);
+
+// Say you had a DID `did:btcr:xk....`
+const didDocument = universalResolver.resolve('did:btcr:xk....');
+</code></pre>
+<h2><a class="header" href="#resolving-dids-of-several-did-methods-with-a-single-resolver" id="resolving-dids-of-several-did-methods-with-a-single-resolver">Resolving DIDs of several DID methods with a single resolver</a></h2>
+<p>In case you need to resolve DIDs from more than one method, a <code>MultiResolver</code> object can be created by passing
+resolvers of various DID methods. The <code>MultiResolver</code> also accepts a <code>UniversalResolver</code> as an optional parameter which
+is used when a DID for an unknown method needs to be resolved. The <code>resolvers</code> object below has resolvers for DID methods
+<code>dock</code> and <code>ethr</code>. For resolving DID of any other method, the given <code>UniversalResolver</code> object will be used.</p>
+<pre><code class="language-js">import { MultiResolver } from '@dock/sdk/resolver';
+
+
+const resolvers = {
+    dock: new DockResolver(dock), // Prebuilt resolver
+    ethr: new EtherResolver(ethereumProviderConfig), // Custom resolver
+  };
+
+const multiResolver = new MultiResolver(resolvers, new UniversalResolver(universalResolverUrl));
+
+// Say you had a DID `did:dock:5D....`, then the `DockResolver` will be used as there a resolver for Dock DID.
+const didDocumentDock = multiResolver.resolve('did:dock:5D....');
+
+// Say you had a DID `did:btcr:xk....`, then the `UniversalResolver` will be used as there is no resolver for BTC DID.
+const didDocumentBtc = multiResolver.resolve('did:btcr:xk....');
+</code></pre>
 <h1><a class="header" href="#verifiable-credentials-and-verifiable-presentations-issuing-signing-and-verification" id="verifiable-credentials-and-verifiable-presentations-issuing-signing-and-verification">Verifiable Credentials and Verifiable Presentations: issuing, signing and verification</a></h1>
 <h2><a class="header" href="#todo" id="todo">TODO:</a></h2>
 <ul>

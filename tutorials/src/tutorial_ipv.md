@@ -1,11 +1,5 @@
 # Verifiable Credentials and Verifiable Presentations: issuing, signing and verification
 
-## TODO:
-- add section about keyDoc creation
-- add section about DID integration
-- The intro was 99% taken from the VCDM spec. Do we need more than this ?
-- which folder should these docs go into? `docs` is being gitignored so the built ones don't get added by mistake.
-
 ## Table of contents
 - [Incremental creation and verification of VC](#incremental-creation-and-verification-of-verifiable-credentials)
     - [Building a Verifiable Credential](#building-a-verifiable-credential)
@@ -25,6 +19,8 @@
         - [Adding a Verifiable Credential](#adding-a-verifiable-credential)
     - [Signing a Verifiable Presentation](#signing-a-verifiable-presentation)
     - [Verifying a Verifiable Presentation](#verifying-a-verifiable-presentation)
+- [Using DIDs](#using-dids)
+- [Creating a keyDoc](#creating-a-keydoc)
 
 --------
 
@@ -337,3 +333,19 @@ For the simplest cases you only need a `challenge` string and possibly a `domain
 ```
 Please note that the verification is an async process that returns an object when the promise resolves. This object contains separate results for the verification processes of the included Verifiable Credentials and the overall Verifiable Presentation. A boolean value for the entire verification process can be checked at the root level `verified` property.
 
+## Using DIDs
+The examples shown above use different kinds of URIs as `id` property of different sections. It is worth mentioning that the use of DIDs is not only supported but also encouraged.
+Their usage is very simple: create as many DIDs as you need and then use them instead of the URIs shown above.
+So instead of `new VerifiableCredential('http://example.edu/credentials/1986')` you can use `new VerifiableCredential('did:dock:6das76dastas675da6s7d5asd675')`and for presentations: instead of `new VerifiablePresentation('http://example.edu/credentials/1986')` you can use `new VerifiablePresentation('did:dock:6das76dastas675da6s7d5asd675')`.
+The same applies when adding `holders`, `subjects` and any section that uses an `id` property.
+If you don't know how to create a DID please refer to the [tutorial on DIDs](tutorial_did.md).
+
+
+## Creating a keyDoc
+It can be seen from the above examples that signing of credentials and presentations require keypairs to be formatted into a `keyDoc` object.
+There is a helper function to help with this formatting, it's called `getKeyDoc` and it is located in the `vc` helpers.
+Its usage is very simple, it accepts a `did` string which is a DID in fully qualified form, a `keypair` object (either the keypair is part of the key doc or if the keys are extractable, they are extracted and keypair is not made part of the keyDoc) and a `type` string containing the type of the provided key (one of the supported 'Sr25519VerificationKey2020', 'Ed25519VerificationKey2018' or 'EcdsaSecp256k1VerificationKey2019'):
+```javascript
+  const keyDoc = getKeyDoc(did, keypair, type)
+```
+Please refer to the [presenting integration tests](../../tests/integration/presenting.test.js) for a live example.

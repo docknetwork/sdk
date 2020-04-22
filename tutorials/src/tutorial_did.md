@@ -87,7 +87,6 @@ To get a DID document, use `getDocument`
     ```js
     const result = await dock.did.getDocument(did);
     ```
-To get more
 
 ## Updating an existing DID on chain
 The public key or the controller of an on-chain DID can be updated by preparing a signed key update.
@@ -116,7 +115,7 @@ creates the key update message bytes with `createKeyUpdate` to pass to the signe
     await dock.sendTransaction(transaction);
     ```
 
-## Updating an existing DID on chain
+## Removing an existing DID from chain
 A DID can be removing from the chain by sending the corresponding message signed with the current key.
 1. Fetch the current keypair to sign the DID removal message
     ```js

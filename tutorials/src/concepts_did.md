@@ -23,8 +23,8 @@ The process of discovering the DID Document for a DID is called DID resolution a
 resolver. To resolve the DID, the resolver first needs to check on which registry the DID is hosted and then decide whether it
 is capable or willing to lookup that registry. The registry is indicated by the `DID method` of that DID. In addition to the
 registry, the method also specifies other details of that DID like the supported operations, crypto, etc. Each DID method
-defines its own specification, Docks's DID method spec is [here](https://github.com/docknetwork/dock-did-driver). In case of
-Dock, the registry is the Dock blockchain and the method is `dock`.
+defines its own specification, Docks's DID method spec is [here](https://github.com/docknetwork/dock-did-driver/blob/master/Dock%20DID%20method%20specification.md).
+In case of Dock, the registry is the Dock blockchain, and the method is `dock`.
 
 An example Dock DID.
 ```
@@ -34,7 +34,7 @@ Above DID has method `dock` and the DID identifier is `5CEdyZkZnALDdCAp7crTRiaCq
 are 32 bytes in size.
 
 An example DID Document
-```
+```json
 {
   "@context": "https://www.w3.org/ns/did/v1",
   "id": "did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW",

@@ -81,7 +81,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> VCDM/VP</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorial</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html" class="active"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html" class="active"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -220,8 +220,7 @@ await dock.sendTransaction(transaction);
 </ol>
 <h2><a class="header" href="#fetching-a-did-from-chain" id="fetching-a-did-from-chain">Fetching a DID from chain</a></h2>
 <p>To get a DID document, use <code>getDocument</code>
-<code>js const result = await dock.did.getDocument(did); </code>
-To get more</p>
+<code>js const result = await dock.did.getDocument(did); </code></p>
 <h2><a class="header" href="#updating-an-existing-did-on-chain" id="updating-an-existing-did-on-chain">Updating an existing DID on chain</a></h2>
 <p>The public key or the controller of an on-chain DID can be updated by preparing a signed key update.</p>
 <ol>
@@ -250,7 +249,7 @@ await dock.sendTransaction(transaction);
 </code></pre>
 </li>
 </ol>
-<h2><a class="header" href="#updating-an-existing-did-on-chain-1" id="updating-an-existing-did-on-chain-1">Updating an existing DID on chain</a></h2>
+<h2><a class="header" href="#removing-an-existing-did-from-chain" id="removing-an-existing-did-from-chain">Removing an existing DID from chain</a></h2>
 <p>A DID can be removing from the chain by sending the corresponding message signed with the current key.</p>
 <ol>
 <li>Fetch the current keypair to sign the DID removal message

@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> VCDM/VP</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorial</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -224,15 +224,15 @@ database persisting the DID and its Document.</p>
 resolver. To resolve the DID, the resolver first needs to check on which registry the DID is hosted and then decide whether it
 is capable or willing to lookup that registry. The registry is indicated by the <code>DID method</code> of that DID. In addition to the
 registry, the method also specifies other details of that DID like the supported operations, crypto, etc. Each DID method
-defines its own specification, Docks's DID method spec is <a href="https://github.com/docknetwork/dock-did-driver">here</a>. In case of
-Dock, the registry is the Dock blockchain and the method is <code>dock</code>.</p>
+defines its own specification, Docks's DID method spec is <a href="https://github.com/docknetwork/dock-did-driver/blob/master/Dock%20DID%20method%20specification.md">here</a>.
+In case of Dock, the registry is the Dock blockchain, and the method is <code>dock</code>.</p>
 <p>An example Dock DID.</p>
 <pre><code>did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW
 </code></pre>
 <p>Above DID has method <code>dock</code> and the DID identifier is <code>5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW</code>. Dock DID identifiers
 are 32 bytes in size.</p>
 <p>An example DID Document</p>
-<pre><code>{
+<pre><code class="language-json">{
   &quot;@context&quot;: &quot;https://www.w3.org/ns/did/v1&quot;,
   &quot;id&quot;: &quot;did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW&quot;,
   &quot;authentication&quot;: [
@@ -288,22 +288,114 @@ status if the credential is revocable. It then checks whether the presentation c
 <h2><a class="header" href="#issuing" id="issuing">Issuing</a></h2>
 <p>To issue a verifiable credential, the issuer needs to have a public key that is accessible by the holder and verifier to verify the
 signature (in <code>proof</code>) in the credential. Though the VCDM spec does not mandate it, an issuer in Dock must have a DID on chain.
-This DID is present in the credential in the <code>issuer</code> field.</p>
+This DID is present in the credential in the <code>issuer</code> field. An example credential where both the issuer and holder have Dock DIDs</p>
+<pre><code class="language-json">{
+    '@context': [
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1'
+    ],
+    id: '0x9b561796d3450eb2673fed26dd9c07192390177ad93e0835bc7a5fbb705d52bc',
+    type: [ 'VerifiableCredential', 'AlumniCredential' ],
+    issuanceDate: '2020-03-18T19:23:24Z',
+    credentialSubject: {
+      id: 'did:dock:5GL3xbkr3vfs4qJ94YUHwpVVsPSSAyvJcafHz1wNb5zrSPGi',
+      alumniOf: 'Example University'
+    },
+    issuer: 'did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr',
+    proof: {
+      type: 'Ed25519Signature2018',
+      created: '2020-04-22T07:50:13Z',
+      jws: 'eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..GBqyaiTMhVt4R5P2bMGcLNJPWEUq7WmGHG7Wc6mKBo9k3vSo7v7sRKwqS8-m0og_ANKcb5m-_YdXC2KMnZwLBg',
+      proofPurpose: 'assertionMethod',
+      verificationMethod: 'did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr#keys-1'
+    }
+}
+</code></pre>
+<h2><a class="header" href="#presentation" id="presentation">Presentation</a></h2>
+<p>The holder while creating the presentation signs it with his private key. For the verifier to verify the presentation, in
+addition to verifying the issuer's signature, he needs to verify this signature as well, and for that he must know the
+holder's public key. One way to achieve this is to make the holder have a DID too so that the verifier can look up the DID
+on chain and learn the public key. An example presentation signed by the holder</p>
+<pre><code class="language-json">{
+    '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
+    type: [ 'VerifiablePresentation' ],
+    verifiableCredential: [
+      {
+          '@context': [
+            'https://www.w3.org/2018/credentials/v1',
+            'https://www.w3.org/2018/credentials/examples/v1'
+          ],
+          id: 'A large credential id with size &gt; 32 bytes',
+          type: [ 'VerifiableCredential', 'AlumniCredential' ],
+          issuanceDate: '2020-03-18T19:23:24Z',
+          credentialSubject: {
+            id: 'did:dock:5GnE6u2dt9nC7tgf5vSdKy4gYX3jwqthbrBnjiay2LWETdrV',
+            alumniOf: 'Example University'
+          },
+          credentialStatus: {
+            id: 'rev-reg:dock:0x0194db371bab472a9cc920b5dfb1447aad5a6db906c46ff378cf0fc337a0c8c0',
+            type: 'CredentialStatusList2017'
+          },
+          issuer: 'did:dock:5CwAuM8cPetXWbZN2JhMFWtLjxZ6DokiDdHViGw2FfxC1Cya',
+          proof: {
+            type: 'Ed25519Signature2018',
+            created: '2020-04-22T07:58:43Z',
+            jws: 'eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..bENDgnK29BHRhP05ehbQkOPfqweppGyI7NeH02YT1hzSDEHseOzCDx-g9dS4lY-m_bElwbOptOlRnQ2g9MW7Ag',
+            proofPurpose: 'assertionMethod',
+            verificationMethod: 'did:dock:5CwAuM8cPetXWbZN2JhMFWtLjxZ6DokiDdHViGw2FfxC1Cya#keys-1'
+          }
+      }
+    ],
+    id: '0x4bd107aee17744dcec10208d7551620664dcba7e88ce11c2312c02df562754f1',
+    proof: {
+      type: 'Ed25519Signature2018',
+      created: '2020-04-22T07:58:49Z',
+      challenge: '0x6a5a5d58a99705c4d499fa7cdcdc62eeb2f742eb878456babf49b9a6669d0b76',
+      domain: 'test domain',
+      jws: 'eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..HW7bDjvsRETeM25a3BtMgER53FtzK6rUBX_46cFo-i6O1y7p_TM-ED2iSTrFBUrDc7vH8QqoeUTY8e5ir5RvCg',
+      proofPurpose: 'authentication',
+      verificationMethod: 'did:dock:5GnE6u2dt9nC7tgf5vSdKy4gYX3jwqthbrBnjiay2LWETdrV#keys-1'
+    }
+}
+</code></pre>
 <h2><a class="header" href="#revocation" id="revocation">Revocation</a></h2>
 <p>If the credential is revocable, the issuer must specify how the revocation check must be done in the <code>credentialStatus</code> field.
 On Dock, credential revocation is managed with a revocation registry. There can be multiple registries on chain and each
-registry has a unique id. It is advised that the revocation authority creates a new registry for each credential type.
+registry has a unique id. It is recommended that the revocation authority creates a new registry for each credential type.
 While issuing the credential, issuer embeds the revocation registry's id in the credential in the <code>credentialStatus</code> field.
-To revoke a credential, the revocation authority (might be same as the issuer), puts a hash of the credential id in the revocation registry.
-To check the revocation status of a credential, hash the credential id and query the registry id specified in the credential.</p>
-<p>The revocation of a credential can be undone if the revocation registry supports undoing. Moreover, currently, each registry is
-controlled by a single DID so that DID can revoke a credential or undo the revocation. In future, Dock will support controlling
-the registry with mulitple DIDs and in different fashions, like any one of the controller DIDs could revoke or a threshold is needed,
-etc. To learn more about revocation registries, refer the corresponding section of the documentation.</p>
-<h2><a class="header" href="#presentation" id="presentation">Presentation</a></h2>
-<p>The holder while creating the presentation signs it with his private key. For the verifier to verify this signature, he
-must know the holder's public key. One way to achieve this is to make the holder have a DID too so that the verifier can look
-up the DID on chain and learn the public key.</p>
+An example credential with Dock revocation registry</p>
+<pre><code class="language-json">{
+    '@context': [
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1'
+    ],
+    id: 'A large credential id with size &gt; 32 bytes',
+    type: [ 'VerifiableCredential', 'AlumniCredential' ],
+    issuanceDate: '2020-03-18T19:23:24Z',
+    credentialSubject: {
+      id: 'did:dock:5GnE6u2dt9nC7tgf5vSdKy4gYX3jwqthbrBnjiay2LWETdrV',
+      alumniOf: 'Example University'
+    },
+    credentialStatus: {
+      id: 'rev-reg:dock:0x0194db371bab472a9cc920b5dfb1447aad5a6db906c46ff378cf0fc337a0c8c0',
+      type: 'CredentialStatusList2017'
+    },
+    issuer: 'did:dock:5CwAuM8cPetXWbZN2JhMFWtLjxZ6DokiDdHViGw2FfxC1Cya',
+    proof: {
+      type: 'Ed25519Signature2018',
+      created: '2020-04-22T07:58:43Z',
+      jws: 'eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..bENDgnK29BHRhP05ehbQkOPfqweppGyI7NeH02YT1hzSDEHseOzCDx-g9dS4lY-m_bElwbOptOlRnQ2g9MW7Ag',
+      proofPurpose: 'assertionMethod',
+      verificationMethod: 'did:dock:5CwAuM8cPetXWbZN2JhMFWtLjxZ6DokiDdHViGw2FfxC1Cya#keys-1'
+    }
+}
+</code></pre>
+<p>To revoke a credential, the revocation authority (might be same as the issuer), puts a hash of the credential id in the revocation registry.
+To check the revocation status of a credential, hash the credential id and query the registry id specified in the credential.
+The revocation of a credential can be undone if the revocation registry supports undoing. Moreover, currently, each registry is
+owned by a single DID so that DID can revoke a credential or undo the revocation. In future, Dock will support ownership of
+the registry with mulitple DIDs and in different fashions, like any one of the owner DIDs could revoke or a threshold is needed,
+etc. To learn more about revocation registries, refer the <a href="./tutorial_revocation.html">revocation section</a> of the documentation.</p>
 <h1><a class="header" href="#tutorials" id="tutorials">Tutorials</a></h1>
 <ol>
 <li><a href="./tutorial_did.html">DID</a></li>
@@ -383,8 +475,7 @@ await dock.sendTransaction(transaction);
 </ol>
 <h2><a class="header" href="#fetching-a-did-from-chain" id="fetching-a-did-from-chain">Fetching a DID from chain</a></h2>
 <p>To get a DID document, use <code>getDocument</code>
-<code>js const result = await dock.did.getDocument(did); </code>
-To get more</p>
+<code>js const result = await dock.did.getDocument(did); </code></p>
 <h2><a class="header" href="#updating-an-existing-did-on-chain" id="updating-an-existing-did-on-chain">Updating an existing DID on chain</a></h2>
 <p>The public key or the controller of an on-chain DID can be updated by preparing a signed key update.</p>
 <ol>
@@ -413,7 +504,7 @@ await dock.sendTransaction(transaction);
 </code></pre>
 </li>
 </ol>
-<h2><a class="header" href="#updating-an-existing-did-on-chain-1" id="updating-an-existing-did-on-chain-1">Updating an existing DID on chain</a></h2>
+<h2><a class="header" href="#removing-an-existing-did-from-chain" id="removing-an-existing-did-from-chain">Removing an existing DID from chain</a></h2>
 <p>A DID can be removing from the chain by sending the corresponding message signed with the current key.</p>
 <ol>
 <li>Fetch the current keypair to sign the DID removal message

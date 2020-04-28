@@ -33,7 +33,7 @@ class VerifiableCredential {
 
   /**
    * Add a context to this Credential's context array
-   * @param {str|object} context - Context to add to the credential context array
+   * @param {string|object} context - Context to add to the credential context array
    * @returns {VerifiableCredential}
    */
   addContext(context) {

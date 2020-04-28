@@ -42,7 +42,7 @@ class VerifiablePresentation {
 
   /**
    * Add a context to this Presentation's context array
-   * @param {str|object} context - Context to add to the presentation context array
+   * @param {string|object} context - Context to add to the presentation context array
    * @returns {VerifiablePresentation}
    */
   addContext(context) {

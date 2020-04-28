@@ -19,7 +19,7 @@ export default class Ed25519Signature2018 extends suites.JwsLinkedDataSignature 
   /**
    * Generate object with `sign` method
    * @param keypair
-   * @returns {Promise<sign>}
+   * @returns {object}
    */
   static signerFactory(keypair) {
     return {

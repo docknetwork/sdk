@@ -20,7 +20,7 @@ export default class EcdsaSepc256k1Signature2019 extends suites.JwsLinkedDataSig
   /**
    * Generate object with `sign` method
    * @param keypair
-   * @returns {Promise<sign>}
+   * @returns {object}
    */
   static signerFactory(keypair) {
     return {

@@ -19,7 +19,7 @@ export default class Sr25519Signature2020 extends suites.JwsLinkedDataSignature 
   /**
    * Generate object with `sign` method
    * @param keypair
-   * @returns {Promise<sign>}
+   * @returns {object}
    */
   static signerFactory(keypair) {
     return {

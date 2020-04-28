@@ -24,7 +24,7 @@ export default class EcdsaSecp256k1VerificationKey2019 {
 
   /**
    * Construct the verifier factory that has the verify method using the current public key
-   * @returns {Promise<verify>}
+   * @returns {object}
    */
   verifier() {
     return EcdsaSecp256k1VerificationKey2019.verifierFactory(this.publicKey);
@@ -33,7 +33,7 @@ export default class EcdsaSecp256k1VerificationKey2019 {
   /**
    * Verifier factory that returns the object with the verify method
    * @param publicKey
-   * @returns {Promise<verify>}
+   * @returns {object}
    */
   static verifierFactory(publicKey) {
     return {

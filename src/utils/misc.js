@@ -8,7 +8,7 @@ const secp256k1Curve = new EC('secp256k1');
 /** // TODO: Error handling when `stateChange` is not registered
  * Helper function to return bytes of a `StateChange` enum. Updates like key change, DID removal, revocation, etc
  * require the change to be wrapped in `StateChange` before serializing for signing.
- * @param {ApiPromise} api - Promise API from polkadot-js
+ * @param {Promise<*>} api - Promise API from polkadot-js
  * @param {object} stateChange - A representation of a `StateChange` enum variant
  * @return {array} An array of Uint8
  */

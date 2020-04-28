@@ -106,10 +106,12 @@ export function createKeyDetail(publicKey, controller) {
   };
 }
 
+// TODO: all methods using (@param {object} didModule) should be moved into dock.sdk class
+
 /**
  * Create and return a `KeyUpdate` as expected by the Substrate node. Signing is intentionally kept separate as the
  * JS code may not have access to the signing key like in case of hardware wallet.
- * @param {DIDModule} didModule - The did module
+ * @param {object} didModule - The did module
  * @param {string} did - Full DID or hex identifier to update
  * @param {PublicKey} newPublicKey - The new public key for the DID. The
  * @param {string} newController - Full DID or hex identifier of the controller of the public key. Is optional and must
@@ -127,7 +129,7 @@ export async function createKeyUpdate(didModule, did, newPublicKey, newControlle
 }
 
 /** Sign the given `KeyUpdate` and returns the signature
- * @param {DIDModule} didModule - The did module
+ * @param {object} didModule - The did module
  * @param {object} keyUpdate - `KeyUpdate` as expected by the Substrate node
  * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * @returns {Signature}
@@ -139,7 +141,7 @@ export function signKeyUpdate(didModule, keyUpdate, currentKeyPair) {
 
 /**
  * Create a `KeyUpdate` as expected by the Substrate node and signs it. Return the `KeyUpdate` object and the signature
- * @param {DIDModule} didModule - The did module
+ * @param {object} didModule - The did module
  * @param {string} did - Full DID or hex identifier to update
  * @param {PublicKey} newPublicKey - The new public key for the DID
  * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID

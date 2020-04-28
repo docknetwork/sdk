@@ -31,7 +31,7 @@ class DockAPI {
    * @constructor
    * @param {string} address - WebSocket RPC endpoint
    */
-  constructor(address) {
+  constructor(address = null) {
     this.address = address;
   }
 

@@ -26,7 +26,7 @@ export class NoDIDError extends Error {
 /**
  * Check if the given identifier is 32 byte hex
  * @param {identifier} identifier - The identifier to check.
- * @return {null} Throws exception if invalid identifier
+ * @return {void} Throws exception if invalid identifier
  */
 export function validateDockDIDHexIdentifier(identifier) {
   // Byte size of the Dock DID identifier, i.e. the `DockDIDQualifier` is not counted.
@@ -38,7 +38,7 @@ export function validateDockDIDHexIdentifier(identifier) {
 /**
  * Check if the given identifier is 32 byte valid SS58 string
  * @param {identifier} identifier - The identifier to check.
- * @return {null} Throws exception if invalid identifier
+ * @return {void} Throws exception if invalid identifier
  */
 export function validateDockDIDSS58Identifier(identifier) {
   // base58-check regex

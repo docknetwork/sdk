@@ -1,14 +1,14 @@
 import { ec as EC } from 'elliptic';
 
-import { PublicKeyEd25519, PublicKeySecp256k1, PublicKeySr25519 } from '../public-keys';
-import { SignatureEd25519, SignatureSecp256k1, SignatureSr25519 } from '../signatures';
+import { PublicKey, PublicKeyEd25519, PublicKeySecp256k1, PublicKeySr25519 } from '../public-keys';
+import { Signature, SignatureEd25519, SignatureSecp256k1, SignatureSr25519 } from '../signatures';
 
 const secp256k1Curve = new EC('secp256k1');
 
 /** // TODO: Error handling when `stateChange` is not registered
  * Helper function to return bytes of a `StateChange` enum. Updates like key change, DID removal, revocation, etc
  * require the change to be wrapped in `StateChange` before serializing for signing.
- * @param {Promise<*>} api - Promise API from polkadot-js
+ * @param {object} api - Promise API from polkadot-js
  * @param {object} stateChange - A representation of a `StateChange` enum variant
  * @return {array} An array of Uint8
  */
@@ -26,7 +26,7 @@ export function getStateChange(api, name, value) {
  * Generate keypair for Ecdsa over Secp256k1. Explicitly denying other options to keep the API simple
  * @param {string} pers - A string
  * @param {array} entropy - A byte array or hex string
- * @returns {Keypair} A keypair
+ * @returns {object} A keypair
  */
 export function generateEcdsaSecp256k1Keypair(pers, entropy) {
   return secp256k1Curve.genKeyPair({ pers, entropy });
@@ -71,7 +71,7 @@ export function getKeyPairType(pair) {
 
 /**
  * Inspect the `type` of the `KeyringPair` to generate the correct kind of PublicKey.
- * @param {KeyringPair} pair - A polkadot-js KeyringPair.
+ * @param {object} pair - A polkadot-js KeyringPair.
  * @return {PublicKey} An instance of the correct subclass of PublicKey
  */
 export function getPublicKeyFromKeyringPair(pair) {
@@ -89,7 +89,7 @@ export function getPublicKeyFromKeyringPair(pair) {
 
 /**
  * Inspect the `type` of the `KeyringPair` to generate the correct kind of Signature.
- * @param {KeyringPair} pair - A polkadot-js KeyringPair.
+ * @param {object} pair - A polkadot-js KeyringPair.
  * @param {array} message - an array of bytes (Uint8)
  * @returns {Signature} An instance of the correct subclass of Signature
  */

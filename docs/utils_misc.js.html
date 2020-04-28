@@ -99,7 +99,7 @@ export function getKeyPairType(pair) {
 
 /**
  * Inspect the `type` of the `KeyringPair` to generate the correct kind of PublicKey.
- * @param {KeyringPair} pair - A polkadot-js KeyringPair.
+ * @param {object} pair - A polkadot-js KeyringPair.
  * @return {PublicKey} An instance of the correct subclass of PublicKey
  */
 export function getPublicKeyFromKeyringPair(pair) {
@@ -117,7 +117,7 @@ export function getPublicKeyFromKeyringPair(pair) {
 
 /**
  * Inspect the `type` of the `KeyringPair` to generate the correct kind of Signature.
- * @param {KeyringPair} pair - A polkadot-js KeyringPair.
+ * @param {object} pair - A polkadot-js KeyringPair.
  * @param {array} message - an array of bytes (Uint8)
  * @returns {Signature} An instance of the correct subclass of Signature
  */

@@ -147,7 +147,7 @@ export async function createKeyUpdate(didModule, did, newPublicKey, newControlle
 /** Sign the given `KeyUpdate` and returns the signature
  * @param {DIDModule} didModule - The did module
  * @param {object} keyUpdate - `KeyUpdate` as expected by the Substrate node
- * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID
+ * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * @returns {Signature}
  */
 export function signKeyUpdate(didModule, keyUpdate, currentKeyPair) {
@@ -160,7 +160,7 @@ export function signKeyUpdate(didModule, keyUpdate, currentKeyPair) {
  * @param {DIDModule} didModule - The did module
  * @param {string} did - Full DID or hex identifier to update
  * @param {PublicKey} newPublicKey - The new public key for the DID
- * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID
+ * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * * @param {string} newController - Full DID or hex identifier of the controller of the public. Is optional and must
  * only be passed when controller is to be updated
  * @returns {array} A 2 element array where the first element is the `KeyUpdate` and the second is the signature
@@ -192,7 +192,7 @@ export async function createDidRemoval(didModule, did) {
  * Sign the given `DidRemoval` and returns the signature
  * @param {module} didModule - The did module
  * @param {object} didRemoval - `DidRemoval` as expected by the Substrate node
- * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID
+ * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * @returns {Signature}
  */
 export function signDidRemoval(didModule, didRemoval, currentKeyPair) {
@@ -204,7 +204,7 @@ export function signDidRemoval(didModule, didRemoval, currentKeyPair) {
  * Create a `DidRemoval` as expected by the Substrate node and signs it. Return the `DidRemoval` object and the signature
  * @param {module} didModule - The did module
  * @param {string} did - Full DID or hex identifier to remove
- * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID
+ * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * @returns {array} A 2 element array where the first element is the `DidRemoval` and the second is the signature
  */
 export async function createSignedDidRemoval(didModule, did, currentKeyPair) {

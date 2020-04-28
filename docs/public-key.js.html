@@ -56,7 +56,7 @@ export class PublicKey {
    * Extracts the public key from a pair. Assumes the KeyringPair is of the correct type. The `type` is intentionally not
    * inspected to follow dependency inversion principle.
    * generate the instance correct subclass
-   * @param {KeyringPair} A polkadot-js KeyringPair.
+   * @param {object} A polkadot-js KeyringPair.
    * @returns {PublicKey}
    */
   static fromKeyringPair(pair) {

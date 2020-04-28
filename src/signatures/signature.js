@@ -27,7 +27,7 @@ export default class Signature {
   /**
    * Signs the given message and wraps it in the Signature
    * @param {array} message - The message to sign as bytearray
-   * @param {KeyringPair} signingPair -The pair from Polkadot-js containing the signing key
+   * @param {object} signingPair -The pair from Polkadot-js containing the signing key
    * @returns {Signature}
    */
   fromPolkadotJSKeyringPair(message, signingPair) {

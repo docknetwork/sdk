@@ -5,7 +5,7 @@ export default class SignatureSecp256k1 extends Signature {
   /**
    * Generate an Ecdsa signature over Secp256k1 curve using elliptic library
    * @param {array} message - The message to sign as bytearray
-   * @param {KeyringPair} signingPair -The pair from elliptic containing the signing key
+   * @param {object} signingPair -The pair from elliptic containing the signing key
    */
   constructor(message, signingPair) {
     super();

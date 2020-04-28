@@ -5,7 +5,7 @@ export default class SignatureEd25519 extends Signature {
   /**
    * Generate a Ed25519 signature using Polkadot-js
    * @param {array} message - The message to sign as bytearray
-   * @param {KeyringPair} signingPair -The pair from Polkadot-js containing the signing key
+   * @param {object} signingPair -The pair from Polkadot-js containing the signing key
    */
   constructor(message, signingPair) {
     super().fromPolkadotJSKeyringPair(message, signingPair);

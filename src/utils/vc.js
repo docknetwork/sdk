@@ -1,6 +1,7 @@
 import vcjs from 'vc-js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
+import DIDResolver from '../did-resolver';
 import documentLoader from './vc/document-loader';
 import { isHexWithGivenByteSize } from './codec';
 import { RevEntryByteSize, RevRegIdByteSize } from './revocation';

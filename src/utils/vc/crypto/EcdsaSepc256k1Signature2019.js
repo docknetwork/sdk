@@ -4,6 +4,11 @@ import { EcdsaSecp256k1SigName, EcdsaSecp256k1VerKeyName } from './constants';
 import EcdsaSecp256k1VerificationKey2019 from './EcdsaSecp256k1VerificationKey2019';
 
 export default class EcdsaSepc256k1Signature2019 extends suites.JwsLinkedDataSignature {
+  /**
+   * Creates a new EcdsaSepc256k1Signature2019 instance
+   * @constructor
+   * @param {object} config - Configuration options
+   */
   constructor({
     keypair, verificationMethod,
   } = {}) {

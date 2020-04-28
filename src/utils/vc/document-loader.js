@@ -4,10 +4,10 @@ import testContext from './contexts';
 /**
  * Takes a resolver and returns a function that returns a document or throws an error when the document
  * cannot be found.
- * @param {DIDResolver} resolver - The resolver is optional but should be passed when DIDs need to be resolved.
+ * @param {DIDResolver} [resolver] - The resolver is optional but should be passed when DIDs need to be resolved.
  * @returns {function(*=): {documentUrl: *, document: null}}
  */
-export default function (resolver) {
+export default function(resolver = null) {
   /**
    * Resolve a URI. If the URI is a DID, then the resolver is used to resolve it.
    * Else, the hardcoded contexts are used to resolve the URI and if that fails

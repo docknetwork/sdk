@@ -1,5 +1,9 @@
 import { parse } from 'did-resolver';
 
+/**
+ * A DID resolver
+ * @typedef {Object} DIDResolver
+ */
 export default class DIDResolver {
   parseDid(did) {
     return parse(did);

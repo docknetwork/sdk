@@ -7,11 +7,14 @@ import {
   ensureObjectWithId, ensureObjectWithKeyOrURI, ensureString, ensureURI,
 } from './utils/type-helpers';
 
+import DIDResolver from './did-resolver';
+
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiablePresentation';
 
 /**
  * Representation of a Verifiable Presentation.
+ * @typedef {Object<string>} VerifiablePresentation
  */
 class VerifiablePresentation {
   /**
@@ -21,11 +24,20 @@ class VerifiablePresentation {
    */
   constructor(id) {
     ensureURI(id);
+
+    /**
+     * @property {string} id The presentation's ID
+     */
     this.id = id;
 
     this.context = [DEFAULT_CONTEXT];
     this.type = [DEFAULT_TYPE];
     this.credentials = [];
+
+    /**
+     * @property {object} proof The presentation's proof
+     */
+    this.proof = null;
   }
 
   /**
@@ -94,9 +106,9 @@ class VerifiablePresentation {
    * @param {object} keyDoc - document with `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
    * @param {string} challenge - proof challenge Required.
    * @param {string} domain - proof domain (optional)
-   * @param {Resolver} resolver - Resolver for DIDs.
+   * @param {DIDResolver} resolver - Resolver for DIDs.
    * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
-   * @returns {Promise<{object}>}
+   * @returns {Promise<VerifiablePresentation>}
    */
   async sign(keyDoc, challenge, domain, resolver, compactProof = true) {
     const signedVP = await signPresentation(
@@ -115,7 +127,7 @@ class VerifiablePresentation {
    * Verify a Verifiable Presentation
    * @param {string} challenge - proof challenge Required.
    * @param {string} domain - proof domain (optional)
-   * @param {Resolver} resolver - Resolver to resolve the issuer DID (optional)
+   * @param {DIDResolver} resolver - Resolver to resolve the issuer DID (optional)
    * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
    * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
    * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.

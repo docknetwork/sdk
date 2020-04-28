@@ -197,7 +197,7 @@ export function createPresentation(verifiableCredential, id, holder) {
  * @param {string} domain - proof domain (optional)
  * @param {Resolver} resolver - Resolver for DIDs.
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
- * @return {Promise<{VerifiablePresentation}>} A VerifiablePresentation with a proof.
+ * @return {Promise<VerifiablePresentation>} A VerifiablePresentation with a proof.
  */
 export async function signPresentation(presentation, keyDoc, challenge, domain, resolver, compactProof = true) {
   // TODO: support other purposes than the default of "authentication"

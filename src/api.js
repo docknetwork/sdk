@@ -18,6 +18,12 @@ import {
   SignatureEd25519,
 } from './signatures';
 
+/**
+ * @typedef {Object} Options The Options to use in the function createUser.
+ * @property {string} address The node address to connect to.
+ * @property {object} keyring PolkadotJS keyring
+ */
+
 /** Helper class to interact with the Dock chain */
 class DockAPI {
   /**
@@ -31,8 +37,7 @@ class DockAPI {
 
   /**
    * Initialises the SDK and connects to the node
-   * @param {Account} address - Optional WebSocket address
-   * @param keyring - Polkadot-js keyring
+   * @param {Options} config - Configuration options
    * @return {Promise} Promise for when SDK is ready for use
    */
   async init({ address, keyring } = {}) {

@@ -160,7 +160,7 @@ export async function verifyCredential(credential, resolver, compactProof = true
  * Check that credential is verified, i.e. the credential has VCDM compliant structure and the `proof`
  * (signature by issuer) is correct.
  * @param {object} credential - verifiable credential to be verified.
- * @param {Resolver} resolver - Resolver for DIDs.
+ * @param {DIDResolver} resolver - Resolver for DIDs.
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
  * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
  * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
@@ -195,7 +195,7 @@ export function createPresentation(verifiableCredential, id, holder) {
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
  * @param {string} challenge - proof challenge Required.
  * @param {string} domain - proof domain (optional)
- * @param {Resolver} resolver - Resolver for DIDs.
+ * @param {DIDResolver} resolver - Resolver for DIDs.
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
  * @return {Promise<VerifiablePresentation>} A VerifiablePresentation with a proof.
  */
@@ -217,7 +217,7 @@ export async function signPresentation(presentation, keyDoc, challenge, domain, 
  * @param {object} presentation - verifiable credential to be verified.
  * @param {string} challenge - proof challenge Required.
  * @param {string} domain - proof domain (optional)
- * @param {Resolver} resolver - Resolver to resolve the issuer DID (optional)
+ * @param {DIDResolver} resolver - Resolver to resolve the issuer DID (optional)
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
  * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
  * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
@@ -266,7 +266,7 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
  * @param {object} presentation - verifiable credential to be verified.
  * @param {string} challenge - proof challenge Required.
  * @param {string} domain - proof domain (optional)
- * @param {Resolver} resolver - Resolver to resolve the issuer DID (optional)
+ * @param {DIDResolver} resolver - Resolver to resolve the issuer DID (optional)
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
  * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
  * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.

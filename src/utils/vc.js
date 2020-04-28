@@ -2,6 +2,8 @@ import vcjs from 'vc-js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import DIDResolver from '../did-resolver';
+import VerifiablePresentation from '../verifiable-presentation';
+
 import documentLoader from './vc/document-loader';
 import { isHexWithGivenByteSize } from './codec';
 import { RevEntryByteSize, RevRegIdByteSize } from './revocation';
@@ -279,7 +281,7 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
  * describe the error if any.
  */
 export async function isVerifiedPresentation(presentation, challenge, domain, resolver, compactProof = true, forceRevocationCheck = true, revocationAPI) {
-  const result = await verifyPresentation(presentation, challenge, domain, compactProof, forceRevocationCheck, revocationAPI);
+  const result = await verifyPresentation(presentation, challenge, domain, resolver, compactProof, forceRevocationCheck, revocationAPI);
   return result.verified;
 }
 

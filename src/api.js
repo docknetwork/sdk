@@ -19,7 +19,7 @@ import {
 } from './signatures';
 
 /**
- * @typedef {Object} Options The Options to use in the function createUser.
+ * @typedef {object} Options The Options to use in the function createUser.
  * @property {string} address The node address to connect to.
  * @property {object} keyring PolkadotJS keyring
  */

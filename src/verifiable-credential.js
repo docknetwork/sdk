@@ -44,7 +44,7 @@ class VerifiableCredential {
 
   /**
    * Add a type to this Credential's type array
-   * @param {str} type - Type to add to the credential type array
+   * @param {string} type - Type to add to the credential type array
    * @returns {VerifiableCredential}
    */
   addType(type) {

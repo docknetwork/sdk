@@ -53,7 +53,7 @@ class VerifiablePresentation {
 
   /**
    * Add a type to this Presentation's type array
-   * @param {str} type - Type to add to the presentation type array
+   * @param {string} type - Type to add to the presentation type array
    * @returns {VerifiablePresentation}
    */
   addType(type) {
@@ -64,7 +64,7 @@ class VerifiablePresentation {
 
   /**
    * Set a holder for this Presentation
-   * @param {str} holder - Holder to add to the presentation
+   * @param {string} holder - Holder to add to the presentation
    * @returns {VerifiablePresentation}
    */
   setHolder(holder) {

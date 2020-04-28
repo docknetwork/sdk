@@ -2,6 +2,8 @@ import {
   getStateChange,
 } from '../utils/misc';
 
+import DidKeys from '../utils/revocation/did-keys';
+
 /** Class to create, update and destroy revocations */
 class RevocationModule {
   /**

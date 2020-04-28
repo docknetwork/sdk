@@ -12,7 +12,7 @@ export default class MultiResolver extends DIDResolver {
    *     The resolvers must either inherit from DIDResolver, or be an async function
    *     from DID string to DIDDocument which throws NoDIDError when and only
    *     when the did in question does not exist.
-   * @param {Resolver | null} catchAll - An optional fallback to use when index does not specify an
+   * @param {DIDResolver | null} catchAll - An optional fallback to use when index does not specify an
    * implementation for the requested method.
    */
   constructor(resolvers, catchAll) {
@@ -25,7 +25,7 @@ export default class MultiResolver extends DIDResolver {
    * Resolve the given DID with the providers or try to fetch from the universal resolver
    * if available.
    * @param {string} did - A full DID (with method, like did:dock:5....)
-   * @returns {Promise<DIDDocument>} Returns a promise to the DID document
+   * @returns {Promise<object>} Returns a promise to the DID document
    */
   async resolve(did) {
     const { method } = this.parseDid(did);
@@ -37,6 +37,6 @@ export default class MultiResolver extends DIDResolver {
     if (this.catchAll) {
       return getResolveMethod(this.catchAll)(did);
     }
-    throw new Error('No resolver found for DID', did);
+    throw new Error('No resolver found for DID ' + did);
   }
 }

@@ -8,7 +8,8 @@ export default class SignatureSr25519 extends Signature {
    * @param {object} signingPair -The pair from Polkadot-js containing the signing key
    */
   constructor(message, signingPair) {
-    super().fromPolkadotJSKeyringPair(message, signingPair);
+    super();
+    this.fromPolkadotJSKeyringPair(message, signingPair);
   }
 
   /**

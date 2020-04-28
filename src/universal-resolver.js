@@ -22,7 +22,7 @@ export default class UniversalResolver extends DIDResolver {
   /**
    * Fetch the DID from the universal resolver.
    * @param {string} did - A full DID (with method, like did:uport:2nQtiQG....)
-   * @returns {Promise<DIDDocument>}
+   * @returns {Promise<object>}
    */
   async resolve(did) {
     try {

@@ -125,7 +125,7 @@ class VerifiableCredential {
    * Sign a Verifiable Credential using the provided keyDoc
    * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
    * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
-   * @returns {Promise<{object}>}
+   * @returns {Promise<VerifiableCredential>}
    */
   async sign(keyDoc, compactProof = true) {
     const signedVC = await issueCredential(

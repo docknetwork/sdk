@@ -1,5 +1,6 @@
 import { validateDockDIDSS58Identifier } from './utils/did';
 import DIDResolver from './did-resolver';
+import DockAPI from './api';
 
 export default class DockResolver extends DIDResolver {
   /**

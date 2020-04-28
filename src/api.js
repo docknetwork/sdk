@@ -40,7 +40,10 @@ class DockAPI {
    * @param {Options} config - Configuration options
    * @return {Promise} Promise for when SDK is ready for use
    */
-  async init({ address, keyring } = {}) {
+  async init({ address, keyring } = {
+    address: null,
+    keyring: null,
+  }) {
     if (this.api) {
       throw new Error('API is already connected');
     }
@@ -96,7 +99,7 @@ class DockAPI {
   /**
    * Helper function to send transaction
    * @param {object} extrinsic - Extrinsic to send
-   * @param {bool} unsub - Should we unsubscribe from the transaction after its finalized
+   * @param {Boolean} unsubscribe - Should we unsubscribe from the transaction after its finalized
    * @return {Promise}
    */
   async sendTransaction(extrinsic, unsubscribe = true) {
@@ -110,7 +113,10 @@ class DockAPI {
               if (unsubscribe && unsubFunc) {
                 unsubFunc();
               }
-              resolve(events, status);
+              resolve({
+                events,
+                status,
+              });
             }
           })
           .catch((error) => {

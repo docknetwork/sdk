@@ -112,11 +112,11 @@ export async function checkRevocationStatus(credential, revocationAPI) {
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
  * @param {object} credential - Credential to be signed.
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
- * @return {object} The signed credential object.
+ * @return {Promise<object>} The signed credential object.
  */
 export async function issueCredential(keyDoc, credential, compactProof = true) {
   const suite = getSuiteFromKeyDoc(keyDoc);
-  // The following code (including `issue` method) will modify the passed credential so clone it.
+  // The following code (including `issue` method) will modify the passed credential so clone it.gb
   const cred = { ...credential };
   cred.issuer = keyDoc.controller;
   return vcjs.issue({
@@ -137,7 +137,7 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
  * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
  * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
- * @return {object} verification result. The returned object will have a key `verified` which is true if the
+ * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
  * credential is valid and not revoked and false otherwise. The `error` will describe the error if any.
  */
 export async function verifyCredential(credential, resolver, compactProof = true, forceRevocationCheck = true, revocationAPI) {
@@ -227,7 +227,7 @@ export async function signPresentation(presentation, keyDoc, challenge, domain, 
  * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
  * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
- * @return {object} verification result. The returned object will have a key `verified` which is true if the
+ * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
  * presentation is valid and all the credentials are valid and not revoked and false otherwise. The `error` will
  * describe the error if any.
  */
@@ -248,7 +248,7 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
       const credential = credentials[i];
       // Check for revocation only if the presentation is verified and revocation check is needed.
       if (isRevocationCheckNeeded(credential.credentialStatus, forceRevocationCheck, revocationAPI)) {
-        const res = checkRevocationStatus(credential, revocationAPI);
+        const res = await checkRevocationStatus(credential, revocationAPI);
 
         // Return error for the first credential that does not pass revocation check.
         if (!res.verified) {

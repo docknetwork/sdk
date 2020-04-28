@@ -12,7 +12,12 @@ export default class DidKeys {
     return this.map;
   }
 
-  getSignatures() {
-    throw new Error('getSignatures method must be implemented in child class!');
+  /**
+   * Get signatures used for authentication of the update to the registry.
+   * @param message
+   * @returns {Map<any, any>}
+   */
+  getSignatures(message) {
+    throw new Error('getSignatures method must be implemented in child class! ' + message);
   }
 }

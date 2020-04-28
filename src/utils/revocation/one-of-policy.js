@@ -1,8 +1,10 @@
 import { getHexIdentifierFromDID } from '../did';
+import Policy from './policy';
 
 // Revocation policy that allows one of the pre-decided controllers to update the registry.
-export default class OneOfPolicy {
+export default class OneOfPolicy extends Policy {
   constructor(controllers) {
+    super();
     if (controllers === undefined) {
       this.controllers = new Set();
     } else {

@@ -95,7 +95,7 @@ class DockAPI {
 
   /**
    * Helper function to send transaction
-   * @param {Extrinsic} extrinsic - Extrinsic to send
+   * @param {object} extrinsic - Extrinsic to send
    * @param {bool} unsub - Should we unsubscribe from the transaction after its finalized
    * @return {Promise}
    */

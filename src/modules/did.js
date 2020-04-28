@@ -23,7 +23,7 @@ class DIDModule {
    * Creates a new DID on the Dock chain.
    * @param {string} did - The new DID. Can be a full DID or hex identifier
    * @param {object} keyDetail - `KeyDetail` as expected by the Substrate node
-   * @return {Extrinsic} The extrinsic to sign and send.
+   * @return {object} The extrinsic to sign and send.
    */
   new(did, keyDetail) {
     const hexId = getHexIdentifierFromDID(did);
@@ -34,7 +34,7 @@ class DIDModule {
    * Updates the details of an already registered DID on the Dock chain.
    * @param {object} keyUpdate - `KeyUpdate` as expected by the Substrate node
    * @param {DidSignature} signature - Signature from existing key
-   * @return {Extrinsic} The extrinsic to sign and send.
+   * @return {object} The extrinsic to sign and send.
    */
   updateKey(keyUpdate, signature) {
     return this.module.updateKey(keyUpdate, signature.toJSON());
@@ -44,7 +44,7 @@ class DIDModule {
    * Removes an already registered DID on the Dock chain.
    * @param {object} didRemoval - `DidRemoval` as expected by the Substrate node
    * @param {DidSignature} signature - Signature from existing key
-   * @return {Extrinsic} The extrinsic to sign and send.
+   * @return {object} The extrinsic to sign and send.
    */
   remove(didRemoval, signature) {
     return this.module.remove(didRemoval, signature.toJSON());

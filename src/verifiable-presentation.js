@@ -14,13 +14,11 @@ const DEFAULT_TYPE = 'VerifiablePresentation';
 
 /**
  * Representation of a Verifiable Presentation.
- * @typedef {Object<string>} VerifiablePresentation
  */
 class VerifiablePresentation {
   /**
    * Create a new Verifiable Presentation instance.
    * @param {string} id - id of the presentation
-   * @returns {VerifiablePresentation}
    */
   constructor(id) {
     ensureURI(id);

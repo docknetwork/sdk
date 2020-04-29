@@ -117,7 +117,7 @@ class VerifiablePresentation {
       resolver,
       compactProof,
     );
-    this.proof = signedVP.proof;
+    this.proof = signedVP.proof.pop();
     return this;
   }
 

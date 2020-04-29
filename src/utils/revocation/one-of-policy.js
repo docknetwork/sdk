@@ -3,6 +3,11 @@ import Policy from './policy';
 
 // Revocation policy that allows one of the pre-decided controllers to update the registry.
 export default class OneOfPolicy extends Policy {
+  /**
+   * Constructs a OneOfPolicy with given controllers
+   * @param {any} controllers - Controller set
+   * @constructor
+   */
   constructor(controllers) {
     super();
     if (controllers === undefined) {
@@ -14,7 +19,7 @@ export default class OneOfPolicy extends Policy {
 
   /**
    * Add a owner to the policy
-   * @param ownerDID
+   * @param {string} ownerDID - Owner's DID
    */
   addOwner(ownerDID) {
     this.controllers.add(ownerDID);

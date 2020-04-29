@@ -19,6 +19,7 @@ class VerifiablePresentation {
   /**
    * Create a new Verifiable Presentation instance.
    * @param {string} id - id of the presentation
+   * @constructor
    */
   constructor(id) {
     ensureURI(id);

@@ -88,7 +88,7 @@ class VerifiablePresentation {
 
   /**
    * Define the JSON representation of a Verifiable Presentation.
-   * @returns {any}
+   * @returns {object}
    */
   toJSON() {
     const { context, credentials, ...rest } = this;

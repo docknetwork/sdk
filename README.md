@@ -68,8 +68,9 @@ yarn test-with-node
 
 Run a single test module with `yarn test <module name or prefix>`.
 
-## Lint
-`yarn lint --fix`
+## Linting and type checking
+We use JSDoc and TypeScript for static type checking during the CI process. PRs must pass linting and type checking to be accepted.
+You can run via: `yarn lint --fix` and `yarn type-check`
 
 ## JSON types
 The types on Substrate node should be reflected in [types.json](./src/types.json)

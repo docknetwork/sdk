@@ -7,8 +7,8 @@ import { randomAsHex, encodeAddress, decodeAddress } from '@polkadot/util-crypto
 import { getSignatureFromKeyringPair } from './misc';
 import { isHexWithGivenByteSize } from './codec';
 
-import { Signature } from '../signatures';
-import { PublicKey } from '../public-keys';
+import { Signature } from '../signatures'; // eslint-disable-line
+import { PublicKey } from '../public-keys'; // eslint-disable-line
 
 export const DockDIDMethod = 'dock';
 export const DockDIDQualifier = `did:${DockDIDMethod}:`;

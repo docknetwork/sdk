@@ -37,6 +37,6 @@ export default class MultiResolver extends DIDResolver {
     if (this.catchAll) {
       return getResolveMethod(this.catchAll)(did);
     }
-    throw new Error('No resolver found for DID ' + did);
+    throw new Error(`No resolver found for DID ${did}`);
   }
 }

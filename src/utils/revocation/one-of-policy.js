@@ -20,6 +20,10 @@ export default class OneOfPolicy extends Policy {
     this.controllers.add(ownerDID);
   }
 
+  /**
+   * Converts policy to JSON object
+   * @returns {object}
+   */
   toJSON() {
     return {
       // Convert each onwer DID to hex identifier if not already

@@ -1,15 +1,17 @@
 import vcjs from 'vc-js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
-import DIDResolver from '../did-resolver';
-import VerifiablePresentation from '../verifiable-presentation';
-
 import documentLoader from './vc/document-loader';
 import { isHexWithGivenByteSize } from './codec';
 import { RevEntryByteSize, RevRegIdByteSize } from './revocation';
 import {
   EcdsaSecp256k1VerKeyName, Ed25519VerKeyName, Sr25519VerKeyName, EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
 } from './vc/custom_crypto';
+
+import DIDResolver from '../did-resolver'; // eslint-disable-line
+/**
+ * @typedef {object} VerifiablePresentation Representation of a Verifiable Presentation.
+ */
 
 // XXX: Does it make sense to have a revocation registry type for Dock like below and eliminate the need for `rev_reg:dock:`?
 // export const RevRegType = 'DockRevocationRegistry2020';
@@ -248,7 +250,7 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
       const credential = credentials[i];
       // Check for revocation only if the presentation is verified and revocation check is needed.
       if (isRevocationCheckNeeded(credential.credentialStatus, forceRevocationCheck, revocationAPI)) {
-        const res = await checkRevocationStatus(credential, revocationAPI);
+        const res = await checkRevocationStatus(credential, revocationAPI); // eslint-disable-line
 
         // Return error for the first credential that does not pass revocation check.
         if (!res.verified) {

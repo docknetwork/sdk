@@ -18,6 +18,6 @@ export default class DidKeys {
    * @returns {Map<any, any>}
    */
   getSignatures(message) {
-    throw new Error('getSignatures method must be implemented in child class! ' + message);
+    throw new Error(`getSignatures method must be implemented in child class! ${message}`);
   }
 }

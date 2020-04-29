@@ -1,6 +1,6 @@
 import { validateDockDIDSS58Identifier } from './utils/did';
 import DIDResolver from './did-resolver';
-import DockAPI from './api';
+import {DockAPI} from './api'; // eslint-disable-line
 
 export default class DockResolver extends DIDResolver {
   /**

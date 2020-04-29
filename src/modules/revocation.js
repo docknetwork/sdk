@@ -2,8 +2,8 @@ import {
   getStateChange,
 } from '../utils/misc';
 
-import DidKeys from '../utils/revocation/did-keys';
-import Policy from '../utils/revocation/policy';
+import DidKeys from '../utils/revocation/did-keys'; // eslint-disable-line
+import Policy from '../utils/revocation/policy'; // eslint-disable-line
 
 /** Class to create, update and destroy revocations */
 class RevocationModule {

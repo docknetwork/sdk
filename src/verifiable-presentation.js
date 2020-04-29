@@ -7,7 +7,7 @@ import {
   ensureObjectWithId, ensureObjectWithKeyOrURI, ensureString, ensureURI,
 } from './utils/type-helpers';
 
-import DIDResolver from './did-resolver';
+import DIDResolver from './did-resolver'; // eslint-disable-line
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiablePresentation';

@@ -6,7 +6,7 @@ import {
 } from '../utils/did';
 import { getStateChange } from '../utils/misc';
 
-import Signature from '../signatures/signature';
+import Signature from '../signatures/signature'; // eslint-disable-line
 
 /** Class to create, update and destroy DIDs */
 class DIDModule {

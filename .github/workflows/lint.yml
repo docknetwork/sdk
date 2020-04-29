@@ -9,8 +9,9 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install, lint and generate docs # Install packages, run lint and jsdoc scripts. Not uploading the docs.
+      - name: Install, lint, type check and generate docs # Not uploading the docs.
         run: |
           yarn install --frozen-lockfile --ignore-scripts
           yarn lint
+          yarn type-check
           yarn docs

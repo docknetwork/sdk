@@ -5,12 +5,10 @@ import {
 } from '../misc';
 import { getHexIdentifierFromDID } from '../did';
 
-// Abstraction over a map of DID -> Keyring
+/**
+ * Abstraction over a map of DID -> Keyring
+ */
 export default class KeyringPairDidKeys extends DidKeys {
-  /* constructor(map) {
-    super(map);
-  } */
-
   /**
    * Create a map of DID -> Signatures. This is used for authentication of the update
    * to the registry.

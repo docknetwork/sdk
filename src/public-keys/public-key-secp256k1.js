@@ -18,7 +18,7 @@ export default class PublicKeySecp256k1 extends PublicKey {
   /**
    * Returns a compressed public key for Secp256k1 curve. The name is intentionally kept same with the base export class to
    * keep the API uniform
-   * @param {KeyPair} pair - A KeyPair from elliptic library
+   * @param {object} pair - A KeyPair from elliptic library
    * @returns {PublicKeySecp256k1}
    */
   static fromKeyringPair(pair) {

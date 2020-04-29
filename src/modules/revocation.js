@@ -2,6 +2,9 @@ import {
   getStateChange,
 } from '../utils/misc';
 
+import DidKeys from '../utils/revocation/did-keys'; // eslint-disable-line
+import Policy from '../utils/revocation/policy'; // eslint-disable-line
+
 /** Class to create, update and destroy revocations */
 class RevocationModule {
   /**
@@ -16,10 +19,10 @@ class RevocationModule {
 
   /**
    * Creating a revocation registry
-   * @param {RegistryId} id - is the unique id of the registry. The function will check whether `id` is already taken or not.
+   * @param {string} id - is the unique id of the registry. The function will check whether `id` is already taken or not.
    * @param {Policy} policy - The registry policy
-   * @param {bool} addOnly - true: credentials can be revoked, but not un-revoked, false: credentials can be revoked and un-revoked
-   * @return {Extrinsic} The extrinsic to sign and send.
+   * @param {Boolean} addOnly - true: credentials can be revoked, but not un-revoked, false: credentials can be revoked and un-revoked
+   * @return {object} The extrinsic to sign and send.
    */
   newRegistry(id, policy, addOnly) {
     return this.module.newRegistry(id, {
@@ -30,10 +33,10 @@ class RevocationModule {
 
   /**
    * Deleting revocation registry
-   * @param {RegistryId} registryID - contains the registry to remove
-   * @param {BlockNumber} lastModified - contains the registry to remove
+   * @param {string} registryID - contains the registry to remove
+   * @param {number} lastModified - contains the registry to remove
    * @param {DidKeys} didKeys - The did key set used for generating proof
-   * @return {Extrinsic} The extrinsic to sign and send.
+   * @return {object} The extrinsic to sign and send.
    */
   removeRegistry(registryID, lastModified, didKeys) {
     const removal = {
@@ -48,11 +51,11 @@ class RevocationModule {
 
   /**
    * Revoke credentials
-   * @param {RegistryId} registryID - contains the registry to remove
+   * @param {string} registryID - contains the registry to remove
    * @param {Set} revokeIds - revoke id list
-   * @param {BlockNumber} lastModified - contains the registry to remove
+   * @param {number} lastModified - contains the registry to remove
    * @param {DidKeys} didKeys - The did key set used for generating proof
-   * @return {Extrinsic} The extrinsic to sign and send.
+   * @return {object} The extrinsic to sign and send.
    */
   revoke(registryID, revokeIds, lastModified, didKeys) {
     const revoke = {
@@ -68,11 +71,11 @@ class RevocationModule {
 
   /**
    * Unrevoke credentials
-   * @param {RegistryId} registryID - contains the registry to remove
+   * @param {string} registryID - contains the registry to remove
    * @param {Set} revokeIds - revoke id list
-   * @param {BlockNumber} lastModified - contains the registry to remove
+   * @param {number} lastModified - contains the registry to remove
    * @param {DidKeys} didKeys - The did key set used for generating proof
-   * @return {Extrinsic} The extrinsic to sign and send.
+   * @return {object} The extrinsic to sign and send.
    */
   unrevoke(registryID, revokeIds, lastModified, didKeys) {
     const unrevoke = {
@@ -89,7 +92,7 @@ class RevocationModule {
   /**
    * The read-only call get_revocation_registry is used to get data of the revocation registry like controllers, policy and type.
    * If the registry is not present, None is returned.
-   * @param {RegistryId} registryID - Revocation registry ID
+   * @param {string} registryID - Revocation registry ID
    * @return {Promise} A promise to registry data
    */
   async getRevocationRegistry(registryID) {
@@ -121,8 +124,8 @@ class RevocationModule {
 
   /**
    * The read-only call get_revocation_status is used to check whether a credential is revoked or not and does not consume any tokens. If
-   * @param {RegistryId} registryId - Revocation registry ID
-   * @param {RevokeId} revokeId - Revocation id. This is set as the hash of the credential id.
+   * @param {string} registryId - Revocation registry ID
+   * @param {string} revokeId - Revocation id. This is set as the hash of the credential id.
    * @return {Promise<Boolean>} Returns a promise to true if credential is revoked else to false.
    */
   async getIsRevoked(registryId, revokeId) {
@@ -143,12 +146,11 @@ class RevocationModule {
 
   /**
    * Internal helper to avoid code duplication while updating the revocation registry by revoking or unrevoking a credential.
-   * @param updateFunc - A function that's called in the context of `dockAPI.revocation` to send an extrinsic. Is either
+   * @param {function} updateFunc - A function that's called in the context of `dockAPI.revocation` to send an extrinsic. Is either
    * `dockAPI.revocation.revoke` or `dockAPI.revocation.unrevoke`
-   * @param dockAPI
    * @param {DidKeys} didKeys - The map of DID and keypair to sign the update
-   * @param registryId - The registry id being updated
-   * @param revId - The revocation id being revoked or unrevoked
+   * @param {string} registryId - The registry id being updated
+   * @param {string} revId - The revocation id being revoked or unrevoked
    * @returns {Promise<void>}
    */
   async updateRevReg(updateFunc, didKeys, registryId, revId) {

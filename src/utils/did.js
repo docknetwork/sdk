@@ -7,6 +7,9 @@ import { randomAsHex, encodeAddress, decodeAddress } from '@polkadot/util-crypto
 import { getSignatureFromKeyringPair } from './misc';
 import { isHexWithGivenByteSize } from './codec';
 
+import { Signature } from '../signatures'; // eslint-disable-line
+import { PublicKey } from '../public-keys'; // eslint-disable-line
+
 export const DockDIDMethod = 'dock';
 export const DockDIDQualifier = `did:${DockDIDMethod}:`;
 export const DockDIDByteSize = 32;
@@ -25,8 +28,8 @@ export class NoDIDError extends Error {
 
 /**
  * Check if the given identifier is 32 byte hex
- * @param {identifier} identifier - The identifier to check.
- * @return {null} Throws exception if invalid identifier
+ * @param {string} identifier - The identifier to check.
+ * @return {void} Throws exception if invalid identifier
  */
 export function validateDockDIDHexIdentifier(identifier) {
   // Byte size of the Dock DID identifier, i.e. the `DockDIDQualifier` is not counted.
@@ -37,8 +40,8 @@ export function validateDockDIDHexIdentifier(identifier) {
 
 /**
  * Check if the given identifier is 32 byte valid SS58 string
- * @param {identifier} identifier - The identifier to check.
- * @return {null} Throws exception if invalid identifier
+ * @param {string} identifier - The identifier to check.
+ * @return {void} Throws exception if invalid identifier
  */
 export function validateDockDIDSS58Identifier(identifier) {
   // base58-check regex
@@ -106,15 +109,17 @@ export function createKeyDetail(publicKey, controller) {
   };
 }
 
+// TODO: all methods using (@param {object} didModule) should be moved into dock.sdk class
+
 /**
  * Create and return a `KeyUpdate` as expected by the Substrate node. Signing is intentionally kept separate as the
  * JS code may not have access to the signing key like in case of hardware wallet.
- * @param {DIDModule} didModule - The did module
+ * @param {object} didModule - The did module
  * @param {string} did - Full DID or hex identifier to update
  * @param {PublicKey} newPublicKey - The new public key for the DID. The
  * @param {string} newController - Full DID or hex identifier of the controller of the public key. Is optional and must
  * only be passed when controller is to be updated.
- * @returns {object} The object has structure and keys with same names as expected by the Substrate node
+ * @returns {Promise<object>} The object has structure and keys with same names as expected by the Substrate node
  */
 export async function createKeyUpdate(didModule, did, newPublicKey, newController) {
   const hexId = getHexIdentifierFromDID(did);
@@ -127,9 +132,9 @@ export async function createKeyUpdate(didModule, did, newPublicKey, newControlle
 }
 
 /** Sign the given `KeyUpdate` and returns the signature
- * @param {DIDModule} didModule - The did module
+ * @param {object} didModule - The did module
  * @param {object} keyUpdate - `KeyUpdate` as expected by the Substrate node
- * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID
+ * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * @returns {Signature}
  */
 export function signKeyUpdate(didModule, keyUpdate, currentKeyPair) {
@@ -139,13 +144,13 @@ export function signKeyUpdate(didModule, keyUpdate, currentKeyPair) {
 
 /**
  * Create a `KeyUpdate` as expected by the Substrate node and signs it. Return the `KeyUpdate` object and the signature
- * @param {DIDModule} didModule - The did module
+ * @param {object} didModule - The did module
  * @param {string} did - Full DID or hex identifier to update
  * @param {PublicKey} newPublicKey - The new public key for the DID
- * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID
+ * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * * @param {string} newController - Full DID or hex identifier of the controller of the public. Is optional and must
  * only be passed when controller is to be updated
- * @returns {array} A 2 element array where the first element is the `KeyUpdate` and the second is the signature
+ * @returns {Promise<array>} A 2 element array where the first element is the `KeyUpdate` and the second is the signature
  */
 export async function createSignedKeyUpdate(didModule, did, newPublicKey, currentKeyPair, newController) {
   const keyUpdate = await createKeyUpdate(didModule, did, newPublicKey, newController);
@@ -158,7 +163,7 @@ export async function createSignedKeyUpdate(didModule, did, newPublicKey, curren
  * JS code may not have access to the signing key like in case of hardware wallet.
  * @param {module} didModule - The did module
  * @param {string} did - Full DID or hex identifier to update
- * @returns {object} The object has structure and keys with same names as expected by the Substrate node
+ * @returns {Promise<object>} The object has structure and keys with same names as expected by the Substrate node
  */
 export async function createDidRemoval(didModule, did) {
   const hexId = getHexIdentifierFromDID(did);
@@ -172,7 +177,7 @@ export async function createDidRemoval(didModule, did) {
  * Sign the given `DidRemoval` and returns the signature
  * @param {module} didModule - The did module
  * @param {object} didRemoval - `DidRemoval` as expected by the Substrate node
- * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID
+ * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * @returns {Signature}
  */
 export function signDidRemoval(didModule, didRemoval, currentKeyPair) {
@@ -184,8 +189,8 @@ export function signDidRemoval(didModule, didRemoval, currentKeyPair) {
  * Create a `DidRemoval` as expected by the Substrate node and signs it. Return the `DidRemoval` object and the signature
  * @param {module} didModule - The did module
  * @param {string} did - Full DID or hex identifier to remove
- * @param {KeyringPair} currentKeyPair - Should have the private key corresponding to the current public key for the DID
- * @returns {array} A 2 element array where the first element is the `DidRemoval` and the second is the signature
+ * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
+ * @returns {Promise<array>} A 2 element array where the first element is the `DidRemoval` and the second is the signature
  */
 export async function createSignedDidRemoval(didModule, did, currentKeyPair) {
   const didRemoval = await createDidRemoval(didModule, did);

@@ -18,6 +18,12 @@ import {
   SignatureEd25519,
 } from './signatures';
 
+/**
+ * @typedef {object} Options The Options to use in the function createUser.
+ * @property {string} address The node address to connect to.
+ * @property {object} keyring PolkadotJS keyring
+ */
+
 /** Helper class to interact with the Dock chain */
 class DockAPI {
   /**
@@ -25,17 +31,19 @@ class DockAPI {
    * @constructor
    * @param {string} address - WebSocket RPC endpoint
    */
-  constructor(address) {
+  constructor(address = null) {
     this.address = address;
   }
 
   /**
    * Initialises the SDK and connects to the node
-   * @param {Account} address - Optional WebSocket address
-   * @param keyring - Polkadot-js keyring
+   * @param {Options} config - Configuration options
    * @return {Promise} Promise for when SDK is ready for use
    */
-  async init({ address, keyring } = {}) {
+  async init({ address, keyring } = {
+    address: null,
+    keyring: null,
+  }) {
     if (this.api) {
       throw new Error('API is already connected');
     }
@@ -90,8 +98,8 @@ class DockAPI {
 
   /**
    * Helper function to send transaction
-   * @param {Extrinsic} extrinsic - Extrinsic to send
-   * @param {bool} unsub - Should we unsubscribe from the transaction after its finalized
+   * @param {object} extrinsic - Extrinsic to send
+   * @param {Boolean} unsubscribe - Should we unsubscribe from the transaction after its finalized
    * @return {Promise}
    */
   async sendTransaction(extrinsic, unsubscribe = true) {
@@ -105,7 +113,10 @@ class DockAPI {
               if (unsubscribe && unsubFunc) {
                 unsubFunc();
               }
-              resolve(events, status);
+              resolve({
+                events,
+                status,
+              });
             }
           })
           .catch((error) => {

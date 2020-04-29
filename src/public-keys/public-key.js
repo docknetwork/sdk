@@ -7,7 +7,8 @@ export default class PublicKey {
    * Creates a new PublicKey object. Validates the given value. Currently supported key
    * types only require validating the byte size.
    * @param {string} value - Value of the public key. This is validated
-   * @return {PublicKey} The PublicKey object if the given value is valid.
+   * @param {number} expectedByteSize - Expected byte size of the key
+   * @constructor
    */
   constructor(value, expectedByteSize) {
     this.validateByteSize(value, expectedByteSize);
@@ -27,12 +28,12 @@ export default class PublicKey {
    * Extracts the public key from a pair. Assumes the KeyringPair is of the correct type. The `type` is intentionally not
    * inspected to follow dependency inversion principle.
    * generate the instance correct subclass
-   * @param {KeyringPair} A polkadot-js KeyringPair.
+   * @param {object} pair A polkadot-js KeyringPair.
    * @returns {PublicKey}
    */
   static fromKeyringPair(pair) {
     // Use of `this` is legal in static methods, https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#Boxing_with_prototype_and_static_methods
-    return new this(u8aToHex(pair.publicKey));
+    return new this(u8aToHex(pair.publicKey), 32);
   }
 
   /**

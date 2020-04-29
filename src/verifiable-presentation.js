@@ -7,6 +7,8 @@ import {
   ensureObjectWithId, ensureObjectWithKeyOrURI, ensureString, ensureURI,
 } from './utils/type-helpers';
 
+import DIDResolver from './did-resolver'; // eslint-disable-line
+
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiablePresentation';
 
@@ -17,20 +19,20 @@ class VerifiablePresentation {
   /**
    * Create a new Verifiable Presentation instance.
    * @param {string} id - id of the presentation
-   * @returns {VerifiablePresentation}
+   * @constructor
    */
   constructor(id) {
     ensureURI(id);
     this.id = id;
-
     this.context = [DEFAULT_CONTEXT];
     this.type = [DEFAULT_TYPE];
     this.credentials = [];
+    this.proof = null;
   }
 
   /**
    * Add a context to this Presentation's context array
-   * @param {str|object} context - Context to add to the presentation context array
+   * @param {string|object} context - Context to add to the presentation context array
    * @returns {VerifiablePresentation}
    */
   addContext(context) {
@@ -41,7 +43,7 @@ class VerifiablePresentation {
 
   /**
    * Add a type to this Presentation's type array
-   * @param {str} type - Type to add to the presentation type array
+   * @param {string} type - Type to add to the presentation type array
    * @returns {VerifiablePresentation}
    */
   addType(type) {
@@ -52,7 +54,7 @@ class VerifiablePresentation {
 
   /**
    * Set a holder for this Presentation
-   * @param {str} holder - Holder to add to the presentation
+   * @param {string} holder - Holder to add to the presentation
    * @returns {VerifiablePresentation}
    */
   setHolder(holder) {
@@ -78,7 +80,7 @@ class VerifiablePresentation {
 
   /**
    * Define the JSON representation of a Verifiable Presentation.
-   * @returns {any}
+   * @returns {object}
    */
   toJSON() {
     const { context, credentials, ...rest } = this;
@@ -94,9 +96,9 @@ class VerifiablePresentation {
    * @param {object} keyDoc - document with `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
    * @param {string} challenge - proof challenge Required.
    * @param {string} domain - proof domain (optional)
-   * @param {Resolver} resolver - Resolver for DIDs.
+   * @param {DIDResolver} resolver - Resolver for DIDs.
    * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
-   * @returns {Promise<{object}>}
+   * @returns {Promise<VerifiablePresentation>}
    */
   async sign(keyDoc, challenge, domain, resolver, compactProof = true) {
     const signedVP = await signPresentation(
@@ -107,7 +109,7 @@ class VerifiablePresentation {
       resolver,
       compactProof,
     );
-    this.proof = signedVP.proof;
+    this.proof = signedVP.proof.pop();
     return this;
   }
 
@@ -115,7 +117,7 @@ class VerifiablePresentation {
    * Verify a Verifiable Presentation
    * @param {string} challenge - proof challenge Required.
    * @param {string} domain - proof domain (optional)
-   * @param {Resolver} resolver - Resolver to resolve the issuer DID (optional)
+   * @param {DIDResolver} resolver - Resolver to resolve the issuer DID (optional)
    * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
    * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
    * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.

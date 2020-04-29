@@ -11,8 +11,11 @@ export default class Signature {
    */
   fromHex(value, expectedByteSize) {
     this.validateByteSize(value, expectedByteSize);
+
+    // @ts-ignore
     const sig = Object.create(this.prototype);
     sig.value = value;
+    return sig;
   }
 
   /**
@@ -27,8 +30,7 @@ export default class Signature {
   /**
    * Signs the given message and wraps it in the Signature
    * @param {array} message - The message to sign as bytearray
-   * @param {KeyringPair} signingPair -The pair from Polkadot-js containing the signing key
-   * @returns {Signature}
+   * @param {object} signingPair -The pair from Polkadot-js containing the signing key
    */
   fromPolkadotJSKeyringPair(message, signingPair) {
     this.value = u8aToHex(signingPair.sign(message));

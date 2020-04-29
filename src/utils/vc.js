@@ -8,6 +8,11 @@ import {
   EcdsaSecp256k1VerKeyName, Ed25519VerKeyName, Sr25519VerKeyName, EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
 } from './vc/custom_crypto';
 
+import DIDResolver from '../did-resolver'; // eslint-disable-line
+/**
+ * @typedef {object} VerifiablePresentation Representation of a Verifiable Presentation.
+ */
+
 // XXX: Does it make sense to have a revocation registry type for Dock like below and eliminate the need for `rev_reg:dock:`?
 // export const RevRegType = 'DockRevocationRegistry2020';
 export const RevRegType = 'CredentialStatusList2017';
@@ -109,11 +114,11 @@ export async function checkRevocationStatus(credential, revocationAPI) {
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
  * @param {object} credential - Credential to be signed.
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
- * @return {object} The signed credential object.
+ * @return {Promise<object>} The signed credential object.
  */
 export async function issueCredential(keyDoc, credential, compactProof = true) {
   const suite = getSuiteFromKeyDoc(keyDoc);
-  // The following code (including `issue` method) will modify the passed credential so clone it.
+  // The following code (including `issue` method) will modify the passed credential so clone it.gb
   const cred = { ...credential };
   cred.issuer = keyDoc.controller;
   return vcjs.issue({
@@ -134,7 +139,7 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
  * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
  * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
- * @return {object} verification result. The returned object will have a key `verified` which is true if the
+ * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
  * credential is valid and not revoked and false otherwise. The `error` will describe the error if any.
  */
 export async function verifyCredential(credential, resolver, compactProof = true, forceRevocationCheck = true, revocationAPI) {
@@ -160,7 +165,7 @@ export async function verifyCredential(credential, resolver, compactProof = true
  * Check that credential is verified, i.e. the credential has VCDM compliant structure and the `proof`
  * (signature by issuer) is correct.
  * @param {object} credential - verifiable credential to be verified.
- * @param {Resolver} resolver - Resolver for DIDs.
+ * @param {DIDResolver} resolver - Resolver for DIDs.
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
  * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
  * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
@@ -195,9 +200,9 @@ export function createPresentation(verifiableCredential, id, holder) {
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
  * @param {string} challenge - proof challenge Required.
  * @param {string} domain - proof domain (optional)
- * @param {Resolver} resolver - Resolver for DIDs.
+ * @param {DIDResolver} resolver - Resolver for DIDs.
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
- * @return {Promise<{VerifiablePresentation}>} A VerifiablePresentation with a proof.
+ * @return {Promise<VerifiablePresentation>} A VerifiablePresentation with a proof.
  */
 export async function signPresentation(presentation, keyDoc, challenge, domain, resolver, compactProof = true) {
   // TODO: support other purposes than the default of "authentication"
@@ -217,14 +222,14 @@ export async function signPresentation(presentation, keyDoc, challenge, domain, 
  * @param {object} presentation - verifiable credential to be verified.
  * @param {string} challenge - proof challenge Required.
  * @param {string} domain - proof domain (optional)
- * @param {Resolver} resolver - Resolver to resolve the issuer DID (optional)
+ * @param {DIDResolver} resolver - Resolver to resolve the issuer DID (optional)
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
  * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
  * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
  * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
  * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
- * @return {object} verification result. The returned object will have a key `verified` which is true if the
+ * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
  * presentation is valid and all the credentials are valid and not revoked and false otherwise. The `error` will
  * describe the error if any.
  */
@@ -245,7 +250,7 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
       const credential = credentials[i];
       // Check for revocation only if the presentation is verified and revocation check is needed.
       if (isRevocationCheckNeeded(credential.credentialStatus, forceRevocationCheck, revocationAPI)) {
-        const res = checkRevocationStatus(credential, revocationAPI);
+        const res = await checkRevocationStatus(credential, revocationAPI); // eslint-disable-line
 
         // Return error for the first credential that does not pass revocation check.
         if (!res.verified) {
@@ -266,7 +271,7 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
  * @param {object} presentation - verifiable credential to be verified.
  * @param {string} challenge - proof challenge Required.
  * @param {string} domain - proof domain (optional)
- * @param {Resolver} resolver - Resolver to resolve the issuer DID (optional)
+ * @param {DIDResolver} resolver - Resolver to resolve the issuer DID (optional)
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
  * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
  * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
@@ -278,7 +283,7 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
  * describe the error if any.
  */
 export async function isVerifiedPresentation(presentation, challenge, domain, resolver, compactProof = true, forceRevocationCheck = true, revocationAPI) {
-  const result = await verifyPresentation(presentation, challenge, domain, compactProof, forceRevocationCheck, revocationAPI);
+  const result = await verifyPresentation(presentation, challenge, domain, resolver, compactProof, forceRevocationCheck, revocationAPI);
   return result.verified;
 }
 

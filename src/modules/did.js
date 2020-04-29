@@ -6,6 +6,7 @@ import {
 } from '../utils/did';
 import { getStateChange } from '../utils/misc';
 
+import Signature from '../signatures/signature'; // eslint-disable-line
 
 /** Class to create, update and destroy DIDs */
 class DIDModule {
@@ -23,7 +24,7 @@ class DIDModule {
    * Creates a new DID on the Dock chain.
    * @param {string} did - The new DID. Can be a full DID or hex identifier
    * @param {object} keyDetail - `KeyDetail` as expected by the Substrate node
-   * @return {Extrinsic} The extrinsic to sign and send.
+   * @return {object} The extrinsic to sign and send.
    */
   new(did, keyDetail) {
     const hexId = getHexIdentifierFromDID(did);
@@ -33,8 +34,8 @@ class DIDModule {
   /**
    * Updates the details of an already registered DID on the Dock chain.
    * @param {object} keyUpdate - `KeyUpdate` as expected by the Substrate node
-   * @param {DidSignature} signature - Signature from existing key
-   * @return {Extrinsic} The extrinsic to sign and send.
+   * @param {Signature} signature - Signature from existing key
+   * @return {object} The extrinsic to sign and send.
    */
   updateKey(keyUpdate, signature) {
     return this.module.updateKey(keyUpdate, signature.toJSON());
@@ -43,8 +44,8 @@ class DIDModule {
   /**
    * Removes an already registered DID on the Dock chain.
    * @param {object} didRemoval - `DidRemoval` as expected by the Substrate node
-   * @param {DidSignature} signature - Signature from existing key
-   * @return {Extrinsic} The extrinsic to sign and send.
+   * @param {Signature} signature - Signature from existing key
+   * @return {object} The extrinsic to sign and send.
    */
   remove(didRemoval, signature) {
     return this.module.remove(didRemoval, signature.toJSON());
@@ -64,7 +65,7 @@ class DIDModule {
    * Throws NoDID if the DID does not exist on chain.
    * @param {string} did - The DID can be passed as fully qualified DID like `dock:did:<SS58 string>` or
    * a 32 byte hex string
-   * @return {object} The DID document.
+   * @return {Promise<object>} The DID document.
    */
   async getDocument(did) {
     const hexId = getHexIdentifierFromDID(did);
@@ -131,7 +132,7 @@ class DIDModule {
    * chain.
    * @param {string} didIdentifier - DID identifier as hex. Not accepting full DID intentionally for efficiency as these
    * methods are used internally
-   * @return {array} A 2 element array with first
+   * @return {Promise<array>} A 2 element array with first
    */
   async getDetail(didIdentifier) {
     validateDockDIDHexIdentifier(didIdentifier);
@@ -156,7 +157,7 @@ class DIDModule {
    * chain or chain returns null response.
    * @param {string} didIdentifier - DID identifier as hex. Not accepting full DID intentionally for efficiency as these
    * methods are used internally
-   * @return {array} A 2 element array with first
+   * @return {Promise<array>} A 2 element array with first
    */
   async getBlockNoForLastChangeToDID(didIdentifier) {
     return (await this.getDetail(didIdentifier))[1];

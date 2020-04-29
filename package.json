@@ -29,7 +29,8 @@
     "rollup-plugin-babel": "4.3.2",
     "rollup-plugin-commonjs": "9.2.1",
     "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-node-resolve": "4.0.1"
+    "rollup-plugin-node-resolve": "4.0.1",
+    "typescript": "^3.8.3"
   },
   "scripts": {
     "lint": "eslint \"{src,example}/**/*.js\"",
@@ -45,7 +46,8 @@
     "vcdm-example": "npx babel-node example/vcdm.js",
     "dev-node": "./scripts/run_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
     "test-with-node": "./scripts/with_docker_test_node yarn test-integration",
-    "mdbook": "mdbook build tutorials --dest-dir ../out/tutorials"
+    "mdbook": "mdbook build tutorials --dest-dir ../out/tutorials",
+    "type-check": "tsc -allowJs -checkJs -noEmit -moduleResolution node --resolveJsonModule -target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
   },
   "jest": {
     "testEnvironment": "node"

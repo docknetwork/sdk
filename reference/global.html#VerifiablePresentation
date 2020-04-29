@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: DIDModule</title>
+    <title>JSDoc: Class: VerifiablePresentation</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: DIDModule</h1>
+    <h1 class="page-title">Class: VerifiablePresentation</h1>
 
     
 
@@ -28,9 +28,9 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>DIDModule<span class="signature">(api)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>VerifiablePresentation<span class="signature">(id)</span><span class="type-signature"></span></h2>
         
-            <div class="class-description">Class to create, update and destroy DIDs</div>
+            <div class="class-description">Representation of a Verifiable Presentation.</div>
         
     
 </header>
@@ -45,7 +45,7 @@
     
 
     
-    <h4 class="name" id="DIDModule"><span class="type-signature"></span>new DIDModule<span class="signature">(api)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="VerifiablePresentation"><span class="type-signature"></span>new VerifiablePresentation<span class="signature">(id)</span><span class="type-signature"></span></h4>
     
 
     
@@ -53,7 +53,7 @@
 
 
 <div class="description">
-    Creates a new instance of DIDModule and sets the api
+    Create a new Verifiable Presentation instance.
 </div>
 
 
@@ -89,13 +89,13 @@
 
         <tr>
             
-                <td class="name"><code>api</code></td>
+                <td class="name"><code>id</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">string</span>
 
 
             
@@ -105,7 +105,7 @@
 
             
 
-            <td class="description last">PolkadotJS API Reference</td>
+            <td class="description last">id of the presentation</td>
         </tr>
 
     
@@ -146,7 +146,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line18">line 18</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line24">line 24</a>
     </li></ul></dd>
     
 
@@ -202,7 +202,7 @@
     
 
     
-    <h4 class="name" id="getBlockNoForLastChangeToDID"><span class="type-signature">(async) </span>getBlockNoForLastChangeToDID<span class="signature">(didIdentifier)</span><span class="type-signature"> &rarr; {Promise.&lt;array>}</span></h4>
+    <h4 class="name" id="addContext"><span class="type-signature"></span>addContext<span class="signature">(context)</span><span class="type-signature"> &rarr; {<a href="global.html#VerifiablePresentation">VerifiablePresentation</a>}</span></h4>
     
 
     
@@ -210,9 +210,7 @@
 
 
 <div class="description">
-    Gets the block number in which the DID was last modified in
-the chain and return it. It will throw error if the DID does not exist on
-chain or chain returns null response.
+    Add a context to this Presentation's context array
 </div>
 
 
@@ -248,7 +246,320 @@ chain or chain returns null response.
 
         <tr>
             
-                <td class="name"><code>didIdentifier</code></td>
+                <td class="name"><code>context</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Context to add to the presentation context array</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line38">line 38</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="addCredential"><span class="type-signature"></span>addCredential<span class="signature">(credential)</span><span class="type-signature"> &rarr; {<a href="global.html#VerifiablePresentation">VerifiablePresentation</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Add a Verifiable Credential to this Presentation
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>credential</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Verifiable Credential for the presentation</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line71">line 71</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="addType"><span class="type-signature"></span>addType<span class="signature">(type)</span><span class="type-signature"> &rarr; {<a href="global.html#VerifiablePresentation">VerifiablePresentation</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Add a type to this Presentation's type array
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>type</code></td>
             
 
             <td class="type">
@@ -264,8 +575,7 @@ chain or chain returns null response.
 
             
 
-            <td class="description last">DID identifier as hex. Not accepting full DID intentionally for efficiency as these
-methods are used internally</td>
+            <td class="description last">Type to add to the presentation type array</td>
         </tr>
 
     
@@ -306,7 +616,7 @@ methods are used internally</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line162">line 162</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line49">line 49</a>
     </li></ul></dd>
     
 
@@ -334,10 +644,6 @@ methods are used internally</td>
 <h5>Returns:</h5>
 
         
-<div class="param-desc">
-    A 2 element array with first
-</div>
-
 
 
 <dl>
@@ -346,7 +652,7 @@ methods are used internally</td>
     </dt>
     <dd>
         
-<span class="param-type">Promise.&lt;array></span>
+<span class="param-type"><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></span>
 
 
     </dd>
@@ -364,7 +670,7 @@ methods are used internally</td>
     
 
     
-    <h4 class="name" id="getDetail"><span class="type-signature">(async) </span>getDetail<span class="signature">(didIdentifier)</span><span class="type-signature"> &rarr; {Promise.&lt;array>}</span></h4>
+    <h4 class="name" id="setHolder"><span class="type-signature"></span>setHolder<span class="signature">(holder)</span><span class="type-signature"> &rarr; {<a href="global.html#VerifiablePresentation">VerifiablePresentation</a>}</span></h4>
     
 
     
@@ -372,9 +678,7 @@ methods are used internally</td>
 
 
 <div class="description">
-    Gets the key detail and block number in which the DID was last modified from
-the chain and return them. It will throw NoDID if the DID does not exist on
-chain.
+    Set a holder for this Presentation
 </div>
 
 
@@ -410,7 +714,7 @@ chain.
 
         <tr>
             
-                <td class="name"><code>didIdentifier</code></td>
+                <td class="name"><code>holder</code></td>
             
 
             <td class="type">
@@ -426,8 +730,7 @@ chain.
 
             
 
-            <td class="description last">DID identifier as hex. Not accepting full DID intentionally for efficiency as these
-methods are used internally</td>
+            <td class="description last">Holder to add to the presentation</td>
         </tr>
 
     
@@ -468,7 +771,7 @@ methods are used internally</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line137">line 137</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line60">line 60</a>
     </li></ul></dd>
     
 
@@ -496,10 +799,6 @@ methods are used internally</td>
 <h5>Returns:</h5>
 
         
-<div class="param-desc">
-    A 2 element array with first
-</div>
-
 
 
 <dl>
@@ -508,7 +807,7 @@ methods are used internally</td>
     </dt>
     <dd>
         
-<span class="param-type">Promise.&lt;array></span>
+<span class="param-type"><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></span>
 
 
     </dd>
@@ -526,7 +825,7 @@ methods are used internally</td>
     
 
     
-    <h4 class="name" id="getDocument"><span class="type-signature">(async) </span>getDocument<span class="signature">(did)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    <h4 class="name" id="sign"><span class="type-signature">(async) </span>sign<span class="signature">(keyDoc, challenge, domain, resolver, compactProof)</span><span class="type-signature"> &rarr; {Promise.&lt;<a href="global.html#VerifiablePresentation">VerifiablePresentation</a>>}</span></h4>
     
 
     
@@ -534,8 +833,7 @@ methods are used internally</td>
 
 
 <div class="description">
-    Gets a DID from the Dock chain and create a DID document according to W3C spec.
-Throws NoDID if the DID does not exist on chain.
+    Sign a Verifiable Presentation using the provided keyDoc
 </div>
 
 
@@ -561,6 +859,8 @@ Throws NoDID if the DID does not exist on chain.
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
@@ -571,7 +871,34 @@ Throws NoDID if the DID does not exist on chain.
 
         <tr>
             
-                <td class="name"><code>did</code></td>
+                <td class="name"><code>keyDoc</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">document with `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>challenge</code></td>
             
 
             <td class="type">
@@ -586,152 +913,19 @@ Throws NoDID if the DID does not exist on chain.
             
 
             
-
-            <td class="description last">The DID can be passed as fully qualified DID like `dock:did:<SS58 string>` or
-a 32 byte hex string</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line70">line 70</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    The DID document.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Promise.&lt;object></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
+                <td class="default">
+                
+                </td>
             
 
-    
+            <td class="description last">proof challenge Required.</td>
+        </tr>
 
-    
-    <h4 class="name" id="getFullyQualifiedDID"><span class="type-signature"></span>getFullyQualifiedDID<span class="signature">(did)</span><span class="type-signature"> &rarr; {string}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Create the fully qualified DID like "did:dock:..."
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>did</code></td>
+                <td class="name"><code>domain</code></td>
             
 
             <td class="type">
@@ -746,157 +940,25 @@ a 32 byte hex string</td>
             
 
             
-
-            <td class="description last">DID</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line59">line 59</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    The DID identifer.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">string</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
+                <td class="default">
+                
+                </td>
             
 
-    
+            <td class="description last">proof domain (optional)</td>
+        </tr>
 
-    
-    <h4 class="name" id="getSerializedDIDRemoval"><span class="type-signature"></span>getSerializedDIDRemoval<span class="signature">(didRemoval)</span><span class="type-signature"> &rarr; {Array}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Serializes a `DidRemoval` for signing.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>didRemoval</code></td>
+                <td class="name"><code>resolver</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">DIDResolver</span>
 
 
             
@@ -905,157 +967,25 @@ a 32 byte hex string</td>
             
 
             
-
-            <td class="description last">`DidRemoval` as expected by the Substrate node</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line180">line 180</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    An array of Uint8
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Array</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
+                <td class="default">
+                
+                </td>
             
 
-    
+            <td class="description last">Resolver for DIDs.</td>
+        </tr>
 
-    
-    <h4 class="name" id="getSerializedKeyUpdate"><span class="type-signature"></span>getSerializedKeyUpdate<span class="signature">(keyUpdate)</span><span class="type-signature"> &rarr; {Array}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Serializes a `KeyUpdate` for signing.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>keyUpdate</code></td>
+                <td class="name"><code>compactProof</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">Boolean</span>
 
 
             
@@ -1064,8 +994,14 @@ a 32 byte hex string</td>
             
 
             
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
 
-            <td class="description last">`KeyUpdate` as expected by the Substrate node</td>
+            <td class="description last">Whether to compact the JSON-LD or not.</td>
         </tr>
 
     
@@ -1106,7 +1042,7 @@ a 32 byte hex string</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line171">line 171</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line103">line 103</a>
     </li></ul></dd>
     
 
@@ -1134,10 +1070,6 @@ a 32 byte hex string</td>
 <h5>Returns:</h5>
 
         
-<div class="param-desc">
-    An array of Uint8
-</div>
-
 
 
 <dl>
@@ -1146,7 +1078,7 @@ a 32 byte hex string</td>
     </dt>
     <dd>
         
-<span class="param-type">Array</span>
+<span class="param-type">Promise.&lt;<a href="global.html#VerifiablePresentation">VerifiablePresentation</a>></span>
 
 
     </dd>
@@ -1164,7 +1096,7 @@ a 32 byte hex string</td>
     
 
     
-    <h4 class="name" id="new"><span class="type-signature"></span>new<span class="signature">(did, keyDetail)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    <h4 class="name" id="toJSON"><span class="type-signature"></span>toJSON<span class="signature">()</span><span class="type-signature"> &rarr; {object}</span></h4>
     
 
     
@@ -1172,7 +1104,113 @@ a 32 byte hex string</td>
 
 
 <div class="description">
-    Creates a new DID on the Dock chain.
+    Define the JSON representation of a Verifiable Presentation.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line85">line 85</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="verify"><span class="type-signature">(async) </span>verify<span class="signature">(challenge, domain, resolver, compactProof, forceRevocationCheck, revocationAPI)</span><span class="type-signature"> &rarr; {Promise.&lt;{object}>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Verify a Verifiable Presentation
 </div>
 
 
@@ -1198,6 +1236,8 @@ a 32 byte hex string</td>
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
@@ -1208,7 +1248,7 @@ a 32 byte hex string</td>
 
         <tr>
             
-                <td class="name"><code>did</code></td>
+                <td class="name"><code>challenge</code></td>
             
 
             <td class="type">
@@ -1223,15 +1263,132 @@ a 32 byte hex string</td>
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">The new DID. Can be a full DID or hex identifier</td>
+            <td class="description last">proof challenge Required.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>keyDetail</code></td>
+                <td class="name"><code>domain</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">proof domain (optional)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>resolver</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">DIDResolver</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Resolver to resolve the issuer DID (optional)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>compactProof</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last">Whether to compact the JSON-LD or not.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>forceRevocationCheck</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last">Whether to force revocation check or not.
+Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>revocationAPI</code></td>
             
 
             <td class="type">
@@ -1246,8 +1403,14 @@ a 32 byte hex string</td>
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">`KeyDetail` as expected by the Substrate node</td>
+            <td class="description last">An object representing a map. "revocation type -> revocation API". The API is used to check
+revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
+as we support more APIs there are more details associated with each API. Only Dock is supported as of now.</td>
         </tr>
 
     
@@ -1288,7 +1451,7 @@ a 32 byte hex string</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line29">line 29</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line129">line 129</a>
     </li></ul></dd>
     
 
@@ -1317,7 +1480,7 @@ a 32 byte hex string</td>
 
         
 <div class="param-desc">
-    The extrinsic to sign and send.
+    - verification result.
 </div>
 
 
@@ -1328,371 +1491,7 @@ a 32 byte hex string</td>
     </dt>
     <dd>
         
-<span class="param-type">object</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="remove"><span class="type-signature"></span>remove<span class="signature">(didRemoval, signature)</span><span class="type-signature"> &rarr; {object}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Removes an already registered DID on the Dock chain.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>didRemoval</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">`DidRemoval` as expected by the Substrate node</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>signature</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Signature</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Signature from existing key</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line50">line 50</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    The extrinsic to sign and send.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">object</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="updateKey"><span class="type-signature"></span>updateKey<span class="signature">(keyUpdate, signature)</span><span class="type-signature"> &rarr; {object}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Updates the details of an already registered DID on the Dock chain.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>keyUpdate</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">`KeyUpdate` as expected by the Substrate node</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>signature</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Signature</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Signature from existing key</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line40">line 40</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    The extrinsic to sign and send.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">object</span>
+<span class="param-type">Promise.&lt;{object}></span>
 
 
     </dd>

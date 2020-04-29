@@ -79,6 +79,8 @@
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
@@ -103,6 +105,12 @@
 
             
 
+            
+                <td class="default">
+                
+                    null
+                
+                </td>
             
 
             <td class="description last">WebSocket RPC endpoint</td>
@@ -146,7 +154,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line28">line 28</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line34">line 34</a>
     </li></ul></dd>
     
 
@@ -240,7 +248,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line127">line 127</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line138">line 138</a>
     </li></ul></dd>
     
 
@@ -302,7 +310,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line138">line 138</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line149">line 149</a>
     </li></ul></dd>
     
 
@@ -382,7 +390,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line87">line 87</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line95">line 95</a>
     </li></ul></dd>
     
 
@@ -440,7 +448,7 @@
     
 
     
-    <h4 class="name" id="init"><span class="type-signature">(async) </span>init<span class="signature">(address, keyring)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="init"><span class="type-signature">(async) </span>init<span class="signature">(config)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -484,13 +492,13 @@
 
         <tr>
             
-                <td class="name"><code>address</code></td>
+                <td class="name"><code>config</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Account</span>
+<span class="param-type"><a href="global.html#Options">Options</a></span>
 
 
             
@@ -500,25 +508,7 @@
 
             
 
-            <td class="description last">Optional WebSocket address</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>keyring</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Polkadot-js keyring</td>
+            <td class="description last">Configuration options</td>
         </tr>
 
     
@@ -559,7 +549,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line38">line 38</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line43">line 43</a>
     </li></ul></dd>
     
 
@@ -617,7 +607,7 @@
     
 
     
-    <h4 class="name" id="sendTransaction"><span class="type-signature">(async) </span>sendTransaction<span class="signature">(extrinsic, unsub)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="sendTransaction"><span class="type-signature">(async) </span>sendTransaction<span class="signature">(extrinsic, unsubscribe)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -651,6 +641,8 @@
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
@@ -667,7 +659,7 @@
             <td class="type">
             
                 
-<span class="param-type">Extrinsic</span>
+<span class="param-type">object</span>
 
 
             
@@ -675,6 +667,10 @@
 
             
 
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">Extrinsic to send</td>
@@ -684,13 +680,13 @@
 
         <tr>
             
-                <td class="name"><code>unsub</code></td>
+                <td class="name"><code>unsubscribe</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">bool</span>
+<span class="param-type">Boolean</span>
 
 
             
@@ -698,6 +694,12 @@
 
             
 
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
             
 
             <td class="description last">Should we unsubscribe from the transaction after its finalized</td>
@@ -741,7 +743,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line97">line 97</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line105">line 105</a>
     </li></ul></dd>
     
 
@@ -897,7 +899,7 @@ Sets the account used to sign transactions
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line79">line 79</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line87">line 87</a>
     </li></ul></dd>
     
 
@@ -943,13 +945,13 @@ Sets the account used to sign transactions
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="VerifiablePresentation.html">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createPresentation">createPresentation</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureObjectWithKeyOrURI">ensureObjectWithKeyOrURI</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSignatures">getSignatures</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createPresentation">createPresentation</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureObjectWithKeyOrURI">ensureObjectWithKeyOrURI</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSignatures">getSignatures</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toMap">toMap</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Tue Apr 28 2020 20:19:29 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Wed Apr 29 2020 21:33:59 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: public-keys/public-key-secp256k1.js</title>
+    <title>JSDoc: Source: did-resolver.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: public-keys/public-key-secp256k1.js</h1>
+    <h1 class="page-title">Source: did-resolver.js</h1>
 
     
 
@@ -26,34 +26,23 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import PublicKey from './public-key';
+            <pre class="prettyprint source linenums"><code>import { parse } from 'did-resolver';
 
-/** Class representing a compressed Secp256k1 PublicKey */
-export default class PublicKeySecp256k1 extends PublicKey {
-  constructor(value) {
-    super(value, 33);
+/**
+ * A DID resolver
+ */
+export default class DIDResolver {
+  parseDid(did) {
+    return parse(did);
   }
 
   /**
-   * @return {Object} The PublicKey JSON variant Secp256k1.
+   * Resolve a Dock DID. The DID is expected to be a fully qualified DID.
+   * @param {string} did - The full DID
+   * @returns {Promise&lt;object>}
    */
-  toJSON() {
-    return {
-      Secp256k1: this.value,
-    };
-  }
-
-  /**
-   * Returns a compressed public key for Secp256k1 curve. The name is intentionally kept same with the base export class to
-   * keep the API uniform
-   * @param {object} pair - A KeyPair from elliptic library
-   * @returns {PublicKeySecp256k1}
-   */
-  static fromKeyringPair(pair) {
-    // `true` is for compressed
-    const pk = pair.getPublic(true, 'hex');
-    // `pk` is hex but does not contain the leading `0x`
-    return new this(`0x${pk}`);
+  async resolve(did) {
+    throw new Error(`Resolving not implemented in base class, please extend. ${this.constructor.name} ${did}`);
   }
 }
 </code></pre>

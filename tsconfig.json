@@ -1,9 +1,12 @@
 {
-    "include": [
-        "src/**/*.js"
-    ],
-    "exclude": [
-        "node_modules",
-        "**/*.test.ts"
-    ]
+  "compilerOptions": {
+    "types": ["node", "jest"],
+  },
+  "include": [
+    "src/**/*.js",
+    "tests/**/*.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

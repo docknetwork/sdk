@@ -22,19 +22,10 @@ class VerifiablePresentation {
    */
   constructor(id) {
     ensureURI(id);
-
-    /**
-     * @property {string} id The presentation's ID
-     */
     this.id = id;
-
     this.context = [DEFAULT_CONTEXT];
     this.type = [DEFAULT_TYPE];
     this.credentials = [];
-
-    /**
-     * @property {object} proof The presentation's proof
-     */
     this.proof = null;
   }
 

@@ -6,7 +6,7 @@ import DIDResolver from '../../did-resolver'; // eslint-disable-line
  * Takes a resolver and returns a function that returns a document or throws an error when the document
  * cannot be found.
  * @param {DIDResolver} [resolver] - The resolver is optional but should be passed when DIDs need to be resolved.
- * @returns {(uri: any) => Promise<{ documentUrl: string; document: any; }>}
+ * @returns {loadDocument} - the returned function
  */
 export default function (resolver = null) {
   /**

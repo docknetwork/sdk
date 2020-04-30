@@ -2,10 +2,10 @@
 /**
  * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
  * @param {string} value - Hexadecimal value
- * @param {number} byteSize - Expected byte size of the input.
+ * @param {number} [byteSize] - Expected byte size of the input.
  * @return {Boolean} True if hex (with given size) else false
  */
-export function isHexWithGivenByteSize(value, byteSize) {
+export function isHexWithGivenByteSize(value, byteSize = undefined) {
   const match = value.match(/^0x([0-9a-f]+$)/i);
   if (match && match.length > 1) {
     if (byteSize !== undefined) {

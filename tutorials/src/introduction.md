@@ -4,7 +4,8 @@
 [Dock](https://dock.io) is a blockchain built using [Substrate](https://www.parity.io/substrate/) and uses [polkadot-js](https://github.com/polkadot-js/)
 for interacting with the chain. The current version of Dock supports creating and managing DIDs compliant with the
 [W3C spec](https://www.w3.org/TR/did-core) and verifiable credentials compliant with the
-[Verifiable Credentials Data Model 1.0](https://www.w3.org/TR/vc-data-model/). This SDK is meant to build client-side or server side javascript applications.
+[Verifiable Credentials Data Model 1.0](https://www.w3.org/TR/vc-data-model/). This SDK is meant to build client-side or
+server side javascript applications.
 
 ## Installation
 - Install from npm with `npm install @docknetwork/sdk` or `yarn add @docknetwork/sdk`

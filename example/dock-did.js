@@ -59,7 +59,7 @@ async function getDIDDoc() {
   console.log('Getting DID now.');
   // Check if DID exists
   const result = await dock.did.getDocument(dockDID);
-  console.log('DID Document:', JSON.stringify(result, true, 2));
+  console.log('DID Document:', JSON.stringify(result, null, 2));
   return result;
 }
 

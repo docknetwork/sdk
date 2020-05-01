@@ -4,6 +4,7 @@
   },
   "include": [
     "src/**/*.js",
+    "example/**/*.js",
     "tests/**/*.test.js"
   ],
   "exclude": [

@@ -17,6 +17,7 @@ const DEFAULT_TYPE = 'VerifiableCredential';
  * @typedef {object} VerifiableCredentialVerificationResult The credential verification result
  * @property {Boolean} verified Is this credential verified or not
  * @property {array} results Verification results
+ * @property {any} [error] Optional error
  */
 
 /**

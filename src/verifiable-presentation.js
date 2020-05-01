@@ -16,6 +16,8 @@ const DEFAULT_TYPE = 'VerifiablePresentation';
  * @typedef {object} VerifiablePresentationVerificationResult The presentation verification result
  * @property {object} presentationResult Is this presentqtion verified or not
  * @property {array} credentialResults Verification results
+ * @property {Boolean} verified Is verified or not
+ * @property {any} [error] Optional error
  */
 
 /**

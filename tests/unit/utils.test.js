@@ -57,6 +57,7 @@ describe('Testing public key and signature instantiation from keyring', () => {
     // Create a keypair of type 'ee25519' which is not supported as of now. Moreover this seems like a bug in
     // polkadot-js as it should not allow to create such pair
     const keyring = new Keyring();
+    // @ts-ignore: KeypairType error
     const badPair = keyring.addFromUri(randomAsHex(32), null, 'ee25519');
     expect(() => getPublicKeyFromKeyringPair(badPair)).toThrow('Only ed25519, sr25519 and secp256k1 keys supported as of now');
   });
@@ -85,6 +86,7 @@ describe('Testing public key and signature instantiation from keyring', () => {
     // Create a keypair of type 'ee25519' which is not supported as of now. Moreover this seems like a bug in
     // polkadot-js as it should not allow to create such pair
     const keyring = new Keyring();
+    // @ts-ignore: KeypairType error
     const badPair = keyring.addFromUri(randomAsHex(32), null, 'ee25519');
     expect(() => getSignatureFromKeyringPair(badPair, [1, 2])).toThrow('Only ed25519, sr25519 and secp256k1 keys supported as of now');
   });

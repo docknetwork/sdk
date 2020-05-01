@@ -1,11 +1,11 @@
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
+import { KeyringPair } from '@polkadot/keyring/types'; // eslint-disable-line
 
 import RevocationModule from './modules/revocation';
 import DIDModule from './modules/did';
 import types from './types.json';
 
-import { KeyringPair } from '@polkadot/keyring/types';
 
 import {
   PublicKey,

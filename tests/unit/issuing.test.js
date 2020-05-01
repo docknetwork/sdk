@@ -223,17 +223,9 @@ describe('Verifiable Credential incremental creation', () => {
   });
 
   test('Incremental VC creations runs basic validation', async () => {
-    expect(() => {
-      new VerifiableCredential({ key: 'value' });
-    }).toThrowError('needs to be a string.');
-
     const credential = new VerifiableCredential(sampleId);
     expect(() => {
       credential.addContext(123);
-    }).toThrowError('needs to be a string.');
-
-    expect(() => {
-      credential.addType(123);
     }).toThrowError('needs to be a string.');
 
     expect(() => {
@@ -313,10 +305,6 @@ describe('Verifiable Presentation incremental creation', () => {
   });
 
   test('Incremental VP creations runs basic validation', async () => {
-    expect(() => {
-      new VerifiablePresentation({ key: 'value' });
-    }).toThrowError('needs to be a string.');
-
     const vp = new VerifiablePresentation(sampleId);
     expect(() => {
       vp.addContext(123);
@@ -326,14 +314,13 @@ describe('Verifiable Presentation incremental creation', () => {
     }).toThrowError('needs to be a valid URI.');
 
     expect(() => {
-      vp.addType(123);
-    }).toThrowError('needs to be a string.');
-
-    expect(() => {
       vp.addCredential({ some: 'value' });
     }).toThrowError('"credential" must include the \'id\' property.');
 
-    await expect(vp.verify()).rejects.toThrowError('The current VerifiablePresentation has no proof.');
+    await expect(vp.verify(
+      'some_challenge',
+      'some_domain',
+    )).rejects.toThrowError('The current VerifiablePresentation has no proof.');
   });
 
   test('Incremental VP creation from external VCs should be possible', async () => {

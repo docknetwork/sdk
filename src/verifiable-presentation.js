@@ -13,6 +13,12 @@ const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiablePresentation';
 
 /**
+ * @typedef {object} VerifiablePresentationVerificationResult The presentation verification result
+ * @property {object} presentationResult Is this presentqtion verified or not
+ * @property {array} credentialResults Verification results
+ */
+
+/**
  * Representation of a Verifiable Presentation.
  */
 class VerifiablePresentation {
@@ -124,7 +130,7 @@ class VerifiablePresentation {
    * @param {object} [revocationAPI] - An object representing a map. "revocation type -> revocation API". The API is used to check
    * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
    * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
-   * @returns {Promise<{object}>} - verification result.
+   * @returns {Promise<VerifiablePresentationVerificationResult>} - verification result.
    */
   async verify(challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null) {
     if (!this.proof) {

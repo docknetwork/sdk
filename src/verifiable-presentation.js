@@ -96,11 +96,11 @@ class VerifiablePresentation {
    * @param {object} keyDoc - document with `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
    * @param {string} challenge - proof challenge Required.
    * @param {string} domain - proof domain (optional)
-   * @param {DIDResolver} resolver - Resolver for DIDs.
-   * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
+   * @param {DIDResolver} [resolver] - Resolver for DIDs.
+   * @param {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
    * @returns {Promise<VerifiablePresentation>}
    */
-  async sign(keyDoc, challenge, domain, resolver, compactProof = true) {
+  async sign(keyDoc, challenge, domain, resolver = null, compactProof = true) {
     const signedVP = await signPresentation(
       this.toJSON(),
       keyDoc,

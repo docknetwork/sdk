@@ -140,16 +140,16 @@ class VerifiableCredential {
 
   /**
    * Verify a Verifiable Credential
-   * @param {object} resolver - Resolver for DIDs.
-   * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
-   * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
+   * @param {object} [resolver] - Resolver for DIDs.
+   * @param {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
+   * @param {Boolean} [forceRevocationCheck] - Whether to force revocation check or not.
    * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
-   * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
+   * @param {object} [revocationAPI] - An object representing a map. "revocation type -> revocation API". The API is used to check
    * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
    * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
    * @returns {Promise<{object}>}
    */
-  async verify(resolver, compactProof = true, forceRevocationCheck = true, revocationAPI) {
+  async verify(resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null) {
     if (!this.proof) {
       throw new Error('The current Verifiable Credential has no proof.');
     }

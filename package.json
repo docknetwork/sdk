@@ -1,8 +1,8 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "0.0.2",
-  "main": "dist/sdk.cjs.js",
-  "module": "dist/sdk.esm.js",
+  "version": "0.0.3",
+  "main": "index.cjs.js",
+  "module": "index.esm.js",
   "license": "MIT",
   "type": "module",
   "repository": {
@@ -34,7 +34,6 @@
   },
   "scripts": {
     "lint": "eslint \"{src,example}/**/*.js\"",
-    "prepare": "yarn build",
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "test": "jest --verbose ./tests/unit",
@@ -53,7 +52,6 @@
     "testEnvironment": "node"
   },
   "files": [
-    "dist",
     "src"
   ],
   "dependencies": {

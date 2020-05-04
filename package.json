@@ -51,9 +51,6 @@
   "jest": {
     "testEnvironment": "node"
   },
-  "files": [
-    "src"
-  ],
   "dependencies": {
     "@polkadot/api": "1.9.1",
     "@polkadot/util": "2.8.1",

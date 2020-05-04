@@ -19,7 +19,6 @@ export default async function() {
             input[id] = files[i];
           }
         }
-        console.log('input', input);
         resolve(files);
       } else {
         throw new Error('Unable to list src files!');

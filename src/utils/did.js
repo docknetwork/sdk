@@ -117,7 +117,7 @@ export function createKeyDetail(publicKey, controller) {
  * @param {object} didModule - The did module
  * @param {string} did - Full DID or hex identifier to update
  * @param {PublicKey} newPublicKey - The new public key for the DID. The
- * @param {string} newController - Full DID or hex identifier of the controller of the public key. Is optional and must
+ * @param {string} [newController] - Full DID or hex identifier of the controller of the public key. Is optional and must
  * only be passed when controller is to be updated.
  * @returns {Promise<object>} The object has structure and keys with same names as expected by the Substrate node
  */
@@ -151,7 +151,7 @@ export function signKeyUpdate(didModule, keyUpdate, currentKeyPair) {
  * @param {string} did - Full DID or hex identifier to update
  * @param {PublicKey} newPublicKey - The new public key for the DID
  * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
- * * @param {string} newController - Full DID or hex identifier of the controller of the public. Is optional and must
+ * * @param {string} [newController] - Full DID or hex identifier of the controller of the public. Is optional and must
  * only be passed when controller is to be updated
  * @returns {Promise<array>} A 2 element array where the first element is the `KeyUpdate` and the second is the signature
  */

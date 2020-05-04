@@ -146,7 +146,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line24">line 24</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line32">line 32</a>
     </li></ul></dd>
     
 
@@ -306,7 +306,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line38">line 38</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line46">line 46</a>
     </li></ul></dd>
     
 
@@ -461,7 +461,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line71">line 71</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line79">line 79</a>
     </li></ul></dd>
     
 
@@ -616,7 +616,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line49">line 49</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line57">line 57</a>
     </li></ul></dd>
     
 
@@ -771,7 +771,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line60">line 60</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line68">line 68</a>
     </li></ul></dd>
     
 
@@ -825,7 +825,7 @@
     
 
     
-    <h4 class="name" id="sign"><span class="type-signature">(async) </span>sign<span class="signature">(keyDoc, challenge, domain, resolver, compactProof)</span><span class="type-signature"> &rarr; {Promise.&lt;<a href="global.html#VerifiablePresentation">VerifiablePresentation</a>>}</span></h4>
+    <h4 class="name" id="sign"><span class="type-signature">(async) </span>sign<span class="signature">(keyDoc, challenge, domain, resolver<span class="signature-attributes">opt</span>, compactProof<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;<a href="global.html#VerifiablePresentation">VerifiablePresentation</a>>}</span></h4>
     
 
     
@@ -857,6 +857,8 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
         <th>Default</th>
@@ -883,6 +885,14 @@
             
             </td>
 
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -911,6 +921,14 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
                 <td class="default">
@@ -937,6 +955,14 @@
             
             </td>
 
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -965,9 +991,21 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
 
             
                 <td class="default">
+                
+                    null
                 
                 </td>
             
@@ -991,6 +1029,16 @@
             
             </td>
 
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -1042,7 +1090,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line103">line 103</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line111">line 111</a>
     </li></ul></dd>
     
 
@@ -1148,7 +1196,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line85">line 85</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line93">line 93</a>
     </li></ul></dd>
     
 
@@ -1202,7 +1250,7 @@
     
 
     
-    <h4 class="name" id="verify"><span class="type-signature">(async) </span>verify<span class="signature">(challenge, domain, resolver, compactProof, forceRevocationCheck, revocationAPI)</span><span class="type-signature"> &rarr; {Promise.&lt;{object}>}</span></h4>
+    <h4 class="name" id="verify"><span class="type-signature">(async) </span>verify<span class="signature">(challenge, domain, resolver<span class="signature-attributes">opt</span>, compactProof<span class="signature-attributes">opt</span>, forceRevocationCheck<span class="signature-attributes">opt</span>, revocationAPI<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;<a href="global.html#VerifiablePresentationVerificationResult">VerifiablePresentationVerificationResult</a>>}</span></h4>
     
 
     
@@ -1234,6 +1282,8 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
         <th>Default</th>
@@ -1260,6 +1310,14 @@
             
             </td>
 
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -1288,6 +1346,14 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
                 <td class="default">
@@ -1315,9 +1381,21 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
 
             
                 <td class="default">
+                
+                    null
                 
                 </td>
             
@@ -1341,6 +1419,16 @@
             
             </td>
 
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -1370,6 +1458,16 @@
             
             </td>
 
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -1401,9 +1499,21 @@ Warning, setting forceRevocationCheck to false can allow false positives when ve
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
 
             
                 <td class="default">
+                
+                    null
                 
                 </td>
             
@@ -1451,7 +1561,7 @@ as we support more APIs there are more details associated with each API. Only Do
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line129">line 129</a>
+        <a href="verifiable-presentation.js.html">verifiable-presentation.js</a>, <a href="verifiable-presentation.js.html#line137">line 137</a>
     </li></ul></dd>
     
 
@@ -1491,7 +1601,7 @@ as we support more APIs there are more details associated with each API. Only Do
     </dt>
     <dd>
         
-<span class="param-type">Promise.&lt;{object}></span>
+<span class="param-type">Promise.&lt;<a href="global.html#VerifiablePresentationVerificationResult">VerifiablePresentationVerificationResult</a>></span>
 
 
     </dd>
@@ -1525,7 +1635,7 @@ as we support more APIs there are more details associated with each API. Only Do
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Mon May 04 2020 18:34:17 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Mon May 04 2020 18:40:33 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

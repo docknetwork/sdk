@@ -1,4 +1,4 @@
-module.exports = {
+{
   "plugins": ["jest"],
   "globals": {
     "process": "readonly"
@@ -18,4 +18,4 @@ module.exports = {
     "no-plusplus": "off",
     "max-len": "off"
   }
-};
+}

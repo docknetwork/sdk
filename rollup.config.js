@@ -1,35 +1,46 @@
-// import resolve from 'rollup-plugin-node-resolve';
-// import commonjs from 'rollup-plugin-commonjs';
-// import babel from 'rollup-plugin-babel';
 import json from 'rollup-plugin-json';
 import pkg from './package.json';
+import glob from 'glob';
 
+export default async function() {
+  const input = {};
 
-export default [
-  // {
-  //   input: 'src/umd.js',
-  //   output: {
-  //     name: 'index',
-  //     file: pkg.browser,
-  //     format: 'umd',
-  //   },
-  //   plugins: [
-  //     resolve(),
-  //     commonjs(),
-  //     babel({
-  //       exclude: 'node_modules/**',
-  //     }),
-  //   ],
-  // },
-  {
+  await new Promise((resolve, reject) => {
+    const dir = 'src';
+    glob(dir + '/**/*.js', null, (er, files) => {
+      if (!er && files) {
+        for (let i = 0; i < files.length; i++) {
+          const fileName = files[i].substr(dir.length + 1);
+          if (fileName.substr(fileName.length - 3) === '.js') {
+            let id = fileName.substr(0, fileName.length - 3);
+            if (id === 'api') {
+              id = 'index';
+            }
+            input[id] = files[i];
+          }
+        }
+        console.log('input', input);
+        resolve(files);
+      } else {
+        throw new Error('Unable to list src files!');
+      }
+    });
+  });
+
+  return [{
     plugins: [
       json(),
     ],
-    input: 'src/api.js',
-    external: [],
-    output: [
-      { file: 'dist/' + pkg.main, format: 'cjs' },
-      { file: 'dist/' + pkg.module, format: 'es' },
-    ],
-  },
-];
+    input,
+    output: [{
+        dir: 'dist',
+        format: 'esm',
+        entryFileNames: '[name].mjs'
+      },
+      {
+        dir: 'dist',
+        format: 'cjs'
+      }
+    ]
+  }];
+};

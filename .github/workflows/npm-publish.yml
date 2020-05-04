@@ -15,9 +15,8 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - run: yarn install --frozen-lockfile --ignore-scripts
       - run: yarn build
-      - run: cp -rf dist/index.cjs.js src
-      - run: cp -rf dist/index.esm.js src
-      - run: cp -rf package.json src
-      - run: cd src && npm publish --access public
+      - run: cp -rf package.json dist
+      - run: cp -rf src/types.json dist
+      - run: cd dist && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

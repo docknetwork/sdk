@@ -14,6 +14,10 @@ jobs:
           node-version: '10.x'
           registry-url: https://registry.npmjs.org/
       - run: yarn install
-      - run: npm publish --access public
+      - run: yarn build
+      - run: cp -rf dist/index.cjs.js src
+      - run: cp -rf dist/index.esm.js src
+      - run: cp -rf package.json src
+      - run: cd src && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

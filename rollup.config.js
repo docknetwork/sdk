@@ -28,8 +28,8 @@ export default [
     input: 'src/api.js',
     external: [],
     output: [
-      { file: pkg.main, format: 'cjs' },
-      { file: pkg.module, format: 'es' },
+      { file: 'dist/' + pkg.main, format: 'cjs' },
+      { file: 'dist/' + pkg.module, format: 'es' },
     ],
   },
 ];

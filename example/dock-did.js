@@ -27,7 +27,7 @@ const secondKeySeed = randomAsHex(32);
 async function removeDID() {
   console.log('Removing DID now.');
 
-  // Sign key update with this key pair as this is the current key of the DID
+  // Sign the DID removal with this key pair as this is the current key of the DID
   const currentPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
 
   const [didRemoval, signature] = await createSignedDidRemoval(dock.did, dockDID, currentPair);

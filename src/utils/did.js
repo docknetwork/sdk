@@ -123,12 +123,15 @@ export function createKeyDetail(publicKey, controller) {
  */
 export async function createKeyUpdate(didModule, did, newPublicKey, newController) {
   const hexId = getHexIdentifierFromDID(did);
-  return {
+  const keyUpdate = {
     did: hexId,
     public_key: newPublicKey.toJSON(),
-    controller: getHexIdentifierFromDID(newController),
     last_modified_in_block: await didModule.getBlockNoForLastChangeToDID(hexId),
   };
+  if (newController) {
+    keyUpdate.controller = getHexIdentifierFromDID(newController);
+  }
+  return keyUpdate;
 }
 
 /** Sign the given `KeyUpdate` and returns the signature

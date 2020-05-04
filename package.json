@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "index.cjs.js",
   "module": "index.esm.js",
   "license": "MIT",

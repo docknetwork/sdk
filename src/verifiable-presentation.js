@@ -13,6 +13,14 @@ const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiablePresentation';
 
 /**
+ * @typedef {object} VerifiablePresentationVerificationResult The presentation verification result
+ * @property {object} presentationResult Is this presentqtion verified or not
+ * @property {array} credentialResults Verification results
+ * @property {Boolean} verified Is verified or not
+ * @property {any} [error] Optional error
+ */
+
+/**
  * Representation of a Verifiable Presentation.
  */
 class VerifiablePresentation {
@@ -96,11 +104,11 @@ class VerifiablePresentation {
    * @param {object} keyDoc - document with `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
    * @param {string} challenge - proof challenge Required.
    * @param {string} domain - proof domain (optional)
-   * @param {DIDResolver} resolver - Resolver for DIDs.
-   * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
+   * @param {DIDResolver} [resolver] - Resolver for DIDs.
+   * @param {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
    * @returns {Promise<VerifiablePresentation>}
    */
-  async sign(keyDoc, challenge, domain, resolver, compactProof = true) {
+  async sign(keyDoc, challenge, domain, resolver = null, compactProof = true) {
     const signedVP = await signPresentation(
       this.toJSON(),
       keyDoc,
@@ -117,16 +125,16 @@ class VerifiablePresentation {
    * Verify a Verifiable Presentation
    * @param {string} challenge - proof challenge Required.
    * @param {string} domain - proof domain (optional)
-   * @param {DIDResolver} resolver - Resolver to resolve the issuer DID (optional)
-   * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
-   * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
+   * @param {DIDResolver} [resolver] - Resolver to resolve the issuer DID (optional)
+   * @param {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
+   * @param {Boolean} [forceRevocationCheck] - Whether to force revocation check or not.
    * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
-   * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
+   * @param {object} [revocationAPI] - An object representing a map. "revocation type -> revocation API". The API is used to check
    * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
    * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
-   * @returns {Promise<{object}>} - verification result.
+   * @returns {Promise<VerifiablePresentationVerificationResult>} - verification result.
    */
-  async verify(challenge, domain, resolver, compactProof = true, forceRevocationCheck = true, revocationAPI) {
+  async verify(challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null) {
     if (!this.proof) {
       throw new Error('The current VerifiablePresentation has no proof.');
     }

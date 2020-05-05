@@ -222,6 +222,32 @@ describe('Verifiable Credential incremental creation', () => {
     expect(credential.expirationDate).toEqual('2021-03-18T19:23:24Z');
   });
 
+  test('Duplicates in context and types are omitted.', async () => {
+    const credential = new VerifiableCredential(sampleId);
+
+    credential.addContext('https://www.w3.org/2018/credentials/examples/v1');
+    expect(credential.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+    ]);
+    credential.addContext('https://www.w3.org/2018/credentials/examples/v1');
+    expect(credential.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+    ]);
+
+    credential.addType('some_type');
+    expect(credential.type).toEqual([
+      'VerifiableCredential',
+      'some_type',
+    ]);
+    credential.addType('some_type');
+    expect(credential.type).toEqual([
+      'VerifiableCredential',
+      'some_type',
+    ]);
+  });
+
   test('Incremental VC creations runs basic validation', async () => {
     const credential = new VerifiableCredential(sampleId);
     expect(() => {
@@ -302,6 +328,32 @@ describe('Verifiable Presentation incremental creation', () => {
     ]);
     vp.addCredential({ id: 'some_credential_id' });
     expect(vp.credentials).toEqual([{ id: 'some_credential_id' }]);
+  });
+
+  test('Duplicate contexts and types are not possible.', async () => {
+    const vp = new VerifiablePresentation(sampleId);
+
+    vp.addContext('https://www.w3.org/2018/credentials/examples/v1');
+    expect(vp.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+    ]);
+    vp.addContext('https://www.w3.org/2018/credentials/examples/v1');
+    expect(vp.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+    ]);
+
+    vp.addType('some_type');
+    expect(vp.type).toEqual([
+      'VerifiablePresentation',
+      'some_type',
+    ]);
+    vp.addType('some_type');
+    expect(vp.type).toEqual([
+      'VerifiablePresentation',
+      'some_type',
+    ]);
   });
 
   test('Incremental VP creations runs basic validation', async () => {

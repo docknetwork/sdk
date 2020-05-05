@@ -39,24 +39,24 @@ class VerifiablePresentation {
   }
 
   /**
-   * Add a context to this Presentation's context array
+   * Add a context to this Presentation's context array. Duplicates are omitted.
    * @param {string|object} context - Context to add to the presentation context array
    * @returns {VerifiablePresentation}
    */
   addContext(context) {
     ensureObjectWithKeyOrURI(context, '@context', 'context');
-    this.context.push(context);
+    this.context = [...new Set([...this.context, context])];
     return this;
   }
 
   /**
-   * Add a type to this Presentation's type array
+   * Add a type to this Presentation's type array. Duplicates are omitted.
    * @param {string} type - Type to add to the presentation type array
    * @returns {VerifiablePresentation}
    */
   addType(type) {
     ensureString(type);
-    this.type.push(type);
+    this.type = [...new Set([...this.type, type])];
     return this;
   }
 

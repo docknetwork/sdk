@@ -39,24 +39,25 @@ class VerifiableCredential {
   }
 
   /**
-   * Add a context to this Credential's context array
+   * Add a context to this Credential's context array. Duplicates are omitted.
    * @param {string|object} context - Context to add to the credential context array
    * @returns {VerifiableCredential}
    */
   addContext(context) {
     ensureObjectWithKeyOrURI(context, '@context', 'context');
-    this.context.push(context);
+    this.context = [...new Set([...this.context, context])];
     return this;
   }
 
   /**
-   * Add a type to this Credential's type array
+   * Add a type to this Credential's type array. Duplicates are omitted.
    * @param {string} type - Type to add to the credential type array
    * @returns {VerifiableCredential}
    */
   addType(type) {
     ensureString(type);
-    this.type.push(type);
+    this.type = [...new Set([...this.type, type])];
+
     return this;
   }
 

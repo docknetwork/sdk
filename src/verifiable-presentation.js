@@ -8,6 +8,7 @@ import {
 } from './utils/type-helpers';
 
 import DIDResolver from './did-resolver'; // eslint-disable-line
+import { getUniqueElementsFromArray } from './utils/misc';
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiablePresentation';
@@ -45,7 +46,7 @@ class VerifiablePresentation {
    */
   addContext(context) {
     ensureObjectWithKeyOrURI(context, '@context', 'context');
-    this.context = [...new Set([...this.context, context])];
+    this.context = getUniqueElementsFromArray([...this.context, context], JSON.stringify);
     return this;
   }
 

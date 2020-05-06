@@ -9,6 +9,7 @@ import {
   ensureURI,
   ensureValidDatetime,
 } from './utils/type-helpers';
+import { getUniqueElementsFromArray } from './utils/misc';
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiableCredential';
@@ -45,9 +46,10 @@ class VerifiableCredential {
    */
   addContext(context) {
     ensureObjectWithKeyOrURI(context, '@context', 'context');
-    this.context = [...new Set([...this.context, context])];
+    this.context = getUniqueElementsFromArray([...this.context, context], JSON.stringify);
     return this;
   }
+
 
   /**
    * Add a type to this Credential's type array. Duplicates are omitted.

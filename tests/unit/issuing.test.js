@@ -235,6 +235,18 @@ describe('Verifiable Credential incremental creation', () => {
       'https://www.w3.org/2018/credentials/v1',
       'https://www.w3.org/2018/credentials/examples/v1',
     ]);
+    credential.addContext({ '@context': 'https://www.google.com' });
+    expect(credential.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+      { '@context': 'https://www.google.com' },
+    ]);
+    credential.addContext({ '@context': 'https://www.google.com' });
+    expect(credential.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+      { '@context': 'https://www.google.com' },
+    ]);
 
     credential.addType('some_type');
     expect(credential.type).toEqual([
@@ -342,6 +354,18 @@ describe('Verifiable Presentation incremental creation', () => {
     expect(vp.context).toEqual([
       'https://www.w3.org/2018/credentials/v1',
       'https://www.w3.org/2018/credentials/examples/v1',
+    ]);
+    vp.addContext({ '@context': 'https://www.google.com' });
+    expect(vp.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+      { '@context': 'https://www.google.com' },
+    ]);
+    vp.addContext({ '@context': 'https://www.google.com' });
+    expect(vp.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+      { '@context': 'https://www.google.com' },
     ]);
 
     vp.addType('some_type');

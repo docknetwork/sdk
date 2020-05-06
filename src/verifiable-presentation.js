@@ -73,7 +73,7 @@ class VerifiablePresentation {
   }
 
   /**
-   * Add a Verifiable Credential to this Presentation
+   * Add a Verifiable Credential to this Presentation. Duplicates will be ignored.
    * @param {object} credential -  Verifiable Credential for the presentation
    * @returns {VerifiablePresentation}
    */
@@ -83,7 +83,8 @@ class VerifiablePresentation {
       cred = credential.toJSON();
     }
     ensureObjectWithId(cred, 'credential');
-    this.credentials.push(cred);
+    this.credentials = getUniqueElementsFromArray([...this.credentials, cred], JSON.stringify);
+
     return this;
   }
 

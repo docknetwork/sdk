@@ -64,13 +64,13 @@ class VerifiableCredential {
   }
 
   /**
-   * Add a subject to this Credential
+   * Add a subject to this Credential. Duplicates are omitted.
    * @param {object} subject -  Subject of the credential
    * @returns {VerifiableCredential}
    */
   addSubject(subject) {
     ensureObjectWithId(subject, 'credentialSubject');
-    this.subject.push(subject);
+    this.subject = getUniqueElementsFromArray([...this.subject, subject], JSON.stringify);
     return this;
   }
 

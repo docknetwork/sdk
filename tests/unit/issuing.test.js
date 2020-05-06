@@ -222,7 +222,7 @@ describe('Verifiable Credential incremental creation', () => {
     expect(credential.expirationDate).toEqual('2021-03-18T19:23:24Z');
   });
 
-  test('Duplicates in context and types are omitted.', async () => {
+  test('Duplicates in context, types and subjects are omitted.', async () => {
     const credential = new VerifiableCredential(sampleId);
 
     credential.addContext('https://www.w3.org/2018/credentials/examples/v1');
@@ -258,6 +258,24 @@ describe('Verifiable Credential incremental creation', () => {
       'VerifiableCredential',
       'some_type',
     ]);
+
+
+    credential.addSubject({
+      id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+      alumniOf: 'Example University',
+    });
+    expect(credential.subject).toEqual([{
+      id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+      alumniOf: 'Example University',
+    }]);
+    credential.addSubject({
+      id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+      alumniOf: 'Example University',
+    });
+    expect(credential.subject).toEqual([{
+      id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+      alumniOf: 'Example University',
+    }]);
   });
 
   test('Incremental VC creations runs basic validation', async () => {
@@ -342,7 +360,7 @@ describe('Verifiable Presentation incremental creation', () => {
     expect(vp.credentials).toEqual([{ id: 'some_credential_id' }]);
   });
 
-  test('Duplicate contexts and types are not possible.', async () => {
+  test('Duplicates contexts, types and credentials are not possible.', async () => {
     const vp = new VerifiablePresentation(sampleId);
 
     vp.addContext('https://www.w3.org/2018/credentials/examples/v1');
@@ -378,6 +396,11 @@ describe('Verifiable Presentation incremental creation', () => {
       'VerifiablePresentation',
       'some_type',
     ]);
+
+    vp.addCredential(getSampleCredential(true));
+    expect(vp.credentials).toEqual([getSampleCredential(true)]);
+    vp.addCredential(getSampleCredential(true));
+    expect(vp.credentials).toEqual([getSampleCredential(true)]);
   });
 
   test('Incremental VP creations runs basic validation', async () => {

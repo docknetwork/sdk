@@ -9,6 +9,7 @@ import {
   ensureURI,
   ensureValidDatetime,
 } from './utils/type-helpers';
+import { getUniqueElementsFromArray } from './utils/misc';
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiableCredential';
@@ -39,35 +40,37 @@ class VerifiableCredential {
   }
 
   /**
-   * Add a context to this Credential's context array
+   * Add a context to this Credential's context array. Duplicates are omitted.
    * @param {string|object} context - Context to add to the credential context array
    * @returns {VerifiableCredential}
    */
   addContext(context) {
     ensureObjectWithKeyOrURI(context, '@context', 'context');
-    this.context.push(context);
+    this.context = getUniqueElementsFromArray([...this.context, context], JSON.stringify);
     return this;
   }
 
+
   /**
-   * Add a type to this Credential's type array
+   * Add a type to this Credential's type array. Duplicates are omitted.
    * @param {string} type - Type to add to the credential type array
    * @returns {VerifiableCredential}
    */
   addType(type) {
     ensureString(type);
-    this.type.push(type);
+    this.type = [...new Set([...this.type, type])];
+
     return this;
   }
 
   /**
-   * Add a subject to this Credential
+   * Add a subject to this Credential. Duplicates are omitted.
    * @param {object} subject -  Subject of the credential
    * @returns {VerifiableCredential}
    */
   addSubject(subject) {
     ensureObjectWithId(subject, 'credentialSubject');
-    this.subject.push(subject);
+    this.subject = getUniqueElementsFromArray([...this.subject, subject], JSON.stringify);
     return this;
   }
 

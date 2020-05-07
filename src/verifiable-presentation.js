@@ -8,6 +8,7 @@ import {
 } from './utils/type-helpers';
 
 import DIDResolver from './did-resolver'; // eslint-disable-line
+import { getUniqueElementsFromArray } from './utils/misc';
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiablePresentation';
@@ -39,24 +40,24 @@ class VerifiablePresentation {
   }
 
   /**
-   * Add a context to this Presentation's context array
+   * Add a context to this Presentation's context array. Duplicates are omitted.
    * @param {string|object} context - Context to add to the presentation context array
    * @returns {VerifiablePresentation}
    */
   addContext(context) {
     ensureObjectWithKeyOrURI(context, '@context', 'context');
-    this.context.push(context);
+    this.context = getUniqueElementsFromArray([...this.context, context], JSON.stringify);
     return this;
   }
 
   /**
-   * Add a type to this Presentation's type array
+   * Add a type to this Presentation's type array. Duplicates are omitted.
    * @param {string} type - Type to add to the presentation type array
    * @returns {VerifiablePresentation}
    */
   addType(type) {
     ensureString(type);
-    this.type.push(type);
+    this.type = [...new Set([...this.type, type])];
     return this;
   }
 
@@ -72,7 +73,7 @@ class VerifiablePresentation {
   }
 
   /**
-   * Add a Verifiable Credential to this Presentation
+   * Add a Verifiable Credential to this Presentation. Duplicates will be ignored.
    * @param {object} credential -  Verifiable Credential for the presentation
    * @returns {VerifiablePresentation}
    */
@@ -82,7 +83,8 @@ class VerifiablePresentation {
       cred = credential.toJSON();
     }
     ensureObjectWithId(cred, 'credential');
-    this.credentials.push(cred);
+    this.credentials = getUniqueElementsFromArray([...this.credentials, cred], JSON.stringify);
+
     return this;
   }
 

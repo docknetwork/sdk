@@ -222,6 +222,62 @@ describe('Verifiable Credential incremental creation', () => {
     expect(credential.expirationDate).toEqual('2021-03-18T19:23:24Z');
   });
 
+  test('Duplicates in context, types and subjects are omitted.', async () => {
+    const credential = new VerifiableCredential(sampleId);
+
+    credential.addContext('https://www.w3.org/2018/credentials/examples/v1');
+    expect(credential.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+    ]);
+    credential.addContext('https://www.w3.org/2018/credentials/examples/v1');
+    expect(credential.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+    ]);
+    credential.addContext({ '@context': 'https://www.google.com' });
+    expect(credential.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+      { '@context': 'https://www.google.com' },
+    ]);
+    credential.addContext({ '@context': 'https://www.google.com' });
+    expect(credential.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+      { '@context': 'https://www.google.com' },
+    ]);
+
+    credential.addType('some_type');
+    expect(credential.type).toEqual([
+      'VerifiableCredential',
+      'some_type',
+    ]);
+    credential.addType('some_type');
+    expect(credential.type).toEqual([
+      'VerifiableCredential',
+      'some_type',
+    ]);
+
+
+    credential.addSubject({
+      id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+      alumniOf: 'Example University',
+    });
+    expect(credential.subject).toEqual([{
+      id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+      alumniOf: 'Example University',
+    }]);
+    credential.addSubject({
+      id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+      alumniOf: 'Example University',
+    });
+    expect(credential.subject).toEqual([{
+      id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+      alumniOf: 'Example University',
+    }]);
+  });
+
   test('Incremental VC creations runs basic validation', async () => {
     const credential = new VerifiableCredential(sampleId);
     expect(() => {
@@ -302,6 +358,49 @@ describe('Verifiable Presentation incremental creation', () => {
     ]);
     vp.addCredential({ id: 'some_credential_id' });
     expect(vp.credentials).toEqual([{ id: 'some_credential_id' }]);
+  });
+
+  test('Duplicates contexts, types and credentials are not possible.', async () => {
+    const vp = new VerifiablePresentation(sampleId);
+
+    vp.addContext('https://www.w3.org/2018/credentials/examples/v1');
+    expect(vp.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+    ]);
+    vp.addContext('https://www.w3.org/2018/credentials/examples/v1');
+    expect(vp.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+    ]);
+    vp.addContext({ '@context': 'https://www.google.com' });
+    expect(vp.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+      { '@context': 'https://www.google.com' },
+    ]);
+    vp.addContext({ '@context': 'https://www.google.com' });
+    expect(vp.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+      { '@context': 'https://www.google.com' },
+    ]);
+
+    vp.addType('some_type');
+    expect(vp.type).toEqual([
+      'VerifiablePresentation',
+      'some_type',
+    ]);
+    vp.addType('some_type');
+    expect(vp.type).toEqual([
+      'VerifiablePresentation',
+      'some_type',
+    ]);
+
+    vp.addCredential(getSampleCredential(true));
+    expect(vp.credentials).toEqual([getSampleCredential(true)]);
+    vp.addCredential(getSampleCredential(true));
+    expect(vp.credentials).toEqual([getSampleCredential(true)]);
   });
 
   test('Incremental VP creations runs basic validation', async () => {

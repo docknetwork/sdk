@@ -110,3 +110,17 @@ export function getSignatureFromKeyringPair(pair, message) {
   }
   return new Cls(message, pair);
 }
+
+/**
+ * Get unique elements from an array as seen by the filterCallback function.
+ * @param {array} a - Array to check for duplicates.
+ * @param {function} filterCallback - Elements will be fed to this function before comparison.
+ * @returns {*}
+ */
+export function getUniqueElementsFromArray(a, filterCallback) {
+  const seen = new Set();
+  return a.filter((item) => {
+    const k = filterCallback(item);
+    return seen.has(k) ? false : seen.add(k);
+  });
+}

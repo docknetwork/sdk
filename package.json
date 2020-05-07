@@ -57,7 +57,7 @@
     "src"
   ],
   "dependencies": {
-    "@polkadot/api": "1.12.1",
+    "@polkadot/api": "1.13.1",
     "@polkadot/util": "2.9.1",
     "@polkadot/util-crypto": "2.9.1",
     "axios": "^0.19.2",

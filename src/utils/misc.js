@@ -1,4 +1,4 @@
-import { ec as EC } from 'elliptic';
+import {ec as EC} from 'elliptic';
 
 import {
   PublicKey, PublicKeyEd25519, PublicKeySecp256k1, PublicKeySr25519, // eslint-disable-line
@@ -33,7 +33,7 @@ export function getStateChange(api, name, value) {
  * @returns {object} A keypair
  */
 export function generateEcdsaSecp256k1Keypair(pers, entropy) {
-  return secp256k1Curve.genKeyPair({ pers, entropy });
+  return secp256k1Curve.genKeyPair({pers, entropy});
 }
 
 /**
@@ -57,38 +57,21 @@ export function verifyEcdsaSecp256k1Sig(message, signature, publicKey) {
 }
 
 /**
- * Return the type of signature from a given keypair
- * @param {object} pair - Can be a keypair from polkadot-js or elliptic library.
- * @returns {string|*} For now, it can be ed25519 or sr25519 or secp256k1 or an error
- */
-export function getKeyPairType(pair) {
-  if (pair.type && (pair.type === 'ed25519' || pair.type === 'sr25519')) {
-    // Polkadot-js keyring has type field with value either 'ed25519' or 'sr25519'
-    return pair.type;
-  }
-  if (pair.ec && pair.priv) {
-    // elliptic library's pair has `ec`, `priv` and `pub`. There is not a cleaner way to detect that
-    return 'secp256k1';
-  }
-  throw new Error('Only ed25519, sr25519 and secp256k1 keys supported as of now');
-}
-
-/**
  * Inspect the `type` of the `KeyringPair` to generate the correct kind of PublicKey.
  * @param {object} pair - A polkadot-js KeyringPair.
  * @return {PublicKey} An instance of the correct subclass of PublicKey
  */
 export function getPublicKeyFromKeyringPair(pair) {
-  const type = getKeyPairType(pair);
-  let Cls;
-  if (type === 'ed25519') {
-    Cls = PublicKeyEd25519;
-  } else if (type === 'sr25519') {
-    Cls = PublicKeySr25519;
-  } else {
-    Cls = PublicKeySecp256k1;
+  switch (pair.type) {
+    case 'ed25519':
+      return PublicKeyEd25519.fromKeyringPair(pair);
+    case 'sr25519':
+      return PublicKeySr25519.fromKeyringPair(pair);
+    case 'ecdsa':
+      return PublicKeySecp256k1.fromKeyringPair(pair);
+    default:
+      throw new Error('Only ed25519, sr25519 and secp256k1 keys supported as of now');
   }
-  return Cls.fromKeyringPair(pair);
 }
 
 /**
@@ -98,14 +81,14 @@ export function getPublicKeyFromKeyringPair(pair) {
  * @returns {Signature} An instance of the correct subclass of Signature
  */
 export function getSignatureFromKeyringPair(pair, message) {
-  const type = getKeyPairType(pair);
-  let Cls;
-  if (type === 'ed25519') {
-    Cls = SignatureEd25519;
-  } else if (type === 'sr25519') {
-    Cls = SignatureSr25519;
-  } else {
-    Cls = SignatureSecp256k1;
+  switch (pair.type) {
+    case 'ed25519':
+      return new SignatureEd25519(message, pair);
+    case 'sr25519':
+      return new SignatureSr25519(message, pair);
+    case 'ecdsa':
+      return new SignatureSecp256k1(message, pair);
+    default:
+      throw new Error('Only ed25519, sr25519 and secp256k1 keys supported as of now');
   }
-  return new Cls(message, pair);
 }

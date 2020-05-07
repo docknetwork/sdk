@@ -2,6 +2,8 @@ import b58 from 'bs58';
 import { sha256 } from 'js-sha256';
 import { ec as EC } from 'elliptic';
 import { EcdsaSecp256k1VerKeyName } from './constants';
+import {u8aToHex} from '@polkadot/util';
+import {signatureVerify} from '@polkadot/util-crypto/signature';
 
 const secp256k1Curve = new EC('secp256k1');
 
@@ -38,8 +40,10 @@ export default class EcdsaSecp256k1VerificationKey2019 {
   static verifierFactory(publicKey) {
     return {
       async verify({ data, signature }) {
-        const hash = sha256.digest(data);
-        return secp256k1Curve.verify(hash, signature, publicKey);
+        // const hash = sha256.digest(data);
+        // return secp256k1Curve.verify(hash, signature, publicKey);
+        const pk = u8aToHex(publicKey);
+        return signatureVerify(data, signature, pk).isValid;
       },
     };
   }

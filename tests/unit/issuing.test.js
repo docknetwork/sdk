@@ -1,3 +1,6 @@
+import { cryptoWaitReady, randomAsHex } from '@polkadot/util-crypto';
+import { Keyring } from '@polkadot/api';
+
 import {
   issueCredential,
   verifyCredential,
@@ -33,8 +36,8 @@ function getSampleCredential(signed = false) {
       issuer: controllerUrl,
       proof: {
         type: 'EcdsaSecp256k1Signature2019',
-        created: '2020-04-15T09:22:48Z',
-        jws: 'eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEQCIHiIBMBw1szt6Y_ksb0rRiEZuAkG3BNXdt6UC_LpFlOfAiAkQktaxOPtfuiTXMsWRv92qvwFubs4Sn5hH4E_arwohA',
+        created: '2020-05-07T12:39:10Z',
+        jws: 'eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..KOcrvvbC3SH3CrMSNIhVAKjF1x19S53IZEmDCxF_8EWzXYldJu3QfDLe44N3sUsdgETnraDsbXCecEQ7Wf0GxAA',
         proofPurpose: 'assertionMethod',
         verificationMethod: keyUrl,
       },
@@ -68,7 +71,7 @@ function getSamplePres(signed = false) {
   return vp;
 }
 
-const keypair = generateEcdsaSecp256k1Keypair('issuer', 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
+let keypair;
 
 function getSampleKey() {
   return {
@@ -92,8 +95,17 @@ const fakeContext = {
 };
 
 describe('Verifiable Credential Issuing', () => {
+  beforeAll(async (done) => {
+    await cryptoWaitReady();
+    const keyring = new Keyring();
+    // Fixme: This way of generating keys needs to be changed. Probably `addFromUri` has not been updated
+    keypair = keyring.addFromUri('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', null, 'ecdsa');
+    done();
+  });
+
   test('Issuing should return an object with a proof, and it must pass validation.', async () => {
     const credential = await issueCredential(getSampleKey(), getSampleCredential());
+    console.log(credential);
     expect(credential.id).toBe('https://example.com/credentials/1872');
     expect(credential.type).toContain('VerifiableCredential');
     expect(credential.type).toContain('AlumniCredential');

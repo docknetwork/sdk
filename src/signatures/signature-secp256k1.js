@@ -9,7 +9,8 @@ export default class SignatureSecp256k1 extends Signature {
    */
   constructor(message, signingPair) {
     super();
-    // Generate the signature
+    this.fromPolkadotJSKeyringPair(message, signingPair);
+    /*// Generate the signature
     const sig = signingPair.sign(message, { canonical: true });
 
     // The signature is recoverable in 65-byte { R | S | index } format
@@ -17,7 +18,7 @@ export default class SignatureSecp256k1 extends Signature {
     const s = sig.s.toString('hex', 32);
     const i = sig.recoveryParam.toString(16).padStart(2, '0');
     // Make it proper hex
-    this.value = `0x${r}${s}${i}`;
+    this.value = `0x${r}${s}${i}`;*/
   }
 
   /**

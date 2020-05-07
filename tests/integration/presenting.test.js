@@ -29,9 +29,8 @@ const holder1DID = createNewDockDID();
 const holder1KeySeed = randomAsHex(32);
 
 const holder2DID = createNewDockDID();
-// entropy used for 2nd holder keys
-const holder2KeyPers = 'holder2';
-const holder2KeyEntropy = randomAsHex(32);
+// seed used for 2nd issuer keys
+const holder2Seed = randomAsHex(32);
 
 const holder3DID = createNewDockDID();
 // seed used for 3rd holder keys
@@ -76,7 +75,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     await registerNewDIDUsingPair(dock, holder1DID, pair2);
 
     // Register holder DID with secp key
-    const pair3 = generateEcdsaSecp256k1Keypair(holder2KeyPers, holder2KeyEntropy);
+    const pair3 = dock.keyring.addFromUri(holder2Seed, null, 'ecdsa');
     await registerNewDIDUsingPair(dock, holder2DID, pair3);
 
     // Register holder DID with sr25519 key
@@ -102,7 +101,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
 
   test('Holder creates a verifiable presentation with single credential and verifier verifies it', async () => {
     const holder1Key = getKeyDoc(holder1DID, dock.keyring.addFromUri(holder1KeySeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
-    const holder2Key = getKeyDoc(holder2DID, generateEcdsaSecp256k1Keypair(holder2KeyPers, holder2KeyEntropy), 'EcdsaSecp256k1VerificationKey2019');
+    const holder2Key = getKeyDoc(holder2DID, dock.keyring.addFromUri(holder2Seed, null, 'ecdsa'), 'EcdsaSecp256k1VerificationKey2019');
     const holder3Key = getKeyDoc(holder3DID, dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
 
     for (const elem of [

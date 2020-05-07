@@ -30,8 +30,9 @@ export default class EcdsaSepc256k1Signature2019 extends suites.JwsLinkedDataSig
   static signerFactory(keypair) {
     return {
       async sign({ data }) {
-        const hash = sha256.digest(data);
-        return new Uint8Array(keypair.sign(hash).toDER());
+        // const hash = sha256.digest(data);
+        // return new Uint8Array(keypair.sign(hash).toDER());
+        return keypair.sign(data);
       },
     };
   }

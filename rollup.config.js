@@ -31,11 +31,12 @@ export default async function() {
       json(),
     ],
     input,
-    output: [{
-        dir: 'dist',
-        format: 'esm',
-        entryFileNames: '[name].mjs'
-      },
+    output: [
+      // {
+      //   dir: 'dist',
+      //   format: 'esm',
+      //   entryFileNames: '[name].mjs'
+      // },
       {
         dir: 'dist',
         format: 'cjs'

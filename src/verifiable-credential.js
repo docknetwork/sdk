@@ -30,13 +30,76 @@ class VerifiableCredential {
    * @param {string} id - id of the credential
    */
   constructor(id) {
-    ensureURI(id);
-    this.id = id;
+    if (id) {
+      this.setId(id);
+    }
 
     this.context = [DEFAULT_CONTEXT];
     this.type = [DEFAULT_TYPE];
     this.subject = [];
     this.setIssuanceDate(new Date().toISOString());
+  }
+
+  static fromJSON(json) {
+    const cert = new VerifiableCredential();
+    cert.setId(json.id);
+
+    json.type.forEach(type => {
+      cert.addType(type);
+    });
+
+    (json.credentialSubject || json.subject).forEach(subject => {
+      cert.addSubject(subject);
+    });
+
+    json['@context'].forEach(context => {
+      cert.addContext(context);
+    });
+
+    cert.setStatus(json.credentialStatus || json.status)
+      .setIssuanceDate(json.issuanceDate)
+      .setExpirationDate(json.expirationDate);
+
+    if (json.proof) {
+      cert.setProof(json.proof);
+    }
+
+    if (json.issuer) {
+      cert.setIssuer(json.issuer);
+    }
+
+    return cert;
+  }
+
+  /**
+   * Sets the credential's ID
+   * @param {string} id - Signed credential's ID
+   * @returns {VerifiableCredential}
+   */
+  setId(id) {
+    ensureURI(id);
+    this.id = id;
+    return this;
+  }
+
+  /**
+   * Sets the credential's issuer DID
+   * @param {string} issuer - the issuer's did
+   * @returns {VerifiableCredential}
+   */
+  setIssuer(issuer) {
+    this.issuer = issuer;
+    return this;
+  }
+
+  /**
+   * Sets the credential's proof
+   * @param {object} proof - Signed credential proof
+   * @returns {VerifiableCredential}
+   */
+  setProof(proof) {
+    this.proof = proof;
+    return this;
   }
 
   /**
@@ -143,7 +206,7 @@ class VerifiableCredential {
       this.toJSON(),
       compactProof,
     );
-    this.proof = signedVC.proof;
+    this.setProof(signedVC.proof);
     this.issuer = signedVC.issuer;
     return this;
   }

@@ -44,15 +44,15 @@ class VerifiableCredential {
     const cert = new VerifiableCredential();
     cert.setId(json.id);
 
-    json.type.forEach(type => {
+    json.type.forEach((type) => {
       cert.addType(type);
     });
 
-    (json.credentialSubject || json.subject).forEach(subject => {
+    (json.credentialSubject || json.subject).forEach((subject) => {
       cert.addSubject(subject);
     });
 
-    json['@context'].forEach(context => {
+    json['@context'].forEach((context) => {
       cert.addContext(context);
     });
 

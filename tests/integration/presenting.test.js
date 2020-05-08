@@ -9,7 +9,6 @@ import { DockResolver } from '../../src/resolver';
 
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
-import { generateEcdsaSecp256k1Keypair } from '../../src/utils/misc';
 import getKeyDoc from '../../src/utils/vc/helpers';
 import {
   createPresentation,
@@ -30,7 +29,7 @@ const holder1KeySeed = randomAsHex(32);
 
 const holder2DID = createNewDockDID();
 // seed used for 2nd issuer keys
-const holder2Seed = randomAsHex(32);
+const holder2KeySeed = randomAsHex(32);
 
 const holder3DID = createNewDockDID();
 // seed used for 3rd holder keys
@@ -56,10 +55,6 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       address: FullNodeEndpoint,
     });
 
-    afterAll(async () => {
-      await dock.disconnect();
-    }, 10000);
-
     // The keyring should be initialized before any test begins as this suite is testing revocation
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
@@ -75,7 +70,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     await registerNewDIDUsingPair(dock, holder1DID, pair2);
 
     // Register holder DID with secp key
-    const pair3 = dock.keyring.addFromUri(holder2Seed, null, 'ecdsa');
+    const pair3 = dock.keyring.addFromUri(holder2KeySeed, null, 'ecdsa');
     await registerNewDIDUsingPair(dock, holder2DID, pair3);
 
     // Register holder DID with sr25519 key
@@ -99,9 +94,13 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     done();
   }, 70000);
 
+  afterAll(async () => {
+    await dock.disconnect();
+  }, 10000);
+
   test('Holder creates a verifiable presentation with single credential and verifier verifies it', async () => {
     const holder1Key = getKeyDoc(holder1DID, dock.keyring.addFromUri(holder1KeySeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
-    const holder2Key = getKeyDoc(holder2DID, dock.keyring.addFromUri(holder2Seed, null, 'ecdsa'), 'EcdsaSecp256k1VerificationKey2019');
+    const holder2Key = getKeyDoc(holder2DID, dock.keyring.addFromUri(holder2KeySeed, null, 'ecdsa'), 'EcdsaSecp256k1VerificationKey2019');
     const holder3Key = getKeyDoc(holder3DID, dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
 
     for (const elem of [

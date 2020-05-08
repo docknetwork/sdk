@@ -1,5 +1,5 @@
-import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
-import { cryptoWaitReady } from '@polkadot/util-crypto';
+import {ApiPromise, WsProvider, Keyring} from '@polkadot/api';
+import {cryptoWaitReady} from '@polkadot/util-crypto';
 
 import RevocationModule from './modules/revocation';
 import DIDModule from './modules/did';
@@ -50,9 +50,19 @@ class DockAPI {
 
     this.address = address || this.address;
 
+    // Polkadot-js needs these extra type information to work. Removing them will lead to
+    // an error. These were taken from substrate node frontend template.
+    const extraTypes = {
+      Address: 'AccountId',
+      LookupSource: 'AccountId',
+    };
+
     this.api = await ApiPromise.create({
       provider: new WsProvider(this.address),
-      types,
+      types: {
+        ...types,
+        ...extraTypes,
+      },
     });
 
     this.didModule = new DIDModule(this.api);
@@ -61,7 +71,7 @@ class DockAPI {
     await cryptoWaitReady();
 
     if (!this.keyring || keyring) {
-      this.keyring = new Keyring(keyring || { type: 'sr25519' });
+      this.keyring = new Keyring(keyring || {type: 'sr25519'});
     }
 
     return this.api;
@@ -108,7 +118,7 @@ class DockAPI {
       let unsubFunc = null;
       try {
         extrinsic
-          .signAndSend(account, ({ events = [], status }) => {
+          .signAndSend(account, ({events = [], status}) => {
             if (status.isFinalized) {
               if (unsubscribe && unsubFunc) {
                 unsubFunc();

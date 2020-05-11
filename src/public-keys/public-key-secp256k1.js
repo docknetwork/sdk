@@ -21,10 +21,10 @@ export default class PublicKeySecp256k1 extends PublicKey {
    * @param {object} pair - A KeyPair from elliptic library
    * @returns {PublicKeySecp256k1}
    */
-  /*static fromKeyringPair(pair) {
+  /* static fromKeyringPair(pair) {
     // `true` is for compressed
     const pk = pair.getPublic(true, 'hex');
     // `pk` is hex but does not contain the leading `0x`
     return new this(`0x${pk}`);
-  }*/
+  } */
 }

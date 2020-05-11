@@ -1,4 +1,4 @@
-import {ec as EC} from 'elliptic';
+import { ec as EC } from 'elliptic';
 
 import {
   PublicKey, PublicKeyEd25519, PublicKeySecp256k1, PublicKeySr25519, // eslint-disable-line
@@ -33,7 +33,7 @@ export function getStateChange(api, name, value) {
  * @returns {object} A keypair
  */
 export function generateEcdsaSecp256k1Keypair(pers, entropy) {
-  return secp256k1Curve.genKeyPair({pers, entropy});
+  return secp256k1Curve.genKeyPair({ pers, entropy });
 }
 
 /**

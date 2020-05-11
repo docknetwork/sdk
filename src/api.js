@@ -1,5 +1,5 @@
-import {ApiPromise, WsProvider, Keyring} from '@polkadot/api';
-import {cryptoWaitReady} from '@polkadot/util-crypto';
+import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
+import { cryptoWaitReady } from '@polkadot/util-crypto';
 
 import RevocationModule from './modules/revocation';
 import DIDModule from './modules/did';
@@ -71,7 +71,7 @@ class DockAPI {
     await cryptoWaitReady();
 
     if (!this.keyring || keyring) {
-      this.keyring = new Keyring(keyring || {type: 'sr25519'});
+      this.keyring = new Keyring(keyring || { type: 'sr25519' });
     }
 
     return this.api;
@@ -118,7 +118,7 @@ class DockAPI {
       let unsubFunc = null;
       try {
         extrinsic
-          .signAndSend(account, ({events = [], status}) => {
+          .signAndSend(account, ({ events = [], status }) => {
             if (status.isFinalized) {
               if (unsubscribe && unsubFunc) {
                 unsubFunc();

@@ -92,7 +92,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     cred4 = await issueCredential(issuerKeyDoc, getUnsignedCred(credId4, holder3DID));
 
     done();
-  }, 70000);
+  }, 90000);
 
   afterAll(async () => {
     await dock.disconnect();

@@ -91,7 +91,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     credential = await issueCredential(issuerKey, unsignedCred);
 
     done();
-  }, 30000);
+  }, 60000);
 
   afterAll(async () => {
     await dockAPI.disconnect();
@@ -111,7 +111,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     const result1 = await verifyCredential(credential, resolver, true, true, { dock: dockAPI });
     expect(result1.verified).toBe(false);
     expect(result1.error).toBe('Revocation check failed');
-  }, 40000);
+  }, 50000);
 
   test('Holder can create a presentation and verifier can verify it successfully when it is not revoked else the verification fails', async () => {
     // The previous test revokes credential so unrevoke it. Its fine if the previous test is not run as unrevoking does not
@@ -165,5 +165,5 @@ describe('Credential revocation with issuer as the revocation authority', () => 
       { dock: dockAPI },
     );
     expect(result1.verified).toBe(false);
-  }, 40000);
+  }, 60000);
 });

@@ -98,7 +98,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
     await registerNewDIDUsingPair(dock, issuer3DID, pair3);
 
     done();
-  }, 30000);
+  }, 60000);
 
   afterAll(async () => {
     await dock.disconnect();
@@ -120,7 +120,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
         getProofMatcherDoc(),
       ),
     );
-  }, 30000);
+  }, 40000);
 
   test('Issue a verifiable credential with secp256k1 key and verify it', async () => {
     const issuerKey = getKeyDoc(issuer2DID, dock.keyring.addFromUri(issuer2Seed, null, 'ecdsa'), 'EcdsaSecp256k1VerificationKey2019');
@@ -136,7 +136,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
         getProofMatcherDoc(),
       ),
     );
-  }, 30000);
+  }, 40000);
 
   test('Issue a verifiable credential with sr25519 key and verify it', async () => {
     const issuerKey = getKeyDoc(issuer3DID, dock.keyring.addFromUri(issuer3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
@@ -155,5 +155,5 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
         getProofMatcherDoc(),
       ),
     );
-  }, 30000);
+  }, 40000);
 });

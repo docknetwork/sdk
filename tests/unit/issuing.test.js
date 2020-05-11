@@ -10,7 +10,8 @@ import {
 } from '../../src/utils/vc';
 import VerifiableCredential from '../../src/verifiable-credential';
 import VerifiablePresentation from '../../src/verifiable-presentation';
-import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../../src/utils/misc';
+import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
+import { hexToU8a } from '@polkadot/util';
 
 const controllerUrl = 'https://gist.githubusercontent.com/lovesh/312d407e3a16be0e7d5e43169e824958/raw';
 const keyUrl = 'https://gist.githubusercontent.com/lovesh/67bdfd354cfaf4fb853df4d6713f4610/raw';
@@ -97,9 +98,12 @@ const fakeContext = {
 describe('Verifiable Credential Issuing', () => {
   beforeAll(async (done) => {
     await cryptoWaitReady();
+    const seed = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
     const keyring = new Keyring();
+    // const keyring = new Keyring({ ss58Format: 42, type: 'ecdsa' });
     // Fixme: This way of generating keys needs to be changed. Probably `addFromUri` has not been updated
-    keypair = keyring.addFromUri('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', null, 'ecdsa');
+    // keypair = keyring.addFromUri(seed, null, 'ecdsa');
+    keypair = keyring.addFromSeed(hexToU8a(seed), {}, 'ecdsa');
     done();
   });
 

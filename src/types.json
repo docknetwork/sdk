@@ -72,7 +72,14 @@
       "DidRemoval": "DidRemoval",
       "Revoke": "Revoke",
       "UnRevoke": "UnRevoke",
-      "RemoveRegistry": "RemoveRegistry"
+      "RemoveRegistry": "RemoveRegistry",
+      "Blob": "Blob"
     }
-  }
+  },
+  "Blob": {
+    "id": "BlobId",
+    "blob": "Vec<u8>",
+    "author": "Did"
+  },
+  "BlobId": "[u8;32]"
 }

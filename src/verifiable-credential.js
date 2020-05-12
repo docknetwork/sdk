@@ -35,7 +35,7 @@ class VerifiableCredential {
 
     this.context = [DEFAULT_CONTEXT];
     this.type = [DEFAULT_TYPE];
-    this.subject = [];
+    this.credentialSubject = [];
     this.setIssuanceDate(new Date().toISOString());
   }
 
@@ -70,7 +70,7 @@ class VerifiableCredential {
    */
   addSubject(subject) {
     ensureObjectWithId(subject, 'credentialSubject');
-    this.subject = getUniqueElementsFromArray([...this.subject, subject], JSON.stringify);
+    this.credentialSubject = getUniqueElementsFromArray([...this.credentialSubject, subject], JSON.stringify);
     return this;
   }
 
@@ -116,11 +116,10 @@ class VerifiableCredential {
    */
   toJSON() {
     const {
-      context, subject, status, ...rest
+      context, status, ...rest
     } = this;
     const credJson = {
       '@context': context,
-      credentialSubject: subject,
     };
     if (status) {
       credJson.credentialStatus = status;

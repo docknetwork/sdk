@@ -37,6 +37,7 @@
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "test": "jest --verbose ./tests/unit",
+    "test-schema": "jest --verbose ./tests/unit/schema.*",
     "test-integration": "NODE_ENV=production jest --forceExit --verbose --runInBand ./tests/integration",
     "docs": "mkdir out && touch out/.nojekyll && jsdoc src -r -c .jsdoc -d out/reference",
     "dock-did-example": "npx babel-node example/dock-did.js",
@@ -65,6 +66,7 @@
     "ethr-did-resolver": "^2.2.0",
     "js-sha256": "^0.9.0",
     "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures#avoid-extendContextLoader",
+    "jsonschema": "^1.2.6",
     "vc-js": "https://github.com/docknetwork/vc-js#avoid-extendContextLoader"
   }
 }

@@ -1,5 +1,6 @@
 import vcjs from 'vc-js';
 import { blake2AsHex } from '@polkadot/util-crypto';
+import { validate } from 'jsonschema';
 
 import documentLoader from './vc/document-loader';
 import { isHexWithGivenByteSize } from './codec';
@@ -264,7 +265,6 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
   return presVer;
 }
 
-
 /**
  * Check that presentation is verified, i.e. the presentation and credentials have VCDM compliant structure and
  * the `proof` (signature by holder) is correct.
@@ -294,4 +294,19 @@ export async function isVerifiedPresentation(presentation, challenge, domain, re
  */
 export function buildDockCredentialStatus(registryId) {
   return { id: `${DockRevRegQualifier}${registryId}`, type: RevRegType };
+}
+
+
+/**
+ * The function uses `jsonschema` package to verify that the `credential`'s subject `credentialSubject` has the JSON schema `schema`
+ * @param {object} credential - The credential to use
+ * @param {object} schema - The schema to use
+ * @returns {Boolean}
+ */
+export function validateCredentialSchema(credential, schema) {
+  const result = validate(credential.credentialSubject, schema.schema || schema, {
+    throwError: true
+  });
+
+  return true;
 }

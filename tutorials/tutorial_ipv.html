@@ -199,7 +199,7 @@ This Credential isn't signed since we only just initialized it. It brings howeve
 &lt;-   &quot;2020-04-14T14:48:48.486Z&quot;
 &gt;    vc.type
 &lt;-   [&quot;VerifiableCredential&quot;]
-&gt;    vc.credentialSubject
+&gt;    vc.subject
 &lt;-   []
 </code></pre>
 <p>The default <code>context</code> is an array with <code>&quot;https://www.w3.org/2018/credentials/v1&quot;</code> as first element. This is required by the VCDMv1 specs so having it as default helps ensure your Verifiable Credentials will be valid in the end.
@@ -242,7 +242,7 @@ This can be achieved by calling the <code>toJSON()</code> method on it:</p>
 <h4><a class="header" href="#adding-a-subject" id="adding-a-subject">Adding a Subject</a></h4>
 <p>A subject can be added with the <code>addSubject</code> function. It accepts a single argument <code>subject</code> that needs to be an object with an <code>id</code> property:</p>
 <pre><code class="language-javascript">&gt;   vc.addSubject({ id: 'did:dock:123qwe123qwe123qwe', alumniOf: 'Example University' })
-&gt;   vc.credentialSubject
+&gt;   vc.subject
 &lt;-  {id: 'did:dock:123qwe123qwe123qwe', alumniOf: 'Example University'}
 </code></pre>
 <h4><a class="header" href="#setting-a-status" id="setting-a-status">Setting a Status</a></h4>

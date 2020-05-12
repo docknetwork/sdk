@@ -5,16 +5,12 @@ import Policy from './policy';
 export default class OneOfPolicy extends Policy {
   /**
    * Constructs a OneOfPolicy with given controllers
-   * @param {any} controllers - Controller set
+   * @param {any} [controllers] - Controller set
    * @constructor
    */
-  constructor(controllers) {
+  constructor(controllers = null) {
     super();
-    if (controllers === undefined) {
-      this.controllers = new Set();
-    } else {
-      this.controllers = controllers;
-    }
+    this.controllers = controllers || new Set();
   }
 
   /**

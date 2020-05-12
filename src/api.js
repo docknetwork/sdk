@@ -1,9 +1,11 @@
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
+import { KeyringPair } from '@polkadot/keyring/types'; // eslint-disable-line
 
 import RevocationModule from './modules/revocation';
 import DIDModule from './modules/did';
 import types from './types.json';
+
 
 import {
   PublicKey,
@@ -20,8 +22,8 @@ import {
 
 /**
  * @typedef {object} Options The Options to use in the function createUser.
- * @property {string} address The node address to connect to.
- * @property {object} keyring PolkadotJS keyring
+ * @property {string} [address] The node address to connect to.
+ * @property {object} [keyring] PolkadotJS keyring
  */
 
 /** Helper class to interact with the Dock chain */
@@ -92,7 +94,7 @@ class DockAPI {
 
   /** TODO: Should probably use set/get and rename account to _account
    * Sets the account used to sign transactions
-   * @param {Account} account - PolkadotJS Keyring account
+   * @param {KeyringPair} account - PolkadotJS Keyring account
    */
   setAccount(account) {
     this.account = account;
@@ -100,7 +102,7 @@ class DockAPI {
 
   /**
    * Gets the current account used to sign transactions
-   * @return {Account} PolkadotJS Keyring account
+   * @return {KeyringPair} PolkadotJS Keyring account
    */
   getAccount() {
     return this.account;

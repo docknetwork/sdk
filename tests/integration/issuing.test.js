@@ -38,7 +38,7 @@ const unsignedCred = getUnsignedCred(credId, holderDID);
  * @param issuer
  * @param issuerKeyId
  * @param sigType
- * @returns {{issuanceDate: string, credentialSubject: {alumniOf: string, id: *}, id: *, proof: AsymmetricMatcher, type: [string, string], issuer: string}}
+ * @returns {{issuanceDate: string, credentialSubject: {alumniOf: string, id: *}, id: *, proof: *, type: [string, string], issuer: string}}
  */
 function getCredMatcherDoc(cred, issuer, issuerKeyId, sigType) {
   return {

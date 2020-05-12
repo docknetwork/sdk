@@ -28,11 +28,12 @@ export function getStateChange(api, name, value) {
 
 /**
  * Generate keypair for Ecdsa over Secp256k1. Explicitly denying other options to keep the API simple
- * @param {string} pers - A string
- * @param {array} entropy - A byte array or hex string
+ * @param {string} [pers] - A string
+ * @param {array|string} [entropy] - A byte array or hex string
  * @returns {object} A keypair
  */
-export function generateEcdsaSecp256k1Keypair(pers, entropy) {
+
+export function generateEcdsaSecp256k1Keypair(pers = null, entropy = null) {
   return secp256k1Curve.genKeyPair({ pers, entropy });
 }
 
@@ -91,4 +92,18 @@ export function getSignatureFromKeyringPair(pair, message) {
     default:
       throw new Error('Only ed25519, sr25519 and secp256k1 keys supported as of now');
   }
+}
+
+/**
+ * Get unique elements from an array as seen by the filterCallback function.
+ * @param {array} a - Array to check for duplicates.
+ * @param {function} filterCallback - Elements will be fed to this function before comparison.
+ * @returns {*}
+ */
+export function getUniqueElementsFromArray(a, filterCallback) {
+  const seen = new Set();
+  return a.filter((item) => {
+    const k = filterCallback(item);
+    return seen.has(k) ? false : seen.add(k);
+  });
 }

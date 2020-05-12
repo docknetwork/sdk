@@ -13,7 +13,10 @@ jobs:
         with:
           node-version: '10.x'
           registry-url: https://registry.npmjs.org/
-      - run: yarn install
-      - run: npm publish --access public
+      - run: yarn install --frozen-lockfile --ignore-scripts
+      - run: yarn build
+      - run: cp -rf package.json dist
+      - run: cp -rf src/types.json dist
+      - run: cd dist && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

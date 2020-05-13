@@ -1,8 +1,10 @@
 import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
 import { validate } from 'jsonschema';
-import JSONSchema07 from '../utils/vc/schemas/schema-draft-07';
+import axios from 'axios';
 
+import JSONSchema07 from '../utils/vc/schemas/schema-draft-07';
 import { getSignatureFromKeyringPair } from '../utils/misc';
+
 
 export const BlobQualifier = 'blob:dock:';
 export const EncodedIDByteSize = 48;
@@ -13,32 +15,6 @@ export const BLOB_ID_MAX_BYTE_SIZE = 32;
 // Maximum size of the blob in bytes
 // implementer may choose to implement this as a dynamic config option settable with the `parameter_type!` macro
 export const BLOB_MAX_BYTE_SIZE = 1024;
-
-// TODO: Remove
-// Schema-validator spec
-const jsonSchemaSpec = {
-  description: 'Schema Object Validation',
-  type: 'object',
-  properties: {
-    $schema: {
-      type: 'string',
-    },
-    description: {
-      type: 'string',
-    },
-    type: {
-      type: 'string',
-    },
-    properties: {
-      type: 'object',
-    },
-    additionalProperties: {
-      type: 'any',
-    },
-  },
-  required: ['$schema', 'type', 'properties'],
-  additionalProperties: true,
-};
 
 /**
  * Generates a random schema ID
@@ -124,22 +100,13 @@ export default class Schema {
    * @param {object} json - The JSON schema to validate
    * @returns {Boolean}
    */
-  static validateSchema(json) {
-    let jsonSchemaSpec;
-    if (json['$schema']) {
-      if (json['$schema'].startsWith('http://json-schema.org/draft-07/schema')) {
-        jsonSchemaSpec = JSONSchema07;
-      } else {
-        // TODO: Fetch json['$schema'] (using http client) and convert function to async
-      }
-    } else {
-      return false;
-    }
-    // Fixme: Is the intention to throw error or return false on error
-    const result = validate(json, jsonSchemaSpec, {
-      throwError: true
+  static async validateSchema(json) {
+    // Get the JSON schema spec to check against.
+    const jsonSchemaSpec = await this.getJSONSchemaSpec(json);
+
+    validate(json, jsonSchemaSpec, {
+      throwError: true,
     });
-    return true;
   }
 
   /**
@@ -154,11 +121,42 @@ export default class Schema {
   static async getSchema(id, dockApi) {
     // TODO: requires blob module
     if (id === 'invalid-format') {
-      throw new Error(`Incorrect schema format`, dockApi);
+      throw new Error('Incorrect schema format', dockApi);
     } else if (id === 'invalid-id') {
       throw new Error(`Invalid schema id ${id}`, dockApi);
     }
 
     return {};
+  }
+
+  /**
+   * Gets the JSON schema spec from given JSON. Will either return the stored JSON schema or get
+   * it using HTTP or will throw error if cannot get.
+   * @param {object} json
+   * @returns {Promise<object>}
+   */
+  static async getJSONSchemaSpec(json) {
+    const schemaKey = '$schema';
+    if (json[schemaKey]) {
+      // The URL might be 'http://json-schema.org/draft-07/schema' or 'http://json-schema.org/draft-07/schema#'
+      // In that case, the schema is already stored in the SDK as this is the latest JSON schema spec
+      if (json[schemaKey] === 'http://json-schema.org/draft-07/schema' || json[schemaKey] === 'http://json-schema.org/draft-07/schema-') {
+        // Return stored JSON schema
+        return JSONSchema07;
+      }
+      // Fetch the URI and expect a JSON response
+      const { data: doc } = await axios.get(json[schemaKey]);
+      if (typeof doc === 'object') {
+        return doc;
+      }
+      // If MIME type did not indicate JSON, try to parse the response as JSON
+      try {
+        return JSON.parse(doc);
+      } catch (e) {
+        throw new Error('Cannot parse response as JSON');
+      }
+    } else {
+      throw new Error(`${schemaKey} not found in the given JSON`);
+    }
   }
 }

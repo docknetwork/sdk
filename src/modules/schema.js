@@ -1,5 +1,6 @@
 import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
 import { validate } from 'jsonschema';
+import JSONSchema07 from '../utils/vc/schemas/schema-draft-07';
 
 import { getSignatureFromKeyringPair } from '../utils/misc';
 
@@ -13,6 +14,7 @@ export const BLOB_ID_MAX_BYTE_SIZE = 32;
 // implementer may choose to implement this as a dynamic config option settable with the `parameter_type!` macro
 export const BLOB_MAX_BYTE_SIZE = 1024;
 
+// TODO: Remove
 // Schema-validator spec
 const jsonSchemaSpec = {
   description: 'Schema Object Validation',
@@ -123,6 +125,17 @@ export default class Schema {
    * @returns {Boolean}
    */
   static validateSchema(json) {
+    let jsonSchemaSpec;
+    if (json['$schema']) {
+      if (json['$schema'].startsWith('http://json-schema.org/draft-07/schema')) {
+        jsonSchemaSpec = JSONSchema07;
+      } else {
+        // TODO: Fetch json['$schema'] (using http client) and convert function to async
+      }
+    } else {
+      return false;
+    }
+    // Fixme: Is the intention to throw error or return false on error
     const result = validate(json, jsonSchemaSpec, {
       throwError: true
     });

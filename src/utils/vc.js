@@ -302,11 +302,11 @@ export function buildDockCredentialStatus(registryId) {
  * schema `schema`
  * @param {object} credential - The credential to use
  * @param {object} schema - The schema to use
- * @returns {Boolean}
+ * @returns {Promise<ValidatorResult>} - Returns promise to an object or throws error
  */
 export function validateCredentialSchema(credential, schema) {
   // TODO: The id will not be part of schema. The spec mentioned that id will be popped off from subject
-  validate(credential.credentialSubject, schema.schema || schema, {
+  return validate(credential.credentialSubject, schema.schema || schema, {
     throwError: true,
   });
 }

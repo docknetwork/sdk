@@ -1,7 +1,12 @@
-import Schema, {SchemaQualifier, EncodedIDByteSize} from '../../src/modules/schema';
+import { cryptoWaitReady } from '@polkadot/util-crypto';
+import { Keyring } from '@polkadot/api';
+import { hexToU8a } from '@polkadot/util';
+
+import Schema, {BlobQualifier, EncodedIDByteSize} from '../../src/modules/schema';
 
 import {
   generateEcdsaSecp256k1Keypair,
+  getPublicKeyFromKeyringPair,
 } from '../../src/utils/misc';
 
 import {
@@ -33,13 +38,22 @@ const exampleAlumniSchema = {
 };
 
 describe('Basic Schema Tests', () => {
+  let keypair;
+  beforeAll(async (done) => {
+    await cryptoWaitReady();
+    const keyring = new Keyring();
+    const seed = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+    keypair = keyring.addFromSeed(hexToU8a(seed), {}, 'sr25519');
+    done();
+  });
+
   const schema = new Schema('schema:dock:5C78GCA');
   schema.name = 'AlumniCredSchema';
   schema.version = '1.0.0';
 
   test('accepts the id optionally and generates id of correct size when id is not given', () => {
     const schemaNoID = new Schema();
-    expect(schemaNoID.id && schemaNoID.id.length).toBe(EncodedIDByteSize + SchemaQualifier.length);
+    expect(schemaNoID.id && schemaNoID.id.length).toBe(EncodedIDByteSize + BlobQualifier.length);
   });
 
   test('setAuthor will set the author and accepts a DID identifier or full DID', () => {
@@ -58,15 +72,14 @@ describe('Basic Schema Tests', () => {
 
   test('setSignature will only accept signature of the supported types and set the signature key of the object.', () => {
     const msg = [1, 2, 3, 4]; // TODO: proper message
-    const pair = generateEcdsaSecp256k1Keypair();
-    const pk = PublicKeySecp256k1.fromKeyringPair(pair);
-    const sig = new SignatureSecp256k1(msg, pair);
+    const pk = getPublicKeyFromKeyringPair(keypair);
+    const sig = new SignatureSecp256k1(msg, keypair);
     schema.setSignature(sig);
     expect(schema.signature).toBe(sig);
   });
 
   test('sign will generate a signature on the schema detail, this signature is verifiable.', () => {
-    schema.sign(generateEcdsaSecp256k1Keypair());
+    schema.sign(keypair);
     expect(!!schema.signature).toBe(true);
   });
 
@@ -83,18 +96,20 @@ describe('Basic Schema Tests', () => {
       }),
     );
   });
-  //
-  // test('getSchema will return schema in correct format.', () => {
-  //   expect(true).toBe(false);
-  // });
-  //
-  test('getSchema throws error when no blob exists at the given id.', async () => {
-    await expect(Schema.getSchema('invalid-id')).rejects.toThrow();
+
+  // TODO: implement when blobmodule is integrated
+  test('getSchema will return schema in correct format.', async () => {
+    await expect(Schema.getSchema('validid')).resolves.toBeDefined();
   });
-  //
-  // test('getSchema throws error when schema not in correct format.', () => {
-  //   expect(true).toBe(false);
-  // });
+
+  test('getSchema throws error when no blob exists at the given id.', async () => {
+    await expect(Schema.getSchema('invalid-id')).rejects.toThrow(/Invalid schema id/);
+  });
+
+  // TODO: implement when blobmodule is integrated
+  test('getSchema throws error when schema not in correct format.', async () => {
+    await expect(Schema.getSchema('invalid-format')).rejects.toThrow(/Incorrect schema format/);
+  });
 });
 
 const exampleCredential = {

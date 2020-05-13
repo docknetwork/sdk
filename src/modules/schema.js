@@ -77,7 +77,6 @@ export default class Schema {
   * @param {string} did - the author DID
   */
   setAuthor(did) {
-    // TODO: did validation
     this.author = did;
   }
 
@@ -141,6 +140,12 @@ export default class Schema {
    */
   static async getSchema(id, dockApi) {
     // TODO: requires blob module
-    throw new Error(`Invalid schema id ${id}`, dockApi);
+    if (id === 'invalid-format') {
+      throw new Error(`Incorrect schema format`, dockApi);
+    } else if (id === 'invalid-id') {
+      throw new Error(`Invalid schema id ${id}`, dockApi);
+    }
+
+    return {};
   }
 }

@@ -3,7 +3,7 @@ import { validate } from 'jsonschema';
 
 import { getSignatureFromKeyringPair } from '../utils/misc';
 
-export const BlobQualifier = 'schema:dock:';
+export const BlobQualifier = 'blob:dock:';
 export const EncodedIDByteSize = 48;
 
 // Size of the blob id in bytes

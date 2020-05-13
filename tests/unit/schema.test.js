@@ -47,7 +47,7 @@ describe('Basic Schema Tests', () => {
     done();
   });
 
-  const schema = new Schema('schema:dock:5C78GCA');
+  const schema = new Schema('blob:dock:5C78GCA');
   schema.name = 'AlumniCredSchema';
   schema.version = '1.0.0';
 
@@ -124,7 +124,7 @@ const exampleCredential = {
    ],
    "issuanceDate": "2020-03-18T19:23:24Z",
    "credentialSchema": {    // this is the schema
-      "id": "schema:dock:5C78GCA",
+      "id": "blobmodule:dock:5C78GCA",
       "type": "JsonSchemaValidator2018"
    },
    "credentialSubject": {

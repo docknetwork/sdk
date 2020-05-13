@@ -306,10 +306,7 @@ export function buildDockCredentialStatus(registryId) {
  */
 export function validateCredentialSchema(credential, schema) {
   // TODO: The id will not be part of schema. The spec mentioned that id will be popped off from subject
-  // Fixme: Is the intention to throw error or return false on error
-  const result = validate(credential.credentialSubject, schema.schema || schema, {
-    throwError: true
+  validate(credential.credentialSubject, schema.schema || schema, {
+    throwError: true,
   });
-
-  return true;
 }

@@ -298,7 +298,8 @@ export function buildDockCredentialStatus(registryId) {
 
 
 /**
- * The function uses `jsonschema` package to verify that the `credential`'s subject `credentialSubject` has the JSON schema `schema`
+ * The function uses `jsonschema` package to verify that the `credential`'s subject `credentialSubject` has the JSON
+ * schema `schema`
  * @param {object} credential - The credential to use
  * @param {object} schema - The schema to use
  * @returns {Boolean}

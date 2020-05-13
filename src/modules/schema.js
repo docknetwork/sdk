@@ -98,13 +98,13 @@ export default class Schema {
   /**
    * Check that the given JSON schema is compliant with JSON schema spec mentioned in RFC
    * @param {object} json - The JSON schema to validate
-   * @returns {Boolean}
+   * @returns {Promise<ValidatorResult>} - Returns promise to an object or throws error
    */
   static async validateSchema(json) {
     // Get the JSON schema spec to check against.
     const jsonSchemaSpec = await this.getJSONSchemaSpec(json);
 
-    validate(json, jsonSchemaSpec, {
+    return validate(json, jsonSchemaSpec, {
       throwError: true,
     });
   }
@@ -137,15 +137,16 @@ export default class Schema {
    */
   static async getJSONSchemaSpec(json) {
     const schemaKey = '$schema';
-    if (json[schemaKey]) {
+    const schemaUrl = json[schemaKey];
+    if (schemaUrl) {
       // The URL might be 'http://json-schema.org/draft-07/schema' or 'http://json-schema.org/draft-07/schema#'
       // In that case, the schema is already stored in the SDK as this is the latest JSON schema spec
-      if (json[schemaKey] === 'http://json-schema.org/draft-07/schema' || json[schemaKey] === 'http://json-schema.org/draft-07/schema-') {
+      if (schemaUrl === 'http://json-schema.org/draft-07/schema' || schemaUrl === 'http://json-schema.org/draft-07/schema#') {
         // Return stored JSON schema
         return JSONSchema07;
       }
       // Fetch the URI and expect a JSON response
-      const { data: doc } = await axios.get(json[schemaKey]);
+      const { data: doc } = await axios.get(schemaUrl);
       if (typeof doc === 'object') {
         return doc;
       }

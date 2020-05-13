@@ -61,12 +61,12 @@ describe('Basic Schema Tests', () => {
     expect(schema.author).toBe(exampleAuthor);
   });
 
-  test('setJSONSchema will only accept valid JSON schema and set the schema key of the object.', () => {
-    expect(() => schema.setJSONSchema({
+  test('setJSONSchema will only accept valid JSON schema and set the schema key of the object.', async () => {
+    await expect(schema.setJSONSchema({
       invalidSchema: true,
-    })).toThrow();
+    })).rejects.toThrow();
 
-    schema.setJSONSchema(exampleAlumniSchema);
+    await schema.setJSONSchema(exampleAlumniSchema);
     expect(schema.schema).toBe(exampleAlumniSchema);
   });
 
@@ -83,8 +83,8 @@ describe('Basic Schema Tests', () => {
     expect(!!schema.signature).toBe(true);
   });
 
-  test('validateSchema will check that the given schema is a valid JSON-schema.', () => {
-    expect(Schema.validateSchema(exampleAlumniSchema)).toBe(true);
+  test('validateSchema will check that the given schema is a valid JSON-schema.', async () => {
+    await expect(Schema.validateSchema(exampleAlumniSchema)).resolves.toBeDefined();
   });
 
   test('toJSON will generate a JSON that can be sent to chain.', () => {
@@ -154,7 +154,7 @@ describe('Validate Credential Schema utility', () => {
   schema.setAuthor(exampleAuthor);
 
   test('credentialSubject has same fields and fields have same types as JSON-schema', () => {
-    expect(validateCredentialSchema(exampleCredential, schema)).toBe(true);
+    expect(validateCredentialSchema(exampleCredential, schema)).toBeDefined();
   });
 
   test('credentialSubject has same fields but fields have different type than JSON-schema', () => {
@@ -173,17 +173,17 @@ describe('Validate Credential Schema utility', () => {
     }, schema)).toThrow();
   });
 
-  test('The schema\'s properties is missing the required key and credentialSubject can omit some of the properties.', () => {
+  test('The schema\'s properties is missing the required key and credentialSubject can omit some of the properties.', async () => {
     const nonRequiredSchema = { ...exampleAlumniSchema };
     delete nonRequiredSchema.required;
-    schema.setJSONSchema(nonRequiredSchema);
+    await schema.setJSONSchema(nonRequiredSchema);
 
     const credentialSubject = { ...exampleCredential.credentialSubject };
     delete credentialSubject.alumniOf;
 
     expect(validateCredentialSchema({
       credentialSubject,
-    }, schema)).toBe(true);
+    }, schema)).toBeDefined();
   });
 
   test('credentialSubject has extra fields than given schema specifies and additionalProperties is false.', () => {
@@ -194,41 +194,41 @@ describe('Validate Credential Schema utility', () => {
     }, schema)).toThrow();
   });
 
-  test('credentialSubject has extra fields than given schema specifies and additionalProperties is true.', () => {
+  test('credentialSubject has extra fields than given schema specifies and additionalProperties is true.', async () => {
     const credentialSubject = { ...exampleCredential.credentialSubject };
     credentialSubject.additionalProperty = true;
 
-    schema.setJSONSchema({
+    await schema.setJSONSchema({
       ...exampleAlumniSchema,
       additionalProperties: true,
     });
 
     expect(validateCredentialSchema({
       credentialSubject,
-    }, schema)).toBe(true);
+    }, schema)).toBeDefined();
   });
 
-  test('credentialSubject has extra fields than given schema specifies and additionalProperties has certain type.', () => {
+  test('credentialSubject has extra fields than given schema specifies and additionalProperties has certain type.', async () => {
     const credentialSubject = { ...exampleCredential.credentialSubject };
     credentialSubject.additionalString = 'mystring';
 
-    schema.setJSONSchema({
+    await schema.setJSONSchema({
       ...exampleAlumniSchema,
       additionalProperties: { type: 'string' },
     });
 
     expect(validateCredentialSchema({
       credentialSubject,
-    }, schema)).toBe(true);
+    }, schema)).toBeDefined();
   });
 
-  test('credentialSubject has nested fields and given schema specifies the nested structure.', () => {
+  test('credentialSubject has nested fields and given schema specifies the nested structure.', async () => {
     const credentialSubject = { ...exampleCredential.credentialSubject };
     credentialSubject.nestedFields = {
       test: true,
     };
 
-    schema.setJSONSchema({
+    await schema.setJSONSchema({
       ...exampleAlumniSchema,
       properties: {
         ...exampleAlumniSchema.properties,
@@ -244,6 +244,6 @@ describe('Validate Credential Schema utility', () => {
 
     expect(validateCredentialSchema({
       credentialSubject,
-    }, schema)).toBe(true);
+    }, schema)).toBeDefined();
   });
 });

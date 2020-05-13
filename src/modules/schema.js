@@ -42,10 +42,8 @@ export default class Schema {
    * Add the JSON schema to this object after checking that `json` is a valid JSON schema. Check if JSON is valid.
    * @param {object} json - the schema JSON
    */
-  setJSONSchema(json) {
-    if (!Schema.validateSchema(json)) {
-      throw new Error('Invalid schema');
-    }
+  async setJSONSchema(json) {
+    await Schema.validateSchema(json);
     this.schema = json;
   }
 

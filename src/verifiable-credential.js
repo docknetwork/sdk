@@ -9,6 +9,7 @@ import {
   ensureURI,
   ensureValidDatetime,
 } from './utils/type-helpers';
+import { validateCredentialSchema } from './utils/vc';
 import { getUniqueElementsFromArray } from './utils/misc';
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
@@ -39,19 +40,31 @@ class VerifiableCredential {
     this.setIssuanceDate(new Date().toISOString());
   }
 
-  // Sets the `credentialSchema` field of the credential with the given id and type as specified in the RFC.
-  // `id` must be a URI.
+  /**
+   * Sets the `credentialSchema` field of the credential with the given id and type as specified in the RFC.
+   * @param {string} id - schema ID URI
+   * @param {string} type - type of the credential schema
+   */
   setSchema(id, type) {
+    ensureURI(id);
     this.credentialSchema = {
-      test: true
+      id, type
     };
   }
 
-  // Check that the credential is compliant with given JSON schema, meaning `credentialSubject` has the
-  // structure specified by the given JSON schema. Use `validateCredentialSchema` but exclude subject's id.
-  // Allows issuer to validate schema before adding it.
+  /**
+   * Check that the credential is compliant with given JSON schema, meaning `credentialSubject` has the
+   * structure specified by the given JSON schema. Use `validateCredentialSchema` but exclude subject's id.
+   * Allows issuer to validate schema before adding it.
+   * @param {object} schema - The schema to validate with
+   * @returns {Boolean}
+   */
   validateSchema(schema) {
+    if (!this.credentialSubject) {
+      throw new Error('No credential subject defined');
+    }
 
+    return validateCredentialSchema(this, schema);
   }
 
   /**
@@ -73,7 +86,6 @@ class VerifiableCredential {
   addType(type) {
     ensureString(type);
     this.type = [...new Set([...this.type, type])];
-
     return this;
   }
 

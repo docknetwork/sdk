@@ -148,6 +148,12 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
   // The method will check that the `credentialSubject` is consistent with `credentialSchema`
   // if `credentialSchema` if `credentialSchema` is present. Uses `validateSchema`.
 export async function verifyCredential(credential, resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null) {
+  // Check schema
+  if (credential.credentialSchema) {
+
+  }
+
+  // Run VCJS verifier
   const credVer = await vcjs.verifyCredential({
     credential,
     suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
@@ -306,11 +312,17 @@ export function buildDockCredentialStatus(registryId) {
  * schema `schema`
  * @param {object} credential - The credential to use
  * @param {object} schema - The schema to use
- * @returns {Promise<ValidatorResult>} - Returns promise to an object or throws error
+ * @returns {Boolean} - Returns promise to an object or throws error
  */
 export function validateCredentialSchema(credential, schema) {
-  // TODO: The id will not be part of schema. The spec mentioned that id will be popped off from subject
-  return validate(credential.credentialSubject, schema.schema || schema, {
-    throwError: true,
-  });
+  const subjects = credential.credentialSubject.length ? credential.credentialSubject : [credential.credentialSubject];
+  for (let i = 0; i < subjects.length; i++) {
+    const subject = {...subjects[i]};
+    delete subject.id; // The id will not be part of schema. The spec mentioned that id will be popped off from subject
+    validate(subject, schema.schema || schema, {
+      throwError: true,
+    });
+  }
+
+  return true;
 }

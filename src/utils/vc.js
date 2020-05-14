@@ -143,6 +143,10 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
  * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
  * credential is valid and not revoked and false otherwise. The `error` will describe the error if any.
  */
+
+ // TODO:
+  // The method will check that the `credentialSubject` is consistent with `credentialSchema`
+  // if `credentialSchema` if `credentialSchema` is present. Uses `validateSchema`.
 export async function verifyCredential(credential, resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null) {
   const credVer = await vcjs.verifyCredential({
     credential,

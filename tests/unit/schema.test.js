@@ -37,6 +37,24 @@ const exampleAlumniSchema = {
   additionalProperties: false,
 };
 
+describe('VerifiableCredential Tests', () => {
+  test.skip('VerifiableCredential\'s setSchema should appropriately set credentialSchema.', () => {
+    // TODO
+  });
+
+  test.skip('VerifiableCredential\'s validateSchema should validate the credentialSubject with given JSON schema.', () => {
+    // TODO
+  });
+
+  test.skip('Utility methods verifyCredential and verifyPresentation should check if schema is incompatible with the credentialSubject.', () => {
+    // TODO
+  });
+
+  test.skip('The verify and verifyPresentation should detect a subject with incompatible schema in credentialSchema.', () => {
+    // TODO
+  });
+});
+
 describe('Basic Schema Tests', () => {
   let keypair;
   beforeAll(async (done) => {

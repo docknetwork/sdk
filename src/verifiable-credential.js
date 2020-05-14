@@ -39,6 +39,21 @@ class VerifiableCredential {
     this.setIssuanceDate(new Date().toISOString());
   }
 
+  // Sets the `credentialSchema` field of the credential with the given id and type as specified in the RFC.
+  // `id` must be a URI.
+  setSchema(id, type) {
+    this.credentialSchema = {
+      test: true
+    };
+  }
+
+  // Check that the credential is compliant with given JSON schema, meaning `credentialSubject` has the
+  // structure specified by the given JSON schema. Use `validateCredentialSchema` but exclude subject's id.
+  // Allows issuer to validate schema before adding it.
+  validateSchema(schema) {
+
+  }
+
   /**
    * Add a context to this Credential's context array. Duplicates are omitted.
    * @param {string|object} context - Context to add to the credential context array
@@ -49,7 +64,6 @@ class VerifiableCredential {
     this.context = getUniqueElementsFromArray([...this.context, context], JSON.stringify);
     return this;
   }
-
 
   /**
    * Add a type to this Credential's type array. Duplicates are omitted.

@@ -79,7 +79,7 @@ export default class Schema {
   * @param {object} pair - Key pair to sign with
   */
   sign(pair) {
-    // TODO: proper message
+    // TODO: proper message when we have getSerializedBlob from fausto
     const msg = [1, 2, 3, 4];
     this.signature = getSignatureFromKeyringPair(pair, msg);
   }
@@ -105,7 +105,6 @@ export default class Schema {
   static async validateSchema(json) {
     // Get the JSON schema spec to check against.
     const jsonSchemaSpec = await this.getJSONSchemaSpec(json);
-
     return validate(json, jsonSchemaSpec, {
       throwError: true,
     });

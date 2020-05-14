@@ -5,6 +5,7 @@ import { validate } from 'jsonschema';
 import documentLoader from './vc/document-loader';
 import { isHexWithGivenByteSize } from './codec';
 import { RevEntryByteSize, RevRegIdByteSize } from './revocation';
+import Schema from '../modules/schema';
 import {
   EcdsaSecp256k1VerKeyName, Ed25519VerKeyName, Sr25519VerKeyName, EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
 } from './vc/custom_crypto';
@@ -144,13 +145,24 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
  * credential is valid and not revoked and false otherwise. The `error` will describe the error if any.
  */
 
- // TODO:
+export async function verifyCredential(credential, resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null) {
+  // TODO: Check schema
   // The method will check that the `credentialSubject` is consistent with `credentialSchema`
   // if `credentialSchema` if `credentialSchema` is present. Uses `validateSchema`.
-export async function verifyCredential(credential, resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null) {
-  // Check schema
-  if (credential.credentialSchema) {
+  if (credential.credentialSubject && credential.credentialSchema) {
+    console.log('credential.credentialSubject', credential.credentialSubject);
+    console.log('credential.credentialSchema', credential.credentialSchema);
 
+    // TODO: need to fetch schema def from did using id
+    // credential.credentialSchema
+    // { id, name, version }
+
+    try {
+      // TODO: needs proper schema definition
+      // validateCredentialSchema(credential, credential.credentialSchema);
+    } catch (e) {
+      throw new Error(`Subject is incompatible with schema ${e}`);
+    }
   }
 
   // Run VCJS verifier

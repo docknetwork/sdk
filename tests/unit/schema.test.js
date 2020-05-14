@@ -12,6 +12,7 @@ import {
 
 import {
   validateCredentialSchema,
+  verifyCredential,
 } from '../../src/utils/vc';
 
 import { PublicKeySecp256k1 } from '../../src/public-keys';
@@ -90,8 +91,19 @@ describe('VerifiableCredential Tests', () => {
     await expect(vc.validateSchema(exampleAlumniSchema)).toBe(true);
   });
 
-  test.skip('Utility method verifyCredential should check if schema is incompatible with the credentialSubject.', () => {
-    // TODO
+  test('Utility method verifyCredential should check if schema is incompatible with the credentialSubject.', async () => {
+    const vcInvalid = {
+      ...exampleCredential,
+      credentialSubject: {
+        id: 'invalid',
+        notEmailAddress: 'john.smith@example.com',
+        notAlumniOf: 'Example Invalid',
+      }
+    };
+
+    await expect(
+      verifyCredential(vcInvalid, null, false, false, null)
+    ).rejects.toThrow();
   });
 
   test.skip('The verify method should detect a subject with incompatible schema in credentialSchema.', () => {

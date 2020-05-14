@@ -4,6 +4,7 @@ import axios from 'axios';
 
 import JSONSchema07 from '../utils/vc/schemas/schema-draft-07';
 import { getSignatureFromKeyringPair } from '../utils/misc';
+import Signature from '../signatures/signature';
 
 
 export const BlobQualifier = 'blob:dock:';
@@ -64,8 +65,11 @@ export default class Schema {
   * @param {object} signature - The schema's signatuer
   */
   setSignature(signature) {
-    // TODO: ensure is signature
-    this.signature = signature;
+    if (signature instanceof Signature) {
+      this.signature = signature;
+    } else {
+      throw new Error('Provided signature object is not of instance Signature');
+    }
   }
 
   /**

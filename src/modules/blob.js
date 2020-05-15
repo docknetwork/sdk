@@ -34,10 +34,9 @@ class BlobModule {
   /**
    *  Get blob with given id from the chain. Throws if the blob can't be found.
    * @param {string} id - Can either be a full blob id like blob:dock:0x... or just the hex identifier
-   * @returns {Promise<void>} TODO: fill proper docstring here
+   * @returns {Promise<Array>} - A 2-element array where the first is the author and the second is the blob contents.
    */
   async getBlob(id) {
-    // Next line is useless
     id.replace(DockBlobQualifier, '');
     const resp = await this.api.query.blobStore.blobs(id);
     if (resp.isNone) {
@@ -45,15 +44,6 @@ class BlobModule {
     }
     const tuple = resp.unwrap();
     return [tuple[0], tuple[1]];
-    //
-    // const respTuple = resp.unwrap();
-    // if (respTuple.length === 2) {
-    //   return [
-    //     respTuple[0],
-    //     respTuple[1].toNumber(),
-    //   ];
-    // }
-    // throw new Error(`Needed 2 items in response but got${respTuple.length}`);
   }
 
   /**

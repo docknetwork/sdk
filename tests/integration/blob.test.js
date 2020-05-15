@@ -1,4 +1,5 @@
 import { randomAsHex } from '@polkadot/util-crypto';
+import { u8aToHex } from '@polkadot/util';
 
 import { DockAPI } from '../../src/api';
 
@@ -6,6 +7,7 @@ import {createNewDockDID, createKeyDetail, getHexIdentifierFromDID} from '../../
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { DockBlobByteSize } from '../../src/modules/blob';
+
 
 describe('Blob Module', () => {
   const dock = new DockAPI();
@@ -53,11 +55,14 @@ describe('Blob Module', () => {
     const pair = dock.keyring.addFromUri(firstKeySeed);
 
     const blobId = randomAsHex(DockBlobByteSize);
+    // Both blob vec and blob hex work
     const blobHex = randomAsHex(32);
+    const blobVec = [1, 2, 3];
     const transaction = await dock.blob.new(
       {
         id: blobId,
-        blob: blobHex,
+        // blob: blobHex,
+        blob: blobVec,
         author: getHexIdentifierFromDID(dockDID),
       },
       pair,
@@ -68,6 +73,9 @@ describe('Blob Module', () => {
 
     const chainBlob = await dock.blob.getBlob(blobId);
     expect(!!chainBlob).toBe(true);
+    console.log('authos', chainBlob[0]);
+    console.log('blob', chainBlob[0]);
+
     // TODO: expect the retrieved blob to be the same as the one I sent
-  }, 3000000);
+  }, 30000);
 });

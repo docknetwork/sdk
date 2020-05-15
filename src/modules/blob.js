@@ -37,11 +37,14 @@ class BlobModule {
    * @returns {Promise<void>} TODO: fill proper docstring here
    */
   async getBlob(id) {
+    // Next line is useless
     id.replace(DockBlobQualifier, '');
     const resp = await this.api.query.blobStore.blobs(id);
     if (resp.isNone) {
       throw new NoBlobError(id);
     }
+    const tuple = resp.unwrap();
+    return [tuple[0], tuple[1]];
     //
     // const respTuple = resp.unwrap();
     // if (respTuple.length === 2) {

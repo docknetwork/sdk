@@ -2,7 +2,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 
 import { DockAPI } from '../../src/api';
 
-import { createNewDockDID, createKeyDetail } from '../../src/utils/did';
+import {createNewDockDID, createKeyDetail, getHexIdentifierFromDID} from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { DockBlobByteSize } from '../../src/modules/blob';
@@ -51,21 +51,14 @@ describe('Blob Module', () => {
 
   test('Can create a Blob.', async () => {
     const pair = dock.keyring.addFromUri(firstKeySeed);
-    const publicKey = getPublicKeyFromKeyringPair(pair);
 
-    // The controller is same as the DID
-    const keyDetail = createKeyDetail(publicKey, dockDID);
-
-    const tx = dock.did.new(dockDID, keyDetail);
-    await dock.sendTransaction(tx);
-    //---------------------------------
     const blobId = randomAsHex(DockBlobByteSize);
     const blobHex = randomAsHex(32);
     const transaction = await dock.blob.new(
       {
         id: blobId,
         blob: blobHex,
-        author: dockDID.replace('did:dock:', ''),
+        author: getHexIdentifierFromDID(dockDID),
       },
       pair,
     );

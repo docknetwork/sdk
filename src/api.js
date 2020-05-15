@@ -2,8 +2,9 @@ import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { KeyringPair } from '@polkadot/keyring/types'; // eslint-disable-line
 
-import RevocationModule from './modules/revocation';
+import BlobModule from './modules/blob';
 import DIDModule from './modules/did';
+import RevocationModule from './modules/revocation';
 import types from './types.json';
 
 
@@ -67,6 +68,7 @@ class DockAPI {
       },
     });
 
+    this.blobModule = new BlobModule(this.api);
     this.didModule = new DIDModule(this.api);
     this.revocationModule = new RevocationModule(this.api);
 
@@ -83,6 +85,7 @@ class DockAPI {
     if (this.api) {
       await this.api.disconnect();
       delete this.api;
+      delete this.blobModule;
       delete this.didModule;
       delete this.revocationModule;
     }
@@ -144,6 +147,17 @@ class DockAPI {
   }
 
   /**
+   * Gets the SDK's Blob module
+   * @return {BlobModule} The module to use
+   */
+  get blob() {
+    if (!this.blobModule) {
+      throw new Error('Unable to get Blob module, SDK is not initialised');
+    }
+    return this.blobModule;
+  }
+
+  /**
    * Gets the SDK's DID module
    * @return {DIDModule} The module to use
    */
@@ -168,6 +182,7 @@ class DockAPI {
 
 export default new DockAPI();
 export {
+  BlobModule,
   DockAPI,
   DIDModule,
   RevocationModule,

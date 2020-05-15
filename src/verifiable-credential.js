@@ -53,8 +53,8 @@ class VerifiableCredential {
     const subject = (json.credentialSubject || json.subject);
     if (subject) {
       const subjects = subject.length ? subject : [subject];
-      subjects.forEach((subject) => {
-        cert.addSubject(subject);
+      subjects.forEach((value) => {
+        cert.addSubject(value);
       });
     }
 

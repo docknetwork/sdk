@@ -31,7 +31,7 @@ class BlobModule {
   /**
    * Register a new Blob on the Dock Chain
    * @param {object} blob - struct to store on chain
-   * @param {Signature} signature - Signature from existing key
+   * @param {object} keyPair - Key pair to sign with
    * @return {object} The extrinsic to sign and send.
    */
   new(blob, keyPair) {

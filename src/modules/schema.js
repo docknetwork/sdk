@@ -34,6 +34,7 @@ export default class Schema {
    * @param {string} [id] - optional schema ID, if not given, generate a random id
    */
   constructor(id) {
+    // TODO: `id` should be validated?
     this.id = id || createNewSchemaID();
     this.name = '';
     this.version = '1.0.0';
@@ -54,6 +55,7 @@ export default class Schema {
   * @param {string} did - the author DID
   */
   setAuthor(did) {
+    // TODO: `did` should be validated, do a best effort. Check either 32 byte (use constant) hex or a valid Dock DID or starts with 'did'
     this.author = did;
   }
 

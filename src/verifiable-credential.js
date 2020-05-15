@@ -1,6 +1,7 @@
 import {
   issueCredential,
   verifyCredential,
+  validateCredentialSchema,
 } from './utils/vc';
 import {
   ensureObjectWithId,
@@ -9,7 +10,6 @@ import {
   ensureURI,
   ensureValidDatetime,
 } from './utils/type-helpers';
-import { validateCredentialSchema } from './utils/vc';
 import { getUniqueElementsFromArray } from './utils/misc';
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
@@ -121,7 +121,7 @@ class VerifiableCredential {
   setSchema(id, type) {
     ensureURI(id);
     this.credentialSchema = {
-      id, type
+      id, type,
     };
   }
 

@@ -26,7 +26,8 @@ export default class UniversalResolver extends DIDResolver {
    */
   async resolve(did) {
     try {
-      const resp = await axios.get(`${this.idUrl}${did}`);
+      const encodedDid = encodeURIComponent(did);
+      const resp = await axios.get(`${this.idUrl}${encodedDid}`);
       return resp.data.didDocument;
     } catch (error) {
       if (error.isAxiosError && error.response.data.match(/DID not found/g)) {

@@ -67,9 +67,10 @@ describe('DID Module', () => {
     // Update DID key to the following
     const newPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
     const newPk = PublicKeyEd25519.fromKeyringPair(newPair);
-    const newController = randomAsHex(32);
 
-    const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, dockDID, newPk, currentPair, newController);
+    const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, dockDID, newPk, currentPair);
+    // Since controller was not passed, it should not be passed in the key update
+    expect(keyUpdate.controller).toBe(undefined);
 
     const transaction = dock.did.updateKey(keyUpdate, signature);
     const result = await dock.sendTransaction(transaction);

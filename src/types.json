@@ -66,6 +66,12 @@
       "OneOf": "BTreeSet<Did>"
     }
   },
+  "BlobId": "[u8;32]",
+  "Blob": {
+    "id": "BlobId",
+    "blob": "Vec<u8>",
+    "author": "Did"
+  },
   "StateChange": {
     "_enum": {
       "KeyUpdate": "KeyUpdate",

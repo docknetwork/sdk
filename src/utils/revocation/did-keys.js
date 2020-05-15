@@ -2,10 +2,10 @@
 export default class DidKeys {
   /**
    * Constructs a DidKeys map abstraction
-   * @param {Map} map - Key map
+   * @param {Map} [map] - Key map
    * @constructor
    */
-  constructor(map) {
+  constructor(map = null) {
     this.map = map || new Map();
   }
 

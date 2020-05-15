@@ -1,9 +1,7 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "0.0.2",
-  "main": "dist/sdk.cjs.js",
-  "module": "dist/sdk.esm.js",
-  "browser": "dist/sdk.umd.js",
+  "version": "0.0.6",
+  "main": "index.js",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -14,6 +12,7 @@
     "@babel/core": "^7.8.7",
     "@babel/node": "^7.8.7",
     "@babel/preset-env": "^7.8.7",
+    "@types/jest": "^25.2.1",
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "24.5.0",
     "concurrently": "^4.1.0",
@@ -23,6 +22,7 @@
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-jest": "^23.8.2",
     "ethr-did-resolver": "^2.2.0",
+    "glob": "^7.1.6",
     "jest": "24.5.0",
     "jsdoc": "^3.6.3",
     "rollup": "1.7.0",
@@ -34,7 +34,6 @@
   },
   "scripts": {
     "lint": "eslint \"{src,example}/**/*.js\"",
-    "prepare": "yarn build",
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "test": "jest --verbose ./tests/unit",
@@ -52,12 +51,9 @@
   "jest": {
     "testEnvironment": "node"
   },
-  "files": [
-    "dist",
-    "src"
-  ],
   "dependencies": {
     "@polkadot/api": "1.13.1",
+    "@polkadot/keyring": "2.9.1",
     "@polkadot/util": "2.9.1",
     "@polkadot/util-crypto": "2.9.1",
     "axios": "^0.19.2",

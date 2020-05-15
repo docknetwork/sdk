@@ -9,9 +9,17 @@ import {
   ensureURI,
   ensureValidDatetime,
 } from './utils/type-helpers';
+import { getUniqueElementsFromArray } from './utils/misc';
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiableCredential';
+
+/**
+ * @typedef {object} VerifiableCredentialVerificationResult The credential verification result
+ * @property {Boolean} verified Is this credential verified or not
+ * @property {array} results Verification results
+ * @property {any} [error] Optional error
+ */
 
 /**
  * Representation of a Verifiable Credential.
@@ -32,35 +40,37 @@ class VerifiableCredential {
   }
 
   /**
-   * Add a context to this Credential's context array
+   * Add a context to this Credential's context array. Duplicates are omitted.
    * @param {string|object} context - Context to add to the credential context array
    * @returns {VerifiableCredential}
    */
   addContext(context) {
     ensureObjectWithKeyOrURI(context, '@context', 'context');
-    this.context.push(context);
+    this.context = getUniqueElementsFromArray([...this.context, context], JSON.stringify);
     return this;
   }
 
+
   /**
-   * Add a type to this Credential's type array
+   * Add a type to this Credential's type array. Duplicates are omitted.
    * @param {string} type - Type to add to the credential type array
    * @returns {VerifiableCredential}
    */
   addType(type) {
     ensureString(type);
-    this.type.push(type);
+    this.type = [...new Set([...this.type, type])];
+
     return this;
   }
 
   /**
-   * Add a subject to this Credential
+   * Add a subject to this Credential. Duplicates are omitted.
    * @param {object} subject -  Subject of the credential
    * @returns {VerifiableCredential}
    */
   addSubject(subject) {
     ensureObjectWithId(subject, 'credentialSubject');
-    this.subject.push(subject);
+    this.subject = getUniqueElementsFromArray([...this.subject, subject], JSON.stringify);
     return this;
   }
 
@@ -140,16 +150,16 @@ class VerifiableCredential {
 
   /**
    * Verify a Verifiable Credential
-   * @param {object} resolver - Resolver for DIDs.
-   * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
-   * @param {Boolean} forceRevocationCheck - Whether to force revocation check or not.
+   * @param {object} [resolver] - Resolver for DIDs.
+   * @param {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
+   * @param {Boolean} [forceRevocationCheck] - Whether to force revocation check or not.
    * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
-   * @param {object} revocationAPI - An object representing a map. "revocation type -> revocation API". The API is used to check
+   * @param {object} [revocationAPI] - An object representing a map. "revocation type -> revocation API". The API is used to check
    * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
    * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
-   * @returns {Promise<{object}>}
+   * @returns {Promise<VerifiableCredentialVerificationResult>}
    */
-  async verify(resolver, compactProof = true, forceRevocationCheck = true, revocationAPI) {
+  async verify(resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null) {
     if (!this.proof) {
       throw new Error('The current Verifiable Credential has no proof.');
     }

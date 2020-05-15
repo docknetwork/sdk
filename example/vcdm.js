@@ -5,7 +5,7 @@ import VerifiableCredential from '../src/verifiable-credential';
 import VerifiablePresentation from '../src/verifiable-presentation';
 import { createNewDockDID } from '../src/utils/did';
 import { registerNewDIDUsingPair } from '../tests/integration/helpers';
-import { OneOfPolicy } from '../src/utils/revocation';
+import { createRandomRegistryId, OneOfPolicy } from '../src/utils/revocation';
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 import getKeyDoc from '../src/utils/vc/helpers';
 import { DockResolver } from '../src/resolver';
@@ -18,7 +18,7 @@ const issuerSeed = randomAsHex(32);
 const holderDID = createNewDockDID();
 const holderSeed = randomAsHex(32);
 
-const registryId = randomAsHex(32);
+const registryId = createRandomRegistryId();
 
 // Sample credential data
 const credentialId = 'http://example.edu/credentials/1986';

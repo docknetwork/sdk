@@ -102,7 +102,7 @@ export default class Schema {
   /**
    * Check that the given JSON schema is compliant with JSON schema spec mentioned in RFC
    * @param {object} json - The JSON schema to validate
-   * @returns {Promise<ValidatorResult>} - Returns promise to an object or throws error
+   * @returns {Promise<object>} - Returns promise to an object or throws error
    */
   static async validateSchema(json) {
     // Get the JSON schema spec to check against.
@@ -119,14 +119,14 @@ export default class Schema {
    * returned if schema is not found on the chain or in JSON format.
    * @param {string} id - The Schema ID
    * @param {object} dockApi - The Dock API
-   * @returns {any}
+   * @returns {Promise<any>}
    */
   static async getSchema(id, dockApi) {
     // TODO: requires blob module
     if (id === 'invalid-format') {
-      throw new Error('Incorrect schema format', dockApi);
+      throw new Error('Incorrect schema format');
     } else if (id === 'invalid-id') {
-      throw new Error(`Invalid schema id ${id}`, dockApi);
+      throw new Error(`Invalid schema id ${id} ${dockApi}`);
     }
 
     return {};

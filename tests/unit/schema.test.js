@@ -172,17 +172,18 @@ describe('Basic Schema Tests', () => {
   });
 
   // TODO: implement when blobmodule is integrated
+  const dock = null; // TODO: these should be integration testse
   test('getSchema will return schema in correct format.', async () => {
-    await expect(Schema.getSchema('validid')).resolves.toBeDefined();
+    await expect(Schema.getSchema('validid', dock)).resolves.toBeDefined();
   });
 
   test('getSchema throws error when no blob exists at the given id.', async () => {
-    await expect(Schema.getSchema('invalid-id')).rejects.toThrow(/Invalid schema id/);
+    await expect(Schema.getSchema('invalid-id', dock)).rejects.toThrow(/Invalid schema id/);
   });
 
   // TODO: implement when blobmodule is integrated
   test('getSchema throws error when schema not in correct format.', async () => {
-    await expect(Schema.getSchema('invalid-format')).rejects.toThrow(/Incorrect schema format/);
+    await expect(Schema.getSchema('invalid-format', dock)).rejects.toThrow(/Incorrect schema format/);
   });
 });
 
@@ -227,17 +228,14 @@ describe('Validate Credential Schema utility', () => {
   });
 
   test('credentialSubject has extra fields than given schema specifies and additionalProperties is false.', () => {
-    const credentialSubject = { ...exampleCredential.credentialSubject };
-    credentialSubject.additionalProperty = true;
+    const credentialSubject = { ...exampleCredential.credentialSubject, additionalProperty: true };
     expect(() => validateCredentialSchema({
       credentialSubject,
     }, schema)).toThrow();
   });
 
   test('credentialSubject has extra fields than given schema specifies and additionalProperties is true.', async () => {
-    const credentialSubject = { ...exampleCredential.credentialSubject };
-    credentialSubject.additionalProperty = true;
-
+    const credentialSubject = { ...exampleCredential.credentialSubject, additionalProperty: true };
     await schema.setJSONSchema({
       ...exampleAlumniSchema,
       additionalProperties: true,
@@ -249,9 +247,7 @@ describe('Validate Credential Schema utility', () => {
   });
 
   test('credentialSubject has extra fields than given schema specifies and additionalProperties has certain type.', async () => {
-    const credentialSubject = { ...exampleCredential.credentialSubject };
-    credentialSubject.additionalString = 'mystring';
-
+    const credentialSubject = { ...exampleCredential.credentialSubject, additionalString: 'mystring' };
     await schema.setJSONSchema({
       ...exampleAlumniSchema,
       additionalProperties: { type: 'string' },
@@ -263,9 +259,11 @@ describe('Validate Credential Schema utility', () => {
   });
 
   test('credentialSubject has nested fields and given schema specifies the nested structure.', async () => {
-    const credentialSubject = { ...exampleCredential.credentialSubject };
-    credentialSubject.nestedFields = {
-      test: true,
+    const credentialSubject = {
+      ...exampleCredential.credentialSubject,
+      nestedFields: {
+        test: true,
+      }
     };
 
     await schema.setJSONSchema({

@@ -1,11 +1,20 @@
+import { encodeAddress, randomAsHex } from '@polkadot/util-crypto';
 import { getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
-import { NoBlobError } from '../utils/blob';
-
+import NoBlobError from '../utils/errors/no-blob-error';
 
 export const DockBlobMethod = 'dock';
 export const DockBlobQualifier = `blob:${DockBlobMethod}:`;
 export const DockBlobByteSize = 32;
 
+/**
+ * Create and return a fully qualified Dock Blob, i.e. "did:dock:<SS58 string>"
+ * @returns {string} - The Blob
+ */
+export function createNewDockBlobId() {
+  const hexId = randomAsHex(DockBlobByteSize);
+  const ss58Id = encodeAddress(hexId);
+  return `${DockBlobQualifier}${ss58Id}`;
+}
 
 /** Class to create and update Blobs on chain. */
 class BlobModule {

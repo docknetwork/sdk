@@ -7,6 +7,18 @@ import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-const
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { DockBlobByteSize } from '../../src/modules/blob';
 
+let account;
+let pair;
+let publicKey;
+let dockDID;
+let keyDetail;
+let txDid;
+// eslint-disable-next-line no-unused-vars
+let resultDid;
+// eslint-disable-next-line no-unused-vars
+let didDoc;
+let blobId;
+
 function errorInResult(result) {
   try {
     return result.events[0].event.data[0].toJSON().Module.error === 1;
@@ -33,27 +45,22 @@ describe('Blob Module', () => {
     await dock.disconnect();
   }, 10000);
 
-  test('Can create and read a Hex Blob.', async () => {
-    const account = dock.keyring.addFromUri(TestAccountURI);
+
+  beforeEach(async () => {
+    account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
-    expect(!!dock.keyring).toBe(true);
-    expect(!!dock.account).toBe(true);
-
-    const pair = dock.keyring.addFromUri(firstKeySeed);
-    const publicKey = getPublicKeyFromKeyringPair(pair);
-    const dockDID = createNewDockDID();
-    // The controller is same as the DID
-    const keyDetail = createKeyDetail(publicKey, dockDID);
-
-    const txDid = dock.did.new(dockDID, keyDetail);
-    const resultDid = await dock.sendTransaction(txDid);
-    expect(!!resultDid).toBe(true);
-    const document = await dock.did.getDocument(dockDID);
-    expect(!!document).toBe(true);
+    pair = dock.keyring.addFromUri(firstKeySeed);
+    publicKey = getPublicKeyFromKeyringPair(pair);
+    dockDID = createNewDockDID();
+    keyDetail = createKeyDetail(publicKey, dockDID);
+    txDid = dock.did.new(dockDID, keyDetail);
+    resultDid = await dock.sendTransaction(txDid);
+    didDoc = await dock.did.getDocument(dockDID);
+    blobId = randomAsHex(DockBlobByteSize);
+  }, 10000);
 
 
-    const blobId = randomAsHex(DockBlobByteSize);
-    // TODO: above this should be moved beforeEach
+  test('Can create and read a Hex Blob.', async () => {
     const blobHex = randomAsHex(32);
     const txBlob = await dock.blob.new(
       {
@@ -73,25 +80,6 @@ describe('Blob Module', () => {
   }, 30000);
 
   test('Can create and read a Vector Blob.', async () => {
-    const account = dock.keyring.addFromUri(TestAccountURI);
-    dock.setAccount(account);
-    expect(!!dock.keyring).toBe(true);
-    expect(!!dock.account).toBe(true);
-
-    const pair = dock.keyring.addFromUri(firstKeySeed);
-    const publicKey = getPublicKeyFromKeyringPair(pair);
-    const dockDID = createNewDockDID();
-    // The controller is same as the DID
-    const keyDetail = createKeyDetail(publicKey, dockDID);
-
-    const txDid = dock.did.new(dockDID, keyDetail);
-    const resultDid = await dock.sendTransaction(txDid);
-    expect(!!resultDid).toBe(true);
-    const document = await dock.did.getDocument(dockDID);
-    expect(!!document).toBe(true);
-
-    const blobId = randomAsHex(DockBlobByteSize);
-    // TODO: above this should be moved beforeEach
     const blobVect = [1, 2, 3];
     const transaction = await dock.blob.new(
       {
@@ -112,25 +100,6 @@ describe('Blob Module', () => {
 
 
   test('Fails to write blob with size greater than allowed.', async () => {
-    const account = dock.keyring.addFromUri(TestAccountURI);
-    dock.setAccount(account);
-    expect(!!dock.keyring).toBe(true);
-    expect(!!dock.account).toBe(true);
-
-    const pair = dock.keyring.addFromUri(firstKeySeed);
-    const publicKey = getPublicKeyFromKeyringPair(pair);
-    const dockDID = createNewDockDID();
-    // The controller is same as the DID
-    const keyDetail = createKeyDetail(publicKey, dockDID);
-
-    const txDid = dock.did.new(dockDID, keyDetail);
-    const resultDid = await dock.sendTransaction(txDid);
-    expect(!!resultDid).toBe(true);
-    const document = await dock.did.getDocument(dockDID);
-    expect(!!document).toBe(true);
-
-    const blobId = randomAsHex(DockBlobByteSize);
-    // TODO: above this should be moved beforeEach
     const blobHex = randomAsHex(1025); // Max size is 1024
     const transaction = await dock.blob.new(
       {
@@ -149,25 +118,6 @@ describe('Blob Module', () => {
   }, 30000);
 
   test('Fails to write blob with id already used.', async () => {
-    const account = dock.keyring.addFromUri(TestAccountURI);
-    dock.setAccount(account);
-    expect(!!dock.keyring).toBe(true);
-    expect(!!dock.account).toBe(true);
-
-    const pair = dock.keyring.addFromUri(firstKeySeed);
-    const publicKey = getPublicKeyFromKeyringPair(pair);
-    const dockDID = createNewDockDID();
-    // The controller is same as the DID
-    const keyDetail = createKeyDetail(publicKey, dockDID);
-
-    const txDid = dock.did.new(dockDID, keyDetail);
-    const resultDid = await dock.sendTransaction(txDid);
-    expect(!!resultDid).toBe(true);
-    const document = await dock.did.getDocument(dockDID);
-    expect(!!document).toBe(true);
-
-    const blobId = randomAsHex(DockBlobByteSize);
-    // TODO: above this should be moved beforeEach
     const blobHexFirst = randomAsHex(12);
     const txFirst = await dock.blob.new(
       {
@@ -202,9 +152,9 @@ describe('Blob Module', () => {
 
 
   test('Should throw error when cannot read blob with given id from chain.', async () => {
-    const blobId = randomAsHex(DockBlobByteSize);
+    const nonExistentBlobId = randomAsHex(DockBlobByteSize);
     await expect(
-      dock.blob.getBlob(blobId),
+      dock.blob.getBlob(nonExistentBlobId),
     ).rejects.toThrowError('does not exist');
   }, 30000);
 });

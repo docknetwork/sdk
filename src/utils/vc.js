@@ -5,7 +5,7 @@ import { validate } from 'jsonschema';
 import documentLoader from './vc/document-loader';
 import { isHexWithGivenByteSize } from './codec';
 import { RevEntryByteSize, RevRegIdByteSize } from './revocation';
-import Schema from '../modules/schema';
+
 import {
   EcdsaSecp256k1VerKeyName, Ed25519VerKeyName, Sr25519VerKeyName, EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
 } from './vc/custom_crypto';
@@ -329,7 +329,7 @@ export function buildDockCredentialStatus(registryId) {
 export function validateCredentialSchema(credential, schema) {
   const subjects = credential.credentialSubject.length ? credential.credentialSubject : [credential.credentialSubject];
   for (let i = 0; i < subjects.length; i++) {
-    const subject = {...subjects[i]};
+    const subject = { ...subjects[i] };
     delete subject.id; // The id will not be part of schema. The spec mentioned that id will be popped off from subject
     validate(subject, schema.schema || schema, {
       throwError: true,

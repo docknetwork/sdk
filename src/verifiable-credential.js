@@ -31,13 +31,86 @@ class VerifiableCredential {
    * @param {string} id - id of the credential
    */
   constructor(id) {
-    ensureURI(id);
-    this.id = id;
+    if (id) {
+      this.setId(id);
+    }
 
     this.context = [DEFAULT_CONTEXT];
     this.type = [DEFAULT_TYPE];
     this.credentialSubject = [];
     this.setIssuanceDate(new Date().toISOString());
+  }
+
+  static fromJSON(json) {
+    const cert = new VerifiableCredential(json.id);
+
+    const types = json.type;
+    if (types) {
+      types.forEach((type) => {
+        cert.addType(type);
+      });
+    }
+
+    const subject = (json.credentialSubject || json.subject);
+    if (subject) {
+      const subjects = subject.length ? subject : [subject];
+      subjects.forEach((value) => {
+        cert.addSubject(value);
+      });
+    }
+
+    const contexts = json['@context'];
+    if (contexts) {
+      contexts.forEach((context) => {
+        cert.addContext(context);
+      });
+    }
+
+    if (json.proof) {
+      cert.setProof(json.proof);
+    }
+
+    if (json.issuer) {
+      cert.setIssuer(json.issuer);
+    }
+
+    cert.setStatus(json.credentialStatus || json.status)
+      .setIssuanceDate(json.issuanceDate)
+      .setExpirationDate(json.expirationDate);
+
+    Object.assign(cert, json);
+    return cert;
+  }
+
+  /**
+   * Sets the credential's ID
+   * @param {string} id - Signed credential's ID
+   * @returns {VerifiableCredential}
+   */
+  setId(id) {
+    ensureURI(id);
+    this.id = id;
+    return this;
+  }
+
+  /**
+   * Sets the credential's issuer DID
+   * @param {string} issuer - the issuer's did
+   * @returns {VerifiableCredential}
+   */
+  setIssuer(issuer) {
+    this.issuer = issuer;
+    return this;
+  }
+
+  /**
+   * Sets the credential's proof
+   * @param {object} proof - Signed credential proof
+   * @returns {VerifiableCredential}
+   */
+  setProof(proof) {
+    this.proof = proof;
+    return this;
   }
 
   /**
@@ -168,7 +241,7 @@ class VerifiableCredential {
       this.toJSON(),
       compactProof,
     );
-    this.proof = signedVC.proof;
+    this.setProof(signedVC.proof);
     this.issuer = signedVC.issuer;
     return this;
   }

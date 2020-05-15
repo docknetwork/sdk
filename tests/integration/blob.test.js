@@ -9,8 +9,7 @@ import { DockBlobByteSize } from '../../src/modules/blob';
 
 function errorInResult(result) {
   try {
-    const { error } = result.events[0].event.data[0].toJSON().Module;
-    return error === 1;
+    return result.events[0].event.data[0].toJSON().Module.error === 1;
   } catch (e) {
     return false;
   }
@@ -197,6 +196,7 @@ describe('Blob Module', () => {
     );
 
     const resultSecond = await dock.sendTransaction(txSecond, false);
+    expect(errorInResult(resultFirst)).toBe(false);
     expect(errorInResult(resultSecond)).toBe(true);
   }, 30000);
 

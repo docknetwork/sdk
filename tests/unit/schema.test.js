@@ -90,25 +90,6 @@ describe('VerifiableCredential Tests', () => {
   test('VerifiableCredential\'s validateSchema should validate the credentialSubject with given JSON schema.', async () => {
     await expect(vc.validateSchema(exampleAlumniSchema)).toBe(true);
   });
-
-  test('Utility method verifyCredential should check if schema is incompatible with the credentialSubject.', async () => {
-    const vcInvalid = {
-      ...exampleCredential,
-      credentialSubject: {
-        id: 'invalid',
-        notEmailAddress: 'john.smith@example.com',
-        notAlumniOf: 'Example Invalid',
-      }
-    };
-
-    await expect(
-      verifyCredential(vcInvalid, null, false, false, null)
-    ).rejects.toThrow();
-  });
-
-  test.skip('The verify method should detect a subject with incompatible schema in credentialSchema.', () => {
-    // TODO
-  });
 });
 
 describe('Basic Schema Tests', () => {
@@ -145,7 +126,7 @@ describe('Basic Schema Tests', () => {
   });
 
   test('setSignature will only accept signature of the supported types and set the signature key of the object.', () => {
-    const msg = [1, 2, 3, 4]; // TODO: proper message
+    const msg = [1, 2, 3, 4];
     const pk = getPublicKeyFromKeyringPair(keypair);
     const sig = new SignatureSecp256k1(msg, keypair);
     schema.setSignature(sig);
@@ -169,21 +150,6 @@ describe('Basic Schema Tests', () => {
         schema: expect.anything(),
       }),
     );
-  });
-
-  // TODO: implement when blobmodule is integrated
-  const dock = null; // TODO: these should be integration testse
-  test('getSchema will return schema in correct format.', async () => {
-    await expect(Schema.getSchema('validid', dock)).resolves.toBeDefined();
-  });
-
-  test('getSchema throws error when no blob exists at the given id.', async () => {
-    await expect(Schema.getSchema('invalid-id', dock)).rejects.toThrow(/Invalid schema id/);
-  });
-
-  // TODO: implement when blobmodule is integrated
-  test('getSchema throws error when schema not in correct format.', async () => {
-    await expect(Schema.getSchema('invalid-format', dock)).rejects.toThrow(/Incorrect schema format/);
   });
 });
 

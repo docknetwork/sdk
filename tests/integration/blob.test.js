@@ -6,6 +6,7 @@ import { createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../.
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { DockBlobByteSize } from '../../src/modules/blob';
+import Schema from '../../src/modules/schema';
 
 let account;
 let pair;
@@ -157,4 +158,41 @@ describe('Blob Module', () => {
       dock.blob.getBlob(nonExistentBlobId),
     ).rejects.toThrowError('does not exist');
   }, 30000);
+});
+
+// TODO: implement when blobmodule is integrated
+describe('Schema Blob Module Integration', () => {
+  const dock = null; // TODO: beforeall dock init for chain reading
+
+  test('Utility method verifyCredential should check if schema is incompatible with the credentialSubject.', async () => {
+    const vcInvalid = {
+      ...exampleCredential,
+      credentialSubject: {
+        id: 'invalid',
+        notEmailAddress: 'john.smith@example.com',
+        notAlumniOf: 'Example Invalid',
+      }
+    };
+
+    await expect(
+      verifyCredential(vcInvalid, null, false, false, null)
+    ).rejects.toThrow();
+  });
+
+  test.skip('The verify method should detect a subject with incompatible schema in credentialSchema.', () => {
+    // TODO
+  });
+
+  test('getSchema will return schema in correct format.', async () => {
+    await expect(Schema.getSchema('validid', dock)).resolves.toBeDefined();
+  });
+
+  test('getSchema throws error when no blob exists at the given id.', async () => {
+    await expect(Schema.getSchema('invalid-id', dock)).rejects.toThrow(/Invalid schema id/);
+  });
+
+  // TODO: implement when blobmodule is integrated
+  test('getSchema throws error when schema not in correct format.', async () => {
+    await expect(Schema.getSchema('invalid-format', dock)).rejects.toThrow(/Incorrect schema format/);
+  });
 });

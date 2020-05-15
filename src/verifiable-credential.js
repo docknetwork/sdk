@@ -41,24 +41,29 @@ class VerifiableCredential {
   }
 
   static fromJSON(json) {
-    const cert = new VerifiableCredential();
-    cert.setId(json.id);
+    const cert = new VerifiableCredential(json.id);
 
-    json.type.forEach((type) => {
-      cert.addType(type);
-    });
+    const types = json.type;
+    if (types) {
+      types.forEach((type) => {
+        cert.addType(type);
+      });
+    }
 
-    (json.credentialSubject || json.subject).forEach((subject) => {
-      cert.addSubject(subject);
-    });
+    const subject = (json.credentialSubject || json.subject);
+    if (subject) {
+      const subjects = subject.length ? subject : [subject];
+      subjects.forEach((subject) => {
+        cert.addSubject(subject);
+      });
+    }
 
-    json['@context'].forEach((context) => {
-      cert.addContext(context);
-    });
-
-    cert.setStatus(json.credentialStatus || json.status)
-      .setIssuanceDate(json.issuanceDate)
-      .setExpirationDate(json.expirationDate);
+    const contexts = json['@context'];
+    if (contexts) {
+      contexts.forEach((context) => {
+        cert.addContext(context);
+      });
+    }
 
     if (json.proof) {
       cert.setProof(json.proof);
@@ -68,6 +73,11 @@ class VerifiableCredential {
       cert.setIssuer(json.issuer);
     }
 
+    cert.setStatus(json.credentialStatus || json.status)
+      .setIssuanceDate(json.issuanceDate)
+      .setExpirationDate(json.expirationDate);
+
+    Object.assign(cert, json);
     return cert;
   }
 

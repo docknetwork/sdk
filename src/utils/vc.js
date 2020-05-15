@@ -146,7 +146,7 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
  */
 
 export async function verifyCredential(credential, resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null) {
-  // TODO: Check schema
+  // TODO: Check schema and fix implementation
   // The method will check that the `credentialSubject` is consistent with `credentialSchema`
   // if `credentialSchema` if `credentialSchema` is present. Uses `validateSchema`.
   if (credential.credentialSubject && credential.credentialSchema) {

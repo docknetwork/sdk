@@ -122,7 +122,7 @@ export default class Schema {
    * @returns {Promise<any>}
    */
   static async getSchema(id, dockApi) {
-    // TODO: requires blob module
+    // TODO: Update implementation to read from chain and format the blob
     if (id === 'invalid-format') {
       throw new Error('Incorrect schema format');
     } else if (id === 'invalid-id') {

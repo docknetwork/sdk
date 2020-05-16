@@ -1,14 +1,17 @@
-import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
+import { randomAsHex, encodeAddress, decodeAddress } from '@polkadot/util-crypto';
+import { u8aToU8a, u8aToString, u8aToHex } from '@polkadot/util';
 import { validate } from 'jsonschema';
 import axios from 'axios';
 
-import JSONSchema07 from '../utils/vc/schemas/schema-draft-07';
 import { getSignatureFromKeyringPair } from '../utils/misc';
+import { isHexWithGivenByteSize } from '../utils/codec';
 import Signature from '../signatures/signature';
 
+// Supported schemas
+import JSONSchema07 from '../utils/vc/schemas/schema-draft-07';
 
+// Blob qualifier
 export const BlobQualifier = 'blob:dock:';
-export const EncodedIDByteSize = 48;
 
 // Size of the blob id in bytes
 export const BLOB_ID_MAX_BYTE_SIZE = 32;
@@ -16,6 +19,50 @@ export const BLOB_ID_MAX_BYTE_SIZE = 32;
 // Maximum size of the blob in bytes
 // implementer may choose to implement this as a dynamic config option settable with the `parameter_type!` macro
 export const BLOB_MAX_BYTE_SIZE = 1024;
+
+/**
+ * Check if the given identifier is 32 byte hex
+ * @param {string} identifier - The identifier to check.
+ * @return {void} Throws exception if invalid identifier
+ */
+export function validateBlobDIDHexIdentifier(identifier) {
+  // Byte size of the Dock DID identifier, i.e. the `DockDIDQualifier` is not counted.
+  if (!isHexWithGivenByteSize(identifier, BLOB_ID_MAX_BYTE_SIZE)) {
+    throw new Error(`DID identifier must be ${BLOB_ID_MAX_BYTE_SIZE} bytes`);
+  }
+}
+
+/**
+ * Gets the hexadecimal value of the given DID.
+ * @param {string} did -  The DID can be passed as fully qualified DID like `blob:dock:<SS58 string>` or
+ * a 32 byte hex string
+ * @return {string} Returns the hexadecimal representation of the DID.
+ */
+export function getHexIdentifierFromDID(did) {
+  if (did.startsWith(BlobQualifier)) {
+    // Fully qualified DID. Remove the qualifier
+    const ss58Did = did.slice(BlobQualifier.length);
+    try {
+      const hex = u8aToHex(decodeAddress(ss58Did));
+      // 2 characters for `0x` and 2*byte size of DID
+      if (hex.length !== (2 + 2 * BLOB_ID_MAX_BYTE_SIZE)) {
+        throw new Error('Unexpected byte size');
+      }
+      return hex;
+    } catch (e) {
+      throw new Error(`Invalid SS58 DID ${did}. ${e}`);
+    }
+  } else {
+    try {
+      // Check if hex and of correct size and return the hex value if successful.
+      validateBlobDIDHexIdentifier(did);
+      return did;
+    } catch (e) {
+      // Cannot parse as hex
+      throw new Error(`Invalid hexadecimal DID ${did}. ${e}`);
+    }
+  }
+}
 
 /**
  * Generates a random schema ID
@@ -34,7 +81,6 @@ export default class Schema {
    * @param {string} [id] - optional schema ID, if not given, generate a random id
    */
   constructor(id) {
-    // TODO: `id` should be validated?
     this.id = id || createNewSchemaID();
     this.name = '';
     this.version = '1.0.0';
@@ -119,17 +165,21 @@ export default class Schema {
    * returned if schema is not found on the chain or in JSON format.
    * @param {string} id - The Schema ID
    * @param {object} dockApi - The Dock API
-   * @returns {Promise<any>}
+   * @returns {Promise<object>}
    */
   static async getSchema(id, dockApi) {
-    // TODO: Update implementation to read from chain and format the blob
-    if (id === 'invalid-format') {
-      throw new Error('Incorrect schema format');
-    } else if (id === 'invalid-id') {
-      throw new Error(`Invalid schema id ${id} ${dockApi}`);
-    }
+    const hexId = getHexIdentifierFromDID(id);
+    const chainBlob = await dockApi.blob.getBlob(hexId);
+    const blobStr = u8aToString(chainBlob[1]);
+    try {
+      const schema = JSON.parse(blobStr);
+      schema.id = id;
+      schema.author = u8aToHex(chainBlob[0]);
 
-    return {};
+      return schema;
+    } catch (e) {
+      throw new Error(`Incorrect schema format: ${e}`);
+    }
   }
 
   /**

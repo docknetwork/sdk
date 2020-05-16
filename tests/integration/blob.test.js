@@ -1,3 +1,4 @@
+import { u8aToU8a, u8aToString, u8aToHex } from '@polkadot/util';
 import { randomAsHex } from '@polkadot/util-crypto';
 
 import { DockAPI } from '../../src/api';
@@ -7,8 +8,9 @@ import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-const
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { verifyCredential } from '../../src/utils/vc';
 import { DockBlobByteSize } from '../../src/modules/blob';
-import Schema from '../../src/modules/schema';
+import Schema, { createNewSchemaID } from '../../src/modules/schema';
 import exampleCredential from '../example-credential';
+import exampleSchema from '../example-schema';
 
 let account;
 let pair;
@@ -160,53 +162,4 @@ describe('Blob Module', () => {
       dock.blob.getBlob(nonExistentBlobId),
     ).rejects.toThrowError('does not exist');
   }, 30000);
-});
-
-// TODO: implement when blobmodule is integrated
-describe('Schema Blob Module Integration', () => {
-  const dock = new DockAPI();
-
-  beforeAll(async (done) => {
-    await dock.init({
-      keyring: TestKeyringOpts,
-      address: FullNodeEndpoint,
-    });
-    done();
-  });
-
-  afterAll(async () => {
-    await dock.disconnect();
-  }, 10000);
-
-  test('getSchema will return schema in correct format.', async () => {
-    await expect(Schema.getSchema('validid', dock)).resolves.toBeDefined();
-  });
-
-  test('getSchema throws error when no blob exists at the given id.', async () => {
-    await expect(Schema.getSchema('invalid-id', dock)).rejects.toThrow(/Invalid schema id/);
-  });
-
-  test('getSchema throws error when schema not in correct format.', async () => {
-    await expect(Schema.getSchema('invalid-format', dock)).rejects.toThrow(/Incorrect schema format/);
-  });
-
-  test('Utility method verifyCredential should check if schema is incompatible with the credentialSubject.', async () => {
-    const vcInvalid = {
-      ...exampleCredential,
-      credentialSubject: {
-        id: 'invalid',
-        notEmailAddress: 'john.smith@example.com',
-        notAlumniOf: 'Example Invalid',
-      }
-    };
-
-    // TODO: fix this test, verifyCredential implementation needs upating
-    await expect(
-      verifyCredential(vcInvalid, null, false, false, { dock })
-    ).rejects.toThrow();
-  });
-
-  test.skip('The verify method should detect a subject with incompatible schema in credentialSchema.', () => {
-    // TODO: write this test implementation
-  });
 });

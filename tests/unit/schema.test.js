@@ -18,27 +18,9 @@ import {
 import { PublicKeySecp256k1 } from '../../src/public-keys';
 import { SignatureSecp256k1 } from '../../src/signatures';
 import exampleCredential from '../example-credential';
+import exampleSchema from '../example-schema';
 
 const exampleAuthor = 'did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW';
-const exampleAlumniSchema = {
-  $schema: 'http://json-schema.org/draft-07/schema#',
-  description: 'Alumni',
-  type: 'object',
-  properties: {
-    id: {
-      type: 'string',
-    },
-    emailAddress: {
-      type: 'string',
-      format: 'email',
-    },
-    alumniOf: {
-      type: 'string',
-    },
-  },
-  required: ['emailAddress', 'alumniOf'],
-  additionalProperties: false,
-};
 
 describe('VerifiableCredential Tests', () => {
   const vc = new VerifiableCredential(exampleCredential.id);
@@ -55,7 +37,7 @@ describe('VerifiableCredential Tests', () => {
   });
 
   test('VerifiableCredential\'s validateSchema should validate the credentialSubject with given JSON schema.', async () => {
-    await expect(vc.validateSchema(exampleAlumniSchema)).toBe(true);
+    await expect(vc.validateSchema(exampleSchema)).toBe(true);
   });
 });
 
@@ -75,7 +57,8 @@ describe('Basic Schema Tests', () => {
 
   test('accepts the id optionally and generates id of correct size when id is not given', () => {
     const schemaNoID = new Schema();
-    expect(schemaNoID.id && schemaNoID.id.length).toBe(EncodedIDByteSize + BlobQualifier.length);
+    const encodedIDByteSize = 48;
+    expect(schemaNoID.id && schemaNoID.id.length).toBe(encodedIDByteSize + BlobQualifier.length);
   });
 
   test('setAuthor will set the author and accepts a DID identifier or full DID', () => {
@@ -88,8 +71,8 @@ describe('Basic Schema Tests', () => {
       invalidSchema: true,
     })).rejects.toThrow();
 
-    await schema.setJSONSchema(exampleAlumniSchema);
-    expect(schema.schema).toBe(exampleAlumniSchema);
+    await schema.setJSONSchema(exampleSchema);
+    expect(schema.schema).toBe(exampleSchema);
   });
 
   test('setSignature will only accept signature of the supported types and set the signature key of the object.', () => {
@@ -106,7 +89,7 @@ describe('Basic Schema Tests', () => {
   });
 
   test('validateSchema will check that the given schema is a valid JSON-schema.', async () => {
-    await expect(Schema.validateSchema(exampleAlumniSchema)).resolves.toBeDefined();
+    await expect(Schema.validateSchema(exampleSchema)).resolves.toBeDefined();
   });
 
   test('toJSON will generate a JSON that can be sent to chain.', () => {
@@ -124,7 +107,7 @@ describe('Validate Credential Schema utility', () => {
   const schema = new Schema();
   schema.name = 'AlumniCredSchema';
   schema.version = '1.0.0';
-  schema.setJSONSchema(exampleAlumniSchema);
+  schema.setJSONSchema(exampleSchema);
   schema.setAuthor(exampleAuthor);
 
   test('credentialSubject has same fields and fields have same types as JSON-schema', () => {
@@ -148,7 +131,7 @@ describe('Validate Credential Schema utility', () => {
   });
 
   test('The schema\'s properties is missing the required key and credentialSubject can omit some of the properties.', async () => {
-    const nonRequiredSchema = { ...exampleAlumniSchema };
+    const nonRequiredSchema = { ...exampleSchema };
     delete nonRequiredSchema.required;
     await schema.setJSONSchema(nonRequiredSchema);
 
@@ -170,7 +153,7 @@ describe('Validate Credential Schema utility', () => {
   test('credentialSubject has extra fields than given schema specifies and additionalProperties is true.', async () => {
     const credentialSubject = { ...exampleCredential.credentialSubject, additionalProperty: true };
     await schema.setJSONSchema({
-      ...exampleAlumniSchema,
+      ...exampleSchema,
       additionalProperties: true,
     });
 
@@ -182,7 +165,7 @@ describe('Validate Credential Schema utility', () => {
   test('credentialSubject has extra fields than given schema specifies and additionalProperties has certain type.', async () => {
     const credentialSubject = { ...exampleCredential.credentialSubject, additionalString: 'mystring' };
     await schema.setJSONSchema({
-      ...exampleAlumniSchema,
+      ...exampleSchema,
       additionalProperties: { type: 'string' },
     });
 
@@ -200,9 +183,9 @@ describe('Validate Credential Schema utility', () => {
     };
 
     await schema.setJSONSchema({
-      ...exampleAlumniSchema,
+      ...exampleSchema,
       properties: {
-        ...exampleAlumniSchema.properties,
+        ...exampleSchema.properties,
         nestedFields: {
           properties: {
             test: {

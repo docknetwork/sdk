@@ -1,5 +1,5 @@
 import { randomAsHex, encodeAddress, decodeAddress } from '@polkadot/util-crypto';
-import { u8aToU8a, u8aToString, u8aToHex } from '@polkadot/util';
+import { u8aToString, u8aToHex } from '@polkadot/util';
 import { validate } from 'jsonschema';
 import axios from 'axios';
 

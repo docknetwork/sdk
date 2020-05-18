@@ -93,6 +93,7 @@ export default class Schema {
   async setJSONSchema(json) {
     await Schema.validateSchema(json);
     this.schema = json;
+    return this;
   }
 
   /**
@@ -103,6 +104,7 @@ export default class Schema {
   setAuthor(did) {
     // TODO: `did` should be validated, do a best effort. Check either 32 byte (use constant) hex or a valid Dock DID or starts with 'did'
     this.author = did;
+    return this;
   }
 
   /**
@@ -118,6 +120,8 @@ export default class Schema {
     } else {
       throw new Error('Provided signature object is not of instance Signature');
     }
+
+    return this;
   }
 
   /**
@@ -126,10 +130,11 @@ export default class Schema {
   * keep resetting the `signature` key
   * @param {object} pair - Key pair to sign with
   */
-  sign(pair) {
+  sign(dockApi, pair) {
     // TODO: proper message when we have getSerializedBlob from fausto
-    const msg = [1, 2, 3, 4];
+    const msg = dockApi.blob.getSerializedBlob();
     this.signature = getSignatureFromKeyringPair(pair, msg);
+    return this;
   }
 
   /**

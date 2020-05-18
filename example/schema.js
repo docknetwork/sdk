@@ -1,7 +1,6 @@
-import Schema from '../src/modules/schema';
-import { validateCredentialSchema } from '../src/utils/vc';
 import { randomAsHex } from '@polkadot/util-crypto';
-import { u8aToU8a, u8aToString, u8aToHex } from '@polkadot/util';
+import { u8aToU8a, u8aToHex } from '@polkadot/util';
+import Schema from '../src/modules/schema';
 
 import { DockAPI } from '../src/api';
 import { DockBlobByteSize } from '../src/modules/blob';
@@ -13,9 +12,6 @@ import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 
 async function main() {
-  // Generate aDID to be used as author
-  const dockDID = createNewDockDID();
-
   console.log('Connecting to the node...');
   const dock = new DockAPI();
   await dock.init({
@@ -25,6 +21,17 @@ async function main() {
   console.log('Setting sdk account...');
   const account = dock.keyring.addFromUri(TestAccountURI);
   dock.setAccount(account);
+
+  // Generate aDID to be used as author
+  const dockDID = createNewDockDID();
+
+  console.log('Creating new DID', dockDID);
+
+  // Generate first key with this seed. The key type is Sr25519
+  const pair = dock.keyring.addFromUri(randomAsHex(32));
+  const publicKey = getPublicKeyFromKeyringPair(pair);
+  const keyDetail = createKeyDetail(publicKey, dockDID);
+  await dock.sendTransaction(dock.did.new(dockDID, keyDetail));
 
   console.log('Creating a new schema...');
   const schema = new Schema();
@@ -56,28 +63,25 @@ async function main() {
   // TODO: Sign the schema
   // schema.sign(msg, account);
 
-  console.log('The schema is:', schema.toJSON());
-
-  console.log('Creating new DID', dockDID);
-
-  // Generate first key with this seed. The key type is Sr25519
-  const pair = dock.keyring.addFromUri(randomAsHex(32));
-
-  const publicKey = getPublicKeyFromKeyringPair(pair);
-  const keyDetail = createKeyDetail(publicKey, dockDID);
-  await dock.sendTransaction(dock.did.new(dockDID, keyDetail));
+  console.log('The schema is:', JSON.stringify(schema.toJSON(), null, 2));
 
   const blobId = randomAsHex(DockBlobByteSize);
-  const blobStr = JSON.stringify(schema.toJSON());
+  // const blobStr = JSON.stringify(schema.toJSON());
+  const blobStr = JSON.stringify({
+    oops: true,
+  });
 
   console.log('Writing schema to the chain with blob id of', blobId, '...');
 
-  await dock.sendTransaction(dock.blob.new({
-      id: blobId,
-      blob: u8aToU8a(blobStr),
-      author: getHexIdentifierFromDID(dockDID),
-    }, pair
-  ), false);
+  const blob = {
+    id: blobId,
+    blob: u8aToHex(u8aToU8a(blobStr)),
+    author: getHexIdentifierFromDID(dockDID),
+  };
+
+  console.log('Sending blob', blob);
+
+  await dock.sendTransaction(dock.blob.new(blob, pair), false);
 
   console.log('Blog written, reading from chain...');
 

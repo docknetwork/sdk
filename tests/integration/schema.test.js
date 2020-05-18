@@ -49,7 +49,7 @@ describe('Schema Blob Module Integration', () => {
     invalidFormatBlobId = randomAsHex(DockBlobByteSize);
     await dock.sendTransaction(dock.blob.new({
         id: invalidFormatBlobId,
-        blob: u8aToU8a('hello world'),
+        blob: u8aToHex(u8aToU8a('hello world')),
         author: getHexIdentifierFromDID(dockDID),
       }, pair
     ), false);
@@ -58,7 +58,7 @@ describe('Schema Blob Module Integration', () => {
     const blobStr = JSON.stringify(exampleSchema);
     await dock.sendTransaction(dock.blob.new({
         id: blobId,
-        blob: u8aToU8a(blobStr),
+        blob: u8aToHex(u8aToU8a(blobStr)),
         author: getHexIdentifierFromDID(dockDID),
       }, pair
     ), false);

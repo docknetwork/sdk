@@ -66,10 +66,7 @@ async function main() {
   console.log('The schema is:', JSON.stringify(schema.toJSON(), null, 2));
 
   const blobId = randomAsHex(DockBlobByteSize);
-  // const blobStr = JSON.stringify(schema.toJSON());
-  const blobStr = JSON.stringify({
-    oops: true,
-  });
+  const blobStr = JSON.stringify(schema.toJSON());
 
   console.log('Writing schema to the chain with blob id of', blobId, '...');
 
@@ -79,7 +76,7 @@ async function main() {
     author: getHexIdentifierFromDID(dockDID),
   };
 
-  console.log('Sending blob', blob);
+  console.log('Sending blob', blob, '...');
 
   await dock.sendTransaction(dock.blob.new(blob, pair), false);
 

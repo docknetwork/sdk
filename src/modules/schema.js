@@ -3,7 +3,6 @@ import { u8aToString, u8aToHex } from '@polkadot/util';
 import { validate } from 'jsonschema';
 import axios from 'axios';
 
-import { getHexIdentifierFromDID } from '../utils/did';
 import { getSignatureFromKeyringPair } from '../utils/misc';
 import { isHexWithGivenByteSize } from '../utils/codec';
 import Signature from '../signatures/signature';
@@ -11,7 +10,6 @@ import Signature from '../signatures/signature';
 // Supported schemas
 import JSONSchema07 from '../utils/vc/schemas/schema-draft-07';
 
-// TODO: use these from blob instead
 // Blob qualifier
 export const BlobQualifier = 'blob:dock:';
 
@@ -40,7 +38,7 @@ export function validateBlobDIDHexIdentifier(identifier) {
  * a 32 byte hex string
  * @return {string} Returns the hexadecimal representation of the DID.
  */
-export function getHexIdentifierFromBlobDID(did) {
+export function getHexIdentifierFromDID(did) {
   if (did.startsWith(BlobQualifier)) {
     // Fully qualified DID. Remove the qualifier
     const ss58Did = did.slice(BlobQualifier.length);
@@ -95,12 +93,6 @@ export default class Schema {
   async setJSONSchema(json) {
     await Schema.validateSchema(json);
     this.schema = json;
-    return this;
-  }
-
-  setName(name) {
-    this.name = name;
-    return this;
   }
 
   /**
@@ -111,7 +103,6 @@ export default class Schema {
   setAuthor(did) {
     // TODO: `did` should be validated, do a best effort. Check either 32 byte (use constant) hex or a valid Dock DID or starts with 'did'
     this.author = did;
-    return this;
   }
 
   /**
@@ -127,26 +118,24 @@ export default class Schema {
     } else {
       throw new Error('Provided signature object is not of instance Signature');
     }
-
-    return this;
   }
 
   /**
   * Serializes the object using `getSerializedBlob` and then signs it using the given
   * polkadot-js pair. The object will be updated with key `signature`. Repeatedly calling it will
   * keep resetting the `signature` key
-  * @param {any} msg - The message to sign
   * @param {object} pair - Key pair to sign with
   */
-  sign(msg, pair) {
+  sign(pair) {
+    // TODO: proper message when we have getSerializedBlob from fausto
+    const msg = [1, 2, 3, 4];
     this.signature = getSignatureFromKeyringPair(pair, msg);
-    return this;
   }
 
   /**
    * Serializes to JSON for sending to the node, as `Blob`. A full DID is converted to the
    * hex identifier and signature object is converted to the enum
-   * @returns {object}
+   * @returns {any}
    */
   toJSON() {
     const {
@@ -154,18 +143,6 @@ export default class Schema {
       ...rest
     } = this;
     return rest;
-  }
-
-  /**
-   * Serializes the schema to a blob object to send to the node
-   * @returns {object}
-   */
-  toBlob(id, did) {
-    return {
-      id: id || randomAsHex(DockBlobByteSize),
-      blob: u8aToHex(u8aToU8a(JSON.stringify(this.toJSON()))),
-      author: getHexIdentifierFromDID(did),
-    };
   }
 
   /**
@@ -191,7 +168,7 @@ export default class Schema {
    * @returns {Promise<object>}
    */
   static async getSchema(id, dockApi) {
-    const hexId = getHexIdentifierFromBlobDID(id);
+    const hexId = getHexIdentifierFromDID(id);
     const chainBlob = await dockApi.blob.getBlob(hexId);
     const blobStr = u8aToString(chainBlob[1]);
     try {

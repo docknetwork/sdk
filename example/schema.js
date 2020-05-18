@@ -2,7 +2,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import Schema from '../src/modules/schema';
 
 import { DockAPI } from '../src/api';
-import { DockBlobByteSize } from '../src/modules/blob';
+import { DockBlobIdByteSize } from '../src/modules/blob';
 import { createNewDockDID, createKeyDetail } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 
@@ -64,7 +64,7 @@ async function main() {
 
   console.log('The schema is:', JSON.stringify(schema.toJSON(), null, 2));
 
-  const blobId = randomAsHex(DockBlobByteSize);
+  const blobId = randomAsHex(DockBlobIdByteSize);
   const blob = schema.toBlob(blobId, dockDID);
 
   console.log('Writing schema to the chain with blob id of', blobId, '...');

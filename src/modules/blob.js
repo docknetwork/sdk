@@ -57,7 +57,7 @@ class BlobModule {
 
   /**
    * Serializes the `Blob` (for signing before sending to the node)
-   * * @param {object} blob - `Blob` as expected by the Substrate node
+   * @param {object} blob - `Blob` as expected by the Substrate node
    * @returns {Array} An array of Uint8
    */
   getSerializedBlob(blob) {

@@ -76,7 +76,7 @@ describe('Basic Schema Tests', () => {
   });
 
   test('setSignature will only accept signature of the supported types and set the signature key of the object.', () => {
-    const msg = [1, 2, 3, 4];
+    const msg = [1, 2, 3, 4]; // TODO: getSerializedBlob?
     const pk = getPublicKeyFromKeyringPair(keypair);
     const sig = new SignatureSecp256k1(msg, keypair);
     schema.setSignature(sig);
@@ -84,7 +84,8 @@ describe('Basic Schema Tests', () => {
   });
 
   test('sign will generate a signature on the schema detail, this signature is verifiable.', () => {
-    schema.sign(keypair);
+    const msg = [1, 2, 3, 4]; // TODO: getSerializedBlob?
+    schema.sign(msg, keypair);
     expect(!!schema.signature).toBe(true);
   });
 

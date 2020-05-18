@@ -9,6 +9,7 @@ import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { verifyCredential } from '../../src/utils/vc';
 import { DockBlobByteSize } from '../../src/modules/blob';
 import Schema, { createNewSchemaID } from '../../src/modules/schema';
+import VerifiableCredential from '../../src/verifiable-credential';
 import exampleCredential from '../example-credential';
 import exampleSchema from '../example-schema';
 
@@ -86,23 +87,26 @@ describe('Schema Blob Module Integration', () => {
     await expect(Schema.getSchema(createNewSchemaID(), dock)).rejects.toThrow(/does not exist/);
   }, 30000);
 
-  test('Utility method verifyCredential should check if schema is incompatible with the credentialSubject.', async () => {
-    const vcInvalid = {
-      ...exampleCredential,
-      credentialSubject: {
-        id: 'invalid',
-        notEmailAddress: 'john.smith@example.com',
-        notAlumniOf: 'Example Invalid',
-      }
-    };
+  const vcInvalid = {
+    ...exampleCredential,
+    credentialSubject: {
+      id: 'invalid',
+      notEmailAddress: 'john.smith@example.com',
+      notAlumniOf: 'Example Invalid',
+    }
+  };
 
-    // TODO: fix this test, verifyCredential implementation needs upating
+  // TODO: these two tests should pass once verifyCredential has been updated
+  test('Utility method verifyCredential should check if schema is incompatible with the credentialSubject.', async () => {
     await expect(
       verifyCredential(vcInvalid, null, false, false, { dock })
     ).rejects.toThrow();
   }, 30000);
 
-  test.skip('The verify method should detect a subject with incompatible schema in credentialSchema.', async () => {
-    // TODO: write this test implementation
+  test('The verify method should detect a subject with incompatible schema in credentialSchema.', async () => {
+    const vc = VerifiableCredential.fromJSON(vcInvalid);
+    await expect(
+      vc.verify(null, false, false, { dock })
+    ).rejects.toThrow();
   }, 30000);
 });

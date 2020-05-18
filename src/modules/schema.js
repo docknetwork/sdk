@@ -96,6 +96,11 @@ export default class Schema {
     return this;
   }
 
+  setName(name) {
+    this.name = name;
+    return this;
+  }
+
   /**
   * Update the object with `author` key. Repeatedly calling it will keep resetting the author
   * did can be a DID hex identifier or full DID

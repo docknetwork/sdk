@@ -3,7 +3,7 @@ import { Keyring } from '@polkadot/api';
 import { hexToU8a } from '@polkadot/util';
 
 import VerifiableCredential from '../../src/verifiable-credential';
-import Schema, { BlobQualifier, EncodedIDByteSize } from '../../src/modules/schema';
+import Schema, { BlobQualifier } from '../../src/modules/schema';
 
 import {
   generateEcdsaSecp256k1Keypair,

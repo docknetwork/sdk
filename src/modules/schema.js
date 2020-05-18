@@ -128,11 +128,10 @@ export default class Schema {
   * Serializes the object using `getSerializedBlob` and then signs it using the given
   * polkadot-js pair. The object will be updated with key `signature`. Repeatedly calling it will
   * keep resetting the `signature` key
+  * @param {any} msg - The message to sign
   * @param {object} pair - Key pair to sign with
   */
-  sign(dockApi, pair) {
-    // TODO: proper message when we have getSerializedBlob from fausto
-    const msg = dockApi.blob.getSerializedBlob();
+  sign(msg, pair) {
     this.signature = getSignatureFromKeyringPair(pair, msg);
     return this;
   }

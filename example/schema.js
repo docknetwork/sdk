@@ -70,14 +70,7 @@ async function main() {
 
   console.log('Writing schema to the chain with blob id of', blobId, '...');
 
-  const blob = {
-    id: blobId,
-    blob: u8aToHex(u8aToU8a(blobStr)),
-    author: getHexIdentifierFromDID(dockDID),
-  };
-
-  console.log('Sending blob', blob, '...');
-
+  const blob = schema.toBlob(blobId, dockDID);
   await dock.sendTransaction(dock.blob.new(blob, pair), false);
 
   console.log('Blog written, reading from chain...');

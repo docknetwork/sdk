@@ -8,8 +8,6 @@ import { getSignatureFromKeyringPair } from '../utils/misc';
 import { isHexWithGivenByteSize } from '../utils/codec';
 import Signature from '../signatures/signature';
 
-import { DockBlobByteSize } from './blob';
-
 // Supported schemas
 import JSONSchema07 from '../utils/vc/schemas/schema-draft-07';
 

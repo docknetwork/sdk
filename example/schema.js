@@ -1,10 +1,9 @@
 import { randomAsHex } from '@polkadot/util-crypto';
-import { u8aToU8a, u8aToHex } from '@polkadot/util';
 import Schema from '../src/modules/schema';
 
 import { DockAPI } from '../src/api';
 import { DockBlobByteSize } from '../src/modules/blob';
-import { createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../src/utils/did';
+import { createNewDockDID, createKeyDetail } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 
 // The following can be tweaked depending on where the node is running and what
@@ -66,11 +65,10 @@ async function main() {
   console.log('The schema is:', JSON.stringify(schema.toJSON(), null, 2));
 
   const blobId = randomAsHex(DockBlobByteSize);
-  const blobStr = JSON.stringify(schema.toJSON());
+  const blob = schema.toBlob(blobId, dockDID);
 
   console.log('Writing schema to the chain with blob id of', blobId, '...');
 
-  const blob = schema.toBlob(blobId, dockDID);
   await dock.sendTransaction(dock.blob.new(blob, pair), false);
 
   console.log('Blog written, reading from chain...');

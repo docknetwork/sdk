@@ -11,6 +11,7 @@ import {
 } from './vc/custom_crypto';
 
 import DIDResolver from '../did-resolver'; // eslint-disable-line
+import Schema from '../modules/schema';
 /**
  * @typedef {object} VerifiablePresentation Representation of a Verifiable Presentation.
  */
@@ -22,8 +23,6 @@ export const DockRevRegQualifier = 'rev-reg:dock:';
 
 // const {Ed25519Signature2018} = suites;
 
-// TODO: discuss whether we still want to allow usage of the signing functionality outside of credentials created with
-// our VerifiableCredential class.
 /**
  * Get signature suite from a keyDoc
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
@@ -141,27 +140,23 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
  * @param {object} [revocationAPI] - An object representing a map. "revocation type -> revocation API". The API is used to check
  * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+ * @param {object} [schemaApi] - An object representing a map. "schema type -> schema API". The API is used to get
+ * a schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
+ * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
  * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
  * credential is valid and not revoked and false otherwise. The `error` will describe the error if any.
  */
 
-export async function verifyCredential(credential, resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null) {
-  // TODO: Check schema and fix implementation
-  // The method will check that the `credentialSubject` is consistent with `credentialSchema`
-  // if `credentialSchema` if `credentialSchema` is present. Uses `validateSchema`.
+export async function verifyCredential(credential, resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null, schemaApi = null) {
   if (credential.credentialSubject && credential.credentialSchema) {
-    console.log('credential.credentialSubject', credential.credentialSubject);
-    console.log('credential.credentialSchema', credential.credentialSchema);
-
-    // TODO: need to fetch schema def from did using id
-    // credential.credentialSchema
-    // { id, name, version }
-
+    if (!schemaApi.dock) {
+      throw new Error('Only Dock schemas are supported as of now.');
+    }
     try {
-      // TODO: needs proper schema definition
-      // validateCredentialSchema(credential, credential.credentialSchema);
+      const schema = await Schema.getSchema(credential.credentialSchema.id, schemaApi.dock);
+      validateCredentialSchema(credential, schema);
     } catch (e) {
-      throw new Error(`Subject is incompatible with schema ${e}`);
+      throw new Error(`Schema validation failed: ${e}`);
     }
   }
 
@@ -335,6 +330,5 @@ export function validateCredentialSchema(credential, schema) {
       throwError: true,
     });
   }
-
   return true;
 }

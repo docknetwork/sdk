@@ -3,8 +3,8 @@ import { Keyring } from '@polkadot/api';
 import { hexToU8a } from '@polkadot/util';
 
 import VerifiableCredential from '../../src/verifiable-credential';
-import Schema, { BlobQualifier, EncodedIDByteSize } from '../../src/modules/schema';
-
+import Schema, { EncodedIDByteSize } from '../../src/modules/schema';
+import { DockBlobQualifier } from '../../src/modules/blob';
 import {
   generateEcdsaSecp256k1Keypair,
   getPublicKeyFromKeyringPair,
@@ -58,7 +58,7 @@ describe('Basic Schema Tests', () => {
   test('accepts the id optionally and generates id of correct size when id is not given', () => {
     const schemaNoID = new Schema();
     const encodedIDByteSize = 48;
-    expect(schemaNoID.id && schemaNoID.id.length).toBe(encodedIDByteSize + BlobQualifier.length);
+    expect(schemaNoID.id && schemaNoID.id.length).toBe(encodedIDByteSize + DockBlobQualifier.length);
   });
 
   test('setAuthor will set the author and accepts a DID identifier or full DID', () => {
@@ -179,7 +179,7 @@ describe('Validate Credential Schema utility', () => {
       ...exampleCredential.credentialSubject,
       nestedFields: {
         test: true,
-      }
+      },
     };
 
     await schema.setJSONSchema({

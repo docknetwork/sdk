@@ -1,5 +1,5 @@
 import { randomAsHex, encodeAddress, decodeAddress } from '@polkadot/util-crypto';
-import { u8aToU8a, u8aToString, u8aToHex } from '@polkadot/util';
+import { u8aToString, u8aToHex } from '@polkadot/util';
 import { validate } from 'jsonschema';
 import axios from 'axios';
 
@@ -10,6 +10,7 @@ import Signature from '../signatures/signature';
 // Supported schemas
 import JSONSchema07 from '../utils/vc/schemas/schema-draft-07';
 
+// TODO: use these from blob instead
 // Blob qualifier
 export const BlobQualifier = 'blob:dock:';
 
@@ -110,7 +111,7 @@ export default class Schema {
   * signing key/capability is not present and the signature is received from outside.
   * Repeatedly calling it will keep resetting the `signature` key.
   * The signature must be one of the supported objects
-  * @param {object} signature - The schema's signatuer
+  * @param {object} signature - The schema's signature
   */
   setSignature(signature) {
     if (signature instanceof Signature) {

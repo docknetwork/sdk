@@ -1,4 +1,4 @@
-import { u8aToU8a } from '@polkadot/util';
+import { u8aToHex, u8aToU8a } from '@polkadot/util';
 import { randomAsHex } from '@polkadot/util-crypto';
 
 import { DockAPI } from '../../src/api';
@@ -6,12 +6,12 @@ import { DockAPI } from '../../src/api';
 import { createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
-import { validateCredentialSchema, verifyCredential } from '../../src/utils/vc';
+import { verifyCredential } from '../../src/utils/vc';
 import { DockBlobIdByteSize } from '../../src/modules/blob';
 import Schema, { createNewSchemaID } from '../../src/modules/schema';
+import VerifiableCredential from '../../src/verifiable-credential';
 import exampleCredential from '../example-credential';
 import exampleSchema from '../example-schema';
-import VerifiableCredential from '../../src/verifiable-credential';
 
 let account;
 let pair;
@@ -19,6 +19,7 @@ let publicKey;
 let dockDID;
 let keyDetail;
 let blobId;
+// eslint-disable-next-line no-unused-vars
 let vcInvalid;
 
 describe('Schema Blob Module Integration', () => {
@@ -46,7 +47,7 @@ describe('Schema Blob Module Integration', () => {
     invalidFormatBlobId = randomAsHex(DockBlobIdByteSize);
     await dock.sendTransaction(dock.blob.new({
       id: invalidFormatBlobId,
-      blob: u8aToU8a('hello world'),
+      blob: u8aToHex(u8aToU8a('hello world')),
       author: getHexIdentifierFromDID(dockDID),
     }, pair), false);
 

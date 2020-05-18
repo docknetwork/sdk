@@ -44,6 +44,8 @@
     "did-resolver-example": "npx babel-node example/resolver.js",
     "revocation-example": "npx babel-node example/revocation.js",
     "vcdm-example": "npx babel-node example/vcdm.js",
+    "schema-example": "npx babel-node example/schema.js",
+    "blob-example": "npx babel-node example/blob.js",
     "dev-node": "./scripts/run_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
     "test-with-node": "./scripts/with_docker_test_node yarn test-integration",
     "mdbook": "mdbook build tutorials --dest-dir ../out/tutorials",
@@ -53,9 +55,9 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "@polkadot/api": "1.13.1",
+    "@polkadot/api": "1.14.1",
     "@polkadot/keyring": "2.9.1",
-    "@polkadot/util": "2.9.1",
+    "@polkadot/util": "2.10.1",
     "@polkadot/util-crypto": "2.9.1",
     "axios": "^0.19.2",
     "bs58": "^4.0.1",

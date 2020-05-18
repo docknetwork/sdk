@@ -3,19 +3,17 @@ import { Keyring } from '@polkadot/api';
 import { hexToU8a } from '@polkadot/util';
 
 import VerifiableCredential from '../../src/verifiable-credential';
-import Schema, { EncodedIDByteSize } from '../../src/modules/schema';
+import Schema from '../../src/modules/schema';
 import { DockBlobQualifier } from '../../src/modules/blob';
+
 import {
-  generateEcdsaSecp256k1Keypair,
   getPublicKeyFromKeyringPair,
 } from '../../src/utils/misc';
 
 import {
   validateCredentialSchema,
-  verifyCredential,
 } from '../../src/utils/vc';
 
-import { PublicKeySecp256k1 } from '../../src/public-keys';
 import { SignatureSecp256k1 } from '../../src/signatures';
 import exampleCredential from '../example-credential';
 import exampleSchema from '../example-schema';
@@ -76,7 +74,7 @@ describe('Basic Schema Tests', () => {
   });
 
   test('setSignature will only accept signature of the supported types and set the signature key of the object.', () => {
-    const msg = [1, 2, 3, 4];
+    const msg = [1, 2, 3, 4]; // TODO: getSerializedBlob?
     const pk = getPublicKeyFromKeyringPair(keypair);
     const sig = new SignatureSecp256k1(msg, keypair);
     schema.setSignature(sig);
@@ -84,7 +82,8 @@ describe('Basic Schema Tests', () => {
   });
 
   test('sign will generate a signature on the schema detail, this signature is verifiable.', () => {
-    schema.sign(keypair);
+    const msg = [1, 2, 3, 4]; // TODO: getSerializedBlob?
+    schema.sign(msg, keypair);
     expect(!!schema.signature).toBe(true);
   });
 

@@ -74,8 +74,10 @@ class VerifiableCredential {
       cert.setIssuer(json.issuer);
     }
 
-
-    cert.setStatus(json.credentialStatus || json.status);
+    const status = (json.credentialStatus || json.status);
+    if (status) {
+      cert.setStatus(status);
+    }
 
     if (json.issuanceDate) {
       cert.setIssuanceDate(json.issuanceDate);

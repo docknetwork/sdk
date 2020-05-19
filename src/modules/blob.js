@@ -4,14 +4,14 @@ import NoBlobError from '../utils/errors/no-blob-error';
 
 export const DockBlobMethod = 'dock';
 export const DockBlobQualifier = `blob:${DockBlobMethod}:`;
-export const DockBlobByteSize = 32;
+export const DockBlobIdByteSize = 32;
 
 /**
  * Create and return a fully qualified Dock Blob, i.e. "did:dock:<SS58 string>"
  * @returns {string} - The Blob
  */
 export function createNewDockBlobId() {
-  const hexId = randomAsHex(DockBlobByteSize);
+  const hexId = randomAsHex(DockBlobIdByteSize);
   return blobHexIdToQualified(hexId);
 }
 

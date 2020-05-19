@@ -7,7 +7,7 @@ import { createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../.
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { verifyCredential } from '../../src/utils/vc';
-import { DockBlobByteSize } from '../../src/modules/blob';
+import { DockBlobIdByteSize } from '../../src/modules/blob';
 import Schema, { createNewSchemaID } from '../../src/modules/schema';
 import exampleCredential from '../example-credential';
 import exampleSchema from '../example-schema';
@@ -61,7 +61,7 @@ describe('Blob Module', () => {
     txDid = dock.did.new(dockDID, keyDetail);
     resultDid = await dock.sendTransaction(txDid);
     didDoc = await dock.did.getDocument(dockDID);
-    blobId = randomAsHex(DockBlobByteSize);
+    blobId = randomAsHex(DockBlobIdByteSize);
   }, 10000);
 
 
@@ -157,7 +157,7 @@ describe('Blob Module', () => {
 
 
   test('Should throw error when cannot read blob with given id from chain.', async () => {
-    const nonExistentBlobId = randomAsHex(DockBlobByteSize);
+    const nonExistentBlobId = randomAsHex(DockBlobIdByteSize);
     await expect(
       dock.blob.getBlob(nonExistentBlobId),
     ).rejects.toThrowError('does not exist');

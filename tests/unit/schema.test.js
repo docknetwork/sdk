@@ -1,22 +1,20 @@
-import { cryptoWaitReady } from '@polkadot/util-crypto';
+import { cryptoWaitReady, randomAsHex } from '@polkadot/util-crypto';
 import { Keyring } from '@polkadot/api';
 import { hexToU8a } from '@polkadot/util';
 
 import VerifiableCredential from '../../src/verifiable-credential';
-import Schema, { BlobQualifier } from '../../src/modules/schema';
+import Schema from '../../src/modules/schema';
+import { DockBlobQualifier } from '../../src/modules/blob';
 
 import {
-  generateEcdsaSecp256k1Keypair,
   getPublicKeyFromKeyringPair,
 } from '../../src/utils/misc';
 
 import {
   validateCredentialSchema,
-  verifyCredential,
 } from '../../src/utils/vc';
 
-import { PublicKeySecp256k1 } from '../../src/public-keys';
-import { SignatureSecp256k1 } from '../../src/signatures';
+import { SignatureSr25519 } from '../../src/signatures';
 import exampleCredential from '../example-credential';
 import exampleSchema from '../example-schema';
 
@@ -43,22 +41,24 @@ describe('VerifiableCredential Tests', () => {
 
 describe('Basic Schema Tests', () => {
   let keypair;
+  let schema;
   beforeAll(async (done) => {
     await cryptoWaitReady();
     const keyring = new Keyring();
     const seed = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-    keypair = keyring.addFromSeed(hexToU8a(seed), {}, 'sr25519');
-    done();
-  });
+    keypair = keyring.addFromUri(randomAsHex(32), null, 'sr25519');
 
-  const schema = new Schema('blob:dock:5C78GCA');
-  schema.name = 'AlumniCredSchema';
-  schema.version = '1.0.0';
+    schema = new Schema('blob:dock:5C78GCA');
+    schema.name = 'AlumniCredSchema';
+    schema.version = '1.0.0';
+
+    done();
+  }, 10000);
 
   test('accepts the id optionally and generates id of correct size when id is not given', () => {
     const schemaNoID = new Schema();
     const encodedIDByteSize = 48;
-    expect(schemaNoID.id && schemaNoID.id.length).toBe(encodedIDByteSize + BlobQualifier.length);
+    expect(schemaNoID.id && schemaNoID.id.length).toBe(encodedIDByteSize + DockBlobQualifier.length);
   });
 
   test('setAuthor will set the author and accepts a DID identifier or full DID', () => {
@@ -78,7 +78,7 @@ describe('Basic Schema Tests', () => {
   test('setSignature will only accept signature of the supported types and set the signature key of the object.', () => {
     const msg = [1, 2, 3, 4]; // TODO: getSerializedBlob?
     const pk = getPublicKeyFromKeyringPair(keypair);
-    const sig = new SignatureSecp256k1(msg, keypair);
+    const sig = new SignatureSr25519(msg, keypair);
     schema.setSignature(sig);
     expect(schema.signature).toBe(sig);
   });
@@ -180,7 +180,7 @@ describe('Validate Credential Schema utility', () => {
       ...exampleCredential.credentialSubject,
       nestedFields: {
         test: true,
-      }
+      },
     };
 
     await schema.setJSONSchema({

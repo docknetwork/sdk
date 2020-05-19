@@ -8,7 +8,7 @@ import { getSignatureFromKeyringPair } from '../utils/misc';
 import { isHexWithGivenByteSize } from '../utils/codec';
 import Signature from '../signatures/signature';
 
-import { DockBlobByteSize } from './blob';
+import { DockBlobIdByteSize } from './blob';
 
 // Supported schemas
 import JSONSchema07 from '../utils/vc/schemas/schema-draft-07';
@@ -105,10 +105,10 @@ export default class Schema {
   }
 
   /**
-  * Update the object with `author` key. Repeatedly calling it will keep resetting the author
-  * did can be a DID hex identifier or full DID
-  * @param {string} did - the author DID
-  */
+   * Update the object with `author` key. Repeatedly calling it will keep resetting the author
+   * did can be a DID hex identifier or full DID
+   * @param {string} did - the author DID
+   */
   setAuthor(did) {
     // TODO: `did` should be validated, do a best effort. Check either 32 byte (use constant) hex or a valid Dock DID or starts with 'did'
     this.author = did;
@@ -116,12 +116,12 @@ export default class Schema {
   }
 
   /**
-  * Update the object with `signature` key. This method is used when
-  * signing key/capability is not present and the signature is received from outside.
-  * Repeatedly calling it will keep resetting the `signature` key.
-  * The signature must be one of the supported objects
-  * @param {object} signature - The schema's signatuer
-  */
+   * Update the object with `signature` key. This method is used when
+   * signing key/capability is not present and the signature is received from outside.
+   * Repeatedly calling it will keep resetting the `signature` key.
+   * The signature must be one of the supported objects
+   * @param {object} signature - The schema's signature
+   */
   setSignature(signature) {
     if (signature instanceof Signature) {
       this.signature = signature;
@@ -133,12 +133,12 @@ export default class Schema {
   }
 
   /**
-  * Serializes the object using `getSerializedBlob` and then signs it using the given
-  * polkadot-js pair. The object will be updated with key `signature`. Repeatedly calling it will
-  * keep resetting the `signature` key
-  * @param {any} msg - The message to sign
-  * @param {object} pair - Key pair to sign with
-  */
+   * Serializes the object using `getSerializedBlob` and then signs it using the given
+   * polkadot-js pair. The object will be updated with key `signature`. Repeatedly calling it will
+   * keep resetting the `signature` key
+   * @param {any} msg - The message to sign
+   * @param {object} pair - Key pair to sign with
+   */
   sign(msg, pair) {
     this.signature = getSignatureFromKeyringPair(pair, msg);
     return this;
@@ -163,7 +163,7 @@ export default class Schema {
    */
   toBlob(id, did) {
     return {
-      id: id || randomAsHex(DockBlobByteSize),
+      id: id || randomAsHex(DockBlobIdByteSize),
       blob: u8aToHex(u8aToU8a(JSON.stringify(this.toJSON()))),
       author: getHexIdentifierFromDID(did),
     };

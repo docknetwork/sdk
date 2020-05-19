@@ -2,7 +2,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import { u8aToU8a, u8aToHex, u8aToString } from '@polkadot/util';
 
 import { DockAPI } from '../src/api';
-import { DockBlobByteSize } from '../src/modules/blob';
+import { DockBlobIdByteSize } from '../src/modules/blob';
 import { createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 
@@ -11,7 +11,7 @@ import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 
 async function writeAndReadBlob(dock, blobValue, dockDID, pair) {
-  const blobId = randomAsHex(DockBlobByteSize);
+  const blobId = randomAsHex(DockBlobIdByteSize);
   console.log('Writing blob with id ', blobId, 'and value', blobValue);
 
   const blob = {

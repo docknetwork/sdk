@@ -175,7 +175,8 @@ class VerifiableCredential {
    */
   addSubject(subject) {
     ensureObjectWithId(subject, 'credentialSubject');
-    this.credentialSubject = getUniqueElementsFromArray([...this.credentialSubject, subject], JSON.stringify);
+    const subjects = this.credentialSubject.length ? this.credentialSubject : [this.credentialSubject];
+    this.credentialSubject = getUniqueElementsFromArray([...subjects, subject], JSON.stringify);
     return this;
   }
 

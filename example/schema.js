@@ -92,9 +92,10 @@ async function main() {
   await vc.verify(resolver, false, false, { dock });
 
   console.log('Credential verified, mutating the subject and trying again...');
-  vc.credentailSubject = {
+  vc.addSubject({
+    id: 'uuid:0x0',
     thisWillFail: true,
-  };
+  });
 
   try {
     await vc.verify(resolver, false, false, { dock });

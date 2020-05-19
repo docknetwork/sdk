@@ -12,6 +12,14 @@ export const DockBlobIdByteSize = 32;
  */
 export function createNewDockBlobId() {
   const hexId = randomAsHex(DockBlobIdByteSize);
+  return blobHexIdToQualified(hexId);
+}
+
+/**
+ * Return a fully qualified Dock Blob, i.e. "did:dock:<SS58 string>"
+ * @returns {string} - The Blob
+ */
+export function blobHexIdToQualified(hexId) {
   const ss58Id = encodeAddress(hexId);
   return `${DockBlobQualifier}${ss58Id}`;
 }

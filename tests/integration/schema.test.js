@@ -19,7 +19,15 @@ let publicKey;
 let dockDID;
 let keyDetail;
 let blobId;
-let vcInvalid;
+
+const vcInvalid = {
+  ...exampleCredential,
+  credentialSubject: {
+    id: 'invalid',
+    notEmailAddress: 'john.smith@example.com',
+    notAlumniOf: 'Example Invalid',
+  },
+};
 
 describe('Schema Blob Module Integration', () => {
   const dock = new DockAPI();
@@ -42,6 +50,11 @@ describe('Schema Blob Module Integration', () => {
     await dock.sendTransaction(dock.did.new(dockDID, keyDetail));
     blobId = randomAsHex(DockBlobIdByteSize);
 
+    vcInvalid.credentialSchema = {
+      id: blobId,
+      type: 'JsonSchemaValidator2018',
+    };
+
     // Write invalid format blob
     invalidFormatBlobId = randomAsHex(DockBlobIdByteSize);
     await dock.sendTransaction(dock.blob.new({
@@ -58,25 +71,12 @@ describe('Schema Blob Module Integration', () => {
       author: getHexIdentifierFromDID(dockDID),
     }, pair), false);
 
-    vcInvalid = {
-      ...exampleCredential,
-      credentialSchema: {
-        id: blobId,
-        type: 'JsonSchemaValidator2018',
-      },
-      credentialSubject: {
-        id: 'invalid',
-        notEmailAddress: 'john.smith@example.com',
-        notAlumniOf: 'Example Invalid',
-      },
-    };
-
     done();
-  }, 60000);
+  }, 120000);
 
   afterAll(async () => {
     await dock.disconnect();
-  }, 30000);
+  }, 120000);
 
   test('getSchema will return schema in correct format.', async () => {
     await expect(Schema.getSchema(blobId, dock)).resolves.toMatchObject({
@@ -84,15 +84,15 @@ describe('Schema Blob Module Integration', () => {
       id: blobId,
       author: getHexIdentifierFromDID(dockDID),
     });
-  }, 30000);
+  }, 120000);
 
   test('getSchema throws error when schema not in correct format.', async () => {
     await expect(Schema.getSchema(invalidFormatBlobId, dock)).rejects.toThrow(/Incorrect schema format/);
-  }, 30000);
+  }, 120000);
 
   test('getSchema throws error when no blob exists at the given id.', async () => {
     await expect(Schema.getSchema(createNewSchemaID(), dock)).rejects.toThrow(/does not exist/);
-  }, 30000);
+  }, 120000);
 
   test('Utility method verifyCredential should check if schema is incompatible with the credentialSubject.', async () => {
     await expect(
@@ -106,7 +106,7 @@ describe('Schema Blob Module Integration', () => {
         vcInvalid, null, false, false, undefined, { dock },
       ),
     ).rejects.toThrow(/Schema validation failed/);
-  }, 30000);
+  }, 120000);
 
   test('The verify method should detect a subject with incompatible schema in credentialSchema.', async () => {
     const vc = VerifiableCredential.fromJSON(vcInvalid);
@@ -115,5 +115,5 @@ describe('Schema Blob Module Integration', () => {
         null, false, false, undefined, { dock },
       ),
     ).rejects.toThrow(/Schema validation failed/);
-  }, 30000);
+  }, 120000);
 });

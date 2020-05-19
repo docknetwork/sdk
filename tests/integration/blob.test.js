@@ -149,7 +149,7 @@ describe('Blob Module', () => {
     const resultSecond = await dock.sendTransaction(txSecond, false);
     expect(errorInResult(resultFirst)).toBe(false);
     expect(errorInResult(resultSecond)).toBe(true);
-  }, 30000);
+  }, 60000);
 
 
   test('Should throw error when cannot read blob with given id from chain.', async () => {

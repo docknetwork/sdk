@@ -231,13 +231,69 @@ describe('Verifiable Credential incremental creation', () => {
       'some_type',
     ]);
     credential.addSubject({ id: 'some_subject_id' });
-    expect(credential.subject).toEqual([{ id: 'some_subject_id' }]);
+    expect(credential.credentialSubject).toEqual([{ id: 'some_subject_id' }]);
     credential.setStatus({ id: 'some_status_id', type: 'CredentialStatusList2017' });
     expect(credential.status).toEqual({ id: 'some_status_id', type: 'CredentialStatusList2017' });
     credential.setIssuanceDate('2020-03-18T19:23:24Z');
     expect(credential.issuanceDate).toEqual('2020-03-18T19:23:24Z');
     credential.setExpirationDate('2021-03-18T19:23:24Z');
     expect(credential.expirationDate).toEqual('2021-03-18T19:23:24Z');
+  });
+
+  test('Duplicates in context, types and subjects are omitted.', async () => {
+    const credential = new VerifiableCredential(sampleId);
+
+    credential.addContext('https://www.w3.org/2018/credentials/examples/v1');
+    expect(credential.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+    ]);
+    credential.addContext('https://www.w3.org/2018/credentials/examples/v1');
+    expect(credential.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+    ]);
+    credential.addContext({ '@context': 'https://www.google.com' });
+    expect(credential.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+      { '@context': 'https://www.google.com' },
+    ]);
+    credential.addContext({ '@context': 'https://www.google.com' });
+    expect(credential.context).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://www.w3.org/2018/credentials/examples/v1',
+      { '@context': 'https://www.google.com' },
+    ]);
+
+    credential.addType('some_type');
+    expect(credential.type).toEqual([
+      'VerifiableCredential',
+      'some_type',
+    ]);
+    credential.addType('some_type');
+    expect(credential.type).toEqual([
+      'VerifiableCredential',
+      'some_type',
+    ]);
+
+
+    credential.addSubject({
+      id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+      alumniOf: 'Example University',
+    });
+    expect(credential.credentialSubject).toEqual([{
+      id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+      alumniOf: 'Example University',
+    }]);
+    credential.addSubject({
+      id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+      alumniOf: 'Example University',
+    });
+    expect(credential.credentialSubject).toEqual([{
+      id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+      alumniOf: 'Example University',
+    }]);
   });
 
   test.skip('Incremental VC creations runs basic validation', async () => {

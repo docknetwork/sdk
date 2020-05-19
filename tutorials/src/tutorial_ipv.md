@@ -42,7 +42,7 @@ This Credential isn't signed since we only just initialized it. It brings howeve
 <-   "2020-04-14T14:48:48.486Z"
 >    vc.type
 <-   ["VerifiableCredential"]
->    vc.subject
+>    vc.credentialSubject
 <-   []
 ```
 The default `context` is an array with `"https://www.w3.org/2018/credentials/v1"` as first element. This is required by the VCDMv1 specs so having it as default helps ensure your Verifiable Credentials will be valid in the end.
@@ -94,7 +94,7 @@ A type can be added with the `addType` function. It accepts a single argument `t
 A subject can be added with the `addSubject` function. It accepts a single argument `subject` that needs to be an object with an `id` property:
 ```javascript
 >   vc.addSubject({ id: 'did:dock:123qwe123qwe123qwe', alumniOf: 'Example University' })
->   vc.subject
+>   vc.credentialSubject
 <-  {id: 'did:dock:123qwe123qwe123qwe', alumniOf: 'Example University'}
 ```
 

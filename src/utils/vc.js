@@ -1,14 +1,17 @@
 import vcjs from 'vc-js';
 import { blake2AsHex } from '@polkadot/util-crypto';
+import { validate } from 'jsonschema';
 
 import documentLoader from './vc/document-loader';
 import { isHexWithGivenByteSize } from './codec';
 import { RevEntryByteSize, RevRegIdByteSize } from './revocation';
+
 import {
   EcdsaSecp256k1VerKeyName, Ed25519VerKeyName, Sr25519VerKeyName, EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
 } from './vc/custom_crypto';
 
 import DIDResolver from '../did-resolver'; // eslint-disable-line
+import Schema from '../modules/schema';
 /**
  * @typedef {object} VerifiablePresentation Representation of a Verifiable Presentation.
  */
@@ -20,8 +23,6 @@ export const DockRevRegQualifier = 'rev-reg:dock:';
 
 // const {Ed25519Signature2018} = suites;
 
-// TODO: discuss whether we still want to allow usage of the signing functionality outside of credentials created with
-// our VerifiableCredential class.
 /**
  * Get signature suite from a keyDoc
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
@@ -139,10 +140,27 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
  * @param {object} [revocationAPI] - An object representing a map. "revocation type -> revocation API". The API is used to check
  * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+ * @param {object} [schemaApi] - An object representing a map. "schema type -> schema API". The API is used to get
+ * a schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
+ * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
  * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
  * credential is valid and not revoked and false otherwise. The `error` will describe the error if any.
  */
-export async function verifyCredential(credential, resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null) {
+
+export async function verifyCredential(credential, resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null, schemaApi = null) {
+  if (credential.credentialSubject && credential.credentialSchema) {
+    if (!schemaApi.dock) {
+      throw new Error('Only Dock schemas are supported as of now.');
+    }
+    try {
+      const schema = await Schema.getSchema(credential.credentialSchema.id, schemaApi.dock);
+      validateCredentialSchema(credential, schema);
+    } catch (e) {
+      throw new Error(`Schema validation failed: ${e}`);
+    }
+  }
+
+  // Run VCJS verifier
   const credVer = await vcjs.verifyCredential({
     credential,
     suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
@@ -264,7 +282,6 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
   return presVer;
 }
 
-
 /**
  * Check that presentation is verified, i.e. the presentation and credentials have VCDM compliant structure and
  * the `proof` (signature by holder) is correct.
@@ -294,4 +311,24 @@ export async function isVerifiedPresentation(presentation, challenge, domain, re
  */
 export function buildDockCredentialStatus(registryId) {
   return { id: `${DockRevRegQualifier}${registryId}`, type: RevRegType };
+}
+
+
+/**
+ * The function uses `jsonschema` package to verify that the `credential`'s subject `credentialSubject` has the JSON
+ * schema `schema`
+ * @param {object} credential - The credential to use
+ * @param {object} schema - The schema to use
+ * @returns {Boolean} - Returns promise to an object or throws error
+ */
+export function validateCredentialSchema(credential, schema) {
+  const subjects = credential.credentialSubject.length ? credential.credentialSubject : [credential.credentialSubject];
+  for (let i = 0; i < subjects.length; i++) {
+    const subject = { ...subjects[i] };
+    delete subject.id; // The id will not be part of schema. The spec mentioned that id will be popped off from subject
+    validate(subject, schema.schema || schema, {
+      throwError: true,
+    });
+  }
+  return true;
 }

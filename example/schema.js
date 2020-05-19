@@ -101,7 +101,7 @@ async function main() {
     await vc.verify(resolver, false, false, { dock });
     throw new Error('Verification succeeded, but it shouldn\'t have. This is a bug.');
   } catch (e) {
-    console.log('Verification failed as expected:', e)
+    console.log('Verification failed as expected:', e);
   }
 
   console.log('All done, disconnecting...');

@@ -18,9 +18,7 @@ let publicKey;
 let dockDID;
 let keyDetail;
 let txDid;
-// eslint-disable-next-line no-unused-vars
 let resultDid;
-// eslint-disable-next-line no-unused-vars
 let didDoc;
 let blobId;
 

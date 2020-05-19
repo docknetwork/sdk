@@ -129,7 +129,6 @@ class VerifiableCredential {
    */
   setSchema(id, type) {
     ensureURI(id);
-    // TODO: rename from `credentialSchema` to `schema` to remove redundancy, since we're in the `credential` class
     this.credentialSchema = {
       id, type,
     };

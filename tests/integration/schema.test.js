@@ -19,7 +19,6 @@ let publicKey;
 let dockDID;
 let keyDetail;
 let blobId;
-// eslint-disable-next-line no-unused-vars
 let vcInvalid;
 
 describe('Schema Blob Module Integration', () => {

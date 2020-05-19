@@ -72,7 +72,7 @@ describe('Schema Blob Module Integration', () => {
     };
 
     done();
-  }, 30000);
+  }, 60000);
 
   afterAll(async () => {
     await dock.disconnect();

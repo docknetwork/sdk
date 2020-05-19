@@ -48,7 +48,6 @@ describe('Blob Module', () => {
     await dock.disconnect();
   }, 10000);
 
-
   beforeEach(async () => {
     account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
@@ -60,8 +59,7 @@ describe('Blob Module', () => {
     resultDid = await dock.sendTransaction(txDid);
     didDoc = await dock.did.getDocument(dockDID);
     blobId = randomAsHex(DockBlobIdByteSize);
-  }, 10000);
-
+  }, 30000);
 
   test('Can create and read a Hex Blob.', async () => {
     const blobHex = randomAsHex(32);

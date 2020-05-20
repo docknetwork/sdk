@@ -1,17 +1,21 @@
 import { u8aToHex, u8aToU8a } from '@polkadot/util';
 import { randomAsHex } from '@polkadot/util-crypto';
 
-import { DockAPI } from '../../src/api';
+import dock, { DockAPI } from '../../src/api';
 
 import { createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
-import { verifyCredential } from '../../src/utils/vc';
-import { DockBlobIdByteSize } from '../../src/modules/blob';
+import { verifyCredential, verifyPresentation } from '../../src/utils/vc';
+import { blobHexIdToQualified, DockBlobIdByteSize } from '../../src/modules/blob';
 import Schema, { createNewSchemaID } from '../../src/modules/schema';
 import VerifiableCredential from '../../src/verifiable-credential';
 import exampleCredential from '../example-credential';
 import exampleSchema from '../example-schema';
+import VerifiablePresentation from '../../src/verifiable-presentation';
+import getKeyDoc from '../../src/utils/vc/helpers';
+import { UniversalResolver } from '../../src/resolver';
+import DockResolver from '../../src/dock-resolver';
 
 let account;
 let pair;
@@ -19,8 +23,11 @@ let publicKey;
 let dockDID;
 let keyDetail;
 let blobId;
-// eslint-disable-next-line no-unused-vars
 let vcInvalid;
+let vpInvalid;
+
+let keyDoc;
+let validCredential;
 
 describe('Schema Blob Module Integration', () => {
   const dock = new DockAPI();
@@ -72,8 +79,45 @@ describe('Schema Blob Module Integration', () => {
       },
     };
 
+
+    keyDoc = getKeyDoc(
+      dockDID,
+      dock.keyring.addFromUri(firstKeySeed, null, 'sr25519'),
+      'Sr25519VerificationKey2020',
+    );
+
+    // keyDoc = getKeyDoc(
+    //   dockDID,
+    //   dock.keyring.addFromUri((firstKeySeed), null, 'ed25519'),
+    //   'Sr25519VerificationKey2020',
+    // );
+
+    validCredential = new VerifiableCredential(exampleCredential.id);
+    validCredential.addContext('https://www.w3.org/2018/credentials/examples/v1');
+    validCredential.addContext('https://schema.org/')
+    validCredential.addType('AlumniCredential');
+    validCredential.addSubject({
+      id: dockDID,
+      alumniOf: 'Example University',
+    });
+    validCredential.setSchema(blobHexIdToQualified(blobId), 'JsonSchemaValidator2018');
+    validCredential.setIssuer(exampleCredential.issuer);
+    await validCredential.sign(keyDoc);
+    console.log(validCredential.toJSON());
+
+    const dockResolver = new DockResolver(dock);
+    const bla = await validCredential.verify(
+      dockResolver,
+      false,
+      false,
+      false,
+      { dock },
+    );
+    console.log(bla);
+
+
     done();
-  }, 30000);
+  }, 90000);
 
   afterAll(async () => {
     await dock.disconnect();
@@ -117,4 +161,38 @@ describe('Schema Blob Module Integration', () => {
       ),
     ).rejects.toThrow(/Schema validation failed/);
   }, 30000);
+
+
+  test('Utility method verifyPresentation should check if schema is incompatible with the credentialSubject.', async () => {
+    // const cred = VerifiableCredential.fromJSON(exampleCredential);
+    vpInvalid = new VerifiablePresentation('https://example.com/credentials/12345');
+    vpInvalid.addCredential(
+      vcInvalid,
+    );
+    // const keyDoc = {
+    //   id: 'https://gist.githubusercontent.com/lovesh/67bdfd354cfaf4fb853df4d6713f4610/raw',
+    //   controller: 'https://gist.githubusercontent.com/lovesh/312d407e3a16be0e7d5e43169e824958/raw',
+    //   type: 'EcdsaSecp256k1VerificationKey2019', // TODO use different signature scheme
+    //   keyPair: pair,
+    //   publicKey,
+    // };
+    vpInvalid = await vpInvalid.sign(
+      keyDoc,
+      'some_challenge',
+      'some_domain',
+    );
+    console.log(vpInvalid);
+
+    await expect(
+      verifyPresentation(
+        vpInvalid.toJSON(), null, false, false, undefined, { notDock: dock },
+      ),
+    ).rejects.toThrow('Only Dock schemas are supported as of now.');
+
+    await expect(
+      verifyPresentation(
+        vpInvalid.toJSON(), null, false, false, undefined, { dock },
+      ),
+    ).rejects.toThrow(/Schema validation failed/);
+  }, 300000);
 });

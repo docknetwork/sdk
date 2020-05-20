@@ -2,6 +2,7 @@ import { encodeAddress, randomAsHex } from '@polkadot/util-crypto';
 import { getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from '../utils/codec';
 import NoBlobError from '../utils/errors/no-blob-error';
+import Signature from '../signatures/signature'; // eslint-disable-line
 
 export const DockBlobQualifier = 'blob:dock:';
 export const DockBlobIdByteSize = 32;
@@ -84,9 +85,8 @@ class BlobModule {
    * @returns {Promise<Array>} - A 2-element array where the first is the author and the second is the blob contents.
    */
   async getBlob(id) {
-    // eslint-disable-next-line no-param-reassign
-    id = id.slice(DockBlobQualifier);
-    const resp = await this.api.query.blobStore.blobs(id);
+    const hexId = getHexIdentifierFromBlobID(id);
+    const resp = await this.api.query.blobStore.blobs(hexId);
     if (resp.isNone) {
       throw new NoBlobError(id);
     }

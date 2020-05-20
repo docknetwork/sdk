@@ -7,7 +7,7 @@ import { createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../.
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { verifyCredential } from '../../src/utils/vc';
-import { DockBlobIdByteSize, createNewDockBlobId } from '../../src/modules/blob';
+import { DockBlobIdByteSize, createNewDockBlobId, blobHexIdToQualified } from '../../src/modules/blob';
 import Schema from '../../src/modules/schema';
 import VerifiableCredential from '../../src/verifiable-credential';
 import exampleCredential from '../example-credential';
@@ -82,7 +82,7 @@ describe('Schema Blob Module Integration', () => {
     await expect(Schema.getSchema(blobId, dock)).resolves.toMatchObject({
       ...exampleSchema,
       id: blobId,
-      author: getHexIdentifierFromDID(dockDID),
+      author: blobHexIdToQualified(getHexIdentifierFromDID(dockDID)),
     });
   }, 120000);
 

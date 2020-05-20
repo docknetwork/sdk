@@ -67,16 +67,6 @@ export function getHexIdentifierFromBlobID(id) {
   }
 }
 
-/**
- * Generates a random schema ID
- * @returns {string}
- */
-export function createNewSchemaID() {
-  const hexId = randomAsHex(BLOB_ID_MAX_BYTE_SIZE);
-  const ss58Id = encodeAddress(hexId);
-  return `${BlobQualifier}${ss58Id}`;
-}
-
 export default class Schema {
   /**
    * Creates a new `Schema` object
@@ -84,7 +74,7 @@ export default class Schema {
    * @param {string} [id] - optional schema ID, if not given, generate a random id
    */
   constructor(id) {
-    this.id = id || createNewSchemaID();
+    this.id = id || createNewDockBlobId();
     this.name = '';
     this.version = '1.0.0';
   }

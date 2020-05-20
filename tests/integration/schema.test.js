@@ -7,8 +7,8 @@ import { createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../.
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { verifyCredential } from '../../src/utils/vc';
-import { DockBlobIdByteSize } from '../../src/modules/blob';
-import Schema, { createNewSchemaID } from '../../src/modules/schema';
+import { DockBlobIdByteSize, createNewDockBlobId } from '../../src/modules/blob';
+import Schema from '../../src/modules/schema';
 import VerifiableCredential from '../../src/verifiable-credential';
 import exampleCredential from '../example-credential';
 import exampleSchema from '../example-schema';
@@ -91,7 +91,7 @@ describe('Schema Blob Module Integration', () => {
   }, 120000);
 
   test('getSchema throws error when no blob exists at the given id.', async () => {
-    await expect(Schema.getSchema(createNewSchemaID(), dock)).rejects.toThrow(/does not exist/);
+    await expect(Schema.getSchema(createNewDockBlobId(), dock)).rejects.toThrow(/does not exist/);
   }, 120000);
 
   test('Utility method verifyCredential should check if schema is incompatible with the credentialSubject.', async () => {

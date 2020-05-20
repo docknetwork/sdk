@@ -8,7 +8,7 @@ import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-const
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { verifyCredential } from '../../src/utils/vc';
 import { DockBlobIdByteSize } from '../../src/modules/blob';
-import Schema, { createNewSchemaID } from '../../src/modules/schema';
+import Schema from '../../src/modules/schema';
 import exampleCredential from '../example-credential';
 import exampleSchema from '../example-schema';
 

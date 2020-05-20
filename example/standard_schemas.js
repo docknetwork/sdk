@@ -276,33 +276,32 @@ const noInfectionCred = {
   },
 };
 
+async function validateSchema(schema, credential) {
+  console.log('Validating schema:', schema.description)
+  await Schema.validateSchema(schema);
+  console.log('Validating credential against schema...')
+  validateCredentialSchema(credential, schema);
+  console.log('Success!');
+}
+
 async function main() {
-  await Schema.validateSchema(bolSchema);
-  validateCredentialSchema(bolCred, bolSchema);
-
-  await Schema.validateSchema(prCardSchema);
-  validateCredentialSchema(credPRCard, prCardSchema);
-
-  await Schema.validateSchema(qpInbonSchema);
-  validateCredentialSchema(qPInbondCred, qpInbonSchema);
-
-  await Schema.validateSchema(healthWorkerPassportSchema);
-  validateCredentialSchema(healthCareWorkerCred, healthWorkerPassportSchema);
-
-  await Schema.validateSchema(proofOfHealthCoreSchema);
-  validateCredentialSchema(proofOfHealthCoreCred, proofOfHealthCoreSchema);
+  await validateSchema(bolSchema, bolCred);
+  await validateSchema(prCardSchema, credPRCard);
+  await validateSchema(qpInbonSchema, qPInbondCred);
+  await validateSchema(healthWorkerPassportSchema, healthCareWorkerCred);
+  await validateSchema(proofOfHealthCoreSchema, proofOfHealthCoreCred);
 
   // Following 3 require change in validator
-  await Schema.validateSchema(infectionDiagnosisSchema);
-  validateCredentialSchema(infectionDiagnosisCred, infectionDiagnosisSchema);
+  await validateSchema(infectionDiagnosisSchema, infectionDiagnosisCred);
+  await validateSchema(immunityEventRecordSchema, immunityEventRecordCred);
+  await validateSchema(noInfectionSchema, noInfectionCred);
 
-  await Schema.validateSchema(immunityEventRecordSchema);
-  validateCredentialSchema(immunityEventRecordCred, immunityEventRecordSchema);
-
-  await Schema.validateSchema(noInfectionSchema);
-  validateCredentialSchema(noInfectionCred, noInfectionSchema);
+  // All done
+  console.log('All schemas validated.');
+  process.exit(0);
 }
 
 main().catch((error) => {
   console.error('Error occurred somewhere, it was caught!', error);
+  process.exit(1);
 });

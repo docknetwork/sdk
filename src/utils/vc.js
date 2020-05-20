@@ -313,7 +313,6 @@ export function buildDockCredentialStatus(registryId) {
   return { id: `${DockRevRegQualifier}${registryId}`, type: RevRegType };
 }
 
-
 /**
  * The function uses `jsonschema` package to verify that the `credential`'s subject `credentialSubject` has the JSON
  * schema `schema`
@@ -322,10 +321,14 @@ export function buildDockCredentialStatus(registryId) {
  * @returns {Boolean} - Returns promise to an object or throws error
  */
 export function validateCredentialSchema(credential, schema) {
+  const requiresID = schema.required && schema.required.indexOf('id') > -1;
   const subjects = credential.credentialSubject.length ? credential.credentialSubject : [credential.credentialSubject];
   for (let i = 0; i < subjects.length; i++) {
     const subject = { ...subjects[i] };
-    delete subject.id; // The id will not be part of schema. The spec mentioned that id will be popped off from subject
+    if (!requiresID) {
+       // The id will not be part of schema. The spec mentioned that id will be popped off from subject
+      delete subject.id;
+    }
     validate(subject, schema.schema || schema, {
       throwError: true,
     });

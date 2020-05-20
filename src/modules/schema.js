@@ -111,9 +111,13 @@ export default class Schema {
    * @returns {object}
    */
   toBlob(author) {
+    if (!this.schema) {
+      throw new Error('Schema required schema property to be serialized to blob');
+    }
+
     return {
       id: this.id,
-      blob: stringToHex(JSON.stringify(this.toJSON())),
+      blob: stringToHex(JSON.stringify(this.schema)),
       author: getHexIdentifierFromDID(author),
     };
   }

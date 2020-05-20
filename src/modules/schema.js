@@ -1,4 +1,4 @@
-import { randomAsHex, decodeAddress } from '@polkadot/util-crypto';
+import { decodeAddress } from '@polkadot/util-crypto';
 import { stringToHex, u8aToString, u8aToHex } from '@polkadot/util';
 import { validate } from 'jsonschema';
 import axios from 'axios';
@@ -8,30 +8,24 @@ import { getSignatureFromKeyringPair } from '../utils/misc';
 import { isHexWithGivenByteSize } from '../utils/codec';
 import Signature from '../signatures/signature';
 
-import { DockBlobIdByteSize, blobHexIdToQualified, createNewDockBlobId } from './blob';
+import {
+  blobHexIdToQualified,
+  createNewDockBlobId,
+  DockBlobIdByteSize,
+  DockBlobQualifier,
+} from './blob';
 
 // Supported schemas
 import JSONSchema07 from '../utils/vc/schemas/schema-draft-07';
-
-// Blob qualifier
-export const BlobQualifier = 'blob:dock:';
-
-// Size of the blob id in bytes
-export const BLOB_ID_MAX_BYTE_SIZE = 32;
-
-// Maximum size of the blob in bytes
-// implementer may choose to implement this as a dynamic config option settable with the `parameter_type!` macro
-export const BLOB_MAX_BYTE_SIZE = 1024;
 
 /**
  * Check if the given identifier is 32 byte hex
  * @param {string} identifier - The identifier to check.
  * @return {void} Throws exception if invalid identifier
  */
-export function validateBlobDIDHexIdentifier(identifier) {
-  // Byte size of the Dock DID identifier, i.e. the `DockDIDQualifier` is not counted.
-  if (!isHexWithGivenByteSize(identifier, BLOB_ID_MAX_BYTE_SIZE)) {
-    throw new Error(`DID identifier must be ${BLOB_ID_MAX_BYTE_SIZE} bytes`);
+export function validateBlobIDHexIdentifier(identifier) {
+  if (!isHexWithGivenByteSize(identifier, DockBlobIdByteSize)) {
+    throw new Error(`ID must be ${DockBlobIdByteSize} bytes`);
   }
 }
 
@@ -42,23 +36,23 @@ export function validateBlobDIDHexIdentifier(identifier) {
  * @return {string} Returns the hexadecimal representation of the ID.
  */
 export function getHexIdentifierFromBlobID(id) {
-  if (id.startsWith(BlobQualifier)) {
-    // Fully qualified DID. Remove the qualifier
-    const ss58Did = id.slice(BlobQualifier.length);
+  if (id.startsWith(DockBlobQualifier)) {
+    // Fully qualified ID. Remove the qualifier
+    const ss58Did = id.slice(DockBlobQualifier.length);
     try {
       const hex = u8aToHex(decodeAddress(ss58Did));
-      // 2 characters for `0x` and 2*byte size of DID
-      if (hex.length !== (2 + 2 * BLOB_ID_MAX_BYTE_SIZE)) {
+      // 2 characters for `0x` and 2*byte size of ID
+      if (hex.length !== (2 + 2 * DockBlobIdByteSize)) {
         throw new Error('Unexpected byte size');
       }
       return hex;
     } catch (e) {
-      throw new Error(`Invalid SS58 DID ${id}. ${e}`);
+      throw new Error(`Invalid SS58 ID ${id}. ${e}`);
     }
   } else {
     try {
       // Check if hex and of correct size and return the hex value if successful.
-      validateBlobDIDHexIdentifier(id);
+      validateBlobIDHexIdentifier(id);
       return id;
     } catch (e) {
       // Cannot parse as hex
@@ -142,9 +136,15 @@ export default class Schema {
   toJSON() {
     const {
       signature,
+      id,
       ...rest
     } = this;
-    return rest;
+
+    return {
+      ...rest,
+      id: getHexIdentifierFromBlobID(this.id),
+      signature: signature.toJSON(),
+    };
   }
 
   /**

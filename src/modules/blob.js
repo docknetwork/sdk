@@ -6,6 +6,10 @@ export const DockBlobMethod = 'dock';
 export const DockBlobQualifier = `blob:${DockBlobMethod}:`;
 export const DockBlobIdByteSize = 32;
 
+// Maximum size of the blob in bytes
+// implementer may choose to implement this as a dynamic config option settable with the `parameter_type!` macro
+export const BLOB_MAX_BYTE_SIZE = 1024;
+
 /**
  * Create and return a fully qualified Dock Blob, i.e. "did:dock:<SS58 string>"
  * @returns {string} - The Blob

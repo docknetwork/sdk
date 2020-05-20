@@ -48,7 +48,7 @@ describe('Basic Schema Tests', () => {
     const seed = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
     keypair = keyring.addFromUri(randomAsHex(32), null, 'sr25519');
 
-    schema = new Schema('blob:dock:5C78GCA');
+    schema = new Schema();
     schema.name = 'AlumniCredSchema';
     schema.version = '1.0.0';
 
@@ -95,6 +95,7 @@ describe('Basic Schema Tests', () => {
 
   test('toJSON will generate a JSON that can be sent to chain.', () => {
     const result = schema.toJSON();
+    console.log('toJSON:', result);
     expect(result).toMatchObject(
       expect.objectContaining({
         id: expect.anything(),

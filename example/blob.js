@@ -28,7 +28,19 @@ async function writeAndReadBlob(dock, blobValue, dockDID, pair) {
   return chainBlob;
 }
 
-async function main() {
+async function createAuthorDID(dock, pair) {
+  // Generate a DID to be used as author
+  const dockDID = createNewDockDID();
+  console.log('Creating new author DID', dockDID);
+
+  // Create an author DID to write with
+  const publicKey = getPublicKeyFromKeyringPair(pair);
+  const keyDetail = createKeyDetail(publicKey, dockDID);
+  await dock.sendTransaction(dock.did.new(dockDID, keyDetail));
+  return dockDID;
+}
+
+async function connectToNode() {
   console.log('Connecting to the node...');
   const dock = new DockAPI();
   await dock.init({
@@ -38,16 +50,18 @@ async function main() {
   console.log('Setting sdk account...');
   const account = dock.keyring.addFromUri(TestAccountURI);
   dock.setAccount(account);
+  return dock;
+}
+
+async function main() {
+  // Connect to the node
+  const dock = await connectToNode();
+
+  // Generate keypair for DID
+  const pair = dock.keyring.addFromUri(randomAsHex(32));
 
   // Generate a DID to be used as author
-  const dockDID = createNewDockDID();
-  console.log('Creating new DID', dockDID);
-
-  // Generate first key with this seed. The key type is Sr25519
-  const pair = dock.keyring.addFromUri(randomAsHex(32));
-  const publicKey = getPublicKeyFromKeyringPair(pair);
-  const keyDetail = createKeyDetail(publicKey, dockDID);
-  await dock.sendTransaction(dock.did.new(dockDID, keyDetail));
+  const dockDID = await createAuthorDID(dock, pair);
 
   // Write blob as string
   const blobValue = stringToHex('hello blob storage!');

@@ -94,21 +94,27 @@ describe('Schema Blob Module Integration', () => {
 
     validCredential = new VerifiableCredential(exampleCredential.id);
     validCredential.addContext('https://www.w3.org/2018/credentials/examples/v1');
-    validCredential.addContext('https://schema.org/')
+    const ctx1 = {
+      "@context": {
+        "emailAddress": "https://schema.org/email"
+      },
+    };
+    validCredential.addContext(ctx1);
     validCredential.addType('AlumniCredential');
     validCredential.addSubject({
       id: dockDID,
       alumniOf: 'Example University',
+      emailAddress: 'john@gmail.com',
     });
     validCredential.setSchema(blobHexIdToQualified(blobId), 'JsonSchemaValidator2018');
-    validCredential.setIssuer(exampleCredential.issuer);
+    validCredential.setIssuer(dockDID);
     await validCredential.sign(keyDoc);
     console.log(validCredential.toJSON());
 
     const dockResolver = new DockResolver(dock);
     const bla = await validCredential.verify(
       dockResolver,
-      false,
+      true,
       false,
       false,
       { dock },
@@ -194,5 +200,37 @@ describe('Schema Blob Module Integration', () => {
         vpInvalid.toJSON(), null, false, false, undefined, { dock },
       ),
     ).rejects.toThrow(/Schema validation failed/);
+  }, 300000);
+
+  test('Utility method verifyPresentation should check if schema is compatible with the credentialSubject.', async () => {
+    // const cred = VerifiableCredential.fromJSON(exampleCredential);
+    let presentation = new VerifiablePresentation('https://example.com/credentials/12345');
+    presentation.addCredential(
+      validCredential,
+    );
+    // const keyDoc = {
+    //   id: 'https://gist.githubusercontent.com/lovesh/67bdfd354cfaf4fb853df4d6713f4610/raw',
+    //   controller: 'https://gist.githubusercontent.com/lovesh/312d407e3a16be0e7d5e43169e824958/raw',
+    //   type: 'EcdsaSecp256k1VerificationKey2019', // TODO use different signature scheme
+    //   keyPair: pair,
+    //   publicKey,
+    // };
+    presentation = await presentation.sign(
+      keyDoc,
+      'some_challenge',
+      'some_domain',
+    );
+    console.log(presentation);
+
+    await expect(
+      verifyPresentation(
+        presentation.toJSON(), 'some_challenge', 'some_domain', new DockResolver(dock), true, false, undefined, {dock: dock})
+    ).resolves.toBeDefined();
+
+    /*await expect(
+      verifyPresentation(
+        vpInvalid.toJSON(), 'some_challenge', false, false, undefined, { dock },
+      ),
+    ).rejects.toThrow(/Schema validation failed/);*/
   }, 300000);
 });

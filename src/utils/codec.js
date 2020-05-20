@@ -1,4 +1,6 @@
-/* eslint import/prefer-default-export: 0 */
+import { u8aToHex } from '@polkadot/util';
+import { decodeAddress } from '@polkadot/util-crypto';
+
 /**
  * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
  * @param {string} value - Hexadecimal value
@@ -17,4 +19,34 @@ export function isHexWithGivenByteSize(value, byteSize = undefined) {
     return (match[1].length % 2) === 0;
   }
   return false;
+}
+
+/**
+ * Gets the hexadecimal value of the given string.
+ * @return {string} Returns the hexadecimal representation of the ID.
+ */
+export function getHexIdentifier(id, qualifier, validate, byteSize) {
+  if (id.startsWith(qualifier)) {
+    // Fully qualified ID. Remove the qualifier
+    const ss58Did = id.slice(qualifier.length);
+    try {
+      const hex = u8aToHex(decodeAddress(ss58Did));
+      // 2 characters for `0x` and 2*byte size of ID
+      if (hex.length !== (2 + 2 * byteSize)) {
+        throw new Error('Unexpected byte size');
+      }
+      return hex;
+    } catch (e) {
+      throw new Error(`Invalid SS58 ID ${id}. ${e}`);
+    }
+  } else {
+    try {
+      // Check if hex and of correct size and return the hex value if successful.
+      validate(id);
+      return id;
+    } catch (e) {
+      // Cannot parse as hex
+      throw new Error(`Invalid hexadecimal ID ${id}. ${e}`);
+    }
+  }
 }

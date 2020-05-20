@@ -76,7 +76,7 @@ async function main() {
 
   await dock.sendTransaction(dock.blob.new(blob, pair), false);
 
-  console.log('Blog written, reading from chain...');
+  console.log('Schema written, reading from chain...');
 
   const result = await Schema.getSchema(blobId, dock);
   console.log('Result from chain:', result);

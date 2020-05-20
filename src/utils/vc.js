@@ -146,19 +146,8 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
  * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
  * credential is valid and not revoked and false otherwise. The `error` will describe the error if any.
  */
-
 export async function verifyCredential(credential, resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null, schemaApi = null) {
-  if (credential.credentialSubject && credential.credentialSchema) {
-    if (!schemaApi.dock) {
-      throw new Error('Only Dock schemas are supported as of now.');
-    }
-    try {
-      const schema = await Schema.getSchema(credential.credentialSchema.id, schemaApi.dock);
-      validateCredentialSchema(credential, schema);
-    } catch (e) {
-      throw new Error(`Schema validation failed: ${e}`);
-    }
-  }
+  await getAndValidateSchemaIfPresent(credential, schemaApi);
 
   // Run VCJS verifier
   const credVer = await vcjs.verifyCredential({
@@ -247,11 +236,14 @@ export async function signPresentation(presentation, keyDoc, challenge, domain, 
  * @param {object} [revocationAPI] - An object representing a map. "revocation type -> revocation API". The API is used to check
  * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+ * @param {object} [schemaAPI] - An object representing a map. "schema type -> schema API". The API is used to get a
+ * schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
+ * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
  * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
  * presentation is valid and all the credentials are valid and not revoked and false otherwise. The `error` will
  * describe the error if any.
  */
-export async function verifyPresentation(presentation, challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null) {
+export async function verifyPresentation(presentation, challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null, schemaAPI = null) {
   // TODO: support other purposes than the default of "authentication"
   const presVer = await vcjs.verify({
     presentation,
@@ -275,6 +267,8 @@ export async function verifyPresentation(presentation, challenge, domain, resolv
           return res;
         }
       }
+      // eslint-disable-next-line no-await-in-loop
+      await getAndValidateSchemaIfPresent(credential, schemaAPI);
     }
 
     // If all credentials pass the revocation check, the let the result of presentation verification be returned.
@@ -334,4 +328,26 @@ export function validateCredentialSchema(credential, schema) {
     });
   }
   return true;
+}
+
+/**
+ * Get schema and run validation on credential if it contains both a credentialSubject and credentialSchema
+ * @param {object} credential - a verifiable credential JSON object
+ * @param {object} [schemaApi] - An object representing a map. "schema type -> schema API". The API is used to get
+ * a schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
+ * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+ * @returns {Promise<void>}
+ */
+export async function getAndValidateSchemaIfPresent(credential, schemaApi) {
+  if (credential.credentialSubject && credential.credentialSchema) {
+    if (!schemaApi.dock) {
+      throw new Error('Only Dock schemas are supported as of now.');
+    }
+    try {
+      const schema = await Schema.getSchema(credential.credentialSchema.id, schemaApi.dock);
+      await validateCredentialSchema(credential, schema);
+    } catch (e) {
+      throw new Error(`Schema validation failed: ${e}`);
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import { randomAsHex, encodeAddress, decodeAddress } from '@polkadot/util-crypto';
+import { randomAsHex, decodeAddress } from '@polkadot/util-crypto';
 import { stringToHex, u8aToString, u8aToHex } from '@polkadot/util';
 import { validate } from 'jsonschema';
 import axios from 'axios';
@@ -8,7 +8,7 @@ import { getSignatureFromKeyringPair } from '../utils/misc';
 import { isHexWithGivenByteSize } from '../utils/codec';
 import Signature from '../signatures/signature';
 
-import { DockBlobIdByteSize } from './blob';
+import { DockBlobIdByteSize, blobHexIdToQualified, createNewDockBlobId } from './blob';
 
 // Supported schemas
 import JSONSchema07 from '../utils/vc/schemas/schema-draft-07';
@@ -188,7 +188,7 @@ export default class Schema {
     try {
       const schema = JSON.parse(blobStr);
       schema.id = id;
-      schema.author = u8aToHex(chainBlob[0]);
+      schema.author = blobHexIdToQualified(u8aToHex(chainBlob[0]));
 
       return schema;
     } catch (e) {

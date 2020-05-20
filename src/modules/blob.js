@@ -71,16 +71,6 @@ class BlobModule {
   getSerializedBlob(blob) {
     return getStateChange(this.api, 'Blob', blob);
   }
-
-
-  /**
-   * Create the fully qualified Blob id like "blob:dock:..."
-   * @param {string} id - Blob id
-   * @return {string} The full Blob identifier.
-   */
-  getFullyQualifiedBlobId(id) {
-    return id.startsWith(DockBlobQualifier) ? id : `${DockBlobQualifier}${id}`;
-  }
 }
 
 export default BlobModule;

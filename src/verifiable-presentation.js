@@ -9,7 +9,6 @@ import {
 
 import DIDResolver from './did-resolver'; // eslint-disable-line
 import { getUniqueElementsFromArray } from './utils/misc';
-import schema from './modules/schema';
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiablePresentation';

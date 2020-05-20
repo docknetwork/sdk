@@ -1,4 +1,4 @@
-import { u8aToHex, u8aToU8a } from '@polkadot/util';
+import { stringToHex } from '@polkadot/util';
 import { randomAsHex } from '@polkadot/util-crypto';
 
 import { DockAPI } from '../../src/api';
@@ -59,7 +59,7 @@ describe('Schema Blob Module Integration', () => {
     invalidFormatBlobId = randomAsHex(DockBlobIdByteSize);
     await dock.sendTransaction(dock.blob.new({
       id: invalidFormatBlobId,
-      blob: u8aToHex(u8aToU8a('hello world')),
+      blob: stringToHex('hello world'),
       author: getHexIdentifierFromDID(dockDID),
     }, pair), false);
 
@@ -67,7 +67,7 @@ describe('Schema Blob Module Integration', () => {
     const blobStr = JSON.stringify(exampleSchema);
     await dock.sendTransaction(dock.blob.new({
       id: blobId,
-      blob: u8aToHex(u8aToU8a(blobStr)),
+      blob: stringToHex(blobStr),
       author: getHexIdentifierFromDID(dockDID),
     }, pair), false);
 

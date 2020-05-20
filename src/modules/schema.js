@@ -1,5 +1,5 @@
 import { randomAsHex, encodeAddress, decodeAddress } from '@polkadot/util-crypto';
-import { u8aToU8a, u8aToString, u8aToHex } from '@polkadot/util';
+import { stringToHex, u8aToString, u8aToHex } from '@polkadot/util';
 import { validate } from 'jsonschema';
 import axios from 'axios';
 
@@ -164,7 +164,7 @@ export default class Schema {
   toBlob(id, did) {
     return {
       id: id || randomAsHex(DockBlobIdByteSize),
-      blob: u8aToHex(u8aToU8a(JSON.stringify(this.toJSON()))),
+      blob: stringToHex(JSON.stringify(this.toJSON())),
       author: getHexIdentifierFromDID(did),
     };
   }

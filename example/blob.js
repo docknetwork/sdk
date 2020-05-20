@@ -1,5 +1,5 @@
 import { randomAsHex } from '@polkadot/util-crypto';
-import { u8aToU8a, u8aToHex, u8aToString } from '@polkadot/util';
+import { u8aToString, stringToHex } from '@polkadot/util';
 
 import { DockAPI } from '../src/api';
 import { DockBlobIdByteSize } from '../src/modules/blob';
@@ -50,7 +50,7 @@ async function main() {
   await dock.sendTransaction(dock.did.new(dockDID, keyDetail));
 
   // Write blob as string
-  const blobValue = u8aToHex(u8aToU8a('hello blob storage!'));
+  const blobValue = stringToHex('hello blob storage!');
   const chainBlob = await writeAndReadBlob(dock, blobValue, dockDID, pair);
   const blobStrFromChain = u8aToString(chainBlob[1]);
   console.log('Resulting blob string from chain:', blobStrFromChain);

@@ -3,8 +3,7 @@ import { getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from '../utils/codec';
 import NoBlobError from '../utils/errors/no-blob-error';
 
-export const DockBlobMethod = 'dock';
-export const DockBlobQualifier = `blob:${DockBlobMethod}:`;
+export const DockBlobQualifier = 'blob:dock:';
 export const DockBlobIdByteSize = 32;
 
 // Maximum size of the blob in bytes
@@ -33,8 +32,8 @@ export function getHexIdentifierFromBlobID(id) {
 }
 
 /**
- * Create and return a fully qualified Dock Blob, i.e. "did:dock:<SS58 string>"
- * @returns {string} - The Blob
+ * Create and return a fully qualified Dock Blob id, i.e. "did:dock:<SS58 string>"
+ * @returns {string} - The Blob id
  */
 export function createNewDockBlobId() {
   const hexId = randomAsHex(DockBlobIdByteSize);
@@ -42,8 +41,9 @@ export function createNewDockBlobId() {
 }
 
 /**
- * Return a fully qualified Dock Blob, i.e. "did:dock:<SS58 string>"
- * @returns {string} - The Blob
+ * Return a fully qualified Dock Blob id, i.e. "did:dock:<SS58 string>"
+ * @param {string} hexId - The hex blob id (without the qualifier)
+ * @returns {string} - The fully qualified Blob id
  */
 export function blobHexIdToQualified(hexId) {
   const ss58Id = encodeAddress(hexId);
@@ -66,11 +66,15 @@ class BlobModule {
    * Register a new Blob on the Dock Chain
    * @param {object} blob - struct to store on chain
    * @param {object} keyPair - Key pair to sign with
+   * @param {Signature} signature - Signature to use
    * @return {object} The extrinsic to sign and send.
    */
-  new(blob, keyPair) {
-    const serializedBlob = this.getSerializedBlob(blob);
-    const signature = getSignatureFromKeyringPair(keyPair, serializedBlob);
+  new(blob, keyPair = undefined, signature = undefined) {
+    if (!signature) {
+      const serializedBlob = this.getSerializedBlob(blob);
+      // eslint-disable-next-line no-param-reassign
+      signature = getSignatureFromKeyringPair(keyPair, serializedBlob);
+    }
     return this.module.new(blob, signature.toJSON());
   }
 
@@ -80,13 +84,18 @@ class BlobModule {
    * @returns {Promise<Array>} - A 2-element array where the first is the author and the second is the blob contents.
    */
   async getBlob(id) {
-    id.replace(DockBlobQualifier, '');
+    // eslint-disable-next-line no-param-reassign
+    id = id.slice(DockBlobQualifier);
     const resp = await this.api.query.blobStore.blobs(id);
     if (resp.isNone) {
       throw new NoBlobError(id);
     }
-    const tuple = resp.unwrap();
-    return [tuple[0], tuple[1]];
+
+    const respTuple = resp.unwrap();
+    if (respTuple.length === 2) {
+      return [respTuple[0], respTuple[1]];
+    }
+    throw new Error(`Needed 2 items in response but got${respTuple.length}`);
   }
 
   /**

@@ -4,9 +4,11 @@ import axios from 'axios';
 
 import { getHexIdentifierFromDID } from '../utils/did';
 import { getSignatureFromKeyringPair } from '../utils/misc';
+import { isHexWithGivenByteSize } from '../utils/codec';
 import Signature from '../signatures/signature';
 
 import {
+  DockBlobIdByteSize,
   blobHexIdToQualified,
   createNewDockBlobId,
   getHexIdentifierFromBlobID,
@@ -48,8 +50,11 @@ export default class Schema {
    * @param {string} did - the author DID
    */
   setAuthor(did) {
-    // TODO: `did` should be validated, do a best effort. Check either 32 byte (use constant) hex or a valid Dock DID or starts with 'did'
-    this.author = did;
+    if (did.startsWith('did:') || isHexWithGivenByteSize(DockBlobIdByteSize)) {
+      this.author = did;
+    } else {
+      throw new Error(`Supplied author ${did} is not a valid DID or ${DockBlobIdByteSize} byte hex string`);
+    }
     return this;
   }
 

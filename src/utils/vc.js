@@ -322,7 +322,8 @@ export function buildDockCredentialStatus(registryId) {
  */
 export function validateCredentialSchema(credential, schema) {
   const requiresID = schema.required && schema.required.indexOf('id') > -1;
-  const subjects = credential.credentialSubject.length ? credential.credentialSubject : [credential.credentialSubject];
+  const credentialSubject = credential.credentialSubject || [];
+  const subjects = credentialSubject.length ? credentialSubject : [credentialSubject];
   for (let i = 0; i < subjects.length; i++) {
     const subject = { ...subjects[i] };
     if (!requiresID) {

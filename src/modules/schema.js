@@ -151,11 +151,11 @@ export default class Schema {
    * Serializes the schema to a blob object to send to the node
    * @returns {object}
    */
-  toBlob(id, did) {
+  toBlob(author) {
     return {
-      id: id || randomAsHex(DockBlobIdByteSize),
+      id: this.id,
       blob: stringToHex(JSON.stringify(this.toJSON())),
-      author: getHexIdentifierFromDID(did),
+      author: getHexIdentifierFromDID(author),
     };
   }
 

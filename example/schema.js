@@ -69,21 +69,20 @@ async function main() {
 
   console.log('The schema is:', JSON.stringify(schema.toJSON(), null, 2));
 
-  const blobId = randomAsHex(DockBlobIdByteSize);
-  const blob = schema.toBlob(blobId, dockDID);
+  const blob = schema.toBlob(dockDID);
 
-  console.log('Writing schema to the chain with blob id of', blobId, '...');
+  console.log('Writing schema to the chain with blob id of', blob.id, '...');
 
   await dock.sendTransaction(dock.blob.new(blob, pair), false);
 
   console.log('Schema written, reading from chain...');
 
-  const result = await Schema.getSchema(blobId, dock);
+  const result = await Schema.getSchema(blob.id, dock);
   console.log('Result from chain:', result);
 
   console.log('Creating a verifiable credential and assigning its schema...');
   const vc = VerifiableCredential.fromJSON(exampleCredential);
-  vc.setSchema(blobHexIdToQualified(blobId), 'JsonSchemaValidator2018');
+  vc.setSchema(blobHexIdToQualified(blob.id), 'JsonSchemaValidator2018');
 
   const universalResolverUrl = 'https://uniresolver.io';
   const resolver = new UniversalResolver(universalResolverUrl);

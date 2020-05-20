@@ -102,7 +102,6 @@ export default class Schema {
     return {
       ...rest,
       id: getHexIdentifierFromBlobID(this.id),
-      signature: signature.toJSON(),
     };
   }
 

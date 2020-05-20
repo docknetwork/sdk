@@ -1,65 +1,19 @@
-import { decodeAddress } from '@polkadot/util-crypto';
 import { stringToHex, u8aToString, u8aToHex } from '@polkadot/util';
 import { validate } from 'jsonschema';
 import axios from 'axios';
 
 import { getHexIdentifierFromDID } from '../utils/did';
 import { getSignatureFromKeyringPair } from '../utils/misc';
-import { isHexWithGivenByteSize } from '../utils/codec';
 import Signature from '../signatures/signature';
 
 import {
   blobHexIdToQualified,
   createNewDockBlobId,
-  DockBlobIdByteSize,
-  DockBlobQualifier,
+  getHexIdentifierFromBlobID,
 } from './blob';
 
 // Supported schemas
 import JSONSchema07 from '../utils/vc/schemas/schema-draft-07';
-
-/**
- * Check if the given identifier is 32 byte hex
- * @param {string} identifier - The identifier to check.
- * @return {void} Throws exception if invalid identifier
- */
-export function validateBlobIDHexIdentifier(identifier) {
-  if (!isHexWithGivenByteSize(identifier, DockBlobIdByteSize)) {
-    throw new Error(`ID must be ${DockBlobIdByteSize} bytes`);
-  }
-}
-
-/**
- * Gets the hexadecimal value of the given ID.
- * @param {string} id -  The ID can be passed as fully qualified ID like `blob:dock:<SS58 string>` or
- * a 32 byte hex string
- * @return {string} Returns the hexadecimal representation of the ID.
- */
-export function getHexIdentifierFromBlobID(id) {
-  if (id.startsWith(DockBlobQualifier)) {
-    // Fully qualified ID. Remove the qualifier
-    const ss58Did = id.slice(DockBlobQualifier.length);
-    try {
-      const hex = u8aToHex(decodeAddress(ss58Did));
-      // 2 characters for `0x` and 2*byte size of ID
-      if (hex.length !== (2 + 2 * DockBlobIdByteSize)) {
-        throw new Error('Unexpected byte size');
-      }
-      return hex;
-    } catch (e) {
-      throw new Error(`Invalid SS58 ID ${id}. ${e}`);
-    }
-  } else {
-    try {
-      // Check if hex and of correct size and return the hex value if successful.
-      validateBlobIDHexIdentifier(id);
-      return id;
-    } catch (e) {
-      // Cannot parse as hex
-      throw new Error(`Invalid hexadecimal ID ${id}. ${e}`);
-    }
-  }
-}
 
 export default class Schema {
   /**

@@ -1,5 +1,7 @@
-import { encodeAddress, randomAsHex } from '@polkadot/util-crypto';
+import { encodeAddress, randomAsHex, decodeAddress } from '@polkadot/util-crypto';
+import { u8aToHex } from '@polkadot/util';
 import { getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
+import { isHexWithGivenByteSize } from '../utils/codec';
 import NoBlobError from '../utils/errors/no-blob-error';
 
 export const DockBlobMethod = 'dock';
@@ -9,6 +11,49 @@ export const DockBlobIdByteSize = 32;
 // Maximum size of the blob in bytes
 // implementer may choose to implement this as a dynamic config option settable with the `parameter_type!` macro
 export const BLOB_MAX_BYTE_SIZE = 1024;
+
+/**
+ * Check if the given identifier is 32 byte hex
+ * @param {string} identifier - The identifier to check.
+ * @return {void} Throws exception if invalid identifier
+ */
+export function validateBlobIDHexIdentifier(identifier) {
+  if (!isHexWithGivenByteSize(identifier, DockBlobIdByteSize)) {
+    throw new Error(`ID must be ${DockBlobIdByteSize} bytes`);
+  }
+}
+
+/**
+ * Gets the hexadecimal value of the given ID.
+ * @param {string} id -  The ID can be passed as fully qualified ID like `blob:dock:<SS58 string>` or
+ * a 32 byte hex string
+ * @return {string} Returns the hexadecimal representation of the ID.
+ */
+export function getHexIdentifierFromBlobID(id) {
+  if (id.startsWith(DockBlobQualifier)) {
+    // Fully qualified ID. Remove the qualifier
+    const ss58Did = id.slice(DockBlobQualifier.length);
+    try {
+      const hex = u8aToHex(decodeAddress(ss58Did));
+      // 2 characters for `0x` and 2*byte size of ID
+      if (hex.length !== (2 + 2 * DockBlobIdByteSize)) {
+        throw new Error('Unexpected byte size');
+      }
+      return hex;
+    } catch (e) {
+      throw new Error(`Invalid SS58 ID ${id}. ${e}`);
+    }
+  } else {
+    try {
+      // Check if hex and of correct size and return the hex value if successful.
+      validateBlobIDHexIdentifier(id);
+      return id;
+    } catch (e) {
+      // Cannot parse as hex
+      throw new Error(`Invalid hexadecimal ID ${id}. ${e}`);
+    }
+  }
+}
 
 /**
  * Create and return a fully qualified Dock Blob, i.e. "did:dock:<SS58 string>"

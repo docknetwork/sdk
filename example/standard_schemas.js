@@ -277,9 +277,9 @@ const noInfectionCred = {
 };
 
 async function validateSchema(schema, credential) {
-  console.log('Validating schema:', schema.description)
+  console.log('Validating schema:', schema.description);
   await Schema.validateSchema(schema);
-  console.log('Validating credential against schema...')
+  console.log('Validating credential against schema...');
   validateCredentialSchema(credential, schema);
   console.log('Success!');
 }

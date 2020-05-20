@@ -326,7 +326,7 @@ export function validateCredentialSchema(credential, schema) {
   for (let i = 0; i < subjects.length; i++) {
     const subject = { ...subjects[i] };
     if (!requiresID) {
-       // The id will not be part of schema. The spec mentioned that id will be popped off from subject
+      // The id will not be part of schema. The spec mentioned that id will be popped off from subject
       delete subject.id;
     }
     validate(subject, schema.schema || schema, {

@@ -50,7 +50,7 @@ export default class Schema {
    * @param {string} did - the author DID
    */
   setAuthor(did) {
-    if (did.startsWith('did:') || isHexWithGivenByteSize(DockBlobIdByteSize)) {
+    if (did.startsWith('did:') || isHexWithGivenByteSize(did, DockBlobIdByteSize)) {
       this.author = did;
     } else {
       throw new Error(`Supplied author ${did} is not a valid DID or ${DockBlobIdByteSize} byte hex string`);

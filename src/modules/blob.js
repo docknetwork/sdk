@@ -33,7 +33,7 @@ export function getHexIdentifierFromBlobID(id) {
 }
 
 /**
- * Create and return a fully qualified Dock Blob id, i.e. "did:dock:<SS58 string>"
+ * Create and return a fully qualified Dock Blob id, i.e. "blob:dock:<SS58 string>"
  * @returns {string} - The Blob id
  */
 export function createNewDockBlobId() {
@@ -42,7 +42,7 @@ export function createNewDockBlobId() {
 }
 
 /**
- * Return a fully qualified Dock Blob id, i.e. "did:dock:<SS58 string>"
+ * Return a fully qualified Dock Blob id, i.e. "blob:dock:<SS58 string>"
  * @param {string} hexId - The hex blob id (without the qualifier)
  * @returns {string} - The fully qualified Blob id
  */

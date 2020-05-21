@@ -16,6 +16,7 @@ import exampleSchema from '../example-schema';
 import VerifiablePresentation from '../../src/verifiable-presentation';
 import getKeyDoc from '../../src/utils/vc/helpers';
 import DockResolver from '../../src/dock-resolver';
+import { SignatureSr25519 } from '../../src/signatures';
 
 let account;
 let pair;
@@ -124,7 +125,7 @@ describe('Schema Blob Module Integration', () => {
     schema.setAuthor(dockDID);
     schema.name = 'AlumniCredSchema';
     await schema.setJSONSchema(exampleSchema);
-    const msg = dock.blob.getSerializedBlob(schema.toBlob());
+    const msg = dockApi.blob.getSerializedBlob(schema.toBlob());
     const pk = getPublicKeyFromKeyringPair(pair);
     const sig = new SignatureSr25519(msg, pair);
     schema.setSignature(sig);
@@ -136,7 +137,7 @@ describe('Schema Blob Module Integration', () => {
     schema.setAuthor(dockDID);
     await schema.setJSONSchema(exampleSchema);
     schema.name = 'AlumniCredSchema';
-    schema.sign(pair, dock.blob);
+    schema.sign(pair, dockApi.blob);
     expect(!!schema.signature).toBe(true);
   });
 

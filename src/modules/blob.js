@@ -72,6 +72,9 @@ class BlobModule {
    */
   new(blob, keyPair = undefined, signature = undefined) {
     if (!signature) {
+      if (!keyPair) {
+        throw Error('You need to provide either a keypair or a signature to register a new Blob.');
+      }
       const serializedBlob = this.getSerializedBlob(blob);
       // eslint-disable-next-line no-param-reassign
       signature = getSignatureFromKeyringPair(keyPair, serializedBlob);

@@ -15,6 +15,18 @@ import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 
 import exampleCredential from '../tests/example-credential';
 
+async function createAuthorDID(dock, pair) {
+  // Generate a DID to be used as author
+  const dockDID = createNewDockDID();
+  console.log('Creating new author DID', dockDID);
+
+  // Create an author DID to write with
+  const publicKey = getPublicKeyFromKeyringPair(pair);
+  const keyDetail = createKeyDetail(publicKey, dockDID);
+  await dock.sendTransaction(dock.did.new(dockDID, keyDetail));
+  return dockDID;
+}
+
 async function main() {
   console.log('Connecting to the node...');
   const dock = new DockAPI();
@@ -26,16 +38,11 @@ async function main() {
   const account = dock.keyring.addFromUri(TestAccountURI);
   dock.setAccount(account);
 
-  // Generate aDID to be used as author
-  const dockDID = createNewDockDID();
-
-  console.log('Creating new DID', dockDID);
-
   // Generate first key with this seed. The key type is Sr25519
   const pair = dock.keyring.addFromUri(randomAsHex(32));
-  const publicKey = getPublicKeyFromKeyringPair(pair);
-  const keyDetail = createKeyDetail(publicKey, dockDID);
-  await dock.sendTransaction(dock.did.new(dockDID, keyDetail));
+
+  // Generate a DID to be used as author
+  const dockDID = await createAuthorDID(dock, pair);
 
   console.log('Creating a new schema...');
   const schema = new Schema();
@@ -65,7 +72,7 @@ async function main() {
     .setAuthor(dockDID);
 
   // TODO: Sign the schema
-  // schema.sign(msg, account);
+  // schema.sign(account);
 
   console.log('The schema is:', JSON.stringify(schema.toJSON(), null, 2));
 

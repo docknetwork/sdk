@@ -1,9 +1,11 @@
-import { u8aToHex, u8aToU8a } from '@polkadot/util';
+import { stringToHex } from '@polkadot/util';
 import { randomAsHex } from '@polkadot/util-crypto';
 
 import { DockAPI } from '../../src/api';
 
-import { hexDIDToQualified, createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../../src/utils/did';
+import {
+  hexDIDToQualified, createNewDockDID, createKeyDetail, getHexIdentifierFromDID,
+} from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { verifyCredential, verifyPresentation } from '../../src/utils/vc';
@@ -51,7 +53,7 @@ describe('Schema Blob Module Integration', () => {
     invalidFormatBlobId = randomAsHex(DockBlobIdByteSize);
     await dockApi.sendTransaction(dockApi.blob.new({
       id: invalidFormatBlobId,
-      blob: u8aToHex(u8aToU8a('hello world')),
+      blob: stringToHex('hello world'),
       author: getHexIdentifierFromDID(dockDID),
     }, pair), false);
 
@@ -59,7 +61,7 @@ describe('Schema Blob Module Integration', () => {
     const blobStr = JSON.stringify(exampleSchema);
     await dockApi.sendTransaction(dockApi.blob.new({
       id: blobId,
-      blob: u8aToU8a(blobStr),
+      blob: stringToHex(blobStr),
       author: getHexIdentifierFromDID(dockDID),
     }, pair), false);
 

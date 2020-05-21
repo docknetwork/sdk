@@ -3,7 +3,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 
 import { DockAPI } from '../../src/api';
 
-import { createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../../src/utils/did';
+import { hexDIDToQualified, createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { verifyCredential } from '../../src/utils/vc';
@@ -82,7 +82,7 @@ describe('Schema Blob Module Integration', () => {
     await expect(Schema.getSchema(blobId, dock)).resolves.toMatchObject({
       ...exampleSchema,
       id: blobId,
-      author: blobHexIdToQualified(getHexIdentifierFromDID(dockDID)),
+      author: hexDIDToQualified(getHexIdentifierFromDID(dockDID)),
     });
   }, 120000);
 

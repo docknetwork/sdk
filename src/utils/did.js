@@ -61,6 +61,16 @@ export function getHexIdentifierFromDID(did) {
   return getHexIdentifier(did, DockDIDQualifier, validateDockDIDHexIdentifier, DockDIDByteSize);
 }
 
+/**
+ * Return a fully qualified Dock DID id, i.e. "did:dock:<SS58 string>"
+ * @param {string} hexId - The hex blob id (without the qualifier)
+ * @returns {string} - The fully qualified Blob id
+ */
+export function hexDIDToQualified(hexId) {
+  const ss58Id = encodeAddress(hexId);
+  return `${DockDIDQualifier}${ss58Id}`;
+}
+
 
 /**
  * Create and return a fully qualified Dock DID, i.e. "did:dock:<SS58 string>"
@@ -68,8 +78,7 @@ export function getHexIdentifierFromDID(did) {
  */
 export function createNewDockDID() {
   const hexId = randomAsHex(DockDIDByteSize);
-  const ss58Id = encodeAddress(hexId);
-  return `${DockDIDQualifier}${ss58Id}`;
+  return hexDIDToQualified(hexId);
 }
 
 /**

@@ -2,14 +2,13 @@ import { stringToHex, u8aToString, u8aToHex } from '@polkadot/util';
 import { validate } from 'jsonschema';
 import axios from 'axios';
 
-import { getHexIdentifierFromDID } from '../utils/did';
+import { getHexIdentifierFromDID, hexDIDToQualified } from '../utils/did';
 import { getSignatureFromKeyringPair } from '../utils/misc';
 import { isHexWithGivenByteSize } from '../utils/codec';
 import Signature from '../signatures/signature';
 
 import {
   DockBlobIdByteSize,
-  blobHexIdToQualified,
   createNewDockBlobId,
   getHexIdentifierFromBlobID,
 } from './blob';
@@ -150,7 +149,7 @@ export default class Schema {
     try {
       const schema = JSON.parse(blobStr);
       schema.id = id;
-      schema.author = blobHexIdToQualified(u8aToHex(chainBlob[0]));
+      schema.author = hexDIDToQualified(u8aToHex(chainBlob[0]));
 
       return schema;
     } catch (e) {

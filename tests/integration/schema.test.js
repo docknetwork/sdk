@@ -10,6 +10,7 @@ import { verifyCredential } from '../../src/utils/vc';
 import { DockBlobIdByteSize, createNewDockBlobId, blobHexIdToQualified } from '../../src/modules/blob';
 import Schema from '../../src/modules/schema';
 import VerifiableCredential from '../../src/verifiable-credential';
+import { SignatureSr25519 } from '../../src/signatures';
 import exampleCredential from '../example-credential';
 import exampleSchema from '../example-schema';
 
@@ -77,6 +78,27 @@ describe('Schema Blob Module Integration', () => {
   afterAll(async () => {
     await dock.disconnect();
   }, 120000);
+
+  test('setSignature will only accept signature of the supported types and set the signature key of the object.', async () => {
+    const schema = new Schema();
+    schema.setAuthor(dockDID);
+    schema.name = 'AlumniCredSchema';
+    await schema.setJSONSchema(exampleSchema);
+    const msg = dock.blob.getSerializedBlob(schema.toBlob());
+    const pk = getPublicKeyFromKeyringPair(pair);
+    const sig = new SignatureSr25519(msg, pair);
+    schema.setSignature(sig);
+    expect(schema.signature).toBe(sig);
+  });
+
+  test('sign will generate a signature on the schema detail, this signature is verifiable.', async () => {
+    const schema = new Schema();
+    schema.setAuthor(dockDID);
+    await schema.setJSONSchema(exampleSchema);
+    schema.name = 'AlumniCredSchema';
+    schema.sign(pair, dock.blob);
+    expect(!!schema.signature).toBe(true);
+  });
 
   test('getSchema will return schema in correct format.', async () => {
     await expect(Schema.getSchema(blobId, dock)).resolves.toMatchObject({

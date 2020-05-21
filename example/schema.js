@@ -76,7 +76,7 @@ async function main() {
 
   console.log('The schema is:', JSON.stringify(schema.toJSON(), null, 2));
 
-  const blob = schema.toBlob(dockDID);
+  const blob = schema.toBlob();
 
   console.log('Writing schema to the chain with blob id of', blob.id, '...');
 

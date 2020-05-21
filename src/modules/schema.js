@@ -79,11 +79,11 @@ export default class Schema {
    * Serializes the object using `getSerializedBlob` and then signs it using the given
    * polkadot-js pair. The object will be updated with key `signature`. Repeatedly calling it will
    * keep resetting the `signature` key
-   * @param {any} msg - The message to sign
    * @param {object} pair - Key pair to sign with
    */
-  sign(msg, pair) {
-    this.signature = getSignatureFromKeyringPair(pair, msg);
+  sign(pair, blobModule) {
+    const serializedBlob = blobModule.getSerializedBlob(this.toBlob());
+    this.signature = getSignatureFromKeyringPair(pair, serializedBlob);
     return this;
   }
 
@@ -109,15 +109,19 @@ export default class Schema {
    * Serializes the schema to a blob object to send to the node
    * @returns {object}
    */
-  toBlob(author) {
+  toBlob() {
     if (!this.schema) {
-      throw new Error('Schema required schema property to be serialized to blob');
+      throw new Error('Schema requires schema property to be serialized to blob');
+    }
+
+    if (!this.author) {
+      throw new Error('Schema requires author property to be serialized to blob');
     }
 
     return {
       id: this.id,
       blob: stringToHex(canonicalize(this.schema)),
-      author: getHexIdentifierFromDID(author),
+      author: getHexIdentifierFromDID(this.author),
     };
   }
 

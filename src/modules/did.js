@@ -54,7 +54,7 @@ class DIDModule {
   /**
    * Create the fully qualified DID like "did:dock:..."
    * @param {string} did - DID
-   * @return {string} The DID identifer.
+   * @return {string} The DID identifier.
    */
   getFullyQualifiedDID(did) {
     return `${DockDIDQualifier}${did}`;

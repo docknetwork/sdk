@@ -1,4 +1,5 @@
 import { stringToHex, u8aToString, u8aToHex } from '@polkadot/util';
+import { canonicalize } from 'json-canonicalize';
 import { validate } from 'jsonschema';
 import axios from 'axios';
 
@@ -115,7 +116,7 @@ export default class Schema {
 
     return {
       id: this.id,
-      blob: stringToHex(JSON.stringify(this.schema)),
+      blob: stringToHex(canonicalize(this.schema)),
       author: getHexIdentifierFromDID(author),
     };
   }

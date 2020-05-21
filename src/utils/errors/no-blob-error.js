@@ -3,9 +3,9 @@
  * This is different from a network error.
  */
 export default class NoBlobError extends Error {
-  constructor(blob) {
-    super(`Blob (${blob}) does not exist`);
+  constructor(id) {
+    super(`Blob ID (${id}) does not exist`);
     this.name = 'NoBlobError';
-    this.blob = blob;
+    this.id = id;
   }
 }

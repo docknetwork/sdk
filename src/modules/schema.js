@@ -1,15 +1,15 @@
 import { stringToHex, u8aToString, u8aToHex } from '@polkadot/util';
+import { canonicalize } from 'json-canonicalize';
 import { validate } from 'jsonschema';
 import axios from 'axios';
 
-import { getHexIdentifierFromDID } from '../utils/did';
+import { getHexIdentifierFromDID, hexDIDToQualified } from '../utils/did';
 import { getSignatureFromKeyringPair } from '../utils/misc';
 import { isHexWithGivenByteSize } from '../utils/codec';
 import Signature from '../signatures/signature';
 
 import {
   DockBlobIdByteSize,
-  blobHexIdToQualified,
   createNewDockBlobId,
   getHexIdentifierFromBlobID,
 } from './blob';
@@ -102,7 +102,6 @@ export default class Schema {
     return {
       ...rest,
       id: getHexIdentifierFromBlobID(this.id),
-      signature: signature.toJSON(),
     };
   }
 
@@ -111,9 +110,13 @@ export default class Schema {
    * @returns {object}
    */
   toBlob(author) {
+    if (!this.schema) {
+      throw new Error('Schema required schema property to be serialized to blob');
+    }
+
     return {
       id: this.id,
-      blob: stringToHex(JSON.stringify(this.toJSON())),
+      blob: stringToHex(canonicalize(this.schema)),
       author: getHexIdentifierFromDID(author),
     };
   }
@@ -147,7 +150,7 @@ export default class Schema {
     try {
       const schema = JSON.parse(blobStr);
       schema.id = id;
-      schema.author = blobHexIdToQualified(u8aToHex(chainBlob[0]));
+      schema.author = hexDIDToQualified(u8aToHex(chainBlob[0]));
 
       return schema;
     } catch (e) {

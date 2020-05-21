@@ -5,6 +5,7 @@ import { hexToU8a } from '@polkadot/util';
 import VerifiableCredential from '../../src/verifiable-credential';
 import Schema from '../../src/modules/schema';
 import { DockBlobQualifier } from '../../src/modules/blob';
+import { createNewDockDID } from '../../src/utils/did';
 
 import {
   getPublicKeyFromKeyringPair,
@@ -100,6 +101,18 @@ describe('Basic Schema Tests', () => {
       expect.objectContaining({
         id: expect.anything(),
         schema: expect.anything(),
+      }),
+    );
+  });
+
+  test('toBlob will generate a JSON that can be sent to written with blob module', () => {
+    const result = schema.toBlob(createNewDockDID());
+    console.log('toBlob:', result);
+    expect(result).toMatchObject(
+      expect.objectContaining({
+        id: expect.anything(),
+        blob: expect.anything(),
+        author: expect.anything(),
       }),
     );
   });

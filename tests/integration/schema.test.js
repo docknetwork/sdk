@@ -56,7 +56,7 @@ describe('Schema Blob Module Integration', () => {
       type: 'JsonSchemaValidator2018',
     };
 
-    // Write invalid format blob
+    // Write a blob with invalid JSON-schema format
     invalidFormatBlobId = randomAsHex(DockBlobIdByteSize);
     await dock.sendTransaction(dock.blob.new({
       id: invalidFormatBlobId,
@@ -119,13 +119,13 @@ describe('Schema Blob Module Integration', () => {
   test('Utility method verifyCredential should check if schema is incompatible with the credentialSubject.', async () => {
     await expect(
       verifyCredential(
-        vcInvalid, null, false, false, undefined, { notDock: dock },
+        vcInvalid, null, true, false, undefined, { notDock: dock },
       ),
     ).rejects.toThrow('Only Dock schemas are supported as of now.');
 
     await expect(
       verifyCredential(
-        vcInvalid, null, false, false, undefined, { dock },
+        vcInvalid, null, true, false, undefined, { dock },
       ),
     ).rejects.toThrow(/Schema validation failed/);
   }, 120000);
@@ -134,7 +134,7 @@ describe('Schema Blob Module Integration', () => {
     const vc = VerifiableCredential.fromJSON(vcInvalid);
     await expect(
       vc.verify(
-        null, false, false, undefined, { dock },
+        null, true, false, undefined, { dock },
       ),
     ).rejects.toThrow(/Schema validation failed/);
   }, 120000);

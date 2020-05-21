@@ -49,7 +49,7 @@ describe('Schema Blob Module Integration', () => {
     await dockApi.sendTransaction(dockApi.did.new(dockDID, keyDetail));
     blobId = randomAsHex(DockBlobIdByteSize);
 
-    // Write invalid format blob
+    // Write a blob with invalid JSON-schema format
     invalidFormatBlobId = randomAsHex(DockBlobIdByteSize);
     await dockApi.sendTransaction(dockApi.blob.new({
       id: invalidFormatBlobId,

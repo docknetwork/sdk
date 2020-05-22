@@ -144,8 +144,8 @@ class VerifiablePresentation {
       throw new Error('The current VerifiablePresentation has no proof.');
     }
 
-    return verifyPresentation(
-      this.toJSON(),
+    return verifyPresentation({
+      presentation: this.toJSON(),
       challenge,
       domain,
       resolver,
@@ -153,7 +153,7 @@ class VerifiablePresentation {
       forceRevocationCheck,
       revocationApi,
       schemaApi,
-    );
+    });
   }
 }
 

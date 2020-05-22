@@ -169,12 +169,12 @@ describe('Verifiable Presentation creation', () => {
       'some_domain',
     );
     expect(signedVp).toMatchObject(getSamplePres(true));
-    const results = await verifyPresentation(
-      signedVp,
-      'some_challenge',
-      'some_domain',
-    );
 
+    const results = await verifyPresentation({
+      presentation: signedVp,
+      challenge: 'some_challenge',
+      domain: 'some_domain',
+    });
 
     expect(results.presentationResult.verified).toBe(true);
     expect(results.presentationResult.results[0].proof['@context']).toBe('https://w3id.org/security/v2');

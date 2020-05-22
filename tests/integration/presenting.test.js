@@ -161,12 +161,12 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
         ),
       );
 
-      const result = await verifyPresentation(
-        signedPres,
-        chal,
+      const result = await verifyPresentation({
+        presentation: signedPres,
+        challenge: chal,
         domain,
         resolver,
-      );
+      });
 
       expect(result.verified).toBe(true);
       expect(result.presentationResult.verified).toBe(true);
@@ -237,12 +237,12 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       ),
     );
 
-    const result = await verifyPresentation(
-      signedPres,
-      chal,
+    const result = await verifyPresentation({
+      presentation: signedPres,
+      challenge: chal,
       domain,
       resolver,
-    );
+    });
 
     // Verifier checks that both credential and presentation are correct.
     expect(result.verified).toBe(true);

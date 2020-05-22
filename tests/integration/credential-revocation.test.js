@@ -152,15 +152,15 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     );
 
     // As the credential is unrevoked, the presentation should verify successfully.
-    const result = await verifyPresentation(
-      signedPres,
-      chal,
+    const result = await verifyPresentation({
+      presentation: signedPres,
+      challenge: chal,
       domain,
       resolver,
-      true,
-      false,
-      { dock: dockAPI },
-    );
+      compactProof: true,
+      forceRevocationCheck: false,
+      revocationApi: { dock: dockAPI },
+    });
     expect(result.verified).toBe(true);
 
     // Revoke credential
@@ -168,15 +168,15 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     await dockAPI.sendTransaction(t3);
 
     // As the credential is revoked, the presentation should verify successfully.
-    const result1 = await verifyPresentation(
-      signedPres,
-      chal,
+    const result1 = await verifyPresentation({
+      presentation: signedPres,
+      challenge: chal,
       domain,
       resolver,
-      true,
-      false,
-      { dock: dockAPI },
-    );
+      compactProof: true,
+      forceRevocationCheck: false,
+      revocationApi: { dock: dockAPI },
+    });
     expect(result1.verified).toBe(false);
   }, 60000);
 });

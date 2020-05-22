@@ -147,9 +147,9 @@ export default class Schema {
    * @param {object} dockApi - The Dock API
    * @returns {Promise<object>}
    */
-  static async getSchema(id, dockApi) {
+  static async get(id, dockApi) {
     const hexId = getHexIdentifierFromBlobID(id);
-    const chainBlob = await dockApi.blob.getBlob(hexId);
+    const chainBlob = await dockApi.blob.get(hexId);
     const blobStr = u8aToString(chainBlob[1]);
     try {
       const schema = JSON.parse(blobStr);

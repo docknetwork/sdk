@@ -101,7 +101,7 @@ describe('Schema Blob Module Integration', () => {
   });
 
   test('getSchema will return schema in correct format.', async () => {
-    await expect(Schema.getSchema(blobId, dock)).resolves.toMatchObject({
+    await expect(Schema.get(blobId, dock)).resolves.toMatchObject({
       ...exampleSchema,
       id: blobId,
       author: hexDIDToQualified(getHexIdentifierFromDID(dockDID)),
@@ -109,11 +109,11 @@ describe('Schema Blob Module Integration', () => {
   }, 120000);
 
   test('getSchema throws error when schema not in correct format.', async () => {
-    await expect(Schema.getSchema(invalidFormatBlobId, dock)).rejects.toThrow(/Incorrect schema format/);
+    await expect(Schema.get(invalidFormatBlobId, dock)).rejects.toThrow(/Incorrect schema format/);
   }, 120000);
 
   test('getSchema throws error when no blob exists at the given id.', async () => {
-    await expect(Schema.getSchema(createNewDockBlobId(), dock)).rejects.toThrow(/does not exist/);
+    await expect(Schema.get(createNewDockBlobId(), dock)).rejects.toThrow(/does not exist/);
   }, 120000);
 
   test('Utility method verifyCredential should check if schema is incompatible with the credentialSubject.', async () => {

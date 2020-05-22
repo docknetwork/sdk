@@ -84,7 +84,7 @@ class BlobModule {
    * @param {string} id - Can either be a full blob id like blob:dock:0x... or just the hex identifier
    * @returns {Promise<Array>} - A 2-element array where the first is the author and the second is the blob contents.
    */
-  async getBlob(id) {
+  async get(id) {
     const hexId = getHexIdentifierFromBlobID(id);
     const resp = await this.api.query.blobStore.blobs(hexId);
     if (resp.isNone) {

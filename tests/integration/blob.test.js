@@ -75,7 +75,7 @@ describe('Blob Module', () => {
     const result = await dock.sendTransaction(txBlob, false);
     expect(!!result).toBe(true);
 
-    const chainBlob = await dock.blob.getBlob(blobId);
+    const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
     expect(chainBlob[1].toString(16)).toEqual(blobHex);
   }, 30000);
@@ -94,7 +94,7 @@ describe('Blob Module', () => {
     const result = await dock.sendTransaction(transaction, false);
     expect(!!result).toBe(true);
 
-    const chainBlob = await dock.blob.getBlob(blobId);
+    const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
     expect(Array.from(chainBlob[1])).toEqual(blobVect);
   }, 30000);
@@ -114,7 +114,7 @@ describe('Blob Module', () => {
     const result = await dock.sendTransaction(transaction, false);
     expect(!!result).toBe(true);
     await expect(
-      dock.blob.getBlob(blobId),
+      dock.blob.get(blobId),
     ).rejects.toThrowError('does not exist');
   }, 30000);
 
@@ -132,7 +132,7 @@ describe('Blob Module', () => {
     const resultFirst = await dock.sendTransaction(txFirst, false);
     expect(!!resultFirst).toBe(true);
 
-    const chainBlob = await dock.blob.getBlob(blobId);
+    const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
     expect(chainBlob[1].toString(16)).toEqual(blobHexFirst);
 
@@ -155,7 +155,7 @@ describe('Blob Module', () => {
   test('Should throw error when cannot read blob with given id from chain.', async () => {
     const nonExistentBlobId = randomAsHex(DockBlobIdByteSize);
     await expect(
-      dock.blob.getBlob(nonExistentBlobId),
+      dock.blob.get(nonExistentBlobId),
     ).rejects.toThrowError('does not exist');
   }, 30000);
 });

@@ -84,7 +84,7 @@ async function main() {
 
   console.log('Schema written, reading from chain...');
 
-  const result = await Schema.getSchema(blob.id, dock);
+  const result = await Schema.get(blob.id, dock);
   console.log('Result from chain:', result);
 
   console.log('Creating a verifiable credential and assigning its schema...');

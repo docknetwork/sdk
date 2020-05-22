@@ -82,7 +82,6 @@ describe('Schema Blob Module Integration', () => {
   test('setSignature will only accept signature of the supported types and set the signature key of the object.', async () => {
     const schema = new Schema();
     schema.setAuthor(dockDID);
-    schema.name = 'AlumniCredSchema';
     await schema.setJSONSchema(exampleSchema);
     const msg = dock.blob.getSerializedBlob(schema.toBlob());
     const pk = getPublicKeyFromKeyringPair(pair);
@@ -95,7 +94,6 @@ describe('Schema Blob Module Integration', () => {
     const schema = new Schema();
     schema.setAuthor(dockDID);
     await schema.setJSONSchema(exampleSchema);
-    schema.name = 'AlumniCredSchema';
     schema.sign(pair, dock.blob);
     expect(!!schema.signature).toBe(true);
   });

@@ -47,11 +47,7 @@ describe('Basic Schema Tests', () => {
     const keyring = new Keyring();
     const seed = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
     keypair = keyring.addFromUri(randomAsHex(32), null, 'sr25519');
-
     schema = new Schema();
-    schema.name = 'AlumniCredSchema';
-    schema.version = '1.0.0';
-
     done();
   }, 10000);
 
@@ -106,8 +102,6 @@ describe('Basic Schema Tests', () => {
 
 describe('Validate Credential Schema utility', () => {
   const schema = new Schema();
-  schema.name = 'AlumniCredSchema';
-  schema.version = '1.0.0';
   schema.setJSONSchema(exampleSchema);
   schema.setAuthor(exampleAuthor);
 

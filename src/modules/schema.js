@@ -25,8 +25,6 @@ export default class Schema {
    */
   constructor(id) {
     this.id = id || createNewDockBlobId();
-    this.name = '';
-    this.version = '1.0.0';
   }
 
   /**
@@ -36,11 +34,6 @@ export default class Schema {
   async setJSONSchema(json) {
     await Schema.validateSchema(json);
     this.schema = json;
-    return this;
-  }
-
-  setName(name) {
-    this.name = name;
     return this;
   }
 

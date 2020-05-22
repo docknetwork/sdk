@@ -27,7 +27,7 @@ blob id, a 32 byte long hex string. They are authored by a DID and have a max si
 The chain is agnostic to the contents of blobs and thus to schemas. Blobs may be used to store types of data other than schemas.
 
 ### Writing a Blob
-A new Blob can be registered on the Dock Chain by using the method `new` in the BlobModule class.
+A new Blob can be registered on the Dock Chain by using the method `writeToChain` in the BlobModule class.
 It accepts a `blob` object with the struct to store on chain (it can either be a hex string or a byte array), and one of `keyPair` (a
 keyPair to sign the extrinsic with) or a `signature` (if you prefer to sign the extrinsic offline). In return you'll get
 a signed extrinsic that you can send to the Dock chain:
@@ -38,7 +38,7 @@ const blobStruct = {
   blob: blobHexOrArray,  // Contents of your blob as a hex string or byte array
   author: '0x...',       // hex part of a dock DID
 }
-const txBlob = await dock.blob.new( blobStruct, keyPair);
+const txBlob = await dock.blob.writeToChain( blobStruct, keyPair);
 const result = await dock.sendTransaction(txBlob, false);
 ```
 If everything worked properly `result` will indicate a successful transaction.
@@ -159,7 +159,7 @@ Writing a Schema to the Dock chain is similar to writing any other Blob. Once yo
 the steps above you can use the `BlobModule` methods to interact with the chain:
 ```javascript
 >  const formattedBlob = myNewSchema.toBlob(dockDID);
->  const blobTx = dock.blob.new(formattedBlob, keyPair);
+>  const blobTx = dock.blob.writeToChain(formattedBlob, keyPair);
 >  await dock.sendTransaction(blobTx, false);
 ```
 

@@ -131,7 +131,7 @@ class VerifiablePresentation {
    * @param {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
    * @param {Boolean} [forceRevocationCheck] - Whether to force revocation check or not.
    * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
-   * @param {object} [revocationAPI] - An object representing a map. "revocation type -> revocation API". The API is used to check
+   * @param {object} [revocationApi] - An object representing a map. "revocation type -> revocation API". The API is used to check
    * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
    * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
    * @param {object} [schemaAPI] - An object representing a map. "schema type -> schema API". The API is used to get a
@@ -139,7 +139,7 @@ class VerifiablePresentation {
    * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
    * @returns {Promise<VerifiablePresentationVerificationResult>} - verification result.
    */
-  async verify(challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null, schemaAPI = null) {
+  async verify(challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null) {
     if (!this.proof) {
       throw new Error('The current VerifiablePresentation has no proof.');
     }
@@ -151,8 +151,8 @@ class VerifiablePresentation {
       resolver,
       compactProof,
       forceRevocationCheck,
-      revocationAPI,
-      schemaAPI,
+      revocationApi,
+      schemaApi,
     );
   }
 }

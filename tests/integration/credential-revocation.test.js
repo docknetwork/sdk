@@ -99,7 +99,14 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
   test('Issuer can issue a revocable credential and holder can verify it successfully when it is not revoked else the verification fails', async () => {
     // The credential verification should pass as the credential has not been revoked.
-    const result = await verifyCredential(credential, resolver, true, true, { dock: dockAPI });
+    const result = await verifyCredential({
+      credential,
+      resolver,
+      compactProof: true,
+      forceRevocationCheck: true,
+      revocationApi: { dock: dockAPI }
+    });
+
     expect(result.verified).toBe(true);
 
     // Revoke the credential
@@ -108,7 +115,13 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     await dockAPI.sendTransaction(t1);
 
     // The credential verification should fail as the credential has been revoked.
-    const result1 = await verifyCredential(credential, resolver, true, true, { dock: dockAPI });
+    const result1 = await verifyCredential({
+      credential,
+      resolver,
+      compactProof: true,
+      forceRevocationCheck: true,
+      revocationApi: { dock: dockAPI }
+    });
     expect(result1.verified).toBe(false);
     expect(result1.error).toBe('Revocation check failed');
   }, 50000);

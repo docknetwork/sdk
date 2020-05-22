@@ -125,7 +125,9 @@ describe('Verifiable Credential Issuing', () => {
     expect(credential.proof.proofPurpose).toBe('assertionMethod');
     expect(credential.proof.verificationMethod).toBe(keyUrl);
 
-    const result = await verifyCredential(credential);
+    const result = await verifyCredential({
+      credential
+    });
     expect(result.verified).toBe(true);
     expect(result.results[0].proof).toBeDefined();
     expect(result.results[0].verified).toBe(true);
@@ -135,7 +137,9 @@ describe('Verifiable Credential Issuing', () => {
 describe('Verifiable Credential Verification', () => {
   test.skip('The sample signed credential should pass verification.', async () => {
     const signedCred = getSampleCredential(true);
-    const result = await verifyCredential(signedCred);
+    const result = await verifyCredential({
+      credential: signedCred
+    });
     expect(result.verified).toBe(true);
     expect(result.results[0].proof['@context']).toBe('https://w3id.org/security/v2');
     expect(result.results[0].proof.created).toBeDefined();

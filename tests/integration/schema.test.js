@@ -65,13 +65,10 @@ describe('Schema Blob Module Integration', () => {
     }, pair), false);
 
     // Write schema blob
-    const blobStr = JSON.stringify(exampleSchema);
-    await dock.sendTransaction(dock.blob.new({
-      id: blobId,
-      blob: stringToHex(blobStr),
-      author: getHexIdentifierFromDID(dockDID),
-    }, pair), false);
-
+    const validSchema = new Schema(blobId);
+    validSchema.setAuthor(dockDID);
+    await validSchema.setJSONSchema(exampleSchema);
+    await dock.sendTransaction(validSchema.writeToChain(dock, pair), false);
     done();
   }, 120000);
 

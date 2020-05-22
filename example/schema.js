@@ -66,10 +66,8 @@ async function main() {
     additionalProperties: false,
   });
 
-  // Set schema name and author
-  schema
-    .setName('Example Schema')
-    .setAuthor(dockDID);
+  // Set schema author
+  schema.setAuthor(dockDID);
 
   // TODO: Sign the schema
   // schema.sign(account);

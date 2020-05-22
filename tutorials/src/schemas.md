@@ -143,10 +143,9 @@ of `Signature`):
 
 #### Formatting for storage
 Your new schema is now ready to be written to the Dock chain, the last step is to format it properly for the BlobModule
-to be able to use it. That's where the `toBlob` method comes in handy. It accepts a single string argument `author`
-(a DID):
+to be able to use it. That's where the `toBlob` method comes in handy:
 ```javascript
->   myNewSchema.toBlob(dockDID)
+>   myNewSchema.toBlob()
 <-  {
       id: ...,
       blob: ...,

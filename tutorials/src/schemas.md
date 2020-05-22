@@ -23,19 +23,19 @@ representation formats.
 ## Blobs
 Before diving into Schemas it is important to understand the way these are stored in the Dock chain.
 Schemas are stored on chain as a `Blob` in the Blob Storage module. They are identified and retrieved by their unique
-blob id, a 32 byte long hex string. The chain is agnostic to the contents of blobs and thus to schemas. Blobs may be
-used to store types of data other than schemas.
+blob id, a 32 byte long hex string. They are authored by a DID and have a max size of 1024 bytes.
+The chain is agnostic to the contents of blobs and thus to schemas. Blobs may be used to store types of data other than schemas.
 
 ### Writing a Blob
 A new Blob can be registered on the Dock Chain by using the method `new` in the BlobModule class.
-It accepts a `blob` object with the struct to store on chain (it can either be a hex string or an array), and one of `keyPair` (a
+It accepts a `blob` object with the struct to store on chain (it can either be a hex string or a byte array), and one of `keyPair` (a
 keyPair to sign the extrinsic with) or a `signature` (if you prefer to sign the extrinsic offline). In return you'll get
 a signed extrinsic that you can send to the Dock chain:
 ```javascript
 const blobId = randomAsHex(DockBlobIdByteSize); // 32-bytes long hex string to use as the blob's id
 const blobStruct = {
   id: blobId,
-  blob: blobHexOrArray,  // Contents of your blob as a hex string or array
+  blob: blobHexOrArray,  // Contents of your blob as a hex string or byte array
   author: '0x...',       // hex part of a dock DID
 }
 const txBlob = await dock.blob.new( blobStruct, keyPair);
@@ -46,11 +46,11 @@ We'll see how to retrieve the blob next.
 
 
 ### Reading a Blob
-A Blob can be retrieved by using the method `getBlob` in the BlobModule class.
+A Blob can be retrieved by using the method `get` in the BlobModule class.
 It accepts a `blobId` string param which can either be a fully-qualified blob id like `blob:dock:0x...`
 or just its hex identifier. In response you will receive a two-element array:
 ```javascript
-const chainBlob = await dock.blob.getBlob(blobId);
+const chainBlob = await dock.blob.get(blobId);
 ```
 `chainBlob`'s first element will be the blob's author (a DID). It's second element will be the contents of your
 blob (`blobHexOrArray` in our previous example).
@@ -72,29 +72,13 @@ When an `id` isn't passed, a random `blobId` will be assigned as the schema's id
 > myNewSchema.id
 <- "blob:dock:5Ek98pDX61Dwo4EDmsogUkYMBqfFHtiS5hVS7xHuVvMByh3N"
 ```
-There are some other defaults too:
-```javascript
-> myNewSchema.name
-<- ""
-> myNewSchema.version
-<- "1.0.0"
-```
 Also worth noticing is the JSON representation of the schema as is right now, which can be achieved by calling
 the `toJSON` method on your new schema:
 ```javascript
 >  myNewSchema.toJSON()
-<- {"name":"","version":"1.0.0","id":"0x768c21de02890dad5dbf6f108b6822b865e4ea495bb7f43f8947714e90fcc060"}
+<- {"id":"0x768c21de02890dad5dbf6f108b6822b865e4ea495bb7f43f8947714e90fcc060"}
 ```
 where you can see that the schema's `id` gets modified with `getHexIdentifierFromBlobID`.
-
-#### Setting a name
-A name can be added with the `setName` method. It accepts a single string argument `name`:
-```javascript
->   myNewSchema.setName('Example Schema')
->   myNewSchema.name
-<-  'Example Schema'
-```
-
 
 #### Setting a JSON Schema
 A JSON schema can be added with the `setJSONSchema` method. It accepts a single argument `json` (an object that is
@@ -135,12 +119,12 @@ identifier or a fully-quailified DID):
 ```
 
 #### Signing a schema
-Signing a schema can be achieved by calling the `sign` method. It accepts a `msg` param to be signed and a `pair`
-(a keyPair to sign with):
+Signing a schema can be achieved by calling the `sign` method. It accepts a `keypair` param (a keyPair to sign with)
+and a `blobModule` object:
 ```javascript
 >   const keyring = new Keyring();
 >   const keypair = keyring.addFromUri(randomAsHex(32), null, 'sr25519');
->   myNewSchema.sign(myNewSchema.schema, keypair)
+>   myNewSchema.sign(keypair, dockApi.blob)
 >   !!myNewSchema.signature
 <-  true
 ```
@@ -181,11 +165,11 @@ the steps above you can use the `BlobModule` methods to interact with the chain:
 ```
 
 ### Reading a Schema from the Dock chain
-Reading a Schema from the Dock chain can easily be achieved by using the `getSchema` method from the `Schema` class.
+Reading a Schema from the Dock chain can easily be achieved by using the `get` method from the `Schema` class.
 It accepts a string `id` param (a fully-qualified blob id like "blob:dock:0x..." or just its hex identifier) and a
 `dockAPI` instance:
 ```javascript
->  const result = await Schema.getSchema(blob.id, dock);
+>  const result = await Schema.get(blob.id, dock);
 ```
 `result[0]` will be the author of the Schema, and `result[1]` will be the contents of the schema itself.
 

@@ -69,8 +69,8 @@ async function main() {
   // Set schema author
   schema.setAuthor(dockDID);
 
-  // TODO: Sign the schema
-  // schema.sign(account);
+  // Sign the schema
+  schema.sign(pair, dock.blob);
 
   console.log('The schema is:', JSON.stringify(schema.toJSON(), null, 2));
   console.log('Writing schema to the chain with blob id of', schema.id, '...');

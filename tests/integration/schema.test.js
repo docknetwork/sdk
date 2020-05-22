@@ -17,6 +17,7 @@ import VerifiablePresentation from '../../src/verifiable-presentation';
 import getKeyDoc from '../../src/utils/vc/helpers';
 import DockResolver from '../../src/dock-resolver';
 import { SignatureSr25519 } from '../../src/signatures';
+import { Sr25519VerKeyName } from '../../src/utils/vc/crypto/constants';
 
 let account;
 let pair;
@@ -70,7 +71,7 @@ describe('Schema Blob Module Integration', () => {
     keyDoc = getKeyDoc(
       dockDID,
       dockApi.keyring.addFromUri(firstKeySeed, null, 'sr25519'),
-      'Sr25519VerificationKey2020',
+      Sr25519VerKeyName,
     );
 
     // Create a resolver for dock DIDs

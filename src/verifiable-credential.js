@@ -274,7 +274,7 @@ class VerifiableCredential {
    * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
    * @returns {Promise<VerifiableCredentialVerificationResult>}
    */
-  async verify(resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null) {
+  async verify({resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null}) {
     if (!this.proof) {
       throw new Error('The current Verifiable Credential has no proof.');
     }

@@ -87,7 +87,12 @@ async function main() {
     console.log('Credential signed, verifying...');
 
     // Verify the credential
-    const verifyResult = await signedCredential.verify(resolver, true, true, { dock });
+    const verifyResult = await signedCredential.verify({
+      resolver,
+      compactProof: true,
+      forceRevocationCheck: true,
+      revocationApi: { dock }
+    });
     if (verifyResult.verified) {
       console.log('Credential has been verified! Result:', verifyResult);
 

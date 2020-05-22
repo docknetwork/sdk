@@ -198,9 +198,12 @@ describe('Schema Blob Module Integration', () => {
 
   test('The verify method should detect a subject with incompatible schema in credentialSchema.', async () => {
     await expect(
-      invalidCredential.verify(
-        dockResolver, true, false, undefined, { dock: dockApi },
-      ),
+      invalidCredential.verify({
+      resolver: dockResolver,
+      compactProof: true,
+      forceRevocationCheck: false,
+      revocationApi: undefined,
+      schemaApi: { dockApi })
     ).rejects.toThrow(/Schema validation failed/);
   }, 30000);
 

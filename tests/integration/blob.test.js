@@ -7,7 +7,7 @@ import { createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../.
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { verifyCredential } from '../../src/utils/vc';
-import { DockBlobIdByteSize } from '../../src/modules/blob';
+import { DockBlobIdByteSize, BLOB_MAX_BYTE_SIZE } from '../../src/modules/blob';
 import Schema from '../../src/modules/schema';
 import exampleCredential from '../example-credential';
 import exampleSchema from '../example-schema';
@@ -101,7 +101,7 @@ describe('Blob Module', () => {
 
 
   test('Fails to write blob with size greater than allowed.', async () => {
-    const blobHex = randomAsHex(1025); // Max size is 1024
+    const blobHex = randomAsHex(BLOB_MAX_BYTE_SIZE + 1); // Max size is 1024
     const transaction = await dock.blob.new(
       {
         id: blobId,

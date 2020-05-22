@@ -1,9 +1,11 @@
-import { u8aToHex, u8aToU8a } from '@polkadot/util';
+import { stringToHex } from '@polkadot/util';
 import { randomAsHex } from '@polkadot/util-crypto';
 
 import { DockAPI } from '../../src/api';
 
-import { hexDIDToQualified, createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../../src/utils/did';
+import {
+  hexDIDToQualified, createNewDockDID, createKeyDetail, getHexIdentifierFromDID,
+} from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { verifyCredential, verifyPresentation } from '../../src/utils/vc';
@@ -14,6 +16,7 @@ import exampleSchema from '../example-schema';
 import VerifiablePresentation from '../../src/verifiable-presentation';
 import getKeyDoc from '../../src/utils/vc/helpers';
 import DockResolver from '../../src/dock-resolver';
+import { SignatureSr25519 } from '../../src/signatures';
 
 let account;
 let pair;
@@ -47,11 +50,11 @@ describe('Schema Blob Module Integration', () => {
     await dockApi.sendTransaction(dockApi.did.new(dockDID, keyDetail));
     blobId = randomAsHex(DockBlobIdByteSize);
 
-    // Write invalid format blob
+    // Write a blob with invalid JSON-schema format
     invalidFormatBlobId = randomAsHex(DockBlobIdByteSize);
     await dockApi.sendTransaction(dockApi.blob.new({
       id: invalidFormatBlobId,
-      blob: u8aToHex(u8aToU8a('hello world')),
+      blob: stringToHex('hello world'),
       author: getHexIdentifierFromDID(dockDID),
     }, pair), false);
 
@@ -59,7 +62,7 @@ describe('Schema Blob Module Integration', () => {
     const blobStr = JSON.stringify(exampleSchema);
     await dockApi.sendTransaction(dockApi.blob.new({
       id: blobId,
-      blob: u8aToU8a(blobStr),
+      blob: stringToHex(blobStr),
       author: getHexIdentifierFromDID(dockDID),
     }, pair), false);
 
@@ -116,6 +119,25 @@ describe('Schema Blob Module Integration', () => {
   afterAll(async () => {
     await dockApi.disconnect();
   }, 30000);
+
+  test('setSignature will only accept signature of the supported types and set the signature key of the object.', async () => {
+    const schema = new Schema();
+    schema.setAuthor(dockDID);
+    await schema.setJSONSchema(exampleSchema);
+    const msg = dockApi.blob.getSerializedBlob(schema.toBlob());
+    const pk = getPublicKeyFromKeyringPair(pair);
+    const sig = new SignatureSr25519(msg, pair);
+    schema.setSignature(sig);
+    expect(schema.signature).toBe(sig);
+  });
+
+  test('sign will generate a signature on the schema detail, this signature is verifiable.', async () => {
+    const schema = new Schema();
+    schema.setAuthor(dockDID);
+    await schema.setJSONSchema(exampleSchema);
+    schema.sign(pair, dockApi.blob);
+    expect(!!schema.signature).toBe(true);
+  });
 
   test('getSchema will return schema in correct format.', async () => {
     await expect(Schema.getSchema(blobId, dockApi)).resolves.toMatchObject({

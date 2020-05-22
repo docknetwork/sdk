@@ -15,7 +15,6 @@ import {
   validateCredentialSchema,
 } from '../../src/utils/vc';
 
-import { SignatureSr25519 } from '../../src/signatures';
 import exampleCredential from '../example-credential';
 import exampleSchema from '../example-schema';
 
@@ -48,11 +47,7 @@ describe('Basic Schema Tests', () => {
     const keyring = new Keyring();
     const seed = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
     keypair = keyring.addFromUri(randomAsHex(32), null, 'sr25519');
-
     schema = new Schema();
-    schema.name = 'AlumniCredSchema';
-    schema.version = '1.0.0';
-
     done();
   }, 10000);
 
@@ -76,20 +71,6 @@ describe('Basic Schema Tests', () => {
     expect(schema.schema).toBe(exampleSchema);
   });
 
-  test('setSignature will only accept signature of the supported types and set the signature key of the object.', () => {
-    const msg = [1, 2, 3, 4]; // TODO: getSerializedBlob?
-    const pk = getPublicKeyFromKeyringPair(keypair);
-    const sig = new SignatureSr25519(msg, keypair);
-    schema.setSignature(sig);
-    expect(schema.signature).toBe(sig);
-  });
-
-  test('sign will generate a signature on the schema detail, this signature is verifiable.', () => {
-    const msg = [1, 2, 3, 4]; // TODO: getSerializedBlob?
-    schema.sign(msg, keypair);
-    expect(!!schema.signature).toBe(true);
-  });
-
   test('validateSchema will check that the given schema is a valid JSON-schema.', async () => {
     await expect(Schema.validateSchema(exampleSchema)).resolves.toBeDefined();
   });
@@ -106,7 +87,8 @@ describe('Basic Schema Tests', () => {
   });
 
   test('toBlob will generate a JSON that can be sent to written with blob module', () => {
-    const result = schema.toBlob(createNewDockDID());
+    schema.setAuthor(createNewDockDID());
+    const result = schema.toBlob();
     console.log('toBlob:', result);
     expect(result).toMatchObject(
       expect.objectContaining({
@@ -120,8 +102,6 @@ describe('Basic Schema Tests', () => {
 
 describe('Validate Credential Schema utility', () => {
   const schema = new Schema();
-  schema.name = 'AlumniCredSchema';
-  schema.version = '1.0.0';
   schema.setJSONSchema(exampleSchema);
   schema.setAuthor(exampleAuthor);
 

@@ -134,9 +134,12 @@ class VerifiablePresentation {
    * @param {object} [revocationAPI] - An object representing a map. "revocation type -> revocation API". The API is used to check
    * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
    * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+   * @param {object} [schemaAPI] - An object representing a map. "schema type -> schema API". The API is used to get a
+   * schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
+   * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
    * @returns {Promise<VerifiablePresentationVerificationResult>} - verification result.
    */
-  async verify(challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null) {
+  async verify(challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationAPI = null, schemaAPI = null) {
     if (!this.proof) {
       throw new Error('The current VerifiablePresentation has no proof.');
     }
@@ -149,6 +152,7 @@ class VerifiablePresentation {
       compactProof,
       forceRevocationCheck,
       revocationAPI,
+      schemaAPI,
     );
   }
 }

@@ -12,19 +12,14 @@
     1. [Schemas in Verifiable Presentations](#schemas-in-verifiable-presentations)
 
 ## Intro
-Data Schemas are useful when enforcing a specific structure on a collection of data like a Verifiable Credential.
-Data Verification schemas, for example, are used to verify that the structure and contents of a Verifiable Credential
-conform to a published schema. Data Encoding schemas, on the other hand, are used to map the contents of a Verifiable
-Credential to an alternative representation format, such as a binary format used in a zero-knowledge proof.
+Data Schemas are useful way of enforcing a specific structure on a collection of data like a Verifiable Credential.
 Data schemas serve a different purpose than that of the `@context` property in a Verifiable Credential, the latter
 neither enforces data structure or data syntax, nor enables the definition of arbitrary encodings to alternate
 representation formats.
 
 ## Blobs
-Before diving into Schemas it is important to understand the way these are stored in the Dock chain.
-Schemas are stored on chain as a `Blob` in the Blob Storage module. They are identified and retrieved by their unique
-blob id, a 32 byte long hex string. They are authored by a DID and have a max size of 1024 bytes.
-The chain is agnostic to the contents of blobs and thus to schemas. Blobs may be used to store types of data other than schemas.
+Schemas are stored on chain as a `Blob` in the Blob Storage module of the Dock chain, so understanding blobs is
+important before diving into Schemas.
 
 ### Writing a Blob
 A new Blob can be registered on the Dock Chain by using the method `writeToChain` in the BlobModule class.

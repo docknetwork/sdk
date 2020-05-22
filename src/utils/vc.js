@@ -345,7 +345,7 @@ export async function getAndValidateSchemaIfPresent(credential, schemaApi) {
       throw new Error('Only Dock schemas are supported as of now.');
     }
     try {
-      const schema = await Schema.getSchema(credential.credentialSchema.id, schemaApi.dock);
+      const schema = await Schema.get(credential.credentialSchema.id, schemaApi.dock);
       await validateCredentialSchema(credential, schema);
     } catch (e) {
       throw new Error(`Schema validation failed: ${e}`);

@@ -24,7 +24,7 @@ async function writeAndReadBlob(dock, blobValue, dockDID, pair) {
 
   console.log('Blob written, reading from chain...');
 
-  const chainBlob = await dock.blob.getBlob(blobId);
+  const chainBlob = await dock.blob.get(blobId);
   return chainBlob;
 }
 

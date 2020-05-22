@@ -140,20 +140,20 @@ describe('Schema Blob Module Integration', () => {
     expect(!!schema.signature).toBe(true);
   });
 
-  test('getSchema will return schema in correct format.', async () => {
-    await expect(Schema.getSchema(blobId, dockApi)).resolves.toMatchObject({
+  test('Schema.get will return schema in correct format.', async () => {
+    await expect(Schema.get(blobId, dockApi)).resolves.toMatchObject({
       ...exampleSchema,
       id: blobId,
       author: hexDIDToQualified(getHexIdentifierFromDID(dockDID)),
     });
   }, 30000);
 
-  test('getSchema throws error when schema not in correct format.', async () => {
-    await expect(Schema.getSchema(invalidFormatBlobId, dockApi)).rejects.toThrow(/Incorrect schema format/);
+  test('Schema.get throws error when schema not in correct format.', async () => {
+    await expect(Schema.get(invalidFormatBlobId, dockApi)).rejects.toThrow(/Incorrect schema format/);
   }, 30000);
 
-  test('getSchema throws error when no blob exists at the given id.', async () => {
-    await expect(Schema.getSchema(createNewDockBlobId(), dockApi)).rejects.toThrow(/does not exist/);
+  test('Schema.get throws error when no blob exists at the given id.', async () => {
+    await expect(Schema.get(createNewDockBlobId(), dockApi)).rejects.toThrow(/does not exist/);
   }, 30000);
 
   test('Utility method verifyCredential should pass if the subject is compatible with the schema in credentialSchema.', async () => {
@@ -171,7 +171,6 @@ describe('Schema Blob Module Integration', () => {
       ),
     ).resolves.toBeDefined();
   }, 30000);
-
 
   test('Utility method verifyCredential should check if schema is incompatible with the credentialSubject.', async () => {
     await expect(

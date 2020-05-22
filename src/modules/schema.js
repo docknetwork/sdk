@@ -119,6 +119,16 @@ export default class Schema {
   }
 
   /**
+   * Prepares a transaction to write this schema object to the dock chain using the blob module
+   * @param {object} dock - The dock API
+   * @param {object} pair - The keypair to sign with
+   * @return {object} The extrinsic to sign and send.
+   */
+  writeToChain(dock, pair) {
+    return dock.blob.new(this.toBlob(), pair);
+  }
+
+  /**
    * Check that the given JSON schema is compliant with JSON schema spec mentioned in RFC
    * @param {object} json - The JSON schema to validate
    * @returns {Promise<object>} - Returns promise to an object or throws error
@@ -140,9 +150,9 @@ export default class Schema {
    * @param {object} dockApi - The Dock API
    * @returns {Promise<object>}
    */
-  static async getSchema(id, dockApi) {
+  static async get(id, dockApi) {
     const hexId = getHexIdentifierFromBlobID(id);
-    const chainBlob = await dockApi.blob.getBlob(hexId);
+    const chainBlob = await dockApi.blob.get(hexId);
     const blobStr = u8aToString(chainBlob[1]);
     try {
       const schema = JSON.parse(blobStr);

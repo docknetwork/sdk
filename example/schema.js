@@ -69,25 +69,22 @@ async function main() {
   // Set schema author
   schema.setAuthor(dockDID);
 
-  // TODO: Sign the schema
-  // schema.sign(account);
+  // Sign the schema
+  schema.sign(pair, dock.blob);
 
   console.log('The schema is:', JSON.stringify(schema.toJSON(), null, 2));
+  console.log('Writing schema to the chain with blob id of', schema.id, '...');
 
-  const blob = schema.toBlob();
-
-  console.log('Writing schema to the chain with blob id of', blob.id, '...');
-
-  await dock.sendTransaction(dock.blob.new(blob, pair), false);
+  await dock.sendTransaction(schema.writeToChain(dock, pair), false);
 
   console.log('Schema written, reading from chain...');
 
-  const result = await Schema.getSchema(blob.id, dock);
+  const result = await Schema.get(schema.id, dock);
   console.log('Result from chain:', result);
 
   console.log('Creating a verifiable credential and assigning its schema...');
   const vc = VerifiableCredential.fromJSON(exampleCredential);
-  vc.setSchema(blobHexIdToQualified(blob.id), 'JsonSchemaValidator2018');
+  vc.setSchema(blobHexIdToQualified(result.id), 'JsonSchemaValidator2018');
 
   const universalResolverUrl = 'https://uniresolver.io';
   const resolver = new UniversalResolver(universalResolverUrl);

@@ -175,23 +175,23 @@ describe('Schema Blob Module Integration', () => {
   test('Utility method verifyCredential should check if schema is incompatible with the credentialSubject.', async () => {
     await expect(
         verifyCredential({
-          credential: vcInvalid,
+          credential: invalidCredential.toJSON(),
           resolver: null,
           compactProof: true,
           forceRevocationCheck: false,
           revocationApi: undefined,
-          schemaApi: { notDock: dock }
+          schemaApi: { notDock: dockApi }
         })
     ).rejects.toThrow('Only Dock schemas are supported as of now.');
 
     await expect(
         verifyCredential({
-          credential: vcInvalid,
+          credential: invalidCredential.toJSON(),
           resolver: null,
           compactProof: true,
           forceRevocationCheck: false,
           revocationApi: undefined,
-          schemaApi: { dock }
+          schemaApi: { dock: dockApi }
         })
     ).rejects.toThrow(/Schema validation failed/);
   }, 30000);
@@ -203,7 +203,8 @@ describe('Schema Blob Module Integration', () => {
       compactProof: true,
       forceRevocationCheck: false,
       revocationApi: undefined,
-      schemaApi: { dockApi })
+      schemaApi: { dock: dockApi }
+    })
     ).rejects.toThrow(/Schema validation failed/);
   }, 30000);
 
@@ -220,15 +221,29 @@ describe('Schema Blob Module Integration', () => {
     );
 
     await expect(
-      verifyPresentation(
-        vpInvalid.toJSON(), 'some_challenge', 'some_domain', dockResolver, true, false, undefined, { notDock: dockApi },
-      ),
+      verifyPresentation({
+        presentation: vpInvalid.toJSON(),
+        challenge: 'some_challenge',
+        domain: 'some_domain',
+        resolver: dockResolver,
+        compactProof: true,
+        forceRevocationCheck: false,
+        revocationApi: undefined,
+        schemaApi: { notDock: dockApi },
+      }),
     ).rejects.toThrow('Only Dock schemas are supported as of now.');
 
     await expect(
-      verifyPresentation(
-        vpInvalid.toJSON(), 'some_challenge', 'some_domain', dockResolver, true, false, undefined, { dock: dockApi },
-      ),
+      verifyPresentation({
+        presentation: vpInvalid.toJSON(),
+        challenge: 'some_challenge',
+        domain: 'some_domain',
+        resolver: dockResolver,
+        compactProof: true,
+        forceRevocationCheck: false,
+        revocationApi: undefined,
+        schemaApi: { dock: dockApi },
+      }),
     ).rejects.toThrow(/Schema validation failed/);
   }, 90000);
 
@@ -244,9 +259,16 @@ describe('Schema Blob Module Integration', () => {
     );
 
     await expect(
-      verifyPresentation(
-        vpValid.toJSON(), 'some_challenge', 'some_domain', dockResolver, true, false, undefined, { dock: dockApi },
-      ),
+      verifyPresentation({
+        presentation: vpValid.toJSON(),
+        challenge: 'some_challenge',
+        domain: 'some_domain',
+        resolver: dockResolver,
+        compactProof: true,
+        forceRevocationCheck: false,
+        revocationApi: undefined,
+        schemaApi: { dock: dockApi },
+      }),
     ).resolves.toBeDefined();
   }, 90000);
 

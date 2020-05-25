@@ -161,7 +161,7 @@ export async function verifyCredential({
   });
 
   // Check for revocation only if the credential is verified and revocation check is needed.
-  if (credVer.verified && isRevocationCheckNeeded(credential.credentialStatus, forceRevocationCheck, revocationApi)) {
+  if (revocationApi && credVer.verified && isRevocationCheckNeeded(credential.credentialStatus, forceRevocationCheck, revocationApi)) {
     const revResult = await checkRevocationStatus(credential, revocationApi);
     // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
     if (!revResult.verified) {
@@ -239,7 +239,7 @@ export async function signPresentation(presentation, keyDoc, challenge, domain, 
  * @param {object} [revocationApi] - An object representing a map. "revocation type -> revocation API". The API is used to check
  * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
- * @param {object} [schemaAPI] - An object representing a map. "schema type -> schema API". The API is used to get a
+ * @param {object} [schemaApi] - An object representing a map. "schema type -> schema API". The API is used to get a
  * schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
  * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
@@ -271,7 +271,7 @@ export async function verifyPresentation({presentation, challenge, domain, resol
         }
       }
       // eslint-disable-next-line no-await-in-loop
-      await getAndValidateSchemaIfPresent(credential, schemaAPI);
+      await getAndValidateSchemaIfPresent(credential, schemaApi);
     }
 
     // If all credentials pass the revocation check, the let the result of presentation verification be returned.
@@ -343,15 +343,17 @@ export function validateCredentialSchema(credential, schema) {
  * @returns {Promise<void>}
  */
 export async function getAndValidateSchemaIfPresent(credential, schemaApi) {
-  if (credential.credentialSubject && credential.credentialSchema) {
-    if (!schemaApi.dock) {
-      throw new Error('Only Dock schemas are supported as of now.');
-    }
-    try {
-      const schema = await Schema.get(credential.credentialSchema.id, schemaApi.dock);
-      await validateCredentialSchema(credential, schema);
-    } catch (e) {
-      throw new Error(`Schema validation failed: ${e}`);
+  if (schemaApi) {
+    if (credential.credentialSubject && credential.credentialSchema) {
+      if (!schemaApi.dock) {
+        throw new Error('Only Dock schemas are supported as of now.');
+      }
+      try {
+        const schema = await Schema.get(credential.credentialSchema.id, schemaApi.dock);
+        await validateCredentialSchema(credential, schema);
+      } catch (e) {
+        throw new Error(`Schema validation failed: ${e}`);
+      }
     }
   }
 }

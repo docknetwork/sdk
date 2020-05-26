@@ -191,7 +191,12 @@ used when present. Basically, once you've created and stored your Schema on chai
     });
 >    validCredential.setSchema(blobHexIdToQualified(blobId), 'JsonSchemaValidator2018');
 >    await validCredential.sign(keyDoc);
->    await validCredential.verify(dockResolver, true, false, undefined, { dock: dockApi })
+>    await validCredential.verify({
+       resolver: dockResolver,
+       compactProof: true,
+       forceRevocationCheck: false,
+       schemaApi: { dock: dockApi }
+     });
 ```
 Assuming that the `blobId` points to a schema taken from the previous examples, the verification above would fail if I
 the `credentialSubject` in the Verifiable Credential didn't have one of the `alumniOf` or `emailAddress` properties.
@@ -205,4 +210,3 @@ Verifiable Credentials contained in a presentation that are using the `credentia
 properties simultaneously.
 This means that the verification of an otherwise valid Verifiable Presentation will fail if one of the Verifiable
 Credentials contained within it uses a Schema and fails to pass schema validation.
-

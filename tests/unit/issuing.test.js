@@ -149,8 +149,10 @@ describe('Verifiable Presentation creation', () => {
     expect(signedVp).toMatchObject(getSamplePres(true));
     const results = await verifyPresentation(
       signedVp,
-      'some_challenge',
-      'some_domain',
+      {
+        challenge: 'some_challenge',
+        domain: 'some_domain',
+      },
     );
 
 
@@ -213,7 +215,7 @@ describe('Verifiable Credential incremental creation', () => {
       'some_type',
     ]);
     credential.addSubject({ id: 'some_subject_id' });
-    expect(credential.subject).toEqual([{ id: 'some_subject_id' }]);
+    expect(credential.credentialSubject).toEqual([{ id: 'some_subject_id' }]);
     credential.setStatus({ id: 'some_status_id', type: 'CredentialStatusList2017' });
     expect(credential.status).toEqual({ id: 'some_status_id', type: 'CredentialStatusList2017' });
     credential.setIssuanceDate('2020-03-18T19:23:24Z');
@@ -264,7 +266,7 @@ describe('Verifiable Credential incremental creation', () => {
       id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
       alumniOf: 'Example University',
     });
-    expect(credential.subject).toEqual([{
+    expect(credential.credentialSubject).toEqual([{
       id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
       alumniOf: 'Example University',
     }]);
@@ -272,7 +274,7 @@ describe('Verifiable Credential incremental creation', () => {
       id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
       alumniOf: 'Example University',
     });
-    expect(credential.subject).toEqual([{
+    expect(credential.credentialSubject).toEqual([{
       id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
       alumniOf: 'Example University',
     }]);
@@ -360,49 +362,6 @@ describe('Verifiable Presentation incremental creation', () => {
     expect(vp.credentials).toEqual([{ id: 'some_credential_id' }]);
   });
 
-  test('Duplicates contexts, types and credentials are not possible.', async () => {
-    const vp = new VerifiablePresentation(sampleId);
-
-    vp.addContext('https://www.w3.org/2018/credentials/examples/v1');
-    expect(vp.context).toEqual([
-      'https://www.w3.org/2018/credentials/v1',
-      'https://www.w3.org/2018/credentials/examples/v1',
-    ]);
-    vp.addContext('https://www.w3.org/2018/credentials/examples/v1');
-    expect(vp.context).toEqual([
-      'https://www.w3.org/2018/credentials/v1',
-      'https://www.w3.org/2018/credentials/examples/v1',
-    ]);
-    vp.addContext({ '@context': 'https://www.google.com' });
-    expect(vp.context).toEqual([
-      'https://www.w3.org/2018/credentials/v1',
-      'https://www.w3.org/2018/credentials/examples/v1',
-      { '@context': 'https://www.google.com' },
-    ]);
-    vp.addContext({ '@context': 'https://www.google.com' });
-    expect(vp.context).toEqual([
-      'https://www.w3.org/2018/credentials/v1',
-      'https://www.w3.org/2018/credentials/examples/v1',
-      { '@context': 'https://www.google.com' },
-    ]);
-
-    vp.addType('some_type');
-    expect(vp.type).toEqual([
-      'VerifiablePresentation',
-      'some_type',
-    ]);
-    vp.addType('some_type');
-    expect(vp.type).toEqual([
-      'VerifiablePresentation',
-      'some_type',
-    ]);
-
-    vp.addCredential(getSampleCredential(true));
-    expect(vp.credentials).toEqual([getSampleCredential(true)]);
-    vp.addCredential(getSampleCredential(true));
-    expect(vp.credentials).toEqual([getSampleCredential(true)]);
-  });
-
   test('Incremental VP creations runs basic validation', async () => {
     const vp = new VerifiablePresentation(sampleId);
     expect(() => {
@@ -416,10 +375,10 @@ describe('Verifiable Presentation incremental creation', () => {
       vp.addCredential({ some: 'value' });
     }).toThrowError('"credential" must include the \'id\' property.');
 
-    await expect(vp.verify(
-      'some_challenge',
-      'some_domain',
-    )).rejects.toThrowError('The current VerifiablePresentation has no proof.');
+    await expect(vp.verify({
+      challenge: 'some_challenge',
+      domain: 'some_domain',
+    })).rejects.toThrowError('The current VerifiablePresentation has no proof.');
   });
 
   test('Incremental VP creation from external VCs should be possible', async () => {
@@ -439,10 +398,10 @@ describe('Verifiable Presentation incremental creation', () => {
     expect(vp.proof).toMatchObject({ proofPurpose: 'authentication' });
     expect(vp.proof).toMatchObject({ verificationMethod: expect.anything() });
 
-    const results = await vp.verify(
-      'some_challenge',
-      'some_domain',
-    );
+    const results = await vp.verify({
+      challenge: 'some_challenge',
+      domain: 'some_domain',
+    });
 
     expect(results.presentationResult).toMatchObject({ verified: true });
     expect(results.presentationResult.results[0]).toMatchObject({ verified: true });
@@ -480,10 +439,10 @@ describe('Verifiable Presentation incremental creation', () => {
     expect(vp.proof).toMatchObject({ proofPurpose: 'authentication' });
     expect(vp.proof).toMatchObject({ verificationMethod: expect.anything() });
 
-    const results = await vp.verify(
-      'some_challenge',
-      'some_domain',
-    );
+    const results = await vp.verify({
+      challenge: 'some_challenge',
+      domain: 'some_domain',
+    });
     expect(results.presentationResult).toMatchObject({ verified: true });
     expect(results.presentationResult.results[0]).toMatchObject({ verified: true });
     expect(results.presentationResult.results[0]).toMatchObject({ proof: expect.anything() });

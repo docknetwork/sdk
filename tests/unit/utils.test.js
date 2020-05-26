@@ -53,15 +53,6 @@ describe('Testing public key and signature instantiation from keyring', () => {
     done();
   });
 
-  test('getCorrectPublicKeyFromKeyringPair throws error on unknown public key type', () => {
-    // Create a keypair of type 'ee25519' which is not supported as of now. Moreover this seems like a bug in
-    // polkadot-js as it should not allow to create such pair
-    const keyring = new Keyring();
-    // @ts-ignore: KeypairType error
-    const badPair = keyring.addFromUri(randomAsHex(32), null, 'ee25519');
-    expect(() => getPublicKeyFromKeyringPair(badPair)).toThrow('Only ed25519, sr25519 and secp256k1 keys supported as of now');
-  });
-
   test('getCorrectPublicKeyFromKeyringPair returns correct public key from ed25519 pair', () => {
     const keyring = new Keyring();
     const pair = keyring.addFromUri(randomAsHex(32), null, 'ed25519');
@@ -80,15 +71,6 @@ describe('Testing public key and signature instantiation from keyring', () => {
     const pair = generateEcdsaSecp256k1Keypair();
     const pk = getPublicKeyFromKeyringPair(pair);
     expect(pk instanceof PublicKeySecp256k1).toBe(true);
-  });
-
-  test('getCorrectSignatureFromKeyringPair throws error on unknown public key type', () => {
-    // Create a keypair of type 'ee25519' which is not supported as of now. Moreover this seems like a bug in
-    // polkadot-js as it should not allow to create such pair
-    const keyring = new Keyring();
-    // @ts-ignore: KeypairType error
-    const badPair = keyring.addFromUri(randomAsHex(32), null, 'ee25519');
-    expect(() => getSignatureFromKeyringPair(badPair, [1, 2])).toThrow('Only ed25519, sr25519 and secp256k1 keys supported as of now');
   });
 
   test('getCorrectSignatureFromKeyringPair returns correct signature from ed25519 pair', () => {

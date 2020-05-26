@@ -57,10 +57,6 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       address: FullNodeEndpoint,
     });
 
-    afterAll(async () => {
-      await dock.disconnect();
-    }, 10000);
-
     // The keyring should be initialized before any test begins as this suite is testing revocation
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
@@ -98,7 +94,11 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     cred4 = await issueCredential(issuerKeyDoc, getUnsignedCred(credId4, holder3DID));
 
     done();
-  }, 70000);
+  }, 90000);
+
+  afterAll(async () => {
+    await dock.disconnect();
+  }, 10000);
 
   test('Holder creates a verifiable presentation with single credential and verifier verifies it', async () => {
     const holder1Key = getKeyDoc(holder1DID, dock.keyring.addFromUri(holder1KeySeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
@@ -114,7 +114,9 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       const sigType = elem[1];
       const holderKey = elem[2];
 
-      const res = await isVerifiedCredential(cred, resolver);
+      const res = await isVerifiedCredential(cred, {
+        resolver
+      });
       expect(res).toBe(true);
 
       const presId = randomAsHex(32);
@@ -159,12 +161,11 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
         ),
       );
 
-      const result = await verifyPresentation(
-        signedPres,
-        chal,
+      const result = await verifyPresentation(signedPres, {
+        challenge: chal,
         domain,
         resolver,
-      );
+      });
 
       expect(result.verified).toBe(true);
       expect(result.presentationResult.verified).toBe(true);
@@ -176,9 +177,18 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
   test('Holder creates a verifiable presentation with 2 credentials and verifier verifies it', async () => {
     const holder3Key = getKeyDoc(holder3DID, dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
 
-    const res = await isVerifiedCredential(cred3, resolver, true, false);
+    const res = await isVerifiedCredential(cred3, {
+      resolver,
+      compactProof: true,
+      forceRevocationCheck: false
+    });
     expect(res).toBe(true);
-    const res1 = await isVerifiedCredential(cred4, resolver, true, false);
+
+    const res1 = await isVerifiedCredential(cred4, {
+      resolver,
+      compactProof: true,
+      forceRevocationCheck: false
+    });
     expect(res1).toBe(true);
 
     const presId = randomAsHex(32);
@@ -224,12 +234,11 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       ),
     );
 
-    const result = await verifyPresentation(
-      signedPres,
-      chal,
+    const result = await verifyPresentation(signedPres, {
+      challenge: chal,
       domain,
       resolver,
-    );
+    });
 
     // Verifier checks that both credential and presentation are correct.
     expect(result.verified).toBe(true);

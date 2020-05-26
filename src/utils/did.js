@@ -1,11 +1,10 @@
 // This file will be turned to a folder and will have files like `did/dock.js` and `did/ethr.js`
 
 // Import some utils from Polkadot JS
-import { u8aToHex } from '@polkadot/util';
-import { randomAsHex, encodeAddress, decodeAddress } from '@polkadot/util-crypto';
+import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
 
 import { getSignatureFromKeyringPair } from './misc';
-import { isHexWithGivenByteSize } from './codec';
+import { isHexWithGivenByteSize, getHexIdentifier } from './codec';
 
 import { Signature } from '../signatures'; // eslint-disable-line
 import { PublicKey } from '../public-keys'; // eslint-disable-line
@@ -59,29 +58,17 @@ export function validateDockDIDSS58Identifier(identifier) {
  * @return {string} Returns the hexadecimal representation of the DID.
  */
 export function getHexIdentifierFromDID(did) {
-  if (did.startsWith(DockDIDQualifier)) {
-    // Fully qualified DID. Remove the qualifier
-    const ss58Did = did.slice(DockDIDQualifier.length);
-    try {
-      const hex = u8aToHex(decodeAddress(ss58Did));
-      // 2 characters for `0x` and 2*byte size of DID
-      if (hex.length !== (2 + 2 * DockDIDByteSize)) {
-        throw new Error('Unexpected byte size');
-      }
-      return hex;
-    } catch (e) {
-      throw new Error(`Invalid SS58 DID ${did}. ${e}`);
-    }
-  } else {
-    try {
-      // Check if hex and of correct size and return the hex value if successful.
-      validateDockDIDHexIdentifier(did);
-      return did;
-    } catch (e) {
-      // Cannot parse as hex
-      throw new Error(`Invalid hexadecimal DID ${did}. ${e}`);
-    }
-  }
+  return getHexIdentifier(did, DockDIDQualifier, validateDockDIDHexIdentifier, DockDIDByteSize);
+}
+
+/**
+ * Return a fully qualified Dock DID id, i.e. "did:dock:<SS58 string>"
+ * @param {string} hexId - The hex blob id (without the qualifier)
+ * @returns {string} - The fully qualified Blob id
+ */
+export function hexDIDToQualified(hexId) {
+  const ss58Id = encodeAddress(hexId);
+  return `${DockDIDQualifier}${ss58Id}`;
 }
 
 
@@ -91,8 +78,7 @@ export function getHexIdentifierFromDID(did) {
  */
 export function createNewDockDID() {
   const hexId = randomAsHex(DockDIDByteSize);
-  const ss58Id = encodeAddress(hexId);
-  return `${DockDIDQualifier}${ss58Id}`;
+  return hexDIDToQualified(hexId);
 }
 
 /**

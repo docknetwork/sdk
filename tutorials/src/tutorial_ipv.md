@@ -42,7 +42,7 @@ This Credential isn't signed since we only just initialized it. It brings howeve
 <-   "2020-04-14T14:48:48.486Z"
 >    vc.type
 <-   ["VerifiableCredential"]
->    vc.subject
+>    vc.credentialSubject
 <-   []
 ```
 The default `context` is an array with `"https://www.w3.org/2018/credentials/v1"` as first element. This is required by the VCDMv1 specs so having it as default helps ensure your Verifiable Credentials will be valid in the end.
@@ -94,7 +94,7 @@ A type can be added with the `addType` function. It accepts a single argument `t
 A subject can be added with the `addSubject` function. It accepts a single argument `subject` that needs to be an object with an `id` property:
 ```javascript
 >   vc.addSubject({ id: 'did:dock:123qwe123qwe123qwe', alumniOf: 'Example University' })
->   vc.subject
+>   vc.credentialSubject
 <-  {id: 'did:dock:123qwe123qwe123qwe', alumniOf: 'Example University'}
 ```
 
@@ -147,10 +147,11 @@ Once done, your `vc` object will have a new `proof` field:
 ```
 
 ### Verifying a Verifiable Credential
-Once your Verifiable Credential has been signed you can proceed to verify it with the `verify` method. If you've used DIDs you need to pass a `resolver` for them. You can also use the booleans `compactProof` (to compact the JSON-LD) and `forceRevocationCheck` (to force revocation check). Please beware that setting `forceRevocationCheck` to false can allow false positives when verifying revocable credentials.
-If your credential has uses the `status` field, you can pass a `revocationAPI` param that accepts an object describing the API to use for the revocation check. No params are required for the simplest cases:
+Once your Verifiable Credential has been signed you can proceed to verify it with the `verify` method. The `verify` method takes an object of arguments, and is optional. If you've used DIDs you need to pass a `resolver` for them. You can also use the booleans `compactProof` (to compact the JSON-LD) and `forceRevocationCheck` (to force revocation check). Please beware that setting `forceRevocationCheck` to false can allow false positives when verifying revocable credentials.
+If your credential has uses the `status` field, you can pass a `revocationApi` param that accepts an object describing the API to use for the revocation check. No params are required for the simplest cases:
+If your credential uses schema and requires blob resolution, you can pass a `schemaApi` param that accepts an object describing the API to pull the schema from chain. No params are required for the simplest cases:
 ```javascript
->   const result = await vc.verify()
+>   const result = await vc.verify({ ... })
 >   result
 <-  {
       verified: true,
@@ -286,10 +287,10 @@ Once done, your `vp` object will have a new `proof` field:
 ### Verifying a Verifiable Presentation
 Once your Verifiable Presentation has been signed you can proceed to verify it with the `verify` method.
 If you've used DIDs you need to pass a `resolver` for them. You can also use the booleans `compactProof` (to compact the JSON-LD) and `forceRevocationCheck` (to force revocation check). Please beware that setting `forceRevocationCheck` to false can allow false positives when verifying revocable credentials.
-If your credential has uses the `status` field, you can pass a `revocationAPI` param that accepts an object describing the API to use for the revocation check.
+If your credential has uses the `status` field, you can pass a `revocationApi` param that accepts an object describing the API to use for the revocation check.
 For the simplest cases you only need a `challenge` string and possibly a `domain` string:
 ```javascript
->   const results = await vp.verify('some_challenge', 'some_domain');
+>   const results = await vp.verify({ challenge: 'some_challenge', domain: 'some_domain' });
 >   results
 <-  {
       "presentationResult": {
@@ -344,7 +345,7 @@ Here's an example of issuing a Verifiable Credential using DIDs, provided that y
 ```javascript
 const issuerKey = getKeyDoc(issuerDID, dock.keyring.addFromUri(issuerSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
 await vc.sign(issuerKey);
-const verificationResult = await signedCredential.verify(resolver, true, true, { dock });
+const verificationResult = await signedCredential.verify({ resolver, compactProof: true, forceRevocationCheck: true, revocationApi: { dock } });
 console.log(verificationResult.verified); // Should print `true`
 ```
 

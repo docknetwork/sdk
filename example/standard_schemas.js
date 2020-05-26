@@ -5,7 +5,6 @@ import bolSchema from '../src/utils/vc/schemas/bol';
 import prCardSchema from '../src/utils/vc/schemas/pr_card';
 import qpInbonSchema from '../src/utils/vc/schemas/qp_inbond';
 import healthWorkerPassportSchema from '../src/utils/vc/schemas/health_worker_passport';
-import proofOfHealthCoreSchema from '../src/utils/vc/schemas/proof_of_health_core';
 import infectionDiagnosisSchema from '../src/utils/vc/schemas/infection_diagnosis';
 import immunityEventRecordSchema from '../src/utils/vc/schemas/immunity_event_record';
 import noInfectionSchema from '../src/utils/vc/schemas/non_infection_check';
@@ -157,31 +156,6 @@ const healthCareWorkerCred = {
   },
 };
 
-// Schema from here https://docs.google.com/document/d/1F5TLvAqCxj1kaPuPe6JhdECixwpbhKpEAb8eeQuDGT4/edit#heading=h.4371z63wgb1t
-const proofOfHealthCoreCred = {
-  '@context': [
-    'https://www.w3.org/2018/credentials/v1',
-    'https://www.w3.org/2018/credentials/examples/v1',
-    'https://schema.org/',
-  ],
-  id: 'https://example.com/credentials/1872',
-  type: ['VerifiableCredential', 'ProofOfHealthCoreCredential'],
-  issuer: 'did:v1:test:nym:z6MkhdmzFu659ZJ4XKj31vtEDmjvsi5yDZG5L7Caz63oP39k',
-  issuanceDate: '2020-04-09T21:13:43Z',
-  credentialSubject: {
-    firstName: 'John',
-    firstInitial: 'J',
-    lastName: 'Smith',
-    lastInitial: 'S',
-    yearOfBirth: 1990,
-    photo: 'https://example.com/photos/102',
-    biometricTemplate: {
-      fingerprint: 'c2856a76a785b8fa185a45c',
-      retina: '8fa185a45cc2856a76a785b',
-    },
-  },
-};
-
 // Schema from here https://docs.google.com/document/d/1F5TLvAqCxj1kaPuPe6JhdECixwpbhKpEAb8eeQuDGT4/edit#heading=h.ppf3i61y3kbc
 const infectionDiagnosisCred = {
   '@context': [
@@ -205,12 +179,12 @@ const infectionDiagnosisCred = {
       retina: '8fa185a45cc2856a76a785b',
     },
     diagnosisCode: 'CodeA',
-    diagnosisTime: '2020-2-13T20:20:39+00:00',
+    diagnosisTime: '2020-02-13T20:20:39+00:00',
     diagnosisLocation: 'New York City, New York, USA',
     diagnosedBy: 'Anne Lyons, MD',
     diagnosisFacility: 'Cedar Sinai Memorial Hospital',
     diagnosisMethods: ['personal interview and observation', 'rRT-PCR'],
-    declaredSafeDate: '2020-3-15',
+    declaredSafeDate: '2020-03-15',
   },
 };
 
@@ -237,11 +211,11 @@ const immunityEventRecordCred = {
       retina: '8fa185a45cc2856a76a785b',
     },
     eventType: 'vaccination',
-    eventTime: '2020-2-13T20:20:39+00:00',
+    eventTime: '2020-02-13T20:20:39+00:00',
     eventBy: 'Anne Lyons, MD',
     eventFacility: 'Cedar Sinai Memorial Hospital',
     eventName: 'X-trans-23 vaccine',
-    potencyDate: '2020-3-15',
+    potencyDate: '2020-03-15',
   },
 };
 
@@ -268,7 +242,7 @@ const noInfectionCred = {
       retina: '8fa185a45cc2856a76a785b',
     },
     virus: ['Covid-19', 'Covid-3'],
-    checkTime: '2020-2-13T20:20:39+00:00',
+    checkTime: '2020-02-13T20:20:39+00:00',
     checkLocation: 'New York City, New York, USA',
     checkedBy: 'Anne Lyons, MD',
     checkFacility: 'Cedar Sinai Memorial Hospital',
@@ -289,9 +263,7 @@ async function main() {
   await validateSchema(prCardSchema, credPRCard);
   await validateSchema(qpInbonSchema, qPInbondCred);
   await validateSchema(healthWorkerPassportSchema, healthCareWorkerCred);
-  await validateSchema(proofOfHealthCoreSchema, proofOfHealthCoreCred);
 
-  // Following 3 require change in validator
   await validateSchema(infectionDiagnosisSchema, infectionDiagnosisCred);
   await validateSchema(immunityEventRecordSchema, immunityEventRecordCred);
   await validateSchema(noInfectionSchema, noInfectionCred);

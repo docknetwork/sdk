@@ -24,6 +24,22 @@ export const DockRevRegQualifier = 'rev-reg:dock:';
 // const {Ed25519Signature2018} = suites;
 
 /**
+* @typedef {object} VerifiableParams The Options to verify credentials and presentations.
+* @property {string} [challenge] - proof challenge Required.
+* @property {string} [domain] - proof domain (optional)
+* @property {DIDResolver} [resolver] - Resolver to resolve the issuer DID (optional)
+* @property {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
+* @property {Boolean} [forceRevocationCheck] - Whether to force revocation check or not.
+* Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
+* @property {object} [revocationApi] - An object representing a map. "revocation type -> revocation API". The API is used to check
+* revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
+* as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+* @property {object} [schemaApi] - An object representing a map. "schema type -> schema API". The API is used to get
+* a schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
+* as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+*/
+
+/**
  * Get signature suite from a keyDoc
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
  * @returns {EcdsaSepc256k1Signature2019|Ed25519Signature2018|Sr25519Signature2020} - signature suite.
@@ -133,7 +149,7 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
 /**
  * Verify a Verifiable Credential. Returns the verification status and error in an object
  * @param {object} [credential] The VCDM Credential
- * @param {object} Verify parameters (TODO: add type info for this object)
+ * @param {VerifiableParams} Verify parameters
  * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
  * credential is valid and not revoked and false otherwise. The `error` will describe the error if any.
  */
@@ -213,7 +229,7 @@ export async function signPresentation(presentation, keyDoc, challenge, domain, 
 /**
  * Verify a Verifiable Presentation. Returns the verification status and error in an object
  * @param {object} presentation The verifiable presentation
- * @param {object} Verify parameters (TODO: add type info for this object)
+ * @param {VerifiableParams} Verify parameters
  * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
  * presentation is valid and all the credentials are valid and not revoked and false otherwise. The `error` will
  * describe the error if any.

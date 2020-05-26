@@ -246,7 +246,9 @@ export async function signPresentation(presentation, keyDoc, challenge, domain, 
  * presentation is valid and all the credentials are valid and not revoked and false otherwise. The `error` will
  * describe the error if any.
  */
-export async function verifyPresentation({presentation, challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null}) {
+export async function verifyPresentation({
+  presentation, challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null,
+}) {
   // TODO: support other purposes than the default of "authentication"
   const presVer = await vcjs.verify({
     presentation,

@@ -91,7 +91,7 @@ async function main() {
       resolver,
       compactProof: true,
       forceRevocationCheck: true,
-      revocationApi: { dock }
+      revocationApi: { dock },
     });
     if (verifyResult.verified) {
       console.log('Credential has been verified! Result:', verifyResult);
@@ -111,7 +111,7 @@ async function main() {
         domain,
         resolver,
         compactProof: true,
-        forceRevocationCheck: false
+        forceRevocationCheck: false,
       });
 
       if (ver.verified) {

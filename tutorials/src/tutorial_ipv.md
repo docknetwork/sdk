@@ -344,7 +344,7 @@ Here's an example of issuing a Verifiable Credential using DIDs, provided that y
 ```javascript
 const issuerKey = getKeyDoc(issuerDID, dock.keyring.addFromUri(issuerSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
 await vc.sign(issuerKey);
-const verificationResult = await signedCredential.verify(resolver, true, true, { dock });
+const verificationResult = await signedCredential.verify({ resolver, compactProof: true, forceRevocationCheck: true, revocationApi: { dock } });
 console.log(verificationResult.verified); // Should print `true`
 ```
 

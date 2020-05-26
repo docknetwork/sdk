@@ -113,8 +113,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       const sigType = elem[1];
       const holderKey = elem[2];
 
-      const res = await isVerifiedCredential({
-        credential: cred,
+      const res = await isVerifiedCredential(cred, {
         resolver
       });
       expect(res).toBe(true);
@@ -178,16 +177,14 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
   test('Holder creates a verifiable presentation with 2 credentials and verifier verifies it', async () => {
     const holder3Key = getKeyDoc(holder3DID, dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
 
-    const res = await isVerifiedCredential({
-      credential: cred3,
+    const res = await isVerifiedCredential(cred3, {
       resolver,
       compactProof: true,
       forceRevocationCheck: false
     });
     expect(res).toBe(true);
 
-    const res1 = await isVerifiedCredential({
-      credential: cred4,
+    const res1 = await isVerifiedCredential(cred4, {
       resolver,
       compactProof: true,
       forceRevocationCheck: false

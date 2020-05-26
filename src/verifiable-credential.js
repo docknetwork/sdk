@@ -271,8 +271,7 @@ class VerifiableCredential {
     if (!this.proof) {
       throw new Error('The current Verifiable Credential has no proof.');
     }
-    return verifyCredential({
-      credential: this.toJSON(),
+    return verifyCredential(this.toJSON(), {
       resolver,
       compactProof,
       forceRevocationCheck,

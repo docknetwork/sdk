@@ -137,8 +137,8 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
  * credential is valid and not revoked and false otherwise. The `error` will describe the error if any.
  */
 
-export async function verifyCredential({
-  credential, resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null,
+export async function verifyCredential(credential, {
+  resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null,
 }) {
   await getAndValidateSchemaIfPresent(credential, schemaApi);
 
@@ -167,8 +167,8 @@ export async function verifyCredential({
  * @param {object} [params] Verify parameters (TODO: add type info for this object)
  * @returns {Promise<boolean>} Returns promise that resolves to true if credential is valid and not revoked and false otherwise
  */
-export async function isVerifiedCredential(params) {
-  const result = await verifyCredential(params);
+export async function isVerifiedCredential(credential, params) {
+  const result = await verifyCredential(credential, params);
   return result.verified;
 }
 

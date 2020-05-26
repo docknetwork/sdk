@@ -158,8 +158,7 @@ describe('Schema Blob Module Integration', () => {
 
   test('Utility method verifyCredential should pass if the subject is compatible with the schema in credentialSchema.', async () => {
     await expect(
-      verifyCredential({
-        credential: validCredential.toJSON(),
+      verifyCredential(validCredential.toJSON(), {
         resolver: dockResolver,
         compactProof: true,
         forceRevocationCheck: false,
@@ -178,8 +177,7 @@ describe('Schema Blob Module Integration', () => {
 
   test('Utility method verifyCredential should check if schema is incompatible with the credentialSubject.', async () => {
     await expect(
-        verifyCredential({
-          credential: invalidCredential.toJSON(),
+        verifyCredential(invalidCredential.toJSON(), {
           resolver: null,
           compactProof: true,
           forceRevocationCheck: false,
@@ -188,8 +186,7 @@ describe('Schema Blob Module Integration', () => {
     ).rejects.toThrow('Only Dock schemas are supported as of now.');
 
     await expect(
-        verifyCredential({
-          credential: invalidCredential.toJSON(),
+        verifyCredential(invalidCredential.toJSON(), {
           resolver: null,
           compactProof: true,
           forceRevocationCheck: false,

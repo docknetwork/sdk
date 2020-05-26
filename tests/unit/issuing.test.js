@@ -111,7 +111,6 @@ describe('Verifiable Credential Issuing', () => {
 
   test.skip('Issuing should return an object with a proof, and it must pass validation.', async () => {
     const credential = await issueCredential(getSampleKey(), getSampleCredential());
-    console.log(credential);
     expect(credential.id).toBe('https://example.com/credentials/1872');
     expect(credential.type).toContain('VerifiableCredential');
     expect(credential.type).toContain('AlumniCredential');
@@ -125,9 +124,7 @@ describe('Verifiable Credential Issuing', () => {
     expect(credential.proof.proofPurpose).toBe('assertionMethod');
     expect(credential.proof.verificationMethod).toBe(keyUrl);
 
-    const result = await verifyCredential({
-      credential
-    });
+    const result = await verifyCredential(credential);
     expect(result.verified).toBe(true);
     expect(result.results[0].proof).toBeDefined();
     expect(result.results[0].verified).toBe(true);
@@ -137,9 +134,7 @@ describe('Verifiable Credential Issuing', () => {
 describe('Verifiable Credential Verification', () => {
   test.skip('The sample signed credential should pass verification.', async () => {
     const signedCred = getSampleCredential(true);
-    const result = await verifyCredential({
-      credential: signedCred
-    });
+    const result = await verifyCredential(signedCred);
     expect(result.verified).toBe(true);
     expect(result.results[0].proof['@context']).toBe('https://w3id.org/security/v2');
     expect(result.results[0].proof.created).toBeDefined();

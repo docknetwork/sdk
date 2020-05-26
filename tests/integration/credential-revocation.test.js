@@ -150,8 +150,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     );
 
     // As the credential is unrevoked, the presentation should verify successfully.
-    const result = await verifyPresentation({
-      presentation: signedPres,
+    const result = await verifyPresentation(signedPres, {
       challenge: chal,
       domain,
       resolver,
@@ -166,8 +165,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     await dockAPI.sendTransaction(t3);
 
     // As the credential is revoked, the presentation should verify successfully.
-    const result1 = await verifyPresentation({
-      presentation: signedPres,
+    const result1 = await verifyPresentation(signedPres, {
       challenge: chal,
       domain,
       resolver,

@@ -219,8 +219,7 @@ describe('Schema Blob Module Integration', () => {
     );
 
     await expect(
-      verifyPresentation({
-        presentation: vpInvalid.toJSON(),
+      verifyPresentation(vpInvalid.toJSON(), {
         challenge: 'some_challenge',
         domain: 'some_domain',
         resolver: dockResolver,
@@ -231,8 +230,7 @@ describe('Schema Blob Module Integration', () => {
     ).rejects.toThrow('Only Dock schemas are supported as of now.');
 
     await expect(
-      verifyPresentation({
-        presentation: vpInvalid.toJSON(),
+      verifyPresentation(vpInvalid.toJSON(), {
         challenge: 'some_challenge',
         domain: 'some_domain',
         resolver: dockResolver,
@@ -255,8 +253,7 @@ describe('Schema Blob Module Integration', () => {
     );
 
     await expect(
-      verifyPresentation({
-        presentation: vpValid.toJSON(),
+      verifyPresentation(vpValid.toJSON(), {
         challenge: 'some_challenge',
         domain: 'some_domain',
         resolver: dockResolver,

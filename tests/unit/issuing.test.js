@@ -165,8 +165,7 @@ describe('Verifiable Presentation creation', () => {
     );
     expect(signedVp).toMatchObject(getSamplePres(true));
 
-    const results = await verifyPresentation({
-      presentation: signedVp,
+    const results = await verifyPresentation(signedVp, {
       challenge: 'some_challenge',
       domain: 'some_domain',
     });

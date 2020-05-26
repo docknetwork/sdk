@@ -160,8 +160,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
         ),
       );
 
-      const result = await verifyPresentation({
-        presentation: signedPres,
+      const result = await verifyPresentation(signedPres, {
         challenge: chal,
         domain,
         resolver,
@@ -234,8 +233,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       ),
     );
 
-    const result = await verifyPresentation({
-      presentation: signedPres,
+    const result = await verifyPresentation(signedPres, {
       challenge: chal,
       domain,
       resolver,

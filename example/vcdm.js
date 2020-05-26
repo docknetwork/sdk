@@ -106,7 +106,14 @@ async function main() {
       await presentation.sign(holderKey, challenge, domain, resolver);
       console.log('Signed presentation', presentation.toJSON());
 
-      const ver = await presentation.verify(challenge, domain, resolver, true, false);
+      const ver = await presentation.verify({
+        challenge,
+        domain,
+        resolver,
+        compactProof: true,
+        forceRevocationCheck: false
+      });
+
       if (ver.verified) {
         console.log('Presentation has been verified! Result:', ver);
       } else {

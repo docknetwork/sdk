@@ -289,7 +289,7 @@ If you've used DIDs you need to pass a `resolver` for them. You can also use the
 If your credential has uses the `status` field, you can pass a `revocationApi` param that accepts an object describing the API to use for the revocation check.
 For the simplest cases you only need a `challenge` string and possibly a `domain` string:
 ```javascript
->   const results = await vp.verify('some_challenge', 'some_domain');
+>   const results = await vp.verify({ challenge: 'some_challenge', domain: 'some_domain' });
 >   results
 <-  {
       "presentationResult": {

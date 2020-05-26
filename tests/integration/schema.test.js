@@ -284,15 +284,25 @@ describe('Schema Blob Module Integration', () => {
     );
 
     await expect(
-      vpInvalid.verify(
-        'some_challenge', 'some_domain', dockResolver, true, false, undefined, { notDock: dockApi },
-      ),
+      vpInvalid.verify({
+        challenge: 'some_challenge',
+        domain: 'some_domain',
+        resolver: dockResolver,
+        compactProof: true,
+        forceRevocationCheck: false,
+        schemaApi: { notDock: dockApi },
+      }),
     ).rejects.toThrow('Only Dock schemas are supported as of now.');
 
     await expect(
-      vpInvalid.verify(
-        'some_challenge', 'some_domain', dockResolver, true, false, undefined, { dock: dockApi },
-      ),
+      vpInvalid.verify({
+        challenge: 'some_challenge',
+        domain: 'some_domain',
+        resolver: dockResolver,
+        compactProof: true,
+        forceRevocationCheck: false,
+        schemaApi: { dock: dockApi },
+      }),
     ).rejects.toThrow(/Schema validation failed/);
   }, 90000);
 
@@ -308,9 +318,14 @@ describe('Schema Blob Module Integration', () => {
     );
 
     await expect(
-      vpValid.verify(
-        'some_challenge', 'some_domain', dockResolver, true, false, undefined, { dock: dockApi },
-      ),
+      vpValid.verify({
+        challenge: 'some_challenge',
+        domain: 'some_domain',
+        resolver: dockResolver,
+        compactProof: true,
+        forceRevocationCheck: false,
+        schemaApi: { dock: dockApi },
+      }),
     ).resolves.toBeDefined();
   }, 90000);
 });

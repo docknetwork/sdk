@@ -139,7 +139,7 @@ class VerifiablePresentation {
    * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
    * @returns {Promise<VerifiablePresentationVerificationResult>} - verification result.
    */
-  async verify(challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null) {
+  async verify({challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null}) {
     if (!this.proof) {
       throw new Error('The current VerifiablePresentation has no proof.');
     }

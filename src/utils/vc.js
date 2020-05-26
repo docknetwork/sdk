@@ -132,14 +132,14 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
 
 /**
  * Verify a Verifiable Credential. Returns the verification status and error in an object
- * @param {object} [params] Verify parameters (TODO: add type info for this object)
+ * @param {object} [credential] The VCDM Credential
+ * @param {object} Verify parameters (TODO: add type info for this object)
  * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
  * credential is valid and not revoked and false otherwise. The `error` will describe the error if any.
  */
-
 export async function verifyCredential(credential, {
   resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null,
-}) {
+} = {}) {
   await getAndValidateSchemaIfPresent(credential, schemaApi);
 
   // Run VCJS verifier
@@ -212,7 +212,8 @@ export async function signPresentation(presentation, keyDoc, challenge, domain, 
 
 /**
  * Verify a Verifiable Presentation. Returns the verification status and error in an object
- * @param {object} [params] Verify parameters (TODO: add type info for this object)
+ * @param {object} presentation The verifiable presentation
+ * @param {object} Verify parameters (TODO: add type info for this object)
  * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
  * presentation is valid and all the credentials are valid and not revoked and false otherwise. The `error` will
  * describe the error if any.

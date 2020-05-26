@@ -151,7 +151,7 @@ export async function verifyCredential({
   });
 
   // Check for revocation only if the credential is verified and revocation check is needed.
-  if (revocationApi && credVer.verified && isRevocationCheckNeeded(credential.credentialStatus, forceRevocationCheck, revocationApi)) {
+  if (credVer.verified && isRevocationCheckNeeded(credential.credentialStatus, forceRevocationCheck, revocationApi)) {
     const revResult = await checkRevocationStatus(credential, revocationApi);
     // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
     if (!revResult.verified) {

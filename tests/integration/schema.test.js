@@ -158,9 +158,13 @@ describe('Schema Blob Module Integration', () => {
 
   test('Utility method verifyCredential should pass if the subject is compatible with the schema in credentialSchema.', async () => {
     await expect(
-      verifyCredential(
-        validCredential.toJSON(), dockResolver, true, false, undefined, { dock: dockApi },
-      ),
+      verifyCredential({
+        credential: validCredential.toJSON(),
+        resolver: dockResolver,
+        compactProof: true,
+        forceRevocationCheck: false,
+        schemaApi: { dock: dockApi }
+      }),
     ).resolves.toBeDefined();
   }, 30000);
 

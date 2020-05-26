@@ -267,7 +267,7 @@ class VerifiableCredential {
    */
   async verify({
     resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null,
-  }) {
+  } = {}) {
     if (!this.proof) {
       throw new Error('The current Verifiable Credential has no proof.');
     }

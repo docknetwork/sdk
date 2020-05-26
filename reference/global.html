@@ -241,6 +241,165 @@
     
 
     
+    <h4 class="name" id="blobHexIdToQualified"><span class="type-signature"></span>blobHexIdToQualified<span class="signature">(hexId)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Return a fully qualified Dock Blob id, i.e. "blob:dock:<SS58 string>"
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>hexId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The hex blob id (without the qualifier)</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_blob.js.html">modules/blob.js</a>, <a href="modules_blob.js.html#line49">line 49</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    - The fully qualified Blob id
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="buildDockCredentialStatus"><span class="type-signature"></span>buildDockCredentialStatus<span class="signature">(registryId)</span><span class="type-signature"> &rarr; {Object}</span></h4>
     
 
@@ -337,7 +496,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line295">line 295</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line291">line 291</a>
     </li></ul></dd>
     
 
@@ -391,7 +550,7 @@
     
 
     
-    <h4 class="name" id="checkRevocationStatus"><span class="type-signature"></span>checkRevocationStatus<span class="signature">(credential, revocationAPI)</span><span class="type-signature"> &rarr; {Promise.&lt;({verified: boolean}|{verified: boolean, error: string})>}</span></h4>
+    <h4 class="name" id="checkRevocationStatus"><span class="type-signature"></span>checkRevocationStatus<span class="signature">(credential, revocationApi)</span><span class="type-signature"> &rarr; {Promise.&lt;({verified: boolean}|{verified: boolean, error: string})>}</span></h4>
     
 
     
@@ -453,7 +612,7 @@
 
         <tr>
             
-                <td class="name"><code>revocationAPI</code></td>
+                <td class="name"><code>revocationApi</code></td>
             
 
             <td class="type">
@@ -505,7 +664,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line93">line 93</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line110">line 110</a>
     </li></ul></dd>
     
 
@@ -689,7 +848,7 @@ JS code may not have access to the signing key like in case of hardware wallet.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line171">line 171</a>
+        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line157">line 157</a>
     </li></ul></dd>
     
 
@@ -872,7 +1031,7 @@ accessible always, like in case of hardware wallet</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line105">line 105</a>
+        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line91">line 91</a>
     </li></ul></dd>
     
 
@@ -1138,7 +1297,7 @@ only be passed when controller is to be updated.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line124">line 124</a>
+        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line110">line 110</a>
     </li></ul></dd>
     
 
@@ -1179,6 +1338,116 @@ only be passed when controller is to be updated.</td>
     <dd>
         
 <span class="param-type">Promise.&lt;object></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createNewDockBlobId"><span class="type-signature"></span>createNewDockBlobId<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Create and return a fully qualified Dock Blob id, i.e. "blob:dock:<SS58 string>"
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_blob.js.html">modules/blob.js</a>, <a href="modules_blob.js.html#line39">line 39</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    - The Blob id
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
 
 
     </dd>
@@ -1248,7 +1517,7 @@ only be passed when controller is to be updated.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line92">line 92</a>
+        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line79">line 79</a>
     </li></ul></dd>
     
 
@@ -1484,7 +1753,7 @@ only be passed when controller is to be updated.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line189">line 189</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line199">line 199</a>
     </li></ul></dd>
     
 
@@ -1799,7 +2068,7 @@ only be passed when controller is to be updated.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line198">line 198</a>
+        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line184">line 184</a>
     </li></ul></dd>
     
 
@@ -2029,7 +2298,7 @@ only be passed when controller is to be updated</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line158">line 158</a>
+        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line144">line 144</a>
     </li></ul></dd>
     
 
@@ -4840,6 +5109,387 @@ generate the instance correct subclass
     
 
     
+    <h4 class="name" id="get"><span class="type-signature">(async) </span>get<span class="signature">(id, dockApi)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get schema from from the chain using the given id, by querying the blob storage.
+Accepts a full blob id like blob:dock:0x... or just the hex identifier and the `DockAPI` object.
+The returned schema would be formatted as specified in the RFC (including author DID, schema id) or an error is
+returned if schema is not found on the chain or in JSON format.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The Schema ID</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dockApi</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The Dock API</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_schema.js.html">modules/schema.js</a>, <a href="modules_schema.js.html#line153">line 153</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;object></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getAndValidateSchemaIfPresent"><span class="type-signature"></span>getAndValidateSchemaIfPresent<span class="signature">(credential, schemaApi<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;void>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get schema and run validation on credential if it contains both a credentialSubject and credentialSchema
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>credential</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">a verifiable credential JSON object</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>schemaApi</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">An object representing a map. "schema type -> schema API". The API is used to get
+a schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
+as we support more APIs there are more details associated with each API. Only Dock is supported as of now.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line327">line 327</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;void></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="getBytesForStateChange"><span class="type-signature"></span>getBytesForStateChange<span class="signature">(api, stateChange)</span><span class="type-signature"> &rarr; {array}</span></h4>
     
 
@@ -5121,7 +5771,7 @@ revocation id
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line81">line 81</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line98">line 98</a>
     </li></ul></dd>
     
 
@@ -5158,6 +5808,276 @@ revocation id
     <dd>
         
 <span class="param-type">*</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getHexIdentifier"><span class="type-signature"></span>getHexIdentifier<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Gets the hexadecimal value of the given string.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_codec.js.html">utils/codec.js</a>, <a href="utils_codec.js.html#line28">line 28</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns the hexadecimal representation of the ID.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getHexIdentifierFromBlobID"><span class="type-signature"></span>getHexIdentifierFromBlobID<span class="signature">(id)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Gets the hexadecimal value of the given ID.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The ID can be passed as fully qualified ID like `blob:dock:<SS58 string>` or
+a 32 byte hex string</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_blob.js.html">modules/blob.js</a>, <a href="modules_blob.js.html#line31">line 31</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns the hexadecimal representation of the ID.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
 
 
     </dd>
@@ -5277,7 +6197,7 @@ a 32 byte hex string</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line61">line 61</a>
+        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line60">line 60</a>
     </li></ul></dd>
     
 
@@ -5318,6 +6238,162 @@ a 32 byte hex string</td>
     <dd>
         
 <span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getJSONSchemaSpec"><span class="type-signature">(async) </span>getJSONSchemaSpec<span class="signature">(json)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Gets the JSON schema spec from given JSON. Will either return the stored JSON schema or get
+it using HTTP or will throw error if cannot get.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_schema.js.html">modules/schema.js</a>, <a href="modules_schema.js.html#line174">line 174</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;object></span>
 
 
     </dd>
@@ -6245,7 +7321,7 @@ to the registry.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line30">line 30</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line47">line 47</a>
     </li></ul></dd>
     
 
@@ -6583,7 +7659,7 @@ to the registry.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line53">line 53</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line70">line 70</a>
     </li></ul></dd>
     
 
@@ -6620,6 +7696,165 @@ to the registry.
     <dd>
         
 <span class="param-type">Boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="hexDIDToQualified"><span class="type-signature"></span>hexDIDToQualified<span class="signature">(hexId)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Return a fully qualified Dock DID id, i.e. "did:dock:<SS58 string>"
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>hexId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The hex blob id (without the qualifier)</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line69">line 69</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    - The fully qualified Blob id
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
 
 
     </dd>
@@ -6781,7 +8016,7 @@ to the registry.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_codec.js.html">utils/codec.js</a>, <a href="utils_codec.js.html#line8">line 8</a>
+        <a href="utils_codec.js.html">utils/codec.js</a>, <a href="utils_codec.js.html#line10">line 10</a>
     </li></ul></dd>
     
 
@@ -6989,7 +8224,7 @@ to the registry.
     
 
     
-    <h4 class="name" id="isRevocationCheckNeeded"><span class="type-signature"></span>isRevocationCheckNeeded<span class="signature">(credStatus, forceRevocationCheck, revocationAPI)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    <h4 class="name" id="isRevocationCheckNeeded"><span class="type-signature"></span>isRevocationCheckNeeded<span class="signature">(credStatus, forceRevocationCheck, revocationApi)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
     
 
     
@@ -6998,7 +8233,7 @@ to the registry.
 
 <div class="description">
     Checks if the revocation check is needed. Will return true if `forceRevocationCheck` is true else will check the
-truthyness of revocationAPI. Will return true even if revocationAPI is an empty object.
+truthyness of revocationApi. Will return true even if revocationApi is an empty object.
 </div>
 
 
@@ -7083,7 +8318,7 @@ Warning, setting forceRevocationCheck to false can allow false positives when ve
 
         <tr>
             
-                <td class="name"><code>revocationAPI</code></td>
+                <td class="name"><code>revocationApi</code></td>
             
 
             <td class="type">
@@ -7140,7 +8375,7 @@ Warning, setting forceRevocationCheck to false can allow false positives when ve
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line71">line 71</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line88">line 88</a>
     </li></ul></dd>
     
 
@@ -7495,7 +8730,7 @@ Warning, setting forceRevocationCheck to false can allow false positives when ve
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line119">line 119</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line136">line 136</a>
     </li></ul></dd>
     
 
@@ -7553,7 +8788,7 @@ Warning, setting forceRevocationCheck to false can allow false positives when ve
     
 
     
-    <h4 class="name" id="isVerifiedCredential"><span class="type-signature"></span>isVerifiedCredential<span class="signature">(credential, resolver, compactProof<span class="signature-attributes">opt</span>, forceRevocationCheck<span class="signature-attributes">opt</span>, revocationAPI<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;boolean>}</span></h4>
+    <h4 class="name" id="isVerifiedCredential"><span class="type-signature"></span>isVerifiedCredential<span class="signature">(credential<span class="signature-attributes">opt</span>, params<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;boolean>}</span></h4>
     
 
     
@@ -7615,68 +8850,6 @@ Warning, setting forceRevocationCheck to false can allow false positives when ve
             
                 <td class="attributes">
                 
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">verifiable credential to be verified.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>resolver</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">DIDResolver</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">Resolver for DIDs.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>compactProof</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
                     &lt;optional><br>
                 
 
@@ -7688,48 +8861,14 @@ Warning, setting forceRevocationCheck to false can allow false positives when ve
 
             
 
-            <td class="description last">Whether to compact the JSON-LD or not.</td>
+            <td class="description last">The credential to verify</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>forceRevocationCheck</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">Whether to force revocation check or not.
-Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>revocationAPI</code></td>
+                <td class="name"><code>params</code></td>
             
 
             <td class="type">
@@ -7755,9 +8894,7 @@ Warning, setting forceRevocationCheck to false can allow false positives when ve
 
             
 
-            <td class="description last">An object representing a map. "revocation type -> revocation API". The API is used to check
-revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
-as we support more APIs there are more details associated with each API. Only Dock is supported as of now.</td>
+            <td class="description last">Verify parameters (TODO: add type info for this object)</td>
         </tr>
 
     
@@ -7798,7 +8935,7 @@ as we support more APIs there are more details associated with each API. Only Do
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line177">line 177</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line187">line 187</a>
     </li></ul></dd>
     
 
@@ -7856,7 +8993,7 @@ as we support more APIs there are more details associated with each API. Only Do
     
 
     
-    <h4 class="name" id="isVerifiedPresentation"><span class="type-signature"></span>isVerifiedPresentation<span class="signature">(presentation, challenge, domain, resolver, compactProof, forceRevocationCheck, revocationAPI)</span><span class="type-signature"> &rarr; {Promise.&lt;boolean>}</span></h4>
+    <h4 class="name" id="isVerifiedPresentation"><span class="type-signature"></span>isVerifiedPresentation<span class="signature">(params<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;boolean>}</span></h4>
     
 
     
@@ -7889,6 +9026,8 @@ the `proof` (signature by holder) is correct.
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -7901,7 +9040,7 @@ the `proof` (signature by holder) is correct.
 
         <tr>
             
-                <td class="name"><code>presentation</code></td>
+                <td class="name"><code>params</code></td>
             
 
             <td class="type">
@@ -7914,151 +9053,20 @@ the `proof` (signature by holder) is correct.
             </td>
 
             
-
-            
-
-            <td class="description last">verifiable credential to be verified.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>challenge</code></td>
-            
-
-            <td class="type">
-            
+                <td class="attributes">
                 
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">proof challenge Required.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>domain</code></td>
-            
-
-            <td class="type">
-            
+                    &lt;optional><br>
                 
-<span class="param-type">string</span>
 
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">proof domain (optional)</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>resolver</code></td>
-            
-
-            <td class="type">
-            
                 
-<span class="param-type">DIDResolver</span>
 
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Resolver to resolve the issuer DID (optional)</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>compactProof</code></td>
-            
-
-            <td class="type">
-            
                 
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
+                </td>
             
 
             
 
-            <td class="description last">Whether to compact the JSON-LD or not.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>forceRevocationCheck</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Whether to force revocation check or not.
-Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>revocationAPI</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">An object representing a map. "revocation type -> revocation API". The API is used to check
-revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
-as we support more APIs there are more details associated with each API. Only Dock is supported as of now.</td>
+            <td class="description last">Verify parameters (TODO: add type info for this object)</td>
         </tr>
 
     
@@ -8099,7 +9107,7 @@ as we support more APIs there are more details associated with each API. Only Do
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line285">line 285</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line281">line 281</a>
     </li></ul></dd>
     
 
@@ -8944,6 +9952,560 @@ if available.
     
 
     
+    <h4 class="name" id="setAuthor"><span class="type-signature"></span>setAuthor<span class="signature">(did)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Update the object with `author` key. Repeatedly calling it will keep resetting the author
+did can be a DID hex identifier or full DID
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>did</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the author DID</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_schema.js.html">modules/schema.js</a>, <a href="modules_schema.js.html#line45">line 45</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setJSONSchema"><span class="type-signature">(async) </span>setJSONSchema<span class="signature">(json)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Add the JSON schema to this object after checking that `json` is a valid JSON schema. Check if JSON is valid.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the schema JSON</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_schema.js.html">modules/schema.js</a>, <a href="modules_schema.js.html#line34">line 34</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setSignature"><span class="type-signature"></span>setSignature<span class="signature">(signature)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Update the object with `signature` key. This method is used when
+signing key/capability is not present and the signature is received from outside.
+Repeatedly calling it will keep resetting the `signature` key.
+The signature must be one of the supported objects
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>signature</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The schema's signature</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_schema.js.html">modules/schema.js</a>, <a href="modules_schema.js.html#line61">line 61</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="sign"><span class="type-signature"></span>sign<span class="signature">(pair)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Serializes the object using `getSerializedBlob` and then signs it using the given
+polkadot-js pair. The object will be updated with key `signature`. Repeatedly calling it will
+keep resetting the `signature` key
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>pair</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Key pair to sign with</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_schema.js.html">modules/schema.js</a>, <a href="modules_schema.js.html#line77">line 77</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="signDidRemoval"><span class="type-signature"></span>signDidRemoval<span class="signature">(didModule, didRemoval, currentKeyPair)</span><span class="type-signature"> &rarr; {Signature}</span></h4>
     
 
@@ -9091,7 +10653,7 @@ if available.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line186">line 186</a>
+        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line172">line 172</a>
     </li></ul></dd>
     
 
@@ -9742,7 +11304,7 @@ if available.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line143">line 143</a>
+        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line129">line 129</a>
     </li></ul></dd>
     
 
@@ -10066,7 +11628,7 @@ if available.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line207">line 207</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line217">line 217</a>
     </li></ul></dd>
     
 
@@ -10107,6 +11669,219 @@ if available.
     <dd>
         
 <span class="param-type">Promise.&lt;<a href="global.html#VerifiablePresentation">VerifiablePresentation</a>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="toBlob"><span class="type-signature"></span>toBlob<span class="signature">()</span><span class="type-signature"> &rarr; {object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Serializes the schema to a blob object to send to the node
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_schema.js.html">modules/schema.js</a>, <a href="modules_schema.js.html#line105">line 105</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="toJSON"><span class="type-signature"></span>toJSON<span class="signature">()</span><span class="type-signature"> &rarr; {object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Serializes to JSON for sending to the node, as `Blob`. A full DID is converted to the
+hex identifier and signature object is converted to the enum
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_schema.js.html">modules/schema.js</a>, <a href="modules_schema.js.html#line88">line 88</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
 
 
     </dd>
@@ -11290,6 +13065,165 @@ if available.
     
 
     
+    <h4 class="name" id="validateBlobIDHexIdentifier"><span class="type-signature"></span>validateBlobIDHexIdentifier<span class="signature">(identifier)</span><span class="type-signature"> &rarr; {void}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Check if the given identifier is 32 byte hex
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>identifier</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The identifier to check.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_blob.js.html">modules/blob.js</a>, <a href="modules_blob.js.html#line19">line 19</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Throws exception if invalid identifier
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">void</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="validateByteSize"><span class="type-signature"></span>validateByteSize<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
@@ -11466,6 +13400,189 @@ if available.
     
 
     
+    <h4 class="name" id="validateCredentialSchema"><span class="type-signature"></span>validateCredentialSchema<span class="signature">(credential, schema)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    The function uses `jsonschema` package to verify that the `credential`'s subject `credentialSubject` has the JSON
+schema `schema`
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>credential</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The credential to use</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>schema</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The schema to use</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line302">line 302</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    - Returns promise to an object or throws error
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="validateDockDIDHexIdentifier"><span class="type-signature"></span>validateDockDIDHexIdentifier<span class="signature">(identifier)</span><span class="type-signature"> &rarr; {void}</span></h4>
     
 
@@ -11567,7 +13684,7 @@ if available.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line34">line 34</a>
+        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line33">line 33</a>
     </li></ul></dd>
     
 
@@ -11726,7 +13843,7 @@ if available.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line46">line 46</a>
+        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line45">line 45</a>
     </li></ul></dd>
     
 
@@ -11767,6 +13884,165 @@ if available.
     <dd>
         
 <span class="param-type">void</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="validateSchema"><span class="type-signature">(async) </span>validateSchema<span class="signature">(json)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Check that the given JSON schema is compliant with JSON schema spec mentioned in RFC
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The JSON schema to validate</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_schema.js.html">modules/schema.js</a>, <a href="modules_schema.js.html#line136">line 136</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    - Returns promise to an object or throws error
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;object></span>
 
 
     </dd>
@@ -12552,7 +14828,7 @@ if available.
     
 
     
-    <h4 class="name" id="verifyCredential"><span class="type-signature"></span>verifyCredential<span class="signature">(credential, resolver<span class="signature-attributes">opt</span>, compactProof<span class="signature-attributes">opt</span>, forceRevocationCheck<span class="signature-attributes">opt</span>, revocationAPI<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    <h4 class="name" id="verifyCredential"><span class="type-signature"></span>verifyCredential<span class="signature">(credential<span class="signature-attributes">opt</span>, Verify)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
     
 
     
@@ -12613,37 +14889,6 @@ if available.
             
                 <td class="attributes">
                 
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">verifiable credential to be verified.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>resolver</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
                     &lt;optional><br>
                 
 
@@ -12655,20 +14900,20 @@ if available.
 
             
 
-            <td class="description last">Resolver for DIDs.</td>
+            <td class="description last">The VCDM Credential</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>compactProof</code></td>
+                <td class="name"><code>Verify</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type"><a href="global.html#VerifiableParams">VerifiableParams</a></span>
 
 
             
@@ -12676,8 +14921,6 @@ if available.
 
             
                 <td class="attributes">
-                
-                    &lt;optional><br>
                 
 
                 
@@ -12688,76 +14931,7 @@ if available.
 
             
 
-            <td class="description last">Whether to compact the JSON-LD or not.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>forceRevocationCheck</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">Whether to force revocation check or not.
-Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>revocationAPI</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">An object representing a map. "revocation type -> revocation API". The API is used to check
-revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
-as we support more APIs there are more details associated with each API. Only Dock is supported as of now.</td>
+            <td class="description last">parameters</td>
         </tr>
 
     
@@ -12798,7 +14972,7 @@ as we support more APIs there are more details associated with each API. Only Do
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line145">line 145</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line156">line 156</a>
     </li></ul></dd>
     
 
@@ -13062,7 +15236,7 @@ credential is valid and not revoked and false otherwise. The `error` will descri
     
 
     
-    <h4 class="name" id="verifyPresentation"><span class="type-signature"></span>verifyPresentation<span class="signature">(presentation, challenge, domain, resolver<span class="signature-attributes">opt</span>, compactProof<span class="signature-attributes">opt</span>, forceRevocationCheck<span class="signature-attributes">opt</span>, revocationAPI<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    <h4 class="name" id="verifyPresentation"><span class="type-signature"></span>verifyPresentation<span class="signature">(presentation, Verify)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
     
 
     
@@ -13094,8 +15268,6 @@ credential is valid and not revoked and false otherwise. The `error` will descri
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
         
 
@@ -13121,215 +15293,33 @@ credential is valid and not revoked and false otherwise. The `error` will descri
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
 
-            <td class="description last">verifiable credential to be verified.</td>
+            <td class="description last">The verifiable presentation</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>challenge</code></td>
+                <td class="name"><code>Verify</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type"><a href="global.html#VerifiableParams">VerifiableParams</a></span>
 
 
             
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
 
-            <td class="description last">proof challenge Required.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>domain</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">proof domain (optional)</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>resolver</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">DIDResolver</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">Resolver to resolve the issuer DID (optional)</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>compactProof</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">Whether to compact the JSON-LD or not.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>forceRevocationCheck</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">Whether to force revocation check or not.
-Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>revocationAPI</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">An object representing a map. "revocation type -> revocation API". The API is used to check
-revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
-as we support more APIs there are more details associated with each API. Only Dock is supported as of now.</td>
+            <td class="description last">parameters</td>
         </tr>
 
     
@@ -13370,7 +15360,7 @@ as we support more APIs there are more details associated with each API. Only Do
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line236">line 236</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line238">line 238</a>
     </li></ul></dd>
     
 
@@ -13413,6 +15403,188 @@ describe the error if any.
     <dd>
         
 <span class="param-type">Promise.&lt;object></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="writeToChain"><span class="type-signature"></span>writeToChain<span class="signature">(dock, pair)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Prepares a transaction to write this schema object to the dock chain using the blob module
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>dock</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The dock API</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>pair</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The keypair to sign with</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_schema.js.html">modules/schema.js</a>, <a href="modules_schema.js.html#line127">line 127</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The extrinsic to sign and send.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
 
 
     </dd>
@@ -13795,7 +15967,7 @@ describe the error if any.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line23">line 23</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line24">line 24</a>
     </li></ul></dd>
     
 
@@ -13987,7 +16159,332 @@ describe the error if any.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="verifiable-credential.js.html">verifiable-credential.js</a>, <a href="verifiable-credential.js.html#line17">line 17</a>
+        <a href="verifiable-credential.js.html">verifiable-credential.js</a>, <a href="verifiable-credential.js.html#line18">line 18</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="VerifiableParams">VerifiableParams</h4>
+
+
+
+
+<div class="description">
+    The Options to verify credentials and presentations.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>challenge</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">proof challenge Required.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>domain</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">proof domain (optional)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>resolver</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">DIDResolver</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Resolver to resolve the issuer DID (optional)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>compactProof</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Whether to compact the JSON-LD or not.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>forceRevocationCheck</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Whether to force revocation check or not.
+Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>revocationApi</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">An object representing a map. "revocation type -> revocation API". The API is used to check
+revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
+as we support more APIs there are more details associated with each API. Only Dock is supported as of now.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>schemaApi</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">An object representing a map. "schema type -> schema API". The API is used to get
+a schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
+as we support more APIs there are more details associated with each API. Only Dock is supported as of now.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line26">line 26</a>
     </li></ul></dd>
     
 
@@ -14059,7 +16556,7 @@ describe the error if any.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line12">line 12</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line15">line 15</a>
     </li></ul></dd>
     
 
@@ -14310,13 +16807,13 @@ describe the error if any.
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createPresentation">createPresentation</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureObjectWithKeyOrURI">ensureObjectWithKeyOrURI</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSignatures">getSignatures</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toMap">toMap</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createPresentation">createPresentation</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureObjectWithKeyOrURI">ensureObjectWithKeyOrURI</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSignatures">getSignatures</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#setAuthor">setAuthor</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#setSignature">setSignature</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toMap">toMap</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri May 22 2020 17:59:21 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Tue May 26 2020 21:35:45 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

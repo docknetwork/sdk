@@ -154,7 +154,8 @@
 <p><a href="https://dock.io">Dock</a> is a blockchain built using <a href="https://www.parity.io/substrate/">Substrate</a> and uses <a href="https://github.com/polkadot-js/">polkadot-js</a>
 for interacting with the chain. The current version of Dock supports creating and managing DIDs compliant with the
 <a href="https://www.w3.org/TR/did-core">W3C spec</a> and verifiable credentials compliant with the
-<a href="https://www.w3.org/TR/vc-data-model/">Verifiable Credentials Data Model 1.0</a>. This SDK is meant to build client-side or server side javascript applications.</p>
+<a href="https://www.w3.org/TR/vc-data-model/">Verifiable Credentials Data Model 1.0</a>. This SDK is meant to build client-side or
+server side javascript applications.</p>
 <h2><a class="header" href="#installation" id="installation">Installation</a></h2>
 <ul>
 <li>Install from npm with <code>npm install @docknetwork/sdk</code> or <code>yarn add @docknetwork/sdk</code></li>
@@ -201,6 +202,7 @@ dock.setAccount(account);
 <ol>
 <li><a href="./concepts_did.html">DID</a></li>
 <li><a href="./concepts_vcdm.html">Verifiable credentials</a></li>
+<li><a href="./concepts_blobs_schemas.html">Blobs and Schemas</a></li>
 </ol>
 <h1><a class="header" href="#w3c-did" id="w3c-did">W3C DID</a></h1>
 <p>DID stands for Decentralized IDentifiers. DIDs are meant to be globally unique identifiers that allow their owner to
@@ -401,6 +403,7 @@ etc. To learn more about revocation registries, refer the <a href="./tutorial_re
 <li><a href="./tutorial_did.html">DID</a></li>
 <li><a href="./tutorial_revocation.html">Revocation</a></li>
 <li><a href="./tutorial_ipv.html">Verifiable credentials</a></li>
+<li><a href="./tutorial_blobs_schemas.html">Blobs and Schemas</a></li>
 </ol>
 <h1><a class="header" href="#did" id="did">DID</a></h1>
 <p>If you are not familiar with DIDs, you can get a conceptual overview <a href="./concepts_did.html">here</a>.</p>
@@ -679,7 +682,7 @@ This Credential isn't signed since we only just initialized it. It brings howeve
 &lt;-   &quot;2020-04-14T14:48:48.486Z&quot;
 &gt;    vc.type
 &lt;-   [&quot;VerifiableCredential&quot;]
-&gt;    vc.subject
+&gt;    vc.credentialSubject
 &lt;-   []
 </code></pre>
 <p>The default <code>context</code> is an array with <code>&quot;https://www.w3.org/2018/credentials/v1&quot;</code> as first element. This is required by the VCDMv1 specs so having it as default helps ensure your Verifiable Credentials will be valid in the end.
@@ -722,7 +725,7 @@ This can be achieved by calling the <code>toJSON()</code> method on it:</p>
 <h4><a class="header" href="#adding-a-subject" id="adding-a-subject">Adding a Subject</a></h4>
 <p>A subject can be added with the <code>addSubject</code> function. It accepts a single argument <code>subject</code> that needs to be an object with an <code>id</code> property:</p>
 <pre><code class="language-javascript">&gt;   vc.addSubject({ id: 'did:dock:123qwe123qwe123qwe', alumniOf: 'Example University' })
-&gt;   vc.subject
+&gt;   vc.credentialSubject
 &lt;-  {id: 'did:dock:123qwe123qwe123qwe', alumniOf: 'Example University'}
 </code></pre>
 <h4><a class="header" href="#setting-a-status" id="setting-a-status">Setting a Status</a></h4>
@@ -765,9 +768,10 @@ Once done, your <code>vc</code> object will have a new <code>proof</code> field:
     }
 </code></pre>
 <h3><a class="header" href="#verifying-a-verifiable-credential" id="verifying-a-verifiable-credential">Verifying a Verifiable Credential</a></h3>
-<p>Once your Verifiable Credential has been signed you can proceed to verify it with the <code>verify</code> method. If you've used DIDs you need to pass a <code>resolver</code> for them. You can also use the booleans <code>compactProof</code> (to compact the JSON-LD) and <code>forceRevocationCheck</code> (to force revocation check). Please beware that setting <code>forceRevocationCheck</code> to false can allow false positives when verifying revocable credentials.
-If your credential has uses the <code>status</code> field, you can pass a <code>revocationAPI</code> param that accepts an object describing the API to use for the revocation check. No params are required for the simplest cases:</p>
-<pre><code class="language-javascript">&gt;   const result = await vc.verify()
+<p>Once your Verifiable Credential has been signed you can proceed to verify it with the <code>verify</code> method. The <code>verify</code> method takes an object of arguments, and is optional. If you've used DIDs you need to pass a <code>resolver</code> for them. You can also use the booleans <code>compactProof</code> (to compact the JSON-LD) and <code>forceRevocationCheck</code> (to force revocation check). Please beware that setting <code>forceRevocationCheck</code> to false can allow false positives when verifying revocable credentials.
+If your credential has uses the <code>status</code> field, you can pass a <code>revocationApi</code> param that accepts an object describing the API to use for the revocation check. No params are required for the simplest cases:
+If your credential uses schema and requires blob resolution, you can pass a <code>schemaApi</code> param that accepts an object describing the API to pull the schema from chain. No params are required for the simplest cases:</p>
+<pre><code class="language-javascript">&gt;   const result = await vc.verify({ ... })
 &gt;   result
 &lt;-  {
       verified: true,
@@ -882,9 +886,9 @@ Once done, your <code>vp</code> object will have a new <code>proof</code> field:
 <h3><a class="header" href="#verifying-a-verifiable-presentation" id="verifying-a-verifiable-presentation">Verifying a Verifiable Presentation</a></h3>
 <p>Once your Verifiable Presentation has been signed you can proceed to verify it with the <code>verify</code> method.
 If you've used DIDs you need to pass a <code>resolver</code> for them. You can also use the booleans <code>compactProof</code> (to compact the JSON-LD) and <code>forceRevocationCheck</code> (to force revocation check). Please beware that setting <code>forceRevocationCheck</code> to false can allow false positives when verifying revocable credentials.
-If your credential has uses the <code>status</code> field, you can pass a <code>revocationAPI</code> param that accepts an object describing the API to use for the revocation check.
+If your credential has uses the <code>status</code> field, you can pass a <code>revocationApi</code> param that accepts an object describing the API to use for the revocation check.
 For the simplest cases you only need a <code>challenge</code> string and possibly a <code>domain</code> string:</p>
-<pre><code class="language-javascript">&gt;   const results = await vp.verify('some_challenge', 'some_domain');
+<pre><code class="language-javascript">&gt;   const results = await vp.verify({ challenge: 'some_challenge', domain: 'some_domain' });
 &gt;   results
 &lt;-  {
       &quot;presentationResult&quot;: {
@@ -936,7 +940,7 @@ Bear in mind that you will need to provide a <code>resolver</code> method if you
 <p>Here's an example of issuing a Verifiable Credential using DIDs, provided that you've created and a DID that you store in <code>issuerDID</code>:</p>
 <pre><code class="language-javascript">const issuerKey = getKeyDoc(issuerDID, dock.keyring.addFromUri(issuerSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
 await vc.sign(issuerKey);
-const verificationResult = await signedCredential.verify(resolver, true, true, { dock });
+const verificationResult = await signedCredential.verify({ resolver, compactProof: true, forceRevocationCheck: true, revocationApi: { dock } });
 console.log(verificationResult.verified); // Should print `true`
 </code></pre>
 <h2><a class="header" href="#creating-a-keydoc" id="creating-a-keydoc">Creating a keyDoc</a></h2>

@@ -1,0 +1,384 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Schema - Dock SDK Tutorial</title>
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html" class="active"><strong aria-hidden="true">2.3.</strong> Schema</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Dock SDK Tutorial</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#schemas" id="schemas">Schemas</a></h1>
+<h2><a class="header" href="#table-of-contents" id="table-of-contents">Table of Contents</a></h2>
+<ol>
+<li><a href="#intro-to-schemas">Intro</a></li>
+<li><a href="#blobs">Blobs</a></li>
+<li><a href="#json-schemas">JSON Schemas</a></li>
+<li><a href="#schemas-in-verifiable-credentials">Schemas in Verifiable Credentials</a></li>
+</ol>
+<h2><a class="header" href="#intro-to-schemas" id="intro-to-schemas">Intro to Schemas</a></h2>
+<p>Data Schemas are useful when enforcing a specific structure on a collection of data like a Verifiable Credential.
+Data Verification schemas, for example, are used to verify that the structure and contents of a Verifiable Credential
+conform to a published schema. Data Encoding schemas, on the other hand, are used to map the contents of a Verifiable
+Credential to an alternative representation format, such as a binary format used in a zero-knowledge proof.
+Data schemas serve a different purpose than that of the <code>@context</code> property in a Verifiable Credential, the latter
+neither enforces data structure or data syntax, nor enables the definition of arbitrary encodings to alternate
+representation formats.</p>
+<h2><a class="header" href="#blobs" id="blobs">Blobs</a></h2>
+<p>Before diving further into Schemas in it is important to understand the way these are stored in the Dock chain.
+Schemas are stored on chain as a <code>Blob</code> in the Blob Storage module. They are identified and retrieved by their unique
+blob id, a 32 byte long hex string. They are authored by a DID and have a max size of 1024 bytes.
+The chain is agnostic to the contents of blobs and thus to schemas. Blobs may be used to store types of data other than
+schemas.</p>
+<h2><a class="header" href="#json-schemas" id="json-schemas">JSON Schemas</a></h2>
+<p>JSON Schema can be used to require that a given JSON document (an instance) satisfies a certain number of criteria.
+JSON Schema validation asserts constraints on the structure of instance data. An instance location that satisfies all
+asserted constraints is then annotated with any keywords that contain non-assertion information, such as descriptive
+metadata and usage hints. If all locations within the instance satisfy all asserted constraints, then the instance is
+said to be valid against the schema.
+Each schema object is independently evaluated against each instance location to which it applies.
+This greatly simplifies the implementation requirements for validators by ensuring that they do not need to maintain
+state across the document-wide validation process.
+More about JSON schemas can be found <a href="http://json-schema.org/draft/2019-09/json-schema-validation.html">here</a> and
+<a href="https://json-schema.org/understanding-json-schema/index.html">here</a>.</p>
+<p>Let's see an example JSON schema definition:</p>
+<pre><code class="language-json">{
+  &quot;$schema&quot;: &quot;http://json-schema.org/draft-07/schema#&quot;,
+  &quot;description&quot;: &quot;Alumni&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;properties&quot;: {
+    &quot;emailAddress&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;email&quot;
+    },
+    &quot;alumniOf&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    }
+  },
+  &quot;required&quot;: [&quot;emailAddress&quot;, &quot;alumniOf&quot;],
+  &quot;additionalProperties&quot;: false
+}
+</code></pre>
+<p>In our context, these schemas are stored on-chain as a blob, which means they have a Blob Id as id and a DID as author:</p>
+<pre><code class="language-json">{
+   &quot;id&quot;: &quot;blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW&quot;,
+   &quot;author&quot;: &quot;did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW&quot;,
+   &quot;schema&quot;: {
+      &quot;$schema&quot;: &quot;http://json-schema.org/draft-07/schema#&quot;,
+      &quot;description&quot;: &quot;Alumni&quot;,
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;properties&quot;: {
+        &quot;emailAddress&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;format&quot;: &quot;email&quot;
+        },
+        &quot;alumniOf&quot;: {
+          &quot;type&quot;: &quot;string&quot;
+        }
+      },
+      &quot;required&quot;: [&quot;emailAddress&quot;, &quot;alumniOf&quot;],
+      &quot;additionalProperties&quot;: false
+    }
+}
+</code></pre>
+<p>Had we referenced this JSON schema from within a Verifiable Credential, validation would fail if the <code>credentialSubject</code>
+doesn't contain an <code>emailAddress</code> field, or it isn't a string formatted as an email; or if it doesn't contain a
+property <code>alumniOf</code> with type string. It'd also fail if a subject contains other properties not listed here (except for
+the <code>id</code> property which is popped out before validation).</p>
+<h2><a class="header" href="#schemas-in-verifiable-credentials" id="schemas-in-verifiable-credentials">Schemas in Verifiable Credentials</a></h2>
+<p>In pursuit of <a href="https://w3c.github.io/vc-data-model/#extensibility">extensibility</a>, VCDM makes an Open World Assumption;
+a credential can state anything. Schemas allow issuers to &quot;opt-out&quot; of some of the freedom VCDM allows. Issuers can
+concretely limit what a given credential will claim. In a closed world, a verifier can rely on the structure of a
+credential to enable new types of credential processing e.g. generating a complete and human-friendly graphical
+representation of a credential.</p>
+<p>The <a href="https://www.w3.org/TR/vc-data-model/">Verifiable Credentials Data Model</a> specifies the models used for Verifiable
+Credentials and Verifiable Presentations, and explains the relationships between three parties: issuer, holder, and
+verifier. A critical piece of infrastructure out of the scope of those specifications is the Credential Schema.
+<a href="https://w3c-ccg.github.io/vc-json-schemas/">This specification</a> provides a mechanism to express a Credential Schema
+and the protocols for evolving the schema.</p>
+<p>Following our example above, we could use the current SDK to store the Email schema above as a Blob in the Dock chain.
+Assuming we did that and our schema was stored as <code>blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW</code>, we
+can use it in a Verifiable Credential as follows:</p>
+<pre><code class="language-json">&quot;credentialSchema&quot;: {
+  &quot;id&quot;: &quot;blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW&quot;,
+  &quot;type&quot;: &quot;JsonSchemaValidator2018&quot;
+}
+</code></pre>
+<p>The following is an example of a valid Verifiable Credential using the above schema:</p>
+<pre><code class="language-json">{
+   &quot;@context&quot;: [
+      &quot;https://www.w3.org/2018/credentials/v1&quot;,
+      &quot;https://www.w3.org/2018/credentials/examples/v1&quot;
+   ],
+   &quot;id&quot;: &quot;uuid:0x9b561796d3450eb2673fed26dd9c07192390177ad93e0835bc7a5fbb705d52bc&quot;,
+   &quot;type&quot;: [
+      &quot;VerifiableCredential&quot;,
+      &quot;AlumniCredential&quot;
+   ],
+   &quot;issuanceDate&quot;: &quot;2020-03-18T19:23:24Z&quot;,
+   &quot;credentialSchema&quot;: {
+      &quot;id&quot;: &quot;blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW&quot;,
+      &quot;type&quot;: &quot;JsonSchemaValidator2018&quot;
+   },
+   &quot;credentialSubject&quot;: {
+      &quot;id&quot;: &quot;did:dock:5GL3xbkr3vfs4qJ94YUHwpVVsPSSAyvJcafHz1wNb5zrSPGi&quot;,
+      &quot;emailAddress&quot;: &quot;john.smith@example.com&quot;,
+      &quot;alumniOf&quot;: &quot;Example University&quot;
+   },
+   &quot;issuer&quot;: &quot;did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr&quot;,
+   &quot;proof&quot;: {
+      &quot;type&quot;: &quot;Ed25519Signature2018&quot;,
+      &quot;created&quot;: &quot;2020-04-22T07:50:13Z&quot;,
+      &quot;jws&quot;: &quot;eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..GBqyaiTMhVt4R5P2bMGcLNJPWEUq7WmGHG7Wc6mKBo9k3vSo7v7sRKwqS8-m0og_ANKcb5m-_YdXC2KMnZwLBg&quot;,
+      &quot;proofPurpose&quot;: &quot;assertionMethod&quot;,
+      &quot;verificationMethod&quot;: &quot;did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr#keys-1&quot;
+   }
+}
+</code></pre>
+<p>In contrast, the following is an example of an invalid Verifiable Credential:</p>
+<pre><code class="language-json">{
+   &quot;@context&quot;: [
+      &quot;https://www.w3.org/2018/credentials/v1&quot;,
+      &quot;https://www.w3.org/2018/credentials/examples/v1&quot;
+   ],
+   &quot;id&quot;: &quot;uuid:0x9b561796d3450eb2673fed26dd9c07192390177ad93e0835bc7a5fbb705d52bc&quot;,
+   &quot;type&quot;: [
+      &quot;VerifiableCredential&quot;,
+      &quot;AlumniCredential&quot;
+   ],
+   &quot;issuanceDate&quot;: &quot;2020-03-18T19:23:24Z&quot;,
+   &quot;credentialSchema&quot;: {
+      &quot;id&quot;: &quot;blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW&quot;,
+      &quot;type&quot;: &quot;JsonSchemaValidator2018&quot;
+   },
+   &quot;credentialSubject&quot;: [
+      {
+        &quot;id&quot;: &quot;did:dock:5GL3xbkr3vfs4qJ94YUHwpVVsPSSAyvJcafHz1wNb5zrSPGi&quot;,
+        &quot;emailAddress&quot;: &quot;john.smith@example.com&quot;,
+        &quot;alumniOf&quot;: &quot;Example University&quot;
+      },
+      {
+        &quot;id&quot;: &quot;did:dock:6DF3xbkr3vfs4qJ94YUHwpVVsPSSAyvJcafHz1wNb5zrSPGi&quot;,
+      }
+
+   ],
+   &quot;issuer&quot;: &quot;did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr&quot;,
+   &quot;proof&quot;: {
+      &quot;type&quot;: &quot;Ed25519Signature2018&quot;,
+      &quot;created&quot;: &quot;2020-04-22T07:50:13Z&quot;,
+      &quot;jws&quot;: &quot;eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..GBqyaiTMhVt4R5P2bMGcLNJPWEUq7WmGHG7Wc6mKBo9k3vSo7v7sRKwqS8-m0og_ANKcb5m-_YdXC2KMnZwLBg&quot;,
+      &quot;proofPurpose&quot;: &quot;assertionMethod&quot;,
+      &quot;verificationMethod&quot;: &quot;did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr#keys-1&quot;
+   }
+}
+</code></pre>
+<p>the reason this last Credential is invalid is that only one of the subjects properly follow the Schema, the second
+subject does not specify the fields <code>emailAddress</code> and <code>alumniOf</code> which were specified as required.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="concepts_vcdm.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="tutorials.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="concepts_vcdm.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="tutorials.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

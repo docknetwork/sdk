@@ -183,7 +183,6 @@ describe('Schema Blob Module Integration', () => {
           resolver: null,
           compactProof: true,
           forceRevocationCheck: false,
-          revocationApi: undefined,
           schemaApi: { notDock: dockApi }
         })
     ).rejects.toThrow('Only Dock schemas are supported as of now.');
@@ -194,7 +193,6 @@ describe('Schema Blob Module Integration', () => {
           resolver: null,
           compactProof: true,
           forceRevocationCheck: false,
-          revocationApi: undefined,
           schemaApi: { dock: dockApi }
         })
     ).rejects.toThrow(/Schema validation failed/);
@@ -206,7 +204,6 @@ describe('Schema Blob Module Integration', () => {
       resolver: dockResolver,
       compactProof: true,
       forceRevocationCheck: false,
-      revocationApi: undefined,
       schemaApi: { dock: dockApi }
     })
     ).rejects.toThrow(/Schema validation failed/);
@@ -232,7 +229,6 @@ describe('Schema Blob Module Integration', () => {
         resolver: dockResolver,
         compactProof: true,
         forceRevocationCheck: false,
-        revocationApi: undefined,
         schemaApi: { notDock: dockApi },
       }),
     ).rejects.toThrow('Only Dock schemas are supported as of now.');
@@ -245,7 +241,6 @@ describe('Schema Blob Module Integration', () => {
         resolver: dockResolver,
         compactProof: true,
         forceRevocationCheck: false,
-        revocationApi: undefined,
         schemaApi: { dock: dockApi },
       }),
     ).rejects.toThrow(/Schema validation failed/);
@@ -270,7 +265,6 @@ describe('Schema Blob Module Integration', () => {
         resolver: dockResolver,
         compactProof: true,
         forceRevocationCheck: false,
-        revocationApi: undefined,
         schemaApi: { dock: dockApi },
       }),
     ).resolves.toBeDefined();

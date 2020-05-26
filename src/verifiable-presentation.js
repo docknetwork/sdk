@@ -130,7 +130,7 @@ class VerifiablePresentation {
    */
   async verify({
     challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null,
-  }) {
+  } = {}) {
     if (!this.proof) {
       throw new Error('The current VerifiablePresentation has no proof.');
     }

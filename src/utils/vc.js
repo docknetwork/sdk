@@ -180,6 +180,7 @@ export async function verifyCredential(credential, {
 /**
  * Check that credential is verified, i.e. the credential has VCDM compliant structure and the `proof`
  * (signature by issuer) is correct.
+ * @param {object} [credential] The credential to verify
  * @param {object} [params] Verify parameters (TODO: add type info for this object)
  * @returns {Promise<boolean>} Returns promise that resolves to true if credential is valid and not revoked and false otherwise
  */
@@ -236,7 +237,7 @@ export async function signPresentation(presentation, keyDoc, challenge, domain, 
  */
 export async function verifyPresentation(presentation, {
   challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null,
-}) {
+} = {}) {
   // TODO: support other purposes than the default of "authentication"
   const presVer = await vcjs.verify({
     presentation,

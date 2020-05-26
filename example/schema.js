@@ -90,7 +90,13 @@ async function main() {
   const resolver = new UniversalResolver(universalResolverUrl);
 
   console.log('Verifying the credential:', vc);
-  await vc.verify(resolver, false, false, { dock });
+  await vc.verify({
+    resolver,
+    compactProof: false,
+    forceRevocationCheck: false,
+    revocationApi: { dock },
+    schemaApi: { dock },
+  });
 
   console.log('Credential verified, mutating the subject and trying again...');
   vc.addSubject({
@@ -99,7 +105,13 @@ async function main() {
   });
 
   try {
-    await vc.verify(resolver, false, false, { dock });
+    await vc.verify({
+      resolver,
+      compactProof: false,
+      forceRevocationCheck: false,
+      revocationApi: { dock },
+      schemaApi: { dock },
+    });
     throw new Error('Verification succeeded, but it shouldn\'t have. This is a bug.');
   } catch (e) {
     console.log('Verification failed as expected:', e);

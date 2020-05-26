@@ -111,7 +111,6 @@ describe('Verifiable Credential Issuing', () => {
 
   test.skip('Issuing should return an object with a proof, and it must pass validation.', async () => {
     const credential = await issueCredential(getSampleKey(), getSampleCredential());
-    console.log(credential);
     expect(credential.id).toBe('https://example.com/credentials/1872');
     expect(credential.type).toContain('VerifiableCredential');
     expect(credential.type).toContain('AlumniCredential');
@@ -165,12 +164,11 @@ describe('Verifiable Presentation creation', () => {
       'some_domain',
     );
     expect(signedVp).toMatchObject(getSamplePres(true));
-    const results = await verifyPresentation(
-      signedVp,
-      'some_challenge',
-      'some_domain',
-    );
 
+    const results = await verifyPresentation(signedVp, {
+      challenge: 'some_challenge',
+      domain: 'some_domain',
+    });
 
     expect(results.presentationResult.verified).toBe(true);
     expect(results.presentationResult.results[0].proof['@context']).toBe('https://w3id.org/security/v2');
@@ -391,10 +389,10 @@ describe('Verifiable Presentation incremental creation', () => {
       vp.addCredential({ some: 'value' });
     }).toThrowError('"credential" must include the \'id\' property.');
 
-    await expect(vp.verify(
-      'some_challenge',
-      'some_domain',
-    )).rejects.toThrowError('The current VerifiablePresentation has no proof.');
+    await expect(vp.verify({
+      challenge: 'some_challenge',
+      domain: 'some_domain',
+    })).rejects.toThrowError('The current VerifiablePresentation has no proof.');
   });
 
   test.skip('Incremental VP creation from external VCs should be possible', async () => {
@@ -414,10 +412,10 @@ describe('Verifiable Presentation incremental creation', () => {
     expect(vp.proof).toMatchObject({ proofPurpose: 'authentication' });
     expect(vp.proof).toMatchObject({ verificationMethod: expect.anything() });
 
-    const results = await vp.verify(
-      'some_challenge',
-      'some_domain',
-    );
+    const results = await vp.verify({
+      challenge: 'some_challenge',
+      domain: 'some_domain',
+    });
 
     expect(results.presentationResult).toMatchObject({ verified: true });
     expect(results.presentationResult.results[0]).toMatchObject({ verified: true });
@@ -455,10 +453,10 @@ describe('Verifiable Presentation incremental creation', () => {
     expect(vp.proof).toMatchObject({ proofPurpose: 'authentication' });
     expect(vp.proof).toMatchObject({ verificationMethod: expect.anything() });
 
-    const results = await vp.verify(
-      'some_challenge',
-      'some_domain',
-    );
+    const results = await vp.verify({
+      challenge: 'some_challenge',
+      domain: 'some_domain',
+    });
     expect(results.presentationResult).toMatchObject({ verified: true });
     expect(results.presentationResult.results[0]).toMatchObject({ verified: true });
     expect(results.presentationResult.results[0]).toMatchObject({ proof: expect.anything() });

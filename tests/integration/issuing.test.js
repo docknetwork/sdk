@@ -114,7 +114,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
       ),
     );
 
-    const result = await verifyCredential(credential, resolver);
+    const result = await verifyCredential(credential, {resolver});
     expect(result).toMatchObject(
       expect.objectContaining(
         getProofMatcherDoc(),
@@ -131,7 +131,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
         getCredMatcherDoc(unsignedCred, issuer2DID, issuerKey.id, 'EcdsaSecp256k1Signature2019'),
       ),
     );
-    const result = await verifyCredential(credential, resolver);
+    const result = await verifyCredential(credential, {resolver});
     expect(result).toMatchObject(
       expect.objectContaining(
         getProofMatcherDoc(),
@@ -149,7 +149,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
       ),
     );
 
-    const result = await verifyCredential(credential, resolver);
+    const result = await verifyCredential(credential, {resolver});
 
     expect(result).toMatchObject(
       expect.objectContaining(

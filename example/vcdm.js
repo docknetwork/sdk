@@ -87,7 +87,12 @@ async function main() {
     console.log('Credential signed, verifying...');
 
     // Verify the credential
-    const verifyResult = await signedCredential.verify(resolver, true, true, { dock });
+    const verifyResult = await signedCredential.verify({
+      resolver,
+      compactProof: true,
+      forceRevocationCheck: true,
+      revocationApi: { dock },
+    });
     if (verifyResult.verified) {
       console.log('Credential has been verified! Result:', verifyResult);
 
@@ -101,7 +106,14 @@ async function main() {
       await presentation.sign(holderKey, challenge, domain, resolver);
       console.log('Signed presentation', presentation.toJSON());
 
-      const ver = await presentation.verify(challenge, domain, resolver, true, false);
+      const ver = await presentation.verify({
+        challenge,
+        domain,
+        resolver,
+        compactProof: true,
+        forceRevocationCheck: false,
+      });
+
       if (ver.verified) {
         console.log('Presentation has been verified! Result:', ver);
       } else {

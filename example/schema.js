@@ -2,7 +2,6 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import Schema from '../src/modules/schema';
 
 import { DockAPI } from '../src/api';
-import { blobHexIdToQualified } from '../src/modules/blob';
 import { createNewDockDID, createKeyDetail } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import VerifiableCredential from '../src/verifiable-credential';
@@ -77,7 +76,7 @@ async function main() {
 
   await dock.sendTransaction(schema.writeToChain(dock, pair), false);
 
-  console.log('Schema written, reading from chain (' + schema.id + ')...');
+  console.log(`Schema written, reading from chain (${schema.id})...`);
 
   const result = await Schema.get(schema.id, dock);
   console.log('Result from chain:', result);

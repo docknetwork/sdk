@@ -81,20 +81,17 @@ export default class Schema {
   }
 
   /**
-   * Serializes to JSON for sending to the node, as `Blob`. A full DID is converted to the
-   * hex identifier and signature object is converted to the enum
+   * Serializes schema object to JSON
    * @returns {object}
    */
   toJSON() {
     const {
       signature,
-      id,
       ...rest
     } = this;
 
     return {
       ...rest,
-      id: getHexIdentifierFromBlobID(this.id),
     };
   }
 
@@ -112,7 +109,7 @@ export default class Schema {
     }
 
     return {
-      id: this.id,
+      id: getHexIdentifierFromBlobID(this.id),
       blob: stringToHex(canonicalize(this.schema)),
       author: getHexIdentifierFromDID(this.author),
     };

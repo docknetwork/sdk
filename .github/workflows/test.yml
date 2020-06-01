@@ -1,4 +1,4 @@
-name: Build and Tests
+name: Build, Tests and Examples
 
 on: [pull_request]
 jobs:
@@ -13,3 +13,4 @@ jobs:
       - run: yarn build
       - run: yarn test
       - run: yarn test-with-node
+      - run: yarn examples-with-node

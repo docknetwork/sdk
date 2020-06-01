@@ -82,7 +82,6 @@ async function main() {
     'did:ethr:0xabcabc03e98e0dc2b855be647c39abe984193675',
     'did:work:2UUHQCd4psvkPLZGnWY33L',
     'did:sov:WRfXPg8dantKVubE3HX8pw',
-    'did:web:uport.me',
     'did:ethr:0x3b0BC51Ab9De1e5B7B6E34E5b960285805C41736',
     'did:nacl:Md8JiMIwsapml_FtQ2ngnGftNP5UmVCAUuhnLyAsPxI',
     'did:jolo:e76fb4b4900e43891f613066b9afca366c6d22f7d87fc9f78a91515be24dfb21',

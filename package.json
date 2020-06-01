@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -33,12 +33,6 @@
     "typescript": "^3.8.3"
   },
   "scripts": {
-    "lint": "eslint \"{src,example}/**/*.js\"",
-    "build": "rollup -c",
-    "watch": "rollup -c -w",
-    "test": "jest --verbose ./tests/unit",
-    "test-integration": "NODE_ENV=production jest --verbose --runInBand ./tests/integration",
-    "docs": "mkdir out && touch out/.nojekyll && jsdoc src -r -c .jsdoc -d out/reference",
     "dock-did-example": "npx babel-node example/dock-did.js",
     "did-resolver-example": "npx babel-node example/resolver.js",
     "revocation-example": "npx babel-node example/revocation.js",
@@ -47,8 +41,19 @@
     "schema-example": "npx babel-node example/schema.js",
     "schema-validation-example": "npx babel-node example/schema-validation.js",
     "blob-example": "npx babel-node example/blob.js",
+
+    "test-examples": "yarn dock-did-example && yarn did-resolver-example && yarn revocation-example && yarn vcdm-example && yarn standard-schemas-example && yarn schema-example && yarn schema-validation-example && yarn blob-example",
+
+    "lint": "eslint \"{src,example}/**/*.js\"",
+    "build": "rollup -c",
+    "watch": "rollup -c -w",
+    "test": "jest --verbose ./tests/unit",
+    "test-integration": "NODE_ENV=production jest --verbose --runInBand ./tests/integration",
+    "test-rev": "NODE_ENV=production jest --verbose --runInBand ./tests/integration/revocation",
+    "docs": "mkdir out && touch out/.nojekyll && jsdoc src -r -c .jsdoc -d out/reference",
     "dev-node": "./scripts/run_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
     "test-with-node": "./scripts/with_docker_test_node yarn test-integration",
+    "examples-with-node": "./scripts/with_docker_test_node yarn test-examples",
     "mdbook": "mdbook build tutorials --dest-dir ../out/tutorials",
     "type-check": "tsc -allowJs -checkJs -noEmit -moduleResolution node --resolveJsonModule -target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
   },

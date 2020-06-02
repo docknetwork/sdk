@@ -69,8 +69,8 @@ describe('DID Module', () => {
     const currentController = getHexIdentifierFromDID(originalDoc.publicKey[0].controller);
 
     // Send key update without changing controller
-    const [keyUpdateNone, signatureNone] = await createSignedKeyUpdate(dock.did, dockDID, publicKey, pair);
-    await dock.sendTransaction(dock.did.updateKey(keyUpdateNone, signatureNone));
+    const [keyUpdateNoModify, signatureNoModify] = await createSignedKeyUpdate(dock.did, dockDID, publicKey, pair);
+    await dock.sendTransaction(dock.did.updateKey(keyUpdateNoModify, signatureNoModify));
     const currentResult = await dock.did.getDocument(dockDID);
     const currentControllerFromChain = getHexIdentifierFromDID(currentResult.publicKey[0].controller);
     expect(currentControllerFromChain).toBe(currentController);

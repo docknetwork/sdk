@@ -1,5 +1,3 @@
-import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
-
 import VerifiableCredential from '../../src/verifiable-credential';
 import VerifiablePresentation from '../../src/verifiable-presentation';
 import Schema from '../../src/modules/schema';

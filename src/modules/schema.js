@@ -28,7 +28,9 @@ export default class Schema {
   }
 
   static fromJSON(json) {
-    const { id, schema, author, ...rest } = json;
+    const {
+      id, schema, author, ...rest
+    } = json;
     const schemaObj = new Schema(id);
 
     if (schema) {

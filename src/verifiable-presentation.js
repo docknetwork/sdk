@@ -40,14 +40,16 @@ class VerifiablePresentation {
   }
 
   static fromJSON(json) {
-    const { verifiableCredential, id, type, ...rest } = json;
+    const {
+      verifiableCredential, id, type, ...rest
+    } = json;
     const vp = new VerifiablePresentation(id);
 
     if (verifiableCredential) {
       if (verifiableCredential.length) {
-        verifiableCredential.forEach(credential => {
+        verifiableCredential.forEach((credential) => {
           vp.addCredential(credential);
-        })
+        });
       } else {
         vp.addCredential(verifiableCredential);
       }
@@ -55,9 +57,9 @@ class VerifiablePresentation {
 
     if (type) {
       if (type.length) {
-        type.forEach(typeVal => {
+        type.forEach((typeVal) => {
           vp.addType(typeVal);
-        })
+        });
       } else {
         vp.addType(type);
       }

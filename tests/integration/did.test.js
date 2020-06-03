@@ -3,7 +3,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import { DockAPI } from '../../src/api';
 
 import {
-  createNewDockDID,
+  createNewDockDID, getHexIdentifierFromDID,
   createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval,
 } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
@@ -59,6 +59,32 @@ describe('DID Module', () => {
     const result = await dock.did.getDocument(dockDID);
     expect(!!result).toBe(true);
   }, 10000);
+
+  test('Can update a DID controller', async () => {
+    const pair = dock.keyring.addFromUri(firstKeySeed);
+    const publicKey = getPublicKeyFromKeyringPair(pair);
+
+    // Get the current did controller
+    const originalDoc = await dock.did.getDocument(dockDID);
+    const currentController = getHexIdentifierFromDID(originalDoc.publicKey[0].controller);
+
+    // Send key update without changing controller
+    const [keyUpdateNoModify, signatureNoModify] = await createSignedKeyUpdate(dock.did, dockDID, publicKey, pair);
+    await dock.sendTransaction(dock.did.updateKey(keyUpdateNoModify, signatureNoModify));
+    const currentResult = await dock.did.getDocument(dockDID);
+    const currentControllerFromChain = getHexIdentifierFromDID(currentResult.publicKey[0].controller);
+    expect(currentControllerFromChain).toBe(currentController);
+
+    // Send key update changing controller to newController
+    const newController = randomAsHex(32);
+    const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, dockDID, publicKey, pair, newController);
+    await dock.sendTransaction(dock.did.updateKey(keyUpdate, signature));
+
+    // Assert that the controller change was successful
+    const result = await dock.did.getDocument(dockDID);
+    const newControllerFromChain = getHexIdentifierFromDID(result.publicKey[0].controller);
+    expect(newControllerFromChain).toBe(newController);
+  }, 30000);
 
   test('Can update a DID key to ed25519 key', async () => {
     // Sign key update with this key pair as this is the current key of the DID

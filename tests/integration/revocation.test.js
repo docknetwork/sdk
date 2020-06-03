@@ -12,13 +12,13 @@ import { registerNewDIDUsingPair } from './helpers';
 
 describe('Revocation Module', () => {
   const dock = new DockAPI();
+  let pair;
 
   // Create a random registry id
   const registryId = randomAsHex(32);
 
   // Create a new controller DID, the DID will be registered on the network and own the registry
   const controllerDID = randomAsHex(32);
-  const controllerDIDTwo = randomAsHex(32);
   const controllerSeed = randomAsHex(32);
 
   // Create a did/keypair proof map
@@ -47,16 +47,13 @@ describe('Revocation Module', () => {
     dock.setAccount(account);
 
     // The DID should be written before any test begins
-    const pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
+    pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
 
     // Set our controller DID and associated keypair to be used for generating proof
     didKeys.set(controllerDID, pair);
 
     // The controller is same as the DID
     await registerNewDIDUsingPair(dock, controllerDID, pair);
-
-    // Create secondary DID
-    await registerNewDIDUsingPair(dock, controllerDIDTwo, pair);
     done();
   }, 40000);
 
@@ -147,15 +144,20 @@ describe('Revocation Module', () => {
   }, 40000);
 
   test('Can create a registry with multiple controllers', async () => {
-    const registryID = randomAsHex(32);
+    const multipleControllerRegistryID = randomAsHex(32);
+
+    // Create secondary DID
+    const controllerDIDTwo = randomAsHex(32);
+    await registerNewDIDUsingPair(dock, controllerDIDTwo, pair);
+
     const controllersNew = new Set();
     controllersNew.add(controllerDID);
     controllersNew.add(controllerDIDTwo);
 
-    const policyNew = new OneOfPolicy(controllersNew);
-    const transaction = dock.revocation.newRegistry(registryID, policyNew, false);
+    const policy = new OneOfPolicy(controllersNew);
+    const transaction = dock.revocation.newRegistry(multipleControllerRegistryID, policy, false);
     await expect(dock.sendTransaction(transaction)).resolves.toBeDefined();
-    const reg = await dock.revocation.getRevocationRegistry(registryID);
+    const reg = await dock.revocation.getRevocationRegistry(multipleControllerRegistryID);
     const controllerSet = reg.policy._raw;
     expect(controllerSet.size).toBe(2);
 

@@ -12,7 +12,6 @@ describe('Serialization', () => {
     expect(vcJson).toMatchObject(exampleCredential);
   });
 
-
   test('VerifiablePresentation from/to JSON serialization', () => {
     const presentationId = 'http://example.edu/credentials/2803';
     const vp = new VerifiablePresentation(presentationId);
@@ -58,5 +57,4 @@ describe('Serialization', () => {
     const constructedSchema = Schema.fromJSON(shemaJSON);
     expect(shemaJSON).toMatchObject(constructedSchema.toJSON());
   });
-
 });

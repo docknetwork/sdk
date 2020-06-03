@@ -39,6 +39,47 @@ class VerifiablePresentation {
     this.proof = null;
   }
 
+  static fromJSON(json) {
+    const {
+      verifiableCredential, id, type, ...rest
+    } = json;
+    const vp = new VerifiablePresentation(id);
+
+    if (type) {
+      vp.type = [];
+      if (type.length !== undefined) {
+        type.forEach((typeVal) => {
+          vp.addType(typeVal);
+        });
+      } else {
+        vp.addType(type);
+      }
+    } else {
+      throw new Error('No type found in JSON object, verifiable presentations must have a type field.');
+    }
+
+    const context = rest['@context'];
+    if (context) {
+      vp.context = rest['@context'];
+      delete rest['@context'];
+    } else {
+      throw new Error('No context found in JSON object, verifiable presentations must have a @context field.');
+    }
+
+    if (verifiableCredential) {
+      if (verifiableCredential.length) {
+        verifiableCredential.forEach((credential) => {
+          vp.addCredential(credential);
+        });
+      } else {
+        vp.addCredential(verifiableCredential);
+      }
+    }
+
+    Object.assign(vp, rest);
+    return vp;
+  }
+
   /**
    * Add a context to this Presentation's context array. Duplicates are omitted.
    * @param {string|object} context - Context to add to the presentation context array

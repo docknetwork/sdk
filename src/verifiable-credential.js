@@ -44,11 +44,27 @@ class VerifiableCredential {
   static fromJSON(json) {
     const cert = new VerifiableCredential(json.id);
 
+    const contexts = json['@context'];
+    if (contexts) {
+      contexts.forEach((context) => {
+        cert.addContext(context);
+      });
+    } else {
+      throw new Error('No context found in JSON object, verifiable credentials must have a @context field.');
+    }
+
     const types = json.type;
     if (types) {
-      types.forEach((type) => {
-        cert.addType(type);
-      });
+      cert.type = [];
+      if (types.length !== undefined) {
+        types.forEach((typeVal) => {
+          cert.addType(typeVal);
+        });
+      } else {
+        cert.addType(types);
+      }
+    } else {
+      throw new Error('No type found in JSON object, verifiable credentials must have a type field.');
     }
 
     const subject = (json.credentialSubject || json.subject);
@@ -56,13 +72,6 @@ class VerifiableCredential {
       const subjects = subject.length ? subject : [subject];
       subjects.forEach((value) => {
         cert.addSubject(value);
-      });
-    }
-
-    const contexts = json['@context'];
-    if (contexts) {
-      contexts.forEach((context) => {
-        cert.addContext(context);
       });
     }
 

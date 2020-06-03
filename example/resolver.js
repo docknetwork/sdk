@@ -78,24 +78,22 @@ async function main() {
 
   console.log('Building DIDs list...');
 
+  const dockDID = await createDockDID();
+
   const didsToTest = [
+    dockDID,
     'did:ethr:0xabcabc03e98e0dc2b855be647c39abe984193675',
     'did:work:2UUHQCd4psvkPLZGnWY33L',
     'did:sov:WRfXPg8dantKVubE3HX8pw',
-    'did:ethr:0x3b0BC51Ab9De1e5B7B6E34E5b960285805C41736',
     'did:nacl:Md8JiMIwsapml_FtQ2ngnGftNP5UmVCAUuhnLyAsPxI',
     'did:jolo:e76fb4b4900e43891f613066b9afca366c6d22f7d87fc9f78a91515be24dfb21',
     'did:stack:v0:16EMaNw3pkn3v6f2BgnSSs53zAKH4Q8YJg-0',
     'did:hcr:0f674e7e-4b49-4898-85f6-96176c1e30de',
     'did:neoid:priv:b4eeeb80d20bfb38b23001d0659ce0c1d96be0aa',
     'did:elem:EiAS3mqC4OLMKOwcz3ItIL7XfWduPT7q3Fa4vHgiCfSG2A',
-    'did:github:gjgd',
-    'did:ccp:ceNobbK6Me9F5zwyE3MKY88QZLw',
-    'did:work:2UUHQCd4psvkPLZGnWY33L',
     'did:ont:AN5g6gz9EoQ3sCNu7514GEghZurrktCMiH',
     'did:kilt:5GFs8gCumJcZDDWof5ETFqDFEsNwCsVJUj2bX7y4xBLxN5qT',
-    'did:evan:testcore:0x126E901F6F408f5E260d95c62E7c73D9B60fd734',
-    await createDockDID(),
+    'did:github:gjgd',
   ];
 
   console.log('Resolving', didsToTest.length, 'dids...');

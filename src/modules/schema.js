@@ -29,8 +29,9 @@ export default class Schema {
 
   static fromJSON(json) {
     const {
-      id, schema, author, ...rest
+      id, schema, author
     } = json;
+
     const schemaObj = new Schema(id);
 
     if (schema) {
@@ -41,7 +42,6 @@ export default class Schema {
       schemaObj.setAuthor(author);
     }
 
-    Object.assign(schemaObj, rest);
     return schemaObj;
   }
 

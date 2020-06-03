@@ -61,6 +61,36 @@ describe('Revocation Module', () => {
     await dock.disconnect();
   }, 10000);
 
+  test('Can create a registry with multiple controllers', async () => {
+    // Create secondary DID
+    const controllerDIDTwo = randomAsHex(32);
+    await registerNewDIDUsingPair(dock, controllerDIDTwo, pair);
+
+    const controllersNew = new Set();
+    controllersNew.add(controllerDID);
+    controllersNew.add(controllerDIDTwo);
+
+    // Create policy and registry with multiple controllers
+    const policy = new OneOfPolicy(controllersNew);
+    const multipleControllerRegistryID = randomAsHex(32);
+    const transaction = dock.revocation.newRegistry(multipleControllerRegistryID, policy, false);
+    await expect(dock.sendTransaction(transaction)).resolves.toBeDefined();
+    const reg = await dock.revocation.getRevocationRegistry(multipleControllerRegistryID);
+    const controllerSet = reg.policy._raw;
+    expect(controllerSet.size).toBe(2);
+
+    let hasFirstDID = false;
+    let hasSecondDID = false;
+    controllerSet.forEach(controller => {
+      if (controller.toString() === controllerDID) {
+        hasFirstDID = true;
+      } else if (controller.toString() === controllerDIDTwo) {
+        hasSecondDID = true;
+      }
+    });
+    expect(hasFirstDID && hasSecondDID).toBe(true);
+  }, 40000);
+
   test('Can create a registry with a OneOf policy', async () => {
     const transaction = dock.revocation.newRegistry(registryId, policy, false);
     await expect(dock.sendTransaction(transaction)).resolves.toBeDefined();
@@ -142,34 +172,4 @@ describe('Revocation Module', () => {
     await expect(dock.sendTransaction(transaction)).resolves.toBeDefined();
     await expect(dock.revocation.getRegistryDetail(registryId)).resolves.toBeDefined();
   }, 40000);
-
-  test('Can create a registry with multiple controllers', async () => {
-    const multipleControllerRegistryID = randomAsHex(32);
-
-    // Create secondary DID
-    const controllerDIDTwo = randomAsHex(32);
-    await registerNewDIDUsingPair(dock, controllerDIDTwo, pair);
-
-    const controllersNew = new Set();
-    controllersNew.add(controllerDID);
-    controllersNew.add(controllerDIDTwo);
-
-    const policy = new OneOfPolicy(controllersNew);
-    const transaction = dock.revocation.newRegistry(multipleControllerRegistryID, policy, false);
-    await expect(dock.sendTransaction(transaction)).resolves.toBeDefined();
-    const reg = await dock.revocation.getRevocationRegistry(multipleControllerRegistryID);
-    const controllerSet = reg.policy._raw;
-    expect(controllerSet.size).toBe(2);
-
-    let hasFirstDID = false;
-    let hasSecondDID = false;
-    controllerSet.forEach(controller => {
-      if (controller.toString() === controllerDID) {
-        hasFirstDID = true;
-      } else if (controller.toString() === controllerDIDTwo) {
-        hasSecondDID = true;
-      }
-    });
-    expect(hasFirstDID && hasSecondDID).toBe(true);
-  }, 30000);
 });

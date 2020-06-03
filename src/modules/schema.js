@@ -27,6 +27,22 @@ export default class Schema {
     this.id = id || createNewDockBlobId();
   }
 
+  static fromJSON(json) {
+    const { id, schema, author, ...rest } = json;
+    const schemaObj = new Schema(id);
+
+    if (schema) {
+      schemaObj.schema = schema;
+    }
+
+    if (author) {
+      schemaObj.setAuthor(author);
+    }
+
+    Object.assign(schemaObj, rest);
+    return schemaObj;
+  }
+
   /**
    * Add the JSON schema to this object after checking that `json` is a valid JSON schema. Check if JSON is valid.
    * @param {object} json - the schema JSON

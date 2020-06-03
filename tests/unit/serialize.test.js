@@ -2,6 +2,9 @@ import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
 
 import VerifiableCredential from '../../src/verifiable-credential';
 import VerifiablePresentation from '../../src/verifiable-presentation';
+import Schema from '../../src/modules/schema';
+import { createNewDockDID } from '../../src/utils/did';
+
 import exampleCredential from '../example-credential';
 
 describe('Serialization', () => {
@@ -26,4 +29,36 @@ describe('Serialization', () => {
     const constructedVP = VerifiablePresentation.fromJSON(vpJson);
     expect(vpJson).toMatchObject(constructedVP.toJSON());
   });
+
+  test('Schema from/to JSON serialization', async () => {
+    const schema = new Schema();
+    await schema.setJSONSchema({
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      description: 'Dock Schema Example',
+      type: 'object',
+      properties: {
+        id: {
+          type: 'string',
+        },
+        emailAddress: {
+          type: 'string',
+          format: 'email',
+        },
+        alumniOf: {
+          type: 'string',
+        },
+      },
+      required: ['emailAddress', 'alumniOf'],
+      additionalProperties: false,
+    });
+
+    // Set schema author
+    const dockDID = createNewDockDID();
+    schema.setAuthor(dockDID);
+
+    const shemaJSON = schema.toJSON();
+    const constructedSchema = Schema.fromJSON(shemaJSON);
+    expect(shemaJSON).toMatchObject(constructedSchema.toJSON());
+  });
+
 });

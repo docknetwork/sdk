@@ -2,13 +2,17 @@ import {
   signPresentation,
   verifyPresentation,
 } from './utils/vc';
-import VerifiableCredential from './verifiable-credential';
+
 import {
-  ensureObjectWithId, ensureObjectWithKeyOrURI, ensureString, ensureURI,
+  ensureObjectWithId,
+  ensureString,
+  ensureURI,
+  isObject,
 } from './utils/type-helpers';
 
-import DIDResolver from './did-resolver'; // eslint-disable-line
 import { getUniqueElementsFromArray } from './utils/misc';
+import VerifiableCredential from './verifiable-credential';
+import DIDResolver from './did-resolver'; // eslint-disable-line
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiablePresentation';
@@ -60,7 +64,7 @@ class VerifiablePresentation {
 
     const context = rest['@context'];
     if (context) {
-      vp.context = rest['@context'];
+      vp.setContext(rest['@context']);
       delete rest['@context'];
     } else {
       throw new Error('No context found in JSON object, verifiable presentations must have a @context field.');
@@ -81,12 +85,27 @@ class VerifiablePresentation {
   }
 
   /**
+   * Sets the context to the given value, overrding all others
+   * @param {string|object} context - Context to assign
+   * @returns {VerifiableCredential}
+   */
+  setContext(context) {
+    if (!isObject(context) && !Array.isArray(context)) {
+      ensureURI(context);
+    }
+    this.context = context;
+    return this;
+  }
+
+  /**
    * Add a context to this Presentation's context array. Duplicates are omitted.
    * @param {string|object} context - Context to add to the presentation context array
    * @returns {VerifiablePresentation}
    */
   addContext(context) {
-    ensureObjectWithKeyOrURI(context, '@context', 'context');
+    if (!isObject(context)) {
+      ensureURI(context);
+    }
     this.context = getUniqueElementsFromArray([...this.context, context], JSON.stringify);
     return this;
   }

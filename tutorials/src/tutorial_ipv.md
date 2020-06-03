@@ -69,7 +69,7 @@ An interesting thing to note here is the transformation happening to some of the
 Once your Verifiable Credential has been initialized, you can proceed to use the rest of the building functions to define it completely before finally signing it.
 
 #### Adding a Context
-A context can be added with the `addContext` method. It accepts a single argument `context` which can either be a string (in which case it needs to be a valid URI), or an object (in which case it needs to be a valid context object with a `@context` field):
+A context can be added with the `addContext` method. It accepts a single argument `context` which can either be a string (in which case it needs to be a valid URI), or an object:
 ```javascript
 >   vc.addContext('https://www.w3.org/2018/credentials/examples/v1')
 >   vc.context
@@ -217,7 +217,7 @@ An interesting thing to note here is the transformation happening to some of the
 Once your Verifiable Presentation has been initialized, you can proceed to use the rest of the building functions to define it completely before finally signing it.
 
 #### Adding a Context
-A context can be added with the `addContext` method. It accepts a single argument `context` which can either be a string (in which case it needs to be a valid URI), or an object (in which case it needs to be a valid context object with a `@context` field):
+A context can be added with the `addContext` method. It accepts a single argument `context` which can either be a string (in which case it needs to be a valid URI), or an object
 ```javascript
 >   vp.addContext('https://www.w3.org/2018/credentials/examples/v1')
 >   vp.context

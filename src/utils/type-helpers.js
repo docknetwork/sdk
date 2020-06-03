@@ -81,15 +81,3 @@ export function ensureValidDatetime(datetime) {
     throw new Error(`${datetime} needs to be a valid datetime.`);
   }
 }
-
-/**
- * If an object is given, fail if it doesn't have an id property. Else fail if it isn't an URI
- * @param value
- */
-export function ensureObjectWithKeyOrURI(value, key, name) {
-  if (!isObject(value)) {
-    ensureURI(value);
-  } else {
-    ensureObjectWithKey(value, key, name);
-  }
-}

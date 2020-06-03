@@ -39,6 +39,40 @@ class VerifiablePresentation {
     this.proof = null;
   }
 
+  static fromJSON(json) {
+    const { verifiableCredential, id, type, ...rest } = json;
+    const vp = new VerifiablePresentation(id);
+
+    if (verifiableCredential) {
+      if (verifiableCredential.length) {
+        verifiableCredential.forEach(credential => {
+          vp.addCredential(credential);
+        })
+      } else {
+        vp.addCredential(verifiableCredential);
+      }
+    }
+
+    if (type) {
+      if (type.length) {
+        type.forEach(typeVal => {
+          vp.addType(typeVal);
+        })
+      } else {
+        vp.addType(type);
+      }
+    }
+
+    const context = rest['@context'];
+    if (context) {
+      vp.context = rest['@context'];
+      delete rest['@context'];
+    }
+
+    Object.assign(vp, rest);
+    return vp;
+  }
+
   /**
    * Add a context to this Presentation's context array. Duplicates are omitted.
    * @param {string|object} context - Context to add to the presentation context array

@@ -45,6 +45,19 @@ class VerifiablePresentation {
     } = json;
     const vp = new VerifiablePresentation(id);
 
+    if (type) {
+      vp.type = [];
+      if (type.length !== undefined) {
+        type.forEach((typeVal) => {
+          vp.addType(typeVal);
+        });
+      } else {
+        vp.addType(type);
+      }
+    } else {
+      throw new Error('No type found in JSON object, verifiable presentations must have a type field.');
+    }
+
     const context = rest['@context'];
     if (context) {
       vp.context = rest['@context'];
@@ -60,16 +73,6 @@ class VerifiablePresentation {
         });
       } else {
         vp.addCredential(verifiableCredential);
-      }
-    }
-
-    if (type) {
-      if (type.length) {
-        type.forEach((typeVal) => {
-          vp.addType(typeVal);
-        });
-      } else {
-        vp.addType(type);
       }
     }
 

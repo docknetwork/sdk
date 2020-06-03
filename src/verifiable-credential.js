@@ -55,9 +55,16 @@ class VerifiableCredential {
 
     const types = json.type;
     if (types) {
-      types.forEach((type) => {
-        cert.addType(type);
-      });
+      cert.type = [];
+      if (types.length !== undefined) {
+        types.forEach((typeVal) => {
+          cert.addType(typeVal);
+        });
+      } else {
+        cert.addType(types);
+      }
+    } else {
+      throw new Error('No type found in JSON object, verifiable credentials must have a type field.');
     }
 
     const subject = (json.credentialSubject || json.subject);

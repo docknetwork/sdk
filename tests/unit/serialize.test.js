@@ -6,6 +6,19 @@ import { createNewDockDID } from '../../src/utils/did';
 import exampleCredential from '../example-credential';
 
 describe('Serialization', () => {
+  test('VerifiableCredential fromJSON should fail if no context is provided', () => {
+    expect(() => VerifiableCredential.fromJSON({
+      ...exampleCredential,
+      '@context': undefined
+    })).toThrow();
+  });
+
+  test('VerifiablePresentation fromJSON should fail if no context is provided', () => {
+    expect(() => VerifiablePresentation.fromJSON({
+      '@context': undefined
+    })).toThrow();
+  });
+
   test('VerifiableCredential from/to JSON serialization', () => {
     const vc = VerifiableCredential.fromJSON(exampleCredential);
     const vcJson = vc.toJSON();

@@ -45,6 +45,14 @@ class VerifiablePresentation {
     } = json;
     const vp = new VerifiablePresentation(id);
 
+    const context = rest['@context'];
+    if (context) {
+      vp.context = rest['@context'];
+      delete rest['@context'];
+    } else {
+      throw new Error('No context found in JSON object, verifiable presentations must have a @context field.');
+    }
+
     if (verifiableCredential) {
       if (verifiableCredential.length) {
         verifiableCredential.forEach((credential) => {
@@ -63,12 +71,6 @@ class VerifiablePresentation {
       } else {
         vp.addType(type);
       }
-    }
-
-    const context = rest['@context'];
-    if (context) {
-      vp.context = rest['@context'];
-      delete rest['@context'];
     }
 
     Object.assign(vp, rest);

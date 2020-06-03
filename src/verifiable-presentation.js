@@ -87,7 +87,7 @@ class VerifiablePresentation {
   /**
    * Sets the context to the given value, overrding all others
    * @param {string|object} context - Context to assign
-   * @returns {VerifiableCredential}
+   * @returns {VerifiablePresentation}
    */
   setContext(context) {
     if (!isObject(context) && !Array.isArray(context)) {

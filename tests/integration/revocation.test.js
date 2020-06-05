@@ -71,9 +71,9 @@ describe('Revocation Module', () => {
     controllersNew.add(controllerDIDTwo);
 
     // Create policy and registry with multiple controllers
-    const policy = new OneOfPolicy(controllersNew);
+    const policyNew = new OneOfPolicy(controllersNew);
     const multipleControllerRegistryID = randomAsHex(32);
-    const transaction = dock.revocation.newRegistry(multipleControllerRegistryID, policy, false);
+    const transaction = dock.revocation.newRegistry(multipleControllerRegistryID, policyNew, false);
     await expect(dock.sendTransaction(transaction)).resolves.toBeDefined();
     const reg = await dock.revocation.getRevocationRegistry(multipleControllerRegistryID);
     const controllerSet = reg.policy._raw;
@@ -81,7 +81,7 @@ describe('Revocation Module', () => {
 
     let hasFirstDID = false;
     let hasSecondDID = false;
-    controllerSet.forEach(controller => {
+    controllerSet.forEach((controller) => {
       if (controller.toString() === controllerDID) {
         hasFirstDID = true;
       } else if (controller.toString() === controllerDIDTwo) {

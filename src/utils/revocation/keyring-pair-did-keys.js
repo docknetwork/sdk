@@ -16,6 +16,7 @@ export default class KeyringPairDidKeys extends DidKeys {
    * @returns {Map<any, any>}
    */
   getSignatures(message) {
+    // TODO: Change to BtreeMap
     const signedProofs = new Map();
     this.map.forEach((pair, did) => {
       const sig = getSignatureFromKeyringPair(pair, message);

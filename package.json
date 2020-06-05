@@ -41,9 +41,7 @@
     "schema-example": "npx babel-node example/schema.js",
     "schema-validation-example": "npx babel-node example/schema-validation.js",
     "blob-example": "npx babel-node example/blob.js",
-
     "test-examples": "yarn dock-did-example && yarn did-resolver-example && yarn revocation-example && yarn vcdm-example && yarn standard-schemas-example && yarn schema-example && yarn schema-validation-example && yarn blob-example",
-
     "lint": "eslint \"{src,example}/**/*.js\"",
     "build": "rollup -c",
     "watch": "rollup -c -w",
@@ -60,10 +58,11 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "@polkadot/api": "1.15.1",
-    "@polkadot/keyring": "2.10.1",
-    "@polkadot/util": "2.10.1",
-    "@polkadot/util-crypto": "2.10.1",
+    "@polkadot/api": "1.17.1",
+    "@polkadot/types": "1.17.1",
+    "@polkadot/keyring": "2.12.2",
+    "@polkadot/util": "2.12.2",
+    "@polkadot/util-crypto": "2.12.2",
     "axios": "^0.19.2",
     "bs58": "^4.0.1",
     "credentials-context": "^1.0.0",

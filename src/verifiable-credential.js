@@ -5,7 +5,7 @@ import {
 } from './utils/vc';
 import {
   ensureObjectWithId,
-  ensureObjectWithKeyOrURI,
+  isObject,
   ensureString,
   ensureURI,
   ensureValidDatetime,
@@ -46,9 +46,7 @@ class VerifiableCredential {
 
     const contexts = json['@context'];
     if (contexts) {
-      contexts.forEach((context) => {
-        cert.addContext(context);
-      });
+      cert.setContext(contexts);
     } else {
       throw new Error('No context found in JSON object, verifiable credentials must have a @context field.');
     }
@@ -159,12 +157,27 @@ class VerifiableCredential {
   }
 
   /**
+   * Sets the context to the given value, overrding all others
+   * @param {string|object} context - Context to assign
+   * @returns {VerifiableCredential}
+   */
+  setContext(context) {
+    if (!isObject(context) && !Array.isArray(context)) {
+      ensureURI(context);
+    }
+    this.context = context;
+    return this;
+  }
+
+  /**
    * Add a context to this Credential's context array. Duplicates are omitted.
    * @param {string|object} context - Context to add to the credential context array
    * @returns {VerifiableCredential}
    */
   addContext(context) {
-    ensureObjectWithKeyOrURI(context, '@context', 'context');
+    if (!isObject(context)) {
+      ensureURI(context);
+    }
     this.context = getUniqueElementsFromArray([...this.context, context], JSON.stringify);
     return this;
   }

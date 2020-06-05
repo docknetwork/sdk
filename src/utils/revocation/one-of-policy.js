@@ -35,7 +35,9 @@ export default class OneOfPolicy extends Policy {
     // verification error. This is a workaround and is needed for now. It maybe fixed later
     controllerIds.sort();
 
-    // Create BtreeSet from controller ids as the node expects it
+    // Create BtreeSet from controller ids as the node expects it.
+    // BTreeSet can be initialed without argument.
+    // @ts-ignore
     const controllerSet = new BTreeSet();
     controllerIds.forEach((cnt) => {
       controllerSet.add(cnt);

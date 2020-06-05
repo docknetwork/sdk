@@ -18,7 +18,10 @@ export default class KeyringPairDidKeys extends DidKeys {
    * @returns {Map<any, any>}
    */
   getSignatures(message) {
+    // Sort the entries by key.
     const sortedMap = new Map([...this.map.entries()].sort());
+    // BTreeMap can be initialed without argument.
+    // @ts-ignore
     const signedProofs = new BTreeMap();
     sortedMap.forEach((pair, did) => {
       const sig = getSignatureFromKeyringPair(pair, message);

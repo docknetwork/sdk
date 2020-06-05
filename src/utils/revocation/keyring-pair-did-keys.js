@@ -1,3 +1,5 @@
+import { BTreeMap } from '@polkadot/types';
+
 import DidKeys from './did-keys';
 
 import {
@@ -16,9 +18,9 @@ export default class KeyringPairDidKeys extends DidKeys {
    * @returns {Map<any, any>}
    */
   getSignatures(message) {
-    // TODO: Change to BtreeMap
-    const signedProofs = new Map();
-    this.map.forEach((pair, did) => {
+    const sortedMap = new Map([...this.map.entries()].sort());
+    const signedProofs = new BTreeMap();
+    sortedMap.forEach((pair, did) => {
       const sig = getSignatureFromKeyringPair(pair, message);
       // Convert the DID to hex if not already since the chain only accepts the DID hex-identifier.
       // This change could have been made while setting the DID but keeping the change least disruptive for now.

@@ -222,7 +222,7 @@ This can be achieved by calling the <code>toJSON()</code> method on it:</p>
 <p>An interesting thing to note here is the transformation happening to some of the root level keys in the JSON representation of a <code>VerifiableCredential</code> object. For example <code>context</code> gets transformed into <code>@context</code> and <code>subject</code> into <code>credentialSubject</code>. This is to ensure compliance with the Verifiable Credential Data Model specs while at the same time providing you with a clean interface to the <code>VerifiableCredential</code> class in your code.</p>
 <p>Once your Verifiable Credential has been initialized, you can proceed to use the rest of the building functions to define it completely before finally signing it.</p>
 <h4><a class="header" href="#adding-a-context" id="adding-a-context">Adding a Context</a></h4>
-<p>A context can be added with the <code>addContext</code> method. It accepts a single argument <code>context</code> which can either be a string (in which case it needs to be a valid URI), or an object (in which case it needs to be a valid context object with a <code>@context</code> field):</p>
+<p>A context can be added with the <code>addContext</code> method. It accepts a single argument <code>context</code> which can either be a string (in which case it needs to be a valid URI), or an object:</p>
 <pre><code class="language-javascript">&gt;   vc.addContext('https://www.w3.org/2018/credentials/examples/v1')
 &gt;   vc.context
 &lt;-  [
@@ -345,7 +345,7 @@ This can be achieved by calling the <code>toJSON()</code> method on it:</p>
 <p>An interesting thing to note here is the transformation happening to some of the root level keys in the JSON representation of a <code>VerifiablePresentation</code> object. For example <code>context</code> gets transformed into <code>@context</code> and <code>credentials</code> into <code>verifiableCredential</code>. This is to ensure compliance with the Verifiable Credentials Data Model specs while at the same time providing you with a clean interface to the <code>VerifiablePresentation</code> class in your code.</p>
 <p>Once your Verifiable Presentation has been initialized, you can proceed to use the rest of the building functions to define it completely before finally signing it.</p>
 <h4><a class="header" href="#adding-a-context-1" id="adding-a-context-1">Adding a Context</a></h4>
-<p>A context can be added with the <code>addContext</code> method. It accepts a single argument <code>context</code> which can either be a string (in which case it needs to be a valid URI), or an object (in which case it needs to be a valid context object with a <code>@context</code> field):</p>
+<p>A context can be added with the <code>addContext</code> method. It accepts a single argument <code>context</code> which can either be a string (in which case it needs to be a valid URI), or an object</p>
 <pre><code class="language-javascript">&gt;   vp.addContext('https://www.w3.org/2018/credentials/examples/v1')
 &gt;   vp.context
 &lt;-  [

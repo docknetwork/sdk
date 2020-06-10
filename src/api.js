@@ -68,17 +68,20 @@ class DockAPI {
       },
     });
 
+    await this.initKeyring(keyring);
+
     this.blobModule = new BlobModule(this.api);
     this.didModule = new DIDModule(this.api);
     this.revocationModule = new RevocationModule(this.api);
 
-    await cryptoWaitReady();
+    return this.api;
+  }
 
+  async initKeyring(keyring = null) {
     if (!this.keyring || keyring) {
+      await cryptoWaitReady();
       this.keyring = new Keyring(keyring || { type: 'sr25519' });
     }
-
-    return this.api;
   }
 
   async disconnect() {

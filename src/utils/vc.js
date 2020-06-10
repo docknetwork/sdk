@@ -59,7 +59,10 @@ export function getSuiteFromKeyDoc(keyDoc) {
     default:
       throw new Error(`Unknown key type ${keyDoc.type}.`);
   }
-  return new Cls({ keypair: keyDoc.keypair, publicKey: keyDoc.publicKey, verificationMethod: keyDoc.id });
+  return new Cls({
+    ...keyDoc,
+    verificationMethod: keyDoc.id,
+  });
 }
 
 /**

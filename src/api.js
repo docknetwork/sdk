@@ -68,7 +68,7 @@ class DockAPI {
       },
     });
 
-    await initKeyring();
+    await this.initKeyring(keyring);
 
     this.blobModule = new BlobModule(this.api);
     this.didModule = new DIDModule(this.api);

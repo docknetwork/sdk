@@ -169,29 +169,32 @@ describe('Schema Blob Module Integration', () => {
 
   test('The verify method should pass if the subject is compatible with the schema in credentialSchema.', async () => {
     await expect(
-      validCredential.verify(
-        dockResolver, true, false, undefined, { dock: dockApi },
-      ),
+      validCredential.verify({
+        resolver: dockResolver,
+        compactProof: true,
+        forceRevocationCheck: false,
+        schemaApi: { dock: dockApi },
+      }),
     ).resolves.toBeDefined();
   }, 30000);
 
   test('Utility method verifyCredential should check if schema is incompatible with the credentialSubject.', async () => {
     await expect(
-        verifyCredential(invalidCredential.toJSON(), {
-          resolver: null,
-          compactProof: true,
-          forceRevocationCheck: false,
-          schemaApi: { notDock: dockApi }
-        })
+      verifyCredential(invalidCredential.toJSON(), {
+        resolver: null,
+        compactProof: true,
+        forceRevocationCheck: false,
+        schemaApi: { notDock: dockApi }
+      })
     ).rejects.toThrow('Only Dock schemas are supported as of now.');
 
     await expect(
-        verifyCredential(invalidCredential.toJSON(), {
-          resolver: null,
-          compactProof: true,
-          forceRevocationCheck: false,
-          schemaApi: { dock: dockApi }
-        })
+      verifyCredential(invalidCredential.toJSON(), {
+        resolver: null,
+        compactProof: true,
+        forceRevocationCheck: false,
+        schemaApi: { dock: dockApi }
+       })
     ).rejects.toThrow(/Schema validation failed/);
   }, 30000);
 

@@ -53,6 +53,17 @@ async function removeValidator(dock, validatorId, force) {
   return r;
 }
 
+// Sudo call to swap validator
+async function swapValidator(dock, swap_out, swap_in) {
+  console.log('Setting sdk account...');
+  const account = dock.keyring.addFromUri('//Alice');
+  dock.setAccount(account);
+  const txn = dock.api.tx.sudo.sudo(dock.api.tx.poAModule.swapValidator(swap_out, swap_in));
+  const r = await dock.sendTransaction(txn, false);
+  console.log(r);
+  return r;
+}
+
 // Prototyping code.
 async function main() {
   const dock = new DockAPI();
@@ -61,6 +72,9 @@ async function main() {
   });
 
   // Charlie listens at 'ws://localhost:9955', Dave at 'ws://localhost:9966', Eve at 'ws://localhost:9977'
+  
+  const alice = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
+  const bob = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty';
 
   const charlie = '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y';
   const charlieNode = 'ws://localhost:9955';
@@ -90,6 +104,14 @@ async function main() {
   // await setSessionKey(dock, sessKey, '//Eve');
   // await addValidator(dock, eve, false);
   // await removeValidator(dock, eve, false);
+
+  // For testing removal of all validators
+  // await removeValidator(dock, alice, false);
+  // await removeValidator(dock, bob, false);
+
+  // Testing swap of validator
+  await swapValidator(dock, charlie, dave);
+
 }
 
 main()

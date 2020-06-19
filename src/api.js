@@ -58,6 +58,8 @@ class DockAPI {
     const extraTypes = {
       Address: 'AccountId',
       LookupSource: 'AccountId',
+      // As there are 2 keys only
+      Keys: 'SessionKeys2',
     };
 
     this.api = await ApiPromise.create({

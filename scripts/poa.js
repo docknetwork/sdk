@@ -54,11 +54,11 @@ async function removeValidator(dock, validatorId, force) {
 }
 
 // Sudo call to swap validator
-async function swapValidator(dock, swap_out, swap_in) {
+async function swapValidator(dock, swapOut, swapIn) {
   console.log('Setting sdk account...');
   const account = dock.keyring.addFromUri('//Alice');
   dock.setAccount(account);
-  const txn = dock.api.tx.sudo.sudo(dock.api.tx.poAModule.swapValidator(swap_out, swap_in));
+  const txn = dock.api.tx.sudo.sudo(dock.api.tx.poAModule.swapValidator(swapOut, swapIn));
   const r = await dock.sendTransaction(txn, false);
   console.log(r);
   return r;

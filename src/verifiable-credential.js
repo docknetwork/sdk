@@ -2,6 +2,8 @@ import {
   issueCredential,
   verifyCredential,
   validateCredentialSchema,
+  DEFAULT_CONTEXT,
+  DEFAULT_TYPE,
 } from './utils/vc';
 import {
   ensureObjectWithId,
@@ -11,9 +13,6 @@ import {
   ensureValidDatetime,
 } from './utils/type-helpers';
 import { getUniqueElementsFromArray } from './utils/misc';
-
-const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
-const DEFAULT_TYPE = 'VerifiableCredential';
 
 /**
  * @typedef {object} VerifiableCredentialVerificationResult The credential verification result

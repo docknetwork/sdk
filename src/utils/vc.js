@@ -20,6 +20,8 @@ import Schema from '../modules/schema';
 // export const RevRegType = 'DockRevocationRegistry2020';
 export const RevRegType = 'CredentialStatusList2017';
 export const DockRevRegQualifier = 'rev-reg:dock:';
+export const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
+export const DEFAULT_TYPE = 'VerifiableCredential';
 
 // const {Ed25519Signature2018} = suites;
 
@@ -104,6 +106,34 @@ export function getDockRevIdFromCredential(credential) {
 }
 
 /**
+ * Checks if a credential has a credentialStatus property and it has the properties we expect
+ * If status doesnt exist or is invalid, throws an error.
+ * @param credential
+ */
+export function verifyCredentialStatus(credential) {
+  if (credential.credentialStatus) {
+    if (!credential.credentialStatus.id) {
+      throw new Error('"credentialStatus" must include an id.');
+    }
+    if (!credential.credentialStatus.type) {
+      throw new Error('"credentialStatus" must include a type.');
+    }
+  } else {
+    throw new Error('"credentialStatus" does not exist.');
+  }
+}
+
+/**
+ * Checks if a credential context is valid, ensures first context is https://www.w3.org/2018/credentials/v1
+ * @param credential
+ */
+export function checkCredentialContext(credential) {
+  if (credential['@context'][0] !== DEFAULT_CONTEXT) {
+    throw new Error(`${DEFAULT_CONTEXT} needs to be first in the list of contexts.`);
+  }
+}
+
+/**
  * Check if the credential is revoked or not.
  * @param credential
  * @param revocationApi
@@ -114,6 +144,8 @@ export async function checkRevocationStatus(credential, revocationApi) {
   if (!revocationApi.dock) {
     throw new Error('Only Dock revocation support is present as of now.');
   } else {
+    verifyCredentialStatus(credential);
+
     if (!hasDockRevocation(credential)) {
       return { verified: false, error: 'The credential status does not have the format required by Dock' };
     }
@@ -159,6 +191,8 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
 export async function verifyCredential(credential, {
   resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null,
 } = {}) {
+  checkCredentialContext(credential);
+
   await getAndValidateSchemaIfPresent(credential, schemaApi);
 
   // Run VCJS verifier
@@ -255,6 +289,10 @@ export async function verifyPresentation(presentation, {
     const credentials = presentation.verifiableCredential;
     for (let i = 0; i < credentials.length; i++) {
       const credential = credentials[i];
+
+      // Ensure credential context
+      checkCredentialContext(credential);
+
       // Check for revocation only if the presentation is verified and revocation check is needed.
       if (isRevocationCheckNeeded(credential.credentialStatus, forceRevocationCheck, revocationApi)) {
         const res = await checkRevocationStatus(credential, revocationApi); // eslint-disable-line

@@ -1,6 +1,7 @@
 import vcjs from 'vc-js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { validate } from 'jsonschema';
+import * as jsonld from 'jsonld';
 
 import documentLoader from './vc/document-loader';
 import { isHexWithGivenByteSize } from './codec';
@@ -106,21 +107,40 @@ export function getDockRevIdFromCredential(credential) {
 }
 
 /**
+ * Helper method to ensure credential is valid according to the context
+ * @param credential
+ */
+export async function ensureCorrectJSONLD(credential) {
+  const expanded = await jsonld.expand(credential);
+  return expanded[0];
+}
+
+/**
  * Checks if a credential has a credentialStatus property and it has the properties we expect
  * If status doesnt exist or is invalid, throws an error.
  * @param credential
  */
-export function verifyCredentialStatus(credential) {
-  if (credential.credentialStatus) {
-    if (!credential.credentialStatus.id) {
+export async function verifyCredentialStatus(credential) {
+  const expanded = await ensureCorrectJSONLD(credential);
+  const expandedStatusProperty = 'https://www.w3.org/2018/credentials#credentialStatus';
+  const statusValues = jsonld.getValues(expanded, expandedStatusProperty);
+  if (statusValues.length === 0) {
+    throw new Error('Unable to de-reference "credentialStatus"');
+  }
+
+  const status = statusValues[0];
+  if (status) {
+    if (!status['@id']) {
       throw new Error('"credentialStatus" must include an id.');
     }
-    if (!credential.credentialStatus.type) {
+    if (!status['@type']) {
       throw new Error('"credentialStatus" must include a type.');
     }
   } else {
     throw new Error('"credentialStatus" does not exist.');
   }
+
+  return status;
 }
 
 /**
@@ -144,7 +164,7 @@ export async function checkRevocationStatus(credential, revocationApi) {
   if (!revocationApi.dock) {
     throw new Error('Only Dock revocation support is present as of now.');
   } else {
-    verifyCredentialStatus(credential);
+    await verifyCredentialStatus(credential);
 
     if (!hasDockRevocation(credential)) {
       return { verified: false, error: 'The credential status does not have the format required by Dock' };
@@ -193,6 +213,7 @@ export async function verifyCredential(credential, {
 } = {}) {
   checkCredentialContext(credential);
 
+  await ensureCorrectJSONLD(credential);
   await getAndValidateSchemaIfPresent(credential, schemaApi);
 
   // Run VCJS verifier
@@ -292,6 +313,7 @@ export async function verifyPresentation(presentation, {
 
       // Ensure credential context
       checkCredentialContext(credential);
+      await ensureCorrectJSONLD(credential);
 
       // Check for revocation only if the presentation is verified and revocation check is needed.
       if (isRevocationCheckNeeded(credential.credentialStatus, forceRevocationCheck, revocationApi)) {

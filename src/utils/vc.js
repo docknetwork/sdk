@@ -313,7 +313,7 @@ export async function verifyPresentation(presentation, {
 
       // Ensure credential context
       checkCredentialContext(credential);
-      await ensureCorrectJSONLD(credential);
+      await ensureCorrectJSONLD(credential); // eslint-disable-line
 
       // Check for revocation only if the presentation is verified and revocation check is needed.
       if (isRevocationCheckNeeded(credential.credentialStatus, forceRevocationCheck, revocationApi)) {

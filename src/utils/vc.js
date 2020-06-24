@@ -154,7 +154,7 @@ export function hasDockRevocation(statuses) {
       && (status.type === RevRegType)
       && status.id.startsWith(DockRevRegQualifier)
       && isHexWithGivenByteSize(status.id.slice(DockRevRegQualifier.length), RevRegIdByteSize)) {
-        return true;
+      return true;
     }
   }
 

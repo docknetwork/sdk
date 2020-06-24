@@ -144,7 +144,7 @@ export function checkCredentialContext(credential) {
 
 /**
  * Check if credential has Dock specific revocation
- * @param credential
+ * @param statuses
  * @returns {Boolean}
  */
 export function hasDockRevocation(statuses) {

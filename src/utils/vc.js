@@ -113,7 +113,7 @@ export async function getCredentialStatuses(credential) {
   const expandedStatusProperty = 'https://www.w3.org/2018/credentials#credentialStatus';
   const statusValues = jsonld.getValues(expanded, expandedStatusProperty);
   if (statusValues.length === 0) {
-    throw new Error('Unable to de-reference "credentialStatus"');
+    throw new Error(`Expected ${expandedStatusProperty} after expanding JSON-LD, but not found.`);
   }
 
   statusValues.forEach((status) => {

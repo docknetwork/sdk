@@ -151,9 +151,9 @@ export function hasDockRevocation(statuses) {
   for (let i = 0; i < statuses.length; i++) {
     const status = statuses[i];
     if (status
-      && (status.type === RevRegType)
-      && status.id.startsWith(DockRevRegQualifier)
-      && isHexWithGivenByteSize(status.id.slice(DockRevRegQualifier.length), RevRegIdByteSize)) {
+      && (status['@type'] === RevRegType)
+      && status['@id'].startsWith(DockRevRegQualifier)
+      && isHexWithGivenByteSize(status['@id'].slice(DockRevRegQualifier.length), RevRegIdByteSize)) {
       return true;
     }
   }

@@ -69,18 +69,6 @@ export function getSuiteFromKeyDoc(keyDoc) {
 }
 
 /**
- * Check if credential has Dock specific revocation
- * @param credential
- * @returns {Boolean}
- */
-export function hasDockRevocation(credential) {
-  return credential.credentialStatus
-    && (credential.credentialStatus.type === RevRegType)
-    && credential.credentialStatus.id.startsWith(DockRevRegQualifier)
-    && isHexWithGivenByteSize(credential.credentialStatus.id.slice(DockRevRegQualifier.length), RevRegIdByteSize);
-}
-
-/**
  * Checks if the revocation check is needed. Will return true if `forceRevocationCheck` is true else will check the
  * truthyness of revocationApi. Will return true even if revocationApi is an empty object.
  * @param {object} credStatus - The `credentialStatus` field in a credential. Does not care about the correct
@@ -120,7 +108,7 @@ export async function ensureCorrectJSONLD(credential) {
  * If status doesnt exist or is invalid, throws an error.
  * @param credential
  */
-export async function verifyCredentialStatus(credential) {
+export async function getCredentialStatuses(credential) {
   const expanded = await ensureCorrectJSONLD(credential);
   const expandedStatusProperty = 'https://www.w3.org/2018/credentials#credentialStatus';
   const statusValues = jsonld.getValues(expanded, expandedStatusProperty);
@@ -128,19 +116,20 @@ export async function verifyCredentialStatus(credential) {
     throw new Error('Unable to de-reference "credentialStatus"');
   }
 
-  const status = statusValues[0];
-  if (status) {
-    if (!status['@id']) {
-      throw new Error('"credentialStatus" must include an id.');
+  statusValues.forEach((status) => {
+    if (status) {
+      if (!status['@id']) {
+        throw new Error('"credentialStatus" must include an id.');
+      }
+      if (!status['@type']) {
+        throw new Error('"credentialStatus" must include a type.');
+      }
+    } else {
+      throw new Error('"credentialStatus" does not exist.');
     }
-    if (!status['@type']) {
-      throw new Error('"credentialStatus" must include a type.');
-    }
-  } else {
-    throw new Error('"credentialStatus" does not exist.');
-  }
+  });
 
-  return status;
+  return statusValues;
 }
 
 /**
@@ -154,6 +143,25 @@ export function checkCredentialContext(credential) {
 }
 
 /**
+ * Check if credential has Dock specific revocation
+ * @param credential
+ * @returns {Boolean}
+ */
+export function hasDockRevocation(statuses) {
+  for (let i = 0; i < statuses.length; i++) {
+    const status = statuses[i];
+    if (status
+      && (status.type === RevRegType)
+      && status.id.startsWith(DockRevRegQualifier)
+      && isHexWithGivenByteSize(status.id.slice(DockRevRegQualifier.length), RevRegIdByteSize)) {
+        return true;
+    }
+  }
+
+  return false;
+}
+
+/**
  * Check if the credential is revoked or not.
  * @param credential
  * @param revocationApi
@@ -164,11 +172,12 @@ export async function checkRevocationStatus(credential, revocationApi) {
   if (!revocationApi.dock) {
     throw new Error('Only Dock revocation support is present as of now.');
   } else {
-    await verifyCredentialStatus(credential);
+    const statuses = await getCredentialStatuses(credential);
 
-    if (!hasDockRevocation(credential)) {
+    if (!hasDockRevocation(statuses)) {
       return { verified: false, error: 'The credential status does not have the format required by Dock' };
     }
+
     const dockAPI = revocationApi.dock;
     const regId = credential.credentialStatus.id.slice(DockRevRegQualifier.length);
     // Hash credential id to get revocation id

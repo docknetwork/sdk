@@ -150,10 +150,12 @@ export function checkCredentialContext(credential) {
 export function hasDockRevocation(statuses) {
   for (let i = 0; i < statuses.length; i++) {
     const status = statuses[i];
+    const id = status['@id'];
+    const type = status['@type'];
     if (status
-      && (status['@type'] === RevRegType)
-      && status['@id'].startsWith(DockRevRegQualifier)
-      && isHexWithGivenByteSize(status['@id'].slice(DockRevRegQualifier.length), RevRegIdByteSize)) {
+      && (type[0] === RevRegType)
+      && id.startsWith(DockRevRegQualifier)
+      && isHexWithGivenByteSize(id.slice(DockRevRegQualifier.length), RevRegIdByteSize)) {
       return true;
     }
   }

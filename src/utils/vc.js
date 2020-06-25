@@ -185,7 +185,7 @@ export async function checkRevocationStatus(credential, revocationApi) {
 
       // Hash credential id to get revocation id
       const revId = getDockRevIdFromCredential(credential);
-      const revocationStatus = await dockAPI.revocation.getIsRevoked(regId, revId);
+      const revocationStatus = await dockAPI.revocation.getIsRevoked(regId, revId); // eslint-disable-line
       if (revocationStatus) {
         return { verified: false, error: 'Revocation check failed' };
       }

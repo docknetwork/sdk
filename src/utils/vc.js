@@ -71,16 +71,14 @@ export function getSuiteFromKeyDoc(keyDoc) {
 /**
  * Checks if the revocation check is needed. Will return true if `forceRevocationCheck` is true else will check the
  * truthyness of revocationApi. Will return true even if revocationApi is an empty object.
- * @param {object} credStatus - The `credentialStatus` field in a credential. Does not care about the correct
- * structure of this field but only the truthyness of this field. The intention is to check whether the credential h
- * had a `credentialStatus` field.
+ * @param {object} credential - The credential, expecing a `credentialStatus` field
  * @param {boolean} forceRevocationCheck - Whether to force the revocation check.
  * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
  * @param {object} revocationApi - See above verification methods for details on this parameter
  * @returns {boolean} - Whether to check for revocation or not.
  */
-export function isRevocationCheckNeeded(credStatus, forceRevocationCheck, revocationApi) {
-  return !!credStatus && (forceRevocationCheck || !!revocationApi);
+export function isRevocationCheckNeeded(credential, forceRevocationCheck, revocationApi) {
+  return !!credential.credentialStatus && (forceRevocationCheck || !!revocationApi);
 }
 
 /**
@@ -236,7 +234,7 @@ export async function verifyCredential(credential, {
   });
 
   // Check for revocation only if the credential is verified and revocation check is needed.
-  if (credVer.verified && isRevocationCheckNeeded(credential.credentialStatus, forceRevocationCheck, revocationApi)) {
+  if (credVer.verified && isRevocationCheckNeeded(credential, forceRevocationCheck, revocationApi)) {
     const revResult = await checkRevocationStatus(credential, revocationApi);
     // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
     if (!revResult.verified) {
@@ -327,7 +325,7 @@ export async function verifyPresentation(presentation, {
       await ensureCorrectJSONLD(credential); // eslint-disable-line
 
       // Check for revocation only if the presentation is verified and revocation check is needed.
-      if (isRevocationCheckNeeded(credential.credentialStatus, forceRevocationCheck, revocationApi)) {
+      if (isRevocationCheckNeeded(credential, forceRevocationCheck, revocationApi)) {
         const res = await checkRevocationStatus(credential, revocationApi); // eslint-disable-line
 
         // Return error for the first credential that does not pass revocation check.

@@ -27,7 +27,7 @@ async function setSessionKey(dock, keys, accountUri) {
   const txn = await dock.api.tx.session.setKeys(keys, []);
   console.log(txn);
   const r = await dock.sendTransaction(txn, false);
-  console.log(r);
+  console.log(`Transaction finalized at blockHash ${r.status.asFinalized}`);
   return r;
 }
 
@@ -38,7 +38,7 @@ async function addValidator(dock, validatorId, force) {
   dock.setAccount(account);
   const txn = dock.api.tx.sudo.sudo(dock.api.tx.poAModule.addValidator(validatorId, force));
   const r = await dock.sendTransaction(txn, false);
-  console.log(r);
+  console.log(`Transaction finalized at blockHash ${r.status.asFinalized}`);
   return r;
 }
 
@@ -49,7 +49,7 @@ async function removeValidator(dock, validatorId, force) {
   dock.setAccount(account);
   const txn = dock.api.tx.sudo.sudo(dock.api.tx.poAModule.removeValidator(validatorId, force));
   const r = await dock.sendTransaction(txn, false);
-  console.log(r);
+  console.log(`Transaction finalized at blockHash ${r.status.asFinalized}`);
   return r;
 }
 
@@ -60,7 +60,7 @@ async function swapValidator(dock, swapOut, swapIn) {
   dock.setAccount(account);
   const txn = dock.api.tx.sudo.sudo(dock.api.tx.poAModule.swapValidator(swapOut, swapIn));
   const r = await dock.sendTransaction(txn, false);
-  console.log(r);
+  console.log(r.status.asFinalized);
   return r;
 }
 
@@ -68,11 +68,11 @@ async function swapValidator(dock, swapOut, swapIn) {
 async function main() {
   const dock = new DockAPI();
   await dock.init({
-    address: 'ws://localhost:9955',
+    address: 'ws://localhost:9944',
   });
 
   // Charlie listens at 'ws://localhost:9955', Dave at 'ws://localhost:9966', Eve at 'ws://localhost:9977'
-  
+
   const alice = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
   const bob = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty';
 
@@ -110,8 +110,7 @@ async function main() {
   // await removeValidator(dock, bob, false);
 
   // Testing swap of validator
-  await swapValidator(dock, charlie, dave);
-
+  // await swapValidator(dock, charlie, dave);
 }
 
 main()

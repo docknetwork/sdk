@@ -43,6 +43,10 @@ async function registerNewDID() {
   const blockHash = status.asFinalized;
   console.log(`Transaction finalized at blockHash ${blockHash}`);
   const header = await dock.api.derive.chain.getHeader(blockHash);
+  // console.log(`Block header is ${header}`);
+  const slotNo = header.digest.logs[0].asPreRuntime[1];
+  // console.log(`Slot number is ${slotNo}`);
+  console.log(`Slot number is ${dock.api.createType('u64', slotNo)} and Block number is ${header.number}`);
   console.log(`Block author is ${header.author}`);
   return header.author;
 }
@@ -60,12 +64,17 @@ async function main() {
   const account = dock.keyring.addFromUri(TestAccountURI);
   dock.setAccount(account);
 
+  // console.log('dock.api', dock.api);
+
   await printBalance('alice', alice);
   await printBalance('bob', bob);
   const aliceBalOld = await getBalance(alice);
   const bobBalOld = await getBalance(bob);
 
   const blockAuthor = await registerNewDID();
+  const blockAuthor1 = await registerNewDID();
+  const blockAuthor2 = await registerNewDID();
+  process.exit(0);
 
   // XXX: This code is not extensible as it requires only 2 nodes running. Sufficient for now.
   if (blockAuthor != alice && blockAuthor != bob) {

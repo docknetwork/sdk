@@ -179,13 +179,18 @@ export async function checkRevocationStatus(credential, revocationApi) {
     }
 
     const dockAPI = revocationApi.dock;
-    const regId = credential.credentialStatus.id.slice(DockRevRegQualifier.length);
-    // Hash credential id to get revocation id
-    const revId = getDockRevIdFromCredential(credential);
-    const revocationStatus = await dockAPI.revocation.getIsRevoked(regId, revId);
-    if (revocationStatus) {
-      return { verified: false, error: 'Revocation check failed' };
+    for (let i = 0; i < statuses.length; i++) {
+      const status = statuses[i];
+      const regId = status['@id'].slice(DockRevRegQualifier.length);
+
+      // Hash credential id to get revocation id
+      const revId = getDockRevIdFromCredential(credential);
+      const revocationStatus = await dockAPI.revocation.getIsRevoked(regId, revId);
+      if (revocationStatus) {
+        return { verified: false, error: 'Revocation check failed' };
+      }
     }
+
     return { verified: true };
   }
 }

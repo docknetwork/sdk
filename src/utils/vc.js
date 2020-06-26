@@ -400,7 +400,7 @@ export async function validateCredentialSchema(credential, schema, context) {
       throw new Error('Compacted subject is empty, likely invalid');
     }
 
-    await validate(compacted, schema.schema || schema, {
+    validate(compacted, schema.schema || schema, {
       throwError: true,
     });
   }

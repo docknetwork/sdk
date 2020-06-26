@@ -31,6 +31,20 @@ let invalidCredential;
 let invalidFormatBlobId;
 let dockResolver;
 
+const ctx1 = {
+  '@context': {
+    emailAddress: 'https://schema.org/email',
+    alumniOf: 'https://schema.org/alumniOf',
+  },
+};
+
+const ctx2 = {
+  '@context': {
+    emailAddress: 'https://schema.org/email',
+    notAlumniOf: 'https://schema.org/alumniOf',
+  },
+};
+
 describe('Schema Blob Module Integration', () => {
   const dockApi = new DockAPI();
 
@@ -80,11 +94,6 @@ describe('Schema Blob Module Integration', () => {
     // Create a valid credential with a schema
     validCredential = new VerifiableCredential('https://example.com/credentials/123');
     validCredential.addContext('https://www.w3.org/2018/credentials/examples/v1');
-    const ctx1 = {
-      '@context': {
-        emailAddress: 'https://schema.org/email',
-      },
-    };
     validCredential.addContext(ctx1);
     validCredential.addType('AlumniCredential');
     validCredential.addSubject({
@@ -98,12 +107,6 @@ describe('Schema Blob Module Integration', () => {
     // Create a valid credential that doesn't follow the schema
     invalidCredential = new VerifiableCredential('https://example.com/credentials/1234');
     invalidCredential.addContext('https://www.w3.org/2018/credentials/examples/v1');
-    const ctx2 = {
-      '@context': {
-        emailAddress: 'https://schema.org/email',
-        notAlumniOf: 'https://schema.org/alumniOf',
-      },
-    };
     invalidCredential.addContext(ctx2);
     invalidCredential.addType('AlumniCredential');
     invalidCredential.addSubject({
@@ -209,12 +212,12 @@ describe('Schema Blob Module Integration', () => {
     ).rejects.toThrow(/Schema validation failed/);
   }, 30000);
 
-
   test('Utility method verifyPresentation should check if schema is incompatible with the credentialSubject.', async () => {
     let vpInvalid = new VerifiablePresentation('https://example.com/credentials/12345');
     vpInvalid.addCredential(
       invalidCredential,
     );
+    vpInvalid.addContext(ctx2);
     vpInvalid = await vpInvalid.sign(
       keyDoc,
       'some_challenge',
@@ -249,6 +252,7 @@ describe('Schema Blob Module Integration', () => {
     vpValid.addCredential(
       validCredential,
     );
+    vpValid.addContext(ctx1);
     vpValid = await vpValid.sign(
       keyDoc,
       'some_challenge',
@@ -272,6 +276,7 @@ describe('Schema Blob Module Integration', () => {
     vpInvalid.addCredential(
       invalidCredential,
     );
+    vpInvalid.addContext(ctx2);
     vpInvalid = await vpInvalid.sign(
       keyDoc,
       'some_challenge',
@@ -306,6 +311,7 @@ describe('Schema Blob Module Integration', () => {
     vpValid.addCredential(
       validCredential,
     );
+    vpValid.addContext(ctx1);
     vpValid = await vpValid.sign(
       keyDoc,
       'some_challenge',

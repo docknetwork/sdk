@@ -8,6 +8,7 @@ import {
   RevRegType,
   signPresentation, verifyCredential,
   verifyPresentation,
+  expandJSONLD,
 } from '../../src/utils/vc';
 import { DockResolver } from '../../src/resolver';
 
@@ -52,6 +53,8 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
   let issuerKey;
   let credential;
+  let expanded;
+  let revId;
 
   beforeAll(async (done) => {
     await dockAPI.init({
@@ -90,6 +93,9 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     issuerKey = getKeyDoc(issuerDID, dockAPI.keyring.addFromUri(issuerSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
     credential = await issueCredential(issuerKey, unsignedCred);
 
+    expanded = await expandJSONLD(credential);
+    revId = getDockRevIdFromCredential(expanded);
+
     done();
   }, 60000);
 
@@ -109,7 +115,6 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     expect(result.verified).toBe(true);
 
     // Revoke the credential
-    const revId = getDockRevIdFromCredential(credential);
     const t1 = await dockAPI.revocation.revokeCredential(didKeys, registryId, revId);
     await dockAPI.sendTransaction(t1);
 
@@ -127,7 +132,6 @@ describe('Credential revocation with issuer as the revocation authority', () => 
   test('Holder can create a presentation and verifier can verify it successfully when it is not revoked else the verification fails', async () => {
     // The previous test revokes credential so unrevoke it. Its fine if the previous test is not run as unrevoking does not
     // throw error if the credential is not revoked.
-    const revId = getDockRevIdFromCredential(credential);
     const t2 = await dockAPI.revocation.unrevokeCredential(didKeys, registryId, revId);
     await dockAPI.sendTransaction(t2);
 

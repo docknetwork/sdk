@@ -23,6 +23,10 @@ export const RevRegType = 'CredentialStatusList2017';
 export const DockRevRegQualifier = 'rev-reg:dock:';
 export const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 export const DEFAULT_TYPE = 'VerifiableCredential';
+export const expandedStatusProperty = 'https://www.w3.org/2018/credentials#credentialStatus';
+export const expandedCredentialProperty = 'https://www.w3.org/2018/credentials#verifiableCredential';
+export const expandedSubjectProperty = 'https://www.w3.org/2018/credentials#credentialSubject';
+export const expandedSchemaProperty = 'https://www.w3.org/2018/credentials#credentialSchema';
 
 // const {Ed25519Signature2018} = suites;
 
@@ -78,7 +82,7 @@ export function getSuiteFromKeyDoc(keyDoc) {
  * @returns {boolean} - Whether to check for revocation or not.
  */
 export function isRevocationCheckNeeded(credential, forceRevocationCheck, revocationApi) {
-  return !!credential.credentialStatus && (forceRevocationCheck || !!revocationApi);
+  return !!credential[expandedStatusProperty] && (forceRevocationCheck || !!revocationApi);
 }
 
 /**
@@ -89,14 +93,14 @@ export function isRevocationCheckNeeded(credential, forceRevocationCheck, revoca
  */
 export function getDockRevIdFromCredential(credential) {
   // The hash outputs the same number of bytes as required by Dock
-  return blake2AsHex(credential.id, RevEntryByteSize * 8);
+  return blake2AsHex(credential['@id'], RevEntryByteSize * 8);
 }
 
 /**
  * Helper method to ensure credential is valid according to the context
  * @param credential
  */
-export async function ensureCorrectJSONLD(credential) {
+export async function expandJSONLD(credential) {
   const expanded = await jsonld.expand(credential);
   return expanded[0];
 }
@@ -106,9 +110,7 @@ export async function ensureCorrectJSONLD(credential) {
  * If status doesnt exist or is invalid, throws an error.
  * @param credential
  */
-export async function getCredentialStatuses(credential) {
-  const expanded = await ensureCorrectJSONLD(credential);
-  const expandedStatusProperty = 'https://www.w3.org/2018/credentials#credentialStatus';
+export async function getCredentialStatuses(expanded) {
   const statusValues = jsonld.getValues(expanded, expandedStatusProperty);
   if (statusValues.length === 0) {
     throw new Error(`Expected ${expandedStatusProperty} after expanding JSON-LD, but not found.`);
@@ -179,12 +181,12 @@ export async function checkRevocationStatus(credential, revocationApi) {
     }
 
     const dockAPI = revocationApi.dock;
+    const revId = getDockRevIdFromCredential(credential);
     for (let i = 0; i < statuses.length; i++) {
       const status = statuses[i];
       const regId = status['@id'].slice(DockRevRegQualifier.length);
 
       // Hash credential id to get revocation id
-      const revId = getDockRevIdFromCredential(credential);
       const revocationStatus = await dockAPI.revocation.getIsRevoked(regId, revId); // eslint-disable-line
       if (revocationStatus) {
         return { verified: false, error: 'Revocation check failed' };
@@ -225,10 +227,14 @@ export async function issueCredential(keyDoc, credential, compactProof = true) {
 export async function verifyCredential(credential, {
   resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null,
 } = {}) {
+  // VCJS expects first context to always have same value
   checkCredentialContext(credential);
 
-  await ensureCorrectJSONLD(credential);
-  await getAndValidateSchemaIfPresent(credential, schemaApi);
+  // Expand credential JSON-LD
+  const expandedCredential = await expandJSONLD(credential);
+
+  // Validate scheam
+  await getAndValidateSchemaIfPresent(expandedCredential, schemaApi, credential['@context']);
 
   // Run VCJS verifier
   const credVer = await vcjs.verifyCredential({
@@ -239,11 +245,13 @@ export async function verifyCredential(credential, {
   });
 
   // Check for revocation only if the credential is verified and revocation check is needed.
-  if (credVer.verified && isRevocationCheckNeeded(credential, forceRevocationCheck, revocationApi)) {
-    const revResult = await checkRevocationStatus(credential, revocationApi);
-    // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
-    if (!revResult.verified) {
-      return revResult;
+  if (credVer.verified) {
+    if (isRevocationCheckNeeded(expandedCredential, forceRevocationCheck, revocationApi)) {
+      const revResult = await checkRevocationStatus(expandedCredential, revocationApi);
+      // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
+      if (!revResult.verified) {
+        return revResult;
+      }
     }
   }
   return credVer;
@@ -321,13 +329,11 @@ export async function verifyPresentation(presentation, {
   });
 
   if (presVer.verified) {
-    const credentials = presentation.verifiableCredential;
-    for (let i = 0; i < credentials.length; i++) {
-      const credential = credentials[i];
+    const expanded = await expandJSONLD(presentation);
 
-      // Ensure credential context
-      checkCredentialContext(credential);
-      await ensureCorrectJSONLD(credential); // eslint-disable-line
+    const credentials = expanded[expandedCredentialProperty];
+    for (let i = 0; i < credentials.length; i++) {
+      const credential = credentials[i]['@graph'][0];
 
       // Check for revocation only if the presentation is verified and revocation check is needed.
       if (isRevocationCheckNeeded(credential, forceRevocationCheck, revocationApi)) {
@@ -339,7 +345,7 @@ export async function verifyPresentation(presentation, {
         }
       }
       // eslint-disable-next-line no-await-in-loop
-      await getAndValidateSchemaIfPresent(credential, schemaApi);
+      await getAndValidateSchemaIfPresent(credential, schemaApi, presentation['@context']);
     }
 
     // If all credentials pass the revocation check, the let the result of presentation verification be returned.
@@ -376,17 +382,20 @@ export function buildDockCredentialStatus(registryId) {
  * @param {object} schema - The schema to use
  * @returns {Boolean} - Returns promise to an object or throws error
  */
-export function validateCredentialSchema(credential, schema) {
+export async function validateCredentialSchema(credential, schema, context) {
   const requiresID = schema.required && schema.required.indexOf('id') > -1;
-  const credentialSubject = credential.credentialSubject || [];
+  const credentialSubject = credential[expandedSubjectProperty] || [];
   const subjects = credentialSubject.length ? credentialSubject : [credentialSubject];
   for (let i = 0; i < subjects.length; i++) {
     const subject = { ...subjects[i] };
     if (!requiresID) {
       // The id will not be part of schema. The spec mentioned that id will be popped off from subject
-      delete subject.id;
+      delete subject['@id'];
     }
-    validate(subject, schema.schema || schema, {
+
+    const compacted = await jsonld.compact(subject, context);
+    delete compacted['@context'];
+    validate(compacted, schema.schema || schema, {
       throwError: true,
     });
   }
@@ -401,15 +410,16 @@ export function validateCredentialSchema(credential, schema) {
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
  * @returns {Promise<void>}
  */
-export async function getAndValidateSchemaIfPresent(credential, schemaApi) {
+export async function getAndValidateSchemaIfPresent(credential, schemaApi, context) { // TODO: update to use exanded values
   if (schemaApi) {
-    if (credential.credentialSubject && credential.credentialSchema) {
+    const schema = credential[expandedSchemaProperty][0];
+    if (credential[expandedSubjectProperty] && schema) {
       if (!schemaApi.dock) {
         throw new Error('Only Dock schemas are supported as of now.');
       }
       try {
-        const schema = await Schema.get(credential.credentialSchema.id, schemaApi.dock);
-        await validateCredentialSchema(credential, schema);
+        const schemaObj = await Schema.get(schema['@id'], schemaApi.dock);
+        await validateCredentialSchema(credential, schemaObj, context);
       } catch (e) {
         throw new Error(`Schema validation failed: ${e}`);
       }

@@ -1,5 +1,5 @@
 import Schema from '../src/modules/schema';
-import { validateCredentialSchema } from '../src/utils/vc';
+import { validateCredentialSchema, expandJSONLD } from '../src/utils/vc';
 
 import bolSchema from '../src/utils/vc/schemas/bol';
 import prCardSchema from '../src/utils/vc/schemas/pr_card';
@@ -254,7 +254,9 @@ async function validateSchema(schema, credential) {
   console.log('Validating schema:', schema.description);
   await Schema.validateSchema(schema);
   console.log('Validating credential against schema...');
-  validateCredentialSchema(credential, schema);
+
+  const expanded = await expandJSONLD(credential);
+  validateCredentialSchema(expanded, schema, credential['@context']);
   console.log('Success!');
 }
 

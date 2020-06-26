@@ -146,7 +146,7 @@ class VerifiableCredential {
    * structure specified by the given JSON schema. Use `validateCredentialSchema` but exclude subject's id.
    * Allows issuer to validate schema before adding it.
    * @param {object} schema - The schema to validate with
-   * @returns {Boolean}
+   * @returns {Promise<Boolean>}
    */
   async validateSchema(schema) {
     if (!this.credentialSubject) {
@@ -154,7 +154,7 @@ class VerifiableCredential {
     }
 
     const expanded = await expandJSONLD(this.toJSON());
-    console.log('expanded', expanded)
+    console.log('expanded', expanded);
     return validateCredentialSchema(expanded, schema, this.context);
   }
 

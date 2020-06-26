@@ -108,7 +108,7 @@ export async function expandJSONLD(credential) {
 /**
  * Checks if a credential has a credentialStatus property and it has the properties we expect
  * If status doesnt exist or is invalid, throws an error.
- * @param credential
+ * @param expanded
  */
 export async function getCredentialStatuses(expanded) {
   const statusValues = jsonld.getValues(expanded, expandedStatusProperty);
@@ -380,7 +380,7 @@ export function buildDockCredentialStatus(registryId) {
  * schema `schema`
  * @param {object} credential - The credential to use
  * @param {object} schema - The schema to use
- * @returns {Boolean} - Returns promise to an object or throws error
+ * @returns {Promise<Boolean>} - Returns promise to an object or throws error
  */
 export async function validateCredentialSchema(credential, schema, context) {
   const requiresID = schema.required && schema.required.indexOf('id') > -1;

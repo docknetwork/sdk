@@ -395,7 +395,12 @@ export async function validateCredentialSchema(credential, schema, context) {
 
     const compacted = await jsonld.compact(subject, context); // eslint-disable-line
     delete compacted['@context'];
-    validate(compacted, schema.schema || schema, {
+
+    if (Object.keys(compacted).length === 0) {
+      throw new Error('Compacted subject is empty, likely invalid');
+    }
+
+    await validate(compacted, schema.schema || schema, {
       throwError: true,
     });
   }

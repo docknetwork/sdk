@@ -1,4 +1,5 @@
 import {
+  expandJSONLD,
   issueCredential,
   verifyCredential,
   validateCredentialSchema,
@@ -147,12 +148,14 @@ class VerifiableCredential {
    * @param {object} schema - The schema to validate with
    * @returns {Boolean}
    */
-  validateSchema(schema) {
+  async validateSchema(schema) {
     if (!this.credentialSubject) {
       throw new Error('No credential subject defined');
     }
 
-    return validateCredentialSchema(this, schema);
+    const expanded = await expandJSONLD(this.toJSON());
+    console.log('expanded', expanded)
+    return validateCredentialSchema(expanded, schema, this.context);
   }
 
   /**

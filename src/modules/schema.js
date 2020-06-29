@@ -140,7 +140,7 @@ export default class Schema {
    * @return {object} The extrinsic to sign and send.
    */
   writeToChain(dock, pair) {
-    return dock.blob.new(this.toBlob(), pair);
+    return dock.sendTransaction(dock.blob.new(this.toBlob(), pair), false);
   }
 
   /**

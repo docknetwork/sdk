@@ -70,7 +70,7 @@ class BlobModule {
    * @param {Signature} signature - Signature to use
    * @return {object} The extrinsic to sign and send.
    */
-  new(blob, keyPair = undefined, signature = undefined) {
+  async new(blob, keyPair = undefined, signature = undefined) {
     if (!signature) {
       if (!keyPair) {
         throw Error('You need to provide either a keypair or a signature to register a new Blob.');
@@ -79,7 +79,7 @@ class BlobModule {
       // eslint-disable-next-line no-param-reassign
       signature = getSignatureFromKeyringPair(keyPair, serializedBlob);
     }
-    return this.module.new(blob, signature.toJSON());
+    return this.api.sendTransaction(this.module.new(blob, signature.toJSON()), false);
   }
 
   /**

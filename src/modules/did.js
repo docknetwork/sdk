@@ -26,9 +26,9 @@ class DIDModule {
    * @param {object} keyDetail - `KeyDetail` as expected by the Substrate node
    * @return {object} The extrinsic to sign and send.
    */
-  new(did, keyDetail) {
+  async new(did, keyDetail) {
     const hexId = getHexIdentifierFromDID(did);
-    return this.module.new(hexId, keyDetail);
+    return this.api.sendTransaction(this.module.new(hexId, keyDetail));
   }
 
   /**
@@ -37,8 +37,8 @@ class DIDModule {
    * @param {Signature} signature - Signature from existing key
    * @return {object} The extrinsic to sign and send.
    */
-  updateKey(keyUpdate, signature) {
-    return this.module.updateKey(keyUpdate, signature.toJSON());
+  async updateKey(keyUpdate, signature) {
+    return this.api.sendTransaction(this.module.updateKey(keyUpdate, signature.toJSON()));
   }
 
   /**
@@ -47,8 +47,8 @@ class DIDModule {
    * @param {Signature} signature - Signature from existing key
    * @return {object} The extrinsic to sign and send.
    */
-  remove(didRemoval, signature) {
-    return this.module.remove(didRemoval, signature.toJSON());
+  async remove(didRemoval, signature) {
+    return this.api.sendTransaction(this.module.remove(didRemoval, signature.toJSON()));
   }
 
   /**

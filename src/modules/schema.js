@@ -139,8 +139,8 @@ export default class Schema {
    * @param {object} pair - The keypair to sign with
    * @return {Promise<object>} The extrinsic to sign and send.
    */
-  writeToChain(dock, pair) {
-    return dock.sendTransaction(dock.blob.new(this.toBlob(), pair), false);
+  async writeToChain(dock, pair) {
+    await dock.blob.new(this.toBlob(), pair, false);
   }
 
   /**

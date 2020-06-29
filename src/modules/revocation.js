@@ -25,8 +25,8 @@ class RevocationModule {
    * @param {Boolean} addOnly - true: credentials can be revoked, but not un-revoked, false: credentials can be revoked and un-revoked
    * @return {Promise<object>} The extrinsic to sign and send.
    */
-  newRegistry(id, policy, addOnly) {
-    return this.sendTransaction(this.module.newRegistry(id, {
+  async newRegistry(id, policy, addOnly) {
+    await this.sendTransaction(this.module.newRegistry(id, {
       policy: policy.toJSON(),
       add_only: addOnly,
     }), false);
@@ -39,7 +39,7 @@ class RevocationModule {
    * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Promise<object>} The extrinsic to sign and send.
    */
-  removeRegistry(registryID, lastModified, didKeys) {
+  async removeRegistry(registryID, lastModified, didKeys) {
     const removal = {
       registry_id: registryID,
       last_modified: lastModified,
@@ -47,7 +47,7 @@ class RevocationModule {
 
     const serializedRemoval = this.getSerializedRemoveRegistry(removal);
     const signedProof = didKeys.getSignatures(serializedRemoval);
-    return this.sendTransaction(this.module.removeRegistry(removal, signedProof));
+    await this.sendTransaction(this.module.removeRegistry(removal, signedProof));
   }
 
   /**
@@ -58,7 +58,7 @@ class RevocationModule {
    * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Promise<object>} The extrinsic to sign and send.
    */
-  revoke(registryID, revokeIds, lastModified, didKeys) {
+  async revoke(registryID, revokeIds, lastModified, didKeys) {
     const revoke = {
       registry_id: registryID,
       revoke_ids: revokeIds,
@@ -67,7 +67,7 @@ class RevocationModule {
 
     const serializedRevoke = this.getSerializedRevoke(revoke);
     const signedProof = didKeys.getSignatures(serializedRevoke);
-    return this.sendTransaction(this.module.revoke(revoke, signedProof));
+    await this.sendTransaction(this.module.revoke(revoke, signedProof));
   }
 
   /**
@@ -78,7 +78,7 @@ class RevocationModule {
    * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Promise<object>} The extrinsic to sign and send.
    */
-  unrevoke(registryID, revokeIds, lastModified, didKeys) {
+  async unrevoke(registryID, revokeIds, lastModified, didKeys) {
     const unrevoke = {
       registry_id: registryID,
       revoke_ids: revokeIds,
@@ -87,7 +87,7 @@ class RevocationModule {
 
     const serializedUnrevoke = this.getSerializedUnrevoke(unrevoke);
     const signedProof = didKeys.getSignatures(serializedUnrevoke);
-    return this.sendTransaction(this.module.unrevoke(unrevoke, signedProof));
+    await this.sendTransaction(this.module.unrevoke(unrevoke, signedProof));
   }
 
   /**

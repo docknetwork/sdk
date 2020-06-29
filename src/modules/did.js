@@ -29,7 +29,7 @@ class DIDModule {
    */
   async new(did, keyDetail) {
     const hexId = getHexIdentifierFromDID(did);
-    return this.sendTransaction(this.module.new(hexId, keyDetail));
+    await this.sendTransaction(this.module.new(hexId, keyDetail));
   }
 
   /**
@@ -39,7 +39,7 @@ class DIDModule {
    * @return {Promise<object>} The extrinsic to sign and send.
    */
   async updateKey(keyUpdate, signature) {
-    return this.sendTransaction(this.module.updateKey(keyUpdate, signature.toJSON()));
+    await this.sendTransaction(this.module.updateKey(keyUpdate, signature.toJSON()));
   }
 
   /**
@@ -49,7 +49,7 @@ class DIDModule {
    * @return {Promise<object>} The extrinsic to sign and send.
    */
   async remove(didRemoval, signature) {
-    return this.sendTransaction(this.module.remove(didRemoval, signature.toJSON()));
+    await this.sendTransaction(this.module.remove(didRemoval, signature.toJSON()));
   }
 
   /**

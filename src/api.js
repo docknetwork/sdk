@@ -30,12 +30,12 @@ import {
 /** Helper class to interact with the Dock chain */
 class DockAPI {
   /**
-   * Skeleton constructor, does nothing yet
+   * Creates a new instance of the DockAPI object, call init to initialize
+   * @param {function} [customSignTx] - Optional custom transaction sign method
    * @constructor
-   * @param {string} address - WebSocket RPC endpoint
    */
-  constructor(address = null) {
-    this.address = address;
+  constructor(customSignTx) {
+    this.customSignTx = customSignTx;
   }
 
   /**

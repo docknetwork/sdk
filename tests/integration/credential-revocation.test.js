@@ -33,7 +33,7 @@ function addRevRegIdToCred(cred, regId) {
 }
 
 describe('Credential revocation with issuer as the revocation authority', () => {
-  const dockAPI = new DockAPI(FullNodeEndpoint);
+  const dockAPI = new DockAPI();
   const resolver = new DockResolver(dockAPI);
 
   // Create a random registry id

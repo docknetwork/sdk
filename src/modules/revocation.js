@@ -26,7 +26,7 @@ class RevocationModule {
    * @return {Promise<object>} The extrinsic to sign and send.
    */
   async newRegistry(id, policy, addOnly) {
-    await this.sendTransaction(this.module.newRegistry(id, {
+    return this.sendTransaction(this.module.newRegistry(id, {
       policy: policy.toJSON(),
       add_only: addOnly,
     }), false);
@@ -47,7 +47,7 @@ class RevocationModule {
 
     const serializedRemoval = this.getSerializedRemoveRegistry(removal);
     const signedProof = didKeys.getSignatures(serializedRemoval);
-    await this.sendTransaction(this.module.removeRegistry(removal, signedProof));
+    return await this.sendTransaction(this.module.removeRegistry(removal, signedProof));
   }
 
   /**
@@ -67,7 +67,7 @@ class RevocationModule {
 
     const serializedRevoke = this.getSerializedRevoke(revoke);
     const signedProof = didKeys.getSignatures(serializedRevoke);
-    await this.sendTransaction(this.module.revoke(revoke, signedProof));
+    return await this.sendTransaction(this.module.revoke(revoke, signedProof));
   }
 
   /**
@@ -87,7 +87,7 @@ class RevocationModule {
 
     const serializedUnrevoke = this.getSerializedUnrevoke(unrevoke);
     const signedProof = didKeys.getSignatures(serializedUnrevoke);
-    await this.sendTransaction(this.module.unrevoke(unrevoke, signedProof));
+    return await this.sendTransaction(this.module.unrevoke(unrevoke, signedProof));
   }
 
   /**

@@ -121,7 +121,7 @@ class DockAPI {
    * @return {Promise}
    */
   async sendTransaction(extrinsic, unsubscribe = true) {
-    return new Promise((resolve, reject) => {
+    const promise = new Promise((resolve, reject) => {
       const account = this.getAccount();
       let unsubFunc = null;
       try {
@@ -147,6 +147,13 @@ class DockAPI {
         reject(error);
       }
     });
+
+    try {
+      const result = await promise;
+      return result;
+    } catch (e) {
+      throw e;
+    }
   }
 
   /**

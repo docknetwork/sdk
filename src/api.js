@@ -115,6 +115,35 @@ class DockAPI {
   }
 
   /**
+   * Helper function to sign and send an extrinsic with the default account
+   * @param {object} extrinsic - Extrinsic to send
+   * @param {Boolean} unsubscribe - Should we unsubscribe from the transaction after its finalized
+   * @return {Promise}
+   */
+  signAndSend(extrinsic, unsubscribe, resolve, reject) {
+    const account = this.getAccount();
+    let unsubFunc = null;
+    return extrinsic
+      .signAndSend(account, ({ events = [], status }) => {
+        if (status.isFinalized) {
+          if (unsubscribe && unsubFunc) {
+            unsubFunc();
+          }
+          resolve({
+            events,
+            status,
+          });
+        }
+      })
+      .catch((error) => {
+        reject(error);
+      })
+      .then((unsub) => {
+        unsubFunc = unsub;
+      });
+  }
+
+  /**
    * Helper function to send transaction
    * @param {object} extrinsic - Extrinsic to send
    * @param {Boolean} unsubscribe - Should we unsubscribe from the transaction after its finalized
@@ -122,27 +151,8 @@ class DockAPI {
    */
   async sendTransaction(extrinsic, unsubscribe = true) {
     const promise = new Promise((resolve, reject) => {
-      const account = this.getAccount();
-      let unsubFunc = null;
       try {
-        extrinsic
-          .signAndSend(account, ({ events = [], status }) => {
-            if (status.isFinalized) {
-              if (unsubscribe && unsubFunc) {
-                unsubFunc();
-              }
-              resolve({
-                events,
-                status,
-              });
-            }
-          })
-          .catch((error) => {
-            reject(error);
-          })
-          .then((unsub) => {
-            unsubFunc = unsub;
-          });
+        this.signAndSend(extrinsic, unsubscribe, resolve, reject);
       } catch (error) {
         reject(error);
       }

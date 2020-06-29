@@ -148,12 +148,8 @@ class DockAPI {
       }
     });
 
-    try {
-      const result = await promise;
-      return result;
-    } catch (e) {
-      throw e;
-    }
+    const result = await promise;
+    return result;
   }
 
   /**

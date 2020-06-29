@@ -34,8 +34,7 @@ is allowed or not. Ifs `true`, it makes the registry add-only meaning that undoi
 undoing is allowed.
 ```js
 // Setting the last argument to false to allow unrevoking the credential (undoing revocation)
-const transaction = dock.revocation.newRegistry(registryId, policy, false);
-await dock.sendTransaction(transaction);
+await dock.revocation.newRegistry(registryId, policy, false);
 ```
 
 ## Revoking a credential
@@ -49,8 +48,7 @@ didKeys.set(ownerDID, ownerKeypair);
 Now get the registry id, `registryId` and the revocation id (the hash of credential id), `revokeId` and send the transaction on chain.
 Revoking an already revoked credential has no effect.
 ```js
-const transaction = await dock.revocation.revokeCredential(didKeys, registryId, revokeId);
-await dock.sendTransaction(transaction);
+await dock.revocation.revokeCredential(didKeys, registryId, revokeId);
 ```
 Revoking multiple ids in a single transaction is possible but with a lower level method `dock.revocation.revoke`.
 
@@ -65,8 +63,7 @@ didKeys.set(ownerDID, ownerKeypair);
 Now get the registry id, `registryId` and the revocation id to undo, `revokeId` and send the transaction on chain.
 Unrevoking an unrevoked credential has no effect.
 ```js
-const transaction = await dock.revocation.unrevokeCredential(didKeys, registryId, revokeId);
-await dock.sendTransaction(transaction);
+await dock.revocation.unrevokeCredential(didKeys, registryId, revokeId);
 ```
 Undoing revocation for multiple ids in a single transaction is possible but with a lower level method `dock.revocation.unrevoke`.
 
@@ -85,6 +82,5 @@ A registry can be deleted leading to all the corresponding revocation ids being 
 from owner like other updates. Use the `dock.revocation.removeRegistry` method to remove a registry.
 ```js
 const lastModified = await dock.revocation.getBlockNoForLastChangeToRegistry(registryId);
-const transaction = dock.revocation.removeRegistry(registryId, lastModified, didKeys);
-await dock.sendTransaction(transaction);
+await dock.revocation.removeRegistry(registryId, lastModified, didKeys);
 ```

@@ -48,24 +48,24 @@ describe('Schema Blob Module Integration', () => {
     publicKey = getPublicKeyFromKeyringPair(pair);
     dockDID = createNewDockDID();
     keyDetail = createKeyDetail(publicKey, dockDID);
-    await dockApi.sendTransaction(dockApi.did.new(dockDID, keyDetail));
+    await dockApi.did.new(dockDID, keyDetail);
     blobId = randomAsHex(DockBlobIdByteSize);
 
     // Write a blob with invalid JSON-schema format
     invalidFormatBlobId = randomAsHex(DockBlobIdByteSize);
-    await dockApi.sendTransaction(dockApi.blob.new({
+    await dockApi.blob.new({
       id: invalidFormatBlobId,
       blob: stringToHex('hello world'),
       author: getHexIdentifierFromDID(dockDID),
-    }, pair), false);
+    }, pair);
 
     // Write schema blob
     const blobStr = JSON.stringify(exampleSchema);
-    await dockApi.sendTransaction(dockApi.blob.new({
+    await dockApi.blob.new({
       id: blobId,
       blob: stringToHex(blobStr),
       author: getHexIdentifierFromDID(dockDID),
-    }, pair), false);
+    }, pair);
 
     // Properly format a keyDoc to use for signing
     keyDoc = getKeyDoc(

@@ -76,8 +76,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     policy.addOwner(issuerDID);
 
     // Add a new revocation registry with above policy
-    const transaction = dockAPI.revocation.newRegistry(registryId, policy, false);
-    await dockAPI.sendTransaction(transaction);
+    await dockAPI.revocation.newRegistry(registryId, policy, false);
 
     // Set our owner DID and associated keypair to be used for generating proof
     didKeys.set(issuerDID, pair);
@@ -110,8 +109,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
     // Revoke the credential
     const revId = getDockRevIdFromCredential(credential);
-    const t1 = await dockAPI.revocation.revokeCredential(didKeys, registryId, revId);
-    await dockAPI.sendTransaction(t1);
+    await dockAPI.revocation.revokeCredential(didKeys, registryId, revId);
 
     // The credential verification should fail as the credential has been revoked.
     const result1 = await verifyCredential(credential, {
@@ -128,8 +126,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     // The previous test revokes credential so unrevoke it. Its fine if the previous test is not run as unrevoking does not
     // throw error if the credential is not revoked.
     const revId = getDockRevIdFromCredential(credential);
-    const t2 = await dockAPI.revocation.unrevokeCredential(didKeys, registryId, revId);
-    await dockAPI.sendTransaction(t2);
+    await dockAPI.revocation.unrevokeCredential(didKeys, registryId, revId);
 
     const holderKey = getKeyDoc(holderDID, dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
 
@@ -161,8 +158,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     expect(result.verified).toBe(true);
 
     // Revoke credential
-    const t3 = await dockAPI.revocation.revokeCredential(didKeys, registryId, revId);
-    await dockAPI.sendTransaction(t3);
+    await dockAPI.revocation.revokeCredential(didKeys, registryId, revId);
 
     // As the credential is revoked, the presentation should verify successfully.
     const result1 = await verifyPresentation(signedPres, {

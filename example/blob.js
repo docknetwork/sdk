@@ -20,7 +20,7 @@ async function writeAndReadBlob(dock, blobValue, dockDID, pair) {
     author: getHexIdentifierFromDID(dockDID),
   };
 
-  await dock.sendTransaction(dock.blob.new(blob, pair), false);
+  await dock.blob.new(blob, pair);
 
   console.log('Blob written, reading from chain...');
 
@@ -36,7 +36,7 @@ async function createAuthorDID(dock, pair) {
   // Create an author DID to write with
   const publicKey = getPublicKeyFromKeyringPair(pair);
   const keyDetail = createKeyDetail(publicKey, dockDID);
-  await dock.sendTransaction(dock.did.new(dockDID, keyDetail));
+  await dock.did.new(dockDID, keyDetail);
   return dockDID;
 }
 

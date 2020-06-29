@@ -68,7 +68,7 @@ class BlobModule {
    * @param {object} blob - struct to store on chain
    * @param {object} keyPair - Key pair to sign with
    * @param {Signature} signature - Signature to use
-   * @return {object} The extrinsic to sign and send.
+   * @return {Promise<object>} The extrinsic to sign and send.
    */
   async new(blob, keyPair = undefined, signature = undefined) {
     if (!signature) {

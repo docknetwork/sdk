@@ -137,7 +137,7 @@ export default class Schema {
    * Prepares a transaction to write this schema object to the dock chain using the blob module
    * @param {object} dock - The dock API
    * @param {object} pair - The keypair to sign with
-   * @return {object} The extrinsic to sign and send.
+   * @return {Promise<object>} The extrinsic to sign and send.
    */
   writeToChain(dock, pair) {
     return dock.sendTransaction(dock.blob.new(this.toBlob(), pair), false);

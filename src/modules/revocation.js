@@ -22,7 +22,7 @@ class RevocationModule {
    * @param {string} id - is the unique id of the registry. The function will check whether `id` is already taken or not.
    * @param {Policy} policy - The registry policy
    * @param {Boolean} addOnly - true: credentials can be revoked, but not un-revoked, false: credentials can be revoked and un-revoked
-   * @return {object} The extrinsic to sign and send.
+   * @return {Promise<object>} The extrinsic to sign and send.
    */
   newRegistry(id, policy, addOnly) {
     return this.api.sendTransaction(this.module.newRegistry(id, {
@@ -36,7 +36,7 @@ class RevocationModule {
    * @param {string} registryID - contains the registry to remove
    * @param {number} lastModified - contains the registry to remove
    * @param {DidKeys} didKeys - The did key set used for generating proof
-   * @return {object} The extrinsic to sign and send.
+   * @return {Promise<object>} The extrinsic to sign and send.
    */
   removeRegistry(registryID, lastModified, didKeys) {
     const removal = {
@@ -55,7 +55,7 @@ class RevocationModule {
    * @param {Set} revokeIds - revoke id list
    * @param {number} lastModified - contains the registry to remove
    * @param {DidKeys} didKeys - The did key set used for generating proof
-   * @return {object} The extrinsic to sign and send.
+   * @return {Promise<object>} The extrinsic to sign and send.
    */
   revoke(registryID, revokeIds, lastModified, didKeys) {
     const revoke = {
@@ -75,7 +75,7 @@ class RevocationModule {
    * @param {Set} revokeIds - revoke id list
    * @param {number} lastModified - contains the registry to remove
    * @param {DidKeys} didKeys - The did key set used for generating proof
-   * @return {object} The extrinsic to sign and send.
+   * @return {Promise<object>} The extrinsic to sign and send.
    */
   unrevoke(registryID, revokeIds, lastModified, didKeys) {
     const unrevoke = {

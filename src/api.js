@@ -121,6 +121,10 @@ class DockAPI {
    * @return {Promise}
    */
   signAndSend(extrinsic, unsubscribe, resolve, reject) {
+    if (this.customSignTx) {
+      return this.customSignTx(extrinsic, unsubscribe, resolve, reject);
+    }
+
     const account = this.getAccount();
     let unsubFunc = null;
     return extrinsic

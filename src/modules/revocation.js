@@ -12,9 +12,10 @@ class RevocationModule {
    * @constructor
    * @param {object} api - PolkadotJS API Reference
    */
-  constructor(api) {
+  constructor(api, sendTransaction) {
     this.api = api;
     this.module = api.tx.revoke;
+    this.sendTransaction = sendTransaction;
   }
 
   /**
@@ -25,7 +26,7 @@ class RevocationModule {
    * @return {Promise<object>} The extrinsic to sign and send.
    */
   newRegistry(id, policy, addOnly) {
-    return this.api.sendTransaction(this.module.newRegistry(id, {
+    return this.sendTransaction(this.module.newRegistry(id, {
       policy: policy.toJSON(),
       add_only: addOnly,
     }), false);
@@ -46,7 +47,7 @@ class RevocationModule {
 
     const serializedRemoval = this.getSerializedRemoveRegistry(removal);
     const signedProof = didKeys.getSignatures(serializedRemoval);
-    return this.api.sendTransaction(this.module.removeRegistry(removal, signedProof));
+    return this.sendTransaction(this.module.removeRegistry(removal, signedProof));
   }
 
   /**
@@ -66,7 +67,7 @@ class RevocationModule {
 
     const serializedRevoke = this.getSerializedRevoke(revoke);
     const signedProof = didKeys.getSignatures(serializedRevoke);
-    return this.api.sendTransaction(this.module.revoke(revoke, signedProof));
+    return this.sendTransaction(this.module.revoke(revoke, signedProof));
   }
 
   /**
@@ -86,7 +87,7 @@ class RevocationModule {
 
     const serializedUnrevoke = this.getSerializedUnrevoke(unrevoke);
     const signedProof = didKeys.getSignatures(serializedUnrevoke);
-    return this.api.sendTransaction(this.module.unrevoke(unrevoke, signedProof));
+    return this.sendTransaction(this.module.unrevoke(unrevoke, signedProof));
   }
 
   /**

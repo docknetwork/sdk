@@ -58,9 +58,10 @@ class BlobModule {
    * @constructor
    * @param {object} api - PolkadotJS API Reference
    */
-  constructor(api) {
+  constructor(api, sendTransaction) {
     this.api = api;
     this.module = api.tx.blobStore;
+    this.sendTransaction = sendTransaction;
   }
 
   /**
@@ -79,7 +80,7 @@ class BlobModule {
       // eslint-disable-next-line no-param-reassign
       signature = getSignatureFromKeyringPair(keyPair, serializedBlob);
     }
-    return this.api.sendTransaction(this.module.new(blob, signature.toJSON()), false);
+    return this.sendTransaction(this.module.new(blob, signature.toJSON()), false);
   }
 
   /**

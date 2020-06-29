@@ -70,9 +70,9 @@ class DockAPI {
 
     await this.initKeyring(keyring);
 
-    this.blobModule = new BlobModule(this.api);
-    this.didModule = new DIDModule(this.api);
-    this.revocationModule = new RevocationModule(this.api);
+    this.blobModule = new BlobModule(this.api, this.sendTransaction.bind(this));
+    this.didModule = new DIDModule(this.api, this.sendTransaction.bind(this));
+    this.revocationModule = new RevocationModule(this.api, this.sendTransaction.bind(this));
 
     return this.api;
   }

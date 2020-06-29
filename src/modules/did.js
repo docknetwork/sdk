@@ -15,9 +15,10 @@ class DIDModule {
    * @constructor
    * @param {object} api - PolkadotJS API Reference
    */
-  constructor(api) {
+  constructor(api, sendTransaction) {
     this.api = api;
     this.module = api.tx.didModule;
+    this.sendTransaction = sendTransaction;
   }
 
   /**
@@ -28,7 +29,7 @@ class DIDModule {
    */
   async new(did, keyDetail) {
     const hexId = getHexIdentifierFromDID(did);
-    return this.api.sendTransaction(this.module.new(hexId, keyDetail));
+    return this.sendTransaction(this.module.new(hexId, keyDetail));
   }
 
   /**
@@ -38,7 +39,7 @@ class DIDModule {
    * @return {Promise<object>} The extrinsic to sign and send.
    */
   async updateKey(keyUpdate, signature) {
-    return this.api.sendTransaction(this.module.updateKey(keyUpdate, signature.toJSON()));
+    return this.sendTransaction(this.module.updateKey(keyUpdate, signature.toJSON()));
   }
 
   /**
@@ -48,7 +49,7 @@ class DIDModule {
    * @return {Promise<object>} The extrinsic to sign and send.
    */
   async remove(didRemoval, signature) {
-    return this.api.sendTransaction(this.module.remove(didRemoval, signature.toJSON()));
+    return this.sendTransaction(this.module.remove(didRemoval, signature.toJSON()));
   }
 
   /**

@@ -143,16 +143,13 @@ export function checkCredentialContext(credential) {
  * @param statuses
  * @returns {Boolean}
  */
-function hasDockRevocation(statuses) {
-  for (let i = 0; i < statuses.length; i++) {
-    const status = statuses[i];
-    const id = status['@id'];
-    if (status
-      && jsonld.getValues(status, '@type').includes(RevRegType)
-      && id.startsWith(DockRevRegQualifier)
-      && isHexWithGivenByteSize(id.slice(DockRevRegQualifier.length), RevRegIdByteSize)) {
-      return true;
-    }
+function hasDockRevocation(status) {
+  const id = status['@id'];
+  if (status
+    && jsonld.getValues(status, '@type').includes(RevRegType)
+    && id.startsWith(DockRevRegQualifier)
+    && isHexWithGivenByteSize(id.slice(DockRevRegQualifier.length), RevRegIdByteSize)) {
+    return true;
   }
 
   return false;
@@ -170,15 +167,15 @@ export async function checkRevocationStatus(credential, revocationApi) {
     throw new Error('Only Dock revocation support is present as of now.');
   } else {
     const statuses = await getCredentialStatuses(credential);
-
-    if (!hasDockRevocation(statuses)) {
-      return { verified: false, error: 'The credential status does not have the format required by Dock' };
-    }
-
     const dockAPI = revocationApi.dock;
     const revId = getDockRevIdFromCredential(credential);
     for (let i = 0; i < statuses.length; i++) {
       const status = statuses[i];
+
+      if (!hasDockRevocation(status)) {
+        return { verified: false, error: 'The credential status does not have the format required by Dock' };
+      }
+
       const regId = status['@id'].slice(DockRevRegQualifier.length);
 
       // Hash credential id to get revocation id

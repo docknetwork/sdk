@@ -375,9 +375,9 @@ export function buildDockCredentialStatus(registryId) {
 }
 
 /**
- * The function uses `jsonschema` package to verify that the `credential`'s subject `credentialSubject` has the JSON
+ * The function uses `jsonschema` package to verify that the expanded `credential`'s subject `credentialSubject` has the JSON
  * schema `schema`
- * @param {object} credential - The credential to use
+ * @param {object} credential - The credential to use, must be expanded JSON-LD
  * @param {object} schema - The schema to use
  * @returns {Promise<Boolean>} - Returns promise to an boolean or throws error
  */

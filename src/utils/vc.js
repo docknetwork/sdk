@@ -75,7 +75,7 @@ export function getSuiteFromKeyDoc(keyDoc) {
 /**
  * Checks if the revocation check is needed. Will return true if `forceRevocationCheck` is true else will check the
  * truthyness of revocationApi. Will return true even if revocationApi is an empty object.
- * @param {object} credential - The credential, expecing a `credentialStatus` field
+ * @param {object} credential - The expanded credential to be checked.
  * @param {boolean} forceRevocationCheck - Whether to force the revocation check.
  * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
  * @param {object} revocationApi - See above verification methods for details on this parameter

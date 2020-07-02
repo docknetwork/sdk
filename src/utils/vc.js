@@ -139,11 +139,11 @@ export function checkCredentialContext(credential) {
 }
 
 /**
- * Check if credential has Dock specific revocation
+ * Check if credential statuses have a Dock specific revocation
  * @param statuses
  * @returns {Boolean}
  */
-export function hasDockRevocation(statuses) {
+function hasDockRevocation(statuses) {
   for (let i = 0; i < statuses.length; i++) {
     const status = statuses[i];
     const id = status['@id'];

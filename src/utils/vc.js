@@ -151,9 +151,8 @@ export function hasDockRevocation(statuses) {
   for (let i = 0; i < statuses.length; i++) {
     const status = statuses[i];
     const id = status['@id'];
-    const type = status['@type'];
     if (status
-      && (type[0] === RevRegType)
+      && jsonld.getValues(status, '@type').includes(RevRegType)
       && id.startsWith(DockRevRegQualifier)
       && isHexWithGivenByteSize(id.slice(DockRevRegQualifier.length), RevRegIdByteSize)) {
       return true;
@@ -380,7 +379,7 @@ export function buildDockCredentialStatus(registryId) {
  * schema `schema`
  * @param {object} credential - The credential to use
  * @param {object} schema - The schema to use
- * @returns {Promise<Boolean>} - Returns promise to an object or throws error
+ * @returns {Promise<Boolean>} - Returns promise to an boolean or throws error
  */
 export async function validateCredentialSchema(credential, schema, context) {
   const requiresID = schema.required && schema.required.indexOf('id') > -1;

@@ -113,7 +113,7 @@ export async function expandJSONLD(credential) {
 export async function getCredentialStatuses(expanded) {
   const statusValues = jsonld.getValues(expanded, expandedStatusProperty);
   if (statusValues.length === 0) {
-    throw new Error(`Expected ${expandedStatusProperty} after expanding JSON-LD, but not found.`);
+    return statusValues;
   }
 
   statusValues.forEach((status) => {

@@ -117,15 +117,11 @@ export async function getCredentialStatuses(expanded) {
   }
 
   statusValues.forEach((status) => {
-    if (status) {
-      if (!status['@id']) {
-        throw new Error('"credentialStatus" must include an id.');
-      }
-      if (!status['@type']) {
-        throw new Error('"credentialStatus" must include a type.');
-      }
-    } else {
-      throw new Error('"credentialStatus" does not exist.');
+    if (!status['@id']) {
+      throw new Error('"credentialStatus" must include an id.');
+    }
+    if (!status['@type']) {
+      throw new Error('"credentialStatus" must include a type.');
     }
   });
 

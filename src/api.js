@@ -31,7 +31,8 @@ import {
 class DockAPI {
   /**
    * Creates a new instance of the DockAPI object, call init to initialize
-   * @param {function} [customSignTx] - Optional custom transaction sign method
+   * @param {function} [customSignTx] - Optional custom transaction sign method,
+   * a function that expects `extrinsic` as first argument and a dock api instance as second argument
    * @constructor
    */
   constructor(customSignTx) {
@@ -119,29 +120,29 @@ class DockAPI {
    * @param {object} extrinsic - Extrinsic to send
    * @return {Promise}
    */
-  signAndSend(extrinsic, resolve, reject) {
+  async signAndSend(extrinsic, resolve, reject) {
     if (this.customSignTx) {
-      return this.customSignTx(extrinsic, resolve, reject);
+      this.customSignTx(extrinsic, this);
+    } else {
+      await extrinsic.signAsync(this.getAccount());
     }
 
-    const account = this.getAccount();
     let unsubFunc = null;
-    return extrinsic
-      .signAndSend(account, ({ events = [], status }) => {
-        if (status.isFinalized) {
-          unsubFunc();
-          resolve({
-            events,
-            status,
-          });
-        }
-      })
-      .catch((error) => {
-        reject(error);
-      })
-      .then((unsub) => {
-        unsubFunc = unsub;
-      });
+    return extrinsic.send(({ events = [], status }) => {
+      if (status.isFinalized) {
+        unsubFunc();
+        resolve({
+          events,
+          status,
+        });
+      }
+    })
+    .catch((error) => {
+      reject(error);
+    })
+    .then((unsub) => {
+      unsubFunc = unsub;
+    });
   }
 
   /**

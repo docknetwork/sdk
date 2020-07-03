@@ -5,12 +5,19 @@
         <meta charset="UTF-8">
         <title>Schema - Dock SDK Tutorial</title>
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        <link rel="icon" href="favicon.svg">
         <link rel="shortcut icon" href="favicon.png">
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
@@ -19,8 +26,9 @@
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -36,7 +44,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -186,8 +194,7 @@ const blobStruct = {
   blob: blobHexOrArray,  // Contents of your blob as a hex string or byte array
   author: '0x...',       // hex part of a dock DID
 }
-const txBlob = await dock.blob.writeToChain( blobStruct, keyPair);
-const result = await dock.sendTransaction(txBlob, false);
+const result = await dock.blob.writeToChain( blobStruct, keyPair);
 </code></pre>
 <p>If everything worked properly <code>result</code> will indicate a successful transaction.
 We'll see how to retrieve the blob next.</p>
@@ -285,8 +292,7 @@ to be able to use it. That's where the <code>toBlob</code> method comes in handy
 <p>Writing a Schema to the Dock chain is similar to writing any other Blob. Once you've created your new schema following
 the steps above you can use the <code>BlobModule</code> methods to interact with the chain:</p>
 <pre><code class="language-javascript">&gt;  const formattedBlob = myNewSchema.toBlob(dockDID);
-&gt;  const blobTx = dock.blob.writeToChain(formattedBlob, keyPair);
-&gt;  await dock.sendTransaction(blobTx, false);
+&gt;  await dock.blob.writeToChain(formattedBlob, keyPair);
 </code></pre>
 <h3><a class="header" href="#reading-a-schema-from-the-dock-chain" id="reading-a-schema-from-the-dock-chain">Reading a Schema from the Dock chain</a></h3>
 <p>Reading a Schema from the Dock chain can easily be achieved by using the <code>get</code> method from the <code>Schema</code> class.
@@ -369,10 +375,10 @@ Credentials contained within it uses a Schema and fails to pass schema validatio
         
 
         
-        
+
         
         <script type="text/javascript">
-            window.playpen_copyable = true;
+            window.playground_copyable = true;
         </script>
         
 

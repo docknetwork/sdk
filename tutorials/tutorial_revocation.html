@@ -5,12 +5,19 @@
         <meta charset="UTF-8">
         <title>Revocation - Dock SDK Tutorial</title>
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        <link rel="icon" href="favicon.svg">
         <link rel="shortcut icon" href="favicon.png">
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
@@ -19,8 +26,9 @@
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -36,7 +44,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -176,8 +184,7 @@ the policy object and a boolean that specifies whether the registry is add-only 
 is allowed or not. Ifs <code>true</code>, it makes the registry add-only meaning that undoing revocations is not allowed, if <code>false</code>,
 undoing is allowed.</p>
 <pre><code class="language-js">// Setting the last argument to false to allow unrevoking the credential (undoing revocation)
-const transaction = dock.revocation.newRegistry(registryId, policy, false);
-await dock.sendTransaction(transaction);
+await dock.revocation.newRegistry(registryId, policy, false);
 </code></pre>
 <h2><a class="header" href="#revoking-a-credential" id="revoking-a-credential">Revoking a credential</a></h2>
 <p>Revoking a credential requires a signature from the owner of the registry. For that, fetch the owner's DID and pair and
@@ -187,8 +194,7 @@ didKeys.set(ownerDID, ownerKeypair);
 </code></pre>
 <p>Now get the registry id, <code>registryId</code> and the revocation id (the hash of credential id), <code>revokeId</code> and send the transaction on chain.
 Revoking an already revoked credential has no effect.</p>
-<pre><code class="language-js">const transaction = await dock.revocation.revokeCredential(didKeys, registryId, revokeId);
-await dock.sendTransaction(transaction);
+<pre><code class="language-js">await dock.revocation.revokeCredential(didKeys, registryId, revokeId);
 </code></pre>
 <p>Revoking multiple ids in a single transaction is possible but with a lower level method <code>dock.revocation.revoke</code>.</p>
 <h2><a class="header" href="#undoing-a-revocation" id="undoing-a-revocation">Undoing a revocation</a></h2>
@@ -199,8 +205,7 @@ didKeys.set(ownerDID, ownerKeypair);
 </code></pre>
 <p>Now get the registry id, <code>registryId</code> and the revocation id to undo, <code>revokeId</code> and send the transaction on chain.
 Unrevoking an unrevoked credential has no effect.</p>
-<pre><code class="language-js">const transaction = await dock.revocation.unrevokeCredential(didKeys, registryId, revokeId);
-await dock.sendTransaction(transaction);
+<pre><code class="language-js">await dock.revocation.unrevokeCredential(didKeys, registryId, revokeId);
 </code></pre>
 <p>Undoing revocation for multiple ids in a single transaction is possible but with a lower level method <code>dock.revocation.unrevoke</code>.</p>
 <h2><a class="header" href="#checking-the-revocation-status" id="checking-the-revocation-status">Checking the revocation status</a></h2>
@@ -214,8 +219,7 @@ if revoked else <code>false</code>.</p>
 <p>A registry can be deleted leading to all the corresponding revocation ids being deleted as well. This requires the signature
 from owner like other updates. Use the <code>dock.revocation.removeRegistry</code> method to remove a registry.</p>
 <pre><code class="language-js">const lastModified = await dock.revocation.getBlockNoForLastChangeToRegistry(registryId);
-const transaction = dock.revocation.removeRegistry(registryId, lastModified, didKeys);
-await dock.sendTransaction(transaction);
+await dock.revocation.removeRegistry(registryId, lastModified, didKeys);
 </code></pre>
 
                     </main>
@@ -260,10 +264,10 @@ await dock.sendTransaction(transaction);
         
 
         
-        
+
         
         <script type="text/javascript">
-            window.playpen_copyable = true;
+            window.playground_copyable = true;
         </script>
         
 

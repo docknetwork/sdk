@@ -202,6 +202,872 @@
     
 
     
+    <h4 class="name" id="createNewRegistryTx"><span class="type-signature"></span>createNewRegistryTx<span class="signature">(id, policy, addOnly)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Creating a revocation registry
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">is the unique id of the registry. The function will check whether `id` is already taken or not.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>policy</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Policy</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The registry policy</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>addOnly</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">true: credentials can be revoked, but not un-revoked, false: credentials can be revoked and un-revoked</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line28">line 28</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The extrinsic to sign and send.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;object></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createRemoveRegistryTx"><span class="type-signature"></span>createRemoveRegistryTx<span class="signature">(registryID, lastModified, didKeys)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Deleting revocation registry
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>registryID</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">contains the registry to remove</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lastModified</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">contains the registry to remove</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>didKeys</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">DidKeys</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The did key set used for generating proof</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line53">line 53</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The extrinsic to sign and send.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;object></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createRevokeTx"><span class="type-signature"></span>createRevokeTx<span class="signature">(registryID, revokeIds, lastModified, didKeys)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Revoke credentials
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>registryID</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">contains the registry to remove</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>revokeIds</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Set</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">revoke id list</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lastModified</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">contains the registry to remove</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>didKeys</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">DidKeys</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The did key set used for generating proof</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line83">line 83</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The extrinsic to sign and send.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;object></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createUnrevokeTx"><span class="type-signature"></span>createUnrevokeTx<span class="signature">(registryID, revokeIds, lastModified, didKeys)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Unrevoke credentials
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>registryID</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">contains the registry to remove</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>revokeIds</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Set</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">revoke id list</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lastModified</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">contains the registry to remove</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>didKeys</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">DidKeys</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The did key set used for generating proof</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line115">line 115</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The extrinsic to sign and send.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;object></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="getBlockNoForLastChangeToRegistry"><span class="type-signature">(async) </span>getBlockNoForLastChangeToRegistry<span class="signature">(registryId)</span><span class="type-signature"> &rarr; {Promise.&lt;(*|number)>}</span></h4>
     
 
@@ -300,7 +1166,7 @@ chain or chain returns null response.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line143">line 143</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line190">line 190</a>
     </li></ul></dd>
     
 
@@ -478,7 +1344,7 @@ chain or chain returns null response.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line131">line 131</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line178">line 178</a>
     </li></ul></dd>
     
 
@@ -633,7 +1499,7 @@ status and second is the block number where the registry was last modified.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line109">line 109</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line156">line 156</a>
     </li></ul></dd>
     
 
@@ -789,7 +1655,7 @@ If the registry is not present, None is returned.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line98">line 98</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line145">line 145</a>
     </li></ul></dd>
     
 
@@ -948,7 +1814,7 @@ If the registry is not present, None is returned.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line210">line 210</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line257">line 257</a>
     </li></ul></dd>
     
 
@@ -1107,7 +1973,7 @@ If the registry is not present, None is returned.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line192">line 192</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line239">line 239</a>
     </li></ul></dd>
     
 
@@ -1266,7 +2132,7 @@ If the registry is not present, None is returned.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line201">line 201</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line248">line 248</a>
     </li></ul></dd>
     
 
@@ -1324,7 +2190,7 @@ If the registry is not present, None is returned.
     
 
     
-    <h4 class="name" id="newRegistry"><span class="type-signature"></span>newRegistry<span class="signature">(id, policy, addOnly)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    <h4 class="name" id="newRegistry"><span class="type-signature">(async) </span>newRegistry<span class="signature">(id, policy, addOnly)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
     
 
     
@@ -1471,7 +2337,7 @@ If the registry is not present, None is returned.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line27">line 27</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line42">line 42</a>
     </li></ul></dd>
     
 
@@ -1500,7 +2366,7 @@ If the registry is not present, None is returned.
 
         
 <div class="param-desc">
-    The extrinsic to sign and send.
+    Promise to the pending transaction
 </div>
 
 
@@ -1511,7 +2377,7 @@ If the registry is not present, None is returned.
     </dt>
     <dd>
         
-<span class="param-type">object</span>
+<span class="param-type">Promise.&lt;object></span>
 
 
     </dd>
@@ -1529,7 +2395,7 @@ If the registry is not present, None is returned.
     
 
     
-    <h4 class="name" id="removeRegistry"><span class="type-signature"></span>removeRegistry<span class="signature">(registryID, lastModified, didKeys)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    <h4 class="name" id="removeRegistry"><span class="type-signature">(async) </span>removeRegistry<span class="signature">(registryID, lastModified, didKeys)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
     
 
     
@@ -1676,7 +2542,7 @@ If the registry is not present, None is returned.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line41">line 41</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line71">line 71</a>
     </li></ul></dd>
     
 
@@ -1705,7 +2571,7 @@ If the registry is not present, None is returned.
 
         
 <div class="param-desc">
-    The extrinsic to sign and send.
+    Promise to the pending transaction
 </div>
 
 
@@ -1716,7 +2582,7 @@ If the registry is not present, None is returned.
     </dt>
     <dd>
         
-<span class="param-type">object</span>
+<span class="param-type">Promise.&lt;object></span>
 
 
     </dd>
@@ -1734,7 +2600,7 @@ If the registry is not present, None is returned.
     
 
     
-    <h4 class="name" id="revoke"><span class="type-signature"></span>revoke<span class="signature">(registryID, revokeIds, lastModified, didKeys)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    <h4 class="name" id="revoke"><span class="type-signature">(async) </span>revoke<span class="signature">(registryID, revokeIds, lastModified, didKeys)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
     
 
     
@@ -1904,7 +2770,7 @@ If the registry is not present, None is returned.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line60">line 60</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line103">line 103</a>
     </li></ul></dd>
     
 
@@ -1933,7 +2799,7 @@ If the registry is not present, None is returned.
 
         
 <div class="param-desc">
-    The extrinsic to sign and send.
+    Promise to the pending transaction
 </div>
 
 
@@ -1944,7 +2810,7 @@ If the registry is not present, None is returned.
     </dt>
     <dd>
         
-<span class="param-type">object</span>
+<span class="param-type">Promise.&lt;object></span>
 
 
     </dd>
@@ -2100,7 +2966,7 @@ Revoke a single credential
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line171">line 171</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line218">line 218</a>
     </li></ul></dd>
     
 
@@ -2154,7 +3020,7 @@ Revoke a single credential
     
 
     
-    <h4 class="name" id="unrevoke"><span class="type-signature"></span>unrevoke<span class="signature">(registryID, revokeIds, lastModified, didKeys)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    <h4 class="name" id="unrevoke"><span class="type-signature">(async) </span>unrevoke<span class="signature">(registryID, revokeIds, lastModified, didKeys)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
     
 
     
@@ -2324,7 +3190,7 @@ Revoke a single credential
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line80">line 80</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line135">line 135</a>
     </li></ul></dd>
     
 
@@ -2353,7 +3219,7 @@ Revoke a single credential
 
         
 <div class="param-desc">
-    The extrinsic to sign and send.
+    Promise to the pending transaction
 </div>
 
 
@@ -2364,7 +3230,7 @@ Revoke a single credential
     </dt>
     <dd>
         
-<span class="param-type">object</span>
+<span class="param-type">Promise.&lt;object></span>
 
 
     </dd>
@@ -2520,7 +3386,7 @@ Unrevoke a single credential
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line183">line 183</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line230">line 230</a>
     </li></ul></dd>
     
 
@@ -2745,7 +3611,7 @@ Unrevoke a single credential
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line156">line 156</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line203">line 203</a>
     </li></ul></dd>
     
 
@@ -2815,7 +3681,7 @@ Unrevoke a single credential
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Thu Jun 11 2020 15:24:04 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri Jul 03 2020 19:41:16 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

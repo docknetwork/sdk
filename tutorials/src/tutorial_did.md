@@ -77,9 +77,7 @@ registered.
     ```
 1. Now submit the transaction using a `DockAPI` object and the newly created DID `did` and `keyDetail`.
     ```js
-    const transaction = dock.did.new(did, keyDetail);
-    // Send the transaction to the chain
-    await dock.sendTransaction(transaction);
+    await dock.did.new(did, keyDetail);
     ```
 
 ## Fetching a DID from chain
@@ -111,8 +109,7 @@ creates the key update message bytes with `createKeyUpdate` to pass to the signe
     ```
 1. Now send the key update message with the signature to the chain in a transaction
     ```js
-    const transaction = dock.did.updateKey(keyUpdate, signature);
-    await dock.sendTransaction(transaction);
+    await dock.did.updateKey(keyUpdate, signature);
     ```
 
 ## Removing an existing DID from chain
@@ -136,8 +133,7 @@ with `createKeyUpdate` to pass to the signer and get the signature
     ```
 1. Now send the message with the signature to the chain in a transaction
    ```js
-   const transaction = dock.did.remove(didRemoval, signature);
-   await dock.sendTransaction(transaction);
+   await dock.did.remove(didRemoval, signature);
    ```
 
 

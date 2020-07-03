@@ -37,7 +37,7 @@ revokeIds.add(revokeId);
 
 async function createRegistry() {
   console.log(`Creating a registry with owner DID (${controllerDID}) with policy type:`, policy.constructor.name);
-  await dock.sendTransaction(dock.revocation.newRegistry(registryId, policy, false));
+  await dock.revocation.newRegistry(registryId, policy, false);
   console.log('Created registry');
 }
 
@@ -45,7 +45,7 @@ async function removeRegistry() {
   console.log('Removing registry...');
 
   const lastModified = await dock.revocation.getBlockNoForLastChangeToRegistry(registryId);
-  await dock.sendTransaction(dock.revocation.removeRegistry(registryId, lastModified, didKeys));
+  await dock.revocation.removeRegistry(registryId, lastModified, didKeys);
 
   console.log('Registry removed. All done.');
 }
@@ -53,13 +53,13 @@ async function removeRegistry() {
 async function unrevoke() {
   console.log('Trying to undo the revocation (unrevoke) of id:', revokeId);
   const extrinsic = await dock.revocation.unrevokeCredential(didKeys, registryId, revokeId);
-  await dock.sendTransaction(extrinsic);
+  await extrinsic;
 }
 
 async function revoke() {
   console.log('Trying to revoke id:', revokeId);
   const extrinsic = await dock.revocation.revokeCredential(didKeys, registryId, revokeId);
-  await dock.sendTransaction(extrinsic);
+  await extrinsic;
 }
 
 async function main() {
@@ -79,7 +79,7 @@ async function main() {
   // The controller is same as the DID
   const publicKey = getPublicKeyFromKeyringPair(pair);
   const keyDetail = createKeyDetail(publicKey, controllerDID);
-  await dock.sendTransaction(dock.did.new(controllerDID, keyDetail));
+  await dock.did.new(controllerDID, keyDetail);
 
   // Create a registry
   await createRegistry();

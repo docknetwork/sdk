@@ -137,12 +137,12 @@ class DockAPI {
         });
       }
     })
-    .catch((error) => {
-      reject(error);
-    })
-    .then((unsub) => {
-      unsubFunc = unsub;
-    });
+      .catch((error) => {
+        reject(error);
+      })
+      .then((unsub) => {
+        unsubFunc = unsub;
+      });
   }
 
   /**

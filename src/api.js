@@ -116,33 +116,16 @@ class DockAPI {
   }
 
   /**
-   * Helper function to sign and send an extrinsic with the default account
+   * Signs an extrinsic with either the set account or a custom sign method (see constructor)
    * @param {object} extrinsic - Extrinsic to send
    * @return {Promise}
    */
-  async signAndSend(extrinsic, resolve, reject) {
+  async signExtrinsic(extrinsic) {
     if (this.customSignTx) {
-      this.customSignTx(extrinsic, this);
+      await this.customSignTx(extrinsic, this);
     } else {
       await extrinsic.signAsync(this.getAccount());
     }
-
-    let unsubFunc = null;
-    return extrinsic.send(({ events = [], status }) => {
-      if (status.isFinalized) {
-        unsubFunc();
-        resolve({
-          events,
-          status,
-        });
-      }
-    })
-      .catch((error) => {
-        reject(error);
-      })
-      .then((unsub) => {
-        unsubFunc = unsub;
-      });
   }
 
   /**
@@ -151,12 +134,30 @@ class DockAPI {
    * @return {Promise}
    */
   async sendTransaction(extrinsic) {
+    await this.signExtrinsic(extrinsic);
     const promise = new Promise((resolve, reject) => {
       try {
-        this.signAndSend(extrinsic, resolve, reject);
+        let unsubFunc = null;
+        return extrinsic.send(({ events = [], status }) => {
+          if (status.isFinalized) {
+            unsubFunc();
+            resolve({
+              events,
+              status,
+            });
+          }
+        })
+          .catch((error) => {
+            reject(error);
+          })
+          .then((unsub) => {
+            unsubFunc = unsub;
+          });
       } catch (error) {
         reject(error);
       }
+
+      return this;
     });
 
     const result = await promise;

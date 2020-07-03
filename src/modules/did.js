@@ -22,14 +22,24 @@ class DIDModule {
   }
 
   /**
+   * Creates transaction to create a new DID on the Dock chain.
+   * @param {string} did - The new DID. Can be a full DID or hex identifier
+   * @param {object} keyDetail - `KeyDetail` as expected by the Substrate node
+   * @return {object} The extrinsic to sign and send.
+   */
+  createNewTx(did, keyDetail) {
+    const hexId = getHexIdentifierFromDID(did);
+    return this.module.new(hexId, keyDetail);
+  }
+
+  /**
    * Creates a new DID on the Dock chain.
    * @param {string} did - The new DID. Can be a full DID or hex identifier
    * @param {object} keyDetail - `KeyDetail` as expected by the Substrate node
-   * @return {Promise<object>} The extrinsic to sign and send.
+   * @return {Promise<object>} Promise to the pending transaction
    */
   async new(did, keyDetail) {
-    const hexId = getHexIdentifierFromDID(did);
-    return await this.sendTransaction(this.module.new(hexId, keyDetail));
+    return await this.sendTransaction(this.createNewTx(did, keyDetail));
   }
 
   /**
@@ -38,8 +48,18 @@ class DIDModule {
    * @param {Signature} signature - Signature from existing key
    * @return {Promise<object>} The extrinsic to sign and send.
    */
+  createUpdateKeyTx(keyUpdate, signature) {
+    return this.module.updateKey(keyUpdate, signature.toJSON());
+  }
+
+  /**
+   * Updates the details of an already registered DID on the Dock chain.
+   * @param {object} keyUpdate - `KeyUpdate` as expected by the Substrate node
+   * @param {Signature} signature - Signature from existing key
+   * @return {Promise<object>} Promise to the pending transaction
+   */
   async updateKey(keyUpdate, signature) {
-    return await this.sendTransaction(this.module.updateKey(keyUpdate, signature.toJSON()));
+    return await this.sendTransaction(this.createUpdateKeyTx(keyUpdate, signature));
   }
 
   /**
@@ -48,8 +68,18 @@ class DIDModule {
    * @param {Signature} signature - Signature from existing key
    * @return {Promise<object>} The extrinsic to sign and send.
    */
+  createRemoveTx(didRemoval, signature) {
+    return this.module.remove(didRemoval, signature.toJSON());
+  }
+
+  /**
+   * Removes an already registered DID on the Dock chain.
+   * @param {object} didRemoval - `DidRemoval` as expected by the Substrate node
+   * @param {Signature} signature - Signature from existing key
+   * @return {Promise<object>} Promise to the pending transaction
+   */
   async remove(didRemoval, signature) {
-    return await this.sendTransaction(this.module.remove(didRemoval, signature.toJSON()));
+    return await this.sendTransaction(this.createRemoveTx(didRemoval, signature));
   }
 
   /**

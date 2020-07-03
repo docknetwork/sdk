@@ -117,12 +117,11 @@ class DockAPI {
   /**
    * Helper function to sign and send an extrinsic with the default account
    * @param {object} extrinsic - Extrinsic to send
-   * @param {Boolean} unsubscribe - Should we unsubscribe from the transaction after its finalized
    * @return {Promise}
    */
-  signAndSend(extrinsic, unsubscribe, resolve, reject) {
+  signAndSend(extrinsic, resolve, reject) {
     if (this.customSignTx) {
-      return this.customSignTx(extrinsic, unsubscribe, resolve, reject);
+      return this.customSignTx(extrinsic, resolve, reject);
     }
 
     const account = this.getAccount();
@@ -130,7 +129,7 @@ class DockAPI {
     return extrinsic
       .signAndSend(account, ({ events = [], status }) => {
         if (status.isFinalized) {
-          if (unsubscribe && unsubFunc) {
+          if (unsubFunc) {
             unsubFunc();
           }
           resolve({
@@ -150,13 +149,12 @@ class DockAPI {
   /**
    * Helper function to send transaction
    * @param {object} extrinsic - Extrinsic to send
-   * @param {Boolean} unsubscribe - Should we unsubscribe from the transaction after its finalized
    * @return {Promise}
    */
-  async sendTransaction(extrinsic, unsubscribe = true) {
+  async sendTransaction(extrinsic) {
     const promise = new Promise((resolve, reject) => {
       try {
-        this.signAndSend(extrinsic, unsubscribe, resolve, reject);
+        this.signAndSend(extrinsic, resolve, reject);
       } catch (error) {
         reject(error);
       }

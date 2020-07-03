@@ -29,7 +29,7 @@ class RevocationModule {
     return this.sendTransaction(this.module.newRegistry(id, {
       policy: policy.toJSON(),
       add_only: addOnly,
-    }), false);
+    }));
   }
 
   /**

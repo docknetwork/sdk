@@ -129,9 +129,7 @@ class DockAPI {
     return extrinsic
       .signAndSend(account, ({ events = [], status }) => {
         if (status.isFinalized) {
-          if (unsubFunc) {
-            unsubFunc();
-          }
+          unsubFunc();
           resolve({
             events,
             status,

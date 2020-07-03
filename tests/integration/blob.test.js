@@ -56,14 +56,14 @@ describe('Blob Module', () => {
     dockDID = createNewDockDID();
     keyDetail = createKeyDetail(publicKey, dockDID);
     txDid = dock.did.new(dockDID, keyDetail);
-    resultDid = await dock.sendTransaction(txDid);
+    resultDid = await txDid;
     didDoc = await dock.did.getDocument(dockDID);
     blobId = randomAsHex(DockBlobIdByteSize);
   }, 30000);
 
   test('Can create and read a Hex Blob.', async () => {
     const blobHex = randomAsHex(32);
-    const txBlob = await dock.blob.new(
+    const result = await dock.blob.new(
       {
         id: blobId,
         blob: blobHex,
@@ -72,7 +72,6 @@ describe('Blob Module', () => {
       pair,
     );
 
-    const result = await dock.sendTransaction(txBlob, false);
     expect(!!result).toBe(true);
 
     const chainBlob = await dock.blob.get(blobId);
@@ -82,7 +81,7 @@ describe('Blob Module', () => {
 
   test('Can create and read a Vector Blob.', async () => {
     const blobVect = [1, 2, 3];
-    const transaction = await dock.blob.new(
+    const result = await dock.blob.new(
       {
         id: blobId,
         blob: blobVect,
@@ -91,7 +90,6 @@ describe('Blob Module', () => {
       pair,
     );
 
-    const result = await dock.sendTransaction(transaction, false);
     expect(!!result).toBe(true);
 
     const chainBlob = await dock.blob.get(blobId);
@@ -102,7 +100,7 @@ describe('Blob Module', () => {
 
   test('Fails to write blob with size greater than allowed.', async () => {
     const blobHex = randomAsHex(BLOB_MAX_BYTE_SIZE + 1); // Max size is 1024
-    const transaction = await dock.blob.new(
+    const result = await dock.blob.new(
       {
         id: blobId,
         blob: blobHex,
@@ -111,7 +109,6 @@ describe('Blob Module', () => {
       pair,
     );
 
-    const result = await dock.sendTransaction(transaction, false);
     expect(!!result).toBe(true);
     await expect(
       dock.blob.get(blobId),
@@ -120,7 +117,7 @@ describe('Blob Module', () => {
 
   test('Fails to write blob with id already used.', async () => {
     const blobHexFirst = randomAsHex(12);
-    const txFirst = await dock.blob.new(
+    const resultFirst = await dock.blob.new(
       {
         id: blobId,
         blob: blobHexFirst,
@@ -129,7 +126,6 @@ describe('Blob Module', () => {
       pair,
     );
 
-    const resultFirst = await dock.sendTransaction(txFirst, false);
     expect(!!resultFirst).toBe(true);
 
     const chainBlob = await dock.blob.get(blobId);
@@ -137,7 +133,7 @@ describe('Blob Module', () => {
     expect(chainBlob[1].toString(16)).toEqual(blobHexFirst);
 
     const blobHexSecond = randomAsHex(123);
-    const txSecond = await dock.blob.new(
+    const resultSecond = await dock.blob.new(
       {
         id: blobId,
         blob: blobHexSecond,
@@ -146,7 +142,6 @@ describe('Blob Module', () => {
       pair,
     );
 
-    const resultSecond = await dock.sendTransaction(txSecond, false);
     expect(errorInResult(resultFirst)).toBe(false);
     expect(errorInResult(resultSecond)).toBe(true);
   }, 60000);

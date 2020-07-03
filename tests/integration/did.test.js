@@ -48,8 +48,7 @@ describe('DID Module', () => {
     // The controller is same as the DID
     const keyDetail = createKeyDetail(publicKey, dockDID);
 
-    const transaction = dock.did.new(dockDID, keyDetail);
-    const result = await dock.sendTransaction(transaction);
+    const result = await dock.did.new(dockDID, keyDetail);
     expect(!!result).toBe(true);
     const document = await dock.did.getDocument(dockDID);
     expect(!!document).toBe(true);
@@ -70,7 +69,7 @@ describe('DID Module', () => {
 
     // Send key update without changing controller
     const [keyUpdateNoModify, signatureNoModify] = await createSignedKeyUpdate(dock.did, dockDID, publicKey, pair);
-    await dock.sendTransaction(dock.did.updateKey(keyUpdateNoModify, signatureNoModify));
+    await dock.did.updateKey(keyUpdateNoModify, signatureNoModify);
     const currentResult = await dock.did.getDocument(dockDID);
     const currentControllerFromChain = getHexIdentifierFromDID(currentResult.publicKey[0].controller);
     expect(currentControllerFromChain).toBe(currentController);
@@ -78,7 +77,7 @@ describe('DID Module', () => {
     // Send key update changing controller to newController
     const newController = randomAsHex(32);
     const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, dockDID, publicKey, pair, newController);
-    await dock.sendTransaction(dock.did.updateKey(keyUpdate, signature));
+    await dock.did.updateKey(keyUpdate, signature);
 
     // Assert that the controller change was successful
     const result = await dock.did.getDocument(dockDID);
@@ -98,8 +97,7 @@ describe('DID Module', () => {
     // Since controller was not passed, it should not be passed in the key update
     expect(keyUpdate.controller).toBe(undefined);
 
-    const transaction = dock.did.updateKey(keyUpdate, signature);
-    const result = await dock.sendTransaction(transaction);
+    const result = await dock.did.updateKey(keyUpdate, signature);
     expect(!!result).toBe(true);
   }, 30000);
 
@@ -109,8 +107,7 @@ describe('DID Module', () => {
 
     const [didRemoval, signature] = await createSignedDidRemoval(dock.did, dockDID, currentPair);
 
-    const transaction = dock.did.remove(didRemoval, signature);
-    const result = await dock.sendTransaction(transaction);
+    const result = await dock.did.remove(didRemoval, signature);
     if (result) {
       await expect(dock.did.getDocument(dockDID)).rejects.toThrow(/does not exist/);
     }

@@ -58,19 +58,20 @@ class BlobModule {
    * @constructor
    * @param {object} api - PolkadotJS API Reference
    */
-  constructor(api) {
+  constructor(api, signAndSend) {
     this.api = api;
     this.module = api.tx.blobStore;
+    this.signAndSend = signAndSend;
   }
 
   /**
-   * Register a new Blob on the Dock Chain
+   * Create a transaction to register a new Blob on the Dock Chain
    * @param {object} blob - struct to store on chain
    * @param {object} keyPair - Key pair to sign with
    * @param {Signature} signature - Signature to use
    * @return {object} The extrinsic to sign and send.
    */
-  new(blob, keyPair = undefined, signature = undefined) {
+  createNewTx(blob, keyPair = undefined, signature = undefined) {
     if (!signature) {
       if (!keyPair) {
         throw Error('You need to provide either a keypair or a signature to register a new Blob.');
@@ -80,6 +81,17 @@ class BlobModule {
       signature = getSignatureFromKeyringPair(keyPair, serializedBlob);
     }
     return this.module.new(blob, signature.toJSON());
+  }
+
+  /**
+   * Register a new Blob on the Dock Chain
+   * @param {object} blob - struct to store on chain
+   * @param {object} keyPair - Key pair to sign with
+   * @param {Signature} signature - Signature to use
+   * @return {Promise<object>} Promise to the pending transaction
+   */
+  async new(blob, keyPair = undefined, signature = undefined) {
+    return await this.signAndSend(this.createNewTx(blob, keyPair, signature));
   }
 
   /**

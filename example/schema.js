@@ -22,7 +22,7 @@ async function createAuthorDID(dock, pair) {
   // Create an author DID to write with
   const publicKey = getPublicKeyFromKeyringPair(pair);
   const keyDetail = createKeyDetail(publicKey, dockDID);
-  await dock.sendTransaction(dock.did.new(dockDID, keyDetail));
+  await dock.did.new(dockDID, keyDetail);
   return dockDID;
 }
 
@@ -74,7 +74,7 @@ async function main() {
   console.log('The schema is:', JSON.stringify(schema.toJSON(), null, 2));
   console.log('Writing schema to the chain with blob id of', schema.id, '...');
 
-  await dock.sendTransaction(schema.writeToChain(dock, pair), false);
+  await schema.writeToChain(dock, pair);
 
   console.log(`Schema written, reading from chain (${schema.id})...`);
 

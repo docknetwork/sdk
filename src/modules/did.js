@@ -15,40 +15,71 @@ class DIDModule {
    * @constructor
    * @param {object} api - PolkadotJS API Reference
    */
-  constructor(api) {
+  constructor(api, signAndSend) {
     this.api = api;
     this.module = api.tx.didModule;
+    this.signAndSend = signAndSend;
+  }
+
+  /**
+   * Creates transaction to create a new DID on the Dock chain.
+   * @param {string} did - The new DID. Can be a full DID or hex identifier
+   * @param {object} keyDetail - `KeyDetail` as expected by the Substrate node
+   * @return {object} The extrinsic to sign and send.
+   */
+  createNewTx(did, keyDetail) {
+    const hexId = getHexIdentifierFromDID(did);
+    return this.module.new(hexId, keyDetail);
   }
 
   /**
    * Creates a new DID on the Dock chain.
    * @param {string} did - The new DID. Can be a full DID or hex identifier
    * @param {object} keyDetail - `KeyDetail` as expected by the Substrate node
-   * @return {object} The extrinsic to sign and send.
+   * @return {Promise<object>} Promise to the pending transaction
    */
-  new(did, keyDetail) {
-    const hexId = getHexIdentifierFromDID(did);
-    return this.module.new(hexId, keyDetail);
+  async new(did, keyDetail) {
+    return await this.signAndSend(this.createNewTx(did, keyDetail));
   }
 
   /**
    * Updates the details of an already registered DID on the Dock chain.
    * @param {object} keyUpdate - `KeyUpdate` as expected by the Substrate node
    * @param {Signature} signature - Signature from existing key
-   * @return {object} The extrinsic to sign and send.
+   * @return {Promise<object>} The extrinsic to sign and send.
    */
-  updateKey(keyUpdate, signature) {
+  createUpdateKeyTx(keyUpdate, signature) {
     return this.module.updateKey(keyUpdate, signature.toJSON());
+  }
+
+  /**
+   * Updates the details of an already registered DID on the Dock chain.
+   * @param {object} keyUpdate - `KeyUpdate` as expected by the Substrate node
+   * @param {Signature} signature - Signature from existing key
+   * @return {Promise<object>} Promise to the pending transaction
+   */
+  async updateKey(keyUpdate, signature) {
+    return await this.signAndSend(this.createUpdateKeyTx(keyUpdate, signature));
   }
 
   /**
    * Removes an already registered DID on the Dock chain.
    * @param {object} didRemoval - `DidRemoval` as expected by the Substrate node
    * @param {Signature} signature - Signature from existing key
-   * @return {object} The extrinsic to sign and send.
+   * @return {Promise<object>} The extrinsic to sign and send.
    */
-  remove(didRemoval, signature) {
+  createRemoveTx(didRemoval, signature) {
     return this.module.remove(didRemoval, signature.toJSON());
+  }
+
+  /**
+   * Removes an already registered DID on the Dock chain.
+   * @param {object} didRemoval - `DidRemoval` as expected by the Substrate node
+   * @param {Signature} signature - Signature from existing key
+   * @return {Promise<object>} Promise to the pending transaction
+   */
+  async remove(didRemoval, signature) {
+    return await this.signAndSend(this.createRemoveTx(didRemoval, signature));
   }
 
   /**

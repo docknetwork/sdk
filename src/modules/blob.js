@@ -58,10 +58,10 @@ class BlobModule {
    * @constructor
    * @param {object} api - PolkadotJS API Reference
    */
-  constructor(api, sendTransaction) {
+  constructor(api, signAndSend) {
     this.api = api;
     this.module = api.tx.blobStore;
-    this.sendTransaction = sendTransaction;
+    this.signAndSend = signAndSend;
   }
 
   /**
@@ -91,7 +91,7 @@ class BlobModule {
    * @return {Promise<object>} Promise to the pending transaction
    */
   async new(blob, keyPair = undefined, signature = undefined) {
-    return await this.sendTransaction(this.createNewTx(blob, keyPair, signature));
+    return await this.signAndSend(this.createNewTx(blob, keyPair, signature));
   }
 
   /**

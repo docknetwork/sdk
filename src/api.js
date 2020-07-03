@@ -71,9 +71,9 @@ class DockAPI {
 
     await this.initKeyring(keyring);
 
-    this.blobModule = new BlobModule(this.api, this.sendTransaction.bind(this));
-    this.didModule = new DIDModule(this.api, this.sendTransaction.bind(this));
-    this.revocationModule = new RevocationModule(this.api, this.sendTransaction.bind(this));
+    this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));
+    this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
+    this.revocationModule = new RevocationModule(this.api, this.signAndSend.bind(this));
 
     return this.api;
   }
@@ -133,7 +133,7 @@ class DockAPI {
    * @param {object} extrinsic - Extrinsic to send
    * @return {Promise}
    */
-  async sendTransaction(extrinsic) {
+  async signAndSend(extrinsic) {
     await this.signExtrinsic(extrinsic);
     const promise = new Promise((resolve, reject) => {
       try {

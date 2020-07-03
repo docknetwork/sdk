@@ -15,10 +15,10 @@ class DIDModule {
    * @constructor
    * @param {object} api - PolkadotJS API Reference
    */
-  constructor(api, sendTransaction) {
+  constructor(api, signAndSend) {
     this.api = api;
     this.module = api.tx.didModule;
-    this.sendTransaction = sendTransaction;
+    this.signAndSend = signAndSend;
   }
 
   /**
@@ -39,7 +39,7 @@ class DIDModule {
    * @return {Promise<object>} Promise to the pending transaction
    */
   async new(did, keyDetail) {
-    return await this.sendTransaction(this.createNewTx(did, keyDetail));
+    return await this.signAndSend(this.createNewTx(did, keyDetail));
   }
 
   /**
@@ -59,7 +59,7 @@ class DIDModule {
    * @return {Promise<object>} Promise to the pending transaction
    */
   async updateKey(keyUpdate, signature) {
-    return await this.sendTransaction(this.createUpdateKeyTx(keyUpdate, signature));
+    return await this.signAndSend(this.createUpdateKeyTx(keyUpdate, signature));
   }
 
   /**
@@ -79,7 +79,7 @@ class DIDModule {
    * @return {Promise<object>} Promise to the pending transaction
    */
   async remove(didRemoval, signature) {
-    return await this.sendTransaction(this.createRemoveTx(didRemoval, signature));
+    return await this.signAndSend(this.createRemoveTx(didRemoval, signature));
   }
 
   /**

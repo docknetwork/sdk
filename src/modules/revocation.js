@@ -12,10 +12,10 @@ class RevocationModule {
    * @constructor
    * @param {object} api - PolkadotJS API Reference
    */
-  constructor(api, sendTransaction) {
+  constructor(api, signAndSend) {
     this.api = api;
     this.module = api.tx.revoke;
-    this.sendTransaction = sendTransaction;
+    this.signAndSend = signAndSend;
   }
 
   /**
@@ -40,7 +40,7 @@ class RevocationModule {
    * @return {Promise<object>} Promise to the pending transaction
    */
   async newRegistry(id, policy, addOnly) {
-    return this.sendTransaction(this.createNewRegistryTx(id, policy, addOnly));
+    return this.signAndSend(this.createNewRegistryTx(id, policy, addOnly));
   }
 
   /**
@@ -69,7 +69,7 @@ class RevocationModule {
    * @return {Promise<object>} Promise to the pending transaction
    */
   async removeRegistry(registryID, lastModified, didKeys) {
-    return await this.sendTransaction(this.createRemoveRegistryTx(registryID, lastModified, didKeys));
+    return await this.signAndSend(this.createRemoveRegistryTx(registryID, lastModified, didKeys));
   }
 
   /**
@@ -101,7 +101,7 @@ class RevocationModule {
    * @return {Promise<object>} Promise to the pending transaction
    */
   async revoke(registryID, revokeIds, lastModified, didKeys) {
-    return await this.sendTransaction(this.createRevokeTx(registryID, revokeIds, lastModified, didKeys));
+    return await this.signAndSend(this.createRevokeTx(registryID, revokeIds, lastModified, didKeys));
   }
 
   /**
@@ -133,7 +133,7 @@ class RevocationModule {
    * @return {Promise<object>} Promise to the pending transaction
    */
   async unrevoke(registryID, revokeIds, lastModified, didKeys) {
-    return await this.sendTransaction(this.createUnrevokeTx(registryID, revokeIds, lastModified, didKeys));
+    return await this.signAndSend(this.createUnrevokeTx(registryID, revokeIds, lastModified, didKeys));
   }
 
   /**

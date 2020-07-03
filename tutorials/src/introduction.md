@@ -48,9 +48,9 @@ To get the account, call `getAccount`
 dock.getAccount();
 ```
 
-To send a transaction, use the `sendTransaction` on the `DockAPI` object
+To send a transaction, use the `signAndSend` on the `DockAPI` object
 ```js
-const res = await dock.sendTransaction(transaction);
+const res = await dock.signAndSend(transaction);
 ```
 
 For interacting with the DID module, i.e. creating, updating and removing them, get the `didModule` with `did` getter

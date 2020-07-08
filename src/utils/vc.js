@@ -145,8 +145,8 @@ function hasDockRevocation(status) {
   const id = status[credentialIDField];
   if (status
     && jsonld.getValues(status, credentialTypeField).includes(RevRegType)
-    && status[credentialIDField].startsWith(DockRevRegQualifier)
-    && isHexWithGivenByteSize(status[credentialIDField].slice(DockRevRegQualifier.length), RevRegIdByteSize)) {
+    && id.startsWith(DockRevRegQualifier)
+    && isHexWithGivenByteSize(id.slice(DockRevRegQualifier.length), RevRegIdByteSize)) {
     return true;
   }
 

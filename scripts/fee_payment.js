@@ -19,7 +19,17 @@ async function printBalance(name, account) {
 
 async function getBalance(account) {
   const { data: balance } = await dock.api.query.system.account(account);
-  return balance.free;
+  return balance.free.toHex();
+}
+
+async function getBlockDetails(dock, blockHash) {
+  const header = await dock.api.derive.chain.getHeader(blockHash);
+  // console.log(`Block header is ${header}`);
+  const slotNo = header.digest.logs[0].asPreRuntime[1];
+  // console.log(`Slot number is ${slotNo}`);
+  console.log(`Slot number is ${dock.api.createType('u64', slotNo)} and Block number is ${header.number}`);
+  console.log(`Block author's key is ${header.author}`);
+  return [dock.api.createType('u64', slotNo), header.number, header.author];
 }
 
 async function registerNewDID() {
@@ -36,19 +46,20 @@ async function registerNewDID() {
   // The controller is same as the DID
   const keyDetail = createKeyDetail(publicKey, dockDID);
 
-  console.log('Submitting new DID', dockDID, publicKey);
+  // console.log('Submitting new DID', dockDID, publicKey);
 
   const transaction = dock.did.new(dockDID, keyDetail);
   const { status } = await dock.sendTransaction(transaction);
   const blockHash = status.asFinalized;
   console.log(`Transaction finalized at blockHash ${blockHash}`);
-  const header = await dock.api.derive.chain.getHeader(blockHash);
+  /* const header = await dock.api.derive.chain.getHeader(blockHash);
   // console.log(`Block header is ${header}`);
   const slotNo = header.digest.logs[0].asPreRuntime[1];
   // console.log(`Slot number is ${slotNo}`);
   console.log(`Slot number is ${dock.api.createType('u64', slotNo)} and Block number is ${header.number}`);
   console.log(`Block author is ${header.author}`);
-  return header.author;
+  return header.author; */
+  return (await getBlockDetails(dock, blockHash))[2];
 }
 
 // Prototyping code.
@@ -72,13 +83,15 @@ async function main() {
   const bobBalOld = await getBalance(bob);
 
   const blockAuthor = await registerNewDID();
-  const blockAuthor1 = await registerNewDID();
-  const blockAuthor2 = await registerNewDID();
-  process.exit(0);
 
   // XXX: This code is not extensible as it requires only 2 nodes running. Sufficient for now.
   if (blockAuthor != alice && blockAuthor != bob) {
     throw new Error(`Block author must be Alice or Bob but was ${blockAuthor}`);
+  }
+  if (blockAuthor == alice) {
+    console.log('Block author is Alice');
+  } else {
+    console.log('Block author is Bob');
   }
 
   await printBalance('alice', alice);
@@ -86,11 +99,11 @@ async function main() {
   const aliceBalNew = await getBalance(alice);
   const bobBalNew = await getBalance(bob);
 
-  if (blockAuthor === alice) {
-    if (aliceBalNew !== aliceBalOld) {
+  if (blockAuthor == alice) {
+    if (aliceBalNew != aliceBalOld) {
       throw new Error('Block author was Alice still its balance changed');
     }
-    if (bobBalNew !== bobBalOld) {
+    if (bobBalNew != bobBalOld) {
       throw new Error('Block author was Alice but Bob\'s balance changed');
     }
   } else {

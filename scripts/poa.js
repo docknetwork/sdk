@@ -25,7 +25,7 @@ async function setSessionKey(dock, keys, accountUri) {
   const account = dock.keyring.addFromUri(accountUri);
   dock.setAccount(account);
   const txn = await dock.api.tx.session.setKeys(keys, []);
-  console.log(txn);
+  // console.log(txn);
   const r = await dock.sendTransaction(txn, false);
   console.log(`Transaction finalized at blockHash ${r.status.asFinalized}`);
   return r;
@@ -93,7 +93,7 @@ async function main() {
   // const sessKey = await genSessionKey(charlieNode, '//Charlie');
   // await setSessionKey(dock, sessKey, '//Charlie');
   // await addValidator(dock, charlie, false);
-  // await removeValidator(dock, charlie, false);
+  await removeValidator(dock, charlie, true);
 
   // const sessKey = await genSessionKey(daveNode, '//Dave');
   // await setSessionKey(dock, sessKey, '//Dave');

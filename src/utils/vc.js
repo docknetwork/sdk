@@ -25,6 +25,9 @@ export const expandedStatusProperty = `${DEFAULT_CONTEXT_URL}#credentialStatus`;
 export const expandedCredentialProperty = `${DEFAULT_CONTEXT_URL}#verifiableCredential`;
 export const expandedSubjectProperty = `${DEFAULT_CONTEXT_URL}#credentialSubject`;
 export const expandedSchemaProperty = `${DEFAULT_CONTEXT_URL}#credentialSchema`;
+export const credentialIDField = '@id';
+export const credentialContextField = '@context';
+export const credentialTypeField = '@type';
 
 /**
  * @typedef {object} VerifiablePresentation Representation of a Verifiable Presentation.
@@ -93,7 +96,7 @@ export function isRevocationCheckNeeded(credential, forceRevocationCheck, revoca
  */
 export function getDockRevIdFromCredential(credential) {
   // The hash outputs the same number of bytes as required by Dock
-  return blake2AsHex(credential['@id'], RevEntryByteSize * 8);
+  return blake2AsHex(credential[credentialIDField], RevEntryByteSize * 8);
 }
 
 /**
@@ -107,20 +110,15 @@ export async function expandJSONLD(credential) {
 
 /**
  * Checks if a credential has a credentialStatus property and it has the properties we expect
- * If status doesnt exist or is invalid, throws an error.
  * @param expanded
  */
 export async function getCredentialStatuses(expanded) {
   const statusValues = jsonld.getValues(expanded, expandedStatusProperty);
-  if (statusValues.length === 0) {
-    return statusValues;
-  }
-
   statusValues.forEach((status) => {
-    if (!status['@id']) {
+    if (!status[credentialIDField]) {
       throw new Error('"credentialStatus" must include an id.');
     }
-    if (!status['@type']) {
+    if (!status[credentialTypeField]) {
       throw new Error('"credentialStatus" must include a type.');
     }
   });
@@ -133,7 +131,7 @@ export async function getCredentialStatuses(expanded) {
  * @param credential
  */
 export function checkCredentialContext(credential) {
-  if (credential['@context'][0] !== DEFAULT_CONTEXT) {
+  if (credential[credentialContextField][0] !== DEFAULT_CONTEXT) {
     throw new Error(`${DEFAULT_CONTEXT} needs to be first in the list of contexts.`);
   }
 }
@@ -144,11 +142,11 @@ export function checkCredentialContext(credential) {
  * @returns {Boolean}
  */
 function hasDockRevocation(status) {
-  const id = status['@id'];
+  const id = status[credentialIDField];
   if (status
-    && jsonld.getValues(status, '@type').includes(RevRegType)
-    && id.startsWith(DockRevRegQualifier)
-    && isHexWithGivenByteSize(id.slice(DockRevRegQualifier.length), RevRegIdByteSize)) {
+    && jsonld.getValues(status, credentialTypeField).includes(RevRegType)
+    && status[credentialIDField].startsWith(DockRevRegQualifier)
+    && isHexWithGivenByteSize(status[credentialIDField].slice(DockRevRegQualifier.length), RevRegIdByteSize)) {
     return true;
   }
 
@@ -176,7 +174,7 @@ export async function checkRevocationStatus(credential, revocationApi) {
         return { verified: false, error: 'The credential status does not have the format required by Dock' };
       }
 
-      const regId = status['@id'].slice(DockRevRegQualifier.length);
+      const regId = status[credentialIDField].slice(DockRevRegQualifier.length);
 
       // Hash credential id to get revocation id
       const revocationStatus = await dockAPI.revocation.getIsRevoked(regId, revId); // eslint-disable-line
@@ -226,7 +224,7 @@ export async function verifyCredential(credential, {
   const expandedCredential = await expandJSONLD(credential);
 
   // Validate scheam
-  await getAndValidateSchemaIfPresent(expandedCredential, schemaApi, credential['@context']);
+  await getAndValidateSchemaIfPresent(expandedCredential, schemaApi, credential[credentialContextField]);
 
   // Run VCJS verifier
   const credVer = await vcjs.verifyCredential({
@@ -237,13 +235,11 @@ export async function verifyCredential(credential, {
   });
 
   // Check for revocation only if the credential is verified and revocation check is needed.
-  if (credVer.verified) {
-    if (isRevocationCheckNeeded(expandedCredential, forceRevocationCheck, revocationApi)) {
-      const revResult = await checkRevocationStatus(expandedCredential, revocationApi);
-      // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
-      if (!revResult.verified) {
-        return revResult;
-      }
+  if (credVer.verified && isRevocationCheckNeeded(expandedCredential, forceRevocationCheck, revocationApi)) {
+    const revResult = await checkRevocationStatus(expandedCredential, revocationApi);
+    // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
+    if (!revResult.verified) {
+      return revResult;
     }
   }
   return credVer;
@@ -337,7 +333,7 @@ export async function verifyPresentation(presentation, {
         }
       }
       // eslint-disable-next-line no-await-in-loop
-      await getAndValidateSchemaIfPresent(credential, schemaApi, presentation['@context']);
+      await getAndValidateSchemaIfPresent(credential, schemaApi, presentation[credentialContextField]);
     }
 
     // If all credentials pass the revocation check, the let the result of presentation verification be returned.
@@ -382,11 +378,11 @@ export async function validateCredentialSchema(credential, schema, context) {
     const subject = { ...subjects[i] };
     if (!requiresID) {
       // The id will not be part of schema. The spec mentioned that id will be popped off from subject
-      delete subject['@id'];
+      delete subject[credentialIDField];
     }
 
     const compacted = await jsonld.compact(subject, context); // eslint-disable-line
-    delete compacted['@context'];
+    delete compacted[credentialContextField];
 
     if (Object.keys(compacted).length === 0) {
       throw new Error('Compacted subject is empty, likely invalid');
@@ -415,7 +411,7 @@ export async function getAndValidateSchemaIfPresent(credential, schemaApi, conte
         throw new Error('Only Dock schemas are supported as of now.');
       }
       try {
-        const schemaObj = await Schema.get(schema['@id'], schemaApi.dock);
+        const schemaObj = await Schema.get(schema[credentialIDField], schemaApi.dock);
         await validateCredentialSchema(credential, schemaObj, context);
       } catch (e) {
         throw new Error(`Schema validation failed: ${e}`);

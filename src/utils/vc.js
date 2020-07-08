@@ -13,22 +13,22 @@ import {
 
 import DIDResolver from '../did-resolver'; // eslint-disable-line
 import Schema from '../modules/schema';
-/**
- * @typedef {object} VerifiablePresentation Representation of a Verifiable Presentation.
- */
 
 // XXX: Does it make sense to have a revocation registry type for Dock like below and eliminate the need for `rev_reg:dock:`?
 // export const RevRegType = 'DockRevocationRegistry2020';
 export const RevRegType = 'CredentialStatusList2017';
 export const DockRevRegQualifier = 'rev-reg:dock:';
-export const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 export const DEFAULT_TYPE = 'VerifiableCredential';
-export const expandedStatusProperty = 'https://www.w3.org/2018/credentials#credentialStatus';
-export const expandedCredentialProperty = 'https://www.w3.org/2018/credentials#verifiableCredential';
-export const expandedSubjectProperty = 'https://www.w3.org/2018/credentials#credentialSubject';
-export const expandedSchemaProperty = 'https://www.w3.org/2018/credentials#credentialSchema';
+export const DEFAULT_CONTEXT_URL = 'https://www.w3.org/2018/credentials';
+export const DEFAULT_CONTEXT = `${DEFAULT_CONTEXT_URL}/v1`;
+export const expandedStatusProperty = `${DEFAULT_CONTEXT_URL}#credentialStatus`;
+export const expandedCredentialProperty = `${DEFAULT_CONTEXT_URL}#verifiableCredential`;
+export const expandedSubjectProperty = `${DEFAULT_CONTEXT_URL}#credentialSubject`;
+export const expandedSchemaProperty = `${DEFAULT_CONTEXT_URL}#credentialSchema`;
 
-// const {Ed25519Signature2018} = suites;
+/**
+ * @typedef {object} VerifiablePresentation Representation of a Verifiable Presentation.
+ */
 
 /**
 * @typedef {object} VerifiableParams The Options to verify credentials and presentations.

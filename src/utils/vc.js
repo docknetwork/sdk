@@ -407,7 +407,7 @@ export async function validateCredentialSchema(credential, schema, context) {
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
  * @returns {Promise<void>}
  */
-export async function getAndValidateSchemaIfPresent(credential, schemaApi, context) { // TODO: update to use exanded values
+export async function getAndValidateSchemaIfPresent(credential, schemaApi, context) {
   if (schemaApi) {
     const schema = credential[expandedSchemaProperty][0];
     if (credential[expandedSubjectProperty] && schema) {

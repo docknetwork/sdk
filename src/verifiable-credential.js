@@ -1,7 +1,10 @@
 import {
+  expandJSONLD,
   issueCredential,
   verifyCredential,
   validateCredentialSchema,
+  DEFAULT_CONTEXT,
+  DEFAULT_TYPE,
 } from './utils/vc';
 import {
   ensureObjectWithId,
@@ -11,9 +14,6 @@ import {
   ensureValidDatetime,
 } from './utils/type-helpers';
 import { getUniqueElementsFromArray } from './utils/misc';
-
-const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
-const DEFAULT_TYPE = 'VerifiableCredential';
 
 /**
  * @typedef {object} VerifiableCredentialVerificationResult The credential verification result
@@ -146,14 +146,16 @@ class VerifiableCredential {
    * structure specified by the given JSON schema. Use `validateCredentialSchema` but exclude subject's id.
    * Allows issuer to validate schema before adding it.
    * @param {object} schema - The schema to validate with
-   * @returns {Boolean}
+   * @returns {Promise<Boolean>}
    */
-  validateSchema(schema) {
+  async validateSchema(schema) {
     if (!this.credentialSubject) {
       throw new Error('No credential subject defined');
     }
 
-    return validateCredentialSchema(this, schema);
+    const expanded = await expandJSONLD(this.toJSON());
+    console.log('expanded', expanded);
+    return validateCredentialSchema(expanded, schema, this.context);
   }
 
   /**

@@ -19,12 +19,24 @@ async function genSessionKey(nodeAddress, accountUri) {
   return hexKey;
 }
 
-// Associate session key with an account using an extrinsic.
+// Associate session key with an account using an extrinsic. Requires validator to have some tokens
 async function setSessionKey(dock, keys, accountUri) {
   console.log('Setting sdk account...');
   const account = dock.keyring.addFromUri(accountUri);
   dock.setAccount(account);
   const txn = await dock.api.tx.session.setKeys(keys, []);
+  // console.log(txn);
+  const r = await dock.sendTransaction(txn, false);
+  console.log(`Transaction finalized at blockHash ${r.status.asFinalized}`);
+  return r;
+}
+
+// Associate session key for a validator using an extrinsic sent by root. Useful when validator does not have tokens.
+async function setSessionKeyByProxy(dock, validatorId, keys) {
+  console.log('Setting sdk account...');
+  const account = dock.keyring.addFromUri('//Alice');
+  dock.setAccount(account);
+  const txn = dock.api.tx.sudo.sudo(dock.api.tx.poAModule.setSessionKey(validatorId, keys));
   // console.log(txn);
   const r = await dock.sendTransaction(txn, false);
   console.log(`Transaction finalized at blockHash ${r.status.asFinalized}`);
@@ -64,6 +76,15 @@ async function swapValidator(dock, swapOut, swapIn) {
   return r;
 }
 
+async function printBalance(name, account) {
+  const dock = new DockAPI();
+  await dock.init({
+    address: 'ws://localhost:9944',
+  });
+  const { data: balance } = await dock.api.query.system.account(account);
+  console.log(`${name}'s balance is ${balance.free}`);
+}
+
 // Prototyping code.
 async function main() {
   const dock = new DockAPI();
@@ -92,8 +113,11 @@ async function main() {
 
   // const sessKey = await genSessionKey(charlieNode, '//Charlie');
   // await setSessionKey(dock, sessKey, '//Charlie');
+  // await setSessionKeyByProxy(dock, charlie, sessKey);
   // await addValidator(dock, charlie, false);
-  await removeValidator(dock, charlie, true);
+  // await printBalance('Alice', alice);
+  // await removeValidator(dock, charlie, false);
+  // await printBalance('Alice', alice);
 
   // const sessKey = await genSessionKey(daveNode, '//Dave');
   // await setSessionKey(dock, sessKey, '//Dave');

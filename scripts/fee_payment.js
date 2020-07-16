@@ -62,6 +62,30 @@ async function registerNewDID() {
   return (await getBlockDetails(dock, blockHash))[2];
 }
 
+async function disableEmissions(dock) {
+  console.log('Setting sdk account...');
+  const account = dock.keyring.addFromUri('//Alice');
+  dock.setAccount(account);
+  const txn = dock.api.tx.sudo.sudo(dock.api.tx.poAModule.setEmissionStatus(false));
+  const { status } = await dock.sendTransaction(txn);
+  const blockHash = status.asFinalized;
+  console.log(`Transaction finalized at blockHash ${blockHash}`);
+  return (await getBlockDetails(dock, blockHash))[2];
+}
+
+async function txnByRoot(dock) {
+  console.log('Setting sdk account...');
+  const account = dock.keyring.addFromUri('//Alice');
+  dock.setAccount(account);
+  // const txn = dock.api.tx.sudo.sudoUncheckedWeight(dock.api.tx.poAModule.setMaxActiveValidators(8), 0);
+  const txn = dock.api.tx.sudo.sudo(dock.api.tx.poAModule.setMaxActiveValidators(8));
+  // const txn = dock.api.tx.poAModule.setMaxActiveValidators(8);
+  const { status } = await dock.sendTransaction(txn);
+  const blockHash = status.asFinalized;
+  console.log(`Transaction finalized at blockHash ${blockHash}`);
+  return (await getBlockDetails(dock, blockHash))[2];
+}
+
 // Prototyping code.
 async function main() {
   await dock.init({
@@ -77,12 +101,15 @@ async function main() {
 
   // console.log('dock.api', dock.api);
 
+  // await disableEmissions(dock);
+
   await printBalance('alice', alice);
   await printBalance('bob', bob);
   const aliceBalOld = await getBalance(alice);
   const bobBalOld = await getBalance(bob);
 
-  const blockAuthor = await registerNewDID();
+  // const blockAuthor = await registerNewDID();
+  const blockAuthor = await txnByRoot(dock);
 
   // XXX: This code is not extensible as it requires only 2 nodes running. Sufficient for now.
   if (blockAuthor != alice && blockAuthor != bob) {
@@ -98,6 +125,7 @@ async function main() {
   await printBalance('bob', bob);
   const aliceBalNew = await getBalance(alice);
   const bobBalNew = await getBalance(bob);
+  // process.exit(0);
 
   if (blockAuthor == alice) {
     if (aliceBalNew != aliceBalOld) {

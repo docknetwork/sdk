@@ -4,6 +4,21 @@ import { DockAPI } from '../src/api';
 
 const dock = new DockAPI();
 
+const accounts = {
+  '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY': 'Alice',
+  '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty': 'Bob',
+  '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y': 'Charlie'
+};
+
+async function printFreeBalance(name, account) {
+  const { data: balance } = await dock.api.query.system.account(account);
+  console.log(`${name}'s unlocked balance is ${balance.free.toHuman()}`);
+}
+
+async function printReservedBalance(name, account) {
+  const { data: balance } = await dock.api.query.system.account(account);
+  console.log(`${name}'s locked balance is ${balance.reserved.toHuman()}`);
+}
 
 async function getBlockDetails(dock, blockHash) {
   const header = await dock.api.derive.chain.getHeader(blockHash);
@@ -16,30 +31,68 @@ async function getBlockDetails(dock, blockHash) {
 }
 
 async function getEpochMetrics(dock) {
+  const emissionSupply = await dock.api.query.poAModule.emissionSupply();
+  console.log(`Emission supply ${emissionSupply}`);
+  console.log('-----------------------------------------------------------------------');
   console.log('Epochs');
+  console.log('');
   const epochs = await dock.api.query.poAModule.epochs.entries();
   // console.log(epochs);
   epochs.forEach(element => {
-    // console.log(element[0]);
+    // console.log(element[1]);
     // console.log(element[0]._meta.type);
     // const epochNo = dock.api.createType('u32', element[0]);
     const epochNo = element[0].toHuman();
     console.log(`epoch no ${epochNo}`);
-    const lastSlot = element[1][2].isSome ? element[1][2].unwrap() : 'Nil';
-    console.log(`No of validators: ${element[1][0]}, Starting slot: ${element[1][1]}, ending slot ${lastSlot}`);
+    const lastSlot = element[1].ending_slot.isSome ? element[1].ending_slot.unwrap().toHuman() : 'Nil'; 
+    console.log(`No of validators: ${element[1].validator_count}, starting slot: ${element[1].starting_slot.toHuman()}, expected ending slot: ${element[1].expected_ending_slot.toHuman()}, ending slot ${lastSlot}`);
+    if (element[1].total_emission.isSome) {
+      const totalEmission = element[1].total_emission.unwrap().toHuman();
+      const treasEmission = element[1].emission_for_treasury.unwrap().toHuman();
+      const valdEmission = element[1].emission_for_validators.unwrap().toHuman();
+      console.log(`Total emission: ${totalEmission}, Emission for Treasury: ${treasEmission}, Emission for validators: ${valdEmission}`);
+    }
+    console.log('');
     // console.log(element[1][2]);
   });
-  console.log('Epoch block counts');
-  const epochBlockCounts = await dock.api.query.poAModule.epochBlockCounts.entries();
+  console.log('------------------------------------------------------------------------------------------------------------');
+  console.log('');
+  console.log('');
+
+  console.log('Validator stats');
+  console.log('');
+  const epochBlockCounts = await dock.api.query.poAModule.validatorStats.entries();
   // console.log(epochBlockCounts);
   epochBlockCounts.forEach(element => {
     // console.log(Object.getOwnPropertyNames(element[0]));
     // console.log(element[0]._args[0]);
     // console.log(element[0].registry);
+    // console.log(element[1]);
     const epochNo = element[0]._args[0];
     const validatorId = encodeAddress(element[0]._args[1]);
-    console.log(`epoch no ${epochNo}, validator id ${validatorId}, blocks ${element[1]}`);
+    console.log(`For epoch no ${epochNo}, validator ${accounts[validatorId]}, blocks authored is ${element[1].block_count}`);
+    if (element[1].locked_reward.isSome) {
+      const locked = element[1].locked_reward.unwrap().toHuman();
+      const unlocked = element[1].unlocked_reward.unwrap().toHuman();
+      console.log(`Locked rewards: ${locked}, Unlocked rewards: ${unlocked}`);
+    }
+    console.log('');
   });
+
+  console.log('');
+  console.log('');
+
+  const alice = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
+  const bob = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty';
+  const charlie = '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y';
+
+
+  await printFreeBalance('Alice', alice);
+  await printReservedBalance('Alice', alice);
+  await printFreeBalance('Bob', bob);
+  await printReservedBalance('Bob', bob);
+  await printFreeBalance('Charlie', charlie);
+  await printReservedBalance('Charlie', charlie);
 }
 
 async function main() {

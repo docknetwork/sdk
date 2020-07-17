@@ -1,4 +1,6 @@
 import { encodeAddress, randomAsHex } from '@polkadot/util-crypto';
+import { stringToHex } from '@polkadot/util';
+
 import { getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from '../utils/codec';
 import NoBlobError from '../utils/errors/no-blob-error';
@@ -72,6 +74,17 @@ class BlobModule {
    * @return {object} The extrinsic to sign and send.
    */
   createNewTx(blob, keyPair = undefined, signature = undefined) {
+    const value = blob.blob;
+    if (!value) {
+      throw new Error('Blob must have a value!');
+    }
+
+    if (typeof value === 'object' && !Array.isArray(value)) {
+      blob.blob = stringToHex(JSON.stringify(value));
+    } else if (typeof value === 'string' && value.substr(0, 2) !== '0x') {
+      blob.blob = stringToHex(value);
+    }
+
     if (!signature) {
       if (!keyPair) {
         throw Error('You need to provide either a keypair or a signature to register a new Blob.');

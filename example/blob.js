@@ -63,8 +63,14 @@ async function main() {
   // Generate a DID to be used as author
   const dockDID = await createAuthorDID(dock, pair);
 
+  // Write blob as json
+  const blobValueJSON = { jsonStorage: true };
+  const chainBlobJSON = await writeAndReadBlob(dock, blobValueJSON, dockDID, pair);
+  const blobJSONFromChain = chainBlobJSON[1];
+  console.log('Resulting blob JSON from chain:', blobJSONFromChain);
+
   // Write blob as string
-  const blobValue = stringToHex('hello blob storage!');
+  const blobValue = 'hello blob storage!';
   const chainBlob = await writeAndReadBlob(dock, blobValue, dockDID, pair);
   const blobStrFromChain = u8aToString(chainBlob[1]);
   console.log('Resulting blob string from chain:', blobStrFromChain);

@@ -1,5 +1,5 @@
 import { encodeAddress, randomAsHex } from '@polkadot/util-crypto';
-import { stringToHex } from '@polkadot/util';
+import { u8aToString, stringToHex } from '@polkadot/util';
 
 import { getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from '../utils/codec';
@@ -121,7 +121,16 @@ class BlobModule {
 
     const respTuple = resp.unwrap();
     if (respTuple.length === 2) {
-      return [respTuple[0], respTuple[1]];
+      let value = respTuple[1];
+
+      // Try to convert the value to a JSON object
+      // if not just use default Uint8 array value
+      try {
+        const strValue = u8aToString(respTuple[1]);
+        value = JSON.parse(strValue);
+      } catch (e) { }
+
+      return [respTuple[0], value];
     }
     throw new Error(`Needed 2 items in response but got${respTuple.length}`);
   }

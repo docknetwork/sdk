@@ -128,7 +128,7 @@ export default class Schema {
 
     return {
       id: getHexIdentifierFromBlobID(this.id),
-      blob: stringToHex(canonicalize(this.schema)),
+      blob: canonicalize(this.schema),
       author: getHexIdentifierFromDID(this.author),
     };
   }
@@ -168,9 +168,10 @@ export default class Schema {
   static async get(id, dockApi) {
     const hexId = getHexIdentifierFromBlobID(id);
     const chainBlob = await dockApi.blob.get(hexId);
-    const blobStr = u8aToString(chainBlob[1]);
     try {
-      const schema = JSON.parse(blobStr);
+      const schema = {
+        ...chainBlob[1],
+      };
       schema.id = id;
       schema.author = hexDIDToQualified(u8aToHex(chainBlob[0]));
 

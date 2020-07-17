@@ -74,26 +74,31 @@ class BlobModule {
    * @return {object} The extrinsic to sign and send.
    */
   createNewTx(blob, keyPair = undefined, signature = undefined) {
-    const value = blob.blob;
+    let value = blob.blob;
     if (!value) {
       throw new Error('Blob must have a value!');
     }
 
     if (typeof value === 'object' && !Array.isArray(value)) {
-      blob.blob = stringToHex(JSON.stringify(value));
+      value = stringToHex(JSON.stringify(value));
     } else if (typeof value === 'string' && value.substr(0, 2) !== '0x') {
-      blob.blob = stringToHex(value);
+      value = stringToHex(value);
     }
+
+    const blobObj = {
+      ...blob,
+      blob: value,
+    };
 
     if (!signature) {
       if (!keyPair) {
         throw Error('You need to provide either a keypair or a signature to register a new Blob.');
       }
-      const serializedBlob = this.getSerializedBlob(blob);
+      const serializedBlob = this.getSerializedBlob(blobObj);
       // eslint-disable-next-line no-param-reassign
       signature = getSignatureFromKeyringPair(keyPair, serializedBlob);
     }
-    return this.module.new(blob, signature.toJSON());
+    return this.module.new(blobObj, signature.toJSON());
   }
 
   /**
@@ -124,11 +129,12 @@ class BlobModule {
       let value = respTuple[1];
 
       // Try to convert the value to a JSON object
-      // if not just use default Uint8 array value
       try {
         const strValue = u8aToString(respTuple[1]);
         value = JSON.parse(strValue);
-      } catch (e) { }
+      } catch (e) {
+        // no-op, just use default Uint8 array value
+      }
 
       return [respTuple[0], value];
     }

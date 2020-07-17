@@ -1,5 +1,5 @@
 import { randomAsHex } from '@polkadot/util-crypto';
-import { u8aToString, stringToHex } from '@polkadot/util';
+import { u8aToString } from '@polkadot/util';
 
 import { DockAPI } from '../src/api';
 import { DockBlobIdByteSize } from '../src/modules/blob';

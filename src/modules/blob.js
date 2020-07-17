@@ -79,7 +79,7 @@ class BlobModule {
       throw new Error('Blob must have a value!');
     }
 
-    if (typeof value === 'object' && !Array.isArray(value)) {
+    if (typeof value === 'object' && !Array.isArray(value) && !(value instanceof Uint8Array)) {
       value = stringToHex(JSON.stringify(value));
     } else if (typeof value === 'string' && value.substr(0, 2) !== '0x') {
       value = stringToHex(value);
@@ -130,8 +130,10 @@ class BlobModule {
 
       // Try to convert the value to a JSON object
       try {
-        const strValue = u8aToString(respTuple[1]);
-        value = JSON.parse(strValue);
+        const strValue = u8aToString(value);
+        if (strValue.substr(0, 1) === '{') {
+          value = JSON.parse(strValue);
+        }
       } catch (e) {
         // no-op, just use default Uint8 array value
       }

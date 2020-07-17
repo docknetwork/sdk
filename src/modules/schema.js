@@ -1,4 +1,4 @@
-import { stringToHex, u8aToString, u8aToHex } from '@polkadot/util';
+import { u8aToHex } from '@polkadot/util';
 import { canonicalize } from 'json-canonicalize';
 import { validate } from 'jsonschema';
 import axios from 'axios';
@@ -168,17 +168,18 @@ export default class Schema {
   static async get(id, dockApi) {
     const hexId = getHexIdentifierFromBlobID(id);
     const chainBlob = await dockApi.blob.get(hexId);
-    try {
+    const chainValue = chainBlob[1];
+
+    if (typeof chainValue === 'object' && !Array.isArray(chainValue) && !(chainValue instanceof Uint8Array)) {
       const schema = {
-        ...chainBlob[1],
+        ...chainValue,
+        id,
+        author: hexDIDToQualified(u8aToHex(chainBlob[0])),
       };
-      schema.id = id;
-      schema.author = hexDIDToQualified(u8aToHex(chainBlob[0]));
 
       return schema;
-    } catch (e) {
-      throw new Error(`Incorrect schema format: ${e}`);
     }
+    throw new Error('Incorrect schema format');
   }
 
   /**

@@ -32,8 +32,6 @@ const policy = new OneOfPolicy(controllers);
 
 // Create revoke IDs
 const revokeId = randomAsHex(32);
-const revokeIds = new Set();
-revokeIds.add(revokeId);
 
 async function createRegistry() {
   console.log(`Creating a registry with owner DID (${controllerDID}) with policy type:`, policy.constructor.name);

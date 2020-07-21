@@ -1,6 +1,6 @@
 import { encodeAddress } from '@polkadot/util-crypto';
 
-import { DockAPI } from '../src/api';
+import { DockAPI } from '../../src/api';
 
 const dock = new DockAPI();
 
@@ -44,7 +44,7 @@ async function getEpochMetrics(dock) {
     // const epochNo = dock.api.createType('u32', element[0]);
     const epochNo = element[0].toHuman();
     console.log(`epoch no ${epochNo}`);
-    const lastSlot = element[1].ending_slot.isSome ? element[1].ending_slot.unwrap().toHuman() : 'Nil'; 
+    const lastSlot = element[1].ending_slot.isSome ? element[1].ending_slot.unwrap().toHuman() : 'Nil';
     console.log(`No of validators: ${element[1].validator_count}, starting slot: ${element[1].starting_slot.toHuman()}, expected ending slot: ${element[1].expected_ending_slot.toHuman()}, ending slot ${lastSlot}`);
     if (element[1].total_emission.isSome) {
       const totalEmission = element[1].total_emission.unwrap().toHuman();

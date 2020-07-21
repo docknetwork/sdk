@@ -119,14 +119,15 @@ class DockAPI {
    * @param {Boolean} unsubscribe - Should we unsubscribe from the transaction after its finalized
    * @return {Promise}
    */
-  async sendTransaction(extrinsic, unsubscribe = true) {
+  async sendTransaction(extrinsic, unsubscribe = true, waitForFinalize = true) {
     return new Promise((resolve, reject) => {
       const account = this.getAccount();
       let unsubFunc = null;
       try {
         extrinsic
           .signAndSend(account, ({ events = [], status }) => {
-            if (status.isFinalized) {
+            const isConfirmed = waitForFinalize ? status.isFinalized : status.isInBlock;
+            if (isConfirmed) {
               if (unsubscribe && unsubFunc) {
                 unsubFunc();
               }

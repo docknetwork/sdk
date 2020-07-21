@@ -1,6 +1,6 @@
 // import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 
-import { DockAPI } from '../src/api';
+import { DockAPI } from '../../src/api';
 import { u8aToHex } from '@polkadot/util';
 
 
@@ -31,7 +31,7 @@ async function setSessionKey(dock, keys, accountUri) {
   return r;
 }
 
-// Associate session key for a validator using an extrinsic sent by root. Useful when validator does not have tokens.
+// Associate session key with an account using an extrinsic sent by root. Useful when validator does not have tokens.
 async function setSessionKeyByProxy(dock, validatorId, keys) {
   console.log('Setting sdk account...');
   const account = dock.keyring.addFromUri('//Alice');
@@ -108,7 +108,7 @@ async function main() {
 
   const ferdie = '5CiPPseXPECbkjWCa6MnjNokrgYjMqmKndv2rSnekmSK2DjL';
 
-  // Each chunk of code below generates a session key, associates that with the account id, adds the account 
+  // Each chunk of code below generates a session key, associates that with the account id, adds the account
   // as validator and removes it. Comment/uncomment appropriately
 
   // const sessKey = await genSessionKey(charlieNode, '//Charlie');

@@ -1,17 +1,16 @@
+import { Keyring } from '@polkadot/api';
+import { cryptoWaitReady } from '@polkadot/util-crypto';
+import { encodeAddress } from '@polkadot/keyring/index';
 import { DockAPI } from '../../src/api';
-import {FullNodeEndpoint, TestKeyringOpts} from '../test-constants';
+import { FullNodeEndpoint, TestKeyringOpts } from '../test-constants';
 import {
   getChainData,
   addValidatorWithHandle,
   removeValidatorWithHandle,
-  setSessionKeyThroughRootWithHandle, genSessionKeyForHandle, getSlotNoFromHeader
+  setSessionKeyThroughRootWithHandle, genSessionKeyForHandle, getSlotNoFromHeader,
 } from './helpers';
-import { Keyring } from '@polkadot/api';
-import {cryptoWaitReady} from '@polkadot/util-crypto';
-import {encodeAddress} from '@polkadot/keyring/index';
 
 describe('Validator set change', () => {
-
   // Assumes nodes Alice, Bob and Charlie are running from a clean slate
 
   const queryHandle = new DockAPI();
@@ -31,7 +30,7 @@ describe('Validator set change', () => {
     });
     aliceHandle.setAccount(aliceKeyring.addFromUri('//Alice'));
 
-    const charlieKeyring = new Keyring({type: 'sr25519'});
+    const charlieKeyring = new Keyring({ type: 'sr25519' });
     await charlieHandle.init({
       address: 'ws://localhost:9966',
     });
@@ -44,92 +43,71 @@ describe('Validator set change', () => {
   }, 30000);
 
   test('Add validator without short circuit', async (done) => {
-    // Add a validator Charlie in mid of epoch. Inspect if added in mid epoch, if not
-    // remove and add again. Repeat this `n` times and once successful ensure Charlie does
-    // not produce any block in current epoch.
+    // Add a validator Charlie in mid of epoch.
     const key = await genSessionKeyForHandle(charlieHandle);
     await setSessionKeyThroughRootWithHandle(aliceHandle, Charlie, key);
     chainData = await getChainData(queryHandle);
     let epochForAddition;
-    let n = 3;
-    while (n > 0) {
-      const block2 = await addValidatorWithHandle(aliceHandle, Charlie, false);
-      console.log(`Validator added at block #${block2.blockNo}`);
-      if (block2.slotNo < chainData.epochEndsAt) {
-        console.log('slot no before epoch end');
-        epochForAddition = (await getChainData(queryHandle)).epoch;
-        break;
-      } else {
-        console.log('slot no not before epoch end');
-        // TODO: Remove and ensure removed
-        n--;
-      }
+    const block2 = await addValidatorWithHandle(aliceHandle, Charlie, false);
+    console.log(`Validator added at block #${block2.blockNo}`);
+    if (block2.slotNo < chainData.epochEndsAt) {
+      console.log('slot no before epoch end');
+      epochForAddition = (await getChainData(queryHandle)).epoch;
+    } else {
+      done.fail('slot no not before epoch end');
     }
 
     // Check if validator starts producing blocks in next epoch
-    if (n < 0) {
-      fail('Test failed as cannot add validator at mid of epoch');
-    } else {
-      // Minimum slots in epoch
-      let count = chainData.minEpochLength;
-      const unsubscribe = await queryHandle.api.derive.chain.subscribeNewHeads(async (header) => {
-        const currentSlotNo = getSlotNoFromHeader(queryHandle, header);
-        if (encodeAddress(header.author) === Charlie) {
-          // No short circuit
-          expect(currentSlotNo).toBeGreaterThan(chainData.epochEndsAt);
-          console.log(`Validator detected at block #${header.number}`);
-          const e = (await getChainData(queryHandle)).epoch;
-          expect(e).toBeGreaterThan(epochForAddition);
-          console.log(`Validator detected at epoch #${e}`);
-          unsubscribe();
-          done();
-        }
-        if (--count === 0) {
-          unsubscribe();
-          fail('Test failed as block author was not charlie');
-        }
-      });
-    }
+    // Minimum slots in epoch
+    let count = chainData.minEpochLength;
+    const unsubscribe = await queryHandle.api.derive.chain.subscribeNewHeads(async (header) => {
+      const currentSlotNo = getSlotNoFromHeader(queryHandle, header);
+      if (encodeAddress(header.author) === Charlie) {
+        // No short circuit
+        expect(currentSlotNo).toBeGreaterThan(chainData.epochEndsAt);
+        console.log(`Validator detected at block #${header.number}`);
+        const e = (await getChainData(queryHandle)).epoch;
+        expect(e).toBeGreaterThan(epochForAddition);
+        console.log(`Validator detected at epoch #${e}`);
+        unsubscribe();
+        done();
+      }
+      if (--count === 0) {
+        unsubscribe();
+        done.fail('Test failed as block author was not charlie');
+      }
+    });
   }, 300000);
 
   test('Remove validator without short circuit', async (done) => {
     // Validator added, now remove
     chainData = await getChainData(queryHandle);
     let epochForRemoval;
-    let n = 3;
-    while (n > 0) {
-      const block2 = await removeValidatorWithHandle(aliceHandle, Charlie, false);
-      console.log(`Validator removed at block #${block2.blockNo}`);
-      if (block2.slotNo < chainData.epochEndsAt) {
-        console.log('slot no before epoch end');
-        epochForRemoval = (await getChainData(queryHandle)).epoch;
-        break;
-      } else {
-        console.log('slot no not before epoch end');
-        n--;
-      }
+    const block = await removeValidatorWithHandle(aliceHandle, Charlie, false);
+    console.log(`Validator removed at block #${block.blockNo}`);
+    if (block.slotNo < chainData.epochEndsAt) {
+      console.log('slot no before epoch end');
+      epochForRemoval = (await getChainData(queryHandle)).epoch;
+    } else {
+      done.fail('slot no not before epoch end');
     }
 
-    if (n < 0) {
-      fail('Test failed as cannot remove validator at mid of epoch');
-    } else {
-      let count = 4;
-      const unsubscribe = await queryHandle.api.derive.chain.subscribeNewHeads(async (header) => {
-        const currentEpoch = (await getChainData(queryHandle)).epoch;
-        if (currentEpoch > epochForRemoval) {
-          if (encodeAddress(header.author) === Charlie) {
-            unsubscribe();
-            fail('Test failed as block author was charlie');
-          }
-          --count;
-          if (count === 0) {
-            console.log('Validator removed');
-            unsubscribe();
-            done();
-          }
+    let count = 4;
+    const unsubscribe = await queryHandle.api.derive.chain.subscribeNewHeads(async (header) => {
+      const currentEpoch = (await getChainData(queryHandle)).epoch;
+      if (currentEpoch > epochForRemoval) {
+        if (encodeAddress(header.author) === Charlie) {
+          unsubscribe();
+          done.fail('Test failed as block author was charlie');
         }
-      });
-    }
+        --count;
+        if (count === 0) {
+          console.log('Validator removed');
+          unsubscribe();
+          done();
+        }
+      }
+    });
   }, 300000);
 
   test('Add validator with short circuit', async (done) => {
@@ -159,7 +137,7 @@ describe('Validator set change', () => {
           done();
         } else if (count === 0) {
           unsubscribe();
-          fail('Could not add validator charlie');
+          done.fail('Could not add validator charlie');
         }
         --count;
       }
@@ -185,7 +163,7 @@ describe('Validator set change', () => {
         if (currentEpoch > chainData.epoch) {
           if (encodeAddress(header.author) === Charlie) {
             unsubscribe();
-            fail('Test failed as block author was charlie');
+            done.fail('Test failed as block author was charlie');
           }
         }
         if (count === 0) {

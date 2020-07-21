@@ -1,7 +1,6 @@
-import {DockAPI} from '../../src/api';
-import {u8aToHex} from '@polkadot/util/index';
+import { u8aToHex } from '@polkadot/util/index';
 import { encodeAddress } from '@polkadot/util-crypto';
-import { AccountId, u8, u32, u64 } from '@polkadot/types/interfaces';
+import { DockAPI } from '../../src/api';
 
 export async function getFreeBalance(dock, account) {
   const { data: balance } = await dock.api.query.system.account(account);
@@ -68,7 +67,7 @@ export async function getChainData(handle) {
 }
 
 // Generate session key by connecting to the node and returns it.
-export async function genSessionKey(nodehanAddress, accountUri) {
+export async function genSessionKey(nodeAddress, accountUri) {
   const dock = new DockAPI();
   await dock.init({
     address: nodeAddress,

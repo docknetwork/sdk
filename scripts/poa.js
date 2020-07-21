@@ -1,6 +1,6 @@
 // import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 
-import { DockAPI } from '../../src/api';
+import { DockAPI } from '../src/api';
 import { u8aToHex } from '@polkadot/util';
 
 

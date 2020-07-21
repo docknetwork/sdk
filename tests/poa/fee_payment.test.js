@@ -1,10 +1,10 @@
-import {DockAPI} from '../../src/api';
-import {cryptoWaitReady, randomAsHex} from '@polkadot/util-crypto/index';
-import {FullNodeEndpoint, TestKeyringOpts} from '../test-constants';
-import {Keyring} from '@polkadot/api/index';
-import {getBlockDetails, getFreeBalance, setEmissionRewardsStatusWithHandle} from './helpers';
-import {createKeyDetail, createNewDockDID} from '../../src/utils/did';
-import {getPublicKeyFromKeyringPair} from '../../src/utils/misc';
+import { cryptoWaitReady, randomAsHex } from '@polkadot/util-crypto/index';
+import { Keyring } from '@polkadot/api/index';
+import { DockAPI } from '../../src/api';
+import { FullNodeEndpoint, TestKeyringOpts } from '../test-constants';
+import { getBlockDetails, getFreeBalance, setEmissionRewardsStatusWithHandle } from './helpers';
+import { createKeyDetail, createNewDockDID } from '../../src/utils/did';
+import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 
 async function sendDIDWriteTxn(handle) {
   // DID will be generated randomly
@@ -15,13 +15,12 @@ async function sendDIDWriteTxn(handle) {
   const keyDetail = createKeyDetail(publicKey, dockDID);
   const transaction = handle.did.new(dockDID, keyDetail);
 
-  const {status} = await handle.sendTransaction(transaction);
+  const { status } = await handle.sendTransaction(transaction);
   const blockHash = status.asFinalized;
   return (await getBlockDetails(handle, blockHash)).author;
 }
 
 describe('Fee payment', () => {
-
   // Assumes nodes Alice and Bob are running
 
   const queryHandle = new DockAPI();
@@ -33,7 +32,7 @@ describe('Fee payment', () => {
   beforeAll(async (done) => {
     await cryptoWaitReady();
 
-    const aliceKeyring = new Keyring({type: 'sr25519'});
+    const aliceKeyring = new Keyring({ type: 'sr25519' });
     await aliceHandle.init({
       address: 'ws://localhost:9944',
     });
@@ -57,7 +56,7 @@ describe('Fee payment', () => {
     const blockAuthor = await sendDIDWriteTxn(aliceHandle);
 
     if (blockAuthor != Alice && blockAuthor != Bob) {
-      fail(`Block author must be Alice or Bob but was ${blockAuthor}`);
+      done.fail(`Block author must be Alice or Bob but was ${blockAuthor}`);
     }
     if (blockAuthor == Alice) {
       console.log('Block author is Alice');
@@ -70,17 +69,17 @@ describe('Fee payment', () => {
 
     if (blockAuthor == Alice) {
       if (aliceBalNew != aliceBalOld) {
-        fail('Block author was Alice still its balance changed');
+        done.fail('Block author was Alice still its balance changed');
       }
       if (bobBalNew != bobBalOld) {
-        fail('Block author was Alice but Bob\'s balance changed');
+        done.fail('Block author was Alice but Bob\'s balance changed');
       }
     } else {
       if (aliceBalNew >= aliceBalOld) {
-        fail('Block author was Bob still Alice\'s balance has not decreased.');
+        done.fail('Block author was Bob still Alice\'s balance has not decreased.');
       }
       if (bobBalNew <= bobBalOld) {
-        fail('Block author was Bob but Bob\'s balance has not increased');
+        done.fail('Block author was Bob but Bob\'s balance has not increased');
       }
     }
 

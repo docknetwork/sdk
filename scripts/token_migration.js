@@ -1,8 +1,8 @@
 import { BTreeMap } from '@polkadot/types';
 
-import { FullNodeEndpoint, TestAccountURI } from '../test-constants';
+import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 
-import { DockAPI } from '../../src/api';
+import { DockAPI } from '../src/api';
 
 const dock = new DockAPI();
 

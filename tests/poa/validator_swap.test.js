@@ -1,17 +1,16 @@
-import {DockAPI} from '../../src/api';
-import {cryptoWaitReady} from '@polkadot/util-crypto/index';
-import {Keyring} from '@polkadot/api/index';
-import {FullNodeEndpoint, TestKeyringOpts} from '../test-constants';
+import { cryptoWaitReady } from '@polkadot/util-crypto/index';
+import { Keyring } from '@polkadot/api/index';
+import { encodeAddress } from '@polkadot/keyring/index';
+import { DockAPI } from '../../src/api';
+import { FullNodeEndpoint, TestKeyringOpts } from '../test-constants';
 import {
   genSessionKeyForHandle, getChainData, getSlotNoFromHeader,
   setSessionKeyThroughRootWithHandle,
-  swapValidatorWithHandle
+  swapValidatorWithHandle,
 } from './helpers';
 
-import {encodeAddress} from '@polkadot/keyring/index';
 
 describe('Validator swap', () => {
-
   // Assumes nodes Alice, Bob and Charlie are running
 
   const queryHandle = new DockAPI();
@@ -26,13 +25,13 @@ describe('Validator swap', () => {
 
   beforeAll(async (done) => {
     await cryptoWaitReady();
-    const aliceKeyring = new Keyring({type: 'sr25519'});
+    const aliceKeyring = new Keyring({ type: 'sr25519' });
     await aliceHandle.init({
       address: 'ws://localhost:9944',
     });
     aliceHandle.setAccount(aliceKeyring.addFromUri('//Alice'));
 
-    const charlieKeyring = new Keyring({type: 'sr25519'});
+    const charlieKeyring = new Keyring({ type: 'sr25519' });
     await charlieHandle.init({
       address: 'ws://localhost:9966',
     });
@@ -58,7 +57,7 @@ describe('Validator swap', () => {
       } else {
         if (encodeAddress(header.author) === Bob) {
           unsubscribe();
-          fail('Test failed as block author was Bob');
+          done.fail('Test failed as block author was Bob');
         }
         const currentEpoch = (await getChainData(queryHandle)).epoch;
         expect(currentEpoch).toBeGreaterThan(startingEpoch);

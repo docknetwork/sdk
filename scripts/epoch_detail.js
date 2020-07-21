@@ -1,6 +1,6 @@
 import { encodeAddress } from '@polkadot/util-crypto';
 
-import { DockAPI } from '../../src/api';
+import { DockAPI } from '../src/api';
 
 const dock = new DockAPI();
 

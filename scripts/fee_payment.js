@@ -1,13 +1,13 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 
-import { FullNodeEndpoint, TestAccountURI } from '../test-constants';
+import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 
-import { DockAPI } from '../../src/api';
+import { DockAPI } from '../src/api';
 
 import {
   createNewDockDID, createKeyDetail,
-} from '../../src/utils/did';
-import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
+} from '../src/utils/did';
+import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 
 
 const dock = new DockAPI();

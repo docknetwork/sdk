@@ -79,12 +79,12 @@ describe('Blob Module', () => {
     expect(chainBlob[1].toString(16)).toEqual(blobHex);
   }, 30000);
 
-  test('Can create and read a Uint8Array Blob.', async () => {
-    const blobUint = new Uint8Array([1, 2, 3]);
+  test('Can create and read a Vector Blob.', async () => {
+    const blobVect = [1, 2, 3];
     const result = await dock.blob.new(
       {
         id: blobId,
-        blob: blobUint,
+        blob: blobVect,
         author: getHexIdentifierFromDID(dockDID),
       },
       pair,
@@ -94,7 +94,7 @@ describe('Blob Module', () => {
 
     const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
-    expect(Array.from(chainBlob[1])).toEqual(blobUint);
+    expect(Array.from(chainBlob[1])).toEqual(blobVect);
   }, 30000);
 
 

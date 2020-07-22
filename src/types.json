@@ -72,6 +72,23 @@
     "blob": "Vec<u8>",
     "author": "Did"
   },
+  "EpochNo": "u32",
+  "EpochLen": "u32",
+  "SlotNo": "u64",
+  "EpochDetail": {
+    "validator_count": "u8",
+    "starting_slot": "SlotNo",
+    "expected_ending_slot": "SlotNo",
+    "ending_slot": "Option<SlotNo>",
+    "total_emission": "Option<u128>",
+    "emission_for_treasury": "Option<u128>",
+    "emission_for_validators": "Option<u128>"
+  },
+  "ValidatorStatsPerEpoch": {
+    "block_count": "EpochLen",
+    "locked_reward": "Option<u128>",
+    "unlocked_reward": "Option<u128>"
+  },
   "StateChange": {
     "_enum": {
       "KeyUpdate": "KeyUpdate",

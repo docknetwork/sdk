@@ -170,7 +170,7 @@ export default class Schema {
     const chainBlob = await dockApi.blob.get(hexId);
     const chainValue = chainBlob[1];
 
-    if (typeof chainValue === 'object' && !Array.isArray(chainValue) && !(chainValue instanceof Uint8Array)) {
+    if (typeof chainValue === 'object' && !(chainValue instanceof Uint8Array)) {
       const schema = {
         ...chainValue,
         id,

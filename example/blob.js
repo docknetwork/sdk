@@ -76,7 +76,7 @@ async function main() {
   console.log('Resulting blob string from chain:', blobStrFromChain);
 
   // Write blob as array
-  const blobValueArray = [1, 2, 3];
+  const blobValueArray = new Uint8Array([1, 2, 3]);
   const chainBlobArray = await writeAndReadBlob(dock, blobValueArray, dockDID, pair);
   const blobArrayFromChain = chainBlobArray[1];
   console.log('Resulting blob array from chain:', blobArrayFromChain);

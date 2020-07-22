@@ -79,7 +79,7 @@ class BlobModule {
       throw new Error('Blob must have a value!');
     }
 
-    if (typeof value === 'object' && !Array.isArray(value) && !(value instanceof Uint8Array)) {
+    if (typeof value === 'object' && !(value instanceof Uint8Array)) {
       value = stringToHex(JSON.stringify(value));
     } else if (typeof value === 'string' && value.substr(0, 2) !== '0x') {
       value = stringToHex(value);

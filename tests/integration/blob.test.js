@@ -80,7 +80,7 @@ describe('Blob Module', () => {
   }, 30000);
 
   test('Can create and read a Vector Blob.', async () => {
-    const blobVect = [1, 2, 3];
+    const blobVect = new Uint8Array([1, 2, 3]);
     const result = await dock.blob.new(
       {
         id: blobId,
@@ -94,7 +94,7 @@ describe('Blob Module', () => {
 
     const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
-    expect(Array.from(chainBlob[1])).toEqual(blobVect);
+    expect(chainBlob[1]).toEqual(blobVect);
   }, 30000);
 
 

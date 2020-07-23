@@ -94,6 +94,8 @@ describe('Blob Module', () => {
 
     const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
+    console.log('blobVect', blobVect)
+    console.log('chainBlob[1]', chainBlob[1]);
     expect(chainBlob[1]).toEqual(blobVect);
   }, 30000);
 

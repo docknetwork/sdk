@@ -1,5 +1,5 @@
 import { randomAsHex } from '@polkadot/util-crypto';
-import { u8aToString, stringToHex } from '@polkadot/util';
+import { u8aToString } from '@polkadot/util';
 
 import { DockAPI } from '../src/api';
 import { DockBlobIdByteSize } from '../src/modules/blob';
@@ -63,14 +63,20 @@ async function main() {
   // Generate a DID to be used as author
   const dockDID = await createAuthorDID(dock, pair);
 
+  // Write blob as json
+  const blobValueJSON = { jsonStorage: true };
+  const chainBlobJSON = await writeAndReadBlob(dock, blobValueJSON, dockDID, pair);
+  const blobJSONFromChain = chainBlobJSON[1];
+  console.log('Resulting blob JSON from chain:', blobJSONFromChain);
+
   // Write blob as string
-  const blobValue = stringToHex('hello blob storage!');
+  const blobValue = 'hello blob storage!';
   const chainBlob = await writeAndReadBlob(dock, blobValue, dockDID, pair);
   const blobStrFromChain = u8aToString(chainBlob[1]);
   console.log('Resulting blob string from chain:', blobStrFromChain);
 
   // Write blob as array
-  const blobValueArray = [1, 2, 3];
+  const blobValueArray = new Uint8Array([1, 2, 3]);
   const chainBlobArray = await writeAndReadBlob(dock, blobValueArray, dockDID, pair);
   const blobArrayFromChain = chainBlobArray[1];
   console.log('Resulting blob array from chain:', blobArrayFromChain);

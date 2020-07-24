@@ -1,4 +1,6 @@
 import { encodeAddress, randomAsHex } from '@polkadot/util-crypto';
+import { u8aToString, stringToHex, bufferToU8a } from '@polkadot/util';
+
 import { getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from '../utils/codec';
 import NoBlobError from '../utils/errors/no-blob-error';
@@ -72,15 +74,33 @@ class BlobModule {
    * @return {object} The extrinsic to sign and send.
    */
   createNewTx(blob, keyPair = undefined, signature = undefined) {
+    let value = blob.blob;
+    if (!value) {
+      throw new Error('Blob must have a value!');
+    }
+
+    if (value instanceof Uint8Array) {
+      value = [...value];
+    } else if (typeof value === 'object') {
+      value = stringToHex(JSON.stringify(value));
+    } else if (typeof value === 'string' && !isHexWithGivenByteSize(value)) {
+      value = stringToHex(value);
+    }
+
+    const blobObj = {
+      ...blob,
+      blob: value,
+    };
+
     if (!signature) {
       if (!keyPair) {
         throw Error('You need to provide either a keypair or a signature to register a new Blob.');
       }
-      const serializedBlob = this.getSerializedBlob(blob);
+      const serializedBlob = this.getSerializedBlob(blobObj);
       // eslint-disable-next-line no-param-reassign
       signature = getSignatureFromKeyringPair(keyPair, serializedBlob);
     }
-    return this.module.new(blob, signature.toJSON());
+    return this.module.new(blobObj, signature.toJSON());
   }
 
   /**
@@ -108,7 +128,19 @@ class BlobModule {
 
     const respTuple = resp.unwrap();
     if (respTuple.length === 2) {
-      return [respTuple[0], respTuple[1]];
+      let value = bufferToU8a(respTuple[1]);
+
+      // Try to convert the value to a JSON object
+      try {
+        const strValue = u8aToString(value);
+        if (strValue.substr(0, 1) === '{') {
+          value = JSON.parse(strValue);
+        }
+      } catch (e) {
+        // no-op, just use default Uint8 array value
+      }
+
+      return [respTuple[0], value];
     }
     throw new Error(`Needed 2 items in response but got${respTuple.length}`);
   }

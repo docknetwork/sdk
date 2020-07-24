@@ -83,7 +83,7 @@ class BlobModule {
       value = [...value];
     } else if (typeof value === 'object') {
       value = stringToHex(JSON.stringify(value));
-    } else if (typeof value === 'string' && value.substr(0, 2) !== '0x') {
+    } else if (typeof value === 'string' && !isHexWithGivenByteSize(value)) {
       value = stringToHex(value);
     }
 

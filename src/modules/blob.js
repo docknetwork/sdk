@@ -1,5 +1,5 @@
 import { encodeAddress, randomAsHex } from '@polkadot/util-crypto';
-import { u8aToString, stringToHex } from '@polkadot/util';
+import { u8aToString, stringToHex, bufferToU8a } from '@polkadot/util';
 
 import { getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from '../utils/codec';
@@ -128,7 +128,7 @@ class BlobModule {
 
     const respTuple = resp.unwrap();
     if (respTuple.length === 2) {
-      let value = respTuple[1];
+      let value = bufferToU8a(respTuple[1]);
 
       // Try to convert the value to a JSON object
       try {

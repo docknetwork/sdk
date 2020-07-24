@@ -61,7 +61,45 @@ describe('Blob Module', () => {
     blobId = randomAsHex(DockBlobIdByteSize);
   }, 30000);
 
-  test('Can create and read a Hex Blob.', async () => {
+  test('Can create and read a JSON Blob.', async () => {
+    const blobJSON = {
+      jsonBlob: true
+    };
+    const result = await dock.blob.new(
+      {
+        id: blobId,
+        blob: blobJSON,
+        author: getHexIdentifierFromDID(dockDID),
+      },
+      pair,
+    );
+
+    expect(!!result).toBe(true);
+
+    const chainBlob = await dock.blob.get(blobId);
+    expect(!!chainBlob).toBe(true);
+    expect(chainBlob[1]).toEqual(blobJSON);
+  }, 30000);
+
+  test('Can create and read a string Blob.', async () => {
+    const blobHex = 'my string'
+    const result = await dock.blob.new(
+      {
+        id: blobId,
+        blob: blobHex,
+        author: getHexIdentifierFromDID(dockDID),
+      },
+      pair,
+    );
+
+    expect(!!result).toBe(true);
+
+    const chainBlob = await dock.blob.get(blobId);
+    expect(!!chainBlob).toBe(true);
+    expect(u8aToString(chainBlob[1])).toEqual(blobHex);
+  }, 30000);
+
+  test('Can create and read a hex Blob.', async () => {
     const blobHex = randomAsHex(32);
     const result = await dock.blob.new(
       {
@@ -76,7 +114,7 @@ describe('Blob Module', () => {
 
     const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
-    expect(chainBlob[1].toString(16)).toEqual(blobHex);
+    expect(u8aToHex(chainBlob[1])).toEqual(blobHex);
   }, 30000);
 
   test('Can create and read a Vector Blob.', async () => {
@@ -94,11 +132,8 @@ describe('Blob Module', () => {
 
     const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
-    console.log('blobVect', blobVect)
-    console.log('chainBlob[1]', chainBlob[1]);
     expect(chainBlob[1]).toEqual(blobVect);
   }, 30000);
-
 
   test('Fails to write blob with size greater than allowed.', async () => {
     const blobHex = randomAsHex(BLOB_MAX_BYTE_SIZE + 1); // Max size is 1024
@@ -130,15 +165,10 @@ describe('Blob Module', () => {
 
     expect(!!resultFirst).toBe(true);
 
-    const chainBlob = await dock.blob.get(blobId);
-    expect(!!chainBlob).toBe(true);
-    expect(chainBlob[1].toString(16)).toEqual(blobHexFirst);
-
-    const blobHexSecond = randomAsHex(123);
     const resultSecond = await dock.blob.new(
       {
         id: blobId,
-        blob: blobHexSecond,
+        blob: randomAsHex(123),
         author: getHexIdentifierFromDID(dockDID),
       },
       pair,
@@ -147,7 +177,6 @@ describe('Blob Module', () => {
     expect(errorInResult(resultFirst)).toBe(false);
     expect(errorInResult(resultSecond)).toBe(true);
   }, 60000);
-
 
   test('Should throw error when cannot read blob with given id from chain.', async () => {
     const nonExistentBlobId = randomAsHex(DockBlobIdByteSize);

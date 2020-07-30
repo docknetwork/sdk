@@ -4,10 +4,21 @@ import { DockAPI } from '../src/api';
 
 const dock = new DockAPI();
 
-const accounts = {
+/* const accounts = {
   '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY': 'Alice',
   '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty': 'Bob',
   '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y': 'Charlie'
+}; */
+
+const accounts = {
+  '5DjPH6m1x4QLc4YaaxtVX752nQWZzBHZzwNhn5TztyMDgz8t': 'FT1',
+  '5HR2ytqigzQdbthhWA2g5K9JQayczEPwhAfSqAwSyb8Etmqh': 'FT2',
+  '5FNdWJ6RjLCJxnew1R1q4GZPjfxmdd3qCuLVPujmjozMGHzb': 'FT3',
+  '5DXQL7gQWq2Y2rJqZopHiUc9knUa4MCoysTqDVRjBWBiT6gP': 'FT4',
+  '5GHA4YoLXqt5MdE3Sg1B9d563tts4jqg7yKhCcv1qWfF5QHB': 'FT5',
+  '5DDNFu3jhBvvWNbtK6BvrZiMUvUn6WZUyPPQTHyKD5JDWXHp': 'FT6',
+  '5Ccaz1mozrwaQiqXmvwykC2FPUDDtQ51tEN2aY5KpDnuNmLN': 'FT7',
+  '5FCFo59AFtZU15yFDTpJyJ74thxjySvFbAJqgut29fh6VXUk': 'FT8',
 };
 
 async function printFreeBalance(name, account) {
@@ -30,10 +41,7 @@ async function getBlockDetails(dock, blockHash) {
   return [dock.api.createType('u64', slotNo), header.number, header.author];
 }
 
-async function getEpochMetrics(dock) {
-  const emissionSupply = await dock.api.query.poAModule.emissionSupply();
-  console.log(`Emission supply ${emissionSupply}`);
-  console.log('-----------------------------------------------------------------------');
+async function getEpochStats(dock) {
   console.log('Epochs');
   console.log('');
   const epochs = await dock.api.query.poAModule.epochs.entries();
@@ -58,7 +66,9 @@ async function getEpochMetrics(dock) {
   console.log('------------------------------------------------------------------------------------------------------------');
   console.log('');
   console.log('');
+}
 
+async function getValidatorStats(dock) {
   console.log('Validator stats');
   console.log('');
   const epochBlockCounts = await dock.api.query.poAModule.validatorStats.entries();
@@ -78,29 +88,34 @@ async function getEpochMetrics(dock) {
     }
     console.log('');
   });
-
+  console.log('------------------------------------------------------------------------------------------------------------');
   console.log('');
   console.log('');
+}
 
-  const alice = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
-  const bob = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty';
-  const charlie = '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y';
+async function getStats(dock) {
+  const emissionSupply = await dock.api.query.poAModule.emissionSupply();
+  console.log(`Emission supply ${emissionSupply}`);
+  console.log('-----------------------------------------------------------------------');
+  
+  // await getEpochStats(dock);
+  
+  // await getValidatorStats(dock);
 
-
-  await printFreeBalance('Alice', alice);
-  await printReservedBalance('Alice', alice);
-  await printFreeBalance('Bob', bob);
-  await printReservedBalance('Bob', bob);
-  await printFreeBalance('Charlie', charlie);
-  await printReservedBalance('Charlie', charlie);
+  for (const k in accounts) {
+    await printFreeBalance(accounts[k], k);
+    await printReservedBalance(accounts[k], k);
+  }
 }
 
 async function main() {
   await dock.init({
-    address: 'ws://localhost:9944',
+    // address: 'ws://localhost:9944',
+    // address: 'ws://3.128.224.235:9944',
+    address: 'wss://testnet-1.dock.io',
   });
   // await getBlockDetails(dock, '0x2747e70f24d4aff7a462f2f34b7cf1b236d0167a1778c8857388f493de48928b');
-  await getEpochMetrics(dock);
+  await getStats(dock);
 }
 
 main()

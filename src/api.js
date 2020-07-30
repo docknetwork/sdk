@@ -20,6 +20,7 @@ import {
   SignatureSr25519,
   SignatureEd25519,
 } from './signatures';
+import PoAModule from './modules/poa';
 
 /**
  * @typedef {object} Options The Options to use in the function createUser.
@@ -74,6 +75,7 @@ class DockAPI {
     this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));
     this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
     this.revocationModule = new RevocationModule(this.api, this.signAndSend.bind(this));
+    this.poaModule = new PoAModule(this.api);
 
     return this.api;
   }
@@ -196,6 +198,17 @@ class DockAPI {
     }
     return this.revocationModule;
   }
+
+  /**
+   * Get the PoA module
+   * @return {PoAModule} The module to use
+   */
+  get poa() {
+    if (!this.poa) {
+      throw new Error('Unable to get PoA module, SDK is not initialised');
+    }
+    return this.poaModule;
+  }
 }
 
 export default new DockAPI();
@@ -204,6 +217,7 @@ export {
   DockAPI,
   DIDModule,
   RevocationModule,
+  PoAModule,
   PublicKey,
   PublicKeySr25519,
   PublicKeyEd25519,

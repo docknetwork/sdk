@@ -69,7 +69,7 @@
     "credentials-context": "^1.0.0",
     "did-resolver": "^1.1.0",
     "ecdsa-secp256k1-signature-2019": "^1.0.0",
-    "elliptic": "^6.5.2",
+    "elliptic": "^6.5.3",
     "ethr-did-resolver": "^2.2.0",
     "js-sha256": "^0.9.0",
     "json-canonicalize": "^1.0.3",

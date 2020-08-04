@@ -99,6 +99,9 @@ async function main() {
   const account = dock.keyring.addFromUri(TestAccountURI);
   dock.setAccount(account);
 
+  const d = await dock.api.rpc.author;
+  console.log(d);
+  process.exit(0);
   // console.log('dock.api', dock.api);
 
   // await disableEmissions(dock);

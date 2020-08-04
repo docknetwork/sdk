@@ -21,6 +21,10 @@ const FT7 = '5Ccaz1mozrwaQiqXmvwykC2FPUDDtQ51tEN2aY5KpDnuNmLN';
 const FT7SessKey = '0xd4d561cc6813845f13414013d00104f817dd8479ca16727270a74a3e61636974b77c21760300dfd81df586c344bae8e86b28da19b3dd3575f09f2cda4dac102a';
 const FT8 = '5FCFo59AFtZU15yFDTpJyJ74thxjySvFbAJqgut29fh6VXUk';
 const FT8SessKey = '0x1685c05750795bcb2bba6d2f969fafff7ad4193472127ba51f0ca2ffe54d0c3a73ded9ca5dc19a3e2c2079da3f9b1fa931fb170234e0c118fd99297e255cfeb0';
+const FT9 = '5D2ge4WCCoPw92GZsRntejAGZmXjasktR4xf2bdKNiGTAB2j';
+const FT9SessKey = '0xbcb21cf8de9c2087f3101c826a15533e06b110023e9324631ae700c0ec75885433d5c7eca2669d57491416c7a9be4cbe0b0b78e79304eef359ba33757066913e';
+const FT10 = '5DFN9pcRFSkyEtX67uAUrpmiBWLtrRwH6bgQX9Kqm7yVDwL4';
+const FT10SessKey = '0x76b3a5fb37113aba71fb3c2e66faa32d8cda132720c42500b4744564393d1c0f207e4d20fa034b5eee32c383dd39b17677fc08e602b96ca9f1110db925eaf051';
 
 async function printBalance(dock, name, account) {
   const { data: balance } = await dock.api.query.system.account(account);
@@ -120,6 +124,21 @@ async function main() {
   // console.log(r);
 
   // const r = await addValidator(dock, sudoSecret, FT8, false);
+  // console.log(r);
+
+  // const r = await setMaxActiveValidators(dock, sudoSecret, 10);
+  // console.log(r);
+
+  // const r = await setSessionKeyByProxy(dock, sudoSecret, FT9, FT9SessKey);
+  // console.log(r);
+
+  // const r = await setSessionKeyByProxy(dock, sudoSecret, FT10, FT10SessKey);
+  // console.log(r);
+
+  // const r = await addValidator(dock, sudoSecret, FT9, false);
+  // console.log(r);
+
+  // const r = await addValidator(dock, sudoSecret, FT10, false);
   // console.log(r);
 
   await printBalance(dock, 'Sudo', sudo);

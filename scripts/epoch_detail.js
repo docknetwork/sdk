@@ -19,7 +19,14 @@ const accounts = {
   '5DDNFu3jhBvvWNbtK6BvrZiMUvUn6WZUyPPQTHyKD5JDWXHp': 'FT6',
   '5Ccaz1mozrwaQiqXmvwykC2FPUDDtQ51tEN2aY5KpDnuNmLN': 'FT7',
   '5FCFo59AFtZU15yFDTpJyJ74thxjySvFbAJqgut29fh6VXUk': 'FT8',
+  '5D2ge4WCCoPw92GZsRntejAGZmXjasktR4xf2bdKNiGTAB2j': 'FT9',
+  '5DFN9pcRFSkyEtX67uAUrpmiBWLtrRwH6bgQX9Kqm7yVDwL4': 'FT10',
 };
+
+// Take entries of map with numeric keys and sort them in ascending order of key
+function sortEntriesOfMapWithNumKey(entries) {
+  entries.sort((element1, element2) => element1[0]._args[0].toNumber() - element2[0]._args[0].toNumber());
+}
 
 async function printFreeBalance(name, account) {
   const { data: balance } = await dock.api.query.system.account(account);
@@ -45,10 +52,11 @@ async function getEpochStats(dock) {
   console.log('Epochs');
   console.log('');
   const epochs = await dock.api.query.poAModule.epochs.entries();
+  sortEntriesOfMapWithNumKey(epochs);
   // console.log(epochs);
   epochs.forEach(element => {
     // console.log(element[1]);
-    // console.log(element[0]._meta.type);
+    console.log(element[0]._args[0].toNumber());
     // const epochNo = dock.api.createType('u32', element[0]);
     const epochNo = element[0].toHuman();
     console.log(`epoch no ${epochNo}`);
@@ -72,6 +80,7 @@ async function getValidatorStats(dock) {
   console.log('Validator stats');
   console.log('');
   const epochBlockCounts = await dock.api.query.poAModule.validatorStats.entries();
+  sortEntriesOfMapWithNumKey(epochBlockCounts);
   // console.log(epochBlockCounts);
   epochBlockCounts.forEach(element => {
     // console.log(Object.getOwnPropertyNames(element[0]));
@@ -97,9 +106,9 @@ async function getStats(dock) {
   const emissionSupply = await dock.api.query.poAModule.emissionSupply();
   console.log(`Emission supply ${emissionSupply}`);
   console.log('-----------------------------------------------------------------------');
-  
-  // await getEpochStats(dock);
-  
+
+  await getEpochStats(dock);
+
   // await getValidatorStats(dock);
 
   for (const k in accounts) {

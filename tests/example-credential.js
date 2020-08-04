@@ -2,6 +2,10 @@ export default {
   '@context': [
     'https://www.w3.org/2018/credentials/v1',
     'https://www.w3.org/2018/credentials/examples/v1',
+    {
+      emailAddress: 'https://schema.org/email',
+      alumniOf: 'https://schema.org/alumniOf',
+    }
   ],
   id: 'uuid:0x9b561796d3450eb2673fed26dd9c07192390177ad93e0835bc7a5fbb705d52bc',
   type: [
@@ -15,7 +19,7 @@ export default {
   },
   credentialSubject: {
     id: 'did:dock:5GL3xbkr3vfs4qJ94YUHwpVVsPSSAyvJcafHz1wNb5zrSPGi',
-    emailAddress: 'john.smith@example.com',
+    emailAddress: 'johnsmith@example.com',
     alumniOf: 'Example University',
   },
   credentialStatus: {

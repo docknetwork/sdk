@@ -33,8 +33,7 @@ const blobStruct = {
   blob: blobHexOrArray,  // Contents of your blob as a hex string or byte array
   author: '0x...',       // hex part of a dock DID
 }
-const txBlob = await dock.blob.writeToChain( blobStruct, keyPair);
-const result = await dock.sendTransaction(txBlob, false);
+const result = await dock.blob.writeToChain( blobStruct, keyPair);
 ```
 If everything worked properly `result` will indicate a successful transaction.
 We'll see how to retrieve the blob next.
@@ -154,8 +153,7 @@ Writing a Schema to the Dock chain is similar to writing any other Blob. Once yo
 the steps above you can use the `BlobModule` methods to interact with the chain:
 ```javascript
 >  const formattedBlob = myNewSchema.toBlob(dockDID);
->  const blobTx = dock.blob.writeToChain(formattedBlob, keyPair);
->  await dock.sendTransaction(blobTx, false);
+>  await dock.blob.writeToChain(formattedBlob, keyPair);
 ```
 
 ### Reading a Schema from the Dock chain

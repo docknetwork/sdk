@@ -31,6 +31,20 @@ let invalidCredential;
 let invalidFormatBlobId;
 let dockResolver;
 
+const ctx1 = {
+  '@context': {
+    emailAddress: 'https://schema.org/email',
+    alumniOf: 'https://schema.org/alumniOf',
+  },
+};
+
+const ctx2 = {
+  '@context': {
+    emailAddress: 'https://schema.org/email',
+    notAlumniOf: 'https://schema.org/alumniOf',
+  },
+};
+
 describe('Schema Blob Module Integration', () => {
   const dockApi = new DockAPI();
 
@@ -48,24 +62,24 @@ describe('Schema Blob Module Integration', () => {
     publicKey = getPublicKeyFromKeyringPair(pair);
     dockDID = createNewDockDID();
     keyDetail = createKeyDetail(publicKey, dockDID);
-    await dockApi.sendTransaction(dockApi.did.new(dockDID, keyDetail));
+    await dockApi.did.new(dockDID, keyDetail);
     blobId = randomAsHex(DockBlobIdByteSize);
 
     // Write a blob with invalid JSON-schema format
     invalidFormatBlobId = randomAsHex(DockBlobIdByteSize);
-    await dockApi.sendTransaction(dockApi.blob.new({
+    await dockApi.blob.new({
       id: invalidFormatBlobId,
       blob: stringToHex('hello world'),
       author: getHexIdentifierFromDID(dockDID),
-    }, pair), false);
+    }, pair);
 
     // Write schema blob
     const blobStr = JSON.stringify(exampleSchema);
-    await dockApi.sendTransaction(dockApi.blob.new({
+    await dockApi.blob.new({
       id: blobId,
       blob: stringToHex(blobStr),
       author: getHexIdentifierFromDID(dockDID),
-    }, pair), false);
+    }, pair);
 
     // Properly format a keyDoc to use for signing
     keyDoc = getKeyDoc(
@@ -80,11 +94,6 @@ describe('Schema Blob Module Integration', () => {
     // Create a valid credential with a schema
     validCredential = new VerifiableCredential('https://example.com/credentials/123');
     validCredential.addContext('https://www.w3.org/2018/credentials/examples/v1');
-    const ctx1 = {
-      '@context': {
-        emailAddress: 'https://schema.org/email',
-      },
-    };
     validCredential.addContext(ctx1);
     validCredential.addType('AlumniCredential');
     validCredential.addSubject({
@@ -98,12 +107,6 @@ describe('Schema Blob Module Integration', () => {
     // Create a valid credential that doesn't follow the schema
     invalidCredential = new VerifiableCredential('https://example.com/credentials/1234');
     invalidCredential.addContext('https://www.w3.org/2018/credentials/examples/v1');
-    const ctx2 = {
-      '@context': {
-        emailAddress: 'https://schema.org/email',
-        notAlumniOf: 'https://schema.org/alumniOf',
-      },
-    };
     invalidCredential.addContext(ctx2);
     invalidCredential.addType('AlumniCredential');
     invalidCredential.addSubject({
@@ -169,29 +172,32 @@ describe('Schema Blob Module Integration', () => {
 
   test('The verify method should pass if the subject is compatible with the schema in credentialSchema.', async () => {
     await expect(
-      validCredential.verify(
-        dockResolver, true, false, undefined, { dock: dockApi },
-      ),
+      validCredential.verify({
+        resolver: dockResolver,
+        compactProof: true,
+        forceRevocationCheck: false,
+        schemaApi: { dock: dockApi },
+      }),
     ).resolves.toBeDefined();
   }, 30000);
 
   test('Utility method verifyCredential should check if schema is incompatible with the credentialSubject.', async () => {
     await expect(
-        verifyCredential(invalidCredential.toJSON(), {
-          resolver: null,
-          compactProof: true,
-          forceRevocationCheck: false,
-          schemaApi: { notDock: dockApi }
-        })
+      verifyCredential(invalidCredential.toJSON(), {
+        resolver: null,
+        compactProof: true,
+        forceRevocationCheck: false,
+        schemaApi: { notDock: dockApi }
+      })
     ).rejects.toThrow('Only Dock schemas are supported as of now.');
 
     await expect(
-        verifyCredential(invalidCredential.toJSON(), {
-          resolver: null,
-          compactProof: true,
-          forceRevocationCheck: false,
-          schemaApi: { dock: dockApi }
-        })
+      verifyCredential(invalidCredential.toJSON(), {
+        resolver: null,
+        compactProof: true,
+        forceRevocationCheck: false,
+        schemaApi: { dock: dockApi }
+       })
     ).rejects.toThrow(/Schema validation failed/);
   }, 30000);
 
@@ -206,12 +212,12 @@ describe('Schema Blob Module Integration', () => {
     ).rejects.toThrow(/Schema validation failed/);
   }, 30000);
 
-
   test('Utility method verifyPresentation should check if schema is incompatible with the credentialSubject.', async () => {
     let vpInvalid = new VerifiablePresentation('https://example.com/credentials/12345');
     vpInvalid.addCredential(
       invalidCredential,
     );
+    vpInvalid.addContext(ctx2);
     vpInvalid = await vpInvalid.sign(
       keyDoc,
       'some_challenge',
@@ -246,6 +252,7 @@ describe('Schema Blob Module Integration', () => {
     vpValid.addCredential(
       validCredential,
     );
+    vpValid.addContext(ctx1);
     vpValid = await vpValid.sign(
       keyDoc,
       'some_challenge',
@@ -269,6 +276,7 @@ describe('Schema Blob Module Integration', () => {
     vpInvalid.addCredential(
       invalidCredential,
     );
+    vpInvalid.addContext(ctx2);
     vpInvalid = await vpInvalid.sign(
       keyDoc,
       'some_challenge',
@@ -303,6 +311,7 @@ describe('Schema Blob Module Integration', () => {
     vpValid.addCredential(
       validCredential,
     );
+    vpValid.addContext(ctx1);
     vpValid = await vpValid.sign(
       keyDoc,
       'some_challenge',

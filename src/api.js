@@ -30,12 +30,13 @@ import {
 /** Helper class to interact with the Dock chain */
 class DockAPI {
   /**
-   * Skeleton constructor, does nothing yet
+   * Creates a new instance of the DockAPI object, call init to initialize
+   * @param {function} [customSignTx] - Optional custom transaction sign method,
+   * a function that expects `extrinsic` as first argument and a dock api instance as second argument
    * @constructor
-   * @param {string} address - WebSocket RPC endpoint
    */
-  constructor(address = null) {
-    this.address = address;
+  constructor(customSignTx) {
+    this.customSignTx = customSignTx;
   }
 
   /**
@@ -58,8 +59,6 @@ class DockAPI {
     const extraTypes = {
       Address: 'AccountId',
       LookupSource: 'AccountId',
-      // As there are 2 keys only
-      Keys: 'SessionKeys2',
     };
 
     this.api = await ApiPromise.create({
@@ -70,17 +69,20 @@ class DockAPI {
       },
     });
 
-    this.blobModule = new BlobModule(this.api);
-    this.didModule = new DIDModule(this.api);
-    this.revocationModule = new RevocationModule(this.api);
+    await this.initKeyring(keyring);
 
-    await cryptoWaitReady();
-
-    if (!this.keyring || keyring) {
-      this.keyring = new Keyring(keyring || { type: 'sr25519' });
-    }
+    this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));
+    this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
+    this.revocationModule = new RevocationModule(this.api, this.signAndSend.bind(this));
 
     return this.api;
+  }
+
+  async initKeyring(keyring = null) {
+    if (!this.keyring || keyring) {
+      await cryptoWaitReady();
+      this.keyring = new Keyring(keyring || { type: 'sr25519' });
+    }
   }
 
   async disconnect() {
@@ -114,29 +116,37 @@ class DockAPI {
   }
 
   /**
-   * Helper function to send transaction
+   * Signs an extrinsic with either the set account or a custom sign method (see constructor)
    * @param {object} extrinsic - Extrinsic to send
-   * @param {Boolean} unsubscribe - Should we unsubscribe from the transaction after its finalized
    * @return {Promise}
    */
-  async sendTransaction(extrinsic, unsubscribe = true, waitForFinalize = true) {
-    return new Promise((resolve, reject) => {
-      const account = this.getAccount();
-      let unsubFunc = null;
+  async signExtrinsic(extrinsic) {
+    if (this.customSignTx) {
+      await this.customSignTx(extrinsic, this);
+    } else {
+      await extrinsic.signAsync(this.getAccount());
+    }
+  }
+
+  /**
+   * Helper function to send transaction
+   * @param {object} extrinsic - Extrinsic to send
+   * @return {Promise}
+   */
+  async signAndSend(extrinsic) {
+    await this.signExtrinsic(extrinsic);
+    const promise = new Promise((resolve, reject) => {
       try {
-        extrinsic
-          .signAndSend(account, ({ events = [], status }) => {
-            const isConfirmed = waitForFinalize ? status.isFinalized : status.isInBlock;
-            if (isConfirmed) {
-              if (unsubscribe && unsubFunc) {
-                unsubFunc();
-              }
-              resolve({
-                events,
-                status,
-              });
-            }
-          })
+        let unsubFunc = null;
+        return extrinsic.send(({ events = [], status }) => {
+          if (status.isFinalized) {
+            unsubFunc();
+            resolve({
+              events,
+              status,
+            });
+          }
+        })
           .catch((error) => {
             reject(error);
           })
@@ -146,7 +156,12 @@ class DockAPI {
       } catch (error) {
         reject(error);
       }
+
+      return this;
     });
+
+    const result = await promise;
+    return result;
   }
 
   /**

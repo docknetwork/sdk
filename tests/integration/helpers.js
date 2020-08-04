@@ -13,8 +13,7 @@ export async function registerNewDIDUsingPair(dockAPI, did, pair) {
 
   // The controller is same as the DID
   const keyDetail = createKeyDetail(publicKey, did);
-  const transaction = dockAPI.did.new(did, keyDetail);
-  return dockAPI.sendTransaction(transaction);
+  return dockAPI.did.new(did, keyDetail);
 }
 
 /**

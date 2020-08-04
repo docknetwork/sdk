@@ -8,6 +8,7 @@ import {
   RevRegType,
   signPresentation, verifyCredential,
   verifyPresentation,
+  expandJSONLD,
 } from '../../src/utils/vc';
 import { DockResolver } from '../../src/resolver';
 
@@ -33,7 +34,7 @@ function addRevRegIdToCred(cred, regId) {
 }
 
 describe('Credential revocation with issuer as the revocation authority', () => {
-  const dockAPI = new DockAPI(FullNodeEndpoint);
+  const dockAPI = new DockAPI();
   const resolver = new DockResolver(dockAPI);
 
   // Create a random registry id
@@ -52,6 +53,8 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
   let issuerKey;
   let credential;
+  let expanded;
+  let revId;
 
   beforeAll(async (done) => {
     await dockAPI.init({
@@ -76,8 +79,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     policy.addOwner(issuerDID);
 
     // Add a new revocation registry with above policy
-    const transaction = dockAPI.revocation.newRegistry(registryId, policy, false);
-    await dockAPI.sendTransaction(transaction);
+    await dockAPI.revocation.newRegistry(registryId, policy, false);
 
     // Set our owner DID and associated keypair to be used for generating proof
     didKeys.set(issuerDID, pair);
@@ -89,6 +91,9 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
     issuerKey = getKeyDoc(issuerDID, dockAPI.keyring.addFromUri(issuerSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
     credential = await issueCredential(issuerKey, unsignedCred);
+
+    expanded = await expandJSONLD(credential);
+    revId = getDockRevIdFromCredential(expanded);
 
     done();
   }, 60000);
@@ -109,9 +114,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     expect(result.verified).toBe(true);
 
     // Revoke the credential
-    const revId = getDockRevIdFromCredential(credential);
-    const t1 = await dockAPI.revocation.revokeCredential(didKeys, registryId, revId);
-    await dockAPI.sendTransaction(t1);
+    await dockAPI.revocation.revokeCredential(didKeys, registryId, revId);
 
     // The credential verification should fail as the credential has been revoked.
     const result1 = await verifyCredential(credential, {
@@ -127,9 +130,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
   test('Holder can create a presentation and verifier can verify it successfully when it is not revoked else the verification fails', async () => {
     // The previous test revokes credential so unrevoke it. Its fine if the previous test is not run as unrevoking does not
     // throw error if the credential is not revoked.
-    const revId = getDockRevIdFromCredential(credential);
-    const t2 = await dockAPI.revocation.unrevokeCredential(didKeys, registryId, revId);
-    await dockAPI.sendTransaction(t2);
+    await dockAPI.revocation.unrevokeCredential(didKeys, registryId, revId);
 
     const holderKey = getKeyDoc(holderDID, dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
 
@@ -161,8 +162,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     expect(result.verified).toBe(true);
 
     // Revoke credential
-    const t3 = await dockAPI.revocation.revokeCredential(didKeys, registryId, revId);
-    await dockAPI.sendTransaction(t3);
+    await dockAPI.revocation.revokeCredential(didKeys, registryId, revId);
 
     // As the credential is revoked, the presentation should verify successfully.
     const result1 = await verifyPresentation(signedPres, {

@@ -12,9 +12,10 @@ class RevocationModule {
    * @constructor
    * @param {object} api - PolkadotJS API Reference
    */
-  constructor(api) {
+  constructor(api, signAndSend) {
     this.api = api;
     this.module = api.tx.revoke;
+    this.signAndSend = signAndSend;
   }
 
   /**
@@ -22,9 +23,9 @@ class RevocationModule {
    * @param {string} id - is the unique id of the registry. The function will check whether `id` is already taken or not.
    * @param {Policy} policy - The registry policy
    * @param {Boolean} addOnly - true: credentials can be revoked, but not un-revoked, false: credentials can be revoked and un-revoked
-   * @return {object} The extrinsic to sign and send.
+   * @return {Promise<object>} The extrinsic to sign and send.
    */
-  newRegistry(id, policy, addOnly) {
+  createNewRegistryTx(id, policy, addOnly) {
     return this.module.newRegistry(id, {
       policy: policy.toJSON(),
       add_only: addOnly,
@@ -32,13 +33,24 @@ class RevocationModule {
   }
 
   /**
+   * Creating a revocation registry
+   * @param {string} id - is the unique id of the registry. The function will check whether `id` is already taken or not.
+   * @param {Policy} policy - The registry policy
+   * @param {Boolean} addOnly - true: credentials can be revoked, but not un-revoked, false: credentials can be revoked and un-revoked
+   * @return {Promise<object>} Promise to the pending transaction
+   */
+  async newRegistry(id, policy, addOnly) {
+    return this.signAndSend(this.createNewRegistryTx(id, policy, addOnly));
+  }
+
+  /**
    * Deleting revocation registry
    * @param {string} registryID - contains the registry to remove
    * @param {number} lastModified - contains the registry to remove
    * @param {DidKeys} didKeys - The did key set used for generating proof
-   * @return {object} The extrinsic to sign and send.
+   * @return {Promise<object>} The extrinsic to sign and send.
    */
-  removeRegistry(registryID, lastModified, didKeys) {
+  createRemoveRegistryTx(registryID, lastModified, didKeys) {
     const removal = {
       registry_id: registryID,
       last_modified: lastModified,
@@ -50,14 +62,25 @@ class RevocationModule {
   }
 
   /**
+   * Deleting revocation registry
+   * @param {string} registryID - contains the registry to remove
+   * @param {number} lastModified - contains the registry to remove
+   * @param {DidKeys} didKeys - The did key set used for generating proof
+   * @return {Promise<object>} Promise to the pending transaction
+   */
+  async removeRegistry(registryID, lastModified, didKeys) {
+    return await this.signAndSend(this.createRemoveRegistryTx(registryID, lastModified, didKeys));
+  }
+
+  /**
    * Revoke credentials
    * @param {string} registryID - contains the registry to remove
    * @param {Set} revokeIds - revoke id list
    * @param {number} lastModified - contains the registry to remove
    * @param {DidKeys} didKeys - The did key set used for generating proof
-   * @return {object} The extrinsic to sign and send.
+   * @return {Promise<object>} The extrinsic to sign and send.
    */
-  revoke(registryID, revokeIds, lastModified, didKeys) {
+  createRevokeTx(registryID, revokeIds, lastModified, didKeys) {
     const revoke = {
       registry_id: registryID,
       revoke_ids: revokeIds,
@@ -70,14 +93,26 @@ class RevocationModule {
   }
 
   /**
+   * Revoke credentials
+   * @param {string} registryID - contains the registry to remove
+   * @param {Set} revokeIds - revoke id list
+   * @param {number} lastModified - contains the registry to remove
+   * @param {DidKeys} didKeys - The did key set used for generating proof
+   * @return {Promise<object>} Promise to the pending transaction
+   */
+  async revoke(registryID, revokeIds, lastModified, didKeys) {
+    return await this.signAndSend(this.createRevokeTx(registryID, revokeIds, lastModified, didKeys));
+  }
+
+  /**
    * Unrevoke credentials
    * @param {string} registryID - contains the registry to remove
    * @param {Set} revokeIds - revoke id list
    * @param {number} lastModified - contains the registry to remove
    * @param {DidKeys} didKeys - The did key set used for generating proof
-   * @return {object} The extrinsic to sign and send.
+   * @return {Promise<object>} The extrinsic to sign and send.
    */
-  unrevoke(registryID, revokeIds, lastModified, didKeys) {
+  createUnrevokeTx(registryID, revokeIds, lastModified, didKeys) {
     const unrevoke = {
       registry_id: registryID,
       revoke_ids: revokeIds,
@@ -87,6 +122,18 @@ class RevocationModule {
     const serializedUnrevoke = this.getSerializedUnrevoke(unrevoke);
     const signedProof = didKeys.getSignatures(serializedUnrevoke);
     return this.module.unrevoke(unrevoke, signedProof);
+  }
+
+  /**
+   * Unrevoke credentials
+   * @param {string} registryID - contains the registry to remove
+   * @param {Set} revokeIds - revoke id list
+   * @param {number} lastModified - contains the registry to remove
+   * @param {DidKeys} didKeys - The did key set used for generating proof
+   * @return {Promise<object>} Promise to the pending transaction
+   */
+  async unrevoke(registryID, revokeIds, lastModified, didKeys) {
+    return await this.signAndSend(this.createUnrevokeTx(registryID, revokeIds, lastModified, didKeys));
   }
 
   /**

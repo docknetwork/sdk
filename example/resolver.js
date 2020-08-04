@@ -54,8 +54,7 @@ async function createDockDID() {
   const pair = dock.keyring.addFromUri(randomAsHex(32), null, 'sr25519');
   const publicKey = getPublicKeyFromKeyringPair(pair);
   const keyDetail = createKeyDetail(publicKey, dockDID);
-  const transaction = dock.did.new(dockDID, keyDetail);
-  await dock.sendTransaction(transaction);
+  await dock.did.new(dockDID, keyDetail);
 
   return dockDID;
 }
@@ -89,7 +88,6 @@ async function main() {
     'did:jolo:e76fb4b4900e43891f613066b9afca366c6d22f7d87fc9f78a91515be24dfb21',
     'did:stack:v0:16EMaNw3pkn3v6f2BgnSSs53zAKH4Q8YJg-0',
     'did:hcr:0f674e7e-4b49-4898-85f6-96176c1e30de',
-    'did:neoid:priv:b4eeeb80d20bfb38b23001d0659ce0c1d96be0aa',
     'did:elem:EiAS3mqC4OLMKOwcz3ItIL7XfWduPT7q3Fa4vHgiCfSG2A',
     'did:ont:AN5g6gz9EoQ3sCNu7514GEghZurrktCMiH',
     'did:kilt:5GFs8gCumJcZDDWof5ETFqDFEsNwCsVJUj2bX7y4xBLxN5qT',

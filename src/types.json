@@ -75,6 +75,7 @@
   "EpochNo": "u32",
   "EpochLen": "u32",
   "SlotNo": "u64",
+  "Balance": "u64",
   "EpochDetail": {
     "validator_count": "u8",
     "starting_slot": "SlotNo",

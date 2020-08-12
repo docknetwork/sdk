@@ -81,14 +81,14 @@
     "starting_slot": "SlotNo",
     "expected_ending_slot": "SlotNo",
     "ending_slot": "Option<SlotNo>",
-    "total_emission": "Option<u128>",
-    "emission_for_treasury": "Option<u128>",
-    "emission_for_validators": "Option<u128>"
+    "total_emission": "Option<Balance>",
+    "emission_for_treasury": "Option<Balance>",
+    "emission_for_validators": "Option<Balance>"
   },
   "ValidatorStatsPerEpoch": {
     "block_count": "EpochLen",
-    "locked_reward": "Option<u128>",
-    "unlocked_reward": "Option<u128>"
+    "locked_reward": "Option<Balance>",
+    "unlocked_reward": "Option<Balance>"
   },
   "StateChange": {
     "_enum": {

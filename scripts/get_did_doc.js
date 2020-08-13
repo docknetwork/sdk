@@ -21,9 +21,7 @@ if (process.argv.length !== 3) {
 dock.init({
   address: FullNodeEndpoint,
 })
-  .then(() => {
-    return getDIDDoc(process.argv[2]);
-  })
+  .then(() => getDIDDoc(process.argv[2]))
   .catch((error) => {
     console.error('Error occurred somewhere, it was caught!', error);
     process.exit(1);

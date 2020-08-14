@@ -4,6 +4,7 @@ import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-constants';
 import { assert, u8aToU8a } from '@polkadot/util';
 import Bytes from '@polkadot/types/primitive/Bytes';
+import StorageKey from '@polkadot/types/primitive/StorageKey';
 
 describe('Master Module', () => {
   // node client
@@ -18,6 +19,45 @@ describe('Master Module', () => {
     await nc.disconnect();
   }, 10000);
 
+  test('scale endoding of call', async () => {
+    /// TODO: these key-value declarations should be randomly generated for all tests
+    let key = add_len_prefix([0xaa, 0xbb]);
+    let val = add_len_prefix([0xcc, 0xdd]);
+
+    // construct call
+    let call = nc.tx.system.setStorage([(key, val)]);
+
+    // sign call
+    let proposal = [...nc.createType('Call', call).toU8a()];
+    assert(array_eq(proposal, [0, 6, 4, 8, 204, 221, 0]), proposal);
+    let payload = {
+      proposal,
+      round_no: 0,
+    };
+    let encoded_state_change = nc.createType('StateChange', { MasterVote: payload }).toU8a();
+    assert(uint8array_eq(
+      encoded_state_change,
+      new Uint8Array([
+        6, // enum tag?
+        28,
+        0, 6, 4, 8, 204, 221, 0, // encoded call
+        0, 0, 0, 0, 0, 0, 0, 0 // padding?
+      ])
+    ), encoded_state_change);
+  })
+
+  test('control: set and get bytes as sudo', async () => {
+    let key = add_len_prefix([0xaa, 0xba]);
+    let val = add_len_prefix([0xcc, 0xda]);
+
+    // construct call
+    let call = nc.tx.system.setStorage([(key, val)]);
+    let sudocall = nc.tx.sudo.sudo(call);
+    await sign_send_tx(sudocall);
+    let sto = await nc.rpc.state.getStorage(key);
+    assert(uint8array_eq(sto.unwrap(), val), "storage item should have been set");
+  }, 40000)
+
   test('Can authenticate and execute a root call', async () => {
     let key = add_len_prefix([0xaa, 0xbb]);
     let val = add_len_prefix([0xcc, 0xdd]);
@@ -27,7 +67,7 @@ describe('Master Module', () => {
 
     // sign call
     let payload = {
-      proposal: nc.createType('Call', call).toU8a(),
+      proposal: [...nc.createType('Call', call).toU8a()],
       round_no: await nc.query.master.round(),
     };
     let encoded_state_change = nc.createType('StateChange', { MasterVote: payload }).toU8a();
@@ -40,13 +80,13 @@ describe('Master Module', () => {
       assert(sto.isNone, "storage item should not have been set");
     })();
 
-    // // submit with invalid votes
-    // await (async () => {
-    //   let res = await sign_send_tx(nc.tx.master.execute(call, ));
-    //   assert(res.status.isFinalized, "transaction was not included in block");
-    //   let sto = await nc.rpc.state.getStorage(key);
-    //   assert(sto.isNone, "storage item should not have been set");
-    // })();
+    // submit with invalid votes
+    await (async () => {
+      let res = await sign_send_tx(nc.tx.master.execute(call, todo("pass some invalid sigs")));
+      assert(res.status.isFinalized, "transaction was not included in block");
+      let sto = await nc.rpc.state.getStorage(key);
+      assert(sto.isNone, "storage item should not have been set");
+    })();
 
     // submit with valid votes
     await (async () => {
@@ -65,14 +105,15 @@ describe('Master Module', () => {
           await keypair(bts("Charliesk\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"))
         ],
       ];
-      let votes = new Set(did_to_key.map(([did, key]) => {
-        let sig = key.sign(encoded_state_change);
-        return [did, { Sr25519: sig }]
-      }));
+      let votes = new Map();
+      for (let [did, key] of did_to_key) {
+        votes.set(did, { Sr25519: key.sign(encoded_state_change) });
+      }
       let res = await sign_send_tx(nc.tx.master.execute(call, votes));
       assert(res.status.isFinalized, "transaction was not included in block");
-      let sto = await nc.rpc.state.getStorage(key);
-      assert(sto.asSome === val, "storage item should have been set");
+      let sto = await nc.rpc.state.getStorage(new Bytes(null, [0xaa, 0xbb]).toU8a());
+      let bytes = sto.unwrap(); // this value is expected not to be None
+      assert(uint8array_eq(bytes, val), "storage item should have been set");
     })();
   }, 40000);
 });
@@ -147,9 +188,22 @@ async function get_test_account_key() {
 // prepend a length tag to a byte list
 // tag will encoded according to "Scale Codec"
 function add_len_prefix(bs /* array of integers */) {
+  assert(bs instanceof Array);
   return new Bytes(null, bs).toU8a()
 }
 
 function todo(t) {
   throw t || "TODO";
+}
+
+function uint8array_eq(a, b) {
+  assert(a instanceof Uint8Array);
+  assert(b instanceof Uint8Array);
+  return a.byteLength === b.byteLength && a.every((_, i) => a[i] === b[i]);
+}
+
+function array_eq(a, b) {
+  assert(a instanceof Array);
+  assert(b instanceof Array);
+  return a.length === b.length && a.every((_, i) => a[i] === b[i]);
 }

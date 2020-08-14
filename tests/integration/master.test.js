@@ -141,11 +141,6 @@ async function keypair(seed /* Uint8Array */) {
   return key
 }
 
-// sign a payload using DID kp
-function sign(kp, payload) {
-  assert(Uint8Array)
-}
-
 async function sign_send_tx(extrinsic) {
   let key = await get_test_account_key();
   await extrinsic.signAsync(key);

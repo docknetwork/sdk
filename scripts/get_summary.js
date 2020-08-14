@@ -77,7 +77,8 @@ async function printSummary() {
 }
 
 dock.init({
-  address: FullNodeEndpoint,
+  // address: FullNodeEndpoint,
+  address: 'wss://testnet-1.dock.io/',
 })
   .then(() => {
     printSummary();

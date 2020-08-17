@@ -33,7 +33,7 @@ describe('Master Module', () => {
     let key = add_len_prefix([0xaa, 0xbb]);
     let val = add_len_prefix([0xcc, 0xdd]);
 
-    let call = nc.tx.system.setStorage([(key, val)]);
+    let call = nc.tx.system.setStorage([[key, val]]);
     let proposal = [...nc.createType('Call', call).toU8a()];
     expect(proposal).toEqual([0, 6, 4, 8, 204, 221, 0]);
     let payload = {
@@ -147,7 +147,7 @@ async function connect() {
 
 // load a DID kp from secret
 async function keypair(seed) {
-  assert(seed instanceof Uint8Array);
+  assert(seed instanceof Uint8Array, "wrong type");
   await cryptoWaitReady();
   let keyring = new Keyring({ type: 'sr25519' });
   let key = keyring.addFromSeed(seed);
@@ -195,7 +195,7 @@ async function get_test_account_key() {
 
 // represent a Uint8Array as hex with a "0x" prefix
 function u8a_hex(bs) {
-  assert(bs instanceof Uint8Array);
+  assert(bs instanceof Uint8Array, "wrong type");
   return '0x' + [...bs].map(bt => ('0' + bt.toString(16)).slice(-2)).join('');
 }
 expect(u8a_hex(new Uint8Array([]))).toEqual('0x');
@@ -235,15 +235,15 @@ async function master_set_storage(
 
 /// convert a string to utf-8 encoded bytes
 function bts(str) {
-  return new Uint8Array([...new TextEncoder("utf-8").encode(str)]);
+  return new Uint8Array([...new TextEncoder().encode(str)]);
 }
 
 // return -1 if a < b, 0 if a == b, 1 if a > b
 function compare_u8a_32(a, b) {
-  assert(a instanceof Uint8Array);
-  assert(b instanceof Uint8Array);
-  assert(a.length === 32);
-  assert(b.length === 32);
+  assert(a instanceof Uint8Array, "wrong type");
+  assert(b instanceof Uint8Array, "wrong type");
+  assert(a.length === 32, "wrong len");
+  assert(b.length === 32, "wrong len");
   for (let i = 0; i < a.length; i++) {
     if (a[i] < b[i]) {
       return -1;

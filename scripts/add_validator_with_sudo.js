@@ -14,7 +14,7 @@ if (process.argv.length !== 3 && process.argv.length !== 4) {
 }
 
 async function addValidator() {
-  const blockHash = await validatorChange(dock, process.argv, dock.poaModule.addValidator, SudoSecretURI);
+  const blockHash = await validatorChange(dock, process.argv, dock.poaModule.addValidator.bind(dock.poaModule), SudoSecretURI);
   console.log(`Add validator extrinsic done in block ${blockHash}`);
   process.exit(0);
 }

@@ -3,6 +3,8 @@
 import { encodeAddress } from '@polkadot/util-crypto';
 import dock from '../src/api';
 
+require('dotenv').config();
+
 const { FullNodeEndpoint } = process.env;
 
 /**
@@ -77,8 +79,7 @@ async function printSummary() {
 }
 
 dock.init({
-  // address: FullNodeEndpoint,
-  address: 'wss://testnet-1.dock.io/',
+  address: FullNodeEndpoint,
 })
   .then(() => {
     printSummary();

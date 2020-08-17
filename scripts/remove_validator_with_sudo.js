@@ -14,7 +14,7 @@ if (process.argv.length !== 3 && process.argv.length !== 4) {
 }
 
 async function removeValidator() {
-  const blockHash = await validatorChange(dock, process.argv, dock.poaModule.removeValidator, SudoSecretURI);
+  const blockHash = await validatorChange(dock, process.argv, dock.poaModule.removeValidator.bind(dock.poaModule), SudoSecretURI);
   console.log(`Remove validator extrinsic done in block ${blockHash}`);
   process.exit(0);
 }

@@ -1,6 +1,6 @@
 import {
   isRevocationCheckNeeded,
-  expandedStatusProperty
+  expandedStatusProperty,
 } from '../../src/utils/vc';
 
 describe('Check isRevocationCheckNeeded', () => {

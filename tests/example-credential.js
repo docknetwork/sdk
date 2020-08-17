@@ -5,7 +5,7 @@ export default {
     {
       emailAddress: 'https://schema.org/email',
       alumniOf: 'https://schema.org/alumniOf',
-    }
+    },
   ],
   id: 'uuid:0x9b561796d3450eb2673fed26dd9c07192390177ad93e0835bc7a5fbb705d52bc',
   type: [

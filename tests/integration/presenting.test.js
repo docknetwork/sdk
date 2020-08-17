@@ -115,7 +115,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       const holderKey = elem[2];
 
       const res = await isVerifiedCredential(cred, {
-        resolver
+        resolver,
       });
       expect(res).toBe(true);
 
@@ -180,14 +180,14 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     const res = await isVerifiedCredential(cred3, {
       resolver,
       compactProof: true,
-      forceRevocationCheck: false
+      forceRevocationCheck: false,
     });
     expect(res).toBe(true);
 
     const res1 = await isVerifiedCredential(cred4, {
       resolver,
       compactProof: true,
-      forceRevocationCheck: false
+      forceRevocationCheck: false,
     });
     expect(res1).toBe(true);
 

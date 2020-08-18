@@ -58,8 +58,8 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "@polkadot/api": "1.26.1",
-    "@polkadot/types": "1.26.1",
+    "@polkadot/api": "1.27.1",
+    "@polkadot/types": "1.27.1",
     "@polkadot/keyring": "3.0.1",
     "@polkadot/util": "3.0.1",
     "@polkadot/util-crypto": "3.0.1",

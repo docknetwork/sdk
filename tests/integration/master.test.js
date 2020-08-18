@@ -3,7 +3,6 @@ import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-constants';
 import { assert } from '@polkadot/util';
-import Bytes from '@polkadot/types/primitive/Bytes';
 
 const ALICE_DID = bts("Alice\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0");
 const BOB_DID = bts("Bob\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0");
@@ -22,32 +21,6 @@ describe('Master Module', () => {
   }, 40000);
 
   afterAll(async () => { await nc.disconnect(); }, 10000);
-
-  test('scale endoding of call', async () => {
-    // prepend a length tag to a byte list
-    // tag will encoded according to "Scale Codec"
-    function add_len_prefix(bs) {
-      return new Bytes(null, bs).toU8a()
-    }
-
-    let key = add_len_prefix([0xaa, 0xbb]);
-    let val = add_len_prefix([0xcc, 0xdd]);
-
-    let call = nc.tx.system.setStorage([[key, val]]);
-    let proposal = [...nc.createType('Call', call).toU8a()];
-    expect(proposal).toEqual([0, 6, 4, 8, 204, 221, 0]);
-    let payload = {
-      proposal,
-      round_no: 0,
-    };
-    let encoded_state_change = nc.createType('StateChange', { MasterVote: payload }).toU8a();
-    expect(encoded_state_change).toEqual(new Uint8Array([
-      6, // enum tag
-      7 << 2, // length tag of encoded call
-      0, 6, 4, 8, 204, 221, 0, // encoded call
-      0, 0, 0, 0, 0, 0, 0, 0 // 64 bit round number
-    ]));
-  })
 
   test('control: set and get bytes as sudo', async () => {
     let key = u8a_hex(randomish_u8a());

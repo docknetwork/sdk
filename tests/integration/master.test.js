@@ -7,9 +7,9 @@ import { assert, u8aToHex, stringToU8a } from '@polkadot/util';
 const ALICE_DID = u8aToHex(stringToU8a("Alice\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"));
 const BOB_DID = u8aToHex(stringToU8a("Bob\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"));
 const CHARLIE_DID = u8aToHex(stringToU8a("Charlie\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"));
-const ALICE_SK = stringToU8a("Alicesk\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0");
-const BOB_SK = stringToU8a("Bobsk\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0");
-const CHARLIE_SK = stringToU8a("Charliesk\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0");
+const ALICE_SK = u8aToHex(stringToU8a("Alicesk\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"));
+const BOB_SK = u8aToHex(stringToU8a("Bobsk\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"));
+const CHARLIE_SK = u8aToHex(stringToU8a("Charliesk\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"));
 
 describe('Master Module', () => {
   // node client
@@ -43,8 +43,8 @@ describe('Master Module', () => {
     let key = u8aToHex(randomAsU8a(32));
     let val = u8aToHex(randomAsU8a(32));
     const did_to_key = [
-      [ALICE_DID, await keypair(randomAsU8a(32))],
-      [CHARLIE_DID, await keypair(randomAsU8a(32))],
+      [ALICE_DID, await keypair(u8aToHex(randomAsU8a(32)))],
+      [CHARLIE_DID, await keypair(u8aToHex(randomAsU8a(32)))],
     ];
     await masterSetStorage(nc, key, val, did_to_key);
     let sto = await nc.rpc.state.getStorage(key);
@@ -118,17 +118,18 @@ async function connect() {
   });
 }
 
-// load a DID kp from secret
+// Load a sr25519 keypair from secret, secret may be "0x" prefixed hex seed
+// or seed phrase or "//DevKey/Derivation/Path".
 async function keypair(seed) {
   await cryptoWaitReady();
   let keyring = new Keyring({ type: 'sr25519' });
-  let key = keyring.addFromSeed(seed);
+  let key = keyring.addFromUri(seed);
   return key
 }
 
 /// sign extrinsic as test account, submit it and wait for it to finalize
 async function signSendTx(extrinsic) {
-  let key = await getTestAccountKey();
+  let key = await keypair(TestAccountURI); //getTestAccountKey();
   await extrinsic.signAsync(key);
 
   const promise = new Promise((resolve, reject) => {
@@ -157,13 +158,6 @@ async function signSendTx(extrinsic) {
   });
 
   return await promise;
-}
-
-async function getTestAccountKey() {
-  await cryptoWaitReady();
-  let keyring = new Keyring(TestKeyringOpts);
-  let key = keyring.addFromUri(TestAccountURI);
-  return key;
 }
 
 async function masterSetStorage(

@@ -29,6 +29,15 @@ async function multiQuery(handle, queries) {
   });
 }
 
+/**
+ * Convert address to Dock address.
+ * @param addr
+ */
+function asDockAddress(addr) {
+  // Currently a Substrate address is used, hence 42
+  return encodeAddress(addr, 42);
+}
+
 async function getSummary(handle) {
   const [epoch,
     epochEndsAt,
@@ -52,9 +61,9 @@ async function getSummary(handle) {
     epochEndsAt: epochEndsAt.toNumber(),
     minEpochLength: minEpochLength.toNumber(),
     maxActiveValidators: maxActiveValidators.toNumber(),
-    activeValidators: activeValidators.map(encodeAddress),
-    validatorsToAdd: validatorsToAdd.map(encodeAddress),
-    validatorsToRemove: validatorsToRemove.map(encodeAddress),
+    activeValidators: activeValidators.map(asDockAddress),
+    validatorsToAdd: validatorsToAdd.map(asDockAddress),
+    validatorsToRemove: validatorsToRemove.map(asDockAddress),
   };
 }
 

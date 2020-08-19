@@ -55,21 +55,9 @@ class DockAPI {
 
     this.address = address || this.address;
 
-    // Polkadot-js needs these extra type information to work. Removing them will lead to
-    // an error. These were taken from substrate node frontend template.
-    const extraTypes = {
-      Address: 'AccountId',
-      LookupSource: 'AccountId',
-      // As there are 2 keys only
-      Keys: 'SessionKeys2',
-    };
-
     this.api = await ApiPromise.create({
       provider: new WsProvider(this.address),
-      types: {
-        ...types,
-        ...extraTypes,
-      },
+      types,
     });
 
     await this.initKeyring(keyring);

@@ -71,7 +71,6 @@ export function hexDIDToQualified(hexId) {
   return `${DockDIDQualifier}${ss58Id}`;
 }
 
-
 /**
  * Create and return a fully qualified Dock DID, i.e. "did:dock:<SS58 string>"
  * @returns {string} - The DID

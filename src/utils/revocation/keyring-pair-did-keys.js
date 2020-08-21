@@ -27,6 +27,7 @@ export default class KeyringPairDidKeys extends DidKeys {
       const sig = getSignatureFromKeyringPair(pair, message);
       // Convert the DID to hex if not already since the chain only accepts the DID hex-identifier.
       // This change could have been made while setting the DID but keeping the change least disruptive for now.
+      // @ts-ignore
       signedProofs.set(getHexIdentifierFromDID(did), sig.toJSON());
     });
     return signedProofs;

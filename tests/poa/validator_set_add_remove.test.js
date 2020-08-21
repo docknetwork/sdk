@@ -127,12 +127,13 @@ describe('Validator set change', () => {
       } else {
         // Validator added
         if (encodeAddress(header.author) === Charlie) {
-          console.log(`Validator detected at block #${header.number}`);
+          const blockNumber = parseInt(`${header.number}`);
+          console.log(`Validator detected at block #${blockNumber}`);
           const currentEpoch = (await getChainData(queryHandle)).epoch;
           expect(currentEpoch).toBeGreaterThan(chainData.epoch);
           expect(getSlotNoFromHeader(queryHandle, header)).toBeLessThan(chainData.epochEndsAt);
           // Worst case, the new validator ends up getting last slot in the epoch
-          expect(header.number - validatorAdded).toBeLessThanOrEqual(4);
+          expect(blockNumber - validatorAdded).toBeLessThanOrEqual(4);
           unsubscribe();
           done();
         } else if (count === 0) {

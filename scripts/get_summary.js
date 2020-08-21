@@ -46,6 +46,8 @@ async function getSummary(handle) {
     activeValidators,
     validatorsToAdd,
     validatorsToRemove,
+    emissionStatus,
+    emissionSupply
   ] = await multiQuery(handle, [
     handle.api.query.poAModule.epoch,
     handle.api.query.poAModule.epochEndsAt,
@@ -54,6 +56,8 @@ async function getSummary(handle) {
     handle.api.query.poAModule.activeValidators,
     handle.api.query.poAModule.queuedValidators,
     handle.api.query.poAModule.removeValidators,
+    handle.api.query.poAModule.emissionStatus,
+    handle.api.query.poAModule.emissionSupply,
   ]);
 
   return {
@@ -64,6 +68,8 @@ async function getSummary(handle) {
     activeValidators: activeValidators.map(asDockAddress),
     validatorsToAdd: validatorsToAdd.map(asDockAddress),
     validatorsToRemove: validatorsToRemove.map(asDockAddress),
+    emissionStatus,
+    emissionSupply: emissionSupply.toNumber(),
   };
 }
 
@@ -73,6 +79,7 @@ async function printSummary() {
   console.log(`Current epoch ends at ${summary.epochEndsAt}`);
   console.log(`Minimum epoch length is ${summary.minEpochLength}`);
   console.log(`Maximum allowed active validators are ${summary.maxActiveValidators}`);
+  console.log(`Active validator count is ${summary.activeValidators.length}`);
   console.log(`Active validator list is ${summary.activeValidators}`);
   if (summary.validatorsToAdd.length > 0) {
     console.log(`List of validators to add in next epoch ${summary.validatorsToAdd}`);
@@ -84,6 +91,8 @@ async function printSummary() {
   } else {
     console.log('No validators to remove');
   }
+  console.log(summary.emissionStatus);
+  console.log(summary.emissionSupply);
   process.exit(0);
 }
 

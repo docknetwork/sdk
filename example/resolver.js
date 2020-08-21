@@ -85,7 +85,6 @@ async function main() {
     'did:work:2UUHQCd4psvkPLZGnWY33L',
     'did:sov:WRfXPg8dantKVubE3HX8pw',
     'did:nacl:Md8JiMIwsapml_FtQ2ngnGftNP5UmVCAUuhnLyAsPxI',
-    'did:stack:v0:16EMaNw3pkn3v6f2BgnSSs53zAKH4Q8YJg-0',
     'did:elem:EiAS3mqC4OLMKOwcz3ItIL7XfWduPT7q3Fa4vHgiCfSG2A',
     'did:ont:AN5g6gz9EoQ3sCNu7514GEghZurrktCMiH',
     'did:kilt:5GFs8gCumJcZDDWof5ETFqDFEsNwCsVJUj2bX7y4xBLxN5qT',

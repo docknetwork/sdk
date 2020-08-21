@@ -3,7 +3,7 @@ import dock from '../src/api';
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
-import { FullNodeEndpoint } from '../tests/test-constants';
+const { FullNodeEndpoint } = process.env;
 
 async function getDIDDoc(dockDID) {
   console.log('Getting DID now.');
@@ -21,9 +21,7 @@ if (process.argv.length !== 3) {
 dock.init({
   address: FullNodeEndpoint,
 })
-  .then(() => {
-    return getDIDDoc(process.argv[2]);
-  })
+  .then(() => getDIDDoc(process.argv[2]))
   .catch((error) => {
     console.error('Error occurred somewhere, it was caught!', error);
     process.exit(1);

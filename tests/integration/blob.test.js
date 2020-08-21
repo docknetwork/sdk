@@ -63,7 +63,7 @@ describe('Blob Module', () => {
 
   test('Can create and read a JSON Blob.', async () => {
     const blobJSON = {
-      jsonBlob: true
+      jsonBlob: true,
     };
     const result = await dock.blob.new(
       {
@@ -82,7 +82,7 @@ describe('Blob Module', () => {
   }, 30000);
 
   test('Can create and read a string Blob.', async () => {
-    const blobHex = 'my string'
+    const blobHex = 'my string';
     const result = await dock.blob.new(
       {
         id: blobId,

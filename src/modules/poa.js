@@ -146,7 +146,7 @@ class PoAModule {
   /**
    * Create extrinsic to add a new validator.
    * @param {string} validatorAddress - Address of the validator
-   * @param {bool} shortCircuit - If true, don't wait till the end of epoch to add else wait for current epoch to finish
+   * @param {boolean} shortCircuit - If true, don't wait till the end of epoch to add else wait for current epoch to finish
    * @param {boolean} asSudo - The extrinsic needs to be sent by sudo.
    * @returns {object} The extrinsic to sign and send.
    */
@@ -158,7 +158,7 @@ class PoAModule {
   /**
    * Create extrinsic to remove an existing validator.
    * @param {string} validatorAddress - Address of the validator
-   * @param {bool} shortCircuit - If true, don't wait till the end of epoch to add else wait for current epoch to finish
+   * @param {boolean} shortCircuit - If true, don't wait till the end of epoch to add else wait for current epoch to finish
    * @param {boolean} asSudo - The extrinsic needs to be sent by sudo.
    * @returns {object} The extrinsic to sign and send.
    */

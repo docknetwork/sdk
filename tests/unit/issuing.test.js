@@ -453,15 +453,15 @@ describe('Verifiable Presentation incremental creation', () => {
   test('Support contexts without @context key', () => {
     const credential = new VerifiableCredential(sampleId);
     const context = {
-      "name": "http://schema.org/name",
-      "image": {
-        "@id": "http://schema.org/image",
-        "@type": "@id"
+      name: 'http://schema.org/name',
+      image: {
+        '@id': 'http://schema.org/image',
+        '@type': '@id',
       },
-      "homepage": {
-        "@id": "http://schema.org/url",
-        "@type": "@id"
-      }
+      homepage: {
+        '@id': 'http://schema.org/url',
+        '@type': '@id',
+      },
     };
     credential.setContext(context);
     expect(credential.context).toEqual(context);

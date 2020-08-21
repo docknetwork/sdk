@@ -108,7 +108,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
       resolver,
       compactProof: true,
       forceRevocationCheck: true,
-      revocationApi: { dock: dockAPI }
+      revocationApi: { dock: dockAPI },
     });
 
     expect(result.verified).toBe(true);
@@ -121,7 +121,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
       resolver,
       compactProof: true,
       forceRevocationCheck: true,
-      revocationApi: { dock: dockAPI }
+      revocationApi: { dock: dockAPI },
     });
     expect(result1.verified).toBe(false);
     expect(result1.error).toBe('Revocation check failed');

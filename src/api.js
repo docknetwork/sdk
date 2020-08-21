@@ -7,7 +7,6 @@ import DIDModule from './modules/did';
 import RevocationModule from './modules/revocation';
 import types from './types.json';
 
-
 import {
   PublicKey,
   PublicKeySr25519,

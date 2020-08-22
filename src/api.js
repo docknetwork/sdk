@@ -5,6 +5,7 @@ import { KeyringPair } from '@polkadot/keyring/types'; // eslint-disable-line
 import BlobModule from './modules/blob';
 import DIDModule from './modules/did';
 import RevocationModule from './modules/revocation';
+import PoAModule from './modules/poa';
 import types from './types.json';
 
 import {
@@ -19,7 +20,6 @@ import {
   SignatureSr25519,
   SignatureEd25519,
 } from './signatures';
-import PoAModule from './modules/poa';
 
 /**
  * @typedef {object} Options The Options to use in the function createUser.

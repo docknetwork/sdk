@@ -6,7 +6,7 @@
 import { Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { u8aToHex, assert } from '@polkadot/util';
-import { createSignedKeyUpdate } from '../src/utils/did';
+import { createSignedKeyUpdate, getHexIdentifierFromDID } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { DockAPI, PublicKeySr25519 } from '../src/api';
 import b58 from 'bs58';
@@ -24,7 +24,7 @@ require('dotenv').config();
 const USAGE = `\
 npx babel-node ./scripts/change_did_key.js <did> <new_pk>
   where
-    <did> is a 32 byte, 0x prefixed hex string.
+    <did> either a fully qualified dock did (did:dock:..) or a 32 byte hex string.
     <new_pk> is a 32 byte, 0x prefixed hex string.
 
 env vars:
@@ -35,6 +35,10 @@ env vars:
 
 Warning: This script only supports sr25519 keys. Do not use it to set an non-sr25519 public key.
          If you do, you will lose control of your DID.
+
+examples:
+- npx babel-node ./scripts/change_did_key.js 0x416c696365000000000000000000000000000000000000000000000000000000 0xb8b868f83227df83240fdbefcaa2636bebf16304c9249069897b510b7d8bbd0b
+- npx babel-node ./scripts/change_did_key.js did:dock:5DYVB5ouXwTKXwMJvKZP49Tv5RFUhJ2i6i4GXou6LpPQDtEL 0xb8b868f83227df83240fdbefcaa2636bebf16304c9249069897b510b7d8bbd0b
 `;
 
 (async () => {
@@ -58,7 +62,8 @@ async function main() {
   if (process.argv.length !== 4) {
     throw USAGE;
   }
-  const [_, __, did, new_pk] = process.argv;
+  const [_, __, did_arg, new_pk] = process.argv;
+  const did = getHexIdentifierFromDID(did_arg);
   assertHex32(did);
   assertHex32(new_pk);
 
@@ -70,7 +75,7 @@ async function main() {
     payerSk: PayerSecret,
   });
 
-  console.log(`Public key for did ${did} successfully updated to ${new_pk}.`)
+  console.log(`Public key for did ${did_arg} successfully updated to ${new_pk}.`)
 }
 
 // This function assumes all keys are sr25519.

@@ -1,7 +1,8 @@
 // Get summary from for PoA like current epoch, when will it end, active validators, queued validators, etc
 
-import { encodeAddress } from '@polkadot/util-crypto';
+
 import dock from '../src/api';
+import { asDockAddress } from './helpers';
 
 require('dotenv').config();
 
@@ -29,15 +30,6 @@ async function multiQuery(handle, queries) {
   });
 }
 
-/**
- * Convert address to Dock address.
- * @param addr
- */
-function asDockAddress(addr) {
-  // Currently a Substrate address is used, hence 42
-  return encodeAddress(addr, 42);
-}
-
 async function getSummary(handle) {
   const [epoch,
     epochEndsAt,
@@ -47,7 +39,7 @@ async function getSummary(handle) {
     validatorsToAdd,
     validatorsToRemove,
     emissionStatus,
-    emissionSupply
+    emissionSupply,
   ] = await multiQuery(handle, [
     handle.api.query.poAModule.epoch,
     handle.api.query.poAModule.epochEndsAt,

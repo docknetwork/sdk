@@ -1,5 +1,7 @@
 // Helpers for scripts
 
+import { encodeAddress } from '@polkadot/util-crypto';
+
 /**
  * Send the give transaction with the given account URI (secret) and return the block hash
  * @param dock
@@ -38,4 +40,13 @@ export async function validatorChange(dock, argv, func, senderAccountUri) {
   }
   const txn = func(argv[2], shortCircuit, true);
   return sendTxnWithAccount(dock, senderAccountUri, txn);
+}
+
+/**
+ * Convert address to Dock address.
+ * @param addr
+ */
+export function asDockAddress(addr) {
+  // Currently a Substrate address is used, hence 42
+  return encodeAddress(addr, 42);
 }

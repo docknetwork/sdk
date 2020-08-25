@@ -1,13 +1,11 @@
 // Signs a master proposal using sr25519, prints the signature as hex.
 
-import types from '../../src/types.json';
-import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
-import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
+import { connect, keypair } from '../helpers';
 
 const fsp = require('fs').promises;
 
-const USEAGE =
+const USAGE =
 `
 Use:
   ./vote.js <round_no> <./path/to/proposal.json>[ yes]
@@ -28,6 +26,8 @@ Expected Env vars:
 main().catch(e => {
   console.error(e);
   process.exit(1);
+}).then(_ => {
+  process.exit(0);
 });
 
 async function main() {
@@ -35,7 +35,7 @@ async function main() {
   const { FullNodeEndpoint, MasterMemberSecret } = process.env;
 
   if (process.argv.length !== 4 && process.argv.length !== 5) {
-    console.error(USEAGE);
+    console.error(USAGE);
     process.exit(2);
   }
 
@@ -91,30 +91,6 @@ async function main() {
     let sig = kp.sign(encoded_state_change);
     console.log(`Signature:\n${u8aToHex(sig)}`);
   }
-}
-
-// connect to running node
-async function connect(ws_url) {
-  const extraTypes = {
-    Address: 'AccountId',
-    LookupSource: 'AccountId',
-  };
-  return await ApiPromise.create({
-    provider: new WsProvider(ws_url),
-    types: {
-      ...types,
-      ...extraTypes,
-    },
-  });
-}
-
-// Load a sr25519 keypair from secret, secret may be "0x" prefixed hex seed
-// or seed phrase or "//DevKey/Derivation/Path".
-async function keypair(seed) {
-  await cryptoWaitReady();
-  let keyring = new Keyring({ type: 'sr25519' });
-  let key = keyring.addFromUri(seed);
-  return key
 }
 
 // normal parseInt does't throw an error when invalid input is provided

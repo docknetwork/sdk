@@ -2,6 +2,10 @@
 
 import { encodeAddress } from '@polkadot/util-crypto';
 
+import types from '../src/types.json';
+import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
+import { cryptoWaitReady } from '@polkadot/util-crypto';
+
 /**
  * Send the give transaction with the given account URI (secret) and return the block hash
  * @param dock
@@ -72,4 +76,36 @@ export async function sendBatch(dock, txs, senderAddress, waitForFinalization = 
   console.timeEnd(`Time for batch of size ${txs.length}`);
   const bal2 = await dock.poaModule.getBalance(senderAddress);
   console.info(`Fee paid is ${parseInt(bal1[0] - bal2[0])}`);
+}
+
+/**
+ * Load a sr25519 keypair from secret, secret may be "0x" prefixed hex seed
+ * or seed phrase or "//DevKey/Derivation/Path".
+ * @param secret - string
+ * @returns {Promise<KeyPair>}
+ */
+export async function keypair(seed) {
+  await cryptoWaitReady();
+  let keyring = new Keyring({ type: 'sr25519' });
+  let key = keyring.addFromUri(seed);
+  return key
+}
+
+/**
+ * connect to running node, returning the raw polkadot-js client
+ * @param websocket url - string
+ * @returns {Promise<KeyPair>}
+ */
+export async function connect(wsUrl) {
+  const extraTypes = {
+    Address: 'AccountId',
+    LookupSource: 'AccountId',
+  };
+  return await ApiPromise.create({
+    provider: new WsProvider(wsUrl),
+    types: {
+      ...types,
+      ...extraTypes,
+    },
+  });
 }

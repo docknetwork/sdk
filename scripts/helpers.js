@@ -2,7 +2,7 @@
 
 import types from '../src/types.json';
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
-import { cryptoWaitReady } from '@polkadot/util-crypto';
+import { cryptoWaitReady, encodeAddress } from '@polkadot/util-crypto';
 
 /**
  * Send the give transaction with the given account URI (secret) and return the block hash
@@ -74,4 +74,13 @@ export async function connect(wsUrl) {
       ...extraTypes,
     },
   });
+}
+
+/**
+ * Convert address to Dock address.
+ * @param addr
+ */
+export function asDockAddress(addr) {
+  // Currently a Substrate address is used, hence 42
+  return encodeAddress(addr, 42);
 }

@@ -1,4 +1,7 @@
 {
+  "Address": "AccountId",
+  "LookupSource": "AccountId",
+  "Keys": "SessionKeys2",
   "Did": "[u8;32]",
   "Bytes32": {
     "value": "[u8;32]"

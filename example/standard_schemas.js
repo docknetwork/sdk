@@ -9,7 +9,6 @@ import infectionDiagnosisSchema from '../src/utils/vc/schemas/infection_diagnosi
 import immunityEventRecordSchema from '../src/utils/vc/schemas/immunity_event_record';
 import noInfectionSchema from '../src/utils/vc/schemas/non_infection_check';
 
-
 // Schema from here https://github.com/w3c-ccg/vc-examples/blob/master/plugfest-2020/vendors/mavennet/credentials/BillOfLading.json
 const bolCred = {
   '@context': [

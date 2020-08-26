@@ -40,6 +40,7 @@ export default class OneOfPolicy extends Policy {
     // @ts-ignore
     const controllerSet = new BTreeSet();
     controllerIds.forEach((cnt) => {
+      // @ts-ignore
       controllerSet.add(cnt);
     });
 

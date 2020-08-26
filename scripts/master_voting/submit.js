@@ -4,41 +4,55 @@
 
 import { keypair, connect } from '../helpers';
 import { schnorrkelVerify } from '@polkadot/util-crypto/schnorrkel';
-import { u8aToHex } from '@polkadot/util';
+import { u8aToHex, assert } from '@polkadot/util';
+const { promises: fs } = require("fs");
 
 require('dotenv').config();
-const { FullNodeEndpoint } = process.env;
 
-submit({
-  nodeWsUrl: FullNodeEndpoint,
-  payerKey: '//Alice',
-  proposal: {
-    "args": [
-      [
-        ["0xaaaa", "0xbbbb"],
-        ["0xbbbb", "0xcccc"]
-      ]
-    ],
-    "callIndex": [0, 6]
-  },
-  votes: [
-    [
-      '0x416c696365000000000000000000000000000000000000000000000000000000', // Alice
-      '0xe087ed705fed0d677b178f24f576338cb0e64ee42b49702aa07a4b7c8fb14f28' +
-      '2270ce905bc2eee224913ff58ba5cda8434d144845efe7ca021a73e7b77cea86',
-    ],
-    [
-      '0x426f620000000000000000000000000000000000000000000000000000000000', // Bob
-      '0xbcfea6351fb136c7993762baef2931eb65575d2d8d7fa0f78d729937c454b94b' +
-      'c916092ad1232926b5c04fa48a0530470878f3441b0a035fe85546029492f38c',
-    ],
-  ],
-}).catch(e => {
+const USAGE = `\
+npx babel-node ./scripts/master_votes_submit.js <proposal_path> <votes_path>
+  where
+    <proposal_path> is the path to a json encoded proposal
+    <votes_path> is the path to a json encoded list of votes. Each vote is a [did, signature] pair.
+env vars:
+  - FullNodeEndpoint: websocket Url of a trusted node
+  - PayerSecret:      secret key to the on-chain account that will submit the transaction
+                      this account pays transaction fees. provided as a substrate secret URI
+
+Note: This script only supports sr25519 keys.
+`;
+
+main().catch(e => {
   console.error(e);
   process.exit(1);
 }).then(_ => {
   process.exit(0);
 });
+
+async function main() {
+  const {
+    FullNodeEndpoint,
+    PayerSecret,
+  } = process.env;
+  assert(FullNodeEndpoint !== undefined, "env var FullNodeEndpoint must be defined");
+  assert(PayerSecret !== undefined, "env var PayerSecret must be defined");
+
+  if (process.argv.length !== 4) {
+    throw USAGE;
+  }
+  const [_, __, proposal_path, votes_path] = process.argv;
+  const proposal = JSON.parse(await fs.readFile(proposal_path));
+  const votes = JSON.parse(await fs.readFile(votes_path));
+
+  await submit({
+    nodeWsUrl: FullNodeEndpoint,
+    payerKey: PayerSecret,
+    proposal,
+    votes,
+  });
+
+  console.log("Proposal and votes successfully submitted.");
+}
 
 /**
  * Submit the on-chain Master::execute extrinsic.

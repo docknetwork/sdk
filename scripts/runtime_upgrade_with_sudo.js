@@ -14,6 +14,15 @@ if (process.argv.length !== 3) {
   process.exit(2);
 }
 
+/**
+ * Returns an array of Authoring version, Spec version, Impl version and Transaction version
+ * @param {*} dock 
+ */
+async function getRuntimeVersion(dock) {
+  const ver = await dock.api.rpc.state.getRuntimeVersion();
+  return [ver.authoringVersion, ver.specVersion, ver.implVersion, ver.transactionVersion];
+}
+
 async function doRuntimeUpgrade() {
   const code = fs.readFileSync(process.argv[2]);
   const codeAsHex = code.toString('hex');
@@ -27,9 +36,22 @@ async function doRuntimeUpgrade() {
   // more accurate to get those constants from chain and then compute weight. Passing on that sudo will be removed soon.
   const txn = dock.api.tx.sudo.sudoUncheckedWeight(proposal, code.length);
 
+  const runtimeVerBeforeUpgrade = await getRuntimeVersion(dock);
+  console.log('Before upgrade');
+  console.log(`Authoring version, Spec version, Impl version, Transaction version -> (${[...runtimeVerBeforeUpgrade]})`);
+
   console.log('Going to send node upgrade transaction');
   const blockHash = await sendTxnWithAccount(dock, SudoSecretURI, txn);
   console.log(`Code upgrade extrinsic finalized in block ${blockHash}`);
+
+  const runtimeVerAfterUpgrade = await getRuntimeVersion(dock);
+  console.log('After upgrade');
+  console.log(`Authoring version, Spec version, Impl version, Transaction version -> (${[...runtimeVerAfterUpgrade]})`);
+
+  // Runtime version should change.
+  if (runtimeVerBeforeUpgrade === runtimeVerAfterUpgrade) {
+    throw new Error('Runtime version did not change post upgrade. Update did not happen, maybe the node was already running the version');
+  }
   process.exit(0);
 }
 

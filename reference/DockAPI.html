@@ -253,7 +253,7 @@ a function that expects `extrinsic` as first argument and a dock api instance as
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line171">line 171</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line175">line 175</a>
     </li></ul></dd>
     
 
@@ -315,7 +315,7 @@ a function that expects `extrinsic` as first argument and a dock api instance as
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line182">line 182</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line186">line 186</a>
     </li></ul></dd>
     
 
@@ -377,7 +377,7 @@ a function that expects `extrinsic` as first argument and a dock api instance as
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line193">line 193</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line197">line 197</a>
     </li></ul></dd>
     
 
@@ -457,7 +457,7 @@ a function that expects `extrinsic` as first argument and a dock api instance as
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line114">line 114</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line104">line 104</a>
     </li></ul></dd>
     
 
@@ -776,7 +776,7 @@ Sets the account used to sign transactions
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line106">line 106</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line96">line 96</a>
     </li></ul></dd>
     
 
@@ -812,7 +812,7 @@ Sets the account used to sign transactions
     
 
     
-    <h4 class="name" id="signAndSend"><span class="type-signature">(async) </span>signAndSend<span class="signature">(extrinsic)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="signAndSend"><span class="type-signature">(async) </span>signAndSend<span class="signature">(extrinsic, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -846,6 +846,8 @@ Sets the account used to sign transactions
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
@@ -871,8 +873,69 @@ Sets the account used to sign transactions
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">Extrinsic to send</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last">If true, waits for extrinsic's block to be finalized,
+else only wait to be included in block.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">An object used to parameters like nonce, etc to the extrinsic</td>
         </tr>
 
     
@@ -913,7 +976,7 @@ Sets the account used to sign transactions
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line136">line 136</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line130">line 130</a>
     </li></ul></dd>
     
 
@@ -967,7 +1030,7 @@ Sets the account used to sign transactions
     
 
     
-    <h4 class="name" id="signExtrinsic"><span class="type-signature">(async) </span>signExtrinsic<span class="signature">(extrinsic)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="signExtrinsic"><span class="type-signature">(async) </span>signExtrinsic<span class="signature">(extrinsic, params)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -1031,6 +1094,29 @@ Sets the account used to sign transactions
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An object used to parameters like nonce, etc to the extrinsic</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -1068,7 +1154,7 @@ Sets the account used to sign transactions
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line123">line 123</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line114">line 114</a>
     </li></ul></dd>
     
 
@@ -1138,7 +1224,7 @@ Sets the account used to sign transactions
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri Aug 21 2020 18:24:53 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri Aug 28 2020 17:41:22 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

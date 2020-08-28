@@ -42,6 +42,8 @@
     "blob-example": "npx babel-node example/blob.js",
     "test-examples": "yarn dock-did-example && yarn did-resolver-example && yarn revocation-example && yarn vcdm-example && yarn standard-schemas-example && yarn schema-example && yarn schema-validation-example && yarn blob-example",
     "get-did": "npx babel-node scripts/get_did_doc.js",
+    "upgrade_with_sudo": "npx babel-node scripts/runtime_upgrade_with_sudo.js",
+    "onboard_with_sudo": "npx babel-node scripts/onboard_validator_with_sudo.js",
     "lint": "eslint \"{src,example}/**/*.js\"",
     "build": "rollup -c",
     "watch": "rollup -c -w",

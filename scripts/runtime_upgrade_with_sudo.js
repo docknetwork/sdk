@@ -20,7 +20,7 @@ if (process.argv.length !== 3) {
  */
 async function getRuntimeVersion(dock) {
   const ver = await dock.api.rpc.state.getRuntimeVersion();
-  return [ver.authoringVersion, ver.specVersion, ver.implVersion, ver.transactionVersion];
+  return [ver.authoringVersion.toNumber(), ver.specVersion.toNumber(), ver.implVersion.toNumber(), ver.transactionVersion.toNumber()];
 }
 
 async function doRuntimeUpgrade() {
@@ -49,7 +49,7 @@ async function doRuntimeUpgrade() {
   console.log(`Authoring version, Spec version, Impl version, Transaction version -> (${[...runtimeVerAfterUpgrade]})`);
 
   // Runtime version should change.
-  if (runtimeVerBeforeUpgrade === runtimeVerAfterUpgrade) {
+  if (JSON.stringify(runtimeVerBeforeUpgrade) === JSON.stringify(runtimeVerAfterUpgrade)) {
     throw new Error('Runtime version did not change post upgrade. Update did not happen, maybe the node was already running the version');
   }
   process.exit(0);

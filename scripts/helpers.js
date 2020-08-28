@@ -9,11 +9,11 @@ import { encodeAddress } from '@polkadot/util-crypto';
  * @param txn
  * @returns {Promise<Hash>}
  */
-export async function sendTxnWithAccount(dock, senderAccountUri, txn) {
+export async function sendTxnWithAccount(dock, senderAccountUri, txn, waitForFinalization = true) {
   const account = dock.keyring.addFromUri(senderAccountUri);
   dock.setAccount(account);
-  const { status } = await dock.signAndSend(txn);
-  return status.asFinalized;
+  const { status } = await dock.signAndSend(txn, waitForFinalization);
+  return waitForFinalization ? status.asFinalized : status.asInBlock;
 }
 
 /**

@@ -80,7 +80,8 @@ async function setMaxActiveValidators(dock, sudoUri, count) {
 async function main() {
   const dock = new DockAPI();
   await dock.init({
-    address: 'wss://testnet-1.dock.io',
+    // address: 'wss://testnet-1.dock.io',
+    address: 'ws://localhost:9944',
   });
 
   // const r = await fuelSudo(dock);
@@ -142,7 +143,6 @@ async function main() {
   // console.log(r);
 
   await printBalance(dock, 'Sudo', sudo);
-
 }
 
 main()

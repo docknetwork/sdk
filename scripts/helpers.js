@@ -50,3 +50,21 @@ export function asDockAddress(addr) {
   // Currently a Substrate address is used, hence 42
   return encodeAddress(addr, 42);
 }
+
+/**
+ * Send a batch of txns and print relevant info like size, weight, block included and fees paid.
+ * @param {*} txs
+ * @param {*} senderAddress
+ */
+export async function sendBatch(dock, txs, senderAddress) {
+  const txBatch = dock.api.tx.utility.batch(txs);
+  console.log(`Batch size is ${txBatch.encodedLength}`);
+  console.info(`Payment info of batch is ${(await txBatch.paymentInfo(senderAddress))}`);
+
+  const bal1 = await dock.poaModule.getBalance(senderAddress);
+  const r = await dock.signAndSend(txBatch);
+  // console.log(`block ${r.status.asInBlock}`);
+  console.info(`block ${r.status.asFinalized}`);
+  const bal2 = await dock.poaModule.getBalance(senderAddress);
+  console.info(`Fee paid is ${parseInt(bal1[0] - bal2[0])}`);
+}

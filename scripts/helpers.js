@@ -1,6 +1,8 @@
 // Helpers for scripts
 
-import { encodeAddress } from '@polkadot/util-crypto';
+import types from '../src/types.json';
+import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
+import { cryptoWaitReady, encodeAddress } from '@polkadot/util-crypto';
 
 /**
  * Send the give transaction with the given account URI (secret) and return the block hash
@@ -40,6 +42,38 @@ export async function validatorChange(dock, argv, func, senderAccountUri) {
   }
   const txn = func(argv[2], shortCircuit, true);
   return sendTxnWithAccount(dock, senderAccountUri, txn);
+}
+
+/**
+ * Load a sr25519 keypair from secret, secret may be "0x" prefixed hex seed
+ * or seed phrase or "//DevKey/Derivation/Path".
+ * @param secret - string
+ * @returns {Promise<KeyPair>}
+ */
+export async function keypair(seed) {
+  await cryptoWaitReady();
+  let keyring = new Keyring({ type: 'sr25519' });
+  let key = keyring.addFromUri(seed);
+  return key
+}
+
+/**
+ * connect to running node, returning the raw polkadot-js client
+ * @param websocket url - string
+ * @returns {Promise<KeyPair>}
+ */
+export async function connect(wsUrl) {
+  const extraTypes = {
+    Address: 'AccountId',
+    LookupSource: 'AccountId',
+  };
+  return await ApiPromise.create({
+    provider: new WsProvider(wsUrl),
+    types: {
+      ...types,
+      ...extraTypes,
+    },
+  });
 }
 
 /**

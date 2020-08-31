@@ -1,0 +1,9 @@
+{
+  "args": [
+    [
+      ["0xaaaa", "0xbbbb"],
+      ["0xbbbb", "0xcccc"]
+    ]
+  ],
+  "callIndex": [0, 6]
+}

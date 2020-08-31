@@ -101,6 +101,39 @@ describe('Master Module', () => {
     let u8a = sto.unwrap();
     expect(u8aToHex(u8a)).toEqual(val);
   }, 20000);
+
+  test('Use a master call to modify master membership.', async () => {
+    let fourth_did = u8aToHex(randomAsU8a(32));
+    const new_membership = nc.createType('Membership', {
+      members: sortedSet([
+        ALICE_DID,
+        BOB_DID,
+        CHARLIE_DID,
+        fourth_did,
+      ]),
+      vote_requirement: 2,
+    });
+
+    // master members are not yet set
+    expect((await nc.query.master.members()).toU8a())
+      .not
+      .toEqual(new_membership.toU8a());
+
+    const call = nc.tx.master.setMembers(new_membership);
+    const votes = await allVote(
+      nc,
+      call,
+      [
+        [BOB_DID, await keypair(BOB_SK)],
+        [ALICE_DID, await keypair(ALICE_SK)],
+      ],
+    );
+    await signSendTx(nc.tx.master.execute(call, votes));
+
+    // master members were set
+    expect((await nc.query.master.members()).toU8a())
+      .toEqual(new_membership.toU8a());
+  }, 20000);
 });
 
 // connect to running node
@@ -168,14 +201,38 @@ async function masterSetStorage(
 ) {
   assert(key.startsWith("0x"), "should prefixed with 0x");
   assert(val.startsWith("0x"), "should prefixed with 0x");
+
+  let call = nc.tx.system.setStorage([[key, val]]); // this is a root-only extrinsic
+  const votes = await allVote(nc, call, did_to_key);
+  await signSendTx(nc.tx.master.execute(call, votes));
+}
+
+/// lexically sorted set of elements.
+function sortedSet(list) {
+  let sorted = [...list];
+  sorted.sort();
+  let ret = new Set();
+  for (let s of sorted) {
+    ret.add(s);
+  }
+  return ret;
+}
+
+/// helper func
+/// sign the call as a StateChange::MasterVote using all provided [did, key] pairs
+/// return the complete proof of master authorization as the on-chain "PMAuth" type
+/// the votes are sorted as lexically as the chain expects
+async function allVote(
+  nc, // node client
+  proposal, // the extrinsic to be run as root
+  did_to_key, // list of [did, key] pairs with which to vote. dids are hex encoded
+) {
   for (let [did, _key] of did_to_key) {
     assert(did.startsWith("0x"), "should prefixed with 0x");
     assert(did.length === 66, "should be 32 bytes");
   }
-
-  let call = nc.tx.system.setStorage([[key, val]]); // this is a root-only extrinsic
   let payload = {
-    proposal: [...nc.createType('Call', call).toU8a()],
+    proposal: [...nc.createType('Call', proposal).toU8a()],
     round_no: await nc.query.master.round(),
   };
   let encoded_state_change = nc.createType('StateChange', { MasterVote: payload }).toU8a();
@@ -187,5 +244,5 @@ async function masterSetStorage(
   for (let [did, key] of dtk_sorted) {
     votes.set(did, { Sr25519: key.sign(encoded_state_change) });
   }
-  await signSendTx(nc.tx.master.execute(call, votes));
+  return votes;
 }

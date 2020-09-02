@@ -26,7 +26,7 @@ async function setSessionKey(dock, keys, accountUri) {
   dock.setAccount(account);
   const txn = await dock.api.tx.session.setKeys(keys, []);
   // console.log(txn);
-  const r = await dock.sendTransaction(txn, false);
+  const r = await dock.signAndSend(txn);
   console.log(`Transaction finalized at blockHash ${r.status.asFinalized}`);
   return r;
 }
@@ -38,7 +38,7 @@ async function setSessionKeyByProxy(dock, validatorId, keys) {
   dock.setAccount(account);
   const txn = dock.api.tx.sudo.sudo(dock.api.tx.poAModule.setSessionKey(validatorId, keys));
   // console.log(txn);
-  const r = await dock.sendTransaction(txn, false);
+  const r = await dock.signAndSend(txn);
   console.log(`Transaction finalized at blockHash ${r.status.asFinalized}`);
   return r;
 }
@@ -49,7 +49,7 @@ async function addValidator(dock, validatorId, force) {
   const account = dock.keyring.addFromUri('//Alice');
   dock.setAccount(account);
   const txn = dock.api.tx.sudo.sudo(dock.api.tx.poAModule.addValidator(validatorId, force));
-  const r = await dock.sendTransaction(txn, false);
+  const r = await dock.signAndSend(txn);
   console.log(`Transaction finalized at blockHash ${r.status.asFinalized}`);
   return r;
 }
@@ -60,7 +60,7 @@ async function removeValidator(dock, validatorId, force) {
   const account = dock.keyring.addFromUri('//Alice');
   dock.setAccount(account);
   const txn = dock.api.tx.sudo.sudo(dock.api.tx.poAModule.removeValidator(validatorId, force));
-  const r = await dock.sendTransaction(txn, false);
+  const r = await dock.signAndSend(txn);
   console.log(`Transaction finalized at blockHash ${r.status.asFinalized}`);
   return r;
 }
@@ -71,7 +71,7 @@ async function swapValidator(dock, swapOut, swapIn) {
   const account = dock.keyring.addFromUri('//Alice');
   dock.setAccount(account);
   const txn = dock.api.tx.sudo.sudo(dock.api.tx.poAModule.swapValidator(swapOut, swapIn));
-  const r = await dock.sendTransaction(txn, false);
+  const r = await dock.signAndSend(txn);
   console.log(r.status.asFinalized);
   return r;
 }
@@ -113,7 +113,6 @@ async function main() {
 
   // const sessKey = await genSessionKey(charlieNode, '//Charlie');
   // await setSessionKey(dock, sessKey, '//Charlie');
-  // await setSessionKeyByProxy(dock, charlie, sessKey);
   // await addValidator(dock, charlie, false);
   // await printBalance('Alice', alice);
   // await removeValidator(dock, charlie, false);

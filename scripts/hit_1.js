@@ -18,15 +18,8 @@ async function fillBlock() {
   console.log(`Transaction finalized at blockHash ${blockHash}`);
 }
 
-
-/* function customSign(nonce) {
-  function sign(extrinsic, _this) {
-    return extrinsic.signAsync(_this.getAccount(), { nonce });
-  }
-  return sign;
-}
-
-async function sendDIDTxns() {
+/*
+async function sendTxnsWithCustomNonce() {
   // const dock = new DockAPI();
   // await dock.init({
   //   address: FullNodeEndpoint,
@@ -60,7 +53,7 @@ Payment info of batch is {"weight":896417461000,"class":"Normal","partialFee":12
 block 0xde8e3edb4ad3dc730f6298d7c60e44cf806ec8c0fa90a59e4ab71a8ecd295491
 Fee paid is 125544610
 */
-async function sendDIDTxns(count) {
+async function sendDIDTxns(count, waitForFinalization = true) {
   console.info(`Sending ${count} DID write extrinsics in a batch`);
   const account = dock.keyring.addFromUri(EndowedSecretURI);
   dock.setAccount(account);
@@ -78,7 +71,7 @@ async function sendDIDTxns(count) {
     didPairs.push([did, pair]);
   }
 
-  await sendBatch(dock, txs, account.address);
+  await sendBatch(dock, txs, account.address, waitForFinalization);
   return didPairs;
 }
 
@@ -124,7 +117,7 @@ Payment info of batch is {"weight":890755261000,"class":"Normal","partialFee":12
 block 0x1f8ab814bf875094f39386bc8c1e0f6f24d41be7c58b5cab3e5d4cc9de022013
 Fee paid is 125350310
 */
-async function sendRemoveTxns(count, didPairs) {
+async function sendRemoveTxns(count, didPairs, waitForFinalization = true) {
   console.info(`Sending ${count} DID remove extrinsics in a batch`);
   const account = dock.keyring.addFromUri(EndowedSecretURI);
   dock.setAccount(account);
@@ -140,7 +133,7 @@ async function sendRemoveTxns(count, didPairs) {
     j++;
   }
 
-  await sendBatch(dock, txs, account.address);
+  await sendBatch(dock, txs, account.address, waitForFinalization);
 }
 
 /*
@@ -180,15 +173,47 @@ async function sendBlobTxns(count, didPairs) {
   return blobIds;
 }
 
-async function main() {
+async function runOnce() {
   // await fillBlock();
   let didPairs = await sendDIDTxns(3400);
   console.log('');
-  // didPairs = await sendKeyUpdateTxns(3300, didPairs);
+  didPairs = await sendKeyUpdateTxns(3300, didPairs);
   console.log('');
   await sendBlobTxns(2000, didPairs);
   console.log('');
   await sendRemoveTxns(3400, didPairs);
+}
+
+async function runInLoop(limit) {
+  if (limit) {
+    console.info(`Will do ${limit} iterations`);
+  }
+  console.time("loop");
+  let count = 0;
+  while (true) {
+    console.time("iteration");
+    console.time("WriteDID");
+    let didPairs = await sendDIDTxns(3400, false);
+    console.timeEnd("WriteDID");
+    console.log('Added 3400 DIDs in a batch');
+    console.log('');
+    console.time("RemoveDID");
+    await sendRemoveTxns(3400, didPairs, false);
+    console.timeEnd("RemoveDID");
+    console.log('Remove 3400 DIDs in a batch');
+    count++;
+    console.info(`Iteration ${count} done`);
+    if (limit && (count >= limit)) {
+      break;
+    }
+    console.timeEnd("iteration");
+  }
+  console.timeEnd("loop");
+}
+
+async function main() {
+  // await runOnce();
+  await runInLoop(10);
   process.exit(0);
 }
 

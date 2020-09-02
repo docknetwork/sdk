@@ -56,15 +56,20 @@ export function asDockAddress(addr) {
  * @param {*} txs
  * @param {*} senderAddress
  */
-export async function sendBatch(dock, txs, senderAddress) {
+export async function sendBatch(dock, txs, senderAddress, waitForFinalization = true) {
   const txBatch = dock.api.tx.utility.batch(txs);
   console.log(`Batch size is ${txBatch.encodedLength}`);
   console.info(`Payment info of batch is ${(await txBatch.paymentInfo(senderAddress))}`);
 
   const bal1 = await dock.poaModule.getBalance(senderAddress);
-  const r = await dock.signAndSend(txBatch);
-  // console.log(`block ${r.status.asInBlock}`);
-  console.info(`block ${r.status.asFinalized}`);
+  console.time(`Time for batch of size ${txs.length}`);
+  const r = await dock.signAndSend(txBatch, waitForFinalization);
+  if (waitForFinalization) {
+    console.info(`block ${r.status.asFinalized}`);
+  } else {
+    console.info(`block ${r.status.asInBlock}`);
+  }
+  console.timeEnd(`Time for batch of size ${txs.length}`);
   const bal2 = await dock.poaModule.getBalance(senderAddress);
   console.info(`Fee paid is ${parseInt(bal1[0] - bal2[0])}`);
 }

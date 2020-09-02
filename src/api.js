@@ -59,6 +59,13 @@ class DockAPI {
       types,
     });
 
+    // this.api.registry.setSignedExtensions(['OnlyMigrator']);
+
+    /* this.api.registry.setSignedExtensions([{'OnlyMigrator': {
+      extra: {},
+      types: {}
+    }}]); */
+
     await this.initKeyring(keyring);
 
     this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));

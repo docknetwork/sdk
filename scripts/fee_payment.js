@@ -48,8 +48,8 @@ async function registerNewDID() {
 
   // console.log('Submitting new DID', dockDID, publicKey);
 
-  const transaction = dock.did.new(dockDID, keyDetail);
-  const { status } = await dock.sendTransaction(transaction);
+  const transaction = dock.did.createNewTx(dockDID, keyDetail);
+  const { status } = await dock.signAndSend(transaction);
   const blockHash = status.asFinalized;
   console.log(`Transaction finalized at blockHash ${blockHash}`);
   /* const header = await dock.api.derive.chain.getHeader(blockHash);
@@ -67,7 +67,7 @@ async function disableEmissions(dock) {
   const account = dock.keyring.addFromUri('//Alice');
   dock.setAccount(account);
   const txn = dock.api.tx.sudo.sudo(dock.api.tx.poAModule.setEmissionStatus(false));
-  const { status } = await dock.sendTransaction(txn);
+  const { status } = await dock.signAndSend(txn);
   const blockHash = status.asFinalized;
   console.log(`Transaction finalized at blockHash ${blockHash}`);
   return (await getBlockDetails(dock, blockHash))[2];
@@ -96,13 +96,8 @@ async function main() {
   const bob = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty';
 
   // Alice will send transaction
-  const account = dock.keyring.addFromUri(TestAccountURI);
+  const account = dock.keyring.addFromUri('//Bob');
   dock.setAccount(account);
-
-  const d = await dock.api.rpc.author;
-  console.log(d);
-  process.exit(0);
-  // console.log('dock.api', dock.api);
 
   // await disableEmissions(dock);
 
@@ -111,8 +106,8 @@ async function main() {
   const aliceBalOld = await getBalance(alice);
   const bobBalOld = await getBalance(bob);
 
-  // const blockAuthor = await registerNewDID();
-  const blockAuthor = await txnByRoot(dock);
+  const blockAuthor = await registerNewDID();
+  // const blockAuthor = await txnByRoot(dock);
 
   // XXX: This code is not extensible as it requires only 2 nodes running. Sufficient for now.
   if (blockAuthor != alice && blockAuthor != bob) {

@@ -93,8 +93,8 @@ export async function setSessionKey(dock, keys, accountUri) {
 
 export async function setSessionKeyForHandle(handle, keys) {
   const txn = await handle.api.tx.session.setKeys(keys, []);
-  // const r = await handle.sendTransaction(txn, false, false);
-  const r = await handle.sendTransaction(txn, false);
+  // const r = await handle.signAndSend(txn, false, false);
+  const r = await handle.signAndSend(txn);
   return getBlockDetails(handle, r.status.asFinalized);
 }
 
@@ -107,8 +107,8 @@ export async function setSessionKeyThroughRoot(dock, sudoAccUri, validatorId, ke
 
 export async function setSessionKeyThroughRootWithHandle(sudoHandle, validatorId, keys) {
   const txn = sudoHandle.api.tx.sudo.sudo(sudoHandle.api.tx.poAModule.setSessionKey(validatorId, keys));
-  const r = await sudoHandle.sendTransaction(txn, false, false);
-  // const r = await sudoHandle.sendTransaction(txn, false);
+  const r = await sudoHandle.signAndSend(txn, false);
+  // const r = await sudoHandle.signAndSend(txn, false);
   return getBlockDetails(sudoHandle, r.status.asInBlock);
   // return getBlockDetails(sudoHandle, r.status.asFinalized);
 }
@@ -122,8 +122,8 @@ export async function addValidator(dock, sudoAccUri, validatorId, shortCircuit) 
 
 export async function addValidatorWithHandle(sudoHandle, validatorId, shortCircuit) {
   const txn = sudoHandle.api.tx.sudo.sudo(sudoHandle.api.tx.poAModule.addValidator(validatorId, shortCircuit));
-  // const r = await sudoHandle.sendTransaction(txn, false, false);
-  const r = await sudoHandle.sendTransaction(txn, false);
+  // const r = await sudoHandle.signAndSend(txn, false);
+  const r = await sudoHandle.signAndSend(txn);
   // return getBlockDetails(sudoHandle, r.status.asInBlock);
   return getBlockDetails(sudoHandle, r.status.asFinalized);
 }
@@ -138,7 +138,7 @@ export async function removeValidator(dock, sudoAccUri, validatorId, shortCircui
 // Sudo call to remove validator
 export async function removeValidatorWithHandle(sudoHandle, validatorId, shortCircuit) {
   const txn = sudoHandle.api.tx.sudo.sudo(sudoHandle.api.tx.poAModule.removeValidator(validatorId, shortCircuit));
-  const r = await sudoHandle.sendTransaction(txn, false, false);
+  const r = await sudoHandle.signAndSend(txn, false);
   return getBlockDetails(sudoHandle, r.status.asInBlock);
 }
 
@@ -151,7 +151,7 @@ export async function swapValidator(dock, sudoAccUri, swapOut, swapIn) {
 
 export async function swapValidatorWithHandle(sudoHandle, swapOut, swapIn) {
   const txn = sudoHandle.api.tx.sudo.sudo(sudoHandle.api.tx.poAModule.swapValidator(swapOut, swapIn));
-  const r = await sudoHandle.sendTransaction(txn, false, false);
+  const r = await sudoHandle.signAndSend(txn, false);
   return getBlockDetails(sudoHandle, r.status.asInBlock);
 }
 
@@ -163,7 +163,7 @@ export async function setEmissionRewardsStatus(dock, sudoAccUri, status) {
 
 export async function setEmissionRewardsStatusWithHandle(sudoHandle, status) {
   const txn = sudoHandle.api.tx.sudo.sudo(sudoHandle.api.tx.poAModule.setEmissionStatus(status));
-  const r = await sudoHandle.sendTransaction(txn, false);
+  const r = await sudoHandle.signAndSend(txn);
   return getBlockDetails(sudoHandle, r.status.asFinalized);
 }
 

@@ -2,15 +2,9 @@ import { DockAPI } from '../src/api';
 
 require('dotenv').config();
 
-const { FullNodeEndpoint } = process.env;
-
 async function getHandle(endpoint) {
-  // console.log('creating handle');
   const handle = new DockAPI();
-  await handle.init({ address: 'ws://localhost:9000' });
-  // await handle.init({ address: 'wss://testnet-b1.dock.io' });
-  // await handle.init({ address: 'ws://localhost:9988' });
-  // console.log('done creating handle');
+  await handle.init({ address: endpoint });
   return handle;
 }
 
@@ -21,35 +15,51 @@ async function getHandles(count, endpoint) {
     handles.push(getHandle(endpoint));
   }
   return Promise.all(handles);
-  // return handles;
 }
 
 // Get balance of an account.
 async function getBalance(handle, address) {
-  const bal = await handle.poaModule.getBalance(address);
-  // console.log(`Balance is ${parseInt(bal[0])}`);
+  const bal = parseInt((await handle.poaModule.getBalance(address)));
+  // console.log(`Balance is ${bal}`);
+  return bal;
 }
 
 // Get balance of given list of accounts.
 async function getBalances(handle, addresses) {
-  return Promise.all(addresses.map((a) => {
-    return getBalance(handle, a);
-  }));
+  return Promise.all(addresses.map((a) => getBalance(handle, a)));
 }
 
 // Get balance of given list of accounts but make the queries multiple times to simulate lots of queries
 async function getBalancesRepeatedly(count, handle, addresses) {
   const promises = [];
   while (promises.length < count) {
-    promises.push(Promise.all(addresses.map((a) => {
-      return getBalance(handle, a);
-    })));
+    promises.push(Promise.all(addresses.map((a) => getBalance(handle, a))));
   }
   return Promise.all(promises);
 }
 
+async function getBalanceWithAllHandles(handles, address) {
+  return Promise.all(handles.map((h) => getBalance(h, address))).then(() => {
+    console.log('done getting balance');
+  });
+}
+
+async function getBalancesWithAllHandles(handles, addresses) {
+  return Promise.all(handles.map((h) => getBalances(h, addresses))).then(() => {
+    console.log('done getting balances');
+  });
+}
+
+async function getBalancesWithAllHandlesRepeat(handles, addresses, count) {
+  return Promise.all(handles.map((h) => getBalancesRepeatedly(count, h, addresses))).then(() => {
+    console.log('done getting balances');
+  });
+}
+
 async function main() {
-  const endpoint = 'ws://localhost';
+  // Websocket server at localhost:9000
+  const endpoint = 'ws://localhost:9000';
+
   const alice = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
   const bob = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty';
   const charlie = '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y';
@@ -57,47 +67,12 @@ async function main() {
   const eve = '5HGjWAeFDfFCWPsjFQdVV2Msvz2XtMktvgocEZcCj68kUMaw';
   const ferdie = '5CiPPseXPECbkjWCa6MnjNokrgYjMqmKndv2rSnekmSK2DjL';
 
-  const count = 2;
+  const count = 10;
   const handles = await getHandles(count, endpoint);
 
-  // for (let i=0; i < count; i++) {
-  //   await getBalance(handles[i], alice);
-  // }
-
-  // console.log(handles);
-  /* handles.map((h) => {
-    getBalance(h, endpoint);
-  }); */
-
-  /* handles.map((h) => {
-    getBalance(h, endpoint);
-  }); */
-
-  /* await Promise.all(handles.map(function(h) {
-    return getBalance(h, alice);
-  })).then(function() {
-    console.log('done getting balance');
-  });
-   */
-
-  /* await Promise.all(handles.map(function(h) {
-    // return getBalances(h, [alice, bob, charlie]);
-    return getBalances(h, [alice, bob, charlie, dave, eve, ferdie]);
-  })).then(function() {
-    console.log('done getting balances');
-  }); */
-
-  await Promise.all(handles.map(function(h) {
-    // return getBalances(h, [alice, bob, charlie]);
-    return getBalancesRepeatedly(2000, h, [alice, bob, charlie, dave, eve, ferdie]);
-  })).then(function() {
-    console.log('done getting balances');
-  });
-  
-  /* const a = Promise.all(handles.map(function(h) {
-    return getBalance(h, alice);
-  }));
-  await a; */
+  await getBalanceWithAllHandles(handles, alice);
+  await getBalancesWithAllHandles(handles, [alice, bob, charlie, dave, eve, ferdie]);
+  await getBalancesWithAllHandlesRepeat(handles, [alice, bob, charlie, dave, eve, ferdie], 100);
 }
 
 main()

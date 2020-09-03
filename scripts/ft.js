@@ -40,7 +40,7 @@ async function fuelSudo(dock) {
   const account = dock.keyring.addFromUri(endowedSecret);
   dock.setAccount(account);
   const txn = dock.api.tx.balances.transfer(sudo, base * 10000);
-  const r = await dock.sendTransaction(txn, false);
+  const r = await dock.signAndSend(txn);
   console.log(`Transaction finalized at blockHash ${r.status.asFinalized}`);
   return r;
 }
@@ -51,7 +51,7 @@ async function setSessionKeyByProxy(dock, sudoUri, validatorId, keys) {
   dock.setAccount(account);
   const txn = dock.api.tx.sudo.sudo(dock.api.tx.poAModule.setSessionKey(validatorId, keys));
   // console.log(txn);
-  const r = await dock.sendTransaction(txn, false);
+  const r = await dock.signAndSend(txn);
   console.log(`Transaction finalized at blockHash ${r.status.asFinalized}`);
   return r;
 }
@@ -61,7 +61,7 @@ async function addValidator(dock, sudoUri, validatorId, shortCircuit) {
   const account = dock.keyring.addFromUri(sudoUri);
   dock.setAccount(account);
   const txn = dock.api.tx.sudo.sudo(dock.api.tx.poAModule.addValidator(validatorId, shortCircuit));
-  const r = await dock.sendTransaction(txn, false);
+  const r = await dock.signAndSend(txn);
   console.log(`Transaction finalized at blockHash ${r.status.asFinalized}`);
   return r;
 }
@@ -71,7 +71,7 @@ async function setMaxActiveValidators(dock, sudoUri, count) {
   const account = dock.keyring.addFromUri(sudoUri);
   dock.setAccount(account);
   const txn = dock.api.tx.sudo.sudo(dock.api.tx.poAModule.setMaxActiveValidators(count));
-  const { status } = await dock.sendTransaction(txn);
+  const { status } = await dock.signAndSend(txn);
   const blockHash = status.asFinalized;
   console.log(`Transaction finalized at blockHash ${blockHash}`);
   return blockHash;

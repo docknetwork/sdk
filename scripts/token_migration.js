@@ -21,7 +21,7 @@ async function addMigrator(dock, migratorId, allowedMigrations) {
   const account = dock.keyring.addFromUri('//Alice');
   dock.setAccount(account);
   const txn = dock.api.tx.sudo.sudo(dock.api.tx.migrationModule.addMigrator(migratorId, allowedMigrations));
-  const r = await dock.sendTransaction(txn, false);
+  const r = await dock.signAndSend(txn);
   console.log(`Transaction finalized at blockHash ${r.status.asFinalized}`);
   return r;
 }
@@ -31,7 +31,7 @@ async function migrate(dock, accountUri, recipients) {
   const account = dock.keyring.addFromUri(accountUri);
   dock.setAccount(account);
   const txn = await dock.api.tx.migrationModule.migrate(recipients);
-  const r = await dock.sendTransaction(txn, false);
+  const r = await dock.signAndSend(txn);
   console.log(`Transaction finalized at blockHash ${r.status.asFinalized}`);
   return r;
 }

@@ -15,7 +15,7 @@ async function sendDIDWriteTxn(handle) {
   const keyDetail = createKeyDetail(publicKey, dockDID);
   const transaction = handle.did.new(dockDID, keyDetail);
 
-  const { status } = await handle.sendTransaction(transaction);
+  const { status } = await handle.signAndSend(transaction);
   const blockHash = status.asFinalized;
   return (await getBlockDetails(handle, blockHash)).author;
 }

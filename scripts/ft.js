@@ -2,6 +2,8 @@ require('dotenv').config();
 
 import { DockAPI } from '../src/api';
 
+const { FullNodeEndpoint } = process.env;
+
 const endowed = '5CUrmmBsA7oPP2uJ58yPTjZn7dUpFzD1MtRuwLdoPQyBnyWM';
 const endowedSecret = process.env['EndowedSecretURI'];
 const sudo = '5CFfPovgr1iLJ4fekiTPmtGMyg7XGmLxUnTvd1Y4GigwPqzH';
@@ -80,8 +82,7 @@ async function setMaxActiveValidators(dock, sudoUri, count) {
 async function main() {
   const dock = new DockAPI();
   await dock.init({
-    // address: 'wss://testnet-1.dock.io',
-    address: 'ws://localhost:9944',
+    address: FullNodeEndpoint,
   });
 
   // const r = await fuelSudo(dock);

@@ -1,10 +1,8 @@
 // Helpers for scripts
 
-import { encodeAddress } from '@polkadot/util-crypto';
-
-import types from '../src/types.json';
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
-import { cryptoWaitReady } from '@polkadot/util-crypto';
+import { cryptoWaitReady, encodeAddress } from '@polkadot/util-crypto';
+import types from '../src/types.json';
 
 /**
  * Send the give transaction with the given account URI (secret) and return the block hash
@@ -86,9 +84,9 @@ export async function sendBatch(dock, txs, senderAddress, waitForFinalization = 
  */
 export async function keypair(seed) {
   await cryptoWaitReady();
-  let keyring = new Keyring({ type: 'sr25519' });
-  let key = keyring.addFromUri(seed);
-  return key
+  const keyring = new Keyring({ type: 'sr25519' });
+  const key = keyring.addFromUri(seed);
+  return key;
 }
 
 /**
@@ -103,9 +101,6 @@ export async function connect(wsUrl) {
   };
   return await ApiPromise.create({
     provider: new WsProvider(wsUrl),
-    types: {
-      ...types,
-      ...extraTypes,
-    },
+    types,
   });
 }

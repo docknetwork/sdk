@@ -1,6 +1,8 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import dock, { DockAPI } from '../src/api';
-import { createNewDockDID, createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval, getHexIdentifierFromDID } from '../src/utils/did';
+import {
+  createNewDockDID, createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval, getHexIdentifierFromDID,
+} from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { sendBatch } from './helpers';
 
@@ -75,7 +77,7 @@ async function sendDIDTxns(count, waitForFinalization = true) {
   return didPairs;
 }
 
-/* 
+/*
 3400 extrinsics fail due to block limit
 ----
 Sending 3300 key update extrinsics in a batch
@@ -188,27 +190,27 @@ async function runInLoop(limit) {
   if (limit) {
     console.info(`Will do ${limit} iterations`);
   }
-  console.time("loop");
+  console.time('loop');
   let count = 0;
   while (true) {
-    console.time("iteration");
-    console.time("WriteDID");
-    let didPairs = await sendDIDTxns(3400, false);
-    console.timeEnd("WriteDID");
+    console.time('iteration');
+    console.time('WriteDID');
+    const didPairs = await sendDIDTxns(3400, false);
+    console.timeEnd('WriteDID');
     console.log('Added 3400 DIDs in a batch');
     console.log('');
-    console.time("RemoveDID");
+    console.time('RemoveDID');
     await sendRemoveTxns(3400, didPairs, false);
-    console.timeEnd("RemoveDID");
+    console.timeEnd('RemoveDID');
     console.log('Remove 3400 DIDs in a batch');
     count++;
     console.info(`Iteration ${count} done`);
     if (limit && (count >= limit)) {
       break;
     }
-    console.timeEnd("iteration");
+    console.timeEnd('iteration');
   }
-  console.timeEnd("loop");
+  console.timeEnd('loop');
 }
 
 async function main() {

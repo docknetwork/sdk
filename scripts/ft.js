@@ -1,13 +1,13 @@
-require('dotenv').config();
-
 import { DockAPI } from '../src/api';
+
+require('dotenv').config();
 
 const { FullNodeEndpoint } = process.env;
 
 const endowed = '5CUrmmBsA7oPP2uJ58yPTjZn7dUpFzD1MtRuwLdoPQyBnyWM';
-const endowedSecret = process.env['EndowedSecretURI'];
+const endowedSecret = process.env.EndowedSecretURI;
 const sudo = '5CFfPovgr1iLJ4fekiTPmtGMyg7XGmLxUnTvd1Y4GigwPqzH';
-const sudoSecret = process.env['SudoSecretURI'];
+const sudoSecret = process.env.SudoSecretURI;
 
 const base = 250000000;
 

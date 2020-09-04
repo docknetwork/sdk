@@ -6,10 +6,10 @@
 import { Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { u8aToHex, assert } from '@polkadot/util';
+import b58 from 'bs58';
 import { createSignedKeyUpdate, getHexIdentifierFromDID } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { DockAPI, PublicKeySr25519 } from '../src/api';
-import b58 from 'bs58';
 
 require('dotenv').config();
 
@@ -44,7 +44,7 @@ examples:
 (async () => {
   await main();
   process.exit(0);
-})().catch(e => {
+})().catch((e) => {
   console.error(e);
   process.exit(1);
 });
@@ -55,9 +55,9 @@ async function main() {
     DidHolderSecret,
     PayerSecret,
   } = process.env;
-  assert(FullNodeEndpoint !== undefined, "env var FullNodeEndpoint must be defined");
-  assert(DidHolderSecret !== undefined, "env var DidHolderSecret must be defined");
-  assert(PayerSecret !== undefined, "env var PayerSecret must be defined");
+  assert(FullNodeEndpoint !== undefined, 'env var FullNodeEndpoint must be defined');
+  assert(DidHolderSecret !== undefined, 'env var DidHolderSecret must be defined');
+  assert(PayerSecret !== undefined, 'env var PayerSecret must be defined');
 
   if (process.argv.length !== 4) {
     throw USAGE;
@@ -75,11 +75,13 @@ async function main() {
     payerSk: PayerSecret,
   });
 
-  console.log(`Public key for did ${did_arg} successfully updated to ${new_pk}.`)
+  console.log(`Public key for did ${did_arg} successfully updated to ${new_pk}.`);
 }
 
 // This function assumes all keys are sr25519.
-async function updateDIDKey({ nodeWsUrl, did, currentSk, newPk, payerSk }) {
+async function updateDIDKey({
+  nodeWsUrl, did, currentSk, newPk, payerSk,
+}) {
   const dock = new DockAPI();
   await dock.init({ address: nodeWsUrl });
   dock.setAccount(await keypair(payerSk));
@@ -88,22 +90,22 @@ async function updateDIDKey({ nodeWsUrl, did, currentSk, newPk, payerSk }) {
   const currentPk = getPublicKeyFromKeyringPair(currentPair).value;
 
   // check
-  let initialPk = await getSr25519PkHex(dock, did);
-  assert_equal(initialPk, currentPk, "provided secret key does not control this did");
+  const initialPk = await getSr25519PkHex(dock, did);
+  assert_equal(initialPk, currentPk, 'provided secret key does not control this did');
 
   const [keyUpdate, signature] = await createSignedKeyUpdate(
     dock.did,
     did,
     new PublicKeySr25519(newPk),
     currentPair,
-    undefined // we are not updating the controller
+    undefined, // we are not updating the controller
   );
 
   await dock.did.updateKey(keyUpdate, signature);
 
   // check
   const finalPk = await getSr25519PkHex(dock, did);
-  assert_equal(finalPk, newPk, "paid transaction did not take effect, something went wrong");
+  assert_equal(finalPk, newPk, 'paid transaction did not take effect, something went wrong');
 
   await dock.disconnect();
 }
@@ -112,9 +114,9 @@ async function updateDIDKey({ nodeWsUrl, did, currentSk, newPk, payerSk }) {
 // or seed phrase or "//DevKey/Derivation/Path".
 async function keypair(seed) {
   await cryptoWaitReady();
-  let keyring = new Keyring({ type: 'sr25519' });
-  let key = keyring.addFromUri(seed);
-  return key
+  const keyring = new Keyring({ type: 'sr25519' });
+  const key = keyring.addFromUri(seed);
+  return key;
 }
 
 function assert_equal(a, b, note = 'equality assertion false') {
@@ -126,7 +128,7 @@ function assert_equal(a, b, note = 'equality assertion false') {
 async function getSr25519PkHex(dock, did) {
   const doc = await dock.did.getDocument(did);
   const pk = doc.publicKey[0];
-  assert_equal(pk.type, 'Sr25519VerificationKey2020', "this script assumes sr25519");
+  assert_equal(pk.type, 'Sr25519VerificationKey2020', 'this script assumes sr25519');
   return u8aToHex(b58.decode(pk.publicKeyBase58));
 }
 
@@ -138,13 +140,13 @@ function assertHex32(v) {
 
 function isHex32(v) {
   if ((typeof v) !== 'string') {
-    throw "bad type passed to isHex32";
+    throw 'bad type passed to isHex32';
   }
-  if (!v.startsWith("0x")) {
+  if (!v.startsWith('0x')) {
     return false;
   }
-  for (let c of v.slice(2)) {
-    if (!"0123456789abcdef".includes(c)) {
+  for (const c of v.slice(2)) {
+    if (!'0123456789abcdef'.includes(c)) {
       return false;
     }
   }

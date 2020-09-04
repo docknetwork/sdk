@@ -3,10 +3,11 @@
 import { u8aToHex } from '@polkadot/util';
 import { connect, keypair } from '../helpers';
 
+require('dotenv').config();
+
 const fsp = require('fs').promises;
 
-const USAGE =
-`
+const USAGE = `
 Use:
   ./vote.js <round_no> <./path/to/proposal.json>[ yes]
 
@@ -23,15 +24,14 @@ Expected Env vars:
     Secret phrase or hex encoded private key with which to sign. Not required for dry-run.
 `;
 
-main().catch(e => {
+main().catch((e) => {
   console.error(e);
   process.exit(1);
-}).then(_ => {
+}).then((_) => {
   process.exit(0);
 });
 
 async function main() {
-  require('dotenv').config();
   const { FullNodeEndpoint, MasterMemberSecret } = process.env;
 
   if (process.argv.length !== 4 && process.argv.length !== 5) {
@@ -47,7 +47,7 @@ async function main() {
   let do_vote_yes = false;
   if (process.argv.length === 5) {
     if (process.argv[4] !== 'yes') {
-      throw 'final argument must be either ommited or "yes"';
+      throw 'final argument must be either omitted or "yes"';
     }
     do_vote_yes = true;
   }
@@ -56,7 +56,7 @@ async function main() {
   try {
     proposal = JSON.parse(proposal_unparsed);
   } catch (e) {
-    console.error(`Proposal is not valid json.`);
+    console.error('Proposal is not valid json.');
     throw e;
   }
 
@@ -65,30 +65,30 @@ async function main() {
   const actual_round_no = (await nc.query.master.round()).toJSON();
   if (actual_round_no !== round_no) {
     throw (
-      'Round number passed as argument is not equal to round number reported by node.\n' +
-      `Passed as argument: ${round_no}\n` +
-      `Reported by node: ${actual_round_no}`
+      'Round number passed as argument is not equal to round number reported by node.\n'
+      + `Passed as argument: ${round_no}\n`
+      + `Reported by node: ${actual_round_no}`
     );
   }
 
   // encode proposal as call
   const call = nc.createType('Call', proposal);
 
-  console.log("");
+  console.log('');
   console.log(`This proposal calls "${call._meta.name}" with arguments:`);
   console.dir(JSON.parse(JSON.stringify(call.args)), { depth: null });
-  console.log("");
+  console.log('');
 
-  let payload = {
+  const payload = {
     proposal: [...nc.createType('Call', call).toU8a()],
     round_no: await nc.query.master.round(),
   };
-  let encoded_state_change = nc.createType('StateChange', { MasterVote: payload }).toU8a();
+  const encoded_state_change = nc.createType('StateChange', { MasterVote: payload }).toU8a();
 
   if (do_vote_yes) {
     // sign and print signature
     const kp = await keypair(MasterMemberSecret);
-    let sig = kp.sign(encoded_state_change);
+    const sig = kp.sign(encoded_state_change);
     console.log(`Signature:\n${u8aToHex(sig)}`);
   }
 }
@@ -97,9 +97,9 @@ async function main() {
 // this function is more strict but it still doesn't catch all bad input
 // for example "101a" does not trigger an error.
 function parseIntChecked(str) {
-  let ret = parseInt(str);
+  const ret = parseInt(str, 10);
   if (isNaN(ret)) {
-    throw `invalid number ${str}`;
+    throw new Error(`invalid number ${str}`);
   }
   return ret;
 }

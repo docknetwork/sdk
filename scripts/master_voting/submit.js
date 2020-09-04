@@ -2,10 +2,11 @@
 // Master::execute() transaction.
 // Assumes all signature are Sr25519.
 
-import { keypair, connect } from '../helpers';
 import { schnorrkelVerify } from '@polkadot/util-crypto/schnorrkel';
 import { u8aToHex, assert } from '@polkadot/util';
-const { promises: fs } = require("fs");
+import { keypair, connect } from '../helpers';
+
+const { promises: fs } = require('fs');
 
 require('dotenv').config();
 
@@ -22,10 +23,10 @@ env vars:
 Note: This script only supports sr25519 keys.
 `;
 
-main().catch(e => {
+main().catch((e) => {
   console.error(e);
   process.exit(1);
-}).then(_ => {
+}).then((_) => {
   process.exit(0);
 });
 
@@ -34,8 +35,8 @@ async function main() {
     FullNodeEndpoint,
     PayerSecret,
   } = process.env;
-  assert(FullNodeEndpoint !== undefined, "env var FullNodeEndpoint must be defined");
-  assert(PayerSecret !== undefined, "env var PayerSecret must be defined");
+  assert(FullNodeEndpoint !== undefined, 'env var FullNodeEndpoint must be defined');
+  assert(PayerSecret !== undefined, 'env var PayerSecret must be defined');
 
   if (process.argv.length !== 4) {
     throw USAGE;
@@ -51,7 +52,7 @@ async function main() {
     votes,
   });
 
-  console.log("Proposal and votes successfully submitted.");
+  console.log('Proposal and votes successfully submitted.');
 }
 
 /**
@@ -96,11 +97,11 @@ async function submit({
  * @returns {Promise<()>}
  */
 function toPMAuth(nodeClient, votes) {
-  let dtk_sorted = [...votes];
+  const dtk_sorted = [...votes];
   dtk_sorted.sort(); // this relies on dids being hex encoded
 
-  let vote_map = new Map();
-  for (let [did, key] of dtk_sorted) {
+  const vote_map = new Map();
+  for (const [did, key] of dtk_sorted) {
     vote_map.set(did, { Sr25519: key });
   }
 
@@ -121,35 +122,35 @@ function toPMAuth(nodeClient, votes) {
 async function assertValidAuth(nodeClient, proposal, mpauth) {
   // * - all signatures are valid over proposal for current voting round
   const encoded_state_change = await asEncodedStateChange(nodeClient, proposal);
-  for (let [did, sig] of mpauth) {
-    let did_doc = await nodeClient.query.didModule.dids(did);
-    let pk = did_doc.unwrap()[0].public_key;
+  for (const [did, sig] of mpauth) {
+    const did_doc = await nodeClient.query.didModule.dids(did);
+    const pk = did_doc.unwrap()[0].public_key;
     if (!pk.isSr25519) {
       throw `This script only supports sr25519. The public key registered for ${did} is not sr25519.`;
     }
-    let srpk = pk.asSr25519.value;
-    let srsig = sig.asSr25519.value;
-    let ver = schnorrkelVerify(encoded_state_change, srsig, srpk);
+    const srpk = pk.asSr25519.value;
+    const srsig = sig.asSr25519.value;
+    const ver = schnorrkelVerify(encoded_state_change, srsig, srpk);
     if (!ver) {
-      throw `Signature invalid:\n` +
-      `  payload: ${u8aToHex(encoded_state_change)}\n` +
-      `  did:     ${did}\n` +
-      `  public:  ${srpk}\n` +
-      `  sig:     ${srsig}`;
+      throw 'Signature invalid:\n'
+      + `  payload: ${u8aToHex(encoded_state_change)}\n`
+      + `  did:     ${did}\n`
+      + `  public:  ${srpk}\n`
+      + `  sig:     ${srsig}`;
     }
   }
 
   // * - all dids are members of master
-  let membership = await nodeClient.query.master.members();
-  for (let [did, _sig] of mpauth) {
-    let is_member = [...membership.members].some(member => u8aToHex(member) === u8aToHex(did));
+  const membership = await nodeClient.query.master.members();
+  for (const [did, _sig] of mpauth) {
+    const is_member = [...membership.members].some((member) => u8aToHex(member) === u8aToHex(did));
     if (!is_member) {
       throw `${did} is not a member of master`;
     }
   }
 
   // * - number of votes is sufficient
-  let vote_count = [...mpauth].length;
+  const vote_count = [...mpauth].length;
   if (membership.vote_requirement > vote_count) {
     throw `Not enough votes. ${membership.vote_requirement} required. ${vote_count} provided.`;
   }
@@ -163,7 +164,7 @@ async function assertValidAuth(nodeClient, proposal, mpauth) {
  * @returns {Promise<()>}
  */
 async function asEncodedStateChange(nodeClient, call) {
-  let payload = {
+  const payload = {
     proposal: [...call.toU8a()],
     round_no: await nodeClient.query.master.round(),
   };

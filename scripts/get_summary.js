@@ -1,6 +1,5 @@
 // Get summary from for PoA like current epoch, when will it end, active validators, queued validators, etc
 
-
 import dock from '../src/api';
 import { asDockAddress } from './helpers';
 

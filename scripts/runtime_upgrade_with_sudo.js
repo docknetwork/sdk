@@ -16,7 +16,7 @@ if (process.argv.length !== 3) {
 
 /**
  * Returns an array of Authoring version, Spec version, Impl version and Transaction version
- * @param {*} dock 
+ * @param {*} dock
  */
 async function getRuntimeVersion(dock) {
   const ver = await dock.api.rpc.state.getRuntimeVersion();

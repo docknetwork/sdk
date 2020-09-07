@@ -1,15 +1,9 @@
-import { cryptoWaitReady, randomAsHex } from '@polkadot/util-crypto';
-import { Keyring } from '@polkadot/api';
-import { hexToU8a } from '@polkadot/util';
+import { cryptoWaitReady } from '@polkadot/util-crypto';
 
 import VerifiableCredential from '../../src/verifiable-credential';
 import Schema from '../../src/modules/schema';
 import { DockBlobQualifier } from '../../src/modules/blob';
 import { createNewDockDID } from '../../src/utils/did';
-
-import {
-  getPublicKeyFromKeyringPair,
-} from '../../src/utils/misc';
 
 import {
   validateCredentialSchema,
@@ -40,17 +34,13 @@ describe('VerifiableCredential Tests', () => {
   test('VerifiableCredential\'s validateSchema should validate the credentialSubject with given JSON schema.', async () => {
     const result = await vc.validateSchema(exampleSchema);
     expect(result).toBe(true);
-  });
+  }, 7000);
 });
 
 describe('Basic Schema Tests', () => {
-  let keypair;
   let schema;
   beforeAll(async (done) => {
     await cryptoWaitReady();
-    const keyring = new Keyring();
-    const seed = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-    keypair = keyring.addFromUri(randomAsHex(32), null, 'sr25519');
     schema = new Schema();
     done();
   }, 10000);

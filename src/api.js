@@ -6,6 +6,7 @@ import BlobModule from './modules/blob';
 import DIDModule from './modules/did';
 import RevocationModule from './modules/revocation';
 import PoAModule from './modules/poa';
+import TokenMigration from './modules/migration';
 import types from './types.json';
 
 import {
@@ -65,6 +66,7 @@ class DockAPI {
     this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
     this.revocationModule = new RevocationModule(this.api, this.signAndSend.bind(this));
     this.poaModule = new PoAModule(this.api);
+    this.migrationModule = new TokenMigration(this.api);
 
     return this.api;
   }

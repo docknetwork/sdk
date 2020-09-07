@@ -1,6 +1,8 @@
 // Import Dock API
 import dock from '../src/api';
 
+require('dotenv').config();
+
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
 const { FullNodeEndpoint } = process.env;

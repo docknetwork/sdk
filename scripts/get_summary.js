@@ -83,8 +83,8 @@ async function printSummary() {
   } else {
     console.log('No validators to remove');
   }
-  console.log(summary.emissionStatus);
-  console.log(summary.emissionSupply);
+  console.log(`Emission status is ${summary.emissionStatus.toJSON()}`);
+  console.log(`Emission supply is ${summary.emissionSupply}`);
   process.exit(0);
 }
 

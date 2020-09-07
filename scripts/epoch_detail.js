@@ -1,8 +1,15 @@
 import { encodeAddress } from '@polkadot/util-crypto';
+import axios from 'axios';
 
 import { DockAPI } from '../src/api';
 
+require('dotenv').config();
+
+const { FullNodeEndpoint } = process.env;
+
 const dock = new DockAPI();
+
+let accounts;
 
 /* const accounts = {
   '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY': 'Alice',
@@ -10,18 +17,18 @@ const dock = new DockAPI();
   '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y': 'Charlie'
 }; */
 
-const accounts = {
-  '5DjPH6m1x4QLc4YaaxtVX752nQWZzBHZzwNhn5TztyMDgz8t': 'FT1',
-  '5HR2ytqigzQdbthhWA2g5K9JQayczEPwhAfSqAwSyb8Etmqh': 'FT2',
-  '5FNdWJ6RjLCJxnew1R1q4GZPjfxmdd3qCuLVPujmjozMGHzb': 'FT3',
-  '5DXQL7gQWq2Y2rJqZopHiUc9knUa4MCoysTqDVRjBWBiT6gP': 'FT4',
+/* const accounts = {
+  '5DVcdiH9cs5RGcrzDw15d972Jfkt3ATWr4fsMEaGfq44azNy': 'FT1',
+  '5DeYZhoygS7GVhxUPcCcmLkRND3CFeeuUhfTx9EdNXMCboZH': 'FT2',
+  '5FsGraZQvF2gUN5ZwRgcFnp9Q9k9FbVF5nPANXvmkN7kkv3Z': 'FT3',
+  '5EgUQVUKdKFP7tpcZmK3K2gMtCVyTymmYiXzGNqU53bLQHVb': 'FT4',
   '5GHA4YoLXqt5MdE3Sg1B9d563tts4jqg7yKhCcv1qWfF5QHB': 'FT5',
   '5DDNFu3jhBvvWNbtK6BvrZiMUvUn6WZUyPPQTHyKD5JDWXHp': 'FT6',
   '5Ccaz1mozrwaQiqXmvwykC2FPUDDtQ51tEN2aY5KpDnuNmLN': 'FT7',
   '5FCFo59AFtZU15yFDTpJyJ74thxjySvFbAJqgut29fh6VXUk': 'FT8',
   '5D2ge4WCCoPw92GZsRntejAGZmXjasktR4xf2bdKNiGTAB2j': 'FT9',
   '5DFN9pcRFSkyEtX67uAUrpmiBWLtrRwH6bgQX9Kqm7yVDwL4': 'FT10',
-};
+}; */
 
 // Take entries of map with numeric keys and sort them in ascending order of key
 function sortEntriesOfMapWithNumKey(entries) {
@@ -54,7 +61,7 @@ async function getEpochStats(dock) {
   const epochs = await dock.api.query.poAModule.epochs.entries();
   sortEntriesOfMapWithNumKey(epochs);
   // console.log(epochs);
-  epochs.forEach(element => {
+  epochs.forEach((element) => {
     // console.log(element[1]);
     console.log(element[0]._args[0].toNumber());
     // const epochNo = dock.api.createType('u32', element[0]);
@@ -82,7 +89,7 @@ async function getValidatorStats(dock) {
   const epochBlockCounts = await dock.api.query.poAModule.validatorStats.entries();
   sortEntriesOfMapWithNumKey(epochBlockCounts);
   // console.log(epochBlockCounts);
-  epochBlockCounts.forEach(element => {
+  epochBlockCounts.forEach((element) => {
     // console.log(Object.getOwnPropertyNames(element[0]));
     // console.log(element[0]._args[0]);
     // console.log(element[0].registry);
@@ -111,19 +118,22 @@ async function getStats(dock) {
 
   // await getValidatorStats(dock);
 
-  for (const k in accounts) {
+  Object.keys(accounts).forEach(async (k) => {
+    console.log(k);
     await printFreeBalance(accounts[k], k);
     await printReservedBalance(accounts[k], k);
-  }
+  });
 }
 
 async function main() {
   await dock.init({
     // address: 'ws://localhost:9944',
     // address: 'ws://3.128.224.235:9944',
-    address: 'wss://testnet-1.dock.io',
+    // address: 'wss://testnet-1.dock.io',
+    address: FullNodeEndpoint,
   });
-  // await getBlockDetails(dock, '0x2747e70f24d4aff7a462f2f34b7cf1b236d0167a1778c8857388f493de48928b');
+  accounts = (await axios.get('https://gist.github.com/lovesh/c540b975774735fe0001c86fa47a91b3/raw')).data;
+  console.log(accounts);
   await getStats(dock);
 }
 

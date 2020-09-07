@@ -9,13 +9,12 @@ import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 async function sendDIDWriteTxn(handle) {
   // DID will be generated randomly
   const dockDID = createNewDockDID();
-  const firstKeySeed = randomAsHex(32);
-  const firstPair = handle.keyring.addFromUri(firstKeySeed, null, 'sr25519');
-  const publicKey = getPublicKeyFromKeyringPair(firstPair);
+  const seed = randomAsHex(32);
+  const pair = handle.keyring.addFromUri(seed, null, 'sr25519');
+  const publicKey = getPublicKeyFromKeyringPair(pair);
   const keyDetail = createKeyDetail(publicKey, dockDID);
-  const transaction = handle.did.new(dockDID, keyDetail);
+  const { status } = await handle.did.new(dockDID, keyDetail);
 
-  const { status } = await handle.signAndSend(transaction);
   const blockHash = status.asFinalized;
   return (await getBlockDetails(handle, blockHash)).author;
 }
@@ -34,7 +33,7 @@ describe('Fee payment', () => {
 
     const aliceKeyring = new Keyring({ type: 'sr25519' });
     await aliceHandle.init({
-      address: 'ws://localhost:9944',
+      address: FullNodeEndpoint,
     });
     aliceHandle.setAccount(aliceKeyring.addFromUri('//Alice'));
 
@@ -45,7 +44,7 @@ describe('Fee payment', () => {
     done();
   });
 
-  test('Check balance', async (done) => {
+  test('Check balance', async () => {
     // Disable emission rewards so that balance change can be detected
     await setEmissionRewardsStatusWithHandle(aliceHandle, false);
 
@@ -83,6 +82,10 @@ describe('Fee payment', () => {
       }
     }
 
-    done();
   }, 30000);
+
+  afterAll(async () => {
+    await aliceHandle.disconnect();
+    await queryHandle.disconnect();
+  }, 10000);
 });

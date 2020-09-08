@@ -43,7 +43,7 @@ describe('Token migration', () => {
     let migrators = await sudoHandle.migrationModule.getMigrators();
     expect(migrators.length).toBe(0);
     const txn = sudoHandle.migrationModule.addMigrator(charlie, 3, true);
-    await sudoHandle.signAndSend(txn);
+    await sudoHandle.signAndSend(txn, false);
     migrators = await queryHandle.migrationModule.getMigrators();
     expect(migrators.length).toBe(1);
   }, 20000);
@@ -60,7 +60,7 @@ describe('Token migration', () => {
     recip1.set(eve, 100);
 
     const txn = charlieHandle.migrationModule.migrate(recip1);
-    await charlieHandle.signAndSend(txn);
+    await charlieHandle.signAndSend(txn, false);
 
     const charlieBal2 = parseInt(await getFreeBalance(queryHandle, charlie));
     const daveBal2 = parseInt(await getFreeBalance(queryHandle, dave));
@@ -75,7 +75,7 @@ describe('Token migration', () => {
 
   afterAll(async (done) => {
     const txn = sudoHandle.migrationModule.removeMigrator(charlie, true);
-    await sudoHandle.signAndSend(txn);
+    await sudoHandle.signAndSend(txn, false);
 
     await sudoHandle.disconnect();
     await charlieHandle.disconnect();

@@ -9,7 +9,6 @@ import {
   swapValidatorWithHandle,
 } from './helpers';
 
-
 describe('Validator swap', () => {
   // Assumes nodes Alice, Bob and Charlie are running
 

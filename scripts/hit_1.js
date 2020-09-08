@@ -21,32 +21,6 @@ async function fillBlock() {
 }
 
 /*
-async function sendTxnsWithCustomNonce() {
-  // const dock = new DockAPI();
-  // await dock.init({
-  //   address: FullNodeEndpoint,
-  // });
-
-  const account = dock.keyring.addFromUri(EndowedSecretURI);
-  dock.setAccount(account);
-  // console.log(dock.api.query.system.account);
-  // console.log(account);
-  // console.log(dock.api.rpc.system);
-  const nonce1 = (await dock.api.rpc.system.accountNextIndex(account.address)).toNumber();
-  console.log(nonce1);
-  const txhash1 = dock.api.tx.balances.transfer(account.address, 1);
-  const nonce2 = nonce1 + 1;
-  console.log(nonce2);
-  const txhash2 = dock.api.tx.balances.transfer(account.address, 1);
-  const nonce3 = nonce2 + 1;
-  console.log(nonce3);
-  dock.signAndSend(txhash1, true, {nonce: nonce1});
-  dock.signAndSend(txhash2, true, {nonce: nonce2});
-  const r = await dock.signAndSend(txhash2, true, {nonce: nonce3});
-  console.log(r.status.asFinalized);
-} */
-
-/*
 Even 5550 extrinsics fail due to block limit
 ----
 Sending 5500 DID write extrinsics in a batch
@@ -176,7 +150,6 @@ async function sendBlobTxns(count, didPairs) {
 }
 
 async function runOnce() {
-  // await fillBlock();
   let didPairs = await sendDIDTxns(3400);
   console.log('');
   didPairs = await sendKeyUpdateTxns(3300, didPairs);
@@ -214,8 +187,24 @@ async function runInLoop(limit) {
 }
 
 async function main() {
-  // await runOnce();
-  await runInLoop(10);
+  let action = 0;
+  if (process.argv.length >= 3) {
+    action = parseInt(process.argv[2]);
+  }
+  switch (action) {
+    case 0:
+      await runInLoop(10);
+      break;
+    case 1:
+      await runOnce();
+      break;
+    case 2:
+      await fillBlock(10);
+      break;
+    default:
+      console.error('Argument should be 0, 1 or 2');
+      process.exit(1);
+  }
   process.exit(0);
 }
 

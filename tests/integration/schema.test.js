@@ -62,7 +62,7 @@ describe('Schema Blob Module Integration', () => {
     publicKey = getPublicKeyFromKeyringPair(pair);
     dockDID = createNewDockDID();
     keyDetail = createKeyDetail(publicKey, dockDID);
-    await dockApi.did.new(dockDID, keyDetail);
+    await dockApi.did.new(dockDID, keyDetail, false);
     blobId = randomAsHex(DockBlobIdByteSize);
 
     // Write a blob with invalid JSON-schema format
@@ -71,7 +71,7 @@ describe('Schema Blob Module Integration', () => {
       id: invalidFormatBlobId,
       blob: stringToHex('hello world'),
       author: getHexIdentifierFromDID(dockDID),
-    }, pair);
+    }, pair, undefined, false);
 
     // Write schema blob
     const blobStr = JSON.stringify(exampleSchema);
@@ -79,7 +79,7 @@ describe('Schema Blob Module Integration', () => {
       id: blobId,
       blob: stringToHex(blobStr),
       author: getHexIdentifierFromDID(dockDID),
-    }, pair);
+    }, pair, undefined, false);
 
     // Properly format a keyDoc to use for signing
     keyDoc = getKeyDoc(

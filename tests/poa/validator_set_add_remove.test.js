@@ -174,5 +174,5 @@ describe('Validator set change', () => {
         --count;
       }
     });
-  });
+  }, 30000);
 });

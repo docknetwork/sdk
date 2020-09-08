@@ -38,8 +38,8 @@ class DIDModule {
    * @param {object} keyDetail - `KeyDetail` as expected by the Substrate node
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async new(did, keyDetail) {
-    return await this.signAndSend(this.createNewTx(did, keyDetail));
+  async new(did, keyDetail, waitForFinalization = true, params = {}) {
+    return await this.signAndSend(this.createNewTx(did, keyDetail), waitForFinalization, params);
   }
 
   /**
@@ -58,8 +58,8 @@ class DIDModule {
    * @param {Signature} signature - Signature from existing key
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async updateKey(keyUpdate, signature) {
-    return await this.signAndSend(this.createUpdateKeyTx(keyUpdate, signature));
+  async updateKey(keyUpdate, signature, waitForFinalization = true, params = {}) {
+    return await this.signAndSend(this.createUpdateKeyTx(keyUpdate, signature), waitForFinalization, params);
   }
 
   /**
@@ -78,8 +78,8 @@ class DIDModule {
    * @param {Signature} signature - Signature from existing key
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async remove(didRemoval, signature) {
-    return await this.signAndSend(this.createRemoveTx(didRemoval, signature));
+  async remove(didRemoval, signature, waitForFinalization = true, params = {}) {
+    return await this.signAndSend(this.createRemoveTx(didRemoval, signature), waitForFinalization, params);
   }
 
   /**

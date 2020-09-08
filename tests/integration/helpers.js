@@ -13,7 +13,7 @@ export async function registerNewDIDUsingPair(dockAPI, did, pair) {
 
   // The controller is same as the DID
   const keyDetail = createKeyDetail(publicKey, did);
-  return dockAPI.did.new(did, keyDetail);
+  return dockAPI.did.new(did, keyDetail, false);
 }
 
 /**

@@ -11,25 +11,6 @@ const dock = new DockAPI();
 
 let accounts;
 
-/* const accounts = {
-  '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY': 'Alice',
-  '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty': 'Bob',
-  '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y': 'Charlie'
-}; */
-
-/* const accounts = {
-  '5DjPH6m1x4QLc4YaaxtVX752nQWZzBHZzwNhn5TztyMDgz8t': 'FT1',
-  '5HR2ytqigzQdbthhWA2g5K9JQayczEPwhAfSqAwSyb8Etmqh': 'FT2',
-  '5FNdWJ6RjLCJxnew1R1q4GZPjfxmdd3qCuLVPujmjozMGHzb': 'FT3',
-  '5DXQL7gQWq2Y2rJqZopHiUc9knUa4MCoysTqDVRjBWBiT6gP': 'FT4',
-  '5GHA4YoLXqt5MdE3Sg1B9d563tts4jqg7yKhCcv1qWfF5QHB': 'FT5',
-  '5DDNFu3jhBvvWNbtK6BvrZiMUvUn6WZUyPPQTHyKD5JDWXHp': 'FT6',
-  '5Ccaz1mozrwaQiqXmvwykC2FPUDDtQ51tEN2aY5KpDnuNmLN': 'FT7',
-  '5FCFo59AFtZU15yFDTpJyJ74thxjySvFbAJqgut29fh6VXUk': 'FT8',
-  '5D2ge4WCCoPw92GZsRntejAGZmXjasktR4xf2bdKNiGTAB2j': 'FT9',
-  '5DFN9pcRFSkyEtX67uAUrpmiBWLtrRwH6bgQX9Kqm7yVDwL4': 'FT10',
-}; */
-
 // Take entries of map with numeric keys and sort them in ascending order of key
 function sortEntriesOfMapWithNumKey(entries) {
   entries.sort((element1, element2) => element1[0]._args[0].toNumber() - element2[0]._args[0].toNumber());
@@ -55,16 +36,13 @@ async function getBlockDetails(dock, blockHash) {
   return [dock.api.createType('u64', slotNo), header.number, header.author];
 }
 
-async function getEpochStats(dock) {
+async function printEpochStats(dock) {
   console.log('Epochs');
   console.log('');
   const epochs = await dock.api.query.poAModule.epochs.entries();
   sortEntriesOfMapWithNumKey(epochs);
-  // console.log(epochs);
   epochs.forEach((element) => {
-    // console.log(element[1]);
     console.log(element[0]._args[0].toNumber());
-    // const epochNo = dock.api.createType('u32', element[0]);
     const epochNo = element[0].toHuman();
     console.log(`epoch no ${epochNo}`);
     const lastSlot = element[1].ending_slot.isSome ? element[1].ending_slot.unwrap().toHuman() : 'Nil';
@@ -76,24 +54,17 @@ async function getEpochStats(dock) {
       console.log(`Total emission: ${totalEmission}, Emission for Treasury: ${treasEmission}, Emission for validators: ${valdEmission}`);
     }
     console.log('');
-    // console.log(element[1][2]);
   });
   console.log('------------------------------------------------------------------------------------------------------------');
   console.log('');
-  console.log('');
 }
 
-async function getValidatorStats(dock) {
+async function printValidatorStats(dock) {
   console.log('Validator stats');
   console.log('');
   const epochBlockCounts = await dock.api.query.poAModule.validatorStats.entries();
   sortEntriesOfMapWithNumKey(epochBlockCounts);
-  // console.log(epochBlockCounts);
   epochBlockCounts.forEach((element) => {
-    // console.log(Object.getOwnPropertyNames(element[0]));
-    // console.log(element[0]._args[0]);
-    // console.log(element[0].registry);
-    // console.log(element[1]);
     const epochNo = element[0]._args[0];
     const validatorId = encodeAddress(element[0]._args[1]);
     console.log(`For epoch no ${epochNo}, validator ${accounts[validatorId]}, blocks authored is ${element[1].block_count}`);
@@ -106,18 +77,16 @@ async function getValidatorStats(dock) {
   });
   console.log('------------------------------------------------------------------------------------------------------------');
   console.log('');
+}
+
+async function printRemainingSupply(dock) {
+  const emissionSupply = await dock.api.query.poAModule.emissionSupply();
+  console.log(`Remaining emission supply ${emissionSupply}`);
+  console.log('-----------------------------------------------------------------------');
   console.log('');
 }
 
-async function getStats(dock) {
-  const emissionSupply = await dock.api.query.poAModule.emissionSupply();
-  console.log(`Emission supply ${emissionSupply}`);
-  console.log('-----------------------------------------------------------------------');
-
-  await getEpochStats(dock);
-
-  // await getValidatorStats(dock);
-
+async function printValidatorBal(dock) {
   Object.keys(accounts).forEach(async (k) => {
     console.log(k);
     await printFreeBalance(accounts[k], k);
@@ -127,14 +96,30 @@ async function getStats(dock) {
 
 async function main() {
   await dock.init({
-    // address: 'ws://localhost:9944',
-    // address: 'ws://3.128.224.235:9944',
-    // address: 'wss://testnet-1.dock.io',
     address: FullNodeEndpoint,
   });
   accounts = (await axios.get('https://gist.github.com/lovesh/c540b975774735fe0001c86fa47a91b3/raw')).data;
-  console.log(accounts);
-  await getStats(dock);
+  let action = 0;
+  if (process.argv.length >= 3) {
+    action = parseInt(process.argv[2]);
+  }
+  switch (action) {
+    case 0:
+      await printRemainingSupply();
+      break;
+    case 1:
+      await printValidatorBal();
+      break;
+    case 2:
+      await printEpochStats();
+      break;
+    case 3:
+      await printValidatorStats();
+      break;
+    default:
+      console.error('Argument should be 0, 1, 2 or 3');
+      process.exit(1);
+  }
 }
 
 main()

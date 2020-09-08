@@ -54,9 +54,14 @@ describe('Token migration', () => {
     const eveBal1 = parseInt(await getFreeBalance(queryHandle, eve));
     const ferdieBal1 = parseInt(await getFreeBalance(queryHandle, ferdie));
 
+    // BTreeMap can be initialed without argument.
+    // @ts-ignore
     const recip1 = new BTreeMap();
+    // @ts-ignore
     recip1.set(ferdie, 300);
+    // @ts-ignore
     recip1.set(dave, 200);
+    // @ts-ignore
     recip1.set(eve, 100);
 
     const txn = charlieHandle.migrationModule.migrate(recip1);

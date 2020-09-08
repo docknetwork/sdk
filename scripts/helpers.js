@@ -9,7 +9,7 @@ import types from '../src/types.json';
  * @param dock
  * @param senderAccountUri
  * @param txn
- * @returns {Promise<Hash>}
+ * @returns {Promise}
  */
 export async function sendTxnWithAccount(dock, senderAccountUri, txn, waitForFinalization = true) {
   const account = dock.keyring.addFromUri(senderAccountUri);
@@ -25,7 +25,7 @@ export async function sendTxnWithAccount(dock, senderAccountUri, txn, waitForFin
  * @param argv Array of command line arguments
  * @param func Function to add or remove
  * @param senderAccountUri
- * @returns {Promise<Hash>}
+ * @returns {Promise}
  */
 export async function validatorChange(dock, argv, func, senderAccountUri) {
   let shortCircuit;
@@ -73,32 +73,27 @@ export async function sendBatch(dock, txs, senderAddress, waitForFinalization = 
   }
   console.timeEnd(`Time for batch of size ${txs.length}`);
   const bal2 = await dock.poaModule.getBalance(senderAddress);
-  console.info(`Fee paid is ${parseInt(bal1[0] - bal2[0])}`);
+  console.info(`Fee paid is ${parseInt(bal1[0]) - parseInt(bal2[0])}`);
 }
 
 /**
  * Load a sr25519 keypair from secret, secret may be "0x" prefixed hex seed
  * or seed phrase or "//DevKey/Derivation/Path".
- * @param secret - string
- * @returns {Promise<KeyPair>}
+ * @param seed - string
+ * @returns {Promise}
  */
 export async function keypair(seed) {
   await cryptoWaitReady();
   const keyring = new Keyring({ type: 'sr25519' });
-  const key = keyring.addFromUri(seed);
-  return key;
+  return keyring.addFromUri(seed);
 }
 
 /**
  * connect to running node, returning the raw polkadot-js client
- * @param websocket url - string
- * @returns {Promise<KeyPair>}
+ * @param wsUrl - string
+ * @returns {Promise}
  */
 export async function connect(wsUrl) {
-  const extraTypes = {
-    Address: 'AccountId',
-    LookupSource: 'AccountId',
-  };
   return await ApiPromise.create({
     provider: new WsProvider(wsUrl),
     types,

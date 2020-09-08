@@ -54,7 +54,7 @@ async function createDockDID() {
   const pair = dock.keyring.addFromUri(randomAsHex(32), null, 'sr25519');
   const publicKey = getPublicKeyFromKeyringPair(pair);
   const keyDetail = createKeyDetail(publicKey, dockDID);
-  await dock.did.new(dockDID, keyDetail);
+  await dock.did.new(dockDID, keyDetail, false);
 
   return dockDID;
 }

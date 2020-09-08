@@ -19,14 +19,14 @@ alice_container_id=$(
 	docker run --rm -d --name alice                           \
         -p 9944:9944 -p 9933:9933 -p 30333:30333            \
         $CONFIG_DOCK_NODE_IMAGE                             \
-        --alice --rpc-external --ws-external --rpc-cors=all
+        --alice --rpc-external --ws-external
 )
 
 bob_container_id=$(
 	docker run --rm -d --name bob                             \
         -p 9945:9944 -p 9934:9933 -p 30334:30333            \
         $CONFIG_DOCK_NODE_IMAGE                             \
-        --bob --rpc-external --ws-external --rpc-cors=all
+        --bob --rpc-external --ws-external
 )
 
 # Charlie's unsafe rpc methods need to be called by PoA tests
@@ -34,7 +34,7 @@ charlie_container_id=$(
 	docker run --rm -d --name charlie                         \
         -p 9966:9944 -p 9935:9933 -p 30335:30333            \
         $CONFIG_DOCK_NODE_IMAGE --charlie --rpc-external    \
-        --ws-external --rpc-cors=all --rpc-methods=Unsafe   
+        --ws-external --rpc-methods=Unsafe   
 )
 
 try_with_node() {

@@ -59,7 +59,7 @@ async function setup() {
 
   // Add a new revocation registry with above policy
   console.log('Creating registry...');
-  await dock.revocation.newRegistry(registryId, policy, false);
+  await dock.revocation.newRegistry(registryId, policy, false, false);
 
   console.log('Issuer has created registry with id', registryId);
 }

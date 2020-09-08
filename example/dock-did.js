@@ -74,7 +74,7 @@ function registerNewDID() {
 
   console.log('Submitting new DID', dockDID, publicKey);
 
-  const transaction = dock.did.new(dockDID, keyDetail);
+  const transaction = dock.did.new(dockDID, keyDetail, false);
   return transaction;
 }
 

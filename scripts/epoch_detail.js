@@ -36,7 +36,7 @@ async function getBlockDetails(dock, blockHash) {
   return [dock.api.createType('u64', slotNo), header.number, header.author];
 }
 
-async function printEpochStats(dock) {
+async function printEpochStats() {
   console.log('Epochs');
   console.log('');
   const epochs = await dock.api.query.poAModule.epochs.entries();
@@ -59,7 +59,7 @@ async function printEpochStats(dock) {
   console.log('');
 }
 
-async function printValidatorStats(dock) {
+async function printValidatorStats() {
   console.log('Validator stats');
   console.log('');
   const epochBlockCounts = await dock.api.query.poAModule.validatorStats.entries();
@@ -79,19 +79,22 @@ async function printValidatorStats(dock) {
   console.log('');
 }
 
-async function printRemainingSupply(dock) {
+async function printRemainingSupply() {
   const emissionSupply = await dock.api.query.poAModule.emissionSupply();
   console.log(`Remaining emission supply ${emissionSupply}`);
   console.log('-----------------------------------------------------------------------');
   console.log('');
 }
 
-async function printValidatorBal(dock) {
-  Object.keys(accounts).forEach(async (k) => {
-    console.log(k);
+async function printValidatorBal() {
+  /* eslint-disable no-await-in-loop */
+  for (const k in accounts) {
+    console.log(`${accounts[k]}'s address is ${k}`);
     await printFreeBalance(accounts[k], k);
     await printReservedBalance(accounts[k], k);
-  });
+    console.log('');
+  }
+  /* eslint-disable no-await-in-loop */
 }
 
 async function main() {

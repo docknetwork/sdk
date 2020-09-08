@@ -79,9 +79,7 @@ export async function genSessionKey(nodeAddress, accountUri) {
 
 export async function genSessionKeyForHandle(handle) {
   const key = await handle.api.rpc.author.rotateKeys();
-  const hexKey = u8aToHex(key);
-  // console.log(hexKey);
-  return hexKey;
+  return u8aToHex(key);
 }
 
 // Associate session key with an account using an extrinsic. Requires validator to have some tokens
@@ -158,6 +156,12 @@ export async function setEmissionRewardsStatus(dock, sudoAccUri, status) {
 
 export async function setEmissionRewardsStatusWithHandle(sudoHandle, status) {
   const txn = sudoHandle.api.tx.sudo.sudo(sudoHandle.api.tx.poAModule.setEmissionStatus(status));
+  const r = await sudoHandle.signAndSend(txn, false);
+  return getBlockDetails(sudoHandle, r.status.asInBlock);
+}
+
+export async function setMinEpochLengthWithHandle(sudoHandle, length) {
+  const txn = sudoHandle.poaModule.setMinEpochLength(length, true);
   const r = await sudoHandle.signAndSend(txn, false);
   return getBlockDetails(sudoHandle, r.status.asInBlock);
 }

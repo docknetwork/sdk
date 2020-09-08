@@ -6,7 +6,7 @@ import { FullNodeEndpoint, TestKeyringOpts } from '../test-constants';
 import {
   genSessionKeyForHandle, getChainData, getSlotNoFromHeader,
   setSessionKeyThroughRootWithHandle,
-  swapValidatorWithHandle,
+  swapValidatorWithHandle, setMinEpochLengthWithHandle,
 } from './helpers';
 
 describe('Validator swap', () => {
@@ -39,6 +39,8 @@ describe('Validator swap', () => {
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
+
+    await setMinEpochLengthWithHandle(aliceHandle, 15);
     done();
   }, 30000);
 

@@ -4,10 +4,14 @@
 
 set -ueo pipefail
 
-DOCK_NODE_HTTP=${DOCK_NODE_HTTP:-http://localhost:9933}
+ALICE_NODE_HTTP=${ALICE_NODE_HTTP:-http://localhost:9933}
+BOB_NODE_HTTP=${BOB_NODE_HTTP:-http://localhost:9934}
+CHARLIE_NODE_HTTP=${CHARLIE_NODE_HTTP:-http://localhost:9935}
 
 callrpc() {
-    curl $DOCK_NODE_HTTP -H "Content-Type:application/json;charset=utf-8" -d "$1"
+    curl $ALICE_NODE_HTTP -H "Content-Type:application/json;charset=utf-8" -d "$1"
+    curl $BOB_NODE_HTTP -H "Content-Type:application/json;charset=utf-8" -d "$1"
+    curl $CHARLIE_NODE_HTTP -H "Content-Type:application/json;charset=utf-8" -d "$1"
 }
 
 wait_for_success() {
@@ -49,4 +53,5 @@ quietly() {
     $@ >/dev/null 2>/dev/null
 }
 
+# Check that nodes' RPC server is ready
 with_timeout 15 wait_for_success quietly callrpc '[]'

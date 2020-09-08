@@ -7,7 +7,7 @@ import {
   getChainData,
   addValidatorWithHandle,
   removeValidatorWithHandle,
-  setSessionKeyThroughRootWithHandle, genSessionKeyForHandle, getSlotNoFromHeader,
+  setSessionKeyThroughRootWithHandle, genSessionKeyForHandle, getSlotNoFromHeader, setMinEpochLengthWithHandle,
 } from './helpers';
 
 describe('Validator set change', () => {
@@ -39,6 +39,8 @@ describe('Validator set change', () => {
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
+
+    await setMinEpochLengthWithHandle(aliceHandle, 15);
     done();
   }, 30000);
 

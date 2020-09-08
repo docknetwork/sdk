@@ -15,7 +15,7 @@ async function sendDIDWriteTxn(handle) {
   const keyDetail = createKeyDetail(publicKey, dockDID);
   const { status } = await handle.did.new(dockDID, keyDetail, false);
 
-  const blockHash = status.asFinalized;
+  const blockHash = status.asInBlock;
   return (await getBlockDetails(handle, blockHash)).author;
 }
 

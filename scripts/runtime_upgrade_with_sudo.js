@@ -26,6 +26,10 @@ async function getRuntimeVersion(dock) {
 async function doRuntimeUpgrade() {
   const code = fs.readFileSync(process.argv[2]);
   const codeAsHex = code.toString('hex');
+
+  fs.writeFileSync('wasm_code.hex', codeAsHex);
+  console.log('WASM code written in hex in file wasm_code.hex');
+
   // Prepare to send the code
   const proposal = dock.api.tx.system.setCode(`0x${codeAsHex}`);
 

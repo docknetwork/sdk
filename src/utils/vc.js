@@ -405,16 +405,19 @@ export async function validateCredentialSchema(credential, schema, context) {
  */
 export async function getAndValidateSchemaIfPresent(credential, schemaApi, context) {
   if (schemaApi) {
-    const schema = credential[expandedSchemaProperty][0];
-    if (credential[expandedSubjectProperty] && schema) {
-      if (!schemaApi.dock) {
-        throw new Error('Only Dock schemas are supported as of now.');
-      }
-      try {
-        const schemaObj = await Schema.get(schema[credentialIDField], schemaApi.dock);
-        await validateCredentialSchema(credential, schemaObj, context);
-      } catch (e) {
-        throw new Error(`Schema validation failed: ${e}`);
+    const schemaList = credential[expandedSchemaProperty];
+    if (schemaList) {
+      const schema = schemaList[0];
+      if (credential[expandedSubjectProperty] && schema) {
+        if (!schemaApi.dock) {
+          throw new Error('Only Dock schemas are supported as of now.');
+        }
+        try {
+          const schemaObj = await Schema.get(schema[credentialIDField], schemaApi.dock);
+          await validateCredentialSchema(credential, schemaObj, context);
+        } catch (e) {
+          throw new Error(`Schema validation failed: ${e}`);
+        }
       }
     }
   }

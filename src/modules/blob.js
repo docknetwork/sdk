@@ -110,8 +110,8 @@ class BlobModule {
    * @param {Signature} signature - Signature to use
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async new(blob, keyPair = undefined, signature = undefined) {
-    return await this.signAndSend(this.createNewTx(blob, keyPair, signature));
+  async new(blob, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
+    return await this.signAndSend(this.createNewTx(blob, keyPair, signature), waitForFinalization, params);
   }
 
   /**

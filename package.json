@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "0.1.6",
+  "version": "0.1.9",
   "main": "index.js",
   "license": "MIT",
   "repository": {

@@ -1,4 +1,4 @@
-import { u8aToU8a, u8aToString, u8aToHex } from '@polkadot/util';
+import { u8aToString, u8aToHex } from '@polkadot/util';
 import { randomAsHex } from '@polkadot/util-crypto';
 
 import { DockAPI } from '../../src/api';
@@ -6,20 +6,13 @@ import { DockAPI } from '../../src/api';
 import { createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
-import { verifyCredential } from '../../src/utils/vc';
 import { DockBlobIdByteSize, BLOB_MAX_BYTE_SIZE } from '../../src/modules/blob';
-import Schema from '../../src/modules/schema';
-import exampleCredential from '../example-credential';
-import exampleSchema from '../example-schema';
 
 let account;
 let pair;
 let publicKey;
 let dockDID;
 let keyDetail;
-let txDid;
-let resultDid;
-let didDoc;
 let blobId;
 
 function errorInResult(result) {
@@ -55,15 +48,14 @@ describe('Blob Module', () => {
     publicKey = getPublicKeyFromKeyringPair(pair);
     dockDID = createNewDockDID();
     keyDetail = createKeyDetail(publicKey, dockDID);
-    txDid = dock.did.new(dockDID, keyDetail);
-    resultDid = await txDid;
-    didDoc = await dock.did.getDocument(dockDID);
+    await dock.did.new(dockDID, keyDetail);
+    await dock.did.getDocument(dockDID);
     blobId = randomAsHex(DockBlobIdByteSize);
   }, 30000);
 
   test('Can create and read a JSON Blob.', async () => {
     const blobJSON = {
-      jsonBlob: true
+      jsonBlob: true,
     };
     const result = await dock.blob.new(
       {
@@ -72,6 +64,8 @@ describe('Blob Module', () => {
         author: getHexIdentifierFromDID(dockDID),
       },
       pair,
+      undefined,
+      false,
     );
 
     expect(!!result).toBe(true);
@@ -82,7 +76,7 @@ describe('Blob Module', () => {
   }, 30000);
 
   test('Can create and read a string Blob.', async () => {
-    const blobHex = 'my string'
+    const blobHex = 'my string';
     const result = await dock.blob.new(
       {
         id: blobId,
@@ -90,6 +84,8 @@ describe('Blob Module', () => {
         author: getHexIdentifierFromDID(dockDID),
       },
       pair,
+      undefined,
+      false,
     );
 
     expect(!!result).toBe(true);
@@ -108,6 +104,8 @@ describe('Blob Module', () => {
         author: getHexIdentifierFromDID(dockDID),
       },
       pair,
+      undefined,
+      false,
     );
 
     expect(!!result).toBe(true);
@@ -126,6 +124,8 @@ describe('Blob Module', () => {
         author: getHexIdentifierFromDID(dockDID),
       },
       pair,
+      undefined,
+      false,
     );
 
     expect(!!result).toBe(true);
@@ -144,6 +144,8 @@ describe('Blob Module', () => {
         author: getHexIdentifierFromDID(dockDID),
       },
       pair,
+      undefined,
+      false,
     );
 
     expect(!!result).toBe(true);
@@ -161,6 +163,8 @@ describe('Blob Module', () => {
         author: getHexIdentifierFromDID(dockDID),
       },
       pair,
+      undefined,
+      false,
     );
 
     expect(!!resultFirst).toBe(true);
@@ -172,6 +176,8 @@ describe('Blob Module', () => {
         author: getHexIdentifierFromDID(dockDID),
       },
       pair,
+      undefined,
+      false,
     );
 
     expect(errorInResult(resultFirst)).toBe(false);

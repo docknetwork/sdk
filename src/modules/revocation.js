@@ -39,8 +39,8 @@ class RevocationModule {
    * @param {Boolean} addOnly - true: credentials can be revoked, but not un-revoked, false: credentials can be revoked and un-revoked
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async newRegistry(id, policy, addOnly) {
-    return this.signAndSend(this.createNewRegistryTx(id, policy, addOnly));
+  async newRegistry(id, policy, addOnly, waitForFinalization = true, params = {}) {
+    return this.signAndSend(this.createNewRegistryTx(id, policy, addOnly), waitForFinalization, params);
   }
 
   /**
@@ -68,8 +68,8 @@ class RevocationModule {
    * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async removeRegistry(registryID, lastModified, didKeys) {
-    return await this.signAndSend(this.createRemoveRegistryTx(registryID, lastModified, didKeys));
+  async removeRegistry(registryID, lastModified, didKeys, waitForFinalization = true, params = {}) {
+    return await this.signAndSend(this.createRemoveRegistryTx(registryID, lastModified, didKeys), waitForFinalization, params);
   }
 
   /**
@@ -100,8 +100,8 @@ class RevocationModule {
    * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async revoke(registryID, revokeIds, lastModified, didKeys) {
-    return await this.signAndSend(this.createRevokeTx(registryID, revokeIds, lastModified, didKeys));
+  async revoke(registryID, revokeIds, lastModified, didKeys, waitForFinalization = true, params = {}) {
+    return await this.signAndSend(this.createRevokeTx(registryID, revokeIds, lastModified, didKeys), waitForFinalization, params);
   }
 
   /**
@@ -132,8 +132,8 @@ class RevocationModule {
    * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async unrevoke(registryID, revokeIds, lastModified, didKeys) {
-    return await this.signAndSend(this.createUnrevokeTx(registryID, revokeIds, lastModified, didKeys));
+  async unrevoke(registryID, revokeIds, lastModified, didKeys, waitForFinalization = true, params = {}) {
+    return await this.signAndSend(this.createUnrevokeTx(registryID, revokeIds, lastModified, didKeys), waitForFinalization, params);
   }
 
   /**
@@ -200,11 +200,11 @@ class RevocationModule {
    * @param {string} revId - The revocation id being revoked or unrevoked
    * @returns {Promise<void>}
    */
-  async updateRevReg(updateFunc, didKeys, registryId, revId) {
+  async updateRevReg(updateFunc, didKeys, registryId, revId, waitForFinalization = true, params = {}) {
     const lastModified = await this.getBlockNoForLastChangeToRegistry(registryId);
     const revokeIds = new Set();
     revokeIds.add(revId);
-    return updateFunc.bind(this)(registryId, revokeIds, lastModified, didKeys);
+    return updateFunc.bind(this)(registryId, revokeIds, lastModified, didKeys, waitForFinalization, params);
   }
 
   /**
@@ -215,8 +215,8 @@ class RevocationModule {
    * @param revId - The revocation id that is being revoked
    * @returns {Promise<void>}
    */
-  async revokeCredential(didKeys, registryId, revId) {
-    return this.updateRevReg(this.revoke, didKeys, registryId, revId);
+  async revokeCredential(didKeys, registryId, revId, waitForFinalization = true, params = {}) {
+    return this.updateRevReg(this.revoke, didKeys, registryId, revId, waitForFinalization, params);
   }
 
   /**
@@ -227,8 +227,8 @@ class RevocationModule {
    * @param revId - The revocation id that is being unrevoked
    * @returns {Promise<void>}
    */
-  async unrevokeCredential(didKeys, registryId, revId) {
-    return this.updateRevReg(this.unrevoke, didKeys, registryId, revId);
+  async unrevokeCredential(didKeys, registryId, revId, waitForFinalization = true, params = {}) {
+    return this.updateRevReg(this.unrevoke, didKeys, registryId, revId, waitForFinalization, params);
   }
 
   /**

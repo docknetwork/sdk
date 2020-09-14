@@ -9,27 +9,27 @@ describe('Serialization', () => {
   test('VerifiableCredential fromJSON should fail if no type is provided', () => {
     expect(() => VerifiableCredential.fromJSON({
       ...exampleCredential,
-      type: undefined
+      type: undefined,
     })).toThrow();
   });
 
   test('VerifiableCredential fromJSON should fail if no context is provided', () => {
     expect(() => VerifiableCredential.fromJSON({
       ...exampleCredential,
-      '@context': undefined
+      '@context': undefined,
     })).toThrow();
   });
 
   test('VerifiablePresentation fromJSON should fail if no type is provided', () => {
     expect(() => VerifiablePresentation.fromJSON({
       '@context': 'https://www.w3.org/2018/credentials/v1',
-      type: undefined
+      type: undefined,
     })).toThrow();
   });
 
   test('VerifiablePresentation fromJSON should fail if no context is provided', () => {
     expect(() => VerifiablePresentation.fromJSON({
-      '@context': undefined
+      '@context': undefined,
     })).toThrow();
   });
 

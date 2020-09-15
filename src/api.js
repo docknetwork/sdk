@@ -175,6 +175,18 @@ class DockAPI {
   }
 
   /**
+   * Checks if the API instance is connected to the node
+   * @return {Boolean} The connection status
+   */
+  get isConnected() {
+    if (!this.api) {
+      return false;
+    }
+
+    return this.api.isConnected;
+  }
+
+  /**
    * Gets the SDK's Blob module
    * @return {BlobModule} The module to use
    */

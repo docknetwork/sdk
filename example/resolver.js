@@ -85,7 +85,6 @@ async function main() {
     'did:work:2UUHQCd4psvkPLZGnWY33L',
     'did:sov:WRfXPg8dantKVubE3HX8pw',
     'did:nacl:Md8JiMIwsapml_FtQ2ngnGftNP5UmVCAUuhnLyAsPxI',
-    'did:github:gjgd',
   ];
 
   console.log('Resolving', didsToTest.length, 'dids...');

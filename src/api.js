@@ -49,7 +49,11 @@ class DockAPI {
     keyring: null,
   }) {
     if (this.api) {
-      throw new Error('API is already connected');
+      if (this.api.isConnected) {
+        throw new Error('API is already connected');
+      } else {
+        this.disconnect();
+      }
     }
 
     this.address = address || this.address;
@@ -77,7 +81,9 @@ class DockAPI {
 
   async disconnect() {
     if (this.api) {
-      await this.api.disconnect();
+      if (this.api.isConnected) {
+        await this.api.disconnect();
+      }
       delete this.api;
       delete this.blobModule;
       delete this.didModule;

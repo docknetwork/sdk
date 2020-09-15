@@ -1,3 +1,3 @@
 #!/bin/bash
 
-CONFIG_DOCK_NODE_IMAGE=${CONFIG_DOCK_NODE_IMAGE:-docknetwork/dock-substrate:b1fb6b48a220d4d901eb810618ae19e64b7b10be-fastblock}
+CONFIG_DOCK_NODE_IMAGE=${CONFIG_DOCK_NODE_IMAGE:-docknetwork/dock-substrate:b96daf89e39624b90e945f09f87a6e10a1d7ae5d}

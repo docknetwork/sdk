@@ -9,15 +9,38 @@ root_dir="$(dirname $0)/.."
 # pre-pull
 docker pull $CONFIG_DOCK_NODE_IMAGE
 
-container_id=$(
-	docker run --rm -d                                        \
+# Starting 3 nodes for testing PoA as well. Node "Charlie" will be added, removed and swapped.
+# Acessibility (P2P, TCP RPC, WS RPC) for nodes
+#		Alice: 30333, 9933, 9944
+#		Bob: 30334, 9934, 9945
+#		Charlie: 30335, 9935, 9966
+
+alice_container_id=$(
+	docker run --rm -d --name alice                           \
         -p 9944:9944 -p 9933:9933 -p 30333:30333            \
         $CONFIG_DOCK_NODE_IMAGE                             \
-        --dev --rpc-external --ws-external --rpc-cors=all
+        --alice --rpc-external --ws-external
+)
+
+bob_container_id=$(
+	docker run --rm -d --name bob                             \
+        -p 9945:9944 -p 9934:9933 -p 30334:30333            \
+        $CONFIG_DOCK_NODE_IMAGE                             \
+        --bob --rpc-external --ws-external
+)
+
+# Charlie's unsafe rpc methods need to be called by PoA tests
+charlie_container_id=$(
+	docker run --rm -d --name charlie                         \
+        -p 9966:9944 -p 9935:9933 -p 30335:30333            \
+        $CONFIG_DOCK_NODE_IMAGE --charlie --rpc-external    \
+        --ws-external --rpc-methods=Unsafe   
 )
 
 try_with_node() {
+	# Wait for nodes to start listening for RPC
 	"$root_dir"/scripts/wait_for_node_rpc_http
+	# Execute the commands, potentially against the nodes
 	$@
 }
 
@@ -27,6 +50,9 @@ else
 	exit_code=$?
 fi
 
-docker kill $container_id
+# Kill nodes
+docker kill $alice_container_id
+docker kill $bob_container_id
+docker kill $charlie_container_id
 
 exit $exit_code

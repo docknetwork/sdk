@@ -1,5 +1,49 @@
+import { extendContextLoader } from 'jsonld-signatures';
+import vc from 'vc-js';
+import { acceptCompositeClaims } from '../../src/utils/cd';
+import { Ed25519KeyPair, suites } from 'jsonld-signatures';
+const { defaultDocumentLoader } = vc;
+import axios from 'axios';
+import contexts from '../../src/utils/vc/contexts';
+
 describe('Composite claim soundness checker', () => {
-  let dock;
+  let issuer1 = 'did:dock:fake';
+  let issuer1Suite;
+  let documentLoader;
+
+  beforeAll(async (done) => {
+    let issuer1Keypair = await Ed25519KeyPair.generate();
+
+    let offlineDocs = {};
+    offlineDocs[issuer1] = fakeDidDock(issuer1, issuer1Keypair);
+    for (let [k, v] of contexts) {
+      offlineDocs[k] = v;
+    }
+    documentLoader = offlineLoader(offlineDocs);
+
+    issuer1Keypair.id = `${issuer1}#keys-1`;
+    issuer1Keypair.controller = issuer1;
+    issuer1Suite = new suites.Ed25519Signature2018({
+      verificationMethod: issuer1Keypair.id,
+      key: issuer1Keypair
+    });
+
+    done();
+  });
+
+  test('control: issue and verify', async () => {
+    let credential = await aCredential(
+      issuer1Suite,
+      documentLoader,
+    );
+    let v = await vc.verifyCredential({
+      credential,
+      suite: issuer1Suite,
+      documentLoader,
+    });
+    expect(v.verified).toBe(true);
+    // TODO, check against an invalid credential and ensure false
+  });
 
   test('behavior on empty input', () => {
     let premises = [];
@@ -39,7 +83,7 @@ describe('Composite claim soundness checker', () => {
   // - Proof assumes claims not attested to by the provided credentials and is therefore not verifiable.
   // - Credential claims are not verifiable(credential verification fails) so proof is not verifiable.
 
-  test('Proof including external claims should fail.', () => {
+  test('Proof including external claims should fail.', async () => {
     let funky_proof_presentaion = {};
     let rules = [{
       if_all: [[{ Bound: "a" }, { Bound: "a" }, { Bound: "a" }]],
@@ -54,26 +98,9 @@ describe('Composite claim soundness checker', () => {
   });
 });
 
-// dummy function
-function prove(
-  _premises,
-  _to_prove,
-  _rules,
-) {
-  return [];
-}
-
-// dummy function
-function validate(_rules, _proof) {
-  return {
-    assumed: [],
-    implied: [],
-  };
-}
-
 // takes a verifiable presentation and rules, returns all claims which are known to be true under
 // the given set of rules
-function verify_all(_dock, _presentation, _rules) {
+async function check_soundness(_dock, _presentation, _rules) {
   return [];
 }
 
@@ -90,4 +117,56 @@ function error_when(cb) {
     return e;
   }
   throw "expected error but no error was thrown";
+}
+
+function aPresentation() {
+  todo();
+}
+
+async function aCredential(
+  suite,
+  documentLoader,
+  credential = {
+    "@context": [
+      "https://www.w3.org/2018/credentials/v1",
+      "https://www.w3.org/2018/credentials/examples/v1"
+    ],
+    "id": "https://example.com/credentials/1872",
+    "type": ["VerifiableCredential", "AlumniCredential"],
+    "issuer": "did:dock:fake",
+    "issuanceDate": "2010-01-01T19:23:24Z",
+    "credentialSubject": {
+      "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+      "alumniOf": "Example University"
+    }
+  }
+) {
+  let ret = await vc.issue({ credential, suite, documentLoader });
+  return ret;
+}
+
+/// create a fake document loader for did docs so we dont need to connect to a dev node
+function offlineLoader(dict) {
+  return async url => {
+    const document = dict[url] ? dict[url] : (await axios.get(url)).data;
+    dict[url] = document; // cache the result
+    return {
+      documentUrl: url,
+      document: dict[url],
+    };
+  };
+}
+
+function fakeDidDock(did, keyPair) {
+  let pk = { ...keyPair };
+  pk.id = `${did}#keys-1`;
+  pk.controller = did;
+  delete pk.privateKey;
+  return {
+    '@context': 'https://www.w3.org/ns/did/v1',
+    id: did,
+    authentication: [pk.id],
+    assertionMethod: [pk.id],
+    publicKey: [pk],
+  };
 }

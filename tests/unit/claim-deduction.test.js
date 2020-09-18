@@ -1,48 +1,52 @@
 import { extendContextLoader } from 'jsonld-signatures';
 import vc from 'vc-js';
-import { acceptCompositeClaims } from '../../src/utils/cd';
+import { acceptCompositeClaims, prove, validate } from '../../src/utils/cd';
 import { Ed25519KeyPair, suites } from 'jsonld-signatures';
-const { defaultDocumentLoader } = vc;
 import axios from 'axios';
 import contexts from '../../src/utils/vc/contexts';
+import {
+  EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
+} from '../../src/utils/vc/custom_crypto';
+import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
+
+/// global document cache, acts as a did method for the tests below
+let documentRegistry = {};
+for (let [k, v] of contexts) {
+  documentRegistry[k] = v;
+}
 
 describe('Composite claim soundness checker', () => {
-  let issuer1 = 'did:dock:fake';
-  let issuer1Suite;
-  let documentLoader;
-
   beforeAll(async (done) => {
-    let issuer1Keypair = await Ed25519KeyPair.generate();
-
-    let offlineDocs = {};
-    offlineDocs[issuer1] = fakeDidDock(issuer1, issuer1Keypair);
-    for (let [k, v] of contexts) {
-      offlineDocs[k] = v;
-    }
-    documentLoader = offlineLoader(offlineDocs);
-
-    issuer1Keypair.id = `${issuer1}#keys-1`;
-    issuer1Keypair.controller = issuer1;
-    issuer1Suite = new suites.Ed25519Signature2018({
-      verificationMethod: issuer1Keypair.id,
-      key: issuer1Keypair
-    });
-
     done();
   });
 
   test('control: issue and verify', async () => {
-    let credential = await aCredential(
-      issuer1Suite,
-      documentLoader,
-    );
-    let v = await vc.verifyCredential({
-      credential,
-      suite: issuer1Suite,
+    let { did: issuer, suite: kp } = await newDid();
+
+    let cred = {
+      "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://www.w3.org/2018/credentials/examples/v1"
+      ],
+      "id": "https://example.com/credentials/1872",
+      "type": ["VerifiableCredential", "AlumniCredential"],
+      "issuer": issuer,
+      "issuanceDate": "2010-01-01T19:23:24Z",
+      "credentialSubject": {
+        "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+        "alumniOf": "Example University"
+      }
+    };
+    let credential = await vc.issue({
+      credential: cred,
+      suite: kp,
       documentLoader,
     });
-    expect(v.verified).toBe(true);
-    // TODO, check against an invalid credential and ensure false
+    expect(await verifyC(credential))
+      .toHaveProperty('verified', true);
+    credential.issuanceDate = "9010-01-01T19:23:24Z";
+    expect(await verifyC(credential))
+      .toHaveProperty('verified', false);
   });
 
   test('behavior on empty input', () => {
@@ -54,14 +58,14 @@ describe('Composite claim soundness checker', () => {
     expect(valid).toEqual({ assumed: [], implied: [] });
   });
 
-  // The claim graphs of credentials are combined in a safe manner; blank nodes from one credential
-  // must not be conflated with those from another. Depending on the claim graph representation,
-  // this may require renaming of blank nodes, or rejection of credential sets where blank node
-  // names are shared between credentials.
-  test('no blank_node conflations', () => {
-    // Need to noodle on how/if this requirement can be tested.
-    todo();
-  });
+  // // The claim graphs of credentials are combined in a safe manner; blank nodes from one credential
+  // // must not be conflated with those from another. Depending on the claim graph representation,
+  // // this may require renaming of blank nodes, or rejection of credential sets where blank node
+  // // names are shared between credentials.
+  // test('no blank_node conflations', () => {
+  //   // Need to noodle on how/if this requirement can be tested.
+  //   todo();
+  // });
 
   // The user is able to input a set of credentials, along with an associated proof of composite
   // claim[s].
@@ -71,36 +75,36 @@ describe('Composite claim soundness checker', () => {
   // The verification result is provided to the user.
   //
   // The program reports all composite claims which were proven.
-  test('end to end, presentation to result', () => {
-    let presentation;
-    let rules;
-    let all = verify_all(dock, presentation, rules);
+  test('end to end, presentation to result', async () => {
+    let presentation = await validPresentation();
+    let rules = [];
+    let all = await acceptCompositeClaims(presentation, rules);
     expect(all).toEqual([]);
     todo();
   });
 
-  // Soundness checking fails if and only if one of the following conditions occurs:
-  // - Proof assumes claims not attested to by the provided credentials and is therefore not verifiable.
-  // - Credential claims are not verifiable(credential verification fails) so proof is not verifiable.
+  // // Soundness checking fails if and only if one of the following conditions occurs:
+  // // - Proof assumes claims not attested to by the provided credentials and is therefore not verifiable.
+  // // - Credential claims are not verifiable(credential verification fails) so proof is not verifiable.
 
-  test('Proof including external claims should fail.', async () => {
-    let funky_proof_presentaion = {};
-    let rules = [{
-      if_all: [[{ Bound: "a" }, { Bound: "a" }, { Bound: "a" }]],
-      then: [[{ Bound: "b" }, { Bound: "b" }, { Bound: "b" }]],
-    }];
-    let err = error_when(() => verify_all(dock, funky_proof_presentaion, rules));
-    expect(err).toEqual("proof assumes unverifiable claims"); // or something
-  });
+  // test('Proof including external claims should fail.', async () => {
+  //   let funky_proof_presentaion = {};
+  //   let rules = [{
+  //     if_all: [[{ Bound: "a" }, { Bound: "a" }, { Bound: "a" }]],
+  //     then: [[{ Bound: "b" }, { Bound: "b" }, { Bound: "b" }]],
+  //   }];
+  //   let err = error_when(() => verify_all(dock, funky_proof_presentaion, rules));
+  //   expect(err).toEqual("proof assumes unverifiable claims"); // or something
+  // });
 
-  test('Unverifiable credential should fail.', () => {
-    todo();
-  });
+  // test('Unverifiable credential should fail.', () => {
+  //   todo();
+  // });
 });
 
 // takes a verifiable presentation and rules, returns all claims which are known to be true under
 // the given set of rules
-async function check_soundness(_dock, _presentation, _rules) {
+async function checkSoundness(presentation, rules) {
   return [];
 }
 
@@ -119,54 +123,117 @@ function error_when(cb) {
   throw "expected error but no error was thrown";
 }
 
-function aPresentation() {
-  todo();
-}
-
-async function aCredential(
-  suite,
-  documentLoader,
-  credential = {
-    "@context": [
-      "https://www.w3.org/2018/credentials/v1",
-      "https://www.w3.org/2018/credentials/examples/v1"
-    ],
-    "id": "https://example.com/credentials/1872",
-    "type": ["VerifiableCredential", "AlumniCredential"],
-    "issuer": "did:dock:fake",
-    "issuanceDate": "2010-01-01T19:23:24Z",
-    "credentialSubject": {
-      "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
-      "alumniOf": "Example University"
-    }
-  }
-) {
-  let ret = await vc.issue({ credential, suite, documentLoader });
-  return ret;
-}
-
 /// create a fake document loader for did docs so we dont need to connect to a dev node
-function offlineLoader(dict) {
-  return async url => {
-    const document = dict[url] ? dict[url] : (await axios.get(url)).data;
-    dict[url] = document; // cache the result
-    return {
-      documentUrl: url,
-      document: dict[url],
-    };
+async function documentLoader(url) {
+  if (documentRegistry[url] === undefined) {
+    documentRegistry[url] = (await axios.get(url)).data;
+  }
+  return {
+    documentUrl: url,
+    document: documentRegistry[url],
   };
 }
 
-function fakeDidDock(did, keyPair) {
-  let pk = { ...keyPair };
-  pk.id = `${did}#keys-1`;
-  pk.controller = did;
-  delete pk.privateKey;
-  return {
+function registerDid(did, keyPair) {
+  if (documentRegistry[did]) { throw `${did} already registered`; }
+  let pk = {
+    id: `${did}#keys-1`,
+    type: keyPair.type,
+    publicKeyBase58: keyPair.publicKeyBase58,
+    controller: did,
+  };
+  let doc = {
     '@context': 'https://www.w3.org/ns/did/v1',
     id: did,
     authentication: [pk.id],
     assertionMethod: [pk.id],
     publicKey: [pk],
   };
+  documentRegistry[did] = doc;
+  documentRegistry[pk.id] = {
+    '@context': 'https://www.w3.org/ns/did/v1',
+    ...pk
+  };
+}
+
+function randoDID() {
+  return `did:dock:${randomAsHex(32)}`;
+}
+
+async function verifyC(credential) {
+  return await vc.verifyCredential({
+    credential,
+    suite: [
+      new Ed25519Signature2018(),
+      new EcdsaSepc256k1Signature2019(),
+      new Sr25519Signature2020()
+    ],
+    documentLoader
+  });
+}
+
+async function verifyP(presentation) {
+  return await vc.verify({
+    presentation,
+    suite: [
+      new Ed25519Signature2018(),
+      new EcdsaSepc256k1Signature2019(),
+      new Sr25519Signature2020()
+    ],
+    documentLoader,
+    unsignedPresentation: true,
+  });
+}
+
+async function newDid() {
+  let did = randoDID();
+  let keypair = await Ed25519KeyPair.generate();
+  registerDid(did, keypair);
+  keypair.id = `${did}#keys-1`;
+  keypair.controller = did;
+  return {
+    did,
+    suite: new suites.Ed25519Signature2018({
+      verificationMethod: keypair.id,
+      key: keypair,
+    })
+  };
+}
+
+async function validCredential() {
+  let { did: issuer, suite: kp } = await newDid();
+  let cred = {
+    "@context": [
+      "https://www.w3.org/2018/credentials/v1",
+      "https://www.w3.org/2018/credentials/examples/v1"
+    ],
+    "id": "https://example.com/credentials/1872",
+    "type": ["VerifiableCredential", "AlumniCredential"],
+    "issuer": issuer,
+    "issuanceDate": "2010-01-01T19:23:24Z",
+    "credentialSubject": {
+      "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+      "alumniOf": "Example University"
+    }
+  };
+  let credential = await vc.issue({
+    credential: cred,
+    suite: kp,
+    documentLoader,
+  });
+  expect(await verifyC(credential))
+    .toHaveProperty('verified', true);
+  return credential;
+}
+
+
+async function validPresentation() {
+  let creds = [await validCredential()];
+  let { did: holder } = await newDid();
+  let presentation = vc.createPresentation({
+    verifiableCredential: creds, id: `urn:${randomAsHex(16)}`, holder
+  });
+  expect(await verifyP(presentation))
+    .toHaveProperty('verified', true);
+  return presentation;
 }

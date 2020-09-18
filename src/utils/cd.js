@@ -26,7 +26,7 @@ async function credsToEEClaimGraph(_credentials) {
  * @returns {Promise<[Claim]>}
  */
 export async function acceptCompositeClaims(presentation, rules = []) {
-  const expanded = await expandJSONLD(presentation);
+  const expanded = await jsonld.expand(presentation);
 
   // get ordered list of all credentials
   const creds = jsonld.getValues(expanded, expandedCredentialProperty);
@@ -51,7 +51,7 @@ export async function acceptCompositeClaims(presentation, rules = []) {
   }
 
   // return (claimgraph U superproof.implied)
-  return [...claimgraph, ...superproof.implied];
+  return [...cg, ...valid.implied];
 }
 
 // dummy function

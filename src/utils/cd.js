@@ -3,7 +3,7 @@
 import { expandedCredentialProperty } from './vc';
 import jsonld from 'jsonld';
 
-const expandedLogicProperty = "https://www.dock.io/ontology/logicV1";
+export const expandedLogicProperty = "https://www.dock.io/ontology/logicV1";
 
 /**
  * Convert a list of credentials which have already been verified into an RDF claim graph.

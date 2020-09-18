@@ -1,13 +1,12 @@
-import { extendContextLoader } from 'jsonld-signatures';
 import vc from 'vc-js';
-import { acceptCompositeClaims, prove, validate } from '../../src/utils/cd';
+import { expandedLogicProperty, acceptCompositeClaims, prove, validate } from '../../src/utils/cd';
 import { Ed25519KeyPair, suites } from 'jsonld-signatures';
 import axios from 'axios';
 import contexts from '../../src/utils/vc/contexts';
 import {
   EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
 } from '../../src/utils/vc/custom_crypto';
-import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
+import { randomAsHex } from '@polkadot/util-crypto';
 
 /// global document cache, acts as a did method for the tests below
 let documentRegistry = {};
@@ -76,47 +75,47 @@ describe('Composite claim soundness checker', () => {
   //
   // The program reports all composite claims which were proven.
   test('end to end, presentation to result', async () => {
+    let rules = sampleRules();
     let presentation = await validPresentation();
-    let rules = [];
-    let all = await acceptCompositeClaims(presentation, rules);
-    expect(all).toEqual([]);
-    todo();
+    presentation[expandedLogicProperty] = jsonLiteral(sampleProof());
+    let all = await checkSoundness(presentation, rules);
+    expect(all).toEqual([]); // will change to someting other than [] once things are working
   });
 
-  // // Soundness checking fails if and only if one of the following conditions occurs:
-  // // - Proof assumes claims not attested to by the provided credentials and is therefore not verifiable.
-  // // - Credential claims are not verifiable(credential verification fails) so proof is not verifiable.
+  // Soundness checking fails if and only if one of the following conditions occurs:
+  // - Proof assumes claims not attested to by the provided credentials and is therefore not verifiable.
+  // - Credential claims are not verifiable(credential verification fails) so proof is not verifiable.
 
-  // test('Proof including external claims should fail.', async () => {
-  //   let funky_proof_presentaion = {};
-  //   let rules = [{
-  //     if_all: [[{ Bound: "a" }, { Bound: "a" }, { Bound: "a" }]],
-  //     then: [[{ Bound: "b" }, { Bound: "b" }, { Bound: "b" }]],
-  //   }];
-  //   let err = error_when(() => verify_all(dock, funky_proof_presentaion, rules));
-  //   expect(err).toEqual("proof assumes unverifiable claims"); // or something
-  // });
+  test('Proof including external claims should fail.', async () => {
+    let rules = sampleRules();
+    let presentation = await validPresentation();
+    presentation[expandedLogicProperty] = jsonLiteral(invalidSampleProof());
+    let err = await assertThrowsAsync(async () => { await checkSoundness(presentation, rules) });
+    expect(err).toEqual("proof incudes ivalid application of rule");
+  });
 
-  // test('Unverifiable credential should fail.', () => {
-  //   todo();
-  // });
+  test('Unverifiable credential should fail.', async () => {
+    let rules = sampleRules();
+    let presentation = await validPresentation();
+    presentation.verifiableCredential[0].issuer = "did:dock:bobert"; // tamper
+    presentation[expandedLogicProperty] = jsonLiteral(sampleProof());
+    let err = await assertThrowsAsync(async () => { await checkSoundness(presentation, rules) });
+    expect(err).toEqual("credential in presentation failed presentation");
+  });
 });
 
 // takes a verifiable presentation and rules, returns all claims which are known to be true under
 // the given set of rules
 async function checkSoundness(presentation, rules) {
-  return [];
+  // todo validate presentation
+  return await acceptCompositeClaims(presentation, rules);
 }
 
-function todo() {
-  throw "TODO!";
-}
-
-// run cb and return the error it throws
+// run asyncronous function cb and return the error it throws
 // if cb does not throw an error, this function will throw an error of it's own
-function error_when(cb) {
+async function assertThrowsAsync(cb) {
   try {
-    cb();
+    await cb();
   } catch (e) {
     return e;
   }
@@ -226,7 +225,7 @@ async function validCredential() {
   return credential;
 }
 
-
+/// makes an unsigned presentation
 async function validPresentation() {
   let creds = [await validCredential()];
   let { did: holder } = await newDid();
@@ -236,4 +235,54 @@ async function validPresentation() {
   expect(await verifyP(presentation))
     .toHaveProperty('verified', true);
   return presentation;
+}
+
+// https://w3c.github.io/json-ld-syntax/#json-literals
+function jsonLiteral(json) {
+  return {
+    "@type": "@json",
+    "@value": JSON.parse(JSON.stringify(json))
+  };
+}
+
+function sampleRules() {
+  return [
+    {
+      if_all: [],
+      then: [
+        ["https://example.com/a", "https://example.com/frobs", "https://example.com/b"]
+      ],
+    }, {
+      if_all: [
+        [
+          { Unbound: "pig" },
+          { Bound: "https://example.com/Ability" },
+          { Bound: "https://example.com/Flight" }
+        ],
+        [
+          { Unbound: "pig" },
+          { Bound: "https://www.w3.org/1999/02/22-rdf-syntax-ns#type" },
+          { Bound: "https://example.com/Pig" }
+        ],
+      ],
+      then: [
+        // is this a valid way to encode a string literal?
+        ["did:dock:bddap", "http://xmlns.com/foaf/spec/#term_firstName", "\"Gorgadon\""]
+      ],
+    }
+  ];
+}
+
+function sampleProof() {
+  return [{
+    rule_index: 0,
+    instantiations: [],
+  }];
+}
+
+function invalidSampleProof() {
+  return [{
+    rule_index: 0,
+    instantiations: ["hey"],
+  }];
 }

@@ -199,7 +199,7 @@ async function main() {
       await runOnce();
       break;
     case 2:
-      await fillBlock(10);
+      await fillBlock();
       break;
     default:
       console.error('Argument should be 0, 1 or 2');

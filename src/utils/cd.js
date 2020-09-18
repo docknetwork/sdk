@@ -11,7 +11,9 @@ export const expandedLogicProperty = "https://www.dock.io/ontology/logicV1";
  *
  * @returns {Promise<[Claim]>}
  */
-async function credsToEEClaimGraph(_credentials) {
+async function credsToEEClaimGraph(credentials) {
+  await jsonld.toRDF(credentials);
+
   // TODO
   return [];
 }
@@ -26,7 +28,7 @@ async function credsToEEClaimGraph(_credentials) {
  * @returns {Promise<[Claim]>}
  */
 export async function acceptCompositeClaims(presentation, rules = []) {
-  const expanded = await jsonld.expand(presentation);
+  const expanded = (await jsonld.expand(presentation))[0];
 
   // get ordered list of all credentials
   const creds = jsonld.getValues(expanded, expandedCredentialProperty);
@@ -34,23 +36,22 @@ export async function acceptCompositeClaims(presentation, rules = []) {
   // convert them to a single claimgraph
   let cg = await credsToEEClaimGraph(creds);
 
-  // get ordered list of all proofs
-  let proofs = jsonld.getValues(expanded, expandedLogicProperty);
+  // get ordered and concatenated proofs
+  let proof = jsonld.getValues(expanded, expandedLogicProperty)
+    .map(fromJSONLiteral)
+    .flat(1);
 
-  // concatenate all proofs into a single proof
-  let superproof = proofs.flat(1);
+  // validate proofs
+  let valid = validate(rules, proof);
 
-  // validate superproof
-  let valid = validate(rules, superproof);
-
-  // assert all superproof.assumed in superproof are in claimgraph
+  // assert all superproof.assumed in proof are in claimgraph
   for (let assumption of valid.assumed) {
-    if (!cg.some(claim => claim_eq(claim, assumption))) {
+    if (!cg.some(claim => claimEq(claim, assumption))) {
       throw { UnverifiableProof: { unverified_assumption: [...assumption] } };
     }
   }
 
-  // return (claimgraph U superproof.implied)
+  // return (claimgraph U proof.implied)
   return [...cg, ...valid.implied];
 }
 
@@ -72,7 +73,7 @@ export function validate(_rules, _proof) {
 }
 
 /// check two claims for equality
-function claim_eq(a, b) {
+function claimEq(a, b) {
   for (claim of [a, b]) {
     if (!(claim instanceof Array) || claim.length !== 3) {
       throw new TypeError();
@@ -80,3 +81,30 @@ function claim_eq(a, b) {
   }
   return a[0] === b[0] && a[1] === b[1] && a[2] == b[2];
 }
+
+// https://w3c.github.io/json-ld-syntax/#json-literals
+function fromJSONLiteral(literal) {
+  let expected_props = ['@type', '@value'];
+  let actual_props = Object.keys(literal);
+  if (!setEq(actual_props, expected_props)) {
+    throw {
+      UnexpectedJsonLiteralProperties: {
+        expected: [...expected_props],
+        actual: [...actual_props]
+      }
+    };
+  }
+  if (literal['@type'] !== '@json') {
+    throw { NotJsonLiteral: { value: literal } };
+  }
+  return literal['@value'];
+}
+
+// check for set equality
+function setEq(a, b) {
+  let sa = new Set([...a]);
+  let sb = new Set([...b]);
+  return [...a].every(inA => sb.has(inA)) && [...b].every(inB => sa.has(inB));
+}
+// expect(setEq([1, 3], [1, 3])).toBe(true);
+// expect(setEq([1], [1, 3])).toBe(false);

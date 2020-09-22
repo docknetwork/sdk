@@ -1,7 +1,7 @@
-import { encodeAddress } from '@polkadot/util-crypto';
 import axios from 'axios';
 
 import { DockAPI } from '../src/api';
+import { asDockAddress } from './helpers';
 
 require('dotenv').config();
 
@@ -66,7 +66,7 @@ async function printValidatorStats() {
   sortEntriesOfMapWithNumKey(epochBlockCounts);
   epochBlockCounts.forEach((element) => {
     const epochNo = element[0]._args[0];
-    const validatorId = encodeAddress(element[0]._args[1]);
+    const validatorId = asDockAddress(element[0]._args[1]);
     console.log(`For epoch no ${epochNo}, validator ${accounts[validatorId]}, blocks authored is ${element[1].block_count}`);
     if (element[1].locked_reward.isSome) {
       const locked = element[1].locked_reward.unwrap().toHuman();
@@ -84,6 +84,10 @@ async function printRemainingSupply() {
   console.log(`Remaining emission supply ${emissionSupply}`);
   console.log('-----------------------------------------------------------------------');
   console.log('');
+  // The treasury always has this address
+  await printFreeBalance('Treasury', '5EYCAe5d818kja8P5YikNggRz4KxztMtMhxP6qSTw7Bwahwq');
+  console.log('-----------------------------------------------------------------------');
+  console.log('');
 }
 
 async function printValidatorBal() {
@@ -92,7 +96,6 @@ async function printValidatorBal() {
     console.log(`${accounts[k]}'s address is ${k}`);
     await printFreeBalance(accounts[k], k);
     await printReservedBalance(accounts[k], k);
-    console.log('');
   }
   /* eslint-disable no-await-in-loop */
 }

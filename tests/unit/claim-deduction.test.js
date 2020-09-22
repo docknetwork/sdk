@@ -1,6 +1,8 @@
 import vc from 'vc-js';
 import { expandedLogicProperty, acceptCompositeClaims, prove, validate } from '../../src/utils/cd';
+import { fromJsonldjsCg } from '../../src/utils/claimgraph';
 import { Ed25519KeyPair, suites } from 'jsonld-signatures';
+import jsonld from 'jsonld';
 import axios from 'axios';
 import contexts from '../../src/utils/vc/contexts';
 import {
@@ -52,7 +54,7 @@ describe('Composite claim soundness checker', () => {
     let { did: issuera, suite: kpa } = await newDid();
     let { did: issuerb, suite: kpb } = await newDid();
 
-    // signing a cred does modify the cred by adding a proof
+    // fyi signing a cred does modify the cred by adding a proof
     let cred = () => {
       return {
         "@context": [
@@ -112,15 +114,6 @@ describe('Composite claim soundness checker', () => {
     expect(valid).toEqual({ assumed: [], implied: [] });
   });
 
-  // // The claim graphs of credentials are combined in a safe manner; blank nodes from one credential
-  // // must not be conflated with those from another. Depending on the claim graph representation,
-  // // this may require renaming of blank nodes, or rejection of credential sets where blank node
-  // // names are shared between credentials.
-  // test('no blank_node conflations', () => {
-  //   // Need to noodle on how/if this requirement can be tested.
-  //   todo();
-  // });
-
   // The user is able to input a set of credentials, along with an associated proof of composite
   // claim[s].
   //
@@ -146,7 +139,7 @@ describe('Composite claim soundness checker', () => {
     let presentation = await validPresentation();
     presentation[expandedLogicProperty] = jsonLiteral(invalidSampleProof());
     let err = await assertThrowsAsync(async () => { await checkSoundness(presentation, rules) });
-    expect(err).toEqual("proof incudes ivalid application of rule");
+    expect(err).toEqual("proof incudes invalid application of rule");
   });
 
   test('Unverifiable credential should fail.', async () => {
@@ -155,19 +148,17 @@ describe('Composite claim soundness checker', () => {
     presentation.verifiableCredential[0].issuer = "did:dock:bobert"; // tamper
     presentation[expandedLogicProperty] = jsonLiteral(sampleProof());
     let err = await assertThrowsAsync(async () => { await checkSoundness(presentation, rules) });
-    expect(err).toEqual("credential in presentation failed presentation");
-  });
-
-  test('convert claimgraph from jsonld-js represention', async () => {
-    let cg = [{ "subject": { "termType": "NamedNode", "value": "did:example:ebfeb1f712ebc6f1c276e12ec21" }, "predicate": { "termType": "NamedNode", "value": "http://schema.org/alumniOf" }, "object": { "termType": "Literal", "value": "Example University", "datatype": { "termType": "NamedNode", "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#HTML" } }, "graph": { "termType": "BlankNode", "value": "_:b0" } }, { "subject": { "termType": "NamedNode", "value": "https://example.com/credentials/1872" }, "predicate": { "termType": "NamedNode", "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" }, "object": { "termType": "NamedNode", "value": "https://www.w3.org/2018/credentials#VerifiableCredential" }, "graph": { "termType": "BlankNode", "value": "_:b0" } }, { "subject": { "termType": "NamedNode", "value": "https://example.com/credentials/1872" }, "predicate": { "termType": "NamedNode", "value": "https://w3id.org/security#proof" }, "object": { "termType": "BlankNode", "value": "_:b1" }, "graph": { "termType": "BlankNode", "value": "_:b0" } }, { "subject": { "termType": "NamedNode", "value": "https://example.com/credentials/1872" }, "predicate": { "termType": "NamedNode", "value": "https://www.w3.org/2018/credentials#credentialSubject" }, "object": { "termType": "NamedNode", "value": "did:example:ebfeb1f712ebc6f1c276e12ec21" }, "graph": { "termType": "BlankNode", "value": "_:b0" } }, { "subject": { "termType": "NamedNode", "value": "https://example.com/credentials/1872" }, "predicate": { "termType": "NamedNode", "value": "https://www.w3.org/2018/credentials#issuanceDate" }, "object": { "termType": "Literal", "value": "2010-01-01T19:23:24Z", "datatype": { "termType": "NamedNode", "value": "http://www.w3.org/2001/XMLSchema#dateTime" } }, "graph": { "termType": "BlankNode", "value": "_:b0" } }, { "subject": { "termType": "NamedNode", "value": "https://example.com/credentials/1872" }, "predicate": { "termType": "NamedNode", "value": "https://www.w3.org/2018/credentials#issuer" }, "object": { "termType": "NamedNode", "value": "did:dock:bobert" }, "graph": { "termType": "BlankNode", "value": "_:b0" } }, { "subject": { "termType": "BlankNode", "value": "_:b2" }, "predicate": { "termType": "NamedNode", "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" }, "object": { "termType": "NamedNode", "value": "https://w3id.org/security#Ed25519Signature2018" }, "graph": { "termType": "BlankNode", "value": "_:b1" } }, { "subject": { "termType": "BlankNode", "value": "_:b2" }, "predicate": { "termType": "NamedNode", "value": "http://purl.org/dc/terms/created" }, "object": { "termType": "Literal", "value": "2020-09-21T20:53:50Z", "datatype": { "termType": "NamedNode", "value": "http://www.w3.org/2001/XMLSchema#dateTime" } }, "graph": { "termType": "BlankNode", "value": "_:b1" } }, { "subject": { "termType": "BlankNode", "value": "_:b2" }, "predicate": { "termType": "NamedNode", "value": "https://w3id.org/security#jws" }, "object": { "termType": "Literal", "value": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..HhpJ4z10n_VkOWQ8g9xK1qxglj0Y9nTRZKDyZbBXzQYKltr2HBSIaJAMNhdeKVnPlE1Xkz5htwxdOwrXTKNLAQ", "datatype": { "termType": "NamedNode", "value": "http://www.w3.org/2001/XMLSchema#string" } }, "graph": { "termType": "BlankNode", "value": "_:b1" } }, { "subject": { "termType": "BlankNode", "value": "_:b2" }, "predicate": { "termType": "NamedNode", "value": "https://w3id.org/security#proofPurpose" }, "object": { "termType": "NamedNode", "value": "https://w3id.org/security#assertionMethod" }, "graph": { "termType": "BlankNode", "value": "_:b1" } }, { "subject": { "termType": "BlankNode", "value": "_:b2" }, "predicate": { "termType": "NamedNode", "value": "https://w3id.org/security#verificationMethod" }, "object": { "termType": "NamedNode", "value": "did:dock:0x661dfbb7a367f335241dc4d4e7d95a29ffb42a286e4ff4d45d3985672804f4ea#keys-1" }, "graph": { "termType": "BlankNode", "value": "_:b1" } }];
-    todo();
+    expect(JSON.stringify(err)).toMatch(/Invalid signature/);
   });
 });
 
 // takes a verifiable presentation and rules, returns all claims which are known to be true under
 // the given set of rules
 async function checkSoundness(presentation, rules) {
-  // todo validate presentation
+  let ver = await verifyP(presentation);
+  if (!ver.verified) {
+    throw ver.error;
+  }
   return await acceptCompositeClaims(presentation, rules);
 }
 

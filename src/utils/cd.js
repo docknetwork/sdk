@@ -52,7 +52,7 @@ async function credToEECG(expandedCredential) {
  * @returns {Promise<[Claim]>}
  */
 export async function acceptCompositeClaims(presentation, rules = []) {
-  const expanded = (await jsonld.expand(presentation))[0];
+  const expanded = await jsonld.expand(presentation);
 
   // get ordered list of all credentials
   const creds = jsonld.getValues(expanded, expandedCredentialProperty);

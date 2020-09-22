@@ -2,20 +2,44 @@
 
 import { expandedCredentialProperty } from './vc';
 import jsonld from 'jsonld';
+import { fromJsonldjsCg, asEE, merge } from './claimgraph';
 
-export const expandedLogicProperty = "https://www.dock.io/ontology/logicV1";
+export const expandedLogicProperty = "https://www.dock.io/rdf2020#logicV1";
+export const expandedProofProperty = "https://w3id.org/security#proof";
+export const expandedIssuerProperty = 'https://www.w3.org/2018/credentials/v1#issuer';
 
 /**
- * Convert a list of credentials which have already been verified into an RDF claim graph.
+ * Convert a list of expanded credentials which have already been verified into an RDF claim graph.
  * The resulting claimgraph is in Explicit Ethos form.
  *
  * @returns {Promise<[Claim]>}
  */
-async function credsToEEClaimGraph(credentials) {
-  await jsonld.toRDF(credentials);
+async function credsToEEClaimGraph(expandedCredentials) {
+  let ees = await Promise.all(expandedCredentials.map(credToEECG));
+  return ees.reduce(merge, []);
+}
 
-  // TODO
-  return [];
+/**
+ * Convert a single expanded credential which has already been verified into an RDF claim graph.
+ * The resulting claimgraph is in Explicit Ethos form.
+ *
+ * @returns {Promise<[Claim]>}
+ */
+async function credToEECG(expandedCredential) {
+  let cred = { ...expandedCredential };
+
+  // This line relies on the assumption that if the credential passed verification then the
+  // issuer property was not forged.
+  let issuer = cred[expandedIssuerProperty][0];
+
+  // remove the proof
+  delete cred[expandedProofProperty];
+
+  // convert to claimgraph
+  let cg = fromJsonldjsCg(await jsonld.toRDF(credential));
+
+  // convert to explicit ethos form
+  return asEE(cg, issuer);
 }
 
 /**
@@ -101,10 +125,10 @@ function fromJSONLiteral(literal) {
 }
 
 // check for set equality
+// expect(setEq([1, 3], [1, 3])).toBe(true);
+// expect(setEq([1], [1, 3])).toBe(false);
 function setEq(a, b) {
   let sa = new Set([...a]);
   let sb = new Set([...b]);
   return [...a].every(inA => sb.has(inA)) && [...b].every(inB => sa.has(inB));
 }
-// expect(setEq([1, 3], [1, 3])).toBe(true);
-// expect(setEq([1], [1, 3])).toBe(false);

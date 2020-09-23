@@ -9,11 +9,15 @@ import {
   EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
 } from '../../src/utils/vc/custom_crypto';
 import { randomAsHex } from '@polkadot/util-crypto';
+import network_cache from '../network-cache';
 
 /// global document cache, acts as a did method for the tests below
 let documentRegistry = {};
 for (let [k, v] of contexts) {
   documentRegistry[k] = v;
+}
+for (let k of Object.keys(network_cache)) {
+  documentRegistry[k] = network_cache[k];
 }
 
 describe('Composite claim soundness checker', () => {
@@ -159,6 +163,8 @@ async function checkSoundness(presentation, rules) {
   if (!ver.verified) {
     throw ver.error;
   }
+  // Pre-expand the presentaion using local cache. Tests run pretty slow otherwise.
+  presentation = await jsonld.expand(presentation, { documentLoader });
   return await acceptCompositeClaims(presentation, rules);
 }
 
@@ -177,11 +183,24 @@ async function assertThrowsAsync(cb) {
 async function documentLoader(url) {
   if (documentRegistry[url] === undefined) {
     documentRegistry[url] = (await axios.get(url)).data;
+    console.warn(
+      'Unit test is making web requests. This is slow. Please update ./test/network-cache.json',
+      'with: ',
+      JSON.stringify({ [url]: documentRegistry[url] }, null, 2)
+    );
   }
   return {
     documentUrl: url,
     document: documentRegistry[url],
   };
+}
+
+async function writeToNetworkCache(url, data) {
+  let fsp = require('fs').promises;
+  let nc_raw = fsp.readFile('./test/network-cache.json');
+  let nc = JSON.parse(ncraw);
+  nc[url] = data;
+  let new_nc_raw = JSON.stringify(ncraw, null, 2);
 }
 
 function registerDid(did, keyPair) {

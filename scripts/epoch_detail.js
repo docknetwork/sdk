@@ -85,7 +85,14 @@ async function printRemainingSupply() {
   console.log('-----------------------------------------------------------------------');
   console.log('');
   // The treasury always has this address
-  await printFreeBalance('Treasury', '5EYCAe5d818kja8P5YikNggRz4KxztMtMhxP6qSTw7Bwahwq');
+  const expectedTreasuryAddress = '5EYCAe5d818kja8P5YikNggRz4KxztMtMhxP6qSTw7Bwahwq';
+  const ta = await dock.api.rpc.poa.treasuryAccount();
+  if (asDockAddress(ta) !== expectedTreasuryAddress) {
+    console.error(`Treasury address is not ${expectedTreasuryAddress}. This should not be the case`);
+    process.exit(1);
+  }
+  const tb = await dock.api.rpc.poa.treasuryBalance();
+  console.log(`Treasury balance is ${tb}`);
   console.log('-----------------------------------------------------------------------');
   console.log('');
 }

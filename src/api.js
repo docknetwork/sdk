@@ -23,9 +23,12 @@ import {
 } from './signatures';
 
 /**
- * @typedef {object} Options The Options to use in the function createUser.
+ * @typedef {object} Options The Options to use in the function DockAPI.
  * @property {string} [address] The node address to connect to.
  * @property {object} [keyring] PolkadotJS keyring
+ * @property {object} [chainTypes] Types for the chain
+ * @property {object} [chainRpc] RPC definitions for the chain
+ * @property {Boolean} [loadPoaModules] Whether to load PoA modules or not. Defaults to true
  */
 
 /** Helper class to interact with the Dock chain */
@@ -46,7 +49,7 @@ class DockAPI {
    * @return {Promise} Promise for when SDK is ready for use
    */
   async init({
-    address, keyring, chainTypes, loadPoaModules = true,
+    address, keyring, chainTypes, chainRpc, loadPoaModules = true,
   } = {
     address: null,
     keyring: null,
@@ -61,9 +64,32 @@ class DockAPI {
 
     this.address = address || this.address;
 
+    // If RPC methods given, use them else set it to empty object.
+    let rpc = chainRpc || {};
+
+    // If using PoA module, extend the RPC methods with PoA specific ones.
+    if (loadPoaModules) {
+      rpc = Object.assign(rpc, {
+        poa: {
+          treasuryAccount: {
+            description: 'Return account address of treasury. The account address can then be used to query the chain for balance',
+            params: [],
+            type: 'AccountId',
+          },
+          treasuryBalance: {
+            description: 'Return free balance of treasury account. In the context of PoA, only free balance makes sense for treasury. But just in case, to check all kinds of balance (locked, reserved, etc), get the account address with above call and query the chain.',
+            params: [],
+            type: 'Balance',
+          },
+        },
+      });
+    }
+
     this.api = await ApiPromise.create({
       provider: new WsProvider(this.address),
       types: chainTypes || types,
+      // @ts-ignore: TS2322
+      rpc,
     });
 
     await this.initKeyring(keyring);

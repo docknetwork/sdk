@@ -222,12 +222,43 @@ describe('Claimgraph operations.', () => {
     ]);
   });
 
-  // // The claim graphs of credentials are combined in a safe manner; blank nodes from one credential
-  // // must not be conflated with those from another. Depending on the claim graph representation,
-  // // this may require renaming of blank nodes, or rejection of credential sets where blank node
-  // // names are shared between credentials.
-  // test('no blank_node conflations', () => {
-  //   // Need to noodle on how/if this requirement can be tested.
-  //   todo();
-  // });
+  // The claim graphs of credentials are combined in a safe manner; blank nodes from one credential
+  // must not be conflated with those from another. Depending on the claim graph representation,
+  // this may require renaming of blank nodes, or rejection of credential sets where blank node
+  // names are shared between credentials.
+  test('no blank_node conflations', () => {
+    let cg1 = [
+      [
+        { Iri: 'https://example.com/a' },
+        { Iri: 'https://example.com/parent' },
+        { Blank: '_:b0' }
+      ]
+    ];
+    let cg2 = [
+      [
+        { Blank: '_:b0' },
+        { Iri: 'https://example.com/parent' },
+        { Iri: 'https://example.com/b' }
+      ]
+    ];
+    let merged = merge([cg1, cg2]);
+
+    // It should not be provable that [a grandparent b] because `_:b0` in
+    // cg1 is not the same as `_:b0` in cg2. Given this result, this property
+    // is apparent.
+    expect(merged).toEqual(
+      [
+        [
+          { Iri: 'https://example.com/a' },
+          { Iri: 'https://example.com/parent' },
+          { Blank: '_:b0' }
+        ],
+        [
+          { Blank: '_:b1' },
+          { Iri: 'https://example.com/parent' },
+          { Iri: 'https://example.com/b' }
+        ]
+      ]
+    );
+  });
 });

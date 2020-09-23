@@ -1,4 +1,5 @@
-import json from 'rollup-plugin-json';
+import json from '@rollup/plugin-json';
+// import { wasm } from '@rollup/plugin-wasm';
 import pkg from './package.json';
 import glob from 'glob';
 
@@ -29,6 +30,12 @@ export default async function() {
   return [{
     plugins: [
       json(),
+      // Temporarily disabled, not sure if required
+      // since rify is a node module doesnt seem to work
+      // but would be nice to try embed it
+      // wasm({
+      //   sync: ['*.wasm'],
+      // }),
     ],
     input,
     output: [

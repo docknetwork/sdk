@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -27,9 +27,12 @@
     "jest": "24.5.0",
     "jsdoc": "^3.6.3",
     "rollup": "2.28.1",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12"
   },
   "scripts": {
+    "webpack": "webpack",
     "dock-did-example": "npx babel-node example/dock-did.js",
     "did-resolver-example": "npx babel-node example/resolver.js",
     "revocation-example": "npx babel-node example/revocation.js",

@@ -7,7 +7,7 @@
 //
 // This module implements utilities for operating on claimgraphs if the above format.
 
-import { deepClone, assertValidClaimGraph, assert } from './common';
+import { deepClone, assertValidClaimGraph, assert, assertType } from './common';
 
 export const claims = { Iri: 'https://www.dock.io/rdf2020#claimsV1' };
 
@@ -51,6 +51,7 @@ export function merge(claimgraphs) {
 // Convert to Explicit Ethos form.
 // See https://www.w3.org/TR/WD-rdf-syntax-971002/ , 2.2. Utility Relations; "Layer 1", reification
 export function asEE(claimgraph, issuerIRI) {
+  assertType(issuerIRI, 'string');
   let cg = deepClone(claimgraph);
   let namer = new Namer();
   namer.reallocateNames(cg);

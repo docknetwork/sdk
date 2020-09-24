@@ -51,6 +51,16 @@ export function canonProof(proof) {
   });
 }
 
+/// Parse all the nodes in a conaonicalized proof.
+export function decanonProof(proof) {
+  return proof.map(({ rule_index, instantiations }) => {
+    return {
+      rule_index,
+      instantiations: instantiations.map(JSON.parse)
+    };
+  });
+}
+
 /// Canonicalize all the nodes in a claimgraph.
 export function canonClaimGraph(cg) {
   return cg.map(claim => claim.map(canon));

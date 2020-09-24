@@ -1,5 +1,5 @@
 import vc from 'vc-js';
-import { expandedLogicProperty, acceptCompositeClaims, prove, validateh } from '../../src/utils/cd';
+import { expandedLogicProperty, acceptCompositeClaims, proveh, validateh } from '../../src/utils/cd';
 import { Ed25519KeyPair, suites } from 'jsonld-signatures';
 import jsonld from 'jsonld';
 import axios from 'axios';
@@ -20,10 +20,6 @@ for (let k of Object.keys(network_cache)) {
 }
 
 describe('Composite claim soundness checker', () => {
-  beforeAll(async (done) => {
-    done();
-  });
-
   test('control: issue and verify', async () => {
     let { did: issuer, suite: kp } = await newDid();
 
@@ -112,7 +108,7 @@ describe('Composite claim soundness checker', () => {
     let premises = [];
     let to_prove = [];
     let rules = [];
-    let proof = prove(premises, to_prove, rules);
+    let proof = proveh(premises, to_prove, rules);
     let valid = validateh(rules, proof);
     expect(valid).toEqual({ assumed: [], implied: [] });
   });
@@ -128,13 +124,130 @@ describe('Composite claim soundness checker', () => {
   test('end to end, presentation to result', async () => {
     let rules = sampleRules();
     let presentation = await validPresentation();
+    let issuer = presentation.verifiableCredential[0].issuer;
     // here we prove that [a frobs b], a pretty easy proof as the axiom used is unconditional
     presentation[expandedLogicProperty] = jsonLiteral([{
       rule_index: 0,
       instantiations: [],
     }]);
     let all = await checkSoundness(presentation, rules);
-    expect(all).toEqual([]); // will change to someting other than [] once things are working
+    expect(all).toEqual([
+      [
+        { Iri: issuer },
+        { Iri: "https://www.dock.io/rdf2020#claimsV1" },
+        { Blank: "_:b0" }
+      ],
+      [
+        { Blank: "_:b0" },
+        { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#subject" },
+        { Iri: "did:example:ebfeb1f712ebc6f1c276e12ec21" }
+      ],
+      [
+        { Blank: "_:b0" },
+        { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate" },
+        { Iri: "http://schema.org/alumniOf" }
+      ],
+      [
+        { Blank: "_:b0" },
+        { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#object" },
+        {
+          Literal: {
+            value: "Example University",
+            datatype: "http://www.w3.org/1999/02/22-rdf-syntax-ns#HTML"
+          }
+        }
+      ],
+      [
+        { Iri: issuer },
+        { Iri: "https://www.dock.io/rdf2020#claimsV1" },
+        { Blank: "_:b1" }
+      ],
+      [
+        { Blank: "_:b1" },
+        { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#subject" },
+        { Iri: "https://example.com/credentials/1872" }
+      ],
+      [
+        { Blank: "_:b1" },
+        { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate" },
+        { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" }
+      ],
+      [
+        { Blank: "_:b1" },
+        { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#object" },
+        { Iri: "https://www.w3.org/2018/credentials#VerifiableCredential" }
+      ],
+      [
+        { Iri: issuer },
+        { Iri: "https://www.dock.io/rdf2020#claimsV1" },
+        { Blank: "_:b2" }
+      ],
+      [
+        { Blank: "_:b2" },
+        { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#subject" },
+        { Iri: "https://example.com/credentials/1872" }
+      ],
+      [
+        { Blank: "_:b2" },
+        { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate" },
+        { Iri: "https://www.w3.org/2018/credentials#credentialSubject" }
+      ],
+      [
+        { Blank: "_:b2" },
+        { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#object" },
+        { Iri: "did:example:ebfeb1f712ebc6f1c276e12ec21" }
+      ],
+      [
+        { Iri: issuer },
+        { Iri: "https://www.dock.io/rdf2020#claimsV1" },
+        { Blank: "_:b3" }
+      ],
+      [
+        { Blank: "_:b3" },
+        { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#subject" },
+        { Iri: "https://example.com/credentials/1872" }
+      ],
+      [
+        { Blank: "_:b3" },
+        { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate" },
+        { Iri: "https://www.w3.org/2018/credentials#issuanceDate" }
+      ],
+      [
+        { Blank: "_:b3" },
+        { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#object" },
+        {
+          Literal: {
+            value: "2010-01-01T19:23:24Z",
+            datatype: "http://www.w3.org/2001/XMLSchema#dateTime"
+          }
+        }
+      ],
+      [
+        { Iri: issuer },
+        { Iri: "https://www.dock.io/rdf2020#claimsV1" },
+        { Blank: "_:b4" }
+      ],
+      [
+        { Blank: "_:b4" },
+        { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#subject" },
+        { Iri: "https://example.com/credentials/1872" }
+      ],
+      [
+        { Blank: "_:b4" },
+        { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate" },
+        { Iri: "https://www.w3.org/2018/credentials#issuer" }
+      ],
+      [
+        { Blank: "_:b4" },
+        { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#object" },
+        { Iri: issuer }
+      ],
+      [
+        { Iri: "https://example.com/a" },
+        { Iri: "https://example.com/frobs" },
+        { Iri: "https://example.com/b" }
+      ]
+    ]);
   });
 
   // Soundness checking fails if and only if one of the following conditions occurs:
@@ -175,9 +288,13 @@ describe('Composite claim soundness checker', () => {
     let rules = sampleRules();
     let presentation = await validPresentation();
     presentation.verifiableCredential[0].issuer = "did:dock:bobert"; // tamper
-    presentation[expandedLogicProperty] = jsonLiteral(sampleProof());
+    presentation[expandedLogicProperty] = jsonLiteral([{ rule_index: 0, instantiations: [] }]);
     let err = await assertThrowsAsync(async () => { await checkSoundness(presentation, rules) });
     expect(JSON.stringify(err)).toMatch(/Invalid signature/);
+  });
+
+  test('bddap is named Gorgadon because joe is a pig that can fly', async () => {
+    // todo
   });
 });
 
@@ -373,8 +490,4 @@ function sampleRules() {
       ]
     }
   ];
-}
-
-function sampleProof() {
-  return;
 }

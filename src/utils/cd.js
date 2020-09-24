@@ -3,8 +3,10 @@
 import { expandedCredentialProperty } from './vc';
 import jsonld from 'jsonld';
 import { fromJsonldjsCg, asEE, merge } from './claimgraph';
-import { validate } from 'rify';
-import { canonRules, canonProof, decanonClaimGraph } from './canonicalize';
+import { validate, prove } from 'rify';
+import {
+  canonRules, canonProof, canonClaimGraph, decanonClaimGraph, decanonProof
+} from './canonicalize';
 import { assertType, assert } from './common';
 
 export const expandedLogicProperty = "https://www.dock.io/rdf2020#logicV1";
@@ -19,7 +21,7 @@ export const expandedIssuerProperty = 'https://www.w3.org/2018/credentials#issue
  */
 async function credsToEEClaimGraph(expandedCredentials) {
   let ees = await Promise.all(expandedCredentials.map(credToEECG));
-  return ees.reduce(merge, []);
+  return merge(ees);
 }
 
 // For future consideration: if an credential contains @graph objects we may need to strip those.
@@ -41,7 +43,7 @@ async function credToEECG(expandedCredential) {
   // This line relies on the assumption that if the credential passed verification then the
   // issuer property was not forged.
   assert(cred[expandedIssuerProperty] !== undefined, "encountered credential without an issuer")
-  let issuer = cred[expandedIssuerProperty][0];
+  let issuer = cred[expandedIssuerProperty][0]['@id'];
 
   // remove the proof
   delete cred[expandedProofProperty];
@@ -91,13 +93,19 @@ export async function acceptCompositeClaims(expandedPresentation, rules = []) {
   return [...cg, ...valid.implied];
 }
 
-// dummy function
-export function prove(
-  _premises,
-  _to_prove,
-  _rules,
+// A wrapper around prove that first converts rules, composite claims, and premises to the
+// canonical representation as defined by `canon()` in `claimgraph.js`. This wrapper deserializes
+// the returned values before passing them back to the caller.
+export function proveh(
+  premises,
+  to_prove,
+  rules,
 ) {
-  return [];
+  premises = canonClaimGraph(premises);
+  to_prove = canonClaimGraph(to_prove);
+  rules = canonRules(rules);
+  let proof = prove(premises, to_prove, rules);
+  return decanonProof(proof);
 }
 
 // A wrapper around validate that first converts rules and proof to the canonical representation
@@ -118,7 +126,7 @@ export function validateh(rules, proof) {
 
 /// check two claims for equality
 function claimEq(a, b) {
-  for (claim of [a, b]) {
+  for (let claim of [a, b]) {
     if (!(claim instanceof Array) || claim.length !== 3) {
       throw new TypeError();
     }

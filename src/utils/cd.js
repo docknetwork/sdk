@@ -1,6 +1,7 @@
 // Claim deduction from verifiable presentations.
 
 import { expandedCredentialProperty } from './vc';
+import deepEqual from 'deep-equal';
 import jsonld from 'jsonld';
 import { fromJsonldjsCg, asEE, merge } from './claimgraph';
 import { validate, prove } from 'rify';
@@ -56,6 +57,24 @@ async function credToEECG(expandedCredential) {
 }
 
 /**
+ * Returns a list of all RDF statements in the presentation. DOES NOT VERIFY THE
+ * PRESENTATION. Verification must be performed for the results of this function to be trustworthy.
+ *
+ * @param presentation - a VCDM presentation as expanded json-ld
+ * @returns {Promise<[Claim]>}
+ */
+export async function presentationToEEClaimGraph(expandedPresentation) {
+  assertType(expandedPresentation, 'object');
+  assert(!Array.isArray(expandedPresentation), 'presentation must not be an array');
+
+  // get ordered list of all credentials
+  const creds = jsonld.getValues(expandedPresentation, expandedCredentialProperty);
+
+  // convert them to a single claimgraph
+  return await credsToEEClaimGraph(creds);
+}
+
+/**
  * Returns a list of all RDF statements proven by the presentation. DOES NOT VERIFY THE
  * PRESENTATION. Verification must be performed for the results of this function to be trustworthy.
  * The return value may contaim duplicate claims.
@@ -65,14 +84,8 @@ async function credToEECG(expandedCredential) {
  * @returns {Promise<[Claim]>}
  */
 export async function acceptCompositeClaims(expandedPresentation, rules = []) {
-  assertType(expandedPresentation, 'object');
-  assert(!Array.isArray(expandedPresentation), 'presentaion must not be an array');
-
-  // get ordered list of all credentials
-  const creds = jsonld.getValues(expandedPresentation, expandedCredentialProperty);
-
-  // convert them to a single claimgraph
-  let cg = await credsToEEClaimGraph(creds);
+  // convert to a claimgraph
+  let cg = await presentationToEEClaimGraph(expandedPresentation);
 
   // get ordered and concatenated proofs
   let proof = jsonld.getValues(expandedPresentation, expandedLogicProperty)
@@ -131,7 +144,7 @@ function claimEq(a, b) {
       throw new TypeError();
     }
   }
-  return a[0] === b[0] && a[1] === b[1] && a[2] == b[2];
+  return deepEqual(a, b);
 }
 
 // https://w3c.github.io/json-ld-syntax/#json-literals

@@ -1,5 +1,12 @@
 import vc from 'vc-js';
-import { expandedLogicProperty, acceptCompositeClaims, proveh, validateh } from '../../src/utils/cd';
+import {
+  expandedLogicProperty,
+  acceptCompositeClaims,
+  proveh,
+  validateh,
+  presentationToEEClaimGraph
+} from '../../src/utils/cd';
+import { claims } from '../../src/utils/claimgraph';
 import { Ed25519KeyPair, suites } from 'jsonld-signatures';
 import jsonld from 'jsonld';
 import axios from 'axios';
@@ -294,12 +301,198 @@ describe('Composite claim soundness checker', () => {
   });
 
   test('bddap is named Gorgadon because joe is a pig that can fly', async () => {
-    // todo
+    let { did: pigchecker, suite: pigchecker_kp } = await newDid();
+    let { did: faa, suite: faa_kp } = await newDid();
+
+    // if pigs can fly, then bddap is Gorgadon
+    let gorg = {
+      if_all: [
+        [
+          { Unbound: "pig" },
+          { Bound: { Iri: "https://example.com/Ability" } },
+          { Bound: { Iri: "https://example.com/Flight" } }
+        ],
+        [
+          { Unbound: "pig" },
+          { Bound: rdf('type') },
+          { Bound: { Iri: "https://example.com/Pig" } }
+        ],
+      ],
+      then: [
+        [
+          { Bound: { Iri: "did:dock:bddap" } },
+          { Bound: { Iri: "http://xmlns.com/foaf/spec/#term_firstName" } },
+          {
+            Bound: {
+              Literal: {
+                value: "Gorgadon",
+                datatype: "http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral",
+              }
+            }
+          }
+        ]
+      ]
+    };
+    let licensing = {
+      // if licenser? claims [a? lp? lo?]
+      // and licenser? mayLicence li?
+      // and li? predicate lp?
+      // and li? object lo?
+      if_all: [
+        [
+          { Unbound: "licenser" },
+          { Bound: claims },
+          { Unbound: "c0" }
+        ],
+        [
+          { Unbound: "c0" },
+          { Bound: rdf('subject') },
+          { Unbound: "a" }
+        ],
+        [
+          { Unbound: "c0" },
+          { Bound: rdf('predicate') },
+          { Unbound: "lp" }
+        ],
+        [
+          { Unbound: "c0" },
+          { Bound: rdf('object') },
+          { Unbound: "lo" }
+        ],
+        [
+          { Unbound: "licenser" },
+          { Bound: { Iri: "https://example.com/mayLicense" } },
+          { Unbound: "li" }
+        ],
+        [
+          { Unbound: "li" },
+          { Bound: rdf('predicate') },
+          { Unbound: "lp" }
+        ],
+        [
+          { Unbound: "li" },
+          { Bound: rdf('object') },
+          { Unbound: "lo" }
+        ],
+      ],
+      // then [a? lp? lo?],
+      then: [
+        [
+          { Unbound: "a" },
+          { Unbound: "lp" },
+          { Unbound: "lo" }
+        ]
+      ]
+    };
+    let licenses = {
+      if_all: [],
+      then: [
+        // the Federal Aviation Administration may grant the ability to fly
+        [
+          { Bound: { Iri: faa } },
+          { Bound: { Iri: "https://example.com/mayLicense" } },
+          { Bound: { Iri: "uuid:5c4cfa6b-d96f-4a53-8786-2cce46cc51c4" } },
+        ],
+        [
+          { Bound: { Iri: "uuid:5c4cfa6b-d96f-4a53-8786-2cce46cc51c4" } },
+          { Bound: rdf('predicate') },
+          { Bound: { Iri: "https://example.com/Ability" } },
+        ],
+        [
+          { Bound: { Iri: "uuid:5c4cfa6b-d96f-4a53-8786-2cce46cc51c4" } },
+          { Bound: rdf('object') },
+          { Bound: { Iri: "https://example.com/Flight" } },
+        ],
+        // pigchecker is trusted to check whether something is a pig
+        [
+          { Bound: { Iri: pigchecker } },
+          { Bound: { Iri: "https://example.com/mayLicense" } },
+          { Bound: { Iri: "uuid:6f165460-894a-4e51-a2a5-79b537678720" } },
+        ],
+        [
+          { Bound: { Iri: "uuid:6f165460-894a-4e51-a2a5-79b537678720" } },
+          { Bound: rdf('predicate') },
+          { Bound: rdf('type') },
+        ],
+        [
+          { Bound: { Iri: "uuid:6f165460-894a-4e51-a2a5-79b537678720" } },
+          { Bound: rdf('object') },
+          { Bound: { Iri: "https://example.com/Pig" } },
+        ]
+      ]
+    };
+    let rules = [gorg, licensing, licenses];
+
+    let joe_is_a_pig = await vc.issue({
+      credential: {
+        "@context": ["https://www.w3.org/2018/credentials/v1"],
+        "id": "https://example.com/credentials/1872",
+        "type": ["VerifiableCredential"],
+        "issuer": pigchecker,
+        "issuanceDate": "2010-01-01T19:23:24Z",
+        "credentialSubject": {
+          "@id": "did:example:joe",
+          "@type": "https://example.com/Pig",
+        }
+      },
+      suite: pigchecker_kp,
+      documentLoader,
+    });
+    let joe_can_fly = await vc.issue({
+      credential: {
+        "@context": ["https://www.w3.org/2018/credentials/v1"],
+        "id": "https://example.com/credentials/1872",
+        "type": ["VerifiableCredential"],
+        "issuer": faa,
+        "issuanceDate": "2010-01-01T19:23:24Z",
+        "credentialSubject": {
+          "@id": "did:example:joe",
+          "https://example.com/Ability": { "@id": "https://example.com/Flight" }
+        }
+      },
+      suite: faa_kp,
+      documentLoader,
+    });
+
+    let presentation = await vc.createPresentation({
+      verifiableCredential: [
+        joe_can_fly,
+        joe_is_a_pig,
+      ],
+      id: 'uuid:ce0d9145-934a-42b3-aa48-af1d27f33c2a',
+      holder: 'uuid:078644cf-de19-436c-9691-fbe8a569a1d4'
+    });
+
+    // create a proof that bddap is Gorgadon
+    let presentation_claimgraph = await presentationToEEClaimGraph(
+      (await jsonld.expand(presentation, { documentLoader }))[0]
+    );
+    let claim_to_prove = [
+      { Iri: "did:dock:bddap" },
+      { Iri: "http://xmlns.com/foaf/spec/#term_firstName" },
+      {
+        Literal: {
+          value: "Gorgadon",
+          datatype: "http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral",
+        }
+      }
+    ];
+    expect(presentation_claimgraph).not.toContainEqual(claim_to_prove);
+    let proof = proveh(
+      presentation_claimgraph,
+      [claim_to_prove],
+      rules
+    );
+    presentation[expandedLogicProperty] = jsonLiteral(proof);
+
+    let cg = await checkSoundness(presentation, rules);
+    expect(cg).toContainEqual(claim_to_prove);
   });
 });
 
 // takes a verifiable presentation and rules, returns all claims which are known to be true under
 // the given set of rules
+// This function is intentionally not exposed publicly.
 async function checkSoundness(presentation, rules) {
   let ver = await verifyP(presentation);
   if (!ver.verified) {
@@ -490,4 +683,13 @@ function sampleRules() {
       ]
     }
   ];
+}
+
+// It's common to use shorthand like `rdf:type`. This function let's us do something similar.
+// expect(rdf('type')).toEqual({ Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' });
+function rdf(keyword) {
+  if (!['type', 'subject', 'predicate', 'object'].includes(keyword)) {
+    throw `are you sure ${keyword} is part of the rdf: context?`;
+  }
+  return { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#' + keyword };
 }

@@ -11,7 +11,7 @@ import { deepClone, assertValidClaimGraph, assert, assertType } from './common';
 
 export const claims = { Iri: 'https://www.dock.io/rdf2020#claimsV1' };
 
-// Convert from the json-ld claimgraph representaion
+// Convert from the json-ld claimgraph representation
 // https://github.com/digitalbazaar/jsonld.js/blob/983cd849f56180e2ee4552ca25dd52b293174830/lib/toRdf.js
 // to this module's representation.
 export function fromJsonldjsCg(jcg) {
@@ -20,7 +20,7 @@ export function fromJsonldjsCg(jcg) {
   );
 }
 
-// convert a single node from json-ld claimgraph representaion to this module's representation.
+// convert a single node from json-ld claimgraph representation to this module's representation.
 function fromJsonldjsNode(jn) {
   switch (jn.termType) {
     case 'NamedNode':

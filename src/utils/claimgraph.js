@@ -7,6 +7,8 @@
 //
 // This module implements utilities for operating on claimgraphs if the above format.
 
+import { deepClone, assertValidClaimGraph, assert } from './common';
+
 export const claims = { Iri: 'https://www.dock.io/rdf2020#claimsV1' };
 
 // Convert from the json-ld claimgraph representaion
@@ -44,41 +46,6 @@ export function merge(claimgraphs) {
     namer.reallocateNames(cg);
   }
   return cgs.flat(1);
-}
-
-// Convert a Node into a cononicalized string representation.
-//
-// ∀ A, B ∈ Node: canon(A) = canon(B) <-> A = B
-export function canon(node) {
-  return JSON.stringify(orderKeys(node));
-}
-
-// recursively lexically sort the keys in an object
-// expect(JSON.stringify(orderKeys(
-//   { b: '', a: '' }
-// ))).toEqual(JSON.stringify(
-//   { a: '', b: '' }
-// ));
-// expect(JSON.stringify(orderKeys(
-//   { b: '', a: { c: '', b: '', a: '' } }
-// ))).toEqual(JSON.stringify(
-//   { a: { a: '', b: '', c: '' }, b: '' }
-// ));
-function orderKeys(a) {
-  switch (typeof a) {
-    case 'string':
-      return a;
-    case 'object':
-      let keys = Object.keys(a);
-      keys.sort();
-      let ret = {};
-      for (let k of keys) {
-        ret[k] = orderKeys(a[k]);
-      }
-      return ret;
-    default:
-      throw 'type error: orderKeys() does not accept type ' + typeof a;
-  }
 }
 
 // Convert to Explicit Ethos form.
@@ -149,58 +116,5 @@ class Namer {
         }
       }
     }
-  }
-}
-
-// deep copy a json serializable object
-function deepClone(obj) {
-  // https://jsben.ch/E55IQ
-  return JSON.parse(JSON.stringify(obj));
-}
-
-function assertValidClaimGraph(cg) {
-  for (let claim of cg) {
-    for (let node of claim) {
-      assertValidNode(node);
-    }
-  }
-}
-
-function assertValidNode(node) {
-  let ks = Object.keys(node);
-  assert(ks.length === 1, 'enum representaion invalid. enum must be exactly one variant');
-  let tag = ks[0];
-  let value = node[tag];
-  switch (tag) {
-    case 'Iri':
-      assertType(value, 'string');
-      break;
-    case 'Blank':
-      assertType(value, 'string');
-      break;
-    case 'Literal':
-      assertType(value, 'object');
-      assert(Object.keys(value).length == 2);
-      assertType(value.value, 'string');
-      assertType(value.datatype, 'string');
-      break;
-    default:
-      throw 'Bad node tag: ' + tag;
-  }
-}
-
-function assertType(a, typ) {
-  if (typeof a !== typ) {
-    throw `Type error. Expected type ${typ}. Got ${a} which has type ${typeof a}.`;
-  }
-}
-
-function assert(b, s) {
-  if (!b) {
-    let m = 'assertion failed';
-    if (s !== undefined) {
-      m += ' ' + s;
-    }
-    throw m;
   }
 }

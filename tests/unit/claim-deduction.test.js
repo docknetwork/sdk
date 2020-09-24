@@ -1,6 +1,5 @@
 import vc from 'vc-js';
-import { expandedLogicProperty, acceptCompositeClaims, prove, validate } from '../../src/utils/cd';
-import { fromJsonldjsCg } from '../../src/utils/claimgraph';
+import { expandedLogicProperty, acceptCompositeClaims, prove, validateh } from '../../src/utils/cd';
 import { Ed25519KeyPair, suites } from 'jsonld-signatures';
 import jsonld from 'jsonld';
 import axios from 'axios';
@@ -34,7 +33,7 @@ describe('Composite claim soundness checker', () => {
         "https://www.w3.org/2018/credentials/examples/v1"
       ],
       "id": "https://example.com/credentials/1872",
-      "type": ["VerifiableCredential", "AlumniCredential"],
+      "type": ["VerifiableCredential"],
       "issuer": issuer,
       "issuanceDate": "2010-01-01T19:23:24Z",
       "credentialSubject": {
@@ -66,7 +65,7 @@ describe('Composite claim soundness checker', () => {
           "https://www.w3.org/2018/credentials/examples/v1"
         ],
         "id": "https://example.com/credentials/1872",
-        "type": ["VerifiableCredential", "AlumniCredential"],
+        "type": ["VerifiableCredential"],
         "issuer": issuera,
         "issuanceDate": "2010-01-01T19:23:24Z",
         "credentialSubject": {
@@ -114,7 +113,7 @@ describe('Composite claim soundness checker', () => {
     let to_prove = [];
     let rules = [];
     let proof = prove(premises, to_prove, rules);
-    let valid = validate(rules, proof);
+    let valid = validateh(rules, proof);
     expect(valid).toEqual({ assumed: [], implied: [] });
   });
 
@@ -129,7 +128,11 @@ describe('Composite claim soundness checker', () => {
   test('end to end, presentation to result', async () => {
     let rules = sampleRules();
     let presentation = await validPresentation();
-    presentation[expandedLogicProperty] = jsonLiteral(sampleProof());
+    // here we prove that [a frobs b], a pretty easy proof as the axiom used is unconditional
+    presentation[expandedLogicProperty] = jsonLiteral([{
+      rule_index: 0,
+      instantiations: [],
+    }]);
     let all = await checkSoundness(presentation, rules);
     expect(all).toEqual([]); // will change to someting other than [] once things are working
   });
@@ -138,12 +141,34 @@ describe('Composite claim soundness checker', () => {
   // - Proof assumes claims not attested to by the provided credentials and is therefore not verifiable.
   // - Credential claims are not verifiable(credential verification fails) so proof is not verifiable.
 
-  test('Proof including external claims should fail.', async () => {
+  test('Proof including unstated claims should fail.', async () => {
     let rules = sampleRules();
     let presentation = await validPresentation();
-    presentation[expandedLogicProperty] = jsonLiteral(invalidSampleProof());
+    presentation[expandedLogicProperty] = jsonLiteral([{
+      rule_index: 1,
+      instantiations: [{ Iri: "http://example.com/joeThePig" }],
+    }]);
     let err = await assertThrowsAsync(async () => { await checkSoundness(presentation, rules) });
-    expect(err).toEqual("proof incudes invalid application of rule");
+    expect(err).toEqual({
+      UnverifiableProof: {
+        unverified_assumption: [
+          { Iri: "http://example.com/joeThePig" },
+          { Iri: "https://example.com/Ability" },
+          { Iri: "https://example.com/Flight" },
+        ]
+      }
+    });
+  });
+
+  test('Proof including inapplicable rule should fail.', async () => {
+    let rules = sampleRules();
+    let presentation = await validPresentation();
+    presentation[expandedLogicProperty] = jsonLiteral([{
+      rule_index: 0,
+      instantiations: [{ Iri: "http://example.com" }],
+    }]);
+    let err = await assertThrowsAsync(async () => { await checkSoundness(presentation, rules) });
+    expect(err).toEqual({ InvalidProof: "BadRuleApplication" });
   });
 
   test('Unverifiable credential should fail.', async () => {
@@ -165,7 +190,7 @@ async function checkSoundness(presentation, rules) {
   }
   // Pre-expand the presentaion using local cache. Tests run pretty slow otherwise.
   presentation = await jsonld.expand(presentation, { documentLoader });
-  return await acceptCompositeClaims(presentation, rules);
+  return await acceptCompositeClaims(presentation[0], rules);
 }
 
 // run asyncronous function cb and return the error it throws
@@ -193,14 +218,6 @@ async function documentLoader(url) {
     documentUrl: url,
     document: documentRegistry[url],
   };
-}
-
-async function writeToNetworkCache(url, data) {
-  let fsp = require('fs').promises;
-  let nc_raw = fsp.readFile('./test/network-cache.json');
-  let nc = JSON.parse(ncraw);
-  nc[url] = data;
-  let new_nc_raw = JSON.stringify(ncraw, null, 2);
 }
 
 function registerDid(did, keyPair) {
@@ -277,7 +294,7 @@ async function validCredential() {
       "https://www.w3.org/2018/credentials/examples/v1"
     ],
     "id": "https://example.com/credentials/1872",
-    "type": ["VerifiableCredential", "AlumniCredential"],
+    "type": ["VerifiableCredential"],
     "issuer": issuer,
     "issuanceDate": "2010-01-01T19:23:24Z",
     "credentialSubject": {
@@ -320,39 +337,44 @@ function sampleRules() {
     {
       if_all: [],
       then: [
-        ["https://example.com/a", "https://example.com/frobs", "https://example.com/b"]
+        [
+          { Bound: { Iri: "https://example.com/a" } },
+          { Bound: { Iri: "https://example.com/frobs" } },
+          { Bound: { Iri: "https://example.com/b" } }
+        ]
       ],
-    }, {
+    },
+    {
       if_all: [
         [
           { Unbound: "pig" },
-          { Bound: "https://example.com/Ability" },
-          { Bound: "https://example.com/Flight" }
+          { Bound: { Iri: "https://example.com/Ability" } },
+          { Bound: { Iri: "https://example.com/Flight" } }
         ],
         [
           { Unbound: "pig" },
-          { Bound: "https://www.w3.org/1999/02/22-rdf-syntax-ns#type" },
-          { Bound: "https://example.com/Pig" }
+          { Bound: { Iri: "https://www.w3.org/1999/02/22-rdf-syntax-ns#type" } },
+          { Bound: { Iri: "https://example.com/Pig" } }
         ],
       ],
       then: [
-        // is this a valid way to encode a string literal?
-        ["did:dock:bddap", "http://xmlns.com/foaf/spec/#term_firstName", "\"Gorgadon\""]
-      ],
+        [
+          { Bound: { Iri: "did:dock:bddap" } },
+          { Bound: { Iri: "http://xmlns.com/foaf/spec/#term_firstName" } },
+          {
+            Bound: {
+              Literal: {
+                value: "Gorgadon",
+                datatype: "http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral",
+              }
+            }
+          }
+        ]
+      ]
     }
   ];
 }
 
 function sampleProof() {
-  return [{
-    rule_index: 0,
-    instantiations: [],
-  }];
-}
-
-function invalidSampleProof() {
-  return [{
-    rule_index: 0,
-    instantiations: ["hey"],
-  }];
+  return;
 }

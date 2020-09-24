@@ -3,10 +3,13 @@
 import { expandedCredentialProperty } from './vc';
 import jsonld from 'jsonld';
 import { fromJsonldjsCg, asEE, merge } from './claimgraph';
+import { validate } from 'rify';
+import { canonRules, canonProof, decanonClaimGraph } from './canonicalize';
+import { assertType, assert } from './common';
 
 export const expandedLogicProperty = "https://www.dock.io/rdf2020#logicV1";
 export const expandedProofProperty = "https://w3id.org/security#proof";
-export const expandedIssuerProperty = 'https://www.w3.org/2018/credentials/v1#issuer';
+export const expandedIssuerProperty = 'https://www.w3.org/2018/credentials#issuer';
 
 /**
  * Convert a list of expanded credentials which have already been verified into an RDF claim graph.
@@ -19,6 +22,10 @@ async function credsToEEClaimGraph(expandedCredentials) {
   return ees.reduce(merge, []);
 }
 
+// For future consideration: if an credential contains @graph objects we may need to strip those.
+// The reason is that the issuer may not intend to attests to claims in that subgraph.
+// It might make sense to instead reify (https://www.w3.org/TR/WD-rdf-syntax-971002/) any subgraphs
+// to avoid losing the data they express.
 /**
  * Convert a single expanded credential which has already been verified into an RDF claim graph.
  * The resulting claimgraph is in Explicit Ethos form.
@@ -26,17 +33,21 @@ async function credsToEEClaimGraph(expandedCredentials) {
  * @returns {Promise<[Claim]>}
  */
 async function credToEECG(expandedCredential) {
-  let cred = { ...expandedCredential };
+  assert(Object.keys(expandedCredential).length === 1);
+  assert(Object.keys(expandedCredential)[0] === '@graph');
+  assert(expandedCredential['@graph'].length === 1);
+  let cred = { ...expandedCredential['@graph'][0] };
 
   // This line relies on the assumption that if the credential passed verification then the
   // issuer property was not forged.
+  assert(cred[expandedIssuerProperty] !== undefined, "encountered credential without an issuer")
   let issuer = cred[expandedIssuerProperty][0];
 
   // remove the proof
   delete cred[expandedProofProperty];
 
   // convert to claimgraph
-  let cg = fromJsonldjsCg(await jsonld.toRDF(credential));
+  let cg = fromJsonldjsCg(await jsonld.toRDF(cred));
 
   // convert to explicit ethos form
   return asEE(cg, issuer);
@@ -47,28 +58,29 @@ async function credToEECG(expandedCredential) {
  * PRESENTATION. Verification must be performed for the results of this function to be trustworthy.
  * The return value may contaim duplicate claims.
  *
- * @param presentation - a VCDM presentation as json-ld
+ * @param presentation - a VCDM presentation as expanded json-ld
  * @param rules - ordered list of axioms which will be accepted within proofs of composite claims
  * @returns {Promise<[Claim]>}
  */
-export async function acceptCompositeClaims(presentation, rules = []) {
-  const expanded = await jsonld.expand(presentation);
+export async function acceptCompositeClaims(expandedPresentation, rules = []) {
+  assertType(expandedPresentation, 'object');
+  assert(!Array.isArray(expandedPresentation), 'presentaion must not be an array');
 
   // get ordered list of all credentials
-  const creds = jsonld.getValues(expanded, expandedCredentialProperty);
+  const creds = jsonld.getValues(expandedPresentation, expandedCredentialProperty);
 
   // convert them to a single claimgraph
   let cg = await credsToEEClaimGraph(creds);
 
   // get ordered and concatenated proofs
-  let proof = jsonld.getValues(expanded, expandedLogicProperty)
+  let proof = jsonld.getValues(expandedPresentation, expandedLogicProperty)
     .map(fromJSONLiteral)
     .flat(1);
 
   // validate proofs
-  let valid = validate(rules, proof);
+  let valid = validateh(rules, proof);
 
-  // assert all superproof.assumed in proof are in claimgraph
+  // assert all assumptions made by the proof are in claimgraph
   for (let assumption of valid.assumed) {
     if (!cg.some(claim => claimEq(claim, assumption))) {
       throw { UnverifiableProof: { unverified_assumption: [...assumption] } };
@@ -88,11 +100,19 @@ export function prove(
   return [];
 }
 
-// dummy function
-export function validate(_rules, _proof) {
+// A wrapper around validate that first converts rules and proof to the canonical representation
+// as defined by `canon()` in `claimgraph.js`. This wrapper deserializes the returned values before
+// passing them back to the caller.
+export function validateh(rules, proof) {
+  rules = canonRules(rules);
+  proof = canonProof(proof);
+  let {
+    assumed,
+    implied,
+  } = validate(rules, proof);
   return {
-    assumed: [],
-    implied: [],
+    assumed: decanonClaimGraph(assumed),
+    implied: decanonClaimGraph(implied),
   };
 }
 

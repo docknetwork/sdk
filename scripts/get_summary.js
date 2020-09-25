@@ -1,11 +1,11 @@
 // Get summary from for PoA like current epoch, when will it end, active validators, queued validators, etc
 
 import dock from '../src/api';
-import { asDockAddress } from './helpers';
+import { asDockAddress } from '../src/utils/codec';
 
 require('dotenv').config();
 
-const { FullNodeEndpoint } = process.env;
+const { FullNodeEndpoint, Network } = process.env;
 
 /**
  * Get multiple items from chain state in a single query
@@ -51,14 +51,16 @@ async function getSummary(handle) {
     handle.api.query.poAModule.emissionSupply,
   ]);
 
+  const conv = (addr) => asDockAddress(addr, Network);
+
   return {
     epoch: epoch.toNumber(),
     epochEndsAt: epochEndsAt.toNumber(),
     minEpochLength: minEpochLength.toNumber(),
     maxActiveValidators: maxActiveValidators.toNumber(),
-    activeValidators: activeValidators.map(asDockAddress),
-    validatorsToAdd: validatorsToAdd.map(asDockAddress),
-    validatorsToRemove: validatorsToRemove.map(asDockAddress),
+    activeValidators: activeValidators.map(conv),
+    validatorsToAdd: validatorsToAdd.map(conv),
+    validatorsToRemove: validatorsToRemove.map(conv),
     emissionStatus,
     emissionSupply: emissionSupply.toNumber(),
   };

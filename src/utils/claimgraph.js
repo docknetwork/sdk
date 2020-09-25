@@ -81,8 +81,16 @@ export function merge(claimgraphs) {
   return cgs.flat(1);
 }
 
-// Convert to Explicit Ethos form.
-// See https://www.w3.org/TR/WD-rdf-syntax-971002/ , 2.2. Utility Relations; "Layer 1", reification
+//
+
+/**
+ * Convert claimgraph to Explicit Ethos form.
+ * https://www.w3.org/TR/WD-rdf-syntax-971002/ , 2.2. Utility Relations; "Layer 1", reification
+ *
+ * @param {Object[]} claimgraph
+ * @param {string} issuerIRI
+ * @returns {Object[]}
+ */
 export function asEE(claimgraph, issuerIRI) {
   assertType(issuerIRI, 'string');
   const cg = deepClone(claimgraph);

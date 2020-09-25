@@ -25,9 +25,9 @@ export const expandedIssuerProperty = 'https://www.w3.org/2018/credentials#issue
  * a provided proof makes unverified assumptions,
  * a provided proof is malformed.
  *
- * @param presentation - a VCDM presentation as expanded json-ld
+ * @param expandedPresentation - a VCDM presentation as expanded json-ld
  * @param rules - ordered list of axioms which will be accepted within proofs of composite claims
- * @returns {Promise<[Claim]>}
+ * @returns {Promise<Object[]>}
  */
 export async function acceptCompositeClaims(expandedPresentation, rules) {
   assert(rules !== undefined);
@@ -46,7 +46,7 @@ export async function acceptCompositeClaims(expandedPresentation, rules) {
  *
  * @param expandedCredentials - A list of expanded credentials, each is expected to be a separate
  *                              @graph.
- * @returns {Promise<[Claim]>}
+ * @returns {Promise<Object[]>}
  */
 async function credsToEEClaimGraph(expandedCredentials) {
   const ees = await Promise.all(expandedCredentials.map(credToEECG));
@@ -61,7 +61,7 @@ async function credsToEEClaimGraph(expandedCredentials) {
  * Convert a single expanded credential which has already been verified into an RDF claim graph.
  * The resulting claimgraph is in Explicit Ethos form.
  *
- * @returns {Promise<[Claim]>}
+ * @returns {Promise<Object[]>}
  */
 async function credToEECG(expandedCredential) {
   assert(expandedCredential['@graph'] !== undefined);
@@ -86,8 +86,8 @@ async function credToEECG(expandedCredential) {
  * Returns a list of all RDF statements in the presentation. DOES NOT VERIFY THE
  * PRESENTATION. Verification must be performed for the results of this function to be trustworthy.
  *
- * @param presentation - a VCDM presentation as expanded json-ld
- * @returns {Promise<[Claim]>}
+ * @param expandedPresentation - a VCDM presentation as expanded json-ld
+ * @returns {Promise<Object[]>}
  */
 export async function presentationToEEClaimGraph(expandedPresentation) {
   const ep = unwrapE(expandedPresentation);
@@ -111,8 +111,8 @@ export class UnverifiedAssumption extends Error {
  * The presentation must be in expanded form.
  * Returns the proofs, concatenated together.
  *
- * @param presentation - a VCDM presentation as expanded json-ld
- * @returns {Promise<[Claim]>}
+ * @param expandedPresentation - a VCDM presentation as expanded json-ld
+ * @returns {Promise<Object[]>}
  */
 export function extractProof(expandedPresentation) {
   return jsonld.getValues(unwrapE(expandedPresentation), expandedLogicProperty)
@@ -125,8 +125,10 @@ export function extractProof(expandedPresentation) {
  * proven true by proof. If the proof is not applicable given the ruleset, or makes unverified
  * assumptions, throw an error. The return value may contain duplicate claims.
  *
- * @param presentation - a VCDM presentation as expanded json-ld
- * @returns {[Claim]}
+ * @param claimgraph - known true assumptions (usually extracted from a presentation or a cred)
+ * @param proof - proof of composite claims (usually comes from calling proveh())
+ * @param rules - ordered list of axioms
+ * @returns {Object[]}
  */
 export function getImplications(claimgraph, proof, rules) {
   const valid = validateh(rules, proof);
@@ -151,12 +153,12 @@ export function getImplications(claimgraph, proof, rules) {
  * @param expandedPresentation - a VCDM presentation as expanded json-ld
  * @param compositeClaims - claims to prove, provide in claimgraph format
  * @param rules - ordered list of axioms which will be accepted within proofs of composite claims
- * @returns {Promise<proof>} - proof is returned as a json literal
+ * @returns {Promise<Object>} - proof is returned as a json literal
  */
 export async function proveCompositeClaims(expandedPresentation, compositeClaims, rules) {
   assert(rules !== undefined);
   const cg = await presentationToEEClaimGraph(expandedPresentation);
-  const prevProof = extractProof(expandedPresentation);
+  const prevProof = await extractProof(expandedPresentation);
   const newProof = proveh(cg, compositeClaims, rules);
   return toJsonLiteral(prevProof.concat(newProof));
 }

@@ -1,19 +1,19 @@
 // Script to print session keys of the current validators
 
 import { u8aToString, bnToU8a, u8aToHex } from '@polkadot/util';
-import { asDockAddress } from './helpers';
+import { asDockAddress } from '../src/utils/codec';
 import dock from '../src/api';
 
 require('dotenv').config();
 
-const { FullNodeEndpoint } = process.env;
+const { FullNodeEndpoint, Network } = process.env;
 
 async function printSessionKeys() {
   const addresses = {};
   const keyOwners = await dock.api.query.session.keyOwner.entries();
 
   keyOwners.forEach((keyOwner) => {
-    const addr = asDockAddress(keyOwner[1].unwrap());
+    const addr = asDockAddress(keyOwner[1].unwrap(), Network);
     if (!(addr in addresses)) {
       addresses[addr] = {};
     }

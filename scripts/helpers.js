@@ -45,15 +45,6 @@ export async function validatorChange(dock, argv, func, senderAccountUri) {
 }
 
 /**
- * Convert address to Dock address.
- * @param addr
- */
-export function asDockAddress(addr) {
-  // Currently a Substrate address is used, hence 42
-  return encodeAddress(addr, 42);
-}
-
-/**
  * Send a batch of txns and print relevant info like size, weight, block included and fees paid.
  * @param {*} txs
  * @param {*} senderAddress

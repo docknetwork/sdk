@@ -8,6 +8,7 @@ import RevocationModule from './modules/revocation';
 import PoAModule from './modules/poa';
 import TokenMigration from './modules/migration';
 import types from './types.json';
+import PoaRpcDefs from './poa-rpc-defs';
 
 import {
   PublicKey,
@@ -23,9 +24,12 @@ import {
 } from './signatures';
 
 /**
- * @typedef {object} Options The Options to use in the function createUser.
+ * @typedef {object} Options The Options to use in the function DockAPI.
  * @property {string} [address] The node address to connect to.
  * @property {object} [keyring] PolkadotJS keyring
+ * @property {object} [chainTypes] Types for the chain
+ * @property {object} [chainRpc] RPC definitions for the chain
+ * @property {Boolean} [loadPoaModules] Whether to load PoA modules or not. Defaults to true
  */
 
 /** Helper class to interact with the Dock chain */
@@ -41,11 +45,13 @@ class DockAPI {
   }
 
   /**
-   * Initialises the SDK and connects to the node
+   * Initializes the SDK and connects to the node
    * @param {Options} config - Configuration options
    * @return {Promise} Promise for when SDK is ready for use
    */
-  async init({ address, keyring } = {
+  async init({
+    address, keyring, chainTypes, chainRpc, loadPoaModules = true,
+  } = {
     address: null,
     keyring: null,
   }) {
@@ -59,9 +65,19 @@ class DockAPI {
 
     this.address = address || this.address;
 
+    // If RPC methods given, use them else set it to empty object.
+    let rpc = chainRpc || {};
+
+    // If using PoA module, extend the RPC methods with PoA specific ones.
+    if (loadPoaModules) {
+      rpc = Object.assign(rpc, PoaRpcDefs);
+    }
+
     this.api = await ApiPromise.create({
       provider: new WsProvider(this.address),
-      types,
+      types: chainTypes || types,
+      // @ts-ignore: TS2322
+      rpc,
     });
 
     await this.initKeyring(keyring);
@@ -69,8 +85,11 @@ class DockAPI {
     this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));
     this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
     this.revocationModule = new RevocationModule(this.api, this.signAndSend.bind(this));
-    this.poaModule = new PoAModule(this.api);
-    this.migrationModule = new TokenMigration(this.api);
+
+    if (loadPoaModules) {
+      this.poaModule = new PoAModule(this.api);
+      this.migrationModule = new TokenMigration(this.api);
+    }
 
     return this.api;
   }

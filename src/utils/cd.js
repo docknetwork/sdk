@@ -9,7 +9,7 @@ import { fromJsonldjsCg, asEE, merge } from './claimgraph';
 import {
   canonRules, canonProof, canonClaimGraph, decanonClaimGraph, decanonProof,
 } from './canonicalize';
-import { assertType } from './common';
+import { assertType, assertValidNode } from './common';
 
 export const expandedLogicProperty = 'https://www.dock.io/rdf2020#logicV1';
 export const expandedProofProperty = 'https://w3id.org/security#proof';
@@ -83,36 +83,85 @@ export class UnverifiedAssumption extends Error {
 }
 
 /**
+ * Extracts any included proofs of composite claims from a presentation.
+ * The presentation must be in expanded form.
+ * Returns the proofs, concatenated together.
+ *
+ * @param presentation - a VCDM presentation as expanded json-ld
+ * @returns {Promise<[Claim]>}
+ */
+export function extractProof(expandedPresentation) {
+  return jsonld.getValues(expandedPresentation, expandedLogicProperty)
+    .map(fromJSONLiteral)
+    .flat(1);
+}
+
+/**
+ * Given a claimgraph of true assumptions, and the allowed logical rules, return the claims that are
+ * proven true by proof. If the proof is not applicable given the ruleset, or makes unverified
+ * assumptions, throw an error. The return value may contain duplicate claims.
+ *
+ * @param presentation - a VCDM presentation as expanded json-ld
+ * @returns {[Claim]}
+ */
+export function getImplications(claimgraph, proof, rules) {
+  const valid = validateh(rules, proof);
+
+  // Check that all assumptions made by the proof were provided in the claimgraph of assumptions
+  for (const assumption of valid.assumed) {
+    if (!claimgraph.some((claim) => claimEq(claim, assumption))) {
+      throw new UnverifiedAssumption([...assumption]);
+    }
+  }
+
+  return valid.implied;
+}
+
+/**
  * Returns a list of all RDF statements proven by the presentation. DOES NOT VERIFY THE
  * PRESENTATION. Verification must be performed for the results of this function to be trustworthy.
  * The return value may contaim duplicate claims.
+ *
+ * This function throws an error if:
+ * a provided proof is not applicable given the ruleset,
+ * a provided proof makes unverified assumptions,
+ * a provided proof is malformed.
  *
  * @param presentation - a VCDM presentation as expanded json-ld
  * @param rules - ordered list of axioms which will be accepted within proofs of composite claims
  * @returns {Promise<[Claim]>}
  */
-export async function acceptCompositeClaims(expandedPresentation, rules = []) {
-  // convert to a claimgraph
+export async function acceptCompositeClaims(expandedPresentation, rules) {
+  assert(rules !== undefined);
+
   const cg = await presentationToEEClaimGraph(expandedPresentation);
+  const proof = extractProof(expandedPresentation);
+  const implied = getImplications(cg, proof, rules);
 
-  // get ordered and concatenated proofs
-  const proof = jsonld.getValues(expandedPresentation, expandedLogicProperty)
-    .map(fromJSONLiteral)
-    .flat(1);
-
-  // validate proofs
-  const valid = validateh(rules, proof);
-
-  // assert all assumptions made by the proof are in claimgraph
-  for (const assumption of valid.assumed) {
-    if (!cg.some((claim) => claimEq(claim, assumption))) {
-      throw new UnverifiedAssumption([...assumption]);
-    }
-  }
-
-  // return (claimgraph U proof.implied)
-  return [...cg, ...valid.implied];
+  // return (claimgraph U implied)
+  return [...cg, ...implied];
 }
+
+/**
+ * Given the assumptions encoded in the provided presentaion, prove a list of composite claims.
+ * T return proof of composite claims as a jsonld json literal which can be attached directly to a
+ * presentaion as {expandedLogicProperty} before [signing and ]submitting.
+ *
+ * This function throws an error if the requested composite claims are unprovable.
+ *
+ * @param expandedPresentation - a VCDM presentation as expanded json-ld
+ * @param compositeClaims - claims to prove, provide in claimgraph format
+ * @param rules - ordered list of axioms which will be accepted within proofs of composite claims
+ * @returns {Promise<proof>} - proof is returned as a json literal
+ */
+export async function proveCompositeClaims(expandedPresentation, compositeClaims, rules) {
+  assert(rules !== undefined);
+  const cg = await presentationToEEClaimGraph(expandedPresentation);
+  const prevProof = extractProof(expandedPresentation);
+  const newProof = proveh(cg, compositeClaims, rules);
+  return toJsonLiteral(prevProof.concat(newProof));
+}
+
 
 // A wrapper around prove that first converts rules, composite claims, and premises to the
 // canonical representation as defined by `canon()` in `claimgraph.js`. This wrapper deserializes
@@ -153,24 +202,28 @@ function claimEq(a, b) {
     if (!(claim instanceof Array) || claim.length !== 3) {
       throw new TypeError();
     }
+    for (const node of claim) {
+      assertValidNode(node);
+    }
   }
   return deepEqual(a, b);
 }
 
 // https://w3c.github.io/json-ld-syntax/#json-literals
 function fromJSONLiteral(literal) {
-  // TODO:
-  //   These are checks on potentially untrusted input. Assertions may not be appropriate here.
-  //   This invalid input should be reported back to the caller in a way they can handle.
-  // REVIEWER:
-  //   Do you have any suggestions for how invalid json literals should be reported?
-  assert(
-    literal['@type'] === '@json',
-    'not a json literal',
-  );
-  assert(
-    literal['@value'] !== undefined,
-    'json literal value not defined',
-  );
+  if (literal['@type'] !== '@json') {
+    throw new TypeError(`not a json literal: ${literal}`);
+  }
+  if (literal['@value'] === undefined) {
+    throw new TypeError(`json literal has no "@value": ${literal}`);
+  }
   return literal['@value'];
+}
+
+// https://w3c.github.io/json-ld-syntax/#json-literals
+function toJsonLiteral(json) {
+  return {
+    "@type": "@json",
+    "@value": JSON.parse(JSON.stringify(json))
+  };
 }

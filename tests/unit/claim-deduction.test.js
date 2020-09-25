@@ -4,7 +4,8 @@ import {
   acceptCompositeClaims,
   proveh,
   validateh,
-  presentationToEEClaimGraph
+  presentationToEEClaimGraph,
+  proveCompositeClaims,
 } from '../../src/utils/cd';
 import { claims } from '../../src/utils/claimgraph';
 import { Ed25519KeyPair, suites } from 'jsonld-signatures';
@@ -16,6 +17,7 @@ import {
 } from '../../src/utils/vc/custom_crypto';
 import { randomAsHex } from '@polkadot/util-crypto';
 import network_cache from '../network-cache';
+import check from '@polkadot/util-crypto/address/check';
 
 /// global document cache, acts as a did method for the tests below
 let documentRegistry = {};
@@ -489,6 +491,21 @@ describe('Composite claim soundness checker', () => {
 
     let cg = await checkSoundness(presentation, rules);
     expect(cg).toContainEqual(claim_to_prove);
+  });
+
+  test('holder: prove composite claim', async () => {
+    const presentation = await validPresentation();
+    const expandedPresentation = (await jsonld.expand(presentation, { documentLoader }))[0];
+    const compositeClaim = [
+      { Iri: "https://example.com/a" },
+      { Iri: "https://example.com/frobs" },
+      { Iri: "https://example.com/b" },
+    ];
+    const rules = sampleRules();
+    let proof = await proveCompositeClaims(expandedPresentation, [compositeClaim], rules);
+    expect(await checkSoundness(presentation, rules)).not.toContainEqual(compositeClaim);
+    presentation[expandedLogicProperty] = proof;
+    expect(await checkSoundness(presentation, rules)).toContainEqual(compositeClaim);
   });
 });
 

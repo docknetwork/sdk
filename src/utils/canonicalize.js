@@ -3,6 +3,7 @@
 // of RDF nodes ({ Iri: 'https://example.com' }) and the rify-js representation
 // AKA strings.
 
+import assert from 'assert';
 import { assertType, assertValidNode } from './common';
 
 // Convert a Node into a cononicalized string representation.
@@ -15,12 +16,10 @@ export function canon(node) {
 
 /// Canonicalize all the nodes in a ruleset.
 export function canonRules(rule) {
-  return rule.map(({ if_all, then }) => {
-    return {
-      if_all: if_all.map(claim => claim.map(canonAtom)),
-      then: then.map(claim => claim.map(canonAtom)),
-    };
-  });
+  return rule.map(({ if_all: ifAll, then }) => ({
+    if_all: ifAll.map((claim) => claim.map(canonAtom)),
+    then: then.map((claim) => claim.map(canonAtom)),
+  }));
 }
 
 /// Canonicalize a rule atom.
@@ -30,45 +29,43 @@ export function canonRules(rule) {
 // expect(canonAtom({ Unbound: "heyo" }))
 //   .toEqual({ Unbound: "heyo" });
 function canonAtom(atom) {
-  if (atom.Bound !== undefined) {
-    assertType(atom.Bound, 'object');
-    return { Bound: canon(atom.Bound) };
-  } else if (atom.Unbound !== undefined) {
-    assertType(atom.Unbound, 'string');
-    return { Unbound: atom.Unbound };
-  } else {
-    throw `expected bound or unbound rule atom got ${atom}`;
+  assert(Object.keys(atom).length === 1, 'enum must have exactly one tag');
+  switch (Object.keys(atom)[0]) {
+    case 'Bound':
+      assertType(atom.Bound, 'object');
+      return { Bound: canon(atom.Bound) };
+    case 'Unbound':
+      assertType(atom.Unbound, 'string');
+      return { Unbound: atom.Unbound };
+    default:
+      throw new TypeError(`expected bound or unbound rule atom got ${atom}`);
   }
 }
 
 /// Canonicalize all the nodes in a proof.
 export function canonProof(proof) {
-  return proof.map(({ rule_index, instantiations }) => {
-    return {
-      rule_index,
-      instantiations: instantiations.map(canon)
-    };
-  });
+  return proof.map(({ rule_index: ruleIndex, instantiations }) => ({
+    rule_index: ruleIndex,
+    instantiations: instantiations.map(canon),
+  }));
 }
 
 /// Parse all the nodes in a conaonicalized proof.
 export function decanonProof(proof) {
-  return proof.map(({ rule_index, instantiations }) => {
-    return {
-      rule_index,
-      instantiations: instantiations.map(JSON.parse)
-    };
-  });
+  return proof.map(({ rule_index: ruleIndex, instantiations }) => ({
+    rule_index: ruleIndex,
+    instantiations: instantiations.map(JSON.parse),
+  }));
 }
 
 /// Canonicalize all the nodes in a claimgraph.
 export function canonClaimGraph(cg) {
-  return cg.map(claim => claim.map(canon));
+  return cg.map((claim) => claim.map(canon));
 }
 
 /// Parse all the nodes in a canonicalized claimgraph.
 export function decanonClaimGraph(cg) {
-  return cg.map(claim => claim.map(JSON.parse));
+  return cg.map((claim) => claim.map(JSON.parse));
 }
 
 // recursively lexically sort the keys in an object
@@ -83,18 +80,20 @@ export function decanonClaimGraph(cg) {
 //   { a: { a: '', b: '', c: '' }, b: '' }
 // ));
 function orderKeys(a) {
+  let keys;
+  let ret;
   switch (typeof a) {
     case 'string':
       return a;
     case 'object':
-      let keys = Object.keys(a);
+      keys = Object.keys(a);
       keys.sort();
-      let ret = {};
-      for (let k of keys) {
+      ret = {};
+      for (const k of keys) {
         ret[k] = orderKeys(a[k]);
       }
       return ret;
     default:
-      throw 'type error: orderKeys() does not accept type ' + typeof a;
+      throw new TypeError(`type error: orderKeys() does not accept type ${typeof a}`);
   }
 }

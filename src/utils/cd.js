@@ -1,17 +1,18 @@
 // Claim deduction from verifiable presentations.
 
-import { expandedCredentialProperty } from './vc';
 import deepEqual from 'deep-equal';
 import jsonld from 'jsonld';
-import { fromJsonldjsCg, asEE, merge } from './claimgraph';
 import { validate, prove } from 'rify';
+import assert from 'assert';
+import { expandedCredentialProperty } from './vc';
+import { fromJsonldjsCg, asEE, merge } from './claimgraph';
 import {
-  canonRules, canonProof, canonClaimGraph, decanonClaimGraph, decanonProof
+  canonRules, canonProof, canonClaimGraph, decanonClaimGraph, decanonProof,
 } from './canonicalize';
-import { assertType, assert } from './common';
+import { assertType } from './common';
 
-export const expandedLogicProperty = "https://www.dock.io/rdf2020#logicV1";
-export const expandedProofProperty = "https://w3id.org/security#proof";
+export const expandedLogicProperty = 'https://www.dock.io/rdf2020#logicV1';
+export const expandedProofProperty = 'https://w3id.org/security#proof';
 export const expandedIssuerProperty = 'https://www.w3.org/2018/credentials#issuer';
 
 /**
@@ -21,7 +22,7 @@ export const expandedIssuerProperty = 'https://www.w3.org/2018/credentials#issue
  * @returns {Promise<[Claim]>}
  */
 async function credsToEEClaimGraph(expandedCredentials) {
-  let ees = await Promise.all(expandedCredentials.map(credToEECG));
+  const ees = await Promise.all(expandedCredentials.map(credToEECG));
   return merge(ees);
 }
 
@@ -39,18 +40,18 @@ async function credToEECG(expandedCredential) {
   assert(Object.keys(expandedCredential).length === 1);
   assert(Object.keys(expandedCredential)[0] === '@graph');
   assert(expandedCredential['@graph'].length === 1);
-  let cred = { ...expandedCredential['@graph'][0] };
+  const cred = { ...expandedCredential['@graph'][0] };
 
   // This line relies on the assumption that if the credential passed verification then the
   // issuer property was not forged.
-  assert(cred[expandedIssuerProperty] !== undefined, "encountered credential without an issuer")
-  let issuer = cred[expandedIssuerProperty][0]['@id'];
+  assert(cred[expandedIssuerProperty] !== undefined, 'encountered credential without an issuer');
+  const issuer = cred[expandedIssuerProperty][0]['@id'];
 
   // remove the proof
   delete cred[expandedProofProperty];
 
   // convert to claimgraph
-  let cg = fromJsonldjsCg(await jsonld.toRDF(cred));
+  const cg = fromJsonldjsCg(await jsonld.toRDF(cred));
 
   // convert to explicit ethos form
   return asEE(cg, issuer);
@@ -74,6 +75,13 @@ export async function presentationToEEClaimGraph(expandedPresentation) {
   return await credsToEEClaimGraph(creds);
 }
 
+export class UnverifiedAssumption extends Error {
+  constructor(unverifiedAssumption) {
+    super('Proof relies on assumption that are not in the input.');
+    this.unverifiedAssumption = unverifiedAssumption;
+  }
+}
+
 /**
  * Returns a list of all RDF statements proven by the presentation. DOES NOT VERIFY THE
  * PRESENTATION. Verification must be performed for the results of this function to be trustworthy.
@@ -85,20 +93,20 @@ export async function presentationToEEClaimGraph(expandedPresentation) {
  */
 export async function acceptCompositeClaims(expandedPresentation, rules = []) {
   // convert to a claimgraph
-  let cg = await presentationToEEClaimGraph(expandedPresentation);
+  const cg = await presentationToEEClaimGraph(expandedPresentation);
 
   // get ordered and concatenated proofs
-  let proof = jsonld.getValues(expandedPresentation, expandedLogicProperty)
+  const proof = jsonld.getValues(expandedPresentation, expandedLogicProperty)
     .map(fromJSONLiteral)
     .flat(1);
 
   // validate proofs
-  let valid = validateh(rules, proof);
+  const valid = validateh(rules, proof);
 
   // assert all assumptions made by the proof are in claimgraph
-  for (let assumption of valid.assumed) {
-    if (!cg.some(claim => claimEq(claim, assumption))) {
-      throw { UnverifiableProof: { unverified_assumption: [...assumption] } };
+  for (const assumption of valid.assumed) {
+    if (!cg.some((claim) => claimEq(claim, assumption))) {
+      throw new UnverifiedAssumption([...assumption]);
     }
   }
 
@@ -111,13 +119,14 @@ export async function acceptCompositeClaims(expandedPresentation, rules = []) {
 // the returned values before passing them back to the caller.
 export function proveh(
   premises,
-  to_prove,
+  toProve,
   rules,
 ) {
-  premises = canonClaimGraph(premises);
-  to_prove = canonClaimGraph(to_prove);
-  rules = canonRules(rules);
-  let proof = prove(premises, to_prove, rules);
+  const proof = prove(
+    canonClaimGraph(premises),
+    canonClaimGraph(toProve),
+    canonRules(rules),
+  );
   return decanonProof(proof);
 }
 
@@ -125,12 +134,13 @@ export function proveh(
 // as defined by `canon()` in `claimgraph.js`. This wrapper deserializes the returned values before
 // passing them back to the caller.
 export function validateh(rules, proof) {
-  rules = canonRules(rules);
-  proof = canonProof(proof);
-  let {
+  const {
     assumed,
     implied,
-  } = validate(rules, proof);
+  } = validate(
+    canonRules(rules),
+    canonProof(proof),
+  );
   return {
     assumed: decanonClaimGraph(assumed),
     implied: decanonClaimGraph(implied),
@@ -139,7 +149,7 @@ export function validateh(rules, proof) {
 
 /// check two claims for equality
 function claimEq(a, b) {
-  for (let claim of [a, b]) {
+  for (const claim of [a, b]) {
     if (!(claim instanceof Array) || claim.length !== 3) {
       throw new TypeError();
     }
@@ -149,27 +159,18 @@ function claimEq(a, b) {
 
 // https://w3c.github.io/json-ld-syntax/#json-literals
 function fromJSONLiteral(literal) {
-  let expected_props = ['@type', '@value'];
-  let actual_props = Object.keys(literal);
-  if (!setEq(actual_props, expected_props)) {
-    throw {
-      UnexpectedJsonLiteralProperties: {
-        expected: [...expected_props],
-        actual: [...actual_props]
-      }
-    };
-  }
-  if (literal['@type'] !== '@json') {
-    throw { NotJsonLiteral: { value: literal } };
-  }
+  // TODO:
+  //   These are checks on potentially untrusted input. Assertions may not be appropriate here.
+  //   This invalid input should be reported back to the caller in a way they can handle.
+  // REVIEWER:
+  //   Do you have any suggestions for how invalid json literals should be reported?
+  assert(
+    literal['@type'] === '@json',
+    'not a json literal',
+  );
+  assert(
+    literal['@value'] !== undefined,
+    'json literal value not defined',
+  );
   return literal['@value'];
-}
-
-// check for set equality
-// expect(setEq([1, 3], [1, 3])).toBe(true);
-// expect(setEq([1], [1, 3])).toBe(false);
-function setEq(a, b) {
-  let sa = new Set([...a]);
-  let sb = new Set([...b]);
-  return [...a].every(inA => sb.has(inA)) && [...b].every(inB => sa.has(inB));
 }

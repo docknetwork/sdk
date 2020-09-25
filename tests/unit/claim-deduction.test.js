@@ -268,16 +268,13 @@ describe('Composite claim soundness checker', () => {
       rule_index: 1,
       instantiations: [{ Iri: "http://example.com/joeThePig" }],
     }]);
-    let err = await assertThrowsAsync(async () => { await checkSoundness(presentation, rules) });
-    expect(err).toEqual({
-      UnverifiableProof: {
-        unverified_assumption: [
-          { Iri: "http://example.com/joeThePig" },
-          { Iri: "https://example.com/Ability" },
-          { Iri: "https://example.com/Flight" },
-        ]
-      }
-    });
+    expect(checkSoundness(presentation, rules))
+      .rejects
+      .toHaveProperty('unverifiedAssumption', [
+        { Iri: "http://example.com/joeThePig" },
+        { Iri: "https://example.com/Ability" },
+        { Iri: "https://example.com/Flight" },
+      ]);
   });
 
   test('Proof including inapplicable rule should fail.', async () => {
@@ -287,8 +284,9 @@ describe('Composite claim soundness checker', () => {
       rule_index: 0,
       instantiations: [{ Iri: "http://example.com" }],
     }]);
-    let err = await assertThrowsAsync(async () => { await checkSoundness(presentation, rules) });
-    expect(err).toEqual({ InvalidProof: "BadRuleApplication" });
+    expect(checkSoundness(presentation, rules))
+      .rejects
+      .toEqual({ InvalidProof: "BadRuleApplication" });
   });
 
   test('Unverifiable credential should fail.', async () => {
@@ -296,8 +294,12 @@ describe('Composite claim soundness checker', () => {
     let presentation = await validPresentation();
     presentation.verifiableCredential[0].issuer = "did:dock:bobert"; // tamper
     presentation[expandedLogicProperty] = jsonLiteral([{ rule_index: 0, instantiations: [] }]);
-    let err = await assertThrowsAsync(async () => { await checkSoundness(presentation, rules) });
-    expect(JSON.stringify(err)).toMatch(/Invalid signature/);
+    expect(
+      checkSoundness(presentation, rules)
+        .catch((err) => Promise.reject(JSON.stringify(err)))
+    )
+      .rejects
+      .toMatch(/Invalid signature/);
   });
 
   test('bddap is named Gorgadon because joe is a pig that can fly', async () => {
@@ -501,17 +503,6 @@ async function checkSoundness(presentation, rules) {
   // Pre-expand the presentaion using local cache. Tests run pretty slow otherwise.
   presentation = await jsonld.expand(presentation, { documentLoader });
   return await acceptCompositeClaims(presentation[0], rules);
-}
-
-// run asyncronous function cb and return the error it throws
-// if cb does not throw an error, this function will throw an error of it's own
-async function assertThrowsAsync(cb) {
-  try {
-    await cb();
-  } catch (e) {
-    return e;
-  }
-  throw "expected error but no error was thrown";
 }
 
 /// create a fake document loader for did docs so we dont need to connect to a dev node

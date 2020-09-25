@@ -1,11 +1,11 @@
 import axios from 'axios';
 
 import { DockAPI } from '../src/api';
-import { asDockAddress } from './helpers';
+import { asDockAddress } from '../src/utils/codec';
 
 require('dotenv').config();
 
-const { FullNodeEndpoint } = process.env;
+const { FullNodeEndpoint, Network } = process.env;
 
 const dock = new DockAPI();
 
@@ -66,7 +66,7 @@ async function printValidatorStats() {
   sortEntriesOfMapWithNumKey(epochBlockCounts);
   epochBlockCounts.forEach((element) => {
     const epochNo = element[0]._args[0];
-    const validatorId = asDockAddress(element[0]._args[1]);
+    const validatorId = asDockAddress(element[0]._args[1], Network);
     console.log(`For epoch no ${epochNo}, validator ${accounts[validatorId]}, blocks authored is ${element[1].block_count}`);
     if (element[1].locked_reward.isSome) {
       const locked = element[1].locked_reward.unwrap().toHuman();
@@ -87,7 +87,7 @@ async function printRemainingSupply() {
   // The treasury always has this address
   const expectedTreasuryAddress = '5EYCAe5d818kja8P5YikNggRz4KxztMtMhxP6qSTw7Bwahwq';
   const ta = await dock.api.rpc.poa.treasuryAccount();
-  if (asDockAddress(ta) !== expectedTreasuryAddress) {
+  if (asDockAddress(ta, Network) !== expectedTreasuryAddress) {
     console.error(`Treasury address is not ${expectedTreasuryAddress}. This should not be the case`);
     process.exit(1);
   }

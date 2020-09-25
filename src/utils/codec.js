@@ -1,5 +1,5 @@
 import { u8aToHex } from '@polkadot/util';
-import { decodeAddress } from '@polkadot/util-crypto';
+import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 
 /**
  * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
@@ -48,5 +48,21 @@ export function getHexIdentifier(id, qualifier, validate, byteSize) {
       // Cannot parse as hex
       throw new Error(`Invalid hexadecimal ID ${id}. ${e}`);
     }
+  }
+}
+
+/**
+ * Convert address to Dock appropriate network address.
+ * @param addr - address to convert
+ * @param network - the network to use, allowed values are `main` and `test` corresponding to mainnet and testnet
+ */
+export function asDockAddress(addr, network = 'test') {
+  switch (network) {
+    case 'test':
+      return encodeAddress(addr, 21);
+    case 'main':
+      return encodeAddress(addr, 22);
+    default:
+      throw new Error(`Network can be either test or main but was passed as ${network}`);
   }
 }

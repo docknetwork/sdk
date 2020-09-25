@@ -469,7 +469,7 @@ describe('Composite claim soundness checker', () => {
 
     // create a proof that bddap is Gorgadon
     let presentation_claimgraph = await presentationToEEClaimGraph(
-      (await jsonld.expand(presentation, { documentLoader }))[0]
+      await jsonld.expand(presentation, { documentLoader })
     );
     let claim_to_prove = [
       { Iri: "did:dock:bddap" },
@@ -495,7 +495,7 @@ describe('Composite claim soundness checker', () => {
 
   test('holder: prove composite claim', async () => {
     const presentation = await validPresentation();
-    const expandedPresentation = (await jsonld.expand(presentation, { documentLoader }))[0];
+    const expandedPresentation = await jsonld.expand(presentation, { documentLoader });
     const compositeClaim = [
       { Iri: "https://example.com/a" },
       { Iri: "https://example.com/frobs" },
@@ -519,7 +519,7 @@ async function checkSoundness(presentation, rules) {
   }
   // Pre-expand the presentaion using local cache. Tests run pretty slow otherwise.
   presentation = await jsonld.expand(presentation, { documentLoader });
-  return await acceptCompositeClaims(presentation[0], rules);
+  return await acceptCompositeClaims(presentation, rules);
 }
 
 /// create a fake document loader for did docs so we dont need to connect to a dev node

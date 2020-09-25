@@ -161,7 +161,6 @@ export async function proveCompositeClaims(expandedPresentation, compositeClaims
   return toJsonLiteral(prevProof.concat(newProof));
 }
 
-
 // A wrapper around prove that first converts rules, composite claims, and premises to the
 // canonical representation as defined by `canon()` in `claimgraph.js`. This wrapper deserializes
 // the returned values before passing them back to the caller.
@@ -222,8 +221,8 @@ function fromJSONLiteral(literal) {
 // https://w3c.github.io/json-ld-syntax/#json-literals
 function toJsonLiteral(json) {
   return {
-    "@type": "@json",
-    "@value": JSON.parse(JSON.stringify(json))
+    '@type': '@json',
+    '@value': JSON.parse(JSON.stringify(json)),
   };
 }
 
@@ -237,7 +236,7 @@ function toJsonLiteral(json) {
 function unwrapE(expanded) {
   assert(
     Array.isArray(expanded) && expanded.length === 1,
-    'expected expanded jsonld as an array of one element'
+    'expected expanded jsonld as an array of one element',
   );
   return expanded[0];
 }

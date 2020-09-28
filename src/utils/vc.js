@@ -232,7 +232,7 @@ export async function verifyCredential(credential, {
     suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
     documentLoader: documentLoader(resolver),
     compactProof,
-    checkStatus: async function(options) {
+    async checkStatus() {
       return { verified: true }; // To work with latest version, we check status elsewhere
     },
   });
@@ -317,7 +317,7 @@ export async function verifyPresentation(presentation, {
     domain,
     documentLoader: documentLoader(resolver),
     compactProof,
-    checkStatus: async function(options) {
+    async checkStatus() {
       return { verified: true }; // To work with latest version, we check status elsewhere
     },
   });

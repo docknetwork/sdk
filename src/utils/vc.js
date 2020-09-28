@@ -233,7 +233,7 @@ export async function verifyCredential(credential, {
     documentLoader: documentLoader(resolver),
     compactProof,
     checkStatus: async function(options) {
-      return { verified: true}; // TEMP
+      return { verified: true }; // To work with latest version, we check status elsewhere
     },
   });
 
@@ -318,7 +318,7 @@ export async function verifyPresentation(presentation, {
     documentLoader: documentLoader(resolver),
     compactProof,
     checkStatus: async function(options) {
-      return { verified: true}; // TEMP
+      return { verified: true }; // To work with latest version, we check status elsewhere
     },
   });
 

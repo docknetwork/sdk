@@ -14,7 +14,7 @@ export default function (resolver = null) {
    * Else, the hardcoded contexts are used to resolve the URI and if that fails
    * it will be fetched using an HTTP client
    * @param {string} uri
-   * @returns {Promise<{documentUrl: string, document: *}>}
+   * @returns {Promise<{documentUrl: string, contextUrl: string, document: *}>}
    */
   async function loadDocument(uri) {
     let document;
@@ -33,6 +33,7 @@ export default function (resolver = null) {
     }
 
     return {
+      contextUrl: null,
       documentUrl: uri,
       document,
     };

@@ -144,7 +144,10 @@ export function checkCredentialContext(credential) {
 function hasDockRevocation(status) {
   const id = status[credentialIDField];
   if (status
-    && jsonld.getValues(status, credentialTypeField).includes(RevRegType)
+    && (
+      jsonld.getValues(status, credentialTypeField).includes(RevRegType) ||
+      jsonld.getValues(status, credentialTypeField).includes('/' + RevRegType)
+    )
     && id.startsWith(DockRevRegQualifier)
     && isHexWithGivenByteSize(id.slice(DockRevRegQualifier.length), RevRegIdByteSize)) {
     return true;
@@ -240,6 +243,7 @@ export async function verifyCredential(credential, {
   // Check for revocation only if the credential is verified and revocation check is needed.
   if (credVer.verified && isRevocationCheckNeeded(expandedCredential, forceRevocationCheck, revocationApi)) {
     const revResult = await checkRevocationStatus(expandedCredential, revocationApi);
+
     // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
     if (!revResult.verified) {
       return revResult;

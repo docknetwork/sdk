@@ -33,6 +33,7 @@ export default function (resolver = null) {
     }
 
     return {
+      contextUrl: null,
       documentUrl: uri,
       document,
     };

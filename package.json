@@ -7,6 +7,9 @@
     "type": "git",
     "url": "https://github.com/docknetwork/sdk"
   },
+  "resolutions": {
+    "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures"
+  },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.8.7",
@@ -49,7 +52,7 @@
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "test": "jest --verbose ./tests/unit",
-    "test-integration": "NODE_ENV=production jest --verbose --runInBand ./tests/integration",
+    "test-integration": "NODE_ENV=production jest --verbose --runInBand ./tests/integration/issuing",
     "test-poa": "NODE_ENV=production jest --verbose --runInBand ./tests/poa",
     "docs": "mkdir out && touch out/.nojekyll && jsdoc src -r -c .jsdoc -d out/reference",
     "dev-node": "./scripts/run_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
@@ -79,9 +82,9 @@
     "js-sha256": "^0.9.0",
     "json-canonicalize": "^1.0.3",
     "jsonld": "^3.1.1",
-    "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures#avoid-extendContextLoader",
+    "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures",
     "jsonschema": "^1.2.6",
     "rify": "^0.4.0",
-    "vc-js": "https://github.com/docknetwork/vc-js#avoid-extendContextLoader"
+    "vc-js": "latest"
   }
 }

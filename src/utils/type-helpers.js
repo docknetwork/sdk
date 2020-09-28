@@ -1,4 +1,4 @@
-import vcjs from 'vc-js';
+import vcjs from 'vc-js/lib';
 
 /**
  * Return true if the given value is a string.

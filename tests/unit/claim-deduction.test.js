@@ -270,7 +270,7 @@ describe('Composite claim soundness checker', () => {
       rule_index: 1,
       instantiations: [{ Iri: "http://example.com/joeThePig" }],
     }]);
-    expect(checkSoundness(presentation, rules))
+    await expect(checkSoundness(presentation, rules))
       .rejects
       .toHaveProperty('unverifiedAssumption', [
         { Iri: "http://example.com/joeThePig" },
@@ -286,7 +286,7 @@ describe('Composite claim soundness checker', () => {
       rule_index: 0,
       instantiations: [{ Iri: "http://example.com" }],
     }]);
-    expect(checkSoundness(presentation, rules))
+    await expect(checkSoundness(presentation, rules))
       .rejects
       .toEqual({ InvalidProof: "BadRuleApplication" });
   });
@@ -296,7 +296,7 @@ describe('Composite claim soundness checker', () => {
     let presentation = await validPresentation();
     presentation.verifiableCredential[0].issuer = "did:dock:bobert"; // tamper
     presentation[expandedLogicProperty] = jsonLiteral([{ rule_index: 0, instantiations: [] }]);
-    expect(
+    await expect(
       checkSoundness(presentation, rules)
         .catch((err) => Promise.reject(JSON.stringify(err)))
     )

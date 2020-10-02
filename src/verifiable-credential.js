@@ -41,66 +41,6 @@ class VerifiableCredential {
     this.setIssuanceDate(new Date().toISOString());
   }
 
-  setFromJSON(json) {
-    const subject = (json.credentialSubject || json.subject);
-    if (subject) {
-      const subjects = subject.length ? subject : [subject];
-      subjects.forEach((value) => {
-        this.addSubject(value);
-      });
-    }
-
-    if (json.proof) {
-      this.setProof(json.proof);
-    }
-
-    if (json.issuer) {
-      this.setIssuer(json.issuer);
-    }
-
-    const status = (json.credentialStatus || json.status);
-    if (status) {
-      this.setStatus(status);
-    }
-
-    if (json.issuanceDate) {
-      this.setIssuanceDate(json.issuanceDate);
-    }
-
-    if (json.expirationDate) {
-      this.setExpirationDate(json.expirationDate);
-    }
-
-    Object.assign(this, json);
-    return this;
-  }
-
-  static fromJSON(json) {
-    const cert = new VerifiableCredential(json.id);
-    const contexts = json['@context'];
-    if (contexts) {
-      this.setContext(contexts);
-    } else {
-      throw new Error('No context found in JSON object, verifiable credentials must have a @context field.');
-    }
-
-    const types = json.type;
-    if (types) {
-      this.type = [];
-      if (types.length !== undefined) {
-        types.forEach((typeVal) => {
-          this.addType(typeVal);
-        });
-      } else {
-        this.addType(types);
-      }
-    } else {
-      throw new Error('No type found in JSON object, verifiable credentials must have a type field.');
-    }
-
-    return cert.setFromJSON(json);
-  }
-
   /**
    * Sets the credential's ID
    * @param {string} id - Signed credential's ID
@@ -305,6 +245,76 @@ class VerifiableCredential {
       revocationApi,
       schemaApi,
     });
+  }
+
+  /**
+   * Sets this credential's properties based on a JSON object
+   * @param {object} json - VC JSON
+   * @returns {VerifiableCredential}
+   */
+  setFromJSON(json) {
+    const subject = (json.credentialSubject || json.subject);
+    if (subject) {
+      const subjects = subject.length ? subject : [subject];
+      subjects.forEach((value) => {
+        this.addSubject(value);
+      });
+    }
+
+    if (json.proof) {
+      this.setProof(json.proof);
+    }
+
+    if (json.issuer) {
+      this.setIssuer(json.issuer);
+    }
+
+    const status = (json.credentialStatus || json.status);
+    if (status) {
+      this.setStatus(status);
+    }
+
+    if (json.issuanceDate) {
+      this.setIssuanceDate(json.issuanceDate);
+    }
+
+    if (json.expirationDate) {
+      this.setExpirationDate(json.expirationDate);
+    }
+
+    Object.assign(this, json);
+    return this;
+  }
+
+  /**
+   * Creates a new VerifiableCredential instance from a JSON object
+   * @param {object} json - VC JSON
+   * @returns {VerifiableCredential}
+   */
+  static fromJSON(json) {
+    const cert = new VerifiableCredential(json.id);
+    const contexts = json['@context'];
+    if (contexts) {
+      cert.setContext(contexts);
+    } else {
+      throw new Error('No context found in JSON object, verifiable credentials must have a @context field.');
+    }
+
+    const types = json.type;
+    if (types) {
+      cert.type = [];
+      if (types.length !== undefined) {
+        types.forEach((typeVal) => {
+          cert.addType(typeVal);
+        });
+      } else {
+        cert.addType(types);
+      }
+    } else {
+      throw new Error('No type found in JSON object, verifiable credentials must have a type field.');
+    }
+
+    return cert.setFromJSON(json);
   }
 }
 

@@ -41,61 +41,64 @@ class VerifiableCredential {
     this.setIssuanceDate(new Date().toISOString());
   }
 
+  setFromJSON(json) {
+    const subject = (json.credentialSubject || json.subject);
+    if (subject) {
+      const subjects = subject.length ? subject : [subject];
+      subjects.forEach((value) => {
+        this.addSubject(value);
+      });
+    }
+
+    if (json.proof) {
+      this.setProof(json.proof);
+    }
+
+    if (json.issuer) {
+      this.setIssuer(json.issuer);
+    }
+
+    const status = (json.credentialStatus || json.status);
+    if (status) {
+      this.setStatus(status);
+    }
+
+    if (json.issuanceDate) {
+      this.setIssuanceDate(json.issuanceDate);
+    }
+
+    if (json.expirationDate) {
+      this.setExpirationDate(json.expirationDate);
+    }
+
+    Object.assign(this, json);
+    return this;
+  }
+
   static fromJSON(json) {
     const cert = new VerifiableCredential(json.id);
-
     const contexts = json['@context'];
     if (contexts) {
-      cert.setContext(contexts);
+      this.setContext(contexts);
     } else {
       throw new Error('No context found in JSON object, verifiable credentials must have a @context field.');
     }
 
     const types = json.type;
     if (types) {
-      cert.type = [];
+      this.type = [];
       if (types.length !== undefined) {
         types.forEach((typeVal) => {
-          cert.addType(typeVal);
+          this.addType(typeVal);
         });
       } else {
-        cert.addType(types);
+        this.addType(types);
       }
     } else {
       throw new Error('No type found in JSON object, verifiable credentials must have a type field.');
     }
 
-    const subject = (json.credentialSubject || json.subject);
-    if (subject) {
-      const subjects = subject.length ? subject : [subject];
-      subjects.forEach((value) => {
-        cert.addSubject(value);
-      });
-    }
-
-    if (json.proof) {
-      cert.setProof(json.proof);
-    }
-
-    if (json.issuer) {
-      cert.setIssuer(json.issuer);
-    }
-
-    const status = (json.credentialStatus || json.status);
-    if (status) {
-      cert.setStatus(status);
-    }
-
-    if (json.issuanceDate) {
-      cert.setIssuanceDate(json.issuanceDate);
-    }
-
-    if (json.expirationDate) {
-      cert.setExpirationDate(json.expirationDate);
-    }
-
-    Object.assign(cert, json);
-    return cert;
+    return cert.setFromJSON(json);
   }
 
   /**

@@ -6,9 +6,11 @@ import immunityEventRecordSchema from '../src/utils/vc/schemas/immunity_event_re
 import noInfectionSchema from '../src/utils/vc/schemas/non_infection_check';
 
 // Schema from here https://github.com/w3c-ccg/vc-examples/blob/master/plugfest-2020/vendors/sicpa/credentials/PermanentResidentCard.json
+const w3CredsUrl = 'https://www.w3.org/2018/credentials/v1';
+
 const credPRCard = {
   '@context': [
-    'https://www.w3.org/2018/credentials/v1',
+    w3CredsUrl,
     'https://w3id.org/citizenship/v1',
   ],
   type: [
@@ -42,7 +44,7 @@ const credPRCard = {
 // Schema from here https://docs.google.com/document/d/1F5TLvAqCxj1kaPuPe6JhdECixwpbhKpEAb8eeQuDGT4/edit#heading=h.uuhsd64qh6k2
 const immunityEventRecordCred = {
   '@context': [
-    'https://www.w3.org/2018/credentials/v1',
+    w3CredsUrl,
     'https://www.w3.org/2018/credentials/examples/v1',
   ],
   id: 'https://example.com/credentials/1872',
@@ -72,7 +74,7 @@ const immunityEventRecordCred = {
 // Schema from here https://docs.google.com/document/d/1F5TLvAqCxj1kaPuPe6JhdECixwpbhKpEAb8eeQuDGT4/edit#heading=h.ketv4b5njsr6
 const noInfectionCred = {
   '@context': [
-    'https://www.w3.org/2018/credentials/v1',
+    w3CredsUrl,
     'https://www.w3.org/2018/credentials/examples/v1',
   ],
   id: 'https://example.com/credentials/1872',

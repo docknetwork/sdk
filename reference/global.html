@@ -646,7 +646,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line372">line 372</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line377">line 377</a>
     </li></ul></dd>
     
 
@@ -2035,7 +2035,7 @@ only be passed when controller is to be updated.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line274">line 274</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line276">line 276</a>
     </li></ul></dd>
     
 
@@ -5572,7 +5572,7 @@ returned if schema is not found on the chain or in JSON format.
     
 
     
-    <h4 class="name" id="getAndValidateSchemaIfPresent"><span class="type-signature"></span>getAndValidateSchemaIfPresent<span class="signature">(credential, schemaApi<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;void>}</span></h4>
+    <h4 class="name" id="getAndValidateSchemaIfPresent"><span class="type-signature"></span>getAndValidateSchemaIfPresent<span class="signature">(credential, schemaApi, context)</span><span class="type-signature"> &rarr; {Promise.&lt;void>}</span></h4>
     
 
     
@@ -5604,8 +5604,6 @@ returned if schema is not found on the chain or in JSON format.
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
         
 
@@ -5631,14 +5629,6 @@ returned if schema is not found on the chain or in JSON format.
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
 
@@ -5662,22 +5652,35 @@ returned if schema is not found on the chain or in JSON format.
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
 
             
 
             <td class="description last">An object representing a map. "schema type -> schema API". The API is used to get
 a schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
 as we support more APIs there are more details associated with each API. Only Dock is supported as of now.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>context</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the context</td>
         </tr>
 
     
@@ -5718,7 +5721,7 @@ as we support more APIs there are more details associated with each API. Only Do
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line416">line 416</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line422">line 422</a>
     </li></ul></dd>
     
 
@@ -6771,7 +6774,7 @@ it using HTTP or will throw error if cannot get.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_schema.js.html">modules/schema.js</a>, <a href="modules_schema.js.html#line191">line 191</a>
+        <a href="modules_schema.js.html">modules/schema.js</a>, <a href="modules_schema.js.html#line189">line 189</a>
     </li></ul></dd>
     
 
@@ -9347,7 +9350,7 @@ Warning, setting forceRevocationCheck to false can allow false positives when ve
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line262">line 262</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line264">line 264</a>
     </li></ul></dd>
     
 
@@ -9519,7 +9522,7 @@ the `proof` (signature by holder) is correct.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line362">line 362</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line367">line 367</a>
     </li></ul></dd>
     
 
@@ -12040,7 +12043,7 @@ keep resetting the `signature` key
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line292">line 292</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line294">line 294</a>
     </li></ul></dd>
     
 
@@ -13936,7 +13939,7 @@ schema `schema`
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line383">line 383</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line388">line 388</a>
     </li></ul></dd>
     
 
@@ -15771,7 +15774,7 @@ credential is valid and not revoked and false otherwise. The `error` will descri
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line313">line 313</a>
+        <a href="utils_vc.js.html">utils/vc.js</a>, <a href="utils_vc.js.html#line315">line 315</a>
     </li></ul></dd>
     
 
@@ -17317,7 +17320,7 @@ as we support more APIs there are more details associated with each API. Only Do
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Sep 30 2020 22:44:38 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Fri Oct 02 2020 19:31:39 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -171,13 +171,11 @@ export default class Schema {
     const chainValue = chainBlob[1];
 
     if (typeof chainValue === 'object' && !(chainValue instanceof Uint8Array)) {
-      const schema = {
+      return {
         ...chainValue,
         id,
         author: hexDIDToQualified(u8aToHex(chainBlob[0])),
       };
-
-      return schema;
     }
     throw new Error('Incorrect schema format');
   }

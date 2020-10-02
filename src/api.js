@@ -192,8 +192,7 @@ class DockAPI {
       return this;
     });
 
-    const result = await promise;
-    return result;
+    return await promise;
   }
 
   /**

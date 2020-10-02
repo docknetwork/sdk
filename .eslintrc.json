@@ -1,5 +1,5 @@
 {
-  "plugins": ["jest"],
+  "plugins": ["jest", "sonarjs"],
   "globals": {
     "process": "readonly"
   },
@@ -7,7 +7,7 @@
     "browser": true,
     "es6": true
   },
-  "extends": ["eslint:recommended", "plugin:jest/recommended", "airbnb-base"],
+  "extends": ["plugin:sonarjs/recommended", "eslint:recommended", "plugin:jest/recommended", "airbnb-base"],
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module"

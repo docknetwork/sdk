@@ -32,8 +32,7 @@ async function removeDID() {
 
   const [didRemoval, signature] = await createSignedDidRemoval(dock.did, dockDID, currentPair);
 
-  const transaction = dock.did.remove(didRemoval, signature, false);
-  return transaction;
+  return dock.did.remove(didRemoval, signature, false);
 }
 
 // This function assumes the DID has been written.
@@ -51,8 +50,7 @@ async function updateDIDKey() {
   const newController = randomAsHex(32);
 
   const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, dockDID, newPk, currentPair, newController);
-  const transaction = dock.did.updateKey(keyUpdate, signature, false);
-  return transaction;
+  return dock.did.updateKey(keyUpdate, signature, false);
 }
 
 async function getDIDDoc() {
@@ -74,8 +72,7 @@ function registerNewDID() {
 
   console.log('Submitting new DID', dockDID, publicKey);
 
-  const transaction = dock.did.new(dockDID, keyDetail, false);
-  return transaction;
+  return dock.did.new(dockDID, keyDetail, false);
 }
 
 // Initialize Dock API, connect to the node and start working with it

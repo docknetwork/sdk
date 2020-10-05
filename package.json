@@ -7,6 +7,9 @@
     "type": "git",
     "url": "https://github.com/docknetwork/sdk"
   },
+  "engines": {
+    "node": ">=13.0.0" 
+  },
   "resolutions": {
     "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures",
     "jsonld": "^2.0.2"

@@ -32,7 +32,7 @@ export function assertValidNode(node) {
       break;
     case 'Literal':
       assertType(value, 'object');
-      assert(Object.keys(value).length === 2);
+      assert(Object.keys(value).length === 2, 'Literals must have exactly two fields');
       assertType(value.value, 'string');
       assertType(value.datatype, 'string');
       break;

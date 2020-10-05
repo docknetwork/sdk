@@ -30,7 +30,10 @@ export const expandedIssuerProperty = 'https://www.w3.org/2018/credentials#issue
  * @returns {Promise<Object[]>}
  */
 export async function acceptCompositeClaims(expandedPresentation, rules) {
-  assert(rules !== undefined);
+  assert(
+    rules !== undefined,
+    'An axiom list must be provided. Hint: rules may be "[]" to reject all.',
+  );
 
   const cg = await presentationToEEClaimGraph(expandedPresentation);
   const proof = extractProof(expandedPresentation);
@@ -64,7 +67,10 @@ async function credsToEEClaimGraph(expandedCredentials) {
  * @returns {Promise<Object[]>}
  */
 async function credToEECG(expandedCredential) {
-  assert(expandedCredential['@graph'] !== undefined);
+  assert(
+    expandedCredential['@graph'] !== undefined,
+    'Expected each credential to expand to its own @graph',
+  );
   const cred = { ...unwrapE(expandedCredential['@graph']) };
 
   // This line relies on the assumption that if the credential passed verification then the
@@ -156,7 +162,10 @@ export function getImplications(claimgraph, proof, rules) {
  * @returns {Promise<Object>} - proof is returned as a json literal
  */
 export async function proveCompositeClaims(expandedPresentation, compositeClaims, rules) {
-  assert(rules !== undefined);
+  assert(
+    rules !== undefined,
+    'An axiom list must be provided. Hint: rules may be "[]" to reject all.',
+  );
   const cg = await presentationToEEClaimGraph(expandedPresentation);
   const prevProof = await extractProof(expandedPresentation);
   const newProof = proveh(cg, compositeClaims, rules);

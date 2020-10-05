@@ -515,7 +515,7 @@ describe('Composite claim soundness checker', () => {
 async function checkSoundness(presentation, rules) {
   let ver = await verifyP(presentation);
   if (!ver.verified) {
-    throw ver.error;
+    throw ver;
   }
   // Pre-expand the presentaion using local cache. Tests run pretty slow otherwise.
   presentation = await jsonld.expand(presentation, { documentLoader });

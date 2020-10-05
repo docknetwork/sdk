@@ -9,6 +9,11 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '13.x'
+
       - name: Install, lint, type check and generate docs # Not uploading the docs.
         run: |
           yarn install --frozen-lockfile --ignore-scripts

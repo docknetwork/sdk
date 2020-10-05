@@ -2,7 +2,7 @@
 // The api of this module is not guaranteed to be stable
 // and may change.
 
-import assert from 'assert';
+import { assert } from '@polkadot/util';
 
 // deep copy a json serializable object
 export function deepClone(obj) {

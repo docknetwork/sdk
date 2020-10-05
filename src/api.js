@@ -64,6 +64,9 @@ class DockAPI {
     }
 
     this.address = address || this.address;
+    if (!this.address || this.address.indexOf('wss://') === -1) {
+      console.warn(`WARNING: Using non-secure endpoint: ${this.address}`);
+    }
 
     // If RPC methods given, use them else set it to empty object.
     let rpc = chainRpc || {};

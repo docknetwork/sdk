@@ -112,6 +112,21 @@ describe('Verifiable Credential Issuing', () => {
     expect(result.results[0].proof).toBeDefined();
     expect(result.results[0].verified).toBe(true);
   }, 30000);
+
+  test('Tampered Credential should not pass validation.', async () => {
+    const credential = await issueCredential(getSampleKey(), getSampleCredential());
+    credential.issuanceDate = '9020-04-15T09:05:35Z';
+    const result = await verifyCredential(credential);
+    expect(result.verified).toBe(false);
+  }, 30000);
+
+  test('Credential With incorrect issuer should not pass validation.', async () => {
+    let keydoc = getSampleKey();
+    keydoc.controller = 'did:rando:id';
+    const credential = await issueCredential(keydoc, getSampleCredential());
+    const result = await verifyCredential(credential);
+    expect(result.verified).toBe(false);
+  }, 30000);
 });
 
 describe('Verifiable Credential Verification', () => {

@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -8,7 +8,7 @@
     "url": "https://github.com/docknetwork/sdk"
   },
   "engines": {
-    "node": ">=13.0.0" 
+    "node": ">=13.0.0"
   },
   "resolutions": {
     "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures",
@@ -79,6 +79,7 @@
     "axios": "^0.19.2",
     "bs58": "^4.0.1",
     "credentials-context": "^1.0.0",
+    "deep-equal": "^2.0.3",
     "did-resolver": "^1.1.0",
     "dotenv": "^8.2.0",
     "elliptic": "^6.5.3",

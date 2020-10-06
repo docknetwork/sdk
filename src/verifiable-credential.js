@@ -97,7 +97,6 @@ class VerifiableCredential {
     }
 
     const expanded = await expandJSONLD(this.toJSON());
-    console.log('expanded', expanded);
     return validateCredentialSchema(expanded, schema, this.context);
   }
 

@@ -12,7 +12,7 @@ In RDF, if graph A is true and graph B is true, then the [union](https://en.wiki
 
 Imagine a signed credential issued by **Alice** claiming that **Joe** is a **Member**.
 
-```
+```json
 {
   ...
   "issuer": "Alice",
@@ -42,6 +42,109 @@ Proven:
 ```
 
 Writing RDF triples about other RDF triples is called [reification](https://www.w3.org/wiki/RdfReification). Signed credentials are [ethos](https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos) arguments so we call this reified representation of credentials "Explicit Ethos" form. If a credential is *verified*, then it's explicit ethos form is *true*.
+
+## Rule Format
+
+To perform reasoning and to accept proofs, the Verifier must select the list of logical rules which they will allow. Rules (or axioms if you prefer), are modeled as if-then relationships.
+
+```js
+const rules = [
+  {
+    if_all: [],
+    then: [],
+  },
+];
+```
+
+During reasoning, when an `if_all` pattern is matched, its corresponding `then` pattern will be implied. In logic terms, each "rule" is the conditional premise of a [modus ponens](https://en.wikipedia.org/wiki/Modus_ponens).
+
+```js
+{ if_all: [A, B, C], then: [C, D, E] }
+```
+
+means `if (A and B and C) then (C and D and E)`.
+
+Rules can contain Bound or Unbound entities. Unbound entities are named variables. Each rule has it's own unique scope, so Unbound entities introduced in the `if_all` pattern can be used in the `then` pattern.
+
+```js
+{
+  if_all: [
+    [{ Bound: alice }, { Bound: likes }, { Unbound: 'thing' }],
+  ],
+  then: [
+    [{ Bound: bob }, { Bound: likes }, { Unbound: 'thing' }]
+  ],
+}
+```
+
+means
+
+```
+For any ?thing:
+  if [alice likes ?thing]
+  then [bob likes ?thing]
+```
+
+in other words: `∀ thing: [alice likes thing] -> [bob likes thing]`
+
+Bound entities are constants of type RdfNode. RDF nodes may be one of three things, an IRI, a blank node, or a literal. For those familiar with algebraic datatypes:
+
+```rust,ignore
+enum RdfNode {
+  Iri(Url),
+  Blank(String),
+  Literal {
+    value: String,
+    datatype: Url,
+  },
+}
+```
+
+The SDK represents RDF nodes like so:
+
+```js
+const alice = { Iri: 'did:sample:alice' };
+const literal = {
+  Literal: {
+    value: '{}',
+    datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#JSON',
+  }
+};
+// blank nodes are generally not useful in rule definitions
+const blank = { Blank: '_:b0' };
+```
+
+Example of a complete rule definition:
+
+```js
+{
+  if_all: [
+    [
+      { Unbound: 'food' },
+      { Bound { Iri: 'https://example.com/contains' } },
+      { Bound: { Iri: 'https://example.com/butter' } }
+    ],
+    [
+      { Unbound: 'person' },
+      { Bound: 'http://xmlns.com/foaf/0.1/name' },
+      { Literal: {
+        value: 'Bob',
+        datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral',
+      } }
+    ],
+  ],
+  then: [
+    [
+      { Unbound: 'person' },
+      { Bound: { Iri: 'https://example.com/likes' } },
+      { Unbound: 'food' },
+    ]
+  ],
+}
+// all things named "Bob" like all things containing butter
+```
+
+See the [claim deduction tutorial](tutorial_claim_deduction.html) for more another example.
 
 ## Terms
 

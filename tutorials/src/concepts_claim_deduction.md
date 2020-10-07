@@ -1,25 +1,60 @@
 # Claim Deduction
 
-The [verifiable credentials data model](https://www.w3.org/TR/vc-data-model/) is based on a machine comprehensible language called [RDF](https://www.w3.org/TR/rdf-primer/). RDF represents arbitrary semantic knowlege as [graph](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics))s. Computers can perform automatic deductive reasoning over RDF, given assumptions (represnted as an RDF graph) and axioms (represented as logical rules), a computer can infer new conclusions and even prove them to other computers using deductive derivations (proofs).
+The [verifiable credentials data model](https://www.w3.org/TR/vc-data-model/) is based on a machine comprehensible language called [RDF](https://www.w3.org/TR/rdf-primer/). RDF represents arbitrary semantic knowledge as [graph](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics))s. Computers can perform automatic deductive reasoning over RDF, given assumptions (represented as an RDF graph) and axioms (represented as logical rules), a computer can infer new conclusions and even prove them to other computers using deductive derivations (proofs).
 
-So what does that have to do with verifiable credentials?
+So what does that have to do with verifiable credentials? Every VCDM credential is an RDF claim graph. Computers can reason about them, deriving new conclusions that weren't explicitly stated by the issuer.
 
-Every VCDM credential is an RDF claim graph. Computers can reason about them, deriving new conclusions that weren't explicitly stated by the issuer.
-
-The dock javascript SDK exposes utilites for primitive deductive reasoning over verified credentials. The Verifier has a choice to perform deduction themself (expensive), or offload that responsibility to the Presenter of the credential[s] by accepting deductive proofs of composite claims.
+The dock javascript SDK exposes utilities for primitive deductive reasoning over verified credentials. The Verifier has a choice to perform deduction themself (expensive), or offload that responsibility to the Presenter of the credential[s] by accepting deductive proofs of composite claims.
 
 In RDF, if graph A is true and graph B is true, then the [union](https://en.wikipedia.org/wiki/Union_(set_theory)) of those graphs, is also true `A∧B->A∪B` [^1]. Using this property we can combine multiple credentials and reason over their union.
 
-### Terms
+## Explicit Ethos using [RDF Reification](https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos)
 
-Composite Claims: Rdf triples which were infered, rather than stated explicitly in a credential.
+Imagine a signed credential issued by **Alice** claiming that **Joe** is a **Member**.
 
-Verifier: The party that accepts and checks credential[s].
+```
+{
+  ...
+  "issuer": "Alice",
+  "credentialSubject": {
+    "id": "Joe",
+    "@type": "Member"
+  },
+  ...
+}
+```
 
-Presenter: The party that sends credentail[s] to the verifier.
+The credential does not directly prove that **Joe** is a **Member**. Rather, it proves **Alice** **Claims** **Joe** to be a **Member**.
 
-Issuer: The party that signed a credential.
+Not proven:[^2]
 
-VCDM: [Verifiable Credentials Data Model](https://www.w3.org/TR/vc-data-model/)
+```turtle
+<Joe> a <Member> .
+```
 
-[^1]: with proper renaming of blank nodes
+Proven:
+
+```turtle
+<Alice> <Claims> [
+  rdf:subject <Joe> ;
+  rdf:predicate a ;
+  def:object <Member> ] .
+```
+
+Writing RDF triples about other RDF triples is called [reification](https://www.w3.org/wiki/RdfReification). Signed credentials are [ethos](https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos) arguments so we call this reified representation of credentials "Explicit Ethos" form. If a credential is *verified*, then it's explicit ethos form is *true*.
+
+## Terms
+
+- [Verifier](https://www.w3.org/TR/vc-data-model/#dfn-verifier): The party that accepts and checks VCDM credential[s].
+- [Issuer](https://www.w3.org/TR/vc-data-model/#dfn-issuer): The party that signed a VCDM credential.
+- [VCDM](https://www.w3.org/TR/vc-data-model/): Verifiable Credentials Data Model
+- [RDF](https://en.wikipedia.org/wiki/Resource_Description_Framework): A model for representing general knowledge in a machine friendly way.
+- RDF triple: A single sentence consisting of subject, predicate and object. Each element of the triple is an RDF node.
+- [RDF graph](https://www.w3.org/TR/rdf-primer/#rdfmodel): A directed, labeled [graph](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)) with RDF triples as edges.
+- [RDF node](https://www.w3.org/TR/rdf-primer/#rdfmodel)
+- Composite Claim: An rdf triple which was infered, rather than stated explicitly in a credential.
+- Explicit [Ethos](https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos) statement: A statement of the form "A claims X." where X is also a statement. Explicit Ethos is encodable in natural human languages as well as in RDF.
+
+[^1]: If you ever decide to implement your own algorithm to merge RDF graphs, remember that [blank nodes](https://www.w3.org/TR/rdf11-concepts/#section-blank-nodes) exists and may need to be renamed depending on the type of graph representation in use.
+
+[^2]: This syntax is an RDF representation called [turtle](https://www.w3.org/TR/turtle/). In turtle, "a" is shorthand for \<http://www.w3.org/1999/02/22-rdf-syntax-ns#type\> which means "is member of set".

@@ -146,6 +146,12 @@ Example of a complete rule definition:
 
 See the [claim deduction tutorial](tutorial_claim_deduction.html) for more another example.
 
+## Limited Expresiveness
+
+The astute among you may notice the SDK's model for rules does not allow logical negation. This is by design. For one, it keeps the the rule description language from being turing complete so inference time is always bounded. Secondly, RDF choses the [Open World Assumption](https://en.wikipedia.org/wiki/Open-world_assumption) so absence of any particular statement in a credential/claimgraph is not meaningful within RDF semantics.
+
+The rule language is expected to be expressive enough to implement [OWL 2 EL](https://www.w3.org/TR/owl2-profiles/#OWL_2_EL) but not [OWL 1 DL](https://www.w3.org/TR/owl-ref/).
+
 ## Terms
 
 - [Verifier](https://www.w3.org/TR/vc-data-model/#dfn-verifier): The party that accepts and checks VCDM credential[s].

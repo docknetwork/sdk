@@ -58,16 +58,28 @@ The scripts read parameters from `.env` file. The available parameters are shown
 
 Run unit tests with `yarn test`.
 
+Run a single unit test module with `yarn test <module name or prefix>`.
+
 Run e2e integrations tests with `yarn test-integration` (required node to be running)
 
 You can run tests against a temporary node in docker like so:
 
 ```
-./scripts/checkout_submodule
+./scripts/with_docker_test_node
+yarn test-integration
+```
+
+or with the alias:
+
+```
 yarn test-with-node
 ```
 
-Run a single test module with `yarn test <module name or prefix>`.
+and examples can be similarly run with:
+
+```
+yarn examples-with-node
+```
 
 ## Linting and type checking
 We use JSDoc and TypeScript for static type checking during the CI process. PRs must pass linting and type checking to be accepted.

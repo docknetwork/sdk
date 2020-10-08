@@ -125,7 +125,7 @@ A DID can be removed from the chain by sending the corresponding message signed 
     const [didRemoval, signature] = await createSignedDidRemoval(dock.did, dockDID, currentPair);
     ```
 1. As mentioned above, in some cases the caller might not have the keypair, then he creates the removal message bytes
-with `createKeyUpdate` to pass to the signer and get the signature
+with `createDidRemoval` to pass to the signer and get the signature
     ```js
     import {createDidRemoval} from '@docknetwork/sdk/utils/did';
     const didRemoval = await createDidRemoval(dock.did, did);

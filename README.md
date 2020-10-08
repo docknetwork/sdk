@@ -1,6 +1,6 @@
-# Dock Client SDK
+# Dock SDK
 
-A JavaScript SDK built ontop of PolkadotJS for interaction with the Dock Substrate node and testnet.
+A Javascript library for working with Verifiable Credentials, DIDs, Claim Deducation and more. Built with PolkadotJS, for use with the [Dock Substrate Node](https://github.com/docknetwork/dock-substrate) or our public main/test networks.
 
 ## Install or build
 - Run `yarn add @docknetwork/sdk` or `npm install @docknetwork/sdk` to install the package from npm

@@ -113,7 +113,7 @@ creates the key update message bytes with `createKeyUpdate` to pass to the signe
     ```
 
 ## Removing an existing DID from chain
-A DID can be removing from the chain by sending the corresponding message signed with the current key.
+A DID can be removed from the chain by sending the corresponding message signed with the current key.
 1. Fetch the current keypair to sign the DID removal message
     ```js
     // the current pair, its a sr25519 in this example

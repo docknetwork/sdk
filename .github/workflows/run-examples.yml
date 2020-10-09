@@ -1,4 +1,4 @@
-name: Build and Tests
+name: Examples
 
 on: [pull_request]
 jobs:
@@ -10,6 +10,4 @@ jobs:
         with:
           node-version: '13.x'
       - run: yarn install --frozen-lockfile --ignore-scripts
-      - run: yarn build
-      - run: yarn test
-      - run: yarn test-with-node
+      - run: yarn examples-with-node

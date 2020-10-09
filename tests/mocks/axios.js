@@ -1,3 +1,4 @@
+jest.mock('axios');
 import axios from 'axios';
 import networkCache from '../network-cache';
 

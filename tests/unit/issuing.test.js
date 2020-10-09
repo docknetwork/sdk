@@ -1,5 +1,4 @@
 // Mock axios
-jest.mock('axios');
 import mockAxios from '../mocks/axios';
 mockAxios();
 

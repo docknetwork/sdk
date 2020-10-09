@@ -1,3 +1,8 @@
+// Mock axios
+jest.mock('axios');
+import mockAxios from '../mocks/axios';
+mockAxios();
+
 import {
   issueCredential,
   verifyCredential,
@@ -8,24 +13,6 @@ import {
 import VerifiableCredential from '../../src/verifiable-credential';
 import VerifiablePresentation from '../../src/verifiable-presentation';
 import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../../src/utils/misc';
-
-// Mock axios
-import axios from 'axios';
-import networkCache from '../network-cache';
-
-jest.mock('axios');
-
-axios.get.mockImplementation(async (url) => {
-  if (networkCache[url]) {
-    return {
-      data: networkCache[url]
-    };
-  }
-
-  console.error(`Test should cache this URL: ${url}`);
-  throw new Error(`Test should cache this URL: ${url}`);
-  return undefined;
-});
 
 // Test constants
 const controllerUrl = 'https://gist.githubusercontent.com/lovesh/312d407e3a16be0e7d5e43169e824958/raw';

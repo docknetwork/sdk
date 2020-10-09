@@ -1,3 +1,7 @@
+// Mock axios
+import mockAxios from '../mocks/axios';
+mockAxios();
+
 import { randomAsHex } from '@polkadot/util-crypto';
 
 import {

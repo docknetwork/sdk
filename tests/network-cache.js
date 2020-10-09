@@ -1,5 +1,5 @@
 export default {
-  "https://w3id.org/security/v1": {
+  'https://w3id.org/security/v1': {
     "@context": {
       "id": "@id",
       "type": "@type",
@@ -72,5 +72,22 @@ export default {
       "signatureAlgorithm": "sec:signingAlgorithm",
       "signatureValue": "sec:signatureValue"
     }
+  },
+  'https://gist.githubusercontent.com/lovesh/67bdfd354cfaf4fb853df4d6713f4610/raw': {
+    "id": "https://gist.githubusercontent.com/lovesh/67bdfd354cfaf4fb853df4d6713f4610/raw",
+    "type": "EcdsaSecp256k1VerificationKey2019",
+    "publicKeyBase58": "yYHXTMCuyAKRXop7WwTrMpRbGGUQehYM2AvsqFsUEKPZ",
+    "@context": "https://w3id.org/security/v2",
+    "controller": "https://gist.githubusercontent.com/lovesh/312d407e3a16be0e7d5e43169e824958/raw"
+  },
+  'https://gist.githubusercontent.com/lovesh/312d407e3a16be0e7d5e43169e824958/raw': {
+    "@context": "https://w3id.org/security/v2",
+    "id": "https://gist.githubusercontent.com/lovesh/312d407e3a16be0e7d5e43169e824958/raw",
+    "assertionMethod": [
+      "https://gist.githubusercontent.com/lovesh/67bdfd354cfaf4fb853df4d6713f4610/raw"
+    ],
+    "authentication": [
+      "https://gist.githubusercontent.com/lovesh/67bdfd354cfaf4fb853df4d6713f4610/raw"
+    ]
   }
 }

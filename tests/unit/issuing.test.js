@@ -9,6 +9,25 @@ import VerifiableCredential from '../../src/verifiable-credential';
 import VerifiablePresentation from '../../src/verifiable-presentation';
 import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 
+// Mock axios
+import axios from 'axios';
+import networkCache from '../network-cache';
+
+jest.mock('axios');
+
+axios.get.mockImplementation(async (url) => {
+  if (networkCache[url]) {
+    return {
+      data: networkCache[url]
+    };
+  }
+
+  console.error(`Test should cache this URL: ${url}`);
+  throw new Error(`Test should cache this URL: ${url}`);
+  return undefined;
+});
+
+// Test constants
 const controllerUrl = 'https://gist.githubusercontent.com/lovesh/312d407e3a16be0e7d5e43169e824958/raw';
 const keyUrl = 'https://gist.githubusercontent.com/lovesh/67bdfd354cfaf4fb853df4d6713f4610/raw';
 const issuanceDate = '2020-04-15T09:05:35Z';
@@ -424,7 +443,6 @@ describe('Verifiable Presentation incremental creation', () => {
     expect(results.credentialResults[0]).toMatchObject({ verified: true });
     expect(results.credentialResults[0]).toMatchObject({ results: expect.anything() });
   }, 20000);
-
 
   test('Issuing an incrementally-created VP from an incrementally created VC should return an object with a proof, and it must pass validation.', async () => {
     const vc = new VerifiableCredential('https://example.com/credentials/1872');

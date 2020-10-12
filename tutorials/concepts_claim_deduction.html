@@ -1,0 +1,357 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Claim Deduction - Dock SDK Tutorial</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html" class="active"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Dock SDK Tutorial</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#claim-deduction" id="claim-deduction">Claim Deduction</a></h1>
+<p>The <a href="https://www.w3.org/TR/vc-data-model/">verifiable credentials data model</a> is based on a machine comprehensible language called <a href="https://www.w3.org/TR/rdf-primer/">RDF</a>. RDF represents arbitrary semantic knowledge as <a href="https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)">graph</a>s. Computers can perform automatic deductive reasoning over RDF, given assumptions (represented as an RDF graph) and axioms (represented as logical rules), a computer can infer new conclusions and even prove them to other computers using deductive derivations (proofs).</p>
+<p>So what does that have to do with verifiable credentials? Every VCDM credential is an RDF claim graph. Computers can reason about them, deriving new conclusions that weren't explicitly stated by the issuer.</p>
+<p>The Dock SDK exposes utilities for primitive deductive reasoning over verified credentials. The Verifier has a choice to perform deduction themself (expensive), or offload that responsibility to the Presenter of the credential[s] by accepting deductive proofs of composite claims.</p>
+<p>In RDF, if graph A is true and graph B is true, then the <a href="https://en.wikipedia.org/wiki/Union_(set_theory)">union</a> of those graphs, is also true <code>A∧B-&gt;A∪B</code> <sup class="footnote-reference"><a href="#1">1</a></sup>. Using this property we can combine multiple credentials and reason over their union.</p>
+<h2><a class="header" href="#explicit-ethos-using-a-hrefhttpsenwikipediaorgwikimodes_of_persuasionethosrdf-reificationa" id="explicit-ethos-using-a-hrefhttpsenwikipediaorgwikimodes_of_persuasionethosrdf-reificationa">Explicit Ethos using <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos">RDF Reification</a></a></h2>
+<p>Imagine a signed credential issued by <strong>Alice</strong> claiming that <strong>Joe</strong> is a <strong>Member</strong>.</p>
+<pre><code class="language-json">{
+  ...
+  &quot;issuer&quot;: &quot;Alice&quot;,
+  &quot;credentialSubject&quot;: {
+    &quot;id&quot;: &quot;Joe&quot;,
+    &quot;@type&quot;: &quot;Member&quot;
+  },
+  ...
+}
+</code></pre>
+<p>The credential does not directly prove that <strong>Joe</strong> is a <strong>Member</strong>. Rather, it proves <strong>Alice</strong> <strong>Claims</strong> <strong>Joe</strong> to be a <strong>Member</strong>.</p>
+<p>Not proven:<sup class="footnote-reference"><a href="#2">2</a></sup></p>
+<pre><code class="language-turtle">&lt;Joe&gt; a &lt;Member&gt; .
+</code></pre>
+<p>Proven:</p>
+<pre><code class="language-turtle">&lt;Alice&gt; &lt;Claims&gt; [
+  rdf:subject &lt;Joe&gt; ;
+  rdf:predicate a ;
+  def:object &lt;Member&gt; ] .
+</code></pre>
+<p>Writing RDF triples about other RDF triples is called <a href="https://www.w3.org/wiki/RdfReification">reification</a>. Signed credentials are <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos">ethos</a> arguments so we call this reified representation of credentials &quot;Explicit Ethos&quot; form. If a credential is <em>verified</em>, then it's explicit ethos form is <em>true</em>.</p>
+<h2><a class="header" href="#rule-format" id="rule-format">Rule Format</a></h2>
+<p>To perform reasoning and to accept proofs, the Verifier must select the list of logical rules which they will allow. Rules (or axioms if you prefer), are modeled as if-then relationships.</p>
+<pre><code class="language-js">const rules = [
+  {
+    if_all: [],
+    then: [],
+  },
+];
+</code></pre>
+<p>During reasoning, when an <code>if_all</code> pattern is matched, its corresponding <code>then</code> pattern will be implied. In logic terms, each &quot;rule&quot; is the conditional premise of a <a href="https://en.wikipedia.org/wiki/Modus_ponens">modus ponens</a>.</p>
+<pre><code class="language-js">{ if_all: [A, B, C], then: [C, D, E] }
+</code></pre>
+<p>means <code>if (A and B and C) then (C and D and E)</code>.</p>
+<p>Rules can contain Bound or Unbound entities. Unbound entities are named variables. Each rule has it's own unique scope, so Unbound entities introduced in the <code>if_all</code> pattern can be used in the <code>then</code> pattern.</p>
+<pre><code class="language-js">{
+  if_all: [
+    [{ Bound: alice }, { Bound: likes }, { Unbound: 'thing' }],
+  ],
+  then: [
+    [{ Bound: bob }, { Bound: likes }, { Unbound: 'thing' }]
+  ],
+}
+</code></pre>
+<p>means</p>
+<pre><code>For any ?thing:
+  if [alice likes ?thing]
+  then [bob likes ?thing]
+</code></pre>
+<p>in other words: <code>∀ thing: [alice likes thing] -&gt; [bob likes thing]</code></p>
+<p>Bound entities are constants of type RdfNode. RDF nodes may be one of three things, an IRI, a blank node, or a literal. For those familiar with algebraic datatypes:</p>
+<pre><code class="language-rust ignore">enum RdfNode {
+  Iri(Url),
+  Blank(String),
+  Literal {
+    value: String,
+    datatype: Url,
+  },
+}
+</code></pre>
+<p>The SDK represents RDF nodes like so:</p>
+<pre><code class="language-js">const alice = { Iri: 'did:sample:alice' };
+const literal = {
+  Literal: {
+    value: '{}',
+    datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#JSON',
+  }
+};
+// blank nodes are generally not useful in rule definitions
+const blank = { Blank: '_:b0' };
+</code></pre>
+<p>Example of a complete rule definition:</p>
+<pre><code class="language-js">{
+  if_all: [
+    [
+      { Unbound: 'food' },
+      { Bound { Iri: 'https://example.com/contains' } },
+      { Bound: { Iri: 'https://example.com/butter' } }
+    ],
+    [
+      { Unbound: 'person' },
+      { Bound: 'http://xmlns.com/foaf/0.1/name' },
+      { Literal: {
+        value: 'Bob',
+        datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral',
+      } }
+    ],
+  ],
+  then: [
+    [
+      { Unbound: 'person' },
+      { Bound: { Iri: 'https://example.com/likes' } },
+      { Unbound: 'food' },
+    ]
+  ],
+}
+// all things named &quot;Bob&quot; like all things containing butter
+</code></pre>
+<p>See the <a href="tutorial_claim_deduction.html">claim deduction tutorial</a> for more another example.</p>
+<h2><a class="header" href="#limited-expresiveness" id="limited-expresiveness">Limited Expresiveness</a></h2>
+<p>The astute among you may notice the SDK's model for rules does not allow logical negation. This is by design. For one, it keeps the the rule description language from being turing complete so inference time is always bounded. Secondly, RDF choses the <a href="https://en.wikipedia.org/wiki/Open-world_assumption">Open World Assumption</a> so absence of any particular statement in a credential/claimgraph is not meaningful within RDF semantics.</p>
+<p>The rule language is expected to be expressive enough to implement <a href="https://www.w3.org/TR/owl2-profiles/#OWL_2_EL">OWL 2 EL</a> but not <a href="https://www.w3.org/TR/owl-ref/">OWL 1 DL</a>.</p>
+<h2><a class="header" href="#terms" id="terms">Terms</a></h2>
+<ul>
+<li><a href="https://www.w3.org/TR/vc-data-model/#dfn-verifier">Verifier</a>: The party that accepts and checks VCDM credential[s].</li>
+<li><a href="https://www.w3.org/TR/vc-data-model/#dfn-issuer">Issuer</a>: The party that signed a VCDM credential.</li>
+<li><a href="https://www.w3.org/TR/vc-data-model/">VCDM</a>: Verifiable Credentials Data Model</li>
+<li><a href="https://en.wikipedia.org/wiki/Resource_Description_Framework">RDF</a>: A model for representing general knowledge in a machine friendly way.</li>
+<li>RDF triple: A single sentence consisting of subject, predicate and object. Each element of the triple is an RDF node.</li>
+<li><a href="https://www.w3.org/TR/rdf-primer/#rdfmodel">RDF graph</a>: A directed, labeled <a href="https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)">graph</a> with RDF triples as edges.</li>
+<li><a href="https://www.w3.org/TR/rdf-primer/#rdfmodel">RDF node</a></li>
+<li>Composite Claim: An rdf triple which was infered, rather than stated explicitly in a credential.</li>
+<li>Explicit <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos">Ethos</a> statement: A statement of the form &quot;A claims X.&quot; where X is also a statement. Explicit Ethos is encodable in natural human languages as well as in RDF.</li>
+</ul>
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p>If you ever decide to implement your own algorithm to merge RDF graphs, remember that <a href="https://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank nodes</a> exists and may need to be renamed depending on the type of graph representation in use.</p>
+</div>
+<div class="footnote-definition" id="2"><sup class="footnote-definition-label">2</sup>
+<p>This syntax is an RDF representation called <a href="https://www.w3.org/TR/turtle/">turtle</a>. In turtle, &quot;a&quot; is shorthand for &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; which means &quot;is member of set&quot;.</p>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="concepts_blobs_schemas.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="tutorials.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="concepts_blobs_schemas.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="tutorials.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

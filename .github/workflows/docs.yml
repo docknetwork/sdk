@@ -12,10 +12,11 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Setup Node JS
         uses: actions/setup-node@v1
         with:
           node-version: '13.x'
-    
+
       - name: Install and Build 🔧 # Only need to install jsdoc package here and then run docs script
         run: |
           yarn install --frozen-lockfile --ignore-scripts

@@ -41,12 +41,32 @@ export function getId(obj) {
   return obj.id;
 }
 
-/**
- * @param {object} credential - An object that could be a VerifiableCredential.
- * @throws {Error}
- * @private
- */
-export function checkCredential(credential) {
+export function checkCredentialJSONLD(credential) {
+  if (!jsonld.getValues(credential, 'type').includes('VerifiableCredential')) {
+    throw new Error('"type" must include `VerifiableCredential`.');
+  }
+
+  // check issuanceDate cardinality
+  if (jsonld.getValues(credential, 'issuanceDate').length > 1) {
+    throw new Error('"issuanceDate" property can only have one value.');
+  }
+
+  // check issuer cardinality
+  if (jsonld.getValues(credential, 'issuer').length > 1) {
+    throw new Error('"issuer" property can only have one value.');
+  }
+
+  // check evidences are URLs
+  // FIXME
+  jsonld.getValues(credential, 'evidence').forEach((evidence) => {
+    const evidenceId = getId(evidence);
+    if (evidenceId && !evidenceId.includes(':')) {
+      throw new Error(`"evidence" id must be a URL: ${evidence}`);
+    }
+  });
+}
+
+export function checkCredentialRequired(credential) {
   // ensure first context is 'https://www.w3.org/2018/credentials/v1'
   if (credential['@context'][0] !== CREDENTIALS_CONTEXT_V1_URL) {
     throw new Error(
@@ -60,10 +80,6 @@ export function checkCredential(credential) {
     throw new Error('"type" property is required.');
   }
 
-  if (!jsonld.getValues(credential, 'type').includes('VerifiableCredential')) {
-    throw new Error('"type" must include `VerifiableCredential`.');
-  }
-
   if (!credential.credentialSubject) {
     throw new Error('"credentialSubject" property is required.');
   }
@@ -72,25 +88,17 @@ export function checkCredential(credential) {
     throw new Error('"issuer" property is required.');
   }
 
-  // check issuanceDate cardinality
-  if (jsonld.getValues(credential, 'issuanceDate').length > 1) {
-    throw new Error('"issuanceDate" property can only have one value.');
-  }
-
   // check issued is a date
   if (!credential.issuanceDate) {
     throw new Error('"issuanceDate" property is required.');
   }
+}
 
+export function checkCredentialOptional(credential) {
   if ('issuanceDate' in credential && !dateRegex.test(credential.issuanceDate)) {
     throw new Error(
       `"issuanceDate" must be a valid date: ${credential.issuanceDate}`,
     );
-  }
-
-  // check issuer cardinality
-  if (jsonld.getValues(credential, 'issuer').length > 1) {
-    throw new Error('"issuer" property can only have one value.');
   }
 
   // check issuer is a URL
@@ -114,15 +122,6 @@ export function checkCredential(credential) {
     }
   }
 
-  // check evidences are URLs
-  // FIXME
-  jsonld.getValues(credential, 'evidence').forEach((evidence) => {
-    const evidenceId = getId(evidence);
-    if (evidenceId && !evidenceId.includes(':')) {
-      throw new Error(`"evidence" id must be a URL: ${evidence}`);
-    }
-  });
-
   // check expires is a date
   if ('expirationDate' in credential
       && !dateRegex.test(credential.expirationDate)) {
@@ -130,6 +129,17 @@ export function checkCredential(credential) {
       `"expirationDate" must be a valid date: ${credential.expirationDate}`,
     );
   }
+}
+
+/**
+ * @param {object} credential - An object that could be a VerifiableCredential.
+ * @throws {Error}
+ * @private
+ */
+export function checkCredential(credential) {
+  checkCredentialRequired(credential);
+  checkCredentialOptional(credential);
+  checkCredentialJSONLD(credential);
 }
 
 async function verifyVCDM(credential, options = {}) {

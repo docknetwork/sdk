@@ -1,6 +1,5 @@
 // Mock axios
 import mockAxios from '../mocks/axios';
-mockAxios();
 
 import {
   issueCredential,
@@ -12,6 +11,8 @@ import {
 import VerifiableCredential from '../../src/verifiable-credential';
 import VerifiablePresentation from '../../src/verifiable-presentation';
 import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../../src/utils/misc';
+
+mockAxios();
 
 // Test constants
 const controllerUrl = 'https://gist.githubusercontent.com/lovesh/312d407e3a16be0e7d5e43169e824958/raw';
@@ -126,7 +127,7 @@ describe('Verifiable Credential Issuing', () => {
   }, 30000);
 
   test('Credential With incorrect issuer should not pass validation.', async () => {
-    let keydoc = getSampleKey();
+    const keydoc = getSampleKey();
     keydoc.controller = 'did:rando:id';
     const credential = await issueCredential(keydoc, getSampleCredential());
     const result = await verifyCredential(credential);
@@ -174,7 +175,6 @@ describe('Verifiable Presentation creation', () => {
         domain: 'some_domain',
       },
     );
-
 
     expect(results.presentationResult.verified).toBe(true);
     expect(results.presentationResult.results[0].proof['@context']).toBe('https://w3id.org/security/v2');
@@ -280,7 +280,6 @@ describe('Verifiable Credential incremental creation', () => {
       'VerifiableCredential',
       'some_type',
     ]);
-
 
     credential.addSubject({
       id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',

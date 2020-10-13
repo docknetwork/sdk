@@ -1,8 +1,6 @@
 // Mock axios
-import mockAxios from '../mocks/axios';
-mockAxios();
-
 import { randomAsHex } from '@polkadot/util-crypto';
+import mockAxios from '../mocks/axios';
 
 import {
   createNewDockDID,
@@ -16,6 +14,8 @@ import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
 import { generateEcdsaSecp256k1Keypair } from '../../src/utils/misc';
 import { issueCredential, verifyCredential } from '../../src/utils/vc';
 import getKeyDoc from '../../src/utils/vc/helpers';
+
+mockAxios();
 
 // 1st issuer's DID.
 const issuer1DID = createNewDockDID();
@@ -109,7 +109,6 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
   afterAll(async () => {
     await dock.disconnect();
   }, 10000);
-
 
   test('Issue a verifiable credential with ed25519 key and verify it', async () => {
     const issuerKey = getKeyDoc(issuer1DID, dock.keyring.addFromUri(issuer1KeySeed, null, 'ed25519'), 'Ed25519VerificationKey2018');

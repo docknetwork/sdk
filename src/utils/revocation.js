@@ -127,4 +127,6 @@ export {
   DidKeys,
   KeyringPairDidKeys,
   OneOfPolicy,
+  RevRegType,
+  DockRevRegQualifier,
 };

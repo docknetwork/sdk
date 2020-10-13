@@ -10,10 +10,6 @@
   "engines": {
     "node": ">=13.0.0"
   },
-  "resolutions": {
-    "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures",
-    "jsonld": "^2.0.2"
-  },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.8.7",
@@ -71,6 +67,10 @@
   "jest": {
     "testEnvironment": "node"
   },
+  "resolutions": {
+    "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures",
+    "jsonld": "2.0.2"
+  },
   "dependencies": {
     "@polkadot/api": "2.1.1",
     "@polkadot/keyring": "3.5.1",
@@ -87,7 +87,7 @@
     "ethr-did-resolver": "^2.2.0",
     "js-sha256": "^0.9.0",
     "json-canonicalize": "^1.0.3",
-    "jsonld": "^2.0.2",
+    "jsonld": "2.0.2",
     "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures",
     "jsonschema": "^1.2.6",
     "rify": "^0.4.0"

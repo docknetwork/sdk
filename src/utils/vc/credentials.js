@@ -248,21 +248,19 @@ export async function verifyCredential(credential, {
  * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
  * @return {Promise<object>} The signed credential object.
  */
-export async function issueCredential(keyDoc, credential, compactProof = true, purpose = null, documentLoader = null) {
-  const suite = getSuiteFromKeyDoc(keyDoc);
-
-  // check to make sure the `suite` has required params
-  // Note: verificationMethod defaults to publicKey.id, in suite constructor
-  if (!suite) {
-    throw new TypeError('"suite" parameter is required for issuing.');
-  }
-  if (!suite.verificationMethod) {
-    throw new TypeError('"suite.verificationMethod" property is required.');
+export async function issueCredential(keyDoc, credential, compactProof = true, documentLoader = null, purpose = null, expansionMap = null) {
+  if (!keyDoc) {
+    throw new TypeError('"keyDoc" parameter is required for issuing.');
   }
 
   // run common credential checks
   if (!credential) {
     throw new TypeError('"credential" parameter is required for issuing.');
+  }
+
+  const suite = getSuiteFromKeyDoc(keyDoc);
+  if (!suite.verificationMethod) {
+    throw new TypeError('"suite.verificationMethod" property is required.');
   }
 
   // The following code (including `issue` method) will modify the passed credential so clone it.gb
@@ -278,5 +276,6 @@ export async function issueCredential(keyDoc, credential, compactProof = true, p
     documentLoader: documentLoader || defaultDocumentLoader(),
     suite,
     compactProof,
+    expansionMap,
   });
 }

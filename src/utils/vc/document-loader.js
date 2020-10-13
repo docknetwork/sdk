@@ -1,7 +1,7 @@
 // load locally embedded contexts
 
 import axios from 'axios';
-import testContext from './contexts';
+import cachedUris from './contexts';
 import DIDResolver from '../../did-resolver'; // eslint-disable-line
 const jsigs = require('jsonld-signatures');
 
@@ -26,9 +26,9 @@ function documentLoader(resolver = null) {
       // Try to resolve a DID and throw if cannot resolve
       document = await resolver.resolve(uri);
     } else {
-      const context = testContext.get(uri);
-      if (context) {
-        document = context;
+      const cachedData = cachedUris.get(uri);
+      if (cachedData) {
+        document = cachedData;
       } else {
         const { data: doc } = await axios.get(uri);
         document = doc;
@@ -42,7 +42,7 @@ function documentLoader(resolver = null) {
     };
   }
 
-  return jsigs.extendContextLoader(loadDocument);
+  return loadDocument;
 }
 
 module.exports = documentLoader;

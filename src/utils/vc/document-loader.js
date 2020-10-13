@@ -1,6 +1,9 @@
+// load locally embedded contexts
+
 import axios from 'axios';
 import testContext from './contexts';
 import DIDResolver from '../../did-resolver'; // eslint-disable-line
+const jsigs = require('jsonld-signatures');
 
 /**
  * Takes a resolver and returns a function that returns a document or throws an error when the document
@@ -8,7 +11,7 @@ import DIDResolver from '../../did-resolver'; // eslint-disable-line
  * @param {DIDResolver} [resolver] - The resolver is optional but should be passed when DIDs need to be resolved.
  * @returns {loadDocument} - the returned function
  */
-export default function (resolver = null) {
+function documentLoader(resolver = null) {
   /**
    * Resolve a URI. If the URI is a DID, then the resolver is used to resolve it.
    * Else, the hardcoded contexts are used to resolve the URI and if that fails
@@ -39,5 +42,7 @@ export default function (resolver = null) {
     };
   }
 
-  return loadDocument;
+  return jsigs.extendContextLoader(loadDocument);
 }
+
+module.exports = documentLoader;

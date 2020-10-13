@@ -4,7 +4,7 @@ import deepEqual from 'deep-equal';
 import jsonld from 'jsonld';
 import { validate, prove } from 'rify';
 import { assert } from '@polkadot/util';
-import { expandedCredentialProperty } from './vc';
+import { expandedCredentialProperty } from './vc/constants';
 import { fromJsonldjsCg, asEE, merge } from './claimgraph';
 import {
   canonRules, canonProof, canonClaimGraph, decanonClaimGraph, decanonProof,

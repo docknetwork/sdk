@@ -143,18 +143,8 @@ export function checkCredential(credential) {
 }
 
 async function verifyVCDM(credential, options = {}) {
-  const { checkStatus } = options;
-
   // run common credential checks
   checkCredential(credential);
-
-  // if credential status is provided, a `checkStatus` function must be given
-  if (credential.credentialStatus && typeof options.checkStatus !== 'function') {
-    throw new TypeError(
-      'A "checkStatus" function must be given to verify credentials with '
-      + '"credentialStatus".',
-    );
-  }
 
   const documentLoader = options.documentLoader || defaultDocumentLoader;
 
@@ -170,13 +160,6 @@ async function verifyVCDM(credential, options = {}) {
   // if verification has already failed, skip status check
   if (!result.verified) {
     return result;
-  }
-
-  if (credential.credentialStatus) {
-    result.statusResult = await checkStatus(options);
-    if (!result.statusResult.verified) {
-      result.verified = false;
-    }
   }
 
   return result;
@@ -215,9 +198,6 @@ export async function verifyCredential(credential, {
     suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
     documentLoader: documentLoader || defaultDocumentLoader(resolver),
     compactProof,
-    async checkStatus() {
-      return { verified: true }; // To work with latest version, we check status elsewhere
-    },
   };
   try {
     credVer = await verifyVCDM(credential, veroptions);
@@ -253,7 +233,6 @@ export async function issueCredential(keyDoc, credential, compactProof = true, d
     throw new TypeError('"keyDoc" parameter is required for issuing.');
   }
 
-  // run common credential checks
   if (!credential) {
     throw new TypeError('"credential" parameter is required for issuing.');
   }

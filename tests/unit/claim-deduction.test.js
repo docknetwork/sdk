@@ -1,3 +1,4 @@
+// TODO: refactor test to not use vc-js
 import vc from 'vc-js';
 import {
   expandedLogicProperty,

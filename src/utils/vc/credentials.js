@@ -257,7 +257,9 @@ export async function issueCredential(keyDoc, credential, compactProof = true, p
 
   // The following code (including `issue` method) will modify the passed credential so clone it.gb
   const cred = { ...credential };
-  cred.issuer = keyDoc.controller;
+  if (keyDoc.controller) {
+    cred.issuer = keyDoc.controller;
+  }
 
   checkCredential(cred);
 

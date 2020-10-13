@@ -39,6 +39,11 @@ export default function getKeyDoc(did, keypair, type) {
  * @returns {EcdsaSepc256k1Signature2019|Ed25519Signature2018|Sr25519Signature2020} - signature suite.
  */
 export function getSuiteFromKeyDoc(keyDoc) {
+  // Check if passing suite directly
+  if (keyDoc.verificationMethod) {
+    return keyDoc;
+  }
+
   let Cls;
   switch (keyDoc.type) {
     case EcdsaSecp256k1VerKeyName:

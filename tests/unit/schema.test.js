@@ -7,9 +7,12 @@ import { createNewDockDID } from '../../src/utils/did';
 
 import {
   validateCredentialSchema,
-  expandedSubjectProperty,
   expandJSONLD,
 } from '../../src/utils/vc';
+
+import {
+  expandedSubjectProperty,
+} from '../../src/utils/vc/constants';
 
 import exampleCredential from '../example-credential';
 import exampleSchema from '../example-schema';

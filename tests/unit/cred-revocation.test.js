@@ -1,7 +1,10 @@
 import {
   isRevocationCheckNeeded,
+} from '../../src/utils/revocation';
+
+import {
   expandedStatusProperty,
-} from '../../src/utils/vc';
+} from '../../src/utils/vc/constants';
 
 describe('Check isRevocationCheckNeeded', () => {
   test('isRevocationCheckNeeded returns true when credentialStatus is present and forceRevocationCheck is true and revocation API is not given', () => {

@@ -32,6 +32,7 @@
     "jsdoc": "^3.6.3",
     "rollup": "2.28.1",
     "typescript": "^3.8.3",
+    "vc-js": "^0.6.4",
     "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12"
   },
@@ -54,7 +55,7 @@
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "test": "jest --verbose ./tests/unit",
-    "test-integration": "NODE_ENV=production jest --verbose --runInBand ./tests/integration",
+    "test-integration": "NODE_ENV=production jest --verbose --runInBand ./tests/integration/credential-revocation",
     "test-poa": "NODE_ENV=production jest --verbose --runInBand ./tests/poa",
     "docs": "mkdir out && touch out/.nojekyll && jsdoc src -r -c .jsdoc -d out/reference",
     "dev-node": "./scripts/run_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",

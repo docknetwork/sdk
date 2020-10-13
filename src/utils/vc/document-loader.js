@@ -1,9 +1,6 @@
-// load locally embedded contexts
-
 import axios from 'axios';
 import cachedUris from './contexts';
 import DIDResolver from '../../did-resolver'; // eslint-disable-line
-const jsigs = require('jsonld-signatures');
 
 /**
  * Takes a resolver and returns a function that returns a document or throws an error when the document

@@ -131,7 +131,6 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
   test('Issue a verifiable credential with secp256k1 key and verify it', async () => {
     const issuerKey = getKeyDoc(issuer2DID, generateEcdsaSecp256k1Keypair(issuer2KeyPers, issuer2KeyEntropy), 'EcdsaSecp256k1VerificationKey2019');
     const credential = await issueCredential(issuerKey, unsignedCred);
-    console.log('credential', credential)
     expect(credential).toMatchObject(
       expect.objectContaining(
         getCredMatcherDoc(unsignedCred, issuer2DID, issuerKey.id, 'EcdsaSecp256k1Signature2019'),
@@ -147,9 +146,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
 
   test('Issue a verifiable credential with sr25519 key and verify it', async () => {
     const issuerKey = getKeyDoc(issuer3DID, dock.keyring.addFromUri(issuer3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
-    console.log('unsignedCred', unsignedCred)
     const credential = await issueCredential(issuerKey, unsignedCred);
-    console.log('credential', credential)
 
     expect(credential).toMatchObject(
       expect.objectContaining(

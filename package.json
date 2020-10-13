@@ -57,7 +57,7 @@
     "lint": "eslint \"{src,example}/**/*.js\"",
     "build": "rollup -c",
     "watch": "rollup -c -w",
-    "test": "jest --verbose ./tests/unit",
+    "test": "jest --verbose ./tests/unit/issuing",
     "test-integration": "NODE_ENV=production jest --verbose --runInBand ./tests/integration",
     "test-poa": "NODE_ENV=production jest --verbose --runInBand ./tests/poa",
     "docs": "mkdir out && touch out/.nojekyll && jsdoc src -r -c .jsdoc -d out/reference",
@@ -90,7 +90,6 @@
     "jsonld": "^2.0.2",
     "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures",
     "jsonschema": "^1.2.6",
-    "rify": "^0.4.0",
-    "vc-js": "latest"
+    "rify": "^0.4.0"
   }
 }

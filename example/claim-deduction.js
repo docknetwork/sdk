@@ -89,7 +89,7 @@ const sampleRules = [
   },
 ];
 
-// we will be proving and verifying the statment [aaa frobs bbb]
+// we will be proving and verifying the statement [aaa frobs bbb]
 const sampleToProve = [
   { Iri: 'https://example.com/bbb' },
   { Iri: frobs },

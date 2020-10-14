@@ -1,7 +1,7 @@
 // Helpers for scripts
 
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
-import { cryptoWaitReady, encodeAddress } from '@polkadot/util-crypto';
+import { cryptoWaitReady } from '@polkadot/util-crypto';
 import types from '../src/types.json';
 
 /**

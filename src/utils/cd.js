@@ -150,9 +150,9 @@ export function getImplications(claimgraph, proof, rules) {
 }
 
 /**
- * Given the assumptions encoded in the provided presentaion, prove a list of composite claims.
+ * Given the assumptions encoded in the provided presentation, prove a list of composite claims.
  * T return proof of composite claims as a jsonld json literal which can be attached directly to a
- * presentaion as {expandedLogicProperty} before [signing and ]submitting.
+ * presentation as {expandedLogicProperty} before [signing and ]submitting.
  *
  * This function throws an error if the requested composite claims are unprovable.
  *

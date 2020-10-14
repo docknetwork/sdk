@@ -129,29 +129,6 @@ export function checkCredential(credential) {
   checkCredentialJSONLD(credential);
 }
 
-async function verifyVCDM(credential, options = {}) {
-  // run common credential checks
-  checkCredential(credential);
-
-  const documentLoader = options.documentLoader || defaultDocumentLoader;
-
-  const { controller } = options;
-  const purpose = options.purpose || new CredentialIssuancePurpose({
-    controller,
-  });
-
-  const result = await jsigs.verify(
-    credential, { purpose, documentLoader, ...options },
-  );
-
-  // if verification has already failed, skip status check
-  if (!result.verified) {
-    return result;
-  }
-
-  return result;
-}
-
 /**
 * @typedef {object} VerifiableParams The Options to verify credentials and presentations.
 * @property {string} [challenge] - proof challenge Required.
@@ -177,7 +154,14 @@ async function verifyVCDM(credential, options = {}) {
  * credential is valid and not revoked and false otherwise. The `error` will describe the error if any.
  */
 export async function verifyCredential(credential, {
-  resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null, documentLoader = null,
+  resolver = null,
+  compactProof = true,
+  forceRevocationCheck = true,
+  revocationApi = null,
+  schemaApi = null,
+  documentLoader = null,
+  purpose = null,
+  controller = null,
 } = {}) {
   if (!credential) {
     throw new TypeError(
@@ -196,15 +180,17 @@ export async function verifyCredential(credential, {
     await getAndValidateSchemaIfPresent(expandedCredential, schemaApi, credential[credentialContextField]);
   }
 
-  // Run VCJS verifier
+  // Verify with jsonld-signatures
   let credVer;
-  const veroptions = {
-    suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
-    documentLoader: documentLoader || defaultDocumentLoader(resolver),
-    compactProof,
-  };
   try {
-    credVer = await verifyVCDM(credential, veroptions);
+    credVer = await jsigs.verify(credential, {
+      purpose: purpose || new CredentialIssuancePurpose({
+        controller,
+      }),
+      suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
+      documentLoader: documentLoader || defaultDocumentLoader(resolver),
+      compactProof,
+    });
   } catch (error) {
     credVer = {
       verified: false,

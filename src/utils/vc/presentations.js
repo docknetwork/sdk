@@ -70,7 +70,6 @@ function checkPresentation(presentation) {
  * @param {string} [options.domain]
  *
  * @param {Function} [options.documentLoader]
- * @param {Function} [options.checkStatus]
  *
  * @throws {Error} If presentation is missing required params.
  *
@@ -140,7 +139,13 @@ export async function verifyVCDM(presentation, options = {}) {
  * describe the error if any.
  */
 export async function verifyPresentation(presentation, {
-  challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null,
+  challenge,
+  domain,
+  resolver = null,
+  compactProof = true,
+  forceRevocationCheck = true,
+  revocationApi = null,
+  schemaApi = null,
 } = {}) {
   if (!presentation) {
     throw new TypeError(
@@ -156,9 +161,10 @@ export async function verifyPresentation(presentation, {
     domain,
     documentLoader: defaultDocumentLoader(resolver),
     compactProof,
-    async checkStatus() {
-      return { verified: true }; // To work with latest version, we check status elsewhere
-    },
+    resolver,
+    forceRevocationCheck,
+    revocationApi,
+    schemaApi,
   };
   try {
     presVer = verifyVCDM(presentation, options);

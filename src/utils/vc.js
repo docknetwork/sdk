@@ -3,7 +3,6 @@ import { issueCredential, verifyCredential } from './vc/credentials';
 
 import {
   isRevocationCheckNeeded,
-  checkRevocationStatus,
   getCredentialStatuses,
   getDockRevIdFromCredential,
 } from './revocation';
@@ -80,7 +79,6 @@ export {
   signPresentation,
   verifyPresentation,
   isRevocationCheckNeeded,
-  checkRevocationStatus,
   getCredentialStatuses,
   validateCredentialSchema,
   getDockRevIdFromCredential,

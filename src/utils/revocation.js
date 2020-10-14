@@ -97,7 +97,9 @@ function hasDockRevocation(status) {
  * which is true if the credential is not revoked and false otherwise. The `error` will describe the error if any.
  */
 export async function checkRevocationStatus(credential, revocationApi) {
-  if (!revocationApi.dock) {
+  if (!revocationApi) {
+    throw new Error('No revocation API supplied');
+  } else if (!revocationApi.dock) {
     throw new Error('Only Dock revocation support is present as of now.');
   } else {
     const statuses = await getCredentialStatuses(credential);

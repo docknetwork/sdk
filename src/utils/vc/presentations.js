@@ -133,10 +133,13 @@ export async function verifyPresentation(presentation, options = {}) {
     // Skip proof validation for unsigned
     if (unsignedPresentation) {
       return { verified, results: [presentation], credentialResults };
-    } if (!verified) {
-      // Early out incase credentials arent verified
+    }
+
+    // Early out incase credentials arent verified
+    if (!verified) {
       return { verified, results: [presentation], credentialResults };
     }
+
     // Get proof purpose
     if (!presentationPurpose && !challenge) {
       throw new Error(

@@ -16,8 +16,14 @@ import {
   EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
 } from './custom_crypto';
 
+import DIDResolver from '../../did-resolver'; // eslint-disable-line
+
 const { AuthenticationProofPurpose } = jsigs.purposes;
 const { constants: { CREDENTIALS_CONTEXT_V1_URL } } = require('credentials-context');
+
+/**
+ * @typedef {object} VerifiablePresentation Representation of a Verifiable Presentation.
+ */
 
 /**
  * @param {object} presentation - An object that could be a presentation.
@@ -45,36 +51,6 @@ function checkPresentation(presentation) {
   }
 }
 
-/**
- * Verifies that the VerifiablePresentation is well formed, and checks the
- * proof signature if it's present. Also verifies all the VerifiableCredentials
- * that are present in the presentation, if any.
- *
- * @param {object} [options={}]
- * @param {VerifiablePresentation} options.presentation
- *
- * @param {LinkedDataSignature|LinkedDataSignature[]} suite - See the definition
- *   in the `verify()` docstring, for this param.
- *
- * @param {boolean} [options.unsignedPresentation=false] - By default, this
- *   function assumes that a presentation is signed (and will return an error if
- *   a `proof` section is missing). Set this to `true` if you're using an
- *   unsigned presentation.
- *
- * Either pass in a proof purpose,
- * @param {AuthenticationProofPurpose} [options.presentationPurpose]
- *
- * or a default purpose will be created with params:
- * @param {string} [options.challenge] - Required if purpose is not passed in.
- * @param {string} [options.controller]
- * @param {string} [options.domain]
- *
- * @param {Function} [options.documentLoader]
- *
- * @throws {Error} If presentation is missing required params.
- *
- * @returns {Promise<VerifyPresentationResult>} The verification result.
- */
 export async function verifyVCDM(presentation, options = {}) {
   const { unsignedPresentation } = options;
 
@@ -131,6 +107,22 @@ export async function verifyVCDM(presentation, options = {}) {
 }
 
 /**
+* @typedef {object} VerifiableParams The Options to verify credentials and presentations.
+* @property {string} [challenge] - proof challenge Required.
+* @property {string} [domain] - proof domain (optional)
+* @property {DIDResolver} [resolver] - Resolver to resolve the issuer DID (optional)
+* @property {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
+* @property {Boolean} [forceRevocationCheck] - Whether to force revocation check or not.
+* Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
+* @property {object} [revocationApi] - An object representing a map. "revocation type -> revocation API". The API is used to check
+* revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
+* as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+* @property {object} [schemaApi] - An object representing a map. "schema type -> schema API". The API is used to get
+* a schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
+* as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+*/
+
+/**
  * Verify a Verifiable Presentation. Returns the verification status and error in an object
  * @param {object} presentation The verifiable presentation
  * @param {VerifiableParams} Verify parameters
@@ -167,7 +159,7 @@ export async function verifyPresentation(presentation, {
     schemaApi,
   };
   try {
-    presVer = verifyVCDM(presentation, options);
+    presVer = await verifyVCDM(presentation, options);
   } catch (error) {
     presVer = {
       verified: false,

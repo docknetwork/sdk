@@ -36,7 +36,7 @@ export default function getKeyDoc(did, keypair, type) {
 /**
  * Get signature suite from a keyDoc
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
- * @returns {EcdsaSepc256k1Signature2019|Ed25519Signature2018|Sr25519Signature2020} - signature suite.
+ * @returns {object} - signature suite.
  */
 export function getSuiteFromKeyDoc(keyDoc) {
   // Check if passing suite directly

@@ -42,4 +42,4 @@ function documentLoader(resolver = null) {
   return loadDocument;
 }
 
-module.exports = documentLoader;
+export default documentLoader;

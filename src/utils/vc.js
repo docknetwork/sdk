@@ -18,10 +18,6 @@ import {
 } from './vc/constants';
 
 /**
- * @typedef {object} VerifiablePresentation Representation of a Verifiable Presentation.
- */
-
-/**
 * @typedef {object} VerifiableParams The Options to verify credentials and presentations.
 * @property {string} [challenge] - proof challenge Required.
 * @property {string} [domain] - proof domain (optional)

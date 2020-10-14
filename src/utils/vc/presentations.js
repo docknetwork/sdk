@@ -74,49 +74,6 @@ export async function verifyPresentationCredentials(presentation, options = {}) 
   };
 }
 
-export async function verifyVCDM(presentation, options = {}) {
-  const { unsignedPresentation } = options;
-
-  checkPresentation(presentation);
-
-  // FIXME: verify presentation first, then each individual credential
-  // only if that proof is verified
-
-  // if verifiableCredentials are present, verify them, individually
-  let { verified, credentialResults } = await verifyPresentationCredentials(presentation, options);
-
-  if (unsignedPresentation) {
-    // No need to verify the proof section of this presentation
-    return { verified, results: [presentation], credentialResults };
-  }
-
-  // early out incase credentials arent verified
-  if (!verified) {
-    return { verified, results: [presentation], credentialResults };
-  }
-
-  const { controller, domain, challenge } = options;
-  if (!options.presentationPurpose && !challenge) {
-    throw new Error(
-      'A "challenge" param is required for AuthenticationProofPurpose.',
-    );
-  }
-
-  const purpose = options.presentationPurpose
-    || new AuthenticationProofPurpose({ controller, domain, challenge });
-
-  const presentationResult = await jsigs.verify(
-    presentation, { purpose, ...options },
-  );
-
-  return {
-    presentationResult,
-    verified: verified && presentationResult.verified,
-    credentialResults,
-    error: presentationResult.error,
-  };
-}
-
 /**
 * @typedef {object} VerifiableParams The Options to verify credentials and presentations.
 * @property {string} [challenge] - proof challenge Required.
@@ -150,6 +107,9 @@ export async function verifyPresentation(presentation, {
   forceRevocationCheck = true,
   revocationApi = null,
   schemaApi = null,
+  unsignedPresentation = false,
+  presentationPurpose = null,
+  controller = null,
 } = {}) {
   if (!presentation) {
     throw new TypeError(
@@ -157,11 +117,13 @@ export async function verifyPresentation(presentation, {
     );
   }
 
-  // TODO: support other purposes than the default of "authentication"
-  let presVer;
+  checkPresentation(presentation);
+
+  let result;
   const options = {
     suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
     challenge,
+    controller,
     domain,
     documentLoader: defaultDocumentLoader(resolver),
     compactProof,
@@ -170,42 +132,47 @@ export async function verifyPresentation(presentation, {
     revocationApi,
     schemaApi,
   };
+
+  // TODO: verify proof then credentials
+  let { verified, credentialResults } = await verifyPresentationCredentials(presentation, options);
   try {
-    presVer = await verifyVCDM(presentation, options);
+    // Skip proof validation for unsigned
+    if (unsignedPresentation) {
+      result = { verified, results: [presentation], credentialResults };
+    } else {
+      // early out incase credentials arent verified
+      if (!verified) {
+        result = { verified, results: [presentation], credentialResults };
+      } else {
+        // Get proof purpose
+        if (!presentationPurpose && !challenge) {
+          throw new Error(
+            'A "challenge" param is required for AuthenticationProofPurpose.',
+          );
+        }
+
+        const purpose = presentationPurpose || new AuthenticationProofPurpose({ controller, domain, challenge });
+        const presentationResult = await jsigs.verify(
+          presentation, { purpose, ...options },
+        );
+
+        result = {
+          presentationResult,
+          verified: verified && presentationResult.verified,
+          credentialResults,
+          error: presentationResult.error,
+        };
+      }
+    }
   } catch (error) {
-    presVer = {
+    result = {
       verified: false,
       results: [{ verified: false, error }],
       error,
     };
   }
 
-  if (presVer.verified) {
-    const expanded = await expandJSONLD(presentation);
-
-    const credentials = expanded[expandedCredentialProperty];
-    for (let i = 0; i < credentials.length; i++) {
-      const credential = credentials[i]['@graph'][0];
-
-      // Check for revocation only if the presentation is verified and revocation check is needed.
-      if (isRevocationCheckNeeded(credential, forceRevocationCheck, revocationApi)) {
-        const res = await checkRevocationStatus(credential, revocationApi); // eslint-disable-line
-
-        // Return error for the first credential that does not pass revocation check.
-        if (!res.verified) {
-          return res;
-        }
-      }
-
-      if (schemaApi) {
-        // eslint-disable-next-line no-await-in-loop
-        await getAndValidateSchemaIfPresent(credential, schemaApi, presentation[credentialContextField]);
-      }
-    }
-
-    // If all credentials pass the revocation check, the let the result of presentation verification be returned.
-  }
-  return presVer;
+  return result;
 }
 
 /**

@@ -50,23 +50,13 @@ function checkPresentation(presentation) {
   }
 }
 
-export async function verifyVCDM(presentation, options = {}) {
-  const { unsignedPresentation } = options;
-
-  checkPresentation(presentation);
-
-  const documentLoader = options.documentLoader || defaultDocumentLoader();
-
-  // FIXME: verify presentation first, then each individual credential
-  // only if that proof is verified
-
-  // if verifiableCredentials are present, verify them, individually
-  let credentialResults;
+export async function verifyPresentationCredentials(presentation, options = {}) {
   let verified = true;
+  let credentialResults = [];
   const credentials = jsonld.getValues(presentation, 'verifiableCredential');
   if (credentials.length > 0) {
     // verify every credential in `verifiableCredential`
-    credentialResults = await Promise.all(credentials.map((credential) => verifyCredential(credential, { documentLoader, ...options })));
+    credentialResults = await Promise.all(credentials.map((credential) => verifyCredential(credential, { ...options })));
 
     for (const [i, credentialResult] of credentialResults.entries()) {
       credentialResult.credentialId = credentials[i].id;
@@ -78,8 +68,30 @@ export async function verifyVCDM(presentation, options = {}) {
     }
   }
 
+  return {
+    verified,
+    credentialResults,
+  };
+}
+
+export async function verifyVCDM(presentation, options = {}) {
+  const { unsignedPresentation } = options;
+
+  checkPresentation(presentation);
+
+  // FIXME: verify presentation first, then each individual credential
+  // only if that proof is verified
+
+  // if verifiableCredentials are present, verify them, individually
+  let { verified, credentialResults } = await verifyPresentationCredentials(presentation, options);
+
   if (unsignedPresentation) {
     // No need to verify the proof section of this presentation
+    return { verified, results: [presentation], credentialResults };
+  }
+
+  // early out incase credentials arent verified
+  if (!verified) {
     return { verified, results: [presentation], credentialResults };
   }
 
@@ -94,7 +106,7 @@ export async function verifyVCDM(presentation, options = {}) {
     || new AuthenticationProofPurpose({ controller, domain, challenge });
 
   const presentationResult = await jsigs.verify(
-    presentation, { purpose, documentLoader, ...options },
+    presentation, { purpose, ...options },
   );
 
   return {

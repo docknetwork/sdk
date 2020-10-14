@@ -176,6 +176,8 @@ describe('Verifiable Presentation creation', () => {
       },
     );
 
+    expect(results.verified).toBe(true);
+    expect(results.error).toBe(undefined);
     expect(results.presentationResult.verified).toBe(true);
     expect(results.presentationResult.results[0].proof['@context']).toBe('https://w3id.org/security/v2');
     expect(results.presentationResult.results[0].proof.type).toBe('EcdsaSecp256k1Signature2019');
@@ -186,12 +188,10 @@ describe('Verifiable Presentation creation', () => {
     expect(results.presentationResult.results[0].proof.proofPurpose).toBe('authentication');
     expect(results.presentationResult.results[0].proof.verificationMethod).toBe(keyUrl);
     expect(results.presentationResult.results[0].verified).toBe(true);
-    expect(results.verified).toBe(true);
     expect(results.credentialResults[0].verified).toBe(true);
     expect(results.credentialResults[0].results).toBeDefined();
     expect(results.credentialResults[1].verified).toBe(true);
     expect(results.credentialResults[1].results).toBeDefined();
-    expect(results.error).toBe(undefined);
   }, 30000);
 });
 

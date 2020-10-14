@@ -15,41 +15,41 @@ import {
 } from './custom_crypto';
 
 /**
- * @param {string|object} obj - Either an object with an id property
- *   or a string that is an id.
- * @returns {string|undefined} Either an id or undefined.
+ * @param {string|object} obj - Object with ID property or a string
+ * @returns {string|undefined} Object's id property or the initial string value
  * @private
- *
  */
-export function getId(obj) {
+function getId(obj) {
+  if (!obj) {
+    return undefined;
+  }
   if (typeof obj === 'string') {
     return obj;
   }
-
-  if (!('id' in obj)) {
-    return undefined;
-  }
-
   return obj.id;
 }
 
+/**
+ * @param {object} credential - An object that could be a VerifiableCredential.
+ * @throws {Error}
+ */
 export function checkCredentialJSONLD(credential) {
+  // Ensure VerifiableCredential is listed in credential types
   if (!jsonld.getValues(credential, 'type').includes('VerifiableCredential')) {
     throw new Error('"type" must include `VerifiableCredential`.');
   }
 
-  // check issuanceDate cardinality
+  // Ensure issuanceDate cardinality
   if (jsonld.getValues(credential, 'issuanceDate').length > 1) {
     throw new Error('"issuanceDate" property can only have one value.');
   }
 
-  // check issuer cardinality
+  // Ensure issuer cardinality
   if (jsonld.getValues(credential, 'issuer').length > 1) {
     throw new Error('"issuer" property can only have one value.');
   }
 
-  // check evidences are URLs
-  // FIXME
+  // Ensure evidences are URIs
   jsonld.getValues(credential, 'evidence').forEach((evidence) => {
     const evidenceId = getId(evidence);
     if (evidenceId && !evidenceId.includes(':')) {
@@ -58,51 +58,48 @@ export function checkCredentialJSONLD(credential) {
   });
 }
 
+/**
+ * @param {object} credential - An object that could be a VerifiableCredential.
+ * @throws {Error}
+ */
 export function checkCredentialRequired(credential) {
-  // ensure first context is 'https://www.w3.org/2018/credentials/v1'
+  // Ensure first context is DEFAULT_CONTEXT_V1_URL
   if (credential['@context'][0] !== DEFAULT_CONTEXT_V1_URL) {
-    throw new Error(
-      `"${DEFAULT_CONTEXT_V1_URL}" needs to be first in the `
-      + 'list of contexts.',
-    );
+    throw new Error(`"${DEFAULT_CONTEXT_V1_URL}" needs to be first in the contexts array.`);
   }
 
-  // check type presence and cardinality
+  // Ensure type property exists
   if (!credential.type) {
     throw new Error('"type" property is required.');
   }
 
+  // Ensure credential has subject
   if (!credential.credentialSubject) {
     throw new Error('"credentialSubject" property is required.');
   }
 
-  if (!credential.issuer) {
-    throw new Error('"issuer" property is required.');
+  // Ensure issuer is valid
+  const issuer = getId(credential.issuer);
+  if (!issuer) {
+    throw new Error('"issuer" must be an object with ID property or a string.');
+  } else if (!issuer.includes(':')) {
+    throw new Error('"issuer" id must be in URL format.');
   }
 
-  // check issued is a date
+  // Ensure there is an issuance date, if exists
   if (!credential.issuanceDate) {
     throw new Error('"issuanceDate" property is required.');
+  } else {
+    ensureValidDatetime(credential.issuanceDate);
   }
 }
 
+/**
+ * @param {object} credential - An object that could be a VerifiableCredential.
+ * @throws {Error}
+ */
 export function checkCredentialOptional(credential) {
-  if ('issuanceDate' in credential) {
-    ensureValidDatetime(credential.issuanceDate);
-  }
-
-  // check issuer is a URL
-  // FIXME
-  if ('issuer' in credential) {
-    const issuer = getId(credential.issuer);
-    if (!issuer) {
-      throw new Error('"issuer" id is required.');
-    }
-    if (!issuer.includes(':')) {
-      throw new Error(`"issuer" id must be a URL: ${issuer}`);
-    }
-  }
-
+  // Ensure credential status is valid, if exists
   if ('credentialStatus' in credential) {
     if (!credential.credentialStatus.id) {
       throw new Error('"credentialStatus" must include an id.');
@@ -112,7 +109,7 @@ export function checkCredentialOptional(credential) {
     }
   }
 
-  // check expires is a date
+  // Ensure expiration date is valid, if exists
   if ('expirationDate' in credential) {
     ensureValidDatetime(credential.expirationDate);
   }
@@ -121,7 +118,6 @@ export function checkCredentialOptional(credential) {
 /**
  * @param {object} credential - An object that could be a VerifiableCredential.
  * @throws {Error}
- * @private
  */
 export function checkCredential(credential) {
   checkCredentialRequired(credential);
@@ -133,10 +129,13 @@ export function checkCredential(credential) {
 * @typedef {object} VerifiableParams The Options to verify credentials and presentations.
 * @property {string} [challenge] - proof challenge Required.
 * @property {string} [domain] - proof domain (optional)
+* @property {string} [controller] - controller (optional)
 * @property {DIDResolver} [resolver] - Resolver to resolve the issuer DID (optional)
+* @property {Boolean} [unsignedPresentation] - Whether to verify the proof or not
 * @property {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
 * @property {Boolean} [forceRevocationCheck] - Whether to force revocation check or not.
 * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
+* @property {object} [presentationPurpose] - A purpose other than the default AuthenticationProofPurpose
 * @property {object} [revocationApi] - An object representing a map. "revocation type -> revocation API". The API is used to check
 * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
 * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
@@ -149,7 +148,7 @@ export function checkCredential(credential) {
 /**
  * Verify a Verifiable Credential. Returns the verification status and error in an object
  * @param {object} [credential] The VCDM Credential
- * @param {VerifiableParams} Verify parameters
+ * @param {VerifiableParams} options Verify parameters, this object is passed down to jsonld-signatures calls
  * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
  * credential is valid and not revoked and false otherwise. The `error` will describe the error if any.
  */
@@ -181,9 +180,9 @@ export async function verifyCredential(credential, {
   }
 
   // Verify with jsonld-signatures
-  let credVer;
+  let result;
   try {
-    credVer = await jsigs.verify(credential, {
+    result = await jsigs.verify(credential, {
       purpose: purpose || new CredentialIssuancePurpose({
         controller,
       }),
@@ -192,7 +191,7 @@ export async function verifyCredential(credential, {
       compactProof,
     });
   } catch (error) {
-    credVer = {
+    result = {
       verified: false,
       results: [{ credential, verified: false, error }],
       error,
@@ -200,7 +199,7 @@ export async function verifyCredential(credential, {
   }
 
   // Check for revocation only if the credential is verified and revocation check is needed.
-  if (credVer.verified && isRevocationCheckNeeded(expandedCredential, forceRevocationCheck, revocationApi)) {
+  if (result.verified && isRevocationCheckNeeded(expandedCredential, forceRevocationCheck, revocationApi)) {
     const revResult = await checkRevocationStatus(expandedCredential, revocationApi);
 
     // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
@@ -208,38 +207,33 @@ export async function verifyCredential(credential, {
       return revResult;
     }
   }
-  return credVer;
+  return result;
 }
 
 /**
  * Issue a Verifiable credential
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
  * @param {object} credential - Credential to be signed.
- * @param {Boolean} compactProof - Whether to compact the JSON-LD or not.
+ * @param {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
  * @return {Promise<object>} The signed credential object.
  */
 export async function issueCredential(keyDoc, credential, compactProof = true, documentLoader = null, purpose = null, expansionMap = null) {
-  if (!keyDoc) {
-    throw new TypeError('"keyDoc" parameter is required for issuing.');
-  }
-
-  if (!credential) {
-    throw new TypeError('"credential" parameter is required for issuing.');
-  }
-
+  // Get suite from keyDoc parameter
   const suite = getSuiteFromKeyDoc(keyDoc);
   if (!suite.verificationMethod) {
     throw new TypeError('"suite.verificationMethod" property is required.');
   }
 
-  // The following code (including `issue` method) will modify the passed credential so clone it.gb
-  const cred = { ...credential };
-  if (keyDoc.controller) {
-    cred.issuer = keyDoc.controller;
-  }
+  // Clone the credential object to prevent mutation
+  const cred = {
+    ...credential,
+    issuer: keyDoc.controller || undefined,
+  };
 
+  // Ensure credential is valid
   checkCredential(cred);
 
+  // Sign and return the credential
   return jsigs.sign(cred, {
     purpose: purpose || new CredentialIssuancePurpose(),
     documentLoader: documentLoader || defaultDocumentLoader(),

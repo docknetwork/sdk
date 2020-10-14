@@ -81,7 +81,7 @@ export function checkCredentialRequired(credential) {
   // Ensure issuer is valid
   const issuer = getId(credential.issuer);
   if (!issuer) {
-    throw new Error('"issuer" must be an object with ID property or a string.');
+    throw new Error(`"issuer" must be an object with ID property or a string. Got: ${credential.issuer}`);
   } else if (!issuer.includes(':')) {
     throw new Error('"issuer" id must be in URL format.');
   }
@@ -152,6 +152,7 @@ export function checkCredential(credential) {
  * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
  * credential is valid and not revoked and false otherwise. The `error` will describe the error if any.
  */
+// TODO: perform verification on the expanded JSON-LD credential
 export async function verifyCredential(credential, {
   resolver = null,
   compactProof = true,
@@ -227,7 +228,7 @@ export async function issueCredential(keyDoc, credential, compactProof = true, d
   // Clone the credential object to prevent mutation
   const cred = {
     ...credential,
-    issuer: keyDoc.controller || undefined,
+    issuer: keyDoc.controller || credential.issuer,
   };
 
   // Ensure credential is valid

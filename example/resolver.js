@@ -83,7 +83,6 @@ async function main() {
     dockDID,
     'did:ethr:0xabcabc03e98e0dc2b855be647c39abe984193675',
     'did:work:2UUHQCd4psvkPLZGnWY33L',
-    'did:sov:WRfXPg8dantKVubE3HX8pw',
     'did:nacl:Md8JiMIwsapml_FtQ2ngnGftNP5UmVCAUuhnLyAsPxI',
   ];
 

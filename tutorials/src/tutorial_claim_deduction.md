@@ -108,7 +108,7 @@ By the primitive definition of "trustworthiness" written above, any claim made b
 
 ## Proving Composite Claims
 
-As a Holder of verifiable credentials, you'll want to prove prove specific claims to a Verifier. If those claims are composite, you'll need to provide a deductive proof in your verifiable credentials presentation. This should be done after the presentation has been assembled. If the presentation is going to be signed, sign it *after* including the deductive proof.
+As a Holder of verifiable credentials, you'll want to prove specific claims to a Verifier. If those claims are composite, you'll need to provide a deductive proof in your verifiable credentials presentation. This should be done after the presentation has been assembled. If the presentation is going to be signed, sign it *after* including the deductive proof.
 
 ```js
 import { proveCompositeClaims } from '@docknetwork/sdk/utils/cd';

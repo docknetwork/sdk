@@ -6,9 +6,12 @@ import { DockBlobQualifier } from '../../src/modules/blob';
 import { createNewDockDID } from '../../src/utils/did';
 
 import {
-  validateCredentialSchema,
   expandJSONLD,
-} from '../../src/utils/vc';
+} from '../../src/utils/vc/helpers';
+
+import {
+  validateCredentialSchema,
+} from '../../src/utils/vc/schema';
 
 import {
   expandedSubjectProperty,

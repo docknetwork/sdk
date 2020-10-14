@@ -1,13 +1,5 @@
 import { signPresentation, verifyPresentation } from './vc/presentations';
 import { issueCredential, verifyCredential } from './vc/credentials';
-
-import {
-  isRevocationCheckNeeded,
-  getCredentialStatuses,
-  getDockRevIdFromCredential,
-} from './revocation';
-
-import { validateCredentialSchema } from './vc/schema';
 import { expandJSONLD } from './vc/helpers';
 
 import {
@@ -57,10 +49,6 @@ export {
   issueCredential,
   signPresentation,
   verifyPresentation,
-  isRevocationCheckNeeded,
-  getCredentialStatuses,
-  validateCredentialSchema,
-  getDockRevIdFromCredential,
   DEFAULT_TYPE,
   DEFAULT_CONTEXT,
 };

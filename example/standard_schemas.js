@@ -1,5 +1,6 @@
 import Schema from '../src/modules/schema';
-import { validateCredentialSchema, expandJSONLD } from '../src/utils/vc';
+import { expandJSONLD } from '../src/utils/vc/helpers';
+import { validateCredentialSchema } from '../src/utils/vc/schema';
 
 import prCardSchema from '../src/utils/vc/schemas/pr_card';
 import immunityEventRecordSchema from '../src/utils/vc/schemas/immunity_event_record';

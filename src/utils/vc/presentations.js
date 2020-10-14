@@ -26,11 +26,11 @@ const { AuthenticationProofPurpose } = jsigs.purposes;
  * @private
  */
 function checkPresentation(presentation) {
-  // normalize to an array to allow the common case of context being a string
+  // Normalize to an array to allow the common case of context being a string
   const context = Array.isArray(presentation['@context'])
     ? presentation['@context'] : [presentation['@context']];
 
-  // ensure first context is 'https://www.w3.org/2018/credentials/v1'
+  // Ensure first context is 'https://www.w3.org/2018/credentials/v1'
   if (context[0] !== DEFAULT_CONTEXT_V1_URL) {
     throw new Error(
       `"${DEFAULT_CONTEXT_V1_URL}" needs to be first in the `
@@ -38,9 +38,8 @@ function checkPresentation(presentation) {
     );
   }
 
+  // Ensure VerifiablePresentation exists in types
   const types = jsonld.getValues(presentation, 'type');
-
-  // check type presence
   if (!types.includes('VerifiablePresentation')) {
     throw new Error('"type" must include "VerifiablePresentation".');
   }
@@ -49,15 +48,19 @@ function checkPresentation(presentation) {
 export async function verifyPresentationCredentials(presentation, options = {}) {
   let verified = true;
   let credentialResults = [];
+
+  // Get presentation credentials
   const credentials = jsonld.getValues(presentation, 'verifiableCredential');
   if (credentials.length > 0) {
-    // verify every credential in `verifiableCredential`
+    // Verify all credentials in list
     credentialResults = await Promise.all(credentials.map((credential) => verifyCredential(credential, { ...options })));
 
+    // Assign credentialId property to all credential results
     for (const [i, credentialResult] of credentialResults.entries()) {
       credentialResult.credentialId = credentials[i].id;
     }
 
+    // Check all credentials passed verification
     const allCredentialsVerified = credentialResults.every((r) => r.verified);
     if (!allCredentialsVerified) {
       verified = false;
@@ -99,10 +102,15 @@ export async function verifyPresentationCredentials(presentation, options = {}) 
  * describe the error if any.
  */
 export async function verifyPresentation(presentation, options = {}) {
+  // Ensure presentation is passed
   if (!presentation) {
     throw new TypeError('"presentation" property is required');
   }
 
+  // Ensure presentation is valid
+  checkPresentation(presentation);
+
+  // Extract parameters
   const {
     challenge,
     domain,
@@ -112,9 +120,7 @@ export async function verifyPresentation(presentation, options = {}) {
     controller,
   } = options;
 
-  checkPresentation(presentation);
-
-  let result;
+  // Build verification options
   const verificationOptions = {
     suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
     documentLoader: defaultDocumentLoader(resolver),
@@ -126,39 +132,39 @@ export async function verifyPresentation(presentation, options = {}) {
   try {
     // Skip proof validation for unsigned
     if (unsignedPresentation) {
-      result = { verified, results: [presentation], credentialResults };
-    } else if (!verified) {
-      // early out incase credentials arent verified
-      result = { verified, results: [presentation], credentialResults };
-    } else {
-      // Get proof purpose
-      if (!presentationPurpose && !challenge) {
-        throw new Error(
-          'A "challenge" param is required for AuthenticationProofPurpose.',
-        );
-      }
-
-      const purpose = presentationPurpose || new AuthenticationProofPurpose({ controller, domain, challenge });
-      const presentationResult = await jsigs.verify(
-        presentation, { purpose, ...verificationOptions },
-      );
-
-      result = {
-        presentationResult,
-        credentialResults,
-        verified: verified && presentationResult.verified,
-        error: presentationResult.error,
-      };
+      return { verified, results: [presentation], credentialResults };
+    } if (!verified) {
+      // Early out incase credentials arent verified
+      return { verified, results: [presentation], credentialResults };
     }
+    // Get proof purpose
+    if (!presentationPurpose && !challenge) {
+      throw new Error(
+        'A "challenge" param is required for AuthenticationProofPurpose.',
+      );
+    }
+
+    // Set purpose and verify
+    const purpose = presentationPurpose || new AuthenticationProofPurpose({ controller, domain, challenge });
+    const presentationResult = await jsigs.verify(
+      presentation, { purpose, ...verificationOptions },
+    );
+
+    // Return results
+    return {
+      presentationResult,
+      credentialResults,
+      verified: verified && presentationResult.verified,
+      error: presentationResult.error,
+    };
   } catch (error) {
-    result = {
+    // Error occured when verifying presentation, catch and return error
+    return {
       verified: false,
       results: [{ verified: false, error }],
       error,
     };
   }
-
-  return result;
 }
 
 /**
@@ -169,23 +175,18 @@ export async function verifyPresentation(presentation, options = {}) {
  * @param {string} domain - proof domain (optional)
  * @param {DIDResolver} [resolver] - Resolver for DIDs.
  * @param {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
+ * @param {object} [presentationPurpose] - Optional presentation purpose to override default AuthenticationProofPurpose
  * @return {Promise<VerifiablePresentation>} A VerifiablePresentation with a proof.
  */
-export async function signPresentation(presentation, keyDoc, challenge, domain, resolver = null, compactProof = true) {
-  // TODO: support other purposes than the default of "authentication"
+export async function signPresentation(presentation, keyDoc, challenge, domain, resolver = null, compactProof = true, presentationPurpose = null) {
   const suite = getSuiteFromKeyDoc(keyDoc);
-  const options = {
-    suite,
-    domain,
-    challenge,
-    compactProof,
-  };
-
-  const purpose = options.purpose || new AuthenticationProofPurpose({
+  const purpose = presentationPurpose || new AuthenticationProofPurpose({
     domain,
     challenge,
   });
 
   const documentLoader = defaultDocumentLoader(resolver);
-  return jsigs.sign(presentation, { purpose, documentLoader, ...options });
+  return jsigs.sign(presentation, {
+    purpose, documentLoader, domain, challenge, compactProof, suite,
+  });
 }

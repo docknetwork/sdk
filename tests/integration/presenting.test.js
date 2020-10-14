@@ -12,12 +12,12 @@ import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
 import { generateEcdsaSecp256k1Keypair } from '../../src/utils/misc';
 import getKeyDoc from '../../src/utils/vc/helpers';
 import {
-  createPresentation,
   issueCredential,
   isVerifiedCredential,
   signPresentation,
   verifyPresentation,
 } from '../../src/utils/vc';
+import { createPresentation } from '../create-presentation';
 
 // Issuer's DID.
 const issuerDID = createNewDockDID();

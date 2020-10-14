@@ -1,4 +1,4 @@
-import { createPresentation, signPresentation, verifyPresentation } from './vc/presentations';
+import { signPresentation, verifyPresentation } from './vc/presentations';
 import { issueCredential, verifyCredential } from './vc/credentials';
 
 import {
@@ -55,7 +55,6 @@ export {
   expandJSONLD,
   verifyCredential,
   issueCredential,
-  createPresentation,
   signPresentation,
   verifyPresentation,
   isRevocationCheckNeeded,

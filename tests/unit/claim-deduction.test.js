@@ -18,9 +18,7 @@ import contexts from '../../src/utils/vc/contexts';
 import {
   EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
 } from '../../src/utils/vc/custom_crypto';
-import {
-  createPresentation,
-} from '../../src/utils/vc/presentations';
+import { createPresentation } from '../create-presentation';
 import network_cache from '../network-cache';
 
 /// global document cache, acts as a did method for the tests below

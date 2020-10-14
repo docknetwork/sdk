@@ -3,13 +3,14 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { DockAPI } from '../../src/api';
 import {
-  createPresentation,
   issueCredential,
   signPresentation, verifyCredential,
   verifyPresentation,
   expandJSONLD,
 } from '../../src/utils/vc';
+
 import { DockResolver } from '../../src/resolver';
+import { createPresentation } from '../create-presentation';
 
 import {
   KeyringPairDidKeys, OneOfPolicy,

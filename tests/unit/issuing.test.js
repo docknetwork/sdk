@@ -4,10 +4,10 @@ import mockAxios from '../mocks/axios';
 import {
   issueCredential,
   verifyCredential,
-  createPresentation,
   verifyPresentation,
   signPresentation,
 } from '../../src/utils/vc';
+import { createPresentation } from '../create-presentation';
 import VerifiableCredential from '../../src/verifiable-credential';
 import VerifiablePresentation from '../../src/verifiable-presentation';
 import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../../src/utils/misc';

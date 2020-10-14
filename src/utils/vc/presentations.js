@@ -112,9 +112,7 @@ export async function verifyPresentation(presentation, {
   controller = null,
 } = {}) {
   if (!presentation) {
-    throw new TypeError(
-      'A "presentation" property is required for verifying.',
-    );
+    throw new TypeError('"presentation" property is required',);
   }
 
   checkPresentation(presentation);
@@ -158,8 +156,8 @@ export async function verifyPresentation(presentation, {
 
         result = {
           presentationResult,
-          verified: verified && presentationResult.verified,
           credentialResults,
+          verified: verified && presentationResult.verified,
           error: presentationResult.error,
         };
       }
@@ -173,39 +171,6 @@ export async function verifyPresentation(presentation, {
   }
 
   return result;
-}
-
-/**
- * Create an unsigned Verifiable Presentation
- * @param {object|Array<object>} verifiableCredential - verifiable credential (or an array of them) to be bundled as a presentation.
- * @param {string} id - optional verifiable presentation id to use
- * @param {string} [holder] - optional presentation holder url
- * @return {object} verifiable presentation.
- */
-export function createPresentation(verifiableCredential, id, holder = null) {
-  const presentation = {
-    '@context': [DEFAULT_CONTEXT_V1_URL],
-    type: ['VerifiablePresentation'],
-  };
-
-  if (verifiableCredential) {
-    const credentials = [].concat(verifiableCredential);
-    // ensure all credentials are valid
-    for (const credential of credentials) {
-      checkCredential(credential);
-    }
-    presentation.verifiableCredential = credentials;
-  }
-  if (id) {
-    presentation.id = id;
-  }
-  if (holder) {
-    presentation.holder = holder;
-  }
-
-  checkPresentation(presentation);
-
-  return presentation;
 }
 
 /**

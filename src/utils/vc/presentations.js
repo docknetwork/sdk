@@ -11,6 +11,7 @@ import { getAndValidateSchemaIfPresent } from './schema';
 import {
   expandedCredentialProperty,
   credentialContextField,
+  DEFAULT_CONTEXT_V1_URL,
 } from './constants';
 
 import {
@@ -18,7 +19,6 @@ import {
 } from './custom_crypto';
 
 const { AuthenticationProofPurpose } = jsigs.purposes;
-const { constants: { CREDENTIALS_CONTEXT_V1_URL } } = require('credentials-context');
 
 /**
  * @typedef {object} VerifiablePresentation Representation of a Verifiable Presentation.
@@ -35,9 +35,9 @@ function checkPresentation(presentation) {
     ? presentation['@context'] : [presentation['@context']];
 
   // ensure first context is 'https://www.w3.org/2018/credentials/v1'
-  if (context[0] !== CREDENTIALS_CONTEXT_V1_URL) {
+  if (context[0] !== DEFAULT_CONTEXT_V1_URL) {
     throw new Error(
-      `"${CREDENTIALS_CONTEXT_V1_URL}" needs to be first in the `
+      `"${DEFAULT_CONTEXT_V1_URL}" needs to be first in the `
       + 'list of contexts.',
     );
   }
@@ -205,7 +205,7 @@ export async function verifyPresentation(presentation, {
  */
 export function createPresentation(verifiableCredential, id, holder = null) {
   const presentation = {
-    '@context': [CREDENTIALS_CONTEXT_V1_URL],
+    '@context': [DEFAULT_CONTEXT_V1_URL],
     type: ['VerifiablePresentation'],
   };
 

@@ -7,21 +7,12 @@ import { isRevocationCheckNeeded, checkRevocationStatus } from '../revocation';
 import DIDResolver from '../../did-resolver'; // eslint-disable-line
 
 import { getSuiteFromKeyDoc, expandJSONLD } from './helpers';
-
-import { credentialContextField } from './constants';
+import { DEFAULT_CONTEXT_V1_URL, credentialContextField } from './constants';
+import { ensureValidDatetime } from '../type-helpers';
 
 import {
   EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
 } from './custom_crypto';
-
-const { constants: { CREDENTIALS_CONTEXT_V1_URL } } = require('credentials-context');
-
-// TODO: use utils for this
-const dateRegex = new RegExp('^(\\d{4})-(0[1-9]|1[0-2])-'
-    + '(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):'
-    + '([0-5][0-9]):([0-5][0-9]|60)'
-    + '(\\.[0-9]+)?(Z|(\\+|-)([01][0-9]|2[0-3]):'
-    + '([0-5][0-9]))$', 'i');
 
 /**
  * @param {string|object} obj - Either an object with an id property
@@ -69,9 +60,9 @@ export function checkCredentialJSONLD(credential) {
 
 export function checkCredentialRequired(credential) {
   // ensure first context is 'https://www.w3.org/2018/credentials/v1'
-  if (credential['@context'][0] !== CREDENTIALS_CONTEXT_V1_URL) {
+  if (credential['@context'][0] !== DEFAULT_CONTEXT_V1_URL) {
     throw new Error(
-      `"${CREDENTIALS_CONTEXT_V1_URL}" needs to be first in the `
+      `"${DEFAULT_CONTEXT_V1_URL}" needs to be first in the `
       + 'list of contexts.',
     );
   }
@@ -96,10 +87,8 @@ export function checkCredentialRequired(credential) {
 }
 
 export function checkCredentialOptional(credential) {
-  if ('issuanceDate' in credential && !dateRegex.test(credential.issuanceDate)) {
-    throw new Error(
-      `"issuanceDate" must be a valid date: ${credential.issuanceDate}`,
-    );
+  if ('issuanceDate' in credential) {
+    ensureValidDatetime(credential.issuanceDate);
   }
 
   // check issuer is a URL
@@ -124,11 +113,8 @@ export function checkCredentialOptional(credential) {
   }
 
   // check expires is a date
-  if ('expirationDate' in credential
-      && !dateRegex.test(credential.expirationDate)) {
-    throw new Error(
-      `"expirationDate" must be a valid date: ${credential.expirationDate}`,
-    );
+  if ('expirationDate' in credential) {
+    ensureValidDatetime(credential.expirationDate);
   }
 }
 

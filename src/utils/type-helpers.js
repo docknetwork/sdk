@@ -86,4 +86,6 @@ export function ensureValidDatetime(datetime) {
   if (!dateRegex.test(datetime)) {
     throw new Error(`${datetime} needs to be a valid datetime.`);
   }
+
+  return true;
 }

@@ -2,15 +2,17 @@
  * Copyright (c) 2019-2020 Digital Bazaar, Inc. All rights reserved.
  */
 
-const jsonld = require('jsonld');
-const { AssertionProofPurpose } = require('jsonld-signatures').purposes;
+import jsonld from 'jsonld';
+import jsigs from 'jsonld-signatures';
+
+const { AssertionProofPurpose } = jsigs.purposes;
 
 /**
  * Creates a proof purpose that will validate whether or not the verification
  * method in a proof was authorized by its declared controller for the
  * proof's purpose.
  */
-class CredentialIssuancePurpose extends AssertionProofPurpose {
+export default class CredentialIssuancePurpose extends AssertionProofPurpose {
   /**
    * @param {object} options - The options to use.
    * @param {object} [options.controller] - The description of the controller,
@@ -71,11 +73,9 @@ class CredentialIssuancePurpose extends AssertionProofPurpose {
         );
       }
 
-      return { valid: true };
+      return { valid: true, error: null };
     } catch (error) {
       return { valid: false, error };
     }
   }
 }
-
-module.exports = CredentialIssuancePurpose;

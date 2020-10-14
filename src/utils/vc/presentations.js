@@ -1,6 +1,7 @@
 import jsonld from 'jsonld';
 import jsigs from 'jsonld-signatures';
 import { verifyCredential, checkCredential } from './credentials';
+import DIDResolver from '../../did-resolver'; // eslint-disable-line
 
 import defaultDocumentLoader from './document-loader';
 import { getSuiteFromKeyDoc, expandJSONLD } from './helpers';
@@ -15,8 +16,6 @@ import {
 import {
   EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
 } from './custom_crypto';
-
-import DIDResolver from '../../did-resolver'; // eslint-disable-line
 
 const { AuthenticationProofPurpose } = jsigs.purposes;
 const { constants: { CREDENTIALS_CONTEXT_V1_URL } } = require('credentials-context');
@@ -120,6 +119,7 @@ export async function verifyVCDM(presentation, options = {}) {
 * @property {object} [schemaApi] - An object representing a map. "schema type -> schema API". The API is used to get
 * a schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
 * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+* @property {object} [documentLoader] - A document loader, can be null and use the default
 */
 
 /**

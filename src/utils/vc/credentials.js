@@ -4,6 +4,7 @@ import CredentialIssuancePurpose from './CredentialIssuancePurpose';
 import defaultDocumentLoader from './document-loader';
 import { getAndValidateSchemaIfPresent } from './schema';
 import { isRevocationCheckNeeded, checkRevocationStatus } from '../revocation';
+import DIDResolver from '../../did-resolver'; // eslint-disable-line
 
 import { getSuiteFromKeyDoc, expandJSONLD } from './helpers';
 
@@ -179,6 +180,7 @@ async function verifyVCDM(credential, options = {}) {
 * @property {object} [schemaApi] - An object representing a map. "schema type -> schema API". The API is used to get
 * a schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
 * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+* @property {object} [documentLoader] - A document loader, can be null and use the default
 */
 
 /**

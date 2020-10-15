@@ -1,7 +1,7 @@
 // Utilities for doing basic operations with chain.
 
 import { Keyring } from '@polkadot/keyring';
-import { randomAsHex, cryptoWaitReady } from '@polkadot/util-crypto';
+import { randomAsHex, cryptoWaitReady, checkAddress } from '@polkadot/util-crypto';
 import { u8aToHex, formatBalance } from '@polkadot/util';
 import { isHexWithGivenByteSize, asDockAddress } from './codec';
 
@@ -13,13 +13,27 @@ const SYMBOL = 'DCK';
 
 // The methods below intentionally take an `ApiPromise` object to decouple from DockAPI.
 
+// Check if an address is valid
+export function validateAddress(address, network = 'test') {
+  if (network !== 'test' && network !== 'main') {
+    throw new Error('Network must be "test" or "main"');
+  }
+  const prfx = network === 'test' ? TESTNET_ADDR_PREFIX : MAINNET_ADDR_PREFIX;
+  const res = checkAddress(address, prfx);
+  if (res[0] === true) {
+    return true;
+  }
+  console.error(`Error while parsing address ${res[1]}`);
+  return false;
+}
+
 // Generate an account. If `secretUri` is not passed, a random one is generated
 export async function generateAccount({ secretUri, type = 'sr25519', network = 'test' }) {
   if (['ed25519', 'sr25519', 'ecdsa'].indexOf(type) === -1) {
     throw new Error(`${type} is not a valid type`);
   }
   if (network !== 'test' && network !== 'main') {
-    throw new Error('Network must be "test" or "main" or "dev"');
+    throw new Error('Network must be "test" or "main"');
   }
 
   if (secretUri === undefined) {

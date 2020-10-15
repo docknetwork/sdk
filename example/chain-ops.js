@@ -2,17 +2,35 @@ import assert from 'assert';
 import { DockAPI } from '../src/api';
 import {
   getLastBlock, getBlockNo, blockNumberToHash, getBlock, getBalance, getAllExtrinsicsFromBlock, getTransfersFromBlock,
-  getAllEventsFromBlock, getLastFinalizeBlock, generateAccount, transferMicroDock, transferDock,
+  getAllEventsFromBlock, getLastFinalizeBlock, generateAccount, transferMicroDock, transferDock, validateAddress,
 } from '../src/utils/chain-ops';
 
 require('dotenv').config();
 
 const { FullNodeEndpoint } = process.env;
 
+function validateAddresses() {
+  if (!validateAddress('3Fc793dfkwsiTpLNStqvXA5JapNyPrr5pQLngwifEB1zc8LG', 'main')) {
+    throw new Error('Cannot validate 3Fc793dfkwsiTpLNStqvXA5JapNyPrr5pQLngwifEB1zc8LG as mainnet address');
+  }
+
+  if (!validateAddress('375J3PbYjaD252gBAWVRfJwD5Hs7iQrHUDhGUGs2ujJgjsjX', 'test')) {
+    throw new Error('Cannot validate 375J3PbYjaD252gBAWVRfJwD5Hs7iQrHUDhGUGs2ujJgjsjX as testnet address');
+  }
+
+  if (validateAddress('3Fc793dfkwsiTpLNStqvXA5JapNyPrr5pQLngwifEB1zc8L', 'main')) {
+    throw new Error('Validated incorrect address 3Fc793dfkwsiTpLNStqvXA5JapNyPrr5pQLngwifEB1zc8L as mainnet address');
+  }
+
+  if (validateAddress('375J3PbYjaD252gBAWVRfJwD5Hs7iQrHUDhGUGs2ujJgjsX', 'test')) {
+    throw new Error('Validated incorrect address 375J3PbYjaD252gBAWVRfJwD5Hs7iQrHUDhGUGs2ujJgjsX as testnet address');
+  }
+}
+
 async function accountGenerationExamples() {
   // With random seed
   // @ts-ignore
-  const [uri1, address1] = await generateAccount({ type: 'ed25519', network: 'main' });
+  const [uri1, address1] = await generateAccount({ type: 'ed25519', network: 'test' });
   console.info(`Generated random seed ${uri1} for ed25519 account with address ${address1}`);
 
   // @ts-ignore
@@ -93,6 +111,8 @@ async function main() {
   await dock.init({
     address: FullNodeEndpoint,
   });
+
+  validateAddresses();
 
   await accountGenerationExamples();
 

@@ -52,7 +52,7 @@ describe('Composite claim soundness checker', () => {
     });
     expect(await verifyC(credential))
       .toHaveProperty('verified', true);
-    credential.issuanceDate = '2010-01-01T19:23:24Z';
+    credential.issuanceDate = "9010-01-01T19:23:24Z";
     expect(await verifyC(credential))
       .toHaveProperty('verified', false);
   });

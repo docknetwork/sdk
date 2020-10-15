@@ -125,12 +125,12 @@ export function docksToMicroDocks(amount) {
 }
 
 // Transfer tokens and return txn hash. Converts to mirco tokens first
-export async function transferDocks(api, senderKeypair, recipAddr, amount) {
-  return transferMicroDocks(api, senderKeypair, recipAddr, docksToMicroDocks(amount));
+export async function transferDock(api, senderKeypair, recipAddr, amount) {
+  return transferMicroDock(api, senderKeypair, recipAddr, docksToMicroDocks(amount));
 }
 
 // Transfer micro tokens and return txn hash.
-export async function transferMicroDocks(api, senderKeypair, recipAddr, amount) {
+export async function transferMicroDock(api, senderKeypair, recipAddr, amount) {
   checkValidMicroAmount(amount);
   const txn = api.tx.balances.transfer(recipAddr, amount);
   return await txn.signAndSend(senderKeypair);

@@ -254,7 +254,7 @@ const rules = [
 <p>You may ask &quot;So what's the difference? There is still only one issuer.&quot;</p>
 <p>By the primitive definition of &quot;trustworthiness&quot; written above, any claim made by a trustworthy issuer is true. did:example:issuer can claim whatever they want by issuing verifiable credentials. They can even claim that some other issuer is trustworthy. Together, the two rules defined in the above example implement a system analogous to TLS certificate chains with did:example:issuer as the single root authority.</p>
 <h2><a class="header" href="#proving-composite-claims" id="proving-composite-claims">Proving Composite Claims</a></h2>
-<p>As a Holder of verifiable credentials, you'll want to prove prove specific claims to a Verifier. If those claims are composite, you'll need to provide a deductive proof in your verifiable credentials presentation. This should be done after the presentation has been assembled. If the presentation is going to be signed, sign it <em>after</em> including the deductive proof.</p>
+<p>As a Holder of verifiable credentials, you'll want to prove specific claims to a Verifier. If those claims are composite, you'll need to provide a deductive proof in your verifiable credentials presentation. This should be done after the presentation has been assembled. If the presentation is going to be signed, sign it <em>after</em> including the deductive proof.</p>
 <pre><code class="language-js">import { proveCompositeClaims } from '@docknetwork/sdk/utils/cd';
 import jsonld from 'jsonld';
 

@@ -1,3 +1,5 @@
+import { BTreeMap } from '@polkadot/types';
+
 const MaxAllowedMigrations = 65535;
 
 class TokenMigration {
@@ -24,8 +26,19 @@ class TokenMigration {
     return this.asSudoIfNeeded(txn, asSudo);
   }
 
+  // Accepts recipients as an BtreeMap of address -> amount
   migrate(recipients) {
     return this.api.tx.migrationModule.migrate(recipients);
+  }
+
+  // Accepts recipients as an array of pairs, each pair is (address, amount)
+  migrateRecipAsList(recipients) {
+    // @ts-ignore
+    const recipMap = new BTreeMap();
+    recipients.sort().forEach(([address, amount]) => {
+      recipMap.set(address, amount);
+    });
+    return this.api.tx.migrationModule.migrate(recipMap);
   }
 
   async getMigrators() {

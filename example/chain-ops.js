@@ -1,8 +1,9 @@
 import assert from 'assert';
 import { DockAPI } from '../src/api';
 import {
-  getLastBlock, getBlockNo, blockNumberToHash, getBlock, getBalance, getAllExtrinsicsFromBlock, getTransfersFromBlock, getAllEventsFromBlock, getLastFinalizeBlock, generateAccount, transferMicroDocks, transferDocks,
-} from '../src/utils/chain_ops';
+  getLastBlock, getBlockNo, blockNumberToHash, getBlock, getBalance, getAllExtrinsicsFromBlock, getTransfersFromBlock,
+  getAllEventsFromBlock, getLastFinalizeBlock, generateAccount, transferMicroDock, transferDock,
+} from '../src/utils/chain-ops';
 
 require('dotenv').config();
 
@@ -79,11 +80,11 @@ async function doTokenTransfer(api) {
   const [, , keypair] = await generateAccount({ secretUri: '//Alice', type: 'sr25519', network: 'test' });
 
   // Transfer tokens
-  const txnHash = await transferDocks(api, keypair, recip, 2.5);
+  const txnHash = await transferDock(api, keypair, recip, 2.5);
   console.info(`Gave 2.5 Docks in transaction hash ${txnHash}`);
 
   // Transfer micro tokens
-  const txnHash1 = await transferMicroDocks(api, keypair, recip, 500);
+  const txnHash1 = await transferMicroDock(api, keypair, recip, 500);
   console.info(`Gave 500 microDocks in transaction hash ${txnHash1}`);
 }
 

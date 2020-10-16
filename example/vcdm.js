@@ -9,7 +9,7 @@ import { createRandomRegistryId, OneOfPolicy } from '../src/utils/revocation';
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 import getKeyDoc from '../src/utils/vc/helpers';
 import { DockResolver } from '../src/resolver';
-import { buildDockCredentialStatus } from '../src/utils/vc';
+import { buildDockCredentialStatus } from '../src/utils/revocation';
 
 // Both issuer and holder have DIDs
 const issuerDID = createNewDockDID();

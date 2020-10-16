@@ -1,13 +1,13 @@
-import { signPresentation, verifyPresentation } from './vc/presentations';
-import { issueCredential, verifyCredential } from './vc/credentials';
-import { expandJSONLD } from './vc/helpers';
+import { signPresentation, verifyPresentation } from './presentations';
+import { issueCredential, verifyCredential } from './credentials';
+import { expandJSONLD } from './helpers';
 
 import {
   RevRegType,
   DockRevRegQualifier,
   DEFAULT_TYPE,
   DEFAULT_CONTEXT,
-} from './vc/constants';
+} from './constants';
 
 /**
  * Check that credential is verified, i.e. the credential has VCDM compliant structure and the `proof`
@@ -32,15 +32,6 @@ export async function isVerifiedCredential(credential, params) {
 export async function isVerifiedPresentation(presentation, params) {
   const result = await verifyPresentation(presentation, params);
   return result.verified;
-}
-
-/**
- * Return `credentialStatus` according to W3C spec when the revocation status is checked on Dock
- * @param registryId - Revocation registry id
- * @returns {{id: string, type: string}}
- */
-export function buildDockCredentialStatus(registryId) {
-  return { id: `${DockRevRegQualifier}${registryId}`, type: RevRegType };
 }
 
 export {

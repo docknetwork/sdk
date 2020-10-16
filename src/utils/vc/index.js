@@ -34,6 +34,7 @@ export async function isVerifiedPresentation(presentation, params) {
   return result.verified;
 }
 
+// TODO: export more methods supplied in revocation/credentials
 export {
   expandJSONLD,
   verifyCredential,

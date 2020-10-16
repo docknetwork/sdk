@@ -8,6 +8,9 @@ import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
  * @return {Boolean} True if hex (with given size) else false
  */
 export function isHexWithGivenByteSize(value, byteSize = undefined) {
+  if (typeof value !== 'string') {
+    return false;
+  }
   const match = value.match(/^0x([0-9a-f]+$)/i);
   if (match && match.length > 1) {
     if (byteSize !== undefined) {
@@ -54,15 +57,17 @@ export function getHexIdentifier(id, qualifier, validate, byteSize) {
 /**
  * Convert address to Dock appropriate network address.
  * @param addr - address to convert
- * @param network - the network to use, allowed values are `main` and `test` corresponding to mainnet and testnet
+ * @param network - the network to use, allowed values are `main`, `test` and `dev` corresponding to mainnet, testnet and dev node
  */
 export function asDockAddress(addr, network = 'test') {
   switch (network) {
+    case 'dev':
+      return encodeAddress(addr, 42);
     case 'test':
       return encodeAddress(addr, 21);
     case 'main':
       return encodeAddress(addr, 22);
     default:
-      throw new Error(`Network can be either test or main but was passed as ${network}`);
+      throw new Error(`Network can be either test or main or dev but was passed as ${network}`);
   }
 }

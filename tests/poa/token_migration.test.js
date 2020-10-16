@@ -42,7 +42,7 @@ describe('Token migration', () => {
   test('Add migrator', async () => {
     let migrators = await sudoHandle.migrationModule.getMigrators();
     expect(migrators.length).toBe(0);
-    const txn = sudoHandle.migrationModule.addMigrator(charlie, 3, true);
+    const txn = sudoHandle.migrationModule.addMigrator(charlie, 6, true);
     await sudoHandle.signAndSend(txn, false);
     migrators = await queryHandle.migrationModule.getMigrators();
     expect(migrators.length).toBe(1);
@@ -76,6 +76,20 @@ describe('Token migration', () => {
     expect(daveBal2).toBe(daveBal1 + 200);
     expect(eveBal2).toBe(eveBal1 + 100);
     expect(ferdieBal2).toBe(ferdieBal1 + 300);
+
+    const recipList = [[dave, 100], [eve, 110], [ferdie, 120]];
+    const txn1 = charlieHandle.migrationModule.migrateRecipAsList(recipList);
+    await charlieHandle.signAndSend(txn1, false);
+
+    const charlieBal3 = parseInt(await getFreeBalance(queryHandle, charlie));
+    const daveBal3 = parseInt(await getFreeBalance(queryHandle, dave));
+    const eveBal3 = parseInt(await getFreeBalance(queryHandle, eve));
+    const ferdieBal3 = parseInt(await getFreeBalance(queryHandle, ferdie));
+
+    expect(charlieBal2).toBe(charlieBal3 + 100 + 110 + 120);
+    expect(daveBal3).toBe(daveBal2 + 100);
+    expect(eveBal3).toBe(eveBal2 + 110);
+    expect(ferdieBal3).toBe(ferdieBal2 + 120);
   }, 40000);
 
   afterAll(async (done) => {

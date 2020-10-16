@@ -1,17 +1,18 @@
 // Mock axios
 import mockAxios from '../mocks/axios';
-mockAxios();
 
 import {
   issueCredential,
   verifyCredential,
-  createPresentation,
   verifyPresentation,
   signPresentation,
-} from '../../src/utils/vc';
+} from '../../src/utils/vc/index';
+import { createPresentation } from '../create-presentation';
 import VerifiableCredential from '../../src/verifiable-credential';
 import VerifiablePresentation from '../../src/verifiable-presentation';
 import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../../src/utils/misc';
+
+mockAxios();
 
 // Test constants
 const controllerUrl = 'https://gist.githubusercontent.com/lovesh/312d407e3a16be0e7d5e43169e824958/raw';
@@ -126,7 +127,7 @@ describe('Verifiable Credential Issuing', () => {
   }, 30000);
 
   test('Credential With incorrect issuer should not pass validation.', async () => {
-    let keydoc = getSampleKey();
+    const keydoc = getSampleKey();
     keydoc.controller = 'did:rando:id';
     const credential = await issueCredential(keydoc, getSampleCredential());
     const result = await verifyCredential(credential);
@@ -175,7 +176,8 @@ describe('Verifiable Presentation creation', () => {
       },
     );
 
-
+    expect(results.verified).toBe(true);
+    expect(results.error).toBe(undefined);
     expect(results.presentationResult.verified).toBe(true);
     expect(results.presentationResult.results[0].proof['@context']).toBe('https://w3id.org/security/v2');
     expect(results.presentationResult.results[0].proof.type).toBe('EcdsaSecp256k1Signature2019');
@@ -186,12 +188,10 @@ describe('Verifiable Presentation creation', () => {
     expect(results.presentationResult.results[0].proof.proofPurpose).toBe('authentication');
     expect(results.presentationResult.results[0].proof.verificationMethod).toBe(keyUrl);
     expect(results.presentationResult.results[0].verified).toBe(true);
-    expect(results.verified).toBe(true);
     expect(results.credentialResults[0].verified).toBe(true);
     expect(results.credentialResults[0].results).toBeDefined();
     expect(results.credentialResults[1].verified).toBe(true);
     expect(results.credentialResults[1].results).toBeDefined();
-    expect(results.error).toBe(undefined);
   }, 30000);
 });
 
@@ -280,7 +280,6 @@ describe('Verifiable Credential incremental creation', () => {
       'VerifiableCredential',
       'some_type',
     ]);
-
 
     credential.addSubject({
       id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',

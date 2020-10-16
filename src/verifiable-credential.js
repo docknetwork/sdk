@@ -2,10 +2,14 @@ import {
   expandJSONLD,
   issueCredential,
   verifyCredential,
-  validateCredentialSchema,
   DEFAULT_CONTEXT,
   DEFAULT_TYPE,
-} from './utils/vc';
+} from './utils/vc/index';
+
+import {
+  validateCredentialSchema,
+} from './utils/vc/schema';
+
 import {
   ensureObjectWithId,
   isObject,

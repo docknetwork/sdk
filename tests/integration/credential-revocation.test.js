@@ -3,17 +3,20 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { DockAPI } from '../../src/api';
 import {
-  createPresentation,
-  DockRevRegQualifier, getDockRevIdFromCredential, issueCredential,
-  RevRegType,
+  issueCredential,
   signPresentation, verifyCredential,
   verifyPresentation,
   expandJSONLD,
-} from '../../src/utils/vc';
+} from '../../src/utils/vc/index';
+
 import { DockResolver } from '../../src/resolver';
+import { createPresentation } from '../create-presentation';
 
 import {
   KeyringPairDidKeys, OneOfPolicy,
+  DockRevRegQualifier,
+  getDockRevIdFromCredential,
+  RevRegType,
 } from '../../src/utils/revocation';
 import {
   getUnsignedCred,

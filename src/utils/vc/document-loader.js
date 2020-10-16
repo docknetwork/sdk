@@ -1,5 +1,5 @@
 import axios from 'axios';
-import testContext from './contexts';
+import cachedUris from './contexts';
 import DIDResolver from '../../did-resolver'; // eslint-disable-line
 
 /**
@@ -8,7 +8,7 @@ import DIDResolver from '../../did-resolver'; // eslint-disable-line
  * @param {DIDResolver} [resolver] - The resolver is optional but should be passed when DIDs need to be resolved.
  * @returns {loadDocument} - the returned function
  */
-export default function (resolver = null) {
+function documentLoader(resolver = null) {
   /**
    * Resolve a URI. If the URI is a DID, then the resolver is used to resolve it.
    * Else, the hardcoded contexts are used to resolve the URI and if that fails
@@ -23,9 +23,9 @@ export default function (resolver = null) {
       // Try to resolve a DID and throw if cannot resolve
       document = await resolver.resolve(uri);
     } else {
-      const context = testContext.get(uri);
-      if (context) {
-        document = context;
+      const cachedData = cachedUris.get(uri);
+      if (cachedData) {
+        document = cachedData;
       } else {
         const { data: doc } = await axios.get(uri);
         document = doc;
@@ -41,3 +41,5 @@ export default function (resolver = null) {
 
   return loadDocument;
 }
+
+export default documentLoader;

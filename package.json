@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -9,10 +9,6 @@
   },
   "engines": {
     "node": ">=13.0.0"
-  },
-  "resolutions": {
-    "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures",
-    "jsonld": "^2.0.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
@@ -55,6 +51,7 @@
     "upgrade_with_sudo": "npx babel-node scripts/runtime_upgrade_with_sudo.js",
     "onboard_with_sudo": "npx babel-node scripts/onboard_validator_with_sudo.js",
     "lint": "eslint \"{src,example}/**/*.js\"",
+    "lint-tests": "eslint \"{tests/unit,tests/integration}/**/*.js\"",
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "test": "jest --verbose ./tests/unit",
@@ -70,6 +67,10 @@
   },
   "jest": {
     "testEnvironment": "node"
+  },
+  "resolutions": {
+    "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures",
+    "jsonld": "2.0.2"
   },
   "dependencies": {
     "@polkadot/api": "2.1.1",
@@ -87,10 +88,9 @@
     "ethr-did-resolver": "^2.2.0",
     "js-sha256": "^0.9.0",
     "json-canonicalize": "^1.0.3",
-    "jsonld": "^2.0.2",
+    "jsonld": "2.0.2",
     "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures",
     "jsonschema": "^1.2.6",
-    "rify": "^0.4.0",
-    "vc-js": "latest"
+    "rify": "^0.4.0"
   }
 }

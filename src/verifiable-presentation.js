@@ -1,7 +1,7 @@
 import {
   signPresentation,
   verifyPresentation,
-} from './utils/vc';
+} from './utils/vc/index';
 
 import {
   ensureObjectWithId,

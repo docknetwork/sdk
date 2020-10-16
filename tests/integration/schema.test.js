@@ -8,7 +8,7 @@ import {
 } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
-import { verifyCredential, verifyPresentation } from '../../src/utils/vc';
+import { verifyCredential, verifyPresentation } from '../../src/utils/vc/index';
 import { blobHexIdToQualified, createNewDockBlobId, DockBlobIdByteSize } from '../../src/modules/blob';
 import Schema from '../../src/modules/schema';
 import VerifiableCredential from '../../src/verifiable-credential';

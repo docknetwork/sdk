@@ -1,8 +1,8 @@
-import vc from 'vc-js';
 import { Ed25519KeyPair, suites } from 'jsonld-signatures';
 import jsonld from 'jsonld';
 import axios from 'axios';
 import { randomAsHex } from '@polkadot/util-crypto';
+import check from '@polkadot/util-crypto/address/check';
 import {
   expandedLogicProperty,
   acceptCompositeClaims,
@@ -11,11 +11,17 @@ import {
   presentationToEEClaimGraph,
   proveCompositeClaims,
 } from '../../src/utils/cd';
+import {
+  issueCredential,
+  verifyPresentation,
+  verifyCredential,
+} from '../../src/utils/vc/index';
 import { claims } from '../../src/utils/claimgraph';
 import contexts from '../../src/utils/vc/contexts';
 import {
   EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
 } from '../../src/utils/vc/custom_crypto';
+import { createPresentation } from '../create-presentation';
 import network_cache from '../network-cache';
 
 /// global document cache, acts as a did method for the tests below
@@ -45,14 +51,10 @@ describe('Composite claim soundness checker', () => {
         alumniOf: 'Example University',
       },
     };
-    const credential = await vc.issue({
-      credential: cred,
-      suite: kp,
-      documentLoader,
-    });
+    const credential = await issueCredential(kp, cred, true, documentLoader);
     expect(await verifyC(credential))
       .toHaveProperty('verified', true);
-    credential.issuanceDate = "9010-01-01T19:23:24Z";
+    credential.issuanceDate = '9010-01-01T19:23:24Z';
     expect(await verifyC(credential))
       .toHaveProperty('verified', false);
   });
@@ -78,20 +80,12 @@ describe('Composite claim soundness checker', () => {
     });
 
     expect(await verifyC(
-      await vc.issue({
-        credential: cred(),
-        suite: kpa,
-        documentLoader,
-      }),
+      await issueCredential(kpa, cred(), true, documentLoader),
     )).toHaveProperty('verified', true);
 
     let err;
     err = await verifyC(
-      await vc.issue({
-        credential: cred(),
-        suite: kpb, // signing a key not associated with issuera
-        documentLoader,
-      }),
+      await issueCredential(kpb, cred(), true, documentLoader),
     );
     expect(err).toHaveProperty('verified', false);
     expect(err.results[0].error.toString())
@@ -100,11 +94,7 @@ describe('Composite claim soundness checker', () => {
     // modify the attackers keydoc to point assert it's controller is issuera
     documentRegistry[`${issuerb}#keys-1`].controller = issuera;
     err = await verifyC(
-      await vc.issue({
-        credential: cred(),
-        suite: kpb, // signing a key not associated with issuera
-        documentLoader,
-      }),
+      await issueCredential(kpb, cred(), true, documentLoader),
     );
     expect(err).toHaveProperty('verified', false);
     expect(err.results[0].error.toString()).toMatch(/not authorized by controller/);
@@ -424,45 +414,38 @@ describe('Composite claim soundness checker', () => {
     };
     const rules = [gorg, licensing, licenses];
 
-    const joe_is_a_pig = await vc.issue({
-      credential: {
-        '@context': ['https://www.w3.org/2018/credentials/v1'],
-        id: 'https://example.com/credentials/1872',
-        type: ['VerifiableCredential'],
-        issuer: pigchecker,
-        issuanceDate: '2010-01-01T19:23:24Z',
-        credentialSubject: {
-          '@id': 'did:example:joe',
-          '@type': 'https://example.com/Pig',
-        },
+    const joe_is_a_pig = await issueCredential(pigchecker_kp, {
+      '@context': ['https://www.w3.org/2018/credentials/v1'],
+      id: 'https://example.com/credentials/1872',
+      type: ['VerifiableCredential'],
+      issuer: pigchecker,
+      issuanceDate: '2010-01-01T19:23:24Z',
+      credentialSubject: {
+        '@id': 'did:example:joe',
+        '@type': 'https://example.com/Pig',
       },
-      suite: pigchecker_kp,
-      documentLoader,
-    });
-    const joe_can_fly = await vc.issue({
-      credential: {
-        '@context': ['https://www.w3.org/2018/credentials/v1'],
-        id: 'https://example.com/credentials/1872',
-        type: ['VerifiableCredential'],
-        issuer: faa,
-        issuanceDate: '2010-01-01T19:23:24Z',
-        credentialSubject: {
-          '@id': 'did:example:joe',
-          'https://example.com/Ability': { '@id': 'https://example.com/Flight' },
-        },
-      },
-      suite: faa_kp,
-      documentLoader,
-    });
+    }, true, documentLoader);
 
-    const presentation = await vc.createPresentation({
-      verifiableCredential: [
+    const joe_can_fly = await issueCredential(faa_kp, {
+      '@context': ['https://www.w3.org/2018/credentials/v1'],
+      id: 'https://example.com/credentials/1872',
+      type: ['VerifiableCredential'],
+      issuer: faa,
+      issuanceDate: '2010-01-01T19:23:24Z',
+      credentialSubject: {
+        '@id': 'did:example:joe',
+        'https://example.com/Ability': { '@id': 'https://example.com/Flight' },
+      },
+    }, true, documentLoader);
+
+    const presentation = createPresentation(
+      [
         joe_can_fly,
         joe_is_a_pig,
       ],
-      id: 'uuid:ce0d9145-934a-42b3-aa48-af1d27f33c2a',
-      holder: 'uuid:078644cf-de19-436c-9691-fbe8a569a1d4',
-    });
+      'uuid:ce0d9145-934a-42b3-aa48-af1d27f33c2a',
+      'uuid:078644cf-de19-436c-9691-fbe8a569a1d4',
+    );
 
     // create a proof that bddap is Gorgadon
     const presentation_claimgraph = await presentationToEEClaimGraph(
@@ -562,8 +545,7 @@ function randoDID() {
 }
 
 async function verifyC(credential) {
-  return await vc.verifyCredential({
-    credential,
+  return await verifyCredential(credential, {
     suite: [
       new Ed25519Signature2018(),
       new EcdsaSepc256k1Signature2019(),
@@ -574,8 +556,7 @@ async function verifyC(credential) {
 }
 
 async function verifyP(presentation) {
-  return await vc.verify({
-    presentation,
+  return await verifyPresentation(presentation, {
     suite: [
       new Ed25519Signature2018(),
       new EcdsaSepc256k1Signature2019(),
@@ -617,11 +598,7 @@ async function validCredential() {
       alumniOf: 'Example University',
     },
   };
-  const credential = await vc.issue({
-    credential: cred,
-    suite: kp,
-    documentLoader,
-  });
+  const credential = await issueCredential(kp, cred, true, documentLoader);
   expect(await verifyC(credential))
     .toHaveProperty('verified', true);
   return credential;
@@ -631,9 +608,7 @@ async function validCredential() {
 async function validPresentation() {
   const creds = [await validCredential()];
   const { did: holder } = await newDid();
-  const presentation = vc.createPresentation({
-    verifiableCredential: creds, id: `urn:${randomAsHex(16)}`, holder,
-  });
+  const presentation = createPresentation(creds, `urn:${randomAsHex(16)}`, holder);
   expect(await verifyP(presentation))
     .toHaveProperty('verified', true);
   return presentation;

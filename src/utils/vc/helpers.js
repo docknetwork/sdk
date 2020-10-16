@@ -1,4 +1,10 @@
+import jsonld from 'jsonld';
 import { getPublicKeyFromKeyringPair } from '../misc';
+
+import {
+  EcdsaSecp256k1VerKeyName, Ed25519VerKeyName, Sr25519VerKeyName,
+  EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
+} from './custom_crypto';
 
 /**
  * @typedef {object} KeyDoc The Options to use in the function createUser.
@@ -25,4 +31,44 @@ export default function getKeyDoc(did, keypair, type) {
     keypair,
     publicKey: getPublicKeyFromKeyringPair(keypair),
   };
+}
+
+/**
+ * Get signature suite from a keyDoc
+ * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
+ * @returns {object} - signature suite.
+ */
+export function getSuiteFromKeyDoc(keyDoc) {
+  // Check if passing suite directly
+  if (keyDoc.verificationMethod) {
+    return keyDoc;
+  }
+
+  let Cls;
+  switch (keyDoc.type) {
+    case EcdsaSecp256k1VerKeyName:
+      Cls = EcdsaSepc256k1Signature2019;
+      break;
+    case Ed25519VerKeyName:
+      Cls = Ed25519Signature2018;
+      break;
+    case Sr25519VerKeyName:
+      Cls = Sr25519Signature2020;
+      break;
+    default:
+      throw new Error(`Unknown key type ${keyDoc.type}.`);
+  }
+  return new Cls({
+    ...keyDoc,
+    verificationMethod: keyDoc.id,
+  });
+}
+
+/**
+ * Helper method to ensure credential is valid according to the context
+ * @param credential
+ */
+export async function expandJSONLD(credential) {
+  const expanded = await jsonld.expand(credential);
+  return expanded[0];
 }

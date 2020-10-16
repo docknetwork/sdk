@@ -1,3 +1,6 @@
+// Mock axios
+import mockAxios from '../mocks/axios';
+
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 
 import VerifiableCredential from '../../src/verifiable-credential';
@@ -6,10 +9,16 @@ import { DockBlobQualifier } from '../../src/modules/blob';
 import { createNewDockDID } from '../../src/utils/did';
 
 import {
-  validateCredentialSchema,
-  expandedSubjectProperty,
   expandJSONLD,
-} from '../../src/utils/vc';
+} from '../../src/utils/vc/helpers';
+
+import {
+  validateCredentialSchema,
+} from '../../src/utils/vc/schema';
+
+import {
+  expandedSubjectProperty,
+} from '../../src/utils/vc/constants';
 
 import exampleCredential from '../example-credential';
 import exampleSchema from '../example-schema';
@@ -34,7 +43,7 @@ describe('VerifiableCredential Tests', () => {
   test('VerifiableCredential\'s validateSchema should validate the credentialSubject with given JSON schema.', async () => {
     const result = await vc.validateSchema(exampleSchema);
     expect(result).toBe(true);
-  }, 7000);
+  }, 10000);
 });
 
 describe('Basic Schema Tests', () => {

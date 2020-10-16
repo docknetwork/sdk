@@ -1,3 +1,6 @@
+// Mock axios
+import mockAxios from '../mocks/axios';
+
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 
 import VerifiableCredential from '../../src/verifiable-credential';
@@ -40,7 +43,7 @@ describe('VerifiableCredential Tests', () => {
   test('VerifiableCredential\'s validateSchema should validate the credentialSubject with given JSON schema.', async () => {
     const result = await vc.validateSchema(exampleSchema);
     expect(result).toBe(true);
-  }, 7000);
+  }, 10000);
 });
 
 describe('Basic Schema Tests', () => {

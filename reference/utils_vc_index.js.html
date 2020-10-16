@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: utils/vc/crypto/Sr25519Signature2020.js</title>
+    <title>JSDoc: Source: utils/vc/index.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: utils/vc/crypto/Sr25519Signature2020.js</h1>
+    <h1 class="page-title">Source: utils/vc/index.js</h1>
 
     
 
@@ -26,42 +26,50 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import { suites } from 'jsonld-signatures';
-import { Sr25519SigName, Sr25519VerKeyName } from './constants';
-import Sr25519VerificationKey2020 from './Sr25519VerificationKey2020';
+            <pre class="prettyprint source linenums"><code>import { signPresentation, verifyPresentation } from './presentations';
+import { issueCredential, verifyCredential } from './credentials';
+import { expandJSONLD } from './helpers';
 
-export default class Sr25519Signature2020 extends suites.JwsLinkedDataSignature {
-  /**
-   * Creates a new Sr25519Signature2020 instance
-   * @constructor
-   * @param {object} config - Configuration options
-   */
-  constructor({
-    keypair, verificationMethod,
-  } = {}) {
-    super({
-      type: Sr25519SigName,
-      alg: 'EdDSA',
-      LDKeyClass: Sr25519VerificationKey2020,
-      verificationMethod,
-      signer: Sr25519Signature2020.signerFactory(keypair),
-    });
-    this.requiredKeyType = Sr25519VerKeyName;
-  }
+import {
+  DEFAULT_TYPE,
+  DEFAULT_CONTEXT,
+} from './constants';
 
-  /**
-   * Generate object with `sign` method
-   * @param keypair
-   * @returns {object}
-   */
-  static signerFactory(keypair) {
-    return {
-      async sign({ data }) {
-        return keypair.sign(data);
-      },
-    };
-  }
+/**
+ * Check that credential is verified, i.e. the credential has VCDM compliant structure and the `proof`
+ * (signature by issuer) is correct.
+ * @param {object} [credential] The credential to verify
+ * @param {object} [params] Verify parameters (TODO: add type info for this object)
+ * @returns {Promise&lt;boolean>} Returns promise that resolves to true if credential is valid and not revoked and false otherwise
+ */
+export async function isVerifiedCredential(credential, params) {
+  const result = await verifyCredential(credential, params);
+  return result.verified;
 }
+
+/**
+ * Check that presentation is verified, i.e. the presentation and credentials have VCDM compliant structure and
+ * the `proof` (signature by holder) is correct.
+ * @param {object} [params] Verify parameters (TODO: add type info for this object)
+ * @returns {Promise&lt;boolean>} - Returns promise that resolves to true if the
+ * presentation is valid and all the credentials are valid and not revoked and false otherwise. The `error` will
+ * describe the error if any.
+ */
+export async function isVerifiedPresentation(presentation, params) {
+  const result = await verifyPresentation(presentation, params);
+  return result.verified;
+}
+
+// TODO: export more methods supplied in revocation/credentials
+export {
+  expandJSONLD,
+  verifyCredential,
+  issueCredential,
+  signPresentation,
+  verifyPresentation,
+  DEFAULT_TYPE,
+  DEFAULT_CONTEXT,
+};
 </code></pre>
         </article>
     </section>

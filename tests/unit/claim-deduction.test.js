@@ -244,7 +244,7 @@ describe('Composite claim soundness checker', () => {
         { Iri: 'https://example.com/b' },
       ],
     ]);
-  });
+  }, 30000);
 
   // Soundness checking fails if and only if one of the following conditions occurs:
   // - Proof assumes claims not attested to by the provided credentials and is therefore not verifiable.
@@ -486,7 +486,7 @@ describe('Composite claim soundness checker', () => {
     expect(await checkSoundness(presentation, rules)).not.toContainEqual(compositeClaim);
     presentation[expandedLogicProperty] = proof;
     expect(await checkSoundness(presentation, rules)).toContainEqual(compositeClaim);
-  });
+  }, 30000);
 });
 
 // takes a verifiable presentation and rules, returns all claims which are known to be true under

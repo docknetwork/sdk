@@ -69,8 +69,7 @@
     "testEnvironment": "node"
   },
   "resolutions": {
-    "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures",
-    "jsonld": "2.0.2"
+    "jsonld": "3.2.0"
   },
   "dependencies": {
     "@polkadot/api": "2.1.1",
@@ -88,7 +87,7 @@
     "ethr-did-resolver": "^2.2.0",
     "js-sha256": "^0.9.0",
     "json-canonicalize": "^1.0.3",
-    "jsonld": "2.0.2",
+    "jsonld": "3.2.0",
     "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures",
     "jsonschema": "^1.2.6",
     "rify": "^0.4.0"

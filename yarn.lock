@@ -4905,7 +4905,7 @@ json5@^2.1.2:
   dependencies:
     minimist "^1.2.5"
 
-"jsonld-signatures@https://github.com/docknetwork/jsonld-signatures#upgrade-jsonld":
+"jsonld-signatures@https://github.com/docknetwork/jsonld-signatures":
   version "6.0.2-0"
   resolved "https://github.com/docknetwork/jsonld-signatures#ac2ac67412a10023c3347381b214a97ed33c7ca8"
   dependencies:

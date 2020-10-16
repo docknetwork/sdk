@@ -16,7 +16,7 @@ import {
   isVerifiedCredential,
   signPresentation,
   verifyPresentation,
-} from '../../src/utils/vc';
+} from '../../src/utils/vc/index';
 import { createPresentation } from '../create-presentation';
 
 // Issuer's DID.

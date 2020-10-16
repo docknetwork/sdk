@@ -4,7 +4,7 @@ import {
   verifyCredential,
   DEFAULT_CONTEXT,
   DEFAULT_TYPE,
-} from './utils/vc';
+} from './utils/vc/index';
 
 import {
   validateCredentialSchema,

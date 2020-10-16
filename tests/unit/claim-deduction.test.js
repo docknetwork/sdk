@@ -15,7 +15,7 @@ import {
   issueCredential,
   verifyPresentation,
   verifyCredential,
-} from '../../src/utils/vc';
+} from '../../src/utils/vc/index';
 import { claims } from '../../src/utils/claimgraph';
 import contexts from '../../src/utils/vc/contexts';
 import {

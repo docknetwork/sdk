@@ -3,8 +3,6 @@ import { issueCredential, verifyCredential } from './credentials';
 import { expandJSONLD } from './helpers';
 
 import {
-  RevRegType,
-  DockRevRegQualifier,
   DEFAULT_TYPE,
   DEFAULT_CONTEXT,
 } from './constants';

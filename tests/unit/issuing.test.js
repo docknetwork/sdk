@@ -6,7 +6,7 @@ import {
   verifyCredential,
   verifyPresentation,
   signPresentation,
-} from '../../src/utils/vc';
+} from '../../src/utils/vc/index';
 import { createPresentation } from '../create-presentation';
 import VerifiableCredential from '../../src/verifiable-credential';
 import VerifiablePresentation from '../../src/verifiable-presentation';

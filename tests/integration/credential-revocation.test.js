@@ -7,7 +7,7 @@ import {
   signPresentation, verifyCredential,
   verifyPresentation,
   expandJSONLD,
-} from '../../src/utils/vc';
+} from '../../src/utils/vc/index';
 
 import { DockResolver } from '../../src/resolver';
 import { createPresentation } from '../create-presentation';

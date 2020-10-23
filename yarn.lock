@@ -1963,6 +1963,11 @@ bip39@^3.0.2:
     pbkdf2 "^3.0.9"
     randombytes "^2.0.1"
 
+blake2s-js@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/blake2s-js/-/blake2s-js-1.3.0.tgz#ebbe068c3277077f68b6ab40914b63f6b83d367f"
+  integrity sha512-+H4oLkODOSeDfDD11PxaZ3Gqi9mtr0QribQRPkQ+v29ZQ689mK/rk5hUVtEjgh3Vq8c4uHPALV0rWjfC6ygrug==
+
 blakejs@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/blakejs/-/blakejs-1.1.0.tgz#69df92ef953aa88ca51a32df6ab1c54a155fc7a5"
@@ -5319,6 +5324,11 @@ move-concurrently@^1.0.1:
     mkdirp "^0.5.1"
     rimraf "^2.5.4"
     run-queue "^1.0.3"
+
+mrklt@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/mrklt/-/mrklt-0.1.0.tgz#dec0e4f6cc930fc9bafeee9df965a58a3d69fe36"
+  integrity sha512-vm3GYrla7IWGf8PqwBadqFiBQBtZ0+ZU3G3zwG3KYtPLff5YWXemyodit/HkVRMg7LkM0BNiS2ZzG4uenTh0tw==
 
 ms@2.0.0:
   version "2.0.0"

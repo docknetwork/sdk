@@ -27,6 +27,7 @@ import { compute_root, create_proof, verify_proof } from 'mrklt';
 import assert from 'assert';
 import { connect, keypair } from '../scripts/helpers';
 import BLAKE2s from 'blake2s-js';
+import BLAKE2b from 'blake2b';
 import { randomAsU8a } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
 
@@ -34,22 +35,44 @@ require('dotenv').config();
 const { FullNodeEndpoint, TestAccountURI } = process.env;
 let conn = connect(FullNodeEndpoint);
 
+async function main() {
+  // batched
+  const docHashes = [
+    utf8('{"example": "document"}'),
+    utf8('{"example": 2}'),
+    randomAsU8a(),
+    utf8('{"example": 4}'),
+  ].map(blake2s);
+  const proofs = await anchorBatched(docHashes);
+  assert(await checkBatched(docHashes[0], proofs[0]) !== null);
+  assert(await checkBatched(docHashes[0], proofs[1]) === null);
+
+  // single
+  const single = blake2s(randomAsU8a());
+  assert(await checkBatched(single, []) === null);
+  await anchorBatched([single]);
+  assert(await checkBatched(single, []) !== null);
+}
+
 // Post a value to the anchors module.
 async function anchor(hash) {
   const nc = await conn;
-  await sendExtrinsic(
-    await signExtrinsic(
-      nc.tx.anchor.deploy(u8aToHex(hash))
-    )
-  );
+  await signExtrinsic(nc.tx.anchor.deploy(u8aToHex(hash)))
+    .then(sendExtrinsic);
+  assert((await check(hash)) !== null);
 }
 
 // Check to see at which block a value was anchored. Return the block when the hash was
 // anchored. If the value is not anchored, return null.
 async function check(hash) {
   const nc = await conn;
-  await nc.query.anchor.anchors(u8aToHex(hash));
-  unimplemented();
+  let opt = await nc.query.anchor.anchors(u8aToHex(blake2b256(hash)));
+  assert(opt.isNone ^ opt.isSome);
+  if (opt.isNone) {
+    return null;
+  } else {
+    return opt.unwrap().toNumber();
+  }
 }
 
 // Anchor a list of hashes to the chain as a batch. Return merkle proofs for each anchor
@@ -85,6 +108,13 @@ function blake2s(bs) {
   return h.digest();
 }
 
+// hash a byte array using blake2b-256
+function blake2b256(bs) {
+  let h = BLAKE2b(32);
+  h.update(bs);
+  return h.digest();
+}
+
 // pack a list of hashed leaves into a single byte array
 function pack32(leaves) {
   for (const leaf of leaves) {
@@ -94,25 +124,6 @@ function pack32(leaves) {
   let ret = new Uint8Array(leaves.map(a => [...a]).flat());
   assert(ret.length === leaves.length * 32);
   return ret;
-}
-
-async function main() {
-  // batched
-  const docHashes = [
-    utf8('{"example": "document"}'),
-    utf8('{"example": 2}'),
-    randomAsU8a(),
-    utf8('{"example": 4}'),
-  ].map(blake2s);
-  const proofs = await anchorBatched(docHashes);
-  assert(await checkBatched(docHashes[0], proofs[0]) !== null);
-  assert(await checkBatched(docHashes[0], proofs[1]) === null);
-
-  // single
-  const single = blake2s(randomAsU8a());
-  assert(await checkBatched(single, []) === null);
-  await anchorBatched([single]);
-  assert(await checkBatched(single, []) !== null);
 }
 
 // MUTATING
@@ -129,7 +140,7 @@ async function sendExtrinsic(extrinsic) {
     try {
       let unsubFunc = null;
       return extrinsic.send(({ events = [], status }) => {
-        if (status.isInBlock) {
+        if (status.isFinalized) {
           unsubFunc();
           resolve({
             events,

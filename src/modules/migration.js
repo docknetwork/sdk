@@ -1,4 +1,5 @@
 import { BTreeMap } from '@polkadot/types';
+import { bnToBn } from '@polkadot/util';
 
 const MaxAllowedMigrations = 65535;
 
@@ -31,12 +32,26 @@ class TokenMigration {
     return this.api.tx.migrationModule.migrate(recipients);
   }
 
-  // Accepts recipients as an array of pairs, each pair is (address, amount)
+  // Accepts recipients as an array of pairs, each pair is (address, amount). Amount can either be a safe JS integer
+  // or a string which will be expected in decimal format. If an address is repeated, its intended amounts are added.
   migrateRecipAsList(recipients) {
     // @ts-ignore
     const recipMap = new BTreeMap();
     recipients.sort().forEach(([address, amount]) => {
-      recipMap.set(address, amount);
+      const existingVal = recipMap.get(address);
+      let value = amount;
+      if (existingVal !== undefined) {
+        // The list in argument repeated addresses. Convert both existing and new values to big number and add.
+        // An alternative could be trying to parse both as either safe integer (`Number.isSafeInteger`) and then checking
+        // if no overflow happens on add and if it does then try to convert to BN
+        const newVal = bnToBn(amount);
+        // @ts-ignore
+        const oldVal = bnToBn(existingVal);
+        const sum = newVal.add(oldVal);
+        // Convert to string decimal representation.
+        value = sum.toString();
+      }
+      recipMap.set(address, value);
     });
     return this.api.tx.migrationModule.migrate(recipMap);
   }

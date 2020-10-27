@@ -41,11 +41,11 @@ describe('Token migration', () => {
 
   test('Add migrator', async () => {
     let migrators = await sudoHandle.migrationModule.getMigrators();
-    expect(migrators.length).toBe(0);
-    const txn = sudoHandle.migrationModule.addMigrator(charlie, 6, true);
+    const initialMigratorCount = migrators.length;
+    const txn = sudoHandle.migrationModule.addMigrator(charlie, 10, true);
     await sudoHandle.signAndSend(txn, false);
     migrators = await queryHandle.migrationModule.getMigrators();
-    expect(migrators.length).toBe(1);
+    expect(migrators.length).toBe(initialMigratorCount + 1);
   }, 20000);
 
   test('Migrate', async () => {
@@ -58,11 +58,11 @@ describe('Token migration', () => {
     // @ts-ignore
     const recip1 = new BTreeMap();
     // @ts-ignore
-    recip1.set(ferdie, 300);
+    recip1.set(ferdie, '300');
     // @ts-ignore
-    recip1.set(dave, 200);
+    recip1.set(dave, '200');
     // @ts-ignore
-    recip1.set(eve, 100);
+    recip1.set(eve, '100');
 
     const txn = charlieHandle.migrationModule.migrate(recip1);
     await charlieHandle.signAndSend(txn, false);
@@ -77,7 +77,7 @@ describe('Token migration', () => {
     expect(eveBal2).toBe(eveBal1 + 100);
     expect(ferdieBal2).toBe(ferdieBal1 + 300);
 
-    const recipList = [[dave, 100], [eve, 110], [ferdie, 120]];
+    const recipList = [[dave, '100'], [eve, '110'], [ferdie, '120']];
     const txn1 = charlieHandle.migrationModule.migrateRecipAsList(recipList);
     await charlieHandle.signAndSend(txn1, false);
 
@@ -90,6 +90,20 @@ describe('Token migration', () => {
     expect(daveBal3).toBe(daveBal2 + 100);
     expect(eveBal3).toBe(eveBal2 + 110);
     expect(ferdieBal3).toBe(ferdieBal2 + 120);
+
+    const recipListWithRepeatedAddreses = [[dave, '100'], [eve, 110], [dave, '400'], [dave, '500'], [dave, 1000], [ferdie, '120'], [ferdie, 300]];
+    const txn2 = charlieHandle.migrationModule.migrateRecipAsList(recipListWithRepeatedAddreses);
+    await charlieHandle.signAndSend(txn2, false);
+
+    const charlieBal4 = parseInt(await getFreeBalance(queryHandle, charlie));
+    const daveBal4 = parseInt(await getFreeBalance(queryHandle, dave));
+    const eveBal4 = parseInt(await getFreeBalance(queryHandle, eve));
+    const ferdieBal4 = parseInt(await getFreeBalance(queryHandle, ferdie));
+
+    expect(charlieBal3).toBe(charlieBal4 + 100 + 110 + 400 + 500 + 1000 + 120 + 300);
+    expect(daveBal4).toBe(daveBal3 + 2000);
+    expect(eveBal4).toBe(eveBal3 + 110);
+    expect(ferdieBal4).toBe(ferdieBal3 + 420);
   }, 40000);
 
   afterAll(async (done) => {

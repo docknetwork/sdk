@@ -49,7 +49,7 @@ export async function validatorChange(dock, argv, func, senderAccountUri) {
  * @param {*} txs
  * @param {*} senderAddress
  */
-export async function sendBatch(dock, txs, senderAddress, waitForFinalization = true) {
+export async function sendBatch(dock, txs, senderAddress, waitForFinalization = false) {
   const txBatch = dock.api.tx.utility.batch(txs);
   console.log(`Batch size is ${txBatch.encodedLength}`);
   console.info(`Payment info of batch is ${(await txBatch.paymentInfo(senderAddress))}`);

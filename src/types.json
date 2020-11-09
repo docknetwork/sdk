@@ -79,6 +79,7 @@
   "EpochLen": "u32",
   "SlotNo": "u64",
   "Balance": "u64",
+  "BlockNumber": "u32",
   "EpochDetail": {
     "validator_count": "u8",
     "starting_slot": "SlotNo",
@@ -91,6 +92,11 @@
     "block_count": "EpochLen",
     "locked_reward": "Option<Balance>",
     "unlocked_reward": "Option<Balance>"
+  },
+  "Bonus": {
+    "total_locked_bonus": "Balance",
+    "swap_bonuses": "Vec<(Balance, BlockNumber)>",
+    "vesting_bonuses": "Vec<(Balance, Balance, u32)>"
   },
   "Payload": {
     "proposal": "Vec<u8>",

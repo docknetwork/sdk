@@ -27,6 +27,16 @@ class TokenMigration {
     return this.asSudoIfNeeded(txn, asSudo);
   }
 
+  setVestingStart(start, asSudo = false) {
+    const txn = this.module.setVestingStart(start);
+    return this.asSudoIfNeeded(txn, asSudo);
+  }
+
+  setVestingEnd(end, asSudo = false) {
+    const txn = this.module.setVestingEnd(end);
+    return this.asSudoIfNeeded(txn, asSudo);
+  }
+
   // Accepts recipients as an BtreeMap of address -> amount
   migrate(recipients) {
     return this.api.tx.migrationModule.migrate(recipients);
@@ -56,8 +66,55 @@ class TokenMigration {
     return this.api.tx.migrationModule.migrate(recipMap);
   }
 
+  // swapBonuses should be an array of arrays with each inner array of size 3 where first item is recipient account, 2nd item is bonus amount and 3rd item is offset (u32)
+  // vestingBonuses should be an array of arrays with each inner array of size 3 where first item is recipient account, 2nd item is bonus amount and 3rd item is offset (u32)
+  giveBonuses(swapBonuses, vestingBonuses) {
+    return this.api.tx.migrationModule.giveBonuses(swapBonuses, vestingBonuses);
+  }
+
+  // Claim bonus for itself
+  claimBonus() {
+    return this.api.tx.migrationModule.claimBonus();
+  }
+
+  // Claim bonus for other account
+  claimBonusForOther(other) {
+    return this.api.tx.migrationModule.claimBonusForOther(other);
+  }
+
+  // Claim swap bonus for itself
+  claimSwapBonus() {
+    return this.api.tx.migrationModule.claimSwapBonus();
+  }
+
+  // Claim swap bonus for other account
+  claimSwapBonusForOther(other) {
+    return this.api.tx.migrationModule.claimSwapBonusForOther(other);
+  }
+
+  // Claim vesting bonus for itself
+  claimVestingBonus() {
+    return this.api.tx.migrationModule.claimVestingBonus();
+  }
+
+  // Claim vesting bonus for other account
+  claimVestingBonusForOther(other) {
+    return this.api.tx.migrationModule.claimVestingBonusForOther(other);
+  }
+
+  // Get details of all migrators
   async getMigrators() {
     return this.api.query.migrationModule.migrators.entries();
+  }
+
+  // Get detail of a given migrator
+  async getMigrator(address) {
+    return this.api.query.migrationModule.migrators(address);
+  }
+
+  // Get bonus of given account
+  async getBonus(address) {
+    return this.api.query.migrationModule.bonuses(address);
   }
 
   /**

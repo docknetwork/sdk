@@ -96,7 +96,7 @@
   "Bonus": {
     "total_locked_bonus": "Balance",
     "swap_bonuses": "Vec<(Balance, BlockNumber)>",
-    "vesting_bonuses": "Vec<(Balance, Balance, u32)>"
+    "vesting_bonuses": "Vec<(Balance, Balance, BlockNumber)>"
   },
   "Payload": {
     "proposal": "Vec<u8>",

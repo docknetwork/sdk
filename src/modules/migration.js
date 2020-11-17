@@ -137,7 +137,8 @@ class TokenMigration {
    * @param {*} address
    */
   async getBonus(address) {
-    return this.api.query.migrationModule.bonuses(address);
+    const bonus = await this.api.query.migrationModule.bonuses(address);
+    return this.api.createType('Option<Bonus>', bonus).unwrapOr(this.api.createType('Bonus'));
   }
 
   /**

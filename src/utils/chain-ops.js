@@ -4,6 +4,7 @@ import { Keyring } from '@polkadot/keyring';
 import { randomAsHex, cryptoWaitReady, checkAddress } from '@polkadot/util-crypto';
 import { u8aToHex, formatBalance } from '@polkadot/util';
 import { isHexWithGivenByteSize, asDockAddress } from './codec';
+import {getSlotNoFromHeader} from "../../tests/poa/helpers";
 
 // XXX: Following info can be fetched from chain. Integrating in DockAPI object is an options.
 const TESTNET_ADDR_PREFIX = 21;
@@ -147,5 +148,18 @@ export async function transferDock(api, senderKeypair, recipAddr, amount) {
 export async function transferMicroDock(api, senderKeypair, recipAddr, amount) {
   checkValidMicroAmount(amount);
   const txn = api.tx.balances.transfer(recipAddr, amount);
-  return await txn.signAndSend(senderKeypair);
+  return txn.signAndSend(senderKeypair);
+}
+
+// Fetch a block by block number or block hash
+export async function getBlockDerived(api, numberOrHash) {
+  const hash = isHexWithGivenByteSize(numberOrHash, 32) ? numberOrHash : (await blockNumberToHash(api, numberOrHash));
+  const block = await api.derive.chain.getHeader(hash);
+  return block;
+}
+
+export async function getBlockAuthor(dock, blockHash) {
+  // Using `api.derive.chain` and not `api.rpc.chain` as block author is needed.
+  const header = await dock.api.derive.chain.getHeader(blockHash);
+  return header.author;
 }

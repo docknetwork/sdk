@@ -149,14 +149,46 @@ async function sendBlobTxns(count, didPairs) {
   return blobIds;
 }
 
+/*
+7500 extrinsics fail due to block limit
+----
+Sending 7000 anchor extrinsics in a batch
+Batch size is 245009
+Payment info of batch is {"weight":888890461000,"class":"Normal","partialFee":2576100000}
+block 0x1e680f681448ee925864fcf16ca8fea99220b312875abbb8066054cd193b6169
+Time for batch of size 7000: 10.758s
+Fee paid is 2576100000
+*/
+async function sendAnchorTxns(count) {
+  console.info(`Sending ${count} anchor extrinsics in a batch`);
+  const account = dock.keyring.addFromUri(EndowedSecretURI);
+  dock.setAccount(account);
+
+  const txs = [];
+  let j = 0;
+  const anchorIds = [];
+  while (txs.length < count) {
+    const anc = randomAsHex(32);
+    const tx = dock.api.tx.anchor.deploy(anc);
+    txs.push(tx);
+    anchorIds.push(anc);
+    j++;
+  }
+
+  await sendBatch(dock, txs, account.address);
+
+  return anchorIds;
+}
+
 async function runOnce() {
   let didPairs = await sendDIDTxns(3400);
   console.log('');
   didPairs = await sendKeyUpdateTxns(3300, didPairs);
   console.log('');
-  await sendBlobTxns(2000, didPairs);
+  await sendBlobTxns(1500, didPairs);
   console.log('');
   await sendRemoveTxns(3400, didPairs);
+  await sendAnchorTxns(7000);
 }
 
 async function runInLoop(limit) {

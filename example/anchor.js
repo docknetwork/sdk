@@ -23,17 +23,21 @@
 // anchor can be interpreted as the root of a merkle-tree with 1 leaf. Since the merkle tree has
 // only one leaf, the proof of inclusion for that leaf will be empty.
 
+/* eslint-disable import/no-extraneous-dependencies, import/newline-after-import */
+
+/* eslint-disable camelcase */
 import { compute_root, create_proof, verify_proof } from 'mrklt';
+/* eslint-disable camelcase */
 import assert from 'assert';
-import { connect, keypair } from '../scripts/helpers';
 import BLAKE2s from 'blake2s-js';
 import BLAKE2b from 'blake2b';
 import { randomAsU8a } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
+import { connect, keypair } from '../scripts/helpers';
 
 require('dotenv').config();
 const { FullNodeEndpoint, TestAccountURI } = process.env;
-let conn = connect(FullNodeEndpoint);
+const conn = connect(FullNodeEndpoint);
 
 async function main() {
   // batched
@@ -66,13 +70,12 @@ async function anchor(hash) {
 // anchored. If the value is not anchored, return null.
 async function check(hash) {
   const nc = await conn;
-  let opt = await nc.query.anchor.anchors(u8aToHex(blake2b256(hash)));
-  assert(opt.isNone ^ opt.isSome);
+  const opt = await nc.query.anchor.anchors(u8aToHex(blake2b256(hash)));
+  assert(opt.isNone !== opt.isSome);
   if (opt.isNone) {
     return null;
-  } else {
-    return opt.unwrap().toNumber();
   }
+  return opt.unwrap().toNumber();
 }
 
 // Anchor a list of hashes to the chain as a batch. Return merkle proofs for each anchor
@@ -98,19 +101,19 @@ async function checkBatched(hash, proof) {
 
 // encode a string as utf8
 function utf8(str) {
-  return new TextEncoder("utf-8").encode(str);
+  return new TextEncoder().encode(str);
 }
 
 // hash a byte array using blake2s-256
 function blake2s(bs) {
-  let h = new BLAKE2s();
+  const h = new BLAKE2s();
   h.update(bs);
   return h.digest();
 }
 
 // hash a byte array using blake2b-256
 function blake2b256(bs) {
-  let h = BLAKE2b(32);
+  const h = BLAKE2b(32);
   h.update(bs);
   return h.digest();
 }
@@ -119,9 +122,9 @@ function blake2b256(bs) {
 function pack32(leaves) {
   for (const leaf of leaves) {
     assert(leaf instanceof Uint8Array);
-    assert(leaf.length == 32);
+    assert(leaf.length === 32);
   }
-  let ret = new Uint8Array(leaves.map(a => [...a]).flat());
+  const ret = new Uint8Array(leaves.map((a) => [...a]).flat());
   assert(ret.length === leaves.length * 32);
   return ret;
 }

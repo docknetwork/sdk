@@ -97,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -731,6 +731,9 @@ const blank = { Blank: '_:b0' };
 <div class="footnote-definition" id="2"><sup class="footnote-definition-label">2</sup>
 <p>This syntax is an RDF representation called <a href="https://www.w3.org/TR/turtle/">turtle</a>. In turtle, &quot;a&quot; is shorthand for &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; which means &quot;is member of set&quot;.</p>
 </div>
+<p>The Dock Blockchain includes a module explicitly intended for proof of existence. Aside from being explicitly supported by the on-chain runtime, it works the same way you would expect. You post the hash of a document on-chain at a specific block. Later you can use that hash to prove the document existed at or before that block.</p>
+<p>The PoE module accepts arbitrary bytes as an anchor but in order to keep anchor size constant the chain stores only the blake2b256 hash of those bytes.</p>
+<p>Developers are free to use the anchoring module however they want, taloring their software to their own use case. An anchoring example can be found in the sdk examples directory. Dock provides a <a href="https://fe.dock.io/#/anchor/batch">fully functioning reference client</a> for anchoring. The client even implements batching anchors into a merkle tree so you can anchor multiple documents in a single transaction.</p>
 <h1><a class="header" href="#tutorials" id="tutorials">Tutorials</a></h1>
 <ol>
 <li><a href="./tutorial_did.html">DID</a></li>
@@ -1713,6 +1716,29 @@ try {
 </code></pre>
 <h2><a class="header" href="#we-need-to-go-deeper" id="we-need-to-go-deeper">We Need to Go Deeper</a></h2>
 <p>The SDK claim deduction module exposes lower level functionality for those who need it. <code>getImplications</code>, <code>proveh</code> and <code>validateh</code>, for example, operate on raw claimgraphs represented as adjacency lists. For even lower level access, check out our <a href="https://github.com/docknetwork/rify">inference engine</a> which is written in Rust and exposed to javascript via wasm.</p>
+<h2><a class="header" href="#graphical-anchoring-utility" id="graphical-anchoring-utility">Graphical Anchoring Utility</a></h2>
+<p>You can also anchor without touching any code. Visit https://fe.dock.io/#/anchor/batch for creation of anchors and https://fe.dock.io/#/anchor/check for anchor verification.</p>
+<h3><a class="header" href="#to-batch-or-not-to-batch" id="to-batch-or-not-to-batch">To Batch, or not to Batch</a></h3>
+<p>Batching (combining multiple anchors into one) can be used to save on transaction costs by anchoring multiple documents in a single transaction as a merkle tree root.</p>
+<p>Batching does have a drawback. In order to verify a document that was anchored as part of the batch, you must provde the merkle proof that was generated when batching said file. Merkle proofs are expressed as <code>.proof.json</code> files and can be downloaded before posting the anchor. No merkle proof is required for batches containing only one document.</p>
+<h2><a class="header" href="#programatic-usage" id="programatic-usage">Programatic Usage</a></h2>
+<p>The on-chain anchoring module allows to developers the flexibility talor anchors to their own use-case, but the sdk does provide a reference example for batching and anchoring documents.</p>
+<p>The anchoring module is hashing algorithm and hash length agnostic. You can post a <a href="https://github.com/multiformats/multihash">multihash</a>, or even use the identity hash; the chain doesn't care.</p>
+<p>One thing to note is that rather than storing your anchor directly, the anchoring module will store the blake2b256 hash of the anchor. This means as a developer you'll need to perform an additional hashing step when looking up anchors:</p>
+<pre><code>// pseudocode
+
+function postAnchor(file) {
+  anchor = myHash(file)
+  deploy(anchor)
+}
+
+fuction checkAnchor(file) {
+  anchor = myHash(file)
+  anchorblake = blake2b256(anchor)
+  return lookup(anchorblake)
+}
+</code></pre>
+<p>See the <code>example/anchor.js</code> in the sdk repository for more info.</p>
 
                     </main>
 

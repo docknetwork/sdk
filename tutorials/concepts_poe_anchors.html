@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Revocation - Dock SDK Tutorial</title>
+        <title>PoE Anchors - Dock SDK Tutorial</title>
         
         
 
@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html" class="active"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html" class="active"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -163,85 +163,22 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#revocation" id="revocation">Revocation</a></h1>
-<h2><a class="header" href="#overview" id="overview">Overview</a></h2>
-<p>Credential revocation is managed with on-chain revocation registries. To revoke a credential, its id (or hash of its id) must be
-added to the credential. It is advised to have one revocation registry per credential type. Each registry has a unique id and
-an associated policy. The policy determines who can update the revocation registry. The registry also has an &quot;add-only&quot; flag specifying
-whether an id once added to the registry can be removed (leading to undoing the revocation) or not.
-Similar to the replay protection mechanism for DIDs, for each registry, the last modified block number is kept which is updated
-each time a credential is revoked or unrevoked.
-For now, only one policy is supported which is that each registry is owned by a single DID. Also, neither the policy
-nor the &quot;add-only&quot; flag can be updated post the creation of the registry for now.</p>
-<h2><a class="header" href="#registry-creation" id="registry-creation">Registry creation</a></h2>
-<p>To create a registry, first a <code>Policy</code> object needs to be created for which a DID is needed. It is advised that the DID
-is registered on chain first (else someone can look at the registry a register the DID, thus controlling the registry).</p>
-<pre><code class="language-js">import {OneOfPolicy} from '@docknetwork/sdk/utils/revocation';
-const policy = new OneOfPolicy();
-policy.addOwner(ownerDID);
-
-// Or in a single step
-const policy = new OneOfPolicy([ownerDID]);
-</code></pre>
-<p>Now create a random registry id. The registry id supposed to be unique among all registries on chain.</p>
-<pre><code class="language-js">import {createRandomRegistryId} from '@docknetwork/sdk/utils/revocation';
-const registryId = createRandomRegistryId();
-</code></pre>
-<p>Now send the transaction to create a registry on-chain using <code>dock.revocation.newRegistry</code>. This method accepts the registry id,
-the policy object and a boolean that specifies whether the registry is add-only or not meaning that whether undoing revocations
-is allowed or not. Ifs <code>true</code>, it makes the registry add-only meaning that undoing revocations is not allowed, if <code>false</code>,
-undoing is allowed.</p>
-<pre><code class="language-js">// Setting the last argument to false to allow unrevoking the credential (undoing revocation)
-await dock.revocation.newRegistry(registryId, policy, false);
-</code></pre>
-<h2><a class="header" href="#revoking-a-credential" id="revoking-a-credential">Revoking a credential</a></h2>
-<p>Revoking a credential requires a signature from the owner of the registry. For that, fetch the owner's DID and pair and
-create a map</p>
-<pre><code class="language-js">const didKeys = new KeyringPairDidKeys();
-didKeys.set(ownerDID, ownerKeypair);
-</code></pre>
-<p>Now get the registry id, <code>registryId</code> and the revocation id (the hash of credential id), <code>revokeId</code> and send the transaction on chain.
-Revoking an already revoked credential has no effect.</p>
-<pre><code class="language-js">await dock.revocation.revokeCredential(didKeys, registryId, revokeId);
-</code></pre>
-<p>Revoking multiple ids in a single transaction is possible but with a lower level method <code>dock.revocation.revoke</code>.</p>
-<h2><a class="header" href="#undoing-a-revocation" id="undoing-a-revocation">Undoing a revocation</a></h2>
-<p>Similar to revocation, undoing the revocation also requires a signature from the owner of the registry. As before, fetch
-the owner's DID and pair and create a map</p>
-<pre><code class="language-js">const didKeys = new KeyringPairDidKeys();
-didKeys.set(ownerDID, ownerKeypair);
-</code></pre>
-<p>Now get the registry id, <code>registryId</code> and the revocation id to undo, <code>revokeId</code> and send the transaction on chain.
-Unrevoking an unrevoked credential has no effect.</p>
-<pre><code class="language-js">await dock.revocation.unrevokeCredential(didKeys, registryId, revokeId);
-</code></pre>
-<p>Undoing revocation for multiple ids in a single transaction is possible but with a lower level method <code>dock.revocation.unrevoke</code>.</p>
-<h2><a class="header" href="#checking-the-revocation-status" id="checking-the-revocation-status">Checking the revocation status</a></h2>
-<p>To check an id is revoked or not, call <code>dock.revocation.getIsRevoked</code> with the registry id and revocation id. Returns <code>true</code>
-if revoked else <code>false</code>.</p>
-<pre><code class="language-js">const isRevoked = await dock.revocation.getIsRevoked(registryId, revokeId);
-</code></pre>
-<h2><a class="header" href="#fetching-the-registry-details" id="fetching-the-registry-details">Fetching the registry details</a></h2>
-<p>To get the details of the registry like policy, add-only status and block number when it was last updated, use <code>dock.revocation.getRegistryDetail</code></p>
-<h2><a class="header" href="#removing-the-registry" id="removing-the-registry">Removing the registry</a></h2>
-<p>A registry can be deleted leading to all the corresponding revocation ids being deleted as well. This requires the signature
-from owner like other updates. Use the <code>dock.revocation.removeRegistry</code> method to remove a registry.</p>
-<pre><code class="language-js">const lastModified = await dock.revocation.getBlockNoForLastChangeToRegistry(registryId);
-await dock.revocation.removeRegistry(registryId, lastModified, didKeys);
-</code></pre>
+                        <p>The Dock Blockchain includes a module explicitly intended for proof of existence. Aside from being explicitly supported by the on-chain runtime, it works the same way you would expect. You post the hash of a document on-chain at a specific block. Later you can use that hash to prove the document existed at or before that block.</p>
+<p>The PoE module accepts arbitrary bytes as an anchor but in order to keep anchor size constant the chain stores only the blake2b256 hash of those bytes.</p>
+<p>Developers are free to use the anchoring module however they want, taloring their software to their own use case. An anchoring example can be found in the sdk examples directory. Dock provides a <a href="https://fe.dock.io/#/anchor/batch">fully functioning reference client</a> for anchoring. The client even implements batching anchors into a merkle tree so you can anchor multiple documents in a single transaction.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="tutorial_ipv.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="concepts_claim_deduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="tutorial_blobs_schemas.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="tutorials.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -253,13 +190,13 @@ await dock.revocation.removeRegistry(registryId, lastModified, didKeys);
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="tutorial_ipv.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="concepts_claim_deduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a rel="next" href="tutorial_blobs_schemas.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="tutorials.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

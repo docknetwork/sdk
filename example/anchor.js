@@ -1,4 +1,3 @@
-// @ts-ignore
 // This example shows two ways to anchor content, Direct and Merklized.
 //
 // The first, direct anchoring, places the content directly into a transaction. This method makes
@@ -96,7 +95,7 @@ function runBenchmarks() {
 // Generate only 1 proof as call to proof generation recreates the tree
 function benchSingleProofCreation(count) {
   /* eslint-disable no-unused-vars */
-  const data = Array(count).fill().map((_, __) => randomAsU8a());
+  const data = Array(count).fill(undefined).map((_, __) => randomAsU8a());
   const start = new Date().getTime();
   const hashes = data.map(blake2s);
   const pl = pack32(hashes);
@@ -114,7 +113,7 @@ function bench(count) {
 
 function timeProofGeneration(count) {
   /* eslint-disable no-unused-vars */
-  const data = Array(count).fill().map((_, __) => randomAsU8a());
+  const data = Array(count).fill(undefined).map((_, __) => randomAsU8a());
   const start = new Date().getTime();
   const hashes = data.map(blake2s);
   const [root, proofs] = buildMerkleTreeAndProofs(hashes);

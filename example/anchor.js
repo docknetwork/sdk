@@ -78,16 +78,72 @@ async function check(hash) {
   return opt.unwrap().toNumber();
 }
 
+// Run some benchmarks to measure time for proof generation and verification.
+function runBenchmarks() {
+  benchSingleProofCreation(4096);
+  benchSingleProofCreation(65536);
+  benchSingleProofCreation(131072);
+  bench(3);
+  bench(11);
+  bench(128);
+  bench(1024);
+}
+
+// Generate only 1 proof as call to proof generation recreates the tree
+function benchSingleProofCreation(count) {
+  const data = Array(count).fill().map((_, __) => randomAsU8a());
+  const start = new Date().getTime();
+  const hashes = data.map(blake2s);
+  const pl = pack32(hashes);
+  create_proof(0, pl);
+  const time = new Date().getTime() - start;
+  console.log(`Time to generate tree of size ${count} and create a proof is ${time} msec`);
+}
+
+function bench(count) {
+  const [root, hashes, proofs, proofDuration] = timeProofGeneration(count);
+  console.log(`Time to compute proofs for ${count} is ${proofDuration} msec`);
+  const verfDuration = timeProofVerification(root, [hashes, proofs]);
+  console.log(`Time to verify proofs for ${count} is ${verfDuration} msec`);
+}
+
+function timeProofGeneration(count) {
+  // Check power of 2
+  // assert((count & (count - 1)) === 0);
+  const data = Array(count).fill().map((_, __) => randomAsU8a());
+  const start = new Date().getTime();
+  const hashes = data.map(blake2s);
+  const [root, proofs] = buildMerkleTreeAndProofs(hashes);
+  const end = new Date().getTime();
+  return [root, hashes, proofs, end - start];
+}
+
+function timeProofVerification(root, [leaves, proofs]) {
+  assert(leaves.length === proofs.length);
+  const start = new Date().getTime();
+  const calculatedRoots = leaves.map((l, index) => verify_proof(l, proofs[index]));
+  const end = new Date().getTime();
+  const rootJson = JSON.stringify(root);
+  calculatedRoots.forEach((cr) => assert(JSON.stringify(cr) === rootJson));
+  return end - start;
+}
+
+// Takes a list of leaves to build a merkle tree and return root of the tree and inclusion proof for all leaves
+function buildMerkleTreeAndProofs(leafHashes) {
+  const pl = pack32(leafHashes); // pl stands for packed leaves
+  const proofs = leafHashes.map((_, i) => create_proof(i, pl));
+  const root = compute_root(pl);
+  return [root, proofs];
+}
+
 // Anchor a list of hashes to the chain as a batch. Return merkle proofs for each anchor
 // in the order they we submitted.
 //
 // This function will fail if the input is an empty list.
 async function anchorBatched(leafHashes) {
-  const pl = pack32(leafHashes); // pl stands for packed leaves
-  const ret = leafHashes.map((_, i) => create_proof(i, pl));
-  const root = compute_root(pl);
+  const [root, proofs] = buildMerkleTreeAndProofs(leafHashes);
   await anchor(root);
-  return ret;
+  return proofs;
 }
 
 // Check a single hash from a batch.

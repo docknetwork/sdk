@@ -74,6 +74,31 @@ async function revocation() {
   console.info(`Fee paid is ${parseInt(bal3[0]) - parseInt(bal4[0])}`);
 }
 
+async function transfers() {
+  const account = dock.keyring.addFromUri(EndowedSecretURI);
+  dock.setAccount(account);
+
+  const BOB = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty';
+
+  const bal1 = await dock.poaModule.getBalance(account.address);
+
+  const transfer = dock.api.tx.balances.transfer(BOB, 100);
+
+  console.info(`Payment info of 1 transfer is ${(await transfer.paymentInfo(account.address))}`);
+
+  const txs = Array(3).fill(dock.api.tx.balances.transfer(BOB, 100));
+
+  const txBatch = dock.api.tx.utility.batch(txs);
+  console.log(`Batch of ${txs.length} transfers`);
+  console.info(`Payment info of batch is ${(await txBatch.paymentInfo(account.address))}`);
+
+  /* await dock.signAndSend(transfer, false);
+
+  const bal2 = await dock.poaModule.getBalance(account.address);
+
+  console.info(`Fee paid is ${parseInt(bal1[0]) - parseInt(bal2[0]) + 100}`); */
+}
+
 async function main() {
   let action = 0;
   if (process.argv.length >= 3) {
@@ -82,6 +107,9 @@ async function main() {
   switch (action) {
     case 0:
       await revocation();
+      break;
+    case 1:
+      await transfers();
       break;
     default:
       console.error('Argument should be 0');

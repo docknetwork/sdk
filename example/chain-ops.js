@@ -2,7 +2,7 @@ import assert from 'assert';
 import { DockAPI } from '../src/api';
 import {
   getLastBlock, getBlockNo, blockNumberToHash, getBlock, getBalance, getAllExtrinsicsFromBlock, getTransfersFromBlock,
-  getAllEventsFromBlock, getLastFinalizeBlock, generateAccount, transferMicroDock, transferDock, validateAddress,
+  getAllEventsFromBlock, getLastFinalizedBlock, generateAccount, transferMicroDock, transferDock, validateAddress,
 } from '../src/utils/chain-ops';
 
 require('dotenv').config();
@@ -60,7 +60,7 @@ async function printLastBlockNo(api) {
 }
 
 async function printLastFinalizedBlockNo(api) {
-  const block = await getLastFinalizeBlock(api);
+  const block = await getLastFinalizedBlock(api);
   const num = getBlockNo(block);
   console.info(`Last finalized block number is ${num}`);
   return num;

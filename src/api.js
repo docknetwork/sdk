@@ -144,22 +144,32 @@ class DockAPI {
    */
   async signExtrinsic(extrinsic, params = {}) {
     if (this.customSignTx) {
-      await this.customSignTx(extrinsic, params, this);
-    } else {
-      await extrinsic.signAsync(this.getAccount(), params);
+      return this.customSignTx(extrinsic, params, this);
     }
+    return extrinsic.signAsync(this.getAccount(), params);
   }
 
   /**
-   * Helper function to send transaction
-   * @param {object} extrinsic - Extrinsic to send
+   * Helper function to sign and send transaction
+   * @param {object} extrinsic - Extrinsic to sign and send
    * @param {Boolean} waitForFinalization - If true, waits for extrinsic's block to be finalized,
    * else only wait to be included in block.
    * @param {object} params - An object used to parameters like nonce, etc to the extrinsic
    * @return {Promise}
    */
   async signAndSend(extrinsic, waitForFinalization = true, params = {}) {
-    await this.signExtrinsic(extrinsic, params);
+    const signedExtrinsic = await this.signExtrinsic(extrinsic, params);
+    return this.send(signedExtrinsic, waitForFinalization);
+  }
+
+  /**
+   * Helper function to send transaction
+   * @param extrinsic - Extrinsic to send
+   * @param waitForFinalization - If true, waits for extrinsic's block to be finalized,
+   * else only wait to be included in block.
+   * @returns {Promise<unknown>}
+   */
+  async send(extrinsic, waitForFinalization = true) {
     const promise = new Promise((resolve, reject) => {
       try {
         let unsubFunc = null;

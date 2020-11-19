@@ -35,8 +35,8 @@ import { randomAsU8a } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
 import { connect, keypair } from '../scripts/helpers';
 
-require('dotenv').config();
-const { FullNodeEndpoint, TestAccountURI } = process.env;
+import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
+
 const conn = connect(FullNodeEndpoint);
 
 async function main() {

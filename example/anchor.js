@@ -1,3 +1,4 @@
+// @ts-ignore
 // This example shows two ways to anchor content, Direct and Merklized.
 //
 // The first, direct anchoring, places the content directly into a transaction. This method makes

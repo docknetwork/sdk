@@ -55,14 +55,17 @@ export async function sendBatch(dock, txs, senderAddress, waitForFinalization = 
   console.info(`Payment info of batch is ${(await txBatch.paymentInfo(senderAddress))}`);
 
   const bal1 = await dock.poaModule.getBalance(senderAddress);
-  console.time(`Time for batch of size ${txs.length}`);
-  const r = await dock.signAndSend(txBatch, waitForFinalization);
+  console.time(`Time for sign and send for batch of size ${txs.length}`);
+  const signedExtrinsic = await dock.signExtrinsic(txBatch);
+  console.time(`Time for send for batch of size ${txs.length}`);
+  const r = await dock.send(signedExtrinsic, waitForFinalization);
   if (waitForFinalization) {
     console.info(`block ${r.status.asFinalized}`);
   } else {
     console.info(`block ${r.status.asInBlock}`);
   }
-  console.timeEnd(`Time for batch of size ${txs.length}`);
+  console.timeEnd(`Time for sign and send for batch of size ${txs.length}`);
+  console.timeEnd(`Time for send for batch of size ${txs.length}`);
   const bal2 = await dock.poaModule.getBalance(senderAddress);
   console.info(`Fee paid is ${parseInt(bal1[0]) - parseInt(bal2[0])}`);
 }

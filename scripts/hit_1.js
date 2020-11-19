@@ -188,7 +188,7 @@ async function runOnce() {
   await sendBlobTxns(1500, didPairs);
   console.log('');
   await sendRemoveTxns(3400, didPairs);
-  await sendAnchorTxns(7000);
+  // await sendAnchorTxns(7000);
 }
 
 async function runInLoop(limit) {
@@ -200,14 +200,14 @@ async function runInLoop(limit) {
   while (true) {
     console.time('iteration');
     console.time('WriteDID');
-    const didPairs = await sendDIDTxns(3400, false);
+    const didPairs = await sendDIDTxns(3200, false);
     console.timeEnd('WriteDID');
-    console.log('Added 3400 DIDs in a batch');
+    console.log('Added 3200 DIDs in a batch');
     console.log('');
     console.time('RemoveDID');
-    await sendRemoveTxns(3400, didPairs, false);
+    await sendRemoveTxns(3200, didPairs, false);
     console.timeEnd('RemoveDID');
-    console.log('Remove 3400 DIDs in a batch');
+    console.log('Remove 3200 DIDs in a batch');
     count++;
     console.info(`Iteration ${count} done`);
     if (limit && (count >= limit)) {

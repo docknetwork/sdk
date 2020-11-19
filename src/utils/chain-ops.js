@@ -4,7 +4,6 @@ import { Keyring } from '@polkadot/keyring';
 import { randomAsHex, cryptoWaitReady, checkAddress } from '@polkadot/util-crypto';
 import { u8aToHex, formatBalance } from '@polkadot/util';
 import { isHexWithGivenByteSize, asDockAddress } from './codec';
-import {getSlotNoFromHeader} from "../../tests/poa/helpers";
 
 // XXX: Following info can be fetched from chain. Integrating in DockAPI object is an options.
 const TESTNET_ADDR_PREFIX = 21;
@@ -58,7 +57,7 @@ export async function getLastBlock(api) {
 }
 
 // Get the last finalized block
-export async function getLastFinalizeBlock(api) {
+export async function getLastFinalizedBlock(api) {
   const h = await api.rpc.chain.getFinalizedHead();
   return getBlock(api, u8aToHex(h));
 }
@@ -73,8 +72,12 @@ export async function blockNumberToHash(api, number) {
 }
 
 // Fetch a block by block number or block hash
-export async function getBlock(api, numberOrHash) {
+export async function getBlock(api, numberOrHash, withAuthor = false) {
   const hash = isHexWithGivenByteSize(numberOrHash, 32) ? numberOrHash : (await blockNumberToHash(api, numberOrHash));
+  if (withAuthor) {
+    const { block, author } = await api.derive.chain.getBlock(hash);
+    return { block, author };
+  }
   const { block } = await api.rpc.chain.getBlock(hash);
   return block;
 }
@@ -149,17 +152,4 @@ export async function transferMicroDock(api, senderKeypair, recipAddr, amount) {
   checkValidMicroAmount(amount);
   const txn = api.tx.balances.transfer(recipAddr, amount);
   return txn.signAndSend(senderKeypair);
-}
-
-// Fetch a block by block number or block hash
-export async function getBlockDerived(api, numberOrHash) {
-  const hash = isHexWithGivenByteSize(numberOrHash, 32) ? numberOrHash : (await blockNumberToHash(api, numberOrHash));
-  const block = await api.derive.chain.getHeader(hash);
-  return block;
-}
-
-export async function getBlockAuthor(dock, blockHash) {
-  // Using `api.derive.chain` and not `api.rpc.chain` as block author is needed.
-  const header = await dock.api.derive.chain.getHeader(blockHash);
-  return header.author;
 }

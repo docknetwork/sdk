@@ -56,6 +56,9 @@ async function main() {
   assert(await checkBatched(single, []) === null);
   await anchorBatched([single]);
   assert(await checkBatched(single, []) !== null);
+
+  // Benchmarks
+  runBenchmarks();
 }
 
 // Post a value to the anchors module.
@@ -91,6 +94,7 @@ function runBenchmarks() {
 
 // Generate only 1 proof as call to proof generation recreates the tree
 function benchSingleProofCreation(count) {
+  /* eslint-disable no-unused-vars */
   const data = Array(count).fill().map((_, __) => randomAsU8a());
   const start = new Date().getTime();
   const hashes = data.map(blake2s);
@@ -108,8 +112,7 @@ function bench(count) {
 }
 
 function timeProofGeneration(count) {
-  // Check power of 2
-  // assert((count & (count - 1)) === 0);
+  /* eslint-disable no-unused-vars */
   const data = Array(count).fill().map((_, __) => randomAsU8a());
   const start = new Date().getTime();
   const hashes = data.map(blake2s);

@@ -306,10 +306,6 @@ describe('Verifiable Credential incremental creation', () => {
     }).toThrowError('needs to be a string.');
 
     expect(() => {
-      credential.addSubject({ some: 'value' });
-    }).toThrowError('"credentialSubject" must include the \'id\' property.');
-
-    expect(() => {
       credential.setStatus({ some: 'value', type: 'something' });
     }).toThrowError('"credentialStatus" must include the \'id\' property.');
     expect(() => {

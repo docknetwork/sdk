@@ -147,7 +147,6 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   addSubject(subject) {
-    ensureObjectWithId(subject, 'credentialSubject');
     if (!this.credentialSubject || this.credentialSubject.length === 0) {
       this.credentialSubject = [subject];
     }

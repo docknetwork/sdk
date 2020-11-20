@@ -23,13 +23,12 @@
 // anchor can be interpreted as the root of a merkle-tree with 1 leaf. Since the merkle tree has
 // only one leaf, the proof of inclusion for that leaf will be empty.
 
-/* eslint-disable import/no-extraneous-dependencies, import/newline-after-import */
+/* eslint-disable import/no-extraneous-dependencies */
 
 /* eslint-disable camelcase */
-import { compute_root, create_proof, verify_proof } from 'mrklt';
+import { create_proof, construct, verify_proof } from 'mrklt';
 /* eslint-disable camelcase */
 import assert from 'assert';
-import BLAKE2s from 'blake2s-js';
 import BLAKE2b from 'blake2b';
 import { randomAsU8a } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
@@ -46,13 +45,13 @@ async function main() {
     utf8('{"example": 2}'),
     randomAsU8a(),
     utf8('{"example": 4}'),
-  ].map(blake2s);
+  ].map(blake2b256);
   const proofs = await anchorBatched(docHashes);
   assert(await checkBatched(docHashes[0], proofs[0]) !== null);
   assert(await checkBatched(docHashes[0], proofs[1]) === null);
 
   // single
-  const single = blake2s(randomAsU8a());
+  const single = blake2b256(randomAsU8a());
   assert(await checkBatched(single, []) === null);
   await anchorBatched([single]);
   assert(await checkBatched(single, []) !== null);
@@ -90,6 +89,8 @@ function runBenchmarks() {
   bench(11);
   bench(128);
   bench(1024);
+  bench(4096);
+  bench(65536);
 }
 
 // Generate only 1 proof as call to proof generation recreates the tree
@@ -97,7 +98,7 @@ function benchSingleProofCreation(count) {
   /* eslint-disable no-unused-vars */
   const data = Array(count).fill(undefined).map((_, __) => randomAsU8a());
   const start = new Date().getTime();
-  const hashes = data.map(blake2s);
+  const hashes = data.map(blake2b256);
   const pl = pack32(hashes);
   create_proof(0, pl);
   const time = new Date().getTime() - start;
@@ -115,7 +116,7 @@ function timeProofGeneration(count) {
   /* eslint-disable no-unused-vars */
   const data = Array(count).fill(undefined).map((_, __) => randomAsU8a());
   const start = new Date().getTime();
-  const hashes = data.map(blake2s);
+  const hashes = data.map(blake2b256);
   const [root, proofs] = buildMerkleTreeAndProofs(hashes);
   const end = new Date().getTime();
   return [root, hashes, proofs, end - start];
@@ -127,16 +128,14 @@ function timeProofVerification(root, [leaves, proofs]) {
   const calculatedRoots = leaves.map((l, index) => verify_proof(l, proofs[index]));
   const end = new Date().getTime();
   const rootJson = JSON.stringify(root);
-  calculatedRoots.forEach((cr) => assert(JSON.stringify(cr) === rootJson));
+  calculatedRoots.forEach((cr) => assert(JSON.stringify([...cr]) === rootJson));
   return end - start;
 }
 
 // Takes a list of leaves to build a merkle tree and return root of the tree and inclusion proof for all leaves
 function buildMerkleTreeAndProofs(leafHashes) {
   const pl = pack32(leafHashes); // pl stands for packed leaves
-  const proofs = leafHashes.map((_, i) => create_proof(i, pl));
-  const root = compute_root(pl);
-  return [root, proofs];
+  return construct(pl);
 }
 
 // Anchor a list of hashes to the chain as a batch. Return merkle proofs for each anchor
@@ -161,13 +160,6 @@ async function checkBatched(hash, proof) {
 // encode a string as utf8
 function utf8(str) {
   return new TextEncoder().encode(str);
-}
-
-// hash a byte array using blake2s-256
-function blake2s(bs) {
-  const h = new BLAKE2s();
-  h.update(bs);
-  return h.digest();
 }
 
 // hash a byte array using blake2b-256

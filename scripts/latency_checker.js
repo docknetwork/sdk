@@ -1,9 +1,9 @@
-import dock from "../src/api";
-import {createKeyDetail, createNewDockDID} from "../src/utils/did";
-import {randomAsHex} from "@polkadot/util-crypto";
-import {getPublicKeyFromKeyringPair} from "../src/utils/misc";
-import {getBlockDetails} from "../tests/poa/helpers";
-import {median} from "./helpers";
+import { randomAsHex } from '@polkadot/util-crypto';
+import dock from '../src/api';
+import { createKeyDetail, createNewDockDID } from '../src/utils/did';
+import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
+import { getBlockDetails } from '../tests/poa/helpers';
+import { median } from './helpers';
 
 require('dotenv').config();
 
@@ -58,6 +58,7 @@ dock.init({
   address: FullNodeEndpoint,
 })
   .then(() => {
+    // TODO: Accept count as argument as well.
     main(10);
   })
   .catch((error) => {

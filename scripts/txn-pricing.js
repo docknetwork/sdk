@@ -2,11 +2,11 @@
 
 import { BTreeSet } from '@polkadot/types';
 
+import { randomAsHex } from '@polkadot/util-crypto';
 import dock from '../src/api';
-import {createKeyDetail, createNewDockDID} from "../src/utils/did";
-import {randomAsHex} from "@polkadot/util-crypto";
-import {getPublicKeyFromKeyringPair} from "../src/utils/misc";
-import {createRandomRegistryId, KeyringPairDidKeys, OneOfPolicy} from "../src/utils/revocation";
+import { createKeyDetail, createNewDockDID } from '../src/utils/did';
+import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
+import { createRandomRegistryId, KeyringPairDidKeys, OneOfPolicy } from '../src/utils/revocation';
 
 require('dotenv').config();
 

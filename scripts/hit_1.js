@@ -188,7 +188,6 @@ async function runOnce() {
   await sendBlobTxns(1500, didPairs);
   console.log('');
   await sendRemoveTxns(3400, didPairs);
-  // await sendAnchorTxns(7000);
 }
 
 async function runInLoop(limit) {
@@ -232,6 +231,9 @@ async function main() {
       break;
     case 2:
       await fillBlock();
+      break;
+    case 3:
+      await sendAnchorTxns(7000);
       break;
     default:
       console.error('Argument should be 0, 1 or 2');

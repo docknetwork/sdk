@@ -115,8 +115,7 @@ async function updateDIDKey({
 async function keypair(seed) {
   await cryptoWaitReady();
   const keyring = new Keyring({ type: 'sr25519' });
-  const key = keyring.addFromUri(seed);
-  return key;
+  return keyring.addFromUri(seed);
 }
 
 function assert_equal(a, b, note = 'equality assertion false') {

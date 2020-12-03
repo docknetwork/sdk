@@ -1,6 +1,8 @@
 import dock from '../src/api';
-import {getLastBlock, getBlockNo, getBlock, getBlockDerived} from "../src/utils/chain-ops";
-import {median} from "./helpers";
+import {
+  getLastBlock, getBlockNo, getBlock, getBlockDerived,
+} from '../src/utils/chain-ops';
+import { median } from './helpers';
 
 require('dotenv').config();
 
@@ -12,7 +14,7 @@ async function getTxnsCountInLastBlocks(count = 10) {
   // console.log(lastBlock.header.parentHash.toString());
   // const lastBlockNo = getBlockNo(lastBlock);
   const blocks = [lastBlock];
-  let parentHash = lastBlock.header.parentHash;
+  let { parentHash } = lastBlock.header;
   while (parentHash !== new Uint8Array(32) && blocks.length < count) {
     const block = await getBlock(dock.api, parentHash.toString());
     // const header = await getBlockDerived(dock.api, currentBlockNo);

@@ -71,3 +71,19 @@ export function asDockAddress(addr, network = 'test') {
       throw new Error(`Network can be either test or main or dev but was passed as ${network}`);
   }
 }
+
+/**
+ * Normalizes the given input to hex. Expects a Uint8Array or a hex string
+ * @param {Uint8Array|string} data
+ */
+export function normalizeToHex(data) {
+  let hex;
+  if (data instanceof Uint8Array) {
+    hex = u8aToHex(data);
+  } else if (isHexWithGivenByteSize(data)) {
+    hex = data;
+  } else {
+    throw new Error('Require a hex string or a byte array');
+  }
+  return hex;
+}

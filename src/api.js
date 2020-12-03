@@ -2,6 +2,7 @@ import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { KeyringPair } from '@polkadot/keyring/types'; // eslint-disable-line
 
+import AnchorModule from './modules/anchor';
 import BlobModule from './modules/blob';
 import DIDModule from './modules/did';
 import RevocationModule from './modules/revocation';
@@ -85,6 +86,7 @@ class DockAPI {
 
     await this.initKeyring(keyring);
 
+    this.anchorModule = new AnchorModule(this.api, this.signAndSend.bind(this));
     this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));
     this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
     this.revocationModule = new RevocationModule(this.api, this.signAndSend.bind(this));
@@ -110,6 +112,7 @@ class DockAPI {
         await this.api.disconnect();
       }
       delete this.api;
+      delete this.anchorModule;
       delete this.blobModule;
       delete this.didModule;
       delete this.revocationModule;
@@ -221,6 +224,17 @@ class DockAPI {
   }
 
   /**
+   * Gets the SDK's Anchor module
+   * @return {AnchorModule} The module to use
+   */
+  get anchor() {
+    if (!this.anchorModule) {
+      throw new Error('Unable to get Anchor module, SDK is not initialised');
+    }
+    return this.anchorModule;
+  }
+
+  /**
    * Gets the SDK's Blob module
    * @return {BlobModule} The module to use
    */
@@ -267,6 +281,7 @@ class DockAPI {
 
 export default new DockAPI();
 export {
+  AnchorModule,
   BlobModule,
   DockAPI,
   DIDModule,

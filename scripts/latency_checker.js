@@ -1,8 +1,6 @@
-import { randomAsHex } from '@polkadot/util-crypto';
 import dock from '../src/api';
 import { createKeyDetail, createNewDockDID } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
-import { getBlockDetails } from '../tests/poa/helpers';
 import { median } from './helpers';
 
 require('dotenv').config();
@@ -23,14 +21,10 @@ async function sendTxn(baseSeed, seedPath) {
   return (new Date().getTime()) - start;
 }
 
-async function main(defaultCount) {
-  let countReqs = 0;
-  if (process.argv.length >= 3) {
-    countReqs = parseInt(process.argv[2]);
-  } else {
-    countReqs = defaultCount;
+async function main(countReqs) {
+  if (countReqs <= 0) {
+    process.exit(2);
   }
-
   const account = dock.keyring.addFromUri(EndowedSecretURI);
   dock.setAccount(account);
 
@@ -48,7 +42,7 @@ async function main(defaultCount) {
     }
   }
   const total = durations.reduce((a, b) => a + b, 0);
-  const mean = total / durations.length;
+  const mean = Math.round(total / durations.length);
   const med = median(durations);
   console.log(`After sending ${durations.length} requests, mean latency is ${mean}ms and median is ${med}ms`);
   process.exit(1);
@@ -58,8 +52,13 @@ dock.init({
   address: FullNodeEndpoint,
 })
   .then(() => {
-    // TODO: Accept count as argument as well.
-    main(10);
+    let count;
+    if (process.argv.length >= 3) {
+      count = parseInt(process.argv[2]);
+    } else {
+      count = 10;
+    }
+    main(count);
   })
   .catch((error) => {
     console.error('Error occurred somewhere, it was caught!', error);

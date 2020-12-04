@@ -43,7 +43,7 @@ export default class AnchorModule {
   /**
    * Query anchor from chain
    * @param anchor
-   * @param {bool} preHashed - If the anchor has already been hashed.
+   * @param {Boolean} preHashed - If the anchor has already been hashed.
    * @returns {Promise<*>} - The promise will either successfully resolve to the block number where anchor was created
    * or reject with an error.
    */

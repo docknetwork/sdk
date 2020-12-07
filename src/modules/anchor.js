@@ -69,7 +69,7 @@ export default class AnchorModule {
   /**
    * Batch multiple documents in binary merkle tree and return the root and proofs for each document
    * @param documents
-   * @returns {(Uint8Array|*)[]} - An 2 element array where 1st element is root and 2nd is an array with proofs for
+   * @returns {Array} - An 2 element array where 1st element is root and 2nd is an array with proofs for
    * each document.
    */
   batchDocumentsInMerkleTree(documents) {

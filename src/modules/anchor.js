@@ -103,7 +103,7 @@ export default class AnchorModule {
   verifyMerkleProofOfLeaf(leaf, proof, root) {
     /* eslint-disable camelcase */
     const calculatedRoot = verify_proof(leaf, proof);
-    return calculatedRoot.every((v, i) => v === root[i]);
+    return calculatedRoot.length === root.length && calculatedRoot.every((v, i) => v === root[i]);
   }
 
   /**

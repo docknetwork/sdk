@@ -5,7 +5,7 @@ import { DockAPI } from '../../src/api';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getBlock } from '../../src/utils/chain-ops';
 
-describe('Blob Module', () => {
+describe('Anchoring Module', () => {
   const dock = new DockAPI();
 
   beforeAll(async (done) => {

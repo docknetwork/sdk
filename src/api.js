@@ -166,7 +166,7 @@ class DockAPI {
   }
 
   /**
-   * Helper function to send transaction
+   * Helper function to send a transaction that has already been signed
    * @param extrinsic - Extrinsic to send
    * @param waitForFinalization - If true, waits for extrinsic's block to be finalized,
    * else only wait to be included in block.

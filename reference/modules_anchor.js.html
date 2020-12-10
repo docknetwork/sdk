@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: signatures/signature-ed25519.js</title>
+    <title>JSDoc: Source: modules/anchor.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: signatures/signature-ed25519.js</h1>
+    <h1 class="page-title">Source: modules/anchor.js</h1>
 
     
 
@@ -26,36 +26,123 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import Signature from './signature';
+            <pre class="prettyprint source linenums"><code>/* eslint-disable camelcase */
+import { construct, verify_proof } from 'mrklt';
+import BLAKE2b from 'blake2b';
+import { u8aToHex, hexToU8a } from '@polkadot/util';
+import { isHexWithGivenByteSize, normalizeToHex } from '../utils/codec';
+import NoAnchorError from '../utils/errors/no-anchor-error';
 
-/** Class representing a Ed25519 Signature */
-export default class SignatureEd25519 extends Signature {
+/** Class to create and query anchors from chain. */
+export default class AnchorModule {
   /**
-   * Generate a Ed25519 signature using Polkadot-js
-   * @param {array} message - The message to sign as bytearray
-   * @param {object} signingPair -The pair from Polkadot-js containing the signing key
+   * Creates a new instance of AnchorModule and sets the api
+   * @constructor
+   * @param {object} api - PolkadotJS API Reference
+   * @param {Function} signAndSend - Callback signing and sending
    */
-  constructor(message, signingPair) {
-    super();
-    this.fromPolkadotJSKeyringPair(message, signingPair);
+  constructor(api, signAndSend) {
+    this.api = api;
+    this.module = api.tx.anchor;
+    this.signAndSend = signAndSend;
   }
 
   /**
-   * Create SignatureEd25519 from given hex string
-   * @param {string} value - Hex string
-   * @returns {Signature}
+   * Prepare transaction to write anchor on chain
+   * @param {Uint8Array|string} anchor
+   * @return {object} The extrinsic to sign and send.
    */
-  fromHex(value) {
-    return super.fromHex(value, 64);
+  deployTx(anchor) {
+    const toPost = normalizeToHex(anchor);
+    return this.module.deploy(toPost);
   }
 
   /**
-   * @return {Object} The DidSignature JSON variant Ed25519.
+   * Write anchor on chain
+   * @param anchor
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise&lt;*>}
    */
-  toJSON() {
-    return {
-      Ed25519: this.value,
-    };
+  async deploy(anchor, waitForFinalization = true, params = {}) {
+    return await this.signAndSend(this.deployTx(anchor), waitForFinalization, params);
+  }
+
+  /**
+   * Query anchor from chain
+   * @param anchor
+   * @param {Boolean} preHashed - If the anchor has already been hashed.
+   * @returns {Promise&lt;*>} - The promise will either successfully resolve to the block number where anchor was created
+   * or reject with an error.
+   */
+  async get(anchor, preHashed = false) {
+    let key;
+    if (preHashed) {
+      key = normalizeToHex(anchor);
+    } else if (anchor instanceof Uint8Array) {
+      key = u8aToHex(this.hash(anchor));
+    } else if (isHexWithGivenByteSize(anchor)) {
+      key = u8aToHex(this.hash(hexToU8a(anchor)));
+    } else {
+      throw new Error('Require a hex string or a byte array');
+    }
+
+    const resp = await this.api.query.anchor.anchors(key);
+    if (resp.isNone) {
+      throw new NoAnchorError(anchor);
+    }
+    return resp.unwrap().toNumber();
+  }
+
+  /**
+   * Batch multiple documents in binary merkle tree and return the root and proofs for each document
+   * @param documents
+   * @returns {Array} - An 2 element array where 1st element is root and 2nd is an array with proofs for
+   * each document.
+   */
+  batchDocumentsInMerkleTree(documents) {
+    // Hash all documents
+    const leafHashes = documents.map(this.hash);
+    // Concatenate all leaf hashes into one bytearray
+    const packed = new Uint8Array(leafHashes.map((a) => [...a]).flat());
+    const [root, proofs] = construct(packed);
+    return [Uint8Array.from(root), proofs];
+  }
+
+  /**
+   * Verify inclusion proof of document in a merkle tree with given root. The document is hashed to form a leaf first
+   * @param document
+   * @param proof
+   * @param root
+   * @returns {boolean}
+   */
+  verifyMerkleProofOfDocument(document, proof, root) {
+    const hash = this.hash(document);
+    return this.verifyMerkleProofOfLeaf(hash, proof, root);
+  }
+
+  /**
+   * Verify inclusion proof of leaf in a merkle tree with given root.
+   * @param leaf
+   * @param proof
+   * @param root
+   * @returns {boolean}
+   */
+  verifyMerkleProofOfLeaf(leaf, proof, root) {
+    /* eslint-disable camelcase */
+    const calculatedRoot = verify_proof(leaf, proof);
+    return calculatedRoot.length === root.length &amp;&amp; calculatedRoot.every((v, i) => v === root[i]);
+  }
+
+  /**
+   * Hash given data using Blake2b
+   * @param anchor
+   * @returns {Uint8Array}
+   */
+  hash(anchor) {
+    const h = BLAKE2b(32);
+    h.update(anchor);
+    return h.digest();
   }
 }
 </code></pre>

@@ -159,7 +159,7 @@ a function that expects `extrinsic` as first argument and a dock api instance as
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line36">line 36</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line37">line 37</a>
     </li></ul></dd>
     
 
@@ -209,6 +209,68 @@ a function that expects `extrinsic` as first argument and a dock api instance as
 
         
             
+<h4 class="name" id="anchor"><span class="type-signature"></span>anchor<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Gets the SDK's Anchor module
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line230">line 230</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
 <h4 class="name" id="blob"><span class="type-signature"></span>blob<span class="type-signature"></span></h4>
 
 
@@ -253,7 +315,7 @@ a function that expects `extrinsic` as first argument and a dock api instance as
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line217">line 217</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line241">line 241</a>
     </li></ul></dd>
     
 
@@ -315,7 +377,7 @@ a function that expects `extrinsic` as first argument and a dock api instance as
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line228">line 228</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line252">line 252</a>
     </li></ul></dd>
     
 
@@ -377,7 +439,7 @@ a function that expects `extrinsic` as first argument and a dock api instance as
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line205">line 205</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line218">line 218</a>
     </li></ul></dd>
     
 
@@ -439,7 +501,7 @@ a function that expects `extrinsic` as first argument and a dock api instance as
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line250">line 250</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line274">line 274</a>
     </li></ul></dd>
     
 
@@ -501,7 +563,7 @@ a function that expects `extrinsic` as first argument and a dock api instance as
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line239">line 239</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line263">line 263</a>
     </li></ul></dd>
     
 
@@ -581,7 +643,7 @@ a function that expects `extrinsic` as first argument and a dock api instance as
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line135">line 135</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line138">line 138</a>
     </li></ul></dd>
     
 
@@ -740,7 +802,7 @@ a function that expects `extrinsic` as first argument and a dock api instance as
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line52">line 52</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line53">line 53</a>
     </li></ul></dd>
     
 
@@ -781,6 +843,187 @@ a function that expects `extrinsic` as first argument and a dock api instance as
     <dd>
         
 <span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="send"><span class="type-signature">(async) </span>send<span class="signature">(extrinsic, waitForFinalization)</span><span class="type-signature"> &rarr; {Promise.&lt;unknown>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Helper function to send a transaction that has already been signed
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>extrinsic</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Extrinsic to send</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last">If true, waits for extrinsic's block to be finalized,
+else only wait to be included in block.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line175">line 175</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;unknown></span>
 
 
     </dd>
@@ -900,7 +1143,7 @@ Sets the account used to sign transactions
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line127">line 127</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line130">line 130</a>
     </li></ul></dd>
     
 
@@ -944,7 +1187,7 @@ Sets the account used to sign transactions
 
 
 <div class="description">
-    Helper function to send transaction
+    Helper function to sign and send transaction
 </div>
 
 
@@ -1002,7 +1245,7 @@ Sets the account used to sign transactions
                 </td>
             
 
-            <td class="description last">Extrinsic to send</td>
+            <td class="description last">Extrinsic to sign and send</td>
         </tr>
 
     
@@ -1100,7 +1343,7 @@ else only wait to be included in block.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line161">line 161</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line163">line 163</a>
     </li></ul></dd>
     
 
@@ -1278,7 +1521,7 @@ else only wait to be included in block.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line145">line 145</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line148">line 148</a>
     </li></ul></dd>
     
 
@@ -1342,13 +1585,13 @@ else only wait to be included in block.</td>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="PoAModule.html">PoAModule</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#asEE">asEE</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatuses">getCredentialStatuses</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSignatures">getSignatures</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#setAuthor">setAuthor</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#setSignature">setSignature</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toMap">toMap</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="PoAModule.html">PoAModule</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#asEE">asEE</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatuses">getCredentialStatuses</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSignatures">getSignatures</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#setAuthor">setAuthor</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#setSignature">setSignature</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toMap">toMap</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Dec 07 2020 13:06:47 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Thu Dec 10 2020 10:24:19 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -35,6 +35,7 @@ export function fromJsonldjsCg(jcg) {
 
 // convert a single node from json-ld claimgraph representation to this module's representation.
 function fromJsonldjsNode(jn) {
+  let ret;
   switch (jn.termType) {
     case 'NamedNode':
       return { Iri: jn.value };
@@ -42,7 +43,7 @@ function fromJsonldjsNode(jn) {
       return { Blank: jn.value };
     case 'Literal':
       assert(jn.datatype.termType === 'NamedNode', 'The datatype of an RDF literal must be an IRI');
-      let ret = { Literal: { value: jn.value, datatype: jn.datatype.value } };
+      ret = { Literal: { value: jn.value, datatype: jn.datatype.value } };
       if (jn.datatype.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString') {
         assert(
           jn.language !== undefined,

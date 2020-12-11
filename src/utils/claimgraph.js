@@ -5,6 +5,18 @@
 // a blank node: `{ Blank: '<string>' }`,
 // or a literal node: `{ Literal: { value: '<string>', datatype: '<iri>' } }`
 //
+// In compliance with https://www.w3.org/TR/rdf11-concepts/#section-Graph-Literal
+// a literal node must have a language tag if and only if datatype is
+// `http://www.w3.org/1999/02/22-rdf-syntax-ns#langString`
+//
+// ```
+// { Literal: {
+//    value: '<string>',
+//    datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
+//    language: '<tag>',
+// } }
+// ```
+//
 // This module implements utilities for operating on claimgraphs if the above format.
 
 import { assert } from '@polkadot/util';
@@ -30,7 +42,15 @@ function fromJsonldjsNode(jn) {
       return { Blank: jn.value };
     case 'Literal':
       assert(jn.datatype.termType === 'NamedNode', 'The datatype of an RDF literal must be an IRI');
-      return { Literal: { value: jn.value, datatype: jn.datatype.value } };
+      let ret = { Literal: { value: jn.value, datatype: jn.datatype.value } };
+      if (jn.datatype.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString') {
+        assert(
+          jn.language !== undefined,
+          'Language tagged strings are expected to have a language tag.',
+        );
+        ret.Literal.language = jn.language;
+      }
+      return ret;
     default:
       throw new TypeError(`Unknown node type: ${jn.termType}`);
   }

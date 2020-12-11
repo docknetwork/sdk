@@ -1,4 +1,5 @@
 import { fromJsonldjsCg, asEE, merge } from '../../src/utils/claimgraph';
+import jsonld from 'jsonld';
 
 describe('Claimgraph operations.', () => {
   test('merge', async () => {
@@ -232,5 +233,43 @@ describe('Claimgraph operations.', () => {
         ],
       ],
     );
+  });
+
+  test('moron != carrot. https://github.com/docknetwork/sdk/issues/173', async () => {
+    const jld = {
+      'https://example.com/a': [{
+        '@value': 'moron',
+        '@language': 'en'
+      }, {
+        '@value': 'moron',
+        '@language': 'cy'
+      }]
+    };
+    const cg = fromJsonldjsCg(await jsonld.toRDF(jld));
+    expect(cg[0]).not.toEqual(cg[1]);
+    expect(cg).toEqual([
+      [
+        { Blank: '_:b0' },
+        { Iri: 'https://example.com/a' },
+        {
+          Literal: {
+            value: 'moron',
+            datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
+            language: 'en'
+          }
+        }
+      ],
+      [
+        { Blank: '_:b0' },
+        { Iri: 'https://example.com/a' },
+        {
+          Literal: {
+            value: 'moron',
+            datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
+            language: 'cy'
+          }
+        }
+      ]
+    ]);
   });
 });

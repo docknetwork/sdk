@@ -7,6 +7,7 @@ import BlobModule from './modules/blob';
 import DIDModule from './modules/did';
 import RevocationModule from './modules/revocation';
 import PoAModule from './modules/poa';
+import CouncilModule from './modules/council';
 import TokenMigration from './modules/migration';
 import types from './types.json';
 import PoaRpcDefs from './poa-rpc-defs';
@@ -90,6 +91,7 @@ class DockAPI {
     this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));
     this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
     this.revocationModule = new RevocationModule(this.api, this.signAndSend.bind(this));
+    this.councilModule = new CouncilModule(this.api, this.signAndSend.bind(this));
 
     if (loadPoaModules) {
       this.poaModule = new PoAModule(this.api);
@@ -176,23 +178,41 @@ class DockAPI {
     const promise = new Promise((resolve, reject) => {
       try {
         let unsubFunc = null;
-        return extrinsic.send(({ events = [], status }) => {
+        return extrinsic.send((extrResult) => {
+          const { events = [], status } = extrResult;
+
+          // Ensure ExtrinsicFailed event doesnt exist
+          for (let i = 0; i < events.length; i++) {
+            const { phase, event: { data, method, section, typeDef } } = events[i];
+            if (method === 'ExtrinsicFailed') {
+              // Loop through each of the parameters
+              // trying to find module error information
+              let errorMsg = `Extrinsic failed submission: ${data.toString()}`;
+              data.forEach((paramData, index) => {
+                if (typeDef[index].type === 'DispatchError' && paramData.isModule) {
+                  const mod = paramData.asModule;
+                  const { documentation, name, section } = mod.registry.findMetaError(mod);
+                  errorMsg += `\nDispatchError: ${section}.${name}: ${documentation}`;
+                }
+              });
+
+              // Throw error
+              const error = new Error(errorMsg);
+              reject(error);
+              return error;
+            }
+          }
+
           // If waiting for finalization
           if (waitForFinalization && status.isFinalized) {
             unsubFunc();
-            resolve({
-              events,
-              status,
-            });
+            resolve(extrResult);
           }
 
           // If not waiting for finalization, wait for inclusion in block.
           if (!waitForFinalization && status.isInBlock) {
             unsubFunc();
-            resolve({
-              events,
-              status,
-            });
+            resolve(extrResult);
           }
         })
           .catch((error) => {
@@ -272,10 +292,21 @@ class DockAPI {
    * @return {PoAModule} The module to use
    */
   get poa() {
-    if (!this.poa) {
+    if (!this.poaModule) {
       throw new Error('Unable to get PoA module, SDK is not initialised');
     }
     return this.poaModule;
+  }
+
+  /**
+   * Get the PoA module
+   * @return {PoAModule} The module to use
+   */
+  get council() {
+    if (!this.councilModule) {
+      throw new Error('Unable to get council module, SDK is not initialised');
+    }
+    return this.councilModule;
   }
 }
 

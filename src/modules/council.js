@@ -34,11 +34,6 @@ export default class CouncilModule {
     await this.signAndSend(tx, waitForFinalization);
   }
 
-  async getMembers() {
-    const result = await this.api.query.council.members();
-    return result;
-  }
-
   async getOpenProposalCount() {
     const result = await this.api.query.council.proposals();
     return result.length;
@@ -62,6 +57,26 @@ export default class CouncilModule {
   async getProposalIndex(proposalHash) {
     const result = (await this.api.query.council.voting(proposalHash)).toJSON();
     return result.index;
+  }
+
+  // TODO: evulate if we need these below methods
+
+  async getTechComitteeMembers() {
+    const result = await this.api.query.technicalCommitteeMembership.members();
+    return result;
+  }
+
+  async getMembers() {
+    const result = await this.api.query.council.members();
+    return result;
+  }
+
+  addTechCommitteeMember(who) {
+    return this.api.tx.technicalCommitteeMembership.addMember(who);
+  }
+
+  removeTechCommitteeMember(who) {
+    return this.api.tx.technicalCommitteeMembership.removeMember(who);
   }
 
   addMember(who) {

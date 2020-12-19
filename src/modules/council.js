@@ -1,6 +1,9 @@
 import { u8aToHex } from '@polkadot/util';
+import { randomAsHex } from '@polkadot/util-crypto';
+import { encodeExtrinsicAsHash } from '../utils/misc';
 
 // TODO: perhaps rename to DemoracyModule and add all methods?
+// if not remove democracy methods here into own module
 // will see how many we need
 export default class CouncilModule {
   /**
@@ -11,6 +14,15 @@ export default class CouncilModule {
   constructor(api, signAndSend) {
     this.api = api;
     this.signAndSend = signAndSend;
+  }
+
+  getProposalHash(tx) {
+    return encodeExtrinsicAsHash(this.api, tx);
+  }
+
+  async executeProposal(proposal, lengthBound = 1000, waitForFinalization = true) {
+    const tx = this.api.tx.council.execute(this.api.createType('Call', proposal), lengthBound);
+    await this.signAndSend(tx, waitForFinalization);
   }
 
   async makeProposal(call, threshold = 2, lengthBound = 1000, waitForFinalization = true) {
@@ -61,22 +73,9 @@ export default class CouncilModule {
 
   // TODO: evulate if we need these below methods
 
-  async getTechComitteeMembers() {
-    const result = await this.api.query.technicalCommitteeMembership.members();
-    return result;
-  }
-
   async getMembers() {
     const result = await this.api.query.council.members();
     return result;
-  }
-
-  addTechCommitteeMember(who) {
-    return this.api.tx.technicalCommitteeMembership.addMember(who);
-  }
-
-  removeTechCommitteeMember(who) {
-    return this.api.tx.technicalCommitteeMembership.removeMember(who);
   }
 
   addMember(who) {

@@ -1,4 +1,5 @@
 import { ec as EC } from 'elliptic';
+import { blake2AsHex } from '@polkadot/util-crypto';
 
 import {
   PublicKey, PublicKeyEd25519, PublicKeySecp256k1, PublicKeySr25519, // eslint-disable-line
@@ -123,4 +124,14 @@ export function getUniqueElementsFromArray(a, filterCallback) {
     const k = filterCallback(item);
     return seen.has(k) ? false : seen.add(k);
   });
+}
+
+/**
+ * Encodes an extrinsic as a blake2 hash
+ * @param {*} api - API for creating Call type
+ * @param {*} tx - Extrinsic to encode
+ * @returns {string}
+ */
+export function encodeExtrinsicAsHash(api, tx) {
+  return blake2AsHex(api.createType('Call', tx).toU8a());
 }

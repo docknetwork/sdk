@@ -71,12 +71,12 @@ export default class CouncilModule {
     return result.index;
   }
 
-  // TODO: evulate if we need these below methods
-
   async getMembers() {
     const result = await this.api.query.council.members();
     return result;
   }
+
+  // TODO: evulate if we need these below methods
 
   addMember(who) {
     return this.api.tx.councilMembership.addMember(who);

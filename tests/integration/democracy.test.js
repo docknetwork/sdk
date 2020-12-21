@@ -122,6 +122,10 @@ describe('Tech-committee', () => {
     // Any account can then close the proposal
     await dock.techCommittee.closeTechComitteeProposal(proposalHash, proposalIndex);
 
+    // Wait for referendum to process
+    const REFERENDUM_PROGRESS_WAIT = 120000;
+    await new Promise((r) => setTimeout(r, REFERENDUM_PROGRESS_WAIT));
+
     // Ensure referendum was added
     // TODO: fix failure here, is it due to current block or referendum times?
     expect(await dock.democracy.getReferendumCount()).toEqual(1);

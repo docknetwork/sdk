@@ -15,7 +15,9 @@ export default class DemocracyModule {
   }
 
   async cancelReferendum(referendumIndex, waitForFinalization = true) {
-    const tx = this.api.tx.democracy.cancelReferendum(referendumIndex);
+    const tx = this.api.tx.sudo.sudo(
+      this.api.tx.democracy.cancelReferendum(referendumIndex)
+    );
     await this.signAndSend(tx, waitForFinalization);
   }
 
@@ -82,6 +84,11 @@ export default class DemocracyModule {
   async getReferendumCount() {
     const result = await this.api.query.forkedDemocracy.referendumCount();
     return result.toNumber();
+  }
+
+  async getReferendumStatus(referendumIndex = 0) {
+    const result = await this.api.query.forkedDemocracy.referendumInfoOf(referendumIndex);
+    return result.toJSON();
   }
 
   async getNextExternal() {

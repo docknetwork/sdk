@@ -20,6 +20,7 @@ export default class CouncilModule {
     return encodeExtrinsicAsHash(this.api, tx);
   }
 
+  // TODO: rename this method to just "execute"
   async executeProposal(proposal, lengthBound = 1000, waitForFinalization = true) {
     const tx = this.api.tx.council.execute(this.api.createType('Call', proposal), lengthBound);
     await this.signAndSend(tx, waitForFinalization);

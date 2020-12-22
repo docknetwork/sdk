@@ -50,12 +50,12 @@ async function council_votes_and_concludes(proposalHash, balance_set_prop, refer
   // Member 1 approves
   console.log('vote 1')
   dock.setAccount(dock.keyring.addFromUri(CouncilMemberAccountUri));
-  await dock.democracy.vote(referendumIndex, true);
+  await dock.council.executeProposal(dock.democracy.vote(referendumIndex, true));
 
   // Member 2 disapproves
   console.log('vote 2')
   dock.setAccount(dock.keyring.addFromUri(CouncilMember2AccountUri));
-  await dock.democracy.vote(referendumIndex, false);
+  await dock.council.executeProposal(dock.democracy.vote(referendumIndex, false));
 
   // Ensure votes went through
   let status = await dock.democracy.getReferendumStatus(referendumIndex);
@@ -70,7 +70,7 @@ async function council_votes_and_concludes(proposalHash, balance_set_prop, refer
   // Last member approves
   console.log('vote 3')
   dock.setAccount(dock.keyring.addFromUri(CouncilMember3AccountUri));
-  await dock.democracy.vote(referendumIndex, true);
+  await dock.council.executeProposal(dock.democracy.vote(referendumIndex, true));
 
   // Ensure last vote went through
   status = await dock.democracy.getReferendumStatus(referendumIndex);

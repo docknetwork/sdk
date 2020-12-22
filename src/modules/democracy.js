@@ -76,17 +76,8 @@ export default class DemocracyModule {
     await this.signAndSend(tx, waitForFinalization);
   }
 
-  vote(referendumIndex, vote, balance = 10000, waitForFinalization = true) {
-    const voteObj = {
-      Standard: {
-        aye: vote,
-        balance,
-      }
-    };
-    const tx = this.api.tx.democracy.vote(referendumIndex, voteObj);
-    console.log('vote obj', voteObj)
-    return tx;
-    // await this.signAndSend(tx, waitForFinalization);
+  vote(referendumIndex, vote, waitForFinalization = true) {
+    return this.api.tx.democracy.vote(referendumIndex, vote);
   }
 
   async getDepositOf(referendumIndex) {

@@ -18,7 +18,7 @@ export default class TechCommitteeModule {
 
   async getTechComitteeProposalIndex(proposalHash) {
     const result = (await this.api.query.technicalCommittee.voting(proposalHash)).toJSON();
-    return result.index;
+    return result && result.index;
   }
 
   async getTechComitteeProposals() {

@@ -76,8 +76,13 @@ export default class DemocracyModule {
     await this.signAndSend(tx, waitForFinalization);
   }
 
-  async vote(referendumIndex, vote, waitForFinalization = true) {
-    const tx = this.api.tx.democracy.vote(referendumIndex, vote);
+  async vote(referendumIndex, vote, balance = 0, waitForFinalization = true) {
+    const tx = this.api.tx.democracy.vote(referendumIndex, {
+      Standard: {
+        aye: vote,
+        balance,
+      }
+    });
     await this.signAndSend(tx, waitForFinalization);
   }
 

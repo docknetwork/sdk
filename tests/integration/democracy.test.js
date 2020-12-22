@@ -6,6 +6,8 @@ import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-const
 // TODO: adjust these, tests take forever - i think we can do better with different node values
 const REFERENDUM_PROGRESS_WAIT = 180000; // 2.5 minutes
 const PROPOSAL_PROGRESS_WAIT = 20000; // 20 seconds
+const DEMOCRACY_MIN_DEPOSIT = 10000 * 1000000; // 10K tokens
+const DEMOCRACY_SECOND_DEPOSIT = 10 * 1000000; // 10 tokens
 
 // TODO: refactor into an array
 const CouncilMemberAccountUri = '//Alice//stash';
@@ -18,10 +20,18 @@ const TechCommitteeMemberUris = [
   '//Eve',
 ];
 
-async function giveBalance(address) {
-  dock.setAccount(dock.keyring.addFromUri(CouncilMemberAccountUri));
-  const transfer = dock.api.tx.balances.transfer(address, 1000000000);
-  await dock.signAndSend(transfer);
+async function giveBalance(address, deposit = 1000000000) {
+  dock.setAccount(dock.keyring.addFromUri('//Alice'));
+  const setBalanceTx = dock.api.tx.balances.setBalance(address, deposit, 0);
+  await dock.signAndSend(dock.api.tx.sudo.sudo(setBalanceTx));
+}
+
+async function getBalanceOf(address) {
+  const { data } = await dock.api.query.system.account(address);
+  return {
+    free: data.free.toNumber(),
+    reserved: data.reserved.toNumber(),
+  };
 }
 
 async function connectAndInit() {
@@ -38,10 +48,12 @@ async function council_votes_and_concludes(proposalHash, balance_set_prop, refer
   // TODO: fix badorigin error
 
   // Member 1 approves
+  console.log('vote 1')
   dock.setAccount(dock.keyring.addFromUri(CouncilMemberAccountUri));
   await dock.democracy.vote(referendumIndex, true);
 
   // Member 2 disapproves
+  console.log('vote 2')
   dock.setAccount(dock.keyring.addFromUri(CouncilMember2AccountUri));
   await dock.democracy.vote(referendumIndex, false);
 
@@ -56,6 +68,7 @@ async function council_votes_and_concludes(proposalHash, balance_set_prop, refer
   );
 
   // Last member approves
+  console.log('vote 3')
   dock.setAccount(dock.keyring.addFromUri(CouncilMember3AccountUri));
   await dock.democracy.vote(referendumIndex, true);
 
@@ -122,10 +135,69 @@ async function conclude_proposal(balance_set_prop_hash, balance_set_prop) {
 }
 
 describe('Proposal proposing', () => {
+  let proposer = '//Charlie';
+  let backer_1 = '//Eve';
+  let backer_2 = '//Ferdie';
+
   beforeAll(async (done) => {
     await connectAndInit();
+
+    // Give proposer and backer balance
+    await giveBalance(dock.keyring.addFromUri(proposer).address, DEMOCRACY_MIN_DEPOSIT * 10);
+    await giveBalance(dock.keyring.addFromUri(backer_1).address, DEMOCRACY_MIN_DEPOSIT * 10);
+    await giveBalance(dock.keyring.addFromUri(backer_2).address, DEMOCRACY_MIN_DEPOSIT * 10);
+
     done();
   }, 320000);
+
+  // test('Rejection of proposal', async () => {
+  //   const currentPublicProposalCount = await dock.democracy.getPublicProposalCount();
+  //   const councilMembers = await dock.council.getMembers();
+  //   expect(councilMembers.length).toEqual(3); // Ensure we have default council members
+  //
+  //
+  //   // Create set balance root extrinsic to propose
+  //   const newBalance = 10000000000;
+  //   const rootAction = dock.api.tx.balances.setBalance(dock.keyring.addFromUri(CouncilMember2AccountUri).address, newBalance, 0);
+  //
+  //   // Get root action proposal hash
+  //   const balanceSetPropHash = dock.council.getProposalHash(rootAction);
+  //
+  //   const referendumIndex = 0;
+  //
+  //   expect((await getBalanceOf(dock.keyring.addFromUri(proposer).address)).reserved).toEqual(0);
+  //   expect((await getBalanceOf(dock.keyring.addFromUri(backer_1).address)).reserved).toEqual(0);
+  //   expect((await getBalanceOf(dock.keyring.addFromUri(backer_2).address)).reserved).toEqual(0);
+  //   expect(await dock.democracy.getDepositOf(referendumIndex)).toEqual(null); // TODO: not sure if we should have here incase existing ref?
+  //
+  //   dock.setAccount(dock.keyring.addFromUri(proposer));
+  //   await dock.democracy.propose(balanceSetPropHash, DEMOCRACY_MIN_DEPOSIT);
+  //
+  //   dock.setAccount(dock.keyring.addFromUri(backer_1));
+  //   await dock.democracy.second(0, DEMOCRACY_SECOND_DEPOSIT);
+  //
+  //   dock.setAccount(dock.keyring.addFromUri(backer_2));
+  //   await dock.democracy.second(0, DEMOCRACY_SECOND_DEPOSIT);
+  //
+  //   expect(await dock.democracy.getPublicProposalCount()).toEqual(currentPublicProposalCount + 1);
+  //
+  //
+  //       // // Public proposal backed by 2 more accounts
+  //       // Democracy::propose(Origin::signed(proposer), balance_set_prop_hash).unwrap();
+  //       // Democracy::second(Origin::signed(backer_1), 0, 10).unwrap();
+  //       // Democracy::second(Origin::signed(backer_2), 0, 10).unwrap();
+  //       // assert_eq!(Democracy::public_props().len(), 1);
+  //       //
+  //       // // Proposer's and backers' free balance decreases and that balance is reserved.
+  //       // assert_eq!(Balances::reserved_balance(proposer), deposit);
+  //       // assert_eq!(Balances::reserved_balance(backer_1), deposit);
+  //       // assert_eq!(Balances::reserved_balance(backer_1), deposit);
+  //       // assert_eq!(Democracy::deposit_of(0).unwrap().0.len(), 3);
+  //       // assert_eq!(Democracy::deposit_of(0).unwrap().1, deposit);
+  //
+  //
+  //
+  // }, 320000);
 
   test('Council proposes root action and accepts', async () => {
     expect(await dock.democracy.getNextExternal()).toEqual(null);

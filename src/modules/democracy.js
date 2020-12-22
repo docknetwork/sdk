@@ -86,6 +86,16 @@ export default class DemocracyModule {
     await this.signAndSend(tx, waitForFinalization);
   }
 
+  async getDepositOf(referendumIndex) {
+    const result = await this.api.query.forkedDemocracy.depositOf(referendumIndex);
+    return result.isNone ? null : result.toNumber();
+  }
+
+  async getPublicProposalCount() {
+    const result = await this.api.query.forkedDemocracy.publicProps();
+    return result.length;
+  }
+
   async getReferendumCount() {
     const result = await this.api.query.forkedDemocracy.referendumCount();
     return result.toNumber();

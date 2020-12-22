@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: modules/did.js</title>
+    <title>JSDoc: Source: utils/chain-ops.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: modules/did.js</h1>
+    <h1 class="page-title">Source: utils/chain-ops.js</h1>
 
     
 
@@ -26,222 +26,177 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import { encodeAddress } from '@polkadot/util-crypto';
-import b58 from 'bs58';
+            <pre class="prettyprint source linenums"><code>// Utilities for doing basic operations with chain.
 
-import {
-  getHexIdentifierFromDID, DockDIDQualifier, NoDIDError, validateDockDIDHexIdentifier,
-} from '../utils/did';
-import { getStateChange } from '../utils/misc';
+import { Keyring } from '@polkadot/keyring';
+import { randomAsHex, cryptoWaitReady, checkAddress } from '@polkadot/util-crypto';
+import { u8aToHex, formatBalance } from '@polkadot/util';
+import { isHexWithGivenByteSize, asDockAddress } from './codec';
 
-import Signature from '../signatures/signature'; // eslint-disable-line
+// XXX: Following info can be fetched from chain. Integrating in DockAPI object is an options.
+const TESTNET_ADDR_PREFIX = 21;
+const MAINNET_ADDR_PREFIX = 22;
+const DECIMAL = 6;
+const SYMBOL = 'DCK';
 
-/** Class to create, update and destroy DIDs */
-class DIDModule {
-  /**
-   * Creates a new instance of DIDModule and sets the api
-   * @constructor
-   * @param {object} api - PolkadotJS API Reference
-   */
-  constructor(api, signAndSend) {
-    this.api = api;
-    this.module = api.tx.didModule;
-    this.signAndSend = signAndSend;
+// The methods below intentionally take an `ApiPromise` object to decouple from DockAPI.
+
+// Check if an address is valid
+export function validateAddress(address, network = 'test') {
+  if (network !== 'test' &amp;&amp; network !== 'main') {
+    throw new Error('Network must be "test" or "main"');
+  }
+  const prfx = network === 'test' ? TESTNET_ADDR_PREFIX : MAINNET_ADDR_PREFIX;
+  const res = checkAddress(address, prfx);
+  if (res[0] === true) {
+    return true;
+  }
+  console.error(`Error while parsing address ${res[1]}`);
+  return false;
+}
+
+// Generate an account. If `secretUri` is not passed, a random one is generated
+export async function generateAccount({ secretUri, type = 'sr25519', network = 'test' }) {
+  if (['ed25519', 'sr25519', 'ecdsa'].indexOf(type) === -1) {
+    throw new Error(`${type} is not a valid type`);
+  }
+  if (network !== 'test' &amp;&amp; network !== 'main') {
+    throw new Error('Network must be "test" or "main"');
   }
 
-  /**
-   * Creates transaction to create a new DID on the Dock chain.
-   * @param {string} did - The new DID. Can be a full DID or hex identifier
-   * @param {object} keyDetail - `KeyDetail` as expected by the Substrate node
-   * @return {object} The extrinsic to sign and send.
-   */
-  createNewTx(did, keyDetail) {
-    const hexId = getHexIdentifierFromDID(did);
-    return this.module.new(hexId, keyDetail);
+  if (secretUri === undefined) {
+    // eslint-disable-next-line no-param-reassign
+    secretUri = randomAsHex(32);
   }
 
-  /**
-   * Creates a new DID on the Dock chain.
-   * @param {string} did - The new DID. Can be a full DID or hex identifier
-   * @param {object} keyDetail - `KeyDetail` as expected by the Substrate node
-   * @return {Promise&lt;object>} Promise to the pending transaction
-   */
-  async new(did, keyDetail, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createNewTx(did, keyDetail), waitForFinalization, params);
+  const prfx = network === 'test' ? TESTNET_ADDR_PREFIX : MAINNET_ADDR_PREFIX;
+
+  await cryptoWaitReady();
+  // @ts-ignore
+  const keyring = new Keyring({ type, ss58Format: prfx });
+  const keypair = keyring.addFromUri(secretUri);
+  return [secretUri, keypair.address, keypair];
+}
+
+// Get the last authored block
+export async function getLastBlock(api) {
+  const { block } = await api.rpc.chain.getBlock();
+  return block;
+}
+
+// Get the last finalized block
+export async function getLastFinalizedBlock(api) {
+  const h = await api.rpc.chain.getFinalizedHead();
+  return getBlock(api, u8aToHex(h));
+}
+
+// Given a block number, return the block hash
+export async function blockNumberToHash(api, number) {
+  if (Number.isInteger(number) &amp;&amp; number > 0) {
+    const h = await api.rpc.chain.getBlockHash(number);
+    return u8aToHex(h);
   }
+  throw new Error(`${number} is not a valid block number`);
+}
 
-  /**
-   * Updates the details of an already registered DID on the Dock chain.
-   * @param {object} keyUpdate - `KeyUpdate` as expected by the Substrate node
-   * @param {Signature} signature - Signature from existing key
-   * @return {Promise&lt;object>} The extrinsic to sign and send.
-   */
-  createUpdateKeyTx(keyUpdate, signature) {
-    return this.module.updateKey(keyUpdate, signature.toJSON());
+// Fetch a block by block number or block hash
+export async function getBlock(api, numberOrHash, withAuthor = false) {
+  const hash = isHexWithGivenByteSize(numberOrHash, 32) ? numberOrHash : (await blockNumberToHash(api, numberOrHash));
+  if (withAuthor) {
+    const { block, author } = await api.derive.chain.getBlock(hash);
+    return { block, author };
   }
+  const { block } = await api.rpc.chain.getBlock(hash);
+  return block;
+}
 
-  /**
-   * Updates the details of an already registered DID on the Dock chain.
-   * @param {object} keyUpdate - `KeyUpdate` as expected by the Substrate node
-   * @param {Signature} signature - Signature from existing key
-   * @return {Promise&lt;object>} Promise to the pending transaction
-   */
-  async updateKey(keyUpdate, signature, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createUpdateKeyTx(keyUpdate, signature), waitForFinalization, params);
+// Given a block header or block, extract the block number
+export function getBlockNo(headerOrBlock) {
+  if ((typeof headerOrBlock.header) === 'object') {
+    return headerOrBlock.header.number.toNumber();
   }
+  return headerOrBlock.number.toNumber();
+}
 
-  /**
-   * Removes an already registered DID on the Dock chain.
-   * @param {object} didRemoval - `DidRemoval` as expected by the Substrate node
-   * @param {Signature} signature - Signature from existing key
-   * @return {Promise&lt;object>} The extrinsic to sign and send.
-   */
-  createRemoveTx(didRemoval, signature) {
-    return this.module.remove(didRemoval, signature.toJSON());
-  }
+// Given a block number or block hash, get all extrinsics.
+export async function getAllExtrinsicsFromBlock(api, numberOrHash) {
+  const block = await getBlock(api, numberOrHash);
+  return block.extrinsics;
+}
 
-  /**
-   * Removes an already registered DID on the Dock chain.
-   * @param {object} didRemoval - `DidRemoval` as expected by the Substrate node
-   * @param {Signature} signature - Signature from existing key
-   * @return {Promise&lt;object>} Promise to the pending transaction
-   */
-  async remove(didRemoval, signature, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createRemoveTx(didRemoval, signature), waitForFinalization, params);
-  }
+// Given a block number or block hash, get all events.
+export async function getAllEventsFromBlock(api, numberOrHash, formatted = true) {
+  const hash = isHexWithGivenByteSize(numberOrHash, 32) ? numberOrHash : (await blockNumberToHash(api, numberOrHash));
+  const events = await api.query.system.events.at(hash);
+  return formatted ? events.map((e) => e.toJSON()) : events;
+}
 
-  /**
-   * Create the fully qualified DID like "did:dock:..."
-   * @param {string} did - DID
-   * @return {string} The DID identifier.
-   */
-  getFullyQualifiedDID(did) {
-    return `${DockDIDQualifier}${did}`;
-  }
+// Format a balance with units or only as number.
+function formatBalIfNeeded(bal, format = true) {
+  return format ? formatBalance(bal, { decimals: DECIMAL, withSi: true, withUnit: SYMBOL }) : bal.toNumber();
+}
 
-  /**
-   * Gets a DID from the Dock chain and create a DID document according to W3C spec.
-   * Throws NoDID if the DID does not exist on chain.
-   * @param {string} did - The DID can be passed as fully qualified DID like `dock:did:&lt;SS58 string>` or
-   * a 32 byte hex string
-   * @return {Promise&lt;object>} The DID document.
-   */
-  async getDocument(did) {
-    const hexId = getHexIdentifierFromDID(did);
-    const detail = (await this.getDetail(hexId))[0];
-
-    // If given DID was in hex, encode to SS58 and then construct fully qualified DID else the DID was already fully qualified
-    const id = (did === hexId) ? this.getFullyQualifiedDID(encodeAddress(hexId)) : did;
-
-    // Determine the type of the public key
-    let type; let
-      publicKeyRaw;
-    if (detail.public_key.isSr25519) {
-      type = 'Sr25519VerificationKey2020';
-      publicKeyRaw = detail.public_key.asSr25519;
-    } else if (detail.public_key.isEd25519) {
-      type = 'Ed25519VerificationKey2018';
-      publicKeyRaw = detail.public_key.asEd25519;
-    } else {
-      type = 'EcdsaSecp256k1VerificationKey2019';
-      publicKeyRaw = detail.public_key.asSecp256K1;
+// Given a block number or block hash, get all transfer extrinsics. Each returned extrinsic is in form `[sender, recipient, amount]`
+export async function getTransfersFromBlock(api, numberOrHash, network, balanceFormatted = true) {
+  const extrinsics = await getAllExtrinsicsFromBlock(api, numberOrHash);
+  const transfers = [];
+  extrinsics.forEach((ext) => {
+    if (ext.method &amp;&amp; ext.method.section === 'balances' &amp;&amp; (ext.method.method === 'transfer' || ext.method.method === 'transferKeepAlive')) {
+      const bal = formatBalIfNeeded(ext.method.args[1], balanceFormatted);
+      transfers.push([asDockAddress(ext.signer, network), asDockAddress(ext.method.args[0], network), bal]);
     }
+  });
+  return transfers;
+}
 
-    // The DID has only one key as of now.
-    const publicKey = {
-      id: `${id}#keys-1`,
-      type,
-      controller: this.getFullyQualifiedDID(encodeAddress(detail.controller)),
-      publicKeyBase58: b58.encode(publicKeyRaw.value),
-      // publicKeyPem: '-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n', // TODO: add proper value
-    };
+// Get free balance of an account.
+export async function getBalance(api, address, formatted = true) {
+  const { data: { free } } = await api.query.system.account(address);
+  return formatBalIfNeeded(free, formatted);
+}
 
-    // Set keys and authentication reference
-    const publicKeys = [publicKey];
-
-    // Set `proofPurpose`s. Check the DID spec for details on `proofPurpose`
-
-    // Set the `proofPurpose` authentication. As there is only one key, this will serve for authentication `proofPurpose`
-    const authentication = [publicKey.id];
-
-    // Set the `proofPurpose` assertionMethod
-    // Explicitly cloning the authentication object as there is only one key supported as of now.
-    // With multiple key support, the key creation will determine the proof purpose
-    const assertionMethod = [...authentication];
-    // TODO: setup proper service when we have it
-    // const service = [{
-    //   id: `${id}#vcs`,
-    //   type: 'VerifiableCredentialService',
-    //   serviceEndpoint: 'https://dock.io/vc/'
-    // }];
-
-    return {
-      '@context': 'https://www.w3.org/ns/did/v1',
-      id,
-      authentication,
-      assertionMethod,
-      publicKey: publicKeys,
-      // service,
-    };
-  }
-
-  /**
-   * Gets the key detail and block number in which the DID was last modified from
-   * the chain and return them. It will throw NoDID if the DID does not exist on
-   * chain.
-   * @param {string} didIdentifier - DID identifier as hex. Not accepting full DID intentionally for efficiency as these
-   * methods are used internally
-   * @return {Promise&lt;array>} A 2 element array with first
-   */
-  async getDetail(didIdentifier) {
-    validateDockDIDHexIdentifier(didIdentifier);
-    const resp = await this.api.query.didModule.dids(didIdentifier);
-    if (resp.isNone) {
-      throw new NoDIDError(`dock:did:${didIdentifier}`);
-    }
-
-    const respTuple = resp.unwrap();
-    if (respTuple.length === 2) {
-      return [
-        respTuple[0],
-        respTuple[1].toNumber(),
-      ];
-    }
-    throw new Error(`Needed 2 items in response but got${respTuple.length}`);
-  }
-
-  /**
-   * Gets the block number in which the DID was last modified in
-   * the chain and return it. It will throw error if the DID does not exist on
-   * chain or chain returns null response.
-   * @param {string} didIdentifier - DID identifier as hex. Not accepting full DID intentionally for efficiency as these
-   * methods are used internally
-   * @return {Promise&lt;array>} A 2 element array with first
-   */
-  async getBlockNoForLastChangeToDID(didIdentifier) {
-    return (await this.getDetail(didIdentifier))[1];
-  }
-
-  /**
-   * Serializes a `KeyUpdate` for signing.
-   * @param {object} keyUpdate - `KeyUpdate` as expected by the Substrate node
-   * @returns {Array} An array of Uint8
-   */
-  getSerializedKeyUpdate(keyUpdate) {
-    return getStateChange(this.api, 'KeyUpdate', keyUpdate);
-  }
-
-  /**
-   * Serializes a `DidRemoval` for signing.
-   * @param {object} didRemoval - `DidRemoval` as expected by the Substrate node
-   * @returns {Array} An array of Uint8
-   */
-  getSerializedDIDRemoval(didRemoval) {
-    return getStateChange(this.api, 'DidRemoval', didRemoval);
+function checkValidMicroAmount(micros) {
+  // TODO: this should handle upto 64 bits
+  if (!Number.isSafeInteger(micros) || micros &lt; 0) {
+    throw new Error(`Amount must be a positive integer and must fit in 53 bits but was ${micros}`);
   }
 }
 
-export default DIDModule;
+// Convert tokens to micros
+export function docksToMicroDocks(amount) {
+  // Token has `DECIMAL` decimal places
+  const micros = amount * (10 ** DECIMAL);
+  checkValidMicroAmount(micros);
+  return micros;
+}
+
+/**
+ * Transfer tokens and return txn hash. Converts to mirco tokens first
+ * @param api
+ * @param senderKeypair
+ * @param recipAddr
+ * @param amount - Amount in tokens
+ * @param sendTxn - If true, will send the transaction and return transaction hash otherwise return the signed transaction
+ * @returns {Promise&lt;*>}
+ */
+export async function transferDock(api, senderKeypair, recipAddr, amount, sendTxn = true) {
+  return transferMicroDock(api, senderKeypair, recipAddr, docksToMicroDocks(amount), sendTxn);
+}
+
+/**
+ * Transfer micro tokens and return txn hash.
+ * @param api
+ * @param senderKeypair
+ * @param recipAddr
+ * @param amount - Amount in micro (10^-6) tokens
+ * @param sendTxn - If true, will send the transaction and return transaction hash otherwise return the signed transaction
+ * @returns {Promise&lt;*>}
+ */
+export async function transferMicroDock(api, senderKeypair, recipAddr, amount, sendTxn = true) {
+  checkValidMicroAmount(amount);
+  const txn = api.tx.balances.transfer(recipAddr, amount);
+  return sendTxn ? txn.signAndSend(senderKeypair) : txn.signAsync(senderKeypair);
+}
 </code></pre>
         </article>
     </section>

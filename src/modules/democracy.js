@@ -100,7 +100,7 @@ export default class DemocracyModule {
     return this.api.tx.democracy.fastTrack(proposalHash, votingPeriod, delay);
   }
 
-  councilPropose(tx) {
-    return this.api.tx.democracy.councilPropose(typeof tx === 'string' ? tx : this.getProposalHash(tx));
+  councilPropose(proposalHash) {
+    return this.api.tx.democracy.councilPropose(proposalHash);
   }
 }

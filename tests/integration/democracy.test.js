@@ -7,7 +7,7 @@ import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-const
 const REFERENDUM_PROGRESS_WAIT = 180000; // 2.5 minutes
 const PROPOSAL_PROGRESS_WAIT = 20000; // 20 seconds
 const DEMOCRACY_MIN_DEPOSIT = 10000 * 1000000; // 10K tokens
-const DEMOCRACY_SECOND_DEPOSIT = 10 * 1000000; // 10 tokens
+const DEMOCRACY_SECOND_DEPOSIT = 10; // 10 tokens
 
 // TODO: refactor into an array
 const CouncilMemberAccountUri = '//Alice//stash';
@@ -45,19 +45,16 @@ async function connectAndInit() {
 }
 
 async function council_votes_and_concludes(proposalHash, balance_set_prop, referendumIndex) {
-  // TODO: fix badorigin error
-
   // Member 1 approves
-  console.log('vote 1')
   dock.setAccount(dock.keyring.addFromUri(CouncilMemberAccountUri));
   await dock.council.executeProposal(dock.democracy.vote(referendumIndex, true));
 
   // Member 2 disapproves
-  console.log('vote 2')
   dock.setAccount(dock.keyring.addFromUri(CouncilMember2AccountUri));
   await dock.council.executeProposal(dock.democracy.vote(referendumIndex, false));
 
   // Ensure votes went through
+  // TODO: fix all votes are nays?
   let status = await dock.democracy.getReferendumStatus(referendumIndex);
   expect(status).toMatchObject(
     expect.objectContaining({
@@ -150,76 +147,84 @@ describe('Proposal proposing', () => {
     done();
   }, 320000);
 
-  // test('Rejection of proposal', async () => {
-  //   const currentPublicProposalCount = await dock.democracy.getPublicProposalCount();
-  //   const councilMembers = await dock.council.getMembers();
-  //   expect(councilMembers.length).toEqual(3); // Ensure we have default council members
-  //
-  //
-  //   // Create set balance root extrinsic to propose
-  //   const newBalance = 10000000000;
-  //   const rootAction = dock.api.tx.balances.setBalance(dock.keyring.addFromUri(CouncilMember2AccountUri).address, newBalance, 0);
-  //
-  //   // Get root action proposal hash
-  //   const balanceSetPropHash = dock.council.getProposalHash(rootAction);
-  //
-  //   const referendumIndex = 0;
-  //
-  //   expect((await getBalanceOf(dock.keyring.addFromUri(proposer).address)).reserved).toEqual(0);
-  //   expect((await getBalanceOf(dock.keyring.addFromUri(backer_1).address)).reserved).toEqual(0);
-  //   expect((await getBalanceOf(dock.keyring.addFromUri(backer_2).address)).reserved).toEqual(0);
-  //   expect(await dock.democracy.getDepositOf(referendumIndex)).toEqual(null); // TODO: not sure if we should have here incase existing ref?
-  //
-  //   dock.setAccount(dock.keyring.addFromUri(proposer));
-  //   await dock.democracy.propose(balanceSetPropHash, DEMOCRACY_MIN_DEPOSIT);
-  //
-  //   dock.setAccount(dock.keyring.addFromUri(backer_1));
-  //   await dock.democracy.second(0, DEMOCRACY_SECOND_DEPOSIT);
-  //
-  //   dock.setAccount(dock.keyring.addFromUri(backer_2));
-  //   await dock.democracy.second(0, DEMOCRACY_SECOND_DEPOSIT);
-  //
-  //   expect(await dock.democracy.getPublicProposalCount()).toEqual(currentPublicProposalCount + 1);
-  //
-  //
-  //       // // Public proposal backed by 2 more accounts
-  //       // Democracy::propose(Origin::signed(proposer), balance_set_prop_hash).unwrap();
-  //       // Democracy::second(Origin::signed(backer_1), 0, 10).unwrap();
-  //       // Democracy::second(Origin::signed(backer_2), 0, 10).unwrap();
-  //       // assert_eq!(Democracy::public_props().len(), 1);
-  //       //
-  //       // // Proposer's and backers' free balance decreases and that balance is reserved.
-  //       // assert_eq!(Balances::reserved_balance(proposer), deposit);
-  //       // assert_eq!(Balances::reserved_balance(backer_1), deposit);
-  //       // assert_eq!(Balances::reserved_balance(backer_1), deposit);
-  //       // assert_eq!(Democracy::deposit_of(0).unwrap().0.len(), 3);
-  //       // assert_eq!(Democracy::deposit_of(0).unwrap().1, deposit);
-  //
-  //
-  //
-  // }, 320000);
+  test('Rejection of proposal', async () => {
+    const currentPublicProposalCount = await dock.democracy.getPublicProposalCount();
+    const councilMembers = await dock.council.getMembers();
+    expect(councilMembers.length).toEqual(3); // Ensure we have default council members
 
-  test('Council proposes root action and accepts', async () => {
-    expect(await dock.democracy.getNextExternal()).toEqual(null);
 
     // Create set balance root extrinsic to propose
     const newBalance = 10000000000;
-    const rootAction = dock.api.tx.balances.setBalance(dock.keyring.addFromUri(CouncilMember3AccountUri).address, newBalance, 0);
+    const rootAction = dock.api.tx.balances.setBalance(dock.keyring.addFromUri(CouncilMember2AccountUri).address, newBalance, 0);
 
-    // Create proposal of council member
-    const councilPropHash = dock.council.getProposalHash(rootAction);
-    const councilProposal = dock.democracy.councilPropose(councilPropHash);
+    // Get root action proposal hash
+    const balanceSetPropHash = dock.council.getProposalHash(rootAction);
 
-    // Must propose as council member
-    dock.setAccount(dock.keyring.addFromUri(CouncilMemberAccountUri));
-    await dock.council.executeProposal(councilProposal);
+    const referendumIndex = 0;
 
-    // Ensure external proposal was added
-    expect(await dock.democracy.getNextExternal()).not.toEqual(null);
+    expect((await getBalanceOf(dock.keyring.addFromUri(proposer).address)).reserved).toEqual(0);
+    expect((await getBalanceOf(dock.keyring.addFromUri(backer_1).address)).reserved).toEqual(0);
+    expect((await getBalanceOf(dock.keyring.addFromUri(backer_2).address)).reserved).toEqual(0);
+    // expect(await dock.democracy.getDepositOf(referendumIndex)).toEqual(null); // TODO: not sure if we should have here incase existing ref?
 
-    // TODO: conclude
-    await conclude_proposal(councilPropHash, councilProposal);
+    console.log('Propose')
+
+    dock.setAccount(dock.keyring.addFromUri(proposer));
+    await dock.democracy.propose(balanceSetPropHash, DEMOCRACY_MIN_DEPOSIT);
+
+    console.log('Second 1')
+
+    dock.setAccount(dock.keyring.addFromUri(backer_1));
+    await dock.democracy.second(0, DEMOCRACY_SECOND_DEPOSIT);
+
+    console.log('Second 2')
+
+    dock.setAccount(dock.keyring.addFromUri(backer_2));
+    await dock.democracy.second(0, DEMOCRACY_SECOND_DEPOSIT);
+
+    console.log('getPublicProposalCount')
+
+    expect(await dock.democracy.getPublicProposalCount()).toEqual(currentPublicProposalCount + 1);
+
+
+        // // Public proposal backed by 2 more accounts
+        // Democracy::propose(Origin::signed(proposer), balance_set_prop_hash).unwrap();
+        // Democracy::second(Origin::signed(backer_1), 0, 10).unwrap();
+        // Democracy::second(Origin::signed(backer_2), 0, 10).unwrap();
+        // assert_eq!(Democracy::public_props().len(), 1);
+        //
+        // // Proposer's and backers' free balance decreases and that balance is reserved.
+        // assert_eq!(Balances::reserved_balance(proposer), deposit);
+        // assert_eq!(Balances::reserved_balance(backer_1), deposit);
+        // assert_eq!(Balances::reserved_balance(backer_1), deposit);
+        // assert_eq!(Democracy::deposit_of(0).unwrap().0.len(), 3);
+        // assert_eq!(Democracy::deposit_of(0).unwrap().1, deposit);
+
+
+
   }, 320000);
+
+  // test('Council proposes root action and accepts', async () => {
+  //   expect(await dock.democracy.getNextExternal()).toEqual(null);
+  //
+  //   // Create set balance root extrinsic to propose
+  //   const newBalance = 10000000000;
+  //   const rootAction = dock.api.tx.balances.setBalance(dock.keyring.addFromUri(CouncilMember3AccountUri).address, newBalance, 0);
+  //
+  //   // Create proposal of council member
+  //   const councilPropHash = dock.council.getProposalHash(rootAction);
+  //   const councilProposal = dock.democracy.councilPropose(councilPropHash);
+  //
+  //   // Must propose as council member
+  //   dock.setAccount(dock.keyring.addFromUri(CouncilMemberAccountUri));
+  //   await dock.council.executeProposal(councilProposal);
+  //
+  //   // Ensure external proposal was added
+  //   expect(await dock.democracy.getNextExternal()).not.toEqual(null);
+  //
+  //   // TODO: conclude
+  //   await conclude_proposal(councilPropHash, councilProposal);
+  // }, 320000);
 
   afterAll(async () => {
     await dock.disconnect();

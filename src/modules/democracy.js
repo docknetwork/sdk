@@ -94,8 +94,13 @@ export default class DemocracyModule {
     return result.isNone ? null : result.toNumber();
   }
 
-  async getPublicProposalCount() {
+  async getPublicProposals() {
     const result = await this.api.query.forkedDemocracy.publicProps();
+    return result;
+  }
+
+  async getPublicProposalCount() {
+    const result = await this.getPublicProposals();
     return result.length;
   }
 

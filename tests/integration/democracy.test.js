@@ -35,23 +35,18 @@ async function connectAndInit() {
 }
 
 async function council_votes_and_concludes(proposalHash, balance_set_prop, referendumIndex) {
-  console.log('council_votes_and_concludes', proposalHash, referendumIndex)
-
-  // TODO: are we passing invalid proposalHash here?
-  // proposal index is null
-  const proposalIndex = await dock.techCommittee.getTechComitteeProposalIndex(proposalHash);
-  console.log('proposalIndex', proposalIndex)
+  // TODO: fix badorigin error
 
   // Member 1 approves
   dock.setAccount(dock.keyring.addFromUri(CouncilMemberAccountUri));
-  await dock.council.vote(proposalHash, proposalIndex, true);
+  await dock.democracy.vote(referendumIndex, true);
 
   // Member 2 disapproves
   dock.setAccount(dock.keyring.addFromUri(CouncilMember2AccountUri));
-  await dock.council.vote(proposalHash, proposalIndex, false);
+  await dock.democracy.vote(referendumIndex, false);
 
+  // Ensure votes went through
   let status = await dock.democracy.getReferendumStatus(referendumIndex);
-  console.log('status', status)
   expect(status).toMatchObject(
     expect.objectContaining({
       Ongoing: {
@@ -60,21 +55,12 @@ async function council_votes_and_concludes(proposalHash, balance_set_prop, refer
     }),
   );
 
-    // assert_eq!(
-    //     ForkedDemocracy::referendum_status(0).unwrap().tally,
-    //     Tally {
-    //         ayes: 1,
-    //         nays: 1,
-    //         turnout: 0
-    //     }
-    // );
-
   // Last member approves
   dock.setAccount(dock.keyring.addFromUri(CouncilMember3AccountUri));
-  await dock.council.vote(proposalHash, proposalIndex, true);
+  await dock.democracy.vote(referendumIndex, true);
 
+  // Ensure last vote went through
   status = await dock.democracy.getReferendumStatus(referendumIndex);
-  console.log('status2', status)
   expect(status).toMatchObject(
     expect.objectContaining({
       Ongoing: {
@@ -83,16 +69,7 @@ async function council_votes_and_concludes(proposalHash, balance_set_prop, refer
     }),
   );
 
-    // assert_eq!(
-    //     ForkedDemocracy::referendum_status(0).unwrap().tally,
-    //     Tally {
-    //         ayes: 2,
-    //         nays: 1,
-    //         turnout: 0
-    //     }
-    // );
-
-
+  // TODO: convert below code
 
     // assert!(pallet_scheduler::Agenda::<TestRuntime>::get(12).is_empty());
     //
@@ -122,7 +99,7 @@ async function conclude_proposal(balance_set_prop_hash, balance_set_prop) {
   const currentRefCount = await dock.democracy.getReferendumCount();
 
   // Wait for referendum to process
-  await new Promise((r) => setTimeout(r, 80000));
+  await new Promise((r) => setTimeout(r, 40000));
 
   // Ensure referendum was set
   expect(await dock.democracy.getReferendumCount()).toEqual(currentRefCount + 1);

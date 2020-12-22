@@ -68,7 +68,7 @@ export default class CouncilModule {
 
   async getProposalIndex(proposalHash) {
     const result = (await this.api.query.council.voting(proposalHash)).toJSON();
-    return result.index;
+    return result && result.index;
   }
 
   async getMembers() {

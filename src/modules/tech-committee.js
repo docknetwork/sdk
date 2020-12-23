@@ -1,5 +1,6 @@
 import { u8aToHex } from '@polkadot/util';
 
+// TODO: typedefs and docstrings
 export default class TechCommitteeModule {
   /**
    * Creates a new instance of TechCommitteeModule and sets the api
@@ -11,17 +12,17 @@ export default class TechCommitteeModule {
     this.signAndSend = signAndSend;
   }
 
-  async closeTechComitteeProposal(proposalHash, index, proposalWeightBound = 1000000000, lengthBound = 1000, waitForFinalization = true) {
+  async closeProposal(proposalHash, index, proposalWeightBound = 1000000000, lengthBound = 1000, waitForFinalization = true) {
     const tx = this.api.tx.technicalCommittee.close(proposalHash, index, proposalWeightBound, lengthBound);
     await this.signAndSend(tx, waitForFinalization);
   }
 
-  async getTechComitteeProposalIndex(proposalHash) {
+  async getProposalIndex(proposalHash) {
     const result = (await this.api.query.technicalCommittee.voting(proposalHash)).toJSON();
     return result && result.index;
   }
 
-  async getTechComitteeProposals() {
+  async getProposals() {
     const result = await this.api.query.technicalCommittee.proposals();
     return result.map(proposalu8a => u8aToHex(proposalu8a).toString());
   }
@@ -37,9 +38,44 @@ export default class TechCommitteeModule {
     await this.signAndSend(tx, waitForFinalization);
   }
 
-  async getTechComitteeMembers() {
-    const result = await this.api.query.technicalCommitteeMembership.members();
+  async disapproveProposal(proposalHash, waitForFinalization = true) {
+    const tx = this.api.tx.technicalCommittee.disapproveProposal(proposalHash);
+    await this.signAndSend(tx, waitForFinalization);
+  }
+
+  async execute(proposal, lengthBound = 1000, waitForFinalization = true) {
+    const tx = this.api.tx.technicalCommittee.execute(this.api.createType('Call', proposal), lengthBound);
+    await this.signAndSend(tx, waitForFinalization);
+  }
+
+  async propose(threshold, proposal, lengthBound = 1000, waitForFinalization = true) {
+    const tx = this.api.tx.technicalCommittee.propose(threshold, this.api.createType('Call', proposal), lengthBound);
+    await this.signAndSend(tx, waitForFinalization);
+  }
+
+  async setMembers(newMembers, prime, oldCount, waitForFinalization = true) {
+    const tx = this.api.tx.technicalCommittee.setMembers(newMembers, prime, oldCount);
+    await this.signAndSend(tx, waitForFinalization);
+  }
+
+  async getMembers() {
+    const result = await this.api.query.technicalCommittee.members();
     return result;
+  }
+
+  async getPrime() {
+    const result = await this.api.query.technicalCommittee.prime();
+    return result;
+  }
+
+  async getProposalCount() {
+    const result = await this.api.query.technicalCommittee.proposalCount();
+    return result;
+  }
+
+  async proposalOf(hash) {
+    const result = await this.api.query.technicalCommittee.proposalOf(hash);
+    return result.toJSON();
   }
 
   addTechCommitteeMember(who) {

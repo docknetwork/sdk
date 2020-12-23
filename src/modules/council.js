@@ -2,9 +2,7 @@ import { u8aToHex } from '@polkadot/util';
 import { randomAsHex } from '@polkadot/util-crypto';
 import { encodeExtrinsicAsHash } from '../utils/misc';
 
-// TODO: perhaps rename to DemoracyModule and add all methods?
-// if not remove democracy methods here into own module
-// will see how many we need
+// TODO: typedefs and docstrings
 export default class CouncilModule {
   /**
    * Creates a new instance of CouncilModule and sets the api
@@ -21,7 +19,7 @@ export default class CouncilModule {
   }
 
   // TODO: rename this method to just "execute"
-  async executeProposal(proposal, lengthBound = 1000, waitForFinalization = true) {
+  async execute(proposal, lengthBound = 1000, waitForFinalization = true) {
     const tx = this.api.tx.council.execute(this.api.createType('Call', proposal), lengthBound);
     await this.signAndSend(tx, waitForFinalization);
   }
@@ -76,8 +74,6 @@ export default class CouncilModule {
     const result = await this.api.query.council.members();
     return result;
   }
-
-  // TODO: evulate if we need these below methods
 
   addMember(who) {
     return this.api.tx.councilMembership.addMember(who);

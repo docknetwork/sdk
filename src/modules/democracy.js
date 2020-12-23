@@ -1,3 +1,4 @@
+// TODO: typedefs and docstrings
 export default class DemocracyModule {
   /**
    * Creates a new instance of DemocracyModule and sets the api
@@ -21,11 +22,6 @@ export default class DemocracyModule {
     await this.signAndSend(tx, waitForFinalization);
   }
 
-  async cancelProposal(proposalIndex, waitForFinalization = true) {
-    const tx = this.api.tx.democracy.cancelProposal(proposalIndex);
-    await this.signAndSend(tx, waitForFinalization);
-  }
-
   async clearPublicProposals(waitForFinalization = true) {
     const tx = this.api.tx.democracy.clearPublicProposals();
     await this.signAndSend(tx, waitForFinalization);
@@ -41,8 +37,10 @@ export default class DemocracyModule {
     await this.signAndSend(tx, waitForFinalization);
   }
 
-  async notePreimage(encodedProposal, waitForFinalization = true) {
-    const tx = this.api.tx.democracy.notePreimage(encodedProposal);
+  async notePreimage(call, waitForFinalization = true) {
+    // const proposal = this.api.createType('Call', call);
+    // const tx = this.api.tx.democracy.notePreimage(call.toHex());
+    const tx = this.api.tx.democracy.notePreimage(call);
     await this.signAndSend(tx, waitForFinalization);
   }
 
@@ -80,9 +78,17 @@ export default class DemocracyModule {
     return this.api.tx.democracy.vote(referendumIndex, vote);
   }
 
+  async getPreimage(proposalHash) {
+    const result = await this.api.query.forkedDemocracy.preimages(proposalHash);
+    return result.isNone ? null : result;
+  }
+
   async getDepositOf(referendumIndex) {
-    const result = await this.api.query.forkedDemocracy.depositOf(referendumIndex);
-    return result.isNone ? null : result.toNumber();
+    const result = (await this.api.query.forkedDemocracy.depositOf(referendumIndex)).toJSON();
+    return (result && result.length) ? {
+      addresses: result[0],
+      balance: result[1],
+    } : null;
   }
 
   async getPublicProposals() {
@@ -110,11 +116,50 @@ export default class DemocracyModule {
     return result.isNone ? null : result;
   }
 
+  async getBlacklist(hash) {
+    const result = await this.api.query.forkedDemocracy.blacklist(hash);
+    return result.toJSON();
+  }
+
+  async getCancellations(hash) {
+    const result = await this.api.query.forkedDemocracy.cancellations(hash);
+    return result;
+  }
+
+  async getLocks(address) {
+    const result = await this.api.query.forkedDemocracy.locks(address);
+    return result;
+  }
+
+  async getVotesOf(address) {
+    const result = await this.api.query.forkedDemocracy.votingOf(address);
+    return result.toJSON();
+  }
+
+  async getStorageVersion() {
+    const result = await this.api.query.forkedDemocracy.storageVersion();
+    return result;
+  }
+
+  async getLowestUnbaked() {
+    const result = await this.api.query.forkedDemocracy.lowestUnbaked();
+    return result;
+  }
+
+  async getLastTabledWasExternal() {
+    const result = await this.api.query.forkedDemocracy.lastTabledWasExternal();
+    return result;
+  }
+
   fastTrack(proposalHash, votingPeriod = 3, delay = 1) {
     return this.api.tx.democracy.fastTrack(proposalHash, votingPeriod, delay);
   }
 
   councilPropose(proposalHash) {
     return this.api.tx.democracy.councilPropose(proposalHash);
+  }
+
+  cancelProposal(propIndex) {
+    return this.api.tx.democracy.cancelProposal(propIndex);
   }
 }

@@ -5,7 +5,7 @@ import { randomAsHex, blake2AsHex } from '@polkadot/util-crypto';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 
 // TODO: adjust these, tests take forever - i think we can do better with different node values
-const REFERENDUM_PROGRESS_WAIT = 170000; // 170 seconds
+const REFERENDUM_PROGRESS_WAIT = 50000; // 50 seconds
 const PROPOSAL_PROGRESS_WAIT = 20000; // 20 seconds
 const DEMOCRACY_MIN_DEPOSIT = 10000 * 1000000; // 10K tokens
 

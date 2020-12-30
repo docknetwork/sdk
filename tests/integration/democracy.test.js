@@ -275,6 +275,7 @@ describe('Tech-committee', () => {
     done();
   }, 320000);
 
+  // TODO: fix this test fails when council tests are also ran (below describe block)
   test('Tech committee fast tracks', async () => {
     // Get current members and proposal count
     const councilMembers = await dock.council.getMembers();

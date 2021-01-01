@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: signatures/signature-secp256k1.js</title>
+    <title>JSDoc: Source: offline-signing/constants.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: signatures/signature-secp256k1.js</h1>
+    <h1 class="page-title">Source: offline-signing/constants.js</h1>
 
     
 
@@ -26,46 +26,55 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import Signature from './signature';
+            <pre class="prettyprint source linenums"><code>/**
+ * @file Keeps the information for each chain. Some of this information like `genesis` or `specName` is immutable but
+ * some like `specVersion` and `transactionVersion` can change and they should be updated to match the chain.
+ */
 
-/** Class representing a Secp256k1 Signature */
-export default class SignatureSecp256k1 extends Signature {
-  /**
-   * Generate an Ecdsa signature over Secp256k1 curve using elliptic library
-   * @param {array} message - The message to sign as bytearray
-   * @param {object} signingPair -The pair from elliptic containing the signing key
-   */
-  constructor(message, signingPair) {
-    super();
-    // Generate the signature
-    const sig = signingPair.sign(message, { canonical: true });
+export const MAINNET_INFO = {
+  ss58Format: 22,
+  properties: {
+    ss58Format: 22,
+    tokenDecimals: 6,
+    tokenSymbol: 'DCK',
+  },
+  genesis: '0xf73467c6544aa68df2ee546b135f955c46b90fa627e9b5d7935f41061bb8a5a9',
+  name: 'Dock Mainnet',
+  specName: 'dock-main-runtime',
+  // Next 2 fields need to change whenever they change on the chain.
+  specVersion: 17,
+  transactionVersion: 1,
+};
 
-    // The signature is recoverable in 65-byte { R | S | index } format
-    const r = sig.r.toString('hex', 32);
-    const s = sig.s.toString('hex', 32);
-    const i = sig.recoveryParam.toString(16).padStart(2, '0');
-    // Make it proper hex
-    this.value = `0x${r}${s}${i}`;
-  }
+export const TESTNET_INFO = {
+  ss58Format: 42,
+  properties: {
+    ss58Format: 42,
+    tokenDecimals: 6,
+    tokenSymbol: 'DCK',
+  },
+  genesis: '0x3f0608444cf5d7eec977430483ffef31ff86dfa6bfc6d7114023ee80cc03ea3f',
+  name: 'Poa Testnet',
+  specName: 'dock-testnet',
+  // Next 2 fields need to change whenever they change on the chain.
+  specVersion: 17,
+  transactionVersion: 1,
+};
 
-  /**
-   * Create SignatureSecp256k1 from given hex string
-   * @param {string} value - Hex string
-   * @returns {Signature}
-   */
-  fromHex(value) {
-    return super.fromHex(value, 65);
-  }
-
-  /**
-   * @return {Object} The DidSignature JSON variant Secp256k1.
-   */
-  toJSON() {
-    return {
-      Secp256k1: this.value,
-    };
-  }
-}
+export const DEVNODE_INFO = {
+  ss58Format: 42,
+  properties: {
+    ss58Format: 42,
+    tokenDecimals: 6,
+    tokenSymbol: 'DCK',
+  },
+  genesis: '0x956cd95ad4baf709e851e0fce555bffa5ae2933851cadfaeeb13fe68fa74dfc5',
+  name: 'Dock Mainnet',
+  specName: 'dock-main-runtime',
+  // Next 2 fields need to change whenever they change on the chain.
+  specVersion: 17,
+  transactionVersion: 1,
+};
 </code></pre>
         </article>
     </section>

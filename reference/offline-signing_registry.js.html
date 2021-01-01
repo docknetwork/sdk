@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: signatures/signature-secp256k1.js</title>
+    <title>JSDoc: Source: offline-signing/registry.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: signatures/signature-secp256k1.js</h1>
+    <h1 class="page-title">Source: offline-signing/registry.js</h1>
 
     
 
@@ -26,45 +26,62 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import Signature from './signature';
+            <pre class="prettyprint source linenums"><code>import { TypeRegistry } from '@polkadot/types';
+import { getSpecTypes } from '@polkadot/types-known';
+import { createMetadata } from '@substrate/txwrapper/lib/util/metadata';
 
-/** Class representing a Secp256k1 Signature */
-export default class SignatureSecp256k1 extends Signature {
-  /**
-   * Generate an Ecdsa signature over Secp256k1 curve using elliptic library
-   * @param {array} message - The message to sign as bytearray
-   * @param {object} signingPair -The pair from elliptic containing the signing key
-   */
-  constructor(message, signingPair) {
-    super();
-    // Generate the signature
-    const sig = signingPair.sign(message, { canonical: true });
+import types from '../types.json';
+import { DEVNODE_INFO, MAINNET_INFO } from './constants';
+import { metadataRpc as devMetadata } from './devnode-metadata.json';
+import { metadataRpc as mainMetadata } from './mainnet-metadata.json';
 
-    // The signature is recoverable in 65-byte { R | S | index } format
-    const r = sig.r.toString('hex', 32);
-    const s = sig.s.toString('hex', 32);
-    const i = sig.recoveryParam.toString(16).padStart(2, '0');
-    // Make it proper hex
-    this.value = `0x${r}${s}${i}`;
+/**
+ * A registry class that stores the types, metadata and chain information.
+ */
+export class Registry {
+  constructor({ chainInfo, metadata, chainTypes }) {
+    createMetadata.clear();
+
+    const registry = new TypeRegistry();
+    registry.setChainProperties(
+      registry.createType(
+        'ChainProperties',
+        chainInfo.properties,
+      ),
+    );
+
+    registry.setKnownTypes({
+      types: chainTypes || types,
+    });
+    registry.register(getSpecTypes(registry, chainInfo.name, chainInfo.specName, chainInfo.specVersion));
+
+    registry.setMetadata(createMetadata(registry, metadata));
+
+    /* eslint-disable no-underscore-dangle */
+    this._registry = registry;
+    this._metadata = metadata;
+    this._chainInfo = chainInfo;
   }
 
-  /**
-   * Create SignatureSecp256k1 from given hex string
-   * @param {string} value - Hex string
-   * @returns {Signature}
-   */
-  fromHex(value) {
-    return super.fromHex(value, 65);
+  get registry() {
+    return this._registry;
   }
 
-  /**
-   * @return {Object} The DidSignature JSON variant Secp256k1.
-   */
-  toJSON() {
-    return {
-      Secp256k1: this.value,
-    };
+  get metadata() {
+    return this._metadata;
   }
+
+  get chainInfo() {
+    return this._chainInfo;
+  }
+}
+
+export function getMainnetRegistry() {
+  return new Registry({ chainInfo: MAINNET_INFO, metadata: mainMetadata });
+}
+
+export function getDevnodeRegistry() {
+  return new Registry({ chainInfo: DEVNODE_INFO, metadata: devMetadata });
 }
 </code></pre>
         </article>

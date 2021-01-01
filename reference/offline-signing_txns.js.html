@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: signatures/signature-secp256k1.js</title>
+    <title>JSDoc: Source: offline-signing/txns.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: signatures/signature-secp256k1.js</h1>
+    <h1 class="page-title">Source: offline-signing/txns.js</h1>
 
     
 
@@ -26,45 +26,74 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import Signature from './signature';
+            <pre class="prettyprint source linenums"><code>import { EXTRINSIC_VERSION } from '@polkadot/types/extrinsic/v4/Extrinsic';
+import { createSignedTx, createSigningPayload, methods } from '@substrate/txwrapper';
 
-/** Class representing a Secp256k1 Signature */
-export default class SignatureSecp256k1 extends Signature {
-  /**
-   * Generate an Ecdsa signature over Secp256k1 curve using elliptic library
-   * @param {array} message - The message to sign as bytearray
-   * @param {object} signingPair -The pair from elliptic containing the signing key
-   */
-  constructor(message, signingPair) {
-    super();
-    // Generate the signature
-    const sig = signingPair.sign(message, { canonical: true });
+/**
+ * Build a transfer txn
+ * @param from
+ * @param to
+ * @param value
+ * @param tip
+ * @param nonce
+ * @param eraPeriod
+ * @param blockNumber
+ * @param blockHash
+ * @param registry - This is an instance of `Registry` class
+ * @returns {{unsignedTxn: UnsignedTransaction, signingPayload: string}}
+ */
+export function buildTransferTxn({
+  from, to, value, tip, nonce, eraPeriod, blockNumber, blockHash, registry,
+}) {
+  const unsignedTxn = methods.balances.transfer({
+    value,
+    dest: to,
+  }, {
+    address: from,
+    blockHash,
+    blockNumber,
+    eraPeriod,
+    genesisHash: registry.chainInfo.genesis,
+    metadataRpc: registry.metadata,
+    nonce,
+    specVersion: registry.chainInfo.specVersion,
+    tip,
+    transactionVersion: registry.chainInfo.transactionVersion,
+  }, {
+    metadataRpc: registry.metadata,
+    registry: registry.registry,
+  });
+  const signingPayload = createSigningPayload(unsignedTxn, { registry: registry.registry });
+  return {
+    unsignedTxn, signingPayload,
+  };
+}
 
-    // The signature is recoverable in 65-byte { R | S | index } format
-    const r = sig.r.toString('hex', 32);
-    const s = sig.s.toString('hex', 32);
-    const i = sig.recoveryParam.toString(16).padStart(2, '0');
-    // Make it proper hex
-    this.value = `0x${r}${s}${i}`;
+/**
+ * @param keypair - The keypair used to sign. Either provide this or provide a keyring object and secret URI
+ * @param keyring - Only considered when keypair is not passed
+ * @param secretUri - Only considered when keypair is not passed
+ * @param unsignedTxn - This is returned from `buildTransferTxn`.
+ * @param signingPayload - This is returned from `buildTransferTxn`.
+ * @param registry - This is an instance of `Registry` class
+ * @returns {string} - Returns txn as hex string
+ */
+export function signTxn({
+  keypair, keyring, secretUri, unsignedTxn, signingPayload, registry,
+}) {
+  let signingKeypair = keypair;
+  // Create a keypair if not already provided using given keyring and secret URI
+  if (signingKeypair === undefined) {
+    if (keyring === undefined || secretUri === undefined) {
+      throw new Error('Either pass a keypair or pass both keyring and a secret URI');
+    }
+    keyring.setSS58Format(registry.chainInfo.ss58Format);
+    signingKeypair = keyring.addFromUri(secretUri);
   }
 
-  /**
-   * Create SignatureSecp256k1 from given hex string
-   * @param {string} value - Hex string
-   * @returns {Signature}
-   */
-  fromHex(value) {
-    return super.fromHex(value, 65);
-  }
+  const { signature } = registry.registry.createType('ExtrinsicPayload', signingPayload, { version: EXTRINSIC_VERSION }).sign(signingKeypair);
 
-  /**
-   * @return {Object} The DidSignature JSON variant Secp256k1.
-   */
-  toJSON() {
-    return {
-      Secp256k1: this.value,
-    };
-  }
+  return createSignedTx(unsignedTxn, signature, { metadataRpc: registry.metadata, registry: registry.registry });
 }
 </code></pre>
         </article>

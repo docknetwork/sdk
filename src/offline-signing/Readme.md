@@ -26,7 +26,7 @@ To create a signed transfer, there are 3 steps:
         from, to, value, tip, nonce, eraPeriod, blockNumber, blockHash, registry,
       });
     ```
-1. Get the keypair or the create a keyring and get the secret key/URI and sign the transaction
+1. Get the keypair or create a keyring and get the secret key/URI and sign the transaction
     ```js
     const signedTxn = await signTxn({
       keyring, secretUri, unsignedTxn: txn.unsignedTxn, signingPayload: txn.signingPayload, registry,

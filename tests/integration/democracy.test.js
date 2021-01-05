@@ -84,9 +84,9 @@ async function council_votes_and_concludes(proposalHash, balance_set_prop, refer
 
   expect(await dock.democracy.getPreimage(proposalHash)).toEqual(null);
 
-  console.log('balance_set_prop', balance_set_prop.toHex())
+  console.log('balance_set_prop', balance_set_prop);
   console.log('proposalHash', proposalHash)
-  await dock.democracy.notePreimage(proposalHash);
+  await dock.democracy.notePreimage(balance_set_prop);
 
   // TODO: FIXME: why is preimage still null?
   expect(await dock.democracy.getPreimage(proposalHash)).not.toEqual(null);
@@ -236,10 +236,10 @@ describe('Proposal proposing', () => {
 
     // Create set balance root extrinsic to propose
     const newBalance = 10000000000;
-    const rootAction = dock.api.tx.balances.setBalance(dock.keyring.addFromUri(CouncilMember3AccountUri).address, newBalance, 0);
+    const rootAction = dock.api.tx.balances.setBalance(dock.keyring.addFromUri(CouncilMember3AccountUri).address, newBalance, 0).toHex();
 
     // Create proposal of council member
-    const councilPropHash = dock.council.getProposalHash(rootAction);
+    const councilPropHash = blake2AsHex(rootAction);
     const councilProposal = dock.democracy.councilPropose(councilPropHash);
 
     // Must propose as council member

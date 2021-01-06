@@ -49,9 +49,11 @@ export class Registry {
 }
 
 export function getMainnetRegistry() {
+  // @ts-ignore
   return new Registry({ chainInfo: MAINNET_INFO, metadata: mainMetadata });
 }
 
 export function getDevnodeRegistry() {
+  // @ts-ignore
   return new Registry({ chainInfo: DEVNODE_INFO, metadata: devMetadata });
 }

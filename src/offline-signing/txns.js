@@ -3,16 +3,17 @@ import { createSignedTx, createSigningPayload, methods } from '@substrate/txwrap
 
 /**
  * Build a transfer txn
- * @param from
- * @param to
- * @param value
- * @param tip
- * @param nonce
- * @param eraPeriod
- * @param blockNumber
- * @param blockHash
- * @param registry - This is an instance of `Registry` class
- * @returns {{unsignedTxn: UnsignedTransaction, signingPayload: string}}
+ * @param {Object} params - An object containing the parameters.
+ * @param params.from
+ * @param params.to
+ * @param params.value
+ * @param params.tip
+ * @param params.nonce
+ * @param params.eraPeriod
+ * @param params.blockNumber
+ * @param params.blockHash
+ * @param params.registry - This is an instance of `Registry` class
+ * @returns {{unsignedTxn: Object, signingPayload: string}}
  */
 export function buildTransferTxn({
   from, to, value, tip, nonce, eraPeriod, blockNumber, blockHash, registry,
@@ -42,12 +43,13 @@ export function buildTransferTxn({
 }
 
 /**
- * @param keypair - The keypair used to sign. Either provide this or provide a keyring object and secret URI
- * @param keyring - Only considered when keypair is not passed
- * @param secretUri - Only considered when keypair is not passed
- * @param unsignedTxn - This is returned from `buildTransferTxn`.
- * @param signingPayload - This is returned from `buildTransferTxn`.
- * @param registry - This is an instance of `Registry` class
+ * @param {Object} params - An object containing the parameters.
+ * @param params.keypair - The keypair used to sign. Either provide this or provide a keyring object and secret URI
+ * @param params.keyring - Only considered when keypair is not passed
+ * @param params.secretUri - Only considered when keypair is not passed
+ * @param params.unsignedTxn - This is returned from `buildTransferTxn`.
+ * @param params.signingPayload - This is returned from `buildTransferTxn`.
+ * @param params.registry - This is an instance of `Registry` class
  * @returns {string} - Returns txn as hex string
  */
 export function signTxn({

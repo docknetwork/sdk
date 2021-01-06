@@ -23,6 +23,7 @@ import { metadataRpc as metadata } from '../src/offline-signing/devnode-metadata
   const eraPeriod = 128;
 
   // Initialize the registry
+  // @ts-ignore
   const registry = new Registry({ chainInfo: DEVNODE_INFO, metadata });
 
   // Build the transfer txn
@@ -34,7 +35,8 @@ import { metadataRpc as metadata } from '../src/offline-signing/devnode-metadata
   const keyring = new Keyring({ type: 'sr25519' });
 
   // Sign the transfer txn
-  const signedTxn = await signTxn({
+  // @ts-ignore
+  const signedTxn = signTxn({
     keyring, secretUri, unsignedTxn: txn.unsignedTxn, signingPayload: txn.signingPayload, registry,
   });
 

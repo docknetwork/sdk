@@ -14,7 +14,7 @@ export const MAINNET_INFO = {
   name: 'Dock Mainnet',
   specName: 'dock-main-runtime',
   // Next 2 fields need to change whenever they change on the chain.
-  specVersion: 17,
+  specVersion: 18,
   transactionVersion: 1,
 };
 
@@ -44,6 +44,6 @@ export const DEVNODE_INFO = {
   name: 'Dock Mainnet',
   specName: 'dock-main-runtime',
   // Next 2 fields need to change whenever they change on the chain.
-  specVersion: 17,
+  specVersion: 18,
   transactionVersion: 1,
 };

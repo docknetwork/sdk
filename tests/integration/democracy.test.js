@@ -6,6 +6,7 @@ import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-const
 
 // TODO: adjust these, tests take forever - i think we can do better with different node values
 const REFERENDUM_PROGRESS_WAIT = 50000; // 50 seconds
+const REFERENDUM_FINISH_WAIT = 90000; // 90 seconds
 const PROPOSAL_PROGRESS_WAIT = 20000; // 20 seconds
 const DEMOCRACY_MIN_DEPOSIT = 10000 * 1000000; // 10K tokens
 
@@ -77,37 +78,29 @@ async function council_votes_and_concludes(proposalHash, balance_set_prop, refer
     }),
   );
 
-  // TODO: convert below code
-  // TODO: give balance to account 10
-    // let _ = <TestRuntime as pallet_democracy::Trait>::Currency::deposit_creating(&10, 1000);
-    // assert_eq!(Balances::free_balance(10), 1000);
-
+  // Ensure no preimage, then note it, then ensure its set
   expect(await dock.democracy.getPreimage(proposalHash)).toEqual(null);
-
-  console.log('balance_set_prop', balance_set_prop);
-  console.log('proposalHash', proposalHash)
   await dock.democracy.notePreimage(balance_set_prop);
-
-  // TODO: FIXME: why is preimage still null?
   expect(await dock.democracy.getPreimage(proposalHash)).not.toEqual(null);
 
-  // TODO: ensure preimage isnt set then set it, then check its set to some
-    // assert!(Democracy::get_preimage(balance_set_prop_hash).is_none());
-    // Democracy::note_preimage(Origin::signed(10), balance_set_prop).unwrap();
-    // assert!(Democracy::get_preimage(balance_set_prop_hash).is_some());
-    // assert!(Balances::free_balance(10) < 1000);
-    //
-    // fast_forward_to(10);
-    // assert!(ForkedDemocracy::referendum_status(0).is_err());
-    // // The proposal is scheduled to be enacted
-    // assert!(pallet_scheduler::Agenda::<TestRuntime>::get(12)[0].is_some());
-    // assert_eq!(Balances::free_balance(42), 0);
-    //
-    // fast_forward_to(12);
-    // assert_eq!(Balances::free_balance(42), 2);
-    // assert_eq!(Balances::free_balance(10), 1000);
-    // // The proposal is enacted
-    // assert!(pallet_scheduler::Agenda::<TestRuntime>::get(12).is_empty());
+  // Wait for referendum to finish
+  await new Promise((r) => setTimeout(r, REFERENDUM_FINISH_WAIT));
+
+  status = await dock.democracy.getReferendumStatus(referendumIndex);
+  console.log('status', status)
+
+  expect(status).toMatchObject(
+    expect.objectContaining({
+      Finished: expect.objectContaining({
+        approved: true,
+        end: expect.any(Number)
+      }),
+    }),
+  );
+
+  // TODO: ensure balance was updated
+  // assert_eq!(Balances::free_balance(42), 2);
+  // assert_eq!(Balances::free_balance(10), 1000);
 }
 
 async function conclude_proposal(balance_set_prop_hash, balance_set_prop) {

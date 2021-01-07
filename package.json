@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "0.3.11",
+  "version": "0.3.17",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -56,7 +56,6 @@
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "test": "jest --verbose ./tests/unit",
-    "test-democracy": "NODE_ENV=production jest --verbose --runInBand ./tests/integration/democracy",
     "test-integration": "NODE_ENV=production jest --verbose --runInBand ./tests/integration",
     "test-poa": "NODE_ENV=production jest --verbose --runInBand ./tests/poa",
     "docs": "mkdir out && touch out/.nojekyll && jsdoc src -r -c .jsdoc -d out/reference",

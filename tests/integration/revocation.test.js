@@ -152,7 +152,9 @@ describe('Revocation Module', () => {
     expect(!!registryDetail).toBe(true);
 
     const lastModified = registryDetail[1];
-    await dock.revocation.unrevoke(registryId, revokeIds, lastModified, didKeys, false);
+    await expect(
+      dock.revocation.unrevoke(registryId, revokeIds, lastModified, didKeys, false),
+    ).rejects.toThrow();
 
     const revocationStatus = await dock.revocation.getIsRevoked(registryId, revokeId);
     expect(revocationStatus).toBe(true);
@@ -163,7 +165,9 @@ describe('Revocation Module', () => {
     expect(!!registryDetail).toBe(true);
 
     const lastModified = registryDetail[1];
-    await dock.revocation.removeRegistry(registryId, lastModified, didKeys, false);
+    await expect(
+      dock.revocation.removeRegistry(registryId, lastModified, didKeys, false),
+    ).rejects.toThrow();
     await expect(dock.revocation.getRegistryDetail(registryId)).resolves.toBeDefined();
   }, 40000);
 });

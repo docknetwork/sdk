@@ -137,18 +137,20 @@ describe('Blob Module', () => {
 
   test('Fails to write blob with size greater than allowed.', async () => {
     const blobHex = randomAsHex(BLOB_MAX_BYTE_SIZE + 1); // Max size is 1024
-    const result = await dock.blob.new(
-      {
-        id: blobId,
-        blob: blobHex,
-        author: getHexIdentifierFromDID(dockDID),
-      },
-      pair,
-      undefined,
-      false,
-    );
 
-    expect(!!result).toBe(true);
+    await expect(
+      dock.blob.new(
+        {
+          id: blobId,
+          blob: blobHex,
+          author: getHexIdentifierFromDID(dockDID),
+        },
+        pair,
+        undefined,
+        false,
+      ),
+    ).rejects.toThrow();
+
     await expect(
       dock.blob.get(blobId),
     ).rejects.toThrowError('does not exist');
@@ -168,20 +170,20 @@ describe('Blob Module', () => {
     );
 
     expect(!!resultFirst).toBe(true);
-
-    const resultSecond = await dock.blob.new(
-      {
-        id: blobId,
-        blob: randomAsHex(123),
-        author: getHexIdentifierFromDID(dockDID),
-      },
-      pair,
-      undefined,
-      false,
-    );
-
     expect(errorInResult(resultFirst)).toBe(false);
-    expect(errorInResult(resultSecond)).toBe(true);
+
+    await expect(
+      dock.blob.new(
+        {
+          id: blobId,
+          blob: randomAsHex(123),
+          author: getHexIdentifierFromDID(dockDID),
+        },
+        pair,
+        undefined,
+        false,
+      ),
+    ).rejects.toThrow();
   }, 60000);
 
   test('Should throw error when cannot read blob with given id from chain.', async () => {

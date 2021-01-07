@@ -1,6 +1,15 @@
 /*
   NOTE: These tests are currently disabled, they all run individually but not sequentially. They also take a long time, and require a custom node as of now.
 */
+
+// Must have 1 test otherwise jest fails
+describe('Democracy', () => {
+  test('Placeholder', () => {
+    expect(true).toEqual(true);
+  });
+});
+
+
 // import dock from '../../src/api';
 // import { randomAsHex, blake2AsHex } from '@polkadot/util-crypto';
 //

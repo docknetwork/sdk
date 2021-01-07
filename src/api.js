@@ -34,8 +34,12 @@ function getExtrinsicError(data, typeDef) {
   data.forEach((paramData, index) => {
     if (typeDef[index].type === 'DispatchError' && paramData.isModule) {
       const mod = paramData.asModule;
-      const { documentation, name, section } = mod.registry.findMetaError(mod);
-      errorMsg += `\nDispatchError: ${section}.${name}: ${documentation}`;
+      try {
+        const { documentation, name, section } = mod.registry.findMetaError(mod);
+        errorMsg += `\nDispatchError: ${section}.${name}: ${documentation}`;
+      } catch (e) {
+        // Incase meta error cant be found, use original msg
+      }
     }
   });
   return errorMsg;

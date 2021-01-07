@@ -307,7 +307,7 @@ class DockAPI {
 
   /**
    * Get the council module
-   * @return {PoAModule} The module to use
+   * @return {CouncilModule} The module to use
    */
   get council() {
     if (!this.councilModule) {
@@ -318,7 +318,7 @@ class DockAPI {
 
   /**
    * Get the democracy module
-   * @return {PoAModule} The module to use
+   * @return {DemocracyModule} The module to use
    */
   get democracy() {
     if (!this.democracyModule) {
@@ -329,7 +329,7 @@ class DockAPI {
 
   /**
    * Get the tech committee module
-   * @return {PoAModule} The module to use
+   * @return {TechCommitteeModule} The module to use
    */
   get techCommittee() {
     if (!this.techCommitteeModule) {

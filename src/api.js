@@ -27,6 +27,20 @@ import {
   SignatureEd25519,
 } from './signatures';
 
+function getExtrinsicError(data, typeDef) {
+  // Loop through each of the parameters
+  // trying to find module error information
+  let errorMsg = `Extrinsic failed submission: ${data.toString()}`;
+  data.forEach((paramData, index) => {
+    if (typeDef[index].type === 'DispatchError' && paramData.isModule) {
+      const mod = paramData.asModule;
+      const { documentation, name, section } = mod.registry.findMetaError(mod);
+      errorMsg += `\nDispatchError: ${section}.${name}: ${documentation}`;
+    }
+  });
+  return errorMsg;
+}
+
 /**
  * @typedef {object} Options The Options to use in the function DockAPI.
  * @property {string} [address] The node address to connect to.
@@ -187,37 +201,26 @@ class DockAPI {
 
           // Ensure ExtrinsicFailed event doesnt exist
           for (let i = 0; i < events.length; i++) {
-            const { phase, event: { data, method, section, typeDef } } = events[i];
+            const {
+              event: {
+                data, method, typeDef,
+              },
+            } = events[i];
             if (method === 'ExtrinsicFailed') {
-              // Loop through each of the parameters
-              // trying to find module error information
-              let errorMsg = `Extrinsic failed submission: ${data.toString()}`;
-              data.forEach((paramData, index) => {
-                if (typeDef[index].type === 'DispatchError' && paramData.isModule) {
-                  const mod = paramData.asModule;
-                  const { documentation, name, section } = mod.registry.findMetaError(mod);
-                  errorMsg += `\nDispatchError: ${section}.${name}: ${documentation}`;
-                }
-              });
-
-              // Throw error
+              const errorMsg = getExtrinsicError(data, typeDef);
               const error = new Error(errorMsg);
               reject(error);
               return error;
             }
           }
 
-          // If waiting for finalization
-          if (waitForFinalization && status.isFinalized) {
+          // If waiting for finalization or if not waiting for finalization, wait for inclusion in block.
+          if ((waitForFinalization && status.isFinalized) || (!waitForFinalization && status.isInBlock)) {
             unsubFunc();
             resolve(extrResult);
           }
 
-          // If not waiting for finalization, wait for inclusion in block.
-          if (!waitForFinalization && status.isInBlock) {
-            unsubFunc();
-            resolve(extrResult);
-          }
+          return extrResult;
         })
           .catch((error) => {
             reject(error);

@@ -24,7 +24,7 @@ export default class TechCommitteeModule {
 
   async getProposals() {
     const result = await this.api.query.technicalCommittee.proposals();
-    return result.map(proposalu8a => u8aToHex(proposalu8a).toString());
+    return result.map((proposalu8a) => u8aToHex(proposalu8a).toString());
   }
 
   async vote(proposalHash, index, approve = false, waitForFinalization = true) {
@@ -59,18 +59,15 @@ export default class TechCommitteeModule {
   }
 
   async getMembers() {
-    const result = await this.api.query.technicalCommittee.members();
-    return result;
+    return await this.api.query.technicalCommittee.members();
   }
 
   async getPrime() {
-    const result = await this.api.query.technicalCommittee.prime();
-    return result;
+    return await this.api.query.technicalCommittee.prime();
   }
 
   async getProposalCount() {
-    const result = await this.api.query.technicalCommittee.proposalCount();
-    return result;
+    return await this.api.query.technicalCommittee.proposalCount();
   }
 
   async proposalOf(hash) {

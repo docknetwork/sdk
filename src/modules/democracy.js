@@ -17,7 +17,7 @@ export default class DemocracyModule {
 
   async cancelReferendum(referendumIndex, waitForFinalization = true) {
     const tx = this.api.tx.sudo.sudo(
-      this.api.tx.simpleDemocracy.cancelReferendum(referendumIndex)
+      this.api.tx.simpleDemocracy.cancelReferendum(referendumIndex),
     );
     await this.signAndSend(tx, waitForFinalization);
   }
@@ -32,14 +32,7 @@ export default class DemocracyModule {
     await this.signAndSend(tx, waitForFinalization);
   }
 
-  async enactProposal(proposalHash, referendumIndex, waitForFinalization = true) {
-    const tx = this.api.tx.simpleDemocracy.enactProposal(proposalHash, referendumIndex);
-    await this.signAndSend(tx, waitForFinalization);
-  }
-
   async notePreimage(call, waitForFinalization = true) {
-    // const proposal = this.api.createType('Call', call);
-    // const tx = this.api.tx.simpleDemocracy.notePreimage(call.toHex());
     const tx = this.api.tx.simpleDemocracy.notePreimage(call);
     await this.signAndSend(tx, waitForFinalization);
   }
@@ -74,10 +67,6 @@ export default class DemocracyModule {
     await this.signAndSend(tx, waitForFinalization);
   }
 
-  vote(referendumIndex, vote, waitForFinalization = true) {
-    return this.api.tx.simpleDemocracy.vote(referendumIndex, vote);
-  }
-
   async getPreimage(proposalHash) {
     const result = await this.api.query.democracy.preimages(proposalHash);
     return result.isNone ? null : result;
@@ -92,8 +81,7 @@ export default class DemocracyModule {
   }
 
   async getPublicProposals() {
-    const result = await this.api.query.democracy.publicProps();
-    return result;
+    return await this.api.query.democracy.publicProps();
   }
 
   async getPublicProposalCount() {
@@ -122,13 +110,11 @@ export default class DemocracyModule {
   }
 
   async getCancellations(hash) {
-    const result = await this.api.query.democracy.cancellations(hash);
-    return result;
+    return await this.api.query.democracy.cancellations(hash);
   }
 
   async getLocks(address) {
-    const result = await this.api.query.democracy.locks(address);
-    return result;
+    return await this.api.query.democracy.locks(address);
   }
 
   async getVotesOf(address) {
@@ -137,18 +123,19 @@ export default class DemocracyModule {
   }
 
   async getStorageVersion() {
-    const result = await this.api.query.democracy.storageVersion();
-    return result;
+    return await this.api.query.democracy.storageVersion();
   }
 
   async getLowestUnbaked() {
-    const result = await this.api.query.democracy.lowestUnbaked();
-    return result;
+    return await this.api.query.democracy.lowestUnbaked();
   }
 
   async getLastTabledWasExternal() {
-    const result = await this.api.query.democracy.lastTabledWasExternal();
-    return result;
+    return await this.api.query.democracy.lastTabledWasExternal();
+  }
+
+  vote(referendumIndex, vote) {
+    return this.api.tx.simpleDemocracy.vote(referendumIndex, vote);
   }
 
   fastTrack(proposalHash, votingPeriod = 3, delay = 1) {

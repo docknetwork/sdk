@@ -1,5 +1,4 @@
 import { u8aToHex } from '@polkadot/util';
-import { randomAsHex } from '@polkadot/util-crypto';
 import { encodeExtrinsicAsHash } from '../utils/misc';
 
 // TODO: typedefs and docstrings
@@ -18,7 +17,6 @@ export default class CouncilModule {
     return encodeExtrinsicAsHash(this.api, tx);
   }
 
-  // TODO: rename this method to just "execute"
   async execute(proposal, lengthBound = 1000, waitForFinalization = true) {
     const tx = this.api.tx.council.execute(this.api.createType('Call', proposal), lengthBound);
     await this.signAndSend(tx, waitForFinalization);
@@ -57,12 +55,11 @@ export default class CouncilModule {
 
   async getProposals() {
     const result = await this.api.query.council.proposals();
-    return result.map(proposalu8a => u8aToHex(proposalu8a).toString());
+    return result.map((proposalu8a) => u8aToHex(proposalu8a).toString());
   }
 
   async getProposalDetails(proposalHash) {
-    const result = await this.api.query.council.proposalOf(proposalHash);
-    return result; // TODO: map into a proposal class?
+    return await this.api.query.council.proposalOf(proposalHash);
   }
 
   async getProposalIndex(proposalHash) {
@@ -71,8 +68,7 @@ export default class CouncilModule {
   }
 
   async getMembers() {
-    const result = await this.api.query.council.members();
-    return result;
+    return await this.api.query.council.members();
   }
 
   addMember(who) {

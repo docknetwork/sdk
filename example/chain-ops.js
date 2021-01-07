@@ -101,9 +101,10 @@ async function doTokenTransfer(api) {
   const txnHash = await transferDock(api, keypair, recip, 2.5);
   console.info(`Gave 2.5 Docks in transaction hash ${txnHash}`);
 
-  // Transfer micro tokens
-  const txnHash1 = await transferMicroDock(api, keypair, recip, 500);
-  console.info(`Gave 500 microDocks in transaction hash ${txnHash1}`);
+  // Prepare a transfer transaction with micro tokens but do not send
+  const txn = await transferMicroDock(api, keypair, recip, 500, false);
+  console.info(`Transfer transaction with 500 microDocks ${txn}`);
+  console.info(`Transfer transaction with 500 microDocks as hex encoded ${txn.toHex()}`);
 }
 
 async function main() {

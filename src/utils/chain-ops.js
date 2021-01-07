@@ -142,14 +142,30 @@ export function docksToMicroDocks(amount) {
   return micros;
 }
 
-// Transfer tokens and return txn hash. Converts to mirco tokens first
-export async function transferDock(api, senderKeypair, recipAddr, amount) {
-  return transferMicroDock(api, senderKeypair, recipAddr, docksToMicroDocks(amount));
+/**
+ * Transfer tokens and return txn hash. Converts to mirco tokens first
+ * @param api
+ * @param senderKeypair
+ * @param recipAddr
+ * @param amount - Amount in tokens
+ * @param sendTxn - If true, will send the transaction and return transaction hash otherwise return the signed transaction
+ * @returns {Promise<*>}
+ */
+export async function transferDock(api, senderKeypair, recipAddr, amount, sendTxn = true) {
+  return transferMicroDock(api, senderKeypair, recipAddr, docksToMicroDocks(amount), sendTxn);
 }
 
-// Transfer micro tokens and return txn hash.
-export async function transferMicroDock(api, senderKeypair, recipAddr, amount) {
+/**
+ * Transfer micro tokens and return txn hash.
+ * @param api
+ * @param senderKeypair
+ * @param recipAddr
+ * @param amount - Amount in micro (10^-6) tokens
+ * @param sendTxn - If true, will send the transaction and return transaction hash otherwise return the signed transaction
+ * @returns {Promise<*>}
+ */
+export async function transferMicroDock(api, senderKeypair, recipAddr, amount, sendTxn = true) {
   checkValidMicroAmount(amount);
   const txn = api.tx.balances.transfer(recipAddr, amount);
-  return txn.signAndSend(senderKeypair);
+  return sendTxn ? txn.signAndSend(senderKeypair) : txn.signAsync(senderKeypair);
 }

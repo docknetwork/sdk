@@ -43,7 +43,7 @@ class TokenMigration {
   migrateRecipAsList(recipients) {
     // @ts-ignore
     const recipMap = new BTreeMap();
-    recipients.sort().forEach(([address, amount]) => {
+    [...recipients].sort().forEach(([address, amount]) => {
       const existingVal = recipMap.get(address);
       let value = amount;
       if (existingVal !== undefined) {

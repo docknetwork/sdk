@@ -21,9 +21,9 @@ const TechCommitteeMemberUris = [
   '//Eve',
 ];
 
-async function giveBalance(address, deposit = 1000000000) {
+async function setBalance(address, newBalance = 1000000000) {
   dock.setAccount(dock.keyring.addFromUri('//Alice'));
-  const setBalanceTx = dock.api.tx.balances.setBalance(address, deposit, 0);
+  const setBalanceTx = dock.api.tx.balances.setBalance(address, newBalance, 0);
   await dock.signAndSend(dock.api.tx.sudo.sudo(setBalanceTx));
 }
 
@@ -41,7 +41,7 @@ async function connectAndInit() {
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
-    await giveBalance(dock.keyring.addFromUri(CouncilMember3AccountUri).address);
+    await setBalance(dock.keyring.addFromUri(CouncilMember3AccountUri).address);
   }
 }
 
@@ -139,9 +139,9 @@ describe('Proposal proposing', () => {
     await connectAndInit();
 
     // Give proposer and backer balance
-    await giveBalance(dock.keyring.addFromUri(proposer).address, DEMOCRACY_MIN_DEPOSIT * 10);
-    await giveBalance(dock.keyring.addFromUri(backer_1).address, DEMOCRACY_MIN_DEPOSIT * 10);
-    await giveBalance(dock.keyring.addFromUri(backer_2).address, DEMOCRACY_MIN_DEPOSIT * 10);
+    await setBalance(dock.keyring.addFromUri(proposer).address, DEMOCRACY_MIN_DEPOSIT * 10);
+    await setBalance(dock.keyring.addFromUri(backer_1).address, DEMOCRACY_MIN_DEPOSIT * 10);
+    await setBalance(dock.keyring.addFromUri(backer_2).address, DEMOCRACY_MIN_DEPOSIT * 10);
 
     done();
   }, 320000);
@@ -220,31 +220,95 @@ describe('Proposal proposing', () => {
   //   expect((await getBalanceOf(giveBalanceAddress)).free).toEqual(0);
   // }, 320000);
   //
-  // test('Public proposes root action and accepts', async () => {
-  //   // TODO: once we resolve below tests issues
-  // }, 320000);
-
-  test('Council proposes root action and accepts', async () => {
-    expect(await dock.democracy.getNextExternal()).toEqual(null);
+  test('Public proposes root action and accepts', async () => {
+    const proposer = dock.keyring.addFromUri(randomAsHex(32));
+    const backer = dock.keyring.addFromUri(randomAsHex(32));
+    const giveToAddr = dock.keyring.addFromUri(randomAsHex(32)).address;
 
     // Create set balance root extrinsic to propose
     const newBalance = 10000000000;
-    const rootAction = dock.api.tx.balances.setBalance(dock.keyring.addFromUri(CouncilMember3AccountUri).address, newBalance, 0).toHex();
+    const rootAction = dock.api.tx.balances.setBalance(giveToAddr, newBalance, 0).toHex();
 
     // Create proposal of council member
     const councilPropHash = blake2AsHex(rootAction);
-    const councilProposal = dock.democracy.councilPropose(councilPropHash);
 
-    // Must propose as council member
-    dock.setAccount(dock.keyring.addFromUri(CouncilMemberAccountUri));
-    await dock.council.execute(councilProposal);
+    // Give some balance but less than `MinimumDeposit`
+    await setBalance(proposer.address, DEMOCRACY_MIN_DEPOSIT - (10 * 1000000));
 
-    // Ensure external proposal was added
-    expect(await dock.democracy.getNextExternal()).not.toEqual(null);
+    // Ensure balance was set
+    const proposerBalance = await getBalanceOf(proposer.address);
+    expect(proposerBalance.free).toBeLessThan(DEMOCRACY_MIN_DEPOSIT);
+    expect(proposerBalance.reserved).toEqual(0);
+
+    // Proposing should fail
+    dock.setAccount(proposer);
+    await expect(dock.democracy.propose(councilPropHash, DEMOCRACY_MIN_DEPOSIT)).rejects.toThrow();
+
+    // Give some more balance to reach `MinimumDeposit`
+    await setBalance(proposer.address, DEMOCRACY_MIN_DEPOSIT * 2);
+    await setBalance(backer.address, DEMOCRACY_MIN_DEPOSIT * 2);
+
+    // Ensure balance is enough
+    expect((await getBalanceOf(proposer.address)).free).toBeGreaterThanOrEqual(DEMOCRACY_MIN_DEPOSIT);
+    expect((await getBalanceOf(backer.address)).free).toBeGreaterThanOrEqual(DEMOCRACY_MIN_DEPOSIT);
+
+    // Proposing should work and proposer's balance should be reserved
+    dock.setAccount(proposer);
+    const lastPropCount = await dock.democracy.getPublicProposalCount();
+    await dock.democracy.propose(councilPropHash, DEMOCRACY_MIN_DEPOSIT);
+    expect(await dock.democracy.getPublicProposalCount()).toEqual(lastPropCount + 1);
+
+    // Second the proposal from the backer
+    dock.setAccount(backer);
+    await dock.democracy.second(lastPropCount, 10);
+
+    // Proposer and backer got their balance locked (reserved)
+    const newProposerBalance = await getBalanceOf(proposer.address);
+    const newBackerBalance = await getBalanceOf(backer.address);
+    expect(newProposerBalance.reserved).toEqual(DEMOCRACY_MIN_DEPOSIT);
+    expect(newBackerBalance.reserved).toEqual(DEMOCRACY_MIN_DEPOSIT);
+    expect(newProposerBalance.free).toBeLessThan(DEMOCRACY_MIN_DEPOSIT);
+    expect(newBackerBalance.free).toBeLessThan(DEMOCRACY_MIN_DEPOSIT);
 
     // Conclude the proposal
     await conclude_proposal(councilPropHash, rootAction);
+
+    // Proposer and backer got their balance back (unreserve
+    const finalProposerBalance = await getBalanceOf(proposer.address);
+    const finalBackerBalance = await getBalanceOf(backer.address);
+    expect(finalProposerBalance.free).toBeGreaterThanOrEqual(DEMOCRACY_MIN_DEPOSIT);
+    expect(finalBackerBalance.free).toBeGreaterThanOrEqual(DEMOCRACY_MIN_DEPOSIT);
+    expect(finalProposerBalance.reserved).toEqual(0);
+    expect(finalBackerBalance.reserved).toEqual(0);
   }, 320000);
+
+  // test('Council proposes root action and accepts', async () => {
+  //   expect(await dock.democracy.getNextExternal()).toEqual(null);
+  //
+  //   const giveToAddr = dock.keyring.addFromUri(randomAsHex(32)).address;
+  //
+  //   // Create set balance root extrinsic to propose
+  //   const newBalance = 10000000000;
+  //   const rootAction = dock.api.tx.balances.setBalance(giveToAddr, newBalance, 0).toHex();
+  //
+  //   // Create proposal of council member
+  //   const councilPropHash = blake2AsHex(rootAction);
+  //   const councilProposal = dock.democracy.councilPropose(councilPropHash);
+  //
+  //   // Must propose as council member
+  //   dock.setAccount(dock.keyring.addFromUri(CouncilMemberAccountUri));
+  //   await dock.council.execute(councilProposal);
+  //
+  //   // Ensure external proposal was added
+  //   expect(await dock.democracy.getNextExternal()).not.toEqual(null);
+  //
+  //   // Conclude the proposal
+  //   await conclude_proposal(councilPropHash, rootAction);
+  //
+  //   // // Ensure balance was set
+  //   // console.log('giveToAddr', giveToAddr)
+  //   // expect((await getBalanceOf(giveToAddr)).free).toEqual(newBalance);
+  // }, 320000);
 
   afterAll(async () => {
     await dock.disconnect();
@@ -259,10 +323,10 @@ describe('Proposal proposing', () => {
 //
 //     // Create new council member account with balance
 //     newMemberAccount = dock.keyring.addFromUri(randomAsHex(32));
-//     await giveBalance(newMemberAccount.address);
-//     await giveBalance(dock.keyring.addFromUri(TechCommitteeMemberUris[0]).address);
-//     await giveBalance(dock.keyring.addFromUri(TechCommitteeMemberUris[1]).address);
-//     await giveBalance(dock.keyring.addFromUri(TechCommitteeMemberUris[2]).address);
+//     await setBalance(newMemberAccount.address);
+//     await setBalance(dock.keyring.addFromUri(TechCommitteeMemberUris[0]).address);
+//     await setBalance(dock.keyring.addFromUri(TechCommitteeMemberUris[1]).address);
+//     await setBalance(dock.keyring.addFromUri(TechCommitteeMemberUris[2]).address);
 //
 //     done();
 //   }, 320000);
@@ -475,7 +539,7 @@ describe('Proposal proposing', () => {
 //
 //     // Create new council member account with balance
 //     newMemberAccount = dock.keyring.addFromUri(randomAsHex(32));
-//     await giveBalance(newMemberAccount.address);
+//     await setBalance(newMemberAccount.address);
 //
 //     done();
 //   }, 320000);

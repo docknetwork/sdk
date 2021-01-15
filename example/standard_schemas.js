@@ -1,3 +1,4 @@
+/* eslint sonarjs/no-duplicate-string: 0 */
 import Schema from '../src/modules/schema';
 import { expandJSONLD } from '../src/utils/vc/helpers';
 import { validateCredentialSchema } from '../src/utils/vc/schema';

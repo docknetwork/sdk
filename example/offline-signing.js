@@ -5,7 +5,7 @@ import {
 } from '../src/offline-signing';
 import { metadataRpc as metadata } from '../src/offline-signing/devnode-metadata.json';
 
-(async function () {
+(async function main() {
   // charlie is try to send `value` tokens to dave
   const charlie = '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y';
   const dave = '5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy';

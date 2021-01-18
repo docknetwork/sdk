@@ -1,10 +1,12 @@
 // Utilities for doing basic operations with chain.
 
 import { Keyring } from '@polkadot/keyring';
-import { randomAsHex, cryptoWaitReady, checkAddress } from '@polkadot/util-crypto';
+import {
+  randomAsHex, cryptoWaitReady, checkAddress, blake2AsU8a,
+} from '@polkadot/util-crypto';
 import { u8aToHex, formatBalance } from '@polkadot/util';
 import { isHexWithGivenByteSize, asDockAddress } from './codec';
-import { blake2AsU8a } from '@polkadot/util-crypto'
+
 // XXX: Following info can be fetched from chain. Integrating in DockAPI object is an options.
 const TESTNET_ADDR_PREFIX = 21;
 const MAINNET_ADDR_PREFIX = 22;
@@ -116,7 +118,7 @@ export async function getTransfersFromBlock(api, numberOrHash, network, balanceF
     if (ext.method && ext.method.section === 'balances' && (ext.method.method === 'transfer' || ext.method.method === 'transferKeepAlive')) {
       const bal = formatBalIfNeeded(ext.method.args[1], balanceFormatted);
       const hash = u8aToHex(blake2AsU8a(ext.toU8a(), 256));
-      transfers.push([asDockAddress(ext.signer, network), asDockAddress(ext.method.args[0], network), bal,hash]);
+      transfers.push([asDockAddress(ext.signer, network), asDockAddress(ext.method.args[0], network), bal, hash]);
     }
   });
   return transfers;

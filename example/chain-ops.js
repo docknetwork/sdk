@@ -1,8 +1,8 @@
 import assert from 'assert';
 import { DockAPI } from '../src/api';
 import {
-  getLastBlock, getBlockNo, blockNumberToHash, getBlock, getBalance, getAllExtrinsicsFromBlock, getTransfersFromBlock,
-  getAllEventsFromBlock, getLastFinalizedBlock, generateAccount, transferMicroDock, transferDock, validateAddress,
+  getLastBlock, getBlockNo, blockNumberToHash, getBlock, getBalance, getAllExtrinsicsFromBlock, getTransferExtrinsicsFromBlock,
+  getAllEventsFromBlock, getLastFinalizedBlock, generateAccount, transferMicroDock, transferDock, validateAddress, getTransferEventsFromBlock,
 } from '../src/utils/chain-ops';
 
 require('dotenv').config();
@@ -84,12 +84,23 @@ async function printExtrinsicsOfBlock(api, blockNumberOrHash) {
   console.info(await getAllExtrinsicsFromBlock(api, blockNumberOrHash));
 }
 
+async function printSuccessfulExtrinsicsOfBlock(api, blockNumberOrHash) {
+  console.info(await getAllExtrinsicsFromBlock(api, blockNumberOrHash, false));
+}
+
 async function printTransfersOfBlock(api, blockNumberOrHash) {
-  console.info(await getTransfersFromBlock(api, blockNumberOrHash, 'dev'));
+  console.info(await getTransferExtrinsicsFromBlock(api, blockNumberOrHash, 'main', true, false));
 }
 
 async function printAllEventsFromBlock(api, blockNumberOrHash) {
   const evs = await getAllEventsFromBlock(api, blockNumberOrHash);
+  console.info(`${evs.length} events found`);
+  console.info(evs);
+}
+
+async function printTransferEventsFromBlock(api, blockNumberOrHash) {
+  const evs = await getTransferEventsFromBlock(api, blockNumberOrHash);
+  console.info(`${evs.length} events found`);
   console.info(evs);
 }
 
@@ -126,11 +137,15 @@ async function main() {
   const address = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
   await printBalance(dock.api, address);
 
-  await printExtrinsicsOfBlock(dock.api, 3);
+  await printExtrinsicsOfBlock(dock.api, '0xeb2f1392566dfb562dde9177647d4488b911bc78981383f69cba0731a9b57a2b');
 
-  await printTransfersOfBlock(dock.api, 3);
+  await printSuccessfulExtrinsicsOfBlock(dock.api, '0x6542f888924e33e438715f9fbfd002653486f4d579290a66a227fa4e03275419');
 
-  await printAllEventsFromBlock(dock.api, 3);
+  await printTransfersOfBlock(dock.api, 3095859);
+
+  await printAllEventsFromBlock(dock.api, '0xeb2f1392566dfb562dde9177647d4488b911bc78981383f69cba0731a9b57a2b');
+
+  await printTransferEventsFromBlock(dock.api, '0xeb2f1392566dfb562dde9177647d4488b911bc78981383f69cba0731a9b57a2b');
 
   await doTokenTransfer(dock.api);
 }

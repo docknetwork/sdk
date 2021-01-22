@@ -21,6 +21,9 @@ async function printSessionKeys() {
     addresses[addr][u8aToString(bnToU8a(keyOwner[0]._args[0][0]))] = u8aToHex(keyOwner[0]._args[0][1]);
   });
 
+  console.log(`Found ${Object.keys(addresses).length} addreses`);
+  console.log();
+
   Object.keys(addresses).forEach((addr) => {
     console.log(`For address ${addr}`);
     console.log(`Aura key is ${addresses[addr].aura}`);

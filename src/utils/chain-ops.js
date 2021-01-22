@@ -92,17 +92,45 @@ export function getBlockNo(headerOrBlock) {
   return headerOrBlock.number.toNumber();
 }
 
-// Given a block number or block hash, get all extrinsics.
-export async function getAllExtrinsicsFromBlock(api, numberOrHash) {
+/**
+ * Given a block number or block hash, get all extrinsics.
+ * @param {*} api
+ * @param {*} numberOrHash
+ * @param {*} includeAllExtrinsics - If false, returns only successful extriniscs.
+ */
+export async function getAllExtrinsicsFromBlock(api, numberOrHash, includeAllExtrinsics = true) {
   const block = await getBlock(api, numberOrHash);
-  return block.extrinsics;
+  let { extrinsics } = block;
+  if (includeAllExtrinsics === false) {
+    // Will only include successful extriniscs and using event `ExtrinsicSuccess` which hash index '0x0000' (1st index of 1st pallet which is system)
+    const events = await getAllEventsFromBlock(api, block.header.number.toNumber(), true);
+    const filteredExtrinsics = [];
+    events.forEach((event) => {
+      if (event.event && event.event.index === '0x0000') {
+        // event corresponds to `ExtrinsicSuccess` and event.phase.ApplyExtrinsic is the extrinisc index in the block
+        filteredExtrinsics.push(extrinsics[event.phase.ApplyExtrinsic]);
+      }
+    });
+    extrinsics = filteredExtrinsics;
+  }
+  return extrinsics;
 }
 
-// Given a block number or block hash, get all events.
+/**
+ * Given a block number or block hash, get all events.
+ * @param {*} api
+ * @param {*} numberOrHash
+ * @param {*} formatted
+ */
 export async function getAllEventsFromBlock(api, numberOrHash, formatted = true) {
   const hash = isHexWithGivenByteSize(numberOrHash, 32) ? numberOrHash : (await blockNumberToHash(api, numberOrHash));
   const events = await api.query.system.events.at(hash);
   return formatted ? events.map((e) => e.toJSON()) : events;
+}
+
+export async function getTransferEventsFromBlock(api, numberOrHash, formatted = true) {
+  const events = await getAllEventsFromBlock(api, numberOrHash, formatted);
+  return events.filter((event) => event.event && event.event.index === '0x0702');
 }
 
 // Format a balance with units or only as number.
@@ -110,9 +138,16 @@ function formatBalIfNeeded(bal, format = true) {
   return format ? formatBalance(bal, { decimals: DECIMAL, withSi: true, withUnit: SYMBOL }) : bal.toNumber();
 }
 
-// Given a block number or block hash, get all transfer extrinsics. Each returned extrinsic is in form `[sender, recipient, amount]`
-export async function getTransfersFromBlock(api, numberOrHash, network, balanceFormatted = true) {
-  const extrinsics = await getAllExtrinsicsFromBlock(api, numberOrHash);
+/**
+ * Given a block number or block hash, get all transfer extrinsics. Each returned extrinsic is in form `[sender, recipient, amount]`
+ * @param {*} api
+ * @param {*} numberOrHash
+ * @param {*} network
+ * @param {*} balanceFormatted
+ * @param {*} includeAllTransfers - If false, will only return successful transfer extrinsics
+ */
+export async function getTransferExtrinsicsFromBlock(api, numberOrHash, network, balanceFormatted = true, includeAllTransfers = true) {
+  const extrinsics = await getAllExtrinsicsFromBlock(api, numberOrHash, includeAllTransfers);
   const transfers = [];
   extrinsics.forEach((ext) => {
     if (ext.method && ext.method.section === 'balances' && (ext.method.method === 'transfer' || ext.method.method === 'transferKeepAlive')) {

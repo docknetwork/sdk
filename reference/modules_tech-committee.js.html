@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: utils/errors/no-anchor-error.js</title>
+    <title>JSDoc: Source: modules/tech-committee.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: utils/errors/no-anchor-error.js</h1>
+    <h1 class="page-title">Source: modules/tech-committee.js</h1>
 
     
 
@@ -26,14 +26,89 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * Anchor wasn't found on chain
- */
-export default class NoAnchorError extends Error {
-  constructor(anchor) {
-    super(`Anchor (${anchor}) does not exist`);
-    this.name = 'NoAnchorError';
-    this.anchor = anchor;
+            <pre class="prettyprint source linenums"><code>import { u8aToHex } from '@polkadot/util';
+
+// TODO: typedefs and docstrings
+export default class TechCommitteeModule {
+  /**
+   * Creates a new instance of TechCommitteeModule and sets the api
+   * @constructor
+   * @param {object} api - PolkadotJS API Reference
+   */
+  constructor(api, signAndSend) {
+    this.api = api;
+    this.signAndSend = signAndSend;
+  }
+
+  async closeProposal(proposalHash, index, proposalWeightBound = 1000000000, lengthBound = 1000, waitForFinalization = true) {
+    const tx = this.api.tx.technicalCommittee.close(proposalHash, index, proposalWeightBound, lengthBound);
+    await this.signAndSend(tx, waitForFinalization);
+  }
+
+  async getProposalIndex(proposalHash) {
+    const result = (await this.api.query.technicalCommittee.voting(proposalHash)).toJSON();
+    return result &amp;&amp; result.index;
+  }
+
+  async getProposals() {
+    const result = await this.api.query.technicalCommittee.proposals();
+    return result.map((proposalu8a) => u8aToHex(proposalu8a).toString());
+  }
+
+  async vote(proposalHash, index, approve = false, waitForFinalization = true) {
+    const tx = this.api.tx.technicalCommittee.vote(proposalHash, index, approve);
+    await this.signAndSend(tx, waitForFinalization);
+  }
+
+  async makeTechCommitteeProposal(call, threshold = 2, lengthBound = 1000, waitForFinalization = true) {
+    const proposal = this.api.createType('Call', call);
+    const tx = this.api.tx.technicalCommittee.propose(threshold, proposal, lengthBound);
+    await this.signAndSend(tx, waitForFinalization);
+  }
+
+  async disapproveProposal(proposalHash, waitForFinalization = true) {
+    const tx = this.api.tx.technicalCommittee.disapproveProposal(proposalHash);
+    await this.signAndSend(tx, waitForFinalization);
+  }
+
+  async execute(proposal, lengthBound = 1000, waitForFinalization = true) {
+    const tx = this.api.tx.technicalCommittee.execute(this.api.createType('Call', proposal), lengthBound);
+    await this.signAndSend(tx, waitForFinalization);
+  }
+
+  async propose(threshold, proposal, lengthBound = 1000, waitForFinalization = true) {
+    const tx = this.api.tx.technicalCommittee.propose(threshold, this.api.createType('Call', proposal), lengthBound);
+    await this.signAndSend(tx, waitForFinalization);
+  }
+
+  async setMembers(newMembers, prime, oldCount, waitForFinalization = true) {
+    const tx = this.api.tx.technicalCommittee.setMembers(newMembers, prime, oldCount);
+    await this.signAndSend(tx, waitForFinalization);
+  }
+
+  async getMembers() {
+    return await this.api.query.technicalCommittee.members();
+  }
+
+  async getPrime() {
+    return await this.api.query.technicalCommittee.prime();
+  }
+
+  async getProposalCount() {
+    return await this.api.query.technicalCommittee.proposalCount();
+  }
+
+  async proposalOf(hash) {
+    const result = await this.api.query.technicalCommittee.proposalOf(hash);
+    return result.toJSON();
+  }
+
+  addTechCommitteeMember(who) {
+    return this.api.tx.technicalCommitteeMembership.addMember(who);
+  }
+
+  removeTechCommitteeMember(who) {
+    return this.api.tx.technicalCommitteeMembership.removeMember(who);
   }
 }
 </code></pre>

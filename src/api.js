@@ -7,6 +7,9 @@ import BlobModule from './modules/blob';
 import DIDModule from './modules/did';
 import RevocationModule from './modules/revocation';
 import PoAModule from './modules/poa';
+import DemocracyModule from './modules/democracy';
+import CouncilModule from './modules/council';
+import TechCommitteeModule from './modules/tech-committee';
 import TokenMigration from './modules/migration';
 import types from './types.json';
 import PoaRpcDefs from './poa-rpc-defs';
@@ -23,6 +26,24 @@ import {
   SignatureSr25519,
   SignatureEd25519,
 } from './signatures';
+
+function getExtrinsicError(data, typeDef) {
+  // Loop through each of the parameters
+  // trying to find module error information
+  let errorMsg = `Extrinsic failed submission: ${data.toString()}`;
+  data.forEach((paramData, index) => {
+    if (typeDef[index].type === 'DispatchError' && paramData.isModule) {
+      const mod = paramData.asModule;
+      try {
+        const { documentation, name, section } = mod.registry.findMetaError(mod);
+        errorMsg += `\nDispatchError: ${section}.${name}: ${documentation}`;
+      } catch (e) {
+        // Incase meta error cant be found, use original msg
+      }
+    }
+  });
+  return errorMsg;
+}
 
 /**
  * @typedef {object} Options The Options to use in the function DockAPI.
@@ -90,6 +111,9 @@ class DockAPI {
     this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));
     this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
     this.revocationModule = new RevocationModule(this.api, this.signAndSend.bind(this));
+    this.democracyModule = new DemocracyModule(this.api, this.signAndSend.bind(this));
+    this.councilModule = new CouncilModule(this.api, this.signAndSend.bind(this));
+    this.techCommitteeModule = new TechCommitteeModule(this.api, this.signAndSend.bind(this));
 
     if (loadPoaModules) {
       this.poaModule = new PoAModule(this.api);
@@ -176,24 +200,31 @@ class DockAPI {
     const promise = new Promise((resolve, reject) => {
       try {
         let unsubFunc = null;
-        return extrinsic.send(({ events = [], status }) => {
-          // If waiting for finalization
-          if (waitForFinalization && status.isFinalized) {
-            unsubFunc();
-            resolve({
-              events,
-              status,
-            });
+        return extrinsic.send((extrResult) => {
+          const { events = [], status } = extrResult;
+
+          // Ensure ExtrinsicFailed event doesnt exist
+          for (let i = 0; i < events.length; i++) {
+            const {
+              event: {
+                data, method, typeDef,
+              },
+            } = events[i];
+            if (method === 'ExtrinsicFailed') {
+              const errorMsg = getExtrinsicError(data, typeDef);
+              const error = new Error(errorMsg);
+              reject(error);
+              return error;
+            }
           }
 
-          // If not waiting for finalization, wait for inclusion in block.
-          if (!waitForFinalization && status.isInBlock) {
+          // If waiting for finalization or if not waiting for finalization, wait for inclusion in block.
+          if ((waitForFinalization && status.isFinalized) || (!waitForFinalization && status.isInBlock)) {
             unsubFunc();
-            resolve({
-              events,
-              status,
-            });
+            resolve(extrResult);
           }
+
+          return extrResult;
         })
           .catch((error) => {
             reject(error);
@@ -272,10 +303,43 @@ class DockAPI {
    * @return {PoAModule} The module to use
    */
   get poa() {
-    if (!this.poa) {
+    if (!this.poaModule) {
       throw new Error('Unable to get PoA module, SDK is not initialised');
     }
     return this.poaModule;
+  }
+
+  /**
+   * Get the council module
+   * @return {CouncilModule} The module to use
+   */
+  get council() {
+    if (!this.councilModule) {
+      throw new Error('Unable to get council module, SDK is not initialised');
+    }
+    return this.councilModule;
+  }
+
+  /**
+   * Get the democracy module
+   * @return {DemocracyModule} The module to use
+   */
+  get democracy() {
+    if (!this.democracyModule) {
+      throw new Error('Unable to get democracy module, SDK is not initialised');
+    }
+    return this.democracyModule;
+  }
+
+  /**
+   * Get the tech committee module
+   * @return {TechCommitteeModule} The module to use
+   */
+  get techCommittee() {
+    if (!this.techCommitteeModule) {
+      throw new Error('Unable to get tech committee module, SDK is not initialised');
+    }
+    return this.techCommitteeModule;
   }
 }
 

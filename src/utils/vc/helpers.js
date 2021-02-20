@@ -68,7 +68,14 @@ export function getSuiteFromKeyDoc(keyDoc) {
  * Helper method to ensure credential is valid according to the context
  * @param credential
  */
-export async function expandJSONLD(credential) {
-  const expanded = await jsonld.expand(credential);
+export async function expandJSONLD(credential, options = {}) {
+  // JSONLD library has an odd quirk where if documentLoader is defined, but null/undefined value, it will try to use it
+  // This little hack fixes that
+  const actualOptions = { ...options };
+  if (!options.documentLoader) {
+    delete actualOptions.documentLoader;
+  }
+
+  const expanded = await jsonld.expand(credential, actualOptions);
   return expanded[0];
 }

@@ -169,11 +169,16 @@ export async function verifyCredential(credential, {
     );
   }
 
+  // Set document loader
+  const docLoader = documentLoader || defaultDocumentLoader(resolver);
+
   // Check credential is valid
   checkCredential(credential);
 
   // Expand credential JSON-LD
-  const expandedCredential = await expandJSONLD(credential);
+  const expandedCredential = await expandJSONLD(credential, {
+    documentLoader,
+  });
 
   // Validate scheam
   if (schemaApi) {
@@ -188,7 +193,7 @@ export async function verifyCredential(credential, {
         controller,
       }),
       suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
-      documentLoader: documentLoader || defaultDocumentLoader(resolver),
+      documentLoader: docLoader,
       compactProof,
     });
   } catch (error) {

@@ -3,6 +3,7 @@ import credentialsContext from 'credentials-context';
 import vcExamplesV1 from './contexts/vc-examples-v1';
 import sr25519Context from './contexts/sr25519-context.json';
 import secContext from './contexts/security_context';
+import secContextV1 from './contexts/security-v1.json';
 import didV1Context from './contexts/did-v1-updated.json';
 import credV1Context from './contexts/credential-v1-updated.json';
 import schema from './contexts/schema.json';
@@ -31,6 +32,10 @@ export default new Map([
   [
     'https://www.dock.io/2020/credentials/context/sr25519',
     sr25519Context,
+  ],
+  [
+    'https://w3id.org/security/v1',
+    secContextV1,
   ],
   [
     'https://w3id.org/security/v2',

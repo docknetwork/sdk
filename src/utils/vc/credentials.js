@@ -177,7 +177,8 @@ export async function verifyCredential(credential, {
 
   // Expand credential JSON-LD
   const expandedCredential = await expandJSONLD(credential, {
-    documentLoader,
+    documentLoader: docLoader,
+    resolver,
   });
 
   // Validate scheam

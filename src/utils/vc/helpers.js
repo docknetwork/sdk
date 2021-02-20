@@ -1,5 +1,6 @@
 import jsonld from 'jsonld';
 import { getPublicKeyFromKeyringPair } from '../misc';
+import defaultDocumentLoader from './document-loader';
 
 import {
   EcdsaSecp256k1VerKeyName, Ed25519VerKeyName, Sr25519VerKeyName,
@@ -69,11 +70,9 @@ export function getSuiteFromKeyDoc(keyDoc) {
  * @param credential
  */
 export async function expandJSONLD(credential, options = {}) {
-  // JSONLD library has an odd quirk where if documentLoader is defined, but null/undefined value, it will try to use it
-  // This little hack fixes that
   const actualOptions = { ...options };
   if (!options.documentLoader) {
-    delete actualOptions.documentLoader;
+    actualOptions.documentLoader = defaultDocumentLoader();
   }
 
   const expanded = await jsonld.expand(credential, actualOptions);

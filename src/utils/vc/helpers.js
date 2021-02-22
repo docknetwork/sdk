@@ -70,11 +70,9 @@ export function getSuiteFromKeyDoc(keyDoc) {
  * @param credential
  */
 export async function expandJSONLD(credential, options = {}) {
-  const actualOptions = { ...options };
-  if (!options.documentLoader) {
-    actualOptions.documentLoader = defaultDocumentLoader(options.resolver);
-  }
-
-  const expanded = await jsonld.expand(credential, actualOptions);
+  const expanded = await jsonld.expand(credential, {
+    ...options,
+    documentLoader: options.documentLoader || defaultDocumentLoader(options.resolver),
+  });
   return expanded[0];
 }

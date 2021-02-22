@@ -93,6 +93,8 @@ function orderKeys(a) {
         ret[k] = orderKeys(a[k]);
       }
       return ret;
+    case 'boolean':
+      return a;
     default:
       throw new TypeError(`type error: orderKeys() does not accept type ${typeof a}`);
   }

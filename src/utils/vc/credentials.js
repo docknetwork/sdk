@@ -163,17 +163,26 @@ export async function verifyCredential(credential, {
   purpose = null,
   controller = null,
 } = {}) {
+  if (documentLoader && resolver) {
+    throw new Error('Passing resolver and documentLoader results in resolver being ignored, please re-factor.');
+  }
+
   if (!credential) {
     throw new TypeError(
       'A "credential" property is required for verifying.',
     );
   }
 
+  // Set document loader
+  const docLoader = documentLoader || defaultDocumentLoader(resolver);
+
   // Check credential is valid
   checkCredential(credential);
 
   // Expand credential JSON-LD
-  const expandedCredential = await expandJSONLD(credential);
+  const expandedCredential = await expandJSONLD(credential, {
+    documentLoader: docLoader,
+  });
 
   // Validate scheam
   if (schemaApi) {
@@ -188,7 +197,7 @@ export async function verifyCredential(credential, {
         controller,
       }),
       suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
-      documentLoader: documentLoader || defaultDocumentLoader(resolver),
+      documentLoader: docLoader,
       compactProof,
     });
   } catch (error) {

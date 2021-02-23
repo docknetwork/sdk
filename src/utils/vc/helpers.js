@@ -71,7 +71,7 @@ export function getSuiteFromKeyDoc(keyDoc) {
  */
 export async function expandJSONLD(credential, options = {}) {
   if (options.documentLoader && options.resolver) {
-    throw new Error(`Passing resolver and documentLoader results in resolver being ignored, please re-factor.`);
+    throw new Error('Passing resolver and documentLoader results in resolver being ignored, please re-factor.');
   }
 
   const expanded = await jsonld.expand(credential, {

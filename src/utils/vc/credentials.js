@@ -164,7 +164,7 @@ export async function verifyCredential(credential, {
   controller = null,
 } = {}) {
   if (documentLoader && resolver) {
-    throw new Error(`Passing resolver and documentLoader results in resolver being ignored, please re-factor.`);
+    throw new Error('Passing resolver and documentLoader results in resolver being ignored, please re-factor.');
   }
 
   if (!credential) {

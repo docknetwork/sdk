@@ -123,8 +123,9 @@ export async function verifyPresentation(presentation, options = {}) {
   // Build verification options
   const verificationOptions = {
     suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
-    documentLoader: defaultDocumentLoader(resolver),
+    documentLoader: options.documentLoader || defaultDocumentLoader(resolver),
     ...options,
+    resolver: null,
   };
 
   // TODO: verify proof then credentials

@@ -102,6 +102,10 @@ export async function verifyPresentationCredentials(presentation, options = {}) 
  * describe the error if any.
  */
 export async function verifyPresentation(presentation, options = {}) {
+  if (options.documentLoader && options.resolver) {
+    throw new Error('Passing resolver and documentLoader results in resolver being ignored, please re-factor.');
+  }
+
   // Ensure presentation is passed
   if (!presentation) {
     throw new TypeError('"presentation" property is required');

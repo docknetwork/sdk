@@ -163,12 +163,12 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#claim-deduction" id="claim-deduction">Claim Deduction</a></h1>
+                        <h1 id="claim-deduction"><a class="header" href="#claim-deduction">Claim Deduction</a></h1>
 <p>The <a href="https://www.w3.org/TR/vc-data-model/">verifiable credentials data model</a> is based on a machine comprehensible language called <a href="https://www.w3.org/TR/rdf-primer/">RDF</a>. RDF represents arbitrary semantic knowledge as <a href="https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)">graph</a>s. Computers can perform automatic deductive reasoning over RDF, given assumptions (represented as an RDF graph) and axioms (represented as logical rules), a computer can infer new conclusions and even prove them to other computers using deductive derivations (proofs).</p>
 <p>So what does that have to do with verifiable credentials? Every VCDM credential is an RDF claim graph. Computers can reason about them, deriving new conclusions that weren't explicitly stated by the issuer.</p>
 <p>The Dock SDK exposes utilities for primitive deductive reasoning over verified credentials. The Verifier has a choice to perform deduction themself (expensive), or offload that responsibility to the Presenter of the credential[s] by accepting deductive proofs of composite claims.</p>
 <p>In RDF, if graph A is true and graph B is true, then the <a href="https://en.wikipedia.org/wiki/Union_(set_theory)">union</a> of those graphs, is also true <code>A∧B-&gt;A∪B</code> <sup class="footnote-reference"><a href="#1">1</a></sup>. Using this property we can combine multiple credentials and reason over their union.</p>
-<h2><a class="header" href="#explicit-ethos-using-a-hrefhttpsenwikipediaorgwikimodes_of_persuasionethosrdf-reificationa" id="explicit-ethos-using-a-hrefhttpsenwikipediaorgwikimodes_of_persuasionethosrdf-reificationa">Explicit Ethos using <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos">RDF Reification</a></a></h2>
+<h2 id="explicit-ethos-using-a-hrefhttpsenwikipediaorgwikimodes_of_persuasionethosrdf-reificationa"><a class="header" href="#explicit-ethos-using-a-hrefhttpsenwikipediaorgwikimodes_of_persuasionethosrdf-reificationa">Explicit Ethos using <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos">RDF Reification</a></a></h2>
 <p>Imagine a signed credential issued by <strong>Alice</strong> claiming that <strong>Joe</strong> is a <strong>Member</strong>.</p>
 <pre><code class="language-json">{
   ...
@@ -191,7 +191,7 @@
   def:object &lt;Member&gt; ] .
 </code></pre>
 <p>Writing RDF triples about other RDF triples is called <a href="https://www.w3.org/wiki/RdfReification">reification</a>. Signed credentials are <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos">ethos</a> arguments so we call this reified representation of credentials &quot;Explicit Ethos&quot; form. If a credential is <em>verified</em>, then it's explicit ethos form is <em>true</em>.</p>
-<h2><a class="header" href="#rule-format" id="rule-format">Rule Format</a></h2>
+<h2 id="rule-format"><a class="header" href="#rule-format">Rule Format</a></h2>
 <p>To perform reasoning and to accept proofs, the Verifier must select the list of logical rules which they will allow. Rules (or axioms if you prefer), are modeled as if-then relationships.</p>
 <pre><code class="language-js">const rules = [
   {
@@ -269,10 +269,10 @@ const blank = { Blank: '_:b0' };
 // all things named &quot;Bob&quot; like all things containing butter
 </code></pre>
 <p>See the <a href="tutorial_claim_deduction.html">claim deduction tutorial</a> for more another example.</p>
-<h2><a class="header" href="#limited-expresiveness" id="limited-expresiveness">Limited Expresiveness</a></h2>
+<h2 id="limited-expresiveness"><a class="header" href="#limited-expresiveness">Limited Expresiveness</a></h2>
 <p>The astute among you may notice the SDK's model for rules does not allow logical negation. This is by design. For one, it keeps the the rule description language from being turing complete so inference time is always bounded. Secondly, RDF choses the <a href="https://en.wikipedia.org/wiki/Open-world_assumption">Open World Assumption</a> so absence of any particular statement in a credential/claimgraph is not meaningful within RDF semantics.</p>
 <p>The rule language is expected to be expressive enough to implement <a href="https://www.w3.org/TR/owl2-profiles/#OWL_2_EL">OWL 2 EL</a> but not <a href="https://www.w3.org/TR/owl-ref/">OWL 1 DL</a>.</p>
-<h2><a class="header" href="#terms" id="terms">Terms</a></h2>
+<h2 id="terms"><a class="header" href="#terms">Terms</a></h2>
 <ul>
 <li><a href="https://www.w3.org/TR/vc-data-model/#dfn-verifier">Verifier</a>: The party that accepts and checks VCDM credential[s].</li>
 <li><a href="https://www.w3.org/TR/vc-data-model/#dfn-issuer">Issuer</a>: The party that signed a VCDM credential.</li>

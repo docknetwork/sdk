@@ -163,11 +163,11 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#claim-deduction" id="claim-deduction">Claim Deduction</a></h1>
-<h2><a class="header" href="#specifying-axioms" id="specifying-axioms">Specifying Axioms</a></h2>
+                        <h1 id="claim-deduction"><a class="header" href="#claim-deduction">Claim Deduction</a></h1>
+<h2 id="specifying-axioms"><a class="header" href="#specifying-axioms">Specifying Axioms</a></h2>
 <p>A Verifier has complete and low level control over the logical rules they deem valid. Rules may vary from use-case to use-case and from verifier to verifier.</p>
 <p>Unwrapping of Explicit Ethos statements is expected to be a common first step when writing a ruleset. This tutorial will give some examples of that.</p>
-<h3><a class="header" href="#simple-unwrapping-of-explicit-ethos" id="simple-unwrapping-of-explicit-ethos">Simple Unwrapping of Explicit Ethos</a></h3>
+<h3 id="simple-unwrapping-of-explicit-ethos"><a class="header" href="#simple-unwrapping-of-explicit-ethos">Simple Unwrapping of Explicit Ethos</a></h3>
 <p>This ruleset names a specific issuer and states that any claims that issuer makes are true.</p>
 <pre><code class="language-js">const rules = [
   {
@@ -200,7 +200,7 @@
 ];
 </code></pre>
 <p>That single rule is enough for some use-cases but it's not scalable. What if we want to allow more than one issuer? Instead of copying the same rule for each issuer we trust, let's define &quot;trustworthiness&quot;:</p>
-<h3><a class="header" href="#unwrapping-explicit-ethos-by-defining-trustworthiness" id="unwrapping-explicit-ethos-by-defining-trustworthiness">Unwrapping Explicit Ethos by Defining Trustworthiness</a></h3>
+<h3 id="unwrapping-explicit-ethos-by-defining-trustworthiness"><a class="header" href="#unwrapping-explicit-ethos-by-defining-trustworthiness">Unwrapping Explicit Ethos by Defining Trustworthiness</a></h3>
 <pre><code class="language-js">const trustworthy =
   { Bound: { Iri: 'https://www.dock.io/rdf2020#Trustworthy' } };
 const type =
@@ -257,7 +257,7 @@ const rules = [
 </code></pre>
 <p>You may ask &quot;So what's the difference? There is still only one issuer.&quot;</p>
 <p>By the primitive definition of &quot;trustworthiness&quot; written above, any claim made by a trustworthy issuer is true. did:example:issuer can claim whatever they want by issuing verifiable credentials. They can even claim that some other issuer is trustworthy. Together, the two rules defined in the above example implement a system analogous to TLS certificate chains with did:example:issuer as the single root authority.</p>
-<h2><a class="header" href="#proving-composite-claims" id="proving-composite-claims">Proving Composite Claims</a></h2>
+<h2 id="proving-composite-claims"><a class="header" href="#proving-composite-claims">Proving Composite Claims</a></h2>
 <p>As a Holder of verifiable credentials, you'll want to prove specific claims to a Verifier. If those claims are composite, you'll need to provide a deductive proof in your verifiable credentials presentation. This should be done after the presentation has been assembled. If the presentation is going to be signed, sign it <em>after</em> including the deductive proof.</p>
 <pre><code class="language-js">import { proveCompositeClaims } from '@docknetwork/sdk/utils/cd';
 import jsonld from 'jsonld';
@@ -292,7 +292,7 @@ presentation[logic] = proof;
 
 // Now JSON.stringify(presentation) is ready to send to a verifier.
 </code></pre>
-<h2><a class="header" href="#verifying-composite-claims" id="verifying-composite-claims">Verifying Composite Claims</a></h2>
+<h2 id="verifying-composite-claims"><a class="header" href="#verifying-composite-claims">Verifying Composite Claims</a></h2>
 <pre><code class="language-js">import { acceptCompositeClaims } from '../src/utils/cd';
 import jsonld from 'jsonld';
 import deepEqual from 'deep-equal';
@@ -319,7 +319,7 @@ if (claims.some(claim =&gt; deepEqual(claim, compositeClaim))) {
   console.error('veracity of the composite claim is unknown');
 }
 </code></pre>
-<h2><a class="header" href="#verifier-side-reasoning" id="verifier-side-reasoning">Verifier-Side Reasoning</a></h2>
+<h2 id="verifier-side-reasoning"><a class="header" href="#verifier-side-reasoning">Verifier-Side Reasoning</a></h2>
 <p>Some use-cases may require the verifier to perform inference in place of the presenter.</p>
 <pre><code class="language-js">import { proveCompositeClaims } from '../src/utils/cd';
 import jsonld from 'jsonld';
@@ -343,7 +343,7 @@ try {
   console.error('veracity of the composite claim is unknown');
 }
 </code></pre>
-<h2><a class="header" href="#we-need-to-go-deeper" id="we-need-to-go-deeper">We Need to Go Deeper</a></h2>
+<h2 id="we-need-to-go-deeper"><a class="header" href="#we-need-to-go-deeper">We Need to Go Deeper</a></h2>
 <p>The SDK claim deduction module exposes lower level functionality for those who need it. <code>getImplications</code>, <code>proveh</code> and <code>validateh</code>, for example, operate on raw claimgraphs represented as adjacency lists. For even lower level access, check out our <a href="https://github.com/docknetwork/rify">inference engine</a> which is written in Rust and exposed to javascript via wasm.</p>
 
                     </main>

@@ -163,9 +163,9 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#did" id="did">DID</a></h1>
+                        <h1 id="did"><a class="header" href="#did">DID</a></h1>
 <p>If you are not familiar with DIDs, you can get a conceptual overview <a href="./concepts_did.html">here</a>.</p>
-<h2><a class="header" href="#overview" id="overview">Overview</a></h2>
+<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
 <p>DIDs in Dock are created by choosing a 32 byte unique (on Dock chain) identifier along with a public key. The public key
 can be changed by providing a signature with the currently active key. The DID can also be removed by providing a signature
 with the currently active key. As of now, a DID can have only one key at a time.
@@ -175,14 +175,14 @@ that block number is changed to the one in which the key got updated. This is do
 update (or removal) to the DID must include the last block number where the DID was updated and after each update the block
 number changes, thus giving replay protection. This detail however is hidden in the API so the caller should not have to worry
 about this.</p>
-<h2><a class="header" href="#did-creation" id="did-creation">DID creation</a></h2>
+<h2 id="did-creation"><a class="header" href="#did-creation">DID creation</a></h2>
 <p>Create a new random DID.</p>
 <pre><code class="language-js">import {createNewDockDID} from '@docknetwork/sdk/utils/did';
 
 const did = createNewDockDID();
 </code></pre>
 <p>The DID is not yet registered on the chain. Before the DID can be registered, a public key needs to created as well.</p>
-<h2><a class="header" href="#public-key-creation" id="public-key-creation">Public key creation</a></h2>
+<h2 id="public-key-creation"><a class="header" href="#public-key-creation">Public key creation</a></h2>
 <p>Dock supports 3 kinds of public keys, Sr25519, Ed25519 and EcdsaSecp256k1. These public keys are supported
 through 3 classes, <code>PublicKeySr25519</code>, <code>PublicKeyEd25519</code> and <code>PublicKeySecp256k1</code> respectively. These 3 classes
 extend from the same class called <code>PublicKey</code>. These can be instantiated directly by passing them as hex encoded bytes</p>
@@ -216,7 +216,7 @@ object of the proper child class of <code>PublicKey</code></p>
 <pre><code class="language-js">import { getPublicKeyFromKeyringPair } from '@docknetwork/sdk/utils/misc';
 const publicKey = getPublicKeyFromKeyringPair(pair);
 </code></pre>
-<h2><a class="header" href="#registering-a-new-did-on-chain" id="registering-a-new-did-on-chain">Registering a new DID on chain</a></h2>
+<h2 id="registering-a-new-did-on-chain"><a class="header" href="#registering-a-new-did-on-chain">Registering a new DID on chain</a></h2>
 <p>Now that you have a DID and a public key, the DID can be registered on the Dock chain. Note that this public key associated
 with DID is independent of the key used for sending the transaction and paying the fees.</p>
 <ol>
@@ -232,10 +232,10 @@ const keyDetail = createKeyDetail(publicKey, did);
 </code></pre>
 </li>
 </ol>
-<h2><a class="header" href="#fetching-a-did-from-chain" id="fetching-a-did-from-chain">Fetching a DID from chain</a></h2>
+<h2 id="fetching-a-did-from-chain"><a class="header" href="#fetching-a-did-from-chain">Fetching a DID from chain</a></h2>
 <p>To get a DID document, use <code>getDocument</code>
 <code>js const result = await dock.did.getDocument(did); </code></p>
-<h2><a class="header" href="#updating-an-existing-did-on-chain" id="updating-an-existing-did-on-chain">Updating an existing DID on chain</a></h2>
+<h2 id="updating-an-existing-did-on-chain"><a class="header" href="#updating-an-existing-did-on-chain">Updating an existing DID on chain</a></h2>
 <p>The public key or the controller of an on-chain DID can be updated by preparing a signed key update.</p>
 <ol>
 <li>Create a new public key and fetch the current keypair to sign the key update message
@@ -262,7 +262,7 @@ const signature = // Get the signature on `keyUpdate`
 </code></pre>
 </li>
 </ol>
-<h2><a class="header" href="#removing-an-existing-did-from-chain" id="removing-an-existing-did-from-chain">Removing an existing DID from chain</a></h2>
+<h2 id="removing-an-existing-did-from-chain"><a class="header" href="#removing-an-existing-did-from-chain">Removing an existing DID from chain</a></h2>
 <p>A DID can be removed from the chain by sending the corresponding message signed with the current key.</p>
 <ol>
 <li>Fetch the current keypair to sign the DID removal message

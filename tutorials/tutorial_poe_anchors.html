@@ -163,12 +163,12 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2><a class="header" href="#graphical-anchoring-utility" id="graphical-anchoring-utility">Graphical Anchoring Utility</a></h2>
+                        <h2 id="graphical-anchoring-utility"><a class="header" href="#graphical-anchoring-utility">Graphical Anchoring Utility</a></h2>
 <p>You can also anchor without touching any code. Visit https://fe.dock.io/#/anchor/batch for creation of anchors and https://fe.dock.io/#/anchor/check for anchor verification.</p>
-<h3><a class="header" href="#to-batch-or-not-to-batch" id="to-batch-or-not-to-batch">To Batch, or not to Batch</a></h3>
+<h3 id="to-batch-or-not-to-batch"><a class="header" href="#to-batch-or-not-to-batch">To Batch, or not to Batch</a></h3>
 <p>Batching (combining multiple anchors into one) can be used to save on transaction costs by anchoring multiple documents in a single transaction as a merkle tree root.</p>
 <p>Batching does have a drawback. In order to verify a document that was anchored as part of the batch, you must provde the merkle proof that was generated when batching said file. Merkle proofs are expressed as <code>.proof.json</code> files and can be downloaded before posting the anchor. No merkle proof is required for batches containing only one document.</p>
-<h2><a class="header" href="#programatic-usage" id="programatic-usage">Programatic Usage</a></h2>
+<h2 id="programatic-usage"><a class="header" href="#programatic-usage">Programatic Usage</a></h2>
 <p>The on-chain anchoring module allows to developers the flexibility talor anchors to their own use-case, but the sdk does provide a reference example for batching and anchoring documents.</p>
 <p>The anchoring module is hashing algorithm and hash length agnostic. You can post a <a href="https://github.com/multiformats/multihash">multihash</a>, or even use the identity hash; the chain doesn't care.</p>
 <p>One thing to note is that rather than storing your anchor directly, the anchoring module will store the blake2b256 hash of the anchor. This means as a developer you'll need to perform an additional hashing step when looking up anchors:</p>

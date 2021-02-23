@@ -163,7 +163,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#did-resolver" id="did-resolver">DID resolver</a></h1>
+                        <h1 id="did-resolver"><a class="header" href="#did-resolver">DID resolver</a></h1>
 <p>The process of learning the DID Document of a DID is called DID resolution and tool that does the resolution is called the
 resolver. Resolution involves looking at the DID method and then fetching the DID Document from the registry, the registry
 might be a centralized database or a blockchain. The SDK supports resolving Dock DIDs natively.
@@ -172,7 +172,7 @@ For other DIDs, resolving the DID through the <a href="https://uniresolver.io">U
 DID document. There is another class called <code>MultiResolver</code> that can accept several types of resolvers (objects of subclasses
 of <code>DIDResolver</code>) and once the <code>MultiResolver</code> is initialized with the resolvers of different DID methods, it can resolve
 DIDs of those methods.</p>
-<h2><a class="header" href="#dock-resolver" id="dock-resolver">Dock resolver</a></h2>
+<h2 id="dock-resolver"><a class="header" href="#dock-resolver">Dock resolver</a></h2>
 <p>The resolver for Dock DIDs <code>DockResolver</code> connects to the Dock blockchain to get the DID details. The resolver is
 constructed by passing it a Dock API object so that it can connect to a Dock node. This is how you resolve a Dock DID:</p>
 <pre><code class="language-js">import { DockResolver } from '@docknetwork/sdk/resolver';
@@ -182,7 +182,7 @@ const dockResolver = new DockResolver(dock);
 // Say you had a DID `dock:did:5D.....`
 const didDocument = dockResolver.resolve('dock:did:5D.....');
 </code></pre>
-<h2><a class="header" href="#creating-a-resolver-class-for-a-different-method" id="creating-a-resolver-class-for-a-different-method">Creating a resolver class for a different method</a></h2>
+<h2 id="creating-a-resolver-class-for-a-different-method"><a class="header" href="#creating-a-resolver-class-for-a-different-method">Creating a resolver class for a different method</a></h2>
 <p>If you want to resolve DIDs other than Dock and do not have/want access to the universal resolver, you can extend the
 <code>DIDResolver</code> class to create a custom resolver. Following is an example to build a custom Ethereum resolver. It uses the
 library <a href="https://github.com/decentralized-identity/ethr-did-resolver">ethr-did-resolver</a> and accepts a provider information
@@ -223,7 +223,7 @@ const ethResolver = new EtherResolver(ethereumProviderConfig);
 // Say you had a DID `did:ethr:0x6f....`
 const didDocument = ethResolver.resolve('did:ethr:0x6f....');
 </code></pre>
-<h2><a class="header" href="#universal-resolver" id="universal-resolver">Universal resolver</a></h2>
+<h2 id="universal-resolver"><a class="header" href="#universal-resolver">Universal resolver</a></h2>
 <p>To resolve DIDs using the <a href="https://uniresolver.io">Universal Resolver</a>, use the <code>UniversalResolver</code>. It needs the URL
 of the universal resolver and assumes the universal resolver from this <a href="https://github.com/decentralized-identity/universal-resolver">codebase</a>
 is running at the URL.</p>
@@ -236,7 +236,7 @@ const universalResolver = new UniversalResolver(universalResolverUrl);
 // Say you had a DID `did:btcr:xk....`
 const didDocument = universalResolver.resolve('did:btcr:xk....');
 </code></pre>
-<h2><a class="header" href="#resolving-dids-of-several-did-methods-with-a-single-resolver" id="resolving-dids-of-several-did-methods-with-a-single-resolver">Resolving DIDs of several DID methods with a single resolver</a></h2>
+<h2 id="resolving-dids-of-several-did-methods-with-a-single-resolver"><a class="header" href="#resolving-dids-of-several-did-methods-with-a-single-resolver">Resolving DIDs of several DID methods with a single resolver</a></h2>
 <p>In case you need to resolve DIDs from more than one method, a <code>MultiResolver</code> object can be created by passing
 resolvers of various DID methods. The <code>MultiResolver</code> also accepts a <code>UniversalResolver</code> as an optional parameter which
 is used when a DID for an unknown method needs to be resolved. The <code>resolvers</code> object below has resolvers for DID methods

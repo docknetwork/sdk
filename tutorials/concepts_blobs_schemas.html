@@ -163,15 +163,15 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#schemas" id="schemas">Schemas</a></h1>
-<h2><a class="header" href="#table-of-contents" id="table-of-contents">Table of Contents</a></h2>
+                        <h1 id="schemas"><a class="header" href="#schemas">Schemas</a></h1>
+<h2 id="table-of-contents"><a class="header" href="#table-of-contents">Table of Contents</a></h2>
 <ol>
 <li><a href="#intro-to-schemas">Intro</a></li>
 <li><a href="#blobs">Blobs</a></li>
 <li><a href="#json-schemas">JSON Schemas</a></li>
 <li><a href="#schemas-in-verifiable-credentials">Schemas in Verifiable Credentials</a></li>
 </ol>
-<h2><a class="header" href="#intro-to-schemas" id="intro-to-schemas">Intro to Schemas</a></h2>
+<h2 id="intro-to-schemas"><a class="header" href="#intro-to-schemas">Intro to Schemas</a></h2>
 <p>Data Schemas are useful when enforcing a specific structure on a collection of data like a Verifiable Credential.
 Data Verification schemas, for example, are used to verify that the structure and contents of a Verifiable Credential
 conform to a published schema. Data Encoding schemas, on the other hand, are used to map the contents of a Verifiable
@@ -179,13 +179,13 @@ Credential to an alternative representation format, such as a binary format used
 Data schemas serve a different purpose than that of the <code>@context</code> property in a Verifiable Credential, the latter
 neither enforces data structure or data syntax, nor enables the definition of arbitrary encodings to alternate
 representation formats.</p>
-<h2><a class="header" href="#blobs" id="blobs">Blobs</a></h2>
+<h2 id="blobs"><a class="header" href="#blobs">Blobs</a></h2>
 <p>Before diving further into Schemas in it is important to understand the way these are stored in the Dock chain.
 Schemas are stored on chain as a <code>Blob</code> in the Blob Storage module. They are identified and retrieved by their unique
 blob id, a 32 byte long hex string. They are authored by a DID and have a max size of 1024 bytes.
 The chain is agnostic to the contents of blobs and thus to schemas. Blobs may be used to store types of data other than
 schemas.</p>
-<h2><a class="header" href="#json-schemas" id="json-schemas">JSON Schemas</a></h2>
+<h2 id="json-schemas"><a class="header" href="#json-schemas">JSON Schemas</a></h2>
 <p>JSON Schema can be used to require that a given JSON document (an instance) satisfies a certain number of criteria.
 JSON Schema validation asserts constraints on the structure of instance data. An instance location that satisfies all
 asserted constraints is then annotated with any keywords that contain non-assertion information, such as descriptive
@@ -240,7 +240,7 @@ More about JSON schemas can be found <a href="http://json-schema.org/draft/2019-
 doesn't contain an <code>emailAddress</code> field, or it isn't a string formatted as an email; or if it doesn't contain a
 property <code>alumniOf</code> with type string. It'd also fail if a subject contains other properties not listed here (except for
 the <code>id</code> property which is popped out before validation).</p>
-<h2><a class="header" href="#schemas-in-verifiable-credentials" id="schemas-in-verifiable-credentials">Schemas in Verifiable Credentials</a></h2>
+<h2 id="schemas-in-verifiable-credentials"><a class="header" href="#schemas-in-verifiable-credentials">Schemas in Verifiable Credentials</a></h2>
 <p>In pursuit of <a href="https://w3c.github.io/vc-data-model/#extensibility">extensibility</a>, VCDM makes an Open World Assumption;
 a credential can state anything. Schemas allow issuers to &quot;opt-out&quot; of some of the freedom VCDM allows. Issuers can
 concretely limit what a given credential will claim. In a closed world, a verifier can rely on the structure of a

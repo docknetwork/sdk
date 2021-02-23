@@ -18,16 +18,22 @@ function documentLoader(resolver = null) {
    */
   async function loadDocument(uri) {
     let document;
-
-    if (resolver && uri.startsWith('did:')) {
+    let uriString = uri.toString();
+    if (resolver && uriString.startsWith('did:')) {
       // Try to resolve a DID and throw if cannot resolve
-      document = await resolver.resolve(uri);
+      document = await resolver.resolve(uriString);
     } else {
-      const cachedData = cachedUris.get(uri);
+      // Strip ending slash from uri
+      if (uriString.endsWith('/')) {
+        uriString = uriString.substr(0, uri.length - 1);
+      }
+
+      // Check its not in data cache
+      const cachedData = cachedUris.get(uriString);
       if (cachedData) {
         document = cachedData;
       } else {
-        const { data: doc } = await axios.get(uri);
+        const { data: doc } = await axios.get(uriString);
         document = doc;
       }
     }

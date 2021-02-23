@@ -163,6 +163,10 @@ export async function verifyCredential(credential, {
   purpose = null,
   controller = null,
 } = {}) {
+  if (documentLoader && resolver) {
+    throw new Error(`Passing resolver and documentLoader results in resolver being ignored, please re-factor.`);
+  }
+
   if (!credential) {
     throw new TypeError(
       'A "credential" property is required for verifying.',
@@ -178,7 +182,6 @@ export async function verifyCredential(credential, {
   // Expand credential JSON-LD
   const expandedCredential = await expandJSONLD(credential, {
     documentLoader: docLoader,
-    resolver,
   });
 
   // Validate scheam

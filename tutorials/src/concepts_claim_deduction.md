@@ -1,8 +1,8 @@
 # Claim Deduction
 
-The [verifiable credentials data model](https://www.w3.org/TR/vc-data-model/) is based on a machine comprehensible language called [RDF](https://www.w3.org/TR/rdf-primer/). RDF represents arbitrary semantic knowledge as [graph](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics))s. Computers can perform automatic deductive reasoning over RDF, given assumptions (represented as an RDF graph) and axioms (represented as logical rules), a computer can infer new conclusions and even prove them to other computers using deductive derivations (proofs).
+The [verifiable credentials data model](https://www.w3.org/TR/vc-data-model/) is based on a machine comprehensible language called [RDF](https://www.w3.org/TR/rdf-primer/). RDF represents arbitrary semantic knowledge as [graph](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics))s. Computers can perform automatic deductive reasoning over RDF; given assumptions (represented as an RDF graph) and axioms (represented as logical rules), a computer can infer new conclusions and even prove them to other computers using deductive derivations (proofs).
 
-So what does that have to do with verifiable credentials? Every VCDM credential is an RDF claim graph. Computers can reason about them, deriving new conclusions that weren't explicitly stated by the issuer.
+Every VCDM credential is representable as an RDF graph so computers can reason about them, deriving new conclusions that weren't explicitly stated by the issuer.
 
 The Dock SDK exposes utilities for primitive deductive reasoning over verified credentials. The Verifier has a choice to perform deduction themself (expensive), or offload that responsibility to the Presenter of the credential[s] by accepting deductive proofs of composite claims.
 
@@ -20,28 +20,28 @@ Imagine a signed credential issued by **Alice** claiming that **Joe** is a **Mem
     "id": "Joe",
     "@type": "Member"
   },
+  "proof": ...,
   ...
 }
 ```
 
 The credential does not directly prove that **Joe** is a **Member**. Rather, it proves **Alice** **Claims** **Joe** to be a **Member**.
 
-Not proven:[^2]
+Not proven:
 
-```turtle
-<Joe> a <Member> .
+```nquads
+<Joe> <type> <Member> .
 ```
 
 Proven:
 
-```turtle
-<Alice> <Claims> [
-  rdf:subject <Joe> ;
-  rdf:predicate a ;
-  def:object <Member> ] .
+```nquads
+<Joe> <type> <Member> <Alice> .
 ```
 
-Writing RDF triples about other RDF triples is called [reification](https://www.w3.org/wiki/RdfReification). Signed credentials are [ethos](https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos) arguments so we call this reified representation of credentials "Explicit Ethos" form. If a credential is *verified*, then it's explicit ethos form is *true*.
+The fourth and final element of the proven *quad* is used here to indicate the source of the information, Alice in this case. The final element of a quad is its [graph name](https://www.w3.org/TR/rdf11-concepts/#dfn-graph-name).
+
+Signed credentials are [ethos](https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos) arguments. A credential may be converted to a list of quads (a claimgraph). We call this representation "Explicit Ethos" form. If a credential is *verified*, then it's explicit ethos form is *true*.
 
 ## Rule Format
 
@@ -59,20 +59,20 @@ const rules = [
 During reasoning, when an `if_all` pattern is matched, its corresponding `then` pattern will be implied. In logic terms, each "rule" is the conditional premise of a [modus ponens](https://en.wikipedia.org/wiki/Modus_ponens).
 
 ```js
-{ if_all: [A, B, C], then: [C, D, E] }
+{ if_all: [A, B, C], then: [D, E] }
 ```
 
-means `if (A and B and C) then (C and D and E)`.
+means `if (A and B and C) then (D and E)`.
 
 Rules can contain Bound or Unbound entities. Unbound entities are named variables. Each rule has it's own unique scope, so Unbound entities introduced in the `if_all` pattern can be used in the `then` pattern.
 
 ```js
 {
   if_all: [
-    [{ Bound: alice }, { Bound: likes }, { Unbound: 'thing' }],
+    [{ Bound: alice }, { Bound: likes }, { Unbound: 'thing' }, { Bound: defaultGraph }],
   ],
   then: [
-    [{ Bound: bob }, { Bound: likes }, { Unbound: 'thing' }]
+    [{ Bound: bob }, { Bound: likes }, { Unbound: 'thing' }, { Bound: defaultGraph }]
   ],
 }
 ```
@@ -87,7 +87,7 @@ For any ?thing:
 
 in other words: `∀ thing: [alice likes thing] -> [bob likes thing]`
 
-Bound entities are constants of type RdfNode. RDF nodes may be one of three things, an IRI, a blank node, or a literal. For those familiar with algebraic datatypes:
+Bound entities are constants of type RdfTerm. RDF nodes may be one of four things, an IRI, a blank node, a literal, or the default graph. For those familiar with algebraic datatypes:
 
 ```rust,ignore
 enum RdfNode {
@@ -97,6 +97,7 @@ enum RdfNode {
     value: String,
     datatype: Url,
   },
+  DefaultGraph,
 }
 ```
 
@@ -112,6 +113,7 @@ const literal = {
 };
 // blank nodes are generally not useful in rule definitions
 const blank = { Blank: '_:b0' };
+const defaultGraph = { DefaultGraph: true };
 ```
 
 Example of a complete rule definition:
@@ -122,7 +124,8 @@ Example of a complete rule definition:
     [
       { Unbound: 'food' },
       { Bound { Iri: 'https://example.com/contains' } },
-      { Bound: { Iri: 'https://example.com/butter' } }
+      { Bound: { Iri: 'https://example.com/butter' } },
+      { Bound: { DefaultGraph: true } }
     ],
     [
       { Unbound: 'person' },
@@ -130,14 +133,16 @@ Example of a complete rule definition:
       { Literal: {
         value: 'Bob',
         datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral',
-      } }
+      } },
+      { Bound: { DefaultGraph: true } }
     ],
   ],
   then: [
     [
       { Unbound: 'person' },
       { Bound: { Iri: 'https://example.com/likes' } },
-      { Unbound: 'food' },
+      { Unbound: 'food' },,
+      { Bound: { DefaultGraph: true } }
     ]
   ],
 }
@@ -159,11 +164,10 @@ The rule language is expected to be expressive enough to implement [OWL 2 EL](ht
 - [VCDM](https://www.w3.org/TR/vc-data-model/): Verifiable Credentials Data Model
 - [RDF](https://en.wikipedia.org/wiki/Resource_Description_Framework): A model for representing general knowledge in a machine friendly way.
 - RDF triple: A single sentence consisting of subject, predicate and object. Each element of the triple is an RDF node.
+- RDF quad: A single sentence consisting of subject, predicate, object, graph. Each element of the quad is an RDF term.
 - [RDF graph](https://www.w3.org/TR/rdf-primer/#rdfmodel): A directed, labeled [graph](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)) with RDF triples as edges.
 - [RDF node](https://www.w3.org/TR/rdf-primer/#rdfmodel)
 - Composite Claim: An rdf triple which was infered, rather than stated explicitly in a credential.
 - Explicit [Ethos](https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos) statement: A statement of the form "A claims X." where X is also a statement. Explicit Ethos is encodable in natural human languages as well as in RDF.
 
 [^1]: If you ever decide to implement your own algorithm to merge RDF graphs, remember that [blank nodes](https://www.w3.org/TR/rdf11-concepts/#section-blank-nodes) exists and may need to be renamed depending on the type of graph representation in use.
-
-[^2]: This syntax is an RDF representation called [turtle](https://www.w3.org/TR/turtle/). In turtle, "a" is shorthand for \<http://www.w3.org/1999/02/22-rdf-syntax-ns#type\> which means "is member of set".

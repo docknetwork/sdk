@@ -26,6 +26,10 @@ export default new Map([
     odrl,
   ],
   [
+    'https://schema.org',
+    schema,
+  ],
+  [
     'http://schema.org',
     schema,
   ],

@@ -102,6 +102,10 @@ export async function verifyPresentationCredentials(presentation, options = {}) 
  * describe the error if any.
  */
 export async function verifyPresentation(presentation, options = {}) {
+  if (options.documentLoader && options.resolver) {
+    throw new Error('Passing resolver and documentLoader results in resolver being ignored, please re-factor.');
+  }
+
   // Ensure presentation is passed
   if (!presentation) {
     throw new TypeError('"presentation" property is required');
@@ -123,8 +127,9 @@ export async function verifyPresentation(presentation, options = {}) {
   // Build verification options
   const verificationOptions = {
     suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
-    documentLoader: defaultDocumentLoader(resolver),
+    documentLoader: options.documentLoader || defaultDocumentLoader(resolver),
     ...options,
+    resolver: null,
   };
 
   // TODO: verify proof then credentials

@@ -167,14 +167,15 @@
 <p>If you are not familiar with DIDs, you can get a conceptual overview <a href="./concepts_did.html">here</a>.</p>
 <h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
 <p>DIDs in Dock are created by choosing a 32 byte unique (on Dock chain) identifier along with a public key. The public key
-can be changed by providing a signature with the currently active key. The DID can also be removed by providing a signature
-with the currently active key. As of now, a DID can have only one key at a time.
-The chain-state stores a few things for a DID, the current public key, the controller and the block number when the DID was
+can be changed by providing a signature with the currently active key.</p>
+<p>The DID can also be removed by providing a signature with the currently active key. As of now, a DID can have only one key
+at a time.</p>
+<p>The chain-state stores a few things for a DID, the current public key, the controller and the block number when the DID was
 last updated, so in the beginning the block number would be the one where the DID was created, when a DID's key is updated,
-that block number is changed to the one in which the key got updated. This is done for replay protection as every
-update (or removal) to the DID must include the last block number where the DID was updated and after each update the block
-number changes, thus giving replay protection. This detail however is hidden in the API so the caller should not have to worry
-about this.</p>
+that block number is changed to the one in which the key got updated.</p>
+<p>This is done for replay protection as every update (or removal) to the DID must include the last block number where the DID
+was updated and after each update the block number changes, thus giving replay protection. This detail however is hidden in
+the API so the caller should not have to worry about this.</p>
 <h2 id="did-creation"><a class="header" href="#did-creation">DID creation</a></h2>
 <p>Create a new random DID.</p>
 <pre><code class="language-js">import {createNewDockDID} from '@docknetwork/sdk/utils/did';
@@ -184,8 +185,9 @@ const did = createNewDockDID();
 <p>The DID is not yet registered on the chain. Before the DID can be registered, a public key needs to created as well.</p>
 <h2 id="public-key-creation"><a class="header" href="#public-key-creation">Public key creation</a></h2>
 <p>Dock supports 3 kinds of public keys, Sr25519, Ed25519 and EcdsaSecp256k1. These public keys are supported
-through 3 classes, <code>PublicKeySr25519</code>, <code>PublicKeyEd25519</code> and <code>PublicKeySecp256k1</code> respectively. These 3 classes
-extend from the same class called <code>PublicKey</code>. These can be instantiated directly by passing them as hex encoded bytes</p>
+through 3 classes, <code>PublicKeySr25519</code>, <code>PublicKeyEd25519</code> and <code>PublicKeySecp256k1</code> respectively.</p>
+<p>These 3 classes extend from the same class called <code>PublicKey</code>. These can be instantiated directly by passing them as hex
+encoded bytes.</p>
 <pre><code class="language-js">import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from '@docknetwork/sdk/api';
 
 const pk1 = new PublicKeySr25519(bytesAsHex);
@@ -220,14 +222,17 @@ const publicKey = getPublicKeyFromKeyringPair(pair);
 <p>Now that you have a DID and a public key, the DID can be registered on the Dock chain. Note that this public key associated
 with DID is independent of the key used for sending the transaction and paying the fees.</p>
 <ol>
-<li>First create a key detail object. The first argument of this function is a <code>PublicKey</code> and the second argument is
-the controller. The controller is the DID that controls the public key and this can be the same as the DID being
-registered.
+<li>
+<p>First create a key detail object. The first argument of this function is a <code>PublicKey</code> and the second argument is
+the controller.</p>
+<p>The controller is the DID that controls the public key and this can be the same as the DID being
+registered.</p>
 <pre><code class="language-js">import {createKeyDetail} from '@docknetwork/sdk/utils/did';
 const keyDetail = createKeyDetail(publicKey, did);
 </code></pre>
 </li>
-<li>Now submit the transaction using a <code>DockAPI</code> object and the newly created DID <code>did</code> and <code>keyDetail</code>.
+<li>
+<p>Now submit the transaction using a <code>DockAPI</code> object and the newly created DID <code>did</code> and <code>keyDetail</code>.</p>
 <pre><code class="language-js">await dock.did.new(did, keyDetail);
 </code></pre>
 </li>
@@ -287,9 +292,9 @@ const signature = // Get the signature on `didRemoval`
 </code></pre>
 </li>
 </ol>
-<p>Note that they accounts used to send the transactions are independent of the keys associated with the DID. So the DID could
-have been created with one account, updated with another account and removed with another account. The accounts are not relevant
-in the data model and not associated with the DID in the chain-state.</p>
+<p>Note that they accounts used to send the transactions are independent of the keys associated with the DID.</p>
+<p>So the DID could have been created with one account, updated with another account and removed with another account.</p>
+<p>The accounts are not relevant in the data model and not associated with the DID in the chain-state.</p>
 
                     </main>
 

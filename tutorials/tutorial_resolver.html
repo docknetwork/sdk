@@ -165,16 +165,20 @@
                     <main>
                         <h1 id="did-resolver"><a class="header" href="#did-resolver">DID resolver</a></h1>
 <p>The process of learning the DID Document of a DID is called DID resolution and tool that does the resolution is called the
-resolver. Resolution involves looking at the DID method and then fetching the DID Document from the registry, the registry
-might be a centralized database or a blockchain. The SDK supports resolving Dock DIDs natively.
-For other DIDs, resolving the DID through the <a href="https://uniresolver.io">Universal Resolver</a> is supported.</p>
+resolver.</p>
+<p>Resolution involves looking at the DID method and then fetching the DID Document from the registry, the registry
+might be a centralized database or a blockchain.</p>
+<p>The SDK supports resolving Dock DIDs natively. For other DIDs, resolving the DID through the
+<a href="https://uniresolver.io">Universal Resolver</a> is supported.</p>
 <p>Each resolver should extend the class <code>DIDResolver</code> and implement the <code>resolve</code> method that accepts a DID and returns the
-DID document. There is another class called <code>MultiResolver</code> that can accept several types of resolvers (objects of subclasses
+DID document.</p>
+<p>There is another class called <code>MultiResolver</code> that can accept several types of resolvers (objects of subclasses
 of <code>DIDResolver</code>) and once the <code>MultiResolver</code> is initialized with the resolvers of different DID methods, it can resolve
 DIDs of those methods.</p>
 <h2 id="dock-resolver"><a class="header" href="#dock-resolver">Dock resolver</a></h2>
-<p>The resolver for Dock DIDs <code>DockResolver</code> connects to the Dock blockchain to get the DID details. The resolver is
-constructed by passing it a Dock API object so that it can connect to a Dock node. This is how you resolve a Dock DID:</p>
+<p>The resolver for Dock DIDs <code>DockResolver</code> connects to the Dock blockchain to get the DID details.</p>
+<p>The resolver is constructed by passing it a Dock API object so that it can connect to a Dock node.
+This is how you resolve a Dock DID:</p>
 <pre><code class="language-js">import { DockResolver } from '@docknetwork/sdk/resolver';
 
 // Assuming the presence of Dock API object `dock`
@@ -184,8 +188,9 @@ const didDocument = dockResolver.resolve('dock:did:5D.....');
 </code></pre>
 <h2 id="creating-a-resolver-class-for-a-different-method"><a class="header" href="#creating-a-resolver-class-for-a-different-method">Creating a resolver class for a different method</a></h2>
 <p>If you want to resolve DIDs other than Dock and do not have/want access to the universal resolver, you can extend the
-<code>DIDResolver</code> class to create a custom resolver. Following is an example to build a custom Ethereum resolver. It uses the
-library <a href="https://github.com/decentralized-identity/ethr-did-resolver">ethr-did-resolver</a> and accepts a provider information
+<code>DIDResolver</code> class to create a custom resolver.</p>
+<p>Following is an example to build a custom Ethereum resolver. It uses the library
+<a href="https://github.com/decentralized-identity/ethr-did-resolver">ethr-did-resolver</a> and accepts a provider information
 as configuration. The example below uses Infura to get access to an Ethereum node and read the DID off Ethereum.</p>
 <pre><code class="language-js">import { DIDResolver } from '@docknetwork/sdk/resolver';
 import ethr from 'ethr-did-resolver';
@@ -238,9 +243,11 @@ const didDocument = universalResolver.resolve('did:btcr:xk....');
 </code></pre>
 <h2 id="resolving-dids-of-several-did-methods-with-a-single-resolver"><a class="header" href="#resolving-dids-of-several-did-methods-with-a-single-resolver">Resolving DIDs of several DID methods with a single resolver</a></h2>
 <p>In case you need to resolve DIDs from more than one method, a <code>MultiResolver</code> object can be created by passing
-resolvers of various DID methods. The <code>MultiResolver</code> also accepts a <code>UniversalResolver</code> as an optional parameter which
+resolvers of various DID methods.</p>
+<p>The <code>MultiResolver</code> also accepts a <code>UniversalResolver</code> as an optional parameter which
 is used when a DID for an unknown method needs to be resolved. The <code>resolvers</code> object below has resolvers for DID methods
-<code>dock</code> and <code>ethr</code>. For resolving DID of any other method, the given <code>UniversalResolver</code> object will be used.</p>
+<code>dock</code> and <code>ethr</code>.</p>
+<p>For resolving DID of any other method, the given <code>UniversalResolver</code> object will be used.</p>
 <pre><code class="language-js">import { MultiResolver } from '@docknetwork/sdk/resolver';
 
 

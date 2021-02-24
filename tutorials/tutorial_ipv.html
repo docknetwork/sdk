@@ -218,12 +218,20 @@ This Credential isn't signed since we only just initialized it. It brings howeve
 &gt;    vc.credentialSubject
 &lt;-   []
 </code></pre>
-<p>The default <code>context</code> is an array with <code>&quot;https://www.w3.org/2018/credentials/v1&quot;</code> as first element. This is required by the VCDMv1 specs so having it as default helps ensure your Verifiable Credentials will be valid in the end.
-A similar approach was taken on the <code>type</code> property, where the default is an array with <code>&quot;VerifiableCredential&quot;</code> already populated. This is also required by the specs.
-The <code>subject</code> property is required to exist, so this is already initialized for you as well although it is empty for now.
-Finally the <code>issuanceDate</code> is also set to the moment you initialized the <code>VerifiableCredential</code> object. You can change this later if desired but it helps having it in the right format from the get go.</p>
-<p>We could also have checked those defaults more easily by checking the Verifiable Credential's JSON representation.
-This can be achieved by calling the <code>toJSON()</code> method on it:</p>
+<p>The default <code>context</code> is an array with
+<code>&quot;https://www.w3.org/2018/credentials/v1&quot;</code> as first element. This is required
+by the VCDMv1 specs so having it as default helps ensure your Verifiable
+Credentials will be valid in the end.</p>
+<p>A similar approach was taken on the <code>type</code> property, where the default is an
+array with <code>&quot;VerifiableCredential&quot;</code> already populated. This is also required
+by the specs. The <code>subject</code> property is required to exist, so this is already
+initialized for you as well although it is empty for now. Finally the
+<code>issuanceDate</code> is also set to the moment you initialized the
+<code>VerifiableCredential</code> object. You can change this later if desired but it
+helps having it in the right format from the get go.</p>
+<p>We could also have checked those defaults more easily by checking the
+Verifiable Credential's JSON representation.</p>
+<p>This can be achieved by calling the <code>toJSON()</code> method on it:</p>
 <pre><code class="language-javascript">&gt;    vc.toJSON()
 &lt;-   {
        &quot;@context&quot;: [ &quot;https://www.w3.org/2018/credentials/v1&quot; ],
@@ -235,8 +243,17 @@ This can be achieved by calling the <code>toJSON()</code> method on it:</p>
        &quot;issuanceDate&quot;: &quot;2020-04-14T14:48:48.486Z&quot;
      }
 </code></pre>
-<p>An interesting thing to note here is the transformation happening to some of the root level keys in the JSON representation of a <code>VerifiableCredential</code> object. For example <code>context</code> gets transformed into <code>@context</code> and <code>subject</code> into <code>credentialSubject</code>. This is to ensure compliance with the Verifiable Credential Data Model specs while at the same time providing you with a clean interface to the <code>VerifiableCredential</code> class in your code.</p>
-<p>Once your Verifiable Credential has been initialized, you can proceed to use the rest of the building functions to define it completely before finally signing it.</p>
+<p>An interesting thing to note here is the transformation happening to some of
+the root level keys in the JSON representation of a <code>VerifiableCredential</code>
+object.</p>
+<p>For example <code>context</code> gets transformed into <code>@context</code> and <code>subject</code>
+into <code>credentialSubject</code>.</p>
+<p>This is to ensure compliance with the Verifiable Credential Data Model specs
+while at the same time providing you with a clean interface to the
+<code>VerifiableCredential</code> class in your code.</p>
+<p>Once your Verifiable Credential has been initialized, you can proceed to use
+the rest of the building functions to define it completely before finally
+signing it.</p>
 <h4 id="adding-a-context"><a class="header" href="#adding-a-context">Adding a Context</a></h4>
 <p>A context can be added with the <code>addContext</code> method. It accepts a single argument <code>context</code> which can either be a string (in which case it needs to be a valid URI), or an object:</p>
 <pre><code class="language-javascript">&gt;   vc.addContext('https://www.w3.org/2018/credentials/examples/v1')
@@ -271,8 +288,14 @@ This can be achieved by calling the <code>toJSON()</code> method on it:</p>
     }
 </code></pre>
 <h4 id="setting-the-issuance-date"><a class="header" href="#setting-the-issuance-date">Setting the Issuance Date</a></h4>
-<p>The issuance date is set by default to the datetime you first initialize your <code>VerifiableCredential</code> object. This means that you don't necessarily need to call this method to achieve a valid Verifiable Credential (which are required to have an issuanceDate property).
-However, if you need to change this date you can use the <code>setIssuanceDate</code> method. It takes a single argument <code>issuanceDate</code> that needs to be a string with a valid ISO formatted datetime:</p>
+<p>The issuance date is set by default to the datetime you first initialize your
+<code>VerifiableCredential</code> object.</p>
+<p>This means that you don't necessarily need to
+call this method to achieve a valid Verifiable Credential (which are required
+to have an issuanceDate property).</p>
+<p>However, if you need to change this date you can use the <code>setIssuanceDate</code>
+method. It takes a single argument <code>issuanceDate</code> that needs to be a string
+with a valid ISO formatted datetime:</p>
 <pre><code class="language-javascript">&gt;   vc.issuanceDate
 &lt;-  &quot;2020-04-14T14:48:48.486Z&quot;
 &gt;   vc.setIssuanceDate(&quot;2019-01-01T14:48:48.486Z&quot;)
@@ -280,13 +303,20 @@ However, if you need to change this date you can use the <code>setIssuanceDate</
 &lt;-  &quot;2019-01-01T14:48:48.486Z&quot;
 </code></pre>
 <h4 id="setting-an-expiration-date"><a class="header" href="#setting-an-expiration-date">Setting an Expiration Date</a></h4>
-<p>An expiration date is not set by default as it isn't required by the specs. If you wish to set one, you can use the <code>setExpirationDate</code> method. It takes a single argument <code>expirationDate</code> that needs to be a string with a valid ISO formatted datetime:</p>
+<p>An expiration date is not set by default as it isn't required by the specs.
+If you wish to set one, you can use the <code>setExpirationDate</code> method.</p>
+<p>It takes a single argument <code>expirationDate</code> that needs to be a string with a
+valid ISO formatted datetime:</p>
 <pre><code class="language-javascript">&gt;   vc.setExpirationDate(&quot;2029-01-01T14:48:48.486Z&quot;)
 &gt;   vc.expirationDate
 &lt;-  &quot;2029-01-01T14:48:48.486Z&quot;
 </code></pre>
 <h3 id="signing-a-verifiable-credential"><a class="header" href="#signing-a-verifiable-credential">Signing a Verifiable Credential</a></h3>
-<p>Once you've crafted your Verifiable Credential it is time to sign it. This can be achieved with the <code>sign</code> method. It requires a <code>keyDoc</code> parameter (an object with the params and keys you'll use for signing) and it also accepts a boolean <code>compactProof</code> that determines whether you want to compact the JSON-LD or not:</p>
+<p>Once you've crafted your Verifiable Credential it is time to sign it. This
+can be achieved with the <code>sign</code> method.</p>
+<p>It requires a <code>keyDoc</code> parameter (an object with the params and keys you'll
+use for signing) and it also accepts a boolean <code>compactProof</code> that determines
+whether you want to compact the JSON-LD or not:</p>
 <pre><code class="language-javascript">&gt;   await vc.sign(keyDoc)
 </code></pre>
 <p>Please note that signing is an async process.
@@ -301,9 +331,20 @@ Once done, your <code>vc</code> object will have a new <code>proof</code> field:
     }
 </code></pre>
 <h3 id="verifying-a-verifiable-credential"><a class="header" href="#verifying-a-verifiable-credential">Verifying a Verifiable Credential</a></h3>
-<p>Once your Verifiable Credential has been signed you can proceed to verify it with the <code>verify</code> method. The <code>verify</code> method takes an object of arguments, and is optional. If you've used DIDs you need to pass a <code>resolver</code> for them. You can also use the booleans <code>compactProof</code> (to compact the JSON-LD) and <code>forceRevocationCheck</code> (to force revocation check). Please beware that setting <code>forceRevocationCheck</code> to false can allow false positives when verifying revocable credentials.
-If your credential has uses the <code>status</code> field, you can pass a <code>revocationApi</code> param that accepts an object describing the API to use for the revocation check. No params are required for the simplest cases:
-If your credential uses schema and requires blob resolution, you can pass a <code>schemaApi</code> param that accepts an object describing the API to pull the schema from chain. No params are required for the simplest cases:</p>
+<p>Once your Verifiable Credential has been signed you can proceed to verify it
+with the <code>verify</code> method. The <code>verify</code> method takes an object of arguments,
+and is optional.</p>
+<p>If you've used DIDs you need to pass a <code>resolver</code> for them.
+You can also use the booleans <code>compactProof</code> (to compact the JSON-LD) and
+<code>forceRevocationCheck</code> (to force revocation check). Please beware that
+setting <code>forceRevocationCheck</code> to false can allow false positives when
+verifying revocable credentials.</p>
+<p>If your credential has uses the <code>status</code> field, you can pass a
+<code>revocationApi</code> param that accepts an object describing the API to use for
+the revocation check. No params are required for the simplest cases:</p>
+<p>If your credential uses schema and requires blob resolution, you can pass a
+<code>schemaApi</code> param that accepts an object describing the API to pull the
+schema from chain. No params are required for the simplest cases:</p>
 <pre><code class="language-javascript">&gt;   const result = await vc.verify({ ... })
 &gt;   result
 &lt;-  {
@@ -325,17 +366,26 @@ If your credential uses schema and requires blob resolution, you can pass a <cod
       ]
     }
 </code></pre>
-<p>Please note that the verification is an async process that returns an object when the promise resolves. A boolean value for the entire verification process can be checked at the root level <code>verified</code> property.</p>
+<p>Please note that the verification is an async process that returns an object
+when the promise resolves. A boolean value for the entire verification
+process can be checked at the root level <code>verified</code> property.</p>
 <hr />
 <h2 id="incremental-creation-and-verification-of-verifiable-presentations"><a class="header" href="#incremental-creation-and-verification-of-verifiable-presentations">Incremental creation and verification of Verifiable Presentations</a></h2>
-<p>The <code>client-sdk</code> exposes a <code>VerifiablePresentation</code> class that is useful to incrementally create valid Verifiable Presentations of any type, sign them and verify them.
-Once the presentation is initialized, you can sequentially call the different methods provided by the class to add <code>contexts</code>, <code>types</code>, <code>holders</code> and <code>credentials</code>.</p>
+<p>The <code>client-sdk</code> exposes a <code>VerifiablePresentation</code> class that is useful to
+incrementally create valid Verifiable Presentations of any type, sign them
+and verify them.</p>
+<p>Once the presentation is initialized, you can sequentially call the different
+methods provided by the class to add <code>contexts</code>, <code>types</code>, <code>holders</code> and
+<code>credentials</code>.</p>
 <h3 id="building-a-verifiable-presentation"><a class="header" href="#building-a-verifiable-presentation">Building a Verifiable Presentation</a></h3>
-<p>The first step to build a Verifiable Presentation is to initialize it, we can do that using the <code>VerifiablePresentation</code> class constructor which takes an <code>id</code> as sole argument:</p>
+<p>The first step to build a Verifiable Presentation is to initialize it, we can
+do that using the <code>VerifiablePresentation</code> class constructor which takes an
+<code>id</code> as sole argument:</p>
 <pre><code class="language-javascript">let vp = new VerifiablePresentation('http://example.edu/credentials/1986');
 </code></pre>
-<p>You now have an unsigned Verifiable Presentation in the <code>vp</code> variable!
-This Presentation isn't signed since we only just initialized it. It brings however some useful defaults to make your life easier.</p>
+<p>You now have an unsigned Verifiable Presentation in the <code>vp</code> variable!</p>
+<p>This Presentation isn't signed since we only just initialized it. It brings
+however some useful defaults to make your life easier.</p>
 <pre><code class="language-javascript">&gt;    vp.context
 &lt;-   [&quot;https://www.w3.org/2018/credentials/v1&quot;]
 &gt;    vp.type
@@ -343,11 +393,18 @@ This Presentation isn't signed since we only just initialized it. It brings howe
 &gt;    vp.credentials
 &lt;-   []
 </code></pre>
-<p>The default <code>context</code> is an array with <code>&quot;https://www.w3.org/2018/credentials/v1&quot;</code> as first element. This is required by the VCDMv1 specs so having it as default helps ensure your Verifiable Presentations will be valid in the end.
-A similar approach was taken on the <code>type</code> property, where the default is an array with <code>&quot;VerifiablePresentation&quot;</code> already populated. This is also required by the specs.
-The <code>credentials</code> property is required to exist, so this is already initialized for you as well although it is empty for now.</p>
-<p>We could also have checked those defaults more easily by checking the Verifiable Presentation's JSON representation.
-This can be achieved by calling the <code>toJSON()</code> method on it:</p>
+<p>The default <code>context</code> is an array with
+<code>&quot;https://www.w3.org/2018/credentials/v1&quot;</code> as first element. This is required
+by the VCDMv1 specs so having it as default helps ensure your Verifiable
+Presentations will be valid in the end.</p>
+<p>A similar approach was taken on the <code>type</code> property, where the default is an
+array with <code>&quot;VerifiablePresentation&quot;</code> already populated. This is also
+required by the specs.</p>
+<p>The <code>credentials</code> property is required to exist, so this is already
+initialized for you as well although it is empty for now.</p>
+<p>We could also have checked those defaults more easily by checking the
+Verifiable Presentation's JSON representation.</p>
+<p>This can be achieved by calling the <code>toJSON()</code> method on it:</p>
 <pre><code class="language-javascript">&gt;    vp.toJSON()
 &lt;-   {
        &quot;@context&quot;: [ &quot;https://www.w3.org/2018/credentials/v1&quot; ],
@@ -358,10 +415,20 @@ This can be achieved by calling the <code>toJSON()</code> method on it:</p>
        &quot;verifiableCredential&quot;: [],
      }
 </code></pre>
-<p>An interesting thing to note here is the transformation happening to some of the root level keys in the JSON representation of a <code>VerifiablePresentation</code> object. For example <code>context</code> gets transformed into <code>@context</code> and <code>credentials</code> into <code>verifiableCredential</code>. This is to ensure compliance with the Verifiable Credentials Data Model specs while at the same time providing you with a clean interface to the <code>VerifiablePresentation</code> class in your code.</p>
-<p>Once your Verifiable Presentation has been initialized, you can proceed to use the rest of the building functions to define it completely before finally signing it.</p>
+<p>An interesting thing to note here is the transformation happening to some of
+the root level keys in the JSON representation of a <code>VerifiablePresentation</code>
+object.</p>
+<p>For example <code>context</code> gets transformed into <code>@context</code> and <code>credentials</code> into
+<code>verifiableCredential</code>. This is to ensure compliance with the Verifiable
+Credentials Data Model specs while at the same time providing you with a
+clean interface to the <code>VerifiablePresentation</code> class in your code.</p>
+<p>Once your Verifiable Presentation has been initialized, you can proceed to
+use the rest of the building functions to define it completely before finally
+signing it.</p>
 <h4 id="adding-a-context-1"><a class="header" href="#adding-a-context-1">Adding a Context</a></h4>
-<p>A context can be added with the <code>addContext</code> method. It accepts a single argument <code>context</code> which can either be a string (in which case it needs to be a valid URI), or an object</p>
+<p>A context can be added with the <code>addContext</code> method. It accepts a single
+argument <code>context</code> which can either be a string (in which case it needs to be
+a valid URI), or an object</p>
 <pre><code class="language-javascript">&gt;   vp.addContext('https://www.w3.org/2018/credentials/examples/v1')
 &gt;   vp.context
 &lt;-  [
@@ -379,14 +446,18 @@ This can be achieved by calling the <code>toJSON()</code> method on it:</p>
     ]
 </code></pre>
 <h4 id="setting-a-holder"><a class="header" href="#setting-a-holder">Setting a Holder</a></h4>
-<p>Setting a Holder is optional and it can be achieved using the <code>setHolder</code> method. It accepts a single argument <code>type</code> that needs to be a string (a URI for the entity that is generating the presentation):</p>
+<p>Setting a Holder is optional and it can be achieved using the <code>setHolder</code>
+method. It accepts a single argument <code>type</code> that needs to be a string (a URI
+for the entity that is generating the presentation):</p>
 <pre><code class="language-javascript">&gt;   vp.setHolder('https://example.com/credentials/1234567890');
 &gt;   vp.holder
 &lt;-  'https://example.com/credentials/1234567890'
 </code></pre>
 <h4 id="adding-a-verifiable-credential"><a class="header" href="#adding-a-verifiable-credential">Adding a Verifiable Credential</a></h4>
-<p>Your Verifiable Presentations can contain one or more Verifiable Credentials inside.
-Adding a Verifiable Credential can be achieved using the <code>addCredential</code> method. It accepts a single argument <code>credential</code> that needs to be an object (a valid, signed Verifiable Credential):</p>
+<p>Your Verifiable Presentations can contain one or more Verifiable Credentials inside.</p>
+<p>Adding a Verifiable Credential can be achieved using the <code>addCredential</code>
+method. It accepts a single argument <code>credential</code> that needs to be an object
+(a valid, signed Verifiable Credential):</p>
 <pre><code class="language-javascript">&gt;   vp.addCredential(vc);
 &gt;   vp.credentials
 &lt;-  [
@@ -395,8 +466,14 @@ Adding a Verifiable Credential can be achieved using the <code>addCredential</co
 </code></pre>
 <p>Please note that the example was truncated to enhance readability.</p>
 <h3 id="signing-a-verifiable-presentation"><a class="header" href="#signing-a-verifiable-presentation">Signing a Verifiable Presentation</a></h3>
-<p>Once you've crafted your Verifiable Presentation and added your Verifiable Credentials to it, it is time to sign it.
-This can be achieved with the <code>sign</code> method. It requires a <code>keyDoc</code> parameter (an object with the params and keys you'll use for signing), and a <code>challenge</code> string for the proof. It also accepts a <code>domain</code> string for the proof, a <code>resolver</code> in case you're using DIDs and a boolean <code>compactProof</code> that determines whether you want to compact the JSON-LD or not:</p>
+<p>Once you've crafted your Verifiable Presentation and added your Verifiable
+Credentials to it, it is time to sign it.</p>
+<p>This can be achieved with the <code>sign</code> method. It requires a <code>keyDoc</code> parameter
+(an object with the params and keys you'll use for signing), and a
+<code>challenge</code> string for the proof.</p>
+<p>It also accepts a <code>domain</code> string for the proof, a <code>resolver</code> in case you're
+using DIDs and a boolean <code>compactProof</code> that determines whether you want to
+compact the JSON-LD or not:</p>
 <pre><code class="language-javascript">&gt;   await vp.sign(
           keyDoc,
           'some_challenge',
@@ -417,10 +494,18 @@ Once done, your <code>vp</code> object will have a new <code>proof</code> field:
     }
 </code></pre>
 <h3 id="verifying-a-verifiable-presentation"><a class="header" href="#verifying-a-verifiable-presentation">Verifying a Verifiable Presentation</a></h3>
-<p>Once your Verifiable Presentation has been signed you can proceed to verify it with the <code>verify</code> method.
-If you've used DIDs you need to pass a <code>resolver</code> for them. You can also use the booleans <code>compactProof</code> (to compact the JSON-LD) and <code>forceRevocationCheck</code> (to force revocation check). Please beware that setting <code>forceRevocationCheck</code> to false can allow false positives when verifying revocable credentials.
-If your credential has uses the <code>status</code> field, you can pass a <code>revocationApi</code> param that accepts an object describing the API to use for the revocation check.
-For the simplest cases you only need a <code>challenge</code> string and possibly a <code>domain</code> string:</p>
+<p>Once your Verifiable Presentation has been signed you can proceed to verify
+it with the <code>verify</code> method.</p>
+<p>If you've used DIDs you need to pass a <code>resolver</code> for them. You can also use
+the booleans <code>compactProof</code> (to compact the JSON-LD) and
+<code>forceRevocationCheck</code> (to force revocation check). Please beware that
+setting <code>forceRevocationCheck</code> to false can allow false positives when
+verifying revocable credentials.</p>
+<p>If your credential has uses the <code>status</code> field, you can pass a
+<code>revocationApi</code> param that accepts an object describing the API to use for
+the revocation check.
+For the simplest cases you only need a <code>challenge</code> string and possibly a
+<code>domain</code> string:</p>
 <pre><code class="language-javascript">&gt;   const results = await vp.verify({ challenge: 'some_challenge', domain: 'some_domain' });
 &gt;   results
 &lt;-  {
@@ -463,13 +548,20 @@ For the simplest cases you only need a <code>challenge</code> string and possibl
       ]
     }
 </code></pre>
-<p>Please note that the verification is an async process that returns an object when the promise resolves. This object contains separate results for the verification processes of the included Verifiable Credentials and the overall Verifiable Presentation. A boolean value for the entire verification process can be checked at the root level <code>verified</code> property.</p>
+<p>Please note that the verification is an async process that returns an object
+when the promise resolves.</p>
+<p>This object contains separate results for the verification processes of the
+included Verifiable Credentials and the overall Verifiable Presentation.</p>
+<p>A boolean value for the entire verification process can be checked at the
+root level <code>verified</code> property.</p>
 <h2 id="using-dids"><a class="header" href="#using-dids">Using DIDs</a></h2>
-<p>The examples shown above use different kinds of URIs as <code>id</code> property of different sections. It is worth mentioning that the use of DIDs is not only supported but also encouraged.
-Their usage is very simple: create as many DIDs as you need and then use them instead of the URIs shown above.
-For example when adding a subject to a Verifiable Credential here we're using a DID instead of a regular URI in the <code>id</code> property of the object:<code>vc.addSubject({ id: 'did:dock:123qwe123qwe123qwe', alumniOf: 'Example University' })</code>.
-If you don't know how to create a DID there's a specific <a href="tutorial_did.html">tutorial on DIDs</a> you can read.
-Bear in mind that you will need to provide a <code>resolver</code> method if you decide to use DIDs in your Verifiable Credentials or Verifiable Presentations. More on resolvers can be found in the <a href="tutorial_resolver.html">tutorial on Resolvers</a>.</p>
+<p>The examples shown above use different kinds of URIs as <code>id</code> property of
+different sections. It is worth mentioning that the use of DIDs is not only
+supported but also encouraged.</p>
+<p>Their usage is very simple: create as many DIDs as you need and then use them instead of the URIs shown above.</p>
+<p>For example when adding a subject to a Verifiable Credential here we're using a DID instead of a regular URI in the <code>id</code> property of the object:<code>vc.addSubject({ id: 'did:dock:123qwe123qwe123qwe', alumniOf: 'Example University' })</code>.</p>
+<p>If you don't know how to create a DID there's a specific <a href="tutorial_did.html">tutorial on DIDs</a> you can read.</p>
+<p>Bear in mind that you will need to provide a <code>resolver</code> method if you decide to use DIDs in your Verifiable Credentials or Verifiable Presentations. More on resolvers can be found in the <a href="tutorial_resolver.html">tutorial on Resolvers</a>.</p>
 <p>Here's an example of issuing a Verifiable Credential using DIDs, provided that you've created and a DID that you store in <code>issuerDID</code>:</p>
 <pre><code class="language-javascript">const issuerKey = getKeyDoc(issuerDID, dock.keyring.addFromUri(issuerSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
 await vc.sign(issuerKey);
@@ -477,10 +569,17 @@ const verificationResult = await signedCredential.verify({ resolver, compactProo
 console.log(verificationResult.verified); // Should print `true`
 </code></pre>
 <h2 id="creating-a-keydoc"><a class="header" href="#creating-a-keydoc">Creating a keyDoc</a></h2>
-<p>It can be seen from the above examples that signing of credentials and presentations require keypairs to be formatted into a <code>keyDoc</code> object.
-There is a helper function to help with this formatting, it's called <code>getKeyDoc</code> and it is located in the <code>vc</code> helpers.
-Its usage is very simple, it accepts a <code>did</code> string which is a DID in fully qualified form, a <code>keypair</code> object (generated by either using polkadot-js's keyring for Sr25519 and Ed25519 or keypair generated with <code>generateEcdsaSecp256k1Keypair</code> for curve secp256k1)
-and a <code>type</code> string containing the type of the provided key (one of the supported 'Sr25519VerificationKey2020', 'Ed25519VerificationKey2018' or 'EcdsaSecp256k1VerificationKey2019'):</p>
+<p>It can be seen from the above examples that signing of credentials and
+presentations require keypairs to be formatted into a <code>keyDoc</code> object.</p>
+<p>There is a helper function to help with this formatting, it's called
+<code>getKeyDoc</code> and it is located in the <code>vc</code> helpers.</p>
+<p>Its usage is very simple, it accepts a <code>did</code> string which is a DID in fully
+qualified form, a <code>keypair</code> object (generated by either using polkadot-js's
+keyring for Sr25519 and Ed25519 or keypair generated with
+<code>generateEcdsaSecp256k1Keypair</code> for curve secp256k1)
+and a <code>type</code> string containing the type of the provided key (one of the
+supported 'Sr25519VerificationKey2020', 'Ed25519VerificationKey2018' or
+'EcdsaSecp256k1VerificationKey2019'):</p>
 <pre><code class="language-javascript">  const keyDoc = getKeyDoc(did, keypair, type)
 </code></pre>
 <p>Please check the example on the <a href="#using-dids">previous section</a> or refer to the <a href="../../tests/integration/presenting.test.js">presenting integration tests</a> for a live example.</p>

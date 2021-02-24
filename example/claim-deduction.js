@@ -46,7 +46,7 @@ const sampleRules = [
         { Unbound: 'p' },
         { Unbound: 'o' },
         { Bound: { Iri: 'did:sample:issuer' } },
-      ]
+      ],
     ],
     then: [
       [

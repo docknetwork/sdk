@@ -4,14 +4,18 @@ If you are not familiar with DIDs, you can get a conceptual overview [here](./co
 
 ## Overview
 DIDs in Dock are created by choosing a 32 byte unique (on Dock chain) identifier along with a public key. The public key
-can be changed by providing a signature with the currently active key. The DID can also be removed by providing a signature
-with the currently active key. As of now, a DID can have only one key at a time.
+can be changed by providing a signature with the currently active key.
+
+The DID can also be removed by providing a signature with the currently active key. As of now, a DID can have only one key
+at a time.
+
 The chain-state stores a few things for a DID, the current public key, the controller and the block number when the DID was
 last updated, so in the beginning the block number would be the one where the DID was created, when a DID's key is updated,
-that block number is changed to the one in which the key got updated. This is done for replay protection as every
-update (or removal) to the DID must include the last block number where the DID was updated and after each update the block
-number changes, thus giving replay protection. This detail however is hidden in the API so the caller should not have to worry
-about this.
+that block number is changed to the one in which the key got updated.
+
+This is done for replay protection as every update (or removal) to the DID must include the last block number where the DID
+was updated and after each update the block number changes, thus giving replay protection. This detail however is hidden in
+the API so the caller should not have to worry about this.
 
 ## DID creation
 Create a new random DID.
@@ -25,8 +29,11 @@ The DID is not yet registered on the chain. Before the DID can be registered, a 
 
 ## Public key creation
 Dock supports 3 kinds of public keys, Sr25519, Ed25519 and EcdsaSecp256k1. These public keys are supported
-through 3 classes, `PublicKeySr25519`, `PublicKeyEd25519` and `PublicKeySecp256k1` respectively. These 3 classes
-extend from the same class called `PublicKey`. These can be instantiated directly by passing them as hex encoded bytes
+through 3 classes, `PublicKeySr25519`, `PublicKeyEd25519` and `PublicKeySecp256k1` respectively.
+
+These 3 classes extend from the same class called `PublicKey`. These can be instantiated directly by passing them as hex
+encoded bytes.
+
 ```js
 import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from '@docknetwork/sdk/api';
 
@@ -69,8 +76,11 @@ const publicKey = getPublicKeyFromKeyringPair(pair);
 Now that you have a DID and a public key, the DID can be registered on the Dock chain. Note that this public key associated
 with DID is independent of the key used for sending the transaction and paying the fees.
 1. First create a key detail object. The first argument of this function is a `PublicKey` and the second argument is
-the controller. The controller is the DID that controls the public key and this can be the same as the DID being
-registered.
+the controller.
+
+    The controller is the DID that controls the public key and this can be the same as the DID being
+    registered.
+
     ```js
     import {createKeyDetail} from '@docknetwork/sdk/utils/did';
     const keyDetail = createKeyDetail(publicKey, did);
@@ -137,6 +147,8 @@ with `createDidRemoval` to pass to the signer and get the signature
    ```
 
 
-Note that they accounts used to send the transactions are independent of the keys associated with the DID. So the DID could
-have been created with one account, updated with another account and removed with another account. The accounts are not relevant
-in the data model and not associated with the DID in the chain-state.
+Note that they accounts used to send the transactions are independent of the keys associated with the DID.
+
+So the DID could have been created with one account, updated with another account and removed with another account.
+
+The accounts are not relevant in the data model and not associated with the DID in the chain-state.

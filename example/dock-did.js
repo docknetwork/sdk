@@ -15,10 +15,12 @@ import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 
 // DID will be generated randomly
-const dockDID = createNewDockDID();
+// const dockDID = createNewDockDID();
+const dockDID = '0x99671527b075a2218a6acf3ea891dc277999c90bd2ccd69921529bf59ec6785d';
 
 // Generate first key with this seed. The key type is Sr25519
-const firstKeySeed = randomAsHex(32);
+// const firstKeySeed = randomAsHex(32);
+const firstKeySeed = '//Lovesh';
 
 // Generate second key (for update) with this seed. The key type is Ed25519
 const secondKeySeed = randomAsHex(32);
@@ -58,6 +60,7 @@ async function getDIDDoc() {
   // Check if DID exists
   const result = await dock.did.getDocument(dockDID);
   console.log('DID Document:', JSON.stringify(result, null, 2));
+  process.exit(0);
   return result;
 }
 
@@ -81,7 +84,8 @@ dock.init({
   address: FullNodeEndpoint,
 })
   .then(() => {
-    const account = dock.keyring.addFromUri(TestAccountURI);
+    console.log(`Using ${TestAccountURI}`);
+    const account = dock.keyring.addFromUri('super hope entire section nice student copy cotton oven aware water note');
     dock.setAccount(account);
     return registerNewDID();
   })

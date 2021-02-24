@@ -1,3 +1,5 @@
+// Generated with solidity-flattener for https://github.com/smartcontractkit/chainlink/blob/develop/evm-contracts/src/v0.6/EACAggregatorProxy.sol
+
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.6.0;
 

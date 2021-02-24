@@ -9,11 +9,11 @@ import {
   createNewDockDID,
   createSignedDidRemoval,
   createSignedKeyUpdate,
-  getHexIdentifierFromDID
+  getHexIdentifierFromDID,
 } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { createRandomRegistryId, KeyringPairDidKeys, OneOfPolicy } from '../src/utils/revocation';
-import {BLOB_MAX_BYTE_SIZE} from "../src/modules/blob";
+import { BLOB_MAX_BYTE_SIZE } from '../src/modules/blob';
 
 require('dotenv').config();
 

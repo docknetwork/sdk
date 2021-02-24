@@ -1,0 +1,34 @@
+import Web3 from 'web3';
+import { blake2AsHex, decodeAddress } from '@polkadot/util-crypto';
+import { hexToU8a, u8aToHex, bnToBn } from '@polkadot/util';
+import { asDockAddress } from './codec';
+
+require('dotenv').config();
+
+const {
+  Network, MinGasPrice, MaxGas,
+} = process.env;
+
+// Convert EVM address to Substrate address
+export function evmAddrToSubstrateAddr(evmAddr) {
+  const bytes = hexToU8a(evmAddr);
+  // Hash(evm:||EVM address) => Substrate address
+  const preimage = ('evm:'.split('').map((c) => c.charCodeAt())).concat(...bytes);
+  return asDockAddress(blake2AsHex(preimage), Network);
+}
+
+// Convert Substrate address to EVM address
+export function substrateAddrToEVMAddr(address) {
+  const bytes = decodeAddress(address);
+  return u8aToHex(Array.from(bytes.slice(0, 20)));
+}
+
+// Give `amount` of Dock tokens to EVM address. `amount` defaults to the number of tokens required to pay of maximum gas
+export function endowEVMAddress(dock, evmAddr, amount) {
+  const substrateAddr = evmAddrToSubstrateAddr(evmAddr);
+  // Selecting the amount such that it can pay fees for the upto the maximum gas allowed and some extra
+  const amt = amount !== undefined ? amount : bnToBn(MinGasPrice).mul(bnToBn(MaxGas)).muln(2);
+
+  const transfer = dock.api.tx.balances.transfer(substrateAddr, amt);
+  return dock.signAndSend(transfer, false);
+}

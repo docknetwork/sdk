@@ -9,7 +9,7 @@ import { getStateChange } from '../utils/misc';
 
 import Signature from '../signatures/signature'; // eslint-disable-line
 
-const ATTESTS_IRI = 'attests'; // TODO: decide on this before merge
+export const ATTESTS_IRI = 'attests'; // TODO: decide on this before merge
 
 /** Class to create, update and destroy DIDs */
 class DIDModule {

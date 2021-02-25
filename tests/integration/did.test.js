@@ -1,6 +1,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 
 import { DockAPI } from '../../src/api';
+import { ATTESTS_IRI } from '../../src/modules/did';
 
 import {
   createNewDockDID, getHexIdentifierFromDID,
@@ -72,7 +73,7 @@ describe('DID Module', () => {
     const didDocument = await dock.did.getDocument(dockDID);
 
     // Verify attests property exists
-    expect(didDocument.attests).toEqual(iri);
+    expect(didDocument[ATTESTS_IRI]).toEqual(iri);
   }, 30000);
 
   test('Can update a DID controller', async () => {

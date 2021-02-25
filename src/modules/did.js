@@ -109,11 +109,11 @@ class DIDModule {
   /**
    * Fetches the DIDs attestations IRI from the chain
    * @param {string} hexId - DID in hex format
-   * @return {Promise<object>} The DID attestations
+   * @return {Promise<string | null>} The DID's attestation, if any
    */
   async getAttests(hexId) {
     const attests = await this.api.query.attest.attestations(hexId);
-    return attests.iri.isSome ? u8aToString(hexToU8a(attests.iri.toString())) : '';
+    return attests.iri.isSome ? u8aToString(hexToU8a(attests.iri.toString())) : null;
   }
 
   /**

@@ -4,10 +4,10 @@ import { DockAPI } from '../../src/api';
 
 import {
   createNewDockDID, getHexIdentifierFromDID,
-  createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval,
+  createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval, createSignedAttestation,
 } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
-import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
+import { getPublicKeyFromKeyringPair, getSignatureFromKeyringPair } from '../../src/utils/misc';
 import { PublicKeyEd25519 } from '../../src/public-keys';
 
 describe('DID Module', () => {
@@ -58,6 +58,22 @@ describe('DID Module', () => {
     const result = await dock.did.getDocument(dockDID);
     expect(!!result).toBe(true);
   }, 10000);
+
+  test('Can attest with a DID', async () => {
+    const priority = 1;
+    const iri = 'my iri';
+    const currentPair = dock.keyring.addFromUri(firstKeySeed);
+
+    // Create signed attestation and send to chain
+    const [attestation, signature] = await createSignedAttestation(dock.did, dockDID, priority, iri, currentPair);
+    await dock.did.attestClaim(dockDID, attestation, signature);
+
+    // Get document to verify the claim is there
+    const didDocument = await dock.did.getDocument(dockDID);
+
+    // Verify attests property exists
+    expect(didDocument.attests).toEqual(iri);
+  }, 30000);
 
   test('Can update a DID controller', async () => {
     const pair = dock.keyring.addFromUri(firstKeySeed);

@@ -2,7 +2,6 @@
 
 // Import some utils from Polkadot JS
 import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
-import { u8aToHex } from '@polkadot/util';
 
 import { getSignatureFromKeyringPair } from './misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from './codec';

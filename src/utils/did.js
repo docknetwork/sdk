@@ -191,7 +191,7 @@ export async function createSignedDidRemoval(didModule, did, currentKeyPair) {
  * JS code may not have access to the signing key like in case of hardware wallet.
  * @param {Number} priority - Attestation priority
  * @param {*} iri - Attestation iri
- * @returns {Promise<object>} The object has structure and keys with same names as expected by the Substrate node
+ * @returns {object} The object has structure and keys with same names as expected by the Substrate node
  */
 export function createDidAttestation(priority, iri) {
   return {

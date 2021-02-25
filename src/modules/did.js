@@ -88,7 +88,7 @@ class DIDModule {
   /**
    * Creates an attestation claim on chain for a specific DID
    * @param {string} attester - Attester's DID
-   * @param {Attestation} attestation - Attestation bytes
+   * @param {object} attestation - Attestation object with priority and iri
    * @param {Signature} signature - Signature from existing key
    */
   async attestClaim(attester, attestation, signature, waitForFinalization = true, params = {}) {

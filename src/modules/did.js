@@ -179,7 +179,6 @@ class DIDModule {
     const document = {
       '@context': 'https://www.w3.org/ns/did/v1',
       id,
-      attests,
       authentication,
       assertionMethod,
       publicKey: publicKeys,

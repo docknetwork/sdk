@@ -2,13 +2,13 @@
 
 The [verifiable credentials data model](https://www.w3.org/TR/vc-data-model/) is based on a machine comprehensible language called [RDF](https://www.w3.org/TR/rdf-primer/). RDF represents arbitrary semantic knowledge as [graph](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics))s. Computers can perform automatic deductive reasoning over RDF; given assumptions (represented as an RDF graph) and axioms (represented as logical rules), a computer can infer new conclusions and even prove them to other computers using deductive derivations (proofs).
 
-Every VCDM credential is representable as an RDF graph so computers can reason about them, deriving new conclusions that weren't explicitly stated by the issuer.
+Every VCDM credential is representable as an RDF graph. So computers can reason about them, deriving new conclusions that weren't explicitly stated by the issuer.
 
 The Dock SDK exposes utilities for primitive deductive reasoning over verified credentials. The Verifier has a choice to perform deduction themself (expensive), or offload that responsibility to the Presenter of the credential[s] by accepting deductive proofs of composite claims.
 
 In RDF, if graph A is true and graph B is true, then the [union](https://en.wikipedia.org/wiki/Union_(set_theory)) of those graphs, is also true `A∧B->A∪B` [^1]. Using this property we can combine multiple credentials and reason over their union.
 
-## Explicit Ethos using [RDF Reification](https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos)
+## Explicit Ethos
 
 Imagine a signed credential issued by **Alice** claiming that **Joe** is a **Member**.
 
@@ -39,13 +39,13 @@ Proven:
 <Joe> <type> <Member> <Alice> .
 ```
 
-The fourth and final element of the proven *quad* is used here to indicate the source of the information, Alice in this case. The final element of a quad is its [graph name](https://www.w3.org/TR/rdf11-concepts/#dfn-graph-name).
+The fourth and final element of the proven *quad* is used here to indicate the source of the information, Alice. The final element of a quad is its [graph name](https://www.w3.org/TR/rdf11-concepts/#dfn-graph-name).
 
-Signed credentials are [ethos](https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos) arguments. A credential may be converted to a list of quads (a claimgraph). We call this representation "Explicit Ethos" form. If a credential is *verified*, then it's explicit ethos form is *true*.
+A signed credentials are [ethos](https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos) arguments and a credential may be converted to a list of quads (a claimgraph). We call this representation "Explicit Ethos" form. If a credential is *verified*, then its explicit ethos form is *true*.
 
 ## Rule Format
 
-To perform reasoning and to accept proofs, the Verifier must select the list of logical rules which they will allow. Rules (or axioms if you prefer), are modeled as if-then relationships.
+To perform reasoning and to accept proofs, the Verifier must select the list of logical rules wish to accept. Rules (or axioms if you prefer), are modeled as if-then relationships.
 
 ```js
 const rules = [
@@ -58,21 +58,27 @@ const rules = [
 
 During reasoning, when an `if_all` pattern is matched, its corresponding `then` pattern will be implied. In logic terms, each "rule" is the conditional premise of a [modus ponens](https://en.wikipedia.org/wiki/Modus_ponens).
 
-```js
-{ if_all: [A, B, C], then: [D, E] }
-```
-
-means `if (A and B and C) then (D and E)`.
+`{ if_all: [A, B, C], then: [D, E] }` means that `if (A and B and C) then (D and E)`.
 
 Rules can contain Bound or Unbound entities. Unbound entities are named variables. Each rule has it's own unique scope, so Unbound entities introduced in the `if_all` pattern can be used in the `then` pattern.
 
 ```js
 {
   if_all: [
-    [{ Bound: alice }, { Bound: likes }, { Unbound: 'thing' }, { Bound: defaultGraph }],
+    [
+      { Bound: alice },
+      { Bound: likes },
+      { Unbound: 'thing' },
+      { Bound: defaultGraph },
+    ],
   ],
   then: [
-    [{ Bound: bob }, { Bound: likes }, { Unbound: 'thing' }, { Bound: defaultGraph }]
+    [
+      { Bound: bob },
+      { Bound: likes },
+      { Unbound: 'thing' },
+      { Bound: defaultGraph },
+    ],
   ],
 }
 ```
@@ -86,6 +92,8 @@ For any ?thing:
 ```
 
 in other words: `∀ thing: [alice likes thing] -> [bob likes thing]`
+
+If an unbound variable appears in the `then` pattern but does not appear in the `if_all` pattern the rule is considered invalid and will be rejected by the reasoner.
 
 Bound entities are constants of type RdfTerm. RDF nodes may be one of four things, an IRI, a blank node, a literal, or the default graph. For those familiar with algebraic datatypes:
 
@@ -116,7 +124,7 @@ const blank = { Blank: '_:b0' };
 const defaultGraph = { DefaultGraph: true };
 ```
 
-Example of a complete rule definition:
+Here is an example of a complete rule definition:
 
 ```js
 {

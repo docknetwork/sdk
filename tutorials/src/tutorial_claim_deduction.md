@@ -4,7 +4,7 @@
 
 A Verifier has complete and low level control over the logical rules they deem valid. Rules may vary from use-case to use-case and from verifier to verifier.
 
-Unwrapping of Explicit Ethos statements is expected to be a common first step when writing a ruleset. This tutorial will give some examples of that.
+A common first step when writing a ruleset will be to unwrap of Explicit Ethos statements.
 
 ### Simple Unwrapping of Explicit Ethos
 
@@ -33,7 +33,7 @@ const rules = [
 ];
 ```
 
-That single rule is enough for some use-cases but it's not scalable. What if we want to allow more than one issuer? Instead of copying the same rule for each issuer we trust, let's define "trustworthiness":
+That single rule is enough for some use-cases but it's not scalable. What if we want to allow more than one issuer? Instead of copying the same rule for each issuer we trust, let's define "trustworthiness".
 
 ### Unwrapping Explicit Ethos by Defining Trustworthiness
 
@@ -63,11 +63,11 @@ const rules = [
 
 You may ask "So what's the difference? There is still only one issuer."
 
-By the primitive definition of "trustworthiness" written above, any claim made by a trustworthy issuer is true. did:example:issuer can claim whatever they want by issuing verifiable credentials. They can even claim that some other issuer is trustworthy. Together, the two rules defined in the above example implement a system analogous to TLS certificate chains with did:example:issuer as the single root authority.
+By the primitive definition of "trustworthiness" written above, any claim made by a trustworthy issuer is true. `did:example:issuer` can claim whatever they want by issuing verifiable credentials. They can even claim that some other issuer is trustworthy. Together, the two rules defined in the above example implement a system analogous to TLS certificate chains with `did:example:issuer` as the single root authority.
 
 ## Proving Composite Claims
 
-As a Holder of verifiable credentials, you'll want to prove specific claims to a Verifier. If those claims are composite, you'll sometimes need to provide a deductive proof in your verifiable credentials presentation. This should be done after the presentation has been assembled. If the presentation is going to be signed, sign it *after* including the deductive proof.
+As a Holder of verifiable credentials, you'll want to prove specific claims to a Verifier. If those claims are composite, you'll sometimes need to bundle a deductive proof in your verifiable credentials presentation. This should be done after the presentation has been assembled. If the presentation is going to be signed, sign it *after* including the deductive proof.
 
 ```js
 import { proveCompositeClaims } from '@docknetwork/sdk/utils/cd';

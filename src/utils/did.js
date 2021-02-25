@@ -190,7 +190,7 @@ export async function createSignedDidRemoval(didModule, did, currentKeyPair) {
  * Create and return a `Attestation` as expected by the Substrate node. Signing is intentionally kept separate as the
  * JS code may not have access to the signing key like in case of hardware wallet.
  * @param {Number} priority - Attestation priority
- * @param {*} iri - Attestation iri
+ * @param {string | null} iri - Attestation iri
  * @returns {object} The object has structure and keys with same names as expected by the Substrate node
  */
 export function createDidAttestation(priority, iri) {

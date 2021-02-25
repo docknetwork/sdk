@@ -67,7 +67,7 @@ describe('DID Module', () => {
 
     // Create signed attestation and send to chain
     const [attestation, signature] = await createSignedAttestation(dock.did, dockDID, priority, iri, currentPair);
-    await dock.did.attestClaim(dockDID, attestation, signature);
+    await dock.did.setClaim(dockDID, attestation, signature);
 
     // Get document to verify the claim is there
     const didDocument = await dock.did.getDocument(dockDID);

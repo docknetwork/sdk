@@ -91,7 +91,7 @@ class DIDModule {
    * @param {object} attestation - Attestation object with priority and iri
    * @param {Signature} signature - Signature from existing key
    */
-  async attestClaim(attester, attestation, signature, waitForFinalization = true, params = {}) {
+  async setClaim(attester, attestation, signature, waitForFinalization = true, params = {}) {
     const hexId = getHexIdentifierFromDID(attester);
     const attestTx = this.api.tx.attest.setClaim(hexId, attestation, signature.toJSON());
     return await this.signAndSend(attestTx, waitForFinalization, params);

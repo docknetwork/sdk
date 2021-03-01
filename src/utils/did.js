@@ -216,7 +216,7 @@ export function signDidAttestation(didModule, did, attestation, currentKeyPair) 
  * Create a `Attestation` as expected by the Substrate node and signs it. Return the `Attestation` object and the signature
  * @param {module} didModule - The did module
  * @param {Number} priority - Attestation priority
- * @param {*} iri - Attestation iri
+ * @param {string | null} iri - Attestation iri
  * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * @returns {Promise<array>} A 2 element array where the first element is the `Attestation` and the second is the signature
  */

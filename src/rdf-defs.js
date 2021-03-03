@@ -30,7 +30,7 @@ export const CLAIM_FILTER = 'https://rdf.dock.io/alpha/2021#ClaimFilter';
 //
 // This ruleset is generic over graph name. The genericity of the rule allows it to prove composite
 // claims where graph != the default graph, but at some potential reasoning cost. See
-// MAYCLAIM_DEF_2 for a lighter-wheight partial definition.
+// MAYCLAIM_DEF_2 for a lighter-weight partial definition.
 export const MAYCLAIM_DEF_1 = [
   {
     if_all: [
@@ -45,7 +45,7 @@ export const MAYCLAIM_DEF_1 = [
         { Unbound: 'p' },
         { Unbound: 'o' },
         { Unbound: 'b' },
-      ]
+      ],
     ],
     then: [
       [
@@ -53,9 +53,9 @@ export const MAYCLAIM_DEF_1 = [
         { Unbound: 'p' },
         { Unbound: 'o' },
         { Unbound: 'a' },
-      ]
+      ],
     ],
-  }
+  },
 ];
 
 // This ruleset defines dockalpha:MayClaim specifically only when used with dockalpha:ANYCLAIM.
@@ -95,7 +95,7 @@ export const MAYCLAIM_DEF_2 = [
         { Unbound: 'p' },
         { Unbound: 'o' },
         { Unbound: 'b' },
-      ]
+      ],
     ],
     then: [
       [
@@ -103,9 +103,9 @@ export const MAYCLAIM_DEF_2 = [
         { Unbound: 'p' },
         { Unbound: 'o' },
         { Bound: { DefaultGraph: true } },
-      ]
+      ],
     ],
-  }
+  },
 ];
 
 // This is how `dockalpha:mayClaim` is expected to relate to `dockalpha:attestsDocumentContents`.

@@ -108,8 +108,8 @@ class DockAPI {
     await this.initKeyring(keyring);
 
     this.anchorModule = new AnchorModule(this.api, this.signAndSend.bind(this));
-    this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));
-    this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
+    this.blobModule = new BlobModule(this.api, this.signAndSendWithFiat.bind(this));
+    this.didModule = new DIDModule(this.api, this.signAndSendWithFiat.bind(this));
     this.revocationModule = new RevocationModule(this.api, this.signAndSend.bind(this));
     this.democracyModule = new DemocracyModule(this.api, this.signAndSend.bind(this));
     this.councilModule = new CouncilModule(this.api, this.signAndSend.bind(this));
@@ -187,6 +187,23 @@ class DockAPI {
   async signAndSend(extrinsic, waitForFinalization = true, params = {}) {
     const signedExtrinsic = await this.signExtrinsic(extrinsic, params);
     return this.send(signedExtrinsic, waitForFinalization);
+  }
+
+  /**
+   * Helper function to sign and send transaction with the fiat filter, if enabled on the ode
+   * @param {object} extrinsic - Extrinsic to sign and send
+   * @param {Boolean} waitForFinalization - If true, waits for extrinsic's block to be finalized,
+   * else only wait to be included in block.
+   * @param {object} params - An object used to parameters like nonce, etc to the extrinsic
+   * @return {Promise}
+   */
+  async signAndSendWithFiat(extrinsic, waitForFinalization = true, params = {}) {
+    if (this.api.tx.fiatFilter) {
+      const signedCall = await this.signExtrinsic(extrinsic, params);
+      const fiatCall = this.api.tx.fiatFilter.executeCall(this.api.createType('Call', signedCall));
+      return await this.signAndSend(fiatCall, waitForFinalization, params);
+    }
+    return await this.signAndSend(extrinsic, waitForFinalization, params);
   }
 
   /**

@@ -96,7 +96,7 @@ describe('DID Module', () => {
     const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, dockDID, newPk, currentPair);
     // Since controller was not passed, it should not be passed in the key update
     expect(keyUpdate.controller).toBe(undefined);
-
+  
     const result = await dock.did.updateKey(keyUpdate, signature, false);
     expect(!!result).toBe(true);
   }, 30000);

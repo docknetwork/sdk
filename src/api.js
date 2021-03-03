@@ -170,10 +170,13 @@ class DockAPI {
    * @return {Promise}
    */
   async signExtrinsic(extrinsic, params = {}) {
+    if (!this.account) {
+      throw new Error(`Attempted to sign extrinsic without an account set, please call dock.setAccount beforehand.`);
+    }
     if (this.customSignTx) {
       return this.customSignTx(extrinsic, params, this);
     }
-    return extrinsic.signAsync(this.getAccount(), params);
+    return extrinsic.signAsync(this.account, params);
   }
 
   /**

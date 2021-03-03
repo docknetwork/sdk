@@ -48,6 +48,7 @@ describe('logic', () => {
       { DefaultGraph: true },
     ]];
 
+    // Manually grant 'did:example:a' authority to make claims. This makes 'did:example:a' a root authority.
     let assumed = [[
       { Iri: 'did:example:a' },
       { Iri: MAYCLAIM },

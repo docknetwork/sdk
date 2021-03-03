@@ -131,7 +131,7 @@ export const MAYCLAIM_DEF_2 = [
 //   }
 // ];
 
-// # The following considerations, and more, are why these rules will be marked as alpha.
+// # The following considerations, and more, are why these definitions (e.g. dockalpha:mayClaim) are marked as alpha.
 //
 // ## New semantics assigned to presence of triples in a named graph
 //

@@ -36,7 +36,7 @@ export async function modifyDocument(iri, cb) {
   addDocument(iri, cb(original));
 }
 
-/// add a document to the registry
+/// check if document is already cached/registered
 export function registered(iri) {
   return iri in documentRegistry;
 }

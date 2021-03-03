@@ -1,4 +1,5 @@
-// @prefix dockalpha: <https://rdf.dock.io/alpha/2021#>
+// @prefix dockalpha: <https://rdf.dock.io/alpha/2021#> .
+// @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
 // id: dockalpha:mayClaim
 // type: rdf:Property
@@ -107,7 +108,7 @@ export const MAYCLAIM_DEF_2 = [
   }
 ];
 
-// This is how dockalpha:mayClaim is expected to interact with dockalpha:attestsDocumentContents.
+// This is how `dockalpha:mayClaim` is expected to relate to `dockalpha:attestsDocumentContents`.
 // export const ATTESTS = 'https://rdf.dock.io/alpha/2021#attestsDocumentContents';
 // export const ATTESTS_DEF_1 = [
 //   {
@@ -130,7 +131,9 @@ export const MAYCLAIM_DEF_2 = [
 //   }
 // ];
 
-// To consider:
+// # The following considerations, and more, are why these rules will be marked as alpha.
+//
+// ## New semantics assigned to presence of triples in a named graph
 //
 // These rules assign semantic meaning to triples stored in named graph.
 //
@@ -139,8 +142,10 @@ export const MAYCLAIM_DEF_2 = [
 // This allows rules to be nice an terse, the above semantics may not be
 // considered universally true by current users of rdf.
 //
-// On a separate note. Should we add indirection to track provenance of information with more
-// detail? For example, instead of saying
+// ## Provenance Tracking
+//
+// Should we add indirection to track provenance of information with more detail? For example,
+// instead of saying
 //
 // ```
 // graph = did:example
@@ -152,14 +157,15 @@ export const MAYCLAIM_DEF_2 = [
 // graph = _:bxx
 // did:example dereferenced to _:bxx at <date>
 // ```
-
-// Meaning of dockalpha:attestsDocumentContents
+//
+// In the context of rdf datasets provenance tracking in not a new idea.
+//
+// ## Meaning of dockalpha:attestsDocumentContents
 //
 // Recently I've been assumning dockalpha:attestsDocumentContents always points to a turtle
 // document on ipfs, but what if a DID wants to attest to another did document? What if an
 // dockalpha:attestsDocumentContents tricks a crawler into thinking a non-turtle document is
-// actually a turtle document? Perhaps this is an argument for provenance tracking.
+// actually a turtle document? Perhaps provenance tracking can solve this.
 //
-// To consider:
-// - Try to prove that this interpretation of dockalpha:attestsDocumentContents is unsound.
-// - Try to prove that this interpretation of dockalpha:attestsDocumentContents is sound.
+// - Can we prove that this interpretation of dockalpha:attestsDocumentContents is unsound.
+// - Can we prove that this interpretation of dockalpha:attestsDocumentContents is sound.

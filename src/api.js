@@ -107,10 +107,10 @@ class DockAPI {
 
     await this.initKeyring(keyring);
 
-    this.anchorModule = new AnchorModule(this.api, this.signAndSend.bind(this));
+    this.anchorModule = new AnchorModule(this.api, this.signAndSendWithFiat.bind(this));
     this.blobModule = new BlobModule(this.api, this.signAndSendWithFiat.bind(this));
     this.didModule = new DIDModule(this.api, this.signAndSendWithFiat.bind(this));
-    this.revocationModule = new RevocationModule(this.api, this.signAndSend.bind(this));
+    this.revocationModule = new RevocationModule(this.api, this.signAndSendWithFiat.bind(this));
     this.democracyModule = new DemocracyModule(this.api, this.signAndSend.bind(this));
     this.councilModule = new CouncilModule(this.api, this.signAndSend.bind(this));
     this.techCommitteeModule = new TechCommitteeModule(this.api, this.signAndSend.bind(this));

@@ -4,7 +4,7 @@ require('dotenv').config();
 
 const DefaultFullNodeEndpoint = 'ws://localhost:9944';
 const DefaultTestKeyringType = 'sr25519';
-const DefaultTestAccountURI = '//Bob';
+const DefaultTestAccountURI = '//Alice';
 
 /**
  * Read variable from environment or use the default value

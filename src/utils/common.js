@@ -1,6 +1,5 @@
 // Helpers for internal use by sdk utilities.
-// The api of this module is not guaranteed to be stable
-// and may change.
+// The api of this module is not guaranteed to be stable.
 
 import { assert } from '@polkadot/util';
 
@@ -12,6 +11,7 @@ export function deepClone(obj) {
 
 export function assertValidClaimGraph(cg) {
   for (const claim of cg) {
+    assert(claim.length === 4, 'claimgraphs must be quads');
     for (const node of claim) {
       assertValidNode(node);
     }
@@ -24,6 +24,9 @@ export function assertValidNode(node) {
   const tag = ks[0];
   const value = node[tag];
   switch (tag) {
+    case 'DefaultGraph':
+      assert(value === true, 'DefaultGraph must be true'); // asserting both type and value
+      break;
     case 'Iri':
       assertType(value, 'string');
       break;

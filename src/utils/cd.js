@@ -5,11 +5,11 @@ import jsonld from 'jsonld';
 import { validate, prove } from 'rify';
 import { assert } from '@polkadot/util';
 import { expandedCredentialProperty } from './vc/constants';
-import { fromJsonldjsCg, asEE, merge } from './claimgraph';
+import { fromJsonldjsCg, merge } from './claimgraph';
 import {
   canonRules, canonProof, canonClaimGraph, decanonClaimGraph, decanonProof,
 } from './canonicalize';
-import { assertValidNode } from './common';
+import { assertValidNode, assertType } from './common';
 
 export const expandedLogicProperty = 'https://www.dock.io/rdf2020#logicV1';
 export const expandedProofProperty = 'https://w3id.org/security#proof';
@@ -56,13 +56,8 @@ async function credsToEEClaimGraph(expandedCredentials) {
   return merge(ees);
 }
 
-// For future consideration: if an credential contains @graph objects we may need to strip those.
-// The reason is that the issuer may not intend to attests to claims in that subgraph.
-// It might make sense to instead reify (https://www.w3.org/TR/WD-rdf-syntax-971002/) any subgraphs
-// to avoid losing the data they express.
 /**
  * Convert a single expanded credential which has already been verified into an RDF claim graph.
- * The resulting claimgraph is in Explicit Ethos form.
  *
  * @returns {Promise<Object[]>}
  */
@@ -77,6 +72,8 @@ async function credToEECG(expandedCredential) {
   // issuer property was not forged.
   assert(cred[expandedIssuerProperty] !== undefined, 'encountered credential without an issuer');
   const issuer = cred[expandedIssuerProperty][0]['@id'];
+  assertType(issuer, 'string');
+  assert(!issuer.startsWith('_:'), 'issuer is assumed not to be a blank node');
 
   // remove the proof
   delete cred[expandedProofProperty];
@@ -84,8 +81,19 @@ async function credToEECG(expandedCredential) {
   // convert to claimgraph
   const cg = fromJsonldjsCg(await jsonld.toRDF(cred));
 
-  // convert to explicit ethos form
-  return asEE(cg, issuer);
+  for (const claim of cg) {
+    // Credentials containing a "@graph" declaration will cause an assertion error here.
+    // And rightfully so. Here's why:
+    // Each statement in a cred is passed to the reasoner as a quad with `issuer` as the graph.
+    // It would be potentially incorrect to overwrite a non-default graph.
+    // Leaving a non-default graph as-is would be unsafe.
+    // While it would be valid to simply delete quads with non-default graphs, it would be confusing
+    // to users if the content of their credential was swallowed without warning.
+    assert(deepEqual(claim[3], { DefaultGraph: true }), 'subgraph found in credential');
+    claim[3] = { Iri: issuer };
+  }
+
+  return cg;
 }
 
 /**
@@ -180,6 +188,9 @@ export function proveh(
   toProve,
   rules,
 ) {
+  foreachQuadInRules(rules, assertQuad);
+  premises.forEach(assertQuad);
+  toProve.forEach(assertQuad);
   const proof = prove(
     canonClaimGraph(premises),
     canonClaimGraph(toProve),
@@ -192,6 +203,7 @@ export function proveh(
 // as defined by `canon()` in `claimgraph.js`. This wrapper deserializes the returned values before
 // passing them back to the caller.
 export function validateh(rules, proof) {
+  foreachQuadInRules(rules, assertQuad);
   const {
     assumed,
     implied,
@@ -205,10 +217,25 @@ export function validateh(rules, proof) {
   };
 }
 
+function foreachQuadInRules(rules, f) {
+  for (const rule of rules) {
+    for (const quad of rule.if_all) {
+      f(quad);
+    }
+    for (const quad of rule.then) {
+      f(quad);
+    }
+  }
+}
+
+function assertQuad(quad) {
+  assert(quad.length === 4, () => `Quads must have length 4, got: ${JSON.stringify(quad)}`);
+}
+
 /// check two claims for equality
 function claimEq(a, b) {
   for (const claim of [a, b]) {
-    if (!(claim instanceof Array) || claim.length !== 3) {
+    if (!(claim instanceof Array) || claim.length !== 4) {
       throw new TypeError();
     }
     for (const node of claim) {

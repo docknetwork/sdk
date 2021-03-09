@@ -7,6 +7,7 @@
   - [Schema](concepts_blobs_schemas.md)
   - [Claim Deduction](concepts_claim_deduction.md)
   - [PoE Anchors](concepts_poe_anchors.md)
+  - [Private Delegation](concepts_private_delegation.md)
 - [Tutorials](tutorials.md)
   - [DID](tutorial_did.md)
   - [DID Resolver](tutorial_resolver.md)
@@ -15,3 +16,4 @@
   - [Schema](tutorial_blobs_schemas.md)
   - [Claim Deduction](tutorial_claim_deduction.md)
   - [PoE Anchors](tutorial_poe_anchors.md)
+  - [Private Delegation](tutorial_private_delegation.md)

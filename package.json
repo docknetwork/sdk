@@ -97,6 +97,6 @@
     "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures",
     "jsonschema": "^1.2.6",
     "mrklt": "^0.2.0",
-    "rify": "^0.6.0-rc.1"
+    "rify": "^0.6.0"
   }
 }

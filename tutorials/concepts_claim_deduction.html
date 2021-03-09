@@ -164,11 +164,11 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="claim-deduction"><a class="header" href="#claim-deduction">Claim Deduction</a></h1>
-<p>The <a href="https://www.w3.org/TR/vc-data-model/">verifiable credentials data model</a> is based on a machine comprehensible language called <a href="https://www.w3.org/TR/rdf-primer/">RDF</a>. RDF represents arbitrary semantic knowledge as <a href="https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)">graph</a>s. Computers can perform automatic deductive reasoning over RDF, given assumptions (represented as an RDF graph) and axioms (represented as logical rules), a computer can infer new conclusions and even prove them to other computers using deductive derivations (proofs).</p>
-<p>So what does that have to do with verifiable credentials? Every VCDM credential is an RDF claim graph. Computers can reason about them, deriving new conclusions that weren't explicitly stated by the issuer.</p>
+<p>The <a href="https://www.w3.org/TR/vc-data-model/">verifiable credentials data model</a> is based on a machine comprehensible language called <a href="https://www.w3.org/TR/rdf-primer/">RDF</a>. RDF represents arbitrary semantic knowledge as <a href="https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)">graph</a>s. Computers can perform automatic deductive reasoning over RDF; given assumptions (represented as an RDF graph) and axioms (represented as logical rules), a computer can infer new conclusions and even prove them to other computers using deductive derivations (proofs).</p>
+<p>Every VCDM credential is representable as an RDF graph. So computers can reason about them, deriving new conclusions that weren't explicitly stated by the issuer.</p>
 <p>The Dock SDK exposes utilities for primitive deductive reasoning over verified credentials. The Verifier has a choice to perform deduction themself (expensive), or offload that responsibility to the Presenter of the credential[s] by accepting deductive proofs of composite claims.</p>
 <p>In RDF, if graph A is true and graph B is true, then the <a href="https://en.wikipedia.org/wiki/Union_(set_theory)">union</a> of those graphs, is also true <code>A∧B-&gt;A∪B</code> <sup class="footnote-reference"><a href="#1">1</a></sup>. Using this property we can combine multiple credentials and reason over their union.</p>
-<h2 id="explicit-ethos-using-a-hrefhttpsenwikipediaorgwikimodes_of_persuasionethosrdf-reificationa"><a class="header" href="#explicit-ethos-using-a-hrefhttpsenwikipediaorgwikimodes_of_persuasionethosrdf-reificationa">Explicit Ethos using <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos">RDF Reification</a></a></h2>
+<h2 id="explicit-ethos"><a class="header" href="#explicit-ethos">Explicit Ethos</a></h2>
 <p>Imagine a signed credential issued by <strong>Alice</strong> claiming that <strong>Joe</strong> is a <strong>Member</strong>.</p>
 <pre><code class="language-json">{
   ...
@@ -177,22 +177,21 @@
     &quot;id&quot;: &quot;Joe&quot;,
     &quot;@type&quot;: &quot;Member&quot;
   },
+  &quot;proof&quot;: ...,
   ...
 }
 </code></pre>
 <p>The credential does not directly prove that <strong>Joe</strong> is a <strong>Member</strong>. Rather, it proves <strong>Alice</strong> <strong>Claims</strong> <strong>Joe</strong> to be a <strong>Member</strong>.</p>
-<p>Not proven:<sup class="footnote-reference"><a href="#2">2</a></sup></p>
-<pre><code class="language-turtle">&lt;Joe&gt; a &lt;Member&gt; .
+<p>Not proven:</p>
+<pre><code class="language-nquads">&lt;Joe&gt; &lt;type&gt; &lt;Member&gt; .
 </code></pre>
 <p>Proven:</p>
-<pre><code class="language-turtle">&lt;Alice&gt; &lt;Claims&gt; [
-  rdf:subject &lt;Joe&gt; ;
-  rdf:predicate a ;
-  def:object &lt;Member&gt; ] .
+<pre><code class="language-nquads">&lt;Joe&gt; &lt;type&gt; &lt;Member&gt; &lt;Alice&gt; .
 </code></pre>
-<p>Writing RDF triples about other RDF triples is called <a href="https://www.w3.org/wiki/RdfReification">reification</a>. Signed credentials are <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos">ethos</a> arguments so we call this reified representation of credentials &quot;Explicit Ethos&quot; form. If a credential is <em>verified</em>, then it's explicit ethos form is <em>true</em>.</p>
+<p>The fourth and final element of the proven <em>quad</em> is used here to indicate the source of the information, Alice. The final element of a quad is its <a href="https://www.w3.org/TR/rdf11-concepts/#dfn-graph-name">graph name</a>.</p>
+<p>A signed credentials are <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos">ethos</a> arguments and a credential may be converted to a list of quads (a claimgraph). We call this representation &quot;Explicit Ethos&quot; form. If a credential is <em>verified</em>, then its explicit ethos form is <em>true</em>.</p>
 <h2 id="rule-format"><a class="header" href="#rule-format">Rule Format</a></h2>
-<p>To perform reasoning and to accept proofs, the Verifier must select the list of logical rules which they will allow. Rules (or axioms if you prefer), are modeled as if-then relationships.</p>
+<p>To perform reasoning and to accept proofs, the Verifier must select the list of logical rules wish to accept. Rules (or axioms if you prefer), are modeled as if-then relationships.</p>
 <pre><code class="language-js">const rules = [
   {
     if_all: [],
@@ -201,16 +200,24 @@
 ];
 </code></pre>
 <p>During reasoning, when an <code>if_all</code> pattern is matched, its corresponding <code>then</code> pattern will be implied. In logic terms, each &quot;rule&quot; is the conditional premise of a <a href="https://en.wikipedia.org/wiki/Modus_ponens">modus ponens</a>.</p>
-<pre><code class="language-js">{ if_all: [A, B, C], then: [C, D, E] }
-</code></pre>
-<p>means <code>if (A and B and C) then (C and D and E)</code>.</p>
+<p><code>{ if_all: [A, B, C], then: [D, E] }</code> means that <code>if (A and B and C) then (D and E)</code>.</p>
 <p>Rules can contain Bound or Unbound entities. Unbound entities are named variables. Each rule has it's own unique scope, so Unbound entities introduced in the <code>if_all</code> pattern can be used in the <code>then</code> pattern.</p>
 <pre><code class="language-js">{
   if_all: [
-    [{ Bound: alice }, { Bound: likes }, { Unbound: 'thing' }],
+    [
+      { Bound: alice },
+      { Bound: likes },
+      { Unbound: 'thing' },
+      { Bound: defaultGraph },
+    ],
   ],
   then: [
-    [{ Bound: bob }, { Bound: likes }, { Unbound: 'thing' }]
+    [
+      { Bound: bob },
+      { Bound: likes },
+      { Unbound: 'thing' },
+      { Bound: defaultGraph },
+    ],
   ],
 }
 </code></pre>
@@ -220,7 +227,8 @@
   then [bob likes ?thing]
 </code></pre>
 <p>in other words: <code>∀ thing: [alice likes thing] -&gt; [bob likes thing]</code></p>
-<p>Bound entities are constants of type RdfNode. RDF nodes may be one of three things, an IRI, a blank node, or a literal. For those familiar with algebraic datatypes:</p>
+<p>If an unbound variable appears in the <code>then</code> pattern but does not appear in the <code>if_all</code> pattern the rule is considered invalid and will be rejected by the reasoner.</p>
+<p>Bound entities are constants of type RdfTerm. RDF nodes may be one of four things, an IRI, a blank node, a literal, or the default graph. For those familiar with algebraic datatypes:</p>
 <pre><code class="language-rust ignore">enum RdfNode {
   Iri(Url),
   Blank(String),
@@ -228,6 +236,7 @@
     value: String,
     datatype: Url,
   },
+  DefaultGraph,
 }
 </code></pre>
 <p>The SDK represents RDF nodes like so:</p>
@@ -240,14 +249,16 @@ const literal = {
 };
 // blank nodes are generally not useful in rule definitions
 const blank = { Blank: '_:b0' };
+const defaultGraph = { DefaultGraph: true };
 </code></pre>
-<p>Example of a complete rule definition:</p>
+<p>Here is an example of a complete rule definition:</p>
 <pre><code class="language-js">{
   if_all: [
     [
       { Unbound: 'food' },
       { Bound { Iri: 'https://example.com/contains' } },
-      { Bound: { Iri: 'https://example.com/butter' } }
+      { Bound: { Iri: 'https://example.com/butter' } },
+      { Bound: { DefaultGraph: true } }
     ],
     [
       { Unbound: 'person' },
@@ -255,14 +266,16 @@ const blank = { Blank: '_:b0' };
       { Literal: {
         value: 'Bob',
         datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral',
-      } }
+      } },
+      { Bound: { DefaultGraph: true } }
     ],
   ],
   then: [
     [
       { Unbound: 'person' },
       { Bound: { Iri: 'https://example.com/likes' } },
-      { Unbound: 'food' },
+      { Unbound: 'food' },,
+      { Bound: { DefaultGraph: true } }
     ]
   ],
 }
@@ -279,6 +292,7 @@ const blank = { Blank: '_:b0' };
 <li><a href="https://www.w3.org/TR/vc-data-model/">VCDM</a>: Verifiable Credentials Data Model</li>
 <li><a href="https://en.wikipedia.org/wiki/Resource_Description_Framework">RDF</a>: A model for representing general knowledge in a machine friendly way.</li>
 <li>RDF triple: A single sentence consisting of subject, predicate and object. Each element of the triple is an RDF node.</li>
+<li>RDF quad: A single sentence consisting of subject, predicate, object, graph. Each element of the quad is an RDF term.</li>
 <li><a href="https://www.w3.org/TR/rdf-primer/#rdfmodel">RDF graph</a>: A directed, labeled <a href="https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)">graph</a> with RDF triples as edges.</li>
 <li><a href="https://www.w3.org/TR/rdf-primer/#rdfmodel">RDF node</a></li>
 <li>Composite Claim: An rdf triple which was infered, rather than stated explicitly in a credential.</li>
@@ -286,9 +300,6 @@ const blank = { Blank: '_:b0' };
 </ul>
 <div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
 <p>If you ever decide to implement your own algorithm to merge RDF graphs, remember that <a href="https://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank nodes</a> exists and may need to be renamed depending on the type of graph representation in use.</p>
-</div>
-<div class="footnote-definition" id="2"><sup class="footnote-definition-label">2</sup>
-<p>This syntax is an RDF representation called <a href="https://www.w3.org/TR/turtle/">turtle</a>. In turtle, &quot;a&quot; is shorthand for &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; which means &quot;is member of set&quot;.</p>
 </div>
 
                     </main>

@@ -618,11 +618,11 @@ can use it in a Verifiable Credential as follows:</p>
 <p>the reason this last Credential is invalid is that only one of the subjects properly follow the Schema, the second
 subject does not specify the fields <code>emailAddress</code> and <code>alumniOf</code> which were specified as required.</p>
 <h1 id="claim-deduction"><a class="header" href="#claim-deduction">Claim Deduction</a></h1>
-<p>The <a href="https://www.w3.org/TR/vc-data-model/">verifiable credentials data model</a> is based on a machine comprehensible language called <a href="https://www.w3.org/TR/rdf-primer/">RDF</a>. RDF represents arbitrary semantic knowledge as <a href="https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)">graph</a>s. Computers can perform automatic deductive reasoning over RDF, given assumptions (represented as an RDF graph) and axioms (represented as logical rules), a computer can infer new conclusions and even prove them to other computers using deductive derivations (proofs).</p>
-<p>So what does that have to do with verifiable credentials? Every VCDM credential is an RDF claim graph. Computers can reason about them, deriving new conclusions that weren't explicitly stated by the issuer.</p>
+<p>The <a href="https://www.w3.org/TR/vc-data-model/">verifiable credentials data model</a> is based on a machine comprehensible language called <a href="https://www.w3.org/TR/rdf-primer/">RDF</a>. RDF represents arbitrary semantic knowledge as <a href="https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)">graph</a>s. Computers can perform automatic deductive reasoning over RDF; given assumptions (represented as an RDF graph) and axioms (represented as logical rules), a computer can infer new conclusions and even prove them to other computers using deductive derivations (proofs).</p>
+<p>Every VCDM credential is representable as an RDF graph. So computers can reason about them, deriving new conclusions that weren't explicitly stated by the issuer.</p>
 <p>The Dock SDK exposes utilities for primitive deductive reasoning over verified credentials. The Verifier has a choice to perform deduction themself (expensive), or offload that responsibility to the Presenter of the credential[s] by accepting deductive proofs of composite claims.</p>
 <p>In RDF, if graph A is true and graph B is true, then the <a href="https://en.wikipedia.org/wiki/Union_(set_theory)">union</a> of those graphs, is also true <code>A∧B-&gt;A∪B</code> <sup class="footnote-reference"><a href="#1">1</a></sup>. Using this property we can combine multiple credentials and reason over their union.</p>
-<h2 id="explicit-ethos-using-a-hrefhttpsenwikipediaorgwikimodes_of_persuasionethosrdf-reificationa"><a class="header" href="#explicit-ethos-using-a-hrefhttpsenwikipediaorgwikimodes_of_persuasionethosrdf-reificationa">Explicit Ethos using <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos">RDF Reification</a></a></h2>
+<h2 id="explicit-ethos"><a class="header" href="#explicit-ethos">Explicit Ethos</a></h2>
 <p>Imagine a signed credential issued by <strong>Alice</strong> claiming that <strong>Joe</strong> is a <strong>Member</strong>.</p>
 <pre><code class="language-json">{
   ...
@@ -631,22 +631,21 @@ subject does not specify the fields <code>emailAddress</code> and <code>alumniOf
     &quot;id&quot;: &quot;Joe&quot;,
     &quot;@type&quot;: &quot;Member&quot;
   },
+  &quot;proof&quot;: ...,
   ...
 }
 </code></pre>
 <p>The credential does not directly prove that <strong>Joe</strong> is a <strong>Member</strong>. Rather, it proves <strong>Alice</strong> <strong>Claims</strong> <strong>Joe</strong> to be a <strong>Member</strong>.</p>
-<p>Not proven:<sup class="footnote-reference"><a href="#2">2</a></sup></p>
-<pre><code class="language-turtle">&lt;Joe&gt; a &lt;Member&gt; .
+<p>Not proven:</p>
+<pre><code class="language-nquads">&lt;Joe&gt; &lt;type&gt; &lt;Member&gt; .
 </code></pre>
 <p>Proven:</p>
-<pre><code class="language-turtle">&lt;Alice&gt; &lt;Claims&gt; [
-  rdf:subject &lt;Joe&gt; ;
-  rdf:predicate a ;
-  def:object &lt;Member&gt; ] .
+<pre><code class="language-nquads">&lt;Joe&gt; &lt;type&gt; &lt;Member&gt; &lt;Alice&gt; .
 </code></pre>
-<p>Writing RDF triples about other RDF triples is called <a href="https://www.w3.org/wiki/RdfReification">reification</a>. Signed credentials are <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos">ethos</a> arguments so we call this reified representation of credentials &quot;Explicit Ethos&quot; form. If a credential is <em>verified</em>, then it's explicit ethos form is <em>true</em>.</p>
+<p>The fourth and final element of the proven <em>quad</em> is used here to indicate the source of the information, Alice. The final element of a quad is its <a href="https://www.w3.org/TR/rdf11-concepts/#dfn-graph-name">graph name</a>.</p>
+<p>A signed credentials are <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos">ethos</a> arguments and a credential may be converted to a list of quads (a claimgraph). We call this representation &quot;Explicit Ethos&quot; form. If a credential is <em>verified</em>, then its explicit ethos form is <em>true</em>.</p>
 <h2 id="rule-format"><a class="header" href="#rule-format">Rule Format</a></h2>
-<p>To perform reasoning and to accept proofs, the Verifier must select the list of logical rules which they will allow. Rules (or axioms if you prefer), are modeled as if-then relationships.</p>
+<p>To perform reasoning and to accept proofs, the Verifier must select the list of logical rules wish to accept. Rules (or axioms if you prefer), are modeled as if-then relationships.</p>
 <pre><code class="language-js">const rules = [
   {
     if_all: [],
@@ -655,16 +654,24 @@ subject does not specify the fields <code>emailAddress</code> and <code>alumniOf
 ];
 </code></pre>
 <p>During reasoning, when an <code>if_all</code> pattern is matched, its corresponding <code>then</code> pattern will be implied. In logic terms, each &quot;rule&quot; is the conditional premise of a <a href="https://en.wikipedia.org/wiki/Modus_ponens">modus ponens</a>.</p>
-<pre><code class="language-js">{ if_all: [A, B, C], then: [C, D, E] }
-</code></pre>
-<p>means <code>if (A and B and C) then (C and D and E)</code>.</p>
+<p><code>{ if_all: [A, B, C], then: [D, E] }</code> means that <code>if (A and B and C) then (D and E)</code>.</p>
 <p>Rules can contain Bound or Unbound entities. Unbound entities are named variables. Each rule has it's own unique scope, so Unbound entities introduced in the <code>if_all</code> pattern can be used in the <code>then</code> pattern.</p>
 <pre><code class="language-js">{
   if_all: [
-    [{ Bound: alice }, { Bound: likes }, { Unbound: 'thing' }],
+    [
+      { Bound: alice },
+      { Bound: likes },
+      { Unbound: 'thing' },
+      { Bound: defaultGraph },
+    ],
   ],
   then: [
-    [{ Bound: bob }, { Bound: likes }, { Unbound: 'thing' }]
+    [
+      { Bound: bob },
+      { Bound: likes },
+      { Unbound: 'thing' },
+      { Bound: defaultGraph },
+    ],
   ],
 }
 </code></pre>
@@ -674,7 +681,8 @@ subject does not specify the fields <code>emailAddress</code> and <code>alumniOf
   then [bob likes ?thing]
 </code></pre>
 <p>in other words: <code>∀ thing: [alice likes thing] -&gt; [bob likes thing]</code></p>
-<p>Bound entities are constants of type RdfNode. RDF nodes may be one of three things, an IRI, a blank node, or a literal. For those familiar with algebraic datatypes:</p>
+<p>If an unbound variable appears in the <code>then</code> pattern but does not appear in the <code>if_all</code> pattern the rule is considered invalid and will be rejected by the reasoner.</p>
+<p>Bound entities are constants of type RdfTerm. RDF nodes may be one of four things, an IRI, a blank node, a literal, or the default graph. For those familiar with algebraic datatypes:</p>
 <pre><code class="language-rust ignore">enum RdfNode {
   Iri(Url),
   Blank(String),
@@ -682,6 +690,7 @@ subject does not specify the fields <code>emailAddress</code> and <code>alumniOf
     value: String,
     datatype: Url,
   },
+  DefaultGraph,
 }
 </code></pre>
 <p>The SDK represents RDF nodes like so:</p>
@@ -694,14 +703,16 @@ const literal = {
 };
 // blank nodes are generally not useful in rule definitions
 const blank = { Blank: '_:b0' };
+const defaultGraph = { DefaultGraph: true };
 </code></pre>
-<p>Example of a complete rule definition:</p>
+<p>Here is an example of a complete rule definition:</p>
 <pre><code class="language-js">{
   if_all: [
     [
       { Unbound: 'food' },
       { Bound { Iri: 'https://example.com/contains' } },
-      { Bound: { Iri: 'https://example.com/butter' } }
+      { Bound: { Iri: 'https://example.com/butter' } },
+      { Bound: { DefaultGraph: true } }
     ],
     [
       { Unbound: 'person' },
@@ -709,14 +720,16 @@ const blank = { Blank: '_:b0' };
       { Literal: {
         value: 'Bob',
         datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral',
-      } }
+      } },
+      { Bound: { DefaultGraph: true } }
     ],
   ],
   then: [
     [
       { Unbound: 'person' },
       { Bound: { Iri: 'https://example.com/likes' } },
-      { Unbound: 'food' },
+      { Unbound: 'food' },,
+      { Bound: { DefaultGraph: true } }
     ]
   ],
 }
@@ -733,6 +746,7 @@ const blank = { Blank: '_:b0' };
 <li><a href="https://www.w3.org/TR/vc-data-model/">VCDM</a>: Verifiable Credentials Data Model</li>
 <li><a href="https://en.wikipedia.org/wiki/Resource_Description_Framework">RDF</a>: A model for representing general knowledge in a machine friendly way.</li>
 <li>RDF triple: A single sentence consisting of subject, predicate and object. Each element of the triple is an RDF node.</li>
+<li>RDF quad: A single sentence consisting of subject, predicate, object, graph. Each element of the quad is an RDF term.</li>
 <li><a href="https://www.w3.org/TR/rdf-primer/#rdfmodel">RDF graph</a>: A directed, labeled <a href="https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)">graph</a> with RDF triples as edges.</li>
 <li><a href="https://www.w3.org/TR/rdf-primer/#rdfmodel">RDF node</a></li>
 <li>Composite Claim: An rdf triple which was infered, rather than stated explicitly in a credential.</li>
@@ -740,9 +754,6 @@ const blank = { Blank: '_:b0' };
 </ul>
 <div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
 <p>If you ever decide to implement your own algorithm to merge RDF graphs, remember that <a href="https://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank nodes</a> exists and may need to be renamed depending on the type of graph representation in use.</p>
-</div>
-<div class="footnote-definition" id="2"><sup class="footnote-definition-label">2</sup>
-<p>This syntax is an RDF representation called <a href="https://www.w3.org/TR/turtle/">turtle</a>. In turtle, &quot;a&quot; is shorthand for &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; which means &quot;is member of set&quot;.</p>
 </div>
 <p>The Dock Blockchain includes a module explicitly intended for proof of existence. Aside from being explicitly supported by the on-chain runtime, it works the same way you would expect. You post the hash of a document on-chain at a specific block. Later you can use that hash to prove the document existed at or before that block.</p>
 <p>The PoE module accepts arbitrary bytes as an anchor but in order to keep anchor size constant the chain stores only the blake2b256 hash of those bytes.</p>
@@ -1661,99 +1672,58 @@ Credentials contained within it uses a Schema and fails to pass schema validatio
 <h1 id="claim-deduction-1"><a class="header" href="#claim-deduction-1">Claim Deduction</a></h1>
 <h2 id="specifying-axioms"><a class="header" href="#specifying-axioms">Specifying Axioms</a></h2>
 <p>A Verifier has complete and low level control over the logical rules they deem valid. Rules may vary from use-case to use-case and from verifier to verifier.</p>
-<p>Unwrapping of Explicit Ethos statements is expected to be a common first step when writing a ruleset. This tutorial will give some examples of that.</p>
+<p>A common first step when writing a ruleset will be to unwrap of Explicit Ethos statements.</p>
 <h3 id="simple-unwrapping-of-explicit-ethos"><a class="header" href="#simple-unwrapping-of-explicit-ethos">Simple Unwrapping of Explicit Ethos</a></h3>
-<p>This ruleset names a specific issuer and states that any claims that issuer makes are true.</p>
+<p>This ruleset names a specific issuer and states that any claims made by that issuer are true.</p>
 <pre><code class="language-js">const rules = [
   {
     if_all: [
       [
-        { Bound: { Iri: 'did:example:issuer' } },
-        { Bound: { Iri: 'https://www.dock.io/rdf2020#claimsV1' } },
-        { Unbound: 'claim' },
-      ],
-      [
-        { Unbound: 'claim' },
-        { Bound: { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#subject' } },
         { Unbound: 'subject' },
-      ],
-      [
-        { Unbound: 'claim' },
-        { Bound: { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate' } },
         { Unbound: 'predicate' },
-      ],
-      [
-        { Unbound: 'claim' },
-        { Bound: { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#object' } },
         { Unbound: 'object' },
+        { Bound: { Iri: 'did:example:issuer' } },
       ],
     ],
     then: [
-      [ { Unbound: 'subject' }, { Unbound: 'predicate' }, { Unbound: 'object' } ],
+      [
+        { Unbound: 'subject' },
+        { Unbound: 'predicate' },
+        { Unbound: 'object' },
+        { Bound: { DefaultGraph: true } },
+      ],
     ],
   }
 ];
 </code></pre>
-<p>That single rule is enough for some use-cases but it's not scalable. What if we want to allow more than one issuer? Instead of copying the same rule for each issuer we trust, let's define &quot;trustworthiness&quot;:</p>
+<p>That single rule is enough for some use-cases but it's not scalable. What if we want to allow more than one issuer? Instead of copying the same rule for each issuer we trust, let's define &quot;trustworthiness&quot;.</p>
 <h3 id="unwrapping-explicit-ethos-by-defining-trustworthiness"><a class="header" href="#unwrapping-explicit-ethos-by-defining-trustworthiness">Unwrapping Explicit Ethos by Defining Trustworthiness</a></h3>
-<pre><code class="language-js">const trustworthy =
-  { Bound: { Iri: 'https://www.dock.io/rdf2020#Trustworthy' } };
-const type =
-  { Bound: { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' } };
-const claims =
-  { Bound: { Iri: 'https://www.dock.io/rdf2020#claimsV1' } };
-const subject =
-  { Bound: { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#subject' } };
-const predicate =
-  { Bound: { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate' } };
-const object =
-  { Bound: { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#object' } };
+<pre><code class="language-js">const trustworthy = { Bound: { Iri: 'https://www.dock.io/rdf2020#Trustworthy' } };
+const type = { Bound: { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' } };
+const defaultGraph = { Bound: { DefaultGraph: true } };
 
 const rules = [
   {
     if_all: [
-      [
-        { Unbound: 'issuer' },
-        type,
-        trustworthy,
-      ],
-      [
-        { Unbound: 'issuer' },
-        claims,
-        { Unbound: 'claim' },
-      ],
-      [
-        { Unbound: 'claim' },
-        subject,
-        { Unbound: 'subject' },
-      ],
-      [
-        { Unbound: 'claim' },
-        predicate,
-        { Unbound: 'predicate' },
-      ],
-      [
-        { Unbound: 'claim' },
-        object,
-        { Unbound: 'object' },
-      ],
+      [{ Unbound: 'issuer' }, type, trustworthy, defaultGraph],
+      [{ Unbound: 's' }, { Unbound: 'p' }, { Unbound: 'o' }, { Unbound: 'issuer' }],
     ],
     then: [
-      [ { Unbound: 'subject' }, { Unbound: 'predicate' }, { Unbound: 'object' } ],
+      [{ Unbound: 's' }, { Unbound: 'p' }, { Unbound: 'o' }, defaultGraph],
     ],
   },
   {
     if_all: [],
     then: [
-      [ { Bound: { Iri: 'did:example:issuer' } }, type, trustworthy ]
+      [{ Bound: { Iri: 'did:example:issuer' } }, type, trustworthy, defaultGraph]
     ],
   }
 ];
 </code></pre>
 <p>You may ask &quot;So what's the difference? There is still only one issuer.&quot;</p>
-<p>By the primitive definition of &quot;trustworthiness&quot; written above, any claim made by a trustworthy issuer is true. did:example:issuer can claim whatever they want by issuing verifiable credentials. They can even claim that some other issuer is trustworthy. Together, the two rules defined in the above example implement a system analogous to TLS certificate chains with did:example:issuer as the single root authority.</p>
+<p>By the primitive definition of &quot;trustworthiness&quot; written above, any claim made by a trustworthy issuer is true. <code>did:example:issuer</code> can claim whatever they want by issuing verifiable credentials. They can even claim that some other issuer is trustworthy. Together, the two rules defined in the above example implement a system analogous to TLS certificate chains with <code>did:example:issuer</code> as the single root authority.</p>
 <h2 id="proving-composite-claims"><a class="header" href="#proving-composite-claims">Proving Composite Claims</a></h2>
-<p>As a Holder of verifiable credentials, you'll want to prove specific claims to a Verifier. If those claims are composite, you'll need to provide a deductive proof in your verifiable credentials presentation. This should be done after the presentation has been assembled. If the presentation is going to be signed, sign it <em>after</em> including the deductive proof.</p>
+<p>As a Holder of verifiable credentials, you'll want to prove specific claims to a Verifier. If those claims are composite, you'll sometimes need to bundle a deductive proof in your verifiable credentials presentation. This should be done after the presentation has been assembled. If the presentation is going to be signed, sign it <em>after</em> including the deductive proof.</p>
 <pre><code class="language-js">import { proveCompositeClaims } from '@docknetwork/sdk/utils/cd';
 import jsonld from 'jsonld';
 
@@ -1765,7 +1735,8 @@ const presentation = { ... };
 const compositeClaim = [
   { Iri: 'uuid:19e91192-210b-4b03-8e9c-8ded0a48d5bf' },
   { Iri: 'http://dbpedia.org/ontology/owner' },
-  { Iri: 'did:example:bob' }
+  { Iri: 'did:example:bob' },
+  { DefaultGraph: true },
 ];
 
 // SDK reasoning utilities take presentations in expanded form

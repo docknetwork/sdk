@@ -19,8 +19,8 @@ An issuer may grant delegation authority to another issuer simply by issuing the
 }
 ```
 
-When `did:ex:b` wishes to issue a credential on behalf of `did:ex:a`, they should bundle it (e.g. in a presentation) with it this "delegation" credential. A delegation credential constitutes a proof of delegation. A proof of delegation bundled with a credential issued by the delegate can be prove that some statement[s] were made by authority some root delegator.
+When `did:ex:b` wishes to issue a credential on behalf of `did:ex:a`, they should bundle it (e.g. in a presentation) with it this "delegation" credential. A delegation credential constitutes a proof of delegation. A proof of delegation bundled with a credential issued by the delegate can be prove that some statement[s] were made by authority of some root delegator.
 
-In order to process delegated credentials a verifier accepts a bundle. The bundle includes both delegations and other credentials. After verifying every credential within the bundle (including the delegations) the verifier uses [Claim Deduction](concepts_claim_deduction.md) to determine which statements are proven by the delegated credential.
+In order to process delegated credentials a verifier accepts a bundle. The bundle includes both delegations and credentials issued by delegates. After verifying every credential within the bundle (including the delegations) the verifier uses [Claim Deduction](concepts_claim_deduction.md) to determine which statements are proven by the delegated credential.
 
-Docks delegation ontology (i.e. rdf vocabulary) and ruleset are currently in alpha. See [Private Delegation](tutorial_private_delegation.md) for an example of their use.
+Dock's delegation ontology (i.e. rdf vocabulary) and ruleset are currently in alpha. See [Private Delegation](tutorial_private_delegation.md) for an example of their use.

@@ -42,7 +42,7 @@ status if the credential is revocable. It then checks whether the presentation c
 To issue a verifiable credential, the issuer needs to have a public key that is accessible by the holder and verifier to verify the
 signature (in `proof`) in the credential. Though the VCDM spec does not mandate it, an issuer in Dock must have a DID on chain.
 This DID is present in the credential in the `issuer` field. An example credential where both the issuer and holder have Dock DIDs
-```json
+```js
 {
     '@context': [
       'https://www.w3.org/2018/credentials/v1',
@@ -71,7 +71,7 @@ The holder while creating the presentation signs it with his private key. For th
 addition to verifying the issuer's signature, he needs to verify this signature as well, and for that he must know the
 holder's public key. One way to achieve this is to make the holder have a DID too so that the verifier can look up the DID
 on chain and learn the public key. An example presentation signed by the holder
-```json
+```js
 {
     '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
     type: [ 'VerifiablePresentation' ],
@@ -121,7 +121,7 @@ On Dock, credential revocation is managed with a revocation registry. There can 
 registry has a unique id. It is recommended that the revocation authority creates a new registry for each credential type.
 While issuing the credential, issuer embeds the revocation registry's id in the credential in the `credentialStatus` field.
 An example credential with Dock revocation registry
-```json
+```js
 {
     '@context': [
       'https://www.w3.org/2018/credentials/v1',
@@ -155,4 +155,3 @@ The revocation of a credential can be undone if the revocation registry supports
 owned by a single DID so that DID can revoke a credential or undo the revocation. In future, Dock will support ownership of
 the registry with mulitple DIDs and in different fashions, like any one of the owner DIDs could revoke or a threshold is needed,
 etc. To learn more about revocation registries, refer the [revocation section](./tutorial_revocation.md) of the documentation.
-

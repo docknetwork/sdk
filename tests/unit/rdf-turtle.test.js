@@ -1,6 +1,3 @@
-import { randomAsU8a } from '@polkadot/util-crypto';
-import { u8aToHex } from '@polkadot/util';
-
 import { parseRDFDocument } from '../../src/utils/rdf';
 
 const rdfInputs = [

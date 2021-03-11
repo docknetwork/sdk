@@ -89,7 +89,7 @@ let presentation = {
 The verifier receives `presentation`, *verifies the enclosed credentials*, then reasons over the union of all the credentials in the bundle using the rule `MAYCLAIM_DEF_1`. The process is the one outlined in [Verifier-Side Reasoning](./tutorial_claim_deduction.md#verifier-side-reasoning) but using a different composite claim and a different rule list.
 
 ```js
-import { MAYCLAIM_DEF_1 } from '../src/rdf-defs';
+import { MAYCLAIM_DEF_1 } from '@docknetwork/sdk/rdf-defs';
 import { proveCompositeClaims } from '../src/utils/cd';
 import jsonld from 'jsonld';
 

@@ -41,7 +41,7 @@ export function fromJsonldjsCg(jcg) {
 }
 
 // convert a single node from json-ld claimgraph representation to this module's representation.
-function fromJsonldjsNode(jn) {
+export function fromJsonldjsNode(jn) {
   let ret;
   switch (jn.termType) {
     case 'DefaultGraph':

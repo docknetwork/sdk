@@ -1,30 +1,6 @@
 import { Parser } from 'n3';
 
-const rdfTermTypeMap = {
-  BlankNode: 'Blank',
-  NamedNode: 'Iri',
-  Literal: 'Literal',
-  DefaultGraph: 'DefaultGraph',
-};
-
-export function formatRDFTerm(type, rdf) {
-  const rdfName = rdfTermTypeMap[type];
-  if (!rdfName) {
-    throw new Error(`Unexpected RDF term type: ${type}`);
-  }
-
-  const formattedRDF = {};
-  if (rdfName === 'Literal') {
-    const { value, datatype } = rdf.toJSON();
-    formattedRDF[rdfName] = {
-      value,
-      datatype: datatype.value,
-    };
-  } else {
-    formattedRDF[rdfName] = rdf.value;
-  }
-  return formattedRDF;
-}
+import { fromJsonldjsNode } from './claimgraph';
 
 export function parseRDFDocument(document, parserOptions = {}) {
   const parser = new Parser(parserOptions);
@@ -45,9 +21,9 @@ export function parseRDFDocument(document, parserOptions = {}) {
     } = quad;
 
     // Format subject, predicate and object terms into rify standard
-    const formattedSubject = formatRDFTerm(subject.termType, subject);
-    const formattedPredicate = formatRDFTerm(predicate.termType, predicate);
-    const formattedObject = formatRDFTerm(object.termType, object);
+    const formattedSubject = fromJsonldjsNode(subject);
+    const formattedPredicate = fromJsonldjsNode(predicate);
+    const formattedObject = fromJsonldjsNode(object);
 
     // Format result as triple
     const result = [
@@ -59,7 +35,7 @@ export function parseRDFDocument(document, parserOptions = {}) {
     // Add graph to complete quad type
     if (useQuads) {
       // TODO: formatted graph if should be quad
-      const formattedGraph = formatRDFTerm(graph.termType, graph);
+      const formattedGraph = fromJsonldjsNode(graph);
       result.push(formattedGraph);
     }
 

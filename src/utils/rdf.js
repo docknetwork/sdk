@@ -3,10 +3,16 @@ import { Parser } from 'n3';
 const rdfTermTypeMap = {
   BlankNode: 'Blank',
   NamedNode: 'Iri',
+  Literal: 'Literal',
+  DefaultGraph: 'DefaultGraph',
 };
 
 export function formatRDFTerm(type, rdf) {
-  const rdfName = rdfTermTypeMap[type] || type;
+  const rdfName = rdfTermTypeMap[type];
+  if (!rdfName) {
+    throw new Error(`Unexpected RDF term type: ${type}`);
+  }
+
   const formattedRDF = {};
   if (rdfName === 'Literal') {
     const { value, datatype } = rdf.toJSON();

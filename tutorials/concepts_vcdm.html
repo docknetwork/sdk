@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html" class="active"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html" class="active"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="concepts_private_delegation.html"><strong aria-hidden="true">2.6.</strong> Private Delegation</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="tutorial_private_delegation.html"><strong aria-hidden="true">3.8.</strong> Private Delegation</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -202,7 +202,7 @@ status if the credential is revocable. It then checks whether the presentation c
 <p>To issue a verifiable credential, the issuer needs to have a public key that is accessible by the holder and verifier to verify the
 signature (in <code>proof</code>) in the credential. Though the VCDM spec does not mandate it, an issuer in Dock must have a DID on chain.
 This DID is present in the credential in the <code>issuer</code> field. An example credential where both the issuer and holder have Dock DIDs</p>
-<pre><code class="language-json">{
+<pre><code class="language-js">{
     '@context': [
       'https://www.w3.org/2018/credentials/v1',
       'https://www.w3.org/2018/credentials/examples/v1'
@@ -229,7 +229,7 @@ This DID is present in the credential in the <code>issuer</code> field. An examp
 addition to verifying the issuer's signature, he needs to verify this signature as well, and for that he must know the
 holder's public key. One way to achieve this is to make the holder have a DID too so that the verifier can look up the DID
 on chain and learn the public key. An example presentation signed by the holder</p>
-<pre><code class="language-json">{
+<pre><code class="language-js">{
     '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
     type: [ 'VerifiablePresentation' ],
     verifiableCredential: [
@@ -277,7 +277,7 @@ On Dock, credential revocation is managed with a revocation registry. There can 
 registry has a unique id. It is recommended that the revocation authority creates a new registry for each credential type.
 While issuing the credential, issuer embeds the revocation registry's id in the credential in the <code>credentialStatus</code> field.
 An example credential with Dock revocation registry</p>
-<pre><code class="language-json">{
+<pre><code class="language-js">{
     '@context': [
       'https://www.w3.org/2018/credentials/v1',
       'https://www.w3.org/2018/credentials/examples/v1'

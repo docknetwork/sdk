@@ -97,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="concepts_private_delegation.html"><strong aria-hidden="true">2.6.</strong> Private Delegation</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="tutorial_private_delegation.html"><strong aria-hidden="true">3.8.</strong> Private Delegation</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -344,7 +344,7 @@ status if the credential is revocable. It then checks whether the presentation c
 <p>To issue a verifiable credential, the issuer needs to have a public key that is accessible by the holder and verifier to verify the
 signature (in <code>proof</code>) in the credential. Though the VCDM spec does not mandate it, an issuer in Dock must have a DID on chain.
 This DID is present in the credential in the <code>issuer</code> field. An example credential where both the issuer and holder have Dock DIDs</p>
-<pre><code class="language-json">{
+<pre><code class="language-js">{
     '@context': [
       'https://www.w3.org/2018/credentials/v1',
       'https://www.w3.org/2018/credentials/examples/v1'
@@ -371,7 +371,7 @@ This DID is present in the credential in the <code>issuer</code> field. An examp
 addition to verifying the issuer's signature, he needs to verify this signature as well, and for that he must know the
 holder's public key. One way to achieve this is to make the holder have a DID too so that the verifier can look up the DID
 on chain and learn the public key. An example presentation signed by the holder</p>
-<pre><code class="language-json">{
+<pre><code class="language-js">{
     '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
     type: [ 'VerifiablePresentation' ],
     verifiableCredential: [
@@ -419,7 +419,7 @@ On Dock, credential revocation is managed with a revocation registry. There can 
 registry has a unique id. It is recommended that the revocation authority creates a new registry for each credential type.
 While issuing the credential, issuer embeds the revocation registry's id in the credential in the <code>credentialStatus</code> field.
 An example credential with Dock revocation registry</p>
-<pre><code class="language-json">{
+<pre><code class="language-js">{
     '@context': [
       'https://www.w3.org/2018/credentials/v1',
       'https://www.w3.org/2018/credentials/examples/v1'
@@ -758,6 +758,25 @@ const defaultGraph = { DefaultGraph: true };
 <p>The Dock Blockchain includes a module explicitly intended for proof of existence. Aside from being explicitly supported by the on-chain runtime, it works the same way you would expect. You post the hash of a document on-chain at a specific block. Later you can use that hash to prove the document existed at or before that block.</p>
 <p>The PoE module accepts arbitrary bytes as an anchor but in order to keep anchor size constant the chain stores only the blake2b256 hash of those bytes.</p>
 <p>Developers are free to use the anchoring module however they want, taloring their software to their own use case. An anchoring example can be found in the sdk examples directory. Dock provides a <a href="https://fe.dock.io/#/anchor/batch">fully functioning reference client</a> for anchoring. The client even implements batching anchors into a merkle tree so you can anchor multiple documents in a single transaction.</p>
+<h1 id="private-delegation"><a class="header" href="#private-delegation">Private Delegation</a></h1>
+<p>Claim Deduction rules can express delegation of authority to issue credentials! It's expected to be a common enough use case that Dock has declared some rdf vocabulary and associated claim deduction rules aid potential delegators.</p>
+<p>An issuer may grant delegation authority to another issuer simply by issuing them a vcdm credential. Let's say <code>did:ex:a</code> wants to grant delegation authority to <code>did:ex:b</code>. <code>did:ex:a</code> simply issues the credential saying that <code>did:ex:b</code> may make any claim.</p>
+<pre><code class="language-json">{
+  &quot;@context&quot;: [ &quot;https://www.w3.org/2018/credentials/v1&quot; ],
+  &quot;id&quot;: &quot;urn:uuid:9b472d4e-492b-49f7-821c-d8c91e7fe767&quot;,
+  &quot;type&quot;: [ &quot;VerifiableCredential&quot; ],
+  &quot;issuer&quot;: &quot;did:dock:a&quot;,
+  &quot;credentialSubject&quot;: {
+    &quot;id&quot;: &quot;did:dock:b&quot;,
+    &quot;https://rdf.dock.io/alpha/2021#mayClaim&quot;: &quot;https://rdf.dock.io/alpha/2021#ANYCLAIM&quot;
+  },
+  &quot;issuanceDate&quot;: &quot;2021-03-18T19:23:24Z&quot;,
+  &quot;proof&quot;: { ... }
+}
+</code></pre>
+<p>When <code>did:ex:b</code> wishes to issue a credential on behalf of <code>did:ex:a</code>, they should bundle it (e.g. in a presentation) with it this &quot;delegation&quot; credential. A delegation credential constitutes a proof of delegation. A proof of delegation bundled with a credential issued by the delegate can be prove that some statement[s] were made by authority of some root delegator.</p>
+<p>In order to process delegated credentials a verifier accepts a bundle. The bundle includes both delegations and credentials issued by delegates. After verifying every credential within the bundle (including the delegations) the verifier uses <a href="concepts_claim_deduction.html">Claim Deduction</a> to determine which statements are proven by the delegated credential.</p>
+<p>Dock's delegation ontology (i.e. rdf vocabulary) and ruleset are currently in alpha. See <a href="tutorial_private_delegation.html">Private Delegation</a> for an example of their use.</p>
 <h1 id="tutorials"><a class="header" href="#tutorials">Tutorials</a></h1>
 <ol>
 <li><a href="./tutorial_did.html">DID</a></li>
@@ -1812,7 +1831,7 @@ try {
 <h2 id="we-need-to-go-deeper"><a class="header" href="#we-need-to-go-deeper">We Need to Go Deeper</a></h2>
 <p>The SDK claim deduction module exposes lower level functionality for those who need it. <code>getImplications</code>, <code>proveh</code> and <code>validateh</code>, for example, operate on raw claimgraphs represented as adjacency lists. For even lower level access, check out our <a href="https://github.com/docknetwork/rify">inference engine</a> which is written in Rust and exposed to javascript via wasm.</p>
 <h2 id="graphical-anchoring-utility"><a class="header" href="#graphical-anchoring-utility">Graphical Anchoring Utility</a></h2>
-<p>You can also anchor without touching any code. Visit https://fe.dock.io/#/anchor/batch for creation of anchors and https://fe.dock.io/#/anchor/check for anchor verification.</p>
+<p>You can also anchor without touching any code. Visit <a href="https://fe.dock.io/#/anchor/batch">https://fe.dock.io/#/anchor/batch</a> for creation of anchors and <a href="https://fe.dock.io/#/anchor/check">https://fe.dock.io/#/anchor/check</a> for anchor verification.</p>
 <h3 id="to-batch-or-not-to-batch"><a class="header" href="#to-batch-or-not-to-batch">To Batch, or not to Batch</a></h3>
 <p>Batching (combining multiple anchors into one) can be used to save on transaction costs by anchoring multiple documents in a single transaction as a merkle tree root.</p>
 <p>Batching does have a drawback. In order to verify a document that was anchored as part of the batch, you must provde the merkle proof that was generated when batching said file. Merkle proofs are expressed as <code>.proof.json</code> files and can be downloaded before posting the anchor. No merkle proof is required for batches containing only one document.</p>
@@ -1834,6 +1853,97 @@ fuction checkAnchor(file) {
 }
 </code></pre>
 <p>See the <code>example/anchor.js</code> in the sdk repository for more info.</p>
+<h1 id="private-delegation-1"><a class="header" href="#private-delegation-1">Private Delegation</a></h1>
+<p>This tutorial follows the lifecycle of a delegated credential. It builds builds on previous turorials <a href="./tutorial_ipv.html">Issuance, Presentation, Verification</a> and <a href="./tutorial_claim_deduction.html">Claim Deduction</a>.</p>
+<h2 id="create-a-delegation"><a class="header" href="#create-a-delegation">Create a Delegation</a></h2>
+<p>Let's assume some root authority, <code>did:ex:a</code>, wants grant <code>did:ex:b</code> full authority to make claims on behalf of <code>did:ex:a</code>. To do this <code>did:ex:a</code> will issue a delegation credential to <code>did:ex:b</code>.</p>
+<details>
+<summary>Boilerplate</summary>
+<pre><code class="language-js">const { v4: uuidv4 } = require('uuid');
+
+function uuid() {
+  return `uuid:${uuidv4()}`;
+}
+
+// Check out the Issuance, Presentation, Verification tutorial for info on signing
+// credentials.
+function signCredential(cred, issuer_secret) { ... }
+
+// Check out the Issuance, Presentation, Verification tutorial for info on verifying
+// VCDM presentations.
+async function verifyPresentation(presentation) { ... }
+</code></pre>
+</details>
+<pre><code class="language-js">const delegation = {
+  '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
+  id: uuid(),
+  type: [ 'VerifiableCredential' ],
+  issuer: 'did:ex:a',
+  credentialSubject: {
+    id: 'did:ex:b',
+    'https://rdf.dock.io/alpha/2021#mayClaim':
+      'https://rdf.dock.io/alpha/2021#ANYCLAIM'
+  },
+  issuanceDate: new Date().toISOString(),
+};
+const signed_delegation = signCredential(delegation, dida_secret);
+</code></pre>
+<p>Next <code>did:ex:a</code> sends the signed credential to <code>did:ex:b</code>.</p>
+<h2 id="issue-a-credential-as-a-delegate"><a class="header" href="#issue-a-credential-as-a-delegate">Issue a Credential as a Delegate</a></h2>
+<p><code>did:ex:b</code> accepts the delegation credential from <code>did:ex:a</code>. Now <code>did:ex:b</code> can use the delegation to make arbitrary attestations on behalf of <code>did:ex:a</code>.</p>
+<pre><code class="language-js">const newcred = {
+  '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
+  id: uuid(),
+  type: [ 'VerifiableCredential' ],
+  issuer: 'did:ex:b',
+  credentialSubject: {
+    id: 'did:ex:c',
+    'https://example.com/score': 100,
+  },
+  issuanceDate: new Date().toISOString(),
+};
+const signed_newcred = signCredential(newcred, didb_secret);
+</code></pre>
+<p>So far we have two credentials, <code>signed_delegation</code> and <code>signed_newcred</code>. <code>signed_delegation</code> proves that any claim made by <code>did:ex:b</code> is effectively a claim made by <code>did:ex:a</code>. <code>signed_newcred</code> proves tha <code>did:ex:b</code> claims that <code>did:ex:c</code> has a score of 100. By applying one of the logical rules provided by the sdk, we can infer that <code>did:ex:a</code> claims <code>did:ex:c</code> has a score of 100. The logical rule named <code>MAYCLAIM_DEF_1</code> will work for this use-case. <code>MAYCLAIM_DEF_1</code> will be used by the verifier.</p>
+<p>Now <code>did:ex:b</code> has both signed credentials. <code>did:ex:b</code> may now pass both credentials to the <em>holder</em>. In this case the holder is <code>did:ex:c</code>. <code>did:ex:c</code> also happens to be the <em>subject</em> of one of the credentials.</p>
+<h2 id="present-a-delegated-credential"><a class="header" href="#present-a-delegated-credential">Present a Delegated Credential</a></h2>
+<p><code>did:ex:c</code> now holds two credentials, <code>signed_delegation</code> and <code>signed_newcred</code>. Together they prove that <code>did:ex:a</code> indirectly claims <code>did:ex:c</code> to have a score of 100. <code>did:ex:c</code> wants to prove this statement to another party, a <em>verifier</em>. <code>did:ex:c</code> must bundle the two credentials into a VCDM <em>presentation</em>.</p>
+<pre><code class="language-js">let presentation = {
+  '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
+  type: [ 'VerifiablePresentation' ],
+  id: uuid(),
+  holder: `did:ex:c`,
+  verifiableCredential: [ signed_delegation, signed_newcred ],
+};
+</code></pre>
+<p><code>presentation</code> is sent to the verifier.</p>
+<h2 id="accept-a-delegated-credential"><a class="header" href="#accept-a-delegated-credential">Accept a Delegated Credential</a></h2>
+<p>The verifier receives <code>presentation</code>, <em>verifies the enclosed credentials</em>, then reasons over the union of all the credentials in the bundle using the rule <code>MAYCLAIM_DEF_1</code>. The process is the one outlined in <a href="./tutorial_claim_deduction.html#verifier-side-reasoning">Verifier-Side Reasoning</a> but using a different composite claim and a different rule list.</p>
+<pre><code class="language-js">import { MAYCLAIM_DEF_1 } from '@docknetwork/sdk/rdf-defs';
+import { proveCompositeClaims } from '../src/utils/cd';
+import jsonld from 'jsonld';
+
+const compositeClaim = [
+  { Iri: 'did:ex:c' },
+  { Iri: 'https://example.com/score' },
+  { Literal: { datatype: 'http://www.w3.org/2001/XMLSchema#integer', value: '100' } }
+  { Iri: 'did:ex:a' },
+];
+
+let ver = await verifyPresentation(presentation);
+if (!ver.verified) {
+  throw ver;
+}
+
+const expPres = await jsonld.expand(presentation);
+
+try {
+  await proveCompositeClaims(expPres, [compositeClaim], MAYCLAIM_DEF_1);
+  console.log('the composite claim was shown to be true');
+} except (e) {
+  console.error('veracity of the composite claim is unknown');
+}
+</code></pre>
 
                     </main>
 

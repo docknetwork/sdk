@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Concepts - Dock SDK Tutorial</title>
+        <title>Private Delegation - Dock SDK Tutorial</title>
         
         
 
@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html" class="active"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="concepts_private_delegation.html"><strong aria-hidden="true">2.6.</strong> Private Delegation</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="tutorial_private_delegation.html"><strong aria-hidden="true">3.8.</strong> Private Delegation</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="concepts_private_delegation.html"><strong aria-hidden="true">2.6.</strong> Private Delegation</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="tutorial_private_delegation.html" class="active"><strong aria-hidden="true">3.8.</strong> Private Delegation</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -163,27 +163,108 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="concepts"><a class="header" href="#concepts">Concepts</a></h1>
-<ol>
-<li><a href="./concepts_did.html">DID</a></li>
-<li><a href="./concepts_vcdm.html">Verifiable credentials</a></li>
-<li><a href="./concepts_blobs_schemas.html">Blobs and Schemas</a></li>
-</ol>
+                        <h1 id="private-delegation"><a class="header" href="#private-delegation">Private Delegation</a></h1>
+<p>This tutorial follows the lifecycle of a delegated credential. It builds builds on previous turorials <a href="./tutorial_ipv.html">Issuance, Presentation, Verification</a> and <a href="./tutorial_claim_deduction.html">Claim Deduction</a>.</p>
+<h2 id="create-a-delegation"><a class="header" href="#create-a-delegation">Create a Delegation</a></h2>
+<p>Let's assume some root authority, <code>did:ex:a</code>, wants grant <code>did:ex:b</code> full authority to make claims on behalf of <code>did:ex:a</code>. To do this <code>did:ex:a</code> will issue a delegation credential to <code>did:ex:b</code>.</p>
+<details>
+<summary>Boilerplate</summary>
+<pre><code class="language-js">const { v4: uuidv4 } = require('uuid');
+
+function uuid() {
+  return `uuid:${uuidv4()}`;
+}
+
+// Check out the Issuance, Presentation, Verification tutorial for info on signing
+// credentials.
+function signCredential(cred, issuer_secret) { ... }
+
+// Check out the Issuance, Presentation, Verification tutorial for info on verifying
+// VCDM presentations.
+async function verifyPresentation(presentation) { ... }
+</code></pre>
+</details>
+<pre><code class="language-js">const delegation = {
+  '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
+  id: uuid(),
+  type: [ 'VerifiableCredential' ],
+  issuer: 'did:ex:a',
+  credentialSubject: {
+    id: 'did:ex:b',
+    'https://rdf.dock.io/alpha/2021#mayClaim':
+      'https://rdf.dock.io/alpha/2021#ANYCLAIM'
+  },
+  issuanceDate: new Date().toISOString(),
+};
+const signed_delegation = signCredential(delegation, dida_secret);
+</code></pre>
+<p>Next <code>did:ex:a</code> sends the signed credential to <code>did:ex:b</code>.</p>
+<h2 id="issue-a-credential-as-a-delegate"><a class="header" href="#issue-a-credential-as-a-delegate">Issue a Credential as a Delegate</a></h2>
+<p><code>did:ex:b</code> accepts the delegation credential from <code>did:ex:a</code>. Now <code>did:ex:b</code> can use the delegation to make arbitrary attestations on behalf of <code>did:ex:a</code>.</p>
+<pre><code class="language-js">const newcred = {
+  '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
+  id: uuid(),
+  type: [ 'VerifiableCredential' ],
+  issuer: 'did:ex:b',
+  credentialSubject: {
+    id: 'did:ex:c',
+    'https://example.com/score': 100,
+  },
+  issuanceDate: new Date().toISOString(),
+};
+const signed_newcred = signCredential(newcred, didb_secret);
+</code></pre>
+<p>So far we have two credentials, <code>signed_delegation</code> and <code>signed_newcred</code>. <code>signed_delegation</code> proves that any claim made by <code>did:ex:b</code> is effectively a claim made by <code>did:ex:a</code>. <code>signed_newcred</code> proves tha <code>did:ex:b</code> claims that <code>did:ex:c</code> has a score of 100. By applying one of the logical rules provided by the sdk, we can infer that <code>did:ex:a</code> claims <code>did:ex:c</code> has a score of 100. The logical rule named <code>MAYCLAIM_DEF_1</code> will work for this use-case. <code>MAYCLAIM_DEF_1</code> will be used by the verifier.</p>
+<p>Now <code>did:ex:b</code> has both signed credentials. <code>did:ex:b</code> may now pass both credentials to the <em>holder</em>. In this case the holder is <code>did:ex:c</code>. <code>did:ex:c</code> also happens to be the <em>subject</em> of one of the credentials.</p>
+<h2 id="present-a-delegated-credential"><a class="header" href="#present-a-delegated-credential">Present a Delegated Credential</a></h2>
+<p><code>did:ex:c</code> now holds two credentials, <code>signed_delegation</code> and <code>signed_newcred</code>. Together they prove that <code>did:ex:a</code> indirectly claims <code>did:ex:c</code> to have a score of 100. <code>did:ex:c</code> wants to prove this statement to another party, a <em>verifier</em>. <code>did:ex:c</code> must bundle the two credentials into a VCDM <em>presentation</em>.</p>
+<pre><code class="language-js">let presentation = {
+  '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
+  type: [ 'VerifiablePresentation' ],
+  id: uuid(),
+  holder: `did:ex:c`,
+  verifiableCredential: [ signed_delegation, signed_newcred ],
+};
+</code></pre>
+<p><code>presentation</code> is sent to the verifier.</p>
+<h2 id="accept-a-delegated-credential"><a class="header" href="#accept-a-delegated-credential">Accept a Delegated Credential</a></h2>
+<p>The verifier receives <code>presentation</code>, <em>verifies the enclosed credentials</em>, then reasons over the union of all the credentials in the bundle using the rule <code>MAYCLAIM_DEF_1</code>. The process is the one outlined in <a href="./tutorial_claim_deduction.html#verifier-side-reasoning">Verifier-Side Reasoning</a> but using a different composite claim and a different rule list.</p>
+<pre><code class="language-js">import { MAYCLAIM_DEF_1 } from '@docknetwork/sdk/rdf-defs';
+import { proveCompositeClaims } from '../src/utils/cd';
+import jsonld from 'jsonld';
+
+const compositeClaim = [
+  { Iri: 'did:ex:c' },
+  { Iri: 'https://example.com/score' },
+  { Literal: { datatype: 'http://www.w3.org/2001/XMLSchema#integer', value: '100' } }
+  { Iri: 'did:ex:a' },
+];
+
+let ver = await verifyPresentation(presentation);
+if (!ver.verified) {
+  throw ver;
+}
+
+const expPres = await jsonld.expand(presentation);
+
+try {
+  await proveCompositeClaims(expPres, [compositeClaim], MAYCLAIM_DEF_1);
+  console.log('the composite claim was shown to be true');
+} except (e) {
+  console.error('veracity of the composite claim is unknown');
+}
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="tutorial_poe_anchors.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
-                        
-                            <a rel="next" href="concepts_did.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
                         
 
                         <div style="clear: both"></div>
@@ -193,15 +274,11 @@
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="tutorial_poe_anchors.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
-                
-                    <a rel="next" href="concepts_did.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
                 
             </nav>
 

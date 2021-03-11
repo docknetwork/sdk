@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html" class="active"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="concepts_private_delegation.html"><strong aria-hidden="true">2.6.</strong> Private Delegation</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html" class="active"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="tutorial_private_delegation.html"><strong aria-hidden="true">3.8.</strong> Private Delegation</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -164,7 +164,7 @@
                 <div id="content" class="content">
                     <main>
                         <h2 id="graphical-anchoring-utility"><a class="header" href="#graphical-anchoring-utility">Graphical Anchoring Utility</a></h2>
-<p>You can also anchor without touching any code. Visit https://fe.dock.io/#/anchor/batch for creation of anchors and https://fe.dock.io/#/anchor/check for anchor verification.</p>
+<p>You can also anchor without touching any code. Visit <a href="https://fe.dock.io/#/anchor/batch">https://fe.dock.io/#/anchor/batch</a> for creation of anchors and <a href="https://fe.dock.io/#/anchor/check">https://fe.dock.io/#/anchor/check</a> for anchor verification.</p>
 <h3 id="to-batch-or-not-to-batch"><a class="header" href="#to-batch-or-not-to-batch">To Batch, or not to Batch</a></h3>
 <p>Batching (combining multiple anchors into one) can be used to save on transaction costs by anchoring multiple documents in a single transaction as a merkle tree root.</p>
 <p>Batching does have a drawback. In order to verify a document that was anchored as part of the batch, you must provde the merkle proof that was generated when batching said file. Merkle proofs are expressed as <code>.proof.json</code> files and can be downloaded before posting the anchor. No merkle proof is required for batches containing only one document.</p>
@@ -198,6 +198,10 @@ fuction checkAnchor(file) {
                         
 
                         
+                            <a rel="next" href="tutorial_private_delegation.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
 
                         <div style="clear: both"></div>
                     </nav>
@@ -211,6 +215,10 @@ fuction checkAnchor(file) {
                     </a>
                 
 
+                
+                    <a rel="next" href="tutorial_private_delegation.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
                 
             </nav>
 

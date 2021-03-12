@@ -35,13 +35,11 @@ describe('RDF Turtle Parsing', () => {
           value: "apple",
           datatype: "http://www.w3.org/2001/XMLSchema#string",
         } },
-        { DefaultGraph: true },
       ],
       [
         { Blank: expect.anything() },
         { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest" },
         { Blank: expect.anything() },
-        { DefaultGraph: true },
       ],
       [
         { Blank: expect.anything() },
@@ -50,19 +48,16 @@ describe('RDF Turtle Parsing', () => {
           value: "banana",
           datatype: "http://www.w3.org/2001/XMLSchema#string",
         } },
-        { DefaultGraph: true },
       ],
       [
         { Blank: expect.anything() },
         { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest" },
         { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil" },
-        { DefaultGraph: true },
       ],
       [
         { Iri: "http://example.org/stuff/1.0/a" },
         { Iri: "http://example.org/stuff/1.0/b" },
         { Blank: expect.anything() },
-        { DefaultGraph: true },
       ],
     ];
 
@@ -80,13 +75,11 @@ describe('RDF Turtle Parsing', () => {
           value: "RDF/XML Syntax Specification (Revised)",
           datatype: "http://www.w3.org/2001/XMLSchema#string",
         } },
-        { DefaultGraph: true },
       ],
       [
         { Iri: "http://www.w3.org/TR/rdf-syntax-grammar" },
         { Iri: "http://example.org/stuff/1.0/editor" },
         { Blank: expect.anything() },
-        { DefaultGraph: true },
       ],
       [
         { Blank: expect.anything() },
@@ -95,13 +88,11 @@ describe('RDF Turtle Parsing', () => {
           value: "Dave Beckett",
           datatype: "http://www.w3.org/2001/XMLSchema#string",
         } },
-        { DefaultGraph: true },
       ],
       [
         { Blank: expect.anything() },
         { Iri: "http://example.org/stuff/1.0/homePage" },
         { Iri: "http://purl.org/net/dajobe/" },
-        { DefaultGraph: true },
       ],
     ];
 

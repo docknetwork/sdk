@@ -8,9 +8,6 @@ export function parseRDFDocument(document, parserOptions = {}) {
   // Parse document using N3, should return a list of quads
   const parsedResult = parser.parse(document);
 
-  // Determine if we should format as quads or triples
-  const useQuads = parsedResult.map((quad) => quad.graph.termType === 'DefaultGraph' && !quad.value).indexOf(true) === -1;
-
   // Format document to format SDK expects
   return parsedResult.map((quad) => {
     const {
@@ -20,25 +17,24 @@ export function parseRDFDocument(document, parserOptions = {}) {
       graph,
     } = quad;
 
+    // Reject if graph isnt default
+    // as rify doesnt support it otherwise
+    if (graph.termType !== 'DefaultGraph') {
+      throw new Error(`Unexpected graph, expecting DefaultGraph: ${JSON.stringify(graph.toJSON())}`);
+    }
+
     // Format subject, predicate and object terms into rify standard
     const formattedSubject = fromJsonldjsNode(subject);
     const formattedPredicate = fromJsonldjsNode(predicate);
     const formattedObject = fromJsonldjsNode(object);
+    const formattedGraph = fromJsonldjsNode(graph);
 
-    // Format result as triple
-    const result = [
+    // Format result as RDF quad
+    return [
       formattedSubject,
       formattedPredicate,
       formattedObject,
+      formattedGraph,
     ];
-
-    // Add graph to complete quad type
-    if (useQuads) {
-      // TODO: formatted graph if should be quad
-      const formattedGraph = fromJsonldjsNode(graph);
-      result.push(formattedGraph);
-    }
-
-    return result;
   });
 }

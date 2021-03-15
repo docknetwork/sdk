@@ -10,7 +10,7 @@ let ipfsClient;
  * Writes a document to IPFS and returns its CID
  * @param {string} document - RDF document to store on IPFS
  * @param {object} connectionConfig - IPFS HTTP Client connection options
- * @returns {*}
+ * @returns {Promise<any>}
  */
 export async function writeToIPFS(document, connectionConfig = ipfsDefaultConfig) {
   if (!ipfsClient) {
@@ -25,7 +25,7 @@ export async function writeToIPFS(document, connectionConfig = ipfsDefaultConfig
  * @param {string} cid - IPFS document cid hash
  * @param {object} connectionConfig - IPFS HTTP Client connection options
  * @param {object} options - IPFS HTTP Client options passed to cat
- * @returns {*}
+ * @returns {Promise<any>}
  */
 export async function dereferenceFromIPFS(cid, connectionConfig = ipfsDefaultConfig, options = {}) {
   if (!ipfsClient) {

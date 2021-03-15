@@ -6,6 +6,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: ibnesayeed/setup-ipfs@0.6.0
+        with:
+          run_daemon: true
       - uses: actions/setup-node@v1
         with:
           node-version: '13.x'

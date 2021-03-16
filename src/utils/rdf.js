@@ -1,37 +1,14 @@
 import { Parser } from 'n3';
-import createClient from 'ipfs-http-client';
 import { fromJsonldjsNode } from './claimgraph';
-
-const ipfsDefaultConfig = 'http://localhost:5001';
-
-let ipfsClient;
-
-/**
- * Writes a document to IPFS and returns its CID
- * @param {string} document - RDF document to store on IPFS
- * @param {object} connectionConfig - IPFS HTTP Client connection options
- * @returns {Promise<any>}
- */
-export async function writeToIPFS(document, connectionConfig = ipfsDefaultConfig) {
-  if (!ipfsClient) {
-    ipfsClient = createClient(connectionConfig);
-  }
-  const { cid } = await ipfsClient.add(document);
-  return cid;
-}
 
 /**
  * Dereferences a CID from IPFS into a string, expects a running node to be connected to
  * @param {string} cid - IPFS document cid hash
  * @param {object} connectionConfig - IPFS HTTP Client connection options
  * @param {object} options - IPFS HTTP Client options passed to cat
- * @returns {Promise<any>}
+ * @returns {Promise<string>}
  */
-export async function dereferenceFromIPFS(cid, connectionConfig = ipfsDefaultConfig, options = {}) {
-  if (!ipfsClient) {
-    ipfsClient = createClient(connectionConfig);
-  }
-
+export async function dereferenceFromIPFS(cid, ipfsClient, options = {}) {
   const result = [];
   const document = await ipfsClient.cat(cid, options);
   for await (const entry of document) {

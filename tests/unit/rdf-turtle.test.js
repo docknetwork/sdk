@@ -105,8 +105,4 @@ describe('RDF Turtle Parsing', () => {
       parseRDFDocument(rdfInputs[2]);
     }).toThrowError(/Unexpected graph/);
   });
-
-  // test('Can fetch RDF document from IPFS', async () => {
-  //   expect(true).toBe(false);
-  // });
 });

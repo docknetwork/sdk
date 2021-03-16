@@ -4,7 +4,7 @@ import { fromJsonldjsNode } from './claimgraph';
 /**
  * Dereferences a CID from IPFS into a string, expects a running node to be connected to
  * @param {string} cid - IPFS document cid hash
- * @param {object} connectionConfig - IPFS HTTP Client connection options
+ * @param {object} ipfsClient - The IPFS HTTP Client
  * @param {object} options - IPFS HTTP Client options passed to cat
  * @returns {Promise<string>}
  */

@@ -13,13 +13,13 @@ const rdfCID = 'QmQeskBk9TsdWXaNX26PvuzkxU8zzoWZo5dmJMPuw5vcSS';
 describe('IPFS', () => {
   let ipfsClient;
   beforeAll(done => {
-    ipfsClient = createClient(connectionConfig);
+    ipfsClient = createClient(ipfsDefaultConfig);
     done();
   });
 
   test('Can dereference document from IPFs', async () => {
     // Write document to node
-    const { cid } = await ipfsClient.add(document);
+    const { cid } = await ipfsClient.add(rdfInput);
     expect(cid.toString()).toEqual(rdfCID);
 
     // Pull document as string

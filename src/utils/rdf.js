@@ -1,5 +1,78 @@
-import { Parser } from 'n3';
+import { Parser, Store, DataFactory } from 'n3';
+import { newEngine } from '@comunica/actor-init-sparql-rdfjs';
 import { fromJsonldjsNode } from './claimgraph';
+
+export function toJsonldjsNode(node) {
+  if (node.DefaultGraph) {
+    return DataFactory.defaultGraph();
+  } else if (node.Iri) {
+    return DataFactory.namedNode(node.Iri);
+  } else if (node.Blank) {
+    return DataFactory.blankNode(node.Blank);
+  } else if (node.Literal) {
+    return DataFactory.literal(node.Literal.value, {
+      value: node.Literal.datatype,
+      language: node.Literal.language,
+    });
+  }
+
+  throw new Error(`Unable to determine node type: ${node}`);
+}
+
+/**
+ * Converts a claimgraph JSON represntation into an N3 RDF store
+ * @returns {Store}
+ */
+export function claimgraphToStore(claimgraph) {
+  const store = new Store();
+  claimgraph.forEach((quad) => {
+    const subject = quad[0];
+    const predicate = quad[1];
+    const object = quad[2];
+    const graph = quad.length > 3 ? toJsonldjsNode(quad[3]) : undefined;
+
+    store.addQuad(DataFactory.quad(
+      toJsonldjsNode(subject),
+      toJsonldjsNode(predicate),
+      toJsonldjsNode(object),
+      graph,
+    ));
+  });
+  return store;
+}
+
+export async function queryClaimgraph(claimgraph, query, engine = null) {
+  // Create an N3 store from claimgraph JSON object
+  const store = claimgraphToStore(claimgraph);
+
+  // Query the engine, if querying multiple times user should
+  // pass engine parameter for optimal performance
+  const myEngine = engine || newEngine();
+  const result = await myEngine.query(query, { sources: [store] });
+
+  // Get bindings from query
+  const bindings = await result.bindings();
+
+  // Convert bindings to claimgraph format
+  return bindings.map((binding) => {
+    const subject = binding.get('?s');
+    const object = binding.get('?o');
+    const predicate = binding.get('?p');
+
+    // Format subject, predicate and object terms into rify standard
+    const formattedSubject = fromJsonldjsNode(subject);
+    const formattedPredicate = fromJsonldjsNode(predicate);
+    const formattedObject = fromJsonldjsNode(object);
+
+    // Format result as RDF triple
+    // TODO: UNSURE: do we provide a graph object and format as a quad here?
+    return [
+      formattedSubject,
+      formattedPredicate,
+      formattedObject,
+    ];
+  });
+}
 
 /**
  * Dereferences a CID from IPFS into a string, expects a running node to be connected to

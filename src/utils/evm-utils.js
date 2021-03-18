@@ -1,4 +1,3 @@
-import Web3 from 'web3';
 import { blake2AsHex, decodeAddress } from '@polkadot/util-crypto';
 import { hexToU8a, u8aToHex, bnToBn } from '@polkadot/util';
 import { asDockAddress } from './codec';
@@ -13,13 +12,16 @@ const {
 export function evmAddrToSubstrateAddr(evmAddr) {
   const bytes = hexToU8a(evmAddr);
   // Hash(evm:||EVM address) => Substrate address
-  const preimage = ('evm:'.split('').map((c) => c.charCodeAt())).concat(...bytes);
+  const prefix = 'evm:';
+  const preimage = [0, 1, 2, 3].map((i) => prefix.charCodeAt(i)).concat(...bytes);
+  // @ts-ignore
   return asDockAddress(blake2AsHex(preimage), Network);
 }
 
 // Convert Substrate address to EVM address
 export function substrateAddrToEVMAddr(address) {
   const bytes = decodeAddress(address);
+  // @ts-ignore
   return u8aToHex(Array.from(bytes.slice(0, 20)));
 }
 

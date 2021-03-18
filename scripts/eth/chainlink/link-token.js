@@ -1,7 +1,7 @@
 import { LinkTokenABI, LinkTokenByteCode } from './bytecodes-and-abis';
 
 import {
-  deployContract,
+  deployContract, endowEVMAddressWithDefault,
   getTestEVMAccountsFromWeb3, getTokenBalance, getWeb3, sendTokens,
 } from '../helpers';
 
@@ -9,6 +9,8 @@ async function main() {
   const web3 = getWeb3();
 
   const [alice, bob] = getTestEVMAccountsFromWeb3(web3);
+  await endowEVMAddressWithDefault(alice.address);
+  await endowEVMAddressWithDefault(bob.address);
 
   console.log(`Generated accounts ${alice.address}, ${bob.address}`);
 
@@ -26,6 +28,7 @@ async function main() {
 
   console.log(`Alice's balance ${(await getTokenBalance(web3, contractAddr, LinkTokenABI, alice.address))}`);
   console.log(`Bob's balance ${(await getTokenBalance(web3, contractAddr, LinkTokenABI, bob.address))}`);
+  process.exit(0);
 }
 
 main().catch((err) => {

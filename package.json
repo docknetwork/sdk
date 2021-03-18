@@ -15,7 +15,6 @@
     "@babel/core": "^7.8.7",
     "@babel/node": "^7.8.7",
     "@babel/preset-env": "^7.8.7",
-    "@ethersproject/abstract-provider": "^5.0.9",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-wasm": "^5.1.0",
     "@types/jest": "^25.2.1",

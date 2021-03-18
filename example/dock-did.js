@@ -15,8 +15,7 @@ import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 
 // DID will be generated randomly
-// const dockDID = createNewDockDID();
-const dockDID = '0x99671527b075a2218a6acf3ea891dc277999c90bd2ccd69921529bf59ec6785d';
+const dockDID = createNewDockDID();
 
 // Generate first key with this seed. The key type is Sr25519
 // const firstKeySeed = randomAsHex(32);

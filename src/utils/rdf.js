@@ -53,25 +53,8 @@ export async function queryClaimgraph(claimgraph, query, engine = null) {
   // Get bindings from query
   const bindings = await result.bindings();
 
-  // Convert bindings to claimgraph format
-  return bindings.map((binding) => {
-    const subject = binding.get('?s');
-    const object = binding.get('?o');
-    const predicate = binding.get('?p');
-
-    // Format subject, predicate and object terms into rify standard
-    const formattedSubject = fromJsonldjsNode(subject);
-    const formattedPredicate = fromJsonldjsNode(predicate);
-    const formattedObject = fromJsonldjsNode(object);
-
-    // Format result as RDF triple
-    // TODO: UNSURE: do we provide a graph object and format as a quad here?
-    return [
-      formattedSubject,
-      formattedPredicate,
-      formattedObject,
-    ];
-  });
+  // Convert bindings to claimgraph format using lookupNext variable
+  return bindings.map((binding) => fromJsonldjsNode(binding.get('?lookupNext')));
 }
 
 /**

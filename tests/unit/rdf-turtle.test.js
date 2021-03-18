@@ -64,33 +64,18 @@ const claimgraph2 = [
 
 describe('RDF SPARQL', () => {
   test('Can query an RDF source (dbpedia)', async () => {
-    const query = 'SELECT * { ?s ?p <http://dbpedia.org/resource/Belgium>. ?s ?p ?o } LIMIT 2';
+    const query = 'SELECT * { ?s ?p <http://dbpedia.org/resource/Belgium>. ?s ?p ?lookupNext } LIMIT 2';
     const newGraph = await queryClaimgraph(dbpediaSource, query);
-    expect(newGraph).toEqual([[
-      { Iri: 'a' },
-      { Iri: 'b' },
+    expect(newGraph).toEqual([
       { Iri: 'http://dbpedia.org/resource/Belgium' }
-    ]]);
+    ]);
   });
 
   test('Can query an RDF claimgraph', async () => {
-    const query = 'SELECT * { <https://example.com/credentials/1872> ?p ?o. ?s ?p ?o } LIMIT 100';
+    const query = 'SELECT * { <https://example.com/credentials/1872> ?p ?o. ?lookupNext ?p ?o } LIMIT 100';
     const newGraph = await queryClaimgraph(claimgraph2, query);
     expect(newGraph).toEqual([
-      [
-        {
-          "Iri": "https://example.com/credentials/1872"
-        },
-        {
-          "Literal": {
-            "value": "Example University",
-            "datatype": "http://www.w3.org/1999/02/22-rdf-syntax-ns#HTML"
-          }
-        },
-        {
-          "Blank": "bc_0__:b11"
-        }
-      ]
+      { Iri: "https://example.com/credentials/1872" },
     ]);
   });
 

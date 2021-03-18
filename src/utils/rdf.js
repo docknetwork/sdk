@@ -4,7 +4,7 @@ import { newEngine } from '@comunica/actor-init-sparql-rdfjs';
 import { fromJsonldjsNode } from './claimgraph';
 
 /**
- * Converts a claimgraph JSON represntation into an N3 RDF store
+ * Converts a a JSON-LD RDF object to N3 data type
  * @param {object} node - JSON-LD RDF representation object
  * @returns {any}
  */
@@ -26,7 +26,8 @@ export function toJsonldjsNode(node) {
 }
 
 /**
- * Converts a claimgraph JSON represntation into an N3 RDF store
+ * Converts a claimgraph JSON representation into an N3 RDF store
+ * @param {object} claimgraph - JSON-LD RDF object
  * @returns {Store}
  */
 export function claimgraphToStore(claimgraph) {
@@ -46,6 +47,13 @@ export function claimgraphToStore(claimgraph) {
   return store;
 }
 
+/**
+ * Queries a claimgraph object and returns its bindings as an RDF term list
+ * @param {object} claimgraph - JSON-LD RDF object
+ * @param {string} query - SPARQL query string
+ * @param {object|null} engine - RDF query engine or null to auto-create
+ * @returns {array<any>}
+ */
 export async function queryClaimgraph(claimgraph, query, engine = null) {
   // Create an N3 store from claimgraph JSON object
   const store = typeof claimgraph === 'string' ? claimgraph : claimgraphToStore(claimgraph);

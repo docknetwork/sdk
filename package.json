@@ -53,7 +53,6 @@
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "test": "jest --verbose ./tests/unit",
-    "test-ql": "NODE_ENV=production jest --verbose --runInBand ./tests/unit/rdf",
     "test-integration": "NODE_ENV=production jest --verbose --runInBand ./tests/integration",
     "test-poa": "NODE_ENV=production jest --verbose --runInBand ./tests/poa",
     "docs": "mkdir out && touch out/.nojekyll && jsdoc src -r -c .jsdoc -d out/reference",

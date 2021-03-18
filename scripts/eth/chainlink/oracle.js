@@ -10,7 +10,7 @@ async function main() {
   const [, bob] = getTestEVMAccountsFromWeb3(web3);
 
   // Assumes Link token is deployed and address is known.
-  const linkTokenAddr = '0xEF681D401f60FCBBb5BB32edbcA72a85dD2b7bff';
+  const linkTokenAddr = '0x8cB6497CDB9D44E168C076B414e4a675ebCC8683';
 
   // Oracle contract takes Link token address as constructor argument.
   const argsABI = web3.eth.abi.encodeParameters(['address'], [linkTokenAddr]);

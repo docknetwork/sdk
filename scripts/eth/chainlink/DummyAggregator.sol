@@ -54,3 +54,22 @@ contract DummyAggregator {
     );
   }
 }
+
+// Proxy over the DummyAggregator.
+contract DummyAggregatorProxy {
+  address private aggr;
+
+  constructor(address _aggregator) public {
+    aggr = _aggregator;
+  }
+
+  function aggregator() external view returns (address)
+  {
+    return aggr;
+  }
+
+  function setAggregator(address _aggregator) external
+  {
+    aggr = _aggregator;
+  }
+}

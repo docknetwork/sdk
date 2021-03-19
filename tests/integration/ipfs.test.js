@@ -26,4 +26,10 @@ describe('IPFS', () => {
     const document = await dereferenceFromIPFS(rdfCID, ipfsClient);
     expect(document).toEqual(rdfInput);
   }, 10000);
+
+  test('Dereference from IPNS fails', async () => {
+    await expect(
+      dereferenceFromIPFS('/ipns/QmSrPmbaUKA3ZodhzPWZnpFgcPMFWF4QsxXbkWfEptTBJd', ipfsClient),
+    ).rejects.toThrow();
+  }, 10000);
 });

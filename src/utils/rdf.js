@@ -9,6 +9,10 @@ import { fromJsonldjsNode } from './claimgraph';
  * @returns {Promise<string>}
  */
 export async function dereferenceFromIPFS(cid, ipfsClient, options = {}) {
+  if (cid.indexOf('/ipns/') !== -1) {
+    throw new Error(`Dereferencing of IPNS documents is disabled in this method, cid: ${cid}`);
+  }
+
   const result = [];
   const document = await ipfsClient.cat(cid, options);
   for await (const entry of document) {

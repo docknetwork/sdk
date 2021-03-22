@@ -83,8 +83,7 @@ dock.init({
   address: FullNodeEndpoint,
 })
   .then(() => {
-    console.log(`Using ${TestAccountURI}`);
-    const account = dock.keyring.addFromUri('super hope entire section nice student copy cotton oven aware water note');
+    const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
     return registerNewDID();
   })

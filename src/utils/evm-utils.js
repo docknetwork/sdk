@@ -27,10 +27,13 @@ export function substrateAddrToEVMAddr(address) {
 
 // Give `amount` of Dock tokens to EVM address. `amount` defaults to the number of tokens required to pay of maximum gas
 export function endowEVMAddress(dock, evmAddr, amount) {
+  //  Convert EVM address to a Substrate address
   const substrateAddr = evmAddrToSubstrateAddr(evmAddr);
+
   // Selecting the amount such that it can pay fees for the upto the maximum gas allowed and some extra
   const amt = amount !== undefined ? amount : bnToBn(MinGasPrice).mul(bnToBn(MaxGas)).muln(2);
 
+  // Transfer to the Substrate address created above
   const transfer = dock.api.tx.balances.transfer(substrateAddr, amt);
   return dock.signAndSend(transfer, false);
 }

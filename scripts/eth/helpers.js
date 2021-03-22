@@ -17,7 +17,7 @@ export function getTestPrivKeysForEVMAccounts() {
   return [alice, bob, carol, dave];
 }
 
-// Returns some test accounts
+// Returns some test EVM accounts
 export function getTestEVMAccountsFromWeb3(web3) {
   return getTestPrivKeysForEVMAccounts().map((k) => web3.eth.accounts.privateKeyToAccount(k));
 }

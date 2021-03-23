@@ -49,7 +49,7 @@ export function claimgraphToStore(claimgraph) {
 
 /**
  * Queries a claimgraph object and returns its bindings as an RDF term list
- * @param {object} claimgraph - JSON-LD RDF object
+ * @param {object} claimgraph - A list of RDF quads
  * @param {string} query - SPARQL query string
  * @param {object|null} engine - RDF query engine or null to auto-create
  * @returns {array<any>}

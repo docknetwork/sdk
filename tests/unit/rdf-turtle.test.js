@@ -74,8 +74,8 @@ describe('RDF SPARQL', () => {
         ?lookupNext dockalpha:mayClaim dockalpha:ANYCLAIM .
       }
     }`;
-    const newGraph = await queryClaimgraph(claimgraph, query);
-    expect(newGraph).toEqual([
+    const queryResult = await queryClaimgraph(claimgraph, query);
+    expect(queryResult).toEqual([
       { Iri: 'did:b' },
     ]);
   });

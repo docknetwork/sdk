@@ -185,3 +185,43 @@ export async function createSignedDidRemoval(didModule, did, currentKeyPair) {
   const signature = signDidRemoval(didModule, didRemoval, currentKeyPair);
   return [didRemoval, signature];
 }
+
+/**
+ * Create and return a `Attestation` as expected by the Substrate node. Signing is intentionally kept separate as the
+ * JS code may not have access to the signing key like in case of hardware wallet.
+ * @param {Number} priority - Attestation priority
+ * @param {string | null} iri - Attestation iri
+ * @returns {object} The object has structure and keys with same names as expected by the Substrate node
+ */
+export function createDidAttestation(priority, iri) {
+  return {
+    priority,
+    iri,
+  };
+}
+
+/**
+ * Sign the given `Attestation` and returns the signature
+ * @param {module} didModule - The did module
+ * @param {object} attestation - `Attestation` as expected by the Substrate node
+ * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
+ * @returns {Signature}
+ */
+export function signDidAttestation(didModule, did, attestation, currentKeyPair) {
+  const serializedAttestation = didModule.getSerializedAttestation(did, attestation);
+  return getSignatureFromKeyringPair(currentKeyPair, serializedAttestation);
+}
+
+/**
+ * Create a `Attestation` as expected by the Substrate node and signs it. Return the `Attestation` object and the signature
+ * @param {module} didModule - The did module
+ * @param {Number} priority - Attestation priority
+ * @param {string | null} iri - Attestation iri
+ * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
+ * @returns {Promise<array>} A 2 element array where the first element is the `Attestation` and the second is the signature
+ */
+export async function createSignedAttestation(didModule, did, priority, iri, currentKeyPair) {
+  const attestation = createDidAttestation(priority, iri);
+  const signature = signDidAttestation(didModule, did, attestation, currentKeyPair);
+  return [attestation, signature];
+}

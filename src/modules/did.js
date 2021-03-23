@@ -1,4 +1,5 @@
 import { encodeAddress } from '@polkadot/util-crypto';
+import { u8aToString, hexToU8a } from '@polkadot/util';
 import b58 from 'bs58';
 
 import {
@@ -7,6 +8,8 @@ import {
 import { getStateChange } from '../utils/misc';
 
 import Signature from '../signatures/signature'; // eslint-disable-line
+
+export const ATTESTS_IRI = 'https://rdf.dock.io/alpha/2021#attestsDocumentContents';
 
 /** Class to create, update and destroy DIDs */
 class DIDModule {
@@ -83,12 +86,34 @@ class DIDModule {
   }
 
   /**
+   * Creates an attestation claim on chain for a specific DID
+   * @param {string} attester - Attester's DID
+   * @param {object} attestation - Attestation object with priority and iri
+   * @param {Signature} signature - Signature from existing key
+   */
+  async setClaim(attester, attestation, signature, waitForFinalization = true, params = {}) {
+    const hexId = getHexIdentifierFromDID(attester);
+    const attestTx = this.api.tx.attest.setClaim(hexId, attestation, signature.toJSON());
+    return await this.signAndSend(attestTx, waitForFinalization, params);
+  }
+
+  /**
    * Create the fully qualified DID like "did:dock:..."
    * @param {string} did - DID
    * @return {string} The DID identifier.
    */
   getFullyQualifiedDID(did) {
     return `${DockDIDQualifier}${did}`;
+  }
+
+  /**
+   * Fetches the DIDs attestations IRI from the chain
+   * @param {string} hexId - DID in hex format
+   * @return {Promise<string | null>} The DID's attestation, if any
+   */
+  async getAttests(hexId) {
+    const attests = await this.api.query.attest.attestations(hexId);
+    return attests.iri.isSome ? u8aToString(hexToU8a(attests.iri.toString())) : null;
   }
 
   /**
@@ -101,6 +126,9 @@ class DIDModule {
   async getDocument(did) {
     const hexId = getHexIdentifierFromDID(did);
     const detail = (await this.getDetail(hexId))[0];
+
+    // Get DIDs attestations
+    const attests = await this.getAttests(hexId);
 
     // If given DID was in hex, encode to SS58 and then construct fully qualified DID else the DID was already fully qualified
     const id = (did === hexId) ? this.getFullyQualifiedDID(encodeAddress(hexId)) : did;
@@ -147,7 +175,8 @@ class DIDModule {
     //   serviceEndpoint: 'https://dock.io/vc/'
     // }];
 
-    return {
+    // Construct document
+    const document = {
       '@context': 'https://www.w3.org/ns/did/v1',
       id,
       authentication,
@@ -155,6 +184,13 @@ class DIDModule {
       publicKey: publicKeys,
       // service,
     };
+
+    // Assign attestations
+    if (attests) {
+      document[ATTESTS_IRI] = attests;
+    }
+
+    return document;
   }
 
   /**
@@ -210,6 +246,16 @@ class DIDModule {
    */
   getSerializedDIDRemoval(didRemoval) {
     return getStateChange(this.api, 'DidRemoval', didRemoval);
+  }
+
+  /**
+   * Serializes an `Attestation` for signing.
+   * @param {object} attestation - `Attestation` as expected by the Substrate node
+   * @returns {Array} An array of Uint8
+   */
+  getSerializedAttestation(did, attestation) {
+    const hexId = getHexIdentifierFromDID(did);
+    return getStateChange(this.api, 'Attestation', [hexId, attestation]);
   }
 }
 

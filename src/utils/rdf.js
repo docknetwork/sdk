@@ -49,14 +49,14 @@ export function claimgraphToStore(claimgraph) {
 
 /**
  * Queries a claimgraph object and returns all the bindings to the variable named `?lookupNext`
- * @param {object} claimgraph - A list of RDF quads
+ * @param {array<object>} claimgraph - A list of RDF quads
  * @param {string} query - SPARQL query string
  * @param {object|null} engine - RDF query engine or null to auto-create
  * @returns {array<any>}
  */
 export async function queryNextLookup(claimgraph, query, engine = null) {
   // Create an N3 store from claimgraph JSON object
-  const store = typeof claimgraph === 'string' ? claimgraph : claimgraphToStore(claimgraph);
+  const store = claimgraphToStore(claimgraph);
 
   // Query the engine, if querying multiple times user should
   // pass engine parameter for optimal performance

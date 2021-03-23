@@ -54,7 +54,7 @@ export function claimgraphToStore(claimgraph) {
  * @param {object|null} engine - RDF query engine or null to auto-create
  * @returns {array<any>}
  */
-export async function queryClaimgraph(claimgraph, query, engine = null) {
+export async function queryNextLookup(claimgraph, query, engine = null) {
   // Create an N3 store from claimgraph JSON object
   const store = typeof claimgraph === 'string' ? claimgraph : claimgraphToStore(claimgraph);
 

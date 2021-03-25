@@ -74,7 +74,6 @@ export async function sendEVMTxn(web3, signer, to, bytecode, value, gasPrice, ga
       gas: gas !== undefined ? gas : web3.utils.toBN(MaxGas),
     },
   );
-
   const txnReceipt = await web3.eth.sendSignedTransaction(txn.rawTransaction);
   console.log(`Txn executed (H: ${txnReceipt.transactionHash})`);
   return txnReceipt;

@@ -52,6 +52,8 @@ async function main() {
   // Withdraw from the intermediate address to the Substrate address sending this transaction, i.e. Jacob
   const withdraw = dock.api.tx.evm.withdraw(intermediateAddress, 1000);
   await dock.signAndSend(withdraw, false);
+  await dock.disconnect();
+
   console.log((await web3.eth.getBalance(intermediateAddress)));
 }
 

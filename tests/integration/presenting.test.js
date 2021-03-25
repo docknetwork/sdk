@@ -84,8 +84,6 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     // Issuer issues credential with id `credId1` to holder with DID `holder1DID`
     cred1 = await issueCredential(issuerKeyDoc, getUnsignedCred(credId1, holder1DID));
 
-    console.log(cred1);
-
     // Issuer issues credential with id `credId2` to holder with DID `holder2DID`
     cred2 = await issueCredential(issuerKeyDoc, getUnsignedCred(credId2, holder2DID));
 
@@ -147,8 +145,6 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
         resolver,
       );
       
-      console.log(signedPres);
-
       expect(signedPres).toMatchObject(
         expect.objectContaining(
           {

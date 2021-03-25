@@ -59,7 +59,6 @@ async function getDIDDoc() {
   // Check if DID exists
   const result = await dock.did.getDocument(dockDID);
   console.log('DID Document:', JSON.stringify(result, null, 2));
-  process.exit(0);
   return result;
 }
 

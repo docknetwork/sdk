@@ -1,5 +1,74 @@
-import { Parser } from 'n3';
+// @ts-nocheck
+import { Parser, Store, DataFactory } from 'n3';
+import { newEngine } from '@comunica/actor-init-sparql-rdfjs';
 import { fromJsonldjsNode } from './claimgraph';
+
+/**
+ * Converts a a JSON-LD RDF object to N3 data type
+ * @param {object} node - JSON-LD RDF representation object
+ * @returns {any}
+ */
+export function toJsonldjsNode(node) {
+  if (node.DefaultGraph) {
+    return DataFactory.defaultGraph();
+  } else if (node.Iri) {
+    return DataFactory.namedNode(node.Iri);
+  } else if (node.Blank) {
+    return DataFactory.blankNode(node.Blank);
+  } else if (node.Literal) {
+    return DataFactory.literal(node.Literal.value, {
+      value: node.Literal.datatype,
+      language: node.Literal.language,
+    });
+  }
+
+  throw new Error(`Unable to determine node type: ${node}`);
+}
+
+/**
+ * Converts a claimgraph JSON representation into an N3 RDF store
+ * @param {object} claimgraph - JSON-LD RDF object
+ * @returns {Store}
+ */
+export function claimgraphToStore(claimgraph) {
+  const store = new Store();
+  claimgraph.forEach((quad) => {
+    const subject = quad[0];
+    const predicate = quad[1];
+    const object = quad[2];
+    const graph = quad.length > 3 ? toJsonldjsNode(quad[3]) : undefined;
+    store.addQuad(DataFactory.quad(
+      toJsonldjsNode(subject),
+      toJsonldjsNode(predicate),
+      toJsonldjsNode(object),
+      graph,
+    ));
+  });
+  return store;
+}
+
+/**
+ * Queries a claimgraph object and returns all the bindings to the variable named `?lookupNext`
+ * @param {array<object>} claimgraph - A list of RDF quads
+ * @param {string} query - SPARQL query string
+ * @param {object|null} engine - RDF query engine or null to auto-create
+ * @returns {array<any>}
+ */
+export async function queryNextLookup(claimgraph, query, engine = null) {
+  // Create an N3 store from claimgraph JSON object
+  const store = claimgraphToStore(claimgraph);
+
+  // Query the engine, if querying multiple times user should
+  // pass engine parameter for optimal performance
+  const myEngine = engine || newEngine();
+  const result = await myEngine.query(query, { sources: [store] });
+
+  // Get bindings from query
+  const bindings = await result.bindings();
+
+  // Convert bindings to claimgraph format using lookupNext variable
+  return bindings.map((binding) => fromJsonldjsNode(binding.get('?lookupNext')));
+}
 
 /**
  * Dereferences a CID from IPFS into a string, expects a running node to be connected to

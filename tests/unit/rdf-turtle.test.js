@@ -1,4 +1,4 @@
-import { parseRDFDocument } from '../../src/utils/rdf';
+import { parseRDFDocument, queryNextLookup } from '../../src/utils/rdf';
 
 const rdfInputs = [
   `
@@ -23,6 +23,63 @@ const rdfInputs = [
     _:subject2 <http://an.example/predicate2> "object2" <http://example.org/graph5> .
   `
 ];
+
+const dbpediaSource = [
+  [
+    { Iri: 'a' },
+    { Iri: 'b' },
+    { Iri: 'http://dbpedia.org/resource/Belgium' }
+  ],
+  [
+    { Iri: 'c' },
+    { Iri: 'd' },
+    { Iri: 'http://dbpedia.org/resource/Ghent' }
+  ],
+  [
+    { Iri: 'c' },
+    { Iri: 'd' },
+    { Iri: 'http://dbpedia.org/resource/Austria' }
+  ]
+];
+
+const claimgraph = [
+  [
+    { Iri: 'did:a' },
+    { Iri: 'http://rdf.dock.io/alpha/2021#mayClaim' },
+    { Iri: 'http://rdf.dock.io/alpha/2021#ANYCLAIM' },
+    { DefaultGraph: true },
+  ],
+  [
+    { Iri: 'did:b' },
+    { Iri: 'http://rdf.dock.io/alpha/2021#mayClaim' },
+    { Iri: 'http://rdf.dock.io/alpha/2021#ANYCLAIM' },
+    { Iri: 'did:a' },
+  ],
+];
+
+describe('RDF SPARQL', () => {
+  test('Can query an RDF source (dbpedia)', async () => {
+    const query = 'SELECT * { ?s ?p <http://dbpedia.org/resource/Belgium>. ?s ?p ?lookupNext } LIMIT 2';
+    const newGraph = await queryNextLookup(dbpediaSource, query);
+    expect(newGraph).toEqual([
+      { Iri: 'http://dbpedia.org/resource/Belgium' }
+    ]);
+  });
+
+  test('Can query a claimgraph', async () => {
+    const query = `prefix dockalpha: <http://rdf.dock.io/alpha/2021#>
+    select * {
+      ?root dockalpha:mayClaim dockalpha:ANYCLAIM .
+      graph ?root {
+        ?lookupNext dockalpha:mayClaim dockalpha:ANYCLAIM .
+      }
+    }`;
+    const queryResult = await queryNextLookup(claimgraph, query);
+    expect(queryResult).toEqual([
+      { Iri: 'did:b' },
+    ]);
+  });
+});
 
 describe('RDF Turtle Parsing', () => {
   test('Can parse and format RDF test 1', async () => {

@@ -75,6 +75,7 @@
     "@polkadot/util-crypto": "5.1.1"
   },
   "dependencies": {
+    "@comunica/actor-init-sparql-rdfjs": "^1.19.2",
     "@polkadot/api": "3.1.1",
     "@polkadot/keyring": "5.1.1",
     "@polkadot/types": "3.1.1",

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: utils/revocation/one-of-policy.js</title>
+    <title>JSDoc: Source: utils/rdf.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: utils/revocation/one-of-policy.js</h1>
+    <h1 class="page-title">Source: utils/rdf.js</h1>
 
     
 
@@ -26,56 +26,138 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import { BTreeSet } from '@polkadot/types';
+            <pre class="prettyprint source linenums"><code>// @ts-nocheck
+import { Parser, Store, DataFactory } from 'n3';
+import { newEngine } from '@comunica/actor-init-sparql-rdfjs';
+import { fromJsonldjsNode } from './claimgraph';
 
-import { getHexIdentifierFromDID } from '../did';
-import Policy from './policy';
-
-// Revocation policy that allows one of the pre-decided controllers to update the registry.
-export default class OneOfPolicy extends Policy {
-  /**
-   * Constructs a OneOfPolicy with given controllers
-   * @param {any} [controllers] - Controller set
-   * @constructor
-   */
-  constructor(controllers = null) {
-    super();
-    this.controllers = controllers || new Set();
-  }
-
-  /**
-   * Add a owner to the policy
-   * @param {string} ownerDID - Owner's DID
-   */
-  addOwner(ownerDID) {
-    this.controllers.add(ownerDID);
-  }
-
-  /**
-   * Converts policy to JSON object
-   * @returns {object}
-   */
-  toJSON() {
-    // Convert each owner DID to hex identifier if not already
-    const controllerIds = [...this.controllers].map(getHexIdentifierFromDID);
-
-    // Sort the controller ids as the node is expecting sorted ids and keeping ids unsorted is giving a signature
-    // verification error. This is a workaround and is needed for now. It maybe fixed later
-    controllerIds.sort();
-
-    // Create BtreeSet from controller ids as the node expects it.
-    // BTreeSet can be initialed without argument.
-    // @ts-ignore
-    const controllerSet = new BTreeSet();
-    controllerIds.forEach((cnt) => {
-      // @ts-ignore
-      controllerSet.add(cnt);
+/**
+ * Converts a a JSON-LD RDF object to N3 data type
+ * @param {object} node - JSON-LD RDF representation object
+ * @returns {any}
+ */
+export function toJsonldjsNode(node) {
+  if (node.DefaultGraph) {
+    return DataFactory.defaultGraph();
+  } else if (node.Iri) {
+    return DataFactory.namedNode(node.Iri);
+  } else if (node.Blank) {
+    return DataFactory.blankNode(node.Blank);
+  } else if (node.Literal) {
+    return DataFactory.literal(node.Literal.value, {
+      value: node.Literal.datatype,
+      language: node.Literal.language,
     });
-
-    return {
-      OneOf: controllerSet,
-    };
   }
+
+  throw new Error(`Unable to determine node type: ${node}`);
+}
+
+/**
+ * Converts a claimgraph JSON representation into an N3 RDF store
+ * @param {object} claimgraph - JSON-LD RDF object
+ * @returns {Store}
+ */
+export function claimgraphToStore(claimgraph) {
+  const store = new Store();
+  claimgraph.forEach((quad) => {
+    const subject = quad[0];
+    const predicate = quad[1];
+    const object = quad[2];
+    const graph = quad.length > 3 ? toJsonldjsNode(quad[3]) : undefined;
+    store.addQuad(DataFactory.quad(
+      toJsonldjsNode(subject),
+      toJsonldjsNode(predicate),
+      toJsonldjsNode(object),
+      graph,
+    ));
+  });
+  return store;
+}
+
+/**
+ * Queries a claimgraph object and returns all the bindings to the variable named `?lookupNext`
+ * @param {array&lt;object>} claimgraph - A list of RDF quads
+ * @param {string} query - SPARQL query string
+ * @param {object|null} engine - RDF query engine or null to auto-create
+ * @returns {array&lt;any>}
+ */
+export async function queryNextLookup(claimgraph, query, engine = null) {
+  // Create an N3 store from claimgraph JSON object
+  const store = claimgraphToStore(claimgraph);
+
+  // Query the engine, if querying multiple times user should
+  // pass engine parameter for optimal performance
+  const myEngine = engine || newEngine();
+  const result = await myEngine.query(query, { sources: [store] });
+
+  // Get bindings from query
+  const bindings = await result.bindings();
+
+  // Convert bindings to claimgraph format using lookupNext variable
+  return bindings.map((binding) => fromJsonldjsNode(binding.get('?lookupNext')));
+}
+
+/**
+ * Dereferences a CID from IPFS into a string, expects a running node to be connected to
+ * @param {string} cid - IPFS document cid hash
+ * @param {object} ipfsClient - The IPFS HTTP Client
+ * @param {object} options - IPFS HTTP Client options passed to cat
+ * @returns {Promise&lt;string>}
+ */
+export async function dereferenceFromIPFS(cid, ipfsClient, options = {}) {
+  if (cid.indexOf('/ipns/') !== -1) {
+    throw new Error(`Dereferencing of IPNS documents is disabled in this method, cid: ${cid}`);
+  }
+
+  const result = [];
+  const document = await ipfsClient.cat(cid, options);
+  for await (const entry of document) {
+    result.push(entry.toString());
+  }
+
+  return result.join('\n');
+}
+
+/**
+ * Parses an RDF document string and formats it according to rify requirements
+ * @param {string} document - RDF document in turtle or other form
+ * @param {object} parserOptions - N3 Parser configuration object
+ * @returns {*}
+ */
+export function parseRDFDocument(document, parserOptions = {}) {
+  const parser = new Parser(parserOptions);
+
+  // Parse document using N3, should return a list of quads
+  const parsedResult = parser.parse(document);
+
+  // Format document to format SDK expects which is a
+  // list of triples as quads are assumed to have DefaultGraph
+  return parsedResult.map((quad) => {
+    const {
+      subject,
+      predicate,
+      object,
+      graph,
+    } = quad;
+
+    // Reject if graph isnt default as rify doesnt support it otherwise
+    if (graph.termType !== 'DefaultGraph') {
+      throw new Error(`Unexpected graph, expecting DefaultGraph: ${JSON.stringify(graph.toJSON())}`);
+    }
+
+    // Format subject, predicate and object terms into rify standard
+    const formattedSubject = fromJsonldjsNode(subject);
+    const formattedPredicate = fromJsonldjsNode(predicate);
+    const formattedObject = fromJsonldjsNode(object);
+
+    // Format result as RDF triple
+    return [
+      formattedSubject,
+      formattedPredicate,
+      formattedObject,
+    ];
+  });
 }
 </code></pre>
         </article>

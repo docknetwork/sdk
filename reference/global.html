@@ -2138,6 +2138,161 @@ which is true if the credential is not revoked and false otherwise. The `error` 
     
 
     
+    <h4 class="name" id="claimgraphToStore"><span class="type-signature"></span>claimgraphToStore<span class="signature">(claimgraph)</span><span class="type-signature"> &rarr; {Store}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Converts a claimgraph JSON representation into an N3 RDF store
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>claimgraph</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">JSON-LD RDF object</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_rdf.js.html">utils/rdf.js</a>, <a href="utils_rdf.js.html#line33">line 33</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Store</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="createDidAttestation"><span class="type-signature"></span>createDidAttestation<span class="signature">(priority, iri)</span><span class="type-signature"> &rarr; {object}</span></h4>
     
 
@@ -4556,6 +4711,207 @@ The resulting claimgraph is in Explicit Ethos form.
     <dd>
         
 <span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="dereferenceFromIPFS"><span class="type-signature"></span>dereferenceFromIPFS<span class="signature">(cid, ipfsClient, options)</span><span class="type-signature"> &rarr; {Promise.&lt;string>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Dereferences a CID from IPFS into a string, expects a running node to be connected to
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>cid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">IPFS document cid hash</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>ipfsClient</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The IPFS HTTP Client</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">IPFS HTTP Client options passed to cat</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_rdf.js.html">utils/rdf.js</a>, <a href="utils_rdf.js.html#line80">line 80</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;string></span>
 
 
     </dd>
@@ -13312,6 +13668,184 @@ describe the error if any.
     
 
     
+    <h4 class="name" id="parseRDFDocument"><span class="type-signature"></span>parseRDFDocument<span class="signature">(document, parserOptions)</span><span class="type-signature"> &rarr; {*}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Parses an RDF document string and formats it according to rify requirements
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>document</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">RDF document in turtle or other form</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>parserOptions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">N3 Parser configuration object</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_rdf.js.html">utils/rdf.js</a>, <a href="utils_rdf.js.html#line100">line 100</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="presentationToEEClaimGraph"><span class="type-signature"></span>presentationToEEClaimGraph<span class="signature">(expandedPresentation)</span><span class="type-signature"> &rarr; {Promise.&lt;Array.&lt;Object>>}</span></h4>
     
 
@@ -13640,6 +14174,210 @@ This function throws an error if the requested composite claims are unprovable.
     <dd>
         
 <span class="param-type">Promise.&lt;Object></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="queryNextLookup"><span class="type-signature"></span>queryNextLookup<span class="signature">(claimgraph, query, engine)</span><span class="type-signature"> &rarr; {array.&lt;any>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Queries a claimgraph object and returns all the bindings to the variable named `?lookupNext`
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>claimgraph</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array.&lt;object></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A list of RDF quads</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>query</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">SPARQL query string</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>engine</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+|
+
+<span class="param-type">null</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">RDF query engine or null to auto-create</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_rdf.js.html">utils/rdf.js</a>, <a href="utils_rdf.js.html#line57">line 57</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">array.&lt;any></span>
 
 
     </dd>
@@ -17954,6 +18692,161 @@ keep resetting the `signature` key
     <dd>
         
 <span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="toJsonldjsNode"><span class="type-signature"></span>toJsonldjsNode<span class="signature">(node)</span><span class="type-signature"> &rarr; {any}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Converts a a JSON-LD RDF object to N3 data type
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>node</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">JSON-LD RDF representation object</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_rdf.js.html">utils/rdf.js</a>, <a href="utils_rdf.js.html#line11">line 11</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">any</span>
 
 
     </dd>
@@ -23732,13 +24625,13 @@ as we support more APIs there are more details associated with each API. Only Do
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="PoAModule.html">PoAModule</a></li><li><a href="Registry.html">Registry</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#buildTransferTxn">buildTransferTxn</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#createDidAttestation">createDidAttestation</a></li><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createSignedAttestation">createSignedAttestation</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatuses">getCredentialStatuses</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSignatures">getSignatures</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#setAuthor">setAuthor</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#setSignature">setSignature</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signDidAttestation">signDidAttestation</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#signTxn">signTxn</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toMap">toMap</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="PoAModule.html">PoAModule</a></li><li><a href="Registry.html">Registry</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#buildTransferTxn">buildTransferTxn</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#claimgraphToStore">claimgraphToStore</a></li><li><a href="global.html#createDidAttestation">createDidAttestation</a></li><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createSignedAttestation">createSignedAttestation</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#dereferenceFromIPFS">dereferenceFromIPFS</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatuses">getCredentialStatuses</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSignatures">getSignatures</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#parseRDFDocument">parseRDFDocument</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#queryNextLookup">queryNextLookup</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#setAuthor">setAuthor</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#setSignature">setSignature</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signDidAttestation">signDidAttestation</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#signTxn">signTxn</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toJsonldjsNode">toJsonldjsNode</a></li><li><a href="global.html#toMap">toMap</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Tue Mar 23 2021 16:33:58 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Thu Mar 25 2021 01:11:53 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

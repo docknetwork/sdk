@@ -1,6 +1,7 @@
 import credentialsContext from 'credentials-context';
 
 import vcExamplesV1 from './contexts/vc-examples-v1';
+import ed25519V1Context from './contexts/ed25519-2020-v1-context.json';
 import sr25519Context from './contexts/sr25519-context.json';
 import secContext from './contexts/security_context';
 import secContextV1 from './contexts/security-v1.json';
@@ -48,5 +49,9 @@ export default new Map([
   [
     'https://www.w3.org/ns/did/v1',
     didV1Context,
+  ],
+  [
+    'https://w3id.org/security/suites/ed25519-2020/v1',
+    ed25519V1Context,
   ],
 ]);

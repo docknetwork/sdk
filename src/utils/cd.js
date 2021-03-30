@@ -2,7 +2,7 @@
 
 import deepEqual from 'deep-equal';
 import jsonld from 'jsonld';
-import { validate, prove } from 'rify';
+import { validate, prove, infer } from 'rify';
 import { assert } from '@polkadot/util';
 import { expandedCredentialProperty } from './vc/constants';
 import { fromJsonldjsCg, merge } from './claimgraph';
@@ -215,6 +215,16 @@ export function validateh(rules, proof) {
     assumed: decanonClaimGraph(assumed),
     implied: decanonClaimGraph(implied),
   };
+}
+
+// A wrapper around infer that first converts premises and rules to the canonical representation
+// as defined by `canon()` in `claimgraph.js`. This wrapper deserializes the returned values before
+// passing them back to the caller.
+export function inferh(premises, rules) {
+  premises.forEach(assertQuad);
+  foreachQuadInRules(rules, assertQuad);
+  const inferred = infer(canonClaimGraph(premises), canonRules(rules));
+  return decanonClaimGraph(inferred);
 }
 
 function foreachQuadInRules(rules, f) {

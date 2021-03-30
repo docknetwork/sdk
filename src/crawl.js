@@ -1,36 +1,45 @@
-import { deepClone } from './utils/common.js';
-import { queryNextLookup } from './utils/rdf.js';
-import { inferh } from './utils/cd.js';
-import { canon } from './utils/canonicalize.js';
+/*
+eslint no-await-in-loop: "off",
+no-constant-condition: ["error", { "checkLoops": false }]
+*/
+
+import { deepClone } from './utils/common';
+import { queryNextLookup } from './utils/rdf';
+import { inferh } from './utils/cd';
+import { canon } from './utils/canonicalize';
 
 // Crawl the rdf dataset composed of DIDs and turtle documents on ipfs. Return the graph
 // representing all knowlege obtained while crawling.
-export async function alphaCrawl(
+export default async function crawl(
   initialFacts,
   rules,
   curiosityQuery,
-  graphResolver,
+  resolveGraph,
 ) {
   let facts = deepClone(initialFacts);
-  const lookedup = [];
+  const lookedup = new Set();
+  const marknew = (term) => {
+    // Add term to lookedup.
+    // Return whether the term was already present in the set.
+    const str = canon(term);
+    const isnew = !lookedup.has(str);
+    lookedup.add(str);
+    return isnew;
+  };
 
   while (true) {
-    let fresh = false;
-
     // reason over what we have so far
     facts = facts.concat(inferh(facts, rules));
 
     // lookup any interesting documents
-    for (const term of await queryNextLookup(facts, curiosityQuery)) {
-      const cterm = canon(term);
-      if (!lookedup.includes(cterm)) {
-        facts = facts.concat(await graphResolver(term));
-        fresh = true;
-        lookedup.push(cterm);
-      }
-    }
+    const interesting = await queryNextLookup(facts, curiosityQuery);
+    const novel = interesting.filter(marknew);
+    const newfacts = [...await Promise.all(novel.map(resolveGraph))];
+    facts = facts.concat(...newfacts);
 
-    if (!fresh) { break; }
+    if (newfacts.length === 0) {
+      break;
+    }
   }
 
   return facts;

@@ -1,4 +1,4 @@
-import { alphaCrawl } from '../../src/crawl.js';
+import crawl from '../../src/crawl.js';
 import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from '../../src/rdf-defs.js';
 import { assertValidNode } from '../../src/utils/common.js';
 
@@ -52,7 +52,7 @@ describe('Crawler', () => {
     });
 
     const initialFacts = await resolveGraph({ Iri: 'did:root' });
-    let allFacts = await alphaCrawl(initialFacts, RULES, CURIOSITY, resolveGraph);
+    let allFacts = await crawl(initialFacts, RULES, CURIOSITY, resolveGraph);
     expect(allFacts).toEqual(
       [
         [
@@ -125,7 +125,6 @@ describe('Crawler', () => {
     );
   }, 100);
 });
-
 
 function graphResolver(sg) {
   async function resolveGraph(term) {

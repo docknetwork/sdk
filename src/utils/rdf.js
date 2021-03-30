@@ -1,8 +1,8 @@
 // @ts-nocheck
 import { Parser, Store, DataFactory } from 'n3';
 import { newEngine } from '@comunica/actor-init-sparql-rdfjs';
-import { fromJsonldjsNode } from './claimgraph';
 import assert from 'assert';
+import { fromJsonldjsNode } from './claimgraph';
 
 /**
  * Converts a a JSON-LD RDF object to N3 data type
@@ -70,7 +70,7 @@ export async function queryNextLookup(claimgraph, query, engine = null) {
   // Convert bindings to claimgraph format using lookupNext variable
   bindings.forEach((b) => assert(
     b.get('?lookupNext') !== undefined,
-    "Query for next lookup must always bind '?lookupNext'"
+    "Query for next lookup must always bind '?lookupNext'",
   ));
   return bindings.map((binding) => fromJsonldjsNode(binding.get('?lookupNext')));
 }

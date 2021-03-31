@@ -85,7 +85,7 @@ async function revocation() {
 
   const revokeId = new Set();
   revokeId.add(randomAsHex(32));
-  const lastModified = await dock.revocation.getBlockNoForLastChangeToRegistry(registryId);
+  let lastModified = await dock.revocation.getBlockNoForLastChangeToRegistry(registryId);
   const revTx = dock.revocation.createRevokeTx(registryId, revokeId, lastModified, didKeys);
   console.info(`Payment info of 1 revocation is ${(await revTx.paymentInfo(account.address))}`);
 
@@ -95,7 +95,7 @@ async function revocation() {
   const bal2 = await dock.poaModule.getBalance(account.address);
   console.info(`Fee paid is ${parseInt(bal1[0]) - parseInt(bal2[0])}`);
 
-  const count = 100;
+  const count = 10;
 
   const revIds = [];
   let i = 0;
@@ -105,7 +105,7 @@ async function revocation() {
   }
   revIds.sort();
   const revokeIds = new BTreeSet();
-  i = 1;
+  i = 0;
   while (i < count) {
     revokeIds.add(revIds[i]);
     i++;
@@ -119,6 +119,10 @@ async function revocation() {
   console.info(`block ${r1.status.asInBlock}`);
   const bal4 = await dock.poaModule.getBalance(account.address);
   console.info(`Fee paid is ${parseInt(bal3[0]) - parseInt(bal4[0])}`);
+
+  lastModified = await dock.revocation.getBlockNoForLastChangeToRegistry(registryId);
+  const revTx2 = dock.revocation.createRemoveRegistryTx(registryId, lastModified, didKeys, false);
+  console.info(`Payment info of removing registry is ${(await revTx2.paymentInfo(account.address))}`);
 }
 
 async function anchors() {

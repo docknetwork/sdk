@@ -68,6 +68,7 @@
     "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
   },
   "jest": {
+    "testEnvironment": "node",
     "transform": {
       "^.+\\.(ts|js)$": "babel-jest"
     },
@@ -78,20 +79,20 @@
   },
   "resolutions": {
     "jsonld": "3.2.0",
-    "@polkadot/api": "3.11.1",
-    "@polkadot/keyring": "5.9.2",
-    "@polkadot/types": "3.11.1",
-    "@polkadot/util": "5.9.2",
-    "@polkadot/util-crypto": "5.9.2"
+    "@polkadot/api": "4.3.1",
+    "@polkadot/keyring": "6.0.5",
+    "@polkadot/types": "4.3.1",
+    "@polkadot/util": "6.0.5",
+    "@polkadot/util-crypto": "6.0.5"
   },
   "dependencies": {
     "@comunica/actor-init-sparql-rdfjs": "^1.19.2",
-    "@polkadot/api": "3.11.1",
-    "@polkadot/keyring": "5.9.2",
-    "@polkadot/types": "3.11.1",
-    "@polkadot/types-known": "3.11.1",
-    "@polkadot/util": "5.9.2",
-    "@polkadot/util-crypto": "5.9.2",
+    "@polkadot/api": "4.3.1",
+    "@polkadot/keyring": "6.0.5",
+    "@polkadot/types": "4.3.1",
+    "@polkadot/types-known": "4.3.1",
+    "@polkadot/util": "6.0.5",
+    "@polkadot/util-crypto": "6.0.5",
     "@substrate/txwrapper": "^3.9.2",
     "axios": "0.21.1",
     "babel-polyfill": "^6.26.0",
@@ -101,7 +102,8 @@
     "deep-equal": "^2.0.3",
     "did-resolver": "^1.1.0",
     "dotenv": "^8.2.0",
-    "elliptic": "^6.5.3",
+    "elliptic": "^6.5.4",
+    "ethr-did-resolver": "^2.2.0",
     "ipfs-http-client": "^49.0.4",
     "js-sha256": "^0.9.0",
     "json-canonicalize": "^1.0.3",

@@ -192,13 +192,13 @@ async function main() {
     case 1:
       await revocation();
       break;
-    case 3:
+    case 2:
       await anchors();
       break;
-    case 4:
+    case 3:
       await blobs();
       break;
-    case 5:
+    case 4:
       await transfers();
       break;
     default:

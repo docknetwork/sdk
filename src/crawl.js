@@ -3,14 +3,14 @@ eslint no-await-in-loop: "off",
 no-constant-condition: ["error", { "checkLoops": false }]
 */
 
+import jsonld from 'jsonld';
+import assert from 'assert';
+import deepEqual from 'deep-equal';
 import { deepClone, assertValidNode } from './utils/common';
 import { queryNextLookup, dereferenceFromIPFS, parseRDFDocument } from './utils/rdf';
 import { inferh } from './utils/cd';
 import { canon } from './utils/canonicalize';
 import { Namer, fromJsonldjsCg } from './utils/claimgraph';
-import jsonld from 'jsonld';
-import assert from 'assert';
-import deepEqual from 'deep-equal';
 
 // Crawl the rdf dataset composed of DIDs and turtle documents on ipfs. Return the graph
 // representing all knowlege obtained while crawling.
@@ -44,7 +44,7 @@ export async function crawl(
     // lookup any interesting documents
     const interesting = await queryNextLookup(facts, curiosityQuery);
     const novel = interesting.filter(marknew);
-    const newfacts = await Promise.all(novel.map(resolveGraph));
+    const newfacts = [...await Promise.all(novel.map(resolveGraph))];
     for (const nf of newfacts) {
       namer.reallocateNames(nf);
     }
@@ -67,13 +67,13 @@ export function graphResolver(
   async function resolve(term) {
     assertValidNode(term);
     if (!('Iri' in term)) {
-      throw new Err('attempted to lookup non-iri ' + JSON.stringify(term));
+      throw new Error(`attempted to lookup non-iri ${JSON.stringify(term)}`);
     }
     const iri = term.Iri;
     let triples;
-    let ipfsPrefix = 'ipfs://';
+    const ipfsPrefix = 'ipfs://';
     if (iri.startsWith(ipfsPrefix)) {
-      let cid = iri.slice(ipfsPrefix.length);
+      const cid = iri.slice(ipfsPrefix.length);
       const body = await dereferenceFromIPFS(cid, ipfsClient);
       triples = await parseRDFDocument(body, { format: 'text/turtle' });
     } else {
@@ -83,13 +83,10 @@ export function graphResolver(
     return triples.map(([s, p, o]) => [s, p, o, { Iri: iri }]);
   }
 
-  const failedLookups = new Set();
-
   async function resolveGraph(term) {
     try {
       return await resolve(term);
     } catch (err) {
-      failedLookups.add(canon(term));
       onFailedLookup(term, err);
       return [];
     }

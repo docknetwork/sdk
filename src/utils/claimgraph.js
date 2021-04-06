@@ -69,7 +69,7 @@ export function fromJsonldjsNode(jn) {
 // Blank node name generator
 // An object of this type won't produce the same name twice, even accross multiple calls to
 // reallocateNames.
-class Namer {
+export class Namer {
   constructor() {
     this.nextBlank = 0;
   }

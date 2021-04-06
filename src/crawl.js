@@ -3,15 +3,18 @@ eslint no-await-in-loop: "off",
 no-constant-condition: ["error", { "checkLoops": false }]
 */
 
-import { deepClone } from './utils/common';
-import { queryNextLookup } from './utils/rdf';
+import { deepClone, assertValidNode } from './utils/common';
+import { queryNextLookup, dereferenceFromIPFS, parseRDFDocument } from './utils/rdf';
 import { inferh } from './utils/cd';
 import { canon } from './utils/canonicalize';
-import { Namer } from './utils/claimgraph';
+import { Namer, fromJsonldjsCg } from './utils/claimgraph';
+import jsonld from 'jsonld';
+import assert from 'assert';
+import deepEqual from 'deep-equal';
 
 // Crawl the rdf dataset composed of DIDs and turtle documents on ipfs. Return the graph
 // representing all knowlege obtained while crawling.
-export default async function crawl(
+export async function crawl(
   initialFacts,
   rules,
   curiosityQuery,
@@ -27,6 +30,7 @@ export default async function crawl(
   const marknew = (term) => {
     // Add term to lookedup.
     // Return whether the term was already present in the set.
+    // like https://doc.rust-lang.org/std/collections/btree_set/struct.BTreeSet.html#method.insert
     const str = canon(term);
     const isnew = !lookedup.has(str);
     lookedup.add(str);
@@ -52,4 +56,55 @@ export default async function crawl(
   }
 
   return facts;
+}
+
+// construct a document fetcher for use in the crawler
+export function graphResolver(
+  ipfsClient,
+  documentLoader,
+  onFailedLookup = (_term, err) => { throw err; },
+) {
+  async function resolve(term) {
+    assertValidNode(term);
+    if (!('Iri' in term)) {
+      throw new Err('attempted to lookup non-iri ' + JSON.stringify(term));
+    }
+    const iri = term.Iri;
+    let triples;
+    let ipfsPrefix = 'ipfs://';
+    if (iri.startsWith(ipfsPrefix)) {
+      let cid = iri.slice(ipfsPrefix.length);
+      const body = await dereferenceFromIPFS(cid, ipfsClient);
+      triples = await parseRDFDocument(body, { format: 'text/turtle' });
+    } else {
+      const jld = (await documentLoader(iri)).document;
+      triples = await jsonldToCg(jld);
+    }
+    return triples.map(([s, p, o]) => [s, p, o, { Iri: iri }]);
+  }
+
+  const failedLookups = new Set();
+
+  async function resolveGraph(term) {
+    try {
+      return await resolve(term);
+    } catch (err) {
+      failedLookups.add(canon(term));
+      onFailedLookup(term, err);
+      return [];
+    }
+  }
+
+  return resolveGraph;
+}
+
+async function jsonldToCg(jld, documentLoader) {
+  const exp = await jsonld.expand(jld, { documentLoader });
+  const cg = fromJsonldjsCg(await jsonld.toRDF(exp));
+  for (const claim of cg) {
+    assert(deepEqual(claim[3], { DefaultGraph: true }), 'illegal subgraph was specified');
+    claim.pop();
+    assert(claim.length === 3);
+  }
+  return cg;
 }

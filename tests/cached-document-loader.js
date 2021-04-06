@@ -15,7 +15,7 @@ for (const k of Object.keys(network_cache)) {
 export async function documentLoader(url) {
   if (documentRegistry[url] === undefined) {
     if (!(url.startsWith('http://') | url.startsWith('https://'))) {
-      throw new Error('failed to resolve', url);
+      throw new Error('failed to resolve ' + url);
     }
     documentRegistry[url] = (await axios.get(url)).data;
     console.warn(

@@ -1,13 +1,7 @@
-import crawl from '../../src/crawl.js';
+import { crawl, graphResolver } from '../../src/crawl.js';
 import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from '../../src/rdf-defs.js';
-import { assertValidNode } from '../../src/utils/common.js';
 import { documentLoader, addDocument } from '../cached-document-loader.js';
 import createClient from 'ipfs-http-client';
-import { dereferenceFromIPFS, parseRDFDocument } from '../../src/utils/rdf';
-import { fromJsonldjsCg } from '../../src/utils/claimgraph';
-import jsonld from 'jsonld';
-import assert from 'assert';
-import deepEqual from 'deep-equal';
 
 const ipfsDefaultConfig = 'http://localhost:5001';
 
@@ -85,9 +79,15 @@ describe('Crawler', () => {
       }
     `;
 
-    let { resolveGraph, listFailedLookups, } = graphResolver(ipfsClient);
+    const failedLookups = [];
+    let resolveGraph = graphResolver(
+      ipfsClient,
+      documentLoader,
+      (term, _err) => failedLookups.push(term),
+    );
     const initialFacts = await resolveGraph({ Iri: 'did:root' });
     let allFacts = await crawl(initialFacts, RULES, CURIOSITY, resolveGraph);
+    expect(failedLookups).toEqual([{ Iri: 'did:c' }]);
     expect(allFacts).toEqual(
       [
         [
@@ -200,63 +200,18 @@ describe('Crawler', () => {
         ]
       ]
     );
-    expect(listFailedLookups()).toEqual([{ Iri: 'did:c' }]);
   }, 1000);
+
+  test('graphResolver', async () => {
+    let resolveGraph = graphResolver(ipfsClient, documentLoader);
+    let initialfacts = await resolveGraph({ Iri: 'did:root' });
+    expect(initialfacts).toEqual([
+      [
+        { Iri: 'did:root' },
+        { Iri: 'https://rdf.dock.io/alpha/2021#attestsDocumentContents' },
+        { Iri: 'ipfs://bafybeifrrafsw7gs7mwlzooxejrv6hljun46c7j4zfyc4mep3vn73zbkxa' },
+        { Iri: 'did:root' },
+      ],
+    ]);
+  });
 });
-
-function graphResolver(ipfsClient) {
-  async function resolve(term) {
-    assertValidNode(term);
-    if (!('Iri' in term)) {
-      console.log('attempted to lookup non-iri', term);
-      return [];
-    }
-    const iri = term.Iri;
-    let triples;
-    let ipfsPrefix = 'ipfs://';
-    if (iri.startsWith(ipfsPrefix)) {
-      let cid = iri.slice(ipfsPrefix.length);
-      const body = await dereferenceFromIPFS(cid, ipfsClient);
-      triples = await parseRDFDocument(body, { format: 'text/turtle' });
-    } else {
-      const jld = (await documentLoader(iri)).document;
-      triples = await jsonldToCg(jld);
-    }
-    return triples.map(([s, p, o]) => [s, p, o, { Iri: iri }]);
-  }
-
-  let failedLookups = [];
-
-  async function resolveGraph(term) {
-    try {
-      return await resolve(term);
-    } catch (e) {
-      failedLookups.push(term);
-      return [];
-    }
-  }
-
-  function listFailedLookups() {
-    return defensive_copy(failedLookups);
-  }
-
-  return {
-    resolveGraph,
-    listFailedLookups,
-  };
-}
-
-async function jsonldToCg(jld, documentLoader) {
-  const exp = await jsonld.expand(jld, { documentLoader });
-  const cg = fromJsonldjsCg(await jsonld.toRDF(exp));
-  for (const claim of cg) {
-    assert(deepEqual(claim[3], { DefaultGraph: true }), 'illegal subgraph was specified');
-    claim.pop();
-    assert(claim.length === 3);
-  }
-  return cg;
-}
-
-function defensive_copy(x) {
-  return JSON.parse(JSON.stringify(x));
-}

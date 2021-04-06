@@ -1,4 +1,4 @@
-import crawl from '../../src/crawl.js';
+import { crawl } from '../../src/crawl.js';
 import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from '../../src/rdf-defs.js';
 import { assertValidNode } from '../../src/utils/common.js';
 
@@ -7,7 +7,7 @@ const LIKES = 'http://purl.org/spar/cito/likes';
 const IDENT = 'http://purl.org/dc/terms/identifier';
 const KNOWS = 'http://xmlns.com/foaf/0.1/knows';
 
-describe('Crawler', () => {
+describe('Crawler unit tests', () => {
   test('happy path', async () => {
     const RULES = [
       ...MAYCLAIM_DEF_1,

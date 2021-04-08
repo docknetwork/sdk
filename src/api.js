@@ -201,9 +201,9 @@ class DockAPI {
    * @return {Promise}
    */
   async signAndSendWithFiat(extrinsic, waitForFinalization = true, params = {}) {
-    if (this.api.tx.fiatFilter) {
+    if (this.api.tx.fiatFilterModule) {
       const signedCall = await this.signExtrinsic(extrinsic, params);
-      const fiatCall = this.api.tx.fiatFilter.executeCall(this.api.createType('Call', signedCall));
+      const fiatCall = this.api.tx.fiatFilterModule.executeCall(this.api.createType('Call', signedCall));
       return await this.signAndSend(fiatCall, waitForFinalization, params);
     }
     return await this.signAndSend(extrinsic, waitForFinalization, params);

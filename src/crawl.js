@@ -44,7 +44,7 @@ export async function crawl(
     // lookup any interesting documents
     const interesting = await queryNextLookup(facts, curiosityQuery);
     const novel = interesting.filter(marknew);
-    const newfacts = [...await Promise.all(novel.map(resolveGraph))];
+    const newfacts = await Promise.all(novel.map(resolveGraph));
     for (const nf of newfacts) {
       namer.reallocateNames(nf);
     }

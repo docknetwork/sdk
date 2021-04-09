@@ -42,24 +42,10 @@ const sampleRules = [
   {
     if_all: [
       [
-        { Bound: { Iri: 'did:sample:issuer' } },
-        { Bound: { Iri: 'https://www.dock.io/rdf2020#claimsV1' } },
-        { Unbound: 'c' },
-      ],
-      [
-        { Unbound: 'c' },
-        { Bound: { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#subject' } },
         { Unbound: 's' },
-      ],
-      [
-        { Unbound: 'c' },
-        { Bound: { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate' } },
         { Unbound: 'p' },
-      ],
-      [
-        { Unbound: 'c' },
-        { Bound: { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#object' } },
         { Unbound: 'o' },
+        { Bound: { Iri: 'did:sample:issuer' } },
       ],
     ],
     then: [
@@ -67,6 +53,7 @@ const sampleRules = [
         { Unbound: 's' },
         { Unbound: 'p' },
         { Unbound: 'o' },
+        { Bound: { DefaultGraph: true } },
       ],
     ],
   },
@@ -77,6 +64,7 @@ const sampleRules = [
         { Unbound: 'a' },
         { Bound: { Iri: frobs } },
         { Unbound: 'b' },
+        { Unbound: 'g' },
       ],
     ],
     then: [
@@ -84,6 +72,7 @@ const sampleRules = [
         { Unbound: 'b' },
         { Bound: { Iri: frobs } },
         { Unbound: 'a' },
+        { Unbound: 'g' },
       ],
     ],
   },
@@ -94,6 +83,7 @@ const sampleToProve = [
   { Iri: 'https://example.com/bbb' },
   { Iri: frobs },
   { Iri: 'https://example.com/aaa' },
+  { DefaultGraph: true },
 ];
 
 // accept a presentation with a proof of composite claims

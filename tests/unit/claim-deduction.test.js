@@ -1,8 +1,6 @@
 import { Ed25519KeyPair, suites } from 'jsonld-signatures';
 import jsonld from 'jsonld';
-import axios from 'axios';
 import { randomAsHex } from '@polkadot/util-crypto';
-import check from '@polkadot/util-crypto/address/check';
 import {
   expandedLogicProperty,
   acceptCompositeClaims,
@@ -16,22 +14,11 @@ import {
   verifyPresentation,
   verifyCredential,
 } from '../../src/utils/vc/index';
-import { claims } from '../../src/utils/claimgraph';
-import contexts from '../../src/utils/vc/contexts';
 import {
   EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
 } from '../../src/utils/vc/custom_crypto';
 import { createPresentation } from '../create-presentation';
-import network_cache from '../network-cache';
-
-/// global document cache, acts as a did method for the tests below
-const documentRegistry = {};
-for (const [k, v] of contexts) {
-  documentRegistry[k] = v;
-}
-for (const k of Object.keys(network_cache)) {
-  documentRegistry[k] = network_cache[k];
-}
+import { documentLoader, addDocument, registered, modifyDocument } from '../cached-document-loader.js';
 
 describe('Composite claim soundness checker', () => {
   test('control: issue and verify', async () => {
@@ -91,8 +78,10 @@ describe('Composite claim soundness checker', () => {
     expect(err.results[0].error.toString())
       .toMatch('Error: Credential issuer must match the verification method controller.');
 
-    // modify the attackers keydoc to point assert it's controller is issuera
-    documentRegistry[`${issuerb}#keys-1`].controller = issuera;
+    // modify the attackers keydoc to assert it's controller is issuera
+    await modifyDocument(`${issuerb}#keys-1`, (original) => ({ ...original, controller: issuera }))
+    expect((await documentLoader(`${issuerb}#keys-1`)).document.controller).toBe(issuera);
+
     err = await verifyC(
       await issueCredential(kpb, cred(), true, documentLoader),
     );
@@ -129,119 +118,50 @@ describe('Composite claim soundness checker', () => {
     const all = await checkSoundness(presentation, rules);
     expect(all).toEqual([
       [
-        { Iri: issuer },
-        { Iri: 'https://www.dock.io/rdf2020#claimsV1' },
-        { Blank: '_:b0' },
-      ],
-      [
-        { Blank: '_:b0' },
-        { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#subject' },
         { Iri: 'did:example:ebfeb1f712ebc6f1c276e12ec21' },
-      ],
-      [
-        { Blank: '_:b0' },
-        { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate' },
         { Iri: 'http://schema.org/alumniOf' },
-      ],
-      [
-        { Blank: '_:b0' },
-        { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#object' },
         {
           Literal: {
             value: 'Example University',
             datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#HTML',
           },
         },
-      ],
-      [
         { Iri: issuer },
-        { Iri: 'https://www.dock.io/rdf2020#claimsV1' },
-        { Blank: '_:b1' },
       ],
       [
-        { Blank: '_:b1' },
-        { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#subject' },
         { Iri: 'https://example.com/credentials/1872' },
-      ],
-      [
-        { Blank: '_:b1' },
-        { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate' },
         { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' },
-      ],
-      [
-        { Blank: '_:b1' },
-        { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#object' },
         { Iri: 'https://www.w3.org/2018/credentials#VerifiableCredential' },
-      ],
-      [
         { Iri: issuer },
-        { Iri: 'https://www.dock.io/rdf2020#claimsV1' },
-        { Blank: '_:b2' },
       ],
       [
-        { Blank: '_:b2' },
-        { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#subject' },
         { Iri: 'https://example.com/credentials/1872' },
-      ],
-      [
-        { Blank: '_:b2' },
-        { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate' },
         { Iri: 'https://www.w3.org/2018/credentials#credentialSubject' },
-      ],
-      [
-        { Blank: '_:b2' },
-        { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#object' },
         { Iri: 'did:example:ebfeb1f712ebc6f1c276e12ec21' },
-      ],
-      [
         { Iri: issuer },
-        { Iri: 'https://www.dock.io/rdf2020#claimsV1' },
-        { Blank: '_:b3' },
       ],
       [
-        { Blank: '_:b3' },
-        { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#subject' },
         { Iri: 'https://example.com/credentials/1872' },
-      ],
-      [
-        { Blank: '_:b3' },
-        { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate' },
         { Iri: 'https://www.w3.org/2018/credentials#issuanceDate' },
-      ],
-      [
-        { Blank: '_:b3' },
-        { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#object' },
         {
           Literal: {
             value: '2010-01-01T19:23:24Z',
             datatype: 'http://www.w3.org/2001/XMLSchema#dateTime',
           },
         },
-      ],
-      [
         { Iri: issuer },
-        { Iri: 'https://www.dock.io/rdf2020#claimsV1' },
-        { Blank: '_:b4' },
       ],
       [
-        { Blank: '_:b4' },
-        { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#subject' },
         { Iri: 'https://example.com/credentials/1872' },
-      ],
-      [
-        { Blank: '_:b4' },
-        { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate' },
         { Iri: 'https://www.w3.org/2018/credentials#issuer' },
-      ],
-      [
-        { Blank: '_:b4' },
-        { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#object' },
+        { Iri: issuer },
         { Iri: issuer },
       ],
       [
         { Iri: 'https://example.com/a' },
         { Iri: 'https://example.com/frobs' },
         { Iri: 'https://example.com/b' },
+        { DefaultGraph: true },
       ],
     ]);
   }, 30000);
@@ -263,6 +183,7 @@ describe('Composite claim soundness checker', () => {
         { Iri: 'http://example.com/joeThePig' },
         { Iri: 'https://example.com/Ability' },
         { Iri: 'https://example.com/Flight' },
+        { DefaultGraph: true },
       ]);
   });
 
@@ -302,11 +223,13 @@ describe('Composite claim soundness checker', () => {
           { Unbound: 'pig' },
           { Bound: { Iri: 'https://example.com/Ability' } },
           { Bound: { Iri: 'https://example.com/Flight' } },
+          { Bound: { DefaultGraph: true } },
         ],
         [
           { Unbound: 'pig' },
           { Bound: rdf('type') },
           { Bound: { Iri: 'https://example.com/Pig' } },
+          { Bound: { DefaultGraph: true } },
         ],
       ],
       then: [
@@ -321,49 +244,39 @@ describe('Composite claim soundness checker', () => {
               },
             },
           },
+          { Bound: { DefaultGraph: true } },
         ],
       ],
     };
     const licensing = {
-      // if licenser? claims [a? lp? lo?]
+      // if  a? lp? lo? licenser?
       // and licenser? mayLicence li?
       // and li? predicate lp?
       // and li? object lo?
       if_all: [
         [
-          { Unbound: 'licenser' },
-          { Bound: claims },
-          { Unbound: 'c0' },
-        ],
-        [
-          { Unbound: 'c0' },
-          { Bound: rdf('subject') },
           { Unbound: 'a' },
-        ],
-        [
-          { Unbound: 'c0' },
-          { Bound: rdf('predicate') },
           { Unbound: 'lp' },
-        ],
-        [
-          { Unbound: 'c0' },
-          { Bound: rdf('object') },
           { Unbound: 'lo' },
+          { Unbound: 'licenser' },
         ],
         [
           { Unbound: 'licenser' },
           { Bound: { Iri: 'https://example.com/mayLicense' } },
           { Unbound: 'li' },
+          { Bound: { DefaultGraph: true } },
         ],
         [
           { Unbound: 'li' },
           { Bound: rdf('predicate') },
           { Unbound: 'lp' },
+          { Bound: { DefaultGraph: true } },
         ],
         [
           { Unbound: 'li' },
           { Bound: rdf('object') },
           { Unbound: 'lo' },
+          { Bound: { DefaultGraph: true } },
         ],
       ],
       // then [a? lp? lo?],
@@ -372,6 +285,7 @@ describe('Composite claim soundness checker', () => {
           { Unbound: 'a' },
           { Unbound: 'lp' },
           { Unbound: 'lo' },
+          { Bound: { DefaultGraph: true } },
         ],
       ],
     };
@@ -383,32 +297,38 @@ describe('Composite claim soundness checker', () => {
           { Bound: { Iri: faa } },
           { Bound: { Iri: 'https://example.com/mayLicense' } },
           { Bound: { Iri: 'uuid:5c4cfa6b-d96f-4a53-8786-2cce46cc51c4' } },
+          { Bound: { DefaultGraph: true } },
         ],
         [
           { Bound: { Iri: 'uuid:5c4cfa6b-d96f-4a53-8786-2cce46cc51c4' } },
           { Bound: rdf('predicate') },
           { Bound: { Iri: 'https://example.com/Ability' } },
+          { Bound: { DefaultGraph: true } },
         ],
         [
           { Bound: { Iri: 'uuid:5c4cfa6b-d96f-4a53-8786-2cce46cc51c4' } },
           { Bound: rdf('object') },
           { Bound: { Iri: 'https://example.com/Flight' } },
+          { Bound: { DefaultGraph: true } },
         ],
         // pigchecker is trusted to check whether something is a pig
         [
           { Bound: { Iri: pigchecker } },
           { Bound: { Iri: 'https://example.com/mayLicense' } },
           { Bound: { Iri: 'uuid:6f165460-894a-4e51-a2a5-79b537678720' } },
+          { Bound: { DefaultGraph: true } },
         ],
         [
           { Bound: { Iri: 'uuid:6f165460-894a-4e51-a2a5-79b537678720' } },
           { Bound: rdf('predicate') },
           { Bound: rdf('type') },
+          { Bound: { DefaultGraph: true } },
         ],
         [
           { Bound: { Iri: 'uuid:6f165460-894a-4e51-a2a5-79b537678720' } },
           { Bound: rdf('object') },
           { Bound: { Iri: 'https://example.com/Pig' } },
+          { Bound: { DefaultGraph: true } },
         ],
       ],
     };
@@ -460,6 +380,7 @@ describe('Composite claim soundness checker', () => {
           datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral',
         },
       },
+      { DefaultGraph: true },
     ];
     expect(presentation_claimgraph).not.toContainEqual(claim_to_prove);
     const proof = proveh(
@@ -480,6 +401,7 @@ describe('Composite claim soundness checker', () => {
       { Iri: 'https://example.com/a' },
       { Iri: 'https://example.com/frobs' },
       { Iri: 'https://example.com/b' },
+      { DefaultGraph: true },
     ];
     const rules = sampleRules();
     const proof = await proveCompositeClaims(expandedPresentation, [compositeClaim], rules);
@@ -502,24 +424,8 @@ async function checkSoundness(presentation, rules) {
   return await acceptCompositeClaims(presentation, rules);
 }
 
-/// create a fake document loader for did docs so we dont need to connect to a dev node
-async function documentLoader(url) {
-  if (documentRegistry[url] === undefined) {
-    documentRegistry[url] = (await axios.get(url)).data;
-    console.warn(
-      'Unit test is making web requests. This is slow. Please update ./test/network-cache.json',
-      'with: ',
-      JSON.stringify({ [url]: documentRegistry[url] }, null, 2),
-    );
-  }
-  return {
-    documentUrl: url,
-    document: documentRegistry[url],
-  };
-}
-
 function registerDid(did, keyPair) {
-  if (documentRegistry[did]) { throw `${did} already registered`; }
+  if (registered(did)) { throw `${did} already registered`; }
   const pk = {
     id: `${did}#keys-1`,
     type: keyPair.type,
@@ -533,11 +439,11 @@ function registerDid(did, keyPair) {
     assertionMethod: [pk.id],
     publicKey: [pk],
   };
-  documentRegistry[did] = doc;
-  documentRegistry[pk.id] = {
+  addDocument(did, doc);
+  addDocument(pk.id, {
     '@context': 'https://www.w3.org/ns/did/v1',
     ...pk,
-  };
+  });
 }
 
 function randoDID() {
@@ -631,6 +537,7 @@ function sampleRules() {
           { Bound: { Iri: 'https://example.com/a' } },
           { Bound: { Iri: 'https://example.com/frobs' } },
           { Bound: { Iri: 'https://example.com/b' } },
+          { Bound: { DefaultGraph: true } },
         ],
       ],
     },
@@ -640,11 +547,13 @@ function sampleRules() {
           { Unbound: 'pig' },
           { Bound: { Iri: 'https://example.com/Ability' } },
           { Bound: { Iri: 'https://example.com/Flight' } },
+          { Bound: { DefaultGraph: true } },
         ],
         [
           { Unbound: 'pig' },
           { Bound: { Iri: 'https://www.w3.org/1999/02/22-rdf-syntax-ns#type' } },
           { Bound: { Iri: 'https://example.com/Pig' } },
+          { Bound: { DefaultGraph: true } },
         ],
       ],
       then: [
@@ -659,6 +568,7 @@ function sampleRules() {
               },
             },
           },
+          { Bound: { DefaultGraph: true } },
         ],
       ],
     },

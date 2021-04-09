@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "0.3.17",
+  "version": "0.4.2",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -31,7 +31,7 @@
     "jest": "24.5.0",
     "jsdoc": "^3.6.3",
     "rollup": "2.28.1",
-    "typescript": "^3.8.3"
+    "typescript": "^4.2.3"
   },
   "scripts": {
     "dock-did-example": "npx babel-node example/dock-did.js",
@@ -48,7 +48,8 @@
     "get-did": "npx babel-node scripts/get_did_doc.js",
     "upgrade_with_sudo": "npx babel-node scripts/runtime_upgrade_with_sudo.js",
     "onboard_with_sudo": "npx babel-node scripts/onboard_validator_with_sudo.js",
-    "lint": "eslint \"{src,example}/**/*.js\"",
+    "lint": "eslint \"src/**/*.js\"",
+    "lint-examples": "eslint \"{src,example}/**/*.js\"",
     "lint-tests": "eslint \"{tests/unit,tests/integration}/**/*.js\"",
     "build": "rollup -c",
     "watch": "rollup -c -w",
@@ -61,7 +62,7 @@
     "test-poa-with-node": "./scripts/with_docker_test_node yarn test-poa",
     "examples-with-node": "./scripts/with_docker_test_node yarn test-examples",
     "mdbook": "mdbook build tutorials --dest-dir ../out/tutorials",
-    "type-check": "tsc -allowJs -checkJs -noEmit -moduleResolution node --resolveJsonModule -target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
+    "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
   },
   "jest": {
     "testEnvironment": "node"
@@ -75,6 +76,7 @@
     "@polkadot/util-crypto": "5.1.1"
   },
   "dependencies": {
+    "@comunica/actor-init-sparql-rdfjs": "^1.19.2",
     "@polkadot/api": "3.1.1",
     "@polkadot/keyring": "5.1.1",
     "@polkadot/types": "3.1.1",
@@ -90,13 +92,14 @@
     "did-resolver": "^1.1.0",
     "dotenv": "^8.2.0",
     "elliptic": "^6.5.3",
-    "ethr-did-resolver": "^2.2.0",
+    "ipfs-http-client": "^49.0.4",
     "js-sha256": "^0.9.0",
     "json-canonicalize": "^1.0.3",
     "jsonld": "3.2.0",
     "jsonld-signatures": "https://github.com/docknetwork/jsonld-signatures",
     "jsonschema": "^1.2.6",
     "mrklt": "^0.2.0",
-    "rify": "^0.4.0"
+    "n3": "^1.8.1",
+    "rify": "^0.6.0"
   }
 }

@@ -26,6 +26,7 @@
     "no-plusplus": "off",
     "max-len": "off",
     "no-console": "off",
+    "no-else-return": "off",
     "no-restricted-syntax": [
       "error",
       {

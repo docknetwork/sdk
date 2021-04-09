@@ -1,6 +1,6 @@
 ## Graphical Anchoring Utility
 
-You can also anchor without touching any code. Visit https://fe.dock.io/#/anchor/batch for creation of anchors and https://fe.dock.io/#/anchor/check for anchor verification.
+You can also anchor without touching any code. Visit [https://fe.dock.io/#/anchor/batch](https://fe.dock.io/#/anchor/batch) for creation of anchors and [https://fe.dock.io/#/anchor/check](https://fe.dock.io/#/anchor/check) for anchor verification.
 
 ### To Batch, or not to Batch
 

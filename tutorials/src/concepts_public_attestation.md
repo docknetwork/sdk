@@ -15,3 +15,16 @@ Public Attestaion live in the DID document of their poster. A DID with a public 
 If `DID attestsDocumentContent DOC` then for every statement `X` in `DOC` `DID claims X`.
 
 The attestation crawler within the sdk currently supports two IRI schema for use as attestation documents: DIDs and ipfs links. DIDs are dereferenced and interpreted as [json-ld](https://www.w3.org/TR/json-ld/). Ipfs links are dereferenced and interpreted as [turtle](https://www.w3.org/TR/turtle/) documents.
+
+## Uses
+
+Two properties of RDF have the potential to supercharge Public Attestations.
+
+1) It's a semantic knowlege representation, it can be [reasoned over](https://github.com/docknetwork/rify).
+2) It's [queryable](https://en.wikipedia.org/wiki/SPARQL) in it's native form.
+
+Via these properties the sdk implements a "Curious Agent". Pretty cool name, huh? The Curious Agent seeks out information. It starts with an initial kernel of knowlege and it follows a sense of curiosity, gradually building it's knowlege graph, stopping when it find nothing new to be curious about. As it crawls, it reasons over the information it's found, deducing new facts, which may spark new curiosity. The Curious Agent accepts it's curiosity as Sparql queries. The Agents ability to reason is also configurable, axioms are provided to the Agent as conjunctive logical rules. Within the sdk, the Curious Agent is simply called `crawl()`.
+
+The Curious Agent is sometimes refered to as "the crawler".
+
+The crawler's driving use-case is to search for [publicaly posted Delegation information](./concepts_public_delegation.md). As such, a bare minimum of functionality is implemented. Want more? Consider contacting us.

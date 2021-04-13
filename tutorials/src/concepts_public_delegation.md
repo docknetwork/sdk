@@ -8,14 +8,38 @@ When a delegation is attested via a credential, we call that a Private Delegatio
 
 Public Delegations remove the need for credential holders to manage and present delegation chains. With Public Delegations, credential verifiers may look up delegation information out-of-band.
 
-Just like in [Private Delegation](./concepts_private_delegation.md), verified delegation information constiutes a knowlege graph that can be merged with the knowlege graph from a verified credential. The merged graphs are reasoned over to determine which facts are proven true.
+Just like in [Private Delegation](./concepts_private_delegation.md), verified delegation information constitutes a knowlege graph that can be merged with the knowlege graph from a verified credential. The merged graphs are reasoned over to determine which facts are proven true.
 
 ## Example
 
-Lets say there is trusted root issuer, `did:ex:root`. `did:ex:root` may delegate authority to make claims on behalf of `did:ex:root`. To do so, `did:ex:root` would attest to a claimgraph like this:
+Let's say there is trusted root issuer, `did:ex:root`. `did:ex:root` may delegate authority to make claims on behalf of `did:ex:root`. To do so, `did:ex:root` would attest to a claimgraph like this:
+
+`ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p`:
 
 ```turtle
-<did:ex:root>
+@prefix dockalpha: <https://rdf.dock.io/alpha/2021#> .
+<did:ex:delegate1> dockalpha:mayClaim dockalpha:ANYCLAIM .
+<did:ex:delegate2> dockalpha:mayClaim dockalpha:ANYCLAIM .
 ```
 
-`did:ex:root` attests to this claimgraph publically by adding the above turtle document to ipfs and setting the `https://rdf.dock.io/alpha/2021#attestsDocumentContents` property of their DID within their DID document. For Dock DIDs, this is done by [setting the attestation for the DID](https://github.com/docknetwork/sdk/blob/61cbaaf61e11cc8cc57d8582095bffafecd794b9/src/modules/did.js#L94) on-chain.
+When `did:ex:root` attests to the above triples, the following dataset is true.
+
+```turtle
+@prefix dockalpha: <https://rdf.dock.io/alpha/2021#> .
+<did:ex:delegate1> dockalpha:mayClaim dockalpha:ANYCLAIM <did:ex:root> .
+<did:ex:delegate2> dockalpha:mayClaim dockalpha:ANYCLAIM <did:ex:root> .
+```
+
+`did:ex:root` may attests to `ipfs://Qmeg1Hq...` by adding the ipfs link to its DID document.
+
+```json
+{
+  "@context": "https://www.w3.org/ns/did/v1",
+  "id": "did:ex:root",
+  "https://rdf.dock.io/alpha/2021#attestsDocumentContent": {
+    "@id": "ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p"
+  }
+}
+```
+
+`did:ex:root` attests to this claimgraph publically by adding the above turtle document to ipfs and setting the `https://rdf.dock.io/alpha/2021#attestsDocumentContents` property in their DID document.

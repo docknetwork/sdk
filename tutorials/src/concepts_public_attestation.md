@@ -16,6 +16,8 @@ If `DID attestsDocumentContent DOC` then for every statement `X` in `DOC` `DID c
 
 The attestation crawler within the sdk currently supports two IRI schemes for pionting to attested documents: DIDs and ipfs links. DIDs are dereferenced and interpreted as [json-ld](https://www.w3.org/TR/json-ld/). Ipfs links are dereferenced and interpreted as [turtle](https://www.w3.org/TR/turtle/) documents.
 
+For Dock DIDs the public attestation can be made by [setting the attestation for the DID](https://github.com/docknetwork/sdk/blob/61cbaaf61e11cc8cc57d8582095bffafecd794b9/src/modules/did.js#L94) on-chain. Setting that value to something else effectively revokes the previous attestation and issues a new one. A DIDs attestation can also be set to `None`, which is equivalent to attesting an empty claimgraph. Dock DIDs have their attestation set to `None` by default. A DID document of a Dock DID (what a mouthful) with attestation set to `None` will not contain the `attestsDocumentContents` key.
+
 ### Example of A DID attesting to a document
 
 `did:ex:ex`:
@@ -44,7 +46,7 @@ Fact 1:
 
 ```turtle
 # `did:ex:ed` attests to the content of `ipfs://Qmeg1..`
-`<did:ex:ed> <https://rdf.dock.io/alpha/2021#attestsDocumentContent> <ipfs://Qmeg1..>
+`<did:ex:ed> <https://rdf.dock.io/alpha/2021#attestsDocumentContent> <ipfs://Qmeg1..> .
 ```
 
 The second fact is infered. Since we know the content of `ipfs://Qmeg1..` we know that `ipfs://Qmeg1..` contains the statement `wd:Q25769 wd:Property:P171 wd:Q648422` (Short-eared Owl is in the genus "Asio"). `did:ex:ex` attests the document `ipfs://Qmeg1..` and `ipfs://Qmeg1..` states that the Short-eared Owl is in the genus "Asio", therefore:
@@ -52,11 +54,9 @@ The second fact is infered. Since we know the content of `ipfs://Qmeg1..` we kno
 Fact 2:
 
 ```turtle
+@prefix wd: <https://www.wikidata.org/wiki/> .
 # `did:ex:ex` claims that the Short-eared Owl is in the genus "Asio".
-<https://www.wikidata.org/wiki/Q25769>
-  <https://www.wikidata.org/wiki/Property:P171>
-  <https://www.wikidata.org/wiki/Q648422>
-  <did:ex:ex> .
+<wd:Q25769> <wd:Property:P171> <wd:Q648422> <did:ex:ex> .
 ```
 
 ### Example of A DID attesting to multiple documents

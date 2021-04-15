@@ -7953,10 +7953,10 @@ retimer@^2.0.0:
   resolved "https://registry.yarnpkg.com/retimer/-/retimer-2.0.0.tgz#e8bd68c5e5a8ec2f49ccb5c636db84c04063bbca"
   integrity sha512-KLXY85WkEq2V2bKex/LOO1ViXVn2KGYe4PYysAdYdjmraYIUsVkXu8O4am+8+5UbaaGl1qho4aqAAPHNQ4GSbg==
 
-rify@^0.7.0-rc.1:
-  version "0.7.0-rc.1"
-  resolved "https://registry.yarnpkg.com/rify/-/rify-0.7.0-rc.1.tgz#7594c00bef158f38a2c1b27166c8a0e4258e34e8"
-  integrity sha512-uOZThwTbGQDVYkQ2AKM7VJ2fKGlR+GKZnrTYV+K4+M2QxVI1QyveLx42HLRIT9YVjPzPqoe8+TwGGsuKcvUz5g==
+rify@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/rify/-/rify-0.7.0.tgz#831c377a55ef81c2163c57c60c31849e1c50c073"
+  integrity sha512-TG+yPMs0XzgWFqoJ35xSv0rRyTBGsd54/sD1tVOnQD0M/yfvS+EOEbXUtDbWtUp5n70pQ9Y6e9LgHUesgB+f9A==
 
 rimraf@2.6.3:
   version "2.6.3"

@@ -180,9 +180,10 @@ export async function proveCompositeClaims(expandedPresentation, compositeClaims
   return toJsonLiteral(prevProof.concat(newProof));
 }
 
-// A wrapper around prove that first converts rules, composite claims, and premises to the
-// canonical representation as defined by `canon()` in `claimgraph.js`. This wrapper deserializes
-// the returned values before passing them back to the caller.
+// prove-high
+// A higher level wrapper around prove that first converts rules, composite claims, and premises to
+// the canonical representation as defined by `canon()` in `claimgraph.js`. This wrapper
+// deserializes the returned values before passing them back to the caller.
 export function proveh(
   premises,
   toProve,
@@ -199,9 +200,10 @@ export function proveh(
   return decanonProof(proof);
 }
 
-// A wrapper around validate that first converts rules and proof to the canonical representation
-// as defined by `canon()` in `claimgraph.js`. This wrapper deserializes the returned values before
-// passing them back to the caller.
+// validate-high
+// A higher level wrapper around validate that first converts rules and proof to the canonical
+// representation as defined by `canon()` in `claimgraph.js`. This wrapper deserializes the
+// returned values before passing them back to the caller.
 export function validateh(rules, proof) {
   foreachQuadInRules(rules, assertQuad);
   const {
@@ -217,9 +219,10 @@ export function validateh(rules, proof) {
   };
 }
 
-// A wrapper around infer that first converts premises and rules to the canonical representation
-// as defined by `canon()` in `claimgraph.js`. This wrapper deserializes the returned values before
-// passing them back to the caller.
+// infer-high
+// A higher level wrapper around infer that first converts premises and rules to the canonical
+// representation as defined by `canon()` in `claimgraph.js`. This wrapper deserializes the
+// returned values before passing them back to the caller.
 export function inferh(premises, rules) {
   premises.forEach(assertQuad);
   foreachQuadInRules(rules, assertQuad);

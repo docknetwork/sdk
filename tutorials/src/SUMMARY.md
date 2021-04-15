@@ -19,5 +19,4 @@
   - [Claim Deduction](tutorial_claim_deduction.md)
   - [PoE Anchors](tutorial_poe_anchors.md)
   - [Private Delegation](tutorial_private_delegation.md)
-  - [Public Attestation](tutorial_public_attestation.md)
   - [Public Delegation](tutorial_public_delegation.md)

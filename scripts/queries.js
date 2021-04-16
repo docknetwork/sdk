@@ -56,7 +56,7 @@ async function getBalancesWithAllHandlesRepeat(handles, addresses, count) {
 
 async function main() {
   // Websocket server at localhost:9000
-  const endpoint = 'ws://localhost:9000';
+  const endpoint = 'ws://localhost:9900';
 
   const alice = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
   const bob = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty';

@@ -165,14 +165,12 @@ async function sendAnchorTxns(count) {
   dock.setAccount(account);
 
   const txs = [];
-  let j = 0;
   const anchorIds = [];
   while (txs.length < count) {
     const anc = randomAsHex(32);
     const tx = dock.api.tx.anchor.deploy(anc);
     txs.push(tx);
     anchorIds.push(anc);
-    j++;
   }
 
   await sendBatch(dock, txs, account.address);

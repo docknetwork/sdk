@@ -2,10 +2,16 @@
 
 # The node to connect to for sending RPC commands
 FullNodeEndpoint = "ws://localhost:9944"
+
 # Whether connecting to a testnet or mainnet. Possible values are `test` and `main`
 Network = "test"
+
 # Various account details
 EndowedSecretURI = "//Ferdie"
 EndowedAddress = "5CiPPseXPECbkjWCa6MnjNokrgYjMqmKndv2rSnekmSK2DjL
 SudoSecretURI = "//Alice"
 SudoAddress = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
+
+# EVM specific parameters
+MinGasPrice = 50
+MaxGas = 400000000

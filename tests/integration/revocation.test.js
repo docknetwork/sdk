@@ -57,9 +57,9 @@ describe('Revocation Module', () => {
     done();
   }, 40000);
 
-  afterAll(async () => {
-    await dock.disconnect();
-  }, 10000);
+  // afterAll(async () => {
+  //   await dock.disconnect();
+  // }, 10000);
 
   test('Can create a registry with multiple controllers', async () => {
     // Create secondary DID

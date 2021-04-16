@@ -120,9 +120,9 @@ describe('Schema Blob Module Integration', () => {
     done();
   }, 90000);
 
-  afterAll(async () => {
-    await dockApi.disconnect();
-  }, 30000);
+  // afterAll(async () => {
+  //   await dockApi.disconnect();
+  // }, 30000);
 
   test('setSignature will only accept signature of the supported types and set the signature key of the object.', async () => {
     const schema = new Schema();

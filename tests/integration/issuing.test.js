@@ -106,9 +106,9 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
     done();
   }, 60000);
 
-  afterAll(async () => {
-    await dock.disconnect();
-  }, 10000);
+  // afterAll(async () => {
+  //   await dock.disconnect();
+  // }, 10000);
 
   test('Issue a verifiable credential with ed25519 key and verify it', async () => {
     const issuerKey = getKeyDoc(issuer1DID, dock.keyring.addFromUri(issuer1KeySeed, null, 'ed25519'), 'Ed25519VerificationKey2018');

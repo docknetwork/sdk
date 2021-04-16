@@ -37,9 +37,9 @@ describe('Blob Module', () => {
     done();
   });
 
-  afterAll(async () => {
-    await dock.disconnect();
-  }, 10000);
+  // afterAll(async () => {
+  //   await dock.disconnect();
+  // }, 10000);
 
   beforeEach(async () => {
     account = dock.keyring.addFromUri(TestAccountURI);

@@ -96,9 +96,9 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     done();
   }, 90000);
 
-  afterAll(async () => {
-    await dock.disconnect();
-  }, 10000);
+  // afterAll(async () => {
+  //   await dock.disconnect();
+  // }, 10000);
 
   test('Holder creates a verifiable presentation with single credential and verifier verifies it', async () => {
     const holder1Key = getKeyDoc(holder1DID, dock.keyring.addFromUri(holder1KeySeed, null, 'ed25519'), 'Ed25519VerificationKey2018');

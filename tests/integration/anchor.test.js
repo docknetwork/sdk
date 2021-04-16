@@ -36,7 +36,7 @@ describe('Anchoring Module', () => {
     expect(block.header.number.toNumber()).toBe(blockNumber);
   });
 
-  afterAll(async () => {
-    await dock.disconnect();
-  }, 10000);
+  // afterAll(async () => {
+  //   await dock.disconnect();
+  // }, 10000);
 });

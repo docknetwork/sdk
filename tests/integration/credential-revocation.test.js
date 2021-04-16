@@ -101,9 +101,9 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     done();
   }, 60000);
 
-  afterAll(async () => {
-    await dockAPI.disconnect();
-  }, 10000);
+  // afterAll(async () => {
+  //   await dockAPI.disconnect();
+  // }, 10000);
 
   test('Issuer can issue a revocable credential and holder can verify it successfully when it is not revoked else the verification fails', async () => {
     // The credential verification should pass as the credential has not been revoked.

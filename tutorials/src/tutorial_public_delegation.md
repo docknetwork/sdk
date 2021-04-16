@@ -83,7 +83,11 @@ The following example shows how a verifier might
 ```js
 import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from '@docknetwork/sdk/rdf-defs';
 import { crawl } from '@docknetwork/sdk/crawl.js';
-import { proveCompositeClaims, presentationToEEClaimGraph, inferh } from '@docknetwork/sdk/utils/cd';
+import {
+  proveCompositeClaims,
+  presentationToEEClaimGraph,
+  inferh,
+} from '@docknetwork/sdk/utils/cd';
 import { merge } from '@docknetwork/sdk/utils/claimgraph';
 import jsonld from 'jsonld';
 
@@ -135,9 +139,9 @@ const initialFacts = await resolveGraph({ Iri: 'did:ex:a' });
 // credentials in order to reason over delegations
 let allFacts = await crawl(initialFacts, RULES, CURIOSITY, resolveGraph);
 
-// Now that we've obtained delegation information for `did:ex:a` we can verify credentials much
-// like normal. The only difference is that we merge claimgraphs before reasoning over
-// the verified credentials.
+// Now that we've obtained delegation information for `did:ex:a` we can verify
+// credentials much like normal. The only difference is that we merge claimgraphs
+// before reasoning over the verified credentials.
 //
 // `presentation` is assumed to be a VCDM presentation provided by a credential holder
 let ver = await verifyPresentation(presentation);

@@ -134,14 +134,14 @@ async function main() {
 
   await printBlock(dock.api, num);
 
-  const address = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
+  const address = '3HrYxW57kbFnd5FryoKVzBrX2arG1N3S32v7DLTY4kcawEKC';
   await printBalance(dock.api, address);
 
   await printExtrinsicsOfBlock(dock.api, '0xeb2f1392566dfb562dde9177647d4488b911bc78981383f69cba0731a9b57a2b');
 
   await printSuccessfulExtrinsicsOfBlock(dock.api, '0x6542f888924e33e438715f9fbfd002653486f4d579290a66a227fa4e03275419');
 
-  await printTransfersOfBlock(dock.api, 3095859);
+  await printTransfersOfBlock(dock.api, 3467189);
 
   await printAllEventsFromBlock(dock.api, '0xeb2f1392566dfb562dde9177647d4488b911bc78981383f69cba0731a9b57a2b');
 

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { Parser, Store, DataFactory } from 'n3';
 import { newEngine } from '@comunica/actor-init-sparql-rdfjs';
+import assert from 'assert';
 import { fromJsonldjsNode } from './claimgraph';
 
 /**
@@ -67,6 +68,10 @@ export async function queryNextLookup(claimgraph, query, engine = null) {
   const bindings = await result.bindings();
 
   // Convert bindings to claimgraph format using lookupNext variable
+  bindings.forEach((b) => assert(
+    b.get('?lookupNext') !== undefined,
+    "Query for next lookup must always bind '?lookupNext'",
+  ));
   return bindings.map((binding) => fromJsonldjsNode(binding.get('?lookupNext')));
 }
 

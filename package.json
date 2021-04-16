@@ -69,13 +69,14 @@
   },
   "jest": {
     "testEnvironment": "node",
+    "testTimeout": 30000,
     "transform": {
       "^.+\\.(ts|js)$": "babel-jest"
     },
     "transformIgnorePatterns": [
       "/node_modules/(?!@polkadot|@babel)"
     ],
-    "setupFilesAfterEnv": ["./tests/setup-test-env.js"] 
+    "setupFilesAfterEnv": ["./tests/setup-test-env.js"]
   },
   "resolutions": {
     "jsonld": "3.2.0",
@@ -112,6 +113,6 @@
     "jsonschema": "^1.2.6",
     "mrklt": "^0.2.0",
     "n3": "^1.8.1",
-    "rify": "^0.6.0"
+    "rify": "^0.7.0"
   }
 }

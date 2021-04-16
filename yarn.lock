@@ -9743,10 +9743,10 @@ retimer@^2.0.0:
   resolved "https://registry.yarnpkg.com/retimer/-/retimer-2.0.0.tgz#e8bd68c5e5a8ec2f49ccb5c636db84c04063bbca"
   integrity sha512-KLXY85WkEq2V2bKex/LOO1ViXVn2KGYe4PYysAdYdjmraYIUsVkXu8O4am+8+5UbaaGl1qho4aqAAPHNQ4GSbg==
 
-rify@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/rify/-/rify-0.6.0.tgz#57886f9e3c0566f453d207ac9f51253a42e7f753"
-  integrity sha512-DX7TcUIyi7zLnxOR+QgvwyNQVqPGcz8I8h2aabPW5+CeSafXMfxxYCSfgnHmMy2VptX9ynAfzQvKQdzsmBxsWQ==
+rify@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/rify/-/rify-0.7.0.tgz#831c377a55ef81c2163c57c60c31849e1c50c073"
+  integrity sha512-TG+yPMs0XzgWFqoJ35xSv0rRyTBGsd54/sD1tVOnQD0M/yfvS+EOEbXUtDbWtUp5n70pQ9Y6e9LgHUesgB+f9A==
 
 rimraf@2.6.3:
   version "2.6.3"

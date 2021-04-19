@@ -9,11 +9,11 @@ import {
   createNewDockDID,
   createSignedDidRemoval,
   createSignedKeyUpdate,
-  getHexIdentifierFromDID
+  getHexIdentifierFromDID,
 } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { createRandomRegistryId, KeyringPairDidKeys, OneOfPolicy } from '../src/utils/revocation';
-import {BLOB_MAX_BYTE_SIZE} from "../src/modules/blob";
+import { BLOB_MAX_BYTE_SIZE } from '../src/modules/blob';
 
 require('dotenv').config();
 
@@ -85,7 +85,7 @@ async function revocation() {
 
   const revokeId = new Set();
   revokeId.add(randomAsHex(32));
-  const lastModified = await dock.revocation.getBlockNoForLastChangeToRegistry(registryId);
+  let lastModified = await dock.revocation.getBlockNoForLastChangeToRegistry(registryId);
   const revTx = dock.revocation.createRevokeTx(registryId, revokeId, lastModified, didKeys);
   console.info(`Payment info of 1 revocation is ${(await revTx.paymentInfo(account.address))}`);
 
@@ -95,7 +95,7 @@ async function revocation() {
   const bal2 = await dock.poaModule.getBalance(account.address);
   console.info(`Fee paid is ${parseInt(bal1[0]) - parseInt(bal2[0])}`);
 
-  const count = 100;
+  const count = 10;
 
   const revIds = [];
   let i = 0;
@@ -105,7 +105,7 @@ async function revocation() {
   }
   revIds.sort();
   const revokeIds = new BTreeSet();
-  i = 1;
+  i = 0;
   while (i < count) {
     revokeIds.add(revIds[i]);
     i++;
@@ -119,6 +119,10 @@ async function revocation() {
   console.info(`block ${r1.status.asInBlock}`);
   const bal4 = await dock.poaModule.getBalance(account.address);
   console.info(`Fee paid is ${parseInt(bal3[0]) - parseInt(bal4[0])}`);
+
+  lastModified = await dock.revocation.getBlockNoForLastChangeToRegistry(registryId);
+  const revTx2 = dock.revocation.createRemoveRegistryTx(registryId, lastModified, didKeys, false);
+  console.info(`Payment info of removing registry is ${(await revTx2.paymentInfo(account.address))}`);
 }
 
 async function anchors() {
@@ -188,13 +192,13 @@ async function main() {
     case 1:
       await revocation();
       break;
-    case 3:
+    case 2:
       await anchors();
       break;
-    case 4:
+    case 3:
       await blobs();
       break;
-    case 5:
+    case 4:
       await transfers();
       break;
     default:

@@ -1,5 +1,6 @@
 import contexts from '../src/utils/vc/contexts';
 import network_cache from './network-cache';
+import axios from 'axios';
 
 // global document cache, replaces the internet and acts as a did method
 const documentRegistry = {};
@@ -13,6 +14,9 @@ for (const k of Object.keys(network_cache)) {
 /// document loader that pulls documents from the local documentRegistry
 export async function documentLoader(url) {
   if (documentRegistry[url] === undefined) {
+    if (!(url.startsWith('http://') | url.startsWith('https://'))) {
+      throw new Error('failed to resolve ' + url);
+    }
     documentRegistry[url] = (await axios.get(url)).data;
     console.warn(
       'Unit test is making web requests. This is slow. Please update ./test/network-cache.json',

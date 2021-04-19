@@ -18,7 +18,8 @@ import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 const dockDID = createNewDockDID();
 
 // Generate first key with this seed. The key type is Sr25519
-const firstKeySeed = randomAsHex(32);
+// const firstKeySeed = randomAsHex(32);
+const firstKeySeed = '//Lovesh';
 
 // Generate second key (for update) with this seed. The key type is Ed25519
 const secondKeySeed = randomAsHex(32);

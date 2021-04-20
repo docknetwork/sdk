@@ -48,6 +48,8 @@ Running dev node:
 ./target/release/dock-testnet --base-path /tmp/alice --chain local --alice --port 30333 --ws-port 9944 --rpc-port 9933 --telemetry-url ws://telemetry.polkadot.io:1024 --validator --dev
 ```
 
+**Use the `mainnet` tag of this repo when interacting with mainnet as the `master` branch isn't guaranteed to be mainnet compatible.**
+
 ## Test and example Configuration
 Configuration variables like websocket endpoint for node `FullNodeEndpoint`, URI for account to pay for extrinsics `TestAccountURI`
 and keyring type `TestKeyringType` can be set as environment variables (or in an .env file). If they are not set, default values as

@@ -144,7 +144,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
         domain,
         resolver,
       );
-
+      
       expect(signedPres).toMatchObject(
         expect.objectContaining(
           {

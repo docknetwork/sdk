@@ -43,6 +43,7 @@ async function getTxnsStatsInLastBlocks(count) {
   const blocks = [lastBlock];
   let { parentHash } = lastBlock.header;
 
+  /* eslint-disable no-await-in-loop */
   while (parentHash !== new Uint8Array(32) && blocks.length < count) {
     const block = await getBlock(dock.api, parentHash.toString());
     weight += await getWeight(parentHash.toString());

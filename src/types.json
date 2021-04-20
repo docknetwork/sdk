@@ -138,13 +138,15 @@
   },
   "ParamType": {
     "_enum": {
+      "Address": null,
       "Int": "u16",
       "Uint": "u16"
     }
   },
   "ContractConfig": {
     "address": "H160",
-    "query_abi_encoded": "Vec<u8>",
+    "query_aggregator_call_encoded": "Vec<u8>",
+    "query_price_abi_encoded": "Vec<u8>",
     "return_val_abi": "Vec<ParamType>"
   },
   "StateChange": {

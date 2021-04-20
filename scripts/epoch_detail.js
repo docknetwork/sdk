@@ -47,11 +47,10 @@ async function printEpochStats() {
     console.log(`epoch no ${epochNo}`);
     const lastSlot = element[1].ending_slot.isSome ? element[1].ending_slot.unwrap().toHuman() : 'Nil';
     console.log(`No of validators: ${element[1].validator_count}, starting slot: ${element[1].starting_slot.toHuman()}, expected ending slot: ${element[1].expected_ending_slot.toHuman()}, ending slot ${lastSlot}`);
-    if (element[1].total_emission.isSome) {
-      const totalEmission = element[1].total_emission.unwrap().toHuman();
+    if (element[1].emission_for_treasury.isSome) {
       const treasEmission = element[1].emission_for_treasury.unwrap().toHuman();
       const valdEmission = element[1].emission_for_validators.unwrap().toHuman();
-      console.log(`Total emission: ${totalEmission}, Emission for Treasury: ${treasEmission}, Emission for validators: ${valdEmission}`);
+      console.log(`Emission for Treasury: ${treasEmission}, Emission for validators: ${valdEmission}`);
     }
     console.log('');
   });
@@ -89,7 +88,6 @@ async function printRemainingSupply() {
   const ta = await dock.api.rpc.poa.treasuryAccount();
   if (asDockAddress(ta, Network) !== expectedTreasuryAddress) {
     console.error(`Treasury address is not ${expectedTreasuryAddress}. This should not be the case`);
-    process.exit(1);
   }
   const tb = await dock.api.rpc.poa.treasuryBalance();
   console.log(`Treasury balance is ${tb}`);

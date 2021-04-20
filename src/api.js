@@ -13,6 +13,7 @@ import TechCommitteeModule from './modules/tech-committee';
 import TokenMigration from './modules/migration';
 import types from './types.json';
 import PoaRpcDefs from './poa-rpc-defs';
+import PriceFeedRpcDefs from './price-feed_rpc-defs';
 
 import {
   PublicKey,
@@ -92,6 +93,9 @@ class DockAPI {
 
     // If RPC methods given, use them else set it to empty object.
     let rpc = chainRpc || {};
+
+    // Initialize price feed rpc
+    rpc = Object.assign(rpc, PriceFeedRpcDefs);
 
     // If using PoA module, extend the RPC methods with PoA specific ones.
     if (loadPoaModules) {

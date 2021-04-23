@@ -97,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="concepts_private_delegation.html"><strong aria-hidden="true">2.6.</strong> Private Delegation</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="tutorial_private_delegation.html"><strong aria-hidden="true">3.8.</strong> Private Delegation</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="concepts_private_delegation.html"><strong aria-hidden="true">2.6.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="concepts_public_attestation.html"><strong aria-hidden="true">2.7.</strong> Public Attestation</a></li><li class="chapter-item expanded "><a href="concepts_public_delegation.html"><strong aria-hidden="true">2.8.</strong> Public Delegation</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="tutorial_private_delegation.html"><strong aria-hidden="true">3.8.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="tutorial_public_delegation.html"><strong aria-hidden="true">3.9.</strong> Public Delegation</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -777,6 +777,99 @@ const defaultGraph = { DefaultGraph: true };
 <p>When <code>did:ex:b</code> wishes to issue a credential on behalf of <code>did:ex:a</code>, they should bundle it (e.g. in a presentation) with it this &quot;delegation&quot; credential. A delegation credential constitutes a proof of delegation. A proof of delegation bundled with a credential issued by the delegate can be prove that some statement[s] were made by authority of some root delegator.</p>
 <p>In order to process delegated credentials a verifier accepts a bundle. The bundle includes both delegations and credentials issued by delegates. After verifying every credential within the bundle (including the delegations) the verifier uses <a href="concepts_claim_deduction.html">Claim Deduction</a> to determine which statements are proven by the delegated credential.</p>
 <p>Dock's delegation ontology (i.e. rdf vocabulary) and ruleset are currently in alpha. See <a href="tutorial_private_delegation.html">Private Delegation</a> for an example of their use.</p>
+<h1 id="public-attestation"><a class="header" href="#public-attestation">Public Attestation</a></h1>
+<p>This feature should be considered <em>Alpha</em>.</p>
+<p><a href="https://github.com/docknetwork/planning/blob/master/rfc/0014-public-attestation.md">RFC</a></p>
+<p>VCDM Verifiable credentials are a way to prove an <em>attestation</em>. Valid credentials prove statements of the form <code>Issuer claims X</code>, where <code>X</code> is itself a statement. One property of verifiable credentials is that the holder may keep them private simply by not sharing them with other parties. That property will be sometimes useful, sometimes not. VCDM crededentials are private and therefore not automatically discoverable but Public Attestations give a decentralized identity the ability to post claims that <em>are</em> discoverable by any party. For Dock DIDs, attestations are linked on-chain but Public Attestations are not specicfic to Dock. Other DID methods can implement public attestations by including them in DID documents.</p>
+<p>Public Attestations are posted as RDF documents. Since RDF can represent, or link to, arbitrary types of data, Public Attestations can be used to publish arbitrary content.</p>
+<h2 id="data-model"><a class="header" href="#data-model">Data Model</a></h2>
+<p>Public Attestaions live in the DID document of their poster. A DID with a public attestation will have an extra property, &quot;https://rdf.dock.io/alpha/2021#attestsDocumentContent&quot;. The value of that property is an IRI that is expected to point to an RDF document. Any statement contained in that document is considered to be a claim made by the DID.</p>
+<p>If <code>DID attestsDocumentContent DOC</code> then for every statement <code>X</code> in <code>DOC</code> <code>DID claims X</code>.</p>
+<p>Two IRI schemes are supported for pionting to attested documents: DIDs and ipfs links. DIDs are dereferenced and interpreted as <a href="https://www.w3.org/TR/json-ld/">json-ld</a>. Ipfs links are dereferenced and interpreted as <a href="https://www.w3.org/TR/turtle/">turtle</a> documents. The sdk makes it easy to dereferece DIDs and ipfs attestation documents but the Public Attestation concept is extendable to other types of IRI, like <a href="https://tools.ietf.org/html/draft-sporny-hashlink-06">hashlinks</a> or <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs">data URIs</a>.</p>
+<p>For Dock DIDs public attestation are made by <a href="https://github.com/docknetwork/sdk/blob/61cbaaf61e11cc8cc57d8582095bffafecd794b9/src/modules/did.js#L94">setting the attestation for the DID</a> on-chain. Changing the value of an attestation effectively revokes the previous attestation and issues a new one. A DIDs attestation can also be set to <code>None</code>, which is equivalent to attesting an empty claimgraph. Dock DIDs have their attestation set to <code>None</code> by default. A Dock DID with attestation set to <code>None</code> will not contain the <code>attestsDocumentContents</code> key.</p>
+<h3 id="example-of-a-did-attesting-to-a-document-in-ipfs"><a class="header" href="#example-of-a-did-attesting-to-a-document-in-ipfs">Example of A DID attesting to a document in ipfs</a></h3>
+<p><code>did:ex:ex</code>:</p>
+<pre><code class="language-json">{
+  &quot;@context&quot;: &quot;https://www.w3.org/ns/did/v1&quot;,
+  &quot;id&quot;: &quot;did:ex:ex&quot;,
+  &quot;https://rdf.dock.io/alpha/2021#attestsDocumentContent&quot;: {
+    &quot;@id&quot;: &quot;ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p&quot;
+  }
+}
+</code></pre>
+<p>Content of <code>ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p</code>:</p>
+<pre><code class="language-turtle">&lt;https://www.wikidata.org/wiki/Q25769&gt;
+  &lt;https://www.wikidata.org/wiki/Property:P171&gt;
+  &lt;https://www.wikidata.org/wiki/Q648422&gt; .
+</code></pre>
+<p>From these documents we can derive two facts. The first fact is encodeded directly in the DID document.</p>
+<p>Fact 1:</p>
+<pre><code class="language-turtle"># `did:ex:ed` attests to the content of `ipfs://Qmeg1..`
+`&lt;did:ex:ed&gt; &lt;https://rdf.dock.io/alpha/2021#attestsDocumentContent&gt; &lt;ipfs://Qmeg1..&gt; .
+</code></pre>
+<p>The second fact is infered. Since we know the content of <code>ipfs://Qmeg1..</code> we know that <code>ipfs://Qmeg1..</code> contains the statement <code>wd:Q25769 wd:Property:P171 wd:Q648422</code> (Short-eared Owl is in the genus &quot;Asio&quot;). <code>did:ex:ex</code> attests the document <code>ipfs://Qmeg1..</code> and <code>ipfs://Qmeg1..</code> states that the Short-eared Owl is in the genus &quot;Asio&quot;, therefore:</p>
+<p>Fact 2:</p>
+<pre><code class="language-turtle">@prefix wd: &lt;https://www.wikidata.org/wiki/&gt; .
+# `did:ex:ex` claims that the Short-eared Owl is in the genus &quot;Asio&quot;.
+&lt;wd:Q25769&gt; &lt;wd:Property:P171&gt; &lt;wd:Q648422&gt; &lt;did:ex:ex&gt; .
+</code></pre>
+<h3 id="example-of-a-did-attesting-to-multiple-documents"><a class="header" href="#example-of-a-did-attesting-to-multiple-documents">Example of A DID attesting to multiple documents</a></h3>
+<p>While it is valid DIDs to include multiple attested IRIs in a single DID document, Dock artificially limits the number of attestation to one per Dock DID. This is to encourage off-chain (ipfs) data storage. If a DID wishes to attests to multiple documents, there are two suggested options: 1) merge the two documents into a single document or 2) attest to a single document which in turn notes an <code>attestsDocumentContents</code> for each of it's children. The following is an example of option &quot;2)&quot;.</p>
+<p><code>did:ex:ex</code>:</p>
+<pre><code class="language-json">{
+  &quot;@context&quot;: &quot;https://www.w3.org/ns/did/v1&quot;,
+  &quot;id&quot;: &quot;did:ex:ex&quot;,
+  &quot;https://rdf.dock.io/alpha/2021#attestsDocumentContent&quot;: {
+    &quot;@id&quot;: &quot;ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p&quot;
+  }
+}
+</code></pre>
+<p><code>ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p</code>:</p>
+<pre><code class="language-turtle">&lt;did:ex:ex&gt;
+  &lt;https://rdf.dock.io/alpha/2021#attestsDocumentContent&gt;
+  &lt;ipfs://QmXoypizjW3WknFiJnLLwHCnL72vedxjQkDDP1mXWo6uco&gt; . # document1
+&lt;did:ex:ex&gt;
+  &lt;https://rdf.dock.io/alpha/2021#attestsDocumentContent&gt;
+  &lt;ipfs://QmdycyxM3r882pHx3M63Xd8NUfsXoEmBnU8W6PgL9eY9cN&gt; . # document2
+</code></pre>
+<h2 id="uses"><a class="header" href="#uses">Uses</a></h2>
+<p>Two properties of RDF have the potential to supercharge Public Attestations.</p>
+<ol>
+<li>It's a semantic knowlege representation, it can be <a href="https://github.com/docknetwork/rify">reasoned over</a>.</li>
+<li>It's <a href="https://en.wikipedia.org/wiki/SPARQL">queryable</a> in it's native form.</li>
+</ol>
+<p>Via these properties the sdk implements a &quot;Curious Agent&quot;. The Curious Agent seeks out information. It starts with an initial kernel of knowlege (an RDF dataset) and it follows a sense of curiosity, gradually building it's knowlege graph by dereferencing IRIs, stopping when it finds nothing new to be curious about. As it crawls, it reasons over the information it's found, deducing new facts, which may in turn spark new curiosity. The Curious Agent accepts it's curiosity as Sparql queries. The logical rules it uses to reason are also configurable, axioms are provided to the Agent as conjunctive if-then statements (like in <a href="./concepts_claim_deduction.html">Claim Deduction</a>). Within the sdk, the Curious Agent is simply called <code>crawl()</code>.</p>
+<p>The Curious Agent is sometimes referred to as &quot;the crawler&quot;.</p>
+<p>The use-case that drove implementation of the crawler is to search for <a href="./concepts_public_delegation.html">publicaly posted Delegation information</a>. As such, a bare minimum of functionality is implemented by <code>crawl()</code>. Want more? Consider contacting us.</p>
+<h1 id="public-delegation"><a class="header" href="#public-delegation">Public Delegation</a></h1>
+<p>This feature should be considered <em>Alpha</em>.</p>
+<p><a href="https://github.com/docknetwork/planning/blob/master/rfc/0013-public-delegation.md">RFC</a></p>
+<p>We combine <a href="./concepts_private_delegation.html">Private Delegation</a> and <a href="./concepts_public_attestation.html">Public Attestation</a> to get Public Delegation.</p>
+<p>When a delegation is attested via a credential, we call that a Private Delegation. As discussed in the <a href="./concepts_public_attestation.html">previous section</a>, attestations can be made in other ways. When a delegation is <a href="./concepts_public_attestation.html">attested publically</a> we call it a Public Delegation.</p>
+<p>Public Delegations remove the need for credential holders to manage and present delegation chains. With Public Delegations, credential verifiers may look up delegation information out-of-band.</p>
+<p>Just like in <a href="./concepts_private_delegation.html">Private Delegation</a>, verified delegation information constitutes a knowlege graph that can be merged with the knowlege graph from a verified credential. The merged graphs are reasoned over to determine facts that are proven true.</p>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
+<p>Let's say there is trusted root issuer, <code>did:ex:root</code>. <code>did:ex:root</code> may delegate authority to make claims on behalf of <code>did:ex:root</code>. To do so, <code>did:ex:root</code> would attest to a claimgraph like this one:</p>
+<p><code>ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p</code>:</p>
+<pre><code class="language-turtle">@prefix dockalpha: &lt;https://rdf.dock.io/alpha/2021#&gt; .
+&lt;did:ex:delegate1&gt; dockalpha:mayClaim dockalpha:ANYCLAIM .
+&lt;did:ex:delegate2&gt; dockalpha:mayClaim dockalpha:ANYCLAIM .
+</code></pre>
+<p>When <code>did:ex:root</code> attests to the above triples, the following dataset is true.</p>
+<pre><code class="language-turtle">@prefix dockalpha: &lt;https://rdf.dock.io/alpha/2021#&gt; .
+&lt;did:ex:delegate1&gt; dockalpha:mayClaim dockalpha:ANYCLAIM &lt;did:ex:root&gt; .
+&lt;did:ex:delegate2&gt; dockalpha:mayClaim dockalpha:ANYCLAIM &lt;did:ex:root&gt; .
+</code></pre>
+<p><code>did:ex:root</code> may attests to <code>ipfs://Qmeg1Hq...</code> by adding the ipfs link to its DID document.</p>
+<pre><code class="language-json">{
+  &quot;@context&quot;: &quot;https://www.w3.org/ns/did/v1&quot;,
+  &quot;id&quot;: &quot;did:ex:root&quot;,
+  &quot;https://rdf.dock.io/alpha/2021#attestsDocumentContent&quot;: {
+    &quot;@id&quot;: &quot;ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p&quot;
+  }
+}
+</code></pre>
+<p>By modifying its DID document to include the ipfs link <code>did:ex:root</code> attests to the delegation publically.</p>
 <h1 id="tutorials"><a class="header" href="#tutorials">Tutorials</a></h1>
 <ol>
 <li><a href="./tutorial_did.html">DID</a></li>
@@ -1945,6 +2038,139 @@ try {
   console.error('veracity of the composite claim is unknown');
 }
 </code></pre>
+<h1 id="public-delegation-1"><a class="header" href="#public-delegation-1">Public Delegation</a></h1>
+<p>This feature should be considered <em>Alpha</em>.</p>
+<p>Public Delegations use the same data model as Private Delegations. A delegator attests to some delegation. The verifier somehow gets and verifies that attestation then reasons over it in conjuction with a some credential. The difference is that while Private Delegations are passed around as credentials, Public Delegations are linked from the DID document of the delegator.</p>
+<h2 id="create-a-delegation-1"><a class="header" href="#create-a-delegation-1">Create a Delegation</a></h2>
+<p>It's assumed that the delegator already controls a DID. See the <a href="./tutorial_did.html">tutorial on DIDs</a> for instructions on creating your own on-chain DID.</p>
+<p>Like in the Private Delegation tutorial, let's assume a root authority, <code>did:ex:a</code>, wants to grant <code>did:ex:b</code> full authority to make claims on behalf of <code>did:ex:a</code>. <code>did:ex:a</code> will post an attestation delegating to <code>did:ex:b</code>.</p>
+<details>
+<summary>Boilerplate</summary>
+<pre><code class="language-js">import createClient from 'ipfs-http-client';
+import { graphResolver } from '@docknetwork/sdk/crawl.js';
+const { v4: uuidv4 } = require('uuid');
+
+// A running ipfs node is required for crawling.
+const ipfsUrl = 'http://localhost:5001';
+
+function uuid() {
+  return `uuid:${uuidv4()}`;
+}
+
+// Check out the Issuance, Presentation, Verification tutorial for info on signing
+// credentials.
+function signCredential(cred, issuer_secret) { ... }
+
+// Check out the Issuance, Presentation, Verification tutorial for info on verifying
+// VCDM presentations.
+async function verifyPresentation(presentation) { ... }
+
+// This function can be implemeted using setClaim().
+// An example of setClaim() usage can be found here:
+//  https://github.com/docknetwork/sdk/blob/master/tests/integration/did.test.js
+async function setAttestation(did, didKey, iri) { ... }
+
+// See the DID resolver tutorial For information about implementing a documentLoader.
+const documentLoader = ...;
+
+const ipfsClient = createClient(ipfsUrl);
+const resolveGraph = graphResolver(ipfsClient, documentLoader);
+</code></pre>
+</details>
+<p>Instead of a credential, the delegation will be expressed as a turtle document, posted on ipfs.</p>
+<pre><code class="language-turtle">@prefix dockalpha: &lt;https://rdf.dock.io/alpha/2021#&gt; .
+&lt;did:ex:b&gt; dockalpha:mayClaim dockalpha:ANYCLAIM .
+</code></pre>
+<p>A link to this ipfs document is then added to the delegators DID document. For a Dock DID, this is done by submitting a transaction on-chain.</p>
+<pre><code class="language-js">await setAttestation(
+  delegatorDid,
+  delegatorSk,
+  'ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p'
+);
+</code></pre>
+<h2 id="issue-a-credential-as-a-delegate-1"><a class="header" href="#issue-a-credential-as-a-delegate-1">Issue a Credential as a Delegate</a></h2>
+<p>With Public Delegation, the delegate doesn't need to worry about the passing on delegation credentials to the holder. The delegations are already posted where the verifier can find them.</p>
+<h2 id="present-a-delegated-credential-1"><a class="header" href="#present-a-delegated-credential-1">Present a Delegated Credential</a></h2>
+<p>With Public Delegation the holder does not need to include a delegation chain when presenting their credential. From the holders perspective, the process of presenting a publically delegated credential is exactly the same as the <a href="./tutorial_ipv.html">process for presenting a normal credential</a>.</p>
+<h2 id="accept-a-delegated-credential-1"><a class="header" href="#accept-a-delegated-credential-1">Accept a Delegated Credential</a></h2>
+<p>The verifier accepts Publicly delegated credentials by merging the credential's claimgraph representation with publically posted delegation information, then reasoning over the result. Once found, the delegation information is also a claimgraph. The delegation information is found by <a href="./concepts_public_attestation.html#uses">crawling the public attestation supergraph</a>. Crawling is potentially slow, so when verification speed is important it should be done early on, like at program startup. Delegation information can be re-used across multiple credential verifications.</p>
+<p>As with any Public Attestations, delegation information is revocable by removing the delegation attestation from the delegators DID doc. As such it is possible for cached delegation information to become out of date. Long running validator processes should devise a mechanism for invalidating out-of-date delegation information, such as re-crawing whenever a change is detected to the DID doc of a delegator (or sub-delegator). This tutorial does not cover invalidation of out-of-date delegations.</p>
+<p>The following example shows how a verifier might</p>
+<pre><code class="language-js">import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from '@docknetwork/sdk/rdf-defs';
+import { crawl } from '@docknetwork/sdk/crawl.js';
+import {
+  proveCompositeClaims,
+  presentationToEEClaimGraph,
+  inferh,
+} from '@docknetwork/sdk/utils/cd';
+import { merge } from '@docknetwork/sdk/utils/claimgraph';
+import jsonld from 'jsonld';
+
+// These logical rules will be used for reasoning during both crawing and verifiying
+// credentials.
+const RULES = [
+  // Imports the definition of dockalpha:mayClaim from sdk
+  ...MAYCLAIM_DEF_1,
+  // Adds a custom rule stating that by attesting to a document the attester grants the
+  // document full delegation authority.
+  {
+    if_all: [
+      [
+        { Unbound: 'a' },
+        { Bound: { Iri: ATTESTS } },
+        { Unbound: 'doc' },
+        { Unbound: 'a' },
+      ],
+    ],
+    then: [
+      [
+        { Unbound: 'doc' },
+        { Bound: { Iri: MAYCLAIM } },
+        { Bound: { Iri: ANYCLAIM } },
+        { Unbound: 'a' },
+      ],
+    ],
+  },
+];
+
+// This query dictates what the crawler will be &quot;curious&quot; about. Any matches to
+// `?lookupNext` will be dereferenced as IRIs. When an IRI is successfully dereferenced
+// the resultant data is merged into the crawlers knowlege graph.
+const CURIOSITY = `
+  prefix dockalpha: &lt;https://rdf.dock.io/alpha/2021#&gt;
+
+  # Any entity to which &quot;did:ex:a&quot; grants full delegation authority is interesting.
+  select ?lookupNext where {
+    graph &lt;did:ex:a&gt; {
+      ?lookupNext dockalpha:mayClaim dockalpha:ANYCLAIM .
+    }
+  }
+`;
+
+// To spark the crawlers interest we'll feed it some initial knowlege about did:ex:a .
+const initialFacts = await resolveGraph({ Iri: 'did:ex:a' });
+
+// `allFact` contains our delegation information, it will be merged with verified
+// credentials in order to reason over delegations
+let allFacts = await crawl(initialFacts, RULES, CURIOSITY, resolveGraph);
+
+// Now that we've obtained delegation information for `did:ex:a` we can verify
+// credentials much like normal. The only difference is that we merge claimgraphs
+// before reasoning over the verified credentials.
+//
+// `presentation` is assumed to be a VCDM presentation provided by a credential holder
+let ver = await verifyPresentation(presentation);
+if (!ver.verified) {
+  throw ver;
+}
+const expPres = await jsonld.expand(presentation);
+const presCg = await presentationToEEClaimGraph(expPres);
+const cg = inferh(merge(presCg, allFacts), RULES);
+
+// At this point all the RDF quads in `cg` are known to be true.
+// doSomethingWithVerifiedData(cg);
+</code></pre>
+<p>More examples of <code>crawl()</code> usage can be found <a href="https://github.com/docknetwork/sdk/blob/master/tests/integration/crawl.test.js">here</a> and <a href="https://github.com/docknetwork/sdk/blob/master/tests/unit/crawl.test.js">here</a>.</p>
 
                     </main>
 

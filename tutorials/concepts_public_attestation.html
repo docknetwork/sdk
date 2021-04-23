@@ -1,0 +1,298 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Public Attestation - Dock SDK Tutorial</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        
+        <link rel="stylesheet" href="css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="concepts_private_delegation.html"><strong aria-hidden="true">2.6.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="concepts_public_attestation.html" class="active"><strong aria-hidden="true">2.7.</strong> Public Attestation</a></li><li class="chapter-item expanded "><a href="concepts_public_delegation.html"><strong aria-hidden="true">2.8.</strong> Public Delegation</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="tutorial_private_delegation.html"><strong aria-hidden="true">3.8.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="tutorial_public_delegation.html"><strong aria-hidden="true">3.9.</strong> Public Delegation</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Dock SDK Tutorial</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="public-attestation"><a class="header" href="#public-attestation">Public Attestation</a></h1>
+<p>This feature should be considered <em>Alpha</em>.</p>
+<p><a href="https://github.com/docknetwork/planning/blob/master/rfc/0014-public-attestation.md">RFC</a></p>
+<p>VCDM Verifiable credentials are a way to prove an <em>attestation</em>. Valid credentials prove statements of the form <code>Issuer claims X</code>, where <code>X</code> is itself a statement. One property of verifiable credentials is that the holder may keep them private simply by not sharing them with other parties. That property will be sometimes useful, sometimes not. VCDM crededentials are private and therefore not automatically discoverable but Public Attestations give a decentralized identity the ability to post claims that <em>are</em> discoverable by any party. For Dock DIDs, attestations are linked on-chain but Public Attestations are not specicfic to Dock. Other DID methods can implement public attestations by including them in DID documents.</p>
+<p>Public Attestations are posted as RDF documents. Since RDF can represent, or link to, arbitrary types of data, Public Attestations can be used to publish arbitrary content.</p>
+<h2 id="data-model"><a class="header" href="#data-model">Data Model</a></h2>
+<p>Public Attestaions live in the DID document of their poster. A DID with a public attestation will have an extra property, &quot;https://rdf.dock.io/alpha/2021#attestsDocumentContent&quot;. The value of that property is an IRI that is expected to point to an RDF document. Any statement contained in that document is considered to be a claim made by the DID.</p>
+<p>If <code>DID attestsDocumentContent DOC</code> then for every statement <code>X</code> in <code>DOC</code> <code>DID claims X</code>.</p>
+<p>Two IRI schemes are supported for pionting to attested documents: DIDs and ipfs links. DIDs are dereferenced and interpreted as <a href="https://www.w3.org/TR/json-ld/">json-ld</a>. Ipfs links are dereferenced and interpreted as <a href="https://www.w3.org/TR/turtle/">turtle</a> documents. The sdk makes it easy to dereferece DIDs and ipfs attestation documents but the Public Attestation concept is extendable to other types of IRI, like <a href="https://tools.ietf.org/html/draft-sporny-hashlink-06">hashlinks</a> or <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs">data URIs</a>.</p>
+<p>For Dock DIDs public attestation are made by <a href="https://github.com/docknetwork/sdk/blob/61cbaaf61e11cc8cc57d8582095bffafecd794b9/src/modules/did.js#L94">setting the attestation for the DID</a> on-chain. Changing the value of an attestation effectively revokes the previous attestation and issues a new one. A DIDs attestation can also be set to <code>None</code>, which is equivalent to attesting an empty claimgraph. Dock DIDs have their attestation set to <code>None</code> by default. A Dock DID with attestation set to <code>None</code> will not contain the <code>attestsDocumentContents</code> key.</p>
+<h3 id="example-of-a-did-attesting-to-a-document-in-ipfs"><a class="header" href="#example-of-a-did-attesting-to-a-document-in-ipfs">Example of A DID attesting to a document in ipfs</a></h3>
+<p><code>did:ex:ex</code>:</p>
+<pre><code class="language-json">{
+  &quot;@context&quot;: &quot;https://www.w3.org/ns/did/v1&quot;,
+  &quot;id&quot;: &quot;did:ex:ex&quot;,
+  &quot;https://rdf.dock.io/alpha/2021#attestsDocumentContent&quot;: {
+    &quot;@id&quot;: &quot;ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p&quot;
+  }
+}
+</code></pre>
+<p>Content of <code>ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p</code>:</p>
+<pre><code class="language-turtle">&lt;https://www.wikidata.org/wiki/Q25769&gt;
+  &lt;https://www.wikidata.org/wiki/Property:P171&gt;
+  &lt;https://www.wikidata.org/wiki/Q648422&gt; .
+</code></pre>
+<p>From these documents we can derive two facts. The first fact is encodeded directly in the DID document.</p>
+<p>Fact 1:</p>
+<pre><code class="language-turtle"># `did:ex:ed` attests to the content of `ipfs://Qmeg1..`
+`&lt;did:ex:ed&gt; &lt;https://rdf.dock.io/alpha/2021#attestsDocumentContent&gt; &lt;ipfs://Qmeg1..&gt; .
+</code></pre>
+<p>The second fact is infered. Since we know the content of <code>ipfs://Qmeg1..</code> we know that <code>ipfs://Qmeg1..</code> contains the statement <code>wd:Q25769 wd:Property:P171 wd:Q648422</code> (Short-eared Owl is in the genus &quot;Asio&quot;). <code>did:ex:ex</code> attests the document <code>ipfs://Qmeg1..</code> and <code>ipfs://Qmeg1..</code> states that the Short-eared Owl is in the genus &quot;Asio&quot;, therefore:</p>
+<p>Fact 2:</p>
+<pre><code class="language-turtle">@prefix wd: &lt;https://www.wikidata.org/wiki/&gt; .
+# `did:ex:ex` claims that the Short-eared Owl is in the genus &quot;Asio&quot;.
+&lt;wd:Q25769&gt; &lt;wd:Property:P171&gt; &lt;wd:Q648422&gt; &lt;did:ex:ex&gt; .
+</code></pre>
+<h3 id="example-of-a-did-attesting-to-multiple-documents"><a class="header" href="#example-of-a-did-attesting-to-multiple-documents">Example of A DID attesting to multiple documents</a></h3>
+<p>While it is valid DIDs to include multiple attested IRIs in a single DID document, Dock artificially limits the number of attestation to one per Dock DID. This is to encourage off-chain (ipfs) data storage. If a DID wishes to attests to multiple documents, there are two suggested options: 1) merge the two documents into a single document or 2) attest to a single document which in turn notes an <code>attestsDocumentContents</code> for each of it's children. The following is an example of option &quot;2)&quot;.</p>
+<p><code>did:ex:ex</code>:</p>
+<pre><code class="language-json">{
+  &quot;@context&quot;: &quot;https://www.w3.org/ns/did/v1&quot;,
+  &quot;id&quot;: &quot;did:ex:ex&quot;,
+  &quot;https://rdf.dock.io/alpha/2021#attestsDocumentContent&quot;: {
+    &quot;@id&quot;: &quot;ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p&quot;
+  }
+}
+</code></pre>
+<p><code>ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p</code>:</p>
+<pre><code class="language-turtle">&lt;did:ex:ex&gt;
+  &lt;https://rdf.dock.io/alpha/2021#attestsDocumentContent&gt;
+  &lt;ipfs://QmXoypizjW3WknFiJnLLwHCnL72vedxjQkDDP1mXWo6uco&gt; . # document1
+&lt;did:ex:ex&gt;
+  &lt;https://rdf.dock.io/alpha/2021#attestsDocumentContent&gt;
+  &lt;ipfs://QmdycyxM3r882pHx3M63Xd8NUfsXoEmBnU8W6PgL9eY9cN&gt; . # document2
+</code></pre>
+<h2 id="uses"><a class="header" href="#uses">Uses</a></h2>
+<p>Two properties of RDF have the potential to supercharge Public Attestations.</p>
+<ol>
+<li>It's a semantic knowlege representation, it can be <a href="https://github.com/docknetwork/rify">reasoned over</a>.</li>
+<li>It's <a href="https://en.wikipedia.org/wiki/SPARQL">queryable</a> in it's native form.</li>
+</ol>
+<p>Via these properties the sdk implements a &quot;Curious Agent&quot;. The Curious Agent seeks out information. It starts with an initial kernel of knowlege (an RDF dataset) and it follows a sense of curiosity, gradually building it's knowlege graph by dereferencing IRIs, stopping when it finds nothing new to be curious about. As it crawls, it reasons over the information it's found, deducing new facts, which may in turn spark new curiosity. The Curious Agent accepts it's curiosity as Sparql queries. The logical rules it uses to reason are also configurable, axioms are provided to the Agent as conjunctive if-then statements (like in <a href="./concepts_claim_deduction.html">Claim Deduction</a>). Within the sdk, the Curious Agent is simply called <code>crawl()</code>.</p>
+<p>The Curious Agent is sometimes referred to as &quot;the crawler&quot;.</p>
+<p>The use-case that drove implementation of the crawler is to search for <a href="./concepts_public_delegation.html">publicaly posted Delegation information</a>. As such, a bare minimum of functionality is implemented by <code>crawl()</code>. Want more? Consider contacting us.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="concepts_private_delegation.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="concepts_public_delegation.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="concepts_private_delegation.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="concepts_public_delegation.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

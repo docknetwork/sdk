@@ -2,7 +2,7 @@ import { TypeRegistry } from '@polkadot/types';
 import { getSpecTypes } from '@polkadot/types-known';
 import { createMetadata } from '@substrate/txwrapper/lib/util/metadata';
 
-import types from '../types.json';
+import types from '../../src/types.json';
 import { DEVNODE_INFO, MAINNET_INFO } from './constants';
 import { metadataRpc as devMetadata } from './devnode-metadata.json';
 import { metadataRpc as mainMetadata } from './mainnet-metadata.json';

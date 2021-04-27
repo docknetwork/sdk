@@ -214,7 +214,7 @@ class DockAPI {
                 data, method, typeDef,
               },
             } = events[i];
-            if (method === 'ExtrinsicFailed') {
+            if (method === 'ExtrinsicFailed' || method === 'BatchInterrupted') {
               const errorMsg = getExtrinsicError(data, typeDef);
               const error = new Error(errorMsg);
               reject(error);

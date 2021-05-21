@@ -138,13 +138,15 @@
                         </a>
                         
                         
+                        
+
                     </div>
                 </div>
 
                 
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -238,13 +240,13 @@ dock.setAccount(account);
 <p>Similarly, for the revocation module, get the <code>revocationModule</code> with <code>revocation</code> getter</p>
 <pre><code class="language-js">const revocationModule = dock.revocation;
 </code></pre>
-<h1 id="concepts"><a class="header" href="#concepts">Concepts</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="concepts"><a class="header" href="#concepts">Concepts</a></h1>
 <ol>
 <li><a href="./concepts_did.html">DID</a></li>
 <li><a href="./concepts_vcdm.html">Verifiable credentials</a></li>
 <li><a href="./concepts_blobs_schemas.html">Blobs and Schemas</a></li>
 </ol>
-<h1 id="w3c-did"><a class="header" href="#w3c-did">W3C DID</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="w3c-did"><a class="header" href="#w3c-did">W3C DID</a></h1>
 <p>DID stands for Decentralized IDentifiers. DIDs are meant to be globally unique identifiers that allow their owner to
 prove cryptographic control over them. The owner(s) of the DID is called the <code>controller</code>. The identifiers are not just assignable
 to humans but to anything. Quoting the <a href="https://www.w3.org/TR/did-core/">DID spec</a>,</p>
@@ -305,7 +307,7 @@ DID and corresponding key and ask Bob who has tokens to register the DID on chai
 he cannot update or remove it since only Alice has the keys associated with that DID. Similarly, when Alice wants to update
 the DID (public key or controller), it can create the update, sign it and send it to Carol this time to send the update on
 chain.</p>
-<h1 id="verifiable-credentials"><a class="header" href="#verifiable-credentials">Verifiable Credentials</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="verifiable-credentials"><a class="header" href="#verifiable-credentials">Verifiable Credentials</a></h1>
 <p>Credentials are a part of our daily lives: driver's licenses are used to
 assert that we are capable of operating a motor vehicle, university degrees
 can be used to assert our level of education, and government-issued passports
@@ -451,7 +453,7 @@ The revocation of a credential can be undone if the revocation registry supports
 owned by a single DID so that DID can revoke a credential or undo the revocation. In future, Dock will support ownership of
 the registry with mulitple DIDs and in different fashions, like any one of the owner DIDs could revoke or a threshold is needed,
 etc. To learn more about revocation registries, refer the <a href="./tutorial_revocation.html">revocation section</a> of the documentation.</p>
-<h1 id="schemas"><a class="header" href="#schemas">Schemas</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="schemas"><a class="header" href="#schemas">Schemas</a></h1>
 <h2 id="table-of-contents"><a class="header" href="#table-of-contents">Table of Contents</a></h2>
 <ol>
 <li><a href="concepts_blobs_schemas.html#intro-to-schemas">Intro</a></li>
@@ -617,7 +619,7 @@ can use it in a Verifiable Credential as follows:</p>
 </code></pre>
 <p>the reason this last Credential is invalid is that only one of the subjects properly follow the Schema, the second
 subject does not specify the fields <code>emailAddress</code> and <code>alumniOf</code> which were specified as required.</p>
-<h1 id="claim-deduction"><a class="header" href="#claim-deduction">Claim Deduction</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="claim-deduction"><a class="header" href="#claim-deduction">Claim Deduction</a></h1>
 <p>The <a href="https://www.w3.org/TR/vc-data-model/">verifiable credentials data model</a> is based on a machine comprehensible language called <a href="https://www.w3.org/TR/rdf-primer/">RDF</a>. RDF represents arbitrary semantic knowledge as <a href="https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)">graph</a>s. Computers can perform automatic deductive reasoning over RDF; given assumptions (represented as an RDF graph) and axioms (represented as logical rules), a computer can infer new conclusions and even prove them to other computers using deductive derivations (proofs).</p>
 <p>Every VCDM credential is representable as an RDF graph. So computers can reason about them, deriving new conclusions that weren't explicitly stated by the issuer.</p>
 <p>The Dock SDK exposes utilities for primitive deductive reasoning over verified credentials. The Verifier has a choice to perform deduction themself (expensive), or offload that responsibility to the Presenter of the credential[s] by accepting deductive proofs of composite claims.</p>
@@ -755,10 +757,10 @@ const defaultGraph = { DefaultGraph: true };
 <div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
 <p>If you ever decide to implement your own algorithm to merge RDF graphs, remember that <a href="https://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank nodes</a> exists and may need to be renamed depending on the type of graph representation in use.</p>
 </div>
-<p>The Dock Blockchain includes a module explicitly intended for proof of existence. Aside from being explicitly supported by the on-chain runtime, it works the same way you would expect. You post the hash of a document on-chain at a specific block. Later you can use that hash to prove the document existed at or before that block.</p>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><p>The Dock Blockchain includes a module explicitly intended for proof of existence. Aside from being explicitly supported by the on-chain runtime, it works the same way you would expect. You post the hash of a document on-chain at a specific block. Later you can use that hash to prove the document existed at or before that block.</p>
 <p>The PoE module accepts arbitrary bytes as an anchor but in order to keep anchor size constant the chain stores only the blake2b256 hash of those bytes.</p>
 <p>Developers are free to use the anchoring module however they want, taloring their software to their own use case. An anchoring example can be found in the sdk examples directory. Dock provides a <a href="https://fe.dock.io/#/anchor/batch">fully functioning reference client</a> for anchoring. The client even implements batching anchors into a merkle tree so you can anchor multiple documents in a single transaction.</p>
-<h1 id="private-delegation"><a class="header" href="#private-delegation">Private Delegation</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="private-delegation"><a class="header" href="#private-delegation">Private Delegation</a></h1>
 <p>Claim Deduction rules can express delegation of authority to issue credentials! It's expected to be a common enough use case that Dock has declared some rdf vocabulary and associated claim deduction rules aid potential delegators.</p>
 <p>An issuer may grant delegation authority to another issuer simply by issuing them a vcdm credential. Let's say <code>did:ex:a</code> wants to grant delegation authority to <code>did:ex:b</code>. <code>did:ex:a</code> simply issues the credential saying that <code>did:ex:b</code> may make any claim.</p>
 <pre><code class="language-json">{
@@ -777,7 +779,7 @@ const defaultGraph = { DefaultGraph: true };
 <p>When <code>did:ex:b</code> wishes to issue a credential on behalf of <code>did:ex:a</code>, they should bundle it (e.g. in a presentation) with it this &quot;delegation&quot; credential. A delegation credential constitutes a proof of delegation. A proof of delegation bundled with a credential issued by the delegate can be prove that some statement[s] were made by authority of some root delegator.</p>
 <p>In order to process delegated credentials a verifier accepts a bundle. The bundle includes both delegations and credentials issued by delegates. After verifying every credential within the bundle (including the delegations) the verifier uses <a href="concepts_claim_deduction.html">Claim Deduction</a> to determine which statements are proven by the delegated credential.</p>
 <p>Dock's delegation ontology (i.e. rdf vocabulary) and ruleset are currently in alpha. See <a href="tutorial_private_delegation.html">Private Delegation</a> for an example of their use.</p>
-<h1 id="public-attestation"><a class="header" href="#public-attestation">Public Attestation</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="public-attestation"><a class="header" href="#public-attestation">Public Attestation</a></h1>
 <p>This feature should be considered <em>Alpha</em>.</p>
 <p><a href="https://github.com/docknetwork/planning/blob/master/rfc/0014-public-attestation.md">RFC</a></p>
 <p>VCDM Verifiable credentials are a way to prove an <em>attestation</em>. Valid credentials prove statements of the form <code>Issuer claims X</code>, where <code>X</code> is itself a statement. One property of verifiable credentials is that the holder may keep them private simply by not sharing them with other parties. That property will be sometimes useful, sometimes not. VCDM crededentials are private and therefore not automatically discoverable but Public Attestations give a decentralized identity the ability to post claims that <em>are</em> discoverable by any party. For Dock DIDs, attestations are linked on-chain but Public Attestations are not specicfic to Dock. Other DID methods can implement public attestations by including them in DID documents.</p>
@@ -841,7 +843,7 @@ const defaultGraph = { DefaultGraph: true };
 <p>Via these properties the sdk implements a &quot;Curious Agent&quot;. The Curious Agent seeks out information. It starts with an initial kernel of knowlege (an RDF dataset) and it follows a sense of curiosity, gradually building it's knowlege graph by dereferencing IRIs, stopping when it finds nothing new to be curious about. As it crawls, it reasons over the information it's found, deducing new facts, which may in turn spark new curiosity. The Curious Agent accepts it's curiosity as Sparql queries. The logical rules it uses to reason are also configurable, axioms are provided to the Agent as conjunctive if-then statements (like in <a href="./concepts_claim_deduction.html">Claim Deduction</a>). Within the sdk, the Curious Agent is simply called <code>crawl()</code>.</p>
 <p>The Curious Agent is sometimes referred to as &quot;the crawler&quot;.</p>
 <p>The use-case that drove implementation of the crawler is to search for <a href="./concepts_public_delegation.html">publicaly posted Delegation information</a>. As such, a bare minimum of functionality is implemented by <code>crawl()</code>. Want more? Consider contacting us.</p>
-<h1 id="public-delegation"><a class="header" href="#public-delegation">Public Delegation</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="public-delegation"><a class="header" href="#public-delegation">Public Delegation</a></h1>
 <p>This feature should be considered <em>Alpha</em>.</p>
 <p><a href="https://github.com/docknetwork/planning/blob/master/rfc/0013-public-delegation.md">RFC</a></p>
 <p>We combine <a href="./concepts_private_delegation.html">Private Delegation</a> and <a href="./concepts_public_attestation.html">Public Attestation</a> to get Public Delegation.</p>
@@ -870,7 +872,7 @@ const defaultGraph = { DefaultGraph: true };
 }
 </code></pre>
 <p>By modifying its DID document to include the ipfs link <code>did:ex:root</code> attests to the delegation publically.</p>
-<h1 id="tutorials"><a class="header" href="#tutorials">Tutorials</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="tutorials"><a class="header" href="#tutorials">Tutorials</a></h1>
 <ol>
 <li><a href="./tutorial_did.html">DID</a></li>
 <li><a href="./tutorial_revocation.html">Revocation</a></li>
@@ -878,7 +880,7 @@ const defaultGraph = { DefaultGraph: true };
 <li><a href="./tutorial_blobs_schemas.html">Blobs and Schemas</a></li>
 <li><a href="./tutorial_evm.html">EVM integration</a></li>
 </ol>
-<h1 id="did"><a class="header" href="#did">DID</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="did"><a class="header" href="#did">DID</a></h1>
 <p>If you are not familiar with DIDs, you can get a conceptual overview <a href="./concepts_did.html">here</a>.</p>
 <h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
 <p>DIDs in Dock are created by choosing a 32 byte unique (on Dock chain) identifier along with a public key. The public key
@@ -1010,7 +1012,7 @@ const signature = // Get the signature on `didRemoval`
 <p>Note that they accounts used to send the transactions are independent of the keys associated with the DID.</p>
 <p>So the DID could have been created with one account, updated with another account and removed with another account.</p>
 <p>The accounts are not relevant in the data model and not associated with the DID in the chain-state.</p>
-<h1 id="did-resolver"><a class="header" href="#did-resolver">DID resolver</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="did-resolver"><a class="header" href="#did-resolver">DID resolver</a></h1>
 <p>The process of learning the DID Document of a DID is called DID resolution and tool that does the resolution is called the
 resolver.</p>
 <p>Resolution involves looking at the DID method and then fetching the DID Document from the registry, the registry
@@ -1111,7 +1113,7 @@ const didDocumentDock = multiResolver.resolve('did:dock:5D....');
 // Say you had a DID `did:btcr:xk....`, then the `UniversalResolver` will be used as there is no resolver for BTC DID.
 const didDocumentBtc = multiResolver.resolve('did:btcr:xk....');
 </code></pre>
-<h1 id="verifiable-credentials-and-verifiable-presentations-issuing-signing-and-verification"><a class="header" href="#verifiable-credentials-and-verifiable-presentations-issuing-signing-and-verification">Verifiable Credentials and Verifiable Presentations: issuing, signing and verification</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="verifiable-credentials-and-verifiable-presentations-issuing-signing-and-verification"><a class="header" href="#verifiable-credentials-and-verifiable-presentations-issuing-signing-and-verification">Verifiable Credentials and Verifiable Presentations: issuing, signing and verification</a></h1>
 <h2 id="table-of-contents-1"><a class="header" href="#table-of-contents-1">Table of contents</a></h2>
 <ul>
 <li><a href="tutorial_ipv.html#incremental-creation-and-verification-of-verifiable-credentials">Incremental creation and verification of VC</a>
@@ -1531,7 +1533,7 @@ supported 'Sr25519VerificationKey2020', 'Ed25519VerificationKey2018' or
 <pre><code class="language-javascript">  const keyDoc = getKeyDoc(did, keypair, type)
 </code></pre>
 <p>Please check the example on the <a href="tutorial_ipv.html#using-dids">previous section</a> or refer to the <a href="../../tests/integration/presenting.test.js">presenting integration tests</a> for a live example.</p>
-<h1 id="revocation-1"><a class="header" href="#revocation-1">Revocation</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="revocation-1"><a class="header" href="#revocation-1">Revocation</a></h1>
 <h2 id="overview-1"><a class="header" href="#overview-1">Overview</a></h2>
 <p>Credential revocation is managed with on-chain revocation registries. To revoke a credential, its id (or hash of its id) must be
 added to the credential. It is advised to have one revocation registry per credential type. Each registry has a unique id and
@@ -1597,7 +1599,7 @@ from owner like other updates. Use the <code>dock.revocation.removeRegistry</cod
 <pre><code class="language-js">const lastModified = await dock.revocation.getBlockNoForLastChangeToRegistry(registryId);
 await dock.revocation.removeRegistry(registryId, lastModified, didKeys);
 </code></pre>
-<h1 id="schemas-1"><a class="header" href="#schemas-1">Schemas</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="schemas-1"><a class="header" href="#schemas-1">Schemas</a></h1>
 <h2 id="table-of-contents-2"><a class="header" href="#table-of-contents-2">Table of contents</a></h2>
 <ol>
 <li><a href="tutorial_blobs_schemas.html#intro">Intro</a></li>
@@ -1782,7 +1784,7 @@ Verifiable Credentials contained in a presentation that are using the <code>cred
 properties simultaneously.
 This means that the verification of an otherwise valid Verifiable Presentation will fail if one of the Verifiable
 Credentials contained within it uses a Schema and fails to pass schema validation.</p>
-<h1 id="claim-deduction-1"><a class="header" href="#claim-deduction-1">Claim Deduction</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="claim-deduction-1"><a class="header" href="#claim-deduction-1">Claim Deduction</a></h1>
 <h2 id="specifying-axioms"><a class="header" href="#specifying-axioms">Specifying Axioms</a></h2>
 <p>A Verifier has complete and low level control over the logical rules they deem valid. Rules may vary from use-case to use-case and from verifier to verifier.</p>
 <p>A common first step when writing a ruleset will be to unwrap of Explicit Ethos statements.</p>
@@ -1924,7 +1926,7 @@ try {
 </code></pre>
 <h2 id="we-need-to-go-deeper"><a class="header" href="#we-need-to-go-deeper">We Need to Go Deeper</a></h2>
 <p>The SDK claim deduction module exposes lower level functionality for those who need it. <code>getImplications</code>, <code>proveh</code> and <code>validateh</code>, for example, operate on raw claimgraphs represented as adjacency lists. For even lower level access, check out our <a href="https://github.com/docknetwork/rify">inference engine</a> which is written in Rust and exposed to javascript via wasm.</p>
-<h2 id="graphical-anchoring-utility"><a class="header" href="#graphical-anchoring-utility">Graphical Anchoring Utility</a></h2>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="graphical-anchoring-utility"><a class="header" href="#graphical-anchoring-utility">Graphical Anchoring Utility</a></h2>
 <p>You can also anchor without touching any code. Visit <a href="https://fe.dock.io/#/anchor/batch">https://fe.dock.io/#/anchor/batch</a> for creation of anchors and <a href="https://fe.dock.io/#/anchor/check">https://fe.dock.io/#/anchor/check</a> for anchor verification.</p>
 <h3 id="to-batch-or-not-to-batch"><a class="header" href="#to-batch-or-not-to-batch">To Batch, or not to Batch</a></h3>
 <p>Batching (combining multiple anchors into one) can be used to save on transaction costs by anchoring multiple documents in a single transaction as a merkle tree root.</p>
@@ -1947,7 +1949,7 @@ fuction checkAnchor(file) {
 }
 </code></pre>
 <p>See the <code>example/anchor.js</code> in the sdk repository for more info.</p>
-<h1 id="private-delegation-1"><a class="header" href="#private-delegation-1">Private Delegation</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="private-delegation-1"><a class="header" href="#private-delegation-1">Private Delegation</a></h1>
 <p>This tutorial follows the lifecycle of a delegated credential. It builds builds on previous turorials <a href="./tutorial_ipv.html">Issuance, Presentation, Verification</a> and <a href="./tutorial_claim_deduction.html">Claim Deduction</a>.</p>
 <h2 id="create-a-delegation"><a class="header" href="#create-a-delegation">Create a Delegation</a></h2>
 <p>Let's assume some root authority, <code>did:ex:a</code>, wants grant <code>did:ex:b</code> full authority to make claims on behalf of <code>did:ex:a</code>. To do this <code>did:ex:a</code> will issue a delegation credential to <code>did:ex:b</code>.</p>
@@ -2038,7 +2040,7 @@ try {
   console.error('veracity of the composite claim is unknown');
 }
 </code></pre>
-<h1 id="public-delegation-1"><a class="header" href="#public-delegation-1">Public Delegation</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="public-delegation-1"><a class="header" href="#public-delegation-1">Public Delegation</a></h1>
 <p>This feature should be considered <em>Alpha</em>.</p>
 <p>Public Delegations use the same data model as Private Delegations. A delegator attests to some delegation. The verifier somehow gets and verifies that attestation then reasons over it in conjuction with a some credential. The difference is that while Private Delegations are passed around as credentials, Public Delegations are linked from the DID document of the delegator.</p>
 <h2 id="create-a-delegation-1"><a class="header" href="#create-a-delegation-1">Create a Delegation</a></h2>

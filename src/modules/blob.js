@@ -11,7 +11,7 @@ export const DockBlobIdByteSize = 32;
 
 // Maximum size of the blob in bytes
 // implementer may choose to implement this as a dynamic config option settable with the `parameter_type!` macro
-export const BLOB_MAX_BYTE_SIZE = 1024;
+export const BLOB_MAX_BYTE_SIZE = 8192;
 
 /**
  * Check if the given identifier is 32 byte hex

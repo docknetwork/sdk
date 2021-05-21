@@ -45,7 +45,7 @@ Use Dock's substrate node: https://github.com/docknetwork/dock-substrate
 
 Running dev node:
 ```
-./target/release/dock-testnet --base-path /tmp/alice --chain local --alice --port 30333 --ws-port 9944 --rpc-port 9933 --telemetry-url ws://telemetry.polkadot.io:1024 --validator --dev
+./target/release/dock-node --base-path /tmp/alice --chain local_poa_testnet --alice --port 30333 --ws-port 9944 --rpc-port 9933 --telemetry-url 'wss://telemetry.polkadot.io/submit/ 0'
 ```
 
 **Use the `mainnet` tag of this repo when interacting with mainnet as the `master` branch isn't guaranteed to be mainnet compatible.**

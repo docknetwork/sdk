@@ -6,7 +6,7 @@ import { endowEVMAddress } from '../../src/utils/evm-utils';
 require('dotenv').config();
 
 const {
-  FullNodeTCPEndpoint, FullNodeEndpoint, EndowedSecretURI, MinGasPrice, MaxGas,
+  FullNodeEndpoint, EndowedSecretURI, MinGasPrice, MaxGas,
 } = process.env;
 
 export function getTestPrivKeysForEVMAccounts() {
@@ -41,13 +41,13 @@ export async function endowEVMAddressWithDefault(evmAddr, amount) {
 
 // Get a web3 instance
 export function getWeb3(endpoint) {
-  const ep = endpoint || FullNodeTCPEndpoint;
+  const ep = endpoint || FullNodeEndpoint;
   return new Web3(ep);
 }
 
 // Get a Ethers instance
 export function getEthers(endpoint) {
-  const ep = endpoint || FullNodeTCPEndpoint;
+  const ep = endpoint || FullNodeEndpoint;
   return new ethers.providers.JsonRpcProvider(ep);
 }
 

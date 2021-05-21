@@ -1,3 +1,5 @@
+/* eslint sonarjs/no-duplicate-string: 0 */
+
 const types = {
   Address: 'MultiAddress',
   LookupSource: 'MultiAddress',

@@ -1,5 +1,7 @@
 import { EXTRINSIC_VERSION } from '@polkadot/types/extrinsic/v4/Extrinsic';
-import { createSignedTx, createSigningPayload, methods } from '@substrate/txwrapper';
+import {
+  createSignedTx, createSigningPayload, methods, decode,
+} from '@substrate/txwrapper';
 
 /**
  * Build a transfer txn
@@ -67,5 +69,9 @@ export function signTxn({
 
   const { signature } = registry.registry.createType('ExtrinsicPayload', signingPayload, { version: EXTRINSIC_VERSION }).sign(signingKeypair);
 
-  return createSignedTx(unsignedTxn, signature, { metadataRpc: registry.metadata, registry: registry.registry });
+  return createSignedTx(unsignedTxn, signature, registry.optionsMeta);
+}
+
+export function decodeSignedTxn(signedTxn, registry) {
+  return decode(signedTxn, registry.optionsMeta);
 }

@@ -1,7 +1,7 @@
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { Keyring } from '@polkadot/keyring';
 import {
-  Registry, DEVNODE_INFO, buildTransferTxn, signTxn,
+  Registry, DEVNODE_INFO, buildTransferTxn, signTxn, decodeSignedTxn,
 } from '../src/offline-signing';
 import { metadataRpc as metadata } from '../src/offline-signing/devnode-metadata.json';
 
@@ -30,6 +30,9 @@ import { metadataRpc as metadata } from '../src/offline-signing/devnode-metadata
   const txn = buildTransferTxn({
     from: charlie, to: dave, value, tip: 0, nonce, eraPeriod, blockNumber, blockHash, registry,
   });
+  console.log('Unsigned Txn');
+  console.log(txn.unsignedTxn);
+  console.log();
 
   await cryptoWaitReady();
   const keyring = new Keyring({ type: 'sr25519' });
@@ -41,5 +44,13 @@ import { metadataRpc as metadata } from '../src/offline-signing/devnode-metadata
   });
 
   // `signedTxn` is the txn in hex that now needs to be broadcasted to the chain. It can be done through api-sidecar or similar tools.
-  console.log(`Signed txn is ${signedTxn}`);
+  console.log('Signed txn');
+  console.log(signedTxn);
+  console.log();
+
+  // Decode the signed txn
+  const decoded = decodeSignedTxn(signedTxn, registry);
+  console.log('Decoded txn');
+  console.log(decoded);
+  console.log();
 }());

@@ -31,15 +31,17 @@ import {
 function getExtrinsicError(data, typeDef) {
   // Loop through each of the parameters
   // trying to find module error information
-  let errorMsg = `Extrinsic failed submission: ${data.toString()}`;
+  let errorMsg = 'Extrinsic failed submission:';
   data.forEach((paramData, index) => {
-    if (typeDef[index].type === 'DispatchError' && paramData.isModule) {
+    if (paramData.isBadOrigin) {
+      errorMsg += '\nBadOrigin';
+    } else if (typeDef[index].type === 'DispatchError' && paramData.isModule) {
       const mod = paramData.asModule;
       try {
-        const { documentation, name, section } = mod.registry.findMetaError(mod);
+        const { documentation, name, section } = mod.registry.findMetaError(mod.error);
         errorMsg += `\nDispatchError: ${section}.${name}: ${documentation}`;
       } catch (e) {
-        // Incase meta error cant be found, use original msg
+        errorMsg += `\nDispatchError: Module index: ${mod.index} Error: ${mod.error}`;
       }
     }
   });

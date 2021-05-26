@@ -20,3 +20,4 @@
   - [PoE Anchors](tutorial_poe_anchors.md)
   - [Private Delegation](tutorial_private_delegation.md)
   - [Public Delegation](tutorial_public_delegation.md)
+  - [EVM](tutorial_evm.md)

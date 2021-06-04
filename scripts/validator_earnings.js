@@ -31,13 +31,93 @@ async function multiQuery(queries) {
   });
 }
 
-async function main() {
-  const events = JSON.parse(fs.readFileSync(eventsFilePath));
+function getEpochToBlockMap() {
   const epochs = JSON.parse(fs.readFileSync(epochsFilePath));
   const epochToBlock = {};
   epochs.forEach((epoch) => {
     epochToBlock[epoch[1][0]] = epoch[0];
   });
+  return epochToBlock;
+}
+
+async function getBlockTimes(blockDetails) {
+  // Block to time mapping
+  const blockToTime = {};
+  const blockNos = new Set();
+  blockDetails.forEach((e) => {
+    blockNos.add(e[0]);
+  });
+  const blockNosArray = [...blockNos];
+
+  console.log(`Fetching ${blockNosArray.length} blocks ...`);
+
+  const hashes = [];
+  /* blockNosArray.forEach(async (b) => {
+    // queries.push([dock.api.query.system.blockHash, b]);
+    // queries.push([dock.api.rpc.chain.getBlockHash, b]);
+  }); */
+
+  for (const b of blockNosArray) {
+    const h = await dock.api.rpc.chain.getBlockHash(b);
+    hashes.push(u8aToHex(h));
+  }
+  // const hashes = (await multiQuery(queries)).map((h) => u8aToHex(h));
+  // const hashes = await multiQuery(queries);
+  // console.log(hashes);
+
+  console.log(`Fetched ${hashes.length} hashes ...`);
+
+  /* const queries = [];
+  hashes.forEach((h) => {
+    queries.push([dock.api.query.timestamp.now.at, h]);
+  });
+
+  const timestamps = await multiQuery(queries); */
+
+  const timestamps = [];
+  for (const h of hashes) {
+    const t = await dock.api.query.timestamp.now.at(h);
+    timestamps.push(t.toNumber());
+  }
+  console.log(timestamps);
+
+  blockNosArray.forEach((b, i) => {
+    blockToTime[b] = new Date(timestamps[i]).toISOString();
+  });
+
+  return blockToTime;
+}
+
+function writeToFile(filePath, blockDetails, showBlockTime, blockToTime) {
+  blockDetails.sort((a, b) => a[0] - b[0]);
+
+  const lines = [];
+
+  if (showBlockTime) {
+    lines.push('Block number,Tokens,Time');
+  } else {
+    lines.push('Block number,Tokens');
+  }
+
+  blockDetails.forEach((event) => {
+    let amount = event[1].toString();
+    const decLen = amount.length - 6;
+    if (decLen >= 0) {
+      amount = `${amount.substr(0, decLen)}.${amount.substr(decLen)}`;
+    }
+    if (showBlockTime) {
+      lines.push(`${event[0]},${amount},${blockToTime[event[0]]}`);
+    } else {
+      lines.push(`${event[0]},${amount}`);
+    }
+  });
+
+  fs.writeFileSync(filePath, lines.join('\n'));
+}
+
+async function getValidatorEarnings() {
+  const rewards = JSON.parse(fs.readFileSync(eventsFilePath));
+  const epochToBlock = getEpochToBlockMap();
 
   await dock.init({
     address: FullNodeEndpoint,
@@ -52,7 +132,7 @@ async function main() {
       const total = (locked.add(unlocked)).toString();
       if (total !== '0') {
         const epochNo = stat[0]._args[0];
-        events.push([epochToBlock[epochNo], total]);
+        rewards.push([epochToBlock[epochNo], total]);
       }
     }
   });
@@ -61,78 +141,50 @@ async function main() {
   const showBlockTime = false;
 
   // Block to time mapping
-  const blockToTime = {};
+  let blockToTime = {};
 
   if (showBlockTime) {
-    const blockNos = new Set();
-    events.forEach((e) => {
-      blockNos.add(e[0]);
-    });
-    const blockNosArray = [...blockNos];
-
-    console.log(`Fetching ${blockNosArray.length} blocks ...`);
-
-    const hashes = [];
-    /* blockNosArray.forEach(async (b) => {
-      // queries.push([dock.api.query.system.blockHash, b]);
-      // queries.push([dock.api.rpc.chain.getBlockHash, b]);
-    }); */
-
-    for (const b of blockNosArray) {
-      const h = await dock.api.rpc.chain.getBlockHash(b);
-      hashes.push(u8aToHex(h));
-    }
-    // const hashes = (await multiQuery(queries)).map((h) => u8aToHex(h));
-    // const hashes = await multiQuery(queries);
-    // console.log(hashes);
-
-    console.log(`Fetched ${hashes.length} hashes ...`);
-
-    /* const queries = [];
-    hashes.forEach((h) => {
-      queries.push([dock.api.query.timestamp.now.at, h]);
-    });
-
-    const timestamps = await multiQuery(queries); */
-
-    const timestamps = [];
-    for (const h of hashes) {
-      const t = await dock.api.query.timestamp.now.at(h);
-      timestamps.push(t.toNumber());
-    }
-    console.log(timestamps);
-
-    blockNosArray.forEach((b, i) => {
-      blockToTime[b] = new Date(timestamps[i]).toISOString();
-    });
+    blockToTime = await getBlockTimes(rewards);
   }
-
   // console.log(blockToTime);
 
-  events.sort((a, b) => a[0] - b[0]);
+  writeToFile('./amounts.csv', rewards, showBlockTime, blockToTime);
+}
 
-  const lines = [];
+async function getTreasuryEarnings() {
+  const rewards = [];
+  const epochToBlock = getEpochToBlockMap();
 
-  if (showBlockTime) {
-    lines.push('Block number,Tokens,Time');
-  } else {
-    lines.push('Block number,Tokens');
-  }
+  await dock.init({
+    address: FullNodeEndpoint,
+  });
 
-  events.forEach((event) => {
-    let amount = event[1].toString();
-    const decLen = amount.length - 6;
-    if (decLen >= 0) {
-      amount = `${amount.substr(0, decLen)}.${amount.substr(decLen)}`;
-    }
-    if (showBlockTime) {
-      lines.push(`${event[0]},${amount},${blockToTime[event[0]]}`);
-    } else {
-      lines.push(`${event[0]},${amount}`);
+  const epochStats = await dock.api.query.poAModule.epochs.entries();
+  epochStats.forEach((stat) => {
+    if (stat[1].emission_for_treasury.isSome) {
+      const emm = stat[1].emission_for_treasury.unwrap().toString();
+      if (emm !== '0') {
+        const epochNo = stat[0]._args[0];
+        rewards.push([epochToBlock[epochNo], emm]);
+      }
     }
   });
 
-  fs.writeFileSync('./amounts.csv', lines.join('\n'));
+  // Whether to fetch time for each block as well.
+  const showBlockTime = true;
+
+  // Block to time mapping
+  let blockToTime = {};
+
+  if (showBlockTime) {
+    blockToTime = await getBlockTimes(rewards);
+  }
+
+  writeToFile('./amounts.csv', rewards, showBlockTime, blockToTime);
+}
+
+async function main() {
+  await getTreasuryEarnings();
 }
 
 main()

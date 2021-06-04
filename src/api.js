@@ -13,7 +13,7 @@ import TechCommitteeModule from './modules/tech-committee';
 import TokenMigration from './modules/migration';
 import types from './types.json';
 import PoaRpcDefs from './poa-rpc-defs';
-import PriceFeedRpcDefs from './price-feed_rpc-defs';
+import PriceFeedRpcDefs from './price-feed-rpc-defs';
 
 import {
   PublicKey,

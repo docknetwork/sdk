@@ -163,6 +163,8 @@ export async function verifyCredential(credential, {
   purpose = null,
   controller = null,
 } = {}) {
+
+console.log('verifyCredential 1', credential)
   if (documentLoader && resolver) {
     throw new Error('Passing resolver and documentLoader results in resolver being ignored, please re-factor.');
   }
@@ -179,6 +181,8 @@ export async function verifyCredential(credential, {
   // Check credential is valid
   checkCredential(credential);
 
+  console.log('expandJSONLD')
+
   // Expand credential JSON-LD
   const expandedCredential = await expandJSONLD(credential, {
     documentLoader: docLoader,
@@ -190,6 +194,8 @@ export async function verifyCredential(credential, {
   }
 
   // Verify with jsonld-signatures
+
+  console.log('verify')
   let result;
   try {
     result = await jsigs.verify(credential, {

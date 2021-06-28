@@ -2262,6 +2262,27 @@
     enabled "2.0.x"
     kuler "^2.0.0"
 
+"@digitalbazaar/ed25519-signature-2018@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@digitalbazaar/ed25519-signature-2018/-/ed25519-signature-2018-2.0.1.tgz#ab421ec09c3a3a9b54d181ca1ee809b029e62db3"
+  integrity sha512-AQI+iJoIPRxZZRwNaTzaU8qdZe+NuvFYRtl2xBsDNPdU+QiaISBEARuNmqpyjf+rsW8GVHC1j9nIQQI+sPO7GA==
+  dependencies:
+    "@digitalbazaar/ed25519-verification-key-2018" "^3.1.1"
+    "@digitalbazaar/jws-linked-data-signature" "^1.0.1"
+    ed25519-signature-2018-context "^1.0.1"
+    esm "^3.2.25"
+    jsonld "^5.2.0"
+
+"@digitalbazaar/ed25519-verification-key-2018@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@digitalbazaar/ed25519-verification-key-2018/-/ed25519-verification-key-2018-3.1.1.tgz#969ca12159239e1bae00baa40c4aec12aef61b3e"
+  integrity sha512-4dtWUNIs30xAv8PZts+Xo5gPM5KEFKg2rw6OpDlo/gy20ViT9CtVqTDcuNG+3hiuKRBs/pTF/NuBeLTtagPvKA==
+  dependencies:
+    "@stablelib/ed25519" "^1.0.1"
+    base58-universal "^1.0.0"
+    crypto-ld "^5.0.0"
+    esm "^3.2.25"
+
 "@digitalbazaar/http-client@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@digitalbazaar/http-client/-/http-client-1.1.0.tgz#cac383b24ace04b18b919deab773462b03d3d7b0"
@@ -2270,6 +2291,15 @@
     esm "^3.2.22"
     ky "^0.25.1"
     ky-universal "^0.8.2"
+
+"@digitalbazaar/jws-linked-data-signature@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@digitalbazaar/jws-linked-data-signature/-/jws-linked-data-signature-1.0.1.tgz#6ebabb0bf15a37a41108a309c9b3dd85fc81b726"
+  integrity sha512-6bj1q/gQgk7rCKGJqwIF7rrSHcqCl049hNwIoNRVHOJpD5pOdTVlJqjdd1/a49UFcoYqiIpb1Bq/5xg/iAsWbQ==
+  dependencies:
+    base64url-universal "^1.1.0"
+    esm "^3.2.25"
+    jsonld-signatures "^9.0.2"
 
 "@ethersproject/abi@5.0.7":
   version "5.0.7"
@@ -3223,6 +3253,54 @@
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"
   integrity sha512-9NET910DNaIPngYnLLPeg+Ogzqsi9uM4mSboU5y6p8S5DzMTVEsJZrawi+BoDNUVBa2DhJqQYUFvMDfgU062LQ==
 
+"@stablelib/binary@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@stablelib/binary/-/binary-1.0.1.tgz#c5900b94368baf00f811da5bdb1610963dfddf7f"
+  integrity sha512-ClJWvmL6UBM/wjkvv/7m5VP3GMr9t0osr4yVgLZsLCOz4hGN9gIAFEqnJ0TsSMAN+n840nf2cHZnA5/KFqHC7Q==
+  dependencies:
+    "@stablelib/int" "^1.0.1"
+
+"@stablelib/ed25519@^1.0.1":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@stablelib/ed25519/-/ed25519-1.0.2.tgz#937a88a2f73a71d9bdc3ea276efe8954776ae0f4"
+  integrity sha512-FtnvUwvKbp6l1dNcg4CswMAVFVu/nzLK3oC7/PRtjYyHbWsIkD8j+5cjXHmwcCpdCpRCaTGACkEhhMQ1RcdSOQ==
+  dependencies:
+    "@stablelib/random" "^1.0.1"
+    "@stablelib/sha512" "^1.0.1"
+    "@stablelib/wipe" "^1.0.1"
+
+"@stablelib/hash@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@stablelib/hash/-/hash-1.0.1.tgz#3c944403ff2239fad8ebb9015e33e98444058bc5"
+  integrity sha512-eTPJc/stDkdtOcrNMZ6mcMK1e6yBbqRBaNW55XA1jU8w/7QdnCF0CmMmOD1m7VSkBR44PWrMHU2l6r8YEQHMgg==
+
+"@stablelib/int@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@stablelib/int/-/int-1.0.1.tgz#75928cc25d59d73d75ae361f02128588c15fd008"
+  integrity sha512-byr69X/sDtDiIjIV6m4roLVWnNNlRGzsvxw+agj8CIEazqWGOQp2dTYgQhtyVXV9wpO6WyXRQUzLV/JRNumT2w==
+
+"@stablelib/random@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@stablelib/random/-/random-1.0.1.tgz#4357a00cb1249d484a9a71e6054bc7b8324a7009"
+  integrity sha512-zOh+JHX3XG9MSfIB0LZl/YwPP9w3o6WBiJkZvjPoKKu5LKFW4OLV71vMxWp9qG5T43NaWyn0QQTWgqCdO+yOBQ==
+  dependencies:
+    "@stablelib/binary" "^1.0.1"
+    "@stablelib/wipe" "^1.0.1"
+
+"@stablelib/sha512@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@stablelib/sha512/-/sha512-1.0.1.tgz#6da700c901c2c0ceacbd3ae122a38ac57c72145f"
+  integrity sha512-13gl/iawHV9zvDKciLo1fQ8Bgn2Pvf7OV6amaRVKiq3pjQ3UmEpXxWiAfV8tYjUpeZroBxtyrwtdooQT/i3hzw==
+  dependencies:
+    "@stablelib/binary" "^1.0.1"
+    "@stablelib/hash" "^1.0.1"
+    "@stablelib/wipe" "^1.0.1"
+
+"@stablelib/wipe@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@stablelib/wipe/-/wipe-1.0.1.tgz#d21401f1d59ade56a62e139462a97f104ed19a36"
+  integrity sha512-WfqfX/eXGiAd3RJe4VU2snh/ZPwtSjLG4ynQ/vYzvghTh7dHFcI1wl+nrkWG6lGhukOxOsUHfv8dUXr58D0ayg==
+
 "@substrate/txwrapper@^6.0.0":
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/@substrate/txwrapper/-/txwrapper-6.0.0.tgz#6d5bfaf8f03ebd24c4d8e9d16c31c537ba8f8035"
@@ -3966,6 +4044,18 @@ base64-js@^1.3.1, base64-js@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.5.1.tgz#1b1b440160a5bf7ad40b650f095963481903930a"
   integrity sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
+
+base64url-universal@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/base64url-universal/-/base64url-universal-1.1.0.tgz#94da6356c1d43ead55b1d91c045c0a5b09ec8181"
+  integrity sha512-WyftvZqye29YQ10ZnuiBeEj0lk8SN8xHU9hOznkLc85wS1cLTp6RpzlMrHxMPD9nH7S55gsBqMqgGyz93rqmkA==
+  dependencies:
+    base64url "^3.0.0"
+
+base64url@^3.0.0, base64url@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/base64url/-/base64url-3.0.1.tgz#6399d572e2bc3f90a9a8b22d5dbb0a32d33f788d"
+  integrity sha512-ir1UPr3dkwexU7FdV8qBBbNDRUhMmIekYMFZfi+C/sLNnRESKPl23nB9b2pltqfOQNnGzsDdId90AEtG5tCx4A==
 
 base@^0.11.1:
   version "0.11.2"
@@ -4836,6 +4926,11 @@ crypto-browserify@3.12.0:
     randombytes "^2.0.0"
     randomfill "^1.0.3"
 
+crypto-ld@^5.0.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/crypto-ld/-/crypto-ld-5.1.0.tgz#fbc1344c553f10aa1bcfc9d94c8c161a56c07150"
+  integrity sha512-Dy1QoQzj+2K6UlGZ9l34cPp+g/YHOd+r3/DXXQTnnz5btGb0vqDlkZBn+icYmwntEmW0bvGVwFWvcwZSbk1EEQ==
+
 cssom@0.3.x, "cssom@>= 0.3.2 < 0.4.0":
   version "0.3.8"
   resolved "https://registry.yarnpkg.com/cssom/-/cssom-0.3.8.tgz#9f1276f5b2b463f2114d3f2c75250af8c1a36f4a"
@@ -5163,6 +5258,11 @@ ecc-jsbn@~0.1.1:
   dependencies:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
+
+ed25519-signature-2018-context@^1.0.1:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/ed25519-signature-2018-context/-/ed25519-signature-2018-context-1.1.0.tgz#68002ea7497c32e8170667cfd67468dedf7d220e"
+  integrity sha512-ppDWYMNwwp9bploq0fS4l048vHIq41nWsAbPq6H4mNVx9G/GxW3fwg4Ln0mqctP13MoEpREK7Biz8TbVVdYXqA==
 
 ee-first@1.1.1:
   version "1.1.1"

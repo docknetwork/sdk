@@ -1,4 +1,6 @@
-import { Ed25519KeyPair, suites } from 'jsonld-signatures';
+import { suites } from 'jsonld-signatures';
+import { Ed25519VerificationKey2018 } from '@digitalbazaar/ed25519-verification-key-2018'; // TODO: remove this package and gen keypair some other way
+import { Ed25519Signature2018 as DBEd25519Signature2018 } from '@digitalbazaar/ed25519-signature-2018'; // TODO: remove this package and gen keypair some other way
 import jsonld from 'jsonld';
 import { randomAsHex } from '@polkadot/util-crypto';
 import {
@@ -475,13 +477,13 @@ async function verifyP(presentation) {
 
 async function newDid() {
   const did = randoDID();
-  const keypair = await Ed25519KeyPair.generate();
+  const keypair = await Ed25519VerificationKey2018.generate();
   registerDid(did, keypair);
   keypair.id = `${did}#keys-1`;
   keypair.controller = did;
   return {
     did,
-    suite: new suites.Ed25519Signature2018({
+    suite: new DBEd25519Signature2018({
       verificationMethod: keypair.id,
       key: keypair,
     }),

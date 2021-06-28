@@ -4,6 +4,7 @@
 
 import jsonld from 'jsonld';
 import jsigs from 'jsonld-signatures';
+import { expandJSONLD } from './helpers';
 
 const { AssertionProofPurpose } = jsigs.purposes;
 
@@ -60,14 +61,18 @@ export default class CredentialIssuancePurpose extends AssertionProofPurpose {
         throw result.error;
       }
 
-      const issuer = jsonld.getValues(document,
+      const expandedDoc = await expandJSONLD(document, {
+        documentLoader,
+      });
+
+      const issuer = jsonld.getValues(expandedDoc,
         'https://www.w3.org/2018/credentials#issuer');
 
       if (!issuer || issuer.length === 0) {
         throw new Error('Credential issuer is required.');
       }
 
-      if (result.controller.id !== issuer[0].id) {
+      if (result.controller.id !== issuer[0]['@id']) {
         throw new Error(
           'Credential issuer must match the verification method controller.',
         );

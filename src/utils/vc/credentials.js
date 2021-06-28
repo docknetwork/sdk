@@ -163,8 +163,6 @@ export async function verifyCredential(credential, {
   purpose = null,
   controller = null,
 } = {}) {
-
-console.log('verifyCredential 1', credential)
   if (documentLoader && resolver) {
     throw new Error('Passing resolver and documentLoader results in resolver being ignored, please re-factor.');
   }
@@ -181,8 +179,6 @@ console.log('verifyCredential 1', credential)
   // Check credential is valid
   checkCredential(credential);
 
-  console.log('expandJSONLD')
-
   // Expand credential JSON-LD
   const expandedCredential = await expandJSONLD(credential, {
     documentLoader: docLoader,
@@ -195,24 +191,24 @@ console.log('verifyCredential 1', credential)
 
   // Verify with jsonld-signatures
 
-  console.log('verify')
   let result;
-  try {
+  // try {
     result = await jsigs.verify(credential, {
       purpose: purpose || new CredentialIssuancePurpose({
         controller,
       }),
+      // TODO: support more key types, see digitalbazaar github
       suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
       documentLoader: docLoader,
       compactProof,
     });
-  } catch (error) {
-    result = {
-      verified: false,
-      results: [{ credential, verified: false, error }],
-      error,
-    };
-  }
+  // } catch (error) {
+  //   result = {
+  //     verified: false,
+  //     results: [{ credential, verified: false, error }],
+  //     error,
+  //   };
+  // }
 
   // Check for revocation only if the credential is verified and revocation check is needed.
   if (result.verified && isRevocationCheckNeeded(expandedCredential, forceRevocationCheck, revocationApi)) {
@@ -234,7 +230,6 @@ console.log('verifyCredential 1', credential)
  * @return {Promise<object>} The signed credential object.
  */
 export async function issueCredential(keyDoc, credential, compactProof = true, documentLoader = null, purpose = null, expansionMap = null) {
-  console.log('issueCredential', keyDoc, credential)
   // Get suite from keyDoc parameter
   const suite = getSuiteFromKeyDoc(keyDoc);
   if (!suite.verificationMethod) {

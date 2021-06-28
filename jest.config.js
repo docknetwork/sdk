@@ -1,7 +1,7 @@
 module.exports = {
   clearMocks: true,
   testTimeout: 30000,
-  testEnvironment: "node",
+  testEnvironment: "./tests/test-environment.js",
   transform: {
     "^.+\\.(ts|js)$": "babel-jest"
   },

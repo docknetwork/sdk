@@ -20,7 +20,7 @@ export default class EcdsaSepc256k1Signature2019 extends CustomLinkedDataSignatu
       contextUrl: SUITE_CONTEXT_URL,
       alg: 'ES256K',
       signer: signer || EcdsaSepc256k1Signature2019.signerFactory(keypair, verificationMethod),
-      verifier: verifier,
+      verifier,
     });
     this.requiredKeyType = EcdsaSecp256k1VerKeyName;
   }

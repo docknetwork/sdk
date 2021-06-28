@@ -1,17 +1,13 @@
-import jsigs, { suites } from 'jsonld-signatures';
-import { sha256 } from 'js-sha256';
-import { EcdsaSecp256k1SigName, EcdsaSecp256k1VerKeyName } from './constants';
-import EcdsaSecp256k1VerificationKey2019 from './EcdsaSecp256k1VerificationKey2019';
+import { suites } from 'jsonld-signatures';
 const base58btc = require('base58-universal');
 const base64url = require('base64url');
 
 const MULTIBASE_BASE58BTC_HEADER = 'z';
-const SUITE_CONTEXT_URL = 'https://w3id.org/security/v2'; // TODO: not right?
 
-function createJws({encodedHeader, verifyData}) {
+function createJws({ encodedHeader, verifyData }) {
   const buffer = Buffer.concat([
-    Buffer.from(encodedHeader + '.', 'utf8'),
-    Buffer.from(verifyData.buffer, verifyData.byteOffset, verifyData.length)
+    Buffer.from(`${encodedHeader}.`, 'utf8'),
+    Buffer.from(verifyData.buffer, verifyData.byteOffset, verifyData.length),
   ]);
   return new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.length);
 }
@@ -46,47 +42,48 @@ export default class CustomLinkedDataSignature extends suites.LinkedDataSignatur
    *
    * @returns {Promise<boolean>} Resolves with the verification result.
    */
-  async verifySignature({verifyData, verificationMethod, proof}) {
+  async verifySignature({ verifyData, verificationMethod, proof }) {
     let signatureBytes;
     let data = verifyData;
 
-    const {proofValue, jws} = proof;
+    const { proofValue, jws } = proof;
     if (proofValue && typeof proofValue === 'string') {
-      if(proofValue[0] !== MULTIBASE_BASE58BTC_HEADER) {
+      if (proofValue[0] !== MULTIBASE_BASE58BTC_HEADER) {
         throw new Error('Only base58btc multibase encoding is supported.');
       }
       signatureBytes = base58btc.decode(proofValue.substr(1));
     } else if (jws && typeof jws === 'string') { // Fallback to older jsonld-signature implementations
-      const [encodedHeader, /*payload*/, encodedSignature] = jws.split('.');
+      const [encodedHeader, /* payload */, encodedSignature] = jws.split('.');
 
       let header;
       try {
         header = JSON.parse(decodeBase64UrlToString(encodedHeader));
-      } catch(e) {
-        throw new Error('Could not parse JWS header; ' + e);
+      } catch (e) {
+        throw new Error(`Could not parse JWS header; ${e}`);
       }
-      if(!(header && typeof header === 'object')) {
+      if (!(header && typeof header === 'object')) {
         throw new Error('Invalid JWS header.');
       }
 
       // confirm header matches all expectations
-      if(!(header.alg === this.alg && header.b64 === false &&
-        Array.isArray(header.crit) && header.crit.length === 1 &&
-        header.crit[0] === 'b64') || Object.keys(header).length !== 3) {
+      if (!(header.alg === this.alg && header.b64 === false
+        && Array.isArray(header.crit) && header.crit.length === 1
+        && header.crit[0] === 'b64')) {
         throw new Error(
-          `Invalid JWS header parameters for ${this.type}.`);
+          `Invalid JWS header parameters for ${this.type}.`,
+        );
       }
 
       signatureBytes = decodeBase64Url(encodedSignature);
-      data = createJws({encodedHeader, verifyData});
+      data = createJws({ encodedHeader, verifyData });
     }
 
-    let {verifier} = this;
-    if(!verifier) {
+    let { verifier } = this;
+    if (!verifier) {
       const key = await this.LDKeyClass.from(verificationMethod);
       verifier = key.verifier();
     }
-    return verifier.verify({data, signature: signatureBytes});
+    return verifier.verify({ data, signature: signatureBytes });
   }
 
   /**
@@ -102,15 +99,15 @@ export default class CustomLinkedDataSignature extends suites.LinkedDataSignatur
    * @returns {Promise<object>} Resolves with the proof containing the signature
    *   value.
    */
-  async sign({verifyData, proof}) {
-    if(!(this.signer && typeof this.signer.sign === 'function')) {
+  async sign({ verifyData, proof }) {
+    if (!(this.signer && typeof this.signer.sign === 'function')) {
       throw new Error('A signer API has not been specified.');
     }
 
-    const signatureBytes = await this.signer.sign({data: verifyData});
-    proof.proofValue =
-      MULTIBASE_BASE58BTC_HEADER + base58btc.encode(signatureBytes);
-
-    return proof;
+    const signatureBytes = await this.signer.sign({ data: verifyData });
+    return {
+      ...proof,
+      proofValue: MULTIBASE_BASE58BTC_HEADER + base58btc.encode(signatureBytes),
+    };
   }
 }

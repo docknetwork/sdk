@@ -19,7 +19,7 @@ export default class Sr25519Signature2020 extends CustomLinkedDataSignature {
       contextUrl: SUITE_CONTEXT_URL,
       alg: 'EdDSA',
       signer: signer || Sr25519Signature2020.signerFactory(keypair, verificationMethod),
-      verifier: verifier,
+      verifier,
     });
     this.requiredKeyType = Sr25519VerKeyName;
   }

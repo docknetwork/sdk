@@ -191,17 +191,17 @@ export async function verifyCredential(credential, {
 
   // Verify with jsonld-signatures
 
-  let result;
+  // let result;
   // try {
-    result = await jsigs.verify(credential, {
-      purpose: purpose || new CredentialIssuancePurpose({
-        controller,
-      }),
-      // TODO: support more key types, see digitalbazaar github
-      suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
-      documentLoader: docLoader,
-      compactProof,
-    });
+  const result = await jsigs.verify(credential, {
+    purpose: purpose || new CredentialIssuancePurpose({
+      controller,
+    }),
+    // TODO: support more key types, see digitalbazaar github
+    suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
+    documentLoader: docLoader,
+    compactProof,
+  });
   // } catch (error) {
   //   result = {
   //     verified: false,

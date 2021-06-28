@@ -17,6 +17,7 @@ function documentLoader(resolver = null) {
    * @returns {Promise<{documentUrl: string, contextUrl: string, document: *}>}
    */
   async function loadDocument(uri) {
+    console.log('loadDocument', uri)
     let document;
     const uriString = uri.toString();
     if (resolver && uriString.startsWith('did:')) {

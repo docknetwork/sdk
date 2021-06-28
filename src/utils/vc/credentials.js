@@ -234,6 +234,7 @@ console.log('verifyCredential 1', credential)
  * @return {Promise<object>} The signed credential object.
  */
 export async function issueCredential(keyDoc, credential, compactProof = true, documentLoader = null, purpose = null, expansionMap = null) {
+  console.log('issueCredential', keyDoc, credential)
   // Get suite from keyDoc parameter
   const suite = getSuiteFromKeyDoc(keyDoc);
   if (!suite.verificationMethod) {

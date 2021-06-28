@@ -2,7 +2,7 @@ import { suites } from 'jsonld-signatures';
 import { Sr25519SigName, Sr25519VerKeyName } from './constants';
 import Sr25519VerificationKey2020 from './Sr25519VerificationKey2020';
 
-export default class Sr25519Signature2020 extends suites.JwsLinkedDataSignature {
+export default class Sr25519Signature2020 extends suites.LinkedDataSignature {
   /**
    * Creates a new Sr25519Signature2020 instance
    * @constructor

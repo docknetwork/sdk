@@ -18,5 +18,4 @@ jobs:
         run: |
           yarn install --frozen-lockfile --ignore-scripts
           yarn lint
-          yarn type-check
           yarn docs

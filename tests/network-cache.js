@@ -7,6 +7,7 @@ export default {
       "sec": "https://w3id.org/security#",
       "xsd": "http://www.w3.org/2001/XMLSchema#",
       "EcdsaKoblitzSignature2016": "sec:EcdsaKoblitzSignature2016",
+      "Ed25519Signature2018": "sec:Ed25519Signature2018",
       "EncryptedMessage": "sec:EncryptedMessage",
       "GraphSignature2012": "sec:GraphSignature2012",
       "LinkedDataSignature2015": "sec:LinkedDataSignature2015",

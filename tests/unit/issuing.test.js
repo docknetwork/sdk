@@ -100,7 +100,6 @@ const fakeContext = {
 describe('Verifiable Credential Issuing', () => {
   test('Issuing should return an object with a proof, and it must pass validation.', async () => {
     const credential = await issueCredential(getSampleKey(), getSampleCredential());
-      console.log('credential', credential)
     expect(credential.id).toBe('https://example.com/credentials/1872');
     expect(credential.type).toContain('VerifiableCredential');
     expect(credential.type).toContain('AlumniCredential');

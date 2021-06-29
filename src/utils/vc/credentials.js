@@ -190,9 +190,6 @@ export async function verifyCredential(credential, {
   }
 
   // Verify with jsonld-signatures
-
-  // let result;
-  // try {
   const result = await jsigs.verify(credential, {
     purpose: purpose || new CredentialIssuancePurpose({
       controller,
@@ -202,13 +199,6 @@ export async function verifyCredential(credential, {
     documentLoader: docLoader,
     compactProof,
   });
-  // } catch (error) {
-  //   result = {
-  //     verified: false,
-  //     results: [{ credential, verified: false, error }],
-  //     error,
-  //   };
-  // }
 
   // Check for revocation only if the credential is verified and revocation check is needed.
   if (result.verified && isRevocationCheckNeeded(expandedCredential, forceRevocationCheck, revocationApi)) {

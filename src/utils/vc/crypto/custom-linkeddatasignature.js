@@ -1,4 +1,5 @@
 import { suites } from 'jsonld-signatures';
+
 const base58btc = require('base58-universal');
 const base64url = require('base64url');
 

@@ -225,7 +225,7 @@ class VerifiableCredential {
       this.toJSON(),
       compactProof,
       null, null, null,
-      issuerObject
+      issuerObject,
     );
     this.setProof(signedVC.proof);
     this.issuer = signedVC.issuer;

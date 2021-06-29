@@ -2,7 +2,7 @@ import { Ed25519SigName, Ed25519VerKeyName } from './constants';
 import Ed25519VerificationKey2018 from './Ed25519VerificationKey2018';
 import CustomLinkedDataSignature from './custom-linkeddatasignature';
 
-const SUITE_CONTEXT_URL = 'https://w3id.org/security/suites/ed25519-2018/v1';
+const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
 export default class Ed25519Signature2018 extends CustomLinkedDataSignature {
   /**

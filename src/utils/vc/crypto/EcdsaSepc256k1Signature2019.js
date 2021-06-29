@@ -3,7 +3,7 @@ import { EcdsaSecp256k1SigName, EcdsaSecp256k1VerKeyName } from './constants';
 import EcdsaSecp256k1VerificationKey2019 from './EcdsaSecp256k1VerificationKey2019';
 import CustomLinkedDataSignature from './custom-linkeddatasignature';
 
-const SUITE_CONTEXT_URL = 'https://w3id.org/security/v2'; // TODO: not right?
+const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
 export default class EcdsaSepc256k1Signature2019 extends CustomLinkedDataSignature {
   /**

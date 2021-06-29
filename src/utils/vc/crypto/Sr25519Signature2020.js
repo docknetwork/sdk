@@ -2,7 +2,7 @@ import { Sr25519SigName, Sr25519VerKeyName } from './constants';
 import Sr25519VerificationKey2020 from './Sr25519VerificationKey2020';
 import CustomLinkedDataSignature from './custom-linkeddatasignature';
 
-const SUITE_CONTEXT_URL = 'https://w3id.org/security/v2'; // TODO: not right?
+const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
 export default class Sr25519Signature2020 extends CustomLinkedDataSignature {
   /**

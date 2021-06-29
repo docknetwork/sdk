@@ -60,12 +60,12 @@ function getSamplePres(signed = false) {
   if (signed) {
     vp = {
       ...vp,
+      '@context': expect.anything(),
       proof: {
         type: 'EcdsaSecp256k1Signature2019',
-        created: expect.anything(),
         challenge: 'some_challenge',
         domain: 'some_domain',
-        jws: expect.anything(),
+        proofValue: expect.anything(),
         proofPurpose: 'authentication',
         verificationMethod: keyUrl,
       },
@@ -109,7 +109,6 @@ describe('Verifiable Credential Issuing', () => {
     expect(credential.issuer).toBe(controllerUrl);
     expect(credential.proof.type).toBe('EcdsaSecp256k1Signature2019');
     expect(credential.proof.created).toBeDefined();
-    expect(credential.proof.jws).toBeDefined();
     expect(credential.proof.proofPurpose).toBe('assertionMethod');
     expect(credential.proof.verificationMethod).toBe(keyUrl);
 
@@ -140,9 +139,6 @@ describe('Verifiable Credential Verification', () => {
     const signedCred = getSampleCredential(true);
     const result = await verifyCredential(signedCred);
     expect(result.verified).toBe(true);
-    expect(result.results[0].proof['@context']).toBe('https://w3id.org/security/v2');
-    expect(result.results[0].proof.created).toBeDefined();
-    expect(result.results[0].proof.jws).toBeDefined();
     expect(result.results[0].proof.proofPurpose).toBe('assertionMethod');
     expect(result.results[0].proof.type).toBe('EcdsaSecp256k1Signature2019');
     expect(result.results[0].proof.verificationMethod).toBe(keyUrl);
@@ -179,12 +175,10 @@ describe('Verifiable Presentation creation', () => {
     expect(results.verified).toBe(true);
     expect(results.error).toBe(undefined);
     expect(results.presentationResult.verified).toBe(true);
-    expect(results.presentationResult.results[0].proof['@context']).toBe('https://w3id.org/security/v2');
+    // expect(results.presentationResult.results[0].proof['@context']).toBe('https://w3id.org/security/v2');
     expect(results.presentationResult.results[0].proof.type).toBe('EcdsaSecp256k1Signature2019');
-    expect(results.presentationResult.results[0].proof.created).toBeDefined();
     expect(results.presentationResult.results[0].proof.challenge).toBe('some_challenge');
     expect(results.presentationResult.results[0].proof.domain).toBe('some_domain');
-    expect(results.presentationResult.results[0].proof.jws).toBeDefined();
     expect(results.presentationResult.results[0].proof.proofPurpose).toBe('authentication');
     expect(results.presentationResult.results[0].proof.verificationMethod).toBe(keyUrl);
     expect(results.presentationResult.results[0].verified).toBe(true);
@@ -409,7 +403,7 @@ describe('Verifiable Presentation incremental creation', () => {
     expect(vp.proof).toMatchObject({ created: expect.anything() });
     expect(vp.proof).toMatchObject({ challenge: 'some_challenge' });
     expect(vp.proof).toMatchObject({ domain: 'some_domain' });
-    expect(vp.proof).toMatchObject({ jws: expect.anything() });
+    expect(vp.proof).toMatchObject({ proofValue: expect.anything() });
     expect(vp.proof).toMatchObject({ proofPurpose: 'authentication' });
     expect(vp.proof).toMatchObject({ verificationMethod: expect.anything() });
 
@@ -449,7 +443,7 @@ describe('Verifiable Presentation incremental creation', () => {
     expect(vp.proof).toMatchObject({ created: expect.anything() });
     expect(vp.proof).toMatchObject({ challenge: 'some_challenge' });
     expect(vp.proof).toMatchObject({ domain: 'some_domain' });
-    expect(vp.proof).toMatchObject({ jws: expect.anything() });
+    expect(vp.proof).toMatchObject({ proofValue: expect.anything() });
     expect(vp.proof).toMatchObject({ proofPurpose: 'authentication' });
     expect(vp.proof).toMatchObject({ verificationMethod: expect.anything() });
 

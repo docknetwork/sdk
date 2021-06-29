@@ -190,23 +190,15 @@ export async function verifyCredential(credential, {
   }
 
   // Verify with jsonld-signatures
-  let result;
-  try {
-    result = await jsigs.verify(credential, {
-      purpose: purpose || new CredentialIssuancePurpose({
-        controller,
-      }),
-      suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
-      documentLoader: docLoader,
-      compactProof,
-    });
-  } catch (error) {
-    result = {
-      verified: false,
-      results: [{ credential, verified: false, error }],
-      error,
-    };
-  }
+  const result = await jsigs.verify(credential, {
+    purpose: purpose || new CredentialIssuancePurpose({
+      controller,
+    }),
+    // TODO: support more key types, see digitalbazaar github
+    suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
+    documentLoader: docLoader,
+    compactProof,
+  });
 
   // Check for revocation only if the credential is verified and revocation check is needed.
   if (result.verified && isRevocationCheckNeeded(expandedCredential, forceRevocationCheck, revocationApi)) {
@@ -225,9 +217,10 @@ export async function verifyCredential(credential, {
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
  * @param {object} credential - Credential to be signed.
  * @param {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
+ * @param {object} [issuerObject] - Optional issuer object to assign
  * @return {Promise<object>} The signed credential object.
  */
-export async function issueCredential(keyDoc, credential, compactProof = true, documentLoader = null, purpose = null, expansionMap = null) {
+export async function issueCredential(keyDoc, credential, compactProof = true, documentLoader = null, purpose = null, expansionMap = null, issuerObject = null) {
   // Get suite from keyDoc parameter
   const suite = getSuiteFromKeyDoc(keyDoc);
   if (!suite.verificationMethod) {
@@ -235,9 +228,13 @@ export async function issueCredential(keyDoc, credential, compactProof = true, d
   }
 
   // Clone the credential object to prevent mutation
+  const issuerId = keyDoc.controller || credential.issuer;
   const cred = {
     ...credential,
-    issuer: keyDoc.controller || credential.issuer,
+    issuer: issuerObject ? {
+      ...issuerObject,
+      id: issuerId,
+    } : issuerId,
   };
 
   // Ensure credential is valid

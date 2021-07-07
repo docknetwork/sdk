@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -92,7 +92,6 @@
     "base64url": "^3.0.1",
     "blake2b": "^2.1.3",
     "bs58": "^4.0.1",
-    "credentials-context": "^1.0.0",
     "deep-equal": "^2.0.3",
     "did-resolver": "^1.1.0",
     "dotenv": "^8.2.0",

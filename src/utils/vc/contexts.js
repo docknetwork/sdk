@@ -1,5 +1,3 @@
-import credentialsContext from 'credentials-context';
-
 import vcExamplesV1 from './contexts/vc-examples-v1';
 import ed25519V1Context from './contexts/ed25519-2020-v1-context.json';
 import sr25519Context from './contexts/sr25519-context.json';
@@ -13,7 +11,6 @@ import odrl from './contexts/odrl.json';
 // Lookup of following URLs will lead to loading data from the context directory, this is done as the Sr25519 keys are not
 // supported in any W3C standard and vc-js has them stored locally. This is a temporary solution.
 export default new Map([
-  ...credentialsContext.contexts,
   [
     'https://www.w3.org/2018/credentials/v1',
     credV1Context,

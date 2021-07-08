@@ -2,7 +2,7 @@
 
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
-import types from '../src/types.json';
+import typesBundle from '@docknetwork/node-types';
 
 /**
  * Send the give transaction with the given account URI (secret) and return the block hash
@@ -90,7 +90,7 @@ export async function keypair(seed) {
 export async function connect(wsUrl) {
   return await ApiPromise.create({
     provider: new WsProvider(wsUrl),
-    types,
+    typesBundle,
   });
 }
 

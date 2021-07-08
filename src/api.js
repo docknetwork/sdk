@@ -1,6 +1,7 @@
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { KeyringPair } from '@polkadot/keyring/types'; // eslint-disable-line
+import typesBundle from '@docknetwork/node-types';
 
 import AnchorModule from './modules/anchor';
 import BlobModule from './modules/blob';
@@ -11,7 +12,6 @@ import DemocracyModule from './modules/democracy';
 import CouncilModule from './modules/council';
 import TechCommitteeModule from './modules/tech-committee';
 import TokenMigration from './modules/migration';
-import types from './types.json';
 import PoaRpcDefs from './poa-rpc-defs';
 import PriceFeedRpcDefs from './price-feed-rpc-defs';
 
@@ -104,12 +104,19 @@ class DockAPI {
       rpc = Object.assign(rpc, PoaRpcDefs);
     }
 
-    this.api = await ApiPromise.create({
+    const apiOptions = {
       provider: new WsProvider(this.address),
-      types: chainTypes || types,
       // @ts-ignore: TS2322
       rpc,
-    });
+    };
+
+    if (chainTypes) {
+      apiOptions.types = chainTypes;
+    } else {
+      apiOptions.typesBundle = typesBundle;
+    }
+
+    this.api = await ApiPromise.create(apiOptions);
 
     await this.initKeyring(keyring);
 

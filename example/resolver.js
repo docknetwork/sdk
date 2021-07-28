@@ -78,11 +78,9 @@ async function main() {
   console.log('Building DIDs list...');
 
   const dockDID = await createDockDID();
-
   const didsToTest = [
     dockDID,
     'did:ethr:0xabcabc03e98e0dc2b855be647c39abe984193675',
-    'did:work:2UUHQCd4psvkPLZGnWY33L',
     'did:nacl:Md8JiMIwsapml_FtQ2ngnGftNP5UmVCAUuhnLyAsPxI',
   ];
 

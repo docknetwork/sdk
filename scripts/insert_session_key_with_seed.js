@@ -17,23 +17,29 @@ if (process.argv.length !== 3) {
 }
 
 /**
- * Generate Aura and Grandpa keys using the given seed
+ * Generate Babe, Grandpa, Authority discovery and Imonline keys using the given seed
  * @param seed Can be 32 byte hex or phrase (list of words)
  * @returns {Promise<void>}
  */
 async function insertKeys(seed) {
   await cryptoWaitReady();
-  const pairAura = dock.keyring.addFromUri(seed, null, 'sr25519');
-  const pkAura = u8aToHex(pairAura.publicKey);
+  const pairBabe = dock.keyring.addFromUri(seed, null, 'sr25519');
+  const pkBabe = u8aToHex(pairBabe.publicKey);
   const pairGran = dock.keyring.addFromUri(seed, null, 'ed25519');
   const pkGran = u8aToHex(pairGran.publicKey);
+  const pairAudi = dock.keyring.addFromUri(seed, null, 'sr25519');
+  const pkAudi = u8aToHex(pairAudi.publicKey);
+  const pairImon = dock.keyring.addFromUri(seed, null, 'sr25519');
+  const pkImon = u8aToHex(pairImon.publicKey);
 
   // Prepare session key by concatenating Aura and Grandpa keys
-  const sessKey = pkAura + pkGran.substring(2); // Remove `0x` from Grandpa key
+  const sessKey = pkBabe + pkGran.substring(2) + pkAudi.substring(2) + pkImon.substring(2); // Remove `0x` from other key
 
-  // Insert aura and grandpa keys through RPC
-  await dock.api.rpc.author.insertKey('aura', seed, pkAura);
+  // Insert keys through RPC
+  await dock.api.rpc.author.insertKey('babe', seed, pkBabe);
   await dock.api.rpc.author.insertKey('gran', seed, pkGran);
+  await dock.api.rpc.author.insertKey('audi', seed, pkAudi);
+  await dock.api.rpc.author.insertKey('imon', seed, pkImon);
 
   const hasKey = await dock.api.rpc.author.hasSessionKeys(sessKey);
   if (!hasKey) {

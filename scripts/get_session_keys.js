@@ -26,9 +26,11 @@ async function printSessionKeys() {
 
   Object.keys(addresses).forEach((addr) => {
     console.log(`For address ${addr}`);
-    console.log(`Aura key is ${addresses[addr].aura}`);
+    console.log(`Babe key is ${addresses[addr].babe}`);
     console.log(`Grandpa key is ${addresses[addr].gran}`);
-    console.log(`Session key is ${addresses[addr].aura + addresses[addr].gran.substring(2)}`);
+    console.log(`Authority Discovery key is ${addresses[addr].audi}`);
+    console.log(`Imonline key is ${addresses[addr].imon}`);
+    console.log(`Session key is ${addresses[addr].babe + addresses[addr].gran.substring(2) + addresses[addr].audi.substring(2) + addresses[addr].imon.substring(2)}`);
     console.log('');
   });
   process.exit(0);

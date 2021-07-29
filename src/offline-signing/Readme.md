@@ -1,5 +1,7 @@
 # Utility for offline signing
 
+## NOTE: THIS UTILITY IS USING A DEPRECATED PACKAGE AND IS PROBABLY OBSOLETE. WE WILL BE UPDATING IT SHORTLY TO BE FUNCTIONAL AGAIN
+
 Signing a transaction requires having certain data like nonce, recent block, genesis, etc which needs to be fetched from the chain.
 This means the signing code needs to connect to the network so that it can reach the node. The utilities here let you supply such data
 manually. For a working example, check [this example script](../../example/offline-signing.js) which is configured to work with the dev node.

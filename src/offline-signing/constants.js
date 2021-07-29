@@ -41,10 +41,10 @@ export const DEVNODE_INFO = {
     tokenSymbol: 'DOCK',
   },
   // This should change whenever dev node changes
-  genesis: '0x956cd95ad4baf709e851e0fce555bffa5ae2933851cadfaeeb13fe68fa74dfc5',
+  genesis: '0x9388db55e44f5c438c0a4d3dd4c260e25261b1c79aa47c91bfd39bced0b9cc4c',
   name: 'Dock Mainnet',
   specName: 'dock-pos-dev-runtime',
   // Next 2 fields need to change whenever they change on the chain.
-  specVersion: 27,
+  specVersion: 31,
   transactionVersion: 1,
 };

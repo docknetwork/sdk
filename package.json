@@ -80,7 +80,7 @@
     "@polkadot/types-known": "5.2.1",
     "@polkadot/util": "^7.0.3",
     "@polkadot/util-crypto": "^7.0.3",
-    "@substrate/txwrapper": "^6.0.0",
+    "@substrate/txwrapper": "^7.0.1",
     "axios": "0.21.1",
     "babel-polyfill": "^6.26.0",
     "base58-universal": "^1.0.0",

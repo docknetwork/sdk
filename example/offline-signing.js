@@ -16,8 +16,8 @@ import { metadataRpc as metadata } from '../src/offline-signing/devnode-metadata
   const nonce = 2;
 
   // These need to be set when txn is being constructed. Set these to the most recent valid block.
-  const blockHash = '0x4b84929231799600766b5ad052fdfb63c167bcc069a36b9bd8d3d092c6412348';
-  const blockNumber = 2824;
+  const blockHash = '0xb679f83bc6889815281ebe31a745b463c4a49b988158ed6c713d2051c86e0b54';
+  const blockNumber = 105;
 
   // Specifies the longevity of the txn in terms of number of blocks
   const eraPeriod = 128;

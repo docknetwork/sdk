@@ -73,5 +73,5 @@ export function signTxn({
 }
 
 export function decodeSignedTxn(signedTxn, registry) {
-  return decode(signedTxn, registry.optionsMeta);
+  return decode(signedTxn, registry.optionsMeta, true);
 }

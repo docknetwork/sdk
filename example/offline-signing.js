@@ -10,7 +10,7 @@ import { metadataRpc as metadata } from '../src/offline-signing/devnode-metadata
   const charlie = '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y';
   const dave = '5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy';
   const secretUri = '//Charlie';
-  const value = 100000;
+  const value = '100000';
 
   // Nonce is set to 0 as its charlie's 1st txn, after each txn from charlie, it needs to be incremented by 1
   const nonce = 2;

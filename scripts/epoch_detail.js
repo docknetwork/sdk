@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { bnToBn } from '@polkadot/util';
 
 import { DockAPI } from '../src/api';
 import { asDockAddress } from '../src/utils/codec';
@@ -68,9 +69,9 @@ async function printValidatorStats() {
     const validatorId = asDockAddress(element[0]._args[1], Network);
     console.log(`For epoch no ${epochNo}, validator ${accounts[validatorId]}, blocks authored is ${element[1].block_count}`);
     if (element[1].locked_reward.isSome) {
-      const locked = element[1].locked_reward.unwrap().toHuman();
-      const unlocked = element[1].unlocked_reward.unwrap().toHuman();
-      console.log(`Locked rewards: ${locked}, Unlocked rewards: ${unlocked}`);
+      const locked = element[1].locked_reward.unwrap();
+      const unlocked = element[1].unlocked_reward.unwrap();
+      console.log(`Locked rewards: ${locked.toHuman()}, Unlocked rewards: ${unlocked.toHuman()}`);
     }
     console.log('');
   });
@@ -105,11 +106,39 @@ async function printValidatorBal() {
   /* eslint-disable no-await-in-loop */
 }
 
+async function printValidatorRewards() {
+  const epochBlockCounts = await dock.api.query.poAModule.validatorStats.entries();
+  sortEntriesOfMapWithNumKey(epochBlockCounts);
+  const validatorRewards = {};
+  const totalRewards = bnToBn(0);
+  epochBlockCounts.forEach((element) => {
+    const epochNo = element[0]._args[0];
+    if (epochNo > 22) {
+      const validatorId = asDockAddress(element[0]._args[1], Network);
+      if (validatorRewards[validatorId] === undefined) {
+        validatorRewards[validatorId] = bnToBn(0);
+      }
+      if (element[1].locked_reward.isSome) {
+        const locked = element[1].locked_reward.unwrap();
+        const unlocked = element[1].unlocked_reward.unwrap();
+        const total = locked.add(unlocked);
+        validatorRewards[validatorId].iadd(total);
+        totalRewards.iadd(total);
+      }
+    }
+  });
+  console.log(`Total rewards ${totalRewards.toString()}`);
+  console.log('Validator rewards');
+  for (const validator in validatorRewards) {
+    console.log(`${validator}: ${validatorRewards[validator].toString()} ${validatorRewards[validator].mul(bnToBn(10000)).div(totalRewards)}`);
+  }
+}
+
 async function main() {
   await dock.init({
     address: FullNodeEndpoint,
   });
-  accounts = (await axios.get('https://gist.github.com/lovesh/c540b975774735fe0001c86fa47a91b3/raw')).data;
+  accounts = (await axios.get('https://gist.githubusercontent.com/lovesh/2cc067d1442d71b8beb9ac2443fdd34c/raw/b45126f99e0e5fe45ab255516439276cacbeb875/mainnet%2520validator%2520names')).data;
   let action = 0;
   if (process.argv.length >= 3) {
     action = parseInt(process.argv[2]);
@@ -127,8 +156,11 @@ async function main() {
     case 3:
       await printValidatorStats();
       break;
+    case 4:
+      await printValidatorRewards();
+      break;
     default:
-      console.error('Argument should be 0, 1, 2 or 3');
+      console.error('Invalid argument');
       process.exit(1);
   }
 }

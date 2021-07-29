@@ -1,11 +1,10 @@
 // Get summary from for PoA like current epoch, when will it end, active validators, queued validators, etc
-
+import { bnToBn } from '@polkadot/util';
 import dock from '../src/api';
-import { asDockAddress } from '../src/utils/codec';
 
 require('dotenv').config();
 
-const { FullNodeEndpoint, Network } = process.env;
+const { FullNodeEndpoint } = process.env;
 
 /**
  * Get multiple items from chain state in a single query
@@ -30,62 +29,36 @@ async function multiQuery(handle, queries) {
 }
 
 async function getSummary(handle) {
-  const [epoch,
-    epochEndsAt,
-    minEpochLength,
-    maxActiveValidators,
-    activeValidators,
-    validatorsToAdd,
-    validatorsToRemove,
+  const [
     emissionStatus,
     emissionSupply,
+    totalIssuance,
   ] = await multiQuery(handle, [
-    handle.api.query.poAModule.epoch,
-    handle.api.query.poAModule.epochEndsAt,
-    handle.api.query.poAModule.minEpochLength,
-    handle.api.query.poAModule.maxActiveValidators,
-    handle.api.query.poAModule.activeValidators,
-    handle.api.query.poAModule.queuedValidators,
-    handle.api.query.poAModule.removeValidators,
-    handle.api.query.poAModule.emissionStatus,
-    handle.api.query.poAModule.emissionSupply,
+    handle.api.query.stakingRewards.stakingEmissionStatus,
+    handle.api.query.stakingRewards.stakingEmissionSupply,
+    handle.api.query.balances.totalIssuance,
   ]);
 
-  const conv = (addr) => asDockAddress(addr, Network);
-
+  const accounts = await dock.api.query.system.account.entries();
+  const totalBal = bnToBn(0);
+  accounts.forEach((entry) => {
+    totalBal.iadd(entry[1].data.free);
+    totalBal.iadd(entry[1].data.reserved);
+  });
   return {
-    epoch: epoch.toNumber(),
-    epochEndsAt: epochEndsAt.toNumber(),
-    minEpochLength: minEpochLength.toNumber(),
-    maxActiveValidators: maxActiveValidators.toNumber(),
-    activeValidators: activeValidators.map(conv),
-    validatorsToAdd: validatorsToAdd.map(conv),
-    validatorsToRemove: validatorsToRemove.map(conv),
     emissionStatus,
-    emissionSupply: emissionSupply.toNumber(),
+    emissionSupply: emissionSupply.toString(),
+    totalIssuance: totalIssuance.toString(),
+    totalBal: totalBal.toString(),
   };
 }
 
 async function printSummary() {
   const summary = await getSummary(dock);
-  console.log(`Current epoch is ${summary.epoch}`);
-  console.log(`Current epoch ends at ${summary.epochEndsAt}`);
-  console.log(`Minimum epoch length is ${summary.minEpochLength}`);
-  console.log(`Maximum allowed active validators are ${summary.maxActiveValidators}`);
-  console.log(`Active validator count is ${summary.activeValidators.length}`);
-  console.log(`Active validator list is ${summary.activeValidators}`);
-  if (summary.validatorsToAdd.length > 0) {
-    console.log(`List of validators to add in next epoch ${summary.validatorsToAdd}`);
-  } else {
-    console.log('No validators in queue to add');
-  }
-  if (summary.validatorsToRemove.length > 0) {
-    console.log(`List of validators to remove in next epoch ${summary.validatorsToRemove}`);
-  } else {
-    console.log('No validators to remove');
-  }
   console.log(`Emission status is ${summary.emissionStatus.toJSON()}`);
   console.log(`Emission supply is ${summary.emissionSupply}`);
+  console.log(`Total issuance is ${summary.totalIssuance}`);
+  console.log(`Total balance is ${summary.totalBal}`);
   process.exit(0);
 }
 

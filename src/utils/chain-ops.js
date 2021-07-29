@@ -106,9 +106,10 @@ export async function getAllExtrinsicsFromBlock(api, numberOrHash, includeAllExt
     const events = await getAllEventsFromBlock(api, block.header.number.toNumber(), true);
     const filteredExtrinsics = [];
     events.forEach((event) => {
+      console.log(event);
       if (event.event && event.event.index === '0x0000') {
-        // event corresponds to `ExtrinsicSuccess` and event.phase.ApplyExtrinsic is the extrinisc index in the block
-        filteredExtrinsics.push(extrinsics[event.phase.ApplyExtrinsic]);
+        // event corresponds to `ExtrinsicSuccess` and event.phase.applyExtrinsic is the extrinisc index in the block
+        filteredExtrinsics.push(extrinsics[event.phase.applyExtrinsic]);
       }
     });
     extrinsics = filteredExtrinsics;
@@ -130,7 +131,7 @@ export async function getAllEventsFromBlock(api, numberOrHash, formatted = true)
 
 export async function getTransferEventsFromBlock(api, numberOrHash, formatted = true) {
   const events = await getAllEventsFromBlock(api, numberOrHash, formatted);
-  return events.filter((event) => event.event && event.event.index === '0x0702');
+  return events.filter((event) => event.event && event.event.index === '0x0302');
 }
 
 // Format a balance with units or only as number.

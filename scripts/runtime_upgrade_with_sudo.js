@@ -32,7 +32,6 @@ async function doRuntimeUpgrade() {
 
   // Prepare to send the code
   const proposal = dock.api.tx.system.setCode(`0x${codeAsHex}`);
-  // const proposal = dock.api.tx.system.setCodeWithoutChecks(`0x${codeAsHex}`);
 
   // The code will be much bigger than whats allowed in a block and thus using only `sudo.sudo`
   // will result in "Invalid Transaction" due to block limit being hit. Thus using `sudo.sudoUncheckedWeight` and

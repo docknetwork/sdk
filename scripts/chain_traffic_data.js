@@ -47,8 +47,8 @@ async function getTxnsStatsInLastBlocks(count) {
   while (parentHash !== new Uint8Array(32) && blocks.length < count) {
     const block = await getBlock(dock.api, parentHash.toString());
     weight += await getWeight(parentHash.toString());
+    parentHash = block.header.parentHash;
     blocks.push(block);
-    parentHash = lastBlock.header.parentHash;
   }
   const extrinsicsCounts = blocks.map((b) => b.extrinsics.length);
   const total = extrinsicsCounts.reduce((a, b) => a + b, 0);

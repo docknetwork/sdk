@@ -2,8 +2,8 @@ import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { Keyring } from '@polkadot/keyring';
 import {
   Registry, DEVNODE_INFO, buildTransferTxn, signTxn, decodeSignedTxn,
-} from '../src/offline-signing';
-import { metadataRpc as metadata } from '../src/offline-signing/devnode-metadata.json';
+} from './offline-signing';
+import { metadataRpc as metadata } from './offline-signing/devnode-metadata.json';
 
 (async function main() {
   // charlie is try to send `value` tokens to dave

@@ -16,6 +16,7 @@ jobs:
       - run: yarn install --frozen-lockfile --ignore-scripts
       - run: yarn build
       - run: cp -rf package.json dist
+      - run: sed -i '$s/}/,\n"type":"module"}/' dist/package.json
       - run: cp -rf README.md dist
       - run: cd dist && npm publish --access public
         env:

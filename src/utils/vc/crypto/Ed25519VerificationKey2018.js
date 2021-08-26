@@ -15,7 +15,7 @@ export default class Ed25519VerificationKey2018 {
    */
   static from(verificationMethod) {
     if (verificationMethod.type !== Ed25519VerKeyName && !verificationMethod.publicKeyBase58) {
-      throw new Error('verification method should have type Sr25519VerificationKey2020 and have the base58 public key');
+      throw new Error(`verification method should have type ${Ed25519VerKeyName} and have the base58 public key`);
     }
     return new this(b58.decode(verificationMethod.publicKeyBase58));
   }

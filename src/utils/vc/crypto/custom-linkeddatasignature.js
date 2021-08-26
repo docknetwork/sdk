@@ -104,7 +104,18 @@ export default class CustomLinkedDataSignature extends suites.LinkedDataSignatur
       throw new Error('A signer API has not been specified.');
     }
 
-    const signatureBytes = await this.signer.sign({ data: verifyData });
+    let signatureBytes;
+    const signature = await this.signer.sign({ data: verifyData });
+    if (typeof signature === 'string') {
+      // Some signers will return a string like: header..signature
+      // split apart those strings to get the signature in bytes
+      const signatureSplit = signature.split('.');
+      const signatureEncoded = signatureSplit[signatureSplit.length - 1];
+      signatureBytes = decodeBase64Url(signatureEncoded);
+    } else {
+      signatureBytes = signature;
+    }
+
     return {
       ...proof,
       proofValue: MULTIBASE_BASE58BTC_HEADER + encode(signatureBytes),

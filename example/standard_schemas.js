@@ -4,7 +4,6 @@ import { expandJSONLD } from '../src/utils/vc/helpers';
 import { validateCredentialSchema } from '../src/utils/vc/schema';
 
 import prCardSchema from './schemas/pr_card';
-import qpInbonSchema from './schemas/qp_inbond';
 import healthWorkerPassportSchema from './schemas/health_worker_passport';
 import infectionDiagnosisSchema from './schemas/infection_diagnosis';
 import immunityEventRecordSchema from './schemas/immunity_event_record';
@@ -225,9 +224,7 @@ async function validateSchema(schema, credential) {
 
 async function main() {
   await validateSchema(prCardSchema, credPRCard);
-  await validateSchema(qpInbonSchema, qPInbondCred);
   await validateSchema(healthWorkerPassportSchema, healthCareWorkerCred);
-
   await validateSchema(infectionDiagnosisSchema, infectionDiagnosisCred);
   await validateSchema(immunityEventRecordSchema, immunityEventRecordCred);
   await validateSchema(noInfectionSchema, noInfectionCred);

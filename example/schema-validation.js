@@ -1,7 +1,7 @@
 import Schema from '../src/modules/schema';
 
 // BOL Schema, its valid
-import bolSchema from '../src/utils/vc/schemas/bol';
+import bolSchema from './schemas/bol';
 
 // Invalid example schema
 const invalidSchema = {

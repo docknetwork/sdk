@@ -3,9 +3,9 @@ import { getSpecTypes } from '@polkadot/types-known';
 import { createMetadata } from '@substrate/txwrapper/lib/util/metadata';
 
 import { DEVNODE_INFO, MAINNET_INFO, TESTNET_INFO } from './constants';
-import { metadataRpc as devMetadata } from './devnode-metadata.json';
-import { metadataRpc as mainMetadata } from './mainnet-metadata.json';
-import { metadataRpc as testMetadata } from './testnet-metadata.json';
+import { metadataRpc as devMetadata } from '../../src/metadata/devnode-metadata.json';
+import { metadataRpc as mainMetadata } from '../../src/metadata/mainnet-metadata.json';
+import { metadataRpc as testMetadata } from '../../src/metadata/testnet-metadata.json';
 
 /**
  * A registry class that stores the types, metadata and chain information.

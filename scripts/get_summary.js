@@ -1,6 +1,6 @@
 // Get summary from for PoA like current epoch, when will it end, active validators, queued validators, etc
 import { bnToBn } from '@polkadot/util';
-import dock from '../src/api';
+import dock from '../src/index';
 
 require('dotenv').config();
 

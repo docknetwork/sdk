@@ -1,7 +1,7 @@
 // Read key-value pairs downloaded from chain and write them back. Used when restoring testnet.
 import fs from 'fs';
 
-import { DockAPI } from '../src/api';
+import { DockAPI } from '../src/index';
 
 require('dotenv').config();
 

@@ -1,6 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 
-import dock from '../src/api';
+import dock from '../src/index';
 import VerifiableCredential from '../src/verifiable-credential';
 import VerifiablePresentation from '../src/verifiable-presentation';
 import { createNewDockDID } from '../src/utils/did';

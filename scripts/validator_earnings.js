@@ -1,7 +1,7 @@
 // Script to get earnings (emission and fees) made by Dock mainnet validator. Writes amount, block no and time in a CSV
 
 import { u8aToHex } from '@polkadot/util';
-import { DockAPI } from '../src/api';
+import { DockAPI } from '../src/index';
 import { asDockAddress } from '../src/utils/codec';
 
 import fs from 'fs';

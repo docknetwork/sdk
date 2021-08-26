@@ -1,6 +1,6 @@
 // Download important state from node and write to JSON file in the same directory
 
-import dock from '../src/api';
+import dock from '../src/index';
 import { asDockAddress } from '../src/utils/codec';
 
 require('dotenv').config();

@@ -1,7 +1,7 @@
 import { u8aToString, u8aToHex } from '@polkadot/util';
 import { randomAsHex } from '@polkadot/util-crypto';
 
-import { DockAPI } from '../../src/api';
+import { DockAPI } from '../../src/index';
 
 import { createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';

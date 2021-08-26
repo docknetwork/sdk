@@ -4,7 +4,7 @@ import {
   getTestEVMAccountsFromWeb3, getWeb3, sendTokensToEVMAddress,
 } from './helpers';
 
-import { DockAPI } from '../../src/api';
+import { DockAPI } from '../../src/index';
 
 import { getBalance } from '../../src/utils/chain-ops';
 import {

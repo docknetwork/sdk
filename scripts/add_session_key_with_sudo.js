@@ -1,7 +1,7 @@
 // Script to set session key of a validator using sudo. This expects 2 arguments, the validator account address
 // and its session key in hex and sends an extrinsic
 
-import dock from '../src/api';
+import dock from '../src/index';
 import { sendTxnWithAccount } from './helpers';
 
 require('dotenv').config();

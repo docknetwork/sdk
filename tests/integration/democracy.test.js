@@ -10,7 +10,7 @@ describe('Democracy', () => {
 });
 
 
-// import dock from '../../src/api';
+// import dock from '../../src/index';
 // import { randomAsHex, blake2AsHex } from '@polkadot/util-crypto';
 //
 // import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';

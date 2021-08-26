@@ -2,7 +2,7 @@ import { BTreeMap } from '@polkadot/types';
 import { cryptoWaitReady } from '@polkadot/util-crypto/index';
 import { Keyring } from '@polkadot/api/index';
 
-import { DockAPI } from '../../src/api';
+import { DockAPI } from '../../src/index';
 import { FullNodeEndpoint } from '../test-constants';
 import { getFreeBalance } from './helpers';
 

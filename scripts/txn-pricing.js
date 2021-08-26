@@ -3,7 +3,7 @@
 import { BTreeSet } from '@polkadot/types';
 
 import { randomAsHex } from '@polkadot/util-crypto';
-import dock from '../src/api';
+import dock from '../src/index';
 import {
   createKeyDetail,
   createNewDockDID,

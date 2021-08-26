@@ -1,6 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 
-import dock from '../src/api';
+import dock from '../src/index';
 import { createNewDockDID, createKeyDetail } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 

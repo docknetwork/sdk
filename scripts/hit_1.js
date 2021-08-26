@@ -1,5 +1,5 @@
 import { randomAsHex } from '@polkadot/util-crypto';
-import dock, { DockAPI } from '../src/api';
+import dock, { DockAPI } from '../src/index';
 import {
   createNewDockDID, createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval, getHexIdentifierFromDID,
 } from '../src/utils/did';

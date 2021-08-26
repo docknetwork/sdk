@@ -1,6 +1,6 @@
 // Script to send runtime upgrade using sudo account
 
-import dock from '../src/api';
+import dock from '../src/index';
 import { sendTxnWithAccount } from './helpers';
 
 require('dotenv').config();

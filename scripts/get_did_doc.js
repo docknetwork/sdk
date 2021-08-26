@@ -1,5 +1,5 @@
 // Import Dock API
-import dock from '../src/api';
+import dock from '../src/index';
 
 require('dotenv').config();
 

@@ -4,7 +4,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 // Import Dock API
 import dock, {
   PublicKeySr25519,
-} from '../src/api';
+} from '../src/index';
 import {
   createNewDockDID, createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval,
 } from '../src/utils/did';

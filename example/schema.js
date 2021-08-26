@@ -1,7 +1,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import Schema from '../src/modules/schema';
 
-import { DockAPI } from '../src/api';
+import { DockAPI } from '../src/index';
 import { createNewDockDID, createKeyDetail } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import VerifiableCredential from '../src/verifiable-credential';

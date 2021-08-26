@@ -1,6 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 
-import { DockAPI } from '../../src/api';
+import { DockAPI } from '../../src/index';
 import { ATTESTS_IRI } from '../../src/modules/did';
 
 import {

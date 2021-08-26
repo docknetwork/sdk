@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { bnToBn } from '@polkadot/util';
 
-import { DockAPI } from '../src/api';
+import { DockAPI } from '../src/index';
 import { asDockAddress } from '../src/utils/codec';
 
 require('dotenv').config();

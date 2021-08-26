@@ -1,7 +1,7 @@
 import { stringToHex } from '@polkadot/util';
 import { randomAsHex } from '@polkadot/util-crypto';
 
-import { DockAPI } from '../../src/api';
+import { DockAPI } from '../../src/index';
 
 import {
   hexDIDToQualified, createNewDockDID, createKeyDetail, getHexIdentifierFromDID,

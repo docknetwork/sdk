@@ -2,7 +2,7 @@
 // the validator account address and its session key in hex and optionally the short circuit boolean value. This sends an extrinsic.
 // This script is equivalent of running scripts `add_session_key_with_sudo` and `add_validator_with_sudo` in succession.
 
-import dock from '../src/api';
+import dock from '../src/index';
 import { sendTxnWithAccount, validatorChange } from './helpers';
 
 require('dotenv').config();

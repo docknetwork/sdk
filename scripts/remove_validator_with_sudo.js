@@ -1,7 +1,7 @@
 // Script to add remove a validator using sudo. This accepts the validator's address and optionally a short circuit argument
 // // which defaults to false and sends an extrinsic
 
-import dock from '../src/api';
+import dock from '../src/index';
 import { validatorChange } from './helpers';
 
 require('dotenv').config();

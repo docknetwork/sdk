@@ -2,7 +2,7 @@
 
 import { u8aToString, bnToU8a, u8aToHex } from '@polkadot/util';
 import { asDockAddress } from '../src/utils/codec';
-import dock from '../src/api';
+import dock from '../src/index';
 
 require('dotenv').config();
 

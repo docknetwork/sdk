@@ -4,7 +4,7 @@
 
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
-import dock from '../src/api';
+import dock from '../src/index';
 
 require('dotenv').config();
 

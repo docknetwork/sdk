@@ -1,7 +1,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
-import { DockAPI } from '../../src/api';
+import { DockAPI } from '../../src/index';
 import {
   issueCredential,
   signPresentation, verifyCredential,

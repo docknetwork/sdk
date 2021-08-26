@@ -1,4 +1,4 @@
-import dock from '../src/api';
+import dock from '../src/index';
 import {
   getLastBlock, getBlock,
 } from '../src/utils/chain-ops';

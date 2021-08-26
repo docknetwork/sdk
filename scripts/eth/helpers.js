@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import Web3 from 'web3';
-import { DockAPI } from '../../src/api';
+import { DockAPI } from '../../src/index';
 import { endowEVMAddress } from '../../src/utils/evm-utils';
 
 require('dotenv').config();

@@ -6,7 +6,7 @@ import {
   createNewDockDID,
 } from '../../src/utils/did';
 
-import { DockAPI } from '../../src/api';
+import { DockAPI } from '../../src/index';
 import { DockResolver } from '../../src/resolver';
 
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';

@@ -9,7 +9,7 @@ import { u8aToHex, assert } from '@polkadot/util';
 import b58 from 'bs58';
 import { createSignedKeyUpdate, getHexIdentifierFromDID } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
-import { DockAPI, PublicKeySr25519 } from '../src/api';
+import { DockAPI, PublicKeySr25519 } from '../src/index';
 
 require('dotenv').config();
 

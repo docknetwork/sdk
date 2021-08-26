@@ -1,6 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import ethr from 'ethr-did-resolver';
-import { DockAPI } from '../src/api';
+import { DockAPI } from '../src/index';
 import { createNewDockDID, createKeyDetail, NoDIDError } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import {

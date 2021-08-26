@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { DockAPI } from '../src/api';
+import { DockAPI } from '../src/index';
 import {
   getLastBlock, getBlockNo, blockNumberToHash, getBlock, getBalance, getAllExtrinsicsFromBlock, getTransferExtrinsicsFromBlock,
   getAllEventsFromBlock, getLastFinalizedBlock, generateAccount, transferMicroDock, transferDock, validateAddress, getTransferEventsFromBlock,

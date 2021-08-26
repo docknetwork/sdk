@@ -1,6 +1,6 @@
 import { cryptoWaitReady, randomAsHex } from '@polkadot/util-crypto/index';
 import { Keyring } from '@polkadot/api/index';
-import { DockAPI } from '../../src/api';
+import { DockAPI } from '../../src/index';
 import { FullNodeEndpoint, TestKeyringOpts } from '../test-constants';
 import { getBlockDetails, getFreeBalance, setEmissionRewardsStatusWithHandle } from './helpers';
 import { createKeyDetail, createNewDockDID } from '../../src/utils/did';

@@ -1,4 +1,4 @@
-import dock from '../src/api';
+import dock from '../src/index';
 import { createKeyDetail, createNewDockDID } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { median } from './helpers';

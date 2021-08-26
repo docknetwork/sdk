@@ -1,6 +1,6 @@
 // This swaps an existing validator for a new one. This accepts the old and new validator's address and sends an extrinsic
 
-import dock from '../src/api';
+import dock from '../src/index';
 import { sendTxnWithAccount } from './helpers';
 
 require('dotenv').config();

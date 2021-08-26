@@ -1,7 +1,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { u8aToString } from '@polkadot/util';
 
-import { DockAPI } from '../src/api';
+import { DockAPI } from '../src/index';
 import { DockBlobIdByteSize } from '../src/modules/blob';
 import { createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';

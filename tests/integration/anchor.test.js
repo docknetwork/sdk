@@ -1,6 +1,6 @@
 import { randomAsU8a } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
-import { DockAPI } from '../../src/api';
+import { DockAPI } from '../../src/index';
 
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getBlock } from '../../src/utils/chain-ops';

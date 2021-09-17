@@ -35,9 +35,13 @@ function getExtrinsicError(data, typeDef, api) {
   data.forEach((error) => {
     if (error.isModule) {
       // for module errors, we have the section indexed, lookup
-      const decoded = api.registry.findMetaError(error.asModule);
-      const { docs, method, section } = decoded;
-      errorMsg += `\n${section}.${method}: ${docs.join(' ')}`;
+      try {
+        const decoded = api.registry.findMetaError(error.asModule);
+        const { docs, method, section } = decoded;
+        errorMsg += `\n${section}.${method}: ${docs.join(' ')}`;
+      } catch (e) {
+        errorMsg += `\nError at module index: ${error.asModule.index} Error: ${error.asModule.error}`;
+      }
     } else {
       const errorStr = error.toString();
       if (errorStr !== '0') {

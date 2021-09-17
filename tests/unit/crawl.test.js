@@ -183,7 +183,7 @@ describe('Crawler unit tests', () => {
         ]
       ]
     );
-  }, 100);
+  }, 10000);
 });
 
 function graphResolver(sg) {

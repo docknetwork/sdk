@@ -28,20 +28,24 @@ import {
   SignatureEd25519,
 } from './signatures';
 
-function getExtrinsicError(data, typeDef) {
+function getExtrinsicError(data, typeDef, api) {
   // Loop through each of the parameters
   // trying to find module error information
   let errorMsg = 'Extrinsic failed submission:';
-  data.forEach((paramData, index) => {
-    if (paramData.isBadOrigin) {
-      errorMsg += '\nBadOrigin';
-    } else if (typeDef[index].type === 'DispatchError' && paramData.isModule) {
-      const mod = paramData.asModule;
+  data.forEach((error) => {
+    if (error.isModule) {
+      // for module errors, we have the section indexed, lookup
       try {
-        const { documentation, name, section } = mod.registry.findMetaError(mod.error);
-        errorMsg += `\nDispatchError: ${section}.${name}: ${documentation}`;
+        const decoded = api.registry.findMetaError(error.asModule);
+        const { docs, method, section } = decoded;
+        errorMsg += `\n${section}.${method}: ${docs.join(' ')}`;
       } catch (e) {
-        errorMsg += `\nDispatchError: Module index: ${mod.index} Error: ${mod.error}`;
+        errorMsg += `\nError at module index: ${error.asModule.index} Error: ${error.asModule.error}`;
+      }
+    } else {
+      const errorStr = error.toString();
+      if (errorStr !== '0') {
+        errorMsg += `\n${errorStr}`; // Other, CannotLookup, BadOrigin, no extra info
       }
     }
   });
@@ -224,7 +228,7 @@ class DockAPI {
               },
             } = events[i];
             if (method === 'ExtrinsicFailed' || method === 'BatchInterrupted') {
-              const errorMsg = getExtrinsicError(data, typeDef);
+              const errorMsg = getExtrinsicError(data, typeDef, this.api);
               const error = new Error(errorMsg);
               reject(error);
               return error;

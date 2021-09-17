@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -11,17 +11,16 @@
     "node": ">=14.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.8.7",
-    "@babel/node": "^7.8.7",
-    "@babel/preset-env": "^7.8.7",
+    "@babel/cli": "^7.15.4",
+    "@babel/core": "^7.15.4",
+    "@babel/node": "^7.15.4",
+    "@babel/preset-env": "^7.15.6",
     "@digitalbazaar/ed25519-signature-2018": "^2.0.1",
     "@digitalbazaar/ed25519-verification-key-2018": "^3.1.1",
     "@rollup/plugin-commonjs": "^20.0.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-wasm": "^5.1.0",
     "@substrate/txwrapper": "^7.0.1",
-    "babel-core": "7.0.0-bridge.0",
     "babel-jest": "24.5.0",
     "concurrently": "^4.1.0",
     "eslint": "^6.8.0",
@@ -76,6 +75,7 @@
   },
   "dependencies": {
     "@comunica/actor-init-sparql-rdfjs": "^1.19.2",
+    "@comunica/types": "^1.0.0",
     "@docknetwork/node-types": "^0.4.7",
     "@polkadot/api": "5.6.1",
     "@polkadot/keyring": "^7.2.1",
@@ -85,7 +85,6 @@
     "@polkadot/util-crypto": "^7.2.1",
     "@types/jest": "^26.0.24",
     "axios": "0.21.1",
-    "babel-polyfill": "^6.26.0",
     "base58-universal": "^1.0.0",
     "base64url": "^3.0.1",
     "blake2b": "^2.1.3",

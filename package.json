@@ -84,7 +84,7 @@
     "@polkadot/util": "^7.2.1",
     "@polkadot/util-crypto": "^7.2.1",
     "@types/jest": "^26.0.24",
-    "axios": "0.21.1",
+    "axios": "0.21.2",
     "base58-universal": "^1.0.0",
     "base64url": "^3.0.1",
     "blake2b": "^2.1.3",

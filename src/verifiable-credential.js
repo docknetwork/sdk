@@ -157,6 +157,19 @@ class VerifiableCredential {
   }
 
   /**
+   * Set the subject for this Credential
+   * @param {object|array} subject - Subject of the credential as object or array
+   * @returns {VerifiableCredential}
+   */
+  setSubject(subject) {
+    if (!isObject(subject) && !Array.isArray(subject)) {
+      throw new Error('credentialSubject must be either an object or array');
+    }
+    this.credentialSubject = subject;
+    return this;
+  }
+
+  /**
    * Set a status for this Credential
    * @param {object} status -  Status of the credential
    * @returns {VerifiableCredential}

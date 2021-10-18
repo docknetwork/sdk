@@ -75,6 +75,12 @@ export default class AnchorModule {
   batchDocumentsInMerkleTree(documents) {
     // Hash all documents
     const leafHashes = documents.map(this.hash);
+
+    // If only one document was hashed, just return that as the root with no proofs (single anchor)
+    if (leafHashes.length === 1) {
+      return [Uint8Array.from(leafHashes), []];
+    }
+
     // Concatenate all leaf hashes into one bytearray
     const packed = new Uint8Array(leafHashes.map((a) => [...a]).flat());
     const [root, proofs] = construct(packed);

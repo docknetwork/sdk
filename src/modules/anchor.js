@@ -84,7 +84,7 @@ export default class AnchorModule {
     // Concatenate all leaf hashes into one bytearray
     const packed = new Uint8Array(leafHashes.map((a) => [...a]).flat());
     const [root, proofs] = construct(packed);
-    return [Uint8Array.from(root), proofs];
+    return [Uint8Array.from(root), proofs, leafHashes];
   }
 
   /**

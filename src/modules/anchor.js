@@ -8,12 +8,12 @@ import NoAnchorError from '../utils/errors/no-anchor-error';
 /** Class to create and query anchors from chain. */
 export default class AnchorModule {
   /**
-   * Creates a new instance of AnchorModule and sets the api
+   * sets the dock api for this module
    * @constructor
    * @param {object} api - PolkadotJS API Reference
    * @param {Function} signAndSend - Callback signing and sending
    */
-  constructor(api, signAndSend) {
+  setApi(api, signAndSend) {
     this.api = api;
     this.module = api.tx.anchor;
     this.signAndSend = signAndSend;
@@ -75,10 +75,16 @@ export default class AnchorModule {
   batchDocumentsInMerkleTree(documents) {
     // Hash all documents
     const leafHashes = documents.map(this.hash);
+
+    // If only one document was hashed, just return that as the root with no proofs (single anchor)
+    if (leafHashes.length === 1) {
+      return [Uint8Array.from(leafHashes), []];
+    }
+
     // Concatenate all leaf hashes into one bytearray
     const packed = new Uint8Array(leafHashes.map((a) => [...a]).flat());
     const [root, proofs] = construct(packed);
-    return [Uint8Array.from(root), proofs];
+    return [Uint8Array.from(root), proofs, leafHashes];
   }
 
   /**

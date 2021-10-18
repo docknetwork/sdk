@@ -71,6 +71,7 @@ class DockAPI {
    */
   constructor(customSignTx) {
     this.customSignTx = customSignTx;
+    this.anchorModule = new AnchorModule();
   }
 
   /**
@@ -124,7 +125,7 @@ class DockAPI {
 
     await this.initKeyring(keyring);
 
-    this.anchorModule = new AnchorModule(this.api, this.signAndSend.bind(this));
+    this.anchorModule.setApi(this.api, this.signAndSend.bind(this));
     this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));
     this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
     this.revocationModule = new RevocationModule(this.api, this.signAndSend.bind(this));

@@ -1,7 +1,6 @@
 // Mock axios
-import mockAxios from '../mocks/axios';
-
 import { cryptoWaitReady } from '@polkadot/util-crypto';
+import mockAxios from '../mocks/axios';
 
 import VerifiableCredential from '../../src/verifiable-credential';
 import Schema from '../../src/modules/schema';

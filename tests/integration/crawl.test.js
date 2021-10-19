@@ -1,7 +1,7 @@
+import createClient from 'ipfs-http-client';
 import { crawl, graphResolver } from '../../src/crawl.js';
 import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from '../../src/rdf-defs.js';
 import { documentLoader, addDocument } from '../cached-document-loader.js';
-import createClient from 'ipfs-http-client';
 
 const ipfsDefaultConfig = 'http://localhost:5001';
 
@@ -20,8 +20,8 @@ const ipfs_content = {
 };
 
 async function ipfsAdd(ipfsClient, content) {
-  let { cid } = await ipfsClient.add(content);
-  return 'ipfs://' + cid.toV1();
+  const { cid } = await ipfsClient.add(content);
+  return `ipfs://${cid.toV1()}`;
 }
 
 describe('Crawler', () => {
@@ -80,13 +80,13 @@ describe('Crawler', () => {
     `;
 
     const failedLookups = [];
-    let resolveGraph = graphResolver(
+    const resolveGraph = graphResolver(
       ipfsClient,
       documentLoader,
       (term, _err) => failedLookups.push(term),
     );
     const initialFacts = await resolveGraph({ Iri: 'did:root' });
-    let allFacts = await crawl(initialFacts, RULES, CURIOSITY, resolveGraph);
+    const allFacts = await crawl(initialFacts, RULES, CURIOSITY, resolveGraph);
     expect(failedLookups).toEqual([{ Iri: 'did:c' }]);
     expect(allFacts).toEqual(
       [
@@ -94,117 +94,117 @@ describe('Crawler', () => {
           { Iri: 'did:root' },
           { Iri: 'https://rdf.dock.io/alpha/2021#attestsDocumentContents' },
           { Iri: rootatt_iri },
-          { Iri: 'did:root' }
+          { Iri: 'did:root' },
         ],
         [
           { Iri: rootatt_iri },
           { Iri: 'https://rdf.dock.io/alpha/2021#mayClaim' },
           { Iri: 'https://rdf.dock.io/alpha/2021#ANYCLAIM' },
-          { Iri: 'did:root' }
+          { Iri: 'did:root' },
         ],
         [
           { Iri: 'did:b' },
           { Iri: 'https://rdf.dock.io/alpha/2021#mayClaim' },
           { Iri: 'https://rdf.dock.io/alpha/2021#ANYCLAIM' },
-          { Iri: rootatt_iri }
+          { Iri: rootatt_iri },
         ],
         [
           { Iri: 'did:b' },
           { Iri: 'https://rdf.dock.io/alpha/2021#mayClaim' },
           { Iri: 'https://rdf.dock.io/alpha/2021#ANYCLAIM' },
-          { Iri: 'did:root' }
+          { Iri: 'did:root' },
         ],
         [
           { Iri: 'did:root' },
           { Iri: 'https://rdf.dock.io/alpha/2021#attestsDocumentContents' },
           { Iri: batt_iri },
-          { Iri: 'did:b' }
+          { Iri: 'did:b' },
         ],
         [
           { Iri: 'did:root' },
           { Iri: 'https://rdf.dock.io/alpha/2021#attestsDocumentContents' },
           { Iri: batt_iri },
-          { Iri: 'did:root' }
+          { Iri: 'did:root' },
         ],
         [
           { Iri: 'did:root' },
           { Iri: 'https://rdf.dock.io/alpha/2021#attestsDocumentContents' },
           { Iri: batt_iri },
-          { Iri: rootatt_iri }
+          { Iri: rootatt_iri },
         ],
         [
           { Iri: batt_iri },
           { Iri: 'https://rdf.dock.io/alpha/2021#mayClaim' },
           { Iri: 'https://rdf.dock.io/alpha/2021#ANYCLAIM' },
-          { Iri: 'did:b' }
+          { Iri: 'did:b' },
         ],
         [
           { Iri: batt_iri },
           { Iri: 'https://rdf.dock.io/alpha/2021#mayClaim' },
           { Iri: 'https://rdf.dock.io/alpha/2021#ANYCLAIM' },
-          { Iri: 'did:root' }
+          { Iri: 'did:root' },
         ],
         [
           { Iri: batt_iri },
           { Iri: 'https://rdf.dock.io/alpha/2021#mayClaim' },
           { Iri: 'https://rdf.dock.io/alpha/2021#ANYCLAIM' },
-          { Iri: rootatt_iri }
+          { Iri: rootatt_iri },
         ],
         [
           { Iri: 'did:c' },
           { Iri: 'https://rdf.dock.io/alpha/2021#mayClaim' },
           { Iri: 'https://rdf.dock.io/alpha/2021#ANYCLAIM' },
-          { Iri: batt_iri }
+          { Iri: batt_iri },
         ],
         [
           { Iri: 'did:b' },
           { Iri: 'http://purl.org/spar/cito/likes' },
           { Iri: 'isbn:978-0-06-245871-1' },
-          { Iri: batt_iri }
+          { Iri: batt_iri },
         ],
         [
           { Iri: 'did:b' },
           { Iri: 'http://purl.org/spar/cito/likes' },
           { Iri: 'isbn:978-0-06-245871-1' },
-          { Iri: 'did:b' }
+          { Iri: 'did:b' },
         ],
         [
           { Iri: 'did:b' },
           { Iri: 'http://purl.org/spar/cito/likes' },
           { Iri: 'isbn:978-0-06-245871-1' },
-          { Iri: 'did:root' }
+          { Iri: 'did:root' },
         ],
         [
           { Iri: 'did:b' },
           { Iri: 'http://purl.org/spar/cito/likes' },
           { Iri: 'isbn:978-0-06-245871-1' },
-          { Iri: rootatt_iri }
+          { Iri: rootatt_iri },
         ],
         [
           { Iri: 'did:c' },
           { Iri: 'https://rdf.dock.io/alpha/2021#mayClaim' },
           { Iri: 'https://rdf.dock.io/alpha/2021#ANYCLAIM' },
-          { Iri: 'did:b' }
+          { Iri: 'did:b' },
         ],
         [
           { Iri: 'did:c' },
           { Iri: 'https://rdf.dock.io/alpha/2021#mayClaim' },
           { Iri: 'https://rdf.dock.io/alpha/2021#ANYCLAIM' },
-          { Iri: 'did:root' }
+          { Iri: 'did:root' },
         ],
         [
           { Iri: 'did:c' },
           { Iri: 'https://rdf.dock.io/alpha/2021#mayClaim' },
           { Iri: 'https://rdf.dock.io/alpha/2021#ANYCLAIM' },
-          { Iri: rootatt_iri }
-        ]
-      ]
+          { Iri: rootatt_iri },
+        ],
+      ],
     );
   }, 1000);
 
   test('graphResolver', async () => {
-    let resolveGraph = graphResolver(ipfsClient, documentLoader);
-    let initialfacts = await resolveGraph({ Iri: 'did:root' });
+    const resolveGraph = graphResolver(ipfsClient, documentLoader);
+    const initialfacts = await resolveGraph({ Iri: 'did:root' });
     expect(initialfacts).toEqual([
       [
         { Iri: 'did:root' },

@@ -1,12 +1,13 @@
-jest.mock('axios');
 import axios from 'axios';
 import networkCache from '../network-cache';
+
+jest.mock('axios');
 
 export default function mockAxios() {
   axios.get.mockImplementation(async (url) => {
     if (networkCache[url]) {
       return {
-        data: networkCache[url]
+        data: networkCache[url],
       };
     }
 

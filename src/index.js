@@ -7,10 +7,6 @@ import AnchorModule from './modules/anchor';
 import BlobModule from './modules/blob';
 import DIDModule from './modules/did';
 import RevocationModule from './modules/revocation';
-import PoAModule from './modules/poa';
-import DemocracyModule from './modules/democracy';
-import CouncilModule from './modules/council';
-import TechCommitteeModule from './modules/tech-committee';
 import TokenMigration from './modules/migration';
 import PoaRpcDefs from './poa-rpc-defs';
 import PriceFeedRpcDefs from './price-feed-rpc-defs';
@@ -129,12 +125,8 @@ class DockAPI {
     this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));
     this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
     this.revocationModule = new RevocationModule(this.api, this.signAndSend.bind(this));
-    this.democracyModule = new DemocracyModule(this.api, this.signAndSend.bind(this));
-    this.councilModule = new CouncilModule(this.api, this.signAndSend.bind(this));
-    this.techCommitteeModule = new TechCommitteeModule(this.api, this.signAndSend.bind(this));
 
     if (loadPoaModules) {
-      this.poaModule = new PoAModule(this.api);
       this.migrationModule = new TokenMigration(this.api);
     }
 
@@ -315,50 +307,6 @@ class DockAPI {
     }
     return this.revocationModule;
   }
-
-  /**
-   * Get the PoA module
-   * @return {PoAModule} The module to use
-   */
-  get poa() {
-    if (!this.poaModule) {
-      throw new Error('Unable to get PoA module, SDK is not initialised');
-    }
-    return this.poaModule;
-  }
-
-  /**
-   * Get the council module
-   * @return {CouncilModule} The module to use
-   */
-  get council() {
-    if (!this.councilModule) {
-      throw new Error('Unable to get council module, SDK is not initialised');
-    }
-    return this.councilModule;
-  }
-
-  /**
-   * Get the democracy module
-   * @return {DemocracyModule} The module to use
-   */
-  get democracy() {
-    if (!this.democracyModule) {
-      throw new Error('Unable to get democracy module, SDK is not initialised');
-    }
-    return this.democracyModule;
-  }
-
-  /**
-   * Get the tech committee module
-   * @return {TechCommitteeModule} The module to use
-   */
-  get techCommittee() {
-    if (!this.techCommitteeModule) {
-      throw new Error('Unable to get tech committee module, SDK is not initialised');
-    }
-    return this.techCommitteeModule;
-  }
 }
 
 export default new DockAPI();
@@ -368,7 +316,6 @@ export {
   DockAPI,
   DIDModule,
   RevocationModule,
-  PoAModule,
   PublicKey,
   PublicKeySr25519,
   PublicKeyEd25519,

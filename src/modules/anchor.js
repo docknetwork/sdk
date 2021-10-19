@@ -78,7 +78,7 @@ export default class AnchorModule {
 
     // If only one document was hashed, just return that as the root with no proofs (single anchor)
     if (leafHashes.length === 1) {
-      return [Uint8Array.from(leafHashes), []];
+      return [leafHashes, []];
     }
 
     // Concatenate all leaf hashes into one bytearray

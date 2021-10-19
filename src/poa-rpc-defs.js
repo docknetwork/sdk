@@ -10,10 +10,5 @@ export default {
       params: [],
       type: 'Balance',
     },
-    getTotalEmissionInEpoch: {
-      description: 'Return total (validators + treasury) emission rewards for given epoch',
-      params: ['EpochNo'],
-      type: 'Balance',
-    },
   },
 };

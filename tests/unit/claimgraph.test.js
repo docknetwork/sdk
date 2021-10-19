@@ -1,5 +1,5 @@
-import { fromJsonldjsCg, asEE, merge } from '../../src/utils/claimgraph';
 import jsonld from 'jsonld';
+import { fromJsonldjsCg, asEE, merge } from '../../src/utils/claimgraph';
 
 describe('Claimgraph operations.', () => {
   test('merge', async () => {
@@ -189,11 +189,11 @@ describe('Claimgraph operations.', () => {
     const jld = {
       'https://example.com/a': [{
         '@value': 'moron',
-        '@language': 'en'
+        '@language': 'en',
       }, {
         '@value': 'moron',
-        '@language': 'cy'
-      }]
+        '@language': 'cy',
+      }],
     };
     const cg = fromJsonldjsCg(await jsonld.toRDF(jld));
     expect(cg[0]).not.toEqual(cg[1]);
@@ -205,8 +205,8 @@ describe('Claimgraph operations.', () => {
           Literal: {
             value: 'moron',
             datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
-            language: 'en'
-          }
+            language: 'en',
+          },
         },
         { DefaultGraph: true },
       ],
@@ -217,11 +217,11 @@ describe('Claimgraph operations.', () => {
           Literal: {
             value: 'moron',
             datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
-            language: 'cy'
-          }
+            language: 'cy',
+          },
         },
         { DefaultGraph: true },
-      ]
+      ],
     ]);
   });
 });

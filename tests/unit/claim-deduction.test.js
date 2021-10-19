@@ -20,7 +20,9 @@ import {
   EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
 } from '../../src/utils/vc/custom_crypto';
 import { createPresentation } from '../create-presentation';
-import { documentLoader, addDocument, registered, modifyDocument } from '../cached-document-loader.js';
+import {
+  documentLoader, addDocument, registered, modifyDocument,
+} from '../cached-document-loader.js';
 
 describe('Composite claim soundness checker', () => {
   test('control: issue and verify', async () => {
@@ -81,7 +83,7 @@ describe('Composite claim soundness checker', () => {
       .toMatch('Error: Credential issuer must match the verification method controller.');
 
     // modify the attackers keydoc to assert it's controller is issuera
-    await modifyDocument(`${issuerb}#keys-1`, (original) => ({ ...original, controller: issuera }))
+    await modifyDocument(`${issuerb}#keys-1`, (original) => ({ ...original, controller: issuera }));
     expect((await documentLoader(`${issuerb}#keys-1`)).document.controller).toBe(issuera);
 
     err = await verifyC(

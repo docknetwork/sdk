@@ -19,7 +19,7 @@ async function getHandles(count, endpoint) {
 
 // Get balance of an account.
 async function getBalance(handle, address) {
-  return parseInt((await handle.poaModule.getBalance(address)));
+  return parseInt((await getBalance(handle.api, address)));
 }
 
 // Get balance of given list of accounts.

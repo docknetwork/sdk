@@ -14,6 +14,7 @@ import {
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { createRandomRegistryId, KeyringPairDidKeys, OneOfPolicy } from '../src/utils/revocation';
 import { BLOB_MAX_BYTE_SIZE } from '../src/modules/blob';
+import { getBalance } from './helpers';
 
 require('dotenv').config();
 
@@ -34,9 +35,9 @@ async function dids() {
 
   const [did, pair, keyDetail] = getDidPair();
 
-  let bal0 = await dock.poaModule.getBalance(account.address);
+  let bal0 = await getBalance(dock.api, account.address);
   await dock.did.new(did, keyDetail, false);
-  let bal00 = await dock.poaModule.getBalance(account.address);
+  let bal00 = await getBalance(dock.api, account.address);
   console.info(`Fee paid for DID write is ${parseInt(bal0[0]) - parseInt(bal00[0])}`);
 
   // Update DID key to the following
@@ -45,15 +46,15 @@ async function dids() {
   const newPk = getPublicKeyFromKeyringPair(newPair);
   const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, did, newPk, pair);
 
-  bal0 = await dock.poaModule.getBalance(account.address);
+  bal0 = await getBalance(dock.api, account.address);
   await dock.did.updateKey(keyUpdate, signature, false);
-  bal00 = await dock.poaModule.getBalance(account.address);
+  bal00 = await getBalance(dock.api, account.address);
   console.info(`Fee paid for DID update is ${parseInt(bal0[0]) - parseInt(bal00[0])}`);
 
   const [didRemoval, signature1] = await createSignedDidRemoval(dock.did, did, newPair);
-  bal0 = await dock.poaModule.getBalance(account.address);
+  bal0 = await getBalance(dock.api, account.address);
   await dock.did.remove(didRemoval, signature1, false);
-  bal00 = await dock.poaModule.getBalance(account.address);
+  bal00 = await getBalance(dock.api, account.address);
   console.info(`Fee paid for DID remove is ${parseInt(bal0[0]) - parseInt(bal00[0])}`);
 }
 
@@ -65,9 +66,9 @@ async function revocation() {
   const didKeys = new KeyringPairDidKeys();
   const [did, pair, keyDetail] = getDidPair();
 
-  let bal0 = await dock.poaModule.getBalance(account.address);
+  let bal0 = await getBalance(dock.api, account.address);
   await dock.did.new(did, keyDetail, false);
-  let bal00 = await dock.poaModule.getBalance(account.address);
+  let bal00 = await getBalance(dock.api, account.address);
   console.info(`Fee paid for DID write is ${parseInt(bal0[0]) - parseInt(bal00[0])}`);
 
   didKeys.set(did, pair);
@@ -77,10 +78,10 @@ async function revocation() {
   const controllers = new Set();
   controllers.add(did);
 
-  bal0 = await dock.poaModule.getBalance(account.address);
+  bal0 = await getBalance(dock.api, account.address);
   const policy = new OneOfPolicy(controllers);
   await dock.revocation.newRegistry(registryId, policy, false, false);
-  bal00 = await dock.poaModule.getBalance(account.address);
+  bal00 = await getBalance(dock.api, account.address);
   console.info(`Fee paid registry create is ${parseInt(bal0[0]) - parseInt(bal00[0])}`);
 
   const revokeId = new Set();
@@ -89,10 +90,10 @@ async function revocation() {
   const revTx = dock.revocation.createRevokeTx(registryId, revokeId, lastModified, didKeys);
   console.info(`Payment info of 1 revocation is ${(await revTx.paymentInfo(account.address))}`);
 
-  const bal1 = await dock.poaModule.getBalance(account.address);
+  const bal1 = await getBalance(dock.api, account.address);
   const r = await dock.signAndSend(revTx, false);
   console.info(`block ${r.status.asInBlock}`);
-  const bal2 = await dock.poaModule.getBalance(account.address);
+  const bal2 = await getBalance(dock.api, account.address);
   console.info(`Fee paid is ${parseInt(bal1[0]) - parseInt(bal2[0])}`);
 
   const count = 10;
@@ -114,10 +115,10 @@ async function revocation() {
   const revTx1 = dock.revocation.createRevokeTx(registryId, revokeIds, await dock.revocation.getBlockNoForLastChangeToRegistry(registryId), didKeys);
   console.info(`Payment info of ${count} revocations is ${(await revTx1.paymentInfo(account.address))}`);
 
-  const bal3 = await dock.poaModule.getBalance(account.address);
+  const bal3 = await getBalance(dock.api, account.address);
   const r1 = await dock.signAndSend(revTx1, false);
   console.info(`block ${r1.status.asInBlock}`);
-  const bal4 = await dock.poaModule.getBalance(account.address);
+  const bal4 = await getBalance(dock.api, account.address);
   console.info(`Fee paid is ${parseInt(bal3[0]) - parseInt(bal4[0])}`);
 
   lastModified = await dock.revocation.getBlockNoForLastChangeToRegistry(registryId);
@@ -130,9 +131,9 @@ async function anchors() {
   dock.setAccount(account);
 
   const anc = randomAsHex(32);
-  const bal0 = await dock.poaModule.getBalance(account.address);
+  const bal0 = await getBalance(dock.api, account.address);
   await dock.anchor.deploy(anc, false);
-  const bal00 = await dock.poaModule.getBalance(account.address);
+  const bal00 = await getBalance(dock.api, account.address);
   console.info(`Fee paid for anchor write is ${parseInt(bal0[0]) - parseInt(bal00[0])}`);
 }
 
@@ -149,9 +150,9 @@ async function blobs() {
     blob: randomAsHex(BLOB_MAX_BYTE_SIZE),
     author: getHexIdentifierFromDID(did),
   };
-  const bal0 = await dock.poaModule.getBalance(account.address);
+  const bal0 = await getBalance(dock.api, account.address);
   await dock.blob.new(blob, pair, undefined, false);
-  const bal00 = await dock.poaModule.getBalance(account.address);
+  const bal00 = await getBalance(dock.api, account.address);
   console.info(`Fee paid for blob write is ${parseInt(bal0[0]) - parseInt(bal00[0])}`);
 }
 
@@ -161,7 +162,7 @@ async function transfers() {
 
   const BOB = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty';
 
-  const bal1 = await dock.poaModule.getBalance(account.address);
+  const bal1 = await getBalance(dock.api, account.address);
 
   const transfer = dock.api.tx.balances.transfer(BOB, 100);
 
@@ -175,7 +176,7 @@ async function transfers() {
 
   await dock.signAndSend(transfer, false);
 
-  const bal2 = await dock.poaModule.getBalance(account.address);
+  const bal2 = await getBalance(dock.api, account.address);
 
   console.info(`Fee paid is ${parseInt(bal1[0]) - parseInt(bal2[0]) + 100}`);
 }

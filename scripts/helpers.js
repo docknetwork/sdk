@@ -44,6 +44,11 @@ export async function validatorChange(dock, argv, func, senderAccountUri) {
   return sendTxnWithAccount(dock, senderAccountUri, txn);
 }
 
+export async function getBalance(api, account) {
+  const { data: balance } = await api.query.system.account(account);
+  return [balance.free.toHex(), balance.reserved.toHex()];
+}
+
 /**
  * Send a batch of txns and print relevant info like size, weight, block included and fees paid.
  * @param {*} txs
@@ -54,7 +59,7 @@ export async function sendBatch(dock, txs, senderAddress, waitForFinalization = 
   console.log(`Batch size is ${txBatch.encodedLength}`);
   console.info(`Payment info of batch is ${(await txBatch.paymentInfo(senderAddress))}`);
 
-  const bal1 = await dock.poaModule.getBalance(senderAddress);
+  const bal1 = await getBalance(dock.api, senderAddress);
   console.time(`Time for sign and send for batch of size ${txs.length}`);
   const signedExtrinsic = await dock.signExtrinsic(txBatch);
   console.time(`Time for send for batch of size ${txs.length}`);
@@ -66,7 +71,7 @@ export async function sendBatch(dock, txs, senderAddress, waitForFinalization = 
   }
   console.timeEnd(`Time for sign and send for batch of size ${txs.length}`);
   console.timeEnd(`Time for send for batch of size ${txs.length}`);
-  const bal2 = await dock.poaModule.getBalance(senderAddress);
+  const bal2 = await getBalance(dock.api, senderAddress);
   console.info(`Fee paid is ${parseInt(bal1[0]) - parseInt(bal2[0])}`);
 }
 

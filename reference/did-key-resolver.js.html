@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: utils/vc/crypto/EcdsaSepc256k1Signature2019.js</title>
+    <title>JSDoc: Source: did-key-resolver.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: utils/vc/crypto/EcdsaSepc256k1Signature2019.js</h1>
+    <h1 class="page-title">Source: did-key-resolver.js</h1>
 
     
 
@@ -26,46 +26,25 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import { sha256 } from 'js-sha256';
-import { EcdsaSecp256k1SigName, EcdsaSecp256k1VerKeyName } from './constants';
-import EcdsaSecp256k1VerificationKey2019 from './EcdsaSecp256k1VerificationKey2019';
-import CustomLinkedDataSignature from './custom-linkeddatasignature';
+            <pre class="prettyprint source linenums"><code>import { getResolver } from 'key-did-resolver';
+import DIDResolver from './did-resolver';
 
-const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
+const methodName = 'key';
+const resolveMethod = getResolver().key;
 
-export default class EcdsaSepc256k1Signature2019 extends CustomLinkedDataSignature {
+export default class DIDKeyResolver extends DIDResolver {
   /**
-   * Creates a new EcdsaSepc256k1Signature2019 instance
-   * @constructor
-   * @param {object} config - Configuration options
+   * Resolve a did:key DID. The DID is expected to be a fully qualified DID.
+   * @param {string} did - The full DID
+   * @returns {Promise&lt;object>}
    */
-  constructor({
-    keypair, verificationMethod, verifier, signer,
-  } = {}) {
-    super({
-      type: EcdsaSecp256k1SigName,
-      LDKeyClass: EcdsaSecp256k1VerificationKey2019,
-      contextUrl: SUITE_CONTEXT_URL,
-      alg: 'ES256K',
-      signer: signer || EcdsaSepc256k1Signature2019.signerFactory(keypair, verificationMethod),
-      verifier,
-    });
-    this.requiredKeyType = EcdsaSecp256k1VerKeyName;
-  }
-
-  /**
-   * Generate object with `sign` method
-   * @param keypair
-   * @returns {object}
-   */
-  static signerFactory(keypair, verificationMethod) {
-    return {
-      id: verificationMethod,
-      async sign({ data }) {
-        const hash = sha256.digest(data);
-        return new Uint8Array(keypair.sign(hash).toDER());
-      },
-    };
+  async resolve(did) {
+    const parsed = this.parseDid(did);
+    if (parsed.method === methodName) {
+      const { didDocument } = await resolveMethod(did, parsed, null, {});
+      return didDocument;
+    }
+    throw new Error(`Resolver for ${methodName} does not support the ${parsed.method} did method.`);
   }
 }
 </code></pre>

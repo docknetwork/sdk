@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -99,6 +99,7 @@
     "jsonld": "^5.2.0",
     "jsonld-signatures": "^9.0.2",
     "jsonschema": "^1.2.6",
+    "key-did-resolver": "^1.4.0",
     "mrklt": "^0.2.0",
     "n3": "^1.8.1",
     "rify": "^0.7.0"

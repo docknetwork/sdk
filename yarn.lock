@@ -3791,7 +3791,7 @@
   dependencies:
     "@stablelib/int" "^1.0.1"
 
-"@stablelib/ed25519@^1.0.1":
+"@stablelib/ed25519@^1.0.1", "@stablelib/ed25519@^1.0.2":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@stablelib/ed25519/-/ed25519-1.0.2.tgz#937a88a2f73a71d9bdc3ea276efe8954776ae0f4"
   integrity sha512-FtnvUwvKbp6l1dNcg4CswMAVFVu/nzLK3oC7/PRtjYyHbWsIkD8j+5cjXHmwcCpdCpRCaTGACkEhhMQ1RcdSOQ==
@@ -8749,6 +8749,16 @@ keccak@^3.0.0:
     node-addon-api "^2.0.0"
     node-gyp-build "^4.2.0"
 
+key-did-resolver@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/key-did-resolver/-/key-did-resolver-1.4.0.tgz#a3b58f6d1956070813aba4394fc66ec46befb789"
+  integrity sha512-Qkp8o7Vx5VRlSEyOV5Hw/qVAyZyxLJNua2x2Ojw9QBn5JEYKIqSq5ig+MAj2gnsIYQGKu6Gl1x/FvD1ptSv96w==
+  dependencies:
+    "@stablelib/ed25519" "^1.0.2"
+    multibase "~4.0.2"
+    uint8arrays "^2.0.5"
+    varint "^6.0.0"
+
 keypair@^1.0.1:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/keypair/-/keypair-1.0.3.tgz#4314109d94052a0acfd6b885695026ad29529c80"
@@ -9325,6 +9335,13 @@ multibase@~0.6.0:
   dependencies:
     base-x "^3.0.8"
     buffer "^5.5.0"
+
+multibase@~4.0.2:
+  version "4.0.6"
+  resolved "https://registry.yarnpkg.com/multibase/-/multibase-4.0.6.tgz#6e624341483d6123ca1ede956208cb821b440559"
+  integrity sha512-x23pDe5+svdLz/k5JPGCVdfn7Q5mZVMBETiC+ORfO+sor9Sgs0smJzAjfTbM5tckeCqnaUuMYoz+k3RXMmJClQ==
+  dependencies:
+    "@multiformats/base-x" "^4.0.1"
 
 multicodec@^0.5.5:
   version "0.5.7"

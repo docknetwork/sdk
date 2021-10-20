@@ -1,6 +1,8 @@
 import { validateDockDIDSS58Identifier } from './utils/did';
 import DIDResolver from './did-resolver';
 
+const methodName = 'dock';
+
 export default class DockResolver extends DIDResolver {
   /**
    * @param {any} dock - An initialized connection to a dock full-node.
@@ -17,8 +19,6 @@ export default class DockResolver extends DIDResolver {
    * @returns {Promise<object>}
    */
   async resolve(did) {
-    const methodName = 'dock';
-
     if (this.dock.isInitialized()) {
       const parsed = this.parseDid(did);
       if (parsed.method === methodName) {

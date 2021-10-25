@@ -1,8 +1,8 @@
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { cryptoWaitReady, randomAsU8a } from '@polkadot/util-crypto';
 import { assert, u8aToHex, stringToU8a } from '@polkadot/util';
-import { FullNodeEndpoint, TestAccountURI } from '../test-constants';
 import typesBundle from '@docknetwork/node-types';
+import { FullNodeEndpoint, TestAccountURI } from '../test-constants';
 
 const ALICE_DID = u8aToHex(stringToU8a('Alice\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'));
 const BOB_DID = u8aToHex(stringToU8a('Bob\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'));

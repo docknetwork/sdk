@@ -41,12 +41,12 @@ describe('Crawler unit tests', () => {
     `;
     const supergraph = {
       'did:root': [
-        [{ Iri: 'did:b' }, { Iri: MAYCLAIM }, { Iri: ANYCLAIM }]
+        [{ Iri: 'did:b' }, { Iri: MAYCLAIM }, { Iri: ANYCLAIM }],
       ],
       'did:b': [
         [{ Iri: 'did:b' }, { Iri: ATTESTS }, { Iri: 'b:attestations' }],
         // this tests blank node hygiene by using the same blank node name in separate documents
-        [{ Iri: 'did:b' }, { Iri: KNOWS }, { Blank: '_:b0' }]
+        [{ Iri: 'did:b' }, { Iri: KNOWS }, { Blank: '_:b0' }],
       ],
       'b:attestations': [
         [{ Iri: 'did:c' }, { Iri: MAYCLAIM }, { Iri: ANYCLAIM }],
@@ -57,17 +57,17 @@ describe('Crawler unit tests', () => {
           {
             Literal: {
               value: '978-0-06-245871-1',
-              datatype: 'https://www.w3.org/2001/XMLSchema#string'
-            }
-          }
+              datatype: 'https://www.w3.org/2001/XMLSchema#string',
+            },
+          },
         ],
-      ]
+      ],
       // did:c makes no attestations
     };
     const resolveGraph = graphResolver(supergraph);
 
     const initialFacts = await resolveGraph({ Iri: 'did:root' });
-    let allFacts = await crawl(initialFacts, RULES, CURIOSITY, resolveGraph);
+    const allFacts = await crawl(initialFacts, RULES, CURIOSITY, resolveGraph);
     expect(allFacts).toEqual(
       [
         [
@@ -128,10 +128,10 @@ describe('Crawler unit tests', () => {
           { Blank: '_:b1' },
           { Iri: 'http://purl.org/dc/terms/identifier' },
           {
-            'Literal': {
-              'value': '978-0-06-245871-1',
-              'datatype': 'https://www.w3.org/2001/XMLSchema#string',
-            }
+            Literal: {
+              value: '978-0-06-245871-1',
+              datatype: 'https://www.w3.org/2001/XMLSchema#string',
+            },
           },
           { Iri: 'b:attestations' },
         ],
@@ -142,7 +142,7 @@ describe('Crawler unit tests', () => {
             Literal: {
               datatype: 'https://www.w3.org/2001/XMLSchema#string',
               value: '978-0-06-245871-1',
-            }
+            },
           },
           { Iri: 'did:b' },
         ],
@@ -153,7 +153,7 @@ describe('Crawler unit tests', () => {
             Literal: {
               datatype: 'https://www.w3.org/2001/XMLSchema#string',
               value: '978-0-06-245871-1',
-            }
+            },
           },
           { Iri: 'did:root' },
         ],
@@ -180,8 +180,8 @@ describe('Crawler unit tests', () => {
           { Iri: 'https://rdf.dock.io/alpha/2021#mayClaim' },
           { Iri: 'https://rdf.dock.io/alpha/2021#ANYCLAIM' },
           { Iri: 'did:root' },
-        ]
-      ]
+        ],
+      ],
     );
   }, 10000);
 });

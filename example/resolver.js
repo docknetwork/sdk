@@ -4,7 +4,7 @@ import { DockAPI } from '../src/index';
 import { createNewDockDID, createKeyDetail, NoDIDError } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import {
-  DIDResolver, MultiResolver, UniversalResolver, DockResolver,
+  DIDResolver, MultiResolver, DIDKeyResolver, UniversalResolver, DockResolver,
 } from '../src/resolver';
 
 // The following can be tweaked depending on where the node is running and what
@@ -69,6 +69,7 @@ async function main() {
   console.log('Creating DID resolvers...');
 
   const resolvers = {
+    key: new DIDKeyResolver(), // did:key resolver
     dock: new DockResolver(dock), // Prebuilt resolver
     ethr: new EtherResolver(ethereumProviderConfig), // Custom resolver
   };
@@ -80,8 +81,9 @@ async function main() {
   const dockDID = await createDockDID();
   const didsToTest = [
     dockDID,
+    'did:key:z6Mkfriq1MqLBoPWecGoDLjguo1sB9brj6wT3qZ5BxkKpuP6',
     'did:ethr:0xabcabc03e98e0dc2b855be647c39abe984193675',
-    'did:nacl:Md8JiMIwsapml_FtQ2ngnGftNP5UmVCAUuhnLyAsPxI',
+    'did:ion:EiClkZMDxPKqC9c-umQfTkR8vvZ9JPhl_xLDI9Nfk38w5w',
   ];
 
   console.log('Resolving', didsToTest.length, 'dids...');

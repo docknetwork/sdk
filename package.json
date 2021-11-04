@@ -38,7 +38,7 @@
     "rollup-plugin-multi-input": "^1.3.1",
     "rollup-plugin-terser": "^7.0.2",
     "typescript": "^4.2.3",
-    "web3": "1.6.0"
+    "web3": "^1.3.4"
   },
   "scripts": {
     "exc": "npx babel-node",

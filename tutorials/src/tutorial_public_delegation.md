@@ -14,7 +14,7 @@ Like in the Private Delegation tutorial, let's assume a root authority, `did:ex:
 <summary>Boilerplate</summary>
 
 ```js
-import createClient from 'ipfs-http-client';
+import {create: createClient} from 'ipfs-http-client';
 import { graphResolver } from '@docknetwork/sdk/crawl.js';
 const { v4: uuidv4 } = require('uuid');
 

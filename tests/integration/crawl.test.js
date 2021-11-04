@@ -1,4 +1,4 @@
-import {create: createClient} from 'ipfs-http-client';
+import {create as createClient} from 'ipfs-http-client';
 import { crawl, graphResolver } from '../../src/crawl.js';
 import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from '../../src/rdf-defs.js';
 import { documentLoader, addDocument } from '../cached-document-loader.js';

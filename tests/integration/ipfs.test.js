@@ -1,4 +1,4 @@
-import {create as createClient} from 'ipfs-http-client';
+import createClient from 'ipfs-http-client';
 import { dereferenceFromIPFS } from '../../src/utils/rdf';
 
 const ipfsDefaultConfig = 'http://localhost:5001';

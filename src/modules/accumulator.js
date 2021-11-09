@@ -100,8 +100,8 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     if (removals !== undefined) {
       AccumulatorModule.ensureArrayOfBytearrays(removals);
     }
-    if (witnessUpdateInfo !== undefined) {
-      AccumulatorModule.ensureArrayOfBytearrays(witnessUpdateInfo);
+    if (witnessUpdateInfo !== undefined && !isHex(witnessUpdateInfo)) {
+      throw new Error(`Require a hex string but got ${witnessUpdateInfo}`);
     }
     const update = {
       id,
@@ -213,7 +213,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
           // const additions = update.additions.isSome ? update.additions.unwrap().map(u8aToHex) : null;
           const additions = update.additions.isSome ? update.additions.unwrap().map((i) => u8aToHex(i)) : null;
           const removals = update.removals.isSome ? update.removals.unwrap().map((i) => u8aToHex(i)) : null;
-          const witness_update_info = update.witness_update_info.isSome ? update.witness_update_info.unwrap().map((i) => u8aToHex(i)) : null;
+          const witness_update_info = update.witness_update_info.isSome ? u8aToHex(update.witness_update_info.unwrap()) : null;
           updates.push({
             new_accumulated: u8aToHex(update.new_accumulated),
             additions,

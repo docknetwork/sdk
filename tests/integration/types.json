@@ -172,7 +172,7 @@
     "new_accumulated": "Vec<u8>",
     "additions": "Option<Vec<Vec<u8>>>",
     "removals": "Option<Vec<Vec<u8>>>",
-    "witness_update_info": "Option<Vec<Vec<u8>>>",
+    "witness_update_info": "Option<Vec<u8>>",
     "last_modified": "BlockNumber"
   },
   "StateChange": {

@@ -5,6 +5,13 @@ import { getHexIdentifierFromDID } from '../utils/did';
 
 /** Class with logic for public keys and corresponding setup parameters. This logic is common in BBS+ and accumulator */
 export default class WithParamsAndPublicKeys {
+  /**
+   * Create object to add new parameters on chain
+   * @param bytes
+   * @param curveType
+   * @param label
+   * @returns {{}}
+   */
   static prepareAddParameters(bytes, curveType = undefined, label = undefined) {
     const params = {};
     if (bytes === undefined) {
@@ -23,6 +30,13 @@ export default class WithParamsAndPublicKeys {
     return params;
   }
 
+  /**
+   * Create object to add new public key on chain
+   * @param bytes
+   * @param curveType
+   * @param paramsRef - Provide if this public key was created using params present on chain.
+   * @returns {{}}
+   */
   static prepareAddPublicKey(bytes, curveType = undefined, paramsRef = undefined) {
     const publicKey = {};
     if (bytes === undefined) {
@@ -45,6 +59,12 @@ export default class WithParamsAndPublicKeys {
     return publicKey;
   }
 
+  /**
+   * Parse a reference to a param or a public key. A reference uniquely identifies a param or a public key and is a pair
+   * of a DID and a positive number starting from 1.
+   * @param ref
+   * @returns {any[]}
+   */
   static parseRef(ref) {
     const parsed = new Array(2);
     if (!(typeof ref === 'object' && ref instanceof Array && ref.length === 2)) {
@@ -141,23 +161,19 @@ export default class WithParamsAndPublicKeys {
     throw new Error('Extending class should implement queryPublicKeyFromChain');
   }
 
-  async getLastParamsWritten(did) {
-    const hexId = getHexIdentifierFromDID(did);
-    const [counter] = await this.api.query[this.moduleName].didCounters(hexId);
-    if (counter > 0) {
-      const resp = await this.queryParamsFromChain(hexId, counter);
-      if (resp.isSome) {
-        return this.createParamsObjFromChainResponse(resp.unwrap());
-      }
-    }
-    return null;
-  }
-
   async getParams(did, counter) {
     const hexId = getHexIdentifierFromDID(did);
     return this.getParamsByHexDid(hexId, counter);
   }
 
+  /**
+   *
+   * @param did
+   * @param counter
+   * @param withParams - If true, return the params referenced by the public key. It will throw an error if params_ref is null
+   * or params were not found on chain which can happen if they were deleted after this public key was added.
+   * @returns {Promise<{bytes: string}|null>}
+   */
   async getPublicKey(did, counter, withParams = false) {
     const hexId = getHexIdentifierFromDID(did);
     return this.getPublicKeyByHexDid(hexId, counter, withParams);
@@ -244,6 +260,11 @@ export default class WithParamsAndPublicKeys {
     return pks;
   }
 
+  /**
+   * Format an object received from the chain as a params object with keys `bytes`, `label` and `curve_type`.
+   * @param params
+   * @returns {{bytes: string}}
+   */
   createParamsObjFromChainResponse(params) {
     const paramsObj = {
       bytes: u8aToHex(params.bytes),
@@ -252,13 +273,18 @@ export default class WithParamsAndPublicKeys {
       paramsObj.curve_type = 'Bls12381';
     }
     if (params.label.isSome) {
-      paramsObj.label = params.label.unwrap();
+      paramsObj.label = u8aToHex(params.label.unwrap());
     } else {
       paramsObj.label = null;
     }
     return paramsObj;
   }
 
+  /**
+   * Format an object received from the chain as a public key object with keys `bytes`, ` params_ref` and `curve_type`.
+   * @param pk
+   * @returns {{bytes: string}}
+   */
   createPublicKeyObjFromChainResponse(pk) {
     const pkObj = {
       bytes: u8aToHex(pk.bytes),
@@ -275,6 +301,28 @@ export default class WithParamsAndPublicKeys {
     return pkObj;
   }
 
+  /**
+   * Get last params written by this DID
+   * @param did
+   * @returns {Promise<{bytes: string}|null>}
+   */
+  async getLastParamsWritten(did) {
+    const hexId = getHexIdentifierFromDID(did);
+    const [counter] = await this.api.query[this.moduleName].didCounters(hexId);
+    if (counter > 0) {
+      const resp = await this.queryParamsFromChain(hexId, counter);
+      if (resp.isSome) {
+        return this.createParamsObjFromChainResponse(resp.unwrap());
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Get last public key written by this DID
+   * @param did
+   * @returns {Promise<{bytes: string}|null>}
+   */
   async getLastPublicKeyWritten(did) {
     const hexId = getHexIdentifierFromDID(did);
     const [, counter] = await this.api.query[this.moduleName].didCounters(hexId);

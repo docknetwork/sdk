@@ -7,7 +7,6 @@ import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-const
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { createKeyDetail, createNewDockDID, getHexIdentifierFromDID } from '../../src/utils/did';
 
-import types from './types.json';
 import BBSPlusModule from '../../src/modules/bbs-plus';
 
 describe('BBS+ Module', () => {
@@ -27,7 +26,6 @@ describe('BBS+ Module', () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
-      chainTypes: types,
     });
     chainModule = dock.bbsPlusModule;
     account = dock.keyring.addFromUri(TestAccountURI);

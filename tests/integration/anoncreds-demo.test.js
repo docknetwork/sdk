@@ -21,7 +21,6 @@ import {
 import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/crypto-wasm-ts/src/accumulator/in-memory-persistence';
 import { DockAPI } from '../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-constants';
-import types from './types.json';
 import { createKeyDetail, createNewDockDID, getHexIdentifierFromDID } from '../../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import BBSPlusModule from '../../src/modules/bbs-plus';
@@ -130,7 +129,6 @@ describe('Complete demo of anonymous credentials', () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
-      chainTypes: types,
     });
     account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);

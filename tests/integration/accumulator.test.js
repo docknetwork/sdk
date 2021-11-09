@@ -8,7 +8,6 @@ import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-const
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { createKeyDetail, createNewDockDID, getHexIdentifierFromDID } from '../../src/utils/did';
 
-import types from './types.json';
 import AccumulatorModule from '../../src/modules/accumulator';
 import { getAllEventsFromBlock } from '../../src/utils/chain-ops';
 
@@ -31,7 +30,6 @@ describe('Accumulator Module', () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
-      chainTypes: types,
     });
     chainModule = dock.accumulatorModule;
     account = dock.keyring.addFromUri(TestAccountURI);

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: modules/accumulator.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: modules/accumulator.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* eslint-disable camelcase */
+
+import { isHex, u8aToHex } from '@polkadot/util';
+import { getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
+import WithParamsAndPublicKeys from './WithParamsAndPublicKeys';
+import { getAllExtrinsicsFromBlock } from '../utils/chain-ops';
+
+/** Class to manage accumulators on chain */
+export default class AccumulatorModule extends WithParamsAndPublicKeys {
+  constructor(api, signAndSend) {
+    super();
+    this.api = api;
+    this.moduleName = 'accumulator';
+    this.module = api.tx[this.moduleName];
+    this.signAndSend = signAndSend;
+  }
+
+  static prepareAddPositiveAccumulator(id, accumulated, publicKeyRef) {
+    const [hexDid, counter] = this.parseRef(publicKeyRef);
+    return {
+      id,
+      accumulator: {
+        Positive: {
+          accumulated,
+          key_ref: [hexDid, counter],
+        },
+      },
+    };
+  }
+
+  static prepareAddUniversalAccumulator(id, accumulated, publicKeyRef, maxSize) {
+    const [hexDid, counter] = this.parseRef(publicKeyRef);
+    return {
+      id,
+      accumulator: {
+        Universal: {
+          common: {
+            accumulated,
+            key_ref: [hexDid, counter],
+          },
+          max_size: maxSize,
+        },
+      },
+    };
+  }
+
+  static ensureArrayOfBytearrays(arr) {
+    if (!(typeof arr === 'object' &amp;&amp; arr instanceof Array)) {
+      throw new Error(`Require an array but got ${arr}`);
+    }
+    for (let i = 0; i &lt; arr.length; i++) {
+      if (!isHex(arr[i])) {
+        throw new Error(`Require a hex string but got ${arr[0]}`);
+      }
+    }
+  }
+
+  /**
+   * Accepts an event and returns the accumulator id and accumulated value if the event was
+   * `accumulator:AccumulatorUpdated`
+   * @param event - The event. This is the `event` key in the `event` object, i.e. for the `event` object got in response
+   * of `api.query.system.events`, the argument to this function is `event.event`.
+   * @returns {null|string[]} - null if the event is not `accumulator:AccumulatorUpdated` else [accumulatorId, accumulated]
+   */
+  static parseEventAsAccumulatorUpdate(event) {
+    if (event.section === 'accumulator' &amp;&amp; event.method === 'AccumulatorUpdated') {
+      return [u8aToHex(event.data[0]), u8aToHex(event.data[1])];
+    }
+    return null;
+  }
+
+  createNewPositiveAccumulatorTx(id, accumulated, publicKeyRef, keyPair = undefined, signature = undefined) {
+    const accum = AccumulatorModule.prepareAddPositiveAccumulator(id, accumulated, publicKeyRef);
+    if (!signature) {
+      if (!keyPair) {
+        throw Error('You need to provide either a keypair or a signature to register new accumulator.');
+      }
+      // eslint-disable-next-line no-param-reassign
+      signature = this.signAddAccumulator(keyPair, accum);
+    }
+    return this.module.addAccumulator(accum, signature.toJSON());
+  }
+
+  createNewUniversalAccumulatorTx(id, accumulated, publicKeyRef, maxSize, keyPair = undefined, signature = undefined) {
+    const accum = AccumulatorModule.prepareAddUniversalAccumulator(id, accumulated, publicKeyRef, maxSize);
+    if (!signature) {
+      if (!keyPair) {
+        throw Error('You need to provide either a keypair or a signature to register new accumulator.');
+      }
+      // eslint-disable-next-line no-param-reassign
+      signature = this.signAddAccumulator(keyPair, accum);
+    }
+    return this.module.addAccumulator(accum, signature.toJSON());
+  }
+
+  /**
+   *
+   * @param id
+   * @param newAccumulated
+   * @param additions
+   * @param removals
+   * @param witnessUpdateInfo
+   * @param created - block no. when accumulator was created
+   * @param nonce - next valid nonce, i.e. the nonce on chain + 1
+   * @param keyPair
+   * @param signature
+   * @returns {Promise&lt;object>}
+   */
+  updateAccumulatorTx(
+    id, newAccumulated,
+    { additions = undefined, removals = undefined, witnessUpdateInfo = undefined },
+    created, nonce, keyPair = undefined, signature = undefined,
+  ) {
+    if (additions !== undefined) {
+      AccumulatorModule.ensureArrayOfBytearrays(additions);
+    }
+    if (removals !== undefined) {
+      AccumulatorModule.ensureArrayOfBytearrays(removals);
+    }
+    if (witnessUpdateInfo !== undefined &amp;&amp; !isHex(witnessUpdateInfo)) {
+      throw new Error(`Require a hex string but got ${witnessUpdateInfo}`);
+    }
+    const update = {
+      id,
+      new_accumulated: newAccumulated,
+      additions,
+      removals,
+      witness_update_info: witnessUpdateInfo,
+      created_at: created,
+      nonce,
+    };
+    if (!signature) {
+      if (!keyPair) {
+        throw Error('You need to provide either a keypair or a signature to update the accumulator.');
+      }
+      // eslint-disable-next-line no-param-reassign
+      signature = this.signUpdateAccumulator(keyPair, update);
+    }
+    return this.module.updateAccumulator(update, signature.toJSON());
+  }
+
+  /**
+   *
+   * @param id
+   * @param created - block no. when accumulator was created
+   * @param nonce - next valid nonce, i.e. the nonce on chain + 1
+   * @param keyPair
+   * @param signature
+   * @returns {Promise&lt;object>}
+   */
+  removeAccumulatorTx(id, created, nonce, keyPair, signature) {
+    const removal = {
+      id,
+      created_at: created,
+      nonce,
+    };
+    if (!signature) {
+      if (!keyPair) {
+        throw Error('You need to provide either a keypair or a signature to remove the accumulator.');
+      }
+      // eslint-disable-next-line no-param-reassign
+      signature = this.signRemoveAccumulator(keyPair, removal);
+    }
+    return this.module.removeAccumulator(removal, signature.toJSON());
+  }
+
+  /**
+   * Send txn on chain that creates accumulator that supports only membership proofs
+   * @param id - Unique id of the new accumulator
+   * @param accumulated
+   * @param publicKeyRef - reference to the public key of the accumulator as pair [did, counter]
+   * @param keyPair
+   * @param signature
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise&lt;object>}
+   */
+  async createNewPositiveAccumulator(id, accumulated, publicKeyRef, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
+    const tx = this.createNewPositiveAccumulatorTx(id, accumulated, publicKeyRef, keyPair, signature);
+    return this.signAndSend(tx, waitForFinalization, params);
+  }
+
+  /**
+   * Send txn on chain that creates accumulator that supports both membership and non-membership proofs
+   * @param id
+   * @param accumulated
+   * @param publicKeyRef - reference to the public key of the accumulator as pair [did, counter]
+   * @param maxSize - Maximum size of the accumulator. This is not enforced on chain and serves as metadata only
+   * @param keyPair
+   * @param signature
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise&lt;object>}
+   */
+  async createNewUniversalAccumulator(id, accumulated, publicKeyRef, maxSize, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
+    const tx = this.createNewUniversalAccumulatorTx(id, accumulated, publicKeyRef, maxSize, keyPair, signature);
+    return this.signAndSend(tx, waitForFinalization, params);
+  }
+
+  /**
+   * Update existing accumulator
+   * @param id
+   * @param newAccumulated
+   * @param additions
+   * @param removals
+   * @param witnessUpdateInfo
+   * @param created - block no. when accumulator was created
+   * @param nonce - next valid nonce, i.e the nonce on chain + 1
+   * @param keyPair
+   * @param signature
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise&lt; object>}
+   */
+  async updateAccumulator(
+    id, newAccumulated,
+    { additions = undefined, removals = undefined, witnessUpdateInfo = undefined },
+    created, nonce, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {},
+  ) {
+    const tx = this.updateAccumulatorTx(id, newAccumulated, { additions, removals, witnessUpdateInfo }, created, nonce, keyPair, signature);
+    return this.signAndSend(tx, waitForFinalization, params);
+  }
+
+  /**
+   * Remove the accumulator from chain. This frees up the id for reuse.
+   * @param id
+   * @param created - block no. when accumulator was created
+   * @param nonce - next valid nonce, i.e the nonce on chain + 1
+   * @param keyPair
+   * @param signature
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise&lt;*>}
+   */
+  async removeAccumulator(id, created, nonce, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
+    const tx = this.removeAccumulatorTx(id, created, nonce, keyPair, signature);
+    return this.signAndSend(tx, waitForFinalization, params);
+  }
+
+  /**
+   * Get the accumulator as an object. The field `type` in object specifies whether it is "positive" or "universal".
+   * Fields `created` and `lastModified` are block nos where the accumulator was created and last updated respectively.
+   * Field `nonce` is the last accepted nonce by the chain, the next write to the accumulator should increment the nonce by 1.
+   * Field `accumulated` contains the current accumulated value.
+   * @param id
+   * @param withKeyAndParams
+   * @returns {Promise&lt;{created: *, lastModified: *}|null>}
+   */
+  async getAccumulator(id, withKeyAndParams = false) {
+    const resp = await this.api.query[this.moduleName].accumulators(id);
+    if (resp.isSome) {
+      const [created, lastModified, nonce, accumulator] = resp.unwrap();
+      const accumulatorObj = {
+        created: created.toNumber(), lastModified: lastModified.toNumber(), nonce: nonce.toNumber(),
+      };
+      let common;
+      if (accumulator.isPositive) {
+        accumulatorObj.type = 'positive';
+        common = accumulator.asPositive;
+      } else {
+        accumulatorObj.type = 'universal';
+        common = accumulator.asUniversal.common;
+        accumulatorObj.max_size = accumulator.asUniversal.max_size.toNumber();
+      }
+      accumulatorObj.accumulated = u8aToHex(common.accumulated);
+      accumulatorObj.key_ref = [u8aToHex(common.key_ref[0]), common.key_ref[1].toNumber()];
+
+      if (withKeyAndParams) {
+        const pk = await this.getPublicKeyByHexDid(accumulatorObj.key_ref[0], accumulatorObj.key_ref[1], true);
+        if (pk !== null) {
+          accumulatorObj.public_key = pk;
+        }
+      }
+      return accumulatorObj;
+    }
+    return null;
+  }
+
+  /**
+   * Fetch a block and get all accumulator updates made in that block's extrinsics corresponding to accumulator id `accumulatorId`
+   * @param accumulatorId
+   * @param blockNoOrBlockHash
+   * @returns {Promise&lt;object[]>} - Resolves to an array of `update`s where each `update` is an object with keys
+   * `new_accumulated`, `additions`, `removals` and `witness_update_info`. The last keys have value null if they were
+   * not provided in the extrinsic.
+   */
+  async getUpdatesFromBlock(accumulatorId, blockNoOrBlockHash) {
+    const extrinsics = await getAllExtrinsicsFromBlock(this.api, blockNoOrBlockHash, false);
+    const updates = [];
+    extrinsics.forEach((ext) => {
+      if (ext.method &amp;&amp; (ext.method.section === 'accumulator') &amp;&amp; (ext.method.method === 'updateAccumulator')) {
+        const update = this.api.createType('AccumulatorUpdate', ext.method.args[0]);
+        if (u8aToHex(update.id) === accumulatorId) {
+          // The following commented line produces truncated hex strings. Don't know why
+          // const additions = update.additions.isSome ? update.additions.unwrap().map(u8aToHex) : null;
+          const additions = update.additions.isSome ? update.additions.unwrap().map((i) => u8aToHex(i)) : null;
+          const removals = update.removals.isSome ? update.removals.unwrap().map((i) => u8aToHex(i)) : null;
+          const witness_update_info = update.witness_update_info.isSome ? u8aToHex(update.witness_update_info.unwrap()) : null;
+          updates.push({
+            new_accumulated: u8aToHex(update.new_accumulated),
+            additions,
+            removals,
+            witness_update_info,
+          });
+        }
+      }
+    });
+    return updates;
+  }
+
+  async queryParamsFromChain(hexDid, counter) {
+    return this.api.query[this.moduleName].accumulatorParams(hexDid, counter);
+  }
+
+  async queryPublicKeyFromChain(hexDid, counter) {
+    return this.api.query[this.moduleName].accumulatorKeys(hexDid, counter);
+  }
+
+  signAddParams(keyPair, params) {
+    const serialized = getStateChange(this.api, 'AddAccumulatorParams', params);
+    return getSignatureFromKeyringPair(keyPair, serialized);
+  }
+
+  signAddPublicKey(keyPair, pk) {
+    const serialized = getStateChange(this.api, 'AddAccumulatorPublicKey', pk);
+    return getSignatureFromKeyringPair(keyPair, serialized);
+  }
+
+  signRemoveParams(keyPair, ref) {
+    const serialized = getStateChange(this.api, 'RemoveAccumulatorParams', ref);
+    return getSignatureFromKeyringPair(keyPair, serialized);
+  }
+
+  signRemovePublicKey(keyPair, ref) {
+    const serialized = getStateChange(this.api, 'RemoveAccumulatorPublicKey', ref);
+    return getSignatureFromKeyringPair(keyPair, serialized);
+  }
+
+  signAddAccumulator(keyPair, addAccumulator) {
+    const serialized = getStateChange(this.api, 'AddAccumulator', addAccumulator);
+    return getSignatureFromKeyringPair(keyPair, serialized);
+  }
+
+  signUpdateAccumulator(keyPair, update) {
+    const serialized = getStateChange(this.api, 'UpdateAccumulator', update);
+    return getSignatureFromKeyringPair(keyPair, serialized);
+  }
+
+  signRemoveAccumulator(keyPair, id) {
+    const serialized = getStateChange(this.api, 'RemoveAccumulator', id);
+    return getSignatureFromKeyringPair(keyPair, serialized);
+  }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="setApi.html">setApi</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#claimgraphToStore">claimgraphToStore</a></li><li><a href="global.html#createDidAttestation">createDidAttestation</a></li><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createNewPositiveAccumulator">createNewPositiveAccumulator</a></li><li><a href="global.html#createNewUniversalAccumulator">createNewUniversalAccumulator</a></li><li><a href="global.html#createParamsObjFromChainResponse">createParamsObjFromChainResponse</a></li><li><a href="global.html#createPublicKeyObjFromChainResponse">createPublicKeyObjFromChainResponse</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createSignedAttestation">createSignedAttestation</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#dereferenceFromIPFS">dereferenceFromIPFS</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccumulator">getAccumulator</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAllParamsByDid">getAllParamsByDid</a></li><li><a href="global.html#getAllPublicKeysByDid">getAllPublicKeysByDid</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatuses">getCredentialStatuses</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getLastParamsWritten">getLastParamsWritten</a></li><li><a href="global.html#getLastPublicKeyWritten">getLastPublicKeyWritten</a></li><li><a href="global.html#getPublicKey">getPublicKey</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSignatures">getSignatures</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#getUpdatesFromBlock">getUpdatesFromBlock</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#parseEventAsAccumulatorUpdate">parseEventAsAccumulatorUpdate</a></li><li><a href="global.html#parseRDFDocument">parseRDFDocument</a></li><li><a href="global.html#parseRef">parseRef</a></li><li><a href="global.html#prepareAddParameters">prepareAddParameters</a></li><li><a href="global.html#prepareAddPublicKey">prepareAddPublicKey</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#queryNextLookup">queryNextLookup</a></li><li><a href="global.html#removeAccumulator">removeAccumulator</a></li><li><a href="global.html#removeAccumulatorTx">removeAccumulatorTx</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#setAuthor">setAuthor</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#setSignature">setSignature</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signDidAttestation">signDidAttestation</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toJsonldjsNode">toJsonldjsNode</a></li><li><a href="global.html#toMap">toMap</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#updateAccumulator">updateAccumulator</a></li><li><a href="global.html#updateAccumulatorTx">updateAccumulatorTx</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#verifySignature">verifySignature</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Tue Nov 09 2021 23:32:19 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

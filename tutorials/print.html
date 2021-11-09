@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="concepts_private_delegation.html"><strong aria-hidden="true">2.6.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="concepts_public_attestation.html"><strong aria-hidden="true">2.7.</strong> Public Attestation</a></li><li class="chapter-item expanded "><a href="concepts_public_delegation.html"><strong aria-hidden="true">2.8.</strong> Public Delegation</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="tutorial_private_delegation.html"><strong aria-hidden="true">3.8.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="tutorial_public_delegation.html"><strong aria-hidden="true">3.9.</strong> Public Delegation</a></li><li class="chapter-item expanded "><a href="tutorial_evm.html"><strong aria-hidden="true">3.10.</strong> EVM</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="concepts_private_delegation.html"><strong aria-hidden="true">2.6.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="concepts_public_attestation.html"><strong aria-hidden="true">2.7.</strong> Public Attestation</a></li><li class="chapter-item expanded "><a href="concepts_public_delegation.html"><strong aria-hidden="true">2.8.</strong> Public Delegation</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="tutorial_private_delegation.html"><strong aria-hidden="true">3.8.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="tutorial_public_delegation.html"><strong aria-hidden="true">3.9.</strong> Public Delegation</a></li><li class="chapter-item expanded "><a href="tutorial_evm.html"><strong aria-hidden="true">3.10.</strong> EVM</a></li><li class="chapter-item expanded "><a href="tutorial_anoncreds.html"><strong aria-hidden="true">3.11.</strong> Anonymous credentials using BBS+ signatures and accumulators</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -2329,6 +2329,45 @@ Check script <a href="scripts/eth/chainlink/access-controlled-aggregator-proxy.j
 use script <a href="scripts/eth/chainlink/deviation-flag-validator.js">deviation-flag-validator.js</a>. The set the validator address while deploying <code>AccessControlledAggregator</code>.</li>
 <li>To setup a contract for an Oracle (not needed for price feed though), check script  <a href="scripts/eth/chainlink/oracle.js">oracle.js</a>.</li>
 </ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="anonymous-credentials"><a class="header" href="#anonymous-credentials">Anonymous credentials</a></h1>
+<h2 id="overview-2"><a class="header" href="#overview-2">Overview</a></h2>
+<p>This document talks about building anonymous credentials using mainly 2 primitives, BBS+ signature scheme which issuer uses to sign the
+credential and accumulators for membership check needed for revocation. BBS+ implementation comes from <a href="https://github.com/docknetwork/crypto-wasm-ts/">this</a>
+Typescript package which uses <a href="https://github.com/docknetwork/crypto-wasm">this</a> WASM wrapper which itself uses <a href="https://github.com/docknetwork/crypto">our Rust crypto library</a>.</p>
+<p>For an overview of these primitives, see <a href="https://github.com/docknetwork/crypto-wasm#overview">this</a>.</p>
+<h2 id="implementation"><a class="header" href="#implementation">Implementation</a></h2>
+<p>On chain, there are 2 modules, one for BBS+ and the other for accumulator. The modules store the BBS+ params, public keys, accumulator params,
+accumulator public keys and some accumulator details like current accumulated value, last updated, etc. They are somewhat agnostic
+to the cryptographic details and treat the values as bytes with some size bounds.</p>
+<ul>
+<li>
+<p><a href="../../src/modules/bbs-plus.js">BBS+ module</a></p>
+<ul>
+<li>Used to create and remove signature parameters and public keys. </li>
+<li>The public keys can either refer the signature params or not pass the reference while creating. </li>
+<li>The params and public keys are owned by a DID and can be only removed by that DID. </li>
+<li>See <a href="../../tests/integration/bbs-plus.test.js">these tests</a> on how to create, query and remove these. </li>
+</ul>
+</li>
+<li>
+<p><a href="../../src/modules/accumulator.js">Accumulator module</a></p>
+<ul>
+<li>The parameters and public keys are managed in the same way as BBS+ signatures.</li>
+<li>Accumulators are owned by a DID and can be only removed by that DID.</li>
+<li>Accumulators are identified by a unique id and that id is used to send updates or remove it.</li>
+<li>The accumulator update contains the additions, removals and the witness update info and these are not stored in chain 
+state but are present in the blocks and the accumulated value corresponding to the update is logged in the event.</li>
+<li>In the chain state, only the most recent accumulated value is stored (along with some metadata like creation time, 
+last update, etc), which is sufficient to verify the witness or the proof of knowledge.</li>
+<li>To update the witness, the updates and witness update info should be parsed from the blocks and the accumulator module provides 
+the functions get the updates and necessary events from the block,</li>
+<li>See <a href="../../tests/integration/accumulator.test.js">these tests</a> on how to create, query and remove params and keys as well as 
+the accumulator.</li>
+</ul>
+</li>
+</ul>
+<p>The SDK itself doesn't include the Typescript package containing the crypto as a dependency. But it can be used with the SDK to issue, prove, 
+verify and revoke credentials as shown in <a href="../../tests/integration/anoncreds-demo.test.js">this test</a>.</p>
 
                     </main>
 

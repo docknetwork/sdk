@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: modules/WithParamsAndPublicKeys.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: modules/WithParamsAndPublicKeys.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* eslint-disable camelcase */
+
+import { u8aToHex } from '@polkadot/util';
+import { getHexIdentifierFromDID } from '../utils/did';
+
+/** Class with logic for public keys and corresponding setup parameters. This logic is common in BBS+ and accumulator */
+export default class WithParamsAndPublicKeys {
+  /**
+   * Create object to add new parameters on chain
+   * @param bytes
+   * @param curveType
+   * @param label
+   * @returns {{}}
+   */
+  static prepareAddParameters(bytes, curveType = undefined, label = undefined) {
+    const params = {};
+    if (bytes === undefined) {
+      throw new Error('bytes must be provided');
+    } else {
+      params.bytes = bytes;
+    }
+    if (curveType === undefined) {
+      params.curveType = 'Bls12381';
+    } else if (curveType === 'Bls12381') {
+      params.curveType = curveType;
+    } else {
+      throw new Error(`Invalid curve type ${curveType}`);
+    }
+    params.label = label;
+    return params;
+  }
+
+  /**
+   * Create object to add new public key on chain
+   * @param bytes
+   * @param curveType
+   * @param paramsRef - Provide if this public key was created using params present on chain.
+   * @returns {{}}
+   */
+  static prepareAddPublicKey(bytes, curveType = undefined, paramsRef = undefined) {
+    const publicKey = {};
+    if (bytes === undefined) {
+      throw new Error('bytes must be provided');
+    } else {
+      publicKey.bytes = bytes;
+    }
+    if (curveType === undefined) {
+      publicKey.curveType = 'Bls12381';
+    } else if (curveType === 'Bls12381') {
+      publicKey.curveType = curveType;
+    } else {
+      throw new Error(`Invalid curve type ${curveType}`);
+    }
+    publicKey.params_ref = paramsRef !== undefined ? WithParamsAndPublicKeys.parseRef(paramsRef) : undefined;
+    return publicKey;
+  }
+
+  /**
+   * Parse a reference to a param or a public key. A reference uniquely identifies a param or a public key and is a pair
+   * of a DID and a positive number starting from 1.
+   * @param ref
+   * @returns {any[]}
+   */
+  static parseRef(ref) {
+    const parsed = new Array(2);
+    if (!(typeof ref === 'object' &amp;&amp; ref instanceof Array &amp;&amp; ref.length === 2)) {
+      throw new Error('Reference should be an array of 2 items');
+    }
+    try {
+      parsed[0] = getHexIdentifierFromDID(ref[0]);
+    } catch (e) {
+      throw new Error(`First item of reference should be a DID but was ${ref[0]}`);
+    }
+    if (typeof ref[1] !== 'number') {
+      throw new Error(`Second item of reference should be a number but was ${ref[1]}`);
+    }
+    // eslint-disable-next-line prefer-destructuring
+    parsed[1] = ref[1];
+    return parsed;
+  }
+
+  createNewParamsTx(addParams, did, keyPair = undefined, signature = undefined) {
+    const hexId = getHexIdentifierFromDID(did);
+    if (!signature) {
+      if (!keyPair) {
+        throw Error('You need to provide either a keypair or a signature to register new parameters.');
+      }
+      // eslint-disable-next-line no-param-reassign
+      signature = this.signAddParams(keyPair, addParams);
+    }
+    return this.module.addParams(addParams, hexId, signature.toJSON());
+  }
+
+  createNewPublicKeyTx(addPk, did, keyPair = undefined, signature = undefined) {
+    const hexId = getHexIdentifierFromDID(did);
+    if (!signature) {
+      if (!keyPair) {
+        throw Error('You need to provide either a keypair or a signature to register new key.');
+      }
+      // eslint-disable-next-line no-param-reassign
+      signature = this.signAddPublicKey(keyPair, addPk);
+    }
+    return this.module.addPublicKey(addPk, hexId, signature.toJSON());
+  }
+
+  removeParamsTx(did, counter, keyPair = undefined, signature = undefined) {
+    const hexId = getHexIdentifierFromDID(did);
+    if (!signature) {
+      if (!keyPair) {
+        throw Error('You need to provide either a keypair or a signature to remove params.');
+      }
+      // eslint-disable-next-line no-param-reassign
+      signature = this.signRemoveParams(keyPair, [hexId, counter]);
+    }
+    return this.module.removeParams([hexId, counter], signature.toJSON());
+  }
+
+  removePublicKeyTx(did, counter, keyPair = undefined, signature = undefined) {
+    const hexId = getHexIdentifierFromDID(did);
+    if (!signature) {
+      if (!keyPair) {
+        throw Error('You need to provide either a keypair or a signature to remove public key.');
+      }
+      // eslint-disable-next-line no-param-reassign
+      signature = this.signRemovePublicKey(keyPair, [hexId, counter]);
+    }
+    return this.module.removePublicKey([hexId, counter], signature.toJSON());
+  }
+
+  async createNewParams(addParams, did, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
+    const tx = this.createNewParamsTx(addParams, did, keyPair, signature);
+    return this.signAndSend(tx, waitForFinalization, params);
+  }
+
+  async createNewPublicKey(addPublicKey, did, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
+    const tx = this.createNewPublicKeyTx(addPublicKey, did, keyPair, signature);
+    return this.signAndSend(tx, waitForFinalization, params);
+  }
+
+  async removeParams(did, counter, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
+    const tx = this.removeParamsTx(did, counter, keyPair, signature);
+    return this.signAndSend(tx, waitForFinalization, params);
+  }
+
+  async removePublicKey(did, counter, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
+    const tx = this.removePublicKeyTx(did, counter, keyPair, signature);
+    return this.signAndSend(tx, waitForFinalization, params);
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  async queryParamsFromChain(hexDid, counter) {
+    throw new Error('Extending class should implement queryParamsFromChain');
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  async queryPublicKeyFromChain(hexDid, counter) {
+    throw new Error('Extending class should implement queryPublicKeyFromChain');
+  }
+
+  async getParams(did, counter) {
+    const hexId = getHexIdentifierFromDID(did);
+    return this.getParamsByHexDid(hexId, counter);
+  }
+
+  /**
+   *
+   * @param did
+   * @param counter
+   * @param withParams - If true, return the params referenced by the public key. It will throw an error if params_ref is null
+   * or params were not found on chain which can happen if they were deleted after this public key was added.
+   * @returns {Promise&lt;{bytes: string}|null>}
+   */
+  async getPublicKey(did, counter, withParams = false) {
+    const hexId = getHexIdentifierFromDID(did);
+    return this.getPublicKeyByHexDid(hexId, counter, withParams);
+  }
+
+  async getParamsByHexDid(hexDid, counter) {
+    const resp = await this.queryParamsFromChain(hexDid, counter);
+    if (resp.isSome) {
+      return this.createParamsObjFromChainResponse(resp.unwrap());
+    }
+    return null;
+  }
+
+  async getPublicKeyByHexDid(hexDid, counter, withParams = false) {
+    const resp = await this.queryPublicKeyFromChain(hexDid, counter);
+    if (resp.isSome) {
+      const pkObj = this.createPublicKeyObjFromChainResponse(resp.unwrap());
+      if (withParams) {
+        if (pkObj.params_ref === null) {
+          throw new Error('No reference to parameters for the public key');
+        } else {
+          const params = await this.getParamsByHexDid(pkObj.params_ref[0], pkObj.params_ref[1]);
+          if (params === null) {
+            throw new Error(`Parameters with reference (${pkObj.params_ref[0]}, ${pkObj.params_ref[1]}) not found on chain`);
+          }
+          pkObj.params = params;
+        }
+      }
+      return pkObj;
+    }
+    return null;
+  }
+
+  /**
+   * Get all params written by a DID
+   * @param did
+   * @returns {Promise&lt;object[]>}
+   */
+  async getAllParamsByDid(did) {
+    const hexId = getHexIdentifierFromDID(did);
+
+    // TODO: Figure out why this doesn't work
+    /* const d = this.api.createType('Did', hexToU8a(hexId));
+    const resp = await this.api.rpc.core_mods.bbsPlusParamsByDid(d);
+    if (resp.isOk) {
+      return resp.unwrap();
+    }
+    return null; */
+
+    const params = [];
+    const [counter] = await this.api.query[this.moduleName].didCounters(hexId);
+    if (counter > 0) {
+      for (let i = 1; i &lt;= counter; i++) {
+        // eslint-disable-next-line no-await-in-loop
+        const param = await this.getParamsByHexDid(hexId, i);
+        if (param !== null) {
+          params.push(param);
+        }
+      }
+    }
+    return params;
+  }
+
+  /**
+   * Get all public keys written by a DID
+   * @param did
+   * @param withParams
+   * @returns {Promise&lt; object[]>}
+   */
+  async getAllPublicKeysByDid(did, withParams = false) {
+    const hexId = getHexIdentifierFromDID(did);
+
+    const pks = [];
+    const [, counter] = await this.api.query[this.moduleName].didCounters(hexId);
+    if (counter > 0) {
+      for (let i = 1; i &lt;= counter; i++) {
+        // eslint-disable-next-line no-await-in-loop
+        const pk = await this.getPublicKeyByHexDid(hexId, i, withParams);
+        if (pk !== null) {
+          pks.push(pk);
+        }
+      }
+    }
+    return pks;
+  }
+
+  /**
+   * Format an object received from the chain as a params object with keys `bytes`, `label` and `curve_type`.
+   * @param params
+   * @returns {{bytes: string}}
+   */
+  createParamsObjFromChainResponse(params) {
+    const paramsObj = {
+      bytes: u8aToHex(params.bytes),
+    };
+    if (params.curve_type.isBls12381) {
+      paramsObj.curve_type = 'Bls12381';
+    }
+    if (params.label.isSome) {
+      paramsObj.label = u8aToHex(params.label.unwrap());
+    } else {
+      paramsObj.label = null;
+    }
+    return paramsObj;
+  }
+
+  /**
+   * Format an object received from the chain as a public key object with keys `bytes`, ` params_ref` and `curve_type`.
+   * @param pk
+   * @returns {{bytes: string}}
+   */
+  createPublicKeyObjFromChainResponse(pk) {
+    const pkObj = {
+      bytes: u8aToHex(pk.bytes),
+    };
+    if (pk.curve_type.isBls12381) {
+      pkObj.curve_type = 'Bls12381';
+    }
+    if (pk.params_ref.isSome) {
+      const pr = pk.params_ref.unwrap();
+      pkObj.params_ref = [u8aToHex(pr[0]), pr[1].toNumber()];
+    } else {
+      pkObj.params_ref = null;
+    }
+    return pkObj;
+  }
+
+  /**
+   * Get last params written by this DID
+   * @param did
+   * @returns {Promise&lt;{bytes: string}|null>}
+   */
+  async getLastParamsWritten(did) {
+    const hexId = getHexIdentifierFromDID(did);
+    const [counter] = await this.api.query[this.moduleName].didCounters(hexId);
+    if (counter > 0) {
+      const resp = await this.queryParamsFromChain(hexId, counter);
+      if (resp.isSome) {
+        return this.createParamsObjFromChainResponse(resp.unwrap());
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Get last public key written by this DID
+   * @param did
+   * @returns {Promise&lt;{bytes: string}|null>}
+   */
+  async getLastPublicKeyWritten(did) {
+    const hexId = getHexIdentifierFromDID(did);
+    const [, counter] = await this.api.query[this.moduleName].didCounters(hexId);
+    if (counter > 0) {
+      const resp = await this.queryPublicKeyFromChain(hexId, counter);
+      if (resp.isSome) {
+        return this.createPublicKeyObjFromChainResponse(resp.unwrap());
+      }
+    }
+    return null;
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  signAddParams(keyPair, params) {
+    throw new Error('Extending class should implement signAddParams');
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  signAddPublicKey(keyPair, pk) {
+    throw new Error('Extending class should implement signAddPublicKey');
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  signRemoveParams(keyPair, ref) {
+    throw new Error('Extending class should implement signRemoveParams');
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  signRemovePublicKey(keyPair, ref) {
+    throw new Error('Extending class should implement signRemovePublicKey');
+  }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="setApi.html">setApi</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#claimgraphToStore">claimgraphToStore</a></li><li><a href="global.html#createDidAttestation">createDidAttestation</a></li><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createNewPositiveAccumulator">createNewPositiveAccumulator</a></li><li><a href="global.html#createNewUniversalAccumulator">createNewUniversalAccumulator</a></li><li><a href="global.html#createParamsObjFromChainResponse">createParamsObjFromChainResponse</a></li><li><a href="global.html#createPublicKeyObjFromChainResponse">createPublicKeyObjFromChainResponse</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createSignedAttestation">createSignedAttestation</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#dereferenceFromIPFS">dereferenceFromIPFS</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccumulator">getAccumulator</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAllParamsByDid">getAllParamsByDid</a></li><li><a href="global.html#getAllPublicKeysByDid">getAllPublicKeysByDid</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatuses">getCredentialStatuses</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getLastParamsWritten">getLastParamsWritten</a></li><li><a href="global.html#getLastPublicKeyWritten">getLastPublicKeyWritten</a></li><li><a href="global.html#getPublicKey">getPublicKey</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSignatures">getSignatures</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#getUpdatesFromBlock">getUpdatesFromBlock</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#parseEventAsAccumulatorUpdate">parseEventAsAccumulatorUpdate</a></li><li><a href="global.html#parseRDFDocument">parseRDFDocument</a></li><li><a href="global.html#parseRef">parseRef</a></li><li><a href="global.html#prepareAddParameters">prepareAddParameters</a></li><li><a href="global.html#prepareAddPublicKey">prepareAddPublicKey</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#queryNextLookup">queryNextLookup</a></li><li><a href="global.html#removeAccumulator">removeAccumulator</a></li><li><a href="global.html#removeAccumulatorTx">removeAccumulatorTx</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#setAuthor">setAuthor</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#setSignature">setSignature</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signDidAttestation">signDidAttestation</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toJsonldjsNode">toJsonldjsNode</a></li><li><a href="global.html#toMap">toMap</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#updateAccumulator">updateAccumulator</a></li><li><a href="global.html#updateAccumulatorTx">updateAccumulatorTx</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#verifySignature">verifySignature</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Tue Nov 09 2021 23:32:19 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

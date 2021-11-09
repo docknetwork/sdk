@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 
-import { u8aToHex } from '@polkadot/util/index.d.ts';
+import { u8aToHex } from '@polkadot/util';
 import { getHexIdentifierFromDID } from '../utils/did';
 
 /** Class with logic for public keys and corresponding setup parameters. This logic is common in BBS+ and accumulator */

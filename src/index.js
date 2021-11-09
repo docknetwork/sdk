@@ -103,6 +103,7 @@ class DockAPI {
     // Initialize price feed rpc
     rpc = Object.assign(rpc, PriceFeedRpcDefs);
 
+    // Initialize the RPC for core modules
     rpc = Object.assign(rpc, CoreModsRpcDefs);
 
     // If using PoA module, extend the RPC methods with PoA specific ones.

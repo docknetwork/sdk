@@ -51,11 +51,7 @@ export default class WithParamsAndPublicKeys {
     } else {
       throw new Error(`Invalid curve type ${curveType}`);
     }
-    if (paramsRef !== undefined) {
-      // eslint-disable-next-line no-param-reassign
-      paramsRef = WithParamsAndPublicKeys.parseRef(paramsRef);
-    }
-    publicKey.params_ref = paramsRef;
+    publicKey.params_ref = paramsRef !== undefined ? WithParamsAndPublicKeys.parseRef(paramsRef) : undefined;
     return publicKey;
   }
 

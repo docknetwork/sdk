@@ -2725,10 +2725,10 @@
     esm "^3.2.25"
     jsonld-signatures "^9.0.2"
 
-"@docknetwork/node-types@^0.4.7":
-  version "0.4.7"
-  resolved "https://registry.yarnpkg.com/@docknetwork/node-types/-/node-types-0.4.7.tgz#01ebb41d56d218c38f03f9f1fc02763b4f6a0c23"
-  integrity sha512-Gll5/qbRYWb+HZlNl42mqRZwHz9SJRN4M5uufYxWkE1QLNooKAJfZ/QlcF/repsrrh0bnTl3yeQQdBeF1EBVpA==
+"@docknetwork/node-types@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/node-types/-/node-types-0.6.0.tgz#08a2dae1551c2ee3612b13d9af907733e7723dde"
+  integrity sha512-Bkl1Fxhu0Viyu7g9dTwFeMnfXsuXXlQ+PftLv2NV0Uh240HBXfQxm3PxPLw3JMAo0UCQw/g7xUHQrV5hJzfB4g==
 
 "@ethersproject/abi@5.0.7":
   version "5.0.7"

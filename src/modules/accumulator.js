@@ -93,7 +93,24 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     return this.module.addAccumulator(accum, signature.toJSON());
   }
 
-  updateAccumulatorTx(id, newAccumulated, { additions = undefined, removals = undefined, witnessUpdateInfo = undefined }, lastModified, keyPair = undefined, signature = undefined) {
+  /**
+   *
+   * @param id
+   * @param newAccumulated
+   * @param additions
+   * @param removals
+   * @param witnessUpdateInfo
+   * @param created - block no. when accumulator was created
+   * @param nonce - next valid nonce, i.e. the nonce on chain + 1
+   * @param keyPair
+   * @param signature
+   * @returns {Promise<*>}
+   */
+  updateAccumulatorTx(
+    id, newAccumulated,
+    { additions = undefined, removals = undefined, witnessUpdateInfo = undefined },
+    created, nonce, keyPair = undefined, signature = undefined,
+  ) {
     if (additions !== undefined) {
       AccumulatorModule.ensureArrayOfBytearrays(additions);
     }
@@ -109,7 +126,8 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
       additions,
       removals,
       witness_update_info: witnessUpdateInfo,
-      last_modified: lastModified,
+      created_at: created,
+      nonce,
     };
     if (!signature) {
       if (!keyPair) {
@@ -121,10 +139,20 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     return this.module.updateAccumulator(update, signature.toJSON());
   }
 
-  removeAccumulatorTx(id, lastModified, keyPair, signature) {
+  /**
+   *
+   * @param id
+   * @param created - block no. when accumulator was created
+   * @param nonce - next valid nonce, i.e. the nonce on chain + 1
+   * @param keyPair
+   * @param signature
+   * @returns {Promise<*>}
+   */
+  removeAccumulatorTx(id, created, nonce, keyPair, signature) {
     const removal = {
       id,
-      last_modified: lastModified,
+      created_at: created,
+      nonce,
     };
     if (!signature) {
       if (!keyPair) {
@@ -136,29 +164,83 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     return this.module.removeAccumulator(removal, signature.toJSON());
   }
 
+  /**
+   * Send txn on chain that creates accumulator that supports only membership proofs
+   * @param id - Unique id of the new accumulator
+   * @param accumulated
+   * @param publicKeyRef - reference to the public key of the accumulator as pair [did, counter]
+   * @param keyPair
+   * @param signature
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<*>}
+   */
   async createNewPositiveAccumulator(id, accumulated, publicKeyRef, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
     const tx = this.createNewPositiveAccumulatorTx(id, accumulated, publicKeyRef, keyPair, signature);
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
+  /**
+   * Send txn on chain that creates accumulator that supports both membership and non-membership proofs
+   * @param id
+   * @param accumulated
+   * @param publicKeyRef - reference to the public key of the accumulator as pair [did, counter]
+   * @param maxSize - Maximum size of the accumulator. This is not enforced on chain and serves as metadata only
+   * @param keyPair
+   * @param signature
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<*>}
+   */
   async createNewUniversalAccumulator(id, accumulated, publicKeyRef, maxSize, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
     const tx = this.createNewUniversalAccumulatorTx(id, accumulated, publicKeyRef, maxSize, keyPair, signature);
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
-  async updateAccumulator(id, newAccumulated, { additions = undefined, removals = undefined, witnessUpdateInfo = undefined }, lastModified, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
-    const tx = this.updateAccumulatorTx(id, newAccumulated, { additions, removals, witnessUpdateInfo }, lastModified, keyPair, signature);
+  /**
+   * Update existing accumulator
+   * @param id
+   * @param newAccumulated
+   * @param additions
+   * @param removals
+   * @param witnessUpdateInfo
+   * @param created - block no. when accumulator was created
+   * @param nonce - next valid nonce, i.e the nonce on chain + 1
+   * @param keyPair
+   * @param signature
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<*>}
+   */
+  async updateAccumulator(
+    id, newAccumulated,
+    { additions = undefined, removals = undefined, witnessUpdateInfo = undefined },
+    created, nonce, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {},
+  ) {
+    const tx = this.updateAccumulatorTx(id, newAccumulated, { additions, removals, witnessUpdateInfo }, created, nonce, keyPair, signature);
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
-  async removeAccumulator(id, lastModified, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
-    const tx = this.removeAccumulatorTx(id, lastModified, keyPair, signature);
+  /**
+   * Remove the accumulator from chain. This frees up the id for reuse.
+   * @param id
+   * @param created - block no. when accumulator was created
+   * @param nonce - next valid nonce, i.e the nonce on chain + 1
+   * @param keyPair
+   * @param signature
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<*>}
+   */
+  async removeAccumulator(id, created, nonce, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
+    const tx = this.removeAccumulatorTx(id, created, nonce, keyPair, signature);
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
   /**
    * Get the accumulator as an object. The field `type` in object specifies whether it is "positive" or "universal".
    * Fields `created` and `lastModified` are block nos where the accumulator was created and last updated respectively.
+   * Field `nonce` is the last accepted nonce by the chain, the next write to the accumulator should increment the nonce by 1.
    * Field `accumulated` contains the current accumulated value.
    * @param id
    * @param withKeyAndParams
@@ -167,9 +249,9 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   async getAccumulator(id, withKeyAndParams = false) {
     const resp = await this.api.query[this.moduleName].accumulators(id);
     if (resp.isSome) {
-      const [created, lastModified, accumulator] = resp.unwrap();
+      const [created, lastModified, nonce, accumulator] = resp.unwrap();
       const accumulatorObj = {
-        created: created.toNumber(), lastModified: lastModified.toNumber(),
+        created: created.toNumber(), lastModified: lastModified.toNumber(), nonce: nonce.toNumber(),
       };
       let common;
       if (accumulator.isPositive) {

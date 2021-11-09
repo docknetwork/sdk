@@ -165,7 +165,8 @@
   },
   "RemoveAccumulator": {
     "id": "AccumulatorId",
-    "last_modified": "BlockNumber"
+    "created_at": "BlockNumber",
+    "nonce": "u32"
   },
   "AccumulatorUpdate": {
     "id": "AccumulatorId",
@@ -173,7 +174,8 @@
     "additions": "Option<Vec<Vec<u8>>>",
     "removals": "Option<Vec<Vec<u8>>>",
     "witness_update_info": "Option<Vec<u8>>",
-    "last_modified": "BlockNumber"
+    "created_at": "BlockNumber",
+    "nonce": "u32"
   },
   "StateChange": {
     "_enum": {

@@ -160,6 +160,7 @@ describe('Accumulator Module', () => {
     expect(accum1.created > 0).toBe(true);
     expect(accum1.lastModified > 0).toBe(true);
     expect(accum1.created).toEqual(accum1.lastModified);
+    expect(accum1.nonce).toEqual(0);
     expect(accum1.type).toEqual('positive');
     expect(accum1.accumulated).toEqual(accumulated1);
     expect(accum1.key_ref).toEqual([getHexIdentifierFromDID(did1), 1]);
@@ -169,6 +170,7 @@ describe('Accumulator Module', () => {
     expect(accum2.created > 0).toBe(true);
     expect(accum2.lastModified > 0).toBe(true);
     expect(accum2.created).toEqual(accum2.lastModified);
+    expect(accum2.nonce).toEqual(0);
     expect(accum2.type).toEqual('universal');
     expect(accum2.accumulated).toEqual(accumulated2);
     expect(accum2.key_ref).toEqual([getHexIdentifierFromDID(did2), 1]);
@@ -184,16 +186,19 @@ describe('Accumulator Module', () => {
     expect(accum2WithKeyAndParams.key_ref).toEqual([getHexIdentifierFromDID(did2), 1]);
     expect(accum2WithKeyAndParams.public_key).toEqual(keyWithParams);
 
-    await expect(chainModule.removeAccumulator(id1, accum1.lastModified, pair2, undefined, false)).rejects.toThrow();
-    await expect(chainModule.removeAccumulator(id2, accum2.lastModified, pair1, undefined, false)).rejects.toThrow();
+    await expect(chainModule.removeAccumulator(id1, accum1.created, accum1.nonce, pair2, undefined, false)).rejects.toThrow();
+    await expect(chainModule.removeAccumulator(id2, accum2.created, accum2.nonce, pair1, undefined, false)).rejects.toThrow();
 
-    await expect(chainModule.removeAccumulator(id1, 300, pair1, undefined, false)).rejects.toThrow();
-    await expect(chainModule.removeAccumulator(id2, 350, pair2, undefined, false)).rejects.toThrow();
+    await expect(chainModule.removeAccumulator(id1, 300, accum1.nonce + 1, pair1, undefined, false)).rejects.toThrow();
+    await expect(chainModule.removeAccumulator(id2, 350, accum2.nonce + 1, pair2, undefined, false)).rejects.toThrow();
 
-    await chainModule.removeAccumulator(id1, accum1.lastModified, pair1, undefined, false);
+    await expect(chainModule.removeAccumulator(id1, accum1.created, accum1.nonce, pair1, undefined, false)).rejects.toThrow();
+    await expect(chainModule.removeAccumulator(id2, accum2.created, accum2.nonce, pair2, undefined, false)).rejects.toThrow();
+
+    await chainModule.removeAccumulator(id1, accum1.created, accum1.nonce + 1, pair1, undefined, false);
     expect(await chainModule.getAccumulator(id1, false)).toEqual(null);
 
-    await chainModule.removeAccumulator(id2, accum2.lastModified, pair2, undefined, false);
+    await chainModule.removeAccumulator(id2, accum2.created, accum2.nonce + 1, pair2, undefined, false);
     expect(await chainModule.getAccumulator(id2, false)).toEqual(null);
   }, 40000);
 
@@ -212,7 +217,7 @@ describe('Accumulator Module', () => {
     expect(accum1.accumulated).toEqual(accumulated1);
 
     const accumulated2 = u8aToHex(accumulator.accumulated);
-    await chainModule.updateAccumulator(id, accumulated2, {}, accum1.lastModified, pair2, undefined, false);
+    await chainModule.updateAccumulator(id, accumulated2, {}, accum1.created, accum1.nonce + 1, pair2, undefined, false);
     const accum2 = await chainModule.getAccumulator(id, false);
     expect(accum2.accumulated).toEqual(accumulated2);
 
@@ -228,7 +233,7 @@ describe('Accumulator Module', () => {
     const additions1 = [u8aToHex(member2), u8aToHex(member3)];
     const removals1 = [u8aToHex(member1)];
     const witUpd1 = u8aToHex(WitnessUpdatePublicInfo.new(hexToU8a(accumulated2), [member2, member3], [member1], keypair.secret_key).value);
-    await chainModule.updateAccumulator(id, accumulated3, { additions: additions1, removals: removals1, witnessUpdateInfo: witUpd1 }, accum2.lastModified, pair2, undefined, false);
+    await chainModule.updateAccumulator(id, accumulated3, { additions: additions1, removals: removals1, witnessUpdateInfo: witUpd1 }, accum2.created, accum2.nonce + 1, pair2, undefined, false);
     const accum3 = await chainModule.getAccumulator(id, false);
     expect(accum3.accumulated).toEqual(accumulated3);
 
@@ -241,7 +246,7 @@ describe('Accumulator Module', () => {
     const accumulated4 = u8aToHex(accumulator.accumulated);
     const additions2 = [u8aToHex(member4), u8aToHex(member5)];
     const witUpd2 = u8aToHex(WitnessUpdatePublicInfo.new(hexToU8a(accumulated3), [member4, member5], [], keypair.secret_key).value);
-    await chainModule.updateAccumulator(id, accumulated4, { additions: additions2, witnessUpdateInfo: witUpd2 }, accum3.lastModified, pair2, undefined, false);
+    await chainModule.updateAccumulator(id, accumulated4, { additions: additions2, witnessUpdateInfo: witUpd2 }, accum3.created, accum3.nonce + 1, pair2, undefined, false);
     const accum4 = await chainModule.getAccumulator(id, false);
     expect(accum4.accumulated).toEqual(accumulated4);
 
@@ -251,7 +256,7 @@ describe('Accumulator Module', () => {
     const accumulated5 = u8aToHex(accumulator.accumulated);
     const removals3 = [u8aToHex(member2), u8aToHex(member4)];
     const witUpd3 = u8aToHex(WitnessUpdatePublicInfo.new(hexToU8a(accumulated4), [], [member2, member4], keypair.secret_key).value);
-    await chainModule.updateAccumulator(id, accumulated5, { removals: removals3, witnessUpdateInfo: witUpd3 }, accum4.lastModified, pair2, undefined, false);
+    await chainModule.updateAccumulator(id, accumulated5, { removals: removals3, witnessUpdateInfo: witUpd3 }, accum4.created, accum4.nonce + 1, pair2, undefined, false);
     const accum5 = await chainModule.getAccumulator(id, false);
     expect(accum5.accumulated).toEqual(accumulated5);
 

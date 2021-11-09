@@ -212,7 +212,7 @@ describe('Complete demo of anonymous credentials', () => {
 
     const accumulated = u8aToHex(accumulator.accumulated);
     const accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
-    await dock.accumulatorModule.updateAccumulator(accumulatorId, accumulated, { additions: [u8aToHex(encodedAttrs[attributeCount - 1])] }, accum.lastModified, accumulatorManagerKeypair, undefined, false);
+    await dock.accumulatorModule.updateAccumulator(accumulatorId, accumulated, { additions: [u8aToHex(encodedAttrs[attributeCount - 1])] }, accum.created, accum.nonce + 1, accumulatorManagerKeypair, undefined, false);
 
     const queriedAccum = await dock.accumulatorModule.getAccumulator(accumulatorId, true);
     expect(queriedAccum.accumulated).toEqual(accumulated);
@@ -235,7 +235,7 @@ describe('Complete demo of anonymous credentials', () => {
 
     let accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     const witnessUpdInfo = WitnessUpdatePublicInfo.new(hexToU8a(accum.accumulated), [member1, member2], [], accumulatorKeypair.secret_key);
-    await dock.accumulatorModule.updateAccumulator(accumulatorId, u8aToHex(accumulator.accumulated), { additions: [u8aToHex(member1), u8aToHex(member2)], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accum.lastModified, accumulatorManagerKeypair, undefined, false);
+    await dock.accumulatorModule.updateAccumulator(accumulatorId, u8aToHex(accumulator.accumulated), { additions: [u8aToHex(member1), u8aToHex(member2)], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accum.created, accum.nonce + 1, accumulatorManagerKeypair, undefined, false);
 
     accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     const updates = await dock.accumulatorModule.getUpdatesFromBlock(accumulatorId, accum.lastModified);
@@ -273,7 +273,7 @@ describe('Complete demo of anonymous credentials', () => {
 
     let accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     let witnessUpdInfo = WitnessUpdatePublicInfo.new(hexToU8a(accum.accumulated), [member3, member4], [member1, member2], accumulatorKeypair.secret_key);
-    await dock.accumulatorModule.updateAccumulator(accumulatorId, u8aToHex(accumulator.accumulated), { additions: [u8aToHex(member3), u8aToHex(member4)], removals: [u8aToHex(member1), u8aToHex(member2)], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accum.lastModified, accumulatorManagerKeypair, undefined, false);
+    await dock.accumulatorModule.updateAccumulator(accumulatorId, u8aToHex(accumulator.accumulated), { additions: [u8aToHex(member3), u8aToHex(member4)], removals: [u8aToHex(member1), u8aToHex(member2)], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accum.created, accum.nonce + 1, accumulatorManagerKeypair, undefined, false);
 
     const member5 = Accumulator.encodePositiveNumberAsAccumulatorMember(200);
     const member6 = Accumulator.encodePositiveNumberAsAccumulatorMember(25);
@@ -284,7 +284,7 @@ describe('Complete demo of anonymous credentials', () => {
     accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     const startingBlock = accum.lastModified;
     witnessUpdInfo = WitnessUpdatePublicInfo.new(hexToU8a(accum.accumulated), [member5, member6], [member4], accumulatorKeypair.secret_key);
-    await dock.accumulatorModule.updateAccumulator(accumulatorId, u8aToHex(accumulator.accumulated), { additions: [u8aToHex(member5), u8aToHex(member6)], removals: [u8aToHex(member4)], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accum.lastModified, accumulatorManagerKeypair, undefined, false);
+    await dock.accumulatorModule.updateAccumulator(accumulatorId, u8aToHex(accumulator.accumulated), { additions: [u8aToHex(member5), u8aToHex(member6)], removals: [u8aToHex(member4)], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accum.created, accum.nonce + 1, accumulatorManagerKeypair, undefined, false);
 
     const member7 = Accumulator.encodePositiveNumberAsAccumulatorMember(201);
     const member8 = Accumulator.encodePositiveNumberAsAccumulatorMember(202);
@@ -295,7 +295,7 @@ describe('Complete demo of anonymous credentials', () => {
 
     accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     witnessUpdInfo = WitnessUpdatePublicInfo.new(hexToU8a(accum.accumulated), [member7, member8, member9], [], accumulatorKeypair.secret_key);
-    await dock.accumulatorModule.updateAccumulator(accumulatorId, u8aToHex(accumulator.accumulated), { additions: [u8aToHex(member7), u8aToHex(member8), u8aToHex(member9)], removals: [], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accum.lastModified, accumulatorManagerKeypair, undefined, false);
+    await dock.accumulatorModule.updateAccumulator(accumulatorId, u8aToHex(accumulator.accumulated), { additions: [u8aToHex(member7), u8aToHex(member8), u8aToHex(member9)], removals: [], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accum.created, accum.nonce + 1, accumulatorManagerKeypair, undefined, false);
 
     accum = await dock.accumulatorModule.getAccumulator(accumulatorId, true);
 
@@ -342,7 +342,7 @@ describe('Complete demo of anonymous credentials', () => {
     await accumulator.remove(encodedAttrs[attributeCount - 1], accumulatorKeypair.secret_key);
     const accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     const witnessUpdInfo = WitnessUpdatePublicInfo.new(hexToU8a(accum.accumulated), [], [encodedAttrs[attributeCount - 1]], accumulatorKeypair.secret_key);
-    await dock.accumulatorModule.updateAccumulator(accumulatorId, u8aToHex(accumulator.accumulated), { additions: [], removals: [u8aToHex(encodedAttrs[attributeCount - 1])], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accum.lastModified, accumulatorManagerKeypair, undefined, false);
+    await dock.accumulatorModule.updateAccumulator(accumulatorId, u8aToHex(accumulator.accumulated), { additions: [], removals: [u8aToHex(encodedAttrs[attributeCount - 1])], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accum.created, accum.nonce + 1, accumulatorManagerKeypair, undefined, false);
   });
 
   test('Witness update should not be possible after removal from accumulator', async () => {

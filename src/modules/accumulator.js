@@ -104,7 +104,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @param nonce - next valid nonce, i.e. the nonce on chain + 1
    * @param keyPair
    * @param signature
-   * @returns {Promise<*>}
+   * @returns {Promise<object>}
    */
   updateAccumulatorTx(
     id, newAccumulated,
@@ -146,7 +146,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @param nonce - next valid nonce, i.e. the nonce on chain + 1
    * @param keyPair
    * @param signature
-   * @returns {Promise<*>}
+   * @returns {Promise<object>}
    */
   removeAccumulatorTx(id, created, nonce, keyPair, signature) {
     const removal = {
@@ -173,7 +173,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @param signature
    * @param waitForFinalization
    * @param params
-   * @returns {Promise<*>}
+   * @returns {Promise<object>}
    */
   async createNewPositiveAccumulator(id, accumulated, publicKeyRef, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
     const tx = this.createNewPositiveAccumulatorTx(id, accumulated, publicKeyRef, keyPair, signature);
@@ -190,7 +190,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @param signature
    * @param waitForFinalization
    * @param params
-   * @returns {Promise<*>}
+   * @returns {Promise<object>}
    */
   async createNewUniversalAccumulator(id, accumulated, publicKeyRef, maxSize, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
     const tx = this.createNewUniversalAccumulatorTx(id, accumulated, publicKeyRef, maxSize, keyPair, signature);
@@ -210,7 +210,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @param signature
    * @param waitForFinalization
    * @param params
-   * @returns {Promise<*>}
+   * @returns {Promise< object>}
    */
   async updateAccumulator(
     id, newAccumulated,
@@ -280,7 +280,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * Fetch a block and get all accumulator updates made in that block's extrinsics corresponding to accumulator id `accumulatorId`
    * @param accumulatorId
    * @param blockNoOrBlockHash
-   * @returns {Promise<*[]>} - Resolves to an array of `update`s where each `update` is an object with keys
+   * @returns {Promise<object[]>} - Resolves to an array of `update`s where each `update` is an object with keys
    * `new_accumulated`, `additions`, `removals` and `witness_update_info`. The last keys have value null if they were
    * not provided in the extrinsic.
    */

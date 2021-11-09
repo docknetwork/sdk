@@ -210,7 +210,7 @@ export default class WithParamsAndPublicKeys {
   /**
    * Get all params written by a DID
    * @param did
-   * @returns {Promise<*[]>}
+   * @returns {Promise<object[]>}
    */
   async getAllParamsByDid(did) {
     const hexId = getHexIdentifierFromDID(did);
@@ -241,7 +241,7 @@ export default class WithParamsAndPublicKeys {
    * Get all public keys written by a DID
    * @param did
    * @param withParams
-   * @returns {Promise<*[]>}
+   * @returns {Promise< object[]>}
    */
   async getAllPublicKeysByDid(did, withParams = false) {
     const hexId = getHexIdentifierFromDID(did);

@@ -14,6 +14,8 @@ import PoaRpcDefs from './rpc-defs/poa-rpc-defs';
 import PriceFeedRpcDefs from './rpc-defs/price-feed-rpc-defs';
 import CoreModsRpcDefs from './rpc-defs/core-mods-rpc-defs';
 
+import ExtrinsicError from './errors/extrinsic-error';
+
 import {
   PublicKey,
   PublicKeySr25519,
@@ -230,7 +232,7 @@ class DockAPI {
             } = events[i];
             if (method === 'ExtrinsicFailed' || method === 'BatchInterrupted') {
               const errorMsg = getExtrinsicError(data, typeDef, this.api);
-              const error = new Error(errorMsg);
+              const error = new ExtrinsicError(errorMsg, method, data);
               reject(error);
               return error;
             }

@@ -49,6 +49,6 @@ async function* getFiles(dir) {
   const distPackageTxt = (await readFile(packagePath)).toString('UTF-8');
   const distPackageJSON = JSON.parse(distPackageTxt);
   distPackageJSON.exports = exports;
-  distPackageJSON.type = module;
+  distPackageJSON.type = 'module';
   await writeFile(packagePath, JSON.stringify(distPackageJSON, null, 2));
 })()

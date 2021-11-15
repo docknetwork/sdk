@@ -5,7 +5,7 @@
 
 import { Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
-import { u8aToHex, assert } from '@polkadot/util';
+import { u8aToHex, assert, isHex } from '@polkadot/util';
 import b58 from 'bs58';
 import { createSignedKeyUpdate, getHexIdentifierFromDID } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
@@ -132,25 +132,7 @@ async function getSr25519PkHex(dock, did) {
 }
 
 function assertHex32(v) {
-  if (!isHex32(v)) {
-    throw `"${v}" is not valid as a 32 byte lowecase 0x-prefixed hex-string`;
+  if (!isHex(v, 256)) {
+    throw new Error(`"${v}" is not valid as a 32 byte lowecase 0x-prefixed hex-string`);
   }
-}
-
-function isHex32(v) {
-  if ((typeof v) !== 'string') {
-    throw 'bad type passed to isHex32';
-  }
-  if (!v.startsWith('0x')) {
-    return false;
-  }
-  for (const c of v.slice(2)) {
-    if (!'0123456789abcdef'.includes(c)) {
-      return false;
-    }
-  }
-  if (v.length !== 66) {
-    return false;
-  }
-  return true;
 }

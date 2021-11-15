@@ -106,7 +106,6 @@ export async function getAllExtrinsicsFromBlock(api, numberOrHash, includeAllExt
     const events = await getAllEventsFromBlock(api, block.header.number.toNumber(), true);
     const filteredExtrinsics = [];
     events.forEach((event) => {
-      console.log(event);
       if (event.event && event.event.index === '0x0000') {
         // event corresponds to `ExtrinsicSuccess` and event.phase.applyExtrinsic is the extrinisc index in the block
         filteredExtrinsics.push(extrinsics[event.phase.applyExtrinsic]);

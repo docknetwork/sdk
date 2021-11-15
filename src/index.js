@@ -8,8 +8,13 @@ import BlobModule from './modules/blob';
 import DIDModule from './modules/did';
 import RevocationModule from './modules/revocation';
 import TokenMigration from './modules/migration';
-import PoaRpcDefs from './poa-rpc-defs';
-import PriceFeedRpcDefs from './price-feed-rpc-defs';
+import BBSPlusModule from './modules/bbs-plus';
+import AccumulatorModule from './modules/accumulator';
+import PoaRpcDefs from './rpc-defs/poa-rpc-defs';
+import PriceFeedRpcDefs from './rpc-defs/price-feed-rpc-defs';
+import CoreModsRpcDefs from './rpc-defs/core-mods-rpc-defs';
+
+import ExtrinsicError from './errors/extrinsic-error';
 
 import {
   PublicKey,
@@ -100,6 +105,9 @@ class DockAPI {
     // Initialize price feed rpc
     rpc = Object.assign(rpc, PriceFeedRpcDefs);
 
+    // Initialize the RPC for core modules
+    rpc = Object.assign(rpc, CoreModsRpcDefs);
+
     // If using PoA module, extend the RPC methods with PoA specific ones.
     if (loadPoaModules) {
       rpc = Object.assign(rpc, PoaRpcDefs);
@@ -125,6 +133,8 @@ class DockAPI {
     this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));
     this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
     this.revocationModule = new RevocationModule(this.api, this.signAndSend.bind(this));
+    this.bbsPlusModule = new BBSPlusModule(this.api, this.signAndSend.bind(this));
+    this.accumulatorModule = new AccumulatorModule(this.api, this.signAndSend.bind(this));
 
     if (loadPoaModules) {
       this.migrationModule = new TokenMigration(this.api);
@@ -222,7 +232,7 @@ class DockAPI {
             } = events[i];
             if (method === 'ExtrinsicFailed' || method === 'BatchInterrupted') {
               const errorMsg = getExtrinsicError(data, typeDef, this.api);
-              const error = new Error(errorMsg);
+              const error = new ExtrinsicError(errorMsg, method, data, status, events);
               reject(error);
               return error;
             }
@@ -306,6 +316,20 @@ class DockAPI {
       throw new Error('Unable to get revocation module, SDK is not initialised');
     }
     return this.revocationModule;
+  }
+
+  get bbsPlus() {
+    if (!this.bbsPlusModule) {
+      throw new Error('Unable to get BBS+ module, SDK is not initialised');
+    }
+    return this.bbsPlusModule;
+  }
+
+  get accumulator() {
+    if (!this.accumulatorModule) {
+      throw new Error('Unable to get Accumulator module, SDK is not initialised');
+    }
+    return this.bbsPlusModule;
   }
 }
 

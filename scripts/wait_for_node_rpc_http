@@ -5,13 +5,9 @@
 set -ueo pipefail
 
 ALICE_NODE_HTTP=${ALICE_NODE_HTTP:-http://localhost:9933}
-BOB_NODE_HTTP=${BOB_NODE_HTTP:-http://localhost:9934}
-CHARLIE_NODE_HTTP=${CHARLIE_NODE_HTTP:-http://localhost:9935}
 
 callrpc() {
     curl $ALICE_NODE_HTTP -H "Content-Type:application/json;charset=utf-8" -d "$1"
-    curl $BOB_NODE_HTTP -H "Content-Type:application/json;charset=utf-8" -d "$1"
-    curl $CHARLIE_NODE_HTTP -H "Content-Type:application/json;charset=utf-8" -d "$1"
 }
 
 wait_for_success() {
@@ -25,14 +21,14 @@ wait_for_success() {
 with_timeout() {
     local timeout="$1"
     shift
-    
+
     sleep $timeout &
     local sproc=$!
 	disown $sproc # keep the death of this command from being reported
 
     ($@) &
     local fproc=$!
-    
+
     # wait for one of the processes to end
     while kill -0 $sproc 2>/dev/null && kill -0 $fproc 2>/dev/null; do :; done
 

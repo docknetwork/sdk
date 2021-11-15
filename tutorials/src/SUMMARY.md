@@ -21,3 +21,4 @@
   - [Private Delegation](tutorial_private_delegation.md)
   - [Public Delegation](tutorial_public_delegation.md)
   - [EVM](tutorial_evm.md)
+  - [Anonymous credentials using BBS+ signatures and accumulators](tutorial_anoncreds.md)

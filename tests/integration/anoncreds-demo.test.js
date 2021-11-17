@@ -46,13 +46,14 @@ describe('Complete demo of anonymous credentials', () => {
   let signature;
   let membershipWitness;
 
+  // User's attributes which will be signed by the issuer of the credential
   const attributes = [
     stringToU8a('John'), // First name
     stringToU8a('Smith'), // Last name
     stringToU8a('M'), // Gender
     stringToU8a('New York'), // City
     stringToU8a('129086521911'), // SSN
-    stringToU8a('userid-xyz'), // user id, this is put in the accumulator and used for revocation
+    stringToU8a('userid-xyz'), // user/credential id, this is put in the accumulator and used for revocation
   ];
   const attributeCount = attributes.length;
 
@@ -62,9 +63,9 @@ describe('Complete demo of anonymous credentials', () => {
       if (i === attributeCount - 1) {
         // The last attribute is used for revocation and is thus put into the accumulator so encoding it in a
         // different way.
-        encoded.push(Signature.encodeMessageForSigning(attrs[i]));
-      } else {
         encoded.push(Accumulator.encodeBytesAsAccumulatorMember(attrs[i]));
+      } else {
+        encoded.push(Signature.encodeMessageForSigning(attrs[i]));
       }
     }
     return encoded;
@@ -96,7 +97,7 @@ describe('Complete demo of anonymous credentials', () => {
     const accumulated = hexToU8a(accum.accumulated);
     const provingKey = Accumulator.generateMembershipProvingKey();
 
-    const statement1 = Statement.poKBBSSignature(sigParams, sigPk, revealedMsgs, false);
+    const statement1 = Statement.bbsSignature(sigParams, sigPk, revealedMsgs, false);
     const statement2 = Statement.accumulatorMembership(accumParams, accumPk, provingKey, accumulated);
     const statements = new Statements();
     statements.add(statement1);
@@ -114,7 +115,7 @@ describe('Complete demo of anonymous credentials', () => {
 
     const proofSpec = new ProofSpec(statements, metaStatements, context);
 
-    const witness1 = Witness.poKBBSSignature(signature, unrevealedMsgs, false);
+    const witness1 = Witness.bbsSignature(signature, unrevealedMsgs, false);
     const witness2 = Witness.accumulatorMembership(encodedAttrs[attributeCount - 1], membershipWitness);
     const witnesses = new Witnesses();
     witnesses.add(witness1);

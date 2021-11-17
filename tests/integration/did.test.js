@@ -8,7 +8,7 @@ import {
   createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval, createSignedAttestation,
 } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
-import { getPublicKeyFromKeyringPair, getSignatureFromKeyringPair } from '../../src/utils/misc';
+import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { PublicKeyEd25519 } from '../../src/public-keys';
 
 describe('DID Module', () => {

@@ -18,7 +18,7 @@
     "@digitalbazaar/ed25519-signature-2018": "^2.0.1",
     "@digitalbazaar/ed25519-verification-key-2018": "^3.1.1",
     "@docknetwork/crypto-wasm": "0.6.0",
-    "@docknetwork/crypto-wasm-ts": "0.6.0",
+    "@docknetwork/crypto-wasm-ts": "0.7.0",
     "@rollup/plugin-commonjs": "^20.0.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-wasm": "^5.1.0",

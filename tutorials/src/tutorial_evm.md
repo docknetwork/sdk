@@ -211,12 +211,12 @@ The complete script is [here](../../scripts/eth/dao/voting-dao-test.js) and belo
 
 ## Chainlink
 
-The chain will have Chainlink contracts for price feed in addition to Link token and others. The contracts and scripts to interact with Chainlink contracts
-are [here](../../scripts/eth/chainlink). The scripts have some comments to explain the working.
+The chain will have Chainlink contracts for price feed in addition to Link token and others. The contracts and scripts to interact
+with Chainlink contracts are at `scripts/eth/chainlink` in the repo. The scripts have some comments to explain the working.
 
-- To deploy the Link token, check the script [link-token.js](scripts/eth/chainlink/link-token.js).
-- To deploy the [FluxAggregator](https://github.com/smartcontractkit/chainlink/blob/develop/evm-contracts/src/v0.6/FluxAggregator.sol) contract that is used by oracles to submit prices, check script [flux-aggegator.js](scripts/eth/chainlink/flux-aggegator.js).
+- To deploy the Link token, check the script `link-token.js` at path `scripts/eth/chainlink/link-token.js` in the repo.
+- To deploy the [FluxAggregator](https://github.com/smartcontractkit/chainlink/blob/develop/evm-contracts/src/v0.6/FluxAggregator.sol) contract that is used by oracles to submit prices, check script `flux-aggegator.js` at path `scripts/eth/chainlink/flux-aggegator.js` in the repo.
 - To deploy aggregator with access control on reads and with proxy, [AccessControlledAggregator](https://github.com/smartcontractkit/chainlink/blob/develop/evm-contracts/src/v0.6/AccessControlledAggregator.sol) and [EACAggregatorProxy](https://github.com/smartcontractkit/chainlink/blob/develop/evm-contracts/src/v0.6/EACAggregatorProxy.sol) are deployed.
-  Check script [access-controlled-aggregator-proxy.js](scripts/eth/chainlink/access-controlled-aggregator-proxy.js). To deploy with [DeviationFlaggingValidator](https://github.com/smartcontractkit/chainlink/blob/develop/evm-contracts/src/v0.6/DeviationFlaggingValidator.sol) that raises flag on price off by a threshold in either direction,
-  use script [deviation-flag-validator.js](scripts/eth/chainlink/deviation-flag-validator.js). The set the validator address while deploying `AccessControlledAggregator`.
-- To setup a contract for an Oracle (not needed for price feed though), check script  [oracle.js](scripts/eth/chainlink/oracle.js).
+  Check script `access-controlled-aggregator-proxy.js` at path `scripts/eth/chainlink/access-controlled-aggregator-proxy.js` in the repo. To deploy with [DeviationFlaggingValidator](https://github.com/smartcontractkit/chainlink/blob/develop/evm-contracts/src/v0.6/DeviationFlaggingValidator.sol) that raises flag on price off by a threshold in either direction,
+  use script `deviation-flag-validator.js` at path `scripts/eth/chainlink/deviation-flag-validator.js`. The set the validator address while deploying `AccessControlledAggregator`.
+- To setup a contract for an Oracle (not needed for price feed though), check script `oracle.js` in `scripts/eth/chainlink/oracle.js`.

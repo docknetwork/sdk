@@ -2319,15 +2319,15 @@ console.log(&quot;Counter after attempted increment from Carol and Dave. Counter
 </li>
 </ol>
 <h2 id="chainlink"><a class="header" href="#chainlink">Chainlink</a></h2>
-<p>The chain will have Chainlink contracts for price feed in addition to Link token and others. The contracts and scripts to interact with Chainlink contracts
-are <a href="../../scripts/eth/chainlink">here</a>. The scripts have some comments to explain the working.</p>
+<p>The chain will have Chainlink contracts for price feed in addition to Link token and others. The contracts and scripts to interact
+with Chainlink contracts are at <code>scripts/eth/chainlink</code> in the repo. The scripts have some comments to explain the working.</p>
 <ul>
-<li>To deploy the Link token, check the script <a href="scripts/eth/chainlink/link-token.js">link-token.js</a>.</li>
-<li>To deploy the <a href="https://github.com/smartcontractkit/chainlink/blob/develop/evm-contracts/src/v0.6/FluxAggregator.sol">FluxAggregator</a> contract that is used by oracles to submit prices, check script <a href="scripts/eth/chainlink/flux-aggegator.js">flux-aggegator.js</a>.</li>
+<li>To deploy the Link token, check the script <code>link-token.js</code> at path <code>scripts/eth/chainlink/link-token.js</code> in the repo.</li>
+<li>To deploy the <a href="https://github.com/smartcontractkit/chainlink/blob/develop/evm-contracts/src/v0.6/FluxAggregator.sol">FluxAggregator</a> contract that is used by oracles to submit prices, check script <code>flux-aggegator.js</code> at path <code>scripts/eth/chainlink/flux-aggegator.js</code> in the repo.</li>
 <li>To deploy aggregator with access control on reads and with proxy, <a href="https://github.com/smartcontractkit/chainlink/blob/develop/evm-contracts/src/v0.6/AccessControlledAggregator.sol">AccessControlledAggregator</a> and <a href="https://github.com/smartcontractkit/chainlink/blob/develop/evm-contracts/src/v0.6/EACAggregatorProxy.sol">EACAggregatorProxy</a> are deployed.
-Check script <a href="scripts/eth/chainlink/access-controlled-aggregator-proxy.js">access-controlled-aggregator-proxy.js</a>. To deploy with <a href="https://github.com/smartcontractkit/chainlink/blob/develop/evm-contracts/src/v0.6/DeviationFlaggingValidator.sol">DeviationFlaggingValidator</a> that raises flag on price off by a threshold in either direction,
-use script <a href="scripts/eth/chainlink/deviation-flag-validator.js">deviation-flag-validator.js</a>. The set the validator address while deploying <code>AccessControlledAggregator</code>.</li>
-<li>To setup a contract for an Oracle (not needed for price feed though), check script  <a href="scripts/eth/chainlink/oracle.js">oracle.js</a>.</li>
+Check script <code>access-controlled-aggregator-proxy.js</code> at path <code>scripts/eth/chainlink/access-controlled-aggregator-proxy.js</code> in the repo. To deploy with <a href="https://github.com/smartcontractkit/chainlink/blob/develop/evm-contracts/src/v0.6/DeviationFlaggingValidator.sol">DeviationFlaggingValidator</a> that raises flag on price off by a threshold in either direction,
+use script <code>deviation-flag-validator.js</code> at path <code>scripts/eth/chainlink/deviation-flag-validator.js</code>. The set the validator address while deploying <code>AccessControlledAggregator</code>.</li>
+<li>To setup a contract for an Oracle (not needed for price feed though), check script <code>oracle.js</code> in <code>scripts/eth/chainlink/oracle.js</code>.</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="anonymous-credentials"><a class="header" href="#anonymous-credentials">Anonymous credentials</a></h1>
 <h2 id="overview-2"><a class="header" href="#overview-2">Overview</a></h2>
@@ -2341,33 +2341,44 @@ accumulator public keys and some accumulator details like current accumulated va
 to the cryptographic details and treat the values as bytes with some size bounds.</p>
 <ul>
 <li>
-<p><a href="../../src/modules/bbs-plus.js">BBS+ module</a></p>
+<p><strong>BBS+ module</strong></p>
 <ul>
-<li>Used to create and remove signature parameters and public keys. </li>
-<li>The public keys can either refer the signature params or not pass the reference while creating. </li>
-<li>The params and public keys are owned by a DID and can be only removed by that DID. </li>
-<li>See <a href="../../tests/integration/bbs-plus.test.js">these tests</a> on how to create, query and remove these. </li>
+<li>At path <code>src/modules/bbs-plus.js</code> in the repo.</li>
+<li>Used to create and remove signature parameters and public keys.</li>
+<li>The public keys can either refer the signature params or not pass the reference while creating.</li>
+<li>The params and public keys are owned by a DID and can be only removed by that DID.</li>
+<li>See the tests at <code>tests/integration/bbs-plus.test.js</code> on how to create, query and remove these.</li>
 </ul>
 </li>
 <li>
-<p><a href="../../src/modules/accumulator.js">Accumulator module</a></p>
+<p><strong>Accumulator module</strong></p>
 <ul>
+<li>At path <code>src/modules/accumulator.js</code> in the repo.</li>
 <li>The parameters and public keys are managed in the same way as BBS+ signatures.</li>
 <li>Accumulators are owned by a DID and can be only removed by that DID.</li>
 <li>Accumulators are identified by a unique id and that id is used to send updates or remove it.</li>
-<li>The accumulator update contains the additions, removals and the witness update info and these are not stored in chain 
+<li>The accumulator update contains the additions, removals and the witness update info and these are not stored in chain
 state but are present in the blocks and the accumulated value corresponding to the update is logged in the event.</li>
-<li>In the chain state, only the most recent accumulated value is stored (along with some metadata like creation time, 
+<li>In the chain state, only the most recent accumulated value is stored (along with some metadata like creation time,
 last update, etc), which is sufficient to verify the witness or the proof of knowledge.</li>
-<li>To update the witness, the updates and witness update info should be parsed from the blocks and the accumulator module provides 
+<li>To update the witness, the updates and witness update info should be parsed from the blocks and the accumulator module provides
 the functions get the updates and necessary events from the block,</li>
-<li>See <a href="../../tests/integration/accumulator.test.js">these tests</a> on how to create, query and remove params and keys as well as 
+<li>See the tests at <code>tests/integration/accumulator.test.js</code> on how to create, query and remove params and keys as well as
 the accumulator.</li>
 </ul>
 </li>
+<li>
+<p>Composite proofs</p>
+<ul>
+<li>Proofs that use BBS+ signatures and accumulator</li>
+<li>The SDK itself doesn't include the Typescript package containing the crypto as a dependency. But it can be used with the SDK to issue, prove,
+verify and revoke credentials as shown in tests mentioned below.</li>
+<li>See the test <code>tests/integration/anoncreds-demo.test.js</code> for an example of how a BBS+ signature can be used with an
+accumulator for anonymous credentials. The accumulator is used to hold a user/credential id. Presence of the id in accumulator
+means the credential is valid and absence means invalid.</li>
 </ul>
-<p>The SDK itself doesn't include the Typescript package containing the crypto as a dependency. But it can be used with the SDK to issue, prove, 
-verify and revoke credentials as shown in <a href="../../tests/integration/anoncreds-demo.test.js">this test</a>.</p>
+</li>
+</ul>
 
                     </main>
 

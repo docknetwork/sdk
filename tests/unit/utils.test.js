@@ -103,16 +103,12 @@ describe('Testing Ecdsa with secp256k1', () => {
     const pk = PublicKeySecp256k1.fromKeyringPair(pair);
     const sig = new SignatureSecp256k1(msg, pair);
     expect(verifyEcdsaSecp256k1Sig(msg, sig, pk)).toBe(true);
-    console.log(hexToU8a(pk.value));
-    console.log(hexToU8a(sig.value));
 
     const msg1 = [1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     const sig1 = new SignatureSecp256k1(msg1, pair);
     expect(verifyEcdsaSecp256k1Sig(msg1, sig1, pk)).toBe(true);
     expect(msg !== msg1).toBe(true);
     expect(sig !== sig1).toBe(true);
-
-    console.log(hexToU8a(sig1.value));
 
     const msg2 = [1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7];
     const sig2 = new SignatureSecp256k1(msg2, pair);

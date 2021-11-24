@@ -39,8 +39,8 @@ function getSampleCredential(signed = false) {
       issuer: controllerUrl,
       proof: {
         type: 'EcdsaSecp256k1Signature2019',
-        created: '2020-04-15T09:22:48Z',
-        jws: 'eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEQCIHiIBMBw1szt6Y_ksb0rRiEZuAkG3BNXdt6UC_LpFlOfAiAkQktaxOPtfuiTXMsWRv92qvwFubs4Sn5hH4E_arwohA',
+        created: '2021-11-24T21:47:28Z',
+        proofValue: 'zAN1rKvtBajWcQS61LU4wX8hB4tUNFze44pHKwkVYoZaGMRxXquAaKcnUiwarZyWmMQzB4ttFLCEFXQq6F9dnq5pWJSC1WZgga',
         proofPurpose: 'assertionMethod',
         verificationMethod: keyUrl,
       },
@@ -74,7 +74,7 @@ function getSamplePres(signed = false) {
   return vp;
 }
 
-const keypair = generateEcdsaSecp256k1Keypair('issuer', 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
+const keypair = generateEcdsaSecp256k1Keypair('ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
 
 function getSampleKey() {
   return {

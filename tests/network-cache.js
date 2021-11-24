@@ -76,7 +76,7 @@ export default {
   'https://gist.githubusercontent.com/lovesh/67bdfd354cfaf4fb853df4d6713f4610/raw': {
     id: 'https://gist.githubusercontent.com/lovesh/67bdfd354cfaf4fb853df4d6713f4610/raw',
     type: 'EcdsaSecp256k1VerificationKey2019',
-    publicKeyBase58: 'yYHXTMCuyAKRXop7WwTrMpRbGGUQehYM2AvsqFsUEKPZ',
+    publicKeyBase58: '222iuczftmixHLkW6wszwyeAfYCZA7bzQMhkEXpeNVJrk',
     '@context': 'https://w3id.org/security/v2',
     controller: 'https://gist.githubusercontent.com/lovesh/312d407e3a16be0e7d5e43169e824958/raw',
   },

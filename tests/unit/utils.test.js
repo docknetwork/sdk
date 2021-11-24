@@ -10,6 +10,7 @@ import {
 import { PublicKeyEd25519, PublicKeySr25519, PublicKeySecp256k1 } from '../../src/public-keys';
 import { SignatureEd25519, SignatureSr25519, SignatureSecp256k1 } from '../../src/signatures';
 import { isHexWithGivenByteSize } from '../../src/utils/codec';
+import { hexToU8a } from '@polkadot/util';
 
 describe('Testing isHexWithGivenByteSize', () => {
   test('isHexWithGivenByteSize rejects strings not starting with 0x', () => {
@@ -88,7 +89,7 @@ describe('Testing public key and signature instantiation from keyring', () => {
   });
 
   test('getCorrectSignatureFromKeyringPair returns correct signature from secp256k1 pair', () => {
-    const pair = generateEcdsaSecp256k1Keypair('my pers string', randomAsHex(32));
+    const pair = generateEcdsaSecp256k1Keypair(randomAsHex(32));
     const sig = getSignatureFromKeyringPair(pair, [1, 2]);
     expect(sig instanceof SignatureSecp256k1).toBe(true);
   });
@@ -96,10 +97,23 @@ describe('Testing public key and signature instantiation from keyring', () => {
 
 describe('Testing Ecdsa with secp256k1', () => {
   test('Signing and verification works', () => {
-    const msg = [1, 2, 3, 4];
-    const pair = generateEcdsaSecp256k1Keypair();
+    const msg = [1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8];
+    const entropy = '0x4c94485e0c21ae6c41ce1dfe7b6bfaceea5ab68e40a2476f50208e526f506080';
+    const pair = generateEcdsaSecp256k1Keypair(entropy);
     const pk = PublicKeySecp256k1.fromKeyringPair(pair);
     const sig = new SignatureSecp256k1(msg, pair);
     expect(verifyEcdsaSecp256k1Sig(msg, sig, pk)).toBe(true);
+
+    const msg1 = [1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const sig1 = new SignatureSecp256k1(msg1, pair);
+    expect(verifyEcdsaSecp256k1Sig(msg1, sig1, pk)).toBe(true);
+    expect(msg !== msg1).toBe(true);
+    expect(sig !== sig1).toBe(true);
+
+    const msg2 = [1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7];
+    const sig2 = new SignatureSecp256k1(msg2, pair);
+    expect(verifyEcdsaSecp256k1Sig(msg2, sig2, pk)).toBe(true);
+    expect(msg2 !== msg1).toBe(true);
+    expect(sig2 !== sig1).toBe(true);
   });
 });

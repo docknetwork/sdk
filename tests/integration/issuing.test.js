@@ -25,7 +25,6 @@ const issuer1KeySeed = randomAsHex(32);
 // 2nd issuer's DID.
 const issuer2DID = createNewDockDID();
 // entropy used for 2nd issuer keys
-const issuer2KeyPers = 'issuer2';
 const issuer2KeyEntropy = randomAsHex(32);
 
 const issuer3DID = createNewDockDID();
@@ -96,7 +95,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
     await registerNewDIDUsingPair(dock, issuer1DID, pair1);
 
     // DID with secp key
-    const pair2 = generateEcdsaSecp256k1Keypair(issuer2KeyPers, issuer2KeyEntropy);
+    const pair2 = generateEcdsaSecp256k1Keypair(issuer2KeyEntropy);
     await registerNewDIDUsingPair(dock, issuer2DID, pair2);
 
     // DID with sr25519 key
@@ -128,7 +127,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
   }, 40000);
 
   test('Issue a verifiable credential with secp256k1 key and verify it', async () => {
-    const issuerKey = getKeyDoc(issuer2DID, generateEcdsaSecp256k1Keypair(issuer2KeyPers, issuer2KeyEntropy), 'EcdsaSecp256k1VerificationKey2019');
+    const issuerKey = getKeyDoc(issuer2DID, generateEcdsaSecp256k1Keypair(issuer2KeyEntropy), 'EcdsaSecp256k1VerificationKey2019');
     const credential = await issueCredential(issuerKey, unsignedCred);
     expect(credential).toMatchObject(
       expect.objectContaining(

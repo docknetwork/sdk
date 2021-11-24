@@ -8,8 +8,8 @@ import {
   createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval, createSignedAttestation,
 } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
-import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
-import { PublicKeyEd25519 } from '../../src/public-keys';
+import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../../src/utils/misc';
+import { PublicKeyEd25519, PublicKeySecp256k1 } from '../../src/public-keys';
 
 describe('DID Module', () => {
   const dock = new DockAPI();
@@ -22,6 +22,9 @@ describe('DID Module', () => {
 
   // Generate second key (for update) with this seed. The key type is Ed25519
   const secondKeySeed = randomAsHex(32);
+
+  // Generate second key (for update) with this seed. The key type is Secp256k1
+  const thirdKeySeed = randomAsHex(32);
 
   beforeAll(async (done) => {
     await dock.init({
@@ -118,9 +121,25 @@ describe('DID Module', () => {
     expect(!!result).toBe(true);
   }, 30000);
 
-  test('Can remove a DID', async () => {
+  test('Can update a DID key to secp256k1 key', async () => {
     // Sign key update with this key pair as this is the current key of the DID
     const currentPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
+
+    // Update DID key to the following
+    const newPair = generateEcdsaSecp256k1Keypair(thirdKeySeed);
+    const newPk = PublicKeySecp256k1.fromKeyringPair(newPair);
+
+    const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, dockDID, newPk, currentPair);
+    // Since controller was not passed, it should not be passed in the key update
+    expect(keyUpdate.controller).toBe(undefined);
+
+    const result = await dock.did.updateKey(keyUpdate, signature, false);
+    expect(!!result).toBe(true);
+  }, 30000);
+
+  test('Can remove a DID', async () => {
+    // Sign key update with this key pair as this is the current key of the DID
+    const currentPair = generateEcdsaSecp256k1Keypair(thirdKeySeed);
 
     const [didRemoval, signature] = await createSignedDidRemoval(dock.did, dockDID, currentPair);
 

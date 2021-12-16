@@ -19,7 +19,7 @@ to the cryptographic details and treat the values as bytes with some size bounds
   - Used to create and remove signature parameters and public keys.
   - The public keys can either refer the signature params or not pass the reference while creating.
   - The params and public keys are owned by a DID and can be only removed by that DID.
-  - See the tests at `tests/integration/bbs-plus.test.js` on how to create, query and remove these.
+  - See the tests at `tests/integration/anoncreds/bbs-plus.test.js` on how to create, query and remove these.
 
 - **Accumulator module**
   - At path `src/modules/accumulator.js` in the repo.
@@ -32,13 +32,13 @@ to the cryptographic details and treat the values as bytes with some size bounds
     last update, etc), which is sufficient to verify the witness or the proof of knowledge.
   - To update the witness, the updates and witness update info should be parsed from the blocks and the accumulator module provides
     the functions get the updates and necessary events from the block,
-  - See the tests at `tests/integration/accumulator.test.js` on how to create, query and remove params and keys as well as
+  - See the tests at `tests/integration/anoncreds/accumulator.test.js` on how to create, query and remove params and keys as well as
     the accumulator.
 
 - Composite proofs
   - Proofs that use BBS+ signatures and accumulator
   - The SDK itself doesn't include the Typescript package containing the crypto as a dependency. But it can be used with the SDK to issue, prove,
     verify and revoke credentials as shown in tests mentioned below.
-  - See the test `tests/integration/anoncreds-demo.test.js` for an example of how a BBS+ signature can be used with an
+  - See the test `tests/integration/anoncreds/demo.test.js` for an example of how a BBS+ signature can be used with an
     accumulator for anonymous credentials. The accumulator is used to hold a user/credential id. Presence of the id in accumulator
     means the credential is valid and absence means invalid.

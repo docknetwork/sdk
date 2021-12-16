@@ -15,17 +15,17 @@ import {
   WitnessEqualityMetaStatement,
   MetaStatement,
   MetaStatements,
-  ProofSpec,
-  Witness, Witnesses, CompositeProof, WitnessUpdatePublicInfo,
+  ProofSpecG1,
+  Witness, Witnesses, CompositeProofG1, WitnessUpdatePublicInfo,
 } from '@docknetwork/crypto-wasm-ts';
 import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/crypto-wasm-ts/src/accumulator/in-memory-persistence';
-import { DockAPI } from '../../src';
-import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-constants';
-import { createKeyDetail, createNewDockDID, getHexIdentifierFromDID } from '../../src/utils/did';
-import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
-import BBSPlusModule from '../../src/modules/bbs-plus';
-import AccumulatorModule from '../../src/modules/accumulator';
-import { getAllEventsFromBlock } from '../../src/utils/chain-ops';
+import { DockAPI } from '../../../src';
+import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
+import { createKeyDetail, createNewDockDID, getHexIdentifierFromDID } from '../../../src/utils/did';
+import { getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
+import BBSPlusModule from '../../../src/modules/bbs-plus';
+import AccumulatorModule from '../../../src/modules/accumulator';
+import { getAllEventsFromBlock } from '../../../src/utils/chain-ops';
 
 describe('Complete demo of anonymous credentials', () => {
   const dock = new DockAPI();
@@ -113,7 +113,7 @@ describe('Complete demo of anonymous credentials', () => {
 
     const context = stringToU8a('some context');
 
-    const proofSpec = new ProofSpec(statements, metaStatements, context);
+    const proofSpec = new ProofSpecG1(statements, metaStatements, context);
 
     const witness1 = Witness.bbsSignature(signature, unrevealedMsgs, false);
     const witness2 = Witness.accumulatorMembership(encodedAttrs[attributeCount - 1], membershipWitness);
@@ -121,7 +121,7 @@ describe('Complete demo of anonymous credentials', () => {
     witnesses.add(witness1);
     witnesses.add(witness2);
 
-    const proof = CompositeProof.generate(proofSpec, witnesses);
+    const proof = CompositeProofG1.generate(proofSpec, witnesses);
 
     expect(proof.verify(proofSpec).verified).toEqual(true);
   }
@@ -240,7 +240,19 @@ describe('Complete demo of anonymous credentials', () => {
     const updates = await dock.accumulatorModule.getUpdatesFromBlock(accumulatorId, accum.lastModified);
     expect(updates.length).toEqual(1);
     const queriedWitnessInfo = new WitnessUpdatePublicInfo(hexToU8a(updates[0].witness_update_info));
-    membershipWitness.updateUsingPublicInfoPostBatchUpdate(encodedAttrs[attributeCount - 1], [member1, member2], [], queriedWitnessInfo);
+    const additions = [];
+    const removals = [];
+    if (updates[0].additions !== null) {
+      for (const a of updates[0].additions) {
+        additions.push(hexToU8a(a));
+      }
+    }
+    if (updates[0].removals !== null) {
+      for (const a of updates[0].removals) {
+        removals.push(hexToU8a(a));
+      }
+    }
+    membershipWitness.updateUsingPublicInfoPostBatchUpdate(encodedAttrs[attributeCount - 1], additions, removals, queriedWitnessInfo);
 
     const queriedAccum = await dock.accumulatorModule.getAccumulator(accumulatorId, true);
     const tempAccumulator = PositiveAccumulator.fromAccumulated(hexToU8a(queriedAccum.accumulated));

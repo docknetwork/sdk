@@ -2725,17 +2725,17 @@
     esm "^3.2.25"
     jsonld-signatures "^9.0.2"
 
-"@docknetwork/crypto-wasm-ts@0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.7.0.tgz#c61eb570e69a2cf5600d3f2d83832df178e617ae"
-  integrity sha512-kZ2Iubxhl3cxogZdZwVCem9uOWYlbiayO2tWoZf924C6w6gDIaNbGl3D2vQLImOQKVSLSbn4jo+1uNPbS55jPA==
+"@docknetwork/crypto-wasm-ts@0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.10.0.tgz#aa3c34e6d36348ccd30d42fa1679703fa8b6e87f"
+  integrity sha512-AWSIm+Kw9IVVDTaOAnr0YJYhxQU8K4TUQan7C2LvehrH+jdjeXuRWjiFKXjGldYSitSuSowfGg1HJV19vQpGFA==
   dependencies:
-    "@docknetwork/crypto-wasm" "0.6.0"
+    "@docknetwork/crypto-wasm" "0.8.0"
 
-"@docknetwork/crypto-wasm@0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.6.0.tgz#9535529d6a3f5b4b839b1aaf68288b346905dbd8"
-  integrity sha512-iEHGuUh1mCIxzosCvg8BLr/ZWwZ97KMSeWqW2Gjg9DZNEMqF/BieX6M744ZvY/sqG+whdrJjl8oApMKZ+UMbvw==
+"@docknetwork/crypto-wasm@0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.8.0.tgz#a7cbf26d7662ad4430acde75e16e665486910630"
+  integrity sha512-xGcpzTN+lKBcnwh0xmGwwalE6EXxgY+d9C6OE0oaTwuU8e9rNhPuDSbIIsO8c1lIuEJlRLNdhM4EODxuNCMuDQ==
 
 "@docknetwork/node-types@^0.6.0":
   version "0.6.0"

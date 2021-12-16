@@ -39,17 +39,17 @@ async function getSummary(handle) {
     handle.api.query.balances.totalIssuance,
   ]);
 
-  const accounts = await dock.api.query.system.account.entries();
-  const totalBal = bnToBn(0);
-  accounts.forEach((entry) => {
-    totalBal.iadd(entry[1].data.free);
-    totalBal.iadd(entry[1].data.reserved);
-  });
+  // const accounts = await dock.api.query.system.account.entries();
+  // const totalBal = bnToBn(0);
+  // accounts.forEach((entry) => {
+  //   totalBal.iadd(entry[1].data.free);
+  //   totalBal.iadd(entry[1].data.reserved);
+  // });
   return {
     emissionStatus,
     emissionSupply: emissionSupply.toString(),
     totalIssuance: totalIssuance.toString(),
-    totalBal: totalBal.toString(),
+    // totalBal: totalBal.toString(),
   };
 }
 
@@ -58,7 +58,7 @@ async function printSummary() {
   console.log(`Emission status is ${summary.emissionStatus.toJSON()}`);
   console.log(`Emission supply is ${summary.emissionSupply}`);
   console.log(`Total issuance is ${summary.totalIssuance}`);
-  console.log(`Total balance is ${summary.totalBal}`);
+  // console.log(`Total balance is ${summary.totalBal}`);
   process.exit(0);
 }
 

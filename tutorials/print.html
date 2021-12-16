@@ -2347,7 +2347,7 @@ to the cryptographic details and treat the values as bytes with some size bounds
 <li>Used to create and remove signature parameters and public keys.</li>
 <li>The public keys can either refer the signature params or not pass the reference while creating.</li>
 <li>The params and public keys are owned by a DID and can be only removed by that DID.</li>
-<li>See the tests at <code>tests/integration/bbs-plus.test.js</code> on how to create, query and remove these.</li>
+<li>See the tests at <code>tests/integration/anoncreds/bbs-plus.test.js</code> on how to create, query and remove these.</li>
 </ul>
 </li>
 <li>
@@ -2363,7 +2363,7 @@ state but are present in the blocks and the accumulated value corresponding to t
 last update, etc), which is sufficient to verify the witness or the proof of knowledge.</li>
 <li>To update the witness, the updates and witness update info should be parsed from the blocks and the accumulator module provides
 the functions get the updates and necessary events from the block,</li>
-<li>See the tests at <code>tests/integration/accumulator.test.js</code> on how to create, query and remove params and keys as well as
+<li>See the tests at <code>tests/integration/anoncreds/accumulator.test.js</code> on how to create, query and remove params and keys as well as
 the accumulator.</li>
 </ul>
 </li>
@@ -2373,7 +2373,7 @@ the accumulator.</li>
 <li>Proofs that use BBS+ signatures and accumulator</li>
 <li>The SDK itself doesn't include the Typescript package containing the crypto as a dependency. But it can be used with the SDK to issue, prove,
 verify and revoke credentials as shown in tests mentioned below.</li>
-<li>See the test <code>tests/integration/anoncreds-demo.test.js</code> for an example of how a BBS+ signature can be used with an
+<li>See the test <code>tests/integration/anoncreds/demo.test.js</code> for an example of how a BBS+ signature can be used with an
 accumulator for anonymous credentials. The accumulator is used to hold a user/credential id. Presence of the id in accumulator
 means the credential is valid and absence means invalid.</li>
 </ul>

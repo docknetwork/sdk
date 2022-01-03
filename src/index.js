@@ -1,4 +1,5 @@
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
+import { HttpProvider } from '@polkadot/rpc-provider';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { KeyringPair } from '@polkadot/keyring/types'; // eslint-disable-line
 import typesBundle from '@docknetwork/node-types';
@@ -94,8 +95,14 @@ class DockAPI {
       }
     }
 
+    if (!address) {
+      throw new Error(`address parameter is Required`);
+    }
+
     this.address = address || this.address;
-    if (!this.address || this.address.indexOf('wss://') === -1) {
+    if (this.address && (
+      this.address.indexOf('wss://') === -1 && this.address.indexOf('https://') === -1
+    )) {
       console.warn(`WARNING: Using non-secure endpoint: ${this.address}`);
     }
 
@@ -113,8 +120,11 @@ class DockAPI {
       rpc = Object.assign(rpc, PoaRpcDefs);
     }
 
+    const isWebsocket = this.address && this.address.indexOf('http') === -1;
+    const provider = isWebsocket ? new WsProvider(this.address) : new HttpProvider(this.address);
+
     const apiOptions = {
-      provider: new WsProvider(this.address),
+      provider,
       // @ts-ignore: TS2322
       rpc,
     };

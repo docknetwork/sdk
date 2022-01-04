@@ -95,10 +95,6 @@ class DockAPI {
       }
     }
 
-    if (!address) {
-      throw new Error('address parameter is Required');
-    }
-
     this.address = address || this.address;
     if (this.address && (
       this.address.indexOf('wss://') === -1 && this.address.indexOf('https://') === -1

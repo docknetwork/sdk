@@ -96,7 +96,7 @@ class DockAPI {
     }
 
     if (!address) {
-      throw new Error(`address parameter is Required`);
+      throw new Error('address parameter is Required');
     }
 
     this.address = address || this.address;

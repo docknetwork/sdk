@@ -29,6 +29,7 @@ import {
   values,
   __,
   complement,
+  split,
   reduceBy,
 } from "ramda";
 
@@ -45,6 +46,7 @@ import {
 require("dotenv").config();
 
 const {
+  StakingPayoutsAlarmEmailTo,
   InitiatorAccountURI,
   BatchSize,
   ConcurrentRequestsLimit,
@@ -56,6 +58,8 @@ const {
   TxFinalizationTimeout,
   IterationTimeout,
 } = envObj({
+  // List of email addresses separated by comma to send alarm email to.
+  StakingPayoutsAlarmEmailTo: notNilAnd(split(",")),
   // Account to send transactions from.
   InitiatorAccountURI: notNilAnd(String),
   // Max batch size.
@@ -84,17 +88,28 @@ Promise.race([
     await dock.init({
       address: FullNodeEndpoint,
     });
+
     const txSender = dock.keyring.addFromUri(InitiatorAccountURI);
     dock.setAccount(txSender);
 
     console.log("Pre-work balance check.");
-    await checkBalance(dock.api, txSender.address, AlarmBalance);
+    await checkBalance(
+      dock.api,
+      StakingPayoutsAlarmEmailTo,
+      txSender.address,
+      AlarmBalance
+    );
 
     console.log("Calculating and sending payouts:");
     await sendStakingPayouts(dock.api, txSender);
 
     console.log("Post-work balance check.");
-    await checkBalance(dock.api, txSender.address, AlarmBalance);
+    await checkBalance(
+      dock.api,
+      StakingPayoutsAlarmEmailTo,
+      txSender.address,
+      AlarmBalance
+    );
 
     console.log(`Done!`);
   })(),
@@ -105,29 +120,6 @@ Promise.race([
     process.exit(1);
   })
   .then(() => process.exit());
-
-/**
- * Checks balance of the given account.
- * In case it's lower than the minimum value, will send an alarm email.
- *
- * @param {*} api
- * @param {*} txSender - account to send tx from
- * @param {BN} min - minimum balance to ring alarm
- */
-const checkBalance = async (api, address, min) => {
-  const {
-    data: { free: balance },
-  } = await api.query.system.account(address);
-
-  if (balance.lt(min)) {
-    console.error(`Balance of the ${address} is less than ${min}`);
-
-    await sendAlarmEmail(
-      "Low balance of the staking payouts sender",
-      `Balance of the \`${address}\` - ${balance} is less than ${min}.`
-    );
-  }
-};
 
 /**
  * Sends staking payouts for recent eras using the given sender account.
@@ -177,14 +169,16 @@ async function sendStakingPayouts(api, txSender) {
     mergeMap(([stashId, eras]) => from(eras.map(assoc("stashId", stashId)))),
     mapRx(({ stashId, era }) => api.tx.staking.payoutStakers(stashId, era)),
     batchExtrinsics(api, BatchSize),
-    signAndSendTransactions(api, txSender)
+    signAndSendExtrinsics(api, txSender)
   );
 
-  await new Promise((resolve) =>
+  await new Promise((resolve, reject) =>
     payoutTxs$
       .pipe(
-        tap(({ hash, tx }) => {
-          console.log(` * Batch transaction finalized at block \`${hash}\`: [`);
+        tap(({ result, tx }) => {
+          console.log(
+            ` * Batch transaction finalized at block \`${result.status.asFinalized}\`: [`
+          );
           for (const arg of tx.method.args[0]) {
             console.log(
               `   \`${arg.get("args").validator_stash}\` rewarded for era ${
@@ -196,9 +190,37 @@ async function sendStakingPayouts(api, txSender) {
         })
       )
       .subscribe({
+        error: reject,
         complete: resolve,
       })
   );
+}
+
+/**
+ * Checks balance of the given account.
+ * In case it's lower than the minimum value, will send an alarm email.
+ *
+ * @param {*} api
+ * @param {string} toAddr - address to send email to
+ * @param {*} txSender - account to check balance of
+ * @param {BN} min - minimum balance to ring alarm
+ */
+async function checkBalance(api, toAddr, address, min) {
+  const {
+    data: { free: balance },
+  } = await api.query.system.account(address);
+
+  if (balance.lt(min)) {
+    console.error(
+      `Balance of the \`${address}\` - ${balance} is less than ${min}.`
+    );
+
+    await sendAlarmEmail(
+      toAddr,
+      "Low balance of the staking payouts sender",
+      `Balance of the \`${address}\` - ${balance} is less than ${min}.`
+    );
+  }
 }
 
 /**
@@ -237,11 +259,11 @@ const fetchErasInfo = async (api) => {
  * Returns unclaimed era rewards for the stash with the given id.
  *
  * @param {*} api
- * @param {string} stashId
  * @param {Array<BN>} allEras
+ * @param {string} stashId
  * @returns {Array<StashEras>}
  */
-const getUnclaimedStashEras = async (api, stashId, allEras) => {
+const getUnclaimedStashEras = curry(async (api, allEras, stashId) => {
   let controllerId = await api.query.staking.bonded(stashId);
   if (controllerId.isNone) {
     return [];
@@ -253,8 +275,8 @@ const getUnclaimedStashEras = async (api, stashId, allEras) => {
     await api.query.staking.ledger(controllerId)
   ).unwrapOrDefault();
 
-  return differenceWith((a, b) => !a.eq(b), allEras, ledger.claimedRewards);
-};
+  return differenceWith((a, b) => a.eq(b), allEras, ledger.claimedRewards);
+});
 
 /**
  * @typedef StashEras
@@ -270,18 +292,20 @@ const getUnclaimedStashEras = async (api, stashId, allEras) => {
  * @param {*} stashIds
  * @returns {Observable<StashEras>}
  */
-const getUnclaimedStashesEras = (api, { eras }, stashIds) =>
-  // Concurrently calculate rewards need to be claimed by each of stashes.
+const getUnclaimedStashesEras = curry((api, { eras }, stashIds) =>
+  // Concurrently get unclaimed eras for each of stashes
   from(stashIds).pipe(
     mergeMap(
       (stashId) =>
-        from(getUnclaimedStashEras(api, stashId, eras)).pipe(
+        from(getUnclaimedStashEras(api, eras, stashId)).pipe(
+          // Filter out stashes with no unclaimed eras
           filterRx(complement(isEmpty)),
           mapRx(assoc("eras", __, { stashId }))
         ),
       ConcurrentRequestsLimit
     )
-  );
+  )
+);
 
 /**
  * Signs and sends extrinsics produced by the given observable.
@@ -292,39 +316,41 @@ const getUnclaimedStashesEras = (api, { eras }, stashIds) =>
  *
  * @returns {Observable<string>} executed tx with hashes
  */
-const signAndSendTransactions = curry((api, initiator, txs$) => {
+const signAndSendExtrinsics = curry((api, initiator, txs$) => {
+  // The first nonce to be used will come from the API call
+  // To send several extrinsics simultaneously, we need to emulate increasing nonce
   return from(api.rpc.system.accountNextIndex(initiator.address)).pipe(
-    // Receive the base nonce from the API
     switchMap((nonce) => {
-      return txs$.pipe(
-        mergeMap((tx) => {
-          return of(null).pipe(
-            switchMap(() => {
-              const sentTx = dock.signAndSend(tx, true, { nonce });
-              // The first nonce to be used was received from the API call
-              // To send several extrinsics simultaneously, we need to emulate increasing nonce
-              nonce = nonce.add(new BN(1));
+      const sendExtrinsic = (tx) =>
+        of(tx).pipe(
+          switchMap((tx) => {
+            const sentTx = dock.signAndSend(tx, true, { nonce });
+            // Increase nonce by hand
+            nonce = nonce.add(new BN(1));
 
-              return from(Promise.race([sentTx, rejectTimeout(10000)]));
-            }),
-            mapRx((hash) => ({ tx, hash })),
-            catchError((error, tr) => {
-              console.error(` * Transaction failed: ${error}`);
-              const stringified = error.toString().toLowerCase();
+            return from(
+              Promise.race([sentTx, rejectTimeout(TxFinalizationTimeout)])
+            );
+          }),
+          mapRx((result) => ({ tx, result })),
+          catchError((error, tr) => {
+            console.error(` * Transaction failed: ${error}`);
+            const stringified = error.toString().toLowerCase();
 
-              // Filter out errors related to balance and double-claim
-              if (
-                stringified.includes("balance") ||
-                stringified.includes("alreadyclaimed")
-              ) {
-                return EMPTY;
-              } else {
-                return timer(RetryTimeout).pipe(concatMapTo(tr));
-              }
-            })
-          );
-        }, ConcurrentTxLimit)
-      );
+            // Filter out errors related to balance and double-claim
+            if (
+              stringified.includes("balance") ||
+              stringified.includes("alreadyclaimed")
+            ) {
+              return EMPTY;
+            } else {
+              // Retry an observable after the given timeout
+              return timer(RetryTimeout).pipe(concatMapTo(tr));
+            }
+          })
+        );
+
+      return txs$.pipe(mergeMap(sendExtrinsic, ConcurrentTxLimit));
     })
   );
 });
@@ -353,7 +379,7 @@ const buildValidatorRewards = curry(
           // Era rewards should be defined
           eraRewards &&
           // Validator commission in the given era should be acceptable
-          eraPrefs.validators[stashId]?.commission?.toBn().lt(MaxCommission)
+          eraPrefs.validators[stashId]?.commission?.toBn().lte(MaxCommission)
         ) {
           const reward = eraPoints.validators[stashId]
             .mul(eraRewards.eraReward)
@@ -373,7 +399,9 @@ const buildValidatorRewards = curry(
     };
 
     return o(
+      // Filter out stashes with no rewards
       reject(isEmpty),
+      // Reduce given stash eras by the stash id
       reduceBy(stashErasReducer, [], prop("stashId"))
     )(validatorEras);
   }

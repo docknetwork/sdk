@@ -333,7 +333,7 @@ const signAndSendExtrinsics = curry((api, initiator, txs$) => {
             );
           }),
           mapRx((result) => ({ tx, result })),
-          catchError((error, tr) => {
+          catchError((error, caught) => {
             console.error(` * Transaction failed: ${error}`);
             const stringified = error.toString().toLowerCase();
 
@@ -345,7 +345,7 @@ const signAndSendExtrinsics = curry((api, initiator, txs$) => {
               return EMPTY;
             } else {
               // Retry an observable after the given timeout
-              return timer(RetryTimeout).pipe(concatMapTo(tr));
+              return timer(RetryTimeout).pipe(concatMapTo(caught));
             }
           })
         );

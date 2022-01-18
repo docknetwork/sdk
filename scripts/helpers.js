@@ -15,7 +15,7 @@ import {
   mapObjIndexed,
   curry,
   __,
-  unless
+  unless,
 } from "ramda";
 import { Observable } from "rxjs";
 
@@ -165,13 +165,13 @@ export const assertNotNil = when(isNil, () => {
 /**
  * Constructs a finite `Number` from the given value.
  * Throws an error in case if the value isn't finite.
- * 
+ *
  * @param {*} input
  * @returns {number}
  */
 export const finiteNumber = o(
   unless(isFinite, () => {
-    throw new TypeError("Invalid number provided");
+    throw new Error("Invalid number provided");
   }),
   Number
 );
@@ -202,7 +202,7 @@ export const parseEnv = curry((parse, name) => {
   try {
     return parse(value);
   } catch (e) {
-    throw new TypeError(`Failed to parse \`${name}\`: ${e}`);
+    throw new Error(`Failed to parse \`${name}\`: ${e}`);
   }
 });
 
@@ -220,7 +220,7 @@ export const envObj = mapObjIndexed(parseEnv);
  *
  * @param {*} api
  * @param {number} limit
- * @param {Observable<import("@polkadot/types/interfaces").Extrinsic>}
+ * @param {Observable<import("@polkadot/types/interfaces").Extrinsic>} extrs$
  * @returns {Observable<import("@polkadot/types/interfaces").Extrinsic>}
  */
 export const batchExtrinsics = curry((api, limit, extrs$) =>
@@ -231,7 +231,7 @@ export const batchExtrinsics = curry((api, limit, extrs$) =>
 );
 
 /**
- * Creates a timeout that will be rejected after the given time.
+ * Creates a promise that will be rejected after the given time.
  *
  * @param {number} time
  * @returns {Promise<void>}

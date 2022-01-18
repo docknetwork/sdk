@@ -1,5 +1,5 @@
 import BN from "bn.js";
-import { from, lastValueFrom, of, timer, Observable, EMPTY } from "rxjs";
+import { from, lastValueFrom, timer, Observable, EMPTY, defer } from "rxjs";
 import {
   tap,
   map as mapRx,
@@ -322,16 +322,15 @@ const signAndSendExtrinsics = curry((api, initiator, txs$) => {
   return from(api.rpc.system.accountNextIndex(initiator.address)).pipe(
     switchMap((nonce) => {
       const sendExtrinsic = (tx) =>
-        of(tx).pipe(
-          switchMap((tx) => {
-            const sentTx = dock.signAndSend(tx, true, { nonce });
-            // Increase nonce by hand
-            nonce = nonce.add(new BN(1));
+        defer(() => {
+          const sentTx = dock.signAndSend(tx, true, { nonce });
+          // Increase nonce by hand
+          nonce = nonce.add(new BN(1));
 
-            return from(
-              Promise.race([sentTx, rejectTimeout(TxFinalizationTimeout)])
-            );
-          }),
+          return from(
+            Promise.race([sentTx, rejectTimeout(TxFinalizationTimeout)])
+          );
+        }).pipe(
           mapRx((result) => ({ tx, result })),
           catchError((error, caught) => {
             console.error(` * Transaction failed: ${error}`);
@@ -372,7 +371,7 @@ const buildValidatorRewards = curry(
         const eraPrefs = prefsByEra[eraKey];
 
         if (
-          // Reward must be greater than 0
+          // Points must be greater than 0
           eraPoints?.eraPoints.gt(new BN(0)) &&
           // We must have a stash as a validator in the given era
           eraPoints?.validators[stashId] &&

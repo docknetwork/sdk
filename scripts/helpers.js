@@ -170,8 +170,8 @@ export const assertNotNil = when(isNil, () => {
  * @returns {number}
  */
 export const finiteNumber = o(
-  unless(isFinite, () => {
-    throw new Error("Invalid number provided");
+  unless(isFinite, (value) => {
+    throw new Error(`Invalid number provided: ${value}`);
   }),
   Number
 );
@@ -182,8 +182,8 @@ export const finiteNumber = o(
  *
  * @template T
  * @template R
- * @param {function(T): R}
- * @param {T?}
+ * @param {function(T): R} function
+ * @param {T?} value
  * @returns {R}
  */
 export const notNilAnd = o(__, assertNotNil);
@@ -210,7 +210,7 @@ export const parseEnv = curry((parse, name) => {
  * Parses object of env variables using supplied parsers.
  *
  * @template T
- * @param {Object<string, function(string):T>}
+ * @param {Object<string, function(string):T>} config
  * @returns {Object<string, T>}
  */
 export const envObj = mapObjIndexed(parseEnv);
@@ -240,3 +240,16 @@ export const rejectTimeout = (time) =>
   new Promise((_, reject) =>
     setTimeout(() => reject(new Error("Timeout is exceeded")), time)
   );
+
+/**
+ * Creates a promise that will be either resolved before the specified
+ * time or rejected after.
+ *
+ * @template T
+ * @param {number} time
+ * @param {Promise<T>} promise
+ * @returns {Promise<T>}
+ */
+export const timeout = curry((time, promise) =>
+  Promise.race([rejectTimeout(time), promise])
+);

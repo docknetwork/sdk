@@ -39,25 +39,27 @@ import {
   batchExtrinsics,
   envObj,
   notNilAnd,
-  rejectTimeout,
+  timeout,
   finiteNumber,
 } from "./helpers";
 
 require("dotenv").config();
 
 const {
+  FullNodeEndpoint,
   StakingPayoutsAlarmEmailTo,
   InitiatorAccountURI,
   BatchSize,
   ConcurrentRequestsLimit,
-  RetryTimeout,
   ConcurrentTxLimit,
+  RetryTimeout,
   MaxCommission,
-  FullNodeEndpoint,
   AlarmBalance,
   TxFinalizationTimeout,
   IterationTimeout,
 } = envObj({
+  // Address of the node RPC.
+  FullNodeEndpoint: notNilAnd(String),
   // List of email addresses separated by comma to send alarm email to.
   StakingPayoutsAlarmEmailTo: notNilAnd(split(",")),
   // Account to send transactions from.
@@ -68,41 +70,63 @@ const {
   ConcurrentRequestsLimit: o(finiteNumber, defaultTo(10)),
   // Max amount of concurrent transactions.
   ConcurrentTxLimit: o(finiteNumber, defaultTo(5)),
-  // Timeout to wait before retry transaction.
+  // Timeout to wait before retry transaction. In ms.
   RetryTimeout: o(finiteNumber, defaultTo(5e3)),
   // Max commission allowed to be set for validators. Default to 5%.
   MaxCommission: o((val) => new BN(val), defaultTo("50000000")),
-  // Address of the node RPC.
-  FullNodeEndpoint: notNilAnd(String),
   // Account balance to ring alarm.
   AlarmBalance: notNilAnd((val) => new BN(val)),
-  // Time to wait for transaction to be finalized.
+  // Time to wait for transaction to be finalized. In ms.
   TxFinalizationTimeout: o(finiteNumber, defaultTo(2e5)),
-  // Time to wait for all payments to be sent before returning with an error.
+  // Time to wait for all payments to be sent before returning with an error. In ms.
   IterationTimeout: o(finiteNumber, defaultTo(4e5)),
 });
 
-Promise.race([
-  (async function main() {
-    console.log("Initializing...");
-    await dock.init({
-      address: FullNodeEndpoint,
-    });
+async function main() {
+  console.log("Initializing...");
 
-    const txSender = dock.keyring.addFromUri(InitiatorAccountURI);
-    dock.setAccount(txSender);
+  await dock.disconnect();
+  await dock.init({
+    address: FullNodeEndpoint,
+  });
+  const txSender = dock.keyring.addFromUri(InitiatorAccountURI);
+  dock.setAccount(txSender);
 
-    console.log("Pre-work balance check.");
-    await checkBalance(
-      dock.api,
-      StakingPayoutsAlarmEmailTo,
-      txSender.address,
-      AlarmBalance
+  console.log("Pre-work balance check.");
+  let balanceIsOk = await checkBalance(
+    dock.api,
+    StakingPayoutsAlarmEmailTo,
+    txSender.address,
+    AlarmBalance
+  );
+
+  console.log("Fetching eras info...");
+  const erasInfo = await fetchErasInfo(dock.api);
+
+  console.log("Calculating and sending payouts:");
+  let needToRecheck;
+
+  try {
+    needToRecheck = await timeout(
+      IterationTimeout,
+      sendStakingPayouts(dock.api, erasInfo, txSender, BatchSize)
     );
+  } catch (err) {
+    needToRecheck = true;
+    console.error(err);
+  }
 
-    console.log("Calculating and sending payouts:");
-    await sendStakingPayouts(dock.api, txSender);
+  if (needToRecheck) {
+    // Check payouts again with a batch size of 1
+    // This needed to execute valid transactions packed in invalid batches
+    console.log("Checking payouts again:");
+    await timeout(
+      IterationTimeout,
+      sendStakingPayouts(dock.api, erasInfo, txSender, 1)
+    );
+  }
 
+  if (balanceIsOk) {
     console.log("Post-work balance check.");
     await checkBalance(
       dock.api,
@@ -110,27 +134,21 @@ Promise.race([
       txSender.address,
       AlarmBalance
     );
+  }
 
-    console.log(`Done!`);
-  })(),
-  rejectTimeout(IterationTimeout),
-])
-  .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  })
-  .then(() => process.exit());
+  console.log("Done!");
+}
 
 /**
  * Sends staking payouts for recent eras using the given sender account.
  *
  * @param {*} api
+ * @param {ErasInfo} erasInfo
  * @param {*} txSender - account to send tx from
+ * @param {number} batchSize
+ * @returns {Promise<boolean>} - `true` if some unpaid eras were found, `false` otherwise
  */
-async function sendStakingPayouts(api, txSender) {
-  console.log("- Fetching eras info...");
-  const erasInfo = await fetchErasInfo(api);
-
+async function sendStakingPayouts(api, erasInfo, txSender, batchSize) {
   const validators = pipe(
     values,
     pluck("validators"),
@@ -140,9 +158,10 @@ async function sendStakingPayouts(api, txSender) {
 
   if (!validators.size) {
     console.log("- Validator set is empty.");
-    return;
+    return false;
   }
 
+  console.log("- Retrieving validator eras...");
   const erasToBePaid = await lastValueFrom(
     getUnclaimedStashesEras(api, erasInfo, validators).pipe(toArray())
   );
@@ -151,7 +170,7 @@ async function sendStakingPayouts(api, txSender) {
 
   if (isEmpty(rewards)) {
     console.log("- No unpaid validator rewards found for recent eras.");
-    return;
+    return false;
   }
 
   console.log("- Payments need to be made:");
@@ -168,32 +187,31 @@ async function sendStakingPayouts(api, txSender) {
   const payoutTxs$ = from(rewards).pipe(
     mergeMap(([stashId, eras]) => from(eras.map(assoc("stashId", stashId)))),
     mapRx(({ stashId, era }) => api.tx.staking.payoutStakers(stashId, era)),
-    batchExtrinsics(api, BatchSize),
-    signAndSendExtrinsics(api, txSender)
+    batchExtrinsics(api, batchSize),
+    signAndSendExtrinsics(api, txSender),
+    tap(({ result, tx }) => {
+      console.log(
+        ` * Batch transaction finalized at block \`${result.status.asFinalized}\`: [`
+      );
+      for (const arg of tx.method.args[0]) {
+        console.log(
+          `   \`${arg.get("args").validator_stash}\` rewarded for era ${
+            arg.get("args").era
+          }`
+        );
+      }
+      console.log(" ]");
+    })
   );
 
   await new Promise((resolve, reject) =>
-    payoutTxs$
-      .pipe(
-        tap(({ result, tx }) => {
-          console.log(
-            ` * Batch transaction finalized at block \`${result.status.asFinalized}\`: [`
-          );
-          for (const arg of tx.method.args[0]) {
-            console.log(
-              `   \`${arg.get("args").validator_stash}\` rewarded for era ${
-                arg.get("args").era
-              }`
-            );
-          }
-          console.log(" ]");
-        })
-      )
-      .subscribe({
-        error: reject,
-        complete: resolve,
-      })
+    payoutTxs$.subscribe({
+      error: reject,
+      complete: resolve,
+    })
   );
+
+  return true;
 }
 
 /**
@@ -201,26 +219,30 @@ async function sendStakingPayouts(api, txSender) {
  * In case it's lower than the minimum value, will send an alarm email.
  *
  * @param {*} api
- * @param {string} toAddr - address to send email to
- * @param {*} txSender - account to check balance of
+ * @param {Array<string> | string} emailAddr - address to send email to
+ * @param {*} accountAddress - account to check balance of
  * @param {BN} min - minimum balance to ring alarm
  */
-async function checkBalance(api, toAddr, address, min) {
+async function checkBalance(api, emailAddr, accountAddress, min) {
   const {
     data: { free: balance },
-  } = await api.query.system.account(address);
+  } = await api.query.system.account(accountAddress);
 
   if (balance.lt(min)) {
     console.error(
-      `Balance of the \`${address}\` - ${balance} is less than ${min}.`
+      `Balance of the \`${accountAddress}\` - ${balance} is less than ${min}.`
     );
 
     await sendAlarmEmail(
-      toAddr,
+      emailAddr,
       "Low balance of the staking payouts sender",
-      `Balance of the \`${address}\` - ${balance} is less than ${min}.`
+      `Balance of the \`${accountAddress}\` - ${balance} is less than ${min}.`
     );
+
+    return false;
   }
+
+  return true;
 }
 
 /**
@@ -235,7 +257,7 @@ async function checkBalance(api, toAddr, address, min) {
  * Fetches information about the recent eras.
  *
  * @param {*} api
- * @returns {ErasInfo}
+ * @returns {Promise<ErasInfo>}
  */
 const fetchErasInfo = async (api) => {
   const eras = await api.derive.staking.erasHistoric();
@@ -327,9 +349,7 @@ const signAndSendExtrinsics = curry((api, initiator, txs$) => {
           // Increase nonce by hand
           nonce = nonce.add(new BN(1));
 
-          return from(
-            Promise.race([sentTx, rejectTimeout(TxFinalizationTimeout)])
-          );
+          return from(timeout(TxFinalizationTimeout, sentTx));
         }).pipe(
           mapRx((result) => ({ tx, result })),
           catchError((error, caught) => {
@@ -357,8 +377,9 @@ const signAndSendExtrinsics = curry((api, initiator, txs$) => {
 /**
  * Groups eras having some reward to be paid by validator stash accounts.
  *
- * @param {{ eras: *, pointsByEra: Object<string, *>, rewardsByEra: Object<string, *>, prefsByEra: Object<string, *> }} erasInfo
- * @param {Array<BN>} validatorEras
+ * @param {ErasInfo} erasInfo
+ * @param {Array<{ stashId: string, eras: Array<BN> }>} validatorEras
+ *
  * @returns {Object<string, { era: BN, reward: BN }>}
  */
 const buildValidatorRewards = curry(
@@ -405,3 +426,22 @@ const buildValidatorRewards = curry(
     )(validatorEras);
   }
 );
+
+export const handler = async () => {
+  await timeout(IterationTimeout * 2, main());
+
+  return "Done";
+};
+
+if (require.main === module) {
+  console.log("Executing the script...");
+
+  handler()
+    .catch((error) => {
+      console.error(error);
+      process.exit(1);
+    })
+    .then(() => process.exit());
+}
+
+export default handler;

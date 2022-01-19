@@ -12,14 +12,16 @@ import { curry } from "ramda";
 export const sendAlarmEmail = curry(async (toAddr, subject, body) => {
   const ses = new SESV2({
     apiVersion: "2019-09-27",
-    accessKeyId: process.env.AwsAccessId,
-    secretAccessKey: process.env.AwsSecretKey,
-    region: process.env.AwsSesEmailRegion,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_SES_REGION,
   });
+
+  toAddr = Array.isArray(toAddr) ? toAddr : [toAddr];
 
   const params = {
     Destination: {
-      ToAddresses: Array.isArray(toAddr) ? toAddr : [toAddr],
+      ToAddresses: toAddr,
     },
     Content: {
       Simple: {
@@ -35,12 +37,12 @@ export const sendAlarmEmail = curry(async (toAddr, subject, body) => {
         },
       },
     },
-    FromEmailAddress: process.env.AlarmEmailTo,
+    FromEmailAddress: toAddr[0],
   };
 
   const r = await ses.sendEmail(params).promise();
   console.log("Email sent.");
   console.log(r);
-  
+
   return r;
 });

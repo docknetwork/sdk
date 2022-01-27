@@ -41,6 +41,7 @@ import {
   notNilAnd,
   timeout,
   finiteNumber,
+  formatDock,
 } from "./helpers";
 
 require("dotenv").config();
@@ -57,6 +58,7 @@ const {
   AlarmBalance,
   TxFinalizationTimeout,
   IterationTimeout,
+  FinalizeTx,
 } = envObj({
   // Address of the node RPC.
   FullNodeEndpoint: notNilAnd(String),
@@ -77,9 +79,11 @@ const {
   // Account balance to ring alarm.
   AlarmBalance: notNilAnd((val) => new BN(val)),
   // Time to wait for transaction to be finalized. In ms.
-  TxFinalizationTimeout: o(finiteNumber, defaultTo(2e5)),
+  TxFinalizationTimeout: o(finiteNumber, defaultTo(3e4)),
   // Time to wait for all payments to be sent before returning with an error. In ms.
   IterationTimeout: o(finiteNumber, defaultTo(4e5)),
+  // Finalize the transaction or just wait for it to be included in the block.
+  FinalizeTx: o(Boolean, defaultTo(false)),
 });
 
 async function main() {
@@ -163,7 +167,7 @@ async function sendStakingPayouts(api, erasInfo, txSender, batchSize) {
 
   console.log("- Retrieving validator eras...");
   const erasToBePaid = await lastValueFrom(
-    getUnclaimedStashesEras(api, erasInfo, validators).pipe(toArray())
+    from(validators).pipe(getUnclaimedStashesEras(api, erasInfo), toArray())
   );
 
   const rewards = pipe(buildValidatorRewards, toPairs)(erasInfo, erasToBePaid);
@@ -173,15 +177,15 @@ async function sendStakingPayouts(api, erasInfo, txSender, batchSize) {
     return false;
   }
 
-  console.log("- Payments need to be made:");
+  console.log("- Payouts need to be made:");
 
   for (const [stashId, eras] of rewards) {
-    console.log(
-      ` * To \`${stashId}\`: ${eras.reduce(
-        ({ reward: a }, { reward: b }) => (a != null ? a.add(b) : b),
-        { reward: null }
-      )}`
+    const total = eras.reduce(
+      (total, { reward }) => (total != null ? total.add(reward) : reward),
+      null
     );
+
+    console.log(` * To \`${stashId}\`: ${formatDock(total)}`);
   }
 
   const payoutTxs$ = from(rewards).pipe(
@@ -190,17 +194,30 @@ async function sendStakingPayouts(api, erasInfo, txSender, batchSize) {
     batchExtrinsics(api, batchSize),
     signAndSendExtrinsics(api, txSender),
     tap(({ result, tx }) => {
-      console.log(
-        ` * Batch transaction finalized at block \`${result.status.asFinalized}\`: [`
-      );
-      for (const arg of tx.method.args[0]) {
-        console.log(
-          `   \`${arg.get("args").validator_stash}\` rewarded for era ${
-            arg.get("args").era
-          }`
-        );
+      // Ther's a much better way to check this...
+      const isBatch = tx.method.args?.[0]?.[0] instanceof Map;
+
+      let msg = " * ";
+      if (isBatch) msg += `Batch transaction`;
+      else msg += `Transaction`;
+
+      if (FinalizeTx) {
+        msg += ` finalized at block \`${result.status.asFinalized}\`: `;
+      } else {
+        msg += ` included at block \`${result.status.asInBlock}\`: `;
       }
-      console.log(" ]");
+
+      const payoutsSummary = (isBatch ? tx.method.args[0] : [tx.method])
+        .map((payout) => payout.get("args"))
+        .map(
+          ({ validator_stash, era }) =>
+            `\`${validator_stash}\` rewarded for era ${era}`
+        )
+        .join(isBatch ? ",\n    " : ",");
+
+      msg += isBatch ? `[\n    ${payoutsSummary}\n ]` : payoutsSummary;
+
+      console.log(msg);
     })
   );
 
@@ -230,13 +247,17 @@ async function checkBalance(api, emailAddr, accountAddress, min) {
 
   if (balance.lt(min)) {
     console.error(
-      `Balance of the \`${accountAddress}\` - ${balance} is less than ${min}.`
+      `Balance of the \`${accountAddress}\` - ${formatDock(
+        balance
+      )} is less than ${formatDock(min)}.`
     );
 
     await sendAlarmEmail(
       emailAddr,
       "Low balance of the staking payouts sender",
-      `Balance of the \`${accountAddress}\` - ${balance} is less than ${min}.`
+      `Balance of the \`${accountAddress}\` - ${formatDock(
+        balance
+      )} is less than ${formatDock(min)}.`
     );
 
     return false;
@@ -283,7 +304,7 @@ const fetchErasInfo = async (api) => {
  * @param {*} api
  * @param {Array<BN>} allEras
  * @param {string} stashId
- * @returns {Array<StashEras>}
+ * @returns {Promise<Array<StashEras>>}
  */
 const getUnclaimedStashEras = curry(async (api, allEras, stashId) => {
   let controllerId = await api.query.staking.bonded(stashId);
@@ -311,12 +332,12 @@ const getUnclaimedStashEras = curry(async (api, allEras, stashId) => {
  *
  * @param {*} api
  * @param {ErasInfo} erasInfo
- * @param {*} stashIds
+ * @param {Observable<string>} stashIds
  * @returns {Observable<StashEras>}
  */
-const getUnclaimedStashesEras = curry((api, { eras }, stashIds) =>
+const getUnclaimedStashesEras = curry((api, { eras }, stashIds$) =>
   // Concurrently get unclaimed eras for each of stashes
-  from(stashIds).pipe(
+  stashIds$.pipe(
     mergeMap(
       (stashId) =>
         from(getUnclaimedStashEras(api, eras, stashId)).pipe(
@@ -336,7 +357,7 @@ const getUnclaimedStashesEras = curry((api, { eras }, stashIds) =>
  * @param {*} initiator
  * @param {Observable<import("@polkadot/types/interfaces").Extrinsic>} txs$
  *
- * @returns {Observable<string>} executed tx with hashes
+ * @returns {Observable<{ result: *, tx: * }>} executed transaction with result
  */
 const signAndSendExtrinsics = curry((api, initiator, txs$) => {
   // The first nonce to be used will come from the API call
@@ -345,7 +366,7 @@ const signAndSendExtrinsics = curry((api, initiator, txs$) => {
     switchMap((nonce) => {
       const sendExtrinsic = (tx) =>
         defer(() => {
-          const sentTx = dock.signAndSend(tx, true, { nonce });
+          const sentTx = dock.signAndSend(tx, FinalizeTx, { nonce });
           // Increase nonce by hand
           nonce = nonce.add(new BN(1));
 
@@ -359,7 +380,9 @@ const signAndSendExtrinsics = curry((api, initiator, txs$) => {
             // Filter out errors related to balance and double-claim
             if (
               stringified.includes("balance") ||
-              stringified.includes("alreadyclaimed")
+              stringified.includes("alreadyclaimed") ||
+              stringified.includes("invalid transaction") ||
+              stringified.includes("election")
             ) {
               return EMPTY;
             } else {
@@ -428,7 +451,7 @@ const buildValidatorRewards = curry(
 );
 
 export const handler = async () => {
-  await timeout(IterationTimeout * 2, main());
+  await timeout(IterationTimeout * 2.5, main());
 
   return "Done";
 };

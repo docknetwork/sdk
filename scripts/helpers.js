@@ -2,6 +2,7 @@
 
 import { ApiPromise, WsProvider, Keyring } from "@polkadot/api";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
+import { formatBalance } from "@polkadot/util";
 import typesBundle from "@docknetwork/node-types";
 import { bufferCount, map as mapRx } from "rxjs/operators";
 import {
@@ -226,7 +227,9 @@ export const envObj = mapObjIndexed(parseEnv);
 export const batchExtrinsics = curry((api, limit, extrs$) =>
   extrs$.pipe(
     bufferCount(limit),
-    mapRx((batch) => api.tx.utility.batch(batch))
+    mapRx((batch) =>
+      batch.length === 1 ? batch[0] : api.tx.utility.batch(batch)
+    )
   )
 );
 
@@ -253,3 +256,12 @@ export const rejectTimeout = (time) =>
 export const timeout = curry((time, promise) =>
   Promise.race([rejectTimeout(time), promise])
 );
+
+/**
+ * Formats given value as DOCK token amount.
+ *
+ * @param {BN} value
+ * @returns {string}
+ */
+export const formatDock = (value) =>
+  formatBalance(value, { decimals: 6, withSi: true, withUnit: "DCK" });

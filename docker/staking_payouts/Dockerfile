@@ -3,9 +3,6 @@ WORKDIR /usr/app
 
 COPY . .
 
-RUN apt update
-RUN apt install python -y
-
 RUN yarn
 RUN yarn build-scripts
 

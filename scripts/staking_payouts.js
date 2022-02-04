@@ -93,6 +93,7 @@ async function main() {
   await dock.init({
     address: FullNodeEndpoint,
   });
+
   const txSender = dock.keyring.addFromUri(InitiatorAccountURI);
   dock.setAccount(txSender);
 
@@ -140,6 +141,7 @@ async function main() {
     );
   }
 
+  await dock.disconnect();
   console.log("Done!");
 }
 

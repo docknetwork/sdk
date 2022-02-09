@@ -73,6 +73,7 @@ class DockAPI {
    */
   constructor(customSignTx) {
     this.customSignTx = customSignTx;
+    this.anchorModule = new AnchorModule();
   }
 
   /**
@@ -134,7 +135,6 @@ class DockAPI {
 
     await this.initKeyring(keyring);
 
-    this.anchorModule = new AnchorModule();
     this.anchorModule.setApi(this.api, this.signAndSend.bind(this));
     this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));
     this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
@@ -162,7 +162,6 @@ class DockAPI {
         await this.api.disconnect();
       }
       delete this.api;
-      delete this.anchorModule;
       delete this.blobModule;
       delete this.didModule;
       delete this.revocationModule;
@@ -285,9 +284,6 @@ class DockAPI {
    * @return {AnchorModule} The module to use
    */
   get anchor() {
-    if (!this.anchorModule) {
-      throw new Error('Unable to get Anchor module, SDK is not initialised');
-    }
     return this.anchorModule;
   }
 

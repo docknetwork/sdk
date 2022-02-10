@@ -20,6 +20,8 @@ import {
 } from "ramda";
 import { Observable } from "rxjs";
 
+import dock from "../src";
+
 /**
  * Send the give transaction with the given account URI (secret) and return the block hash
  * @param dock
@@ -265,3 +267,35 @@ export const timeout = curry((time, promise) =>
  */
 export const formatDock = (value) =>
   formatBalance(value, { decimals: 6, withSi: true, withUnit: "DCK" });
+
+/**
+ * Enhances supplied function by providing access to the initialized global dock API.
+ *
+ * Global dock API object will be initialized with the given params before passing to the function,
+ * and will be disconnected when the promise will be either resolved or rejected.
+ *
+ * @template T
+ * @param {Object} params
+ * @param {function(DockAPI): T}
+ * @returns {T}
+ */
+export const withDockAPI = curry((params, fn) => async () => {
+  console.log("Connecting...");
+  let err, res;
+
+  try {
+    await dock.init(params);
+    res = await fn(dock);
+  } catch (e) {
+    err = e;
+  } finally {
+    console.log("Disconnecting...");
+    await dock.disconnect();
+
+    if (err) {
+      throw err;
+    } else {
+      return res;
+    }
+  }
+});

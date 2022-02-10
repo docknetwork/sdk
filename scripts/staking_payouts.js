@@ -5,6 +5,7 @@ import {
   map as mapRx,
   filter as filterRx,
   mergeMap,
+  concatMap,
   switchMap,
   toArray,
   concatMapTo,
@@ -33,7 +34,6 @@ import {
   reduceBy,
 } from "ramda";
 
-import dock from "../src";
 import { sendAlarmEmail } from "./email_utils";
 import {
   batchExtrinsics,
@@ -42,6 +42,7 @@ import {
   timeout,
   finiteNumber,
   formatDock,
+  withDockAPI,
 } from "./helpers";
 
 require("dotenv").config();
@@ -86,75 +87,71 @@ const {
   FinalizeTx: o(Boolean, defaultTo(false)),
 });
 
-async function main() {
-  console.log("Initializing...");
-
-  await dock.disconnect();
-  await dock.init({
+const main = withDockAPI(
+  {
     address: FullNodeEndpoint,
-  });
+  },
+  async (dock) => {
+    const initiator = dock.keyring.addFromUri(InitiatorAccountURI);
 
-  const txSender = dock.keyring.addFromUri(InitiatorAccountURI);
-  dock.setAccount(txSender);
-
-  console.log("Pre-work balance check.");
-  let balanceIsOk = await checkBalance(
-    dock.api,
-    StakingPayoutsAlarmEmailTo,
-    txSender.address,
-    AlarmBalance
-  );
-
-  console.log("Fetching eras info...");
-  const erasInfo = await fetchErasInfo(dock.api);
-
-  console.log("Calculating and sending payouts:");
-  let needToRecheck;
-
-  try {
-    needToRecheck = await timeout(
-      IterationTimeout,
-      sendStakingPayouts(dock.api, erasInfo, txSender, BatchSize)
-    );
-  } catch (err) {
-    needToRecheck = true;
-    console.error(err);
-  }
-
-  if (needToRecheck) {
-    // Check payouts again with a batch size of 1
-    // This needed to execute valid transactions packed in invalid batches
-    console.log("Checking payouts again:");
-    await timeout(
-      IterationTimeout,
-      sendStakingPayouts(dock.api, erasInfo, txSender, 1)
-    );
-  }
-
-  if (balanceIsOk) {
-    console.log("Post-work balance check.");
-    await checkBalance(
+    console.log("Pre-work balance check.");
+    let balanceIsOk = await checkBalance(
       dock.api,
       StakingPayoutsAlarmEmailTo,
-      txSender.address,
+      initiator.address,
       AlarmBalance
     );
-  }
 
-  await dock.disconnect();
-  console.log("Done!");
-}
+    console.log("Fetching eras info...");
+    const erasInfo = await fetchErasInfo(dock.api);
+
+    console.log("Calculating and sending payouts:");
+    let needToRecheck;
+
+    try {
+      needToRecheck = await timeout(
+        IterationTimeout,
+        sendStakingPayouts(dock, erasInfo, initiator, BatchSize)
+      );
+    } catch (err) {
+      needToRecheck = true;
+      console.error(err);
+    }
+
+    if (needToRecheck) {
+      // Check payouts again with a batch size of 1
+      // This needed to execute valid transactions packed in invalid batches
+      console.log("Checking payouts again:");
+      await timeout(
+        IterationTimeout,
+        sendStakingPayouts(dock, erasInfo, initiator, 1)
+      );
+    }
+
+    if (balanceIsOk) {
+      console.log("Post-work balance check.");
+      await checkBalance(
+        dock.api,
+        StakingPayoutsAlarmEmailTo,
+        initiator.address,
+        AlarmBalance
+      );
+    }
+
+    console.log("Done!");
+  }
+);
 
 /**
  * Sends staking payouts for recent eras using the given sender account.
  *
- * @param {*} api
+ * @param {DockAPI} dock
  * @param {ErasInfo} erasInfo
- * @param {*} txSender - account to send tx from
+ * @param {*} initiator - account to send tx from
  * @param {number} batchSize
  * @returns {Promise<boolean>} - `true` if some unpaid eras were found, `false` otherwise
  */
-async function sendStakingPayouts(api, erasInfo, txSender, batchSize) {
+async function sendStakingPayouts(dock, erasInfo, initiator, batchSize) {
   const validators = pipe(
     values,
     pluck("validators"),
@@ -169,7 +166,10 @@ async function sendStakingPayouts(api, erasInfo, txSender, batchSize) {
 
   console.log("- Retrieving validator eras...");
   const erasToBePaid = await lastValueFrom(
-    from(validators).pipe(getUnclaimedStashesEras(api, erasInfo), toArray())
+    from(validators).pipe(
+      getUnclaimedStashesEras(dock.api, erasInfo),
+      toArray()
+    )
   );
 
   const rewards = pipe(buildValidatorRewards, toPairs)(erasInfo, erasToBePaid);
@@ -190,37 +190,41 @@ async function sendStakingPayouts(api, erasInfo, txSender, batchSize) {
     console.log(` * To \`${stashId}\`: ${formatDock(total)}`);
   }
 
+  const logResult = ({ result, tx }) => {
+    // Ther's a much better way to check this...
+    const isBatch = tx.method.args?.[0]?.[0] instanceof Map;
+
+    let msg = " * ";
+    if (isBatch) msg += `Batch transaction`;
+    else msg += `Transaction`;
+
+    if (FinalizeTx) {
+      msg += ` finalized at block \`${result.status.asFinalized}\`: `;
+    } else {
+      msg += ` included at block \`${result.status.asInBlock}\`: `;
+    }
+
+    const payoutsSummary = (isBatch ? tx.method.args[0] : [tx.method])
+      .map((payout) => payout.get("args"))
+      .map(
+        ({ validator_stash, era }) =>
+          `\`${validator_stash}\` rewarded for era ${era}`
+      )
+      .join(isBatch ? ",\n    " : ",");
+
+    msg += isBatch ? `[\n    ${payoutsSummary}\n ]` : payoutsSummary;
+
+    console.log(msg);
+  };
+
   const payoutTxs$ = from(rewards).pipe(
-    mergeMap(([stashId, eras]) => from(eras.map(assoc("stashId", stashId)))),
-    mapRx(({ stashId, era }) => api.tx.staking.payoutStakers(stashId, era)),
-    batchExtrinsics(api, batchSize),
-    signAndSendExtrinsics(api, txSender),
-    tap(({ result, tx }) => {
-      // Ther's a much better way to check this...
-      const isBatch = tx.method.args?.[0]?.[0] instanceof Map;
-
-      let msg = " * ";
-      if (isBatch) msg += `Batch transaction`;
-      else msg += `Transaction`;
-
-      if (FinalizeTx) {
-        msg += ` finalized at block \`${result.status.asFinalized}\`: `;
-      } else {
-        msg += ` included at block \`${result.status.asInBlock}\`: `;
-      }
-
-      const payoutsSummary = (isBatch ? tx.method.args[0] : [tx.method])
-        .map((payout) => payout.get("args"))
-        .map(
-          ({ validator_stash, era }) =>
-            `\`${validator_stash}\` rewarded for era ${era}`
-        )
-        .join(isBatch ? ",\n    " : ",");
-
-      msg += isBatch ? `[\n    ${payoutsSummary}\n ]` : payoutsSummary;
-
-      console.log(msg);
-    })
+    concatMap(([stashId, eras]) => from(eras.map(assoc("stashId", stashId)))),
+    mapRx(({ stashId, era }) =>
+      dock.api.tx.staking.payoutStakers(stashId, era)
+    ),
+    batchExtrinsics(dock.api, batchSize),
+    signAndSendExtrinsics(dock, initiator),
+    tap(logResult)
   );
 
   await new Promise((resolve, reject) =>
@@ -361,13 +365,14 @@ const getUnclaimedStashesEras = curry((api, { eras }, stashIds$) =>
  *
  * @returns {Observable<{ result: *, tx: * }>} executed transaction with result
  */
-const signAndSendExtrinsics = curry((api, initiator, txs$) => {
+const signAndSendExtrinsics = curry((dock, initiator, txs$) => {
   // The first nonce to be used will come from the API call
   // To send several extrinsics simultaneously, we need to emulate increasing nonce
-  return from(api.rpc.system.accountNextIndex(initiator.address)).pipe(
+  return from(dock.api.rpc.system.accountNextIndex(initiator.address)).pipe(
     switchMap((nonce) => {
       const sendExtrinsic = (tx) =>
         defer(() => {
+          dock.setAccount(initiator);
           const sentTx = dock.signAndSend(tx, FinalizeTx, { nonce });
           // Increase nonce by hand
           nonce = nonce.add(new BN(1));

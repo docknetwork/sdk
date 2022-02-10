@@ -276,16 +276,16 @@ export const formatDock = (value) =>
  *
  * @template T
  * @param {Object} params
- * @param {function(DockAPI): T}
- * @returns {T}
+ * @param {function(DockAPI, ...*): Promise<T>}
+ * @returns {function(...*): Promise<T>}
  */
-export const withDockAPI = curry((params, fn) => async () => {
+export const withDockAPI = curry((params, fn) => async (...args) => {
   console.log("Connecting...");
   let err, res;
 
   try {
     await dock.init(params);
-    res = await fn(dock);
+    res = await fn(dock, ...args);
   } catch (e) {
     err = e;
   } finally {

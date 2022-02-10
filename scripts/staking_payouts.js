@@ -32,6 +32,8 @@ import {
   complement,
   split,
   reduceBy,
+  equals,
+  either,
 } from "ramda";
 
 import { sendAlarmEmail } from "./email_utils";
@@ -77,14 +79,14 @@ const {
   RetryTimeout: o(finiteNumber, defaultTo(5e3)),
   // Max commission allowed to be set for validators. Default to 5%.
   MaxCommission: o((val) => new BN(val), defaultTo("50000000")),
-  // Account balance to ring alarm.
+  // Min account balance to ring alarm.
   AlarmBalance: notNilAnd((val) => new BN(val)),
   // Time to wait for transaction to be finalized. In ms.
   TxFinalizationTimeout: o(finiteNumber, defaultTo(3e4)),
-  // Time to wait for all payments to be sent before returning with an error. In ms.
+  // Time to wait for all payments to be sent in an iteration before returning with an error. In ms.
   IterationTimeout: o(finiteNumber, defaultTo(4e5)),
   // Finalize the transaction or just wait for it to be included in the block.
-  FinalizeTx: o(Boolean, defaultTo(false)),
+  FinalizeTx: either(equals("true"), o(Boolean, Number)),
 });
 
 const main = withDockAPI(

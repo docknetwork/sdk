@@ -1,4 +1,4 @@
-import { ec as EC } from 'elliptic';
+import elliptic from 'elliptic';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import { sha256 } from 'js-sha256';
@@ -9,6 +9,7 @@ import {
   Signature, SignatureEd25519, SignatureSecp256k1, SignatureSr25519, // eslint-disable-line
 } from '../signatures';
 
+const EC = elliptic.ec;
 const secp256k1Curve = new EC('secp256k1');
 
 /** // TODO: Error handling when `stateChange` is not registered

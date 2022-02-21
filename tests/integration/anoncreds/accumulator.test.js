@@ -3,13 +3,13 @@ import { initializeWasm } from '@docknetwork/crypto-wasm';
 import { Accumulator, PositiveAccumulator, WitnessUpdatePublicInfo } from '@docknetwork/crypto-wasm-ts';
 import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/crypto-wasm-ts/src/accumulator/in-memory-persistence';
 import { hexToU8a, stringToHex, u8aToHex } from '@polkadot/util';
-import { DockAPI } from '../../src';
-import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-constants';
-import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
-import { createKeyDetail, createNewDockDID, getHexIdentifierFromDID } from '../../src/utils/did';
+import { DockAPI } from '../../../src';
+import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
+import { getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
+import { createKeyDetail, createNewDockDID, getHexIdentifierFromDID } from '../../../src/utils/did';
 
-import AccumulatorModule from '../../src/modules/accumulator';
-import { getAllEventsFromBlock } from '../../src/utils/chain-ops';
+import AccumulatorModule from '../../../src/modules/accumulator';
+import { getAllEventsFromBlock } from '../../../src/utils/chain-ops';
 
 describe('Accumulator Module', () => {
   const dock = new DockAPI();
@@ -198,7 +198,7 @@ describe('Accumulator Module', () => {
 
     await chainModule.removeAccumulator(id2, accum2.created, accum2.nonce + 1, pair2, undefined, false);
     expect(await chainModule.getAccumulator(id2, false)).toEqual(null);
-  }, 40000);
+  }, 50000);
 
   test('Update accumulator', async () => {
     const queriedPkWithParams = await chainModule.getPublicKey(did2, 1, true);

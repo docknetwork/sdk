@@ -2,12 +2,12 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import { hexToU8a, u8aToHex, stringToHex } from '@polkadot/util';
 import { initializeWasm } from '@docknetwork/crypto-wasm';
 import { KeypairG2, SignatureParamsG1 } from '@docknetwork/crypto-wasm-ts';
-import { DockAPI } from '../../src';
-import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-constants';
-import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
-import { createKeyDetail, createNewDockDID, getHexIdentifierFromDID } from '../../src/utils/did';
+import { DockAPI } from '../../../src';
+import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
+import { getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
+import { createKeyDetail, createNewDockDID, getHexIdentifierFromDID } from '../../../src/utils/did';
 
-import BBSPlusModule from '../../src/modules/bbs-plus';
+import BBSPlusModule from '../../../src/modules/bbs-plus';
 
 describe('BBS+ Module', () => {
   const dock = new DockAPI();

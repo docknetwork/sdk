@@ -1,6 +1,7 @@
-import { ec as EC } from 'elliptic';
+import elliptic from 'elliptic';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
+import { sha256 } from 'js-sha256';
 import {
   PublicKey, PublicKeyEd25519, PublicKeySecp256k1, PublicKeySr25519, // eslint-disable-line
 } from '../public-keys';
@@ -8,6 +9,7 @@ import {
   Signature, SignatureEd25519, SignatureSecp256k1, SignatureSr25519, // eslint-disable-line
 } from '../signatures';
 
+const EC = elliptic.ec;
 const secp256k1Curve = new EC('secp256k1');
 
 /** // TODO: Error handling when `stateChange` is not registered
@@ -34,18 +36,31 @@ export function getStateChange(api, name, value) {
  * @returns {object} A keypair
  */
 
-export function generateEcdsaSecp256k1Keypair(pers = null, entropy = null) {
-  return secp256k1Curve.genKeyPair({ pers, entropy });
+export function generateEcdsaSecp256k1Keypair(entropy = null) {
+  return secp256k1Curve.genKeyPair({ entropy });
 }
 
 /**
  * Verify a given signature on a given message
- * @param {array} message - Bytes of message
+ * @param {array} message - Bytes of message. Its assumed that the message is not hashed already
+ * and hashed before verifying
  * @param {SignatureSecp256k1} signature - signature to verify
  * @param {PublicKeySecp256k1} publicKey - Secp256k1 public key for verification
  * @returns {boolean} True when signature is valid, false otherwise
  */
 export function verifyEcdsaSecp256k1Sig(message, signature, publicKey) {
+  const hash = sha256.digest(message);
+  return verifyEcdsaSecp256k1SigPrehashed(hash, signature, publicKey);
+}
+
+/**
+ * Verify a given signature on a given message hash
+ * @param {array} messageHash - Hash of the message. Its assumed that the message is hashed already
+ * @param {SignatureSecp256k1} signature - signature to verify
+ * @param {PublicKeySecp256k1} publicKey - Secp256k1 public key for verification
+ * @returns {boolean} True when signature is valid, false otherwise
+ */
+export function verifyEcdsaSecp256k1SigPrehashed(messageHash, signature, publicKey) {
   // Remove the leading `0x`
   const sigHex = signature.value.slice(2);
   // Break it in 2 chunks of 32 bytes each
@@ -55,7 +70,7 @@ export function verifyEcdsaSecp256k1Sig(message, signature, publicKey) {
   // Generate public key object. Not extracting the public key for signature as the verifier
   // should always know what public key is being used.
   const pk = secp256k1Curve.keyFromPublic(pkHex, 'hex');
-  return secp256k1Curve.verify(message, sig, pk);
+  return secp256k1Curve.verify(messageHash, sig, pk);
 }
 
 /**

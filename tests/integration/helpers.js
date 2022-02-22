@@ -1,5 +1,7 @@
+import { bnToBn } from '@polkadot/util';
 import { createKeyDetail } from '../../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
+import { MaxGas, MinGasPrice } from '../test-constants';
 
 /**
  * Registers a new DID on dock chain, keeps the controller same as the DID
@@ -36,4 +38,8 @@ export function getUnsignedCred(credId, holderDID) {
       alumniOf: 'Example University',
     },
   };
+}
+
+export function defaultEVMAccountEndowment() {
+  return bnToBn(MinGasPrice).mul(bnToBn(MaxGas)).muln(2);
 }

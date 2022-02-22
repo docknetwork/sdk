@@ -20,13 +20,13 @@ The motivation for this integration was to support [Chainlink](https://chain.lin
 
 The document will however show how to deploy and use a different set of contracts. A [DAO](https://academy.binance.com/en/glossary/decentralized-autonomous-organization), which replicates [Aragon's voting app](https://github.com/aragon/aragon-apps/tree/master/apps/voting). The app lets token holders vote in proportion to the tokens they hold and the winning vote executes an action by calling a method on another contract.
 
-Most of the examples use web-3 but there is [an example](../../scripts/eth/with-ethers.js) using ethers-js as well.
+Most of the examples use web-3 but there is [a test](../../tests/integration/eth/using-ethers.test.js) using ethers-js as well.
 
 ## Dock and EVM accounts
 
 Accounts in Dock are 32 bytes (excluding network identifier and checksum) but EVM accounts are 20 bytes (last 20 bytes of the public key). As there is no direct conversion possible between these two and we don't support
 binding these two together in an onchain mapping, a separate Ethereum address has to be created and funded with tokens to send Ethereum style transactions. `pallet-evm` derives a Dock address from this Ethereum address
-and expects that Dock address to have tokens. The example script [transfer-testing](../../scripts/eth/transfer-testing.js) shows an Ethereum account `carol` created using web3 being given some tokens using function `endowEVMAddress`.
+and expects that Dock address to have tokens. The test [native-balance-to-eth.test](../../tests/integration/eth/native-balance-to-eth.test.js) shows an Ethereum account `carol` created using web3 being given some tokens using function `endowEVMAddress`.
 
 ```js
   // An API object which will connect to node and send non-EVM transactions like balance transfer

@@ -1,5 +1,5 @@
 import b58 from 'bs58';
-import { sr25519Verify } from '@polkadot/util-crypto/sr25519';
+import { schnorrkelVerify } from '@polkadot/util-crypto/schnorrkel';
 import { Sr25519VerKeyName } from './constants';
 
 export default class Sr25519VerificationKey2020 {
@@ -35,7 +35,7 @@ export default class Sr25519VerificationKey2020 {
   static verifierFactory(publicKey) {
     return {
       async verify({ data, signature }) {
-        return sr25519Verify(data, signature, publicKey);
+        return schnorrkelVerify(data, signature, publicKey);
       },
     };
   }

@@ -1,6 +1,5 @@
 import { suites } from 'jsonld-signatures';
 import * as base58btc from 'base58-universal';
-import { Ed25519VerificationKey2018 } from '@digitalbazaar/ed25519-verification-key-2018'; // TODO: remove this package and gen keypair some other way
 import { hexToU8a } from '@polkadot/util';
 
 import jsonld from 'jsonld';

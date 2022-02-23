@@ -1,10 +1,11 @@
 import b58 from 'bs58';
+import { u8aToU8a } from '@polkadot/util';
 import { schnorrkelVerify } from '@polkadot/util-crypto/schnorrkel';
 import { Sr25519VerKeyName } from './constants';
 
 export default class Sr25519VerificationKey2020 {
   constructor(publicKey) {
-    this.publicKey = [...publicKey];
+    this.publicKey = u8aToU8a(publicKey);
   }
 
   /**

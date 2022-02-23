@@ -65,7 +65,7 @@ function getProofMatcherDoc() {
   return {
     results: [
       {
-        error: expect.anything(),
+        error: undefined,
         proof: expect.anything(),
         purposeResult: expect.anything(),
         verificationMethod: expect.anything(),

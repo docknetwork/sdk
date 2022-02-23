@@ -6,7 +6,9 @@ import {
 } from '../../../scripts/eth/helpers';
 import { ERC20_BYTECODE, ERC20_ABI } from '../../../scripts/eth/bytecodes-and-abis';
 
-import { FullNodeTCPEndpoint, MinGasPrice, MaxGas } from '../../test-constants';
+import {
+  FullNodeTCPEndpoint, TestAccountURI, MinGasPrice, MaxGas, FullNodeEndpoint,
+} from '../../test-constants';
 import { defaultEVMAccountEndowment } from '../helpers';
 
 async function deploy(signer, supply) {
@@ -31,8 +33,8 @@ describe('Deploy an ERC-20 contract and transfer ERC-20 tokens', () => {
     const [a, b] = getTestEVMAccountsFromEthers(ethersProvider);
     alice = a;
     bob = b;
-    await endowEVMAddressWithDefault(alice.address, defaultEVMAccountEndowment());
-    await endowEVMAddressWithDefault(bob.address, defaultEVMAccountEndowment());
+    await endowEVMAddressWithDefault(alice.address, defaultEVMAccountEndowment(), FullNodeEndpoint, TestAccountURI);
+    await endowEVMAddressWithDefault(bob.address, defaultEVMAccountEndowment(), FullNodeEndpoint, TestAccountURI);
     done();
   });
 

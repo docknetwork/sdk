@@ -12,13 +12,13 @@ import {
 } from '../../../src/utils/evm-utils';
 
 import {
-  FullNodeEndpoint, TestKeyringOpts, TestAccountURI, MinGasPrice, MaxGas,
+  FullNodeEndpoint, TestKeyringOpts, TestAccountURI, MinGasPrice, MaxGas, FullNodeTCPEndpoint,
 } from '../../test-constants';
 import { defaultEVMAccountEndowment } from '../helpers';
 
 describe('Transfer native Dock tokens to an EVM account and withdraw it back to native account', () => {
   const dock = new DockAPI();
-  const web3 = getWeb3(FullNodeEndpoint);
+  const web3 = getWeb3(FullNodeTCPEndpoint);
   let carol;
   let jacob;
   // 100 tokens

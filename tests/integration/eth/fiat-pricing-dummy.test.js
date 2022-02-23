@@ -6,13 +6,13 @@ import {
 } from '../../../scripts/eth/bytecodes-and-abis';
 
 import {
-  FullNodeEndpoint, TestAccountURI, MinGasPrice, MaxGas,
+  FullNodeEndpoint, TestAccountURI, MinGasPrice, MaxGas, FullNodeTCPEndpoint,
 } from '../../test-constants';
 import { defaultEVMAccountEndowment } from '../helpers';
 
 describe('Deploy a dummy aggregator and a proxy contract', () => {
   let alice;
-  const web3 = getWeb3(FullNodeEndpoint);
+  const web3 = getWeb3(FullNodeTCPEndpoint);
 
   beforeAll(async (done) => {
     const [a] = getTestEVMAccountsFromWeb3(web3);

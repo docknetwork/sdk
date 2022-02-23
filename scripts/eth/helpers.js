@@ -36,7 +36,9 @@ export async function endowEVMAddressWithDefault(evmAddr, amount, nodeEndpoint, 
   const keypair = dock.keyring.addFromUri(accountUri !== undefined ? accountUri : EndowedSecretURI);
   dock.setAccount(keypair);
 
-  return endowEVMAddress(dock, evmAddr, amount);
+  const res = await endowEVMAddress(dock, evmAddr, amount);
+  await dock.disconnect();
+  return res;
 }
 
 // Get a web3 instance

@@ -7,14 +7,14 @@ import {
 } from '../../../scripts/eth/helpers';
 
 import {
-  FullNodeEndpoint, TestAccountURI, MinGasPrice, MaxGas,
+  FullNodeEndpoint, TestAccountURI, MinGasPrice, MaxGas, FullNodeTCPEndpoint,
 } from '../../test-constants';
 import { defaultEVMAccountEndowment } from '../helpers';
 
 describe('Deploy an ERC-20 contract and transfer ERC-20 tokens', () => {
   let alice;
   let bob;
-  const web3 = getWeb3(FullNodeEndpoint);
+  const web3 = getWeb3(FullNodeTCPEndpoint);
 
   beforeAll(async (done) => {
     const [a, b] = getTestEVMAccountsFromWeb3(web3);

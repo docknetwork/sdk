@@ -12,8 +12,8 @@ async function deploy(signer) {
   const supply = 100000;
   const contract = await factory.deploy(supply, {
     value: 0,
-    gasPrice: MinGasPrice,
-    gasLimit: MaxGas,
+    gasPrice: parseInt(MinGasPrice, 10),
+    gasLimit: parseInt(MaxGas, 10),
   });
 
   console.log(`Contract deployed at ${contract.address}`);
@@ -34,8 +34,7 @@ async function main() {
   const contractAddr = await deploy(alice);
 
   const contract = new ethers.Contract(contractAddr, ERC20_ABI, provider);
-
-  const receipt = await contract.connect(alice).transfer(bob.address, 5000, { gasLimit: GAS_LIMIT, gasPrice: GAS_PRICE, from: alice.address });
+  const receipt = await contract.connect(alice).transfer(bob.address, 5000, { gasLimit: parseInt(MaxGas, 10), gasPrice: parseInt(MinGasPrice, 10), from: alice.address });
   console.log(`Txn hash is ${receipt.hash}`);
 }
 

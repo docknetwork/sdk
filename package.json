@@ -29,7 +29,7 @@
     "eslint-plugin-jest": "^23.8.2",
     "eslint-plugin-sonarjs": "0.5.0",
     "eth-revert-reason": "^1.0.3",
-    "ethers": "^5.0.32",
+    "ethers": "^5.4",
     "ethr-did-resolver": "^2.2.0",
     "glob": "^7.1.6",
     "jest": "24.5.0",
@@ -39,7 +39,7 @@
     "rollup-plugin-terser": "^7.0.2",
     "typescript": "^4.2.3",
     "ipfs-http-client": "^49.0.4",
-    "web3": "^1.3.4"
+    "web3": "^1.7.0"
   },
   "scripts": {
     "exc": "npx babel-node",
@@ -65,11 +65,11 @@
     "testd": "jest --verbose ./tests/unit/issuing",
     "test": "jest --verbose ./tests/unit",
     "test-integration": "NODE_ENV=production jest --verbose --runInBand ./tests/integration",
-    "test-poa": "NODE_ENV=production jest --verbose --runInBand ./tests/poa",
+    "test-eth": "NODE_ENV=production jest --verbose --runInBand ./tests/integration/eth",
     "docs": "mkdir out && touch out/.nojekyll && jsdoc src -r -c .jsdoc -d out/reference",
     "dev-node": "./scripts/run_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
     "test-with-node": "./scripts/with_docker_test_node yarn test-integration",
-    "test-poa-with-node": "./scripts/with_docker_test_node yarn test-poa",
+    "test-eth-with-node": "./scripts/with_docker_test_node yarn test-eth",
     "examples-with-node": "./scripts/with_docker_test_node yarn test-examples",
     "mdbook": "mdbook build tutorials --dest-dir ../out/tutorials",
     "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"

@@ -5,7 +5,9 @@ import {
   DUMMY_AGGREGATOR_BYTECODE, DUMMY_AGGREGATOR_ABI, DUMMY_PROXY_BYTECODE, DUMMY_PROXY_ABI,
 } from '../../../scripts/eth/bytecodes-and-abis';
 
-import { FullNodeEndpoint, MinGasPrice, MaxGas } from '../../test-constants';
+import {
+  FullNodeEndpoint, TestAccountURI, MinGasPrice, MaxGas,
+} from '../../test-constants';
 import { defaultEVMAccountEndowment } from '../helpers';
 
 describe('Deploy a dummy aggregator and a proxy contract', () => {
@@ -15,7 +17,7 @@ describe('Deploy a dummy aggregator and a proxy contract', () => {
   beforeAll(async (done) => {
     const [a] = getTestEVMAccountsFromWeb3(web3);
     alice = a;
-    await endowEVMAddressWithDefault(alice.address, defaultEVMAccountEndowment());
+    await endowEVMAddressWithDefault(alice.address, defaultEVMAccountEndowment(), FullNodeEndpoint, TestAccountURI);
     done();
   }, 15000);
 

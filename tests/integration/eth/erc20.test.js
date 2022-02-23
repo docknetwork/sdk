@@ -6,7 +6,9 @@ import {
   getTestEVMAccountsFromWeb3, getTokenBalance, getWeb3, sendTokens,
 } from '../../../scripts/eth/helpers';
 
-import { FullNodeEndpoint, MinGasPrice, MaxGas } from '../../test-constants';
+import {
+  FullNodeEndpoint, TestAccountURI, MinGasPrice, MaxGas,
+} from '../../test-constants';
 import { defaultEVMAccountEndowment } from '../helpers';
 
 describe('Deploy an ERC-20 contract and transfer ERC-20 tokens', () => {
@@ -18,8 +20,8 @@ describe('Deploy an ERC-20 contract and transfer ERC-20 tokens', () => {
     const [a, b] = getTestEVMAccountsFromWeb3(web3);
     alice = a;
     bob = b;
-    await endowEVMAddressWithDefault(alice.address, defaultEVMAccountEndowment());
-    await endowEVMAddressWithDefault(bob.address, defaultEVMAccountEndowment());
+    await endowEVMAddressWithDefault(alice.address, defaultEVMAccountEndowment(), FullNodeEndpoint, TestAccountURI);
+    await endowEVMAddressWithDefault(bob.address, defaultEVMAccountEndowment(), FullNodeEndpoint, TestAccountURI);
     done();
   });
 

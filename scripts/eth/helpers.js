@@ -28,12 +28,12 @@ export function getTestEVMAccountsFromEthers(provider) {
 
 // Give `amount` of Dock tokens to EVM address. `amount` defaults to the number of tokens required to pay of maximum gas.
 // Uses the node endpoint and endowed account seed from environment variable.
-export async function endowEVMAddressWithDefault(evmAddr, amount) {
+export async function endowEVMAddressWithDefault(evmAddr, amount, nodeEndpoint, accountUri) {
   const dock = new DockAPI();
   await dock.init({
-    address: FullNodeEndpoint,
+    address: nodeEndpoint !== undefined ? nodeEndpoint : FullNodeEndpoint,
   });
-  const keypair = dock.keyring.addFromUri(EndowedSecretURI);
+  const keypair = dock.keyring.addFromUri(accountUri !== undefined ? accountUri : EndowedSecretURI);
   dock.setAccount(keypair);
 
   return endowEVMAddress(dock, evmAddr, amount);

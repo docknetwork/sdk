@@ -228,7 +228,7 @@ export async function issueCredential(keyDoc, credential, compactProof = true, d
   }
 
   // Clone the credential object to prevent mutation
-  const issuerId = keyDoc.controller || credential.issuer;
+  const issuerId = credential.issuer || keyDoc.controller;
   const cred = {
     ...credential,
     issuer: issuerObject ? {

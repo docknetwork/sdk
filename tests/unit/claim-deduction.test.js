@@ -1,6 +1,7 @@
 import { suites } from 'jsonld-signatures';
-import { Ed25519VerificationKey2018 } from '@digitalbazaar/ed25519-verification-key-2018'; // TODO: remove this package and gen keypair some other way
-import { Ed25519Signature2018 as DBEd25519Signature2018 } from '@digitalbazaar/ed25519-signature-2018'; // TODO: remove this package and gen keypair some other way
+import * as base58btc from 'base58-universal';
+import { hexToU8a } from '@polkadot/util';
+
 import jsonld from 'jsonld';
 import { randomAsHex } from '@polkadot/util-crypto';
 import {
@@ -24,6 +25,8 @@ import {
   documentLoader, addDocument, registered, modifyDocument,
 } from '../cached-document-loader.js';
 
+import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../../src/utils/misc';
+
 describe('Composite claim soundness checker', () => {
   test('control: issue and verify', async () => {
     const { did: issuer, suite: kp } = await newDid();
@@ -43,7 +46,8 @@ describe('Composite claim soundness checker', () => {
       },
     };
     const credential = await issueCredential(kp, cred, true, documentLoader);
-    expect(await verifyC(credential))
+    const vresult = await verifyC(credential);
+    expect(vresult)
       .toHaveProperty('verified', true);
     credential.issuanceDate = '9010-01-01T19:23:24Z';
     expect(await verifyC(credential))
@@ -430,11 +434,14 @@ async function checkSoundness(presentation, rules) {
 
 function registerDid(did, keyPair) {
   if (registered(did)) { throw `${did} already registered`; }
+
+  const publicKeyBase58 = base58btc.encode(hexToU8a(keyPair.publicKey.value));
   const pk = {
     id: `${did}#keys-1`,
     type: keyPair.type,
-    publicKeyBase58: keyPair.publicKeyBase58,
+    publicKeyBase58,
     controller: did,
+    publicKey: keyPair.publicKey.value,
   };
   const doc = {
     '@context': 'https://www.w3.org/ns/did/v1',
@@ -447,48 +454,46 @@ function registerDid(did, keyPair) {
   addDocument(pk.id, {
     '@context': 'https://www.w3.org/ns/did/v1',
     ...pk,
+    pkdoc: true,
   });
 }
 
 function randoDID() {
-  return `did:dock:${randomAsHex(32)}`;
+  return `did:dock:${randomAsHex(32).substr(2, 20)}`;
 }
 
 async function verifyC(credential) {
   return await verifyCredential(credential, {
-    suite: [
-      new Ed25519Signature2018(),
-      new EcdsaSepc256k1Signature2019(),
-      new Sr25519Signature2020(),
-    ],
     documentLoader,
   });
 }
 
 async function verifyP(presentation) {
   return await verifyPresentation(presentation, {
-    suite: [
-      new Ed25519Signature2018(),
-      new EcdsaSepc256k1Signature2019(),
-      new Sr25519Signature2020(),
-    ],
     documentLoader,
     unsignedPresentation: true,
   });
 }
 
-async function newDid() {
-  const did = randoDID();
-  const keypair = await Ed25519VerificationKey2018.generate();
-  registerDid(did, keypair);
-  keypair.id = `${did}#keys-1`;
-  keypair.controller = did;
+function getSampleKey(randomDID, keypair) {
   return {
-    did,
-    suite: new DBEd25519Signature2018({
-      verificationMethod: keypair.id,
-      key: keypair,
-    }),
+    id: `${randomDID}#keys-1`,
+    controller: randomDID,
+    type: 'EcdsaSecp256k1VerificationKey2019',
+    keypair,
+    thisisstring: 'yes',
+    publicKey: getPublicKeyFromKeyringPair(keypair),
+  };
+}
+
+async function newDid() {
+  const kp = generateEcdsaSecp256k1Keypair(randomAsHex(32));
+  const randomDID = randoDID();
+  const keypair = getSampleKey(randomDID, kp);
+  registerDid(randomDID, keypair);
+  return {
+    did: randomDID,
+    suite: keypair,
   };
 }
 

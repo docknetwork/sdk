@@ -3,7 +3,7 @@ import { crawl, graphResolver } from '../../src/crawl.js';
 import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from '../../src/rdf-defs.js';
 import { documentLoader, addDocument } from '../cached-document-loader.js';
 
-const ipfsDefaultConfig = 'http://localhost:5001';
+const ipfsDefaultConfig = 'http://127.0.0.1:5001';
 
 const ATTESTS = 'https://rdf.dock.io/alpha/2021#attestsDocumentContents';
 
@@ -200,7 +200,7 @@ describe('Crawler', () => {
         ],
       ],
     );
-  }, 1000);
+  });
 
   test('graphResolver', async () => {
     const resolveGraph = graphResolver(ipfsClient, documentLoader);
@@ -209,7 +209,7 @@ describe('Crawler', () => {
       [
         { Iri: 'did:root' },
         { Iri: 'https://rdf.dock.io/alpha/2021#attestsDocumentContents' },
-        { Iri: 'ipfs://bafybeifrrafsw7gs7mwlzooxejrv6hljun46c7j4zfyc4mep3vn73zbkxa' },
+        { Iri: 'ipfs://zdj7WhNuZPY5dapbDmkHcLQHBJAuK6jA9jiiev1xB6CW7kMwu' },
         { Iri: 'did:root' },
       ],
     ]);

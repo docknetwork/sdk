@@ -1,9 +1,8 @@
-import {
-  getStateChange,
-} from '../utils/misc';
+import { BTreeSet } from "@polkadot/types";
+import { getStateChange } from "../utils/misc";
 
-import DidKeys from '../utils/revocation/did-keys'; // eslint-disable-line
-import Policy from '../utils/revocation/policy'; // eslint-disable-line
+import DidKeys from "../utils/revocation/did-keys"; // eslint-disable-line
+import Policy from "../utils/revocation/policy"; // eslint-disable-line
 
 /** Class to create, update and destroy revocations */
 class RevocationModule {
@@ -26,10 +25,13 @@ class RevocationModule {
    * @return {Promise<object>} The extrinsic to sign and send.
    */
   createNewRegistryTx(id, policy, addOnly) {
-    return this.module.newRegistry(id, {
-      policy: policy.toJSON(),
-      add_only: addOnly,
-    });
+    return this.module.newRegistry(
+      id,
+      this.api.registry.createType("Registry", {
+        policy: policy.toJSON(),
+        add_only: addOnly,
+      })
+    );
   }
 
   /**
@@ -39,8 +41,18 @@ class RevocationModule {
    * @param {Boolean} addOnly - true: credentials can be revoked, but not un-revoked, false: credentials can be revoked and un-revoked
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async newRegistry(id, policy, addOnly, waitForFinalization = true, params = {}) {
-    return this.signAndSend(this.createNewRegistryTx(id, policy, addOnly), waitForFinalization, params);
+  async newRegistry(
+    id,
+    policy,
+    addOnly,
+    waitForFinalization = true,
+    params = {}
+  ) {
+    return this.signAndSend(
+      this.createNewRegistryTx(id, policy, addOnly),
+      waitForFinalization,
+      params
+    );
   }
 
   /**
@@ -68,8 +80,18 @@ class RevocationModule {
    * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async removeRegistry(registryID, lastModified, didKeys, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createRemoveRegistryTx(registryID, lastModified, didKeys), waitForFinalization, params);
+  async removeRegistry(
+    registryID,
+    lastModified,
+    didKeys,
+    waitForFinalization = true,
+    params = {}
+  ) {
+    return await this.signAndSend(
+      this.createRemoveRegistryTx(registryID, lastModified, didKeys),
+      waitForFinalization,
+      params
+    );
   }
 
   /**
@@ -89,7 +111,10 @@ class RevocationModule {
 
     const serializedRevoke = this.getSerializedRevoke(revoke);
     const signedProof = didKeys.getSignatures(serializedRevoke);
-    return this.module.revoke(revoke, signedProof);
+    return this.module.revoke(
+      this.api.registry.createType("Revoke", revoke),
+      signedProof
+    );
   }
 
   /**
@@ -100,8 +125,19 @@ class RevocationModule {
    * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async revoke(registryID, revokeIds, lastModified, didKeys, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createRevokeTx(registryID, revokeIds, lastModified, didKeys), waitForFinalization, params);
+  async revoke(
+    registryID,
+    revokeIds,
+    lastModified,
+    didKeys,
+    waitForFinalization = true,
+    params = {}
+  ) {
+    return await this.signAndSend(
+      this.createRevokeTx(registryID, revokeIds, lastModified, didKeys),
+      waitForFinalization,
+      params
+    );
   }
 
   /**
@@ -121,7 +157,10 @@ class RevocationModule {
 
     const serializedUnrevoke = this.getSerializedUnrevoke(unrevoke);
     const signedProof = didKeys.getSignatures(serializedUnrevoke);
-    return this.module.unrevoke(unrevoke, signedProof);
+    return this.module.unrevoke(
+      this.api.registry.createType("UnRevoke", unrevoke),
+      signedProof
+    );
   }
 
   /**
@@ -132,8 +171,19 @@ class RevocationModule {
    * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async unrevoke(registryID, revokeIds, lastModified, didKeys, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createUnrevokeTx(registryID, revokeIds, lastModified, didKeys), waitForFinalization, params);
+  async unrevoke(
+    registryID,
+    revokeIds,
+    lastModified,
+    didKeys,
+    waitForFinalization = true,
+    params = {}
+  ) {
+    return await this.signAndSend(
+      this.createUnrevokeTx(registryID, revokeIds, lastModified, didKeys),
+      waitForFinalization,
+      params
+    );
   }
 
   /**
@@ -161,10 +211,7 @@ class RevocationModule {
 
     const respTuple = resp.unwrap();
     if (respTuple.length === 2) {
-      return [
-        respTuple[0],
-        respTuple[1].toNumber(),
-      ];
+      return [respTuple[0], respTuple[1].toNumber()];
     }
     throw new Error(`Needed 2 items in response but got${respTuple.length}`);
   }
@@ -200,11 +247,28 @@ class RevocationModule {
    * @param {string} revId - The revocation id being revoked or unrevoked
    * @returns {Promise<void>}
    */
-  async updateRevReg(updateFunc, didKeys, registryId, revId, waitForFinalization = true, params = {}) {
-    const lastModified = await this.getBlockNoForLastChangeToRegistry(registryId);
-    const revokeIds = new Set();
-    revokeIds.add(revId);
-    return updateFunc.bind(this)(registryId, revokeIds, lastModified, didKeys, waitForFinalization, params);
+  async updateRevReg(
+    updateFunc,
+    didKeys,
+    registryId,
+    revId,
+    waitForFinalization = true,
+    params = {}
+  ) {
+    const lastModified = await this.getBlockNoForLastChangeToRegistry(
+      registryId
+    );
+    const revokeIds = new BTreeSet();
+    revokeIds.add(this.api.registry.createType("Did", revId));
+
+    return updateFunc.bind(this)(
+      this.api.registry.createType("RegistryId", registryId),
+      revokeIds,
+      this.api.registry.createType("BlockNumber", lastModified),
+      didKeys,
+      waitForFinalization,
+      params
+    );
   }
 
   /**
@@ -215,8 +279,21 @@ class RevocationModule {
    * @param revId - The revocation id that is being revoked
    * @returns {Promise<void>}
    */
-  async revokeCredential(didKeys, registryId, revId, waitForFinalization = true, params = {}) {
-    return this.updateRevReg(this.revoke, didKeys, registryId, revId, waitForFinalization, params);
+  async revokeCredential(
+    didKeys,
+    registryId,
+    revId,
+    waitForFinalization = true,
+    params = {}
+  ) {
+    return this.updateRevReg(
+      this.revoke,
+      didKeys,
+      registryId,
+      revId,
+      waitForFinalization,
+      params
+    );
   }
 
   /**
@@ -227,8 +304,21 @@ class RevocationModule {
    * @param revId - The revocation id that is being unrevoked
    * @returns {Promise<void>}
    */
-  async unrevokeCredential(didKeys, registryId, revId, waitForFinalization = true, params = {}) {
-    return this.updateRevReg(this.unrevoke, didKeys, registryId, revId, waitForFinalization, params);
+  async unrevokeCredential(
+    didKeys,
+    registryId,
+    revId,
+    waitForFinalization = true,
+    params = {}
+  ) {
+    return this.updateRevReg(
+      this.unrevoke,
+      didKeys,
+      registryId,
+      revId,
+      waitForFinalization,
+      params
+    );
   }
 
   /**
@@ -237,7 +327,7 @@ class RevocationModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedRevoke(revoke) {
-    return getStateChange(this.api, 'Revoke', revoke);
+    return getStateChange(this.api, "Revoke", revoke);
   }
 
   /**
@@ -246,7 +336,7 @@ class RevocationModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedUnrevoke(unrevoke) {
-    return getStateChange(this.api, 'Unrevoke', unrevoke);
+    return getStateChange(this.api, "Unrevoke", unrevoke);
   }
 
   /**
@@ -255,7 +345,7 @@ class RevocationModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedRemoveRegistry(removeReg) {
-    return getStateChange(this.api, 'RemoveRegistry', removeReg);
+    return getStateChange(this.api, "RemoveRegistry", removeReg);
   }
 }
 

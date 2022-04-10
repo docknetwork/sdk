@@ -1,4 +1,4 @@
-import { BTreeSet } from '@polkadot/types';
+import { BTreeSet, VecFixed } from '@polkadot/types';
 
 import { getHexIdentifierFromDID } from '../did';
 import Policy from './policy';
@@ -10,8 +10,9 @@ export default class OneOfPolicy extends Policy {
    * @param {any} [controllers] - Controller set
    * @constructor
    */
-  constructor(controllers = null) {
+  constructor(registry, controllers = null) {
     super();
+    this.registry = registry;
     this.controllers = controllers || new Set();
   }
 
@@ -29,7 +30,7 @@ export default class OneOfPolicy extends Policy {
    */
   toJSON() {
     // Convert each owner DID to hex identifier if not already
-    const controllerIds = [...this.controllers].map(getHexIdentifierFromDID);
+    const controllerIds = [...this.controllers];
 
     // Sort the controller ids as the node is expecting sorted ids and keeping ids unsorted is giving a signature
     // verification error. This is a workaround and is needed for now. It maybe fixed later

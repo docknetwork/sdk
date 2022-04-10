@@ -59,12 +59,12 @@ describe('Prefilled positive accumulator', () => {
     const label = stringToHex('accumulator-params-label');
     const params = Accumulator.generateParams(hexToU8a(label));
     const bytes1 = u8aToHex(params);
-    const params1 = chainModuleClass.prepareAddParameters(bytes1, undefined, label);
+    const params1 = chainModule.prepareAddParameters(bytes1, undefined, label);
     await chainModule.createNewParams(params1, getHexIdentifierFromDID(did), pair, undefined, false);
 
     keypair = Accumulator.generateKeypair(params, seedAccum);
     const bytes2 = u8aToHex(keypair.public_key);
-    const pk1 = chainModuleClass.prepareAddPublicKey(bytes2, undefined, [did, 1]);
+    const pk1 = chainModule.prepareAddPublicKey(bytes2, undefined, [did, 1]);
     await chainModule.createNewPublicKey(pk1, getHexIdentifierFromDID(did), pair, undefined, false);
 
     accumulator = PositiveAccumulator.initialize(params, keypair.secret_key);
@@ -89,21 +89,21 @@ describe('Prefilled positive accumulator', () => {
     // Witness created for member 1
     const member1 = members[10];
     const witness1 = await accumulator.membershipWitness(member1, keypair.secret_key, accumState);
-    expect(verifAccumulator.verifyMembershipWitness(member1, witness1, hexToU8a(queriedAccum.public_key.bytes), hexToU8a(queriedAccum.public_key.params.bytes))).toEqual(true);
+    expect(verifAccumulator.verifyMembershipWitness(member1, witness1, hexToU8a(queriedAccum.publicKey.bytes), hexToU8a(queriedAccum.publicKey.params.bytes))).toEqual(true);
 
     // Witness created for member 2
     const member2 = members[25];
     const witness2 = await accumulator.membershipWitness(member2, keypair.secret_key, accumState);
-    expect(verifAccumulator.verifyMembershipWitness(member2, witness2, hexToU8a(queriedAccum.public_key.bytes), hexToU8a(queriedAccum.public_key.params.bytes))).toEqual(true);
+    expect(verifAccumulator.verifyMembershipWitness(member2, witness2, hexToU8a(queriedAccum.publicKey.bytes), hexToU8a(queriedAccum.publicKey.params.bytes))).toEqual(true);
 
     // Witness created for member 3
     const member3 = members[79];
     const witness3 = await accumulator.membershipWitness(member3, keypair.secret_key, accumState);
-    expect(verifAccumulator.verifyMembershipWitness(member3, witness3, hexToU8a(queriedAccum.public_key.bytes), hexToU8a(queriedAccum.public_key.params.bytes))).toEqual(true);
+    expect(verifAccumulator.verifyMembershipWitness(member3, witness3, hexToU8a(queriedAccum.publicKey.bytes), hexToU8a(queriedAccum.publicKey.params.bytes))).toEqual(true);
 
     // Previous users' witness still works
-    expect(verifAccumulator.verifyMembershipWitness(member1, witness1, hexToU8a(queriedAccum.public_key.bytes), hexToU8a(queriedAccum.public_key.params.bytes))).toEqual(true);
-    expect(verifAccumulator.verifyMembershipWitness(member2, witness2, hexToU8a(queriedAccum.public_key.bytes), hexToU8a(queriedAccum.public_key.params.bytes))).toEqual(true);
+    expect(verifAccumulator.verifyMembershipWitness(member1, witness1, hexToU8a(queriedAccum.publicKey.bytes), hexToU8a(queriedAccum.publicKey.params.bytes))).toEqual(true);
+    expect(verifAccumulator.verifyMembershipWitness(member2, witness2, hexToU8a(queriedAccum.publicKey.bytes), hexToU8a(queriedAccum.publicKey.params.bytes))).toEqual(true);
 
     // Manager decides to remove a member, the new accumulated value will be published along with witness update info
     const witnessUpdInfo = WitnessUpdatePublicInfo.new(accumulator.accumulated, [], [member2], keypair.secret_key);
@@ -122,7 +122,7 @@ describe('Prefilled positive accumulator', () => {
     // Witness created for member 3
     const member4 = members[52];
     const witness4 = await accumulator.membershipWitness(member4, keypair.secret_key, accumState);
-    expect(verifAccumulator.verifyMembershipWitness(member4, witness4, hexToU8a(queriedAccum.public_key.bytes), hexToU8a(queriedAccum.public_key.params.bytes))).toEqual(true);
+    expect(verifAccumulator.verifyMembershipWitness(member4, witness4, hexToU8a(queriedAccum.publicKey.bytes), hexToU8a(queriedAccum.publicKey.params.bytes))).toEqual(true);
 
     // Older witnesses need to be updated
     accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
@@ -142,10 +142,10 @@ describe('Prefilled positive accumulator', () => {
     const queriedWitnessInfo = new WitnessUpdatePublicInfo(hexToU8a(updates[0].witness_update_info));
 
     witness1.updateUsingPublicInfoPostBatchUpdate(member1, additions, removals, queriedWitnessInfo);
-    expect(verifAccumulator.verifyMembershipWitness(member1, witness1, hexToU8a(queriedAccum.public_key.bytes), hexToU8a(queriedAccum.public_key.params.bytes))).toEqual(true);
+    expect(verifAccumulator.verifyMembershipWitness(member1, witness1, hexToU8a(queriedAccum.publicKey.bytes), hexToU8a(queriedAccum.publicKey.params.bytes))).toEqual(true);
 
     witness3.updateUsingPublicInfoPostBatchUpdate(member3, additions, removals, queriedWitnessInfo);
-    expect(verifAccumulator.verifyMembershipWitness(member3, witness3, hexToU8a(queriedAccum.public_key.bytes), hexToU8a(queriedAccum.public_key.params.bytes))).toEqual(true);
+    expect(verifAccumulator.verifyMembershipWitness(member3, witness3, hexToU8a(queriedAccum.publicKey.bytes), hexToU8a(queriedAccum.publicKey.params.bytes))).toEqual(true);
   });
 
   afterAll(async () => {

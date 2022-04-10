@@ -44,7 +44,7 @@ describe('BBS+ Module', () => {
     let label = stringToHex('test-params-label');
     let params = SignatureParamsG1.generate(10, hexToU8a(label));
     const bytes1 = u8aToHex(params.toBytes());
-    const params1 = chainModuleClass.prepareAddParameters(bytes1, undefined, label);
+    const params1 = chainModule.prepareAddParameters(bytes1, undefined, label);
     await chainModule.createNewParams(params1, getHexIdentifierFromDID(did1), pair1, undefined, false);
     const paramsWritten1 = await chainModule.getLastParamsWritten(did1);
     expect(paramsWritten1.bytes).toEqual(params1.bytes);
@@ -55,7 +55,7 @@ describe('BBS+ Module', () => {
 
     params = SignatureParamsG1.generate(20);
     const bytes2 = u8aToHex(params.toBytes());
-    const params2 = chainModuleClass.prepareAddParameters(bytes2);
+    const params2 = chainModule.prepareAddParameters(bytes2);
     await chainModule.createNewParams(params2, getHexIdentifierFromDID(did2), pair2, undefined, false);
     const paramsWritten2 = await chainModule.getLastParamsWritten(did2);
     expect(paramsWritten2.bytes).toEqual(params2.bytes);
@@ -67,7 +67,7 @@ describe('BBS+ Module', () => {
     label = stringToHex('test-params-label-2');
     params = SignatureParamsG1.generate(23, hexToU8a(label));
     const bytes3 = u8aToHex(params.toBytes());
-    const params3 = chainModuleClass.prepareAddParameters(bytes3, undefined, label);
+    const params3 = chainModule.prepareAddParameters(bytes3, undefined, label);
     await chainModule.createNewParams(params3, getHexIdentifierFromDID(did1), pair1, undefined, false);
     const paramsWritten3 = await chainModule.getLastParamsWritten(did1);
     expect(paramsWritten3.bytes).toEqual(params3.bytes);
@@ -87,8 +87,8 @@ describe('BBS+ Module', () => {
   test('Can create public keys', async () => {
     const params = SignatureParamsG1.generate(5);
     let keypair = KeypairG2.generate(params);
-    const bytes1 = u8aToHex(keypair.publicKey);
-    const pk1 = chainModuleClass.prepareAddPublicKey(bytes1);
+    const bytes1 = u8aToHex(keypair.public_key);
+    const pk1 = chainModule.prepareAddPublicKey(bytes1);
     await chainModule.createNewPublicKey(pk1, getHexIdentifierFromDID(did1), pair1, undefined, false);
     const pkWritten1 = await chainModule.getLastPublicKeyWritten(did1);
     expect(pkWritten1.bytes).toEqual(pk1.bytes);
@@ -101,8 +101,8 @@ describe('BBS+ Module', () => {
     const params1Val = SignatureParamsG1.valueFromBytes(hexToU8a(queriedParams1.bytes));
     const params1 = new SignatureParamsG1(params1Val, hexToU8a(queriedParams1.label));
     keypair = KeypairG2.generate(params1);
-    const bytes2 = u8aToHex(keypair.publicKey);
-    const pk2 = chainModuleClass.prepareAddPublicKey(bytes2, undefined, [did1, 1]);
+    const bytes2 = u8aToHex(keypair.public_key);
+    const pk2 = chainModule.prepareAddPublicKey(bytes2, undefined, [did1, 1]);
     await chainModule.createNewPublicKey(pk2, getHexIdentifierFromDID(did2), pair2, undefined, false);
     const pkWritten2 = await chainModule.getLastPublicKeyWritten(did2);
     expect(pkWritten2.bytes).toEqual(pk2.bytes);
@@ -118,8 +118,8 @@ describe('BBS+ Module', () => {
     const params2Val = SignatureParamsG1.valueFromBytes(hexToU8a(queriedParams2.bytes));
     const params2 = new SignatureParamsG1(params2Val, hexToU8a(queriedParams2.label));
     keypair = KeypairG2.generate(params2);
-    const bytes3 = u8aToHex(keypair.publicKey);
-    const pk3 = chainModuleClass.prepareAddPublicKey(bytes3, undefined, [did1, 2]);
+    const bytes3 = u8aToHex(keypair.public_key);
+    const pk3 = chainModule.prepareAddPublicKey(bytes3, undefined, [did1, 2]);
     await chainModule.createNewPublicKey(pk3, getHexIdentifierFromDID(did2), pair2, undefined, false);
     const pkWritten3 = await chainModule.getLastPublicKeyWritten(did2);
     expect(pkWritten3.bytes).toEqual(pk3.bytes);

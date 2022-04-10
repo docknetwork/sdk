@@ -1,51 +1,52 @@
 /* eslint-disable camelcase */
 
-import { isHex, u8aToHex } from '@polkadot/util';
-import { getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
-import WithParamsAndPublicKeys from './WithParamsAndPublicKeys';
-import { getAllExtrinsicsFromBlock } from '../utils/chain-ops';
+import { isHex, u8aToHex } from "@polkadot/util";
+import { getSignatureFromKeyringPair, getStateChange } from "../utils/misc";
+import WithParamsAndPublicKeys from "./WithParamsAndPublicKeys";
+import { getAllExtrinsicsFromBlock } from "../utils/chain-ops";
+import { Vec } from "@polkadot/types";
 
 /** Class to manage accumulators on chain */
 export default class AccumulatorModule extends WithParamsAndPublicKeys {
   constructor(api, signAndSend) {
     super();
     this.api = api;
-    this.moduleName = 'accumulator';
+    this.moduleName = "accumulator";
     this.module = api.tx[this.moduleName];
     this.signAndSend = signAndSend;
   }
 
-  static prepareAddPositiveAccumulator(id, accumulated, publicKeyRef) {
-    const [hexDid, counter] = this.parseRef(publicKeyRef);
+  prepareAddPositiveAccumulator(id, accumulated, publicKeyRef) {
+    const vals = this.parseRef(publicKeyRef);
     return {
-      id,
-      accumulator: {
+      id: this.api.registry.createType("AccumulatorId", id),
+      accumulator: this.api.registry.createType("Accumulator", {
         Positive: {
           accumulated,
-          key_ref: [hexDid, counter],
+          key_ref: vals,
         },
-      },
+      }),
     };
   }
 
-  static prepareAddUniversalAccumulator(id, accumulated, publicKeyRef, maxSize) {
-    const [hexDid, counter] = this.parseRef(publicKeyRef);
+  prepareAddUniversalAccumulator(id, accumulated, publicKeyRef, maxSize) {
+    const vals = this.parseRef(publicKeyRef);
     return {
-      id,
-      accumulator: {
+      id: this.api.registry.createType("AccumulatorId", id),
+      accumulator: this.api.registry.createType("Accumulator", {
         Universal: {
-          common: {
+          common: this.api.registry.createType("AccumulatorCommon", {
             accumulated,
-            key_ref: [hexDid, counter],
-          },
-          max_size: maxSize,
+            key_ref: vals,
+          }),
+          maxSize: maxSize,
         },
-      },
+      }),
     };
   }
 
   static ensureArrayOfBytearrays(arr) {
-    if (!(typeof arr === 'object' && arr instanceof Array)) {
+    if (!(typeof arr === "object" && arr instanceof Array)) {
       throw new Error(`Require an array but got ${arr}`);
     }
     for (let i = 0; i < arr.length; i++) {
@@ -63,43 +64,78 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {null|string[]} - null if the event is not `accumulator:AccumulatorUpdated` else [accumulatorId, accumulated]
    */
   static parseEventAsAccumulatorUpdate(event) {
-    if (event.section === 'accumulator' && event.method === 'AccumulatorUpdated') {
+    if (
+      event.section === "accumulator" &&
+      event.method === "AccumulatorUpdated"
+    ) {
       return [u8aToHex(event.data[0]), u8aToHex(event.data[1])];
     }
     return null;
   }
 
-  createNewPositiveAccumulatorTx(id, accumulated, publicKeyRef, keyPair = undefined, signature = undefined) {
-    const accum = AccumulatorModule.prepareAddPositiveAccumulator(id, accumulated, publicKeyRef);
+  createNewPositiveAccumulatorTx(
+    id,
+    accumulated,
+    publicKeyRef,
+    keyPair = undefined,
+    signature = undefined
+  ) {
+    const accum = this.prepareAddPositiveAccumulator(
+      id,
+      accumulated,
+      publicKeyRef
+    );
     if (!signature) {
       if (!keyPair) {
-        throw Error('You need to provide either a keypair or a signature to register new accumulator.');
+        throw Error(
+          "You need to provide either a keypair or a signature to register new accumulator."
+        );
       }
       // eslint-disable-next-line no-param-reassign
       signature = this.signAddAccumulator(keyPair, accum);
     }
-    return this.module.addAccumulator(accum, signature.toJSON());
+    return this.module.addAccumulator(
+      this.api.registry.createType("AddAccumulator", accum),
+      this.api.registry.createType("DidSignature", signature.toJSON())
+    );
   }
 
-  createNewUniversalAccumulatorTx(id, accumulated, publicKeyRef, maxSize, keyPair = undefined, signature = undefined) {
-    const accum = AccumulatorModule.prepareAddUniversalAccumulator(id, accumulated, publicKeyRef, maxSize);
+  createNewUniversalAccumulatorTx(
+    id,
+    accumulated,
+    publicKeyRef,
+    maxSize,
+    keyPair = undefined,
+    signature = undefined
+  ) {
+    const accum = this.prepareAddUniversalAccumulator(
+      id,
+      accumulated,
+      publicKeyRef,
+      maxSize
+    );
     if (!signature) {
       if (!keyPair) {
-        throw Error('You need to provide either a keypair or a signature to register new accumulator.');
+        throw Error(
+          "You need to provide either a keypair or a signature to register new accumulator."
+        );
       }
       // eslint-disable-next-line no-param-reassign
       signature = this.signAddAccumulator(keyPair, accum);
     }
-    return this.module.addAccumulator(accum, signature.toJSON());
+    return this.module.addAccumulator(
+      this.api.registry.createType("AddAccumulator", accum),
+      this.api.registry.createType("DidSignature", signature.toJSON())
+    );
   }
 
   /**
    *
    * @param id
-   * @param newAccumulated
+   * @param new_accumulated
    * @param additions
    * @param removals
-   * @param witnessUpdateInfo
+   * @param witness_update_info
    * @param created - block no. when accumulator was created
    * @param nonce - next valid nonce, i.e. the nonce on chain + 1
    * @param keyPair
@@ -107,9 +143,17 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise<object>}
    */
   updateAccumulatorTx(
-    id, newAccumulated,
-    { additions = undefined, removals = undefined, witnessUpdateInfo = undefined },
-    created, nonce, keyPair = undefined, signature = undefined,
+    id,
+    newAccumulated,
+    {
+      additions = undefined,
+      removals = undefined,
+      witnessUpdateInfo = undefined,
+    },
+    created,
+    nonce,
+    keyPair = undefined,
+    signature = undefined
   ) {
     if (additions !== undefined) {
       AccumulatorModule.ensureArrayOfBytearrays(additions);
@@ -125,18 +169,26 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
       new_accumulated: newAccumulated,
       additions,
       removals,
-      witness_update_info: witnessUpdateInfo,
+      witness_update_info: this.api.createType(
+        "Option<Vec<u8>>",
+        witnessUpdateInfo
+      ),
       created_at: created,
       nonce,
     };
     if (!signature) {
       if (!keyPair) {
-        throw Error('You need to provide either a keypair or a signature to update the accumulator.');
+        throw Error(
+          "You need to provide either a keypair or a signature to update the accumulator."
+        );
       }
       // eslint-disable-next-line no-param-reassign
       signature = this.signUpdateAccumulator(keyPair, update);
     }
-    return this.module.updateAccumulator(update, signature.toJSON());
+    return this.module.updateAccumulator(
+      this.api.registry.createType("AccumulatorUpdate", update),
+      this.api.registry.createType("DidSignature", signature.toJSON())
+    );
   }
 
   /**
@@ -149,19 +201,24 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise<object>}
    */
   removeAccumulatorTx(id, created, nonce, keyPair, signature) {
-    const removal = {
+    const removal = this.api.registry.createType("RemoveAccumulator", {
       id,
       created_at: created,
       nonce,
-    };
+    });
     if (!signature) {
       if (!keyPair) {
-        throw Error('You need to provide either a keypair or a signature to remove the accumulator.');
+        throw Error(
+          "You need to provide either a keypair or a signature to remove the accumulator."
+        );
       }
       // eslint-disable-next-line no-param-reassign
       signature = this.signRemoveAccumulator(keyPair, removal);
     }
-    return this.module.removeAccumulator(removal, signature.toJSON());
+    return this.module.removeAccumulator(
+      removal,
+      this.api.registry.createType("DidSignature", signature.toJSON())
+    );
   }
 
   /**
@@ -175,8 +232,22 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @param params
    * @returns {Promise<object>}
    */
-  async createNewPositiveAccumulator(id, accumulated, publicKeyRef, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
-    const tx = this.createNewPositiveAccumulatorTx(id, accumulated, publicKeyRef, keyPair, signature);
+  async createNewPositiveAccumulator(
+    id,
+    accumulated,
+    publicKeyRef,
+    keyPair = undefined,
+    signature = undefined,
+    waitForFinalization = true,
+    params = {}
+  ) {
+    const tx = this.createNewPositiveAccumulatorTx(
+      id,
+      accumulated,
+      publicKeyRef,
+      keyPair,
+      signature
+    );
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
@@ -192,18 +263,34 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @param params
    * @returns {Promise<object>}
    */
-  async createNewUniversalAccumulator(id, accumulated, publicKeyRef, maxSize, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
-    const tx = this.createNewUniversalAccumulatorTx(id, accumulated, publicKeyRef, maxSize, keyPair, signature);
+  async createNewUniversalAccumulator(
+    id,
+    accumulated,
+    publicKeyRef,
+    maxSize,
+    keyPair = undefined,
+    signature = undefined,
+    waitForFinalization = true,
+    params = {}
+  ) {
+    const tx = this.createNewUniversalAccumulatorTx(
+      id,
+      accumulated,
+      publicKeyRef,
+      maxSize,
+      keyPair,
+      signature
+    );
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
   /**
    * Update existing accumulator
    * @param id
-   * @param newAccumulated
+   * @param new_accumulated
    * @param additions
    * @param removals
-   * @param witnessUpdateInfo
+   * @param witness_update_info
    * @param created - block no. when accumulator was created
    * @param nonce - next valid nonce, i.e the nonce on chain + 1
    * @param keyPair
@@ -213,11 +300,29 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise< object>}
    */
   async updateAccumulator(
-    id, newAccumulated,
-    { additions = undefined, removals = undefined, witnessUpdateInfo = undefined },
-    created, nonce, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {},
+    id,
+    new_accumulated,
+    {
+      additions = undefined,
+      removals = undefined,
+      witnessUpdateInfo = undefined,
+    },
+    created,
+    nonce,
+    keyPair = undefined,
+    signature = undefined,
+    waitForFinalization = true,
+    params = {}
   ) {
-    const tx = this.updateAccumulatorTx(id, newAccumulated, { additions, removals, witnessUpdateInfo }, created, nonce, keyPair, signature);
+    const tx = this.updateAccumulatorTx(
+      id,
+      new_accumulated,
+      { additions, removals, witnessUpdateInfo },
+      created,
+      nonce,
+      keyPair,
+      signature
+    );
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
@@ -232,7 +337,15 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @param params
    * @returns {Promise<*>}
    */
-  async removeAccumulator(id, created, nonce, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
+  async removeAccumulator(
+    id,
+    created,
+    nonce,
+    keyPair = undefined,
+    signature = undefined,
+    waitForFinalization = true,
+    params = {}
+  ) {
     const tx = this.removeAccumulatorTx(id, created, nonce, keyPair, signature);
     return this.signAndSend(tx, waitForFinalization, params);
   }
@@ -247,27 +360,40 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise<{created: *, lastModified: *}|null>}
    */
   async getAccumulator(id, withKeyAndParams = false) {
-    const resp = await this.api.query[this.moduleName].accumulators(id);
+    const resp = await this.api.query[this.moduleName].accumulators(
+      this.api.createType("AccumulatorId", id)
+    );
     if (resp.isSome) {
       const [created, lastModified, nonce, accumulator] = resp.unwrap();
       const accumulatorObj = {
-        created: created.toNumber(), lastModified: lastModified.toNumber(), nonce: nonce.toNumber(),
+        created: created.toNumber(),
+        lastModified: lastModified.toNumber(),
+        nonce: nonce.toNumber(),
       };
       let common;
       if (accumulator.isPositive) {
-        accumulatorObj.type = 'positive';
+        accumulatorObj.type = "positive";
         common = accumulator.asPositive;
       } else {
-        accumulatorObj.type = 'universal';
+        accumulatorObj.type = "universal";
         common = accumulator.asUniversal.common;
-        accumulatorObj.max_size = accumulator.asUniversal.max_size.toNumber();
+        accumulatorObj.maxSize = accumulator.asUniversal.maxSize.toNumber();
       }
       accumulatorObj.accumulated = u8aToHex(common.accumulated);
-      accumulatorObj.key_ref = [u8aToHex(common.key_ref[0]), common.key_ref[1].toNumber()];
+      accumulatorObj.key_ref = [
+        u8aToHex(common.keyRef[0]),
+        common.keyRef[1].toNumber(),
+      ];
+      accumulatorObj.keyRef = accumulatorObj.key_ref;
 
       if (withKeyAndParams) {
-        const pk = await this.getPublicKeyByHexDid(accumulatorObj.key_ref[0], accumulatorObj.key_ref[1], true);
+        const pk = await this.getPublicKeyByHexDid(
+          accumulatorObj.key_ref[0],
+          accumulatorObj.key_ref[1],
+          true
+        );
         if (pk !== null) {
+          accumulatorObj.publicKey = pk;
           accumulatorObj.public_key = pk;
         }
       }
@@ -285,19 +411,39 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * not provided in the extrinsic.
    */
   async getUpdatesFromBlock(accumulatorId, blockNoOrBlockHash) {
-    const extrinsics = await getAllExtrinsicsFromBlock(this.api, blockNoOrBlockHash, false);
+    const extrinsics = await getAllExtrinsicsFromBlock(
+      this.api,
+      blockNoOrBlockHash,
+      false
+    );
     const updates = [];
     extrinsics.forEach((ext) => {
-      if (ext.method && (ext.method.section === 'accumulator') && (ext.method.method === 'updateAccumulator')) {
-        const update = this.api.createType('AccumulatorUpdate', ext.method.args[0]);
+      if (
+        ext.method &&
+        ext.method.section === "accumulator" &&
+        ext.method.method === "updateAccumulator"
+      ) {
+        const update = //this.api.createType(
+          //"AccumulatorUpdate",
+          ext.method.args[0];
+        //);
+        //console.log(ext.method.args, ext.method);
+
         if (u8aToHex(update.id) === accumulatorId) {
           // The following commented line produces truncated hex strings. Don't know why
           // const additions = update.additions.isSome ? update.additions.unwrap().map(u8aToHex) : null;
-          const additions = update.additions.isSome ? update.additions.unwrap().map((i) => u8aToHex(i)) : null;
-          const removals = update.removals.isSome ? update.removals.unwrap().map((i) => u8aToHex(i)) : null;
-          const witness_update_info = update.witness_update_info.isSome ? u8aToHex(update.witness_update_info.unwrap()) : null;
+          const additions = update.additions.isSome
+            ? update.additions.unwrap().map((i) => u8aToHex(i))
+            : null;
+          const removals = update.removals.isSome
+            ? update.removals.unwrap().map((i) => u8aToHex(i))
+            : null;
+          let witness_update_info = update.witnessUpdateInfo.isSome
+            ? u8aToHex(update.witnessUpdateInfo.unwrap())
+            : null;
+
           updates.push({
-            new_accumulated: u8aToHex(update.new_accumulated),
+            new_accumulated: u8aToHex(update.newAccumulated),
             additions,
             removals,
             witness_update_info,
@@ -309,45 +455,59 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   }
 
   async queryParamsFromChain(hexDid, counter) {
-    return this.api.query[this.moduleName].accumulatorParams(hexDid, counter);
+    return this.api.query[this.moduleName].accumulatorParams(
+      this.api.registry.createType("Did", hexDid),
+      counter
+    );
   }
 
   async queryPublicKeyFromChain(hexDid, counter) {
-    return this.api.query[this.moduleName].accumulatorKeys(hexDid, counter);
+    return this.api.query[this.moduleName].accumulatorKeys(
+      this.api.registry.createType("Did", hexDid),
+      counter
+    );
   }
 
   signAddParams(keyPair, params) {
-    const serialized = getStateChange(this.api, 'AddAccumulatorParams', params);
+    const serialized = getStateChange(this.api, "AddAccumulatorParams", params);
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 
   signAddPublicKey(keyPair, pk) {
-    const serialized = getStateChange(this.api, 'AddAccumulatorPublicKey', pk);
+    const serialized = getStateChange(this.api, "AddAccumulatorPublicKey", pk);
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 
   signRemoveParams(keyPair, ref) {
-    const serialized = getStateChange(this.api, 'RemoveAccumulatorParams', ref);
+    const serialized = getStateChange(this.api, "RemoveAccumulatorParams", ref);
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 
   signRemovePublicKey(keyPair, ref) {
-    const serialized = getStateChange(this.api, 'RemoveAccumulatorPublicKey', ref);
+    const serialized = getStateChange(
+      this.api,
+      "RemoveAccumulatorPublicKey",
+      ref
+    );
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 
   signAddAccumulator(keyPair, addAccumulator) {
-    const serialized = getStateChange(this.api, 'AddAccumulator', addAccumulator);
+    const serialized = getStateChange(
+      this.api,
+      "AddAccumulator",
+      addAccumulator
+    );
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 
   signUpdateAccumulator(keyPair, update) {
-    const serialized = getStateChange(this.api, 'UpdateAccumulator', update);
+    const serialized = getStateChange(this.api, "UpdateAccumulator", update);
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 
   signRemoveAccumulator(keyPair, id) {
-    const serialized = getStateChange(this.api, 'RemoveAccumulator', id);
+    const serialized = getStateChange(this.api, "RemoveAccumulator", id);
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 }

@@ -1,15 +1,19 @@
-import { encodeAddress } from '@polkadot/util-crypto';
-import { u8aToString, hexToU8a } from '@polkadot/util';
-import b58 from 'bs58';
+import { encodeAddress } from "@polkadot/util-crypto";
+import { u8aToString, hexToU8a } from "@polkadot/util";
+import b58 from "bs58";
 
 import {
-  getHexIdentifierFromDID, DockDIDQualifier, NoDIDError, validateDockDIDHexIdentifier,
-} from '../utils/did';
-import { getStateChange } from '../utils/misc';
+  getHexIdentifierFromDID,
+  DockDIDQualifier,
+  NoDIDError,
+  validateDockDIDHexIdentifier,
+} from "../utils/did";
+import { getStateChange } from "../utils/misc";
 
-import Signature from '../signatures/signature'; // eslint-disable-line
+import Signature from "../signatures/signature"; // eslint-disable-line
 
-export const ATTESTS_IRI = 'https://rdf.dock.io/alpha/2021#attestsDocumentContents';
+export const ATTESTS_IRI =
+  "https://rdf.dock.io/alpha/2021#attestsDocumentContents";
 
 /** Class to create, update and destroy DIDs */
 class DIDModule {
@@ -32,7 +36,7 @@ class DIDModule {
    */
   createNewTx(did, keyDetail) {
     const hexId = getHexIdentifierFromDID(did);
-    return this.module.new(hexId, keyDetail);
+    return this.module.new(this.api.registry.createType("Did", hexId), this.api.registry.createType("KeyDetail", keyDetail));
   }
 
   /**
@@ -42,7 +46,11 @@ class DIDModule {
    * @return {Promise<object>} Promise to the pending transaction
    */
   async new(did, keyDetail, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createNewTx(did, keyDetail), waitForFinalization, params);
+    return await this.signAndSend(
+      this.createNewTx(did, keyDetail),
+      waitForFinalization,
+      params
+    );
   }
 
   /**
@@ -52,7 +60,7 @@ class DIDModule {
    * @return {Promise<object>} The extrinsic to sign and send.
    */
   createUpdateKeyTx(keyUpdate, signature) {
-    return this.module.updateKey(keyUpdate, signature.toJSON());
+    return this.module.updateKey(keyUpdate, this.api.registry.createType("DidSignature", signature.toJSON()));
   }
 
   /**
@@ -61,8 +69,17 @@ class DIDModule {
    * @param {Signature} signature - Signature from existing key
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async updateKey(keyUpdate, signature, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createUpdateKeyTx(keyUpdate, signature), waitForFinalization, params);
+  async updateKey(
+    keyUpdate,
+    signature,
+    waitForFinalization = true,
+    params = {}
+  ) {
+    return await this.signAndSend(
+      this.createUpdateKeyTx(keyUpdate, signature),
+      waitForFinalization,
+      params
+    );
   }
 
   /**
@@ -72,7 +89,7 @@ class DIDModule {
    * @return {Promise<object>} The extrinsic to sign and send.
    */
   createRemoveTx(didRemoval, signature) {
-    return this.module.remove(didRemoval, signature.toJSON());
+    return this.module.remove(didRemoval, this.api.registry.createType("DidSignature", signature.toJSON()));
   }
 
   /**
@@ -82,7 +99,11 @@ class DIDModule {
    * @return {Promise<object>} Promise to the pending transaction
    */
   async remove(didRemoval, signature, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createRemoveTx(didRemoval, signature), waitForFinalization, params);
+    return await this.signAndSend(
+      this.createRemoveTx(didRemoval, signature),
+      waitForFinalization,
+      params
+    );
   }
 
   /**
@@ -91,9 +112,19 @@ class DIDModule {
    * @param {object} attestation - Attestation object with priority and iri
    * @param {Signature} signature - Signature from existing key
    */
-  async setClaim(attester, attestation, signature, waitForFinalization = true, params = {}) {
+  async setClaim(
+    attester,
+    attestation,
+    signature,
+    waitForFinalization = true,
+    params = {}
+  ) {
     const hexId = getHexIdentifierFromDID(attester);
-    const attestTx = this.api.tx.attest.setClaim(hexId, attestation, signature.toJSON());
+    const attestTx = this.api.tx.attest.setClaim(
+      hexId,
+      attestation,
+      signature.toJSON()
+    );
     return await this.signAndSend(attestTx, waitForFinalization, params);
   }
 
@@ -113,7 +144,9 @@ class DIDModule {
    */
   async getAttests(hexId) {
     const attests = await this.api.query.attest.attestations(hexId);
-    return attests.iri.isSome ? u8aToString(hexToU8a(attests.iri.toString())) : null;
+    return attests.iri.isSome
+      ? u8aToString(hexToU8a(attests.iri.toString()))
+      : null;
   }
 
   /**
@@ -131,20 +164,22 @@ class DIDModule {
     const attests = await this.getAttests(hexId);
 
     // If given DID was in hex, encode to SS58 and then construct fully qualified DID else the DID was already fully qualified
-    const id = (did === hexId) ? this.getFullyQualifiedDID(encodeAddress(hexId)) : did;
+    const id =
+      did === hexId ? this.getFullyQualifiedDID(encodeAddress(hexId)) : did;
 
     // Determine the type of the public key
-    let type; let
-      publicKeyRaw;
-    if (detail.public_key.isSr25519) {
-      type = 'Sr25519VerificationKey2020';
-      publicKeyRaw = detail.public_key.asSr25519;
-    } else if (detail.public_key.isEd25519) {
-      type = 'Ed25519VerificationKey2018';
-      publicKeyRaw = detail.public_key.asEd25519;
+    let type;
+    let publicKeyRaw;
+
+    if (detail.publicKey.isSr25519) {
+      type = "Sr25519VerificationKey2020";
+      publicKeyRaw = detail.publicKey.asSr25519;
+    } else if (detail.publicKey.isEd25519) {
+      type = "Ed25519VerificationKey2018";
+      publicKeyRaw = detail.publicKey.asEd25519;
     } else {
-      type = 'EcdsaSecp256k1VerificationKey2019';
-      publicKeyRaw = detail.public_key.asSecp256K1;
+      type = "EcdsaSecp256k1VerificationKey2019";
+      publicKeyRaw = detail.publicKey.asSecp256k1;
     }
 
     // The DID has only one key as of now.
@@ -177,7 +212,7 @@ class DIDModule {
 
     // Construct document
     const document = {
-      '@context': 'https://www.w3.org/ns/did/v1',
+      "@context": "https://www.w3.org/ns/did/v1",
       id,
       authentication,
       assertionMethod,
@@ -210,10 +245,7 @@ class DIDModule {
 
     const respTuple = resp.unwrap();
     if (respTuple.length === 2) {
-      return [
-        respTuple[0],
-        respTuple[1].toNumber(),
-      ];
+      return [respTuple[0], respTuple[1].toNumber()];
     }
     throw new Error(`Needed 2 items in response but got${respTuple.length}`);
   }
@@ -236,7 +268,7 @@ class DIDModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedKeyUpdate(keyUpdate) {
-    return getStateChange(this.api, 'KeyUpdate', keyUpdate);
+    return getStateChange(this.api, "KeyUpdate", keyUpdate);
   }
 
   /**
@@ -245,7 +277,7 @@ class DIDModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedDIDRemoval(didRemoval) {
-    return getStateChange(this.api, 'DidRemoval', didRemoval);
+    return getStateChange(this.api, "DidRemoval", didRemoval);
   }
 
   /**
@@ -255,7 +287,7 @@ class DIDModule {
    */
   getSerializedAttestation(did, attestation) {
     const hexId = getHexIdentifierFromDID(did);
-    return getStateChange(this.api, 'Attestation', [hexId, attestation]);
+    return getStateChange(this.api, "Attestation", [hexId, attestation]);
   }
 }
 

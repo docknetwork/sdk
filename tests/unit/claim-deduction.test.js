@@ -1,5 +1,5 @@
 import { suites } from 'jsonld-signatures';
-import * as base58btc from 'base58-universal';
+const base58btc = require('base58-universal');
 import { hexToU8a } from '@polkadot/util';
 
 import jsonld from 'jsonld';
@@ -435,13 +435,13 @@ async function checkSoundness(presentation, rules) {
 function registerDid(did, keyPair) {
   if (registered(did)) { throw `${did} already registered`; }
 
-  const publicKeyBase58 = base58btc.encode(hexToU8a(keyPair.publicKey.value));
+  const publicKeyBase58 = base58btc.encode(hexToU8a(keypair.public_key.value));
   const pk = {
     id: `${did}#keys-1`,
     type: keyPair.type,
     publicKeyBase58,
     controller: did,
-    publicKey: keyPair.publicKey.value,
+    publicKey: keypair.public_key.value,
   };
   const doc = {
     '@context': 'https://www.w3.org/ns/did/v1',

@@ -11,6 +11,10 @@ import { getHexIdentifierFromDID } from '../did';
  * Abstraction over a map of DID -> Keyring
  */
 export default class KeyringPairDidKeys extends DidKeys {
+  constructor(reg) {
+    super();
+    this.reg = reg;
+  }
   /**
    * Create a map of DID -> Signatures. This is used for authentication of the update
    * to the registry.
@@ -28,7 +32,7 @@ export default class KeyringPairDidKeys extends DidKeys {
       // Convert the DID to hex if not already since the chain only accepts the DID hex-identifier.
       // This change could have been made while setting the DID but keeping the change least disruptive for now.
       // @ts-ignore
-      signedProofs.set(getHexIdentifierFromDID(did), sig.toJSON());
+      signedProofs.set(this.reg.createType("Did", getHexIdentifierFromDID(did)), sig.toJSON());
     });
     return signedProofs;
   }

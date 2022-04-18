@@ -25,11 +25,11 @@ describe("Revocation Module", () => {
     });
 
     // Create a random registry id
-    registryId = dock.api.registry.createType("RegistryId", randomAsHex(32));
+    registryId = randomAsHex(32);
 
     // Create a new controller DID, the DID will be registered on the network and own the registry
     const controllerDIDRaw = randomAsHex(32);
-    controllerDID = dock.api.registry.createType("Did", controllerDIDRaw);
+    controllerDID = controllerDIDRaw;
     const controllerSeed = randomAsHex(32);
 
     // Create a did/keypair proof map
@@ -43,7 +43,7 @@ describe("Revocation Module", () => {
     policy = new OneOfPolicy(dock.api.registry, controllers);
 
     // Create revoke IDs
-    revokeId = dock.api.registry.createType("Did", randomAsHex(32));
+    revokeId = randomAsHex(32);
     revokeIds = new Set();
     revokeIds.add(revokeId);
 
@@ -68,7 +68,7 @@ describe("Revocation Module", () => {
 
   test("Can create a registry with multiple controllers", async () => {
     // Create secondary DID
-    const controllerDIDTwo = dock.api.registry.createType("Did", randomAsHex(32));
+    const controllerDIDTwo = randomAsHex(32);
     await registerNewDIDUsingPair(dock, controllerDIDTwo, pair);
 
     const controllersNew = new Set();
@@ -77,10 +77,8 @@ describe("Revocation Module", () => {
 
     // Create policy and registry with multiple controllers
     const policyNew = new OneOfPolicy(dock.api.registry, controllersNew);
-    const multipleControllerRegistryID = dock.api.registry.createType(
-      "Did",
-      randomAsHex(32)
-    );
+    const multipleControllerRegistryID = randomAsHex(32);
+    
     await expect(
       dock.revocation.newRegistry(
         multipleControllerRegistryID,

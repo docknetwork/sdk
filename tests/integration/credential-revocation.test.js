@@ -61,7 +61,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
   let revId;
 
   const issuerDIDRaw = createNewDockDID();
-  const holderDIDRaw =  createNewDockDID()
+  const holderDIDRaw = createNewDockDID()
 
   beforeAll(async (done) => {
     await dockAPI.init({
@@ -69,11 +69,10 @@ describe('Credential revocation with issuer as the revocation authority', () => 
       address: FullNodeEndpoint,
     });
     
-
     didKeys = new KeyringPairDidKeys(dockAPI.api.registry)
 
-    issuerDID = dockAPI.api.registry.createType("Did", getHexIdentifierFromDID(issuerDIDRaw));
-    holderDID = dockAPI.api.registry.createType("Did", getHexIdentifierFromDID(holderDIDRaw));
+    issuerDID = getHexIdentifierFromDID(issuerDIDRaw);
+    holderDID = getHexIdentifierFromDID(holderDIDRaw);
 
     // The keyring should be initialized before any test begins as this suite is testing revocation
     const account = dockAPI.keyring.addFromUri(TestAccountURI);

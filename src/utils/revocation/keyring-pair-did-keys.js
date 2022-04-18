@@ -32,7 +32,7 @@ export default class KeyringPairDidKeys extends DidKeys {
       // Convert the DID to hex if not already since the chain only accepts the DID hex-identifier.
       // This change could have been made while setting the DID but keeping the change least disruptive for now.
       // @ts-ignore
-      signedProofs.set(this.reg.createType("Did", getHexIdentifierFromDID(did)), sig.toJSON());
+      signedProofs.set(getHexIdentifierFromDID(did), sig.toJSON());
     });
     return signedProofs;
   }

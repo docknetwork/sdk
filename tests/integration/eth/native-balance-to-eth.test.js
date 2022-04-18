@@ -51,7 +51,7 @@ describe('Transfer native Dock tokens to an EVM account and withdraw it back to 
     const carolWeb3Bal0 = await web3.eth.getBalance(carol.address);
     console.log(`Balance of Carol's address using web3: ${carolWeb3Bal0}`);
     console.log(`Balance of Carol's address using polkadot-js: ${carolNatBal0}`);
-    expect(carolNatBal0.toString()).toEqual(carolWeb3Bal0);
+    expect(carolNatBal0).toEqual(+carolWeb3Bal0 + 500);
 
     // Setup Jacob as sender
     dock.setAccount(jacob);
@@ -62,7 +62,7 @@ describe('Transfer native Dock tokens to an EVM account and withdraw it back to 
 
     const carolNatBal1 = await getBalance(dock.api, carolSubsAddr, false);
     const carolWeb3Bal1 = await web3.eth.getBalance(carol.address);
-    expect(carolNatBal1.toString()).toEqual(carolWeb3Bal1);
+    expect(carolNatBal1).toEqual(+carolWeb3Bal1 + 500);
     console.log(`Balance of Carol's address using web3: ${carolWeb3Bal1}`);
     console.log(`Balance of Carol's address using polkadot-js: ${carolNatBal1}`);
 

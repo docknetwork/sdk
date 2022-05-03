@@ -2332,17 +2332,17 @@
     ky "^0.25.1"
     ky-universal "^0.8.2"
 
-"@docknetwork/crypto-wasm-ts@0.10.0":
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.10.0.tgz#aa3c34e6d36348ccd30d42fa1679703fa8b6e87f"
-  integrity sha512-AWSIm+Kw9IVVDTaOAnr0YJYhxQU8K4TUQan7C2LvehrH+jdjeXuRWjiFKXjGldYSitSuSowfGg1HJV19vQpGFA==
+"@docknetwork/crypto-wasm-ts@0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.12.0.tgz#4f1af85cce43361b696293f92968efb6cab3edd2"
+  integrity sha512-Hm7oGXtc9sXRLRsQFSIkDdYq+4yq0Nx0fk46U+pEJX1nl0JYZf76JIAXhzBYVVDJCPTCDeNavjeeV249awJCsQ==
   dependencies:
-    "@docknetwork/crypto-wasm" "0.8.0"
+    "@docknetwork/crypto-wasm" "0.9.0"
 
-"@docknetwork/crypto-wasm@0.8.0":
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.8.0.tgz#a7cbf26d7662ad4430acde75e16e665486910630"
-  integrity sha512-xGcpzTN+lKBcnwh0xmGwwalE6EXxgY+d9C6OE0oaTwuU8e9rNhPuDSbIIsO8c1lIuEJlRLNdhM4EODxuNCMuDQ==
+"@docknetwork/crypto-wasm@0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.9.0.tgz#0d590cd8902f65c50a60ccc78aece1b8c54261bb"
+  integrity sha512-Qd0/T/NCF4c/Ae6m7bodkWZevpJW1WRoUqBagtcRlfD51rubCgYDMl539xnT7Gca/x0slqwXH/7LmiLzI39mDg==
 
 "@docknetwork/node-types@^0.6.0":
   version "0.6.0"
@@ -4665,9 +4665,14 @@ camelcase@^6.2.1:
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
 caniuse-lite@^1.0.30001271:
-  version "1.0.30001271"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001271.tgz#0dda0c9bcae2cf5407cd34cac304186616cc83e8"
-  integrity sha512-BBruZFWmt3HFdVPS8kceTBIguKxu4f99n5JNp06OlPD/luoAMIaIK5ieV5YjnBLH3Nysai9sxj9rpJj4ZisXOA==
+  version "1.0.30001335"
+  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001335.tgz"
+  integrity sha512-ddP1Tgm7z2iIxu6QTtbZUv6HJxSaV/PZeSrWFZtbY4JZ69tOeNhBCl3HyRQgeNZKE5AOn1kpV7fhljigy0Ty3w==
+
+caniuse-lite@^1.0.30001335:
+  version "1.0.30001335"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001335.tgz#899254a0b70579e5a957c32dced79f0727c61f2a"
+  integrity sha512-ddP1Tgm7z2iIxu6QTtbZUv6HJxSaV/PZeSrWFZtbY4JZ69tOeNhBCl3HyRQgeNZKE5AOn1kpV7fhljigy0Ty3w==
 
 canonicalize@^1.0.1:
   version "1.0.5"

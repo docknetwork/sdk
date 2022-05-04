@@ -42,3 +42,11 @@ to the cryptographic details and treat the values as bytes with some size bounds
   - See the test `tests/integration/anoncreds/demo.test.js` for an example of how a BBS+ signature can be used with an
     accumulator for anonymous credentials. The accumulator is used to hold a user/credential id. Presence of the id in accumulator
     means the credential is valid and absence means invalid.
+
+- Verifiable encryption
+  - Encrypt messages from BBS+ signatures for a 3rd party and prove that the encryption was done correctly.
+  - See the test `tests/integration/anoncreds/saver-and-bound-check.test.js`
+
+- Bound check/Range proof
+  - Prove that messages under a BBS+ signature satisfy some bounds.
+  - See the test `tests/integration/anoncreds/saver-and-bound-check.test.js`

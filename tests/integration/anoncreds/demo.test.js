@@ -1,4 +1,3 @@
-import { initializeWasm } from '@docknetwork/crypto-wasm';
 import { randomAsHex } from '@polkadot/util-crypto';
 import {
   hexToU8a, stringToHex, stringToU8a, u8aToHex,
@@ -23,6 +22,7 @@ import {
   AccumulatorParams,
   BBSPlusPublicKeyG2,
   AccumulatorPublicKey,
+  initializeWasm,
 } from '@docknetwork/crypto-wasm-ts';
 import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/crypto-wasm-ts/src/accumulator/in-memory-persistence';
 import { DockAPI } from '../../../src';
@@ -158,13 +158,13 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     const params = new SignatureParamsG1(paramsVal, hexToU8a(queriedParams.label));
     issuerBbsPlusKeypair = KeypairG2.generate(params);
 
-    const pk = BBSPlusModule.prepareAddPublicKey(u8aToHex(issuerBbsPlusKeypair.publicKey.value), undefined, [issuerDid, 1]);
+    const pk = BBSPlusModule.prepareAddPublicKey(u8aToHex(issuerBbsPlusKeypair.publicKey.bytes), undefined, [issuerDid, 1]);
     await dock.bbsPlusModule.createNewPublicKey(pk, getHexIdentifierFromDID(issuerDid), issuerKeypair, undefined, false);
   }, 10000);
 
   test('Create Accumulator params', async () => {
     const label = stringToHex('My Accumulator params');
-    const bytes = u8aToHex(Accumulator.generateParams(hexToU8a(label)).value);
+    const bytes = u8aToHex(Accumulator.generateParams(hexToU8a(label)).bytes);
     const params = AccumulatorModule.prepareAddParameters(bytes, undefined, label);
     await dock.accumulatorModule.createNewParams(params, getHexIdentifierFromDID(accumulatorManagerDid), accumulatorManagerKeypair, undefined, false);
     const paramsWritten = await dock.accumulatorModule.getLastParamsWritten(accumulatorManagerDid);
@@ -176,7 +176,7 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     const queriedParams = await dock.accumulatorModule.getParams(accumulatorManagerDid, 1);
     accumulatorKeypair = Accumulator.generateKeypair(new AccumulatorParams(hexToU8a(queriedParams.bytes)), hexToU8a(seedAccum));
 
-    const pk = AccumulatorModule.prepareAddPublicKey(u8aToHex(accumulatorKeypair.publicKey.value), undefined, [accumulatorManagerDid, 1]);
+    const pk = AccumulatorModule.prepareAddPublicKey(u8aToHex(accumulatorKeypair.publicKey.bytes), undefined, [accumulatorManagerDid, 1]);
     await dock.accumulatorModule.createNewPublicKey(pk, getHexIdentifierFromDID(accumulatorManagerDid), accumulatorManagerKeypair, undefined, false);
   }, 10000);
 

@@ -1,6 +1,5 @@
 import { randomAsHex } from '@polkadot/util-crypto';
-import { initializeWasm } from '@docknetwork/crypto-wasm';
-import { Accumulator, PositiveAccumulator, WitnessUpdatePublicInfo, AccumulatorParams } from '@docknetwork/crypto-wasm-ts';
+import { initializeWasm, Accumulator, PositiveAccumulator, WitnessUpdatePublicInfo, AccumulatorParams } from '@docknetwork/crypto-wasm-ts';
 import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/crypto-wasm-ts/src/accumulator/in-memory-persistence';
 import { hexToU8a, stringToHex, u8aToHex } from '@polkadot/util';
 import { DockAPI } from '../../../src';
@@ -47,7 +46,7 @@ describe('Accumulator Module', () => {
   test('Can create new params', async () => {
     let label = stringToHex('accumulator-params-label');
     let params = Accumulator.generateParams(hexToU8a(label));
-    const bytes1 = u8aToHex(params.value);
+    const bytes1 = u8aToHex(params.bytes);
     const params1 = chainModuleClass.prepareAddParameters(bytes1, undefined, label);
     await chainModule.createNewParams(params1, getHexIdentifierFromDID(did1), pair1, undefined, false);
     const paramsWritten1 = await chainModule.getLastParamsWritten(did1);
@@ -59,7 +58,7 @@ describe('Accumulator Module', () => {
 
     label = stringToHex('some label');
     params = Accumulator.generateParams(hexToU8a(label));
-    const bytes2 = u8aToHex(params.value);
+    const bytes2 = u8aToHex(params.bytes);
     const params2 = chainModuleClass.prepareAddParameters(bytes2);
     await chainModule.createNewParams(params2, getHexIdentifierFromDID(did2), pair2, undefined, false);
     const paramsWritten2 = await chainModule.getLastParamsWritten(did2);
@@ -71,7 +70,7 @@ describe('Accumulator Module', () => {
 
     label = stringToHex('some label');
     params = Accumulator.generateParams(hexToU8a(label));
-    const bytes3 = u8aToHex(params.value);
+    const bytes3 = u8aToHex(params.bytes);
     const params3 = chainModuleClass.prepareAddParameters(bytes3);
     await chainModule.createNewParams(params3, getHexIdentifierFromDID(did1), pair1, undefined, false);
     const paramsWritten3 = await chainModule.getLastParamsWritten(did1);
@@ -92,7 +91,7 @@ describe('Accumulator Module', () => {
   test('Can create public keys', async () => {
     const params = Accumulator.generateParams();
     let keypair = Accumulator.generateKeypair(params);
-    const bytes1 = u8aToHex(keypair.publicKey);
+    const bytes1 = u8aToHex(keypair.publicKey.bytes);
     const pk1 = chainModuleClass.prepareAddPublicKey(bytes1);
     await chainModule.createNewPublicKey(pk1, getHexIdentifierFromDID(did1), pair1, undefined, false);
     const pkWritten1 = await chainModule.getLastPublicKeyWritten(did1);
@@ -105,7 +104,7 @@ describe('Accumulator Module', () => {
     const params1 = await chainModule.getParams(did1, 1);
     const aparams1 = new AccumulatorParams(hexToU8a(params1.bytes));
     keypair = Accumulator.generateKeypair(aparams1, hexToU8a(seedAccum));
-    const bytes2 = u8aToHex(keypair.publicKey.value);
+    const bytes2 = u8aToHex(keypair.publicKey.bytes);
     const pk2 = chainModuleClass.prepareAddPublicKey(bytes2, undefined, [did1, 1]);
     await chainModule.createNewPublicKey(pk2, getHexIdentifierFromDID(did2), pair2, undefined, false);
     const pkWritten2 = await chainModule.getLastPublicKeyWritten(did2);
@@ -121,7 +120,7 @@ describe('Accumulator Module', () => {
     const params2 = await chainModule.getParams(did1, 2);
     const aparams2 = new AccumulatorParams(hexToU8a(params2.bytes));
     keypair = Accumulator.generateKeypair(aparams2);
-    const bytes3 = u8aToHex(keypair.publicKey.value);
+    const bytes3 = u8aToHex(keypair.publicKey.bytes);
     const pk3 = chainModuleClass.prepareAddPublicKey(bytes3, undefined, [did1, 2]);
     await chainModule.createNewPublicKey(pk3, getHexIdentifierFromDID(did2), pair2, undefined, false);
     const pkWritten3 = await chainModule.getLastPublicKeyWritten(did2);

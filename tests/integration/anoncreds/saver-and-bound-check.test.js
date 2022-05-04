@@ -1,4 +1,3 @@
-import { generateFieldElementFromNumber, initializeWasm } from '@docknetwork/crypto-wasm';
 import { randomAsHex } from '@polkadot/util-crypto';
 import {
   hexToU8a, stringToHex, stringToU8a, u8aToHex,
@@ -23,6 +22,7 @@ import {
   SaverChunkedCommitmentGens,
   QuasiProofSpecG1,
   BoundCheckSnarkSetup,
+  initializeWasm,
 } from '@docknetwork/crypto-wasm-ts';
 
 import { DockAPI } from '../../../src';
@@ -65,7 +65,7 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
       if (i === encAttrIdx) {
         encoded.push(SignatureG1.reversibleEncodeStringMessageForSigning(attrs[i]));
       } else if (i === boundedAttrIdx) {
-        encoded.push(generateFieldElementFromNumber(attrs[i]));
+        encoded.push(SignatureG1.encodePositiveNumberForSigning(attrs[i]));
       } else {
         encoded.push(Signature.encodeMessageForSigning(attrs[i]));
       }
@@ -104,7 +104,7 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
     expect(paramsWritten.label).toEqual(params.label);
 
     issuerBbsPlusKeypair = KeypairG2.generate(sigParams);
-    const pk = BBSPlusModule.prepareAddPublicKey(u8aToHex(issuerBbsPlusKeypair.publicKey.value), undefined, [issuerDid, 1]);
+    const pk = BBSPlusModule.prepareAddPublicKey(u8aToHex(issuerBbsPlusKeypair.publicKey.bytes), undefined, [issuerDid, 1]);
     await dock.bbsPlusModule.createNewPublicKey(pk, getHexIdentifierFromDID(issuerDid), issuerKeypair, undefined, false);
   }, 10000);
 

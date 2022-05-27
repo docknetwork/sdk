@@ -14,7 +14,10 @@ export default class DIDKeyResolver extends DIDResolver {
     const parsed = this.parseDid(did);
     if (parsed.method === methodName) {
       const { didDocument } = await resolveMethod(did, parsed, null, {});
-      return didDocument;
+      return {
+        '@context': 'https://www.w3.org/ns/did/v1',
+        ...didDocument,
+      };
     }
     throw new Error(`Resolver for ${methodName} does not support the ${parsed.method} did method.`);
   }

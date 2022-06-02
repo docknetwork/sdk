@@ -11,6 +11,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2 # If you're using actions/checkout@v2 you must set persist-credentials to false in most cases for the deployment to work correctly.
         with:
+          ref: github-action-matrix # This is temporary and must be reverted before merging. Its done to check the change in actions
           persist-credentials: false
 
       - name: Setup node

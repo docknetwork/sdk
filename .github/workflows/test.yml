@@ -10,6 +10,8 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: github-action-matrix # This is temporary and must be reverted before merging. Its done to check the change in actions
       - uses: ibnesayeed/setup-ipfs@0.6.0
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'

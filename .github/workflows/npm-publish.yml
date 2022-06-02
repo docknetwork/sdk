@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+        with:
+          ref: github-action-matrix # This is temporary and must be reverted before merging. Its done to check the change in actions
       - uses: actions/setup-node@v1
         with:
           node-version: '14.x'

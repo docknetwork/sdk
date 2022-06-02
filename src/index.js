@@ -223,7 +223,7 @@ class DockAPI {
    * @returns {Promise<unknown>}
    */
   async send(extrinsic, waitForFinalization = true) {
-    const promise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       try {
         let unsubFunc = null;
         return extrinsic.send((extrResult) => {
@@ -264,8 +264,6 @@ class DockAPI {
 
       return this;
     });
-
-    return await promise;
   }
 
   /**

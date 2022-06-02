@@ -37,7 +37,7 @@ export default class AnchorModule {
    * @returns {Promise<*>}
    */
   async deploy(anchor, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.deployTx(anchor), waitForFinalization, params);
+    return this.signAndSend(this.deployTx(anchor), waitForFinalization, params);
   }
 
   /**

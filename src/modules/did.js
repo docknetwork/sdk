@@ -42,7 +42,7 @@ class DIDModule {
    * @return {Promise<object>} Promise to the pending transaction
    */
   async new(did, keyDetail, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createNewTx(did, keyDetail), waitForFinalization, params);
+    return this.signAndSend(this.createNewTx(did, keyDetail), waitForFinalization, params);
   }
 
   /**
@@ -62,7 +62,7 @@ class DIDModule {
    * @return {Promise<object>} Promise to the pending transaction
    */
   async updateKey(keyUpdate, signature, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createUpdateKeyTx(keyUpdate, signature), waitForFinalization, params);
+    return this.signAndSend(this.createUpdateKeyTx(keyUpdate, signature), waitForFinalization, params);
   }
 
   /**
@@ -82,7 +82,7 @@ class DIDModule {
    * @return {Promise<object>} Promise to the pending transaction
    */
   async remove(didRemoval, signature, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createRemoveTx(didRemoval, signature), waitForFinalization, params);
+    return this.signAndSend(this.createRemoveTx(didRemoval, signature), waitForFinalization, params);
   }
 
   /**
@@ -94,7 +94,7 @@ class DIDModule {
   async setClaim(attester, attestation, signature, waitForFinalization = true, params = {}) {
     const hexId = getHexIdentifierFromDID(attester);
     const attestTx = this.api.tx.attest.setClaim(hexId, attestation, signature.toJSON());
-    return await this.signAndSend(attestTx, waitForFinalization, params);
+    return this.signAndSend(attestTx, waitForFinalization, params);
   }
 
   /**

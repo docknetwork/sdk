@@ -154,7 +154,7 @@ async function anchorBatched(leafHashes) {
 // If the merkle root was never anchored, return null.
 async function checkBatched(hash, proof) {
   const root = verify_proof(hash, proof);
-  return await check(root);
+  return check(root);
 }
 
 // encode a string as utf8
@@ -190,7 +190,7 @@ async function signExtrinsic(extrinsic) {
 
 // submit extrinsic and wait for it to finalize
 async function sendExtrinsic(extrinsic) {
-  return await new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
       let unsubFunc = null;
       return extrinsic.send(({ events = [], status }) => {

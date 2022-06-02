@@ -204,5 +204,5 @@ async function signSendTx(extrinsic, kp) {
     return this;
   });
 
-  return await promise;
+  return promise;
 }

@@ -94,7 +94,7 @@ async function accept(presentation) {
     throw new Error('bad presentation');
   }
   const expanded = await jsonld.expand(presentation);
-  return await acceptCompositeClaims(expanded, sampleRules);
+  return acceptCompositeClaims(expanded, sampleRules);
 }
 
 // Use the assumptions encoded in the presention to prove a statement

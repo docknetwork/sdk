@@ -93,7 +93,7 @@ export async function keypair(seed) {
  * @returns {Promise}
  */
 export async function connect(wsUrl) {
-  return await ApiPromise.create({
+  return ApiPromise.create({
     provider: new WsProvider(wsUrl),
     typesBundle,
   });

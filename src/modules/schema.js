@@ -140,7 +140,7 @@ export default class Schema {
    * @return {Promise<object>} The extrinsic to sign and send.
    */
   async writeToChain(dock, pair, signature = undefined, waitForFinalization = true, params = {}) {
-    return await dock.blob.new(this.toBlob(), pair, signature, waitForFinalization, params);
+    return dock.blob.new(this.toBlob(), pair, signature, waitForFinalization, params);
   }
 
   /**

@@ -138,7 +138,7 @@ describe('Master Module', () => {
 
 // connect to running node
 async function connect() {
-  return await ApiPromise.create({
+  return ApiPromise.create({
     provider: new WsProvider(FullNodeEndpoint),
     typesBundle,
   });
@@ -182,7 +182,7 @@ async function signSendTx(extrinsic) {
     return this;
   });
 
-  return await promise;
+  return promise;
 }
 
 async function masterSetStorage(

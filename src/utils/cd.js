@@ -110,7 +110,7 @@ export async function presentationToEEClaimGraph(expandedPresentation) {
   const creds = jsonld.getValues(ep, expandedCredentialProperty);
 
   // convert them to a single claimgraph
-  return await credsToEEClaimGraph(creds);
+  return credsToEEClaimGraph(creds);
 }
 
 export class UnverifiedAssumption extends Error {

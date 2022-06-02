@@ -69,7 +69,7 @@ class RevocationModule {
    * @return {Promise<object>} Promise to the pending transaction
    */
   async removeRegistry(registryID, lastModified, didKeys, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createRemoveRegistryTx(registryID, lastModified, didKeys), waitForFinalization, params);
+    return this.signAndSend(this.createRemoveRegistryTx(registryID, lastModified, didKeys), waitForFinalization, params);
   }
 
   /**
@@ -101,7 +101,7 @@ class RevocationModule {
    * @return {Promise<object>} Promise to the pending transaction
    */
   async revoke(registryID, revokeIds, lastModified, didKeys, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createRevokeTx(registryID, revokeIds, lastModified, didKeys), waitForFinalization, params);
+    return this.signAndSend(this.createRevokeTx(registryID, revokeIds, lastModified, didKeys), waitForFinalization, params);
   }
 
   /**
@@ -133,7 +133,7 @@ class RevocationModule {
    * @return {Promise<object>} Promise to the pending transaction
    */
   async unrevoke(registryID, revokeIds, lastModified, didKeys, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createUnrevokeTx(registryID, revokeIds, lastModified, didKeys), waitForFinalization, params);
+    return this.signAndSend(this.createUnrevokeTx(registryID, revokeIds, lastModified, didKeys), waitForFinalization, params);
   }
 
   /**

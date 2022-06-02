@@ -429,7 +429,7 @@ async function checkSoundness(presentation, rules) {
   }
   // Pre-expand the presentaion using local cache. Tests run pretty slow otherwise.
   presentation = await jsonld.expand(presentation, { documentLoader });
-  return await acceptCompositeClaims(presentation, rules);
+  return acceptCompositeClaims(presentation, rules);
 }
 
 function registerDid(did, keyPair) {
@@ -463,13 +463,13 @@ function randoDID() {
 }
 
 async function verifyC(credential) {
-  return await verifyCredential(credential, {
+  return verifyCredential(credential, {
     documentLoader,
   });
 }
 
 async function verifyP(presentation) {
-  return await verifyPresentation(presentation, {
+  return verifyPresentation(presentation, {
     documentLoader,
     unsignedPresentation: true,
   });

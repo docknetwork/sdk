@@ -3,7 +3,11 @@ name: Build and Tests
 on: [pull_request]
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x]
+        os: [ubuntu-latest, macos-latest]
     steps:
       - uses: actions/checkout@v2
       - uses: ibnesayeed/setup-ipfs@0.6.0
@@ -13,7 +17,7 @@ jobs:
           run_daemon: true
       - uses: actions/setup-node@v1
         with:
-          node-version: '14.x'
+          node-version: ${{ matrix.node-version }}
       - run: yarn install --frozen-lockfile --ignore-scripts
       - run: yarn build
       - run: yarn test

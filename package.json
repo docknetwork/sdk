@@ -89,6 +89,7 @@
     "base64url": "3.0.1",
     "blake2b": "2.1.4",
     "bs58": "5.0.0",
+    "buffer": "^6.0.3",
     "deep-equal": "2.0.5",
     "dotenv": "16.0.0",
     "elliptic": "6.5.4",

@@ -1,6 +1,7 @@
 import { suites } from 'jsonld-signatures';
 import { encode, decode } from 'base58-universal';
 import base64url from 'base64url';
+import { Buffer } from 'buffer';
 
 const MULTIBASE_BASE58BTC_HEADER = 'z';
 

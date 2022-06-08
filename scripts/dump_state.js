@@ -1,23 +1,23 @@
 // Download important state from node and write to JSON file in the same directory
 
-import dock from '../src/index';
-import { asDockAddress } from '../src/utils/codec';
+import dock from "../src/index";
+import { asDockAddress } from "../src/utils/codec";
 
-require('dotenv').config();
+require("dotenv").config();
 
-const fs = require('fs');
+const fs = require("fs");
 
 const { FullNodeEndpoint, Network } = process.env;
 
 if (process.argv.length !== 3) {
-  console.error('Need only 1 argument which is the name of dump file');
+  console.error("Need only 1 argument which is the name of dump file");
   process.exit(1);
 }
 
 async function storageMapEntriesToObject(entries) {
   const ret = {};
   entries.forEach((entry) => {
-    ret[entry[0]._args[0]] = entry[1].toJSON();
+    ret[entry[0].args[0]] = entry[1].toJSON();
   });
   return ret;
 }
@@ -25,11 +25,11 @@ async function storageMapEntriesToObject(entries) {
 async function storageDoubleMapEntriesToObject(entries) {
   const ret = {};
   entries.forEach((entry) => {
-    const key1 = entry[0]._args[0];
+    const key1 = entry[0].args[0];
     if (ret[key1] === undefined) {
       ret[key1] = {};
     }
-    const key2 = entry[0]._args[1];
+    const key2 = entry[0].args[1];
     ret[key1][key2] = entry[1].toJSON();
   });
   return ret;
@@ -39,7 +39,8 @@ async function downloadAccounts() {
   const accounts = await dock.api.query.system.account.entries();
   const ret = {};
   accounts.forEach((entry) => {
-    ret[asDockAddress(entry[0]._args[0], Network)] = entry[1].toJSON();
+    console.log(entry[0].args)
+    ret[asDockAddress(entry[0].args[0], Network)] = entry[1].toJSON();
   });
   return ret;
 }
@@ -48,7 +49,7 @@ async function downloadAccountLocks() {
   const accounts = await dock.api.query.balances.locks.entries();
   const ret = {};
   accounts.forEach((entry) => {
-    ret[asDockAddress(entry[0]._args[0], Network)] = entry[1].toJSON();
+    ret[asDockAddress(entry[0].args[0], Network)] = entry[1].toJSON();
   });
   return ret;
 }
@@ -56,7 +57,10 @@ async function downloadAccountLocks() {
 async function downloadMigs() {
   const m = await dock.api.query.migrationModule.migrators.entries();
   const b = await dock.api.query.migrationModule.bonuses.entries();
-  return { migrators: storageMapEntriesToObject(m), bonuses: storageMapEntriesToObject(b) };
+  return {
+    migrators: storageMapEntriesToObject(m),
+    bonuses: storageMapEntriesToObject(b),
+  };
 }
 
 async function downloadAnchors() {
@@ -100,11 +104,11 @@ async function downloadEvmAccountStorage() {
 }
 
 async function downloadPoAState() {
-  const epochs = await dock.api.query.poAModule.epochs.entries();
-  const stats = await dock.api.query.poAModule.validatorStats.entries();
+  const supply = await dock.api.query.poAModule.emissionSupply();
+  const poaLastBlock = await dock.api.query.poAModule.poALastBlock();
   return {
-    epochs: storageMapEntriesToObject(epochs),
-    stats: storageDoubleMapEntriesToObject(stats),
+    supply,
+    poaLastBlock,
   };
 }
 
@@ -160,13 +164,12 @@ async function downloadState() {
   process.exit(0);
 }
 
-dock.init({
-  address: FullNodeEndpoint,
-})
-  .then(() => {
-    downloadState();
+dock
+  .init({
+    address: FullNodeEndpoint,
   })
+  .then(downloadState)
   .catch((error) => {
-    console.error('Error occurred somewhere, it was caught!', error);
+    console.error("Error occurred somewhere, it was caught!", error);
     process.exit(1);
   });

@@ -20,11 +20,11 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
   }
 
   async queryParamsFromChain(hexDid, counter) {
-    return this.api.query[this.moduleName].bbsPlusParams(this.api.registry.createType("Did", hexDid), counter);
+    return this.api.query[this.moduleName].bbsPlusParams(hexDid, counter);
   }
 
   async queryPublicKeyFromChain(hexDid, counter) {
-    return this.api.query[this.moduleName].bbsPlusKeys(this.api.registry.createType("Did", hexDid), counter);
+    return this.api.query[this.moduleName].bbsPlusKeys(hexDid, counter);
   }
 
   signAddParams(keyPair, params) {

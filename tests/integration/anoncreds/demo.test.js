@@ -1,6 +1,8 @@
-import { initializeWasm } from "@docknetwork/crypto-wasm";
-import { randomAsHex } from "@polkadot/util-crypto";
-import { hexToU8a, stringToHex, stringToU8a, u8aToHex } from "@polkadot/util";
+import { initializeWasm } from '@docknetwork/crypto-wasm';
+import { randomAsHex } from '@polkadot/util-crypto';
+import {
+  hexToU8a, stringToHex, stringToU8a, u8aToHex,
+} from '@polkadot/util';
 import {
   Accumulator,
   SignatureParamsG1,
@@ -18,25 +20,25 @@ import {
   Witnesses,
   CompositeProofG1,
   WitnessUpdatePublicInfo,
-} from "@docknetwork/crypto-wasm-ts";
-import { InMemoryState } from "@docknetwork/crypto-wasm-ts/lib/crypto-wasm-ts/src/accumulator/in-memory-persistence";
-import { DockAPI } from "../../../src";
+} from '@docknetwork/crypto-wasm-ts';
+import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/crypto-wasm-ts/src/accumulator/in-memory-persistence';
+import { DockAPI } from '../../../src';
 import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
-} from "../../test-constants";
+} from '../../test-constants';
 import {
   createKeyDetail,
   createNewDockDID,
   getHexIdentifierFromDID,
-} from "../../../src/utils/did";
-import { getPublicKeyFromKeyringPair } from "../../../src/utils/misc";
-import BBSPlusModule from "../../../src/modules/bbs-plus";
-import AccumulatorModule from "../../../src/modules/accumulator";
-import { getAllEventsFromBlock } from "../../../src/utils/chain-ops";
+} from '../../../src/utils/did';
+import { getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
+import BBSPlusModule from '../../../src/modules/bbs-plus';
+import AccumulatorModule from '../../../src/modules/accumulator';
+import { getAllEventsFromBlock } from '../../../src/utils/chain-ops';
 
-describe("Complete demo of anonymous credentials", () => {
+describe('Complete demo of anonymous credentials', () => {
   const dock = new DockAPI();
   let account;
   let issuerDid;
@@ -57,12 +59,12 @@ describe("Complete demo of anonymous credentials", () => {
 
   // User's attributes which will be signed by the issuer of the credential
   const attributes = [
-    stringToU8a("John"), // First name
-    stringToU8a("Smith"), // Last name
-    stringToU8a("M"), // Gender
-    stringToU8a("New York"), // City
-    stringToU8a("129086521911"), // SSN
-    stringToU8a("userid-xyz"), // user/credential id, this is put in the accumulator and used for revocation
+    stringToU8a('John'), // First name
+    stringToU8a('Smith'), // Last name
+    stringToU8a('M'), // Gender
+    stringToU8a('New York'), // City
+    stringToU8a('129086521911'), // SSN
+    stringToU8a('userid-xyz'), // user/credential id, this is put in the accumulator and used for revocation
   ];
   const attributeCount = attributes.length;
 
@@ -98,13 +100,13 @@ describe("Complete demo of anonymous credentials", () => {
 
     const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 1, true);
     const sigParams = new SignatureParamsG1(
-      SignatureParamsG1.valueFromBytes(hexToU8a(queriedPk.params.bytes))
+      SignatureParamsG1.valueFromBytes(hexToU8a(queriedPk.params.bytes)),
     );
     const sigPk = hexToU8a(queriedPk.bytes);
 
     const accum = await dock.accumulatorModule.getAccumulator(
       accumulatorId,
-      true
+      true,
     );
     const accumParams = hexToU8a(accum.publicKey.params.bytes);
     const accumPk = hexToU8a(accum.publicKey.bytes);
@@ -115,13 +117,13 @@ describe("Complete demo of anonymous credentials", () => {
       sigParams,
       sigPk,
       revealedMsgs,
-      false
+      false,
     );
     const statement2 = Statement.accumulatorMembership(
       accumParams,
       accumPk,
       provingKey,
-      accumulated
+      accumulated,
     );
     const statements = new Statements();
     statements.add(statement1);
@@ -135,14 +137,14 @@ describe("Complete demo of anonymous credentials", () => {
     const metaStatements = new MetaStatements();
     metaStatements.add(ms);
 
-    const context = stringToU8a("some context");
+    const context = stringToU8a('some context');
 
     const proofSpec = new ProofSpecG1(statements, metaStatements, context);
 
     const witness1 = Witness.bbsSignature(signature, unrevealedMsgs, false);
     const witness2 = Witness.accumulatorMembership(
       encodedAttrs[attributeCount - 1],
-      membershipWitness
+      membershipWitness,
     );
     const witnesses = new Witnesses();
     witnesses.add(witness1);
@@ -166,9 +168,9 @@ describe("Complete demo of anonymous credentials", () => {
       issuerDid,
       createKeyDetail(
         getPublicKeyFromKeyringPair(issuerKeypair),
-        getHexIdentifierFromDID(issuerDid)
+        getHexIdentifierFromDID(issuerDid),
       ),
-      false
+      false,
     );
     accumulatorManagerKeypair = dock.keyring.addFromUri(randomAsHex(32));
     accumulatorManagerDid = createNewDockDID();
@@ -176,117 +178,117 @@ describe("Complete demo of anonymous credentials", () => {
       accumulatorManagerDid,
       createKeyDetail(
         getPublicKeyFromKeyringPair(accumulatorManagerKeypair),
-        getHexIdentifierFromDID(accumulatorManagerDid)
+        getHexIdentifierFromDID(accumulatorManagerDid),
       ),
-      false
+      false,
     );
     await initializeWasm();
     done();
   }, 20000);
 
-  test("Create BBS+ params", async () => {
-    const label = stringToHex("My BBS+ params");
+  test('Create BBS+ params', async () => {
+    const label = stringToHex('My BBS+ params');
     const bytes = u8aToHex(
-      SignatureParamsG1.generate(attributeCount, hexToU8a(label)).toBytes()
+      SignatureParamsG1.generate(attributeCount, hexToU8a(label)).toBytes(),
     );
-    const params = dock.bbsPlusModule.prepareAddParameters(
+    const params = BBSPlusModule.prepareAddParameters(
       bytes,
       undefined,
-      label
+      label,
     );
     await dock.bbsPlusModule.createNewParams(
       params,
       getHexIdentifierFromDID(issuerDid),
       issuerKeypair,
       undefined,
-      false
+      false,
     );
     const paramsWritten = await dock.bbsPlusModule.getLastParamsWritten(
-      issuerDid
+      issuerDid,
     );
     expect(paramsWritten.bytes).toEqual(params.bytes);
     expect(paramsWritten.label).toEqual(params.label);
   }, 10000);
 
-  test("Create BBS+ keypair", async () => {
+  test('Create BBS+ keypair', async () => {
     const queriedParams = await dock.bbsPlusModule.getParams(issuerDid, 1);
     const paramsVal = SignatureParamsG1.valueFromBytes(
-      hexToU8a(queriedParams.bytes)
+      hexToU8a(queriedParams.bytes),
     );
     const params = new SignatureParamsG1(
       paramsVal,
-      hexToU8a(queriedParams.label)
+      hexToU8a(queriedParams.label),
     );
     issuerBbsPlusKeypair = KeypairG2.generate(params);
 
-    const pk = dock.bbsPlusModule.prepareAddPublicKey(
+    const pk = BBSPlusModule.prepareAddPublicKey(
       u8aToHex(issuerBbsPlusKeypair.publicKey),
       undefined,
-      [issuerDid, 1]
+      [issuerDid, 1],
     );
     await dock.bbsPlusModule.createNewPublicKey(
       pk,
       getHexIdentifierFromDID(issuerDid),
       issuerKeypair,
       undefined,
-      false
+      false,
     );
   }, 10000);
 
-  test("Create Accumulator params", async () => {
-    const label = stringToHex("My Accumulator params");
+  test('Create Accumulator params', async () => {
+    const label = stringToHex('My Accumulator params');
     const bytes = u8aToHex(Accumulator.generateParams(hexToU8a(label)));
-    const params = dock.accumulatorModule.prepareAddParameters(
+    const params = AccumulatorModule.prepareAddParameters(
       bytes,
       undefined,
-      label
+      label,
     );
     await dock.accumulatorModule.createNewParams(
       params,
       getHexIdentifierFromDID(accumulatorManagerDid),
       accumulatorManagerKeypair,
       undefined,
-      false
+      false,
     );
     const paramsWritten = await dock.accumulatorModule.getLastParamsWritten(
-      accumulatorManagerDid
+      accumulatorManagerDid,
     );
     expect(paramsWritten.bytes).toEqual(params.bytes);
     expect(paramsWritten.label).toEqual(params.label);
   }, 10000);
 
-  test("Create Accumulator keypair", async () => {
+  test('Create Accumulator keypair', async () => {
     const queriedParams = await dock.accumulatorModule.getParams(
       accumulatorManagerDid,
-      1
+      1,
     );
     accumulatorKeypair = Accumulator.generateKeypair(
       hexToU8a(queriedParams.bytes),
-      hexToU8a(seedAccum)
+      hexToU8a(seedAccum),
     );
 
-    const pk = dock.accumulatorModule.prepareAddPublicKey(
+    const pk = AccumulatorModule.prepareAddPublicKey(
       u8aToHex(accumulatorKeypair.public_key),
       undefined,
-      [accumulatorManagerDid, 1]
+      [accumulatorManagerDid, 1],
     );
     await dock.accumulatorModule.createNewPublicKey(
       pk,
       getHexIdentifierFromDID(accumulatorManagerDid),
       accumulatorManagerKeypair,
       undefined,
-      false
+      false,
     );
   }, 10000);
 
-  test("Create Accumulator", async () => {
+  test('Create Accumulator', async () => {
     const queriedParams = await dock.accumulatorModule.getParams(
       accumulatorManagerDid,
-      1
+      1,
     );
     accumulator = PositiveAccumulator.initialize(
       hexToU8a(queriedParams.bytes),
-      accumulatorKeypair.secret_key
+      accumulatorKeypair.secret_key,
     );
 
     accumulatorId = randomAsHex(32);
@@ -297,55 +299,55 @@ describe("Complete demo of anonymous credentials", () => {
       [accumulatorManagerDid, 1],
       accumulatorManagerKeypair,
       undefined,
-      false
+      false,
     );
   }, 10000);
 
-  test("Sign attributes, i.e. issue credential", async () => {
+  test('Sign attributes, i.e. issue credential', async () => {
     const encodedAttrs = encodedAttributes(attributes);
     const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 1, true);
     const paramsVal = SignatureParamsG1.valueFromBytes(
-      hexToU8a(queriedPk.params.bytes)
+      hexToU8a(queriedPk.params.bytes),
     );
     const params = new SignatureParamsG1(
       paramsVal,
-      hexToU8a(queriedPk.params.label)
+      hexToU8a(queriedPk.params.label),
     );
     signature = SignatureG1.generate(
       encodedAttrs,
       issuerBbsPlusKeypair.secretKey,
       params,
-      false
+      false,
     );
     // User verifies the credential (signature)
     const result = signature.verify(
       encodedAttrs,
       hexToU8a(queriedPk.bytes),
       params,
-      false
+      false,
     );
     expect(result.verified).toEqual(true);
   });
 
-  test("Add attribute to accumulator for checking revocation later", async () => {
+  test('Add attribute to accumulator for checking revocation later', async () => {
     const encodedAttrs = encodedAttributes(attributes);
     await accumulator.add(
       encodedAttrs[attributeCount - 1],
       accumulatorKeypair.secret_key,
-      accumulatorState
+      accumulatorState,
     );
     expect(
-      accumulatorState.state.has(encodedAttrs[attributeCount - 1])
+      accumulatorState.state.has(encodedAttrs[attributeCount - 1]),
     ).toEqual(true);
     membershipWitness = await accumulator.membershipWitness(
       encodedAttrs[attributeCount - 1],
       accumulatorKeypair.secret_key,
-      accumulatorState
+      accumulatorState,
     );
     const accumulated = u8aToHex(accumulator.accumulated);
     const accum = await dock.accumulatorModule.getAccumulator(
       accumulatorId,
-      true
+      true,
     );
     await dock.accumulatorModule.updateAccumulator(
       accumulatorId,
@@ -355,49 +357,49 @@ describe("Complete demo of anonymous credentials", () => {
       accum.nonce + 1,
       accumulatorManagerKeypair,
       undefined,
-      false
+      false,
     );
     const queriedAccum = await dock.accumulatorModule.getAccumulator(
       accumulatorId,
-      true
+      true,
     );
     expect(queriedAccum.accumulated).toEqual(accumulated);
     const tempAccumulator = PositiveAccumulator.fromAccumulated(
-      hexToU8a(queriedAccum.accumulated)
+      hexToU8a(queriedAccum.accumulated),
     );
     expect(
       tempAccumulator.verifyMembershipWitness(
         encodedAttrs[attributeCount - 1],
         membershipWitness,
         hexToU8a(queriedAccum.publicKey.bytes),
-        hexToU8a(queriedAccum.publicKey.params.bytes)
-      )
+        hexToU8a(queriedAccum.publicKey.params.bytes),
+      ),
     ).toEqual(true);
   }, 20000);
 
-  test("Prove knowledge of signature, i.e. possession of credential and accumulator membership", async () => {
+  test('Prove knowledge of signature, i.e. possession of credential and accumulator membership', async () => {
     await proveAndVerify();
   });
 
-  test("Add new members to the accumulator and update witness", async () => {
+  test('Add new members to the accumulator and update witness', async () => {
     const encodedAttrs = encodedAttributes(attributes);
     const member1 = Accumulator.encodePositiveNumberAsAccumulatorMember(100);
     const member2 = Accumulator.encodePositiveNumberAsAccumulatorMember(105);
     await accumulator.addBatch(
       [member1, member2],
       accumulatorKeypair.secret_key,
-      accumulatorState
+      accumulatorState,
     );
 
     let accum = await dock.accumulatorModule.getAccumulator(
       accumulatorId,
-      false
+      false,
     );
     const witnessUpdInfo = WitnessUpdatePublicInfo.new(
       hexToU8a(accum.accumulated),
       [member1, member2],
       [],
-      accumulatorKeypair.secret_key
+      accumulatorKeypair.secret_key,
     );
     await dock.accumulatorModule.updateAccumulator(
       accumulatorId,
@@ -410,17 +412,17 @@ describe("Complete demo of anonymous credentials", () => {
       accum.nonce + 1,
       accumulatorManagerKeypair,
       undefined,
-      false
+      false,
     );
 
     accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     const updates = await dock.accumulatorModule.getUpdatesFromBlock(
       accumulatorId,
-      accum.lastModified
+      accum.lastModified,
     );
     expect(updates.length).toEqual(1);
     const queriedWitnessInfo = new WitnessUpdatePublicInfo(
-      hexToU8a(updates[0].witness_update_info)
+      hexToU8a(updates[0].witnessUpdateInfo),
     );
     const additions = [];
     const removals = [];
@@ -438,31 +440,31 @@ describe("Complete demo of anonymous credentials", () => {
       encodedAttrs[attributeCount - 1],
       additions,
       removals,
-      queriedWitnessInfo
+      queriedWitnessInfo,
     );
 
     const queriedAccum = await dock.accumulatorModule.getAccumulator(
       accumulatorId,
-      true
+      true,
     );
     const tempAccumulator = PositiveAccumulator.fromAccumulated(
-      hexToU8a(queriedAccum.accumulated)
+      hexToU8a(queriedAccum.accumulated),
     );
     expect(
       tempAccumulator.verifyMembershipWitness(
         encodedAttrs[attributeCount - 1],
         membershipWitness,
         hexToU8a(queriedAccum.publicKey.bytes),
-        hexToU8a(queriedAccum.publicKey.params.bytes)
-      )
+        hexToU8a(queriedAccum.publicKey.params.bytes),
+      ),
     ).toEqual(true);
   });
 
-  test("After witness update, prove knowledge of signature, i.e. possession of credential and accumulator membership", async () => {
+  test('After witness update, prove knowledge of signature, i.e. possession of credential and accumulator membership', async () => {
     await proveAndVerify();
   });
 
-  test("Do several updates to the accumulator and update witness", async () => {
+  test('Do several updates to the accumulator and update witness', async () => {
     const encodedAttrs = encodedAttributes(attributes);
 
     const member1 = Accumulator.encodePositiveNumberAsAccumulatorMember(100);
@@ -477,18 +479,18 @@ describe("Complete demo of anonymous credentials", () => {
     await accumulator.addRemoveBatches(
       [member3, member4],
       [member1, member2],
-      accumulatorKeypair.secret_key
+      accumulatorKeypair.secret_key,
     );
 
     let accum = await dock.accumulatorModule.getAccumulator(
       accumulatorId,
-      false
+      false,
     );
     let witnessUpdInfo = WitnessUpdatePublicInfo.new(
       hexToU8a(accum.accumulated),
       [member3, member4],
       [member1, member2],
-      accumulatorKeypair.secret_key
+      accumulatorKeypair.secret_key,
     );
     await dock.accumulatorModule.updateAccumulator(
       accumulatorId,
@@ -502,7 +504,7 @@ describe("Complete demo of anonymous credentials", () => {
       accum.nonce + 1,
       accumulatorManagerKeypair,
       undefined,
-      false
+      false,
     );
 
     const member5 = Accumulator.encodePositiveNumberAsAccumulatorMember(200);
@@ -512,7 +514,7 @@ describe("Complete demo of anonymous credentials", () => {
     await accumulator.addRemoveBatches(
       [member5, member6],
       [member4],
-      accumulatorKeypair.secret_key
+      accumulatorKeypair.secret_key,
     );
 
     accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
@@ -521,7 +523,7 @@ describe("Complete demo of anonymous credentials", () => {
       hexToU8a(accum.accumulated),
       [member5, member6],
       [member4],
-      accumulatorKeypair.secret_key
+      accumulatorKeypair.secret_key,
     );
     await dock.accumulatorModule.updateAccumulator(
       accumulatorId,
@@ -535,7 +537,7 @@ describe("Complete demo of anonymous credentials", () => {
       accum.nonce + 1,
       accumulatorManagerKeypair,
       undefined,
-      false
+      false,
     );
 
     const member7 = Accumulator.encodePositiveNumberAsAccumulatorMember(201);
@@ -545,7 +547,7 @@ describe("Complete demo of anonymous credentials", () => {
     // await accumulator.addBatch([member7, member8, member9], accumulatorKeypair.secret_key, accumulatorState);
     await accumulator.addBatch(
       [member7, member8, member9],
-      accumulatorKeypair.secret_key
+      accumulatorKeypair.secret_key,
     );
 
     accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
@@ -553,7 +555,7 @@ describe("Complete demo of anonymous credentials", () => {
       hexToU8a(accum.accumulated),
       [member7, member8, member9],
       [],
-      accumulatorKeypair.secret_key
+      accumulatorKeypair.secret_key,
     );
     await dock.accumulatorModule.updateAccumulator(
       accumulatorId,
@@ -567,7 +569,7 @@ describe("Complete demo of anonymous credentials", () => {
       accum.nonce + 1,
       accumulatorManagerKeypair,
       undefined,
-      false
+      false,
     );
 
     accum = await dock.accumulatorModule.getAccumulator(accumulatorId, true);
@@ -580,7 +582,7 @@ describe("Complete demo of anonymous credentials", () => {
       const evs = await getAllEventsFromBlock(dock.api, currentBlockNo, false);
       for (const event of evs) {
         const ret = AccumulatorModule.parseEventAsAccumulatorUpdate(
-          event.event
+          event.event,
         );
         if (ret !== null && ret[0] === accumulatorId) {
           blockNosWithUpdates.push(currentBlockNo);
@@ -594,10 +596,10 @@ describe("Complete demo of anonymous credentials", () => {
       // eslint-disable-next-line no-await-in-loop
       const updates = await dock.accumulatorModule.getUpdatesFromBlock(
         accumulatorId,
-        blockNo
+        blockNo,
       );
       const wi = new WitnessUpdatePublicInfo(
-        hexToU8a(updates[0].witness_update_info)
+        hexToU8a(updates[0].witnessUpdateInfo),
       );
       updateInfo.push(wi);
     }
@@ -610,41 +612,41 @@ describe("Complete demo of anonymous credentials", () => {
         [member7, member8, member9],
       ],
       [[member1, member2], [member4], []],
-      [updateInfo[0], updateInfo[1], updateInfo[2]]
+      [updateInfo[0], updateInfo[1], updateInfo[2]],
     );
 
     const tempAccumulator = PositiveAccumulator.fromAccumulated(
-      hexToU8a(accum.accumulated)
+      hexToU8a(accum.accumulated),
     );
     expect(
       tempAccumulator.verifyMembershipWitness(
         encodedAttrs[attributeCount - 1],
         membershipWitness,
         hexToU8a(accum.publicKey.bytes),
-        hexToU8a(accum.publicKey.params.bytes)
-      )
+        hexToU8a(accum.publicKey.params.bytes),
+      ),
     ).toEqual(true);
   }, 30000);
 
-  test("After another witness update, prove knowledge of signature, i.e. possession of credential and accumulator membership", async () => {
+  test('After another witness update, prove knowledge of signature, i.e. possession of credential and accumulator membership', async () => {
     await proveAndVerify();
   });
 
-  test("Revoke by removing from the accumulator", async () => {
+  test('Revoke by removing from the accumulator', async () => {
     const encodedAttrs = encodedAttributes(attributes);
     await accumulator.remove(
       encodedAttrs[attributeCount - 1],
-      accumulatorKeypair.secret_key
+      accumulatorKeypair.secret_key,
     );
     const accum = await dock.accumulatorModule.getAccumulator(
       accumulatorId,
-      false
+      false,
     );
     const witnessUpdInfo = WitnessUpdatePublicInfo.new(
       hexToU8a(accum.accumulated),
       [],
       [encodedAttrs[attributeCount - 1]],
-      accumulatorKeypair.secret_key
+      accumulatorKeypair.secret_key,
     );
     await dock.accumulatorModule.updateAccumulator(
       accumulatorId,
@@ -658,35 +660,33 @@ describe("Complete demo of anonymous credentials", () => {
       accum.nonce + 1,
       accumulatorManagerKeypair,
       undefined,
-      false
+      false,
     );
   });
 
-  test("Witness update should not be possible after removal from accumulator", async () => {
+  test('Witness update should not be possible after removal from accumulator', async () => {
     const encodedAttrs = encodedAttributes(attributes);
     const accum = await dock.accumulatorModule.getAccumulator(
       accumulatorId,
-      false
+      false,
     );
     const updates = await dock.accumulatorModule.getUpdatesFromBlock(
       accumulatorId,
-      accum.lastModified
+      accum.lastModified,
     );
     expect(updates.length).toEqual(1);
     const queriedWitnessInfo = new WitnessUpdatePublicInfo(
-      hexToU8a(updates[0].witness_update_info)
+      hexToU8a(updates[0].witnessUpdateInfo),
     );
-    expect(() =>
-      membershipWitness.updateUsingPublicInfoPostBatchUpdate(
-        encodedAttrs[attributeCount - 1],
-        [],
-        [hexToU8a(updates[0].removals[0])],
-        queriedWitnessInfo
-      )
-    ).toThrow();
+    expect(() => membershipWitness.updateUsingPublicInfoPostBatchUpdate(
+      encodedAttrs[attributeCount - 1],
+      [],
+      [hexToU8a(updates[0].removals[0])],
+      queriedWitnessInfo,
+    )).toThrow();
   });
 
-  test("After revocation, i.e. removing from accumulator, prove verification should fail", async () => {
+  test('After revocation, i.e. removing from accumulator, prove verification should fail', async () => {
     let failed = false;
     try {
       await proveAndVerify();

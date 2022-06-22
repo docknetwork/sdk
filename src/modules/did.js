@@ -1,19 +1,18 @@
-import { encodeAddress } from "@polkadot/util-crypto";
-import { u8aToString, hexToU8a } from "@polkadot/util";
-import b58 from "bs58";
+import { encodeAddress } from '@polkadot/util-crypto';
+import { u8aToString, hexToU8a } from '@polkadot/util';
+import b58 from 'bs58';
 
 import {
   getHexIdentifierFromDID,
   DockDIDQualifier,
   NoDIDError,
   validateDockDIDHexIdentifier,
-} from "../utils/did";
-import { getStateChange } from "../utils/misc";
+} from '../utils/did';
+import { getStateChange } from '../utils/misc';
 
 import Signature from "../signatures/signature"; // eslint-disable-line
 
-export const ATTESTS_IRI =
-  "https://rdf.dock.io/alpha/2021#attestsDocumentContents";
+export const ATTESTS_IRI = 'https://rdf.dock.io/alpha/2021#attestsDocumentContents';
 
 /** Class to create, update and destroy DIDs */
 class DIDModule {
@@ -36,7 +35,7 @@ class DIDModule {
    */
   createNewTx(did, keyDetail) {
     const hexId = getHexIdentifierFromDID(did);
-    return this.module.new(this.api.registry.createType("Did", hexId), this.api.registry.createType("KeyDetail", keyDetail));
+    return this.module.new(hexId, keyDetail);
   }
 
   /**
@@ -49,7 +48,7 @@ class DIDModule {
     return await this.signAndSend(
       this.createNewTx(did, keyDetail),
       waitForFinalization,
-      params
+      params,
     );
   }
 
@@ -60,7 +59,7 @@ class DIDModule {
    * @return {Promise<object>} The extrinsic to sign and send.
    */
   createUpdateKeyTx(keyUpdate, signature) {
-    return this.module.updateKey(keyUpdate, this.api.registry.createType("DidSignature", signature.toJSON()));
+    return this.module.updateKey(keyUpdate, signature.toJSON());
   }
 
   /**
@@ -73,12 +72,12 @@ class DIDModule {
     keyUpdate,
     signature,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     return await this.signAndSend(
       this.createUpdateKeyTx(keyUpdate, signature),
       waitForFinalization,
-      params
+      params,
     );
   }
 
@@ -89,7 +88,7 @@ class DIDModule {
    * @return {Promise<object>} The extrinsic to sign and send.
    */
   createRemoveTx(didRemoval, signature) {
-    return this.module.remove(didRemoval, this.api.registry.createType("DidSignature", signature.toJSON()));
+    return this.module.remove(didRemoval, signature.toJSON());
   }
 
   /**
@@ -102,7 +101,7 @@ class DIDModule {
     return await this.signAndSend(
       this.createRemoveTx(didRemoval, signature),
       waitForFinalization,
-      params
+      params,
     );
   }
 
@@ -117,13 +116,13 @@ class DIDModule {
     attestation,
     signature,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     const hexId = getHexIdentifierFromDID(attester);
     const attestTx = this.api.tx.attest.setClaim(
       hexId,
       attestation,
-      signature.toJSON()
+      signature.toJSON(),
     );
     return await this.signAndSend(attestTx, waitForFinalization, params);
   }
@@ -164,21 +163,20 @@ class DIDModule {
     const attests = await this.getAttests(hexId);
 
     // If given DID was in hex, encode to SS58 and then construct fully qualified DID else the DID was already fully qualified
-    const id =
-      did === hexId ? this.getFullyQualifiedDID(encodeAddress(hexId)) : did;
+    const id = did === hexId ? this.getFullyQualifiedDID(encodeAddress(hexId)) : did;
 
     // Determine the type of the public key
     let type;
     let publicKeyRaw;
 
     if (detail.publicKey.isSr25519) {
-      type = "Sr25519VerificationKey2020";
+      type = 'Sr25519VerificationKey2020';
       publicKeyRaw = detail.publicKey.asSr25519;
     } else if (detail.publicKey.isEd25519) {
-      type = "Ed25519VerificationKey2018";
+      type = 'Ed25519VerificationKey2018';
       publicKeyRaw = detail.publicKey.asEd25519;
     } else {
-      type = "EcdsaSecp256k1VerificationKey2019";
+      type = 'EcdsaSecp256k1VerificationKey2019';
       publicKeyRaw = detail.publicKey.asSecp256k1;
     }
 
@@ -212,7 +210,7 @@ class DIDModule {
 
     // Construct document
     const document = {
-      "@context": "https://www.w3.org/ns/did/v1",
+      '@context': 'https://www.w3.org/ns/did/v1',
       id,
       authentication,
       assertionMethod,
@@ -268,7 +266,7 @@ class DIDModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedKeyUpdate(keyUpdate) {
-    return getStateChange(this.api, "KeyUpdate", keyUpdate);
+    return getStateChange(this.api, 'KeyUpdate', keyUpdate);
   }
 
   /**
@@ -277,7 +275,7 @@ class DIDModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedDIDRemoval(didRemoval) {
-    return getStateChange(this.api, "DidRemoval", didRemoval);
+    return getStateChange(this.api, 'DidRemoval', didRemoval);
   }
 
   /**
@@ -287,7 +285,7 @@ class DIDModule {
    */
   getSerializedAttestation(did, attestation) {
     const hexId = getHexIdentifierFromDID(did);
-    return getStateChange(this.api, "Attestation", [hexId, attestation]);
+    return getStateChange(this.api, 'Attestation', [hexId, attestation]);
   }
 }
 

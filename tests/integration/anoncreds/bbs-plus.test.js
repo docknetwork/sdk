@@ -44,7 +44,7 @@ describe('BBS+ Module', () => {
     let label = stringToHex('test-params-label');
     let params = SignatureParamsG1.generate(10, hexToU8a(label));
     const bytes1 = u8aToHex(params.toBytes());
-    const params1 = chainModule.prepareAddParameters(bytes1, undefined, label);
+    const params1 = chainModuleClass.prepareAddParameters(bytes1, undefined, label);
     await chainModule.createNewParams(params1, getHexIdentifierFromDID(did1), pair1, undefined, false);
     const paramsWritten1 = await chainModule.getLastParamsWritten(did1);
     expect(paramsWritten1.bytes).toEqual(params1.bytes);
@@ -55,7 +55,7 @@ describe('BBS+ Module', () => {
 
     params = SignatureParamsG1.generate(20);
     const bytes2 = u8aToHex(params.toBytes());
-    const params2 = chainModule.prepareAddParameters(bytes2);
+    const params2 = chainModuleClass.prepareAddParameters(bytes2);
     await chainModule.createNewParams(params2, getHexIdentifierFromDID(did2), pair2, undefined, false);
     const paramsWritten2 = await chainModule.getLastParamsWritten(did2);
     expect(paramsWritten2.bytes).toEqual(params2.bytes);
@@ -67,7 +67,7 @@ describe('BBS+ Module', () => {
     label = stringToHex('test-params-label-2');
     params = SignatureParamsG1.generate(23, hexToU8a(label));
     const bytes3 = u8aToHex(params.toBytes());
-    const params3 = chainModule.prepareAddParameters(bytes3, undefined, label);
+    const params3 = chainModuleClass.prepareAddParameters(bytes3, undefined, label);
     await chainModule.createNewParams(params3, getHexIdentifierFromDID(did1), pair1, undefined, false);
     const paramsWritten3 = await chainModule.getLastParamsWritten(did1);
     expect(paramsWritten3.bytes).toEqual(params3.bytes);
@@ -88,11 +88,11 @@ describe('BBS+ Module', () => {
     const params = SignatureParamsG1.generate(5);
     let keypair = KeypairG2.generate(params);
     const bytes1 = u8aToHex(keypair.public_key);
-    const pk1 = chainModule.prepareAddPublicKey(bytes1);
+    const pk1 = chainModuleClass.prepareAddPublicKey(bytes1);
     await chainModule.createNewPublicKey(pk1, getHexIdentifierFromDID(did1), pair1, undefined, false);
     const pkWritten1 = await chainModule.getLastPublicKeyWritten(did1);
     expect(pkWritten1.bytes).toEqual(pk1.bytes);
-    expect(pkWritten1.params_ref).toBe(null);
+    expect(pkWritten1.paramsRef).toBe(null);
 
     const queriedPk1 = await chainModule.getPublicKey(did1, 1);
     expect(pkWritten1).toEqual(queriedPk1);
@@ -102,11 +102,11 @@ describe('BBS+ Module', () => {
     const params1 = new SignatureParamsG1(params1Val, hexToU8a(queriedParams1.label));
     keypair = KeypairG2.generate(params1);
     const bytes2 = u8aToHex(keypair.public_key);
-    const pk2 = chainModule.prepareAddPublicKey(bytes2, undefined, [did1, 1]);
+    const pk2 = chainModuleClass.prepareAddPublicKey(bytes2, undefined, [did1, 1]);
     await chainModule.createNewPublicKey(pk2, getHexIdentifierFromDID(did2), pair2, undefined, false);
     const pkWritten2 = await chainModule.getLastPublicKeyWritten(did2);
     expect(pkWritten2.bytes).toEqual(pk2.bytes);
-    expect(pkWritten2.params_ref).toEqual([getHexIdentifierFromDID(did1), 1]);
+    expect(pkWritten2.paramsRef).toEqual([getHexIdentifierFromDID(did1), 1]);
 
     const queriedPk2 = await chainModule.getPublicKey(did2, 1);
     expect(pkWritten2).toEqual(queriedPk2);
@@ -119,11 +119,11 @@ describe('BBS+ Module', () => {
     const params2 = new SignatureParamsG1(params2Val, hexToU8a(queriedParams2.label));
     keypair = KeypairG2.generate(params2);
     const bytes3 = u8aToHex(keypair.public_key);
-    const pk3 = chainModule.prepareAddPublicKey(bytes3, undefined, [did1, 2]);
+    const pk3 = chainModuleClass.prepareAddPublicKey(bytes3, undefined, [did1, 2]);
     await chainModule.createNewPublicKey(pk3, getHexIdentifierFromDID(did2), pair2, undefined, false);
     const pkWritten3 = await chainModule.getLastPublicKeyWritten(did2);
     expect(pkWritten3.bytes).toEqual(pk3.bytes);
-    expect(pkWritten3.params_ref).toEqual([getHexIdentifierFromDID(did1), 2]);
+    expect(pkWritten3.paramsRef).toEqual([getHexIdentifierFromDID(did1), 2]);
 
     const queriedPk3 = await chainModule.getPublicKey(did2, 2);
     expect(pkWritten3).toEqual(queriedPk3);

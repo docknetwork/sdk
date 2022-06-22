@@ -15,6 +15,7 @@ export default class KeyringPairDidKeys extends DidKeys {
     super();
     this.reg = reg;
   }
+
   /**
    * Create a map of DID -> Signatures. This is used for authentication of the update
    * to the registry.

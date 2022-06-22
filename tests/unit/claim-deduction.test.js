@@ -1,5 +1,4 @@
 import { suites } from 'jsonld-signatures';
-const base58btc = require('base58-universal');
 import { hexToU8a } from '@polkadot/util';
 
 import jsonld from 'jsonld';
@@ -26,6 +25,8 @@ import {
 } from '../cached-document-loader.js';
 
 import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../../src/utils/misc';
+
+const base58btc = require('base58-universal');
 
 describe('Composite claim soundness checker', () => {
   test('control: issue and verify', async () => {
@@ -432,16 +433,16 @@ async function checkSoundness(presentation, rules) {
   return await acceptCompositeClaims(presentation, rules);
 }
 
-function registerDid(did, keyPair) {
+function registerDid(did, keypair) {
   if (registered(did)) { throw `${did} already registered`; }
 
-  const publicKeyBase58 = base58btc.encode(hexToU8a(keypair.public_key.value));
+  const publicKeyBase58 = base58btc.encode(hexToU8a(keypair.publicKey.value));
   const pk = {
     id: `${did}#keys-1`,
-    type: keyPair.type,
+    type: keypair.type,
     publicKeyBase58,
     controller: did,
-    publicKey: keypair.public_key.value,
+    publicKey: keypair.publicKey.value,
   };
   const doc = {
     '@context': 'https://www.w3.org/ns/did/v1',

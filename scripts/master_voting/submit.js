@@ -168,7 +168,7 @@ async function asEncodedStateChange(nodeClient, call) {
     proposal: [...call.toU8a()],
     round_no: await nodeClient.query.master.round(),
   };
-  return nodeClient.createType('StateChange', { MasterVote: payload }).toU8a();
+  return nodeClient.createType('CoreModsStateChange', { MasterVote: payload }).toU8a();
 }
 
 /**

@@ -111,7 +111,7 @@ export async function createKeyUpdate(didModule, did, newPublicKey, newControlle
   const keyUpdate = {
     did: hexId,
     public_key: newPublicKey.toJSON(),
-    last_modified_in_block: await didModule.getBlockNoForLastChangeToDID(hexId),
+    lastModified_in_block: await didModule.getBlockNoForLastChangeToDID(hexId),
   };
   if (newController) {
     keyUpdate.controller = getHexIdentifierFromDID(newController);
@@ -157,7 +157,7 @@ export async function createDidRemoval(didModule, did) {
   const hexId = getHexIdentifierFromDID(did);
   return {
     did: hexId,
-    last_modified_in_block: await didModule.getBlockNoForLastChangeToDID(hexId),
+    lastModified_in_block: await didModule.getBlockNoForLastChangeToDID(hexId),
   };
 }
 

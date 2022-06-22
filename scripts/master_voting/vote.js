@@ -83,7 +83,7 @@ async function main() {
     proposal: [...nc.createType('Call', call).toU8a()],
     round_no: await nc.query.master.round(),
   };
-  const encoded_state_change = nc.createType('StateChange', { MasterVote: payload }).toU8a();
+  const encoded_state_change = nc.createType('CoreModsStateChange', { MasterVote: payload }).toU8a();
 
   if (do_vote_yes) {
     // sign and print signature

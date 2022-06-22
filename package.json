@@ -75,7 +75,6 @@
   "dependencies": {
     "@comunica/actor-init-sparql-rdfjs": "^1.19.2",
     "@comunica/types": "^1.0.0",
-    "@docknetwork/node-types": "^0.6.0",
     "@polkadot/api": "^7.6.1",
     "@polkadot/keyring": "^8.3.3",
     "@polkadot/rpc-provider": "^7.6.1",

@@ -26,7 +26,7 @@ export default class SignatureSecp256k1 extends Signature {
   }
 
   /**
-   * @return {Object} The DidSignature JSON variant Secp256k1.
+   * @return {Object} The CoreModsDidDidSignature JSON variant Secp256k1.
    */
   toJSON() {
     return {

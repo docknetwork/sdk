@@ -100,7 +100,7 @@ class BlobModule {
       // eslint-disable-next-line no-param-reassign
       signature = getSignatureFromKeyringPair(keyPair, serializedBlob);
     }
-    return this.module.new(blobObj, this.api.registry.createType("DidSignature", signature.toJSON()));
+    return this.module.new(blobObj, signature.toJSON());
   }
 
   /**

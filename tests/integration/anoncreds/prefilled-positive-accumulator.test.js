@@ -59,12 +59,12 @@ describe('Prefilled positive accumulator', () => {
     const label = stringToHex('accumulator-params-label');
     const params = Accumulator.generateParams(hexToU8a(label));
     const bytes1 = u8aToHex(params);
-    const params1 = chainModule.prepareAddParameters(bytes1, undefined, label);
+    const params1 = chainModuleClass.prepareAddParameters(bytes1, undefined, label);
     await chainModule.createNewParams(params1, getHexIdentifierFromDID(did), pair, undefined, false);
 
     keypair = Accumulator.generateKeypair(params, seedAccum);
     const bytes2 = u8aToHex(keypair.public_key);
-    const pk1 = chainModule.prepareAddPublicKey(bytes2, undefined, [did, 1]);
+    const pk1 = chainModuleClass.prepareAddPublicKey(bytes2, undefined, [did, 1]);
     await chainModule.createNewPublicKey(pk1, getHexIdentifierFromDID(did), pair, undefined, false);
 
     accumulator = PositiveAccumulator.initialize(params, keypair.secret_key);
@@ -139,7 +139,7 @@ describe('Prefilled positive accumulator', () => {
         removals.push(hexToU8a(a));
       }
     }
-    const queriedWitnessInfo = new WitnessUpdatePublicInfo(hexToU8a(updates[0].witness_update_info));
+    const queriedWitnessInfo = new WitnessUpdatePublicInfo(hexToU8a(updates[0].witnessUpdateInfo));
 
     witness1.updateUsingPublicInfoPostBatchUpdate(member1, additions, removals, queriedWitnessInfo);
     expect(verifAccumulator.verifyMembershipWitness(member1, witness1, hexToU8a(queriedAccum.publicKey.bytes), hexToU8a(queriedAccum.publicKey.params.bytes))).toEqual(true);

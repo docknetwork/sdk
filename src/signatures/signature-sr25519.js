@@ -22,7 +22,7 @@ export default class SignatureSr25519 extends Signature {
   }
 
   /**
-   * @return {Object} The DidSignature JSON variant Sr25519.
+   * @return {Object} The CoreModsDidDidSignature JSON variant Sr25519.
    */
   toJSON() {
     return {

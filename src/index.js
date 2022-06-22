@@ -2,7 +2,6 @@ import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { HttpProvider } from '@polkadot/rpc-provider';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { KeyringPair } from '@polkadot/keyring/types'; // eslint-disable-line
-import typesBundle from '@docknetwork/node-types';
 
 import AnchorModule from './modules/anchor';
 import BlobModule from './modules/blob';
@@ -127,8 +126,6 @@ class DockAPI {
 
     if (chainTypes) {
       apiOptions.types = chainTypes;
-    } else {
-      apiOptions.typesBundle = typesBundle;
     }
 
     this.api = await ApiPromise.create(apiOptions);

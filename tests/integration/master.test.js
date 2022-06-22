@@ -1,7 +1,6 @@
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { cryptoWaitReady, randomAsU8a } from '@polkadot/util-crypto';
 import { assert, u8aToHex, stringToU8a } from '@polkadot/util';
-import typesBundle from '@docknetwork/node-types';
 import { FullNodeEndpoint, TestAccountURI } from '../test-constants';
 
 const ALICE_DID = u8aToHex(stringToU8a('Alice\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'));
@@ -104,7 +103,7 @@ describe('Master Module', () => {
 
   test('Use a master call to modify master membership.', async () => {
     const fourth_did = u8aToHex(randomAsU8a(32));
-    const new_membership = nc.createType('Membership', {
+    const new_membership = nc.createType('CoreModsMasterMembership', {
       members: sortedSet([
         ALICE_DID,
         BOB_DID,
@@ -140,7 +139,6 @@ describe('Master Module', () => {
 async function connect() {
   return await ApiPromise.create({
     provider: new WsProvider(FullNodeEndpoint),
-    typesBundle,
   });
 }
 
@@ -201,13 +199,13 @@ async function masterSetStorage(
 
 /// lexically sorted set of elements.
 function sortedSet(list) {
-  const sorted = [...list];
-  sorted.sort();
   const ret = new Set();
-  for (const s of sorted) {
+  for (const s of list) {
     ret.add(s);
   }
-  return ret;
+  const sorted = [...ret];
+  sorted.sort();
+  return sorted;
 }
 
 /// helper func
@@ -227,7 +225,7 @@ async function allVote(
     proposal: [...nc.createType('Call', proposal).toU8a()],
     round_no: await nc.query.master.round(),
   };
-  const encoded_state_change = nc.createType('StateChange', { MasterVote: payload }).toU8a();
+  const encoded_state_change = nc.createType('CoreModsStateChange', { MasterVote: payload }).toU8a();
 
   const dtk_sorted = [...did_to_key];
   dtk_sorted.sort(); // this relies on dids being hex encoded

@@ -45,7 +45,8 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
   // Register a new DID for issuer
 
-  let issuerDID, holderDID;
+  let issuerDID; let
+    holderDID;
   const issuerSeed = randomAsHex(32);
 
   // Register a new DID for holder
@@ -53,7 +54,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
   const holderSeed = randomAsHex(32);
 
   // Create a did/keypair proof map
-  let didKeys ;
+  let didKeys;
 
   let issuerKey;
   let credential;
@@ -61,15 +62,15 @@ describe('Credential revocation with issuer as the revocation authority', () => 
   let revId;
 
   const issuerDIDRaw = createNewDockDID();
-  const holderDIDRaw = createNewDockDID()
+  const holderDIDRaw = createNewDockDID();
 
   beforeAll(async (done) => {
     await dockAPI.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
-    
-    didKeys = new KeyringPairDidKeys(dockAPI.api.registry)
+
+    didKeys = new KeyringPairDidKeys(dockAPI.api.registry);
 
     issuerDID = getHexIdentifierFromDID(issuerDIDRaw);
     holderDID = getHexIdentifierFromDID(holderDIDRaw);
@@ -125,10 +126,8 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
     expect(result.verified).toBe(true);
 
-
     // Revoke the credential
     await dockAPI.revocation.revokeCredential(didKeys, registryId, revId, false);
-
 
     // The credential verification should fail as the credential has been revoked.
     const result1 = await verifyCredential(credential, {

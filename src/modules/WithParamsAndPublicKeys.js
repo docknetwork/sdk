@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 
 import { u8aToHex } from '@polkadot/util';
-import { Tuple } from '@polkadot/types'
 import { getHexIdentifierFromDID } from '../utils/did';
 
 /** Class with logic for public keys and corresponding setup parameters. This logic is common in BBS+ and accumulator */
@@ -13,7 +12,7 @@ export default class WithParamsAndPublicKeys {
    * @param label
    * @returns {{}}
    */
-  prepareAddParameters(bytes, curveType = undefined, label = undefined) {
+  static prepareAddParameters(bytes, curveType = undefined, label = undefined) {
     const params = {};
     if (bytes === undefined) {
       throw new Error('bytes must be provided');
@@ -21,9 +20,9 @@ export default class WithParamsAndPublicKeys {
       params.bytes = bytes;
     }
     if (curveType === undefined) {
-      params.curve_type = 'Bls12381';
+      params.curveType = 'Bls12381';
     } else if (curveType === 'Bls12381') {
-      params.curve_type = curveType;
+      params.curveType = curveType;
     } else {
       throw new Error(`Invalid curve type ${curveType}`);
     }
@@ -35,10 +34,10 @@ export default class WithParamsAndPublicKeys {
    * Create object to add new public key on chain
    * @param bytes
    * @param curveType
-   * @param params_ref - Provide if this public key was created using params present on chain.
+   * @param paramsRef - Provide if this public key was created using params present on chain.
    * @returns {{}}
    */
-  prepareAddPublicKey(bytes, curveType = undefined, params_ref = undefined) {
+  static prepareAddPublicKey(bytes, curveType = undefined, paramsRef = undefined) {
     const publicKey = {};
     if (bytes === undefined) {
       throw new Error('bytes must be provided');
@@ -46,13 +45,13 @@ export default class WithParamsAndPublicKeys {
       publicKey.bytes = bytes;
     }
     if (curveType === undefined) {
-      publicKey.curve_type = 'Bls12381';
+      publicKey.curveType = 'Bls12381';
     } else if (curveType === 'Bls12381') {
-      publicKey.curve_type = curveType;
+      publicKey.curveType = curveType;
     } else {
       throw new Error(`Invalid curve type ${curveType}`);
     }
-    publicKey.params_ref = params_ref !== undefined ? this.api.registry.createType("Option<ParametersStorageKey>", this.parseRef(params_ref)) : undefined;
+    publicKey.paramsRef = paramsRef !== undefined ? WithParamsAndPublicKeys.parseRef(paramsRef) : undefined;
     return publicKey;
   }
 
@@ -62,13 +61,13 @@ export default class WithParamsAndPublicKeys {
    * @param ref
    * @returns {any[]}
    */
-  parseRef(ref) {
+  static parseRef(ref) {
     const parsed = new Array(2);
     if (!(typeof ref === 'object' && ref instanceof Array && ref.length === 2)) {
       throw new Error('Reference should be an array of 2 items');
     }
     try {
-      parsed[0] = this.api.registry.createType("Did", getHexIdentifierFromDID(ref[0]));
+      parsed[0] = getHexIdentifierFromDID(ref[0]);
     } catch (e) {
       throw new Error(`First item of reference should be a DID but was ${ref[0]}`);
     }
@@ -77,11 +76,11 @@ export default class WithParamsAndPublicKeys {
     }
     // eslint-disable-next-line prefer-destructuring
     parsed[1] = ref[1];
-    return new Tuple(this.api.registry, ["Did", "u32"], parsed);
+    return parsed;
   }
 
   createNewParamsTx(addParams, did, keyPair = undefined, signature = undefined) {
-    const hexId = this.api.registry.createType("Did", getHexIdentifierFromDID(did));
+    const hexId = getHexIdentifierFromDID(did);
     if (!signature) {
       if (!keyPair) {
         throw Error('You need to provide either a keypair or a signature to register new parameters.');
@@ -89,11 +88,11 @@ export default class WithParamsAndPublicKeys {
       // eslint-disable-next-line no-param-reassign
       signature = this.signAddParams(keyPair, addParams);
     }
-    return this.module.addParams(this.api.registry.createType("AccumulatorParameters", addParams), hexId, this.api.registry.createType("DidSignature", signature.toJSON()));
+    return this.module.addParams(addParams, hexId, signature.toJSON());
   }
 
   createNewPublicKeyTx(addPk, did, keyPair = undefined, signature = undefined) {
-    const hexId = this.api.registry.createType("Did", getHexIdentifierFromDID(did));
+    const hexId = getHexIdentifierFromDID(did);
     if (!signature) {
       if (!keyPair) {
         throw Error('You need to provide either a keypair or a signature to register new key.');
@@ -101,11 +100,11 @@ export default class WithParamsAndPublicKeys {
       // eslint-disable-next-line no-param-reassign
       signature = this.signAddPublicKey(keyPair, addPk);
     }
-    return this.module.addPublicKey(this.api.registry.createType("AccumulatorPublicKey", addPk), hexId, this.api.registry.createType("DidSignature", signature.toJSON()));
+    return this.module.addPublicKey(addPk, hexId, signature.toJSON());
   }
 
   removeParamsTx(did, counter, keyPair = undefined, signature = undefined) {
-    const hexId = this.api.registry.createType("Did", getHexIdentifierFromDID(did));
+    const hexId = getHexIdentifierFromDID(did);
     if (!signature) {
       if (!keyPair) {
         throw Error('You need to provide either a keypair or a signature to remove params.');
@@ -113,11 +112,11 @@ export default class WithParamsAndPublicKeys {
       // eslint-disable-next-line no-param-reassign
       signature = this.signRemoveParams(keyPair, [hexId, counter]);
     }
-    return this.module.removeParams([hexId, counter], this.api.registry.createType("DidSignature", signature.toJSON()));
+    return this.module.removeParams([hexId, counter], signature.toJSON());
   }
 
   removePublicKeyTx(did, counter, keyPair = undefined, signature = undefined) {
-    const hexId = this.api.registry.createType("Did", getHexIdentifierFromDID(did));
+    const hexId = getHexIdentifierFromDID(did);
     if (!signature) {
       if (!keyPair) {
         throw Error('You need to provide either a keypair or a signature to remove public key.');
@@ -125,7 +124,7 @@ export default class WithParamsAndPublicKeys {
       // eslint-disable-next-line no-param-reassign
       signature = this.signRemovePublicKey(keyPair, [hexId, counter]);
     }
-    return this.module.removePublicKey([hexId, counter], this.api.registry.createType("DidSignature", signature.toJSON()));
+    return this.module.removePublicKey([hexId, counter], signature.toJSON());
   }
 
   async createNewParams(addParams, did, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
@@ -167,7 +166,7 @@ export default class WithParamsAndPublicKeys {
    *
    * @param did
    * @param counter
-   * @param withParams - If true, return the params referenced by the public key. It will throw an error if params_ref is null
+   * @param withParams - If true, return the params referenced by the public key. It will throw an error if paramsRef is null
    * or params were not found on chain which can happen if they were deleted after this public key was added.
    * @returns {Promise<{bytes: string}|null>}
    */
@@ -189,12 +188,12 @@ export default class WithParamsAndPublicKeys {
     if (resp.isSome) {
       const pkObj = this.createPublicKeyObjFromChainResponse(resp.unwrap());
       if (withParams) {
-        if (pkObj.params_ref === null) {
+        if (pkObj.paramsRef === null) {
           throw new Error('No reference to parameters for the public key');
         } else {
-          const params = await this.getParamsByHexDid(pkObj.params_ref[0], pkObj.params_ref[1]);
+          const params = await this.getParamsByHexDid(pkObj.paramsRef[0], pkObj.paramsRef[1]);
           if (params === null) {
-            throw new Error(`Parameters with reference (${pkObj.params_ref[0]}, ${pkObj.params_ref[1]}) not found on chain`);
+            throw new Error(`Parameters with reference (${pkObj.paramsRef[0]}, ${pkObj.paramsRef[1]}) not found on chain`);
           }
           pkObj.params = params;
         }
@@ -244,7 +243,7 @@ export default class WithParamsAndPublicKeys {
     const hexId = getHexIdentifierFromDID(did);
 
     const pks = [];
-    const [, counter] = await this.api.query[this.moduleName].didCounters(this.api.registry.createType("Did", hexId));
+    const [, counter] = await this.api.query[this.moduleName].didCounters(hexId);
     if (counter > 0) {
       for (let i = 1; i <= counter; i++) {
         // eslint-disable-next-line no-await-in-loop
@@ -268,7 +267,6 @@ export default class WithParamsAndPublicKeys {
     };
     if (params.curveType.isBls12381) {
       paramsObj.curveType = 'Bls12381';
-      paramsObj.curve_type = 'Bls12381'
     }
     if (params.label.isSome) {
       paramsObj.label = u8aToHex(params.label.unwrap());
@@ -279,7 +277,7 @@ export default class WithParamsAndPublicKeys {
   }
 
   /**
-   * Format an object received from the chain as a public key object with keys `bytes`, ` params_ref` and `curveType`.
+   * Format an object received from the chain as a public key object with keys `bytes`, ` paramsRef` and `curveType`.
    * @param pk
    * @returns {{bytes: string}}
    */
@@ -292,9 +290,9 @@ export default class WithParamsAndPublicKeys {
     }
     if (pk.paramsRef.isSome) {
       const pr = pk.paramsRef.unwrap();
-      pkObj.params_ref = [u8aToHex(pr[0]), pr[1].toNumber()];
+      pkObj.paramsRef = [u8aToHex(pr[0]), pr[1].toNumber()];
     } else {
-      pkObj.params_ref = null
+      pkObj.paramsRef = null;
     }
     return pkObj;
   }
@@ -323,7 +321,7 @@ export default class WithParamsAndPublicKeys {
    */
   async getLastPublicKeyWritten(did) {
     const hexId = getHexIdentifierFromDID(did);
-    const [, counter] = await this.api.query[this.moduleName].didCounters(this.api.registry.createType("Did", hexId));
+    const [, counter] = await this.api.query[this.moduleName].didCounters(hexId);
     if (counter > 0) {
       const resp = await this.queryPublicKeyFromChain(hexId, counter);
       if (resp.isSome) {

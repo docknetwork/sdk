@@ -26,7 +26,7 @@ function getId(obj) {
   if (typeof obj === 'string') {
     return obj;
   }
-  return obj.id// || 'dock:did:' + String(obj);
+  return obj.id;// || 'dock:did:' + String(obj);
 }
 
 /**

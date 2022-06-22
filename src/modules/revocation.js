@@ -1,5 +1,5 @@
-import { BTreeSet } from "@polkadot/types";
-import { getStateChange } from "../utils/misc";
+import { BTreeSet } from '@polkadot/types';
+import { getStateChange } from '../utils/misc';
 
 import DidKeys from "../utils/revocation/did-keys"; // eslint-disable-line
 import Policy from "../utils/revocation/policy"; // eslint-disable-line
@@ -27,10 +27,10 @@ class RevocationModule {
   createNewRegistryTx(id, policy, addOnly) {
     return this.module.newRegistry(
       id,
-      this.api.registry.createType("Registry", {
+      {
         policy: policy.toJSON(),
-        add_only: addOnly,
-      })
+        addOnly,
+      },
     );
   }
 
@@ -46,12 +46,12 @@ class RevocationModule {
     policy,
     addOnly,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     return this.signAndSend(
       this.createNewRegistryTx(id, policy, addOnly),
       waitForFinalization,
-      params
+      params,
     );
   }
 
@@ -64,8 +64,8 @@ class RevocationModule {
    */
   createRemoveRegistryTx(registryID, lastModified, didKeys) {
     const removal = {
-      registry_id: registryID,
-      last_modified: lastModified,
+      registryId: registryID,
+      lastModified,
     };
 
     const serializedRemoval = this.getSerializedRemoveRegistry(removal);
@@ -85,12 +85,12 @@ class RevocationModule {
     lastModified,
     didKeys,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     return await this.signAndSend(
       this.createRemoveRegistryTx(registryID, lastModified, didKeys),
       waitForFinalization,
-      params
+      params,
     );
   }
 
@@ -104,16 +104,16 @@ class RevocationModule {
    */
   createRevokeTx(registryID, revokeIds, lastModified, didKeys) {
     const revoke = {
-      registry_id: registryID,
-      revoke_ids: revokeIds,
-      last_modified: lastModified,
+      registryId: registryID,
+      revokeIds: [...revokeIds],
+      lastModified,
     };
 
     const serializedRevoke = this.getSerializedRevoke(revoke);
     const signedProof = didKeys.getSignatures(serializedRevoke);
     return this.module.revoke(
-      this.api.registry.createType("Revoke", revoke),
-      signedProof
+      revoke,
+      signedProof,
     );
   }
 
@@ -131,12 +131,12 @@ class RevocationModule {
     lastModified,
     didKeys,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     return await this.signAndSend(
       this.createRevokeTx(registryID, revokeIds, lastModified, didKeys),
       waitForFinalization,
-      params
+      params,
     );
   }
 
@@ -150,16 +150,16 @@ class RevocationModule {
    */
   createUnrevokeTx(registryID, revokeIds, lastModified, didKeys) {
     const unrevoke = {
-      registry_id: registryID,
-      revoke_ids: revokeIds,
-      last_modified: lastModified,
+      registryId: registryID,
+      revokeIds: [...revokeIds],
+      lastModified,
     };
 
     const serializedUnrevoke = this.getSerializedUnrevoke(unrevoke);
     const signedProof = didKeys.getSignatures(serializedUnrevoke);
     return this.module.unrevoke(
-      this.api.registry.createType("UnRevoke", unrevoke),
-      signedProof
+      unrevoke,
+      signedProof,
     );
   }
 
@@ -177,12 +177,12 @@ class RevocationModule {
     lastModified,
     didKeys,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     return await this.signAndSend(
       this.createUnrevokeTx(registryID, revokeIds, lastModified, didKeys),
       waitForFinalization,
-      params
+      params,
     );
   }
 
@@ -198,7 +198,7 @@ class RevocationModule {
   }
 
   /**
-   * Get detail of the registry. Its a 2 element array where the first element is the registry's policy and add_only
+   * Get detail of the registry. Its a 2 element array where the first element is the registry's policy and addOnly
    * status and second is the block number where the registry was last modified.
    * @param registryID
    * @returns {Promise<array>}
@@ -253,21 +253,21 @@ class RevocationModule {
     registryId,
     revId,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     const lastModified = await this.getBlockNoForLastChangeToRegistry(
-      registryId
+      registryId,
     );
     const revokeIds = new BTreeSet();
-    revokeIds.add(this.api.registry.createType("Did", revId));
+    revokeIds.add(revId);
 
     return updateFunc.bind(this)(
-      this.api.registry.createType("RegistryId", registryId),
+      registryId,
       revokeIds,
-      this.api.registry.createType("BlockNumber", lastModified),
+      lastModified,
       didKeys,
       waitForFinalization,
-      params
+      params,
     );
   }
 
@@ -284,7 +284,7 @@ class RevocationModule {
     registryId,
     revId,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     return this.updateRevReg(
       this.revoke,
@@ -292,7 +292,7 @@ class RevocationModule {
       registryId,
       revId,
       waitForFinalization,
-      params
+      params,
     );
   }
 
@@ -309,7 +309,7 @@ class RevocationModule {
     registryId,
     revId,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     return this.updateRevReg(
       this.unrevoke,
@@ -317,7 +317,7 @@ class RevocationModule {
       registryId,
       revId,
       waitForFinalization,
-      params
+      params,
     );
   }
 
@@ -327,7 +327,7 @@ class RevocationModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedRevoke(revoke) {
-    return getStateChange(this.api, "Revoke", revoke);
+    return getStateChange(this.api, 'Revoke', revoke);
   }
 
   /**
@@ -336,7 +336,7 @@ class RevocationModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedUnrevoke(unrevoke) {
-    return getStateChange(this.api, "Unrevoke", unrevoke);
+    return getStateChange(this.api, 'Unrevoke', unrevoke);
   }
 
   /**
@@ -345,7 +345,7 @@ class RevocationModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedRemoveRegistry(removeReg) {
-    return getStateChange(this.api, "RemoveRegistry", removeReg);
+    return getStateChange(this.api, 'RemoveRegistry', removeReg);
   }
 }
 

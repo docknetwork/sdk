@@ -4,7 +4,7 @@ import { isHexWithGivenByteSize } from '../utils/codec';
 /** Class representing a Signature. This export class should always be extended (abstract export class in some languages) */
 export default class Signature {
   /**
-   * Creates a new DidSignature object. Validates the given value. Currently supported signature
+   * Creates a new CoreModsDidDidSignature object. Validates the given value. Currently supported signature
    * types only require validating the byte size.
    * @param {string} value - Value of the signature. This is validated
    * @return {Signature} The Signature object if the given value is valid.
@@ -37,7 +37,7 @@ export default class Signature {
   }
 
   /**
-   * @return {Object} The correct DidSignature JSON variant. The extending export class should implement it.
+   * @return {Object} The correct CoreModsDidDidSignature JSON variant. The extending export class should implement it.
    */
   toJSON() {
     throw new Error('Not implemented. The extending export class should implement it');

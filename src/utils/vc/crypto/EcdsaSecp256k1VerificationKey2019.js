@@ -1,13 +1,15 @@
 import b58 from 'bs58';
+import { u8aToU8a } from '@polkadot/util';
 import { sha256 } from 'js-sha256';
-import { ec as EC } from 'elliptic';
+import elliptic from 'elliptic';
 import { EcdsaSecp256k1VerKeyName } from './constants';
 
+const EC = elliptic.ec;
 const secp256k1Curve = new EC('secp256k1');
 
 export default class EcdsaSecp256k1VerificationKey2019 {
   constructor(publicKey) {
-    this.publicKey = [...publicKey];
+    this.publicKey = u8aToU8a(publicKey);
   }
 
   /**

@@ -31,7 +31,7 @@ import { create_proof, construct, verify_proof } from 'mrklt';
 import assert from 'assert';
 import BLAKE2b from 'blake2b';
 import { randomAsU8a } from '@polkadot/util-crypto';
-import { u8aToHex } from '@polkadot/util';
+import { u8aToHex, u8aToU8a } from '@polkadot/util';
 import { connect, keypair } from '../scripts/helpers';
 
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
@@ -63,7 +63,7 @@ async function main() {
 // Post a value to the anchors module.
 async function anchor(hash) {
   const nc = await conn;
-  await signExtrinsic(nc.tx.anchor.deploy(u8aToHex(hash)))
+  await signExtrinsic(nc.tx.anchor.deploy(u8aToHex(u8aToU8a(hash))))
     .then(sendExtrinsic);
   assert((await check(hash)) !== null);
 }
@@ -72,7 +72,7 @@ async function anchor(hash) {
 // anchored. If the value is not anchored, return null.
 async function check(hash) {
   const nc = await conn;
-  const opt = await nc.query.anchor.anchors(u8aToHex(blake2b256(hash)));
+  const opt = await nc.query.anchor.anchors(u8aToHex(u8aToU8a(blake2b256(hash))));
   assert(opt.isNone !== opt.isSome);
   if (opt.isNone) {
     return null;
@@ -165,7 +165,7 @@ function utf8(str) {
 // hash a byte array using blake2b-256
 function blake2b256(bs) {
   const h = BLAKE2b(32);
-  h.update(bs);
+  h.update(u8aToU8a(bs));
   return h.digest();
 }
 

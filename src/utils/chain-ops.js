@@ -7,15 +7,20 @@ import {
 import { u8aToHex, formatBalance } from '@polkadot/util';
 import { isHexWithGivenByteSize, asDockAddress } from './codec';
 
-// XXX: Following info can be fetched from chain. Integrating in DockAPI object is an options.
+// XXX: Following info can be fetched from chain. Integrating in DockAPI object is an option.
 const TESTNET_ADDR_PREFIX = 21;
 const MAINNET_ADDR_PREFIX = 22;
 const DECIMAL = 6;
 const SYMBOL = 'DCK';
 
-// The methods below intentionally take an `ApiPromise` object to decouple from DockAPI.
+// The methods below intentionally take an `ApiPromise` object to decouple from `DockAPI` object.
 
-// Check if an address is valid
+/**
+ * Return true if an address is valid according to the provided network, false otherwise.
+ * @param {string} address - The address in SS58 format.
+ * @param {string} network - Address if from testnet or mainnet. Accepts only `test` and `main`.
+ * @returns {boolean} true if the address is valid, false otherwise.
+ */
 export function validateAddress(address, network = 'test') {
   if (network !== 'test' && network !== 'main') {
     throw new Error('Network must be "test" or "main"');
@@ -96,18 +101,18 @@ export function getBlockNo(headerOrBlock) {
  * Given a block number or block hash, get all extrinsics.
  * @param {*} api
  * @param {*} numberOrHash
- * @param {*} includeAllExtrinsics - If false, returns only successful extriniscs.
+ * @param {*} includeAllExtrinsics - If false, returns only successful extrinsics.
  */
 export async function getAllExtrinsicsFromBlock(api, numberOrHash, includeAllExtrinsics = true) {
   const block = await getBlock(api, numberOrHash);
   let { extrinsics } = block;
   if (includeAllExtrinsics === false) {
-    // Will only include successful extriniscs and using event `ExtrinsicSuccess` which hash index '0x0000' (1st index of 1st pallet which is system)
+    // Will only include successful extrinsics and using event `ExtrinsicSuccess` which hash index '0x0000' (1st index of 1st pallet which is system)
     const events = await getAllEventsFromBlock(api, block.header.number.toNumber(), true);
     const filteredExtrinsics = [];
     events.forEach((event) => {
       if (event.event && event.event.index === '0x0000') {
-        // event corresponds to `ExtrinsicSuccess` and event.phase.applyExtrinsic is the extrinisc index in the block
+        // event corresponds to `ExtrinsicSuccess` and event.phase.applyExtrinsic is the extrinsic index in the block
         filteredExtrinsics.push(extrinsics[event.phase.applyExtrinsic]);
       }
     });

@@ -6,7 +6,7 @@ import { endowEVMAddress } from '../../src/utils/evm-utils';
 require('dotenv').config();
 
 const {
-  FullNodeEndpoint, EndowedSecretURI, MinGasPrice, MaxGas,
+  FullNodeEndpoint, EndowedSecretURI, MinGasPrice, MaxGas, FullNodeTCPEndpoint,
 } = process.env;
 
 export function getTestPrivKeysForEVMAccounts() {
@@ -28,15 +28,17 @@ export function getTestEVMAccountsFromEthers(provider) {
 
 // Give `amount` of Dock tokens to EVM address. `amount` defaults to the number of tokens required to pay of maximum gas.
 // Uses the node endpoint and endowed account seed from environment variable.
-export async function endowEVMAddressWithDefault(evmAddr, amount) {
+export async function endowEVMAddressWithDefault(evmAddr, amount, nodeEndpoint, accountUri) {
   const dock = new DockAPI();
   await dock.init({
-    address: FullNodeEndpoint,
+    address: nodeEndpoint !== undefined ? nodeEndpoint : FullNodeEndpoint,
   });
-  const keypair = dock.keyring.addFromUri(EndowedSecretURI);
+  const keypair = dock.keyring.addFromUri(accountUri !== undefined ? accountUri : EndowedSecretURI);
   dock.setAccount(keypair);
 
-  return endowEVMAddress(dock, evmAddr, amount);
+  const res = await endowEVMAddress(dock, evmAddr, amount);
+  await dock.disconnect();
+  return res;
 }
 
 // Get a web3 instance
@@ -47,7 +49,7 @@ export function getWeb3(endpoint) {
 
 // Get a Ethers instance
 export function getEthers(endpoint) {
-  const ep = endpoint || FullNodeEndpoint;
+  const ep = endpoint || FullNodeTCPEndpoint;
   return new ethers.providers.JsonRpcProvider(ep);
 }
 

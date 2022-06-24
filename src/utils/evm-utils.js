@@ -21,8 +21,7 @@ export function evmAddrToSubstrateAddr(evmAddr) {
 // Convert Substrate address to EVM address
 export function substrateAddrToEVMAddr(address) {
   const bytes = decodeAddress(address);
-  // @ts-ignore
-  return u8aToHex(Array.from(bytes.slice(0, 20)));
+  return u8aToHex(bytes.slice(0, 20));
 }
 
 // Give `amount` of Dock tokens to EVM address. `amount` defaults to the number of tokens required to pay of maximum gas

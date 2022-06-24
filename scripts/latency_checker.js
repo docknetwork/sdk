@@ -58,7 +58,7 @@ dock.init({
     } else {
       count = 10;
     }
-    main(count);
+    return main(count);
   })
   .catch((error) => {
     console.error('Error occurred somewhere, it was caught!', error);

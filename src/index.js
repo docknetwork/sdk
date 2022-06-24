@@ -91,7 +91,7 @@ class DockAPI {
       if (this.api.isConnected) {
         throw new Error('API is already connected');
       } else {
-        this.disconnect();
+        await this.disconnect();
       }
     }
 

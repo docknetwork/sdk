@@ -165,6 +165,9 @@ class DockAPI {
       delete this.blobModule;
       delete this.didModule;
       delete this.revocationModule;
+      delete this.bbsPlusModule;
+      delete this.accumulatorModule;
+      delete this.migrationModule;
     }
   }
 

@@ -62,9 +62,7 @@ async function doRuntimeUpgrade() {
 dock.init({
   address: FullNodeEndpoint,
 })
-  .then(() => {
-    doRuntimeUpgrade();
-  })
+  .then(doRuntimeUpgrade)
   .catch((error) => {
     console.error('Error occurred somewhere, it was caught!', error);
     process.exit(1);

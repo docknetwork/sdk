@@ -212,9 +212,7 @@ async function main() {
 dock.init({
   address: FullNodeEndpoint,
 })
-  .then(() => {
-    main();
-  })
+  .then(main)
   .catch((error) => {
     console.error('Error occurred somewhere, it was caught!', error);
     process.exit(1);

@@ -54,9 +54,9 @@ export const sendAlarmEmail = curry(async (toAddr, subject, body) => {
     FromEmailAddress: toAddr[0],
   };
 
-  const r = await ses.sendEmail(params).promise();
+  const res = await ses.sendEmail(params).promise();
   console.log("Email sent.");
-  console.log(r);
+  console.log(res);
 
-  return r;
+  return res;
 });

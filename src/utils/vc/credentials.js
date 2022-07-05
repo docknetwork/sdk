@@ -184,7 +184,7 @@ export async function verifyCredential(credential, {
     documentLoader: docLoader,
   });
 
-  // Validate scheam
+  // Validate schema
   if (schemaApi) {
     await getAndValidateSchemaIfPresent(expandedCredential, schemaApi, credential[credentialContextField]);
   }

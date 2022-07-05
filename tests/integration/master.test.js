@@ -248,7 +248,7 @@ async function allVote(
   const votes = [];
   for (const [did, key] of did_to_key) {
     const nonce = await nc.didModule.getNextNonceForDID(did);
-    const vote = {nonce, proposal: encodedProposal, round_no: roundNo};
+    const vote = { nonce, proposal: encodedProposal, round_no: roundNo };
     const encodedStateChange = getStateChange(nc.api, 'MasterVote', vote);
     const signature = getSignatureFromKeyringPair(key, encodedStateChange);
     const didSig = createDidSig(did, 1, signature);

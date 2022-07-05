@@ -76,7 +76,15 @@ async function downloadBlobs() {
 
 async function downloadDids() {
   const dids = await dock.api.query.didModule.dids.entries();
-  return storageMapEntriesToObject(dids);
+  const controllers = await dock.api.query.didModule.didControllers.entries();
+  const keys = await dock.api.query.didModule.didKeys.entries();
+  const sps = await dock.api.query.didModule.didServiceEndpoints.entries();
+  return {
+    dids: storageMapEntriesToObject(dids),
+    controllers: storageDoubleMapEntriesToObject(controllers),
+    keys: storageDoubleMapEntriesToObject(keys),
+    serviceEndpoints: storageDoubleMapEntriesToObject(sps),
+  };
 }
 
 async function downloadRegs() {
@@ -99,15 +107,6 @@ async function downloadEvmAccountStorage() {
   return storageDoubleMapEntriesToObject(storages);
 }
 
-async function downloadPoAState() {
-  const epochs = await dock.api.query.poAModule.epochs.entries();
-  const stats = await dock.api.query.poAModule.validatorStats.entries();
-  return {
-    epochs: storageMapEntriesToObject(epochs),
-    stats: storageDoubleMapEntriesToObject(stats),
-  };
-}
-
 async function downloadState() {
   const accounts = await downloadAccounts();
 
@@ -123,7 +122,9 @@ async function downloadState() {
 
   const blobs = await downloadBlobs();
 
-  const dids = await downloadDids();
+  const {
+    dids, controllers, keys, serviceEndpoints,
+  } = await downloadDids();
 
   const regs = await downloadRegs();
 
@@ -132,8 +133,6 @@ async function downloadState() {
   const evmCodes = await downloadEvmAccountCode();
 
   const evmStorages = await downloadEvmAccountStorage();
-
-  const poaState = await downloadPoAState();
 
   const treasuryBal = await dock.api.rpc.poa.treasuryBalance();
 
@@ -147,11 +146,13 @@ async function downloadState() {
     attests,
     blobs,
     dids,
+    controllers,
+    keys,
+    serviceEndpoints,
     regs,
     revs,
     evmCodes,
     evmStorages,
-    poaState,
     treasuryBal,
   };
 

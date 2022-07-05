@@ -2,6 +2,8 @@
 
 import { u8aToHex } from '@polkadot/util';
 import { connect, keypair } from '../helpers';
+import { getHexIdentifierFromDID } from '../../src/utils/did';
+import { getStateChange } from '../../src/utils/misc';
 
 require('dotenv').config();
 
@@ -22,6 +24,8 @@ Expected Env vars:
     Websocket rpc url to a trusted live node e.g. wss://example.com:9944
 - MasterMemberSecret
     Secret phrase or hex encoded private key with which to sign. Not required for dry-run.
+- Did
+    Did of the member in hex or fully qualified form.
 `;
 
 main().catch((e) => {
@@ -32,7 +36,7 @@ main().catch((e) => {
 });
 
 async function main() {
-  const { FullNodeEndpoint, MasterMemberSecret } = process.env;
+  const { FullNodeEndpoint, MasterMemberSecret, Did } = process.env;
 
   if (process.argv.length !== 4 && process.argv.length !== 5) {
     console.error(USAGE);
@@ -40,6 +44,8 @@ async function main() {
   }
 
   const round_no = parseIntChecked(process.argv[2]);
+
+  const did = getHexIdentifierFromDID(did);
 
   const proposal_filename = process.argv[3];
   const proposal_unparsed = await fsp.readFile(proposal_filename);
@@ -62,7 +68,7 @@ async function main() {
 
   const nc = await connect(FullNodeEndpoint);
 
-  const actual_round_no = (await nc.query.master.round()).toJSON();
+  const actual_round_no = (await nc.api.query.master.round()).toJSON();
   if (actual_round_no !== round_no) {
     throw (
       'Round number passed as argument is not equal to round number reported by node.\n'
@@ -72,24 +78,24 @@ async function main() {
   }
 
   // encode proposal as call
-  const call = nc.createType('Call', proposal);
+  const call = nc.api.createType('Call', proposal);
 
   console.log('');
   console.log(`This proposal calls "${call._meta.name}" with arguments:`);
   console.dir(JSON.parse(JSON.stringify(call.args)), { depth: null });
   console.log('');
 
-  const payload = {
-    proposal: [...nc.createType('Call', call).toU8a()],
-    round_no: await nc.query.master.round(),
-  };
-  const encoded_state_change = nc.createType('StateChange', { MasterVote: payload }).toU8a();
+  const encodedProposal = [...nc.api.createType('Call', proposal).toU8a()];
+  const nonce = await nc.didModule.getNextNonceForDID(did);
+  const vote = { nonce, proposal: encodedProposal, round_no: actual_round_no };
+  const encodedStateChange = getStateChange(nc.api, 'MasterVote', vote);
 
   if (do_vote_yes) {
     // sign and print signature
     const kp = await keypair(MasterMemberSecret);
-    const sig = kp.sign(encoded_state_change);
-    console.log(`Signature:\n${u8aToHex(sig)}`);
+    const sig = kp.sign(encodedStateChange);
+    console.log(`Nonce:\n${nonce}\n`);
+    console.log(`Signature:\n${u8aToHex(sig)}\n`);
   }
 }
 

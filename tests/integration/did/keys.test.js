@@ -77,6 +77,22 @@ describe('Key support for DIDs', () => {
     expect(dk.verRels.isKeyAgreement()).toEqual(false);
   });
 
+  test('Get DID document', async () => {
+    const doc = await dock.did.getDocument(dockDid);
+    expect(doc.controller.length).toEqual(1);
+    expect(doc.verificationMethod.length).toEqual(3);
+    expect(doc.authentication.length).toEqual(2);
+    expect(doc.authentication[0]).toEqual(`${dockDid}#keys-1`);
+    expect(doc.authentication[1]).toEqual(`${dockDid}#keys-2`);
+    expect(doc.assertionMethod.length).toEqual(3);
+    expect(doc.assertionMethod[0]).toEqual(`${dockDid}#keys-1`);
+    expect(doc.assertionMethod[1]).toEqual(`${dockDid}#keys-2`);
+    expect(doc.assertionMethod[2]).toEqual(`${dockDid}#keys-3`);
+    expect(doc.capabilityInvocation.length).toEqual(2);
+    expect(doc.capabilityInvocation[0]).toEqual(`${dockDid}#keys-1`);
+    expect(doc.capabilityInvocation[1]).toEqual(`${dockDid}#keys-2`);
+  });
+
   test('Add more keys to DID', async () => {
     const pair1 = generateEcdsaSecp256k1Keypair(seed4);
     const publicKey1 = PublicKeySecp256k1.fromKeyringPair(pair1);
@@ -86,8 +102,7 @@ describe('Key support for DIDs', () => {
     const didKey1 = new DidKey(publicKey1, verRels1);
 
     const pair = dock.keyring.addFromUri(seed2, null, 'ed25519');
-    const [addKeys, sig] = await dock.did.createSignedAddKeys([didKey1], hexDid, hexDid, pair, 2);
-    await dock.did.addKeys(addKeys, sig);
+    await dock.did.addKeys([didKey1], dockDid, dockDid, pair, 2);
 
     const didDetail = await dock.did.getOnchainDidDetail(hexDid);
     expect(didDetail.lastKeyId).toBe(4);
@@ -102,10 +117,37 @@ describe('Key support for DIDs', () => {
     expect(dk1.verRels.isKeyAgreement()).toEqual(false);
   });
 
+  test('Get DID document after update', async () => {
+    const doc = await dock.did.getDocument(dockDid);
+    expect(doc.controller.length).toEqual(1);
+
+    expect(doc.verificationMethod.length).toEqual(4);
+    expect(doc.verificationMethod[0].id).toEqual(`${dockDid}#keys-1`);
+    expect(doc.verificationMethod[0].controller).toEqual(dockDid);
+    expect(doc.verificationMethod[0].publicKeyMultibase).toBeDefined();
+    expect(doc.verificationMethod[1].id).toEqual(`${dockDid}#keys-2`);
+    expect(doc.verificationMethod[1].controller).toEqual(dockDid);
+    expect(doc.verificationMethod[1].publicKeyMultibase).toBeDefined();
+
+    expect(doc.authentication.length).toEqual(2);
+    expect(doc.authentication[0]).toEqual(`${dockDid}#keys-1`);
+    expect(doc.authentication[1]).toEqual(`${dockDid}#keys-2`);
+
+    expect(doc.assertionMethod.length).toEqual(4);
+    expect(doc.assertionMethod[0]).toEqual(`${dockDid}#keys-1`);
+    expect(doc.assertionMethod[1]).toEqual(`${dockDid}#keys-2`);
+    expect(doc.assertionMethod[2]).toEqual(`${dockDid}#keys-3`);
+    expect(doc.assertionMethod[3]).toEqual(`${dockDid}#keys-4`);
+
+    expect(doc.capabilityInvocation.length).toEqual(3);
+    expect(doc.capabilityInvocation[0]).toEqual(`${dockDid}#keys-1`);
+    expect(doc.capabilityInvocation[1]).toEqual(`${dockDid}#keys-2`);
+    expect(doc.capabilityInvocation[2]).toEqual(`${dockDid}#keys-4`);
+  });
+
   test('Remove keys from DID', async () => {
     const pair = generateEcdsaSecp256k1Keypair(seed4);
-    const [removeKeys, sig] = await dock.did.createSignedRemoveKeys([1, 3], hexDid, hexDid, pair, 4);
-    await dock.did.removeKeys(removeKeys, sig);
+    await dock.did.removeKeys([1, 3], dockDid, dockDid, pair, 4);
 
     const didDetail = await dock.did.getOnchainDidDetail(hexDid);
     expect(didDetail.lastKeyId).toBe(4);

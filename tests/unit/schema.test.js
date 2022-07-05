@@ -42,7 +42,7 @@ describe('VerifiableCredential Tests', () => {
   test('VerifiableCredential\'s validateSchema should validate the credentialSubject with given JSON schema.', async () => {
     const result = await vc.validateSchema(exampleSchema);
     expect(result).toBe(true);
-  }, 10000);
+  }, 20000);
 });
 
 describe('Basic Schema Tests', () => {
@@ -57,11 +57,6 @@ describe('Basic Schema Tests', () => {
     const schemaNoID = new Schema();
     const encodedIDByteSize = 48;
     expect(schemaNoID.id && schemaNoID.id.length).toBe(encodedIDByteSize + DockBlobQualifier.length);
-  });
-
-  test('setAuthor will set the author and accepts a DID identifier or full DID', () => {
-    schema.setAuthor(exampleAuthor);
-    expect(schema.author).toBe(exampleAuthor);
   });
 
   test('setJSONSchema will only accept valid JSON schema and set the schema key of the object.', async () => {
@@ -88,13 +83,11 @@ describe('Basic Schema Tests', () => {
   });
 
   test('toBlob will generate a JSON that can be sent to written with blob module', () => {
-    schema.setAuthor(createNewDockDID());
     const result = schema.toBlob();
     expect(result).toMatchObject(
       expect.objectContaining({
         id: expect.anything(),
         blob: expect.anything(),
-        author: expect.anything(),
       }),
     );
   });
@@ -103,7 +96,6 @@ describe('Basic Schema Tests', () => {
 describe('Validate Credential Schema utility', () => {
   const schema = new Schema();
   schema.setJSONSchema(exampleSchema);
-  schema.setAuthor(exampleAuthor);
 
   let expandedCredential;
   beforeAll(async (done) => {

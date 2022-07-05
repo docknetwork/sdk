@@ -99,14 +99,14 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
     const sigParams = SignatureParamsG1.generate(attributeCount, hexToU8a(label));
     const bytes = u8aToHex(sigParams.toBytes());
     const params = BBSPlusModule.prepareAddParameters(bytes, undefined, label);
-    await dock.bbsPlusModule.createAddParams(params, getHexIdentifierFromDID(issuerDid), issuerKeypair, undefined, false);
+    await dock.bbsPlusModule.addParams(params, getHexIdentifierFromDID(issuerDid), issuerKeypair, undefined, false);
     const paramsWritten = await dock.bbsPlusModule.getLastParamsWritten(issuerDid);
     expect(paramsWritten.bytes).toEqual(params.bytes);
     expect(paramsWritten.label).toEqual(params.label);
 
     issuerBbsPlusKeypair = KeypairG2.generate(sigParams);
     const pk = BBSPlusModule.prepareAddPublicKey(u8aToHex(issuerBbsPlusKeypair.publicKey.bytes), undefined, [issuerDid, 1]);
-    await dock.bbsPlusModule.createAddPublicKey(pk, getHexIdentifierFromDID(issuerDid), issuerKeypair, undefined, false);
+    await dock.bbsPlusModule.addPublicKey(pk, getHexIdentifierFromDID(issuerDid), issuerKeypair, undefined, false);
   }, 10000);
 
   test('Sign attributes, i.e. issue credential', async () => {

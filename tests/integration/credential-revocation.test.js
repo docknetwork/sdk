@@ -13,7 +13,7 @@ import { DockResolver } from '../../src/resolver';
 import { createPresentation } from '../create-presentation';
 
 import {
-  KeyringPairDidKeys, OneOfPolicy,
+  OneOfPolicy,
   DockRevRegQualifier,
   getDockRevIdFromCredential,
   RevRegType,
@@ -51,9 +51,6 @@ describe('Credential revocation with issuer as the revocation authority', () => 
   const holderDID = createNewDockDID();
   const holderSeed = randomAsHex(32);
 
-  // Create a did/keypair proof map
-  const didKeys = new KeyringPairDidKeys();
-
   let issuerKey;
   let credential;
   let expanded;
@@ -83,9 +80,6 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
     // Add a new revocation registry with above policy
     await dockAPI.revocation.newRegistry(registryId, policy, false, false);
-
-    // Set our owner DID and associated keypair to be used for generating proof
-    didKeys.set(issuerDID, pair);
 
     let unsignedCred = getUnsignedCred(credId, holderDID);
 
@@ -117,7 +111,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     expect(result.verified).toBe(true);
 
     // Revoke the credential
-    await dockAPI.revocation.revokeCredential(didKeys, registryId, revId, false);
+    await dockAPI.revocation.revokeCredentialWithOneOfPolicy(didKeys, registryId, revId, false);
 
     // The credential verification should fail as the credential has been revoked.
     const result1 = await verifyCredential(credential, {
@@ -133,7 +127,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
   test('Holder can create a presentation and verifier can verify it successfully when it is not revoked else the verification fails', async () => {
     // The previous test revokes credential so unrevoke it. Its fine if the previous test is not run as unrevoking does not
     // throw error if the credential is not revoked.
-    await dockAPI.revocation.unrevokeCredential(didKeys, registryId, revId, false);
+    await dockAPI.revocation.unrevokeCredentialWithOneOfPolicy(didKeys, registryId, revId, false);
 
     const holderKey = getKeyDoc(holderDID, dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
 
@@ -165,7 +159,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     expect(result.verified).toBe(true);
 
     // Revoke credential
-    await dockAPI.revocation.revokeCredential(didKeys, registryId, revId, false);
+    await dockAPI.revocation.revokeCredentialWithOneOfPolicy(didKeys, registryId, revId, false);
 
     // As the credential is revoked, the presentation should verify successfully.
     const result1 = await verifyPresentation(signedPres, {

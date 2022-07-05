@@ -78,7 +78,6 @@ describe('Serialization', () => {
 
     // Set schema author
     const dockDID = createNewDockDID();
-    schema.setAuthor(dockDID);
 
     const shemaJSON = schema.toJSON();
     const constructedSchema = Schema.fromJSON(shemaJSON);

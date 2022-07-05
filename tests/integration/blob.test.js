@@ -11,7 +11,6 @@ import { registerNewDIDUsingPair } from './helpers';
 let account;
 let pair;
 let dockDID;
-let hexDid;
 let blobId;
 
 function errorInResult(result) {
@@ -38,7 +37,6 @@ describe('Blob Module', () => {
     pair = dock.keyring.addFromUri(firstKeySeed);
     dockDID = createNewDockDID();
     await registerNewDIDUsingPair(dock, dockDID, pair);
-    hexDid = getHexIdentifierFromDID(dockDID);
     done();
   });
 
@@ -58,17 +56,13 @@ describe('Blob Module', () => {
       id: blobId,
       blob: blobJSON,
     };
-    const [addBlob, didSig] = await dock.blob.createSignedAddBlob(dock.didModule, blob, hexDid, pair, 1);
-    const result = await dock.blob.new(
-      addBlob,
-      didSig,
-      false,
-    );
+    const result = await dock.blob.new(blob, dockDID, pair, 1, { didModule: dock.didModule }, false);
 
     expect(!!result).toBe(true);
 
     const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
+    expect(chainBlob[0]).toEqual(getHexIdentifierFromDID(dockDID));
     expect(chainBlob[1]).toEqual(blobJSON);
   }, 30000);
 
@@ -78,19 +72,13 @@ describe('Blob Module', () => {
       id: blobId,
       blob: blobHex,
     };
-    const [addBlob, didSig] = await dock.blob.createSignedAddBlob(dock.didModule, blob, hexDid, pair, 1);
-
-    const result = await dock.blob.new(
-      addBlob,
-      didSig,
-      undefined,
-      false,
-    );
+    const result = await dock.blob.new(blob, dockDID, pair, 1, { didModule: dock.didModule }, false);
 
     expect(!!result).toBe(true);
 
     const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
+    expect(chainBlob[0]).toEqual(getHexIdentifierFromDID(dockDID));
     expect(u8aToString(chainBlob[1])).toEqual(blobHex);
   }, 30000);
 
@@ -98,22 +86,16 @@ describe('Blob Module', () => {
     const blobHex = randomAsHex(32);
     const blob = {
       id: blobId,
-      blob: blobHex
+      blob: blobHex,
     };
 
-    const [addBlob, didSig] = await dock.blob.createSignedAddBlob(dock.didModule, blob, hexDid, pair, 1);
-
-    const result = await dock.blob.new(
-      addBlob,
-      didSig,
-      undefined,
-      false,
-    );
+    const result = await dock.blob.new(blob, dockDID, pair, 1, { didModule: dock.didModule }, false);
 
     expect(!!result).toBe(true);
 
     const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
+    expect(chainBlob[0]).toEqual(getHexIdentifierFromDID(dockDID));
     expect(u8aToHex(chainBlob[1])).toEqual(blobHex);
   }, 30000);
 
@@ -124,18 +106,13 @@ describe('Blob Module', () => {
       blob: blobVect,
     };
 
-    const [addBlob, didSig] = await dock.blob.createSignedAddBlob(dock.didModule, blob, hexDid, pair, 1);
-    const result = await dock.blob.new(
-      addBlob,
-      didSig,
-      undefined,
-      false,
-    );
+    const result = await dock.blob.new(blob, dockDID, pair, 1, { didModule: dock.didModule }, false);
 
     expect(!!result).toBe(true);
 
     const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
+    expect(chainBlob[0]).toEqual(getHexIdentifierFromDID(dockDID));
     expect(chainBlob[1]).toEqual(blobVect);
   }, 30000);
 
@@ -145,15 +122,7 @@ describe('Blob Module', () => {
       id: blobId,
       blob: blobHex,
     };
-    const [addBlob, didSig] = await dock.blob.createSignedAddBlob(dock.didModule, blob, hexDid, pair, 1);
-    await expect(
-      dock.blob.new(
-        addBlob,
-        didSig,
-        undefined,
-        false,
-      ),
-    ).rejects.toThrow();
+    await expect(dock.blob.new(blob, dockDID, pair, 1, { didModule: dock.didModule }, false)).rejects.toThrow();
 
     await expect(
       dock.blob.get(blobId),
@@ -166,13 +135,7 @@ describe('Blob Module', () => {
       id: blobId,
       blob: blobHexFirst,
     };
-    let [addBlob, didSig] = await dock.blob.createSignedAddBlob(dock.didModule, blob, hexDid, pair, 1);
-    const resultFirst = await dock.blob.new(
-      addBlob,
-      didSig,
-      undefined,
-      false,
-    );
+    const resultFirst = await dock.blob.new(blob, dockDID, pair, 1, { didModule: dock.didModule }, false);
 
     expect(!!resultFirst).toBe(true);
     expect(errorInResult(resultFirst)).toBe(false);
@@ -182,16 +145,7 @@ describe('Blob Module', () => {
       blob: randomAsHex(123),
     };
 
-    [addBlob, didSig] = await dock.blob.createSignedAddBlob(dock.didModule, blob, hexDid, pair, 1);
-
-    await expect(
-      dock.blob.new(
-        addBlob,
-        didSig,
-        undefined,
-        false,
-      ),
-    ).rejects.toThrow();
+    await expect(dock.blob.new(blob, dockDID, pair, 1, { didModule: dock.didModule }, false)).rejects.toThrow();
   }, 60000);
 
   test('Should throw error when cannot read blob with given id from chain.', async () => {

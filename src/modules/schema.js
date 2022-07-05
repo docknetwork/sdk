@@ -70,23 +70,6 @@ export default class Schema {
   }
 
   /**
-   * Update the object with `signature` key. This method is used when
-   * signing key/capability is not present and the signature is received from outside.
-   * Repeatedly calling it will keep resetting the `signature` key.
-   * The signature must be one of the supported objects
-   * @param {object} signature - The schema's signature
-   */
-  setSignature(signature) {
-    if (signature instanceof Signature) {
-      this.signature = signature;
-    } else {
-      throw new Error('Provided signature object is not of instance Signature');
-    }
-
-    return this;
-  }
-
-  /**
    * Serializes the object using `getSerializedBlob` and then signs it using the given
    * polkadot-js pair. The object will be updated with key `signature`. Repeatedly calling it will
    * keep resetting the `signature` key
@@ -122,10 +105,6 @@ export default class Schema {
       throw new Error('Schema requires schema property to be serialized to blob');
     }
 
-    if (!this.author) {
-      throw new Error('Schema requires author property to be serialized to blob');
-    }
-
     return {
       id: getHexIdentifierFromBlobID(this.id),
       blob: canonicalize(this.schema),
@@ -135,11 +114,22 @@ export default class Schema {
   /**
    * Prepares a transaction to write this schema object to the dock chain using the blob module
    * @param {object} dock - The dock API
-   * @param {object} pair - The keypair to sign with
+   * @param signerDid
+   * @param keyPair
+   * @param keyId
+   * @param nonce
+   * @param waitForFinalization
+   * @param params
    * @return {Promise<object>} The extrinsic to sign and send.
    */
-  async writeToChain(dock, pair, signature = undefined, waitForFinalization = true, params = {}) {
-    return await dock.blob.new(this.toBlob(), pair, signature, waitForFinalization, params);
+  async writeToChain(dock, signerDid, keyPair, keyId, nonce = undefined, waitForFinalization, params = {}) {
+    let arg;
+    if (nonce === undefined) {
+      arg = {didModule: dock.did};
+    } else {
+      arg = {nonce};
+    }
+    return await dock.blob.new(this.toBlob(), signerDid, keyPair, keyId, arg, waitForFinalization, params);
   }
 
   /**
@@ -156,7 +146,7 @@ export default class Schema {
   }
 
   /**
-   * Get schema from from the chain using the given id, by querying the blob storage.
+   * Get schema from the chain using the given id, by querying the blob storage.
    * Accepts a full blob id like blob:dock:0x... or just the hex identifier and the `DockAPI` object.
    * The returned schema would be formatted as specified in the RFC (including author DID, schema id) or an error is
    * returned if schema is not found on the chain or in JSON format.
@@ -173,7 +163,7 @@ export default class Schema {
       return {
         ...chainValue,
         id,
-        author: hexDIDToQualified(u8aToHex(chainBlob[0])),
+        author: hexDIDToQualified(u8aToHex(chainBlob[0][0][0])),
       };
     }
     throw new Error('Incorrect schema format');

@@ -27,12 +27,12 @@ import {
 import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/crypto-wasm-ts/src/accumulator/in-memory-persistence';
 import { DockAPI } from '../../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
-import { createKeyDetail, createNewDockDID, getHexIdentifierFromDID } from '../../../src/utils/did';
-import { getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
+import { createNewDockDID } from '../../../src/utils/did';
 import BBSPlusModule from '../../../src/modules/bbs-plus';
 import AccumulatorModule from '../../../src/modules/accumulator';
 import { getAllEventsFromBlock } from '../../../src/utils/chain-ops';
 import { getRevealedUnrevealed } from './utils';
+import { registerNewDIDUsingPair } from '../helpers';
 
 describe('Complete demo of anonymous credentials using BBS+ and accumulator', () => {
   const dock = new DockAPI();
@@ -86,7 +86,7 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     revealedAttrIndices.add(1);
     const [revealedAttrs, unrevealedAttrs] = getRevealedUnrevealed(encodedAttrs, revealedAttrIndices);
 
-    const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 1, true);
+    const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 2, true);
     const sigParams = new SignatureParamsG1(SignatureParamsG1.valueFromBytes(hexToU8a(queriedPk.params.bytes)));
     const sigPk = new BBSPlusPublicKeyG2(hexToU8a(queriedPk.bytes));
 
@@ -134,10 +134,10 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     dock.setAccount(account);
     issuerKeypair = dock.keyring.addFromUri(randomAsHex(32));
     issuerDid = createNewDockDID();
-    await dock.did.new(issuerDid, createKeyDetail(getPublicKeyFromKeyringPair(issuerKeypair), issuerDid), false);
+    await registerNewDIDUsingPair(dock, issuerDid, issuerKeypair);
     accumulatorManagerKeypair = dock.keyring.addFromUri(randomAsHex(32));
     accumulatorManagerDid = createNewDockDID();
-    await dock.did.new(accumulatorManagerDid, createKeyDetail(getPublicKeyFromKeyringPair(accumulatorManagerKeypair), accumulatorManagerDid), false);
+    await registerNewDIDUsingPair(dock, accumulatorManagerDid, accumulatorManagerKeypair);
     await initializeWasm();
     done();
   }, 20000);
@@ -146,7 +146,8 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     const label = stringToHex('My BBS+ params');
     const bytes = u8aToHex(SignatureParamsG1.generate(attributeCount, hexToU8a(label)).toBytes());
     const params = BBSPlusModule.prepareAddParameters(bytes, undefined, label);
-    await dock.bbsPlusModule.createNewParams(params, getHexIdentifierFromDID(issuerDid), issuerKeypair, undefined, false);
+    const [addParams, sig] = await dock.bbsPlusModule.createSignedAddParams(dock.did, params, issuerDid, issuerKeypair, 1);
+    await dock.bbsPlusModule.createAddParams(addParams, sig, false);
     const paramsWritten = await dock.bbsPlusModule.getLastParamsWritten(issuerDid);
     expect(paramsWritten.bytes).toEqual(params.bytes);
     expect(paramsWritten.label).toEqual(params.label);
@@ -159,14 +160,16 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     issuerBbsPlusKeypair = KeypairG2.generate(params);
 
     const pk = BBSPlusModule.prepareAddPublicKey(u8aToHex(issuerBbsPlusKeypair.publicKey.bytes), undefined, [issuerDid, 1]);
-    await dock.bbsPlusModule.createNewPublicKey(pk, getHexIdentifierFromDID(issuerDid), issuerKeypair, undefined, false);
+    const [addPk, sig] = await dock.bbsPlusModule.createSignedAddPublicKey(dock.did, pk, issuerDid, issuerDid, issuerKeypair, 1);
+    await dock.bbsPlusModule.createAddPublicKey(addPk, sig, false);
   }, 10000);
 
   test('Create Accumulator params', async () => {
     const label = stringToHex('My Accumulator params');
     const bytes = u8aToHex(Accumulator.generateParams(hexToU8a(label)).bytes);
     const params = AccumulatorModule.prepareAddParameters(bytes, undefined, label);
-    await dock.accumulatorModule.createNewParams(params, getHexIdentifierFromDID(accumulatorManagerDid), accumulatorManagerKeypair, undefined, false);
+    const [addParams, sig] = await dock.accumulatorModule.createSignedAddParams(dock.did, params, accumulatorManagerDid, accumulatorManagerKeypair, 1);
+    await dock.accumulatorModule.createAddParams(addParams, sig, false);
     const paramsWritten = await dock.accumulatorModule.getLastParamsWritten(accumulatorManagerDid);
     expect(paramsWritten.bytes).toEqual(params.bytes);
     expect(paramsWritten.label).toEqual(params.label);
@@ -177,7 +180,8 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     accumulatorKeypair = Accumulator.generateKeypair(new AccumulatorParams(hexToU8a(queriedParams.bytes)), hexToU8a(seedAccum));
 
     const pk = AccumulatorModule.prepareAddPublicKey(u8aToHex(accumulatorKeypair.publicKey.bytes), undefined, [accumulatorManagerDid, 1]);
-    await dock.accumulatorModule.createNewPublicKey(pk, getHexIdentifierFromDID(accumulatorManagerDid), accumulatorManagerKeypair, undefined, false);
+    const [addPk, sig] = await dock.accumulatorModule.createSignedAddPublicKey(dock.did, pk, accumulatorManagerDid, accumulatorManagerKeypair, 1);
+    await dock.accumulatorModule.createAddPublicKey(addPk, sig, false);
   }, 10000);
 
   test('Create Accumulator', async () => {
@@ -186,12 +190,13 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
 
     accumulatorId = randomAsHex(32);
     const accumulated = u8aToHex(accumulator.accumulated);
-    await dock.accumulatorModule.createNewPositiveAccumulator(accumulatorId, accumulated, [accumulatorManagerDid, 1], accumulatorManagerKeypair, undefined, false);
+    const [addAcc, sig] = await dock.accumulatorModule.createSignedAddPositiveAccumulator(dock.did, accumulatorId, accumulated, [accumulatorManagerDid, 1], accumulatorManagerDid, accumulatorManagerKeypair, 1);
+    await dock.accumulatorModule.addAccumulator(addAcc, sig, false);
   }, 10000);
 
   test('Sign attributes, i.e. issue credential', async () => {
     const encodedAttrs = encodedAttributes(attributes);
-    const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 1, true);
+    const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 2, true);
     const paramsVal = SignatureParamsG1.valueFromBytes(hexToU8a(queriedPk.params.bytes));
     const params = new SignatureParamsG1(paramsVal, hexToU8a(queriedPk.params.label));
     signature = SignatureG1.generate(encodedAttrs, issuerBbsPlusKeypair.secretKey, params, false);
@@ -209,8 +214,8 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     membershipWitness = await accumulator.membershipWitness(encodedAttrs[attributeCount - 1], accumulatorKeypair.secretKey, accumulatorState);
 
     const accumulated = u8aToHex(accumulator.accumulated);
-    const accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
-    await dock.accumulatorModule.updateAccumulator(accumulatorId, accumulated, { additions: [u8aToHex(encodedAttrs[attributeCount - 1])] }, accum.created, accum.nonce + 1, accumulatorManagerKeypair, undefined, false);
+    const [updAcc, sig] = await dock.accumulatorModule.createSignedUpdateAccumulator(dock.did, accumulatorId, accumulated, { additions: [u8aToHex(encodedAttrs[attributeCount - 1])] }, accumulatorManagerDid, accumulatorManagerKeypair, 1);
+    await dock.accumulatorModule.updateAccumulator(updAcc, sig, false);
 
     const queriedAccum = await dock.accumulatorModule.getAccumulator(accumulatorId, true);
     expect(queriedAccum.accumulated).toEqual(accumulated);
@@ -233,7 +238,8 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
 
     let accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     const witnessUpdInfo = WitnessUpdatePublicInfo.new(hexToU8a(accum.accumulated), [member1, member2], [], accumulatorKeypair.secretKey);
-    await dock.accumulatorModule.updateAccumulator(accumulatorId, u8aToHex(accumulator.accumulated), { additions: [u8aToHex(member1), u8aToHex(member2)], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accum.created, accum.nonce + 1, accumulatorManagerKeypair, undefined, false);
+    const [updAcc, sig] = await dock.accumulatorModule.createSignedUpdateAccumulator(dock.did, accumulatorId, u8aToHex(accumulator.accumulated), { additions: [u8aToHex(member1), u8aToHex(member2)], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accumulatorManagerDid, accumulatorManagerKeypair, 1);
+    await dock.accumulatorModule.updateAccumulator(updAcc, sig, false);
 
     accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     const updates = await dock.accumulatorModule.getUpdatesFromBlock(accumulatorId, accum.lastModified);
@@ -283,7 +289,8 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
 
     let accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     let witnessUpdInfo = WitnessUpdatePublicInfo.new(hexToU8a(accum.accumulated), [member3, member4], [member1, member2], accumulatorKeypair.secretKey);
-    await dock.accumulatorModule.updateAccumulator(accumulatorId, u8aToHex(accumulator.accumulated), { additions: [u8aToHex(member3), u8aToHex(member4)], removals: [u8aToHex(member1), u8aToHex(member2)], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accum.created, accum.nonce + 1, accumulatorManagerKeypair, undefined, false);
+    let [updAcc, sig] = await dock.accumulatorModule.createSignedUpdateAccumulator(dock.did, accumulatorId, u8aToHex(accumulator.accumulated), { additions: [u8aToHex(member3), u8aToHex(member4)], removals: [u8aToHex(member1), u8aToHex(member2)], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accumulatorManagerDid, accumulatorManagerKeypair, 1);
+    await dock.accumulatorModule.updateAccumulator(updAcc, sig, false);
 
     const member5 = Accumulator.encodePositiveNumberAsAccumulatorMember(200);
     const member6 = Accumulator.encodePositiveNumberAsAccumulatorMember(25);
@@ -294,7 +301,8 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     const startingBlock = accum.lastModified;
     witnessUpdInfo = WitnessUpdatePublicInfo.new(hexToU8a(accum.accumulated), [member5, member6], [member4], accumulatorKeypair.secretKey);
-    await dock.accumulatorModule.updateAccumulator(accumulatorId, u8aToHex(accumulator.accumulated), { additions: [u8aToHex(member5), u8aToHex(member6)], removals: [u8aToHex(member4)], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accum.created, accum.nonce + 1, accumulatorManagerKeypair, undefined, false);
+    [updAcc, sig] = await dock.accumulatorModule.createSignedUpdateAccumulator(dock.did, accumulatorId, u8aToHex(accumulator.accumulated), { additions: [u8aToHex(member5), u8aToHex(member6)], removals: [u8aToHex(member4)], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accumulatorManagerDid, accumulatorManagerKeypair, 1);
+    await dock.accumulatorModule.updateAccumulator(updAcc, sig, false);
 
     const member7 = Accumulator.encodePositiveNumberAsAccumulatorMember(201);
     const member8 = Accumulator.encodePositiveNumberAsAccumulatorMember(202);
@@ -305,7 +313,8 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
 
     accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     witnessUpdInfo = WitnessUpdatePublicInfo.new(hexToU8a(accum.accumulated), [member7, member8, member9], [], accumulatorKeypair.secretKey);
-    await dock.accumulatorModule.updateAccumulator(accumulatorId, u8aToHex(accumulator.accumulated), { additions: [u8aToHex(member7), u8aToHex(member8), u8aToHex(member9)], removals: [], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accum.created, accum.nonce + 1, accumulatorManagerKeypair, undefined, false);
+    [updAcc, sig] = await dock.accumulatorModule.createSignedUpdateAccumulator(dock.did, accumulatorId, u8aToHex(accumulator.accumulated), { additions: [u8aToHex(member7), u8aToHex(member8), u8aToHex(member9)], removals: [], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accumulatorManagerDid, accumulatorManagerKeypair, 1);
+    await dock.accumulatorModule.updateAccumulator(updAcc, sig, false);
 
     accum = await dock.accumulatorModule.getAccumulator(accumulatorId, true);
 
@@ -352,7 +361,8 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     await accumulator.remove(encodedAttrs[attributeCount - 1], accumulatorKeypair.secretKey);
     const accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     const witnessUpdInfo = WitnessUpdatePublicInfo.new(hexToU8a(accum.accumulated), [], [encodedAttrs[attributeCount - 1]], accumulatorKeypair.secretKey);
-    await dock.accumulatorModule.updateAccumulator(accumulatorId, u8aToHex(accumulator.accumulated), { additions: [], removals: [u8aToHex(encodedAttrs[attributeCount - 1])], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accum.created, accum.nonce + 1, accumulatorManagerKeypair, undefined, false);
+    const [updAcc, sig] = await dock.accumulatorModule.createSignedUpdateAccumulator(dock.did, accumulatorId, u8aToHex(accumulator.accumulated), { additions: [], removals: [u8aToHex(encodedAttrs[attributeCount - 1])], witnessUpdateInfo: u8aToHex(witnessUpdInfo.value) }, accumulatorManagerDid, accumulatorManagerKeypair, 1);
+    await dock.accumulatorModule.updateAccumulator(updAcc, sig, false);
   });
 
   test('Witness update should not be possible after removal from accumulator', async () => {

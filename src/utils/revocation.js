@@ -1,9 +1,9 @@
 import { randomAsHex, blake2AsHex } from '@polkadot/util-crypto';
 import jsonld from 'jsonld';
 
-import KeyringPairDidKeys from './revocation/keyring-pair-did-keys';
+// import KeyringPairDidKeys from './revocation/keyring-pair-did-keys';
 import OneOfPolicy from './revocation/one-of-policy';
-import DidKeys from './revocation/did-keys';
+import PAuth from './revocation/did-keys';
 import { isHexWithGivenByteSize } from './codec';
 
 import {
@@ -135,8 +135,7 @@ export async function checkRevocationStatus(credential, revocationApi) {
 }
 
 export {
-  DidKeys,
-  KeyringPairDidKeys,
+  PAuth,
   OneOfPolicy,
   RevRegType,
   DockRevRegQualifier,

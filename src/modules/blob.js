@@ -4,7 +4,8 @@ import { u8aToString, stringToHex, bufferToU8a } from '@polkadot/util';
 import { getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from '../utils/codec';
 import NoBlobError from '../utils/errors/no-blob-error';
-import Signature from '../signatures/signature'; // eslint-disable-line
+import { Signature } from '../signatures';
+import { createDidSig } from '../utils/did';
 
 export const DockBlobQualifier = 'blob:dock:';
 export const DockBlobIdByteSize = 32;
@@ -68,50 +69,24 @@ class BlobModule {
 
   /**
    * Create a transaction to register a new Blob on the Dock Chain
-   * @param {object} blob - struct to store on chain
-   * @param {object} keyPair - Key pair to sign with
-   * @param {Signature} signature - Signature to use
+   * @param {object} addBlob - struct to store on chain and nonce
+   * @param {object} signature - Signature to use
    * @return {object} The extrinsic to sign and send.
    */
-  createNewTx(blob, keyPair = undefined, signature = undefined) {
-    let value = blob.blob;
-    if (!value) {
-      throw new Error('Blob must have a value!');
-    }
-
-    if (value instanceof Uint8Array) {
-      value = [...value];
-    } else if (typeof value === 'object') {
-      value = stringToHex(JSON.stringify(value));
-    } else if (typeof value === 'string' && !isHexWithGivenByteSize(value)) {
-      value = stringToHex(value);
-    }
-
-    const blobObj = {
-      ...blob,
-      blob: value,
-    };
-
-    if (!signature) {
-      if (!keyPair) {
-        throw Error('You need to provide either a keypair or a signature to register a new Blob.');
-      }
-      const serializedBlob = this.getSerializedBlob(blobObj);
-      // eslint-disable-next-line no-param-reassign
-      signature = getSignatureFromKeyringPair(keyPair, serializedBlob);
-    }
-    return this.module.new(blobObj, signature.toJSON());
+  createNewTx(addBlob, signature) {
+    return this.module.new(addBlob, signature);
   }
 
   /**
    * Register a new Blob on the Dock Chain
-   * @param {object} blob - struct to store on chain
-   * @param {object} keyPair - Key pair to sign with
-   * @param {Signature} signature - Signature to use
+   * @param {object} addBlob - struct to store on chain
+   * @param {object} signature - Signature to use
+   * @param waitForFinalization
+   * @param params
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async new(blob, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createNewTx(blob, keyPair, signature), waitForFinalization, params);
+  async new(addBlob, signature, waitForFinalization = true, params = {}) {
+    return await this.signAndSend(this.createNewTx(addBlob, signature), waitForFinalization, params);
   }
 
   /**
@@ -145,13 +120,48 @@ class BlobModule {
     throw new Error(`Needed 2 items in response but got${respTuple.length}`);
   }
 
+  async createSignedAddBlob(didModule, blob, hexDid, keyPair, keyId, nonce = undefined) {
+    if (!blob.blob) {
+      throw new Error('Blob must have a value!');
+    }
+
+    const blobObj = {
+      ...blob,
+      blob: this.getSerializedBlobValue(blob.blob),
+    };
+
+    if (nonce === undefined) {
+      nonce = await didModule.getNextNonceForDID(hexDid);
+    }
+    const addBlob = {
+      blob: blobObj,
+      nonce,
+    };
+    const serializedAddBlob = this.getSerializedBlob(addBlob);
+    const signature = getSignatureFromKeyringPair(keyPair, serializedAddBlob);
+    const didSig = createDidSig(hexDid, keyId, signature);
+    return [addBlob, didSig];
+  }
+
+  getSerializedBlobValue(blobValue) {
+    if (blobValue instanceof Uint8Array) {
+      return [...blobValue];
+    } else if (typeof blobValue === 'object') {
+      return stringToHex(JSON.stringify(blobValue));
+    } else if (typeof blobValue === 'string' && !isHexWithGivenByteSize(blobValue)) {
+      return stringToHex(blobValue);
+    }
+    // Assuming `blobValue` is in hex
+    return blobValue;
+  }
+
   /**
    * Serializes the `Blob` (for signing before sending to the node)
    * @param {object} blob - `Blob` as expected by the Substrate node
    * @returns {Array} An array of Uint8
    */
   getSerializedBlob(blob) {
-    return getStateChange(this.api, 'Blob', blob);
+    return getStateChange(this.api, 'AddBlob', blob);
   }
 }
 

@@ -1,14 +1,16 @@
 import { randomAsHex } from '@polkadot/util-crypto';
-import { initializeWasm, Accumulator, PositiveAccumulator, WitnessUpdatePublicInfo, AccumulatorParams } from '@docknetwork/crypto-wasm-ts';
+import {
+  initializeWasm, Accumulator, PositiveAccumulator, WitnessUpdatePublicInfo, AccumulatorParams,
+} from '@docknetwork/crypto-wasm-ts';
 import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/crypto-wasm-ts/src/accumulator/in-memory-persistence';
 import { hexToU8a, stringToHex, u8aToHex } from '@polkadot/util';
 import { DockAPI } from '../../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
-import { getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
-import { createKeyDetail, createNewDockDID, getHexIdentifierFromDID } from '../../../src/utils/did';
+import { createNewDockDID, getHexIdentifierFromDID } from '../../../src/utils/did';
 
 import AccumulatorModule from '../../../src/modules/accumulator';
 import { getAllEventsFromBlock } from '../../../src/utils/chain-ops';
+import { registerNewDIDUsingPair } from '../helpers';
 
 describe('Accumulator Module', () => {
   const dock = new DockAPI();
@@ -37,8 +39,8 @@ describe('Accumulator Module', () => {
     pair2 = dock.keyring.addFromUri(seed2);
     did1 = createNewDockDID();
     did2 = createNewDockDID();
-    await dock.did.new(did1, createKeyDetail(getPublicKeyFromKeyringPair(pair1), did1), false);
-    await dock.did.new(did2, createKeyDetail(getPublicKeyFromKeyringPair(pair2), did2), false);
+    await registerNewDIDUsingPair(dock, did1, pair1);
+    await registerNewDIDUsingPair(dock, did2, pair2);
     await initializeWasm();
     done();
   }, 20000);
@@ -48,7 +50,8 @@ describe('Accumulator Module', () => {
     let params = Accumulator.generateParams(hexToU8a(label));
     const bytes1 = u8aToHex(params.bytes);
     const params1 = chainModuleClass.prepareAddParameters(bytes1, undefined, label);
-    await chainModule.createNewParams(params1, getHexIdentifierFromDID(did1), pair1, undefined, false);
+    const [addParams1, sig1] = await chainModule.createSignedAddParams(dock.did, params1, did1, pair1, 1);
+    await chainModule.createAddParams(addParams1, sig1, false);
     const paramsWritten1 = await chainModule.getLastParamsWritten(did1);
     expect(paramsWritten1.bytes).toEqual(params1.bytes);
     expect(paramsWritten1.label).toEqual(params1.label);
@@ -60,7 +63,8 @@ describe('Accumulator Module', () => {
     params = Accumulator.generateParams(hexToU8a(label));
     const bytes2 = u8aToHex(params.bytes);
     const params2 = chainModuleClass.prepareAddParameters(bytes2);
-    await chainModule.createNewParams(params2, getHexIdentifierFromDID(did2), pair2, undefined, false);
+    const [addParams2, sig2] = await chainModule.createSignedAddParams(dock.did, params2, did2, pair2, 1);
+    await chainModule.createAddParams(addParams2, sig2, false);
     const paramsWritten2 = await chainModule.getLastParamsWritten(did2);
     expect(paramsWritten2.bytes).toEqual(params2.bytes);
     expect(paramsWritten2.label).toBe(null);
@@ -72,7 +76,8 @@ describe('Accumulator Module', () => {
     params = Accumulator.generateParams(hexToU8a(label));
     const bytes3 = u8aToHex(params.bytes);
     const params3 = chainModuleClass.prepareAddParameters(bytes3);
-    await chainModule.createNewParams(params3, getHexIdentifierFromDID(did1), pair1, undefined, false);
+    const [addParams3, sig3] = await chainModule.createSignedAddParams(dock.did, params3, did1, pair1, 1);
+    await chainModule.createAddParams(addParams3, sig3, false);
     const paramsWritten3 = await chainModule.getLastParamsWritten(did1);
     expect(paramsWritten3.bytes).toEqual(params3.bytes);
     expect(paramsWritten3.label).toBe(null);
@@ -93,26 +98,24 @@ describe('Accumulator Module', () => {
     let keypair = Accumulator.generateKeypair(params);
     const bytes1 = u8aToHex(keypair.publicKey.bytes);
     const pk1 = chainModuleClass.prepareAddPublicKey(bytes1);
-    await chainModule.createNewPublicKey(pk1, getHexIdentifierFromDID(did1), pair1, undefined, false);
-    const pkWritten1 = await chainModule.getLastPublicKeyWritten(did1);
-    expect(pkWritten1.bytes).toEqual(pk1.bytes);
-    expect(pkWritten1.params_ref).toBe(null);
+    const [addPk1, sig1] = await chainModule.createSignedAddPublicKey(dock.did, pk1, did1, pair1, 1);
+    await chainModule.createAddPublicKey(addPk1, sig1, false);
 
     const queriedPk1 = await chainModule.getPublicKey(did1, 1);
-    expect(pkWritten1).toEqual(queriedPk1);
+    expect(queriedPk1.bytes).toEqual(pk1.bytes);
+    expect(queriedPk1.params_ref).toBe(null);
 
     const params1 = await chainModule.getParams(did1, 1);
     const aparams1 = new AccumulatorParams(hexToU8a(params1.bytes));
     keypair = Accumulator.generateKeypair(aparams1, hexToU8a(seedAccum));
     const bytes2 = u8aToHex(keypair.publicKey.bytes);
     const pk2 = chainModuleClass.prepareAddPublicKey(bytes2, undefined, [did1, 1]);
-    await chainModule.createNewPublicKey(pk2, getHexIdentifierFromDID(did2), pair2, undefined, false);
-    const pkWritten2 = await chainModule.getLastPublicKeyWritten(did2);
-    expect(pkWritten2.bytes).toEqual(pk2.bytes);
-    expect(pkWritten2.params_ref).toEqual([getHexIdentifierFromDID(did1), 1]);
+    const [addPk2, sig2] = await chainModule.createSignedAddPublicKey(dock.did, pk2, did2, pair2, 1);
+    await chainModule.createAddPublicKey(addPk2, sig2, false);
 
     const queriedPk2 = await chainModule.getPublicKey(did2, 1);
-    expect(pkWritten2).toEqual(queriedPk2);
+    expect(queriedPk2.bytes).toEqual(pk2.bytes);
+    expect(queriedPk2.params_ref).toEqual([getHexIdentifierFromDID(did1), 1]);
 
     const queriedPk2WithParams = await chainModule.getPublicKey(did2, 1, true);
     expect(queriedPk2WithParams.params).toEqual(params1);
@@ -122,23 +125,22 @@ describe('Accumulator Module', () => {
     keypair = Accumulator.generateKeypair(aparams2);
     const bytes3 = u8aToHex(keypair.publicKey.bytes);
     const pk3 = chainModuleClass.prepareAddPublicKey(bytes3, undefined, [did1, 2]);
-    await chainModule.createNewPublicKey(pk3, getHexIdentifierFromDID(did2), pair2, undefined, false);
-    const pkWritten3 = await chainModule.getLastPublicKeyWritten(did2);
-    expect(pkWritten3.bytes).toEqual(pk3.bytes);
-    expect(pkWritten3.params_ref).toEqual([getHexIdentifierFromDID(did1), 2]);
+    const [addPk3, sig3] = await chainModule.createSignedAddPublicKey(dock.did, pk3, did2, pair2, 1);
+    await chainModule.createAddPublicKey(addPk3, sig3, false);
 
     const queriedPk3 = await chainModule.getPublicKey(did2, 2);
-    expect(pkWritten3).toEqual(queriedPk3);
+    expect(queriedPk3.bytes).toEqual(pk3.bytes);
+    expect(queriedPk3.params_ref).toEqual([getHexIdentifierFromDID(did1), 2]);
 
     const queriedPk3WithParams = await chainModule.getPublicKey(did2, 2, true);
     expect(queriedPk3WithParams.params).toEqual(params2);
 
     const pksByDid1 = await chainModule.getAllPublicKeysByDid(did1);
-    expect(pksByDid1[0]).toEqual(pkWritten1);
+    expect(pksByDid1[0]).toEqual(queriedPk1);
 
     const pksByDid2 = await chainModule.getAllPublicKeysByDid(did2);
-    expect(pksByDid2[0]).toEqual(pkWritten2);
-    expect(pksByDid2[1]).toEqual(pkWritten3);
+    expect(pksByDid2[0]).toEqual(queriedPk2);
+    expect(pksByDid2[1]).toEqual(queriedPk3);
 
     const pksWithParamsByDid2 = await chainModule.getAllPublicKeysByDid(did2, true);
     expect(pksWithParamsByDid2[0]).toEqual(queriedPk2WithParams);
@@ -148,18 +150,19 @@ describe('Accumulator Module', () => {
   test('Can add and remove accumulator', async () => {
     const id1 = randomAsHex(32);
     const accumulated1 = randomAsHex(100);
-    await chainModule.createNewPositiveAccumulator(id1, accumulated1, [did1, 1], pair1, undefined, false);
+    const [addAcc1, sig1] = await chainModule.createSignedAddPositiveAccumulator(dock.did, id1, accumulated1, [did1, 1], did1, pair1, 1);
+    await chainModule.addAccumulator(addAcc1, sig1, false);
 
     const id2 = randomAsHex(32);
     const accumulated2 = randomAsHex(100);
     const maxSize = 100000;
-    await chainModule.createNewUniversalAccumulator(id2, accumulated2, [did2, 1], maxSize, pair2, undefined, false);
+    const [addAcc2, sig2] = await chainModule.createSignedAddUniversalAccumulator(dock.did, id2, accumulated2, [did2, 1], maxSize, did2, pair2, 1);
+    await chainModule.addAccumulator(addAcc2, sig2, false);
 
     const accum1 = await chainModule.getAccumulator(id1, false);
     expect(accum1.created > 0).toBe(true);
     expect(accum1.lastModified > 0).toBe(true);
     expect(accum1.created).toEqual(accum1.lastModified);
-    expect(accum1.nonce).toEqual(0);
     expect(accum1.type).toEqual('positive');
     expect(accum1.accumulated).toEqual(accumulated1);
     expect(accum1.key_ref).toEqual([getHexIdentifierFromDID(did1), 1]);
@@ -169,7 +172,6 @@ describe('Accumulator Module', () => {
     expect(accum2.created > 0).toBe(true);
     expect(accum2.lastModified > 0).toBe(true);
     expect(accum2.created).toEqual(accum2.lastModified);
-    expect(accum2.nonce).toEqual(0);
     expect(accum2.type).toEqual('universal');
     expect(accum2.accumulated).toEqual(accumulated2);
     expect(accum2.key_ref).toEqual([getHexIdentifierFromDID(did2), 1]);
@@ -185,19 +187,12 @@ describe('Accumulator Module', () => {
     expect(accum2WithKeyAndParams.key_ref).toEqual([getHexIdentifierFromDID(did2), 1]);
     expect(accum2WithKeyAndParams.public_key).toEqual(keyWithParams);
 
-    await expect(chainModule.removeAccumulator(id1, accum1.created, accum1.nonce, pair2, undefined, false)).rejects.toThrow();
-    await expect(chainModule.removeAccumulator(id2, accum2.created, accum2.nonce, pair1, undefined, false)).rejects.toThrow();
-
-    await expect(chainModule.removeAccumulator(id1, 300, accum1.nonce + 1, pair1, undefined, false)).rejects.toThrow();
-    await expect(chainModule.removeAccumulator(id2, 350, accum2.nonce + 1, pair2, undefined, false)).rejects.toThrow();
-
-    await expect(chainModule.removeAccumulator(id1, accum1.created, accum1.nonce, pair1, undefined, false)).rejects.toThrow();
-    await expect(chainModule.removeAccumulator(id2, accum2.created, accum2.nonce, pair2, undefined, false)).rejects.toThrow();
-
-    await chainModule.removeAccumulator(id1, accum1.created, accum1.nonce + 1, pair1, undefined, false);
+    const [remAcc3, sig3] = await chainModule.createSignedRemoveAccumulator(dock.did, id1, did1, pair1, 1);
+    await chainModule.removeAccumulator(remAcc3, sig3, false);
     expect(await chainModule.getAccumulator(id1, false)).toEqual(null);
 
-    await chainModule.removeAccumulator(id2, accum2.created, accum2.nonce + 1, pair2, undefined, false);
+    const [remAcc4, sig4] = await chainModule.createSignedRemoveAccumulator(dock.did, id2, did2, pair2, 1);
+    await chainModule.removeAccumulator(remAcc4, sig4, false);
     expect(await chainModule.getAccumulator(id2, false)).toEqual(null);
   }, 50000);
 
@@ -212,12 +207,14 @@ describe('Accumulator Module', () => {
 
     const accumulated1 = u8aToHex(accumulator.accumulated);
     const id = randomAsHex(32);
-    await chainModule.createNewPositiveAccumulator(id, accumulated1, [did2, 1], pair2, undefined, false);
+    const [addAcc1, sig1] = await chainModule.createSignedAddPositiveAccumulator(dock.did, id, accumulated1, [did2, 1], did2, pair2, 1);
+    await chainModule.addAccumulator(addAcc1, sig1, false);
     const accum1 = await chainModule.getAccumulator(id, false);
     expect(accum1.accumulated).toEqual(accumulated1);
 
     const accumulated2 = u8aToHex(accumulator.accumulated);
-    await chainModule.updateAccumulator(id, accumulated2, {}, accum1.created, accum1.nonce + 1, pair2, undefined, false);
+    const [updAcc2, sig2] = await chainModule.createSignedUpdateAccumulator(dock.did, id, accumulated2, {}, did2, pair2, 1);
+    await chainModule.updateAccumulator(updAcc2, sig2, false);
     const accum2 = await chainModule.getAccumulator(id, false);
     expect(accum2.accumulated).toEqual(accumulated2);
 
@@ -233,7 +230,8 @@ describe('Accumulator Module', () => {
     const additions1 = [u8aToHex(member2), u8aToHex(member3)];
     const removals1 = [u8aToHex(member1)];
     const witUpd1 = u8aToHex(WitnessUpdatePublicInfo.new(hexToU8a(accumulated2), [member2, member3], [member1], keypair.secretKey).value);
-    await chainModule.updateAccumulator(id, accumulated3, { additions: additions1, removals: removals1, witnessUpdateInfo: witUpd1 }, accum2.created, accum2.nonce + 1, pair2, undefined, false);
+    const [updAcc3, sig3] = await chainModule.createSignedUpdateAccumulator(dock.did, id, accumulated3, { additions: additions1, removals: removals1, witnessUpdateInfo: witUpd1 }, did2, pair2, 1);
+    await chainModule.updateAccumulator(updAcc3, sig3, false);
     const accum3 = await chainModule.getAccumulator(id, false);
     expect(accum3.accumulated).toEqual(accumulated3);
 
@@ -246,7 +244,8 @@ describe('Accumulator Module', () => {
     const accumulated4 = u8aToHex(accumulator.accumulated);
     const additions2 = [u8aToHex(member4), u8aToHex(member5)];
     const witUpd2 = u8aToHex(WitnessUpdatePublicInfo.new(hexToU8a(accumulated3), [member4, member5], [], keypair.secretKey).value);
-    await chainModule.updateAccumulator(id, accumulated4, { additions: additions2, witnessUpdateInfo: witUpd2 }, accum3.created, accum3.nonce + 1, pair2, undefined, false);
+    const [updAcc4, sig4] = await chainModule.createSignedUpdateAccumulator(dock.did, id, accumulated4, { additions: additions2, witnessUpdateInfo: witUpd2 }, did2, pair2, 1);
+    await chainModule.updateAccumulator(updAcc4, sig4, false);
     const accum4 = await chainModule.getAccumulator(id, false);
     expect(accum4.accumulated).toEqual(accumulated4);
 
@@ -256,7 +255,8 @@ describe('Accumulator Module', () => {
     const accumulated5 = u8aToHex(accumulator.accumulated);
     const removals3 = [u8aToHex(member2), u8aToHex(member4)];
     const witUpd3 = u8aToHex(WitnessUpdatePublicInfo.new(hexToU8a(accumulated4), [], [member2, member4], keypair.secretKey).value);
-    await chainModule.updateAccumulator(id, accumulated5, { removals: removals3, witnessUpdateInfo: witUpd3 }, accum4.created, accum4.nonce + 1, pair2, undefined, false);
+    const [updAcc5, sig5] = await chainModule.createSignedUpdateAccumulator(dock.did, id, accumulated5, { removals: removals3, witnessUpdateInfo: witUpd3 }, did2, pair2, 1);
+    await chainModule.updateAccumulator(updAcc5, sig5, false);
     const accum5 = await chainModule.getAccumulator(id, false);
     expect(accum5.accumulated).toEqual(accumulated5);
 
@@ -294,20 +294,23 @@ describe('Accumulator Module', () => {
   }, 50000);
 
   test('Can remove public keys and params', async () => {
-    await chainModule.removePublicKey(did1, 1, pair1, undefined, false);
+    const [remPk1, sig1] = await chainModule.createSignedRemovePublicKey(dock.did, did1, 1, pair1, 1);
+    await chainModule.removePublicKey(remPk1, sig1, false);
     const pk1 = await chainModule.getPublicKey(did1, 1);
     expect(pk1).toEqual(null);
 
     const pksByDid1 = await chainModule.getAllPublicKeysByDid(did1);
     expect(pksByDid1.length).toEqual(0);
 
-    await chainModule.removeParams(did1, 1, pair1, undefined, false);
+    const [remPar3, sig3] = await chainModule.createSignedRemoveParams(dock.did, did1, 1, pair1, 1);
+    await chainModule.removeParams(remPar3, sig3, false);
     const params1 = await chainModule.getParams(did1, 1);
     expect(params1).toEqual(null);
 
     await expect(chainModule.getPublicKey(did2, 1, true)).rejects.toThrow();
 
-    await chainModule.removePublicKey(did2, 1, pair2, undefined, false);
+    const [remPk4, sig4] = await chainModule.createSignedRemovePublicKey(dock.did, did2, 1, pair2, 1);
+    await chainModule.removePublicKey(remPk4, sig4, false);
     const pk2 = await chainModule.getPublicKey(did2, 1);
     expect(pk2).toEqual(null);
 
@@ -317,15 +320,18 @@ describe('Accumulator Module', () => {
     const queriedPk2 = await chainModule.getPublicKey(did2, 2);
     expect(pksByDid2[0]).toEqual(queriedPk2);
 
-    await chainModule.removePublicKey(did2, 2, pair2, undefined, false);
+    const [remPk5, sig5] = await chainModule.createSignedRemovePublicKey(dock.did, did2, 2, pair2, 1);
+    await chainModule.removePublicKey(remPk5, sig5, false);
     const pk3 = await chainModule.getPublicKey(did2, 2);
     expect(pk3).toEqual(null);
 
-    await chainModule.removeParams(did1, 2, pair1, undefined, false);
+    const [remPar6, sig6] = await chainModule.createSignedRemoveParams(dock.did, did1, 2, pair1, 1);
+    await chainModule.removeParams(remPar6, sig6, false);
     const params2 = await chainModule.getParams(did1, 2);
     expect(params2).toEqual(null);
 
-    await chainModule.removeParams(did2, 1, pair2, undefined, false);
+    const [remPar7, sig7] = await chainModule.createSignedRemoveParams(dock.did, did2, 1, pair2, 1);
+    await chainModule.removeParams(remPar7, sig7, false);
     const params3 = await chainModule.getParams(did2, 1);
     expect(params3).toEqual(null);
   }, 50000);

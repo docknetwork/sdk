@@ -150,3 +150,14 @@ export function getUniqueElementsFromArray(a, filterCallback) {
 export function encodeExtrinsicAsHash(api, tx) {
   return blake2AsHex(api.createType('Call', tx).toU8a());
 }
+
+/**
+ * Convert bytes to struct `WrappedBytes` expected by chain
+ * @param bytes
+ * @returns {{'0'}}
+ */
+export function bytesToWrappedBytes(bytes) {
+  return {
+    0: bytes,
+  };
+}

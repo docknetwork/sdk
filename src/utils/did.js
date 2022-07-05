@@ -7,14 +7,14 @@ import { getSignatureFromKeyringPair } from './misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from './codec';
 
 import { Signature } from '../signatures'; // eslint-disable-line
-import { PublicKey } from '../public-keys'; // eslint-disable-line
+import { PublicKey, VerificationRelationship } from '../public-keys'; // eslint-disable-line
 
 export const DockDIDMethod = 'dock';
 export const DockDIDQualifier = `did:${DockDIDMethod}:`;
 export const DockDIDByteSize = 32;
 
 /**
- * Error thrown when a DID document lookup was successful, but the did in question does not exist.
+ * Error thrown when a DID document lookup was successful, but the DID in question does not exist.
  * This is different from a network error.
  */
 export class NoDIDError extends Error {
@@ -22,6 +22,31 @@ export class NoDIDError extends Error {
     super(`DID (${did}) does not exist`);
     this.name = 'NoDIDError';
     this.did = did;
+    this.message = 'A DID document lookup was successful, but the DID in question does not exist. This is different from a network error.';
+  }
+}
+
+/**
+ * Error thrown when a DID exists on chain but is an off-chain DID, meaning the DID document exists off-chain.
+ */
+export class NoOnchainDIDError extends Error {
+  constructor(did) {
+    super(`DID (${did}) is an off-chain DID`);
+    this.name = 'NoOnchainDIDError';
+    this.did = did;
+    this.message = 'The DID exists on chain but is an off-chain DID, meaning the DID document exists off-chain.';
+  }
+}
+
+/**
+ * Error thrown when a DID exists on chain and is an on-chain DID but the lookup was performed for an off-chain DID.
+ */
+export class NoOffchainDIDError extends Error {
+  constructor(did) {
+    super(`DID (${did}) is an on-chain DID`);
+    this.name = 'NoOffchainDIDError';
+    this.did = did;
+    this.message = 'The DID exists on chain and is an on-chain DID but the lookup was performed for an off-chain DID.';
   }
 }
 
@@ -81,16 +106,29 @@ export function createNewDockDID() {
 }
 
 /**
- * Returns a `KeyDetail` as expected by the Substrate node
+ * Returns a `DidKey` as expected by the Substrate node
  * @param {PublicKey} publicKey - The public key for the DID. The Keyring is intentionally avoided here as it may not be
  * accessible always, like in case of hardware wallet
- * @param {string} controller - Full DID or hex identifier of the controller of the public key
+ * @param {VerificationRelationship} verRel
  * @returns {object} - The object has structure and keys with same names as expected by the Substrate node
  */
-export function createKeyDetail(publicKey, controller) {
+export function createDidKey(publicKey, verRel) {
   return {
-    public_key: publicKey.toJSON(),
-    controller: getHexIdentifierFromDID(controller),
+    publicKey: publicKey.toJSON(),
+    verRels: verRel.value,
+  };
+}
+
+/**
+ *
+ * @param {string} did - DID as hex
+ * @param {number} keyId -
+ * @param {Signature} sig
+ * @returns {{sig: *, keyId, did}}
+ */
+export function createDidSig(did, keyId, sig) {
+  return {
+    did, keyId: { 0: keyId }, sig: sig.toJSON(),
   };
 }
 
@@ -203,25 +241,31 @@ export function createDidAttestation(priority, iri) {
 /**
  * Sign the given `Attestation` and returns the signature
  * @param {module} didModule - The did module
- * @param {object} attestation - `Attestation` as expected by the Substrate node
+ * @param {object} setAttestation - `SetAttestationClaim` as expected by the Substrate node
  * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * @returns {Signature}
  */
-export function signDidAttestation(didModule, did, attestation, currentKeyPair) {
-  const serializedAttestation = didModule.getSerializedAttestation(did, attestation);
+export function signDidAttestation(didModule, setAttestation, currentKeyPair) {
+  const serializedAttestation = didModule.getSerializedAttestation(setAttestation);
   return getSignatureFromKeyringPair(currentKeyPair, serializedAttestation);
 }
 
 /**
  * Create a `Attestation` as expected by the Substrate node and signs it. Return the `Attestation` object and the signature
  * @param {module} didModule - The did module
+ * @param hexDid
  * @param {Number} priority - Attestation priority
  * @param {string | null} iri - Attestation iri
  * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
  * @returns {Promise<array>} A 2 element array where the first element is the `Attestation` and the second is the signature
  */
-export async function createSignedAttestation(didModule, did, priority, iri, currentKeyPair) {
+export async function createSignedAttestation(didModule, hexDid, priority, iri, currentKeyPair) {
+  const nonce = await didModule.getNextNonceForDID(hexDid);
   const attestation = createDidAttestation(priority, iri);
-  const signature = signDidAttestation(didModule, did, attestation, currentKeyPair);
-  return [attestation, signature];
+  const setAttestation = {
+    attest: attestation,
+    nonce,
+  };
+  const signature = signDidAttestation(didModule, setAttestation, currentKeyPair);
+  return [setAttestation, signature];
 }

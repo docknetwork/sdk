@@ -6,7 +6,6 @@ import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-const
 
 import {
   OneOfPolicy,
-  KeyringPairDidKeys,
 } from '../../src/utils/revocation';
 import { registerNewDIDUsingPair } from './helpers';
 
@@ -20,9 +19,6 @@ describe('Revocation Module', () => {
   // Create a new controller DID, the DID will be registered on the network and own the registry
   const controllerDID = randomAsHex(32);
   const controllerSeed = randomAsHex(32);
-
-  // Create a did/keypair proof map
-  const didKeys = new KeyringPairDidKeys();
 
   // Create a list of controllers
   const controllers = new Set();
@@ -48,9 +44,6 @@ describe('Revocation Module', () => {
 
     // The DID should be written before any test begins
     pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
-
-    // Set our controller DID and associated keypair to be used for generating proof
-    didKeys.set(controllerDID, pair);
 
     // The controller is same as the DID
     await registerNewDIDUsingPair(dock, controllerDID, pair);
@@ -100,34 +93,24 @@ describe('Revocation Module', () => {
   }, 40000);
 
   test('Can revoke from a registry', async () => {
-    const registryDetail = await dock.revocation.getRegistryDetail(registryId);
-    expect(!!registryDetail).toBe(true);
-
-    const lastModified = registryDetail[1];
-    await expect(dock.revocation.revoke(registryId, revokeIds, lastModified, didKeys, false)).resolves.toBeDefined();
-
+    const [revoke, sig, nonce] = await dock.revocation.createSignedRevoke(dock.did, registryId, revokeIds, controllerDID, pair, 1);
+    await dock.revocation.revoke(revoke, [[sig, nonce]], false);
     const revocationStatus = await dock.revocation.getIsRevoked(registryId, revokeId);
     expect(revocationStatus).toBe(true);
   }, 40000);
 
   test('Can unrevoke from a registry', async () => {
-    const registryDetail = await dock.revocation.getRegistryDetail(registryId);
-    expect(!!registryDetail).toBe(true);
-
-    const lastModified = registryDetail[1];
-    await dock.revocation.unrevoke(registryId, revokeIds, lastModified, didKeys, false);
+    const [unrevoke, sig, nonce] = await dock.revocation.createSignedUnRevoke(dock.did, registryId, revokeIds, controllerDID, pair, 1);
+    await dock.revocation.unrevoke(unrevoke, [[sig, nonce]], false);
 
     const revocationStatus = await dock.revocation.getIsRevoked(registryId, revokeId);
     expect(revocationStatus).toBe(false);
   }, 40000);
 
   test('Can remove a registry', async () => {
-    const registryDetail = await dock.revocation.getRegistryDetail(registryId);
-    expect(!!registryDetail).toBe(true);
-
-    const lastModified = registryDetail[1];
-    await dock.revocation.removeRegistry(registryId, lastModified, didKeys, false);
-    await expect(dock.revocation.getRegistryDetail(registryId)).rejects.toThrow(/Could not find revocation registry/);
+    const [remove, sig, nonce] = await dock.revocation.createSignedRemove(dock.did, registryId, controllerDID, pair, 1);
+    await dock.revocation.removeRegistry(remove, [[sig, nonce]], false);
+    await expect(dock.revocation.getRevocationRegistry(registryId)).rejects.toThrow(/Could not find revocation registry/);
   }, 40000);
 
   test('Can create an add only registry', async () => {
@@ -137,23 +120,23 @@ describe('Revocation Module', () => {
   }, 40000);
 
   test('Can revoke from an add only registry', async () => {
-    const registryDetail = await dock.revocation.getRegistryDetail(registryId);
-    expect(!!registryDetail).toBe(true);
+    const reg = await dock.revocation.getRevocationRegistry(registryId);
+    expect(!!reg).toBe(true);
 
-    const lastModified = registryDetail[1];
-    await dock.revocation.revoke(registryId, revokeIds, lastModified, didKeys, false);
+    const [revoke, sig, nonce] = await dock.revocation.createSignedRevoke(dock.did, registryId, revokeIds, controllerDID, pair, 1);
+    await dock.revocation.revoke(revoke, [[sig, nonce]], false);
 
     const revocationStatus = await dock.revocation.getIsRevoked(registryId, revokeId);
     expect(revocationStatus).toBe(true);
   }, 40000);
 
   test('Can not unrevoke from an add only registry', async () => {
-    const registryDetail = await dock.revocation.getRegistryDetail(registryId);
-    expect(!!registryDetail).toBe(true);
+    const reg = await dock.revocation.getRevocationRegistry(registryId);
+    expect(!!reg).toBe(true);
 
-    const lastModified = registryDetail[1];
+    const [unrevoke, sig, nonce] = await dock.revocation.createSignedUnRevoke(dock.did, registryId, revokeIds, controllerDID, pair, 1);
     await expect(
-      dock.revocation.unrevoke(registryId, revokeIds, lastModified, didKeys, false),
+      dock.revocation.unrevoke(unrevoke, [[sig, nonce]], false),
     ).rejects.toThrow();
 
     const revocationStatus = await dock.revocation.getIsRevoked(registryId, revokeId);
@@ -161,13 +144,14 @@ describe('Revocation Module', () => {
   }, 40000);
 
   test('Can not remove an add only registry', async () => {
-    const registryDetail = await dock.revocation.getRegistryDetail(registryId);
-    expect(!!registryDetail).toBe(true);
+    const reg = await dock.revocation.getRevocationRegistry(registryId);
+    expect(!!reg).toBe(true);
 
-    const lastModified = registryDetail[1];
+    const [remove, sig, nonce] = await dock.revocation.createSignedRemove(dock.did, registryId, controllerDID, pair, 1);
     await expect(
-      dock.revocation.removeRegistry(registryId, lastModified, didKeys, false),
+      dock.revocation.removeRegistry(remove, [[sig, nonce]], false),
     ).rejects.toThrow();
-    await expect(dock.revocation.getRegistryDetail(registryId)).resolves.toBeDefined();
+
+    await expect(dock.revocation.getRevocationRegistry(registryId)).resolves.toBeDefined();
   }, 40000);
 });

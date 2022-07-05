@@ -2,7 +2,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import Schema from '../src/modules/schema';
 
 import { DockAPI } from '../src/index';
-import { createNewDockDID, createKeyDetail } from '../src/utils/did';
+import { createNewDockDID, createDidKey } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import VerifiableCredential from '../src/verifiable-credential';
 
@@ -21,7 +21,7 @@ async function createAuthorDID(dock, pair) {
 
   // Create an author DID to write with
   const publicKey = getPublicKeyFromKeyringPair(pair);
-  const keyDetail = createKeyDetail(publicKey, dockDID);
+  const keyDetail = createDidKey(publicKey, dockDID);
   await dock.did.new(dockDID, keyDetail, false);
   return dockDID;
 }

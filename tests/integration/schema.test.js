@@ -4,7 +4,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import { DockAPI } from '../../src/index';
 
 import {
-  hexDIDToQualified, createNewDockDID, createKeyDetail, getHexIdentifierFromDID,
+  hexDIDToQualified, createNewDockDID, createDidKey, getHexIdentifierFromDID,
 } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
@@ -18,12 +18,12 @@ import getKeyDoc from '../../src/utils/vc/helpers';
 import DockResolver from '../../src/dock-resolver';
 import { SignatureSr25519 } from '../../src/signatures';
 import { Sr25519VerKeyName } from '../../src/utils/vc/crypto/constants';
+import { registerNewDIDUsingPair } from './helpers';
 
 let account;
 let pair;
-let publicKey;
 let dockDID;
-let keyDetail;
+let hexDid;
 let blobId;
 let keyDoc;
 let validCredential;
@@ -59,27 +59,28 @@ describe('Schema Blob Module Integration', () => {
     account = dockApi.keyring.addFromUri(TestAccountURI);
     dockApi.setAccount(account);
     pair = dockApi.keyring.addFromUri(firstKeySeed);
-    publicKey = getPublicKeyFromKeyringPair(pair);
     dockDID = createNewDockDID();
-    keyDetail = createKeyDetail(publicKey, dockDID);
-    await dockApi.did.new(dockDID, keyDetail, false);
+    hexDid = getHexIdentifierFromDID(dockDID);
+    await registerNewDIDUsingPair(dockApi, dockDID, pair);
     blobId = randomAsHex(DockBlobIdByteSize);
 
     // Write a blob with invalid JSON-schema format
     invalidFormatBlobId = randomAsHex(DockBlobIdByteSize);
-    await dockApi.blob.new({
-      id: invalidFormatBlobId,
+    let blob = {
+      id: blobId,
       blob: stringToHex('hello world'),
-      author: getHexIdentifierFromDID(dockDID),
-    }, pair, undefined, false);
+    };
+    let [addBlob, didSig] = await dockApi.blob.createSignedAddBlob(dockApi.didModule, blob, hexDid, pair, 1);
+    await dockApi.blob.new(addBlob, didSig, undefined, false);
 
     // Write schema blob
     const blobStr = JSON.stringify(exampleSchema);
-    await dockApi.blob.new({
+    blob = {
       id: blobId,
       blob: stringToHex(blobStr),
-      author: getHexIdentifierFromDID(dockDID),
-    }, pair, undefined, false);
+    };
+    [addBlob, didSig] = await dockApi.blob.createSignedAddBlob(dockApi.didModule, blob, hexDid, pair, 1);
+    await dockApi.blob.new(addBlob, didSig, undefined, false);
 
     // Properly format a keyDoc to use for signing
     keyDoc = getKeyDoc(
@@ -128,8 +129,8 @@ describe('Schema Blob Module Integration', () => {
     const schema = new Schema();
     schema.setAuthor(dockDID);
     await schema.setJSONSchema(exampleSchema);
-    const msg = dockApi.blob.getSerializedBlob(schema.toBlob());
-    const pk = getPublicKeyFromKeyringPair(pair);
+    let [addBlob, didSig] = await dockApi.blob.createSignedAddBlob(dockApi.didModule, schema.toBlob(), hexDid, pair, 1);
+    const msg = dockApi.blob.getSerializedBlob(addBlob);
     const sig = new SignatureSr25519(msg, pair);
     schema.setSignature(sig);
     expect(schema.signature).toBe(sig);

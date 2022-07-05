@@ -1,5 +1,5 @@
 import dock from '../src/index';
-import { createKeyDetail, createNewDockDID } from '../src/utils/did';
+import { createDidKey, createNewDockDID } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { median } from './helpers';
 
@@ -15,7 +15,7 @@ async function sendTxn(baseSeed, seedPath) {
   const seed = `${baseSeed}/${seedPath}`;
   const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
   const publicKey = getPublicKeyFromKeyringPair(pair);
-  const keyDetail = createKeyDetail(publicKey, dockDID);
+  const keyDetail = createDidKey(publicKey, dockDID);
   const start = new Date().getTime();
   await dock.did.new(dockDID, keyDetail, false);
   return (new Date().getTime()) - start;

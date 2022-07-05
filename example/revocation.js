@@ -1,7 +1,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 
 import dock from '../src/index';
-import { createNewDockDID, createKeyDetail } from '../src/utils/did';
+import { createNewDockDID, createDidKey } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 
 import {
@@ -76,7 +76,7 @@ async function main() {
 
   // The controller is same as the DID
   const publicKey = getPublicKeyFromKeyringPair(pair);
-  const keyDetail = createKeyDetail(publicKey, controllerDID);
+  const keyDetail = createDidKey(publicKey, controllerDID);
   await dock.did.new(controllerDID, keyDetail, false);
 
   // Create a registry

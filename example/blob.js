@@ -3,7 +3,7 @@ import { u8aToString } from '@polkadot/util';
 
 import { DockAPI } from '../src/index';
 import { DockBlobIdByteSize } from '../src/modules/blob';
-import { createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../src/utils/did';
+import { createNewDockDID, createDidKey, getHexIdentifierFromDID } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 
 // The following can be tweaked depending on where the node is running and what
@@ -34,7 +34,7 @@ async function createAuthorDID(dock, pair) {
 
   // Create an author DID to write with
   const publicKey = getPublicKeyFromKeyringPair(pair);
-  const keyDetail = createKeyDetail(publicKey, dockDID);
+  const keyDetail = createDidKey(publicKey, dockDID);
   await dock.did.new(dockDID, keyDetail, false);
   return dockDID;
 }

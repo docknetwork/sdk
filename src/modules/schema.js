@@ -129,7 +129,6 @@ export default class Schema {
     return {
       id: getHexIdentifierFromBlobID(this.id),
       blob: canonicalize(this.schema),
-      author: getHexIdentifierFromDID(this.author),
     };
   }
 

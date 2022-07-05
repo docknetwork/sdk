@@ -1,7 +1,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import dock, { DockAPI } from '../src/index';
 import {
-  createNewDockDID, createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval, getHexIdentifierFromDID,
+  createNewDockDID, createDidKey, createSignedKeyUpdate, createSignedDidRemoval, getHexIdentifierFromDID,
 } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { sendBatch } from './helpers';
@@ -41,7 +41,7 @@ async function sendDIDTxns(count, waitForFinalization = true) {
     const seed = randomAsHex(32);
     const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
     const publicKey = getPublicKeyFromKeyringPair(pair);
-    const keyDetail = createKeyDetail(publicKey, did);
+    const keyDetail = createDidKey(publicKey, did);
     const tx = dock.did.createNewTx(did, keyDetail);
     txs.push(tx);
     didPairs.push([did, pair]);

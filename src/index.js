@@ -6,7 +6,7 @@ import typesBundle from '@docknetwork/node-types';
 
 import AnchorModule from './modules/anchor';
 import BlobModule from './modules/blob';
-import DIDModule from './modules/did';
+import { DIDModule } from './modules/did';
 import RevocationModule from './modules/revocation';
 import TokenMigration from './modules/migration';
 import BBSPlusModule from './modules/bbs-plus';
@@ -16,6 +16,7 @@ import PriceFeedRpcDefs from './rpc-defs/price-feed-rpc-defs';
 import CoreModsRpcDefs from './rpc-defs/core-mods-rpc-defs';
 
 import ExtrinsicError from './errors/extrinsic-error';
+import types from './types.json';
 
 import {
   PublicKey,
@@ -125,11 +126,13 @@ class DockAPI {
       rpc,
     };
 
-    if (chainTypes) {
-      apiOptions.types = chainTypes;
-    } else {
-      apiOptions.typesBundle = typesBundle;
-    }
+    // TODO: Fix me! Only temporary
+    // if (chainTypes) {
+    //   apiOptions.types = chainTypes;
+    // } else {
+    //   apiOptions.typesBundle = typesBundle;
+    // }
+    apiOptions.types = types;
 
     this.api = await ApiPromise.create(apiOptions);
 

@@ -1,21 +1,27 @@
 import { bnToBn } from '@polkadot/util';
-import { createKeyDetail } from '../../src/utils/did';
+import { createDidKey } from '../../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { MaxGas, MinGasPrice } from '../test-constants';
+import { DidKey, VerificationRelationship } from '../../src/public-keys';
+import { BTreeSet } from '@polkadot/types';
 
 /**
  * Registers a new DID on dock chain, keeps the controller same as the DID
  * @param dockAPI
  * @param did
  * @param pair
+ * @param verRels
  * @returns {Promise<void>}
  */
-export async function registerNewDIDUsingPair(dockAPI, did, pair) {
+export async function registerNewDIDUsingPair(dockAPI, did, pair, verRels = undefined) {
   const publicKey = getPublicKeyFromKeyringPair(pair);
 
-  // The controller is same as the DID
-  const keyDetail = createKeyDetail(publicKey, did);
-  return dockAPI.did.new(did, keyDetail, false);
+  if (verRels === undefined) {
+    verRels = new VerificationRelationship();
+  }
+  // No additional controller
+  const didKey = new DidKey(publicKey, verRels);
+  return dockAPI.did.new(did, [didKey], [], false);
 }
 
 /**

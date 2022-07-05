@@ -3,16 +3,15 @@ import { randomAsHex } from '@polkadot/util-crypto';
 
 import { DockAPI } from '../../src/index';
 
-import { createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../../src/utils/did';
+import { createNewDockDID, getHexIdentifierFromDID } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
-import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { DockBlobIdByteSize, BLOB_MAX_BYTE_SIZE } from '../../src/modules/blob';
+import { registerNewDIDUsingPair } from './helpers';
 
 let account;
 let pair;
-let publicKey;
 let dockDID;
-let keyDetail;
+let hexDid;
 let blobId;
 
 function errorInResult(result) {
@@ -34,6 +33,12 @@ describe('Blob Module', () => {
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
+    account = dock.keyring.addFromUri(TestAccountURI);
+    dock.setAccount(account);
+    pair = dock.keyring.addFromUri(firstKeySeed);
+    dockDID = createNewDockDID();
+    await registerNewDIDUsingPair(dock, dockDID, pair);
+    hexDid = getHexIdentifierFromDID(dockDID);
     done();
   });
 
@@ -42,14 +47,6 @@ describe('Blob Module', () => {
   }, 10000);
 
   beforeEach(async () => {
-    account = dock.keyring.addFromUri(TestAccountURI);
-    dock.setAccount(account);
-    pair = dock.keyring.addFromUri(firstKeySeed);
-    publicKey = getPublicKeyFromKeyringPair(pair);
-    dockDID = createNewDockDID();
-    keyDetail = createKeyDetail(publicKey, dockDID);
-    await dock.did.new(dockDID, keyDetail);
-    await dock.did.getDocument(dockDID);
     blobId = randomAsHex(DockBlobIdByteSize);
   }, 30000);
 
@@ -57,14 +54,14 @@ describe('Blob Module', () => {
     const blobJSON = {
       jsonBlob: true,
     };
+    const blob = {
+      id: blobId,
+      blob: blobJSON,
+    };
+    const [addBlob, didSig] = await dock.blob.createSignedAddBlob(dock.didModule, blob, hexDid, pair, 1);
     const result = await dock.blob.new(
-      {
-        id: blobId,
-        blob: blobJSON,
-        author: getHexIdentifierFromDID(dockDID),
-      },
-      pair,
-      undefined,
+      addBlob,
+      didSig,
       false,
     );
 
@@ -77,13 +74,15 @@ describe('Blob Module', () => {
 
   test('Can create and read a string Blob.', async () => {
     const blobHex = 'my string';
+    const blob = {
+      id: blobId,
+      blob: blobHex,
+    };
+    const [addBlob, didSig] = await dock.blob.createSignedAddBlob(dock.didModule, blob, hexDid, pair, 1);
+
     const result = await dock.blob.new(
-      {
-        id: blobId,
-        blob: blobHex,
-        author: getHexIdentifierFromDID(dockDID),
-      },
-      pair,
+      addBlob,
+      didSig,
       undefined,
       false,
     );
@@ -97,13 +96,16 @@ describe('Blob Module', () => {
 
   test('Can create and read a hex Blob.', async () => {
     const blobHex = randomAsHex(32);
+    const blob = {
+      id: blobId,
+      blob: blobHex
+    };
+
+    const [addBlob, didSig] = await dock.blob.createSignedAddBlob(dock.didModule, blob, hexDid, pair, 1);
+
     const result = await dock.blob.new(
-      {
-        id: blobId,
-        blob: blobHex,
-        author: getHexIdentifierFromDID(dockDID),
-      },
-      pair,
+      addBlob,
+      didSig,
       undefined,
       false,
     );
@@ -117,13 +119,15 @@ describe('Blob Module', () => {
 
   test('Can create and read a Vector Blob.', async () => {
     const blobVect = new Uint8Array([1, 2, 3]);
+    const blob = {
+      id: blobId,
+      blob: blobVect,
+    };
+
+    const [addBlob, didSig] = await dock.blob.createSignedAddBlob(dock.didModule, blob, hexDid, pair, 1);
     const result = await dock.blob.new(
-      {
-        id: blobId,
-        blob: blobVect,
-        author: getHexIdentifierFromDID(dockDID),
-      },
-      pair,
+      addBlob,
+      didSig,
       undefined,
       false,
     );
@@ -137,15 +141,15 @@ describe('Blob Module', () => {
 
   test('Fails to write blob with size greater than allowed.', async () => {
     const blobHex = randomAsHex(BLOB_MAX_BYTE_SIZE + 1); // Max size is 1024
-
+    const blob = {
+      id: blobId,
+      blob: blobHex,
+    };
+    const [addBlob, didSig] = await dock.blob.createSignedAddBlob(dock.didModule, blob, hexDid, pair, 1);
     await expect(
       dock.blob.new(
-        {
-          id: blobId,
-          blob: blobHex,
-          author: getHexIdentifierFromDID(dockDID),
-        },
-        pair,
+        addBlob,
+        didSig,
         undefined,
         false,
       ),
@@ -158,13 +162,14 @@ describe('Blob Module', () => {
 
   test('Fails to write blob with id already used.', async () => {
     const blobHexFirst = randomAsHex(12);
+    let blob = {
+      id: blobId,
+      blob: blobHexFirst,
+    };
+    let [addBlob, didSig] = await dock.blob.createSignedAddBlob(dock.didModule, blob, hexDid, pair, 1);
     const resultFirst = await dock.blob.new(
-      {
-        id: blobId,
-        blob: blobHexFirst,
-        author: getHexIdentifierFromDID(dockDID),
-      },
-      pair,
+      addBlob,
+      didSig,
       undefined,
       false,
     );
@@ -172,14 +177,17 @@ describe('Blob Module', () => {
     expect(!!resultFirst).toBe(true);
     expect(errorInResult(resultFirst)).toBe(false);
 
+    blob = {
+      id: blobId,
+      blob: randomAsHex(123),
+    };
+
+    [addBlob, didSig] = await dock.blob.createSignedAddBlob(dock.didModule, blob, hexDid, pair, 1);
+
     await expect(
       dock.blob.new(
-        {
-          id: blobId,
-          blob: randomAsHex(123),
-          author: getHexIdentifierFromDID(dockDID),
-        },
-        pair,
+        addBlob,
+        didSig,
         undefined,
         false,
       ),

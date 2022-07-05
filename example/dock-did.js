@@ -6,7 +6,7 @@ import dock, {
   PublicKeySr25519,
 } from '../src/index';
 import {
-  createNewDockDID, createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval,
+  createNewDockDID, createDidKey, createSignedKeyUpdate, createSignedDidRemoval,
 } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 
@@ -18,8 +18,7 @@ import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 const dockDID = createNewDockDID();
 
 // Generate first key with this seed. The key type is Sr25519
-// const firstKeySeed = randomAsHex(32);
-const firstKeySeed = '//Lovesh';
+const firstKeySeed = randomAsHex(32);
 
 // Generate second key (for update) with this seed. The key type is Ed25519
 const secondKeySeed = randomAsHex(32);
@@ -69,7 +68,7 @@ function registerNewDID() {
   const publicKey = PublicKeySr25519.fromKeyringPair(firstPair);
 
   // The controller is same as the DID
-  const keyDetail = createKeyDetail(publicKey, dockDID);
+  const keyDetail = createDidKey(publicKey, dockDID);
 
   console.log('Submitting new DID', dockDID, publicKey);
 

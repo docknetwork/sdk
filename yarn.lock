@@ -8986,6 +8986,11 @@ multiformats@^9.4.2, multiformats@^9.4.5:
   resolved "https://registry.yarnpkg.com/multiformats/-/multiformats-9.4.9.tgz#5d3c7cf8dfeef6bda2535d37fd0ac99b10a15046"
   integrity sha512-zA84TTJcRfRMpjvYqy63piBbSEdqlIGqNNSpP6kspqtougqjo60PRhIFo+oAxrjkof14WMCImvr7acK6rPpXLw==
 
+multiformats@^9.7.0:
+  version "9.7.0"
+  resolved "https://registry.yarnpkg.com/multiformats/-/multiformats-9.7.0.tgz#845799e8df70fbb6b15922500e45cb87cf12f7e5"
+  integrity sha512-uv/tcgwk0yN4DStopnBN4GTgvaAlYdy6KnZpuzEPFOYQd71DYFJjs0MN1ERElAflrZaYyGBWXyGxL5GgrxIx0Q==
+
 multihashes@^0.4.15, multihashes@~0.4.15:
   version "0.4.21"
   resolved "https://registry.yarnpkg.com/multihashes/-/multihashes-0.4.21.tgz#dc02d525579f334a7909ade8a122dabb58ccfcb5"

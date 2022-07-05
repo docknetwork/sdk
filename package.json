@@ -106,6 +106,7 @@
     "jsonschema": "1.4.0",
     "key-did-resolver": "^1.4.0",
     "mrklt": "^0.2.0",
+    "multiformats": "^9.7.0",
     "n3": "1.13.0",
     "rify": "^0.7.0"
   }

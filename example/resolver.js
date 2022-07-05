@@ -1,7 +1,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import ethr from 'ethr-did-resolver';
 import { DockAPI } from '../src/index';
-import { createNewDockDID, createKeyDetail, NoDIDError } from '../src/utils/did';
+import { createNewDockDID, createDidKey, NoDIDError } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import {
   DIDResolver, MultiResolver, DIDKeyResolver, UniversalResolver, DockResolver,
@@ -53,7 +53,7 @@ async function createDockDID() {
   const dockDID = createNewDockDID();
   const pair = dock.keyring.addFromUri(randomAsHex(32), null, 'sr25519');
   const publicKey = getPublicKeyFromKeyringPair(pair);
-  const keyDetail = createKeyDetail(publicKey, dockDID);
+  const keyDetail = createDidKey(publicKey, dockDID);
   await dock.did.new(dockDID, keyDetail, false);
 
   return dockDID;

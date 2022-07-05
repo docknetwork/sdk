@@ -5,7 +5,7 @@ import { BTreeSet } from '@polkadot/types';
 import { randomAsHex } from '@polkadot/util-crypto';
 import dock from '../src/index';
 import {
-  createKeyDetail,
+  createDidKey,
   createNewDockDID,
   createSignedDidRemoval,
   createSignedKeyUpdate,
@@ -25,7 +25,7 @@ function getDidPair() {
   const seed = randomAsHex(32);
   const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
   const publicKey = getPublicKeyFromKeyringPair(pair);
-  const keyDetail = createKeyDetail(publicKey, did);
+  const keyDetail = createDidKey(publicKey, did);
   return [did, pair, keyDetail];
 }
 

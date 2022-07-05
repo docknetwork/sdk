@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 
 import { u8aToHex } from '@polkadot/util';
-import { getHexIdentifierFromDID } from '../utils/did';
+import { createDidSig, getHexIdentifierFromDID } from '../utils/did';
 
 /** Class with logic for public keys and corresponding setup parameters. This logic is common in BBS+ and accumulator */
 export default class WithParamsAndPublicKeys {
@@ -67,7 +67,7 @@ export default class WithParamsAndPublicKeys {
       throw new Error('Reference should be an array of 2 items');
     }
     try {
-      parsed[0] = getHexIdentifierFromDID(ref[0]);
+      parsed[0] = { 0: getHexIdentifierFromDID(ref[0]) };
     } catch (e) {
       throw new Error(`First item of reference should be a DID but was ${ref[0]}`);
     }
@@ -75,76 +75,68 @@ export default class WithParamsAndPublicKeys {
       throw new Error(`Second item of reference should be a number but was ${ref[1]}`);
     }
     // eslint-disable-next-line prefer-destructuring
-    parsed[1] = ref[1];
+    parsed[1] = { 0: ref[1] };
     return parsed;
   }
 
-  createNewParamsTx(addParams, did, keyPair = undefined, signature = undefined) {
-    const hexId = getHexIdentifierFromDID(did);
-    if (!signature) {
-      if (!keyPair) {
-        throw Error('You need to provide either a keypair or a signature to register new parameters.');
-      }
-      // eslint-disable-next-line no-param-reassign
-      signature = this.signAddParams(keyPair, addParams);
-    }
-    return this.module.addParams(addParams, hexId, signature.toJSON());
+  createAddParamsTx(addParams, signature) {
+    return this.module.addParams(addParams, signature);
   }
 
-  createNewPublicKeyTx(addPk, did, keyPair = undefined, signature = undefined) {
-    const hexId = getHexIdentifierFromDID(did);
-    if (!signature) {
-      if (!keyPair) {
-        throw Error('You need to provide either a keypair or a signature to register new key.');
-      }
-      // eslint-disable-next-line no-param-reassign
-      signature = this.signAddPublicKey(keyPair, addPk);
-    }
-    return this.module.addPublicKey(addPk, hexId, signature.toJSON());
+  createAddPublicKeyTx(addPk, signature) {
+    return this.module.addPublicKey(addPk, signature);
   }
 
-  removeParamsTx(did, counter, keyPair = undefined, signature = undefined) {
-    const hexId = getHexIdentifierFromDID(did);
-    if (!signature) {
-      if (!keyPair) {
-        throw Error('You need to provide either a keypair or a signature to remove params.');
-      }
-      // eslint-disable-next-line no-param-reassign
-      signature = this.signRemoveParams(keyPair, [hexId, counter]);
-    }
-    return this.module.removeParams([hexId, counter], signature.toJSON());
+  removeParamsTx(removeParams, signature) {
+    return this.module.removeParams(removeParams, signature);
   }
 
-  removePublicKeyTx(did, counter, keyPair = undefined, signature = undefined) {
-    const hexId = getHexIdentifierFromDID(did);
-    if (!signature) {
-      if (!keyPair) {
-        throw Error('You need to provide either a keypair or a signature to remove public key.');
-      }
-      // eslint-disable-next-line no-param-reassign
-      signature = this.signRemovePublicKey(keyPair, [hexId, counter]);
-    }
-    return this.module.removePublicKey([hexId, counter], signature.toJSON());
+  removePublicKeyTx(removePk, signature) {
+    return this.module.removePublicKey(removePk, signature);
   }
 
-  async createNewParams(addParams, did, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
-    const tx = this.createNewParamsTx(addParams, did, keyPair, signature);
+  async createAddParams(addParams, signature, waitForFinalization = true, params = {}) {
+    const tx = this.createAddParamsTx(addParams, signature);
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
-  async createNewPublicKey(addPublicKey, did, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
-    const tx = this.createNewPublicKeyTx(addPublicKey, did, keyPair, signature);
+  async createAddPublicKey(addPublicKey, signature, waitForFinalization = true, params = {}) {
+    const tx = this.createAddPublicKeyTx(addPublicKey, signature);
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
-  async removeParams(did, counter, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
-    const tx = this.removeParamsTx(did, counter, keyPair, signature);
+  async removeParams(removeParams, signature, waitForFinalization = true, params = {}) {
+    const tx = this.removeParamsTx(removeParams, signature);
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
-  async removePublicKey(did, counter, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
-    const tx = this.removePublicKeyTx(did, counter, keyPair, signature);
+  async removePublicKey(removePk, signature, waitForFinalization = true, params = {}) {
+    const tx = this.removePublicKeyTx(removePk, signature);
     return this.signAndSend(tx, waitForFinalization, params);
+  }
+
+  async createSignedAddParams(didModule, params, did, keyPair, keyId, nonce = undefined) {
+    const hexDid = getHexIdentifierFromDID(did);
+    if (nonce === undefined) {
+      // eslint-disable-next-line no-param-reassign
+      nonce = await didModule.getNextNonceForDID(hexDid);
+    }
+    const addParams = { params, nonce };
+    const signature = this.signAddParams(keyPair, addParams);
+    const didSig = createDidSig(hexDid, keyId, signature);
+    return [addParams, didSig];
+  }
+
+  async createSignedRemoveParams(didModule, did, counter, keyPair, keyId, nonce = undefined) {
+    const hexDid = getHexIdentifierFromDID(did);
+    if (nonce === undefined) {
+      // eslint-disable-next-line no-param-reassign
+      nonce = await didModule.getNextNonceForDID(hexDid);
+    }
+    const removeParams = { params_ref: [{ 0: hexDid }, { 0: counter }], nonce };
+    const signature = this.signRemoveParams(keyPair, removeParams);
+    const didSig = createDidSig(hexDid, keyId, signature);
+    return [removeParams, didSig];
   }
 
   // eslint-disable-next-line no-unused-vars
@@ -204,59 +196,6 @@ export default class WithParamsAndPublicKeys {
   }
 
   /**
-   * Get all params written by a DID
-   * @param did
-   * @returns {Promise<object[]>}
-   */
-  async getAllParamsByDid(did) {
-    const hexId = getHexIdentifierFromDID(did);
-
-    // TODO: Figure out why this doesn't work
-    /* const d = this.api.createType('Did', hexToU8a(hexId));
-    const resp = await this.api.rpc.core_mods.bbsPlusParamsByDid(d);
-    if (resp.isOk) {
-      return resp.unwrap();
-    }
-    return null; */
-
-    const params = [];
-    const [counter] = await this.api.query[this.moduleName].didCounters(hexId);
-    if (counter > 0) {
-      for (let i = 1; i <= counter; i++) {
-        // eslint-disable-next-line no-await-in-loop
-        const param = await this.getParamsByHexDid(hexId, i);
-        if (param !== null) {
-          params.push(param);
-        }
-      }
-    }
-    return params;
-  }
-
-  /**
-   * Get all public keys written by a DID
-   * @param did
-   * @param withParams
-   * @returns {Promise< object[]>}
-   */
-  async getAllPublicKeysByDid(did, withParams = false) {
-    const hexId = getHexIdentifierFromDID(did);
-
-    const pks = [];
-    const [, counter] = await this.api.query[this.moduleName].didCounters(hexId);
-    if (counter > 0) {
-      for (let i = 1; i <= counter; i++) {
-        // eslint-disable-next-line no-await-in-loop
-        const pk = await this.getPublicKeyByHexDid(hexId, i, withParams);
-        if (pk !== null) {
-          pks.push(pk);
-        }
-      }
-    }
-    return pks;
-  }
-
-  /**
    * Format an object received from the chain as a params object with keys `bytes`, `label` and `curve_type`.
    * @param params
    * @returns {{bytes: string}}
@@ -290,28 +229,11 @@ export default class WithParamsAndPublicKeys {
     }
     if (pk.params_ref.isSome) {
       const pr = pk.params_ref.unwrap();
-      pkObj.params_ref = [u8aToHex(pr[0]), pr[1].toNumber()];
+      pkObj.params_ref = [u8aToHex(pr[0][0][0]), pr[1][0].toNumber()];
     } else {
       pkObj.params_ref = null;
     }
     return pkObj;
-  }
-
-  /**
-   * Get last params written by this DID
-   * @param did
-   * @returns {Promise<{bytes: string}|null>}
-   */
-  async getLastParamsWritten(did) {
-    const hexId = getHexIdentifierFromDID(did);
-    const [counter] = await this.api.query[this.moduleName].didCounters(hexId);
-    if (counter > 0) {
-      const resp = await this.queryParamsFromChain(hexId, counter);
-      if (resp.isSome) {
-        return this.createParamsObjFromChainResponse(resp.unwrap());
-      }
-    }
-    return null;
   }
 
   /**
@@ -337,17 +259,7 @@ export default class WithParamsAndPublicKeys {
   }
 
   // eslint-disable-next-line no-unused-vars
-  signAddPublicKey(keyPair, pk) {
-    throw new Error('Extending class should implement signAddPublicKey');
-  }
-
-  // eslint-disable-next-line no-unused-vars
   signRemoveParams(keyPair, ref) {
     throw new Error('Extending class should implement signRemoveParams');
-  }
-
-  // eslint-disable-next-line no-unused-vars
-  signRemovePublicKey(keyPair, ref) {
-    throw new Error('Extending class should implement signRemovePublicKey');
   }
 }

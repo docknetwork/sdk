@@ -11,8 +11,8 @@ import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/crypto-wasm-ts/sr
 import { DockAPI } from '../../../src';
 import AccumulatorModule from '../../../src/modules/accumulator';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
-import { createKeyDetail, createNewDockDID, getHexIdentifierFromDID } from '../../../src/utils/did';
-import { getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
+import { createNewDockDID} from '../../../src/utils/did';
+import { registerNewDIDUsingPair } from '../helpers';
 
 describe('Prefilled positive accumulator', () => {
   // Incase updating an accumulator is expensive like making a blockchain txn, a cheaper strategy
@@ -55,7 +55,7 @@ describe('Prefilled positive accumulator', () => {
     dock.setAccount(account);
     pair = dock.keyring.addFromUri(seed1);
     did = createNewDockDID();
-    await dock.did.new(did, createKeyDetail(getPublicKeyFromKeyringPair(pair), did), false);
+    await registerNewDIDUsingPair(dock, did, pair);
     await initializeWasm();
     done();
   }, 20000);
@@ -65,12 +65,14 @@ describe('Prefilled positive accumulator', () => {
     const params = Accumulator.generateParams(hexToU8a(label));
     const bytes1 = u8aToHex(params.bytes);
     const params1 = chainModuleClass.prepareAddParameters(bytes1, undefined, label);
-    await chainModule.createNewParams(params1, getHexIdentifierFromDID(did), pair, undefined, false);
+    const [addParams1, sig1] = await chainModule.createSignedAddParams(dock.did, params1, did, pair, 1);
+    await chainModule.createAddParams(addParams1, sig1, false);
 
     keypair = Accumulator.generateKeypair(params, seedAccum);
     const bytes2 = u8aToHex(keypair.publicKey.bytes);
     const pk1 = chainModuleClass.prepareAddPublicKey(bytes2, undefined, [did, 1]);
-    await chainModule.createNewPublicKey(pk1, getHexIdentifierFromDID(did), pair, undefined, false);
+    const [addPk2, sig2] = await chainModule.createSignedAddPublicKey(dock.did, pk1, did, pair, 1);
+    await chainModule.createAddPublicKey(addPk2, sig2, false);
 
     accumulator = PositiveAccumulator.initialize(params, keypair.secretKey);
 
@@ -82,7 +84,8 @@ describe('Prefilled positive accumulator', () => {
 
     accumulatorId = randomAsHex(32);
     const accumulated = u8aToHex(accumulator.accumulated);
-    await dock.accumulatorModule.createNewPositiveAccumulator(accumulatorId, accumulated, [did, 1], pair, undefined, false);
+    const [addAcc3, sig3] = await chainModule.createSignedAddPositiveAccumulator(dock.did, accumulatorId, accumulated, [did, 1], did, pair, 1);
+    await dock.accumulatorModule.addAccumulator(addAcc3, sig3, false);
     const queriedAccum = await dock.accumulatorModule.getAccumulator(accumulatorId, true);
     expect(queriedAccum.accumulated).toEqual(u8aToHex(accumulator.accumulated));
   });
@@ -119,7 +122,8 @@ describe('Prefilled positive accumulator', () => {
     let accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     const accumulated = u8aToHex(accumulator.accumulated);
     const witUpdBytes = u8aToHex(witnessUpdInfo.value);
-    await dock.accumulatorModule.updateAccumulator(accumulatorId, accumulated, { removals: [u8aToHex(member2)], witnessUpdateInfo: witUpdBytes }, accum.created, accum.nonce + 1, pair, undefined, false);
+    const [updAcc, sig] = await chainModule.createSignedUpdateAccumulator(dock.did, accumulatorId, accumulated, { removals: [u8aToHex(member2)], witnessUpdateInfo: witUpdBytes }, did, pair, 1);
+    await dock.accumulatorModule.updateAccumulator(updAcc, sig, false);
 
     queriedAccum = await dock.accumulatorModule.getAccumulator(accumulatorId, true);
     expect(queriedAccum.accumulated).toEqual(accumulated);

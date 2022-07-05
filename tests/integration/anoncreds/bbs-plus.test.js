@@ -21,7 +21,7 @@ describe('BBS+ Module', () => {
   const seed1 = randomAsHex(32);
   const seed2 = randomAsHex(32);
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
@@ -36,7 +36,6 @@ describe('BBS+ Module', () => {
     await registerNewDIDUsingPair(dock, did1, pair1);
     await registerNewDIDUsingPair(dock, did2, pair2);
     await initializeWasm();
-    done();
   }, 20000);
 
   test('Can create new params', async () => {
@@ -44,8 +43,7 @@ describe('BBS+ Module', () => {
     let params = SignatureParamsG1.generate(10, hexToU8a(label));
     const bytes1 = u8aToHex(params.toBytes());
     const params1 = chainModuleClass.prepareAddParameters(bytes1, undefined, label);
-    const [addParams1, sig1] = await chainModule.createSignedAddParams(dock.did, params1, did1, pair1, 1);
-    await chainModule.createAddParams(addParams1, sig1, false);
+    await chainModule.addParams(params1, did1, pair1, 1, { didModule: dock.did }, false);
     const paramsWritten1 = await chainModule.getLastParamsWritten(did1);
     expect(paramsWritten1.bytes).toEqual(params1.bytes);
     expect(paramsWritten1.label).toEqual(params1.label);
@@ -56,8 +54,7 @@ describe('BBS+ Module', () => {
     params = SignatureParamsG1.generate(20);
     const bytes2 = u8aToHex(params.toBytes());
     const params2 = chainModuleClass.prepareAddParameters(bytes2);
-    const [addParams2, sig2] = await chainModule.createSignedAddParams(dock.did, params2, did2, pair2, 1);
-    await chainModule.createAddParams(addParams2, sig2, false);
+    await chainModule.addParams(params2, did2, pair2, 1, { didModule: dock.did }, false);
     const paramsWritten2 = await chainModule.getLastParamsWritten(did2);
     expect(paramsWritten2.bytes).toEqual(params2.bytes);
     expect(paramsWritten2.label).toBe(null);
@@ -69,8 +66,7 @@ describe('BBS+ Module', () => {
     params = SignatureParamsG1.generate(23, hexToU8a(label));
     const bytes3 = u8aToHex(params.toBytes());
     const params3 = chainModuleClass.prepareAddParameters(bytes3, undefined, label);
-    const [addParams3, sig3] = await chainModule.createSignedAddParams(dock.did, params3, did1, pair1, 1);
-    await chainModule.createAddParams(addParams3, sig3, false);
+    await chainModule.addParams(params3, did1, pair1, 1, { didModule: dock.did }, false);
     const paramsWritten3 = await chainModule.getLastParamsWritten(did1);
     expect(paramsWritten3.bytes).toEqual(params3.bytes);
     expect(paramsWritten3.label).toBe(params3.label);
@@ -91,8 +87,7 @@ describe('BBS+ Module', () => {
     let keypair = KeypairG2.generate(params);
     const bytes1 = u8aToHex(keypair.publicKey.bytes);
     const pk1 = chainModuleClass.prepareAddPublicKey(bytes1);
-    const [addPk1, sig1] = await chainModule.createSignedAddPublicKey(dock.did, pk1, did1, did1, pair1, 1);
-    await chainModule.createAddPublicKey(addPk1, sig1, false);
+    await chainModule.addPublicKey(pk1, did1, did1, pair1, 1, { didModule: dock.did }, false);
     const queriedPk1 = await chainModule.getPublicKey(did1, 2);
     expect(queriedPk1.bytes).toEqual(pk1.bytes);
     expect(queriedPk1.params_ref).toBe(null);
@@ -103,8 +98,7 @@ describe('BBS+ Module', () => {
     keypair = KeypairG2.generate(params1);
     const bytes2 = u8aToHex(keypair.publicKey.bytes);
     const pk2 = chainModuleClass.prepareAddPublicKey(bytes2, undefined, [did1, 1]);
-    const [addPk2, sig2] = await chainModule.createSignedAddPublicKey(dock.did, pk2, did2, did2, pair2, 1);
-    await chainModule.createAddPublicKey(addPk2, sig2, false);
+    await chainModule.addPublicKey(pk2, did2, did2, pair2, 1, { didModule: dock.did }, false);
     const queriedPk2 = await chainModule.getPublicKey(did2, 2);
     expect(queriedPk2.bytes).toEqual(pk2.bytes);
     expect(queriedPk2.params_ref).toEqual([getHexIdentifierFromDID(did1), 1]);
@@ -118,8 +112,7 @@ describe('BBS+ Module', () => {
     keypair = KeypairG2.generate(params2);
     const bytes3 = u8aToHex(keypair.publicKey.bytes);
     const pk3 = chainModuleClass.prepareAddPublicKey(bytes3, undefined, [did1, 2]);
-    const [addPk3, sig3] = await chainModule.createSignedAddPublicKey(dock.did, pk3, did2, did2, pair2, 1);
-    await chainModule.createAddPublicKey(addPk3, sig3, false);
+    await chainModule.addPublicKey(pk3, did2, did2, pair2, 1, { didModule: dock.did }, false);
 
     const queriedPk3 = await chainModule.getPublicKey(did2, 3);
     expect(queriedPk3.bytes).toEqual(pk3.bytes);
@@ -130,35 +123,29 @@ describe('BBS+ Module', () => {
   }, 30000);
 
   test('Can remove public keys and params', async () => {
-    const [remPk1, sig1] = await chainModule.createSignedRemovePublicKey(dock.did, did1, 2, did1, pair1, 1);
-    await chainModule.removePublicKey(remPk1, sig1, false);
+    await chainModule.removePublicKey(2, did1, did1, pair1, 1, { didModule: dock.did }, false);
     const pk1 = await chainModule.getPublicKey(did1, 2);
     expect(pk1).toEqual(null);
 
-    const [remPar2, sig2] = await chainModule.createSignedRemoveParams(dock.did, did1, 1, pair1, 1);
-    await chainModule.removeParams(remPar2, sig2, false);
+    await chainModule.removeParams(1, did1, pair1, 1, { didModule: dock.did }, false);
     const params1 = await chainModule.getParams(did1, 1);
     expect(params1).toEqual(null);
 
     await expect(chainModule.getPublicKey(did2, 2, true)).rejects.toThrow();
 
-    const [remPk3, sig3] = await chainModule.createSignedRemovePublicKey(dock.did, did2, 2, did2, pair2, 1);
-    await chainModule.removePublicKey(remPk3, sig3, false);
+    await chainModule.removePublicKey(2, did2, did2, pair2, 1, { didModule: dock.did }, false);
     const pk2 = await chainModule.getPublicKey(did2, 2);
     expect(pk2).toEqual(null);
 
-    const [remPk4, sig4] = await chainModule.createSignedRemovePublicKey(dock.did, did2, 3, did2, pair2, 1);
-    await chainModule.removePublicKey(remPk4, sig4, false);
+    await chainModule.removePublicKey(3, did2, did2, pair2, 1, { didModule: dock.did }, false);
     const pk3 = await chainModule.getPublicKey(did2, 3);
     expect(pk3).toEqual(null);
 
-    const [remPar5, sig5] = await chainModule.createSignedRemoveParams(dock.did, did1, 2, pair1, 1);
-    await chainModule.removeParams(remPar5, sig5, false);
+    await chainModule.removeParams(2, did1, pair1, 1, { didModule: dock.did }, false);
     const params2 = await chainModule.getParams(did1, 2);
     expect(params2).toEqual(null);
 
-    const [remPar6, sig6] = await chainModule.createSignedRemoveParams(dock.did, did2, 1, pair2, 1);
-    await chainModule.removeParams(remPar6, sig6, false);
+    await chainModule.removeParams(1, did2, pair2, 1, { didModule: dock.did }, false);
     const params3 = await chainModule.getParams(did2, 1);
     expect(params3).toEqual(null);
   }, 50000);

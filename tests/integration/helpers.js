@@ -1,9 +1,9 @@
 import { bnToBn } from '@polkadot/util';
+import { BTreeSet } from '@polkadot/types';
 import { createDidKey } from '../../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { MaxGas, MinGasPrice } from '../test-constants';
 import { DidKey, VerificationRelationship } from '../../src/public-keys';
-import { BTreeSet } from '@polkadot/types';
 
 /**
  * Registers a new DID on dock chain, keeps the controller same as the DID
@@ -11,9 +11,10 @@ import { BTreeSet } from '@polkadot/types';
  * @param did
  * @param pair
  * @param verRels
+ * @param controllers
  * @returns {Promise<void>}
  */
-export async function registerNewDIDUsingPair(dockAPI, did, pair, verRels = undefined) {
+export async function registerNewDIDUsingPair(dockAPI, did, pair, verRels = undefined, controllers = []) {
   const publicKey = getPublicKeyFromKeyringPair(pair);
 
   if (verRels === undefined) {
@@ -21,7 +22,7 @@ export async function registerNewDIDUsingPair(dockAPI, did, pair, verRels = unde
   }
   // No additional controller
   const didKey = new DidKey(publicKey, verRels);
-  return dockAPI.did.new(did, [didKey], [], false);
+  return dockAPI.did.new(did, [didKey], controllers, false);
 }
 
 /**
@@ -48,4 +49,16 @@ export function getUnsignedCred(credId, holderDID) {
 
 export function defaultEVMAccountEndowment() {
   return bnToBn(MinGasPrice).mul(bnToBn(MaxGas)).muln(2);
+}
+
+export function checkVerificationMethods(did, doc, length, index = undefined, keyNo = undefined) {
+  expect(doc.publicKey.length).toEqual(length);
+  if (length > 0 && index !== undefined) {
+    if (keyNo === undefined) {
+      keyNo = index + 1;
+    }
+    expect(doc.publicKey[index].id).toEqual(`${did}#keys-${keyNo}`);
+    expect(doc.publicKey[index].controller).toEqual(did);
+    expect(doc.publicKey[index].publicKeyBase58).toBeDefined();
+  }
 }

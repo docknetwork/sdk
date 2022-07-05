@@ -13,6 +13,5 @@ export default function mockAxios() {
 
     console.error(`Test should cache this URL: ${url}`);
     throw new Error(`Test should cache this URL: ${url}`);
-    return undefined;
   });
 }

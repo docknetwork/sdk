@@ -16,7 +16,6 @@ import PriceFeedRpcDefs from './rpc-defs/price-feed-rpc-defs';
 import CoreModsRpcDefs from './rpc-defs/core-mods-rpc-defs';
 
 import ExtrinsicError from './errors/extrinsic-error';
-import types from './types.json';
 
 import {
   PublicKey,
@@ -126,13 +125,11 @@ class DockAPI {
       rpc,
     };
 
-    // TODO: Fix me! Only temporary
-    // if (chainTypes) {
-    //   apiOptions.types = chainTypes;
-    // } else {
-    //   apiOptions.typesBundle = typesBundle;
-    // }
-    apiOptions.types = types;
+    if (chainTypes) {
+      apiOptions.types = chainTypes;
+    } else {
+      apiOptions.typesBundle = typesBundle;
+    }
 
     this.api = await ApiPromise.create(apiOptions);
 

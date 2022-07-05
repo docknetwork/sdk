@@ -14,11 +14,10 @@ describe('Deploy a dummy aggregator and a proxy contract', () => {
   let alice;
   const web3 = getWeb3(FullNodeTCPEndpoint);
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     const [a] = getTestEVMAccountsFromWeb3(web3);
     alice = a;
     await endowEVMAddressWithDefault(alice.address, defaultEVMAccountEndowment(), FullNodeEndpoint, TestAccountURI);
-    done();
   }, 15000);
 
   afterAll(async () => {

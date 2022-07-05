@@ -4,10 +4,9 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import { DockAPI } from '../../src/index';
 
 import {
-  hexDIDToQualified, createNewDockDID, createDidKey, getHexIdentifierFromDID,
+  createNewDockDID, getHexIdentifierFromDID,
 } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
-import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { verifyCredential, verifyPresentation } from '../../src/utils/vc/index';
 import { blobHexIdToQualified, createNewDockBlobId, DockBlobIdByteSize } from '../../src/modules/blob';
 import Schema from '../../src/modules/schema';
@@ -16,7 +15,6 @@ import exampleSchema from '../example-schema';
 import VerifiablePresentation from '../../src/verifiable-presentation';
 import getKeyDoc from '../../src/utils/vc/helpers';
 import DockResolver from '../../src/dock-resolver';
-import { SignatureSr25519 } from '../../src/signatures';
 import { Sr25519VerKeyName } from '../../src/utils/vc/crypto/constants';
 import { registerNewDIDUsingPair } from './helpers';
 
@@ -51,7 +49,7 @@ describe('Schema Blob Module Integration', () => {
   // Generate first key with this seed. The key type is Sr25519
   const firstKeySeed = randomAsHex(32);
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dockApi.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
@@ -67,11 +65,10 @@ describe('Schema Blob Module Integration', () => {
     // Write a blob with invalid JSON-schema format
     invalidFormatBlobId = randomAsHex(DockBlobIdByteSize);
     let blob = {
-      id: blobId,
+      id: invalidFormatBlobId,
       blob: stringToHex('hello world'),
     };
-    let [addBlob, didSig] = await dockApi.blob.createSignedAddBlob(dockApi.didModule, blob, hexDid, pair, 1);
-    await dockApi.blob.new(addBlob, didSig, undefined, false);
+    await dockApi.blob.new(blob, dockDID, pair, 1, { didModule: dockApi.didModule }, false);
 
     // Write schema blob
     const blobStr = JSON.stringify(exampleSchema);
@@ -79,8 +76,7 @@ describe('Schema Blob Module Integration', () => {
       id: blobId,
       blob: stringToHex(blobStr),
     };
-    [addBlob, didSig] = await dockApi.blob.createSignedAddBlob(dockApi.didModule, blob, hexDid, pair, 1);
-    await dockApi.blob.new(addBlob, didSig, undefined, false);
+    await dockApi.blob.new(blob, dockDID, pair, 1, { didModule: dockApi.didModule }, false);
 
     // Properly format a keyDoc to use for signing
     keyDoc = getKeyDoc(
@@ -117,40 +113,21 @@ describe('Schema Blob Module Integration', () => {
     });
     invalidCredential.setSchema(blobHexIdToQualified(blobId), 'JsonSchemaValidator2018');
     await invalidCredential.sign(keyDoc);
-
-    done();
   }, 90000);
 
   afterAll(async () => {
     await dockApi.disconnect();
   }, 30000);
 
-  test('setSignature will only accept signature of the supported types and set the signature key of the object.', async () => {
+  test('Set and get schema', async () => {
     const schema = new Schema();
-    schema.setAuthor(dockDID);
     await schema.setJSONSchema(exampleSchema);
-    let [addBlob, didSig] = await dockApi.blob.createSignedAddBlob(dockApi.didModule, schema.toBlob(), hexDid, pair, 1);
-    const msg = dockApi.blob.getSerializedBlob(addBlob);
-    const sig = new SignatureSr25519(msg, pair);
-    schema.setSignature(sig);
-    expect(schema.signature).toBe(sig);
-  });
-
-  test('sign will generate a signature on the schema detail, this signature is verifiable.', async () => {
-    const schema = new Schema();
-    schema.setAuthor(dockDID);
-    await schema.setJSONSchema(exampleSchema);
-    schema.sign(pair, dockApi.blob);
-    expect(!!schema.signature).toBe(true);
-  });
-
-  test('Schema.get will return schema in correct format.', async () => {
+    await dockApi.blob.new(schema.toBlob(), hexDid, pair, 1, { didModule: dockApi.didModule }, false);
     await expect(Schema.get(blobId, dockApi)).resolves.toMatchObject({
       ...exampleSchema,
       id: blobId,
-      author: hexDIDToQualified(getHexIdentifierFromDID(dockDID)),
     });
-  }, 30000);
+  }, 20000);
 
   test('Schema.get throws error when schema not in correct format.', async () => {
     await expect(Schema.get(invalidFormatBlobId, dockApi)).rejects.toThrow(/Incorrect schema format/);
@@ -161,8 +138,9 @@ describe('Schema Blob Module Integration', () => {
   }, 30000);
 
   test('Utility method verifyCredential should pass if the subject is compatible with the schema in credentialSchema.', async () => {
+    const j = validCredential.toJSON();
     await expect(
-      verifyCredential(validCredential.toJSON(), {
+      verifyCredential(j, {
         resolver: dockResolver,
         compactProof: true,
         forceRevocationCheck: false,

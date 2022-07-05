@@ -6,13 +6,14 @@ import dock, {
   PublicKeySr25519,
 } from '../src/index';
 import {
-  createNewDockDID, createDidKey, createSignedKeyUpdate, createSignedDidRemoval,
+  createNewDockDID
 } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
+import { DidKey, VerificationRelationship } from '../src/public-keys';
 
 // DID will be generated randomly
 const dockDID = createNewDockDID();
@@ -28,29 +29,40 @@ async function removeDID() {
   console.log('Removing DID now.');
 
   // Sign the DID removal with this key pair as this is the current key of the DID
-  const currentPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
+  const pair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
 
-  const [didRemoval, signature] = await createSignedDidRemoval(dock.did, dockDID, currentPair);
-
-  return dock.did.remove(didRemoval, signature, false);
+  return dock.did.remove(dockDID, dockDID, pair, 1, undefined, false);
 }
 
 // This function assumes the DID has been written.
-async function updateDIDKey() {
-  console.log('Updating key now.');
+async function addController() {
+  console.log('Add new controller now.');
 
   // Sign key update with this key pair as this is the current key of the DID
-  const currentPair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
+  const pair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
+
+  const newController = createNewDockDID();
+
+  return dock.did.addControllers([newController], dockDID, dockDID, pair, 1, undefined, false);
+}
+
+// This function assumes the DID has been written.
+async function addKey() {
+  console.log('Add new key now.');
+
+  // Sign key update with this key pair as this is the current key of the DID
+  const pair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
 
   // Update DID key to the following
   const newPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
   // the following function will figure out the correct PublicKey type from the `type` property of `newPair`
   const newPk = getPublicKeyFromKeyringPair(newPair);
 
-  const newController = randomAsHex(32);
+  const vr = new VerificationRelationship();
+  vr.setAuthentication();
+  const newDidKey = new DidKey(newPk, vr);
 
-  const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, dockDID, newPk, currentPair, newController);
-  return dock.did.updateKey(keyUpdate, signature, false);
+  return dock.did.addKeys([newDidKey], dockDID, dockDID, pair, 1, undefined, false);
 }
 
 async function getDIDDoc() {
@@ -68,11 +80,11 @@ function registerNewDID() {
   const publicKey = PublicKeySr25519.fromKeyringPair(firstPair);
 
   // The controller is same as the DID
-  const keyDetail = createDidKey(publicKey, dockDID);
+  const didKey = new DidKey(publicKey, new VerificationRelationship());
 
   console.log('Submitting new DID', dockDID, publicKey);
 
-  return dock.did.new(dockDID, keyDetail, false);
+  return dock.did.new(dockDID, [didKey], [], false);
 }
 
 // Initialize Dock API, connect to the node and start working with it
@@ -86,7 +98,9 @@ dock.init({
     return registerNewDID();
   })
   .then(getDIDDoc)
-  .then(updateDIDKey)
+  .then(addKey)
+  .then(getDIDDoc)
+  .then(addController)
   .then(getDIDDoc)
   .then(removeDID)
   .then(async () => {

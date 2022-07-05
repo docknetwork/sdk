@@ -123,18 +123,6 @@ and a `blobModule` object:
 <-  true
 ```
 
-#### Setting a signature manually
-A signature can also be manually added with the `setSignature` method. It accepts a single argument `signature` (an instance
-of `Signature`):
-```javascript
->   const keyring = new Keyring();
->   const keypair = keyring.addFromUri(randomAsHex(32), null, 'sr25519');
->   const sig = new SignatureSr25519(msg, keypair);
->   myNewSchema.setSignature(sig)
->   myNewSchema.signature === sig
-<-  true
-```
-
 #### Formatting for storage
 Your new schema is now ready to be written to the Dock chain, the last step is to format it properly for the BlobModule
 to be able to use it. That's where the `toBlob` method comes in handy:

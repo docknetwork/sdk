@@ -80,7 +80,7 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
   const dock = new DockAPI();
   const resolver = new DockResolver(dock);
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
@@ -103,8 +103,6 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
     // DID with sr25519 key
     const pair3 = dock.keyring.addFromUri(issuer3KeySeed, null, 'sr25519');
     await registerNewDIDUsingPair(dock, issuer3DID, pair3);
-
-    done();
   }, 60000);
 
   afterAll(async () => {

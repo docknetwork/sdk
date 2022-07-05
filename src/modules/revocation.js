@@ -1,10 +1,9 @@
 import {
+  getNonce,
   getSignatureFromKeyringPair,
   getStateChange,
 } from '../utils/misc';
 
-import DidKeys from '../utils/revocation/did-keys'; // eslint-disable-line
-import Policy from '../utils/revocation/policy';
 import { createDidSig, getHexIdentifierFromDID } from '../utils/did'; // eslint-disable-line
 
 /** Class to create, update and destroy revocations */
@@ -13,6 +12,7 @@ class RevocationModule {
    * Creates a new instance of RevocationModule and sets the api
    * @constructor
    * @param {object} api - PolkadotJS API Reference
+   * @param signAndSend
    */
   constructor(api, signAndSend) {
     this.api = api;
@@ -43,6 +43,8 @@ class RevocationModule {
    * @param {string} id - is the unique id of the registry. The function will check whether `id` is already taken or not.
    * @param {Policy} policy - The registry policy
    * @param {Boolean} addOnly - true: credentials can be revoked, but not un-revoked, false: credentials can be revoked and un-revoked
+   * @param waitForFinalization
+   * @param params
    * @return {Promise<object>} Promise to the pending transaction
    */
   async newRegistry(id, policy, addOnly, waitForFinalization = true, params = {}) {
@@ -51,10 +53,9 @@ class RevocationModule {
 
   /**
    * Deleting revocation registry
-   * @param {string} registryID - contains the registry to remove
-   * @param {number} lastModified - contains the registry to remove
-   * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Promise<object>} The extrinsic to sign and send.
+   * @param removal
+   * @param didSigs
    */
   createRemoveRegistryTx(removal, didSigs) {
     return this.module.removeRegistry(removal, didSigs);
@@ -62,22 +63,21 @@ class RevocationModule {
 
   /**
    * Deleting revocation registry
-   * @param {string} registryID - contains the registry to remove
-   * @param {number} lastModified - contains the registry to remove
-   * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Promise<object>} Promise to the pending transaction
+   * @param removal
+   * @param didSigs
+   * @param waitForFinalization
+   * @param params
    */
   async removeRegistry(removal, didSigs, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createRemoveRegistryTx(removal, didSigs), waitForFinalization, params);
+    return this.signAndSend(this.createRemoveRegistryTx(removal, didSigs), waitForFinalization, params);
   }
 
   /**
    * Revoke credentials
-   * @param {string} registryId - contains the registry to remove
-   * @param {Set} revokeIds - revoke id list
-   * @param {number} lastModified - contains the registry to remove
-   * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Promise<object>} The extrinsic to sign and send.
+   * @param revoke
+   * @param didSigs
    */
   createRevokeTx(revoke, didSigs) {
     return this.module.revoke(revoke, didSigs);
@@ -85,23 +85,21 @@ class RevocationModule {
 
   /**
    * Revoke credentials
-   * @param {string} registryId - contains the registry to remove
-   * @param {Set} revokeIds - revoke id list
-   * @param {number} lastModified - contains the registry to remove
-   * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Promise<object>} Promise to the pending transaction
+   * @param revoke
+   * @param didSigs
+   * @param waitForFinalization
+   * @param params
    */
   async revoke(revoke, didSigs, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createRevokeTx(revoke, didSigs), waitForFinalization, params);
+    return this.signAndSend(this.createRevokeTx(revoke, didSigs), waitForFinalization, params);
   }
 
   /**
    * Unrevoke credentials
-   * @param {string} registryID - contains the registry to remove
-   * @param {Set} revokeIds - revoke id list
-   * @param {number} lastModified - contains the registry to remove
-   * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Promise<object>} The extrinsic to sign and send.
+   * @param unrevoke
+   * @param didSigs
    */
   createUnrevokeTx(unrevoke, didSigs) {
     return this.module.unrevoke(unrevoke, didSigs);
@@ -109,14 +107,14 @@ class RevocationModule {
 
   /**
    * Unrevoke credentials
-   * @param {string} registryID - contains the registry to remove
-   * @param {Set} revokeIds - revoke id list
-   * @param {number} lastModified - contains the registry to remove
-   * @param {DidKeys} didKeys - The did key set used for generating proof
    * @return {Promise<object>} Promise to the pending transaction
+   * @param unrevoke
+   * @param didSigs
+   * @param waitForFinalization
+   * @param params
    */
   async unrevoke(unrevoke, didSigs, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createUnrevokeTx(unrevoke, didSigs), waitForFinalization, params);
+    return this.signAndSend(this.createUnrevokeTx(unrevoke, didSigs), waitForFinalization, params);
   }
 
   /**
@@ -146,84 +144,75 @@ class RevocationModule {
   }
 
   /**
-   * Internal helper to avoid code duplication while updating the revocation registry by revoking or unrevoking a credential.
-   * @param {function} updateFunc - A function that's called in the context of `dockAPI.revocation` to send an extrinsic. Is either
-   * `dockAPI.revocation.revoke` or `dockAPI.revocation.unrevoke`
-   * @param {DidKeys} didKeys - The map of DID and keypair to sign the update
-   * @param {string} registryId - The registry id being updated
-   * @param {string} revId - The revocation id being revoked or unrevoked
-   * @returns {Promise<void>}
-   */
-  async updateRevReg(updateFunc, didKeys, registryId, revId, waitForFinalization = true, params = {}) {
-    const lastModified = await this.getBlockNoForLastChangeToRegistry(registryId);
-    const revokeIds = new Set();
-    revokeIds.add(revId);
-    return updateFunc.bind(this)(registryId, revokeIds, lastModified, didKeys, waitForFinalization, params);
-  }
-
-  /**
    * TODO: Use the spread operator to accept multiple revocation ids
-   * Revoke a single credential
-   * @param {DidKeys} didKeys - The map of DID and keypair to sign the update
+   * Revoke a single credential. Works only with registries having `OneOf` policy
    * @param registryId - The registry id being updated
    * @param revId - The revocation id that is being revoked
+   * @param did
+   * @param keyPair
+   * @param keyId
+   * @param nonce
+   * @param didModule
+   * @param waitForFinalization
+   * @param params
    * @returns {Promise<void>}
    */
-  async revokeCredential(didKeys, registryId, revId, waitForFinalization = true, params = {}) {
-    return this.updateRevReg(this.revoke, didKeys, registryId, revId, waitForFinalization, params);
+  async revokeCredentialWithOneOfPolicy(registryId, revId, did, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
+    const [revoke, sig, sigNonce] = await this.createSignedRevoke(registryId, [revId], did, keyPair, keyId, { nonce, didModule });
+    return this.revoke(revoke, [[sig, sigNonce]], waitForFinalization, params);
   }
 
   /**
-   * TODO: Use the spread operator to accept multiple revocation ids
-   * Unrevoke a single credential
-   * @param {DidKeys} didKeys - The map of DID and keypair to sign the update
-   * @param registryId - The registry id being updated
-   * @param revId - The revocation id that is being unrevoked
-   * @returns {Promise<void>}
+   * Unrevoke a single credential. Works only with registries having `OneOf` policy
+   * @param registryId
+   * @param revId
+   * @param did
+   * @param keyPair
+   * @param keyId
+   * @param nonce
+   * @param didModule
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<Object>}
    */
-  async unrevokeCredential(didKeys, registryId, revId, waitForFinalization = true, params = {}) {
-    return this.updateRevReg(this.unrevoke, didKeys, registryId, revId, waitForFinalization, params);
+  async unrevokeCredentialWithOneOfPolicy(registryId, revId, did, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
+    const [revoke, sig, sigNonce] = await this.createSignedUnRevoke(registryId, [revId], did, keyPair, keyId, { nonce, didModule });
+    return this.unrevoke(revoke, [[sig, sigNonce]], waitForFinalization, params);
   }
 
-  async createSignedRevoke(didModule, registryId, revokeIds, did, keyPair, keyId, nonce = undefined) {
-    const hexDid = getHexIdentifierFromDID(did);
-    if (nonce === undefined) {
-      nonce = await didModule.getNextNonceForDID(hexDid);
-    }
+  async removeRegistryWithOneOfPolicy(registryId, did, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
+    const [removal, sig, sigNonce] = await this.createSignedRemove(registryId, did, keyPair, keyId, { nonce, didModule });
+    return this.removeRegistry(removal, [[sig, sigNonce]], waitForFinalization, params);
+  }
 
-    const revoke = {
+  async createSignedUpdate(updateFunc, registryId, revokeIds, did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    const hexDid = getHexIdentifierFromDID(did);
+    // eslint-disable-next-line no-param-reassign
+    nonce = await getNonce(hexDid, nonce, didModule);
+
+    const update = {
       registry_id: registryId,
       revoke_ids: revokeIds,
       nonce,
     };
-    const serializedRevoke = this.getSerializedRevoke(revoke);
+    const serializedRevoke = updateFunc.bind(this)(update);
     const signature = getSignatureFromKeyringPair(keyPair, serializedRevoke);
     const didSig = createDidSig(hexDid, keyId, signature);
     return [{ registry_id: registryId, revoke_ids: revokeIds }, didSig, nonce];
   }
 
-  async createSignedUnRevoke(didModule, registryId, revokeIds, did, keyPair, keyId, nonce = undefined) {
-    const hexDid = getHexIdentifierFromDID(did);
-    if (nonce === undefined) {
-      nonce = await didModule.getNextNonceForDID(hexDid);
-    }
-
-    const unRevoke = {
-      registry_id: registryId,
-      revoke_ids: revokeIds,
-      nonce,
-    };
-    const serializedUnRevoke = this.getSerializedUnrevoke(unRevoke);
-    const signature = getSignatureFromKeyringPair(keyPair, serializedUnRevoke);
-    const didSig = createDidSig(hexDid, keyId, signature);
-    return [{ registry_id: registryId, revoke_ids: revokeIds }, didSig, nonce];
+  async createSignedRevoke(registryId, revokeIds, did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    return this.createSignedUpdate(this.getSerializedRevoke, registryId, revokeIds, did, keyPair, keyId, { nonce, didModule });
   }
 
-  async createSignedRemove(didModule, registryId, did, keyPair, keyId, nonce = undefined) {
+  async createSignedUnRevoke(registryId, revokeIds, did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    return this.createSignedUpdate(this.getSerializedUnrevoke, registryId, revokeIds, did, keyPair, keyId, { nonce, didModule });
+  }
+
+  async createSignedRemove(registryId, did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     const hexDid = getHexIdentifierFromDID(did);
-    if (nonce === undefined) {
-      nonce = await didModule.getNextNonceForDID(hexDid);
-    }
+    // eslint-disable-next-line no-param-reassign
+    nonce = await getNonce(hexDid, nonce, didModule);
 
     const remove = {
       registry_id: registryId,

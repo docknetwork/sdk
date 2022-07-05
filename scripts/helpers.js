@@ -21,6 +21,7 @@ import {
 import { Observable } from "rxjs";
 
 import dock from "../src";
+import { DockAPI } from '../src';
 
 /**
  * Send the give transaction with the given account URI (secret) and return the block hash
@@ -123,10 +124,15 @@ export async function keypair(seed) {
  * @returns {Promise}
  */
 export async function connect(wsUrl) {
-  return await ApiPromise.create({
+  /*return await ApiPromise.create({
     provider: new WsProvider(wsUrl),
     typesBundle,
+  });*/
+  const dock = new DockAPI();
+  await dock.init({
+    address: wsUrl,
   });
+  return dock;
 }
 
 export function median(numbers) {

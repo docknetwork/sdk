@@ -29,7 +29,7 @@ describe('Crawler', () => {
   let rootatt_iri;
   let batt_iri;
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     ipfsClient = createClient(ipfsDefaultConfig);
 
     rootatt_iri = await ipfsAdd(ipfsClient, ipfs_content.rootatt);
@@ -43,8 +43,6 @@ describe('Crawler', () => {
       '@id': 'did:root',
       [ATTESTS]: { '@id': batt_iri },
     });
-
-    done();
   });
 
   test('happy path', async () => {

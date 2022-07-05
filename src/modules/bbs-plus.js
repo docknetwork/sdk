@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 
-import { getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
+import { getNonce, getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
 import WithParamsAndPublicKeys from './WithParamsAndPublicKeys';
 import { createDidSig, getHexIdentifierFromDID } from '../utils/did';
 
@@ -67,29 +67,45 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
     return this.api.query[this.moduleName].bbsPlusKeys(hexDid, { 0: counter });
   }
 
-  async createSignedAddPublicKey(didModule, publicKey, did, controllerDid, keyPair, keyId, nonce = undefined) {
-    const hexDid = getHexIdentifierFromDID(did);
-    const controllerHexDid = getHexIdentifierFromDID(controllerDid);
-    if (nonce === undefined) {
-      // eslint-disable-next-line no-param-reassign
-      nonce = await didModule.getNextNonceForDID(controllerHexDid);
-    }
-    const addPk = { key: publicKey, did: hexDid, nonce };
+  async createAddPublicKeyTx(publicKey, targetDid, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    const targetHexDid = getHexIdentifierFromDID(targetDid);
+    const signerHexDid = getHexIdentifierFromDID(signerDid);
+    const [addPk, signature] = await this.createSignedAddPublicKey(publicKey, targetHexDid, signerHexDid, keyPair, keyId, { nonce, didModule });
+    return this.module.addPublicKey(addPk, signature);
+  }
+
+  async createRemovePublicKeyTx(removeKeyId, targetDid, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    const targetHexDid = getHexIdentifierFromDID(targetDid);
+    const signerHexDid = getHexIdentifierFromDID(signerDid);
+    const [removePk, signature] = await this.createSignedRemovePublicKey(removeKeyId, targetHexDid, signerHexDid, keyPair, keyId, { nonce, didModule });
+    return this.module.removePublicKey(removePk, signature);
+  }
+
+  async addPublicKey(publicKey, targetDid, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
+    const tx = await this.createAddPublicKeyTx(publicKey, targetDid, signerDid, keyPair, keyId, { nonce, didModule });
+    return this.signAndSend(tx, waitForFinalization, params);
+  }
+
+  async removePublicKey(removeKeyId, targetDid, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
+    const tx = await this.createRemovePublicKeyTx(removeKeyId, targetDid, signerDid, keyPair, keyId, { nonce, didModule });
+    return this.signAndSend(tx, waitForFinalization, params);
+  }
+
+  async createSignedAddPublicKey(publicKey, targetHexDid, signerHexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    // eslint-disable-next-line no-param-reassign
+    nonce = await getNonce(signerHexDid, nonce, didModule);
+    const addPk = { key: publicKey, did: targetHexDid, nonce };
     const signature = this.signAddPublicKey(keyPair, addPk);
-    const didSig = createDidSig(hexDid, keyId, signature);
+    const didSig = createDidSig(signerHexDid, keyId, signature);
     return [addPk, didSig];
   }
 
-  async createSignedRemovePublicKey(didModule, did, removeKeyId, controllerDid, keyPair, keyId, nonce = undefined) {
-    const hexDid = getHexIdentifierFromDID(did);
-    const controllerHexDid = getHexIdentifierFromDID(controllerDid);
-    if (nonce === undefined) {
-      // eslint-disable-next-line no-param-reassign
-      nonce = await didModule.getNextNonceForDID(controllerHexDid);
-    }
-    const removeKey = { key_ref: [{ 0: hexDid }, { 0: removeKeyId }], did: hexDid, nonce };
+  async createSignedRemovePublicKey(removeKeyId, targetHexDid, signerHexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    // eslint-disable-next-line no-param-reassign
+    nonce = await getNonce(signerHexDid, nonce, didModule);
+    const removeKey = { key_ref: [{ 0: targetHexDid }, { 0: removeKeyId }], did: targetHexDid, nonce };
     const signature = this.signRemovePublicKey(keyPair, removeKey);
-    const didSig = createDidSig(hexDid, keyId, signature);
+    const didSig = createDidSig(signerHexDid, keyId, signature);
     return [removeKey, didSig];
   }
 

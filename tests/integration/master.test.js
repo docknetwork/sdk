@@ -21,13 +21,12 @@ describe('Master Module', () => {
   let masterModule;
   let masterQuery;
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     nc = await connect();
     systemModule = nc.api.tx.system;
     sudoModule = nc.api.tx.sudo;
     masterModule = nc.api.tx.master;
     masterQuery = nc.api.query.master;
-    done();
   }, 40000);
 
   afterAll(async () => { await nc.disconnect(); }, 10000);
@@ -198,7 +197,7 @@ async function signSendTx(extrinsic) {
     return this;
   });
 
-  return await promise;
+  return promise;
 }
 
 async function masterSetStorage(
@@ -248,7 +247,7 @@ async function allVote(
   const votes = [];
   for (const [did, key] of did_to_key) {
     const nonce = await nc.didModule.getNextNonceForDID(did);
-    const vote = {nonce, proposal: encodedProposal, round_no: roundNo};
+    const vote = { nonce, proposal: encodedProposal, round_no: roundNo };
     const encodedStateChange = getStateChange(nc.api, 'MasterVote', vote);
     const signature = getSignatureFromKeyringPair(key, encodedStateChange);
     const didSig = createDidSig(did, 1, signature);

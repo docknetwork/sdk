@@ -7,16 +7,15 @@ import { ATTESTS_IRI } from '../../../src/modules/did';
 import {
   createNewDockDID,
   getHexIdentifierFromDID,
-  createSignedAttestation,
   NoDIDError,
   NoOffchainDIDError,
-  createDidSig,
 } from '../../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
 import {
   VerificationRelationship, DidKey,
 } from '../../../src/public-keys';
+import { checkVerificationMethods } from '../helpers';
 
 describe('Basic DID tests', () => {
   const dock = new DockAPI();
@@ -28,12 +27,11 @@ describe('Basic DID tests', () => {
   // Generate first key with this seed. The key type is Sr25519
   const seed = randomAsHex(32);
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
-    done();
   });
 
   afterAll(async () => {
@@ -82,7 +80,7 @@ describe('Basic DID tests', () => {
     const result = await dock.did.getDocument(dockDid);
     expect(!!result).toBe(true);
     expect(result.controller.length).toEqual(1);
-    expect(result.verificationMethod.length).toEqual(1);
+    checkVerificationMethods(dockDid, result, 1, 0);
     expect(result.authentication.length).toEqual(1);
     expect(result.authentication[0]).toEqual(`${dockDid}#keys-1`);
     expect(result.assertionMethod.length).toEqual(1);
@@ -96,10 +94,7 @@ describe('Basic DID tests', () => {
     const iri = 'my iri';
     const pair = dock.keyring.addFromUri(seed);
 
-    // Create signed attestation and send to chain
-    const [attestation, signature] = await createSignedAttestation(dock.did, hexDid, priority, iri, pair);
-    const didSig = createDidSig(hexDid, 1, signature);
-    await dock.did.setClaim(attestation, didSig);
+    await dock.did.setClaim(priority, iri, dockDid, pair, 1, undefined, false);
 
     const att = await dock.did.getAttests(hexDid);
     expect(att).toEqual(iri);
@@ -113,9 +108,9 @@ describe('Basic DID tests', () => {
 
   test('Can remove DID', async () => {
     const pair = dock.keyring.addFromUri(seed);
-    const [didRemoval, signature] = await dock.did.createSignedDidRemoval(hexDid, hexDid, pair, 1);
-    await dock.did.remove(didRemoval, signature);
+    await dock.did.remove(dockDid, dockDid, pair, 1, undefined, false);
     // DID removed
+    await expect(dock.did.getDocument(dockDid)).rejects.toThrow(NoDIDError);
     await expect(dock.did.getOnchainDidDetail(hexDid)).rejects.toThrow(NoDIDError);
     await expect(dock.did.getDidKey(dockDid, 1)).rejects.toThrow();
     await expect(dock.did.isController(hexDid, hexDid)).resolves.toEqual(false);

@@ -1,7 +1,7 @@
 import { encodeAddress } from '@polkadot/util-crypto';
 import { u8aToString, hexToU8a, u8aToHex } from '@polkadot/util';
 import { BTreeSet } from '@polkadot/types';
-import * as b58 from 'multiformats/bases/base58';
+import b58 from 'bs58';
 import {
   getHexIdentifierFromDID,
   DockDIDQualifier,
@@ -19,7 +19,6 @@ import {
   PublicKeyEd25519, PublicKeySecp256k1, PublicKeySr25519, PublicKeyX25519, DidKey, VerificationRelationship,
 } from '../../public-keys';
 import { ServiceEndpointType } from '../../service-endpoint';
-import dock from '../../index';
 
 export const ATTESTS_IRI = 'https://rdf.dock.io/alpha/2021#attestsDocumentContents';
 
@@ -48,7 +47,7 @@ class DIDModule {
   }
 
   async newOffchain(did, didDocRef, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createNewOffchainTx(did, didDocRef), waitForFinalization, params);
+    return this.signAndSend(this.createNewOffchainTx(did, didDocRef), waitForFinalization, params);
   }
 
   createSetOffchainDidRefTx(did, didDocRef) {
@@ -57,7 +56,7 @@ class DIDModule {
   }
 
   async setOffchainDidRef(did, didDocRef, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createSetOffchainDidRefTx(did, didDocRef), waitForFinalization, params);
+    return this.signAndSend(this.createSetOffchainDidRefTx(did, didDocRef), waitForFinalization, params);
   }
 
   createRemoveOffchainDidTx(did) {
@@ -66,7 +65,7 @@ class DIDModule {
   }
 
   async removeOffchainDid(did, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createRemoveOffchainDidTx(did), waitForFinalization, params);
+    return this.signAndSend(this.createRemoveOffchainDidTx(did), waitForFinalization, params);
   }
 
   /**
@@ -80,7 +79,7 @@ class DIDModule {
     const cnts = new BTreeSet();
     if (controllers !== undefined) {
       controllers.forEach((c) => {
-        cnts.add(c);
+        cnts.add(getHexIdentifierFromDID(c));
       });
     }
     const hexId = getHexIdentifierFromDID(did);
@@ -97,89 +96,132 @@ class DIDModule {
    * @return {Promise<object>} Promise to the pending transaction
    */
   async new(did, didKeys, controllers, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createNewOnchainTx(did, didKeys, controllers), waitForFinalization, params);
+    return this.signAndSend(this.createNewOnchainTx(did, didKeys, controllers), waitForFinalization, params);
   }
 
-  createAddKeysTx(addKeys, signature) {
+  async createAddKeysTx(didKeys, targetDid, signerDid, keyPair, keyId, nonce = undefined) {
+    const targetHexDid = getHexIdentifierFromDID(targetDid);
+    const signerHexDid = getHexIdentifierFromDID(signerDid);
+    const [addKeys, signature] = await this.createSignedAddKeys(didKeys, targetHexDid, signerHexDid, keyPair, keyId, nonce);
     return this.module.addKeys(addKeys, signature);
   }
 
-  async addKeys(addKeys, signature, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createAddKeysTx(addKeys, signature), waitForFinalization, params);
+  async addKeys(didKeys, targetDid, signerDid, keyPair, keyId, nonce = undefined, waitForFinalization = true, params = {}) {
+    return this.signAndSend((await this.createAddKeysTx(didKeys, targetDid, signerDid, keyPair, keyId, nonce)), waitForFinalization, params);
   }
 
-  createAddControllersTx(addControllers, signature) {
+  async createAddControllersTx(controllers, targetDid, signerDid, keyPair, keyId, nonce = undefined) {
+    const targetHexDid = getHexIdentifierFromDID(targetDid);
+    const signerHexDid = getHexIdentifierFromDID(signerDid);
+    const [addControllers, signature] = await this.createSignedAddControllers(controllers, targetHexDid, signerHexDid, keyPair, keyId, nonce);
     return this.module.addControllers(addControllers, signature);
   }
 
-  async addControllers(addControllers, signature, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createAddControllersTx(addControllers, signature), waitForFinalization, params);
+  async addControllers(controllers, targetDid, signerDid, keyPair, keyId, nonce = undefined, waitForFinalization = true, params = {}) {
+    const tx = await this.createAddControllersTx(controllers, targetDid, signerDid, keyPair, keyId, nonce);
+    return this.signAndSend(tx, waitForFinalization, params);
   }
 
-  createAddServiceEndpointTx(addServiceEndpoint, signature) {
+  async createAddServiceEndpointTx(endpointId, endpointType, origins, targetDid, signerDid, keyPair, keyId, nonce = undefined) {
+    const targetHexDid = getHexIdentifierFromDID(targetDid);
+    const signerHexDid = getHexIdentifierFromDID(signerDid);
+    const [addServiceEndpoint, signature] = await this.createSignedAddServiceEndpoint(endpointId, endpointType, origins, targetHexDid, signerHexDid, keyPair, keyId, nonce);
     return this.module.addServiceEndpoint(addServiceEndpoint, signature);
   }
 
-  async addServiceEndpoint(addServiceEndpoint, signature, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createAddServiceEndpointTx(addServiceEndpoint, signature), waitForFinalization, params);
+  async addServiceEndpoint(endpointId, endpointType, origins, targetDid, signerDid, keyPair, keyId, nonce = undefined, waitForFinalization = true, params = {}) {
+    const tx = await this.createAddServiceEndpointTx(endpointId, endpointType, origins, targetDid, signerDid, keyPair, keyId, nonce);
+    return this.signAndSend(tx, waitForFinalization, params);
   }
 
-  createRemoveKeysTx(removeKeys, signature) {
+  async createRemoveKeysTx(keyIds, targetDid, signerDid, keyPair, keyId, nonce = undefined) {
+    const targetHexDid = getHexIdentifierFromDID(targetDid);
+    const signerHexDid = getHexIdentifierFromDID(signerDid);
+    const [removeKeys, signature] = await this.createSignedRemoveKeys(keyIds, targetHexDid, signerHexDid, keyPair, keyId, nonce);
     return this.module.removeKeys(removeKeys, signature);
   }
 
-  async removeKeys(removeKeys, signature, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createRemoveKeysTx(removeKeys, signature), waitForFinalization, params);
+  async removeKeys(keyIds, targetDid, signerDid, keyPair, keyId, nonce, waitForFinalization = true, params = {}) {
+    const tx = await this.createRemoveKeysTx(keyIds, targetDid, signerDid, keyPair, keyId, nonce);
+    return this.signAndSend(tx, waitForFinalization, params);
   }
 
-  removeControllersTx(removeControllers, signature) {
+  async removeControllersTx(controllers, targetDid, signerDid, keyPair, keyId, nonce = undefined) {
+    const targetHexDid = getHexIdentifierFromDID(targetDid);
+    const signerHexDid = getHexIdentifierFromDID(signerDid);
+    const [removeControllers, signature] = await this.createSignedRemoveControllers(controllers, targetHexDid, signerHexDid, keyPair, keyId, nonce);
     return this.module.removeControllers(removeControllers, signature);
   }
 
-  async removeControllers(removeControllers, signature, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.removeControllersTx(removeControllers, signature), waitForFinalization, params);
+  async removeControllers(controllers, did, controllerDid, keyPair, keyId, nonce = undefined, waitForFinalization = true, params = {}) {
+    const tx = await this.removeControllersTx(controllers, did, controllerDid, keyPair, keyId, nonce);
+    return this.signAndSend(tx, waitForFinalization, params);
   }
 
-  createRemoveServiceEndpointTx(removeServiceEndpoint, signature) {
+  async createRemoveServiceEndpointTx(endpointId, targetDid, signerDid, keyPair, keyId, nonce = undefined) {
+    const targetHexDid = getHexIdentifierFromDID(targetDid);
+    const signerHexDid = getHexIdentifierFromDID(signerDid);
+    const [removeServiceEndpoint, signature] = await this.createSignedRemoveServiceEndpoint(endpointId, targetHexDid, signerHexDid, keyPair, keyId, nonce);
     return this.module.removeServiceEndpoint(removeServiceEndpoint, signature);
   }
 
-  async removeServiceEndpoint(removeServiceEndpoint, signature, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createRemoveServiceEndpointTx(removeServiceEndpoint, signature), waitForFinalization, params);
+  async removeServiceEndpoint(endpointId, targetDid, signerDid, keyPair, keyId, nonce = undefined, waitForFinalization = true, params = {}) {
+    const tx = await this.createRemoveServiceEndpointTx(endpointId, targetDid, signerDid, keyPair, keyId, nonce);
+    return this.signAndSend(tx, waitForFinalization, params);
   }
 
   /**
    * Removes an already registered DID on the Dock chain.
-   * @param {object} didRemoval - `DidRemoval` as expected by the Substrate node
-   * @param {Signature} signature - Signature from existing key
    * @return {Promise<object>} The extrinsic to sign and send.
+   * @param targetDid
+   * @param signerDid
+   * @param keyPair
+   * @param keyId
+   * @param nonce
    */
-  createRemoveTx(didRemoval, signature) {
+  async createRemoveTx(targetDid, signerDid, keyPair, keyId, nonce = undefined) {
+    const hexDid = getHexIdentifierFromDID(targetDid);
+    const signerHexDid = getHexIdentifierFromDID(signerDid);
+    const [didRemoval, signature] = await this.createSignedDidRemoval(hexDid, signerHexDid, keyPair, keyId, nonce);
     return this.module.removeOnchainDid(didRemoval, signature);
   }
 
   /**
    * Removes an already registered DID on the Dock chain.
-   * @param {object} didRemoval - `DidRemoval` as expected by the Substrate node
-   * @param {Signature} signature - Signature from existing key
+   * @param targetDid
+   * @param signerDid
+   * @param keyPair
+   * @param keyId
+   * @param nonce
    * @param waitForFinalization
    * @param params
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async remove(didRemoval, signature, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createRemoveTx(didRemoval, signature), waitForFinalization, params);
+  async remove(targetDid, signerDid, keyPair, keyId, nonce = undefined, waitForFinalization = true, params = {}) {
+    const tx = await this.createRemoveTx(targetDid, signerDid, keyPair, keyId, nonce);
+    return this.signAndSend(tx, waitForFinalization, params);
+  }
+
+  async createSetClaimTx(priority, iri, did, keyPair, keyId, nonce = undefined) {
+    const hexDid = getHexIdentifierFromDID(did);
+    const [setAttestation, signature] = await this.createSignedAttestation(priority, iri, hexDid, keyPair, keyId, nonce);
+    return this.api.tx.attest.setClaim(setAttestation, signature);
   }
 
   /**
    * Creates an attestation claim on chain for a specific DID
-   * @param {object} setAttestation - `SetAttestationClaim` object with priority and iri
-   * @param {object} signature - signature from DID
+   * @param priority
+   * @param iri
+   * @param did
+   * @param keyPair
+   * @param keyId
+   * @param nonce
    * @param waitForFinalization
    * @param params
    */
-  async setClaim(setAttestation, signature, waitForFinalization = true, params = {}) {
-    const attestTx = this.api.tx.attest.setClaim(setAttestation, signature);
-    return await this.signAndSend(attestTx, waitForFinalization, params);
+  async setClaim(priority, iri, did, keyPair, keyId, nonce = undefined, waitForFinalization = true, params = {}) {
+    const attestTx = await this.createSetClaimTx(priority, iri, did, keyPair, keyId, nonce);
+    return this.signAndSend(attestTx, waitForFinalization, params);
   }
 
   /**
@@ -208,6 +250,7 @@ class DIDModule {
    * a 32 byte hex string
    * @return {Promise<object>} The DID document.
    */
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   async getDocument(did) {
     const hexId = getHexIdentifierFromDID(did);
 
@@ -318,7 +361,7 @@ class DIDModule {
       id: `${id}#keys-${index}`,
       type: typ,
       controller: id,
-      publicKeyMultibase: b58.base58btc.encode(publicKeyRaw),
+      publicKeyBase58: b58.encode(publicKeyRaw),
     }));
     const assertionMethod = assertion.map((i) => `${id}#keys-${i}`);
     const authentication = authn.map((i) => `${id}#keys-${i}`);
@@ -327,10 +370,10 @@ class DIDModule {
 
     // Construct document
     const document = {
-      '@context': 'https://www.w3.org/ns/did/v1',
+      '@context': ['https://www.w3.org/ns/did/v1'],
       id,
       controller: controllers.map((c) => this.getFullyQualifiedDID(encodeAddress(c))),
-      verificationMethod,
+      publicKey: verificationMethod,
     };
 
     if (authentication.length > 0) {
@@ -482,10 +525,7 @@ class DIDModule {
     };
   }
 
-  async createSignedAddKeys(didKeys, did, controllerDid, keyPair, keyId, nonce = undefined) {
-    const hexDid = getHexIdentifierFromDID(did);
-    const controllerHexDid = getHexIdentifierFromDID(controllerDid);
-
+  async createSignedAddKeys(didKeys, hexDid, controllerHexDid, keyPair, keyId, nonce = undefined) {
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
       nonce = await this.getNextNonceForDID(controllerHexDid);
@@ -499,10 +539,7 @@ class DIDModule {
     return [addKeys, didSig];
   }
 
-  async createSignedAddControllers(controllers, did, controllerDid, keyPair, keyId, nonce = undefined) {
-    const hexDid = getHexIdentifierFromDID(did);
-    const controllerHexDid = getHexIdentifierFromDID(controllerDid);
-
+  async createSignedAddControllers(controllers, hexDid, controllerHexDid, keyPair, keyId, nonce = undefined) {
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
       nonce = await this.getNextNonceForDID(controllerHexDid);
@@ -510,7 +547,7 @@ class DIDModule {
 
     const cnts = new BTreeSet();
     controllers.forEach((c) => {
-      cnts.add(c);
+      cnts.add(getHexIdentifierFromDID(c));
     });
     const addControllers = { did: hexDid, controllers: cnts, nonce };
     const serializedAddControllers = this.getSerializedAddControllers(addControllers);
@@ -519,10 +556,7 @@ class DIDModule {
     return [addControllers, didSig];
   }
 
-  async createSignedAddServiceEndpoint(endpointId, endpointType, origins, did, controllerDid, keyPair, keyId, nonce = undefined) {
-    const hexDid = getHexIdentifierFromDID(did);
-    const controllerHexDid = getHexIdentifierFromDID(controllerDid);
-
+  async createSignedAddServiceEndpoint(endpointId, endpointType, origins, hexDid, controllerHexDid, keyPair, keyId, nonce = undefined) {
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
       nonce = await this.getNextNonceForDID(controllerHexDid);
@@ -569,7 +603,7 @@ class DIDModule {
 
     const cnts = new BTreeSet();
     controllers.forEach((c) => {
-      cnts.add(c);
+      cnts.add(getHexIdentifierFromDID(c));
     });
 
     const removeControllers = { did: hexDid, controllers: cnts, nonce };
@@ -579,10 +613,7 @@ class DIDModule {
     return [removeControllers, didSig];
   }
 
-  async createSignedRemoveServiceEndpoint(endpointId, did, controllerDid, keyPair, keyId, nonce = undefined) {
-    const hexDid = getHexIdentifierFromDID(did);
-    const controllerHexDid = getHexIdentifierFromDID(controllerDid);
-
+  async createSignedRemoveServiceEndpoint(endpointId, hexDid, controllerHexDid, keyPair, keyId, nonce = undefined) {
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
       nonce = await this.getNextNonceForDID(controllerHexDid);
@@ -595,10 +626,7 @@ class DIDModule {
     return [removeServiceEndpoint, didSig];
   }
 
-  async createSignedDidRemoval(did, controllerDid, keyPair, keyId, nonce = undefined) {
-    const hexDid = getHexIdentifierFromDID(did);
-    const controllerHexDid = getHexIdentifierFromDID(controllerDid);
-
+  async createSignedDidRemoval(hexDid, controllerHexDid, keyPair, keyId, nonce = undefined) {
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
       nonce = await this.getNextNonceForDID(controllerHexDid);
@@ -609,6 +637,24 @@ class DIDModule {
     const signature = getSignatureFromKeyringPair(keyPair, serializedRemoval);
     const didSig = createDidSig(controllerHexDid, keyId, signature);
     return [removal, didSig];
+  }
+
+  async createSignedAttestation(priority, iri, hexDid, keyPair, keyId, nonce = undefined) {
+    if (nonce === undefined) {
+      // eslint-disable-next-line no-param-reassign
+      nonce = await this.getNextNonceForDID(hexDid);
+    }
+    const setAttestation = {
+      attest: {
+        priority,
+        iri,
+      },
+      nonce,
+    };
+    const serializedAttestation = this.getSerializedAttestation(setAttestation);
+    const signature = getSignatureFromKeyringPair(keyPair, serializedAttestation);
+    const didSig = createDidSig(hexDid, keyId, signature);
+    return [setAttestation, didSig];
   }
 
   /**

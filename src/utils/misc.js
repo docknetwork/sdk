@@ -161,3 +161,13 @@ export function bytesToWrappedBytes(bytes) {
     0: bytes,
   };
 }
+
+export async function getNonce(hexDid, nonce = undefined, didModule = undefined) {
+  if (nonce === undefined && didModule === undefined) {
+    throw new Error('Provide either nonce or didModule to fetch nonce but none provided');
+  }
+  if (nonce === undefined) {
+    return didModule.getNextNonceForDID(hexDid);
+  }
+  return nonce;
+}

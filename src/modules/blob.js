@@ -1,11 +1,12 @@
 import { encodeAddress, randomAsHex } from '@polkadot/util-crypto';
-import { u8aToString, stringToHex, bufferToU8a } from '@polkadot/util';
+import {
+  u8aToString, stringToHex, bufferToU8a, u8aToHex,
+} from '@polkadot/util';
 
-import { getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
+import { getNonce, getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from '../utils/codec';
 import NoBlobError from '../utils/errors/no-blob-error';
-import { Signature } from '../signatures';
-import { createDidSig } from '../utils/did';
+import { createDidSig, getHexIdentifierFromDID } from '../utils/did';
 
 export const DockBlobQualifier = 'blob:dock:';
 export const DockBlobIdByteSize = 32;
@@ -60,6 +61,7 @@ class BlobModule {
    * Creates a new instance of BlobModule and sets the api
    * @constructor
    * @param {object} api - PolkadotJS API Reference
+   * @param signAndSend
    */
   constructor(api, signAndSend) {
     this.api = api;
@@ -67,26 +69,16 @@ class BlobModule {
     this.signAndSend = signAndSend;
   }
 
-  /**
-   * Create a transaction to register a new Blob on the Dock Chain
-   * @param {object} addBlob - struct to store on chain and nonce
-   * @param {object} signature - Signature to use
-   * @return {object} The extrinsic to sign and send.
-   */
-  createNewTx(addBlob, signature) {
-    return this.module.new(addBlob, signature);
+  async createNewTx(blob, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    const hexDid = getHexIdentifierFromDID(signerDid);
+    const [addBlob, didSig] = await this.createSignedAddBlob(blob, hexDid, keyPair, keyId, { nonce, didModule });
+    return this.module.new(addBlob, didSig);
   }
 
-  /**
-   * Register a new Blob on the Dock Chain
-   * @param {object} addBlob - struct to store on chain
-   * @param {object} signature - Signature to use
-   * @param waitForFinalization
-   * @param params
-   * @return {Promise<object>} Promise to the pending transaction
-   */
-  async new(addBlob, signature, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createNewTx(addBlob, signature), waitForFinalization, params);
+  async new(blob, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
+    return this.signAndSend(
+      (await this.createNewTx(blob, signerDid, keyPair, keyId, { nonce, didModule })), waitForFinalization, params,
+    );
   }
 
   /**
@@ -115,24 +107,22 @@ class BlobModule {
         // no-op, just use default Uint8 array value
       }
 
-      return [respTuple[0], value];
+      return [u8aToHex(respTuple[0][0][0]), value];
     }
     throw new Error(`Needed 2 items in response but got${respTuple.length}`);
   }
 
-  async createSignedAddBlob(didModule, blob, hexDid, keyPair, keyId, nonce = undefined) {
+  async createSignedAddBlob(blob, hexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     if (!blob.blob) {
       throw new Error('Blob must have a value!');
     }
+    // eslint-disable-next-line no-param-reassign
+    nonce = await getNonce(hexDid, nonce, didModule);
 
     const blobObj = {
       ...blob,
       blob: this.getSerializedBlobValue(blob.blob),
     };
-
-    if (nonce === undefined) {
-      nonce = await didModule.getNextNonceForDID(hexDid);
-    }
     const addBlob = {
       blob: blobObj,
       nonce,

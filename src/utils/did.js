@@ -1,9 +1,8 @@
 // This file will be turned to a folder and will have files like `did/dock.js` and `did/ethr.js`
 
 // Import some utils from Polkadot JS
+// eslint-disable-next-line max-classes-per-file
 import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
-
-import { getSignatureFromKeyringPair } from './misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from './codec';
 
 import { Signature } from '../signatures'; // eslint-disable-line
@@ -126,146 +125,8 @@ export function createDidKey(publicKey, verRel) {
  * @param {Signature} sig
  * @returns {{sig: *, keyId, did}}
  */
-export function createDidSig(did, keyId, sig) {
+export function createDidSig(did, keyId = 1, sig) {
   return {
     did, keyId: { 0: keyId }, sig: sig.toJSON(),
   };
-}
-
-// TODO: all methods using (@param {object} didModule) should be moved into dock.sdk class
-
-/**
- * Create and return a `KeyUpdate` as expected by the Substrate node. Signing is intentionally kept separate as the
- * JS code may not have access to the signing key like in case of hardware wallet.
- * @param {object} didModule - The did module
- * @param {string} did - Full DID or hex identifier to update
- * @param {PublicKey} newPublicKey - The new public key for the DID. The
- * @param {string} [newController] - Full DID or hex identifier of the controller of the public key. Is optional and must
- * only be passed when controller is to be updated.
- * @returns {Promise<object>} The object has structure and keys with same names as expected by the Substrate node
- */
-export async function createKeyUpdate(didModule, did, newPublicKey, newController) {
-  const hexId = getHexIdentifierFromDID(did);
-  const keyUpdate = {
-    did: hexId,
-    public_key: newPublicKey.toJSON(),
-    last_modified_in_block: await didModule.getBlockNoForLastChangeToDID(hexId),
-  };
-  if (newController) {
-    keyUpdate.controller = getHexIdentifierFromDID(newController);
-  }
-  return keyUpdate;
-}
-
-/** Sign the given `KeyUpdate` and returns the signature
- * @param {object} didModule - The did module
- * @param {object} keyUpdate - `KeyUpdate` as expected by the Substrate node
- * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
- * @returns {Signature}
- */
-export function signKeyUpdate(didModule, keyUpdate, currentKeyPair) {
-  const serializedKeyUpdate = didModule.getSerializedKeyUpdate(keyUpdate);
-  return getSignatureFromKeyringPair(currentKeyPair, serializedKeyUpdate);
-}
-
-/**
- * Create a `KeyUpdate` as expected by the Substrate node and signs it. Return the `KeyUpdate` object and the signature
- * @param {object} didModule - The did module
- * @param {string} did - Full DID or hex identifier to update
- * @param {PublicKey} newPublicKey - The new public key for the DID
- * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
- * * @param {string} [newController] - Full DID or hex identifier of the controller of the public. Is optional and must
- * only be passed when controller is to be updated
- * @returns {Promise<array>} A 2 element array where the first element is the `KeyUpdate` and the second is the signature
- */
-export async function createSignedKeyUpdate(didModule, did, newPublicKey, currentKeyPair, newController) {
-  const keyUpdate = await createKeyUpdate(didModule, did, newPublicKey, newController);
-  const signature = signKeyUpdate(didModule, keyUpdate, currentKeyPair);
-  return [keyUpdate, signature];
-}
-
-/**
- * Create and return a `DidRemoval` as expected by the Substrate node. Signing is intentionally kept separate as the
- * JS code may not have access to the signing key like in case of hardware wallet.
- * @param {module} didModule - The did module
- * @param {string} did - Full DID or hex identifier to update
- * @returns {Promise<object>} The object has structure and keys with same names as expected by the Substrate node
- */
-export async function createDidRemoval(didModule, did) {
-  const hexId = getHexIdentifierFromDID(did);
-  return {
-    did: hexId,
-    last_modified_in_block: await didModule.getBlockNoForLastChangeToDID(hexId),
-  };
-}
-
-/**
- * Sign the given `DidRemoval` and returns the signature
- * @param {module} didModule - The did module
- * @param {object} didRemoval - `DidRemoval` as expected by the Substrate node
- * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
- * @returns {Signature}
- */
-export function signDidRemoval(didModule, didRemoval, currentKeyPair) {
-  const serializedDIDRemoval = didModule.getSerializedDIDRemoval(didRemoval);
-  return getSignatureFromKeyringPair(currentKeyPair, serializedDIDRemoval);
-}
-
-/**
- * Create a `DidRemoval` as expected by the Substrate node and signs it. Return the `DidRemoval` object and the signature
- * @param {module} didModule - The did module
- * @param {string} did - Full DID or hex identifier to remove
- * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
- * @returns {Promise<array>} A 2 element array where the first element is the `DidRemoval` and the second is the signature
- */
-export async function createSignedDidRemoval(didModule, did, currentKeyPair) {
-  const didRemoval = await createDidRemoval(didModule, did);
-  const signature = signDidRemoval(didModule, didRemoval, currentKeyPair);
-  return [didRemoval, signature];
-}
-
-/**
- * Create and return a `Attestation` as expected by the Substrate node. Signing is intentionally kept separate as the
- * JS code may not have access to the signing key like in case of hardware wallet.
- * @param {Number} priority - Attestation priority
- * @param {string | null} iri - Attestation iri
- * @returns {object} The object has structure and keys with same names as expected by the Substrate node
- */
-export function createDidAttestation(priority, iri) {
-  return {
-    priority,
-    iri,
-  };
-}
-
-/**
- * Sign the given `Attestation` and returns the signature
- * @param {module} didModule - The did module
- * @param {object} setAttestation - `SetAttestationClaim` as expected by the Substrate node
- * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
- * @returns {Signature}
- */
-export function signDidAttestation(didModule, setAttestation, currentKeyPair) {
-  const serializedAttestation = didModule.getSerializedAttestation(setAttestation);
-  return getSignatureFromKeyringPair(currentKeyPair, serializedAttestation);
-}
-
-/**
- * Create a `Attestation` as expected by the Substrate node and signs it. Return the `Attestation` object and the signature
- * @param {module} didModule - The did module
- * @param hexDid
- * @param {Number} priority - Attestation priority
- * @param {string | null} iri - Attestation iri
- * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
- * @returns {Promise<array>} A 2 element array where the first element is the `Attestation` and the second is the signature
- */
-export async function createSignedAttestation(didModule, hexDid, priority, iri, currentKeyPair) {
-  const nonce = await didModule.getNextNonceForDID(hexDid);
-  const attestation = createDidAttestation(priority, iri);
-  const setAttestation = {
-    attest: attestation,
-    nonce,
-  };
-  const signature = signDidAttestation(didModule, setAttestation, currentKeyPair);
-  return [setAttestation, signature];
 }

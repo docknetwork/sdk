@@ -1,5 +1,5 @@
 import jsigs from 'jsonld-signatures';
-import { encode, decode } from 'base58-universal';
+import base58btc from 'bs58';
 import base64url from 'base64url';
 
 const MULTIBASE_BASE58BTC_HEADER = 'z';
@@ -51,7 +51,7 @@ export default class CustomLinkedDataSignature extends jsigs.suites.LinkedDataSi
       if (proofValue[0] !== MULTIBASE_BASE58BTC_HEADER) {
         throw new Error('Only base58btc multibase encoding is supported.');
       }
-      signatureBytes = decode(proofValue.substr(1));
+      signatureBytes = base58btc.decode(proofValue.substr(1));
     } else if (jws && typeof jws === 'string') { // Fallback to older jsonld-signature implementations
       const [encodedHeader, /* payload */, encodedSignature] = jws.split('.');
 
@@ -118,7 +118,7 @@ export default class CustomLinkedDataSignature extends jsigs.suites.LinkedDataSi
 
     return {
       ...proof,
-      proofValue: MULTIBASE_BASE58BTC_HEADER + encode(signatureBytes),
+      proofValue: MULTIBASE_BASE58BTC_HEADER + base58btc.encode(signatureBytes),
     };
   }
 }

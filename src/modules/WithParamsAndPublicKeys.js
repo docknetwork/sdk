@@ -2,6 +2,7 @@
 
 import { u8aToHex } from '@polkadot/util';
 import { createDidSig, getHexIdentifierFromDID } from '../utils/did';
+import { getNonce } from '../utils/misc';
 
 /** Class with logic for public keys and corresponding setup parameters. This logic is common in BBS+ and accumulator */
 export default class WithParamsAndPublicKeys {
@@ -79,61 +80,41 @@ export default class WithParamsAndPublicKeys {
     return parsed;
   }
 
-  createAddParamsTx(addParams, signature) {
+  async createAddParamsTx(params, did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    const hexDid = getHexIdentifierFromDID(did);
+    const [addParams, signature] = await this.createSignedAddParams(params, hexDid, keyPair, keyId, { nonce, didModule });
     return this.module.addParams(addParams, signature);
   }
 
-  createAddPublicKeyTx(addPk, signature) {
-    return this.module.addPublicKey(addPk, signature);
-  }
-
-  removeParamsTx(removeParams, signature) {
+  async removeParamsTx(index, did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    const hexDid = getHexIdentifierFromDID(did);
+    const [removeParams, signature] = await this.createSignedRemoveParams(index, hexDid, keyPair, keyId, { nonce, didModule });
     return this.module.removeParams(removeParams, signature);
   }
 
-  removePublicKeyTx(removePk, signature) {
-    return this.module.removePublicKey(removePk, signature);
-  }
-
-  async createAddParams(addParams, signature, waitForFinalization = true, params = {}) {
-    const tx = this.createAddParamsTx(addParams, signature);
+  async addParams(param, did, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
+    const tx = await this.createAddParamsTx(param, did, keyPair, keyId, { nonce, didModule });
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
-  async createAddPublicKey(addPublicKey, signature, waitForFinalization = true, params = {}) {
-    const tx = this.createAddPublicKeyTx(addPublicKey, signature);
+  async removeParams(index, did, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
+    const tx = await this.removeParamsTx(index, did, keyPair, keyId, { nonce, didModule });
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
-  async removeParams(removeParams, signature, waitForFinalization = true, params = {}) {
-    const tx = this.removeParamsTx(removeParams, signature);
-    return this.signAndSend(tx, waitForFinalization, params);
-  }
-
-  async removePublicKey(removePk, signature, waitForFinalization = true, params = {}) {
-    const tx = this.removePublicKeyTx(removePk, signature);
-    return this.signAndSend(tx, waitForFinalization, params);
-  }
-
-  async createSignedAddParams(didModule, params, did, keyPair, keyId, nonce = undefined) {
-    const hexDid = getHexIdentifierFromDID(did);
-    if (nonce === undefined) {
-      // eslint-disable-next-line no-param-reassign
-      nonce = await didModule.getNextNonceForDID(hexDid);
-    }
+  async createSignedAddParams(params, hexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    // eslint-disable-next-line no-param-reassign
+    nonce = await getNonce(hexDid, nonce, didModule);
     const addParams = { params, nonce };
     const signature = this.signAddParams(keyPair, addParams);
     const didSig = createDidSig(hexDid, keyId, signature);
     return [addParams, didSig];
   }
 
-  async createSignedRemoveParams(didModule, did, counter, keyPair, keyId, nonce = undefined) {
-    const hexDid = getHexIdentifierFromDID(did);
-    if (nonce === undefined) {
-      // eslint-disable-next-line no-param-reassign
-      nonce = await didModule.getNextNonceForDID(hexDid);
-    }
-    const removeParams = { params_ref: [{ 0: hexDid }, { 0: counter }], nonce };
+  async createSignedRemoveParams(index, hexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    // eslint-disable-next-line no-param-reassign
+    nonce = await getNonce(hexDid, nonce, didModule);
+    const removeParams = { params_ref: [{ 0: hexDid }, { 0: index }], nonce };
     const signature = this.signRemoveParams(keyPair, removeParams);
     const didSig = createDidSig(hexDid, keyId, signature);
     return [removeParams, didSig];

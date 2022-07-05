@@ -38,17 +38,12 @@ await dock.revocation.newRegistry(registryId, policy, false);
 ```
 
 ## Revoking a credential
-Revoking a credential requires a signature from the owner of the registry. For that, fetch the owner's DID and pair and
-create a map
-```js
-const didKeys = new KeyringPairDidKeys();
-didKeys.set(ownerDID, ownerKeypair);
-```
-
+Revoking a credential requires a signature from the owner of the registry.
 Now get the registry id, `registryId` and the revocation id (the hash of credential id), `revokeId` and send the transaction on chain.
 Revoking an already revoked credential has no effect.
+
 ```js
-await dock.revocation.revokeCredential(didKeys, registryId, revokeId);
+await dock.revocation.revokeCredentialWithOneOfPolicy(didKeys, registryId, revokeId);
 ```
 Revoking multiple ids in a single transaction is possible but with a lower level method `dock.revocation.revoke`.
 
@@ -62,8 +57,9 @@ didKeys.set(ownerDID, ownerKeypair);
 
 Now get the registry id, `registryId` and the revocation id to undo, `revokeId` and send the transaction on chain.
 Unrevoking an unrevoked credential has no effect.
+
 ```js
-await dock.revocation.unrevokeCredential(didKeys, registryId, revokeId);
+await dock.revocation.unrevokeCredentialWithOneOfPolicy(didKeys, registryId, revokeId);
 ```
 Undoing revocation for multiple ids in a single transaction is possible but with a lower level method `dock.revocation.unrevoke`.
 

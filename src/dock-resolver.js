@@ -23,7 +23,7 @@ export default class DockResolver extends DIDResolver {
       const parsed = this.parseDid(did);
       if (parsed.method === methodName) {
         validateDockDIDSS58Identifier(parsed.id);
-        return this.dock.did.getDocument(parsed.did);
+        return await this.dock.did.getDocument(parsed.did);
       }
       throw new Error(`Resolver for ${methodName} does not support the ${parsed.method} did method.`);
     } else {

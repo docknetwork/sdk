@@ -8326,9 +8326,9 @@ jsonld-context-parser@^2.0.0, jsonld-context-parser@^2.0.2, jsonld-context-parse
     relative-to-absolute-iri "^1.0.5"
 
 jsonld-signatures@^9.0.2:
-  version "9.3.0"
-  resolved "https://registry.yarnpkg.com/jsonld-signatures/-/jsonld-signatures-9.3.0.tgz#4da0ac56c14ece9e0bf1dc02bdf419aabd5f5ce1"
-  integrity sha512-I52f8AmCoaUuM7gbFUGu9Ir3odGWOmQPlNPE/VYbiRrC3UfIRig0hYhNFkcVhe0ZXsE5L0if6Fo5SutKFqs3uQ==
+  version "9.3.1"
+  resolved "https://registry.yarnpkg.com/jsonld-signatures/-/jsonld-signatures-9.3.1.tgz#38f553fadb85c19bef61515247c3e53bb9a132ff"
+  integrity sha512-OasKERvvbfbuItVFrb0pOHiclHPvT98IAorayZnEj48/E0Vz3rTPLzC14rDi1CEXjiiTGeNadLzTLdomdeZEAQ==
   dependencies:
     jsonld "^5.0.0"
     security-context "^4.0.0"

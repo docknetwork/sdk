@@ -1,4 +1,5 @@
 import b58 from 'bs58';
+import * as b58multi from 'multiformats/bases/base58';
 import { u8aToU8a } from '@polkadot/util';
 import { sha256 } from 'js-sha256';
 import elliptic from 'elliptic';
@@ -18,10 +19,16 @@ export default class EcdsaSecp256k1VerificationKey2019 {
    * @returns {EcdsaSecp256k1VerificationKey2019}
    */
   static from(verificationMethod) {
-    if (verificationMethod.type !== EcdsaSecp256k1VerKeyName && !verificationMethod.publicKeyBase58) {
-      throw new Error(`verification method should have type ${EcdsaSecp256k1VerKeyName} and have the base58 public key`);
+    if (verificationMethod.type !== EcdsaSecp256k1VerKeyName) {
+      throw new Error(`verification method should have type ${EcdsaSecp256k1VerKeyName}`);
     }
-    return new this(b58.decode(verificationMethod.publicKeyBase58));
+    if (verificationMethod.publicKeyMultibase !== undefined) {
+      return new this(b58multi.base58btc.decode(verificationMethod.publicKeyMultibase));
+    }
+    if (verificationMethod.publicKeyBase58 !== undefined) {
+      return new this(b58.decode(verificationMethod.publicKeyBase58));
+    }
+    throw new Error('verification method should have either publicKeyMultibase or publicKeyBase58 but none was provided');
   }
 
   /**

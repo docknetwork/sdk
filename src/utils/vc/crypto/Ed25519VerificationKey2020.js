@@ -1,10 +1,9 @@
-import b58 from 'bs58';
 import * as b58multi from 'multiformats/bases/base58';
-import { u8aToU8a } from '@polkadot/util';
-import { schnorrkelVerify } from '@polkadot/util-crypto/schnorrkel';
-import { Sr25519VerKeyName } from './constants';
+import { u8aToHex, u8aToU8a } from '@polkadot/util';
+import { signatureVerify } from '@polkadot/util-crypto/signature';
+import { Ed2551920VerKeyName } from './constants';
 
-export default class Sr25519VerificationKey2020 {
+export default class Ed25519VerificationKey2020 {
   constructor(publicKey) {
     this.publicKey = u8aToU8a(publicKey);
   }
@@ -12,19 +11,17 @@ export default class Sr25519VerificationKey2020 {
   /**
    * Construct the public key object from the verification method
    * @param verificationMethod
-   * @returns {Sr25519VerificationKey2020}
+   * @returns {Ed25519VerificationKey2020}
    */
   static from(verificationMethod) {
-    if (verificationMethod.type !== Sr25519VerKeyName) {
-      throw new Error(`verification method should have type ${Sr25519VerKeyName}`);
+    // TODO: Remove duplicate code
+    if (verificationMethod.type !== Ed2551920VerKeyName) {
+      throw new Error(`verification method should have type ${Ed2551920VerKeyName}`);
     }
     if (verificationMethod.publicKeyMultibase !== undefined) {
       return new this(b58multi.base58btc.decode(verificationMethod.publicKeyMultibase));
     }
-    if (verificationMethod.publicKeyBase58 !== undefined) {
-      return new this(b58.decode(verificationMethod.publicKeyBase58));
-    }
-    throw new Error('verification method should have either publicKeyMultibase or publicKeyBase58 but none was provided');
+    throw new Error('verification method should have publicKeyMultibase');
   }
 
   /**
@@ -32,7 +29,7 @@ export default class Sr25519VerificationKey2020 {
    * @returns {object}
    */
   verifier() {
-    return Sr25519VerificationKey2020.verifierFactory(this.publicKey);
+    return Ed25519VerificationKey2020.verifierFactory(this.publicKey);
   }
 
   /**
@@ -43,7 +40,8 @@ export default class Sr25519VerificationKey2020 {
   static verifierFactory(publicKey) {
     return {
       async verify({ data, signature }) {
-        return schnorrkelVerify(data, signature, publicKey);
+        const pk = u8aToHex(publicKey);
+        return signatureVerify(data, signature, pk).isValid;
       },
     };
   }

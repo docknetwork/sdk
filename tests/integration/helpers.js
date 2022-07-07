@@ -36,6 +36,7 @@ export function getUnsignedCred(credId, holderDID) {
     '@context': [
       'https://www.w3.org/2018/credentials/v1',
       'https://www.w3.org/2018/credentials/examples/v1',
+      'https://w3id.org/security/suites/ed25519-2020/v1',
     ],
     id: credId,
     type: ['VerifiableCredential', 'AlumniCredential'],

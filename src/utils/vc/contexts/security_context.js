@@ -11,6 +11,8 @@ export default {
     EcdsaSecp256r1Signature2019: 'sec:EcdsaSecp256r1Signature2019',
     EcdsaSecp256k1VerificationKey2019: 'sec:EcdsaSecp256k1VerificationKey2019',
     EcdsaSecp256r1VerificationKey2019: 'sec:EcdsaSecp256r1VerificationKey2019',
+    Ed25519Signature2020: 'sec:Ed25519Signature2020',
+    Ed25519VerificationKey2020: 'sec:Ed25519VerificationKey2020',
     Ed25519Signature2018: 'sec:Ed25519Signature2018',
     Ed25519VerificationKey2018: 'sec:Ed25519VerificationKey2018',
     Sr25519Signature2020: 'sec:Sr25519Signature2020',

@@ -3,6 +3,7 @@ import ed25519V1Context from './contexts/ed25519-2020-v1-context.json';
 import sr25519Context from './contexts/sr25519-context.json';
 import secContext from './contexts/security_context';
 import secContextV1 from './contexts/security-v1.json';
+import secContextV3 from './contexts/security-v3.json';
 import didV1Context from './contexts/did-v1-updated.json';
 import credV1Context from './contexts/credential-v1-updated.json';
 import schema from './contexts/schema.json';
@@ -50,5 +51,9 @@ export default new Map([
   [
     'https://w3id.org/security/suites/ed25519-2020/v1',
     ed25519V1Context,
+  ],
+  [
+    'https://w3id.org/security/v3-unstable',
+    secContextV3,
   ],
 ]);

@@ -130,7 +130,6 @@ describe('Schema Blob Module Integration', () => {
     await expect(Schema.get(blobId, dockApi)).resolves.toMatchObject({
       ...exampleSchema,
       id: blobId,
-      author: hexDIDToQualified(getHexIdentifierFromDID(dockDID)),
     });
   }, 20000);
 

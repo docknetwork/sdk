@@ -8,6 +8,7 @@
     "xsd": "http://www.w3.org/2001/XMLSchema#",
 
     "EcdsaKoblitzSignature2016": "sec:EcdsaKoblitzSignature2016",
+    "Ed25519Signature2020": "sec:Ed25519Signature2020",
     "Ed25519Signature2018": "sec:Ed25519Signature2018",
     "EncryptedMessage": "sec:EncryptedMessage",
     "GraphSignature2012": "sec:GraphSignature2012",

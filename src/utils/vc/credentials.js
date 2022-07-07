@@ -11,7 +11,7 @@ import { DEFAULT_CONTEXT_V1_URL, credentialContextField } from './constants';
 import { ensureValidDatetime } from '../type-helpers';
 
 import {
-  EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
+  EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020, Ed25519Signature2020,
 } from './custom_crypto';
 
 /**
@@ -195,7 +195,7 @@ export async function verifyCredential(credential, {
       controller,
     }),
     // TODO: support more key types, see digitalbazaar github
-    suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
+    suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020(), new Ed25519Signature2020()],
     documentLoader: docLoader,
     compactProof,
   });
@@ -217,6 +217,9 @@ export async function verifyCredential(credential, {
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
  * @param {object} credential - Credential to be signed.
  * @param {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
+ * @param documentLoader
+ * @param purpose
+ * @param expansionMap
  * @param {object} [issuerObject] - Optional issuer object to assign
  * @return {Promise<object>} The signed credential object.
  */

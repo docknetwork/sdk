@@ -322,7 +322,7 @@ class DIDModule {
             typ = 'Sr25519VerificationKey2020';
             publicKeyRaw = pk.asSr25519.value;
           } else if (pk.isEd25519) {
-            typ = 'Ed25519VerificationKey2018';
+            typ = 'Ed25519VerificationKey2020';
             publicKeyRaw = pk.asEd25519.value;
           } else if (pk.isSecp256K1) {
             typ = 'EcdsaSecp256k1VerificationKey2019';
@@ -370,7 +370,7 @@ class DIDModule {
 
     // Construct document
     const document = {
-      '@context': 'https://www.w3.org/ns/did/v1',
+      '@context': ['https://www.w3.org/ns/did/v1', 'https://w3id.org/security/suites/ed25519-2020/v1'],
       id,
       controller: controllers.map((c) => this.getFullyQualifiedDID(encodeAddress(c))),
       verificationMethod,

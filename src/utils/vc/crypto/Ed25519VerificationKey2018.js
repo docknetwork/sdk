@@ -1,4 +1,5 @@
 import b58 from 'bs58';
+import * as b58multi from 'multiformats/bases/base58';
 import { u8aToHex, u8aToU8a } from '@polkadot/util';
 import { signatureVerify } from '@polkadot/util-crypto/signature';
 import { Ed25519VerKeyName } from './constants';
@@ -14,10 +15,17 @@ export default class Ed25519VerificationKey2018 {
    * @returns {Ed25519VerificationKey2018}
    */
   static from(verificationMethod) {
-    if (verificationMethod.type !== Ed25519VerKeyName && !verificationMethod.publicKeyBase58) {
-      throw new Error(`verification method should have type ${Ed25519VerKeyName} and have the base58 public key`);
+    // TODO: Remove duplicate code
+    if (verificationMethod.type !== Ed25519VerKeyName) {
+      throw new Error(`verification method should have type ${Ed25519VerKeyName}`);
     }
-    return new this(b58.decode(verificationMethod.publicKeyBase58));
+    if (verificationMethod.publicKeyMultibase !== undefined) {
+      return new this(b58multi.base58btc.decode(verificationMethod.publicKeyMultibase));
+    }
+    if (verificationMethod.publicKeyBase58 !== undefined) {
+      return new this(b58.decode(verificationMethod.publicKeyBase58));
+    }
+    throw new Error('verification method should have either publicKeyMultibase or publicKeyBase58 but none was provided');
   }
 
   /**

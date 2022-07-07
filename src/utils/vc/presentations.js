@@ -11,7 +11,7 @@ import {
 } from './constants';
 
 import {
-  EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
+  EcdsaSepc256k1Signature2019, Ed25519Signature2018, Ed25519Signature2020, Sr25519Signature2020,
 } from './custom_crypto';
 
 const { AuthenticationProofPurpose } = jsigs.purposes;
@@ -126,7 +126,7 @@ export async function verifyPresentation(presentation, options = {}) {
 
   // Build verification options
   const verificationOptions = {
-    suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
+    suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020(), new Ed25519Signature2020()],
     documentLoader: options.documentLoader || defaultDocumentLoader(resolver),
     ...options,
     resolver: null,

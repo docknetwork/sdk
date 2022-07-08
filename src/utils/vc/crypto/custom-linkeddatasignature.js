@@ -1,4 +1,4 @@
-import { suites } from 'jsonld-signatures';
+import jsigs from 'jsonld-signatures';
 import { encode, decode } from 'base58-universal';
 import base64url from 'base64url';
 
@@ -21,7 +21,7 @@ function decodeBase64UrlToString(string) {
   return base64url.decode(string);
 }
 
-export default class CustomLinkedDataSignature extends suites.LinkedDataSignature {
+export default class CustomLinkedDataSignature extends jsigs.suites.LinkedDataSignature {
   /**
    * Creates a new CustomLinkedDataSignature instance
    * @constructor

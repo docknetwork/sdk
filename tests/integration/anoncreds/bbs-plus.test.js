@@ -1,7 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { hexToU8a, u8aToHex, stringToHex } from '@polkadot/util';
-import { initializeWasm } from '@docknetwork/crypto-wasm';
-import { KeypairG2, SignatureParamsG1 } from '@docknetwork/crypto-wasm-ts';
+import { initializeWasm, KeypairG2, SignatureParamsG1 } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI } from '../../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
@@ -87,7 +86,7 @@ describe('BBS+ Module', () => {
   test('Can create public keys', async () => {
     const params = SignatureParamsG1.generate(5);
     let keypair = KeypairG2.generate(params);
-    const bytes1 = u8aToHex(keypair.public_key);
+    const bytes1 = u8aToHex(keypair.publicKey.bytes);
     const pk1 = chainModuleClass.prepareAddPublicKey(bytes1);
     await chainModule.createNewPublicKey(pk1, getHexIdentifierFromDID(did1), pair1, undefined, false);
     const pkWritten1 = await chainModule.getLastPublicKeyWritten(did1);
@@ -101,7 +100,7 @@ describe('BBS+ Module', () => {
     const params1Val = SignatureParamsG1.valueFromBytes(hexToU8a(queriedParams1.bytes));
     const params1 = new SignatureParamsG1(params1Val, hexToU8a(queriedParams1.label));
     keypair = KeypairG2.generate(params1);
-    const bytes2 = u8aToHex(keypair.public_key);
+    const bytes2 = u8aToHex(keypair.publicKey.bytes);
     const pk2 = chainModuleClass.prepareAddPublicKey(bytes2, undefined, [did1, 1]);
     await chainModule.createNewPublicKey(pk2, getHexIdentifierFromDID(did2), pair2, undefined, false);
     const pkWritten2 = await chainModule.getLastPublicKeyWritten(did2);
@@ -118,7 +117,7 @@ describe('BBS+ Module', () => {
     const params2Val = SignatureParamsG1.valueFromBytes(hexToU8a(queriedParams2.bytes));
     const params2 = new SignatureParamsG1(params2Val, hexToU8a(queriedParams2.label));
     keypair = KeypairG2.generate(params2);
-    const bytes3 = u8aToHex(keypair.public_key);
+    const bytes3 = u8aToHex(keypair.publicKey.bytes);
     const pk3 = chainModuleClass.prepareAddPublicKey(bytes3, undefined, [did1, 2]);
     await chainModule.createNewPublicKey(pk3, getHexIdentifierFromDID(did2), pair2, undefined, false);
     const pkWritten3 = await chainModule.getLastPublicKeyWritten(did2);

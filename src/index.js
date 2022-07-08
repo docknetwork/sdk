@@ -90,7 +90,7 @@ class DockAPI {
       if (this.api.isConnected) {
         throw new Error('API is already connected');
       } else {
-        this.disconnect();
+        await this.disconnect();
       }
     }
 
@@ -159,10 +159,12 @@ class DockAPI {
         await this.api.disconnect();
       }
       delete this.api;
-      delete this.anchorModule;
       delete this.blobModule;
       delete this.didModule;
       delete this.revocationModule;
+      delete this.bbsPlusModule;
+      delete this.accumulatorModule;
+      delete this.migrationModule;
     }
   }
 
@@ -282,9 +284,6 @@ class DockAPI {
    * @return {AnchorModule} The module to use
    */
   get anchor() {
-    if (!this.anchorModule) {
-      throw new Error('Unable to get Anchor module, SDK is not initialised');
-    }
     return this.anchorModule;
   }
 

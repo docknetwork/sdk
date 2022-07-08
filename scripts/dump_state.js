@@ -164,10 +164,9 @@ async function downloadState() {
   process.exit(0);
 }
 
-dock
-  .init({
-    address: FullNodeEndpoint,
-  })
+dock.init({
+  address: FullNodeEndpoint,
+})
   .then(downloadState)
   .catch((error) => {
     console.error("Error occurred somewhere, it was caught!", error);

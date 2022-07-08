@@ -1,5 +1,6 @@
 node_modules
 dist
+build
 out
 npm-debug.log
 yarn-error.log

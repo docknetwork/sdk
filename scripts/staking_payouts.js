@@ -89,60 +89,55 @@ const {
   FinalizeTx: either(equals("true"), o(Boolean, Number)),
 });
 
-const main = withDockAPI(
-  {
-    address: FullNodeEndpoint,
-  },
-  async (dock) => {
-    const initiator = dock.keyring.addFromUri(InitiatorAccountURI);
+const main = async (dock) => {
+  const initiator = dock.keyring.addFromUri(InitiatorAccountURI);
 
-    console.log("Pre-work balance check.");
-    let balanceIsOk = await checkBalance(
+  console.log("Pre-work balance check.");
+  let balanceIsOk = await checkBalance(
+    dock.api,
+    StakingPayoutsAlarmEmailTo,
+    initiator.address,
+    AlarmBalance
+  );
+
+  console.log("Fetching eras info...");
+  const erasInfo = await fetchErasInfo(dock.api);
+
+  console.log("Calculating and sending payouts:");
+  let needToRecheck;
+
+  try {
+    needToRecheck = await timeout(
+      IterationTimeout,
+      sendStakingPayouts(dock, erasInfo, initiator, BatchSize)
+    );
+  } catch (err) {
+    needToRecheck = true;
+    console.error(err);
+  }
+
+  if (needToRecheck) {
+    // Check payouts again with a batch size of 1
+    // This needed to execute valid transactions packed in invalid batches
+    console.log("Checking payouts again:");
+    await timeout(
+      IterationTimeout,
+      sendStakingPayouts(dock, erasInfo, initiator, 1)
+    );
+  }
+
+  if (balanceIsOk) {
+    console.log("Post-work balance check.");
+    await checkBalance(
       dock.api,
       StakingPayoutsAlarmEmailTo,
       initiator.address,
       AlarmBalance
     );
-
-    console.log("Fetching eras info...");
-    const erasInfo = await fetchErasInfo(dock.api);
-
-    console.log("Calculating and sending payouts:");
-    let needToRecheck;
-
-    try {
-      needToRecheck = await timeout(
-        IterationTimeout,
-        sendStakingPayouts(dock, erasInfo, initiator, BatchSize)
-      );
-    } catch (err) {
-      needToRecheck = true;
-      console.error(err);
-    }
-
-    if (needToRecheck) {
-      // Check payouts again with a batch size of 1
-      // This needed to execute valid transactions packed in invalid batches
-      console.log("Checking payouts again:");
-      await timeout(
-        IterationTimeout,
-        sendStakingPayouts(dock, erasInfo, initiator, 1)
-      );
-    }
-
-    if (balanceIsOk) {
-      console.log("Post-work balance check.");
-      await checkBalance(
-        dock.api,
-        StakingPayoutsAlarmEmailTo,
-        initiator.address,
-        AlarmBalance
-      );
-    }
-
-    console.log("Done!");
   }
-);
+
+  console.log("Done!");
+};
 
 /**
  * Sends staking payouts for recent eras using the given sender account.
@@ -459,11 +454,16 @@ const buildValidatorRewards = curry(
   }
 );
 
-export const handler = async () => {
-  await timeout(IterationTimeout * 2.5, main());
+export const handler = withDockAPI(
+  {
+    address: FullNodeEndpoint,
+  },
+  async (dock) => {
+    await timeout(IterationTimeout * 2.5, main(dock));
 
-  return "Done";
-};
+    return "Done";
+  }
+);
 
 if (require.main === module) {
   console.log("Executing the script...");
@@ -476,4 +476,4 @@ if (require.main === module) {
     .then(() => process.exit());
 }
 
-export default handler;
+export default main;

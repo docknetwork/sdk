@@ -11,11 +11,18 @@ import {
   prop,
   when,
   isNil,
+  map,
+  zipWith,
+  call,
+  pipe,
+  addIndex,
   o,
   mapObjIndexed,
   curry,
   __,
   unless,
+  tryCatch,
+  evolve,
 } from "ramda";
 import { Observable } from "rxjs";
 
@@ -202,10 +209,30 @@ export const parseEnv = curry((parse, name) => {
 
   try {
     return parse(value);
-  } catch (e) {
-    throw new Error(`Failed to parse \`${name}\`: ${e}`);
+  } catch (error) {
+    throw new Error(
+      `Failed to parse \`${name}\` with value \`${value}\`: ${error}`
+    );
   }
 });
+
+/**
+ * Parses `process.argv` starting from 3rd element using supplied parsers.
+ *
+ * @template T
+ * @param {Array<function(string):T>} argv
+ * @returns {Array<T>}
+ */
+export const argvArgs = addIndex(map)(
+  tryCatch(
+    (parse, idx) => parse(process.argv[2 + idx], idx),
+    (error, _, idx) => {
+      throw new Error(
+        `Failed to parse argv #${idx} with value \`${process.argv[2 + idx]}\`: ${error}`
+      );
+    }
+  )
+);
 
 /**
  * Parses object of env variables using supplied parsers.

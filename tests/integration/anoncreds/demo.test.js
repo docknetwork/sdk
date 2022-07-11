@@ -99,8 +99,8 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     const sigPk = new BBSPlusPublicKeyG2(hexToU8a(queriedPk.bytes));
 
     const accum = await dock.accumulatorModule.getAccumulator(accumulatorId, true);
-    const accumParams = new AccumulatorParams(hexToU8a(accum.public_key.params.bytes));
-    const accumPk = new AccumulatorPublicKey(hexToU8a(accum.public_key.bytes));
+    const accumParams = new AccumulatorParams(hexToU8a(accum.publicKey.params.bytes));
+    const accumPk = new AccumulatorPublicKey(hexToU8a(accum.publicKey.bytes));
     const accumulated = hexToU8a(accum.accumulated);
     const provingKey = Accumulator.generateMembershipProvingKey();
 
@@ -287,7 +287,7 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     expect(queriedAccum.accumulated).toEqual(accumulated);
 
     const tempAccumulator = PositiveAccumulator.fromAccumulated(hexToU8a(queriedAccum.accumulated));
-    expect(tempAccumulator.verifyMembershipWitness(encodedAttrs[attributeCount - 1], membershipWitness, new AccumulatorPublicKey(hexToU8a(queriedAccum.public_key.bytes)), new AccumulatorParams(hexToU8a(queriedAccum.public_key.params.bytes)))).toEqual(true);
+    expect(tempAccumulator.verifyMembershipWitness(encodedAttrs[attributeCount - 1], membershipWitness, new AccumulatorPublicKey(hexToU8a(queriedAccum.publicKey.bytes)), new AccumulatorParams(hexToU8a(queriedAccum.publicKey.params.bytes)))).toEqual(true);
   }, 20000);
 
   test('Prove knowledge of signature, i.e. possession of credential and accumulator membership', async () => {
@@ -336,7 +336,7 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
 
     const queriedAccum = await dock.accumulatorModule.getAccumulator(accumulatorId, true);
     const tempAccumulator = PositiveAccumulator.fromAccumulated(hexToU8a(queriedAccum.accumulated));
-    expect(tempAccumulator.verifyMembershipWitness(encodedAttrs[attributeCount - 1], membershipWitness, new AccumulatorPublicKey(hexToU8a(queriedAccum.public_key.bytes)), new AccumulatorParams(hexToU8a(queriedAccum.public_key.params.bytes)))).toEqual(true);
+    expect(tempAccumulator.verifyMembershipWitness(encodedAttrs[attributeCount - 1], membershipWitness, new AccumulatorPublicKey(hexToU8a(queriedAccum.publicKey.bytes)), new AccumulatorParams(hexToU8a(queriedAccum.publicKey.params.bytes)))).toEqual(true);
   });
 
   test('After witness update, prove knowledge of signature, i.e. possession of credential and accumulator membership', async () => {
@@ -427,7 +427,7 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     );
 
     const tempAccumulator = PositiveAccumulator.fromAccumulated(hexToU8a(accum.accumulated));
-    expect(tempAccumulator.verifyMembershipWitness(encodedAttrs[attributeCount - 1], membershipWitness, new AccumulatorPublicKey(hexToU8a(accum.public_key.bytes)), new AccumulatorParams(hexToU8a(accum.public_key.params.bytes)))).toEqual(true);
+    expect(tempAccumulator.verifyMembershipWitness(encodedAttrs[attributeCount - 1], membershipWitness, new AccumulatorPublicKey(hexToU8a(accum.publicKey.bytes)), new AccumulatorParams(hexToU8a(accum.publicKey.params.bytes)))).toEqual(true);
   }, 30000);
 
   test('After another witness update, prove knowledge of signature, i.e. possession of credential and accumulator membership', async () => {

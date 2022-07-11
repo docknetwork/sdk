@@ -1,20 +1,12 @@
 // Script to send runtime upgrade using sudo account
 
-import dock from '../src/index';
-import { sendTxnWithAccount } from './helpers';
+import { sendTxnWithAccount, withDockAPI } from "./helpers";
 
-require('dotenv').config();
+require("dotenv").config();
 
-const fs = require('fs');
+const fs = require("fs");
 
 const { FullNodeEndpoint, SudoSecretURI } = process.env;
-
-console.log(FullNodeEndpoint)
-
-if (process.argv.length !== 3) {
-  console.error('Need only 1 argument which is the path of wasm file');
-  process.exit(2);
-}
 
 /**
  * Returns an array of Authoring version, Spec version, Impl version and Transaction version
@@ -22,15 +14,19 @@ if (process.argv.length !== 3) {
  */
 async function getRuntimeVersion(dock) {
   const ver = await dock.api.rpc.state.getRuntimeVersion();
-  return [ver.authoringVersion.toNumber(), ver.specVersion.toNumber(), ver.implVersion.toNumber(), ver.transactionVersion.toNumber()];
+  return [
+    ver.authoringVersion.toNumber(),
+    ver.specVersion.toNumber(),
+    ver.implVersion.toNumber(),
+    ver.transactionVersion.toNumber(),
+  ];
 }
 
-async function doRuntimeUpgrade() {
-  const code = fs.readFileSync(process.argv[2]);
-  const codeAsHex = code.toString('hex');
+async function main(dock, code) {
+  const codeAsHex = code.toString("hex");
 
-  fs.writeFileSync('wasm_code.hex', codeAsHex);
-  console.log('WASM code written in hex in file wasm_code.hex');
+  fs.writeFileSync("wasm_code.hex", codeAsHex);
+  console.log("WASM code written in hex in file wasm_code.hex");
 
   // Prepare to send the code
   const proposal = dock.api.tx.system.setCode(`0x${codeAsHex}`);
@@ -43,29 +39,54 @@ async function doRuntimeUpgrade() {
   const txn = dock.api.tx.sudo.sudoUncheckedWeight(proposal, code.length);
 
   const runtimeVerBeforeUpgrade = await getRuntimeVersion(dock);
-  console.log('Before upgrade');
-  console.log(`Authoring version, Spec version, Impl version, Transaction version -> (${[...runtimeVerBeforeUpgrade]})`);
+  console.log("Before upgrade");
+  console.log(
+    `Authoring version, Spec version, Impl version, Transaction version -> (${[
+      ...runtimeVerBeforeUpgrade,
+    ]})`
+  );
 
-  console.log('Going to send node upgrade transaction');
+  console.log("Going to send node upgrade transaction");
   const blockHash = await sendTxnWithAccount(dock, SudoSecretURI, txn);
   console.log(`Code upgrade extrinsic finalized in block ${blockHash}`);
 
   const runtimeVerAfterUpgrade = await getRuntimeVersion(dock);
-  console.log('After upgrade');
-  console.log(`Authoring version, Spec version, Impl version, Transaction version -> (${[...runtimeVerAfterUpgrade]})`);
+  console.log("After upgrade");
+  console.log(
+    `Authoring version, Spec version, Impl version, Transaction version -> (${[
+      ...runtimeVerAfterUpgrade,
+    ]})`
+  );
 
   // Runtime version should change.
-  if (JSON.stringify(runtimeVerBeforeUpgrade) === JSON.stringify(runtimeVerAfterUpgrade)) {
-    throw new Error('Runtime version did not change post upgrade. Update did not happen, maybe the node was already running the version');
+  if (
+    JSON.stringify(runtimeVerBeforeUpgrade) ===
+    JSON.stringify(runtimeVerAfterUpgrade)
+  ) {
+    throw new Error(
+      "Runtime version did not change post upgrade. Update did not happen, maybe the node was already running the version"
+    );
   }
   process.exit(0);
 }
 
-dock.init({
-  address: FullNodeEndpoint,
-})
-  .then(doRuntimeUpgrade)
-  .catch((error) => {
-    console.error('Error occurred somewhere, it was caught!', error);
-    process.exit(1);
-  });
+if (require.main === module) {
+  console.log("Performing runtime upgrade..");
+
+  if (process.argv.length !== 3) {
+    console.error("Need only 1 argument which is the path of wasm file");
+    process.exit(2);
+  }
+
+  withDockAPI(
+    { address: FullNodeEndpoint },
+    main
+  )(fs.readFileSync(process.argv[2]))
+    .catch((error) => {
+      console.error("Error occurred somewhere, it was caught!", error);
+      process.exit(1);
+    })
+    .then(() => process.exit());
+}
+
+export default main;

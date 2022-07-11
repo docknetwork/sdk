@@ -6,6 +6,7 @@ import * as jsig from '@digitalbazaar/ed25519-signature-2020';
 
 const SUITE_CONTEXT_URL = 'https://w3id.org/security/suites/ed25519-2020/v1';
 
+// export default class Ed25519Signature2020 extends CustomLinkedDataSignature {
 export default class Ed25519Signature2020 extends jsig.Ed25519Signature2020 {
   /**
    * Creates a new Ed25519Signature2020 instance
@@ -15,7 +16,7 @@ export default class Ed25519Signature2020 extends jsig.Ed25519Signature2020 {
   constructor({
     keypair, verificationMethod, verifier, signer,
   } = {}) {
-    /*super({
+/*    super({
       type: Ed2551920SigName,
       LDKeyClass: Ed25519VerificationKey2020,
       contextUrl: SUITE_CONTEXT_URL,

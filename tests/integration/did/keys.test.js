@@ -20,14 +20,13 @@ describe('Key support for DIDs', () => {
   const seed6 = randomAsHex(32);
   const seed5 = randomAsHex(32);
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
-    done();
   });
 
   afterAll(async () => {

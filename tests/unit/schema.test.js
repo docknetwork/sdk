@@ -47,7 +47,7 @@ describe('VerifiableCredential Tests', () => {
 
 describe('Basic Schema Tests', () => {
   let schema;
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await cryptoWaitReady();
     schema = new Schema();
     done();
@@ -98,9 +98,8 @@ describe('Validate Credential Schema utility', () => {
   schema.setJSONSchema(exampleSchema);
 
   let expandedCredential;
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     expandedCredential = await expandJSONLD(exampleCredential);
-    done();
   }, 10000);
 
   test('credentialSubject has same fields and fields have same types as JSON-schema', () => {

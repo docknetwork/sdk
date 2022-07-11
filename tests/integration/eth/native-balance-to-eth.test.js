@@ -24,7 +24,7 @@ describe('Transfer native Dock tokens to an EVM account and withdraw it back to 
   // 100 tokens
   const transferAmount = 100000000;
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
@@ -33,7 +33,6 @@ describe('Transfer native Dock tokens to an EVM account and withdraw it back to 
     const [, , c] = getTestEVMAccountsFromWeb3(web3);
     carol = c;
     jacob = dock.keyring.addFromUri(TestAccountURI);
-    done();
   });
 
   afterAll(async () => {

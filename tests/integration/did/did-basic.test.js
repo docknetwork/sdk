@@ -26,12 +26,11 @@ describe('Basic DID tests', () => {
   // Generate first key with this seed. The key type is Sr25519
   const seed = randomAsHex(32);
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
-    done();
   });
 
   afterAll(async () => {

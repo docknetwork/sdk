@@ -45,7 +45,7 @@ describe('Prefilled positive accumulator', () => {
   let accumulator;
   const accumState = new InMemoryState();
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
@@ -57,7 +57,6 @@ describe('Prefilled positive accumulator', () => {
     did = createNewDockDID();
     await registerNewDIDUsingPair(dock, did, pair);
     await initializeWasm();
-    done();
   }, 20000);
 
   test('Prefill', async () => {

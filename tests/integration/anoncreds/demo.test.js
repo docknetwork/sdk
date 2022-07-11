@@ -125,7 +125,7 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     expect(proof.verify(proofSpec).verified).toEqual(true);
   }
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
@@ -139,7 +139,6 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     accumulatorManagerDid = createNewDockDID();
     await registerNewDIDUsingPair(dock, accumulatorManagerDid, accumulatorManagerKeypair);
     await initializeWasm();
-    done();
   }, 20000);
 
   test('Create BBS+ params', async () => {

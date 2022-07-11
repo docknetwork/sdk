@@ -19,14 +19,13 @@ describe('Off-chain DIDs ', () => {
   const secondDocRef = randomAsHex(110);
   const thirdDocRef = randomAsHex(89);
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
-    done();
   });
 
   afterAll(async () => {

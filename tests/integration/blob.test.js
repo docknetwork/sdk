@@ -27,7 +27,7 @@ describe('Blob Module', () => {
   // Generate first key with this seed. The key type is Sr25519
   const firstKeySeed = randomAsHex(32);
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
@@ -37,7 +37,6 @@ describe('Blob Module', () => {
     pair = dock.keyring.addFromUri(firstKeySeed);
     dockDID = createNewDockDID();
     await registerNewDIDUsingPair(dock, dockDID, pair);
-    done();
   });
 
   afterAll(async () => {

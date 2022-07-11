@@ -38,7 +38,7 @@ describe('Revocation Module', () => {
   const revokeIds = new Set();
   revokeIds.add(revokeId);
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
@@ -56,7 +56,6 @@ describe('Revocation Module', () => {
     await registerNewDIDUsingPair(dock, ownerDID, pair);
     // Register secondary DID
     await registerNewDIDUsingPair(dock, ownerDID2, pair2);
-    done();
   }, 40000);
 
   afterAll(async () => {

@@ -21,13 +21,12 @@ describe('Master Module', () => {
   let masterModule;
   let masterQuery;
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     nc = await connect();
     systemModule = nc.api.tx.system;
     sudoModule = nc.api.tx.sudo;
     masterModule = nc.api.tx.master;
     masterQuery = nc.api.query.master;
-    done();
   }, 40000);
 
   afterAll(async () => { await nc.disconnect(); }, 10000);

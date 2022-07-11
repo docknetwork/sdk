@@ -49,9 +49,8 @@ describe('Testing isHexWithGivenByteSize', () => {
 });
 
 describe('Testing public key and signature instantiation from keyring', () => {
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await cryptoWaitReady();
-    done();
   });
 
   test('getCorrectPublicKeyFromKeyringPair returns correct public key from ed25519 pair', () => {

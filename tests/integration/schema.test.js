@@ -51,7 +51,7 @@ describe('Schema Blob Module Integration', () => {
   // Generate first key with this seed. The key type is Sr25519
   const firstKeySeed = randomAsHex(32);
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dockApi.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
@@ -115,8 +115,6 @@ describe('Schema Blob Module Integration', () => {
     });
     invalidCredential.setSchema(blobHexIdToQualified(blobId), 'JsonSchemaValidator2018');
     await invalidCredential.sign(keyDoc);
-
-    done();
   }, 90000);
 
   afterAll(async () => {

@@ -33,14 +33,13 @@ describe('DID service endpoints', () => {
   const origins2Text = ['https://foo.example.com', 'https://bar.example.com', 'https://baz.example.com'];
   const origins3Text = ['https://biz.example.com'];
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
-    done();
   });
 
   afterAll(async () => {

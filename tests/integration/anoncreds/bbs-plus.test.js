@@ -21,7 +21,7 @@ describe('BBS+ Module', () => {
   const seed1 = randomAsHex(32);
   const seed2 = randomAsHex(32);
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
@@ -36,7 +36,6 @@ describe('BBS+ Module', () => {
     await registerNewDIDUsingPair(dock, did1, pair1);
     await registerNewDIDUsingPair(dock, did2, pair2);
     await initializeWasm();
-    done();
   }, 20000);
 
   test('Can create new params', async () => {

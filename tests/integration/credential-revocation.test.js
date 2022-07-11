@@ -56,7 +56,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
   let expanded;
   let revId;
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dockAPI.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
@@ -91,8 +91,6 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
     expanded = await expandJSONLD(credential);
     revId = getDockRevIdFromCredential(expanded);
-
-    done();
   }, 60000);
 
   afterAll(async () => {

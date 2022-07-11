@@ -37,7 +37,7 @@ describe('Custom nonce', () => {
     await dock.send(signedExtrinsic, false);
   }
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
@@ -47,7 +47,6 @@ describe('Custom nonce', () => {
     const pair = dock.keyring.addFromUri(seed1);
     await registerNewDIDUsingPair(dock, did1, pair);
     await initializeWasm();
-    done();
   });
 
   afterAll(async () => {

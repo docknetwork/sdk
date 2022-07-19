@@ -4,7 +4,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import { DockAPI } from '../../src/index';
 
 import {
-  createNewDockDID, getHexIdentifierFromDID,
+  createNewDockDID, getHexIdentifierFromDID, hexDIDToQualified,
 } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { verifyCredential, verifyPresentation } from '../../src/utils/vc/index';
@@ -126,6 +126,7 @@ describe('Schema Blob Module Integration', () => {
     await expect(Schema.get(blobId, dockApi)).resolves.toMatchObject({
       ...exampleSchema,
       id: blobId,
+      author: hexDIDToQualified(getHexIdentifierFromDID(dockDID))
     });
   }, 20000);
 

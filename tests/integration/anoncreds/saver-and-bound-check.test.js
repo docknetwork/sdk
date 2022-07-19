@@ -235,7 +235,7 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
 
     const verifierProofSpec = new QuasiProofSpecG1(verifierStatements, metaStatements);
     expect(proof.verifyUsingQuasiProofSpec(verifierProofSpec).verified).toEqual(true);
-  });
+  }, 45000);
 
   afterAll(async () => {
     await dock.disconnect();

@@ -10,6 +10,8 @@ class MyEnvironment extends NodeEnvironment {
           Uint32Array,
           Uint8Array,
           ArrayBuffer,
+          TextDecoder,
+          TextEncoder,
         },
       },
       context

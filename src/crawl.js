@@ -85,7 +85,7 @@ export function graphResolver(
 
   async function resolveGraph(term) {
     try {
-      return resolve(term);
+      return await resolve(term);
     } catch (err) {
       onFailedLookup(term, err);
       return [];

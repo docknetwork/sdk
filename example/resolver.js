@@ -10,6 +10,7 @@ import {
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
+import { registerNewDIDUsingPair } from '../tests/integration/helpers';
 
 const universalResolverUrl = 'https://uniresolver.io';
 
@@ -52,10 +53,7 @@ async function createDockDID() {
 
   const dockDID = createNewDockDID();
   const pair = dock.keyring.addFromUri(randomAsHex(32), null, 'sr25519');
-  const publicKey = getPublicKeyFromKeyringPair(pair);
-  const keyDetail = createDidKey(publicKey, dockDID);
-  await dock.did.new(dockDID, keyDetail, false);
-
+  await registerNewDIDUsingPair(dock, dockDID, pair);
   return dockDID;
 }
 

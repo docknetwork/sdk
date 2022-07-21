@@ -162,6 +162,14 @@ export function bytesToWrappedBytes(bytes) {
   };
 }
 
+/**
+ * Get the nonce to be used for sending the next transaction if not provided already.
+ * @param hexDid - DID whose nonce is needed
+ * @param nonce - If provided, returned as it is.
+ * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+ * using this
+ * @returns {Promise<undefined|*>}
+ */
 export async function getNonce(hexDid, nonce = undefined, didModule = undefined) {
   if (nonce === undefined && didModule === undefined) {
     throw new Error('Provide either nonce or didModule to fetch nonce but none provided');

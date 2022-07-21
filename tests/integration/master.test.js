@@ -172,7 +172,7 @@ async function signSendTx(extrinsic) {
   const key = await keypair(TestAccountURI); // getTestAccountKey();
   await extrinsic.signAsync(key);
 
-  const promise = new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
       let unsubFunc = null;
       return extrinsic.send(({ events = [], status }) => {
@@ -196,8 +196,6 @@ async function signSendTx(extrinsic) {
 
     return this;
   });
-
-  return promise;
 }
 
 async function masterSetStorage(

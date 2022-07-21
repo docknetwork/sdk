@@ -8,7 +8,7 @@ import {
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { OffChainDidDocRef } from '../../../src/modules/did';
 
-describe('Off-chain DIDs ', () => {
+describe('Off-chain DIDs', () => {
   const dock = new DockAPI();
 
   // Generate a random DID

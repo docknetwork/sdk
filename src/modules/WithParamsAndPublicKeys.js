@@ -80,25 +80,73 @@ export default class WithParamsAndPublicKeys {
     return parsed;
   }
 
-  async createAddParamsTx(params, did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
-    const hexDid = getHexIdentifierFromDID(did);
+  /**
+   * Create transaction to add new BBS+ params.
+   * @param params - The BBS+ params to add.
+   * @param signerDid - Signer of the payload
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @returns {Promise<*>}
+   */
+  async createAddParamsTx(params, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    const hexDid = getHexIdentifierFromDID(signerDid);
     const [addParams, signature] = await this.createSignedAddParams(params, hexDid, keyPair, keyId, { nonce, didModule });
     return this.module.addParams(addParams, signature);
   }
 
-  async removeParamsTx(index, did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
-    const hexDid = getHexIdentifierFromDID(did);
+  /**
+   * Create transaction to remove existing BBS+ params.
+   * @param index - Index to uniquely identify BBS+ params
+   * @param signerDid - Signer of the payload
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @returns {Promise<*>}
+   */
+  async removeParamsTx(index, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    const hexDid = getHexIdentifierFromDID(signerDid);
     const [removeParams, signature] = await this.createSignedRemoveParams(index, hexDid, keyPair, keyId, { nonce, didModule });
     return this.module.removeParams(removeParams, signature);
   }
 
-  async addParams(param, did, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const tx = await this.createAddParamsTx(param, did, keyPair, keyId, { nonce, didModule });
+  /**
+   * Add new BBS+ params.
+   * @param param - The BBS+ params to add.
+   * @param signerDid - Signer of the payload
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<*>}
+   */
+  async addParams(param, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
+    const tx = await this.createAddParamsTx(param, signerDid, keyPair, keyId, { nonce, didModule });
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
-  async removeParams(index, did, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const tx = await this.removeParamsTx(index, did, keyPair, keyId, { nonce, didModule });
+  /**
+   * Remove existing BBS+ params.
+   * @param index - Index to uniquely identify BBS+ params
+   * @param signerDid - Signer of the blob
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<*>}
+   */
+  async removeParams(index, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
+    const tx = await this.removeParamsTx(index, signerDid, keyPair, keyId, { nonce, didModule });
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
@@ -126,7 +174,7 @@ export default class WithParamsAndPublicKeys {
   }
 
   // eslint-disable-next-line no-unused-vars
-  async queryPublicKeyFromChain(hexDid, counter) {
+  async queryPublicKeyFromChain(hexDid, keyId) {
     throw new Error('Extending class should implement queryPublicKeyFromChain');
   }
 
@@ -138,14 +186,14 @@ export default class WithParamsAndPublicKeys {
   /**
    *
    * @param did
-   * @param counter
+   * @param keyId
    * @param withParams - If true, return the params referenced by the public key. It will throw an error if params_ref is null
    * or params were not found on chain which can happen if they were deleted after this public key was added.
    * @returns {Promise<{bytes: string}|null>}
    */
-  async getPublicKey(did, counter, withParams = false) {
+  async getPublicKey(did, keyId, withParams = false) {
     const hexId = getHexIdentifierFromDID(did);
-    return this.getPublicKeyByHexDid(hexId, counter, withParams);
+    return this.getPublicKeyByHexDid(hexId, keyId, withParams);
   }
 
   async getParamsByHexDid(hexDid, counter) {
@@ -156,8 +204,8 @@ export default class WithParamsAndPublicKeys {
     return null;
   }
 
-  async getPublicKeyByHexDid(hexDid, counter, withParams = false) {
-    const resp = await this.queryPublicKeyFromChain(hexDid, counter);
+  async getPublicKeyByHexDid(hexDid, keyId, withParams = false) {
+    const resp = await this.queryPublicKeyFromChain(hexDid, keyId);
     if (resp.isSome) {
       const pkObj = this.createPublicKeyObjFromChainResponse(resp.unwrap());
       if (withParams) {
@@ -215,23 +263,6 @@ export default class WithParamsAndPublicKeys {
       pkObj.params_ref = null;
     }
     return pkObj;
-  }
-
-  /**
-   * Get last public key written by this DID
-   * @param did
-   * @returns {Promise<{bytes: string}|null>}
-   */
-  async getLastPublicKeyWritten(did) {
-    const hexId = getHexIdentifierFromDID(did);
-    const [, counter] = await this.api.query[this.moduleName].didCounters(hexId);
-    if (counter > 0) {
-      const resp = await this.queryPublicKeyFromChain(hexId, counter);
-      if (resp.isSome) {
-        return this.createPublicKeyObjFromChainResponse(resp.unwrap());
-      }
-    }
-    return null;
   }
 
   // eslint-disable-next-line no-unused-vars

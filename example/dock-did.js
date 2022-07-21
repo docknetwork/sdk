@@ -14,6 +14,8 @@ import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 // account is to be used for sending the transaction.
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 import { DidKey, VerificationRelationship } from '../src/public-keys';
+import { u8aToHex } from '@polkadot/util';
+import { ServiceEndpointType } from '../src/modules/did/service-endpoint';
 
 // DID will be generated randomly
 const dockDID = createNewDockDID();
@@ -32,6 +34,23 @@ async function removeDID() {
   const pair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
 
   return dock.did.remove(dockDID, dockDID, pair, 1, undefined, false);
+}
+
+// This function assumes the DID has been written.
+async function addServiceEndpoint() {
+  console.log('Add new service endpoint now.');
+
+  // Sign key update with this key pair as this is the current key of the DID
+  const pair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
+
+  const spType = new ServiceEndpointType();
+  spType.setLinkedDomains();
+  const encoder = new TextEncoder();
+  const spIdText = `${dockDID}#linked-domain`;
+  const spId = u8aToHex(encoder.encode(spIdText));
+  const originsText = ['https://foo.example.com'];
+  const origins = originsText.map((u) => u8aToHex(encoder.encode(u)));
+  return dock.did.addServiceEndpoint(spId, spType, origins, dockDID, dockDID, pair, 1, undefined, false);
 }
 
 // This function assumes the DID has been written.
@@ -101,6 +120,7 @@ dock.init({
   .then(addKey)
   .then(getDIDDoc)
   .then(addController)
+  .then(addServiceEndpoint)
   .then(getDIDDoc)
   .then(removeDID)
   .then(async () => {

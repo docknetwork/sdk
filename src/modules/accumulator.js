@@ -70,24 +70,73 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     return null;
   }
 
+  /**
+   * Create transaction to add accumulator public key
+   * @param publicKey - Accumulator public key
+   * @param signerDid - Signer of the transaction payload
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @returns {Promise<*>}
+   */
   async createAddPublicKeyTx(publicKey, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     const signerHexDid = getHexIdentifierFromDID(signerDid);
     const [addPk, signature] = await this.createSignedAddPublicKey(publicKey, signerHexDid, keyPair, keyId, { nonce, didModule });
     return this.module.addPublicKey(addPk, signature);
   }
 
+  /**
+   * Create transaction to remove accumulator public key
+   * @param removeKeyId - Index of the accumulator public key
+   * @param signerDid - Signer of the transaction payload
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @returns {Promise<*>}
+   */
   async createRemovePublicKeyTx(removeKeyId, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     const signerHexDid = getHexIdentifierFromDID(signerDid);
     const [remPk, signature] = await this.createSignedRemovePublicKey(removeKeyId, signerHexDid, keyPair, keyId, { nonce, didModule });
     return this.module.removePublicKey(remPk, signature);
   }
 
+  /**
+   * Create a transaction to add positive (add-only) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key
+   * @param signerDid - Signer of the transaction payload
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @returns {Promise<*>}
+   */
   async createAddPositiveAccumulatorTx(id, accumulated, publicKeyRef, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     const signerHexDid = getHexIdentifierFromDID(signerDid);
     const [addAccumulator, signature] = await this.createSignedAddPositiveAccumulator(id, accumulated, publicKeyRef, signerHexDid, keyPair, keyId, { nonce, didModule });
     return this.module.addAccumulator(addAccumulator, signature);
   }
 
+  /**
+   * Create a transaction to add universal (supports add/remove) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key
+   * @param maxSize - Maximum size of the accumulator
+   * @param signerDid - Signer of the transaction payload
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @returns {Promise<*>}
+   */
   async createAddUniversalAccumulatorTx(id, accumulated, publicKeyRef, maxSize, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     const signerHexDid = getHexIdentifierFromDID(signerDid);
     const [addAccumulator, signature] = await this.createSignedAddUniversalAccumulator(id, accumulated, publicKeyRef, maxSize, signerHexDid, keyPair, keyId, { nonce, didModule });
@@ -95,16 +144,18 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   }
 
   /**
-   *
-   * @param id
-   * @param newAccumulated
+   * Create a transaction to update accumulator
+   * @param id - Unique accumulator id
+   * @param newAccumulated - Accumulated value after the update
    * @param additions
    * @param removals
    * @param witnessUpdateInfo
-   * @param created - block no. when accumulator was created
-   * @param nonce - next valid nonce, i.e. the nonce on chain + 1
-   * @param keyPair
-   * @param signature
+   * @param signerDid - Signer of the transaction payload
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
    * @returns {Promise<object>}
    */
   async updateAccumulatorTx(
@@ -118,12 +169,14 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   }
 
   /**
-   *
-   * @param id
-   * @param created - block no. when accumulator was created
-   * @param nonce - next valid nonce, i.e. the nonce on chain + 1
-   * @param keyPair
-   * @param signature
+   * Create transaction to remove accumulator
+   * @param id - id to remove
+   * @param signerDid - Signer of the transaction payload
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
    * @returns {Promise<object>}
    */
   async removeAccumulatorTx(id, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
@@ -132,21 +185,78 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     return this.module.removeAccumulator(removal, signature);
   }
 
+  /**
+   * Add accumulator public key
+   * @param publicKey - Accumulator public key
+   * @param signerDid - Signer of the transaction payload
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<*>}
+   */
   async addPublicKey(publicKey, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
     const tx = await this.createAddPublicKeyTx(publicKey, signerDid, keyPair, keyId, { nonce, didModule });
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
+  /**
+   * Remove a public key
+   * @param removeKeyId - Index of the accumulator public key
+   * @param signerDid - Signer of the transaction payload
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<*>}
+   */
   async removePublicKey(removeKeyId, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
     const tx = await this.createRemovePublicKeyTx(removeKeyId, signerDid, keyPair, keyId, { nonce, didModule });
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
+  /**
+   * Add a positive (add-only) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key
+   * @param signerDid - Signer of the transaction payload
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<*>}
+   */
   async addPositiveAccumulator(id, accumulated, publicKeyRef, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
     const tx = await this.createAddPositiveAccumulatorTx(id, accumulated, publicKeyRef, signerDid, keyPair, keyId, { nonce, didModule });
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
+  /**
+   * Add universal (supports add/remove) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key
+   * @param maxSize - Maximum size of the accumulator
+   * @param signerDid - Signer of the transaction payload
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<*>}
+   */
   async addUniversalAccumulator(id, accumulated, publicKeyRef, maxSize, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
     const tx = await this.createAddUniversalAccumulatorTx(id, accumulated, publicKeyRef, maxSize, signerDid, keyPair, keyId, { nonce, didModule });
     return this.signAndSend(tx, waitForFinalization, params);
@@ -155,14 +265,16 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   /**
    * Update existing accumulator
    * @param id
-   * @param newAccumulated
+   * @param newAccumulated - Accumulated value after the update
    * @param additions
    * @param removals
    * @param witnessUpdateInfo
-   * @param created - block no. when accumulator was created
-   * @param nonce - next valid nonce, i.e the nonce on chain + 1
-   * @param keyPair
-   * @param signature
+   * @param signerDid - Signer of the transaction payload
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
    * @param waitForFinalization
    * @param params
    * @returns {Promise< object>}
@@ -177,10 +289,13 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   /**
    * Remove the accumulator from chain. This frees up the id for reuse.
    * @param id
-   * @param created - block no. when accumulator was created
-   * @param nonce - next valid nonce, i.e the nonce on chain + 1
-   * @param keyPair
-   * @param signature
+   * @param id - id to remove
+   * @param signerDid - Signer of the transaction payload
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
    * @param waitForFinalization
    * @param params
    * @returns {Promise<*>}

@@ -1,11 +1,11 @@
 import { randomAsHex } from '@polkadot/util-crypto';
-import { BTreeSet } from '@polkadot/types';
 import { DockAPI, PublicKeySecp256k1 } from '../../../src';
 import { createNewDockDID, getHexIdentifierFromDID } from '../../../src/utils/did';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
 import { DidKey, VerificationRelationship } from '../../../src/public-keys';
 import { checkVerificationMethods } from '../helpers';
+import PublicKeyX25519 from '../../../src/public-keys/public-key-x25519';
 
 describe('Key support for DIDs', () => {
   const dock = new DockAPI();
@@ -18,8 +18,6 @@ describe('Key support for DIDs', () => {
   const seed2 = randomAsHex(32);
   const seed3 = randomAsHex(32);
   const seed4 = randomAsHex(32);
-  const seed6 = randomAsHex(32);
-  const seed5 = randomAsHex(32);
 
   beforeAll(async () => {
     await dock.init({
@@ -80,7 +78,6 @@ describe('Key support for DIDs', () => {
   test('Get DID document', async () => {
     const doc = await dock.did.getDocument(dockDid);
     expect(doc.controller.length).toEqual(1);
-    // expect(doc.verificationMethod.length).toEqual(3);
     checkVerificationMethods(dockDid, doc, 3, 0);
     checkVerificationMethods(dockDid, doc, 3, 1);
     checkVerificationMethods(dockDid, doc, 3, 2);
@@ -181,5 +178,26 @@ describe('Key support for DIDs', () => {
     expect(doc.controller.length).toEqual(1);
     checkVerificationMethods(dockDid, doc, 2, 0, 2);
     checkVerificationMethods(dockDid, doc, 2, 1, 4);
+  });
+
+  test('Add x25519 key-agreement to DID', async () => {
+    const verRels = new VerificationRelationship();
+    verRels.setKeyAgreement();
+    // Generating a random X25519 public key
+    const publicKey = new PublicKeyX25519(randomAsHex(32));
+    const didKey = new DidKey(publicKey, verRels);
+
+    const pair = dock.keyring.addFromUri(seed2, null, 'ed25519');
+    await dock.did.addKeys([didKey], dockDid, dockDid, pair, 2);
+    const didDetail = await dock.did.getOnchainDidDetail(hexDid);
+    expect(didDetail.lastKeyId).toBe(5);
+    const dk = await dock.did.getDidKey(dockDid, 5);
+    expect(dk.publicKey).toEqual(publicKey);
+    expect(dk.verRels.isAuthentication()).toEqual(false);
+    expect(dk.verRels.isAssertion()).toEqual(false);
+    expect(dk.verRels.isCapabilityInvocation()).toEqual(false);
+    expect(dk.verRels.isKeyAgreement()).toEqual(true);
+    const doc = await dock.did.getDocument(dockDid);
+    checkVerificationMethods(dockDid, doc, 3, 2, 5);
   });
 });

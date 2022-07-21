@@ -31,8 +31,8 @@ async function* getFiles(dir) {
     }
 
     if (f.indexOf('.js') > -1) {
-      exports[`./${f.substr(0, f.length - 3)}`] = {
-        require: `./${f.substr(0, f.length - 3)}.cjs`,
+      exports[`./${f.substring(0, f.length - 3)}`] = {
+        require: `./${f.substring(0, f.length - 3)}.cjs`,
         default: `./${f}`,
       };
     } else {

@@ -455,7 +455,7 @@ function registerDid(did, keyPair) {
 }
 
 function randoDID() {
-  return `did:dock:${randomAsHex(32).substr(2, 20)}`;
+  return `did:dock:${randomAsHex(32).substring(2, 2 + 20)}`;
 }
 
 async function verifyC(credential) {

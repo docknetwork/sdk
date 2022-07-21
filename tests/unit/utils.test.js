@@ -1,6 +1,7 @@
 import { cryptoWaitReady, randomAsHex } from '@polkadot/util-crypto';
 import { Keyring } from '@polkadot/api';
 
+import { hexToU8a } from '@polkadot/util';
 import {
   generateEcdsaSecp256k1Keypair,
   getPublicKeyFromKeyringPair,
@@ -10,7 +11,6 @@ import {
 import { PublicKeyEd25519, PublicKeySr25519, PublicKeySecp256k1 } from '../../src/public-keys';
 import { SignatureEd25519, SignatureSr25519, SignatureSecp256k1 } from '../../src/signatures';
 import { isHexWithGivenByteSize } from '../../src/utils/codec';
-import { hexToU8a } from '@polkadot/util';
 
 describe('Testing isHexWithGivenByteSize', () => {
   test('isHexWithGivenByteSize rejects strings not starting with 0x', () => {

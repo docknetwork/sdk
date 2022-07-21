@@ -4,10 +4,8 @@ import axios from 'axios';
 
 import { hexDIDToQualified } from '../utils/did';
 import { getSignatureFromKeyringPair } from '../utils/misc';
-import { isHexWithGivenByteSize } from '../utils/codec';
 
 import {
-  DockBlobIdByteSize,
   createNewDockBlobId,
   getHexIdentifierFromBlobID,
 } from './blob';
@@ -27,17 +25,13 @@ export default class Schema {
 
   static fromJSON(json) {
     const {
-      id, schema, author,
+      id, schema,
     } = json;
 
     const schemaObj = new Schema(id);
 
     if (schema) {
       schemaObj.schema = schema;
-    }
-
-    if (author) {
-      schemaObj.setAuthor(author);
     }
 
     return schemaObj;
@@ -50,20 +44,6 @@ export default class Schema {
   async setJSONSchema(json) {
     await Schema.validateSchema(json);
     this.schema = json;
-    return this;
-  }
-
-  /**
-   * Update the object with `author` key. Repeatedly calling it will keep resetting the author
-   * did can be a DID hex identifier or full DID
-   * @param {string} did - the author DID
-   */
-  setAuthor(did) {
-    if (did.startsWith('did:') || isHexWithGivenByteSize(did, DockBlobIdByteSize)) {
-      this.author = did;
-    } else {
-      throw new Error(`Supplied author ${did} is not a valid DID or ${DockBlobIdByteSize} byte hex string`);
-    }
     return this;
   }
 

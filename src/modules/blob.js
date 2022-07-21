@@ -69,12 +69,36 @@ class BlobModule {
     this.signAndSend = signAndSend;
   }
 
+  /**
+   * Create a signed transaction for adding a new blob
+   * @param blob
+   * @param signerDid - Signer of the blob
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @returns {Promise<*>}
+   */
   async createNewTx(blob, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     const hexDid = getHexIdentifierFromDID(signerDid);
     const [addBlob, didSig] = await this.createSignedAddBlob(blob, hexDid, keyPair, keyId, { nonce, didModule });
     return this.module.new(addBlob, didSig);
   }
 
+  /**
+   * Write a new blob on chain.
+   * @param blob
+   * @param signerDid - Signer of the blob
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<*>}
+   */
   async new(blob, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
     return this.signAndSend(
       (await this.createNewTx(blob, signerDid, keyPair, keyId, { nonce, didModule })), waitForFinalization, params,
@@ -100,7 +124,7 @@ class BlobModule {
       // Try to convert the value to a JSON object
       try {
         const strValue = u8aToString(value);
-        if (strValue.substr(0, 1) === '{') {
+        if (strValue.substring(0, 1) === '{') {
           value = JSON.parse(strValue);
         }
       } catch (e) {
@@ -112,6 +136,17 @@ class BlobModule {
     throw new Error(`Needed 2 items in response but got${respTuple.length}`);
   }
 
+  /**
+   * Create an `AddBlob` struct as expected by node and return along with signature.
+   * @param blob
+   * @param hexDid - Signer DID in hex form
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @returns {Promise}
+   */
   async createSignedAddBlob(blob, hexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     if (!blob.blob) {
       throw new Error('Blob must have a value!');

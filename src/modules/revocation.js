@@ -52,20 +52,22 @@ class RevocationModule {
   }
 
   /**
-   * Deleting revocation registry
+   * Create a transaction to remove a revocation registry
    * @return {Promise<object>} The extrinsic to sign and send.
-   * @param removal
-   * @param didSigs
+   * @param removal - The payload to remove the registry
+   * @param didSigs - Array of pairs with each pair of the form `[DidSig, nonce]` where `nonce` is the nonce used while
+   * signing the payload
    */
   createRemoveRegistryTx(removal, didSigs) {
     return this.module.removeRegistry(removal, didSigs);
   }
 
   /**
-   * Deleting revocation registry
+   * Remove a revocation registry
    * @return {Promise<object>} Promise to the pending transaction
    * @param removal
-   * @param didSigs
+   * @param didSigs - Array of pairs with each pair of the form `[DidSig, nonce]` where `nonce` is the nonce used while
+   * signing the payload
    * @param waitForFinalization
    * @param params
    */
@@ -74,10 +76,11 @@ class RevocationModule {
   }
 
   /**
-   * Revoke credentials
+   * Create transaction to revoke credentials
    * @return {Promise<object>} The extrinsic to sign and send.
    * @param revoke
-   * @param didSigs
+   * @param didSigs - Array of pairs with each pair of the form `[DidSig, nonce]` where `nonce` is the nonce used while
+   * signing the payload
    */
   createRevokeTx(revoke, didSigs) {
     return this.module.revoke(revoke, didSigs);
@@ -96,10 +99,11 @@ class RevocationModule {
   }
 
   /**
-   * Unrevoke credentials
+   * Create transaction to unrevoke credentials
    * @return {Promise<object>} The extrinsic to sign and send.
    * @param unrevoke
-   * @param didSigs
+   * @param didSigs - Array of pairs with each pair of the form `[DidSig, nonce]` where `nonce` is the nonce used while
+   * signing the payload
    */
   createUnrevokeTx(unrevoke, didSigs) {
     return this.module.unrevoke(unrevoke, didSigs);
@@ -109,7 +113,8 @@ class RevocationModule {
    * Unrevoke credentials
    * @return {Promise<object>} Promise to the pending transaction
    * @param unrevoke
-   * @param didSigs
+   * @param didSigs - Array of pairs with each pair of the form `[DidSig, nonce]` where `nonce` is the nonce used while
+   * signing the payload
    * @param waitForFinalization
    * @param params
    */

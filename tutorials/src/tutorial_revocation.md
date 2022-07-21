@@ -43,25 +43,20 @@ Now get the registry id, `registryId` and the revocation id (the hash of credent
 Revoking an already revoked credential has no effect.
 
 ```js
-await dock.revocation.revokeCredentialWithOneOfPolicy(didKeys, registryId, revokeId);
+await dock.revocation.revokeCredentialWithOneOfPolicy(registryId, revokeId, ownerDID, ownerKeypair, 1, {didModule: dock.did});
 ```
-Revoking multiple ids in a single transaction is possible but with a lower level method `dock.revocation.revoke`.
+Revoking multiple ids in a single transaction is possible but with a lower level method `dock.revocation.revoke`. See tests for its usage
 
 ## Undoing a revocation
-Similar to revocation, undoing the revocation also requires a signature from the owner of the registry. As before, fetch
-the owner's DID and pair and create a map
-```js
-const didKeys = new KeyringPairDidKeys();
-didKeys.set(ownerDID, ownerKeypair);
-```
+Similar to revocation, undoing the revocation also requires a signature from the owner of the registry.
 
-Now get the registry id, `registryId` and the revocation id to undo, `revokeId` and send the transaction on chain.
+Get the registry id, `registryId` and the revocation id to undo, `revokeId` and send the transaction on chain.
 Unrevoking an unrevoked credential has no effect.
 
 ```js
-await dock.revocation.unrevokeCredentialWithOneOfPolicy(didKeys, registryId, revokeId);
+await dock.revocation.unrevokeCredentialWithOneOfPolicy(registryId, revokeId, ownerDID, ownerKeypair, 1, {didModule: dock.did});
 ```
-Undoing revocation for multiple ids in a single transaction is possible but with a lower level method `dock.revocation.unrevoke`.
+Undoing revocation for multiple ids in a single transaction is possible but with a lower level method `dock.revocation.unrevoke`. See tests for its usage
 
 ## Checking the revocation status
 To check an id is revoked or not, call `dock.revocation.getIsRevoked` with the registry id and revocation id. Returns `true`
@@ -77,6 +72,5 @@ To get the details of the registry like policy, add-only status and block number
 A registry can be deleted leading to all the corresponding revocation ids being deleted as well. This requires the signature
 from owner like other updates. Use the `dock.revocation.removeRegistry` method to remove a registry.
 ```js
-const lastModified = await dock.revocation.getBlockNoForLastChangeToRegistry(registryId);
-await dock.revocation.removeRegistry(registryId, lastModified, didKeys);
+await dock.revocation.removeRegistryWithOneOfPolicy(registryId, ownerDID, ownerKeypair, 1, {didModule: dock.did}, false);
 ```

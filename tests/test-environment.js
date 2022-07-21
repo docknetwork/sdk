@@ -14,7 +14,7 @@ class MyEnvironment extends NodeEnvironment {
           TextEncoder,
         },
       },
-      context
+      context,
     );
   }
 

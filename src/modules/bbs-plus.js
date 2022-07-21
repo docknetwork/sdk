@@ -63,10 +63,22 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
     return this.api.query[this.moduleName].bbsPlusParams(hexDid, { 0: counter });
   }
 
-  async queryPublicKeyFromChain(hexDid, counter) {
-    return this.api.query[this.moduleName].bbsPlusKeys(hexDid, { 0: counter });
+  async queryPublicKeyFromChain(hexDid, keyId) {
+    return this.api.query[this.moduleName].bbsPlusKeys(hexDid, { 0: keyId });
   }
 
+  /**
+   * Create transaction to add a BBS+ public key
+   * @param publicKey - BBS+ public key to add.
+   * @param targetDid - The DID to which key is being added
+   * @param signerDid - The DID that is adding the key by signing the payload because it controls `targetDid`
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @returns {Promise<*>}
+   */
   async createAddPublicKeyTx(publicKey, targetDid, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     const targetHexDid = getHexIdentifierFromDID(targetDid);
     const signerHexDid = getHexIdentifierFromDID(signerDid);
@@ -74,6 +86,18 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
     return this.module.addPublicKey(addPk, signature);
   }
 
+  /**
+   * Create transaction to remove BBS+ public key
+   * @param removeKeyId - The key index for key to remove.
+   * @param targetDid - The DID from which key is being removed
+   * @param signerDid - The DID that is removing the key by signing the payload because it controls `targetDid`
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @returns {Promise<*>}
+   */
   async createRemovePublicKeyTx(removeKeyId, targetDid, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     const targetHexDid = getHexIdentifierFromDID(targetDid);
     const signerHexDid = getHexIdentifierFromDID(signerDid);
@@ -81,11 +105,39 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
     return this.module.removePublicKey(removePk, signature);
   }
 
+  /**
+   * Add a BBS+ public key
+   * @param publicKey - BBS+ public key to add.
+   * @param targetDid - The DID to which key is being added
+   * @param signerDid - The DID that is adding the key by signing the payload because it controls `targetDid`
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<*>}
+   */
   async addPublicKey(publicKey, targetDid, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
     const tx = await this.createAddPublicKeyTx(publicKey, targetDid, signerDid, keyPair, keyId, { nonce, didModule });
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
+  /**
+   * Remove BBS+ public key
+   * @param removeKeyId - The key index for key to remove.
+   * @param targetDid - The DID from which key is being removed
+   * @param signerDid - The DID that is removing the key by signing the payload because it controls `targetDid`
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<*>}
+   */
   async removePublicKey(removeKeyId, targetDid, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
     const tx = await this.createRemovePublicKeyTx(removeKeyId, targetDid, signerDid, keyPair, keyId, { nonce, didModule });
     return this.signAndSend(tx, waitForFinalization, params);

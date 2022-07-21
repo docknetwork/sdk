@@ -51,7 +51,7 @@ export default class CustomLinkedDataSignature extends jsigs.suites.LinkedDataSi
       if (proofValue[0] !== MULTIBASE_BASE58BTC_HEADER) {
         throw new Error('Only base58btc multibase encoding is supported.');
       }
-      signatureBytes = base58btc.decode(proofValue.substr(1));
+      signatureBytes = base58btc.decode(proofValue.substring(1));
     } else if (jws && typeof jws === 'string') { // Fallback to older jsonld-signature implementations
       const [encodedHeader, /* payload */, encodedSignature] = jws.split('.');
 

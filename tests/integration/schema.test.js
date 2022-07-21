@@ -126,7 +126,7 @@ describe('Schema Blob Module Integration', () => {
     await expect(Schema.get(blobId, dockApi)).resolves.toMatchObject({
       ...exampleSchema,
       id: blobId,
-      author: hexDIDToQualified(getHexIdentifierFromDID(dockDID))
+      author: hexDIDToQualified(getHexIdentifierFromDID(dockDID)),
     });
   }, 20000);
 
@@ -139,9 +139,8 @@ describe('Schema Blob Module Integration', () => {
   }, 30000);
 
   test('Utility method verifyCredential should pass if the subject is compatible with the schema in credentialSchema.', async () => {
-    const j = validCredential.toJSON();
     await expect(
-      verifyCredential(j, {
+      verifyCredential(validCredential.toJSON(), {
         resolver: dockResolver,
         compactProof: true,
         forceRevocationCheck: false,

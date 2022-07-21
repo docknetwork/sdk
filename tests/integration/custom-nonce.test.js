@@ -11,7 +11,7 @@ import { createNewDockDID, getHexIdentifierFromDID, NoDIDError } from '../../src
 import { registerNewDIDUsingPair } from './helpers';
 import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { DidKey, VerificationRelationship } from '../../src/public-keys';
-import { ServiceEndpointType } from '../../src/service-endpoint';
+import { ServiceEndpointType } from '../../src/modules/did/service-endpoint';
 import { DockBlobIdByteSize } from '../../src/modules/blob';
 import BBSPlusModule from '../../src/modules/bbs-plus';
 import AccumulatorModule from '../../src/modules/accumulator';

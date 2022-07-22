@@ -4,6 +4,7 @@ import {
   lensProp,
   find,
   curry,
+  all,
   allPass,
   filter,
   reduce,
@@ -26,9 +27,7 @@ import {
   converge,
   ifElse,
   identity,
-  all,
   findIndex,
-  tap as tapR,
   any,
   unless,
   curryN,
@@ -48,7 +47,6 @@ import {
   scan,
   bufferTime,
   pluck,
-  concat,
 } from "rxjs";
 import { envObj, formatDock, notNilAnd, withDockAPI } from "./helpers";
 import { sendAlarmEmailHtml } from "./email_utils";
@@ -102,22 +100,20 @@ const main = async (dock) => {
     )
   );
 
-  const applyFilters = curry((buildFilters, data$) =>
+  const applyFilters = curry((filters, data$) =>
     data$.pipe(
-      mergeMap((tx) =>
-        withExtrinsicUrl(converge(merge, buildFilters(dock)))(tx, dock)
-      )
+      mergeMap((tx) => withExtrinsicUrl(converge(merge, filters))(tx, dock))
     )
   );
 
   const res$ = merge(
     txs$.pipe(
       tap(LogLevel === "debug" ? logTx : identity),
-      applyFilters(txFilters)
+      applyFilters(txFilters())
     ),
-    events$.pipe(applyFilters(eventFilters))
+    events$.pipe(applyFilters(eventFilters()))
   ).pipe(
-    batchNotifications(5e3),
+    batchNotifications(3e3),
     tap((email) => console.log("Sending email: ", email)),
     concatMap(
       o(
@@ -194,30 +190,37 @@ const isValidSudo = pipe(
   ifElse(
     isEmpty,
     F,
-    any((event) => event.data.toJSON()[0].err == null)
+    all((event) => event.data.toJSON()[0].err == null)
   )
 );
+/*
+const isValidDemocracy = pipe(
+  prop("events"),
+  filter(methodFilter("democracy", "Executed")),
+  ifElse(
+    isEmpty,
+    F,
+    all((event) => event.data.toJSON()[1].err == null)
+  )
+);
+*/
 /**
  * Returns `true` if given extrinsic was executed successfully.
  */
-const successfulTx = both(
-  either(
-    both(
-      either(
-        anyEventByMethodFilter("system", "ExtrinsicSuccess"),
-        anyEventByMethodFilter("utility", "ItemCompleted")
-      ),
-      either(complement(anyEventByMethodFilter("sudo", "Sudid")), isValidSudo)
-    ),
-    isValidSudo
-  ),
+const successfulTx = allPass([
+  anyPass([
+    anyEventByMethodFilter("system", "ExtrinsicSuccess"),
+    anyEventByMethodFilter("utility", "ItemCompleted"),
+    isValidSudo,
+  ]),
+  either(complement(anyEventByMethodFilter("sudo", "Sudid")), isValidSudo),
   complement(
-    anyPass([
+    either(
       anyEventByMethodFilter("utility", "BatchInterrupted"),
-      anyEventByMethodFilter("system", "ExtrinsicFailed"),
-    ])
-  )
-);
+      anyEventByMethodFilter("system", "ExtrinsicFailed")
+    )
+  ),
+]);
 /**
  * Filters extrinsics by its `section`/`method`.
  */
@@ -383,37 +386,17 @@ const txFilters = () => [
 ];
 
 const eventFilters = () => {
-  const councilDiffAcumulator = new DiffAccumulator([]);
+  const councilDiffAcumulator = new DiffAccumulator(null);
 
   return [
     // Democracy proposal
     checkMap(
       both(democracyEvent("Proposed"), democracyTx("propose")),
-      ({ event, tx }, dock) => {
-        const {
-          data: [index],
-        } = event.toJSON();
-        const {
+      ({
+        tx: {
           args: [hash],
-        } = tx;
-
-        return from(dock.api.query.democracy.publicProps()).pipe(
-          mapRx((props) => {
-            const proposal = props.find(
-              ([idx, propHash]) =>
-                idx.eq(index) && hash.toString() == propHash.toString()
-            );
-
-            if (proposal) {
-              const [_, hash, account] = proposal;
-
-              return `New Democracy proposal ${hash} by <b>${account}</b>`;
-            } else {
-              return `New Democracy proposal`;
-            }
-          })
-        );
-      }
+        },
+      }) => of(`New Democracy proposal ${hash}`)
     ),
 
     // Democracy proposal preimage is noted

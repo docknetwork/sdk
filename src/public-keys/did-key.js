@@ -1,12 +1,14 @@
+import VerificationRelationship from './verification-relationship';
+
 export default class DidKey {
   /**
    *
    * @param {PublicKey} publicKey
    * @param {VerificationRelationship} verRels
    */
-  constructor(publicKey, verRels) {
+  constructor(publicKey, verRels = undefined) {
     this.publicKey = publicKey;
-    this.verRels = verRels;
+    this.verRels = verRels !== undefined ? verRels : new VerificationRelationship();
   }
 
   toJSON() {

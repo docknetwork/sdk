@@ -118,7 +118,7 @@ async function assertValidAuth(nodeClient, proposal, mpauth) {
   for (const [didSig, nonce] of mpauth) {
     const sig = didSig.sig;
     const did = didSig.did;
-    const didKey = await nodeClient.didModule.getDidKey(did, didSig.keyId[0]);
+    const didKey = await nodeClient.didModule.getDidKey(did, didSig.keyId);
     const pk = didKey.publicKey;
     if (!pk.isSr25519) {
       throw `This script only supports sr25519. The public key registered for ${did} is not sr25519.`;

@@ -157,9 +157,7 @@ export function encodeExtrinsicAsHash(api, tx) {
  * @returns {{'0'}}
  */
 export function bytesToWrappedBytes(bytes) {
-  return {
-    0: bytes,
-  };
+  return bytes;
 }
 
 /**

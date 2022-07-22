@@ -127,6 +127,6 @@ export function createDidKey(publicKey, verRel) {
  */
 export function createDidSig(did, keyId = 1, sig) {
   return {
-    did, keyId: { 0: keyId }, sig: sig.toJSON(),
+    did, keyId, sig: sig.toJSON(),
   };
 }

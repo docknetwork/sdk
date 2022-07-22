@@ -68,7 +68,7 @@ export default class WithParamsAndPublicKeys {
       throw new Error('Reference should be an array of 2 items');
     }
     try {
-      parsed[0] = { 0: getHexIdentifierFromDID(ref[0]) };
+      parsed[0] = getHexIdentifierFromDID(ref[0]);
     } catch (e) {
       throw new Error(`First item of reference should be a DID but was ${ref[0]}`);
     }
@@ -76,7 +76,7 @@ export default class WithParamsAndPublicKeys {
       throw new Error(`Second item of reference should be a number but was ${ref[1]}`);
     }
     // eslint-disable-next-line prefer-destructuring
-    parsed[1] = { 0: ref[1] };
+    parsed[1] = ref[1];
     return parsed;
   }
 
@@ -162,7 +162,7 @@ export default class WithParamsAndPublicKeys {
   async createSignedRemoveParams(index, hexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getNonce(hexDid, nonce, didModule);
-    const removeParams = { params_ref: [{ 0: hexDid }, { 0: index }], nonce };
+    const removeParams = { params_ref: [hexDid, index], nonce };
     const signature = this.signRemoveParams(keyPair, removeParams);
     const didSig = createDidSig(hexDid, keyId, signature);
     return [removeParams, didSig];
@@ -258,7 +258,7 @@ export default class WithParamsAndPublicKeys {
     }
     if (pk.params_ref.isSome) {
       const pr = pk.params_ref.unwrap();
-      pkObj.params_ref = [u8aToHex(pr[0][0][0]), pr[1][0].toNumber()];
+      pkObj.params_ref = [u8aToHex(pr[0]), pr[1].toNumber()];
     } else {
       pkObj.params_ref = null;
     }

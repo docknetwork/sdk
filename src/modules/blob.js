@@ -131,7 +131,7 @@ class BlobModule {
         // no-op, just use default Uint8 array value
       }
 
-      return [u8aToHex(respTuple[0][0][0]), value];
+      return [u8aToHex(respTuple[0]), value];
     }
     throw new Error(`Needed 2 items in response but got${respTuple.length}`);
   }

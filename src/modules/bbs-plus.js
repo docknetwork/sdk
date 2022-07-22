@@ -27,7 +27,7 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
    */
   async getLastParamsWritten(did) {
     const hexId = getHexIdentifierFromDID(did);
-    const counter = (await this.api.query[this.moduleName].paramsCounter(hexId))[0];
+    const counter = (await this.api.query[this.moduleName].paramsCounter(hexId));
     if (counter > 0) {
       const resp = await this.queryParamsFromChain(hexId, counter);
       if (resp.isSome) {
@@ -46,7 +46,7 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
     const hexId = getHexIdentifierFromDID(did);
 
     const params = [];
-    const counter = (await this.api.query[this.moduleName].paramsCounter(hexId))[0];
+    const counter = (await this.api.query[this.moduleName].paramsCounter(hexId));
     if (counter > 0) {
       for (let i = 1; i <= counter; i++) {
         // eslint-disable-next-line no-await-in-loop
@@ -60,11 +60,11 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
   }
 
   async queryParamsFromChain(hexDid, counter) {
-    return this.api.query[this.moduleName].bbsPlusParams(hexDid, { 0: counter });
+    return this.api.query[this.moduleName].bbsPlusParams(hexDid, counter);
   }
 
   async queryPublicKeyFromChain(hexDid, keyId) {
-    return this.api.query[this.moduleName].bbsPlusKeys(hexDid, { 0: keyId });
+    return this.api.query[this.moduleName].bbsPlusKeys(hexDid, keyId);
   }
 
   /**
@@ -155,7 +155,7 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
   async createSignedRemovePublicKey(removeKeyId, targetHexDid, signerHexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getNonce(signerHexDid, nonce, didModule);
-    const removeKey = { key_ref: [{ 0: targetHexDid }, { 0: removeKeyId }], did: targetHexDid, nonce };
+    const removeKey = { key_ref: [targetHexDid, removeKeyId], did: targetHexDid, nonce };
     const signature = this.signRemovePublicKey(keyPair, removeKey);
     const didSig = createDidSig(signerHexDid, keyId, signature);
     return [removeKey, didSig];

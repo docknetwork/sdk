@@ -65,7 +65,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    */
   static parseEventAsAccumulatorUpdate(event) {
     if (event.section === 'accumulator' && event.method === 'AccumulatorUpdated') {
-      return [u8aToHex(event.data[0][0]), u8aToHex(event.data[1])];
+      return [u8aToHex(event.data[0]), u8aToHex(event.data[1])];
     }
     return null;
   }
@@ -317,7 +317,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   async createSignedRemovePublicKey(removeKeyId, signerHexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getNonce(signerHexDid, nonce, didModule);
-    const removeKey = { key_ref: [{ 0: signerHexDid }, { 0: removeKeyId }], nonce };
+    const removeKey = { key_ref: [signerHexDid, removeKeyId], nonce };
     const signature = this.signRemovePublicKey(keyPair, removeKey);
     const didSig = createDidSig(signerHexDid, keyId, signature);
     return [removeKey, didSig];
@@ -404,8 +404,8 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
         accumulatorObj.max_size = accumInfo.accumulator.asUniversal.max_size.toNumber();
       }
       accumulatorObj.accumulated = u8aToHex(common.accumulated);
-      const owner = u8aToHex(common.key_ref[0][0][0]);
-      const keyId = common.key_ref[1][0].toNumber();
+      const owner = u8aToHex(common.key_ref[0]);
+      const keyId = common.key_ref[1].toNumber();
       accumulatorObj.key_ref = [owner, keyId];
 
       if (withKeyAndParams) {
@@ -433,7 +433,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     extrinsics.forEach((ext) => {
       if (ext.method && (ext.method.section === 'accumulator') && (ext.method.method === 'updateAccumulator')) {
         const update = this.api.createType('UpdateAccumulator', ext.method.args[0]);
-        if (u8aToHex(update.id[0]) === accumulatorId) {
+        if (u8aToHex(update.id) === accumulatorId) {
           // The following commented line produces truncated hex strings. Don't know why
           // const additions = update.additions.isSome ? update.additions.unwrap().map(u8aToHex) : null;
           const additions = update.additions.isSome ? update.additions.unwrap().map((i) => u8aToHex(i)) : null;
@@ -459,7 +459,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   async getLastParamsWritten(did) {
     const hexId = getHexIdentifierFromDID(did);
     const counters = await this.api.query[this.moduleName].accumulatorOwnerCounters(hexId);
-    const counter = counters.params_counter[0].toNumber();
+    const counter = counters.params_counter.toNumber();
     if (counter > 0) {
       const resp = await this.queryParamsFromChain(hexId, counter);
       if (resp.isSome) {
@@ -479,7 +479,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
 
     const params = [];
     const counters = await this.api.query[this.moduleName].accumulatorOwnerCounters(hexId);
-    const counter = counters.params_counter[0].toNumber();
+    const counter = counters.params_counter.toNumber();
     if (counter > 0) {
       for (let i = 1; i <= counter; i++) {
         // eslint-disable-next-line no-await-in-loop
@@ -503,7 +503,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
 
     const pks = [];
     const counters = await this.api.query[this.moduleName].accumulatorOwnerCounters(hexId);
-    const counter = counters.key_counter[0].toNumber();
+    const counter = counters.key_counter.toNumber();
     if (counter > 0) {
       for (let i = 1; i <= counter; i++) {
         // eslint-disable-next-line no-await-in-loop
@@ -517,11 +517,11 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   }
 
   async queryParamsFromChain(hexDid, counter) {
-    return this.api.query[this.moduleName].accumulatorParams(hexDid, { 0: counter });
+    return this.api.query[this.moduleName].accumulatorParams(hexDid, counter);
   }
 
   async queryPublicKeyFromChain(hexDid, counter) {
-    return this.api.query[this.moduleName].accumulatorKeys(hexDid, { 0: counter });
+    return this.api.query[this.moduleName].accumulatorKeys(hexDid, counter);
   }
 
   signAddParams(keyPair, params) {

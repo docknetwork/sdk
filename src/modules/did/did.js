@@ -467,10 +467,10 @@ class DIDModule {
       cnts.forEach(([key, value]) => {
         if (value.isSome) {
           const [controlled, controller] = key.toHuman();
-          if (controlled[0] !== hexId) {
-            throw new Error(`Controlled DID ${controlled[0]} was found to be different than queried DID ${hexId}`);
+          if (controlled !== hexId) {
+            throw new Error(`Controlled DID ${controlled} was found to be different than queried DID ${hexId}`);
           }
-          controllers.push(controller[0][0]);
+          controllers.push(controller);
         }
       });
     }
@@ -484,11 +484,11 @@ class DIDModule {
         // eslint-disable-next-line no-underscore-dangle
         const [d, spId] = key._args;
         // eslint-disable-next-line no-underscore-dangle
-        const d_ = u8aToHex(d[0]);
+        const d_ = u8aToHex(d);
         if (d_ !== hexId) {
           throw new Error(`DID ${d_} was found to be different than queried DID ${hexId}`);
         }
-        serviceEndpoints.push([spId[0], sp]);
+        serviceEndpoints.push([spId, sp]);
       }
     });
 
@@ -506,11 +506,11 @@ class DIDModule {
           // eslint-disable-next-line no-underscore-dangle
           const [d, i] = key._args;
           // eslint-disable-next-line no-underscore-dangle
-          const d_ = u8aToHex(d[0]);
+          const d_ = u8aToHex(d);
           if (d_ !== hexId) {
             throw new Error(`DID ${d_} was found to be different than queried DID ${hexId}`);
           }
-          const index = i[0].toNumber();
+          const index = i.toNumber();
           const pk = dk.publicKey;
           let publicKeyRaw;
           let typ;
@@ -595,7 +595,7 @@ class DIDModule {
         return {
           id: decoder.decode(spId),
           type: 'LinkedDomains',
-          serviceEndpoint: sp.origins.map((o) => decoder.decode(o[0])),
+          serviceEndpoint: sp.origins.map((o) => decoder.decode(o)),
         };
       });
     }
@@ -630,7 +630,7 @@ class DIDModule {
     const didDetail = resp.asOnChain;
     return {
       nonce: didDetail.nonce.toNumber(),
-      lastKeyId: didDetail.lastKeyId[0].toNumber(),
+      lastKeyId: didDetail.lastKeyId.toNumber(),
       activeControllerKeys: didDetail.activeControllerKeys.toNumber(),
       activeControllers: didDetail.activeControllers.toNumber(),
     };
@@ -655,11 +655,11 @@ class DIDModule {
     const detail = { accountId: u8aToHex(resp.accountId) };
 
     if (resp.docRef.isCid) {
-      detail.docRef = OffChainDidDocRef.cid(u8aToHex(resp.docRef.asCid[0]));
+      detail.docRef = OffChainDidDocRef.cid(u8aToHex(resp.docRef.asCid));
     } else if (resp.docRef.isUrl) {
-      detail.docRef = OffChainDidDocRef.url(u8aToHex(resp.docRef.asUrl[0]));
+      detail.docRef = OffChainDidDocRef.url(u8aToHex(resp.docRef.asUrl));
     } else if (resp.docRef.isCustom) {
-      detail.docRef = OffChainDidDocRef.custom(u8aToHex(resp.docRef.asCustom[0]));
+      detail.docRef = OffChainDidDocRef.custom(u8aToHex(resp.docRef.asCustom));
     } else {
       throw new Error(`Cannot parse DIDDoc ref ${resp.docRef}`);
     }
@@ -694,7 +694,7 @@ class DIDModule {
    */
   async getDidKey(did, keyIndex) {
     const hexId = getHexIdentifierFromDID(did);
-    let resp = await this.api.query.didModule.didKeys(hexId, { 0: keyIndex });
+    let resp = await this.api.query.didModule.didKeys(hexId, keyIndex);
     if (resp.isNone) {
       throw new Error(`No key for found did ${did} and key index ${keyIndex}`);
     }
@@ -737,14 +737,14 @@ class DIDModule {
    */
   async getServiceEndpoint(did, endpointId) {
     const hexId = getHexIdentifierFromDID(did);
-    let resp = await this.api.query.didModule.didServiceEndpoints(hexId, { 0: endpointId });
+    let resp = await this.api.query.didModule.didServiceEndpoints(hexId, endpointId);
     if (resp.isNone) {
       throw new Error(`No service endpoint found for did ${did} and with id ${endpointId}`);
     }
     resp = resp.unwrap();
     return {
       type: new ServiceEndpointType(resp.types.toNumber()),
-      origins: resp.origins.map((o) => u8aToHex(o[0])),
+      origins: resp.origins.map(origin => u8aToHex(origin)),
     };
   }
 
@@ -785,9 +785,9 @@ class DIDModule {
       nonce = await this.getNextNonceForDID(controllerHexDid);
     }
 
-    const endpoint = { types: endpointType.value, origins: origins.map((o) => ({ 0: o })) };
+    const endpoint = { types: endpointType.value, origins: origins };
     const addServiceEndpoint = {
-      did: hexDid, id: { 0: endpointId }, endpoint, nonce,
+      did: hexDid, id: endpointId, endpoint, nonce,
     };
     const serializedServiceEndpoint = this.getSerializedAddServiceEndpoint(addServiceEndpoint);
     const signature = getSignatureFromKeyringPair(keyPair, serializedServiceEndpoint);
@@ -806,7 +806,7 @@ class DIDModule {
 
     const keys = new BTreeSet();
     keyIds.forEach((k) => {
-      keys.add({ 0: k });
+      keys.add(k);
     });
     const removeKeys = { did: hexDid, keys, nonce };
     const serializedRemoveKeys = this.getSerializedRemoveKeys(removeKeys);
@@ -842,7 +842,7 @@ class DIDModule {
       nonce = await this.getNextNonceForDID(controllerHexDid);
     }
 
-    const removeServiceEndpoint = { did: hexDid, id: { 0: endpointId }, nonce };
+    const removeServiceEndpoint = { did: hexDid, id: endpointId, nonce };
     const serializedRemoveServiceEndpoint = this.getSerializedRemoveServiceEndpoint(removeServiceEndpoint);
     const signature = getSignatureFromKeyringPair(keyPair, serializedRemoveServiceEndpoint);
     const didSig = createDidSig(controllerHexDid, keyId, signature);

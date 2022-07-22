@@ -744,7 +744,7 @@ class DIDModule {
     resp = resp.unwrap();
     return {
       type: new ServiceEndpointType(resp.types.toNumber()),
-      origins: resp.origins.map(origin => u8aToHex(origin)),
+      origins: resp.origins.map((origin) => u8aToHex(origin)),
     };
   }
 
@@ -785,7 +785,7 @@ class DIDModule {
       nonce = await this.getNextNonceForDID(controllerHexDid);
     }
 
-    const endpoint = { types: endpointType.value, origins: origins };
+    const endpoint = { types: endpointType.value, origins };
     const addServiceEndpoint = {
       did: hexDid, id: endpointId, endpoint, nonce,
     };

@@ -833,7 +833,7 @@ class DIDModule {
     }
 
     if (serviceEndpoints.length > 0) {
-      document.service = serviceEndpoints.map(([spId, sp]) => {
+      document.service = serviceEndpoints.map(({ id: spId, endpoint: sp }) => {
         const decoder = new TextDecoder();
         const spType = sp.types.toNumber();
         if (spType !== 1) {

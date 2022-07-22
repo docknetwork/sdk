@@ -1,18 +1,15 @@
 module.exports = {
   clearMocks: true,
   testTimeout: 30000,
-  testEnvironment: "./tests/test-environment.js",
-  transform: {
-    "^.+\\.(ts|js)$": "babel-jest"
-  },
+  testEnvironment: './tests/test-environment.js',
   transformIgnorePatterns: [
-    "/node_modules/(?!@polkadot|@babel)"
-  ],
-  setupFilesAfterEnv: [
-    "./tests/setup-test-env.js"
+    '/node_modules/(?!@polkadot|@babel)',
   ],
   globals: {
-    Uint8Array: Uint8Array,
-    ArrayBuffer: ArrayBuffer
-  }
+    Uint8Array,
+    Uint32Array,
+    ArrayBuffer,
+    TextDecoder,
+    TextEncoder,
+  },
 };

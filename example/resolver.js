@@ -1,8 +1,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import ethr from 'ethr-did-resolver';
 import { DockAPI } from '../src/index';
-import { createNewDockDID, createKeyDetail, NoDIDError } from '../src/utils/did';
-import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
+import { createNewDockDID, NoDIDError } from '../src/utils/did';
 import {
   DIDResolver, MultiResolver, DIDKeyResolver, UniversalResolver, DockResolver,
 } from '../src/resolver';
@@ -10,6 +9,7 @@ import {
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
+import { registerNewDIDUsingPair } from '../tests/integration/helpers';
 
 const universalResolverUrl = 'https://uniresolver.io';
 
@@ -35,7 +35,7 @@ class EtherResolver extends DIDResolver {
   async resolve(did) {
     const parsed = this.parseDid(did);
     try {
-      return await this.ethres(did, parsed);
+      return this.ethres(did, parsed);
     } catch (e) {
       throw new NoDIDError(did);
     }
@@ -52,10 +52,7 @@ async function createDockDID() {
 
   const dockDID = createNewDockDID();
   const pair = dock.keyring.addFromUri(randomAsHex(32), null, 'sr25519');
-  const publicKey = getPublicKeyFromKeyringPair(pair);
-  const keyDetail = createKeyDetail(publicKey, dockDID);
-  await dock.did.new(dockDID, keyDetail, false);
-
+  await registerNewDIDUsingPair(dock, dockDID, pair);
   return dockDID;
 }
 

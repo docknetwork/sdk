@@ -93,11 +93,11 @@ describe('logic', () => {
 // return the bundle as a claimgraph as if the presentation were verified
 async function asCg(creds) {
   const exp = await expand(present(creds));
-  return await presentationToEEClaimGraph(exp);
+  return presentationToEEClaimGraph(exp);
 }
 
 async function expand(jld) {
-  return await jsonld.expand(jld, { documentLoader });
+  return jsonld.expand(jld, { documentLoader });
 }
 
 function assert_error(cb, expected_error) {

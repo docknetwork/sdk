@@ -50,5 +50,20 @@ export default {
       ],
       type: 'Option<(Vec<u8>, Option<AccumulatorPublicKeyWithParams>)>',
     },
+    didDetails: {
+      description: 'Get all keys, controllers and service endpoints of the DID',
+      params: [
+        {
+          name: 'did',
+          type: 'Did',
+        },
+        {
+          name: 'params',
+          type: 'Option<u8>',
+          isOptional: true,
+        },
+      ],
+      type: 'Option<AggregatedDidDetailsResponse>',
+    },
   },
 };

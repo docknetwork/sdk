@@ -3,19 +3,17 @@
 If you are not familiar with DIDs, you can get a conceptual overview [here](./concepts_did.md).
 
 ## Overview
-DIDs in Dock are created by choosing a 32 byte unique (on Dock chain) identifier along with a public key. The public key
-can be changed by providing a signature with the currently active key.
+DIDs in Dock are created by choosing a 32 byte unique (on Dock chain) identifier along with 1 ore more public keys or controllers.
+The public key can be added or removed by the DID's controller (which the DID maybe itself) signature with a key having
+`capabilityInvocation` verification relationship.
 
-The DID can also be removed by providing a signature with the currently active key. As of now, a DID can have only one key
-at a time.
+The DID can also be removed by providing a signature from the DID's controller.
 
-The chain-state stores a few things for a DID, the current public key, the controller and the block number when the DID was
-last updated, so in the beginning the block number would be the one where the DID was created, when a DID's key is updated,
-that block number is changed to the one in which the key got updated.
+The chain-state stores a few things for a DID, the active public keys, the controllers, service endpoints and the current nonce
+of the DID. The nonce starts as the block number where the DID was created and each subsequent action like adding/removing a key
+for itself or any DID it controls, adding a blob, etc should supply a nonce 1 higher than the previous one.
 
-This is done for replay protection as every update (or removal) to the DID must include the last block number where the DID
-was updated and after each update the block number changes, thus giving replay protection. This detail however is hidden in
-the API so the caller should not have to worry about this.
+This is done for replay protection but this detail however is hidden in the API so the caller should not have to worry about this.
 
 ## DID creation
 Create a new random DID.
@@ -75,19 +73,16 @@ const publicKey = getPublicKeyFromKeyringPair(pair);
 ## Registering a new DID on chain
 Now that you have a DID and a public key, the DID can be registered on the Dock chain. Note that this public key associated
 with DID is independent of the key used for sending the transaction and paying the fees.
-1. First create a key detail object. The first argument of this function is a `PublicKey` and the second argument is
-the controller.
-
-    The controller is the DID that controls the public key and this can be the same as the DID being
-    registered.
+1. First create a `DidKey` object. The first argument of this function is a `PublicKey` and the second argument is
+the verification relationship. A verification relationship can be 1 or more of these `authentication`, `assertion`, `capabilityInvocation` or `keyAgreement`
 
     ```js
-    import {createKeyDetail} from '@docknetwork/sdk/utils/did';
-    const keyDetail = createKeyDetail(publicKey, did);
+    import { DidKey, VerificationRelationship } from '@docknetwork/sdk/public-keys';
+    const didKey = new DidKey(publicKey, new VerificationRelationship());
     ```
-1. Now submit the transaction using a `DockAPI` object and the newly created DID `did` and `keyDetail`.
+1. Now submit the transaction using a `DockAPI` object and the newly created DID `did` and `didKey`.
     ```js
-    await dock.did.new(did, keyDetail);
+    await dock.did.new(did, [didKey], []);
     ```
 
 ## Fetching a DID from chain
@@ -96,9 +91,10 @@ To get a DID document, use `getDocument`
     const result = await dock.did.getDocument(did);
     ```
 
-## Updating an existing DID on chain
-The public key or the controller of an on-chain DID can be updated by preparing a signed key update.
-1. Create a new public key and fetch the current keypair to sign the key update message
+## Adding a key to an existing DID
+A DID's controller can add a public key to an on-chain DID by preparing a signed payload. Each new key is given a number key index
+which 1 is greater than the last used index. Key indices start from 1.
+1. Create a new public key and use the current keypair to sign the message
     ```js
     // the current pair, its a sr25519 in this example
     const currentPair = dock.keyring.addFromUri(secretUri, null, 'sr25519');
@@ -106,45 +102,31 @@ The public key or the controller of an on-chain DID can be updated by preparing 
     ```
 1. The caller might directly create a signed key update
     ```js
-    import {createSignedKeyUpdate} from '@docknetwork/sdk/utils/did';
-    // If you do not wish to update the controller, don't pass `newController`
-    const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, did, newPk, currentPair, newController);
+    const vr = new VerificationRelationship();
+    // This new key can only be used for issuance.
+    vr.setAssertion();
+    const newDidKey = new DidKey(newPk, vr);
     ```
-1. In some cases the caller might not have the keypair like a hardware wallet or a remote signer, in that case, the caller
-creates the key update message bytes with `createKeyUpdate` to pass to the signer and get the signature
+1. Now send the signed payload in a transaction to the chain in a transaction.
+   In the arguments, the first `did` specifies that a key must be added to DID `did` and the second `did` specifies that DID `did` is signing the payload
+   The `1` below is for the key index.
     ```js
-    import {createKeyUpdate} from '@docknetwork/sdk/utils/did';
-    const keyUpdate = await createKeyUpdate(dock.did, did, newPk, newController);
-    const signature = // Get the signature on `keyUpdate`
-    ```
-1. Now send the key update message with the signature to the chain in a transaction
-    ```js
-    await dock.did.updateKey(keyUpdate, signature);
+    dock.did.addKeys([newDidKey], did, did, currentPair, 1, undefined, false);
     ```
 
 ## Removing an existing DID from chain
-A DID can be removed from the chain by sending the corresponding message signed with the current key.
+A DID can be removed from the chain by sending the corresponding message signed with an appropriate key.
 1. Fetch the current keypair to sign the DID removal message
     ```js
     // the current pair, its a sr25519 in this example
     const currentPair = dock.keyring.addFromUri(secretUri, null, 'sr25519');
     ```
-1. The caller might directly create a signed message
-    ```js
-    import {createSignedDidRemoval} from '@docknetwork/sdk/utils/did';
-    const [didRemoval, signature] = await createSignedDidRemoval(dock.did, dockDID, currentPair);
-    ```
-1. As mentioned above, in some cases the caller might not have the keypair, then he creates the removal message bytes
-with `createDidRemoval` to pass to the signer and get the signature
-    ```js
-    import {createDidRemoval} from '@docknetwork/sdk/utils/did';
-    const didRemoval = await createDidRemoval(dock.did, did);
-    const signature = // Get the signature on `didRemoval`
-    ```
 1. Now send the message with the signature to the chain in a transaction
    ```js
-   await dock.did.remove(didRemoval, signature);
+   dock.did.remove(did, did, pair, 1)
    ```
+
+For more details see example in `examples/dock-did.js` or the integration tests.
 
 
 Note that they accounts used to send the transactions are independent of the keys associated with the DID.

@@ -62,7 +62,7 @@ class EtherResolver extends DIDResolver {
   async resolve(did) {
     const parsed = this.parseDid(did);
     try {
-      return await this.ethres(did, parsed);
+      return this.ethres(did, parsed);
     } catch (e) {
       throw new NoDIDError(did);
     }

@@ -24,7 +24,7 @@ function documentLoader(resolver = null) {
       document = await resolver.resolve(uriString);
     } else {
       // Strip ending slash from uri to determine cache key
-      const cacheKey = uriString.endsWith('/') ? uriString.substr(0, uri.length - 1) : uriString;
+      const cacheKey = uriString.endsWith('/') ? uriString.substring(0, uri.length - 1) : uriString;
 
       // Check its not in data cache
       const cachedData = cachedUris.get(cacheKey);

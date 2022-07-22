@@ -13,14 +13,14 @@ import { canon } from './utils/canonicalize';
 import { Namer, fromJsonldjsCg } from './utils/claimgraph';
 
 // Crawl the rdf dataset composed of DIDs and turtle documents on ipfs. Return the graph
-// representing all knowlege obtained while crawling.
+// representing all knowledge obtained while crawling.
 export async function crawl(
   initialFacts,
   rules,
   curiosityQuery,
   resolveGraph,
 ) {
-  // namer is used to ensure blank node hygene whenever adding new claimgraphs
+  // namer is used to ensure blank node hygiene whenever adding new claimgraphs
   const namer = new Namer();
 
   let facts = deepClone(initialFacts);

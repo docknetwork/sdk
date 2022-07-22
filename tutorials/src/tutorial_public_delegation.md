@@ -35,7 +35,7 @@ async function verifyPresentation(presentation) { ... }
 
 // This function can be implemeted using setClaim().
 // An example of setClaim() usage can be found here:
-//  https://github.com/docknetwork/sdk/blob/master/tests/integration/did.test.js
+//  https://github.com/docknetwork/sdk/blob/master/tests/integration/did-basic.test.js
 async function setAttestation(did, didKey, iri) { ... }
 
 // See the DID resolver tutorial For information about implementing a documentLoader.

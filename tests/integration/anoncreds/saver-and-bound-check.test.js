@@ -27,10 +27,11 @@ import {
 
 import { DockAPI } from '../../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
-import { createKeyDetail, createNewDockDID, getHexIdentifierFromDID } from '../../../src/utils/did';
+import { createDidKey, createNewDockDID, getHexIdentifierFromDID } from '../../../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
 import BBSPlusModule from '../../../src/modules/bbs-plus';
 import { getRevealedUnrevealed } from './utils';
+import { registerNewDIDUsingPair } from '../helpers';
 
 describe('Complete demo of verifiable encryption using SAVER and bound check using LegoGroth16', () => {
   const dock = new DockAPI();
@@ -42,7 +43,8 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
   const chunkBitSize = 16;
   let decryptorDid;
   let decryptorKeypair;
-  let encryptionGens, snarkPk, decryptorSk, encryptionKey, decryptionKey;
+  let encryptionGens; let snarkPk; let decryptorSk; let encryptionKey; let
+    decryptionKey;
 
   let signature;
 
@@ -73,7 +75,7 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
     return encoded;
   }
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
@@ -83,14 +85,15 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
 
     issuerKeypair = dock.keyring.addFromUri(randomAsHex(32));
     issuerDid = createNewDockDID();
-    await dock.did.new(issuerDid, createKeyDetail(getPublicKeyFromKeyringPair(issuerKeypair), issuerDid), false);
+    // await dock.did.new(issuerDid, createDidKey(getPublicKeyFromKeyringPair(issuerKeypair), issuerDid), false);
+    await registerNewDIDUsingPair(dock, issuerDid, issuerKeypair);
 
     decryptorKeypair = dock.keyring.addFromUri(randomAsHex(32));
     decryptorDid = createNewDockDID();
-    await dock.did.new(decryptorDid, createKeyDetail(getPublicKeyFromKeyringPair(decryptorKeypair), decryptorDid), false);
+    // await dock.did.new(decryptorDid, createDidKey(getPublicKeyFromKeyringPair(decryptorKeypair), decryptorDid), false);
+    await registerNewDIDUsingPair(dock, decryptorDid, decryptorKeypair);
 
     await initializeWasm();
-    done();
   }, 20000);
 
   test('Create BBS+ params and keys', async () => {
@@ -98,19 +101,19 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
     const sigParams = SignatureParamsG1.generate(attributeCount, hexToU8a(label));
     const bytes = u8aToHex(sigParams.toBytes());
     const params = BBSPlusModule.prepareAddParameters(bytes, undefined, label);
-    await dock.bbsPlusModule.createNewParams(params, getHexIdentifierFromDID(issuerDid), issuerKeypair, undefined, false);
+    await dock.bbsPlusModule.addParams(params, issuerDid, issuerKeypair, 1, { didModule: dock.didModule }, false);
     const paramsWritten = await dock.bbsPlusModule.getLastParamsWritten(issuerDid);
     expect(paramsWritten.bytes).toEqual(params.bytes);
     expect(paramsWritten.label).toEqual(params.label);
 
     issuerBbsPlusKeypair = KeypairG2.generate(sigParams);
     const pk = BBSPlusModule.prepareAddPublicKey(u8aToHex(issuerBbsPlusKeypair.publicKey.bytes), undefined, [issuerDid, 1]);
-    await dock.bbsPlusModule.createNewPublicKey(pk, getHexIdentifierFromDID(issuerDid), issuerKeypair, undefined, false);
+    await dock.bbsPlusModule.addPublicKey(pk, issuerDid, issuerDid, issuerKeypair, 1, { didModule: dock.didModule }, false);
   }, 10000);
 
   test('Sign attributes, i.e. issue credential', async () => {
     const encodedAttrs = encodedAttributes(attributes);
-    const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 1, true);
+    const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 2, true);
     const paramsVal = SignatureParamsG1.valueFromBytes(hexToU8a(queriedPk.params.bytes));
     const params = new SignatureParamsG1(paramsVal, hexToU8a(queriedPk.params.label));
     signature = SignatureG1.generate(encodedAttrs, issuerBbsPlusKeypair.secretKey, params, false);
@@ -139,7 +142,7 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
     const ek = encryptionKey.decompress();
     const pk = snarkPk.decompress();
 
-    const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 1, true);
+    const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 2, true);
     const sigParams = new SignatureParamsG1(SignatureParamsG1.valueFromBytes(hexToU8a(queriedPk.params.bytes)));
     const sigPk = new BBSPlusPublicKeyG2(hexToU8a(queriedPk.bytes));
 
@@ -193,7 +196,7 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
     // Prover decompresses the proving key
     const snarkProvingKey = pk.decompress();
 
-    const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 1, true);
+    const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 2, true);
     const sigParams = new SignatureParamsG1(SignatureParamsG1.valueFromBytes(hexToU8a(queriedPk.params.bytes)));
     const sigPk = new BBSPlusPublicKeyG2(hexToU8a(queriedPk.bytes));
 
@@ -232,7 +235,7 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
 
     const verifierProofSpec = new QuasiProofSpecG1(verifierStatements, metaStatements);
     expect(proof.verifyUsingQuasiProofSpec(verifierProofSpec).verified).toEqual(true);
-  });
+  }, 45000);
 
   afterAll(async () => {
     await dock.disconnect();

@@ -1,10 +1,12 @@
 import { encodeAddress, randomAsHex } from '@polkadot/util-crypto';
-import { u8aToString, stringToHex, bufferToU8a } from '@polkadot/util';
+import {
+  u8aToString, stringToHex, bufferToU8a, u8aToHex,
+} from '@polkadot/util';
 
-import { getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
+import { getNonce, getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from '../utils/codec';
 import NoBlobError from '../utils/errors/no-blob-error';
-import Signature from '../signatures/signature'; // eslint-disable-line
+import { createDidSig, getHexIdentifierFromDID } from '../utils/did';
 
 export const DockBlobQualifier = 'blob:dock:';
 export const DockBlobIdByteSize = 32;
@@ -59,6 +61,7 @@ class BlobModule {
    * Creates a new instance of BlobModule and sets the api
    * @constructor
    * @param {object} api - PolkadotJS API Reference
+   * @param signAndSend
    */
   constructor(api, signAndSend) {
     this.api = api;
@@ -67,51 +70,39 @@ class BlobModule {
   }
 
   /**
-   * Create a transaction to register a new Blob on the Dock Chain
-   * @param {object} blob - struct to store on chain
-   * @param {object} keyPair - Key pair to sign with
-   * @param {Signature} signature - Signature to use
-   * @return {object} The extrinsic to sign and send.
+   * Create a signed transaction for adding a new blob
+   * @param blob
+   * @param signerDid - Signer of the blob
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @returns {Promise<*>}
    */
-  createNewTx(blob, keyPair = undefined, signature = undefined) {
-    let value = blob.blob;
-    if (!value) {
-      throw new Error('Blob must have a value!');
-    }
-
-    if (value instanceof Uint8Array) {
-      value = [...value];
-    } else if (typeof value === 'object') {
-      value = stringToHex(JSON.stringify(value));
-    } else if (typeof value === 'string' && !isHexWithGivenByteSize(value)) {
-      value = stringToHex(value);
-    }
-
-    const blobObj = {
-      ...blob,
-      blob: value,
-    };
-
-    if (!signature) {
-      if (!keyPair) {
-        throw Error('You need to provide either a keypair or a signature to register a new Blob.');
-      }
-      const serializedBlob = this.getSerializedBlob(blobObj);
-      // eslint-disable-next-line no-param-reassign
-      signature = getSignatureFromKeyringPair(keyPair, serializedBlob);
-    }
-    return this.module.new(blobObj, signature.toJSON());
+  async createNewTx(blob, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    const hexDid = getHexIdentifierFromDID(signerDid);
+    const [addBlob, didSig] = await this.createSignedAddBlob(blob, hexDid, keyPair, keyId, { nonce, didModule });
+    return this.module.new(addBlob, didSig);
   }
 
   /**
-   * Register a new Blob on the Dock Chain
-   * @param {object} blob - struct to store on chain
-   * @param {object} keyPair - Key pair to sign with
-   * @param {Signature} signature - Signature to use
-   * @return {Promise<object>} Promise to the pending transaction
+   * Write a new blob on chain.
+   * @param blob
+   * @param signerDid - Signer of the blob
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<*>}
    */
-  async new(blob, keyPair = undefined, signature = undefined, waitForFinalization = true, params = {}) {
-    return await this.signAndSend(this.createNewTx(blob, keyPair, signature), waitForFinalization, params);
+  async new(blob, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
+    return this.signAndSend(
+      (await this.createNewTx(blob, signerDid, keyPair, keyId, { nonce, didModule })), waitForFinalization, params,
+    );
   }
 
   /**
@@ -133,16 +124,60 @@ class BlobModule {
       // Try to convert the value to a JSON object
       try {
         const strValue = u8aToString(value);
-        if (strValue.substr(0, 1) === '{') {
+        if (strValue.substring(0, 1) === '{') {
           value = JSON.parse(strValue);
         }
       } catch (e) {
         // no-op, just use default Uint8 array value
       }
 
-      return [respTuple[0], value];
+      return [u8aToHex(respTuple[0]), value];
     }
     throw new Error(`Needed 2 items in response but got${respTuple.length}`);
+  }
+
+  /**
+   * Create an `AddBlob` struct as expected by node and return along with signature.
+   * @param blob
+   * @param hexDid - Signer DID in hex form
+   * @param keyPair - Signer's keypair
+   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @returns {Promise}
+   */
+  async createSignedAddBlob(blob, hexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    if (!blob.blob) {
+      throw new Error('Blob must have a value!');
+    }
+    // eslint-disable-next-line no-param-reassign
+    nonce = await getNonce(hexDid, nonce, didModule);
+
+    const blobObj = {
+      ...blob,
+      blob: this.getSerializedBlobValue(blob.blob),
+    };
+    const addBlob = {
+      blob: blobObj,
+      nonce,
+    };
+    const serializedAddBlob = this.getSerializedBlob(addBlob);
+    const signature = getSignatureFromKeyringPair(keyPair, serializedAddBlob);
+    const didSig = createDidSig(hexDid, keyId, signature);
+    return [addBlob, didSig];
+  }
+
+  getSerializedBlobValue(blobValue) {
+    if (blobValue instanceof Uint8Array) {
+      return [...blobValue];
+    } else if (typeof blobValue === 'object') {
+      return stringToHex(JSON.stringify(blobValue));
+    } else if (typeof blobValue === 'string' && !isHexWithGivenByteSize(blobValue)) {
+      return stringToHex(blobValue);
+    }
+    // Assuming `blobValue` is in hex
+    return blobValue;
   }
 
   /**
@@ -151,7 +186,7 @@ class BlobModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedBlob(blob) {
-    return getStateChange(this.api, 'Blob', blob);
+    return getStateChange(this.api, 'AddBlob', blob);
   }
 }
 

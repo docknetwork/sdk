@@ -157,44 +157,151 @@ resolver. To resolve the DID, the resolver first needs to check on which registr
 is capable or willing to lookup that registry. The registry is indicated by the <code>DID method</code> of that DID. In addition to the
 registry, the method also specifies other details of that DID like the supported operations, crypto, etc. Each DID method
 defines its own specification, Docks's DID method spec is <a href="https://github.com/docknetwork/dock-did-driver/blob/master/Dock%20DID%20method%20specification.md">here</a>.
-In case of Dock, the registry is the Dock blockchain, and the method is <code>dock</code>.</p>
-<p>An example Dock DID.</p>
+In case of Dock, the registry is the Dock blockchain, and the method is <code>dock</code>.
+We support 2 kinds of DIDs, on-chain and off-chain.
+With off-chain DIDs, only a reference to the DID Document is kept on chain and this reference can be an CID (for IPFS) or a URL or any
+custom format.
+With on-chain DIDs, the keys, controllers and service endpoints of the DID are stored on chain. A DID key can have 1 or more <a href="https://www.w3.org/TR/did-core/#verification-relationships">verification
+methods</a> which indicates what that key can be used for. Only a DID key with verification
+relationship <code>capabilityInvocation</code> can update the DID document, i.e. add/remove keys, add/remove controllers,
+add/remove service endpoints and remove the DID. Also a DID can have 1 or more controllers and these controllers can also
+update its DID document. A DID with a key with <code>capabilityInvocation</code> verification relationship is its own controller.</p>
+<p>An example on-chain Dock DID.</p>
 <pre><code>did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW
 </code></pre>
 <p>Above DID has method <code>dock</code> and the DID identifier is <code>5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW</code>. Dock DID identifiers
 are 32 bytes in size.</p>
 <p>An example DID Document</p>
 <pre><code class="language-json">{
-  &quot;@context&quot;: &quot;https://www.w3.org/ns/did/v1&quot;,
-  &quot;id&quot;: &quot;did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW&quot;,
-  &quot;authentication&quot;: [
-    &quot;did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW#keys-1&quot;
+  &quot;@context&quot;: [
+    &quot;https://www.w3.org/ns/did/v1&quot;
   ],
-  &quot;assertionMethod&quot;: [
-    &quot;did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW#keys-1&quot;
+  &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
+  &quot;controller&quot;: [
+    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;
   ],
   &quot;publicKey&quot;: [
     {
-      &quot;id&quot;: &quot;did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW#keys-1&quot;,
+      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;,
       &quot;type&quot;: &quot;Sr25519VerificationKey2020&quot;,
-      &quot;controller&quot;: &quot;did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW&quot;,
-      &quot;publicKeyBase58&quot;: &quot;8bEsU4JWBVVFQCdd8du7Txo6L3JHdJYQByHBqzL1WXwy&quot;
+      &quot;controller&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
+      &quot;publicKeyBase58&quot;: &quot;7d3QsaW6kP7bGiJtRZBxdyZsbJqp6HXv1owwr8aYBjbg&quot;
+    },
+    {
+      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2&quot;,
+      &quot;type&quot;: &quot;Ed25519VerificationKey2018&quot;,
+      &quot;controller&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
+      &quot;publicKeyBase58&quot;: &quot;p6gb7WNh9SWC4hkye4VV5epo1LYpLXKH21ojfwJLayg&quot;
+    }
+  ],
+  &quot;authentication&quot;: [
+    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;,
+    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2&quot;
+  ],
+  &quot;assertionMethod&quot;: [
+    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;
+  ],
+  &quot;capabilityInvocation&quot;: [
+    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;
+  ]
+}
+</code></pre>
+<p>Dock DIDs support multiple keys. The keys are present in the <code>publicKey</code> section. As per the above DID document, the DID <code>did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn</code>
+has 2 public keys and 1 controller which is itself.
+Note how that public key  is referred to using its <code>id</code> in <code>authentication</code>, <code>assertionMethod</code> and <code>capabilityInvocation</code> sections.
+The above document states that the DID <code>did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn</code> can authenticate with 2 public keys
+whose id is specified under <code>authentication</code>. When it attests to some fact (becomes issuer), it can only use 1 key, which is under <code>assertionMethod</code>.
+The keys specified under <code>capabilityInvocation</code> can be used to update the DID document, i.e. add/remove keys, etc.</p>
+<pre><code class="language-json">{
+  &quot;@context&quot;: [
+    &quot;https://www.w3.org/ns/did/v1&quot;
+  ],
+  &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
+  &quot;controller&quot;: [
+    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
+    &quot;did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz&quot;
+  ],
+  &quot;publicKey&quot;: [
+    {
+      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;,
+      &quot;type&quot;: &quot;Sr25519VerificationKey2020&quot;,
+      &quot;controller&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
+      &quot;publicKeyBase58&quot;: &quot;7d3QsaW6kP7bGiJtRZBxdyZsbJqp6HXv1owwr8aYBjbg&quot;
+    },
+    {
+      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2&quot;,
+      &quot;type&quot;: &quot;Ed25519VerificationKey2018&quot;,
+      &quot;controller&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
+      &quot;publicKeyBase58&quot;: &quot;p6gb7WNh9SWC4hkye4VV5epo1LYpLXKH21ojfwJLayg&quot;
+    }
+  ],
+  &quot;authentication&quot;: [
+    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;,
+    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2&quot;
+  ],
+  &quot;assertionMethod&quot;: [
+    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;
+  ],
+  &quot;capabilityInvocation&quot;: [
+    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;
+  ]
+}
+</code></pre>
+<p>In the above DID document, there are controllers, 1 is the DID <code>did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn</code> itself
+and the other is <code>did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz</code>. This means that DID <code>did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz</code>
+can also modify above DID document, i.e. add/remove keys, add/remove controller, etc.</p>
+<pre><code class="language-json">{
+  &quot;@context&quot;: [
+    &quot;https://www.w3.org/ns/did/v1&quot;
+  ],
+  &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
+  &quot;controller&quot;: [
+    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
+    &quot;did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz&quot;
+  ],
+  &quot;publicKey&quot;: [
+    {
+      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;,
+      &quot;type&quot;: &quot;Sr25519VerificationKey2020&quot;,
+      &quot;controller&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
+      &quot;publicKeyBase58&quot;: &quot;7d3QsaW6kP7bGiJtRZBxdyZsbJqp6HXv1owwr8aYBjbg&quot;
+    },
+    {
+      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2&quot;,
+      &quot;type&quot;: &quot;Ed25519VerificationKey2018&quot;,
+      &quot;controller&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
+      &quot;publicKeyBase58&quot;: &quot;p6gb7WNh9SWC4hkye4VV5epo1LYpLXKH21ojfwJLayg&quot;
+    }
+  ],
+  &quot;authentication&quot;: [
+    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;,
+    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2&quot;
+  ],
+  &quot;assertionMethod&quot;: [
+    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;
+  ],
+  &quot;capabilityInvocation&quot;: [
+    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;
+  ],
+  &quot;service&quot;: [
+    {
+      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1&quot;,
+      &quot;type&quot;: &quot;LinkedDomains&quot;,
+      &quot;serviceEndpoint&quot;: [
+        &quot;https://foo.example.com&quot;
+      ]
     }
   ]
 }
 </code></pre>
-<p>Note that Dock DIDs support only one key as of now. The key is present in the <code>publicKey</code> section. Note how that public key
-is referred to using its <code>id</code> in <code>authentication</code> and <code>assertionMethod</code> sections. The above document states that the DID
-<code>did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW</code> authenticates with public key under <code>publicKey</code> and also when
-it attests to some fact (becomes issuer), it uses that key. As there is only one public key supported for a DID, that
-public key is used for both <code>authentication</code> and <code>assertionMethod</code>. When support for multiple keys is added, the DID can
-specify which key(s) needs to be used for <code>authentication</code> and which ones for <code>assertionMethod</code>.</p>
+<p>In the above document, there is also a service endpoint for the DID.</p>
 <p>Another thing to keep in mind is that the keys associated with the Dock DID are independent of the keys used to send the
 transaction on chain and pay fees. Eg. Alice might not have any tokens to write anything on chain but can still create a
 DID and corresponding key and ask Bob who has tokens to register the DID on chain. Even though Bob wrote the DID on chain,
 he cannot update or remove it since only Alice has the keys associated with that DID. Similarly, when Alice wants to update
-the DID (public key or controller), it can create the update, sign it and send it to Carol this time to send the update on
-chain.</p>
+the DID , it can create the update, sign it and send it to Carol this time to send the update on chain. Similar to blockchain
+accounts, DIDs also have their own nonce which increments by 1 on each action of a DID. The nonce of a DID is set to the block number on
+which its created and the DID is expected to send signed payloads, each with nonce 1 more than the previous nonce.</p>
 
                     </main>
 

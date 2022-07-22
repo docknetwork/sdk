@@ -146,7 +146,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line15">line 15</a>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line31">line 31</a>
     </li></ul></dd>
     
 
@@ -202,7 +202,1952 @@
     
 
     
-    <h4 class="name" id="createNewTx"><span class="type-signature"></span>createNewTx<span class="signature">(did, keyDetail)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    <h4 class="name" id="addControllers"><span class="type-signature">(async) </span>addControllers<span class="signature">(controllers, targetDid, signerDid, keyPair, keyId, nonce, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Add controllers to an on-chain DID.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>controllers</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The DIDs that will control the `targetDid`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>targetDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The DID to which controllers are being added</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signerDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The DID that is adding the controllers by signing the payload because it controls `targetDid`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Signer's keypair</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
+fetched from chain before creating the transaction</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line286">line 286</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="addKeys"><span class="type-signature">(async) </span>addKeys<span class="signature">(didKeys, targetDid, signerDid, keyPair, keyId, nonce, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Add keys to an on-chain DID
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>didKeys</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;DidKey></span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Array of `DidKey`s as expected by the Substrate node</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>targetDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The DID to which keys are being added</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signerDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The DID that is adding the keys by signing the payload because it controls `targetDid`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Signer's keypair</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
+fetched from chain before creating the transaction</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line217">line 217</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="addServiceEndpoint"><span class="type-signature">(async) </span>addServiceEndpoint<span class="signature">(endpointId, endpointType, origins, targetDid, signerDid, keyPair, keyId, nonce, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Add a new service endpoint
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>endpointId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The id of the service endpoint. Each endpoint has a unique id.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>endpointType</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">ServiceEndpointType</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The type of the endpoint.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>origins</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">An array of one of URIs encoded as hex.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>targetDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The DID to which service endpoint is being added</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signerDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The DID that is adding the service endpoint by signing the payload because it controls `targetDid`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Signer's keypair</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
+fetched from chain before creating the transaction</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line360">line 360</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createAddControllersTx"><span class="type-signature">(async) </span>createAddControllersTx<span class="signature">(controllers, targetDid, signerDid, keyPair, keyId, nonce)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Create transaction to add controllers to an on-chain DID.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>controllers</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The DIDs that will control the `targetDid`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>targetDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The DID to which keys are being added</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signerDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The DID that is adding the controllers by signing the payload because it controls `targetDid`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Signer's keypair</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
+fetched from chain before creating the transaction</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line252">line 252</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createAddKeysTx"><span class="type-signature">(async) </span>createAddKeysTx<span class="signature">(didKeys, targetDid, signerDid, keyPair, keyId, nonce)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Create transaction to add keys to an on-chain DID.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>didKeys</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;DidKey></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Array of `DidKey`s as expected by the Substrate node</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>targetDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The DID to which keys are being added</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signerDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The DID that is adding the keys by signing the payload because it controls `targetDid`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Signer's keypair</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
+fetched from chain before creating the transaction</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line183">line 183</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createAddServiceEndpointTx"><span class="type-signature">(async) </span>createAddServiceEndpointTx<span class="signature">(endpointId, endpointType, origins, targetDid, signerDid, keyPair, keyId, nonce)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Create a transaction to add a new service endpoint
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>endpointId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The id of the service endpoint. Each endpoint has a unique id.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>endpointType</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">ServiceEndpointType</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The type of the endpoint.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>origins</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An array of one of URIs encoded as hex.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>targetDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The DID to which service endpoint is being added</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signerDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The DID that is adding the service endpoint by signing the payload because it controls `targetDid`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Signer's keypair</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
+fetched from chain before creating the transaction</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line320">line 320</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createNewOffchainTx"><span class="type-signature"></span>createNewOffchainTx<span class="signature">(did, didDocRef)</span><span class="type-signature"> &rarr; {*}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Creates transaction to create a new off-chain DID
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>did</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">-</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>didDocRef</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">OffChainDidDocRef</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Off chain reference for the DID</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line49">line 49</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createNewOnchainTx"><span class="type-signature"></span>createNewOnchainTx<span class="signature">(did, didKeys, controllers)</span><span class="type-signature"> &rarr; {object}</span></h4>
     
 
     
@@ -269,13 +2214,13 @@
 
         <tr>
             
-                <td class="name"><code>keyDetail</code></td>
+                <td class="name"><code>didKeys</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">Array.&lt;DidKey></span>
 
 
             
@@ -285,7 +2230,30 @@
 
             
 
-            <td class="description last">`KeyDetail` as expected by the Substrate node</td>
+            <td class="description last">Array of `DidKey`s as expected by the Substrate node</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>controllers</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Array of `Did`s as expected by the Substrate node</td>
         </tr>
 
     
@@ -326,7 +2294,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line33">line 33</a>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line134">line 134</a>
     </li></ul></dd>
     
 
@@ -384,7 +2352,7 @@
     
 
     
-    <h4 class="name" id="createRemoveTx"><span class="type-signature"></span>createRemoveTx<span class="signature">(didRemoval, signature)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    <h4 class="name" id="createRemoveKeysTx"><span class="type-signature">(async) </span>createRemoveKeysTx<span class="signature">(keyIds, targetDid, signerDid, keyPair, keyId, nonce)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
     
 
     
@@ -392,7 +2360,7 @@
 
 
 <div class="description">
-    Removes an already registered DID on the Dock chain.
+    Create transaction to remove keys
 </div>
 
 
@@ -428,15 +2396,10 @@
 
         <tr>
             
-                <td class="name"><code>didRemoval</code></td>
+                <td class="name"><code>keyIds</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
             
             </td>
 
@@ -444,22 +2407,17 @@
 
             
 
-            <td class="description last">`DidRemoval` as expected by the Substrate node</td>
+            <td class="description last">Key indices to remove</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>signature</code></td>
+                <td class="name"><code>targetDid</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">Signature</span>
-
-
             
             </td>
 
@@ -467,7 +2425,80 @@
 
             
 
-            <td class="description last">Signature from existing key</td>
+            <td class="description last">The DID from which keys are being removed</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signerDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The DID that is removing the keys by signing the payload because it controls `targetDid`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Signer's keypair</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
+fetched from chain before creating the transaction</td>
         </tr>
 
     
@@ -508,7 +2539,621 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line74">line 74</a>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line396">line 396</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createRemoveOffchainDidTx"><span class="type-signature"></span>createRemoveOffchainDidTx<span class="signature">(did)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Create transaction to remove off chain DID
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>did</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line107">line 107</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createRemoveServiceEndpointTx"><span class="type-signature">(async) </span>createRemoveServiceEndpointTx<span class="signature">(endpointId, targetDid, signerDid, keyPair, keyId, nonce)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Create transaction to remove a service endpoint from a DID
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>endpointId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The endpoint to remove</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>targetDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The DID from which endpoint is being removed</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signerDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The DID that is removing the endpoint by signing the payload because it controls `targetDid`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Signer's keypair</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
+fetched from chain before creating the transaction</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line528">line 528</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createRemoveTx"><span class="type-signature">(async) </span>createRemoveTx<span class="signature">(targetDid, signerDid, keyPair, keyId, nonce)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Create a transaction to remove an on-chain DID
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>targetDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The DID being removed</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signerDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The DID that is removing `targetDid` by signing the payload because it controls `targetDid`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Signer's keypair</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
+fetched from chain before creating the transaction</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line593">line 593</a>
     </li></ul></dd>
     
 
@@ -566,16 +3211,12 @@
     
 
     
-    <h4 class="name" id="createUpdateKeyTx"><span class="type-signature"></span>createUpdateKeyTx<span class="signature">(keyUpdate, signature)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    <h4 class="name" id="createSetClaimTx"><span class="type-signature">(async) </span>createSetClaimTx<span class="signature">(priority, iri, did, keyPair, keyId, nonce)</span><span class="type-signature"> &rarr; {Promise.&lt;SubmittableExtrinsic.&lt;ApiType>>}</span></h4>
     
 
     
 
 
-
-<div class="description">
-    Updates the details of an already registered DID on the Dock chain.
-</div>
 
 
 
@@ -610,15 +3251,10 @@
 
         <tr>
             
-                <td class="name"><code>keyUpdate</code></td>
+                <td class="name"><code>priority</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
             
             </td>
 
@@ -626,22 +3262,17 @@
 
             
 
-            <td class="description last">`KeyUpdate` as expected by the Substrate node</td>
+            <td class="description last"></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>signature</code></td>
+                <td class="name"><code>iri</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">Signature</span>
-
-
             
             </td>
 
@@ -649,7 +3280,79 @@
 
             
 
-            <td class="description last">Signature from existing key</td>
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>did</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
         </tr>
 
     
@@ -690,7 +3393,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line54">line 54</a>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line653">line 653</a>
     </li></ul></dd>
     
 
@@ -718,10 +3421,6 @@
 <h5>Returns:</h5>
 
         
-<div class="param-desc">
-    The extrinsic to sign and send.
-</div>
-
 
 
 <dl>
@@ -730,7 +3429,175 @@
     </dt>
     <dd>
         
-<span class="param-type">Promise.&lt;object></span>
+<span class="param-type">Promise.&lt;SubmittableExtrinsic.&lt;ApiType>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createSetOffchainDidRefTx"><span class="type-signature"></span>createSetOffchainDidRefTx<span class="signature">(did, didDocRef)</span><span class="type-signature"> &rarr; {*}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Create a transaction to update the DID Doc reference of the off chain DID
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>did</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>didDocRef</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">new reference</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line76">line 76</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
 
 
     </dd>
@@ -849,7 +3716,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line114">line 114</a>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line719">line 719</a>
     </li></ul></dd>
     
 
@@ -907,7 +3774,7 @@
     
 
     
-    <h4 class="name" id="getBlockNoForLastChangeToDID"><span class="type-signature">(async) </span>getBlockNoForLastChangeToDID<span class="signature">(didIdentifier)</span><span class="type-signature"> &rarr; {Promise.&lt;array>}</span></h4>
+    <h4 class="name" id="getDidKey"><span class="type-signature">(async) </span>getDidKey<span class="signature">(did, keyIndex)</span><span class="type-signature"> &rarr; {Promise.&lt;DidKey>}</span></h4>
     
 
     
@@ -915,9 +3782,7 @@
 
 
 <div class="description">
-    Gets the block number in which the DID was last modified in
-the chain and return it. It will throw error if the DID does not exist on
-chain or chain returns null response.
+    Get the `DidKey` for the DID with given key index. Key indices start from 1 and can have holes
 </div>
 
 
@@ -953,13 +3818,31 @@ chain or chain returns null response.
 
         <tr>
             
-                <td class="name"><code>didIdentifier</code></td>
+                <td class="name"><code>did</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyIndex</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">number</span>
 
 
             
@@ -969,8 +3852,7 @@ chain or chain returns null response.
 
             
 
-            <td class="description last">DID identifier as hex. Not accepting full DID intentionally for efficiency as these
-methods are used internally</td>
+            <td class="description last"></td>
         </tr>
 
     
@@ -1011,7 +3893,7 @@ methods are used internally</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line229">line 229</a>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line944">line 944</a>
     </li></ul></dd>
     
 
@@ -1039,10 +3921,6 @@ methods are used internally</td>
 <h5>Returns:</h5>
 
         
-<div class="param-desc">
-    A 2 element array with first
-</div>
-
 
 
 <dl>
@@ -1051,169 +3929,7 @@ methods are used internally</td>
     </dt>
     <dd>
         
-<span class="param-type">Promise.&lt;array></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getDetail"><span class="type-signature">(async) </span>getDetail<span class="signature">(didIdentifier)</span><span class="type-signature"> &rarr; {Promise.&lt;array>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Gets the key detail and block number in which the DID was last modified from
-the chain and return them. It will throw NoDID if the DID does not exist on
-chain.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>didIdentifier</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">DID identifier as hex. Not accepting full DID intentionally for efficiency as these
-methods are used internally</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line204">line 204</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    A 2 element array with first
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Promise.&lt;array></span>
+<span class="param-type">Promise.&lt;DidKey></span>
 
 
     </dd>
@@ -1334,7 +4050,7 @@ a 32 byte hex string</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line126">line 126</a>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line734">line 734</a>
     </li></ul></dd>
     
 
@@ -1493,7 +4209,7 @@ a 32 byte hex string</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line105">line 105</a>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line710">line 710</a>
     </li></ul></dd>
     
 
@@ -1551,7 +4267,7 @@ a 32 byte hex string</td>
     
 
     
-    <h4 class="name" id="getSerializedAttestation"><span class="type-signature"></span>getSerializedAttestation<span class="signature">(attestation)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    <h4 class="name" id="getNextNonceForDID"><span class="type-signature">(async) </span>getNextNonceForDID<span class="signature">(didIdentifier)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
     
 
     
@@ -1559,7 +4275,7 @@ a 32 byte hex string</td>
 
 
 <div class="description">
-    Serializes an `Attestation` for signing.
+    Gets the nonce that should be used for sending the next transaction by this DID. Its 1 more than the current nonce.
 </div>
 
 
@@ -1595,15 +4311,10 @@ a 32 byte hex string</td>
 
         <tr>
             
-                <td class="name"><code>attestation</code></td>
+                <td class="name"><code>didIdentifier</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
             
             </td>
 
@@ -1611,7 +4322,7 @@ a 32 byte hex string</td>
 
             
 
-            <td class="description last">`Attestation` as expected by the Substrate node</td>
+            <td class="description last"></td>
         </tr>
 
     
@@ -1652,7 +4363,627 @@ a 32 byte hex string</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line256">line 256</a>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line934">line 934</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getNonceForDID"><span class="type-signature">(async) </span>getNonceForDID<span class="signature">(didIdentifier)</span><span class="type-signature"> &rarr; {Promise.&lt;number>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Gets the current nonce for the DID. It will throw error if the DID does not exist on
+chain or chain returns null response.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>didIdentifier</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">DID identifier as hex. Not accepting full DID intentionally for efficiency as these
+methods are used internally</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line925">line 925</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;number></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getOffchainDidDetail"><span class="type-signature">(async) </span>getOffchainDidDetail<span class="signature">(didIdentifier)</span><span class="type-signature"> &rarr; {Promise.&lt;{accountId: HexString}>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Gets the DID detail of an on chain DID
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>didIdentifier</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line893">line 893</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;{accountId: HexString}></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getOnchainDidDetail"><span class="type-signature">(async) </span>getOnchainDidDetail<span class="signature">(didIdentifier)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Gets the DID detail of an on chain DID
+the chain and return them. It will throw NoDID if the DID does not exist on
+chain.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>didIdentifier</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">DID identifier as hex. Not accepting full DID intentionally for efficiency as these
+methods are used internally</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line868">line 868</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;object></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getSerializedAddKeys"><span class="type-signature"></span>getSerializedAddKeys<span class="signature">(addKeys)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Serializes a `AddKeys` for signing.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>addKeys</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">`AddKeys` as expected by the Substrate node</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line1226">line 1226</a>
     </li></ul></dd>
     
 
@@ -1710,7 +5041,166 @@ a 32 byte hex string</td>
     
 
     
-    <h4 class="name" id="getSerializedDIDRemoval"><span class="type-signature"></span>getSerializedDIDRemoval<span class="signature">(didRemoval)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    <h4 class="name" id="getSerializedAttestation"><span class="type-signature"></span>getSerializedAttestation<span class="signature">(setAttestation)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Serializes an `Attestation` for signing.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>setAttestation</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">`SetAttestationClaim` as expected by the Substrate node</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line1268">line 1268</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    An array of Uint8
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getSerializedDidRemoval"><span class="type-signature"></span>getSerializedDidRemoval<span class="signature">(didRemoval)</span><span class="type-signature"> &rarr; {Array}</span></h4>
     
 
     
@@ -1811,7 +5301,7 @@ a 32 byte hex string</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line247">line 247</a>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line1259">line 1259</a>
     </li></ul></dd>
     
 
@@ -1869,7 +5359,7 @@ a 32 byte hex string</td>
     
 
     
-    <h4 class="name" id="getSerializedKeyUpdate"><span class="type-signature"></span>getSerializedKeyUpdate<span class="signature">(keyUpdate)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    <h4 class="name" id="getServiceEndpoint"><span class="type-signature">(async) </span>getServiceEndpoint<span class="signature">(did, endpointId)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -1877,166 +5367,7 @@ a 32 byte hex string</td>
 
 
 <div class="description">
-    Serializes a `KeyUpdate` for signing.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>keyUpdate</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">`KeyUpdate` as expected by the Substrate node</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line238">line 238</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    An array of Uint8
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Array</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="new"><span class="type-signature">(async) </span>new<span class="signature">(did, keyDetail)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Creates a new DID on the Dock chain.
+    Returns the service endpoint of the DID and known by `endpointId`
 </div>
 
 
@@ -2077,33 +5408,23 @@ a 32 byte hex string</td>
 
             <td class="type">
             
-                
-<span class="param-type">string</span>
-
-
-            
             </td>
 
             
 
             
 
-            <td class="description last">The new DID. Can be a full DID or hex identifier</td>
+            <td class="description last"></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>keyDetail</code></td>
+                <td class="name"><code>endpointId</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
             
             </td>
 
@@ -2111,7 +5432,7 @@ a 32 byte hex string</td>
 
             
 
-            <td class="description last">`KeyDetail` as expected by the Substrate node</td>
+            <td class="description last"></td>
         </tr>
 
     
@@ -2152,7 +5473,7 @@ a 32 byte hex string</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line44">line 44</a>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line993">line 993</a>
     </li></ul></dd>
     
 
@@ -2180,10 +5501,6 @@ a 32 byte hex string</td>
 <h5>Returns:</h5>
 
         
-<div class="param-desc">
-    Promise to the pending transaction
-</div>
-
 
 
 <dl>
@@ -2192,7 +5509,7 @@ a 32 byte hex string</td>
     </dt>
     <dd>
         
-<span class="param-type">Promise.&lt;object></span>
+<span class="param-type">Promise</span>
 
 
     </dd>
@@ -2210,7 +5527,7 @@ a 32 byte hex string</td>
     
 
     
-    <h4 class="name" id="remove"><span class="type-signature">(async) </span>remove<span class="signature">(didRemoval, signature)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    <h4 class="name" id="isController"><span class="type-signature">(async) </span>isController<span class="signature">(controlled, controller)</span><span class="type-signature"> &rarr; {Promise.&lt;boolean>}</span></h4>
     
 
     
@@ -2218,7 +5535,7 @@ a 32 byte hex string</td>
 
 
 <div class="description">
-    Removes an already registered DID on the Dock chain.
+    Returns true if DID `controller` is a controller of DID `controlled`, false otherwise
 </div>
 
 
@@ -2254,15 +5571,10 @@ a 32 byte hex string</td>
 
         <tr>
             
-                <td class="name"><code>didRemoval</code></td>
+                <td class="name"><code>controlled</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
             
             </td>
 
@@ -2270,22 +5582,17 @@ a 32 byte hex string</td>
 
             
 
-            <td class="description last">`DidRemoval` as expected by the Substrate node</td>
+            <td class="description last"></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>signature</code></td>
+                <td class="name"><code>controller</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">Signature</span>
-
-
             
             </td>
 
@@ -2293,7 +5600,7 @@ a 32 byte hex string</td>
 
             
 
-            <td class="description last">Signature from existing key</td>
+            <td class="description last"></td>
         </tr>
 
     
@@ -2334,7 +5641,268 @@ a 32 byte hex string</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line84">line 84</a>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line977">line 977</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;boolean></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="new"><span class="type-signature">(async) </span>new<span class="signature">(did, didKeys, controllers, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Creates a new DID on the Dock chain.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>did</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The new DID. Can be a full DID or hex identifier</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>didKeys</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;DidKey></span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Array of `DidKey`s as expected by the Substrate node</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>controllers</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Array of `Did`s as expected by the Substrate node.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line158">line 158</a>
     </li></ul></dd>
     
 
@@ -2392,7 +5960,1908 @@ a 32 byte hex string</td>
     
 
     
-    <h4 class="name" id="setClaim"><span class="type-signature">(async) </span>setClaim<span class="signature">(attester, attestation, signature)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="newOffchain"><span class="type-signature">(async) </span>newOffchain<span class="signature">(did, didDocRef, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Create a new off-chain DID
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>did</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>didDocRef</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Off chain reference for the DID</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line62">line 62</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="remove"><span class="type-signature">(async) </span>remove<span class="signature">(targetDid, signerDid, keyPair, keyId, nonce, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Removes an on-chain DID.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>targetDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The DID being removed</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signerDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The DID that is removing `targetDid` by signing the payload because it controls `targetDid`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Signer's keypair</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
+fetched from chain before creating the transaction</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line624">line 624</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Promise to the pending transaction
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;object></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="removeControllers"><span class="type-signature">(async) </span>removeControllers<span class="signature">(controllers, targetDid, signerDid, keyPair, keyId, nonce, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Remove controllers from a DID
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>controllers</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Controller DIDs to remove.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>targetDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The DID from which controllers are being removed</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signerDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The DID that is removing the controllers by signing the payload because it controls `targetDid`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Signer's keypair</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
+fetched from chain before creating the transaction</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line496">line 496</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="removeControllersTx"><span class="type-signature">(async) </span>removeControllersTx<span class="signature">(controllers, targetDid, signerDid, keyPair, keyId, nonce)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Create transaction to remove controllers from a DID
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>controllers</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Controller DIDs to remove.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>targetDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The DID from which controllers are being removed</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signerDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The DID that is removing the controllers by signing the payload because it controls `targetDid`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Signer's keypair</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
+fetched from chain before creating the transaction</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line462">line 462</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="removeKeys"><span class="type-signature">(async) </span>removeKeys<span class="signature">(keyIds, targetDid, signerDid, keyPair, keyId, nonce, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Remove keys from a DID
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>keyIds</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Key indices to remove</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>targetDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The DID from which keys are being removed</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signerDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The DID that is removing the keys by signing the payload because it controls `targetDid`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Signer's keypair</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
+fetched from chain before creating the transaction</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line430">line 430</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="removeOffchainDid"><span class="type-signature">(async) </span>removeOffchainDid<span class="signature">(did, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Remove off-chain DID
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>did</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line119">line 119</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="removeServiceEndpoint"><span class="type-signature">(async) </span>removeServiceEndpoint<span class="signature">(endpointId, targetDid, signerDid, keyPair, keyId, nonce, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Remove a service endpoint from a DID
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>endpointId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The endpoint to remove</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>targetDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The DID from which endpoint is being removed</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signerDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The DID that is removing the endpoint by signing the payload because it controls `targetDid`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Signer's keypair</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
+fetched from chain before creating the transaction</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line562">line 562</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setClaim"><span class="type-signature">(async) </span>setClaim<span class="signature">(priority, iri, did, keyPair, keyId, nonce, waitForFinalization, params)</span><span class="type-signature"></span></h4>
     
 
     
@@ -2426,6 +7895,8 @@ a 32 byte hex string</td>
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
@@ -2436,69 +7907,178 @@ a 32 byte hex string</td>
 
         <tr>
             
-                <td class="name"><code>attester</code></td>
+                <td class="name"><code>priority</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
             
             </td>
 
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">Attester's DID</td>
+            <td class="description last"></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>attestation</code></td>
+                <td class="name"><code>iri</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
             
             </td>
 
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">Attestation object with priority and iri</td>
+            <td class="description last"></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>signature</code></td>
+                <td class="name"><code>did</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">Signature</span>
-
-
             
             </td>
 
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">Signature from existing key</td>
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
         </tr>
 
     
@@ -2539,7 +8119,7 @@ a 32 byte hex string</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line94">line 94</a>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line684">line 684</a>
     </li></ul></dd>
     
 
@@ -2575,7 +8155,7 @@ a 32 byte hex string</td>
     
 
     
-    <h4 class="name" id="updateKey"><span class="type-signature">(async) </span>updateKey<span class="signature">(keyUpdate, signature)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    <h4 class="name" id="setOffchainDidRef"><span class="type-signature">(async) </span>setOffchainDidRef<span class="signature">(did, didDocRef, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
     
 
     
@@ -2583,7 +8163,7 @@ a 32 byte hex string</td>
 
 
 <div class="description">
-    Updates the details of an already registered DID on the Dock chain.
+    Update the DID Doc reference of the off chain DID
 </div>
 
 
@@ -2609,6 +8189,8 @@ a 32 byte hex string</td>
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
@@ -2619,46 +8201,90 @@ a 32 byte hex string</td>
 
         <tr>
             
-                <td class="name"><code>keyUpdate</code></td>
+                <td class="name"><code>did</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
             
             </td>
 
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">`KeyUpdate` as expected by the Substrate node</td>
+            <td class="description last"></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>signature</code></td>
+                <td class="name"><code>didDocRef</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">Signature</span>
-
-
             
             </td>
 
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">Signature from existing key</td>
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
         </tr>
 
     
@@ -2699,7 +8325,7 @@ a 32 byte hex string</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_did.js.html">modules/did.js</a>, <a href="modules_did.js.html#line64">line 64</a>
+        <a href="modules_did_did.js.html">modules/did/did.js</a>, <a href="modules_did_did.js.html#line89">line 89</a>
     </li></ul></dd>
     
 
@@ -2727,10 +8353,6 @@ a 32 byte hex string</td>
 <h5>Returns:</h5>
 
         
-<div class="param-desc">
-    Promise to the pending transaction
-</div>
-
 
 
 <dl>
@@ -2739,7 +8361,7 @@ a 32 byte hex string</td>
     </dt>
     <dd>
         
-<span class="param-type">Promise.&lt;object></span>
+<span class="param-type">Promise.&lt;*></span>
 
 
     </dd>
@@ -2767,13 +8389,13 @@ a 32 byte hex string</td>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="setApi.html">setApi</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#claimgraphToStore">claimgraphToStore</a></li><li><a href="global.html#createDidAttestation">createDidAttestation</a></li><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createNewPositiveAccumulator">createNewPositiveAccumulator</a></li><li><a href="global.html#createNewUniversalAccumulator">createNewUniversalAccumulator</a></li><li><a href="global.html#createParamsObjFromChainResponse">createParamsObjFromChainResponse</a></li><li><a href="global.html#createPublicKeyObjFromChainResponse">createPublicKeyObjFromChainResponse</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createSignedAttestation">createSignedAttestation</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#dereferenceFromIPFS">dereferenceFromIPFS</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccumulator">getAccumulator</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAllParamsByDid">getAllParamsByDid</a></li><li><a href="global.html#getAllPublicKeysByDid">getAllPublicKeysByDid</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatuses">getCredentialStatuses</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getLastParamsWritten">getLastParamsWritten</a></li><li><a href="global.html#getLastPublicKeyWritten">getLastPublicKeyWritten</a></li><li><a href="global.html#getPublicKey">getPublicKey</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSignatures">getSignatures</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#getUpdatesFromBlock">getUpdatesFromBlock</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#parseEventAsAccumulatorUpdate">parseEventAsAccumulatorUpdate</a></li><li><a href="global.html#parseRDFDocument">parseRDFDocument</a></li><li><a href="global.html#parseRef">parseRef</a></li><li><a href="global.html#prepareAddParameters">prepareAddParameters</a></li><li><a href="global.html#prepareAddPublicKey">prepareAddPublicKey</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#queryNextLookup">queryNextLookup</a></li><li><a href="global.html#removeAccumulator">removeAccumulator</a></li><li><a href="global.html#removeAccumulatorTx">removeAccumulatorTx</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#setAuthor">setAuthor</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#setSignature">setSignature</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signDidAttestation">signDidAttestation</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#signPrehashed">signPrehashed</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toJsonldjsNode">toJsonldjsNode</a></li><li><a href="global.html#toMap">toMap</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#updateAccumulator">updateAccumulator</a></li><li><a href="global.html#updateAccumulatorTx">updateAccumulatorTx</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateAddress">validateAddress</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyEcdsaSecp256k1SigPrehashed">verifyEcdsaSecp256k1SigPrehashed</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#verifySignature">verifySignature</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="NoOffchainDIDError.html">NoOffchainDIDError</a></li><li><a href="NoOnchainDIDError.html">NoOnchainDIDError</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="setApi.html">setApi</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#addParams">addParams</a></li><li><a href="global.html#addPositiveAccumulator">addPositiveAccumulator</a></li><li><a href="global.html#addPublicKey">addPublicKey</a></li><li><a href="global.html#addUniversalAccumulator">addUniversalAccumulator</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#bytesToWrappedBytes">bytesToWrappedBytes</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#claimgraphToStore">claimgraphToStore</a></li><li><a href="global.html#createAddParamsTx">createAddParamsTx</a></li><li><a href="global.html#createAddPositiveAccumulatorTx">createAddPositiveAccumulatorTx</a></li><li><a href="global.html#createAddPublicKeyTx">createAddPublicKeyTx</a></li><li><a href="global.html#createAddUniversalAccumulatorTx">createAddUniversalAccumulatorTx</a></li><li><a href="global.html#createDidKey">createDidKey</a></li><li><a href="global.html#createDidSig">createDidSig</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createParamsObjFromChainResponse">createParamsObjFromChainResponse</a></li><li><a href="global.html#createPublicKeyObjFromChainResponse">createPublicKeyObjFromChainResponse</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createRemovePublicKeyTx">createRemovePublicKeyTx</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#dereferenceFromIPFS">dereferenceFromIPFS</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccumulator">getAccumulator</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAllParamsByDid">getAllParamsByDid</a></li><li><a href="global.html#getAllPublicKeysByDid">getAllPublicKeysByDid</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatuses">getCredentialStatuses</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getLastParamsWritten">getLastParamsWritten</a></li><li><a href="global.html#getNonce">getNonce</a></li><li><a href="global.html#getPublicKey">getPublicKey</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#getUpdatesFromBlock">getUpdatesFromBlock</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#parseEventAsAccumulatorUpdate">parseEventAsAccumulatorUpdate</a></li><li><a href="global.html#parseRDFDocument">parseRDFDocument</a></li><li><a href="global.html#parseRef">parseRef</a></li><li><a href="global.html#prepareAddParameters">prepareAddParameters</a></li><li><a href="global.html#prepareAddPublicKey">prepareAddPublicKey</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#queryNextLookup">queryNextLookup</a></li><li><a href="global.html#removeAccumulator">removeAccumulator</a></li><li><a href="global.html#removeAccumulatorTx">removeAccumulatorTx</a></li><li><a href="global.html#removeParams">removeParams</a></li><li><a href="global.html#removeParamsTx">removeParamsTx</a></li><li><a href="global.html#removePublicKey">removePublicKey</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signPrehashed">signPrehashed</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toJsonldjsNode">toJsonldjsNode</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#updateAccumulator">updateAccumulator</a></li><li><a href="global.html#updateAccumulatorTx">updateAccumulatorTx</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateAddress">validateAddress</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyEcdsaSecp256k1SigPrehashed">verifyEcdsaSecp256k1SigPrehashed</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#verifySignature">verifySignature</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Fri Jun 24 2022 18:35:59 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Fri Jul 22 2022 22:38:14 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

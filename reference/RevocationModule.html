@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>RevocationModule<span class="signature">(api)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>RevocationModule<span class="signature">(api, signAndSend)</span><span class="type-signature"></span></h2>
         
             <div class="class-description">Class to create, update and destroy revocations</div>
         
@@ -45,7 +45,7 @@
     
 
     
-    <h4 class="name" id="RevocationModule"><span class="type-signature"></span>new RevocationModule<span class="signature">(api)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="RevocationModule"><span class="type-signature"></span>new RevocationModule<span class="signature">(api, signAndSend)</span><span class="type-signature"></span></h4>
     
 
     
@@ -109,6 +109,24 @@
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>signAndSend</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -146,7 +164,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line9">line 9</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line10">line 10</a>
     </li></ul></dd>
     
 
@@ -349,7 +367,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line28">line 28</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line30">line 30</a>
     </li></ul></dd>
     
 
@@ -407,7 +425,7 @@
     
 
     
-    <h4 class="name" id="createRemoveRegistryTx"><span class="type-signature"></span>createRemoveRegistryTx<span class="signature">(registryID, lastModified, didKeys)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    <h4 class="name" id="createRemoveRegistryTx"><span class="type-signature"></span>createRemoveRegistryTx<span class="signature">(removal, didSigs)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
     
 
     
@@ -415,7 +433,7 @@
 
 
 <div class="description">
-    Deleting revocation registry
+    Create a transaction to remove a revocation registry
 </div>
 
 
@@ -451,15 +469,10 @@
 
         <tr>
             
-                <td class="name"><code>registryID</code></td>
+                <td class="name"><code>removal</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
             
             </td>
 
@@ -467,22 +480,17 @@
 
             
 
-            <td class="description last">contains the registry to remove</td>
+            <td class="description last">The payload to remove the registry</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>lastModified</code></td>
+                <td class="name"><code>didSigs</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
             
             </td>
 
@@ -490,30 +498,8 @@
 
             
 
-            <td class="description last">contains the registry to remove</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>didKeys</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">DidKeys</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The did key set used for generating proof</td>
+            <td class="description last">Array of pairs with each pair of the form `[DidSig, nonce]` where `nonce` is the nonce used while
+signing the payload</td>
         </tr>
 
     
@@ -554,7 +540,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line53">line 53</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line61">line 61</a>
     </li></ul></dd>
     
 
@@ -612,7 +598,7 @@
     
 
     
-    <h4 class="name" id="createRevokeTx"><span class="type-signature"></span>createRevokeTx<span class="signature">(registryID, revokeIds, lastModified, didKeys)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    <h4 class="name" id="createRevokeTx"><span class="type-signature"></span>createRevokeTx<span class="signature">(revoke, didSigs)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
     
 
     
@@ -620,7 +606,7 @@
 
 
 <div class="description">
-    Revoke credentials
+    Create transaction to revoke credentials
 </div>
 
 
@@ -656,465 +642,7 @@
 
         <tr>
             
-                <td class="name"><code>registryID</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">contains the registry to remove</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>revokeIds</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Set</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">revoke id list</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>lastModified</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">contains the registry to remove</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>didKeys</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">DidKeys</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The did key set used for generating proof</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line83">line 83</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    The extrinsic to sign and send.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Promise.&lt;object></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="createUnrevokeTx"><span class="type-signature"></span>createUnrevokeTx<span class="signature">(registryID, revokeIds, lastModified, didKeys)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Unrevoke credentials
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>registryID</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">contains the registry to remove</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>revokeIds</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Set</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">revoke id list</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>lastModified</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">contains the registry to remove</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>didKeys</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">DidKeys</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The did key set used for generating proof</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line115">line 115</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    The extrinsic to sign and send.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Promise.&lt;object></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getBlockNoForLastChangeToRegistry"><span class="type-signature">(async) </span>getBlockNoForLastChangeToRegistry<span class="signature">(registryId)</span><span class="type-signature"> &rarr; {Promise.&lt;(*|number)>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Gets the block number in which the registry was last modified in the chain
-and return it. Throws error if the registry with given id does not exist on
-chain or chain returns null response.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>registryId</code></td>
+                <td class="name"><code>revoke</code></td>
             
 
             <td class="type">
@@ -1129,6 +657,25 @@ chain or chain returns null response.
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>didSigs</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Array of pairs with each pair of the form `[DidSig, nonce]` where `nonce` is the nonce used while
+signing the payload</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -1166,7 +713,7 @@ chain or chain returns null response.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line190">line 190</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line85">line 85</a>
     </li></ul></dd>
     
 
@@ -1194,6 +741,10 @@ chain or chain returns null response.
 <h5>Returns:</h5>
 
         
+<div class="param-desc">
+    The extrinsic to sign and send.
+</div>
+
 
 
 <dl>
@@ -1202,7 +753,180 @@ chain or chain returns null response.
     </dt>
     <dd>
         
-<span class="param-type">Promise.&lt;(*|number)></span>
+<span class="param-type">Promise.&lt;object></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createUnrevokeTx"><span class="type-signature"></span>createUnrevokeTx<span class="signature">(unrevoke, didSigs)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Create transaction to unrevoke credentials
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>unrevoke</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>didSigs</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Array of pairs with each pair of the form `[DidSig, nonce]` where `nonce` is the nonce used while
+signing the payload</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line108">line 108</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The extrinsic to sign and send.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;object></span>
 
 
     </dd>
@@ -1344,7 +1068,7 @@ chain or chain returns null response.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line178">line 178</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line146">line 146</a>
     </li></ul></dd>
     
 
@@ -1402,157 +1126,6 @@ chain or chain returns null response.
     
 
     
-    <h4 class="name" id="getRegistryDetail"><span class="type-signature">(async) </span>getRegistryDetail<span class="signature">(registryID)</span><span class="type-signature"> &rarr; {Promise.&lt;array>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Get detail of the registry. Its a 2 element array where the first element is the registry's policy and add_only
-status and second is the block number where the registry was last modified.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>registryID</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line156">line 156</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Promise.&lt;array></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id="getRevocationRegistry"><span class="type-signature">(async) </span>getRevocationRegistry<span class="signature">(registryID)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
@@ -1561,8 +1134,8 @@ status and second is the block number where the registry was last modified.
 
 
 <div class="description">
-    The read-only call get_revocation_registry is used to get data of the revocation registry like controllers, policy and type.
-If the registry is not present, None is returned.
+    Get data of the revocation registry like controllers, policy and type.
+If the registry is not present, error is thrown.
 </div>
 
 
@@ -1655,7 +1228,7 @@ If the registry is not present, None is returned.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line145">line 145</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line131">line 131</a>
     </li></ul></dd>
     
 
@@ -1814,7 +1387,7 @@ If the registry is not present, None is returned.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line257">line 257</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line255">line 255</a>
     </li></ul></dd>
     
 
@@ -1973,7 +1546,7 @@ If the registry is not present, None is returned.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line239">line 239</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line237">line 237</a>
     </li></ul></dd>
     
 
@@ -2132,7 +1705,7 @@ If the registry is not present, None is returned.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line248">line 248</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line246">line 246</a>
     </li></ul></dd>
     
 
@@ -2190,7 +1763,7 @@ If the registry is not present, None is returned.
     
 
     
-    <h4 class="name" id="newRegistry"><span class="type-signature">(async) </span>newRegistry<span class="signature">(id, policy, addOnly)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    <h4 class="name" id="newRegistry"><span class="type-signature">(async) </span>newRegistry<span class="signature">(id, policy, addOnly, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
     
 
     
@@ -2224,6 +1797,8 @@ If the registry is not present, None is returned.
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
@@ -2249,6 +1824,10 @@ If the registry is not present, None is returned.
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">is the unique id of the registry. The function will check whether `id` is already taken or not.</td>
         </tr>
@@ -2271,6 +1850,10 @@ If the registry is not present, None is returned.
 
             
 
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">The registry policy</td>
@@ -2295,8 +1878,58 @@ If the registry is not present, None is returned.
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">true: credentials can be revoked, but not un-revoked, false: credentials can be revoked and un-revoked</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
         </tr>
 
     
@@ -2337,7 +1970,7 @@ If the registry is not present, None is returned.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line42">line 42</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line50">line 50</a>
     </li></ul></dd>
     
 
@@ -2395,7 +2028,7 @@ If the registry is not present, None is returned.
     
 
     
-    <h4 class="name" id="removeRegistry"><span class="type-signature">(async) </span>removeRegistry<span class="signature">(registryID, lastModified, didKeys)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    <h4 class="name" id="removeRegistry"><span class="type-signature">(async) </span>removeRegistry<span class="signature">(removal, didSigs, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
     
 
     
@@ -2403,7 +2036,7 @@ If the registry is not present, None is returned.
 
 
 <div class="description">
-    Deleting revocation registry
+    Remove a revocation registry
 </div>
 
 
@@ -2429,6 +2062,8 @@ If the registry is not present, None is returned.
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
@@ -2439,69 +2074,91 @@ If the registry is not present, None is returned.
 
         <tr>
             
-                <td class="name"><code>registryID</code></td>
+                <td class="name"><code>removal</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
             
             </td>
 
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">contains the registry to remove</td>
+            <td class="description last"></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>lastModified</code></td>
+                <td class="name"><code>didSigs</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
             
             </td>
 
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">contains the registry to remove</td>
+            <td class="description last">Array of pairs with each pair of the form `[DidSig, nonce]` where `nonce` is the nonce used while
+signing the payload</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>didKeys</code></td>
+                <td class="name"><code>waitForFinalization</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">DidKeys</span>
-
-
             
             </td>
 
             
 
             
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
 
-            <td class="description last">The did key set used for generating proof</td>
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
         </tr>
 
     
@@ -2542,7 +2199,7 @@ If the registry is not present, None is returned.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line71">line 71</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line74">line 74</a>
     </li></ul></dd>
     
 
@@ -2600,7 +2257,7 @@ If the registry is not present, None is returned.
     
 
     
-    <h4 class="name" id="revoke"><span class="type-signature">(async) </span>revoke<span class="signature">(registryID, revokeIds, lastModified, didKeys)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    <h4 class="name" id="revoke"><span class="type-signature">(async) </span>revoke<span class="signature">(revoke, didSigs, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
     
 
     
@@ -2634,6 +2291,8 @@ If the registry is not present, None is returned.
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
@@ -2644,92 +2303,90 @@ If the registry is not present, None is returned.
 
         <tr>
             
-                <td class="name"><code>registryID</code></td>
+                <td class="name"><code>revoke</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
             
             </td>
 
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">contains the registry to remove</td>
+            <td class="description last"></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>revokeIds</code></td>
+                <td class="name"><code>didSigs</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">Set</span>
-
-
             
             </td>
 
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">revoke id list</td>
+            <td class="description last"></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>lastModified</code></td>
+                <td class="name"><code>waitForFinalization</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
             
             </td>
 
             
 
             
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
 
-            <td class="description last">contains the registry to remove</td>
+            <td class="description last"></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>didKeys</code></td>
+                <td class="name"><code>params</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">DidKeys</span>
-
-
             
             </td>
 
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">The did key set used for generating proof</td>
+            <td class="description last"></td>
         </tr>
 
     
@@ -2770,7 +2427,7 @@ If the registry is not present, None is returned.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line103">line 103</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line97">line 97</a>
     </li></ul></dd>
     
 
@@ -2828,7 +2485,7 @@ If the registry is not present, None is returned.
     
 
     
-    <h4 class="name" id="revokeCredential"><span class="type-signature">(async) </span>revokeCredential<span class="signature">(didKeys, registryId, revId)</span><span class="type-signature"> &rarr; {Promise.&lt;void>}</span></h4>
+    <h4 class="name" id="revokeCredentialWithOneOfPolicy"><span class="type-signature">(async) </span>revokeCredentialWithOneOfPolicy<span class="signature">(registryId, revId, did, keyPair, keyId, nonce, didModule, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;void>}</span></h4>
     
 
     
@@ -2837,7 +2494,7 @@ If the registry is not present, None is returned.
 
 <div class="description">
     TODO: Use the spread operator to accept multiple revocation ids
-Revoke a single credential
+Revoke a single credential. Works only with registries having `OneOf` policy
 </div>
 
 
@@ -2869,29 +2526,6 @@ Revoke a single credential
     </thead>
 
     <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>didKeys</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">DidKeys</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The map of DID and keypair to sign the update</td>
-        </tr>
-
     
 
         <tr>
@@ -2929,6 +2563,132 @@ Revoke a single credential
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>did</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>didModule</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -2966,7 +2726,7 @@ Revoke a single credential
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line218">line 218</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line165">line 165</a>
     </li></ul></dd>
     
 
@@ -3020,7 +2780,7 @@ Revoke a single credential
     
 
     
-    <h4 class="name" id="unrevoke"><span class="type-signature">(async) </span>unrevoke<span class="signature">(registryID, revokeIds, lastModified, didKeys)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    <h4 class="name" id="unrevoke"><span class="type-signature">(async) </span>unrevoke<span class="signature">(unrevoke, didSigs, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
     
 
     
@@ -3054,6 +2814,8 @@ Revoke a single credential
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
@@ -3064,92 +2826,91 @@ Revoke a single credential
 
         <tr>
             
-                <td class="name"><code>registryID</code></td>
+                <td class="name"><code>unrevoke</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
             
             </td>
 
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">contains the registry to remove</td>
+            <td class="description last"></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>revokeIds</code></td>
+                <td class="name"><code>didSigs</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">Set</span>
-
-
             
             </td>
 
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">revoke id list</td>
+            <td class="description last">Array of pairs with each pair of the form `[DidSig, nonce]` where `nonce` is the nonce used while
+signing the payload</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>lastModified</code></td>
+                <td class="name"><code>waitForFinalization</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
             
             </td>
 
             
 
             
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
 
-            <td class="description last">contains the registry to remove</td>
+            <td class="description last"></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>didKeys</code></td>
+                <td class="name"><code>params</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">DidKeys</span>
-
-
             
             </td>
 
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">The did key set used for generating proof</td>
+            <td class="description last"></td>
         </tr>
 
     
@@ -3190,7 +2951,7 @@ Revoke a single credential
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line135">line 135</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line121">line 121</a>
     </li></ul></dd>
     
 
@@ -3248,7 +3009,7 @@ Revoke a single credential
     
 
     
-    <h4 class="name" id="unrevokeCredential"><span class="type-signature">(async) </span>unrevokeCredential<span class="signature">(didKeys, registryId, revId)</span><span class="type-signature"> &rarr; {Promise.&lt;void>}</span></h4>
+    <h4 class="name" id="unrevokeCredentialWithOneOfPolicy"><span class="type-signature">(async) </span>unrevokeCredentialWithOneOfPolicy<span class="signature">(registryId, revId, did, keyPair, keyId, nonce, didModule, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;Object>}</span></h4>
     
 
     
@@ -3256,8 +3017,7 @@ Revoke a single credential
 
 
 <div class="description">
-    TODO: Use the spread operator to accept multiple revocation ids
-Unrevoke a single credential
+    Unrevoke a single credential. Works only with registries having `OneOf` policy
 </div>
 
 
@@ -3293,29 +3053,6 @@ Unrevoke a single credential
 
         <tr>
             
-                <td class="name"><code>didKeys</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">DidKeys</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The map of DID and keypair to sign the update</td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>registryId</code></td>
             
 
@@ -3327,7 +3064,7 @@ Unrevoke a single credential
 
             
 
-            <td class="description last">The registry id being updated</td>
+            <td class="description last"></td>
         </tr>
 
     
@@ -3345,7 +3082,133 @@ Unrevoke a single credential
 
             
 
-            <td class="description last">The revocation id that is being unrevoked</td>
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>did</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nonce</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>didModule</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
         </tr>
 
     
@@ -3386,7 +3249,7 @@ Unrevoke a single credential
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line230">line 230</a>
+        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line183">line 183</a>
     </li></ul></dd>
     
 
@@ -3422,232 +3285,7 @@ Unrevoke a single credential
     </dt>
     <dd>
         
-<span class="param-type">Promise.&lt;void></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="updateRevReg"><span class="type-signature">(async) </span>updateRevReg<span class="signature">(updateFunc, didKeys, registryId, revId)</span><span class="type-signature"> &rarr; {Promise.&lt;void>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Internal helper to avoid code duplication while updating the revocation registry by revoking or unrevoking a credential.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>updateFunc</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">A function that's called in the context of `dockAPI.revocation` to send an extrinsic. Is either
-`dockAPI.revocation.revoke` or `dockAPI.revocation.unrevoke`</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>didKeys</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">DidKeys</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The map of DID and keypair to sign the update</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>registryId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The registry id being updated</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>revId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The revocation id being revoked or unrevoked</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_revocation.js.html">modules/revocation.js</a>, <a href="modules_revocation.js.html#line203">line 203</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Promise.&lt;void></span>
+<span class="param-type">Promise.&lt;Object></span>
 
 
     </dd>
@@ -3675,13 +3313,13 @@ Unrevoke a single credential
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="setApi.html">setApi</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#claimgraphToStore">claimgraphToStore</a></li><li><a href="global.html#createDidAttestation">createDidAttestation</a></li><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createNewPositiveAccumulator">createNewPositiveAccumulator</a></li><li><a href="global.html#createNewUniversalAccumulator">createNewUniversalAccumulator</a></li><li><a href="global.html#createParamsObjFromChainResponse">createParamsObjFromChainResponse</a></li><li><a href="global.html#createPublicKeyObjFromChainResponse">createPublicKeyObjFromChainResponse</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createSignedAttestation">createSignedAttestation</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#dereferenceFromIPFS">dereferenceFromIPFS</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccumulator">getAccumulator</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAllParamsByDid">getAllParamsByDid</a></li><li><a href="global.html#getAllPublicKeysByDid">getAllPublicKeysByDid</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatuses">getCredentialStatuses</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getLastParamsWritten">getLastParamsWritten</a></li><li><a href="global.html#getLastPublicKeyWritten">getLastPublicKeyWritten</a></li><li><a href="global.html#getPublicKey">getPublicKey</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSignatures">getSignatures</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#getUpdatesFromBlock">getUpdatesFromBlock</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#parseEventAsAccumulatorUpdate">parseEventAsAccumulatorUpdate</a></li><li><a href="global.html#parseRDFDocument">parseRDFDocument</a></li><li><a href="global.html#parseRef">parseRef</a></li><li><a href="global.html#prepareAddParameters">prepareAddParameters</a></li><li><a href="global.html#prepareAddPublicKey">prepareAddPublicKey</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#queryNextLookup">queryNextLookup</a></li><li><a href="global.html#removeAccumulator">removeAccumulator</a></li><li><a href="global.html#removeAccumulatorTx">removeAccumulatorTx</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#setAuthor">setAuthor</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#setSignature">setSignature</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signDidAttestation">signDidAttestation</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#signPrehashed">signPrehashed</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toJsonldjsNode">toJsonldjsNode</a></li><li><a href="global.html#toMap">toMap</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#updateAccumulator">updateAccumulator</a></li><li><a href="global.html#updateAccumulatorTx">updateAccumulatorTx</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateAddress">validateAddress</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyEcdsaSecp256k1SigPrehashed">verifyEcdsaSecp256k1SigPrehashed</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#verifySignature">verifySignature</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="NoOffchainDIDError.html">NoOffchainDIDError</a></li><li><a href="NoOnchainDIDError.html">NoOnchainDIDError</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="setApi.html">setApi</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#addParams">addParams</a></li><li><a href="global.html#addPositiveAccumulator">addPositiveAccumulator</a></li><li><a href="global.html#addPublicKey">addPublicKey</a></li><li><a href="global.html#addUniversalAccumulator">addUniversalAccumulator</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#bytesToWrappedBytes">bytesToWrappedBytes</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#claimgraphToStore">claimgraphToStore</a></li><li><a href="global.html#createAddParamsTx">createAddParamsTx</a></li><li><a href="global.html#createAddPositiveAccumulatorTx">createAddPositiveAccumulatorTx</a></li><li><a href="global.html#createAddPublicKeyTx">createAddPublicKeyTx</a></li><li><a href="global.html#createAddUniversalAccumulatorTx">createAddUniversalAccumulatorTx</a></li><li><a href="global.html#createDidKey">createDidKey</a></li><li><a href="global.html#createDidSig">createDidSig</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createParamsObjFromChainResponse">createParamsObjFromChainResponse</a></li><li><a href="global.html#createPublicKeyObjFromChainResponse">createPublicKeyObjFromChainResponse</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createRemovePublicKeyTx">createRemovePublicKeyTx</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#dereferenceFromIPFS">dereferenceFromIPFS</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccumulator">getAccumulator</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAllParamsByDid">getAllParamsByDid</a></li><li><a href="global.html#getAllPublicKeysByDid">getAllPublicKeysByDid</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatuses">getCredentialStatuses</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getLastParamsWritten">getLastParamsWritten</a></li><li><a href="global.html#getNonce">getNonce</a></li><li><a href="global.html#getPublicKey">getPublicKey</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#getUpdatesFromBlock">getUpdatesFromBlock</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#parseEventAsAccumulatorUpdate">parseEventAsAccumulatorUpdate</a></li><li><a href="global.html#parseRDFDocument">parseRDFDocument</a></li><li><a href="global.html#parseRef">parseRef</a></li><li><a href="global.html#prepareAddParameters">prepareAddParameters</a></li><li><a href="global.html#prepareAddPublicKey">prepareAddPublicKey</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#queryNextLookup">queryNextLookup</a></li><li><a href="global.html#removeAccumulator">removeAccumulator</a></li><li><a href="global.html#removeAccumulatorTx">removeAccumulatorTx</a></li><li><a href="global.html#removeParams">removeParams</a></li><li><a href="global.html#removeParamsTx">removeParamsTx</a></li><li><a href="global.html#removePublicKey">removePublicKey</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signPrehashed">signPrehashed</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toJsonldjsNode">toJsonldjsNode</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#updateAccumulator">updateAccumulator</a></li><li><a href="global.html#updateAccumulatorTx">updateAccumulatorTx</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateAddress">validateAddress</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyEcdsaSecp256k1SigPrehashed">verifyEcdsaSecp256k1SigPrehashed</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#verifySignature">verifySignature</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Fri Jun 24 2022 18:35:59 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Fri Jul 22 2022 22:38:14 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

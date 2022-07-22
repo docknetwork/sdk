@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: signatures/signature-secp256k1.js</title>
+    <title>JSDoc: Source: public-keys/public-key-x25519.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: signatures/signature-secp256k1.js</h1>
+    <h1 class="page-title">Source: public-keys/public-key-x25519.js</h1>
 
     
 
@@ -26,56 +26,21 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import { sha256 } from 'js-sha256';
-import Signature from './signature';
+            <pre class="prettyprint source linenums"><code>import PublicKey from './public-key';
 
-/** Class representing a Secp256k1 Signature */
-export default class SignatureSecp256k1 extends Signature {
-  /**
-   * Generate an Ecdsa signature over Secp256k1 curve using elliptic library
-   * @param {array} message - The message to sign as bytearray. Its assumed that the message is not hashed already
-   * and hashed before signing
-   * @param {object} signingPair -The pair from elliptic containing the signing key
-   */
-  constructor(message, signingPair) {
-    super();
-    // Hash the message before signing
-    const hash = sha256.digest(message);
-    this.value = this.signPrehashed(hash, signingPair);
+/** Class representing a X25519 PublicKey */
+export default class PublicKeyX25519 extends PublicKey {
+  constructor(value) {
+    super(value, 32);
   }
 
   /**
-   * Create SignatureSecp256k1 from given hex string
-   * @param {string} value - Hex string
-   * @returns {Signature}
-   */
-  fromHex(value) {
-    return super.fromHex(value, 65);
-  }
-
-  /**
-   * @return {Object} The DidSignature JSON variant Secp256k1.
+   * @return {Object} The PublicKey JSON variant X25519.
    */
   toJSON() {
     return {
-      Secp256k1: this.value,
+      X25519: this.value,
     };
-  }
-
-  /**
-   * Sign an already hashed message
-   * @param messageHash - Hash of the message
-   * @param signingPair
-   * @returns {string}
-   */
-  signPrehashed(messageHash, signingPair) {
-    const sig = signingPair.sign(messageHash, { canonical: true });
-    // The signature is recoverable in 65-byte { R | S | index } format
-    const r = sig.r.toString('hex', 32);
-    const s = sig.s.toString('hex', 32);
-    const i = sig.recoveryParam.toString(16).padStart(2, '0');
-    // Make it proper hex
-    return `0x${r}${s}${i}`;
   }
 }
 </code></pre>

@@ -165,15 +165,13 @@ important before diving into Schemas.</p>
 <h3 id="writing-a-blob"><a class="header" href="#writing-a-blob">Writing a Blob</a></h3>
 <p>A new Blob can be registered on the Dock Chain by using the method <code>writeToChain</code> in the BlobModule class.
 It accepts a <code>blob</code> object with the struct to store on chain (it can either be a hex string or a byte array), and one of <code>keyPair</code> (a
-keyPair to sign the extrinsic with) or a <code>signature</code> (if you prefer to sign the extrinsic offline). In return you'll get
-a signed extrinsic that you can send to the Dock chain:</p>
+keyPair to sign the payload with). You'll get a signed extrinsic that you can send to the Dock chain:</p>
 <pre><code class="language-javascript">const blobId = randomAsHex(DockBlobIdByteSize); // 32-bytes long hex string to use as the blob's id
 const blobStruct = {
   id: blobId,
   blob: blobHexOrArray,  // Contents of your blob as a hex string or byte array
-  author: '0x...',       // hex part of a dock DID
 }
-const result = await dock.blob.writeToChain( blobStruct, keyPair);
+const result = await dock.blob.new(blobStruct, signerDid, keyPair, 1, { didModule: dock.didModule });
 </code></pre>
 <p>If everything worked properly <code>result</code> will indicate a successful transaction.
 We'll see how to retrieve the blob next.</p>
@@ -230,33 +228,6 @@ checked to be a valid JSON schema before being added):</p>
 &gt;   myNewSchema.schema === someNewJSONSchema
 &lt;-  true
 </code></pre>
-<h4 id="setting-an-author"><a class="header" href="#setting-an-author">Setting an author</a></h4>
-<p>An author can be added with the <code>setAuthor</code> method. It accepts a single string argument <code>did</code> (which can be a DID's hex
-identifier or a fully-quailified DID):</p>
-<pre><code class="language-javascript">&gt;   const exampleAuthor = 'did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW';
-&gt;   myNewSchema.setAuthor(exampleAuthor)
-&gt;   myNewSchema.author === exampleAuthor
-&lt;-  true
-</code></pre>
-<h4 id="signing-a-schema"><a class="header" href="#signing-a-schema">Signing a schema</a></h4>
-<p>Signing a schema can be achieved by calling the <code>sign</code> method. It accepts a <code>keypair</code> param (a keyPair to sign with)
-and a <code>blobModule</code> object:</p>
-<pre><code class="language-javascript">&gt;   const keyring = new Keyring();
-&gt;   const keypair = keyring.addFromUri(randomAsHex(32), null, 'sr25519');
-&gt;   myNewSchema.sign(keypair, dockApi.blob)
-&gt;   !!myNewSchema.signature
-&lt;-  true
-</code></pre>
-<h4 id="setting-a-signature-manually"><a class="header" href="#setting-a-signature-manually">Setting a signature manually</a></h4>
-<p>A signature can also be manually added with the <code>setSignature</code> method. It accepts a single argument <code>signature</code> (an instance
-of <code>Signature</code>):</p>
-<pre><code class="language-javascript">&gt;   const keyring = new Keyring();
-&gt;   const keypair = keyring.addFromUri(randomAsHex(32), null, 'sr25519');
-&gt;   const sig = new SignatureSr25519(msg, keypair);
-&gt;   myNewSchema.setSignature(sig)
-&gt;   myNewSchema.signature === sig
-&lt;-  true
-</code></pre>
 <h4 id="formatting-for-storage"><a class="header" href="#formatting-for-storage">Formatting for storage</a></h4>
 <p>Your new schema is now ready to be written to the Dock chain, the last step is to format it properly for the BlobModule
 to be able to use it. That's where the <code>toBlob</code> method comes in handy:</p>
@@ -264,14 +235,12 @@ to be able to use it. That's where the <code>toBlob</code> method comes in handy
 &lt;-  {
       id: ...,
       blob: ...,
-      author: ...,
     }
 </code></pre>
 <h3 id="writing-a-schema-to-the-dock-chain"><a class="header" href="#writing-a-schema-to-the-dock-chain">Writing a Schema to the Dock chain</a></h3>
-<p>Writing a Schema to the Dock chain is similar to writing any other Blob. Once you've created your new schema following
-the steps above you can use the <code>BlobModule</code> methods to interact with the chain:</p>
+<p>Writing a Schema to the Dock chain is similar to writing any other Blob. <code>1</code> is the key id for the on-chain public key corresponding to <code>keyPair</code></p>
 <pre><code class="language-javascript">&gt;  const formattedBlob = myNewSchema.toBlob(dockDID);
-&gt;  await dock.blob.writeToChain(formattedBlob, keyPair);
+&gt;  await myNewSchema.writeToChain(dock, dockDID, keyPair, 1);
 </code></pre>
 <h3 id="reading-a-schema-from-the-dock-chain"><a class="header" href="#reading-a-schema-from-the-dock-chain">Reading a Schema from the Dock chain</a></h3>
 <p>Reading a Schema from the Dock chain can easily be achieved by using the <code>get</code> method from the <code>Schema</code> class.

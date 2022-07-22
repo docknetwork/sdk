@@ -29,20 +29,19 @@
             <pre class="prettyprint source linenums"><code>// This file will be turned to a folder and will have files like `did/dock.js` and `did/ethr.js`
 
 // Import some utils from Polkadot JS
+// eslint-disable-next-line max-classes-per-file
 import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
-
-import { getSignatureFromKeyringPair } from './misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from './codec';
 
 import { Signature } from '../signatures'; // eslint-disable-line
-import { PublicKey } from '../public-keys'; // eslint-disable-line
+import { PublicKey, VerificationRelationship } from '../public-keys'; // eslint-disable-line
 
 export const DockDIDMethod = 'dock';
 export const DockDIDQualifier = `did:${DockDIDMethod}:`;
 export const DockDIDByteSize = 32;
 
 /**
- * Error thrown when a DID document lookup was successful, but the did in question does not exist.
+ * Error thrown when a DID document lookup was successful, but the DID in question does not exist.
  * This is different from a network error.
  */
 export class NoDIDError extends Error {
@@ -50,6 +49,31 @@ export class NoDIDError extends Error {
     super(`DID (${did}) does not exist`);
     this.name = 'NoDIDError';
     this.did = did;
+    this.message = 'A DID document lookup was successful, but the DID in question does not exist. This is different from a network error.';
+  }
+}
+
+/**
+ * Error thrown when a DID exists on chain but is an off-chain DID, meaning the DID document exists off-chain.
+ */
+export class NoOnchainDIDError extends Error {
+  constructor(did) {
+    super(`DID (${did}) is an off-chain DID`);
+    this.name = 'NoOnchainDIDError';
+    this.did = did;
+    this.message = 'The DID exists on chain but is an off-chain DID, meaning the DID document exists off-chain.';
+  }
+}
+
+/**
+ * Error thrown when a DID exists on chain and is an on-chain DID but the lookup was performed for an off-chain DID.
+ */
+export class NoOffchainDIDError extends Error {
+  constructor(did) {
+    super(`DID (${did}) is an on-chain DID`);
+    this.name = 'NoOffchainDIDError';
+    this.did = did;
+    this.message = 'The DID exists on chain and is an on-chain DID but the lookup was performed for an off-chain DID.';
   }
 }
 
@@ -109,149 +133,30 @@ export function createNewDockDID() {
 }
 
 /**
- * Returns a `KeyDetail` as expected by the Substrate node
+ * Returns a `DidKey` as expected by the Substrate node
  * @param {PublicKey} publicKey - The public key for the DID. The Keyring is intentionally avoided here as it may not be
  * accessible always, like in case of hardware wallet
- * @param {string} controller - Full DID or hex identifier of the controller of the public key
+ * @param {VerificationRelationship} verRel
  * @returns {object} - The object has structure and keys with same names as expected by the Substrate node
  */
-export function createKeyDetail(publicKey, controller) {
+export function createDidKey(publicKey, verRel) {
   return {
-    public_key: publicKey.toJSON(),
-    controller: getHexIdentifierFromDID(controller),
+    publicKey: publicKey.toJSON(),
+    verRels: verRel.value,
   };
 }
 
-// TODO: all methods using (@param {object} didModule) should be moved into dock.sdk class
-
 /**
- * Create and return a `KeyUpdate` as expected by the Substrate node. Signing is intentionally kept separate as the
- * JS code may not have access to the signing key like in case of hardware wallet.
- * @param {object} didModule - The did module
- * @param {string} did - Full DID or hex identifier to update
- * @param {PublicKey} newPublicKey - The new public key for the DID. The
- * @param {string} [newController] - Full DID or hex identifier of the controller of the public key. Is optional and must
- * only be passed when controller is to be updated.
- * @returns {Promise&lt;object>} The object has structure and keys with same names as expected by the Substrate node
+ *
+ * @param {string} did - DID as hex
+ * @param {number} keyId -
+ * @param {Signature} sig
+ * @returns {{sig: *, keyId, did}}
  */
-export async function createKeyUpdate(didModule, did, newPublicKey, newController) {
-  const hexId = getHexIdentifierFromDID(did);
-  const keyUpdate = {
-    did: hexId,
-    public_key: newPublicKey.toJSON(),
-    last_modified_in_block: await didModule.getBlockNoForLastChangeToDID(hexId),
-  };
-  if (newController) {
-    keyUpdate.controller = getHexIdentifierFromDID(newController);
-  }
-  return keyUpdate;
-}
-
-/** Sign the given `KeyUpdate` and returns the signature
- * @param {object} didModule - The did module
- * @param {object} keyUpdate - `KeyUpdate` as expected by the Substrate node
- * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
- * @returns {Signature}
- */
-export function signKeyUpdate(didModule, keyUpdate, currentKeyPair) {
-  const serializedKeyUpdate = didModule.getSerializedKeyUpdate(keyUpdate);
-  return getSignatureFromKeyringPair(currentKeyPair, serializedKeyUpdate);
-}
-
-/**
- * Create a `KeyUpdate` as expected by the Substrate node and signs it. Return the `KeyUpdate` object and the signature
- * @param {object} didModule - The did module
- * @param {string} did - Full DID or hex identifier to update
- * @param {PublicKey} newPublicKey - The new public key for the DID
- * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
- * * @param {string} [newController] - Full DID or hex identifier of the controller of the public. Is optional and must
- * only be passed when controller is to be updated
- * @returns {Promise&lt;array>} A 2 element array where the first element is the `KeyUpdate` and the second is the signature
- */
-export async function createSignedKeyUpdate(didModule, did, newPublicKey, currentKeyPair, newController) {
-  const keyUpdate = await createKeyUpdate(didModule, did, newPublicKey, newController);
-  const signature = signKeyUpdate(didModule, keyUpdate, currentKeyPair);
-  return [keyUpdate, signature];
-}
-
-/**
- * Create and return a `DidRemoval` as expected by the Substrate node. Signing is intentionally kept separate as the
- * JS code may not have access to the signing key like in case of hardware wallet.
- * @param {module} didModule - The did module
- * @param {string} did - Full DID or hex identifier to update
- * @returns {Promise&lt;object>} The object has structure and keys with same names as expected by the Substrate node
- */
-export async function createDidRemoval(didModule, did) {
-  const hexId = getHexIdentifierFromDID(did);
+export function createDidSig(did, keyId = 1, sig) {
   return {
-    did: hexId,
-    last_modified_in_block: await didModule.getBlockNoForLastChangeToDID(hexId),
+    did, keyId, sig: sig.toJSON(),
   };
-}
-
-/**
- * Sign the given `DidRemoval` and returns the signature
- * @param {module} didModule - The did module
- * @param {object} didRemoval - `DidRemoval` as expected by the Substrate node
- * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
- * @returns {Signature}
- */
-export function signDidRemoval(didModule, didRemoval, currentKeyPair) {
-  const serializedDIDRemoval = didModule.getSerializedDIDRemoval(didRemoval);
-  return getSignatureFromKeyringPair(currentKeyPair, serializedDIDRemoval);
-}
-
-/**
- * Create a `DidRemoval` as expected by the Substrate node and signs it. Return the `DidRemoval` object and the signature
- * @param {module} didModule - The did module
- * @param {string} did - Full DID or hex identifier to remove
- * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
- * @returns {Promise&lt;array>} A 2 element array where the first element is the `DidRemoval` and the second is the signature
- */
-export async function createSignedDidRemoval(didModule, did, currentKeyPair) {
-  const didRemoval = await createDidRemoval(didModule, did);
-  const signature = signDidRemoval(didModule, didRemoval, currentKeyPair);
-  return [didRemoval, signature];
-}
-
-/**
- * Create and return a `Attestation` as expected by the Substrate node. Signing is intentionally kept separate as the
- * JS code may not have access to the signing key like in case of hardware wallet.
- * @param {Number} priority - Attestation priority
- * @param {string | null} iri - Attestation iri
- * @returns {object} The object has structure and keys with same names as expected by the Substrate node
- */
-export function createDidAttestation(priority, iri) {
-  return {
-    priority,
-    iri,
-  };
-}
-
-/**
- * Sign the given `Attestation` and returns the signature
- * @param {module} didModule - The did module
- * @param {object} attestation - `Attestation` as expected by the Substrate node
- * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
- * @returns {Signature}
- */
-export function signDidAttestation(didModule, did, attestation, currentKeyPair) {
-  const serializedAttestation = didModule.getSerializedAttestation(did, attestation);
-  return getSignatureFromKeyringPair(currentKeyPair, serializedAttestation);
-}
-
-/**
- * Create a `Attestation` as expected by the Substrate node and signs it. Return the `Attestation` object and the signature
- * @param {module} didModule - The did module
- * @param {Number} priority - Attestation priority
- * @param {string | null} iri - Attestation iri
- * @param {object} currentKeyPair - Should have the private key corresponding to the current public key for the DID
- * @returns {Promise&lt;array>} A 2 element array where the first element is the `Attestation` and the second is the signature
- */
-export async function createSignedAttestation(didModule, did, priority, iri, currentKeyPair) {
-  const attestation = createDidAttestation(priority, iri);
-  const signature = signDidAttestation(didModule, did, attestation, currentKeyPair);
-  return [attestation, signature];
 }
 </code></pre>
         </article>
@@ -263,13 +168,13 @@ export async function createSignedAttestation(didModule, did, priority, iri, cur
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="setApi.html">setApi</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#claimgraphToStore">claimgraphToStore</a></li><li><a href="global.html#createDidAttestation">createDidAttestation</a></li><li><a href="global.html#createDidRemoval">createDidRemoval</a></li><li><a href="global.html#createKeyDetail">createKeyDetail</a></li><li><a href="global.html#createKeyUpdate">createKeyUpdate</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createNewPositiveAccumulator">createNewPositiveAccumulator</a></li><li><a href="global.html#createNewUniversalAccumulator">createNewUniversalAccumulator</a></li><li><a href="global.html#createParamsObjFromChainResponse">createParamsObjFromChainResponse</a></li><li><a href="global.html#createPublicKeyObjFromChainResponse">createPublicKeyObjFromChainResponse</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createSignedAttestation">createSignedAttestation</a></li><li><a href="global.html#createSignedDidRemoval">createSignedDidRemoval</a></li><li><a href="global.html#createSignedKeyUpdate">createSignedKeyUpdate</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#dereferenceFromIPFS">dereferenceFromIPFS</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccumulator">getAccumulator</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAllParamsByDid">getAllParamsByDid</a></li><li><a href="global.html#getAllPublicKeysByDid">getAllPublicKeysByDid</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatuses">getCredentialStatuses</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getLastParamsWritten">getLastParamsWritten</a></li><li><a href="global.html#getLastPublicKeyWritten">getLastPublicKeyWritten</a></li><li><a href="global.html#getPublicKey">getPublicKey</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSignatures">getSignatures</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#getUpdatesFromBlock">getUpdatesFromBlock</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#parseEventAsAccumulatorUpdate">parseEventAsAccumulatorUpdate</a></li><li><a href="global.html#parseRDFDocument">parseRDFDocument</a></li><li><a href="global.html#parseRef">parseRef</a></li><li><a href="global.html#prepareAddParameters">prepareAddParameters</a></li><li><a href="global.html#prepareAddPublicKey">prepareAddPublicKey</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#queryNextLookup">queryNextLookup</a></li><li><a href="global.html#removeAccumulator">removeAccumulator</a></li><li><a href="global.html#removeAccumulatorTx">removeAccumulatorTx</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#setAuthor">setAuthor</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#setSignature">setSignature</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signDidAttestation">signDidAttestation</a></li><li><a href="global.html#signDidRemoval">signDidRemoval</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signKeyUpdate">signKeyUpdate</a></li><li><a href="global.html#signPrehashed">signPrehashed</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toJsonldjsNode">toJsonldjsNode</a></li><li><a href="global.html#toMap">toMap</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#updateAccumulator">updateAccumulator</a></li><li><a href="global.html#updateAccumulatorTx">updateAccumulatorTx</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateAddress">validateAddress</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyEcdsaSecp256k1SigPrehashed">verifyEcdsaSecp256k1SigPrehashed</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#verifySignature">verifySignature</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="NoOffchainDIDError.html">NoOffchainDIDError</a></li><li><a href="NoOnchainDIDError.html">NoOnchainDIDError</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="setApi.html">setApi</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#addParams">addParams</a></li><li><a href="global.html#addPositiveAccumulator">addPositiveAccumulator</a></li><li><a href="global.html#addPublicKey">addPublicKey</a></li><li><a href="global.html#addUniversalAccumulator">addUniversalAccumulator</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#bytesToWrappedBytes">bytesToWrappedBytes</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#claimgraphToStore">claimgraphToStore</a></li><li><a href="global.html#createAddParamsTx">createAddParamsTx</a></li><li><a href="global.html#createAddPositiveAccumulatorTx">createAddPositiveAccumulatorTx</a></li><li><a href="global.html#createAddPublicKeyTx">createAddPublicKeyTx</a></li><li><a href="global.html#createAddUniversalAccumulatorTx">createAddUniversalAccumulatorTx</a></li><li><a href="global.html#createDidKey">createDidKey</a></li><li><a href="global.html#createDidSig">createDidSig</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createParamsObjFromChainResponse">createParamsObjFromChainResponse</a></li><li><a href="global.html#createPublicKeyObjFromChainResponse">createPublicKeyObjFromChainResponse</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createRemovePublicKeyTx">createRemovePublicKeyTx</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#dereferenceFromIPFS">dereferenceFromIPFS</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccumulator">getAccumulator</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAllParamsByDid">getAllParamsByDid</a></li><li><a href="global.html#getAllPublicKeysByDid">getAllPublicKeysByDid</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatuses">getCredentialStatuses</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getLastParamsWritten">getLastParamsWritten</a></li><li><a href="global.html#getNonce">getNonce</a></li><li><a href="global.html#getPublicKey">getPublicKey</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#getUpdatesFromBlock">getUpdatesFromBlock</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#parseEventAsAccumulatorUpdate">parseEventAsAccumulatorUpdate</a></li><li><a href="global.html#parseRDFDocument">parseRDFDocument</a></li><li><a href="global.html#parseRef">parseRef</a></li><li><a href="global.html#prepareAddParameters">prepareAddParameters</a></li><li><a href="global.html#prepareAddPublicKey">prepareAddPublicKey</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#queryNextLookup">queryNextLookup</a></li><li><a href="global.html#removeAccumulator">removeAccumulator</a></li><li><a href="global.html#removeAccumulatorTx">removeAccumulatorTx</a></li><li><a href="global.html#removeParams">removeParams</a></li><li><a href="global.html#removeParamsTx">removeParamsTx</a></li><li><a href="global.html#removePublicKey">removePublicKey</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signPrehashed">signPrehashed</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toJsonldjsNode">toJsonldjsNode</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#updateAccumulator">updateAccumulator</a></li><li><a href="global.html#updateAccumulatorTx">updateAccumulatorTx</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateAddress">validateAddress</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyEcdsaSecp256k1SigPrehashed">verifyEcdsaSecp256k1SigPrehashed</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#verifySignature">verifySignature</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Fri Jun 24 2022 18:35:59 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Fri Jul 22 2022 22:38:14 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

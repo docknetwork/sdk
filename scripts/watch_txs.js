@@ -19,6 +19,7 @@ import {
   last,
   pipe,
   o,
+  when,
   always,
   isEmpty,
   both,
@@ -100,18 +101,21 @@ const main = async (dock) => {
     )
   );
 
-  const applyFilters = curry((filters, data$) =>
-    data$.pipe(
-      mergeMap((tx) => withExtrinsicUrl(converge(merge, filters))(tx, dock))
-    )
-  );
+  const applyFilters = curry((buildFilters, data$) => {
+    const handleItem = withExtrinsicUrl(converge(merge, buildFilters(dock)))(
+      __,
+      dock
+    );
+
+    return data$.pipe(mergeMap(handleItem));
+  });
 
   const res$ = merge(
     txs$.pipe(
       tap(LogLevel === "debug" ? logTx : identity),
-      applyFilters(txFilters())
+      applyFilters(txFilters)
     ),
-    events$.pipe(applyFilters(eventFilters()))
+    events$.pipe(applyFilters(eventFilters))
   ).pipe(
     batchNotifications(3e3),
     tap((email) => console.log("Sending email: ", email)),
@@ -162,7 +166,8 @@ class DiffAccumulator {
   }
 
   handle(data) {
-    this.diff = this.last ? new Diff(data, this.last) : Diff.prototype.empty();
+    this.diff =
+      this.last == null ? new Diff(data, this.last) : Diff.prototype.empty();
     this.last = data;
 
     return this;
@@ -230,11 +235,7 @@ const txByMethodFilter = curry(
     o(
       __,
       o(
-        ifElse(
-          ({ method }) => typeof method === "object",
-          view(methodLens),
-          identity
-        ),
+        when(({ method }) => typeof method === "object", view(methodLens)),
         prop("tx")
       )
     )
@@ -299,19 +300,23 @@ const democracyEvent = eventByMethodFilter("democracy");
  */
 const councilEvent = eventByMethodFilter("council");
 /**
- * Filter events produced by `council` pallet.
+ * Filter events produced by `balances` pallet.
  */
 const balancesEvent = eventByMethodFilter("balances");
 /**
- * Filter events produced by `technicalCommitteeEvent` pallet.
+ * Filter events produced by `technicalCommittee` pallet.
  */
 const technicalCommitteeEvent = eventByMethodFilter("technicalCommittee");
 /**
- * Filter events produced by `technicalCommitteeMembershipEvent` pallet.
+ * Filter events produced by `technicalCommitteeMembership` pallet.
  */
 const technicalCommitteeMembershipEvent = eventByMethodFilter(
   "technicalCommitteeMembership"
 );
+/**
+ * Filter events produced by `elections` pallet.
+ */
+const electionsEvent = eventByMethodFilter("elections");
 
 /**
  * Filter extrinsics from `democracy` pallet.
@@ -383,6 +388,16 @@ const txFilters = () => [
       )}`
     );
   }),
+
+  // Democracy proposal cancelled
+  checkMap(
+    democracyTx("cancelProposal"),
+    ({
+      event: {
+        data: [proposalIndex],
+      },
+    }) => of(`Proposal #${proposalIndex.toString()} was cancelled`)
+  ),
 ];
 
 const eventFilters = () => {
@@ -399,14 +414,30 @@ const eventFilters = () => {
       }) => of(`New Democracy proposal ${hash}`)
     ),
 
-    // Democracy proposal preimage is noted
     checkMap(
-      democracyEvent("PreimageNoted"),
-      ({
-        event: {
-          data: [proposalHash],
+      both(democracyEvent("PreimageNoted"), democracyTx("notePreimage")),
+      (
+        {
+          event: {
+            data: [proposalHash],
+          },
+          tx: {
+            args: [preimage],
+          },
         },
-      }) => of(`Proposal preimage is noted for ${proposalHash.toString()}`)
+        dock
+      ) => {
+        const proposal = dock.api.createType("Call", preimage);
+        const metadata = dock.api.registry.findMetaCall(proposal.callIndex);
+
+        return of(
+          `Proposal preimage is noted for ${proposalHash.toString()}: ${
+            metadata.section
+          }::${metadata.method} with args ${JSON.stringify(
+            proposal.toJSON().args
+          )}`
+        );
+      }
     ),
 
     // Democracy proposal fast-tracked
@@ -417,16 +448,6 @@ const eventFilters = () => {
           args: [proposalHash],
         },
       }) => of(`Proposal is fast-tracked: ${proposalHash.toString()}`)
-    ),
-
-    // Democracy proposal cancelled
-    checkMap(
-      democracyTx("cancelProposal"),
-      ({
-        event: {
-          data: [proposalIndex],
-        },
-      }) => of(`Proposal #${proposalIndex.toString()} was cancelled`)
     ),
 
     // Council proposal
@@ -452,7 +473,7 @@ const eventFilters = () => {
 
     // Council member renounced
     checkMap(
-      eventByMethodFilter("elections", "Renounced"),
+      electionsEvent("Renounced"),
       ({
         tx: {
           data: [member],
@@ -492,18 +513,15 @@ const eventFilters = () => {
     ),
 
     // `set_balance` call
-    checkMap(
-      both(balancesEvent("BalanceSet"), balancesTx("setBalance")),
-      ({ event }) => {
-        const [who, free, reserved] = event.data.toJSON();
+    checkMap(balancesEvent("BalanceSet"), ({ event }) => {
+      const [who, free, reserved] = event.data.toJSON();
 
-        return of(
-          `\`set_balance\` was called on ${who}: free: ${formatDock(
-            free
-          )}, reserved: ${formatDock(reserved)}`
-        );
-      }
-    ),
+      return of(
+        `\`set_balance\` was called on ${who}: free: ${formatDock(
+          free
+        )}, reserved: ${formatDock(reserved)}`
+      );
+    }),
 
     // Techinal Committee proposal
     checkMap(technicalCommitteeEvent("Proposed"), ({ event }, dock) => {
@@ -677,8 +695,13 @@ const createEventsWithExtrsCombinator = (dock) => {
         });
         return selfAcc.prependExtrinsics(acc.extrinsics);
       } else {
+        const isSudo = txByMethodFilter("sudo", [
+          "sudo",
+          "sudoUncheckedWeight",
+        ])({ tx });
+
         const acc = mergeEventsWithExtrs(events, tx.args[0], {
-          config: config | SUDO,
+          config: config | (isSudo ? SUDO : 0),
           rootTx,
         });
         const selfAcc = txWithEvents(acc.events, tx, {

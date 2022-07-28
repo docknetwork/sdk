@@ -5,10 +5,10 @@ export default {
       params: [
         {
           name: 'id',
-          type: 'PublicKeyStorageKey',
+          type: 'BBSPlusPublicKeyStorageKey',
         },
       ],
-      type: 'Option<BbsPlusPublicKeyWithParams>',
+      type: 'Option<BBSPlusPublicKeyWithParams>',
     },
     bbsPlusParamsByDid: {
       description: 'Return all BBS+ params by a DID',
@@ -18,7 +18,7 @@ export default {
           type: 'Did',
         },
       ],
-      type: 'BTreeMap<u32, BbsPlusParameters>',
+      type: 'BTreeMap<IncId, BBSPlusParameters>',
     },
     bbsPlusPublicKeysByDid: {
       description: 'Return all BBS+ key with params by a DID',
@@ -28,17 +28,17 @@ export default {
           type: 'Did',
         },
       ],
-      type: 'BTreeMap<u32, BbsPlusPublicKeyWithParams>',
+      type: 'BTreeMap<IncId, BBSPlusPublicKeyWithParams>',
     },
     accumulatorPublicKeyWithParams: {
       description: 'Return Accumulator public key with params',
       params: [
         {
           name: 'id',
-          type: 'PublicKeyStorageKey',
+          type: 'AccumPublicKeyStorageKey',
         },
       ],
-      type: 'Option<AccumulatorPublicKeyWithParams>',
+      type: 'Option<AccumPublicKeyWithParams>',
     },
     accumulatorWithPublicKeyAndParams: {
       description: 'Return Accumulator public key with params',
@@ -48,7 +48,7 @@ export default {
           type: 'AccumulatorId',
         },
       ],
-      type: 'Option<(Vec<u8>, Option<AccumulatorPublicKeyWithParams>)>',
+      type: 'Option<(Vec<u8>, Option<AccumPublicKeyWithParams>)>',
     },
     didDetails: {
       description: 'Get all keys, controllers and service endpoints of the DID',
@@ -59,11 +59,26 @@ export default {
         },
         {
           name: 'params',
-          type: 'Option<u8>',
+          type: 'u8',
           isOptional: true,
         },
       ],
       type: 'Option<AggregatedDidDetailsResponse>',
+    },
+    didListDetails: {
+      description: 'Get all keys, controllers and service endpoints of the DID',
+      params: [
+        {
+          name: 'dids',
+          type: 'Vec<Did>',
+        },
+        {
+          name: 'params',
+          type: 'u8',
+          isOptional: true,
+        },
+      ],
+      type: 'Vec<Option<AggregatedDidDetailsResponse>>',
     },
   },
 };

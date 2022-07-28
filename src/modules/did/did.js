@@ -734,19 +734,19 @@ class DIDModule {
   async getDocument(did) {
     const hexId = getHexIdentifierFromDID(did);
 
-    let didDetails = await this.api.rpc.core_mods.didDetails(hexId);
+    let didDetails = await this.api.rpc.core_mods.didDetails(hexId, 15);
     if (didDetails.isNone) {
       throw new NoDIDError(`dock:did:${did}`);
     }
     didDetails = didDetails.unwrap();
 
-    let { controllers, serviceEndpoints } = didDetails;
     const rawKeys = didDetails.get('keys').unwrap();
-    controllers = controllers.unwrap();
-    serviceEndpoints = serviceEndpoints.unwrap();
-
-    // Get DIDs attestations
-    const attests = await this.getAttests(hexId);
+    const controllers = didDetails.controllers.unwrap();
+    const serviceEndpoints = didDetails.serviceEndpoints.unwrap();
+    const rawAttests = didDetails.attestation.unwrap();
+    const attests = rawAttests.iri.isSome
+      ? u8aToString(hexToU8a(rawAttests.iri.toString()))
+      : null;
 
     // If given DID was in hex, encode to SS58 and then construct fully qualified DID else the DID was already fully qualified
     const id = did === hexId ? this.getFullyQualifiedDID(encodeAddress(hexId)) : did;
@@ -778,6 +778,7 @@ class DIDModule {
       } else {
         throw new Error(`Cannot parse public key ${pk}`);
       }
+
       keys.push([index, typ, publicKeyRaw]);
       const vr = new VerificationRelationship(dk.verRels.toNumber());
       if (vr.isAuthentication(vr)) {

@@ -2463,10 +2463,10 @@
   resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.9.0.tgz#0d590cd8902f65c50a60ccc78aece1b8c54261bb"
   integrity sha512-Qd0/T/NCF4c/Ae6m7bodkWZevpJW1WRoUqBagtcRlfD51rubCgYDMl539xnT7Gca/x0slqwXH/7LmiLzI39mDg==
 
-"@docknetwork/node-types@^0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/node-types/-/node-types-0.9.0.tgz#40b272fb3554f00ffe5302fa18679342ba06c8ad"
-  integrity sha512-CZcUv3RNGENU4lOnpFLA7VhG0fp3pGY/ieC8kMyaaUNA/mCZy+H6hLwHNW7APp1loXeSlyKfyDwSt4Zs24Xmdg==
+"@docknetwork/node-types@^0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/node-types/-/node-types-0.10.0.tgz#b6ef86739c922510e2e059e55a5d243eb2160c1d"
+  integrity sha512-E3fo9YNA6JxqwUbYEmizwwiGL+FGbrds6XvPXlAXy6ST5hJ7g9okL054Wef2AZ+bp1QPp56KC7HI7iMz77KNKw==
 
 "@ethereumjs/common@^2.5.0", "@ethereumjs/common@^2.6.4":
   version "2.6.5"

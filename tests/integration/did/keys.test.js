@@ -55,7 +55,7 @@ describe('Key support for DIDs', () => {
     expect(didDetail.lastKeyId).toBe(3);
     expect(didDetail.activeControllerKeys).toBe(2);
     expect(didDetail.activeControllers).toBe(1);
-    await expect(dock.did.isController(hexDid, hexDid)).resolves.toEqual(true);
+    await expect(dock.did.isController(dockDid, dockDid)).resolves.toEqual(true);
 
     for (const [i, pk] of [[1, publicKey1], [2, publicKey2]]) {
       // eslint-disable-next-line no-await-in-loop

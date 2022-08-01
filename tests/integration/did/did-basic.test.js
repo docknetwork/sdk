@@ -55,12 +55,12 @@ describe('Basic DID tests', () => {
     const verRels = new VerificationRelationship();
     const didKey = new DidKey(publicKey, verRels);
 
-    await dock.did.new(dockDid, [didKey], new BTreeSet(), false);
+    await dock.did.new(dockDid, [didKey], [], false);
     const didDetail = await dock.did.getOnchainDidDetail(hexDid);
     expect(didDetail.lastKeyId).toBe(1);
     expect(didDetail.activeControllerKeys).toBe(1);
     expect(didDetail.activeControllers).toBe(1);
-    await expect(dock.did.isController(hexDid, hexDid)).resolves.toEqual(true);
+    await expect(dock.did.isController(dockDid, dockDid)).resolves.toEqual(true);
 
     // DID cannot be fetched as off-chain DID
     await expect(dock.did.getOffchainDidDetail(hexDid)).rejects.toThrow(NoOffchainDIDError);

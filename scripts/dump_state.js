@@ -107,6 +107,21 @@ async function downloadEvmAccountStorage() {
   return storageDoubleMapEntriesToObject(storages);
 }
 
+async function downloadBbsPlus() {
+  const paramsCounter = await dock.api.query.bbsPlus.paramsCounter.entries();
+  const params = await dock.api.query.bbsPlus.bbsPlusParams.entries();
+  const keys = await dock.api.query.bbsPlus.bbsPlusKeys.entries();
+  return { bbsPlusParamsCounter: storageMapEntriesToObject(paramsCounter), bbsPlusParams: storageDoubleMapEntriesToObject(params), bbsPlusKeys: storageDoubleMapEntriesToObject(keys)};
+}
+
+async function downloadAccum() {
+  const counter = await dock.api.query.accumulator.accumulatorOwnerCounters.entries();
+  const params = await dock.api.query.accumulator.accumulatorParams.entries();
+  const keys = await dock.api.query.accumulator.accumulatorKeys.entries();
+  const accum = await dock.api.query.accumulator.accumulators.entries();
+  return { accumulatorCounter: storageMapEntriesToObject(counter), accumulatorParams: storageDoubleMapEntriesToObject(params), accumulatorKeys: storageDoubleMapEntriesToObject(keys), accumulators: storageMapEntriesToObject(accum)};
+}
+
 async function downloadState() {
   const accounts = await downloadAccounts();
 
@@ -136,6 +151,10 @@ async function downloadState() {
 
   const treasuryBal = await dock.api.rpc.poa.treasuryBalance();
 
+  const bbsPlus = await downloadBbsPlus();
+
+  const accum = await downloadAccum();
+
   const obj = {
     accounts,
     locks,
@@ -154,6 +173,8 @@ async function downloadState() {
     evmCodes,
     evmStorages,
     treasuryBal,
+    ...bbsPlus,
+    ...accum,
   };
 
   const dumpFileName = process.argv[2];

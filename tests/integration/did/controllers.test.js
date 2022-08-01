@@ -49,20 +49,20 @@ describe('DID controllers', () => {
     const publicKey2 = getPublicKeyFromKeyringPair(pair2);
     const verRels2 = new VerificationRelationship();
     const didKey2 = new DidKey(publicKey2, verRels2);
-    await dock.did.new(dockDid2, [didKey2], [hexDid1], false);
+    await dock.did.new(dockDid2, [didKey2], [dockDid1], false);
 
     const didDetail1 = await dock.did.getOnchainDidDetail(hexDid1);
     expect(didDetail1.lastKeyId).toBe(1);
     expect(didDetail1.activeControllerKeys).toBe(1);
     expect(didDetail1.activeControllers).toBe(1);
-    await expect(dock.did.isController(hexDid1, hexDid1)).resolves.toEqual(true);
+    await expect(dock.did.isController(dockDid1, dockDid1)).resolves.toEqual(true);
 
     const didDetail2 = await dock.did.getOnchainDidDetail(hexDid2);
     expect(didDetail2.lastKeyId).toBe(1);
     expect(didDetail2.activeControllerKeys).toBe(1);
     expect(didDetail2.activeControllers).toBe(2);
-    await expect(dock.did.isController(hexDid2, hexDid2)).resolves.toEqual(true);
-    await expect(dock.did.isController(hexDid2, hexDid1)).resolves.toEqual(true);
+    await expect(dock.did.isController(dockDid2, dockDid2)).resolves.toEqual(true);
+    await expect(dock.did.isController(dockDid2, dockDid1)).resolves.toEqual(true);
 
     for (const [newSeed, signer, pair, keyCount] of [[seed3, hexDid1, pair1, 2], [seed4, hexDid2, pair2, 3]]) {
       const newPair = dock.keyring.addFromUri(newSeed);
@@ -111,20 +111,19 @@ describe('DID controllers', () => {
   }, 10000);
 
   test('Create DID controlled by other', async () => {
-    await dock.did.new(dockDid3, [], [hexDid1], false);
+    await dock.did.new(dockDid3, [], [dockDid1], false);
 
     const didDetail1 = await dock.did.getOnchainDidDetail(hexDid3);
     expect(didDetail1.lastKeyId).toBe(0);
     expect(didDetail1.activeControllerKeys).toBe(0);
     expect(didDetail1.activeControllers).toBe(1);
-    await expect(dock.did.isController(hexDid3, hexDid3)).resolves.toEqual(false);
-    await expect(dock.did.isController(hexDid3, hexDid1)).resolves.toEqual(true);
+    await expect(dock.did.isController(dockDid3, dockDid3)).resolves.toEqual(false);
+    await expect(dock.did.isController(dockDid3, dockDid1)).resolves.toEqual(true);
   });
 
   test('Get DID document', async () => {
     const doc3 = await dock.did.getDocument(dockDid3);
     expect(doc3.controller.length).toEqual(1);
-    // expect(doc3.verificationMethod.length).toEqual(0);
     checkVerificationMethods(dockDid3, doc3, 0);
     expect(doc3.authentication).not.toBeDefined();
     expect(doc3.assertionMethod).not.toBeDefined();
@@ -147,8 +146,8 @@ describe('DID controllers', () => {
     expect(didDetail.lastKeyId).toBe(1);
     expect(didDetail.activeControllerKeys).toBe(0);
     expect(didDetail.activeControllers).toBe(1);
-    await expect(dock.did.isController(hexDid3, hexDid3)).resolves.toEqual(false);
-    await expect(dock.did.isController(hexDid3, hexDid1)).resolves.toEqual(true);
+    await expect(dock.did.isController(dockDid3, dockDid3)).resolves.toEqual(false);
+    await expect(dock.did.isController(dockDid3, dockDid1)).resolves.toEqual(true);
 
     const dk1 = await dock.did.getDidKey(dockDid3, 1);
     expect(dk1.publicKey).toEqual(publicKey1);
@@ -164,9 +163,9 @@ describe('DID controllers', () => {
     expect(didDetail.lastKeyId).toBe(1);
     expect(didDetail.activeControllerKeys).toBe(0);
     expect(didDetail.activeControllers).toBe(2);
-    await expect(dock.did.isController(hexDid3, hexDid3)).resolves.toEqual(false);
-    await expect(dock.did.isController(hexDid3, hexDid1)).resolves.toEqual(true);
-    await expect(dock.did.isController(hexDid3, hexDid2)).resolves.toEqual(true);
+    await expect(dock.did.isController(dockDid3, dockDid3)).resolves.toEqual(false);
+    await expect(dock.did.isController(dockDid3, dockDid1)).resolves.toEqual(true);
+    await expect(dock.did.isController(dockDid3, dockDid2)).resolves.toEqual(true);
   });
 
   test('Get DID document after update', async () => {
@@ -188,9 +187,9 @@ describe('DID controllers', () => {
     expect(didDetail.lastKeyId).toBe(1);
     expect(didDetail.activeControllerKeys).toBe(0);
     expect(didDetail.activeControllers).toBe(1);
-    await expect(dock.did.isController(hexDid3, hexDid3)).resolves.toEqual(false);
-    await expect(dock.did.isController(hexDid3, hexDid1)).resolves.toEqual(false);
-    await expect(dock.did.isController(hexDid3, hexDid2)).resolves.toEqual(true);
+    await expect(dock.did.isController(dockDid3, dockDid3)).resolves.toEqual(false);
+    await expect(dock.did.isController(dockDid3, dockDid1)).resolves.toEqual(false);
+    await expect(dock.did.isController(dockDid3, dockDid2)).resolves.toEqual(true);
   });
 
   test('Remove DID using its controller', async () => {
@@ -199,7 +198,7 @@ describe('DID controllers', () => {
     await expect(dock.did.getDocument(dockDid3)).rejects.toThrow(NoDIDError);
     await expect(dock.did.getOnchainDidDetail(hexDid3)).rejects.toThrow(NoDIDError);
     await expect(dock.did.getDidKey(dockDid3, 1)).rejects.toThrow();
-    await expect(dock.did.isController(hexDid3, hexDid2)).resolves.toEqual(false);
+    await expect(dock.did.isController(dockDid3, dockDid2)).resolves.toEqual(false);
   });
 
   test('Add and remove multiple controllers', async () => {
@@ -207,23 +206,22 @@ describe('DID controllers', () => {
     const pair2 = dock.keyring.addFromUri(seed2);
 
     const dockDid4 = createNewDockDID();
-    const hexDid4 = getHexIdentifierFromDID(dockDid4);
 
     await dock.did.addControllers([dockDid3, dockDid4], dockDid2, dockDid1, pair1, 1);
 
     let didDetail = await dock.did.getOnchainDidDetail(hexDid2);
     expect(didDetail.activeControllers).toBe(4);
-    await expect(dock.did.isController(hexDid2, hexDid1)).resolves.toEqual(true);
-    await expect(dock.did.isController(hexDid2, hexDid2)).resolves.toEqual(true);
-    await expect(dock.did.isController(hexDid2, hexDid3)).resolves.toEqual(true);
-    await expect(dock.did.isController(hexDid2, hexDid4)).resolves.toEqual(true);
+    await expect(dock.did.isController(dockDid2, dockDid1)).resolves.toEqual(true);
+    await expect(dock.did.isController(dockDid2, dockDid2)).resolves.toEqual(true);
+    await expect(dock.did.isController(dockDid2, dockDid3)).resolves.toEqual(true);
+    await expect(dock.did.isController(dockDid2, dockDid4)).resolves.toEqual(true);
 
     await dock.did.removeControllers([dockDid1, dockDid3, dockDid4], dockDid2, dockDid2, pair2, 1);
     didDetail = await dock.did.getOnchainDidDetail(hexDid2);
     expect(didDetail.activeControllers).toBe(1);
-    await expect(dock.did.isController(hexDid2, hexDid1)).resolves.toEqual(false);
-    await expect(dock.did.isController(hexDid2, hexDid2)).resolves.toEqual(true);
-    await expect(dock.did.isController(hexDid2, hexDid3)).resolves.toEqual(false);
-    await expect(dock.did.isController(hexDid2, hexDid4)).resolves.toEqual(false);
+    await expect(dock.did.isController(dockDid2, dockDid1)).resolves.toEqual(false);
+    await expect(dock.did.isController(dockDid2, dockDid2)).resolves.toEqual(true);
+    await expect(dock.did.isController(dockDid2, dockDid3)).resolves.toEqual(false);
+    await expect(dock.did.isController(dockDid2, dockDid4)).resolves.toEqual(false);
   });
 });

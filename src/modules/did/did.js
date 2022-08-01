@@ -433,7 +433,7 @@ class DIDModule {
     signerDid,
     keyPair,
     keyId,
-    nonce,
+    nonce = undefined,
     waitForFinalization = true,
     params = {},
   ) {
@@ -834,8 +834,8 @@ class DIDModule {
     }
 
     if (serviceEndpoints.length > 0) {
+      const decoder = new TextDecoder();
       document.service = serviceEndpoints.map(({ id: spId, endpoint: sp }) => {
-        const decoder = new TextDecoder();
         const spType = sp.types.toNumber();
         if (spType !== 1) {
           throw new Error(

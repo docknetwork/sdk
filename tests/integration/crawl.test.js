@@ -1,4 +1,4 @@
-import createClient from 'ipfs-http-client';
+import { create } from 'ipfs-http-client';
 import { newEngine } from '@comunica/actor-init-sparql-rdfjs';
 import { crawl, graphResolver } from '../../src/crawl.js';
 import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from '../../src/rdf-defs.js';
@@ -31,7 +31,7 @@ describe('Crawler', () => {
   let batt_iri;
 
   beforeAll(async () => {
-    ipfsClient = createClient(ipfsDefaultConfig);
+    ipfsClient = create(ipfsDefaultConfig);
 
     rootatt_iri = await ipfsAdd(ipfsClient, ipfs_content.rootatt);
     batt_iri = await ipfsAdd(ipfsClient, ipfs_content.batt);

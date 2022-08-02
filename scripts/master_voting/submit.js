@@ -2,7 +2,7 @@
 // Master::execute() transaction.
 // Assumes all signature are Sr25519.
 
-import { schnorrkelVerify } from '@polkadot/util-crypto/schnorrkel';
+import { sr25519Verify } from '@polkadot/util-crypto/sr25519';
 import { u8aToHex, assert } from '@polkadot/util';
 import { keypair, connect } from '../helpers';
 import { createDidSig } from '../../src/utils/did';
@@ -126,7 +126,7 @@ async function assertValidAuth(nodeClient, proposal, mpauth) {
     const srpk = pk.asSr25519.value;
     const srsig = sig.asSr25519.value;
     const encoded_state_change = asEncodedStateChange(nodeClient, roundNo, proposal, nonce);
-    const ver = schnorrkelVerify(encoded_state_change, srsig, srpk);
+    const ver = sr25519Verify(encoded_state_change, srsig, srpk);
     if (!ver) {
       throw 'Signature invalid:\n'
       + `  payload: ${u8aToHex(encoded_state_change)}\n`

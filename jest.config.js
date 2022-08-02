@@ -1,4 +1,5 @@
 module.exports = {
+  bail: true,
   clearMocks: true,
   testTimeout: 30000,
   testEnvironment: './tests/test-environment.js',

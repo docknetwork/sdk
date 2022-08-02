@@ -85,6 +85,12 @@
   "dependencies": {
     "@docknetwork/node-types": "^0.10.0",
     "@polkadot/api": "6.5.1",
+    "@polkadot/keyring": "^7.6.1",
+    "@polkadot/rpc-provider": "6.5.1",
+    "@polkadot/types": "6.5.1",
+    "@polkadot/types-known": "6.5.1",
+    "@polkadot/util": "^7.6.1",
+    "@polkadot/util-crypto": "^7.6.1",
     "axios": "0.27.2",
     "base64url": "3.0.1",
     "blake2b": "2.1.4",
@@ -99,7 +105,6 @@
     "jsonschema": "1.4.1",
     "key-did-resolver": "^1.4.0",
     "mrklt": "^0.2.0",
-    "multiformats": "^9.7.1",
     "n3": "1.16.2",
     "rify": "^0.7.1"
   }

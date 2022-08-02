@@ -1,6 +1,5 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 
-import { BTreeSet } from '@polkadot/types';
 import { DockAPI } from '../../../src';
 import { ATTESTS_IRI } from '../../../src/modules/did';
 

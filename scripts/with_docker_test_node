@@ -7,14 +7,13 @@ source $(dirname $0)/config
 root_dir="$(dirname $0)/.."
 
 # pre-pull
-# TODO: Revert before merging at both places
-docker pull docknetwork/dock-substrate:fastblock_new
+docker pull $CONFIG_DOCK_NODE_IMAGE
 
 # start a pos alice node
 alice_container_id=$(
 	docker run --rm -d --name alice                           \
         -p 9944:9944 -p 9933:9933 -p 30333:30333            \
-        docknetwork/dock-substrate:fastblock_new                             \
+        $CONFIG_DOCK_NODE_IMAGE                             \
         --alice --rpc-external --ws-external
 )
 

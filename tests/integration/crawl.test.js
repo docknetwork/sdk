@@ -1,4 +1,5 @@
-import createClient from 'ipfs-http-client';
+import { create } from 'ipfs-http-client';
+import { newEngine } from '@comunica/actor-init-sparql-rdfjs';
 import { crawl, graphResolver } from '../../src/crawl.js';
 import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from '../../src/rdf-defs.js';
 import { documentLoader, addDocument } from '../cached-document-loader.js';
@@ -30,7 +31,7 @@ describe('Crawler', () => {
   let batt_iri;
 
   beforeAll(async () => {
-    ipfsClient = createClient(ipfsDefaultConfig);
+    ipfsClient = create(ipfsDefaultConfig);
 
     rootatt_iri = await ipfsAdd(ipfsClient, ipfs_content.rootatt);
     batt_iri = await ipfsAdd(ipfsClient, ipfs_content.batt);
@@ -84,7 +85,7 @@ describe('Crawler', () => {
       (term, _err) => failedLookups.push(term),
     );
     const initialFacts = await resolveGraph({ Iri: 'did:root' });
-    const allFacts = await crawl(initialFacts, RULES, CURIOSITY, resolveGraph);
+    const allFacts = await crawl(initialFacts, RULES, CURIOSITY, resolveGraph, newEngine());
     expect(failedLookups).toEqual([{ Iri: 'did:c' }]);
     expect(allFacts).toEqual(
       [
@@ -207,7 +208,7 @@ describe('Crawler', () => {
       [
         { Iri: 'did:root' },
         { Iri: 'https://rdf.dock.io/alpha/2021#attestsDocumentContents' },
-        { Iri: 'ipfs://zdj7WhNuZPY5dapbDmkHcLQHBJAuK6jA9jiiev1xB6CW7kMwu' },
+        { Iri: 'ipfs://bafybeifrrafsw7gs7mwlzooxejrv6hljun46c7j4zfyc4mep3vn73zbkxa' },
         { Iri: 'did:root' },
       ],
     ]);

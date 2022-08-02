@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -8,19 +8,20 @@
     "url": "https://github.com/docknetwork/sdk"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.15.4",
     "@babel/core": "^7.15.4",
     "@babel/node": "^7.15.4",
     "@babel/preset-env": "^7.15.6",
-    "@docknetwork/crypto-wasm-ts": "0.13.0",
+    "@docknetwork/crypto-wasm-ts": "0.17.0",
     "@rollup/plugin-commonjs": "^20.0.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.1.3",
     "@rollup/plugin-wasm": "^5.1.0",
-    "@substrate/txwrapper": "^7.0.1",
+    "@comunica/actor-init-sparql-rdfjs": "^1.22.3",
+    "@comunica/types": "^1.0.0",
     "@types/jest": "^26.0.24",
     "aws-sdk": "^2.1057.0",
     "babel-jest": "24.5.0",
@@ -33,7 +34,7 @@
     "ethers": "^5.4",
     "ethr-did-resolver": "^2.2.0",
     "glob": "^7.1.6",
-    "ipfs-http-client": "^49.0.4",
+    "ipfs-http-client": "^51.0.0",
     "jest": "24.5.0",
     "jsdoc": "^3.6.3",
     "ramda": "^0.27.2",
@@ -43,7 +44,7 @@
     "rollup-plugin-terser": "^7.0.2",
     "rxjs": "^7.4.0",
     "typescript": "^4.2.3",
-    "web3": "^1.7.0"
+    "web3": "^1.7.5"
   },
   "scripts": {
     "jest": "NODE_OPTIONS='--experimental-vm-modules' jest",
@@ -80,33 +81,39 @@
     "mdbook": "mdbook build tutorials --dest-dir ../out/tutorials",
     "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
   },
+  "resolutions": {
+    "@polkadot/api": "7.15.1",
+    "@polkadot/keyring": "8.7.1",
+    "@polkadot/rpc-provider": "7.15.1",
+    "@polkadot/types": "7.15.1",
+    "@polkadot/types-known": "7.15.1",
+    "@polkadot/util": "8.7.1",
+    "@polkadot/util-crypto": "8.7.1"
+  },
   "dependencies": {
-    "@comunica/actor-init-sparql-rdfjs": "^1.19.2",
-    "@comunica/types": "^1.0.0",
     "@docknetwork/node-types": "^0.10.0",
-    "@polkadot/api": "6.5.1",
-    "@polkadot/keyring": "^7.6.1",
-    "@polkadot/rpc-provider": "6.5.1",
-    "@polkadot/types": "6.5.1",
-    "@polkadot/types-known": "6.5.1",
-    "@polkadot/util": "^7.6.1",
-    "@polkadot/util-crypto": "^7.6.1",
-    "axios": "0.26.0",
+    "@polkadot/api": "7.15.1",
+    "@polkadot/keyring": "8.7.1",
+    "@polkadot/rpc-provider": "7.15.1",
+    "@polkadot/types": "7.15.1",
+    "@polkadot/types-known": "7.15.1",
+    "@polkadot/util": "8.7.1",
+    "@polkadot/util-crypto": "8.7.1",
+    "axios": "0.27.2",
     "base64url": "3.0.1",
     "blake2b": "2.1.4",
     "bs58": "5.0.0",
     "deep-equal": "2.0.5",
-    "dotenv": "16.0.0",
+    "dotenv": "16.0.1",
     "elliptic": "6.5.4",
     "js-sha256": "0.9.0",
     "json-canonicalize": "1.0.4",
     "jsonld": "5.2.0",
     "jsonld-signatures": "^9.0.2",
-    "jsonschema": "1.4.0",
+    "jsonschema": "1.4.1",
     "key-did-resolver": "^1.4.0",
     "mrklt": "^0.2.0",
-    "multiformats": "^9.7.0",
-    "n3": "1.13.0",
-    "rify": "^0.7.0"
+    "n3": "1.16.2",
+    "rify": "^0.7.1"
   }
 }

@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { Parser, Store, DataFactory } from 'n3';
-import { newEngine } from '@comunica/actor-init-sparql-rdfjs';
 import assert from 'assert';
 import { fromJsonldjsNode } from './claimgraph';
 
@@ -52,17 +51,20 @@ export function claimgraphToStore(claimgraph) {
  * Queries a claimgraph object and returns all the bindings to the variable named `?lookupNext`
  * @param {array<object>} claimgraph - A list of RDF quads
  * @param {string} query - SPARQL query string
- * @param {object|null} engine - RDF query engine or null to auto-create
+ * @param {object} engine - RDF query engine
  * @returns {array<any>}
  */
-export async function queryNextLookup(claimgraph, query, engine = null) {
+export async function queryNextLookup(claimgraph, query, engine) {
+  if (!engine) {
+    throw new Error('queryNextLookup requires an RDF query engine');
+  }
+
   // Create an N3 store from claimgraph JSON object
   const store = claimgraphToStore(claimgraph);
 
   // Query the engine, if querying multiple times user should
   // pass engine parameter for optimal performance
-  const myEngine = engine || newEngine();
-  const result = await myEngine.query(query, { sources: [store] });
+  const result = await engine.query(query, { sources: [store] });
 
   // Get bindings from query
   const bindings = await result.bindings();

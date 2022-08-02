@@ -769,9 +769,9 @@ class DIDModule {
       } else if (pk.isEd25519) {
         typ = 'Ed25519VerificationKey2018';
         publicKeyRaw = pk.asEd25519.value;
-      } else if (pk.isSecp256K1) {
+      } else if (pk.isSecp256k1) {
         typ = 'EcdsaSecp256k1VerificationKey2019';
-        publicKeyRaw = pk.asSecp256K1.value;
+        publicKeyRaw = pk.asSecp256k1.value;
       } else if (pk.isX25519) {
         typ = 'X25519KeyAgreementKey2019';
         publicKeyRaw = pk.asX25519.value;
@@ -951,13 +951,14 @@ class DIDModule {
     resp = resp.unwrap();
 
     const pk = resp.publicKey;
+
     let publicKey;
     if (pk.isSr25519) {
       publicKey = new PublicKeySr25519(u8aToHex(pk.asSr25519.value));
     } else if (pk.isEd25519) {
       publicKey = new PublicKeyEd25519(u8aToHex(pk.asEd25519.value));
-    } else if (pk.isSecp256K1) {
-      publicKey = new PublicKeySecp256k1(u8aToHex(pk.asSecp256K1.value));
+    } else if (pk.isSecp256k1) {
+      publicKey = new PublicKeySecp256k1(u8aToHex(pk.asSecp256k1.value));
     } else if (pk.isX25519) {
       publicKey = new PublicKeyX25519(u8aToHex(pk.asX25519.value));
     } else {

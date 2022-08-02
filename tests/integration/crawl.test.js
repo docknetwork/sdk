@@ -208,7 +208,7 @@ describe('Crawler', () => {
       [
         { Iri: 'did:root' },
         { Iri: 'https://rdf.dock.io/alpha/2021#attestsDocumentContents' },
-        { Iri: 'ipfs://zdj7WhNuZPY5dapbDmkHcLQHBJAuK6jA9jiiev1xB6CW7kMwu' },
+        { Iri: 'ipfs://bafybeifrrafsw7gs7mwlzooxejrv6hljun46c7j4zfyc4mep3vn73zbkxa' },
         { Iri: 'did:root' },
       ],
     ]);

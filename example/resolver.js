@@ -80,7 +80,6 @@ async function main() {
     dockDID,
     'did:key:z6Mkfriq1MqLBoPWecGoDLjguo1sB9brj6wT3qZ5BxkKpuP6',
     'did:ethr:0xabcabc03e98e0dc2b855be647c39abe984193675',
-    'did:ion:EiClkZMDxPKqC9c-umQfTkR8vvZ9JPhl_xLDI9Nfk38w5w',
   ];
 
   console.log('Resolving', didsToTest.length, 'dids...');

@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -83,7 +83,7 @@
   "dependencies": {
     "@comunica/actor-init-sparql-rdfjs": "^1.19.2",
     "@comunica/types": "^1.0.0",
-    "@docknetwork/node-types": "^0.8.0",
+    "@docknetwork/node-types": "^0.10.0",
     "@polkadot/api": "6.5.1",
     "@polkadot/keyring": "^7.6.1",
     "@polkadot/rpc-provider": "6.5.1",

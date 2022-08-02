@@ -1124,7 +1124,7 @@
   resolved "https://registry.yarnpkg.com/@comunica/actor-http-proxy/-/actor-http-proxy-1.22.1.tgz#ccc70c4eda51d0d2960c3d6f90cc4a7c5d142e21"
   integrity sha512-q8Dil+MnKeZWKNxLLDXan070TUP+8io7zwwCs5apvaU26ghojBU4OOJx1vL6CInUjZCzTeyCYVPsBbvykjLZ2w==
 
-"@comunica/actor-init-sparql-rdfjs@^1.19.2":
+"@comunica/actor-init-sparql-rdfjs@^1.22.3":
   version "1.22.3"
   resolved "https://registry.yarnpkg.com/@comunica/actor-init-sparql-rdfjs/-/actor-init-sparql-rdfjs-1.22.3.tgz#a3c84da88c2b9df05f414f36700a6522c3d06c03"
   integrity sha512-twc9yf1nOCuCxuSYREODKRN1WJ2updEJ6Y5AllrY1VnBAiP1hWWJxn65KGjE6e9GDvfW1MTfPuXtqxlqIsDn8w==

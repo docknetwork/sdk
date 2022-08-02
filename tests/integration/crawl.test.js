@@ -1,4 +1,5 @@
 import createClient from 'ipfs-http-client';
+import { newEngine } from '@comunica/actor-init-sparql-rdfjs';
 import { crawl, graphResolver } from '../../src/crawl.js';
 import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from '../../src/rdf-defs.js';
 import { documentLoader, addDocument } from '../cached-document-loader.js';
@@ -84,7 +85,7 @@ describe('Crawler', () => {
       (term, _err) => failedLookups.push(term),
     );
     const initialFacts = await resolveGraph({ Iri: 'did:root' });
-    const allFacts = await crawl(initialFacts, RULES, CURIOSITY, resolveGraph);
+    const allFacts = await crawl(initialFacts, RULES, CURIOSITY, resolveGraph, newEngine());
     expect(failedLookups).toEqual([{ Iri: 'did:c' }]);
     expect(allFacts).toEqual(
       [

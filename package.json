@@ -20,7 +20,6 @@
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.1.3",
     "@rollup/plugin-wasm": "^5.1.0",
-    "@substrate/txwrapper": "^7.0.1",
     "@comunica/actor-init-sparql-rdfjs": "^1.22.3",
     "@comunica/types": "^1.0.0",
     "@types/jest": "^26.0.24",
@@ -81,6 +80,15 @@
     "examples-with-node": "./scripts/with_docker_test_node yarn test-examples",
     "mdbook": "mdbook build tutorials --dest-dir ../out/tutorials",
     "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
+  },
+  "resolutions": {
+    "@polkadot/api": "6.5.1",
+    "@polkadot/keyring": "^7.6.1",
+    "@polkadot/rpc-provider": "6.5.1",
+    "@polkadot/types": "6.5.1",
+    "@polkadot/types-known": "6.5.1",
+    "@polkadot/util": "^7.6.1",
+    "@polkadot/util-crypto": "^7.6.1"
   },
   "dependencies": {
     "@docknetwork/node-types": "^0.10.0",

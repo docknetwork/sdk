@@ -8,7 +8,7 @@
     "url": "https://github.com/docknetwork/sdk"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=15.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.15.4",

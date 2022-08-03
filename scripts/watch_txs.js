@@ -11,7 +11,6 @@ import {
   F,
   splitAt,
   prop,
-  anyPass,
   assoc,
   view,
   either,
@@ -33,6 +32,7 @@ import {
   unless,
   curryN,
   defaultTo,
+  head,
 } from "ramda";
 import {
   from,
@@ -44,10 +44,13 @@ import {
   map as mapRx,
   concatMap,
   of,
+  defer,
   filter as filterRx,
   scan,
+  concat,
   bufferTime,
   pluck,
+  takeUntil,
 } from "rxjs";
 import { envObj, formatDock, notNilAnd, withDockAPI } from "./helpers";
 import { sendAlarmEmailHtml } from "./email_utils";
@@ -71,15 +74,43 @@ const {
   BaseExtrinsicExplorerUrl: defaultTo("https://dock.subscan.io/extrinsic"),
 });
 
-const main = async (dock) => {
+const main = async (dock, startBlock) => {
   const { ExtrinsicFailed } = dock.api.events.system;
   const mergeEventsWithExtrs = createEventsWithExtrsCombinator(dock);
 
-  const blocks$ = new Observable((sub) => {
+  const currentBlocks$ = new Observable((sub) => {
     dock.api.derive.chain.subscribeNewBlocks((block) => {
       sub.next(block);
     });
   });
+
+  const previousBlocks$ =
+    startBlock != null
+      ? defer(() => {
+          const source = defer(() => of(startBlock++)).pipe(
+            concatMap((number) =>
+              of(number).pipe(
+                concatMap((number) =>
+                  from(dock.api.rpc.chain.getBlockHash(number))
+                ),
+                concatMap((hash) => from(dock.api.derive.chain.getBlock(hash))),
+                takeUntil(
+                  currentBlocks$.pipe(
+                    filterRx(
+                      (block) => block.block.header.number.toNumber() <= number
+                    )
+                  )
+                )
+              )
+            ),
+            concatMap((value) => concat(of(value), source))
+          );
+
+          return source;
+        })
+      : EMPTY;
+
+  const blocks$ = concat(previousBlocks$, currentBlocks$);
 
   const txs$ = blocks$.pipe(
     concatMap((block) =>
@@ -102,12 +133,9 @@ const main = async (dock) => {
   );
 
   const applyFilters = curry((buildFilters, data$) => {
-    const handleItem = withExtrinsicUrl(converge(merge, buildFilters(dock)))(
-      __,
-      dock
-    );
+    const handleItem = withExtrinsicUrl(converge(merge, buildFilters(dock)));
 
-    return data$.pipe(mergeMap(handleItem));
+    return data$.pipe(mergeMap((item) => handleItem(item, dock)));
   });
 
   const res$ = merge(
@@ -167,7 +195,7 @@ class DiffAccumulator {
 
   handle(data) {
     this.diff =
-      this.last == null ? new Diff(data, this.last) : Diff.prototype.empty();
+      this.last != null ? new Diff(data, this.last) : Diff.prototype.empty();
     this.last = data;
 
     return this;
@@ -198,34 +226,19 @@ const isValidSudo = pipe(
     all((event) => event.data.toJSON()[0].err == null)
   )
 );
-/*
-const isValidDemocracy = pipe(
-  prop("events"),
-  filter(methodFilter("democracy", "Executed")),
-  ifElse(
-    isEmpty,
-    F,
-    all((event) => event.data.toJSON()[1].err == null)
-  )
-);
-*/
+
 /**
  * Returns `true` if given extrinsic was executed successfully.
  */
-const successfulTx = allPass([
-  anyPass([
-    anyEventByMethodFilter("system", "ExtrinsicSuccess"),
-    anyEventByMethodFilter("utility", "ItemCompleted"),
-    isValidSudo,
-  ]),
+const successfulTx = both(
   either(complement(anyEventByMethodFilter("sudo", "Sudid")), isValidSudo),
   complement(
     either(
       anyEventByMethodFilter("utility", "BatchInterrupted"),
       anyEventByMethodFilter("system", "ExtrinsicFailed")
     )
-  ),
-]);
+  )
+);
 /**
  * Filters extrinsics by its `section`/`method`.
  */
@@ -572,15 +585,15 @@ const eventFilters = () => {
   ];
 };
 
-const logTx = ({ tx, rootTx, events }) => {
-  let msg = "";
+const logTx = ({ tx, rootTx, events, block }) => {
+  let msg = `In block #${block.block.header.number} `;
   const signer =
     rootTx?.signature?.signer?.toString() || rootTx?.signer?.toString();
 
   if (signer) {
-    msg += `From ${signer}: `;
+    msg += `from ${signer}: `;
   } else {
-    msg += `Unsigned: `;
+    msg += `unsigned: `;
   }
 
   msg += `${tx.method.section || tx.section}::${tx.method.method || tx.method}`;
@@ -616,7 +629,7 @@ const createEventsWithExtrsCombinator = (dock) => {
     }
   }
 
-  const { ItemCompleted, BatchInterrupted } = dock.api.events.utility;
+  const { BatchCompleted, BatchInterrupted } = dock.api.events.utility;
   const { Sudid } = dock.api.events.sudo;
 
   const findTx = find((entities) => {
@@ -634,18 +647,14 @@ const createEventsWithExtrsCombinator = (dock) => {
   const txWithEvents = (events, tx, { config: config, rootTx }) => {
     if (config & BATCH) {
       let idx = findIndex(
-        either(ItemCompleted.is, BatchInterrupted.is),
+        either(BatchCompleted.is, BatchInterrupted.is),
         events
       );
       if (idx === -1) {
-        idx = events.length - 1;
+        idx = events.length;
       }
 
-      let splitIdx = idx;
-      if (events[idx] && ItemCompleted.is(events[idx])) {
-        splitIdx = splitIdx + 1;
-      }
-      const [curEvents, nextEvents] = splitAt(splitIdx, events);
+      const [curEvents, nextEvents] = splitAt(idx, events);
 
       return new TxWithEventsAccumulator(
         [{ events: curEvents, tx, rootTx }],
@@ -693,7 +702,12 @@ const createEventsWithExtrsCombinator = (dock) => {
           config: config,
           rootTx,
         });
-        return selfAcc.prependExtrinsics(acc.extrinsics);
+
+        return BatchCompleted.is(head(acc.events))
+          ? selfAcc.prependExtrinsics(acc.extrinsics)
+          : selfAcc.prependExtrinsics(
+              acc.extrinsics.slice(0, acc.events[0].toJSON().data[0])
+            );
       } else {
         const isSudo = txByMethodFilter("sudo", [
           "sudo",

@@ -29,13 +29,12 @@ describe('Deploy an ERC-20 contract and transfer ERC-20 tokens', () => {
   let bob;
   const ethersProvider = getEthers(FullNodeTCPEndpoint);
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     const [a, b] = getTestEVMAccountsFromEthers(ethersProvider);
     alice = a;
     bob = b;
     await endowEVMAddressWithDefault(alice.address, defaultEVMAccountEndowment(), FullNodeEndpoint, TestAccountURI);
     await endowEVMAddressWithDefault(bob.address, defaultEVMAccountEndowment(), FullNodeEndpoint, TestAccountURI);
-    done();
   });
 
   afterAll(async () => {

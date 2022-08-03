@@ -14,7 +14,8 @@ import {
  * schema `schema`
  * @param {object} credential - The credential to use, must be expanded JSON-LD
  * @param {object} schema - The schema to use
- * @returns {Promise<Boolean>} - Returns promise to an boolean or throws error
+ * @param context
+ * @returns {Promise<Boolean>} - Returns promise to a boolean or throws error
  */
 export async function validateCredentialSchema(credential, schema, context) {
   const requiresID = schema.required && schema.required.indexOf('id') > -1;

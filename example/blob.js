@@ -3,12 +3,13 @@ import { u8aToString } from '@polkadot/util';
 
 import { DockAPI } from '../src/index';
 import { DockBlobIdByteSize } from '../src/modules/blob';
-import { createNewDockDID, createKeyDetail, getHexIdentifierFromDID } from '../src/utils/did';
+import { createNewDockDID, createDidKey, getHexIdentifierFromDID } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
+import { DidKey, VerificationRelationship } from '../src/public-keys';
 
 async function writeAndReadBlob(dock, blobValue, dockDID, pair) {
   const blobId = randomAsHex(DockBlobIdByteSize);
@@ -17,14 +18,13 @@ async function writeAndReadBlob(dock, blobValue, dockDID, pair) {
   const blob = {
     id: blobId,
     blob: blobValue,
-    author: getHexIdentifierFromDID(dockDID),
   };
 
-  await dock.blob.new(blob, pair, undefined, false);
+  await dock.blob.new(blob, dockDID, pair, 1, { didModule: dock.did }, false);
 
   console.log('Blob written, reading from chain...');
 
-  return await dock.blob.get(blobId);
+  return dock.blob.get(blobId);
 }
 
 async function createAuthorDID(dock, pair) {
@@ -34,8 +34,8 @@ async function createAuthorDID(dock, pair) {
 
   // Create an author DID to write with
   const publicKey = getPublicKeyFromKeyringPair(pair);
-  const keyDetail = createKeyDetail(publicKey, dockDID);
-  await dock.did.new(dockDID, keyDetail, false);
+  const didKey = new DidKey(publicKey, new VerificationRelationship());
+  await dock.did.new(dockDID, [didKey], [], false);
   return dockDID;
 }
 

@@ -184,7 +184,7 @@ export async function verifyCredential(credential, {
     documentLoader: docLoader,
   });
 
-  // Validate scheam
+  // Validate schema
   if (schemaApi) {
     await getAndValidateSchemaIfPresent(expandedCredential, schemaApi, credential[credentialContextField]);
   }
@@ -217,6 +217,9 @@ export async function verifyCredential(credential, {
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
  * @param {object} credential - Credential to be signed.
  * @param {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
+ * @param documentLoader
+ * @param purpose
+ * @param expansionMap
  * @param {object} [issuerObject] - Optional issuer object to assign
  * @return {Promise<object>} The signed credential object.
  */

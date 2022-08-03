@@ -18,12 +18,12 @@ async function* getFiles(dir) {
   }
 }
 
-;(async () => {
+(async () => {
   const exports = {
     '.': {
       require: './index.cjs',
       default: './index.js',
-    }
+    },
   };
   for await (const f of getFiles(distDir)) {
     if (f.indexOf('.cjs') > -1) {
@@ -31,14 +31,14 @@ async function* getFiles(dir) {
     }
 
     if (f.indexOf('.js') > -1) {
-      exports['./' + f.substr(0, f.length - 3)] = {
-        require: './' + f.substr(0, f.length - 3) + '.cjs',
-        default: './' + f,
+      exports[`./${f.substring(0, f.length - 3)}`] = {
+        require: `./${f.substring(0, f.length - 3)}.cjs`,
+        default: `./${f}`,
       };
     } else {
-      exports['./' + f] = {
-        require: './' + f + '/index.cjs',
-        default: './' + f + '/index.js',
+      exports[`./${f}`] = {
+        require: `./${f}/index.cjs`,
+        default: `./${f}/index.js`,
       };
     }
   }
@@ -51,4 +51,4 @@ async function* getFiles(dir) {
   distPackageJSON.exports = exports;
   distPackageJSON.type = 'module';
   await writeFile(packagePath, JSON.stringify(distPackageJSON, null, 2));
-})()
+})();

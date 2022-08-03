@@ -16,7 +16,7 @@ main().catch((e) => {
 async function main() {
   const { FullNodeEndpoint } = process.env;
 
-  const nc = await connect(FullNodeEndpoint);
+  const nc = (await connect(FullNodeEndpoint)).api;
 
   const proposal = nc.tx.system.setStorage([
     [u8aToHex(randomAsU8a(32)), u8aToHex(randomAsU8a(32))],

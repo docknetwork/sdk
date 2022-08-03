@@ -1,6 +1,7 @@
 import { cryptoWaitReady, randomAsHex } from '@polkadot/util-crypto';
 import { Keyring } from '@polkadot/api';
 
+import { hexToU8a } from '@polkadot/util';
 import {
   generateEcdsaSecp256k1Keypair,
   getPublicKeyFromKeyringPair,
@@ -10,7 +11,6 @@ import {
 import { PublicKeyEd25519, PublicKeySr25519, PublicKeySecp256k1 } from '../../src/public-keys';
 import { SignatureEd25519, SignatureSr25519, SignatureSecp256k1 } from '../../src/signatures';
 import { isHexWithGivenByteSize } from '../../src/utils/codec';
-import { hexToU8a } from '@polkadot/util';
 
 describe('Testing isHexWithGivenByteSize', () => {
   test('isHexWithGivenByteSize rejects strings not starting with 0x', () => {
@@ -49,9 +49,8 @@ describe('Testing isHexWithGivenByteSize', () => {
 });
 
 describe('Testing public key and signature instantiation from keyring', () => {
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await cryptoWaitReady();
-    done();
   });
 
   test('getCorrectPublicKeyFromKeyringPair returns correct public key from ed25519 pair', () => {
@@ -69,7 +68,7 @@ describe('Testing public key and signature instantiation from keyring', () => {
   });
 
   test('getCorrectPublicKeyFromKeyringPair returns correct public key from secp256k1 pair', () => {
-    const pair = generateEcdsaSecp256k1Keypair();
+    const pair = generateEcdsaSecp256k1Keypair(randomAsHex(32));
     const pk = getPublicKeyFromKeyringPair(pair);
     expect(pk instanceof PublicKeySecp256k1).toBe(true);
   });

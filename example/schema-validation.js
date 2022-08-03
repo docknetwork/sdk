@@ -18,12 +18,17 @@ async function main() {
   // Run validation for invalid schema
   console.log('Example schema should be invalid:', invalidSchema);
 
+  let success = false;
   try {
     // This method will throw an error as schema is invalid
     await Schema.validateSchema(invalidSchema);
-    console.error('Invalid schema passed validation, something went wrong!');
   } catch (e) {
-    console.log('Schema validation failed:', e);
+    success = true;
+    console.log('As expected, schema validation failed with error:', e);
+  }
+
+  if (success === false) {
+    throw new Error('Invalid schema passed validation, something went wrong!');
   }
 }
 

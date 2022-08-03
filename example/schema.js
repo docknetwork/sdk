@@ -2,7 +2,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import Schema from '../src/modules/schema';
 
 import { DockAPI } from '../src/index';
-import { createNewDockDID, createKeyDetail } from '../src/utils/did';
+import { createNewDockDID } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import VerifiableCredential from '../src/verifiable-credential';
 
@@ -13,6 +13,7 @@ import { UniversalResolver } from '../src/resolver';
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 
 import exampleCredential from '../tests/example-credential';
+import { DidKey, VerificationRelationship } from '../src/public-keys';
 
 async function createAuthorDID(dock, pair) {
   // Generate a DID to be used as author
@@ -21,8 +22,8 @@ async function createAuthorDID(dock, pair) {
 
   // Create an author DID to write with
   const publicKey = getPublicKeyFromKeyringPair(pair);
-  const keyDetail = createKeyDetail(publicKey, dockDID);
-  await dock.did.new(dockDID, keyDetail, false);
+  const didKey = new DidKey(publicKey, new VerificationRelationship());
+  await dock.did.new(dockDID, [didKey], [], false);
   return dockDID;
 }
 
@@ -65,16 +66,10 @@ async function main() {
     additionalProperties: false,
   });
 
-  // Set schema author
-  schema.setAuthor(dockDID);
-
-  // Sign the schema
-  schema.sign(pair, dock.blob);
-
   console.log('The schema is:', JSON.stringify(schema.toJSON(), null, 2));
   console.log('Writing schema to the chain with blob id of', schema.id, '...');
 
-  await schema.writeToChain(dock, pair, undefined, false);
+  await schema.writeToChain(dock, dockDID, pair, 1, undefined, false);
 
   console.log(`Schema written, reading from chain (${schema.id})...`);
 

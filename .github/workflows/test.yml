@@ -13,7 +13,7 @@ jobs:
           run_daemon: true
       - uses: actions/setup-node@v1
         with:
-          node-version: '14.x'
+          node-version: '16.x'
       - run: yarn install --frozen-lockfile --ignore-scripts
       - run: yarn build
       - run: yarn test

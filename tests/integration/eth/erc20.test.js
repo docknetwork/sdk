@@ -16,13 +16,12 @@ describe('Deploy an ERC-20 contract and transfer ERC-20 tokens', () => {
   let bob;
   const web3 = getWeb3(FullNodeTCPEndpoint);
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     const [a, b] = getTestEVMAccountsFromWeb3(web3);
     alice = a;
     bob = b;
     await endowEVMAddressWithDefault(alice.address, defaultEVMAccountEndowment(), FullNodeEndpoint, TestAccountURI);
     await endowEVMAddressWithDefault(bob.address, defaultEVMAccountEndowment(), FullNodeEndpoint, TestAccountURI);
-    done();
   });
 
   afterAll(async () => {

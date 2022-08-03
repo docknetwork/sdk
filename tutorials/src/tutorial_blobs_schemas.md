@@ -24,16 +24,14 @@ important before diving into Schemas.
 ### Writing a Blob
 A new Blob can be registered on the Dock Chain by using the method `writeToChain` in the BlobModule class.
 It accepts a `blob` object with the struct to store on chain (it can either be a hex string or a byte array), and one of `keyPair` (a
-keyPair to sign the extrinsic with) or a `signature` (if you prefer to sign the extrinsic offline). In return you'll get
-a signed extrinsic that you can send to the Dock chain:
+keyPair to sign the payload with). You'll get a signed extrinsic that you can send to the Dock chain:
 ```javascript
 const blobId = randomAsHex(DockBlobIdByteSize); // 32-bytes long hex string to use as the blob's id
 const blobStruct = {
   id: blobId,
   blob: blobHexOrArray,  // Contents of your blob as a hex string or byte array
-  author: '0x...',       // hex part of a dock DID
 }
-const result = await dock.blob.writeToChain( blobStruct, keyPair);
+const result = await dock.blob.new(blobStruct, signerDid, keyPair, 1, { didModule: dock.didModule });
 ```
 If everything worked properly `result` will indicate a successful transaction.
 We'll see how to retrieve the blob next.
@@ -102,38 +100,6 @@ checked to be a valid JSON schema before being added):
 <-  true
 ```
 
-#### Setting an author
-An author can be added with the `setAuthor` method. It accepts a single string argument `did` (which can be a DID's hex
-identifier or a fully-quailified DID):
-```javascript
->   const exampleAuthor = 'did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW';
->   myNewSchema.setAuthor(exampleAuthor)
->   myNewSchema.author === exampleAuthor
-<-  true
-```
-
-#### Signing a schema
-Signing a schema can be achieved by calling the `sign` method. It accepts a `keypair` param (a keyPair to sign with)
-and a `blobModule` object:
-```javascript
->   const keyring = new Keyring();
->   const keypair = keyring.addFromUri(randomAsHex(32), null, 'sr25519');
->   myNewSchema.sign(keypair, dockApi.blob)
->   !!myNewSchema.signature
-<-  true
-```
-
-#### Setting a signature manually
-A signature can also be manually added with the `setSignature` method. It accepts a single argument `signature` (an instance
-of `Signature`):
-```javascript
->   const keyring = new Keyring();
->   const keypair = keyring.addFromUri(randomAsHex(32), null, 'sr25519');
->   const sig = new SignatureSr25519(msg, keypair);
->   myNewSchema.setSignature(sig)
->   myNewSchema.signature === sig
-<-  true
-```
 
 #### Formatting for storage
 Your new schema is now ready to be written to the Dock chain, the last step is to format it properly for the BlobModule
@@ -143,17 +109,15 @@ to be able to use it. That's where the `toBlob` method comes in handy:
 <-  {
       id: ...,
       blob: ...,
-      author: ...,
     }
 ```
 
 
 ### Writing a Schema to the Dock chain
-Writing a Schema to the Dock chain is similar to writing any other Blob. Once you've created your new schema following
-the steps above you can use the `BlobModule` methods to interact with the chain:
+Writing a Schema to the Dock chain is similar to writing any other Blob. `1` is the key id for the on-chain public key corresponding to `keyPair`
 ```javascript
 >  const formattedBlob = myNewSchema.toBlob(dockDID);
->  await dock.blob.writeToChain(formattedBlob, keyPair);
+>  await myNewSchema.writeToChain(dock, dockDID, keyPair, 1);
 ```
 
 ### Reading a Schema from the Dock chain

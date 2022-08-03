@@ -6,7 +6,7 @@ import typesBundle from '@docknetwork/node-types';
 
 import AnchorModule from './modules/anchor';
 import BlobModule from './modules/blob';
-import DIDModule from './modules/did';
+import { DIDModule } from './modules/did';
 import RevocationModule from './modules/revocation';
 import TokenMigration from './modules/migration';
 import BBSPlusModule from './modules/bbs-plus';

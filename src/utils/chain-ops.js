@@ -158,7 +158,7 @@ export async function getTransferExtrinsicsFromBlock(api, numberOrHash, network,
     if (ext.method && ext.method.section === 'balances' && (ext.method.method === 'transfer' || ext.method.method === 'transferKeepAlive')) {
       const bal = formatBalIfNeeded(ext.method.args[1], balanceFormatted);
       const hash = u8aToHex(blake2AsU8a(ext.toU8a(), 256));
-      transfers.push([asDockAddress(ext.signer, network), asDockAddress(ext.method.args[0], network), bal, hash]);
+      transfers.push([asDockAddress(ext.signer.toHex(), network), asDockAddress(ext.method.args[0].toHex(), network), bal, hash]);
     }
   });
   return transfers;

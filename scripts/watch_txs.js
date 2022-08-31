@@ -49,37 +49,54 @@ import {
   filter as filterRx,
   concat,
   bufferTime,
-  pluck,
   takeUntil,
   take,
   switchMap,
+  mergeMap,
   ReplaySubject,
 } from "rxjs";
-import { envObj, formatDock, notNilAnd, withDockAPI } from "./helpers";
+import {
+  envObj,
+  formatDock,
+  notNilAnd,
+  withDockAPI,
+  finiteNumber,
+} from "./helpers";
 import { sendAlarmEmailHtml } from "./email_utils";
 
 const {
   TxWatcherAlarmEmailTo,
   FullNodeEndpoint,
   LogLevel,
+  BatchNoficationTimeout,
+  StartBlock,
   BaseBlockExplorerUrl,
   BaseExtrinsicExplorerUrl,
 } = envObj({
+  // Email to send alarm emails to.
   TxWatcherAlarmEmailTo: notNilAnd(String),
+  // Address of the node RPC.
   FullNodeEndpoint: notNilAnd(String),
+  // Level of logs to be used for profiling: `debug` or null.
   LogLevel: unless(
     isNil,
     unless(includes(__, ["debug"]), () => {
       throw new Error('Allowed options: ["debug"]');
     })
   ),
+  // Amount of time used to accumulate notifications into a single email.
+  BatchNoficationTimeout: o(finiteNumber, defaultTo(3e3)),
+  // Block number to start from.
+  StartBlock: unless(isNil, finiteNumber),
+  // Base explorer url to construct block address.
   BaseBlockExplorerUrl: defaultTo("https://dock.subscan.io/block"),
+  // Base explorer url to construct extrinsic address.
   BaseExtrinsicExplorerUrl: defaultTo("https://dock.subscan.io/extrinsic"),
 });
 
 const main = async (dock, startBlock) => {
   const { ExtrinsicFailed } = dock.api.events.system;
-  const mergeEventsWithExtrs = createEventsWithExtrsCombinator(dock);
+  const mergeEventsWithExtrs = createTxWithEventsCombinator(dock);
 
   // Emits recently created blocks
   const currentBlocks$ = new Observable((sub) => {
@@ -142,8 +159,8 @@ const main = async (dock, startBlock) => {
   );
 
   // Applies filters to the given observable
-  const applyFilters = curry((buildFilters, data$) => {
-    const handleItem = withExtrinsicUrl(converge(merge, buildFilters(dock)));
+  const applyFilters = curry((filters, data$) => {
+    const handleItem = withExtrinsicUrl(converge(merge, filters));
 
     return data$.pipe(concatMap((item) => handleItem(item, dock)));
   });
@@ -151,13 +168,13 @@ const main = async (dock, startBlock) => {
   const res$ = merge(
     txs$.pipe(
       tap(LogLevel === "debug" ? logTx : identity),
-      applyFilters(txFilters)
+      applyFilters(txFilters())
     ),
-    events$.pipe(applyFilters(eventFilters))
+    events$.pipe(applyFilters(eventFilters(dock)))
   ).pipe(
-    batchNotifications(3e3),
+    batchNotifications(BatchNoficationTimeout),
     tap((email) => console.log("Sending email: ", email)),
-    concatMap(
+    mergeMap(
       o(
         from,
         sendAlarmEmailHtml(
@@ -239,7 +256,7 @@ const anyEventByMethodFilter = curry(
   pipe(methodFilter, any, o(__, prop("events")))
 );
 /**
- * Filters extrinsics by its `section`/`method`.
+ * Filters extrinsics by its `section`/`method(s)`.
  */
 const txByMethodFilter = curry(
   pipe(
@@ -280,7 +297,7 @@ const successfulTx = both(
   )
 );
 /**
- * Filters successful extrinsics by its `section`/`method`.
+ * Filters successful extrinsics by its `section`/`method(s)`.
  */
 const successfulTxByMethodFilter = curry(
   pipe(txByMethodFilter, both(successfulTx))
@@ -554,7 +571,7 @@ const eventFilters = (dock) => {
 
             return newDiff;
           }),
-          pluck("diff"),
+          mapRx(prop("diff")),
           filterRx(complement(isEmpty)),
           mapRx(
             ({ added, removed }) =>
@@ -644,27 +661,38 @@ const logTx = ({ tx, rootTx, events, block }) => {
   );
 };
 
-const createEventsWithExtrsCombinator = (dock) => {
+/**
+ *
+ * Builds a function to flatten nested extrinsics and combine them with the corresponding events.
+ * @param {DockAPI} dock
+ * @returns {function(*):*}
+ *
+ * @todo rewrite as a visitor
+ */
+const createTxWithEventsCombinator = (dock) => {
   const BATCH = 1;
   const SUDO = 2;
 
+  /**
+   * Contains extrinsic combined with their corresponding events and next events to be combined with the next extrinsic.
+   */
   class TxWithEventsAccumulator {
-    constructor(extrinsics, events) {
+    constructor(extrinsics, nextEvents) {
       this.extrinsics = extrinsics;
-      this.events = events;
+      this.nextEvents = nextEvents;
     }
 
     appendExtrinsics(extrinsics) {
       return new TxWithEventsAccumulator(
         this.extrinsics.concat(extrinsics),
-        this.events
+        this.nextEvents
       );
     }
 
     prependExtrinsics(extrinsics) {
       return new TxWithEventsAccumulator(
         extrinsics.concat(this.extrinsics),
-        this.events
+        this.nextEvents
       );
     }
   }
@@ -718,7 +746,7 @@ const createEventsWithExtrsCombinator = (dock) => {
   };
 
   /**
-   * Merges extrinsic with its events
+   * Merges extrinsics with their corresponding events
    */
   const mergeEventsWithExtrs = ifElse(
     (_, tx) => findTx([tx.args, tx.args?.[0]]),
@@ -726,11 +754,14 @@ const createEventsWithExtrsCombinator = (dock) => {
       const isBatch = txByMethodFilter("utility", ["batch", "batchAll"])({
         tx,
       });
+      const isSudo =
+        !isBatch &&
+        txByMethodFilter("sudo", ["sudo", "sudoUncheckedWeight"])({ tx });
 
       if (isBatch) {
         const acc = reduce(
-          ({ extrinsics, events }, tx) => {
-            const merged = mergeEventsWithExtrs(events, tx, {
+          ({ extrinsics, nextEvents }, tx) => {
+            const merged = mergeEventsWithExtrs(nextEvents, tx, {
               config: config | BATCH,
               rootTx,
             });
@@ -741,32 +772,29 @@ const createEventsWithExtrsCombinator = (dock) => {
           tx.args[0]
         );
 
-        const selfAcc = txWithEvents(acc.events, tx, {
-          config: config,
+        const selfAcc = txWithEvents(acc.nextEvents, tx, {
+          config,
           rootTx,
         });
 
-        return BatchCompleted.is(head(acc.events))
+        return BatchCompleted.is(head(acc.nextEvents))
           ? selfAcc.prependExtrinsics(acc.extrinsics)
           : selfAcc.prependExtrinsics(
-              acc.extrinsics.slice(0, acc.events[0].toJSON().data[0])
+              acc.extrinsics.slice(0, acc.nextEvents[0].toJSON().data[0])
             );
-      } else {
-        const isSudo = txByMethodFilter("sudo", [
-          "sudo",
-          "sudoUncheckedWeight",
-        ])({ tx });
-
+      } else if (isSudo) {
         const acc = mergeEventsWithExtrs(events, tx.args[0], {
           config: config | (isSudo ? SUDO : 0),
           rootTx,
         });
-        const selfAcc = txWithEvents(acc.events, tx, {
-          config: config,
+        const selfAcc = txWithEvents(acc.nextEvents, tx, {
+          config,
           rootTx,
         });
 
         return selfAcc.prependExtrinsics(acc.extrinsics);
+      } else {
+        return txWithEvents(events, tx, { config, rootTx });
       }
     },
     txWithEvents
@@ -775,7 +803,10 @@ const createEventsWithExtrsCombinator = (dock) => {
   return mergeEventsWithExtrs;
 };
 
-withDockAPI({ address: FullNodeEndpoint }, main)()
+withDockAPI(
+  { address: FullNodeEndpoint },
+  main
+)(StartBlock)
   .then(() => process.exit(0))
   .catch((err) => {
     console.error(err);

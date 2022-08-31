@@ -712,7 +712,16 @@ const createTxWithEventsCombinator = (dock) => {
     );
   });
 
-  const txWithEvents = (events, tx, { config: config, rootTx }) => {
+  /**
+   * Picks events for the given returning `TxWithEventsAccumulator` initialized with the given extrinsic merged with their events,
+   * and remaining events to be processed.
+   *
+   * @param {Array<*>} events
+   * @param {*} tx
+   * @param {{config: number, rootTx: *}} param2
+   * @returns
+   */
+  const pickEventsForExtrinsic = (events, tx, { config: config, rootTx }) => {
     if (config & BATCH) {
       let idx = findIndex(
         either(BatchCompleted.is, BatchInterrupted.is),
@@ -746,7 +755,7 @@ const createTxWithEventsCombinator = (dock) => {
   };
 
   /**
-   * Merges extrinsics with their corresponding events
+   * Recursively merges extrinsics with their corresponding events.
    */
   const mergeEventsWithExtrs = ifElse(
     (_, tx) => findTx([tx.args, tx.args?.[0]]),
@@ -772,7 +781,7 @@ const createTxWithEventsCombinator = (dock) => {
           tx.args[0]
         );
 
-        const selfAcc = txWithEvents(acc.nextEvents, tx, {
+        const selfAcc = pickEventsForExtrinsic(acc.nextEvents, tx, {
           config,
           rootTx,
         });
@@ -787,17 +796,17 @@ const createTxWithEventsCombinator = (dock) => {
           config: config | (isSudo ? SUDO : 0),
           rootTx,
         });
-        const selfAcc = txWithEvents(acc.nextEvents, tx, {
+        const selfAcc = pickEventsForExtrinsic(acc.nextEvents, tx, {
           config,
           rootTx,
         });
 
         return selfAcc.prependExtrinsics(acc.extrinsics);
       } else {
-        return txWithEvents(events, tx, { config, rootTx });
+        return pickEventsForExtrinsic(events, tx, { config, rootTx });
       }
     },
-    txWithEvents
+    pickEventsForExtrinsic
   );
 
   return mergeEventsWithExtrs;

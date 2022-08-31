@@ -30,14 +30,15 @@ import {
   findIndex,
   any,
   unless,
+  difference,
   curryN,
   defaultTo,
   head,
 } from "ramda";
 import {
   from,
+  share,
   Observable,
-  mergeMap,
   merge,
   tap,
   EMPTY,
@@ -46,11 +47,13 @@ import {
   of,
   defer,
   filter as filterRx,
-  scan,
   concat,
   bufferTime,
   pluck,
   takeUntil,
+  take,
+  switchMap,
+  ReplaySubject,
 } from "rxjs";
 import { envObj, formatDock, notNilAnd, withDockAPI } from "./helpers";
 import { sendAlarmEmailHtml } from "./email_utils";
@@ -78,12 +81,14 @@ const main = async (dock, startBlock) => {
   const { ExtrinsicFailed } = dock.api.events.system;
   const mergeEventsWithExtrs = createEventsWithExtrsCombinator(dock);
 
+  // Emits recently created blocks
   const currentBlocks$ = new Observable((sub) => {
     dock.api.derive.chain.subscribeNewBlocks((block) => {
       sub.next(block);
     });
   });
 
+  // Emits blocks starting from the specified number
   const previousBlocks$ =
     startBlock != null
       ? defer(() => {
@@ -112,30 +117,35 @@ const main = async (dock, startBlock) => {
 
   const blocks$ = concat(previousBlocks$, currentBlocks$);
 
-  const txs$ = blocks$.pipe(
-    concatMap((block) =>
-      from(
-        block.extrinsics.flatMap(({ extrinsic, events }) => {
-          return ExtrinsicFailed.is(last(events))
-            ? []
-            : mergeEventsWithExtrs(events, extrinsic, {
-                rootTx: extrinsic,
-                config: 0,
-              }).extrinsics;
-        })
-      ).pipe(mapRx(assoc("block", block)))
+  // Flattens extrinsics returning transaction along with produced events
+  const txs$ = blocks$
+    .pipe(
+      concatMap((block) =>
+        from(
+          block.extrinsics.flatMap(({ extrinsic, events }) => {
+            return ExtrinsicFailed.is(last(events))
+              ? []
+              : mergeEventsWithExtrs(events, extrinsic, {
+                  rootTx: extrinsic,
+                  config: 0,
+                }).extrinsics;
+          })
+        ).pipe(mapRx(assoc("block", block)))
+      )
     )
-  );
+    .pipe(share());
+  // For each transaction event repeats its transaction
   const events$ = txs$.pipe(
     concatMap(({ events, ...rest }) =>
       from(events).pipe(mapRx((event) => ({ event, events, ...rest })))
     )
   );
 
+  // Applies filter to the given observable
   const applyFilters = curry((buildFilters, data$) => {
     const handleItem = withExtrinsicUrl(converge(merge, buildFilters(dock)));
 
-    return data$.pipe(mergeMap((item) => handleItem(item, dock)));
+    return data$.pipe(concatMap((item) => handleItem(item, dock)));
   });
 
   const res$ = merge(
@@ -177,6 +187,9 @@ export const batchNotifications = curry((timeLimit, notifications$) =>
 const sectionLens = lensProp("section");
 const methodLens = lensProp("method");
 
+/**
+ * Represents added/removed difference between new data and old data.
+ */
 class Diff {
   constructor(newData, oldData) {
     this.added = difference(newData, oldData);
@@ -188,6 +201,9 @@ class Diff {
   }
 }
 
+/**
+ * Accumulates differences.
+ */
 class DiffAccumulator {
   constructor(init) {
     this.last = init;
@@ -202,6 +218,9 @@ class DiffAccumulator {
   }
 }
 
+/**
+ * Filters given entity by its `section`/`method(s)`
+ */
 const methodFilter = curry((section, methods) =>
   allPass([
     o(equals(section), view(sectionLens)),
@@ -209,9 +228,30 @@ const methodFilter = curry((section, methods) =>
   ])
 );
 
+/**
+ * Filters given event by its `section`/`method(s)`
+ */
 const eventByMethodFilter = curry(pipe(methodFilter, o(__, prop("event"))));
+/**
+ * Filters extrinsics to contain at least one event with the given `section`/`method(s)`
+ */
 const anyEventByMethodFilter = curry(
   pipe(methodFilter, any, o(__, prop("events")))
+);
+/**
+ * Filters extrinsics by its `section`/`method`.
+ */
+const txByMethodFilter = curry(
+  pipe(
+    methodFilter,
+    o(
+      __,
+      o(
+        when(({ method }) => typeof method === "object", view(methodLens)),
+        prop("tx")
+      )
+    )
+  )
 );
 
 /**
@@ -236,21 +276,6 @@ const successfulTx = both(
     either(
       anyEventByMethodFilter("utility", "BatchInterrupted"),
       anyEventByMethodFilter("system", "ExtrinsicFailed")
-    )
-  )
-);
-/**
- * Filters extrinsics by its `section`/`method`.
- */
-const txByMethodFilter = curry(
-  pipe(
-    methodFilter,
-    o(
-      __,
-      o(
-        when(({ method }) => typeof method === "object", view(methodLens)),
-        prop("tx")
-      )
     )
   )
 );
@@ -330,7 +355,6 @@ const technicalCommitteeMembershipEvent = eventByMethodFilter(
  * Filter events produced by `elections` pallet.
  */
 const electionsEvent = eventByMethodFilter("elections");
-
 /**
  * Filter extrinsics from `democracy` pallet.
  */
@@ -365,7 +389,7 @@ const txFilters = () => [
     electionsTx("removeMember"),
     ({
       tx: {
-        data: [member],
+        args: [member],
       },
     }) => of(`Council member removed ${member.toString()}`)
   ),
@@ -386,7 +410,7 @@ const txFilters = () => [
     democracyTx("second"),
     ({
       tx: {
-        data: [idx],
+        args: [idx],
       },
     }) => of(`Proposal #${idx.toString()} is seconded`)
   ),
@@ -406,15 +430,17 @@ const txFilters = () => [
   checkMap(
     democracyTx("cancelProposal"),
     ({
-      event: {
-        data: [proposalIndex],
+      tx: {
+        args: [proposalIndex],
       },
     }) => of(`Proposal #${proposalIndex.toString()} was cancelled`)
   ),
 ];
 
-const eventFilters = () => {
-  const councilDiffAcumulator = new DiffAccumulator(null);
+const eventFilters = (dock) => {
+  // Emits latest council diff accumulator
+  const councilDiffAccumulator = new ReplaySubject(1);
+  councilDiffAccumulator.next(null);
 
   return [
     // Democracy proposal
@@ -488,7 +514,7 @@ const eventFilters = () => {
     checkMap(
       electionsEvent("Renounced"),
       ({
-        tx: {
+        event: {
           data: [member],
         },
       }) => of(`Council member renounced: ${member.toString()}`)
@@ -496,24 +522,37 @@ const eventFilters = () => {
 
     // Council members changed
     checkMap(
-      councilEvent("NewTerm"),
+      electionsEvent("NewTerm"),
       ({
         event: {
           data: [newMembers],
         },
+        block,
       }) =>
-        of(newMembers).pipe(
-          scan(
-            (
-              acc,
-              {
-                event: {
-                  data: [newMembers],
-                },
-              }
-            ) => acc.handle(newMembers),
-            councilDiffAcumulator
-          ),
+        councilDiffAccumulator.pipe(
+          take(1),
+          switchMap((acc) => {
+            if (acc == null) {
+              return from(
+                dock.api.rpc.chain.getBlockHash(
+                  block.block.header.number.toNumber() - 1
+                )
+              ).pipe(
+                switchMap((blockHash) =>
+                  dock.api.query.council.members.at(blockHash)
+                ),
+                mapRx((data) => new DiffAccumulator(data.toJSON()))
+              );
+            } else {
+              return of(acc);
+            }
+          }),
+          mapRx((acc) => {
+            const newDiff = acc.handle(newMembers.toJSON().map(head));
+            councilDiffAccumulator.next(newDiff);
+
+            return newDiff;
+          }),
           pluck("diff"),
           filterRx(complement(isEmpty)),
           mapRx(
@@ -677,6 +716,9 @@ const createEventsWithExtrsCombinator = (dock) => {
     return new TxWithEventsAccumulator([{ events, tx, rootTx }], []);
   };
 
+  /**
+   * Merges extrinsic with its events
+   */
   const mergeEventsWithExtrs = ifElse(
     (_, tx) => findTx([tx.args, tx.args?.[0]]),
     (events, tx, { rootTx, config }) => {
@@ -732,7 +774,10 @@ const createEventsWithExtrsCombinator = (dock) => {
   return mergeEventsWithExtrs;
 };
 
-withDockAPI({ address: FullNodeEndpoint }, main)()
+withDockAPI(
+  { address: FullNodeEndpoint },
+  main
+)(16)
   .then(() => process.exit(0))
   .catch((err) => {
     console.error(err);

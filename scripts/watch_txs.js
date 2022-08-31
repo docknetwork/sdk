@@ -134,14 +134,14 @@ const main = async (dock, startBlock) => {
       )
     )
     .pipe(share());
-  // For each transaction event repeats its transaction
+  // Each event repeats its transaction
   const events$ = txs$.pipe(
     concatMap(({ events, ...rest }) =>
       from(events).pipe(mapRx((event) => ({ event, events, ...rest })))
     )
   );
 
-  // Applies filter to the given observable
+  // Applies filters to the given observable
   const applyFilters = curry((buildFilters, data$) => {
     const handleItem = withExtrinsicUrl(converge(merge, buildFilters(dock)));
 
@@ -453,6 +453,7 @@ const eventFilters = (dock) => {
       }) => of(`New Democracy proposal ${hash}`)
     ),
 
+    // Democracy preimage noted for the proposal
     checkMap(
       both(democracyEvent("PreimageNoted"), democracyTx("notePreimage")),
       (

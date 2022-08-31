@@ -774,10 +774,7 @@ const createEventsWithExtrsCombinator = (dock) => {
   return mergeEventsWithExtrs;
 };
 
-withDockAPI(
-  { address: FullNodeEndpoint },
-  main
-)(16)
+withDockAPI({ address: FullNodeEndpoint }, main)()
   .then(() => process.exit(0))
   .catch((err) => {
     console.error(err);

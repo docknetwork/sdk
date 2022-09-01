@@ -507,7 +507,7 @@ const eventFilters = (dock) => {
       }) => of(`Proposal is fast-tracked: ${proposalHash.toString()}`)
     ),
 
-    // Council proposal
+    // Council proposal created
     checkMap(councilEvent("Proposed"), ({ event }, dock) => {
       const {
         data: [_, __, hash],
@@ -525,6 +525,17 @@ const eventFilters = (dock) => {
             )})`;
           }
         })
+      );
+    }),
+
+    // Council proposal closed
+    checkMap(councilEvent("Closed"), ({ event }) => {
+      const {
+        data: [hash, yesVotes, noVotes],
+      } = event.toJSON();
+
+      return of(
+        `Council proposal ${hash} closed with ${yesVotes} yes/${noVotes} no`
       );
     }),
 

@@ -36,7 +36,7 @@ import {
   either,
 } from "ramda";
 
-import { sendAlarmEmail } from "./email_utils";
+import { sendAlarmEmailText } from "./email_utils";
 import {
   batchExtrinsics,
   envObj,
@@ -260,7 +260,7 @@ async function checkBalance(api, emailAddr, accountAddress, min) {
       )} is less than ${formatDock(min)}.`
     );
 
-    await sendAlarmEmail(
+    await sendAlarmEmailText(
       emailAddr,
       "Low balance of the staking payouts sender",
       `Balance of the \`${accountAddress}\` - ${formatDock(

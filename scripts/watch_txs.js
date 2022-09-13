@@ -552,12 +552,15 @@ const eventFilters = (dock) => {
     // Council members changed
     checkMap(
       electionsEvent("NewTerm"),
-      ({
-        event: {
-          data: [newMembers],
+      (
+        {
+          event: {
+            data: [newMembers],
+          },
+          block,
         },
-        block,
-      }) =>
+        dock
+      ) =>
         councilDiffAccumulator.pipe(
           take(1),
           switchMap((acc) => {

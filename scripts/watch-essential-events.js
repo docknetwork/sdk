@@ -6,14 +6,17 @@ import {
   curry,
   all,
   allPass,
+  addIndex,
   filter,
   reduce,
   F,
   splitAt,
   prop,
   assoc,
+  cond,
   view,
   either,
+  T,
   __,
   last,
   pipe,
@@ -22,6 +25,7 @@ import {
   always,
   isEmpty,
   both,
+  flip,
   complement,
   isNil,
   converge,
@@ -30,7 +34,6 @@ import {
   findIndex,
   any,
   unless,
-  difference,
   curryN,
   defaultTo,
   head,
@@ -50,10 +53,7 @@ import {
   concat,
   bufferTime,
   takeUntil,
-  take,
-  switchMap,
   mergeMap,
-  ReplaySubject,
 } from "rxjs";
 import {
   envObj,
@@ -162,15 +162,15 @@ const main = async (dock, startBlock) => {
   const applyFilters = curry((filters, data$) => {
     const handleItem = withExtrinsicUrl(converge(merge, filters));
 
-    return data$.pipe(concatMap((item) => handleItem(item, dock)));
+    return data$.pipe(mergeMap((item) => handleItem(item, dock)));
   });
 
   const res$ = merge(
     txs$.pipe(
       tap(LogLevel === "debug" ? logTx : identity),
-      applyFilters(txFilters())
+      applyFilters(txFilters)
     ),
-    events$.pipe(applyFilters(eventFilters(dock)))
+    events$.pipe(applyFilters(eventFilters))
   ).pipe(
     batchNotifications(BatchNoficationTimeout),
     tap((email) => console.log("Sending email: ", email)),
@@ -203,37 +203,6 @@ export const batchNotifications = curry((timeLimit, notifications$) =>
 
 const sectionLens = lensProp("section");
 const methodLens = lensProp("method");
-
-/**
- * Represents added/removed difference between new data and old data.
- */
-class Diff {
-  constructor(newData, oldData) {
-    this.added = difference(newData, oldData);
-    this.removed = difference(oldData, newData);
-  }
-
-  empty() {
-    return new Diff([], []);
-  }
-}
-
-/**
- * Accumulates differences.
- */
-class DiffAccumulator {
-  constructor(init) {
-    this.last = init;
-  }
-
-  handle(data) {
-    this.diff =
-      this.last != null ? new Diff(data, this.last) : Diff.prototype.empty();
-    this.last = data;
-
-    return this;
-  }
-}
 
 /**
  * Filters given entity by its `section`/`method(s)`
@@ -388,14 +357,8 @@ const systemTx = successfulTxByMethodFilter("system");
  * Filter extrinsics from `elections` pallet.
  */
 const electionsTx = successfulTxByMethodFilter("elections");
-/**
- * Filter extrinsics from `technicalCommitteeMembership` pallet.
- */
-const technicalCommitteeMembershipTx = successfulTxByMethodFilter(
-  "technicalCommitteeMembership"
-);
 
-const txFilters = () => [
+const txFilters = [
   // Council candidacy submission
   checkMap(electionsTx("submitCandidacy"), () =>
     of(`Self-submitted as a council candidate`)
@@ -432,6 +395,16 @@ const txFilters = () => [
     }) => of(`Proposal #${idx.toString()} is seconded`)
   ),
 
+  // Democracy proposal fast-tracked
+  checkMap(
+    democracyTx("fastTrack"),
+    ({
+      tx: {
+        args: [proposalHash],
+      },
+    }) => of(`Proposal is fast-tracked: ${proposalHash.toString()}`)
+  ),
+
   // `force_transfer` call
   checkMap(balancesTx("forceTransfer"), ({ tx }) => {
     const [source, dest, value] = tx.args;
@@ -454,207 +427,178 @@ const txFilters = () => [
   ),
 ];
 
-const eventFilters = (dock) => {
-  // Emits latest council diff accumulator
-  const councilDiffAccumulator = new ReplaySubject(1);
-  councilDiffAccumulator.next(null);
+const eventFilters = [
+  // Democracy proposal
+  checkMap(
+    /*both(*/ democracyEvent("Proposed") /*, democracyTx("propose"))*/,
+    (/*{
+      tx: {
+        args: [hash],
+      },
+    }*/) => of(`New Democracy proposal`)
+  ),
 
-  return [
-    // Democracy proposal
-    checkMap(
-      both(democracyEvent("Proposed"), democracyTx("propose")),
-      ({
-        tx: {
-          args: [hash],
-        },
-      }) => of(`New Democracy proposal ${hash}`)
-    ),
-
-    // Democracy preimage noted for the proposal
-    checkMap(
-      both(democracyEvent("PreimageNoted"), democracyTx("notePreimage")),
-      (
-        {
-          event: {
-            data: [proposalHash],
-          },
-          tx: {
-            args: [preimage],
-          },
-        },
-        dock
-      ) => {
-        const proposal = dock.api.createType("Call", preimage);
-        const metadata = dock.api.registry.findMetaCall(proposal.callIndex);
-
-        return of(
-          `Proposal preimage is noted for ${proposalHash.toString()}: ${
-            metadata.section
-          }::${metadata.method} with args ${JSON.stringify(
-            proposal.toJSON().args
-          )}`
-        );
-      }
-    ),
-
-    // Democracy proposal fast-tracked
-    checkMap(
-      both(democracyTx("fastTrack"), democracyEvent("Started")),
-      ({
-        tx: {
-          args: [proposalHash],
-        },
-      }) => of(`Proposal is fast-tracked: ${proposalHash.toString()}`)
-    ),
-
-    // Council proposal created
-    checkMap(councilEvent("Proposed"), ({ event }, dock) => {
-      const {
-        data: [_, __, hash],
-      } = event.toJSON();
-
-      return from(dock.api.query.council.proposalOf(hash)).pipe(
-        mapRx((proposal) => {
-          if (proposal.isNone) {
-            return `New Council proposal ${hash}`;
-          } else {
-            const { args, section, method } = proposal.unwrap();
-
-            return `New Council proposal ${section}::${method}(${JSON.stringify(
-              args
-            )})`;
-          }
-        })
-      );
-    }),
-
-    // Council proposal closed
-    checkMap(councilEvent("Closed"), ({ event }) => {
-      const {
-        data: [hash, yesVotes, noVotes],
-      } = event.toJSON();
-
-      return of(
-        `Council proposal ${hash} closed with ${yesVotes} yes/${noVotes} no`
-      );
-    }),
-
-    // Council member renounced
-    checkMap(
-      electionsEvent("Renounced"),
-      ({
+  // Democracy preimage noted for the proposal
+  checkMap(
+    /*both(*/ democracyEvent(
+      "PreimageNoted"
+    ) /*, democracyTx("notePreimage"))*/,
+    (
+      {
         event: {
-          data: [member],
+          data: [proposalHash],
         },
-      }) => of(`Council member renounced: ${member.toString()}`)
-    ),
-
-    // Council members changed
-    checkMap(
-      electionsEvent("NewTerm"),
-      (
-        {
-          event: {
-            data: [newMembers],
-          },
-          block,
-        },
-        dock
-      ) =>
-        councilDiffAccumulator.pipe(
-          take(1),
-          switchMap((acc) => {
-            if (acc == null) {
-              return from(
-                dock.api.rpc.chain.getBlockHash(
-                  block.block.header.number.toNumber() - 1
-                )
-              ).pipe(
-                switchMap((blockHash) =>
-                  dock.api.query.council.members.at(blockHash)
-                ),
-                mapRx((data) => new DiffAccumulator(data.toJSON()))
-              );
-            } else {
-              return of(acc);
-            }
-          }),
-          mapRx((acc) => {
-            const newDiff = acc.handle(newMembers.toJSON().map(head));
-            councilDiffAccumulator.next(newDiff);
-
-            return newDiff;
-          }),
-          mapRx(prop("diff")),
-          filterRx(complement(isEmpty)),
-          mapRx(
-            ({ added, removed }) =>
-              `Council membership changed. Members added: ${
-                added.join(",") || "none"
-              }, members removed: ${removed.join(",") || "none"}`
-          )
-        )
-    ),
-
-    // `set_balance` call
-    checkMap(balancesEvent("BalanceSet"), ({ event }) => {
-      const [who, free, reserved] = event.data.toJSON();
+        /*tx: {
+          args: [preimage],
+        },*/
+      },
+      dock
+    ) => {
+      //const proposal = dock.api.createType("Call", preimage);
+      const metadata = dock.api.registry.findMetaCall(proposal.callIndex);
 
       return of(
-        `\`set_balance\` was called on ${who}: free: ${formatDock(
-          free
-        )}, reserved: ${formatDock(reserved)}`
+        `Proposal preimage is noted for ${proposalHash.toString()}: ${
+          metadata.section
+        }::${metadata.method}`
       );
-    }),
 
-    // Techinal Committee proposal
-    checkMap(technicalCommitteeEvent("Proposed"), ({ event }, dock) => {
-      const {
-        data: [_, __, hash],
-      } = event.toJSON();
+      /*return of(
+        `Proposal preimage is noted for ${proposalHash.toString()}: ${
+          metadata.section
+        }::${metadata.method} with args ${JSON.stringify(
+          proposal.toJSON().args
+        )}`
+      );*/
+    }
+  ),
 
-      return from(dock.api.query.technicalCommittee.proposalOf(hash)).pipe(
-        mapRx((proposal) => {
-          if (proposal.isNone) {
-            return `New Technical Committee proposal ${hash}`;
-          } else {
-            const { args, section, method } = proposal.unwrap();
+  /*// Democracy proposal fast-tracked
+  checkMap(
+    both(democracyTx("fastTrack"), democracyEvent("Started")),
+    ({
+      tx: {
+        args: [proposalHash],
+      },
+    }) => of(`Proposal is fast-tracked: ${proposalHash.toString()}`)
+  ),*/
 
-            return `New Technical Committee proposal ${section}::${method}(${JSON.stringify(
-              args
-            )})`;
-          }
-        })
+  // Council proposal created
+  checkMap(councilEvent("Proposed"), ({ event }, dock) => {
+    const {
+      data: [_, __, hash],
+    } = event.toJSON();
+
+    return from(dock.api.query.council.proposalOf(hash)).pipe(
+      mapRx((proposal) => {
+        if (proposal.isNone) {
+          return `New Council proposal ${hash}`;
+        } else {
+          const { args, section, method } = proposal.unwrap();
+
+          return `New Council proposal ${section}::${method}(${JSON.stringify(
+            args
+          )})`;
+        }
+      })
+    );
+  }),
+
+  // Council proposal closed
+  checkMap(councilEvent("Closed"), ({ event }) => {
+    const {
+      data: [hash, yesVotes, noVotes],
+    } = event.toJSON();
+
+    return of(
+      `Council proposal ${hash} closed with ${yesVotes} yes/${noVotes} no`
+    );
+  }),
+
+  // Council member renounced
+  checkMap(
+    electionsEvent("Renounced"),
+    ({
+      event: {
+        data: [member],
+      },
+    }) => of(`Council member renounced: ${member.toString()}`)
+  ),
+
+  // Council members changed
+  checkMap(
+    electionsEvent("NewTerm"),
+    ({
+      event: {
+        data: [newMembers],
+      },
+    }) => {
+      return of(
+        `Council membership changed. New members: ${newMembers
+          .toJSON()
+          .map(head)}`
       );
-    }),
+    }
+  ),
 
-    // Techinal Committee member added
-    checkMap(
-      both(
-        technicalCommitteeMembershipEvent("MemberAdded"),
-        technicalCommitteeMembershipTx("addMember")
-      ),
-      ({
-        tx: {
-          args: [member],
-        },
-      }) => of(`New technical committee member added: ${member}`)
-    ),
+  // `set_balance` call
+  checkMap(balancesEvent("BalanceSet"), ({ event }) => {
+    const [who, free, reserved] = event.data.toJSON();
 
-    // Techinal Committee member removed
-    checkMap(
-      both(
-        technicalCommitteeMembershipEvent("MemberRemoved"),
-        technicalCommitteeMembershipTx("removeMember")
-      ),
-      ({
-        tx: {
-          args: [member],
-        },
-      }) => of(`Technical committee member removed: ${member}`)
-    ),
-  ];
-};
+    return of(
+      `\`set_balance\` was called on ${who}: free: ${formatDock(
+        free
+      )}, reserved: ${formatDock(reserved)}`
+    );
+  }),
+
+  // Techinal Committee proposal
+  checkMap(technicalCommitteeEvent("Proposed"), ({ event }, dock) => {
+    const {
+      data: [_, __, hash],
+    } = event.toJSON();
+
+    return from(dock.api.query.technicalCommittee.proposalOf(hash)).pipe(
+      mapRx((proposal) => {
+        if (proposal.isNone) {
+          return `New Technical Committee proposal ${hash}`;
+        } else {
+          const { args, section, method } = proposal.unwrap();
+
+          return `New Technical Committee proposal ${section}::${method}(${JSON.stringify(
+            args
+          )})`;
+        }
+      })
+    );
+  }),
+
+  // Techinal Committee member added
+  checkMap(
+    //both(
+    technicalCommitteeMembershipEvent("MemberAdded"),
+    // technicalCommitteeMembershipTx("addMember")
+    //),
+    (/*{
+      tx: {
+        args: [member],
+      },
+    }*/) => of(`New technical committee member added`)
+  ),
+
+  // Techinal Committee member removed
+  checkMap(
+    //both(
+    technicalCommitteeMembershipEvent("MemberRemoved"),
+    //technicalCommitteeMembershipTx("removeMember")
+    //),
+    (/*{
+      tx: {
+        args: [member],
+      },
+    }*/) => of(`Technical committee member removed`)
+  ),
+];
 
 const logTx = ({ tx, rootTx, events, block }) => {
   let msg = `In block #${block.block.header.number} `;
@@ -711,86 +655,72 @@ const createTxWithEventsCombinator = (dock) => {
     }
   }
 
-  const { BatchCompleted, BatchInterrupted } = dock.api.events.utility;
+  const { BatchCompleted, BatchInterrupted /*ItemCompleted*/ } =
+    dock.api.events.utility;
   const { Sudid } = dock.api.events.sudo;
-
-  const findTx = find((entities) => {
-    const entity = entities?.[0];
-
-    return (
-      entity &&
-      entity.method &&
-      entity.section &&
-      entity.args &&
-      entity.callIndex
-    );
-  });
 
   /**
    * Picks events for the given returning `TxWithEventsAccumulator` initialized with the given extrinsic merged with their events,
    * and remaining events to be processed.
+   *
+   * **Until `ItemCompleted` event isn't produced by the utility, it's not possible to match batch transactions with their events properly. For this purpose, some logic is simplified.**
    *
    * @param {Array<*>} events
    * @param {*} tx
    * @param {{config: number, rootTx: *}} param2
    * @returns
    */
-  const pickEventsForExtrinsic = (events, tx, { config: config, rootTx }) => {
+  const pickEventsForExtrinsic = (events, tx, { config, rootTx }) => {
+    let batchIdx = -1,
+      sudoIdx = -1;
     if (config & BATCH) {
-      let idx = findIndex(
-        either(BatchCompleted.is, BatchInterrupted.is),
+      // `ItemCompleted` event isn't available yet
+      batchIdx = findIndex(
+        either(/*ItemCompleted.is*/ BatchCompleted.is, BatchInterrupted.is),
         events
-      );
-      if (idx === -1) {
-        idx = events.length;
-      }
-
-      const [curEvents, nextEvents] = splitAt(idx, events);
-
-      return new TxWithEventsAccumulator(
-        [{ events: curEvents, tx, rootTx }],
-        nextEvents
-      );
-    } else if (config & SUDO) {
-      let idx = findIndex(Sudid.is, events);
-      if (idx === -1) {
-        idx = events.length - 1;
-      }
-
-      const [curEvents, nextEvents] = splitAt(idx + 1, events);
-
-      return new TxWithEventsAccumulator(
-        [{ events: curEvents, tx, rootTx }],
-        nextEvents
-      );
+      ); /* else if (ItemCompleted.is(events[idx])) {
+        idx++;
+      }*/
+    }
+    sudoIdx = findIndex(Sudid.is, events);
+    if (config & SUDO && sudoIdx !== -1) {
+      sudoIdx++;
     }
 
-    return new TxWithEventsAccumulator([{ events, tx, rootTx }], []);
+    const minIdx = Math.min(
+      events.length,
+      ...[batchIdx, sudoIdx].filter((idx) => idx + 1)
+    );
+    const [curEvents, nextEvents] = splitAt(minIdx, events);
+
+    return new TxWithEventsAccumulator(
+      [{ events: curEvents, tx, rootTx }],
+      nextEvents
+    );
   };
+
+  const isBatch = o(
+    txByMethodFilter("utility", ["batch", "batchAll"]),
+    assoc("tx", __, {})
+  );
+  const isSudo = o(
+    txByMethodFilter("sudo", ["sudo", "sudoUncheckedWeight"]),
+    assoc("tx", __, {})
+  );
 
   /**
    * Recursively merges extrinsics with their corresponding events.
    */
-  const mergeEventsWithExtrs = ifElse(
-    (_, tx) => findTx([tx.args, tx.args?.[0]]),
-    (events, tx, { rootTx, config }) => {
-      const isBatch = txByMethodFilter("utility", ["batch", "batchAll"])({
-        tx,
-      });
-      const isSudo =
-        !isBatch &&
-        txByMethodFilter("sudo", ["sudo", "sudoUncheckedWeight"])({ tx });
-
-      if (isBatch) {
-        const acc = reduce(
-          ({ extrinsics, nextEvents }, tx) => {
-            const merged = mergeEventsWithExtrs(nextEvents, tx, {
+  const mergeEventsWithExtrs = cond([
+    [
+      flip(isBatch),
+      (events, tx, { rootTx, config }) => {
+        const acc = addIndex(reduce)(
+          ({ extrinsics, nextEvents }, tx) =>
+            mergeEventsWithExtrs(nextEvents, tx, {
               config: config | BATCH,
               rootTx,
-            });
-
-            return merged.prependExtrinsics(extrinsics);
-          },
+            }).prependExtrinsics(extrinsics),
           new TxWithEventsAccumulator([], events),
           tx.args[0]
         );
@@ -800,14 +730,24 @@ const createTxWithEventsCombinator = (dock) => {
           rootTx,
         });
 
-        return BatchCompleted.is(head(acc.nextEvents))
-          ? selfAcc.prependExtrinsics(acc.extrinsics)
-          : selfAcc.prependExtrinsics(
-              acc.extrinsics.slice(0, acc.nextEvents[0].toJSON().data[0])
-            );
-      } else if (isSudo) {
+        if (BatchCompleted.is(head(acc.nextEvents))) {
+          return selfAcc.prependExtrinsics(acc.extrinsics);
+        } else {
+          if (!BatchInterrupted.is(head(acc.nextEvents))) {
+            throw new Error(`Invalid event: ${head(acc.nextEvents)}`);
+          }
+
+          return selfAcc.prependExtrinsics(
+            acc.extrinsics.slice(0, acc.nextEvents[0].toJSON().data[0])
+          );
+        }
+      },
+    ],
+    [
+      flip(isSudo),
+      (events, tx, { rootTx, config }) => {
         const acc = mergeEventsWithExtrs(events, tx.args[0], {
-          config: config | (isSudo ? SUDO : 0),
+          config: config | SUDO,
           rootTx,
         });
         const selfAcc = pickEventsForExtrinsic(acc.nextEvents, tx, {
@@ -816,12 +756,10 @@ const createTxWithEventsCombinator = (dock) => {
         });
 
         return selfAcc.prependExtrinsics(acc.extrinsics);
-      } else {
-        return pickEventsForExtrinsic(events, tx, { config, rootTx });
-      }
-    },
-    pickEventsForExtrinsic
-  );
+      },
+    ],
+    [T, pickEventsForExtrinsic],
+  ]);
 
   return mergeEventsWithExtrs;
 };

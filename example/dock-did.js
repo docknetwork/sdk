@@ -2,11 +2,12 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 
 // Import Dock API
+import { u8aToHex } from '@polkadot/util';
 import dock, {
   PublicKeySr25519,
 } from '../src/index';
 import {
-  createNewDockDID
+  createNewDockDID,
 } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 
@@ -14,7 +15,6 @@ import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 // account is to be used for sending the transaction.
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
 import { DidKey, VerificationRelationship } from '../src/public-keys';
-import { u8aToHex } from '@polkadot/util';
 import { ServiceEndpointType } from '../src/modules/did/service-endpoint';
 
 // DID will be generated randomly

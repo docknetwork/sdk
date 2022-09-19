@@ -2,7 +2,6 @@ import {
   equals,
   includes,
   lensProp,
-  find,
   curry,
   all,
   allPass,
@@ -19,6 +18,7 @@ import {
   T,
   __,
   last,
+  split,
   pipe,
   o,
   when,
@@ -74,7 +74,7 @@ const {
   BaseExtrinsicExplorerUrl,
 } = envObj({
   // Email to send alarm emails to.
-  TxWatcherAlarmEmailTo: notNilAnd(String),
+  TxWatcherAlarmEmailTo: notNilAnd(split(",")),
   // Address of the node RPC.
   FullNodeEndpoint: notNilAnd(String),
   // Level of logs to be used for profiling: `debug` or null.

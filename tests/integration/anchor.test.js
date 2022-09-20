@@ -8,14 +8,13 @@ import { getBlock } from '../../src/utils/chain-ops';
 describe('Anchoring Module', () => {
   const dock = new DockAPI();
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
-    done();
   });
 
   test('Can create and query anchors', async () => {

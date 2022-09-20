@@ -1,4 +1,4 @@
-import createClient from 'ipfs-http-client';
+import { create } from 'ipfs-http-client';
 import { dereferenceFromIPFS } from '../../src/utils/rdf';
 
 const ipfsDefaultConfig = 'http://localhost:5001';
@@ -13,7 +13,7 @@ const rdfCID = 'QmQeskBk9TsdWXaNX26PvuzkxU8zzoWZo5dmJMPuw5vcSS';
 describe('IPFS', () => {
   let ipfsClient;
   beforeAll((done) => {
-    ipfsClient = createClient(ipfsDefaultConfig);
+    ipfsClient = create(ipfsDefaultConfig);
     done();
   });
 

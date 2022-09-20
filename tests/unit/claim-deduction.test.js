@@ -1,4 +1,4 @@
-import { suites } from 'jsonld-signatures';
+import b58 from 'bs58';
 import { hexToU8a } from '@polkadot/util';
 
 import jsonld from 'jsonld';
@@ -16,17 +16,12 @@ import {
   verifyPresentation,
   verifyCredential,
 } from '../../src/utils/vc/index';
-import {
-  EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
-} from '../../src/utils/vc/custom_crypto';
 import { createPresentation } from '../create-presentation';
 import {
   documentLoader, addDocument, registered, modifyDocument,
-} from '../cached-document-loader.js';
+} from '../cached-document-loader';
 
 import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../../src/utils/misc';
-
-const base58btc = require('base58-universal');
 
 describe('Composite claim soundness checker', () => {
   test('control: issue and verify', async () => {
@@ -430,13 +425,13 @@ async function checkSoundness(presentation, rules) {
   }
   // Pre-expand the presentaion using local cache. Tests run pretty slow otherwise.
   presentation = await jsonld.expand(presentation, { documentLoader });
-  return await acceptCompositeClaims(presentation, rules);
+  return acceptCompositeClaims(presentation, rules);
 }
 
 function registerDid(did, keypair) {
   if (registered(did)) { throw `${did} already registered`; }
 
-  const publicKeyBase58 = base58btc.encode(hexToU8a(keypair.publicKey.value));
+  const publicKeyBase58 = b58.encode(hexToU8a(keypair.publicKey.value));
   const pk = {
     id: `${did}#keys-1`,
     type: keypair.type,
@@ -460,17 +455,17 @@ function registerDid(did, keypair) {
 }
 
 function randoDID() {
-  return `did:dock:${randomAsHex(32).substr(2, 20)}`;
+  return `did:dock:${randomAsHex(32).substring(2, 2 + 20)}`;
 }
 
 async function verifyC(credential) {
-  return await verifyCredential(credential, {
+  return verifyCredential(credential, {
     documentLoader,
   });
 }
 
 async function verifyP(presentation) {
-  return await verifyPresentation(presentation, {
+  return verifyPresentation(presentation, {
     documentLoader,
     unsignedPresentation: true,
   });

@@ -1,7 +1,8 @@
 import dock from '../src/index';
-import { createKeyDetail, createNewDockDID } from '../src/utils/did';
+import { createNewDockDID } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { median } from './helpers';
+import { DidKey, VerificationRelationship } from '../src/public-keys';
 
 require('dotenv').config();
 
@@ -15,9 +16,9 @@ async function sendTxn(baseSeed, seedPath) {
   const seed = `${baseSeed}/${seedPath}`;
   const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
   const publicKey = getPublicKeyFromKeyringPair(pair);
-  const keyDetail = createKeyDetail(publicKey, dockDID);
+  const didKey = new DidKey(publicKey, new VerificationRelationship());
   const start = new Date().getTime();
-  await dock.did.new(dockDID, keyDetail, false);
+  await dock.did.new(dockDID, [didKey], [], false);
   return (new Date().getTime()) - start;
 }
 
@@ -58,7 +59,7 @@ dock.init({
     } else {
       count = 10;
     }
-    main(count);
+    return main(count);
   })
   .catch((error) => {
     console.error('Error occurred somewhere, it was caught!', error);

@@ -5,6 +5,8 @@
 import { sr25519Verify } from '@polkadot/util-crypto/sr25519';
 import { u8aToHex, assert } from '@polkadot/util';
 import { keypair, connect } from '../helpers';
+import { createDidSig } from '../../src/utils/did';
+import { getStateChange } from '../../src/utils/misc';
 
 const { promises: fs } = require('fs');
 
@@ -14,7 +16,7 @@ const USAGE = `\
 npx babel-node ./scripts/master_votes_submit.js <proposal_path> <votes_path>
   where
     <proposal_path> is the path to a json encoded proposal
-    <votes_path> is the path to a json encoded list of votes. Each vote is a [did, signature] pair.
+    <votes_path> is the path to a json encoded list of votes. Each vote is a [did, keyId, nonce, signature] array.
 env vars:
   - FullNodeEndpoint: websocket Url of a trusted node
   - PayerSecret:      secret key to the on-chain account that will submit the transaction
@@ -74,38 +76,29 @@ async function submit({
   const nc = await connect(nodeWsUrl);
 
   // encode proposal as call
-  const call = nc.createType('Call', proposal);
+  const call = nc.api.createType('Call', proposal);
 
   // parse votes
-  const mpauth = toPMAuth(nc, votes);
+  const mpauth = toAuth(votes);
 
   // verify votes are valid and sufficient before submitting
   await assertValidAuth(nc, call, mpauth);
 
   // combine signatures and encoded call into a single "execute" extrinsic
-  const extrinsic = nc.tx.master.execute(call, mpauth);
+  const extrinsic = nc.api.tx.master.execute(call, mpauth);
 
   // submit
   await signSendTx(extrinsic, await keypair(payerKey));
 }
 
 /**
- * Convert a list of [did, signature] pairs to Proof of Master Authorization
- * `did` and `signature` should both be formated as 0x-prefixed hex.
- * @param nodeClient
+ * Convert an array of [did, keyId, signature, nonce] tuples to array of [didSig, nonce]
+ * `did` and `signature` should both be formatted as 0x-prefixed hex.
  * @param votes
- * @returns {Promise<()>}
+ * @returns {Array}
  */
-function toPMAuth(nodeClient, votes) {
-  const dtk_sorted = [...votes];
-  dtk_sorted.sort(); // this relies on dids being hex encoded
-
-  const vote_map = new Map();
-  for (const [did, key] of dtk_sorted) {
-    vote_map.set(did, { Sr25519: key });
-  }
-
-  return nodeClient.createType('PMAuth', vote_map);
+function toAuth(votes) {
+  return votes.map((did, keyId, signature, nonce) => [createDidSig(did, keyId, signature), nonce]);
 }
 
 /**
@@ -121,15 +114,28 @@ function toPMAuth(nodeClient, votes) {
  */
 async function assertValidAuth(nodeClient, proposal, mpauth) {
   // * - all signatures are valid over proposal for current voting round
+<<<<<<< HEAD
   const encoded_state_change = await asEncodedStateChange(nodeClient, proposal);
   for (const [did, sig] of mpauth) {
     const did_doc = await nodeClient.query.didModule.dids(did);
     const pk = did_doc.unwrap()[0].publicKey;
+=======
+  const roundNo = (await nodeClient.api.query.master.round()).toJSON();
+  for (const [didSig, nonce] of mpauth) {
+    const sig = didSig.sig;
+    const did = didSig.did;
+    const didKey = await nodeClient.didModule.getDidKey(did, didSig.keyId);
+    const pk = didKey.publicKey;
+>>>>>>> origin/master
     if (!pk.isSr25519) {
       throw `This script only supports sr25519. The public key registered for ${did} is not sr25519.`;
     }
     const srpk = pk.asSr25519.value;
     const srsig = sig.asSr25519.value;
+<<<<<<< HEAD
+=======
+    const encoded_state_change = asEncodedStateChange(nodeClient, roundNo, proposal, nonce);
+>>>>>>> origin/master
     const ver = sr25519Verify(encoded_state_change, srsig, srpk);
     if (!ver) {
       throw 'Signature invalid:\n'
@@ -141,7 +147,7 @@ async function assertValidAuth(nodeClient, proposal, mpauth) {
   }
 
   // * - all dids are members of master
-  const membership = await nodeClient.query.master.members();
+  const membership = await nodeClient.api.query.master.members();
   for (const [did, _sig] of mpauth) {
     const is_member = [...membership.members].some((member) => u8aToHex(member) === u8aToHex(did));
     if (!is_member) {
@@ -158,17 +164,26 @@ async function assertValidAuth(nodeClient, proposal, mpauth) {
 
 /**
  * Dumps call into a StateChange::MasterVote and serializes the result.
- * Round number is infered from current chainstate.
+ * Round number is inferred from current chainstate.
  * @param nodeClient
+ * @param roundNo
  * @param call - as on-chain type
- * @returns {Promise<()>}
+ * @param nonce
+ * @returns
  */
+<<<<<<< HEAD
 async function asEncodedStateChange(nodeClient, call) {
   const payload = {
     proposal: [...call.toU8a()],
     round_no: await nodeClient.query.master.round(),
   };
   return nodeClient.createType('CoreModsStateChange', { MasterVote: payload }).toU8a();
+=======
+function asEncodedStateChange(nodeClient, roundNo, call, nonce) {
+  const encodedProposal = [...nodeClient.api.createType('Call', call).toU8a()];
+  const vote = { nonce, proposal: encodedProposal, round_no: roundNo };
+  return getStateChange(nodeClient.api, 'MasterVote', vote);
+>>>>>>> origin/master
 }
 
 /**

@@ -1,7 +1,10 @@
-import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
+import { Keyring } from '@polkadot/api';
 import { cryptoWaitReady, randomAsU8a } from '@polkadot/util-crypto';
 import { assert, u8aToHex, stringToU8a } from '@polkadot/util';
-import { FullNodeEndpoint, TestAccountURI } from '../test-constants';
+import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-constants';
+import { DockAPI } from '../../src';
+import { getSignatureFromKeyringPair, getStateChange } from '../../src/utils/misc';
+import { createDidSig } from '../../src/utils/did';
 
 const ALICE_DID = u8aToHex(stringToU8a('Alice\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'));
 const BOB_DID = u8aToHex(stringToU8a('Bob\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'));
@@ -13,28 +16,39 @@ const CHARLIE_SK = u8aToHex(stringToU8a('Charliesk\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0
 describe('Master Module', () => {
   // node client
   let nc;
+  let systemModule;
+  let sudoModule;
+  let masterModule;
+  let masterQuery;
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     nc = await connect();
-    done();
+    systemModule = nc.api.tx.system;
+    sudoModule = nc.api.tx.sudo;
+    masterModule = nc.api.tx.master;
+    masterQuery = nc.api.query.master;
   }, 40000);
 
   afterAll(async () => { await nc.disconnect(); }, 10000);
 
+  async function getStorage(key) {
+    return nc.api.rpc.state.getStorage(key);
+  }
+
   test('control: set and get bytes as sudo', async () => {
     const key = u8aToHex(randomAsU8a(32));
     const val = u8aToHex(randomAsU8a(32));
-    const sudocall = nc.tx.sudo.sudo(nc.tx.system.setStorage([[key, val]]));
+    const sudocall = sudoModule.sudo(systemModule.setStorage([[key, val]]));
     await signSendTx(sudocall);
-    const bs = (await nc.rpc.state.getStorage(key)).unwrap();
+    const bs = (await getStorage(key)).unwrap();
     expect(u8aToHex(bs)).toEqual(val);
   }, 20000);
 
   test('Root call with no votes', async () => {
     const key = u8aToHex(randomAsU8a(32));
     const val = u8aToHex(randomAsU8a(32));
-    await masterSetStorage(nc, key, val, []);
-    const sto = await nc.rpc.state.getStorage(key);
+    await masterSetStorage(nc, systemModule, masterModule, key, val, []);
+    const sto = await getStorage(key);
     assert(sto.isNone, 'storage item should not have been set');
   }, 20000);
 
@@ -45,8 +59,8 @@ describe('Master Module', () => {
       [ALICE_DID, await keypair(u8aToHex(randomAsU8a(32)))],
       [CHARLIE_DID, await keypair(u8aToHex(randomAsU8a(32)))],
     ];
-    await masterSetStorage(nc, key, val, did_to_key);
-    const sto = await nc.rpc.state.getStorage(key);
+    await masterSetStorage(nc, systemModule, masterModule, key, val, did_to_key);
+    const sto = await getStorage(key);
     assert(sto.isNone, 'storage item should not have been set');
   }, 20000);
 
@@ -57,8 +71,8 @@ describe('Master Module', () => {
       [ALICE_DID, await keypair(ALICE_SK)],
       [CHARLIE_DID, await keypair(CHARLIE_SK)],
     ];
-    await masterSetStorage(nc, key, val, did_to_key);
-    const sto = await nc.rpc.state.getStorage(key);
+    await masterSetStorage(nc, systemModule, masterModule, key, val, did_to_key);
+    const sto = await getStorage(key);
     const u8a = sto.unwrap();
     expect(u8aToHex(u8a)).toEqual(val);
   }, 20000);
@@ -69,8 +83,8 @@ describe('Master Module', () => {
     const did_to_key = [
       [ALICE_DID, await keypair(ALICE_SK)],
     ];
-    await masterSetStorage(nc, key, val, did_to_key);
-    const sto = await nc.rpc.state.getStorage(key);
+    await masterSetStorage(nc, systemModule, masterModule, key, val, did_to_key);
+    const sto = await getStorage(key);
     assert(sto.isNone, 'storage item should not have been set');
   }, 20000);
 
@@ -82,8 +96,8 @@ describe('Master Module', () => {
       [BOB_DID, await keypair(BOB_SK)],
       [CHARLIE_DID, await keypair(CHARLIE_SK)],
     ];
-    await masterSetStorage(nc, key, val, did_to_key);
-    const sto = await nc.rpc.state.getStorage(key);
+    await masterSetStorage(nc, systemModule, masterModule, key, val, did_to_key);
+    const sto = await getStorage(key);
     const u8a = sto.unwrap();
     expect(u8aToHex(u8a)).toEqual(val);
   }, 20000);
@@ -95,15 +109,15 @@ describe('Master Module', () => {
       [BOB_DID, await keypair(BOB_SK)],
       [ALICE_DID, await keypair(ALICE_SK)],
     ];
-    await masterSetStorage(nc, key, val, did_to_key);
-    const sto = await nc.rpc.state.getStorage(key);
+    await masterSetStorage(nc, systemModule, masterModule, key, val, did_to_key);
+    const sto = await getStorage(key);
     const u8a = sto.unwrap();
     expect(u8aToHex(u8a)).toEqual(val);
   }, 20000);
 
   test('Use a master call to modify master membership.', async () => {
     const fourth_did = u8aToHex(randomAsU8a(32));
-    const new_membership = nc.createType('CoreModsMasterMembership', {
+    const new_membership = nc.api.createType('Membership', {
       members: sortedSet([
         ALICE_DID,
         BOB_DID,
@@ -114,11 +128,11 @@ describe('Master Module', () => {
     });
 
     // master members are not yet set
-    expect((await nc.query.master.members()).toU8a())
+    expect((await masterQuery.members()).toU8a())
       .not
       .toEqual(new_membership.toU8a());
 
-    const call = nc.tx.master.setMembers(new_membership);
+    const call = masterModule.setMembers(new_membership);
     const votes = await allVote(
       nc,
       call,
@@ -127,19 +141,22 @@ describe('Master Module', () => {
         [ALICE_DID, await keypair(ALICE_SK)],
       ],
     );
-    await signSendTx(nc.tx.master.execute(call, votes));
+    await signSendTx(masterModule.execute(call, votes));
 
     // master members were set
-    expect((await nc.query.master.members()).toU8a())
+    expect((await masterQuery.members()).toU8a())
       .toEqual(new_membership.toU8a());
   }, 20000);
 });
 
 // connect to running node
 async function connect() {
-  return await ApiPromise.create({
-    provider: new WsProvider(FullNodeEndpoint),
+  const dock = new DockAPI();
+  await dock.init({
+    keyring: TestKeyringOpts,
+    address: FullNodeEndpoint,
   });
+  return dock;
 }
 
 // Load a sr25519 keypair from secret, secret may be "0x" prefixed hex seed
@@ -155,7 +172,7 @@ async function signSendTx(extrinsic) {
   const key = await keypair(TestAccountURI); // getTestAccountKey();
   await extrinsic.signAsync(key);
 
-  const promise = new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
       let unsubFunc = null;
       return extrinsic.send(({ events = [], status }) => {
@@ -179,12 +196,12 @@ async function signSendTx(extrinsic) {
 
     return this;
   });
-
-  return await promise;
 }
 
 async function masterSetStorage(
   nc, // node client
+  systemModule,
+  masterModule,
   key, // hex encoded bytes
   val, // hex encoded bytes
   did_to_key, // list of [did, key] pairs with which to vote. dids are hex encoded
@@ -192,9 +209,9 @@ async function masterSetStorage(
   assert(key.startsWith('0x'), 'should prefixed with 0x');
   assert(val.startsWith('0x'), 'should prefixed with 0x');
 
-  const call = nc.tx.system.setStorage([[key, val]]); // this is a root-only extrinsic
+  const call = systemModule.setStorage([[key, val]]); // this is a root-only extrinsic
   const votes = await allVote(nc, call, did_to_key);
-  await signSendTx(nc.tx.master.execute(call, votes));
+  await signSendTx(masterModule.execute(call, votes));
 }
 
 /// lexically sorted set of elements.
@@ -221,18 +238,18 @@ async function allVote(
     assert(did.startsWith('0x'), 'should prefixed with 0x');
     assert(did.length === 66, 'should be 32 bytes');
   }
-  const payload = {
-    proposal: [...nc.createType('Call', proposal).toU8a()],
-    round_no: await nc.query.master.round(),
-  };
-  const encoded_state_change = nc.createType('CoreModsStateChange', { MasterVote: payload }).toU8a();
 
-  const dtk_sorted = [...did_to_key];
-  dtk_sorted.sort(); // this relies on dids being hex encoded
+  const encodedProposal = [...nc.api.createType('Call', proposal).toU8a()];
+  const roundNo = await nc.api.query.master.round();
 
-  const votes = new Map();
-  for (const [did, key] of dtk_sorted) {
-    votes.set(did, { Sr25519: key.sign(encoded_state_change) });
+  const votes = [];
+  for (const [did, key] of did_to_key) {
+    const nonce = await nc.didModule.getNextNonceForDID(did);
+    const vote = { nonce, proposal: encodedProposal, round_no: roundNo };
+    const encodedStateChange = getStateChange(nc.api, 'MasterVote', vote);
+    const signature = getSignatureFromKeyringPair(key, encodedStateChange);
+    const didSig = createDidSig(did, 1, signature);
+    votes.push([didSig, nonce]);
   }
   return votes;
 }

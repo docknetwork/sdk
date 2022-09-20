@@ -1,7 +1,7 @@
 const NodeEnvironment = require('jest-environment-node');
 
 class MyEnvironment extends NodeEnvironment {
-  constructor(config) {
+  constructor(config, context) {
     super(
       {
         ...config,
@@ -10,8 +10,11 @@ class MyEnvironment extends NodeEnvironment {
           Uint32Array,
           Uint8Array,
           ArrayBuffer,
+          TextDecoder,
+          TextEncoder,
         },
       },
+      context,
     );
   }
 

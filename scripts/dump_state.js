@@ -80,7 +80,15 @@ async function downloadBlobs() {
 
 async function downloadDids() {
   const dids = await dock.api.query.didModule.dids.entries();
-  return storageMapEntriesToObject(dids);
+  const controllers = await dock.api.query.didModule.didControllers.entries();
+  const keys = await dock.api.query.didModule.didKeys.entries();
+  const sps = await dock.api.query.didModule.didServiceEndpoints.entries();
+  return {
+    dids: storageMapEntriesToObject(dids),
+    controllers: storageDoubleMapEntriesToObject(controllers),
+    keys: storageDoubleMapEntriesToObject(keys),
+    serviceEndpoints: storageDoubleMapEntriesToObject(sps),
+  };
 }
 
 async function downloadRegs() {
@@ -103,6 +111,7 @@ async function downloadEvmAccountStorage() {
   return storageDoubleMapEntriesToObject(storages);
 }
 
+<<<<<<< HEAD
 async function downloadPoAState() {
   const supply = await dock.api.query.poAModule.emissionSupply();
   const poaLastBlock = await dock.api.query.poAModule.poALastBlock();
@@ -110,6 +119,21 @@ async function downloadPoAState() {
     supply,
     poaLastBlock,
   };
+=======
+async function downloadBbsPlus() {
+  const paramsCounter = await dock.api.query.bbsPlus.paramsCounter.entries();
+  const params = await dock.api.query.bbsPlus.bbsPlusParams.entries();
+  const keys = await dock.api.query.bbsPlus.bbsPlusKeys.entries();
+  return { bbsPlusParamsCounter: storageMapEntriesToObject(paramsCounter), bbsPlusParams: storageDoubleMapEntriesToObject(params), bbsPlusKeys: storageDoubleMapEntriesToObject(keys)};
+}
+
+async function downloadAccum() {
+  const counter = await dock.api.query.accumulator.accumulatorOwnerCounters.entries();
+  const params = await dock.api.query.accumulator.accumulatorParams.entries();
+  const keys = await dock.api.query.accumulator.accumulatorKeys.entries();
+  const accum = await dock.api.query.accumulator.accumulators.entries();
+  return { accumulatorCounter: storageMapEntriesToObject(counter), accumulatorParams: storageDoubleMapEntriesToObject(params), accumulatorKeys: storageDoubleMapEntriesToObject(keys), accumulators: storageMapEntriesToObject(accum)};
+>>>>>>> origin/master
 }
 
 async function downloadState() {
@@ -127,7 +151,9 @@ async function downloadState() {
 
   const blobs = await downloadBlobs();
 
-  const dids = await downloadDids();
+  const {
+    dids, controllers, keys, serviceEndpoints,
+  } = await downloadDids();
 
   const regs = await downloadRegs();
 
@@ -137,9 +163,11 @@ async function downloadState() {
 
   const evmStorages = await downloadEvmAccountStorage();
 
-  const poaState = await downloadPoAState();
-
   const treasuryBal = await dock.api.rpc.poa.treasuryBalance();
+
+  const bbsPlus = await downloadBbsPlus();
+
+  const accum = await downloadAccum();
 
   const obj = {
     accounts,
@@ -151,12 +179,16 @@ async function downloadState() {
     attests,
     blobs,
     dids,
+    controllers,
+    keys,
+    serviceEndpoints,
     regs,
     revs,
     evmCodes,
     evmStorages,
-    poaState,
     treasuryBal,
+    ...bbsPlus,
+    ...accum,
   };
 
   const dumpFileName = process.argv[2];
@@ -164,10 +196,16 @@ async function downloadState() {
   process.exit(0);
 }
 
+<<<<<<< HEAD
 dock
   .init({
     address: FullNodeEndpoint,
   })
+=======
+dock.init({
+  address: FullNodeEndpoint,
+})
+>>>>>>> origin/master
   .then(downloadState)
   .catch((error) => {
     console.error("Error occurred somewhere, it was caught!", error);

@@ -50,7 +50,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
   const dock = new DockAPI();
   const resolver = new DockResolver(dock);
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
@@ -91,8 +91,6 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
 
     // Issuer issues credential with id `credId4` to holder with DID `holder3DID`
     cred4 = await issueCredential(issuerKeyDoc, getUnsignedCred(credId4, holder3DID));
-
-    done();
   }, 90000);
 
   afterAll(async () => {

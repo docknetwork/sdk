@@ -1,17 +1,18 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 
 import dock from '../src/index';
-import { createNewDockDID, createKeyDetail } from '../src/utils/did';
+import { createNewDockDID } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 
 import {
   OneOfPolicy,
-  KeyringPairDidKeys, createRandomRegistryId,
+  createRandomRegistryId,
 } from '../src/utils/revocation';
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
+import { DidKey, VerificationRelationship } from '../src/public-keys';
 
 // Create a random registry id
 const registryId = createRandomRegistryId();
@@ -19,9 +20,6 @@ const registryId = createRandomRegistryId();
 // Create a new controller DID, the DID will be registered on the network and own the registry
 const controllerDID = createNewDockDID();
 const controllerSeed = randomAsHex(32);
-
-// Create a did/keypair proof map
-const didKeys = new KeyringPairDidKeys();
 
 // Create a list of controllers
 const controllers = new Set();
@@ -39,24 +37,23 @@ async function createRegistry() {
   console.log('Created registry');
 }
 
-async function removeRegistry() {
+async function removeRegistry(pair) {
   console.log('Removing registry...');
 
-  const lastModified = await dock.revocation.getBlockNoForLastChangeToRegistry(registryId);
-  await dock.revocation.removeRegistry(registryId, lastModified, didKeys, false);
+  await dock.revocation.removeRegistryWithOneOfPolicy(registryId, controllerDID, pair, 1, {didModule: dock.did}, false);
 
   console.log('Registry removed. All done.');
 }
 
-async function unrevoke() {
+async function unrevoke(pair) {
   console.log('Trying to undo the revocation (unrevoke) of id:', revokeId);
-  const extrinsic = await dock.revocation.unrevokeCredential(didKeys, registryId, revokeId, false);
+  const extrinsic = await dock.revocation.unrevokeCredentialWithOneOfPolicy(registryId, revokeId, controllerDID, pair, 1, {didModule: dock.did}, false);
   await extrinsic;
 }
 
-async function revoke() {
+async function revoke(pair) {
   console.log('Trying to revoke id:', revokeId);
-  const extrinsic = await dock.revocation.revokeCredential(didKeys, registryId, revokeId, false);
+  const extrinsic = await dock.revocation.revokeCredentialWithOneOfPolicy(registryId, revokeId, controllerDID, pair, 1, {didModule: dock.did}, false);
   await extrinsic;
 }
 
@@ -72,26 +69,25 @@ async function main() {
 
   // Set our controller DID and associated keypair to be used for generating proof
   console.log(`Creating controller DID (${controllerDID}) using sr25519 pair from seed (${controllerSeed})...`);
-  didKeys.set(controllerDID, pair);
 
   // The controller is same as the DID
   const publicKey = getPublicKeyFromKeyringPair(pair);
-  const keyDetail = createKeyDetail(publicKey, controllerDID);
-  await dock.did.new(controllerDID, keyDetail, false);
+  const didKey = new DidKey(publicKey, new VerificationRelationship());
+  await dock.did.new(controllerDID, [didKey], [], false);
 
   // Create a registry
   await createRegistry();
 
   // Revoke
-  await revoke();
+  await revoke(pair);
 
-  // Check if revocation was a sucess
+  // Check if revocation was a success
   const isRevoked = await dock.revocation.getIsRevoked(registryId, revokeId);
   if (isRevoked) {
     console.log('Revocation success. Trying to unrevoke...');
 
     // Try to unrevoke
-    await unrevoke();
+    await unrevoke(pair);
 
     // Check if unrevoke worked
     const isUnrevoked = !(await dock.revocation.getIsRevoked(registryId, revokeId));
@@ -105,7 +101,7 @@ async function main() {
   }
 
   // Cleanup, remove the registry
-  await removeRegistry();
+  await removeRegistry(pair);
 
   // Disconnect from the node
   await dock.disconnect();

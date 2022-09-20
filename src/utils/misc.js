@@ -150,3 +150,30 @@ export function getUniqueElementsFromArray(a, filterCallback) {
 export function encodeExtrinsicAsHash(api, tx) {
   return blake2AsHex(api.createType('Call', tx).toU8a());
 }
+
+/**
+ * Convert bytes to struct `WrappedBytes` expected by chain
+ * @param bytes
+ * @returns {{'0'}}
+ */
+export function bytesToWrappedBytes(bytes) {
+  return bytes;
+}
+
+/**
+ * Get the nonce to be used for sending the next transaction if not provided already.
+ * @param hexDid - DID whose nonce is needed
+ * @param nonce - If provided, returned as it is.
+ * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+ * using this
+ * @returns {Promise<undefined|*>}
+ */
+export async function getNonce(hexDid, nonce = undefined, didModule = undefined) {
+  if (nonce === undefined && didModule === undefined) {
+    throw new Error('Provide either nonce or didModule to fetch nonce but none provided');
+  }
+  if (nonce === undefined) {
+    return didModule.getNextNonceForDID(hexDid);
+  }
+  return nonce;
+}

@@ -1,10 +1,11 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import dock, { DockAPI } from '../src/index';
 import {
-  createNewDockDID, createKeyDetail, createSignedKeyUpdate, createSignedDidRemoval, getHexIdentifierFromDID,
+  createNewDockDID,
 } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { sendBatch } from './helpers';
+import { DidKey, VerificationRelationship } from '../src/public-keys';
 
 require('dotenv').config();
 
@@ -21,15 +22,17 @@ async function fillBlock() {
 }
 
 /*
-Even 5550 extrinsics fail due to block limit
+2000 extrinsics fail due to block limit
 ----
-Sending 5500 DID write extrinsics in a batch
-Batch size is 544509
-Payment info of batch is {"weight":896417461000,"class":"Normal","partialFee":125544610}
-block 0xde8e3edb4ad3dc730f6298d7c60e44cf806ec8c0fa90a59e4ab71a8ecd295491
-Fee paid is 125544610
+Sending 1950 DID write extrinsics in a batch
+Batch size is 138459
+Payment info of batch is {"weight":639111121000,"class":"Normal","partialFee":4525885851}
+block 0x08f0c2dbf36e9633d7730e3c5528f2b69dcbbdd37751429999e3f0514c862e92
+Time for sign and send for batch of size 1950: 4.021s
+Time for send for batch of size 1950: 3.933s
+Fee paid is 4525885851
 */
-async function sendDIDTxns(count, waitForFinalization = true) {
+async function sendOnChainDIDTxns(count, waitForFinalization = true) {
   console.info(`Sending ${count} DID write extrinsics in a batch`);
   const account = dock.keyring.addFromUri(EndowedSecretURI);
   dock.setAccount(account);
@@ -41,8 +44,8 @@ async function sendDIDTxns(count, waitForFinalization = true) {
     const seed = randomAsHex(32);
     const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
     const publicKey = getPublicKeyFromKeyringPair(pair);
-    const keyDetail = createKeyDetail(publicKey, did);
-    const tx = dock.did.createNewTx(did, keyDetail);
+    const didKey = new DidKey(publicKey, new VerificationRelationship());
+    const tx = dock.did.createNewOnchainTx(did, [didKey], []);
     txs.push(tx);
     didPairs.push([did, pair]);
   }
@@ -52,16 +55,16 @@ async function sendDIDTxns(count, waitForFinalization = true) {
 }
 
 /*
-3400 extrinsics fail due to block limit
-----
-Sending 3300 key update extrinsics in a batch
-Batch size is 452109
-Payment info of batch is {"weight":881057061000,"class":"Normal","partialFee":125452210}
-block 0x14e851a4ffe6698033bba90f74cc0ba2d2348b39dd2d93178e0bb6114f81af4a
-Fee paid is 125452210
+Sending 1950 add keys extrinsics in a batch
+Batch size is 341259
+Payment info of batch is {"weight":444111121000,"class":"Normal","partialFee":5595841624}
+block 0x08bd9e7ff8149a905ac041e606ef9a6b0c8849ebd32710e8330818be0a7f99e2
+Time for sign and send for batch of size 1950: 2.798s
+Time for send for batch of size 1950: 2.728s
+Fee paid is 5595836170
 */
-async function sendKeyUpdateTxns(count, didPairs) {
-  console.info(`Sending ${count} key update extrinsics in a batch`);
+async function sendAddKeyTxns(count, didPairs) {
+  console.info(`Sending ${count} add keys extrinsics in a batch`);
   const account = dock.keyring.addFromUri(EndowedSecretURI);
   dock.setAccount(account);
 
@@ -73,10 +76,9 @@ async function sendKeyUpdateTxns(count, didPairs) {
     const seed = randomAsHex(32);
     const newPair = dock.keyring.addFromUri(seed, null, 'sr25519');
     const publicKey = getPublicKeyFromKeyringPair(newPair);
-    const [keyUpdate, signature] = await createSignedKeyUpdate(dock.did, did, publicKey, currentPair);
-    const tx = dock.did.createUpdateKeyTx(keyUpdate, signature);
+    const didKey = new DidKey(publicKey, new VerificationRelationship());
+    const tx = await dock.did.createAddKeysTx([didKey], did, did, currentPair, 1);
     txs.push(tx);
-    didPairs[j][1] = newPair;
     j++;
   }
 
@@ -85,13 +87,41 @@ async function sendKeyUpdateTxns(count, didPairs) {
 }
 
 /*
-3500 extrinsics fail due to block limit
-----
-Sending 3400 DID remove extrinsics in a batch
-Batch size is 350209
-Payment info of batch is {"weight":890755261000,"class":"Normal","partialFee":125350310}
-block 0x1f8ab814bf875094f39386bc8c1e0f6f24d41be7c58b5cab3e5d4cc9de022013
-Fee paid is 125350310
+Sending 1950 add controller extrinsics in a batch
+Batch size is 335409
+Payment info of batch is {"weight":249111121000,"class":"Normal","partialFee":4579392438}
+block 0x05e5c35c40eb34b2ba29482bc61e43a2d631cb465261828f5262bf890bdb0edb
+Time for sign and send for batch of size 1950: 2.360s
+Time for send for batch of size 1950: 2.297s
+Fee paid is 4579392438
+*/
+async function sendAddControllerTxns(count, didPairs) {
+  console.info(`Sending ${count} add controller extrinsics in a batch`);
+  const account = dock.keyring.addFromUri(EndowedSecretURI);
+  dock.setAccount(account);
+
+  const txs = [];
+  let j = 0;
+  while (txs.length < count) {
+    const did = didPairs[j][0];
+    const currentPair = didPairs[j][1];
+    const tx = await dock.did.createAddControllersTx([createNewDockDID()], did, did, currentPair, 1);
+    txs.push(tx);
+    j++;
+  }
+
+  await sendBatch(dock, txs, account.address);
+  return didPairs;
+}
+
+/*
+Sending 1950 DID remove extrinsics in a batch
+Batch size is 271059
+Payment info of batch is {"weight":249111121000,"class":"Normal","partialFee":3935805809}
+block 0x1c8107b099372e0e859d6bc2b1c632e851bdf45a9c1a3a4f1d4730e8644fb028
+Time for sign and send for batch of size 1950: 4.826s
+Time for send for batch of size 1950: 4.776s
+Fee paid is 393580275
 */
 async function sendRemoveTxns(count, didPairs, waitForFinalization = true) {
   console.info(`Sending ${count} DID remove extrinsics in a batch`);
@@ -103,8 +133,7 @@ async function sendRemoveTxns(count, didPairs, waitForFinalization = true) {
   while (txs.length < count) {
     const did = didPairs[j][0];
     const currentPair = didPairs[j][1];
-    const [remove, signature] = await createSignedDidRemoval(dock.did, did, currentPair);
-    const tx = dock.did.createRemoveTx(remove, signature);
+    const tx = await dock.did.createRemoveTx(did, did, currentPair, 1);
     txs.push(tx);
     j++;
   }
@@ -113,13 +142,13 @@ async function sendRemoveTxns(count, didPairs, waitForFinalization = true) {
 }
 
 /*
-2000 extrinsics fail due to websocket capacity as each blob is close to 1 KB. Error 'WebSocket at Capacity: Exceeded max fragments.'
-----
 Sending 1500 blob write extrinsics in a batch
-Batch size is 1692009
-Payment info of batch is {"weight":397631211000,"class":"Normal","partialFee":126692110}
-block 0x196d7ad5053e30cabf8e3bdf85d767f278e83ea6c0b2bd694ea73a4a50274eaa
-Fee paid is 126692110
+Batch size is 1704009
+Payment info of batch is {"weight":440770321000,"class":"Normal","partialFee":19206750363}
+block 0x24ece5a89ac1bce6443c3a365a0ac4cd8952c926fba382babb408cd3702a6af6
+Time for sign and send for batch of size 1500: 1.543s
+Time for send for batch of size 1500: 1.337s
+Fee paid is 19206744950
 */
 async function sendBlobTxns(count, didPairs) {
   console.info(`Sending ${count} blob write extrinsics in a batch`);
@@ -136,9 +165,8 @@ async function sendBlobTxns(count, didPairs) {
     const blob = {
       id: blobId,
       blob: randomAsHex(995),
-      author: getHexIdentifierFromDID(did),
     };
-    const tx = dock.blob.createNewTx(blob, pair);
+    const tx = await dock.blob.createNewTx(blob, did, pair, 1, { didModule: dock.did });
     txs.push(tx);
     blobIds.push(blobId);
     j++;
@@ -179,13 +207,15 @@ async function sendAnchorTxns(count) {
 }
 
 async function runOnce() {
-  let didPairs = await sendDIDTxns(3400);
+  let didPairs = await sendOnChainDIDTxns(1950);
   console.log('');
-  didPairs = await sendKeyUpdateTxns(3300, didPairs);
+  didPairs = await sendAddKeyTxns(1950, didPairs);
+  console.log('');
+  await sendAddControllerTxns(1950, didPairs);
   console.log('');
   await sendBlobTxns(1500, didPairs);
   console.log('');
-  await sendRemoveTxns(3400, didPairs);
+  await sendRemoveTxns(1950, didPairs);
 }
 
 async function runInLoop(limit) {
@@ -197,14 +227,14 @@ async function runInLoop(limit) {
   while (true) {
     console.time('iteration');
     console.time('WriteDID');
-    const didPairs = await sendDIDTxns(3200, false);
+    const didPairs = await sendOnChainDIDTxns(1950, false);
     console.timeEnd('WriteDID');
-    console.log('Added 3200 DIDs in a batch');
+    console.log('Added 1950 DIDs in a batch');
     console.log('');
     console.time('RemoveDID');
-    await sendRemoveTxns(3200, didPairs, false);
+    await sendRemoveTxns(1950, didPairs, false);
     console.timeEnd('RemoveDID');
-    console.log('Remove 3200 DIDs in a batch');
+    console.log('Remove 1950 DIDs in a batch');
     count++;
     console.info(`Iteration ${count} done`);
     if (limit && (count >= limit)) {
@@ -243,9 +273,7 @@ async function main() {
 dock.init({
   address: FullNodeEndpoint,
 })
-  .then(() => {
-    main();
-  })
+  .then(main)
   .catch((error) => {
     console.error('Error occurred somewhere, it was caught!', error);
     process.exit(1);

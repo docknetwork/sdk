@@ -15,12 +15,12 @@ export default class DockResolver extends DIDResolver {
 
   /**
    * Resolve a Dock DID. The DID is expected to be a fully qualified DID.
-   * @param {string} did - The full DID
+   * @param {string} didUrl - The full DID
    * @returns {Promise<object>}
    */
-  async resolve(did) {
+  async resolve(didUrl) {
     if (this.dock.isInitialized()) {
-      const parsed = this.parseDid(did);
+      const parsed = this.parseDid(didUrl);
       if (parsed.method === methodName) {
         validateDockDIDSS58Identifier(parsed.id);
         return this.dock.did.getDocument(parsed.did);

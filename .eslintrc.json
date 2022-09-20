@@ -21,6 +21,7 @@
         "variables": true
       }
     ],
+    "import/no-extraneous-dependencies": "off",
     "class-methods-use-this": "off",
     "no-return-await": "off",
     "no-plusplus": "off",

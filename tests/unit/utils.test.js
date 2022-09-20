@@ -49,9 +49,8 @@ describe('Testing isHexWithGivenByteSize', () => {
 });
 
 describe('Testing public key and signature instantiation from keyring', () => {
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     await cryptoWaitReady();
-    done();
   });
 
   test('getCorrectPublicKeyFromKeyringPair returns correct public key from ed25519 pair', () => {
@@ -69,7 +68,7 @@ describe('Testing public key and signature instantiation from keyring', () => {
   });
 
   test('getCorrectPublicKeyFromKeyringPair returns correct public key from secp256k1 pair', () => {
-    const pair = generateEcdsaSecp256k1Keypair();
+    const pair = generateEcdsaSecp256k1Keypair(randomAsHex(32));
     const pk = getPublicKeyFromKeyringPair(pair);
     expect(pk instanceof PublicKeySecp256k1).toBe(true);
   });

@@ -2,10 +2,12 @@ import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { HttpProvider } from '@polkadot/rpc-provider';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { KeyringPair } from '@polkadot/keyring/types'; // eslint-disable-line
+import { initializeWasm } from '@docknetwork/crypto-wasm'
+import typesBundle from '@docknetwork/node-types';
 
 import AnchorModule from './modules/anchor';
 import BlobModule from './modules/blob';
-import DIDModule from './modules/did';
+import { DIDModule } from './modules/did';
 import RevocationModule from './modules/revocation';
 import TokenMigration from './modules/migration';
 import BBSPlusModule from './modules/bbs-plus';
@@ -86,11 +88,13 @@ class DockAPI {
     address: null,
     keyring: null,
   }) {
+    await initializeWasm();
+
     if (this.api) {
       if (this.api.isConnected) {
         throw new Error('API is already connected');
       } else {
-        this.disconnect();
+        await this.disconnect();
       }
     }
 
@@ -126,6 +130,8 @@ class DockAPI {
 
     if (chainTypes) {
       apiOptions.types = chainTypes;
+    } else {
+      apiOptions.typesBundle = typesBundle;
     }
 
     this.api = await ApiPromise.create(apiOptions);
@@ -159,10 +165,12 @@ class DockAPI {
         await this.api.disconnect();
       }
       delete this.api;
-      delete this.anchorModule;
       delete this.blobModule;
       delete this.didModule;
       delete this.revocationModule;
+      delete this.bbsPlusModule;
+      delete this.accumulatorModule;
+      delete this.migrationModule;
     }
   }
 
@@ -282,9 +290,6 @@ class DockAPI {
    * @return {AnchorModule} The module to use
    */
   get anchor() {
-    if (!this.anchorModule) {
-      throw new Error('Unable to get Anchor module, SDK is not initialised');
-    }
     return this.anchorModule;
   }
 

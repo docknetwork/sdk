@@ -62,7 +62,7 @@ async function main() {
 
 // Post a value to the anchors module.
 async function anchor(hash) {
-  const nc = await conn;
+  const nc = (await conn).api;
   await signExtrinsic(nc.tx.anchor.deploy(u8aToHex(u8aToU8a(hash))))
     .then(sendExtrinsic);
   assert((await check(hash)) !== null);
@@ -71,7 +71,7 @@ async function anchor(hash) {
 // Check to see at which block a value was anchored. Return the block when the hash was
 // anchored. If the value is not anchored, return null.
 async function check(hash) {
-  const nc = await conn;
+  const nc = (await conn).api;
   const opt = await nc.query.anchor.anchors(u8aToHex(u8aToU8a(blake2b256(hash))));
   assert(opt.isNone !== opt.isSome);
   if (opt.isNone) {
@@ -154,7 +154,7 @@ async function anchorBatched(leafHashes) {
 // If the merkle root was never anchored, return null.
 async function checkBatched(hash, proof) {
   const root = verify_proof(hash, proof);
-  return await check(root);
+  return check(root);
 }
 
 // encode a string as utf8

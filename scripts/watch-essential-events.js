@@ -445,23 +445,21 @@ const eventFilters = [
     ) /*, democracyTx("notePreimage"))*/,
     (
       {
-        event: {
-          data: [proposalHash],
-        },
+        event,
         /*tx: {
           args: [preimage],
         },*/
       },
       dock
     ) => {
-      //const proposal = dock.api.createType("Call", preimage);
-      const metadata = dock.api.registry.findMetaCall(proposal.callIndex);
+      const {
+        data: [proposalHash],
+      } = event.toJSON();
 
-      return of(
-        `Proposal preimage is noted for ${proposalHash.toString()}: ${
-          metadata.section
-        }::${metadata.method}`
-      );
+      // const proposal = dock.api.createType("Call", preimage);
+      // const metadata = dock.api.registry.findMetaCall(proposal.callIndex);
+
+      return of(`Proposal preimage is noted for ${proposalHash}`);
 
       /*return of(
         `Proposal preimage is noted for ${proposalHash.toString()}: ${

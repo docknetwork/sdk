@@ -40,20 +40,20 @@ async function createRegistry() {
 async function removeRegistry(pair) {
   console.log('Removing registry...');
 
-  await dock.revocation.removeRegistryWithOneOfPolicy(registryId, controllerDID, pair, 1, {didModule: dock.did}, false);
+  await dock.revocation.removeRegistryWithOneOfPolicy(registryId, controllerDID, pair, 1, { didModule: dock.did }, false);
 
   console.log('Registry removed. All done.');
 }
 
 async function unrevoke(pair) {
   console.log('Trying to undo the revocation (unrevoke) of id:', revokeId);
-  const extrinsic = await dock.revocation.unrevokeCredentialWithOneOfPolicy(registryId, revokeId, controllerDID, pair, 1, {didModule: dock.did}, false);
+  const extrinsic = await dock.revocation.unrevokeCredentialWithOneOfPolicy(registryId, revokeId, controllerDID, pair, 1, { didModule: dock.did }, false);
   await extrinsic;
 }
 
 async function revoke(pair) {
   console.log('Trying to revoke id:', revokeId);
-  const extrinsic = await dock.revocation.revokeCredentialWithOneOfPolicy(registryId, revokeId, controllerDID, pair, 1, {didModule: dock.did}, false);
+  const extrinsic = await dock.revocation.revokeCredentialWithOneOfPolicy(registryId, revokeId, controllerDID, pair, 1, { didModule: dock.did }, false);
   await extrinsic;
 }
 

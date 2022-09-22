@@ -23,7 +23,7 @@ import {
   registerNewDIDUsingPair,
 } from './helpers';
 import getKeyDoc from '../../src/utils/vc/helpers';
-import { createNewDockDID, getHexIdentifierFromDID } from '../../src/utils/did';
+import { createNewDockDID } from '../../src/utils/did';
 
 const credId = 'A large credential id with size > 32 bytes';
 
@@ -44,13 +44,11 @@ describe('Credential revocation with issuer as the revocation authority', () => 
   const registryId = randomAsHex(32);
 
   // Register a new DID for issuer
-
-  let issuerDID; let
-    holderDID;
+  const issuerDID = createNewDockDID();
   const issuerSeed = randomAsHex(32);
 
   // Register a new DID for holder
-
+  const holderDID = createNewDockDID();
   const holderSeed = randomAsHex(32);
 
   let issuerKey;
@@ -65,11 +63,6 @@ describe('Credential revocation with issuer as the revocation authority', () => 
       address: FullNodeEndpoint,
     });
 
-    didKeys = new KeyringPairDidKeys(dockAPI.api.registry);
-
-    issuerDID = getHexIdentifierFromDID(issuerDIDRaw);
-    holderDID = getHexIdentifierFromDID(holderDIDRaw);
-
     // The keyring should be initialized before any test begins as this suite is testing revocation
     const account = dockAPI.keyring.addFromUri(TestAccountURI);
     dockAPI.setAccount(account);
@@ -80,7 +73,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
     // Register holder DID
     const pair1 = dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519');
-    await registerNewDIDUsingPair(dockAPI, holderDIDRaw, pair1);
+    await registerNewDIDUsingPair(dockAPI, holderDID, pair1);
 
     // Create a new policy
     const policy = new OneOfPolicy();
@@ -135,7 +128,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     // throw error if the credential is not revoked.
     await dockAPI.revocation.unrevokeCredentialWithOneOfPolicy(registryId, revId, issuerDID, issuerKeyPair, 1, { didModule: dockAPI.did }, false);
 
-    const holderKey = getKeyDoc(holderDIDRaw, dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
+    const holderKey = getKeyDoc(holderDID, dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
 
     // Create presentation for unrevoked credential
     const presId = randomAsHex(32);

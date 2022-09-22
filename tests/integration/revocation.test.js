@@ -1,7 +1,8 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 
-import { BTreeSet, Vec } from '@polkadot/types';
 import { DockAPI } from '../../src/index';
+
+import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 
 import {
   OneOfPolicy,
@@ -43,29 +44,6 @@ describe('Revocation Module', () => {
       address: FullNodeEndpoint,
     });
 
-    // Create a random registry id
-    registryId = randomAsHex(32);
-
-    // Create a new controller DID, the DID will be registered on the network and own the registry
-    const controllerDIDRaw = randomAsHex(32);
-    controllerDID = controllerDIDRaw;
-    const controllerSeed = randomAsHex(32);
-
-    // Create a did/keypair proof map
-    didKeys = new KeyringPairDidKeys();
-
-    // Create a list of controllers
-    const controllers = new Set();
-    controllers.add(controllerDID);
-
-    // Create a registry policy
-    policy = new OneOfPolicy(controllers);
-
-    // Create revoke IDs
-    revokeId = randomAsHex(32);
-    revokeIds = new Set();
-    revokeIds.add(revokeId);
-
     // The keyring should be initialized before any test begins as this suite is testing revocation
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
@@ -85,13 +63,7 @@ describe('Revocation Module', () => {
   }, 10000);
 
   test('Can create a registry with a OneOf policy', async () => {
-    const a = await dock.revocation.newRegistry(
-      registryId,
-      policy,
-      false,
-      false,
-    );
-    expect(a).toBeDefined();
+    await expect(dock.revocation.newRegistry(registryId, policy, false, false)).resolves.toBeDefined();
     const reg = await dock.revocation.getRevocationRegistry(registryId);
     expect(!!reg).toBe(true);
   }, 40000);
@@ -118,9 +90,7 @@ describe('Revocation Module', () => {
   }, 40000);
 
   test('Can create an add only registry', async () => {
-    await expect(
-      dock.revocation.newRegistry(registryId, policy, true, false),
-    ).resolves.toBeDefined();
+    await expect(dock.revocation.newRegistry(registryId, policy, true, false)).resolves.toBeDefined();
     const reg = await dock.revocation.getRevocationRegistry(registryId);
     expect(!!reg).toBe(true);
   }, 40000);
@@ -145,10 +115,7 @@ describe('Revocation Module', () => {
       dock.revocation.unrevoke(unrevoke, [[sig, nonce]], false),
     ).rejects.toThrow();
 
-    const revocationStatus = await dock.revocation.getIsRevoked(
-      registryId,
-      revokeId,
-    );
+    const revocationStatus = await dock.revocation.getIsRevoked(registryId, revokeId);
     expect(revocationStatus).toBe(true);
   }, 40000);
 

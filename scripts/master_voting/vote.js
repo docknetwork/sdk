@@ -85,18 +85,10 @@ async function main() {
   console.dir(JSON.parse(JSON.stringify(call.args)), { depth: null });
   console.log('');
 
-<<<<<<< HEAD
-  const payload = {
-    proposal: [...nc.createType('Call', call).toU8a()],
-    round_no: await nc.query.master.round(),
-  };
-  const encoded_state_change = nc.createType('CoreModsStateChange', { MasterVote: payload }).toU8a();
-=======
   const encodedProposal = [...nc.api.createType('Call', proposal).toU8a()];
   const nonce = await nc.didModule.getNextNonceForDID(did);
   const vote = { nonce, proposal: encodedProposal, round_no: actual_round_no };
   const encodedStateChange = getStateChange(nc.api, 'MasterVote', vote);
->>>>>>> origin/master
 
   if (do_vote_yes) {
     // sign and print signature

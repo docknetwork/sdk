@@ -880,9 +880,9 @@ class DIDModule {
     const didDetail = resp.asOnChain;
     return {
       nonce: didDetail.nonce.toNumber(),
-      lastKeyId: didDetail.lastKeyId.toNumber(),
-      activeControllerKeys: didDetail.activeControllerKeys.toNumber(),
-      activeControllers: didDetail.activeControllers.toNumber(),
+      lastKeyId: didDetail.data.lastKeyId.toNumber(),
+      activeControllerKeys: didDetail.data.activeControllerKeys.toNumber(),
+      activeControllers: didDetail.data.activeControllers.toNumber(),
     };
   }
 

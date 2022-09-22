@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -81,24 +81,15 @@
     "mdbook": "mdbook build tutorials --dest-dir ../out/tutorials",
     "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
   },
-  "resolutions": {
-    "@polkadot/api": "7.15.1",
-    "@polkadot/keyring": "8.7.1",
-    "@polkadot/rpc-provider": "7.15.1",
-    "@polkadot/types": "7.15.1",
-    "@polkadot/types-known": "7.15.1",
-    "@polkadot/util": "8.7.1",
-    "@polkadot/util-crypto": "8.7.1"
-  },
   "dependencies": {
     "@docknetwork/node-types": "^0.10.0",
-    "@polkadot/api": "7.15.1",
-    "@polkadot/keyring": "8.7.1",
-    "@polkadot/rpc-provider": "7.15.1",
-    "@polkadot/types": "7.15.1",
-    "@polkadot/types-known": "7.15.1",
-    "@polkadot/util": "8.7.1",
-    "@polkadot/util-crypto": "8.7.1",
+    "@polkadot/api": "9.4.1",
+    "@polkadot/keyring": "10.1.8",
+    "@polkadot/rpc-provider": "9.4.1",
+    "@polkadot/types": "9.4.1",
+    "@polkadot/types-known": "9.4.1",
+    "@polkadot/util": "10.1.8",
+    "@polkadot/util-crypto": "10.1.8",
     "axios": "0.27.2",
     "base64url": "3.0.1",
     "blake2b": "2.1.4",

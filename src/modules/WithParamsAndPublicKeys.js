@@ -162,7 +162,7 @@ export default class WithParamsAndPublicKeys {
   async createSignedRemoveParams(index, hexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getNonce(hexDid, nonce, didModule);
-    const removeParams = { params_ref: [hexDid, index], nonce };
+    const removeParams = { paramsRef: [hexDid, index], nonce };
     const signature = this.signRemoveParams(keyPair, removeParams);
     const didSig = createDidSig(hexDid, keyId, signature);
     return [removeParams, didSig];
@@ -187,7 +187,7 @@ export default class WithParamsAndPublicKeys {
    *
    * @param did
    * @param keyId
-   * @param withParams - If true, return the params referenced by the public key. It will throw an error if params_ref is null
+   * @param withParams - If true, return the params referenced by the public key. It will throw an error if paramsRef is null
    * or params were not found on chain which can happen if they were deleted after this public key was added.
    * @returns {Promise<{bytes: string}|null>}
    */

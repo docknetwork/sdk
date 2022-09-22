@@ -3,7 +3,7 @@ import { u8aToString } from '@polkadot/util';
 
 import { DockAPI } from '../src/index';
 import { DockBlobIdByteSize } from '../src/modules/blob';
-import { createNewDockDID, createDidKey, getHexIdentifierFromDID } from '../src/utils/did';
+import { createNewDockDID } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 
 // The following can be tweaked depending on where the node is running and what

@@ -1,4 +1,3 @@
-
 import { newEngine } from '@comunica/actor-init-sparql-rdfjs';
 
 import { crawl } from '../../src/crawl.js';

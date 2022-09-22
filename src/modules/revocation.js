@@ -30,9 +30,9 @@ class RevocationModule {
   createNewRegistryTx(id, policy, addOnly) {
     const addReg = {
       id,
-      registry: {
+      newRegistry: {
         policy: policy.toJSON(),
-        add_only: addOnly,
+        addOnly,
       },
     };
     return this.module.newRegistry(addReg);
@@ -200,20 +200,22 @@ class RevocationModule {
     return this.removeRegistry(removal, [[sig, sigNonce]], waitForFinalization, params);
   }
 
-  async createSignedUpdate(updateFunc, registryId, revokeIds, did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+  async createSignedUpdate(updateFunc, registryId, [...revokeIds], did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     const hexDid = getHexIdentifierFromDID(did);
     // eslint-disable-next-line no-param-reassign
     nonce = await getNonce(hexDid, nonce, didModule);
 
     const update = {
-      registry_id: registryId,
-      revoke_ids: revokeIds,
+      data: {
+        registryId,
+        revokeIds,
+      },
       nonce,
     };
     const serializedRevoke = updateFunc.bind(this)(update);
     const signature = getSignatureFromKeyringPair(keyPair, serializedRevoke);
     const didSig = createDidSig(hexDid, keyId, signature);
-    return [{ registry_id: registryId, revoke_ids: revokeIds }, didSig, nonce];
+    return [{ registryId, revokeIds }, didSig, nonce];
   }
 
   async createSignedRevoke(registryId, revokeIds, did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
@@ -230,13 +232,13 @@ class RevocationModule {
     nonce = await getNonce(hexDid, nonce, didModule);
 
     const remove = {
-      registry_id: registryId,
+      data: { registryId },
       nonce,
     };
     const serializedRemove = this.getSerializedRemoveRegistry(remove);
     const signature = getSignatureFromKeyringPair(keyPair, serializedRemove);
     const didSig = createDidSig(hexDid, keyId, signature);
-    return [{ registry_id: registryId }, didSig, nonce];
+    return [{ registryId }, didSig, nonce];
   }
 
   /**

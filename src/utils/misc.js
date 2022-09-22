@@ -20,7 +20,7 @@ const secp256k1Curve = new EC('secp256k1');
  * @return {array} An array of Uint8
  */
 export function getBytesForStateChange(api, stateChange) {
-  return api.createType('CoreModsStateChange', stateChange).toU8a();
+  return api.createType('StateChange', stateChange).toU8a();
 }
 
 export function getStateChange(api, name, value) {

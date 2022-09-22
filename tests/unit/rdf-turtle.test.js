@@ -1,5 +1,5 @@
-import { parseRDFDocument, queryNextLookup } from '../../src/utils/rdf';
 import { newEngine } from '@comunica/actor-init-sparql-rdfjs';
+import { parseRDFDocument, queryNextLookup } from '../../src/utils/rdf';
 
 const rdfInputs = [
   `

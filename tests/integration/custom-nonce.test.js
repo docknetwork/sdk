@@ -148,7 +148,7 @@ describe('Custom nonce', () => {
 
     const queriedPk = await dock.bbsPlusModule.getPublicKey(did1, 3);
     expect(queriedPk.bytes).toEqual(pk.bytes);
-    expect(queriedPk.params_ref).toEqual([getHexIdentifierFromDID(did1), 1]);
+    expect(queriedPk.paramsRef).toEqual([getHexIdentifierFromDID(did1), 1]);
 
     const queriedParams1 = await dock.accumulatorModule.getParams(did1, 1);
     expect(queriedParams1.bytes).toEqual(addParams1.bytes);
@@ -156,17 +156,17 @@ describe('Custom nonce', () => {
 
     const queriedPk1 = await dock.accumulatorModule.getPublicKey(did1, 1);
     expect(queriedPk1.bytes).toEqual(pk1.bytes);
-    expect(queriedPk1.params_ref).toEqual([getHexIdentifierFromDID(did1), 1]);
+    expect(queriedPk1.paramsRef).toEqual([getHexIdentifierFromDID(did1), 1]);
 
     const accum1 = await dock.accumulatorModule.getAccumulator(id1, true);
     expect(accum1.type).toEqual('positive');
     expect(accum1.accumulated).toEqual(accumulated1);
-    expect(accum1.key_ref).toEqual([getHexIdentifierFromDID(did1), 1]);
+    expect(accum1.keyRef).toEqual([getHexIdentifierFromDID(did1), 1]);
 
     const accum2 = await dock.accumulatorModule.getAccumulator(id2, true);
     expect(accum2.type).toEqual('universal');
     expect(accum2.accumulated).toEqual(accumulated2);
-    expect(accum2.key_ref).toEqual([getHexIdentifierFromDID(did1), 1]);
+    expect(accum2.keyRef).toEqual([getHexIdentifierFromDID(did1), 1]);
     expect(accum1.created).toEqual(accum2.created);
     expect(accum1.lastModified).toEqual(accum2.lastModified);
   }, 20000);
@@ -200,7 +200,7 @@ describe('Custom nonce', () => {
     for (const [regId, revs, nonce] of [[registryId1, revokeIds1, currentNonce + 1], [registryId2, revokeIds2, currentNonce + 2], [registryId3, revokeIds3, currentNonce + 3]]) {
       const [revoke, sig, computedNonce] = await dock.revocation.createSignedRevoke(regId, revs, did1, pair, 1, { nonce });
       expect(computedNonce).toEqual(nonce);
-      const tx = await dock.revocation.createRevokeTx(revoke, [[sig, nonce]]);
+      const tx = await dock.revocation.createRevokeTx(revoke, [{ sig, nonce }]);
       txs.push(tx);
     }
 

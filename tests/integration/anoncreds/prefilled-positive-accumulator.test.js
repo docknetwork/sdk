@@ -93,8 +93,8 @@ describe('Prefilled positive accumulator', () => {
     // Witness created for member 1
     const member1 = members[10];
     const witness1 = await accumulator.membershipWitness(member1, keypair.secretKey, accumState);
-    let accumPk = new AccumulatorPublicKey(hexToU8a(queriedAccum.public_key.bytes));
-    let accumParams = new AccumulatorParams(hexToU8a(queriedAccum.public_key.params.bytes));
+    let accumPk = new AccumulatorPublicKey(hexToU8a(queriedAccum.publicKey.bytes));
+    let accumParams = new AccumulatorParams(hexToU8a(queriedAccum.publicKey.params.bytes));
     expect(verifAccumulator.verifyMembershipWitness(member1, witness1, accumPk, accumParams)).toEqual(true);
 
     // Witness created for member 2
@@ -125,8 +125,8 @@ describe('Prefilled positive accumulator', () => {
 
     verifAccumulator = PositiveAccumulator.fromAccumulated(hexToU8a(queriedAccum.accumulated));
 
-    accumPk = new AccumulatorPublicKey(hexToU8a(queriedAccum.public_key.bytes));
-    accumParams = new AccumulatorParams(hexToU8a(queriedAccum.public_key.params.bytes));
+    accumPk = new AccumulatorPublicKey(hexToU8a(queriedAccum.publicKey.bytes));
+    accumParams = new AccumulatorParams(hexToU8a(queriedAccum.publicKey.params.bytes));
 
     // Witness created for member 3
     const member4 = members[52];

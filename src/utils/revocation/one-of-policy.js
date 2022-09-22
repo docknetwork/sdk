@@ -8,9 +8,9 @@ export default class OneOfPolicy extends Policy {
    * @param {any} [controllers] - Controller set
    * @constructor
    */
-  constructor(controllers = new Set()) {
+  constructor(controllers = []) {
     super();
-    this.controllers = controllers;
+    this.controllers = new Set([...controllers].map((did) => getHexIdentifierFromDID(did)));
   }
 
   /**

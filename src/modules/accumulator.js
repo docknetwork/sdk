@@ -311,7 +311,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   async createSignedAddPublicKey(publicKey, signerHexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getNonce(signerHexDid, nonce, didModule);
-    const addPk = { public_key: publicKey, nonce };
+    const addPk = { publicKey, nonce };
     const signature = this.signAddPublicKey(keyPair, addPk);
     const didSig = createDidSig(signerHexDid, keyId, signature);
     return [addPk, didSig];
@@ -320,7 +320,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   async createSignedRemovePublicKey(removeKeyId, signerHexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getNonce(signerHexDid, nonce, didModule);
-    const removeKey = { key_ref: [signerHexDid, removeKeyId], nonce };
+    const removeKey = { keyRef: [signerHexDid, removeKeyId], nonce };
     const signature = this.signRemovePublicKey(keyPair, removeKey);
     const didSig = createDidSig(signerHexDid, keyId, signature);
     return [removeKey, didSig];
@@ -397,7 +397,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     if (resp.isSome) {
       const accumInfo = resp.unwrap();
       const accumulatorObj = {
-        created: accumInfo.created_at.toNumber(), lastModified: accumInfo.last_updated_at.toNumber(),
+        created: accumInfo.createdAt.toNumber(), lastModified: accumInfo.lastUpdatedAt.toNumber(),
       };
       let common;
       if (accumInfo.accumulator.isPositive) {
@@ -406,12 +406,12 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
       } else {
         accumulatorObj.type = 'universal';
         common = accumInfo.accumulator.asUniversal.common;
-        accumulatorObj.max_size = accumInfo.accumulator.asUniversal.max_size.toNumber();
+        accumulatorObj.maxSize = accumInfo.accumulator.asUniversal.maxSize.toNumber();
       }
       accumulatorObj.accumulated = u8aToHex(common.accumulated);
-      const owner = u8aToHex(common.key_ref[0]);
-      const keyId = common.key_ref[1].toNumber();
-      accumulatorObj.key_ref = [owner, keyId];
+      const owner = u8aToHex(common.keyRef[0]);
+      const keyId = common.keyRef[1].toNumber();
+      accumulatorObj.keyRef = [owner, keyId];
 
       if (withKeyAndParams) {
         const pk = await this.getPublicKeyByHexDid(owner, keyId, true);
@@ -475,7 +475,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   async getLastParamsWritten(did) {
     const hexId = getHexIdentifierFromDID(did);
     const counters = await this.api.query[this.moduleName].accumulatorOwnerCounters(hexId);
-    const counter = counters.params_counter.toNumber();
+    const counter = counters.paramsCounter.toNumber();
     if (counter > 0) {
       const resp = await this.queryParamsFromChain(hexId, counter);
       if (resp.isSome) {
@@ -495,7 +495,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
 
     const params = [];
     const counters = await this.api.query[this.moduleName].accumulatorOwnerCounters(hexId);
-    const counter = counters.params_counter.toNumber();
+    const counter = counters.paramsCounter.toNumber();
     if (counter > 0) {
       for (let i = 1; i <= counter; i++) {
         // eslint-disable-next-line no-await-in-loop
@@ -519,7 +519,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
 
     const pks = [];
     const counters = await this.api.query[this.moduleName].accumulatorOwnerCounters(hexId);
-    const counter = counters.key_counter.toNumber();
+    const counter = counters.keyCounter.toNumber();
     if (counter > 0) {
       for (let i = 1; i <= counter; i++) {
         // eslint-disable-next-line no-await-in-loop

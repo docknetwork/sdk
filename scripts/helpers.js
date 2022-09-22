@@ -122,10 +122,16 @@ export async function keypair(seed) {
  * @param wsUrl - string
  * @returns {Promise}
  */
-export async function connect(wsUrl) {
-  return await ApiPromise.create({
+ export async function connect(wsUrl) {
+  /*return await ApiPromise.create({
     provider: new WsProvider(wsUrl),
+    typesBundle,
+  });*/
+  const dock = new DockAPI();
+  await dock.init({
+    address: wsUrl,
   });
+  return dock;
 }
 
 export function median(numbers) {

@@ -2,7 +2,6 @@ import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { HttpProvider } from '@polkadot/rpc-provider';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { KeyringPair } from '@polkadot/keyring/types'; // eslint-disable-line
-import { initializeWasm } from '@docknetwork/crypto-wasm';
 import typesBundle from '@docknetwork/node-types';
 
 import AnchorModule from './modules/anchor';
@@ -88,8 +87,6 @@ class DockAPI {
     address: null,
     keyring: null,
   }) {
-    await initializeWasm();
-
     if (this.api) {
       if (this.api.isConnected) {
         throw new Error('API is already connected');

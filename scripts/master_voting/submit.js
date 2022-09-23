@@ -114,28 +114,18 @@ function toAuth(votes) {
  */
 async function assertValidAuth(nodeClient, proposal, mpauth) {
   // * - all signatures are valid over proposal for current voting round
-<<<<<<< HEAD
-  const encoded_state_change = await asEncodedStateChange(nodeClient, proposal);
-  for (const [did, sig] of mpauth) {
-    const did_doc = await nodeClient.query.didModule.dids(did);
-    const pk = did_doc.unwrap()[0].publicKey;
-=======
   const roundNo = (await nodeClient.api.query.master.round()).toJSON();
   for (const [didSig, nonce] of mpauth) {
     const sig = didSig.sig;
     const did = didSig.did;
     const didKey = await nodeClient.didModule.getDidKey(did, didSig.keyId);
     const pk = didKey.publicKey;
->>>>>>> origin/master
     if (!pk.isSr25519) {
       throw `This script only supports sr25519. The public key registered for ${did} is not sr25519.`;
     }
     const srpk = pk.asSr25519.value;
     const srsig = sig.asSr25519.value;
-<<<<<<< HEAD
-=======
     const encoded_state_change = asEncodedStateChange(nodeClient, roundNo, proposal, nonce);
->>>>>>> origin/master
     const ver = sr25519Verify(encoded_state_change, srsig, srpk);
     if (!ver) {
       throw 'Signature invalid:\n'

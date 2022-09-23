@@ -111,15 +111,6 @@ async function downloadEvmAccountStorage() {
   return storageDoubleMapEntriesToObject(storages);
 }
 
-<<<<<<< HEAD
-async function downloadPoAState() {
-  const supply = await dock.api.query.poAModule.emissionSupply();
-  const poaLastBlock = await dock.api.query.poAModule.poALastBlock();
-  return {
-    supply,
-    poaLastBlock,
-  };
-=======
 async function downloadBbsPlus() {
   const paramsCounter = await dock.api.query.bbsPlus.paramsCounter.entries();
   const params = await dock.api.query.bbsPlus.bbsPlusParams.entries();
@@ -133,7 +124,6 @@ async function downloadAccum() {
   const keys = await dock.api.query.accumulator.accumulatorKeys.entries();
   const accum = await dock.api.query.accumulator.accumulators.entries();
   return { accumulatorCounter: storageMapEntriesToObject(counter), accumulatorParams: storageDoubleMapEntriesToObject(params), accumulatorKeys: storageDoubleMapEntriesToObject(keys), accumulators: storageMapEntriesToObject(accum)};
->>>>>>> origin/master
 }
 
 async function downloadState() {
@@ -196,16 +186,9 @@ async function downloadState() {
   process.exit(0);
 }
 
-<<<<<<< HEAD
-dock
-  .init({
-    address: FullNodeEndpoint,
-  })
-=======
 dock.init({
   address: FullNodeEndpoint,
 })
->>>>>>> origin/master
   .then(downloadState)
   .catch((error) => {
     console.error("Error occurred somewhere, it was caught!", error);

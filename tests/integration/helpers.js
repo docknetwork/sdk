@@ -62,3 +62,10 @@ export function checkVerificationMethods(did, doc, length, index = undefined, ke
     expect(doc.publicKey[index].publicKeyBase58).toBeDefined();
   }
 }
+
+export function checkMapsEqual(mapA, mapB) {
+  expect(mapA.size).toEqual(mapB.size);
+  for (const key of mapA.keys()) {
+    expect(mapA.get(key)).toEqual(mapB.get(key));
+  }
+}

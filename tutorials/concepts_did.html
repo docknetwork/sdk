@@ -295,13 +295,73 @@ can also modify above DID document, i.e. add/remove keys, add/remove controller,
 }
 </code></pre>
 <p>In the above document, there is also a service endpoint for the DID.</p>
+<p>DIDs can also be keyless, i.e. not have any keys of its own. In this case the DID is not self-controlled by controlled by
+another DID(s) and the other DID could add/remove keys, controllers or remove the DID. An example keyless DID is shown below</p>
+<pre><code class="language-json">{
+  &quot;@context&quot;: [
+    &quot;https://www.w3.org/ns/did/v1&quot;
+  ],
+  &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
+  &quot;controller&quot;: [
+    &quot;did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz&quot;
+  ],
+  &quot;publicKey&quot;: [],
+  &quot;authentication&quot;: [],
+  &quot;assertionMethod&quot;: [],
+  &quot;capabilityInvocation&quot;: [],
+  &quot;service&quot;: [
+    {
+      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1&quot;,
+      &quot;type&quot;: &quot;LinkedDomains&quot;,
+      &quot;serviceEndpoint&quot;: [
+        &quot;https://bar.example.com&quot;
+      ]
+    }
+  ]
+}
+</code></pre>
+<p>In the above DID Doc, DID <code>did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn</code> is controlled by <code>did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz</code>. Now
+<code>did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz</code> add a key, say for authentication to <code>did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn</code> and the
+DID Doc will look like below</p>
+<pre><code class="language-json">{
+  &quot;@context&quot;: [
+    &quot;https://www.w3.org/ns/did/v1&quot;
+  ],
+  &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
+  &quot;controller&quot;: [
+    &quot;did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz&quot;
+  ],
+  &quot;publicKey&quot;: [
+    {
+      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;,
+      &quot;type&quot;: &quot;Ed25519VerificationKey2018&quot;,
+      &quot;controller&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
+      &quot;publicKeyBase58&quot;: &quot;p6gb7WNh9SWC4hkye4VV5epo1LYpLXKH21ojfwJLayg&quot;
+    }
+  ],
+  &quot;authentication&quot;: [
+    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;,
+  ],
+  &quot;assertionMethod&quot;: [],
+  &quot;capabilityInvocation&quot;: [],
+  &quot;service&quot;: [
+    {
+      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1&quot;,
+      &quot;type&quot;: &quot;LinkedDomains&quot;,
+      &quot;serviceEndpoint&quot;: [
+        &quot;https://bar.example.com&quot;
+      ]
+    }
+  ]
+}
+</code></pre>
 <p>Another thing to keep in mind is that the keys associated with the Dock DID are independent of the keys used to send the
 transaction on chain and pay fees. Eg. Alice might not have any tokens to write anything on chain but can still create a
 DID and corresponding key and ask Bob who has tokens to register the DID on chain. Even though Bob wrote the DID on chain,
 he cannot update or remove it since only Alice has the keys associated with that DID. Similarly, when Alice wants to update
 the DID , it can create the update, sign it and send it to Carol this time to send the update on chain. Similar to blockchain
-accounts, DIDs also have their own nonce which increments by 1 on each action of a DID. The nonce of a DID is set to the block number on
-which its created and the DID is expected to send signed payloads, each with nonce 1 more than the previous nonce.</p>
+accounts, DIDs also have their own nonce which increments by 1 on each action of a DID. On DID creation, its nonce is set to
+the block number on which its created and the DID is expected to send signed payloads, each with nonce 1 more than the previous nonce.</p>
 
                     </main>
 

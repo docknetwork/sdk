@@ -24,7 +24,7 @@ import {
   AccumulatorPublicKey,
   initializeWasm,
 } from '@docknetwork/crypto-wasm-ts';
-import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/crypto-wasm-ts/src/accumulator/in-memory-persistence';
+import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
 import { DockAPI } from '../../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { createNewDockDID } from '../../../src/utils/did';

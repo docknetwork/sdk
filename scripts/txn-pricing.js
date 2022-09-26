@@ -23,7 +23,6 @@ import {
 } from '@docknetwork/crypto-wasm-ts';
 import BBSPlusModule from '../src/modules/bbs-plus';
 import AccumulatorModule from '../src/modules/accumulator';
-import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/crypto-wasm-ts/src/accumulator/in-memory-persistence';
 
 require('dotenv').config();
 

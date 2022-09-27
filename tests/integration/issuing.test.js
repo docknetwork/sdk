@@ -2,15 +2,13 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import mockAxios from '../mocks/axios';
 
-import {
-  createNewDockDID,
-} from '../../src/utils/did';
+import { createNewDockDID, } from '../../src/utils/did';
 
 import { DockAPI } from '../../src/index';
 import { DockResolver } from '../../src/resolver';
 
-import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
-import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
+import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-constants';
+import { getCredMatcherDoc, getProofMatcherDoc, getUnsignedCred, registerNewDIDUsingPair } from './helpers';
 import { generateEcdsaSecp256k1Keypair } from '../../src/utils/misc';
 import { issueCredential, verifyCredential } from '../../src/utils/vc/index';
 import getKeyDoc from '../../src/utils/vc/helpers';
@@ -36,45 +34,6 @@ const holderDID = createNewDockDID();
 const credId = randomAsHex(32);
 
 const unsignedCred = getUnsignedCred(credId, holderDID);
-
-/**
- * Test helper to get the matching doc as per the cred
- * @param cred - credential to match
- * @param issuer
- * @param issuerKeyId
- * @param sigType
- * @returns {{issuanceDate: string, credentialSubject: {alumniOf: string, id: *}, id: *, proof: *, type: [string, string], issuer: string}}
- */
-function getCredMatcherDoc(cred, issuer, issuerKeyId, sigType) {
-  return {
-    id: cred.id,
-    type: cred.type,
-    issuanceDate: cred.issuanceDate,
-    credentialSubject: cred.credentialSubject,
-    issuer,
-    proof: expect.objectContaining({
-      type: sigType,
-      proofValue: expect.anything(),
-      proofPurpose: 'assertionMethod',
-      verificationMethod: issuerKeyId,
-    }),
-  };
-}
-
-function getProofMatcherDoc() {
-  return {
-    results: [
-      {
-        error: undefined,
-        proof: expect.anything(),
-        purposeResult: expect.anything(),
-        verificationMethod: expect.anything(),
-        verified: true,
-      },
-    ],
-    verified: true,
-  };
-}
 
 describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
   const dock = new DockAPI();

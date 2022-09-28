@@ -113,12 +113,12 @@ describe('DID service endpoints', () => {
     expect(doc.service[1].type).toEqual('LinkedDomains');
     expect(
       (doc.service[0].id === spId2Text && doc.service[1].id === spId3Text)
-      || (doc.service[0].id === spId3Text && doc.service[1].id === spId2Text)
+      || (doc.service[0].id === spId3Text && doc.service[1].id === spId2Text),
     ).toBe(true);
 
     expect(
       (JSON.stringify(doc.service[0].serviceEndpoint) === JSON.stringify(origins2Text) && JSON.stringify(doc.service[1].serviceEndpoint) === JSON.stringify(origins3Text))
-      || (JSON.stringify(doc.service[0].serviceEndpoint) === JSON.stringify(origins3Text) && JSON.stringify(doc.service[1].serviceEndpoint) === JSON.stringify(origins2Text))
+      || (JSON.stringify(doc.service[0].serviceEndpoint) === JSON.stringify(origins3Text) && JSON.stringify(doc.service[1].serviceEndpoint) === JSON.stringify(origins2Text)),
     ).toBe(true);
   });
 

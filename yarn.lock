@@ -9363,6 +9363,11 @@ parent-module@^1.0.0:
   dependencies:
     callsites "^3.0.0"
 
+parity-scale-codec@^0.5.3:
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/parity-scale-codec/-/parity-scale-codec-0.5.3.tgz#12719281c5b39f7dbdfaa8fcd073c3746dfceac8"
+  integrity sha512-1lBbXrCpfwcwgyOHANUt1KuS7vW8Mf/5jaU08YK7OxlXg2axmXKEaI91LTP7CBEaDp7YDVSX8Xkds9PGzcSCvQ==
+
 parse-asn1@^5.0.0, parse-asn1@^5.1.5:
   version "5.1.6"
   resolved "https://registry.yarnpkg.com/parse-asn1/-/parse-asn1-5.1.6.tgz#385080a3ec13cb62a62d39409cb3e88844cdaed4"

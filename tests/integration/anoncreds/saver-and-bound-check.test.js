@@ -27,8 +27,7 @@ import {
 
 import { DockAPI } from '../../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
-import { createDidKey, createNewDockDID, getHexIdentifierFromDID } from '../../../src/utils/did';
-import { getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
+import { createNewDockDID } from '../../../src/utils/did';
 import BBSPlusModule from '../../../src/modules/bbs-plus';
 import { getRevealedUnrevealed } from './utils';
 import { registerNewDIDUsingPair } from '../helpers';
@@ -85,12 +84,10 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
 
     issuerKeypair = dock.keyring.addFromUri(randomAsHex(32));
     issuerDid = createNewDockDID();
-    // await dock.did.new(issuerDid, createDidKey(getPublicKeyFromKeyringPair(issuerKeypair), issuerDid), false);
     await registerNewDIDUsingPair(dock, issuerDid, issuerKeypair);
 
     decryptorKeypair = dock.keyring.addFromUri(randomAsHex(32));
     decryptorDid = createNewDockDID();
-    // await dock.did.new(decryptorDid, createDidKey(getPublicKeyFromKeyringPair(decryptorKeypair), decryptorDid), false);
     await registerNewDIDUsingPair(dock, decryptorDid, decryptorKeypair);
 
     await initializeWasm();

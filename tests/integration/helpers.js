@@ -1,6 +1,4 @@
 import { bnToBn } from '@polkadot/util';
-import { BTreeSet } from '@polkadot/types';
-import { createDidKey } from '../../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { MaxGas, MinGasPrice } from '../test-constants';
 import { DidKey, VerificationRelationship } from '../../src/public-keys';
@@ -61,4 +59,50 @@ export function checkVerificationMethods(did, doc, length, index = undefined, ke
     expect(doc.publicKey[index].controller).toEqual(did);
     expect(doc.publicKey[index].publicKeyBase58).toBeDefined();
   }
+}
+
+export function checkMapsEqual(mapA, mapB) {
+  expect(mapA.size).toEqual(mapB.size);
+  for (const key of mapA.keys()) {
+    expect(mapA.get(key)).toEqual(mapB.get(key));
+  }
+}
+
+/**
+ * Test helper to get the matching doc as per the cred
+ * @param cred - credential to match
+ * @param issuer
+ * @param issuerKeyId
+ * @param sigType
+ * @returns {{issuanceDate: string, credentialSubject: {alumniOf: string, id: *}, id: *, proof: *, type: [string, string], issuer: string}}
+ */
+export function getCredMatcherDoc(cred, issuer, issuerKeyId, sigType) {
+  return {
+    id: cred.id,
+    type: cred.type,
+    issuanceDate: cred.issuanceDate,
+    credentialSubject: cred.credentialSubject,
+    issuer,
+    proof: expect.objectContaining({
+      type: sigType,
+      proofValue: expect.anything(),
+      proofPurpose: 'assertionMethod',
+      verificationMethod: issuerKeyId,
+    }),
+  };
+}
+
+export function getProofMatcherDoc() {
+  return {
+    results: [
+      {
+        error: undefined,
+        proof: expect.anything(),
+        purposeResult: expect.anything(),
+        verificationMethod: expect.anything(),
+        verified: true,
+      },
+    ],
+    verified: true,
+  };
 }

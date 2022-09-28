@@ -7,7 +7,7 @@ import {
   WitnessUpdatePublicInfo,
 } from '@docknetwork/crypto-wasm-ts';
 import { randomAsHex } from '@polkadot/util-crypto';
-import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/crypto-wasm-ts/src/accumulator/in-memory-persistence';
+import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
 import { DockAPI } from '../../../src';
 import AccumulatorModule from '../../../src/modules/accumulator';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';

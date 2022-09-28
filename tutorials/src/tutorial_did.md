@@ -73,6 +73,11 @@ const publicKey = getPublicKeyFromKeyringPair(pair);
 ## Registering a new DID on chain
 Now that you have a DID and a public key, the DID can be registered on the Dock chain. Note that this public key associated
 with DID is independent of the key used for sending the transaction and paying the fees.
+
+### Self-controlled DIDs
+
+In most cases, a DID will have its own keys and will control itself, i.e. a self-controlled DID. Following is an example of DID creation in this scenario.
+
 1. First create a `DidKey` object. The first argument of this function is a `PublicKey` and the second argument is
 the verification relationship. A verification relationship can be 1 or more of these `authentication`, `assertion`, `capabilityInvocation` or `keyAgreement`
 
@@ -80,10 +85,21 @@ the verification relationship. A verification relationship can be 1 or more of t
     import { DidKey, VerificationRelationship } from '@docknetwork/sdk/public-keys';
     const didKey = new DidKey(publicKey, new VerificationRelationship());
     ```
-1. Now submit the transaction using a `DockAPI` object and the newly created DID `did` and `didKey`.
+
+2. Now submit the transaction using a `DockAPI` object and the newly created DID `did` and `didKey`.
     ```js
     await dock.did.new(did, [didKey], []);
     ```
+
+### Keyless DIDs
+
+A DID might not have any keys and thus be controlled by other DIDs. Assuming a DID `did1` already exists, it can register a
+keyless DID `did2` as
+  ```js
+  await dock.did.new(did2, [], [did1]);
+  ```
+
+Moreover, a DID can have keys for certain functions like authentication but still be controlled by other DID(s).
 
 ## Fetching a DID from chain
 To get a DID document, use `getDocument`

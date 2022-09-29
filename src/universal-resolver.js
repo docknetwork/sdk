@@ -29,8 +29,8 @@ export default class UniversalResolver extends DIDResolver {
     try {
       const resp = await axios.get(`${this.idUrl}${encodedDid}`, {
         headers: {
-          Accept: 'application/ld+json;profile="https://w3id.org/did-resolution"'
-        }
+          Accept: 'application/ld+json;profile="https://w3id.org/did-resolution"',
+        },
       });
       // Sometimes didDocument doesnt exist, if so return data as document
       return resp.data.didDocument || resp.data;

@@ -2961,6 +2961,11 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
+"@juanelas/base64@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@juanelas/base64/-/base64-1.0.5.tgz#abbda3f529947b4d9784619c4fa039a3f9b58399"
+  integrity sha512-gTIElNo4ohMcYUZzol/Hb6DYJzphxl0b1B4egJJ+JiqxqcOcWx4XLMAB+lhWuMsMX3uR1oc5hwPusU3lgc1FkQ==
+
 "@multiformats/base-x@^4.0.1":
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/@multiformats/base-x/-/base-x-4.0.1.tgz#95ff0fa58711789d53aefb2590a8b7a4e715d121"

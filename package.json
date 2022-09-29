@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -86,6 +86,7 @@
   },
   "dependencies": {
     "@docknetwork/node-types": "^0.13.0",
+    "@juanelas/base64": "^1.0.5",
     "@polkadot/api": "9.4.1",
     "@polkadot/keyring": "10.1.8",
     "@polkadot/rpc-provider": "9.4.1",

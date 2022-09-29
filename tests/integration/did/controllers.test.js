@@ -78,7 +78,7 @@ describe('DID controllers', () => {
       expect(didDetail.activeControllerKeys).toBe(1);
       expect(didDetail.activeControllers).toBe(2);
     }
-  }, 30000);
+  }, 60000);
 
   test('Get DID documents', async () => {
     const doc1 = await dock.did.getDocument(dockDid1);

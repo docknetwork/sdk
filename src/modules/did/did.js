@@ -878,11 +878,12 @@ class DIDModule {
       throw new NoOnchainDIDError(`dock:did:${didIdentifier}`);
     }
     const didDetail = resp.asOnChain;
+    const data = didDetail.data || didDetail;
     return {
       nonce: didDetail.nonce.toNumber(),
-      lastKeyId: didDetail.data.lastKeyId.toNumber(),
-      activeControllerKeys: didDetail.data.activeControllerKeys.toNumber(),
-      activeControllers: didDetail.data.activeControllers.toNumber(),
+      lastKeyId: data.lastKeyId.toNumber(),
+      activeControllerKeys: data.activeControllerKeys.toNumber(),
+      activeControllers: data.activeControllers.toNumber(),
     };
   }
 

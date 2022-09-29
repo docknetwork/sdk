@@ -82,7 +82,7 @@
     "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
   },
   "dependencies": {
-    "@docknetwork/node-types": "^0.11.0",
+    "@docknetwork/node-types": "^0.13.0",
     "@polkadot/api": "9.4.1",
     "@polkadot/keyring": "10.1.8",
     "@polkadot/rpc-provider": "9.4.1",

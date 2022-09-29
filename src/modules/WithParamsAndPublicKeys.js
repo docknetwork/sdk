@@ -225,7 +225,7 @@ export default class WithParamsAndPublicKeys {
   }
 
   /**
-   * Format an object received from the chain as a params object with keys `bytes`, `label` and `curve_type`.
+   * Format an object received from the chain as a params object with keys `bytes`, `label` and `curveType`.
    * @param params
    * @returns {{bytes: string}}
    */

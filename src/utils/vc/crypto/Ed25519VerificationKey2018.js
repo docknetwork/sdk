@@ -15,7 +15,7 @@ export default class Ed25519VerificationKey2018 {
    * @returns {Ed25519VerificationKey2018}
    */
   static from(verificationMethod) {
-    if (verificationMethod.type !== Ed25519VerKeyName) {
+    if (verificationMethod.type.indexOf(Ed25519VerKeyName) === -1) {
       throw new Error(`verification method should have type ${Ed25519VerKeyName}`);
     }
 

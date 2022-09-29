@@ -19,7 +19,7 @@ export default class EcdsaSecp256k1VerificationKey2019 {
    * @returns {EcdsaSecp256k1VerificationKey2019}
    */
   static from(verificationMethod) {
-    if (verificationMethod.type !== EcdsaSecp256k1VerKeyName) {
+    if (verificationMethod.type.indexOf(EcdsaSecp256k1VerKeyName) === -1) {
       throw new Error(`verification method should have type ${EcdsaSecp256k1VerKeyName}`);
     }
 

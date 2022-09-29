@@ -15,7 +15,7 @@ export default class Sr25519VerificationKey2020 {
    * @returns {Sr25519VerificationKey2020}
    */
   static from(verificationMethod) {
-    if (verificationMethod.type !== Sr25519VerKeyName) {
+    if (verificationMethod.type.indexOf(Sr25519VerKeyName) === -1) {
       throw new Error(`verification method should have type ${Sr25519VerKeyName}`);
     }
 

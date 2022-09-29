@@ -64,15 +64,16 @@ async function verify(credentialJSON) {
 }
 
 async function main() {
+  let exitCode = 0;
   try {
     await verify(exampleOne);
   } catch (e) {
     console.error('Error verifying credential', e);
-    process.exit(1);
+    exitCode = 1;
   }
 
   // Exit
-  process.exit(0);
+  process.exit(exitCode);
 }
 
 main();

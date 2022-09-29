@@ -5,7 +5,7 @@ import {
   randomAsHex, cryptoWaitReady, checkAddress, blake2AsU8a,
 } from '@polkadot/util-crypto';
 import { u8aToHex, formatBalance } from '@polkadot/util';
-import { isHexWithGivenByteSize, asDockAddress } from './codec';
+import { isHexWithGivenByteSize } from './codec';
 
 // XXX: Following info can be fetched from chain. Integrating in DockAPI object is an option.
 const TESTNET_ADDR_PREFIX = 21;
@@ -147,18 +147,17 @@ function formatBalIfNeeded(bal, format = true) {
  * Given a block number or block hash, get all transfer extrinsics. Each returned extrinsic is in form `[sender, recipient, amount]`
  * @param {*} api
  * @param {*} numberOrHash
- * @param {*} network
  * @param {*} balanceFormatted
  * @param {*} includeAllTransfers - If false, will only return successful transfer extrinsics
  */
-export async function getTransferExtrinsicsFromBlock(api, numberOrHash, network, balanceFormatted = true, includeAllTransfers = true) {
+export async function getTransferExtrinsicsFromBlock(api, numberOrHash, balanceFormatted = true, includeAllTransfers = true) {
   const extrinsics = await getAllExtrinsicsFromBlock(api, numberOrHash, includeAllTransfers);
   const transfers = [];
   extrinsics.forEach((ext) => {
     if (ext.method && ext.method.section === 'balances' && (ext.method.method === 'transfer' || ext.method.method === 'transferKeepAlive')) {
       const bal = formatBalIfNeeded(ext.method.args[1], balanceFormatted);
       const hash = u8aToHex(blake2AsU8a(ext.toU8a(), 256));
-      transfers.push([asDockAddress(ext.signer, network), asDockAddress(ext.method.args[0], network), bal, hash]);
+      transfers.push([ext.signer.toString(), ext.method.args[0].toString(), bal, hash]);
     }
   });
   return transfers;

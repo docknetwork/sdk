@@ -2,7 +2,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import {
   initializeWasm, Accumulator, PositiveAccumulator, WitnessUpdatePublicInfo, AccumulatorParams,
 } from '@docknetwork/crypto-wasm-ts';
-import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/crypto-wasm-ts/src/accumulator/in-memory-persistence';
+import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
 import { hexToU8a, stringToHex, u8aToHex } from '@polkadot/util';
 import { DockAPI } from '../../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';

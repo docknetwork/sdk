@@ -59,8 +59,6 @@ async function verify(credentialJSON) {
   if (verifyResult.verified) {
     console.log('Credential has been verified!', verifyResult.results);
   } else {
-    // console.log('results', verifyResult.results[0].error && verifyResult.results[0].error.details)
-    // console.log('results', verifyResult.results[0].error && verifyResult.results[0].error.details)
     throw verifyResult.error;
   }
 }

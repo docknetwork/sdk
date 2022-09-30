@@ -9,8 +9,6 @@ const fs = require('fs');
 
 const { FullNodeEndpoint, SudoSecretURI } = process.env;
 
-console.log(FullNodeEndpoint)
-
 if (process.argv.length !== 3) {
   console.error('Need only 1 argument which is the path of wasm file');
   process.exit(2);
@@ -26,6 +24,7 @@ async function getRuntimeVersion(dock) {
 }
 
 async function doRuntimeUpgrade() {
+  console.log(`Upgrading runtime using endpoint: ${FullNodeEndpoint}`);
   const code = fs.readFileSync(process.argv[2]);
   const codeAsHex = code.toString('hex');
 

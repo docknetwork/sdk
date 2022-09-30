@@ -25,13 +25,15 @@ export default class UniversalResolver extends DIDResolver {
    * @returns {Promise<object>}
    */
   async resolve(did) {
-    const encodedDid = encodeURIComponent(did.substr(0, did.indexOf('#')).trim());
+    const hashIndex = did.indexOf('#');
+    const encodedDid = encodeURIComponent(hashIndex === -1 ? did : did.substr(0, hashIndex).trim());
     try {
       const resp = await axios.get(`${this.idUrl}${encodedDid}`, {
         headers: {
           Accept: 'application/ld+json;profile="https://w3id.org/did-resolution"',
         },
       });
+
       // Sometimes didDocument doesnt exist, if so return data as document
       return resp.data.didDocument || resp.data;
     } catch (error) {

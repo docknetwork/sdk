@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -56,6 +56,7 @@
     "staking_payouts": "npx babel-node scripts/staking_payouts.js",
     "did-resolver-example": "npx babel-node example/resolver.js",
     "revocation-example": "npx babel-node example/revocation.js",
+    "didweb-example": "npx babel-node example/didweb.js",
     "vcdm-example": "npx babel-node example/vcdm.js",
     "standard-schemas-example": "npx babel-node example/standard_schemas.js",
     "schema-example": "npx babel-node example/schema.js",
@@ -63,7 +64,7 @@
     "blob-example": "npx babel-node example/blob.js",
     "claim-deduction-example": "npx babel-node example/claim-deduction.js",
     "anchor-example": "npx babel-node example/anchor.js",
-    "test-examples": "yarn dock-did-example && yarn did-resolver-example && yarn revocation-example && yarn vcdm-example && yarn standard-schemas-example && yarn schema-example && yarn schema-validation-example && yarn blob-example && yarn claim-deduction-example && yarn anchor-example",
+    "test-examples": "yarn didweb-example && yarn dock-did-example && yarn did-resolver-example && yarn revocation-example && yarn vcdm-example && yarn standard-schemas-example && yarn schema-example && yarn schema-validation-example && yarn blob-example && yarn claim-deduction-example && yarn anchor-example",
     "get-did": "npx babel-node scripts/get_did_doc.js",
     "upgrade_with_sudo": "npx babel-node scripts/runtime_upgrade_with_sudo.js",
     "onboard_with_sudo": "npx babel-node scripts/onboard_validator_with_sudo.js",
@@ -113,7 +114,7 @@
     "js-sha256": "0.9.0",
     "json-canonicalize": "1.0.4",
     "jsonld": "5.2.0",
-    "jsonld-signatures": "^9.0.2",
+    "jsonld-signatures": "^9.3.1",
     "jsonschema": "1.4.1",
     "key-did-resolver": "^1.4.0",
     "mrklt": "^0.2.0",

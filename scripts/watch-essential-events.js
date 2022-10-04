@@ -57,14 +57,9 @@ import {
   repeat,
   withLatestFrom,
   takeWhile,
-  zip,
-  takeUntil,
-  delay,
-  delayWhen,
   firstValueFrom,
   shareReplay,
   scan,
-  distinct,
   distinctUntilChanged,
 } from "rxjs";
 import {
@@ -507,15 +502,10 @@ const eventFilters = [
       },
       dock
     ) => {
-      //const proposal = dock.api.createType("Call", preimage);
-      const metadata = dock.api.registry.findMetaCall(proposal.callIndex);
+      // const proposal = dock.api.createType("Call", preimage);
+      // const metadata = dock.api.registry.findMetaCall(proposal.callIndex);
 
-      return of(
-        `Proposal preimage is noted for ${proposalHash.toString()}: ${
-          metadata.section
-        }::${metadata.method}`
-      );
-
+      return of(`Proposal preimage is noted for ${proposalHash.toString()}`);
       /*return of(
         `Proposal preimage is noted for ${proposalHash.toString()}: ${
           metadata.section

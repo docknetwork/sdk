@@ -44,6 +44,10 @@ export default new Map([
     secContext,
   ],
   [
+    'https://w3id.org/did/v0.11',
+    didV1Context,
+  ],
+  [
     'https://www.w3.org/ns/did/v1',
     didV1Context,
   ],

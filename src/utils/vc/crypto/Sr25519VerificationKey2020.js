@@ -1,4 +1,5 @@
 import b58 from 'bs58';
+import * as base64 from '@juanelas/base64';
 import { u8aToU8a } from '@polkadot/util';
 import { sr25519Verify } from '@polkadot/util-crypto/sr25519';
 import { Sr25519VerKeyName } from './constants';
@@ -14,10 +15,19 @@ export default class Sr25519VerificationKey2020 {
    * @returns {Sr25519VerificationKey2020}
    */
   static from(verificationMethod) {
-    if (verificationMethod.type !== Sr25519VerKeyName && !verificationMethod.publicKeyBase58) {
-      throw new Error(`verification method should have type ${Sr25519VerKeyName} and have the base58 public key`);
+    if (!verificationMethod.type || verificationMethod.type.indexOf(Sr25519VerKeyName) === -1) {
+      throw new Error(`verification method should have type ${Sr25519VerKeyName} - got: ${verificationMethod.type}`);
     }
-    return new this(b58.decode(verificationMethod.publicKeyBase58));
+
+    if (verificationMethod.publicKeyBase58) {
+      return new this(b58.decode(verificationMethod.publicKeyBase58));
+    }
+
+    if (verificationMethod.publicKeyBase64) {
+      return new this(base64.decode(verificationMethod.publicKeyBase64));
+    }
+
+    throw new Error(`Unsupported signature encoding for ${Sr25519VerKeyName}`);
   }
 
   /**

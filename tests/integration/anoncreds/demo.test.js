@@ -24,7 +24,7 @@ import {
   AccumulatorPublicKey,
   initializeWasm,
 } from '@docknetwork/crypto-wasm-ts';
-import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/crypto-wasm-ts/src/accumulator/in-memory-persistence';
+import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
 import { DockAPI } from '../../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { createNewDockDID } from '../../../src/utils/did';
@@ -208,7 +208,7 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
   test('Add attribute to accumulator for checking revocation later', async () => {
     const encodedAttrs = encodedAttributes(attributes);
     await accumulator.add(encodedAttrs[attributeCount - 1], accumulatorKeypair.secretKey, accumulatorState);
-    expect(accumulatorState.state.has(encodedAttrs[attributeCount - 1])).toEqual(true);
+    await expect(accumulatorState.has(encodedAttrs[attributeCount - 1])).resolves.toEqual(true);
 
     membershipWitness = await accumulator.membershipWitness(encodedAttrs[attributeCount - 1], accumulatorKeypair.secretKey, accumulatorState);
 
@@ -231,8 +231,6 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     const member1 = Accumulator.encodePositiveNumberAsAccumulatorMember(100);
     const member2 = Accumulator.encodePositiveNumberAsAccumulatorMember(105);
     await accumulator.addBatch([member1, member2], accumulatorKeypair.secretKey, accumulatorState);
-
-    console.log(accumulatorState.state);
 
     let accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     const witnessUpdInfo = WitnessUpdatePublicInfo.new(hexToU8a(accum.accumulated), [member1, member2], [], accumulatorKeypair.secretKey);
@@ -284,10 +282,9 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     const member3 = Accumulator.encodePositiveNumberAsAccumulatorMember(110);
     const member4 = Accumulator.encodePositiveNumberAsAccumulatorMember(111);
 
-    // TODO: Figure out why the state check doesn't work    // expect(accumulatorState.state.has(member1)).toEqual(true);
-    // expect(accumulatorState.state.has(member2)).toEqual(true);
-    // await accumulator.addRemoveBatches([member3, member4], [member1, member2], accumulatorKeypair.secret_key, accumulatorState);
-    await accumulator.addRemoveBatches([member3, member4], [member1, member2], accumulatorKeypair.secretKey);
+    await expect(accumulatorState.has(member1)).resolves.toEqual(true);
+    await expect(accumulatorState.has(member2)).resolves.toEqual(true);
+    await accumulator.addRemoveBatches([member3, member4], [member1, member2], accumulatorKeypair.secret_key, accumulatorState);
 
     let accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     let witnessUpdInfo = WitnessUpdatePublicInfo.new(hexToU8a(accum.accumulated), [member3, member4], [member1, member2], accumulatorKeypair.secretKey);
@@ -296,8 +293,7 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     const member5 = Accumulator.encodePositiveNumberAsAccumulatorMember(200);
     const member6 = Accumulator.encodePositiveNumberAsAccumulatorMember(25);
 
-    // await accumulator.addRemoveBatches([member5, member6], [member4], accumulatorKeypair.secret_key, accumulatorState);
-    await accumulator.addRemoveBatches([member5, member6], [member4], accumulatorKeypair.secretKey);
+    await accumulator.addRemoveBatches([member5, member6], [member4], accumulatorKeypair.secret_key, accumulatorState);
 
     accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     const startingBlock = accum.lastModified;
@@ -308,8 +304,7 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     const member8 = Accumulator.encodePositiveNumberAsAccumulatorMember(202);
     const member9 = Accumulator.encodePositiveNumberAsAccumulatorMember(203);
 
-    // await accumulator.addBatch([member7, member8, member9], accumulatorKeypair.secret_key, accumulatorState);
-    await accumulator.addBatch([member7, member8, member9], accumulatorKeypair.secretKey);
+    await accumulator.addBatch([member7, member8, member9], accumulatorKeypair.secret_key, accumulatorState);
 
     accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
     witnessUpdInfo = WitnessUpdatePublicInfo.new(hexToU8a(accum.accumulated), [member7, member8, member9], [], accumulatorKeypair.secretKey);

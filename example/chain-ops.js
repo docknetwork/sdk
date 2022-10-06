@@ -89,7 +89,7 @@ async function printSuccessfulExtrinsicsOfBlock(api, blockNumberOrHash) {
 }
 
 async function printTransfersOfBlock(api, blockNumberOrHash) {
-  console.info(await getTransferExtrinsicsFromBlock(api, blockNumberOrHash, 'main', true, false));
+  console.info(await getTransferExtrinsicsFromBlock(api, blockNumberOrHash, true, false));
 }
 
 async function printAllEventsFromBlock(api, blockNumberOrHash) {

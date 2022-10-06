@@ -221,9 +221,12 @@ export async function verifyCredential(credential, {
  * @param purpose
  * @param expansionMap
  * @param {object} [issuerObject] - Optional issuer object to assign
+ * @param {Boolean} [addSuiteContext] - Toggles the default
+ *   behavior of each signature suite enforcing the presence of its own
+ *   `@context` (if it is not present, it's added to the context list).
  * @return {Promise<object>} The signed credential object.
  */
-export async function issueCredential(keyDoc, credential, compactProof = true, documentLoader = null, purpose = null, expansionMap = null, issuerObject = null) {
+export async function issueCredential(keyDoc, credential, compactProof = true, documentLoader = null, purpose = null, expansionMap = null, issuerObject = null, addSuiteContext = false) {
   // Get suite from keyDoc parameter
   const suite = getSuiteFromKeyDoc(keyDoc);
   if (!suite.verificationMethod) {
@@ -250,5 +253,6 @@ export async function issueCredential(keyDoc, credential, compactProof = true, d
     suite,
     compactProof,
     expansionMap,
+    addSuiteContext,
   });
 }

@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "2.3.4",
+  "version": "2.4.0",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -88,13 +88,13 @@
   "dependencies": {
     "@docknetwork/node-types": "^0.13.0",
     "@juanelas/base64": "^1.0.5",
-    "@polkadot/api": "^9.4.1",
+    "@polkadot/api": "^9.4.3",
     "@polkadot/keyring": "^10.1.8",
-    "@polkadot/rpc-provider": "^9.4.1",
-    "@polkadot/types": "^9.4.1",
-    "@polkadot/types-known": "^9.4.1",
-    "@polkadot/util": "^10.1.8",
-    "@polkadot/util-crypto": "^10.1.8",
+    "@polkadot/rpc-provider": "^9.4.3",
+    "@polkadot/types": "^9.4.3",
+    "@polkadot/types-known": "^9.4.3",
+    "@polkadot/util": "^10.1.9",
+    "@polkadot/util-crypto": "^10.1.9",
     "axios": "0.27.2",
     "base64url": "3.0.1",
     "blake2b": "2.1.4",

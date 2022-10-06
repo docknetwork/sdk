@@ -117,22 +117,22 @@ describe('Master Module', () => {
 
   test('Use a master call to modify master membership.', async () => {
     const fourth_did = u8aToHex(randomAsU8a(32));
-    const new_membership = nc.api.createType('Membership', {
+    const newMembership = nc.api.createType('Membership', {
       members: sortedSet([
         ALICE_DID,
         BOB_DID,
         CHARLIE_DID,
         fourth_did,
       ]),
-      vote_requirement: 2,
+      voteRequirement: 2,
     });
 
     // master members are not yet set
     expect((await masterQuery.members()).toU8a())
       .not
-      .toEqual(new_membership.toU8a());
+      .toEqual(newMembership.toU8a());
 
-    const call = masterModule.setMembers(new_membership);
+    const call = masterModule.setMembers(newMembership);
     const votes = await allVote(
       nc,
       call,
@@ -145,7 +145,7 @@ describe('Master Module', () => {
 
     // master members were set
     expect((await masterQuery.members()).toU8a())
-      .toEqual(new_membership.toU8a());
+      .toEqual(newMembership.toU8a());
   }, 20000);
 });
 
@@ -216,13 +216,13 @@ async function masterSetStorage(
 
 /// lexically sorted set of elements.
 function sortedSet(list) {
-  const sorted = [...list];
-  sorted.sort();
   const ret = new Set();
-  for (const s of sorted) {
+  for (const s of list) {
     ret.add(s);
   }
-  return ret;
+  const sorted = [...ret];
+  sorted.sort();
+  return sorted;
 }
 
 /// helper func
@@ -245,11 +245,11 @@ async function allVote(
   const votes = [];
   for (const [did, key] of did_to_key) {
     const nonce = await nc.didModule.getNextNonceForDID(did);
-    const vote = { nonce, proposal: encodedProposal, round_no: roundNo };
+    const vote = { nonce, data: { proposal: encodedProposal, roundNo } };
     const encodedStateChange = getStateChange(nc.api, 'MasterVote', vote);
     const signature = getSignatureFromKeyringPair(key, encodedStateChange);
     const didSig = createDidSig(did, 1, signature);
-    votes.push([didSig, nonce]);
+    votes.push({ sig: didSig, nonce });
   }
   return votes;
 }

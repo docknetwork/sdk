@@ -428,16 +428,16 @@ async function checkSoundness(presentation, rules) {
   return acceptCompositeClaims(presentation, rules);
 }
 
-function registerDid(did, keyPair) {
+function registerDid(did, keypair) {
   if (registered(did)) { throw `${did} already registered`; }
 
-  const publicKeyBase58 = b58.encode(hexToU8a(keyPair.publicKey.value));
+  const publicKeyBase58 = b58.encode(hexToU8a(keypair.publicKey.value));
   const pk = {
     id: `${did}#keys-1`,
-    type: keyPair.type,
+    type: keypair.type,
     publicKeyBase58,
     controller: did,
-    publicKey: keyPair.publicKey.value,
+    publicKey: keypair.publicKey.value,
   };
   const doc = {
     '@context': 'https://www.w3.org/ns/did/v1',

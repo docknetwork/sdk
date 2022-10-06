@@ -1,5 +1,3 @@
-import { BTreeSet } from '@polkadot/types';
-
 import { getHexIdentifierFromDID } from '../did';
 import Policy from './policy';
 
@@ -10,9 +8,9 @@ export default class OneOfPolicy extends Policy {
    * @param {any} [controllers] - Controller set
    * @constructor
    */
-  constructor(controllers = null) {
+  constructor(controllers = []) {
     super();
-    this.controllers = controllers || new Set();
+    this.controllers = new Set([...controllers].map((did) => getHexIdentifierFromDID(did)));
   }
 
   /**
@@ -20,7 +18,20 @@ export default class OneOfPolicy extends Policy {
    * @param {string} ownerDID - Owner's DID
    */
   addOwner(ownerDID) {
-    this.controllers.add(ownerDID);
+    this.controllers.add(getHexIdentifierFromDID(ownerDID));
+  }
+
+  /**
+   * Returns list containing unique sorted owner DIDs.
+   * @param {string} ownerDID - Owner's DID
+   */
+  controllerIds() {
+    const controllerIds = [...this.controllers];
+    // Sort the controller ids as the node is expecting sorted ids and keeping ids unsorted is giving a signature
+    // verification error. This is a workaround and is needed for now. It maybe fixed later
+    controllerIds.sort();
+
+    return controllerIds;
   }
 
   /**
@@ -28,24 +39,8 @@ export default class OneOfPolicy extends Policy {
    * @returns {object}
    */
   toJSON() {
-    // Convert each owner DID to hex identifier if not already
-    const controllerIds = [...this.controllers].map(getHexIdentifierFromDID);
-
-    // Sort the controller ids as the node is expecting sorted ids and keeping ids unsorted is giving a signature
-    // verification error. This is a workaround and is needed for now. It maybe fixed later
-    controllerIds.sort();
-
-    // Create BtreeSet from controller ids as the node expects it.
-    // BTreeSet can be initialed without argument.
-    // @ts-ignore
-    const controllerSet = new BTreeSet();
-    controllerIds.forEach((cnt) => {
-      // @ts-ignore
-      controllerSet.add(cnt);
-    });
-
     return {
-      OneOf: controllerSet,
+      OneOf: this.controllerIds(),
     };
   }
 }

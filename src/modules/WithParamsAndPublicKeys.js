@@ -52,7 +52,7 @@ export default class WithParamsAndPublicKeys {
     } else {
       throw new Error(`Invalid curve type ${curveType}`);
     }
-    publicKey.params_ref = paramsRef !== undefined ? WithParamsAndPublicKeys.parseRef(paramsRef) : undefined;
+    publicKey.paramsRef = paramsRef !== undefined ? WithParamsAndPublicKeys.parseRef(paramsRef) : undefined;
     return publicKey;
   }
 
@@ -162,7 +162,7 @@ export default class WithParamsAndPublicKeys {
   async createSignedRemoveParams(index, hexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getNonce(hexDid, nonce, didModule);
-    const removeParams = { params_ref: [hexDid, index], nonce };
+    const removeParams = { paramsRef: [hexDid, index], nonce };
     const signature = this.signRemoveParams(keyPair, removeParams);
     const didSig = createDidSig(hexDid, keyId, signature);
     return [removeParams, didSig];
@@ -187,7 +187,7 @@ export default class WithParamsAndPublicKeys {
    *
    * @param did
    * @param keyId
-   * @param withParams - If true, return the params referenced by the public key. It will throw an error if params_ref is null
+   * @param withParams - If true, return the params referenced by the public key. It will throw an error if paramsRef is null
    * or params were not found on chain which can happen if they were deleted after this public key was added.
    * @returns {Promise<{bytes: string}|null>}
    */
@@ -209,12 +209,12 @@ export default class WithParamsAndPublicKeys {
     if (resp.isSome) {
       const pkObj = this.createPublicKeyObjFromChainResponse(resp.unwrap());
       if (withParams) {
-        if (pkObj.params_ref === null) {
+        if (pkObj.paramsRef === null) {
           throw new Error('No reference to parameters for the public key');
         } else {
-          const params = await this.getParamsByHexDid(pkObj.params_ref[0], pkObj.params_ref[1]);
+          const params = await this.getParamsByHexDid(pkObj.paramsRef[0], pkObj.paramsRef[1]);
           if (params === null) {
-            throw new Error(`Parameters with reference (${pkObj.params_ref[0]}, ${pkObj.params_ref[1]}) not found on chain`);
+            throw new Error(`Parameters with reference (${pkObj.paramsRef[0]}, ${pkObj.paramsRef[1]}) not found on chain`);
           }
           pkObj.params = params;
         }
@@ -225,7 +225,7 @@ export default class WithParamsAndPublicKeys {
   }
 
   /**
-   * Format an object received from the chain as a params object with keys `bytes`, `label` and `curve_type`.
+   * Format an object received from the chain as a params object with keys `bytes`, `label` and `curveType`.
    * @param params
    * @returns {{bytes: string}}
    */
@@ -233,8 +233,8 @@ export default class WithParamsAndPublicKeys {
     const paramsObj = {
       bytes: u8aToHex(params.bytes),
     };
-    if (params.curve_type.isBls12381) {
-      paramsObj.curve_type = 'Bls12381';
+    if (params.curveType.isBls12381) {
+      paramsObj.curveType = 'Bls12381';
     }
     if (params.label.isSome) {
       paramsObj.label = u8aToHex(params.label.unwrap());
@@ -245,7 +245,7 @@ export default class WithParamsAndPublicKeys {
   }
 
   /**
-   * Format an object received from the chain as a public key object with keys `bytes`, ` params_ref` and `curve_type`.
+   * Format an object received from the chain as a public key object with keys `bytes`, ` paramsRef` and `curveType`.
    * @param pk
    * @returns {{bytes: string}}
    */
@@ -253,14 +253,14 @@ export default class WithParamsAndPublicKeys {
     const pkObj = {
       bytes: u8aToHex(pk.bytes),
     };
-    if (pk.curve_type.isBls12381) {
-      pkObj.curve_type = 'Bls12381';
+    if (pk.curveType.isBls12381) {
+      pkObj.curveType = 'Bls12381';
     }
-    if (pk.params_ref.isSome) {
-      const pr = pk.params_ref.unwrap();
-      pkObj.params_ref = [u8aToHex(pr[0]), pr[1].toNumber()];
+    if (pk.paramsRef.isSome) {
+      const pr = pk.paramsRef.unwrap();
+      pkObj.paramsRef = [u8aToHex(pr[0]), pr[1].toNumber()];
     } else {
-      pkObj.params_ref = null;
+      pkObj.paramsRef = null;
     }
     return pkObj;
   }

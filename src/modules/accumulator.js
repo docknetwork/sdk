@@ -17,29 +17,29 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   }
 
   static prepareAddPositiveAccumulator(id, accumulated, publicKeyRef) {
-    const [hexDid, counter] = this.parseRef(publicKeyRef);
+    const vals = AccumulatorModule.parseRef(publicKeyRef);
     return {
       id,
       accumulator: {
         Positive: {
           accumulated,
-          key_ref: [hexDid, counter],
+          keyRef: vals,
         },
       },
     };
   }
 
   static prepareAddUniversalAccumulator(id, accumulated, publicKeyRef, maxSize) {
-    const [hexDid, counter] = this.parseRef(publicKeyRef);
+    const vals = AccumulatorModule.parseRef(publicKeyRef);
     return {
       id,
       accumulator: {
         Universal: {
           common: {
             accumulated,
-            key_ref: [hexDid, counter],
+            keyRef: vals,
           },
-          max_size: maxSize,
+          maxSize,
         },
       },
     };
@@ -64,7 +64,10 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {null|string[]} - null if the event is not `accumulator:AccumulatorUpdated` else [accumulatorId, accumulated]
    */
   static parseEventAsAccumulatorUpdate(event) {
-    if (event.section === 'accumulator' && event.method === 'AccumulatorUpdated') {
+    if (
+      event.section === 'accumulator'
+      && event.method === 'AccumulatorUpdated'
+    ) {
       return [u8aToHex(event.data[0]), u8aToHex(event.data[1])];
     }
     return null;
@@ -308,7 +311,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   async createSignedAddPublicKey(publicKey, signerHexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getNonce(signerHexDid, nonce, didModule);
-    const addPk = { public_key: publicKey, nonce };
+    const addPk = { publicKey, nonce };
     const signature = this.signAddPublicKey(keyPair, addPk);
     const didSig = createDidSig(signerHexDid, keyId, signature);
     return [addPk, didSig];
@@ -317,7 +320,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   async createSignedRemovePublicKey(removeKeyId, signerHexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getNonce(signerHexDid, nonce, didModule);
-    const removeKey = { key_ref: [signerHexDid, removeKeyId], nonce };
+    const removeKey = { keyRef: [signerHexDid, removeKeyId], nonce };
     const signature = this.signRemovePublicKey(keyPair, removeKey);
     const didSig = createDidSig(signerHexDid, keyId, signature);
     return [removeKey, didSig];
@@ -388,11 +391,13 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise<{created: *, lastModified: *}|null>}
    */
   async getAccumulator(id, withKeyAndParams = false) {
-    const resp = await this.api.query[this.moduleName].accumulators(id);
+    const resp = await this.api.query[this.moduleName].accumulators(
+      id,
+    );
     if (resp.isSome) {
       const accumInfo = resp.unwrap();
       const accumulatorObj = {
-        created: accumInfo.created_at.toNumber(), lastModified: accumInfo.last_updated_at.toNumber(),
+        created: accumInfo.createdAt.toNumber(), lastModified: accumInfo.lastUpdatedAt.toNumber(),
       };
       let common;
       if (accumInfo.accumulator.isPositive) {
@@ -401,17 +406,17 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
       } else {
         accumulatorObj.type = 'universal';
         common = accumInfo.accumulator.asUniversal.common;
-        accumulatorObj.max_size = accumInfo.accumulator.asUniversal.max_size.toNumber();
+        accumulatorObj.maxSize = accumInfo.accumulator.asUniversal.maxSize.toNumber();
       }
       accumulatorObj.accumulated = u8aToHex(common.accumulated);
-      const owner = u8aToHex(common.key_ref[0]);
-      const keyId = common.key_ref[1].toNumber();
-      accumulatorObj.key_ref = [owner, keyId];
+      const owner = u8aToHex(common.keyRef[0]);
+      const keyId = common.keyRef[1].toNumber();
+      accumulatorObj.keyRef = [owner, keyId];
 
       if (withKeyAndParams) {
         const pk = await this.getPublicKeyByHexDid(owner, keyId, true);
         if (pk !== null) {
-          accumulatorObj.public_key = pk;
+          accumulatorObj.publicKey = pk;
         }
       }
       return accumulatorObj;
@@ -424,11 +429,15 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @param accumulatorId
    * @param blockNoOrBlockHash
    * @returns {Promise<object[]>} - Resolves to an array of `update`s where each `update` is an object with keys
-   * `new_accumulated`, `additions`, `removals` and `witness_update_info`. The last keys have value null if they were
+   * `newAccumulated`, `additions`, `removals` and `witnessUpdateInfo`. The last keys have value null if they were
    * not provided in the extrinsic.
    */
   async getUpdatesFromBlock(accumulatorId, blockNoOrBlockHash) {
-    const extrinsics = await getAllExtrinsicsFromBlock(this.api, blockNoOrBlockHash, false);
+    const extrinsics = await getAllExtrinsicsFromBlock(
+      this.api,
+      blockNoOrBlockHash,
+      false,
+    );
     const updates = [];
     extrinsics.forEach((ext) => {
       if (ext.method && (ext.method.section === 'accumulator') && (ext.method.method === 'updateAccumulator')) {
@@ -436,14 +445,21 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
         if (u8aToHex(update.id) === accumulatorId) {
           // The following commented line produces truncated hex strings. Don't know why
           // const additions = update.additions.isSome ? update.additions.unwrap().map(u8aToHex) : null;
-          const additions = update.additions.isSome ? update.additions.unwrap().map((i) => u8aToHex(i)) : null;
-          const removals = update.removals.isSome ? update.removals.unwrap().map((i) => u8aToHex(i)) : null;
-          const witness_update_info = update.witness_update_info.isSome ? u8aToHex(update.witness_update_info.unwrap()) : null;
+          const additions = update.additions.isSome
+            ? update.additions.unwrap().map((i) => u8aToHex(i))
+            : null;
+          const removals = update.removals.isSome
+            ? update.removals.unwrap().map((i) => u8aToHex(i))
+            : null;
+          const witnessUpdateInfo = update.witnessUpdateInfo.isSome
+            ? u8aToHex(update.witnessUpdateInfo.unwrap())
+            : null;
+
           updates.push({
-            new_accumulated: u8aToHex(update.new_accumulated),
+            newAccumulated: u8aToHex(update.newAccumulated),
             additions,
             removals,
-            witness_update_info,
+            witnessUpdateInfo,
           });
         }
       }
@@ -459,7 +475,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   async getLastParamsWritten(did) {
     const hexId = getHexIdentifierFromDID(did);
     const counters = await this.api.query[this.moduleName].accumulatorOwnerCounters(hexId);
-    const counter = counters.params_counter.toNumber();
+    const counter = counters.paramsCounter.toNumber();
     if (counter > 0) {
       const resp = await this.queryParamsFromChain(hexId, counter);
       if (resp.isSome) {
@@ -479,7 +495,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
 
     const params = [];
     const counters = await this.api.query[this.moduleName].accumulatorOwnerCounters(hexId);
-    const counter = counters.params_counter.toNumber();
+    const counter = counters.paramsCounter.toNumber();
     if (counter > 0) {
       for (let i = 1; i <= counter; i++) {
         // eslint-disable-next-line no-await-in-loop
@@ -503,7 +519,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
 
     const pks = [];
     const counters = await this.api.query[this.moduleName].accumulatorOwnerCounters(hexId);
-    const counter = counters.key_counter.toNumber();
+    const counter = counters.keyCounter.toNumber();
     if (counter > 0) {
       for (let i = 1; i <= counter; i++) {
         // eslint-disable-next-line no-await-in-loop
@@ -517,11 +533,17 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   }
 
   async queryParamsFromChain(hexDid, counter) {
-    return this.api.query[this.moduleName].accumulatorParams(hexDid, counter);
+    return this.api.query[this.moduleName].accumulatorParams(
+      hexDid,
+      counter,
+    );
   }
 
   async queryPublicKeyFromChain(hexDid, counter) {
-    return this.api.query[this.moduleName].accumulatorKeys(hexDid, counter);
+    return this.api.query[this.moduleName].accumulatorKeys(
+      hexDid,
+      counter,
+    );
   }
 
   signAddParams(keyPair, params) {
@@ -540,12 +562,20 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   }
 
   signRemovePublicKey(keyPair, ref) {
-    const serialized = getStateChange(this.api, 'RemoveAccumulatorPublicKey', ref);
+    const serialized = getStateChange(
+      this.api,
+      'RemoveAccumulatorPublicKey',
+      ref,
+    );
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 
   signAddAccumulator(keyPair, addAccumulator) {
-    const serialized = getStateChange(this.api, 'AddAccumulator', addAccumulator);
+    const serialized = getStateChange(
+      this.api,
+      'AddAccumulator',
+      addAccumulator,
+    );
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 

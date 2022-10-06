@@ -98,7 +98,7 @@ describe('Accumulator Module', () => {
 
     const queriedPk1 = await chainModule.getPublicKey(did1, 1);
     expect(queriedPk1.bytes).toEqual(pk1.bytes);
-    expect(queriedPk1.params_ref).toBe(null);
+    expect(queriedPk1.paramsRef).toBe(null);
 
     const params1 = await chainModule.getParams(did1, 1);
     const aparams1 = new AccumulatorParams(hexToU8a(params1.bytes));
@@ -109,7 +109,7 @@ describe('Accumulator Module', () => {
 
     const queriedPk2 = await chainModule.getPublicKey(did2, 1);
     expect(queriedPk2.bytes).toEqual(pk2.bytes);
-    expect(queriedPk2.params_ref).toEqual([getHexIdentifierFromDID(did1), 1]);
+    expect(queriedPk2.paramsRef).toEqual([getHexIdentifierFromDID(did1), 1]);
 
     const queriedPk2WithParams = await chainModule.getPublicKey(did2, 1, true);
     expect(queriedPk2WithParams.params).toEqual(params1);
@@ -123,7 +123,7 @@ describe('Accumulator Module', () => {
 
     const queriedPk3 = await chainModule.getPublicKey(did2, 2);
     expect(queriedPk3.bytes).toEqual(pk3.bytes);
-    expect(queriedPk3.params_ref).toEqual([getHexIdentifierFromDID(did1), 2]);
+    expect(queriedPk3.paramsRef).toEqual([getHexIdentifierFromDID(did1), 2]);
 
     const queriedPk3WithParams = await chainModule.getPublicKey(did2, 2, true);
     expect(queriedPk3WithParams.params).toEqual(params2);
@@ -135,7 +135,10 @@ describe('Accumulator Module', () => {
     expect(pksByDid2[0]).toEqual(queriedPk2);
     expect(pksByDid2[1]).toEqual(queriedPk3);
 
-    const pksWithParamsByDid2 = await chainModule.getAllPublicKeysByDid(did2, true);
+    const pksWithParamsByDid2 = await chainModule.getAllPublicKeysByDid(
+      did2,
+      true,
+    );
     expect(pksWithParamsByDid2[0]).toEqual(queriedPk2WithParams);
     expect(pksWithParamsByDid2[1]).toEqual(queriedPk3WithParams);
   }, 30000);
@@ -156,8 +159,8 @@ describe('Accumulator Module', () => {
     expect(accum1.created).toEqual(accum1.lastModified);
     expect(accum1.type).toEqual('positive');
     expect(accum1.accumulated).toEqual(accumulated1);
-    expect(accum1.key_ref).toEqual([getHexIdentifierFromDID(did1), 1]);
-    expect(accum1.public_key).toBeUndefined();
+    expect(accum1.keyRef).toEqual([getHexIdentifierFromDID(did1), 1]);
+    expect(accum1.publicKey).toBeUndefined();
 
     const accum2 = await chainModule.getAccumulator(id2, false);
     expect(accum2.created > 0).toBe(true);
@@ -165,18 +168,20 @@ describe('Accumulator Module', () => {
     expect(accum2.created).toEqual(accum2.lastModified);
     expect(accum2.type).toEqual('universal');
     expect(accum2.accumulated).toEqual(accumulated2);
-    expect(accum2.key_ref).toEqual([getHexIdentifierFromDID(did2), 1]);
-    expect(accum2.public_key).toBeUndefined();
+    expect(accum2.keyRef).toEqual([getHexIdentifierFromDID(did2), 1]);
+    expect(accum2.publicKey).toBeUndefined();
 
     const keyWithParams = await chainModule.getPublicKey(did2, 1, true);
     const accum2WithKeyAndParams = await chainModule.getAccumulator(id2, true);
     expect(accum2WithKeyAndParams.created > 0).toBe(true);
     expect(accum2WithKeyAndParams.lastModified > 0).toBe(true);
-    expect(accum2WithKeyAndParams.created).toEqual(accum2WithKeyAndParams.lastModified);
+    expect(accum2WithKeyAndParams.created).toEqual(
+      accum2WithKeyAndParams.lastModified,
+    );
     expect(accum2WithKeyAndParams.type).toEqual('universal');
     expect(accum2WithKeyAndParams.accumulated).toEqual(accumulated2);
-    expect(accum2WithKeyAndParams.key_ref).toEqual([getHexIdentifierFromDID(did2), 1]);
-    expect(accum2WithKeyAndParams.public_key).toEqual(keyWithParams);
+    expect(accum2WithKeyAndParams.keyRef).toEqual([getHexIdentifierFromDID(did2), 1]);
+    expect(accum2WithKeyAndParams.publicKey).toEqual(keyWithParams);
 
     await chainModule.removeAccumulator(id1, did1, pair1, 1, { didModule: dock.did }, false);
     expect(await chainModule.getAccumulator(id1, false)).toEqual(null);
@@ -244,37 +249,56 @@ describe('Accumulator Module', () => {
     const accum5 = await chainModule.getAccumulator(id, false);
     expect(accum5.accumulated).toEqual(accumulated5);
 
-    const updates1 = await chainModule.getUpdatesFromBlock(id, accum2.lastModified);
-    expect(updates1[0].new_accumulated).toEqual(accumulated2);
+    const updates1 = await chainModule.getUpdatesFromBlock(
+      id,
+      accum2.lastModified,
+    );
+    expect(updates1[0].newAccumulated).toEqual(accumulated2);
     expect(updates1[0].additions).toEqual(null);
     expect(updates1[0].removals).toEqual(null);
-    expect(updates1[0].witness_update_info).toEqual(null);
+    expect(updates1[0].witnessUpdateInfo).toEqual(null);
 
-    const events1 = await getAllEventsFromBlock(chainModule.api, accum2.lastModified, false);
-    expect(chainModuleClass.parseEventAsAccumulatorUpdate(events1[0].event)).toEqual(null);
-    expect(chainModuleClass.parseEventAsAccumulatorUpdate(events1[1].event)).toEqual([id, accumulated2]);
+    const events1 = (
+      await getAllEventsFromBlock(chainModule.api, accum2.lastModified, false)
+    ).filter(({ event }) => event.section === 'accumulator');
 
-    const updates2 = await chainModule.getUpdatesFromBlock(id, accum3.lastModified);
-    expect(updates2[0].new_accumulated).toEqual(accumulated3);
+    expect(
+      chainModuleClass.parseEventAsAccumulatorUpdate(events1[0].event),
+    ).toEqual([id, accumulated2]);
+
+    const updates2 = await chainModule.getUpdatesFromBlock(
+      id,
+      accum3.lastModified,
+    );
+    expect(updates2[0].newAccumulated).toEqual(accumulated3);
     expect(updates2[0].additions).toEqual(additions1);
     expect(updates2[0].removals).toEqual(removals1);
-    expect(updates2[0].witness_update_info).toEqual(witUpd1);
+    expect(updates2[0].witnessUpdateInfo).toEqual(witUpd1);
 
-    const events2 = await getAllEventsFromBlock(chainModule.api, accum3.lastModified, false);
-    expect(chainModuleClass.parseEventAsAccumulatorUpdate(events2[0].event)).toEqual(null);
-    expect(chainModuleClass.parseEventAsAccumulatorUpdate(events2[1].event)).toEqual([id, accumulated3]);
+    const events2 = (
+      await getAllEventsFromBlock(chainModule.api, accum3.lastModified, false)
+    ).filter(({ event }) => event.section === 'accumulator');
+    expect(
+      chainModuleClass.parseEventAsAccumulatorUpdate(events2[0].event),
+    ).toEqual([id, accumulated3]);
 
-    const updates3 = await chainModule.getUpdatesFromBlock(id, accum4.lastModified);
-    expect(updates3[0].new_accumulated).toEqual(accumulated4);
+    const updates3 = await chainModule.getUpdatesFromBlock(
+      id,
+      accum4.lastModified,
+    );
+    expect(updates3[0].newAccumulated).toEqual(accumulated4);
     expect(updates3[0].additions).toEqual(additions2);
     expect(updates3[0].removals).toEqual(null);
-    expect(updates3[0].witness_update_info).toEqual(witUpd2);
+    expect(updates3[0].witnessUpdateInfo).toEqual(witUpd2);
 
-    const updates4 = await chainModule.getUpdatesFromBlock(id, accum5.lastModified);
-    expect(updates4[0].new_accumulated).toEqual(accumulated5);
+    const updates4 = await chainModule.getUpdatesFromBlock(
+      id,
+      accum5.lastModified,
+    );
+    expect(updates4[0].newAccumulated).toEqual(accumulated5);
     expect(updates4[0].additions).toEqual(null);
     expect(updates4[0].removals).toEqual(removals3);
-    expect(updates4[0].witness_update_info).toEqual(witUpd3);
+    expect(updates4[0].witnessUpdateInfo).toEqual(witUpd3);
   }, 50000);
 
   test('Can remove public keys and params', async () => {

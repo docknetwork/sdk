@@ -3,7 +3,6 @@
 import { ApiPromise, WsProvider, Keyring } from "@polkadot/api";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import { formatBalance } from "@polkadot/util";
-import typesBundle from "@docknetwork/node-types";
 import { bufferCount, map as mapRx } from "rxjs/operators";
 import {
   always,
@@ -123,7 +122,7 @@ export async function keypair(seed) {
  * @param wsUrl - string
  * @returns {Promise}
  */
-export async function connect(wsUrl) {
+ export async function connect(wsUrl) {
   /*return await ApiPromise.create({
     provider: new WsProvider(wsUrl),
     typesBundle,

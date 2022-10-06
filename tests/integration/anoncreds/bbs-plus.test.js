@@ -90,7 +90,7 @@ describe('BBS+ Module', () => {
     await chainModule.addPublicKey(pk1, did1, did1, pair1, 1, { didModule: dock.did }, false);
     const queriedPk1 = await chainModule.getPublicKey(did1, 2);
     expect(queriedPk1.bytes).toEqual(pk1.bytes);
-    expect(queriedPk1.params_ref).toBe(null);
+    expect(queriedPk1.paramsRef).toBe(null);
 
     const queriedParams1 = await chainModule.getParams(did1, 1);
     const params1Val = SignatureParamsG1.valueFromBytes(hexToU8a(queriedParams1.bytes));
@@ -101,7 +101,7 @@ describe('BBS+ Module', () => {
     await chainModule.addPublicKey(pk2, did2, did2, pair2, 1, { didModule: dock.did }, false);
     const queriedPk2 = await chainModule.getPublicKey(did2, 2);
     expect(queriedPk2.bytes).toEqual(pk2.bytes);
-    expect(queriedPk2.params_ref).toEqual([getHexIdentifierFromDID(did1), 1]);
+    expect(queriedPk2.paramsRef).toEqual([getHexIdentifierFromDID(did1), 1]);
 
     const queriedPk2WithParams = await chainModule.getPublicKey(did2, 2, true);
     expect(queriedPk2WithParams.params).toEqual(queriedParams1);
@@ -116,7 +116,7 @@ describe('BBS+ Module', () => {
 
     const queriedPk3 = await chainModule.getPublicKey(did2, 3);
     expect(queriedPk3.bytes).toEqual(pk3.bytes);
-    expect(queriedPk3.params_ref).toEqual([getHexIdentifierFromDID(did1), 2]);
+    expect(queriedPk3.paramsRef).toEqual([getHexIdentifierFromDID(did1), 2]);
 
     const queriedPk3WithParams = await chainModule.getPublicKey(did2, 3, true);
     expect(queriedPk3WithParams.params).toEqual(queriedParams2);

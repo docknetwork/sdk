@@ -147,8 +147,8 @@ async function assertValidAuth(nodeClient, proposal, mpauth) {
 
   // * - number of votes is sufficient
   const vote_count = [...mpauth].length;
-  if (membership.vote_requirement > vote_count) {
-    throw `Not enough votes. ${membership.vote_requirement} required. ${vote_count} provided.`;
+  if (membership.voteRequirement > vote_count) {
+    throw `Not enough votes. ${membership.voteRequirement} required. ${vote_count} provided.`;
   }
 }
 

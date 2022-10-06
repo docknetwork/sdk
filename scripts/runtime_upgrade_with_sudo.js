@@ -24,6 +24,7 @@ async function getRuntimeVersion(dock) {
 }
 
 async function doRuntimeUpgrade() {
+  console.log(`Upgrading runtime using endpoint: ${FullNodeEndpoint}`);
   const code = fs.readFileSync(process.argv[2]);
   const codeAsHex = code.toString('hex');
 

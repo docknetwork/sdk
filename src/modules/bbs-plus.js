@@ -155,7 +155,7 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
   async createSignedRemovePublicKey(removeKeyId, targetHexDid, signerHexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getNonce(signerHexDid, nonce, didModule);
-    const removeKey = { key_ref: [targetHexDid, removeKeyId], did: targetHexDid, nonce };
+    const removeKey = { keyRef: [targetHexDid, removeKeyId], did: targetHexDid, nonce };
     const signature = this.signRemovePublicKey(keyPair, removeKey);
     const didSig = createDidSig(signerHexDid, keyId, signature);
     return [removeKey, didSig];

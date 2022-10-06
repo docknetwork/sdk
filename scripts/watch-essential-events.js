@@ -37,6 +37,7 @@ import {
   curryN,
   defaultTo,
   head,
+  inc,
 } from "ramda";
 import {
   from,
@@ -52,8 +53,14 @@ import {
   filter as filterRx,
   concat,
   bufferTime,
-  takeUntil,
   mergeMap,
+  repeat,
+  withLatestFrom,
+  takeWhile,
+  firstValueFrom,
+  shareReplay,
+  scan,
+  distinctUntilChanged,
 } from "rxjs";
 import {
   envObj,
@@ -72,6 +79,7 @@ const {
   StartBlock,
   BaseBlockExplorerUrl,
   BaseExtrinsicExplorerUrl,
+  ConcurrentBlocksSyncLimit,
 } = envObj({
   // Email to send alarm emails to.
   TxWatcherAlarmEmailTo: notNilAnd(split(",")),
@@ -92,6 +100,8 @@ const {
   BaseBlockExplorerUrl: defaultTo("https://dock.subscan.io/block"),
   // Base explorer url to construct extrinsic address.
   BaseExtrinsicExplorerUrl: defaultTo("https://dock.subscan.io/extrinsic"),
+  // Max amount of blocks to be requested concurrently when syncing.
+  ConcurrentBlocksSyncLimit: o(finiteNumber, defaultTo(100)),
 });
 
 const main = async (dock, startBlock) => {
@@ -103,36 +113,74 @@ const main = async (dock, startBlock) => {
     dock.api.derive.chain.subscribeNewBlocks((block) => {
       sub.next(block);
     });
-  });
+  }).pipe(shareReplay(1));
+
+  await firstValueFrom(currentBlocks$);
 
   // Emits blocks starting from the specified number
   const previousBlocks$ =
     startBlock != null
       ? defer(() => {
-          const source = defer(() => of(startBlock++)).pipe(
-            concatMap((number) =>
-              of(number).pipe(
-                concatMap((number) =>
-                  from(dock.api.rpc.chain.getBlockHash(number))
-                ),
-                concatMap((hash) => from(dock.api.derive.chain.getBlock(hash))),
-                takeUntil(
-                  currentBlocks$.pipe(
-                    filterRx(
-                      (block) => block.block.header.number.toNumber() <= number
-                    )
+          const blocks$ = of(startBlock).pipe(
+            repeat(ConcurrentBlocksSyncLimit),
+            repeat({
+              delay: () => blocks$,
+            }),
+            withLatestFrom(currentBlocks$),
+            scan((lastBlockNumber, [startBlockNumber, lastBlock]) => {
+              const nextBlockNumber =
+                lastBlockNumber == null
+                  ? startBlockNumber
+                  : inc(lastBlockNumber);
+
+              if (lastBlock.block.header.number.toNumber() >= nextBlockNumber) {
+                return nextBlockNumber;
+              } else {
+                return lastBlockNumber;
+              }
+            }, null),
+            distinctUntilChanged(),
+            mergeMap(
+              (number) =>
+                of(number).pipe(
+                  concatMap((number) =>
+                    from(dock.api.rpc.chain.getBlockHash(number))
+                  ),
+                  concatMap((hash) =>
+                    from(dock.api.derive.chain.getBlock(hash))
                   )
-                )
-              )
+                ),
+              ConcurrentBlocksSyncLimit
             ),
-            concatMap((value) => concat(of(value), source))
+            share()
           );
 
-          return source;
+          return blocks$;
         })
       : EMPTY;
 
-  const blocks$ = concat(previousBlocks$, currentBlocks$);
+  const blocks$ = concat(
+    previousBlocks$.pipe(
+      withLatestFrom(currentBlocks$),
+      concatMap(([latestSyncedBlock, currentBlock]) => {
+        const curNumber = currentBlock.block.header.number.toNumber(),
+          lastSyncedNumber = latestSyncedBlock.block.header.number.toNumber();
+        const done = curNumber === lastSyncedNumber + 1;
+
+        if (done) {
+          return of(latestSyncedBlock, null);
+        } else {
+          return of(latestSyncedBlock);
+        }
+      }),
+      takeWhile(Boolean)
+    ),
+    of(null).pipe(
+      tap(() => console.log("Listening for new blocks")),
+      filterRx(Boolean)
+    ),
+    currentBlocks$
+  );
 
   // Flattens extrinsics returning transaction along with produced events
   const txs$ = blocks$
@@ -454,15 +502,10 @@ const eventFilters = [
       },
       dock
     ) => {
-      //const proposal = dock.api.createType("Call", preimage);
-      const metadata = dock.api.registry.findMetaCall(proposal.callIndex);
+      // const proposal = dock.api.createType("Call", preimage);
+      // const metadata = dock.api.registry.findMetaCall(proposal.callIndex);
 
-      return of(
-        `Proposal preimage is noted for ${proposalHash.toString()}: ${
-          metadata.section
-        }::${metadata.method}`
-      );
-
+      return of(`Proposal preimage is noted for ${proposalHash.toString()}`);
       /*return of(
         `Proposal preimage is noted for ${proposalHash.toString()}: ${
           metadata.section

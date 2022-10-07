@@ -162,6 +162,7 @@ export async function verifyCredential(credential, {
   documentLoader = null,
   purpose = null,
   controller = null,
+  suite = [],
 } = {}) {
   if (documentLoader && resolver) {
     throw new Error('Passing resolver and documentLoader results in resolver being ignored, please re-factor.');
@@ -195,7 +196,7 @@ export async function verifyCredential(credential, {
       controller,
     }),
     // TODO: support more key types, see digitalbazaar github
-    suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
+    suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020(), ...suite],
     documentLoader: docLoader,
     compactProof,
   });

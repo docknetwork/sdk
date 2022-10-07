@@ -255,17 +255,19 @@ class VerifiableCredential {
    * @returns {Promise<VerifiableCredentialVerificationResult>}
    */
   async verify({
-    resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null,
+    resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null, suite = [],
   } = {}) {
     if (!this.proof) {
       throw new Error('The current Verifiable Credential has no proof.');
     }
+
     return verifyCredential(this.toJSON(), {
       resolver,
       compactProof,
       forceRevocationCheck,
       revocationApi,
       schemaApi,
+      suite,
     });
   }
 

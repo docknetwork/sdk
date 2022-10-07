@@ -189,7 +189,7 @@ class VerifiablePresentation {
    * @returns {Promise<VerifiablePresentationVerificationResult>} - verification result.
    */
   async verify({
-    challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null,
+    challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null, suite = [],
   } = {}) {
     if (!this.proof) {
       throw new Error('The current VerifiablePresentation has no proof.');
@@ -203,6 +203,7 @@ class VerifiablePresentation {
       forceRevocationCheck,
       revocationApi,
       schemaApi,
+      suite,
     });
   }
 }

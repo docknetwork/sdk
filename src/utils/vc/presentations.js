@@ -122,14 +122,15 @@ export async function verifyPresentation(presentation, options = {}) {
     unsignedPresentation = false,
     presentationPurpose,
     controller,
+    suite = [],
   } = options;
 
   // Build verification options
   const verificationOptions = {
-    suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020()],
     documentLoader: options.documentLoader || defaultDocumentLoader(resolver),
     ...options,
     resolver: null,
+    suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020(), ...suite],
   };
 
   // TODO: verify proof then credentials

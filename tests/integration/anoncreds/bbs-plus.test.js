@@ -122,10 +122,36 @@ describe('BBS+ Module', () => {
     expect(queriedPk3WithParams.params).toEqual(queriedParams2);
   }, 30000);
 
+  test('Get public keys with DID resolution', async () => {
+    const document1 = await dock.did.getDocument(did1, { getBbsPlusSigKeys: true });
+    expect(document1.publicKey.length).toEqual(2);
+    expect(document1.assertionMethod.length).toEqual(2);
+    expect(document1.publicKey[1].id.endsWith('#keys-2')).toEqual(true);
+    expect(document1.publicKey[1].type).toEqual('Bls12381G2KeyDock2022');
+    expect(document1.assertionMethod[1].endsWith('#keys-2')).toEqual(true);
+
+    const document2 = await dock.did.getDocument(did2, { getBbsPlusSigKeys: true });
+    expect(document2.publicKey.length).toEqual(3);
+    expect(document2.assertionMethod.length).toEqual(3);
+    expect(document2.publicKey[1].id.endsWith('#keys-2')).toEqual(true);
+    expect(document2.publicKey[1].type).toEqual('Bls12381G2KeyDock2022');
+    expect(document2.publicKey[2].id.endsWith('#keys-3')).toEqual(true);
+    expect(document2.publicKey[2].type).toEqual('Bls12381G2KeyDock2022');
+    expect(document2.assertionMethod[1].endsWith('#keys-2')).toEqual(true);
+    expect(document2.assertionMethod[2].endsWith('#keys-3')).toEqual(true);
+  });
+
   test('Can remove public keys and params', async () => {
     await chainModule.removePublicKey(2, did1, did1, pair1, 1, { didModule: dock.did }, false);
     const pk1 = await chainModule.getPublicKey(did1, 2);
     expect(pk1).toEqual(null);
+
+    const document1 = await dock.did.getDocument(did1, { getBbsPlusSigKeys: true });
+    expect(document1.publicKey.length).toEqual(1);
+    expect(document1.assertionMethod.length).toEqual(1);
+    expect(document1.publicKey[0].id.endsWith('#keys-1')).toEqual(true);
+    expect(document1.publicKey[0].type).not.toEqual('Bls12381G2KeyDock2022');
+    expect(document1.assertionMethod[0].endsWith('#keys-1')).toEqual(true);
 
     await chainModule.removeParams(1, did1, pair1, 1, { didModule: dock.did }, false);
     const params1 = await chainModule.getParams(did1, 1);
@@ -137,9 +163,26 @@ describe('BBS+ Module', () => {
     const pk2 = await chainModule.getPublicKey(did2, 2);
     expect(pk2).toEqual(null);
 
+    let document2 = await dock.did.getDocument(did2, { getBbsPlusSigKeys: true });
+    expect(document2.publicKey.length).toEqual(2);
+    expect(document2.assertionMethod.length).toEqual(2);
+    expect(document2.publicKey[0].id.endsWith('#keys-1')).toEqual(true);
+    expect(document2.publicKey[0].type).not.toEqual('Bls12381G2KeyDock2022');
+    expect(document2.assertionMethod[0].endsWith('#keys-1')).toEqual(true);
+    expect(document2.publicKey[1].id.endsWith('#keys-3')).toEqual(true);
+    expect(document2.publicKey[1].type).toEqual('Bls12381G2KeyDock2022');
+    expect(document2.assertionMethod[1].endsWith('#keys-3')).toEqual(true);
+
     await chainModule.removePublicKey(3, did2, did2, pair2, 1, { didModule: dock.did }, false);
     const pk3 = await chainModule.getPublicKey(did2, 3);
     expect(pk3).toEqual(null);
+
+    document2 = await dock.did.getDocument(did2, { getBbsPlusSigKeys: true });
+    expect(document2.publicKey.length).toEqual(1);
+    expect(document2.assertionMethod.length).toEqual(1);
+    expect(document2.publicKey[0].id.endsWith('#keys-1')).toEqual(true);
+    expect(document2.publicKey[0].type).not.toEqual('Bls12381G2KeyDock2022');
+    expect(document2.assertionMethod[0].endsWith('#keys-1')).toEqual(true);
 
     await chainModule.removeParams(2, did1, pair1, 1, { didModule: dock.did }, false);
     const params2 = await chainModule.getParams(did1, 2);

@@ -77,7 +77,7 @@ export function validateDockDIDSS58Identifier(identifier) {
 
 /**
  * Gets the hexadecimal value of the given DID.
- * @param {string} did -  The DID can be passed as fully qualified DID like `dock:did:<SS58 string>` or
+ * @param {string} did -  The DID can be passed as fully qualified DID like `did:dock:<SS58 string>` or
  * a 32 byte hex string
  * @return {string} Returns the hexadecimal representation of the DID.
  */

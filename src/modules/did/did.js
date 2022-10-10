@@ -727,7 +727,7 @@ class DIDModule {
   /**
    * Gets a DID from the Dock chain and create a DID document according to W3C spec.
    * Throws NoDID if the DID does not exist on chain.
-   * @param {string} did - The DID can be passed as fully qualified DID like `dock:did:<SS58 string>` or
+   * @param {string} did - The DID can be passed as fully qualified DID like `did:dock:<SS58 string>` or
    * a 32 byte hex string
    * @return {Promise<object>} The DID document.
    */
@@ -737,7 +737,7 @@ class DIDModule {
 
     let didDetails = await this.api.rpc.core_mods.didDetails(hexId, 15);
     if (didDetails.isNone) {
-      throw new NoDIDError(`dock:did:${hexDIDToQualified(hexId)}`);
+      throw new NoDIDError(`did:dock:${hexDIDToQualified(hexId)}`);
     }
     didDetails = didDetails.unwrap();
 
@@ -912,12 +912,12 @@ class DIDModule {
     validateDockDIDHexIdentifier(didIdentifier);
     let resp = await this.api.query.didModule.dids(didIdentifier);
     if (resp.isNone) {
-      throw new NoDIDError(`dock:did:${didIdentifier}`);
+      throw new NoDIDError(`did:dock:${didIdentifier}`);
     }
 
     resp = resp.unwrap();
     if (resp.isOffChain) {
-      throw new NoOnchainDIDError(`dock:did:${didIdentifier}`);
+      throw new NoOnchainDIDError(`did:dock:${didIdentifier}`);
     }
     const didDetail = resp.asOnChain;
     const data = didDetail.data || didDetail;
@@ -938,11 +938,11 @@ class DIDModule {
     validateDockDIDHexIdentifier(didIdentifier);
     let resp = await this.api.query.didModule.dids(didIdentifier);
     if (resp.isNone) {
-      throw new NoDIDError(`dock:did:${didIdentifier}`);
+      throw new NoDIDError(`did:dock:${didIdentifier}`);
     }
     resp = resp.unwrap();
     if (resp.isOnChain) {
-      throw new NoOffchainDIDError(`dock:did:${didIdentifier}`);
+      throw new NoOffchainDIDError(`did:dock:${didIdentifier}`);
     }
     resp = resp.asOffChain;
     const detail = { accountId: u8aToHex(resp.accountId) };

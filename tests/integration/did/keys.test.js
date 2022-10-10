@@ -76,21 +76,32 @@ describe('Key support for DIDs', () => {
   });
 
   test('Get DID document', async () => {
+    function check(doc) {
+      expect(doc.controller.length).toEqual(1);
+      checkVerificationMethods(dockDid, doc, 3, 0);
+      checkVerificationMethods(dockDid, doc, 3, 1);
+      checkVerificationMethods(dockDid, doc, 3, 2);
+      expect(doc.authentication.length).toEqual(2);
+      expect(doc.authentication[0]).toEqual(`${dockDid}#keys-1`);
+      expect(doc.authentication[1]).toEqual(`${dockDid}#keys-2`);
+      expect(doc.assertionMethod.length).toEqual(3);
+      expect(doc.assertionMethod[0]).toEqual(`${dockDid}#keys-1`);
+      expect(doc.assertionMethod[1]).toEqual(`${dockDid}#keys-2`);
+      expect(doc.assertionMethod[2]).toEqual(`${dockDid}#keys-3`);
+      expect(doc.capabilityInvocation.length).toEqual(2);
+      expect(doc.capabilityInvocation[0]).toEqual(`${dockDid}#keys-1`);
+      expect(doc.capabilityInvocation[1]).toEqual(`${dockDid}#keys-2`);
+    }
+
     const doc = await dock.did.getDocument(dockDid);
-    expect(doc.controller.length).toEqual(1);
-    checkVerificationMethods(dockDid, doc, 3, 0);
-    checkVerificationMethods(dockDid, doc, 3, 1);
-    checkVerificationMethods(dockDid, doc, 3, 2);
-    expect(doc.authentication.length).toEqual(2);
-    expect(doc.authentication[0]).toEqual(`${dockDid}#keys-1`);
-    expect(doc.authentication[1]).toEqual(`${dockDid}#keys-2`);
-    expect(doc.assertionMethod.length).toEqual(3);
-    expect(doc.assertionMethod[0]).toEqual(`${dockDid}#keys-1`);
-    expect(doc.assertionMethod[1]).toEqual(`${dockDid}#keys-2`);
-    expect(doc.assertionMethod[2]).toEqual(`${dockDid}#keys-3`);
-    expect(doc.capabilityInvocation.length).toEqual(2);
-    expect(doc.capabilityInvocation[0]).toEqual(`${dockDid}#keys-1`);
-    expect(doc.capabilityInvocation[1]).toEqual(`${dockDid}#keys-2`);
+    check(doc);
+
+    // The same checks should pass when passing the flag for BBS+ keys
+    const doc1 = await dock.did.getDocument(dockDid, { getBbsPlusSigKeys: false });
+    check(doc1);
+
+    const doc2 = await dock.did.getDocument(dockDid, { getBbsPlusSigKeys: true });
+    check(doc2);
   });
 
   test('Add more keys to DID', async () => {
@@ -118,28 +129,39 @@ describe('Key support for DIDs', () => {
   });
 
   test('Get DID document after key addition', async () => {
+    function check(doc) {
+      expect(doc.controller.length).toEqual(1);
+
+      checkVerificationMethods(dockDid, doc, 4, 0);
+      checkVerificationMethods(dockDid, doc, 4, 1);
+      checkVerificationMethods(dockDid, doc, 4, 2);
+      checkVerificationMethods(dockDid, doc, 4, 3);
+
+      expect(doc.authentication.length).toEqual(2);
+      expect(doc.authentication[0]).toEqual(`${dockDid}#keys-1`);
+      expect(doc.authentication[1]).toEqual(`${dockDid}#keys-2`);
+
+      expect(doc.assertionMethod.length).toEqual(4);
+      expect(doc.assertionMethod[0]).toEqual(`${dockDid}#keys-1`);
+      expect(doc.assertionMethod[1]).toEqual(`${dockDid}#keys-2`);
+      expect(doc.assertionMethod[2]).toEqual(`${dockDid}#keys-3`);
+      expect(doc.assertionMethod[3]).toEqual(`${dockDid}#keys-4`);
+
+      expect(doc.capabilityInvocation.length).toEqual(3);
+      expect(doc.capabilityInvocation[0]).toEqual(`${dockDid}#keys-1`);
+      expect(doc.capabilityInvocation[1]).toEqual(`${dockDid}#keys-2`);
+      expect(doc.capabilityInvocation[2]).toEqual(`${dockDid}#keys-4`);
+    }
+
     const doc = await dock.did.getDocument(dockDid);
-    expect(doc.controller.length).toEqual(1);
+    check(doc);
 
-    checkVerificationMethods(dockDid, doc, 4, 0);
-    checkVerificationMethods(dockDid, doc, 4, 1);
-    checkVerificationMethods(dockDid, doc, 4, 2);
-    checkVerificationMethods(dockDid, doc, 4, 3);
+    // The same checks should pass when passing the flag for BBS+ keys
+    const doc1 = await dock.did.getDocument(dockDid, { getBbsPlusSigKeys: false });
+    check(doc1);
 
-    expect(doc.authentication.length).toEqual(2);
-    expect(doc.authentication[0]).toEqual(`${dockDid}#keys-1`);
-    expect(doc.authentication[1]).toEqual(`${dockDid}#keys-2`);
-
-    expect(doc.assertionMethod.length).toEqual(4);
-    expect(doc.assertionMethod[0]).toEqual(`${dockDid}#keys-1`);
-    expect(doc.assertionMethod[1]).toEqual(`${dockDid}#keys-2`);
-    expect(doc.assertionMethod[2]).toEqual(`${dockDid}#keys-3`);
-    expect(doc.assertionMethod[3]).toEqual(`${dockDid}#keys-4`);
-
-    expect(doc.capabilityInvocation.length).toEqual(3);
-    expect(doc.capabilityInvocation[0]).toEqual(`${dockDid}#keys-1`);
-    expect(doc.capabilityInvocation[1]).toEqual(`${dockDid}#keys-2`);
-    expect(doc.capabilityInvocation[2]).toEqual(`${dockDid}#keys-4`);
+    const doc2 = await dock.did.getDocument(dockDid, { getBbsPlusSigKeys: true });
+    check(doc2);
   });
 
   test('Remove keys from DID', async () => {
@@ -174,10 +196,21 @@ describe('Key support for DIDs', () => {
   });
 
   test('Get DID document after key removal', async () => {
+    function check(doc) {
+      expect(doc.controller.length).toEqual(1);
+      checkVerificationMethods(dockDid, doc, 2, 0, 2);
+      checkVerificationMethods(dockDid, doc, 2, 1, 4);
+    }
+
     const doc = await dock.did.getDocument(dockDid);
-    expect(doc.controller.length).toEqual(1);
-    checkVerificationMethods(dockDid, doc, 2, 0, 2);
-    checkVerificationMethods(dockDid, doc, 2, 1, 4);
+    check(doc);
+
+    // The same checks should pass when passing the flag for BBS+ keys
+    const doc1 = await dock.did.getDocument(dockDid, { getBbsPlusSigKeys: false });
+    check(doc1);
+
+    const doc2 = await dock.did.getDocument(dockDid, { getBbsPlusSigKeys: true });
+    check(doc2);
   });
 
   test('Add x25519 key-agreement to DID', async () => {

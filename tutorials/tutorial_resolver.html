@@ -154,8 +154,8 @@ This is how you resolve a Dock DID:</p>
 
 // Assuming the presence of Dock API object `dock`
 const dockResolver = new DockResolver(dock);
-// Say you had a DID `dock:did:5D.....`
-const didDocument = dockResolver.resolve('dock:did:5D.....');
+// Say you had a DID `did:dock:5D.....`
+const didDocument = dockResolver.resolve('did:dock:5D.....');
 </code></pre>
 <h2 id="creating-a-resolver-class-for-a-different-method"><a class="header" href="#creating-a-resolver-class-for-a-different-method">Creating a resolver class for a different method</a></h2>
 <p>If you want to resolve DIDs other than Dock and do not have/want access to the universal resolver, you can extend the

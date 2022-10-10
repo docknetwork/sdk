@@ -9,7 +9,7 @@ import {
   validateDockDIDHexIdentifier,
   NoOnchainDIDError,
   NoOffchainDIDError,
-  createDidSig,
+  createDidSig, hexDIDToQualified,
 } from '../../utils/did';
 import { getSignatureFromKeyringPair, getStateChange } from '../../utils/misc';
 
@@ -24,6 +24,7 @@ import {
   VerificationRelationship,
 } from '../../public-keys';
 import { ServiceEndpointType } from './service-endpoint';
+import WithParamsAndPublicKeys from '../WithParamsAndPublicKeys';
 
 export const ATTESTS_IRI = 'https://rdf.dock.io/alpha/2021#attestsDocumentContents';
 
@@ -731,12 +732,12 @@ class DIDModule {
    * @return {Promise<object>} The DID document.
    */
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  async getDocument(did) {
+  async getDocument(did, { getBbsPlusSigKeys = false } = {}) {
     const hexId = getHexIdentifierFromDID(did);
 
     let didDetails = await this.api.rpc.core_mods.didDetails(hexId, 15);
     if (didDetails.isNone) {
-      throw new NoDIDError(`dock:did:${did}`);
+      throw new NoDIDError(`dock:did:${hexDIDToQualified(hexId)}`);
     }
     didDetails = didDetails.unwrap();
 
@@ -794,6 +795,47 @@ class DIDModule {
         keyAgr.push(index);
       }
     });
+
+    // Fetch BBS+ keys if needed
+    if (getBbsPlusSigKeys === true) {
+      const details = didDetails.details.asOnChain;
+      const lastKeyId = details.lastKeyId.toNumber();
+      // If any keys should be fetched
+      if (lastKeyId > keys.length) {
+        // key id can be anything from 1 to `lastKeyId`
+        const possibleBbsPlusKeyIds = new Set();
+        for (let i = 1; i <= lastKeyId; i++) {
+          possibleBbsPlusKeyIds.add(i);
+        }
+        // Remove key ids already seen as non-BBS+
+        for (const [i] of keys) {
+          possibleBbsPlusKeyIds.delete(i);
+        }
+
+        // Query all BBS+ keys in a single RPC call to the node.
+        const queryKeys = [];
+        for (const k of possibleBbsPlusKeyIds) {
+          queryKeys.push([hexId, k]);
+        }
+        const resp = await this.api.query.bbsPlus.bbsPlusKeys.multi(queryKeys);
+
+        let currentIter = 0;
+        for (const r of resp) {
+          // The gaps in `keyId` might correspond to removed keys
+          if (r.isSome) {
+            // Don't care about signature params for now
+            const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(r.unwrap());
+            if (pkObj.curveType !== 'Bls12381') {
+              throw new Error(`Curve type should have been Bls12381 but was ${pkObj.curveType}`);
+            }
+            const keyIndex = queryKeys[currentIter][1];
+            keys.push([keyIndex, 'Bls12381G2KeyDock2022', hexToU8a(pkObj.bytes)]);
+            assertion.push(keyIndex);
+          }
+          currentIter++;
+        }
+      }
+    }
 
     keys.sort((a, b) => a[0] - b[0]);
     assertion.sort();

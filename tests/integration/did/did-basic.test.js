@@ -76,16 +76,27 @@ describe('Basic DID tests', () => {
   });
 
   test('Can get a DID document', async () => {
-    const result = await dock.did.getDocument(dockDid);
-    expect(!!result).toBe(true);
-    expect(result.controller.length).toEqual(1);
-    checkVerificationMethods(dockDid, result, 1, 0);
-    expect(result.authentication.length).toEqual(1);
-    expect(result.authentication[0]).toEqual(`${dockDid}#keys-1`);
-    expect(result.assertionMethod.length).toEqual(1);
-    expect(result.assertionMethod[0]).toEqual(`${dockDid}#keys-1`);
-    expect(result.capabilityInvocation.length).toEqual(1);
-    expect(result.capabilityInvocation[0]).toEqual(`${dockDid}#keys-1`);
+    function check(doc) {
+      expect(!!doc).toBe(true);
+      expect(doc.controller.length).toEqual(1);
+      checkVerificationMethods(dockDid, doc, 1, 0);
+      expect(doc.authentication.length).toEqual(1);
+      expect(doc.authentication[0]).toEqual(`${dockDid}#keys-1`);
+      expect(doc.assertionMethod.length).toEqual(1);
+      expect(doc.assertionMethod[0]).toEqual(`${dockDid}#keys-1`);
+      expect(doc.capabilityInvocation.length).toEqual(1);
+      expect(doc.capabilityInvocation[0]).toEqual(`${dockDid}#keys-1`);
+    }
+
+    const doc = await dock.did.getDocument(dockDid);
+    check(doc);
+
+    // The same checks should pass when passing the flag for BBS+ keys
+    const doc1 = await dock.did.getDocument(dockDid, { getBbsPlusSigKeys: false });
+    check(doc1);
+
+    const doc2 = await dock.did.getDocument(dockDid, { getBbsPlusSigKeys: true });
+    check(doc2);
   }, 10000);
 
   test('Can attest with a DID', async () => {

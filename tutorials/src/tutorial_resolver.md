@@ -26,8 +26,8 @@ import { DockResolver } from '@docknetwork/sdk/resolver';
 
 // Assuming the presence of Dock API object `dock`
 const dockResolver = new DockResolver(dock);
-// Say you had a DID `dock:did:5D.....`
-const didDocument = dockResolver.resolve('dock:did:5D.....');
+// Say you had a DID `did:dock:5D.....`
+const didDocument = dockResolver.resolve('did:dock:5D.....');
 ```
 
 ## Creating a resolver class for a different method

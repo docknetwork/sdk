@@ -161,21 +161,45 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
     return [removeKey, didSig];
   }
 
+  /**
+   *
+   * @param keyPair
+   * @param params
+   * @returns {Signature}
+   */
   signAddParams(keyPair, params) {
     const serialized = getStateChange(this.api, 'AddBBSPlusParams', params);
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 
+  /**
+   *
+   * @param keyPair
+   * @param pk
+   * @returns {Signature}
+   */
   signAddPublicKey(keyPair, pk) {
     const serialized = getStateChange(this.api, 'AddBBSPlusPublicKey', pk);
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 
+  /**
+   *
+   * @param keyPair
+   * @param ref
+   * @returns {Signature}
+   */
   signRemoveParams(keyPair, ref) {
     const serialized = getStateChange(this.api, 'RemoveBBSPlusParams', ref);
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 
+  /**
+   *
+   * @param keyPair
+   * @param ref
+   * @returns {Signature}
+   */
   signRemovePublicKey(keyPair, ref) {
     const serialized = getStateChange(this.api, 'RemoveBBSPlusPublicKey', ref);
     return getSignatureFromKeyringPair(keyPair, serialized);

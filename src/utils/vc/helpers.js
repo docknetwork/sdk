@@ -5,6 +5,7 @@ import defaultDocumentLoader from './document-loader';
 import {
   EcdsaSecp256k1VerKeyName, Ed25519VerKeyName, Sr25519VerKeyName,
   EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
+  Bls12381BBSSignatureDock2022, Bls12381BBSDockVerKeyName,
 } from './custom_crypto';
 
 /**
@@ -55,6 +56,9 @@ export function getSuiteFromKeyDoc(keyDoc) {
       break;
     case Sr25519VerKeyName:
       Cls = Sr25519Signature2020;
+      break;
+    case Bls12381BBSDockVerKeyName:
+      Cls = Bls12381BBSSignatureDock2022;
       break;
     default:
       throw new Error(`Unknown key type ${keyDoc.type}.`);

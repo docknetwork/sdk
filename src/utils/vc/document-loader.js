@@ -32,6 +32,7 @@ function documentLoader(resolver = null) {
         document = cachedData;
       } else {
         const { data: doc } = await axios.get(uriString);
+        cachedUris.set(cacheKey, doc);
         document = doc;
       }
     }

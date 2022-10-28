@@ -7,10 +7,24 @@ import didV1Context from './contexts/did-v1-updated.json';
 import credV1Context from './contexts/credential-v1-updated.json';
 import schema from './contexts/schema.json';
 import odrl from './contexts/odrl.json';
+import bbsV1Context from './contexts/bbs-v1.json';
+import dockBBSV1Context from './contexts/dock-bbs-v1.json';
 
 // Lookup of following URLs will lead to loading data from the context directory, this is done as the Sr25519 keys are not
 // supported in any W3C standard and vc-js has them stored locally. This is a temporary solution.
 export default new Map([
+  [
+    'https://ld.dock.io/security/bbs/v1',
+    dockBBSV1Context,
+  ],
+  [
+    'https://w3id.org/security/bbs/v1',
+    bbsV1Context,
+  ],
+  [
+    'https://w3c-ccg.github.io/ldp-bbs2020/contexts/v1/',
+    bbsV1Context,
+  ],
   [
     'https://www.w3.org/2018/credentials/v1',
     credV1Context,

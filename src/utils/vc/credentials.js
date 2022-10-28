@@ -11,7 +11,7 @@ import { DEFAULT_CONTEXT_V1_URL, credentialContextField } from './constants';
 import { ensureValidDatetime } from '../type-helpers';
 
 import {
-  EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
+  EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020, Bls12381BBSSignatureDock2022,
 } from './custom_crypto';
 
 /**
@@ -196,7 +196,7 @@ export async function verifyCredential(credential, {
       controller,
     }),
     // TODO: support more key types, see digitalbazaar github
-    suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020(), ...suite],
+    suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020(), new Bls12381BBSSignatureDock2022(), ...suite],
     documentLoader: docLoader,
     compactProof,
   });

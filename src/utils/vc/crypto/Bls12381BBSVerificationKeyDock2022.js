@@ -73,9 +73,6 @@ const verifierFactory = (key) => {
 export default class Bls12381BBSVerificationKeyDock2022 {
   constructor(options) {
     this.type = 'Bls12381G2KeyDock2022';
-
-    // TODO: key size checks
-
     this.id = options.id;
     this.controller = options.controller;
     this.privateKeyBuffer = options.privateKeyBase58

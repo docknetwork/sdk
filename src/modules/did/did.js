@@ -799,7 +799,8 @@ class DIDModule {
     // Fetch BBS+ keys if needed
     if (getBbsPlusSigKeys === true) {
       const details = didDetails.details.asOnChain;
-      const lastKeyId = details.lastKeyId.toNumber();
+      const data = details.data || details;
+      const lastKeyId = data.lastKeyId.toNumber();
       // If any keys should be fetched
       if (lastKeyId > keys.length) {
         // key id can be anything from 1 to `lastKeyId`

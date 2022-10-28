@@ -17,7 +17,7 @@
     "@babel/preset-env": "^7.15.6",
     "@comunica/actor-init-sparql-rdfjs": "^1.22.3",
     "@comunica/types": "^1.0.0",
-    "@docknetwork/crypto-wasm": "0.14.0",
+    "@docknetwork/crypto-wasm": "0.16.0",
     "@rollup/plugin-commonjs": "^20.0.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.1.3",

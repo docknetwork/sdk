@@ -2363,11 +2363,6 @@
     json-pointer "^0.6.2"
     lzutf8 "^0.6.3"
 
-"@docknetwork/crypto-wasm@0.14.0":
-  version "0.14.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.14.0.tgz#a6db205cd66fd5ab56d3f6225aaac05dcb0fb187"
-  integrity sha512-616P/vGzA88uGme2bhuiJuSmyYJ6D2IG2EyhhVps7jT9wCDAqQP3A151mnYYg3Tu3dtblVmz8WKuUK7AsDJcWA==
-
 "@docknetwork/crypto-wasm@0.16.0":
   version "0.16.0"
   resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.16.0.tgz#9c5bfd3f241e8eaae845000b172103dc9cdc57bf"

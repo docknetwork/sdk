@@ -145,10 +145,10 @@ describe('Proving that blood group is not AB-', () => {
     const sigPk = new BBSPlusPublicKeyG2(hexToU8a(queriedPk.bytes));
 
     credential1 = signMessageObject(attributes1, issuerBbsPlusKeypair.secretKey, labelBytes, encoder);
-    expect(verifyMessageObject(attributes1, credential1.signature, sigPk, labelBytes, encoder)).toBe(true);
+    expect(verifyMessageObject(attributes1, credential1.signature, sigPk, labelBytes, encoder).verified).toBe(true);
 
     credential2 = signMessageObject(attributes2, issuerBbsPlusKeypair.secretKey, labelBytes, encoder);
-    expect(verifyMessageObject(attributes2, credential2.signature, sigPk, labelBytes, encoder)).toBe(true);
+    expect(verifyMessageObject(attributes2, credential2.signature, sigPk, labelBytes, encoder).verified).toBe(true);
   });
 
   it('verifier generates SNARk proving and verifying key', async () => {

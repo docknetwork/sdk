@@ -64,7 +64,7 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
     const encoded = [];
     for (let i = 0; i < attrs.length; i++) {
       if (i === encAttrIdx) {
-        encoded.push(SignatureG1.reversibleEncodeStringMessageForSigning(attrs[i]));
+        encoded.push(SignatureG1.reversibleEncodeStringForSigning(attrs[i]));
       } else if (i === boundedAttrIdx) {
         encoded.push(SignatureG1.encodePositiveNumberForSigning(attrs[i]));
       } else {

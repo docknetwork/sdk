@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -75,7 +75,7 @@
     "build-scripts": "rollup -c rollup.scripts.config.js",
     "watch": "rollup -c -w",
     "test": "yarn jest --verbose ./tests/unit",
-    "test-integration": "NODE_ENV=production jest --verbose --runInBand ./tests/integration/anoncreds/issuing.test",
+    "test-integration": "NODE_ENV=production jest --verbose --runInBand ./tests/integration",
     "test-eth": "NODE_ENV=production jest --verbose --runInBand tests/integration/eth",
     "docs": "mkdir out && touch out/.nojekyll && jsdoc src -r -c .jsdoc -d out/reference",
     "dev-node": "./scripts/run_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",

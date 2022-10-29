@@ -2,6 +2,7 @@ import { u8aToU8a } from '@polkadot/util';
 import b58 from 'bs58';
 
 import {
+  KeypairG2,
   SignatureG1,
   BBSPlusPublicKeyG2,
   BBSPlusSecretKey,
@@ -75,14 +76,29 @@ export default class Bls12381BBSVerificationKeyDock2022 {
     this.type = 'Bls12381G2KeyDock2022';
     this.id = options.id;
     this.controller = options.controller;
-    this.privateKeyBuffer = options.privateKeyBase58
-      ? b58.decode(options.privateKeyBase58)
-      : undefined;
-    this.publicKeyBuffer = b58.decode(options.publicKeyBase58);
+
+    const { keypair } = options;
+
+    if (keypair) {
+      this.privateKeyBuffer = keypair.sk.value;
+      this.publicKeyBuffer = keypair.pk.value;
+    } else {
+      this.privateKeyBuffer = options.privateKeyBase58
+        ? b58.decode(options.privateKeyBase58)
+        : undefined;
+      this.publicKeyBuffer = b58.decode(options.publicKeyBase58);
+    }
   }
 
   static async from(options) {
     return new Bls12381BBSVerificationKeyDock2022(options);
+  }
+
+  static generate({
+    seed, params, controller, id,
+  } = {}) {
+    const keypair = KeypairG2.generate(params || getSigParamsOfRequiredSize(1, SIGNATURE_PARAMS_LABEL_BYTES), seed);
+    return new Bls12381BBSVerificationKeyDock2022({ keypair, controller, id });
   }
 
   /**

@@ -1,5 +1,4 @@
 import jsonld from 'jsonld';
-import { getPublicKeyFromKeyringPair } from '../misc';
 import defaultDocumentLoader from './document-loader';
 
 import {
@@ -32,7 +31,6 @@ export default function getKeyDoc(did, keypair, type, id) {
     controller: did,
     type,
     keypair,
-    // publicKey: getPublicKeyFromKeyringPair(keypair), // TODO: do we need?
   };
 }
 

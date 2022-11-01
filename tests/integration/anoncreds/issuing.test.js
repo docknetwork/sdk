@@ -4,7 +4,7 @@ import { initializeWasm, KeypairG2, SignatureParamsG1 } from '@docknetwork/crypt
 import { DockAPI } from '../../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { createNewDockDID } from '../../../src/utils/did';
-import Bls12381BBSVerificationKeyDock2022 from '../../../src/utils/vc/crypto/Bls12381BBSVerificationKeyDock2022';
+import Bls12381BBSKeyDock2022 from '../../../src/utils/vc/crypto/Bls12381BBSKeyDock2022';
 
 import BBSPlusModule from '../../../src/modules/bbs-plus';
 import { DockResolver } from '../../../src/resolver';
@@ -92,7 +92,7 @@ describe('BBS+ Module', () => {
   }, 20000);
 
   test('Can create BBS+ public key for the DID', async () => {
-    keypair = Bls12381BBSVerificationKeyDock2022.generate({
+    keypair = Bls12381BBSKeyDock2022.generate({
       controller: did1,
     });
 

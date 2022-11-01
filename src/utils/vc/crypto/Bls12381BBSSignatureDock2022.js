@@ -39,7 +39,7 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
       type: Bls12381BBSSigDockSigName,
       LDKeyClass: Bls12381BBSVerificationKeyDock2022,
       contextUrl: SUITE_CONTEXT_URL,
-      alg: 'ES256K',
+      alg: 'BLS12-381',
       signer: signer || Bls12381BBSSignatureDock2022.signerFactory(keypair, verificationMethod),
       verifier,
     });
@@ -95,7 +95,7 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
         },
       });
     } else {
-      throw new Error('Credential must have define credentialSchema');
+      throw new Error('Credential must define credentialSchema');
     }
 
     // Encode messages, retrieve names/values array

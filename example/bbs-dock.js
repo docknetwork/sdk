@@ -1,6 +1,6 @@
 import VerifiableCredential from '../src/verifiable-credential';
 import { MultiResolver } from '../src/resolver';
-import Bls12381BBSKeyDock2022 from '../src/utils/vc/crypto/Bls12381BBSKeyDock2022';
+import Bls12381G2KeyDock2022 from '../src/utils/vc/crypto/Bls12381G2KeyDock2022';
 
 const keypairOpts = {
   "id": "did:example:489398593#keys-1",
@@ -96,7 +96,7 @@ async function signAndVerify(credentialJSON) {
   credential.setIssuer(keypairOpts.controller);
 
   // Create the keypair
-  const keyPair = new Bls12381BBSKeyDock2022(keypairOpts);
+  const keyPair = new Bls12381G2KeyDock2022(keypairOpts);
 
   // Sign and print the results
   console.log('Signing credential:', JSON.stringify(credential.toJSON(), null, 2));

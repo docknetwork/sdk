@@ -71,7 +71,7 @@ const verifierFactory = (key) => {
   };
 };
 
-export default class Bls12381BBSKeyDock2022 {
+export default class Bls12381G2KeyDock2022 {
   constructor(options) {
     this.type = 'Bls12381G2KeyDock2022';
     this.id = options.id;
@@ -91,14 +91,14 @@ export default class Bls12381BBSKeyDock2022 {
   }
 
   static async from(options) {
-    return new Bls12381BBSKeyDock2022(options);
+    return new Bls12381G2KeyDock2022(options);
   }
 
   static generate({
     seed, params, controller, id,
   } = {}) {
     const keypair = KeypairG2.generate(params || getSigParamsOfRequiredSize(1, SIGNATURE_PARAMS_LABEL_BYTES), seed);
-    return new Bls12381BBSKeyDock2022({ keypair, controller, id });
+    return new Bls12381G2KeyDock2022({ keypair, controller, id });
   }
 
   /**

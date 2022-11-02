@@ -5,4 +5,4 @@ export const Ed25519SigName = 'Ed25519Signature2018';
 export const Sr25519VerKeyName = 'Sr25519VerificationKey2020';
 export const Sr25519SigName = 'Sr25519Signature2020';
 export const Bls12381BBSSigDockSigName = 'Bls12381BBS+SignatureDock2022';
-export const Bls12381BBSDockVerKeyName = 'Bls12381G2KeyDock2022';
+export const Bls12381BBSDockVerKeyName = 'Bls12381G2VerificationKeyDock2022';

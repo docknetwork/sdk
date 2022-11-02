@@ -103,7 +103,7 @@ describe('BBS+ Module', () => {
     const { publicKey } = didDocument;
 
     expect(publicKey.length).toEqual(2);
-    expect(publicKey[1].type).toEqual('Bls12381G2KeyPairDock2022');
+    expect(publicKey[1].type).toEqual('Bls12381G2VerificationKeyDock2022');
 
     keypair.id = publicKey[1].id;
   }, 30000);

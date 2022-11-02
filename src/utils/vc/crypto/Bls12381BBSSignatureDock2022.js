@@ -39,7 +39,7 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
       type: Bls12381BBSSigDockSigName,
       LDKeyClass: Bls12381G2KeyDock2022,
       contextUrl: SUITE_CONTEXT_URL,
-      alg: 'BLS12-381',
+      alg: 'Bls12381BBS+SignatureDock2022',
       signer: signer || Bls12381BBSSignatureDock2022.signerFactory(keypair, verificationMethod),
       verifier,
     });

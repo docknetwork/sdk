@@ -13,7 +13,7 @@ import jsonld from 'jsonld';
 import { SECURITY_CONTEXT_URL } from 'jsonld-signatures';
 import { Bls12381BBSSigDockSigName } from './constants';
 
-import Bls12381G2KeyDock2022 from './Bls12381G2KeyDock2022';
+import Bls12381G2KeyPairDock2022 from './Bls12381G2KeyPairDock2022';
 import CustomLinkedDataSignature from './custom-linkeddatasignature';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
@@ -37,7 +37,7 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
 
     super({
       type: Bls12381BBSSigDockSigName,
-      LDKeyClass: Bls12381G2KeyDock2022,
+      LDKeyClass: Bls12381G2KeyPairDock2022,
       contextUrl: SUITE_CONTEXT_URL,
       alg: 'Bls12381BBS+SignatureDock2022',
       signer: signer || Bls12381BBSSignatureDock2022.signerFactory(keypair, verificationMethod),

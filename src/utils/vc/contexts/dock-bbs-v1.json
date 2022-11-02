@@ -106,8 +106,8 @@
         }
       }
     },
-    "Bls12381G2KeyDock2022": {
-      "@id": "https://ld.dock.io/security#Bls12381G2KeyDock2022",
+    "Bls12381G2KeyPairDock2022": {
+      "@id": "https://ld.dock.io/security#Bls12381G2KeyPairDock2022",
       "@context": {
         "@protected": true,
         "id": "@id",

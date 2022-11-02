@@ -13,6 +13,8 @@ import {
   SIGNATURE_PARAMS_LABEL_BYTES,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 
+import { Bls12381BBSDockVerKeyName } from './constants';
+
 const signerFactory = (key) => {
   if (!key.id) {
     return {
@@ -73,7 +75,7 @@ const verifierFactory = (key) => {
 
 export default class Bls12381G2KeyPairDock2022 {
   constructor(options) {
-    this.type = 'Bls12381G2KeyPairDock2022';
+    this.type = Bls12381BBSDockVerKeyName;
     this.id = options.id;
     this.controller = options.controller;
 

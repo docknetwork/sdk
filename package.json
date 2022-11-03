@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "2.5.1",
+  "version": "2.6.0",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -17,8 +17,7 @@
     "@babel/preset-env": "^7.15.6",
     "@comunica/actor-init-sparql-rdfjs": "^1.22.3",
     "@comunica/types": "^1.0.0",
-    "@docknetwork/crypto-wasm": "0.14.0",
-    "@docknetwork/crypto-wasm-ts": "0.23.0",
+    "@docknetwork/crypto-wasm": "0.16.0",
     "@rollup/plugin-commonjs": "^20.0.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.1.3",
@@ -52,6 +51,7 @@
   "scripts": {
     "jest": "NODE_OPTIONS='--experimental-vm-modules' jest",
     "exc": "npx babel-node",
+    "bbs-dock-example": "npx babel-node example/bbs-dock.js",
     "dock-did-example": "npx babel-node example/dock-did.js",
     "staking_payouts": "npx babel-node scripts/staking_payouts.js",
     "did-resolver-example": "npx babel-node example/resolver.js",
@@ -86,9 +86,10 @@
     "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
   },
   "dependencies": {
+    "@docknetwork/crypto-wasm-ts": "0.26.0",
     "@docknetwork/node-types": "^0.13.0",
     "@juanelas/base64": "^1.0.5",
-    "@polkadot/api": "^9.4.3",
+    "@polkadot/api": "9.4.3",
     "@polkadot/keyring": "^10.1.9",
     "@polkadot/rpc-provider": "9.4.3",
     "@polkadot/types": "9.4.3",
@@ -102,9 +103,10 @@
     "deep-equal": "2.0.5",
     "dotenv": "16.0.1",
     "elliptic": "6.5.4",
+    "flat": "^5.0.2",
     "js-sha256": "0.9.0",
     "json-canonicalize": "1.0.4",
-    "jsonld": "5.2.0",
+    "jsonld": "^5.0.0",
     "jsonld-signatures": "^9.3.1",
     "jsonschema": "1.4.1",
     "key-did-resolver": "^1.4.0",

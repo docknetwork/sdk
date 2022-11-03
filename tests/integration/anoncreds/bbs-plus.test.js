@@ -127,16 +127,16 @@ describe('BBS+ Module', () => {
     expect(document1.publicKey.length).toEqual(2);
     expect(document1.assertionMethod.length).toEqual(2);
     expect(document1.publicKey[1].id.endsWith('#keys-2')).toEqual(true);
-    expect(document1.publicKey[1].type).toEqual('Bls12381G2KeyDock2022');
+    expect(document1.publicKey[1].type).toEqual('Bls12381G2VerificationKeyDock2022');
     expect(document1.assertionMethod[1].endsWith('#keys-2')).toEqual(true);
 
     const document2 = await dock.did.getDocument(did2, { getBbsPlusSigKeys: true });
     expect(document2.publicKey.length).toEqual(3);
     expect(document2.assertionMethod.length).toEqual(3);
     expect(document2.publicKey[1].id.endsWith('#keys-2')).toEqual(true);
-    expect(document2.publicKey[1].type).toEqual('Bls12381G2KeyDock2022');
+    expect(document2.publicKey[1].type).toEqual('Bls12381G2VerificationKeyDock2022');
     expect(document2.publicKey[2].id.endsWith('#keys-3')).toEqual(true);
-    expect(document2.publicKey[2].type).toEqual('Bls12381G2KeyDock2022');
+    expect(document2.publicKey[2].type).toEqual('Bls12381G2VerificationKeyDock2022');
     expect(document2.assertionMethod[1].endsWith('#keys-2')).toEqual(true);
     expect(document2.assertionMethod[2].endsWith('#keys-3')).toEqual(true);
   });
@@ -150,7 +150,7 @@ describe('BBS+ Module', () => {
     expect(document1.publicKey.length).toEqual(1);
     expect(document1.assertionMethod.length).toEqual(1);
     expect(document1.publicKey[0].id.endsWith('#keys-1')).toEqual(true);
-    expect(document1.publicKey[0].type).not.toEqual('Bls12381G2KeyDock2022');
+    expect(document1.publicKey[0].type).not.toEqual('Bls12381G2VerificationKeyDock2022');
     expect(document1.assertionMethod[0].endsWith('#keys-1')).toEqual(true);
 
     await chainModule.removeParams(1, did1, pair1, 1, { didModule: dock.did }, false);
@@ -167,10 +167,10 @@ describe('BBS+ Module', () => {
     expect(document2.publicKey.length).toEqual(2);
     expect(document2.assertionMethod.length).toEqual(2);
     expect(document2.publicKey[0].id.endsWith('#keys-1')).toEqual(true);
-    expect(document2.publicKey[0].type).not.toEqual('Bls12381G2KeyDock2022');
+    expect(document2.publicKey[0].type).not.toEqual('Bls12381G2VerificationKeyDock2022');
     expect(document2.assertionMethod[0].endsWith('#keys-1')).toEqual(true);
     expect(document2.publicKey[1].id.endsWith('#keys-3')).toEqual(true);
-    expect(document2.publicKey[1].type).toEqual('Bls12381G2KeyDock2022');
+    expect(document2.publicKey[1].type).toEqual('Bls12381G2VerificationKeyDock2022');
     expect(document2.assertionMethod[1].endsWith('#keys-3')).toEqual(true);
 
     await chainModule.removePublicKey(3, did2, did2, pair2, 1, { didModule: dock.did }, false);
@@ -181,7 +181,7 @@ describe('BBS+ Module', () => {
     expect(document2.publicKey.length).toEqual(1);
     expect(document2.assertionMethod.length).toEqual(1);
     expect(document2.publicKey[0].id.endsWith('#keys-1')).toEqual(true);
-    expect(document2.publicKey[0].type).not.toEqual('Bls12381G2KeyDock2022');
+    expect(document2.publicKey[0].type).not.toEqual('Bls12381G2VerificationKeyDock2022');
     expect(document2.assertionMethod[0].endsWith('#keys-1')).toEqual(true);
 
     await chainModule.removeParams(2, did1, pair1, 1, { didModule: dock.did }, false);

@@ -76,18 +76,18 @@ export function verifyEcdsaSecp256k1SigPrehashed(messageHash, signature, publicK
 /**
  * Return the type of signature from a given keypair
  * @param {object} pair - Can be a keypair from polkadot-js or elliptic library.
- * @returns {string|*} For now, it can be ed25519 or sr25519 or secp256k1 or an error
+ * @returns {string|*}
  */
 export function getKeyPairType(pair) {
-  if (pair.type && (pair.type === 'ed25519' || pair.type === 'sr25519')) {
-    // Polkadot-js keyring has type field with value either 'ed25519' or 'sr25519'
+  if (pair.type) {
     return pair.type;
   }
+
   if (pair.ec && pair.priv) {
     // elliptic library's pair has `ec`, `priv` and `pub`. There is not a cleaner way to detect that
     return 'secp256k1';
   }
-  throw new Error('Only ed25519, sr25519 and secp256k1 keys supported as of now');
+  throw new Error('Cannot detect key pair type');
 }
 
 /**

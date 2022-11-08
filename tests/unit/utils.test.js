@@ -1,7 +1,7 @@
 import { cryptoWaitReady, randomAsHex } from '@polkadot/util-crypto';
 import { Keyring } from '@polkadot/api';
-import { waitReady } from '@polkadot/wasm-crypto';
-import { hexToU8a } from '@polkadot/util';
+import { initializeWasm } from '@docknetwork/crypto-wasm-ts';
+
 import {
   generateEcdsaSecp256k1Keypair,
   getPublicKeyFromKeyringPair,
@@ -50,8 +50,8 @@ describe('Testing isHexWithGivenByteSize', () => {
 
 describe('Testing public key and signature instantiation from keyring', () => {
   beforeAll(async () => {
+    await initializeWasm();
     await cryptoWaitReady();
-    await waitReady();
   });
 
   test('getCorrectPublicKeyFromKeyringPair returns correct public key from ed25519 pair', () => {

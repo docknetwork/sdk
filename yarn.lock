@@ -898,7 +898,7 @@
     pirates "^4.0.5"
     source-map-support "^0.5.16"
 
-"@babel/runtime@^7.18.9", "@babel/runtime@^7.19.0", "@babel/runtime@^7.19.4", "@babel/runtime@^7.20.1", "@babel/runtime@^7.8.4":
+"@babel/runtime@^7.18.9", "@babel/runtime@^7.19.4", "@babel/runtime@^7.20.1", "@babel/runtime@^7.8.4":
   version "7.20.1"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.20.1.tgz#1148bb33ab252b165a06698fde7576092a78b4a9"
   integrity sha512-mrzLkl6U9YLF8qpqI7TB82PESyEGjm/0Ly91jG575eVxMMlb8fYfOXFZIJ8XfLrJZQbm7dlKry2bJmXBUEkdFg==
@@ -3072,16 +3072,7 @@
     eventemitter3 "^4.0.7"
     rxjs "^7.5.7"
 
-"@polkadot/keyring@10.1.9":
-  version "10.1.9"
-  resolved "https://registry.yarnpkg.com/@polkadot/keyring/-/keyring-10.1.9.tgz#56c4e31e8cdb9ebcdf992c19603ee53a4c90451c"
-  integrity sha512-oUYhvfOCzyMA+SJ+O5BasQYYalmMkVBRHADASFNAxVBMbOl1DKNQx3tgpUZlbA95UzRPjKbV0RplhAIzb5CzVQ==
-  dependencies:
-    "@babel/runtime" "^7.19.0"
-    "@polkadot/util" "10.1.9"
-    "@polkadot/util-crypto" "10.1.9"
-
-"@polkadot/keyring@^10.1.11":
+"@polkadot/keyring@10.1.11", "@polkadot/keyring@^10.1.11":
   version "10.1.11"
   resolved "https://registry.yarnpkg.com/@polkadot/keyring/-/keyring-10.1.11.tgz#a3fed011b0c8826ea2097e04f7189e9be66fbf98"
   integrity sha512-Nv8cZaOA/KbdslDMTklJ58+y+UPpic3+oMQoozuq48Ccjv7WeW2BX47XM/RNE8nYFg6EHa6Whfm4IFaFb8s7ag==
@@ -3220,23 +3211,6 @@
     ed2curve "^0.3.0"
     tweetnacl "^1.0.3"
 
-"@polkadot/util-crypto@10.1.9":
-  version "10.1.9"
-  resolved "https://registry.yarnpkg.com/@polkadot/util-crypto/-/util-crypto-10.1.9.tgz#807ffd4c8bb20ffe6eb446a74a3a8725c845acf1"
-  integrity sha512-wmrT5M8dOaSklnKwk7Wg6TjJzLYm5YCVJW97ziz5ulfN7LFbOwtPQ3fpk6uzBmnrRNXpI5hjYzzTKEyHrZZqhA==
-  dependencies:
-    "@babel/runtime" "^7.19.0"
-    "@noble/hashes" "1.1.2"
-    "@noble/secp256k1" "1.7.0"
-    "@polkadot/networks" "10.1.9"
-    "@polkadot/util" "10.1.9"
-    "@polkadot/wasm-crypto" "^6.3.1"
-    "@polkadot/x-bigint" "10.1.9"
-    "@polkadot/x-randomvalues" "10.1.9"
-    "@scure/base" "1.1.1"
-    ed2curve "^0.3.0"
-    tweetnacl "^1.0.3"
-
 "@polkadot/util@10.1.11", "@polkadot/util@^10.1.11":
   version "10.1.11"
   resolved "https://registry.yarnpkg.com/@polkadot/util/-/util-10.1.11.tgz#22bcdabbd7a0d266417f6569cc655f516d371a82"
@@ -3247,19 +3221,6 @@
     "@polkadot/x-global" "10.1.11"
     "@polkadot/x-textdecoder" "10.1.11"
     "@polkadot/x-textencoder" "10.1.11"
-    "@types/bn.js" "^5.1.1"
-    bn.js "^5.2.1"
-
-"@polkadot/util@10.1.9":
-  version "10.1.9"
-  resolved "https://registry.yarnpkg.com/@polkadot/util/-/util-10.1.9.tgz#0280a830881ccb4c7c428ef8b5669db87c16d71b"
-  integrity sha512-nbXE7dqfsP38uHwMXBoL5s2x+5PXsGZIfWa0bjCdy6RwF6btqFTo7ryi0kzkco/kil0EZ3QaB+EJxVVaAwX2bA==
-  dependencies:
-    "@babel/runtime" "^7.19.0"
-    "@polkadot/x-bigint" "10.1.9"
-    "@polkadot/x-global" "10.1.9"
-    "@polkadot/x-textdecoder" "10.1.9"
-    "@polkadot/x-textencoder" "10.1.9"
     "@types/bn.js" "^5.1.1"
     bn.js "^5.2.1"
 

@@ -95,7 +95,20 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
         },
       });
     } else {
-      throw new Error('Credential must define credentialSchema');
+      credSchema = new CredentialSchema({
+        ...CredentialSchema.essential(),
+        type: 'object',
+        properties: {
+          credentialSubject: {
+            type: 'object',
+            properties: {
+              id: {
+                type: 'string',
+              },
+            },
+          },
+        },
+      }, DEFAULT_PARSING_OPTS);
     }
 
     // Encode messages, retrieve names/values array

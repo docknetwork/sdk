@@ -187,7 +187,7 @@ export async function verifyCredential(credential, {
 
   // Validate schema
   if (schemaApi) {
-    await getAndValidateSchemaIfPresent(expandedCredential, schemaApi, credential[credentialContextField]);
+    await getAndValidateSchemaIfPresent(expandedCredential, schemaApi, credential[credentialContextField], docLoader);
   }
 
   // Verify with jsonld-signatures

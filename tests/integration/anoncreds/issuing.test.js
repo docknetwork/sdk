@@ -128,6 +128,14 @@ describe('BBS+ Module', () => {
         getProofMatcherDoc(),
       ),
     );
+
+    // Ensure embedding the schema doesnt conflict with the other schema resolutions
+    const resultWithSchema = await verifyCredential(credential, { resolver, schemaApi: { dock }, });
+    expect(resultWithSchema).toMatchObject(
+      expect.objectContaining(
+        getProofMatcherDoc(),
+      ),
+    );
   }, 30000);
 
   test('Can issue+verify a BBS+ credential with default schema', async () => {

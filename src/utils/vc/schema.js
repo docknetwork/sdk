@@ -1,6 +1,7 @@
 import jsonld from 'jsonld';
 import { validate } from 'jsonschema';
 import Schema from '../../modules/schema';
+import defaultDocumentLoader from './document-loader';
 
 import {
   expandedSubjectProperty,
@@ -28,7 +29,7 @@ export async function validateCredentialSchema(credential, schema, context, docu
       delete subject[credentialIDField];
     }
 
-    const compacted = await jsonld.compact(subject, context, documentLoader && { documentLoader }); // eslint-disable-line
+    const compacted = await jsonld.compact(subject, context, { documentLoader: documentLoader || defaultDocumentLoader() }); // eslint-disable-line
     delete compacted[credentialContextField];
 
     if (Object.keys(compacted).length === 0) {

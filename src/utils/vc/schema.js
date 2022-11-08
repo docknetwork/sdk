@@ -28,7 +28,7 @@ export async function validateCredentialSchema(credential, schema, context, docu
       delete subject[credentialIDField];
     }
 
-    const compacted = await jsonld.compact(subject, context, { documentLoader }); // eslint-disable-line
+    const compacted = await jsonld.compact(subject, context, documentLoader && { documentLoader }); // eslint-disable-line
     delete compacted[credentialContextField];
 
     if (Object.keys(compacted).length === 0) {

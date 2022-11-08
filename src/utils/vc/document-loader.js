@@ -2,6 +2,32 @@ import axios from 'axios';
 import cachedUris from './contexts';
 import DIDResolver from '../../did-resolver'; // eslint-disable-line
 
+function parseEmbeddedDataURI(embedded) {
+  // Strip new lines
+  const dataUri = embedded.replace(/\r?\n/g, '');
+
+  // split the URI up into the "metadata" and the "data" portions
+  const firstComma = dataUri.indexOf(',');
+  if (firstComma === -1) {
+    throw new Error('Malformed data URI');
+  }
+
+  // Remove the scheme and parse metadata
+  const meta = dataUri.substring(5, firstComma).split(';'); // 'data:'.length = 5
+  if (meta[0] !== 'application/json') {
+    throw new Error(`Expected media type application/json but was ${meta[0]}`);
+  }
+
+  const isBase64 = meta.indexOf('base64') !== -1;
+  if (isBase64) {
+    throw new Error('Base64 embedded JSON is not yet supported');
+  }
+
+  // Extract data string
+  const dataStr = decodeURIComponent(dataUri.substring(firstComma + 1));
+  return JSON.parse(dataStr);
+}
+
 /**
  * Takes a resolver and returns a function that returns a document or throws an error when the document
  * cannot be found.
@@ -19,7 +45,10 @@ function documentLoader(resolver = null) {
   async function loadDocument(uri) {
     let document;
     const uriString = uri.toString();
-    if (resolver && uriString.startsWith('did:')) {
+
+    if (uriString.startsWith('data:')) {
+      document = parseEmbeddedDataURI(uriString);
+    } else if (resolver && uriString.startsWith('did:')) {
       // Try to resolve a DID and throw if cannot resolve
       document = await resolver.resolve(uriString);
     } else {

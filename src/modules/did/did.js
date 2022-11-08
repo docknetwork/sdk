@@ -732,7 +732,7 @@ class DIDModule {
    * @return {Promise<object>} The DID document.
    */
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  async getDocument(did, { getBbsPlusSigKeys = false } = {}) {
+  async getDocument(did, { getBbsPlusSigKeys = true } = {}) {
     const hexId = getHexIdentifierFromDID(did);
 
     let didDetails = await this.api.rpc.core_mods.didDetails(hexId, 15);
@@ -799,7 +799,8 @@ class DIDModule {
     // Fetch BBS+ keys if needed
     if (getBbsPlusSigKeys === true) {
       const details = didDetails.details.asOnChain;
-      const lastKeyId = details.lastKeyId.toNumber();
+      const data = details.data || details;
+      const lastKeyId = data.lastKeyId.toNumber();
       // If any keys should be fetched
       if (lastKeyId > keys.length) {
         // key id can be anything from 1 to `lastKeyId`
@@ -829,7 +830,7 @@ class DIDModule {
               throw new Error(`Curve type should have been Bls12381 but was ${pkObj.curveType}`);
             }
             const keyIndex = queryKeys[currentIter][1];
-            keys.push([keyIndex, 'Bls12381G2KeyDock2022', hexToU8a(pkObj.bytes)]);
+            keys.push([keyIndex, 'Bls12381G2VerificationKeyDock2022', hexToU8a(pkObj.bytes)]);
             assertion.push(keyIndex);
           }
           currentIter++;

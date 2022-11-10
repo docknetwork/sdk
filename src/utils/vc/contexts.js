@@ -9,10 +9,15 @@ import schema from './contexts/schema.json';
 import odrl from './contexts/odrl.json';
 import bbsV1Context from './contexts/bbs-v1.json';
 import dockBBSV1Context from './contexts/dock-bbs-v1.json';
+import dockPrettyVCContext from './contexts/prettyvc.json';
 
 // Lookup of following URLs will lead to loading data from the context directory, this is done as the Sr25519 keys are not
 // supported in any W3C standard and vc-js has them stored locally. This is a temporary solution.
 export default new Map([
+  [
+    'https://ld.dock.io/credentials/prettyvc',
+    dockPrettyVCContext,
+  ],
   [
     'https://ld.dock.io/security/bbs/v1',
     dockBBSV1Context,

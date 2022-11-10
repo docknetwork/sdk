@@ -1,0 +1,32 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "id": "@id",
+    "type": "@type",
+    "PrettyVerifiableCredential": {
+      "@id": "https://ld.dock.io/credentials#PrettyVerifiableCredential",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "cred": "https://www.w3.org/2018/credentials#",
+        "prettyVC": {
+          "@id": "cred:prettyVC",
+          "@type": "@id",
+          "@context": {
+            "@version": 1.1,
+            "@protected": true,
+            "id": "@id",
+            "type": "@type",
+            "prettyCred": "https://ld.dock.io/credentials/prettyvc#",
+            "liquid": "prettyCred:liquid",
+            "orientation": "prettyCred:orientation",
+            "size": "prettyCred:size",
+            "proof": "prettyCred:proof"
+          }
+        }
+      }
+    }
+  }
+}

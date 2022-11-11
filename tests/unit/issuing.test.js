@@ -125,6 +125,25 @@ describe('Verifiable Credential Issuing', () => {
     expect(result.verified).toBe(false);
   }, 30000);
 
+  test('Expired Credential should not pass validation with verifyDates as true', async () => {
+    const credential = await issueCredential(getSampleKey(), {
+      ...getSampleCredential(),
+      expirationDate: new Date('2000-01-01T09:05:35Z').toISOString(),
+    });
+    const result = await verifyCredential(credential);
+    expect(result.verified).toBe(false);
+    expect(result.error.message).toEqual('Credential has expired');
+  }, 30000);
+
+  test('Expired Credential should pass validation with verifyDates as false', async () => {
+    const credential = await issueCredential(getSampleKey(), {
+      ...getSampleCredential(),
+      expirationDate: new Date('2000-01-01T09:05:35Z').toISOString(),
+    });
+    const result = await verifyCredential(credential, { verifyDates: false });
+    expect(result.verified).toBe(true);
+  }, 30000);
+
   test('Credential With incorrect issuer should not pass validation.', async () => {
     const keydoc = getSampleKey();
     keydoc.controller = 'did:rando:id';

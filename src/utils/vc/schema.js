@@ -1,6 +1,7 @@
 import jsonld from 'jsonld';
 import { validate } from 'jsonschema';
 import Schema from '../../modules/schema';
+import defaultDocumentLoader from './document-loader';
 
 import {
   expandedSubjectProperty,
@@ -17,7 +18,7 @@ import {
  * @param context
  * @returns {Promise<Boolean>} - Returns promise to a boolean or throws error
  */
-export async function validateCredentialSchema(credential, schema, context) {
+export async function validateCredentialSchema(credential, schema, context, documentLoader) {
   const requiresID = schema.required && schema.required.indexOf('id') > -1;
   const credentialSubject = credential[expandedSubjectProperty] || [];
   const subjects = credentialSubject.length ? credentialSubject : [credentialSubject];
@@ -28,7 +29,7 @@ export async function validateCredentialSchema(credential, schema, context) {
       delete subject[credentialIDField];
     }
 
-    const compacted = await jsonld.compact(subject, context); // eslint-disable-line
+    const compacted = await jsonld.compact(subject, context, { documentLoader: documentLoader || defaultDocumentLoader() }); // eslint-disable-line
     delete compacted[credentialContextField];
 
     if (Object.keys(compacted).length === 0) {
@@ -49,19 +50,34 @@ export async function validateCredentialSchema(credential, schema, context) {
  * a schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
  * @param {object} context - the context
+ * @param {object} documentLoader - the document loader
  * @returns {Promise<void>}
  */
-export async function getAndValidateSchemaIfPresent(credential, schemaApi, context) {
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export async function getAndValidateSchemaIfPresent(credential, schemaApi, context, documentLoader) {
   const schemaList = credential[expandedSchemaProperty];
   if (schemaList) {
     const schema = schemaList[0];
     if (credential[expandedSubjectProperty] && schema) {
-      if (!schemaApi.dock) {
-        throw new Error('Only Dock schemas are supported as of now.');
+      let schemaObj;
+      const schemaUri = schema[credentialIDField];
+
+      if (schemaUri.startsWith('blob:dock')) {
+        if (!schemaApi.dock) {
+          throw new Error('Only Dock schemas are supported as of now.');
+        }
+        schemaObj = await Schema.get(schemaUri, schemaApi.dock);
+      } else {
+        const { document } = await documentLoader(schemaUri);
+        schemaObj = document;
       }
+
+      if (!schemaObj) {
+        throw new Error(`Could not load schema URI: ${schemaUri}`);
+      }
+
       try {
-        const schemaObj = await Schema.get(schema[credentialIDField], schemaApi.dock);
-        await validateCredentialSchema(credential, schemaObj, context);
+        await validateCredentialSchema(credential, schemaObj, context, documentLoader);
       } catch (e) {
         throw new Error(`Schema validation failed: ${e}`);
       }

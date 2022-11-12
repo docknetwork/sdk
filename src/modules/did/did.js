@@ -9,7 +9,7 @@ import {
   validateDockDIDHexIdentifier,
   NoOnchainDIDError,
   NoOffchainDIDError,
-  createDidSig, hexDIDToQualified,
+  createDidSig,
 } from '../../utils/did';
 import { getSignatureFromKeyringPair, getStateChange } from '../../utils/misc';
 
@@ -734,73 +734,105 @@ class DIDModule {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   async getDocument(did, { getBbsPlusSigKeys = true } = {}) {
     const hexId = getHexIdentifierFromDID(did);
+    let didDetails = await this.getOnchainDidDetail(hexId);
+    didDetails = didDetails.data || didDetails;
 
-    let didDetails = await this.api.rpc.core_mods.didDetails(hexId, 15);
-    if (didDetails.isNone) {
-      throw new NoDIDError(`did:dock:${hexDIDToQualified(hexId)}`);
-    }
-    didDetails = didDetails.unwrap();
-
-    const rawKeys = didDetails.get('keys').unwrap();
-    const controllers = didDetails.controllers.unwrap();
-    const serviceEndpoints = didDetails.serviceEndpoints.unwrap();
-    const rawAttests = didDetails.attestation.unwrap();
-    const attests = rawAttests.iri.isSome
-      ? u8aToString(hexToU8a(rawAttests.iri.toString()))
-      : null;
+    // Get DIDs attestations
+    const attests = await this.getAttests(hexId);
 
     // If given DID was in hex, encode to SS58 and then construct fully qualified DID else the DID was already fully qualified
-    const id = did === hexId ? this.getFullyQualifiedDID(encodeAddress(hexId)) : did;
+    const id = (did === hexId) ? this.getFullyQualifiedDID(encodeAddress(hexId)) : did;
 
-    // Categorize keys them by verification relationship type
+    // Get controllers
+    const controllers = [];
+    if (didDetails.activeControllers > 0) {
+      const cnts = await this.api.query.didModule.didControllers.entries(hexId);
+      cnts.forEach(([key, value]) => {
+        if (value.isSome) {
+          const [controlled, controller] = key.toHuman();
+          if (controlled !== hexId) {
+            throw new Error(`Controlled DID ${controlled[0]} was found to be different than queried DID ${hexId}`);
+          }
+          controllers.push(controller);
+        }
+      });
+    }
+
+    // Get service endpoints
+    const serviceEndpoints = [];
+    const sps = await this.api.query.didModule.didServiceEndpoints.entries(hexId);
+    sps.forEach(([key, value]) => {
+      if (value.isSome) {
+        const sp = value.unwrap();
+        // eslint-disable-next-line no-underscore-dangle
+        const [d, spId] = key.args;
+        // eslint-disable-next-line no-underscore-dangle
+        const d_ = u8aToHex(d);
+        if (d_ !== hexId) {
+          throw new Error(`DID ${d_} was found to be different than queried DID ${hexId}`);
+        }
+        serviceEndpoints.push([spId, sp]);
+      }
+    });
+
+    // Get keys and categorize them by verification relationship type
     const keys = [];
     const assertion = [];
     const authn = [];
     const capInv = [];
     const keyAgr = [];
+    if (didDetails.lastKeyId > 0) {
+      const dks = await this.api.query.didModule.didKeys.entries(hexId);
+      dks.forEach(([key, value]) => {
+        if (value.isSome) {
+          const dk = value.unwrap();
+          // eslint-disable-next-line no-underscore-dangle
+          const [d, i] = key.args;
+          // eslint-disable-next-line no-underscore-dangle
+          const d_ = u8aToHex(d);
+          if (d_ !== hexId) {
+            throw new Error(`DID ${d_} was found to be different than queried DID ${hexId}`);
+          }
+          const index = i.toNumber();
+          const pk = dk.publicKey;
+          let publicKeyRaw;
+          let typ;
+          if (pk.isSr25519) {
+            typ = 'Sr25519VerificationKey2020';
+            publicKeyRaw = pk.asSr25519.value;
+          } else if (pk.isEd25519) {
+            typ = 'Ed25519VerificationKey2018';
+            publicKeyRaw = pk.asEd25519.value;
+          } else if (pk.isSecp256k1) {
+            typ = 'EcdsaSecp256k1VerificationKey2019';
+            publicKeyRaw = pk.asSecp256k1.value;
+          } else if (pk.isX25519) {
+            typ = 'X25519KeyAgreementKey2019';
+            publicKeyRaw = pk.asX25519.value;
+          } else {
+            throw new Error(`Cannot parse public key ${pk}`);
+          }
+          keys.push([index, typ, publicKeyRaw]);
+          const vr = new VerificationRelationship(dk.verRels.toNumber());
+          if (vr.isAuthentication(vr)) {
+            authn.push(index);
+          }
+          if (vr.isAssertion(vr)) {
+            assertion.push(index);
+          }
+          if (vr.isCapabilityInvocation(vr)) {
+            capInv.push(index);
+          }
+          if (vr.isKeyAgreement(vr)) {
+            keyAgr.push(index);
+          }
+        }
+      });
+    }
 
-    [...rawKeys].forEach(({ id: i, key: dk }) => {
-      const index = i.toNumber();
-      const pk = dk.publicKey;
-      let publicKeyRaw;
-      let typ;
-      if (pk.isSr25519) {
-        typ = 'Sr25519VerificationKey2020';
-        publicKeyRaw = pk.asSr25519.value;
-      } else if (pk.isEd25519) {
-        typ = 'Ed25519VerificationKey2018';
-        publicKeyRaw = pk.asEd25519.value;
-      } else if (pk.isSecp256k1) {
-        typ = 'EcdsaSecp256k1VerificationKey2019';
-        publicKeyRaw = pk.asSecp256k1.value;
-      } else if (pk.isX25519) {
-        typ = 'X25519KeyAgreementKey2019';
-        publicKeyRaw = pk.asX25519.value;
-      } else {
-        throw new Error(`Cannot parse public key ${pk}`);
-      }
-
-      keys.push([index, typ, publicKeyRaw]);
-      const vr = new VerificationRelationship(dk.verRels.toNumber());
-      if (vr.isAuthentication(vr)) {
-        authn.push(index);
-      }
-      if (vr.isAssertion(vr)) {
-        assertion.push(index);
-      }
-      if (vr.isCapabilityInvocation(vr)) {
-        capInv.push(index);
-      }
-      if (vr.isKeyAgreement(vr)) {
-        keyAgr.push(index);
-      }
-    });
-
-    // Fetch BBS+ keys if needed
     if (getBbsPlusSigKeys === true) {
-      const details = didDetails.details.asOnChain;
-      const data = details.data || details;
-      const lastKeyId = data.lastKeyId.toNumber();
+      const { lastKeyId } = didDetails;
+
       // If any keys should be fetched
       if (lastKeyId > keys.length) {
         // key id can be anything from 1 to `lastKeyId`
@@ -878,7 +910,7 @@ class DIDModule {
 
     if (serviceEndpoints.length > 0) {
       const decoder = new TextDecoder();
-      document.service = serviceEndpoints.map(({ id: spId, endpoint: sp }) => {
+      document.service = serviceEndpoints.map(([spId, sp]) => {
         const spType = sp.types.toNumber();
         if (spType !== 1) {
           throw new Error(

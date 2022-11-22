@@ -26,7 +26,7 @@ const credentialType = 'AlumniCredential';
 const credentialSubject = { id: holderDID, alumniOf: 'Example University' };
 const credentialStatus = buildDockCredentialStatus(registryId);
 const credentialIssuanceDate = '2020-03-18T19:23:24Z';
-const credentialExpirationDate = '2021-03-18T19:23:24Z';
+const credentialExpirationDate = '2999-03-18T19:23:24Z';
 
 const presentationId = 'http://example.edu/credentials/2803';
 const challenge = randomAsHex(32);

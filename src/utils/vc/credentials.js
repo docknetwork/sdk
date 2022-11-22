@@ -163,6 +163,7 @@ export async function verifyCredential(credential, {
   purpose = null,
   controller = null,
   suite = [],
+  verifyDates = true,
 } = {}) {
   if (documentLoader && resolver) {
     throw new Error('Passing resolver and documentLoader results in resolver being ignored, please re-factor.');
@@ -179,6 +180,27 @@ export async function verifyCredential(credential, {
 
   // Check credential is valid
   checkCredential(credential);
+
+  // Check expiration date
+  if (verifyDates && 'expirationDate' in credential) {
+    const expirationDate = new Date(credential.expirationDate);
+    const currentDate = new Date();
+    if (currentDate > expirationDate) {
+      const error = new Error('Credential has expired');
+      return {
+        verified: false,
+        error,
+        results: [{
+          verified: false,
+          expirationDate,
+          error: {
+            name: error.name,
+            message: error.message,
+          },
+        }],
+      };
+    }
+  }
 
   // Expand credential JSON-LD
   const expandedCredential = await expandJSONLD(credential, {

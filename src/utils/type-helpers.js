@@ -89,3 +89,9 @@ export function ensureValidDatetime(datetime) {
 
   return true;
 }
+
+export function ensureArray(value) {
+  if (Array.isArray(value)) {
+    throw new Error(`${value} needs to be a array.`);
+  }
+}

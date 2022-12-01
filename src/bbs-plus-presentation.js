@@ -18,6 +18,9 @@ export default class BbsPlusPresentation {
   }
 
   createPresentation() {
+    if (this.credentials.length <= 0) {
+      throw new Error('No credential provided to present');
+    }
     const presBuilder = new PresentationBuilder();
     for (let i = 0; i < this.credentials.length; i++) {
       const { credential, issuerPublicKey, revealAttributes } = this.credentials[i];

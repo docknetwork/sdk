@@ -14,21 +14,15 @@ const DEFAULT_PARSING_OPTS = {
 
 export default class BbsPlusPresentation {
   constructor() {
-    this.credentials = [];
+    this.presBuilder = new PresentationBuilder();
+  }
+  addAttributeToReveal(credentialIndex, attributes = []) {
+    ensureArray(attributes);
+    this.presBuilder.markAttributesRevealed(credentialIndex, new Set(attributes));
   }
 
   createPresentation() {
-    if (this.credentials.length <= 0) {
-      throw new Error('No credential provided to present');
-    }
-    const presBuilder = new PresentationBuilder();
-    for (let i = 0; i < this.credentials.length; i++) {
-      const { credential, issuerPublicKey, revealAttributes } = this.credentials[i];
-      presBuilder.addCredential(credential, issuerPublicKey);
-      presBuilder.markAttributesRevealed(i, new Set(revealAttributes));
-    }
-
-    const pres = presBuilder.finalize();
+    const pres = this.presBuilder.finalize();
     return pres.toJSON();
   }
 
@@ -42,7 +36,7 @@ export default class BbsPlusPresentation {
     throw new Error('Unable to retrieve issuer DID');
   }
 
-  async addCredentialsToPresent(j, revealAttributes) {
+  async addCredentialsToPresent(j, revealAttributes = []) {
     ensureArray(revealAttributes);
     await initializeWasm();
     const json = typeof j === 'string' ? JSON.parse(j) : j;
@@ -76,10 +70,6 @@ export default class BbsPlusPresentation {
       credentialSchema: credSchema.toJSON(),
       ...json,
     });
-    this.credentials.push({
-      credential,
-      issuerPublicKey: pk,
-      revealAttributes,
-    });
+    return this.presBuilder.addCredential(credential, pk);
   }
 }

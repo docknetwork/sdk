@@ -39,7 +39,7 @@ describe('BBS plus presentation', () => {
     });
   }, 30000);
   beforeEach(() => {
-    bbsPlusPresentation = new BbsPlusPresentation();
+    bbsPlusPresentation = new BbsPlusPresentation(dock);
   });
   test('Can in add credentials to presentation builder', async () => {
     const idx = await bbsPlusPresentation.addCredentialsToPresent(credential);
@@ -59,8 +59,8 @@ describe('BBS plus presentation', () => {
   });
   test('expect to throw exception when attributes provided is not an array', async () => {
     const idx = await bbsPlusPresentation.addCredentialsToPresent(credential);
-    await expect(bbsPlusPresentation.addAttributeToReveal(idx, {}))
-      .rejects
-      .toThrow('The value provided must be an array');
+    expect(() => {
+      bbsPlusPresentation.addAttributeToReveal(idx, {});
+    }).toThrow();
   });
 });

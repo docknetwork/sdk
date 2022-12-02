@@ -5,7 +5,8 @@ import {
   PresentationBuilder,
   Credential,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
-import dock from './index';
+// eslint-disable-next-line no-unused-vars
+import { DockAPI } from './index';
 import { ensureArray, isObject, isString } from './utils/type-helpers';
 
 const DEFAULT_PARSING_OPTS = {
@@ -15,10 +16,12 @@ const DEFAULT_PARSING_OPTS = {
 export default class BbsPlusPresentation {
   /**
    * Create a new BbsPlusPresentation instance.
+   * @param {DockAPI} dock
    * @constructor
    */
-  constructor() {
+  constructor(dock) {
     this.presBuilder = new PresentationBuilder();
+    this.dock = dock;
   }
 
   /**
@@ -66,7 +69,7 @@ export default class BbsPlusPresentation {
     await initializeWasm();
     const json = typeof j === 'string' ? JSON.parse(j) : j;
 
-    const didDocument = await dock.did.getDocument(this.getCredentialIssuerDID(json));
+    const didDocument = await this.dock.did.getDocument(this.getCredentialIssuerDID(json));
 
     const pkRaw = b58.decode(didDocument.publicKey[1].publicKeyBase58);
     const pk = new BBSPlusPublicKeyG2(pkRaw);

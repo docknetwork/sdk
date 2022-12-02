@@ -13,30 +13,54 @@ const DEFAULT_PARSING_OPTS = {
 };
 
 export default class BbsPlusPresentation {
+  /**
+   * Create a new BbsPlusPresentation instance.
+   * @constructor
+   */
   constructor() {
     this.presBuilder = new PresentationBuilder();
   }
 
+  /**
+   * Species attributes to be revealed in the credential
+   * @param {number} credentialIndex
+   * @param {Array.<string>} attributes
+   */
   addAttributeToReveal(credentialIndex, attributes = []) {
     ensureArray(attributes);
     this.presBuilder.markAttributesRevealed(credentialIndex, new Set(attributes));
   }
 
+  /**
+   * Creates a presentation from the added credentials
+   * @returns {object}
+   */
   createPresentation() {
     const pres = this.presBuilder.finalize();
     return pres.toJSON();
   }
 
-  getCredentialIssuerDID(j) {
-    if (isString(j.issuer) && j.issuer.trim().startsWith('did:')) {
-      return j.issuer;
+  /**
+   * Gets issuer DID from credential, throws an exception if non is found
+   * @param credential
+   * @returns {string}
+   */
+  getCredentialIssuerDID(credential) {
+    if (isString(credential.issuer) && credential.issuer.trim().startsWith('did:')) {
+      return credential.issuer;
     }
-    if (isObject(j.issuer) && isString(j.issuer.id) && j.issuer.id.trim().startsWith('did:')) {
-      return j.issuer.id;
+    if (isObject(credential.issuer) && isString(credential.issuer.id) && credential.issuer.id.trim().startsWith('did:')) {
+      return credential.issuer.id;
     }
     throw new Error('Unable to retrieve issuer DID');
   }
 
+  /**
+   * Add jsonld credentials to be presented.
+   * @param j
+   * @param revealAttributes
+   * @returns {Promise<number>}
+   */
   async addCredentialsToPresent(j, revealAttributes = []) {
     ensureArray(revealAttributes);
     await initializeWasm();

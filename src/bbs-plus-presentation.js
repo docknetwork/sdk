@@ -16,6 +16,7 @@ export default class BbsPlusPresentation {
   constructor() {
     this.presBuilder = new PresentationBuilder();
   }
+
   addAttributeToReveal(credentialIndex, attributes = []) {
     ensureArray(attributes);
     this.presBuilder.markAttributesRevealed(credentialIndex, new Set(attributes));

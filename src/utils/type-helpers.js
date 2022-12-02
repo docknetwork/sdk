@@ -92,6 +92,6 @@ export function ensureValidDatetime(datetime) {
 
 export function ensureArray(value) {
   if (!Array.isArray(value)) {
-    throw new Error(`${value} needs to be a array.`);
+    throw new Error(`The value provided must be an array`);
   }
 }

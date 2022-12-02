@@ -37,7 +37,7 @@ describe('BBS plus presentation', () => {
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
-  });
+  }, 30000);
   beforeEach(() => {
     bbsPlusPresentation = new BbsPlusPresentation();
   });

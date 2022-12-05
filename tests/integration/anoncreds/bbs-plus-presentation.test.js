@@ -17,7 +17,7 @@ describe('BBS plus presentation', () => {
   beforeEach(async () => {
     credential = await createAnonCredential();
     bbsPlusPresentation = new BbsPlusPresentation(dock);
-  });
+  }, 30000);
   test('Can in add credentials to presentation builder', async () => {
     const idx = await bbsPlusPresentation.addCredentialsToPresent(credential);
     expect(idx).toBe(0);

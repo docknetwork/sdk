@@ -86,7 +86,7 @@
     "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
   },
   "dependencies": {
-    "@docknetwork/crypto-wasm-ts": "0.26.0",
+    "@docknetwork/crypto-wasm-ts": "0.27.0",
     "@docknetwork/node-types": "^0.13.0",
     "@juanelas/base64": "^1.0.5",
     "@polkadot/api": "9.7.1",

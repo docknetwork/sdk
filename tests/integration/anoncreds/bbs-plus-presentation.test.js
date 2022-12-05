@@ -6,19 +6,19 @@ import { createAnonCredential } from './bbs-test-helpers';
 let credential
 
 describe('BBS plus presentation', () => {
-  // const dock = new DockAPI();
-  // let bbsPlusPresentation;
-  // beforeAll(async () => {
-  //   await dock.init({
-  //     keyring: TestKeyringOpts,
-  //     address: FullNodeEndpoint,
-  //   });
-  //   bbsPlusPresentation = new BbsPlusPresentation(dock);
-  //   credential = await createAnonCredential();
-  // }, 30000);
-  // afterAll(async () => {
-  //   await dock.disconnect();
-  // }, 10000);
+  const dock = new DockAPI();
+  let bbsPlusPresentation;
+  beforeAll(async () => {
+    await dock.init({
+      keyring: TestKeyringOpts,
+      address: FullNodeEndpoint,
+    });
+    bbsPlusPresentation = new BbsPlusPresentation(dock);
+    credential = await createAnonCredential();
+  }, 30000);
+  afterAll(async () => {
+    await dock.disconnect();
+  }, 10000);
   test('dummy', ()=>{
     expect(true).toBeTruthy();
   })

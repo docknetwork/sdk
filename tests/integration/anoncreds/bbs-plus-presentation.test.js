@@ -40,4 +40,7 @@ describe('BBS plus presentation', () => {
       bbsPlusPresentation.addAttributeToReveal(idx, {});
     }).toThrow();
   });
+  afterAll(async () => {
+    await dock.disconnect();
+  }, 10000);
 });

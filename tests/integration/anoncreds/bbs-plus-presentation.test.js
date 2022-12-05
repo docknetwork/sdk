@@ -13,10 +13,8 @@ describe('BBS plus presentation', () => {
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
-  }, 30000);
-  beforeEach(async () => {
-    credential = await createAnonCredential();
     bbsPlusPresentation = new BbsPlusPresentation(dock);
+    credential = await createAnonCredential();
   }, 30000);
   test('Can in add credentials to presentation builder', async () => {
     const idx = await bbsPlusPresentation.addCredentialsToPresent(credential);

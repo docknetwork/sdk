@@ -155,13 +155,28 @@ describe('BBS+ Presentation', () => {
     const sk = new BBSPlusSecretKey(keypair.privateKeyBuffer);
     const credential = credBuilder.sign(sk, undefined, { requireAllFieldsFromSchema: false });
     expect(credential.verify(pk).verified).toEqual(true);
-    // console.log(credential.toJSON());
 
     const presBuilder = new PresentationBuilder();
     presBuilder.addCredential(credential, pk);
     const pres = presBuilder.finalize();
     expect(pres.verify([pk]).verified).toEqual(true);
   }, 30000);
+  test('Can in add credentials to presentation builder', async () => {
+    const credSchema = new CredentialSchema(residentCardSchema1, { useDefaults: true });
+    const credBuilder = new CredentialBuilder();
+    credBuilder.schema = credSchema;
+    credBuilder.subject = credentialJSONWithoutSchema.credentialSubject;
+
+    for (const k of ['@context', 'id', 'type', 'identifier', 'name', 'description']) {
+      credBuilder.setTopLevelField(k, credentialJSONWithoutSchema[k]);
+    }
+
+    const sk = new BBSPlusSecretKey(keypair.privateKeyBuffer);
+    const credential = credBuilder.sign(sk, undefined, { requireAllFieldsFromSchema: false });
+
+    const idx = await bbsPlusPresentation.addCredentialsToPresent(credential);
+    expect(idx).toBe(0);
+  });
   afterAll(async () => {
     await dock.disconnect();
   }, 10000);

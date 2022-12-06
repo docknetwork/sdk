@@ -151,6 +151,9 @@ describe('BBS+ Presentation', () => {
     for (const k of ['@context', 'id', 'type', 'identifier', 'name', 'description']) {
       credBuilder.setTopLevelField(k, credentialJSONWithoutSchema[k]);
     }
+    credBuilder.setTopLevelField('issuer', {
+      id: did1,
+    });
 
     const sk = new BBSPlusSecretKey(keypair.privateKeyBuffer);
     const credential = credBuilder.sign(sk, undefined, { requireAllFieldsFromSchema: false });

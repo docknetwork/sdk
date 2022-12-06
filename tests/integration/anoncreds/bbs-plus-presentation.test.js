@@ -1,14 +1,12 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
-import { initializeWasm, BBSPlusSecretKey, BBSPlusPublicKeyG2 } from '@docknetwork/crypto-wasm-ts';
-import { CredentialSchema, CredentialBuilder, PresentationBuilder } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
-import b58 from 'bs58';
+import { initializeWasm, BBSPlusSecretKey } from '@docknetwork/crypto-wasm-ts';
+import { CredentialSchema, CredentialBuilder } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 import { DockAPI } from '../../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { createNewDockDID } from '../../../src/utils/did';
 import Bls12381G2KeyPairDock2022 from '../../../src/utils/vc/crypto/Bls12381G2KeyPairDock2022';
 import BbsPlusPresentation from '../../../src/bbs-plus-presentation';
-
 import BBSPlusModule from '../../../src/modules/bbs-plus';
 import { registerNewDIDUsingPair } from '../helpers';
 
@@ -42,6 +40,10 @@ const residentCardSchema1 = {
     },
     description: {
       title: 'Desc',
+      type: 'string',
+    },
+    issuer: {
+      title: 'Issuer',
       type: 'string',
     },
     credentialSubject: {
@@ -115,6 +117,8 @@ describe('BBS+ Presentation', () => {
     pair1 = dock.keyring.addFromUri(randomAsHex(32));
     did1 = createNewDockDID();
     await registerNewDIDUsingPair(dock, did1, pair1);
+  }, 20000);
+  beforeEach(() => {
     bbsPlusPresentation = new BbsPlusPresentation(dock);
   }, 20000);
 
@@ -135,50 +139,71 @@ describe('BBS+ Presentation', () => {
     keypair.id = publicKey[1].id;
   }, 30000);
 
-  test('Can create a credential and presentation', async () => {
-    const didDocument = await dock.did.getDocument(did1);
-    const pkRaw = b58.decode(didDocument.publicKey[1].publicKeyBase58);
-    const pk = new BBSPlusPublicKeyG2(pkRaw);
-
-    const credSchema = new CredentialSchema(residentCardSchema1, { useDefaults: true });
-    const credBuilder = new CredentialBuilder();
-    credBuilder.schema = credSchema;
-    credBuilder.subject = credentialJSONWithoutSchema.credentialSubject;
-
-    for (const k of ['@context', 'id', 'type', 'identifier', 'name', 'description']) {
-      credBuilder.setTopLevelField(k, credentialJSONWithoutSchema[k]);
-    }
-    credBuilder.setTopLevelField('issuer', {
-      id: did1,
-    });
-
-    const sk = new BBSPlusSecretKey(keypair.privateKeyBuffer);
-    const credential = credBuilder.sign(sk, undefined, { requireAllFieldsFromSchema: false });
-    expect(credential.verify(pk).verified).toEqual(true);
-
-    const presBuilder = new PresentationBuilder();
-    presBuilder.addCredential(credential, pk);
-    const pres = presBuilder.finalize();
-    expect(pres.verify([pk]).verified).toEqual(true);
-  }, 30000);
   test('Can in add credentials to presentation builder', async () => {
     const credSchema = new CredentialSchema(residentCardSchema1, { useDefaults: true });
     const credBuilder = new CredentialBuilder();
     credBuilder.schema = credSchema;
     credBuilder.subject = credentialJSONWithoutSchema.credentialSubject;
-
     for (const k of ['@context', 'id', 'type', 'identifier', 'name', 'description']) {
       credBuilder.setTopLevelField(k, credentialJSONWithoutSchema[k]);
     }
-    credBuilder.setTopLevelField('issuer', {
-      id: did1,
-    });
-
+    credBuilder.setTopLevelField('issuer', did1);
     const sk = new BBSPlusSecretKey(keypair.privateKeyBuffer);
     const credential = credBuilder.sign(sk, undefined, { requireAllFieldsFromSchema: false });
 
-    const idx = await bbsPlusPresentation.addCredentialsToPresent(credential);
+    const idx = await bbsPlusPresentation.addCredentialsToPresent(credential.toJSON());
     expect(idx).toBe(0);
+  }, 30000);
+  test('expect to reveal specified attributes', async () => {
+    const credSchema = new CredentialSchema(residentCardSchema1, { useDefaults: true });
+    const credBuilder = new CredentialBuilder();
+    credBuilder.schema = credSchema;
+    credBuilder.subject = credentialJSONWithoutSchema.credentialSubject;
+    for (const k of ['@context', 'id', 'type', 'identifier', 'name', 'description']) {
+      credBuilder.setTopLevelField(k, credentialJSONWithoutSchema[k]);
+    }
+    credBuilder.setTopLevelField('issuer', did1);
+    const sk = new BBSPlusSecretKey(keypair.privateKeyBuffer);
+    const credential = credBuilder.sign(sk, undefined, { requireAllFieldsFromSchema: false });
+
+    const idx = await bbsPlusPresentation.addCredentialsToPresent(credential.toJSON());
+    await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
+    const presentation = await bbsPlusPresentation.createPresentation();
+    expect(presentation.spec.credentials[0].revealedAttributes).toHaveProperty('credentialSubject');
+    expect(presentation.spec.credentials[0].revealedAttributes.credentialSubject).toHaveProperty('lprNumber', 1234);
+  });
+  test('expect not to reveal any attributes', async () => {
+    const credSchema = new CredentialSchema(residentCardSchema1, { useDefaults: true });
+    const credBuilder = new CredentialBuilder();
+    credBuilder.schema = credSchema;
+    credBuilder.subject = credentialJSONWithoutSchema.credentialSubject;
+    for (const k of ['@context', 'id', 'type', 'identifier', 'name', 'description']) {
+      credBuilder.setTopLevelField(k, credentialJSONWithoutSchema[k]);
+    }
+    credBuilder.setTopLevelField('issuer', did1);
+    const sk = new BBSPlusSecretKey(keypair.privateKeyBuffer);
+    const credential = credBuilder.sign(sk, undefined, { requireAllFieldsFromSchema: false });
+
+    await bbsPlusPresentation.addCredentialsToPresent(credential.toJSON());
+    const presentation = await bbsPlusPresentation.createPresentation();
+    expect(presentation.spec.credentials[0].revealedAttributes).toMatchObject({});
+  });
+  test('expect to throw exception when attributes provided is not an array', async () => {
+    const credSchema = new CredentialSchema(residentCardSchema1, { useDefaults: true });
+    const credBuilder = new CredentialBuilder();
+    credBuilder.schema = credSchema;
+    credBuilder.subject = credentialJSONWithoutSchema.credentialSubject;
+    for (const k of ['@context', 'id', 'type', 'identifier', 'name', 'description']) {
+      credBuilder.setTopLevelField(k, credentialJSONWithoutSchema[k]);
+    }
+    credBuilder.setTopLevelField('issuer', did1);
+    const sk = new BBSPlusSecretKey(keypair.privateKeyBuffer);
+    const credential = credBuilder.sign(sk, undefined, { requireAllFieldsFromSchema: false });
+
+    const idx = await bbsPlusPresentation.addCredentialsToPresent(credential.toJSON());
+    expect(() => {
+      bbsPlusPresentation.addAttributeToReveal(idx, {});
+    }).toThrow();
   });
   afterAll(async () => {
     await dock.disconnect();

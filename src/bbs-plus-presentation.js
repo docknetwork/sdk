@@ -49,6 +49,7 @@ export default class BbsPlusPresentation {
    * @returns {string}
    */
   getCredentialIssuerDID(credential) {
+    console.log(credential)
     if (isString(credential.issuer) && credential.issuer.trim().startsWith('did:')) {
       return credential.issuer;
     }

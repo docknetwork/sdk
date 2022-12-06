@@ -21,7 +21,7 @@ const residentCardSchema1 = {
     '@context': {
       title: 'Context',
       type: 'array',
-      items: [{type: 'string'}, {type: 'string'}, {type: 'string'}],
+      items: [{ type: 'string' }, { type: 'string' }, { type: 'string' }],
     },
     id: {
       title: 'Id',
@@ -30,7 +30,7 @@ const residentCardSchema1 = {
     type: {
       title: 'Type',
       type: 'array',
-      items: [{type: 'string'}, {type: 'string'}],
+      items: [{ type: 'string' }, { type: 'string' }],
     },
     identifier: {
       title: 'identifier',
@@ -54,7 +54,7 @@ const residentCardSchema1 = {
         type: {
           title: 'Type',
           type: 'array',
-          items: [{type: 'string'}, {type: 'string'}],
+          items: [{ type: 'string' }, { type: 'string' }],
         },
         givenName: {
           title: 'Given Name',
@@ -73,7 +73,6 @@ const residentCardSchema1 = {
     },
   },
 };
-
 
 const credentialJSONWithoutSchema = {
   '@context': [
@@ -94,8 +93,6 @@ const credentialJSONWithoutSchema = {
     lprNumber: 1234,
   },
 };
-
-
 
 describe('BBS+ Presentation', () => {
   const dock = new DockAPI();

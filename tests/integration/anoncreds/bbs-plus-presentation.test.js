@@ -1,14 +1,16 @@
-import { u8aToHex } from '@polkadot/util';
 import { randomAsHex } from '@polkadot/util-crypto';
-import { initializeWasm, BBSPlusSecretKey, BBSPlusPublicKeyG2 } from '@docknetwork/crypto-wasm-ts';
-import { CredentialSchema, CredentialBuilder, PresentationBuilder } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
-import b58 from 'bs58';
+import { hexToU8a, u8aToHex, stringToHex } from '@polkadot/util';
+import { initializeWasm, KeypairG2, SignatureParamsG1 } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI } from '../../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { createNewDockDID } from '../../../src/utils/did';
-import { registerNewDIDUsingPair } from '../helpers';
 import Bls12381G2KeyPairDock2022 from '../../../src/utils/vc/crypto/Bls12381G2KeyPairDock2022';
+
 import BBSPlusModule from '../../../src/modules/bbs-plus';
+import { DockResolver } from '../../../src/resolver';
+import { registerNewDIDUsingPair, getCredMatcherDoc, getProofMatcherDoc } from '../helpers';
+import { issueCredential, verifyCredential } from '../../../src/utils/vc/index';
+import getKeyDoc from '../../../src/utils/vc/helpers';
 
 const residentCardSchema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
@@ -66,13 +68,15 @@ const credentialJSON = {
   },
 };
 
-describe('BBS plus presentation', () => {
+describe('BBS+ Module', () => {
   const dock = new DockAPI();
+  const resolver = new DockResolver(dock);
   let account;
   let did1;
   let pair1;
   let chainModule;
   let keypair;
+
   beforeAll(async () => {
     await initializeWasm();
     await dock.init({
@@ -85,85 +89,79 @@ describe('BBS plus presentation', () => {
     pair1 = dock.keyring.addFromUri(randomAsHex(32));
     did1 = createNewDockDID();
     await registerNewDIDUsingPair(dock, did1, pair1);
+  }, 20000);
+
+  test('Can create BBS+ public key for the DID', async () => {
     keypair = Bls12381G2KeyPairDock2022.generate({
       controller: did1,
     });
 
     const pk1 = BBSPlusModule.prepareAddPublicKey(u8aToHex(keypair.publicKeyBuffer));
     await chainModule.addPublicKey(pk1, did1, did1, pair1, 1, { didModule: dock.did }, false);
+
+    const didDocument = await dock.did.getDocument(did1);
+    const { publicKey } = didDocument;
+
+    expect(publicKey.length).toEqual(2);
+    expect(publicKey[1].type).toEqual('Bls12381G2VerificationKeyDock2022');
+
+    keypair.id = publicKey[1].id;
   }, 30000);
+
+  test('Can issue+verify a BBS+ credential with embedded schema', async () => {
+    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
+    const unsignedCred = {
+      ...credentialJSON,
+      issuer: did1,
+    };
+
+    const credential = await issueCredential(issuerKey, unsignedCred);
+    expect(credential).toMatchObject(
+      expect.objectContaining(
+        getCredMatcherDoc(unsignedCred, did1, issuerKey.id, 'Bls12381BBS+SignatureDock2022'),
+      ),
+    );
+
+    const result = await verifyCredential(credential, { resolver });
+    expect(result).toMatchObject(
+      expect.objectContaining(
+        getProofMatcherDoc(),
+      ),
+    );
+
+    // Ensure embedding the schema doesnt conflict with the other schema resolutions
+    const resultWithSchema = await verifyCredential(credential, { resolver, schemaApi: { dock }, });
+    expect(resultWithSchema).toMatchObject(
+      expect.objectContaining(
+        getProofMatcherDoc(),
+      ),
+    );
+  }, 30000);
+
+  test('Can issue+verify a BBS+ credential with default schema', async () => {
+    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
+    const unsignedCred = {
+      ...credentialJSON,
+      issuer: did1,
+    };
+    delete unsignedCred.credentialSchema;
+
+    const credential = await issueCredential(issuerKey, unsignedCred);
+    expect(credential).toMatchObject(
+      expect.objectContaining(
+        getCredMatcherDoc(unsignedCred, did1, issuerKey.id, 'Bls12381BBS+SignatureDock2022'),
+      ),
+    );
+
+    const result = await verifyCredential(credential, { resolver });
+    expect(result).toMatchObject(
+      expect.objectContaining(
+        getProofMatcherDoc(),
+      ),
+    );
+  }, 30000);
+
   afterAll(async () => {
     await dock.disconnect();
   }, 10000);
-  test('Can create a credential and presentation', async () => {
-    const didDocument = await dock.did.getDocument(did1);
-    const pkRaw = b58.decode(didDocument.publicKey[1].publicKeyBase58);
-    const pk = new BBSPlusPublicKeyG2(pkRaw);
-
-    const credSchema = new CredentialSchema(residentCardSchema, { useDefaults: true });
-    const credBuilder = new CredentialBuilder();
-    credBuilder.schema = credSchema;
-    credBuilder.subject = credentialJSON.credentialSubject;
-
-    for (const k of ['@context', 'id', 'type', 'identifier', 'name', 'description']) {
-      credBuilder.setTopLevelField(k, credentialJSON[k]);
-    }
-
-    const sk = new BBSPlusSecretKey(keypair.privateKeyBuffer);
-    const credential = credBuilder.sign(sk, undefined, { requireAllFieldsFromSchema: false });
-    expect(credential.verify(pk).verified).toEqual(true);
-    // console.log(credential.toJSON());
-
-    const presBuilder = new PresentationBuilder();
-    presBuilder.addCredential(credential, pk);
-    const pres = presBuilder.finalize();
-    expect(pres.verify([pk]).verified).toEqual(true);
-  }, 30000);
-  // test('Can in add credentials to presentation builder', async () => {
-  //   const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
-  //   const unsignedCred = {
-  //     ...credentialJSON,
-  //     issuer: did1,
-  //   };
-  //   const credential = await issueCredential(issuerKey, unsignedCred);
-  //   const idx = await bbsPlusPresentation.addCredentialsToPresent(credential);
-  //   expect(idx).toBe(0);
-  // });
-  // test('expect to reveal specified attributes', async () => {
-  //   const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
-  //   const unsignedCred = {
-  //     ...credentialJSON,
-  //     issuer: did1,
-  //   };
-  //   const credential = await issueCredential(issuerKey, unsignedCred);
-  //   const idx = await bbsPlusPresentation.addCredentialsToPresent(credential);
-  //   await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
-  //   const presentation = await bbsPlusPresentation.createPresentation();
-  //   expect(presentation.spec.credentials[0].revealedAttributes).toHaveProperty('credentialSubject');
-  //   expect(presentation.spec.credentials[0].revealedAttributes.credentialSubject).toHaveProperty('lprNumber', 1234);
-  // });
-  // test('expect not to reveal any attributes', async () => {
-  //   const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
-  //   const unsignedCred = {
-  //     ...credentialJSON,
-  //     issuer: did1,
-  //   };
-  //   const credential = await issueCredential(issuerKey, unsignedCred);
-  //   await bbsPlusPresentation.addCredentialsToPresent(credential);
-  //   const presentation = await bbsPlusPresentation.createPresentation();
-  //   expect(presentation.spec.credentials[0].revealedAttributes).toMatchObject({});
-  // });
-  // test('expect to throw exception when attributes provided is not an array', async () => {
-  //   const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
-  //   const unsignedCred = {
-  //     ...credentialJSON,
-  //     issuer: did1,
-  //   };
-  //   const credential = await issueCredential(issuerKey, unsignedCred);
-  //   const idx = await bbsPlusPresentation.addCredentialsToPresent(credential);
-  //   expect(() => {
-  //     bbsPlusPresentation.addAttributeToReveal(idx, {});
-  //   }).toThrow();
-  // });
-  //
 });

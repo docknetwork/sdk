@@ -189,18 +189,7 @@ describe('BBS+ Presentation', () => {
     expect(presentation.spec.credentials[0].revealedAttributes).toMatchObject({});
   });
   test('expect to throw exception when attributes provided is not an array', async () => {
-    const credSchema = new CredentialSchema(residentCardSchema1, { useDefaults: true });
-    const credBuilder = new CredentialBuilder();
-    credBuilder.schema = credSchema;
-    credBuilder.subject = credentialJSONWithoutSchema.credentialSubject;
-    for (const k of ['@context', 'id', 'type', 'identifier', 'name', 'description']) {
-      credBuilder.setTopLevelField(k, credentialJSONWithoutSchema[k]);
-    }
-    credBuilder.setTopLevelField('issuer', did1);
-    const sk = new BBSPlusSecretKey(keypair.privateKeyBuffer);
-    const credential = credBuilder.sign(sk, undefined, { requireAllFieldsFromSchema: false });
-
-    const idx = await bbsPlusPresentation.addCredentialsToPresent(credential.toJSON());
+    const idx = await bbsPlusPresentation.addCredentialsToPresent(getBBSCredential(did1, keypair));
     expect(() => {
       bbsPlusPresentation.addAttributeToReveal(idx, {});
     }).toThrow();
@@ -209,3 +198,17 @@ describe('BBS+ Presentation', () => {
     await dock.disconnect();
   }, 10000);
 });
+
+function getBBSCredential (did1, keypair) {
+  const credSchema = new CredentialSchema(residentCardSchema1, { useDefaults: true });
+  const credBuilder = new CredentialBuilder();
+  credBuilder.schema = credSchema;
+  credBuilder.subject = credentialJSONWithoutSchema.credentialSubject;
+  for (const k of ['@context', 'id', 'type', 'identifier', 'name', 'description']) {
+    credBuilder.setTopLevelField(k, credentialJSONWithoutSchema[k]);
+  }
+  credBuilder.setTopLevelField('issuer', did1);
+  const sk = new BBSPlusSecretKey(keypair.privateKeyBuffer);
+  const credential = credBuilder.sign(sk, undefined, { requireAllFieldsFromSchema: false });
+  return credential.toJSON();
+}

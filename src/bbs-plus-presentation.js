@@ -79,20 +79,7 @@ export default class BbsPlusPresentation {
       typeof credentialSchema === 'string'
         ? JSON.parse(credentialSchema)
         : credentialSchema,
-    ) : new CredentialSchema({
-      ...CredentialSchema.essential(),
-      type: 'object',
-      properties: {
-        credentialSubject: {
-          type: 'object',
-          properties: {
-            id: {
-              type: 'string',
-            },
-          },
-        },
-      },
-    }, DEFAULT_PARSING_OPTS);
+    ) : new CredentialSchema(CredentialSchema.essential(), DEFAULT_PARSING_OPTS);
 
     const credential = Credential.fromJSON({
       credentialSchema: credSchema.toJSON(),

@@ -17,7 +17,6 @@
     "@babel/preset-env": "^7.15.6",
     "@comunica/actor-init-sparql-rdfjs": "^1.22.3",
     "@comunica/types": "^1.0.0",
-    "@docknetwork/crypto-wasm": "0.16.0",
     "@rollup/plugin-commonjs": "^20.0.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.1.3",
@@ -86,7 +85,7 @@
     "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
   },
   "dependencies": {
-    "@docknetwork/crypto-wasm-ts": "0.27.0",
+    "@docknetwork/crypto-wasm-ts": "0.28.0",
     "@docknetwork/node-types": "^0.13.0",
     "@juanelas/base64": "^1.0.5",
     "@polkadot/api": "9.7.1",

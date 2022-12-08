@@ -1,7 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
-import { initializeWasm, BBSPlusSecretKey } from '@docknetwork/crypto-wasm-ts';
-import { CredentialSchema, CredentialBuilder } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
+import { initializeWasm } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI } from '../../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { createNewDockDID } from '../../../src/utils/did';
@@ -9,8 +8,10 @@ import Bls12381G2KeyPairDock2022 from '../../../src/utils/vc/crypto/Bls12381G2Ke
 import BbsPlusPresentation from '../../../src/bbs-plus-presentation';
 import BBSPlusModule from '../../../src/modules/bbs-plus';
 import { registerNewDIDUsingPair } from '../helpers';
+import getKeyDoc from '../../../src/utils/vc/helpers';
+import { issueCredential } from '../../../src/utils/vc';
 
-const residentCardSchema1 = {
+const residentCardSchema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   $id: 'https://ld.dock.io/examples/resident-card-schema.json',
   title: 'Resident Card Example',
@@ -42,10 +43,6 @@ const residentCardSchema1 = {
       title: 'Desc',
       type: 'string',
     },
-    issuer: {
-      title: 'Issuer',
-      type: 'string',
-    },
     credentialSubject: {
       type: 'object',
       properties: {
@@ -72,11 +69,27 @@ const residentCardSchema1 = {
           minimum: 0,
         },
       },
+      required: [],
+    },
+    expirationDate: {
+      title: 'Expiration Date',
+      type: 'string',
+    },
+    issuanceDate: {
+      title: 'Issuance Date',
+      type: 'string',
+    },
+    issuer: {
+      title: 'Issuer DID',
+      type: 'string',
     },
   },
 };
-
-const credentialJSONWithoutSchema = {
+const embeddedSchema = {
+  id: `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(residentCardSchema))}`,
+  type: 'JsonSchemaValidator2018',
+};
+const credentialJSON = {
   '@context': [
     'https://www.w3.org/2018/credentials/v1',
     'https://w3id.org/citizenship/v1',
@@ -84,9 +97,12 @@ const credentialJSONWithoutSchema = {
   ],
   id: 'https://issuer.oidp.uscis.gov/credentials/83627465',
   type: ['VerifiableCredential', 'PermanentResidentCard'],
+  credentialSchema: embeddedSchema,
   identifier: '83627465',
   name: 'Permanent Resident Card',
   description: 'Government of Example Permanent Resident Card.',
+  issuanceDate: '2019-12-03T12:19:52Z',
+  expirationDate: '2029-12-03T12:19:52Z',
   credentialSubject: {
     id: 'did:example:b34ca6cd37bbf23',
     type: ['PermanentResident', 'Person'],
@@ -119,7 +135,7 @@ describe('BBS+ Presentation', () => {
     await registerNewDIDUsingPair(dock, did1, pair1);
   }, 20000);
   beforeEach(() => {
-    bbsPlusPresentation = new BbsPlusPresentation(dock);
+    bbsPlusPresentation = new BbsPlusPresentation();
   }, 20000);
 
   test('Can create BBS+ public key for the DID', async () => {
@@ -140,25 +156,58 @@ describe('BBS+ Presentation', () => {
   }, 30000);
 
   test('Can in add credentials to presentation builder', async () => {
-
-    const idx = await bbsPlusPresentation.addCredentialsToPresent(await getBBSCredential(did1, keypair));
+    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
+    const unsignedCred = {
+      ...credentialJSON,
+      issuer: did1,
+    };
+    const credential = await issueCredential(issuerKey, unsignedCred);
+    const didDocument = await dock.did.getDocument(did1);
+    const idx = await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
     expect(idx).toBe(0);
   }, 30000);
   test('expect to reveal specified attributes', async () => {
+    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
+    const unsignedCred = {
+      ...credentialJSON,
+      issuer: did1,
+    };
+    const credential = await issueCredential(issuerKey, unsignedCred);
 
-    const idx = await bbsPlusPresentation.addCredentialsToPresent(await getBBSCredential(did1, keypair));
+    const didDocument = await dock.did.getDocument(did1);
+
+    const idx = await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
     await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
     const presentation = await bbsPlusPresentation.createPresentation();
     expect(presentation.spec.credentials[0].revealedAttributes).toHaveProperty('credentialSubject');
     expect(presentation.spec.credentials[0].revealedAttributes.credentialSubject).toHaveProperty('lprNumber', 1234);
   });
   test('expect not to reveal any attributes', async () => {
-    await bbsPlusPresentation.addCredentialsToPresent(await getBBSCredential(did1, keypair));
+    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
+    const unsignedCred = {
+      ...credentialJSON,
+      issuer: did1,
+    };
+    const credential = await issueCredential(issuerKey, unsignedCred);
+    const didDocument = await dock.did.getDocument(did1);
+
+    await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
+
     const presentation = await bbsPlusPresentation.createPresentation();
     expect(presentation.spec.credentials[0].revealedAttributes).toMatchObject({});
   });
   test('expect to throw exception when attributes provided is not an array', async () => {
-    const idx = await bbsPlusPresentation.addCredentialsToPresent(await getBBSCredential(did1, keypair));
+    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
+    const unsignedCred = {
+      ...credentialJSON,
+      issuer: did1,
+    };
+    const credential = await issueCredential(issuerKey, unsignedCred);
+
+    const didDocument = await dock.did.getDocument(did1);
+
+    const idx = await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
+
     expect(() => {
       bbsPlusPresentation.addAttributeToReveal(idx, {});
     }).toThrow();
@@ -167,17 +216,3 @@ describe('BBS+ Presentation', () => {
     await dock.disconnect();
   }, 10000);
 });
-
-function getBBSCredential(did1, keypair) {
-  const credSchema = new CredentialSchema(residentCardSchema1, { useDefaults: true });
-  const credBuilder = new CredentialBuilder();
-  credBuilder.schema = credSchema;
-  credBuilder.subject = credentialJSONWithoutSchema.credentialSubject;
-  for (const k of ['@context', 'id', 'type', 'identifier', 'name', 'description']) {
-    credBuilder.setTopLevelField(k, credentialJSONWithoutSchema[k]);
-  }
-  credBuilder.setTopLevelField('issuer', did1);
-  const sk = new BBSPlusSecretKey(keypair.privateKeyBuffer);
-  const credential = credBuilder.sign(sk, undefined, { requireAllFieldsFromSchema: false });
-  return credential.toJSON();
-}

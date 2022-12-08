@@ -5,9 +5,7 @@ import {
   PresentationBuilder,
   Credential,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
-// eslint-disable-next-line no-unused-vars
-import { DockAPI } from './index';
-import { ensureArray, isObject, isString } from './utils/type-helpers';
+import { ensureArray } from './utils/type-helpers';
 
 const DEFAULT_PARSING_OPTS = {
   useDefaults: true,
@@ -16,12 +14,10 @@ const DEFAULT_PARSING_OPTS = {
 export default class BbsPlusPresentation {
   /**
    * Create a new BbsPlusPresentation instance.
-   * @param {DockAPI} dock
    * @constructor
    */
-  constructor(dock) {
+  constructor() {
     this.presBuilder = new PresentationBuilder();
-    this.dock = dock;
   }
 
   /**
@@ -44,34 +40,18 @@ export default class BbsPlusPresentation {
   }
 
   /**
-   * Gets issuer DID from credential, throws an exception if non is found
-   * @param credential
-   * @returns {string}
-   */
-  getCredentialIssuerDID(credential) {
-    if (isString(credential.issuer) && credential.issuer.trim().startsWith('did:')) {
-      return credential.issuer;
-    }
-    if (isObject(credential.issuer) && isString(credential.issuer.id) && credential.issuer.id.trim().startsWith('did:')) {
-      return credential.issuer.id;
-    }
-    throw new Error('Unable to retrieve issuer DID');
-  }
-
-  /**
    * Add jsonld credentials to be presented.
-   * @param j
+   * @param credentialLD
    * @param revealAttributes
+   * @param publicKey
    * @returns {Promise<number>}
    */
-  async addCredentialsToPresent(j, revealAttributes = []) {
+  async addCredentialsToPresent(credentialLD, revealAttributes = [], publicKey) {
     ensureArray(revealAttributes);
     await initializeWasm();
-    const json = typeof j === 'string' ? JSON.parse(j) : j;
+    const json = typeof credentialLD === 'string' ? JSON.parse(credentialLD) : credentialLD;
 
-    const didDocument = await this.dock.did.getDocument(this.getCredentialIssuerDID(json));
-
-    const pkRaw = b58.decode(didDocument.publicKey[1].publicKeyBase58);
+    const pkRaw = b58.decode(publicKey);
     const pk = new BBSPlusPublicKeyG2(pkRaw);
 
     const { credentialSchema } = json;

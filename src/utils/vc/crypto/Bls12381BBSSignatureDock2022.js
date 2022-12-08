@@ -1,5 +1,5 @@
 import {
-  CredentialSchema, SIGNATURE_PARAMS_LABEL_BYTES,
+  CredentialSchema, CredentialBuilder, SIGNATURE_PARAMS_LABEL_BYTES,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 
 import {
@@ -81,30 +81,17 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
     await initializeWasm();
 
     // Serialize the data for signing
-    const serializedCredential = await this.serializeForSigning(options);
-
-    // Create an encoder through the schema, if one exists
-    let credSchema;
-    const { credentialSchema } = options.document;
-    if (credentialSchema) {
-      credSchema = CredentialSchema.fromJSON({
-        ...credentialSchema,
-        parsingOptions: {
-          ...DEFAULT_PARSING_OPTS,
-          ...(credentialSchema.parsingOptions || {}),
-        },
-      });
-    } else {
-      credSchema = new CredentialSchema(CredentialSchema.essential(), DEFAULT_PARSING_OPTS);
-    }
+    const [serializedCredential, credSchema] = await this.serializeForSigning(options);
+    // console.log('serializedCredential', serializedCredential);
 
     // Encode messages, retrieve names/values array
-    const namesValues = credSchema.encoder.encodeMessageObject(serializedCredential, SIGNATURE_PARAMS_LABEL_BYTES);
-    return namesValues[1];
+    const [names, values] = credSchema.encoder.encodeMessageObject(serializedCredential, SIGNATURE_PARAMS_LABEL_BYTES);
+    return values;
   }
 
   async serializeForSigning({
-    document, proof,
+    document, proof, documentLoader,
+    signingOptions = { requireAllFieldsFromSchema: false, generateSchema: true },
   }) {
     // `jws`,`signatureValue`,`proofValue` must not be included in the proof
     const trimmedProof = {
@@ -115,10 +102,38 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
     delete trimmedProof.signatureValue;
     delete trimmedProof.proofValue;
 
-    return {
+    let credSchema;
+    if (document.credentialSchema) {
+      const loadedSchema = (await documentLoader(document.credentialSchema.id)).document;
+      if (loadedSchema) {
+        credSchema = new CredentialSchema(loadedSchema, {
+          ...DEFAULT_PARSING_OPTS,
+          ...(document.credentialSchema.parsingOptions || {}),
+        });
+      }
+    }
+
+    if (!credSchema) {
+      credSchema = new CredentialSchema(CredentialSchema.essential(), DEFAULT_PARSING_OPTS);
+    }
+
+    const credBuilder = new CredentialBuilder();
+    credBuilder.schema = credSchema;
+
+    const {
+      cryptoVersion, credentialSchema, credentialSubject, credentialStatus, ...custom
+    } = {
       proof: trimmedProof,
       ...document,
     };
+    credBuilder.subject = credentialSubject;
+    credBuilder.credStatus = credentialStatus;
+
+    Object.keys(custom).forEach((k) => {
+      credBuilder.setTopLevelField(k, custom[k]);
+    });
+
+    return [credBuilder.serializeForSigning(signingOptions), credSchema];
   }
 
   /**

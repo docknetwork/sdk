@@ -85,10 +85,12 @@ const residentCardSchema = {
     },
   },
 };
+
 const embeddedSchema = {
   id: `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(residentCardSchema))}`,
   type: 'JsonSchemaValidator2018',
 };
+
 const credentialJSON = {
   '@context': [
     'https://www.w3.org/2018/credentials/v1',
@@ -114,12 +116,12 @@ const credentialJSON = {
 
 describe('BBS+ Presentation', () => {
   const dock = new DockAPI();
-  let bbsPlusPresentation;
   let account;
   let did1;
   let pair1;
   let chainModule;
   let keypair;
+  let didDocument;
 
   beforeAll(async () => {
     await initializeWasm();
@@ -133,70 +135,42 @@ describe('BBS+ Presentation', () => {
     pair1 = dock.keyring.addFromUri(randomAsHex(32));
     did1 = createNewDockDID();
     await registerNewDIDUsingPair(dock, did1, pair1);
-  }, 20000);
-  beforeEach(() => {
-    bbsPlusPresentation = new BbsPlusPresentation();
-  }, 20000);
 
-  test('Can create BBS+ public key for the DID', async () => {
     keypair = Bls12381G2KeyPairDock2022.generate({
       controller: did1,
     });
 
     const pk1 = BBSPlusModule.prepareAddPublicKey(u8aToHex(keypair.publicKeyBuffer));
     await chainModule.addPublicKey(pk1, did1, did1, pair1, 1, { didModule: dock.did }, false);
-
-    const didDocument = await dock.did.getDocument(did1);
+    
+    didDocument = await dock.did.getDocument(did1);
     const { publicKey } = didDocument;
-
     expect(publicKey.length).toEqual(2);
     expect(publicKey[1].type).toEqual('Bls12381G2VerificationKeyDock2022');
-
     keypair.id = publicKey[1].id;
-  }, 30000);
+  }, 20000);
 
-  test('Can in add credentials to presentation builder', async () => {
-    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
-    const unsignedCred = {
-      ...credentialJSON,
-      issuer: did1,
-    };
-    const credential = await issueCredential(issuerKey, unsignedCred);
-    const didDocument = await dock.did.getDocument(did1);
-    const idx = await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
-    expect(idx).toBe(0);
-  }, 30000);
   test('expect to reveal specified attributes', async () => {
+    const bbsPlusPresentation = new BbsPlusPresentation();
+
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
     const unsignedCred = {
       ...credentialJSON,
       issuer: did1,
     };
+    
     const credential = await issueCredential(issuerKey, unsignedCred);
-
-    const didDocument = await dock.did.getDocument(did1);
-
     const idx = await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
     await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
+
     const presentation = await bbsPlusPresentation.createPresentation();
     expect(presentation.spec.credentials[0].revealedAttributes).toHaveProperty('credentialSubject');
     expect(presentation.spec.credentials[0].revealedAttributes.credentialSubject).toHaveProperty('lprNumber', 1234);
+    console.log('result', JSON.stringify(presentation, null, 2))
   });
-  test('expect not to reveal any attributes', async () => {
-    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
-    const unsignedCred = {
-      ...credentialJSON,
-      issuer: did1,
-    };
-    const credential = await issueCredential(issuerKey, unsignedCred);
-    const didDocument = await dock.did.getDocument(did1);
 
-    await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
-
-    const presentation = await bbsPlusPresentation.createPresentation();
-    expect(presentation.spec.credentials[0].revealedAttributes).toMatchObject({});
-  });
   test('expect to throw exception when attributes provided is not an array', async () => {
+    const bbsPlusPresentation = new BbsPlusPresentation();
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
     const unsignedCred = {
       ...credentialJSON,
@@ -212,6 +186,7 @@ describe('BBS+ Presentation', () => {
       bbsPlusPresentation.addAttributeToReveal(idx, {});
     }).toThrow();
   });
+
   afterAll(async () => {
     await dock.disconnect();
   }, 10000);

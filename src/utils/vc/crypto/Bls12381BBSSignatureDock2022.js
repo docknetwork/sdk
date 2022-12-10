@@ -18,8 +18,9 @@ import CustomLinkedDataSignature from './custom-linkeddatasignature';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
-const DEFAULT_PARSING_OPTS = {
-  useDefaults: true,
+export const DEFAULT_PARSING_OPTS = {
+  // useDefaults: true,
+  useDefaults: false,
 };
 
 /**
@@ -82,35 +83,46 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
 
     // Serialize the data for signing
     const [serializedCredential, credSchema] = await this.serializeForSigning(options);
-    // console.log('serializedCredential', serializedCredential);
+    console.log('serializedCredential', JSON.stringify(serializedCredential, null, 2));
 
     // Encode messages, retrieve names/values array
     const nameValues = credSchema.encoder.encodeMessageObject(serializedCredential, SIGNATURE_PARAMS_LABEL_BYTES);
     return nameValues[1];
   }
 
-  async serializeForSigning({
-    document, proof, documentLoader,
-    signingOptions = { requireAllFieldsFromSchema: false, generateSchema: true },
+  async serializeForSigning(options) {
+    return await Bls12381BBSSignatureDock2022.convertCredential(options);
+  }
+
+  static async convertCredential({
+    document, proof, /* documentLoader */
+    signingOptions = { requireAllFieldsFromSchema: false },
   }) {
     // `jws`,`signatureValue`,`proofValue` must not be included in the proof
     const trimmedProof = {
       '@context': document['@context'] || SECURITY_CONTEXT_URL,
-      ...proof,
+      ...(proof || document.proof),
     };
+
     delete trimmedProof.jws;
     delete trimmedProof.signatureValue;
     delete trimmedProof.proofValue;
 
     let credSchema;
     if (document.credentialSchema) {
-      const loadedSchema = (await documentLoader(document.credentialSchema.id)).document;
-      if (loadedSchema) {
-        credSchema = new CredentialSchema(loadedSchema, {
-          ...DEFAULT_PARSING_OPTS,
-          ...(document.credentialSchema.parsingOptions || {}),
-        });
-      }
+      credSchema = CredentialSchema.fromJSON({
+        parsingOptions: DEFAULT_PARSING_OPTS,
+        ...document.credentialSchema,
+      });
+
+      // TODO: support documentloader for schemas here so we can use dock chain schemas
+      // const loadedSchema = (await documentLoader(document.credentialSchema.id)).document;
+      // if (loadedSchema) {
+      //   credSchema = new CredentialSchema(loadedSchema, {
+      //     ...DEFAULT_PARSING_OPTS,
+      //     ...(document.credentialSchema.parsingOptions || {}),
+      //   });
+      // }
     }
 
     if (!credSchema) {
@@ -123,8 +135,8 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
     const {
       cryptoVersion, credentialSchema, credentialSubject, credentialStatus, ...custom
     } = {
-      proof: trimmedProof,
       ...document,
+      proof: trimmedProof,
     };
     credBuilder.subject = credentialSubject;
     credBuilder.credStatus = credentialStatus;
@@ -133,7 +145,9 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
       credBuilder.setTopLevelField(k, custom[k]);
     });
 
-    return [credBuilder.serializeForSigning(signingOptions), credSchema];
+    const retval = credBuilder.serializeForSigning(signingOptions);
+
+    return [retval, credBuilder.schema];
   }
 
   /**

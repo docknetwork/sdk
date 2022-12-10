@@ -1,15 +1,12 @@
 import { BBSPlusPublicKeyG2, initializeWasm } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
 import {
-  CredentialSchema,
   PresentationBuilder,
   Credential,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 import { ensureArray } from './utils/type-helpers';
 
-const DEFAULT_PARSING_OPTS = {
-  useDefaults: true,
-};
+import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';
 
 export default class BbsPlusPresentation {
   /**
@@ -42,29 +39,20 @@ export default class BbsPlusPresentation {
   /**
    * Add jsonld credentials to be presented.
    * @param credentialLD
-   * @param revealAttributes
    * @param publicKey
    * @returns {Promise<number>}
    */
-  async addCredentialsToPresent(credentialLD, revealAttributes = [], publicKey) {
-    ensureArray(revealAttributes);
+  async addCredentialsToPresent(credentialLD, publicKey) {
     await initializeWasm();
     const json = typeof credentialLD === 'string' ? JSON.parse(credentialLD) : credentialLD;
 
     const pkRaw = b58.decode(publicKey);
     const pk = new BBSPlusPublicKeyG2(pkRaw);
 
-    const { credentialSchema } = json;
-    const credSchema = credentialSchema ? CredentialSchema.fromJSON(
-      typeof credentialSchema === 'string'
-        ? JSON.parse(credentialSchema)
-        : credentialSchema,
-    ) : new CredentialSchema(CredentialSchema.essential(), DEFAULT_PARSING_OPTS);
-
-    const credential = Credential.fromJSON({
-      credentialSchema: credSchema.toJSON(),
-      ...json,
+    const [credential] = await Bls12381BBSSignatureDock2022.convertCredential({
+      document: json,
     });
-    return this.presBuilder.addCredential(credential, pk);
+
+    return await this.presBuilder.addCredential(Credential.fromJSON(credential, credentialLD.proof.proofValue), pk);
   }
 }

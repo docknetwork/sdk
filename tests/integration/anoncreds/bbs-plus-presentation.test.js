@@ -7,9 +7,10 @@ import { createNewDockDID } from '../../../src/utils/did';
 import Bls12381G2KeyPairDock2022 from '../../../src/utils/vc/crypto/Bls12381G2KeyPairDock2022';
 import BbsPlusPresentation from '../../../src/bbs-plus-presentation';
 import BBSPlusModule from '../../../src/modules/bbs-plus';
-import { registerNewDIDUsingPair } from '../helpers';
+import { getProofMatcherDoc, registerNewDIDUsingPair } from '../helpers';
 import getKeyDoc from '../../../src/utils/vc/helpers';
-import { issueCredential } from '../../../src/utils/vc';
+import { issueCredential, verifyCredential } from '../../../src/utils/vc';
+import { DockResolver } from '../../../src/resolver';
 
 const residentCardSchema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
@@ -116,6 +117,7 @@ const credentialJSON = {
 
 describe('BBS+ Presentation', () => {
   const dock = new DockAPI();
+  const resolver = new DockResolver(dock);
   let account;
   let did1;
   let pair1;
@@ -142,7 +144,7 @@ describe('BBS+ Presentation', () => {
 
     const pk1 = BBSPlusModule.prepareAddPublicKey(u8aToHex(keypair.publicKeyBuffer));
     await chainModule.addPublicKey(pk1, did1, did1, pair1, 1, { didModule: dock.did }, false);
-    
+
     didDocument = await dock.did.getDocument(did1);
     const { publicKey } = didDocument;
     expect(publicKey.length).toEqual(2);
@@ -158,8 +160,15 @@ describe('BBS+ Presentation', () => {
       ...credentialJSON,
       issuer: did1,
     };
-    
+
     const credential = await issueCredential(issuerKey, unsignedCred);
+    const result = await verifyCredential(credential, { resolver });
+    expect(result).toMatchObject(
+      expect.objectContaining(
+        getProofMatcherDoc(),
+      ),
+    );
+
     const idx = await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
     await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
 

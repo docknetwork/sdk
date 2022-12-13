@@ -7,6 +7,7 @@ import {
 import { ensureArray } from './utils/type-helpers';
 
 import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';
+import CustomLinkedDataSignature from './utils/vc/crypto/custom-linkeddatasignature';
 
 export default class BbsPlusPresentation {
   /**
@@ -53,6 +54,6 @@ export default class BbsPlusPresentation {
       document: json,
     });
 
-    return await this.presBuilder.addCredential(Credential.fromJSON(credential, credentialLD.proof.proofValue), pk);
+    return this.presBuilder.addCredential(Credential.fromJSON(credential, CustomLinkedDataSignature.fromJsigProofValue(credentialLD.proof.proofValue)), pk);
   }
 }

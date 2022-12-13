@@ -48,10 +48,7 @@ export default class CustomLinkedDataSignature extends jsigs.suites.LinkedDataSi
 
     const { proofValue, jws } = proof;
     if (proofValue && typeof proofValue === 'string') {
-      if (proofValue[0] !== MULTIBASE_BASE58BTC_HEADER) {
-        throw new Error('Only base58btc multibase encoding is supported.');
-      }
-      signatureBytes = base58btc.decode(proofValue.substring(1));
+      signatureBytes = base58btc.decode(CustomLinkedDataSignature.fromJsigProofValue(proofValue));
     } else if (jws && typeof jws === 'string') { // Fallback to older jsonld-signature implementations
       const [encodedHeader, /* payload */, encodedSignature] = jws.split('.');
 
@@ -120,5 +117,17 @@ export default class CustomLinkedDataSignature extends jsigs.suites.LinkedDataSi
       ...proof,
       proofValue: MULTIBASE_BASE58BTC_HEADER + base58btc.encode(signatureBytes),
     };
+  }
+
+  /**
+   * Json-ld signs prefix signatures with a specific character. Removes that character
+   * @param proofValue
+   * @returns {*|string}
+   */
+  static fromJsigProofValue(proofValue) {
+    if (proofValue[0] !== MULTIBASE_BASE58BTC_HEADER) {
+      throw new Error('Only base58btc multibase encoding is supported.');
+    }
+    return proofValue.substring(1);
   }
 }

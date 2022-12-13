@@ -4,6 +4,7 @@ import {
   PresentationBuilder,
   Credential,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
+import { Presentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
 import { ensureArray } from './utils/type-helpers';
 
 import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';
@@ -55,5 +56,24 @@ export default class BbsPlusPresentation {
     });
 
     return this.presBuilder.addCredential(Credential.fromJSON(credential, CustomLinkedDataSignature.fromJsigProofValue(credentialLD.proof.proofValue)), pk);
+  }
+
+  /**
+   *
+   * @param presentationLD
+   * @param publicKey
+   * @returns {Promise<boolean>}
+   */
+  async verifyPresentation(presentationLD, publicKey) {
+    await initializeWasm();
+
+    const recreatedPres = Presentation.fromJSON(presentationLD);
+
+    const pkRaw = b58.decode(publicKey);
+    const pk = new BBSPlusPublicKeyG2(pkRaw);
+
+    const result = recreatedPres.verify([pk]);
+    const { verified } = result;
+    return verified;
   }
 }

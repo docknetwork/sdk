@@ -150,7 +150,7 @@ describe('BBS+ Presentation', () => {
     expect(publicKey.length).toEqual(2);
     expect(publicKey[1].type).toEqual('Bls12381G2VerificationKeyDock2022');
     keypair.id = publicKey[1].id;
-  }, 20000);
+  }, 30000);
 
   test('expect to reveal specified attributes', async () => {
     const bbsPlusPresentation = new BbsPlusPresentation();
@@ -175,7 +175,35 @@ describe('BBS+ Presentation', () => {
     const presentation = await bbsPlusPresentation.createPresentation();
     expect(presentation.spec.credentials[0].revealedAttributes).toHaveProperty('credentialSubject');
     expect(presentation.spec.credentials[0].revealedAttributes.credentialSubject).toHaveProperty('lprNumber', 1234);
-  });
+
+    const resultPres = bbsPlusPresentation.verifyPresentation(presentation, didDocument.publicKey[1].publicKeyBase58);
+    expect(resultPres).toBeTruthy()
+  }, 30000);
+
+
+  test('expect to create presentation from multiple credentials', async () => {
+    const bbsPlusPresentation = new BbsPlusPresentation();
+
+    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
+    const unsignedCred = {
+      ...credentialJSON,
+      issuer: did1,
+    };
+
+    const credential = await issueCredential(issuerKey, unsignedCred);
+    const credential2 = await issueCredential(issuerKey, unsignedCred);
+
+    const idx = await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
+    const idx2 = await bbsPlusPresentation.addCredentialsToPresent(credential2, didDocument.publicKey[1].publicKeyBase58);
+    await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
+    await bbsPlusPresentation.addAttributeToReveal(idx2);
+
+    const presentation = await bbsPlusPresentation.createPresentation();
+
+    const resultPres = bbsPlusPresentation.verifyPresentation(presentation, didDocument.publicKey[1].publicKeyBase58);
+    expect(resultPres).toBeTruthy();
+  }, 30000);
+
 
   test('expect to throw exception when attributes provided is not an array', async () => {
     const bbsPlusPresentation = new BbsPlusPresentation();
@@ -191,7 +219,8 @@ describe('BBS+ Presentation', () => {
     expect(() => {
       bbsPlusPresentation.addAttributeToReveal(idx, {});
     }).toThrow();
-  });
+  }, 30000);
+
 
   afterAll(async () => {
     await dock.disconnect();

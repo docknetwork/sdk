@@ -175,7 +175,6 @@ describe('BBS+ Presentation', () => {
     const presentation = await bbsPlusPresentation.createPresentation();
     expect(presentation.spec.credentials[0].revealedAttributes).toHaveProperty('credentialSubject');
     expect(presentation.spec.credentials[0].revealedAttributes.credentialSubject).toHaveProperty('lprNumber', 1234);
-    console.log('result', JSON.stringify(presentation, null, 2))
   });
 
   test('expect to throw exception when attributes provided is not an array', async () => {
@@ -186,8 +185,6 @@ describe('BBS+ Presentation', () => {
       issuer: did1,
     };
     const credential = await issueCredential(issuerKey, unsignedCred);
-
-    const didDocument = await dock.did.getDocument(did1);
 
     const idx = await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
 

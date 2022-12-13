@@ -83,7 +83,6 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
 
     // Serialize the data for signing
     const [serializedCredential, credSchema] = await this.serializeForSigning(options);
-    console.log('serializedCredential', JSON.stringify(serializedCredential, null, 2));
 
     // Encode messages, retrieve names/values array
     const nameValues = credSchema.encoder.encodeMessageObject(serializedCredential, SIGNATURE_PARAMS_LABEL_BYTES);

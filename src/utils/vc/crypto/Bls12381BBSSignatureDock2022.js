@@ -81,15 +81,11 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
     await initializeWasm();
 
     // Serialize the data for signing
-    const [serializedCredential, credSchema] = Bls12381BBSSignatureDock2022.serializeForSigning(options);
+    const [serializedCredential, credSchema] = Bls12381BBSSignatureDock2022.convertCredential(options);
 
     // Encode messages, retrieve names/values array
     const nameValues = credSchema.encoder.encodeMessageObject(serializedCredential, SIGNATURE_PARAMS_LABEL_BYTES);
     return nameValues[1];
-  }
-
-  static serializeForSigning(options) {
-    return Bls12381BBSSignatureDock2022.convertCredential(options);
   }
 
   static convertCredential({
@@ -114,6 +110,7 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
       });
 
       // TODO: support documentloader for schemas here so we can use dock chain schemas
+      // requires that the presentation wrapper passes a documentloader to this method
       // const loadedSchema = (await documentLoader(document.credentialSchema.id)).document;
       // if (loadedSchema) {
       //   credSchema = new CredentialSchema(loadedSchema, {
@@ -144,7 +141,6 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
     });
 
     const retval = credBuilder.updateSchemaIfNeeded(signingOptions);
-
     return [retval, credBuilder.schema];
   }
 

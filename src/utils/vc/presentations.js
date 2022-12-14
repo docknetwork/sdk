@@ -197,6 +197,7 @@ export async function verifyBBSPresentation(presentation, options = {}) {
     const { verified } = result;
     return verified;
   }
+  return false;
 }
 
 /**

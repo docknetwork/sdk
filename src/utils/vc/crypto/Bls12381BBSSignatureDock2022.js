@@ -143,7 +143,7 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
       credBuilder.setTopLevelField(k, custom[k]);
     });
 
-    const retval = credBuilder.serializeForSigning(signingOptions);
+    const retval = credBuilder.updateSchemaIfNeeded(signingOptions);
 
     return [retval, credBuilder.schema];
   }

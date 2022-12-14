@@ -1,5 +1,8 @@
 import jsonld from 'jsonld';
 import jsigs from 'jsonld-signatures';
+import { Presentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
+import b58 from 'bs58';
+import { BBSPlusPublicKeyG2 } from '@docknetwork/crypto-wasm-ts';
 import { verifyCredential } from './credentials';
 import DIDResolver from '../../did-resolver'; // eslint-disable-line
 
@@ -173,6 +176,26 @@ export async function verifyPresentation(presentation, options = {}) {
       results: [{ verified: false, error }],
       error,
     };
+  }
+}
+
+export async function verifyBBSPresentation(presentation, options = {}) {
+  if (options.documentLoader && options.resolver) {
+    throw new Error('Passing resolver and documentLoader results in resolver being ignored, please re-factor.');
+  }
+  // TODO handle other ways of getting issuer public keys
+  const { publicKeys } = options;
+  if (Array.isArray(publicKeys)) {
+    const recreatedPres = Presentation.fromJSON(presentation);
+
+    const pks = publicKeys.map((publicKey) => {
+      const pkRaw = b58.decode(publicKey);
+      return new BBSPlusPublicKeyG2(pkRaw);
+    });
+
+    const result = recreatedPres.verify(pks);
+    const { verified } = result;
+    return verified;
   }
 }
 

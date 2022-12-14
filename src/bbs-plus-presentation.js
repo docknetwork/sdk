@@ -4,11 +4,11 @@ import {
   PresentationBuilder,
   Credential,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
-import { Presentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
 import { ensureArray } from './utils/type-helpers';
 
 import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';
 import CustomLinkedDataSignature from './utils/vc/crypto/custom-linkeddatasignature';
+import { verifyBBSPresentation } from './utils/vc/presentations';
 
 export default class BbsPlusPresentation {
   /**
@@ -20,13 +20,21 @@ export default class BbsPlusPresentation {
   }
 
   /**
+   * Set presentation context
+   * @param context
+   */
+  setPresentationBuilderContext(context) {
+    this.presBuilder.context = context;
+  }
+
+  /**
    * Species attributes to be revealed in the credential
    * @param {number} credentialIndex
    * @param {Array.<string>} attributes
    */
   addAttributeToReveal(credentialIndex, attributes = []) {
     ensureArray(attributes);
-    this.presBuilder.markAttributesRevealed(credentialIndex, new Set(attributes));
+    this.presBuilder.markAttributesRevealed(credentialIndex, new Set([...attributes, 'proof.verificationMethod']));
   }
 
   /**
@@ -67,20 +75,10 @@ export default class BbsPlusPresentation {
    *
    * @param presentationLD
    * @param {Array.<string>} publicKeys
-   * @returns {boolean}
+   * @returns {Promise<boolean>}
    */
   verifyPresentation(presentationLD, publicKeys) {
     ensureArray(publicKeys);
-
-    const recreatedPres = Presentation.fromJSON(presentationLD);
-
-    const pks = publicKeys.map((publicKey) => {
-      const pkRaw = b58.decode(publicKey);
-      return new BBSPlusPublicKeyG2(pkRaw);
-    });
-
-    const result = recreatedPres.verify(pks);
-    const { verified } = result;
-    return verified;
+    return verifyBBSPresentation(presentationLD, { publicKeys });
   }
 }

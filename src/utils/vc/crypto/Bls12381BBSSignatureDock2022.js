@@ -150,7 +150,7 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
    * @param documentLoader {function}
    * @param expansionMap {function}
    */
-  async getVerificationMethod({ proof, documentLoader }) {
+  static async getVerificationMethod({ proof, documentLoader }) {
     let { verificationMethod } = proof;
     if (typeof verificationMethod === 'object') {
       verificationMethod = verificationMethod.id;
@@ -181,6 +181,16 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
       throw new Error('The verification method has been revoked.');
     }
     return result;
+  }
+
+  /**
+   * @param document {object} to be signed.
+   * @param proof {object}
+   * @param documentLoader {function}
+   * @param expansionMap {function}
+   */
+  async getVerificationMethod({ proof, documentLoader }) {
+    return Bls12381BBSSignatureDock2022.getVerificationMethod({ proof, documentLoader });
   }
 
   /**

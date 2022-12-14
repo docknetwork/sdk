@@ -9,7 +9,7 @@ import BbsPlusPresentation from '../../../src/bbs-plus-presentation';
 import BBSPlusModule from '../../../src/modules/bbs-plus';
 import { getProofMatcherDoc, registerNewDIDUsingPair } from '../helpers';
 import getKeyDoc from '../../../src/utils/vc/helpers';
-import { issueCredential, verifyCredential } from '../../../src/utils/vc';
+import { issueCredential, verifyPresentation } from '../../../src/utils/vc';
 import { DockResolver } from '../../../src/resolver';
 
 const residentCardSchema = {
@@ -163,12 +163,7 @@ describe('BBS+ Presentation', () => {
     };
 
     const credential = await issueCredential(issuerKey, unsignedCred);
-    const result = await verifyCredential(credential, { resolver });
-    expect(result).toMatchObject(
-      expect.objectContaining(
-        getProofMatcherDoc(),
-      ),
-    );
+
 
     const idx = await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
     await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
@@ -176,9 +171,14 @@ describe('BBS+ Presentation', () => {
     const presentation = await bbsPlusPresentation.createPresentation();
     expect(presentation.spec.credentials[0].revealedAttributes).toHaveProperty('credentialSubject');
     expect(presentation.spec.credentials[0].revealedAttributes.credentialSubject).toHaveProperty('lprNumber', 1234);
+    
+    // Ensure verificationMethod & type is revealed always
+    expect(presentation.spec.credentials[0].revealedAttributes.proof).toBeDefined();
+    expect(presentation.spec.credentials[0].revealedAttributes.proof).toHaveProperty('verificationMethod', credential.proof.verificationMethod);
+    expect(presentation.spec.credentials[0].revealedAttributes.proof).toHaveProperty('type', credential.proof.type);
 
-    const resultPres = bbsPlusPresentation.verifyPresentation(presentation, [didDocument.publicKey[1].publicKeyBase58]);
-    expect(resultPres).toBeTruthy();
+    const { verified } = await verifyPresentation(presentation, { resolver });
+    expect(verified).toEqual(true);
   }, 30000);
 
   test('expect to create presentation from multiple credentials', async () => {
@@ -194,13 +194,20 @@ describe('BBS+ Presentation', () => {
     const credential2 = await issueCredential(issuerKey, unsignedCred);
 
     const idx = await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
-    await bbsPlusPresentation.addCredentialsToPresent(credential2, didDocument.publicKey[1].publicKeyBase58);
+    const idx2 = await bbsPlusPresentation.addCredentialsToPresent(credential2, didDocument.publicKey[1].publicKeyBase58);
     await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
+    await bbsPlusPresentation.addAttributeToReveal(idx2, ['credentialSubject.familyName']);
 
     const presentation = await bbsPlusPresentation.createPresentation();
+    
+    expect(presentation.spec.credentials[0].revealedAttributes).toHaveProperty('credentialSubject');
+    expect(presentation.spec.credentials[0].revealedAttributes.credentialSubject).toHaveProperty('lprNumber', 1234);
+    
+    expect(presentation.spec.credentials[1].revealedAttributes).toHaveProperty('credentialSubject');
+    expect(presentation.spec.credentials[1].revealedAttributes.credentialSubject).toHaveProperty('familyName', 'SMITH');
 
-    const resultPres = bbsPlusPresentation.verifyPresentation(presentation, [didDocument.publicKey[1].publicKeyBase58, didDocument.publicKey[1].publicKeyBase58]);
-    expect(resultPres).toBeTruthy();
+    const { verified } = await verifyPresentation(presentation, { resolver });
+    expect(verified).toEqual(true);
   }, 30000);
 
   test('expect to throw exception when attributes provided is not an array', async () => {
@@ -229,23 +236,17 @@ describe('BBS+ Presentation', () => {
     };
 
     const credential = await issueCredential(issuerKey, unsignedCred);
-    const result = await verifyCredential(credential, { resolver });
-    expect(result).toMatchObject(
-      expect.objectContaining(
-        getProofMatcherDoc(),
-      ),
-    );
 
     const idx = await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
     await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
 
     const presentation = await bbsPlusPresentation.createPresentation({ nonce: '1234' });
+    expect(presentation.nonce).toBeDefined();
     expect(presentation.spec.credentials[0].revealedAttributes).toHaveProperty('credentialSubject');
     expect(presentation.spec.credentials[0].revealedAttributes.credentialSubject).toHaveProperty('lprNumber', 1234);
 
-    const resultPres = bbsPlusPresentation.verifyPresentation(presentation, [didDocument.publicKey[1].publicKeyBase58]);
-    expect(resultPres).toBeTruthy();
-    expect(presentation.nonce).toBeDefined();
+    const { verified } = await verifyPresentation(presentation, { resolver });
+    expect(verified).toEqual(true);
   }, 30000);
 
   afterAll(async () => {

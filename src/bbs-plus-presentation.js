@@ -4,7 +4,6 @@ import {
   PresentationBuilder,
   Credential,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
-import { Presentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
 import { ensureArray } from './utils/type-helpers';
 
 import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';
@@ -60,27 +59,11 @@ export default class BbsPlusPresentation {
       document: json,
     });
 
-    return this.presBuilder.addCredential(Credential.fromJSON(credential, CustomLinkedDataSignature.fromJsigProofValue(credentialLD.proof.proofValue)), pk);
-  }
+    const idx = await this.presBuilder.addCredential(Credential.fromJSON(credential, CustomLinkedDataSignature.fromJsigProofValue(credentialLD.proof.proofValue)), pk);
 
-  /**
-   *
-   * @param presentationLD
-   * @param {Array.<string>} publicKeys
-   * @returns {boolean}
-   */
-  verifyPresentation(presentationLD, publicKeys) {
-    ensureArray(publicKeys);
-
-    const recreatedPres = Presentation.fromJSON(presentationLD);
-
-    const pks = publicKeys.map((publicKey) => {
-      const pkRaw = b58.decode(publicKey);
-      return new BBSPlusPublicKeyG2(pkRaw);
-    });
-
-    const result = recreatedPres.verify(pks);
-    const { verified } = result;
-    return verified;
+    // Enforce revealing of verificationMethod and type
+    await this.addAttributeToReveal(idx, ['proof.type']);
+    await this.addAttributeToReveal(idx, ['proof.verificationMethod']);
+    return idx;
   }
 }

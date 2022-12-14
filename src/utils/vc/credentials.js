@@ -270,7 +270,7 @@ export async function issueCredential(keyDoc, credential, compactProof = true, d
   checkCredential(cred);
 
   // Sign and return the credential
-  return await jsigs.sign(cred, {
+  return jsigs.sign(cred, {
     purpose: purpose || new CredentialIssuancePurpose(),
     documentLoader: documentLoader || defaultDocumentLoader(),
     suite,

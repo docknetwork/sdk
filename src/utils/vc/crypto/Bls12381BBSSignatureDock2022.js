@@ -19,8 +19,7 @@ import CustomLinkedDataSignature from './custom-linkeddatasignature';
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
 export const DEFAULT_PARSING_OPTS = {
-  // useDefaults: true,
-  useDefaults: false,
+  useDefaults: true,
 };
 
 /**
@@ -82,18 +81,18 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
     await initializeWasm();
 
     // Serialize the data for signing
-    const [serializedCredential, credSchema] = await this.serializeForSigning(options);
+    const [serializedCredential, credSchema] = Bls12381BBSSignatureDock2022.serializeForSigning(options);
 
     // Encode messages, retrieve names/values array
     const nameValues = credSchema.encoder.encodeMessageObject(serializedCredential, SIGNATURE_PARAMS_LABEL_BYTES);
     return nameValues[1];
   }
 
-  async serializeForSigning(options) {
-    return await Bls12381BBSSignatureDock2022.convertCredential(options);
+  static serializeForSigning(options) {
+    return Bls12381BBSSignatureDock2022.convertCredential(options);
   }
 
-  static async convertCredential({
+  static convertCredential({
     document, proof, /* documentLoader */
     signingOptions = { requireAllFieldsFromSchema: false },
   }) {

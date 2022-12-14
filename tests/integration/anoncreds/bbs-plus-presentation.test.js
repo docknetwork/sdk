@@ -219,6 +219,35 @@ describe('BBS+ Presentation', () => {
     }).toThrow();
   }, 30000);
 
+  test('expect to create presentation with nonce', async () => {
+    const bbsPlusPresentation = new BbsPlusPresentation();
+
+    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
+    const unsignedCred = {
+      ...credentialJSON,
+      issuer: did1,
+    };
+
+    const credential = await issueCredential(issuerKey, unsignedCred);
+    const result = await verifyCredential(credential, { resolver });
+    expect(result).toMatchObject(
+      expect.objectContaining(
+        getProofMatcherDoc(),
+      ),
+    );
+
+    const idx = await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
+    await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
+
+    const presentation = await bbsPlusPresentation.createPresentation({ nonce: '1234' });
+    expect(presentation.spec.credentials[0].revealedAttributes).toHaveProperty('credentialSubject');
+    expect(presentation.spec.credentials[0].revealedAttributes.credentialSubject).toHaveProperty('lprNumber', 1234);
+
+    const resultPres = bbsPlusPresentation.verifyPresentation(presentation, [didDocument.publicKey[1].publicKeyBase58]);
+    expect(resultPres).toBeTruthy();
+    expect(presentation.nonce).toBeDefined();
+  }, 30000);
+
   afterAll(async () => {
     await dock.disconnect();
   }, 10000);

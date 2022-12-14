@@ -30,10 +30,15 @@ export default class BbsPlusPresentation {
   }
 
   /**
-   * Creates a presentation from the added credentials
+   * Create bbs presentation
+   * @param options
    * @returns {object}
    */
-  createPresentation() {
+  createPresentation(options = {}) {
+    const { nonce } = options;
+    if (nonce && typeof nonce === 'string') {
+      this.presBuilder.nonce = b58.decode(nonce);
+    }
     const pres = this.presBuilder.finalize();
     return pres.toJSON();
   }
@@ -51,7 +56,7 @@ export default class BbsPlusPresentation {
     const pkRaw = b58.decode(publicKey);
     const pk = new BBSPlusPublicKeyG2(pkRaw);
 
-    const [credential] = await Bls12381BBSSignatureDock2022.convertCredential({
+    const [credential] = Bls12381BBSSignatureDock2022.convertCredential({
       document: json,
     });
 

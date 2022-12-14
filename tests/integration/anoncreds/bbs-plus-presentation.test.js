@@ -7,7 +7,7 @@ import { createNewDockDID } from '../../../src/utils/did';
 import Bls12381G2KeyPairDock2022 from '../../../src/utils/vc/crypto/Bls12381G2KeyPairDock2022';
 import BbsPlusPresentation from '../../../src/bbs-plus-presentation';
 import BBSPlusModule from '../../../src/modules/bbs-plus';
-import { getProofMatcherDoc, registerNewDIDUsingPair } from '../helpers';
+import { registerNewDIDUsingPair } from '../helpers';
 import getKeyDoc from '../../../src/utils/vc/helpers';
 import { issueCredential, verifyPresentation } from '../../../src/utils/vc';
 import { DockResolver } from '../../../src/resolver';
@@ -164,14 +164,13 @@ describe('BBS+ Presentation', () => {
 
     const credential = await issueCredential(issuerKey, unsignedCred);
 
-
     const idx = await bbsPlusPresentation.addCredentialToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
     await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
 
     const presentation = await bbsPlusPresentation.createPresentation();
     expect(presentation.spec.credentials[0].revealedAttributes).toHaveProperty('credentialSubject');
     expect(presentation.spec.credentials[0].revealedAttributes.credentialSubject).toHaveProperty('lprNumber', 1234);
-    
+
     // Ensure verificationMethod & type is revealed always
     expect(presentation.spec.credentials[0].revealedAttributes.proof).toBeDefined();
     expect(presentation.spec.credentials[0].revealedAttributes.proof).toHaveProperty('verificationMethod', credential.proof.verificationMethod);
@@ -199,10 +198,10 @@ describe('BBS+ Presentation', () => {
     await bbsPlusPresentation.addAttributeToReveal(idx2, ['credentialSubject.familyName']);
 
     const presentation = await bbsPlusPresentation.createPresentation();
-    
+
     expect(presentation.spec.credentials[0].revealedAttributes).toHaveProperty('credentialSubject');
     expect(presentation.spec.credentials[0].revealedAttributes.credentialSubject).toHaveProperty('lprNumber', 1234);
-    
+
     expect(presentation.spec.credentials[1].revealedAttributes).toHaveProperty('credentialSubject');
     expect(presentation.spec.credentials[1].revealedAttributes.credentialSubject).toHaveProperty('familyName', 'SMITH');
 
@@ -228,6 +227,10 @@ describe('BBS+ Presentation', () => {
 
   test('expect to create presentation with nonce', async () => {
     const bbsPlusPresentation = new BbsPlusPresentation();
+    bbsPlusPresentation.setPresentationContext([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://ld.dock.io/security/bbs/v1',
+    ]);
 
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
     const unsignedCred = {
@@ -241,7 +244,9 @@ describe('BBS+ Presentation', () => {
     await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
 
     const presentation = await bbsPlusPresentation.createPresentation({ nonce: '1234' });
+
     expect(presentation.nonce).toBeDefined();
+    expect(presentation.context).toBeDefined();
     expect(presentation.spec.credentials[0].revealedAttributes).toHaveProperty('credentialSubject');
     expect(presentation.spec.credentials[0].revealedAttributes.credentialSubject).toHaveProperty('lprNumber', 1234);
 

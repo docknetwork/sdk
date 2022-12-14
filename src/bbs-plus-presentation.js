@@ -66,4 +66,12 @@ export default class BbsPlusPresentation {
     await this.addAttributeToReveal(idx, ['proof.verificationMethod']);
     return idx;
   }
+
+  /**
+   *
+   * @param context
+   */
+  setPresentationContext(context) {
+    this.presBuilder.context = context;
+  }
 }

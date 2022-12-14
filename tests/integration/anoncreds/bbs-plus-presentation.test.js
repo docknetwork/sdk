@@ -12,6 +12,7 @@ import getKeyDoc from '../../../src/utils/vc/helpers';
 import { issueCredential, verifyPresentation } from '../../../src/utils/vc';
 import { DockResolver } from '../../../src/resolver';
 
+// TODO: move to fixtures
 const residentCardSchema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   $id: 'https://ld.dock.io/examples/resident-card-schema.json',
@@ -92,6 +93,7 @@ const embeddedSchema = {
   type: 'JsonSchemaValidator2018',
 };
 
+// TODO: move to fixtures
 const credentialJSON = {
   '@context': [
     'https://www.w3.org/2018/credentials/v1',
@@ -155,7 +157,6 @@ describe('BBS+ Presentation', () => {
 
   test('expect to reveal specified attributes', async () => {
     const bbsPlusPresentation = new BbsPlusPresentation();
-
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
     const unsignedCred = {
       ...credentialJSON,
@@ -163,7 +164,6 @@ describe('BBS+ Presentation', () => {
     };
 
     const credential = await issueCredential(issuerKey, unsignedCred);
-
 
     const idx = await bbsPlusPresentation.addCredentialToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
     await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
@@ -241,7 +241,7 @@ describe('BBS+ Presentation', () => {
     await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
 
     const presentation = await bbsPlusPresentation.createPresentation({ nonce: '1234' });
-    expect(presentation.nonce).toBeDefined();
+    expect(presentation.nonce).toEqual('1234');
     expect(presentation.spec.credentials[0].revealedAttributes).toHaveProperty('credentialSubject');
     expect(presentation.spec.credentials[0].revealedAttributes.credentialSubject).toHaveProperty('lprNumber', 1234);
 

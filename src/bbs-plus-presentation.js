@@ -49,7 +49,7 @@ export default class BbsPlusPresentation {
    * @returns {Promise<number>}
    */
   async addCredentialToPresent(credentialLD, publicKey) {
-    await initializeWasm();
+    // TODO: pass documentLoader/resolver options instead of PK
     const json = typeof credentialLD === 'string' ? JSON.parse(credentialLD) : credentialLD;
 
     const pkRaw = b58.decode(publicKey);
@@ -62,8 +62,8 @@ export default class BbsPlusPresentation {
     const idx = await this.presBuilder.addCredential(Credential.fromJSON(credential, CustomLinkedDataSignature.fromJsigProofValue(credentialLD.proof.proofValue)), pk);
 
     // Enforce revealing of verificationMethod and type
-    await this.addAttributeToReveal(idx, ['proof.type']);
-    await this.addAttributeToReveal(idx, ['proof.verificationMethod']);
+    this.addAttributeToReveal(idx, ['proof.type']);
+    this.addAttributeToReveal(idx, ['proof.verificationMethod']);
     return idx;
   }
 }

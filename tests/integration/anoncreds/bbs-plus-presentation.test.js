@@ -165,7 +165,7 @@ describe('BBS+ Presentation', () => {
     const credential = await issueCredential(issuerKey, unsignedCred);
 
 
-    const idx = await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
+    const idx = await bbsPlusPresentation.addCredentialToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
     await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
 
     const presentation = await bbsPlusPresentation.createPresentation();
@@ -193,8 +193,8 @@ describe('BBS+ Presentation', () => {
     const credential = await issueCredential(issuerKey, unsignedCred);
     const credential2 = await issueCredential(issuerKey, unsignedCred);
 
-    const idx = await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
-    const idx2 = await bbsPlusPresentation.addCredentialsToPresent(credential2, didDocument.publicKey[1].publicKeyBase58);
+    const idx = await bbsPlusPresentation.addCredentialToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
+    const idx2 = await bbsPlusPresentation.addCredentialToPresent(credential2, didDocument.publicKey[1].publicKeyBase58);
     await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
     await bbsPlusPresentation.addAttributeToReveal(idx2, ['credentialSubject.familyName']);
 
@@ -219,7 +219,7 @@ describe('BBS+ Presentation', () => {
     };
     const credential = await issueCredential(issuerKey, unsignedCred);
 
-    const idx = await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
+    const idx = await bbsPlusPresentation.addCredentialToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
 
     expect(() => {
       bbsPlusPresentation.addAttributeToReveal(idx, {});
@@ -237,7 +237,7 @@ describe('BBS+ Presentation', () => {
 
     const credential = await issueCredential(issuerKey, unsignedCred);
 
-    const idx = await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
+    const idx = await bbsPlusPresentation.addCredentialToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
     await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
 
     const presentation = await bbsPlusPresentation.createPresentation({ nonce: '1234' });

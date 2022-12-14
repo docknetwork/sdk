@@ -43,12 +43,12 @@ export default class BbsPlusPresentation {
   }
 
   /**
-   * Add jsonld credentials to be presented.
+   * Adds a BBS+ JSON-LD credential to be presented
    * @param credentialLD
    * @param publicKey
    * @returns {Promise<number>}
    */
-  async addCredentialsToPresent(credentialLD, publicKey) {
+  async addCredentialToPresent(credentialLD, publicKey) {
     await initializeWasm();
     const json = typeof credentialLD === 'string' ? JSON.parse(credentialLD) : credentialLD;
 

@@ -1,14 +1,16 @@
-import { BBSPlusPublicKeyG2, initializeWasm } from '@docknetwork/crypto-wasm-ts';
+import { BBSPlusPublicKeyG2 } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
 import {
   PresentationBuilder,
   Credential,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
-import { ensureArray } from './utils/type-helpers';
+import { stringToU8a } from '@polkadot/util';
+import { ensureArray, ensureURI, isObject } from './utils/type-helpers';
 
 import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';
 import CustomLinkedDataSignature from './utils/vc/crypto/custom-linkeddatasignature';
 
+const DEFAULT_CONTEXT = 'https://ld.dock.io/security/bbs/v1';
 export default class BbsPlusPresentation {
   /**
    * Create a new BbsPlusPresentation instance.
@@ -16,6 +18,7 @@ export default class BbsPlusPresentation {
    */
   constructor() {
     this.presBuilder = new PresentationBuilder();
+    this.setPresentationContext([DEFAULT_CONTEXT]);
   }
 
   /**
@@ -34,9 +37,12 @@ export default class BbsPlusPresentation {
    * @returns {object}
    */
   createPresentation(options = {}) {
-    const { nonce } = options;
+    const { nonce, context } = options;
     if (nonce && typeof nonce === 'string') {
       this.presBuilder.nonce = b58.decode(nonce);
+    }
+    if (context) {
+      this.setPresentationContext(context);
     }
     const pres = this.presBuilder.finalize();
     return pres.toJSON();
@@ -49,7 +55,7 @@ export default class BbsPlusPresentation {
    * @returns {Promise<number>}
    */
   async addCredentialToPresent(credentialLD, publicKey) {
-    await initializeWasm();
+    // TODO: pass documentLoader/resolver options instead of PK
     const json = typeof credentialLD === 'string' ? JSON.parse(credentialLD) : credentialLD;
 
     const pkRaw = b58.decode(publicKey);
@@ -62,8 +68,8 @@ export default class BbsPlusPresentation {
     const idx = await this.presBuilder.addCredential(Credential.fromJSON(credential, CustomLinkedDataSignature.fromJsigProofValue(credentialLD.proof.proofValue)), pk);
 
     // Enforce revealing of verificationMethod and type
-    await this.addAttributeToReveal(idx, ['proof.type']);
-    await this.addAttributeToReveal(idx, ['proof.verificationMethod']);
+    this.addAttributeToReveal(idx, ['proof.type']);
+    this.addAttributeToReveal(idx, ['proof.verificationMethod']);
     return idx;
   }
 
@@ -72,6 +78,9 @@ export default class BbsPlusPresentation {
    * @param context
    */
   setPresentationContext(context) {
+    if (!isObject(context) && !Array.isArray(context)) {
+      ensureURI(context);
+    }
     this.presBuilder.context = context;
   }
 }

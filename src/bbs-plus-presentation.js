@@ -61,18 +61,20 @@ export default class BbsPlusPresentation {
   /**
    *
    * @param presentationLD
-   * @param publicKey
+   * @param {Array.<string>} publicKeys
    * @returns {Promise<boolean>}
    */
-  async verifyPresentation(presentationLD, publicKey) {
+  async verifyPresentation(presentationLD, publicKeys) {
     await initializeWasm();
 
     const recreatedPres = Presentation.fromJSON(presentationLD);
 
-    const pkRaw = b58.decode(publicKey);
-    const pk = new BBSPlusPublicKeyG2(pkRaw);
+    const pks = publicKeys.map((publicKey) => {
+      const pkRaw = b58.decode(publicKey);
+      return new BBSPlusPublicKeyG2(pkRaw);
+    });
 
-    const result = recreatedPres.verify([pk]);
+    const result = recreatedPres.verify(pks);
     const { verified } = result;
     return verified;
   }

@@ -133,6 +133,7 @@ describe('BBS+ Presentation', () => {
     });
     chainModule = dock.bbsPlusModule;
     account = dock.keyring.addFromUri(TestAccountURI);
+
     dock.setAccount(account);
     pair1 = dock.keyring.addFromUri(randomAsHex(32));
     did1 = createNewDockDID();
@@ -176,10 +177,9 @@ describe('BBS+ Presentation', () => {
     expect(presentation.spec.credentials[0].revealedAttributes).toHaveProperty('credentialSubject');
     expect(presentation.spec.credentials[0].revealedAttributes.credentialSubject).toHaveProperty('lprNumber', 1234);
 
-    const resultPres = bbsPlusPresentation.verifyPresentation(presentation, didDocument.publicKey[1].publicKeyBase58);
-    expect(resultPres).toBeTruthy()
+    const resultPres = bbsPlusPresentation.verifyPresentation(presentation, [didDocument.publicKey[1].publicKeyBase58]);
+    expect(resultPres).toBeTruthy();
   }, 30000);
-
 
   test('expect to create presentation from multiple credentials', async () => {
     const bbsPlusPresentation = new BbsPlusPresentation();
@@ -194,16 +194,14 @@ describe('BBS+ Presentation', () => {
     const credential2 = await issueCredential(issuerKey, unsignedCred);
 
     const idx = await bbsPlusPresentation.addCredentialsToPresent(credential, didDocument.publicKey[1].publicKeyBase58);
-    const idx2 = await bbsPlusPresentation.addCredentialsToPresent(credential2, didDocument.publicKey[1].publicKeyBase58);
+    await bbsPlusPresentation.addCredentialsToPresent(credential2, didDocument.publicKey[1].publicKeyBase58);
     await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
-    await bbsPlusPresentation.addAttributeToReveal(idx2);
 
     const presentation = await bbsPlusPresentation.createPresentation();
 
-    const resultPres = bbsPlusPresentation.verifyPresentation(presentation, didDocument.publicKey[1].publicKeyBase58);
+    const resultPres = bbsPlusPresentation.verifyPresentation(presentation, [didDocument.publicKey[1].publicKeyBase58, didDocument.publicKey[1].publicKeyBase58]);
     expect(resultPres).toBeTruthy();
   }, 30000);
-
 
   test('expect to throw exception when attributes provided is not an array', async () => {
     const bbsPlusPresentation = new BbsPlusPresentation();
@@ -220,7 +218,6 @@ describe('BBS+ Presentation', () => {
       bbsPlusPresentation.addAttributeToReveal(idx, {});
     }).toThrow();
   }, 30000);
-
 
   afterAll(async () => {
     await dock.disconnect();

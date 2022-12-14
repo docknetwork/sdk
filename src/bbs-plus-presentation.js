@@ -65,6 +65,7 @@ export default class BbsPlusPresentation {
    * @returns {Promise<boolean>}
    */
   async verifyPresentation(presentationLD, publicKeys) {
+    ensureArray(publicKeys);
     await initializeWasm();
 
     const recreatedPres = Presentation.fromJSON(presentationLD);

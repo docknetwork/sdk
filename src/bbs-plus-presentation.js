@@ -1,4 +1,4 @@
-import { BBSPlusPublicKeyG2, initializeWasm } from '@docknetwork/crypto-wasm-ts';
+import { BBSPlusPublicKeyG2 } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
 import {
   PresentationBuilder,

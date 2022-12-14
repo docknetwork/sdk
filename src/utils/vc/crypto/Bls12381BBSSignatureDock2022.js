@@ -19,7 +19,7 @@ import CustomLinkedDataSignature from './custom-linkeddatasignature';
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
 export const DEFAULT_PARSING_OPTS = {
-  useDefaults: true,
+  useDefaults: false,
 };
 
 /**

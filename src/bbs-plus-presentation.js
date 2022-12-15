@@ -38,8 +38,8 @@ export default class BbsPlusPresentation {
    */
   createPresentation(options = {}) {
     const { nonce, context } = options;
-    if (nonce && typeof nonce === 'string') {
-      this.presBuilder.nonce = b58.decode(nonce);
+    if (nonce) {
+      this.presBuilder.nonce = stringToU8a(nonce);
     }
     if (context) {
       this.setPresentationContext(context);

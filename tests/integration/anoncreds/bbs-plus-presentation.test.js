@@ -1,5 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
-import { u8aToHex } from '@polkadot/util';
+import { u8aToHex, stringToU8a } from '@polkadot/util';
+import b58 from 'bs58';
 import { initializeWasm } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI } from '../../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
@@ -241,7 +242,7 @@ describe('BBS+ Presentation', () => {
     await bbsPlusPresentation.addAttributeToReveal(idx, ['credentialSubject.lprNumber']);
 
     const presentation = await bbsPlusPresentation.createPresentation({ nonce: '1234' });
-    expect(presentation.nonce).toEqual('1234');
+    expect(presentation.nonce).toEqual(b58.encode(stringToU8a('1234')));
     expect(presentation.spec.credentials[0].revealedAttributes).toHaveProperty('credentialSubject');
     expect(presentation.spec.credentials[0].revealedAttributes.credentialSubject).toHaveProperty('lprNumber', 1234);
 

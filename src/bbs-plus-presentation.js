@@ -1,5 +1,6 @@
 import { BBSPlusPublicKeyG2 } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
+import { stringToU8a } from '@polkadot/util';
 import {
   PresentationBuilder,
   Credential,

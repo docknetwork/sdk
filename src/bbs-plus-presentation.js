@@ -1,4 +1,4 @@
-import { BBSPlusPublicKeyG2 } from '@docknetwork/crypto-wasm-ts';
+import { BBSPlusPublicKeyG2, initializeWasm, isWasmInitialized } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
 import { stringToU8a } from '@polkadot/util';
 import {
@@ -9,6 +9,7 @@ import { ensureArray, ensureURI, isObject } from './utils/type-helpers';
 
 import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';
 import CustomLinkedDataSignature from './utils/vc/crypto/custom-linkeddatasignature';
+import defaultDocumentLoader from './utils/vc/document-loader';
 
 const DEFAULT_CONTEXT = 'https://ld.dock.io/security/bbs/v1';
 export default class BbsPlusPresentation {
@@ -51,14 +52,31 @@ export default class BbsPlusPresentation {
   /**
    * Adds a BBS+ JSON-LD credential to be presented
    * @param credentialLD
-   * @param publicKey
+   * @param options
    * @returns {Promise<number>}
    */
-  async addCredentialToPresent(credentialLD, publicKey) {
-    // TODO: pass documentLoader/resolver options instead of PK
+  async addCredentialToPresent(credentialLD, options = {}) {
+    if (options.documentLoader && options.resolver) {
+      throw new Error('Passing resolver and documentLoader results in resolver being ignored, please re-factor.');
+    }
+    if (!isWasmInitialized()) {
+      await initializeWasm();
+    }
+    const documentLoader = options.documentLoader || defaultDocumentLoader(options.resolver);
+
     const json = typeof credentialLD === 'string' ? JSON.parse(credentialLD) : credentialLD;
 
-    const pkRaw = b58.decode(publicKey);
+    const { proof } = json;
+
+    if (!proof) {
+      throw new Error('BBS credential does not have a proof');
+    }
+    const keyDocument = await Bls12381BBSSignatureDock2022.getVerificationMethod({
+      proof,
+      documentLoader,
+    });
+
+    const pkRaw = b58.decode(keyDocument.publicKeyBase58);
     const pk = new BBSPlusPublicKeyG2(pkRaw);
 
     const [credential] = Bls12381BBSSignatureDock2022.convertCredential({

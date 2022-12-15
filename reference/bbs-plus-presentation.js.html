@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: modules/revocation.js</title>
+    <title>JSDoc: Source: bbs-plus-presentation.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: modules/revocation.js</h1>
+    <h1 class="page-title">Source: bbs-plus-presentation.js</h1>
 
     
 
@@ -26,278 +26,92 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import {
-  getNonce,
-  getSignatureFromKeyringPair,
-  getStateChange,
-} from '../utils/misc';
+            <pre class="prettyprint source linenums"><code>import { BBSPlusPublicKeyG2 } from '@docknetwork/crypto-wasm-ts';
+import b58 from 'bs58';
+import { stringToU8a } from '@polkadot/util';
+import {
+  PresentationBuilder,
+  Credential,
+} from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
+import { ensureArray, ensureURI, isObject } from './utils/type-helpers';
 
-import { createDidSig, getHexIdentifierFromDID } from '../utils/did'; // eslint-disable-line
+import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';
+import CustomLinkedDataSignature from './utils/vc/crypto/custom-linkeddatasignature';
 
-/** Class to create, update and destroy revocations */
-class RevocationModule {
+const DEFAULT_CONTEXT = 'https://ld.dock.io/security/bbs/v1';
+export default class BbsPlusPresentation {
   /**
-   * Creates a new instance of RevocationModule and sets the api
+   * Create a new BbsPlusPresentation instance.
    * @constructor
-   * @param {object} api - PolkadotJS API Reference
-   * @param signAndSend
    */
-  constructor(api, signAndSend) {
-    this.api = api;
-    this.module = api.tx.revoke;
-    this.signAndSend = signAndSend;
+  constructor() {
+    this.presBuilder = new PresentationBuilder();
+    this.setPresentationContext([DEFAULT_CONTEXT]);
   }
 
   /**
-   * Creating a revocation registry
-   * @param {string} id - is the unique id of the registry. The function will check whether `id` is already taken or not.
-   * @param {Policy} policy - The registry policy
-   * @param {Boolean} addOnly - true: credentials can be revoked, but not un-revoked, false: credentials can be revoked and un-revoked
-   * @return {Promise&lt;object>} The extrinsic to sign and send.
+   * Species attributes to be revealed in the credential
+   * @param {number} credentialIndex
+   * @param {Array.&lt;string>} attributes
    */
-  createNewRegistryTx(id, policy, addOnly) {
-    const addReg = {
-      id,
-      newRegistry: {
-        policy: policy.toJSON(),
-        addOnly,
-      },
-    };
-    return this.module.newRegistry(addReg);
+  addAttributeToReveal(credentialIndex, attributes = []) {
+    ensureArray(attributes);
+    this.presBuilder.markAttributesRevealed(credentialIndex, new Set(attributes));
   }
 
   /**
-   * Creating a revocation registry
-   * @param {string} id - is the unique id of the registry. The function will check whether `id` is already taken or not.
-   * @param {Policy} policy - The registry policy
-   * @param {Boolean} addOnly - true: credentials can be revoked, but not un-revoked, false: credentials can be revoked and un-revoked
-   * @param waitForFinalization
-   * @param params
-   * @return {Promise&lt;object>} Promise to the pending transaction
+   * Create bbs presentation
+   * @param options
+   * @returns {object}
    */
-  async newRegistry(
-    id,
-    policy,
-    addOnly,
-    waitForFinalization = true,
-    params = {},
-  ) {
-    return this.signAndSend(
-      this.createNewRegistryTx(id, policy, addOnly),
-      waitForFinalization,
-      params,
-    );
-  }
-
-  /**
-   * Create a transaction to remove a revocation registry
-   * @return {Promise&lt;object>} The extrinsic to sign and send.
-   * @param removal - The payload to remove the registry
-   * @param didSigs - Array of pairs with each pair of the form `[DidSig, nonce]` where `nonce` is the nonce used while
-   * signing the payload
-   */
-  createRemoveRegistryTx(removal, didSigs) {
-    return this.module.removeRegistry(removal, didSigs);
-  }
-
-  /**
-   * Remove a revocation registry
-   * @return {Promise&lt;object>} Promise to the pending transaction
-   * @param removal
-   * @param didSigs - Array of pairs with each pair of the form `[DidSig, nonce]` where `nonce` is the nonce used while
-   * signing the payload
-   * @param waitForFinalization
-   * @param params
-   */
-  async removeRegistry(removal, didSigs, waitForFinalization = true, params = {}) {
-    return this.signAndSend(this.createRemoveRegistryTx(removal, didSigs), waitForFinalization, params);
-  }
-
-  /**
-   * Create transaction to revoke credentials
-   * @return {Promise&lt;object>} The extrinsic to sign and send.
-   * @param revoke
-   * @param didSigs - Array of pairs with each pair of the form `[DidSig, nonce]` where `nonce` is the nonce used while
-   * signing the payload
-   */
-  createRevokeTx(revoke, didSigs) {
-    return this.module.revoke(revoke, didSigs);
-  }
-
-  /**
-   * Revoke credentials
-   * @return {Promise&lt;object>} Promise to the pending transaction
-   * @param revoke
-   * @param didSigs
-   * @param waitForFinalization
-   * @param params
-   */
-  async revoke(revoke, didSigs, waitForFinalization = true, params = {}) {
-    return this.signAndSend(this.createRevokeTx(revoke, didSigs), waitForFinalization, params);
-  }
-
-  /**
-   * Create transaction to unrevoke credentials
-   * @return {Promise&lt;object>} The extrinsic to sign and send.
-   * @param unrevoke
-   * @param didSigs - Array of pairs with each pair of the form `[DidSig, nonce]` where `nonce` is the nonce used while
-   * signing the payload
-   */
-  createUnrevokeTx(unrevoke, didSigs) {
-    return this.module.unrevoke(unrevoke, didSigs);
-  }
-
-  /**
-   * Unrevoke credentials
-   * @return {Promise&lt;object>} Promise to the pending transaction
-   * @param unrevoke
-   * @param didSigs - Array of pairs with each pair of the form `[DidSig, nonce]` where `nonce` is the nonce used while
-   * signing the payload
-   * @param waitForFinalization
-   * @param params
-   */
-  async unrevoke(unrevoke, didSigs, waitForFinalization = true, params = {}) {
-    return this.signAndSend(this.createUnrevokeTx(unrevoke, didSigs), waitForFinalization, params);
-  }
-
-  /**
-   * Get data of the revocation registry like controllers, policy and type.
-   * If the registry is not present, error is thrown.
-   * @param {string} registryID - Revocation registry ID
-   * @return {Promise} A promise to registry data
-   */
-  async getRevocationRegistry(registryID) {
-    const resp = await this.api.query.revoke.registries(registryID);
-    if (resp.isNone) {
-      throw new Error(`Could not find revocation registry: ${registryID}`);
+  createPresentation(options = {}) {
+    const { nonce, context } = options;
+    if (nonce) {
+      this.presBuilder.nonce = stringToU8a(nonce);
     }
-
-    return resp.unwrap();
+    if (context) {
+      this.setPresentationContext(context);
+    }
+    const pres = this.presBuilder.finalize();
+    return pres.toJSON();
   }
 
   /**
-   * The read-only call get_revocation_status is used to check whether a credential is revoked or not and does not consume any tokens. If
-   * @param {string} registryId - Revocation registry ID
-   * @param {string} revokeId - Revocation id. This is set as the hash of the credential id.
-   * @return {Promise&lt;Boolean>} Returns a promise to true if credential is revoked else to false.
+   * Adds a BBS+ JSON-LD credential to be presented
+   * @param credentialLD
+   * @param publicKey
+   * @returns {Promise&lt;number>}
    */
-  async getIsRevoked(registryId, revokeId) {
-    const resp = await this.api.query.revoke.revocations(registryId, revokeId);
-    return !resp.isNone;
+  async addCredentialToPresent(credentialLD, publicKey) {
+    // TODO: pass documentLoader/resolver options instead of PK
+    const json = typeof credentialLD === 'string' ? JSON.parse(credentialLD) : credentialLD;
+
+    const pkRaw = b58.decode(publicKey);
+    const pk = new BBSPlusPublicKeyG2(pkRaw);
+
+    const [credential] = Bls12381BBSSignatureDock2022.convertCredential({
+      document: json,
+    });
+
+    const idx = await this.presBuilder.addCredential(Credential.fromJSON(credential, CustomLinkedDataSignature.fromJsigProofValue(credentialLD.proof.proofValue)), pk);
+
+    // Enforce revealing of verificationMethod and type
+    this.addAttributeToReveal(idx, ['proof.type']);
+    this.addAttributeToReveal(idx, ['proof.verificationMethod']);
+    return idx;
   }
 
   /**
-   * TODO: Use the spread operator to accept multiple revocation ids
-   * Revoke a single credential. Works only with registries having `OneOf` policy
-   * @param registryId - The registry id being updated
-   * @param revId - The revocation id that is being revoked
-   * @param did
-   * @param keyPair
-   * @param keyId
-   * @param nonce
-   * @param didModule
-   * @param waitForFinalization
-   * @param params
-   * @returns {Promise&lt;void>}
+   *
+   * @param context
    */
-  async revokeCredentialWithOneOfPolicy(registryId, revId, did, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const [revoke, sig, sigNonce] = await this.createSignedRevoke(registryId, [revId], did, keyPair, keyId, { nonce, didModule });
-    return this.revoke(revoke, [[sig, sigNonce]], waitForFinalization, params);
-  }
-
-  /**
-   * Unrevoke a single credential. Works only with registries having `OneOf` policy
-   * @param registryId
-   * @param revId
-   * @param did
-   * @param keyPair
-   * @param keyId
-   * @param nonce
-   * @param didModule
-   * @param waitForFinalization
-   * @param params
-   * @returns {Promise&lt;Object>}
-   */
-  async unrevokeCredentialWithOneOfPolicy(registryId, revId, did, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const [revoke, sig, sigNonce] = await this.createSignedUnRevoke(registryId, [revId], did, keyPair, keyId, { nonce, didModule });
-    return this.unrevoke(revoke, [[sig, sigNonce]], waitForFinalization, params);
-  }
-
-  async removeRegistryWithOneOfPolicy(registryId, did, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const [removal, sig, sigNonce] = await this.createSignedRemove(registryId, did, keyPair, keyId, { nonce, didModule });
-    return this.removeRegistry(removal, [[sig, sigNonce]], waitForFinalization, params);
-  }
-
-  async createSignedUpdate(updateFunc, registryId, [...revokeIds], did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
-    const hexDid = getHexIdentifierFromDID(did);
-    // eslint-disable-next-line no-param-reassign
-    nonce = await getNonce(hexDid, nonce, didModule);
-
-    const update = {
-      data: {
-        registryId,
-        revokeIds,
-      },
-      nonce,
-    };
-    const serializedRevoke = updateFunc.bind(this)(update);
-    const signature = getSignatureFromKeyringPair(keyPair, serializedRevoke);
-    const didSig = createDidSig(hexDid, keyId, signature);
-    return [{ registryId, revokeIds }, didSig, nonce];
-  }
-
-  async createSignedRevoke(registryId, revokeIds, did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
-    return this.createSignedUpdate(this.getSerializedRevoke, registryId, revokeIds, did, keyPair, keyId, { nonce, didModule });
-  }
-
-  async createSignedUnRevoke(registryId, revokeIds, did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
-    return this.createSignedUpdate(this.getSerializedUnrevoke, registryId, revokeIds, did, keyPair, keyId, { nonce, didModule });
-  }
-
-  async createSignedRemove(registryId, did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
-    const hexDid = getHexIdentifierFromDID(did);
-    // eslint-disable-next-line no-param-reassign
-    nonce = await getNonce(hexDid, nonce, didModule);
-
-    const remove = {
-      data: { registryId },
-      nonce,
-    };
-    const serializedRemove = this.getSerializedRemoveRegistry(remove);
-    const signature = getSignatureFromKeyringPair(keyPair, serializedRemove);
-    const didSig = createDidSig(hexDid, keyId, signature);
-    return [{ registryId }, didSig, nonce];
-  }
-
-  /**
-   * Serializes a `Revoke` for signing.
-   * @param {object} revoke - `Revoke` as expected by the Substrate node
-   * @returns {Array} An array of Uint8
-   */
-  getSerializedRevoke(revoke) {
-    return getStateChange(this.api, 'Revoke', revoke);
-  }
-
-  /**
-   * Serializes a `Unrevoke` for signing.
-   * @param {object} unrevoke - `Unrevoke` as expected by the Substrate node
-   * @returns {Array} An array of Uint8
-   */
-  getSerializedUnrevoke(unrevoke) {
-    return getStateChange(this.api, 'UnRevoke', unrevoke);
-  }
-
-  /**
-   * Serializes a `RemoveRegistry` for signing.
-   * @param {object} removeReg - `RemoveRegistry` as expected by the Substrate node
-   * @returns {Array} An array of Uint8
-   */
-  getSerializedRemoveRegistry(removeReg) {
-    return getStateChange(this.api, 'RemoveRegistry', removeReg);
+  setPresentationContext(context) {
+    if (!isObject(context) &amp;&amp; !Array.isArray(context)) {
+      ensureURI(context);
+    }
+    this.presBuilder.context = context;
   }
 }
-
-export default RevocationModule;
 </code></pre>
         </article>
     </section>

@@ -89,3 +89,13 @@ export function ensureValidDatetime(datetime) {
 
   return true;
 }
+
+/**
+ * Fail if the given value isn't an array
+ * @param value
+ */
+export function ensureArray(value) {
+  if (!Array.isArray(value)) {
+    throw new Error('The value provided must be an array');
+  }
+}

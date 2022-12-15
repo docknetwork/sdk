@@ -1,5 +1,8 @@
 import jsonld from 'jsonld';
 import jsigs from 'jsonld-signatures';
+import { BBSPlusPublicKeyG2 } from '@docknetwork/crypto-wasm-ts';
+import { Presentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
+import b58 from 'bs58';
 import { verifyCredential } from './credentials';
 import DIDResolver from '../../did-resolver'; // eslint-disable-line
 
@@ -13,6 +16,8 @@ import {
 import {
   EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
 } from './custom_crypto';
+
+import Bls12381BBSSignatureDock2022 from './crypto/Bls12381BBSSignatureDock2022';
 
 const { AuthenticationProofPurpose } = jsigs.purposes;
 
@@ -111,6 +116,10 @@ export async function verifyPresentation(presentation, options = {}) {
     throw new TypeError('"presentation" property is required');
   }
 
+  if (isBBSPlusPresentation(presentation)) {
+    return verifyBBSPlusPresentation(presentation, options);
+  }
+
   // Ensure presentation is valid
   checkPresentation(presentation);
 
@@ -198,4 +207,30 @@ export async function signPresentation(presentation, keyDoc, challenge, domain, 
   return jsigs.sign(presentation, {
     purpose, documentLoader, domain, challenge, compactProof, suite,
   });
+}
+
+function isBBSPlusPresentation(presentation) {
+  // Since there is no type parameter present we have to guess by checking field types
+  // these wont exist in a standard VP
+  return typeof presentation.version === 'string' && typeof presentation.proof === 'string' && typeof presentation.spec !== 'undefined' && typeof presentation.spec.credentials !== 'undefined';
+}
+
+async function verifyBBSPlusPresentation(presentation, options = {}) {
+  const documentLoader = options.documentLoader || defaultDocumentLoader(options.resolver);
+
+  const keyDocuments = await Promise.all(presentation.spec.credentials.map((c, idx) => {
+    const { proof } = c.revealedAttributes;
+    if (!proof) {
+      throw new Error(`Presentation credential does not reveal its proof for index ${idx}`);
+    }
+    return Bls12381BBSSignatureDock2022.getVerificationMethod({ proof, documentLoader });
+  }));
+
+  const recreatedPres = Presentation.fromJSON(presentation);
+  const pks = keyDocuments.map((keyDocument) => {
+    const pkRaw = b58.decode(keyDocument.publicKeyBase58);
+    return new BBSPlusPublicKeyG2(pkRaw);
+  });
+
+  return recreatedPres.verify(pks);
 }

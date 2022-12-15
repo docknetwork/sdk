@@ -1,5 +1,5 @@
 import {
-  CredentialSchema, SIGNATURE_PARAMS_LABEL_BYTES,
+  CredentialSchema, CredentialBuilder, SIGNATURE_PARAMS_LABEL_BYTES,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 
 import {
@@ -18,8 +18,8 @@ import CustomLinkedDataSignature from './custom-linkeddatasignature';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
-const DEFAULT_PARSING_OPTS = {
-  useDefaults: true,
+export const DEFAULT_PARSING_OPTS = {
+  useDefaults: false,
 };
 
 /**
@@ -81,57 +81,67 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
     await initializeWasm();
 
     // Serialize the data for signing
-    const serializedCredential = await this.serializeForSigning(options);
-
-    // Create an encoder through the schema, if one exists
-    let credSchema;
-    const { credentialSchema } = options.document;
-    if (credentialSchema) {
-      credSchema = CredentialSchema.fromJSON({
-        ...credentialSchema,
-        parsingOptions: {
-          ...DEFAULT_PARSING_OPTS,
-          ...(credentialSchema.parsingOptions || {}),
-        },
-      });
-    } else {
-      credSchema = new CredentialSchema({
-        ...CredentialSchema.essential(),
-        type: 'object',
-        properties: {
-          credentialSubject: {
-            type: 'object',
-            properties: {
-              id: {
-                type: 'string',
-              },
-            },
-          },
-        },
-      }, DEFAULT_PARSING_OPTS);
-    }
+    const [serializedCredential, credSchema] = Bls12381BBSSignatureDock2022.convertCredential(options);
 
     // Encode messages, retrieve names/values array
-    const namesValues = credSchema.encoder.encodeMessageObject(serializedCredential, SIGNATURE_PARAMS_LABEL_BYTES);
-    return namesValues[1];
+    const nameValues = credSchema.encoder.encodeMessageObject(serializedCredential, SIGNATURE_PARAMS_LABEL_BYTES);
+    return nameValues[1];
   }
 
-  async serializeForSigning({
-    document, proof,
+  static convertCredential({
+    document, proof, /* documentLoader */
+    signingOptions = { requireAllFieldsFromSchema: false },
   }) {
     // `jws`,`signatureValue`,`proofValue` must not be included in the proof
     const trimmedProof = {
       '@context': document['@context'] || SECURITY_CONTEXT_URL,
-      ...proof,
+      ...(proof || document.proof),
     };
+
     delete trimmedProof.jws;
     delete trimmedProof.signatureValue;
     delete trimmedProof.proofValue;
 
-    return {
-      proof: trimmedProof,
+    let credSchema;
+    if (document.credentialSchema) {
+      credSchema = CredentialSchema.fromJSON({
+        parsingOptions: DEFAULT_PARSING_OPTS,
+        ...document.credentialSchema,
+      });
+
+      // TODO: support documentloader for schemas here so we can use dock chain schemas
+      // requires that the presentation wrapper passes a documentloader to this method
+      // const loadedSchema = (await documentLoader(document.credentialSchema.id)).document;
+      // if (loadedSchema) {
+      //   credSchema = new CredentialSchema(loadedSchema, {
+      //     ...DEFAULT_PARSING_OPTS,
+      //     ...(document.credentialSchema.parsingOptions || {}),
+      //   });
+      // }
+    }
+
+    if (!credSchema) {
+      credSchema = new CredentialSchema(CredentialSchema.essential(), DEFAULT_PARSING_OPTS);
+    }
+
+    const credBuilder = new CredentialBuilder();
+    credBuilder.schema = credSchema;
+
+    const {
+      cryptoVersion, credentialSchema, credentialSubject, credentialStatus, ...custom
+    } = {
       ...document,
+      proof: trimmedProof,
     };
+    credBuilder.subject = credentialSubject;
+    credBuilder.credStatus = credentialStatus;
+
+    Object.keys(custom).forEach((k) => {
+      credBuilder.setTopLevelField(k, custom[k]);
+    });
+
+    const retval = credBuilder.updateSchemaIfNeeded(signingOptions);
+    return [retval, credBuilder.schema];
   }
 
   /**
@@ -140,7 +150,7 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
    * @param documentLoader {function}
    * @param expansionMap {function}
    */
-  async getVerificationMethod({ proof, documentLoader }) {
+  static async getVerificationMethod({ proof, documentLoader }) {
     let { verificationMethod } = proof;
     if (typeof verificationMethod === 'object') {
       verificationMethod = verificationMethod.id;
@@ -171,6 +181,16 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
       throw new Error('The verification method has been revoked.');
     }
     return result;
+  }
+
+  /**
+   * @param document {object} to be signed.
+   * @param proof {object}
+   * @param documentLoader {function}
+   * @param expansionMap {function}
+   */
+  async getVerificationMethod({ proof, documentLoader }) {
+    return Bls12381BBSSignatureDock2022.getVerificationMethod({ proof, documentLoader });
   }
 
   /**

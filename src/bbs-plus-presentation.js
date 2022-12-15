@@ -4,7 +4,6 @@ import {
   PresentationBuilder,
   Credential,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
-import { stringToU8a } from '@polkadot/util';
 import { ensureArray, ensureURI, isObject } from './utils/type-helpers';
 
 import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';

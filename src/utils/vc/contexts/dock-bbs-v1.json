@@ -3,7 +3,6 @@
     "@version": 1.1,
     "id": "@id",
     "type": "@type",
-
     "dockBBS": "https://ld.dock.io/dock-bbs",
     "parsingOptions": {
       "@id": "dockBBS:parsingOptions",
@@ -30,7 +29,6 @@
       "@type": "@id",
       "@container": "@graph"
     },
-
     "Bls12381BBS+SignatureProofDock2022": {
       "@id": "https://ld.dock.io/security#Bls12381BBS+SignatureDock2022",
       "@context": {

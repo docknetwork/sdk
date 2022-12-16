@@ -9,7 +9,9 @@ import BbsPlusPresentation from '../../../src/bbs-plus-presentation';
 import BBSPlusModule from '../../../src/modules/bbs-plus';
 import { registerNewDIDUsingPair } from '../helpers';
 import getKeyDoc from '../../../src/utils/vc/helpers';
-import { issueCredential, signPresentation, verifyPresentation, verifyCredential } from '../../../src/utils/vc';
+import {
+  issueCredential, signPresentation, verifyPresentation, verifyCredential,
+} from '../../../src/utils/vc';
 import { DockResolver } from '../../../src/resolver';
 import { convertToPresentation } from '../../../src/utils/vc/crypto/Bls12381BBSSignatureProofDock2022';
 import { createPresentation } from '../../create-presentation';
@@ -120,60 +122,59 @@ describe('BBS+ Derived Credentials', () => {
   async function createAndVerifyPresentation(credentials) {
     const holderKey = getKeyDoc(holder3DID, dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
 
-      const presId = randomAsHex(32);
-      const chal = randomAsHex(32);
-      const domain = 'test domain';
-      const presentation = createPresentation(
-        credentials,
-        presId,
-      );
+    const presId = randomAsHex(32);
+    const chal = randomAsHex(32);
+    const domain = 'test domain';
+    const presentation = createPresentation(
+      credentials,
+      presId,
+    );
 
-      expect(presentation).toMatchObject(
-        expect.objectContaining(
-          {
-            type: ['VerifiablePresentation'],
-            verifiableCredential: credentials,
-            id: presId,
-          },
-        ),
-      );
+    expect(presentation).toMatchObject(
+      expect.objectContaining(
+        {
+          type: ['VerifiablePresentation'],
+          verifiableCredential: credentials,
+          id: presId,
+        },
+      ),
+    );
 
-      const signedPres = await signPresentation(
-        presentation,
-        holderKey,
-        chal,
-        domain,
-        resolver,
-      );
+    const signedPres = await signPresentation(
+      presentation,
+      holderKey,
+      chal,
+      domain,
+      resolver,
+    );
 
-      expect(signedPres).toMatchObject(
-        expect.objectContaining(
-          {
-            type: ['VerifiablePresentation'],
-            verifiableCredential: credentials,
-            id: presId,
-            proof: expect.objectContaining({
-              type: 'Sr25519Signature2020',
-              challenge: chal,
-              domain,
-              proofPurpose: 'authentication',
-            }),
-          },
-        ),
-      );
+    expect(signedPres).toMatchObject(
+      expect.objectContaining(
+        {
+          type: ['VerifiablePresentation'],
+          verifiableCredential: credentials,
+          id: presId,
+          proof: expect.objectContaining({
+            type: 'Sr25519Signature2020',
+            challenge: chal,
+            domain,
+            proofPurpose: 'authentication',
+          }),
+        },
+      ),
+    );
 
-      const result = await verifyPresentation(signedPres, {
-        challenge: chal,
-        domain,
-        resolver,
-      });
+    const result = await verifyPresentation(signedPres, {
+      challenge: chal,
+      domain,
+      resolver,
+    });
 
-      expect(result.verified).toBe(true);
-      expect(result.presentationResult.verified).toBe(true);
-      expect(result.credentialResults.length).toBe(1);
-      expect(result.credentialResults[0].verified).toBe(true);
+    expect(result.verified).toBe(true);
+    expect(result.presentationResult.verified).toBe(true);
+    expect(result.credentialResults.length).toBe(1);
+    expect(result.credentialResults[0].verified).toBe(true);
   }
-
 
   test('Holder creates a derived BBS+ verifiable credential from a BBS+ credential with selective disclosure', async () => {
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);

@@ -8,10 +8,9 @@ import {
 import { ensureArray } from './utils/type-helpers';
 
 import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';
+import { Bls12381BBSSigProofDockSigName } from './utils/vc/crypto/constants';
 import CustomLinkedDataSignature from './utils/vc/crypto/custom-linkeddatasignature';
 import defaultDocumentLoader from './utils/vc/document-loader';
-
-const BBS_SIG_PROOF_TYPE = 'Bls12381BBS+SignatureProofDock2022';
 
 export default class BbsPlusPresentation {
   /**
@@ -122,7 +121,7 @@ export default class BbsPlusPresentation {
           proofPurpose: 'assertionMethod',
           created: date,
           ...credential.revealedAttributes.proof,
-          type: BBS_SIG_PROOF_TYPE,
+          type: Bls12381BBSSigProofDockSigName,
           proofValue: presentation.proof,
           nonce: presentation.nonce,
           context: presentation.context,

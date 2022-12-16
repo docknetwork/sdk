@@ -3,6 +3,76 @@
     "@version": 1.1,
     "id": "@id",
     "type": "@type",
+    "dockBBS": "https://ld.dock.io/dock-bbs",
+    "parsingOptions": {
+      "@id": "dockBBS:parsingOptions",
+      "@type": "@id",
+      "@container": "@graph"
+    },
+    "defaultDecimalPlaces": {
+      "@id": "dockBBS:defaultDecimalPlaces",
+      "@type": "@id",
+      "@container": "@graph"
+    },
+    "defaultMinimumInteger": {
+      "@id": "dockBBS:defaultMinimumInteger",
+      "@type": "@id",
+      "@container": "@graph"
+    },
+    "useDefaults": {
+      "@id": "dockBBS:useDefaults",
+      "@type": "@id",
+      "@container": "@graph"
+    },
+    "version": {
+      "@id": "dockBBS:useDefaults",
+      "@type": "@id",
+      "@container": "@graph"
+    },
+    "Bls12381BBS+SignatureProofDock2022": {
+      "@id": "https://ld.dock.io/security#Bls12381BBS+SignatureDock2022",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "challenge": "https://ld.dock.io/security#challenge",
+        "created": {
+          "@id": "http://purl.org/dc/terms/created",
+          "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+        },
+        "domain": "https://ld.dock.io/security#domain",
+        "context": "https://ld.dock.io/security#context",
+        "attributeCiphertexts": "https://ld.dock.io/security#attributeCiphertexts",
+        "attributeEqualities": "https://ld.dock.io/security#attributeEqualities",
+        "proofValue": "https://ld.dock.io/security#proofValue",
+        "nonce": "https://ld.dock.io/security#nonce",
+        "proofPurpose": {
+          "@id": "https://ld.dock.io/security#proofPurpose",
+          "@type": "@vocab",
+          "@context": {
+            "@version": 1.1,
+            "@protected": true,
+            "id": "@id",
+            "type": "@type",
+            "assertionMethod": {
+              "@id": "https://ld.dock.io/security#assertionMethod",
+              "@type": "@id",
+              "@container": "@set"
+            },
+            "authentication": {
+              "@id": "https://ld.dock.io/security#authenticationMethod",
+              "@type": "@id",
+              "@container": "@set"
+            }
+          }
+        },
+        "verificationMethod": {
+          "@id": "https://ld.dock.io/security#verificationMethod",
+          "@type": "@id"
+        }
+      }
+    },
     "Bls12381BBS+SignatureDock2022": {
       "@id": "https://ld.dock.io/security#Bls12381BBS+SignatureDock2022",
       "@context": {

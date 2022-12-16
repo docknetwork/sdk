@@ -20,44 +20,9 @@ const residentCardSchema = {
   title: 'Resident Card Example',
   type: 'object',
   properties: {
-    '@context': {
-      title: 'Context',
-      type: 'array',
-      items: [{ type: 'string' }, { type: 'string' }, { type: 'string' }],
-    },
-    id: {
-      title: 'Id',
-      type: 'string',
-    },
-    type: {
-      title: 'Type',
-      type: 'array',
-      items: [{ type: 'string' }, { type: 'string' }],
-    },
-    identifier: {
-      title: 'identifier',
-      type: 'string',
-    },
-    name: {
-      title: 'Name',
-      type: 'string',
-    },
-    description: {
-      title: 'Desc',
-      type: 'string',
-    },
     credentialSubject: {
       type: 'object',
       properties: {
-        id: {
-          title: 'Id',
-          type: 'string',
-        },
-        type: {
-          title: 'Type',
-          type: 'array',
-          items: [{ type: 'string' }, { type: 'string' }],
-        },
         givenName: {
           title: 'Given Name',
           type: 'string',
@@ -73,18 +38,6 @@ const residentCardSchema = {
         },
       },
       required: [],
-    },
-    expirationDate: {
-      title: 'Expiration Date',
-      type: 'string',
-    },
-    issuanceDate: {
-      title: 'Issuance Date',
-      type: 'string',
-    },
-    issuer: {
-      title: 'Issuer DID',
-      type: 'string',
     },
   },
 };

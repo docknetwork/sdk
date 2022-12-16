@@ -53,7 +53,7 @@ Running dev node:
 ## Test and example Configuration
 Configuration variables like websocket endpoint for node `FullNodeEndpoint`, URI for account to pay for extrinsics `TestAccountURI`
 and keyring type `TestKeyringType` can be set as environment variables (or in an .env file). If they are not set, default values as
-specified in file [test-constants.js](./tests/test-constants.js) are used.  
+specified in file [test-constants.js](./tests/test-constants.js) are used.
 The scripts read parameters from `.env` file. The available parameters are shown in an example env file [env_example](env_example)
 
 ## Test
@@ -67,7 +67,7 @@ Run e2e integrations tests with `yarn test-integration` (required node to be run
 You can run tests against a temporary node in docker like so:
 
 ```
-./scripts/with_docker_test_node
+./scripts/with_all_docker_test_nodes
 yarn test-integration
 ```
 

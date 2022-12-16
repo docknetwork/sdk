@@ -81,6 +81,9 @@
     "test-with-node": "./scripts/with_docker_test_node yarn test-integration",
     "test-eth-with-node": "./scripts/with_docker_test_node yarn test-eth",
     "examples-with-node": "./scripts/with_docker_test_node yarn test-examples",
+    "test-with-all-nodes": "./scripts/with_all_docker_test_nodes yarn test-integration",
+    "test-eth-with-all-nodes": "./scripts/with_all_docker_test_nodes yarn test-eth",
+    "examples-with-all-nodes": "./scripts/with_all_docker_test_nodes yarn test-examples",
     "mdbook": "mdbook build tutorials --dest-dir ../out/tutorials",
     "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
   },

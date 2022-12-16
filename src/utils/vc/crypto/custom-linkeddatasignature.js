@@ -115,8 +115,12 @@ export default class CustomLinkedDataSignature extends jsigs.suites.LinkedDataSi
 
     return {
       ...proof,
-      proofValue: MULTIBASE_BASE58BTC_HEADER + base58btc.encode(signatureBytes),
+      proofValue: CustomLinkedDataSignature.encodeProofValue(signatureBytes),
     };
+  }
+
+  static encodeProofValue(signatureBytes) {
+    return MULTIBASE_BASE58BTC_HEADER + base58btc.encode(signatureBytes);
   }
 
   /**

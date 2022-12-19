@@ -2,12 +2,36 @@ name: Examples
 
 on: [pull_request]
 jobs:
-  build:
+  master:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
           node-version: '16.x'
+        env:
+          CONFIG_DOCK_NODE_IMAGE_TAG: 'master'
+      - run: yarn install --frozen-lockfile --ignore-scripts
+      - run: yarn examples-with-node
+  mainnet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+        env:
+          CONFIG_DOCK_NODE_IMAGE_TAG: 'mainnet'
+      - run: yarn install --frozen-lockfile --ignore-scripts
+      - run: yarn examples-with-node
+  testnet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+        env:
+          CONFIG_DOCK_NODE_IMAGE_TAG: 'testnet'
       - run: yarn install --frozen-lockfile --ignore-scripts
       - run: yarn examples-with-node

@@ -67,7 +67,7 @@ Run e2e integrations tests with `yarn test-integration` (required node to be run
 You can run tests against a temporary node in docker like so:
 
 ```
-./scripts/with_all_docker_test_nodes
+./scripts/with_docker_test_node
 yarn test-integration
 ```
 

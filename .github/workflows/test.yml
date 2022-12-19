@@ -1,23 +1,8 @@
-name: Build and Tests
+name: Integration tests
 
 on: [pull_request]
 jobs:
-  unit-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ibnesayeed/setup-ipfs@0.6.0
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-        with:
-          run_daemon: true
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '16.x'
-      - run: yarn install --frozen-lockfile --ignore-scripts
-      - run: yarn build
-      - run: yarn test
-  integration-tests-with-master:
+  master:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -34,7 +19,7 @@ jobs:
       - run: yarn build
       - run: yarn test
       - run: yarn test-with-node
-  integration-tests-with-mainnet:
+  mainnet:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -51,7 +36,7 @@ jobs:
       - run: yarn build
       - run: yarn test
       - run: yarn test-with-node
-  integration-tests-with-testnet:
+  testnet:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

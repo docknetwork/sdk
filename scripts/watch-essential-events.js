@@ -117,20 +117,18 @@ const {
 
 const main = async (dock, startBlock) => {
   await new Promise((resolve, reject) => {
-    // Last sequential block number to be processed.
-    // It's the minimum known block number of the unprocessed block.
-    let lastUnprocessed = startBlock;
+    // The minimum number of the unprocessed block.
+    let minUnprocessed = startBlock;
 
     return defer(() =>
       from(dock.disconnect()).pipe(
         switchMap(() => from(dock.init({ address: FullNodeEndpoint }))),
         switchMap(() => {
-          const updates$ = processBlocks(dock, lastUnprocessed);
+          const updates$ = processBlocks(dock, minUnprocessed);
 
           return updates$.pipe(
             tap((number) => {
-              console.log(number);
-              lastUnprocessed = number;
+              minUnprocessed = number;
             }),
             timeout({
               each: BlockProcessingTimeOut,
@@ -151,7 +149,7 @@ const main = async (dock, startBlock) => {
             sendAlarmEmailHtml(
               TxWatcherAlarmEmailTo,
               "Dock blockchain watcher was restarted",
-              `<h2>Due to either connection or node API problems, the dock blockchain essential notifications watcher was restarted with the last unprocessed block ${lastUnprocessed}.</h2>`
+              `<h2>Due to either connection or node API problems, the dock blockchain essential notifications watcher was restarted with the last unprocessed block ${minUnprocessed}.</h2>`
             )
           )
         )
@@ -168,11 +166,11 @@ const main = async (dock, startBlock) => {
  * @param {Observable<Block>} - blocks
  * @returns {Observable<{skipped: Set<number>, maxReceived: number, block: Block}>}
  */
-const trackSkipped = curry((startBlock, obs$) => {
+const trackSkipped = curry((startBlock, blocks$) => {
   const skipped = new Set();
   let maxReceived = startBlock != null ? (startBlock || 1) - 1 : null;
 
-  return obs$.pipe(
+  return blocks$.pipe(
     mapRx((block) => {
       const received = block.block.header.number.toNumber();
       if (maxReceived == null) {
@@ -203,11 +201,12 @@ const trackSkipped = curry((startBlock, obs$) => {
 });
 
 /**
- * Processes blocks starting with the given block number.
+ * Processes every block's extrinsics and events starting with the given block number.
+ * Returns an observable emitting the minimum sequential unprocessed block number at the moment.
  *
  * @param {*} dock
- * @param {*} startBlock
- * @returns
+ * @param {number} startBlock
+ * @returns {Observable<number>} - last unprocessed block number
  */
 const processBlocks = (dock, startBlock) => {
   const { ExtrinsicFailed } = dock.api.events.system;
@@ -220,6 +219,7 @@ const processBlocks = (dock, startBlock) => {
     return data$.pipe(mergeMap((item) => handleItem(item, dock)));
   });
 
+  // Denotes the set of currently processed blocks.
   const processing = new Set();
 
   return subscribeBlocks(dock, startBlock).pipe(
@@ -308,10 +308,10 @@ export const subscribeBlocks = curry((dock, startBlock) => {
       : EMPTY;
 
   return concat(
+    // Wait for the first block to be emitted
     currentBlocks$.pipe(first(), filterRx(F)),
     defer(() =>
       concat(
-        // Wait for the first block to be emitted
         previousBlocks$.pipe(
           trackSkipped(startBlock),
           withLatestFrom(currentBlocks$),

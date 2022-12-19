@@ -7,7 +7,6 @@ import {
   allPass,
   addIndex,
   filter,
-  reduce,
   F,
   splitAt,
   prop,
@@ -37,9 +36,13 @@ import {
   curryN,
   defaultTo,
   head,
+  reduce,
   inc,
+  min,
+  max,
 } from "ramda";
 import {
+  timeout,
   from,
   share,
   Observable,
@@ -51,24 +54,23 @@ import {
   of,
   defer,
   filter as filterRx,
+  catchError,
   concat,
   bufferTime,
   mergeMap,
+  switchMap,
   repeat,
   withLatestFrom,
   takeWhile,
-  firstValueFrom,
   shareReplay,
   scan,
   distinctUntilChanged,
+  first,
+  throwError,
+  retry,
 } from "rxjs";
-import {
-  envObj,
-  formatDock,
-  notNilAnd,
-  withDockAPI,
-  finiteNumber,
-} from "./helpers";
+import { envObj, formatDock, notNilAnd, finiteNumber } from "./helpers";
+import dock from "../src";
 import { sendAlarmEmailHtml } from "./email_utils";
 
 const {
@@ -80,6 +82,9 @@ const {
   BaseBlockExplorerUrl,
   BaseExtrinsicExplorerUrl,
   ConcurrentBlocksSyncLimit,
+  BlockProcessingTimeOut,
+  RetryDelay,
+  RetryAttempts,
 } = envObj({
   // Email to send alarm emails to.
   TxWatcherAlarmEmailTo: notNilAnd(split(",")),
@@ -102,109 +107,111 @@ const {
   BaseExtrinsicExplorerUrl: defaultTo("https://dock.subscan.io/extrinsic"),
   // Max amount of blocks to be requested concurrently when syncing.
   ConcurrentBlocksSyncLimit: o(finiteNumber, defaultTo(100)),
+  // Maximum time allowed for the block processing. The workflow will be launched if no block is processed within this time.
+  BlockProcessingTimeOut: o(finiteNumber, defaultTo(1e4)),
+  // Denotes how much time will be waiting prior to reconnecting.
+  RetryDelay: o(finiteNumber, defaultTo(3e4)),
+  // Amount of retry attempts before exiting with 1 code.
+  RetryAttempts: o(finiteNumber, defaultTo(3)),
 });
 
 const main = async (dock, startBlock) => {
-  const { ExtrinsicFailed } = dock.api.events.system;
-  const mergeEventsWithExtrs = createTxWithEventsCombinator(dock);
+  await new Promise((resolve, reject) => {
+    // Last sequential block number to be processed.
+    // It's the minimum known block number of the unprocessed block.
+    let lastUnprocessed = startBlock;
 
-  // Emits recently created blocks
-  const currentBlocks$ = new Observable((sub) => {
-    dock.api.derive.chain.subscribeNewBlocks((block) => {
-      sub.next(block);
-    });
-  }).pipe(shareReplay(1));
+    return defer(() =>
+      from(dock.disconnect()).pipe(
+        switchMap(() => from(dock.init({ address: FullNodeEndpoint }))),
+        switchMap(() => {
+          const updates$ = processBlocks(dock, lastUnprocessed);
 
-  await firstValueFrom(currentBlocks$);
-
-  // Emits blocks starting from the specified number
-  const previousBlocks$ =
-    startBlock != null
-      ? defer(() => {
-          const blocks$ = of(startBlock).pipe(
-            repeat(ConcurrentBlocksSyncLimit),
-            repeat({
-              delay: () => blocks$,
+          return updates$.pipe(
+            tap((number) => {
+              console.log(number);
+              lastUnprocessed = number;
             }),
-            withLatestFrom(currentBlocks$),
-            scan((lastBlockNumber, [startBlockNumber, lastBlock]) => {
-              const nextBlockNumber =
-                lastBlockNumber == null
-                  ? startBlockNumber
-                  : inc(lastBlockNumber);
+            timeout({
+              each: BlockProcessingTimeOut,
+              with: () => {
+                console.log(`Timeout exceeded`);
 
-              if (lastBlock.block.header.number.toNumber() >= nextBlockNumber) {
-                return nextBlockNumber;
-              } else {
-                return lastBlockNumber;
-              }
-            }, null),
-            distinctUntilChanged(),
-            mergeMap(
-              (number) =>
-                of(number).pipe(
-                  concatMap((number) =>
-                    from(dock.api.rpc.chain.getBlockHash(number))
-                  ),
-                  concatMap((hash) =>
-                    from(dock.api.derive.chain.getBlock(hash))
-                  )
-                ),
-              ConcurrentBlocksSyncLimit
-            ),
-            share()
+                return throwError(() => `Timeout exceeded`);
+              },
+            })
           );
-
-          return blocks$;
         })
-      : EMPTY;
-
-  const blocks$ = concat(
-    previousBlocks$.pipe(
-      withLatestFrom(currentBlocks$),
-      concatMap(([latestSyncedBlock, currentBlock]) => {
-        const curNumber = currentBlock.block.header.number.toNumber(),
-          lastSyncedNumber = latestSyncedBlock.block.header.number.toNumber();
-        const done = curNumber === lastSyncedNumber + 1;
-
-        if (done) {
-          return of(latestSyncedBlock, null);
-        } else {
-          return of(latestSyncedBlock);
-        }
-      }),
-      takeWhile(Boolean)
-    ),
-    of(null).pipe(
-      tap(() => console.log("Listening for new blocks")),
-      filterRx(Boolean)
-    ),
-    currentBlocks$
-  );
-
-  // Flattens extrinsics returning transaction along with produced events
-  const txs$ = blocks$
-    .pipe(
-      concatMap((block) =>
-        from(
-          block.extrinsics.flatMap(({ extrinsic, events }) => {
-            return ExtrinsicFailed.is(last(events))
-              ? []
-              : mergeEventsWithExtrs(events, extrinsic, {
-                  rootTx: extrinsic,
-                  config: 0,
-                }).extrinsics;
-          })
-        ).pipe(mapRx(assoc("block", block)))
       )
     )
-    .pipe(share());
-  // Each event repeats its transaction
-  const events$ = txs$.pipe(
-    concatMap(({ events, ...rest }) =>
-      from(events).pipe(mapRx((event) => ({ event, events, ...rest })))
-    )
+      .pipe(
+        retry({ delay: RetryDelay, count: RetryAttempts }),
+        catchError(() =>
+          from(
+            sendAlarmEmailHtml(
+              TxWatcherAlarmEmailTo,
+              "Dock blockchain watcher was restarted",
+              `<h2>Due to either connection or node API problems, the dock blockchain essential notifications watcher was restarted with the last unprocessed block ${lastUnprocessed}.</h2>`
+            )
+          )
+        )
+      )
+      .subscribe({ complete: () => resolve(null), error: reject });
+  });
+};
+
+/**
+ * Keeps track of the skipped blocks producing by `blocks$` observable treating `startBlock` as initial block.
+ * Used to have the state of non-processed blocks.
+ *
+ * @param {startBlock?} - initial sync block
+ * @param {Observable<Block>} - blocks
+ * @returns {Observable<{skipped: Set<number>, maxReceived: number, block: Block}>}
+ */
+const trackSkipped = curry((startBlock, obs$) => {
+  const skipped = new Set();
+  let maxReceived = startBlock != null ? (startBlock || 1) - 1 : null;
+
+  return obs$.pipe(
+    mapRx((block) => {
+      const received = block.block.header.number.toNumber();
+      if (maxReceived == null) {
+        maxReceived = received;
+      }
+
+      if (!skipped.delete(received) && received < maxReceived) {
+        console.log(
+          `Syncing failure: skipped - `,
+          skipped,
+          "received - ",
+          received,
+          "maxReceived - ",
+          maxReceived
+        );
+      }
+
+      // Keep track of all the blocks which are missing.
+      // They must be received later and processed, and in case of sync failure, we'll use the min number as the start block.
+      for (let i = maxReceived + 1; i < received; i++) {
+        skipped.add(i);
+      }
+      maxReceived = max(received, maxReceived);
+
+      return { maxReceived, block, skipped };
+    })
   );
+});
+
+/**
+ * Processes blocks starting with the given block number.
+ *
+ * @param {*} dock
+ * @param {*} startBlock
+ * @returns
+ */
+const processBlocks = (dock, startBlock) => {
+  const { ExtrinsicFailed } = dock.api.events.system;
+  const mergeEventsWithExtrs = createTxWithEventsCombinator(dock);
 
   // Applies filters to the given observable
   const applyFilters = curry((filters, data$) => {
@@ -213,30 +220,171 @@ const main = async (dock, startBlock) => {
     return data$.pipe(mergeMap((item) => handleItem(item, dock)));
   });
 
-  const res$ = merge(
-    txs$.pipe(
-      tap(LogLevel === "debug" ? logTx : identity),
-      applyFilters(txFilters)
-    ),
-    events$.pipe(applyFilters(eventFilters))
-  ).pipe(
-    batchNotifications(BatchNoficationTimeout),
-    tap((email) => console.log("Sending email: ", email)),
-    mergeMap(
-      o(
-        from,
-        sendAlarmEmailHtml(
-          TxWatcherAlarmEmailTo,
-          "Dock blockchain alarm notification"
+  const processing = new Set();
+
+  return subscribeBlocks(dock, startBlock).pipe(
+    trackSkipped(startBlock),
+    mergeMap(({ block, skipped, maxReceived }) => {
+      // Flattens extrinsics returning transaction along with produced events
+      const txs$ = from(
+        block.extrinsics.flatMap(({ extrinsic, events }) => {
+          return ExtrinsicFailed.is(last(events))
+            ? []
+            : mergeEventsWithExtrs(events, extrinsic, {
+                rootTx: extrinsic,
+                config: 0,
+              }).extrinsics;
+        })
+      )
+        .pipe(mapRx(assoc("block", block)))
+        .pipe(share());
+
+      // Each event repeats its transaction
+      const events$ = txs$.pipe(
+        concatMap(({ events, ...rest }) =>
+          from(events).pipe(mapRx((event) => ({ event, events, ...rest })))
         )
+      );
+
+      const handleBlock$ = merge(
+        txs$.pipe(
+          tap(LogLevel === "debug" ? logTx : identity),
+          applyFilters(txFilters)
+        ),
+        events$.pipe(applyFilters(eventFilters))
+      ).pipe(
+        batchNotifications(BatchNoficationTimeout),
+        tap((email) => console.log("Sending email: ", email)),
+        mergeMap(
+          o(
+            from,
+            sendAlarmEmailHtml(
+              TxWatcherAlarmEmailTo,
+              "Dock blockchain alarm notification"
+            )
+          )
+        )
+      );
+
+      const number = block.block.header.number.toNumber();
+
+      return concat(
+        defer(() => {
+          processing.add(number);
+
+          return of(reduce(min, number, [...skipped, ...processing]));
+        }),
+        handleBlock$.pipe(tap(console.log), filterRx(F)),
+        defer(() => {
+          processing.delete(number);
+
+          return of(reduce(min, maxReceived + 1, [...skipped, ...processing]));
+        })
+      );
+    })
+  );
+};
+
+/**
+ * Subscribes to blocks starting with the given block number.
+ * Returns an observable emitting blocks.
+ *
+ * @param {*} dock
+ * @param {*} startBlock
+ * @returns {Observable<Block>}
+ */
+export const subscribeBlocks = curry((dock, startBlock) => {
+  // Emits recently created blocks
+  const currentBlocks$ = new Observable((sub) => {
+    dock.api.derive.chain.subscribeNewBlocks((block) => {
+      sub.next(block);
+    });
+  }).pipe(shareReplay(1));
+
+  // Emits blocks starting from the specified number
+  const previousBlocks$ =
+    startBlock != null
+      ? defer(() => syncPrevousBlocks(dock, startBlock, currentBlocks$))
+      : EMPTY;
+
+  return concat(
+    currentBlocks$.pipe(first(), filterRx(F)),
+    defer(() =>
+      concat(
+        // Wait for the first block to be emitted
+        previousBlocks$.pipe(
+          trackSkipped(startBlock),
+          withLatestFrom(currentBlocks$),
+          concatMap(
+            ([
+              { block: latestSyncedBlock, skipped, maxReceived },
+              currentBlock,
+            ]) => {
+              const curNumber = currentBlock.block.header.number.toNumber();
+              const done = curNumber === maxReceived && skipped.size === 0;
+
+              if (done) {
+                return of(latestSyncedBlock, null);
+              } else {
+                return of(latestSyncedBlock);
+              }
+            }
+          ),
+          takeWhile(Boolean)
+        ),
+        defer(() => {
+          console.log("Listening for new blocks");
+
+          return EMPTY;
+        }),
+        currentBlocks$
       )
     )
   );
+});
 
-  await new Promise((resolve, reject) =>
-    res$.subscribe({ complete: () => resolve(null), error: reject })
+/**
+ * Syncs blocks starting with the given block number.
+ * Returns an observable emitting blocks.
+ *
+ * @param {*} dock
+ * @param {*} startBlock
+ * @param {Observable<Block>} currentBlocks$ - emits recent blocks
+ * @returns {Observable<Block>}
+ */
+const syncPrevousBlocks = curry((dock, startBlock, currentBlocks$) => {
+  console.log(`Syncing blocks starting from ${startBlock}`);
+
+  const blocks$ = of(startBlock).pipe(
+    repeat(ConcurrentBlocksSyncLimit),
+    repeat({
+      delay: () => blocks$,
+    }),
+    withLatestFrom(currentBlocks$),
+    scan((lastBlockNumber, [startBlockNumber, lastBlock]) => {
+      const nextBlockNumber =
+        lastBlockNumber == null ? startBlockNumber : inc(lastBlockNumber);
+
+      if (lastBlock.block.header.number.toNumber() >= nextBlockNumber) {
+        return nextBlockNumber;
+      } else {
+        return lastBlockNumber;
+      }
+    }, null),
+    distinctUntilChanged(),
+    mergeMap(
+      (number) =>
+        of(number).pipe(
+          concatMap((number) => from(dock.api.rpc.chain.getBlockHash(number))),
+          concatMap((hash) => from(dock.api.derive.chain.getBlock(hash)))
+        ),
+      ConcurrentBlocksSyncLimit
+    ),
+    share()
   );
-};
+
+  return blocks$;
+});
 
 /**
  * Batches notifications received from the observable.
@@ -807,10 +955,7 @@ const createTxWithEventsCombinator = (dock) => {
   return mergeEventsWithExtrs;
 };
 
-withDockAPI(
-  { address: FullNodeEndpoint },
-  main
-)(StartBlock)
+main(dock, StartBlock)
   .then(() => process.exit(0))
   .catch((err) => {
     console.error(err);

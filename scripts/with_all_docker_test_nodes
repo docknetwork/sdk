@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -ueo pipefail
+
+source $(dirname $0)/config
+
+root_dir="$(dirname $0)/.."
+
+declare -a images=("$CONFIG_DOCK_NODE_MASTER_IMAGE" "$CONFIG_DOCK_NODE_MAINNET_IMAGE" "$CONFIG_DOCK_NODE_TESTNET_IMAGE")
+
+for image in "${images[@]}"
+do
+    CONFIG_DOCK_NODE_IMAGE=$image bash "$root_dir/scripts/with_docker_test_node" $@
+done
+
+exit 0

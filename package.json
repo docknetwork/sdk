@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "2.9.2",
+  "version": "2.10.0",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -81,12 +81,15 @@
     "test-with-node": "./scripts/with_docker_test_node yarn test-integration",
     "test-eth-with-node": "./scripts/with_docker_test_node yarn test-eth",
     "examples-with-node": "./scripts/with_docker_test_node yarn test-examples",
+    "test-with-all-nodes": "./scripts/with_all_docker_test_nodes yarn test-integration",
+    "test-eth-with-all-nodes": "./scripts/with_all_docker_test_nodes yarn test-eth",
+    "examples-with-all-nodes": "./scripts/with_all_docker_test_nodes yarn test-examples",
     "mdbook": "mdbook build tutorials --dest-dir ../out/tutorials",
     "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
   },
   "dependencies": {
     "@docknetwork/crypto-wasm-ts": "0.31.1",
-    "@docknetwork/node-types": "^0.13.0",
+    "@docknetwork/node-types": "^0.15.0",
     "@juanelas/base64": "^1.0.5",
     "@polkadot/api": "9.7.1",
     "@polkadot/keyring": "10.1.11",

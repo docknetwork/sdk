@@ -136,9 +136,12 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
     credBuilder.subject = credentialSubject;
     credBuilder.credStatus = credentialStatus;
 
-    Object.keys(custom).forEach((k) => {
+    Object.keys(custom).sort().forEach((k) => {
       credBuilder.setTopLevelField(k, custom[k]);
     });
+
+    credBuilder.setTopLevelField('@context', JSON.stringify(document['@context']));
+    credBuilder.setTopLevelField('type', JSON.stringify(document.type));
 
     const retval = credBuilder.updateSchemaIfNeeded(signingOptions);
     return [retval, credBuilder.schema];

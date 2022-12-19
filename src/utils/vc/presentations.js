@@ -209,13 +209,13 @@ export async function signPresentation(presentation, keyDoc, challenge, domain, 
   });
 }
 
-function isBBSPlusPresentation(presentation) {
+export function isBBSPlusPresentation(presentation) {
   // Since there is no type parameter present we have to guess by checking field types
   // these wont exist in a standard VP
   return typeof presentation.version === 'string' && typeof presentation.proof === 'string' && typeof presentation.spec !== 'undefined' && typeof presentation.spec.credentials !== 'undefined';
 }
 
-async function verifyBBSPlusPresentation(presentation, options = {}) {
+export async function verifyBBSPlusPresentation(presentation, options = {}) {
   const documentLoader = options.documentLoader || defaultDocumentLoader(options.resolver);
 
   const keyDocuments = await Promise.all(presentation.spec.credentials.map((c, idx) => {

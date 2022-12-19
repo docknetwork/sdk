@@ -5,13 +5,13 @@ import {
   PresentationBuilder,
   Credential,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
-import { ensureArray, ensureURI, isObject } from './utils/type-helpers';
+import { ensureArray } from './utils/type-helpers';
 
 import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';
+import { Bls12381BBSSigProofDockSigName } from './utils/vc/crypto/constants';
 import CustomLinkedDataSignature from './utils/vc/crypto/custom-linkeddatasignature';
 import defaultDocumentLoader from './utils/vc/document-loader';
 
-const DEFAULT_CONTEXT = 'https://ld.dock.io/security/bbs/v1';
 export default class BbsPlusPresentation {
   /**
    * Create a new BbsPlusPresentation instance.
@@ -19,7 +19,6 @@ export default class BbsPlusPresentation {
    */
   constructor() {
     this.presBuilder = new PresentationBuilder();
-    this.setPresentationContext([DEFAULT_CONTEXT]);
   }
 
   /**
@@ -43,7 +42,7 @@ export default class BbsPlusPresentation {
       this.presBuilder.nonce = stringToU8a(nonce);
     }
     if (context) {
-      this.setPresentationContext(context);
+      this.presBuilder.context = context;
     }
     const pres = this.presBuilder.finalize();
     return pres.toJSON();
@@ -83,22 +82,54 @@ export default class BbsPlusPresentation {
       document: json,
     });
 
-    const idx = await this.presBuilder.addCredential(Credential.fromJSON(credential, CustomLinkedDataSignature.fromJsigProofValue(credentialLD.proof.proofValue)), pk);
+    const convertedCredential = Credential.fromJSON(credential, CustomLinkedDataSignature.fromJsigProofValue(credentialLD.proof.proofValue));
+    console.log('convertedCredential', convertedCredential.toJSON());
+    const idx = await this.presBuilder.addCredential(convertedCredential, pk);
 
     // Enforce revealing of verificationMethod and type
     this.addAttributeToReveal(idx, ['proof.type']);
     this.addAttributeToReveal(idx, ['proof.verificationMethod']);
+
+    // We also require context and type for JSON-LD
+    this.addAttributeToReveal(idx, ['@context']);
+    this.addAttributeToReveal(idx, ['type']);
     return idx;
   }
 
-  /**
-   *
-   * @param context
-   */
-  setPresentationContext(context) {
-    if (!isObject(context) && !Array.isArray(context)) {
-      ensureURI(context);
+  deriveCredentials(options) {
+    const presentation = this.createPresentation(options);
+    const { credentials } = presentation.spec;
+    if (credentials.length > 1) {
+      throw new Error('Cannot derive from multiple credentials in a presentation');
     }
-    this.presBuilder.context = context;
+
+    return credentials.map((credential) => {
+      if (!credential.revealedAttributes.proof) {
+        throw new Error('Credential proof is not revealed, it should be');
+      }
+
+      const date = new Date().toISOString();
+
+      return {
+        ...credential.revealedAttributes,
+        '@context': JSON.parse(credential.revealedAttributes['@context']),
+        type: JSON.parse(credential.revealedAttributes.type),
+        credentialSchema: JSON.parse(credential.schema),
+        issuer: credential.revealedAttributes.issuer || credential.revealedAttributes.proof.verificationMethod.split('#')[0],
+        issuanceDate: credential.revealedAttributes.issuanceDate || date,
+        proof: {
+          proofPurpose: 'assertionMethod',
+          created: date,
+          ...credential.revealedAttributes.proof,
+          type: Bls12381BBSSigProofDockSigName,
+          proofValue: presentation.proof,
+          nonce: presentation.nonce,
+          context: presentation.context,
+          attributeCiphertexts: presentation.attributeCiphertexts,
+          attributeEqualities: presentation.spec.attributeEqualities,
+          version: credential.version,
+        },
+      };
+    });
   }
 }

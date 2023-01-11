@@ -32,7 +32,6 @@ import {
   complement,
   split,
   reduceBy,
-  equals,
   either,
 } from "ramda";
 
@@ -44,10 +43,12 @@ import {
   timeout,
   finiteNumber,
   formatDock,
+  parseBool,
   withDockAPI,
 } from "./helpers";
+import dotenv from "dotenv";
 
-require("dotenv").config();
+dotenv.config();
 
 const {
   FullNodeEndpoint,
@@ -62,6 +63,8 @@ const {
   TxFinalizationTimeout,
   IterationTimeout,
   FinalizeTx,
+  TargetStashIds,
+  TargetAllValidatorsMatchingCriteria,
 } = envObj({
   // Address of the node RPC.
   FullNodeEndpoint: notNilAnd(String),
@@ -77,17 +80,27 @@ const {
   ConcurrentTxLimit: o(finiteNumber, defaultTo(5)),
   // Timeout to wait before retry transaction. In ms.
   RetryTimeout: o(finiteNumber, defaultTo(5e3)),
-  // Max commission allowed to be set for validators. Default to 5%.
+  // Max commission allowed to be set for validators. Default is 5%. Used as a criteria if `TargetAllValidatorsMatchingCriteria` is enabled.
   MaxCommission: o((val) => new BN(val), defaultTo("50000000")),
-  // Min account balance to ring alarm.
+  // Min account balance to ring the alarm.
   AlarmBalance: notNilAnd((val) => new BN(val)),
   // Time to wait for transaction to be finalized. In ms.
   TxFinalizationTimeout: o(finiteNumber, defaultTo(3e4)),
   // Time to wait for all payments to be sent in an iteration before returning with an error. In ms.
   IterationTimeout: o(finiteNumber, defaultTo(4e5)),
   // Finalize the transaction or just wait for it to be included in the block.
-  FinalizeTx: either(equals("true"), o(Boolean, Number)),
+  FinalizeTx: parseBool,
+  // List of validator stashes to make payouts to independently of matching criteria or not.
+  TargetStashIds: pipe(defaultTo(""), split(","), reject(isEmpty)),
+  // Target all validators matching criteria along with targeting supplied stash id list.
+  TargetAllValidatorsMatchingCriteria: parseBool,
 });
+
+if (!TargetAllValidatorsMatchingCriteria && TargetStashIds.length === 0) {
+  throw new Error(
+    `No target validators were found. You can provide list of validator stash ids by specifying \`TargetStashIds\` or force all validators to be checked by setting \`TargetAllValidatorsMatchingCriteria\` to \`true\``
+  );
+}
 
 const main = withDockAPI(
   {
@@ -122,7 +135,7 @@ const main = withDockAPI(
 
     if (needToRecheck) {
       // Check payouts again with a batch size of 1
-      // This needed to execute valid transactions packed in invalid batches
+      // This is needed to execute valid transactions packed in invalid batches
       console.log("Checking payouts again:");
       await timeout(
         IterationTimeout,
@@ -145,6 +158,24 @@ const main = withDockAPI(
 );
 
 /**
+ * @typedef EraInfo
+ * @prop {*} points
+ * @prop {*} rewards
+ * @prop {*} prefs
+ */
+
+/**
+ * Ensures that validator comission is less or equal to the supplied value.
+ * @param {BN} maxComission
+ * @param {string} stashId
+ * @param {*} EraInfo
+ * @returns {bool}
+ */
+const ensureComissionLessOrEqualTo = curry((maxComission, stashId, { prefs }) =>
+  prefs.validators[stashId]?.commission?.toBn().lte(maxComission)
+);
+
+/**
  * Sends staking payouts for recent eras using the given sender account.
  *
  * @param {DockAPI} dock
@@ -154,27 +185,56 @@ const main = withDockAPI(
  * @returns {Promise<boolean>} - `true` if some unpaid eras were found, `false` otherwise
  */
 async function sendStakingPayouts(dock, erasInfo, initiator, batchSize) {
-  const validators = pipe(
-    values,
-    pluck("validators"),
-    chain(keys),
-    (values) => new Set(values)
-  )(erasInfo.pointsByEra);
+  const targetValidatorStashIds = new Set(TargetStashIds);
 
-  if (!validators.size) {
+  let validatorStashIds;
+  if (TargetAllValidatorsMatchingCriteria) {
+    const eraValidators = pipe(
+      values,
+      pluck("validators"),
+      chain(keys),
+      (valitors) => new Set(valitors)
+    )(erasInfo.pointsByEra);
+
+    console.log(
+      `- Payouts will be made to target validator stashes ${JSON.stringify([
+        ...targetValidatorStashIds,
+      ])} and all validators matching criteria`
+    );
+    validatorStashIds = new Set([...eraValidators, ...targetValidatorStashIds]);
+  } else {
+    console.log(
+      `- Payouts will be made only to target validator stashes ${JSON.stringify(
+        [...targetValidatorStashIds]
+      )}`
+    );
+    validatorStashIds = targetValidatorStashIds;
+  }
+
+  if (!validatorStashIds.size) {
     console.log("- Validator set is empty.");
     return false;
   }
 
   console.log("- Retrieving validator eras...");
   const erasToBePaid = await lastValueFrom(
-    from(validators).pipe(
+    from(validatorStashIds).pipe(
       getUnclaimedStashesEras(dock.api, erasInfo),
       toArray()
     )
   );
 
-  const rewards = pipe(buildValidatorRewards, toPairs)(erasInfo, erasToBePaid);
+  // Payout validator if it's either in a target list or satisfies criteria.
+  const checkValidator = either(
+    (validatorStashId) => targetValidatorStashIds.has(validatorStashId),
+    ensureComissionLessOrEqualTo(MaxCommission)
+  );
+
+  const rewards = pipe(buildValidatorRewards, toPairs)(
+    checkValidator,
+    erasInfo,
+    erasToBePaid
+  );
 
   if (isEmpty(rewards)) {
     console.log("- No unpaid validator rewards found for recent eras.");
@@ -193,7 +253,7 @@ async function sendStakingPayouts(dock, erasInfo, initiator, batchSize) {
   }
 
   const logResult = ({ result, tx }) => {
-    // Ther's a much better way to check this...
+    // There's a much better way to check this...
     const isBatch = tx.method.args?.[0]?.[0] instanceof Map;
 
     let msg = " * ";
@@ -386,7 +446,7 @@ const signAndSendExtrinsics = curry((dock, initiator, txs$) => {
             console.error(` * Transaction failed: ${error}`);
             const stringified = error.toString().toLowerCase();
 
-            // Filter out errors related to balance and double-claim
+            // Filter out errors related to balance, election and double-claim
             if (
               stringified.includes("balance") ||
               stringified.includes("alreadyclaimed") ||
@@ -409,29 +469,40 @@ const signAndSendExtrinsics = curry((dock, initiator, txs$) => {
 /**
  * Groups eras having some reward to be paid by validator stash accounts.
  *
+ * @param {function(string, EraInfo): boolean} checkValidatorInEra - checks if validator in the era has an acceptable configuration
  * @param {ErasInfo} erasInfo
  * @param {Array<{ stashId: string, eras: Array<BN> }>} validatorEras
  *
  * @returns {Object<string, { era: BN, reward: BN }>}
  */
 const buildValidatorRewards = curry(
-  ({ pointsByEra, rewardsByEra, prefsByEra }, validatorEras) => {
+  (
+    checkValidatorInEra,
+    { pointsByEra, rewardsByEra, prefsByEra },
+    validatorEras
+  ) => {
     const stashErasReducer = (acc, { eras, stashId }) => {
       const eraReducer = (acc, era) => {
         const eraKey = era.toString();
         const eraPoints = pointsByEra[eraKey];
         const eraRewards = rewardsByEra[eraKey];
         const eraPrefs = prefsByEra[eraKey];
+        const eraInfo = {
+          points: eraPoints,
+          rewards: eraRewards,
+          prefs: eraPrefs,
+        };
 
         if (
           // Points must be greater than 0
           eraPoints?.eraPoints.gt(new BN(0)) &&
           // We must have a stash as a validator in the given era
           eraPoints?.validators[stashId] &&
-          // Era rewards should be defined
+          // Era rewards and prefs should be defined
           eraRewards &&
-          // Validator commission in the given era should be acceptable
-          eraPrefs.validators[stashId]?.commission?.toBn().lte(MaxCommission)
+          eraPrefs &&
+          // Validator configuration in the era should be acceptable
+          checkValidatorInEra(stashId, eraInfo)
         ) {
           const reward = eraPoints.validators[stashId]
             .mul(eraRewards.eraReward)

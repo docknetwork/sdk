@@ -52,16 +52,6 @@ exports[`Fees bbsPlus 9`] = `0`;
 
 exports[`Fees blobs 1`] = `90`;
 
-exports[`Fees democracy.notePreimage 1`] = `45020`;
-
-exports[`Fees democracy.notePreimage 2`] = `20020`;
-
-exports[`Fees democracy.notePreimageOperational 1`] = `90120`;
-
-exports[`Fees democracy.notePreimageOperational 2`] = `40120`;
-
-exports[`Fees democracy.notePreimageOperational 3`] = `40040`;
-
 exports[`Fees dids 1`] = `0`;
 
 exports[`Fees dids 2`] = `10`;

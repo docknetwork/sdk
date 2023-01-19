@@ -8,8 +8,9 @@ import {
   SignatureParamsG1,
   WitnessUpdatePublicInfo,
 } from "@docknetwork/crypto-wasm-ts";
+import { DockAPI } from "../../src/index";
+import { BN, hexToU8a, stringToHex, u8aToHex } from "@polkadot/util";
 import { randomAsHex } from "@polkadot/util-crypto";
-import dock from "../../src/index";
 import { createNewDockDID } from "../../src/utils/did";
 import { getPublicKeyFromKeyringPair } from "../../src/utils/misc";
 import {
@@ -19,7 +20,6 @@ import {
 import { BLOB_MAX_BYTE_SIZE } from "../../src/modules/blob";
 import { DidKey, VerificationRelationship } from "../../src/public-keys";
 import { ServiceEndpointType } from "../../src/modules/did/service-endpoint";
-import { BN, hexToU8a, stringToHex, u8aToHex } from "@polkadot/util";
 import BBSPlusModule from "../../src/modules/bbs-plus";
 import AccumulatorModule from "../../src/modules/accumulator";
 import {
@@ -28,25 +28,27 @@ import {
   TestKeyringOpts,
 } from "../test-constants";
 
-async function getBalance(api, account) {
-  const { data: balance } = await api.query.system.account(account);
-  return balance;
-}
-
-function getDidPair() {
-  const did = createNewDockDID();
-  const seed = randomAsHex(32);
-  const pair = dock.keyring.addFromUri(seed, null, "sr25519");
-  const publicKey = getPublicKeyFromKeyringPair(pair);
-  const didKey = new DidKey(publicKey, new VerificationRelationship());
-  return [did, pair, didKey];
-}
-
-async function getRuntimeVersion() {
-  return await dock.api.rpc.state.getRuntimeVersion();
-}
-
 describe("Fees", () => {
+  const dock = new DockAPI();
+
+  async function getBalance(account) {
+    const { data: balance } = await dock.api.query.system.account(account);
+    return balance;
+  }
+
+  function getDidPair() {
+    const did = createNewDockDID();
+    const seed = randomAsHex(32);
+    const pair = dock.keyring.addFromUri(seed, null, "sr25519");
+    const publicKey = getPublicKeyFromKeyringPair(pair);
+    const didKey = new DidKey(publicKey, new VerificationRelationship());
+    return [did, pair, didKey];
+  }
+
+  async function getRuntimeVersion() {
+    return await dock.api.rpc.state.getRuntimeVersion();
+  }
+
   beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
@@ -65,42 +67,58 @@ describe("Fees", () => {
     await dock.disconnect();
   }, 10000);
 
-  const withPaidFeeMatchingSnapshot = async (
-    execTx,
-    applyToAfter = Object.create(null)
+  const withPaidFeeAssertion = async (
+    assert,
+    sendTx,
+    applyToBefore = Object.create(null)
   ) => {
     const { address } = dock.getAccount();
-    const before = await getBalance(dock.api, address);
-    await execTx();
-    const after = await getBalance(dock.api, address);
+    const before = await getBalance(address);
+    await sendTx();
+    const after = await getBalance(address);
     // Compare values with `10 DOCK` precision
-    expect(Math.round((before.free - after.free) / 1e7) * 10).toMatchSnapshot();
+    assert(Math.round((before.free - after.free) / 1e7) * 10);
 
     for (const prop of ["feeFrozen", "reserved", "miscFrozen"]) {
-      const compareWith = applyToAfter[prop]
-        ? applyToAfter[prop](before[prop])
+      const beforeProp = applyToBefore[prop]
+        ? applyToBefore[prop](before[prop])
         : before[prop];
 
       expect([prop, "=", after[prop].toString()]).toEqual([
         prop,
         "=",
-        compareWith.toString(),
+        beforeProp.toString(),
       ]);
     }
   };
 
-  const withPaidFeeThrowingMatchingSnapshot = async (
-    execTx,
-    applyToAfter = Object.create(null)
+  const withPaidFeeMatchingSnapshot = (
+    sendTx,
+    applyToBefore = Object.create(null)
+  ) =>
+    withPaidFeeAssertion(
+      (fee) => expect(fee).toMatchSnapshot(),
+      sendTx,
+      applyToBefore
+    );
+
+  const throwingWithPaidFeeAssertion = async (
+    assert,
+    sendTx,
+    applyToBefore
   ) => {
     let throwed = false;
-    await withPaidFeeMatchingSnapshot(async () => {
-      try {
-        await execTx();
-      } catch {
-        throwed = true;
-      }
-    }, applyToAfter);
+    await withPaidFeeAssertion(
+      assert,
+      async () => {
+        try {
+          await sendTx();
+        } catch {
+          throwed = true;
+        }
+      },
+      applyToBefore
+    );
     expect(throwed).toBe(true);
   };
 
@@ -631,12 +649,13 @@ describe("Fees", () => {
     const runtimeVersion = await getRuntimeVersion();
     const specVersion = runtimeVersion.specVersion.toNumber();
 
-    if (process.env.DISABLE_PREIMAGE_TESTS || specVersion < 44) {
+    if (process.env.DISABLE_DEMOCRACY_PREIMAGE_TESTS || specVersion < 44) {
       return;
     }
 
     const preimage = randomAsHex(2e6);
-    await withPaidFeeMatchingSnapshot(
+    await withPaidFeeAssertion(
+      (fee) => expect(fee).toBe(45020),
       () =>
         dock.signAndSend(dock.api.tx.democracy.notePreimage(preimage), false),
       {
@@ -645,8 +664,10 @@ describe("Fees", () => {
       }
     );
 
-    await withPaidFeeThrowingMatchingSnapshot(() =>
-      dock.signAndSend(dock.api.tx.democracy.notePreimage(preimage), false)
+    await throwingWithPaidFeeAssertion(
+      (fee) => expect(fee).toBe(20020),
+      () =>
+        dock.signAndSend(dock.api.tx.democracy.notePreimage(preimage), false)
     );
   }, 30000);
 
@@ -654,7 +675,7 @@ describe("Fees", () => {
     const runtimeVersion = await getRuntimeVersion();
     const specVersion = runtimeVersion.specVersion.toNumber();
 
-    if (process.env.DISABLE_PREIMAGE_TESTS || specVersion < 44) {
+    if (process.env.DISABLE_DEMOCRACY_PREIMAGE_TESTS || specVersion < 44) {
       return;
     }
 
@@ -662,7 +683,8 @@ describe("Fees", () => {
     const stashAccount = dock.keyring.addFromUri("//Charlie", null, "sr25519");
     dock.setAccount(stashAccount);
 
-    await withPaidFeeMatchingSnapshot(
+    await withPaidFeeAssertion(
+      (fee) => expect(fee).toBe(90120),
       () =>
         dock.signAndSend(
           dock.api.tx.council.execute(
@@ -677,21 +699,25 @@ describe("Fees", () => {
       }
     );
 
-    await withPaidFeeMatchingSnapshot(() =>
-      dock.signAndSend(
-        dock.api.tx.council.execute(
-          dock.api.tx.democracy.notePreimageOperational(preimage),
-          preimage.length
-        ),
-        false
-      )
+    await throwingWithPaidFeeAssertion(
+      (fee) => expect(fee).toBe(40120),
+      () =>
+        dock.signAndSend(
+          dock.api.tx.council.execute(
+            dock.api.tx.democracy.notePreimageOperational(preimage),
+            preimage.length
+          ),
+          false
+        )
     );
 
-    await withPaidFeeThrowingMatchingSnapshot(() =>
-      dock.signAndSend(
-        dock.api.tx.democracy.notePreimageOperational(preimage),
-        false
-      )
+    await throwingWithPaidFeeAssertion(
+      (fee) => expect(fee).toBe(40040),
+      () =>
+        dock.signAndSend(
+          dock.api.tx.democracy.notePreimageOperational(preimage),
+          false
+        )
     );
   }, 30000);
 });

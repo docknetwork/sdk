@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CONFIG_DOCK_NODE_IMAGE_TAG: 'testnet'
-      DISABLE_PREIMAGE_TESTS: true
+      DISABLE_DEMOCRACY_PREIMAGE_TESTS: true
     steps:
       - uses: actions/checkout@v2
       - uses: ibnesayeed/setup-ipfs@0.6.0

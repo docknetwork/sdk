@@ -1,0 +1,123 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Fees accumulator 1`] = `10`;
+
+exports[`Fees accumulator 2`] = `10`;
+
+exports[`Fees accumulator 3`] = `10`;
+
+exports[`Fees accumulator 4`] = `10`;
+
+exports[`Fees accumulator 5`] = `10`;
+
+exports[`Fees accumulator 6`] = `10`;
+
+exports[`Fees accumulator 7`] = `10`;
+
+exports[`Fees accumulator 8`] = `10`;
+
+exports[`Fees accumulator 9`] = `10`;
+
+exports[`Fees accumulator 10`] = `10`;
+
+exports[`Fees accumulator 11`] = `10`;
+
+exports[`Fees accumulator 12`] = `10`;
+
+exports[`Fees accumulator 13`] = `10`;
+
+exports[`Fees accumulator 14`] = `10`;
+
+exports[`Fees accumulator 15`] = `10`;
+
+exports[`Fees anchors 1`] = `0`;
+
+exports[`Fees bbsPlus 1`] = `10`;
+
+exports[`Fees bbsPlus 2`] = `10`;
+
+exports[`Fees bbsPlus 3`] = `10`;
+
+exports[`Fees bbsPlus 4`] = `10`;
+
+exports[`Fees bbsPlus 5`] = `10`;
+
+exports[`Fees bbsPlus 6`] = `10`;
+
+exports[`Fees bbsPlus 7`] = `10`;
+
+exports[`Fees bbsPlus 8`] = `10`;
+
+exports[`Fees bbsPlus 9`] = `0`;
+
+exports[`Fees blobs 1`] = `90`;
+
+exports[`Fees democracy.notePreimage 1`] = `45020`;
+
+exports[`Fees democracy.notePreimage 2`] = `20020`;
+
+exports[`Fees democracy.notePreimageOperational 1`] = `90120`;
+
+exports[`Fees democracy.notePreimageOperational 2`] = `40120`;
+
+exports[`Fees democracy.notePreimageOperational 3`] = `40040`;
+
+exports[`Fees dids 1`] = `0`;
+
+exports[`Fees dids 2`] = `10`;
+
+exports[`Fees dids 3`] = `10`;
+
+exports[`Fees dids 4`] = `10`;
+
+exports[`Fees dids 5`] = `10`;
+
+exports[`Fees dids 6`] = `10`;
+
+exports[`Fees dids 7`] = `10`;
+
+exports[`Fees dids 8`] = `10`;
+
+exports[`Fees dids 9`] = `10`;
+
+exports[`Fees dids 10`] = `10`;
+
+exports[`Fees dids 11`] = `10`;
+
+exports[`Fees dids 12`] = `0`;
+
+exports[`Fees dids 13`] = `10`;
+
+exports[`Fees dids 14`] = `10`;
+
+exports[`Fees dids 15`] = `10`;
+
+exports[`Fees dids 16`] = `10`;
+
+exports[`Fees dids 17`] = `10`;
+
+exports[`Fees dids 18`] = `10`;
+
+exports[`Fees dids 19`] = `10`;
+
+exports[`Fees dids 20`] = `10`;
+
+exports[`Fees dids 21`] = `20`;
+
+exports[`Fees revocation 1`] = `0`;
+
+exports[`Fees revocation 2`] = `10`;
+
+exports[`Fees revocation 3`] = `10`;
+
+exports[`Fees revocation 4`] = `10`;
+
+exports[`Fees revocation 5`] = `10`;
+
+exports[`Fees revocation 6`] = `10`;
+
+exports[`Fees revocation 7`] = `60`;
+
+exports[`Fees transfers 1`] = `0`;
+
+exports[`Fees transfers 2`] = `10`;

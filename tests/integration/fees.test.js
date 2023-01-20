@@ -12,13 +12,12 @@ import { DockAPI } from "../../src/index";
 import { BN, hexToU8a, stringToHex, u8aToHex } from "@polkadot/util";
 import { randomAsHex } from "@polkadot/util-crypto";
 import { createNewDockDID } from "../../src/utils/did";
-import { getPublicKeyFromKeyringPair } from "../../src/utils/misc";
+import { createDidPair, getBalance } from "./helpers";
 import {
   createRandomRegistryId,
   OneOfPolicy,
 } from "../../src/utils/revocation";
 import { BLOB_MAX_BYTE_SIZE } from "../../src/modules/blob";
-import { DidKey, VerificationRelationship } from "../../src/public-keys";
 import { ServiceEndpointType } from "../../src/modules/did/service-endpoint";
 import BBSPlusModule from "../../src/modules/bbs-plus";
 import AccumulatorModule from "../../src/modules/accumulator";
@@ -26,28 +25,11 @@ import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
+  TestAccountCouncilMemberURI,
 } from "../test-constants";
 
 describe("Fees", () => {
   const dock = new DockAPI();
-
-  async function getBalance(account) {
-    const { data: balance } = await dock.api.query.system.account(account);
-    return balance;
-  }
-
-  function getDidPair() {
-    const did = createNewDockDID();
-    const seed = randomAsHex(32);
-    const pair = dock.keyring.addFromUri(seed, null, "sr25519");
-    const publicKey = getPublicKeyFromKeyringPair(pair);
-    const didKey = new DidKey(publicKey, new VerificationRelationship());
-    return [did, pair, didKey];
-  }
-
-  async function getRuntimeVersion() {
-    return await dock.api.rpc.state.getRuntimeVersion();
-  }
 
   beforeAll(async () => {
     await dock.init({
@@ -68,15 +50,17 @@ describe("Fees", () => {
   }, 10000);
 
   const withPaidFeeAssertion = async (
-    assert,
     sendTx,
+    assert,
     applyToBefore = Object.create(null)
   ) => {
     const { address } = dock.getAccount();
-    const before = await getBalance(address);
-    await sendTx();
-    const after = await getBalance(address);
-    // Compare values with `10 DOCK` precision
+
+    const before = await getBalance(dock.api, address);
+    const result = await sendTx();
+    const after = await getBalance(dock.api, address);
+
+    // Compare free balances with `10 DOCK` precision
     assert(Math.round((before.free - after.free) / 1e7) * 10);
 
     for (const prop of ["feeFrozen", "reserved", "miscFrozen"]) {
@@ -90,26 +74,24 @@ describe("Fees", () => {
         beforeProp.toString(),
       ]);
     }
+
+    return result;
   };
 
-  const withPaidFeeMatchingSnapshot = (
-    sendTx,
-    applyToBefore = Object.create(null)
-  ) =>
+  const withPaidFeeMatchingSnapshot = (sendTx, applyToBefore) =>
     withPaidFeeAssertion(
-      (fee) => expect(fee).toMatchSnapshot(),
       sendTx,
+      (fee) => expect(fee).toMatchSnapshot(),
       applyToBefore
     );
 
   const throwingWithPaidFeeAssertion = async (
-    assert,
     sendTx,
+    assert,
     applyToBefore
   ) => {
     let throwed = false;
     await withPaidFeeAssertion(
-      assert,
       async () => {
         try {
           await sendTx();
@@ -117,33 +99,34 @@ describe("Fees", () => {
           throwed = true;
         }
       },
+      assert,
       applyToBefore
     );
     expect(throwed).toBe(true);
   };
 
   test("dids", async () => {
-    const [did, pair, didKey] = getDidPair();
+    const [did, pair, didKey] = createDidPair(dock);
 
     await withPaidFeeMatchingSnapshot(() => {
       return dock.did.new(did, [didKey], [], false, undefined, false);
     });
 
     // Add DID key with all verification relationships
-    const [, , dk1] = getDidPair();
+    const [, , dk1] = createDidPair(dock);
     await withPaidFeeMatchingSnapshot(() => {
       return dock.did.addKeys([dk1], did, did, pair, 1, undefined, false);
     });
 
     // Add DID key with only 1 verification relationship
-    const [, , dk2] = getDidPair();
+    const [, , dk2] = createDidPair(dock);
     dk2.verRels.setAuthentication();
     await withPaidFeeMatchingSnapshot(() => {
       return dock.did.addKeys([dk2], did, did, pair, 1, undefined, false);
     });
 
     // Add DID key with only 2 verification relationships
-    const [, , dk3] = getDidPair();
+    const [, , dk3] = createDidPair(dock);
     dk3.verRels.setAuthentication();
     dk3.verRels.setAssertion();
     await withPaidFeeMatchingSnapshot(() => {
@@ -151,7 +134,7 @@ describe("Fees", () => {
     });
 
     // Add DID key with 3 verification relationships
-    const [, , dk4] = getDidPair();
+    const [, , dk4] = createDidPair(dock);
     dk4.verRels.setAuthentication();
     dk4.verRels.setAssertion();
     dk4.verRels.setCapabilityInvocation();
@@ -160,8 +143,8 @@ describe("Fees", () => {
     });
 
     // Add 2 DID keys with only 1 verification relationship
-    const [, , dk5] = getDidPair();
-    const [, , dk6] = getDidPair();
+    const [, , dk5] = createDidPair(dock);
+    const [, , dk6] = createDidPair(dock);
     dk5.verRels.setAuthentication();
     dk6.verRels.setCapabilityInvocation();
     await withPaidFeeMatchingSnapshot(() => {
@@ -169,9 +152,9 @@ describe("Fees", () => {
     });
 
     // Add 3 DID keys with only 1 verification relationship
-    const [, , dk7] = getDidPair();
-    const [, , dk8] = getDidPair();
-    const [, , dk9] = getDidPair();
+    const [, , dk7] = createDidPair(dock);
+    const [, , dk8] = createDidPair(dock);
+    const [, , dk9] = createDidPair(dock);
     dk7.verRels.setAuthentication();
     dk8.verRels.setCapabilityInvocation();
     dk9.verRels.setAssertion();
@@ -255,25 +238,25 @@ describe("Fees", () => {
     });
 
     // Adding a new DID which doesn't control itself but controlled by one other controller
-    const [did1] = getDidPair();
+    const [did1] = createDidPair(dock);
     await withPaidFeeMatchingSnapshot(() => {
       return dock.did.new(did1, [], [did], false);
     });
 
     // Adding a new DID which doesn't control itself but controlled by 2 other controllers
-    const [did2] = getDidPair();
+    const [did2] = createDidPair(dock);
     await withPaidFeeMatchingSnapshot(() => {
       return dock.did.new(did2, [], [did, did1], false);
     });
 
     // Adding a new DID which doesn't control itself but has a key and controlled by one other controller
-    const [did3, , dk_] = getDidPair();
+    const [did3, , dk_] = createDidPair(dock);
     await withPaidFeeMatchingSnapshot(() => {
       return dock.did.new(did3, [dk_], [did], false);
     });
 
     // Add DID key with all verification relationships to a DID that doesn't control itself
-    const [, , dk__] = getDidPair();
+    const [, , dk__] = createDidPair(dock);
     await withPaidFeeMatchingSnapshot(() => {
       return dock.did.addKeys([dk__], did1, did, pair, 1, undefined, false);
     });
@@ -334,7 +317,7 @@ describe("Fees", () => {
   }, 40000);
 
   test("revocation", async () => {
-    const [did, pair, dk] = getDidPair();
+    const [did, pair, dk] = createDidPair(dock);
     await dock.did.new(did, [dk], [], false);
 
     const registryId = createRandomRegistryId();
@@ -393,7 +376,7 @@ describe("Fees", () => {
   }, 30000);
 
   test("blobs", async () => {
-    const [did, pair, dk] = getDidPair();
+    const [did, pair, dk] = createDidPair(dock);
     await dock.did.new(did, [dk], [], false);
 
     const blobId = randomAsHex(32);
@@ -407,7 +390,7 @@ describe("Fees", () => {
   }, 30000);
 
   test("bbsPlus", async () => {
-    const [did, pair, dk] = getDidPair();
+    const [did, pair, dk] = createDidPair(dock);
     await dock.did.new(did, [dk], [], false);
 
     const label = stringToHex("My BBS+ params");
@@ -482,7 +465,7 @@ describe("Fees", () => {
   }, 30000);
 
   test("accumulator", async () => {
-    const [did, pair, dk] = getDidPair();
+    const [did, pair, dk] = createDidPair(dock);
     await dock.did.new(did, [dk], [], false);
 
     const label = stringToHex("My Accumulator params");
@@ -646,7 +629,7 @@ describe("Fees", () => {
   }, 30000);
 
   test("democracy.notePreimage", async () => {
-    const runtimeVersion = await getRuntimeVersion();
+    const runtimeVersion = await dock.api.rpc.state.getRuntimeVersion();
     const specVersion = runtimeVersion.specVersion.toNumber();
 
     if (process.env.DISABLE_DEMOCRACY_PREIMAGE_TESTS || specVersion < 44) {
@@ -654,25 +637,28 @@ describe("Fees", () => {
     }
 
     const preimage = randomAsHex(2e6);
+
+    // First, send a whitelist transaction. It should have a 40K DOCK deposit and a 5K DOCK fee.
     await withPaidFeeAssertion(
-      (fee) => expect(fee).toBe(45020),
       () =>
         dock.signAndSend(dock.api.tx.democracy.notePreimage(preimage), false),
+      (fee) => expect(fee).toBe(45020),
       {
         // 40K DOCK per deposit
         reserved: (before) => before.add(new BN(4e10)),
       }
     );
 
+    // Second, attempt to execute a transaction that will fail (preimage already exists). The result total fee will be around 20K, with no deposit.
     await throwingWithPaidFeeAssertion(
-      (fee) => expect(fee).toBe(20020),
       () =>
-        dock.signAndSend(dock.api.tx.democracy.notePreimage(preimage), false)
+        dock.signAndSend(dock.api.tx.democracy.notePreimage(preimage), false),
+      (fee) => expect(fee).toBe(20020)
     );
   }, 30000);
 
   test("democracy.notePreimageOperational", async () => {
-    const runtimeVersion = await getRuntimeVersion();
+    const runtimeVersion = await dock.api.rpc.state.getRuntimeVersion();
     const specVersion = runtimeVersion.specVersion.toNumber();
 
     if (process.env.DISABLE_DEMOCRACY_PREIMAGE_TESTS || specVersion < 44) {
@@ -680,11 +666,15 @@ describe("Fees", () => {
     }
 
     const preimage = randomAsHex(4e6);
-    const stashAccount = dock.keyring.addFromUri("//Charlie", null, "sr25519");
+    const stashAccount = dock.keyring.addFromUri(
+      TestAccountCouncilMemberURI,
+      null,
+      "sr25519"
+    );
     dock.setAccount(stashAccount);
 
+    // First, send a whitelist transaction. It should have a 80K DOCK deposit and a 10K DOCK fee.
     await withPaidFeeAssertion(
-      (fee) => expect(fee).toBe(90120),
       () =>
         dock.signAndSend(
           dock.api.tx.council.execute(
@@ -693,14 +683,15 @@ describe("Fees", () => {
           ),
           false
         ),
+      (fee) => expect(fee).toBe(90120),
       {
         // 80K DOCK per deposit
         reserved: (before) => before.add(new BN(8e10)),
       }
     );
 
-    await throwingWithPaidFeeAssertion(
-      (fee) => expect(fee).toBe(40120),
+    // Second, attempt to execute a transaction that will fail implicitly (preimage already exists). The result total fee will be around 20K, with no deposit.
+    await withPaidFeeAssertion(
       () =>
         dock.signAndSend(
           dock.api.tx.council.execute(
@@ -708,16 +699,18 @@ describe("Fees", () => {
             preimage.length
           ),
           false
-        )
+        ),
+      (fee) => expect(fee).toBe(40120)
     );
 
+    // Finally, attempt to execute a transaction that will explicitly fail (bad origin). The result total fee will be around 40K, no deposit.
     await throwingWithPaidFeeAssertion(
-      (fee) => expect(fee).toBe(40040),
       () =>
         dock.signAndSend(
           dock.api.tx.democracy.notePreimageOperational(preimage),
           false
-        )
+        ),
+      (fee) => expect(fee).toBe(40040)
     );
   }, 30000);
 });

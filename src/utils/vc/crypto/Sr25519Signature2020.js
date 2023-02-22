@@ -11,7 +11,7 @@ export default class Sr25519Signature2020 extends CustomLinkedDataSignature {
    * @param {object} config - Configuration options
    */
   constructor({
-    keypair, verificationMethod, verifier, signer,
+    keypair, verificationMethod, verifier, signer, useProofValue,
   } = {}) {
     super({
       type: Sr25519SigName,
@@ -20,6 +20,7 @@ export default class Sr25519Signature2020 extends CustomLinkedDataSignature {
       alg: 'EdDSA',
       signer: signer || Sr25519Signature2020.signerFactory(keypair, verificationMethod),
       verifier,
+      useProofValue,
     });
     this.requiredKeyType = Sr25519VerKeyName;
   }

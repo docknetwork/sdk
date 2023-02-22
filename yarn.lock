@@ -2339,6 +2339,36 @@
     enabled "2.0.x"
     kuler "^2.0.0"
 
+"@digitalbazaar/did-io@^1.0.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@digitalbazaar/did-io/-/did-io-1.1.0.tgz#d9ba99641290ae1a68e7d2dae03f349bad180c9d"
+  integrity sha512-XrM0HIukrRY6rtEM2osMbAEzXfXM6SXSKRJ2iZqTkkSdqrI1iiA3Y87CMYfqVwpwyd6WcWdzKR5SpLkbIh1+WQ==
+  dependencies:
+    "@digitalbazaar/lru-memoize" "^2.0.0"
+    esm "^3.2.25"
+
+"@digitalbazaar/did-method-key@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@digitalbazaar/did-method-key/-/did-method-key-2.0.0.tgz#852b871c20f9ccea1c993de823b41899cf979699"
+  integrity sha512-540CsZUesyRxku72Dkl7BC/h26iFko/X+NXx1D2KQpi8cSgb6gs1PqvXEAUThszGq1y2p/6ByDKYAJhlaAG8VQ==
+  dependencies:
+    "@digitalbazaar/did-io" "^1.0.0"
+    "@digitalbazaar/ed25519-verification-key-2020" "^3.0.0"
+    "@digitalbazaar/x25519-key-agreement-key-2019" "^5.1.1"
+    "@digitalbazaar/x25519-key-agreement-key-2020" "^2.0.0"
+    esm "^3.2.25"
+
+"@digitalbazaar/ed25519-verification-key-2020@^3.0.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@digitalbazaar/ed25519-verification-key-2020/-/ed25519-verification-key-2020-3.3.0.tgz#226b2aac6ec5a3b53a11b280bfc8695512aeedf0"
+  integrity sha512-/euFk/BNnwLIbaWxHW76PW26emuGjaJ8vbTMgdcIcx3TbDE1dsAbmLSzE9122KLT59CLLfOXvl5uA9xa14VRqQ==
+  dependencies:
+    "@noble/ed25519" "^1.6.0"
+    base58-universal "^1.0.0"
+    base64url-universal "^1.1.0"
+    crypto-ld "^5.1.0"
+    esm "^3.2.25"
+
 "@digitalbazaar/http-client@^1.1.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@digitalbazaar/http-client/-/http-client-1.2.0.tgz#1ea3661e77000a15bd892a294f20dc6cc5d1c93b"
@@ -2347,6 +2377,38 @@
     esm "^3.2.22"
     ky "^0.25.1"
     ky-universal "^0.8.2"
+
+"@digitalbazaar/lru-memoize@^2.0.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@digitalbazaar/lru-memoize/-/lru-memoize-2.2.0.tgz#0de3d5738ffc05b6cb4d6eda3dfd165761870b4a"
+  integrity sha512-EoNfEJyelJYKoAlVKGt9X/d/AimGS7YV35Ae2mrIiu39JsCBVBoVSkXOKNJ9BeQeLI/rhjAYfVdHM/1SLT58FA==
+  dependencies:
+    esm "^3.2.25"
+    lru-cache "^6.0.0"
+
+"@digitalbazaar/x25519-key-agreement-key-2019@^5.1.1":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@digitalbazaar/x25519-key-agreement-key-2019/-/x25519-key-agreement-key-2019-5.2.0.tgz#f589fcb6a73b5ff2691f94fa271a6a85b1e2dfc8"
+  integrity sha512-EztEdGfkeOAQ4xVbnsHWi5kQwVQo3R8H4JVqvLCsfgiNJ4wNrBTKbIz5UWQjcsr8Hj3BBqaemMfBda9pYL1mTA==
+  dependencies:
+    "@noble/ed25519" "^1.6.0"
+    base58-universal "^1.0.0"
+    crypto-ld "^5.0.0"
+    ed2curve "^0.3.0"
+    esm "^3.2.25"
+    tweetnacl "^1.0.3"
+
+"@digitalbazaar/x25519-key-agreement-key-2020@^2.0.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@digitalbazaar/x25519-key-agreement-key-2020/-/x25519-key-agreement-key-2020-2.1.0.tgz#3517f47beb4c45399087de24c0a98e90e2686f27"
+  integrity sha512-5QgecaGQhI7VqtpirrnMtg/R4dI4fZ5DRtOkyzQYnMakjRaBJGOhdPnHNhEvNaAsDXCnIX1g9RBEMnhlOYyyVA==
+  dependencies:
+    "@noble/ed25519" "^1.6.0"
+    base58-universal "^1.0.0"
+    crypto-ld "^5.0.0"
+    ed2curve "^0.3.0"
+    esm "^3.2.25"
+    tweetnacl "^1.0.3"
 
 "@docknetwork/crypto-wasm-ts@0.31.1":
   version "0.31.1"
@@ -2977,6 +3039,11 @@
   version "2.1.8-no-fsevents.3"
   resolved "https://registry.yarnpkg.com/@nicolo-ribaudo/chokidar-2/-/chokidar-2-2.1.8-no-fsevents.3.tgz#323d72dd25103d0c4fbdce89dadf574a787b1f9b"
   integrity sha512-s88O1aVtXftvp5bCPB7WnmXc5IwOZZ7YPuwNPt+GtOOXpPvad1LfbmjYv+qII7zP6RU2QGnqve27dnLycEnyEQ==
+
+"@noble/ed25519@^1.6.0":
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/@noble/ed25519/-/ed25519-1.7.3.tgz#57e1677bf6885354b466c38e2b620c62f45a7123"
+  integrity sha512-iR8GBkDt0Q3GyaVcIu7mSsVIqnFbkbRzGLWlvhwunacoLwt4J3swfKhfaM6rN6WY+TBGoYT1GtT1mIh2/jGbRQ==
 
 "@noble/hashes@1.1.3":
   version "1.1.3"
@@ -4344,12 +4411,26 @@ base-x@^4.0.0:
   resolved "https://registry.yarnpkg.com/base-x/-/base-x-4.0.0.tgz#d0e3b7753450c73f8ad2389b5c018a4af7b2224a"
   integrity sha512-FuwxlW4H5kh37X/oW59pwTzzTKRzfrrQwhmyspRM7swOEZcHtDZSCt45U6oKgtuFE+WYPblePMVIPR4RZrh/hw==
 
+base58-universal@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/base58-universal/-/base58-universal-1.0.0.tgz#6da5b89c2c9be8fc40bcf6b3a5a03f123ad3825e"
+  integrity sha512-v0Ja4jwaQP8gBZPNXpfaXlLht2ed/Gp3AsVUZXtlZgY1qbKS0CjxvYs43U0Gh00zbVc1neMe+q/ULJ7ubVyB+w==
+  dependencies:
+    esm "^3.2.25"
+
 base64-js@^1.0.2, base64-js@^1.3.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.5.1.tgz#1b1b440160a5bf7ad40b650f095963481903930a"
   integrity sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
 
-base64url@3.0.1:
+base64url-universal@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/base64url-universal/-/base64url-universal-1.1.0.tgz#94da6356c1d43ead55b1d91c045c0a5b09ec8181"
+  integrity sha512-WyftvZqye29YQ10ZnuiBeEj0lk8SN8xHU9hOznkLc85wS1cLTp6RpzlMrHxMPD9nH7S55gsBqMqgGyz93rqmkA==
+  dependencies:
+    base64url "^3.0.0"
+
+base64url@3.0.1, base64url@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/base64url/-/base64url-3.0.1.tgz#6399d572e2bc3f90a9a8b22d5dbb0a32d33f788d"
   integrity sha512-ir1UPr3dkwexU7FdV8qBBbNDRUhMmIekYMFZfi+C/sLNnRESKPl23nB9b2pltqfOQNnGzsDdId90AEtG5tCx4A==
@@ -5151,6 +5232,11 @@ crypto-browserify@3.12.0:
     randombytes "^2.0.0"
     randomfill "^1.0.3"
 
+crypto-ld@^5.0.0, crypto-ld@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/crypto-ld/-/crypto-ld-5.1.0.tgz#fbc1344c553f10aa1bcfc9d94c8c161a56c07150"
+  integrity sha512-Dy1QoQzj+2K6UlGZ9l34cPp+g/YHOd+r3/DXXQTnnz5btGb0vqDlkZBn+icYmwntEmW0bvGVwFWvcwZSbk1EEQ==
+
 cssom@0.3.x, "cssom@>= 0.3.2 < 0.4.0":
   version "0.3.8"
   resolved "https://registry.yarnpkg.com/cssom/-/cssom-0.3.8.tgz#9f1276f5b2b463f2114d3f2c75250af8c1a36f4a"
@@ -5806,7 +5892,7 @@ eslint@^6.8.0:
     text-table "^0.2.0"
     v8-compile-cache "^2.0.3"
 
-esm@^3.2.22:
+esm@^3.2.22, esm@^3.2.25:
   version "3.2.25"
   resolved "https://registry.yarnpkg.com/esm/-/esm-3.2.25.tgz#342c18c29d56157688ba5ce31f8431fbb795cc10"
   integrity sha512-U1suiZ2oDVWv4zPO56S0NcR5QriEahGtdN2OR6FiOG4WJvcjBVFB0qI4+eKoWFH483PKGuLuu6V8Z4T5g63UVA==

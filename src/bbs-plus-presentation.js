@@ -83,7 +83,6 @@ export default class BbsPlusPresentation {
     });
 
     const convertedCredential = Credential.fromJSON(credential, CustomLinkedDataSignature.fromJsigProofValue(credentialLD.proof.proofValue));
-    console.log('convertedCredential', convertedCredential.toJSON());
     const idx = await this.presBuilder.addCredential(convertedCredential, pk);
 
     // Enforce revealing of verificationMethod and type

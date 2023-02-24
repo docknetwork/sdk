@@ -39,7 +39,7 @@ export default function getKeyDoc(did, keypair, type, id) {
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
  * @returns {object} - signature suite.
  */
-export function getSuiteFromKeyDoc(keyDoc) {
+export function getSuiteFromKeyDoc(keyDoc, useProofValue) {
   // Check if passing suite directly
   if (keyDoc.verificationMethod) {
     return keyDoc;
@@ -62,9 +62,11 @@ export function getSuiteFromKeyDoc(keyDoc) {
     default:
       throw new Error(`Unknown key type ${keyDoc.type}.`);
   }
+
   return new Cls({
     ...keyDoc,
     verificationMethod: keyDoc.id,
+    useProofValue,
   });
 }
 

@@ -65,7 +65,7 @@ function getSamplePres(signed = false) {
         type: 'EcdsaSecp256k1Signature2019',
         challenge: 'some_challenge',
         domain: 'some_domain',
-        proofValue: expect.anything(),
+        jws: expect.anything(),
         proofPurpose: 'authentication',
         verificationMethod: keyUrl,
       },
@@ -116,6 +116,13 @@ describe('Verifiable Credential Issuing', () => {
     expect(result.verified).toBe(true);
     expect(result.results[0].proof).toBeDefined();
     expect(result.results[0].verified).toBe(true);
+  }, 30000);
+
+  test('Issuing should return an object with a proof, and it must pass validation (using proofValue).', async () => {
+    const credential = await issueCredential(getSampleKey(), getSampleCredential(), true, null, null, null, null, false, true);
+    expect(credential.proof.proofValue).toBeDefined();
+    const result = await verifyCredential(credential);
+    expect(result.verified).toBe(true);
   }, 30000);
 
   test('Tampered Credential should not pass validation.', async () => {
@@ -422,7 +429,7 @@ describe('Verifiable Presentation incremental creation', () => {
     expect(vp.proof).toMatchObject({ created: expect.anything() });
     expect(vp.proof).toMatchObject({ challenge: 'some_challenge' });
     expect(vp.proof).toMatchObject({ domain: 'some_domain' });
-    expect(vp.proof).toMatchObject({ proofValue: expect.anything() });
+    expect(vp.proof).toMatchObject({ jws: expect.anything() });
     expect(vp.proof).toMatchObject({ proofPurpose: 'authentication' });
     expect(vp.proof).toMatchObject({ verificationMethod: expect.anything() });
 
@@ -462,7 +469,7 @@ describe('Verifiable Presentation incremental creation', () => {
     expect(vp.proof).toMatchObject({ created: expect.anything() });
     expect(vp.proof).toMatchObject({ challenge: 'some_challenge' });
     expect(vp.proof).toMatchObject({ domain: 'some_domain' });
-    expect(vp.proof).toMatchObject({ proofValue: expect.anything() });
+    expect(vp.proof).toMatchObject({ jws: expect.anything() });
     expect(vp.proof).toMatchObject({ proofPurpose: 'authentication' });
     expect(vp.proof).toMatchObject({ verificationMethod: expect.anything() });
 

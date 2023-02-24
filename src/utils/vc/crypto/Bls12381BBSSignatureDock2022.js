@@ -42,6 +42,7 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
       alg: 'Bls12381BBS+SignatureDock2022',
       signer: signer || Bls12381BBSSignatureDock2022.signerFactory(keypair, verificationMethod),
       verifier,
+      useProofValue: true,
     });
 
     this.proof = {

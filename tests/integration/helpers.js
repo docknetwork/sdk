@@ -87,7 +87,6 @@ export function getCredMatcherDoc(cred, issuer, issuerKeyId, sigType) {
     issuer,
     proof: expect.objectContaining({
       type: sigType,
-      proofValue: expect.anything(),
       proofPurpose: 'assertionMethod',
       verificationMethod: issuerKeyId,
     }),

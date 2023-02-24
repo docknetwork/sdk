@@ -30,6 +30,7 @@ export default class CustomLinkedDataSignature extends jsigs.suites.LinkedDataSi
   constructor(config) {
     super(config);
     this.alg = config.alg;
+    this.useProofValue = config.useProofValue || false;
   }
 
   /**
@@ -101,22 +102,34 @@ export default class CustomLinkedDataSignature extends jsigs.suites.LinkedDataSi
       throw new Error('A signer API has not been specified.');
     }
 
-    let signatureBytes;
-    const signature = await this.signer.sign({ data: verifyData });
-    if (typeof signature === 'string') {
-      // Some signers will return a string like: header..signature
-      // split apart those strings to get the signature in bytes
-      const signatureSplit = signature.split('.');
-      const signatureEncoded = signatureSplit[signatureSplit.length - 1];
-      signatureBytes = decodeBase64Url(signatureEncoded);
+    const getSigBytes = async (data) => {
+      let signatureBytes;
+      const signature = await this.signer.sign({ data });
+      if (typeof signature === 'string') {
+        // Some signers will return a string like: header..signature
+        // split apart those strings to get the signature in bytes
+        const signatureSplit = signature.split('.');
+        const signatureEncoded = signatureSplit[signatureSplit.length - 1];
+        signatureBytes = decodeBase64Url(signatureEncoded);
+      } else {
+        signatureBytes = signature;
+      }
+      return signatureBytes;
+    };
+
+    const finalProof = { ...proof };
+    if (this.useProofValue) {
+      const signatureBytes = await getSigBytes(verifyData);
+      finalProof.proofValue = CustomLinkedDataSignature.encodeProofValue(signatureBytes);
     } else {
-      signatureBytes = signature;
+      const header = { alg: this.alg, b64: false, crit: ['b64'] };
+      const encodedHeader = base64url.encode(JSON.stringify(header));
+      const jwsData = createJws({ encodedHeader, verifyData });
+      const signatureBytesJWS = await getSigBytes(jwsData);
+      finalProof.jws = `${encodedHeader}..${base64url.encode(signatureBytesJWS)}`;
     }
 
-    return {
-      ...proof,
-      proofValue: CustomLinkedDataSignature.encodeProofValue(signatureBytes),
-    };
+    return finalProof;
   }
 
   static encodeProofValue(signatureBytes) {

@@ -1,3 +1,4 @@
+/*
 import VerifiableCredential from '../src/verifiable-credential';
 
 import {
@@ -77,3 +78,4 @@ async function main() {
 }
 
 main();
+*/

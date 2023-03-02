@@ -12,7 +12,7 @@ export default class EcdsaSepc256k1Signature2019 extends CustomLinkedDataSignatu
    * @param {object} config - Configuration options
    */
   constructor({
-    keypair, verificationMethod, verifier, signer,
+    keypair, verificationMethod, verifier, signer, useProofValue,
   } = {}) {
     super({
       type: EcdsaSecp256k1SigName,
@@ -21,6 +21,7 @@ export default class EcdsaSepc256k1Signature2019 extends CustomLinkedDataSignatu
       alg: 'ES256K',
       signer: signer || EcdsaSepc256k1Signature2019.signerFactory(keypair, verificationMethod),
       verifier,
+      useProofValue,
     });
     this.requiredKeyType = EcdsaSecp256k1VerKeyName;
   }

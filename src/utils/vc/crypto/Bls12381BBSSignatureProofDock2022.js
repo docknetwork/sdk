@@ -71,6 +71,7 @@ export default class Bls12381BBSSignatureProofDock2022 extends CustomLinkedDataS
       LDKeyClass: Bls12381G2KeyPairDock2022,
       contextUrl: SUITE_CONTEXT_URL,
       alg: Bls12381BBSSigProofDockSigName,
+      useProofValue: true,
     });
 
     this.proof = {

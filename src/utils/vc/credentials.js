@@ -250,9 +250,9 @@ export async function verifyCredential(credential, {
  *   `@context` (if it is not present, it's added to the context list).
  * @return {Promise<object>} The signed credential object.
  */
-export async function issueCredential(keyDoc, credential, compactProof = true, documentLoader = null, purpose = null, expansionMap = null, issuerObject = null, addSuiteContext = false) {
+export async function issueCredential(keyDoc, credential, compactProof = true, documentLoader = null, purpose = null, expansionMap = null, issuerObject = null, addSuiteContext = false, useProofValue = false) {
   // Get suite from keyDoc parameter
-  const suite = getSuiteFromKeyDoc(keyDoc);
+  const suite = getSuiteFromKeyDoc(keyDoc, useProofValue);
   if (!suite.verificationMethod) {
     throw new TypeError('"suite.verificationMethod" property is required.');
   }

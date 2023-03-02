@@ -1,11 +1,12 @@
 // The constants below are used for examples and tests
 
-require('dotenv').config();
+require("dotenv").config();
 
-const DefaultFullNodeEndpoint = 'ws://localhost:9944';
-const DefaultFullNodeTCPEndpoint = 'http://localhost:9933';
-const DefaultTestKeyringType = 'sr25519';
-const DefaultTestAccountURI = '//Alice';
+const DefaultFullNodeEndpoint = "ws://localhost:9944";
+const DefaultFullNodeTCPEndpoint = "http://localhost:9933";
+const DefaultTestKeyringType = "sr25519";
+const DefaultTestAccountURI = "//Alice";
+const DefaultTestAccountCouncilMemberURI = "//Charlie";
 const DefaultMinGasPrice = 50;
 const DefaultMaxGas = 429496729;
 
@@ -25,9 +26,21 @@ function fromEnv(varName, defaultVal) {
   throw new Error(`Environment variable "${varName}" not defined`);
 }
 
-export const FullNodeEndpoint = fromEnv('FullNodeEndpoint', DefaultFullNodeEndpoint);
-export const FullNodeTCPEndpoint = fromEnv('FullNodeTCPEndpoint', DefaultFullNodeTCPEndpoint);
-export const TestKeyringOpts = { type: fromEnv('TestKeyringType', DefaultTestKeyringType) };
-export const TestAccountURI = fromEnv('TestAccountURI', DefaultTestAccountURI);
-export const MinGasPrice = fromEnv('MinGasPrice', DefaultMinGasPrice);
-export const MaxGas = fromEnv('MaxGas', DefaultMaxGas);
+export const FullNodeEndpoint = fromEnv(
+  "FullNodeEndpoint",
+  DefaultFullNodeEndpoint
+);
+export const FullNodeTCPEndpoint = fromEnv(
+  "FullNodeTCPEndpoint",
+  DefaultFullNodeTCPEndpoint
+);
+export const TestKeyringOpts = {
+  type: fromEnv("TestKeyringType", DefaultTestKeyringType),
+};
+export const TestAccountURI = fromEnv("TestAccountURI", DefaultTestAccountURI);
+export const TestAccountCouncilMemberURI = fromEnv(
+  "TestAccountCouncilMemberURI",
+  DefaultTestAccountCouncilMemberURI
+);
+export const MinGasPrice = fromEnv("MinGasPrice", DefaultMinGasPrice);
+export const MaxGas = fromEnv("MaxGas", DefaultMaxGas);

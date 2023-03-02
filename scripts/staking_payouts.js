@@ -190,19 +190,18 @@ async function sendStakingPayouts(dock, erasInfo, initiator, batchSize) {
 
   let validatorStashIds;
   if (TargetAllValidatorsMatchingCriteria) {
-    const eraValidators = pipe(
-      values,
-      pluck("validators"),
-      chain(keys),
-      (valitors) => new Set(valitors)
-    )(erasInfo.pointsByEra);
-
     console.log(
       `- Payouts will be made to target validator stashes ${JSON.stringify([
         ...targetValidatorStashIds,
       ])} and all validators matching criteria`
     );
-    validatorStashIds = new Set([...eraValidators, ...targetValidatorStashIds]);
+
+    validatorStashIds = pipe(
+      values,
+      pluck("validators"),
+      chain(keys),
+      (valitors) => new Set(valitors)
+    )(erasInfo.pointsByEra);
   } else {
     console.log(
       `- Payouts will be made only to target validator stashes ${JSON.stringify(

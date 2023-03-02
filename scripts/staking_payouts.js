@@ -165,14 +165,15 @@ const main = withDockAPI(
  */
 
 /**
- * Ensures that validator comission is less or equal to the supplied value.
- * @param {BN} maxComission
+ * Ensures that supplied validator's commission in the given era is less or equal to the supplied value.
+ * @param {BN} maxCommission
  * @param {string} stashId
  * @param {*} EraInfo
  * @returns {bool}
  */
-const ensureComissionLessOrEqualTo = curry((maxComission, stashId, { prefs }) =>
-  prefs.validators[stashId]?.commission?.toBn().lte(maxComission)
+const ensureCommissionLessOrEqualTo = curry(
+  (maxCommission, stashId, { prefs }) =>
+    prefs.validators[stashId]?.commission?.toBn().lte(maxCommission)
 );
 
 /**
@@ -227,7 +228,7 @@ async function sendStakingPayouts(dock, erasInfo, initiator, batchSize) {
   // Payout validator if it's either in a target list or satisfies criteria.
   const checkValidator = either(
     (validatorStashId) => targetValidatorStashIds.has(validatorStashId),
-    ensureComissionLessOrEqualTo(MaxCommission)
+    ensureCommissionLessOrEqualTo(MaxCommission)
   );
 
   const rewards = pipe(buildValidatorRewards, toPairs)(

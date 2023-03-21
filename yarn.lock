@@ -2348,10 +2348,10 @@
     ky "^0.25.1"
     ky-universal "^0.8.2"
 
-"@docknetwork/crypto-wasm-ts@0.31.1":
-  version "0.31.1"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.31.1.tgz#400540b2777445bd525daac917f37ec819f3e71e"
-  integrity sha512-wxuIsc0cW2ZJibagr0CluwHzV6JvZ4RLsjvUf7UKHiACXWFylf0pBP1X5xOE5tWBSO5YDi5xqz2PtxYZNyG4tA==
+"@docknetwork/crypto-wasm-ts@0.31.2":
+  version "0.31.2"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.31.2.tgz#617d72414dc5f3df0ad2954430a698c7f2496d13"
+  integrity sha512-rtgDj5/UZ7X1Tf0yz9qFlED5hYV2T61WEVuv2NRwv6EuNYe7mVc7IJk3hcJIkq01wWjbkxxKDsqxwbyxT2AEHQ==
   dependencies:
     "@docknetwork/crypto-wasm" "0.16.0"
     "@types/flat" "^5.0.2"

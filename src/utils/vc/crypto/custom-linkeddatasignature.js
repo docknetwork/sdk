@@ -111,12 +111,6 @@ export default class CustomLinkedDataSignature extends jsigs.suites.LinkedDataSi
         throw new Error('Invalid JWS header.');
       }
 
-      // if (header.alg !== this.alg) {
-      //   throw new Error(
-      //     `Invalid JWS header alg, expected ${this.alg}.`,
-      //   );
-      // }
-
       signatureBytes = decodeBase64Url(encodedSignature);
       data = createJws({ encodedHeader, verifyData });
     }

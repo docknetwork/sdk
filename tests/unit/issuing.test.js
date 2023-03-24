@@ -10,14 +10,12 @@ import {
 import { createPresentation } from '../create-presentation';
 import VerifiableCredential from '../../src/verifiable-credential';
 import VerifiablePresentation from '../../src/verifiable-presentation';
-import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../../src/utils/misc';
+import testingKeys from '../test-keys';
 
 mockAxios();
 
 // Test constants
 const issuanceDate = '2020-04-15T09:05:35Z';
-
-const keypairEcdsaSecp256k1 = generateEcdsaSecp256k1Keypair('ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
 
 const vpId = 'https://example.com/credentials/12345';
 const vpHolder = 'https://example.com/credentials/1234567890';
@@ -55,39 +53,6 @@ function getSamplePres(presentationCredentials) {
     holder: vpHolder,
   };
 }
-
-// TODO: loop all tests for multiple testingKeys (ed25519 etc)
-const testingKeys = [{
-  sigType: 'JsonWebSignature2020',
-  keyDocument: {
-    '@context': 'https://w3id.org/security/suites/jws-2020/v1',
-    id: 'urn:JsonWebKey2020#keys-1',
-    controller: 'urn:JsonWebKey2020',
-    type: 'JsonWebKey2020',
-    publicKeyJwk: {
-      kty: "EC",
-      crv: "P-384",
-      x: "dMtj6RjwQK4G5HP3iwOD94RwbzPhS4wTZHO1luk_0Wz89chqV6uJyb51KaZzK0tk",
-      y: "viPKF7Zbc4FxKegoupyVRcBr8TZHFxUrKQq4huOAyMuhTYJbFpAwMhIrWppql02E"
-    },
-    privateKeyJwk: {
-      kty: "EC",
-      crv: "P-384",
-      x: "dMtj6RjwQK4G5HP3iwOD94RwbzPhS4wTZHO1luk_0Wz89chqV6uJyb51KaZzK0tk",
-      y: "viPKF7Zbc4FxKegoupyVRcBr8TZHFxUrKQq4huOAyMuhTYJbFpAwMhIrWppql02E",
-      d: "Wq5_KgqjvYh_EGvBDYtSs_0ufJJP0y0tkAXl6GqxHMkY0QP8vmD76mniXD-BWhd_"
-    }
-  },
-}, {
-  sigType: 'EcdsaSecp256k1Signature2019',
-  keyDocument: {
-    id: 'urn:EcdsaSecp256k1VerificationKey2019#keys-1',
-    controller: 'urn:EcdsaSecp256k1VerificationKey2019',
-    type: 'EcdsaSecp256k1VerificationKey2019',
-    keypair: keypairEcdsaSecp256k1,
-    publicKey: getPublicKeyFromKeyringPair(keypairEcdsaSecp256k1),
-  },
-}];
 
 testingKeys.forEach((testKey) => {
   const { sigType, keyDocument } = testKey;

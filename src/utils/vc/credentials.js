@@ -30,7 +30,39 @@ function getId(obj) {
   if (typeof obj === 'string') {
     return obj;
   }
-  return obj.id;// || 'did:dock:' + String(obj);
+  return obj.id;
+}
+
+export function formatToJWTPayload(keyDoc, cred) {
+  const kid = keyDoc.id;
+  const credentialIssuer = cred.issuer;
+  const subject = cred.credentialSubject.id;
+  const validFrom = cred.validFrom || cred.issuanceDate;
+  const { issuanceDate, expirationDate } = cred;
+
+  // Reference: https://www.w3.org/TR/vc-data-model/#jwt-encoding
+  const vcJwtPayload = {
+    jti: cred.id,
+    sub: subject || '',
+    iss: credentialIssuer.id || credentialIssuer,
+    iat: Math.floor(Date.parse(issuanceDate) / 1000),
+    vc: cred,
+  };
+
+  if (validFrom) {
+    vcJwtPayload.nbf = Math.floor(Date.parse(validFrom) / 1000);
+  }
+
+  if (expirationDate) {
+    vcJwtPayload.exp = Math.floor(Date.parse(expirationDate) / 1000);
+  }
+
+  const vcJwtHeader = {
+    typ: 'JWT',
+    kid,
+  };
+
+  return [vcJwtHeader, vcJwtPayload];
 }
 
 /**
@@ -221,7 +253,12 @@ export async function verifyCredential(vcJSONorString, {
 
   // JWT formatted credential?
   if (isJWT) {
-    const header = JSON.parse(base64url.decode(vcJSONorString.split('.')[0]).toString());
+    const jwtSplit = vcJSONorString.split('.');
+    if (jwtSplit.length !== 3) {
+      throw new Error('Malformed JWT');
+    }
+
+    const header = JSON.parse(base64url.decode(jwtSplit[0]).toString());
     if (!header.kid) {
       throw new Error('No kid in JWT header');
     }
@@ -229,7 +266,7 @@ export async function verifyCredential(vcJSONorString, {
     const { document: keyDocument } = await docLoader(header.kid);
     const keyDocSuite = await getSuiteFromKeyDoc(keyDocument, false, { detached: false, header });
     const verified = await keyDocSuite.verifySignature({
-      verifyData: bufferToUint8Array(Buffer.from(vcJSONorString.split('.')[1], 'utf8')),
+      verifyData: bufferToUint8Array(Buffer.from(jwtSplit[1], 'utf8')),
       verificationMethod: keyDocument,
       proof: {
         jws: vcJSONorString,
@@ -284,7 +321,7 @@ export async function verifyCredential(vcJSONorString, {
  *   `@context` (if it is not present, it's added to the context list).
  * @return {Promise<object>} The signed credential object.
  */
-export async function issueCredential(keyDoc, credential, compactProof = true, documentLoader = null, purpose = null, expansionMap = null, issuerObject = null, addSuiteContext = true, type = false) {
+export async function issueCredential(keyDoc, credential, compactProof = true, documentLoader = null, purpose = null, expansionMap = null, issuerObject = null, addSuiteContext = true, type = 'jsonld') {
   const useProofValue = type === 'proofValue';
   const useJWT = type === 'jwt';
 
@@ -292,7 +329,6 @@ export async function issueCredential(keyDoc, credential, compactProof = true, d
   const issuerId = credential.issuer || keyDoc.controller;
   const cred = {
     ...credential,
-    // issued: credential.issuanceDate,
     issuer: issuerObject ? {
       ...issuerObject,
       id: issuerId,
@@ -304,57 +340,8 @@ export async function issueCredential(keyDoc, credential, compactProof = true, d
 
   // Should use JWT format?
   if (useJWT) {
-  // TODO: verify/expand JSON-LD for JWT option?
-
-    const kid = keyDoc.id;
-    const credentialIssuer = cred.issuer;
-    const subject = cred.credentialSubject.id;
-    const validFrom = cred.validFrom || cred.issuanceDate;
-    const { issuanceDate, expirationDate } = cred;
-    // Prepare payload
-    // See https://www.w3.org/TR/vc-data-model/#jwt-encoding
-    const vcJwtPayload = {
-    /**
-         * `jti` MUST represent the `id` property of the verifiable credential.
-         */
-      jti: cred.id,
-      /**
-         * `sub` MUST represent the `id` property contained in the verifiable credential subject.
-         */
-      sub: subject || '',
-      /**
-         * `iss` MUST represent the issuer property of a verifiable credential.
-         */
-      iss: credentialIssuer.id || credentialIssuer,
-      /**
-         * `nbf` MUST represent `issuanceDate`, encoded as a UNIX timestamp.
-         *
-         * Note: since `validFrom` will replace `issuanceDate` in the future, we support both.
-         */
-      ...(validFrom && {
-        nbf: Math.floor(Date.parse(validFrom) / 1000),
-      }),
-      /**
-         * `exp` MUST represent the `expirationDate` property, encoded as a UNIX timestamp.
-         */
-      ...(expirationDate && {
-        exp: Math.floor(Date.parse(expirationDate) / 1000),
-      }),
-      /**
-         * Time at which the VC JWT was issued.
-         */
-      iat: Math.floor(Date.parse(issuanceDate) / 1000),
-      /**
-         * vc: JSON object, which MUST be present in a JWT verifiable credential.
-         * The object contains the verifiable credential according to this specification.
-         */
-      vc: cred,
-    };
-
-    const vcJwtHeader = {
-      typ: 'JWT',
-      kid,
-    };
+    // Format to VC JWT spec
+    const [vcJwtHeader, vcJwtPayload] = formatToJWTPayload(keyDoc, cred);
 
     // Get suite from keyDoc parameter
     const jwtOpts = { detached: false, header: vcJwtHeader };

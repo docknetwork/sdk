@@ -4,7 +4,51 @@ import base64url from 'base64url';
 
 const MULTIBASE_BASE58BTC_HEADER = 'z';
 
-function createJws({ encodedHeader, verifyData }) {
+const detachedHeaderParams = {
+  b64: false,
+  crit: ['b64'],
+};
+
+// Taken from https://github.com/transmute-industries/verifiable-data/blob/main/packages/jose-ld/src/JWS/createSigner.ts
+export async function signJWS(signer, type, options, data) {
+  if (!type) {
+    return signer.sign({ data });
+  }
+
+  const header = {
+    alg: type,
+    ...options.header,
+    ...(options.detached ? detachedHeaderParams : undefined),
+  };
+  const encodedHeader = base64url.encode(JSON.stringify(header));
+  const encodedPayload = base64url.encode(
+    data instanceof Uint8Array
+      ? Buffer.from(data).toString('utf-8')
+      : JSON.stringify(data),
+  );
+
+  const toBeSigned = options.detached
+    ? new Uint8Array(
+      Buffer.concat([
+        Buffer.from(encodedHeader, 'utf8'),
+        Buffer.from('.', 'utf-8'),
+        data,
+      ]),
+    )
+    : new Uint8Array(Buffer.from(`${encodedHeader}.${encodedPayload}`));
+
+  const message = toBeSigned;
+  const signature = await signer.sign({ data: message });
+
+  // If not, encode it ourselves
+  return options.detached
+    ? `${encodedHeader}..${base64url.encode(Buffer.from(signature))}`
+    : `${encodedHeader}.${encodedPayload}.${base64url.encode(
+      Buffer.from(signature),
+    )}`;
+}
+
+export function createJws({ encodedHeader, verifyData }) {
   const buffer = Buffer.concat([
     Buffer.from(`${encodedHeader}.`, 'utf8'),
     Buffer.from(verifyData.buffer, verifyData.byteOffset, verifyData.length),
@@ -12,12 +56,16 @@ function createJws({ encodedHeader, verifyData }) {
   return new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.length);
 }
 
-function decodeBase64Url(string) {
+export function decodeBase64Url(string) {
   const buffer = base64url.toBuffer(string);
   return new Uint8Array(buffer.buffer, buffer.offset, buffer.length);
 }
 
-function decodeBase64UrlToString(string) {
+export function bufferToUint8Array(buffer) {
+  return new Uint8Array(buffer.buffer, buffer.offset, buffer.length);
+}
+
+export function decodeBase64UrlToString(string) {
   return base64url.decode(string);
 }
 
@@ -63,14 +111,11 @@ export default class CustomLinkedDataSignature extends jsigs.suites.LinkedDataSi
         throw new Error('Invalid JWS header.');
       }
 
-      // confirm header matches all expectations
-      if (!(header.alg === this.alg && header.b64 === false
-        && Array.isArray(header.crit) && header.crit.length === 1
-        && header.crit[0] === 'b64')) {
-        throw new Error(
-          `Invalid JWS header parameters for ${this.type}.`,
-        );
-      }
+      // if (header.alg !== this.alg) {
+      //   throw new Error(
+      //     `Invalid JWS header alg, expected ${this.alg}.`,
+      //   );
+      // }
 
       signatureBytes = decodeBase64Url(encodedSignature);
       data = createJws({ encodedHeader, verifyData });
@@ -122,6 +167,12 @@ export default class CustomLinkedDataSignature extends jsigs.suites.LinkedDataSi
       const signatureBytes = await getSigBytes(verifyData);
       finalProof.proofValue = CustomLinkedDataSignature.encodeProofValue(signatureBytes);
     } else {
+      if (!this.alg) {
+        throw new Error('Suite doesn\'t contain required alg parameter');
+      }
+
+      // TODO: use signJWS
+
       const header = { alg: this.alg, b64: false, crit: ['b64'] };
       const encodedHeader = base64url.encode(JSON.stringify(header));
       const jwsData = createJws({ encodedHeader, verifyData });

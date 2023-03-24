@@ -180,6 +180,7 @@ class VerifiablePresentation {
       compactProof,
     );
     this.proof = signedVP.proof.pop();
+    this.context = signedVP['@context'];
     return this;
   }
 

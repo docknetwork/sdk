@@ -235,7 +235,7 @@ class VerifiableCredential {
    *   `@context` (if it is not present, it's added to the context list).
    * @returns {Promise<VerifiableCredential>}
    */
-  async sign(keyDoc, compactProof = true, issuerObject = null, addSuiteContext = false, useProofValue = false) {
+  async sign(keyDoc, compactProof = true, issuerObject = null, addSuiteContext = true, format = null) {
     const signedVC = await issueCredential(
       keyDoc,
       this.toJSON(),
@@ -243,10 +243,11 @@ class VerifiableCredential {
       null, null, null,
       issuerObject,
       addSuiteContext,
-      useProofValue,
+      format,
     );
     this.setProof(signedVC.proof);
     this.issuer = signedVC.issuer;
+    this.context = signedVC['@context'];
     return this;
   }
 

@@ -1,78 +1,4 @@
 export default {
-  'https://w3id.org/security/v1': {
-    '@context': {
-      id: '@id',
-      type: '@type',
-      dc: 'http://purl.org/dc/terms/',
-      sec: 'https://w3id.org/security#',
-      xsd: 'http://www.w3.org/2001/XMLSchema#',
-      EcdsaKoblitzSignature2016: 'sec:EcdsaKoblitzSignature2016',
-      Ed25519Signature2018: 'sec:Ed25519Signature2018',
-      EncryptedMessage: 'sec:EncryptedMessage',
-      GraphSignature2012: 'sec:GraphSignature2012',
-      LinkedDataSignature2015: 'sec:LinkedDataSignature2015',
-      LinkedDataSignature2016: 'sec:LinkedDataSignature2016',
-      CryptographicKey: 'sec:Key',
-      authenticationTag: 'sec:authenticationTag',
-      canonicalizationAlgorithm: 'sec:canonicalizationAlgorithm',
-      cipherAlgorithm: 'sec:cipherAlgorithm',
-      cipherData: 'sec:cipherData',
-      cipherKey: 'sec:cipherKey',
-      created: {
-        '@id': 'dc:created',
-        '@type': 'xsd:dateTime',
-      },
-      creator: {
-        '@id': 'dc:creator',
-        '@type': '@id',
-      },
-      digestAlgorithm: 'sec:digestAlgorithm',
-      digestValue: 'sec:digestValue',
-      domain: 'sec:domain',
-      encryptionKey: 'sec:encryptionKey',
-      expiration: {
-        '@id': 'sec:expiration',
-        '@type': 'xsd:dateTime',
-      },
-      expires: {
-        '@id': 'sec:expiration',
-        '@type': 'xsd:dateTime',
-      },
-      initializationVector: 'sec:initializationVector',
-      iterationCount: 'sec:iterationCount',
-      nonce: 'sec:nonce',
-      normalizationAlgorithm: 'sec:normalizationAlgorithm',
-      owner: {
-        '@id': 'sec:owner',
-        '@type': '@id',
-      },
-      password: 'sec:password',
-      privateKey: {
-        '@id': 'sec:privateKey',
-        '@type': '@id',
-      },
-      privateKeyPem: 'sec:privateKeyPem',
-      publicKey: {
-        '@id': 'sec:publicKey',
-        '@type': '@id',
-      },
-      publicKeyBase58: 'sec:publicKeyBase58',
-      publicKeyPem: 'sec:publicKeyPem',
-      publicKeyWif: 'sec:publicKeyWif',
-      publicKeyService: {
-        '@id': 'sec:publicKeyService',
-        '@type': '@id',
-      },
-      revoked: {
-        '@id': 'sec:revoked',
-        '@type': 'xsd:dateTime',
-      },
-      salt: 'sec:salt',
-      signature: 'sec:signature',
-      signatureAlgorithm: 'sec:signingAlgorithm',
-      signatureValue: 'sec:signatureValue',
-    },
-  },
   'https://gist.githubusercontent.com/lovesh/67bdfd354cfaf4fb853df4d6713f4610/raw': {
     id: 'https://gist.githubusercontent.com/lovesh/67bdfd354cfaf4fb853df4d6713f4610/raw',
     type: 'EcdsaSecp256k1VerificationKey2019',
@@ -89,5 +15,46 @@ export default {
     authentication: [
       'https://gist.githubusercontent.com/lovesh/67bdfd354cfaf4fb853df4d6713f4610/raw',
     ],
+  },
+
+  'urn:EcdsaSecp256k1VerificationKey2019#keys-1': {
+    id: 'urn:EcdsaSecp256k1VerificationKey2019#keys-1',
+    type: 'EcdsaSecp256k1VerificationKey2019',
+    publicKeyBase58: '222iuczftmixHLkW6wszwyeAfYCZA7bzQMhkEXpeNVJrk',
+    '@context': 'https://w3id.org/security/v2',
+    controller: 'urn:EcdsaSecp256k1VerificationKey2019',
+  },
+  'urn:EcdsaSecp256k1VerificationKey2019': {
+    '@context': 'https://w3id.org/security/v2',
+    id: 'urn:EcdsaSecp256k1VerificationKey2019',
+    assertionMethod: [
+      'urn:EcdsaSecp256k1VerificationKey2019#keys-1',
+    ],
+    authentication: [
+      'urn:EcdsaSecp256k1VerificationKey2019#keys-1',
+    ],
+  },
+
+  'urn:JsonWebKey2020': {
+    '@context': 'https://w3id.org/security/v2',
+    id: 'urn:JsonWebKey2020',
+    assertionMethod: [
+      'urn:JsonWebKey2020#keys-1',
+    ],
+    authentication: [
+      'urn:JsonWebKey2020#keys-1',
+    ],
+  },
+  'urn:JsonWebKey2020#keys-1': {
+    '@context': 'https://w3id.org/security/suites/jws-2020/v1',
+    id: 'urn:JsonWebKey2020#keys-1',
+    controller: 'urn:JsonWebKey2020',
+    type: 'JsonWebKey2020',
+    publicKeyJwk: {
+      kty: 'EC',
+      crv: 'P-384',
+      x: 'dMtj6RjwQK4G5HP3iwOD94RwbzPhS4wTZHO1luk_0Wz89chqV6uJyb51KaZzK0tk',
+      y: 'viPKF7Zbc4FxKegoupyVRcBr8TZHFxUrKQq4huOAyMuhTYJbFpAwMhIrWppql02E'
+    },
   },
 };

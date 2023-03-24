@@ -14,7 +14,7 @@ import {
 } from './constants';
 
 import {
-  EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
+  EcdsaSepc256k1Signature2019, Ed25519Signature2018, JsonWebSignature2020, Sr25519Signature2020,
 } from './custom_crypto';
 
 import Bls12381BBSSignatureDock2022 from './crypto/Bls12381BBSSignatureDock2022';
@@ -139,7 +139,13 @@ export async function verifyPresentation(presentation, options = {}) {
     documentLoader: options.documentLoader || defaultDocumentLoader(resolver),
     ...options,
     resolver: null,
-    suite: [new Ed25519Signature2018(), new EcdsaSepc256k1Signature2019(), new Sr25519Signature2020(), ...suite],
+    suite: [
+      new Ed25519Signature2018(),
+      new EcdsaSepc256k1Signature2019(),
+      new Sr25519Signature2020(),
+      new JsonWebSignature2020(),
+      ...suite,
+    ],
   };
 
   // TODO: verify proof then credentials
@@ -196,8 +202,8 @@ export async function verifyPresentation(presentation, options = {}) {
  * @param {object} [presentationPurpose] - Optional presentation purpose to override default AuthenticationProofPurpose
  * @return {Promise<VerifiablePresentation>} A VerifiablePresentation with a proof.
  */
-export async function signPresentation(presentation, keyDoc, challenge, domain, resolver = null, compactProof = true, presentationPurpose = null) {
-  const suite = getSuiteFromKeyDoc(keyDoc);
+export async function signPresentation(presentation, keyDoc, challenge, domain, resolver = null, compactProof = true, presentationPurpose = null, addSuiteContext = true) {
+  const suite = await getSuiteFromKeyDoc(keyDoc);
   const purpose = presentationPurpose || new AuthenticationProofPurpose({
     domain,
     challenge,
@@ -205,7 +211,7 @@ export async function signPresentation(presentation, keyDoc, challenge, domain, 
 
   const documentLoader = defaultDocumentLoader(resolver);
   return jsigs.sign(presentation, {
-    purpose, documentLoader, domain, challenge, compactProof, suite,
+    purpose, documentLoader, domain, challenge, compactProof, suite, addSuiteContext,
   });
 }
 

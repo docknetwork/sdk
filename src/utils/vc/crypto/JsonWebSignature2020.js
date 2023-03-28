@@ -1,11 +1,9 @@
 import { JsonWebKey } from '@transmute/json-web-signature';
 import CustomLinkedDataSignature from './custom-linkeddatasignature';
-// import JsonWebKey from './JsonWebKey';
 
 const SUITE_CONTEXT_URL = 'https://w3id.org/security/suites/jws-2020/v1';
 
 export default class JsonWebSignature2020 extends CustomLinkedDataSignature {
-// export default class JsonWebSignature2020 extends JsonWebSignature {
   /**
    * Creates a new JsonWebSignature2020 instance
    * @constructor

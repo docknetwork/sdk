@@ -15,7 +15,7 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
   constructor(api, signAndSend) {
     super();
     this.api = api;
-    this.moduleName = 'bbsPlus';
+    this.moduleName = 'offchainSignatures';
     this.module = api.tx[this.moduleName];
     this.signAndSend = signAndSend;
   }
@@ -30,8 +30,8 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
     const counter = (await this.api.query[this.moduleName].paramsCounter(hexId));
     if (counter > 0) {
       const resp = await this.queryParamsFromChain(hexId, counter);
-      if (resp.isSome) {
-        return this.createParamsObjFromChainResponse(resp.unwrap());
+      if (resp) {
+        return this.createParamsObjFromChainResponse(resp);
       }
     }
     return null;
@@ -50,8 +50,8 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
     if (counter > 0) {
       for (let i = 1; i <= counter; i++) {
         // eslint-disable-next-line no-await-in-loop
-        const param = await this.getParamsByHexDid(hexId, i);
-        if (param !== null) {
+        let param = await this.getParamsByHexDid(hexId, i);
+        if (param != null) {
           params.push(param);
         }
       }
@@ -60,11 +60,34 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
   }
 
   async queryParamsFromChain(hexDid, counter) {
-    return this.api.query[this.moduleName].bbsPlusParams(hexDid, counter);
+    let params = await this.api.query[this.moduleName].signatureParams(hexDid, counter);
+
+    if (params.isSome) {
+      params = params.unwrap();
+
+      if (params.isBbsPlus) {
+        return params.asBbsPlus
+      } else {
+        return null
+      }
+    } else {
+      return null
+    }
   }
 
   async queryPublicKeyFromChain(hexDid, keyId) {
-    return this.api.query[this.moduleName].bbsPlusKeys(hexDid, keyId);
+    let key = await this.api.query[this.moduleName].publicKeys(hexDid, keyId);
+    if (key.isSome) {
+      key = key.unwrap();
+
+      if (key.isBbsPlus) {
+        return key.asBbsPlus
+      } else {
+        return null
+      }
+    } else {
+      return null
+    }
   }
 
   /**
@@ -80,9 +103,10 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
    * @returns {Promise<*>}
    */
   async createAddPublicKeyTx(publicKey, targetDid, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    const offchainPublicKey = this.api.createType("OffchainPublicKey", { BBSPlus: publicKey });
     const targetHexDid = getHexIdentifierFromDID(targetDid);
     const signerHexDid = getHexIdentifierFromDID(signerDid);
-    const [addPk, signature] = await this.createSignedAddPublicKey(publicKey, targetHexDid, signerHexDid, keyPair, keyId, { nonce, didModule });
+    const [addPk, signature] = await this.createSignedAddPublicKey(offchainPublicKey, targetHexDid, signerHexDid, keyPair, keyId, { nonce, didModule });
     return this.module.addPublicKey(addPk, signature);
   }
 
@@ -168,7 +192,7 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
    * @returns {Signature}
    */
   signAddParams(keyPair, params) {
-    const serialized = getStateChange(this.api, 'AddBBSPlusParams', params);
+    const serialized = getStateChange(this.api, 'AddOffchainSignatureParams', params);
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 
@@ -179,7 +203,7 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
    * @returns {Signature}
    */
   signAddPublicKey(keyPair, pk) {
-    const serialized = getStateChange(this.api, 'AddBBSPlusPublicKey', pk);
+    const serialized = getStateChange(this.api, 'AddOffchainSignaturePublicKey', pk);
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 
@@ -190,7 +214,7 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
    * @returns {Signature}
    */
   signRemoveParams(keyPair, ref) {
-    const serialized = getStateChange(this.api, 'RemoveBBSPlusParams', ref);
+    const serialized = getStateChange(this.api, 'RemoveOffchainSignatureParams', ref);
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 
@@ -201,7 +225,7 @@ export default class BBSPlusModule extends WithParamsAndPublicKeys {
    * @returns {Signature}
    */
   signRemovePublicKey(keyPair, ref) {
-    const serialized = getStateChange(this.api, 'RemoveBBSPlusPublicKey', ref);
+    const serialized = getStateChange(this.api, 'RemoveOffchainSignaturePublicKey', ref);
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 }

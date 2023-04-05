@@ -92,8 +92,9 @@ export default class WithParamsAndPublicKeys {
    * @returns {Promise<*>}
    */
   async createAddParamsTx(params, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    const offchainParams = this.api.createType("OffchainSignatureParams", { BBSPlus: params })
     const hexDid = getHexIdentifierFromDID(signerDid);
-    const [addParams, signature] = await this.createSignedAddParams(params, hexDid, keyPair, keyId, { nonce, didModule });
+    const [addParams, signature] = await this.createSignedAddParams(offchainParams, hexDid, keyPair, keyId, { nonce, didModule });
     return this.module.addParams(addParams, signature);
   }
 
@@ -198,16 +199,16 @@ export default class WithParamsAndPublicKeys {
 
   async getParamsByHexDid(hexDid, counter) {
     const resp = await this.queryParamsFromChain(hexDid, counter);
-    if (resp.isSome) {
-      return this.createParamsObjFromChainResponse(resp.unwrap());
+    if (resp) {
+      return this.createParamsObjFromChainResponse(resp);
     }
     return null;
   }
 
   async getPublicKeyByHexDid(hexDid, keyId, withParams = false) {
     const resp = await this.queryPublicKeyFromChain(hexDid, keyId);
-    if (resp.isSome) {
-      const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(resp.unwrap());
+    if (resp) {
+      const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(resp);
       if (withParams) {
         if (pkObj.paramsRef === null) {
           throw new Error('No reference to parameters for the public key');

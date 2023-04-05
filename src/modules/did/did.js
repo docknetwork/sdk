@@ -836,33 +836,44 @@ class DIDModule {
       // If any keys should be fetched
       if (lastKeyId > keys.length) {
         // key id can be anything from 1 to `lastKeyId`
-        const possibleBbsPlusKeyIds = new Set();
+        const possibleKeyIds = new Set();
         for (let i = 1; i <= lastKeyId; i++) {
-          possibleBbsPlusKeyIds.add(i);
+          possibleKeyIds.add(i);
         }
         // Remove key ids already seen as non-BBS+
         for (const [i] of keys) {
-          possibleBbsPlusKeyIds.delete(i);
+          possibleKeyIds.delete(i);
         }
 
         // Query all BBS+ keys in a single RPC call to the node.
         const queryKeys = [];
-        for (const k of possibleBbsPlusKeyIds) {
+        for (const k of possibleKeyIds) {
           queryKeys.push([hexId, k]);
         }
-        const resp = await this.api.query.bbsPlus.bbsPlusKeys.multi(queryKeys);
+        const resp = await this.api.query.offchainSignatures.publicKeys.multi(queryKeys);
 
         let currentIter = 0;
-        for (const r of resp) {
+        for (let r of resp) {
           // The gaps in `keyId` might correspond to removed keys
           if (r.isSome) {
+            let rawKey, keyType;
+            r = r.unwrap();
+
+            if (r.isBbsPlus) {
+              keyType = 'Bls12381G2VerificationKeyDock2022'
+              rawKey = r.asBbsPlus
+            } else {
+              // TODO!
+              throw "Unsupported key type"
+              rawKey = r.asPs
+            };
             // Don't care about signature params for now
-            const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(r.unwrap());
+            const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(rawKey);
             if (pkObj.curveType !== 'Bls12381') {
               throw new Error(`Curve type should have been Bls12381 but was ${pkObj.curveType}`);
             }
             const keyIndex = queryKeys[currentIter][1];
-            keys.push([keyIndex, 'Bls12381G2VerificationKeyDock2022', hexToU8a(pkObj.bytes)]);
+            keys.push([keyIndex, keyType, hexToU8a(pkObj.bytes)]);
             assertion.push(keyIndex);
           }
           currentIter++;

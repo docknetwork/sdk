@@ -16,7 +16,12 @@ import {
   EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
   Bls12381BBSSignatureDock2022, Bls12381BBSSignatureProofDock2022, JsonWebSignature2020,
 } from './custom_crypto';
-import { bufferToUint8Array, signJWS } from './crypto/custom-linkeddatasignature';
+import { signJWS } from './jws';
+
+export const VC_ISSUE_TYPE_JSONLD = 'jsonld';
+export const VC_ISSUE_TYPE_PROOFVALUE = 'proofValue';
+export const VC_ISSUE_TYPE_JWT = 'jwt';
+export const VC_ISSUE_TYPE_DEFAULT = VC_ISSUE_TYPE_JSONLD;
 
 /**
  * @param {string|object} obj - Object with ID property or a string
@@ -33,6 +38,10 @@ function getId(obj) {
   return obj.id;
 }
 
+function dateStringToTimestamp(dateStr) {
+  return Math.floor(Date.parse(dateStr) / 1000);
+}
+
 export function formatToJWTPayload(keyDoc, cred) {
   const kid = keyDoc.id;
   const credentialIssuer = cred.issuer;
@@ -45,16 +54,16 @@ export function formatToJWTPayload(keyDoc, cred) {
     jti: cred.id,
     sub: subject || '',
     iss: credentialIssuer.id || credentialIssuer,
-    iat: Math.floor(Date.parse(issuanceDate) / 1000),
+    iat: dateStringToTimestamp(issuanceDate),
     vc: cred,
   };
 
   if (validFrom) {
-    vcJwtPayload.nbf = Math.floor(Date.parse(validFrom) / 1000);
+    vcJwtPayload.nbf = dateStringToTimestamp(validFrom);
   }
 
   if (expirationDate) {
-    vcJwtPayload.exp = Math.floor(Date.parse(expirationDate) / 1000);
+    vcJwtPayload.exp = dateStringToTimestamp(expirationDate);
   }
 
   const vcJwtHeader = {
@@ -266,7 +275,7 @@ export async function verifyCredential(vcJSONorString, {
     const { document: keyDocument } = await docLoader(header.kid);
     const keyDocSuite = await getSuiteFromKeyDoc(keyDocument, false, { detached: false, header });
     const verified = await keyDocSuite.verifySignature({
-      verifyData: bufferToUint8Array(Buffer.from(jwtSplit[1], 'utf8')),
+      verifyData: new Uint8Array(Buffer.from(jwtSplit[1], 'utf8')),
       verificationMethod: keyDocument,
       proof: {
         jws: vcJSONorString,
@@ -319,11 +328,12 @@ export async function verifyCredential(vcJSONorString, {
  * @param {Boolean} [addSuiteContext] - Toggles the default
  *   behavior of each signature suite enforcing the presence of its own
  *   `@context` (if it is not present, it's added to the context list).
+ * @param {(jsonld|jwt|proofValue)} [type] - Optional format/type of the credential (JSON-LD, JWT, proofValue)
  * @return {Promise<object>} The signed credential object.
  */
-export async function issueCredential(keyDoc, credential, compactProof = true, documentLoader = null, purpose = null, expansionMap = null, issuerObject = null, addSuiteContext = true, type = 'jsonld') {
-  const useProofValue = type === 'proofValue';
-  const useJWT = type === 'jwt';
+export async function issueCredential(keyDoc, credential, compactProof = true, documentLoader = null, purpose = null, expansionMap = null, issuerObject = null, addSuiteContext = true, type = VC_ISSUE_TYPE_DEFAULT) {
+  const useProofValue = type === VC_ISSUE_TYPE_PROOFVALUE;
+  const useJWT = type === VC_ISSUE_TYPE_JWT;
 
   // Clone the credential object to prevent mutation
   const issuerId = credential.issuer || keyDoc.controller;
@@ -345,7 +355,7 @@ export async function issueCredential(keyDoc, credential, compactProof = true, d
 
     // Get suite from keyDoc parameter
     const jwtOpts = { detached: false, header: vcJwtHeader };
-    const suite = await getSuiteFromKeyDoc(keyDoc, useProofValue, jwtOpts);
+    const suite = await getSuiteFromKeyDoc(keyDoc, false, jwtOpts);
     return signJWS(suite.signer || suite, suite.alg, jwtOpts, vcJwtPayload);
   }
 

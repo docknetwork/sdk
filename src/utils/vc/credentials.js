@@ -46,10 +46,13 @@ export function formatToJWTPayload(keyDoc, cred) {
   const kid = keyDoc.id;
   const credentialIssuer = cred.issuer;
   const subject = cred.credentialSubject.id;
-  const validFrom = cred.validFrom || cred.issuanceDate;
   const { issuanceDate, expirationDate } = cred;
 
-  // Reference: https://www.w3.org/TR/vc-data-model/#jwt-encoding
+  // NOTE: Expecting validFrom here for future spec support
+  const validFrom = cred.validFrom || issuanceDate;
+
+  // References: https://www.w3.org/TR/vc-data-model/#jwt-encoding
+  // https://www.rfc-editor.org/rfc/rfc7519#section-4.1.6
   const vcJwtPayload = {
     jti: cred.id,
     sub: subject || '',

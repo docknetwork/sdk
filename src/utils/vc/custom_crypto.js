@@ -18,6 +18,7 @@ import Sr25519VerificationKey2020 from './crypto/Sr25519VerificationKey2020';
 import Sr25519Signature2020 from './crypto/Sr25519Signature2020';
 import Bls12381BBSSignatureDock2022 from './crypto/Bls12381BBSSignatureDock2022';
 import Bls12381BBSSignatureProofDock2022 from './crypto/Bls12381BBSSignatureProofDock2022';
+import JsonWebSignature2020 from './crypto/JsonWebSignature2020';
 
 export {
   EcdsaSecp256k1VerKeyName,
@@ -37,4 +38,5 @@ export {
   Bls12381BBSDockVerKeyName,
   Bls12381BBSSigDockSigName,
   Bls12381BBSSigProofDockSigName,
+  JsonWebSignature2020,
 };

@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -97,6 +97,7 @@
     "@polkadot/types-known": "9.7.1",
     "@polkadot/util": "10.1.11",
     "@polkadot/util-crypto": "10.1.11",
+    "@transmute/json-web-signature": "^0.7.0-unstable.80",
     "axios": "0.27.2",
     "base64url": "3.0.1",
     "blake2b": "2.1.4",

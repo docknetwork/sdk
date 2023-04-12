@@ -1,10 +1,11 @@
 import jsonld from 'jsonld';
+import { JsonWebKey } from '@transmute/json-web-signature';
 import defaultDocumentLoader from './document-loader';
 
 import {
   EcdsaSecp256k1VerKeyName, Ed25519VerKeyName, Sr25519VerKeyName,
   EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
-  Bls12381BBSSignatureDock2022, Bls12381BBSDockVerKeyName,
+  Bls12381BBSSignatureDock2022, Bls12381BBSDockVerKeyName, JsonWebSignature2020,
 } from './custom_crypto';
 
 /**
@@ -39,13 +40,14 @@ export default function getKeyDoc(did, keypair, type, id) {
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
  * @returns {object} - signature suite.
  */
-export function getSuiteFromKeyDoc(keyDoc, useProofValue) {
+export async function getSuiteFromKeyDoc(keyDoc, useProofValue, options) {
   // Check if passing suite directly
   if (keyDoc.verificationMethod) {
     return keyDoc;
   }
 
   let Cls;
+  let { keypair } = keyDoc;
   switch (keyDoc.type) {
     case EcdsaSecp256k1VerKeyName:
       Cls = EcdsaSepc256k1Signature2019;
@@ -59,6 +61,12 @@ export function getSuiteFromKeyDoc(keyDoc, useProofValue) {
     case Bls12381BBSDockVerKeyName:
       Cls = Bls12381BBSSignatureDock2022;
       break;
+    case 'JsonWebKey2020':
+      Cls = JsonWebSignature2020;
+      if (!keypair) {
+        keypair = await JsonWebKey.from(keyDoc, options);
+      }
+      break;
     default:
       throw new Error(`Unknown key type ${keyDoc.type}.`);
   }
@@ -67,6 +75,8 @@ export function getSuiteFromKeyDoc(keyDoc, useProofValue) {
     ...keyDoc,
     verificationMethod: keyDoc.id,
     useProofValue,
+    keyDoc,
+    keypair,
   });
 }
 

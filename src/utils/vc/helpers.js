@@ -103,7 +103,7 @@ export function potentialToArray(a) {
 
 export function getKeyFromDIDDocument(didDocument, didUrl) {
   // Ensure not already a key doc
-  if (didDocument.publicKeyBase58 || didDocument.publicKeyMultibase) {
+  if (didDocument.publicKeyBase58 || didDocument.publicKeyMultibase || didDocument.publicKeyJwk || (didDocument.publicKey && !Array.isArray(didDocument.publicKey))) {
     return didDocument;
   }
 

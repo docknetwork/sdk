@@ -8,7 +8,7 @@ import { getAndValidateSchemaIfPresent } from './schema';
 import { isRevocationCheckNeeded, checkRevocationStatus } from '../revocation';
 import DIDResolver from '../../did-resolver'; // eslint-disable-line
 
-import { getSuiteFromKeyDoc, expandJSONLD } from './helpers';
+import { getSuiteFromKeyDoc, expandJSONLD, getKeyFromDIDDocument } from './helpers';
 import { DEFAULT_CONTEXT_V1_URL, credentialContextField } from './constants';
 import { ensureValidDatetime } from '../type-helpers';
 
@@ -275,7 +275,8 @@ export async function verifyCredential(vcJSONorString, {
       throw new Error('No kid in JWT header');
     }
 
-    const { document: keyDocument } = await docLoader(header.kid);
+    const { document: didDocument } = await docLoader(header.kid);
+    const keyDocument = getKeyFromDIDDocument(didDocument, header.kid);
     const keyDocSuite = await getSuiteFromKeyDoc(keyDocument, false, { detached: false, header });
     const verified = await keyDocSuite.verifySignature({
       verifyData: new Uint8Array(Buffer.from(jwtSplit[1], 'utf8')),

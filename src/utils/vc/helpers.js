@@ -95,3 +95,22 @@ export async function expandJSONLD(credential, options = {}) {
   });
   return expanded[0];
 }
+
+export function potentialToArray(a) {
+  /* eslint-disable no-nested-ternary */
+  return a ? (Array.isArray(a) ? a : [a]) : [];
+}
+
+export function getKeyFromDIDDocument(didDocument, didUrl) {
+  // Ensure not already a key doc
+  if (didDocument.publicKeyBase58 || didDocument.publicKeyMultibase || didDocument.publicKeyJwk || (didDocument.publicKey && !Array.isArray(didDocument.publicKey))) {
+    return didDocument;
+  }
+
+  const possibleKeys = [
+    ...potentialToArray(didDocument.verificationMethod),
+    ...potentialToArray(didDocument.keyAgreement),
+    ...potentialToArray(didDocument.publicKey),
+  ];
+  return possibleKeys.filter((key) => key.id === didUrl)[0];
+}

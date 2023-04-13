@@ -119,4 +119,25 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
       ),
     );
   }, 40000);
+
+  test('(JWT) Issue a verifiable credential with ed25519 key and verify it', async () => {
+    const issuerKey = getKeyDoc(issuer1DID, dock.keyring.addFromUri(issuer1KeySeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
+    const credential = await issueCredential(issuerKey, unsignedCred, true, null, null, null, null, false, 'jwt');
+    const result = await verifyCredential(credential, { resolver });
+    expect(result.verified).toBeTruthy();
+  }, 40000);
+
+  test('(JWT) Issue a verifiable credential with secp256k1 key and verify it', async () => {
+    const issuerKey = getKeyDoc(issuer2DID, generateEcdsaSecp256k1Keypair(issuer2KeyEntropy), 'EcdsaSecp256k1VerificationKey2019');
+    const credential = await issueCredential(issuerKey, unsignedCred, true, null, null, null, null, false, 'jwt');
+    const result = await verifyCredential(credential, { resolver });
+    expect(result.verified).toBeTruthy();
+  }, 40000);
+
+  test('(JWT) Issue a verifiable credential with sr25519 key and verify it', async () => {
+    const issuerKey = getKeyDoc(issuer3DID, dock.keyring.addFromUri(issuer3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
+    const credential = await issueCredential(issuerKey, unsignedCred, true, null, null, null, null, false, 'jwt');
+    const result = await verifyCredential(credential, { resolver });
+    expect(result.verified).toBeTruthy();
+  }, 40000);
 });

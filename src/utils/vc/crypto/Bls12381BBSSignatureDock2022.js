@@ -135,7 +135,10 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
       proof: trimmedProof,
     };
     credBuilder.subject = credentialSubject;
-    credBuilder.credStatus = credentialStatus;
+
+    if (credentialStatus) {
+      credBuilder.setCredentialStatus(credentialStatus.id, credentialStatus.revocationCheck, credentialStatus.revocationId);
+    }
 
     Object.keys(custom).sort().forEach((k) => {
       credBuilder.setTopLevelField(k, custom[k]);

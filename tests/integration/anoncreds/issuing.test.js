@@ -161,6 +161,41 @@ describe('BBS+ Module', () => {
     );
   }, 30000);
 
+  test('Can issue+verify a BBS+ credential with revocation status', async () => {
+    const MEM_CHECK_STR = 'membership';
+    const NON_MEM_CHECK_STR = 'non-membership';
+
+    const registryId = 'dock:accumulator';
+    const memberValue = 'test';
+
+    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
+    const unsignedCred = {
+      ...credentialJSON,
+      issuer: did1,
+      credentialStatus: {
+        id: registryId,
+        type: 'DockVBAccumulator2022',
+        revocationCheck: MEM_CHECK_STR,
+        revocationId: memberValue,
+      },
+    };
+    delete unsignedCred.credentialSchema;
+
+    const credential = await issueCredential(issuerKey, unsignedCred);
+    expect(credential).toMatchObject(
+      expect.objectContaining(
+        getCredMatcherDoc(unsignedCred, did1, issuerKey.id, 'Bls12381BBS+SignatureDock2022'),
+      ),
+    );
+
+    const result = await verifyCredential(credential, { resolver });
+    expect(result).toMatchObject(
+      expect.objectContaining(
+        getProofMatcherDoc(),
+      ),
+    );
+  }, 30000);
+
   afterAll(async () => {
     await dock.disconnect();
   }, 10000);

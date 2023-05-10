@@ -23,4 +23,24 @@ export default class BBSModule extends OffchainSignatures {
   static buildPublicKey(publicKey) {
     return new BBSPublicKey(publicKey)
   }
+
+  async queryParamsFromChain(hexDid, counter) {
+    const params = await super.queryParamsFromChain(hexDid, counter);
+
+    if (params?.isBbs) {
+      return params.asBbs;
+    } else {
+      return null;
+    }
+  }
+
+  async queryPublicKeyFromChain(hexDid, keyId) {
+    const key = await super.queryPublicKeyFromChain(hexDid, keyId);
+
+    if (key?.isBbs) {
+      return key.asBbs
+    } else {
+      return null
+    }
+  }
 }

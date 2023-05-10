@@ -859,12 +859,15 @@ class DIDModule {
             let rawKey, keyType;
             r = r.unwrap();
 
-            if (r.isBbsPlus) {
+            if (r.isBbs) {
+              keyType = 'Bls12381G2VerificationKeyDock2022'
+              rawKey = r.r.asBbs
+            } else if (r.isBbsPlus) {
               keyType = 'Bls12381G2VerificationKeyDock2022'
               rawKey = r.asBbsPlus
-            } else {
-              // TODO!
-              throw "Unsupported key type"
+            } else if (r.isPs) {
+              // TODO
+              keyType = 'Bls12381PSVerificationKeyDock2022'
               rawKey = r.asPs
             };
             // Don't care about signature params for now

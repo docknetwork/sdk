@@ -23,4 +23,24 @@ export default class PSModule extends OffchainSignatures {
   static buildPublicKey(publicKey) {
     return new PSPublicKey(publicKey)
   }
+
+  async queryParamsFromChain(hexDid, counter) {
+    const params = await super.queryParamsFromChain(hexDid, counter);
+
+    if (params?.isPs) {
+      return params.asPs;
+    } else {
+      return null;
+    }
+  }
+
+  async queryPublicKeyFromChain(hexDid, keyId) {
+    const key = await super.queryPublicKeyFromChain(hexDid, keyId);
+
+    if (key?.isPs) {
+      return key.asPs
+    } else {
+      return null
+    }
+  }
 }

@@ -71,13 +71,7 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
     let params = await this.api.query[this.moduleName].signatureParams(hexDid, counter);
 
     if (params.isSome) {
-      params = params.unwrap();
-
-      if (params.isBbsPlus) {
-        return params.asBbsPlus
-      } else {
-        return null
-      }
+      return params.unwrap();
     } else {
       return null
     }
@@ -85,22 +79,17 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
 
   async queryPublicKeyFromChain(hexDid, keyId) {
     let key = await this.api.query[this.moduleName].publicKeys(hexDid, keyId);
-    if (key.isSome) {
-      key = key.unwrap();
 
-      if (key.isBbsPlus) {
-        return key.asBbsPlus
-      } else {
-        return null
-      }
+    if (key.isSome) {
+      return key.unwrap();
     } else {
       return null
     }
   }
 
   /**
-   * Create transaction to add a BBS+ public key
-   * @param publicKey - BBS+ public key to add.
+   * Create transaction to add a public key
+   * @param publicKey - public key to add.
    * @param targetDid - The DID to which key is being added
    * @param signerDid - The DID that is adding the key by signing the payload because it controls `targetDid`
    * @param keyPair - Signer's keypair
@@ -119,7 +108,7 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
   }
 
   /**
-   * Create transaction to remove BBS+ public key
+   * Create transaction to remove public key
    * @param removeKeyId - The key index for key to remove.
    * @param targetDid - The DID from which key is being removed
    * @param signerDid - The DID that is removing the key by signing the payload because it controls `targetDid`
@@ -138,8 +127,8 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
   }
 
   /**
-   * Add a BBS+ public key
-   * @param publicKey - BBS+ public key to add.
+   * Add a public key
+   * @param publicKey - public key to add.
    * @param targetDid - The DID to which key is being added
    * @param signerDid - The DID that is adding the key by signing the payload because it controls `targetDid`
    * @param keyPair - Signer's keypair
@@ -157,7 +146,7 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
   }
 
   /**
-   * Remove BBS+ public key
+   * Remove public key
    * @param removeKeyId - The key index for key to remove.
    * @param targetDid - The DID from which key is being removed
    * @param signerDid - The DID that is removing the key by signing the payload because it controls `targetDid`

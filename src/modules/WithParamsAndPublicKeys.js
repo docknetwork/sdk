@@ -7,7 +7,7 @@ import { getNonce } from '../utils/misc';
 /** Class with logic for public keys and corresponding setup parameters. This logic is common in BBS+ and accumulator */
 export default class WithParamsAndPublicKeys {
   static buildParams(params) {
-    return params
+    return params;
   }
 
   /**
@@ -96,7 +96,7 @@ export default class WithParamsAndPublicKeys {
    * @returns {Promise<*>}
    */
   async createAddParamsTx(params, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
-    const offchainParams = this.constructor.buildParams(params)
+    const offchainParams = this.constructor.buildParams(params);
     const hexDid = getHexIdentifierFromDID(signerDid);
     const [addParams, signature] = await this.createSignedAddParams(offchainParams, hexDid, keyPair, keyId, { nonce, didModule });
     return this.module.addParams(addParams, signature);

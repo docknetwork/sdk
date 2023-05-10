@@ -6,7 +6,7 @@ import {
   BBSPlusSignatureG1,
   BBSPlusPublicKeyG2,
   BBSPlusSecretKey,
-  BBSPlusSignatureParamsG1
+  BBSPlusSignatureParamsG1,
 } from '@docknetwork/crypto-wasm-ts';
 
 import {

@@ -9,11 +9,11 @@ import { createDidSig, getHexIdentifierFromDID } from '../utils/did';
 /** Class to manage accumulators on chain */
 export default class AccumulatorModule extends WithParamsAndPublicKeys {
   static buildParams(params) {
-    return params
+    return params;
   }
 
   static buildPublicKey(key) {
-    return key
+    return key;
   }
 
   constructor(api, signAndSend) {

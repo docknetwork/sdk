@@ -21,11 +21,11 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
   }
 
   static buildParams(params) {
-    return params
+    return params;
   }
 
   static buildPublicKey(publicKey) {
-    return publicKey
+    return publicKey;
   }
 
   /**
@@ -58,7 +58,7 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
     if (counter > 0) {
       for (let i = 1; i <= counter; i++) {
         // eslint-disable-next-line no-await-in-loop
-        let param = await this.getParamsByHexDid(hexId, i);
+        const param = await this.getParamsByHexDid(hexId, i);
         if (param != null) {
           params.push(param);
         }
@@ -68,22 +68,22 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
   }
 
   async queryParamsFromChain(hexDid, counter) {
-    let params = await this.api.query[this.moduleName].signatureParams(hexDid, counter);
+    const params = await this.api.query[this.moduleName].signatureParams(hexDid, counter);
 
     if (params.isSome) {
       return params.unwrap();
     } else {
-      return null
+      return null;
     }
   }
 
   async queryPublicKeyFromChain(hexDid, keyId) {
-    let key = await this.api.query[this.moduleName].publicKeys(hexDid, keyId);
+    const key = await this.api.query[this.moduleName].publicKeys(hexDid, keyId);
 
     if (key.isSome) {
       return key.unwrap();
     } else {
-      return null
+      return null;
     }
   }
 

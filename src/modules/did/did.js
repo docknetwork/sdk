@@ -856,20 +856,21 @@ class DIDModule {
         for (let r of resp) {
           // The gaps in `keyId` might correspond to removed keys
           if (r.isSome) {
-            let rawKey, keyType;
+            let rawKey; let
+              keyType;
             r = r.unwrap();
 
             if (r.isBbs) {
-              keyType = 'Bls12381G2VerificationKeyDock2022'
-              rawKey = r.asBbs
+              keyType = 'Bls12381G2VerificationKeyDock2022';
+              rawKey = r.asBbs;
             } else if (r.isBbsPlus) {
-              keyType = 'Bls12381G2VerificationKeyDock2022'
-              rawKey = r.asBbsPlus
+              keyType = 'Bls12381G2VerificationKeyDock2022';
+              rawKey = r.asBbsPlus;
             } else if (r.isPs) {
               // TODO
-              keyType = 'Bls12381PSVerificationKeyDock2022'
-              rawKey = r.asPs
-            };
+              keyType = 'Bls12381PSVerificationKeyDock2022';
+              rawKey = r.asPs;
+            }
             // Don't care about signature params for now
             const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(rawKey);
             if (pkObj.curveType !== 'Bls12381') {

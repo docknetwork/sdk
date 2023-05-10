@@ -6,7 +6,7 @@ import {
   initializeWasm,
   BBSPlusSignatureG1,
   BBSPlusSecretKey,
-  BBSPlusSignatureParamsG1
+  BBSPlusSignatureParamsG1,
 } from '@docknetwork/crypto-wasm-ts';
 
 import jsonld from 'jsonld';

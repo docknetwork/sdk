@@ -7,8 +7,8 @@ import {
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 import { ensureArray } from './utils/type-helpers';
 
-import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';
-import { Bls12381BBSSigProofDockSigName } from './utils/vc/crypto/constants';
+import Bls12381PSSignatureDock2023 from './utils/vc/crypto/Bls12381PSSignatureDock2023';
+import { Bls12381PSSigProofDockSigName } from './utils/vc/crypto/constants';
 import CustomLinkedDataSignature from './utils/vc/crypto/custom-linkeddatasignature';
 import defaultDocumentLoader from './utils/vc/document-loader';
 
@@ -70,7 +70,7 @@ export default class PSPresentation {
     if (!proof) {
       throw new Error('BBS credential does not have a proof');
     }
-    const keyDocument = await Bls12381BBSSignatureDock2022.getVerificationMethod({
+    const keyDocument = await Bls12381PSSignatureDock2023.getVerificationMethod({
       proof,
       documentLoader,
     });
@@ -78,7 +78,7 @@ export default class PSPresentation {
     const pkRaw = b58.decode(keyDocument.publicKeyBase58);
     const pk = new PSPublicKey(pkRaw);
 
-    const [credential] = Bls12381BBSSignatureDock2022.convertCredential({
+    const [credential] = Bls12381PSSignatureDock2023.convertCredential({
       document: json,
     });
 
@@ -120,7 +120,7 @@ export default class PSPresentation {
           proofPurpose: 'assertionMethod',
           created: date,
           ...credential.revealedAttributes.proof,
-          type: Bls12381BBSSigProofDockSigName,
+          type: Bls12381PSSigProofDockSigName,
           proofValue: presentation.proof,
           nonce: presentation.nonce,
           context: presentation.context,

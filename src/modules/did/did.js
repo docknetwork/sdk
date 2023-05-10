@@ -861,14 +861,14 @@ class DIDModule {
             r = r.unwrap();
 
             if (r.isBbs) {
-              keyType = 'Bls12381G2VerificationKeyDock2022';
+              keyType = 'Bls12381BBSVerificationKeyDock2023';
               rawKey = r.asBbs;
             } else if (r.isBbsPlus) {
               keyType = 'Bls12381G2VerificationKeyDock2022';
               rawKey = r.asBbsPlus;
             } else if (r.isPs) {
               // TODO
-              keyType = 'Bls12381PSVerificationKeyDock2022';
+              keyType = 'Bls12381PSVerificationKeyDock2023';
               rawKey = r.asPs;
             }
             // Don't care about signature params for now

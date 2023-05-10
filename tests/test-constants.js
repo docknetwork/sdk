@@ -60,7 +60,10 @@ export const BBS = {
   getModule: (dock) => dock.bbs,
   SignatureParams: BBSSignatureParams,
   KeyPair: BBSKeypair,
-  KeyType: 'Bls12381G2VerificationKeyDock2022'
+  KeyType: 'Bls12381BBSVerificationKeyDock2023',
+  SigType: 'Bls12381BBSSignatureDock2023',
+  Context: 'https://ld.dock.io/security/bbs23/v1',
+  VerKey: 'Bls12381BBSVerificationKeyDock2023'
 };
 export const BBSPlus = {
   Name: "BBS+",
@@ -69,7 +72,10 @@ export const BBSPlus = {
   getModule: (dock) => dock.bbsPlus,
   SignatureParams: BBSPlusSignatureParamsG1,
   KeyPair: BBSPlusKeypairG2,
-  KeyType: 'Bls12381G2VerificationKeyDock2022'
+  KeyType: 'Bls12381G2VerificationKeyDock2022',
+  Context: 'https://ld.dock.io/security/bbs/v1',
+  VerKey: 'Bls12381G2VerificationKeyDock2022',
+  SigType: 'Bls12381BBS+SignatureDock2022'
 };
 export const PS = {
   Name: "PS",
@@ -78,7 +84,10 @@ export const PS = {
   getModule: (dock) => dock.ps,
   SignatureParams: PSSignatureParams,
   KeyPair: PSKeypair,
-  KeyType: 'Bls12381PSVerificationKeyDock2022'
+  KeyType: 'Bls12381PSVerificationKeyDock2023',
+  SigType: 'Bls12381PSSignatureDock2023',
+  Context: 'https://ld.dock.io/security/ps/v1',
+  VerKey: 'Bls12381PSVerificationKeyDock2023'
 };
 
 export const Schemes = [BBS, BBSPlus, PS]

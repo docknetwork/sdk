@@ -7,7 +7,7 @@ import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
-  Schemes
+  Schemes,
 } from "../../test-constants";
 import { createNewDockDID } from "../../../src/utils/did";
 import Bls12381G2KeyPairDock2022 from "../../../src/utils/vc/crypto/Bls12381G2KeyPairDock2022";
@@ -52,31 +52,31 @@ const embeddedSchema = {
   type: "JsonSchemaValidator2018",
 };
 
-// TODO: move to fixtures
-const credentialJSON = {
-  "@context": [
-    "https://www.w3.org/2018/credentials/v1",
-    "https://w3id.org/citizenship/v1",
-    "https://ld.dock.io/security/bbs/v1",
-  ],
-  id: "https://issuer.oidp.uscis.gov/credentials/83627465",
-  type: ["VerifiableCredential", "PermanentResidentCard"],
-  credentialSchema: embeddedSchema,
-  identifier: "83627465",
-  name: "Permanent Resident Card",
-  description: "Government of Example Permanent Resident Card.",
-  issuanceDate: "2019-12-03T12:19:52Z",
-  expirationDate: "2029-12-03T12:19:52Z",
-  credentialSubject: {
-    id: "did:example:b34ca6cd37bbf23",
-    type: ["PermanentResident", "Person"],
-    givenName: "JOHN",
-    familyName: "SMITH",
-    lprNumber: 1234,
-  },
-};
+for (const { Name, Module, Presentation, Context, KeyType, getModule } of Schemes) {
+  // TODO: move to fixtures
+  const credentialJSON = {
+    "@context": [
+      "https://www.w3.org/2018/credentials/v1",
+      "https://w3id.org/citizenship/v1",
+      Context,
+    ],
+    id: "https://issuer.oidp.uscis.gov/credentials/83627465",
+    type: ["VerifiableCredential", "PermanentResidentCard"],
+    credentialSchema: embeddedSchema,
+    identifier: "83627465",
+    name: "Permanent Resident Card",
+    description: "Government of Example Permanent Resident Card.",
+    issuanceDate: "2019-12-03T12:19:52Z",
+    expirationDate: "2029-12-03T12:19:52Z",
+    credentialSubject: {
+      id: "did:example:b34ca6cd37bbf23",
+      type: ["PermanentResident", "Person"],
+      givenName: "JOHN",
+      familyName: "SMITH",
+      lprNumber: 1234,
+    },
+  };
 
-for (const { Name, Module, Presentation } of Schemes) {
   describe(`${Name} Presentation`, () => {
     const dock = new DockAPI();
     const resolver = new DockResolver(dock);
@@ -85,6 +85,7 @@ for (const { Name, Module, Presentation } of Schemes) {
     let pair1;
     let keypair;
     let didDocument;
+    let chainModule;
 
     beforeAll(async () => {
       await initializeWasm();
@@ -103,10 +104,10 @@ for (const { Name, Module, Presentation } of Schemes) {
         controller: did1,
       });
 
-      const pk1 = Module.prepareAddPublicKey(
-        u8aToHex(keypair.publicKeyBuffer)
-      );
-      await Module.addPublicKey(
+      chainModule = getModule(dock);
+
+      const pk1 = Module.prepareAddPublicKey(u8aToHex(keypair.publicKeyBuffer));
+      await chainModule.addPublicKey(
         pk1,
         did1,
         did1,
@@ -119,7 +120,7 @@ for (const { Name, Module, Presentation } of Schemes) {
       didDocument = await dock.did.getDocument(did1);
       const { publicKey } = didDocument;
       expect(publicKey.length).toEqual(2);
-      expect(publicKey[1].type).toEqual("Bls12381G2VerificationKeyDock2022");
+      expect(publicKey[1].type).toEqual(KeyType);
       keypair.id = publicKey[1].id;
     }, 30000);
 

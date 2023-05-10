@@ -2,9 +2,18 @@ import jsonld from 'jsonld';
 import defaultDocumentLoader from './document-loader';
 
 import {
-  EcdsaSecp256k1VerKeyName, Ed25519VerKeyName, Sr25519VerKeyName,
-  EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
-  Bls12381BBSSignatureDock2022, Bls12381BBSDockVerKeyName,
+  EcdsaSecp256k1VerKeyName,
+  Ed25519VerKeyName,
+  Sr25519VerKeyName,
+  EcdsaSepc256k1Signature2019,
+  Ed25519Signature2018,
+  Sr25519Signature2020,
+  Bls12381BBSSignatureDock2022,
+  Bls12381BBSDockVerKeyName,
+  Bls12381BBS23DockVerKeyName,
+  Bls12381BBSSignatureDock2023,
+  Bls12381PSSignatureDock2023,
+  Bls12381PS23DockVerKeyName,
 } from './custom_crypto';
 
 /**
@@ -59,6 +68,11 @@ export function getSuiteFromKeyDoc(keyDoc, useProofValue) {
     case Bls12381BBSDockVerKeyName:
       Cls = Bls12381BBSSignatureDock2022;
       break;
+    case Bls12381BBS23DockVerKeyName:
+      Cls = Bls12381BBSSignatureDock2023;
+      break;
+    case Bls12381PS23DockVerKeyName:
+      Cls = Bls12381PSSignatureDock2023;
     default:
       throw new Error(`Unknown key type ${keyDoc.type}.`);
   }
@@ -76,12 +90,15 @@ export function getSuiteFromKeyDoc(keyDoc, useProofValue) {
  */
 export async function expandJSONLD(credential, options = {}) {
   if (options.documentLoader && options.resolver) {
-    throw new Error('Passing resolver and documentLoader results in resolver being ignored, please re-factor.');
+    throw new Error(
+      'Passing resolver and documentLoader results in resolver being ignored, please re-factor.',
+    );
   }
 
   const expanded = await jsonld.expand(credential, {
     ...options,
-    documentLoader: options.documentLoader || defaultDocumentLoader(options.resolver),
+    documentLoader:
+      options.documentLoader || defaultDocumentLoader(options.resolver),
   });
   return expanded[0];
 }

@@ -5,9 +5,9 @@ import {
 
 import {
   Encoder,
-  SignatureParamsG1,
-  KeypairG2,
-  SignatureG1,
+  BBSPlusSignatureParamsG1,
+  BBSPlusKeypairG2,
+  BBSPlusSignatureG1,
   Statement,
   Statements,
   WitnessEqualityMetaStatement,
@@ -19,14 +19,11 @@ import {
   ProofSpecG1,
   R1CSSnarkSetup,
   initializeWasm,
-  signMessageObject,
-  verifyMessageObject,
-  getSigParamsForMsgStructure,
   getRevealedAndUnrevealed,
   getIndicesForMsgNames, CircomInputs, encodeRevealedMsgs,
 } from '@docknetwork/crypto-wasm-ts';
 
-import { generateFieldElementFromNumber } from '@docknetwork/crypto-wasm';
+import {  generateFieldElementFromNumber } from '@docknetwork/crypto-wasm';
 import { DockAPI } from '../../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { createNewDockDID } from '../../../src/utils/did';
@@ -119,7 +116,7 @@ describe('Proving that blood group is not AB-', () => {
 
     // Setup encoder
     const defaultEncoder = (v) => {
-      return SignatureG1.encodeMessageForSigning(Uint8Array.from(Buffer.from(v.toString(), 'utf-8')));
+      return BBSPlusSignatureG1.encodeMessageForSigning(Uint8Array.from(Buffer.from(v.toString(), 'utf-8')));
     };
     encoder = new Encoder(undefined, defaultEncoder);
     encodedABNeg = encoder.encodeDefault('AB-');
@@ -132,10 +129,10 @@ describe('Proving that blood group is not AB-', () => {
 
   test('Create BBS+ params and keys', async () => {
     // Message count shouldn't matter as `label` is known
-    const sigParams = SignatureParamsG1.generate(1, labelBytes);
+    const sigParams = BBSPlusSignatureParamsG1.generate(1, labelBytes);
     // Not writing the BBS+ params on chain as its assumed that the label is hardcoded in the code as system parameter
 
-    issuerBbsPlusKeypair = KeypairG2.generate(sigParams);
+    issuerBbsPlusKeypair = BBSPlusKeypairG2.generate(sigParams);
     const pk = BBSPlusModule.prepareAddPublicKey(u8aToHex(issuerBbsPlusKeypair.publicKey.bytes));
     await dock.bbsPlusModule.addPublicKey(pk, issuerDid, issuerDid, issuerKeypair, 1, { didModule: dock.didModule }, false);
   });
@@ -144,11 +141,11 @@ describe('Proving that blood group is not AB-', () => {
     const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 2, false);
     const sigPk = new BBSPlusPublicKeyG2(hexToU8a(queriedPk.bytes));
 
-    credential1 = signMessageObject(attributes1, issuerBbsPlusKeypair.secretKey, labelBytes, encoder);
-    expect(verifyMessageObject(attributes1, credential1.signature, sigPk, labelBytes, encoder).verified).toBe(true);
+    credential1 = BBSPlusSignatureParamsG1.signMessageObject(attributes1, issuerBbsPlusKeypair.secretKey, labelBytes, encoder);
+    expect(BBSPlusSignatureParamsG1.verifyMessageObject(attributes1, credential1.signature, sigPk, labelBytes, encoder).verified).toBe(true);
 
-    credential2 = signMessageObject(attributes2, issuerBbsPlusKeypair.secretKey, labelBytes, encoder);
-    expect(verifyMessageObject(attributes2, credential2.signature, sigPk, labelBytes, encoder).verified).toBe(true);
+    credential2 = BBSPlusSignatureParamsG1.signMessageObject(attributes2, issuerBbsPlusKeypair.secretKey, labelBytes, encoder);
+    expect(BBSPlusSignatureParamsG1.verifyMessageObject(attributes2, credential2.signature, sigPk, labelBytes, encoder).verified).toBe(true);
   });
 
   it('verifier generates SNARk proving and verifying key', async () => {
@@ -176,7 +173,7 @@ describe('Proving that blood group is not AB-', () => {
     const revealedNames = new Set();
     revealedNames.add('fname');
 
-    const sigParams = getSigParamsForMsgStructure(attributesStruct, labelBytes);
+    const sigParams = BBSPlusSignatureParamsG1.getSigParamsForMsgStructure(attributesStruct, labelBytes);
     const [revealedMsgs, unrevealedMsgs, revealedMsgsRaw] = getRevealedAndUnrevealed(
       credentialAttributesRaw,
       revealedNames,
@@ -184,7 +181,7 @@ describe('Proving that blood group is not AB-', () => {
     );
     expect(revealedMsgsRaw).toEqual({ fname: expectedFirstName });
 
-    const statement1 = Statement.bbsSignature(sigParams, sigPk, revealedMsgs, false);
+    const statement1 = Statement.bbsPlusSignature(sigParams, sigPk, revealedMsgs, false);
     const statement2 = Statement.r1csCircomProver(r1cs, wasm, snarkPk);
 
     const statementsProver = new Statements();
@@ -203,7 +200,7 @@ describe('Proving that blood group is not AB-', () => {
     const proofSpecProver = new ProofSpecG1(statementsProver, metaStmtsProver);
     expect(proofSpecProver.isValid()).toEqual(true);
 
-    const witness1 = Witness.bbsSignature(credential.signature, unrevealedMsgs, false);
+    const witness1 = Witness.bbsPlusSignature(credential.signature, unrevealedMsgs, false);
 
     const inputs = new CircomInputs();
     inputs.setPrivateInput('in', credential.encodedMessages['physical.bloodGroup']);
@@ -220,7 +217,7 @@ describe('Proving that blood group is not AB-', () => {
     const revealedMsgsFromVerifier = encodeRevealedMsgs(revealedMsgsRaw, attributesStruct, encoder);
     checkMapsEqual(revealedMsgs, revealedMsgsFromVerifier);
 
-    const statement3 = Statement.bbsSignature(sigParams, sigPk, revealedMsgsFromVerifier, false);
+    const statement3 = Statement.bbsPlusSignature(sigParams, sigPk, revealedMsgsFromVerifier, false);
     const pub = [generateFieldElementFromNumber(1), encodedABNeg];
     const statement4 = Statement.r1csCircomVerifier(pub, snarkVk);
 

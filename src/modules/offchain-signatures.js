@@ -3,8 +3,6 @@
 import { getNonce, getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
 import WithParamsAndPublicKeys from './WithParamsAndPublicKeys';
 import { createDidSig, getHexIdentifierFromDID } from '../utils/did';
-import BBSPlusPublicKey from '../offchain-signatures/public-keys/bbs-plus';
-import BBSPlusParams from '../offchain-signatures/params/bbs-plus';
 
 /** Class to write offchain signature parameters and keys on chain */
 export default class OffchainSignatures extends WithParamsAndPublicKeys {

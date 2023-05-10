@@ -4,7 +4,7 @@ import OffchainSignatures from './offchain-signatures';
 import PSPublicKey from '../offchain-signatures/public-keys/ps';
 import PSParams from '../offchain-signatures/params/ps';
 
-/** Class to write Pointcheval-Sanders parameters and keys on chain */
+/** Class to write `Pointcheval-Sanders` parameters and keys on chain */
 export default class PSModule extends OffchainSignatures {
   /**
    * sets the dock api for this module

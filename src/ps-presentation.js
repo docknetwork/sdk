@@ -1,9 +1,9 @@
-import { BBSPlusPublicKeyG2, initializeWasm, isWasmInitialized } from '@docknetwork/crypto-wasm-ts';
+import { PSPublicKey, initializeWasm, isWasmInitialized } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
 import { stringToU8a } from '@polkadot/util';
 import {
-  BBSPlusPresentationBuilder,
-  BBSPlusCredential,
+  PSPresentationBuilder,
+  PSCredential,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 import { ensureArray } from './utils/type-helpers';
 
@@ -12,13 +12,13 @@ import { Bls12381BBSSigProofDockSigName } from './utils/vc/crypto/constants';
 import CustomLinkedDataSignature from './utils/vc/crypto/custom-linkeddatasignature';
 import defaultDocumentLoader from './utils/vc/document-loader';
 
-export default class BbsPlusPresentation {
+export default class PSPresentation {
   /**
-   * Create a new BbsPlusPresentation instance.
+   * Create a new PSPresentation instance.
    * @constructor
    */
   constructor() {
-    this.presBuilder = new BBSPlusPresentationBuilder();
+    this.presBuilder = new PSPresentationBuilder();
   }
 
   /**
@@ -76,13 +76,13 @@ export default class BbsPlusPresentation {
     });
 
     const pkRaw = b58.decode(keyDocument.publicKeyBase58);
-    const pk = new BBSPlusPublicKeyG2(pkRaw);
+    const pk = new PSPublicKey(pkRaw);
 
     const [credential] = Bls12381BBSSignatureDock2022.convertCredential({
       document: json,
     });
 
-    const convertedCredential = BBSPlusCredential.fromJSON(credential, CustomLinkedDataSignature.fromJsigProofValue(credentialLD.proof.proofValue));
+    const convertedCredential = PSCredential.fromJSON(credential, CustomLinkedDataSignature.fromJsigProofValue(credentialLD.proof.proofValue));
     const idx = await this.presBuilder.addCredential(convertedCredential, pk);
 
     // Enforce revealing of verificationMethod and type

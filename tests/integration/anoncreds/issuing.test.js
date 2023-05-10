@@ -1,6 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
-import { hexToU8a, u8aToHex, stringToHex } from '@polkadot/util';
-import { initializeWasm, KeypairG2, SignatureParamsG1 } from '@docknetwork/crypto-wasm-ts';
+import { u8aToHex } from '@polkadot/util';
+import { initializeWasm } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI } from '../../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { createNewDockDID } from '../../../src/utils/did';

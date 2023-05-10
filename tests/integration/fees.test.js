@@ -3,9 +3,9 @@ import {
   Accumulator,
   AccumulatorParams,
   initializeWasm,
-  KeypairG2,
+  BBSPlusKeypairG2,
   PositiveAccumulator,
-  SignatureParamsG1,
+  BBSPlusSignatureParamsG1,
   WitnessUpdatePublicInfo,
 } from "@docknetwork/crypto-wasm-ts";
 import { DockAPI } from "../../src/index";
@@ -60,8 +60,8 @@ describe("Fees", () => {
     const result = await sendTx();
     const after = await getBalance(dock.api, address);
 
-    // Compare free balances with `10 DOCK` precision
-    assert(Math.round((before.free - after.free) / 1e7) * 10);
+    // Compare free balances with `4 DOCK` precision
+    assert(Math.round((before.free - after.free) / 4e6) * 4);
 
     for (const prop of ["feeFrozen", "reserved", "miscFrozen"]) {
       const beforeProp = applyToBefore[prop]
@@ -398,7 +398,7 @@ describe("Fees", () => {
     // Add params with different attribute sizes
     for (const attributeCount of [10, 11, 12, 13, 14, 15]) {
       const bytes = u8aToHex(
-        SignatureParamsG1.generate(attributeCount, hexToU8a(label)).toBytes()
+        BBSPlusSignatureParamsG1.generate(attributeCount, hexToU8a(label)).toBytes()
       );
       const params = BBSPlusModule.prepareAddParameters(
         bytes,
@@ -418,8 +418,8 @@ describe("Fees", () => {
     }
 
     // Add a public key
-    const kp = KeypairG2.generate(
-      SignatureParamsG1.generate(10, hexToU8a(label))
+    const kp = BBSPlusKeypairG2.generate(
+      BBSPlusSignatureParamsG1.generate(10, hexToU8a(label))
     );
     const pk = BBSPlusModule.prepareAddPublicKey(
       u8aToHex(kp.publicKey.bytes),
@@ -683,7 +683,7 @@ describe("Fees", () => {
           ),
           false
         ),
-      (fee) => expect(fee).toBe(90120),
+      (fee) => expect(fee).toBe(90116),
       {
         // 80K DOCK per deposit
         reserved: (before) => before.add(new BN(8e10)),

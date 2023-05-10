@@ -1,7 +1,7 @@
 import jsonld from 'jsonld';
 import jsigs from 'jsonld-signatures';
 import { BBSPlusPublicKeyG2 } from '@docknetwork/crypto-wasm-ts';
-import { Presentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
+import { BBSPlusPresentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
 import b58 from 'bs58';
 import { verifyCredential } from './credentials';
 import DIDResolver from '../../did-resolver'; // eslint-disable-line
@@ -226,7 +226,7 @@ export async function verifyBBSPlusPresentation(presentation, options = {}) {
     return Bls12381BBSSignatureDock2022.getVerificationMethod({ proof, documentLoader });
   }));
 
-  const recreatedPres = Presentation.fromJSON(presentation);
+  const recreatedPres = BBSPlusPresentation.fromJSON(presentation);
   const pks = keyDocuments.map((keyDocument) => {
     const pkRaw = b58.decode(keyDocument.publicKeyBase58);
     return new BBSPlusPublicKeyG2(pkRaw);

@@ -4,9 +4,9 @@ import {
 
 import {
   initializeWasm,
-  SignatureG1,
+  BBSPlusSignatureG1,
   BBSPlusSecretKey,
-  getSigParamsOfRequiredSize,
+  BBSPlusSignatureParamsG1
 } from '@docknetwork/crypto-wasm-ts';
 
 import jsonld from 'jsonld';
@@ -211,8 +211,8 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
         }
 
         const msgCount = data.length;
-        const sigParams = getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES);
-        const signature = SignatureG1.generate(data, new BBSPlusSecretKey(keypair.privateKeyBuffer), sigParams, false);
+        const sigParams = BBSPlusSignatureParamsG1.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES);
+        const signature = BBSPlusSignatureG1.generate(data, new BBSPlusSecretKey(keypair.privateKeyBuffer), sigParams, false);
         return signature.value;
       },
     };

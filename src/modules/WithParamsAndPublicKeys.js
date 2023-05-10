@@ -6,6 +6,10 @@ import { getNonce } from '../utils/misc';
 
 /** Class with logic for public keys and corresponding setup parameters. This logic is common in BBS+ and accumulator */
 export default class WithParamsAndPublicKeys {
+  static buildParams(params) {
+    return params
+  }
+
   /**
    * Create object to add new parameters on chain
    * @param bytes
@@ -116,8 +120,8 @@ export default class WithParamsAndPublicKeys {
   }
 
   /**
-   * Add new BBS+ params.
-   * @param param - The BBS+ params to add.
+   * Add new signature params.
+   * @param param - The signature params to add.
    * @param signerDid - Signer of the payload
    * @param keyPair - Signer's keypair
    * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification

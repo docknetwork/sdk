@@ -1,6 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { hexToU8a, u8aToHex, stringToHex } from '@polkadot/util';
-import { initializeWasm, KeypairG2, SignatureParamsG1 } from '@docknetwork/crypto-wasm-ts';
+import { initializeWasm, BBSPlusKeypairG2, BBSPlusSignatureParamsG1 } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI } from '../../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { createNewDockDID, getHexIdentifierFromDID } from '../../../src/utils/did';
@@ -40,7 +40,7 @@ describe('BBS+ Module', () => {
 
   test('Can create new params', async () => {
     let label = stringToHex('test-params-label');
-    let params = SignatureParamsG1.generate(10, hexToU8a(label));
+    let params = BBSPlusSignatureParamsG1.generate(10, hexToU8a(label));
     const bytes1 = u8aToHex(params.toBytes());
     const params1 = chainModuleClass.prepareAddParameters(bytes1, undefined, label);
     await chainModule.addParams(params1, did1, pair1, 1, { didModule: dock.did }, false);
@@ -51,7 +51,7 @@ describe('BBS+ Module', () => {
     const queriedParams1 = await chainModule.getParams(did1, 1);
     expect(paramsWritten1).toEqual(queriedParams1);
 
-    params = SignatureParamsG1.generate(20);
+    params = BBSPlusSignatureParamsG1.generate(20);
     const bytes2 = u8aToHex(params.toBytes());
     const params2 = chainModuleClass.prepareAddParameters(bytes2);
     await chainModule.addParams(params2, did2, pair2, 1, { didModule: dock.did }, false);
@@ -63,7 +63,7 @@ describe('BBS+ Module', () => {
     expect(paramsWritten2).toEqual(queriedParams2);
 
     label = stringToHex('test-params-label-2');
-    params = SignatureParamsG1.generate(23, hexToU8a(label));
+    params = BBSPlusSignatureParamsG1.generate(23, hexToU8a(label));
     const bytes3 = u8aToHex(params.toBytes());
     const params3 = chainModuleClass.prepareAddParameters(bytes3, undefined, label);
     await chainModule.addParams(params3, did1, pair1, 1, { didModule: dock.did }, false);
@@ -83,8 +83,8 @@ describe('BBS+ Module', () => {
   }, 30000);
 
   test('Can create public keys', async () => {
-    const params = SignatureParamsG1.generate(5);
-    let keypair = KeypairG2.generate(params);
+    const params = BBSPlusSignatureParamsG1.generate(5);
+    let keypair = BBSPlusKeypairG2.generate(params);
     const bytes1 = u8aToHex(keypair.publicKey.bytes);
     const pk1 = chainModuleClass.prepareAddPublicKey(bytes1);
     await chainModule.addPublicKey(pk1, did1, did1, pair1, 1, { didModule: dock.did }, false);
@@ -93,9 +93,9 @@ describe('BBS+ Module', () => {
     expect(queriedPk1.paramsRef).toBe(null);
 
     const queriedParams1 = await chainModule.getParams(did1, 1);
-    const params1Val = SignatureParamsG1.valueFromBytes(hexToU8a(queriedParams1.bytes));
-    const params1 = new SignatureParamsG1(params1Val, hexToU8a(queriedParams1.label));
-    keypair = KeypairG2.generate(params1);
+    const params1Val = BBSPlusSignatureParamsG1.valueFromBytes(hexToU8a(queriedParams1.bytes));
+    const params1 = new BBSPlusSignatureParamsG1(params1Val, hexToU8a(queriedParams1.label));
+    keypair = BBSPlusKeypairG2.generate(params1);
     const bytes2 = u8aToHex(keypair.publicKey.bytes);
     const pk2 = chainModuleClass.prepareAddPublicKey(bytes2, undefined, [did1, 1]);
     await chainModule.addPublicKey(pk2, did2, did2, pair2, 1, { didModule: dock.did }, false);
@@ -107,9 +107,9 @@ describe('BBS+ Module', () => {
     expect(queriedPk2WithParams.params).toEqual(queriedParams1);
 
     const queriedParams2 = await chainModule.getParams(did1, 2);
-    const params2Val = SignatureParamsG1.valueFromBytes(hexToU8a(queriedParams2.bytes));
-    const params2 = new SignatureParamsG1(params2Val, hexToU8a(queriedParams2.label));
-    keypair = KeypairG2.generate(params2);
+    const params2Val = BBSPlusSignatureParamsG1.valueFromBytes(hexToU8a(queriedParams2.bytes));
+    const params2 = new BBSPlusSignatureParamsG1(params2Val, hexToU8a(queriedParams2.label));
+    keypair = BBSPlusKeypairG2.generate(params2);
     const bytes3 = u8aToHex(keypair.publicKey.bytes);
     const pk3 = chainModuleClass.prepareAddPublicKey(bytes3, undefined, [did1, 2]);
     await chainModule.addPublicKey(pk3, did2, did2, pair2, 1, { didModule: dock.did }, false);

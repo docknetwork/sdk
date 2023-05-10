@@ -4,10 +4,9 @@ import {
 } from '@polkadot/util';
 
 import {
-  SignatureParamsG1,
-  KeypairG2,
-  SignatureG1,
-  Signature,
+  BBSPlusSignatureParamsG1,
+  BBSPlusKeypairG2,
+  BBSPlusSignatureG1,
   Statement,
   Statements,
   WitnessEqualityMetaStatement,
@@ -64,11 +63,11 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
     const encoded = [];
     for (let i = 0; i < attrs.length; i++) {
       if (i === encAttrIdx) {
-        encoded.push(SignatureG1.reversibleEncodeStringForSigning(attrs[i]));
+        encoded.push(BBSPlusSignatureG1.reversibleEncodeStringForSigning(attrs[i]));
       } else if (i === boundedAttrIdx) {
-        encoded.push(SignatureG1.encodePositiveNumberForSigning(attrs[i]));
+        encoded.push(BBSPlusSignatureG1.encodePositiveNumberForSigning(attrs[i]));
       } else {
-        encoded.push(Signature.encodeMessageForSigning(attrs[i]));
+        encoded.push(BBSPlusSignatureG1.encodeMessageForSigning(attrs[i]));
       }
     }
     return encoded;
@@ -95,7 +94,7 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
 
   test('Create BBS+ params and keys', async () => {
     const label = stringToHex('My BBS+ params');
-    const sigParams = SignatureParamsG1.generate(attributeCount, hexToU8a(label));
+    const sigParams = BBSPlusSignatureParamsG1.generate(attributeCount, hexToU8a(label));
     const bytes = u8aToHex(sigParams.toBytes());
     const params = BBSPlusModule.prepareAddParameters(bytes, undefined, label);
     await dock.bbsPlusModule.addParams(params, issuerDid, issuerKeypair, 1, { didModule: dock.didModule }, false);
@@ -103,7 +102,7 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
     expect(paramsWritten.bytes).toEqual(params.bytes);
     expect(paramsWritten.label).toEqual(params.label);
 
-    issuerBbsPlusKeypair = KeypairG2.generate(sigParams);
+    issuerBbsPlusKeypair = BBSPlusKeypairG2.generate(sigParams);
     const pk = BBSPlusModule.prepareAddPublicKey(u8aToHex(issuerBbsPlusKeypair.publicKey.bytes), undefined, [issuerDid, 1]);
     await dock.bbsPlusModule.addPublicKey(pk, issuerDid, issuerDid, issuerKeypair, 1, { didModule: dock.didModule }, false);
   }, 10000);
@@ -111,9 +110,9 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
   test('Sign attributes, i.e. issue credential', async () => {
     const encodedAttrs = encodedAttributes(attributes);
     const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 2, true);
-    const paramsVal = SignatureParamsG1.valueFromBytes(hexToU8a(queriedPk.params.bytes));
-    const params = new SignatureParamsG1(paramsVal, hexToU8a(queriedPk.params.label));
-    signature = SignatureG1.generate(encodedAttrs, issuerBbsPlusKeypair.secretKey, params, false);
+    const paramsVal = BBSPlusSignatureParamsG1.valueFromBytes(hexToU8a(queriedPk.params.bytes));
+    const params = new BBSPlusSignatureParamsG1(paramsVal, hexToU8a(queriedPk.params.label));
+    signature = BBSPlusSignatureG1.generate(encodedAttrs, issuerBbsPlusKeypair.secretKey, params, false);
 
     // User verifies the credential (signature)
     const result = signature.verify(encodedAttrs, new BBSPlusPublicKeyG2(hexToU8a(queriedPk.bytes)), params, false);
@@ -140,7 +139,7 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
     const pk = snarkPk.decompress();
 
     const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 2, true);
-    const sigParams = new SignatureParamsG1(SignatureParamsG1.valueFromBytes(hexToU8a(queriedPk.params.bytes)));
+    const sigParams = new BBSPlusSignatureParamsG1(BBSPlusSignatureParamsG1.valueFromBytes(hexToU8a(queriedPk.params.bytes)));
     const sigPk = new BBSPlusPublicKeyG2(hexToU8a(queriedPk.bytes));
 
     const encodedAttrs = encodedAttributes(attributes);
@@ -148,7 +147,7 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
     const revealedAttrIndices = new Set();
     const [revealedAttrs, unrevealedAttrs] = getRevealedUnrevealed(encodedAttrs, revealedAttrIndices);
 
-    const statement1 = Statement.bbsSignature(sigParams, sigPk, revealedAttrs, false);
+    const statement1 = Statement.bbsPlusSignature(sigParams, sigPk, revealedAttrs, false);
     const statement2 = Statement.saverProver(encGens, commGens, ek, pk, chunkBitSize);
 
     const proverStatements = new Statements();
@@ -161,7 +160,7 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
     const metaStatements = new MetaStatements();
     metaStatements.add(MetaStatement.witnessEquality(witnessEq));
 
-    const witness1 = Witness.bbsSignature(signature, unrevealedAttrs, false);
+    const witness1 = Witness.bbsPlusSignature(signature, unrevealedAttrs, false);
     const witness2 = Witness.saver(encodedAttrs[encAttrIdx]);
     const witnesses = new Witnesses();
     witnesses.add(witness1);
@@ -194,7 +193,7 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
     const snarkProvingKey = pk.decompress();
 
     const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 2, true);
-    const sigParams = new SignatureParamsG1(SignatureParamsG1.valueFromBytes(hexToU8a(queriedPk.params.bytes)));
+    const sigParams = new BBSPlusSignatureParamsG1(BBSPlusSignatureParamsG1.valueFromBytes(hexToU8a(queriedPk.params.bytes)));
     const sigPk = new BBSPlusPublicKeyG2(hexToU8a(queriedPk.bytes));
 
     const encodedAttrs = encodedAttributes(attributes);
@@ -203,7 +202,7 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
     revealedAttrIndices.add(0);
     const [revealedAttrs, unrevealedAttrs] = getRevealedUnrevealed(encodedAttrs, revealedAttrIndices);
 
-    const statement1 = Statement.bbsSignature(sigParams, sigPk, revealedAttrs, false);
+    const statement1 = Statement.bbsPlusSignature(sigParams, sigPk, revealedAttrs, false);
     const statement2 = Statement.boundCheckProver(min, max, snarkProvingKey);
     const proverStatements = new Statements();
     proverStatements.add(statement1);
@@ -215,7 +214,7 @@ describe('Complete demo of verifiable encryption using SAVER and bound check usi
     const metaStatements = new MetaStatements();
     metaStatements.add(MetaStatement.witnessEquality(witnessEq));
 
-    const witness1 = Witness.bbsSignature(signature, unrevealedAttrs, false);
+    const witness1 = Witness.bbsPlusSignature(signature, unrevealedAttrs, false);
     const witness2 = Witness.boundCheckLegoGroth16(encodedAttrs[boundedAttrIdx]);
     const witnesses = new Witnesses();
     witnesses.add(witness1);

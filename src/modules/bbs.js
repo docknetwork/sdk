@@ -1,11 +1,11 @@
 /* eslint-disable camelcase */
 
 import OffchainSignatures from './offchain-signatures';
-import BBSPlusPublicKey from '../offchain-signatures/public-keys/bbs-plus';
-import BBSPlusParams from '../offchain-signatures/params/bbs-plus';
+import BBSPublicKey from '../offchain-signatures/public-keys/bbs';
+import BBSParams from '../offchain-signatures/params/bbs';
 
-/** Class to write `BBS+` parameters and keys on chain */
-export default class BBSPlusModule extends OffchainSignatures {
+/** Class to write `BBS` parameters and keys on chain */
+export default class BBSModule extends OffchainSignatures {
   /**
    * sets the dock api for this module
    * @constructor
@@ -17,10 +17,10 @@ export default class BBSPlusModule extends OffchainSignatures {
   }
 
   static buildParams(params) {
-    return new BBSPlusParams(params)
+    return new BBSParams(params)
   }
 
   static buildPublicKey(publicKey) {
-    return new BBSPlusPublicKey(publicKey)
+    return new BBSPublicKey(publicKey)
   }
 }

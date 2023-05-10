@@ -4,10 +4,9 @@ import {
 } from '@polkadot/util';
 import {
   Accumulator,
-  SignatureParamsG1,
-  KeypairG2,
-  SignatureG1,
-  Signature,
+  BBSPlusSignatureParamsG1,
+  BBSPlusKeypairG2,
+  BBSPlusSignatureG1,
   PositiveAccumulator,
   Statement,
   Statements,
@@ -72,7 +71,7 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
         // different way.
         encoded.push(Accumulator.encodeBytesAsAccumulatorMember(attrs[i]));
       } else {
-        encoded.push(Signature.encodeMessageForSigning(attrs[i]));
+        encoded.push(BBSPlusSignatureG1.encodeMessageForSigning(attrs[i]));
       }
     }
     return encoded;
@@ -87,7 +86,7 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     const [revealedAttrs, unrevealedAttrs] = getRevealedUnrevealed(encodedAttrs, revealedAttrIndices);
 
     const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 2, true);
-    const sigParams = new SignatureParamsG1(SignatureParamsG1.valueFromBytes(hexToU8a(queriedPk.params.bytes)));
+    const sigParams = new BBSPlusSignatureParamsG1(BBSPlusSignatureParamsG1.valueFromBytes(hexToU8a(queriedPk.params.bytes)));
     const sigPk = new BBSPlusPublicKeyG2(hexToU8a(queriedPk.bytes));
 
     const accum = await dock.accumulatorModule.getAccumulator(accumulatorId, true);
@@ -96,7 +95,7 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
     const accumulated = hexToU8a(accum.accumulated);
     const provingKey = Accumulator.generateMembershipProvingKey();
 
-    const statement1 = Statement.bbsSignature(sigParams, sigPk, revealedAttrs, false);
+    const statement1 = Statement.bbsPlusSignature(sigParams, sigPk, revealedAttrs, false);
     const statement2 = Statement.accumulatorMembership(accumParams, accumPk, provingKey, accumulated);
     const statements = new Statements();
     statements.add(statement1);
@@ -114,7 +113,7 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
 
     const proofSpec = new ProofSpecG1(statements, metaStatements, [], context);
 
-    const witness1 = Witness.bbsSignature(signature, unrevealedAttrs, false);
+    const witness1 = Witness.bbsPlusSignature(signature, unrevealedAttrs, false);
     const witness2 = Witness.accumulatorMembership(encodedAttrs[attributeCount - 1], membershipWitness);
     const witnesses = new Witnesses();
     witnesses.add(witness1);
@@ -143,7 +142,7 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
 
   test('Create BBS+ params', async () => {
     const label = stringToHex('My BBS+ params');
-    const bytes = u8aToHex(SignatureParamsG1.generate(attributeCount, hexToU8a(label)).toBytes());
+    const bytes = u8aToHex(BBSPlusSignatureParamsG1.generate(attributeCount, hexToU8a(label)).toBytes());
     const params = BBSPlusModule.prepareAddParameters(bytes, undefined, label);
     await dock.bbsPlusModule.addParams(params, issuerDid, issuerKeypair, 1, { didModule: dock.did }, false);
     const paramsWritten = await dock.bbsPlusModule.getLastParamsWritten(issuerDid);
@@ -153,14 +152,14 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
 
   test('Create BBS+ keypair', async () => {
     const queriedParams = await dock.bbsPlusModule.getParams(issuerDid, 1);
-    const paramsVal = SignatureParamsG1.valueFromBytes(
+    const paramsVal = BBSPlusSignatureParamsG1.valueFromBytes(
       hexToU8a(queriedParams.bytes),
     );
-    const params = new SignatureParamsG1(
+    const params = new BBSPlusSignatureParamsG1(
       paramsVal,
       hexToU8a(queriedParams.label),
     );
-    issuerBbsPlusKeypair = KeypairG2.generate(params);
+    issuerBbsPlusKeypair = BBSPlusKeypairG2.generate(params);
 
     const pk = BBSPlusModule.prepareAddPublicKey(u8aToHex(issuerBbsPlusKeypair.publicKey.bytes), undefined, [issuerDid, 1]);
     await dock.bbsPlusModule.addPublicKey(pk, issuerDid, issuerDid, issuerKeypair, 1, { didModule: dock.did }, false);
@@ -196,9 +195,9 @@ describe('Complete demo of anonymous credentials using BBS+ and accumulator', ()
   test('Sign attributes, i.e. issue credential', async () => {
     const encodedAttrs = encodedAttributes(attributes);
     const queriedPk = await dock.bbsPlusModule.getPublicKey(issuerDid, 2, true);
-    const paramsVal = SignatureParamsG1.valueFromBytes(hexToU8a(queriedPk.params.bytes));
-    const params = new SignatureParamsG1(paramsVal, hexToU8a(queriedPk.params.label));
-    signature = SignatureG1.generate(encodedAttrs, issuerBbsPlusKeypair.secretKey, params, false);
+    const paramsVal = BBSPlusSignatureParamsG1.valueFromBytes(hexToU8a(queriedPk.params.bytes));
+    const params = new BBSPlusSignatureParamsG1(paramsVal, hexToU8a(queriedPk.params.label));
+    signature = BBSPlusSignatureG1.generate(encodedAttrs, issuerBbsPlusKeypair.secretKey, params, false);
 
     // User verifies the credential (signature)
     const result = signature.verify(encodedAttrs, new BBSPlusPublicKeyG2(hexToU8a(queriedPk.bytes)), params, false);

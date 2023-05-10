@@ -1,7 +1,7 @@
 import {
   BBSPlusPublicKeyG2,
 } from '@docknetwork/crypto-wasm-ts';
-import { Presentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
+import { BBSPlusPresentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
 import b58 from 'bs58';
 
 import Bls12381BBSSignatureDock2022 from './Bls12381BBSSignatureDock2022';
@@ -103,7 +103,7 @@ export default class Bls12381BBSSignatureProofDock2022 extends CustomLinkedDataS
       );
 
       const presentationJSON = convertToPresentation({ ...document, proof });
-      const recreatedPres = Presentation.fromJSON(presentationJSON);
+      const recreatedPres = BBSPlusPresentation.fromJSON(presentationJSON);
 
       const pks = [verificationMethod].map((keyDocument) => {
         const pkRaw = b58.decode(keyDocument.publicKeyBase58);

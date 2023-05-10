@@ -9,7 +9,9 @@ import BlobModule from './modules/blob';
 import { DIDModule } from './modules/did';
 import RevocationModule from './modules/revocation';
 import TokenMigration from './modules/migration';
+import BBSModule from './modules/bbs';
 import BBSPlusModule from './modules/bbs-plus';
+import PSModule from './modules/ps';
 import AccumulatorModule from './modules/accumulator';
 import PoaRpcDefs from './rpc-defs/poa-rpc-defs';
 import PriceFeedRpcDefs from './rpc-defs/price-feed-rpc-defs';
@@ -29,6 +31,7 @@ import {
   SignatureSr25519,
   SignatureEd25519,
 } from './signatures';
+import OffchainSignatures from './modules/offchain-signatures';
 
 function getExtrinsicError(data, typeDef, api) {
   // Loop through each of the parameters
@@ -139,7 +142,10 @@ class DockAPI {
     this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));
     this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
     this.revocationModule = new RevocationModule(this.api, this.signAndSend.bind(this));
+    this.bbsModule = new BBSModule(this.api, this.signAndSend.bind(this));
     this.bbsPlusModule = new BBSPlusModule(this.api, this.signAndSend.bind(this));
+    this.psModule = new PSModule(this.api, this.signAndSend.bind(this));
+    this.offchainSignaturesModule = new OffchainSignatures(this.api, this.signAndSend.bind(this));
     this.accumulatorModule = new AccumulatorModule(this.api, this.signAndSend.bind(this));
 
     if (loadPoaModules) {
@@ -165,7 +171,9 @@ class DockAPI {
       delete this.blobModule;
       delete this.didModule;
       delete this.revocationModule;
+      delete this.bbsModule;
       delete this.bbsPlusModule;
+      delete this.psModule;
       delete this.accumulatorModule;
       delete this.migrationModule;
     }
@@ -323,11 +331,25 @@ class DockAPI {
     return this.revocationModule;
   }
 
+  get bbs() {
+    if (!this.bbsModule) {
+      throw new Error('Unable to get BBS module, SDK is not initialised');
+    }
+    return this.bbsModule;
+  }
+
   get bbsPlus() {
     if (!this.bbsPlusModule) {
       throw new Error('Unable to get BBS+ module, SDK is not initialised');
     }
     return this.bbsPlusModule;
+  }
+
+  get ps() {
+    if (!this.psModule) {
+      throw new Error('Unable to get PS module, SDK is not initialised');
+    }
+    return this.psModule;
   }
 
   get accumulator() {

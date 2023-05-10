@@ -861,7 +861,7 @@ class DIDModule {
 
             if (r.isBbs) {
               keyType = 'Bls12381G2VerificationKeyDock2022'
-              rawKey = r.r.asBbs
+              rawKey = r.asBbs
             } else if (r.isBbsPlus) {
               keyType = 'Bls12381G2VerificationKeyDock2022'
               rawKey = r.asBbsPlus

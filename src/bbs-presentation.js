@@ -16,7 +16,7 @@ import { Bls12381BBSSigProofDockSigName } from "./utils/vc/crypto/constants";
 import CustomLinkedDataSignature from "./utils/vc/crypto/custom-linkeddatasignature";
 import defaultDocumentLoader from "./utils/vc/document-loader";
 
-export default class BbsPresentation {
+export default class BBSPresentation {
   /**
    * Create a new BbsPresentation instance.
    * @constructor

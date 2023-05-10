@@ -1,5 +1,13 @@
 // The constants below are used for examples and tests
 
+import { BBSKeypair, BBSPlusKeypairG2, BBSPlusSignatureParamsG1, BBSSignatureParams, PSKeypair, PSSignatureParams } from "@docknetwork/crypto-wasm-ts";
+import BBSModule from "../src/modules/bbs";
+import BBSPlusModule from "../src/modules/bbs-plus";
+import PSModule from "../src/modules/ps";
+import BBSPresentation from "../src/bbs-presentation";
+import BBSPlusPresentation from "../src/bbs-plus-presentation";
+import PSPresentation from "../src/ps-presentation";
+
 require("dotenv").config();
 
 const DefaultFullNodeEndpoint = "ws://localhost:9944";
@@ -44,3 +52,33 @@ export const TestAccountCouncilMemberURI = fromEnv(
 );
 export const MinGasPrice = fromEnv("MinGasPrice", DefaultMinGasPrice);
 export const MaxGas = fromEnv("MaxGas", DefaultMaxGas);
+
+export const BBS = {
+  Name: "BBS",
+  Module: BBSModule,
+  Presentation: BBSPresentation,
+  getModule: (dock) => dock.bbs,
+  SignatureParams: BBSSignatureParams,
+  KeyPair: BBSKeypair,
+  KeyType: 'Bls12381G2VerificationKeyDock2022'
+};
+export const BBSPlus = {
+  Name: "BBS+",
+  Module: BBSPlusModule,
+  Presentation: BBSPlusPresentation,
+  getModule: (dock) => dock.bbsPlus,
+  SignatureParams: BBSPlusSignatureParamsG1,
+  KeyPair: BBSPlusKeypairG2,
+  KeyType: 'Bls12381G2VerificationKeyDock2022'
+};
+export const PS = {
+  Name: "PS",
+  Module: PSModule,
+  Presentation: PSPresentation,
+  getModule: (dock) => dock.ps,
+  SignatureParams: PSSignatureParams,
+  KeyPair: PSKeypair,
+  KeyType: 'Bls12381PSVerificationKeyDock2022'
+};
+
+export const Schemes = [BBS, BBSPlus, PS]

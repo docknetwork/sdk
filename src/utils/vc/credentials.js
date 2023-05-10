@@ -1,12 +1,14 @@
 import jsonld from 'jsonld';
 import jsigs from 'jsonld-signatures';
+
+import base64url from 'base64url';
 import CredentialIssuancePurpose from './CredentialIssuancePurpose';
 import defaultDocumentLoader from './document-loader';
 import { getAndValidateSchemaIfPresent } from './schema';
 import { isRevocationCheckNeeded, checkRevocationStatus } from '../revocation';
 import DIDResolver from "../../did-resolver"; // eslint-disable-line
 
-import { getSuiteFromKeyDoc, expandJSONLD } from './helpers';
+import { getSuiteFromKeyDoc, expandJSONLD, getKeyFromDIDDocument } from './helpers';
 import { DEFAULT_CONTEXT_V1_URL, credentialContextField } from './constants';
 import { ensureValidDatetime } from '../type-helpers';
 
@@ -20,7 +22,14 @@ import {
   Bls12381BBSSignatureProofDock2022,
   Bls12381BBSSignatureDock2023,
   Bls12381BBSSignatureProofDock2023,
+  JsonWebSignature2020
 } from './custom_crypto';
+import { signJWS } from './jws';
+
+export const VC_ISSUE_TYPE_JSONLD = 'jsonld';
+export const VC_ISSUE_TYPE_PROOFVALUE = 'proofValue';
+export const VC_ISSUE_TYPE_JWT = 'jwt';
+export const VC_ISSUE_TYPE_DEFAULT = VC_ISSUE_TYPE_JSONLD;
 
 /**
  * @param {string|object} obj - Object with ID property or a string
@@ -34,7 +43,46 @@ function getId(obj) {
   if (typeof obj === 'string') {
     return obj;
   }
-  return obj.id; // || 'did:dock:' + String(obj);
+  return obj.id;
+}
+
+function dateStringToTimestamp(dateStr) {
+  return Math.floor(Date.parse(dateStr) / 1000);
+}
+
+export function formatToJWTPayload(keyDoc, cred) {
+  const kid = keyDoc.id;
+  const credentialIssuer = cred.issuer;
+  const subject = cred.credentialSubject.id;
+  const { issuanceDate, expirationDate } = cred;
+
+  // NOTE: Expecting validFrom here for future spec support
+  const validFrom = cred.validFrom || issuanceDate;
+
+  // References: https://www.w3.org/TR/vc-data-model/#jwt-encoding
+  // https://www.rfc-editor.org/rfc/rfc7519#section-4.1.6
+  const vcJwtPayload = {
+    jti: cred.id,
+    sub: subject || '',
+    iss: credentialIssuer.id || credentialIssuer,
+    iat: dateStringToTimestamp(issuanceDate),
+    vc: cred,
+  };
+
+  if (validFrom) {
+    vcJwtPayload.nbf = dateStringToTimestamp(validFrom);
+  }
+
+  if (expirationDate) {
+    vcJwtPayload.exp = dateStringToTimestamp(expirationDate);
+  }
+
+  const vcJwtHeader = {
+    typ: 'JWT',
+    kid,
+  };
+
+  return [vcJwtHeader, vcJwtPayload];
 }
 
 /**
@@ -159,32 +207,32 @@ export function checkCredential(credential) {
 
 /**
  * Verify a Verifiable Credential. Returns the verification status and error in an object
- * @param {object} [credential] The VCDM Credential
+ * @param {object} [vcJSONorString] The VCDM Credential as JSON-LD or JWT string
  * @param {VerifiableParams} options Verify parameters, this object is passed down to jsonld-signatures calls
  * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
  * credential is valid and not revoked and false otherwise. The `error` will describe the error if any.
  */
-// TODO: perform verification on the expanded JSON-LD credential
-export async function verifyCredential(
-  credential,
-  {
-    resolver = null,
-    compactProof = true,
-    forceRevocationCheck = true,
-    revocationApi = null,
-    schemaApi = null,
-    documentLoader = null,
-    purpose = null,
-    controller = null,
-    suite = [],
-    verifyDates = true,
-  } = {},
-) {
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export async function verifyCredential(vcJSONorString, {
+  resolver = null,
+  compactProof = true,
+  forceRevocationCheck = true,
+  revocationApi = null,
+  schemaApi = null,
+  documentLoader = null,
+  purpose = null,
+  controller = null,
+  suite = [],
+  verifyDates = true,
+} = {}) {
   if (documentLoader && resolver) {
     throw new Error(
       'Passing resolver and documentLoader results in resolver being ignored, please re-factor.',
     );
   }
+
+  const isJWT = typeof vcJSONorString === 'string';
+  const credential = isJWT ? JSON.parse(base64url.decode(vcJSONorString.split('.')[1])).vc : vcJSONorString;
 
   if (!credential) {
     throw new TypeError('A "credential" property is required for verifying.');
@@ -234,7 +282,33 @@ export async function verifyCredential(
     );
   }
 
-  // Verify with jsonld-signatures
+  // JWT formatted credential?
+  if (isJWT) {
+    const jwtSplit = vcJSONorString.split('.');
+    if (jwtSplit.length !== 3) {
+      throw new Error('Malformed JWT');
+    }
+
+    const header = JSON.parse(base64url.decode(jwtSplit[0]).toString());
+    if (!header.kid) {
+      throw new Error('No kid in JWT header');
+    }
+
+    const { document: didDocument } = await docLoader(header.kid);
+    const keyDocument = getKeyFromDIDDocument(didDocument, header.kid);
+    const keyDocSuite = await getSuiteFromKeyDoc(keyDocument, false, { detached: false, header });
+    const verified = await keyDocSuite.verifySignature({
+      verifyData: new Uint8Array(Buffer.from(jwtSplit[1], 'utf8')),
+      verificationMethod: keyDocument,
+      proof: {
+        jws: vcJSONorString,
+      },
+    });
+
+    return { verified };
+  }
+
+  // Verify with jsonld-signatures otherwise
   const result = await jsigs.verify(credential, {
     purpose:
       purpose
@@ -252,6 +326,7 @@ export async function verifyCredential(
       new Bls12381BBSSignatureProofDock2023(),
       new Bls12381PSSignatureDock2023(),
       new Bls12381PSSignatureProofDock2023(),
+      new JsonWebSignature2020(),
       ...suite,
     ],
     documentLoader: docLoader,
@@ -292,24 +367,12 @@ export async function verifyCredential(
  * @param {Boolean} [addSuiteContext] - Toggles the default
  *   behavior of each signature suite enforcing the presence of its own
  *   `@context` (if it is not present, it's added to the context list).
+ * @param {(jsonld|jwt|proofValue)} [type] - Optional format/type of the credential (JSON-LD, JWT, proofValue)
  * @return {Promise<object>} The signed credential object.
  */
-export async function issueCredential(
-  keyDoc,
-  credential,
-  compactProof = true,
-  documentLoader = null,
-  purpose = null,
-  expansionMap = null,
-  issuerObject = null,
-  addSuiteContext = false,
-  useProofValue = false,
-) {
-  // Get suite from keyDoc parameter
-  const suite = getSuiteFromKeyDoc(keyDoc, useProofValue);
-  if (!suite.verificationMethod) {
-    throw new TypeError('"suite.verificationMethod" property is required.');
-  }
+export async function issueCredential(keyDoc, credential, compactProof = true, documentLoader = null, purpose = null, expansionMap = null, issuerObject = null, addSuiteContext = true, type = VC_ISSUE_TYPE_DEFAULT) {
+  const useProofValue = type === VC_ISSUE_TYPE_PROOFVALUE;
+  const useJWT = type === VC_ISSUE_TYPE_JWT;
 
   // Clone the credential object to prevent mutation
   const issuerId = credential.issuer || keyDoc.controller;
@@ -326,7 +389,24 @@ export async function issueCredential(
   // Ensure credential is valid
   checkCredential(cred);
 
-  // Sign and return the credential
+  // Should use JWT format?
+  if (useJWT) {
+    // Format to VC JWT spec
+    const [vcJwtHeader, vcJwtPayload] = formatToJWTPayload(keyDoc, cred);
+
+    // Get suite from keyDoc parameter
+    const jwtOpts = { detached: false, header: vcJwtHeader };
+    const suite = await getSuiteFromKeyDoc(keyDoc, false, jwtOpts);
+    return signJWS(suite.signer || suite, suite.alg, jwtOpts, vcJwtPayload);
+  }
+
+  // Get suite from keyDoc parameter
+  const suite = await getSuiteFromKeyDoc(keyDoc, useProofValue);
+  if (!suite.verificationMethod) {
+    throw new TypeError('"suite.verificationMethod" property is required.');
+  }
+
+  // Sign and return the credential with jsonld-signatures otherwise
   return jsigs.sign(cred, {
     purpose: purpose || new CredentialIssuancePurpose(),
     documentLoader: documentLoader || defaultDocumentLoader(),

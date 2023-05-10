@@ -1,4 +1,5 @@
 import jsonld from 'jsonld';
+import { JsonWebKey } from '@transmute/json-web-signature';
 import defaultDocumentLoader from './document-loader';
 
 import {
@@ -14,6 +15,7 @@ import {
   Bls12381BBSSignatureDock2023,
   Bls12381PSSignatureDock2023,
   Bls12381PS23DockVerKeyName,
+  JsonWebSignature2020
 } from './custom_crypto';
 
 /**
@@ -48,13 +50,14 @@ export default function getKeyDoc(did, keypair, type, id) {
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
  * @returns {object} - signature suite.
  */
-export function getSuiteFromKeyDoc(keyDoc, useProofValue) {
+export async function getSuiteFromKeyDoc(keyDoc, useProofValue, options) {
   // Check if passing suite directly
   if (keyDoc.verificationMethod) {
     return keyDoc;
   }
 
   let Cls;
+  let { keypair } = keyDoc;
   switch (keyDoc.type) {
     case EcdsaSecp256k1VerKeyName:
       Cls = EcdsaSepc256k1Signature2019;
@@ -73,6 +76,13 @@ export function getSuiteFromKeyDoc(keyDoc, useProofValue) {
       break;
     case Bls12381PS23DockVerKeyName:
       Cls = Bls12381PSSignatureDock2023;
+      break;
+    case 'JsonWebKey2020':
+      Cls = JsonWebSignature2020;
+      if (!keypair) {
+        keypair = await JsonWebKey.from(keyDoc, options);
+      }
+      break;
     default:
       throw new Error(`Unknown key type ${keyDoc.type}.`);
   }
@@ -81,6 +91,8 @@ export function getSuiteFromKeyDoc(keyDoc, useProofValue) {
     ...keyDoc,
     verificationMethod: keyDoc.id,
     useProofValue,
+    keyDoc,
+    keypair,
   });
 }
 
@@ -101,4 +113,23 @@ export async function expandJSONLD(credential, options = {}) {
       options.documentLoader || defaultDocumentLoader(options.resolver),
   });
   return expanded[0];
+}
+
+export function potentialToArray(a) {
+  /* eslint-disable no-nested-ternary */
+  return a ? (Array.isArray(a) ? a : [a]) : [];
+}
+
+export function getKeyFromDIDDocument(didDocument, didUrl) {
+  // Ensure not already a key doc
+  if (didDocument.publicKeyBase58 || didDocument.publicKeyMultibase || didDocument.publicKeyJwk || (didDocument.publicKey && !Array.isArray(didDocument.publicKey))) {
+    return didDocument;
+  }
+
+  const possibleKeys = [
+    ...potentialToArray(didDocument.verificationMethod),
+    ...potentialToArray(didDocument.keyAgreement),
+    ...potentialToArray(didDocument.publicKey),
+  ];
+  return possibleKeys.filter((key) => key.id === didUrl)[0];
 }

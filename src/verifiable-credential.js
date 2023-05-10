@@ -233,9 +233,10 @@ class VerifiableCredential {
    * @param {Boolean} [addSuiteContext] - Toggles the default
    *   behavior of each signature suite enforcing the presence of its own
    *   `@context` (if it is not present, it's added to the context list).
+   * @param {(jsonld|jwt|proofValue)} [type] - Optional format/type of the credential (JSON-LD, JWT, proofValue)
    * @returns {Promise<VerifiableCredential>}
    */
-  async sign(keyDoc, compactProof = true, issuerObject = null, addSuiteContext = false, useProofValue = false) {
+  async sign(keyDoc, compactProof = true, issuerObject = null, addSuiteContext = true, type = null) {
     const signedVC = await issueCredential(
       keyDoc,
       this.toJSON(),
@@ -243,10 +244,11 @@ class VerifiableCredential {
       null, null, null,
       issuerObject,
       addSuiteContext,
-      useProofValue,
+      type,
     );
     this.setProof(signedVC.proof);
     this.issuer = signedVC.issuer;
+    this.context = signedVC['@context'];
     return this;
   }
 

@@ -19,7 +19,7 @@ export async function documentLoader(url) {
     }
     documentRegistry[url] = (await axios.get(url)).data;
     console.warn(
-      'Unit test is making web requests. This is slow. Please update ./test/network-cache.json',
+      'Unit test is making web requests. This is slow. Please update ./test/network-cache.js',
       'with: ',
       JSON.stringify({ [url]: documentRegistry[url] }, null, 2),
     );

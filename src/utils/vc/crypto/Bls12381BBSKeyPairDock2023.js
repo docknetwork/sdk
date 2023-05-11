@@ -13,7 +13,7 @@ import {
   SIGNATURE_PARAMS_LABEL_BYTES,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 
-import { Bls12381BBSDockVerKeyName } from './constants';
+import { Bls12381BBS23DockVerKeyName } from './constants';
 
 const signerFactory = (key) => {
   if (!key.id) {
@@ -73,9 +73,9 @@ const verifierFactory = (key) => {
   };
 };
 
-export default class Bls12381G2KeyPairDock2022 {
+export default class Bls12381BBSKeyPairDock2023 {
   constructor(options) {
-    this.type = Bls12381BBSDockVerKeyName;
+    this.type = Bls12381BBS23DockVerKeyName;
     this.id = options.id;
     this.controller = options.controller;
 
@@ -93,14 +93,14 @@ export default class Bls12381G2KeyPairDock2022 {
   }
 
   static async from(options) {
-    return new Bls12381G2KeyPairDock2022(options);
+    return new Bls12381BBSKeyPairDock2023(options);
   }
 
   static generate({
-    seed, params, controller, id,
+    seed, params, controller, id, msgCount = 1
   } = {}) {
-    const keypair = BBSKeypair.generate(params || BBSSignatureParams.getSigParamsOfRequiredSize(1, SIGNATURE_PARAMS_LABEL_BYTES), seed);
-    return new Bls12381G2KeyPairDock2022({ keypair, controller, id });
+    const keypair = BBSKeypair.generate(params || BBSSignatureParams.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES), seed);
+    return new Bls12381BBSKeyPairDock2023({ keypair, controller, id });
   }
 
   /**

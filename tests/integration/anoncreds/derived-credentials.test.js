@@ -9,7 +9,6 @@ import {
   Schemes,
 } from "../../test-constants";
 import { createNewDockDID } from "../../../src/utils/did";
-import Bls12381G2KeyPairDock2022 from "../../../src/utils/vc/crypto/Bls12381G2KeyPairDock2022";
 import { registerNewDIDUsingPair } from "../helpers";
 import getKeyDoc from "../../../src/utils/vc/helpers";
 import {
@@ -57,19 +56,20 @@ const embeddedSchema = {
   type: "JsonSchemaValidator2018",
 };
 
-const holder3DID = createNewDockDID();
-// seed used for 3rd holder keys
-const holder3KeySeed = randomAsHex(32);
-
 for (const {
   Name,
   Module,
   Presentation,
+  CryptoKeyPair,
   convertToPresentation,
   VerKey,
   getModule,
   Context,
 } of Schemes) {
+  const holder3DID = createNewDockDID();
+  // seed used for 3rd holder keys
+  const holder3KeySeed = randomAsHex(32);
+
   // TODO: move to fixtures
   const credentialJSON = {
     "@context": [
@@ -118,8 +118,8 @@ for (const {
       did1 = createNewDockDID();
       await registerNewDIDUsingPair(dock, did1, pair1);
 
-      keypair = Bls12381G2KeyPairDock2022.generate({
-        controller: did1,
+      keypair = CryptoKeyPair.generate({
+        controller: did1, msgCount: 100
       });
 
       const pk1 = Module.prepareAddPublicKey(u8aToHex(keypair.publicKeyBuffer));

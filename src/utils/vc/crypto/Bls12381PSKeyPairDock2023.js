@@ -73,7 +73,7 @@ const verifierFactory = (key) => {
   };
 };
 
-export default class Bls12381PSKeyPairDock2022 {
+export default class Bls12381PSKeyPairDock2023 {
   constructor(options) {
     this.type = Bls12381PSDockVerKeyName;
     this.id = options.id;
@@ -93,14 +93,14 @@ export default class Bls12381PSKeyPairDock2022 {
   }
 
   static async from(options) {
-    return new Bls12381PSKeyPairDock2022(options);
+    return new Bls12381PSKeyPairDock2023(options);
   }
 
   static generate({
-    seed, params, controller, id,
+    seed, params, controller, id, msgCount = 1
   } = {}) {
-    const keypair = PSKeypair.generate(params || PSSignatureParams.getSigParamsOfRequiredSize(1, SIGNATURE_PARAMS_LABEL_BYTES), seed);
-    return new Bls12381PSKeyPairDock2022({ keypair, controller, id });
+    const keypair = PSKeypair.generate(params || PSSignatureParams.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES), seed);
+    return new Bls12381PSKeyPairDock2023({ keypair, controller, id });
   }
 
   /**

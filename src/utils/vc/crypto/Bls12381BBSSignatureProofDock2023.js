@@ -5,9 +5,9 @@ import { BBSPresentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-crede
 import b58 from 'bs58';
 
 import Bls12381BBSSignatureDock2023 from './Bls12381BBSSignatureDock2023';
-import { Bls12381BBSSigDockSigName, Bls12381BBSSigProofDockSigName } from './constants';
+import { Bls12381BBS23SigDockSigName, Bls12381BBS23SigProofDockSigName } from './constants';
 
-import Bls12381G2KeyPairDock2022 from './Bls12381G2KeyPairDock2022';
+import Bls12381BBSKeyPairDock2023 from './Bls12381BBSKeyPairDock2023';
 import CustomLinkedDataSignature from './custom-linkeddatasignature';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
@@ -37,7 +37,7 @@ export function convertToPresentation(document) {
           schema: JSON.stringify(credentialSchema),
           revealedAttributes: {
             proof: {
-              type: Bls12381BBSSigDockSigName,
+              type: Bls12381BBS23SigDockSigName,
               verificationMethod: proof.verificationMethod,
             },
             '@context': JSON.stringify(context),
@@ -67,10 +67,10 @@ export default class Bls12381BBSSignatureProofDock2023 extends CustomLinkedDataS
     } = options;
 
     super({
-      type: Bls12381BBSSigProofDockSigName,
-      LDKeyClass: Bls12381G2KeyPairDock2022,
+      type: Bls12381BBS23SigProofDockSigName,
+      LDKeyClass: Bls12381BBSKeyPairDock2023,
       contextUrl: SUITE_CONTEXT_URL,
-      alg: Bls12381BBSSigProofDockSigName,
+      alg: Bls12381BBS23SigProofDockSigName,
       useProofValue: true,
     });
 
@@ -86,7 +86,7 @@ export default class Bls12381BBSSignatureProofDock2023 extends CustomLinkedDataS
         },
         'https://ld.dock.io/security/bb23/v1',
       ],
-      type: Bls12381BBSSigProofDockSigName,
+      type: Bls12381BBS23SigProofDockSigName,
     };
 
     this.verificationMethod = verificationMethod;
@@ -136,7 +136,7 @@ export default class Bls12381BBSSignatureProofDock2023 extends CustomLinkedDataS
 }
 
 Bls12381BBSSignatureProofDock2023.proofType = [
-  Bls12381BBSSigProofDockSigName,
-  `sec:${Bls12381BBSSigProofDockSigName}`,
-  `https://w3id.org/security#${Bls12381BBSSigProofDockSigName}`,
+  Bls12381BBS23SigProofDockSigName,
+  `sec:${Bls12381BBS23SigProofDockSigName}`,
+  `https://w3id.org/security#${Bls12381BBS23SigProofDockSigName}`,
 ];

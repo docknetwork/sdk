@@ -8,6 +8,12 @@ import {
   Bls12381BBSDockVerKeyName,
   Bls12381BBSSigDockSigName,
   Bls12381BBSSigProofDockSigName,
+  Bls12381BBS23DockVerKeyName,
+  Bls12381BBS23SigDockSigName,
+  Bls12381BBS23SigProofDockSigName,
+  Bls12381PSDockVerKeyName,
+  Bls12381PSSigDockSigName,
+  Bls12381PSSigProofDockSigName,
 } from './crypto/constants';
 
 import EcdsaSecp256k1VerificationKey2019 from './crypto/EcdsaSecp256k1VerificationKey2019';
@@ -46,5 +52,11 @@ export {
   Bls12381BBSDockVerKeyName,
   Bls12381BBSSigDockSigName,
   Bls12381BBSSigProofDockSigName,
+  Bls12381BBS23DockVerKeyName,
+  Bls12381BBS23SigDockSigName,
+  Bls12381BBS23SigProofDockSigName,
+  Bls12381PSDockVerKeyName,
+  Bls12381PSSigDockSigName,
+  Bls12381PSSigProofDockSigName,
   JsonWebSignature2020,
 };

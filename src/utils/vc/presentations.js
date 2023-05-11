@@ -266,6 +266,7 @@ const buildVerifier = (signatureClass, pkClass, presentationClass) => async func
   );
 
   const recreatedPres = presentationClass.fromJSON(presentation);
+  console.log(recreatedPres);
   const pks = keyDocuments.map((keyDocument) => {
     const pkRaw = b58.decode(keyDocument.publicKeyBase58);
     return new pkClass(pkRaw);

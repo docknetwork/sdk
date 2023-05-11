@@ -14,7 +14,7 @@ import {
   Bls12381BBS23DockVerKeyName,
   Bls12381BBSSignatureDock2023,
   Bls12381PSSignatureDock2023,
-  Bls12381PS23DockVerKeyName,
+  Bls12381PSDockVerKeyName,
   JsonWebSignature2020
 } from './custom_crypto';
 
@@ -74,7 +74,7 @@ export async function getSuiteFromKeyDoc(keyDoc, useProofValue, options) {
     case Bls12381BBS23DockVerKeyName:
       Cls = Bls12381BBSSignatureDock2023;
       break;
-    case Bls12381PS23DockVerKeyName:
+    case Bls12381PSDockVerKeyName:
       Cls = Bls12381PSSignatureDock2023;
       break;
     case 'JsonWebKey2020':

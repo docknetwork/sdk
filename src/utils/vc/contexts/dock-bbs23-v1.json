@@ -29,8 +29,8 @@
       "@type": "@id",
       "@container": "@graph"
     },
-    "Bls12381BBS+SignatureProofDock2022": {
-      "@id": "https://ld.dock.io/security#Bls12381BBS+SignatureDock2022",
+    "Bls12381BBSSignatureProofDock2023": {
+      "@id": "https://ld.dock.io/security#Bls12381BBSSignatureDock2023",
       "@context": {
         "@version": 1.1,
         "@protected": true,
@@ -73,8 +73,8 @@
         }
       }
     },
-    "Bls12381BBS+SignatureDock2022": {
-      "@id": "https://ld.dock.io/security#Bls12381BBS+SignatureDock2022",
+    "Bls12381BBSSignatureDock2023": {
+      "@id": "https://ld.dock.io/security#Bls12381BBSSignatureDock2023",
       "@context": {
         "@version": 1.1,
         "@protected": true,

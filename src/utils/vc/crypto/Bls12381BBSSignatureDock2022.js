@@ -1,5 +1,5 @@
 import {
-  CredentialSchema, CredentialBuilder, SIGNATURE_PARAMS_LABEL_BYTES,
+  CredentialSchema, SIGNATURE_PARAMS_LABEL_BYTES, BBSPlusCredentialBuilder,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 
 import {
@@ -93,10 +93,14 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
     document, proof, /* documentLoader */
     signingOptions = { requireAllFieldsFromSchema: false },
   }) {
+    proof ||= document.proof;
+    if (proof.type !== Bls12381BBSSigDockSigName) {
+      throw new Error(`Invalid \`proof.type\`, expected ${Bls12381BBSSigDockSigName}, received ${proof.type}`)
+    }
     // `jws`,`signatureValue`,`proofValue` must not be included in the proof
     const trimmedProof = {
       '@context': document['@context'] || SECURITY_CONTEXT_URL,
-      ...(proof || document.proof),
+      ...proof,
     };
 
     delete trimmedProof.jws;
@@ -125,7 +129,7 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
       credSchema = new CredentialSchema(CredentialSchema.essential(), DEFAULT_PARSING_OPTS);
     }
 
-    const credBuilder = new CredentialBuilder();
+    const credBuilder = new BBSPlusCredentialBuilder();
     credBuilder.schema = credSchema;
 
     const {

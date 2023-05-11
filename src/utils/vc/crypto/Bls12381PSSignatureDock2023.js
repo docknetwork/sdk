@@ -1,5 +1,5 @@
 import {
-  CredentialSchema, CredentialBuilder, SIGNATURE_PARAMS_LABEL_BYTES,
+  CredentialSchema, SIGNATURE_PARAMS_LABEL_BYTES, PSCredentialBuilder,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 
 import {
@@ -11,9 +11,9 @@ import {
 
 import jsonld from 'jsonld';
 import { SECURITY_CONTEXT_URL } from 'jsonld-signatures';
-import { Bls12381BBSSigDockSigName } from './constants';
+import { Bls12381PSSigDockSigName } from './constants';
 
-import Bls12381PSKeyPairDock2022 from './Bls12381PSKeyPairDock2023';
+import Bls12381PSKeyPairDock2023 from './Bls12381PSKeyPairDock2023';
 import CustomLinkedDataSignature from './custom-linkeddatasignature';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
@@ -36,8 +36,8 @@ export default class Bls12381PSSignatureDock2023 extends CustomLinkedDataSignatu
     } = options;
 
     super({
-      type: Bls12381BBSSigDockSigName,
-      LDKeyClass: Bls12381PSKeyPairDock2022,
+      type: Bls12381PSSigDockSigName,
+      LDKeyClass: Bls12381PSKeyPairDock2023,
       contextUrl: SUITE_CONTEXT_URL,
       alg: 'Bls12381PSSignatureDock2023',
       signer: signer || Bls12381PSSignatureDock2023.signerFactory(keypair, verificationMethod),
@@ -57,7 +57,7 @@ export default class Bls12381PSSignatureDock2023 extends CustomLinkedDataSignatu
         },
         'https://ld.dock.io/security/ps/v1',
       ],
-      type: Bls12381BBSSigDockSigName,
+      type: Bls12381PSSigDockSigName,
     };
 
     this.verificationMethod = verificationMethod;
@@ -93,10 +93,14 @@ export default class Bls12381PSSignatureDock2023 extends CustomLinkedDataSignatu
     document, proof, /* documentLoader */
     signingOptions = { requireAllFieldsFromSchema: false },
   }) {
+    proof ||= document.proof;
+    if (proof.type !== Bls12381PSSigDockSigName) {
+      throw new Error(`Invalid \`proof.type\`, expected ${Bls12381PSSigDockSigName}, received ${proof.type}`)
+    }
     // `jws`,`signatureValue`,`proofValue` must not be included in the proof
     const trimmedProof = {
       '@context': document['@context'] || SECURITY_CONTEXT_URL,
-      ...(proof || document.proof),
+      ...proof,
     };
 
     delete trimmedProof.jws;
@@ -125,7 +129,7 @@ export default class Bls12381PSSignatureDock2023 extends CustomLinkedDataSignatu
       credSchema = new CredentialSchema(CredentialSchema.essential(), DEFAULT_PARSING_OPTS);
     }
 
-    const credBuilder = new CredentialBuilder();
+    const credBuilder = new PSCredentialBuilder();
     credBuilder.schema = credSchema;
 
     const {
@@ -211,8 +215,8 @@ export default class Bls12381PSSignatureDock2023 extends CustomLinkedDataSignatu
         }
 
         const msgCount = data.length;
-        PSSignatureParams.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES);
-        const signature = PSSignature.generate(data, new PSSecretKey(keypair.privateKeyBuffer), sigParams, false);
+        const sigParams = PSSignatureParams.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES);
+        const signature = PSSignature.generate(data, PSSecretKey.generate(msgCount, keypair.privateKeyBuffer), sigParams, false);
         return signature.value;
       },
     };
@@ -224,7 +228,7 @@ export default class Bls12381PSSignatureDock2023 extends CustomLinkedDataSignatu
 }
 
 Bls12381PSSignatureDock2023.proofType = [
-  Bls12381BBSSigDockSigName,
-  `sec:${Bls12381BBSSigDockSigName}`,
-  `https://w3id.org/security#${Bls12381BBSSigDockSigName}`,
+  Bls12381PSSigDockSigName,
+  `sec:${Bls12381PSSigDockSigName}`,
+  `https://w3id.org/security#${Bls12381PSSigDockSigName}`,
 ];

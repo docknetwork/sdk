@@ -9,8 +9,7 @@ import {
   TestKeyringOpts,
   Schemes,
 } from "../../test-constants";
-import { createNewDockDID } from "../../../src/utils/did";
-import Bls12381G2KeyPairDock2022 from "../../../src/utils/vc/crypto/Bls12381G2KeyPairDock2022";
+import { createNewDockDID } from "../../../src/utils/did";;
 import { registerNewDIDUsingPair } from "../helpers";
 import getKeyDoc from "../../../src/utils/vc/helpers";
 import { issueCredential, verifyPresentation } from "../../../src/utils/vc";
@@ -52,7 +51,7 @@ const embeddedSchema = {
   type: "JsonSchemaValidator2018",
 };
 
-for (const { Name, Module, Presentation, Context, KeyType, getModule } of Schemes) {
+for (const { Name, Module, Presentation, Context, KeyType, CryptoKeyPair, getModule } of Schemes) {
   // TODO: move to fixtures
   const credentialJSON = {
     "@context": [
@@ -100,8 +99,8 @@ for (const { Name, Module, Presentation, Context, KeyType, getModule } of Scheme
       did1 = createNewDockDID();
       await registerNewDIDUsingPair(dock, did1, pair1);
 
-      keypair = Bls12381G2KeyPairDock2022.generate({
-        controller: did1,
+      keypair = CryptoKeyPair.generate({
+        controller: did1, msgCount: 100
       });
 
       chainModule = getModule(dock);

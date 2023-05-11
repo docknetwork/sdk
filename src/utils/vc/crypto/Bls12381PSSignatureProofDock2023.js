@@ -7,7 +7,7 @@ import b58 from 'bs58';
 import Bls12381PSSignatureDock2023 from './Bls12381PSSignatureDock2023';
 import { Bls12381PSSigDockSigName, Bls12381PSSigProofDockSigName } from './constants';
 
-import Bls12381PSKeyPairDock2022 from './Bls12381PSKeyPairDock2023';
+import Bls12381PSKeyPairDock2023 from './Bls12381PSKeyPairDock2023';
 import CustomLinkedDataSignature from './custom-linkeddatasignature';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
@@ -68,7 +68,7 @@ export default class Bls12381PSSignatureProofDock2022 extends CustomLinkedDataSi
 
     super({
       type: Bls12381PSSigProofDockSigName,
-      LDKeyClass: Bls12381PSKeyPairDock2022,
+      LDKeyClass: Bls12381PSKeyPairDock2023,
       contextUrl: SUITE_CONTEXT_URL,
       alg: Bls12381PSSigProofDockSigName,
       useProofValue: true,

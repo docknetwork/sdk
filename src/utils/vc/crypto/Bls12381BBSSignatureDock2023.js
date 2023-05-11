@@ -1,5 +1,5 @@
 import {
-  CredentialSchema, CredentialBuilder, SIGNATURE_PARAMS_LABEL_BYTES,
+  CredentialSchema, BBSCredentialBuilder, SIGNATURE_PARAMS_LABEL_BYTES,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 
 import {
@@ -11,9 +11,9 @@ import {
 
 import jsonld from 'jsonld';
 import { SECURITY_CONTEXT_URL } from 'jsonld-signatures';
-import { Bls12381BBSSigDockSigName } from './constants';
+import { Bls12381BBS23SigDockSigName } from './constants';
 
-import Bls12381G2KeyPairDock2022 from './Bls12381G2KeyPairDock2022';
+import Bls12381BBSKeyPairDock2023 from './Bls12381BBSKeyPairDock2023';
 import CustomLinkedDataSignature from './custom-linkeddatasignature';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
@@ -36,10 +36,10 @@ export default class Bls12381BBSSignatureDock2023 extends CustomLinkedDataSignat
     } = options;
 
     super({
-      type: Bls12381BBSSigDockSigName,
-      LDKeyClass: Bls12381G2KeyPairDock2022,
+      type: Bls12381BBS23SigDockSigName,
+      LDKeyClass: Bls12381BBSKeyPairDock2023,
       contextUrl: SUITE_CONTEXT_URL,
-      alg: 'Bls12381BBS+SignatureDock2022',
+      alg: 'Bls12381BBSSignatureDock2023',
       signer: signer || Bls12381BBSSignatureDock2023.signerFactory(keypair, verificationMethod),
       verifier,
       useProofValue: true,
@@ -57,7 +57,7 @@ export default class Bls12381BBSSignatureDock2023 extends CustomLinkedDataSignat
         },
         'https://ld.dock.io/security/bbs23/v1',
       ],
-      type: Bls12381BBSSigDockSigName,
+      type: Bls12381BBS23SigDockSigName,
     };
 
     this.verificationMethod = verificationMethod;
@@ -93,10 +93,14 @@ export default class Bls12381BBSSignatureDock2023 extends CustomLinkedDataSignat
     document, proof, /* documentLoader */
     signingOptions = { requireAllFieldsFromSchema: false },
   }) {
+    proof ||= document.proof;
+    if (proof.type !== Bls12381BBS23SigDockSigName) {
+      throw new Error(`Invalid \`proof.type\`, expected ${Bls12381BBS23SigDockSigName}, received ${proof.type}`)
+    }
     // `jws`,`signatureValue`,`proofValue` must not be included in the proof
     const trimmedProof = {
       '@context': document['@context'] || SECURITY_CONTEXT_URL,
-      ...(proof || document.proof),
+      ...proof,
     };
 
     delete trimmedProof.jws;
@@ -125,7 +129,7 @@ export default class Bls12381BBSSignatureDock2023 extends CustomLinkedDataSignat
       credSchema = new CredentialSchema(CredentialSchema.essential(), DEFAULT_PARSING_OPTS);
     }
 
-    const credBuilder = new CredentialBuilder();
+    const credBuilder = new BBSCredentialBuilder();
     credBuilder.schema = credSchema;
 
     const {
@@ -224,7 +228,7 @@ export default class Bls12381BBSSignatureDock2023 extends CustomLinkedDataSignat
 }
 
 Bls12381BBSSignatureDock2023.proofType = [
-  Bls12381BBSSigDockSigName,
-  `sec:${Bls12381BBSSigDockSigName}`,
-  `https://w3id.org/security#${Bls12381BBSSigDockSigName}`,
+  Bls12381BBS23SigDockSigName,
+  `sec:${Bls12381BBS23SigDockSigName}`,
+  `https://w3id.org/security#${Bls12381BBS23SigDockSigName}`,
 ];

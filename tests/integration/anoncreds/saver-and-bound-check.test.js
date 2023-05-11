@@ -102,8 +102,8 @@ for (const {
       await initializeWasm();
     }, 20000);
 
-    test("Create BBS+ params and keys", async () => {
-      const label = stringToHex("My BBS+ params");
+    test("Create params and keys", async () => {
+      const label = stringToHex("My params");
       const sigParams = SignatureParams.generate(
         attributeCount,
         hexToU8a(label)
@@ -170,7 +170,7 @@ for (const {
 
     test("Setup for decryptor", async () => {
       encryptionGens = SaverEncryptionGens.generate();
-      [snarkPk, decryptorSk, encryptionKey, decryptionKey] =
+      [snarkPk, , encryptionKey,] =
         SaverDecryptor.setup(encryptionGens, chunkBitSize);
     }, 20000);
 

@@ -6,6 +6,7 @@ import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
+  Schemes
 } from "../../test-constants";
 import { createNewDockDID } from "../../../src/utils/did";
 
@@ -53,7 +54,7 @@ const embeddedSchema = {
   type: "JsonSchemaValidator2018",
 };
 
-for (const { Name, Module, SigType, Context, KeyPair } of Schemes) {
+for (const { Name, Module, Context, CryptoKeyPair, getModule, VerKey, SigType } of Schemes) {
   const credentialJSON = {
     "@context": [
       "https://www.w3.org/2018/credentials/v1",
@@ -100,8 +101,9 @@ for (const { Name, Module, SigType, Context, KeyPair } of Schemes) {
     }, 20000);
 
     test(`Can create ${Name} public key for the DID`, async () => {
-      keypair = KeyPair.generate({
+      keypair = CryptoKeyPair.generate({
         controller: did1,
+        msgCount: 100
       });
 
       const pk1 = Module.prepareAddPublicKey(u8aToHex(keypair.publicKeyBuffer));
@@ -119,7 +121,7 @@ for (const { Name, Module, SigType, Context, KeyPair } of Schemes) {
       const { publicKey } = didDocument;
 
       expect(publicKey.length).toEqual(2);
-      expect(publicKey[1].type).toEqual("Bls12381G2VerificationKeyDock2022");
+      expect(publicKey[1].type).toEqual(VerKey);
 
       keypair.id = publicKey[1].id;
     }, 30000);
@@ -138,7 +140,7 @@ for (const { Name, Module, SigType, Context, KeyPair } of Schemes) {
             unsignedCred,
             did1,
             issuerKey.id,
-            "Bls12381${Name}SignatureDock2022"
+            SigType
           )
         )
       );

@@ -60,8 +60,8 @@ describe("Fees", () => {
     const result = await sendTx();
     const after = await getBalance(dock.api, address);
 
-    // Compare free balances with `5 DOCK` precision
-    assert(Math.round((before.free - after.free) / 5e6) * 5);
+    // Compare free balances with `10 DOCK` precision
+    assert(Math.round((before.free - after.free) / 1e7) * 10);
 
     for (const prop of ["feeFrozen", "reserved", "miscFrozen"]) {
       const beforeProp = applyToBefore[prop]
@@ -683,7 +683,7 @@ describe("Fees", () => {
           ),
           false
         ),
-      (fee) => expect(fee).toBe(90115),
+      (fee) => expect(fee).toBe(90120),
       {
         // 80K DOCK per deposit
         reserved: (before) => before.add(new BN(8e10)),

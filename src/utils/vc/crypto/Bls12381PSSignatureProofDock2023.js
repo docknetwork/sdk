@@ -1,7 +1,7 @@
 import {
   PSPublicKey,
 } from '@docknetwork/crypto-wasm-ts';
-import { PSPresentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
+import { Presentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
 import b58 from 'bs58';
 
 import Bls12381PSSignatureDock2023 from './Bls12381PSSignatureDock2023';
@@ -103,7 +103,7 @@ export default class Bls12381PSSignatureProofDock2022 extends CustomLinkedDataSi
       );
 
       const presentationJSON = convertToPresentation({ ...document, proof });
-      const recreatedPres = PSPresentation.fromJSON(presentationJSON);
+      const recreatedPres = Presentation.fromJSON(presentationJSON);
 
       const pks = [verificationMethod].map((keyDocument) => {
         const pkRaw = b58.decode(keyDocument.publicKeyBase58);

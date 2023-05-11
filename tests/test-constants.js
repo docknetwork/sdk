@@ -19,9 +19,7 @@ import {
 import BBSModule from "../src/modules/bbs";
 import BBSPlusModule from "../src/modules/bbs-plus";
 import PSModule from "../src/modules/ps";
-import BBSPresentation from "../src/bbs-presentation";
-import BBSPlusPresentation from "../src/bbs-plus-presentation";
-import PSPresentation from "../src/ps-presentation";
+import Presentation from "../src/presentation";
 import { convertToPresentation as convertToPSPresentation } from "../src/utils/vc/crypto/Bls12381PSSignatureProofDock2023";
 import { convertToPresentation as convertToBBSPresentation } from "../src/utils/vc/crypto/Bls12381BBSSignatureProofDock2023";
 import { convertToPresentation as convertToBBSPlusPresentation } from "../src/utils/vc/crypto/Bls12381BBSSignatureProofDock2022";
@@ -79,7 +77,7 @@ export const BBS = {
   Name: "BBS",
   Module: BBSModule,
   PublicKey: BBSPublicKey,
-  Presentation: BBSPresentation,
+  Presentation,
   buildStatement: Statement.bbsSignature,
   buildWitness: Witness.bbsSignature,
   getModule: (dock) => dock.bbs,
@@ -97,7 +95,7 @@ export const BBSPlus = {
   Name: "BBS+",
   Module: BBSPlusModule,
   PublicKey: BBSPlusPublicKeyG2,
-  Presentation: BBSPlusPresentation,
+  Presentation,
   buildStatement: Statement.bbsPlusSignature,
   buildWitness: Witness.bbsPlusSignature,
   getModule: (dock) => dock.bbsPlus,
@@ -115,7 +113,7 @@ export const PS = {
   Name: "PS",
   Module: PSModule,
   PublicKey: PSPublicKey,
-  Presentation: PSPresentation,
+  Presentation,
   buildStatement: Statement.psSignature,
   buildWitness: Witness.psSignature,
   getModule: (dock) => dock.ps,

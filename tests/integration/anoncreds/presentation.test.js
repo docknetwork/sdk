@@ -9,7 +9,7 @@ import {
   TestKeyringOpts,
   Schemes,
 } from "../../test-constants";
-import { createNewDockDID } from "../../../src/utils/did";;
+import { createNewDockDID } from "../../../src/utils/did";
 import { registerNewDIDUsingPair } from "../helpers";
 import getKeyDoc from "../../../src/utils/vc/helpers";
 import { issueCredential, verifyPresentation } from "../../../src/utils/vc";
@@ -51,7 +51,15 @@ const embeddedSchema = {
   type: "JsonSchemaValidator2018",
 };
 
-for (const { Name, Module, Presentation, Context, KeyType, CryptoKeyPair, getModule } of Schemes) {
+for (const {
+  Name,
+  Module,
+  Presentation,
+  Context,
+  KeyType,
+  CryptoKeyPair,
+  getModule,
+} of Schemes) {
   // TODO: move to fixtures
   const credentialJSON = {
     "@context": [
@@ -100,7 +108,8 @@ for (const { Name, Module, Presentation, Context, KeyType, CryptoKeyPair, getMod
       await registerNewDIDUsingPair(dock, did1, pair1);
 
       keypair = CryptoKeyPair.generate({
-        controller: did1, msgCount: 100
+        controller: did1,
+        msgCount: 100,
       });
 
       chainModule = getModule(dock);
@@ -143,6 +152,7 @@ for (const { Name, Module, Presentation, Context, KeyType, CryptoKeyPair, getMod
       ]);
 
       const presentation = await presentationInstance.createPresentation();
+
       expect(
         presentation.spec.credentials[0].revealedAttributes
       ).toHaveProperty("credentialSubject");

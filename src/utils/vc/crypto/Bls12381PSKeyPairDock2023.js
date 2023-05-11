@@ -60,10 +60,10 @@ const verifierFactory = (key) => {
     async verify({ data, signature }) {
       const msgCount = data.length;
       const sigParams = PSSignatureParams.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES);
-      const bbsSignature = new PSSignature(u8aToU8a(signature));
+      const psSignature = new PSSignature(u8aToU8a(signature));
 
       try {
-        const result = bbsSignature.verify(data, new PSPublicKey(u8aToU8a(key.publicKeyBuffer)), sigParams, false);
+        const result = psSignature.verify(data, new PSPublicKey(u8aToU8a(key.publicKeyBuffer)), sigParams, false);
         return result.verified;
       } catch (e) {
         console.error('crypto-wasm-ts error:', e);

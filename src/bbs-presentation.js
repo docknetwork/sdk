@@ -6,7 +6,7 @@ import {
 import b58 from 'bs58';
 import { stringToU8a } from '@polkadot/util';
 import {
-  BBSPresentationBuilder,
+  PresentationBuilder,
   BBSCredential,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 import { ensureArray } from './utils/type-helpers';
@@ -22,7 +22,7 @@ export default class BBSPresentation {
    * @constructor
    */
   constructor() {
-    this.presBuilder = new BBSPresentationBuilder();
+    this.presBuilder = new PresentationBuilder();
   }
 
   /**

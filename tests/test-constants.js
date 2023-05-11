@@ -1,12 +1,31 @@
 // The constants below are used for examples and tests
 
-import { BBSKeypair, BBSPlusKeypairG2, BBSPlusSignatureParamsG1, BBSSignatureParams, PSKeypair, PSSignatureParams } from "@docknetwork/crypto-wasm-ts";
+import {
+  Statement,
+  Witness,
+  BBSKeypair,
+  BBSPlusKeypairG2,
+  BBSPlusPublicKeyG2,
+  PSPublicKey,
+  BBSPlusSignatureParamsG1,
+  BBSPublicKey,
+  BBSSignatureParams,
+  PSKeypair,
+  PSSignatureParams,
+  PSSignature,
+  BBSSignature,
+  BBSPlusSignatureG1,
+} from "@docknetwork/crypto-wasm-ts";
 import BBSModule from "../src/modules/bbs";
 import BBSPlusModule from "../src/modules/bbs-plus";
 import PSModule from "../src/modules/ps";
 import BBSPresentation from "../src/bbs-presentation";
 import BBSPlusPresentation from "../src/bbs-plus-presentation";
 import PSPresentation from "../src/ps-presentation";
+import { convertToPresentation as convertToPSPresentation } from "../src/utils/vc/crypto/Bls12381PSSignatureProofDock2023";
+import { convertToPresentation as convertToBBSPresentation } from "../src/utils/vc/crypto/Bls12381BBSSignatureProofDock2023";
+import { convertToPresentation as convertToBBSPlusPresentation } from "../src/utils/vc/crypto/Bls12381BBSSignatureProofDock2022";
+
 
 require("dotenv").config();
 
@@ -56,38 +75,53 @@ export const MaxGas = fromEnv("MaxGas", DefaultMaxGas);
 export const BBS = {
   Name: "BBS",
   Module: BBSModule,
+  PublicKey: BBSPublicKey,
   Presentation: BBSPresentation,
+  buildStatement: Statement.bbsSignature,
+  buildWitness: Witness.bbsSignature,
   getModule: (dock) => dock.bbs,
   SignatureParams: BBSSignatureParams,
+  Signature: BBSSignature,
   KeyPair: BBSKeypair,
-  KeyType: 'Bls12381BBSVerificationKeyDock2023',
-  SigType: 'Bls12381BBSSignatureDock2023',
-  Context: 'https://ld.dock.io/security/bbs23/v1',
-  VerKey: 'Bls12381BBSVerificationKeyDock2023'
+  convertToPresentation: convertToBBSPresentation,
+  KeyType: "Bls12381BBSVerificationKeyDock2023",
+  SigType: "Bls12381BBSSignatureDock2023",
+  Context: "https://ld.dock.io/security/bbs23/v1",
+  VerKey: "Bls12381BBSVerificationKeyDock2023",
 };
 export const BBSPlus = {
   Name: "BBS+",
   Module: BBSPlusModule,
+  PublicKey: BBSPlusPublicKeyG2,
   Presentation: BBSPlusPresentation,
+  buildStatement: Statement.bbsPlusSignature,
+  buildWitness: Witness.bbsPlusSignature,
   getModule: (dock) => dock.bbsPlus,
   SignatureParams: BBSPlusSignatureParamsG1,
+  Signature: BBSPlusSignatureG1,
   KeyPair: BBSPlusKeypairG2,
-  KeyType: 'Bls12381G2VerificationKeyDock2022',
-  Context: 'https://ld.dock.io/security/bbs/v1',
-  VerKey: 'Bls12381G2VerificationKeyDock2022',
-  SigType: 'Bls12381BBS+SignatureDock2022'
+  convertToPresentation: convertToBBSPlusPresentation,
+  KeyType: "Bls12381G2VerificationKeyDock2022",
+  Context: "https://ld.dock.io/security/bbs/v1",
+  VerKey: "Bls12381G2VerificationKeyDock2022",
+  SigType: "Bls12381BBS+SignatureDock2022",
 };
 export const PS = {
   Name: "PS",
   Module: PSModule,
+  PublicKey: PSPublicKey,
   Presentation: PSPresentation,
+  buildStatement: Statement.psSignature,
+  buildWitness: Witness.psSignature,
   getModule: (dock) => dock.ps,
   SignatureParams: PSSignatureParams,
+  Signature: PSSignature,
   KeyPair: PSKeypair,
-  KeyType: 'Bls12381PSVerificationKeyDock2023',
-  SigType: 'Bls12381PSSignatureDock2023',
-  Context: 'https://ld.dock.io/security/ps/v1',
-  VerKey: 'Bls12381PSVerificationKeyDock2023'
+  convertToPresentation: convertToPSPresentation,
+  KeyType: "Bls12381PSVerificationKeyDock2023",
+  SigType: "Bls12381PSSignatureDock2023",
+  Context: "https://ld.dock.io/security/ps/v1",
+  VerKey: "Bls12381PSVerificationKeyDock2023",
 };
 
-export const Schemes = [BBS, BBSPlus, PS]
+export const Schemes = [BBS, BBSPlus, PS];

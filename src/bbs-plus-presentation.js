@@ -32,7 +32,7 @@ export default class BBSPlusPresentation {
   }
 
   /**
-   * Create bbs presentation
+   * Create BBS+ presentation
    * @param options
    * @returns {object}
    */
@@ -68,7 +68,7 @@ export default class BBSPlusPresentation {
     const { proof } = json;
 
     if (!proof) {
-      throw new Error('BBS credential does not have a proof');
+      throw new Error('BBS+ credential does not have a proof');
     }
     const keyDocument = await Bls12381BBSSignatureDock2022.getVerificationMethod({
       proof,

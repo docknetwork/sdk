@@ -2,11 +2,11 @@ import { u8aToU8a } from '@polkadot/util';
 import b58 from 'bs58';
 
 import {
-  BBSPlusKeypairG2,
-  BBSPlusSignatureG1,
-  BBSPlusPublicKeyG2,
-  BBSPlusSecretKey,
-  BBSPlusSignatureParamsG1,
+  PSKeypair,
+  PSSignature,
+  PSPublicKey,
+  PSSecretKey,
+  PSSignatureParams,
 } from '@docknetwork/crypto-wasm-ts';
 
 import {
@@ -33,8 +33,8 @@ const signerFactory = (key) => {
   return {
     async sign({ data }) {
       const msgCount = data.length;
-      const sigParams = BBSPlusSignatureParamsG1.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES);
-      const signature = BBSPlusSignatureG1.generate(data, new BBSPlusSecretKey(u8aToU8a(key.privateKeyBuffer)), sigParams, false);
+      const sigParams = PSSignatureParams.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES);
+      const signature = PSSignature.generate(data, new PSSecretKey(u8aToU8a(key.privateKeyBuffer)), sigParams, false);
       return signature.value;
     },
   };
@@ -59,11 +59,11 @@ const verifierFactory = (key) => {
   return {
     async verify({ data, signature }) {
       const msgCount = data.length;
-      const sigParams = BBSPlusSignatureParamsG1.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES);
-      const bbsSignature = new BBSPlusSignatureG1(u8aToU8a(signature));
+      const sigParams = PSSignatureParams.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES);
+      const bbsSignature = new PSSignature(u8aToU8a(signature));
 
       try {
-        const result = bbsSignature.verify(data, new BBSPlusPublicKeyG2(u8aToU8a(key.publicKeyBuffer)), sigParams, false);
+        const result = bbsSignature.verify(data, new PSPublicKey(u8aToU8a(key.publicKeyBuffer)), sigParams, false);
         return result.verified;
       } catch (e) {
         console.error('crypto-wasm-ts error:', e);
@@ -99,7 +99,7 @@ export default class Bls12381PSKeyPairDock2022 {
   static generate({
     seed, params, controller, id,
   } = {}) {
-    const keypair = BBSPlusKeypairG2.generate(params || BBSPlusSignatureParamsG1.getSigParamsOfRequiredSize(1, SIGNATURE_PARAMS_LABEL_BYTES), seed);
+    const keypair = PSKeypair.generate(params || PSSignatureParams.getSigParamsOfRequiredSize(1, SIGNATURE_PARAMS_LABEL_BYTES), seed);
     return new Bls12381PSKeyPairDock2022({ keypair, controller, id });
   }
 

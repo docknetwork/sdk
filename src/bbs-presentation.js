@@ -56,7 +56,7 @@ export default class BBSPresentation {
   }
 
   /**
-   * Adds a BBS+ JSON-LD credential to be presented
+   * Adds a BBS JSON-LD credential to be presented
    * @param credentialLD
    * @param options
    * @returns {Promise<number>}

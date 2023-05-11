@@ -32,7 +32,7 @@ export default class PSPresentation {
   }
 
   /**
-   * Create bbs presentation
+   * Create PS presentation
    * @param options
    * @returns {object}
    */
@@ -49,7 +49,7 @@ export default class PSPresentation {
   }
 
   /**
-   * Adds a BBS+ JSON-LD credential to be presented
+   * Adds a PS JSON-LD credential to be presented
    * @param credentialLD
    * @param options
    * @returns {Promise<number>}
@@ -68,7 +68,7 @@ export default class PSPresentation {
     const { proof } = json;
 
     if (!proof) {
-      throw new Error('BBS credential does not have a proof');
+      throw new Error('PS credential does not have a proof');
     }
     const keyDocument = await Bls12381PSSignatureDock2023.getVerificationMethod({
       proof,

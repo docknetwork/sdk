@@ -19,7 +19,6 @@ import {
   verifyCredential,
 } from "../../../src/utils/vc";
 import { DockResolver } from "../../../src/resolver";
-import { convertToPresentation } from "../../../src/utils/vc/crypto/Bls12381BBSSignatureProofDock2022";
 import { createPresentation } from "../../create-presentation";
 
 // TODO: move to fixtures
@@ -66,6 +65,7 @@ for (const {
   Name,
   Module,
   Presentation,
+  convertToPresentation,
   VerKey,
   getModule,
   Context,
@@ -256,10 +256,10 @@ for (const {
       const presentation = await presentationInstance.createPresentation(
         presentationOptions
       );
-      const reconstructedBBSPres = convertToPresentation(credentials[0]);
-      expect(reconstructedBBSPres.proof).toBeDefined();
+      const reconstructedPres = convertToPresentation(credentials[0]);
+      expect(reconstructedPres.proof).toBeDefined();
       expect({
-        ...reconstructedBBSPres,
+        ...reconstructedPres,
         proof: "",
       }).toMatchObject({ ...presentation, proof: "" });
 

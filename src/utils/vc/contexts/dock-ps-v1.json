@@ -3,29 +3,29 @@
     "@version": 1.1,
     "id": "@id",
     "type": "@type",
-    "dockBBS": "https://ld.dock.io/dock-ps",
+    "dockPS": "https://ld.dock.io/dock-ps",
     "parsingOptions": {
-      "@id": "dockBBS:parsingOptions",
+      "@id": "dockPS:parsingOptions",
       "@type": "@id",
       "@container": "@graph"
     },
     "defaultDecimalPlaces": {
-      "@id": "dockBBS:defaultDecimalPlaces",
+      "@id": "dockPS:defaultDecimalPlaces",
       "@type": "@id",
       "@container": "@graph"
     },
     "defaultMinimumInteger": {
-      "@id": "dockBBS:defaultMinimumInteger",
+      "@id": "dockPS:defaultMinimumInteger",
       "@type": "@id",
       "@container": "@graph"
     },
     "useDefaults": {
-      "@id": "dockBBS:useDefaults",
+      "@id": "dockPS:useDefaults",
       "@type": "@id",
       "@container": "@graph"
     },
     "version": {
-      "@id": "dockBBS:useDefaults",
+      "@id": "dockPS:useDefaults",
       "@type": "@id",
       "@container": "@graph"
     },
@@ -114,51 +114,8 @@
         }
       }
     },
-    "BbsBlsSignatureProof2020": {
-      "@id": "https://ld.dock.io/security#BbsBlsSignatureProof2020",
-      "@context": {
-        "@version": 1.1,
-        "@protected": true,
-        "id": "@id",
-        "type": "@type",
-
-        "challenge": "https://ld.dock.io/security#challenge",
-        "created": {
-          "@id": "http://purl.org/dc/terms/created",
-          "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
-        },
-        "domain": "https://ld.dock.io/security#domain",
-        "nonce": "https://ld.dock.io/security#nonce",
-        "proofPurpose": {
-          "@id": "https://ld.dock.io/security#proofPurpose",
-          "@type": "@vocab",
-          "@context": {
-            "@version": 1.1,
-            "@protected": true,
-            "id": "@id",
-            "type": "@type",
-            "sec": "https://ld.dock.io/security#",
-            "assertionMethod": {
-              "@id": "https://ld.dock.io/security#assertionMethod",
-              "@type": "@id",
-              "@container": "@set"
-            },
-            "authentication": {
-              "@id": "https://ld.dock.io/security#authenticationMethod",
-              "@type": "@id",
-              "@container": "@set"
-            }
-          }
-        },
-        "proofValue": "https://ld.dock.io/security#proofValue",
-        "verificationMethod": {
-          "@id": "https://ld.dock.io/security#verificationMethod",
-          "@type": "@id"
-        }
-      }
-    },
-    "Bls12381G1Key2020": {
-      "@id": "https://ld.dock.io/security#Bls12381G1Key2020",
+    "Bls12381PSKey2023": {
+      "@id": "https://ld.dock.io/security#Bls12381PSKey2023",
       "@context": {
         "@protected": true,
         "id": "@id",
@@ -176,8 +133,8 @@
         }
       }
     },
-    "Bls12381G2KeyPairDock2022": {
-      "@id": "https://ld.dock.io/security#Bls12381G2KeyPairDock2022",
+    "Bls12381PSKeyPairDock2023": {
+      "@id": "https://ld.dock.io/security#Bls12381PSKeyPairDock2023",
       "@context": {
         "@protected": true,
         "id": "@id",

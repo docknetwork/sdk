@@ -176,8 +176,8 @@ for (const {
       await initializeWasm();
     }, 20000);
 
-    test("Create BBS+ params", async () => {
-      const label = stringToHex("My BBS+ params");
+    test("Create params", async () => {
+      const label = stringToHex("My params");
       const bytes = u8aToHex(
         SignatureParams.generate(attributeCount, hexToU8a(label)).toBytes()
       );
@@ -197,7 +197,7 @@ for (const {
       expect(paramsWritten.label).toEqual(params.label);
     }, 10000);
 
-    test("Create BBS+ keypair", async () => {
+    test("Create keypair", async () => {
       const queriedParams = await getModule(dock).getParams(issuerDid, 1);
       const paramsVal = SignatureParams.valueFromBytes(
         hexToU8a(queriedParams.bytes)

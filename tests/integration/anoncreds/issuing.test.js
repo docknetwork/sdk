@@ -6,7 +6,7 @@ import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
-  Schemes
+  Schemes,
 } from "../../test-constants";
 import { createNewDockDID } from "../../../src/utils/did";
 
@@ -54,7 +54,15 @@ const embeddedSchema = {
   type: "JsonSchemaValidator2018",
 };
 
-for (const { Name, Module, Context, CryptoKeyPair, getModule, VerKey, SigType } of Schemes) {
+for (const {
+  Name,
+  Module,
+  Context,
+  CryptoKeyPair,
+  getModule,
+  VerKey,
+  SigType,
+} of Schemes) {
   const credentialJSON = {
     "@context": [
       "https://www.w3.org/2018/credentials/v1",
@@ -103,7 +111,7 @@ for (const { Name, Module, Context, CryptoKeyPair, getModule, VerKey, SigType } 
     test(`Can create ${Name} public key for the DID`, async () => {
       keypair = CryptoKeyPair.generate({
         controller: did1,
-        msgCount: 100
+        msgCount: 100,
       });
 
       const pk1 = Module.prepareAddPublicKey(u8aToHex(keypair.publicKeyBuffer));
@@ -136,12 +144,7 @@ for (const { Name, Module, Context, CryptoKeyPair, getModule, VerKey, SigType } 
       const credential = await issueCredential(issuerKey, unsignedCred);
       expect(credential).toMatchObject(
         expect.objectContaining(
-          getCredMatcherDoc(
-            unsignedCred,
-            did1,
-            issuerKey.id,
-            SigType
-          )
+          getCredMatcherDoc(unsignedCred, did1, issuerKey.id, SigType)
         )
       );
 

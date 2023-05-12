@@ -34,7 +34,12 @@ const signerFactory = (key) => {
     async sign({ data }) {
       const msgCount = data.length;
       const sigParams = PSSignatureParams.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES);
-      const signature = PSSignature.generate(data, new PSSecretKey(u8aToU8a(key.privateKeyBuffer)), sigParams, false);
+      let sk = new PSSecretKey(u8aToU8a(key.privateKeyBuffer));
+      if (sk.supportedMessageCount() > msgCount) {
+        sk = sk.adaptForLess(msgCount);
+      }
+
+      const signature = PSSignature.generate(data, sk, sigParams);
       return signature.value;
     },
   };
@@ -63,7 +68,12 @@ const verifierFactory = (key) => {
       const psSignature = new PSSignature(u8aToU8a(signature));
 
       try {
-        const result = psSignature.verify(data, new PSPublicKey(u8aToU8a(key.publicKeyBuffer)), sigParams, false);
+        let pk = new PSPublicKey(u8aToU8a(key.publicKeyBuffer));
+        if (pk.supportedMessageCount() > msgCount) {
+          pk = pk.adaptForLess(msgCount);
+        }
+
+        const result = psSignature.verify(data, pk, sigParams);
         return result.verified;
       } catch (e) {
         console.error('crypto-wasm-ts error:', e);

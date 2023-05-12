@@ -54,7 +54,7 @@ for (const {
     let encoder;
     let encodedABNeg;
 
-    const label = stringToHex("My BBS+ params");
+    const label = stringToHex("My params");
     const labelBytes = hexToU8a(label);
     let issuerSchemeKeypair;
 
@@ -140,10 +140,10 @@ for (const {
       wasm = getWasmBytes("not_equal_public.wasm");
     }, 10000);
 
-    test("Create BBS+ params and keys", async () => {
+    test("Create params and keys", async () => {
       // Message count shouldn't matter as `label` is known
       const sigParams = SignatureParams.generate(100, labelBytes);
-      // Not writing the BBS+ params on chain as its assumed that the label is hardcoded in the code as system parameter
+      // Not writing the params on chain as its assumed that the label is hardcoded in the code as system parameter
 
       issuerSchemeKeypair = KeyPair.generate(sigParams);
       const pk = Module.prepareAddPublicKey(

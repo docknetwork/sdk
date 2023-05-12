@@ -9,49 +9,14 @@ import { Bls12381BBS23SigDockSigName, Bls12381BBS23SigProofDockSigName } from '.
 
 import Bls12381BBSKeyPairDock2023 from './Bls12381BBSKeyPairDock2023';
 import CustomLinkedDataSignature from './custom-linkeddatasignature';
+import { buildPresentationConverter } from './utils';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
 /*
  * Converts a derived BBS+ proof credential to the native presentation format
  */
-export function convertToPresentation(document) {
-  const {
-    '@context': context,
-    type,
-    credentialSchema,
-    issuer,
-    issuanceDate,
-    proof,
-    ...revealedAttributes
-  } = document;
-
-  return {
-    version: '0.0.1',
-    nonce: proof.nonce,
-    context: proof.context,
-    spec: {
-      credentials: [
-        {
-          version: proof.version,
-          schema: JSON.stringify(credentialSchema),
-          revealedAttributes: {
-            proof: {
-              type: Bls12381BBS23SigDockSigName,
-              verificationMethod: proof.verificationMethod,
-            },
-            '@context': JSON.stringify(context),
-            type: JSON.stringify(type),
-            ...revealedAttributes,
-          },
-        },
-      ],
-      attributeEqualities: proof.attributeEqualities,
-    },
-    attributeCiphertexts: proof.attributeCiphertexts,
-    proof: proof.proofValue,
-  };
-}
+export const convertToPresentation = buildPresentationConverter(Bls12381BBS23SigDockSigName);
 
 /**
  * A BBS signature suite for use with derived BBS+ credentials aka BBS+ presentations

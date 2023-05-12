@@ -97,7 +97,7 @@ export default class Bls12381G2KeyPairDock2022 {
   }
 
   static generate({
-    seed, params, controller, id, msgCount = 1
+    seed, params, controller, id, msgCount = 1,
   } = {}) {
     const keypair = BBSPlusKeypairG2.generate(params || BBSPlusSignatureParamsG1.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES), seed);
     return new Bls12381G2KeyPairDock2022({ keypair, controller, id });

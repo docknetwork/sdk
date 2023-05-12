@@ -15,7 +15,7 @@ import {
   Bls12381BBSSignatureDock2023,
   Bls12381PSSignatureDock2023,
   Bls12381PSDockVerKeyName,
-  JsonWebSignature2020
+  JsonWebSignature2020,
 } from './custom_crypto';
 
 /**

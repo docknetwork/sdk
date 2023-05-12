@@ -1,17 +1,17 @@
-import jsonld from "jsonld";
-import jsigs from "jsonld-signatures";
+import jsonld from 'jsonld';
+import jsigs from 'jsonld-signatures';
 import {
   BBSPlusPublicKeyG2,
   BBSPublicKey,
   PSPublicKey,
-} from "@docknetwork/crypto-wasm-ts";
-import { Presentation } from "@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation";
-import b58 from "bs58";
-import { verifyCredential } from "./credentials";
+} from '@docknetwork/crypto-wasm-ts';
+import { Presentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
+import b58 from 'bs58';
+import { verifyCredential } from './credentials';
 import DIDResolver from "../../did-resolver"; // eslint-disable-line
 
-import defaultDocumentLoader from "./document-loader";
-import { getSuiteFromKeyDoc } from "./helpers";
+import defaultDocumentLoader from './document-loader';
+import { getSuiteFromKeyDoc } from './helpers';
 import {
   Bls12381BBSSigDockSigName,
   Bls12381PSSigDockSigName,
@@ -19,9 +19,9 @@ import {
   Bls12381BBSDockVerKeyName,
   Bls12381PSDockVerKeyName,
   Bls12381BBS23DockVerKeyName,
-} from "./crypto/constants";
+} from './crypto/constants';
 
-import { DEFAULT_CONTEXT_V1_URL } from "./constants";
+import { DEFAULT_CONTEXT_V1_URL } from './constants';
 
 import {
   EcdsaSepc256k1Signature2019,
@@ -31,7 +31,7 @@ import {
   Bls12381BBSSignatureDock2022,
   Bls12381BBSSignatureDock2023,
   Bls12381PSSignatureDock2023,
-} from "./custom_crypto";
+} from './custom_crypto';
 
 const { AuthenticationProofPurpose } = jsigs.purposes;
 
@@ -46,40 +46,38 @@ const { AuthenticationProofPurpose } = jsigs.purposes;
  */
 function checkPresentation(presentation) {
   // Normalize to an array to allow the common case of context being a string
-  const context = Array.isArray(presentation["@context"])
-    ? presentation["@context"]
-    : [presentation["@context"]];
+  const context = Array.isArray(presentation['@context'])
+    ? presentation['@context']
+    : [presentation['@context']];
 
   // Ensure first context is 'https://www.w3.org/2018/credentials/v1'
   if (context[0] !== DEFAULT_CONTEXT_V1_URL) {
     throw new Error(
-      `"${DEFAULT_CONTEXT_V1_URL}" needs to be first in the ` +
-        "list of contexts."
+      `"${DEFAULT_CONTEXT_V1_URL}" needs to be first in the `
+        + 'list of contexts.',
     );
   }
 
   // Ensure VerifiablePresentation exists in types
-  const types = jsonld.getValues(presentation, "type");
-  if (!types.includes("VerifiablePresentation")) {
+  const types = jsonld.getValues(presentation, 'type');
+  if (!types.includes('VerifiablePresentation')) {
     throw new Error('"type" must include "VerifiablePresentation".');
   }
 }
 
 export async function verifyPresentationCredentials(
   presentation,
-  options = {}
+  options = {},
 ) {
   let verified = true;
   let credentialResults = [];
 
   // Get presentation credentials
-  const credentials = jsonld.getValues(presentation, "verifiableCredential");
+  const credentials = jsonld.getValues(presentation, 'verifiableCredential');
   if (credentials.length > 0) {
     // Verify all credentials in list
     credentialResults = await Promise.all(
-      credentials.map((credential) =>
-        verifyCredential(credential, { ...options })
-      )
+      credentials.map((credential) => verifyCredential(credential, { ...options })),
     );
 
     // Assign credentialId property to all credential results
@@ -131,7 +129,7 @@ export async function verifyPresentationCredentials(
 export async function verifyPresentation(presentation, options = {}) {
   if (options.documentLoader && options.resolver) {
     throw new Error(
-      "Passing resolver and documentLoader results in resolver being ignored, please re-factor."
+      'Passing resolver and documentLoader results in resolver being ignored, please re-factor.',
     );
   }
 
@@ -175,7 +173,7 @@ export async function verifyPresentation(presentation, options = {}) {
   // TODO: verify proof then credentials
   const { verified, credentialResults } = await verifyPresentationCredentials(
     presentation,
-    verificationOptions
+    verificationOptions,
   );
   try {
     // Skip proof validation for unsigned
@@ -191,14 +189,13 @@ export async function verifyPresentation(presentation, options = {}) {
     // Get proof purpose
     if (!presentationPurpose && !challenge) {
       throw new Error(
-        'A "challenge" param is required for AuthenticationProofPurpose.'
+        'A "challenge" param is required for AuthenticationProofPurpose.',
       );
     }
 
     // Set purpose and verify
-    const purpose =
-      presentationPurpose ||
-      new AuthenticationProofPurpose({ controller, domain, challenge });
+    const purpose = presentationPurpose
+      || new AuthenticationProofPurpose({ controller, domain, challenge });
     const presentationResult = await jsigs.verify(presentation, {
       purpose,
       ...verificationOptions,
@@ -240,12 +237,11 @@ export async function signPresentation(
   resolver = null,
   compactProof = true,
   presentationPurpose = null,
-  addSuiteContext = true
+  addSuiteContext = true,
 ) {
   const suite = await getSuiteFromKeyDoc(keyDoc);
-  const purpose =
-    presentationPurpose ||
-    new AuthenticationProofPurpose({
+  const purpose = presentationPurpose
+    || new AuthenticationProofPurpose({
       domain,
       challenge,
     });
@@ -266,23 +262,22 @@ export function isAnoncreds(presentation) {
   // Since there is no type parameter present we have to guess by checking field types
   // these wont exist in a standard VP
   return (
-    typeof presentation.version === "string" &&
-    typeof presentation.proof === "string" &&
-    typeof presentation.spec !== "undefined" &&
-    typeof presentation.spec.credentials !== "undefined"
+    typeof presentation.version === 'string'
+    && typeof presentation.proof === 'string'
+    && typeof presentation.spec !== 'undefined'
+    && typeof presentation.spec.credentials !== 'undefined'
   );
 }
 
 export async function verifyAnoncreds(presentation, options = {}) {
-  const documentLoader =
-    options.documentLoader || defaultDocumentLoader(options.resolver);
+  const documentLoader = options.documentLoader || defaultDocumentLoader(options.resolver);
 
   const keyDocuments = await Promise.all(
     presentation.spec.credentials.map((c, idx) => {
       const { proof } = c.revealedAttributes;
       if (!proof) {
         throw new Error(
-          `Presentation credential does not reveal its proof for index ${idx}`
+          `Presentation credential does not reveal its proof for index ${idx}`,
         );
       }
 
@@ -302,7 +297,7 @@ export async function verifyAnoncreds(presentation, options = {}) {
       }
 
       return sigClass.getVerificationMethod({ proof, documentLoader });
-    })
+    }),
   );
 
   const recreatedPres = Presentation.fromJSON(presentation);
@@ -310,9 +305,9 @@ export async function verifyAnoncreds(presentation, options = {}) {
     const pkRaw = b58.decode(keyDocument.publicKeyBase58);
 
     if (!keyDocument.type) {
-      throw new Error(`No type provided for key document ${JSON.stringify(keyDocument)}`)
+      throw new Error(`No type provided for key document ${JSON.stringify(keyDocument)}`);
     }
-    const keyType = keyDocument.type.startsWith('did:') ? keyDocument.type.slice(4): keyDocument.type;
+    const keyType = keyDocument.type.startsWith('did:') ? keyDocument.type.slice(4) : keyDocument.type;
 
     switch (keyType) {
       case Bls12381BBSDockVerKeyName:

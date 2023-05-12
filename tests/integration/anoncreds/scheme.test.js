@@ -21,7 +21,7 @@ for (const {
   getModule,
   KeyPair,
   SignatureParams,
-  KeyType,
+  VerKey,
 } of Schemes) {
   describe(`${Name} Module`, () => {
     const dock = new DockAPI();
@@ -221,7 +221,7 @@ for (const {
       expect(document1.publicKey.length).toEqual(2);
       expect(document1.assertionMethod.length).toEqual(2);
       expect(document1.publicKey[1].id.endsWith("#keys-2")).toEqual(true);
-      expect(document1.publicKey[1].type).toEqual(KeyType);
+      expect(document1.publicKey[1].type).toEqual(VerKey);
       expect(document1.assertionMethod[1].endsWith("#keys-2")).toEqual(true);
 
       const document2 = await dock.did.getDocument(did2, {
@@ -230,9 +230,9 @@ for (const {
       expect(document2.publicKey.length).toEqual(3);
       expect(document2.assertionMethod.length).toEqual(3);
       expect(document2.publicKey[1].id.endsWith("#keys-2")).toEqual(true);
-      expect(document2.publicKey[1].type).toEqual(KeyType);
+      expect(document2.publicKey[1].type).toEqual(VerKey);
       expect(document2.publicKey[2].id.endsWith("#keys-3")).toEqual(true);
-      expect(document2.publicKey[2].type).toEqual(KeyType);
+      expect(document2.publicKey[2].type).toEqual(VerKey);
       expect(document2.assertionMethod[1].endsWith("#keys-2")).toEqual(true);
       expect(document2.assertionMethod[2].endsWith("#keys-3")).toEqual(true);
     });
@@ -256,7 +256,7 @@ for (const {
       expect(document1.publicKey.length).toEqual(1);
       expect(document1.assertionMethod.length).toEqual(1);
       expect(document1.publicKey[0].id.endsWith("#keys-1")).toEqual(true);
-      expect(document1.publicKey[0].type).not.toEqual(KeyType);
+      expect(document1.publicKey[0].type).not.toEqual(VerKey);
       expect(document1.assertionMethod[0].endsWith("#keys-1")).toEqual(true);
 
       await chainModule.removeParams(
@@ -290,10 +290,10 @@ for (const {
       expect(document2.publicKey.length).toEqual(2);
       expect(document2.assertionMethod.length).toEqual(2);
       expect(document2.publicKey[0].id.endsWith("#keys-1")).toEqual(true);
-      expect(document2.publicKey[0].type).not.toEqual(KeyType);
+      expect(document2.publicKey[0].type).not.toEqual(VerKey);
       expect(document2.assertionMethod[0].endsWith("#keys-1")).toEqual(true);
       expect(document2.publicKey[1].id.endsWith("#keys-3")).toEqual(true);
-      expect(document2.publicKey[1].type).toEqual(KeyType);
+      expect(document2.publicKey[1].type).toEqual(VerKey);
       expect(document2.assertionMethod[1].endsWith("#keys-3")).toEqual(true);
 
       await chainModule.removePublicKey(
@@ -312,7 +312,7 @@ for (const {
       expect(document2.publicKey.length).toEqual(1);
       expect(document2.assertionMethod.length).toEqual(1);
       expect(document2.publicKey[0].id.endsWith("#keys-1")).toEqual(true);
-      expect(document2.publicKey[0].type).not.toEqual(KeyType);
+      expect(document2.publicKey[0].type).not.toEqual(VerKey);
       expect(document2.assertionMethod[0].endsWith("#keys-1")).toEqual(true);
 
       await chainModule.removeParams(

@@ -22,7 +22,7 @@ import {
   Bls12381BBSSignatureProofDock2022,
   Bls12381BBSSignatureDock2023,
   Bls12381BBSSignatureProofDock2023,
-  JsonWebSignature2020
+  JsonWebSignature2020,
 } from './custom_crypto';
 import { signJWS } from './jws';
 

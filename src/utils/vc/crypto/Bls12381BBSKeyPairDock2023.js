@@ -97,7 +97,7 @@ export default class Bls12381BBSKeyPairDock2023 {
   }
 
   static generate({
-    seed, params, controller, id, msgCount = 1
+    seed, params, controller, id, msgCount = 1,
   } = {}) {
     const keypair = BBSKeypair.generate(params || BBSSignatureParams.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES), seed);
     return new Bls12381BBSKeyPairDock2023({ keypair, controller, id });

@@ -56,7 +56,7 @@ for (const {
   Module,
   Presentation,
   Context,
-  KeyType,
+  VerKey,
   CryptoKeyPair,
   getModule,
 } of Schemes) {
@@ -128,7 +128,7 @@ for (const {
       didDocument = await dock.did.getDocument(did1);
       const { publicKey } = didDocument;
       expect(publicKey.length).toEqual(2);
-      expect(publicKey[1].type).toEqual(KeyType);
+      expect(publicKey[1].type).toEqual(VerKey);
       keypair.id = publicKey[1].id;
     }, 30000);
 

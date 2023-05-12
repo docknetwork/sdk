@@ -97,7 +97,7 @@ export default class Bls12381PSKeyPairDock2023 {
   }
 
   static generate({
-    seed, params, controller, id, msgCount = 1
+    seed, params, controller, id, msgCount = 1,
   } = {}) {
     const keypair = PSKeypair.generate(params || PSSignatureParams.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES), seed);
     return new Bls12381PSKeyPairDock2023({ keypair, controller, id });

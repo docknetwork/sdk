@@ -1,5 +1,5 @@
 import {
-  CredentialSchema, SIGNATURE_PARAMS_LABEL_BYTES, PSCredentialBuilder,
+  CredentialSchema, PS_SIGNATURE_PARAMS_LABEL_BYTES, PSCredentialBuilder,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 
 import {
@@ -85,7 +85,7 @@ export default class Bls12381PSSignatureDock2023 extends CustomLinkedDataSignatu
     const [serializedCredential, credSchema] = Bls12381PSSignatureDock2023.convertCredential(options);
 
     // Encode messages, retrieve names/values array
-    const nameValues = credSchema.encoder.encodeMessageObject(serializedCredential, SIGNATURE_PARAMS_LABEL_BYTES);
+    const nameValues = credSchema.encoder.encodeMessageObject(serializedCredential, PS_SIGNATURE_PARAMS_LABEL_BYTES);
     return nameValues[1];
   }
 
@@ -215,7 +215,7 @@ export default class Bls12381PSSignatureDock2023 extends CustomLinkedDataSignatu
         }
 
         const msgCount = data.length;
-        const sigParams = PSSignatureParams.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES);
+        const sigParams = PSSignatureParams.getSigParamsOfRequiredSize(msgCount, PS_SIGNATURE_PARAMS_LABEL_BYTES);
         const signature = PSSignature.generate(data, PSSecretKey.generate(msgCount, keypair.privateKeyBuffer), sigParams, false);
         return signature.value;
       },

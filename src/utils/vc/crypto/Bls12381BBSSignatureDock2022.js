@@ -1,5 +1,5 @@
 import {
-  CredentialSchema, SIGNATURE_PARAMS_LABEL_BYTES, BBSPlusCredentialBuilder,
+  CredentialSchema, BBS_PLUS_SIGNATURE_PARAMS_LABEL_BYTES, BBSPlusCredentialBuilder,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 
 import {
@@ -85,7 +85,7 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
     const [serializedCredential, credSchema] = Bls12381BBSSignatureDock2022.convertCredential(options);
 
     // Encode messages, retrieve names/values array
-    const nameValues = credSchema.encoder.encodeMessageObject(serializedCredential, SIGNATURE_PARAMS_LABEL_BYTES);
+    const nameValues = credSchema.encoder.encodeMessageObject(serializedCredential, BBS_PLUS_SIGNATURE_PARAMS_LABEL_BYTES);
     return nameValues[1];
   }
 
@@ -215,7 +215,7 @@ export default class Bls12381BBSSignatureDock2022 extends CustomLinkedDataSignat
         }
 
         const msgCount = data.length;
-        const sigParams = BBSPlusSignatureParamsG1.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES);
+        const sigParams = BBSPlusSignatureParamsG1.getSigParamsOfRequiredSize(msgCount, BBS_PLUS_SIGNATURE_PARAMS_LABEL_BYTES);
         const signature = BBSPlusSignatureG1.generate(data, new BBSPlusSecretKey(keypair.privateKeyBuffer), sigParams, false);
         return signature.value;
       },

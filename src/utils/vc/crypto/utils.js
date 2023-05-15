@@ -16,7 +16,7 @@ export const buildPresentationConverter = (proofType) => function convertToPrese
   } = document;
 
   return {
-    version: '0.0.1',
+    version: '0.1.0',
     nonce: proof.nonce,
     context: proof.context,
     spec: {

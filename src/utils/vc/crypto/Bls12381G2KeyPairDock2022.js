@@ -10,7 +10,7 @@ import {
 } from '@docknetwork/crypto-wasm-ts';
 
 import {
-  SIGNATURE_PARAMS_LABEL_BYTES,
+  BBS_PLUS_SIGNATURE_PARAMS_LABEL_BYTES,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 
 import { Bls12381BBSDockVerKeyName } from './constants';
@@ -33,7 +33,7 @@ const signerFactory = (key) => {
   return {
     async sign({ data }) {
       const msgCount = data.length;
-      const sigParams = BBSPlusSignatureParamsG1.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES);
+      const sigParams = BBSPlusSignatureParamsG1.getSigParamsOfRequiredSize(msgCount, BBS_PLUS_SIGNATURE_PARAMS_LABEL_BYTES);
       const signature = BBSPlusSignatureG1.generate(data, new BBSPlusSecretKey(u8aToU8a(key.privateKeyBuffer)), sigParams, false);
       return signature.value;
     },
@@ -59,7 +59,7 @@ const verifierFactory = (key) => {
   return {
     async verify({ data, signature }) {
       const msgCount = data.length;
-      const sigParams = BBSPlusSignatureParamsG1.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES);
+      const sigParams = BBSPlusSignatureParamsG1.getSigParamsOfRequiredSize(msgCount, BBS_PLUS_SIGNATURE_PARAMS_LABEL_BYTES);
       const bbsSignature = new BBSPlusSignatureG1(u8aToU8a(signature));
 
       try {
@@ -99,7 +99,7 @@ export default class Bls12381G2KeyPairDock2022 {
   static generate({
     seed, params, controller, id, msgCount = 1,
   } = {}) {
-    const keypair = BBSPlusKeypairG2.generate(params || BBSPlusSignatureParamsG1.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES), seed);
+    const keypair = BBSPlusKeypairG2.generate(params || BBSPlusSignatureParamsG1.getSigParamsOfRequiredSize(msgCount, BBS_PLUS_SIGNATURE_PARAMS_LABEL_BYTES), seed);
     return new Bls12381G2KeyPairDock2022({ keypair, controller, id });
   }
 

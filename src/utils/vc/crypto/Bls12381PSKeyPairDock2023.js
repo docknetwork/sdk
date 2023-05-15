@@ -10,7 +10,7 @@ import {
 } from '@docknetwork/crypto-wasm-ts';
 
 import {
-  SIGNATURE_PARAMS_LABEL_BYTES,
+  PS_SIGNATURE_PARAMS_LABEL_BYTES,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 
 import { Bls12381PSDockVerKeyName } from './constants';
@@ -33,7 +33,7 @@ const signerFactory = (key) => {
   return {
     async sign({ data }) {
       const msgCount = data.length;
-      const sigParams = PSSignatureParams.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES);
+      const sigParams = PSSignatureParams.getSigParamsOfRequiredSize(msgCount, PS_SIGNATURE_PARAMS_LABEL_BYTES);
       let sk = new PSSecretKey(u8aToU8a(key.privateKeyBuffer));
       if (sk.supportedMessageCount() > msgCount) {
         sk = sk.adaptForLess(msgCount);
@@ -64,7 +64,7 @@ const verifierFactory = (key) => {
   return {
     async verify({ data, signature }) {
       const msgCount = data.length;
-      const sigParams = PSSignatureParams.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES);
+      const sigParams = PSSignatureParams.getSigParamsOfRequiredSize(msgCount, PS_SIGNATURE_PARAMS_LABEL_BYTES);
       const psSignature = new PSSignature(u8aToU8a(signature));
 
       try {
@@ -109,7 +109,7 @@ export default class Bls12381PSKeyPairDock2023 {
   static generate({
     seed, params, controller, id, msgCount = 1,
   } = {}) {
-    const keypair = PSKeypair.generate(params || PSSignatureParams.getSigParamsOfRequiredSize(msgCount, SIGNATURE_PARAMS_LABEL_BYTES), seed);
+    const keypair = PSKeypair.generate(params || PSSignatureParams.getSigParamsOfRequiredSize(msgCount, PS_SIGNATURE_PARAMS_LABEL_BYTES), seed);
     return new Bls12381PSKeyPairDock2023({ keypair, controller, id });
   }
 

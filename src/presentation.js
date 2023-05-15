@@ -92,11 +92,12 @@ export default class Presentation {
     const { proof } = json;
 
     if (!proof) {
-      throw new Error('BBS credential does not have a proof');
+      throw new Error('Credential does not have a proof');
     }
 
-    let Signature; let Credential; let
-      PublicKey;
+    let Signature;
+    let Credential;
+    let PublicKey;
 
     switch (proof.type) {
       case Bls12381BBSSigDockSigName:

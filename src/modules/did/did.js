@@ -867,7 +867,6 @@ class DIDModule {
               keyType = 'Bls12381G2VerificationKeyDock2022';
               rawKey = r.asBbsPlus;
             } else if (r.isPs) {
-              // TODO
               keyType = 'Bls12381PSVerificationKeyDock2023';
               rawKey = r.asPs;
             }

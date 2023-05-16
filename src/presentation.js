@@ -21,6 +21,8 @@ import {
   Bls12381PSSigDockSigName,
   Bls12381BBS23SigDockSigName,
   Bls12381PSSigProofDockSigName,
+  Bls12381BBS23SigProofDockSigName,
+  Bls12381BBSSigProofDockSigName,
 } from './utils/vc/crypto/constants';
 import CustomLinkedDataSignature from './utils/vc/crypto/custom-linkeddatasignature';
 import defaultDocumentLoader from './utils/vc/document-loader';
@@ -28,10 +30,6 @@ import {
   Bls12381BBSSignatureDock2023,
   Bls12381PSSignatureDock2023,
 } from './utils/vc/custom_crypto';
-import {
-  Bls12381BBS23SigProofDockSigName,
-  Bls12381BBSSigProofDockSigName,
-} from '../dist/utils/vc/crypto/constants.cjs';
 
 const SIG_NAME_TO_PROOF_NAME = Object.setPrototypeOf(
   {

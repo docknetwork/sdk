@@ -16,10 +16,12 @@ export default class BBSModule extends OffchainSignatures {
     super(...args);
   }
 
+  /// Builds `BBS` params from the provided value.
   static buildParams(params) {
     return new BBSParams(params)
   }
 
+  /// Builds `BBS` public key from the provided value.
   static buildPublicKey(publicKey) {
     return new BBSPublicKey(publicKey)
   }

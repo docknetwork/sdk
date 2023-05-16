@@ -8,10 +8,12 @@ import { createDidSig, getHexIdentifierFromDID } from '../utils/did';
 
 /** Class to manage accumulators on chain */
 export default class AccumulatorModule extends WithParamsAndPublicKeys {
+  /// Builds accumulator params from the provided value.
   static buildParams(params) {
     return params;
   }
 
+  /// Builds accumulator public key from the provided value.
   static buildPublicKey(key) {
     return key;
   }

@@ -16,10 +16,12 @@ export default class PSModule extends OffchainSignatures {
     super(...args);
   }
 
+  /// Builds `Pointcheval-Sanders` params from the provided value.
   static buildParams(params) {
     return new PSParams(params)
   }
 
+  /// Builds `Pointcheval-Sanders` public key from the provided value.
   static buildPublicKey(publicKey) {
     return new PSPublicKey(publicKey)
   }

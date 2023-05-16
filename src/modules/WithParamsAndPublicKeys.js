@@ -6,6 +6,7 @@ import { getNonce } from '../utils/misc';
 
 /** Class with logic for public keys and corresponding setup parameters. This logic is common in BBS+ and accumulator */
 export default class WithParamsAndPublicKeys {
+  /// Builds module-specific params from the provided value.
   static buildParams(params) {
     return params;
   }

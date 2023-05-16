@@ -1,46 +1,46 @@
-import { randomAsHex } from "@polkadot/util-crypto";
-import { stringToU8a, u8aToHex } from "@polkadot/util";
-import { initializeWasm } from "@docknetwork/crypto-wasm-ts";
-import { DockAPI } from "../../../src";
+import { randomAsHex } from '@polkadot/util-crypto';
+import { stringToU8a, u8aToHex } from '@polkadot/util';
+import { initializeWasm } from '@docknetwork/crypto-wasm-ts';
+import { DockAPI } from '../../../src';
 import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
   Schemes,
-} from "../../test-constants";
-import { createNewDockDID } from "../../../src/utils/did";
-import { registerNewDIDUsingPair } from "../helpers";
-import getKeyDoc from "../../../src/utils/vc/helpers";
+} from '../../test-constants';
+import { createNewDockDID } from '../../../src/utils/did';
+import { registerNewDIDUsingPair } from '../helpers';
+import getKeyDoc from '../../../src/utils/vc/helpers';
 import {
   issueCredential,
   signPresentation,
   verifyPresentation,
   verifyCredential,
-} from "../../../src/utils/vc";
-import { DockResolver } from "../../../src/resolver";
-import { createPresentation } from "../../create-presentation";
+} from '../../../src/utils/vc';
+import { DockResolver } from '../../../src/resolver';
+import { createPresentation } from '../../create-presentation';
 
 // TODO: move to fixtures
 const residentCardSchema = {
-  $schema: "http://json-schema.org/draft-07/schema#",
-  $id: "https://ld.dock.io/examples/resident-card-schema.json",
-  title: "Resident Card Example",
-  type: "object",
+  $schema: 'http://json-schema.org/draft-07/schema#',
+  $id: 'https://ld.dock.io/examples/resident-card-schema.json',
+  title: 'Resident Card Example',
+  type: 'object',
   properties: {
     credentialSubject: {
-      type: "object",
+      type: 'object',
       properties: {
         givenName: {
-          title: "Given Name",
-          type: "string",
+          title: 'Given Name',
+          type: 'string',
         },
         familyName: {
-          title: "Family Name",
-          type: "string",
+          title: 'Family Name',
+          type: 'string',
         },
         lprNumber: {
-          title: "LPR Number",
-          type: "integer",
+          title: 'LPR Number',
+          type: 'integer',
           minimum: 0,
         },
       },
@@ -51,9 +51,9 @@ const residentCardSchema = {
 
 const embeddedSchema = {
   id: `data:application/json;charset=utf-8,${encodeURIComponent(
-    JSON.stringify(residentCardSchema)
+    JSON.stringify(residentCardSchema),
   )}`,
-  type: "JsonSchemaValidator2018",
+  type: 'JsonSchemaValidator2018',
 };
 
 for (const {
@@ -72,24 +72,24 @@ for (const {
 
   // TODO: move to fixtures
   const credentialJSON = {
-    "@context": [
-      "https://www.w3.org/2018/credentials/v1",
-      "https://w3id.org/citizenship/v1",
+    '@context': [
+      'https://www.w3.org/2018/credentials/v1',
+      'https://w3id.org/citizenship/v1',
       Context,
     ],
-    id: "https://issuer.oidp.uscis.gov/credentials/83627465",
-    type: ["VerifiableCredential", "PermanentResidentCard"],
+    id: 'https://issuer.oidp.uscis.gov/credentials/83627465',
+    type: ['VerifiableCredential', 'PermanentResidentCard'],
     credentialSchema: embeddedSchema,
-    identifier: "83627465",
-    name: "Permanent Resident Card",
-    description: "Government of Example Permanent Resident Card.",
-    issuanceDate: "2019-12-03T12:19:52Z",
-    expirationDate: "2029-12-03T12:19:52Z",
+    identifier: '83627465',
+    name: 'Permanent Resident Card',
+    description: 'Government of Example Permanent Resident Card.',
+    issuanceDate: '2019-12-03T12:19:52Z',
+    expirationDate: '2029-12-03T12:19:52Z',
     credentialSubject: {
-      id: "did:example:b34ca6cd37bbf23",
-      type: ["PermanentResident", "Person"],
-      givenName: "JOHN",
-      familyName: "SMITH",
+      id: 'did:example:b34ca6cd37bbf23',
+      type: ['PermanentResident', 'Person'],
+      givenName: 'JOHN',
+      familyName: 'SMITH',
       lprNumber: 1234,
     },
   };
@@ -119,7 +119,7 @@ for (const {
       await registerNewDIDUsingPair(dock, did1, pair1);
 
       keypair = CryptoKeyPair.generate({
-        controller: did1, msgCount: 100
+        controller: did1, msgCount: 100,
       });
 
       const pk1 = Module.prepareAddPublicKey(u8aToHex(keypair.publicKeyBuffer));
@@ -130,7 +130,7 @@ for (const {
         pair1,
         1,
         { didModule: dock.did },
-        false
+        false,
       );
 
       didDocument = await dock.did.getDocument(did1);
@@ -143,28 +143,28 @@ for (const {
       await registerNewDIDUsingPair(
         dock,
         holder3DID,
-        dock.keyring.addFromUri(holder3KeySeed, null, "sr25519")
+        dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'),
       );
     }, 30000);
 
     async function createAndVerifyPresentation(credentials) {
       const holderKey = getKeyDoc(
         holder3DID,
-        dock.keyring.addFromUri(holder3KeySeed, null, "sr25519"),
-        "Sr25519VerificationKey2020"
+        dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'),
+        'Sr25519VerificationKey2020',
       );
 
       const presId = randomAsHex(32);
       const chal = randomAsHex(32);
-      const domain = "test domain";
+      const domain = 'test domain';
       const presentation = createPresentation(credentials, presId);
 
       expect(presentation).toMatchObject(
         expect.objectContaining({
-          type: ["VerifiablePresentation"],
+          type: ['VerifiablePresentation'],
           verifiableCredential: credentials,
           id: presId,
-        })
+        }),
       );
 
       const signedPres = await signPresentation(
@@ -172,21 +172,21 @@ for (const {
         holderKey,
         chal,
         domain,
-        resolver
+        resolver,
       );
 
       expect(signedPres).toMatchObject(
         expect.objectContaining({
-          type: ["VerifiablePresentation"],
+          type: ['VerifiablePresentation'],
           verifiableCredential: credentials,
           id: presId,
           proof: expect.objectContaining({
-            type: "Sr25519Signature2020",
+            type: 'Sr25519Signature2020',
             challenge: chal,
             domain,
-            proofPurpose: "authentication",
+            proofPurpose: 'authentication',
           }),
-        })
+        }),
       );
 
       const result = await verifyPresentation(signedPres, {
@@ -201,7 +201,7 @@ for (const {
       expect(result.credentialResults[0].verified).toBe(true);
     }
 
-    test("Holder creates a derived verifiable credential from a credential with selective disclosure", async () => {
+    test('Holder creates a derived verifiable credential from a credential with selective disclosure', async () => {
       const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
       const unsignedCred = {
         ...credentialJSON,
@@ -209,8 +209,8 @@ for (const {
       };
 
       const presentationOptions = {
-        nonce: stringToU8a("noncetest"),
-        context: "my context",
+        nonce: stringToU8a('noncetest'),
+        context: 'my context',
       };
 
       // Create W3C credential
@@ -220,48 +220,48 @@ for (const {
       const presentationInstance = new Presentation();
       const idx = await presentationInstance.addCredentialToPresent(
         credential,
-        { resolver }
+        { resolver },
       );
 
       // Reveal subject attributes
       await presentationInstance.addAttributeToReveal(idx, [
-        "credentialSubject.lprNumber",
+        'credentialSubject.lprNumber',
       ]);
 
       // NOTE: revealing subject type because of JSON-LD processing for this certain credential
       // you may not always need to do this depending on your JSON-LD contexts
       await presentationInstance.addAttributeToReveal(idx, [
-        "credentialSubject.type.0",
+        'credentialSubject.type.0',
       ]);
       await presentationInstance.addAttributeToReveal(idx, [
-        "credentialSubject.type.1",
+        'credentialSubject.type.1',
       ]);
 
       // Derive a W3C Verifiable Credential JSON from the above presentation
       const credentials = await presentationInstance.deriveCredentials(
-        presentationOptions
+        presentationOptions,
       );
       expect(credentials.length).toEqual(1);
       expect(credentials[0].proof).toBeDefined();
-      expect(credentials[0]).toHaveProperty("credentialSubject");
+      expect(credentials[0]).toHaveProperty('credentialSubject');
       expect(credentials[0].credentialSubject).toMatchObject(
         expect.objectContaining({
           type: unsignedCred.credentialSubject.type,
           lprNumber: 1234,
-        })
+        }),
       );
 
       // Ensure reconstructing presentation from credential matches
       // NOTE: ignoring proof here as itll differ when signed twice as above
       const presentation = await presentationInstance.createPresentation(
-        presentationOptions
+        presentationOptions,
       );
       const reconstructedPres = convertToPresentation(credentials[0]);
       expect(reconstructedPres.proof).toBeDefined();
       expect({
         ...reconstructedPres,
-        proof: "",
-      }).toMatchObject({ ...presentation, proof: "" });
+        proof: '',
+      }).toMatchObject({ ...presentation, proof: '' });
 
       // Try to verify the derived credential alone
       const credentialResult = await verifyCredential(credentials[0], {

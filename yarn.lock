@@ -2353,22 +2353,20 @@
     ky "^0.25.1"
     ky-universal "^0.8.2"
 
-"@docknetwork/crypto-wasm-ts@0.31.2":
-  version "0.31.2"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.31.2.tgz#617d72414dc5f3df0ad2954430a698c7f2496d13"
-  integrity sha512-rtgDj5/UZ7X1Tf0yz9qFlED5hYV2T61WEVuv2NRwv6EuNYe7mVc7IJk3hcJIkq01wWjbkxxKDsqxwbyxT2AEHQ==
+"@docknetwork/crypto-wasm-ts@file:../crypto-wasm-ts":
+  version "0.32.0"
   dependencies:
-    "@docknetwork/crypto-wasm" "0.16.0"
+    "@docknetwork/crypto-wasm" "0.17.0"
     "@types/flat" "^5.0.2"
     bs58 "5.0.0"
     flat "^5.0.2"
     json-pointer "^0.6.2"
     lzutf8 "^0.6.3"
 
-"@docknetwork/crypto-wasm@0.16.0":
-  version "0.16.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.16.0.tgz#9c5bfd3f241e8eaae845000b172103dc9cdc57bf"
-  integrity sha512-oEpN9gBUNEC8fIX73YDyGOvQNmliM0+kMFddw2XwINct0AQ1j77GwwaVo0DT4yLIY9abrL4+mBPl0pbqY2+UlQ==
+"@docknetwork/crypto-wasm@0.17.0":
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.17.0.tgz#ac6f7844e8d5e70100b568c5d11c9e92775a819e"
+  integrity sha512-W9WL1bcLFwjNvg7xnZH/nRJY+syZkvwALFro8neoNnXYV57D1DF28qKsEM1Fp3PBUa+swYLjx6X9l8fl2ib0qA==
 
 "@docknetwork/node-types@^0.15.0":
   version "0.15.0"

@@ -1,5 +1,7 @@
-import { randomAsHex } from "@polkadot/util-crypto";
-import { hexToU8a, stringToHex, stringToU8a, u8aToHex } from "@polkadot/util";
+import { randomAsHex } from '@polkadot/util-crypto';
+import {
+  hexToU8a, stringToHex, stringToU8a, u8aToHex,
+} from '@polkadot/util';
 
 import {
   Statement,
@@ -16,18 +18,18 @@ import {
   QuasiProofSpecG1,
   BoundCheckSnarkSetup,
   initializeWasm,
-} from "@docknetwork/crypto-wasm-ts";
+} from '@docknetwork/crypto-wasm-ts';
 
-import { DockAPI } from "../../../src";
+import { DockAPI } from '../../../src';
 import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
   Schemes,
-} from "../../test-constants";
-import { createNewDockDID } from "../../../src/utils/did";
-import { getRevealedUnrevealed } from "./utils";
-import { registerNewDIDUsingPair } from "../helpers";
+} from '../../test-constants';
+import { createNewDockDID } from '../../../src/utils/did';
+import { getRevealedUnrevealed } from './utils';
+import { registerNewDIDUsingPair } from '../helpers';
 
 for (const {
   Name,
@@ -58,11 +60,11 @@ for (const {
 
     // User's attributes which will be signed by the issuer of the credential
     const attributes = [
-      stringToU8a("John"), // First name
-      stringToU8a("Smith"), // Last name
+      stringToU8a('John'), // First name
+      stringToU8a('Smith'), // Last name
       10000, // Salary
-      stringToU8a("New York"), // City
-      "129086521911", // SSN
+      stringToU8a('New York'), // City
+      '129086521911', // SSN
     ];
     const attributeCount = attributes.length;
 
@@ -102,11 +104,11 @@ for (const {
       await initializeWasm();
     }, 20000);
 
-    test("Create params and keys", async () => {
-      const label = stringToHex("My params");
+    test('Create params and keys', async () => {
+      const label = stringToHex('My params');
       const sigParams = SignatureParams.generate(
         attributeCount,
-        hexToU8a(label)
+        hexToU8a(label),
       );
       const bytes = u8aToHex(sigParams.toBytes());
       const params = Module.prepareAddParameters(bytes, undefined, label);
@@ -116,10 +118,10 @@ for (const {
         issuerKeypair,
         1,
         { didModule: dock.didModule },
-        false
+        false,
       );
       const paramsWritten = await getModule(dock).getLastParamsWritten(
-        issuerDid
+        issuerDid,
       );
       expect(paramsWritten.bytes).toEqual(params.bytes);
       expect(paramsWritten.label).toEqual(params.label);
@@ -128,7 +130,7 @@ for (const {
       const pk = Module.prepareAddPublicKey(
         u8aToHex(issuerSchemeKeypair.publicKey.bytes),
         undefined,
-        [issuerDid, 1]
+        [issuerDid, 1],
       );
       await getModule(dock).addPublicKey(
         pk,
@@ -137,25 +139,25 @@ for (const {
         issuerKeypair,
         1,
         { didModule: dock.didModule },
-        false
+        false,
       );
     }, 10000);
 
-    test("Sign attributes, i.e. issue credential", async () => {
+    test('Sign attributes, i.e. issue credential', async () => {
       const encodedAttrs = encodedAttributes(attributes);
       const queriedPk = await getModule(dock).getPublicKey(issuerDid, 2, true);
       const paramsVal = SignatureParams.valueFromBytes(
-        hexToU8a(queriedPk.params.bytes)
+        hexToU8a(queriedPk.params.bytes),
       );
       const params = new SignatureParams(
         paramsVal,
-        hexToU8a(queriedPk.params.label)
+        hexToU8a(queriedPk.params.label),
       );
       signature = Signature.generate(
         encodedAttrs,
         issuerSchemeKeypair.secretKey,
         params,
-        false
+        false,
       );
 
       // User verifies the credential (signature)
@@ -163,21 +165,20 @@ for (const {
         encodedAttrs,
         new PublicKey(hexToU8a(queriedPk.bytes)),
         params,
-        false
+        false,
       );
       expect(result.verified).toEqual(true);
     });
 
-    test("Setup for decryptor", async () => {
+    test('Setup for decryptor', async () => {
       encryptionGens = SaverEncryptionGens.generate();
-      [snarkPk, , encryptionKey,] =
-        SaverDecryptor.setup(encryptionGens, chunkBitSize);
+      [snarkPk, , encryptionKey] = SaverDecryptor.setup(encryptionGens, chunkBitSize);
     }, 20000);
 
-    test("Encrypt attribute and prove verifiably encrypted", async () => {
+    test('Encrypt attribute and prove verifiably encrypted', async () => {
       // Verifier creates and shares with the prover
       const gens = SaverChunkedCommitmentGens.generate(
-        hexToU8a(stringToHex("some label"))
+        hexToU8a(stringToHex('some label')),
       );
       const commGens = gens.decompress();
 
@@ -192,7 +193,7 @@ for (const {
 
       const queriedPk = await getModule(dock).getPublicKey(issuerDid, 2, true);
       const sigParams = new SignatureParams(
-        SignatureParams.valueFromBytes(hexToU8a(queriedPk.params.bytes))
+        SignatureParams.valueFromBytes(hexToU8a(queriedPk.params.bytes)),
       );
       const sigPk = new PublicKey(hexToU8a(queriedPk.bytes));
 
@@ -201,23 +202,23 @@ for (const {
       const revealedAttrIndices = new Set();
       const [revealedAttrs, unrevealedAttrs] = getRevealedUnrevealed(
         encodedAttrs,
-        revealedAttrIndices
+        revealedAttrIndices,
       );
 
       const statement1 = buildStatement(
         sigParams,
-        "adaptForLess" in sigPk
+        'adaptForLess' in sigPk
           ? sigPk.adaptForLess(sigParams.supportedMessageCount())
           : sigPk,
         revealedAttrs,
-        false
+        false,
       );
       const statement2 = Statement.saverProver(
         encGens,
         commGens,
         ek,
         pk,
-        chunkBitSize
+        chunkBitSize,
       );
 
       const proverStatements = new Statements();
@@ -238,11 +239,11 @@ for (const {
 
       const proverProofSpec = new QuasiProofSpecG1(
         proverStatements,
-        metaStatements
+        metaStatements,
       );
       const proof = CompositeProofG1.generateUsingQuasiProofSpec(
         proverProofSpec,
-        witnesses
+        witnesses,
       );
 
       // Verifier only needs the verification key
@@ -252,7 +253,7 @@ for (const {
         commGens,
         ek,
         vk,
-        chunkBitSize
+        chunkBitSize,
       );
       const verifierStatements = new Statements();
       verifierStatements.add(statement1);
@@ -260,14 +261,14 @@ for (const {
 
       const verifierProofSpec = new QuasiProofSpecG1(
         verifierStatements,
-        metaStatements
+        metaStatements,
       );
       expect(
-        proof.verifyUsingQuasiProofSpec(verifierProofSpec).verified
+        proof.verifyUsingQuasiProofSpec(verifierProofSpec).verified,
       ).toEqual(true);
     }, 180000);
 
-    test("Prove bounded message", async () => {
+    test('Prove bounded message', async () => {
       // Verifier does setup and shares proving key with prover. This key does not need to be published on chain.
       const pk = BoundCheckSnarkSetup();
 
@@ -281,7 +282,7 @@ for (const {
 
       const queriedPk = await getModule(dock).getPublicKey(issuerDid, 2, true);
       const sigParams = new SignatureParams(
-        SignatureParams.valueFromBytes(hexToU8a(queriedPk.params.bytes))
+        SignatureParams.valueFromBytes(hexToU8a(queriedPk.params.bytes)),
       );
       const sigPk = new PublicKey(hexToU8a(queriedPk.bytes));
 
@@ -291,16 +292,16 @@ for (const {
       revealedAttrIndices.add(0);
       const [revealedAttrs, unrevealedAttrs] = getRevealedUnrevealed(
         encodedAttrs,
-        revealedAttrIndices
+        revealedAttrIndices,
       );
 
       const statement1 = buildStatement(
         sigParams,
-        "adaptForLess" in sigPk
+        'adaptForLess' in sigPk
           ? sigPk.adaptForLess(sigParams.supportedMessageCount())
           : sigPk,
         revealedAttrs,
-        false
+        false,
       );
       const statement2 = Statement.boundCheckProver(min, max, snarkProvingKey);
       const proverStatements = new Statements();
@@ -315,7 +316,7 @@ for (const {
 
       const witness1 = buildWitness(signature, unrevealedAttrs, false);
       const witness2 = Witness.boundCheckLegoGroth16(
-        encodedAttrs[boundedAttrIdx]
+        encodedAttrs[boundedAttrIdx],
       );
       const witnesses = new Witnesses();
       witnesses.add(witness1);
@@ -323,18 +324,18 @@ for (const {
 
       const proverProofSpec = new QuasiProofSpecG1(
         proverStatements,
-        metaStatements
+        metaStatements,
       );
       const proof = CompositeProofG1.generateUsingQuasiProofSpec(
         proverProofSpec,
-        witnesses
+        witnesses,
       );
 
       const snarkVerifyingKey = pk.getVerifyingKeyUncompressed();
       const statement3 = Statement.boundCheckVerifier(
         min,
         max,
-        snarkVerifyingKey
+        snarkVerifyingKey,
       );
       const verifierStatements = new Statements();
       verifierStatements.add(statement1);
@@ -342,10 +343,10 @@ for (const {
 
       const verifierProofSpec = new QuasiProofSpecG1(
         verifierStatements,
-        metaStatements
+        metaStatements,
       );
       expect(
-        proof.verifyUsingQuasiProofSpec(verifierProofSpec).verified
+        proof.verifyUsingQuasiProofSpec(verifierProofSpec).verified,
       ).toEqual(true);
     }, 45000);
 

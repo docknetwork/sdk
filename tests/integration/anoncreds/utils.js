@@ -1,6 +1,6 @@
-import * as path from "path";
-import * as r1csf from "r1csfile";
-import * as fs from "fs";
+import * as path from 'path';
+import * as r1csf from 'r1csfile';
+import * as fs from 'fs';
 /**
  * Given messages and indices to reveal, returns 2 maps, one for revealed messages and one for unrevealed
  * @param messages
@@ -23,7 +23,7 @@ export function getRevealedUnrevealed(messages, revealedIndices) {
 }
 
 export function circomArtifactPath(fileName) {
-  return `${path.resolve("./")}/tests/integration/anoncreds/circom/${fileName}`;
+  return `${path.resolve('./')}/tests/integration/anoncreds/circom/${fileName}`;
 }
 
 export function getWasmBytes(fileName) {

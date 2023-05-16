@@ -15,26 +15,25 @@ import {
   PSSignature,
   BBSSignature,
   BBSPlusSignatureG1,
-} from "@docknetwork/crypto-wasm-ts";
-import BBSModule from "../src/modules/bbs";
-import BBSPlusModule from "../src/modules/bbs-plus";
-import PSModule from "../src/modules/ps";
-import Presentation from "../src/presentation";
-import { convertToPresentation as convertToPSPresentation } from "../src/utils/vc/crypto/Bls12381PSSignatureProofDock2023";
-import { convertToPresentation as convertToBBSPresentation } from "../src/utils/vc/crypto/Bls12381BBSSignatureProofDock2023";
-import { convertToPresentation as convertToBBSPlusPresentation } from "../src/utils/vc/crypto/Bls12381BBSSignatureProofDock2022";
-import Bls12381BBSKeyPairDock2023 from "../src/utils/vc/crypto/Bls12381BBSKeyPairDock2023";
-import Bls12381G2KeyPairDock2022 from "../src/utils/vc/crypto/Bls12381G2KeyPairDock2022";
-import Bls12381PSKeyPairDock2023 from "../src/utils/vc/crypto/Bls12381PSKeyPairDock2023";
+} from '@docknetwork/crypto-wasm-ts';
+import BBSModule from '../src/modules/bbs';
+import BBSPlusModule from '../src/modules/bbs-plus';
+import PSModule from '../src/modules/ps';
+import Presentation from '../src/presentation';
+import { convertToPresentation as convertToPSPresentation } from '../src/utils/vc/crypto/Bls12381PSSignatureProofDock2023';
+import { convertToPresentation as convertToBBSPresentation } from '../src/utils/vc/crypto/Bls12381BBSSignatureProofDock2023';
+import { convertToPresentation as convertToBBSPlusPresentation } from '../src/utils/vc/crypto/Bls12381BBSSignatureProofDock2022';
+import Bls12381BBSKeyPairDock2023 from '../src/utils/vc/crypto/Bls12381BBSKeyPairDock2023';
+import Bls12381G2KeyPairDock2022 from '../src/utils/vc/crypto/Bls12381G2KeyPairDock2022';
+import Bls12381PSKeyPairDock2023 from '../src/utils/vc/crypto/Bls12381PSKeyPairDock2023';
 
+require('dotenv').config();
 
-require("dotenv").config();
-
-const DefaultFullNodeEndpoint = "ws://localhost:9944";
-const DefaultFullNodeTCPEndpoint = "http://localhost:9933";
-const DefaultTestKeyringType = "sr25519";
-const DefaultTestAccountURI = "//Alice";
-const DefaultTestAccountCouncilMemberURI = "//Charlie";
+const DefaultFullNodeEndpoint = 'ws://localhost:9944';
+const DefaultFullNodeTCPEndpoint = 'http://localhost:9933';
+const DefaultTestKeyringType = 'sr25519';
+const DefaultTestAccountURI = '//Alice';
+const DefaultTestAccountCouncilMemberURI = '//Charlie';
 const DefaultMinGasPrice = 50;
 const DefaultMaxGas = 429496729;
 
@@ -55,26 +54,26 @@ function fromEnv(varName, defaultVal) {
 }
 
 export const FullNodeEndpoint = fromEnv(
-  "FullNodeEndpoint",
-  DefaultFullNodeEndpoint
+  'FullNodeEndpoint',
+  DefaultFullNodeEndpoint,
 );
 export const FullNodeTCPEndpoint = fromEnv(
-  "FullNodeTCPEndpoint",
-  DefaultFullNodeTCPEndpoint
+  'FullNodeTCPEndpoint',
+  DefaultFullNodeTCPEndpoint,
 );
 export const TestKeyringOpts = {
-  type: fromEnv("TestKeyringType", DefaultTestKeyringType),
+  type: fromEnv('TestKeyringType', DefaultTestKeyringType),
 };
-export const TestAccountURI = fromEnv("TestAccountURI", DefaultTestAccountURI);
+export const TestAccountURI = fromEnv('TestAccountURI', DefaultTestAccountURI);
 export const TestAccountCouncilMemberURI = fromEnv(
-  "TestAccountCouncilMemberURI",
-  DefaultTestAccountCouncilMemberURI
+  'TestAccountCouncilMemberURI',
+  DefaultTestAccountCouncilMemberURI,
 );
-export const MinGasPrice = fromEnv("MinGasPrice", DefaultMinGasPrice);
-export const MaxGas = fromEnv("MaxGas", DefaultMaxGas);
+export const MinGasPrice = fromEnv('MinGasPrice', DefaultMinGasPrice);
+export const MaxGas = fromEnv('MaxGas', DefaultMaxGas);
 
 export const BBS = {
-  Name: "BBS",
+  Name: 'BBS',
   Module: BBSModule,
   PublicKey: BBSPublicKey,
   Presentation,
@@ -86,12 +85,12 @@ export const BBS = {
   KeyPair: BBSKeypair,
   CryptoKeyPair: Bls12381BBSKeyPairDock2023,
   convertToPresentation: convertToBBSPresentation,
-  SigType: "Bls12381BBSSignatureDock2023",
-  Context: "https://ld.dock.io/security/bbs23/v1",
-  VerKey: "Bls12381BBSVerificationKeyDock2023",
+  SigType: 'Bls12381BBSSignatureDock2023',
+  Context: 'https://ld.dock.io/security/bbs23/v1',
+  VerKey: 'Bls12381BBSVerificationKeyDock2023',
 };
 export const BBSPlus = {
-  Name: "BBS+",
+  Name: 'BBS+',
   Module: BBSPlusModule,
   PublicKey: BBSPlusPublicKeyG2,
   Presentation,
@@ -103,12 +102,12 @@ export const BBSPlus = {
   KeyPair: BBSPlusKeypairG2,
   CryptoKeyPair: Bls12381G2KeyPairDock2022,
   convertToPresentation: convertToBBSPlusPresentation,
-  Context: "https://ld.dock.io/security/bbs/v1",
-  VerKey: "Bls12381G2VerificationKeyDock2022",
-  SigType: "Bls12381BBS+SignatureDock2022",
+  Context: 'https://ld.dock.io/security/bbs/v1',
+  VerKey: 'Bls12381G2VerificationKeyDock2022',
+  SigType: 'Bls12381BBS+SignatureDock2022',
 };
 export const PS = {
-  Name: "PS",
+  Name: 'PS',
   Module: PSModule,
   PublicKey: PSPublicKey,
   Presentation,
@@ -120,9 +119,9 @@ export const PS = {
   KeyPair: PSKeypair,
   CryptoKeyPair: Bls12381PSKeyPairDock2023,
   convertToPresentation: convertToPSPresentation,
-  SigType: "Bls12381PSSignatureDock2023",
-  Context: "https://ld.dock.io/security/ps/v1",
-  VerKey: "Bls12381PSVerificationKeyDock2023",
+  SigType: 'Bls12381PSSignatureDock2023',
+  Context: 'https://ld.dock.io/security/ps/v1',
+  VerKey: 'Bls12381PSVerificationKeyDock2023',
 };
 
 export const Schemes = [BBS, BBSPlus, PS];

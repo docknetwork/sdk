@@ -15,6 +15,7 @@ import { Bls12381PSSigDockSigName } from './constants';
 
 import Bls12381PSKeyPairDock2023 from './Bls12381PSKeyPairDock2023';
 import CustomLinkedDataSignature from './custom-linkeddatasignature';
+import { u8aToU8a } from '@polkadot/util';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
@@ -216,7 +217,11 @@ export default class Bls12381PSSignatureDock2023 extends CustomLinkedDataSignatu
 
         const msgCount = data.length;
         const sigParams = PSSignatureParams.getSigParamsOfRequiredSize(msgCount, PS_SIGNATURE_PARAMS_LABEL_BYTES);
-        const signature = PSSignature.generate(data, PSSecretKey.generate(msgCount, keypair.privateKeyBuffer), sigParams, false);
+        let sk = new PSSecretKey(u8aToU8a(keypair.privateKeyBuffer));
+        if (sk.supportedMessageCount() > msgCount) {
+          sk = sk.adaptForLess(msgCount);
+        }
+        const signature = PSSignature.generate(data, sk, sigParams);
         return signature.value;
       },
     };

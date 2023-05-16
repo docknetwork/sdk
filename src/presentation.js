@@ -20,6 +20,7 @@ import {
   Bls12381BBSSigDockSigName,
   Bls12381PSSigDockSigName,
   Bls12381BBS23SigDockSigName,
+  Bls12381PSSigProofDockSigName,
 } from './utils/vc/crypto/constants';
 import CustomLinkedDataSignature from './utils/vc/crypto/custom-linkeddatasignature';
 import defaultDocumentLoader from './utils/vc/document-loader';
@@ -27,6 +28,19 @@ import {
   Bls12381BBSSignatureDock2023,
   Bls12381PSSignatureDock2023,
 } from './utils/vc/custom_crypto';
+import {
+  Bls12381BBS23SigProofDockSigName,
+  Bls12381BBSSigProofDockSigName,
+} from '../dist/utils/vc/crypto/constants.cjs';
+
+const SIG_NAME_TO_PROOF_NAME = Object.setPrototypeOf(
+  {
+    [Bls12381BBSSigDockSigName]: Bls12381BBSSigProofDockSigName,
+    [Bls12381BBS23SigDockSigName]: Bls12381BBS23SigProofDockSigName,
+    [Bls12381PSSigDockSigName]: Bls12381PSSigProofDockSigName,
+  },
+  null,
+);
 
 export default class Presentation {
   /**
@@ -164,6 +178,12 @@ export default class Presentation {
       }
 
       const date = new Date().toISOString();
+      const type = SIG_NAME_TO_PROOF_NAME[credential.revealedAttributes.proof.type];
+      if (type == null) {
+        throw new Error(
+          `Failed to map credential signature type to the proof type: ${credential.revealedAttributes.proof.type}`,
+        );
+      }
 
       return {
         ...credential.revealedAttributes,
@@ -178,7 +198,7 @@ export default class Presentation {
           proofPurpose: 'assertionMethod',
           created: date,
           ...credential.revealedAttributes.proof,
-          type: credential.type,
+          type,
           proofValue: presentation.proof,
           nonce: presentation.nonce,
           context: presentation.context,

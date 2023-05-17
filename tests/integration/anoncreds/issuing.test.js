@@ -144,13 +144,13 @@ for (const {
       const credential = await issueCredential(issuerKey, unsignedCred);
       expect(credential).toMatchObject(
         expect.objectContaining(
-          getCredMatcherDoc(unsignedCred, did1, issuerKey.id, SigType)
-        )
+          getCredMatcherDoc(unsignedCred, did1, issuerKey.id, SigType),
+        ),
       );
 
       const result = await verifyCredential(credential, { resolver });
       expect(result).toMatchObject(
-        expect.objectContaining(getProofMatcherDoc())
+        expect.objectContaining(getProofMatcherDoc()),
       );
 
       // Ensure embedding the schema doesnt conflict with the other schema resolutions
@@ -159,7 +159,7 @@ for (const {
         schemaApi: { dock },
       });
       expect(resultWithSchema).toMatchObject(
-        expect.objectContaining(getProofMatcherDoc())
+        expect.objectContaining(getProofMatcherDoc()),
       );
     }, 30000);
 
@@ -174,13 +174,13 @@ for (const {
       const credential = await issueCredential(issuerKey, unsignedCred);
       expect(credential).toMatchObject(
         expect.objectContaining(
-          getCredMatcherDoc(unsignedCred, did1, issuerKey.id, SigType)
-        )
+          getCredMatcherDoc(unsignedCred, did1, issuerKey.id, SigType),
+        ),
       );
 
       const result = await verifyCredential(credential, { resolver });
       expect(result).toMatchObject(
-        expect.objectContaining(getProofMatcherDoc())
+        expect.objectContaining(getProofMatcherDoc()),
       );
     }, 30000);
 

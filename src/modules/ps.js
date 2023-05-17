@@ -6,30 +6,20 @@ import PSParams from '../offchain-signatures/params/ps';
 
 /** Class to write `Pointcheval-Sanders` parameters and keys on chain */
 export default class PSModule extends OffchainSignatures {
-  /**
-   * sets the dock api for this module
-   * @constructor
-   * @param {object} api - PolkadotJS API Reference
-   * @param {Function} signAndSend - Callback signing and sending
-   */
-  constructor(...args) {
-    super(...args);
-  }
-
   /// Builds `Pointcheval-Sanders` params from the provided value.
   static buildParams(params) {
-    return new PSParams(params)
+    return new PSParams(params);
   }
 
   /// Builds `Pointcheval-Sanders` public key from the provided value.
   static buildPublicKey(publicKey) {
-    return new PSPublicKey(publicKey)
+    return new PSPublicKey(publicKey);
   }
 
   async queryParamsFromChain(hexDid, counter) {
     const params = await super.queryParamsFromChain(hexDid, counter);
 
-    if (params?.isPs) {
+    if (params != null && params.isPs) {
       return params.asPs;
     } else {
       return null;
@@ -39,10 +29,10 @@ export default class PSModule extends OffchainSignatures {
   async queryPublicKeyFromChain(hexDid, keyId) {
     const key = await super.queryPublicKeyFromChain(hexDid, keyId);
 
-    if (key?.isPs) {
-      return key.asPs
+    if (key != null && key.isPs) {
+      return key.asPs;
     } else {
-      return null
+      return null;
     }
   }
 }

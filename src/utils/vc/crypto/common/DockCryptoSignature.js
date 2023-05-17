@@ -1,16 +1,14 @@
-import {
-  CredentialSchema,
-} from "@docknetwork/crypto-wasm-ts/lib/anonymous-credentials";
+import { CredentialSchema } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 
-import { initializeWasm } from "@docknetwork/crypto-wasm-ts";
+import { initializeWasm } from '@docknetwork/crypto-wasm-ts';
 
-import jsonld from "jsonld";
-import { SECURITY_CONTEXT_URL } from "jsonld-signatures";
+import jsonld from 'jsonld';
+import { SECURITY_CONTEXT_URL } from 'jsonld-signatures';
 
-import CustomLinkedDataSignature from "./CustomLinkedDataSignature";
-import { u8aToU8a } from "@polkadot/util";
+import { u8aToU8a } from '@polkadot/util';
+import CustomLinkedDataSignature from './CustomLinkedDataSignature';
 
-const SUITE_CONTEXT_URL = "https://www.w3.org/2018/credentials/v1";
+const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
 export const DEFAULT_PARSING_OPTS = {
   useDefaults: false,
@@ -28,7 +26,9 @@ export default class DockCryptoSignature extends CustomLinkedDataSignature {
    * @param url
    */
   constructor(options = {}, type, LDKeyClass, url) {
-    const { verificationMethod, signer, keypair, verifier } = options;
+    const {
+      verificationMethod, signer, keypair, verifier,
+    } = options;
 
     super({
       type,
@@ -41,13 +41,13 @@ export default class DockCryptoSignature extends CustomLinkedDataSignature {
     });
 
     this.proof = {
-      "@context": [
+      '@context': [
         {
-          sec: "https://w3id.org/security#",
+          sec: 'https://w3id.org/security#',
           proof: {
-            "@id": "sec:proof",
-            "@type": "@id",
-            "@container": "@graph",
+            '@id': 'sec:proof',
+            '@type': '@id',
+            '@container': '@graph',
           },
         },
         url,
@@ -78,13 +78,12 @@ export default class DockCryptoSignature extends CustomLinkedDataSignature {
     await initializeWasm();
 
     // Serialize the data for signing
-    const [serializedCredential, credSchema] =
-      this.constructor.convertCredential(options);
+    const [serializedCredential, credSchema] = this.constructor.convertCredential(options);
 
     // Encode messages, retrieve names/values array
     const nameValues = credSchema.encoder.encodeMessageObject(
       serializedCredential,
-      labelBytes
+      labelBytes,
     );
     return nameValues[1];
   }
@@ -92,21 +91,21 @@ export default class DockCryptoSignature extends CustomLinkedDataSignature {
   static convertCredential(
     {
       document,
-      proof /* documentLoader */,
+      proof: explicitProof /* documentLoader */,
       signingOptions = { requireAllFieldsFromSchema: false },
     },
     expectedType,
-    CredentialBuilder
+    CredentialBuilder,
   ) {
-    proof ||= document.proof;
+    const proof = explicitProof || document.proof;
     if (proof.type !== expectedType) {
       throw new Error(
-        `Invalid \`proof.type\`, expected ${expectedType}, received ${proof.type}`
+        `Invalid \`proof.type\`, expected ${expectedType}, received ${proof.type}`,
       );
     }
     // `jws`,`signatureValue`,`proofValue` must not be included in the proof
     const trimmedProof = {
-      "@context": document["@context"] || SECURITY_CONTEXT_URL,
+      '@context': document['@context'] || SECURITY_CONTEXT_URL,
       ...proof,
     };
 
@@ -135,7 +134,7 @@ export default class DockCryptoSignature extends CustomLinkedDataSignature {
     if (!credSchema) {
       credSchema = new CredentialSchema(
         CredentialSchema.essential(),
-        DEFAULT_PARSING_OPTS
+        DEFAULT_PARSING_OPTS,
       );
     }
 
@@ -162,10 +161,10 @@ export default class DockCryptoSignature extends CustomLinkedDataSignature {
       });
 
     credBuilder.setTopLevelField(
-      "@context",
-      JSON.stringify(document["@context"])
+      '@context',
+      JSON.stringify(document['@context']),
     );
-    credBuilder.setTopLevelField("type", JSON.stringify(document.type));
+    credBuilder.setTopLevelField('type', JSON.stringify(document.type));
 
     const retval = credBuilder.updateSchemaIfNeeded(signingOptions);
     return [retval, credBuilder.schema];
@@ -179,7 +178,7 @@ export default class DockCryptoSignature extends CustomLinkedDataSignature {
    */
   static async getVerificationMethod({ proof, documentLoader }) {
     let { verificationMethod } = proof;
-    if (typeof verificationMethod === "object") {
+    if (typeof verificationMethod === 'object') {
       verificationMethod = verificationMethod.id;
     }
     if (!verificationMethod) {
@@ -190,22 +189,22 @@ export default class DockCryptoSignature extends CustomLinkedDataSignature {
     const result = await jsonld.frame(
       verificationMethod,
       {
-        "@context": SECURITY_CONTEXT_URL,
-        "@embed": "@always",
+        '@context': SECURITY_CONTEXT_URL,
+        '@embed': '@always',
         id: verificationMethod,
       },
       {
         documentLoader,
         compactToRelative: false,
         expandContext: SECURITY_CONTEXT_URL,
-      }
+      },
     );
     if (!result) {
       throw new Error(`Verification method ${verificationMethod} not found.`);
     }
     // ensure verification method has not been revoked
     if (result.revoked !== undefined) {
-      throw new Error("The verification method has been revoked.");
+      throw new Error('The verification method has been revoked.');
     }
     return result;
   }
@@ -240,27 +239,27 @@ export default class DockCryptoSignature extends CustomLinkedDataSignature {
     SignatureParams,
     Signature,
     DefaultLabelBytes,
-    { prepareSecretKey = null } = {}
+    { prepareSecretKey = null } = {},
   ) {
     if (SecretKey == null) {
-      throw new Error(`No \`SecretKey\` provided`);
+      throw new Error('No `SecretKey` provided');
     } else if (SignatureParams == null) {
-      throw new Error(`No \`SignatureParams\` provided`);
+      throw new Error('No `SignatureParams` provided');
     } else if (Signature == null) {
-      throw new Error(`No \`Signature\` provided`);
+      throw new Error('No `Signature` provided');
     }
 
     return {
       id: verificationMethod,
       async sign({ data }) {
         if (!keypair || !keypair.privateKeyBuffer) {
-          throw new Error("No private key to sign with.");
+          throw new Error('No private key to sign with.');
         }
 
         const msgCount = data.length;
         const sigParams = SignatureParams.getSigParamsOfRequiredSize(
           msgCount,
-          DefaultLabelBytes
+          DefaultLabelBytes,
         );
         let sk = new SecretKey(u8aToU8a(keypair.privateKeyBuffer));
         if (prepareSecretKey != null) {

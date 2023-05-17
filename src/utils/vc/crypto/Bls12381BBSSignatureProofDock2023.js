@@ -1,23 +1,17 @@
-import { BBSPublicKey } from "@docknetwork/crypto-wasm-ts";
+import { BBSPublicKey } from '@docknetwork/crypto-wasm-ts';
 import {
   Bls12381BBS23SigProofDockSigName,
-  Bls12381BBS23SigDockSigName
-} from "./constants";
+  Bls12381BBS23SigDockSigName,
+} from './constants';
 
-import Bls12381BBSKeyPairDock2023 from "./Bls12381BBSKeyPairDock2023";
-import DockCryptoSignatureProof from "./common/DockCryptoSignatureProof";
-import Bls12381BBSSignatureDock2023 from "./Bls12381BBSSignatureDock2023";
+import Bls12381BBSKeyPairDock2023 from './Bls12381BBSKeyPairDock2023';
+import DockCryptoSignatureProof from './common/DockCryptoSignatureProof';
+import Bls12381BBSSignatureDock2023 from './Bls12381BBSSignatureDock2023';
 
 /**
  * A BBS signature suite for use with derived BBS credentials aka BBS presentations
  */
 export default class Bls12381BBSSignatureProofDock2022 extends DockCryptoSignatureProof {
-  static proofType = [
-    Bls12381BBS23SigProofDockSigName,
-    `sec:${Bls12381BBS23SigProofDockSigName}`,
-    `https://w3id.org/security#${Bls12381BBS23SigProofDockSigName}`,
-  ];
-
   /**
    * Default constructor
    * @param options {SignatureSuiteOptions} options for constructing the signature suite
@@ -28,7 +22,7 @@ export default class Bls12381BBSSignatureProofDock2022 extends DockCryptoSignatu
       Bls12381BBS23SigProofDockSigName,
       Bls12381BBSKeyPairDock2023,
       BBSPublicKey,
-      Bls12381BBSSignatureDock2023
+      Bls12381BBSSignatureDock2023,
     );
   }
 
@@ -36,3 +30,9 @@ export default class Bls12381BBSSignatureProofDock2022 extends DockCryptoSignatu
     return super.convertToPresentation(document, Bls12381BBS23SigDockSigName);
   }
 }
+
+Bls12381BBSSignatureProofDock2022.proofType = [
+  Bls12381BBS23SigProofDockSigName,
+  `sec:${Bls12381BBS23SigProofDockSigName}`,
+  `https://w3id.org/security#${Bls12381BBS23SigProofDockSigName}`,
+];

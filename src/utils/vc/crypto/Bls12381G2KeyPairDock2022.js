@@ -32,7 +32,7 @@ export default class Bls12381G2KeyPairDock2022 extends DockCryptoKeyPair {
       BBSPlusSecretKey,
       BBSPlusSignatureParamsG2,
       BBSPlusSignatureG1,
-      BBS_PLUS_SIGNATURE_PARAMS_LABEL_BYTES
+      BBS_PLUS_SIGNATURE_PARAMS_LABEL_BYTES,
     );
   }
 
@@ -42,7 +42,7 @@ export default class Bls12381G2KeyPairDock2022 extends DockCryptoKeyPair {
       BBSPlusPublicKeyG2,
       BBSPlusSignatureParamsG1,
       BBSPlusSignatureG1,
-      BBS_PLUS_SIGNATURE_PARAMS_LABEL_BYTES
+      BBS_PLUS_SIGNATURE_PARAMS_LABEL_BYTES,
     );
   }
 }

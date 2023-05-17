@@ -1,9 +1,9 @@
-import { Presentation } from "@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation";
-import b58 from "bs58";
+import { Presentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
+import b58 from 'bs58';
 
-import CustomLinkedDataSignature from "./CustomLinkedDataSignature";
+import CustomLinkedDataSignature from './CustomLinkedDataSignature';
 
-const SUITE_CONTEXT_URL = "https://www.w3.org/2018/credentials/v1";
+const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
 /**
  * Defines commons for the `@docknetwork/crypto-wasm-ts` signature proofs.
@@ -28,16 +28,16 @@ export default class DockCryptoSignatureProof extends CustomLinkedDataSignature 
     });
 
     this.proof = {
-      "@context": [
+      '@context': [
         {
-          sec: "https://w3id.org/security#",
+          sec: 'https://w3id.org/security#',
           proof: {
-            "@id": "sec:proof",
-            "@type": "@id",
-            "@container": "@graph",
+            '@id': 'sec:proof',
+            '@type': '@id',
+            '@container': '@graph',
           },
         },
-        "https://ld.dock.io/security/ps/v1",
+        'https://ld.dock.io/security/ps/v1',
       ],
       type,
     };
@@ -47,7 +47,9 @@ export default class DockCryptoSignatureProof extends CustomLinkedDataSignature 
     this.verificationMethod = verificationMethod;
   }
 
-  async verifyProof({ proof, document, documentLoader, expansionMap }) {
+  async verifyProof({
+    proof, document, documentLoader, expansionMap,
+  }) {
     try {
       const verificationMethod = await this.getVerificationMethod({
         proof,
@@ -68,7 +70,7 @@ export default class DockCryptoSignatureProof extends CustomLinkedDataSignature 
       });
 
       if (!recreatedPres.verify(pks)) {
-        throw new Error("Invalid signature");
+        throw new Error('Invalid signature');
       }
 
       return { verified: true, verificationMethod };
@@ -84,11 +86,11 @@ export default class DockCryptoSignatureProof extends CustomLinkedDataSignature 
    */
   static convertToPresentation(document, proofType) {
     if (proofType == null) {
-      throw new Error(`\`proofType\` must be provided`);
+      throw new Error('`proofType` must be provided');
     }
 
     const {
-      "@context": context,
+      '@context': context,
       type,
       credentialSchema,
       issuer,
@@ -98,7 +100,7 @@ export default class DockCryptoSignatureProof extends CustomLinkedDataSignature 
     } = document;
 
     return {
-      version: "0.1.0",
+      version: '0.1.0',
       nonce: proof.nonce,
       context: proof.context,
       spec: {
@@ -111,7 +113,7 @@ export default class DockCryptoSignatureProof extends CustomLinkedDataSignature 
                 type: proofType,
                 verificationMethod: proof.verificationMethod,
               },
-              "@context": JSON.stringify(context),
+              '@context': JSON.stringify(context),
               type: JSON.stringify(type),
               ...revealedAttributes,
             },

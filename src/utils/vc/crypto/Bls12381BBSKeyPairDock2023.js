@@ -4,26 +4,28 @@ import {
   BBSPublicKey,
   BBSSecretKey,
   BBSSignatureParams,
-} from "@docknetwork/crypto-wasm-ts";
+} from '@docknetwork/crypto-wasm-ts';
 
-import { BBS_SIGNATURE_PARAMS_LABEL_BYTES } from "@docknetwork/crypto-wasm-ts/lib/anonymous-credentials";
+import { BBS_SIGNATURE_PARAMS_LABEL_BYTES } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 
-import { Bls12381BBS23DockVerKeyName } from "./constants";
-import DockCryptoKeyPair from "./common/DockCryptoKeyPair";
+import { Bls12381BBS23DockVerKeyName } from './constants';
+import DockCryptoKeyPair from './common/DockCryptoKeyPair';
 
 export default class Bls12381BBSKeyPairDock2023 extends DockCryptoKeyPair {
   constructor(options) {
     super(options, Bls12381BBS23DockVerKeyName);
   }
 
-  static generate({ seed, params, controller, id, msgCount = 1 } = {}) {
+  static generate({
+    seed, params, controller, id, msgCount = 1,
+  } = {}) {
     const keypair = BBSKeypair.generate(
-      params ||
-        BBSSignatureParams.getSigParamsOfRequiredSize(
+      params
+        || BBSSignatureParams.getSigParamsOfRequiredSize(
           msgCount,
-          BBS_SIGNATURE_PARAMS_LABEL_BYTES
+          BBS_SIGNATURE_PARAMS_LABEL_BYTES,
         ),
-      seed
+      seed,
     );
     return new Bls12381BBSKeyPairDock2023({ keypair, controller, id });
   }
@@ -34,7 +36,7 @@ export default class Bls12381BBSKeyPairDock2023 extends DockCryptoKeyPair {
       BBSSecretKey,
       BBSSignatureParams,
       BBSSignature,
-      BBS_SIGNATURE_PARAMS_LABEL_BYTES
+      BBS_SIGNATURE_PARAMS_LABEL_BYTES,
     );
   }
 
@@ -44,7 +46,7 @@ export default class Bls12381BBSKeyPairDock2023 extends DockCryptoKeyPair {
       BBSPublicKey,
       BBSSignatureParams,
       BBSSignature,
-      BBS_SIGNATURE_PARAMS_LABEL_BYTES
+      BBS_SIGNATURE_PARAMS_LABEL_BYTES,
     );
   }
 }

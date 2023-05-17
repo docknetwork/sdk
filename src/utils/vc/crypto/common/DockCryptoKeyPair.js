@@ -1,5 +1,5 @@
-import { u8aToU8a } from "@polkadot/util";
-import b58 from "bs58";
+import { u8aToU8a } from '@polkadot/util';
+import b58 from 'bs58';
 
 /**
  * Defines commons for the `@docknetwork/crypto-wasm-ts` keypairs.
@@ -43,28 +43,28 @@ export default class DockCryptoKeyPair {
     SignatureParams,
     Signature,
     DefaultLabelBytes,
-    { preparePrivateKey = null } = {}
+    { preparePrivateKey = null } = {},
   ) {
     if (SecretKey == null) {
-      throw new Error(`No \`SecretKey\` provided`);
+      throw new Error('No `SecretKey` provided');
     } else if (SignatureParams == null) {
-      throw new Error(`No \`SignatureParams\` provided`);
+      throw new Error('No `SignatureParams` provided');
     } else if (Signature == null) {
-      throw new Error(`No \`Signature\` provided`);
+      throw new Error('No `Signature` provided');
     } else if (DefaultLabelBytes == null) {
-      throw new Error(`No \`DefaultLabelBytes\` provided`);
+      throw new Error('No `DefaultLabelBytes` provided');
     }
     if (!key.id) {
       return {
         async sign() {
-          throw new Error("No key ID for the label.");
+          throw new Error('No key ID for the label.');
         },
       };
     }
     if (!key.privateKeyBuffer) {
       return {
         async sign() {
-          throw new Error("No private key to sign with.");
+          throw new Error('No private key to sign with.');
         },
       };
     }
@@ -73,7 +73,7 @@ export default class DockCryptoKeyPair {
         const msgCount = data.length;
         const sigParams = SignatureParams.getSigParamsOfRequiredSize(
           msgCount,
-          DefaultLabelBytes
+          DefaultLabelBytes,
         );
         let sk = new SecretKey(u8aToU8a(key.privateKeyBuffer));
         if (preparePrivateKey != null) {
@@ -101,26 +101,26 @@ export default class DockCryptoKeyPair {
     SignatureParams,
     Signature,
     DefaultLabelBytes,
-    { preparePublicKey = null } = {}
+    { preparePublicKey = null } = {},
   ) {
     if (PublicKey == null) {
-      throw new Error(`No \`PublicKey\` provided`);
+      throw new Error('No `PublicKey` provided');
     } else if (SignatureParams == null) {
-      throw new Error(`No \`SignatureParams\` provided`);
+      throw new Error('No `SignatureParams` provided');
     } else if (Signature == null) {
-      throw new Error(`No \`Signature\` provided`);
+      throw new Error('No `Signature` provided');
     }
     if (!key.id) {
       return {
         async sign() {
-          throw new Error("No key ID for the label.");
+          throw new Error('No key ID for the label.');
         },
       };
     }
     if (!key.publicKeyBuffer) {
       return {
         async verify() {
-          throw new Error("No public key to verify with.");
+          throw new Error('No public key to verify with.');
         },
       };
     }
@@ -130,7 +130,7 @@ export default class DockCryptoKeyPair {
         const msgCount = data.length;
         const sigParams = SignatureParams.getSigParamsOfRequiredSize(
           msgCount,
-          DefaultLabelBytes
+          DefaultLabelBytes,
         );
         const signature = new Signature(u8aToU8a(rawSignature));
 
@@ -142,7 +142,7 @@ export default class DockCryptoKeyPair {
           const result = signature.verify(data, pk, sigParams, false);
           return result.verified;
         } catch (e) {
-          console.error("crypto-wasm-ts error:", e);
+          console.error('crypto-wasm-ts error:', e);
           return false;
         }
       },

@@ -1,6 +1,6 @@
 import { Ed25519SigName, Ed25519VerKeyName } from './constants';
 import Ed25519VerificationKey2018 from './Ed25519VerificationKey2018';
-import CustomLinkedDataSignature from './custom-linkeddatasignature';
+import CustomLinkedDataSignature from './common/CustomLinkedDataSignature';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
@@ -27,6 +27,7 @@ export default class Ed25519Signature2018 extends CustomLinkedDataSignature {
   /**
    * Generate object with `sign` method
    * @param keypair
+   * @param verificationMethod
    * @returns {object}
    */
   static signerFactory(keypair, verificationMethod) {

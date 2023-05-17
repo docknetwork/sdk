@@ -20,9 +20,9 @@ import BBSModule from '../src/modules/bbs';
 import BBSPlusModule from '../src/modules/bbs-plus';
 import PSModule from '../src/modules/ps';
 import Presentation from '../src/presentation';
-import { convertToPresentation as convertToPSPresentation } from '../src/utils/vc/crypto/Bls12381PSSignatureProofDock2023';
-import { convertToPresentation as convertToBBSPresentation } from '../src/utils/vc/crypto/Bls12381BBSSignatureProofDock2023';
-import { convertToPresentation as convertToBBSPlusPresentation } from '../src/utils/vc/crypto/Bls12381BBSSignatureProofDock2022';
+import Bls12381PSSignatureProofDock2023 from '../src/utils/vc/crypto/Bls12381PSSignatureProofDock2023';
+import Bls12381BBSSignatureProofDock2023 from '../src/utils/vc/crypto/Bls12381BBSSignatureProofDock2023';
+import Bls12381BBSSignatureProofDock2022 from '../src/utils/vc/crypto/Bls12381BBSSignatureProofDock2022';
 import Bls12381BBSKeyPairDock2023 from '../src/utils/vc/crypto/Bls12381BBSKeyPairDock2023';
 import Bls12381G2KeyPairDock2022 from '../src/utils/vc/crypto/Bls12381G2KeyPairDock2022';
 import Bls12381PSKeyPairDock2023 from '../src/utils/vc/crypto/Bls12381PSKeyPairDock2023';
@@ -84,7 +84,7 @@ export const BBS = {
   Signature: BBSSignature,
   KeyPair: BBSKeypair,
   CryptoKeyPair: Bls12381BBSKeyPairDock2023,
-  convertToPresentation: convertToBBSPresentation,
+  convertToPresentation: Bls12381BBSSignatureProofDock2023.convertToPresentation,
   SigType: 'Bls12381BBSSignatureDock2023',
   Context: 'https://ld.dock.io/security/bbs23/v1',
   VerKey: 'Bls12381BBSVerificationKeyDock2023',
@@ -101,7 +101,7 @@ export const BBSPlus = {
   Signature: BBSPlusSignatureG1,
   KeyPair: BBSPlusKeypairG2,
   CryptoKeyPair: Bls12381G2KeyPairDock2022,
-  convertToPresentation: convertToBBSPlusPresentation,
+  convertToPresentation: Bls12381BBSSignatureProofDock2022.convertToPresentation,
   Context: 'https://ld.dock.io/security/bbs/v1',
   VerKey: 'Bls12381G2VerificationKeyDock2022',
   SigType: 'Bls12381BBS+SignatureDock2022',
@@ -118,7 +118,7 @@ export const PS = {
   Signature: PSSignature,
   KeyPair: PSKeypair,
   CryptoKeyPair: Bls12381PSKeyPairDock2023,
-  convertToPresentation: convertToPSPresentation,
+  convertToPresentation: Bls12381PSSignatureProofDock2023.convertToPresentation,
   SigType: 'Bls12381PSSignatureDock2023',
   Context: 'https://ld.dock.io/security/ps/v1',
   VerKey: 'Bls12381PSVerificationKeyDock2023',

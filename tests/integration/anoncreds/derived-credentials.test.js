@@ -267,7 +267,8 @@ for (const {
       const credentialResult = await verifyCredential(credentials[0], {
         resolver,
       });
-      expect(credentialResult.verified).toEqual(true);
+      expect(credentialResult.verified).toBe(true);
+      expect(credentialResult.error).toBe(undefined);
 
       // Create a VP and verify it from this credential
       await createAndVerifyPresentation(credentials);

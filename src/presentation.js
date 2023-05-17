@@ -24,7 +24,7 @@ import {
   Bls12381BBS23SigProofDockSigName,
   Bls12381BBSSigProofDockSigName,
 } from './utils/vc/crypto/constants';
-import CustomLinkedDataSignature from './utils/vc/crypto/custom-linkeddatasignature';
+import CustomLinkedDataSignature from './utils/vc/crypto/common/CustomLinkedDataSignature';
 import defaultDocumentLoader from './utils/vc/document-loader';
 import {
   Bls12381BBSSignatureDock2023,
@@ -149,7 +149,7 @@ export default class Presentation {
         credentialLD.proof.proofValue,
       ),
     );
-    const idx = await this.presBuilder.addCredential(convertedCredential, pk);
+    const idx = this.presBuilder.addCredential(convertedCredential, pk);
 
     // Enforce revealing of verificationMethod and type
     this.addAttributeToReveal(idx, ['proof.type']);

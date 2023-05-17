@@ -37,7 +37,7 @@ export default class DockCryptoKeyPair {
    * @param config
    * @returns {object}
    */
-  static signerFactory(
+  static signerFactoryForSigScheme(
     key,
     SecretKey,
     SignatureParams,
@@ -95,7 +95,7 @@ export default class DockCryptoKeyPair {
    * @param config
    * @returns {object}
    */
-  static verifierFactory(
+  static verifierFactoryForSigScheme(
     key,
     PublicKey,
     SignatureParams,

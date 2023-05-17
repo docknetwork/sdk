@@ -233,7 +233,7 @@ export default class DockCryptoSignature extends CustomLinkedDataSignature {
    * @param DefaultLabelBytes
    * @returns {object}
    */
-  static signerFactory(
+  static signerFactoryForSigScheme(
     keypair,
     verificationMethod,
     SecretKey,

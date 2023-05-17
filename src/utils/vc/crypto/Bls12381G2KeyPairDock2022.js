@@ -27,7 +27,7 @@ export default class Bls12381G2KeyPairDock2022 extends DockCryptoKeyPair {
   }
 
   static signerFactory(key) {
-    return super.signerFactory(
+    return super.signerFactoryForSigScheme(
       key,
       BBSPlusSecretKey,
       BBSPlusSignatureParamsG2,
@@ -37,7 +37,7 @@ export default class Bls12381G2KeyPairDock2022 extends DockCryptoKeyPair {
   }
 
   static verifierFactory(key) {
-    return super.verifierFactory(
+    return super.verifierFactoryForSigScheme(
       key,
       BBSPlusPublicKeyG2,
       BBSPlusSignatureParamsG1,

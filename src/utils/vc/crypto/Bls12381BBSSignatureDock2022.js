@@ -68,7 +68,7 @@ export default class Bls12381BBSSignatureDock2022 extends DockCryptoSignature {
    * @returns {object}
    */
   static signerFactory(keypair, verificationMethod) {
-    return super.signerFactory(
+    return super.signerFactoryForSigScheme(
       keypair,
       verificationMethod,
       BBSPlusSecretKey,

@@ -732,7 +732,7 @@ class DIDModule {
    * @return {Promise<object>} The DID document.
    */
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  async getDocument(did, { getBbsPlusSigKeys = true } = {}) {
+  async getDocument(did, { getOffchainSigKeys = true } = {}) {
     const hexId = getHexIdentifierFromDID(did);
     let didDetails = await this.getOnchainDidDetail(hexId);
     didDetails = didDetails.data || didDetails;
@@ -830,7 +830,7 @@ class DIDModule {
       });
     }
 
-    if (getBbsPlusSigKeys === true) {
+    if (getOffchainSigKeys === true) {
       const { lastKeyId } = didDetails;
 
       // If any keys should be fetched

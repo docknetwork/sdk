@@ -216,7 +216,7 @@ for (const {
 
     test('Get public keys with DID resolution', async () => {
       const document1 = await dock.did.getDocument(did1, {
-        getBbsPlusSigKeys: true,
+        getOffchainSigKeys: true,
       });
       expect(document1.publicKey.length).toEqual(2);
       expect(document1.assertionMethod.length).toEqual(2);
@@ -225,7 +225,7 @@ for (const {
       expect(document1.assertionMethod[1].endsWith('#keys-2')).toEqual(true);
 
       const document2 = await dock.did.getDocument(did2, {
-        getBbsPlusSigKeys: true,
+        getOffchainSigKeys: true,
       });
       expect(document2.publicKey.length).toEqual(3);
       expect(document2.assertionMethod.length).toEqual(3);
@@ -251,7 +251,7 @@ for (const {
       expect(pk1).toEqual(null);
 
       const document1 = await dock.did.getDocument(did1, {
-        getBbsPlusSigKeys: true,
+        getOffchainSigKeys: true,
       });
       expect(document1.publicKey.length).toEqual(1);
       expect(document1.assertionMethod.length).toEqual(1);
@@ -285,7 +285,7 @@ for (const {
       expect(pk2).toEqual(null);
 
       let document2 = await dock.did.getDocument(did2, {
-        getBbsPlusSigKeys: true,
+        getOffchainSigKeys: true,
       });
       expect(document2.publicKey.length).toEqual(2);
       expect(document2.assertionMethod.length).toEqual(2);
@@ -308,7 +308,7 @@ for (const {
       const pk3 = await chainModule.getPublicKey(did2, 3);
       expect(pk3).toEqual(null);
 
-      document2 = await dock.did.getDocument(did2, { getBbsPlusSigKeys: true });
+      document2 = await dock.did.getDocument(did2, { getOffchainSigKeys: true });
       expect(document2.publicKey.length).toEqual(1);
       expect(document2.assertionMethod.length).toEqual(1);
       expect(document2.publicKey[0].id.endsWith('#keys-1')).toEqual(true);

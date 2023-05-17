@@ -20,11 +20,6 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
     this.signAndSend = signAndSend;
   }
 
-  /// Builds module-specific params from the provided value.  /// Builds module-specific params from the provided value.
-  static buildParams(params) {
-    return params;
-  }
-
   /// Builds module-specific public key from the provided value.
   static buildPublicKey(publicKey) {
     return publicKey;

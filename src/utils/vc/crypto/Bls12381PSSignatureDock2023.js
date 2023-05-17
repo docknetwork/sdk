@@ -72,7 +72,7 @@ export default class Bls12381PSSignatureDock2023 extends DockCryptoSignature {
       PSSignatureParams,
       PSSignature,
       PS_SIGNATURE_PARAMS_LABEL_BYTES,
-      { prepareSecretKey: Bls12381PSKeyPairDock2023.adapatKey }
+      { prepareSecretKey: Bls12381PSKeyPairDock2023.adaptKey }
     );
   }
 }

@@ -37,7 +37,7 @@ export default class Bls12381PSKeyPairDock2023 extends DockCryptoKeyPair {
       PSSignatureParams,
       PSSignature,
       PS_SIGNATURE_PARAMS_LABEL_BYTES,
-      { preparePrivateKey: this.adapatKey },
+      { preparePrivateKey: this.adaptKey },
     );
   }
 
@@ -48,7 +48,7 @@ export default class Bls12381PSKeyPairDock2023 extends DockCryptoKeyPair {
       PSSignatureParams,
       PSSignature,
       PS_SIGNATURE_PARAMS_LABEL_BYTES,
-      { preparePublicKey: this.adapatKey },
+      { preparePublicKey: this.adaptKey },
     );
   }
 
@@ -58,7 +58,7 @@ export default class Bls12381PSKeyPairDock2023 extends DockCryptoKeyPair {
    * @param {*} key
    * @param {*} data
    */
-  static adapatKey(key, data) {
+  static adaptKey(key, data) {
     const supportedMessageCount = key.supportedMessageCount();
 
     if (supportedMessageCount === data.length) {

@@ -6,7 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CONFIG_DOCK_NODE_IMAGE_TAG: 'master'
-      TestSchemes: 'BBSPlus'
     steps:
       - uses: actions/checkout@v2
       - uses: ibnesayeed/setup-ipfs@0.6.0

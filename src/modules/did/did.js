@@ -850,36 +850,59 @@ class DIDModule {
         for (const k of possibleKeyIds) {
           queryKeys.push([hexId, k]);
         }
-        const resp = await this.api.query.offchainSignatures.publicKeys.multi(queryKeys);
+        if (this.api.query.offchainSignatures != null) {
+          const resp = await this.api.query.offchainSignatures.publicKeys.multi(queryKeys);
 
-        let currentIter = 0;
-        for (let r of resp) {
-          // The gaps in `keyId` might correspond to removed keys
-          if (r.isSome) {
-            let rawKey; let
-              keyType;
-            r = r.unwrap();
+          let currentIter = 0;
+          for (let r of resp) {
+            // The gaps in `keyId` might correspond to removed keys
+            if (r.isSome) {
+              let rawKey; let
+                keyType;
+              r = r.unwrap();
 
-            if (r.isBbs) {
-              keyType = 'Bls12381BBSVerificationKeyDock2023';
-              rawKey = r.asBbs;
-            } else if (r.isBbsPlus) {
-              keyType = 'Bls12381G2VerificationKeyDock2022';
-              rawKey = r.asBbsPlus;
-            } else if (r.isPs) {
-              keyType = 'Bls12381PSVerificationKeyDock2023';
-              rawKey = r.asPs;
+              if (r.isBbs) {
+                keyType = 'Bls12381BBSVerificationKeyDock2023';
+                rawKey = r.asBbs;
+              } else if (r.isBbsPlus) {
+                keyType = 'Bls12381G2VerificationKeyDock2022';
+                rawKey = r.asBbsPlus;
+              } else if (r.isPs) {
+                keyType = 'Bls12381PSVerificationKeyDock2023';
+                rawKey = r.asPs;
+              }
+              // Don't care about signature params for now
+              const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(rawKey);
+              if (pkObj.curveType !== 'Bls12381') {
+                throw new Error(`Curve type should have been Bls12381 but was ${pkObj.curveType}`);
+              }
+              const keyIndex = queryKeys[currentIter][1];
+              keys.push([keyIndex, keyType, hexToU8a(pkObj.bytes)]);
+              assertion.push(keyIndex);
             }
-            // Don't care about signature params for now
-            const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(rawKey);
-            if (pkObj.curveType !== 'Bls12381') {
-              throw new Error(`Curve type should have been Bls12381 but was ${pkObj.curveType}`);
-            }
-            const keyIndex = queryKeys[currentIter][1];
-            keys.push([keyIndex, keyType, hexToU8a(pkObj.bytes)]);
-            assertion.push(keyIndex);
+            currentIter++;
           }
-          currentIter++;
+        } else {
+          const resp = await this.api.query.bbsPlus.bbsPlusKeys.multi(queryKeys);
+
+          let currentIter = 0;
+          for (const r of resp) {
+            // The gaps in `keyId` might correspond to removed keys
+            if (r.isSome) {
+              const keyType = 'Bls12381G2VerificationKeyDock2022';
+              const rawKey = r.unwrap();
+
+              // Don't care about signature params for now
+              const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(rawKey);
+              if (pkObj.curveType !== 'Bls12381') {
+                throw new Error(`Curve type should have been Bls12381 but was ${pkObj.curveType}`);
+              }
+              const keyIndex = queryKeys[currentIter][1];
+              keys.push([keyIndex, keyType, hexToU8a(pkObj.bytes)]);
+              assertion.push(keyIndex);
+            }
+            currentIter++;
+          }
         }
       }
     }

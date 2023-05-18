@@ -142,10 +142,14 @@ class DockAPI {
     this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));
     this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
     this.revocationModule = new RevocationModule(this.api, this.signAndSend.bind(this));
-    this.bbsModule = new BBSModule(this.api, this.signAndSend.bind(this));
-    this.bbsPlusModule = new BBSPlusModule(this.api, this.signAndSend.bind(this));
-    this.psModule = new PSModule(this.api, this.signAndSend.bind(this));
     this.offchainSignaturesModule = new OffchainSignatures(this.api, this.signAndSend.bind(this));
+    if (this.offchainSignaturesModule.legacy) {
+      this.bbsPlusModule = this.offchainSignaturesModule;
+    } else {
+      this.bbsModule = new BBSModule(this.api, this.signAndSend.bind(this));
+      this.bbsPlusModule = new BBSPlusModule(this.api, this.signAndSend.bind(this));
+      this.psModule = new PSModule(this.api, this.signAndSend.bind(this));
+    }
     this.accumulatorModule = new AccumulatorModule(this.api, this.signAndSend.bind(this));
 
     if (loadPoaModules) {

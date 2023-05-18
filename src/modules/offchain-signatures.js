@@ -1,8 +1,36 @@
 /* eslint-disable camelcase */
 
-import { getNonce, getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
+import {
+  getNonce,
+  getSignatureFromKeyringPair,
+  getStateChange,
+} from '../utils/misc';
 import WithParamsAndPublicKeys from './WithParamsAndPublicKeys';
 import { createDidSig, getHexIdentifierFromDID } from '../utils/did';
+
+const STATE_CHANGES = {
+  AddParams: 'AddOffchainSignatureParams',
+  RemoveParams: 'RemoveOffchainSignatureParams',
+  AddPublicKey: 'AddOffchainSignaturePublicKey',
+  RemovePublicKey: 'RemoveOffchainSignaturePublicKey',
+};
+
+const LEGACY_STATE_CHANGES = {
+  AddParams: 'AddBBSPlusParams',
+  RemoveParams: 'RemoveBBSPlusParams',
+  AddPublicKey: 'AddBBSPlusPublicKey',
+  RemovePublicKey: 'RemoveBBSPlusPublicKey',
+};
+
+const METHODS = {
+  Params: 'signatureParams',
+  PublicKeys: 'publicKeys',
+};
+
+const LEGACY_METHODS = {
+  Params: 'bbsPlusParams',
+  PublicKeys: 'bbsPlusKeys',
+};
 
 /** Class to write offchain signature parameters and keys on chain */
 export default class OffchainSignatures extends WithParamsAndPublicKeys {
@@ -15,7 +43,10 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
   constructor(api, signAndSend) {
     super();
     this.api = api;
-    this.moduleName = 'offchainSignatures';
+    this.legacy = api.tx.offchainSignatures == null;
+    this.moduleName = this.legacy ? 'bbsPlus' : 'offchainSignatures';
+    this.stateChanges = this.legacy ? LEGACY_STATE_CHANGES : STATE_CHANGES;
+    this.methods = this.legacy ? LEGACY_METHODS : METHODS;
     this.module = api.tx[this.moduleName];
     this.signAndSend = signAndSend;
   }
@@ -32,7 +63,7 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
    */
   async getLastParamsWritten(did) {
     const hexId = getHexIdentifierFromDID(did);
-    const counter = (await this.api.query[this.moduleName].paramsCounter(hexId));
+    const counter = await this.api.query[this.moduleName].paramsCounter(hexId);
     if (counter > 0) {
       const resp = await this.queryParamsFromChain(hexId, counter);
       if (resp) {
@@ -51,7 +82,7 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
     const hexId = getHexIdentifierFromDID(did);
 
     const params = [];
-    const counter = (await this.api.query[this.moduleName].paramsCounter(hexId));
+    const counter = await this.api.query[this.moduleName].paramsCounter(hexId);
     if (counter > 0) {
       for (let i = 1; i <= counter; i++) {
         // eslint-disable-next-line no-await-in-loop
@@ -65,7 +96,10 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
   }
 
   async queryParamsFromChain(hexDid, counter) {
-    const params = await this.api.query[this.moduleName].signatureParams(hexDid, counter);
+    const params = await this.api.query[this.moduleName][this.methods.Params](
+      hexDid,
+      counter,
+    );
 
     if (params.isSome) {
       return params.unwrap();
@@ -75,7 +109,10 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
   }
 
   async queryPublicKeyFromChain(hexDid, keyId) {
-    const key = await this.api.query[this.moduleName].publicKeys(hexDid, keyId);
+    const key = await this.api.query[this.moduleName][this.methods.PublicKeys](
+      hexDid,
+      keyId,
+    );
 
     if (key.isSome) {
       return key.unwrap();
@@ -96,11 +133,25 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
    * using this
    * @returns {Promise<*>}
    */
-  async createAddPublicKeyTx(publicKey, targetDid, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+  async createAddPublicKeyTx(
+    publicKey,
+    targetDid,
+    signerDid,
+    keyPair,
+    keyId,
+    { nonce = undefined, didModule = undefined },
+  ) {
     const offchainPublicKey = this.constructor.buildPublicKey(publicKey);
     const targetHexDid = getHexIdentifierFromDID(targetDid);
     const signerHexDid = getHexIdentifierFromDID(signerDid);
-    const [addPk, signature] = await this.createSignedAddPublicKey(offchainPublicKey, targetHexDid, signerHexDid, keyPair, keyId, { nonce, didModule });
+    const [addPk, signature] = await this.createSignedAddPublicKey(
+      offchainPublicKey,
+      targetHexDid,
+      signerHexDid,
+      keyPair,
+      keyId,
+      { nonce, didModule },
+    );
     return this.module.addPublicKey(addPk, signature);
   }
 
@@ -116,10 +167,24 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
    * using this
    * @returns {Promise<*>}
    */
-  async createRemovePublicKeyTx(removeKeyId, targetDid, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+  async createRemovePublicKeyTx(
+    removeKeyId,
+    targetDid,
+    signerDid,
+    keyPair,
+    keyId,
+    { nonce = undefined, didModule = undefined },
+  ) {
     const targetHexDid = getHexIdentifierFromDID(targetDid);
     const signerHexDid = getHexIdentifierFromDID(signerDid);
-    const [removePk, signature] = await this.createSignedRemovePublicKey(removeKeyId, targetHexDid, signerHexDid, keyPair, keyId, { nonce, didModule });
+    const [removePk, signature] = await this.createSignedRemovePublicKey(
+      removeKeyId,
+      targetHexDid,
+      signerHexDid,
+      keyPair,
+      keyId,
+      { nonce, didModule },
+    );
     return this.module.removePublicKey(removePk, signature);
   }
 
@@ -137,8 +202,24 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
    * @param params
    * @returns {Promise<*>}
    */
-  async addPublicKey(publicKey, targetDid, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const tx = await this.createAddPublicKeyTx(publicKey, targetDid, signerDid, keyPair, keyId, { nonce, didModule });
+  async addPublicKey(
+    publicKey,
+    targetDid,
+    signerDid,
+    keyPair,
+    keyId,
+    { nonce = undefined, didModule = undefined },
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const tx = await this.createAddPublicKeyTx(
+      publicKey,
+      targetDid,
+      signerDid,
+      keyPair,
+      keyId,
+      { nonce, didModule },
+    );
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
@@ -156,12 +237,35 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
    * @param params
    * @returns {Promise<*>}
    */
-  async removePublicKey(removeKeyId, targetDid, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const tx = await this.createRemovePublicKeyTx(removeKeyId, targetDid, signerDid, keyPair, keyId, { nonce, didModule });
+  async removePublicKey(
+    removeKeyId,
+    targetDid,
+    signerDid,
+    keyPair,
+    keyId,
+    { nonce = undefined, didModule = undefined },
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const tx = await this.createRemovePublicKeyTx(
+      removeKeyId,
+      targetDid,
+      signerDid,
+      keyPair,
+      keyId,
+      { nonce, didModule },
+    );
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
-  async createSignedAddPublicKey(publicKey, targetHexDid, signerHexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+  async createSignedAddPublicKey(
+    publicKey,
+    targetHexDid,
+    signerHexDid,
+    keyPair,
+    keyId,
+    { nonce = undefined, didModule = undefined },
+  ) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getNonce(signerHexDid, nonce, didModule);
     const addPk = { key: publicKey, did: targetHexDid, nonce };
@@ -170,10 +274,21 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
     return [addPk, didSig];
   }
 
-  async createSignedRemovePublicKey(removeKeyId, targetHexDid, signerHexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+  async createSignedRemovePublicKey(
+    removeKeyId,
+    targetHexDid,
+    signerHexDid,
+    keyPair,
+    keyId,
+    { nonce = undefined, didModule = undefined },
+  ) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getNonce(signerHexDid, nonce, didModule);
-    const removeKey = { keyRef: [targetHexDid, removeKeyId], did: targetHexDid, nonce };
+    const removeKey = {
+      keyRef: [targetHexDid, removeKeyId],
+      did: targetHexDid,
+      nonce,
+    };
     const signature = this.signRemovePublicKey(keyPair, removeKey);
     const didSig = createDidSig(signerHexDid, keyId, signature);
     return [removeKey, didSig];
@@ -186,7 +301,11 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
    * @returns {Signature}
    */
   signAddParams(keyPair, params) {
-    const serialized = getStateChange(this.api, 'AddOffchainSignatureParams', params);
+    const serialized = getStateChange(
+      this.api,
+      this.stateChanges.AddParams,
+      params,
+    );
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 
@@ -197,7 +316,11 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
    * @returns {Signature}
    */
   signAddPublicKey(keyPair, pk) {
-    const serialized = getStateChange(this.api, 'AddOffchainSignaturePublicKey', pk);
+    const serialized = getStateChange(
+      this.api,
+      this.stateChanges.AddPublicKey,
+      pk,
+    );
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 
@@ -208,7 +331,11 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
    * @returns {Signature}
    */
   signRemoveParams(keyPair, ref) {
-    const serialized = getStateChange(this.api, 'RemoveOffchainSignatureParams', ref);
+    const serialized = getStateChange(
+      this.api,
+      this.stateChanges.RemoveParams,
+      ref,
+    );
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 
@@ -219,7 +346,11 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
    * @returns {Signature}
    */
   signRemovePublicKey(keyPair, ref) {
-    const serialized = getStateChange(this.api, 'RemoveOffchainSignaturePublicKey', ref);
+    const serialized = getStateChange(
+      this.api,
+      this.stateChanges.RemovePublicKey,
+      ref,
+    );
     return getSignatureFromKeyringPair(keyPair, serialized);
   }
 }

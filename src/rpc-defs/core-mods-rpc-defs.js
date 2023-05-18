@@ -1,3 +1,5 @@
+const SignaturePublicKeyStorageKey = '(Did, IncId)';
+
 export default {
   core_mods: {
     psPublicKeyWithParams: {
@@ -5,10 +7,10 @@ export default {
       params: [
         {
           name: 'id',
-          type: 'SignaturePublicKeyStorageKey',
+          type: SignaturePublicKeyStorageKey,
         },
       ],
-      type: 'Option<PSPublicKeyWithParams>',
+      type: 'Option<(PsPublicKey, Option<PsParameters>)>',
     },
     psParamsByDid: {
       description: 'Return all PS params by a DID',
@@ -18,7 +20,7 @@ export default {
           type: 'Did',
         },
       ],
-      type: 'BTreeMap<IncId, PSParams>',
+      type: 'BTreeMap<IncId, PsParameters>',
     },
     psPublicKeysByDid: {
       description: 'Return all PS key with params by a DID',
@@ -28,17 +30,17 @@ export default {
           type: 'Did',
         },
       ],
-      type: 'BTreeMap<IncId, PSPublicKeyWithParams>',
+      type: 'BTreeMap<IncId, (PsPublicKey, Option<PsParameters>)>',
     },
     bbsPublicKeyWithParams: {
       description: 'Return BBS public key with params',
       params: [
         {
           name: 'id',
-          type: 'SignaturePublicKeyStorageKey',
+          type: SignaturePublicKeyStorageKey,
         },
       ],
-      type: 'Option<BBSPublicKeyWithParams>',
+      type: 'Option<(BbsPublicKey, Option<BbsParameters>)>',
     },
     bbsParamsByDid: {
       description: 'Return all BBS params by a DID',
@@ -48,7 +50,7 @@ export default {
           type: 'Did',
         },
       ],
-      type: 'BTreeMap<IncId, BBSParams>',
+      type: 'BTreeMap<IncId, BbsParameters>',
     },
     bbsPublicKeysByDid: {
       description: 'Return all BBS key with params by a DID',
@@ -58,17 +60,17 @@ export default {
           type: 'Did',
         },
       ],
-      type: 'BTreeMap<IncId, BBSPublicKeyWithParams>',
+      type: 'BTreeMap<IncId, (BbsPublicKey, Option<BbsParameters>)>',
     },
     bbsPlusPublicKeyWithParams: {
       description: 'Return BBS+ public key with params',
       params: [
         {
           name: 'id',
-          type: 'SignaturePublicKeyStorageKey',
+          type: SignaturePublicKeyStorageKey,
         },
       ],
-      type: 'Option<BBSPlusPublicKeyWithParams>',
+      type: 'Option<(BbsPlusPublicKey, Option<BbsPlusParameters>)>',
     },
     bbsPlusParamsByDid: {
       description: 'Return all BBS+ params by a DID',
@@ -78,7 +80,7 @@ export default {
           type: 'Did',
         },
       ],
-      type: 'BTreeMap<IncId, BBSPlusParameters>',
+      type: 'BTreeMap<IncId, BbsPlusParameters>',
     },
     bbsPlusPublicKeysByDid: {
       description: 'Return all BBS+ key with params by a DID',
@@ -88,7 +90,7 @@ export default {
           type: 'Did',
         },
       ],
-      type: 'BTreeMap<IncId, BBSPlusPublicKeyWithParams>',
+      type: 'BTreeMap<IncId, (BbsPlusPublicKey, Option<BbsPlusParameters>)>',
     },
     accumulatorPublicKeyWithParams: {
       description: 'Return Accumulator public key with params',

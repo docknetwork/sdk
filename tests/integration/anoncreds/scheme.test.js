@@ -15,6 +15,13 @@ import {
 
 import { registerNewDIDUsingPair } from '../helpers';
 
+const addParticipantIdIfNotPresent = (key) => {
+  if (!('participantId' in key)) {
+    key.participantId = null;
+  }
+  return key;
+};
+
 for (const {
   Name,
   Module,
@@ -22,6 +29,9 @@ for (const {
   KeyPair,
   SignatureParams,
   VerKey,
+  getParamsByDid,
+  getPublicKeyWithParamsByStorageKey,
+  getPublicKeysByDid,
 } of Schemes) {
   describe(`${Name} Module`, () => {
     const dock = new DockAPI();
@@ -70,9 +80,15 @@ for (const {
         { didModule: dock.did },
         false,
       );
+
       const paramsWritten1 = await chainModule.getLastParamsWritten(did1);
       expect(paramsWritten1.bytes).toEqual(params1.bytes);
       expect(paramsWritten1.label).toEqual(params1.label);
+      const allParams = await getParamsByDid(
+        dock.api,
+        getHexIdentifierFromDID(did1),
+      );
+      expect(Object.values(allParams.toJSON())).toEqual([params1]);
 
       const queriedParams1 = await chainModule.getParams(did1, 1);
       expect(paramsWritten1).toEqual(queriedParams1);
@@ -170,6 +186,13 @@ for (const {
       const queriedPk2 = await chainModule.getPublicKey(did2, 2);
       expect(queriedPk2.bytes).toEqual(pk2.bytes);
       expect(queriedPk2.paramsRef).toEqual([getHexIdentifierFromDID(did1), 1]);
+      const keyWithParams = await getPublicKeyWithParamsByStorageKey(dock.api, [
+        getHexIdentifierFromDID(did2),
+        2,
+      ]);
+      const jsonKeyWithParams = keyWithParams.toJSON();
+      addParticipantIdIfNotPresent(jsonKeyWithParams[0]);
+      expect(jsonKeyWithParams).toEqual([queriedPk2, queriedParams1]);
 
       const queriedPk2WithParams = await chainModule.getPublicKey(
         did2,
@@ -212,6 +235,19 @@ for (const {
         true,
       );
       expect(queriedPk3WithParams.params).toEqual(queriedParams2);
+      const allPks = await getPublicKeysByDid(
+        dock.api,
+        getHexIdentifierFromDID(did2),
+      );
+      expect(
+        Object.values(allPks.toJSON()).map((keyWithParams) => {
+          addParticipantIdIfNotPresent(keyWithParams[0]);
+          return keyWithParams;
+        }),
+      ).toEqual([
+        [queriedPk2, queriedParams1],
+        [queriedPk3, queriedParams2],
+      ]);
     }, 30000);
 
     test('Get public keys with DID resolution', async () => {
@@ -308,7 +344,9 @@ for (const {
       const pk3 = await chainModule.getPublicKey(did2, 3);
       expect(pk3).toEqual(null);
 
-      document2 = await dock.did.getDocument(did2, { getOffchainSigKeys: true });
+      document2 = await dock.did.getDocument(did2, {
+        getOffchainSigKeys: true,
+      });
       expect(document2.publicKey.length).toEqual(1);
       expect(document2.assertionMethod.length).toEqual(1);
       expect(document2.publicKey[0].id.endsWith('#keys-1')).toEqual(true);

@@ -91,6 +91,10 @@ export const BBS = {
   SigType: "Bls12381BBSSignatureDock2023",
   Context: "https://ld.dock.io/security/bbs23/v1",
   VerKey: "Bls12381BBSVerificationKeyDock2023",
+  getParamsByDid: (api, did) => api.rpc.core_mods.bbsParamsByDid(did),
+  getPublicKeyWithParamsByStorageKey: (api, storageKey) =>
+    api.rpc.core_mods.bbsPublicKeyWithParams(storageKey),
+  getPublicKeysByDid: (api, did) => api.rpc.core_mods.bbsPublicKeysByDid(did),
 };
 export const BBSPlus = {
   Name: "BBS+",
@@ -109,6 +113,10 @@ export const BBSPlus = {
   Context: "https://ld.dock.io/security/bbs/v1",
   VerKey: "Bls12381G2VerificationKeyDock2022",
   SigType: "Bls12381BBS+SignatureDock2022",
+  getParamsByDid: (api, did) => api.rpc.core_mods.bbsPlusParamsByDid(did),
+  getPublicKeyWithParamsByStorageKey: (api, storageKey) =>
+    api.rpc.core_mods.bbsPlusPublicKeyWithParams(storageKey),
+  getPublicKeysByDid: (api, did) => api.rpc.core_mods.bbsPlusPublicKeysByDid(did),
 };
 export const PS = {
   Name: "PS",
@@ -126,6 +134,10 @@ export const PS = {
   SigType: "Bls12381PSSignatureDock2023",
   Context: "https://ld.dock.io/security/ps/v1",
   VerKey: "Bls12381PSVerificationKeyDock2023",
+  getParamsByDid: (api, did) => api.rpc.core_mods.psParamsByDid(did),
+  getPublicKeyWithParamsByStorageKey: (api, storageKey) =>
+    api.rpc.core_mods.psPublicKeyWithParams(storageKey),
+  getPublicKeysByDid: (api, did) => api.rpc.core_mods.psPublicKeysByDid(did),
 };
 export const AllSchemes = Object.setPrototypeOf({ BBS, BBSPlus, PS }, null);
 

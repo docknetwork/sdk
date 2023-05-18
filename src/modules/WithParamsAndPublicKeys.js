@@ -268,6 +268,7 @@ export default class WithParamsAndPublicKeys {
     } else {
       pkObj.paramsRef = null;
     }
+    pkObj.participantId = null;
     return pkObj;
   }
 

@@ -15,21 +15,9 @@ const STATE_CHANGES = {
   RemovePublicKey: 'RemoveOffchainSignaturePublicKey',
 };
 
-const LEGACY_STATE_CHANGES = {
-  AddParams: 'AddBBSPlusParams',
-  RemoveParams: 'RemoveBBSPlusParams',
-  AddPublicKey: 'AddBBSPlusPublicKey',
-  RemovePublicKey: 'RemoveBBSPlusPublicKey',
-};
-
 const METHODS = {
   Params: 'signatureParams',
   PublicKeys: 'publicKeys',
-};
-
-const LEGACY_METHODS = {
-  Params: 'bbsPlusParams',
-  PublicKeys: 'bbsPlusKeys',
 };
 
 /** Class to write offchain signature parameters and keys on chain */
@@ -43,10 +31,9 @@ export default class OffchainSignatures extends WithParamsAndPublicKeys {
   constructor(api, signAndSend) {
     super();
     this.api = api;
-    this.legacy = api.tx.offchainSignatures == null;
-    this.moduleName = this.legacy ? 'bbsPlus' : 'offchainSignatures';
-    this.stateChanges = this.legacy ? LEGACY_STATE_CHANGES : STATE_CHANGES;
-    this.methods = this.legacy ? LEGACY_METHODS : METHODS;
+    this.moduleName = 'offchainSignatures';
+    this.stateChanges = STATE_CHANGES;
+    this.methods = METHODS;
     this.module = api.tx[this.moduleName];
     this.signAndSend = signAndSend;
   }

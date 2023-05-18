@@ -2353,20 +2353,22 @@
     ky "^0.25.1"
     ky-universal "^0.8.2"
 
-"@docknetwork/crypto-wasm-ts@file:../crypto-wasm-ts":
-  version "0.32.0"
+"@docknetwork/crypto-wasm-ts@^0.33.0":
+  version "0.33.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.33.0.tgz#46c6a587ecc45f0b94d14b5bc3ca4baf1b917c73"
+  integrity sha512-IklhIO9JYioBDGkHNVWk63p92/Z2UHWzD8fE7VQHMi0wUKKHUnxQ7GqxrtKSEIjeYi/h6ovQZDuM91Zc0BGEuw==
   dependencies:
-    "@docknetwork/crypto-wasm" "0.17.0"
+    "@docknetwork/crypto-wasm" "^0.18.0"
     "@types/flat" "^5.0.2"
     bs58 "5.0.0"
     flat "^5.0.2"
     json-pointer "^0.6.2"
     lzutf8 "^0.6.3"
 
-"@docknetwork/crypto-wasm@0.17.0":
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.17.0.tgz#ac6f7844e8d5e70100b568c5d11c9e92775a819e"
-  integrity sha512-W9WL1bcLFwjNvg7xnZH/nRJY+syZkvwALFro8neoNnXYV57D1DF28qKsEM1Fp3PBUa+swYLjx6X9l8fl2ib0qA==
+"@docknetwork/crypto-wasm@^0.18.0":
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.18.0.tgz#f38678812b23a677afe00c57ff20792a256f1799"
+  integrity sha512-dipHJlZcoi60x/cBDfkhGXx5VCtLyHPyzVF/sjLl8PX7pC3TlyRRApW1uh3peRLG/klP34dneG2jC/x6u2iDcw==
 
 "@docknetwork/node-types@^0.15.0":
   version "0.15.0"
@@ -11476,10 +11478,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@^4.2.3:
-  version "4.8.4"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.8.4.tgz#c464abca159669597be5f96b8943500b238e60e6"
-  integrity sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==
+typescript@5.0.4:
+  version "5.0.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.4.tgz#b217fd20119bd61a94d4011274e0ab369058da3b"
+  integrity sha512-cW9T5W9xY37cc+jfEnaUvX91foxtHkza3Nw3wkoF4sSlKn0MONdkdEndig/qPBWXNkmplh3NzayQzCiHM4/hqw==
 
 uc.micro@^1.0.1, uc.micro@^1.0.5:
   version "1.0.6"

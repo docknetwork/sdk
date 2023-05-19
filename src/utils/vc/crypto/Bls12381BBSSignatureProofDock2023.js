@@ -11,7 +11,7 @@ import Bls12381BBSSignatureDock2023 from './Bls12381BBSSignatureDock2023';
 /**
  * A BBS signature suite for use with derived BBS credentials aka BBS presentations
  */
-export default class Bls12381BBSSignatureProofDock2022 extends DockCryptoSignatureProof {
+export default class Bls12381BBSSignatureProofDock2023 extends DockCryptoSignatureProof {
   /**
    * Default constructor
    * @param options {SignatureSuiteOptions} options for constructing the signature suite
@@ -31,7 +31,7 @@ export default class Bls12381BBSSignatureProofDock2022 extends DockCryptoSignatu
   }
 }
 
-Bls12381BBSSignatureProofDock2022.proofType = [
+Bls12381BBSSignatureProofDock2023.proofType = [
   Bls12381BBS23SigProofDockSigName,
   `sec:${Bls12381BBS23SigProofDockSigName}`,
   `https://w3id.org/security#${Bls12381BBS23SigProofDockSigName}`,

@@ -23,6 +23,7 @@ export default class Bls12381BBSSignatureProofDock2023 extends DockCryptoSignatu
       Bls12381BBSKeyPairDock2023,
       BBSPublicKey,
       Bls12381BBSSignatureDock2023,
+      'https://ld.dock.io/security/bbs23/v1',
     );
   }
 

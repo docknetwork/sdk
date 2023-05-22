@@ -23,6 +23,7 @@ export default class Bls12381PSSignatureProofDock2022 extends DockCryptoSignatur
       Bls12381PSKeyPairDock2023,
       PSPublicKey,
       Bls12381PSSignatureDock2023,
+      'https://ld.dock.io/security/ps/v1',
     );
   }
 

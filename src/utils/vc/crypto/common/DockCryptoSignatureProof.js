@@ -16,7 +16,7 @@ export default class DockCryptoSignatureProof extends CustomLinkedDataSignature 
    * @param PublicKey
    * @param Signature
    */
-  constructor(options = {}, type, LDKeyClass, PublicKey, Signature) {
+  constructor(options = {}, type, LDKeyClass, PublicKey, Signature, link) {
     const { verificationMethod } = options;
 
     super({
@@ -37,7 +37,7 @@ export default class DockCryptoSignatureProof extends CustomLinkedDataSignature 
             '@container': '@graph',
           },
         },
-        'https://ld.dock.io/security/ps/v1',
+        link,
       ],
       type,
     };

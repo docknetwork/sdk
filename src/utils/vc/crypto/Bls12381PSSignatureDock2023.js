@@ -66,8 +66,17 @@ export default class Bls12381PSSignatureDock2023 extends DockCryptoSignature {
       PSSignatureParams,
       PSSignature,
       PS_SIGNATURE_PARAMS_LABEL_BYTES,
-      { prepareSecretKey: Bls12381PSKeyPairDock2023.adaptKey },
     );
+  }
+
+  /**
+   * Attempts to adapt supplied key for the `msgCount` messages.
+   * Throws an error if `msgCount` is greater than the supported message count.
+   * @param {*} key
+   * @param {*} msgCount
+   */
+  static adaptKey(key, msgCount) {
+    return Bls12381PSKeyPairDock2023.adaptKey(key, msgCount);
   }
 }
 

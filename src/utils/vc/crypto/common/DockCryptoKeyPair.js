@@ -43,7 +43,6 @@ export default class DockCryptoKeyPair {
     SignatureParams,
     Signature,
     DefaultLabelBytes,
-    { preparePrivateKey = null } = {},
   ) {
     if (SecretKey == null) {
       throw new Error('No `SecretKey` provided');
@@ -68,6 +67,8 @@ export default class DockCryptoKeyPair {
         },
       };
     }
+    const { adaptKey } = this;
+
     return {
       async sign({ data }) {
         const msgCount = data.length;
@@ -75,10 +76,7 @@ export default class DockCryptoKeyPair {
           msgCount,
           DefaultLabelBytes,
         );
-        let sk = new SecretKey(u8aToU8a(key.privateKeyBuffer));
-        if (preparePrivateKey != null) {
-          sk = preparePrivateKey(sk, data);
-        }
+        const sk = adaptKey(new SecretKey(u8aToU8a(key.privateKeyBuffer)), data.length);
         const signature = Signature.generate(data, sk, sigParams, false);
         return signature.value;
       },
@@ -101,7 +99,6 @@ export default class DockCryptoKeyPair {
     SignatureParams,
     Signature,
     DefaultLabelBytes,
-    { preparePublicKey = null } = {},
   ) {
     if (PublicKey == null) {
       throw new Error('No `PublicKey` provided');
@@ -125,6 +122,8 @@ export default class DockCryptoKeyPair {
       };
     }
 
+    const { adaptKey } = this;
+
     return {
       async verify({ data, signature: rawSignature }) {
         const msgCount = data.length;
@@ -135,10 +134,7 @@ export default class DockCryptoKeyPair {
         const signature = new Signature(u8aToU8a(rawSignature));
 
         try {
-          let pk = new PublicKey(u8aToU8a(key.publicKeyBuffer));
-          if (preparePublicKey != null) {
-            pk = preparePublicKey(pk, data);
-          }
+          const pk = adaptKey(new PublicKey(u8aToU8a(key.publicKeyBuffer)), data.length);
           const result = signature.verify(data, pk, sigParams, false);
           return result.verified;
         } catch (e) {
@@ -147,6 +143,15 @@ export default class DockCryptoKeyPair {
         }
       },
     };
+  }
+
+  /**
+   * Adapts the provided public or secret key for the given message count.
+   * @param {*} key
+   * @param {*} _msgCount
+   */
+  static adaptKey(key, _msgCount) {
+    return key;
   }
 
   /**

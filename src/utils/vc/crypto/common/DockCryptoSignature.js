@@ -142,8 +142,8 @@ export default class DockCryptoSignature extends CustomLinkedDataSignature {
     credBuilder.schema = credSchema;
 
     const {
-      cryptoVersion,
-      credentialSchema,
+      cryptoVersion: _cryptoVersion,
+      credentialSchema: _credentialSchema,
       credentialSubject,
       credentialStatus,
       ...custom
@@ -239,7 +239,6 @@ export default class DockCryptoSignature extends CustomLinkedDataSignature {
     SignatureParams,
     Signature,
     DefaultLabelBytes,
-    { prepareSecretKey = null } = {},
   ) {
     if (SecretKey == null) {
       throw new Error('No `SecretKey` provided');
@@ -248,6 +247,8 @@ export default class DockCryptoSignature extends CustomLinkedDataSignature {
     } else if (Signature == null) {
       throw new Error('No `Signature` provided');
     }
+
+    const { adaptKey } = this;
 
     return {
       id: verificationMethod,
@@ -261,14 +262,23 @@ export default class DockCryptoSignature extends CustomLinkedDataSignature {
           msgCount,
           DefaultLabelBytes,
         );
-        let sk = new SecretKey(u8aToU8a(keypair.privateKeyBuffer));
-        if (prepareSecretKey != null) {
-          sk = prepareSecretKey(sk, data);
-        }
+        const sk = adaptKey(
+          new SecretKey(u8aToU8a(keypair.privateKeyBuffer)),
+          data.length,
+        );
         const signature = Signature.generate(data, sk, sigParams);
         return signature.value;
       },
     };
+  }
+
+  /**
+   * Adapts the provided public or secret key for the given message count.
+   * @param {*} key
+   * @param {*} _msgCount
+   */
+  static adaptKey(key, _msgCount) {
+    return key;
   }
 
   ensureSuiteContext() {

@@ -37,7 +37,6 @@ export default class Bls12381PSKeyPairDock2023 extends DockCryptoKeyPair {
       PSSignatureParams,
       PSSignature,
       PS_SIGNATURE_PARAMS_LABEL_BYTES,
-      { preparePrivateKey: this.adaptKey },
     );
   }
 
@@ -48,26 +47,25 @@ export default class Bls12381PSKeyPairDock2023 extends DockCryptoKeyPair {
       PSSignatureParams,
       PSSignature,
       PS_SIGNATURE_PARAMS_LABEL_BYTES,
-      { preparePublicKey: this.adaptKey },
     );
   }
 
   /**
-   * Attempts to adapt supplied key for the `data.length` messages.
-   * Throws an error if `data.length` is greater than the supported message count.
+   * Attempts to adapt supplied key for the `msgCount` messages.
+   * Throws an error if `msgCount` is greater than the supported message count.
    * @param {*} key
-   * @param {*} data
+   * @param {*} msgCount
    */
-  static adaptKey(key, data) {
+  static adaptKey(key, msgCount) {
     const supportedMessageCount = key.supportedMessageCount();
 
-    if (supportedMessageCount === data.length) {
+    if (supportedMessageCount === msgCount) {
       return key;
-    } else if (supportedMessageCount > data.length) {
-      return key.adaptForLess(data.length);
+    } else if (supportedMessageCount > msgCount) {
+      return key.adaptForLess(msgCount);
     } else {
       throw new Error(
-        `Failed to adapt provided key ${key} for ${data.length} messages`,
+        `Failed to adapt provided key ${key} supporting ${supportedMessageCount} for ${msgCount} messages - can only adapt for less amount of messages`,
       );
     }
   }

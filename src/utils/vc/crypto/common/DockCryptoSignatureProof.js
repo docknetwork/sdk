@@ -93,8 +93,8 @@ export default class DockCryptoSignatureProof extends CustomLinkedDataSignature 
       '@context': context,
       type,
       credentialSchema,
-      issuer,
-      issuanceDate,
+      issuer: _issuer,
+      issuanceDate: _issuanceDate,
       proof,
       ...revealedAttributes
     } = document;

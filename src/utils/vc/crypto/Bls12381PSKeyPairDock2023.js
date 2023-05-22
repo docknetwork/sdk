@@ -16,40 +16,6 @@ export default class Bls12381PSKeyPairDock2023 extends DockCryptoKeyPair {
     super(options, Bls12381PSDockVerKeyName);
   }
 
-  static generate({
-    seed, params, controller, id, msgCount = 1,
-  } = {}) {
-    const keypair = PSKeypair.generate(
-      params
-        || PSSignatureParams.getSigParamsOfRequiredSize(
-          msgCount,
-          PS_SIGNATURE_PARAMS_LABEL_BYTES,
-        ),
-      seed,
-    );
-    return new Bls12381PSKeyPairDock2023({ keypair, controller, id });
-  }
-
-  static signerFactory(key) {
-    return super.signerFactoryForSigScheme(
-      key,
-      PSSecretKey,
-      PSSignatureParams,
-      PSSignature,
-      PS_SIGNATURE_PARAMS_LABEL_BYTES,
-    );
-  }
-
-  static verifierFactory(key) {
-    return super.verifierFactoryForSigScheme(
-      key,
-      PSPublicKey,
-      PSSignatureParams,
-      PSSignature,
-      PS_SIGNATURE_PARAMS_LABEL_BYTES,
-    );
-  }
-
   /**
    * Attempts to adapt supplied key for the `msgCount` messages.
    * Throws an error if `msgCount` is greater than the supported message count.
@@ -70,3 +36,10 @@ export default class Bls12381PSKeyPairDock2023 extends DockCryptoKeyPair {
     }
   }
 }
+
+Bls12381PSKeyPairDock2023.SecretKey = PSSecretKey;
+Bls12381PSKeyPairDock2023.PublicKey = PSPublicKey;
+Bls12381PSKeyPairDock2023.SignatureParams = PSSignatureParams;
+Bls12381PSKeyPairDock2023.Signature = PSSignature;
+Bls12381PSKeyPairDock2023.KeyPair = PSKeypair;
+Bls12381PSKeyPairDock2023.defaultLabelBytes = PS_SIGNATURE_PARAMS_LABEL_BYTES;

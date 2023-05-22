@@ -1,4 +1,3 @@
-import { BBSPublicKey } from '@docknetwork/crypto-wasm-ts';
 import {
   Bls12381BBS23SigProofDockSigName,
   Bls12381BBS23SigDockSigName,
@@ -21,17 +20,13 @@ export default class Bls12381BBSSignatureProofDock2023 extends DockCryptoSignatu
       options,
       Bls12381BBS23SigProofDockSigName,
       Bls12381BBSKeyPairDock2023,
-      BBSPublicKey,
-      Bls12381BBSSignatureDock2023,
       'https://ld.dock.io/security/bbs23/v1',
     );
   }
-
-  static convertToPresentation(document) {
-    return super.convertToPresentation(document, Bls12381BBS23SigDockSigName);
-  }
 }
 
+Bls12381BBSSignatureProofDock2023.Signature = Bls12381BBSSignatureDock2023;
+Bls12381BBSSignatureProofDock2023.sigName = Bls12381BBS23SigDockSigName;
 Bls12381BBSSignatureProofDock2023.proofType = [
   Bls12381BBS23SigProofDockSigName,
   `sec:${Bls12381BBS23SigProofDockSigName}`,

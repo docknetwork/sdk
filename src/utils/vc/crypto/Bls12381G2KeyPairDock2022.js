@@ -1,10 +1,9 @@
 import {
   BBSPlusKeypairG2,
   BBSPlusSignatureG1,
-  BBSPlusPublicKeyG2,
   BBSPlusSecretKey,
   BBSPlusSignatureParamsG1,
-  BBSPlusSignatureParamsG2,
+  BBSPlusPublicKeyG2,
 } from '@docknetwork/crypto-wasm-ts';
 
 import {
@@ -18,31 +17,11 @@ export default class Bls12381G2KeyPairDock2022 extends DockCryptoKeyPair {
   constructor(options) {
     super(options, Bls12381BBSDockVerKeyName);
   }
-
-  static generate({
-    seed, params, controller, id, msgCount = 1,
-  } = {}) {
-    const keypair = BBSPlusKeypairG2.generate(params || BBSPlusSignatureParamsG1.getSigParamsOfRequiredSize(msgCount, BBS_PLUS_SIGNATURE_PARAMS_LABEL_BYTES), seed);
-    return new Bls12381G2KeyPairDock2022({ keypair, controller, id });
-  }
-
-  static signerFactory(key) {
-    return super.signerFactoryForSigScheme(
-      key,
-      BBSPlusSecretKey,
-      BBSPlusSignatureParamsG2,
-      BBSPlusSignatureG1,
-      BBS_PLUS_SIGNATURE_PARAMS_LABEL_BYTES,
-    );
-  }
-
-  static verifierFactory(key) {
-    return super.verifierFactoryForSigScheme(
-      key,
-      BBSPlusPublicKeyG2,
-      BBSPlusSignatureParamsG1,
-      BBSPlusSignatureG1,
-      BBS_PLUS_SIGNATURE_PARAMS_LABEL_BYTES,
-    );
-  }
 }
+
+Bls12381G2KeyPairDock2022.SecretKey = BBSPlusSecretKey;
+Bls12381G2KeyPairDock2022.PublicKey = BBSPlusPublicKeyG2;
+Bls12381G2KeyPairDock2022.SignatureParams = BBSPlusSignatureParamsG1;
+Bls12381G2KeyPairDock2022.Signature = BBSPlusSignatureG1;
+Bls12381G2KeyPairDock2022.KeyPair = BBSPlusKeypairG2;
+Bls12381G2KeyPairDock2022.defaultLabelBytes = BBS_PLUS_SIGNATURE_PARAMS_LABEL_BYTES;

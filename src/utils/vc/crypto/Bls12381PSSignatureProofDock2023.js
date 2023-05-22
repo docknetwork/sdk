@@ -1,4 +1,3 @@
-import { PSPublicKey } from '@docknetwork/crypto-wasm-ts';
 import {
   Bls12381PSSigDockSigName,
   Bls12381PSSigProofDockSigName,
@@ -21,17 +20,13 @@ export default class Bls12381PSSignatureProofDock2022 extends DockCryptoSignatur
       options,
       Bls12381PSSigProofDockSigName,
       Bls12381PSKeyPairDock2023,
-      PSPublicKey,
-      Bls12381PSSignatureDock2023,
       'https://ld.dock.io/security/ps/v1',
     );
   }
-
-  static convertToPresentation(document) {
-    return super.convertToPresentation(document, Bls12381PSSigDockSigName);
-  }
 }
 
+Bls12381PSSignatureProofDock2022.Signature = Bls12381PSSignatureDock2023;
+Bls12381PSSignatureProofDock2022.sigName = Bls12381PSSigDockSigName;
 Bls12381PSSignatureProofDock2022.proofType = [
   Bls12381PSSigProofDockSigName,
   `sec:${Bls12381PSSigProofDockSigName}`,

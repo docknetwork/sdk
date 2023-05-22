@@ -87,7 +87,9 @@ export const BBS = {
   KeyPair: BBSKeypair,
   CryptoKeyPair: Bls12381BBSKeyPairDock2023,
   convertToPresentation:
-    Bls12381BBSSignatureProofDock2023.convertToPresentation,
+    Bls12381BBSSignatureProofDock2023.convertToPresentation.bind(
+      Bls12381BBSSignatureProofDock2023
+    ),
   SigType: "Bls12381BBSSignatureDock2023",
   Context: "https://ld.dock.io/security/bbs23/v1",
   VerKey: "Bls12381BBSVerificationKeyDock2023",
@@ -109,14 +111,17 @@ export const BBSPlus = {
   KeyPair: BBSPlusKeypairG2,
   CryptoKeyPair: Bls12381G2KeyPairDock2022,
   convertToPresentation:
-    Bls12381BBSSignatureProofDock2022.convertToPresentation,
+    Bls12381BBSSignatureProofDock2022.convertToPresentation.bind(
+      Bls12381BBSSignatureProofDock2022
+    ),
   Context: "https://ld.dock.io/security/bbs/v1",
   VerKey: "Bls12381G2VerificationKeyDock2022",
   SigType: "Bls12381BBS+SignatureDock2022",
   getParamsByDid: (api, did) => api.rpc.core_mods.bbsPlusParamsByDid(did),
   getPublicKeyWithParamsByStorageKey: (api, storageKey) =>
     api.rpc.core_mods.bbsPlusPublicKeyWithParams(storageKey),
-  getPublicKeysByDid: (api, did) => api.rpc.core_mods.bbsPlusPublicKeysByDid(did),
+  getPublicKeysByDid: (api, did) =>
+    api.rpc.core_mods.bbsPlusPublicKeysByDid(did),
 };
 export const PS = {
   Name: "PS",
@@ -130,7 +135,10 @@ export const PS = {
   Signature: PSSignature,
   KeyPair: PSKeypair,
   CryptoKeyPair: Bls12381PSKeyPairDock2023,
-  convertToPresentation: Bls12381PSSignatureProofDock2023.convertToPresentation,
+  convertToPresentation:
+    Bls12381PSSignatureProofDock2023.convertToPresentation.bind(
+      Bls12381PSSignatureProofDock2023
+    ),
   SigType: "Bls12381PSSignatureDock2023",
   Context: "https://ld.dock.io/security/ps/v1",
   VerKey: "Bls12381PSVerificationKeyDock2023",

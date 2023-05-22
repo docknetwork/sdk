@@ -1,13 +1,6 @@
 import {
-  PS_SIGNATURE_PARAMS_LABEL_BYTES,
   PSCredentialBuilder,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
-
-import {
-  PSSignature,
-  PSSecretKey,
-  PSSignatureParams,
-} from '@docknetwork/crypto-wasm-ts';
 
 import { Bls12381PSSigDockSigName } from './constants';
 
@@ -30,56 +23,10 @@ export default class Bls12381PSSignatureDock2023 extends DockCryptoSignature {
       'https://ld.dock.io/security/ps/v1',
     );
   }
-
-  /**
-   * @param {object} options - The options to use.
-   * @param {object} options.document - The document to be signed/verified.
-   * @param {object} options.proof - The proof to be verified.
-   * @param {function} options.documentLoader - The document loader to use.
-   * @param {function} options.expansionMap - NOT SUPPORTED; do not use.
-   *
-   * @returns {Promise<{Uint8Array}>}.
-   */
-  async createVerifyData(options) {
-    return super.createVerifyData(options, PS_SIGNATURE_PARAMS_LABEL_BYTES);
-  }
-
-  static convertCredential(credential) {
-    return super.convertCredential(
-      credential,
-      Bls12381PSSigDockSigName,
-      PSCredentialBuilder,
-    );
-  }
-
-  /**
-   * Generate object with `sign` method
-   * @param keypair
-   * @param verificationMethod
-   * @returns {object}
-   */
-  static signerFactory(keypair, verificationMethod) {
-    return super.signerFactoryForSigScheme(
-      keypair,
-      verificationMethod,
-      PSSecretKey,
-      PSSignatureParams,
-      PSSignature,
-      PS_SIGNATURE_PARAMS_LABEL_BYTES,
-    );
-  }
-
-  /**
-   * Attempts to adapt supplied key for the `msgCount` messages.
-   * Throws an error if `msgCount` is greater than the supported message count.
-   * @param {*} key
-   * @param {*} msgCount
-   */
-  static adaptKey(key, msgCount) {
-    return Bls12381PSKeyPairDock2023.adaptKey(key, msgCount);
-  }
 }
 
+Bls12381PSSignatureDock2023.KeyPair = Bls12381PSKeyPairDock2023;
+Bls12381PSSignatureDock2023.CredentialBuilder = PSCredentialBuilder;
 Bls12381PSSignatureDock2023.proofType = [
   Bls12381PSSigDockSigName,
   `sec:${Bls12381PSSigDockSigName}`,

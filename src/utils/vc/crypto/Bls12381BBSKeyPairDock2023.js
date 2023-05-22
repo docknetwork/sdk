@@ -15,38 +15,11 @@ export default class Bls12381BBSKeyPairDock2023 extends DockCryptoKeyPair {
   constructor(options) {
     super(options, Bls12381BBS23DockVerKeyName);
   }
-
-  static generate({
-    seed, params, controller, id, msgCount = 1,
-  } = {}) {
-    const keypair = BBSKeypair.generate(
-      params
-        || BBSSignatureParams.getSigParamsOfRequiredSize(
-          msgCount,
-          BBS_SIGNATURE_PARAMS_LABEL_BYTES,
-        ),
-      seed,
-    );
-    return new Bls12381BBSKeyPairDock2023({ keypair, controller, id });
-  }
-
-  static signerFactory(key) {
-    return super.signerFactoryForSigScheme(
-      key,
-      BBSSecretKey,
-      BBSSignatureParams,
-      BBSSignature,
-      BBS_SIGNATURE_PARAMS_LABEL_BYTES,
-    );
-  }
-
-  static verifierFactory(key) {
-    return super.verifierFactoryForSigScheme(
-      key,
-      BBSPublicKey,
-      BBSSignatureParams,
-      BBSSignature,
-      BBS_SIGNATURE_PARAMS_LABEL_BYTES,
-    );
-  }
 }
+
+Bls12381BBSKeyPairDock2023.SecretKey = BBSSecretKey;
+Bls12381BBSKeyPairDock2023.PublicKey = BBSPublicKey;
+Bls12381BBSKeyPairDock2023.SignatureParams = BBSSignatureParams;
+Bls12381BBSKeyPairDock2023.Signature = BBSSignature;
+Bls12381BBSKeyPairDock2023.KeyPair = BBSKeypair;
+Bls12381BBSKeyPairDock2023.defaultLabelBytes = BBS_SIGNATURE_PARAMS_LABEL_BYTES;

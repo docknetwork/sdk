@@ -46,7 +46,6 @@ export default withExtendedStaticProperties(
      * @param options.controller
      * @param options.id
      * @param options.msgCount
-     * @returns
      */
     static generate({
       seed, params, controller, id, msgCount = 1,
@@ -83,8 +82,12 @@ export default withExtendedStaticProperties(
         };
       }
       const {
-        adaptKey, SecretKey, SignatureParams, Signature, defaultLabelBytes,
+        SecretKey,
+        SignatureParams,
+        Signature,
+        defaultLabelBytes,
       } = this;
+      const keypairClass = this;
 
       return {
         async sign({ data }) {
@@ -93,7 +96,7 @@ export default withExtendedStaticProperties(
             msgCount,
             defaultLabelBytes,
           );
-          const sk = adaptKey(
+          const sk = keypairClass.adaptKey(
             new SecretKey(u8aToU8a(key.privateKeyBuffer)),
             data.length,
           );
@@ -105,18 +108,18 @@ export default withExtendedStaticProperties(
 
     /**
      * Generate object with `verify` method
-     * @param key
+     * @param keypair
      * @returns {object}
      */
-    static verifierFactory(key) {
-      if (!key.id) {
+    static verifierFactory(keypair) {
+      if (!keypair.id) {
         return {
           async sign() {
             throw new Error('No key ID for the label.');
           },
         };
       }
-      if (!key.publicKeyBuffer) {
+      if (!keypair.publicKeyBuffer) {
         return {
           async verify() {
             throw new Error('No public key to verify with.');
@@ -125,12 +128,9 @@ export default withExtendedStaticProperties(
       }
 
       const {
-        adaptKey,
-        PublicKey,
-        Signature,
-        SignatureParams,
-        defaultLabelBytes,
+        PublicKey, Signature, SignatureParams, defaultLabelBytes,
       } = this;
+      const keypairClass = this;
 
       return {
         async verify({ data, signature: rawSignature }) {
@@ -142,8 +142,8 @@ export default withExtendedStaticProperties(
           const signature = new Signature(u8aToU8a(rawSignature));
 
           try {
-            const pk = adaptKey(
-              new PublicKey(u8aToU8a(key.publicKeyBuffer)),
+            const pk = keypairClass.adaptKey(
+              new PublicKey(u8aToU8a(keypair.publicKeyBuffer)),
               data.length,
             );
             const result = signature.verify(data, pk, sigParams, false);

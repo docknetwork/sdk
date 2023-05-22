@@ -49,13 +49,5 @@ export default function withExtendedStaticProperties(properties, parentClass) {
     });
   }
 
-  try {
-    WithExtendedStaticProperties.name = `WithExtendedStaticProperties(${
-      parentClass.name || 'anonymous'
-    })`;
-  } catch (e) {
-    console.error(`Failed to rename class ${WithExtendedStaticProperties}: ${e}`);
-  }
-
   return WithExtendedStaticProperties;
 }

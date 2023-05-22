@@ -8,7 +8,7 @@ import DockCryptoSignatureProof from './common/DockCryptoSignatureProof';
 import Bls12381BBSSignatureDock2022 from './Bls12381BBSSignatureDock2022';
 
 /**
- * A BBS signature suite for use with derived BBS credentials aka BBS presentations
+ * A BBS+ signature suite for use with derived BBS+ credentials aka BBS+ presentations
  */
 export default class Bls12381BBSSignatureProofDock2022 extends DockCryptoSignatureProof {
   /**

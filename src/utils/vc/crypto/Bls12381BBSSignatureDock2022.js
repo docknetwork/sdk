@@ -8,7 +8,7 @@ import Bls12381G2KeyPairDock2022 from './Bls12381G2KeyPairDock2022';
 import DockCryptoSignature from './common/DockCryptoSignature';
 
 /**
- * A BBSPlus signature suite for use with BLS12-381 Dock key pairs
+ * A BBS+ signature suite for use with BLS12-381 Dock key pairs
  */
 export default class Bls12381BBSSignatureDock2022 extends DockCryptoSignature {
   /**

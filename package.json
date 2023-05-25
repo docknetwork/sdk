@@ -17,6 +17,7 @@
     "@babel/preset-env": "^7.15.6",
     "@comunica/actor-init-sparql-rdfjs": "^1.22.3",
     "@comunica/types": "^1.0.0",
+    "@docknetwork/crypto-wasm": "^0.18.0",
     "@polkadot/x-bigint": "10.1.11",
     "@polkadot/x-bundle": "10.1.11",
     "@polkadot/x-global": "10.1.11",
@@ -106,8 +107,7 @@
     "@polkadot/x-randomvalues": "10.1.11"
   },
   "dependencies": {
-    "@docknetwork/crypto-wasm": "^0.18.0",
-    "@docknetwork/crypto-wasm-ts": "^0.33.2",
+    "@docknetwork/crypto-wasm-ts": "^0.33.3",
     "@docknetwork/node-types": "^0.16.0",
     "@juanelas/base64": "^1.0.5",
     "@polkadot/api": "9.7.1",

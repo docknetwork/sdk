@@ -279,6 +279,327 @@ a provided proof is malformed.
     
 
     
+    <h4 class="name" id="adaptKey"><span class="type-signature"></span>adaptKey<span class="signature">(key, msgCount)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Attempts to adapt supplied key for the `msgCount` messages.
+Throws an error if `msgCount` is greater than the supported message count.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>msgCount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_Bls12381PSKeyPairDock2023.js.html">utils/vc/crypto/Bls12381PSKeyPairDock2023.js</a>, <a href="utils_vc_crypto_Bls12381PSKeyPairDock2023.js.html#line25">line 25</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="adaptKey"><span class="type-signature"></span>adaptKey<span class="signature">(key, _msgCount)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Adapts the provided public or secret key for the given message count.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>_msgCount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_common_DockCryptoKeyPair.js.html">utils/vc/crypto/common/DockCryptoKeyPair.js</a>, <a href="utils_vc_crypto_common_DockCryptoKeyPair.js.html#line164">line 164</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="addAttributeToReveal"><span class="type-signature"></span>addAttributeToReveal<span class="signature">(credentialIndex, attributes)</span><span class="type-signature"></span></h4>
     
 
@@ -403,7 +724,7 @@ a provided proof is malformed.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="bbs-plus-presentation.js.html">bbs-plus-presentation.js</a>, <a href="bbs-plus-presentation.js.html#line29">line 29</a>
+        <a href="presentation.js.html">presentation.js</a>, <a href="presentation.js.html#line57">line 57</a>
     </li></ul></dd>
     
 
@@ -553,7 +874,7 @@ a provided proof is malformed.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="bbs-plus-presentation.js.html">bbs-plus-presentation.js</a>, <a href="bbs-plus-presentation.js.html#line57">line 57</a>
+        <a href="presentation.js.html">presentation.js</a>, <a href="presentation.js.html#line88">line 88</a>
     </li></ul></dd>
     
 
@@ -752,7 +1073,7 @@ a provided proof is malformed.
 
 
 <div class="description">
-    Add new BBS+ params.
+    Add new signature params.
 </div>
 
 
@@ -799,7 +1120,7 @@ a provided proof is malformed.
 
             
 
-            <td class="description last">The BBS+ params to add.</td>
+            <td class="description last">The signature params to add.</td>
         </tr>
 
     
@@ -967,7 +1288,7 @@ using this</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line130">line 130</a>
+        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line136">line 136</a>
     </li></ul></dd>
     
 
@@ -1619,7 +1940,7 @@ using this</td>
 
 
 <div class="description">
-    Add a BBS+ public key
+    Add a public key
 </div>
 
 
@@ -1666,7 +1987,7 @@ using this</td>
 
             
 
-            <td class="description last">BBS+ public key to add.</td>
+            <td class="description last">public key to add.</td>
         </tr>
 
     
@@ -1852,7 +2173,7 @@ using this</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_bbs-plus.js.html">modules/bbs-plus.js</a>, <a href="modules_bbs-plus.js.html#line122">line 122</a>
+        <a href="modules_offchain-signatures.js.html">modules/offchain-signatures.js</a>, <a href="modules_offchain-signatures.js.html#line192">line 192</a>
     </li></ul></dd>
     
 
@@ -3098,7 +3419,7 @@ each document.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line170">line 170</a>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line182">line 182</a>
     </li></ul></dd>
     
 
@@ -3246,7 +3567,7 @@ each document.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line84">line 84</a>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line92">line 92</a>
     </li></ul></dd>
     
 
@@ -3394,7 +3715,7 @@ each document.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line149">line 149</a>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line161">line 161</a>
     </li></ul></dd>
     
 
@@ -3542,7 +3863,7 @@ each document.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line113">line 113</a>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line121">line 121</a>
     </li></ul></dd>
     
 
@@ -4058,6 +4379,138 @@ which is true if the credential is not revoked and false otherwise. The `error` 
     
 
     
+    <h4 class="name" id="convertToPresentation"><span class="type-signature"></span>convertToPresentation<span class="signature">(document)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Converts a derived proof credential to the native presentation format
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>document</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_common_DockCryptoSignatureProof.js.html">utils/vc/crypto/common/DockCryptoSignatureProof.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignatureProof.js.html#line87">line 87</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="createAddParamsTx"><span class="type-signature">(async) </span>createAddParamsTx<span class="signature">(params, signerDid, keyPair, keyId, nonce, didModule)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
     
 
@@ -4245,7 +4698,7 @@ using this</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line94">line 94</a>
+        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line99">line 99</a>
     </li></ul></dd>
     
 
@@ -4825,7 +5278,7 @@ using this</td>
 
 
 <div class="description">
-    Create transaction to add a BBS+ public key
+    Create transaction to add a public key
 </div>
 
 
@@ -4872,7 +5325,7 @@ using this</td>
 
             
 
-            <td class="description last">BBS+ public key to add.</td>
+            <td class="description last">public key to add.</td>
         </tr>
 
     
@@ -5022,7 +5475,7 @@ using this</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_bbs-plus.js.html">modules/bbs-plus.js</a>, <a href="modules_bbs-plus.js.html#line82">line 82</a>
+        <a href="modules_offchain-signatures.js.html">modules/offchain-signatures.js</a>, <a href="modules_offchain-signatures.js.html#line123">line 123</a>
     </li></ul></dd>
     
 
@@ -6067,7 +6520,7 @@ accessible always, like in case of hardware wallet</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line232">line 232</a>
+        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line238">line 238</a>
     </li></ul></dd>
     
 
@@ -6129,7 +6582,7 @@ accessible always, like in case of hardware wallet</td>
 
 
 <div class="description">
-    Create bbs presentation
+    Create BBS+ presentation
 </div>
 
 
@@ -6217,7 +6670,7 @@ accessible always, like in case of hardware wallet</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="bbs-plus-presentation.js.html">bbs-plus-presentation.js</a>, <a href="bbs-plus-presentation.js.html#line39">line 39</a>
+        <a href="presentation.js.html">presentation.js</a>, <a href="presentation.js.html#line70">line 70</a>
     </li></ul></dd>
     
 
@@ -6367,7 +6820,7 @@ accessible always, like in case of hardware wallet</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line252">line 252</a>
+        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line258">line 258</a>
     </li></ul></dd>
     
 
@@ -6780,7 +7233,7 @@ using this</td>
 
 
 <div class="description">
-    Create transaction to remove BBS+ public key
+    Create transaction to remove public key
 </div>
 
 
@@ -6977,7 +7430,7 @@ using this</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_bbs-plus.js.html">modules/bbs-plus.js</a>, <a href="modules_bbs-plus.js.html#line101">line 101</a>
+        <a href="modules_offchain-signatures.js.html">modules/offchain-signatures.js</a>, <a href="modules_offchain-signatures.js.html#line157">line 157</a>
     </li></ul></dd>
     
 
@@ -7209,6 +7662,29 @@ using this</td>
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code></code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">labelBytes</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">bytes to be used for the params label</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -7246,7 +7722,7 @@ using this</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_Bls12381BBSSignatureDock2022.js.html">utils/vc/crypto/Bls12381BBSSignatureDock2022.js</a>, <a href="utils_vc_crypto_Bls12381BBSSignatureDock2022.js.html#line81">line 81</a>
+        <a href="utils_vc_crypto_common_DockCryptoSignature.js.html">utils/vc/crypto/common/DockCryptoSignature.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignature.js.html#line80">line 80</a>
     </li></ul></dd>
     
 
@@ -9578,7 +10054,7 @@ cannot be found.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_helpers.js.html">utils/vc/helpers.js</a>, <a href="utils_vc_helpers.js.html#line87">line 87</a>
+        <a href="utils_vc_helpers.js.html">utils/vc/helpers.js</a>, <a href="utils_vc_helpers.js.html#line103">line 103</a>
     </li></ul></dd>
     
 
@@ -10937,7 +11413,7 @@ types only require validating the byte size.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_custom-linkeddatasignature.js.html">utils/vc/crypto/custom-linkeddatasignature.js</a>, <a href="utils_vc_crypto_custom-linkeddatasignature.js.html#line132">line 132</a>
+        <a href="utils_vc_crypto_common_CustomLinkedDataSignature.js.html">utils/vc/crypto/common/CustomLinkedDataSignature.js</a>, <a href="utils_vc_crypto_common_CustomLinkedDataSignature.js.html#line132">line 132</a>
     </li></ul></dd>
     
 
@@ -11432,6 +11908,254 @@ generate the instance correct subclass
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="signatures_signature.js.html">signatures/signature.js</a>, <a href="signatures_signature.js.html#line35">line 35</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="generate"><span class="type-signature"></span>generate<span class="signature">(options)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Generates new keypair using provided options.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>seed</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>controller</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>msgCount</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_common_DockCryptoKeyPair.js.html">utils/vc/crypto/common/DockCryptoKeyPair.js</a>, <a href="utils_vc_crypto_common_DockCryptoKeyPair.js.html#line50">line 50</a>
     </li></ul></dd>
     
 
@@ -12840,7 +13564,7 @@ Field `accumulated` contains the current accumulated value.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_bbs-plus.js.html">modules/bbs-plus.js</a>, <a href="modules_bbs-plus.js.html#line45">line 45</a>
+        <a href="modules_offchain-signatures.js.html">modules/offchain-signatures.js</a>, <a href="modules_offchain-signatures.js.html#line68">line 68</a>
     </li></ul></dd>
     
 
@@ -14945,7 +15669,7 @@ it using HTTP or will throw error if cannot get.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_bbs-plus.js.html">modules/bbs-plus.js</a>, <a href="modules_bbs-plus.js.html#line28">line 28</a>
+        <a href="modules_offchain-signatures.js.html">modules/offchain-signatures.js</a>, <a href="modules_offchain-signatures.js.html#line51">line 51</a>
     </li></ul></dd>
     
 
@@ -15331,7 +16055,7 @@ or params were not found on chain which can happen if they were deleted after th
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line194">line 194</a>
+        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line200">line 200</a>
     </li></ul></dd>
     
 
@@ -15827,7 +16551,7 @@ or params were not found on chain which can happen if they were deleted after th
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_helpers.js.html">utils/vc/helpers.js</a>, <a href="utils_vc_helpers.js.html#line43">line 43</a>
+        <a href="utils_vc_helpers.js.html">utils/vc/helpers.js</a>, <a href="utils_vc_helpers.js.html#line53">line 53</a>
     </li></ul></dd>
     
 
@@ -16443,612 +17167,6 @@ not provided in the extrinsic.
     
 
     
-    <h4 class="name" id="getVerificationMethod"><span class="type-signature">(async) </span>getVerificationMethod<span class="signature">(document, proof, documentLoader, expansionMap)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>document</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">to be signed.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>proof</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>documentLoader</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>expansionMap</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_Bls12381BBSSignatureDock2022.js.html">utils/vc/crypto/Bls12381BBSSignatureDock2022.js</a>, <a href="utils_vc_crypto_Bls12381BBSSignatureDock2022.js.html#line157">line 157</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getVerificationMethod"><span class="type-signature">(async) </span>getVerificationMethod<span class="signature">(document, proof, documentLoader, expansionMap)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>document</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">to be signed.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>proof</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>documentLoader</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>expansionMap</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_Bls12381BBSSignatureDock2022.js.html">utils/vc/crypto/Bls12381BBSSignatureDock2022.js</a>, <a href="utils_vc_crypto_Bls12381BBSSignatureDock2022.js.html#line196">line 196</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getVerificationMethod"><span class="type-signature">(async) </span>getVerificationMethod<span class="signature">(document, proof, documentLoader, expansionMap)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>document</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">to be signed.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>proof</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>documentLoader</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>expansionMap</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_Bls12381BBSSignatureProofDock2022.js.html">utils/vc/crypto/Bls12381BBSSignatureProofDock2022.js</a>, <a href="utils_vc_crypto_Bls12381BBSSignatureProofDock2022.js.html#line129">line 129</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id="getVerificationMethod"><span class="type-signature">(async) </span>getVerificationMethod<span class="signature">(document, proof, documentLoader)</span><span class="type-signature"></span></h4>
     
 
@@ -17193,6 +17311,612 @@ not provided in the extrinsic.
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="utils_vc_crypto_JsonWebSignature2020.js.html">utils/vc/crypto/JsonWebSignature2020.js</a>, <a href="utils_vc_crypto_JsonWebSignature2020.js.html#line75">line 75</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getVerificationMethod"><span class="type-signature">(async) </span>getVerificationMethod<span class="signature">(document, proof, documentLoader, expansionMap)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>document</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">to be signed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>proof</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>documentLoader</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>expansionMap</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_common_DockCryptoSignature.js.html">utils/vc/crypto/common/DockCryptoSignature.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignature.js.html#line178">line 178</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getVerificationMethod"><span class="type-signature">(async) </span>getVerificationMethod<span class="signature">(document, proof, documentLoader, expansionMap)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>document</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">to be signed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>proof</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>documentLoader</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>expansionMap</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_common_DockCryptoSignature.js.html">utils/vc/crypto/common/DockCryptoSignature.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignature.js.html#line217">line 217</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getVerificationMethod"><span class="type-signature">(async) </span>getVerificationMethod<span class="signature">(document, proof, documentLoader, expansionMap)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>document</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">to be signed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>proof</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>documentLoader</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>expansionMap</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_common_DockCryptoSignatureProof.js.html">utils/vc/crypto/common/DockCryptoSignatureProof.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignatureProof.js.html#line131">line 131</a>
     </li></ul></dd>
     
 
@@ -18756,7 +19480,7 @@ Warning, setting forceRevocationCheck to false can allow false positives when ve
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line338">line 338</a>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line373">line 373</a>
     </li></ul></dd>
     
 
@@ -19767,7 +20491,7 @@ of a DID and a positive number starting from 1.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line65">line 65</a>
+        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line70">line 70</a>
     </li></ul></dd>
     
 
@@ -19953,7 +20677,7 @@ of a DID and a positive number starting from 1.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line16">line 16</a>
+        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line21">line 21</a>
     </li></ul></dd>
     
 
@@ -20139,7 +20863,7 @@ of a DID and a positive number starting from 1.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line41">line 41</a>
+        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line46">line 46</a>
     </li></ul></dd>
     
 
@@ -21498,7 +22222,7 @@ using this</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line148">line 148</a>
+        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line154">line 154</a>
     </li></ul></dd>
     
 
@@ -21739,7 +22463,7 @@ using this</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line111">line 111</a>
+        <a href="modules_WithParamsAndPublicKeys.js.html">modules/WithParamsAndPublicKeys.js</a>, <a href="modules_WithParamsAndPublicKeys.js.html#line117">line 117</a>
     </li></ul></dd>
     
 
@@ -22078,7 +22802,7 @@ using this</td>
 
 
 <div class="description">
-    Remove BBS+ public key
+    Remove public key
 </div>
 
 
@@ -22311,7 +23035,7 @@ using this</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_bbs-plus.js.html">modules/bbs-plus.js</a>, <a href="modules_bbs-plus.js.html#line141">line 141</a>
+        <a href="modules_offchain-signatures.js.html">modules/offchain-signatures.js</a>, <a href="modules_offchain-signatures.js.html#line227">line 227</a>
     </li></ul></dd>
     
 
@@ -23850,7 +24574,7 @@ LinkedDataSignature.createProof().
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_custom-linkeddatasignature.js.html">utils/vc/crypto/custom-linkeddatasignature.js</a>, <a href="utils_vc_crypto_custom-linkeddatasignature.js.html#line84">line 84</a>
+        <a href="utils_vc_crypto_common_CustomLinkedDataSignature.js.html">utils/vc/crypto/common/CustomLinkedDataSignature.js</a>, <a href="utils_vc_crypto_common_CustomLinkedDataSignature.js.html#line84">line 84</a>
     </li></ul></dd>
     
 
@@ -24019,7 +24743,7 @@ LinkedDataSignature.createProof().
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_bbs-plus.js.html">modules/bbs-plus.js</a>, <a href="modules_bbs-plus.js.html#line170">line 170</a>
+        <a href="modules_offchain-signatures.js.html">modules/offchain-signatures.js</a>, <a href="modules_offchain-signatures.js.html#line290">line 290</a>
     </li></ul></dd>
     
 
@@ -24183,7 +24907,7 @@ LinkedDataSignature.createProof().
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_bbs-plus.js.html">modules/bbs-plus.js</a>, <a href="modules_bbs-plus.js.html#line181">line 181</a>
+        <a href="modules_offchain-signatures.js.html">modules/offchain-signatures.js</a>, <a href="modules_offchain-signatures.js.html#line305">line 305</a>
     </li></ul></dd>
     
 
@@ -24289,7 +25013,7 @@ LinkedDataSignature.createProof().
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_Bls12381G2KeyPairDock2022.js.html">utils/vc/crypto/Bls12381G2KeyPairDock2022.js</a>, <a href="utils_vc_crypto_Bls12381G2KeyPairDock2022.js.html#line111">line 111</a>
+        <a href="utils_vc_crypto_common_DockCryptoKeyPair.js.html">utils/vc/crypto/common/DockCryptoKeyPair.js</a>, <a href="utils_vc_crypto_common_DockCryptoKeyPair.js.html#line173">line 173</a>
     </li></ul></dd>
     
 
@@ -24347,7 +25071,7 @@ LinkedDataSignature.createProof().
     
 
     
-    <h4 class="name" id="signerFactory"><span class="type-signature"></span>signerFactory<span class="signature">(keypair)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    <h4 class="name" id="signerFactory"><span class="type-signature"></span>signerFactory<span class="signature">(keypair, verificationMethod)</span><span class="type-signature"> &rarr; {object}</span></h4>
     
 
     
@@ -24406,6 +25130,24 @@ LinkedDataSignature.createProof().
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>verificationMethod</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -24443,7 +25185,343 @@ LinkedDataSignature.createProof().
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_Bls12381BBSSignatureDock2022.js.html">utils/vc/crypto/Bls12381BBSSignatureDock2022.js</a>, <a href="utils_vc_crypto_Bls12381BBSSignatureDock2022.js.html#line205">line 205</a>
+        <a href="utils_vc_crypto_EcdsaSepc256k1Signature2019.js.html">utils/vc/crypto/EcdsaSepc256k1Signature2019.js</a>, <a href="utils_vc_crypto_EcdsaSepc256k1Signature2019.js.html#line35">line 35</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="signerFactory"><span class="type-signature"></span>signerFactory<span class="signature">(keypair, verificationMethod)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Generate object with `sign` method
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>keypair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>verificationMethod</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_Ed25519Signature2018.js.html">utils/vc/crypto/Ed25519Signature2018.js</a>, <a href="utils_vc_crypto_Ed25519Signature2018.js.html#line33">line 33</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="signerFactory"><span class="type-signature"></span>signerFactory<span class="signature">(keypair, verificationMethod)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Generate object with `sign` method
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>keypair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>verificationMethod</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_Sr25519Signature2020.js.html">utils/vc/crypto/Sr25519Signature2020.js</a>, <a href="utils_vc_crypto_Sr25519Signature2020.js.html#line34">line 34</a>
     </li></ul></dd>
     
 
@@ -24593,7 +25671,7 @@ LinkedDataSignature.createProof().
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_EcdsaSepc256k1Signature2019.js.html">utils/vc/crypto/EcdsaSepc256k1Signature2019.js</a>, <a href="utils_vc_crypto_EcdsaSepc256k1Signature2019.js.html#line34">line 34</a>
+        <a href="utils_vc_crypto_common_DockCryptoKeyPair.js.html">utils/vc/crypto/common/DockCryptoKeyPair.js</a>, <a href="utils_vc_crypto_common_DockCryptoKeyPair.js.html#line69">line 69</a>
     </li></ul></dd>
     
 
@@ -24647,7 +25725,7 @@ LinkedDataSignature.createProof().
     
 
     
-    <h4 class="name" id="signerFactory"><span class="type-signature"></span>signerFactory<span class="signature">(keypair)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    <h4 class="name" id="signerFactory"><span class="type-signature"></span>signerFactory<span class="signature">(keypair, verificationMethod)</span><span class="type-signature"> &rarr; {object}</span></h4>
     
 
     
@@ -24706,142 +25784,10 @@ LinkedDataSignature.createProof().
         </tr>
 
     
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_Ed25519Signature2018.js.html">utils/vc/crypto/Ed25519Signature2018.js</a>, <a href="utils_vc_crypto_Ed25519Signature2018.js.html#line32">line 32</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">object</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="signerFactory"><span class="type-signature"></span>signerFactory<span class="signature">(keypair)</span><span class="type-signature"> &rarr; {object}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Generate object with `sign` method
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
 
         <tr>
             
-                <td class="name"><code>keypair</code></td>
+                <td class="name"><code>verificationMethod</code></td>
             
 
             <td class="type">
@@ -24893,7 +25839,7 @@ LinkedDataSignature.createProof().
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_Sr25519Signature2020.js.html">utils/vc/crypto/Sr25519Signature2020.js</a>, <a href="utils_vc_crypto_Sr25519Signature2020.js.html#line33">line 33</a>
+        <a href="utils_vc_crypto_common_DockCryptoSignature.js.html">utils/vc/crypto/common/DockCryptoSignature.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignature.js.html#line230">line 230</a>
     </li></ul></dd>
     
 
@@ -25418,7 +26364,7 @@ LinkedDataSignature.createProof().
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line205">line 205</a>
+        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line232">line 232</a>
     </li></ul></dd>
     
 
@@ -25586,7 +26532,7 @@ LinkedDataSignature.createProof().
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_bbs-plus.js.html">modules/bbs-plus.js</a>, <a href="modules_bbs-plus.js.html#line192">line 192</a>
+        <a href="modules_offchain-signatures.js.html">modules/offchain-signatures.js</a>, <a href="modules_offchain-signatures.js.html#line320">line 320</a>
     </li></ul></dd>
     
 
@@ -25750,7 +26696,7 @@ LinkedDataSignature.createProof().
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_bbs-plus.js.html">modules/bbs-plus.js</a>, <a href="modules_bbs-plus.js.html#line203">line 203</a>
+        <a href="modules_offchain-signatures.js.html">modules/offchain-signatures.js</a>, <a href="modules_offchain-signatures.js.html#line335">line 335</a>
     </li></ul></dd>
     
 
@@ -30069,116 +31015,6 @@ schema `schema`
     
 
     
-    <h4 class="name" id="verifier"><span class="type-signature"></span>verifier<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Returns a verifier object for use with jsonld-signatures.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_Bls12381G2KeyPairDock2022.js.html">utils/vc/crypto/Bls12381G2KeyPairDock2022.js</a>, <a href="utils_vc_crypto_Bls12381G2KeyPairDock2022.js.html#line120">line 120</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    Used to verify jsonld-signatures.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id="verifier"><span class="type-signature"></span>verifier<span class="signature">()</span><span class="type-signature"> &rarr; {object}</span></h4>
     
 
@@ -30480,6 +31316,116 @@ schema `schema`
     <dd>
         
 <span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="verifier"><span class="type-signature"></span>verifier<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Returns a verifier object for use with jsonld-signatures.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_common_DockCryptoKeyPair.js.html">utils/vc/crypto/common/DockCryptoKeyPair.js</a>, <a href="utils_vc_crypto_common_DockCryptoKeyPair.js.html#line182">line 182</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Used to verify jsonld-signatures.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
 
 
     </dd>
@@ -30947,6 +31893,156 @@ schema `schema`
     
 
     
+    <h4 class="name" id="verifierFactory"><span class="type-signature"></span>verifierFactory<span class="signature">(keypair)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Generate object with `verify` method
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>keypair</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_common_DockCryptoKeyPair.js.html">utils/vc/crypto/common/DockCryptoKeyPair.js</a>, <a href="utils_vc_crypto_common_DockCryptoKeyPair.js.html#line114">line 114</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="verifyCredential"><span class="type-signature"></span>verifyCredential<span class="signature">(vcJSONorString<span class="signature-attributes">opt</span>, options)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
     
 
@@ -31091,7 +32187,7 @@ schema `schema`
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line204">line 204</a>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line216">line 216</a>
     </li></ul></dd>
     
 
@@ -32057,7 +33153,7 @@ and hashed before verifying</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line109">line 109</a>
+        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line129">line 129</a>
     </li></ul></dd>
     
 
@@ -32567,7 +33663,7 @@ describe the error if any.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_custom-linkeddatasignature.js.html">utils/vc/crypto/custom-linkeddatasignature.js</a>, <a href="utils_vc_crypto_custom-linkeddatasignature.js.html#line39">line 39</a>
+        <a href="utils_vc_crypto_common_CustomLinkedDataSignature.js.html">utils/vc/crypto/common/CustomLinkedDataSignature.js</a>, <a href="utils_vc_crypto_common_CustomLinkedDataSignature.js.html#line39">line 39</a>
     </li></ul></dd>
     
 
@@ -33092,7 +34188,7 @@ describe the error if any.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_helpers.js.html">utils/vc/helpers.js</a>, <a href="utils_vc_helpers.js.html#line11">line 11</a>
+        <a href="utils_vc_helpers.js.html">utils/vc/helpers.js</a>, <a href="utils_vc_helpers.js.html#line21">line 21</a>
     </li></ul></dd>
     
 
@@ -33991,7 +35087,7 @@ as we support more APIs there are more details associated with each API. Only Do
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line176">line 176</a>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line188">line 188</a>
     </li></ul></dd>
     
 
@@ -34440,7 +35536,7 @@ as we support more APIs there are more details associated with each API. Only Do
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line81">line 81</a>
+        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line101">line 101</a>
     </li></ul></dd>
     
 
@@ -34512,7 +35608,7 @@ as we support more APIs there are more details associated with each API. Only Do
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line24">line 24</a>
+        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line38">line 38</a>
     </li></ul></dd>
     
 
@@ -34763,13 +35859,13 @@ as we support more APIs there are more details associated with each API. Only Do
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="NoOffchainDIDError.html">NoOffchainDIDError</a></li><li><a href="NoOnchainDIDError.html">NoOnchainDIDError</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="setApi.html">setApi</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#addAttributeToReveal">addAttributeToReveal</a></li><li><a href="global.html#addCredentialToPresent">addCredentialToPresent</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#addParams">addParams</a></li><li><a href="global.html#addPositiveAccumulator">addPositiveAccumulator</a></li><li><a href="global.html#addPublicKey">addPublicKey</a></li><li><a href="global.html#addUniversalAccumulator">addUniversalAccumulator</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#bytesToWrappedBytes">bytesToWrappedBytes</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#claimgraphToStore">claimgraphToStore</a></li><li><a href="global.html#controllerIds">controllerIds</a></li><li><a href="global.html#createAddParamsTx">createAddParamsTx</a></li><li><a href="global.html#createAddPositiveAccumulatorTx">createAddPositiveAccumulatorTx</a></li><li><a href="global.html#createAddPublicKeyTx">createAddPublicKeyTx</a></li><li><a href="global.html#createAddUniversalAccumulatorTx">createAddUniversalAccumulatorTx</a></li><li><a href="global.html#createDidKey">createDidKey</a></li><li><a href="global.html#createDidSig">createDidSig</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createParamsObjFromChainResponse">createParamsObjFromChainResponse</a></li><li><a href="global.html#createPresentation">createPresentation</a></li><li><a href="global.html#createPublicKeyObjFromChainResponse">createPublicKeyObjFromChainResponse</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createRemovePublicKeyTx">createRemovePublicKeyTx</a></li><li><a href="global.html#createVerifyData">createVerifyData</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#dereferenceFromIPFS">dereferenceFromIPFS</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureArray">ensureArray</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromJsigProofValue">fromJsigProofValue</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccumulator">getAccumulator</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAllParamsByDid">getAllParamsByDid</a></li><li><a href="global.html#getAllPublicKeysByDid">getAllPublicKeysByDid</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatuses">getCredentialStatuses</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getLastParamsWritten">getLastParamsWritten</a></li><li><a href="global.html#getNonce">getNonce</a></li><li><a href="global.html#getPublicKey">getPublicKey</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#getUpdatesFromBlock">getUpdatesFromBlock</a></li><li><a href="global.html#getVerificationMethod">getVerificationMethod</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#parseEventAsAccumulatorUpdate">parseEventAsAccumulatorUpdate</a></li><li><a href="global.html#parseRDFDocument">parseRDFDocument</a></li><li><a href="global.html#parseRef">parseRef</a></li><li><a href="global.html#prepareAddParameters">prepareAddParameters</a></li><li><a href="global.html#prepareAddPublicKey">prepareAddPublicKey</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#queryNextLookup">queryNextLookup</a></li><li><a href="global.html#removeAccumulator">removeAccumulator</a></li><li><a href="global.html#removeAccumulatorTx">removeAccumulatorTx</a></li><li><a href="global.html#removeParams">removeParams</a></li><li><a href="global.html#removeParamsTx">removeParamsTx</a></li><li><a href="global.html#removePublicKey">removePublicKey</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signAddParams">signAddParams</a></li><li><a href="global.html#signAddPublicKey">signAddPublicKey</a></li><li><a href="global.html#signer">signer</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signPrehashed">signPrehashed</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#signRemoveParams">signRemoveParams</a></li><li><a href="global.html#signRemovePublicKey">signRemovePublicKey</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toJsonldjsNode">toJsonldjsNode</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#updateAccumulator">updateAccumulator</a></li><li><a href="global.html#updateAccumulatorTx">updateAccumulatorTx</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateAddress">validateAddress</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyEcdsaSecp256k1SigPrehashed">verifyEcdsaSecp256k1SigPrehashed</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#verifySignature">verifySignature</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockAPI.html">DockAPI</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="NoOffchainDIDError.html">NoOffchainDIDError</a></li><li><a href="NoOnchainDIDError.html">NoOnchainDIDError</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="setApi.html">setApi</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#adaptKey">adaptKey</a></li><li><a href="global.html#addAttributeToReveal">addAttributeToReveal</a></li><li><a href="global.html#addCredentialToPresent">addCredentialToPresent</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#addParams">addParams</a></li><li><a href="global.html#addPositiveAccumulator">addPositiveAccumulator</a></li><li><a href="global.html#addPublicKey">addPublicKey</a></li><li><a href="global.html#addUniversalAccumulator">addUniversalAccumulator</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#bytesToWrappedBytes">bytesToWrappedBytes</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationStatus">checkRevocationStatus</a></li><li><a href="global.html#claimgraphToStore">claimgraphToStore</a></li><li><a href="global.html#controllerIds">controllerIds</a></li><li><a href="global.html#convertToPresentation">convertToPresentation</a></li><li><a href="global.html#createAddParamsTx">createAddParamsTx</a></li><li><a href="global.html#createAddPositiveAccumulatorTx">createAddPositiveAccumulatorTx</a></li><li><a href="global.html#createAddPublicKeyTx">createAddPublicKeyTx</a></li><li><a href="global.html#createAddUniversalAccumulatorTx">createAddUniversalAccumulatorTx</a></li><li><a href="global.html#createDidKey">createDidKey</a></li><li><a href="global.html#createDidSig">createDidSig</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createParamsObjFromChainResponse">createParamsObjFromChainResponse</a></li><li><a href="global.html#createPresentation">createPresentation</a></li><li><a href="global.html#createPublicKeyObjFromChainResponse">createPublicKeyObjFromChainResponse</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createRemovePublicKeyTx">createRemovePublicKeyTx</a></li><li><a href="global.html#createVerifyData">createVerifyData</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#dereferenceFromIPFS">dereferenceFromIPFS</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureArray">ensureArray</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromJsigProofValue">fromJsigProofValue</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generate">generate</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccumulator">getAccumulator</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAllParamsByDid">getAllParamsByDid</a></li><li><a href="global.html#getAllPublicKeysByDid">getAllPublicKeysByDid</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatuses">getCredentialStatuses</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getLastParamsWritten">getLastParamsWritten</a></li><li><a href="global.html#getNonce">getNonce</a></li><li><a href="global.html#getPublicKey">getPublicKey</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#getUpdatesFromBlock">getUpdatesFromBlock</a></li><li><a href="global.html#getVerificationMethod">getVerificationMethod</a></li><li><a href="global.html#hasDockRevocation">hasDockRevocation</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRevocationCheckNeeded">isRevocationCheckNeeded</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#parseEventAsAccumulatorUpdate">parseEventAsAccumulatorUpdate</a></li><li><a href="global.html#parseRDFDocument">parseRDFDocument</a></li><li><a href="global.html#parseRef">parseRef</a></li><li><a href="global.html#prepareAddParameters">prepareAddParameters</a></li><li><a href="global.html#prepareAddPublicKey">prepareAddPublicKey</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#queryNextLookup">queryNextLookup</a></li><li><a href="global.html#removeAccumulator">removeAccumulator</a></li><li><a href="global.html#removeAccumulatorTx">removeAccumulatorTx</a></li><li><a href="global.html#removeParams">removeParams</a></li><li><a href="global.html#removeParamsTx">removeParamsTx</a></li><li><a href="global.html#removePublicKey">removePublicKey</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signAddParams">signAddParams</a></li><li><a href="global.html#signAddPublicKey">signAddPublicKey</a></li><li><a href="global.html#signer">signer</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signPrehashed">signPrehashed</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#signRemoveParams">signRemoveParams</a></li><li><a href="global.html#signRemovePublicKey">signRemovePublicKey</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toJsonldjsNode">toJsonldjsNode</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#updateAccumulator">updateAccumulator</a></li><li><a href="global.html#updateAccumulatorTx">updateAccumulatorTx</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateAddress">validateAddress</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyEcdsaSecp256k1SigPrehashed">verifyEcdsaSecp256k1SigPrehashed</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#verifySignature">verifySignature</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Thu Apr 13 2023 00:12:05 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Fri May 26 2023 12:41:44 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

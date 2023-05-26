@@ -1,7 +1,7 @@
 import jsigs from 'jsonld-signatures';
 import base58btc from 'bs58';
 import base64url from 'base64url';
-import { createJws } from '../jws';
+import { createJws } from '../../jws';
 
 const MULTIBASE_BASE58BTC_HEADER = 'z';
 

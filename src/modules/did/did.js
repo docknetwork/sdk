@@ -732,7 +732,7 @@ class DIDModule {
    * @return {Promise<object>} The DID document.
    */
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  async getDocument(did, { getBbsPlusSigKeys = true } = {}) {
+  async getDocument(did, { getOffchainSigKeys = true } = {}) {
     const hexId = getHexIdentifierFromDID(did);
     let didDetails = await this.getOnchainDidDetail(hexId);
     didDetails = didDetails.data || didDetails;
@@ -830,42 +830,79 @@ class DIDModule {
       });
     }
 
-    if (getBbsPlusSigKeys === true) {
+    if (getOffchainSigKeys === true) {
       const { lastKeyId } = didDetails;
 
       // If any keys should be fetched
       if (lastKeyId > keys.length) {
         // key id can be anything from 1 to `lastKeyId`
-        const possibleBbsPlusKeyIds = new Set();
+        const possibleKeyIds = new Set();
         for (let i = 1; i <= lastKeyId; i++) {
-          possibleBbsPlusKeyIds.add(i);
+          possibleKeyIds.add(i);
         }
         // Remove key ids already seen as non-BBS+
         for (const [i] of keys) {
-          possibleBbsPlusKeyIds.delete(i);
+          possibleKeyIds.delete(i);
         }
 
         // Query all BBS+ keys in a single RPC call to the node.
         const queryKeys = [];
-        for (const k of possibleBbsPlusKeyIds) {
+        for (const k of possibleKeyIds) {
           queryKeys.push([hexId, k]);
         }
-        const resp = await this.api.query.bbsPlus.bbsPlusKeys.multi(queryKeys);
+        if (this.api.query.offchainSignatures != null) {
+          const resp = await this.api.query.offchainSignatures.publicKeys.multi(queryKeys);
 
-        let currentIter = 0;
-        for (const r of resp) {
-          // The gaps in `keyId` might correspond to removed keys
-          if (r.isSome) {
-            // Don't care about signature params for now
-            const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(r.unwrap());
-            if (pkObj.curveType !== 'Bls12381') {
-              throw new Error(`Curve type should have been Bls12381 but was ${pkObj.curveType}`);
+          let currentIter = 0;
+          for (let r of resp) {
+            // The gaps in `keyId` might correspond to removed keys
+            if (r.isSome) {
+              let rawKey; let
+                keyType;
+              r = r.unwrap();
+
+              if (r.isBbs) {
+                keyType = 'Bls12381BBSVerificationKeyDock2023';
+                rawKey = r.asBbs;
+              } else if (r.isBbsPlus) {
+                keyType = 'Bls12381G2VerificationKeyDock2022';
+                rawKey = r.asBbsPlus;
+              } else if (r.isPs) {
+                keyType = 'Bls12381PSVerificationKeyDock2023';
+                rawKey = r.asPs;
+              }
+              // Don't care about signature params for now
+              const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(rawKey);
+              if (pkObj.curveType !== 'Bls12381') {
+                throw new Error(`Curve type should have been Bls12381 but was ${pkObj.curveType}`);
+              }
+              const keyIndex = queryKeys[currentIter][1];
+              keys.push([keyIndex, keyType, hexToU8a(pkObj.bytes)]);
+              assertion.push(keyIndex);
             }
-            const keyIndex = queryKeys[currentIter][1];
-            keys.push([keyIndex, 'Bls12381G2VerificationKeyDock2022', hexToU8a(pkObj.bytes)]);
-            assertion.push(keyIndex);
+            currentIter++;
           }
-          currentIter++;
+        } else {
+          const resp = await this.api.query.bbsPlus.bbsPlusKeys.multi(queryKeys);
+
+          let currentIter = 0;
+          for (const r of resp) {
+            // The gaps in `keyId` might correspond to removed keys
+            if (r.isSome) {
+              const keyType = 'Bls12381G2VerificationKeyDock2022';
+              const rawKey = r.unwrap();
+
+              // Don't care about signature params for now
+              const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(rawKey);
+              if (pkObj.curveType !== 'Bls12381') {
+                throw new Error(`Curve type should have been Bls12381 but was ${pkObj.curveType}`);
+              }
+              const keyIndex = queryKeys[currentIter][1];
+              keys.push([keyIndex, keyType, hexToU8a(pkObj.bytes)]);
+              assertion.push(keyIndex);
+            }
+            currentIter++;
+          }
         }
       }
     }

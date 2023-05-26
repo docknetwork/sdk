@@ -330,7 +330,7 @@ testingKeys.forEach((testKey) => {
       const sampleIssuedCredential = await issueCredential(testKey.keyDocument, getSampleCredential());
       presentationCredentials = [sampleIssuedCredential, sampleIssuedCredential];
     });
-    
+
     test('VP creation with only id should be possible, yet bring default values', async () => {
       const vp = new VerifiablePresentation(sampleId);
       expect(vp.id).toBe(sampleId);

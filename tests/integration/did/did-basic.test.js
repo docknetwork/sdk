@@ -92,10 +92,10 @@ describe('Basic DID tests', () => {
     check(doc);
 
     // The same checks should pass when passing the flag for BBS+ keys
-    const doc1 = await dock.did.getDocument(dockDid, { getBbsPlusSigKeys: false });
+    const doc1 = await dock.did.getDocument(dockDid, { getOffchainSigKeys: false });
     check(doc1);
 
-    const doc2 = await dock.did.getDocument(dockDid, { getBbsPlusSigKeys: true });
+    const doc2 = await dock.did.getDocument(dockDid, { getOffchainSigKeys: true });
     check(doc2);
   }, 10000);
 

@@ -13,6 +13,7 @@
     "sourceType": "module"
   },
   "rules": {
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
     "no-use-before-define": [
       "error",
       {

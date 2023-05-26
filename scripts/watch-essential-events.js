@@ -164,9 +164,9 @@ const main = async (dock, startBlock) => {
  *
  * @param {startBlock?} - initial sync block
  * @param {Observable<Block>} - blocks
- * @returns {Observable<{skipped: Set<number>, maxReceived: number, block: Block}>}
+ * @returns {Observable<{maxSeqProcessed: number, maxReceived: number, block: Block}>}
  */
-const trackSkipped = curry((startBlock, blocks$) => {
+const trackSeqProcessed = curry((startBlock, blocks$) => {
   const skipped = new Set();
   let maxReceived = startBlock != null ? (startBlock || 1) - 1 : null;
 
@@ -194,8 +194,9 @@ const trackSkipped = curry((startBlock, blocks$) => {
         skipped.add(i);
       }
       maxReceived = max(received, maxReceived);
+      const maxSeqProcessed = reduce(min, maxReceived, [...skipped]);
 
-      return { maxReceived, block, skipped };
+      return { maxReceived, maxSeqProcessed, block };
     })
   );
 });
@@ -219,12 +220,9 @@ const processBlocks = (dock, startBlock) => {
     return data$.pipe(mergeMap((item) => handleItem(item, dock)));
   });
 
-  // Denotes the set of currently processed blocks.
-  const processing = new Set();
-
   return subscribeBlocks(dock, startBlock).pipe(
-    trackSkipped(startBlock),
-    mergeMap(({ block, skipped, maxReceived }) => {
+    trackSeqProcessed(startBlock),
+    mergeMap(({ block, maxSeqProcessed }) => {
       // Flattens extrinsics returning transaction along with produced events
       const txs$ = from(
         block.extrinsics.flatMap(({ extrinsic, events }) => {
@@ -269,19 +267,32 @@ const processBlocks = (dock, startBlock) => {
       const number = block.block.header.number.toNumber();
 
       return concat(
-        defer(() => {
-          processing.add(number);
-
-          return of(reduce(min, number, [...skipped, ...processing]));
-        }),
+        of({ maxSeqProcessed, number, state: 0 }),
         handleBlock$.pipe(tap(console.log), filterRx(F)),
-        defer(() => {
-          processing.delete(number);
-
-          return of(reduce(min, maxReceived + 1, [...skipped, ...processing]));
-        })
+        of({ number, state: 1 })
       );
-    })
+    }),
+    scan(
+      (
+        { minUnprocessed, maxReceived, processing },
+        { maxSeqProcessed = minUnprocessed, number, state }
+      ) => {
+        if (!state) processing.add(number);
+        else processing.delete(number);
+
+        return {
+          minUnprocessed: reduce(min, maxSeqProcessed, [...processing]),
+          processing,
+          maxReceived: Math.max(maxReceived, number),
+        };
+      },
+      {
+        minUnprocessed: startBlock,
+        maxReceived: startBlock,
+        processing: new Set(),
+      }
+    ),
+    mapRx(prop("minUnprocessed"))
   );
 };
 
@@ -313,15 +324,16 @@ export const subscribeBlocks = curry((dock, startBlock) => {
     defer(() =>
       concat(
         previousBlocks$.pipe(
-          trackSkipped(startBlock),
+          trackSeqProcessed(startBlock),
           withLatestFrom(currentBlocks$),
           concatMap(
             ([
-              { block: latestSyncedBlock, skipped, maxReceived },
+              { block: latestSyncedBlock, maxSeqProcessed, maxReceived },
               currentBlock,
             ]) => {
               const curNumber = currentBlock.block.header.number.toNumber();
-              const done = curNumber === maxReceived && skipped.size === 0;
+              const done =
+                curNumber === maxReceived && maxSeqProcessed === maxReceived;
 
               if (done) {
                 return of(latestSyncedBlock, null);

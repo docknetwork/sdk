@@ -1,6 +1,6 @@
 // Helpers for scripts
 
-import { ApiPromise, WsProvider, Keyring } from "@polkadot/api";
+import { Keyring } from "@polkadot/api";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import { formatBalance } from "@polkadot/util";
 import { bufferCount, map as mapRx } from "rxjs/operators";
@@ -11,6 +11,8 @@ import {
   prop,
   when,
   isNil,
+  either,
+  equals,
   o,
   mapObjIndexed,
   curry,
@@ -304,3 +306,11 @@ export const withDockAPI = curry((params, fn) => async (...args) => {
     }
   }
 });
+
+/**
+ * Converts "true" and non-zero to `true`, other values to `false`.
+ *
+ * @param {*} value
+ * @returns {bool}
+ */
+export const parseBool = either(equals("true"), o(Boolean, Number));

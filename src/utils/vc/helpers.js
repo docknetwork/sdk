@@ -3,9 +3,19 @@ import { JsonWebKey } from '@transmute/json-web-signature';
 import defaultDocumentLoader from './document-loader';
 
 import {
-  EcdsaSecp256k1VerKeyName, Ed25519VerKeyName, Sr25519VerKeyName,
-  EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
-  Bls12381BBSSignatureDock2022, Bls12381BBSDockVerKeyName, JsonWebSignature2020,
+  EcdsaSecp256k1VerKeyName,
+  Ed25519VerKeyName,
+  Sr25519VerKeyName,
+  EcdsaSepc256k1Signature2019,
+  Ed25519Signature2018,
+  Sr25519Signature2020,
+  Bls12381BBSSignatureDock2022,
+  Bls12381BBSDockVerKeyName,
+  Bls12381BBS23DockVerKeyName,
+  Bls12381BBSSignatureDock2023,
+  Bls12381PSSignatureDock2023,
+  Bls12381PSDockVerKeyName,
+  JsonWebSignature2020,
 } from './custom_crypto';
 
 /**
@@ -61,6 +71,12 @@ export async function getSuiteFromKeyDoc(keyDoc, useProofValue, options) {
     case Bls12381BBSDockVerKeyName:
       Cls = Bls12381BBSSignatureDock2022;
       break;
+    case Bls12381BBS23DockVerKeyName:
+      Cls = Bls12381BBSSignatureDock2023;
+      break;
+    case Bls12381PSDockVerKeyName:
+      Cls = Bls12381PSSignatureDock2023;
+      break;
     case 'JsonWebKey2020':
       Cls = JsonWebSignature2020;
       if (!keypair) {
@@ -86,12 +102,15 @@ export async function getSuiteFromKeyDoc(keyDoc, useProofValue, options) {
  */
 export async function expandJSONLD(credential, options = {}) {
   if (options.documentLoader && options.resolver) {
-    throw new Error('Passing resolver and documentLoader results in resolver being ignored, please re-factor.');
+    throw new Error(
+      'Passing resolver and documentLoader results in resolver being ignored, please re-factor.',
+    );
   }
 
   const expanded = await jsonld.expand(credential, {
     ...options,
-    documentLoader: options.documentLoader || defaultDocumentLoader(options.resolver),
+    documentLoader:
+      options.documentLoader || defaultDocumentLoader(options.resolver),
   });
   return expanded[0];
 }
@@ -103,7 +122,12 @@ export function potentialToArray(a) {
 
 export function getKeyFromDIDDocument(didDocument, didUrl) {
   // Ensure not already a key doc
-  if (didDocument.publicKeyBase58 || didDocument.publicKeyMultibase || didDocument.publicKeyJwk || (didDocument.publicKey && !Array.isArray(didDocument.publicKey))) {
+  if (
+    didDocument.publicKeyBase58
+    || didDocument.publicKeyMultibase
+    || didDocument.publicKeyJwk
+    || (didDocument.publicKey && !Array.isArray(didDocument.publicKey))
+  ) {
     return didDocument;
   }
 

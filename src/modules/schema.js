@@ -66,7 +66,7 @@ export default class Schema {
    */
   toJSON() {
     const {
-      signature,
+      signature: _signature,
       ...rest
     } = this;
 

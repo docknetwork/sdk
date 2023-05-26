@@ -6,6 +6,11 @@ import { getNonce } from '../utils/misc';
 
 /** Class with logic for public keys and corresponding setup parameters. This logic is common in BBS+ and accumulator */
 export default class WithParamsAndPublicKeys {
+  /// Builds module-specific params from the provided value.
+  static buildParams(params) {
+    return params;
+  }
+
   /**
    * Create object to add new parameters on chain
    * @param bytes
@@ -92,8 +97,9 @@ export default class WithParamsAndPublicKeys {
    * @returns {Promise<*>}
    */
   async createAddParamsTx(params, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+    const offchainParams = this.constructor.buildParams(params);
     const hexDid = getHexIdentifierFromDID(signerDid);
-    const [addParams, signature] = await this.createSignedAddParams(params, hexDid, keyPair, keyId, { nonce, didModule });
+    const [addParams, signature] = await this.createSignedAddParams(offchainParams, hexDid, keyPair, keyId, { nonce, didModule });
     return this.module.addParams(addParams, signature);
   }
 
@@ -115,8 +121,8 @@ export default class WithParamsAndPublicKeys {
   }
 
   /**
-   * Add new BBS+ params.
-   * @param param - The BBS+ params to add.
+   * Add new signature params.
+   * @param param - The signature params to add.
    * @param signerDid - Signer of the payload
    * @param keyPair - Signer's keypair
    * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
@@ -198,16 +204,16 @@ export default class WithParamsAndPublicKeys {
 
   async getParamsByHexDid(hexDid, counter) {
     const resp = await this.queryParamsFromChain(hexDid, counter);
-    if (resp.isSome) {
-      return this.createParamsObjFromChainResponse(resp.unwrap());
+    if (resp) {
+      return this.createParamsObjFromChainResponse(resp);
     }
     return null;
   }
 
   async getPublicKeyByHexDid(hexDid, keyId, withParams = false) {
     const resp = await this.queryPublicKeyFromChain(hexDid, keyId);
-    if (resp.isSome) {
-      const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(resp.unwrap());
+    if (resp) {
+      const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(resp);
       if (withParams) {
         if (pkObj.paramsRef === null) {
           throw new Error('No reference to parameters for the public key');
@@ -262,6 +268,7 @@ export default class WithParamsAndPublicKeys {
     } else {
       pkObj.paramsRef = null;
     }
+    pkObj.participantId = null;
     return pkObj;
   }
 

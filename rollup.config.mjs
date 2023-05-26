@@ -3,12 +3,12 @@ import multiInput from 'rollup-plugin-multi-input';
 import commonjs from '@rollup/plugin-commonjs';
 import { terser } from 'rollup-plugin-terser';
 // import { wasm } from '@rollup/plugin-wasm';
-import pkg from './package.json';
+// import pkg from './package.json';
 
 export default async function() {
   return [{
     plugins: [
-      multiInput(),
+      multiInput.default(),
       json(),
       terser(),
       commonjs(),

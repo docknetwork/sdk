@@ -1,18 +1,46 @@
-import { BBSPlusPublicKeyG2, initializeWasm, isWasmInitialized } from '@docknetwork/crypto-wasm-ts';
+import {
+  BBSPlusPublicKeyG2,
+  initializeWasm,
+  isWasmInitialized,
+  BBSPublicKey,
+  PSPublicKey,
+} from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
 import { stringToU8a } from '@polkadot/util';
 import {
   PresentationBuilder,
-  Credential,
+  BBSPlusCredential,
+  BBSCredential,
+  PSCredential,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 import { ensureArray } from './utils/type-helpers';
 
 import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';
-import { Bls12381BBSSigProofDockSigName } from './utils/vc/crypto/constants';
-import CustomLinkedDataSignature from './utils/vc/crypto/custom-linkeddatasignature';
+import {
+  Bls12381BBSSigDockSigName,
+  Bls12381PSSigDockSigName,
+  Bls12381BBS23SigDockSigName,
+  Bls12381PSSigProofDockSigName,
+  Bls12381BBS23SigProofDockSigName,
+  Bls12381BBSSigProofDockSigName,
+} from './utils/vc/crypto/constants';
+import CustomLinkedDataSignature from './utils/vc/crypto/common/CustomLinkedDataSignature';
 import defaultDocumentLoader from './utils/vc/document-loader';
+import {
+  Bls12381BBSSignatureDock2023,
+  Bls12381PSSignatureDock2023,
+} from './utils/vc/custom_crypto';
 
-export default class BbsPlusPresentation {
+const SIG_NAME_TO_PROOF_NAME = Object.setPrototypeOf(
+  {
+    [Bls12381BBSSigDockSigName]: Bls12381BBSSigProofDockSigName,
+    [Bls12381BBS23SigDockSigName]: Bls12381BBS23SigProofDockSigName,
+    [Bls12381PSSigDockSigName]: Bls12381PSSigProofDockSigName,
+  },
+  null,
+);
+
+export default class Presentation {
   /**
    * Create a new BbsPlusPresentation instance.
    * @constructor
@@ -28,11 +56,14 @@ export default class BbsPlusPresentation {
    */
   addAttributeToReveal(credentialIndex, attributes = []) {
     ensureArray(attributes);
-    this.presBuilder.markAttributesRevealed(credentialIndex, new Set(attributes));
+    this.presBuilder.markAttributesRevealed(
+      credentialIndex,
+      new Set(attributes),
+    );
   }
 
   /**
-   * Create bbs presentation
+   * Create BBS+ presentation
    * @param options
    * @returns {object}
    */
@@ -56,34 +87,69 @@ export default class BbsPlusPresentation {
    */
   async addCredentialToPresent(credentialLD, options = {}) {
     if (options.documentLoader && options.resolver) {
-      throw new Error('Passing resolver and documentLoader results in resolver being ignored, please re-factor.');
+      throw new Error(
+        'Passing resolver and documentLoader results in resolver being ignored, please re-factor.',
+      );
     }
     if (!isWasmInitialized()) {
       await initializeWasm();
     }
+
     const documentLoader = options.documentLoader || defaultDocumentLoader(options.resolver);
 
-    const json = typeof credentialLD === 'string' ? JSON.parse(credentialLD) : credentialLD;
+    const json = typeof credentialLD === 'string'
+      ? JSON.parse(credentialLD)
+      : credentialLD;
 
     const { proof } = json;
 
     if (!proof) {
-      throw new Error('BBS credential does not have a proof');
+      throw new Error('Credential does not have a proof');
     }
-    const keyDocument = await Bls12381BBSSignatureDock2022.getVerificationMethod({
+
+    let Signature;
+    let Credential;
+    let PublicKey;
+
+    switch (proof.type) {
+      case Bls12381BBSSigDockSigName:
+        Signature = Bls12381BBSSignatureDock2022;
+        Credential = BBSPlusCredential;
+        PublicKey = BBSPlusPublicKeyG2;
+        break;
+      case Bls12381BBS23SigDockSigName:
+        Signature = Bls12381BBSSignatureDock2023;
+        Credential = BBSCredential;
+        PublicKey = BBSPublicKey;
+        break;
+      case Bls12381PSSigDockSigName:
+        Signature = Bls12381PSSignatureDock2023;
+        Credential = PSCredential;
+        PublicKey = PSPublicKey;
+        break;
+      default:
+        throw new Error(`Invalid proof type ${proof.type}`);
+    }
+
+    const keyDocument = await Signature.getVerificationMethod({
       proof,
       documentLoader,
     });
 
     const pkRaw = b58.decode(keyDocument.publicKeyBase58);
-    const pk = new BBSPlusPublicKeyG2(pkRaw);
+    const pk = new PublicKey(pkRaw);
 
-    const [credential] = Bls12381BBSSignatureDock2022.convertCredential({
+    const [credential] = Signature.convertCredential({
       document: json,
     });
 
-    const convertedCredential = Credential.fromJSON(credential, CustomLinkedDataSignature.fromJsigProofValue(credentialLD.proof.proofValue));
-    const idx = await this.presBuilder.addCredential(convertedCredential, pk);
+    const convertedCredential = Credential.fromJSON(
+      credential,
+      CustomLinkedDataSignature.fromJsigProofValue(
+        credentialLD.proof.proofValue,
+      ),
+    );
+    const idx = this.presBuilder.addCredential(convertedCredential, pk);
 
     // Enforce revealing of verificationMethod and type
     this.addAttributeToReveal(idx, ['proof.type']);
@@ -99,7 +165,9 @@ export default class BbsPlusPresentation {
     const presentation = this.createPresentation(options);
     const { credentials } = presentation.spec;
     if (credentials.length > 1) {
-      throw new Error('Cannot derive from multiple credentials in a presentation');
+      throw new Error(
+        'Cannot derive from multiple credentials in a presentation',
+      );
     }
 
     return credentials.map((credential) => {
@@ -108,19 +176,27 @@ export default class BbsPlusPresentation {
       }
 
       const date = new Date().toISOString();
+      const type = SIG_NAME_TO_PROOF_NAME[credential.revealedAttributes.proof.type];
+      if (type == null) {
+        throw new Error(
+          `Failed to map credential signature type to the proof type: ${credential.revealedAttributes.proof.type}`,
+        );
+      }
 
       return {
         ...credential.revealedAttributes,
         '@context': JSON.parse(credential.revealedAttributes['@context']),
         type: JSON.parse(credential.revealedAttributes.type),
         credentialSchema: JSON.parse(credential.schema),
-        issuer: credential.revealedAttributes.issuer || credential.revealedAttributes.proof.verificationMethod.split('#')[0],
+        issuer:
+          credential.revealedAttributes.issuer
+          || credential.revealedAttributes.proof.verificationMethod.split('#')[0],
         issuanceDate: credential.revealedAttributes.issuanceDate || date,
         proof: {
           proofPurpose: 'assertionMethod',
           created: date,
           ...credential.revealedAttributes.proof,
-          type: Bls12381BBSSigProofDockSigName,
+          type,
           proofValue: presentation.proof,
           nonce: presentation.nonce,
           context: presentation.context,

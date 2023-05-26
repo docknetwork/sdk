@@ -1,7 +1,6 @@
 import * as path from 'path';
 import * as r1csf from 'r1csfile';
 import * as fs from 'fs';
-
 /**
  * Given messages and indices to reveal, returns 2 maps, one for revealed messages and one for unrevealed
  * @param messages
@@ -9,10 +8,7 @@ import * as fs from 'fs';
  * @returns [Map<number, Uint8Array>, Map<number, Uint8Array>]
  */
 // eslint-disable-next-line import/prefer-default-export
-export function getRevealedUnrevealed(
-  messages,
-  revealedIndices,
-) {
+export function getRevealedUnrevealed(messages, revealedIndices) {
   const revealedMsgs = new Map();
   const unrevealedMsgs = new Map();
   for (let i = 0; i < messages.length; i++) {

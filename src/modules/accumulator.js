@@ -478,8 +478,8 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     const counter = counters.paramsCounter.toNumber();
     if (counter > 0) {
       const resp = await this.queryParamsFromChain(hexId, counter);
-      if (resp.isSome) {
-        return this.createParamsObjFromChainResponse(resp.unwrap());
+      if (resp) {
+        return this.createParamsObjFromChainResponse(resp);
       }
     }
     return null;
@@ -533,17 +533,29 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   }
 
   async queryParamsFromChain(hexDid, counter) {
-    return this.api.query[this.moduleName].accumulatorParams(
+    const params = await this.api.query[this.moduleName].accumulatorParams(
       hexDid,
       counter,
     );
+
+    if (params.isSome) {
+      return params.unwrap();
+    } else {
+      return null;
+    }
   }
 
   async queryPublicKeyFromChain(hexDid, counter) {
-    return this.api.query[this.moduleName].accumulatorKeys(
+    const key = await this.api.query[this.moduleName].accumulatorKeys(
       hexDid,
       counter,
     );
+
+    if (key.isSome) {
+      return key.unwrap();
+    } else {
+      return null;
+    }
   }
 
   signAddParams(keyPair, params) {

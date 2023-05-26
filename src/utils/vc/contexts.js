@@ -9,6 +9,8 @@ import schema from './contexts/schema.json';
 import odrl from './contexts/odrl.json';
 import bbsV1Context from './contexts/bbs-v1.json';
 import dockBBSV1Context from './contexts/dock-bbs-v1.json';
+import dockBBS23V1Context from './contexts/dock-bbs23-v1.json';
+import dockPSV1Context from './contexts/dock-ps-v1.json';
 import dockPrettyVCContext from './contexts/prettyvc.json';
 import jws2020V1Context from './contexts/jws-2020-v1.json';
 
@@ -22,6 +24,14 @@ export default new Map([
   [
     'https://ld.dock.io/security/bbs/v1',
     dockBBSV1Context,
+  ],
+  [
+    'https://ld.dock.io/security/bbs23/v1',
+    dockBBS23V1Context,
+  ],
+  [
+    'https://ld.dock.io/security/ps/v1',
+    dockPSV1Context,
   ],
   [
     'https://w3id.org/security/bbs/v1',

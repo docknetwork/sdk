@@ -1,7 +1,7 @@
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { HttpProvider } from '@polkadot/rpc-provider';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
-import { KeyringPair } from '@polkadot/keyring/types'; // eslint-disable-line
+import { KeyringPair } from "@polkadot/keyring/types"; // eslint-disable-line
 import typesBundle from '@docknetwork/node-types';
 
 import AnchorModule from './modules/anchor';
@@ -9,7 +9,10 @@ import BlobModule from './modules/blob';
 import { DIDModule } from './modules/did';
 import RevocationModule from './modules/revocation';
 import TokenMigration from './modules/migration';
+import BBSModule from './modules/bbs';
 import BBSPlusModule from './modules/bbs-plus';
+import LegacyBBSPlusModule from './modules/legacy-bbs-plus';
+import PSModule from './modules/ps';
 import AccumulatorModule from './modules/accumulator';
 import PoaRpcDefs from './rpc-defs/poa-rpc-defs';
 import PriceFeedRpcDefs from './rpc-defs/price-feed-rpc-defs';
@@ -24,11 +27,8 @@ import {
   PublicKeySecp256k1,
 } from './public-keys';
 
-import {
-  Signature,
-  SignatureSr25519,
-  SignatureEd25519,
-} from './signatures';
+import { Signature, SignatureSr25519, SignatureEd25519 } from './signatures';
+import OffchainSignatures from './modules/offchain-signatures';
 
 function getExtrinsicError(data, typeDef, api) {
   // Loop through each of the parameters
@@ -81,12 +81,15 @@ class DockAPI {
    * @param {Options} config - Configuration options
    * @return {Promise} Promise for when SDK is ready for use
    */
-  async init({
-    address, keyring, chainTypes, chainRpc, loadPoaModules = true,
-  } = {
-    address: null,
-    keyring: null,
-  }) {
+  /* eslint-disable sonarjs/cognitive-complexity */
+  async init(
+    {
+      address, keyring, chainTypes, chainRpc, loadPoaModules = true,
+    } = {
+      address: null,
+      keyring: null,
+    },
+  ) {
     if (this.api) {
       if (this.api.isConnected) {
         throw new Error('API is already connected');
@@ -96,9 +99,11 @@ class DockAPI {
     }
 
     this.address = address || this.address;
-    if (this.address && (
-      this.address.indexOf('wss://') === -1 && this.address.indexOf('https://') === -1
-    )) {
+    if (
+      this.address
+      && this.address.indexOf('wss://') === -1
+      && this.address.indexOf('https://') === -1
+    ) {
       console.warn(`WARNING: Using non-secure endpoint: ${this.address}`);
     }
 
@@ -117,7 +122,9 @@ class DockAPI {
     }
 
     const isWebsocket = this.address && this.address.indexOf('http') === -1;
-    const provider = isWebsocket ? new WsProvider(this.address) : new HttpProvider(this.address);
+    const provider = isWebsocket
+      ? new WsProvider(this.address)
+      : new HttpProvider(this.address);
 
     const apiOptions = {
       provider,
@@ -138,9 +145,32 @@ class DockAPI {
     this.anchorModule.setApi(this.api, this.signAndSend.bind(this));
     this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));
     this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
-    this.revocationModule = new RevocationModule(this.api, this.signAndSend.bind(this));
-    this.bbsPlusModule = new BBSPlusModule(this.api, this.signAndSend.bind(this));
-    this.accumulatorModule = new AccumulatorModule(this.api, this.signAndSend.bind(this));
+    this.revocationModule = new RevocationModule(
+      this.api,
+      this.signAndSend.bind(this),
+    );
+    this.legacyBBSPlus = this.api.tx.offchainSignatures == null;
+    if (this.legacyBBSPlus) {
+      this.bbsPlusModule = new LegacyBBSPlusModule(
+        this.api,
+        this.signAndSend.bind(this),
+      );
+    } else {
+      this.offchainSignaturesModule = new OffchainSignatures(
+        this.api,
+        this.signAndSend.bind(this),
+      );
+      this.bbsModule = new BBSModule(this.api, this.signAndSend.bind(this));
+      this.bbsPlusModule = new BBSPlusModule(
+        this.api,
+        this.signAndSend.bind(this),
+      );
+      this.psModule = new PSModule(this.api, this.signAndSend.bind(this));
+    }
+    this.accumulatorModule = new AccumulatorModule(
+      this.api,
+      this.signAndSend.bind(this),
+    );
 
     if (loadPoaModules) {
       this.migrationModule = new TokenMigration(this.api);
@@ -148,6 +178,7 @@ class DockAPI {
 
     return this.api;
   }
+  /* eslint-enable sonarjs/cognitive-complexity */
 
   async initKeyring(keyring = null) {
     if (!this.keyring || keyring) {
@@ -165,9 +196,13 @@ class DockAPI {
       delete this.blobModule;
       delete this.didModule;
       delete this.revocationModule;
+      delete this.offchainSignatures;
+      delete this.bbsModule;
       delete this.bbsPlusModule;
+      delete this.psModule;
       delete this.accumulatorModule;
       delete this.migrationModule;
+      delete this.legacyBBSPlus;
     }
   }
 
@@ -228,32 +263,43 @@ class DockAPI {
     const promise = new Promise((resolve, reject) => {
       try {
         let unsubFunc = null;
-        return extrinsic.send((extrResult) => {
-          const { events = [], status } = extrResult;
+        return extrinsic
+          .send((extrResult) => {
+            const { events = [], status } = extrResult;
 
-          // Ensure ExtrinsicFailed event doesnt exist
-          for (let i = 0; i < events.length; i++) {
-            const {
-              event: {
-                data, method, typeDef,
-              },
-            } = events[i];
-            if (method === 'ExtrinsicFailed' || method === 'BatchInterrupted') {
-              const errorMsg = getExtrinsicError(data, typeDef, this.api);
-              const error = new ExtrinsicError(errorMsg, method, data, status, events);
-              reject(error);
-              return error;
+            // Ensure ExtrinsicFailed event doesnt exist
+            for (let i = 0; i < events.length; i++) {
+              const {
+                event: { data, method, typeDef },
+              } = events[i];
+              if (
+                method === 'ExtrinsicFailed'
+                || method === 'BatchInterrupted'
+              ) {
+                const errorMsg = getExtrinsicError(data, typeDef, this.api);
+                const error = new ExtrinsicError(
+                  errorMsg,
+                  method,
+                  data,
+                  status,
+                  events,
+                );
+                reject(error);
+                return error;
+              }
             }
-          }
 
-          // If waiting for finalization or if not waiting for finalization, wait for inclusion in block.
-          if ((waitForFinalization && status.isFinalized) || (!waitForFinalization && status.isInBlock)) {
-            unsubFunc();
-            resolve(extrResult);
-          }
+            // If waiting for finalization or if not waiting for finalization, wait for inclusion in block.
+            if (
+              (waitForFinalization && status.isFinalized)
+              || (!waitForFinalization && status.isInBlock)
+            ) {
+              unsubFunc();
+              resolve(extrResult);
+            }
 
-          return extrResult;
-        })
+            return extrResult;
+          })
           .catch((error) => {
             reject(error);
           })
@@ -318,9 +364,21 @@ class DockAPI {
    */
   get revocation() {
     if (!this.revocationModule) {
-      throw new Error('Unable to get revocation module, SDK is not initialised');
+      throw new Error(
+        'Unable to get revocation module, SDK is not initialised',
+      );
     }
     return this.revocationModule;
+  }
+
+  get bbs() {
+    if (this.legacyBBSPlus) {
+      throw new Error('BBS isn\'t supported by the chain');
+    }
+    if (!this.bbsModule) {
+      throw new Error('Unable to get BBS module, SDK is not initialised');
+    }
+    return this.bbsModule;
   }
 
   get bbsPlus() {
@@ -330,9 +388,21 @@ class DockAPI {
     return this.bbsPlusModule;
   }
 
+  get ps() {
+    if (this.legacyBBSPlus) {
+      throw new Error('PS isn\'t supported by the chain');
+    }
+    if (!this.psModule) {
+      throw new Error('Unable to get PS module, SDK is not initialised');
+    }
+    return this.psModule;
+  }
+
   get accumulator() {
     if (!this.accumulatorModule) {
-      throw new Error('Unable to get Accumulator module, SDK is not initialised');
+      throw new Error(
+        'Unable to get Accumulator module, SDK is not initialised',
+      );
     }
     return this.bbsPlusModule;
   }
@@ -344,6 +414,11 @@ export {
   BlobModule,
   DockAPI,
   DIDModule,
+  BBSModule,
+  BBSPlusModule,
+  OffchainSignatures,
+  PSModule,
+  LegacyBBSPlusModule,
   RevocationModule,
   PublicKey,
   PublicKeySr25519,

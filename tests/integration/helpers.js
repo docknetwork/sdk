@@ -1,9 +1,9 @@
 import { bnToBn } from '@polkadot/util';
-import { randomAsHex } from "@polkadot/util-crypto";
+import { randomAsHex } from '@polkadot/util-crypto';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { MaxGas, MinGasPrice } from '../test-constants';
 import { DidKey, VerificationRelationship } from '../../src/public-keys';
-import { createNewDockDID } from "../../src/utils/did";
+import { createNewDockDID } from '../../src/utils/did';
 
 /**
  * Registers a new DID on dock chain, keeps the controller same as the DID
@@ -129,7 +129,7 @@ export async function getBalance(api, account) {
 export function createDidPair(dock) {
   const did = createNewDockDID();
   const seed = randomAsHex(32);
-  const pair = dock.keyring.addFromUri(seed, null, "sr25519");
+  const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
   const publicKey = getPublicKeyFromKeyringPair(pair);
   const didKey = new DidKey(publicKey, new VerificationRelationship());
   return [did, pair, didKey];

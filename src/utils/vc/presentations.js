@@ -1,23 +1,37 @@
 import jsonld from 'jsonld';
 import jsigs from 'jsonld-signatures';
-import { BBSPlusPublicKeyG2 } from '@docknetwork/crypto-wasm-ts';
+import {
+  BBSPlusPublicKeyG2,
+  BBSPublicKey,
+  PSPublicKey,
+} from '@docknetwork/crypto-wasm-ts';
 import { Presentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
 import b58 from 'bs58';
 import { verifyCredential } from './credentials';
-import DIDResolver from '../../did-resolver'; // eslint-disable-line
+import DIDResolver from "../../did-resolver"; // eslint-disable-line
 
 import defaultDocumentLoader from './document-loader';
 import { getSuiteFromKeyDoc } from './helpers';
+import {
+  Bls12381BBSSigDockSigName,
+  Bls12381PSSigDockSigName,
+  Bls12381BBS23SigDockSigName,
+  Bls12381BBSDockVerKeyName,
+  Bls12381PSDockVerKeyName,
+  Bls12381BBS23DockVerKeyName,
+} from './crypto/constants';
+
+import { DEFAULT_CONTEXT_V1_URL } from './constants';
 
 import {
-  DEFAULT_CONTEXT_V1_URL,
-} from './constants';
-
-import {
-  EcdsaSepc256k1Signature2019, Ed25519Signature2018, JsonWebSignature2020, Sr25519Signature2020,
+  EcdsaSepc256k1Signature2019,
+  Ed25519Signature2018,
+  Sr25519Signature2020,
+  JsonWebSignature2020,
+  Bls12381BBSSignatureDock2022,
+  Bls12381BBSSignatureDock2023,
+  Bls12381PSSignatureDock2023,
 } from './custom_crypto';
-
-import Bls12381BBSSignatureDock2022 from './crypto/Bls12381BBSSignatureDock2022';
 
 const { AuthenticationProofPurpose } = jsigs.purposes;
 
@@ -33,13 +47,14 @@ const { AuthenticationProofPurpose } = jsigs.purposes;
 function checkPresentation(presentation) {
   // Normalize to an array to allow the common case of context being a string
   const context = Array.isArray(presentation['@context'])
-    ? presentation['@context'] : [presentation['@context']];
+    ? presentation['@context']
+    : [presentation['@context']];
 
   // Ensure first context is 'https://www.w3.org/2018/credentials/v1'
   if (context[0] !== DEFAULT_CONTEXT_V1_URL) {
     throw new Error(
       `"${DEFAULT_CONTEXT_V1_URL}" needs to be first in the `
-      + 'list of contexts.',
+        + 'list of contexts.',
     );
   }
 
@@ -50,7 +65,10 @@ function checkPresentation(presentation) {
   }
 }
 
-export async function verifyPresentationCredentials(presentation, options = {}) {
+export async function verifyPresentationCredentials(
+  presentation,
+  options = {},
+) {
   let verified = true;
   let credentialResults = [];
 
@@ -58,7 +76,9 @@ export async function verifyPresentationCredentials(presentation, options = {}) 
   const credentials = jsonld.getValues(presentation, 'verifiableCredential');
   if (credentials.length > 0) {
     // Verify all credentials in list
-    credentialResults = await Promise.all(credentials.map((credential) => verifyCredential(credential, { ...options })));
+    credentialResults = await Promise.all(
+      credentials.map((credential) => verifyCredential(credential, { ...options })),
+    );
 
     // Assign credentialId property to all credential results
     for (const [i, credentialResult] of credentialResults.entries()) {
@@ -79,24 +99,24 @@ export async function verifyPresentationCredentials(presentation, options = {}) 
 }
 
 /**
-* @typedef {object} VerifiableParams The Options to verify credentials and presentations.
-* @property {string} [challenge] - proof challenge Required.
-* @property {string} [domain] - proof domain (optional)
-* @property {string} [controller] - controller (optional)
-* @property {DIDResolver} [resolver] - Resolver to resolve the issuer DID (optional)
-* @property {Boolean} [unsignedPresentation] - Whether to verify the proof or not
-* @property {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
-* @property {Boolean} [forceRevocationCheck] - Whether to force revocation check or not.
-* Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
-* @property {object} [presentationPurpose] - A purpose other than the default AuthenticationProofPurpose
-* @property {object} [revocationApi] - An object representing a map. "revocation type -> revocation API". The API is used to check
-* revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
-* as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
-* @property {object} [schemaApi] - An object representing a map. "schema type -> schema API". The API is used to get
-* a schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
-* as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
-* @property {object} [documentLoader] - A document loader, can be null and use the default
-*/
+ * @typedef {object} VerifiableParams The Options to verify credentials and presentations.
+ * @property {string} [challenge] - proof challenge Required.
+ * @property {string} [domain] - proof domain (optional)
+ * @property {string} [controller] - controller (optional)
+ * @property {DIDResolver} [resolver] - Resolver to resolve the issuer DID (optional)
+ * @property {Boolean} [unsignedPresentation] - Whether to verify the proof or not
+ * @property {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
+ * @property {Boolean} [forceRevocationCheck] - Whether to force revocation check or not.
+ * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
+ * @property {object} [presentationPurpose] - A purpose other than the default AuthenticationProofPurpose
+ * @property {object} [revocationApi] - An object representing a map. "revocation type -> revocation API". The API is used to check
+ * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
+ * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+ * @property {object} [schemaApi] - An object representing a map. "schema type -> schema API". The API is used to get
+ * a schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
+ * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+ * @property {object} [documentLoader] - A document loader, can be null and use the default
+ */
 
 /**
  * Verify a Verifiable Presentation. Returns the verification status and error in an object
@@ -108,7 +128,9 @@ export async function verifyPresentationCredentials(presentation, options = {}) 
  */
 export async function verifyPresentation(presentation, options = {}) {
   if (options.documentLoader && options.resolver) {
-    throw new Error('Passing resolver and documentLoader results in resolver being ignored, please re-factor.');
+    throw new Error(
+      'Passing resolver and documentLoader results in resolver being ignored, please re-factor.',
+    );
   }
 
   // Ensure presentation is passed
@@ -116,8 +138,8 @@ export async function verifyPresentation(presentation, options = {}) {
     throw new TypeError('"presentation" property is required');
   }
 
-  if (isBBSPlusPresentation(presentation)) {
-    return verifyBBSPlusPresentation(presentation, options);
+  if (isAnoncreds(presentation)) {
+    return verifyAnoncreds(presentation, options);
   }
 
   // Ensure presentation is valid
@@ -149,7 +171,10 @@ export async function verifyPresentation(presentation, options = {}) {
   };
 
   // TODO: verify proof then credentials
-  const { verified, credentialResults } = await verifyPresentationCredentials(presentation, verificationOptions);
+  const { verified, credentialResults } = await verifyPresentationCredentials(
+    presentation,
+    verificationOptions,
+  );
   try {
     // Skip proof validation for unsigned
     if (unsignedPresentation) {
@@ -169,10 +194,12 @@ export async function verifyPresentation(presentation, options = {}) {
     }
 
     // Set purpose and verify
-    const purpose = presentationPurpose || new AuthenticationProofPurpose({ controller, domain, challenge });
-    const presentationResult = await jsigs.verify(
-      presentation, { purpose, ...verificationOptions },
-    );
+    const purpose = presentationPurpose
+      || new AuthenticationProofPurpose({ controller, domain, challenge });
+    const presentationResult = await jsigs.verify(presentation, {
+      purpose,
+      ...verificationOptions,
+    });
 
     // Return results
     return {
@@ -202,40 +229,96 @@ export async function verifyPresentation(presentation, options = {}) {
  * @param {object} [presentationPurpose] - Optional presentation purpose to override default AuthenticationProofPurpose
  * @return {Promise<VerifiablePresentation>} A VerifiablePresentation with a proof.
  */
-export async function signPresentation(presentation, keyDoc, challenge, domain, resolver = null, compactProof = true, presentationPurpose = null, addSuiteContext = true) {
+export async function signPresentation(
+  presentation,
+  keyDoc,
+  challenge,
+  domain,
+  resolver = null,
+  compactProof = true,
+  presentationPurpose = null,
+  addSuiteContext = true,
+) {
   const suite = await getSuiteFromKeyDoc(keyDoc);
-  const purpose = presentationPurpose || new AuthenticationProofPurpose({
-    domain,
-    challenge,
-  });
+  const purpose = presentationPurpose
+    || new AuthenticationProofPurpose({
+      domain,
+      challenge,
+    });
 
   const documentLoader = defaultDocumentLoader(resolver);
   return jsigs.sign(presentation, {
-    purpose, documentLoader, domain, challenge, compactProof, suite, addSuiteContext,
+    purpose,
+    documentLoader,
+    domain,
+    challenge,
+    compactProof,
+    suite,
+    addSuiteContext,
   });
 }
 
-export function isBBSPlusPresentation(presentation) {
+export function isAnoncreds(presentation) {
   // Since there is no type parameter present we have to guess by checking field types
   // these wont exist in a standard VP
-  return typeof presentation.version === 'string' && typeof presentation.proof === 'string' && typeof presentation.spec !== 'undefined' && typeof presentation.spec.credentials !== 'undefined';
+  return (
+    typeof presentation.version === 'string'
+    && typeof presentation.proof === 'string'
+    && typeof presentation.spec !== 'undefined'
+    && typeof presentation.spec.credentials !== 'undefined'
+  );
 }
 
-export async function verifyBBSPlusPresentation(presentation, options = {}) {
+export async function verifyAnoncreds(presentation, options = {}) {
   const documentLoader = options.documentLoader || defaultDocumentLoader(options.resolver);
 
-  const keyDocuments = await Promise.all(presentation.spec.credentials.map((c, idx) => {
-    const { proof } = c.revealedAttributes;
-    if (!proof) {
-      throw new Error(`Presentation credential does not reveal its proof for index ${idx}`);
-    }
-    return Bls12381BBSSignatureDock2022.getVerificationMethod({ proof, documentLoader });
-  }));
+  const keyDocuments = await Promise.all(
+    presentation.spec.credentials.map((c, idx) => {
+      const { proof } = c.revealedAttributes;
+      if (!proof) {
+        throw new Error(
+          `Presentation credential does not reveal its proof for index ${idx}`,
+        );
+      }
+
+      let sigClass;
+      switch (proof.type) {
+        case Bls12381BBSSigDockSigName:
+          sigClass = Bls12381BBSSignatureDock2022;
+          break;
+        case Bls12381BBS23SigDockSigName:
+          sigClass = Bls12381BBSSignatureDock2023;
+          break;
+        case Bls12381PSSigDockSigName:
+          sigClass = Bls12381PSSignatureDock2023;
+          break;
+        default:
+          throw new Error(`Invalid proof type ${proof.type}`);
+      }
+
+      return sigClass.getVerificationMethod({ proof, documentLoader });
+    }),
+  );
 
   const recreatedPres = Presentation.fromJSON(presentation);
   const pks = keyDocuments.map((keyDocument) => {
     const pkRaw = b58.decode(keyDocument.publicKeyBase58);
-    return new BBSPlusPublicKeyG2(pkRaw);
+
+    if (!keyDocument.type) {
+      throw new Error(`No type provided for key document ${JSON.stringify(keyDocument)}`);
+    }
+    const keyType = keyDocument.type.startsWith('did:') ? keyDocument.type.slice(4) : keyDocument.type;
+
+    switch (keyType) {
+      case Bls12381BBSDockVerKeyName:
+        return new BBSPlusPublicKeyG2(pkRaw);
+      case Bls12381BBS23DockVerKeyName:
+        return new BBSPublicKey(pkRaw);
+      case Bls12381PSDockVerKeyName:
+        return new PSPublicKey(pkRaw);
+      default:
+        throw new Error(`Invalid key document type: ${keyType}`);
+    }
   });
 
   return recreatedPres.verify(pks);

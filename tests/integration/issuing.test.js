@@ -2,13 +2,15 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import mockAxios from '../mocks/axios';
 
-import { createNewDockDID, } from '../../src/utils/did';
+import { createNewDockDID } from '../../src/utils/did';
 
 import { DockAPI } from '../../src/index';
 import { DockResolver } from '../../src/resolver';
 
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-constants';
-import { getCredMatcherDoc, getProofMatcherDoc, getUnsignedCred, registerNewDIDUsingPair } from './helpers';
+import {
+  getCredMatcherDoc, getProofMatcherDoc, getUnsignedCred, registerNewDIDUsingPair,
+} from './helpers';
 import { generateEcdsaSecp256k1Keypair } from '../../src/utils/misc';
 import { issueCredential, verifyCredential } from '../../src/utils/vc/index';
 import getKeyDoc from '../../src/utils/vc/helpers';

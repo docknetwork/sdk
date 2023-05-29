@@ -63,7 +63,7 @@ export default class Presentation {
   }
 
   /**
-   * Create BBS+ presentation
+   * Create a presentation
    * @param options
    * @returns {object}
    */
@@ -80,7 +80,7 @@ export default class Presentation {
   }
 
   /**
-   * Adds a BBS+ JSON-LD credential to be presented
+   * Adds a JSON-LD credential to be presented
    * @param credentialLD
    * @param options
    * @returns {Promise<number>}

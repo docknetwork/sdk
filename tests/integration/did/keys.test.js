@@ -96,7 +96,7 @@ describe('Key support for DIDs', () => {
     const doc = await dock.did.getDocument(dockDid);
     check(doc);
 
-    // The same checks should pass when passing the flag for BBS+ keys
+    // The same checks should pass when passing the flag for keys
     const doc1 = await dock.did.getDocument(dockDid, { getOffchainSigKeys: false });
     check(doc1);
 
@@ -156,7 +156,7 @@ describe('Key support for DIDs', () => {
     const doc = await dock.did.getDocument(dockDid);
     check(doc);
 
-    // The same checks should pass when passing the flag for BBS+ keys
+    // The same checks should pass when passing the flag for keys
     const doc1 = await dock.did.getDocument(dockDid, { getOffchainSigKeys: false });
     check(doc1);
 
@@ -205,7 +205,7 @@ describe('Key support for DIDs', () => {
     const doc = await dock.did.getDocument(dockDid);
     check(doc);
 
-    // The same checks should pass when passing the flag for BBS+ keys
+    // The same checks should pass when passing the flag for keys
     const doc1 = await dock.did.getDocument(dockDid, { getOffchainSigKeys: false });
     check(doc1);
 

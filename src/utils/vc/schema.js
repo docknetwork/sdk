@@ -36,7 +36,9 @@ export async function validateCredentialSchema(credential, schema, context, docu
       throw new Error('Compacted subject is empty, likely invalid');
     }
 
-    validate(compacted, schema.schema || schema, {
+    const schemaObj = schema.schema || schema;
+    const subjectSchema = (schemaObj.properties && schemaObj.properties.credentialSubject) || schemaObj;
+    validate(compacted, subjectSchema, {
       throwError: true,
     });
   }

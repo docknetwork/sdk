@@ -1,15 +1,23 @@
 import jsonld from 'jsonld';
 import jsigs from 'jsonld-signatures';
+import { statusTypeMatches, checkStatus } from '@digitalbazaar/vc-status-list';
 
 import base64url from 'base64url';
 import CredentialIssuancePurpose from './CredentialIssuancePurpose';
 import defaultDocumentLoader from './document-loader';
 import { getAndValidateSchemaIfPresent } from './schema';
 import { isRevocationCheckNeeded, checkRevocationStatus } from '../revocation';
-import DIDResolver from "../../did-resolver"; // eslint-disable-line
+import DIDResolver from "../../resolver/did/did-resolver"; // eslint-disable-line
 
-import { getSuiteFromKeyDoc, expandJSONLD, getKeyFromDIDDocument } from './helpers';
-import { DEFAULT_CONTEXT_V1_URL, credentialContextField } from './constants';
+import {
+  getSuiteFromKeyDoc,
+  expandJSONLD,
+  getKeyFromDIDDocument,
+} from './helpers';
+import {
+  DEFAULT_CONTEXT_V1_URL,
+  credentialContextField,
+} from './constants';
 import { ensureValidDatetime } from '../type-helpers';
 
 import {
@@ -213,18 +221,21 @@ export function checkCredential(credential) {
  * credential is valid and not revoked and false otherwise. The `error` will describe the error if any.
  */
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export async function verifyCredential(vcJSONorString, {
-  resolver = null,
-  compactProof = true,
-  forceRevocationCheck = true,
-  revocationApi = null,
-  schemaApi = null,
-  documentLoader = null,
-  purpose = null,
-  controller = null,
-  suite = [],
-  verifyDates = true,
-} = {}) {
+export async function verifyCredential(
+  vcJSONorString,
+  {
+    resolver = null,
+    compactProof = true,
+    forceRevocationCheck = true,
+    revocationApi = null,
+    schemaApi = null,
+    documentLoader = null,
+    purpose = null,
+    controller = null,
+    suite = [],
+    verifyDates = true,
+  } = {},
+) {
   if (documentLoader && resolver) {
     throw new Error(
       'Passing resolver and documentLoader results in resolver being ignored, please re-factor.',
@@ -232,7 +243,9 @@ export async function verifyCredential(vcJSONorString, {
   }
 
   const isJWT = typeof vcJSONorString === 'string';
-  const credential = isJWT ? JSON.parse(base64url.decode(vcJSONorString.split('.')[1])).vc : vcJSONorString;
+  const credential = isJWT
+    ? JSON.parse(base64url.decode(vcJSONorString.split('.')[1])).vc
+    : vcJSONorString;
 
   if (!credential) {
     throw new TypeError('A "credential" property is required for verifying.');
@@ -296,7 +309,10 @@ export async function verifyCredential(vcJSONorString, {
 
     const { document: didDocument } = await docLoader(header.kid);
     const keyDocument = getKeyFromDIDDocument(didDocument, header.kid);
-    const keyDocSuite = await getSuiteFromKeyDoc(keyDocument, false, { detached: false, header });
+    const keyDocSuite = await getSuiteFromKeyDoc(keyDocument, false, {
+      detached: false,
+      header,
+    });
     const verified = await keyDocSuite.verifySignature({
       verifyData: new Uint8Array(Buffer.from(jwtSplit[1], 'utf8')),
       verificationMethod: keyDocument,
@@ -308,6 +324,20 @@ export async function verifyCredential(vcJSONorString, {
     return { verified };
   }
 
+  suite = [
+    new Ed25519Signature2018(),
+    new EcdsaSepc256k1Signature2019(),
+    new Sr25519Signature2020(),
+    new Bls12381BBSSignatureDock2022(),
+    new Bls12381BBSSignatureProofDock2022(),
+    new Bls12381BBSSignatureDock2023(),
+    new Bls12381BBSSignatureProofDock2023(),
+    new Bls12381PSSignatureDock2023(),
+    new Bls12381PSSignatureProofDock2023(),
+    new JsonWebSignature2020(),
+    ...suite,
+  ];
+
   // Verify with jsonld-signatures otherwise
   const result = await jsigs.verify(credential, {
     purpose:
@@ -316,42 +346,53 @@ export async function verifyCredential(vcJSONorString, {
         controller,
       }),
     // TODO: support more key types, see digitalbazaar github
-    suite: [
-      new Ed25519Signature2018(),
-      new EcdsaSepc256k1Signature2019(),
-      new Sr25519Signature2020(),
-      new Bls12381BBSSignatureDock2022(),
-      new Bls12381BBSSignatureProofDock2022(),
-      new Bls12381BBSSignatureDock2023(),
-      new Bls12381BBSSignatureProofDock2023(),
-      new Bls12381PSSignatureDock2023(),
-      new Bls12381PSSignatureProofDock2023(),
-      new JsonWebSignature2020(),
-      ...suite,
-    ],
+    suite,
     documentLoader: docLoader,
     compactProof,
   });
 
   // Check for revocation only if the credential is verified and revocation check is needed.
-  if (
-    result.verified
-    && isRevocationCheckNeeded(
-      expandedCredential,
-      forceRevocationCheck,
-      revocationApi,
-    )
-  ) {
-    const revResult = await checkRevocationStatus(
-      expandedCredential,
-      revocationApi,
-    );
+  if (result.verified) {
+    const isStatusList2021Credential = statusTypeMatches({ credential });
 
-    // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
-    if (!revResult.verified) {
-      return revResult;
+    if (isStatusList2021Credential) {
+      const revResult = await checkStatus({
+        credential,
+        suite,
+        documentLoader: docLoader,
+        verifyStatusListCredential: true,
+        verifyMatchingIssuers: true,
+      });
+
+      // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
+      if (!revResult.verified) {
+        if (!revResult.error) {
+          revResult.error = 'Credential was revoked (or suspended) according to the status list referenced in `credentialStatus`';
+        }
+
+        return revResult;
+      }
+    } else {
+      const checkDockRevocation = isRevocationCheckNeeded(
+        expandedCredential,
+        forceRevocationCheck,
+        revocationApi,
+      );
+
+      if (checkDockRevocation) {
+        const revResult = await checkRevocationStatus(
+          expandedCredential,
+          revocationApi,
+        );
+
+        // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
+        if (!revResult.verified) {
+          return revResult;
+        }
+      }
     }
   }
+
   return result;
 }
 
@@ -370,7 +411,17 @@ export async function verifyCredential(vcJSONorString, {
  * @param {(jsonld|jwt|proofValue)} [type] - Optional format/type of the credential (JSON-LD, JWT, proofValue)
  * @return {Promise<object>} The signed credential object.
  */
-export async function issueCredential(keyDoc, credential, compactProof = true, documentLoader = null, purpose = null, expansionMap = null, issuerObject = null, addSuiteContext = true, type = VC_ISSUE_TYPE_DEFAULT) {
+export async function issueCredential(
+  keyDoc,
+  credential,
+  compactProof = true,
+  documentLoader = null,
+  purpose = null,
+  expansionMap = null,
+  issuerObject = null,
+  addSuiteContext = true,
+  type = VC_ISSUE_TYPE_DEFAULT,
+) {
   const useProofValue = type === VC_ISSUE_TYPE_PROOFVALUE;
   const useJWT = type === VC_ISSUE_TYPE_JWT;
 

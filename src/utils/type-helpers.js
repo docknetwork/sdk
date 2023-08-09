@@ -36,6 +36,13 @@ export function ensureObject(value) {
   }
 }
 
+export function ensureNonEmptyObject(value) {
+  ensureObject(value);
+  if (Object.keys(value) === 0) {
+    throw new Error(`${value} needs to be non-empty object.`);
+  }
+}
+
 /**
  * Fail if the given string isn't a URI
  * @param uri
@@ -45,6 +52,25 @@ export function ensureURI(uri) {
   const pattern = new RegExp('^\\w+:\\/?\\/?[^\\s]+$');
   if (!pattern.test(uri)) {
     throw new Error(`${uri} needs to be a valid URI.`);
+  }
+}
+
+const SOURCE = '([a-zA-Z0-9_.-]+)';
+const HEX_ID = '(0[xX][0-9a-fA-F]+)';
+const STATUS_LIST_ID_MATCHER = new RegExp(
+  `^status-list2021:${SOURCE}:${HEX_ID}$`,
+);
+
+/**
+ * Fail if the given string isn't a valid `StatusList2021Credential` id.
+ * @param uri
+ */
+export function ensureStatusListId(statusListId) {
+  ensureString(statusListId);
+  if (!STATUS_LIST_ID_MATCHER.test(statusListId)) {
+    throw new Error(
+      `${statusListId} needs to be a valid \`StatusList2021Credential\` identifier.`,
+    );
   }
 }
 
@@ -77,11 +103,14 @@ export function ensureObjectWithId(value, name) {
 export function ensureValidDatetime(datetime) {
   // Z and T can be lowercase
   // RFC3339 regex
-  const dateRegex = new RegExp('^(\\d{4})-(0[1-9]|1[0-2])-'
+  const dateRegex = new RegExp(
+    '^(\\d{4})-(0[1-9]|1[0-2])-'
       + '(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):'
       + '([0-5][0-9]):([0-5][0-9]|60)'
       + '(\\.[0-9]+)?(Z|(\\+|-)([01][0-9]|2[0-3]):'
-      + '([0-5][0-9]))$', 'i');
+      + '([0-5][0-9]))$',
+    'i',
+  );
 
   if (!dateRegex.test(datetime)) {
     throw new Error(`${datetime} needs to be a valid datetime.`);

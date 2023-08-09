@@ -31,11 +31,12 @@ export async function registerNewDIDUsingPair(dockAPI, did, pair, verRels = unde
  * @param holderDID - Holder DID
  * @returns {{issuanceDate: string, credentialSubject: {alumniOf: string, id: *}, id: *, type: [string, string], '@context': [string, string]}}
  */
-export function getUnsignedCred(credId, holderDID) {
+export function getUnsignedCred(credId, holderDID, additionalContext = []) {
   return {
     '@context': [
       'https://www.w3.org/2018/credentials/v1',
       'https://www.w3.org/2018/credentials/examples/v1',
+      ...additionalContext
     ],
     id: credId,
     type: ['VerifiableCredential', 'AlumniCredential'],

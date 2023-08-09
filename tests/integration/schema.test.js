@@ -14,7 +14,7 @@ import VerifiableCredential from '../../src/verifiable-credential';
 import exampleSchema from '../example-schema';
 import VerifiablePresentation from '../../src/verifiable-presentation';
 import getKeyDoc from '../../src/utils/vc/helpers';
-import DockResolver from '../../src/dock-resolver';
+import { DockResolver } from '../../src/resolver';
 import { Sr25519VerKeyName } from '../../src/utils/vc/crypto/constants';
 import { registerNewDIDUsingPair } from './helpers';
 

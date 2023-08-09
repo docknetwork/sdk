@@ -27,6 +27,8 @@ const dock = new DockAPI();
 
 // Custom ethereum resolver class
 class EtherResolver extends DIDResolver {
+  static METHOD = 'ethr';
+
   constructor(config) {
     super();
     this.ethres = ethr.getResolver(config).ethr;
@@ -65,13 +67,13 @@ async function main() {
 
   console.log('Creating DID resolvers...');
 
-  const resolvers = {
-    key: new DIDKeyResolver(), // did:key resolver
-    dock: new DockResolver(dock), // Prebuilt resolver
-    ethr: new EtherResolver(ethereumProviderConfig), // Custom resolver
-  };
+  const resolvers = [
+    new DIDKeyResolver(), // did:key resolver
+    new DockResolver(dock), // Prebuilt resolver
+    new EtherResolver(ethereumProviderConfig), // Custom resolver
+  ];
 
-  const resolver = new MultiResolver(resolvers, new UniversalResolver(universalResolverUrl));
+  const resolver = new MultiResolver([new UniversalResolver(universalResolverUrl), ...resolvers]);
 
   console.log('Building DIDs list...');
 

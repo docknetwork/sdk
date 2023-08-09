@@ -46,7 +46,7 @@ exports[`Fees bbsPlus 6`] = `10`;
 
 exports[`Fees bbsPlus 7`] = `10`;
 
-exports[`Fees bbsPlus 8`] = `10`;
+exports[`Fees bbsPlus 8`] = `0`;
 
 exports[`Fees bbsPlus 9`] = `0`;
 
@@ -106,7 +106,7 @@ exports[`Fees revocation 5`] = `10`;
 
 exports[`Fees revocation 6`] = `10`;
 
-exports[`Fees revocation 7`] = `60`;
+exports[`Fees revocation 7`] = `50`;
 
 exports[`Fees transfers 1`] = `0`;
 

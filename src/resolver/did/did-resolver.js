@@ -16,6 +16,8 @@ eslint prefer-destructuring: "off"
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { MultiResolver } from '../generic';
+
 const ID_CHAR = '[a-zA-Z0-9_.-]';
 const METHOD = '([a-zA-Z0-9_]+)';
 const METHOD_ID = `(${ID_CHAR}+(:${ID_CHAR}+)*)`;
@@ -23,10 +25,10 @@ const PARAM_CHAR = '[a-zA-Z0-9_.:%-]';
 const PARAM = `;${PARAM_CHAR}+=${PARAM_CHAR}*`;
 const PARAMS = `((${PARAM})*)`;
 // eslint-disable-next-line no-useless-escape
-const PATH = '(\/[^#?]*)?';
+const PATH = '(/[^#?]*)?';
 const QUERY = '([?][^#]*)?';
 // eslint-disable-next-line no-useless-escape
-const FRAGMENT = '(\#.*)?';
+const FRAGMENT = '(#.*)?';
 const DID_MATCHER = new RegExp(
   `^did:${METHOD}:${METHOD_ID}${PARAMS}${PATH}${QUERY}${FRAGMENT}$`,
 );
@@ -54,23 +56,16 @@ function parse(didUrl) {
     if (sections[8]) parts.fragment = sections[8].slice(1);
     return parts;
   }
-  throw new Error(`Invalid DID ${didUrl}`);
+  throw new Error(`Invalid DID: \`${didUrl}\``);
 }
 
 /**
- * A DID resolver
+ * Resolves `DID` with the identifier `did:*`.
  */
-export default class DIDResolver {
+export default class DIDResolver extends MultiResolver {
+  static PREFIX = 'did';
+
   parseDid(did) {
     return parse(did);
-  }
-
-  /**
-   * Resolve a Dock DID. The DID is expected to be a fully qualified DID.
-   * @param {string} did - The full DID
-   * @returns {Promise<object>}
-   */
-  async resolve(did) {
-    throw new Error(`Resolving not implemented in base class, please extend. ${this.constructor.name} ${did}`);
   }
 }

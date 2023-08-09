@@ -27,8 +27,9 @@ import Bls12381BBSKeyPairDock2023 from "../src/utils/vc/crypto/Bls12381BBSKeyPai
 import Bls12381G2KeyPairDock2022 from "../src/utils/vc/crypto/Bls12381G2KeyPairDock2022";
 import Bls12381PSKeyPairDock2023 from "../src/utils/vc/crypto/Bls12381PSKeyPairDock2023";
 
-require("dotenv").config();
+import dotenv from "dotenv";
 
+dotenv.config();
 const DefaultFullNodeEndpoint = "ws://localhost:9944";
 const DefaultFullNodeTCPEndpoint = "http://localhost:9933";
 const DefaultTestKeyringType = "sr25519";

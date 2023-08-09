@@ -1,14 +1,15 @@
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { HttpProvider } from '@polkadot/rpc-provider';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
-import { KeyringPair } from "@polkadot/keyring/types"; // eslint-disable-line
 import typesBundle from '@docknetwork/node-types';
+import { KeyringPair } from "@polkadot/keyring/types"; // eslint-disable-line
 
 import AnchorModule from './modules/anchor';
 import BlobModule from './modules/blob';
 import { DIDModule } from './modules/did';
 import RevocationModule from './modules/revocation';
 import TokenMigration from './modules/migration';
+import StatusListCredentialModule from './modules/status-list-credential';
 import BBSModule from './modules/bbs';
 import BBSPlusModule from './modules/bbs-plus';
 import LegacyBBSPlusModule from './modules/legacy-bbs-plus';
@@ -29,6 +30,7 @@ import {
 
 import { Signature, SignatureSr25519, SignatureEd25519 } from './signatures';
 import OffchainSignatures from './modules/offchain-signatures';
+import StatusList2021Credential from './status-list-credential/status-list-2021-credential';
 
 function getExtrinsicError(data, typeDef, api) {
   // Loop through each of the parameters
@@ -149,6 +151,7 @@ class DockAPI {
       this.api,
       this.signAndSend.bind(this),
     );
+    this.statusListCredentialModule = new StatusListCredentialModule(this.api, this.signAndSend.bind(this));
     this.legacyBBSPlus = this.api.tx.offchainSignatures == null;
     if (this.legacyBBSPlus) {
       this.bbsPlusModule = new LegacyBBSPlusModule(
@@ -203,6 +206,7 @@ class DockAPI {
       delete this.accumulatorModule;
       delete this.migrationModule;
       delete this.legacyBBSPlus;
+      delete this.statusListCredentialModule;
     }
   }
 
@@ -416,6 +420,7 @@ export {
   DIDModule,
   BBSModule,
   BBSPlusModule,
+  StatusListCredentialModule,
   OffchainSignatures,
   PSModule,
   LegacyBBSPlusModule,
@@ -425,6 +430,7 @@ export {
   PublicKeyEd25519,
   PublicKeySecp256k1,
   Signature,
+  StatusList2021Credential,
   SignatureSr25519,
   SignatureEd25519,
 };

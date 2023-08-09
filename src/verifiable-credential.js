@@ -6,9 +6,7 @@ import {
   DEFAULT_TYPE,
 } from './utils/vc/index';
 
-import {
-  validateCredentialSchema,
-} from './utils/vc/schema';
+import { validateCredentialSchema } from './utils/vc/schema';
 
 import {
   ensureObjectWithId,
@@ -51,9 +49,17 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   setId(id) {
-    ensureURI(id);
+    this.constructor.verifyID(id);
     this.id = id;
     return this;
+  }
+
+  /**
+   * Fail if the given verifiable credential id isn't a valid URI.
+   * @param {*} id
+   */
+  static verifyID(id) {
+    ensureURI(id);
   }
 
   /**
@@ -82,9 +88,10 @@ class VerifiableCredential {
    * @param {string} type - type of the credential schema
    */
   setSchema(id, type) {
-    ensureURI(id);
+    this.constructor.verifyID(id);
     this.credentialSchema = {
-      id, type,
+      id,
+      type,
     };
   }
 
@@ -111,7 +118,7 @@ class VerifiableCredential {
    */
   setContext(context) {
     if (!isObject(context) && !Array.isArray(context)) {
-      ensureURI(context);
+      this.constructor.verifyID(context);
     }
     this.context = context;
     return this;
@@ -124,9 +131,12 @@ class VerifiableCredential {
    */
   addContext(context) {
     if (!isObject(context)) {
-      ensureURI(context);
+      this.constructor.verifyID(context);
     }
-    this.context = getUniqueElementsFromArray([...this.context, context], JSON.stringify);
+    this.context = getUniqueElementsFromArray(
+      [...this.context, context],
+      JSON.stringify,
+    );
     return this;
   }
 
@@ -151,8 +161,13 @@ class VerifiableCredential {
       this.credentialSubject = [subject];
     }
 
-    const subjects = this.credentialSubject.length ? this.credentialSubject : [this.credentialSubject];
-    this.credentialSubject = getUniqueElementsFromArray([...subjects, subject], JSON.stringify);
+    const subjects = this.credentialSubject.length
+      ? this.credentialSubject
+      : [this.credentialSubject];
+    this.credentialSubject = getUniqueElementsFromArray(
+      [...subjects, subject],
+      JSON.stringify,
+    );
     return this;
   }
 
@@ -210,9 +225,7 @@ class VerifiableCredential {
    * @returns {any}
    */
   toJSON() {
-    const {
-      context, status, ...rest
-    } = this;
+    const { context, status, ...rest } = this;
     const credJson = {
       '@context': context,
     };
@@ -236,12 +249,20 @@ class VerifiableCredential {
    * @param {(jsonld|jwt|proofValue)} [type] - Optional format/type of the credential (JSON-LD, JWT, proofValue)
    * @returns {Promise<VerifiableCredential>}
    */
-  async sign(keyDoc, compactProof = true, issuerObject = null, addSuiteContext = true, type = null) {
+  async sign(
+    keyDoc,
+    compactProof = true,
+    issuerObject = null,
+    addSuiteContext = true,
+    type = null,
+  ) {
     const signedVC = await issueCredential(
       keyDoc,
       this.toJSON(),
       compactProof,
-      null, null, null,
+      null,
+      null,
+      null,
       issuerObject,
       addSuiteContext,
       type,
@@ -258,7 +279,12 @@ class VerifiableCredential {
    * @returns {Promise<VerifiableCredentialVerificationResult>}
    */
   async verify({
-    resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null, suite = [],
+    resolver = null,
+    compactProof = true,
+    forceRevocationCheck = true,
+    revocationApi = null,
+    schemaApi = null,
+    suite = [],
   } = {}) {
     if (!this.proof) {
       throw new Error('The current Verifiable Credential has no proof.');
@@ -280,7 +306,7 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   setFromJSON(json) {
-    const subject = (json.credentialSubject || json.subject);
+    const subject = json.credentialSubject || json.subject;
     if (subject) {
       const subjects = subject.length ? subject : [subject];
       subjects.forEach((value) => {
@@ -296,7 +322,7 @@ class VerifiableCredential {
       this.setIssuer(json.issuer);
     }
 
-    const status = (json.credentialStatus || json.status);
+    const status = json.credentialStatus || json.status;
     if (status) {
       this.setStatus(status);
     }
@@ -319,12 +345,14 @@ class VerifiableCredential {
    * @returns {VerifiableCredential}
    */
   static fromJSON(json) {
-    const cert = new VerifiableCredential(json.id);
+    const cert = new this(json.id);
     const contexts = json['@context'];
     if (contexts) {
       cert.setContext(contexts);
     } else {
-      throw new Error('No context found in JSON object, verifiable credentials must have a @context field.');
+      throw new Error(
+        'No context found in JSON object, verifiable credentials must have a @context field.',
+      );
     }
 
     const types = json.type;
@@ -338,7 +366,9 @@ class VerifiableCredential {
         cert.addType(types);
       }
     } else {
-      throw new Error('No type found in JSON object, verifiable credentials must have a type field.');
+      throw new Error(
+        'No type found in JSON object, verifiable credentials must have a type field.',
+      );
     }
 
     return cert.setFromJSON(json);

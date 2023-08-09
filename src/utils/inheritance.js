@@ -4,10 +4,14 @@
  * All properties will be checked for presence during the object constructor call.
  * Each property on its own will be checked every time it will be accessed.
  * In case some property is missing, an error will be thrown.
- * @param {*} properties
- * @param {*} parentClass
+ *
+ * @template T
+ * @param {Array<string>} properties
+ * @param {T} parentClass
+ * @returns {T}
  */
-export default function withExtendedStaticProperties(properties, parentClass) {
+// eslint-disable-next-line import/prefer-default-export
+export function withExtendedStaticProperties(properties, parentClass) {
   class WithExtendedStaticProperties extends parentClass {
     constructor(...args) {
       super(...args);
@@ -18,7 +22,7 @@ export default function withExtendedStaticProperties(properties, parentClass) {
       for (const property of properties) {
         if (this.constructor[property] == null) {
           throw new Error(
-            `Static property \`${property}\` of \`${this}\` isn't extended properly`,
+            `Static property \`${property}\` of \`${this.constructor.name}\` isn't extended properly`,
           );
         }
       }
@@ -31,7 +35,7 @@ export default function withExtendedStaticProperties(properties, parentClass) {
         const value = this[`_@${property}`];
         if (value == null) {
           throw new Error(
-            `Static property \`${property}\` of \`${this}\` isn't extended properly`,
+            `Static property \`${property}\` of \`${this.name}\` isn't extended properly`,
           );
         }
 
@@ -40,7 +44,11 @@ export default function withExtendedStaticProperties(properties, parentClass) {
       set(newValue) {
         if (newValue == null) {
           throw new Error(
-            `Attempt to set \`null\`ish value to the property \`${property}\` of \`${this}\``,
+            `Attempt to set \`null\`ish value to the property \`${property}\` of \`${this.name}\``,
+          );
+        } else if (this[`_@${property}`] != null) {
+          throw new Error(
+            `Can't override the property \`${property}\` of \`${this.name}\``,
           );
         }
 

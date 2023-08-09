@@ -1,8 +1,12 @@
 import axios from 'axios';
-import { NoDIDError } from './utils/did';
-import DIDResolver from './did-resolver';
+import { NoDIDError } from '../utils/did';
+import { Resolver, WILDCARD } from './generic';
 
-export default class UniversalResolver extends DIDResolver {
+export default class UniversalResolver extends Resolver {
+  static PREFIX = 'did';
+
+  static METHOD = WILDCARD;
+
   /**
    * Create an adapter to a
    * [universal-resolver](https://github.com/decentralized-identity/universal-resolver) instance. The
@@ -26,11 +30,14 @@ export default class UniversalResolver extends DIDResolver {
    */
   async resolve(did) {
     const hashIndex = did.indexOf('#');
-    const encodedDid = encodeURIComponent(hashIndex === -1 ? did : did.substr(0, hashIndex).trim());
+    const encodedDid = encodeURIComponent(
+      hashIndex === -1 ? did : did.substr(0, hashIndex).trim(),
+    );
     try {
       const resp = await axios.get(`${this.idUrl}${encodedDid}`, {
         headers: {
-          Accept: 'application/ld+json;profile="https://w3id.org/did-resolution"',
+          Accept:
+            'application/ld+json;profile="https://w3id.org/did-resolution"',
         },
       });
 

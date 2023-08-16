@@ -4,7 +4,10 @@ import { u8aToHex } from '@polkadot/util';
 import { createDidSig, getHexIdentifierFromDID } from '../utils/did';
 import { getNonce } from '../utils/misc';
 
-/** Class with logic for public keys and corresponding setup parameters. This logic is common in BBS+ and accumulator */
+/**
+ * Class with logic for public keys and corresponding setup parameters.
+ * This logic is common in offchain signatures modules and accumulator
+ */
 export default class WithParamsAndPublicKeys {
   /// Builds module-specific params from the provided value.
   static buildParams(params) {
@@ -43,7 +46,11 @@ export default class WithParamsAndPublicKeys {
    * @param paramsRef - Provide if this public key was created using params present on chain.
    * @returns {{}}
    */
-  static prepareAddPublicKey(bytes, curveType = undefined, paramsRef = undefined) {
+  static prepareAddPublicKey(
+    bytes,
+    curveType = undefined,
+    paramsRef = undefined,
+  ) {
     const publicKey = {};
     if (bytes === undefined) {
       throw new Error('bytes must be provided');
@@ -57,7 +64,9 @@ export default class WithParamsAndPublicKeys {
     } else {
       throw new Error(`Invalid curve type ${curveType}`);
     }
-    publicKey.paramsRef = paramsRef !== undefined ? WithParamsAndPublicKeys.parseRef(paramsRef) : undefined;
+    publicKey.paramsRef = paramsRef !== undefined
+      ? WithParamsAndPublicKeys.parseRef(paramsRef)
+      : undefined;
     return publicKey;
   }
 
@@ -69,16 +78,22 @@ export default class WithParamsAndPublicKeys {
    */
   static parseRef(ref) {
     const parsed = new Array(2);
-    if (!(typeof ref === 'object' && ref instanceof Array && ref.length === 2)) {
+    if (
+      !(typeof ref === 'object' && ref instanceof Array && ref.length === 2)
+    ) {
       throw new Error('Reference should be an array of 2 items');
     }
     try {
       parsed[0] = getHexIdentifierFromDID(ref[0]);
     } catch (e) {
-      throw new Error(`First item of reference should be a DID but was ${ref[0]}`);
+      throw new Error(
+        `First item of reference should be a DID but was ${ref[0]}`,
+      );
     }
     if (typeof ref[1] !== 'number') {
-      throw new Error(`Second item of reference should be a number but was ${ref[1]}`);
+      throw new Error(
+        `Second item of reference should be a number but was ${ref[1]}`,
+      );
     }
     // eslint-disable-next-line prefer-destructuring
     parsed[1] = ref[1];
@@ -96,10 +111,22 @@ export default class WithParamsAndPublicKeys {
    * using this
    * @returns {Promise<*>}
    */
-  async createAddParamsTx(params, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+  async createAddParamsTx(
+    params,
+    signerDid,
+    keyPair,
+    keyId,
+    { nonce = undefined, didModule = undefined },
+  ) {
     const offchainParams = this.constructor.buildParams(params);
     const hexDid = getHexIdentifierFromDID(signerDid);
-    const [addParams, signature] = await this.createSignedAddParams(offchainParams, hexDid, keyPair, keyId, { nonce, didModule });
+    const [addParams, signature] = await this.createSignedAddParams(
+      offchainParams,
+      hexDid,
+      keyPair,
+      keyId,
+      { nonce, didModule },
+    );
     return this.module.addParams(addParams, signature);
   }
 
@@ -114,9 +141,21 @@ export default class WithParamsAndPublicKeys {
    * using this
    * @returns {Promise<*>}
    */
-  async removeParamsTx(index, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+  async removeParamsTx(
+    index,
+    signerDid,
+    keyPair,
+    keyId,
+    { nonce = undefined, didModule = undefined },
+  ) {
     const hexDid = getHexIdentifierFromDID(signerDid);
-    const [removeParams, signature] = await this.createSignedRemoveParams(index, hexDid, keyPair, keyId, { nonce, didModule });
+    const [removeParams, signature] = await this.createSignedRemoveParams(
+      index,
+      hexDid,
+      keyPair,
+      keyId,
+      { nonce, didModule },
+    );
     return this.module.removeParams(removeParams, signature);
   }
 
@@ -133,8 +172,19 @@ export default class WithParamsAndPublicKeys {
    * @param params
    * @returns {Promise<*>}
    */
-  async addParams(param, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const tx = await this.createAddParamsTx(param, signerDid, keyPair, keyId, { nonce, didModule });
+  async addParams(
+    param,
+    signerDid,
+    keyPair,
+    keyId,
+    { nonce = undefined, didModule = undefined },
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const tx = await this.createAddParamsTx(param, signerDid, keyPair, keyId, {
+      nonce,
+      didModule,
+    });
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
@@ -151,12 +201,29 @@ export default class WithParamsAndPublicKeys {
    * @param params
    * @returns {Promise<*>}
    */
-  async removeParams(index, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const tx = await this.removeParamsTx(index, signerDid, keyPair, keyId, { nonce, didModule });
+  async removeParams(
+    index,
+    signerDid,
+    keyPair,
+    keyId,
+    { nonce = undefined, didModule = undefined },
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const tx = await this.removeParamsTx(index, signerDid, keyPair, keyId, {
+      nonce,
+      didModule,
+    });
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
-  async createSignedAddParams(params, hexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+  async createSignedAddParams(
+    params,
+    hexDid,
+    keyPair,
+    keyId,
+    { nonce = undefined, didModule = undefined },
+  ) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getNonce(hexDid, nonce, didModule);
     const addParams = { params, nonce };
@@ -165,7 +232,13 @@ export default class WithParamsAndPublicKeys {
     return [addParams, didSig];
   }
 
-  async createSignedRemoveParams(index, hexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+  async createSignedRemoveParams(
+    index,
+    hexDid,
+    keyPair,
+    keyId,
+    { nonce = undefined, didModule = undefined },
+  ) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getNonce(hexDid, nonce, didModule);
     const removeParams = { paramsRef: [hexDid, index], nonce };
@@ -218,9 +291,14 @@ export default class WithParamsAndPublicKeys {
         if (pkObj.paramsRef === null) {
           throw new Error('No reference to parameters for the public key');
         } else {
-          const params = await this.getParamsByHexDid(pkObj.paramsRef[0], pkObj.paramsRef[1]);
+          const params = await this.getParamsByHexDid(
+            pkObj.paramsRef[0],
+            pkObj.paramsRef[1],
+          );
           if (params === null) {
-            throw new Error(`Parameters with reference (${pkObj.paramsRef[0]}, ${pkObj.paramsRef[1]}) not found on chain`);
+            throw new Error(
+              `Parameters with reference (${pkObj.paramsRef[0]}, ${pkObj.paramsRef[1]}) not found on chain`,
+            );
           }
           pkObj.params = params;
         }

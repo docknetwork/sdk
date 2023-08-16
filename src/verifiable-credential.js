@@ -222,7 +222,7 @@ class VerifiableCredential {
 
   /**
    * Define the JSON representation of a Verifiable Credential.
-   * @returns {any}
+   * @returns {object}
    */
   toJSON() {
     const { context, status, ...rest } = this;

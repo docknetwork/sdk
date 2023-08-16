@@ -22,6 +22,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
 
     let encodedStatusList;
     let cachedDecodedStatusList;
+
     // Caches decoded status list.
     Object.defineProperty(this, 'decodedStatusList', {
       enumerable: false,
@@ -170,6 +171,16 @@ export default class StatusList2021Credential extends VerifiableCredential {
   }
 
   /**
+   * Converts `StatusList2021Credential` to its JSON representation.
+   * @returns {object}
+   */
+  toJSON() {
+    this.validate();
+
+    return super.toJSON();
+  }
+
+  /**
    * Encodes `StatusList2021Credential` as bytes.
    * @returns {Uint8Array}
    */
@@ -188,19 +199,29 @@ export default class StatusList2021Credential extends VerifiableCredential {
   }
 
   /**
-   * Validates underlying credentials.
+   * Validates underlying `StatusList2021Credential`.
    */
   validate() {
-    if (
-      !this.constructor.statusPurposes.has(
-        this.credentialSubject?.statusPurpose,
-      )
-    ) {
+    const { credentialSubject } = this;
+
+    if (!credentialSubject) throw new Error('Missing `credentialSubject`');
+    if (!this.constructor.statusPurposes.has(credentialSubject.statusPurpose)) {
       throw new Error(
         `Invalid \`statusPurpose\`, expected one of \`${[
           ...this.constructor.statusPurposes,
         ].join(', ')}\``,
       );
+    }
+    if (typeof credentialSubject.id !== 'string' || !credentialSubject.id) {
+      throw new Error('Missing `credentialSubject.id`');
+    }
+    if (credentialSubject.type !== 'StatusList2021') {
+      throw new Error(
+        '`credentialSubject.type` must be set to `StatusList2021`',
+      );
+    }
+    if (!credentialSubject.encodedList) {
+      throw new Error('`credentialSubject.encodedList` must be present');
     }
   }
 

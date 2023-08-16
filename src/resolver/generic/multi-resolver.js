@@ -7,8 +7,8 @@ import { WILDCARD } from './const';
  * Resolves an entity using a provided list of resolvers.
  * Each resolver must have static properties `PREFIX` and `METHOD`,
  * then the matching resolver will be called with the fully qualified identifier.
- * In case no matching resolver is found, will be used first to match either the `WILDCARD` method, `WILDCARD` prefix, or both.
  * If the resolver must be used for any `PREFIX`/`METHOD` as default, use the `WILDCARD` symbol.
+ * In case no matching resolver is found, will be used first to match either the `WILDCARD` method, `WILDCARD` prefix, or both.
  *
  * @template T
  */
@@ -50,7 +50,7 @@ export default class MultiResolver extends Resolver {
 
   /**
    * Resolves an entity with the provided identifier.
-   * @param {string} _id - fully qualified identifier.
+   * @param {string} id - fully qualified identifier.
    * @returns {Resolver<T> | null}
    */
   matchingResolver(id) {

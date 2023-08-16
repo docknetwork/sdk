@@ -81,7 +81,7 @@ export const createResolver = (
         );
         itemsAllowed(
           [resolverOrFn.constructor.METHOD || WILDCARD],
-          [this.constructor.PREFIX],
+          [this.constructor.METHOD],
         );
       }
 

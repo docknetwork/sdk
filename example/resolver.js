@@ -3,7 +3,7 @@ import ethr from 'ethr-did-resolver';
 import { DockAPI } from '../src/index';
 import { createNewDockDID, NoDIDError } from '../src/utils/did';
 import {
-  DIDResolver, MultiResolver, DIDKeyResolver, UniversalResolver, DockResolver,
+  DIDResolver, DIDKeyResolver, UniversalResolver, WILDCARD, DockDIDResolver,
 } from '../src/resolver';
 
 // The following can be tweaked depending on where the node is running and what
@@ -69,11 +69,15 @@ async function main() {
 
   const resolvers = [
     new DIDKeyResolver(), // did:key resolver
-    new DockResolver(dock), // Prebuilt resolver
+    new DockDIDResolver(dock), // Prebuilt resolver
     new EtherResolver(ethereumProviderConfig), // Custom resolver
   ];
 
-  const resolver = new MultiResolver([new UniversalResolver(universalResolverUrl), ...resolvers]);
+  class AnyDIDResolver extends DIDResolver {
+    static METHOD = WILDCARD;
+  }
+
+  const resolver = new AnyDIDResolver([new UniversalResolver(universalResolverUrl), ...resolvers]);
 
   console.log('Building DIDs list...');
 

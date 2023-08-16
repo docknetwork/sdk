@@ -1,4 +1,4 @@
-import StatusList2021Credential from '../status-list-credential/status-list-2021-credential';
+import StatusList2021Credential from '../status-list-credential/status-list2021-credential';
 import {
   getNonce,
   getSignatureFromKeyringPair,

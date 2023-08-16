@@ -30,7 +30,7 @@ import {
 
 import { Signature, SignatureSr25519, SignatureEd25519 } from './signatures';
 import OffchainSignatures from './modules/offchain-signatures';
-import StatusList2021Credential from './status-list-credential/status-list-2021-credential';
+import StatusList2021Credential from './status-list-credential/status-list2021-credential';
 
 function getExtrinsicError(data, typeDef, api) {
   // Loop through each of the parameters

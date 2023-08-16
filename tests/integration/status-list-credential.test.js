@@ -23,7 +23,7 @@ import { DockStatusList2021Qualifier } from "../../src/utils/vc/constants";
 import { getUnsignedCred, registerNewDIDUsingPair } from "./helpers";
 import getKeyDoc from "../../src/utils/vc/helpers";
 import { createNewDockDID } from "../../src/utils/did";
-import StatusList2021Credential from "../../src/status-list-credential/status-list-2021-credential";
+import StatusList2021Credential from "../../src/status-list-credential/status-list2021-credential";
 
 const credId = "A large credential id with size > 32 bytes";
 

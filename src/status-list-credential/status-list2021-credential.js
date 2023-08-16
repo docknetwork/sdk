@@ -3,35 +3,39 @@ import {
   createList,
   createCredential,
 } from '@digitalbazaar/vc-status-list';
-import { u8aToHex } from '@polkadot/util';
+import { u8aToHex, u8aToU8a } from '@polkadot/util';
 import { DockStatusList2021Qualifier } from '../utils/vc/constants';
 import VerifiableCredential from '../verifiable-credential';
 import { ensureStatusListId } from '../utils/type-helpers';
+import { KeyDoc } from "../utils/vc/helpers"; // eslint-disable-line
 
+/**
+ * Status list 2021 verifiable credential as per https://www.w3.org/TR/vc-status-list/#statuslist2021credential.
+ */
 export default class StatusList2021Credential extends VerifiableCredential {
   /**
-   * Create a new Verifiable Credential instance.
+   * Create a new Status List 2021 Verifiable Credential instance.
    * @param {string} id - id of the credential
    */
   constructor(id) {
     super(id);
-    this.validate();
 
-    let encodedStatusList; let
-      cachedStatusList;
+    let encodedStatusList;
+    let cachedDecodedStatusList;
+    // Caches decoded status list.
     Object.defineProperty(this, 'decodedStatusList', {
       enumerable: false,
       value: async function decodedStatusList() {
         if (
           encodedStatusList === this.credentialSubject.encodedList
-          && cachedStatusList !== void 0
+          && cachedDecodedStatusList !== void 0
         ) {
-          return cachedStatusList;
+          return cachedDecodedStatusList;
         } else {
-          cachedStatusList = await decodeList(this.credentialSubject);
+          cachedDecodedStatusList = await decodeList(this.credentialSubject);
           encodedStatusList = this.credentialSubject.encodedList;
 
-          return cachedStatusList;
+          return cachedDecodedStatusList;
         }
       },
     });
@@ -46,16 +50,17 @@ export default class StatusList2021Credential extends VerifiableCredential {
   }
 
   /**
-   * Creates new `StatusList2021Credential` using supplied `keyDoc`, `id`, `params`.
+   * Creates new `StatusList2021Credential` with supplied `id` and option `statusPurpose` = `revocation` by default,
+   * `length` and `revokeIndices`. Note that credential with `statusPurpose` = `revocation` can't unrevoke its indices.
+   * To allow unrevoking indices in the future, use `statusPurpose` = `suspension`.
+   * The proof will be generated immediately using supplied `keyDoc`.
    *
-   * @param {*} keyDoc
+   * @param {KeyDoc} keyDoc
    * @param {string} id - on-chain hex identifier for the `StatusList2021Credential`.
    * @param {object} [params={}]
-   * @param {string} params.statusPurpose - `statusPurpose` of the `StatusList2021Credential`.
-   * Can be either `revocation`, `suspension`.
-   *
-   * @param {number} params.length - length of the underlying `StatusList`.
-   * @param {Iterable<number>} params.revokeIndices - iterable producing indices to be revoked initially
+   * @param {string} [params.statusPurpose=revocation] - `statusPurpose` of the `StatusList2021Credential`. Can be either `revocation`, `suspension`.
+   * @param {number} [params.length=1e4] - length of the underlying `StatusList`.
+   * @param {Iterable<number>} [params.revokeIndices=[]] - iterable producing indices to be revoked initially
    */
   static async create(
     keyDoc,
@@ -76,8 +81,10 @@ export default class StatusList2021Credential extends VerifiableCredential {
   }
 
   /**
+   * Revokes/unrevokes indices in the underlying status list, regenerating the proof.
+   * If `statusPurpose` = `revocation`, indices can't be unrevoked.
    *
-   * @param {*} keyDoc
+   * @param {KeyDoc} keyDoc
    * @param {object} update
    * @param {Iterable<number>} update.revokeIndices
    * @param {Iterable<number>} update.unrevokeIndices
@@ -139,14 +146,27 @@ export default class StatusList2021Credential extends VerifiableCredential {
 
   /**
    * Decodes `StatusList2021Credential` from provided bytes.
-   * @param {*} bytes
+   * @param {Uint8Array} bytes
    */
   static fromBytes(bytes) {
-    const bufferCred = Buffer.from(bytes);
-    const stringifiedCred = bufferCred.toString('utf-8');
+    const bufferCred = Buffer.from(u8aToU8a(bytes));
+    const stringifiedCred = bufferCred.toString('utf8');
     const parsedCred = JSON.parse(stringifiedCred);
 
     return this.fromJSON(parsedCred);
+  }
+
+  /**
+   * Instantiates `StatusList2021Credential` from the provided `JSON`.
+   *
+   * @param {object} json
+   * @returns {StatusList2021Credential}
+   */
+  static fromJSON(json) {
+    const cred = super.fromJSON(json);
+    cred.validate();
+
+    return cred;
   }
 
   /**
@@ -155,16 +175,16 @@ export default class StatusList2021Credential extends VerifiableCredential {
    */
   toBytes() {
     const stringifiedCred = JSON.stringify(this.toJSON());
-    const bufferCred = new Uint8Array(Buffer.from(stringifiedCred, 'utf-8'));
-    return u8aToHex(bufferCred);
+    return new Uint8Array(Buffer.from(stringifiedCred, 'utf8'));
   }
 
   /**
+   * Converts given credentials to the substrate-compatible representation.
    *
-   * @returns {{ StatusList2021Credential: Uint8Array }}
+   * @returns {{ StatusList2021Credential: string }}
    */
   toSubstrate() {
-    return { StatusList2021Credential: this.toBytes() };
+    return { StatusList2021Credential: u8aToHex(this.toBytes()) };
   }
 
   /**
@@ -172,7 +192,9 @@ export default class StatusList2021Credential extends VerifiableCredential {
    */
   validate() {
     if (
-      this.constructor.statusPurposes.has(this.credentialSubject.statusPurpose)
+      !this.constructor.statusPurposes.has(
+        this.credentialSubject?.statusPurpose,
+      )
     ) {
       throw new Error(
         `Invalid \`statusPurpose\`, expected one of \`${[

@@ -7,7 +7,6 @@ import { MultiResolver } from './generic';
  */
 export default class DockResolver extends MultiResolver {
   static PREFIX = [DockDIDResolver.PREFIX, DockStatusListResolver.PREFIX];
-
   static METHOD = 'dock';
 
   /**

@@ -4,7 +4,6 @@ import { Resolver, WILDCARD } from './generic';
 
 export default class UniversalResolver extends Resolver {
   static PREFIX = 'did';
-
   static METHOD = WILDCARD;
 
   /**

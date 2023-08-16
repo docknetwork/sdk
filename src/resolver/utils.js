@@ -68,7 +68,6 @@ export const createResolver = (
   { prefix = WILDCARD, method = WILDCARD } = {},
 ) => new (class extends Resolver {
     static PREFIX = prefix;
-
     static METHOD = method;
 
     constructor() {

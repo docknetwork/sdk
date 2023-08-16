@@ -665,7 +665,7 @@ describe("Fees", () => {
       return;
     }
 
-    const preimage = randomAsHex(2e6);
+    const preimage = randomAsHex(4e6);
     const stashAccount = dock.keyring.addFromUri(
       TestAccountCouncilMemberURI,
       null,

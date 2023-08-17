@@ -60,9 +60,9 @@ class Resolver {
 
 /**
  * Resolves an entity if it's identifier is supported.
- * Each resolver must have static properties `PREFIX` and `METHOD`,
+ * Each resolver must have static `string` or `WILDCARD` symbol properties `PREFIX` and `METHOD`,
  * then the `supports` method will return `true` if they match the identifier.
- * If the resolver must be used for any `PREFIX`/`METHOD` as default, use the `WILDCARD` symbol.
+ * In case the resolver must be used for any `PREFIX`/`METHOD` as default, use the `WILDCARD` symbol.
  *
  * @class
  */

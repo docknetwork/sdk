@@ -1,12 +1,18 @@
 import { isObject } from 'jsonld/lib/types';
 import Resolver from './resolver';
-import { createResolver, itemsAllowed } from '../utils';
+import { itemsAllowed } from '../utils';
+import { createResolver } from './helpers'; // eslint-disable-line import/no-cycle
 import { WILDCARD } from './const';
 
 /**
- * Resolves an entity using a provided list of resolvers.
- * Each resolver must have static properties `PREFIX` and `METHOD`,
- * then the matching resolver will be called with the fully qualified identifier.
+ * Can either
+ * - implement its own `resolve` and have multiple `PREFIX`/`METHOD`(s)
+ * - act as a router and resolve an entity using a provided list of resolvers
+ *
+ * In the first case, it has to implement a `resolve` function and avoid providing any resolvers to the `super.constructor`.
+ * In the second case, it has no to have an overridden `resolve` and provide a list of resolvers into the `super.constructor`.
+ * Each resolver must have static properties `PREFIX` and `METHOD`, and unlike `Resolver`, `MultiResolver` can have Arrays of strings.
+ *
  * If the resolver must be used for any `PREFIX`/`METHOD` as default, use the `WILDCARD` symbol.
  * In case no matching resolver is found, will be used first to match either the `WILDCARD` method, `WILDCARD` prefix, or both.
  *
@@ -28,7 +34,10 @@ export default class MultiResolver extends Resolver {
     } else {
       if (isObject(resolvers)) {
         // Legacy constructor support
-        resolverList = Object.entries(resolvers).map(([prefix, resolverOrFn]) => createResolver(resolverOrFn, { prefix }));
+        resolverList = Object.entries(resolvers).map(([method, resolverOrFn]) => createResolver(resolverOrFn, {
+          method,
+          prefix: this.constructor.PREFIX,
+        }));
       } else {
         resolverList = resolvers || [];
       }
@@ -85,7 +94,10 @@ export default class MultiResolver extends Resolver {
           }\``,
         );
       }
-      if (this === resolver && resolver.resolve === MultiResolver.prototype.resolve) {
+      if (
+        this === resolver
+        && resolver.resolve === MultiResolver.prototype.resolve
+      ) {
         throw new Error(
           `Resolver \`${resolver.constructor.name}\` must implement its own \`resolve\``,
         );

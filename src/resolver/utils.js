@@ -1,7 +1,3 @@
-/* eslint-disable max-classes-per-file */
-import { WILDCARD } from './generic/const';
-import Resolver from './generic/resolver';
-
 /**
  * Before resolving an entity, ensures that `DockAPI` is initialized, throws an error otherwise.
  * @template T
@@ -38,6 +34,12 @@ const fmtIter = (iter) => `\`[${[...iter].map((item) => item.toString()).join(',
 export const itemsAllowed = (items, allowed, wildcard) => {
   const itemsSet = new Set(items);
   const allowedSet = new Set(allowed);
+  if (items.size === 0) {
+    throw new Error('Empty item set provided');
+  }
+  if (allowed.size === 0) {
+    throw new Error('Empty allowed set provided');
+  }
 
   for (const toCheck of [itemsSet, allowedSet]) {
     if (toCheck.has(wildcard) && toCheck.size > 1) {
@@ -57,41 +59,3 @@ export const itemsAllowed = (items, allowed, wildcard) => {
     }
   }
 };
-
-/**
- * Creates a resolver.
- *
- * @template T
- * @param {Resolver<T> | function(): Promise<T>} resolverOrFn
- * @param {object?} config
- * @param {(string | symbol)?} [config.prefix=WILDCARD]
- * @param {(string | symbol)?} [config.method=WILDCARD]
- * @returns {Resolver<T>}
- */
-export const createResolver = (
-  resolverOrFn,
-  { prefix = WILDCARD, method = WILDCARD } = {},
-) => new (class extends Resolver {
-    static PREFIX = prefix;
-    static METHOD = method;
-
-    constructor() {
-      super();
-
-      const isResolver = typeof resolverOrFn !== 'function';
-      if (isResolver) {
-        itemsAllowed(
-          [resolverOrFn.constructor.PREFIX || WILDCARD],
-          [this.constructor.PREFIX],
-        );
-        itemsAllowed(
-          [resolverOrFn.constructor.METHOD || WILDCARD],
-          [this.constructor.METHOD],
-        );
-      }
-
-      this.resolve = !isResolver
-        ? resolverOrFn
-        : resolverOrFn.resolve.bind(resolverOrFn);
-    }
-})();

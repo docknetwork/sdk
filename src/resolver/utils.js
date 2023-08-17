@@ -19,35 +19,40 @@ export const withInitializedDockAPI = (resolverClass) => class WithInitializedDo
 };
 
 /**
- * Ensures item to be present in allowed set and that both sets are valid.
+ * Returns string containing items of the provided iterable.
+ *
+ * @template V
+ * @param {Iterable<V>} iter
+ * @returns {string}
+ */
+const fmtIter = (iter) => `\`[${[...iter].map((item) => item.toString()).join(', ')}]\``;
+
+/**
+ * Ensures that each item is present in the allowed set and that both sets are valid.
  *
  * @template T
- * @param {Array<T>} items
- * @param {Array<T>} allowed
+ * @param {Iterable<T>} items
+ * @param {Iterable<T>} allowed
  * @param {T} wildcard
  */
 export const itemsAllowed = (items, allowed, wildcard) => {
-  items = new Set(items);
-  allowed = new Set(allowed);
+  const itemsSet = new Set(items);
+  const allowedSet = new Set(allowed);
 
-  for (const toCheck of [items, allowed]) {
+  for (const toCheck of [itemsSet, allowedSet]) {
     if (toCheck.has(wildcard) && toCheck.size > 1) {
       throw new Error(
-        `Can't have wildcard mixed with other patterns for \`[${[
-          ...toCheck,
-        ].join(', ')}]\``,
+        `Can't have wildcard mixed with other patterns for ${fmtIter(toCheck)}`,
       );
     }
   }
 
-  if (allowed.has(wildcard)) return;
+  if (allowedSet.has(wildcard)) return;
 
-  for (const item of items) {
-    if (!allowed.has(item)) {
+  for (const item of itemsSet) {
+    if (!allowedSet.has(item)) {
       throw new Error(
-        `Item not found in \`[${[...allowed].join(
-          ', ',
-        )}]\`: \`${item.toString()}\``,
+        `Item not found in ${fmtIter(allowedSet)}: \`${item.toString()}\``,
       );
     }
   }

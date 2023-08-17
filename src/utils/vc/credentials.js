@@ -14,10 +14,7 @@ import {
   expandJSONLD,
   getKeyFromDIDDocument,
 } from './helpers';
-import {
-  DEFAULT_CONTEXT_V1_URL,
-  credentialContextField,
-} from './constants';
+import { DEFAULT_CONTEXT_V1_URL, credentialContextField } from './constants';
 import { ensureValidDatetime } from '../type-helpers';
 
 import {
@@ -324,7 +321,7 @@ export async function verifyCredential(
     return { verified };
   }
 
-  suite = [
+  const fullSuite = [
     new Ed25519Signature2018(),
     new EcdsaSepc256k1Signature2019(),
     new Sr25519Signature2020(),
@@ -346,7 +343,7 @@ export async function verifyCredential(
         controller,
       }),
     // TODO: support more key types, see digitalbazaar github
-    suite,
+    suite: fullSuite,
     documentLoader: docLoader,
     compactProof,
   });
@@ -358,7 +355,7 @@ export async function verifyCredential(
     if (isStatusList2021Credential) {
       const revResult = await checkStatus({
         credential,
-        suite,
+        suite: fullSuite,
         documentLoader: docLoader,
         verifyStatusListCredential: true,
         verifyMatchingIssuers: true,

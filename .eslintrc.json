@@ -24,7 +24,6 @@
       }
     ],
     "no-void": "off",
-    "no-param-reassign": "off",
     "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
     "import/no-extraneous-dependencies": "off",
     "class-methods-use-this": "off",

@@ -85,7 +85,7 @@ export default class MultiResolver extends Resolver {
           }\``,
         );
       }
-      if (resolver.resolve === MultiResolver.prototype.resolve) {
+      if (this === resolver && resolver.resolve === MultiResolver.prototype.resolve) {
         throw new Error(
           `Resolver \`${resolver.constructor.name}\` must implement its own \`resolve\``,
         );

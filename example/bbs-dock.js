@@ -1,5 +1,5 @@
 import VerifiableCredential from '../src/verifiable-credential';
-import { MultiResolver } from '../src/resolver';
+import { DIDResolver } from '../src/resolver';
 import Bls12381G2KeyPairDock2022 from '../src/utils/vc/crypto/Bls12381G2KeyPairDock2022';
 
 const keypairOpts = {
@@ -9,7 +9,13 @@ const keypairOpts = {
   "publicKeyBase58": "GzJYyMYXQyAdmRK3JcfQnHJtz5TyRiYyYtfj6SZD9LQ4zDapQ3qeC1AaBwCtzhQ8En6EGiLe7ke2RaeLNTxJ9GVompK6j6kHB8e5m2ya5qdCB2bbNMVii99QfmYsbj36J3B"
 };
 
-class ExampleDIDResolver {
+class ExampleDIDResolver extends DIDResolver {
+  static METHOD = 'example';
+
+  constructor() {
+    super();
+  }
+
   async resolve(did) {
     if (did.indexOf('#keys-1') !== -1) {
       return {
@@ -25,9 +31,7 @@ class ExampleDIDResolver {
   }
 }
 
-const resolver = new MultiResolver({
-  example: new ExampleDIDResolver(),
-});
+const resolver = new ExampleDIDResolver();
 
 const residentCardSchema = {
   "$schema": "http://json-schema.org/draft-07/schema#",

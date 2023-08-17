@@ -142,6 +142,19 @@ describe("Resolvers", () => {
     expect(await wildcard.resolve("asdasdasd:asdasdasd:")).toBe(
       "wildcard-wildcard-asdasdasd:asdasdasd:"
     );
+
+    const nestedWildcard = new WildcardPrefixAndMethod([
+      new APrefixResolverWithBMethodFull(),
+      new WildcardPrefixAndMethod([wildcard]),
+    ]);
+    expect(await nestedWildcard.resolve("a:b:")).toBe("ab-extended-a:b:");
+    expect(await nestedWildcard.resolve("c:d:")).toBe("cd-full-c:d:");
+    expect(await wildcard.resolve("a:asdasdas:")).toBe(
+      "a-wildcard-a:asdasdas:"
+    );
+    expect(await nestedWildcard.resolve("asdasdasd:asdasdasd:")).toBe(
+      "wildcard-wildcard-asdasdasd:asdasdasd:"
+    );
   });
 
   it("checks `createResolver`", async () => {

@@ -5,7 +5,7 @@ import { createResolver } from './helpers'; // eslint-disable-line import/no-cyc
 import { WILDCARD } from './const';
 
 /**
- * Can either
+ * Successor can either
  * - implement its own `resolve` and have multiple `PREFIX`/`METHOD`(s)
  * - act as a router and resolve an entity using a provided list of resolvers
  *

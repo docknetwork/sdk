@@ -79,6 +79,7 @@ class Resolver {
  * then the `supports` method will return `true` if they match the identifier.
  * In case the resolver must be used for any `PREFIX`/`METHOD` as default, use the `WILDCARD` symbol.
  *
- * @type {Resolver}
+ * @template T
+ * @type {Resolver<T>}
  */
 export default withExtendedStaticProperties(['PREFIX', 'METHOD'], Resolver);

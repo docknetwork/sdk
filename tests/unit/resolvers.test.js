@@ -79,7 +79,7 @@ describe("Resolvers", () => {
     expect(() => new BMethod()).toThrowError(
       "Static property `PREFIX` of `BMethod` isn't extended properly"
     );
-    expect(() => new APrefixBMethod()).toThrowError("No resolvers provided");
+    expect(() => new APrefixBMethod()).toThrowError("No resolvers were provided. You need to either implement `resolve` or provide a list of resolvers.");
     expect(() => new APrefix()).toThrowError(
       "Static property `METHOD` of `APrefix` isn't extended properly"
     );
@@ -177,16 +177,29 @@ describe("Resolvers", () => {
       })()
     );
 
-    expect(
-      await createResolver(resolve, { prefix: "abc", method: "cde" }).resolve(
-        "abc:cde:1"
-      )
-    ).toBe(1);
+    const singleResolver = createResolver(resolve, {
+      prefix: "abc",
+      method: "cde",
+    });
 
-    expect(
-      await createResolver(
-        createResolver(resolve, { prefix: "abc", method: "cde" })
-      ).resolve("abc:cde:1")
-    ).toBe(1);
+    expect(await singleResolver.resolve("abc:cde:1")).toBe(1);
+    expect(singleResolver.supports("abc:cde:1")).toBe(true);
+    expect(await singleResolver.supports("abc:de:1")).toBe(false);
+
+    const wildcardResolver = createResolver(
+      createResolver(resolve, { prefix: "abc", method: "cde" })
+    );
+
+    expect(await wildcardResolver.resolve("abc:cde:1")).toBe(1);
+    expect(wildcardResolver.supports("abc:cde:1")).toBe(true);
+    expect(await wildcardResolver.supports("abc:de:1")).toBe(true);
+
+    const multiResolver = createResolver(resolve, {
+      prefix: ["abc"],
+      method: ["cde"],
+    });
+    expect(await multiResolver.resolve("abc:cde:1")).toBe(1);
+    expect(multiResolver.supports("abc:cde:1")).toBe(true);
+    expect(await multiResolver.supports("abc:de:1")).toBe(false);
   });
 });

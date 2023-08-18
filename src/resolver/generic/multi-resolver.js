@@ -42,7 +42,7 @@ export default class MultiResolver extends Resolver {
         resolverList = resolvers || [];
       }
 
-      if (!resolverList.length) throw new Error('No resolvers provided');
+      if (!resolverList.length) throw new Error('No resolvers were provided. You need to either implement `resolve` or provide a list of resolvers.');
     }
 
     this.resolvers = this.buildResolversMap(resolverList);

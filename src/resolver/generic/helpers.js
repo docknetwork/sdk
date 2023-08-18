@@ -46,5 +46,9 @@ export const createResolver = (
         ? resolverOrFn
         : resolverOrFn.resolve.bind(resolverOrFn);
     }
+
+    async resolve(_id) {
+      throw new Error('Unimplemented');
+    }
   })();
 };

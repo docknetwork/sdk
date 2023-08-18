@@ -30,9 +30,11 @@ export function withExtendedStaticProperties(properties, parentClass) {
   }
 
   for (const property of properties) {
+    const propertySymbol = Symbol(property);
+
     Object.defineProperty(WithExtendedStaticProperties, property, {
       get() {
-        const value = this[`_@${property}`];
+        const value = this[propertySymbol];
         if (value == null) {
           throw new Error(
             `Static property \`${property}\` of \`${this.name}\` isn't extended properly`,
@@ -46,13 +48,13 @@ export function withExtendedStaticProperties(properties, parentClass) {
           throw new Error(
             `Attempt to set \`null\`ish value to the property \`${property}\` of \`${this.name}\``,
           );
-        } else if (this[`_@${property}`] != null) {
+        } else if (this[propertySymbol] != null) {
           throw new Error(
             `Can't override the property \`${property}\` of \`${this.name}\``,
           );
         }
 
-        this[`_@${property}`] = newValue;
+        this[propertySymbol] = newValue;
       },
     });
   }

@@ -7,6 +7,21 @@ import { WILDCARD } from './const';
  */
 class Resolver {
   /**
+   * Matching prefix - either a string or wildcard pattern.
+   * @type {string | symbol}
+   * @abstract
+   * @static
+   */
+  static PREFIX;
+  /**
+   * Matching method - either a string or wildcard pattern.
+   * @type {string | symbol}
+   * @abstract
+   * @static
+   */
+  static METHOD;
+
+  /**
    * Returns `true` if an entity with the provided identifier can be resolved using this resolver.
    * @param {string} _id - fully qualified identifier.
    * @returns {boolean}
@@ -64,6 +79,6 @@ class Resolver {
  * then the `supports` method will return `true` if they match the identifier.
  * In case the resolver must be used for any `PREFIX`/`METHOD` as default, use the `WILDCARD` symbol.
  *
- * @class
+ * @type {Resolver}
  */
 export default withExtendedStaticProperties(['PREFIX', 'METHOD'], Resolver);

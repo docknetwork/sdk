@@ -7,10 +7,10 @@ import { itemsAllowed } from '../utils';
  * Creates a resolver.
  *
  * @template T
- * @param {Resolver<T> | function(): Promise<T>} resolverOrFn
- * @param {object?} config
- * @param {(string | symbol)?} [config.prefix=WILDCARD]
- * @param {(string | symbol)?} [config.method=WILDCARD]
+ * @param {Resolver<T> | function(string): Promise<T>} resolverOrFn
+ * @param {object} [config={}]
+ * @param {Array<string> | string | symbol} [config.prefix=WILDCARD]
+ * @param {Array<string> | string | symbol} [config.method=WILDCARD]
  * @returns {Resolver<T> | MultiResolver<T>}
  */
 // eslint-disable-next-line import/prefer-default-export
@@ -21,7 +21,7 @@ export const createResolver = (
   const isMulti = Array.isArray(prefix) || Array.isArray(method);
   const baseClass = isMulti ? MultiResolver : Resolver;
 
-  return new (class extends baseClass {
+  return new (class ResolverCreatedUsingCreateResolver extends baseClass {
     static PREFIX = prefix;
     static METHOD = method;
 

@@ -11,7 +11,8 @@ import { WILDCARD } from './const';
  *
  * In the first case, it has to implement a `resolve` function and avoid providing any resolvers to the `super.constructor`.
  * In the second case, it has no to have an overridden `resolve` and provide a list of resolvers into the `super.constructor`.
- * Each resolver must have static properties `PREFIX` and `METHOD`, and unlike `Resolver`, `MultiResolver` can have Arrays of strings.
+ * Each resolver must have static properties `PREFIX` and `METHOD`, and unlike `Resolver`, `MultiResolver` can have `PREFIX`
+ * and `METHOD` specified as Arrays of strings.
  *
  * If the resolver must be used for any `PREFIX`/`METHOD` as default, use the `WILDCARD` symbol.
  * In case no matching resolver is found, will be used first to match either the `WILDCARD` method, `WILDCARD` prefix, or both.
@@ -19,6 +20,21 @@ import { WILDCARD } from './const';
  * @template T
  */
 export default class MultiResolver extends Resolver {
+  /**
+   * Matching string prefix, array of string prefixes, or wildcard pattern.
+   * @type {Array<string> | string | symbol}
+   * @abstract
+   * @static
+   */
+  static PREFIX;
+  /**
+   * Matching string method, array of string methods, or wildcard pattern.
+   * @type {Array<string> | string | symbol}
+   * @abstract
+   * @static
+   */
+  static METHOD;
+
   constructor(resolvers) {
     super();
 
@@ -42,7 +58,11 @@ export default class MultiResolver extends Resolver {
         resolverList = resolvers || [];
       }
 
-      if (!resolverList.length) throw new Error('No resolvers were provided. You need to either implement `resolve` or provide a list of resolvers.');
+      if (!resolverList.length) {
+        throw new Error(
+          'No resolvers were provided. You need to either implement `resolve` or provide a list of resolvers.',
+        );
+      }
     }
 
     this.resolvers = this.buildResolversMap(resolverList);
@@ -114,7 +134,7 @@ export default class MultiResolver extends Resolver {
           acc[prefix] ||= Object.create(null);
           if (acc[prefix][method] != null) {
             throw new Error(
-              `Two resolvers for the same prefix and method - \`${prefix}:${method}\`: \`${acc[prefix][method].constructor.name}\` and \`${resolver.constructor.name}\``,
+              `Two resolvers for the same prefix and method - \`${prefix}:${method}:\`: \`${acc[prefix][method].constructor.name}\` and \`${resolver.constructor.name}\``,
             );
           }
           acc[prefix][method] = resolver;

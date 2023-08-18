@@ -1,7 +1,10 @@
 import axios from 'axios';
-import { NoDIDError } from '../utils/did';
-import { Resolver, WILDCARD } from './generic';
+import { NoDIDError } from '../../utils/did';
+import { Resolver, WILDCARD } from '../generic';
 
+/**
+ * Resolves `DID`s with wildcard method: `did:*:`.
+ */
 export default class UniversalResolver extends Resolver {
   static PREFIX = 'did';
   static METHOD = WILDCARD;

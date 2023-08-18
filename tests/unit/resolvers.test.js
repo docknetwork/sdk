@@ -79,7 +79,9 @@ describe("Resolvers", () => {
     expect(() => new BMethod()).toThrowError(
       "Static property `PREFIX` of `BMethod` isn't extended properly"
     );
-    expect(() => new APrefixBMethod()).toThrowError("No resolvers were provided. You need to either implement `resolve` or provide a list of resolvers.");
+    expect(() => new APrefixBMethod()).toThrowError(
+      "No resolvers were provided. You need to either implement `resolve` or provide a list of resolvers."
+    );
     expect(() => new APrefix()).toThrowError(
       "Static property `METHOD` of `APrefix` isn't extended properly"
     );
@@ -90,7 +92,7 @@ describe("Resolvers", () => {
       () =>
         new APrefixBMethod([new APrefixBMethodFull(), new APrefixBMethodFull()])
     ).toThrowError(
-      "Two resolvers for the same prefix and method - `a:b`: `APrefixBMethodFull` and `APrefixBMethodFull`"
+      "Two resolvers for the same prefix and method - `a:b:`: `APrefixBMethodFull` and `APrefixBMethodFull`"
     );
     expect(await new APrefixBMethodFull().resolve("a:b:123")).toBe(
       "ab-full-a:b:123"
@@ -164,18 +166,14 @@ describe("Resolvers", () => {
 
   it("checks `createResolver`", async () => {
     const resolve = async () => 1;
-    expect(createResolver(resolve, { prefix: "abc", method: "cde" })).toEqual(
-      new (class extends Resolver {
-        static PREFIX = "abc";
-        static METHOD = "cde";
 
-        constructor() {
-          super();
+    expect(
+      () => createResolver(new APrefixBMethodFull(), { prefix: "c" })
+    ).toThrowError("Item not found in `[c]`: `a`");
 
-          this.resolve = resolve;
-        }
-      })()
-    );
+    expect(
+      () => createResolver(new APrefixBMethodFull(), { method: "c" })
+    ).toThrowError("Item not found in `[c]`: `b`");
 
     const singleResolver = createResolver(resolve, {
       prefix: "abc",

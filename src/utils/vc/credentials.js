@@ -196,14 +196,17 @@ export function checkCredential(credential) {
  * @property {string} [domain] - proof domain (optional)
  * @property {string} [controller] - controller (optional)
  * @property {DIDResolver} [resolver] - Resolver to resolve the issuer DID (optional)
- * @property {Boolean} [unsignedPresentation] - Whether to verify the proof or not
- * @property {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
- * @property {Boolean} [forceRevocationCheck] - Whether to force revocation check or not.
+ * @property {boolean} [unsignedPresentation] - Whether to verify the proof or not
+ * @property {boolean} [compactProof] - Whether to compact the JSON-LD or not.
+ * @property {boolean} [forceRevocationCheck] - Whether to force revocation check or not. **Will be used only if credential doesn't have `StatusList2021Entry` in `credentialStatus`.**
  * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
+ * @property {boolean} [verifyMatchingIssuersForRevocation = true] - ensure that status list credential issuer is same as credential issuer.
+ * **Will be used only if credential doesn't have `StatusList2021Entry` in `credentialStatus`.**
  * @property {object} [purpose] - A purpose other than the default CredentialIssuancePurpose
  * @property {object} [revocationApi] - An object representing a map. "revocation type -> revocation API". The API is used to check
  * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
+ * **Will be used only if credential doesn't have `StatusList2021Entry` in `credentialStatus`.**
  * @property {object} [schemaApi] - An object representing a map. "schema type -> schema API". The API is used to get
  * a schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
  * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
@@ -212,6 +215,7 @@ export function checkCredential(credential) {
 
 /**
  * Verify a Verifiable Credential. Returns the verification status and error in an object
+ * **`forceRevocationCheck` and `revocationApi` will be used only if the credential doesn't have `StatusList2021Entry` in `credentialStatus`.**
  * @param {object} [vcJSONorString] The VCDM Credential as JSON-LD or JWT string
  * @param {VerifiableParams} options Verify parameters, this object is passed down to jsonld-signatures calls
  * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
@@ -224,6 +228,7 @@ export async function verifyCredential(
     resolver = null,
     compactProof = true,
     forceRevocationCheck = true,
+    verifyMatchingIssuersForRevocation = true,
     revocationApi = null,
     schemaApi = null,
     documentLoader = null,
@@ -358,7 +363,7 @@ export async function verifyCredential(
         suite: fullSuite,
         documentLoader: docLoader,
         verifyStatusListCredential: true,
-        verifyMatchingIssuers: true,
+        verifyMatchingIssuers: verifyMatchingIssuersForRevocation,
       });
 
       // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
@@ -397,12 +402,12 @@ export async function verifyCredential(
  * Issue a Verifiable credential
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
  * @param {object} credential - Credential to be signed.
- * @param {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
+ * @param {boolean} [compactProof] - Whether to compact the JSON-LD or not.
  * @param documentLoader
  * @param purpose
  * @param expansionMap
  * @param {object} [issuerObject] - Optional issuer object to assign
- * @param {Boolean} [addSuiteContext] - Toggles the default
+ * @param {boolean} [addSuiteContext] - Toggles the default
  *   behavior of each signature suite enforcing the presence of its own
  *   `@context` (if it is not present, it's added to the context list).
  * @param {(jsonld|jwt|proofValue)} [type] - Optional format/type of the credential (JSON-LD, JWT, proofValue)

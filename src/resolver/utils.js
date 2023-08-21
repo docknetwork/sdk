@@ -15,7 +15,7 @@ export const withInitializedDockAPI = (resolverClass) => class WithInitializedDo
 };
 
 /**
- * Returns string containing items of the provided iterable.
+ * Returns string containing comma separated items of the provided iterable.
  *
  * @template V
  * @param {Iterable<V>} iter

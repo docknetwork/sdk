@@ -4,6 +4,7 @@ import {
   FullNodeEndpoint,
   TestKeyringOpts,
   TestAccountURI,
+  DisableStatusListTests
 } from "../test-constants";
 import { DockAPI } from "../../src/index";
 import defaultDocumentLoader from "../../src/utils/vc/document-loader";
@@ -44,7 +45,7 @@ function addCredentialStatus(
   };
 }
 
-const buildTest = process.env.DISABLE_STATUS_LIST_TESTS
+const buildTest = DisableStatusListTests
   ? describe.skip
   : describe;
 
@@ -125,8 +126,6 @@ buildTest("StatusList2021Credential", () => {
       unsignedCred,
       void 0,
       defaultDocumentLoader(resolver),
-      void 0,
-      console.log
     );
 
     expanded = await expandJSONLD(credential);

@@ -9,6 +9,8 @@ const STATUS_LIST_ID_MATCHER = new RegExp(
 /**
  * A `StatusList2021Credential` resolver.
  * Accepts identifiers in format `status-list2021:`.
+ *
+ * @abstract
  */
 export default class StatusList2021Resolver extends MultiResolver {
   static PREFIX = 'status-list2021';

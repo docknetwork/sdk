@@ -10,13 +10,15 @@ import { WILDCARD } from './const';
  * - act as a router and resolve an entity using a provided list of resolvers
  *
  * In the first case, it has to implement a `resolve` function and avoid providing any resolvers to the `super.constructor`.
- * In the second case, it has no to have an overridden `resolve` and provide a list of resolvers into the `super.constructor`.
+ * In the second case, it doesn't have to override `resolve` but instead provide a list of resolvers into the `super.constructor`.
  * Each resolver must have static properties `PREFIX` and `METHOD`, and unlike `Resolver`, `MultiResolver` can have `PREFIX`
  * and `METHOD` specified as Arrays of strings.
  *
  * If the resolver must be used for any `PREFIX`/`METHOD` as default, use the `WILDCARD` symbol.
  * In case no matching resolver is found, will be used first to match either the `WILDCARD` method, `WILDCARD` prefix, or both.
  *
+ * @class
+ * @abstract
  * @template T
  */
 export default class MultiResolver extends Resolver {
@@ -71,7 +73,7 @@ export default class MultiResolver extends Resolver {
   /**
    * Returns `true` if an entity with the provided identifier can be resolved using this resolver.
    * @param {string} id - fully qualified identifier.
-   * @returns {Promise<boolean>}
+   * @returns {boolean}
    */
   supports(id) {
     return this.matchingResolver(id) != null;

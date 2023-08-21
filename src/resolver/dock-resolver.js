@@ -10,7 +10,8 @@ export default class DockResolver extends MultiResolver {
   static METHOD = 'dock';
 
   /**
-   * @param {any} dock - An initialized connection to a dock full-node.
+   * Resolves dock-hosted entities such us `did:dock:*` and `status-list2021:dock:*`.
+   * @param {DockAPI} dock - An initialized connection to a dock full-node.
    * @constructor
    */
   constructor(dock) {

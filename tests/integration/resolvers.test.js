@@ -8,6 +8,7 @@ import {
   FullNodeEndpoint,
   TestKeyringOpts,
   TestAccountURI,
+  DisableStatusListTests
 } from "../test-constants";
 
 import { createNewDockDID } from "../../src/utils/did";
@@ -59,7 +60,7 @@ describe("Resolvers", () => {
     // The controller is same as the DID
     await registerNewDIDUsingPair(dock, ownerDID, pair);
 
-    if (!process.env.DISABLE_STATUS_LIST_TESTS) {
+    if (!DisableStatusListTests) {
       statusListCred = await StatusList2021Credential.create(
         ownerKey,
         statusListCredId
@@ -90,14 +91,14 @@ describe("Resolvers", () => {
     expect(await resolver.resolve(ownerDID)).toEqual(
       await dock.did.getDocument(getHexIdentifierFromDID(ownerDID))
     );
-    if (!process.env.DISABLE_STATUS_LIST_TESTS)
+    if (!DisableStatusListTests)
       expect(await resolver.resolve(statusListCred.id)).toEqual(
         statusListCred.toJSON()
       );
   });
 
   it("checks `DockStatusList2021Resolver`", async () => {
-    if (process.env.DISABLE_STATUS_LIST_TESTS) return;
+    if (DisableStatusListTests) return;
 
     const resolver = new DockStatusList2021Resolver(dock);
 
@@ -125,7 +126,7 @@ describe("Resolvers", () => {
     expect(await resolver.resolve(ownerDID)).toEqual(
       await dock.did.getDocument(getHexIdentifierFromDID(ownerDID))
     );
-    if (!process.env.DISABLE_STATUS_LIST_TESTS)
+    if (!DisableStatusListTests)
       expect(resolver.resolve(statusListCred.id)).rejects.toThrowError(
         `Invalid DID: \`${statusListCred.id}\``
       );

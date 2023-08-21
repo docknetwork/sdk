@@ -10,7 +10,6 @@
  * @param {T} parentClass
  * @returns {T}
  */
-// eslint-disable-next-line import/prefer-default-export
 export function withExtendedStaticProperties(properties, parentClass) {
   class WithExtendedStaticProperties extends parentClass {
     constructor(...args) {

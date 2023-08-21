@@ -1,4 +1,4 @@
-import { Resolver, MultiResolver, WILDCARD } from "../../src/resolver";
+import { MultiResolver, WILDCARD } from "../../src/resolver";
 import { createResolver } from "../../src/resolver";
 
 class APrefixBMethodFull extends MultiResolver {

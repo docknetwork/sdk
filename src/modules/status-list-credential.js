@@ -52,7 +52,7 @@ export default class StatusListCredentialModule {
 
   /**
    * Create a transaction to create a new status list credential on-chain.
-   * @param id - is the unique id of the registry. The function will check whether `id` is already taken or not.
+   * @param id - is the unique id of the status list credential. The function will check whether `id` is already taken or not.
    * @param statusListCredential - the credential to be associated with the given `id`
    * @param policy - the credential policy
    * @return {Promise<object>} - the extrinsic to sign and send.
@@ -78,7 +78,7 @@ export default class StatusListCredentialModule {
 
   /**
    * Create a transaction to remove an existing status list credential from the chain.
-   * @param id - is the unique id of the registry. The function will check whether `id` is already taken or not.
+   * @param statusListCredentialId - is the unique id of the status list credential. The function will check whether `id` is already taken or not.
    * @param didSigs - `DID` signatures over an action with a nonce authorizing this action according to the existing policy.
    * @return {Promise<object>} - the extrinsic to sign and send.
    */
@@ -88,7 +88,7 @@ export default class StatusListCredentialModule {
 
   /**
    * Create a new status list credential on-chain.
-   * @param id - is the unique id of the registry. The function will check whether `id` is already taken or not.
+   * @param id - is the unique id of the status list credential. The function will check whether `id` is already taken or not.
    * @param statusListCredential - The status list credential to be associated with the given `id`.
    * @param policy - The credential policy.
    * @param waitForFinalization

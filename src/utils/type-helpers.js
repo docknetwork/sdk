@@ -36,13 +36,6 @@ export function ensureObject(value) {
   }
 }
 
-export function ensureNonEmptyObject(value) {
-  ensureObject(value);
-  if (Object.keys(value) === 0) {
-    throw new Error(`${value} needs to be non-empty object.`);
-  }
-}
-
 /**
  * Fail if the given string isn't a URI
  * @param uri
@@ -63,7 +56,7 @@ const STATUS_LIST_ID_MATCHER = new RegExp(
 
 /**
  * Fail if the given string isn't a valid `StatusList2021Credential` id.
- * @param uri
+ * @param statusListId
  */
 export function ensureStatusListId(statusListId) {
   ensureString(statusListId);

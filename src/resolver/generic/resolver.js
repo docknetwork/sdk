@@ -3,6 +3,8 @@ import { withExtendedStaticProperties } from '../../utils/inheritance';
 import { WILDCARD } from './const';
 
 /**
+ * @class
+ * @abstract
  * @template T
  */
 class Resolver {
@@ -23,7 +25,7 @@ class Resolver {
 
   /**
    * Returns `true` if an entity with the provided identifier can be resolved using this resolver.
-   * @param {string} _id - fully qualified identifier.
+   * @param {string} id - fully qualified identifier.
    * @returns {boolean}
    */
   supports(id) {
@@ -55,7 +57,7 @@ class Resolver {
     ensureString(id);
     const end = id.indexOf(':');
 
-    return id.slice(0, end).trim();
+    return id.slice(0, end);
   }
 
   /**
@@ -69,7 +71,7 @@ class Resolver {
     const start = id.indexOf(':');
     const end = id.indexOf(':', start + 1);
 
-    return id.slice(start + 1, end).trim();
+    return id.slice(start + 1, end);
   }
 }
 

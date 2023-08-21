@@ -6,6 +6,7 @@ import {
   FullNodeEndpoint,
   TestKeyringOpts,
   TestAccountURI,
+  DisableStatusListTests
 } from "../test-constants";
 
 import { getHexIdentifierFromDID } from "../../src/utils/did";
@@ -22,7 +23,7 @@ const expectEqualCreds = (cred1, cred2) => {
     StatusList2021Credential.fromJSON(cred2.toJSON())
   );
 };
-const buildTest = process.env.DISABLE_STATUS_LIST_TESTS ? describe.skip : describe;
+const buildTest = DisableStatusListTests ? describe.skip : describe;
 
 buildTest("StatusListCredential Module", () => {
   const dock = new DockAPI();

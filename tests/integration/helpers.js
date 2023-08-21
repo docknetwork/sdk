@@ -29,6 +29,7 @@ export async function registerNewDIDUsingPair(dockAPI, did, pair, verRels = unde
  * Test helper to get an unsigned cred with given credential id and holder DID
  * @param credId - Credential id
  * @param holderDID - Holder DID
+ * @param additionalContext - Additional `URI`s to be added to the `@context` property.
  * @returns {{issuanceDate: string, credentialSubject: {alumniOf: string, id: *}, id: *, type: [string, string], '@context': [string, string]}}
  */
 export function getUnsignedCred(credId, holderDID, additionalContext = []) {

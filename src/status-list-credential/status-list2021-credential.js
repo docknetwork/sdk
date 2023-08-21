@@ -25,7 +25,6 @@ export default class StatusList2021Credential extends VerifiableCredential {
 
     // Caches decoded status list.
     Object.defineProperty(this, 'decodedStatusList', {
-      enumerable: false,
       value: async function decodedStatusList() {
         if (
           encodedStatusList === this.credentialSubject.encodedList
@@ -59,9 +58,10 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * @param {KeyDoc} keyDoc
    * @param {string} id - on-chain hex identifier for the `StatusList2021Credential`.
    * @param {object} [params={}]
-   * @param {string} [params.statusPurpose=revocation] - `statusPurpose` of the `StatusList2021Credential`. Can be either `revocation`, `suspension`.
+   * @param {'revocation'|'suspension'} [params.statusPurpose=revocation] - `statusPurpose` of the `StatusList2021Credential`.
+   * Can be either `revocation` or `suspension`.
    * @param {number} [params.length=1e4] - length of the underlying `StatusList`.
-   * @param {Iterable<number>} [params.revokeIndices=[]] - iterable producing indices to be revoked initially
+   * @param {Iterable<number>} [params.revokeIndices=[]] - iterable producing indices to be revoked (or suspended) initially
    */
   static async create(
     keyDoc,
@@ -86,9 +86,8 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * If `statusPurpose` = `revocation`, indices can't be unrevoked.
    *
    * @param {KeyDoc} keyDoc
-   * @param {object} update
-   * @param {Iterable<number>} update.revokeIndices
-   * @param {Iterable<number>} update.unrevokeIndices
+   * @param {Iterable<number>} update.revokeIndices - indices to be revoked (or suspended)
+   * @param {Iterable<number>} update.unrevokeIndices - indices to be unrevoked (or unsuspended)
    * @returns {this}
    */
   async update(keyDoc, { revokeIndices = [], unrevokeIndices = [] }) {
@@ -185,8 +184,11 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * @returns {Uint8Array}
    */
   toBytes() {
-    const stringifiedCred = JSON.stringify(this.toJSON());
-    return new Uint8Array(Buffer.from(stringifiedCred, 'utf8'));
+    const jsonCred = this.toJSON();
+    const stringifiedCred = JSON.stringify(jsonCred);
+    const bufferCred = Buffer.from(stringifiedCred, 'utf8');
+
+    return new Uint8Array(bufferCred);
   }
 
   /**

@@ -33,7 +33,7 @@ export default class UniversalResolver extends Resolver {
   async resolve(did) {
     const hashIndex = did.indexOf('#');
     const encodedDid = encodeURIComponent(
-      hashIndex === -1 ? did : did.substr(0, hashIndex).trim(),
+      hashIndex === -1 ? did : did.slice(0, hashIndex).trim(),
     );
     try {
       const resp = await axios.get(`${this.idUrl}${encodedDid}`, {

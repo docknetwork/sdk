@@ -39,6 +39,8 @@ const DefaultMinGasPrice = 50;
 const DefaultMaxGas = 429496729;
 const DefaultTestSchemes = "BBS,BBSPlus,PS";
 
+const boolEnv = (value) => value === "true" || !!+value;
+
 /**
  * Read variable from environment or use the default value
  * @param varName - The variable name to read from environment variable
@@ -74,6 +76,9 @@ export const TestAccountCouncilMemberURI = fromEnv(
 export const MinGasPrice = fromEnv("MinGasPrice", DefaultMinGasPrice);
 export const MaxGas = fromEnv("MaxGas", DefaultMaxGas);
 export const TestSchemes = fromEnv("TestSchemes", DefaultTestSchemes);
+export const DisableStatusListTests = boolEnv(
+  fromEnv("DisableStatusListTests", "false")
+);
 
 export const BBS = {
   Name: "BBS",

@@ -632,7 +632,7 @@ describe("Fees", () => {
     const runtimeVersion = await dock.api.rpc.state.getRuntimeVersion();
     const specVersion = runtimeVersion.specVersion.toNumber();
 
-    if (process.env.DISABLE_DEMOCRACY_PREIMAGE_TESTS || specVersion < 44) {
+    if (specVersion < 44) {
       return;
     }
 
@@ -661,7 +661,7 @@ describe("Fees", () => {
     const runtimeVersion = await dock.api.rpc.state.getRuntimeVersion();
     const specVersion = runtimeVersion.specVersion.toNumber();
 
-    if (process.env.DISABLE_DEMOCRACY_PREIMAGE_TESTS || specVersion < 44) {
+    if (specVersion < 44) {
       return;
     }
 

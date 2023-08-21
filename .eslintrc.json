@@ -26,6 +26,7 @@
     "no-void": "off",
     "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
     "import/no-extraneous-dependencies": "off",
+    "import/prefer-default-export": "off",
     "class-methods-use-this": "off",
     "no-return-await": "off",
     "no-plusplus": "off",

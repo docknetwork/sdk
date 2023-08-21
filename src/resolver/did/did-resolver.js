@@ -61,6 +61,7 @@ function parse(didUrl) {
 
 /**
  * Resolves `DID` with the identifier `did:*`.
+ * @abstract
  */
 export default class DIDResolver extends MultiResolver {
   static PREFIX = 'did';

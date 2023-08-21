@@ -13,7 +13,6 @@ import { itemsAllowed } from '../utils';
  * @param {Array<string> | string | symbol} [config.method=WILDCARD]
  * @returns {Resolver<T> | MultiResolver<T>}
  */
-// eslint-disable-next-line import/prefer-default-export
 export const createResolver = (
   resolverOrFn,
   { prefix = WILDCARD, method = WILDCARD } = {},

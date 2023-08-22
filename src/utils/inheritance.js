@@ -11,7 +11,7 @@
  * @returns {T}
  */
 export function withExtendedStaticProperties(properties, parentClass) {
-  class WithExtendedStaticProperties extends parentClass {
+  const extendedClass = class extends parentClass {
     constructor(...args) {
       super(...args);
 
@@ -26,12 +26,12 @@ export function withExtendedStaticProperties(properties, parentClass) {
         }
       }
     }
-  }
+  };
 
   for (const property of properties) {
     const propertySymbol = Symbol(property);
 
-    Object.defineProperty(WithExtendedStaticProperties, property, {
+    Object.defineProperty(extendedClass, property, {
       get() {
         const value = this[propertySymbol];
         if (value == null) {
@@ -58,5 +58,5 @@ export function withExtendedStaticProperties(properties, parentClass) {
     });
   }
 
-  return WithExtendedStaticProperties;
+  return extendedClass;
 }

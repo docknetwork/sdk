@@ -8,7 +8,7 @@
 export const withInitializedDockAPI = (
   resolverClass,
   pickDockAPI = ({ dock }) => dock,
-) => class ResolverWithInitializedDockAPI extends resolverClass {
+) => class extends resolverClass {
   async resolve(url) {
     if (pickDockAPI(this).isInitialized()) {
       return super.resolve(url);

@@ -21,7 +21,6 @@ class DockDIDResolver extends DIDResolver {
   async resolve(qualifiedDid) {
     const { id, did } = this.parseDid(qualifiedDid);
     validateDockDIDSS58Identifier(id);
-    console.log(did, id);
 
     return await this.dock.did.getDocument(did);
   }

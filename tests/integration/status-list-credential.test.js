@@ -1,46 +1,46 @@
-import { randomAsHex } from "@polkadot/util-crypto";
+import { randomAsHex } from '@polkadot/util-crypto';
 
 import {
   FullNodeEndpoint,
   TestKeyringOpts,
   TestAccountURI,
-  DisableStatusListTests
-} from "../test-constants";
-import { DockAPI } from "../../src/index";
-import defaultDocumentLoader from "../../src/utils/vc/document-loader";
+  DisableStatusListTests,
+} from '../test-constants';
+import { DockAPI } from '../../src/index';
+import defaultDocumentLoader from '../../src/utils/vc/document-loader';
 import {
   issueCredential,
   signPresentation,
   verifyCredential,
   verifyPresentation,
   expandJSONLD,
-} from "../../src/utils/vc/index";
+} from '../../src/utils/vc/index';
 
-import { DockResolver } from "../../src/resolver";
-import { createPresentation } from "../create-presentation";
+import { DockResolver } from '../../src/resolver';
+import { createPresentation } from '../create-presentation';
 
-import { OneOfPolicy } from "../../src/utils/revocation";
-import { DockStatusList2021Qualifier } from "../../src/utils/vc/constants";
-import { getUnsignedCred, registerNewDIDUsingPair } from "./helpers";
-import { getKeyDoc }from "../../src/utils/vc/helpers";
-import { createNewDockDID } from "../../src/utils/did";
-import StatusList2021Credential from "../../src/status-list-credential/status-list2021-credential";
+import { OneOfPolicy } from '../../src/utils/revocation';
+import { DockStatusList2021Qualifier } from '../../src/utils/vc/constants';
+import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
+import { getKeyDoc } from '../../src/utils/vc/helpers';
+import { createNewDockDID } from '../../src/utils/did';
+import StatusList2021Credential from '../../src/status-list-credential/status-list2021-credential';
 
-const credId = "A large credential id with size > 32 bytes";
+const credId = 'A large credential id with size > 32 bytes';
 
 function addCredentialStatus(
   cred,
   statusListCredentialId,
-  statusListCredentialIndex
+  statusListCredentialIndex,
 ) {
   return {
     ...cred,
     credentialStatus: {
       id: `${DockStatusList2021Qualifier}${statusListCredentialId}#${statusListCredentialIndex}`,
-      type: "StatusList2021Entry",
+      type: 'StatusList2021Entry',
       statusListIndex: String(statusListCredentialIndex),
       statusListCredential: `${DockStatusList2021Qualifier}${statusListCredentialId}`,
-      statusPurpose: "suspension",
+      statusPurpose: 'suspension',
     },
   };
 }
@@ -49,7 +49,7 @@ const buildTest = DisableStatusListTests
   ? describe.skip
   : describe;
 
-buildTest("StatusList2021Credential", () => {
+buildTest('StatusList2021Credential', () => {
   const dockAPI = new DockAPI();
   const resolver = new DockResolver(dockAPI);
 
@@ -81,11 +81,11 @@ buildTest("StatusList2021Credential", () => {
     dockAPI.setAccount(account);
 
     // Register issuer DID
-    issuerKeyPair = dockAPI.keyring.addFromUri(issuerSeed, null, "ed25519");
+    issuerKeyPair = dockAPI.keyring.addFromUri(issuerSeed, null, 'ed25519');
     await registerNewDIDUsingPair(dockAPI, issuerDID, issuerKeyPair);
 
     // Register holder DID
-    const pair1 = dockAPI.keyring.addFromUri(holderSeed, null, "ed25519");
+    const pair1 = dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519');
     await registerNewDIDUsingPair(dockAPI, holderDID, pair1);
 
     // Create a new policy
@@ -94,31 +94,31 @@ buildTest("StatusList2021Credential", () => {
     issuerKey = getKeyDoc(
       issuerDID,
       issuerKeyPair,
-      "Ed25519VerificationKey2018"
+      'Ed25519VerificationKey2018',
     );
 
     const statusListCred = await StatusList2021Credential.create(
       issuerKey,
       statusListCredentialId,
-      { statusPurpose: "suspension" }
+      { statusPurpose: 'suspension' },
     );
 
     // Add a new revocation status list with above policy
     await dockAPI.statusListCredentialModule.createStatusListCredential(
       statusListCredentialId,
       statusListCred,
-      policy
+      policy,
     );
 
     let unsignedCred = getUnsignedCred(credId, holderDID, [
-      "https://w3id.org/vc/status-list/2021/v1",
+      'https://w3id.org/vc/status-list/2021/v1',
     ]);
 
     // Issuer issues the credential with a given status list id for revocation
     unsignedCred = addCredentialStatus(
       unsignedCred,
       statusListCredentialId,
-      statusListCredentialIndex
+      statusListCredentialIndex,
     );
 
     credential = await issueCredential(
@@ -135,7 +135,7 @@ buildTest("StatusList2021Credential", () => {
     await dockAPI.disconnect();
   }, 10000);
 
-  test("Issuer can issue a revocable credential and holder can verify it successfully when it is not revoked else the verification fails", async () => {
+  test('Issuer can issue a revocable credential and holder can verify it successfully when it is not revoked else the verification fails', async () => {
     // The credential verification should pass as the credential has not been revoked.
     const result = await verifyCredential(credential, {
       resolver,
@@ -145,10 +145,9 @@ buildTest("StatusList2021Credential", () => {
     expect(result.verified).toBe(true);
 
     // Revoke the credential
-    const fetchedCred =
-      await dockAPI.statusListCredentialModule.fetchStatusList2021Credential(
-        statusListCredentialId
-      );
+    const fetchedCred = await dockAPI.statusListCredentialModule.fetchStatusList2021Credential(
+      statusListCredentialId,
+    );
     await fetchedCred.update(issuerKey, {
       revokeIndices: [statusListCredentialIndex],
     });
@@ -159,7 +158,7 @@ buildTest("StatusList2021Credential", () => {
       issuerDID,
       issuerKeyPair,
       1,
-      dockAPI
+      dockAPI,
     );
 
     // The credential verification should fail as the credential has been revoked.
@@ -170,17 +169,16 @@ buildTest("StatusList2021Credential", () => {
 
     expect(result1.verified).toBe(false);
     expect(result1.error).toBe(
-      "Credential was revoked (or suspended) according to the status list referenced in `credentialStatus`"
+      'Credential was revoked (or suspended) according to the status list referenced in `credentialStatus`',
     );
   }, 50000);
 
-  test("Holder can create a presentation and verifier can verify it successfully when it is not revoked else the verification fails", async () => {
+  test('Holder can create a presentation and verifier can verify it successfully when it is not revoked else the verification fails', async () => {
     // The previous test revokes credential so unsuspend it. Its fine if the previous test is not run as unrevoking does not
     // throw error if the credential is not revoked.
-    let fetchedCred =
-      await dockAPI.statusListCredentialModule.fetchStatusList2021Credential(
-        statusListCredentialId
-      );
+    let fetchedCred = await dockAPI.statusListCredentialModule.fetchStatusList2021Credential(
+      statusListCredentialId,
+    );
     await fetchedCred.update(issuerKey, {
       unsuspendIndices: [statusListCredentialIndex],
     });
@@ -191,25 +189,25 @@ buildTest("StatusList2021Credential", () => {
       issuerDID,
       issuerKeyPair,
       1,
-      dockAPI
+      dockAPI,
     );
     const holderKey = getKeyDoc(
       holderDID,
-      dockAPI.keyring.addFromUri(holderSeed, null, "ed25519"),
-      "Ed25519VerificationKey2018"
+      dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'),
+      'Ed25519VerificationKey2018',
     );
 
     // Create presentation for unsuspended credential
     const presId = randomAsHex(32);
     const chal = randomAsHex(32);
-    const domain = "test domain";
+    const domain = 'test domain';
     const presentation = createPresentation(credential, presId);
     const signedPres = await signPresentation(
       presentation,
       holderKey,
       chal,
       domain,
-      resolver
+      resolver,
     );
 
     // As the credential is unsuspended, the presentation should verify successfully.
@@ -222,10 +220,9 @@ buildTest("StatusList2021Credential", () => {
     expect(result.verified).toBe(true);
 
     // Revoke credential
-    fetchedCred =
-      await dockAPI.statusListCredentialModule.fetchStatusList2021Credential(
-        statusListCredentialId
-      );
+    fetchedCred = await dockAPI.statusListCredentialModule.fetchStatusList2021Credential(
+      statusListCredentialId,
+    );
     await fetchedCred.update(issuerKey, {
       revokeIndices: [statusListCredentialIndex],
     });
@@ -236,7 +233,7 @@ buildTest("StatusList2021Credential", () => {
       issuerDID,
       issuerKeyPair,
       1,
-      dockAPI
+      dockAPI,
     );
 
     // As the credential is revoked, the presentation should verify successfully.

@@ -22,7 +22,7 @@ import {
   getUnsignedCred,
   registerNewDIDUsingPair,
 } from './helpers';
-import { getKeyDoc }from '../../src/utils/vc/helpers';
+import { getKeyDoc } from '../../src/utils/vc/helpers';
 import { createNewDockDID } from '../../src/utils/did';
 
 const credId = 'A large credential id with size > 32 bytes';

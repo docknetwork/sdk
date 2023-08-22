@@ -17,7 +17,7 @@ import {
   getProofMatcherDoc,
 } from '../helpers';
 import { issueCredential, verifyCredential } from '../../../src/utils/vc/index';
-import { getKeyDoc }from '../../../src/utils/vc/helpers';
+import { getKeyDoc } from '../../../src/utils/vc/helpers';
 
 const residentCardSchema = {
   $schema: 'http://json-schema.org/draft-07/schema#',

@@ -1,3 +1,4 @@
+/* eslint-disable  max-classes-per-file */
 import { randomAsHex } from '@polkadot/util-crypto';
 import ethr from 'ethr-did-resolver';
 import { DockAPI } from '../src/index';

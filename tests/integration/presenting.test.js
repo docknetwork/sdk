@@ -10,7 +10,7 @@ import { DockResolver } from '../../src/resolver';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
 import { generateEcdsaSecp256k1Keypair } from '../../src/utils/misc';
-import { getKeyDoc }from '../../src/utils/vc/helpers';
+import { getKeyDoc } from '../../src/utils/vc/helpers';
 import {
   issueCredential,
   isVerifiedCredential,

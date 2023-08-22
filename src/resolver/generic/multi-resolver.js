@@ -1,5 +1,5 @@
 import Resolver from './resolver';
-import { ensureItemsAllowed } from '../utils';
+import { ensureItemsAllowed, cacheLast } from '../utils';
 import { WILDCARD } from './const';
 import { ensureString } from '../../utils/type-helpers';
 
@@ -64,6 +64,7 @@ export default class MultiResolver extends Resolver {
     }
 
     this.resolvers = this.buildResolversMap(resolverList);
+    this.matchingResolver = cacheLast(this.matchingResolver);
   }
 
   /**

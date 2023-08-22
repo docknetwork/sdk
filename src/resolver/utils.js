@@ -25,7 +25,35 @@ export const withInitializedDockAPI = (
  * @param {Iterable<V>} iter
  * @returns {string}
  */
-const fmtIter = (iter) => `\`[${[...iter].map((item) => item.toString()).join(', ')}]\``;
+export const fmtIter = (iter) => `\`[${[...iter].map((item) => item.toString()).join(', ')}]\``;
+
+/**
+ * Caches last function result and returns it if function called with the same args again.
+ * @param {Function}
+ * @returns {Function}
+ */
+export const cacheLast = (fn) => {
+  let lastArgs;
+  let lastValue;
+
+  return function cached(...args) {
+    if (lastArgs !== void 0) {
+      let same = true;
+      const length = Math.max(lastArgs.length, args.length);
+      for (let i = 0; i < length && same; ++i) {
+        same &&= lastArgs[i] === args[i];
+      }
+
+      if (same) {
+        return lastValue;
+      }
+    }
+    lastValue = fn.apply(this, args);
+    lastArgs = args;
+
+    return lastValue;
+  };
+};
 
 /**
  * Ensures that each item is present in the allowed set and that both sets are valid.

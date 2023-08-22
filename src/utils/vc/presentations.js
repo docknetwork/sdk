@@ -109,12 +109,6 @@ export async function verifyPresentationCredentials(
  * @property {Boolean} [forceRevocationCheck] - Whether to force revocation check or not.
  * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
  * @property {object} [presentationPurpose] - A purpose other than the default AuthenticationProofPurpose
- * @property {object} [revocationApi] - An object representing a map. "revocation type -> revocation API". The API is used to check
- * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
- * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
- * @property {object} [schemaApi] - An object representing a map. "schema type -> schema API". The API is used to get
- * a schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
- * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
  * @property {object} [documentLoader] - A document loader, can be null and use the default
  */
 

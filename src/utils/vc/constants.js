@@ -1,6 +1,7 @@
 // XXX: Does it make sense to have a revocation registry type for Dock like below and eliminate the need for `rev_reg:dock:`?
 // export const RevRegType = 'DockRevocationRegistry2020';
 export const RevRegType = 'CredentialStatusList2017';
+export const StatusList2021EntryType = 'StatusList2021Entry';
 export const DockRevRegQualifier = 'rev-reg:dock:';
 export const DockStatusList2021Qualifier = 'status-list2021:dock:';
 export const DEFAULT_TYPE = 'VerifiableCredential';

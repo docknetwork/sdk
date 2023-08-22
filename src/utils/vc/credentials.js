@@ -6,8 +6,12 @@ import base64url from 'base64url';
 import CredentialIssuancePurpose from './CredentialIssuancePurpose';
 import defaultDocumentLoader from './document-loader';
 import { getAndValidateSchemaIfPresent } from './schema';
-import { isRevocationCheckNeeded, checkRevocationStatus } from '../revocation';
-import DIDResolver from "../../resolver/did/did-resolver"; // eslint-disable-line
+import {
+  checkRevocationRegistryStatus,
+  getCredentialStatuses,
+  hasRegistryRevocation,
+} from '../revocation';
+import { Resolver } from "../../resolver"; // eslint-disable-line
 
 import {
   getSuiteFromKeyDoc,
@@ -195,27 +199,21 @@ export function checkCredential(credential) {
  * @property {string} [challenge] - proof challenge Required.
  * @property {string} [domain] - proof domain (optional)
  * @property {string} [controller] - controller (optional)
- * @property {DIDResolver} [resolver] - Resolver to resolve the issuer DID (optional)
+ * @property {Resolver} [resolver] - Resolver to resolve the `DID`s/`StatusList`s/`Blob`s/Revocation registries (optional)
  * @property {boolean} [unsignedPresentation] - Whether to verify the proof or not
  * @property {boolean} [compactProof] - Whether to compact the JSON-LD or not.
- * @property {boolean} [forceRevocationCheck] - Whether to force revocation check or not. **Will be used only if credential doesn't have `StatusList2021Entry` in `credentialStatus`.**
- * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
- * @property {boolean} [verifyMatchingIssuersForRevocation = true] - ensure that status list credential issuer is same as credential issuer.
+ * @property {boolean} [skipRevocationCheck=false] - Disables revocation check.
+ * **Warning, setting `skipRevocationCheck` to `true` can allow false positives when verifying revocable credentials.**
+ * @property {boolean} [skipSchemaCheck=false] - Disables schema check.
+ * **Warning, setting `skipSchemaCheck` to `true` can allow false positives when verifying revocable credentials.**
+ * @property {boolean} [verifyMatchingIssuersForRevocation=true] - ensure that status list credential issuer is same as credential issuer.
  * **Will be used only if credential doesn't have `StatusList2021Entry` in `credentialStatus`.**
  * @property {object} [purpose] - A purpose other than the default CredentialIssuancePurpose
- * @property {object} [revocationApi] - An object representing a map. "revocation type -> revocation API". The API is used to check
- * revocation status. For now, the object specifies the type as key and the value as the API, but the structure can change
- * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
- * **Will be used only if credential doesn't have `StatusList2021Entry` in `credentialStatus`.**
- * @property {object} [schemaApi] - An object representing a map. "schema type -> schema API". The API is used to get
- * a schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
- * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
  * @property {object} [documentLoader] - A document loader, can be null and use the default
  */
 
 /**
  * Verify a Verifiable Credential. Returns the verification status and error in an object
- * **`forceRevocationCheck` and `revocationApi` will be used only if the credential doesn't have `StatusList2021Entry` in `credentialStatus`.**
  * @param {object} [vcJSONorString] The VCDM Credential as JSON-LD or JWT string
  * @param {VerifiableParams} options Verify parameters, this object is passed down to jsonld-signatures calls
  * @return {Promise<object>} verification result. The returned object will have a key `verified` which is true if the
@@ -227,10 +225,9 @@ export async function verifyCredential(
   {
     resolver = null,
     compactProof = true,
-    forceRevocationCheck = true,
+    skipRevocationCheck = false,
+    skipSchemaCheck = false,
     verifyMatchingIssuersForRevocation = true,
-    revocationApi = null,
-    schemaApi = null,
     documentLoader = null,
     purpose = null,
     controller = null,
@@ -287,11 +284,9 @@ export async function verifyCredential(
     documentLoader: docLoader,
   });
 
-  // Validate schema
-  if (schemaApi) {
+  if (!skipSchemaCheck) {
     await getAndValidateSchemaIfPresent(
       expandedCredential,
-      schemaApi,
       credential[credentialContextField],
       docLoader,
     );
@@ -354,44 +349,58 @@ export async function verifyCredential(
   });
 
   // Check for revocation only if the credential is verified and revocation check is needed.
-  if (result.verified) {
-    const isStatusList2021Credential = statusTypeMatches({ credential });
+  if (result.verified && !skipRevocationCheck) {
+    const statuses = getCredentialStatuses(expandedCredential);
 
-    if (isStatusList2021Credential) {
-      const revResult = await checkStatus({
-        credential,
-        suite: fullSuite,
-        documentLoader: docLoader,
-        verifyStatusListCredential: true,
-        verifyMatchingIssuers: verifyMatchingIssuersForRevocation,
-      });
+    switch (statuses.length) {
+      case 0:
+        break;
+      case 1: {
+        const isStatusList2021Status = statusTypeMatches({ credential });
+        if (isStatusList2021Status) {
+          const revResult = await checkStatus({
+            credential,
+            suite: fullSuite,
+            documentLoader: docLoader,
+            verifyStatusListCredential: true,
+            verifyMatchingIssuers: verifyMatchingIssuersForRevocation,
+          });
 
-      // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
-      if (!revResult.verified) {
-        if (!revResult.error) {
-          revResult.error = 'Credential was revoked (or suspended) according to the status list referenced in `credentialStatus`';
+          // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
+          if (!revResult.verified) {
+            if (!revResult.error) {
+              revResult.error = 'Credential was revoked (or suspended) according to the status list referenced in `credentialStatus`';
+            }
+
+            return revResult;
+          }
         }
 
-        return revResult;
-      }
-    } else {
-      const checkDockRevocation = isRevocationCheckNeeded(
-        expandedCredential,
-        forceRevocationCheck,
-        revocationApi,
-      );
+        const isRegistryRevocationStatus = hasRegistryRevocation(expandedCredential);
+        if (isRegistryRevocationStatus) {
+          const revResult = await checkRevocationRegistryStatus(
+            expandedCredential,
+            docLoader,
+          );
 
-      if (checkDockRevocation) {
-        const revResult = await checkRevocationStatus(
-          expandedCredential,
-          revocationApi,
+          // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
+          if (!revResult.verified) {
+            return revResult;
+          }
+        }
+
+        if (!isStatusList2021Status && !isRegistryRevocationStatus) {
+          throw new Error(
+            `Unsupported \`credentialStatus\`: \`${statuses[0]}\``,
+          );
+        }
+
+        break;
+      }
+      default:
+        throw new Error(
+          `\`statusPurpose\` must be an object or an array containing a single item, received: \`${statuses}\``,
         );
-
-        // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
-        if (!revResult.verified) {
-          return revResult;
-        }
-      }
     }
   }
 
@@ -419,7 +428,7 @@ export async function issueCredential(
   compactProof = true,
   documentLoader = null,
   purpose = null,
-  expansionMap = null,
+  expansionMap,
   issuerObject = null,
   addSuiteContext = true,
   type = VC_ISSUE_TYPE_DEFAULT,

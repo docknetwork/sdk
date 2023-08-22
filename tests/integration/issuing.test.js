@@ -13,7 +13,7 @@ import {
 } from './helpers';
 import { generateEcdsaSecp256k1Keypair } from '../../src/utils/misc';
 import { issueCredential, verifyCredential } from '../../src/utils/vc/index';
-import getKeyDoc from '../../src/utils/vc/helpers';
+import { getKeyDoc }from '../../src/utils/vc/helpers';
 
 mockAxios();
 

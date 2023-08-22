@@ -22,7 +22,7 @@ import {
   getUnsignedCred,
   registerNewDIDUsingPair,
 } from './helpers';
-import getKeyDoc from '../../src/utils/vc/helpers';
+import { getKeyDoc }from '../../src/utils/vc/helpers';
 import { createNewDockDID } from '../../src/utils/did';
 
 const credId = 'A large credential id with size > 32 bytes';
@@ -103,10 +103,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     const result = await verifyCredential(credential, {
       resolver,
       compactProof: true,
-      forceRevocationCheck: true,
-      revocationApi: { dock: dockAPI },
     });
-
     expect(result.verified).toBe(true);
 
     // Revoke the credential
@@ -116,9 +113,8 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     const result1 = await verifyCredential(credential, {
       resolver,
       compactProof: true,
-      forceRevocationCheck: true,
-      revocationApi: { dock: dockAPI },
     });
+
     expect(result1.verified).toBe(false);
     expect(result1.error).toBe('Revocation check failed');
   }, 50000);
@@ -152,8 +148,6 @@ describe('Credential revocation with issuer as the revocation authority', () => 
       domain,
       resolver,
       compactProof: true,
-      forceRevocationCheck: false,
-      revocationApi: { dock: dockAPI },
     });
     expect(result.verified).toBe(true);
 
@@ -166,8 +160,6 @@ describe('Credential revocation with issuer as the revocation authority', () => 
       domain,
       resolver,
       compactProof: true,
-      forceRevocationCheck: false,
-      revocationApi: { dock: dockAPI },
     });
     expect(result1.verified).toBe(false);
   }, 60000);

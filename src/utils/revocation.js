@@ -2,7 +2,6 @@ import { randomAsHex, blake2AsHex } from '@polkadot/util-crypto';
 import jsonld from 'jsonld';
 
 import OneOfPolicy from './revocation/one-of-policy';
-import { isHexWithGivenByteSize } from './codec';
 
 import {
   RevRegType,
@@ -46,23 +45,10 @@ export function createRandomRegistryId() {
 }
 
 /**
- * Checks if the revocation check is needed. Will return true if `forceRevocationCheck` is true else will check the
- * truthyness of revocationApi. Will return true even if revocationApi is an empty object.
- * @param {object} credential - The expanded credential to be checked.
- * @param {boolean} forceRevocationCheck - Whether to force the revocation check.
- * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
- * @param {object} revocationApi - See above verification methods for details on this parameter
- * @returns {boolean} - Whether to check for revocation or not.
- */
-export function isRevocationCheckNeeded(credential, forceRevocationCheck, revocationApi) {
-  return !!credential[expandedStatusProperty] && (forceRevocationCheck || !!revocationApi);
-}
-
-/**
  * Checks if a credential has a credentialStatus property and it has the properties we expect
  * @param expanded
  */
-export async function getCredentialStatuses(expanded) {
+export function getCredentialStatuses(expanded) {
   const statusValues = jsonld.getValues(expanded, expandedStatusProperty);
   statusValues.forEach((status) => {
     if (!status[credentialIDField]) {
@@ -77,63 +63,55 @@ export async function getCredentialStatuses(expanded) {
 }
 
 /**
- * Check if a credential status has a Dock specific revocation
+ * Returns `true` if supplied status is a registry revocation status.
  * @param status
- * @returns {Boolean}
+ * @returns {boolean}
  */
-function hasDockRevocation(status) {
-  const id = status[credentialIDField];
-  if (status
-    && (
-      jsonld.getValues(status, credentialTypeField).includes(RevRegType)
-      || jsonld.getValues(status, credentialTypeField).includes(`/${RevRegType}`)
-    )
-    && id.startsWith(DockRevRegQualifier)
-    && isHexWithGivenByteSize(id.slice(DockRevRegQualifier.length), RevRegIdByteSize)) {
-    return true;
-  }
+export const isRegistryRevocationStatus = ({ [credentialTypeField]: type }) => type.includes(RevRegType) || type.includes(`/${RevRegType}`);
 
-  return false;
+/**
+ * Checks if a credential status has a registry revocation.
+ * @param status
+ * @returns {boolean}
+ */
+export function hasRegistryRevocation(expanded) {
+  return !!getCredentialStatuses(expanded).find(isRegistryRevocationStatus);
 }
 
 /**
- * Check if the credential is revoked or not.
+ * Check if the credential is revoked or not according to the revocation registry mechanism.
  * @param credential
- * @param revocationApi
+ * @param documentLoader
  * @returns {Promise<{verified: boolean}|{verified: boolean, error: string}>} The returned object will have a key `verified`
  * which is true if the credential is not revoked and false otherwise. The `error` will describe the error if any.
  */
-export async function checkRevocationStatus(credential, revocationApi) {
-  if (!revocationApi) {
-    throw new Error('No revocation API supplied');
-  } else if (!revocationApi.dock) {
-    throw new Error('Only Dock revocation support is present as of now.');
-  } else {
-    const statuses = await getCredentialStatuses(credential);
-    const dockAPI = revocationApi.dock;
-    const revId = getDockRevIdFromCredential(credential);
-    for (let i = 0; i < statuses.length; i++) {
-      const status = statuses[i];
-
-      if (!hasDockRevocation(status)) {
-        return { verified: false, error: 'The credential status does not have the format required by Dock' };
-      }
-
-      const regId = status[credentialIDField].slice(DockRevRegQualifier.length);
-
-      // Hash credential id to get revocation id
-      const revocationStatus = await dockAPI.revocation.getIsRevoked(regId, revId); // eslint-disable-line
-      if (revocationStatus) {
-        return { verified: false, error: 'Revocation check failed' };
-      }
-    }
-
-    return { verified: true };
+export async function checkRevocationRegistryStatus(
+  credential,
+  documentLoader,
+) {
+  const statuses = await getCredentialStatuses(credential);
+  const revId = getDockRevIdFromCredential(credential);
+  if (statuses.length !== 1) {
+    throw new Error(
+      `\`statusPurpose\` must be an array containing a single item, received: \`${credential[expandedStatusProperty]}\``,
+    );
   }
+
+  const [status] = statuses;
+  if (!isRegistryRevocationStatus(status)) {
+    throw new Error(`Expected registry revocation status, got \`${status}\``);
+  }
+
+  const regId = status[credentialIDField];
+  const fullId = `${regId}#${revId}`;
+
+  // Hash credential id to get revocation id
+  const { document: revocationStatus } = await documentLoader(fullId);
+  if (revocationStatus) {
+    return { verified: false, error: 'Revocation check failed' };
+  }
+
+  return { verified: true };
 }
 
-export {
-  OneOfPolicy,
-  RevRegType,
-  DockRevRegQualifier,
-};
+export { OneOfPolicy, RevRegType, DockRevRegQualifier };

@@ -254,15 +254,16 @@ class VerifiableCredential {
     compactProof = true,
     issuerObject = null,
     addSuiteContext = true,
+    documentLoader = null,
     type = null,
   ) {
     const signedVC = await issueCredential(
       keyDoc,
       this.toJSON(),
       compactProof,
+      documentLoader,
       null,
-      null,
-      null,
+      void 0,
       issuerObject,
       addSuiteContext,
       type,
@@ -281,9 +282,8 @@ class VerifiableCredential {
   async verify({
     resolver = null,
     compactProof = true,
-    forceRevocationCheck = true,
-    revocationApi = null,
-    schemaApi = null,
+    skipRevocationCheck = false,
+    skipSchemaCheck = false,
     suite = [],
   } = {}) {
     if (!this.proof) {
@@ -293,9 +293,8 @@ class VerifiableCredential {
     return verifyCredential(this.toJSON(), {
       resolver,
       compactProof,
-      forceRevocationCheck,
-      revocationApi,
-      schemaApi,
+      skipRevocationCheck,
+      skipSchemaCheck,
       suite,
     });
   }

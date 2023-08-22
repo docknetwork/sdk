@@ -1,7 +1,7 @@
 import jsonld from 'jsonld';
 import { validate } from 'jsonschema';
-import Schema from '../../modules/schema';
 import defaultDocumentLoader from './document-loader';
+import { hexDIDToQualified } from '../did';
 
 import {
   expandedSubjectProperty,
@@ -18,10 +18,17 @@ import {
  * @param context
  * @returns {Promise<Boolean>} - Returns promise to a boolean or throws error
  */
-export async function validateCredentialSchema(credential, schema, context, documentLoader) {
+export async function validateCredentialSchema(
+  credential,
+  schema,
+  context,
+  documentLoader,
+) {
   const requiresID = schema.required && schema.required.indexOf('id') > -1;
   const credentialSubject = credential[expandedSubjectProperty] || [];
-  const subjects = credentialSubject.length ? credentialSubject : [credentialSubject];
+  const subjects = credentialSubject.length
+    ? credentialSubject
+    : [credentialSubject];
   for (let i = 0; i < subjects.length; i++) {
     const subject = { ...subjects[i] };
     if (!requiresID) {
@@ -29,7 +36,10 @@ export async function validateCredentialSchema(credential, schema, context, docu
       delete subject[credentialIDField];
     }
 
-    const compacted = await jsonld.compact(subject, context, { documentLoader: documentLoader || defaultDocumentLoader() }); // eslint-disable-line
+    // eslint-disable-next-line
+    const compacted = await jsonld.compact(subject, context, {
+      documentLoader: documentLoader || defaultDocumentLoader(),
+    });
     delete compacted[credentialContextField];
 
     if (Object.keys(compacted).length === 0) {
@@ -37,7 +47,8 @@ export async function validateCredentialSchema(credential, schema, context, docu
     }
 
     const schemaObj = schema.schema || schema;
-    const subjectSchema = (schemaObj.properties && schemaObj.properties.credentialSubject) || schemaObj;
+    const subjectSchema = (schemaObj.properties && schemaObj.properties.credentialSubject)
+      || schemaObj;
 
     validate(compacted, subjectSchema, {
       throwError: true,
@@ -49,38 +60,47 @@ export async function validateCredentialSchema(credential, schema, context, docu
 /**
  * Get schema and run validation on credential if it contains both a credentialSubject and credentialSchema
  * @param {object} credential - a verifiable credential JSON object
- * @param {object} schemaApi - An object representing a map. "schema type -> schema API". The API is used to get
- * a schema doc. For now, the object specifies the type as key and the value as the API, but the structure can change
- * as we support more APIs there are more details associated with each API. Only Dock is supported as of now.
  * @param {object} context - the context
  * @param {object} documentLoader - the document loader
  * @returns {Promise<void>}
  */
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export async function getAndValidateSchemaIfPresent(credential, schemaApi, context, documentLoader) {
+export async function getAndValidateSchemaIfPresent(
+  credential,
+  context,
+  documentLoader,
+) {
   const schemaList = credential[expandedSchemaProperty];
   if (schemaList) {
     const schema = schemaList[0];
     if (credential[expandedSubjectProperty] && schema) {
-      let schemaObj;
       const schemaUri = schema[credentialIDField];
+      let schemaObj;
 
-      if (schemaUri.startsWith('blob:dock')) {
-        if (!schemaApi.dock) {
-          throw new Error('Only Dock schemas are supported as of now.');
+      const { document } = await documentLoader(schemaUri);
+      if (Array.isArray(document) && document.length === 2) {
+        const [author, data] = document;
+
+        if (typeof data !== 'object' || data instanceof Uint8Array) {
+          throw new Error('Incorrect schema format');
         }
-        schemaObj = await Schema.get(schemaUri, schemaApi.dock);
+
+        schemaObj = {
+          ...data,
+          id: schemaUri,
+          author: hexDIDToQualified(author),
+        };
       } else {
-        const { document } = await documentLoader(schemaUri);
         schemaObj = document;
       }
 
-      if (!schemaObj) {
-        throw new Error(`Could not load schema URI: ${schemaUri}`);
-      }
-
       try {
-        await validateCredentialSchema(credential, schemaObj, context, documentLoader);
+        await validateCredentialSchema(
+          credential,
+          schemaObj,
+          context,
+          documentLoader,
+        );
       } catch (e) {
         throw new Error(`Schema validation failed: ${e}`);
       }

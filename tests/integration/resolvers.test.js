@@ -14,7 +14,7 @@ import {
 import { createNewDockDID } from "../../src/utils/did";
 import { OneOfPolicy } from "../../src/utils/revocation";
 import { registerNewDIDUsingPair } from "./helpers";
-import getKeyDoc from "../../src/utils/vc/helpers";
+import { getKeyDoc }from "../../src/utils/vc/helpers";
 import StatusList2021Credential from "../../src/status-list-credential/status-list2021-credential";
 import dockDidResolver from "../../src/resolver/did/dock-did-resolver";
 

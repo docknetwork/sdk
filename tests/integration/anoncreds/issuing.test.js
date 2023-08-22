@@ -17,7 +17,7 @@ import {
   getProofMatcherDoc,
 } from '../helpers';
 import { issueCredential, verifyCredential } from '../../../src/utils/vc/index';
-import getKeyDoc from '../../../src/utils/vc/helpers';
+import { getKeyDoc }from '../../../src/utils/vc/helpers';
 
 const residentCardSchema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
@@ -156,7 +156,6 @@ for (const {
       // Ensure embedding the schema doesnt conflict with the other schema resolutions
       const resultWithSchema = await verifyCredential(credential, {
         resolver,
-        schemaApi: { dock },
       });
       expect(resultWithSchema).toMatchObject(
         expect.objectContaining(getProofMatcherDoc()),

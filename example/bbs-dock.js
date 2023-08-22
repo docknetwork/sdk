@@ -109,8 +109,7 @@ async function signAndVerify(credentialJSON) {
 
   // Verify the credential
   const verifyResult = await credential.verify({
-    resolver,
-    forceRevocationCheck: false,
+    resolver
   });
 
   if (verifyResult.verified) {

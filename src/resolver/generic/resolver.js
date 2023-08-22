@@ -29,9 +29,10 @@ class Resolver {
    * @returns {boolean}
    */
   supports(id) {
+    ensureString(id);
+
     return (
-      typeof id === 'string'
-      && (this.constructor.METHOD === WILDCARD
+      (this.constructor.METHOD === WILDCARD
         || this.method(id) === this.constructor.METHOD)
       && (this.constructor.PREFIX === WILDCARD
         || this.prefix(id) === this.constructor.PREFIX)
@@ -40,11 +41,14 @@ class Resolver {
 
   /**
    * Resolves an entity with the provided identifier.
-   * @param {string} _id - fully qualified identifier.
+   * @abstract
+   * @param {string} id - fully qualified identifier.
    * @returns {Promise<T>}
    */
-  async resolve(_id) {
-    throw new Error('Unimplemented');
+  async resolve(id) {
+    throw new Error(
+      `Unimplemented \`resolve\` for \`${this.constructor.name}\`, can't resolve \`${id}\``,
+    );
   }
 
   /**

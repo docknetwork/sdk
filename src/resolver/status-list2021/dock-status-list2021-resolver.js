@@ -4,14 +4,21 @@ import StatusList2021Resolver from './status-list2021-resolver';
 class DockStatusListResolver extends StatusList2021Resolver {
   static METHOD = 'dock';
 
+  /**
+   * @param {DockAPI} dock - An initialized connection to a dock full-node.
+   * @constructor
+   */
   constructor(dock) {
     super();
 
+    /**
+     * @type {DockAPI}
+     */
     this.dock = dock;
   }
 
   async resolve(fullyQualifiedStatusListId) {
-    const dockStatusListId = this.parse(fullyQualifiedStatusListId);
+    const { id: dockStatusListId } = this.parse(fullyQualifiedStatusListId);
 
     const cred = await this.dock.statusListCredentialModule.fetchStatusList2021Credential(
       dockStatusListId,
@@ -22,7 +29,7 @@ class DockStatusListResolver extends StatusList2021Resolver {
 }
 
 /**
- * Resolves `DID`s with identifier `did:dock:*`.
+ * Resolves `StatusList2021Credential`s with identifier `status-list2021:dock:*`.
  * @type {DockStatusListResolver}
  */
 export default withInitializedDockAPI(DockStatusListResolver);

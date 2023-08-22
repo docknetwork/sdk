@@ -31,8 +31,8 @@ function parseEmbeddedDataURI(embedded) {
 /**
  * Takes a resolver and returns a function that returns a document or throws an error when the document
  * cannot be found.
- * @param {Resolver} [resolver] - The resolver is optional but should be passed when `DID`s / `StatusList2021Credential`s and other documents
- * need to be resolved.
+ * @param {Resolver} [resolver] - The resolver is optional but should be passed when
+ * `DID`s / `StatusList2021Credential`s / `Blob`s / revocation registries and other documents need to be resolved.
  * @returns {loadDocument} - the returned function
  */
 function documentLoader(resolver = null) {

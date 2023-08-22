@@ -1,7 +1,7 @@
-import MultiResolver from './multi-resolver'; // eslint-disable-line import/no-cycle
+import MultiResolver from './multi-resolver';
 import Resolver from './resolver';
 import { WILDCARD } from './const';
-import { itemsAllowed } from '../utils';
+import { ensureItemsAllowed } from '../utils';
 
 /**
  * Creates a resolver.
@@ -29,12 +29,12 @@ export const createResolver = (
 
       const isFn = typeof resolverOrFn === 'function';
       if (!isFn && resolverOrFn instanceof Resolver) {
-        itemsAllowed(
+        ensureItemsAllowed(
           [].concat(resolverOrFn.constructor.PREFIX),
           [].concat(this.constructor.PREFIX),
           WILDCARD,
         );
-        itemsAllowed(
+        ensureItemsAllowed(
           [].concat(resolverOrFn.constructor.METHOD),
           [].concat(this.constructor.METHOD),
           WILDCARD,

@@ -10,7 +10,7 @@ import {
 } from '../../test-constants';
 import { createNewDockDID } from '../../../src/utils/did';
 import { registerNewDIDUsingPair } from '../helpers';
-import getKeyDoc from '../../../src/utils/vc/helpers';
+import { getKeyDoc }from '../../../src/utils/vc/helpers';
 import {
   issueCredential,
   signPresentation,

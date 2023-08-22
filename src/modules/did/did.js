@@ -13,7 +13,6 @@ import {
 } from '../../utils/did';
 import { getSignatureFromKeyringPair, getStateChange } from '../../utils/misc';
 
-import Signature from "../../signatures/signature"; // eslint-disable-line
 import OffChainDidDocRef from './offchain-did-doc-ref';
 import {
   PublicKeyEd25519,

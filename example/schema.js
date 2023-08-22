@@ -1,24 +1,31 @@
-import { randomAsHex } from '@polkadot/util-crypto';
-import Schema from '../src/modules/schema';
+import { randomAsHex } from "@polkadot/util-crypto";
+import Schema from "../src/modules/schema";
 
-import { DockAPI } from '../src/index';
-import { createNewDockDID } from '../src/utils/did';
-import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
-import VerifiableCredential from '../src/verifiable-credential';
+import { DockAPI } from "../src/index";
+import { createNewDockDID } from "../src/utils/did";
+import { getPublicKeyFromKeyringPair } from "../src/utils/misc";
+import VerifiableCredential from "../src/verifiable-credential";
+import { Ed25519VerKeyName } from "../src/utils/vc/crypto/constants";
+import { getKeyDoc } from "../src/utils/vc/helpers";
+import defaultDocumentLoader from "../src/utils/vc/document-loader";
 
-import { UniversalResolver } from '../src/resolver';
+import {
+  UniversalResolver,
+  DockResolver,
+  WildcardMultiResolver,
+} from "../src/resolver";
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
-import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
+import { FullNodeEndpoint, TestAccountURI } from "../tests/test-constants";
+import { registerNewDIDUsingPair } from "../tests/integration/helpers";
 
-import exampleCredential from '../tests/example-credential';
-import { DidKey, VerificationRelationship } from '../src/public-keys';
+import { DidKey, VerificationRelationship } from "../src/public-keys";
 
 async function createAuthorDID(dock, pair) {
   // Generate a DID to be used as author
   const dockDID = createNewDockDID();
-  console.log('Creating new author DID', dockDID);
+  console.log("Creating new author DID", dockDID);
 
   // Create an author DID to write with
   const publicKey = getPublicKeyFromKeyringPair(pair);
@@ -28,73 +35,101 @@ async function createAuthorDID(dock, pair) {
 }
 
 async function main() {
-  console.log('Connecting to the node...');
+  console.log("Connecting to the node...");
   const dock = new DockAPI();
   await dock.init({
     address: FullNodeEndpoint,
   });
 
-  console.log('Setting sdk account...');
+  console.log("Setting sdk account...");
   const account = dock.keyring.addFromUri(TestAccountURI);
   dock.setAccount(account);
+  const keySeed = randomAsHex(32);
+  const subjectKeySeed = randomAsHex(32);
 
   // Generate first key with this seed. The key type is Sr25519
-  const pair = dock.keyring.addFromUri(randomAsHex(32));
+  const pair = dock.keyring.addFromUri(keySeed, null, 'ed25519');
 
   // Generate a DID to be used as author
   const dockDID = await createAuthorDID(dock, pair);
 
-  console.log('Creating a new schema...');
+  // Properly format a keyDoc to use for signing
+  const keyDoc = getKeyDoc(
+    dockDID,
+    pair,
+    Ed25519VerKeyName
+  );
+
+  const subjectPair = dock.keyring.addFromUri(subjectKeySeed);
+  const subjectDID = createNewDockDID();
+  await registerNewDIDUsingPair(dock, subjectDID, subjectPair);
+
+  console.log("Creating a new schema...");
   const schema = new Schema();
   await schema.setJSONSchema({
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    description: 'Dock Schema Example',
-    type: 'object',
+    $schema: "http://json-schema.org/draft-07/schema#",
+    description: "Dock Schema Example",
+    type: "object",
     properties: {
       id: {
-        type: 'string',
+        type: "string",
       },
       emailAddress: {
-        type: 'string',
-        format: 'email',
+        type: "string",
+        format: "email",
       },
       alumniOf: {
-        type: 'string',
+        type: "string",
       },
     },
-    required: ['emailAddress', 'alumniOf'],
+    required: ["emailAddress", "alumniOf"],
     additionalProperties: false,
   });
 
-  console.log('The schema is:', JSON.stringify(schema.toJSON(), null, 2));
-  console.log('Writing schema to the chain with blob id of', schema.id, '...');
+  console.log("The schema is:", JSON.stringify(schema.toJSON(), null, 2));
+  console.log("Writing schema to the chain with blob id of", schema.id, "...");
 
   await schema.writeToChain(dock, dockDID, pair, 1, undefined, false);
 
   console.log(`Schema written, reading from chain (${schema.id})...`);
 
   const result = await Schema.get(schema.id, dock);
-  console.log('Result from chain:', result);
+  console.log("Result from chain:", result);
 
-  console.log('Creating a verifiable credential and assigning its schema...');
-  const vc = VerifiableCredential.fromJSON(exampleCredential);
-  vc.setSchema(result.id, 'JsonSchemaValidator2018');
+  const universalResolverUrl = "https://uniresolver.io";
+  const resolver = new WildcardMultiResolver([
+    new DockResolver(dock),
+    new UniversalResolver(universalResolverUrl),
+  ]);
 
-  const universalResolverUrl = 'https://uniresolver.io';
-  const resolver = new UniversalResolver(universalResolverUrl);
+  console.log("Creating a verifiable credential and assigning its schema...");
+  const vc = new VerifiableCredential("https://example.com/credentials/187");
+  vc.setSchema(result.id, "JsonSchemaValidator2018");
+  vc.addContext("https://www.w3.org/2018/credentials/examples/v1");
+  vc.addContext({
+    emailAddress: "https://schema.org/email",
+    alumniOf: "https://schema.org/alumniOf",
+  });
+  vc.addType("AlumniCredential");
+  vc.addSubject({
+    id: subjectDID,
+    alumniOf: "Example University",
+    emailAddress: "abc@example.com",
+  });
+  await vc.sign(keyDoc);
 
-  console.log('Verifying the credential:', vc);
-  await vc.verify({
+  console.log("Verifying the credential:", vc);
+  const { verified, error } = await vc.verify({
     resolver,
     compactProof: false,
-    forceRevocationCheck: false,
-    revocationApi: { dock },
-    schemaApi: { dock },
   });
+  if (!verified) {
+    throw error || new Error("Verification failed");
+  }
 
-  console.log('Credential verified, mutating the subject and trying again...');
+  console.log("Credential verified, mutating the subject and trying again...");
   vc.addSubject({
-    id: 'uuid:0x0',
+    id: "uuid:0x0",
     thisWillFail: true,
   });
 
@@ -102,16 +137,15 @@ async function main() {
     await vc.verify({
       resolver,
       compactProof: false,
-      forceRevocationCheck: false,
-      revocationApi: { dock },
-      schemaApi: { dock },
     });
-    throw new Error('Verification succeeded, but it shouldn\'t have. This is a bug.');
+    throw new Error(
+      "Verification succeeded, but it shouldn't have. This is a bug."
+    );
   } catch (e) {
-    console.log('Verification failed as expected:', e);
+    console.log("Verification failed as expected:", e);
   }
 
-  console.log('All done, disconnecting...');
+  console.log("All done, disconnecting...");
   await dock.disconnect();
 }
 
@@ -120,6 +154,6 @@ main()
     process.exit(0);
   })
   .catch((error) => {
-    console.error('Error occurred somewhere, it was caught!', error);
+    console.error("Error occurred somewhere, it was caught!", error);
     process.exit(1);
   });

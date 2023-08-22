@@ -1,8 +1,7 @@
-import { isObject } from 'jsonld/lib/types';
 import Resolver from './resolver';
-import { itemsAllowed } from '../utils';
-import { createResolver } from './helpers'; // eslint-disable-line import/no-cycle
+import { ensureItemsAllowed } from '../utils';
 import { WILDCARD } from './const';
+import { ensureString } from '../../utils/type-helpers';
 
 /**
  * Successor can either
@@ -10,6 +9,7 @@ import { WILDCARD } from './const';
  * - act as a router and resolve an entity using a provided list of resolvers
  *
  * In the first case, it has to implement a `resolve` function and avoid providing any resolvers to the `super.constructor`.
+ *
  * In the second case, it doesn't have to override `resolve` but instead provide a list of resolvers into the `super.constructor`.
  * Each resolver must have static properties `PREFIX` and `METHOD`, and unlike `Resolver`, `MultiResolver` can have `PREFIX`
  * and `METHOD` specified as Arrays of strings.
@@ -37,12 +37,16 @@ export default class MultiResolver extends Resolver {
    */
   static METHOD;
 
-  constructor(resolvers) {
+  /**
+   *
+   * @param {Array<Resolver<T>>} [resolvers=[]]
+   */
+  constructor(resolvers = []) {
     super();
 
     let resolverList;
     if (this.resolve !== MultiResolver.prototype.resolve) {
-      if (!resolvers) {
+      if (!resolvers.length) {
         resolverList = [this];
       } else {
         throw new Error(
@@ -50,15 +54,7 @@ export default class MultiResolver extends Resolver {
         );
       }
     } else {
-      if (isObject(resolvers)) {
-        // Legacy constructor support
-        resolverList = Object.entries(resolvers).map(([method, resolverOrFn]) => createResolver(resolverOrFn, {
-          method,
-          prefix: this.constructor.PREFIX,
-        }));
-      } else {
-        resolverList = resolvers || [];
-      }
+      resolverList = resolvers;
 
       if (!resolverList.length) {
         throw new Error(
@@ -85,20 +81,22 @@ export default class MultiResolver extends Resolver {
    * @returns {Resolver<T> | null}
    */
   matchingResolver(id) {
-    if (typeof id !== 'string') {
-      return null;
-    }
-
+    ensureString(id);
     const prefix = this.prefix(id);
     const method = this.method(id);
 
-    return (
-      this.resolvers[prefix]?.[method]
-      || this.resolvers[prefix]?.[WILDCARD]
-      || this.resolvers[WILDCARD]?.[method]
-      || this.resolvers[WILDCARD]?.[WILDCARD]
-      || null
-    );
+    for (const [currentPrefix, currentMethod] of [
+      [prefix, method],
+      [prefix, WILDCARD],
+      [WILDCARD, method],
+      [WILDCARD, WILDCARD],
+    ]) {
+      const resolver = this.resolvers[currentPrefix]?.[currentMethod];
+
+      if (resolver === this || resolver?.supports(id)) return resolver;
+    }
+
+    return null;
   }
 
   /**
@@ -128,8 +126,16 @@ export default class MultiResolver extends Resolver {
       const prefixArr = [].concat(PREFIX);
       const methodArr = [].concat(METHOD);
 
-      itemsAllowed(prefixArr, [].concat(this.constructor.PREFIX), WILDCARD);
-      itemsAllowed(methodArr, [].concat(this.constructor.METHOD), WILDCARD);
+      ensureItemsAllowed(
+        prefixArr,
+        [].concat(this.constructor.PREFIX),
+        WILDCARD,
+      );
+      ensureItemsAllowed(
+        methodArr,
+        [].concat(this.constructor.METHOD),
+        WILDCARD,
+      );
 
       for (const prefix of prefixArr) {
         for (const method of methodArr) {

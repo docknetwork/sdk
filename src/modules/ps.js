@@ -1,11 +1,11 @@
 /* eslint-disable camelcase */
 
-import OffchainSignatures from './offchain-signatures';
+import OffchainSignaturesModule from './offchain-signatures';
 import PSPublicKey from '../offchain-signatures/public-keys/ps';
 import PSParams from '../offchain-signatures/params/ps';
 
 /** Class to write `Pointcheval-Sanders` parameters and keys on chain */
-export default class PSModule extends OffchainSignatures {
+export default class PSModule extends OffchainSignaturesModule {
   /// Builds `Pointcheval-Sanders` params from the provided value.
   static buildParams(params) {
     return new PSParams(params);

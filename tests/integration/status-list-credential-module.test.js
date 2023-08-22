@@ -13,7 +13,7 @@ import { getHexIdentifierFromDID } from "../../src/utils/did";
 import { createNewDockDID } from "../../src/utils/did";
 import { OneOfPolicy } from "../../src/utils/revocation";
 import { registerNewDIDUsingPair } from "./helpers";
-import getKeyDoc from "../../src/utils/vc/helpers";
+import { getKeyDoc }from "../../src/utils/vc/helpers";
 import StatusList2021Credential from "../../src/status-list-credential/status-list2021-credential";
 
 const expectEqualCreds = (cred1, cred2) => {
@@ -140,23 +140,23 @@ buildTest("StatusListCredential Module", () => {
     expect(await fetchedCred.revoked(revokeId)).toBe(true);
   }, 40000);
 
-  test("Cant unrevoke from a status list credential with `statusPurpose` = `revocation`", async () => {
+  test("Cant unsuspend from a status list credential with `statusPurpose` = `revocation`", async () => {
     const cred =
       await dock.statusListCredentialModule.fetchStatusList2021Credential(
         statusListCredId
       );
     expect(
-      cred.update(ownerKey, { unrevokeIndices: revokeIds })
+      cred.update(ownerKey, { unsuspendIndices: revokeIds })
     ).rejects.toEqual(
       new Error(
-        "Can't unrevoke indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`"
+        "Can't unsuspend indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`"
       )
     );
     expect(
-      cred.update(ownerKey, { unrevokeIndices: revokeIds })
+      cred.update(ownerKey, { unsuspendIndices: revokeIds })
     ).rejects.toEqual(
       new Error(
-        "Can't unrevoke indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`"
+        "Can't unsuspend indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`"
       )
     );
     expect(await cred.revokedBatch(revokeIds)).toEqual(
@@ -164,7 +164,7 @@ buildTest("StatusListCredential Module", () => {
     );
   }, 40000);
 
-  test("Can unrevoke from a status list credential", async () => {
+  test("Can unsuspend from a status list credential", async () => {
     const credential = await StatusList2021Credential.create(
       ownerKey,
       statusListCredId,
@@ -189,7 +189,7 @@ buildTest("StatusListCredential Module", () => {
         statusListCredId
       );
     expectEqualCreds(credential, fetchedCred);
-    await fetchedCred.update(ownerKey, { unrevokeIndices: revokeIds });
+    await fetchedCred.update(ownerKey, { unsuspendIndices: revokeIds });
     expect(await fetchedCred.revokedBatch(revokeIds)).toEqual(
       Array.from(revokeIds, () => false)
     );
@@ -280,7 +280,7 @@ buildTest("StatusListCredential Module", () => {
     expect(hasFirstDID && hasSecondDID).toBe(true);
   }, 40000);
 
-  test("Can revoke, unrevoke and remove status list with multiple owners", async () => {
+  test("Can revoke, unsuspend and remove status list with multiple owners", async () => {
     const revId = (Math.random() * 10e3) | 0;
 
     let fetchedCred =
@@ -305,7 +305,7 @@ buildTest("StatusListCredential Module", () => {
       );
     expect(await fetchedCred.revoked(revId)).toBe(true);
 
-    await fetchedCred.update(ownerKey2, { unrevokeIndices: [revId] });
+    await fetchedCred.update(ownerKey2, { unsuspendIndices: [revId] });
 
     // Unrevoke from another DID
     await dock.statusListCredentialModule.updateStatusListCredentialWithOneOfPolicy(

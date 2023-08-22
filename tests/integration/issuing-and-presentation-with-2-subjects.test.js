@@ -15,7 +15,7 @@ import { getCredMatcherDoc, getProofMatcherDoc, registerNewDIDUsingPair } from '
 import {
   issueCredential, signPresentation, verifyCredential, verifyPresentation,
 } from '../../src/utils/vc/index';
-import getKeyDoc from '../../src/utils/vc/helpers';
+import { getKeyDoc }from '../../src/utils/vc/helpers';
 import { createPresentation } from '../create-presentation';
 
 mockAxios();

@@ -150,20 +150,6 @@ describe("Resolvers", () => {
     );
   });
 
-  it("checks `MultiResolver.constructor` legacy", async () => {
-    const resolve = async () => 1;
-    const resolver = new APrefixCDMethod({ b: resolve, c: resolve });
-
-    expect(await resolver.resolve("a:b:1")).toBe(1);
-    expect(await resolver.resolve("a:c:1")).toBe(1);
-    expect(resolver.resolve("a:d:1")).rejects.toThrowError(
-      "No resolver found for `a:d:1`"
-    );
-    expect(await resolver.supports("a:b:1")).toBe(true);
-    expect(await resolver.supports("a:c:1")).toBe(true);
-    expect(await resolver.supports("a:d:1")).toBe(false);
-  });
-
   it("checks `createResolver`", async () => {
     const resolve = async () => 1;
 

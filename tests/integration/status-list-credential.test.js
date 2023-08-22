@@ -22,7 +22,7 @@ import { createPresentation } from "../create-presentation";
 import { OneOfPolicy } from "../../src/utils/revocation";
 import { DockStatusList2021Qualifier } from "../../src/utils/vc/constants";
 import { getUnsignedCred, registerNewDIDUsingPair } from "./helpers";
-import getKeyDoc from "../../src/utils/vc/helpers";
+import { getKeyDoc }from "../../src/utils/vc/helpers";
 import { createNewDockDID } from "../../src/utils/did";
 import StatusList2021Credential from "../../src/status-list-credential/status-list2021-credential";
 
@@ -175,14 +175,14 @@ buildTest("StatusList2021Credential", () => {
   }, 50000);
 
   test("Holder can create a presentation and verifier can verify it successfully when it is not revoked else the verification fails", async () => {
-    // The previous test revokes credential so unrevoke it. Its fine if the previous test is not run as unrevoking does not
+    // The previous test revokes credential so unsuspend it. Its fine if the previous test is not run as unrevoking does not
     // throw error if the credential is not revoked.
     let fetchedCred =
       await dockAPI.statusListCredentialModule.fetchStatusList2021Credential(
         statusListCredentialId
       );
     await fetchedCred.update(issuerKey, {
-      unrevokeIndices: [statusListCredentialIndex],
+      unsuspendIndices: [statusListCredentialIndex],
     });
 
     await dockAPI.statusListCredentialModule.updateStatusListCredentialWithOneOfPolicy(
@@ -199,7 +199,7 @@ buildTest("StatusList2021Credential", () => {
       "Ed25519VerificationKey2018"
     );
 
-    // Create presentation for unrevoked credential
+    // Create presentation for unsuspended credential
     const presId = randomAsHex(32);
     const chal = randomAsHex(32);
     const domain = "test domain";
@@ -212,7 +212,7 @@ buildTest("StatusList2021Credential", () => {
       resolver
     );
 
-    // As the credential is unrevoked, the presentation should verify successfully.
+    // As the credential is unsuspended, the presentation should verify successfully.
     const result = await verifyPresentation(signedPres, {
       challenge: chal,
       domain,

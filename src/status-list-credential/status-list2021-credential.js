@@ -51,7 +51,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
 
   /**
    * Creates new `StatusList2021Credential` with supplied `id` and option `statusPurpose` = `revocation` by default,
-   * `length` and `revokeIndices`. Note that credential with `statusPurpose` = `revocation` can't unrevoke its indices.
+   * `length` and `revokeIndices`. Note that credential with `statusPurpose` = `revocation` can't unsuspend its indices.
    * To allow unrevoking indices in the future, use `statusPurpose` = `suspension`.
    * The proof will be generated immediately using supplied `keyDoc`.
    *
@@ -61,7 +61,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * @param {'revocation'|'suspension'} [params.statusPurpose=revocation] - `statusPurpose` of the `StatusList2021Credential`.
    * Can be either `revocation` or `suspension`.
    * @param {number} [params.length=1e4] - length of the underlying `StatusList`.
-   * @param {Iterable<number>} [params.revokeIndices=[]] - iterable producing indices to be revoked (or suspended) initially
+   * @param {Iterable<number>} [params.revokeIndices=[]] - iterable producing indices to be revoked or suspended initially
    */
   static async create(
     keyDoc,
@@ -82,21 +82,22 @@ export default class StatusList2021Credential extends VerifiableCredential {
   }
 
   /**
-   * Revokes/unrevokes indices in the underlying status list, regenerating the proof.
-   * If `statusPurpose` = `revocation`, indices can't be unrevoked.
+   * Revokes indices and unsuspends other indices in the underlying status list, regenerating the proof.
+   * If `statusPurpose` = `revocation`, indices can't be unsuspended.
    *
    * @param {KeyDoc} keyDoc
-   * @param {Iterable<number>} update.revokeIndices - indices to be revoked (or suspended)
-   * @param {Iterable<number>} update.unrevokeIndices - indices to be unrevoked (or unsuspended)
+   * @param {object} [update={}]
+   * @param {Iterable<number>} update.revokeIndices - indices to be revoked or suspended
+   * @param {Iterable<number>} update.unsuspendIndices - indices to be unsuspended
    * @returns {this}
    */
-  async update(keyDoc, { revokeIndices = [], unrevokeIndices = [] }) {
+  async update(keyDoc, { revokeIndices = [], unsuspendIndices = [] }) {
     if (
       this.credentialSubject.statusPurpose === 'revocation'
-      && [...unrevokeIndices].length > 0
+      && [...unsuspendIndices].length > 0
     ) {
       throw new Error(
-        "Can't unrevoke indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`",
+        "Can't unsuspend indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`",
       );
     }
 
@@ -105,7 +106,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
     this.constructor.updateStatusList(
       statusList,
       revokeIndices,
-      unrevokeIndices,
+      unsuspendIndices,
     );
 
     this.credentialSubject.encodedList = await statusList.encode();
@@ -118,7 +119,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
   }
 
   /**
-   * Returns `true` if given index is revoked, `false` otherwise.
+   * Returns `true` if given index is revoked or suspended, `false` otherwise.
    * Throws an error if the underlying status list can't be decoded or supplied index is out of range.
    *
    * @param {number} index
@@ -132,7 +133,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
 
   /**
    * Accepts an iterable of indices to be checked and returns an array containing `true` in the positions
-   * of revoked indices and `false` for non-revoked indices.
+   * of revoked (suspended) indices and `false` for non-revoked (non-suspended) indices.
    * Throws an error if the underlying status list can't be decoded or any of supplied indices is out of range.
    *
    * @param {Iterable<number>} indices
@@ -228,31 +229,31 @@ export default class StatusList2021Credential extends VerifiableCredential {
   }
 
   /**
-   * Revokes `revokeIndices` and unrevokes `unrevokeIndices` from the supplied `StatusList`.
+   * Revokes (suspends) `revokeIndices` and unsuspends (unsuspends) `unsuspendIndices` from the supplied `StatusList`.
    * Throws an error if any index is present in both iterables or some index is out of bounds.
    *
    * @param {StatusList} statusList
    * @param {Iterable<number>} revokeIndices
-   * @param {Iterable<number>} unrevokeIndices
+   * @param {Iterable<number>} unsuspendIndices
    */
   static updateStatusList(
     statusList,
     revokeIndices = [],
-    unrevokeIndices = [],
+    unsuspendIndices = [],
   ) {
     const revokeIndiceSet = new Set(revokeIndices);
-    const unrevokeIndiceSet = new Set(unrevokeIndices);
+    const unsuspendeIndiceSet = new Set(unsuspendIndices);
 
     for (const idx of revokeIndiceSet) {
-      if (unrevokeIndiceSet.has(idx)) {
+      if (unsuspendeIndiceSet.has(idx)) {
         throw new Error(
-          `Index \`${idx}\` appears in both revoke and unrevoke sets`,
+          `Index \`${idx}\` appears in both revoke and unsuspend sets`,
         );
       }
 
       statusList.setStatus(idx, true);
     }
-    for (const idx of unrevokeIndiceSet) {
+    for (const idx of unsuspendeIndiceSet) {
       statusList.setStatus(idx, false);
     }
   }

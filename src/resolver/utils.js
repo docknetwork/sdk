@@ -2,11 +2,15 @@
  * Before resolving an entity, ensures that `DockAPI` is initialized, throws an error otherwise.
  * @template T
  * @param {T} resolverClass
+ * @param {function(T): DockAPI} pickDockAPI
  * @returns {T}
  */
-export const withInitializedDockAPI = (resolverClass) => class WithInitializedDockAPI extends resolverClass {
+export const withInitializedDockAPI = (
+  resolverClass,
+  pickDockAPI = ({ dock }) => dock,
+) => class ResolverWithInitializedDockAPI extends resolverClass {
   async resolve(url) {
-    if (this.dock.isInitialized()) {
+    if (pickDockAPI(this).isInitialized()) {
       return super.resolve(url);
     } else {
       throw new Error('DockAPI is not connected');
@@ -31,7 +35,7 @@ const fmtIter = (iter) => `\`[${[...iter].map((item) => item.toString()).join(',
  * @param {Iterable<T>} allowed
  * @param {T} wildcard
  */
-export const itemsAllowed = (items, allowed, wildcard) => {
+export const ensureItemsAllowed = (items, allowed, wildcard) => {
   const itemsSet = new Set(items);
   const allowedSet = new Set(allowed);
   if (items.size === 0) {

@@ -4,7 +4,7 @@ module.exports = {
   testTimeout: 30000,
   testEnvironment: "./tests/test-environment",
   transformIgnorePatterns: [
-    "/node_modules/(?!@polkadot|@babel|@digitalbazaar|ky-universal)",
+    "/node_modules/(?!@polkadot|@babel|@digitalbazaar)",
   ],
   verbose: true,
   globals: {

@@ -27,7 +27,7 @@
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-wasm": "^5.1.0",
-    "@types/jest": "^29.5.3",
+    "@types/jest": "^26.0.24",
     "aws-sdk": "^2.1057.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^24.5.0",
@@ -57,7 +57,6 @@
     "web3": "^1.7.5"
   },
   "scripts": {
-    "jest": "NODE_OPTIONS='' jest",
     "exc": "npx babel-node",
     "bbs-dock-example": "npx babel-node example/bbs-dock.js",
     "dock-did-example": "npx babel-node example/dock-did.js",

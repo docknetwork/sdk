@@ -16,10 +16,9 @@ eslint prefer-destructuring: "off"
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { MultiResolver } from '../generic';
+import { MultiResolver, METHOD_REG_EXP_PATTERN } from '../generic';
 
 const ID_CHAR = '[a-zA-Z0-9_.-]';
-const METHOD = '([a-zA-Z0-9_]+)';
 const METHOD_ID = `(${ID_CHAR}+(:${ID_CHAR}+)*)`;
 const PARAM_CHAR = '[a-zA-Z0-9_.:%-]';
 const PARAM = `;${PARAM_CHAR}+=${PARAM_CHAR}*`;
@@ -30,7 +29,7 @@ const QUERY = '([?][^#]*)?';
 // eslint-disable-next-line no-useless-escape
 const FRAGMENT = '(#.*)?';
 const DID_MATCHER = new RegExp(
-  `^did:${METHOD}:${METHOD_ID}${PARAMS}${PATH}${QUERY}${FRAGMENT}$`,
+  `^did:${METHOD_REG_EXP_PATTERN}:${METHOD_ID}${PARAMS}${PATH}${QUERY}${FRAGMENT}$`,
 );
 
 function parse(didUrl) {

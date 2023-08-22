@@ -1,4 +1,11 @@
-export const METHOD_REG_EXP_PATTERN = '([a-zA-Z0-9_.-]+)';
+/**
+ * `RegExp` pattern to match the `METHOD`.
+ */
+export const METHOD_REG_EXP_PATTERN = '([a-zA-Z0-9_]+)';
+
+/**
+ * `RegExp` pattern for the hex identifier `0x...`.
+ */
 export const HEX_ID_REG_EXP_PATTERN = '(0x[0-9a-fA-F]+)';
 
 /**

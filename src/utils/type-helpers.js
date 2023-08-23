@@ -1,3 +1,4 @@
+import { METHOD_REG_EXP_PATTERN, HEX_ID_REG_EXP_PATTERN } from '../resolver/generic/const';
 /**
  * Return true if the given value is a string.
  * @param value
@@ -48,10 +49,8 @@ export function ensureURI(uri) {
   }
 }
 
-const SOURCE = '([a-zA-Z0-9_.-]+)';
-const HEX_ID = '(0[xX][0-9a-fA-F]+)';
 const STATUS_LIST_ID_MATCHER = new RegExp(
-  `^status-list2021:${SOURCE}:${HEX_ID}$`,
+  `^status-list2021:${METHOD_REG_EXP_PATTERN}:${HEX_ID_REG_EXP_PATTERN}$`,
 );
 
 /**
@@ -62,7 +61,7 @@ export function ensureStatusListId(statusListId) {
   ensureString(statusListId);
   if (!STATUS_LIST_ID_MATCHER.test(statusListId)) {
     throw new Error(
-      `${statusListId} needs to be a valid \`StatusList2021Credential\` identifier.`,
+      `\`${statusListId}\` needs to be a valid \`StatusList2021Credential\` identifier.`,
     );
   }
 }

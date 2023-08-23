@@ -39,7 +39,7 @@ export default class MultiResolver extends Resolver {
 
   /**
    *
-   * @param {Array<Resolver<T>>} [resolvers=[]]
+   * @param {Array<Resolver<T> | MultiResolver<T>>} [resolvers=[]]
    */
   constructor(resolvers = []) {
     super();
@@ -79,7 +79,7 @@ export default class MultiResolver extends Resolver {
   /**
    * Resolves an entity with the provided identifier.
    * @param {string} id - fully qualified identifier.
-   * @returns {Resolver<T> | null}
+   * @returns {Resolver<T> | MultiResolver<T> | null}
    */
   matchingResolver(id) {
     ensureString(id);

@@ -242,10 +242,10 @@ export default class StatusList2021Credential extends VerifiableCredential {
     unsuspendIndices = [],
   ) {
     const revokeIndiceSet = new Set(revokeIndices);
-    const unsuspendeIndiceSet = new Set(unsuspendIndices);
+    const unsuspendIndiceSet = new Set(unsuspendIndices);
 
     for (const idx of revokeIndiceSet) {
-      if (unsuspendeIndiceSet.has(idx)) {
+      if (unsuspendIndiceSet.has(idx)) {
         throw new Error(
           `Index \`${idx}\` appears in both revoke and unsuspend sets`,
         );
@@ -253,7 +253,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
 
       statusList.setStatus(idx, true);
     }
-    for (const idx of unsuspendeIndiceSet) {
+    for (const idx of unsuspendIndiceSet) {
       statusList.setStatus(idx, false);
     }
   }

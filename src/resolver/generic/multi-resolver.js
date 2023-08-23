@@ -170,6 +170,6 @@ export default class MultiResolver extends Resolver {
       );
     }
 
-    return resolver.resolve(id);
+    return await resolver.resolve(id);
   }
 }

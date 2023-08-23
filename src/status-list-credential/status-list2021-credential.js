@@ -78,7 +78,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
     });
     const cred = this.fromJSON(jsonCred);
 
-    return cred.sign(keyDoc);
+    return await cred.sign(keyDoc);
   }
 
   /**

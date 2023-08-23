@@ -65,7 +65,7 @@ describe('Resolvers', () => {
         statusListCredId,
       );
       await expect(
-        dock.statusListCredentialModule.createStatusListCredential(
+        dock.statusListCredential.createStatusListCredential(
           statusListCredId,
           statusListCred,
           policy,

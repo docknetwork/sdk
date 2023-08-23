@@ -20,7 +20,7 @@ class DockStatusListResolver extends StatusList2021Resolver {
   async resolve(fullyQualifiedStatusListId) {
     const { id: dockStatusListId } = this.parse(fullyQualifiedStatusListId);
 
-    const cred = await this.dock.statusListCredentialModule.fetchStatusList2021Credential(
+    const cred = await this.dock.statusListCredential.fetchStatusList2021Credential(
       dockStatusListId,
     );
 

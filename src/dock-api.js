@@ -357,7 +357,7 @@ export default class DockAPI {
   }
 
   /**
-   * Gets the SDK's DID module
+   * Gets the SDK's StatusListCredentialModule module
    * @return {StatusListCredentialModule} The module to use
    */
   get statusListCredential() {
@@ -370,7 +370,7 @@ export default class DockAPI {
   }
 
   /**
-   * Gets the SDK's DID module
+   * Gets the SDK's OffchainSignaturesModule module
    * @return {OffchainSignaturesModule} The module to use
    */
   get offchainSignatures() {
@@ -395,6 +395,10 @@ export default class DockAPI {
     return this.revocationModule;
   }
 
+  /**
+   * Gets the SDK's `BBS` module
+   * @return {BBSModule} The module to use
+   */
   get bbs() {
     if (this.legacyBBSPlus) {
       throw new Error("BBS isn't supported by the chain");
@@ -405,6 +409,10 @@ export default class DockAPI {
     return this.bbsModule;
   }
 
+  /**
+   * Gets the SDK's `BBSPlus` module
+   * @return {BBSPlusModule} The module to use
+   */
   get bbsPlus() {
     if (!this.bbsPlusModule) {
       throw new Error('Unable to get BBS+ module, SDK is not initialised');
@@ -412,6 +420,10 @@ export default class DockAPI {
     return this.bbsPlusModule;
   }
 
+  /**
+   * Gets the SDK's `PS` module
+   * @return {PSModule} The module to use
+   */
   get ps() {
     if (this.legacyBBSPlus) {
       throw new Error("PS isn't supported by the chain");
@@ -422,6 +434,10 @@ export default class DockAPI {
     return this.psModule;
   }
 
+  /**
+   * Gets the SDK's `Accumulator` module
+   * @return {AccumulatorModule} The module to use
+   */
   get accumulator() {
     if (!this.accumulatorModule) {
       throw new Error(

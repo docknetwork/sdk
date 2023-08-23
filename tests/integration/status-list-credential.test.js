@@ -104,7 +104,7 @@ buildTest('StatusList2021Credential', () => {
     );
 
     // Add a new revocation status list with above policy
-    await dockAPI.statusListCredentialModule.createStatusListCredential(
+    await dockAPI.statusListCredential.createStatusListCredential(
       statusListCredentialId,
       statusListCred,
       policy,
@@ -145,14 +145,14 @@ buildTest('StatusList2021Credential', () => {
     expect(result.verified).toBe(true);
 
     // Revoke the credential
-    const fetchedCred = await dockAPI.statusListCredentialModule.fetchStatusList2021Credential(
+    const fetchedCred = await dockAPI.statusListCredential.fetchStatusList2021Credential(
       statusListCredentialId,
     );
     await fetchedCred.update(issuerKey, {
       revokeIndices: [statusListCredentialIndex],
     });
 
-    await dockAPI.statusListCredentialModule.updateStatusListCredentialWithOneOfPolicy(
+    await dockAPI.statusListCredential.updateStatusListCredentialWithOneOfPolicy(
       statusListCredentialId,
       fetchedCred,
       issuerDID,
@@ -176,14 +176,14 @@ buildTest('StatusList2021Credential', () => {
   test('Holder can create a presentation and verifier can verify it successfully when it is not revoked else the verification fails', async () => {
     // The previous test revokes credential so unsuspend it. Its fine if the previous test is not run as unrevoking does not
     // throw error if the credential is not revoked.
-    let fetchedCred = await dockAPI.statusListCredentialModule.fetchStatusList2021Credential(
+    let fetchedCred = await dockAPI.statusListCredential.fetchStatusList2021Credential(
       statusListCredentialId,
     );
     await fetchedCred.update(issuerKey, {
       unsuspendIndices: [statusListCredentialIndex],
     });
 
-    await dockAPI.statusListCredentialModule.updateStatusListCredentialWithOneOfPolicy(
+    await dockAPI.statusListCredential.updateStatusListCredentialWithOneOfPolicy(
       statusListCredentialId,
       fetchedCred,
       issuerDID,
@@ -220,14 +220,14 @@ buildTest('StatusList2021Credential', () => {
     expect(result.verified).toBe(true);
 
     // Revoke credential
-    fetchedCred = await dockAPI.statusListCredentialModule.fetchStatusList2021Credential(
+    fetchedCred = await dockAPI.statusListCredential.fetchStatusList2021Credential(
       statusListCredentialId,
     );
     await fetchedCred.update(issuerKey, {
       revokeIndices: [statusListCredentialIndex],
     });
 
-    await dockAPI.statusListCredentialModule.updateStatusListCredentialWithOneOfPolicy(
+    await dockAPI.statusListCredential.updateStatusListCredentialWithOneOfPolicy(
       statusListCredentialId,
       fetchedCred,
       issuerDID,

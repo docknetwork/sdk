@@ -8,6 +8,7 @@ import {
   always,
   ifElse,
   has,
+  map,
   prop,
   when,
   isNil,
@@ -18,11 +19,10 @@ import {
   curry,
   __,
   unless,
+  fromPairs,
 } from "ramda";
 import { Observable } from "rxjs";
-
-import dock from "../src";
-import { DockAPI } from '../src';
+import { DockAPI } from "../src";
 
 /**
  * Send the give transaction with the given account URI (secret) and return the block hash
@@ -124,7 +124,7 @@ export async function keypair(seed) {
  * @param wsUrl - string
  * @returns {Promise}
  */
- export async function connect(wsUrl) {
+export async function connect(wsUrl) {
   /*return await ApiPromise.create({
     provider: new WsProvider(wsUrl),
     typesBundle,
@@ -270,10 +270,16 @@ export const timeout = curry((time, promise) =>
  * Formats given value as DOCK token amount.
  *
  * @param {BN} value
+ * @param {?object} config
  * @returns {string}
  */
-export const formatDock = (value) =>
-  formatBalance(value, { decimals: 6, withSi: true, withUnit: "DCK" });
+export const formatDock = (value, config = {}) =>
+  formatBalance(value, {
+    decimals: 6,
+    withSi: true,
+    ...config,
+    withUnit: "DCK",
+  });
 
 /**
  * Enhances supplied function by providing access to the initialized global dock API.
@@ -289,15 +295,16 @@ export const formatDock = (value) =>
 export const withDockAPI = curry((params, fn) => async (...args) => {
   console.log("Connecting...");
   let err, res;
+  const dockAPI = new DockAPI();
 
   try {
-    await dock.init(params);
-    res = await fn(dock, ...args);
+    await dockAPI.init(params);
+    res = await fn(dockAPI, ...args);
   } catch (e) {
     err = e;
   } finally {
     console.log("Disconnecting...");
-    await dock.disconnect();
+    await dockAPI.disconnect();
 
     if (err) {
       throw err;
@@ -314,3 +321,132 @@ export const withDockAPI = curry((params, fn) => async (...args) => {
  * @returns {bool}
  */
 export const parseBool = either(equals("true"), o(Boolean, Number));
+
+/**
+ * Queries validator identity.
+ * @param {*} api
+ * @param {*} accountId
+ * @returns {Promise<string>}
+ */
+export const validatorIdentity = curry(async (api, accountId) => {
+  const val = api.createType(
+    "Option<Registration>",
+    await api.query.identity.identityOf(api.createType("AccountId", accountId))
+  );
+
+  if (val.isSome) {
+    const info = val.unwrap().info;
+
+    return `\`${api.createType(
+      "String",
+      info.toHuman().display.Raw
+    )}\` (${accountId.toString()})`;
+  } else {
+    return `\`${accountId.toString()}\``;
+  }
+});
+
+export const formatAsISO = (date) =>
+  date.toISOString().replace(/T/, " ").replace(/\..+/, "");
+
+export const addLoggerPrefix = curry((buildPrefix, logger) =>
+  o(
+    fromPairs,
+    map((key) => [key, (...args) => logger[key](buildPrefix(...args), ...args)])
+  )(["error", "log", "info", "warn"])
+);
+
+/**
+ * Returns hash and number of the first block satisfying provided predicate.
+ * Throws an error in case such block can't be found.
+ *
+ * @template T
+ * @param {*} api
+ * @param {{ start: number, end: number }}
+ * @param {{ targetValue: T, fetchValue: (number) => T, checkBlock: (block: any) => boolean }} endBlockNumber
+ * @param {{ maxBlocksPerUnit: number = null, debug = false }} targetEra
+ * @returns {T}
+ */
+export const binarySearchBlock = async (
+  api,
+  { start: startBlockNumber, end: endBlockNumber },
+  { targetValue, fetchValue, checkBlock },
+  { maxBlocksPerUnit = null, debug = false }
+) => {
+  // Number of iterations performed during binary search.
+  let jumps = 0;
+  while (startBlockNumber < endBlockNumber) {
+    jumps++;
+    const midBlockNumber = ((startBlockNumber + endBlockNumber) / 2) | 0;
+    const midBlockHash = await api.rpc.chain.getBlockHash(midBlockNumber);
+    const midValue = await fetchValue(midBlockHash);
+
+    if (debug)
+      timestampLogger.log(
+        "target value:",
+        targetValue,
+        "current value:",
+        midValue,
+        "start block:",
+        startBlockNumber,
+        "end block:",
+        endBlockNumber,
+        "jumps:",
+        jumps
+      );
+
+    if (midValue < targetValue) {
+      startBlockNumber = midBlockNumber + 1;
+      if (maxBlocksPerUnit != null) {
+        endBlockNumber = Math.min(
+          midBlockNumber + maxBlocksPerUnit * (1 + targetValue - midValue),
+          endBlockNumber
+        );
+      }
+    } else if (midValue > targetValue) {
+      endBlockNumber = midBlockNumber;
+      if (maxBlocksPerUnit != null) {
+        startBlockNumber = Math.max(
+          midBlockNumber - maxBlocksPerUnit * (1 + midValue - targetValue),
+          startBlockNumber
+        );
+      }
+    } else {
+      endBlockNumber = midBlockNumber;
+      if (maxBlocksPerUnit != null) {
+        startBlockNumber = Math.max(
+          midBlockNumber - maxBlocksPerUnit,
+          startBlockNumber
+        );
+      }
+
+      const midBlock = await api.derive.chain.getBlock(midBlockHash);
+      const found = checkBlock(midBlock);
+
+      if (found) {
+        if (debug)
+          timestampLogger.log(
+            `First block that satisfied value \`${targetValue}\` found - \`${midBlockNumber}\` (${jumps} jumps)`,
+            found
+          );
+
+        return { hash: midBlockHash, number: midBlockNumber };
+      }
+    }
+  }
+
+  throw new Error(`No block found`);
+};
+
+/**
+ * Overrides `log`, `error`, `info`, and `warn` methods of the console to put a timestamp at the beginning.
+ * @typedef TimestampLogger
+ * @prop {Function} log
+ * @prop {Function} error
+ * @prop {Function} info
+ * @prop {Function} warn
+ */
+export const timestampLogger = addLoggerPrefix(
+  () => `[${formatAsISO(new Date())}]`,
+  console
+);

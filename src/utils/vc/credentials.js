@@ -9,7 +9,7 @@ import { getAndValidateSchemaIfPresent } from './schema';
 import {
   checkRevocationRegistryStatus,
   getCredentialStatuses,
-  hasRegistryRevocation,
+  hasRegistryRevocationStatus,
 } from '../revocation';
 import { Resolver } from "../../resolver"; // eslint-disable-line
 
@@ -376,7 +376,7 @@ export async function verifyCredential(
           }
         }
 
-        const isRegistryRevocationStatus = hasRegistryRevocation(expandedCredential);
+        const isRegistryRevocationStatus = hasRegistryRevocationStatus(expandedCredential);
         if (isRegistryRevocationStatus) {
           const revResult = await checkRevocationRegistryStatus(
             expandedCredential,

@@ -71,10 +71,10 @@ export const isRegistryRevocationStatus = ({ [credentialTypeField]: type }) => t
 
 /**
  * Checks if a credential status has a registry revocation.
- * @param status
+ * @param expanded
  * @returns {boolean}
  */
-export function hasRegistryRevocation(expanded) {
+export function hasRegistryRevocationStatus(expanded) {
   return !!getCredentialStatuses(expanded).find(isRegistryRevocationStatus);
 }
 

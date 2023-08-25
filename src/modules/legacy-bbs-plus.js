@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 
-import OffchainSignatures from './offchain-signatures';
+import OffchainSignaturesModule from './offchain-signatures';
 
 const LEGACY_STATE_CHANGES = {
   AddParams: 'AddBBSPlusParams',
@@ -17,7 +17,7 @@ const LEGACY_METHODS = {
 /** Legacy class to write `BBS+` parameters and keys on chain.
  * Use to interact with chains without offchain signatures module.
  */
-export default class LegacyBBSPlusModule extends OffchainSignatures {
+export default class LegacyBBSPlusModule extends OffchainSignaturesModule {
   constructor(...args) {
     super(...args);
     this.moduleName = 'bbsPlus';

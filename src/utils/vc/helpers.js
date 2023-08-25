@@ -36,7 +36,7 @@ import {
  * @param {string} id - the ID of the key for future resolution
  * @returns {KeyDoc}
  */
-export default function getKeyDoc(did, keypair, type, id) {
+export function getKeyDoc(did, keypair, type, id) {
   return {
     id: id || `${did}#keys-1`,
     controller: did,

@@ -7,7 +7,6 @@ import * as fs from 'fs';
  * @param revealedIndices
  * @returns [Map<number, Uint8Array>, Map<number, Uint8Array>]
  */
-// eslint-disable-next-line import/prefer-default-export
 export function getRevealedUnrevealed(messages, revealedIndices) {
   const revealedMsgs = new Map();
   const unrevealedMsgs = new Map();

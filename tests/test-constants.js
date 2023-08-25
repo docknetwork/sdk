@@ -27,8 +27,9 @@ import Bls12381BBSKeyPairDock2023 from "../src/utils/vc/crypto/Bls12381BBSKeyPai
 import Bls12381G2KeyPairDock2022 from "../src/utils/vc/crypto/Bls12381G2KeyPairDock2022";
 import Bls12381PSKeyPairDock2023 from "../src/utils/vc/crypto/Bls12381PSKeyPairDock2023";
 
-require("dotenv").config();
+import dotenv from "dotenv";
 
+dotenv.config();
 const DefaultFullNodeEndpoint = "ws://localhost:9944";
 const DefaultFullNodeTCPEndpoint = "http://localhost:9933";
 const DefaultTestKeyringType = "sr25519";
@@ -37,6 +38,8 @@ const DefaultTestAccountCouncilMemberURI = "//Charlie";
 const DefaultMinGasPrice = 50;
 const DefaultMaxGas = 429496729;
 const DefaultTestSchemes = "BBS,BBSPlus,PS";
+
+const boolEnv = (value) => value === "true" || !!+value;
 
 /**
  * Read variable from environment or use the default value
@@ -73,6 +76,9 @@ export const TestAccountCouncilMemberURI = fromEnv(
 export const MinGasPrice = fromEnv("MinGasPrice", DefaultMinGasPrice);
 export const MaxGas = fromEnv("MaxGas", DefaultMaxGas);
 export const TestSchemes = fromEnv("TestSchemes", DefaultTestSchemes);
+export const DisableStatusListTests = boolEnv(
+  fromEnv("DisableStatusListTests", "false")
+);
 
 export const BBS = {
   Name: "BBS",

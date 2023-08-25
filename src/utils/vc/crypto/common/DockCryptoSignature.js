@@ -6,7 +6,7 @@ import jsonld from 'jsonld';
 import { SECURITY_CONTEXT_URL } from 'jsonld-signatures';
 
 import { u8aToU8a } from '@polkadot/util';
-import withExtendedStaticProperties from './withExtendedStaticProperties';
+import { withExtendedStaticProperties } from '../../../inheritance';
 import CustomLinkedDataSignature from './CustomLinkedDataSignature';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';

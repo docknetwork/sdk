@@ -106,7 +106,7 @@ class BlobModule {
   }
 
   /**
-   *  Get blob with given id from the chain. Throws if the blob can't be found.
+   * Get blob with given id from the chain. Throws if the blob can't be found.
    * @param {string} id - Can either be a full blob id like blob:dock:0x... or just the hex identifier
    * @returns {Promise<Array>} - A 2-element array where the first is the author and the second is the blob contents.
    */

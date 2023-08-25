@@ -156,8 +156,6 @@ used when present. Basically, once you've created and stored your Schema on chai
 >    await validCredential.verify({
        resolver: dockResolver,
        compactProof: true,
-       forceRevocationCheck: false,
-       schemaApi: { dock: dockApi }
      });
 ```
 Assuming that the `blobId` points to a schema taken from the previous examples, the verification above would fail if I

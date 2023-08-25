@@ -4,11 +4,14 @@
  * All properties will be checked for presence during the object constructor call.
  * Each property on its own will be checked every time it will be accessed.
  * In case some property is missing, an error will be thrown.
- * @param {*} properties
- * @param {*} parentClass
+ *
+ * @template T
+ * @param {Array<string>} properties
+ * @param {T} parentClass
+ * @returns {T}
  */
-export default function withExtendedStaticProperties(properties, parentClass) {
-  class WithExtendedStaticProperties extends parentClass {
+export function withExtendedStaticProperties(properties, parentClass) {
+  const extendedClass = class extends parentClass {
     constructor(...args) {
       super(...args);
 
@@ -18,20 +21,22 @@ export default function withExtendedStaticProperties(properties, parentClass) {
       for (const property of properties) {
         if (this.constructor[property] == null) {
           throw new Error(
-            `Static property \`${property}\` of \`${this}\` isn't extended properly`,
+            `Static property \`${property}\` of \`${this.constructor.name}\` isn't extended properly`,
           );
         }
       }
     }
-  }
+  };
 
   for (const property of properties) {
-    Object.defineProperty(WithExtendedStaticProperties, property, {
+    const propertySymbol = Symbol(property);
+
+    Object.defineProperty(extendedClass, property, {
       get() {
-        const value = this[`_@${property}`];
+        const value = this[propertySymbol];
         if (value == null) {
           throw new Error(
-            `Static property \`${property}\` of \`${this}\` isn't extended properly`,
+            `Static property \`${property}\` of \`${this.name}\` isn't extended properly`,
           );
         }
 
@@ -40,14 +45,18 @@ export default function withExtendedStaticProperties(properties, parentClass) {
       set(newValue) {
         if (newValue == null) {
           throw new Error(
-            `Attempt to set \`null\`ish value to the property \`${property}\` of \`${this}\``,
+            `Attempt to set \`null\`ish value to the property \`${property}\` of \`${this.name}\``,
+          );
+        } else if (this[propertySymbol] != null) {
+          throw new Error(
+            `Can't override the property \`${property}\` of \`${this.name}\``,
           );
         }
 
-        this[`_@${property}`] = newValue;
+        this[propertySymbol] = newValue;
       },
     });
   }
 
-  return WithExtendedStaticProperties;
+  return extendedClass;
 }

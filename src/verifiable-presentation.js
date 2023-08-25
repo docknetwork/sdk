@@ -1,7 +1,4 @@
-import {
-  signPresentation,
-  verifyPresentation,
-} from './utils/vc/index';
+import { signPresentation, verifyPresentation } from './utils/vc/index';
 
 import {
   ensureObjectWithId,
@@ -12,7 +9,7 @@ import {
 
 import { getUniqueElementsFromArray } from './utils/misc';
 import VerifiableCredential from './verifiable-credential';
-import DIDResolver from './did-resolver'; // eslint-disable-line
+import DIDResolver from "./resolver/did/did-resolver"; // eslint-disable-line
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiablePresentation';
@@ -59,7 +56,9 @@ class VerifiablePresentation {
         vp.addType(type);
       }
     } else {
-      throw new Error('No type found in JSON object, verifiable presentations must have a type field.');
+      throw new Error(
+        'No type found in JSON object, verifiable presentations must have a type field.',
+      );
     }
 
     const context = rest['@context'];
@@ -67,7 +66,9 @@ class VerifiablePresentation {
       vp.setContext(rest['@context']);
       delete rest['@context'];
     } else {
-      throw new Error('No context found in JSON object, verifiable presentations must have a @context field.');
+      throw new Error(
+        'No context found in JSON object, verifiable presentations must have a @context field.',
+      );
     }
 
     if (verifiableCredential) {
@@ -106,7 +107,10 @@ class VerifiablePresentation {
     if (!isObject(context)) {
       ensureURI(context);
     }
-    this.context = getUniqueElementsFromArray([...this.context, context], JSON.stringify);
+    this.context = getUniqueElementsFromArray(
+      [...this.context, context],
+      JSON.stringify,
+    );
     return this;
   }
 
@@ -143,7 +147,10 @@ class VerifiablePresentation {
       cred = credential.toJSON();
     }
     ensureObjectWithId(cred, 'credential');
-    this.credentials = getUniqueElementsFromArray([...this.credentials, cred], JSON.stringify);
+    this.credentials = getUniqueElementsFromArray(
+      [...this.credentials, cred],
+      JSON.stringify,
+    );
 
     return this;
   }
@@ -190,7 +197,14 @@ class VerifiablePresentation {
    * @returns {Promise<VerifiablePresentationVerificationResult>} - verification result.
    */
   async verify({
-    challenge, domain, resolver = null, compactProof = true, forceRevocationCheck = true, revocationApi = null, schemaApi = null, suite = [],
+    challenge,
+    domain,
+    resolver = null,
+    compactProof = true,
+    skipRevocationCheck = false,
+    skipSchemaCheck = false,
+    verifyMatchingIssuersForRevocation = true,
+    suite = [],
   } = {}) {
     if (!this.proof) {
       throw new Error('The current VerifiablePresentation has no proof.');
@@ -201,9 +215,9 @@ class VerifiablePresentation {
       domain,
       resolver,
       compactProof,
-      forceRevocationCheck,
-      revocationApi,
-      schemaApi,
+      skipRevocationCheck,
+      skipSchemaCheck,
+      verifyMatchingIssuersForRevocation,
       suite,
     });
   }

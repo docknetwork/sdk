@@ -45,21 +45,29 @@ export function createRandomRegistryId() {
 }
 
 /**
- * Checks if a credential has a credentialStatus property and it has the properties we expect
+ * Retrieves a value under the `credentialStatus` property and ensures it has the expected properties.
+ * Returns `null` if no value is found.
  * @param expanded
  */
-export function getCredentialStatuses(expanded) {
+export function getCredentialStatus(expanded) {
   const statusValues = jsonld.getValues(expanded, expandedStatusProperty);
-  statusValues.forEach((status) => {
-    if (!status[credentialIDField]) {
-      throw new Error('"credentialStatus" must include an id.');
-    }
-    if (!status[credentialTypeField]) {
-      throw new Error('"credentialStatus" must include a type.');
-    }
-  });
+  if (!statusValues.length) {
+    return null;
+  } else if (statusValues.length > 1) {
+    throw new Error(
+      `\`statusPurpose\` must be an array containing up to one item, received: \`${expanded[expandedStatusProperty]}\``,
+    );
+  }
+  const [status] = statusValues;
 
-  return statusValues;
+  if (!status[credentialIDField]) {
+    throw new Error('"credentialStatus" must include an id.');
+  }
+  if (!status[credentialTypeField]) {
+    throw new Error('"credentialStatus" must include a type.');
+  }
+
+  return status;
 }
 
 /**
@@ -75,7 +83,9 @@ export const isRegistryRevocationStatus = ({ [credentialTypeField]: type }) => t
  * @returns {boolean}
  */
 export function hasRegistryRevocationStatus(expanded) {
-  return !!getCredentialStatuses(expanded).find(isRegistryRevocationStatus);
+  const status = getCredentialStatus(expanded);
+
+  return !!status && isRegistryRevocationStatus(status);
 }
 
 /**
@@ -89,15 +99,12 @@ export async function checkRevocationRegistryStatus(
   credential,
   documentLoader,
 ) {
-  const statuses = await getCredentialStatuses(credential);
+  const status = await getCredentialStatus(credential);
   const revId = getDockRevIdFromCredential(credential);
-  if (statuses.length !== 1) {
-    throw new Error(
-      `\`statusPurpose\` must be an array containing a single item, received: \`${credential[expandedStatusProperty]}\``,
-    );
+  if (!status) {
+    throw new Error('Missing `credentialStatus`');
   }
 
-  const [status] = statuses;
   if (!isRegistryRevocationStatus(status)) {
     throw new Error(`Expected registry revocation status, got \`${status}\``);
   }

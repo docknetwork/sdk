@@ -8,7 +8,7 @@ import defaultDocumentLoader from './document-loader';
 import { getAndValidateSchemaIfPresent } from './schema';
 import {
   checkRevocationRegistryStatus,
-  getCredentialStatuses,
+  getCredentialStatus,
   hasRegistryRevocationStatus,
 } from '../revocation';
 import { Resolver } from "../../resolver"; // eslint-disable-line
@@ -350,57 +350,45 @@ export async function verifyCredential(
 
   // Check for revocation only if the credential is verified and revocation check is needed.
   if (result.verified && !skipRevocationCheck) {
-    const statuses = getCredentialStatuses(expandedCredential);
+    const status = getCredentialStatus(expandedCredential);
 
-    switch (statuses.length) {
-      case 0:
-        break;
-      case 1: {
-        const isStatusList2021Status = statusTypeMatches({ credential });
-        if (isStatusList2021Status) {
-          const revResult = await checkStatus({
-            credential,
-            suite: fullSuite,
-            documentLoader: docLoader,
-            verifyStatusListCredential: true,
-            verifyMatchingIssuers: verifyMatchingIssuersForRevocation,
-          });
+    if (status) {
+      const isStatusList2021Status = statusTypeMatches({ credential });
+      if (isStatusList2021Status) {
+        const revResult = await checkStatus({
+          credential,
+          suite: fullSuite,
+          documentLoader: docLoader,
+          verifyStatusListCredential: true,
+          verifyMatchingIssuers: verifyMatchingIssuersForRevocation,
+        });
 
-          // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
-          if (!revResult.verified) {
-            if (!revResult.error) {
-              revResult.error = 'Credential was revoked (or suspended) according to the status list referenced in `credentialStatus`';
-            }
-
-            return revResult;
+        // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
+        if (!revResult.verified) {
+          if (!revResult.error) {
+            revResult.error = 'Credential was revoked (or suspended) according to the status list referenced in `credentialStatus`';
           }
+
+          return revResult;
         }
-
-        const isRegistryRevocationStatus = hasRegistryRevocationStatus(expandedCredential);
-        if (isRegistryRevocationStatus) {
-          const revResult = await checkRevocationRegistryStatus(
-            expandedCredential,
-            docLoader,
-          );
-
-          // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
-          if (!revResult.verified) {
-            return revResult;
-          }
-        }
-
-        if (!isStatusList2021Status && !isRegistryRevocationStatus) {
-          throw new Error(
-            `Unsupported \`credentialStatus\`: \`${statuses[0]}\``,
-          );
-        }
-
-        break;
       }
-      default:
-        throw new Error(
-          `\`statusPurpose\` must be an object or an array containing a single item, received: \`${statuses}\``,
+
+      const isRegistryRevocationStatus = hasRegistryRevocationStatus(expandedCredential);
+      if (isRegistryRevocationStatus) {
+        const revResult = await checkRevocationRegistryStatus(
+          expandedCredential,
+          docLoader,
         );
+
+        // If revocation check fails, return the error else return the result of credential verification to avoid data loss.
+        if (!revResult.verified) {
+          return revResult;
+        }
+      }
+
+      if (!isStatusList2021Status && !isRegistryRevocationStatus) {
+        throw new Error(`Unsupported \`credentialStatus\`: \`${status}\``);
+      }
     }
   }
 

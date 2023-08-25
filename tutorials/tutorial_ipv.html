@@ -88,11 +88,33 @@
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
         <div id="page-wrapper" class="page-wrapper">
 
             <div class="page">
                                 <div id="menu-bar-hover-placeholder"></div>
-                <div id="menu-bar" class="menu-bar sticky bordered">
+                <div id="menu-bar" class="menu-bar sticky">
                     <div class="left-buttons">
                         <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
                             <i class="fa fa-bars"></i>
@@ -320,12 +342,8 @@ You can also use the booleans <code>compactProof</code> (to compact the JSON-LD)
 <code>forceRevocationCheck</code> (to force revocation check). Please beware that
 setting <code>forceRevocationCheck</code> to false can allow false positives when
 verifying revocable credentials.</p>
-<p>If your credential has uses the <code>status</code> field, you can pass a
-<code>revocationApi</code> param that accepts an object describing the API to use for
-the revocation check. No params are required for the simplest cases:</p>
-<p>If your credential uses schema and requires blob resolution, you can pass a
-<code>schemaApi</code> param that accepts an object describing the API to pull the
-schema from chain. No params are required for the simplest cases:</p>
+<p>If your credential has uses the <code>credentialStatus</code> field, the credential will be checked
+not to be revoked unless you pass <code>skipRevocationCheck</code> flag.</p>
 <pre><code class="language-javascript">&gt;   const result = await vc.verify({ ... })
 &gt;   result
 &lt;-  {
@@ -482,9 +500,7 @@ the booleans <code>compactProof</code> (to compact the JSON-LD) and
 <code>forceRevocationCheck</code> (to force revocation check). Please beware that
 setting <code>forceRevocationCheck</code> to false can allow false positives when
 verifying revocable credentials.</p>
-<p>If your credential has uses the <code>status</code> field, you can pass a
-<code>revocationApi</code> param that accepts an object describing the API to use for
-the revocation check.
+<p>If your credential uses the <code>credentialStatus</code> field, the credential will be checked to be not revoked unless you pass <code>skipRevocationCheck</code>.
 For the simplest cases you only need a <code>challenge</code> string and possibly a
 <code>domain</code> string:</p>
 <pre><code class="language-javascript">&gt;   const results = await vp.verify({ challenge: 'some_challenge', domain: 'some_domain' });

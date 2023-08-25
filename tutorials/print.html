@@ -89,11 +89,33 @@
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
         <div id="page-wrapper" class="page-wrapper">
 
             <div class="page">
                                 <div id="menu-bar-hover-placeholder"></div>
-                <div id="menu-bar" class="menu-bar sticky bordered">
+                <div id="menu-bar" class="menu-bar sticky">
                     <div class="left-buttons">
                         <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
                             <i class="fa fa-bars"></i>
@@ -1162,34 +1184,36 @@ DIDs of those methods.</p>
 <p>The resolver for Dock DIDs <code>DockResolver</code> connects to the Dock blockchain to get the DID details.</p>
 <p>The resolver is constructed by passing it a Dock API object so that it can connect to a Dock node.
 This is how you resolve a Dock DID:</p>
-<pre><code class="language-js">import { DockResolver } from '@docknetwork/sdk/resolver';
+<pre><code class="language-js">import { DockResolver } from &quot;@docknetwork/sdk/resolver&quot;;
 
 // Assuming the presence of Dock API object `dock`
 const dockResolver = new DockResolver(dock);
 // Say you had a DID `did:dock:5D.....`
-const didDocument = dockResolver.resolve('did:dock:5D.....');
+const didDocument = dockResolver.resolve(&quot;did:dock:5D.....&quot;);
 </code></pre>
 <h2 id="creating-a-resolver-class-for-a-different-method"><a class="header" href="#creating-a-resolver-class-for-a-different-method">Creating a resolver class for a different method</a></h2>
 <p>If you want to resolve DIDs other than Dock and do not have/want access to the universal resolver, you can extend the
-<code>DIDResolver</code> class to create a custom resolver.</p>
+<code>DIDResolver</code> class to derive a custom resolver.</p>
 <p>Following is an example to build a custom Ethereum resolver. It uses the library
 <a href="https://github.com/decentralized-identity/ethr-did-resolver">ethr-did-resolver</a> and accepts a provider information
 as configuration. The example below uses Infura to get access to an Ethereum node and read the DID off Ethereum.</p>
-<pre><code class="language-js">import { DIDResolver } from '@docknetwork/sdk/resolver';
-import ethr from 'ethr-did-resolver';
+<pre><code class="language-js">import { DIDResolver } from &quot;@docknetwork/sdk/resolver&quot;;
+import ethr from &quot;ethr-did-resolver&quot;;
 
 // Infura's Ethereum provider for the main net.
 const ethereumProviderConfig = {
   networks: [
     {
-      name: 'mainnet',
-      rpcUrl: 'https://mainnet.infura.io/v3/blahblahtoken',
+      name: &quot;mainnet&quot;,
+      rpcUrl: &quot;https://mainnet.infura.io/v3/blahblahtoken&quot;,
     },
   ],
 };
 
 // Custom ethereum resolver class
 class EtherResolver extends DIDResolver {
+  static METHOD = &quot;ethr&quot;;
+
   constructor(config) {
     super();
     this.ethres = ethr.getResolver(config).ethr;
@@ -1209,43 +1233,49 @@ class EtherResolver extends DIDResolver {
 const ethResolver = new EtherResolver(ethereumProviderConfig);
 
 // Say you had a DID `did:ethr:0x6f....`
-const didDocument = ethResolver.resolve('did:ethr:0x6f....');
+const didDocument = ethResolver.resolve(&quot;did:ethr:0x6f....&quot;);
 </code></pre>
 <h2 id="universal-resolver"><a class="header" href="#universal-resolver">Universal resolver</a></h2>
 <p>To resolve DIDs using the <a href="https://uniresolver.io">Universal Resolver</a>, use the <code>UniversalResolver</code>. It needs the URL
 of the universal resolver and assumes the universal resolver from this <a href="https://github.com/decentralized-identity/universal-resolver">codebase</a>
 is running at the URL.</p>
-<pre><code class="language-js">import { UniversalResolver } from '@docknetwork/sdk/resolver';
+<pre><code class="language-js">import { UniversalResolver } from &quot;@docknetwork/sdk/resolver&quot;;
 
 // Change the resolver URL to something else in case you cannot use the resolver at https://uniresolver.io
-const universalResolverUrl = 'https://uniresolver.io';
+const universalResolverUrl = &quot;https://uniresolver.io&quot;;
 const universalResolver = new UniversalResolver(universalResolverUrl);
 
 // Say you had a DID `did:btcr:xk....`
-const didDocument = universalResolver.resolve('did:btcr:xk....');
+const didDocument = universalResolver.resolve(&quot;did:btcr:xk....&quot;);
 </code></pre>
 <h2 id="resolving-dids-of-several-did-methods-with-a-single-resolver"><a class="header" href="#resolving-dids-of-several-did-methods-with-a-single-resolver">Resolving DIDs of several DID methods with a single resolver</a></h2>
-<p>In case you need to resolve DIDs from more than one method, a <code>MultiResolver</code> object can be created by passing
-resolvers of various DID methods.</p>
-<p>The <code>MultiResolver</code> also accepts a <code>UniversalResolver</code> as an optional parameter which
-is used when a DID for an unknown method needs to be resolved. The <code>resolvers</code> object below has resolvers for DID methods
-<code>dock</code> and <code>ethr</code>.</p>
-<p>For resolving DID of any other method, the given <code>UniversalResolver</code> object will be used.</p>
-<pre><code class="language-js">import { MultiResolver } from '@docknetwork/sdk/resolver';
+<p>In case you need to resolve DIDs from more than one method, a <code>DIDResolver</code> can be created by passing
+resolvers of various DID methods to the derived class constructor.</p>
+<p>The derived <code>DIDResolver</code> without overriden <code>resolve</code> accepts a list of resolvers each of which
+will be dispatched according to their prefix and method configuration. The <code>resolvers</code> array below
+has resolvers for DID methods <code>dock</code> and <code>ethr</code>.</p>
+<p>For resolving DID of any other method, <code>UniversalResolver</code> object will be used.</p>
+<pre><code class="language-js">import { DockDIDResolver, DIDResolver, WILDCARD } from &quot;@docknetwork/sdk/resolver&quot;;
 
+class MultiDIDResolver extends DIDResolver {
+  static METHOD = WILDCARD;
 
-const resolvers = {
-    dock: new DockResolver(dock), // Prebuilt resolver
-    ethr: new EtherResolver(ethereumProviderConfig), // Custom resolver
-  };
+  constructor(dock) {
+    super([
+      new DockDIDResolver(dock),
+      new EtherResolver(ethereumProviderConfig),
+      new UniversalResolver(universalResolverUrl)
+    ]);
+  }
+}
 
-const multiResolver = new MultiResolver(resolvers, new UniversalResolver(universalResolverUrl));
+const multiResolver = new MultiDIDResolver(resolvers);
 
 // Say you had a DID `did:dock:5D....`, then the `DockResolver` will be used as there a resolver for Dock DID.
-const didDocumentDock = multiResolver.resolve('did:dock:5D....');
+const didDocumentDock = multiResolver.resolve(&quot;did:dock:5D....&quot;);
 
 // Say you had a DID `did:btcr:xk....`, then the `UniversalResolver` will be used as there is no resolver for BTC DID.
-const didDocumentBtc = multiResolver.resolve('did:btcr:xk....');
+const didDocumentBtc = multiResolver.resolve(&quot;did:btcr:xk....&quot;);
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="verifiable-credentials-and-verifiable-presentations-issuing-signing-and-verification"><a class="header" href="#verifiable-credentials-and-verifiable-presentations-issuing-signing-and-verification">Verifiable Credentials and Verifiable Presentations: issuing, signing and verification</a></h1>
 <h2 id="table-of-contents-1"><a class="header" href="#table-of-contents-1">Table of contents</a></h2>
@@ -1423,12 +1453,8 @@ You can also use the booleans <code>compactProof</code> (to compact the JSON-LD)
 <code>forceRevocationCheck</code> (to force revocation check). Please beware that
 setting <code>forceRevocationCheck</code> to false can allow false positives when
 verifying revocable credentials.</p>
-<p>If your credential has uses the <code>status</code> field, you can pass a
-<code>revocationApi</code> param that accepts an object describing the API to use for
-the revocation check. No params are required for the simplest cases:</p>
-<p>If your credential uses schema and requires blob resolution, you can pass a
-<code>schemaApi</code> param that accepts an object describing the API to pull the
-schema from chain. No params are required for the simplest cases:</p>
+<p>If your credential has uses the <code>credentialStatus</code> field, the credential will be checked
+not to be revoked unless you pass <code>skipRevocationCheck</code> flag.</p>
 <pre><code class="language-javascript">&gt;   const result = await vc.verify({ ... })
 &gt;   result
 &lt;-  {
@@ -1585,9 +1611,7 @@ the booleans <code>compactProof</code> (to compact the JSON-LD) and
 <code>forceRevocationCheck</code> (to force revocation check). Please beware that
 setting <code>forceRevocationCheck</code> to false can allow false positives when
 verifying revocable credentials.</p>
-<p>If your credential has uses the <code>status</code> field, you can pass a
-<code>revocationApi</code> param that accepts an object describing the API to use for
-the revocation check.
+<p>If your credential uses the <code>credentialStatus</code> field, the credential will be checked to be not revoked unless you pass <code>skipRevocationCheck</code>.
 For the simplest cases you only need a <code>challenge</code> string and possibly a
 <code>domain</code> string:</p>
 <pre><code class="language-javascript">&gt;   const results = await vp.verify({ challenge: 'some_challenge', domain: 'some_domain' });
@@ -1864,8 +1888,6 @@ used when present. Basically, once you've created and stored your Schema on chai
 &gt;    await validCredential.verify({
        resolver: dockResolver,
        compactProof: true,
-       forceRevocationCheck: false,
-       schemaApi: { dock: dockApi }
      });
 </code></pre>
 <p>Assuming that the <code>blobId</code> points to a schema taken from the previous examples, the verification above would fail if I

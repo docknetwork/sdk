@@ -2,8 +2,10 @@ import {
   decodeList,
   createList,
   createCredential,
+  StatusList, // eslint-disable-line
 } from '@digitalbazaar/vc-status-list';
 import { u8aToHex, u8aToU8a } from '@polkadot/util';
+import { gzip, ungzip } from 'pako';
 import { DockStatusList2021Qualifier } from '../utils/vc/constants';
 import VerifiableCredential from '../verifiable-credential';
 import { ensureStatusListId } from '../utils/type-helpers';
@@ -69,7 +71,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
     { statusPurpose = 'revocation', length = 1e4, revokeIndices = [] } = {},
   ) {
     const statusList = await createList({ length });
-    this.updateStatusList(statusList, revokeIndices);
+    this.updateStatusList(statusPurpose, statusList, revokeIndices);
 
     const jsonCred = await createCredential({
       id: `${DockStatusList2021Qualifier}${id}`,
@@ -92,18 +94,9 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * @returns {this}
    */
   async update(keyDoc, { revokeIndices = [], unsuspendIndices = [] }) {
-    if (
-      this.credentialSubject.statusPurpose === 'revocation'
-      && [...unsuspendIndices].length > 0
-    ) {
-      throw new Error(
-        "Can't unsuspend indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`",
-      );
-    }
-
     const statusList = await this.decodedStatusList();
-
     this.constructor.updateStatusList(
+      this.credentialSubject.statusPurpose,
       statusList,
       revokeIndices,
       unsuspendIndices,
@@ -150,8 +143,8 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * @param {Uint8Array} bytes
    */
   static fromBytes(bytes) {
-    const bufferCred = Buffer.from(u8aToU8a(bytes));
-    const stringifiedCred = bufferCred.toString('utf8');
+    const gzipBufferCred = Buffer.from(u8aToU8a(bytes));
+    const stringifiedCred = ungzip(gzipBufferCred, { to: 'string' });
     const parsedCred = JSON.parse(stringifiedCred);
 
     return this.fromJSON(parsedCred);
@@ -187,9 +180,9 @@ export default class StatusList2021Credential extends VerifiableCredential {
   toBytes() {
     const jsonCred = this.toJSON();
     const stringifiedCred = JSON.stringify(jsonCred);
-    const bufferCred = Buffer.from(stringifiedCred, 'utf8');
+    const bufferCred = Buffer.from(stringifiedCred);
 
-    return new Uint8Array(bufferCred);
+    return gzip(bufferCred);
   }
 
   /**
@@ -230,21 +223,31 @@ export default class StatusList2021Credential extends VerifiableCredential {
 
   /**
    * Revokes (suspends) `revokeIndices` and unsuspends (unsuspends) `unsuspendIndices` from the supplied `StatusList`.
-   * Throws an error if any index is present in both iterables or some index is out of bounds.
    *
+   * Throws an error if
+   * - non-empty `unsuspendIndices` passed along with `statusPurpose != suspension`
+   * - any index is present in both iterables
+   * - some index is out of bounds.
+   *
+   * @param {'revocation'|'suspension'} statusPurpose
    * @param {StatusList} statusList
    * @param {Iterable<number>} revokeIndices
    * @param {Iterable<number>} unsuspendIndices
    */
   static updateStatusList(
+    statusPurpose,
     statusList,
     revokeIndices = [],
     unsuspendIndices = [],
   ) {
-    const revokeIndiceSet = new Set(revokeIndices);
     const unsuspendIndiceSet = new Set(unsuspendIndices);
+    if (statusPurpose !== 'suspension' && unsuspendIndiceSet.size > 0) {
+      throw new Error(
+        `Can't unsuspend indices for credential with \`statusPurpose\` = \`${statusPurpose}\`, it's only possible with \`statusPurpose\` = \`suspension\``,
+      );
+    }
 
-    for (const idx of revokeIndiceSet) {
+    for (const idx of revokeIndices) {
       if (unsuspendIndiceSet.has(idx)) {
         throw new Error(
           `Index \`${idx}\` appears in both revoke and unsuspend sets`,

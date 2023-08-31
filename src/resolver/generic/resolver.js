@@ -61,7 +61,7 @@ class Resolver {
     ensureString(id);
     const end = id.indexOf(':');
 
-    return id.slice(0, end);
+    return ~end ? id.slice(0, end) : '';
   }
 
   /**
@@ -75,7 +75,7 @@ class Resolver {
     const start = id.indexOf(':');
     const end = id.indexOf(':', start + 1);
 
-    return id.slice(start + 1, end);
+    return ~start && ~end ? id.slice(start + 1, end) : '';
   }
 }
 

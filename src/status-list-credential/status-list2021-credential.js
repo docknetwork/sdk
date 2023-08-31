@@ -95,7 +95,6 @@ export default class StatusList2021Credential extends VerifiableCredential {
    */
   async update(keyDoc, { revokeIndices = [], unsuspendIndices = [] }) {
     const statusList = await this.decodedStatusList();
-
     this.constructor.updateStatusList(
       this.credentialSubject.statusPurpose,
       statusList,
@@ -242,7 +241,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
     unsuspendIndices = [],
   ) {
     const unsuspendIndiceSet = new Set(unsuspendIndices);
-    if (statusPurpose !== 'suspension' && unsuspendIndices.size > 0) {
+    if (statusPurpose !== 'suspension' && unsuspendIndiceSet.size > 0) {
       throw new Error(
         `Can't unsuspend indices for credential with \`statusPurpose\` = \`${statusPurpose}\`, it's only possible with \`statusPurpose\` = \`suspension\``,
       );

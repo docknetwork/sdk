@@ -2,6 +2,7 @@ import {
   decodeList,
   createList,
   createCredential,
+  StatusList, // eslint-disable-line
 } from '@digitalbazaar/vc-status-list';
 import { u8aToHex, u8aToU8a } from '@polkadot/util';
 import { DockStatusList2021Qualifier } from '../utils/vc/constants';
@@ -69,7 +70,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
     { statusPurpose = 'revocation', length = 1e4, revokeIndices = [] } = {},
   ) {
     const statusList = await createList({ length });
-    this.updateStatusList(statusList, revokeIndices);
+    this.updateStatusList(statusPurpose, statusList, revokeIndices);
 
     const jsonCred = await createCredential({
       id: `${DockStatusList2021Qualifier}${id}`,
@@ -92,18 +93,10 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * @returns {this}
    */
   async update(keyDoc, { revokeIndices = [], unsuspendIndices = [] }) {
-    if (
-      this.credentialSubject.statusPurpose === 'revocation'
-      && [...unsuspendIndices].length > 0
-    ) {
-      throw new Error(
-        "Can't unsuspend indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`",
-      );
-    }
-
     const statusList = await this.decodedStatusList();
 
     this.constructor.updateStatusList(
+      this.credentialSubject.statusPurpose,
       statusList,
       revokeIndices,
       unsuspendIndices,
@@ -230,21 +223,31 @@ export default class StatusList2021Credential extends VerifiableCredential {
 
   /**
    * Revokes (suspends) `revokeIndices` and unsuspends (unsuspends) `unsuspendIndices` from the supplied `StatusList`.
-   * Throws an error if any index is present in both iterables or some index is out of bounds.
    *
+   * Throws an error if
+   * - non-empty `unsuspendIndices` passed along with `statusPurpose != suspension`
+   * - any index is present in both iterables
+   * - some index is out of bounds.
+   *
+   * @param {'revocation'|'suspension'} statusPurpose
    * @param {StatusList} statusList
    * @param {Iterable<number>} revokeIndices
    * @param {Iterable<number>} unsuspendIndices
    */
   static updateStatusList(
+    statusPurpose,
     statusList,
     revokeIndices = [],
     unsuspendIndices = [],
   ) {
-    const revokeIndiceSet = new Set(revokeIndices);
     const unsuspendIndiceSet = new Set(unsuspendIndices);
+    if (statusPurpose !== 'suspension' && unsuspendIndices.size > 0) {
+      throw new Error(
+        `Can't unsuspend indices for credential with \`statusPurpose\` = \`${statusPurpose}\`, it's only possible with \`statusPurpose\` = \`suspension\``,
+      );
+    }
 
-    for (const idx of revokeIndiceSet) {
+    for (const idx of revokeIndices) {
       if (unsuspendIndiceSet.has(idx)) {
         throw new Error(
           `Index \`${idx}\` appears in both revoke and unsuspend sets`,

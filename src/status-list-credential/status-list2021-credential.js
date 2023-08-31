@@ -5,6 +5,7 @@ import {
   StatusList, // eslint-disable-line
 } from '@digitalbazaar/vc-status-list';
 import { u8aToHex, u8aToU8a } from '@polkadot/util';
+import { gzip, ungzip } from 'pako';
 import { DockStatusList2021Qualifier } from '../utils/vc/constants';
 import VerifiableCredential from '../verifiable-credential';
 import { ensureStatusListId } from '../utils/type-helpers';
@@ -143,8 +144,8 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * @param {Uint8Array} bytes
    */
   static fromBytes(bytes) {
-    const bufferCred = Buffer.from(u8aToU8a(bytes));
-    const stringifiedCred = bufferCred.toString('utf8');
+    const gzipBufferCred = Buffer.from(u8aToU8a(bytes));
+    const stringifiedCred = ungzip(gzipBufferCred, { to: 'string' });
     const parsedCred = JSON.parse(stringifiedCred);
 
     return this.fromJSON(parsedCred);
@@ -180,9 +181,9 @@ export default class StatusList2021Credential extends VerifiableCredential {
   toBytes() {
     const jsonCred = this.toJSON();
     const stringifiedCred = JSON.stringify(jsonCred);
-    const bufferCred = Buffer.from(stringifiedCred, 'utf8');
+    const bufferCred = Buffer.from(stringifiedCred);
 
-    return new Uint8Array(bufferCred);
+    return gzip(bufferCred);
   }
 
   /**

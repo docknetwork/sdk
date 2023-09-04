@@ -2481,22 +2481,26 @@
     jsonld "^5.2.0"
     jsonld-signatures "^9.3.0"
 
-"@docknetwork/crypto-wasm-ts@^0.33.3":
-  version "0.33.3"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.33.3.tgz#28f86d454e0f4170ef52aed9220e3b270ee49711"
-  integrity sha512-T8IBmi9fExCHOvdWeOzsLphPXi4/DTtXkDGngSsDqKGT2tuMgIswXlu5UCJoNa8qKnbmrUs/S/Vw7tDid4eyiA==
+"@docknetwork/crypto-wasm-ts@^0.38.1":
+  version "0.38.1"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.38.1.tgz#36742c1cf694de67b5838b1df51332b9982f2d68"
+  integrity sha512-Vfbo75UoHXiT12Hcz/Hd6JNkCiE3AX6HKmkxo+dU6XYjyh5DlvD2OAJdCWWR54UILefji570lUyEA+U0MoU/4g==
   dependencies:
-    "@docknetwork/crypto-wasm" "^0.18.0"
+    "@docknetwork/crypto-wasm" "0.19.0"
     "@types/flat" "^5.0.2"
+    "@types/lodash" "^4.14.195"
     bs58 "5.0.0"
     flat "^5.0.2"
     json-pointer "^0.6.2"
-    lzutf8 "^0.6.3"
+    lodash "^4.17.21"
+    lzutf8 "0.6.3"
 
-"@docknetwork/crypto-wasm@^0.18.0":
-  version "0.18.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.18.0.tgz#f38678812b23a677afe00c57ff20792a256f1799"
-  integrity sha512-dipHJlZcoi60x/cBDfkhGXx5VCtLyHPyzVF/sjLl8PX7pC3TlyRRApW1uh3peRLG/klP34dneG2jC/x6u2iDcw==
+"@docknetwork/crypto-wasm@0.19.0", "@docknetwork/crypto-wasm@^0.19.0":
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.19.0.tgz#64905fa517135a53ca61b2d1cc6c8267212d7bc6"
+  integrity sha512-ubk104MHeEBlH/jXKiNQ6xClaDMzu6WwK7AkNyMqtRcxJ7y5088LGekQwCdfOja85hTOKwx0LR/CRDBwQVRMRQ==
+  dependencies:
+    buffer "^6.0.3"
 
 "@docknetwork/node-types@^0.16.0":
   version "0.16.0"
@@ -4062,6 +4066,11 @@
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/@types/linkify-it/-/linkify-it-3.0.2.tgz#fd2cd2edbaa7eaac7e7f3c1748b52a19143846c9"
   integrity sha512-HZQYqbiFVWufzCwexrvh694SOim8z2d+xJl5UNamcvQFejLY/2YUtzXHYi3cHdI7PMlS8ejH2slRAOJQ32aNbA==
+
+"@types/lodash@^4.14.195":
+  version "4.14.197"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.197.tgz#e95c5ddcc814ec3e84c891910a01e0c8a378c54b"
+  integrity sha512-BMVOiWs0uNxHVlHBgzTIqJYmj+PgCo4euloGF+5m4okL3rEYzM2EEv78mw8zWSMM57dM7kVIgJ2QDvwHSoCI5g==
 
 "@types/long@^4.0.1":
   version "4.0.2"
@@ -9238,7 +9247,7 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
-lzutf8@^0.6.3:
+lzutf8@0.6.3:
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/lzutf8/-/lzutf8-0.6.3.tgz#37a2ebe80922a8405f1e3f24c6c2b74c3e430981"
   integrity sha512-CAkF9HKrM+XpB0f3DepQ2to2iUEo0zrbh+XgBqgNBc1+k8HMM3u/YSfHI3Dr4GmoTIez2Pr/If1XFl3rU26AwA==

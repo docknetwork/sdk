@@ -102,6 +102,7 @@ export default withExtendedStaticProperties(
         spec: {
           credentials: [
             {
+              sigType: proof.sigType,
               version: proof.version,
               schema: JSON.stringify(credentialSchema),
               revealedAttributes: {
@@ -116,6 +117,8 @@ export default withExtendedStaticProperties(
             },
           ],
           attributeEqualities: proof.attributeEqualities,
+          boundedPseudonyms: proof.boundedPseudonyms,
+          unboundedPseudonyms: proof.unboundedPseudonyms,
         },
         attributeCiphertexts: proof.attributeCiphertexts,
         proof: proof.proofValue,

@@ -162,32 +162,30 @@ for (const {
       const queriedPk = await getModule(dock).getPublicKey(issuerDid, 2, false);
       const sigPk = new PublicKey(hexToU8a(queriedPk.bytes));
 
-      credential1 = SignatureParams.signMessageObject(
+      credential1 = Signature.signMessageObject(
         attributes1,
         issuerSchemeKeypair.secretKey,
         labelBytes,
         encoder,
       );
       expect(
-        SignatureParams.verifyMessageObject(
+        credential1.signature.verifyMessageObject(
           attributes1,
-          credential1.signature,
           sigPk,
           labelBytes,
           encoder,
         ).verified,
       ).toBe(true);
 
-      credential2 = SignatureParams.signMessageObject(
+      credential2 = Signature.signMessageObject(
         attributes2,
         issuerSchemeKeypair.secretKey,
         labelBytes,
         encoder,
       );
       expect(
-        SignatureParams.verifyMessageObject(
+        credential2.signature.verifyMessageObject(
           attributes2,
-          credential2.signature,
           sigPk,
           labelBytes,
           encoder,

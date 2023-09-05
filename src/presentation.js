@@ -202,7 +202,10 @@ export default class Presentation {
           context: presentation.context,
           attributeCiphertexts: presentation.attributeCiphertexts,
           attributeEqualities: presentation.spec.attributeEqualities,
+          boundedPseudonyms: presentation.spec.boundedPseudonyms,
+          unboundedPseudonyms: presentation.spec.unboundedPseudonyms,
           version: credential.version,
+          sigType: credential.sigType,
         },
       };
     });

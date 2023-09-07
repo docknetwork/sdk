@@ -23,8 +23,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CONFIG_DOCK_NODE_IMAGE_TAG: 'mainnet'
-      DisableStatusListTests: true
-      TestSchemes: 'BBSPlus'
     steps:
       - uses: actions/checkout@v2
       - uses: ibnesayeed/setup-ipfs@0.6.0
@@ -42,7 +40,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CONFIG_DOCK_NODE_IMAGE_TAG: 'testnet'
-      DisableStatusListTests: true
     steps:
       - uses: actions/checkout@v2
       - uses: ibnesayeed/setup-ipfs@0.6.0

@@ -222,7 +222,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
   }
 
   /**
-   * Revokes (suspends) `revokeIndices` and unsuspends (unsuspends) `unsuspendIndices` from the supplied `StatusList`.
+   * Revokes (suspends) `revokeIndices` and unsuspends `unsuspendIndices` from the supplied `StatusList`.
    *
    * Throws an error if
    * - non-empty `unsuspendIndices` passed along with `statusPurpose != suspension`

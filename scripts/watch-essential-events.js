@@ -14,6 +14,7 @@ import {
   cond,
   view,
   either,
+  map,
   T,
   __,
   last,
@@ -40,6 +41,7 @@ import {
   inc,
   min,
   max,
+  anyPass,
 } from "ramda";
 import {
   timeout,
@@ -68,6 +70,7 @@ import {
   first,
   throwError,
   retry,
+  Subject,
 } from "rxjs";
 import { envObj, formatDock, notNilAnd, finiteNumber } from "./helpers";
 import dock from "../src";
@@ -144,14 +147,16 @@ const main = async (dock, startBlock) => {
     )
       .pipe(
         retry({ delay: RetryDelay, count: RetryAttempts }),
-        catchError(() =>
-          from(
-            sendAlarmEmailHtml(
-              TxWatcherAlarmEmailTo,
-              "Dock blockchain watcher was restarted",
-              `<h2>Due to either connection or node API problems, the dock blockchain essential notifications watcher was restarted with the last unprocessed block ${minUnprocessed}.</h2>`
+        catchError(
+          (error) =>
+            void console.error(error) ||
+            from(
+              sendAlarmEmailHtml(
+                TxWatcherAlarmEmailTo,
+                "Dock blockchain watcher was restarted",
+                `<h2>Due to either connection or node API problems, the dock blockchain essential notifications watcher was restarted with the last unprocessed block ${minUnprocessed}.</h2>`
+              )
             )
-          )
         )
       )
       .subscribe({ complete: () => resolve(null), error: reject });
@@ -163,10 +168,11 @@ const main = async (dock, startBlock) => {
  * Used to have the state of non-processed blocks.
  *
  * @param {startBlock?} - initial sync block
+ * @param {Subject} - missed blocks sink
  * @param {Observable<Block>} - blocks
  * @returns {Observable<{maxSeqProcessed: number, maxReceived: number, block: Block}>}
  */
-const trackSeqProcessed = curry((startBlock, blocks$) => {
+const trackSeqProcessed = curry((startBlock, missedBlocksSink, blocks$) => {
   const skipped = new Set();
   let maxReceived = startBlock != null ? (startBlock || 1) - 1 : null;
 
@@ -191,6 +197,7 @@ const trackSeqProcessed = curry((startBlock, blocks$) => {
       // Keep track of all the blocks which are missing.
       // They must be received later and processed, and in case of sync failure, we'll use the min number as the start block.
       for (let i = maxReceived + 1; i < received; i++) {
+        missedBlocksSink.next(i);
         skipped.add(i);
       }
       maxReceived = max(received, maxReceived);
@@ -220,8 +227,13 @@ const processBlocks = (dock, startBlock) => {
     return data$.pipe(mergeMap((item) => handleItem(item, dock)));
   });
 
-  return subscribeBlocks(dock, startBlock).pipe(
-    trackSeqProcessed(startBlock),
+  const missedBlocksSink = new Subject();
+  const missedBlocks$ = missedBlocksSink.pipe(
+    mergeMap(blockByNumber, ConcurrentBlocksSyncLimit)
+  );
+
+  return merge(subscribeBlocks(dock, startBlock), missedBlocks$).pipe(
+    trackSeqProcessed(startBlock, missedBlocksSink),
     mergeMap(({ block, maxSeqProcessed }) => {
       // Flattens extrinsics returning transaction along with produced events
       const txs$ = from(
@@ -324,7 +336,7 @@ export const subscribeBlocks = curry((dock, startBlock) => {
     defer(() =>
       concat(
         previousBlocks$.pipe(
-          trackSeqProcessed(startBlock),
+          trackSeqProcessed(startBlock, new Subject()),
           withLatestFrom(currentBlocks$),
           concatMap(
             ([
@@ -384,19 +396,24 @@ const syncPrevousBlocks = curry((dock, startBlock, currentBlocks$) => {
       }
     }, null),
     distinctUntilChanged(),
-    mergeMap(
-      (number) =>
-        of(number).pipe(
-          concatMap((number) => from(dock.api.rpc.chain.getBlockHash(number))),
-          concatMap((hash) => from(dock.api.derive.chain.getBlock(hash)))
-        ),
-      ConcurrentBlocksSyncLimit
-    ),
+    mergeMap(blockByNumber, ConcurrentBlocksSyncLimit),
     share()
   );
 
   return blocks$;
 });
+
+/**
+ * Retrieves a block associated with the given number.
+ *
+ * @param {*} number
+ * @returns {Observable<*>}
+ */
+const blockByNumber = (number) =>
+  of(number).pipe(
+    concatMap((number) => from(dock.api.rpc.chain.getBlockHash(number))),
+    concatMap((hash) => from(dock.api.derive.chain.getBlock(hash)))
+  );
 
 /**
  * Batches notifications received from the observable.
@@ -453,7 +470,7 @@ const txByMethodFilter = curry(
  */
 const isValidSudo = pipe(
   prop("events"),
-  filter(methodFilter("sudo", "Sudid")),
+  filter(methodFilter("sudo", ["Sudid", "SudoAsDone"])),
   ifElse(
     isEmpty,
     F,
@@ -465,7 +482,7 @@ const isValidSudo = pipe(
  * Returns `true` if given extrinsic was executed successfully.
  */
 const successfulTx = both(
-  either(complement(anyEventByMethodFilter("sudo", "Sudid")), isValidSudo),
+  either(complement(anyEventByMethodFilter("sudo", ["Sudid", "SudoAsDone"])), isValidSudo),
   complement(
     either(
       anyEventByMethodFilter("utility", "BatchInterrupted"),
@@ -549,6 +566,13 @@ const technicalCommitteeMembershipEvent = eventByMethodFilter(
  * Filter events produced by `elections` pallet.
  */
 const electionsEvent = eventByMethodFilter("elections");
+
+/**
+ * Filter extrinsics produced by `technicalCommitteeMembership` pallet.
+ */
+const technicalCommitteeMembershipTx = successfulTxByMethodFilter(
+  "technicalCommitteeMembership"
+);
 /**
  * Filter extrinsics from `democracy` pallet.
  */
@@ -567,6 +591,7 @@ const systemTx = successfulTxByMethodFilter("system");
 const electionsTx = successfulTxByMethodFilter("elections");
 
 const txFilters = [
+  checkMap(isValidSudo, () => of(`\`sudo\` transaction executed`)),
   // Council candidacy submission
   checkMap(electionsTx("submitCandidacy"), () =>
     of(`Self-submitted as a council candidate`)
@@ -638,53 +663,34 @@ const txFilters = [
 const eventFilters = [
   // Democracy proposal
   checkMap(
-    /*both(*/ democracyEvent("Proposed") /*, democracyTx("propose"))*/,
-    (/*{
+    democracyEvent("Proposed"),
+    ({
       tx: {
         args: [hash],
       },
-    }*/) => of(`New Democracy proposal`)
+    }) => of(`New Democracy proposal: ${hash}`)
   ),
 
   // Democracy preimage noted for the proposal
   checkMap(
-    /*both(*/ democracyEvent(
-      "PreimageNoted"
-    ) /*, democracyTx("notePreimage"))*/,
-    (
-      {
-        event: {
-          data: [proposalHash],
-        },
-        /*tx: {
-          args: [preimage],
-        },*/
+    democracyEvent("PreimageNoted"),
+    ({
+      event: {
+        data: [proposalHash],
       },
-      dock
-    ) => {
-      // const proposal = dock.api.createType("Call", preimage);
-      // const metadata = dock.api.registry.findMetaCall(proposal.callIndex);
+    }) => {
+      const proposal = dock.api.createType("Call", preimage);
+      const metadata = dock.api.registry.findMetaCall(proposal.callIndex);
 
-      return of(`Proposal preimage is noted for ${proposalHash.toString()}`);
-      /*return of(
+      return of(
         `Proposal preimage is noted for ${proposalHash.toString()}: ${
           metadata.section
         }::${metadata.method} with args ${JSON.stringify(
           proposal.toJSON().args
         )}`
-      );*/
+      );
     }
   ),
-
-  /*// Democracy proposal fast-tracked
-  checkMap(
-    both(democracyTx("fastTrack"), democracyEvent("Started")),
-    ({
-      tx: {
-        args: [proposalHash],
-      },
-    }) => of(`Proposal is fast-tracked: ${proposalHash.toString()}`)
-  ),*/
 
   // Council proposal created
   checkMap(councilEvent("Proposed"), ({ event }, dock) => {
@@ -778,28 +784,28 @@ const eventFilters = [
 
   // Techinal Committee member added
   checkMap(
-    //both(
-    technicalCommitteeMembershipEvent("MemberAdded"),
-    // technicalCommitteeMembershipTx("addMember")
-    //),
-    (/*{
+    both(
+      technicalCommitteeMembershipEvent("MemberAdded"),
+      technicalCommitteeMembershipTx("addMember")
+    ),
+    ({
       tx: {
         args: [member],
       },
-    }*/) => of(`New technical committee member added`)
+    }) => of(`New technical committee member added: ${member.toString()}`)
   ),
 
   // Techinal Committee member removed
   checkMap(
-    //both(
-    technicalCommitteeMembershipEvent("MemberRemoved"),
-    //technicalCommitteeMembershipTx("removeMember")
-    //),
-    (/*{
+    both(
+      technicalCommitteeMembershipEvent("MemberRemoved"),
+      technicalCommitteeMembershipTx("removeMember")
+    ),
+    ({
       tx: {
         args: [member],
       },
-    }*/) => of(`Technical committee member removed`)
+    }) => of(`Technical committee member removed: ${member.toString()}`)
   ),
 ];
 
@@ -813,7 +819,6 @@ const logTx = ({ tx, rootTx, events, block }) => {
   } else {
     msg += `unsigned: `;
   }
-
   msg += `${tx.method.section || tx.section}::${tx.method.method || tx.method}`;
 
   console.log(
@@ -832,7 +837,8 @@ const logTx = ({ tx, rootTx, events, block }) => {
  */
 const createTxWithEventsCombinator = (dock) => {
   const BATCH = 1;
-  const SUDO = 2;
+  const SUDO = 0b10;
+  const SUDO_AS = 0b100;
 
   /**
    * Contains extrinsic combined with their corresponding events and next events to be combined with the next extrinsic.
@@ -858,15 +864,13 @@ const createTxWithEventsCombinator = (dock) => {
     }
   }
 
-  const { BatchCompleted, BatchInterrupted /*ItemCompleted*/ } =
+  const { BatchCompleted, BatchInterrupted, ItemCompleted } =
     dock.api.events.utility;
-  const { Sudid } = dock.api.events.sudo;
+  const { Sudid, SudoAsDone } = dock.api.events.sudo;
 
   /**
    * Picks events for the given returning `TxWithEventsAccumulator` initialized with the given extrinsic merged with their events,
    * and remaining events to be processed.
-   *
-   * **Until `ItemCompleted` event isn't produced by the utility, it's not possible to match batch transactions with their events properly. For this purpose, some logic is simplified.**
    *
    * @param {Array<*>} events
    * @param {*} tx
@@ -875,24 +879,29 @@ const createTxWithEventsCombinator = (dock) => {
    */
   const pickEventsForExtrinsic = (events, tx, { config, rootTx }) => {
     let batchIdx = -1,
-      sudoIdx = -1;
+      sudoIdx = -1,
+      sudoAsIdx = -1;
     if (config & BATCH) {
-      // `ItemCompleted` event isn't available yet
       batchIdx = findIndex(
-        either(/*ItemCompleted.is*/ BatchCompleted.is, BatchInterrupted.is),
+        anyPass([ItemCompleted.is, BatchCompleted.is, BatchInterrupted.is]),
         events
-      ); /* else if (ItemCompleted.is(events[idx])) {
-        idx++;
-      }*/
+      );
+      if (~batchIdx && ItemCompleted.is(events[batchIdx])) {
+        batchIdx++;
+      }
     }
     sudoIdx = findIndex(Sudid.is, events);
-    if (config & SUDO && sudoIdx !== -1) {
+    sudoAsIdx = findIndex(SudoAsDone.is, events);
+    if (config & SUDO && ~sudoIdx) {
       sudoIdx++;
+    }
+    if (config & SUDO_AS && ~sudoAsIdx) {
+      sudoAsIdx++;
     }
 
     const minIdx = Math.min(
       events.length,
-      ...[batchIdx, sudoIdx].filter((idx) => idx + 1)
+      ...[batchIdx, sudoIdx, sudoAsIdx].filter((idx) => ~idx)
     );
     const [curEvents, nextEvents] = splitAt(minIdx, events);
 
@@ -910,6 +919,7 @@ const createTxWithEventsCombinator = (dock) => {
     txByMethodFilter("sudo", ["sudo", "sudoUncheckedWeight"]),
     assoc("tx", __, {})
   );
+  const isSudoAs = o(txByMethodFilter("sudo", "sudoAs"), assoc("tx", __, {}));
 
   /**
    * Recursively merges extrinsics with their corresponding events.
@@ -951,6 +961,21 @@ const createTxWithEventsCombinator = (dock) => {
       (events, tx, { rootTx, config }) => {
         const acc = mergeEventsWithExtrs(events, tx.args[0], {
           config: config | SUDO,
+          rootTx,
+        });
+        const selfAcc = pickEventsForExtrinsic(acc.nextEvents, tx, {
+          config,
+          rootTx,
+        });
+
+        return selfAcc.prependExtrinsics(acc.extrinsics);
+      },
+    ],
+    [
+      flip(isSudoAs),
+      (events, tx, { rootTx, config }) => {
+        const acc = mergeEventsWithExtrs(events, tx.args[1], {
+          config: config | SUDO_AS,
           rootTx,
         });
         const selfAcc = pickEventsForExtrinsic(acc.nextEvents, tx, {

@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "5.0.2",
+  "version": "6.2.0",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -14,10 +14,11 @@
     "@babel/cli": "^7.15.4",
     "@babel/core": "^7.15.4",
     "@babel/node": "^7.15.4",
+    "@babel/plugin-transform-modules-commonjs": "^7.15.4",
     "@babel/preset-env": "^7.15.6",
     "@comunica/actor-init-sparql-rdfjs": "^1.22.3",
     "@comunica/types": "^1.0.0",
-    "@docknetwork/crypto-wasm": "^0.18.0",
+    "@docknetwork/crypto-wasm": "^0.20.0",
     "@polkadot/x-bigint": "10.1.11",
     "@polkadot/x-bundle": "10.1.11",
     "@polkadot/x-global": "10.1.11",
@@ -28,7 +29,8 @@
     "@rollup/plugin-wasm": "^5.1.0",
     "@types/jest": "^26.0.24",
     "aws-sdk": "^2.1057.0",
-    "babel-jest": "24.5.0",
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^24.5.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.20.2",
@@ -39,7 +41,8 @@
     "ethr-did-resolver": "^2.2.0",
     "glob": "^7.1.6",
     "ipfs-http-client": "^51.0.0",
-    "jest": "24.5.0",
+    "jest": "^24.5.0",
+    "jest-environment-node": "^24.5.0",
     "jsdoc": "^3.6.3",
     "parity-scale-codec": "^0.5.3",
     "r1csfile": "0.0.41",
@@ -54,7 +57,6 @@
     "web3": "^1.7.5"
   },
   "scripts": {
-    "jest": "NODE_OPTIONS='--experimental-vm-modules' jest",
     "exc": "npx babel-node",
     "bbs-dock-example": "npx babel-node example/bbs-dock.js",
     "dock-did-example": "npx babel-node example/dock-did.js",
@@ -107,7 +109,8 @@
     "@polkadot/x-randomvalues": "10.1.11"
   },
   "dependencies": {
-    "@docknetwork/crypto-wasm-ts": "^0.33.3",
+    "@digitalbazaar/vc-status-list": "^4.0.0",
+    "@docknetwork/crypto-wasm-ts": "^0.39.0",
     "@docknetwork/node-types": "^0.16.0",
     "@juanelas/base64": "^1.0.5",
     "@polkadot/api": "9.7.1",
@@ -139,6 +142,7 @@
     "key-did-resolver": "^1.4.0",
     "mrklt": "^0.2.0",
     "n3": "1.16.2",
+    "pako": "^2.1.0",
     "rify": "^0.7.1"
   }
 }

@@ -1,9 +1,10 @@
+/* eslint-disable  max-classes-per-file */
 import { randomAsHex } from '@polkadot/util-crypto';
 import ethr from 'ethr-did-resolver';
 import { DockAPI } from '../src/index';
 import { createNewDockDID, NoDIDError } from '../src/utils/did';
 import {
-  DIDResolver, MultiResolver, DIDKeyResolver, UniversalResolver, DockResolver,
+  DIDResolver, DIDKeyResolver, UniversalResolver, WILDCARD, DockDIDResolver,
 } from '../src/resolver';
 
 // The following can be tweaked depending on where the node is running and what
@@ -27,6 +28,8 @@ const dock = new DockAPI();
 
 // Custom ethereum resolver class
 class EtherResolver extends DIDResolver {
+  static METHOD = 'ethr';
+
   constructor(config) {
     super();
     this.ethres = ethr.getResolver(config).ethr;
@@ -65,13 +68,17 @@ async function main() {
 
   console.log('Creating DID resolvers...');
 
-  const resolvers = {
-    key: new DIDKeyResolver(), // did:key resolver
-    dock: new DockResolver(dock), // Prebuilt resolver
-    ethr: new EtherResolver(ethereumProviderConfig), // Custom resolver
-  };
+  const resolvers = [
+    new DIDKeyResolver(), // did:key resolver
+    new DockDIDResolver(dock), // Prebuilt resolver
+    new EtherResolver(ethereumProviderConfig), // Custom resolver
+  ];
 
-  const resolver = new MultiResolver(resolvers, new UniversalResolver(universalResolverUrl));
+  class AnyDIDResolver extends DIDResolver {
+    static METHOD = WILDCARD;
+  }
+
+  const resolver = new AnyDIDResolver([new UniversalResolver(universalResolverUrl), ...resolvers]);
 
   console.log('Building DIDs list...');
 

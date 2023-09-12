@@ -1,6 +1,6 @@
 import { u8aToU8a } from '@polkadot/util';
 import b58 from 'bs58';
-import withExtendedStaticProperties from './withExtendedStaticProperties';
+import { withExtendedStaticProperties } from '../../../inheritance';
 
 /**
  * Defines commons for the `@docknetwork/crypto-wasm-ts` keypairs.

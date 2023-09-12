@@ -10,7 +10,7 @@ import {
 } from '../../test-constants';
 import { createNewDockDID } from '../../../src/utils/did';
 import { registerNewDIDUsingPair } from '../helpers';
-import getKeyDoc from '../../../src/utils/vc/helpers';
+import { getKeyDoc } from '../../../src/utils/vc/helpers';
 import {
   issueCredential,
   signPresentation,
@@ -237,6 +237,27 @@ for (const {
         'credentialSubject.type.1',
       ]);
 
+      // Begin to derive a credential from the above issued one
+      const presentationInstance2 = new Presentation();
+      const idx2 = await presentationInstance2.addCredentialToPresent(
+        credential,
+        { resolver },
+      );
+
+      // Reveal subject attributes
+      await presentationInstance2.addAttributeToReveal(idx2, [
+        'credentialSubject.lprNumber',
+      ]);
+
+      // NOTE: revealing subject type because of JSON-LD processing for this certain credential
+      // you may not always need to do this depending on your JSON-LD contexts
+      await presentationInstance2.addAttributeToReveal(idx2, [
+        'credentialSubject.type.0',
+      ]);
+      await presentationInstance2.addAttributeToReveal(idx2, [
+        'credentialSubject.type.1',
+      ]);
+
       // Derive a W3C Verifiable Credential JSON from the above presentation
       const credentials = await presentationInstance.deriveCredentials(
         presentationOptions,
@@ -253,9 +274,10 @@ for (const {
 
       // Ensure reconstructing presentation from credential matches
       // NOTE: ignoring proof here as itll differ when signed twice as above
-      const presentation = await presentationInstance.createPresentation(
+      const presentation = await presentationInstance2.createPresentation(
         presentationOptions,
       );
+
       const reconstructedPres = convertToPresentation(credentials[0]);
       expect(reconstructedPres.proof).toBeDefined();
       expect({

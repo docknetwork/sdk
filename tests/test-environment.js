@@ -12,6 +12,7 @@ class MyEnvironment extends NodeEnvironment {
           ArrayBuffer,
           TextDecoder,
           TextEncoder,
+          Buffer
         },
       },
       context,

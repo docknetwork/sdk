@@ -21,7 +21,7 @@ const METHODS = {
 };
 
 /** Class to write offchain signature parameters and keys on chain */
-export default class OffchainSignatures extends WithParamsAndPublicKeys {
+export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
   /**
    * sets the dock api for this module
    * @constructor

@@ -1,6 +1,6 @@
 import { Presentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
 import b58 from 'bs58';
-import withExtendedStaticProperties from './withExtendedStaticProperties';
+import { withExtendedStaticProperties } from '../../../inheritance';
 
 import CustomLinkedDataSignature from './CustomLinkedDataSignature';
 
@@ -102,6 +102,7 @@ export default withExtendedStaticProperties(
         spec: {
           credentials: [
             {
+              sigType: proof.sigType,
               version: proof.version,
               schema: JSON.stringify(credentialSchema),
               revealedAttributes: {
@@ -116,6 +117,8 @@ export default withExtendedStaticProperties(
             },
           ],
           attributeEqualities: proof.attributeEqualities,
+          boundedPseudonyms: proof.boundedPseudonyms,
+          unboundedPseudonyms: proof.unboundedPseudonyms,
         },
         attributeCiphertexts: proof.attributeCiphertexts,
         proof: proof.proofValue,

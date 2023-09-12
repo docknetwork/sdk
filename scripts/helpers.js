@@ -373,85 +373,81 @@ export const addLoggerPrefix = curry((buildPrefix, logger) =>
  * @param {*} api
  * @param {{ start: number, end: number, targetValue: T, fetchValue: (number) => Promise<T>, checkBlock: (block: any) => boolean }}
  * @param {{ maxBlocksPerUnit: number = null, debug = false }} targetEra
- * @returns {T}
+ * @returns {{ number: number, hash: * }}
  */
-export const binarySearchFirstSatisfyingBlock = curry(async (
-  api,
-  {
-    start: startBlockNumber,
-    end: endBlockNumber,
-    targetValue,
-    fetchValue,
-    checkBlock,
-  },
-  { maxBlocksPerUnit = null, debug = false }
-) => {
-  for (
-    // Number of iterations performed during binary search.
-    let jumps = 0;
-    startBlockNumber < endBlockNumber;
-    jumps++
-  ) {
-    const midBlockNumber = ((startBlockNumber + endBlockNumber) / 2) | 0;
-    const midBlockHash = await api.rpc.chain.getBlockHash(midBlockNumber);
-    const midValue = await fetchValue(midBlockHash);
+export const binarySearchFirstSatisfyingBlock = curry(
+  async (
+    api,
+    { startBlockNumber, endBlockNumber, targetValue, fetchValue, checkBlock },
+    { maxBlocksPerUnit = null, debug = false } = {}
+  ) => {
+    for (
+      // Number of iterations performed during binary search.
+      let jumps = 0;
+      startBlockNumber < endBlockNumber;
+      jumps++
+    ) {
+      const midBlockNumber = ((startBlockNumber + endBlockNumber) / 2) | 0;
+      const midBlockHash = await api.rpc.chain.getBlockHash(midBlockNumber);
+      const midValue = await fetchValue(midBlockHash);
 
-    if (debug)
-      timestampLogger.log(
-        "target value:",
-        targetValue,
-        "current value:",
-        midValue,
-        "start block:",
-        startBlockNumber,
-        "end block:",
-        endBlockNumber,
-        "jumps:",
-        jumps
-      );
-
-    if (midValue < targetValue) {
-      startBlockNumber = midBlockNumber + 1;
-      if (maxBlocksPerUnit != null) {
-        endBlockNumber = Math.min(
-          midBlockNumber + maxBlocksPerUnit * (1 + targetValue - midValue),
-          endBlockNumber
+      if (debug)
+        timestampLogger.log(
+          "target value:",
+          targetValue,
+          "current value:",
+          midValue,
+          "start block:",
+          startBlockNumber,
+          "end block:",
+          endBlockNumber,
+          "jumps:",
+          jumps
         );
-      }
-    } else if (midValue > targetValue) {
-      endBlockNumber = midBlockNumber;
-      if (maxBlocksPerUnit != null) {
-        startBlockNumber = Math.max(
-          midBlockNumber - maxBlocksPerUnit * (1 + midValue - targetValue),
-          startBlockNumber
-        );
-      }
-    } else {
-      endBlockNumber = midBlockNumber;
-      if (maxBlocksPerUnit != null) {
-        startBlockNumber = Math.max(
-          midBlockNumber - maxBlocksPerUnit,
-          startBlockNumber
-        );
-      }
 
-      const midBlock = await api.derive.chain.getBlock(midBlockHash);
-      const found = checkBlock(midBlock);
-
-      if (found) {
-        if (debug)
-          timestampLogger.log(
-            `First block that satisfied value \`${targetValue}\` found - \`${midBlockNumber}\` (${jumps} jumps)`,
-            found
+      if (midValue < targetValue) {
+        startBlockNumber = midBlockNumber + 1;
+        if (maxBlocksPerUnit != null) {
+          endBlockNumber = Math.min(
+            midBlockNumber + maxBlocksPerUnit * (1 + targetValue - midValue),
+            endBlockNumber
           );
+        }
+      } else if (midValue > targetValue) {
+        endBlockNumber = midBlockNumber;
+        if (maxBlocksPerUnit != null) {
+          startBlockNumber = Math.max(
+            midBlockNumber - maxBlocksPerUnit * (1 + midValue - targetValue),
+            startBlockNumber
+          );
+        }
+      } else {
+        endBlockNumber = midBlockNumber;
+        if (maxBlocksPerUnit != null) {
+          startBlockNumber = Math.max(
+            midBlockNumber - maxBlocksPerUnit,
+            startBlockNumber
+          );
+        }
 
-        return { hash: midBlockHash, number: midBlockNumber };
+        const midBlock = await api.derive.chain.getBlock(midBlockHash);
+        const found = checkBlock(midBlock);
+
+        if (found) {
+          if (debug)
+            timestampLogger.log(
+              `First block that satisfied value \`${targetValue}\` found - \`${midBlockNumber}\` (${jumps} jumps)`,
+              found
+            );
+
+          return { hash: midBlockHash, number: midBlockNumber };
+        }
       }
     }
-  }
 
-  throw new Error(`No block found`);
-});
+    throw new Error(`No block found`);
+  }
+);
 
 /**
  * Overrides `log`, `error`, `info`, and `warn` methods of the console to put a timestamp at the beginning.

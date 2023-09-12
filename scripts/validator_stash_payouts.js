@@ -8,17 +8,10 @@ import {
   timestampLogger,
   binarySearchFirstSatisfyingBlock,
 } from "./helpers";
-import { o, defaultTo, unless, either, curry, fromPairs, map } from "ramda";
+import { o, defaultTo, unless, either, curry, __, sum } from "ramda";
 import BN from "bn.js";
 import { validateAddress } from "../src/utils/chain-ops";
-import {
-  toArray,
-  from,
-  mergeMap,
-  lastValueFrom,
-  switchMap,
-  map as mapRx,
-} from "rxjs";
+import { toArray, from, mergeMap, lastValueFrom } from "rxjs";
 import { ApiPromise } from "@polkadot/api";
 
 const greaterThanZero = unless(
@@ -36,6 +29,7 @@ const {
   IncludeBlocks,
   Debug,
   BlocksPerEra,
+  SessionsPerEra,
   ConcurrentErasLimit,
 } = envObj({
   // Address of the node RPC.
@@ -63,6 +57,8 @@ const {
   Debug: parseBool,
   // Number of blocks per a single era.
   BlocksPerEra: o(finiteNumber, defaultTo(14400)),
+  // Number of sessions per a single era.
+  SessionsPerEra: o(finiteNumber, defaultTo(4)),
   // Number of eras to be processed concurrently
   ConcurrentErasLimit: o(finiteNumber, defaultTo(10)),
 });
@@ -72,13 +68,18 @@ const main = withDockAPI(
     address: FullNodeEndpoint,
   },
   async (dock) => {
-    const currentEraIndex = (await dock.api.query.staking.activeEra())
+    const activeEraIndex = (await dock.api.query.staking.activeEra())
       .unwrap()
       .index.toNumber();
 
-    if (currentEraIndex < StartEra + ErasCount) {
+    if (activeEraIndex < StartEra + ErasCount) {
       throw new Error(
-        `\`StartEra\` + \`ErasCount\` must be less or equal to ${currentEraIndex}`
+        `\`StartEra\` + \`ErasCount\` must be less or equal to ${activeEraIndex}`
+      );
+    }
+    if (BlocksPerEra % SessionsPerEra) {
+      throw new Error(
+        "Failed to calculate blocks per session, `BlocksPerEra` should be divisible by `SessionsPerEra` with zero remainder"
       );
     }
 
@@ -88,11 +89,11 @@ const main = withDockAPI(
     );
     const lastBlock = (await dock.api.query.system.number()).toNumber();
 
-    const payouts$ = from(eraIndices).pipe(
+    const validatorEraResults$ = from(eraIndices).pipe(
       mergeMap(
         o(from, async (eraIndex) => {
           const startBlock = Math.max(
-            lastBlock - BlocksPerEra * (currentEraIndex - eraIndex),
+            lastBlock - BlocksPerEra * (activeEraIndex - eraIndex),
             0
           );
 
@@ -106,7 +107,7 @@ const main = withDockAPI(
           const eraPaidApi = await dock.api.at(eraPaidBlockHash);
 
           const blocks = IncludeBlocks
-            ? (await fetchProducedBlockCounts(dock, number)).join(", ")
+            ? await fetchProducedBlockCounts(dock, number)
             : null;
 
           const eraValidatorInfo = await fetchValidatorStashEraInfo(
@@ -144,9 +145,11 @@ const main = withDockAPI(
         ConcurrentErasLimit
       )
     );
-    const payouts = await lastValueFrom(payouts$.pipe(toArray()));
+    const validatorEraResults = await lastValueFrom(
+      validatorEraResults$.pipe(toArray())
+    );
 
-    const { total, staking, commission } = payouts
+    const { total, staking, commission, blocks } = validatorEraResults
       .sort(([i1], [i2]) => i1 - i2)
       .reduce(
         (acc, [index, { total, staking, commission, blocks, prefs }]) => {
@@ -156,7 +159,7 @@ const main = withDockAPI(
             )}\` (staking = ${formatDock(staking)}, commission = ${formatDock(
               commission
             )}), commission = ${prefs.commission.toNumber() / 1e7}%${
-              blocks ? `, blocks produced = ${blocks}` : ""
+              blocks != null ? `, blocks produced = ${blocks.join("/")}` : ""
             }`
           );
 
@@ -164,7 +167,7 @@ const main = withDockAPI(
             total: acc.total.add(total),
             staking: acc.staking.add(staking),
             commission: acc.commission.add(commission),
-            blocks: acc.blocks + blocks,
+            blocks: blocks != null ? acc.blocks + sum(blocks) : null,
           };
         },
         {
@@ -182,7 +185,13 @@ const main = withDockAPI(
         forceUnit: "DCK",
       })}\`: staking = \`${formatDock(staking, {
         forceUnit: "DCK",
-      })}\`, commission = \`${formatDock(commission, { forceUnit: "DCK" })}\``
+      })}\`, commission = \`${formatDock(commission, { forceUnit: "DCK" })}\`${
+        blocks != null
+          ? `, average blocks per session = ${
+              blocks / eraIndices.length / SessionsPerEra
+            }`
+          : ""
+      }`
     );
   }
 );
@@ -192,10 +201,10 @@ const fetchProducedBlockCounts = async (dock, number) => {
   const lastSessionIndex = await api.query.session.currentIndex();
 
   const sessionEnds = await Promise.all(
-    Array.from({ length: 3 }, (_, idx) =>
+    Array.from({ length: SessionsPerEra - 1 }, (_, idx) =>
       findNewSession(
         dock,
-        number - (BlocksPerEra * (idx + 1)) / 4,
+        (number - (BlocksPerEra * (idx + 1)) / SessionsPerEra) | 0,
         number,
         lastSessionIndex.toNumber() - idx - 1
       )
@@ -209,16 +218,14 @@ const fetchProducedBlockCounts = async (dock, number) => {
     api,
   ];
 
-  return await Promise.all(
-    sessionAPIs.map((api) => lastValueFrom(countStashSessionBlocks(api, Stash)))
-  );
+  return await Promise.all(sessionAPIs.map(countStashSessionBlocks(__, Stash)));
 };
 
 /**
  * Instantiates an API at the block with the supplied number.
  * @param {*} dock
  * @param {number} number
- * @returns {ApiPromise}
+ * @returns {Promise<ApiPromise>}
  */
 const apiAtBlock = async (dock, number) =>
   await dock.api.at(await dock.api.rpc.chain.getBlockHash(number));
@@ -227,16 +234,17 @@ const apiAtBlock = async (dock, number) =>
  * Returns the amount of blocks produced by the supplied stash during the current session.
  * @param {*} api
  * @param {*} stash
- * @returns {Observable<number>}
+ * @returns {Promise<number>}
  */
-const countStashSessionBlocks = curry((api, stash) =>
-  from(api.query.session.currentIndex()).pipe(
-    switchMap((sessionIndex) =>
-      from(api.query.imOnline.authoredBlocks(sessionIndex, stash))
-    ),
-    mapRx((authoredBlocks) => authoredBlocks.toNumber())
-  )
-);
+const countStashSessionBlocks = curry(async (api, stash) => {
+  const sessionIndex = await api.query.session.currentIndex();
+  const authoredBlocks = await api.query.imOnline.authoredBlocks(
+    sessionIndex,
+    stash
+  );
+
+  return authoredBlocks.toNumber();
+});
 
 /**
  * Returns hash of the block when `EraPaid` was emitted for the `targetEra`.
@@ -256,8 +264,8 @@ const findEraPaidBlock = async (
   return binarySearchFirstSatisfyingBlock(
     dock.api,
     {
-      start: startBlockNumber,
-      end: endBlockNumber,
+      startBlockNumber,
+      endBlockNumber,
       fetchValue: async (blockHash) => {
         const activeEra = await dock.api.query.staking.activeEra.at(blockHash);
 
@@ -295,8 +303,8 @@ const findNewSession = async (
   return binarySearchFirstSatisfyingBlock(
     dock.api,
     {
-      start: startBlockNumber,
-      end: endBlockNumber,
+      startBlockNumber,
+      endBlockNumber,
       fetchValue: async (blockHash) => {
         const sessionIndex = await dock.api.query.session.currentIndex.at(
           blockHash
@@ -313,7 +321,7 @@ const findNewSession = async (
               section === "session" && method === "NewSession"
           ),
     },
-    { maxBlocksPerUnit: (BlocksPerEra / 4) | 0, debug: Debug }
+    { maxBlocksPerUnit: BlocksPerEra / SessionsPerEra, debug: Debug }
   );
 };
 /**

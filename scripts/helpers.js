@@ -289,8 +289,8 @@ export const formatDock = (value, config = {}) =>
  *
  * @template T
  * @param {Object} params
- * @param {function(DockAPI, ...*): Promise<T>}
- * @returns {function(...*): Promise<T>}
+ * @param {function(dock: DockAPI, ...args: any[]): Promise<T>}
+ * @returns {function(...args: any[]): Promise<T>}
  */
 export const withDockAPI = curry((params, fn) => async (...args) => {
   console.log("Connecting...");
@@ -328,7 +328,7 @@ export const parseBool = either(equals("true"), o(Boolean, Number));
  * @param {*} accountId
  * @returns {Promise<string>}
  */
-export const validatorIdentity = curry(async (api, accountId) => {
+export const accountIdentity = curry(async (api, accountId) => {
   const val = api.createType(
     "Option<Registration>",
     await api.query.identity.identityOf(api.createType("AccountId", accountId))
@@ -340,15 +340,24 @@ export const validatorIdentity = curry(async (api, accountId) => {
     return `\`${api.createType(
       "String",
       info.toHuman().display.Raw
-    )}\` (${accountId.toString()})`;
+    )} (${accountId.toString()})\``;
   } else {
     return `\`${accountId.toString()}\``;
   }
 });
 
+/**
+ * Formats supplied date in ISO format.
+ *
+ * @param {*} date
+ * @returns
+ */
 export const formatAsISO = (date) =>
   date.toISOString().replace(/T/, " ").replace(/\..+/, "");
 
+/**
+ * Enhances logger by adding a prefix built by the supplied function on each call.
+ */
 export const addLoggerPrefix = curry((buildPrefix, logger) =>
   o(
     fromPairs,
@@ -362,21 +371,27 @@ export const addLoggerPrefix = curry((buildPrefix, logger) =>
  *
  * @template T
  * @param {*} api
- * @param {{ start: number, end: number }}
- * @param {{ targetValue: T, fetchValue: (number) => T, checkBlock: (block: any) => boolean }} endBlockNumber
+ * @param {{ start: number, end: number, targetValue: T, fetchValue: (number) => Promise<T>, checkBlock: (block: any) => boolean }}
  * @param {{ maxBlocksPerUnit: number = null, debug = false }} targetEra
  * @returns {T}
  */
-export const binarySearchBlock = async (
+export const binarySearchFirstSatisfyingBlock = curry(async (
   api,
-  { start: startBlockNumber, end: endBlockNumber },
-  { targetValue, fetchValue, checkBlock },
+  {
+    start: startBlockNumber,
+    end: endBlockNumber,
+    targetValue,
+    fetchValue,
+    checkBlock,
+  },
   { maxBlocksPerUnit = null, debug = false }
 ) => {
-  // Number of iterations performed during binary search.
-  let jumps = 0;
-  while (startBlockNumber < endBlockNumber) {
-    jumps++;
+  for (
+    // Number of iterations performed during binary search.
+    let jumps = 0;
+    startBlockNumber < endBlockNumber;
+    jumps++
+  ) {
     const midBlockNumber = ((startBlockNumber + endBlockNumber) / 2) | 0;
     const midBlockHash = await api.rpc.chain.getBlockHash(midBlockNumber);
     const midValue = await fetchValue(midBlockHash);
@@ -436,7 +451,7 @@ export const binarySearchBlock = async (
   }
 
   throw new Error(`No block found`);
-};
+});
 
 /**
  * Overrides `log`, `error`, `info`, and `warn` methods of the console to put a timestamp at the beginning.

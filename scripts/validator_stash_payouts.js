@@ -6,7 +6,7 @@ import {
   finiteNumber,
   parseBool,
   timestampLogger,
-  binarySearchBlock,
+  binarySearchFirstSatisfyingBlock,
 } from "./helpers";
 import { o, defaultTo, unless, either, curry, fromPairs, map } from "ramda";
 import BN from "bn.js";
@@ -253,10 +253,11 @@ const findEraPaidBlock = async (
   endBlockNumber,
   targetEra
 ) => {
-  return binarySearchBlock(
+  return binarySearchFirstSatisfyingBlock(
     dock.api,
-    { start: startBlockNumber, end: endBlockNumber },
     {
+      start: startBlockNumber,
+      end: endBlockNumber,
       fetchValue: async (blockHash) => {
         const activeEra = await dock.api.query.staking.activeEra.at(blockHash);
 
@@ -291,10 +292,11 @@ const findNewSession = async (
   endBlockNumber,
   targetSession
 ) => {
-  return binarySearchBlock(
+  return binarySearchFirstSatisfyingBlock(
     dock.api,
-    { start: startBlockNumber, end: endBlockNumber },
     {
+      start: startBlockNumber,
+      end: endBlockNumber,
       fetchValue: async (blockHash) => {
         const sessionIndex = await dock.api.query.session.currentIndex.at(
           blockHash

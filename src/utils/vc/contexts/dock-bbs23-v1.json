@@ -19,6 +19,11 @@
       "@type": "@id",
       "@container": "@graph"
     },
+    "defaultMinimumDate": {
+      "@id": "dockBBS23:defaultMinimumDate",
+      "@type": "@id",
+      "@container": "@graph"
+    },
     "useDefaults": {
       "@id": "dockBBS23:useDefaults",
       "@type": "@id",

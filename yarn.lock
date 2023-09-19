@@ -2481,10 +2481,10 @@
     jsonld "^5.2.0"
     jsonld-signatures "^9.3.0"
 
-"@docknetwork/crypto-wasm-ts@^0.41.0":
-  version "0.41.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.41.0.tgz#cb3054a586f5ecef2915787a1c59d1697724f5f6"
-  integrity sha512-4gLxJ3TRTmKAu5qThxGYNSt2BjqheHWRiougoZibs6gR2RsOxa2lKQ17P0Y45jgW+88ndtsV8Zx2KX7ry/9onA==
+"@docknetwork/crypto-wasm-ts@^0.42.0":
+  version "0.42.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.42.0.tgz#4edd11e315b8ed62b5d470eed9de8d7a6332117c"
+  integrity sha512-M5dp6WiX5OS9AzUv7TaWAU/dDg7GlWHx3e3BbvquQV1qgklDlkqpgdM2O2rWYdQMCgyAEcGwFMtD2dyF8e8xyQ==
   dependencies:
     "@docknetwork/crypto-wasm" "0.21.0"
     "@types/flat" "^5.0.2"

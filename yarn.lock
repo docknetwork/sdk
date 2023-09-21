@@ -2481,12 +2481,12 @@
     jsonld "^5.2.0"
     jsonld-signatures "^9.3.0"
 
-"@docknetwork/crypto-wasm-ts@^0.39.0":
-  version "0.39.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.39.0.tgz#1ca6d4c59d8d2271ecaf77999a12ac251a1262a1"
-  integrity sha512-PfsXlYwecdi3NJtkc4tvyGN5Uvu8KFG/l8T6FCvgPMFaiFD+j86cJq4hAiIJ/Kpnlony8w2jr1WGg/CHAFMXhA==
+"@docknetwork/crypto-wasm-ts@^0.42.0":
+  version "0.42.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.42.0.tgz#4edd11e315b8ed62b5d470eed9de8d7a6332117c"
+  integrity sha512-M5dp6WiX5OS9AzUv7TaWAU/dDg7GlWHx3e3BbvquQV1qgklDlkqpgdM2O2rWYdQMCgyAEcGwFMtD2dyF8e8xyQ==
   dependencies:
-    "@docknetwork/crypto-wasm" "0.20.0"
+    "@docknetwork/crypto-wasm" "0.21.0"
     "@types/flat" "^5.0.2"
     "@types/lodash" "^4.14.195"
     bs58 "5.0.0"
@@ -2495,10 +2495,10 @@
     lodash "^4.17.21"
     lzutf8 "0.6.3"
 
-"@docknetwork/crypto-wasm@0.20.0", "@docknetwork/crypto-wasm@^0.20.0":
-  version "0.20.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.20.0.tgz#3f857b700668d145700530816869d88e3a3f1143"
-  integrity sha512-q9KrSugl77sTgxxLZO/MfLI1jA4HDTwH1YJUlj1Si2AVopYmxuTLmMckC8c5IQMPkp78npkQLapMK51JrVATpg==
+"@docknetwork/crypto-wasm@0.21.0", "@docknetwork/crypto-wasm@^0.21.0":
+  version "0.21.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.21.0.tgz#0831fa7d85c43d5e78c467d11ed4279f8a958ad4"
+  integrity sha512-iSxb0CeWO3SpIKFiBOzV4SR5qnw3GXCyiXVOvT+qJGxNsGUZJh/Qa5LR0k1YKG02b7K2034EVKKlu7D+1xCMYg==
   dependencies:
     buffer "^6.0.3"
 

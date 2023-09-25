@@ -86,6 +86,9 @@ export default class StatusList2021Credential extends VerifiableCredential {
   /**
    * Revokes indices and unsuspends other indices in the underlying status list, regenerating the proof.
    * If `statusPurpose` = `revocation`, indices can't be unsuspended.
+   * The status list revoked (suspended)/unsuspended indices will be set atomically and in case of an error,
+   * the underlying value won't be modified.
+   * Throws an error if the underlying status list can't be decoded or any of the supplied indices is out of range.
    *
    * @param {KeyDoc} keyDoc
    * @param {object} [update={}]
@@ -94,7 +97,9 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * @returns {this}
    */
   async update(keyDoc, { revokeIndices = [], unsuspendIndices = [] }) {
-    const statusList = await this.decodedStatusList();
+    const statusList = new StatusList({
+      buffer: new Uint8Array((await this.decodedStatusList()).bitstring.bits),
+    });
     this.constructor.updateStatusList(
       this.credentialSubject.statusPurpose,
       statusList,

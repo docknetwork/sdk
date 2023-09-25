@@ -79,7 +79,8 @@ import {
   timestampLogger,
 } from "./helpers";
 import dock from "../src";
-import { sendAlarmEmailHtml } from "./email_utils";
+import { sendAlarmEmailText } from "./email_utils";
+import { TYPES, postMessage } from "./slack";
 
 const {
   TxWatcherAlarmEmailTo,
@@ -155,18 +156,30 @@ const main = async (dock, startBlock) => {
         catchError(
           (error) =>
             void timestampLogger.error(error) ||
-            from(
-              sendAlarmEmailHtml(
-                TxWatcherAlarmEmailTo,
-                "Dock blockchain watcher was restarted",
-                `<h2>Due to either connection or node API problems, the dock blockchain essential notifications watcher was restarted with the last unprocessed block ${minUnprocessed}.</h2>`
-              )
+            sendMessage(
+              "Mainnet watcher was restarted",
+              `Due to either connection or node API problems, the dock blockchain essential notifications watcher was restarted with the last unprocessed block ${minUnprocessed}.`
             )
         )
       )
       .subscribe({ complete: () => resolve(null), error: reject });
   });
 };
+
+const sendMessage = curry((header, message) =>
+  merge(
+    from(
+      postMessage(TYPES.DANGER, header, [
+        {
+          title: "Summary",
+          value: message,
+          short: false,
+        },
+      ])
+    ),
+    from(sendAlarmEmailText(TxWatcherAlarmEmailTo, header, message))
+  )
+);
 
 /**
  * Keeps track of the skipped blocks producing by `blocks$` observable treating `startBlock` as initial block.
@@ -188,11 +201,9 @@ const trackSeqProcessed = curry((startBlock, missedBlocksSink, blocks$) => {
         maxReceived = received;
       }
 
-      if (!skipped.delete(received) && received < maxReceived) {
-        timestampLogger.log(
-          `Syncing failure: skipped - `,
-          skipped,
-          "received - ",
+      if (skipped.delete(received)) {
+        timestampLogger.info(
+          `Received skipped block - `,
           received,
           "maxReceived - ",
           maxReceived
@@ -202,8 +213,8 @@ const trackSeqProcessed = curry((startBlock, missedBlocksSink, blocks$) => {
       // Keep track of all the blocks which are missing.
       // They must be received later and processed, and in case of sync failure, we'll use the min number as the start block.
       for (let i = maxReceived + 1; i < received; i++) {
-        missedBlocksSink.next(i);
         skipped.add(i);
+        missedBlocksSink.next(i);
       }
       maxReceived = max(received, maxReceived);
       const maxSeqProcessed = reduce(min, maxReceived, [...skipped]);
@@ -234,7 +245,7 @@ const processBlocks = (dock, startBlock) => {
 
   const missedBlocksSink = new Subject();
   const missedBlocks$ = missedBlocksSink.pipe(
-    mergeMap(blockByNumber, ConcurrentBlocksSyncLimit)
+    mergeMap(blockByNumber(dock), ConcurrentBlocksSyncLimit)
   );
 
   return merge(subscribeBlocks(dock, startBlock), missedBlocks$).pipe(
@@ -270,15 +281,7 @@ const processBlocks = (dock, startBlock) => {
       ).pipe(
         batchNotifications(BatchNoficationTimeout),
         tap((email) => timestampLogger.log("Sending email: ", email)),
-        mergeMap(
-          o(
-            from,
-            sendAlarmEmailHtml(
-              TxWatcherAlarmEmailTo,
-              "Dock blockchain alarm notification"
-            )
-          )
-        )
+        mergeMap(o(from, sendMessage("Mainnet alarm notification")))
       );
 
       const number = block.block.header.number.toNumber();
@@ -401,7 +404,7 @@ const syncPrevousBlocks = curry((dock, startBlock, currentBlocks$) => {
       }
     }, null),
     distinctUntilChanged(),
-    mergeMap(blockByNumber, ConcurrentBlocksSyncLimit),
+    mergeMap(blockByNumber(dock), ConcurrentBlocksSyncLimit),
     share()
   );
 
@@ -414,11 +417,12 @@ const syncPrevousBlocks = curry((dock, startBlock, currentBlocks$) => {
  * @param {*} number
  * @returns {Observable<*>}
  */
-const blockByNumber = (number) =>
+const blockByNumber = curry((dock, number) =>
   of(number).pipe(
     concatMap((number) => from(dock.api.rpc.chain.getBlockHash(number))),
     concatMap((hash) => from(dock.api.derive.chain.getBlock(hash)))
-  );
+  )
+);
 
 /**
  * Batches notifications received from the observable.
@@ -427,7 +431,7 @@ export const batchNotifications = curry((timeLimit, notifications$) =>
   notifications$.pipe(
     bufferTime(timeLimit, null),
     filterRx(complement(isEmpty)),
-    mapRx((batch) => batch.join("<br />"))
+    mapRx((batch) => batch.join("\n"))
   )
 );
 
@@ -514,7 +518,7 @@ const checkMap = ifElse(__, __, always(EMPTY));
  */
 const buildExtrinsicUrl = curry(
   (blockNumber, txHash) =>
-    `<a href="${BaseBlockExplorerUrl}/${blockNumber.toString()}">block #${blockNumber.toString()}</a> as <a href="${BaseExtrinsicExplorerUrl}/${txHash.toString()}">extrinsic ${txHash.toString()}</a>.`
+    `<${BaseBlockExplorerUrl}/${blockNumber.toString()} | block #${blockNumber.toString()}> as <${BaseExtrinsicExplorerUrl}/${txHash.toString()} | extrinsic ${txHash.toString()}>.`
 );
 /**
  * Enhances observable returned by the given function by adding url to the extrinsic and its block.
@@ -535,7 +539,7 @@ const withExtrinsicUrl = (fn) =>
           mapRx(
             (timestamp) =>
               `${msg} ${
-                signer ? `by <b>${signer}</b>` : "sent unsigned"
+                signer ? `by \`${signer}\`` : "sent unsigned"
               } at ${new Date(
                 +timestamp.toString()
               ).toUTCString()} in ${buildExtrinsicUrl(

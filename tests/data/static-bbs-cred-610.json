@@ -7,20 +7,21 @@
       "name": "dk:name"
     }
   ],
-  "id": "https://creds-staging.dock.io/0985a64f2910e74c48e4066fa683e4cdd9c54d021f6b83a9fd8cb56db9c460e3",
+  "id": "https://creds-staging.dock.io/be2b56a51e0ec8aa2ee5e92a0267a82bff6cc11a5f2275cfc8b014f3b9422a21",
   "type": [
     "VerifiableCredential",
     "BasicCredential"
   ],
   "credentialSubject": {
-    "name": "basic bbs static"
+    "id": "mysnjid",
+    "name": "sbj name"
   },
-  "issuanceDate": "2023-09-22T20:59:25.847Z",
+  "issuanceDate": "2023-09-25T18:27:27.053Z",
   "issuer": {
     "name": "newdid",
     "id": "did:dock:5GZn9zQTggPWijzgnoV8sZ5a74rFqC8qrz2ncp7GggeGCtKd"
   },
-  "name": "basic bbs static",
+  "name": "static bbs plus test",
   "proof": {
     "@context": [
       {
@@ -34,9 +35,9 @@
       "https://ld.dock.io/security/bbs/v1"
     ],
     "type": "Bls12381BBS+SignatureDock2022",
-    "created": "2023-09-22T20:59:55Z",
+    "created": "2023-09-25T18:28:13Z",
     "verificationMethod": "did:dock:5GZn9zQTggPWijzgnoV8sZ5a74rFqC8qrz2ncp7GggeGCtKd#keys-2",
     "proofPurpose": "assertionMethod",
-    "proofValue": "zaEUvk9cmVeVrHueiKMKPwxtV3zab2fRiVkGmah74rFnyXbQtYBtyrGs4zmVTs2jrrWQzeHsgNjf4H1MYMqVjvQmKCfnw4PPjMXS2p8gYQiwm8XaJJwSjT94p1af1ygHrbkpjQmMafPf3gfVqRbyvULW2G"
+    "proofValue": "zToVRuY4HPCWvXjKCcNFvc3FsxYGMzjSvsfBNS41XHWuAbq9G583kqNhLueELxYCdcL5KSNSr9ABA7JopkyNhoxuB9VaLjXhsn5V7ZxEmAu4W1XpKEXMSoae9MLtRRNDdDpPusihQe7uhM9FhuAEkuBnnp"
   }
-} 
+}

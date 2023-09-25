@@ -5,7 +5,7 @@ import staticCred610 from '../data/static-bbs-cred-610.json';
 
 const loadDocumentDefault = defaultDocumentLoader(null);
 
-describe('Testing isHexWithGivenByteSize', () => {
+describe('Static BBS+ Credential Verification (backwards compatibility)', () => {
   test('verifies BBS+ credential from SDK 6.1.0', async () => {
     const result = await verifyCredential(staticCred610, {
       documentLoader: async (doc) => {

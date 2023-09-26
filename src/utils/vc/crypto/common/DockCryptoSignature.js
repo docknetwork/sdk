@@ -115,10 +115,15 @@ export default withExtendedStaticProperties(
       let credSchema;
       if (document.credentialSchema) {
         credSchema = CredentialSchema.fromJSON({
-          parsingOptions: DEFAULT_PARSING_OPTS,
+          // Passing all the default parsing options. Ideally `document.credentialSchema` should contain these
+          parsingOptions: {
+            useDefaults: false,
+            defaultMinimumInteger: -((2 ** 32) - 1),
+            defaultMinimumDate: -((2 ** 44) - 1),
+            defaultDecimalPlaces: 0,
+          },
           ...document.credentialSchema,
         });
-
         // TODO: support documentloader for schemas here so we can use dock chain schemas
         // requires that the presentation wrapper passes a documentloader to this method
         // const loadedSchema = (await documentLoader(document.credentialSchema.id)).document;
@@ -136,7 +141,7 @@ export default withExtendedStaticProperties(
           // Passing old parsing options and version
           {
             useDefaults: false,
-            defaultMinimumInteger: -(Math.pow(2, 32) - 1),
+            defaultMinimumInteger: -((2 ** 32) - 1),
             defaultDecimalPlaces: 0,
           },
           false,

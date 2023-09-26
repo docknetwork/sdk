@@ -161,7 +161,7 @@ for (const {
       expect(resultWithSchema).toMatchObject(
         expect.objectContaining(getProofMatcherDoc()),
       );
-    }, 30000);
+      }, 30000);
 
     test(`Can issue+verify a ${Name} credential with default schema`, async () => {
       const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);

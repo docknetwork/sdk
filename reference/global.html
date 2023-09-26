@@ -14383,7 +14383,7 @@ Returns the proofs, concatenated together.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line145">line 145</a>
+        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line150">line 150</a>
     </li></ul></dd>
     
 
@@ -15298,7 +15298,7 @@ types only require validating the byte size.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line159">line 159</a>
+        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line164">line 164</a>
     </li></ul></dd>
     
 
@@ -28716,7 +28716,7 @@ Throws an error if the underlying status list can't be decoded or supplied index
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line121">line 121</a>
+        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line126">line 126</a>
     </li></ul></dd>
     
 
@@ -28873,7 +28873,7 @@ Throws an error if the underlying status list can't be decoded or any of supplie
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line135">line 135</a>
+        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line140">line 140</a>
     </li></ul></dd>
     
 
@@ -32836,7 +32836,7 @@ else only wait to be included in block.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line180">line 180</a>
+        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line185">line 185</a>
     </li></ul></dd>
     
 
@@ -34002,7 +34002,7 @@ else only wait to be included in block.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line170">line 170</a>
+        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line175">line 175</a>
     </li></ul></dd>
     
 
@@ -34475,7 +34475,7 @@ else only wait to be included in block.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line193">line 193</a>
+        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line198">line 198</a>
     </li></ul></dd>
     
 
@@ -34983,6 +34983,9 @@ else only wait to be included in block.</td>
 <div class="description">
     Revokes indices and unsuspends other indices in the underlying status list, regenerating the proof.
 If `statusPurpose` = `revocation`, indices can't be unsuspended.
+The status list revoked (suspended)/unsuspended indices will be set atomically and in case of an error,
+the underlying value won't be modified.
+Throws an error if the underlying status list can't be decoded or any of the supplied indices is out of range.
 </div>
 
 
@@ -35202,7 +35205,7 @@ If `statusPurpose` = `revocation`, indices can't be unsuspended.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line96">line 96</a>
+        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line99">line 99</a>
     </li></ul></dd>
     
 
@@ -36096,7 +36099,7 @@ Throws an error if
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line237">line 237</a>
+        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line242">line 242</a>
     </li></ul></dd>
     
 
@@ -36686,7 +36689,7 @@ using this</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line200">line 200</a>
+        <a href="status-list-credential_status-list2021-credential.js.html">status-list-credential/status-list2021-credential.js</a>, <a href="status-list-credential_status-list2021-credential.js.html#line205">line 205</a>
     </li></ul></dd>
     
 
@@ -43501,7 +43504,7 @@ Warning, setting forceRevocationCheck to false can allow false positives when ve
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Thu Sep 21 2023 20:00:25 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Tue Sep 26 2023 21:55:31 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

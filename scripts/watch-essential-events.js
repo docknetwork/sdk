@@ -166,21 +166,6 @@ const main = async (dock, startBlock) => {
   });
 };
 
-const sendMessage = curry((header, message) =>
-  merge(
-    from(
-      postMessage(TYPES.DANGER, header, [
-        {
-          title: "Summary",
-          value: message,
-          short: false,
-        },
-      ])
-    ),
-    from(sendAlarmEmailText(TxWatcherAlarmEmailTo, header, message))
-  )
-);
-
 /**
  * Keeps track of the skipped blocks producing by `blocks$` observable treating `startBlock` as initial block.
  * Used to have the state of non-processed blocks.
@@ -414,13 +399,35 @@ const syncPrevousBlocks = curry((dock, startBlock, currentBlocks$) => {
 /**
  * Retrieves a block associated with the given number.
  *
- * @param {*} number
+ * @param {*} dock
+ * @param {number} number
  * @returns {Observable<*>}
  */
 const blockByNumber = curry((dock, number) =>
   of(number).pipe(
     concatMap((number) => from(dock.api.rpc.chain.getBlockHash(number))),
     concatMap((hash) => from(dock.api.derive.chain.getBlock(hash)))
+  )
+);
+
+/**
+ * Post a message to the `Slack` and send alarm email.
+ * @param {string} header
+ * @param {string} message
+ * @returns {Observable<*>}
+ */
+const sendMessage = curry((header, message) =>
+  merge(
+    from(
+      postMessage(TYPES.DANGER, header, [
+        {
+          title: "Summary",
+          value: message,
+          short: false,
+        },
+      ])
+    ),
+    from(sendAlarmEmailText(TxWatcherAlarmEmailTo, header, message))
   )
 );
 
@@ -686,11 +693,14 @@ const eventFilters = [
   // Democracy preimage noted for the proposal
   checkMap(
     democracyEvent("PreimageNoted"),
-    ({
-      event: {
-        data: [proposalHash],
+    (
+      {
+        event: {
+          data: [proposalHash],
+        },
       },
-    }) => {
+      dock
+    ) => {
       const proposal = dock.api.createType("Call", preimage);
       const metadata = dock.api.registry.findMetaCall(proposal.callIndex);
 

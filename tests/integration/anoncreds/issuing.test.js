@@ -85,6 +85,7 @@ for (const {
       lprNumber: 1234,
     },
   };
+
   describe(`${Name} Module`, () => {
     const dock = new DockAPI();
     const resolver = new DockResolver(dock);

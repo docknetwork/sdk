@@ -133,7 +133,14 @@ export default withExtendedStaticProperties(
       if (!credSchema) {
         credSchema = new CredentialSchema(
           CredentialSchema.essential(),
-          DEFAULT_PARSING_OPTS,
+          // Passing old parsing options and version
+          {
+            useDefaults: false,
+            defaultMinimumInteger: -(Math.pow(2, 32) - 1),
+            defaultDecimalPlaces: 0,
+          },
+          false,
+          { version: '0.0.1' },
         );
       }
 

@@ -10,6 +10,7 @@ import {
   F,
   splitAt,
   prop,
+  map,
   assoc,
   cond,
   view,
@@ -701,15 +702,35 @@ const eventFilters = [
       },
       dock
     ) => {
-      const proposal = dock.api.createType("Call", preimage);
-      const metadata = dock.api.registry.findMetaCall(proposal.callIndex);
+      return from(dock.api.query.democracy.preimages(proposalHash)).pipe(
+        switchMap((preimageOpt) => {
+          if (preimageOpt.isSome && preimageOpt.unwrap().isAvailable) {
+            const proposal = dock.api.createType(
+              "Call",
+              preimageOpt.unwrap().asAvailable.data
+            );
+            const metadata = dock.api.registry.findMetaCall(proposal.callIndex);
+            const args = pipe(
+              map(String),
+              map((value) =>
+                value.length > 100
+                  ? `${value.slice(0, 50)}... (truncated)`
+                  : value
+              ),
+              JSON.stringify
+            )(proposal.toJSON().args);
 
-      return of(
-        `Proposal preimage is noted for ${proposalHash.toString()}: ${
-          metadata.section
-        }::${metadata.method} with args ${JSON.stringify(
-          proposal.toJSON().args
-        )}`
+            return of(
+              `Proposal preimage is noted for ${proposalHash.toString()}: \`${
+                metadata.section
+              }::${metadata.method}\` with args ${args}`
+            );
+          } else {
+            return of(
+              `Proposal preimage is noted for ${proposalHash.toString()}`
+            );
+          }
+        })
       );
     }
   ),

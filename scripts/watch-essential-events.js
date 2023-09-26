@@ -714,7 +714,7 @@ const eventFilters = [
               map(String),
               map((value) =>
                 value.length > 100
-                  ? `${value.slice(0, 50)}... (truncated)`
+                  ? `${value.slice(0, 100)}... (truncated)`
                   : value
               ),
               JSON.stringify

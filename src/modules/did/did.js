@@ -853,7 +853,6 @@ class DIDModule {
         }
         if (this.api.query.offchainSignatures != null) {
           const resp = await this.api.query.offchainSignatures.publicKeys.multi(queryKeys);
-
           let currentIter = 0;
           for (let r of resp) {
             // The gaps in `keyId` might correspond to removed keys
@@ -885,7 +884,6 @@ class DIDModule {
           }
         } else {
           const resp = await this.api.query.bbsPlus.bbsPlusKeys.multi(queryKeys);
-
           let currentIter = 0;
           for (const r of resp) {
             // The gaps in `keyId` might correspond to removed keys

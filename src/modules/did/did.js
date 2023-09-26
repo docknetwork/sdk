@@ -27,6 +27,8 @@ import WithParamsAndPublicKeys from '../WithParamsAndPublicKeys';
 
 export const ATTESTS_IRI = 'https://rdf.dock.io/alpha/2021#attestsDocumentContents';
 
+const valuePropOrIdentity = (val) => val.value || val;
+
 /** Class to create, update and destroy DIDs */
 class DIDModule {
   /**
@@ -798,16 +800,16 @@ class DIDModule {
           let typ;
           if (pk.isSr25519) {
             typ = 'Sr25519VerificationKey2020';
-            publicKeyRaw = pk.asSr25519.value;
+            publicKeyRaw = valuePropOrIdentity(pk.asSr25519);
           } else if (pk.isEd25519) {
             typ = 'Ed25519VerificationKey2018';
-            publicKeyRaw = pk.asEd25519.value;
+            publicKeyRaw = valuePropOrIdentity(pk.asEd25519);
           } else if (pk.isSecp256k1) {
             typ = 'EcdsaSecp256k1VerificationKey2019';
-            publicKeyRaw = pk.asSecp256k1.value;
+            publicKeyRaw = valuePropOrIdentity(pk.asSecp256k1);
           } else if (pk.isX25519) {
             typ = 'X25519KeyAgreementKey2019';
-            publicKeyRaw = pk.asX25519.value;
+            publicKeyRaw = valuePropOrIdentity(pk.asX25519);
           } else {
             throw new Error(`Cannot parse public key ${pk}`);
           }
@@ -1066,13 +1068,13 @@ class DIDModule {
 
     let publicKey;
     if (pk.isSr25519) {
-      publicKey = new PublicKeySr25519(u8aToHex(pk.asSr25519.value));
+      publicKey = new PublicKeySr25519(u8aToHex(valuePropOrIdentity(pk.asSr25519)));
     } else if (pk.isEd25519) {
-      publicKey = new PublicKeyEd25519(u8aToHex(pk.asEd25519.value));
+      publicKey = new PublicKeyEd25519(u8aToHex(valuePropOrIdentity(pk.asEd25519)));
     } else if (pk.isSecp256k1) {
-      publicKey = new PublicKeySecp256k1(u8aToHex(pk.asSecp256k1.value));
+      publicKey = new PublicKeySecp256k1(u8aToHex(valuePropOrIdentity(pk.asSecp256k1)));
     } else if (pk.isX25519) {
-      publicKey = new PublicKeyX25519(u8aToHex(pk.asX25519.value));
+      publicKey = new PublicKeyX25519(u8aToHex(valuePropOrIdentity(pk.asX25519)));
     } else {
       throw new Error(`Cannot parse public key ${pk}`);
     }

@@ -27,6 +27,15 @@ const residentCardSchema = {
   title: 'Resident Card Example',
   type: 'object',
   properties: {
+    // TOOD: fix and restore below for future
+    // // NOTE: schema here defines context/type to make sure
+    // // that the string conversion works even with it defined in schema
+    // '@context': {
+    //   type: 'array',
+    // },
+    // type: {
+    //   type: 'array',
+    // },
     credentialSubject: {
       type: 'object',
       properties: {

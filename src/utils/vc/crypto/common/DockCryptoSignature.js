@@ -142,9 +142,7 @@ export default withExtendedStaticProperties(
       // NOTE: version is important here and MUST be 0.0.1 otherwise it will invalidate BBS+ credentials
       // that were issued before a change. This is required because the version value is not known in credentials
       // where no credentialSchema object is defined
-      let forceOldVersion = false;
       if (!credSchema) {
-        forceOldVersion = true;
         credSchema = new CredentialSchema(
           CredentialSchema.essential(),
           // Passing old parsing options and version
@@ -182,15 +180,13 @@ export default withExtendedStaticProperties(
           credBuilder.setTopLevelField(k, custom[k]);
         });
 
-      // v0.0.1 relaxed generation previously required strings for context/type
-      // so enforce this here
-      if (forceOldVersion) {
-        credBuilder.setTopLevelField(
-          '@context',
-          JSON.stringify(document['@context']),
-        );
-        credBuilder.setTopLevelField('type', JSON.stringify(document.type));
-      }
+      // To work with JSON-LD credentials/presentations, we must always reveal the context and type
+      // NOTE: that they are encoded as JSON strings here to reduce message count and so its *always known*
+      credBuilder.setTopLevelField(
+        '@context',
+        JSON.stringify(document['@context']),
+      );
+      credBuilder.setTopLevelField('type', JSON.stringify(document.type));
 
       // Allow for relaxed schema generation, then embed the generated schema directly into the credential
       const builtAnoncreds = credBuilder.updateSchemaIfNeeded(signingOptions);

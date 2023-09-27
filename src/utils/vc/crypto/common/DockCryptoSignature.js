@@ -1,4 +1,4 @@
-import { CredentialSchema } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
+import { CredentialSchema, DefaultSchemaParsingOpts } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 
 import { initializeWasm } from '@docknetwork/crypto-wasm-ts';
 
@@ -58,6 +58,7 @@ export default withExtendedStaticProperties(
         type,
       };
 
+      this.requireCredentialSchema = true;
       this.verificationMethod = verificationMethod;
       if (keypair) {
         if (verificationMethod === undefined) {
@@ -113,15 +114,12 @@ export default withExtendedStaticProperties(
       delete trimmedProof.proofValue;
 
       let credSchema;
-      if (document.credentialSchema) {
+
+      // If we already have a schema to use, add that first and then generate relaxed values later on
+      if (document.credentialSchema && document.credentialSchema.id) {
         credSchema = CredentialSchema.fromJSON({
           // Passing all the default parsing options. Ideally `document.credentialSchema` should contain these
-          parsingOptions: {
-            useDefaults: false,
-            defaultMinimumInteger: -((2 ** 32) - 1),
-            defaultMinimumDate: -((2 ** 44) - 1),
-            defaultDecimalPlaces: 0,
-          },
+          parsingOptions: DefaultSchemaParsingOpts,
           ...document.credentialSchema,
         });
         // TODO: support documentloader for schemas here so we can use dock chain schemas
@@ -135,7 +133,18 @@ export default withExtendedStaticProperties(
         // }
       }
 
+      // Else, schema object exists but no ID means the SDK is signalling for the suite to generate a schema
+      if (!credSchema && document.credentialSchema) {
+        credSchema = new CredentialSchema(CredentialSchema.essential());
+      }
+
+      // Else, no schema was found so just use the essentials and v0.0.1 schema version
+      // NOTE: version is important here and MUST be 0.0.1 otherwise it will invalidate BBS+ credentials
+      // that were issued before a change. This is required because the version value is not known in credentials
+      // where no credentialSchema object is defined
+      let forceOldVersion = false;
       if (!credSchema) {
+        forceOldVersion = true;
         credSchema = new CredentialSchema(
           CredentialSchema.essential(),
           // Passing old parsing options and version
@@ -152,6 +161,7 @@ export default withExtendedStaticProperties(
       const credBuilder = new this.CredentialBuilder();
       credBuilder.schema = credSchema;
 
+      // Extract top level fields from the document aside from these ones
       const {
         cryptoVersion: _cryptoVersion,
         credentialSchema: _credentialSchema,
@@ -165,20 +175,35 @@ export default withExtendedStaticProperties(
       credBuilder.subject = credentialSubject;
       credBuilder.credStatus = credentialStatus;
 
+      // Add all other top level fields to the credential
       Object.keys(custom)
         .sort()
         .forEach((k) => {
           credBuilder.setTopLevelField(k, custom[k]);
         });
 
-      credBuilder.setTopLevelField(
-        '@context',
-        JSON.stringify(document['@context']),
-      );
-      credBuilder.setTopLevelField('type', JSON.stringify(document.type));
+      // v0.0.1 relaxed generation previously required strings for context/type
+      // so enforce this here
+      if (forceOldVersion) {
+        credBuilder.setTopLevelField(
+          '@context',
+          JSON.stringify(document['@context']),
+        );
+        credBuilder.setTopLevelField('type', JSON.stringify(document.type));
+      }
 
-      const retval = credBuilder.updateSchemaIfNeeded(signingOptions);
-      return [retval, credBuilder.schema];
+      // Allow for relaxed schema generation, then embed the generated schema directly into the credential
+      const builtAnoncreds = credBuilder.updateSchemaIfNeeded(signingOptions);
+
+      // Re-assign the embedded schema to the document schema object
+      // this is a bit hacky, but its the only way right now
+      if (document.credentialSchema) {
+        const fullSchema = builtAnoncreds.credentialSchema;
+        Object.assign(document.credentialSchema, typeof fullSchema === 'string' ? JSON.parse(fullSchema) : fullSchema);
+      }
+
+      // Return the built anoncreds credential and the schema associated
+      return [builtAnoncreds, credBuilder.schema];
     }
 
     /**

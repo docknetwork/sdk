@@ -1,6 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
-import { initializeWasm } from '@docknetwork/crypto-wasm-ts';
+import { CredentialSchema, initializeWasm } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI } from '../../../src';
 import {
   FullNodeEndpoint,
@@ -9,7 +9,6 @@ import {
   Schemes,
 } from '../../test-constants';
 import { createNewDockDID } from '../../../src/utils/did';
-
 import { DockResolver } from '../../../src/resolver';
 import {
   registerNewDIDUsingPair,
@@ -149,6 +148,17 @@ for (const {
         ),
       );
 
+      // Ensure extra properties from crypto-wasm-ts are assigned to schema object
+      expect(credential.credentialSchema).toMatchObject({
+        parsingOptions: {
+          useDefaults: false,
+          defaultMinimumInteger: -4294967295,
+          defaultMinimumDate: -17592186044415,
+          defaultDecimalPlaces: 0,
+        },
+        version: CredentialSchema.VERSION,
+      });
+
       const result = await verifyCredential(credential, { resolver });
       expect(result).toMatchObject(
         expect.objectContaining(getProofMatcherDoc()),
@@ -161,7 +171,7 @@ for (const {
       expect(resultWithSchema).toMatchObject(
         expect.objectContaining(getProofMatcherDoc()),
       );
-      }, 30000);
+    }, 30000);
 
     test(`Can issue+verify a ${Name} credential with default schema`, async () => {
       const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
@@ -177,6 +187,18 @@ for (const {
           getCredMatcherDoc(unsignedCred, did1, issuerKey.id, SigType),
         ),
       );
+
+      // Ensure schema was now defined, added by crypto-wasm-ts
+      expect(credential.credentialSchema).toBeDefined();
+      expect(credential.credentialSchema).toMatchObject({
+        parsingOptions: {
+          useDefaults: false,
+          defaultMinimumInteger: -4294967295,
+          defaultMinimumDate: -17592186044415,
+          defaultDecimalPlaces: 0,
+        },
+        version: CredentialSchema.VERSION,
+      });
 
       const result = await verifyCredential(credential, { resolver });
       expect(result).toMatchObject(

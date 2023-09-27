@@ -456,6 +456,15 @@ export async function issueCredential(
     throw new TypeError('"suite.verificationMethod" property is required.');
   }
 
+  // Some suites (such as Dock BBS+) require a schema to exist
+  // we intentionally dont set the ID here because it will be auto generated on signing
+  if (!cred.credentialSchema && suite.requireCredentialSchema) {
+    cred.credentialSchema = {
+      id: '',
+      type: 'JsonSchemaValidator2018',
+    };
+  }
+
   // Sign and return the credential with jsonld-signatures otherwise
   return jsigs.sign(cred, {
     purpose: purpose || new CredentialIssuancePurpose(),

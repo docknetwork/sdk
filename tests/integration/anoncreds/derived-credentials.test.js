@@ -407,6 +407,9 @@ for (const {
         resolver,
         predicateParams,
       });
+      if (credentialResult.error) {
+        console.log('credentialResult.error', JSON.stringify(credentialResult.error, null, 2));
+      }
       expect(credentialResult.error).toBe(undefined);
       expect(credentialResult.verified).toBe(true);
 

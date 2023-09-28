@@ -119,7 +119,7 @@ export default withExtendedStaticProperties(
       if (document.credentialSchema && document.credentialSchema.id) {
         credSchema = CredentialSchema.fromJSON({
           // Passing all the default parsing options. Ideally `document.credentialSchema` should contain these
-          // parsingOptions: DefaultSchemaParsingOpts,
+          parsingOptions: DefaultSchemaParsingOpts,
           ...document.credentialSchema,
         });
         // TODO: support documentloader for schemas here so we can use dock chain schemas

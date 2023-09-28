@@ -46,6 +46,10 @@ export default withExtendedStaticProperties(
       };
 
       this.verificationMethod = verificationMethod;
+      this.accumulatorPublicKeys = options.accumulatorPublicKeys;
+      this.predicateParams = options.predicateParams;
+      this.circomOutputs = options.circomOutputs;
+      this.blindedAttributesCircomOutputs = options.blindedAttributesCircomOutputs;
     }
 
     async verifyProof({
@@ -70,7 +74,12 @@ export default withExtendedStaticProperties(
           return new this.constructor.Signature.KeyPair.PublicKey(pkRaw);
         });
 
-        if (!recreatedPres.verify(pks)) {
+        const {
+          accumulatorPublicKeys, predicateParams,
+          circomOutputs, blindedAttributesCircomOutputs,
+        } = this;
+
+        if (!recreatedPres.verify(pks, accumulatorPublicKeys, predicateParams, circomOutputs, blindedAttributesCircomOutputs)) {
           throw new Error('Invalid signature');
         }
 
@@ -96,7 +105,7 @@ export default withExtendedStaticProperties(
       } = document;
 
       return {
-        version: '0.1.0',
+        version: '0.1.0', // TODO: should this be retrieved from the doc somehow?
         nonce: proof.nonce,
         context: proof.context,
         spec: {
@@ -104,6 +113,7 @@ export default withExtendedStaticProperties(
             {
               sigType: proof.sigType,
               version: proof.version,
+              bounds: proof.bounds,
               schema: JSON.stringify(credentialSchema),
               revealedAttributes: {
                 proof: {

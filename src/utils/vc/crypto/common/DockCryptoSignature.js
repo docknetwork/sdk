@@ -76,7 +76,7 @@ export default withExtendedStaticProperties(
      * @param {function} options.expansionMap - NOT SUPPORTED; do not use.
      * @param {labelBytes} - bytes to be used for the params label
      *
-     * @returns {Promise<{Uint8Array}>}.
+     * @returns {Promise<Uint8Array[]>}.
      */
     async createVerifyData(options, labelBytes) {
       await initializeWasm();
@@ -119,7 +119,7 @@ export default withExtendedStaticProperties(
       if (document.credentialSchema && document.credentialSchema.id) {
         credSchema = CredentialSchema.fromJSON({
           // Passing all the default parsing options. Ideally `document.credentialSchema` should contain these
-          parsingOptions: DefaultSchemaParsingOpts,
+          // parsingOptions: DefaultSchemaParsingOpts,
           ...document.credentialSchema,
         });
         // TODO: support documentloader for schemas here so we can use dock chain schemas
@@ -165,7 +165,7 @@ export default withExtendedStaticProperties(
         credentialSchema: _credentialSchema,
         credentialSubject,
         credentialStatus,
-        ...custom
+        ...topLevelFields
       } = {
         ...document,
         proof: trimmedProof,
@@ -174,10 +174,10 @@ export default withExtendedStaticProperties(
       credBuilder.credStatus = credentialStatus;
 
       // Add all other top level fields to the credential
-      Object.keys(custom)
+      Object.keys(topLevelFields)
         .sort()
         .forEach((k) => {
-          credBuilder.setTopLevelField(k, custom[k]);
+          credBuilder.setTopLevelField(k, topLevelFields[k]);
         });
 
       // To work with JSON-LD credentials/presentations, we must always reveal the context and type

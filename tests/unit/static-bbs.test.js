@@ -23,7 +23,10 @@ describe('Static BBS+ Credential Verification (backwards compatibility)', () => 
     const result = await verifyCredential(staticCred610, {
       documentLoader,
     });
-    console.error(JSON.stringify(result, null, 2));
+
+    if (!result.verified) {
+      console.error(JSON.stringify(result, null, 2));
+    }
     expect(result.verified).toBe(true);
   });
 

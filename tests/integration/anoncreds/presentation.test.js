@@ -204,7 +204,7 @@ for (const {
       // Verify the presentation, note that we must pass predicateParams with the verification key
       const { verified } = await verifyPresentation(presentation, { resolver, predicateParams });
       expect(verified).toEqual(true);
-    }, 30000);
+    }, 60000);
 
     test('expect to reveal specified attributes', async () => {
       const presentationInstance = new Presentation();

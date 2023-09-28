@@ -206,6 +206,7 @@ export default class Presentation {
           unboundedPseudonyms: presentation.spec.unboundedPseudonyms,
           version: credential.version,
           sigType: credential.sigType,
+          bounds: credential.bounds,
         },
       };
     });

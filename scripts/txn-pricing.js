@@ -18,8 +18,8 @@ import {
   Accumulator,
   AccumulatorParams,
   initializeWasm,
-  KeypairG2, PositiveAccumulator,
-  SignatureParamsG1, WitnessUpdatePublicInfo
+  BBSPlusKeypairG2, PositiveAccumulator,
+  BBSPlusSignatureParamsG1, WitnessUpdatePublicInfo
 } from '@docknetwork/crypto-wasm-ts';
 import BBSPlusModule from '../src/modules/bbs-plus';
 import AccumulatorModule from '../src/modules/accumulator';
@@ -291,7 +291,7 @@ async function bbsPlus() {
 
   // Add params with different attribute sizes
   for (const attributeCount of [10, 11, 12, 13, 14, 15]) {
-    const bytes = u8aToHex(SignatureParamsG1.generate(attributeCount, hexToU8a(label)).toBytes());
+    const bytes = u8aToHex(BBSPlusSignatureParamsG1.generate(attributeCount, hexToU8a(label)).toBytes());
     const params = BBSPlusModule.prepareAddParameters(bytes, undefined, label);
     await printFeePaid(dock.api, account.address, async () => {
       console.info(`Add BBS+ params with ${attributeCount} attributes`);
@@ -300,7 +300,7 @@ async function bbsPlus() {
   }
 
   // Add a public key
-  const kp = KeypairG2.generate(SignatureParamsG1.generate(10, hexToU8a(label)));
+  const kp = BBSPlusKeypairG2.generate(BBSPlusSignatureParamsG1.generate(10, hexToU8a(label)));
   const pk = BBSPlusModule.prepareAddPublicKey(u8aToHex(kp.publicKey.bytes), undefined, [did, 1]);
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Add a BBS+ key');

@@ -2,6 +2,12 @@ node_modules
 dist
 build
 tests
-tutorial
+tutorials
 .github
 .env
+docker
+.editorconfig
+.eslintrc.json
+.git
+.npmrc
+env_example

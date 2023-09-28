@@ -3,7 +3,7 @@ import {
   hexToU8a, stringToHex, u8aToHex, u8aToString,
 } from '@polkadot/util';
 import {
-  Accumulator, initializeWasm, KeypairG2, SignatureParamsG1,
+  Accumulator, initializeWasm, BBSPlusKeypairG2, BBSPlusSignatureParamsG1,
 } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI, PublicKeySecp256k1 } from '../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-constants';
@@ -92,12 +92,12 @@ describe('Custom nonce', () => {
 
     // Add BBS+ params and keys
     const label = stringToHex('test-label');
-    const params = SignatureParamsG1.generate(10, hexToU8a(label));
+    const params = BBSPlusSignatureParamsG1.generate(10, hexToU8a(label));
     const addParams = BBSPlusModule.prepareAddParameters(u8aToHex(params.toBytes()), undefined, label);
     const tx5 = await dock.bbsPlusModule.createAddParamsTx(addParams, did1, pair, 1, { nonce: nonce + 5 });
     txs.push(tx5);
 
-    const keypair = KeypairG2.generate(params);
+    const keypair = BBSPlusKeypairG2.generate(params);
     const pk = BBSPlusModule.prepareAddPublicKey(u8aToHex(keypair.publicKey.bytes), undefined, [did1, 1]);
     const tx6 = await dock.bbsPlusModule.createAddPublicKeyTx(pk, did1, did1, pair, 1, { nonce: nonce + 6 });
     txs.push(tx6);

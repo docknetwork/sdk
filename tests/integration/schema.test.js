@@ -13,8 +13,8 @@ import Schema from '../../src/modules/schema';
 import VerifiableCredential from '../../src/verifiable-credential';
 import exampleSchema from '../example-schema';
 import VerifiablePresentation from '../../src/verifiable-presentation';
-import getKeyDoc from '../../src/utils/vc/helpers';
-import DockResolver from '../../src/dock-resolver';
+import { getKeyDoc } from '../../src/utils/vc/helpers';
+import { DockResolver } from '../../src/resolver';
 import { Sr25519VerKeyName } from '../../src/utils/vc/crypto/constants';
 import { registerNewDIDUsingPair } from './helpers';
 
@@ -143,8 +143,6 @@ describe('Schema Blob Module Integration', () => {
       verifyCredential(validCredential.toJSON(), {
         resolver: dockResolver,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { dock: dockApi },
       }),
     ).resolves.toBeDefined();
   }, 30000);
@@ -154,8 +152,6 @@ describe('Schema Blob Module Integration', () => {
       validCredential.verify({
         resolver: dockResolver,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { dock: dockApi },
       }),
     ).resolves.toBeDefined();
   }, 30000);
@@ -165,17 +161,13 @@ describe('Schema Blob Module Integration', () => {
       verifyCredential(invalidCredential.toJSON(), {
         resolver: null,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { notDock: dockApi },
       }),
-    ).rejects.toThrow('Only Dock schemas are supported as of now.');
+    ).rejects.toThrow(/Unsupported protocol blob:/);
 
     await expect(
       verifyCredential(invalidCredential.toJSON(), {
-        resolver: null,
+        resolver: dockResolver,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { dock: dockApi },
       }),
     ).rejects.toThrow(/Schema validation failed/);
   }, 30000);
@@ -185,8 +177,6 @@ describe('Schema Blob Module Integration', () => {
       invalidCredential.verify({
         resolver: dockResolver,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { dock: dockApi },
       }),
     ).rejects.toThrow(/Schema validation failed/);
   }, 30000);
@@ -207,12 +197,10 @@ describe('Schema Blob Module Integration', () => {
       verifyPresentation(vpInvalid.toJSON(), {
         challenge: 'some_challenge',
         domain: 'some_domain',
-        resolver: dockResolver,
+        resolver: null,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { notDock: dockApi },
       }),
-    ).rejects.toThrow('Only Dock schemas are supported as of now.');
+    ).rejects.toThrow(/Unsupported protocol blob:/);
 
     await expect(
       verifyPresentation(vpInvalid.toJSON(), {
@@ -220,8 +208,6 @@ describe('Schema Blob Module Integration', () => {
         domain: 'some_domain',
         resolver: dockResolver,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { dock: dockApi },
       }),
     ).rejects.toThrow(/Schema validation failed/);
   }, 90000);
@@ -244,8 +230,6 @@ describe('Schema Blob Module Integration', () => {
         domain: 'some_domain',
         resolver: dockResolver,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { dock: dockApi },
       }),
     ).resolves.toBeDefined();
   }, 90000);
@@ -266,12 +250,10 @@ describe('Schema Blob Module Integration', () => {
       vpInvalid.verify({
         challenge: 'some_challenge',
         domain: 'some_domain',
-        resolver: dockResolver,
+        resolver: null,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { notDock: dockApi },
       }),
-    ).rejects.toThrow('Only Dock schemas are supported as of now.');
+    ).rejects.toThrow(/Unsupported protocol blob:/);
 
     await expect(
       vpInvalid.verify({
@@ -279,8 +261,6 @@ describe('Schema Blob Module Integration', () => {
         domain: 'some_domain',
         resolver: dockResolver,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { dock: dockApi },
       }),
     ).rejects.toThrow(/Schema validation failed/);
   }, 90000);
@@ -303,8 +283,6 @@ describe('Schema Blob Module Integration', () => {
         domain: 'some_domain',
         resolver: dockResolver,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { dock: dockApi },
       }),
     ).resolves.toBeDefined();
   }, 90000);

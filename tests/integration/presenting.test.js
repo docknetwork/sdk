@@ -10,7 +10,7 @@ import { DockResolver } from '../../src/resolver';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
 import { generateEcdsaSecp256k1Keypair } from '../../src/utils/misc';
-import getKeyDoc from '../../src/utils/vc/helpers';
+import { getKeyDoc } from '../../src/utils/vc/helpers';
 import {
   issueCredential,
   isVerifiedCredential,
@@ -177,14 +177,12 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     const res = await isVerifiedCredential(cred3, {
       resolver,
       compactProof: true,
-      forceRevocationCheck: false,
     });
     expect(res).toBe(true);
 
     const res1 = await isVerifiedCredential(cred4, {
       resolver,
       compactProof: true,
-      forceRevocationCheck: false,
     });
     expect(res1).toBe(true);
 

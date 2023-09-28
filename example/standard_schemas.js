@@ -4,7 +4,7 @@ import { expandJSONLD } from '../src/utils/vc';
 import { validateCredentialSchema } from '../src/utils/vc/schema';
 
 import prCardSchema from './schemas/pr_card';
-import healthWorkerPassportSchema from './schemas/health_worker_passport';
+// import healthWorkerPassportSchema from './schemas/health_worker_passport';
 import infectionDiagnosisSchema from './schemas/infection_diagnosis';
 import immunityEventRecordSchema from './schemas/immunity_event_record';
 import noInfectionSchema from './schemas/non_infection_check';
@@ -42,7 +42,7 @@ const credPRCard = {
   name: 'Permanent Resident Card',
   description: 'Government of Example Permanent Resident Card.',
 };
-
+/*
 // Schema from here https://docs.google.com/document/d/1F5TLvAqCxj1kaPuPe6JhdECixwpbhKpEAb8eeQuDGT4/edit#heading=h.kdkhzpmqto5s
 const healthCareWorkerCred = {
   '@context': [
@@ -77,7 +77,7 @@ const healthCareWorkerCred = {
       },
     ],
   },
-};
+}; */
 
 // Schema from here https://docs.google.com/document/d/1F5TLvAqCxj1kaPuPe6JhdECixwpbhKpEAb8eeQuDGT4/edit#heading=h.ppf3i61y3kbc
 const infectionDiagnosisCred = {

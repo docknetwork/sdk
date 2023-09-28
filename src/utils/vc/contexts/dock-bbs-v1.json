@@ -19,6 +19,11 @@
       "@type": "@id",
       "@container": "@graph"
     },
+    "defaultMinimumDate": {
+      "@id": "dockBBS:defaultMinimumDate",
+      "@type": "@id",
+      "@container": "@graph"
+    },
     "useDefaults": {
       "@id": "dockBBS:useDefaults",
       "@type": "@id",
@@ -43,6 +48,9 @@
         },
         "domain": "https://ld.dock.io/security#domain",
         "context": "https://ld.dock.io/security#context",
+        "sigType": "https://ld.dock.io/security#sigType",
+        "boundedPseudonyms": "https://ld.dock.io/security#boundedPseudonyms",
+        "unboundedPseudonyms": "https://ld.dock.io/security#unboundedPseudonyms",
         "attributeCiphertexts": "https://ld.dock.io/security#attributeCiphertexts",
         "attributeEqualities": "https://ld.dock.io/security#attributeEqualities",
         "proofValue": "https://ld.dock.io/security#proofValue",

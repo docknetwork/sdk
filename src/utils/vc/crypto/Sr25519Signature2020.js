@@ -1,6 +1,6 @@
 import { Sr25519SigName, Sr25519VerKeyName } from './constants';
 import Sr25519VerificationKey2020 from './Sr25519VerificationKey2020';
-import CustomLinkedDataSignature from './custom-linkeddatasignature';
+import CustomLinkedDataSignature from './common/CustomLinkedDataSignature';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
@@ -28,6 +28,7 @@ export default class Sr25519Signature2020 extends CustomLinkedDataSignature {
   /**
    * Generate object with `sign` method
    * @param keypair
+   * @param verificationMethod
    * @returns {object}
    */
   static signerFactory(keypair, verificationMethod) {

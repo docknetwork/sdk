@@ -1,10 +1,11 @@
 module.exports = {
+  plugins: ["@babel/plugin-transform-modules-commonjs"],
   presets: [
     [
-      '@babel/preset-env',
+      "@babel/preset-env",
       {
         targets: {
-          node: 'current',
+          node: "current",
         },
       },
     ],

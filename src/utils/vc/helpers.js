@@ -1,10 +1,21 @@
 import jsonld from 'jsonld';
+import { JsonWebKey } from '@transmute/json-web-signature';
 import defaultDocumentLoader from './document-loader';
 
 import {
-  EcdsaSecp256k1VerKeyName, Ed25519VerKeyName, Sr25519VerKeyName,
-  EcdsaSepc256k1Signature2019, Ed25519Signature2018, Sr25519Signature2020,
-  Bls12381BBSSignatureDock2022, Bls12381BBSDockVerKeyName,
+  EcdsaSecp256k1VerKeyName,
+  Ed25519VerKeyName,
+  Sr25519VerKeyName,
+  EcdsaSepc256k1Signature2019,
+  Ed25519Signature2018,
+  Sr25519Signature2020,
+  Bls12381BBSSignatureDock2022,
+  Bls12381BBSDockVerKeyName,
+  Bls12381BBS23DockVerKeyName,
+  Bls12381BBSSignatureDock2023,
+  Bls12381PSSignatureDock2023,
+  Bls12381PSDockVerKeyName,
+  JsonWebSignature2020,
 } from './custom_crypto';
 
 /**
@@ -25,7 +36,7 @@ import {
  * @param {string} id - the ID of the key for future resolution
  * @returns {KeyDoc}
  */
-export default function getKeyDoc(did, keypair, type, id) {
+export function getKeyDoc(did, keypair, type, id) {
   return {
     id: id || `${did}#keys-1`,
     controller: did,
@@ -39,13 +50,14 @@ export default function getKeyDoc(did, keypair, type, id) {
  * @param {object} keyDoc - key document containing `id`, `controller`, `type`, `privateKeyBase58` and `publicKeyBase58`
  * @returns {object} - signature suite.
  */
-export function getSuiteFromKeyDoc(keyDoc, useProofValue) {
+export async function getSuiteFromKeyDoc(keyDoc, useProofValue, options) {
   // Check if passing suite directly
   if (keyDoc.verificationMethod) {
     return keyDoc;
   }
 
   let Cls;
+  let { keypair } = keyDoc;
   switch (keyDoc.type) {
     case EcdsaSecp256k1VerKeyName:
       Cls = EcdsaSepc256k1Signature2019;
@@ -59,6 +71,18 @@ export function getSuiteFromKeyDoc(keyDoc, useProofValue) {
     case Bls12381BBSDockVerKeyName:
       Cls = Bls12381BBSSignatureDock2022;
       break;
+    case Bls12381BBS23DockVerKeyName:
+      Cls = Bls12381BBSSignatureDock2023;
+      break;
+    case Bls12381PSDockVerKeyName:
+      Cls = Bls12381PSSignatureDock2023;
+      break;
+    case 'JsonWebKey2020':
+      Cls = JsonWebSignature2020;
+      if (!keypair) {
+        keypair = await JsonWebKey.from(keyDoc, options);
+      }
+      break;
     default:
       throw new Error(`Unknown key type ${keyDoc.type}.`);
   }
@@ -67,6 +91,8 @@ export function getSuiteFromKeyDoc(keyDoc, useProofValue) {
     ...keyDoc,
     verificationMethod: keyDoc.id,
     useProofValue,
+    keyDoc,
+    keypair,
   });
 }
 
@@ -76,12 +102,39 @@ export function getSuiteFromKeyDoc(keyDoc, useProofValue) {
  */
 export async function expandJSONLD(credential, options = {}) {
   if (options.documentLoader && options.resolver) {
-    throw new Error('Passing resolver and documentLoader results in resolver being ignored, please re-factor.');
+    throw new Error(
+      'Passing resolver and documentLoader results in resolver being ignored, please re-factor.',
+    );
   }
 
   const expanded = await jsonld.expand(credential, {
     ...options,
-    documentLoader: options.documentLoader || defaultDocumentLoader(options.resolver),
+    documentLoader:
+      options.documentLoader || defaultDocumentLoader(options.resolver),
   });
   return expanded[0];
+}
+
+export function potentialToArray(a) {
+  /* eslint-disable no-nested-ternary */
+  return a ? (Array.isArray(a) ? a : [a]) : [];
+}
+
+export function getKeyFromDIDDocument(didDocument, didUrl) {
+  // Ensure not already a key doc
+  if (
+    didDocument.publicKeyBase58
+    || didDocument.publicKeyMultibase
+    || didDocument.publicKeyJwk
+    || (didDocument.publicKey && !Array.isArray(didDocument.publicKey))
+  ) {
+    return didDocument;
+  }
+
+  const possibleKeys = [
+    ...potentialToArray(didDocument.verificationMethod),
+    ...potentialToArray(didDocument.keyAgreement),
+    ...potentialToArray(didDocument.publicKey),
+  ];
+  return possibleKeys.filter((key) => key.id === didUrl)[0];
 }

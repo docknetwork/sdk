@@ -195,13 +195,8 @@ You can also use the booleans `compactProof` (to compact the JSON-LD) and
 setting `forceRevocationCheck` to false can allow false positives when
 verifying revocable credentials.
 
-If your credential has uses the `status` field, you can pass a
-`revocationApi` param that accepts an object describing the API to use for
-the revocation check. No params are required for the simplest cases:
-
-If your credential uses schema and requires blob resolution, you can pass a
-`schemaApi` param that accepts an object describing the API to pull the
-schema from chain. No params are required for the simplest cases:
+If your credential has uses the `credentialStatus` field, the credential will be checked
+not to be revoked unless you pass `skipRevocationCheck` flag.
 ```javascript
 >   const result = await vc.verify({ ... })
 >   result
@@ -392,9 +387,7 @@ the booleans `compactProof` (to compact the JSON-LD) and
 setting `forceRevocationCheck` to false can allow false positives when
 verifying revocable credentials.
 
-If your credential has uses the `status` field, you can pass a
-`revocationApi` param that accepts an object describing the API to use for
-the revocation check.
+If your credential uses the `credentialStatus` field, the credential will be checked to be not revoked unless you pass `skipRevocationCheck`.
 For the simplest cases you only need a `challenge` string and possibly a
 `domain` string:
 ```javascript

@@ -12,8 +12,10 @@ import { DockResolver } from '../../src/resolver';
 
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getCredMatcherDoc, getProofMatcherDoc, registerNewDIDUsingPair } from './helpers';
-import { issueCredential, signPresentation, verifyCredential, verifyPresentation } from '../../src/utils/vc/index';
-import getKeyDoc from '../../src/utils/vc/helpers';
+import {
+  issueCredential, signPresentation, verifyCredential, verifyPresentation,
+} from '../../src/utils/vc/index';
+import { getKeyDoc } from '../../src/utils/vc/helpers';
 import { createPresentation } from '../create-presentation';
 
 mockAxios();
@@ -42,11 +44,11 @@ const unsignedCred = {
   issuanceDate: '2020-03-18T19:23:24Z',
   credentialSubject: [
     {
-      id: subject1DID,  // DID of the user who is given read access to the document
+      id: subject1DID, // DID of the user who is given read access to the document
       type: 'reader',
     },
     {
-      id: subject2DID,  // DID of the document
+      id: subject2DID, // DID of the document
       type: 'document',
     },
   ],

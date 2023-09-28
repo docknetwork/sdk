@@ -1,6 +1,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
-import { initializeWasm } from '@docknetwork/crypto-wasm-ts';
+import { error } from 'console';
+import { initializeWasm, BoundCheckSnarkSetup } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI } from '../../../src';
 import {
   FullNodeEndpoint,
@@ -156,7 +157,7 @@ for (const {
       );
     }, 30000);
 
-    async function createAndVerifyPresentation(credentials) {
+    async function createAndVerifyPresentation(credentials, verifyOptions = {}) {
       const holderKey = getKeyDoc(
         holder3DID,
         dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'),
@@ -202,6 +203,7 @@ for (const {
         challenge: chal,
         domain,
         resolver,
+        ...verifyOptions,
       });
 
       expect(result.verified).toBe(true);
@@ -303,6 +305,113 @@ for (const {
 
       // Create a VP and verify it from this credential
       await createAndVerifyPresentation(credentials);
+    }, 30000);
+
+    test('Holder creates a derived verifiable credential from a credential with range proofs', async () => {
+      const provingKeyId = 'provingKeyId';
+      const pk = BoundCheckSnarkSetup();
+      const provingKey = pk.decompress();
+
+      const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
+      const unsignedCred = {
+        ...credentialJSON,
+        issuer: did1,
+      };
+
+      const presentationOptions = {
+        nonce: stringToU8a('noncetest'),
+        context: 'my context',
+      };
+
+      // Create W3C credential
+      const credential = await issueCredential(issuerKey, unsignedCred);
+
+      // Begin to derive a credential from the above issued one
+      const presentationInstance = new Presentation();
+      const idx = await presentationInstance.addCredentialToPresent(
+        credential,
+        { resolver },
+      );
+
+      // NOTE: revealing subject type because of JSON-LD processing for this certain credential
+      // you may not always need to do this depending on your JSON-LD contexts
+      await presentationInstance.addAttributeToReveal(idx, [
+        'credentialSubject.type.0',
+      ]);
+      await presentationInstance.addAttributeToReveal(idx, [
+        'credentialSubject.type.1',
+      ]);
+
+      // Enforce LPR number to be between values aswell as revealed
+      // NOTE: unlike other tests, we cannot "reveal" this value and enforce bounds at the same time!
+      presentationInstance.presBuilder.enforceBounds(
+        idx,
+        'credentialSubject.lprNumber',
+        1233,
+        1235,
+        provingKeyId,
+        provingKey,
+      );
+
+      // Enforce issuance date to be between values
+      // NOTE: we dont need to set proving key value here (must still set ID though!) as its done above, should pass undefined
+      presentationInstance.presBuilder.enforceBounds(
+        idx,
+        'issuanceDate',
+        new Date('2019-10-01'),
+        new Date('2020-01-01'),
+        provingKeyId,
+        undefined,
+      );
+
+      // Derive a W3C Verifiable Credential JSON from the above presentation
+      const credentials = await presentationInstance.deriveCredentials(
+        presentationOptions,
+      );
+      expect(credentials.length).toEqual(1);
+      expect(credentials[0].proof).toBeDefined();
+      expect(credentials[0].proof.bounds).toBeDefined();
+      expect(credentials[0].proof.bounds).toEqual({
+        issuanceDate: {
+          min: 1569888000000,
+          max: 1577836800000,
+          paramId: 'provingKeyId',
+          protocol: 'LegoGroth16',
+        },
+        credentialSubject: {
+          lprNumber: {
+            min: 1233,
+            max: 1235,
+            paramId: 'provingKeyId',
+            protocol: 'LegoGroth16',
+          },
+        },
+      });
+      expect(credentials[0]).toHaveProperty('credentialSubject');
+      expect(credentials[0].credentialSubject).toMatchObject(
+        expect.objectContaining({
+          type: unsignedCred.credentialSubject.type,
+        }),
+      );
+
+      const reconstructedPres = convertToPresentation(credentials[0]);
+      expect(reconstructedPres.proof).toBeDefined();
+      expect(reconstructedPres.spec.credentials[0].bounds).toEqual(credentials[0].proof.bounds);
+
+      // Setup predicate params with the verifying key for range proofs
+      const predicateParams = new Map();
+      predicateParams.set(provingKeyId, pk.getVerifyingKey());
+
+      // Try to verify the derived credential alone
+      const credentialResult = await verifyCredential(credentials[0], {
+        resolver,
+        predicateParams,
+      });
+      expect(credentialResult.error).toBe(undefined);
+      expect(credentialResult.verified).toBe(true);
+
+      // Create a VP and verify it from this credential
+      await createAndVerifyPresentation(credentials, { predicateParams });
     }, 30000);
 
     afterAll(async () => {

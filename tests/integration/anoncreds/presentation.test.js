@@ -1,7 +1,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { u8aToHex, stringToU8a } from '@polkadot/util';
 import b58 from 'bs58';
-import { initializeWasm } from '@docknetwork/crypto-wasm-ts';
+import { BoundCheckSnarkSetup, initializeWasm } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI } from '../../../src';
 import {
   FullNodeEndpoint,
@@ -130,6 +130,80 @@ for (const {
       expect(publicKey.length).toEqual(2);
       expect(publicKey[1].type).toEqual(VerKey);
       keypair.id = publicKey[1].id;
+    }, 30000);
+
+    test('expect to range proofs', async () => {
+      const provingKeyId = 'provingKeyId';
+      const pk = BoundCheckSnarkSetup();
+      const provingKey = pk.decompress();
+      const presentationInstance = new Presentation();
+      const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
+      const unsignedCred = {
+        ...credentialJSON,
+        issuer: did1,
+      };
+
+      const credential = await issueCredential(issuerKey, unsignedCred);
+
+      const idx = await presentationInstance.addCredentialToPresent(
+        credential,
+        { resolver },
+      );
+
+      await presentationInstance.addAttributeToReveal(idx, [
+        'credentialSubject.lprNumber',
+      ]);
+
+      // Enforce issuance date to be between values
+      presentationInstance.presBuilder.enforceBounds(
+        idx,
+        'issuanceDate',
+        new Date('2019-10-01'),
+        new Date('2020-01-01'),
+        provingKeyId,
+        provingKey,
+      );
+
+      const presentation = await presentationInstance.createPresentation();
+
+      expect(presentation.spec.credentials[0].bounds).toBeDefined();
+      expect(presentation.spec.credentials[0].bounds).toEqual({
+        issuanceDate: {
+          min: 1569888000000,
+          max: 1577836800000,
+          paramId: 'provingKeyId',
+          protocol: 'LegoGroth16',
+        },
+      });
+
+      expect(
+        presentation.spec.credentials[0].revealedAttributes,
+      ).toHaveProperty('credentialSubject');
+      expect(
+        presentation.spec.credentials[0].revealedAttributes.credentialSubject,
+      ).toHaveProperty('lprNumber', 1234);
+
+      // Ensure verificationMethod & type is revealed always
+      expect(
+        presentation.spec.credentials[0].revealedAttributes.proof,
+      ).toBeDefined();
+      expect(
+        presentation.spec.credentials[0].revealedAttributes.proof,
+      ).toHaveProperty(
+        'verificationMethod',
+        credential.proof.verificationMethod,
+      );
+      expect(
+        presentation.spec.credentials[0].revealedAttributes.proof,
+      ).toHaveProperty('type', credential.proof.type);
+
+      // Setup predicate params with the verifying key for range proofs
+      const predicateParams = new Map();
+      predicateParams.set(provingKeyId, pk.getVerifyingKey());
+
+      // Verify the presentation, note that we must pass predicateParams with the verification key
+      const { verified } = await verifyPresentation(presentation, { resolver, predicateParams });
+      expect(verified).toEqual(true);
     }, 30000);
 
     test('expect to reveal specified attributes', async () => {

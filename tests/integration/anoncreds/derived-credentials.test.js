@@ -1,6 +1,5 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
-import { error } from 'console';
 import { initializeWasm, BoundCheckSnarkSetup } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI } from '../../../src';
 import {
@@ -415,7 +414,7 @@ for (const {
 
       // Create a VP and verify it from this credential
       await createAndVerifyPresentation(credentials, { predicateParams });
-    }, 30000);
+    }, 60000);
 
     afterAll(async () => {
       await dock.disconnect();

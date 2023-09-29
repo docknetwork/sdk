@@ -265,6 +265,10 @@ export function isAnoncreds(presentation) {
 
 export async function verifyAnoncreds(presentation, options = {}) {
   const documentLoader = options.documentLoader || defaultDocumentLoader(options.resolver);
+  const {
+    predicateParams, accumulatorPublicKeys,
+    circomOutputs, blindedAttributesCircomOutputs,
+  } = options;
 
   const keyDocuments = await Promise.all(
     presentation.spec.credentials.map((c, idx) => {
@@ -315,5 +319,5 @@ export async function verifyAnoncreds(presentation, options = {}) {
     }
   });
 
-  return recreatedPres.verify(pks);
+  return recreatedPres.verify(pks, accumulatorPublicKeys, predicateParams, circomOutputs, blindedAttributesCircomOutputs);
 }

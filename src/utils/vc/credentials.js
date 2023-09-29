@@ -233,6 +233,12 @@ export async function verifyCredential(
     controller = null,
     suite = [],
     verifyDates = true,
+
+    // Anoncreds params
+    predicateParams = null,
+    accumulatorPublicKeys = null,
+    circomOutputs = null,
+    blindedAttributesCircomOutputs = null,
   } = {},
 ) {
   if (documentLoader && resolver) {
@@ -321,17 +327,21 @@ export async function verifyCredential(
     return { verified };
   }
 
+  // Specify certain parameters for anoncreds
+  const anoncredsParams = {
+    accumulatorPublicKeys, predicateParams, circomOutputs, blindedAttributesCircomOutputs,
+  };
   const fullSuite = [
     new Ed25519Signature2018(),
     new EcdsaSepc256k1Signature2019(),
     new Sr25519Signature2020(),
-    new Bls12381BBSSignatureDock2022(),
-    new Bls12381BBSSignatureProofDock2022(),
-    new Bls12381BBSSignatureDock2023(),
-    new Bls12381BBSSignatureProofDock2023(),
-    new Bls12381PSSignatureDock2023(),
-    new Bls12381PSSignatureProofDock2023(),
     new JsonWebSignature2020(),
+    new Bls12381BBSSignatureDock2022(anoncredsParams),
+    new Bls12381BBSSignatureProofDock2022(anoncredsParams),
+    new Bls12381BBSSignatureDock2023(anoncredsParams),
+    new Bls12381BBSSignatureProofDock2023(anoncredsParams),
+    new Bls12381PSSignatureDock2023(anoncredsParams),
+    new Bls12381PSSignatureProofDock2023(anoncredsParams),
     ...suite,
   ];
 

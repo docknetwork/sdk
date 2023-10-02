@@ -14,7 +14,7 @@ import {
   CompositeProofG1,
   SaverDecryptor,
   SaverEncryptionGens,
-  SaverChunkedCommitmentGens,
+  SaverChunkedCommitmentKey,
   QuasiProofSpecG1,
   BoundCheckSnarkSetup,
   initializeWasm,
@@ -177,7 +177,7 @@ for (const {
 
     test('Encrypt attribute and prove verifiably encrypted', async () => {
       // Verifier creates and shares with the prover
-      const gens = SaverChunkedCommitmentGens.generate(
+      const gens = SaverChunkedCommitmentKey.generate(
         hexToU8a(stringToHex('some label')),
       );
       const commGens = gens.decompress();
@@ -303,7 +303,7 @@ for (const {
         revealedAttrs,
         false,
       );
-      const statement2 = Statement.boundCheckProver(min, max, snarkProvingKey);
+      const statement2 = Statement.boundCheckLegoProver(min, max, snarkProvingKey);
       const proverStatements = new Statements();
       proverStatements.add(statement1);
       proverStatements.add(statement2);
@@ -332,7 +332,7 @@ for (const {
       );
 
       const snarkVerifyingKey = pk.getVerifyingKeyUncompressed();
-      const statement3 = Statement.boundCheckVerifier(
+      const statement3 = Statement.boundCheckLegoVerifier(
         min,
         max,
         snarkVerifyingKey,

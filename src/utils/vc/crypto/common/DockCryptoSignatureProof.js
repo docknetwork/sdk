@@ -105,7 +105,7 @@ export default withExtendedStaticProperties(
       } = document;
 
       return {
-        version: '0.1.0', // TODO: should this be retrieved from the doc somehow?
+        version: proof.version,
         nonce: proof.nonce,
         context: proof.context,
         spec: {

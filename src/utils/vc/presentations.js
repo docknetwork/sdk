@@ -106,8 +106,6 @@ export async function verifyPresentationCredentials(
  * @property {DIDResolver} [resolver] - Resolver to resolve the issuer DID (optional)
  * @property {Boolean} [unsignedPresentation] - Whether to verify the proof or not
  * @property {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
- * @property {Boolean} [forceRevocationCheck] - Whether to force revocation check or not.
- * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
  * @property {object} [presentationPurpose] - A purpose other than the default AuthenticationProofPurpose
  * @property {object} [documentLoader] - A document loader, can be null and use the default
  */

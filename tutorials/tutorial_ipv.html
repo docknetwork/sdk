@@ -343,10 +343,7 @@ Once done, your <code>vc</code> object will have a new <code>proof</code> field:
 with the <code>verify</code> method. The <code>verify</code> method takes an object of arguments,
 and is optional.</p>
 <p>If you've used DIDs you need to pass a <code>resolver</code> for them.
-You can also use the booleans <code>compactProof</code> (to compact the JSON-LD) and
-<code>forceRevocationCheck</code> (to force revocation check). Please beware that
-setting <code>forceRevocationCheck</code> to false can allow false positives when
-verifying revocable credentials.</p>
+You can also use the booleans <code>compactProof</code> (to compact the JSON-LD).</p>
 <p>If your credential has uses the <code>credentialStatus</code> field, the credential will be checked
 not to be revoked unless you pass <code>skipRevocationCheck</code> flag.</p>
 <pre><code class="language-javascript">&gt;   const result = await vc.verify({ ... })
@@ -501,10 +498,7 @@ Once done, your <code>vp</code> object will have a new <code>proof</code> field:
 <p>Once your Verifiable Presentation has been signed you can proceed to verify
 it with the <code>verify</code> method.</p>
 <p>If you've used DIDs you need to pass a <code>resolver</code> for them. You can also use
-the booleans <code>compactProof</code> (to compact the JSON-LD) and
-<code>forceRevocationCheck</code> (to force revocation check). Please beware that
-setting <code>forceRevocationCheck</code> to false can allow false positives when
-verifying revocable credentials.</p>
+the booleans <code>compactProof</code> (to compact the JSON-LD).</p>
 <p>If your credential uses the <code>credentialStatus</code> field, the credential will be checked to be not revoked unless you pass <code>skipRevocationCheck</code>.
 For the simplest cases you only need a <code>challenge</code> string and possibly a
 <code>domain</code> string:</p>
@@ -567,7 +561,7 @@ supported but also encouraged.</p>
 <p>Here's an example of issuing a Verifiable Credential using DIDs, provided that you've created and a DID that you store in <code>issuerDID</code>:</p>
 <pre><code class="language-javascript">const issuerKey = getKeyDoc(issuerDID, dock.keyring.addFromUri(issuerSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
 await vc.sign(issuerKey);
-const verificationResult = await signedCredential.verify({ resolver, compactProof: true, forceRevocationCheck: true, revocationApi: { dock } });
+const verificationResult = await signedCredential.verify({ resolver, compactProof: true });
 console.log(verificationResult.verified); // Should print `true`
 </code></pre>
 <h2 id="creating-a-keydoc"><a class="header" href="#creating-a-keydoc">Creating a keyDoc</a></h2>

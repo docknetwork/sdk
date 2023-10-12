@@ -107,7 +107,6 @@ async function main() {
         domain,
         resolver,
         compactProof: true,
-        forceRevocationCheck: false,
       });
 
       if (ver.verified) {

@@ -75,7 +75,6 @@ describe('Revocation Module', () => {
     expect(revocationStatus).toBe(true);
   }, 40000);
 
-
   test('Can unrevoke single from a registry', async () => {
     const [unrevoke, sig, nonce] = await dock.revocation.createSignedUnRevoke(registryId, revokeIds, ownerDID, pair, 1, { didModule: dock.did });
     await dock.revocation.unrevoke(unrevoke, [[sig, nonce]], false);
@@ -86,24 +85,30 @@ describe('Revocation Module', () => {
 
   test('Can revoke and unrevoke multiple from a registry', async () => {
     const rIds = new Set();
-    rIds.add(randomAsHex(32));
-    rIds.add(randomAsHex(32));
-    rIds.add(randomAsHex(32));
+    const count = 500;
+
+    for (let i = 0; i < count; i++) {
+      rIds.add(randomAsHex(32));
+    }
 
     const rIdsArr = Array.from(rIds);
 
     const [revoke, sig, nonce] = await dock.revocation.createSignedRevoke(registryId, rIds, ownerDID, pair, 1, { didModule: dock.did });
     await dock.revocation.revoke(revoke, [[sig, nonce]], false);
 
+    console.time(`Check ${count} revocation status one by one`);
     for (let i = 0; i < rIdsArr.length; i++) {
       // eslint-disable-next-line no-await-in-loop
       const status = await dock.revocation.getIsRevoked(registryId, rIdsArr[i]);
       expect(status).toBe(true);
     }
+    console.timeEnd(`Check ${count} revocation status one by one`);
 
+    console.time(`Check ${count} revocation status in a batch`);
     const revocationStatuses = await dock.revocation.areRevoked(rIdsArr.map((r) => [registryId, r]));
     expect(revocationStatuses.length).toBe(rIds.size);
     revocationStatuses.forEach((s) => expect(s).toBe(true));
+    console.timeEnd(`Check ${count} revocation status in a batch`);
 
     const [unrevoke, sig1, nonce1] = await dock.revocation.createSignedUnRevoke(registryId, rIds, ownerDID, pair, 1, { didModule: dock.did });
 

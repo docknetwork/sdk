@@ -20,7 +20,7 @@ import { DockResolver } from '../../src/resolver';
 import { createPresentation } from '../create-presentation';
 
 import { OneOfPolicy } from '../../src/utils/revocation';
-import { DockStatusList2021Qualifier } from '../../src/utils/vc/constants';
+import { DockStatusList2021Qualifier, StatusList2021EntryType } from '../../src/utils/vc/constants';
 import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
 import { createNewDockDID } from '../../src/utils/did';
@@ -37,7 +37,7 @@ function addCredentialStatus(
     ...cred,
     credentialStatus: {
       id: `${DockStatusList2021Qualifier}${statusListCredentialId}#${statusListCredentialIndex}`,
-      type: 'StatusList2021Entry',
+      type: StatusList2021EntryType,
       statusListIndex: String(statusListCredentialIndex),
       statusListCredential: `${DockStatusList2021Qualifier}${statusListCredentialId}`,
       statusPurpose: 'suspension',
@@ -49,7 +49,7 @@ const buildTest = DisableStatusListTests
   ? describe.skip
   : describe;
 
-buildTest('StatusList2021Credential', () => {
+describe('StatusList2021Credential', () => {
   const dockAPI = new DockAPI();
   const resolver = new DockResolver(dockAPI);
 

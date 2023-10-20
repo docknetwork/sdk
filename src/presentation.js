@@ -9,9 +9,6 @@ import b58 from 'bs58';
 import { stringToU8a } from '@polkadot/util';
 import {
   PresentationBuilder,
-  BBSPlusCredential,
-  BBSCredential,
-  PSCredential,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 import { ensureArray } from './utils/type-helpers';
 
@@ -24,7 +21,6 @@ import {
   Bls12381BBS23SigProofDockSigName,
   Bls12381BBSSigProofDockSigName,
 } from './utils/vc/crypto/constants';
-import CustomLinkedDataSignature from './utils/vc/crypto/common/CustomLinkedDataSignature';
 import defaultDocumentLoader from './utils/vc/document-loader';
 import {
   Bls12381BBSSignatureDock2023,
@@ -108,23 +104,19 @@ export default class Presentation {
     }
 
     let Signature;
-    let Credential;
     let PublicKey;
 
     switch (proof.type) {
       case Bls12381BBSSigDockSigName:
         Signature = Bls12381BBSSignatureDock2022;
-        Credential = BBSPlusCredential;
         PublicKey = BBSPlusPublicKeyG2;
         break;
       case Bls12381BBS23SigDockSigName:
         Signature = Bls12381BBSSignatureDock2023;
-        Credential = BBSCredential;
         PublicKey = BBSPublicKey;
         break;
       case Bls12381PSSigDockSigName:
         Signature = Bls12381PSSignatureDock2023;
-        Credential = PSCredential;
         PublicKey = PSPublicKey;
         break;
       default:
@@ -139,25 +131,17 @@ export default class Presentation {
     const pkRaw = b58.decode(keyDocument.publicKeyBase58);
     const pk = new PublicKey(pkRaw);
 
-    const [credential] = Signature.convertCredential({
-      document: json,
-    });
-
-    const convertedCredential = Credential.fromJSON(
-      credential,
-      CustomLinkedDataSignature.fromJsigProofValue(
-        credentialLD.proof.proofValue,
-      ),
-    );
+    const convertedCredential = Signature.convertCredentialForPresBuilding({ document: json });
     const idx = this.presBuilder.addCredential(convertedCredential, pk);
 
     // Enforce revealing of verificationMethod and type
-    this.addAttributeToReveal(idx, ['proof.type']);
-    this.addAttributeToReveal(idx, ['proof.verificationMethod']);
-
     // We also require context and type for JSON-LD
-    this.addAttributeToReveal(idx, ['@context']);
-    this.addAttributeToReveal(idx, ['type']);
+    this.addAttributeToReveal(idx, [
+      'proof.type',
+      'proof.verificationMethod',
+      '@context',
+      'type',
+    ]);
     return idx;
   }
 
@@ -197,6 +181,7 @@ export default class Presentation {
           created: date,
           ...credential.revealedAttributes.proof,
           type,
+          // Question: Why each cred will have the same proof, nonce, context, etc. They don't apply here. And is the same proof repeatedly verified?
           proofValue: presentation.proof,
           nonce: presentation.nonce,
           context: presentation.context,

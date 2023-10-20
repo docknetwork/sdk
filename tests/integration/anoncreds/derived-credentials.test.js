@@ -65,16 +65,25 @@ const embeddedSchema = {
   type: 'JsonSchemaValidator2018',
 };
 
-for (const {
+describe.each(Schemes)('Derived Credentials', ({
   Name,
   Module,
   Presentation,
   CryptoKeyPair,
-  convertToPresentation,
   VerKey,
   getModule,
   Context,
-} of Schemes) {
+  convertToPresentation,
+}) => {
+  const dock = new DockAPI();
+  const resolver = new DockResolver(dock);
+  let account;
+  let did1;
+  let pair1;
+  let chainModule;
+  let keypair;
+  let didDocument;
+
   const holder3DID = createNewDockDID();
   // seed used for 3rd holder keys
   const holder3KeySeed = randomAsHex(32);
@@ -103,321 +112,314 @@ for (const {
     },
   };
 
-  describe(`${Name} Derived Credentials`, () => {
-    const dock = new DockAPI();
-    const resolver = new DockResolver(dock);
-    let account;
-    let did1;
-    let pair1;
-    let chainModule;
-    let keypair;
-    let didDocument;
+  beforeAll(async () => {
+    await initializeWasm();
+    await dock.init({
+      keyring: TestKeyringOpts,
+      address: FullNodeEndpoint,
+    });
+    chainModule = getModule(dock);
+    account = dock.keyring.addFromUri(TestAccountURI);
 
-    beforeAll(async () => {
-      await initializeWasm();
-      await dock.init({
-        keyring: TestKeyringOpts,
-        address: FullNodeEndpoint,
-      });
-      chainModule = getModule(dock);
-      account = dock.keyring.addFromUri(TestAccountURI);
+    dock.setAccount(account);
+    pair1 = dock.keyring.addFromUri(randomAsHex(32));
+    did1 = createNewDockDID();
+    await registerNewDIDUsingPair(dock, did1, pair1);
 
-      dock.setAccount(account);
-      pair1 = dock.keyring.addFromUri(randomAsHex(32));
-      did1 = createNewDockDID();
-      await registerNewDIDUsingPair(dock, did1, pair1);
+    keypair = CryptoKeyPair.generate({
+      controller: did1, msgCount: 100,
+    });
 
-      keypair = CryptoKeyPair.generate({
-        controller: did1, msgCount: 100,
-      });
+    const pk1 = Module.prepareAddPublicKey(u8aToHex(keypair.publicKeyBuffer));
+    await chainModule.addPublicKey(
+      pk1,
+      did1,
+      did1,
+      pair1,
+      1,
+      { didModule: dock.did },
+      false,
+    );
 
-      const pk1 = Module.prepareAddPublicKey(u8aToHex(keypair.publicKeyBuffer));
-      await chainModule.addPublicKey(
-        pk1,
-        did1,
-        did1,
-        pair1,
-        1,
-        { didModule: dock.did },
-        false,
-      );
+    didDocument = await dock.did.getDocument(did1);
+    const { publicKey } = didDocument;
+    expect(publicKey.length).toEqual(2);
+    expect(publicKey[1].type).toEqual(VerKey);
+    keypair.id = publicKey[1].id;
 
-      didDocument = await dock.did.getDocument(did1);
-      const { publicKey } = didDocument;
-      expect(publicKey.length).toEqual(2);
-      expect(publicKey[1].type).toEqual(VerKey);
-      keypair.id = publicKey[1].id;
+    // Register holder DID with sr25519 key
+    await registerNewDIDUsingPair(
+      dock,
+      holder3DID,
+      dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'),
+    );
+  }, 30000);
 
-      // Register holder DID with sr25519 key
-      await registerNewDIDUsingPair(
-        dock,
-        holder3DID,
-        dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'),
-      );
-    }, 30000);
+  async function createAndVerifyPresentation(credentials, verifyOptions = {}) {
+    const holderKey = getKeyDoc(
+      holder3DID,
+      dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'),
+      'Sr25519VerificationKey2020',
+    );
 
-    async function createAndVerifyPresentation(credentials, verifyOptions = {}) {
-      const holderKey = getKeyDoc(
-        holder3DID,
-        dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'),
-        'Sr25519VerificationKey2020',
-      );
+    const presId = randomAsHex(32);
+    const chal = randomAsHex(32);
+    const domain = 'test domain';
+    const presentation = createPresentation(credentials, presId);
 
-      const presId = randomAsHex(32);
-      const chal = randomAsHex(32);
-      const domain = 'test domain';
-      const presentation = createPresentation(credentials, presId);
+    expect(presentation).toMatchObject(
+      expect.objectContaining({
+        type: ['VerifiablePresentation'],
+        verifiableCredential: credentials,
+        id: presId,
+      }),
+    );
 
-      expect(presentation).toMatchObject(
-        expect.objectContaining({
-          type: ['VerifiablePresentation'],
-          verifiableCredential: credentials,
-          id: presId,
+    // Question: What is the point of this? Verifying this would require knowing the holder's public key which makes
+    // the holder linkable and defeats the purpose of BBS+
+    const signedPres = await signPresentation(
+      presentation,
+      holderKey,
+      chal,
+      domain,
+      resolver,
+    );
+
+    expect(signedPres).toMatchObject(
+      expect.objectContaining({
+        type: ['VerifiablePresentation'],
+        verifiableCredential: credentials,
+        id: presId,
+        proof: expect.objectContaining({
+          type: 'Sr25519Signature2020',
+          challenge: chal,
+          domain,
+          proofPurpose: 'authentication',
         }),
-      );
+      }),
+    );
 
-      const signedPres = await signPresentation(
-        presentation,
-        holderKey,
-        chal,
-        domain,
-        resolver,
-      );
+    const result = await verifyPresentation(signedPres, {
+      challenge: chal,
+      domain,
+      resolver,
+      ...verifyOptions,
+    });
 
-      expect(signedPres).toMatchObject(
-        expect.objectContaining({
-          type: ['VerifiablePresentation'],
-          verifiableCredential: credentials,
-          id: presId,
-          proof: expect.objectContaining({
-            type: 'Sr25519Signature2020',
-            challenge: chal,
-            domain,
-            proofPurpose: 'authentication',
-          }),
-        }),
-      );
+    expect(result.verified).toBe(true);
+    expect(result.presentationResult.verified).toBe(true);
+    expect(result.credentialResults.length).toBe(1);
+    expect(result.credentialResults[0].verified).toBe(true);
+  }
 
-      const result = await verifyPresentation(signedPres, {
-        challenge: chal,
-        domain,
-        resolver,
-        ...verifyOptions,
-      });
+  test(`For ${Name}, holder creates a derived verifiable credential from a credential with selective disclosure`, async () => {
+    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
+    const unsignedCred = {
+      ...credentialJSON,
+      issuer: did1,
+    };
 
-      expect(result.verified).toBe(true);
-      expect(result.presentationResult.verified).toBe(true);
-      expect(result.credentialResults.length).toBe(1);
-      expect(result.credentialResults[0].verified).toBe(true);
-    }
+    const presentationOptions = {
+      nonce: stringToU8a('noncetest'),
+      context: 'my context',
+    };
 
-    test('Holder creates a derived verifiable credential from a credential with selective disclosure', async () => {
-      const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
-      const unsignedCred = {
-        ...credentialJSON,
-        issuer: did1,
-      };
+    // Create W3C credential
+    const credential = await issueCredential(issuerKey, unsignedCred);
 
-      const presentationOptions = {
-        nonce: stringToU8a('noncetest'),
-        context: 'my context',
-      };
+    // Begin to derive a credential from the above issued one
+    const presentationInstance = new Presentation();
+    const idx = await presentationInstance.addCredentialToPresent(
+      credential,
+      { resolver },
+    );
 
-      // Create W3C credential
-      const credential = await issueCredential(issuerKey, unsignedCred);
+    // Reveal subject attributes
+    presentationInstance.addAttributeToReveal(idx, [
+      'credentialSubject.lprNumber',
+    ]);
 
-      // Begin to derive a credential from the above issued one
-      const presentationInstance = new Presentation();
-      const idx = await presentationInstance.addCredentialToPresent(
-        credential,
-        { resolver },
-      );
+    // NOTE: revealing subject type because of JSON-LD processing for this certain credential
+    // you may not always need to do this depending on your JSON-LD contexts
+    presentationInstance.addAttributeToReveal(idx, [
+      'credentialSubject.type.0',
+    ]);
+    presentationInstance.addAttributeToReveal(idx, [
+      'credentialSubject.type.1',
+    ]);
 
-      // Reveal subject attributes
-      await presentationInstance.addAttributeToReveal(idx, [
-        'credentialSubject.lprNumber',
-      ]);
+    // Begin to derive a credential from the above issued one
+    const presentationInstance2 = new Presentation();
+    const idx2 = await presentationInstance2.addCredentialToPresent(
+      credential,
+      { resolver },
+    );
 
-      // NOTE: revealing subject type because of JSON-LD processing for this certain credential
-      // you may not always need to do this depending on your JSON-LD contexts
-      await presentationInstance.addAttributeToReveal(idx, [
-        'credentialSubject.type.0',
-      ]);
-      await presentationInstance.addAttributeToReveal(idx, [
-        'credentialSubject.type.1',
-      ]);
+    // Reveal subject attributes
+    presentationInstance2.addAttributeToReveal(idx2, [
+      'credentialSubject.lprNumber',
+    ]);
 
-      // Begin to derive a credential from the above issued one
-      const presentationInstance2 = new Presentation();
-      const idx2 = await presentationInstance2.addCredentialToPresent(
-        credential,
-        { resolver },
-      );
+    // NOTE: revealing subject type because of JSON-LD processing for this certain credential
+    // you may not always need to do this depending on your JSON-LD contexts
+    presentationInstance2.addAttributeToReveal(idx2, [
+      'credentialSubject.type.0',
+    ]);
+    presentationInstance2.addAttributeToReveal(idx2, [
+      'credentialSubject.type.1',
+    ]);
 
-      // Reveal subject attributes
-      await presentationInstance2.addAttributeToReveal(idx2, [
-        'credentialSubject.lprNumber',
-      ]);
+    // Derive a W3C Verifiable Credential JSON from the above presentation
+    const credentials = await presentationInstance.deriveCredentials(
+      presentationOptions,
+    );
+    expect(credentials.length).toEqual(1);
+    expect(credentials[0].proof).toBeDefined();
+    expect(credentials[0]).toHaveProperty('credentialSubject');
+    expect(credentials[0].credentialSubject).toMatchObject(
+      expect.objectContaining({
+        type: unsignedCred.credentialSubject.type,
+        lprNumber: 1234,
+      }),
+    );
 
-      // NOTE: revealing subject type because of JSON-LD processing for this certain credential
-      // you may not always need to do this depending on your JSON-LD contexts
-      await presentationInstance2.addAttributeToReveal(idx2, [
-        'credentialSubject.type.0',
-      ]);
-      await presentationInstance2.addAttributeToReveal(idx2, [
-        'credentialSubject.type.1',
-      ]);
+    // Ensure reconstructing presentation from credential matches
+    // NOTE: ignoring proof here as itll differ when signed twice as above
+    const presentation = await presentationInstance2.createPresentation(
+      presentationOptions,
+    );
 
-      // Derive a W3C Verifiable Credential JSON from the above presentation
-      const credentials = await presentationInstance.deriveCredentials(
-        presentationOptions,
-      );
-      expect(credentials.length).toEqual(1);
-      expect(credentials[0].proof).toBeDefined();
-      expect(credentials[0]).toHaveProperty('credentialSubject');
-      expect(credentials[0].credentialSubject).toMatchObject(
-        expect.objectContaining({
-          type: unsignedCred.credentialSubject.type,
-          lprNumber: 1234,
-        }),
-      );
+    // Question: What is the point of this? A single credential cant be converted to a presentation and a presentation
+    // has other data that credential won't have
+    const reconstructedPres = convertToPresentation(credentials[0]);
+    expect(reconstructedPres.proof).toBeDefined();
+    expect({
+      ...reconstructedPres,
+      proof: '',
+    }).toMatchObject({ ...presentation, proof: '' });
 
-      // Ensure reconstructing presentation from credential matches
-      // NOTE: ignoring proof here as itll differ when signed twice as above
-      const presentation = await presentationInstance2.createPresentation(
-        presentationOptions,
-      );
+    // Try to verify the derived credential alone
+    const credentialResult = await verifyCredential(credentials[0], {
+      resolver,
+    });
+    expect(credentialResult.verified).toBe(true);
+    expect(credentialResult.error).toBe(undefined);
 
-      const reconstructedPres = convertToPresentation(credentials[0]);
-      expect(reconstructedPres.proof).toBeDefined();
-      expect({
-        ...reconstructedPres,
-        proof: '',
-      }).toMatchObject({ ...presentation, proof: '' });
+    // Create a VP and verify it from this credential
+    await createAndVerifyPresentation(credentials);
+  }, 30000);
 
-      // Try to verify the derived credential alone
-      const credentialResult = await verifyCredential(credentials[0], {
-        resolver,
-      });
-      expect(credentialResult.verified).toBe(true);
-      expect(credentialResult.error).toBe(undefined);
+  test('Holder creates a derived verifiable credential from a credential with range proofs', async () => {
+    const provingKeyId = 'provingKeyId';
+    const pk = BoundCheckSnarkSetup();
+    const provingKey = pk.decompress();
 
-      // Create a VP and verify it from this credential
-      await createAndVerifyPresentation(credentials);
-    }, 30000);
+    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
+    const unsignedCred = {
+      ...credentialJSON,
+      issuer: did1,
+    };
 
-    test('Holder creates a derived verifiable credential from a credential with range proofs', async () => {
-      const provingKeyId = 'provingKeyId';
-      const pk = BoundCheckSnarkSetup();
-      const provingKey = pk.decompress();
+    const presentationOptions = {
+      nonce: stringToU8a('noncetest'),
+      context: 'my context',
+    };
 
-      const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
-      const unsignedCred = {
-        ...credentialJSON,
-        issuer: did1,
-      };
+    // Create W3C credential
+    const credential = await issueCredential(issuerKey, unsignedCred);
 
-      const presentationOptions = {
-        nonce: stringToU8a('noncetest'),
-        context: 'my context',
-      };
+    // Begin to derive a credential from the above issued one
+    const presentationInstance = new Presentation();
+    const idx = await presentationInstance.addCredentialToPresent(
+      credential,
+      { resolver },
+    );
 
-      // Create W3C credential
-      const credential = await issueCredential(issuerKey, unsignedCred);
+    // NOTE: revealing subject type because of JSON-LD processing for this certain credential
+    // you may not always need to do this depending on your JSON-LD contexts
+    await presentationInstance.addAttributeToReveal(idx, [
+      'credentialSubject.type.0',
+    ]);
+    await presentationInstance.addAttributeToReveal(idx, [
+      'credentialSubject.type.1',
+    ]);
 
-      // Begin to derive a credential from the above issued one
-      const presentationInstance = new Presentation();
-      const idx = await presentationInstance.addCredentialToPresent(
-        credential,
-        { resolver },
-      );
+    // Enforce LPR number to be between values aswell as revealed
+    // NOTE: unlike other tests, we cannot "reveal" this value and enforce bounds at the same time!
+    presentationInstance.presBuilder.enforceBounds(
+      idx,
+      'credentialSubject.lprNumber',
+      1233,
+      1235,
+      provingKeyId,
+      provingKey,
+    );
 
-      // NOTE: revealing subject type because of JSON-LD processing for this certain credential
-      // you may not always need to do this depending on your JSON-LD contexts
-      await presentationInstance.addAttributeToReveal(idx, [
-        'credentialSubject.type.0',
-      ]);
-      await presentationInstance.addAttributeToReveal(idx, [
-        'credentialSubject.type.1',
-      ]);
+    // Enforce issuance date to be between values
+    // NOTE: we dont need to set proving key value here (must still set ID though!) as its done above, should pass undefined
+    presentationInstance.presBuilder.enforceBounds(
+      idx,
+      'issuanceDate',
+      new Date('2019-10-01'),
+      new Date('2020-01-01'),
+      provingKeyId,
+      undefined,
+    );
 
-      // Enforce LPR number to be between values aswell as revealed
-      // NOTE: unlike other tests, we cannot "reveal" this value and enforce bounds at the same time!
-      presentationInstance.presBuilder.enforceBounds(
-        idx,
-        'credentialSubject.lprNumber',
-        1233,
-        1235,
-        provingKeyId,
-        provingKey,
-      );
-
-      // Enforce issuance date to be between values
-      // NOTE: we dont need to set proving key value here (must still set ID though!) as its done above, should pass undefined
-      presentationInstance.presBuilder.enforceBounds(
-        idx,
-        'issuanceDate',
-        new Date('2019-10-01'),
-        new Date('2020-01-01'),
-        provingKeyId,
-        undefined,
-      );
-
-      // Derive a W3C Verifiable Credential JSON from the above presentation
-      const credentials = await presentationInstance.deriveCredentials(
-        presentationOptions,
-      );
-      expect(credentials.length).toEqual(1);
-      expect(credentials[0].proof).toBeDefined();
-      expect(credentials[0].proof.bounds).toBeDefined();
-      expect(credentials[0].proof.bounds).toEqual({
-        issuanceDate: {
-          min: 1569888000000,
-          max: 1577836800000,
+    // Derive a W3C Verifiable Credential JSON from the above presentation
+    const credentials = await presentationInstance.deriveCredentials(
+      presentationOptions,
+    );
+    expect(credentials.length).toEqual(1);
+    expect(credentials[0].proof).toBeDefined();
+    expect(credentials[0].proof.bounds).toBeDefined();
+    expect(credentials[0].proof.bounds).toEqual({
+      issuanceDate: {
+        min: 1569888000000,
+        max: 1577836800000,
+        paramId: 'provingKeyId',
+        protocol: 'LegoGroth16',
+      },
+      credentialSubject: {
+        lprNumber: {
+          min: 1233,
+          max: 1235,
           paramId: 'provingKeyId',
           protocol: 'LegoGroth16',
         },
-        credentialSubject: {
-          lprNumber: {
-            min: 1233,
-            max: 1235,
-            paramId: 'provingKeyId',
-            protocol: 'LegoGroth16',
-          },
-        },
-      });
-      expect(credentials[0]).toHaveProperty('credentialSubject');
-      expect(credentials[0].credentialSubject).toMatchObject(
-        expect.objectContaining({
-          type: unsignedCred.credentialSubject.type,
-        }),
-      );
+      },
+    });
+    expect(credentials[0]).toHaveProperty('credentialSubject');
+    expect(credentials[0].credentialSubject).toMatchObject(
+      expect.objectContaining({
+        type: unsignedCred.credentialSubject.type,
+      }),
+    );
 
-      const reconstructedPres = convertToPresentation(credentials[0]);
-      expect(reconstructedPres.proof).toBeDefined();
-      expect(reconstructedPres.spec.credentials[0].bounds).toEqual(credentials[0].proof.bounds);
+    const reconstructedPres = convertToPresentation(credentials[0]);
+    expect(reconstructedPres.proof).toBeDefined();
+    expect(reconstructedPres.spec.credentials[0].bounds).toEqual(credentials[0].proof.bounds);
 
-      // Setup predicate params with the verifying key for range proofs
-      const predicateParams = new Map();
-      predicateParams.set(provingKeyId, pk.getVerifyingKey());
+    // Setup predicate params with the verifying key for range proofs
+    const predicateParams = new Map();
+    predicateParams.set(provingKeyId, pk.getVerifyingKey());
 
-      // Try to verify the derived credential alone
-      const credentialResult = await verifyCredential(credentials[0], {
-        resolver,
-        predicateParams,
-      });
-      if (credentialResult.error) {
-        console.log('credentialResult.error', JSON.stringify(credentialResult.error, null, 2));
-      }
-      expect(credentialResult.error).toBe(undefined);
-      expect(credentialResult.verified).toBe(true);
+    // Try to verify the derived credential alone
+    const credentialResult = await verifyCredential(credentials[0], {
+      resolver,
+      predicateParams,
+    });
+    if (credentialResult.error) {
+      console.log('credentialResult.error', JSON.stringify(credentialResult.error, null, 2));
+    }
+    expect(credentialResult.error).toBe(undefined);
+    expect(credentialResult.verified).toBe(true);
 
-      // Create a VP and verify it from this credential
-      await createAndVerifyPresentation(credentials, { predicateParams });
-    }, 60000);
+    // Create a VP and verify it from this credential
+    await createAndVerifyPresentation(credentials, { predicateParams });
+  }, 60000);
 
-    afterAll(async () => {
-      await dock.disconnect();
-    }, 10000);
-  });
-}
+  afterAll(async () => {
+    await dock.disconnect();
+  }, 10000);
+});

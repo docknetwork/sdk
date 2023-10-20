@@ -99,7 +99,7 @@ export async function checkRevocationRegistryStatus(
   credential,
   documentLoader,
 ) {
-  const status = await getCredentialStatus(credential);
+  const status = getCredentialStatus(credential);
   const revId = getDockRevIdFromCredential(credential);
   if (!status) {
     throw new Error('Missing `credentialStatus`');

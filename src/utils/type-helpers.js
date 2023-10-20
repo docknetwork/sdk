@@ -53,6 +53,10 @@ const STATUS_LIST_ID_MATCHER = new RegExp(
   `^status-list2021:${METHOD_REG_EXP_PATTERN}:${HEX_ID_REG_EXP_PATTERN}$`,
 );
 
+const PRIVATE_STATUS_LIST_ID_MATCHER = new RegExp(
+  `^private-status-list2021:${HEX_ID_REG_EXP_PATTERN}$`,
+);
+
 /**
  * Fail if the given string isn't a valid `StatusList2021Credential` id.
  * @param statusListId
@@ -62,6 +66,19 @@ export function ensureStatusListId(statusListId) {
   if (!STATUS_LIST_ID_MATCHER.test(statusListId)) {
     throw new Error(
       `\`${statusListId}\` needs to be a valid \`StatusList2021Credential\` identifier.`,
+    );
+  }
+}
+
+/**
+ * Fail if the given string isn't a valid `PrivateStatusList2021Credential` id.
+ * @param statusListId
+ */
+export function ensurePrivateStatusListId(statusListId) {
+  ensureString(statusListId);
+  if (!PRIVATE_STATUS_LIST_ID_MATCHER.test(statusListId)) {
+    throw new Error(
+      `\`${statusListId}\` needs to be a valid \`PrivateStatusList2021Credential\` identifier.`,
     );
   }
 }

@@ -1,4 +1,5 @@
 import {
+  BBSPlusCredential,
   BBSPlusCredentialBuilder,
 } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 
@@ -27,6 +28,7 @@ export default class Bls12381BBSSignatureDock2022 extends DockCryptoSignature {
 
 Bls12381BBSSignatureDock2022.KeyPair = Bls12381G2KeyPairDock2022;
 Bls12381BBSSignatureDock2022.CredentialBuilder = BBSPlusCredentialBuilder;
+Bls12381BBSSignatureDock2022.Credential = BBSPlusCredential;
 Bls12381BBSSignatureDock2022.proofType = [
   Bls12381BBSSigDockSigName,
   `sec:${Bls12381BBSSigDockSigName}`,

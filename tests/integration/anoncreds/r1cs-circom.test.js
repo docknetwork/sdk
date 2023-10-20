@@ -17,9 +17,9 @@ import {
   getIndicesForMsgNames,
   CircomInputs,
   encodeRevealedMsgs,
+  MessageEncoder,
 } from '@docknetwork/crypto-wasm-ts';
 
-import { generateFieldElementFromNumber } from '@docknetwork/crypto-wasm';
 import { DockAPI } from '../../../src';
 import {
   FullNodeEndpoint,
@@ -302,7 +302,7 @@ for (const {
         revealedMsgsFromVerifier,
         false,
       );
-      const pub = [generateFieldElementFromNumber(1), encodedABNeg];
+      const pub = [MessageEncoder.encodePositiveNumberForSigning(1), encodedABNeg];
       const statement4 = Statement.r1csCircomVerifier(pub, snarkVk);
 
       const statementsVerifier = new Statements();

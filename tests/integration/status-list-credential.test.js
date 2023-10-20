@@ -13,7 +13,6 @@ import {
   signPresentation,
   verifyCredential,
   verifyPresentation,
-  expandJSONLD,
 } from '../../src/utils/vc/index';
 
 import { DockResolver } from '../../src/resolver';
@@ -51,7 +50,6 @@ buildTest('StatusList2021Credential', () => {
   let issuerKey;
   let issuerKeyPair;
   let credential;
-  let expanded;
 
   beforeAll(async () => {
     await dockAPI.init({
@@ -97,6 +95,13 @@ buildTest('StatusList2021Credential', () => {
       'https://w3id.org/vc/status-list/2021/v1',
     ]);
 
+    expect(() => addStatusList21EntryToCredential(
+      unsignedCred,
+      statusListCredentialId,
+      statusListCredentialIndex,
+      'wrongPurpose',
+    )).toThrow();
+
     // Issuer issues the credential with a given status list id for revocation
     unsignedCred = addStatusList21EntryToCredential(
       unsignedCred,
@@ -111,8 +116,6 @@ buildTest('StatusList2021Credential', () => {
       void 0,
       defaultDocumentLoader(resolver),
     );
-
-    expanded = await expandJSONLD(credential);
   }, 60000);
 
   afterAll(async () => {

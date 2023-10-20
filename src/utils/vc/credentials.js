@@ -1,6 +1,6 @@
 import jsonld from 'jsonld';
 import jsigs from 'jsonld-signatures';
-import { statusTypeMatches, checkStatus, decodeList } from '@digitalbazaar/vc-status-list';
+import { statusTypeMatches, checkStatus } from '@digitalbazaar/vc-status-list';
 
 import base64url from 'base64url';
 import { CredentialBuilder } from '@docknetwork/crypto-wasm-ts';
@@ -564,7 +564,7 @@ export async function verifyPrivateStatus(credentialStatus, privateStatusListCre
 
   // verify VC
   if (verifyStatusListCredential) {
-    const verifyResult = await verifyCredential(privateStatusListCredential, {
+    const verifyResult = await verifyCredential(privateStatusListCredential.toJSON(), {
       suite: fullSuite,
       documentLoader,
     });
@@ -573,15 +573,10 @@ export async function verifyPrivateStatus(credentialStatus, privateStatusListCre
     }
   }
 
-  // decode list from SL VC
-  // get JSON StatusList
-  const { credentialSubject: sl } = privateStatusListCredential;
-  const { encodedList } = sl;
-  const list = await decodeList({ encodedList });
-
   // check VC's SL index for the status
   const { statusListIndex } = credentialStatus;
   const index = parseInt(statusListIndex, 10);
+  const list = await privateStatusListCredential.decodedStatusList();
   const verified = !list.getStatus(index);
   return { verified };
 }

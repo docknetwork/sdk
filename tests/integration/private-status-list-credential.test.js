@@ -132,7 +132,7 @@ describe('PrivateStatusList2021Credential', () => {
     const status = getPrivateStatus(credential);
 
     // The status is given to a party capable of checking revocation. Revocation check passes.
-    const { verified: v } = await verifyPrivateStatus(status, privateStatusListCredential.toJSON(), { documentLoader: defaultDocumentLoader(resolver), expectedIssuer: credential.issuer });
+    const { verified: v } = await verifyPrivateStatus(status, privateStatusListCredential, { documentLoader: defaultDocumentLoader(resolver), expectedIssuer: credential.issuer });
     expect(v).toEqual(true);
 
     // Revoke credential
@@ -148,7 +148,7 @@ describe('PrivateStatusList2021Credential', () => {
     expect(v1).toEqual(true);
 
     // The revocation check fails now
-    const { verified: v2 } = await verifyPrivateStatus(status, privateStatusListCredential.toJSON(), { documentLoader: defaultDocumentLoader(resolver), expectedIssuer: credential.issuer });
+    const { verified: v2 } = await verifyPrivateStatus(status, privateStatusListCredential, { documentLoader: defaultDocumentLoader(resolver), expectedIssuer: credential.issuer });
     expect(v2).toEqual(false);
   });
 
@@ -188,7 +188,7 @@ describe('PrivateStatusList2021Credential', () => {
     const statuses = getPrivateStatuses(signedPres);
 
     // The status will be verified by the parties in charge of revocation and these can be distinct
-    const { verified: v } = await verifyPrivateStatus(statuses[0], privateStatusListCredential.toJSON(), { documentLoader: defaultDocumentLoader(resolver), expectedIssuer: credential.issuer });
+    const { verified: v } = await verifyPrivateStatus(statuses[0], privateStatusListCredential, { documentLoader: defaultDocumentLoader(resolver), expectedIssuer: credential.issuer });
     expect(v).toEqual(true);
 
     // Revoke credential
@@ -206,7 +206,7 @@ describe('PrivateStatusList2021Credential', () => {
     expect(v1).toBe(true);
 
     // Status check fails now.
-    const { verified: v2 } = await verifyPrivateStatus(statuses[0], privateStatusListCredential.toJSON(), { documentLoader: defaultDocumentLoader(resolver), expectedIssuer: credential.issuer });
+    const { verified: v2 } = await verifyPrivateStatus(statuses[0], privateStatusListCredential, { documentLoader: defaultDocumentLoader(resolver), expectedIssuer: credential.issuer });
     expect(v2).toEqual(false);
   });
 

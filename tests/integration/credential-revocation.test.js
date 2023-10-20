@@ -14,9 +14,7 @@ import { createPresentation } from '../create-presentation';
 
 import {
   OneOfPolicy,
-  DockRevRegQualifier,
   getDockRevIdFromCredential,
-  RevRegType,
 } from '../../src/utils/revocation';
 import {
   getUnsignedCred,
@@ -24,19 +22,10 @@ import {
 } from './helpers';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
 import { createNewDockDID } from '../../src/utils/did';
-import { getPrivateStatus } from '../../src/utils/vc/credentials';
+import { addRevRegIdToCredential, getPrivateStatus } from '../../src/utils/vc/credentials';
 import { getPrivateStatuses } from '../../src/utils/vc/presentations';
 
 const credId = 'A large credential id with size > 32 bytes';
-
-function addRevRegIdToCred(cred, regId) {
-  const newCred = { ...cred };
-  newCred.credentialStatus = {
-    id: `${DockRevRegQualifier}${regId}`,
-    type: RevRegType,
-  };
-  return newCred;
-}
 
 describe('Credential revocation with issuer as the revocation authority', () => {
   const dockAPI = new DockAPI();
@@ -87,7 +76,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     let unsignedCred = getUnsignedCred(credId, holderDID);
 
     // Issuer issues the credential with a given registry id for revocation
-    unsignedCred = addRevRegIdToCred(unsignedCred, registryId);
+    unsignedCred = addRevRegIdToCredential(unsignedCred, registryId);
 
     issuerKey = getKeyDoc(issuerDID, issuerKeyPair, 'Ed25519VerificationKey2018');
     credential = await issueCredential(issuerKey, unsignedCred);

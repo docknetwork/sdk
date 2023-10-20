@@ -9,9 +9,9 @@ import CredentialIssuancePurpose from './CredentialIssuancePurpose';
 import defaultDocumentLoader from './document-loader';
 import { getAndValidateSchemaIfPresent } from './schema';
 import {
-  checkRevocationRegistryStatus,
+  checkRevocationRegistryStatus, DockRevRegQualifier,
   getCredentialStatus,
-  isRegistryRevocationStatus,
+  isRegistryRevocationStatus, RevRegType,
 } from '../revocation';
 import { Resolver } from "../../resolver"; // eslint-disable-line
 
@@ -20,7 +20,12 @@ import {
   expandJSONLD,
   getKeyFromDIDDocument,
 } from './helpers';
-import { DEFAULT_CONTEXT_V1_URL, credentialContextField, PrivateStatusList2021EntryType } from './constants';
+import {
+  DEFAULT_CONTEXT_V1_URL,
+  credentialContextField,
+  PrivateStatusList2021EntryType,
+  DockStatusList2021Qualifier, StatusList2021EntryType, PrivateStatusList2021Qualifier,
+} from './constants';
 import { ensureValidDatetime } from '../type-helpers';
 
 import {
@@ -579,6 +584,73 @@ export async function verifyPrivateStatus(credentialStatus, privateStatusListCre
   const index = parseInt(statusListIndex, 10);
   const verified = !list.getStatus(index);
   return { verified };
+}
+
+/**
+ * Add revocation registry id to credential
+ * @param cred
+ * @param regId
+ * @returns {*}
+ */
+export function addRevRegIdToCredential(cred, regId) {
+  const newCred = { ...cred };
+  newCred.credentialStatus = {
+    id: `${DockRevRegQualifier}${regId}`,
+    type: RevRegType,
+  };
+  return newCred;
+}
+
+/**
+ * For setting revocation type of credential to status list 21
+ * @param cred
+ * @param statusListCredentialId
+ * @param statusListCredentialIndex
+ * @param purpose
+ * @returns {Object}
+ */
+export function addStatusList21EntryToCredential(
+  cred,
+  statusListCredentialId,
+  statusListCredentialIndex,
+  purpose,
+) {
+  return {
+    ...cred,
+    credentialStatus: {
+      id: `${DockStatusList2021Qualifier}${statusListCredentialId}#${statusListCredentialIndex}`,
+      type: StatusList2021EntryType,
+      statusListIndex: String(statusListCredentialIndex),
+      statusListCredential: `${DockStatusList2021Qualifier}${statusListCredentialId}`,
+      statusPurpose: purpose,
+    },
+  };
+}
+
+/**
+ * For setting revocation type of credential to private status list 21
+ * @param cred
+ * @param statusListCredentialId
+ * @param statusListCredentialIndex
+ * @param purpose
+ * @returns {Object}
+ */
+export function addPrivateStatusListEntryToCredential(
+  cred,
+  statusListCredentialId,
+  statusListCredentialIndex,
+  purpose,
+) {
+  return {
+    ...cred,
+    credentialStatus: {
+      id: `${PrivateStatusList2021Qualifier}${statusListCredentialId}#${statusListCredentialIndex}`,
+      type: PrivateStatusList2021EntryType,
+      statusListIndex: String(statusListCredentialIndex),
+      statusListCredential: `${PrivateStatusList2021Qualifier}${statusListCredentialId}`,
+      statusPurpose: purpose,
+    },
+  };
 }
 
 function getDocLoader(documentLoader, resolver) {

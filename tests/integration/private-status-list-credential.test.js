@@ -99,6 +99,13 @@ describe('PrivateStatusList2021Credential', () => {
       },
     }];
 
+    expect(() => addPrivateStatusListEntryToCredential(
+      unsignedCred,
+      statusListCredentialId,
+      statusListCredentialIndex,
+      'wrongPurpose',
+    )).toThrow();
+
     // Issuer issues the credential with a given status list id for revocation
     unsignedCred = addPrivateStatusListEntryToCredential(
       unsignedCred,

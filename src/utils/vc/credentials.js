@@ -615,6 +615,7 @@ export function addStatusList21EntryToCredential(
   statusListCredentialIndex,
   purpose,
 ) {
+  validateStatusPurpose(purpose);
   return {
     ...cred,
     credentialStatus: {
@@ -641,6 +642,7 @@ export function addPrivateStatusListEntryToCredential(
   statusListCredentialIndex,
   purpose,
 ) {
+  validateStatusPurpose(purpose);
   return {
     ...cred,
     credentialStatus: {
@@ -651,6 +653,12 @@ export function addPrivateStatusListEntryToCredential(
       statusPurpose: purpose,
     },
   };
+}
+
+function validateStatusPurpose(purpose) {
+  if (purpose !== 'suspension' && purpose !== 'revocation') {
+    throw new Error(`statusPurpose must 'suspension' or 'revocation' but was '${purpose}'`)
+  }
 }
 
 function getDocLoader(documentLoader, resolver) {

@@ -1968,7 +1968,7 @@ Throws an error if `msgCount` is greater than the supported message count.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="presentation.js.html">presentation.js</a>, <a href="presentation.js.html#line57">line 57</a>
+        <a href="presentation.js.html">presentation.js</a>, <a href="presentation.js.html#line53">line 53</a>
     </li></ul></dd>
     
 
@@ -2118,7 +2118,7 @@ Throws an error if `msgCount` is greater than the supported message count.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="presentation.js.html">presentation.js</a>, <a href="presentation.js.html#line88">line 88</a>
+        <a href="presentation.js.html">presentation.js</a>, <a href="presentation.js.html#line84">line 84</a>
     </li></ul></dd>
     
 
@@ -2899,6 +2899,210 @@ using this</td>
     
 
     
+    <h4 class="name" id="addPrivateStatusListEntryToCredential"><span class="type-signature"></span>addPrivateStatusListEntryToCredential<span class="signature">(cred, statusListCredentialId, statusListCredentialIndex, purpose)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    For setting revocation type of credential to private status list 21
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>cred</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>statusListCredentialId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>statusListCredentialIndex</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>purpose</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line634">line 634</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="addPublicKey"><span class="type-signature">(async) </span>addPublicKey<span class="signature">(publicKey, signerDid, keyPair, keyId, nonce, didModule, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;*>}</span></h4>
     
 
@@ -3454,6 +3658,378 @@ using this</td>
     <dd>
         
 <span class="param-type">Promise.&lt;*></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="addRevRegIdToCredential"><span class="type-signature"></span>addRevRegIdToCredential<span class="signature">(cred, regId)</span><span class="type-signature"> &rarr; {*}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Add revocation registry id to credential
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>cred</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>regId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line590">line 590</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="addStatusList21EntryToCredential"><span class="type-signature"></span>addStatusList21EntryToCredential<span class="signature">(cred, statusListCredentialId, statusListCredentialIndex, purpose)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    For setting revocation type of credential to status list 21
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>cred</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>statusListCredentialId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>statusListCredentialIndex</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>purpose</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line607">line 607</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
 
 
     </dd>
@@ -5352,7 +5928,7 @@ each document.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line191">line 191</a>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line198">line 198</a>
     </li></ul></dd>
     
 
@@ -5500,7 +6076,7 @@ each document.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line101">line 101</a>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line108">line 108</a>
     </li></ul></dd>
     
 
@@ -5648,7 +6224,7 @@ each document.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line170">line 170</a>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line177">line 177</a>
     </li></ul></dd>
     
 
@@ -5796,7 +6372,7 @@ each document.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line130">line 130</a>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line137">line 137</a>
     </li></ul></dd>
     
 
@@ -6301,6 +6877,700 @@ which is true if the credential is not revoked and false otherwise. The `error` 
 
 
 
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="convertCredential"><span class="type-signature"></span>convertCredential<span class="signature">(document, explicitProof, signingOptions)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Convert given JSON-LD credential to TS-anoncred's credential. This would not have the signature.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>document</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">JSON-LD credential</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>explicitProof</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signingOptions</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_common_DockCryptoSignature.js.html">utils/vc/crypto/common/DockCryptoSignature.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignature.js.html#line118">line 118</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    - Returns [serialized cred object, cred schema]
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="convertCredentialForPresBuilding"><span class="type-signature"></span>convertCredentialForPresBuilding<span class="signature">(document, explicitProof)</span><span class="type-signature"> &rarr; {Credential}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Convert given JSON-LD credential to TS-anoncred's credential for adding to a presentation. This would have the signature.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>document</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">JSON-LD credential</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>explicitProof</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_common_DockCryptoSignature.js.html">utils/vc/crypto/common/DockCryptoSignature.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignature.js.html#line181">line 181</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Credential</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="convertCredentialForVerification"><span class="type-signature"></span>convertCredentialForVerification<span class="signature">(document, explicitProof)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Convert given JSON-LD credential to TS-anoncred's credential. This would have the signature.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>document</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">JSON-LD credential</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>explicitProof</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_common_DockCryptoSignature.js.html">utils/vc/crypto/common/DockCryptoSignature.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignature.js.html#line208">line 208</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="convertCredentialToSerializedForSigning"><span class="type-signature">(async) </span>convertCredentialToSerializedForSigning<span class="signature">(document, explicitProof)</span><span class="type-signature"> &rarr; {Promise.&lt;Array>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Convert given JSON-LD credential to TS-anoncred's credential. This would not have the signature.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>document</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">JSON-LD credential</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>explicitProof</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_common_DockCryptoSignature.js.html">utils/vc/crypto/common/DockCryptoSignature.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignature.js.html#line248">line 248</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;Array></span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -9242,7 +10512,7 @@ accessible always, like in case of hardware wallet</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="presentation.js.html">presentation.js</a>, <a href="presentation.js.html#line70">line 70</a>
+        <a href="presentation.js.html">presentation.js</a>, <a href="presentation.js.html#line66">line 66</a>
     </li></ul></dd>
     
 
@@ -10793,6 +12063,10 @@ using this</td>
 
 
 
+<div class="description">
+    Create serialized credential for signing and verification
+</div>
+
 
 
 
@@ -10961,29 +12235,6 @@ using this</td>
 </table>
 
             </td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code></code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">labelBytes</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">bytes to be used for the params label</td>
         </tr>
 
     
@@ -12359,7 +13610,7 @@ cannot be found.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_type-helpers.js.html">utils/type-helpers.js</a>, <a href="utils_type-helpers.js.html#line118">line 118</a>
+        <a href="utils_type-helpers.js.html">utils/type-helpers.js</a>, <a href="utils_type-helpers.js.html#line135">line 135</a>
     </li></ul></dd>
     
 
@@ -12646,7 +13897,7 @@ cannot be found.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_type-helpers.js.html">utils/type-helpers.js</a>, <a href="utils_type-helpers.js.html#line87">line 87</a>
+        <a href="utils_type-helpers.js.html">utils/type-helpers.js</a>, <a href="utils_type-helpers.js.html#line104">line 104</a>
     </li></ul></dd>
     
 
@@ -12829,7 +14080,139 @@ cannot be found.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_type-helpers.js.html">utils/type-helpers.js</a>, <a href="utils_type-helpers.js.html#line75">line 75</a>
+        <a href="utils_type-helpers.js.html">utils/type-helpers.js</a>, <a href="utils_type-helpers.js.html#line92">line 92</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="ensurePrivateStatusListId"><span class="type-signature"></span>ensurePrivateStatusListId<span class="signature">(statusListId)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Fail if the given string isn't a valid `PrivateStatusList2021Credential` id.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>statusListId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_type-helpers.js.html">utils/type-helpers.js</a>, <a href="utils_type-helpers.js.html#line77">line 77</a>
     </li></ul></dd>
     
 
@@ -12961,7 +14344,7 @@ cannot be found.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_type-helpers.js.html">utils/type-helpers.js</a>, <a href="utils_type-helpers.js.html#line60">line 60</a>
+        <a href="utils_type-helpers.js.html">utils/type-helpers.js</a>, <a href="utils_type-helpers.js.html#line64">line 64</a>
     </li></ul></dd>
     
 
@@ -13357,7 +14740,7 @@ cannot be found.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_type-helpers.js.html">utils/type-helpers.js</a>, <a href="utils_type-helpers.js.html#line95">line 95</a>
+        <a href="utils_type-helpers.js.html">utils/type-helpers.js</a>, <a href="utils_type-helpers.js.html#line112">line 112</a>
     </li></ul></dd>
     
 
@@ -13660,6 +15043,174 @@ Returns the proofs, concatenated together.
     <dd>
         
 <span class="param-type">Promise.&lt;Array.&lt;Object>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="extractSchemaForSigning"><span class="type-signature">(async) </span>extractSchemaForSigning<span class="signature">(document, documentLoader)</span><span class="type-signature"> &rarr; {Promise.&lt;Array>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Extract schema from the document and load the schema from its id/reference if needed.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>document</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>documentLoader</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_common_DockCryptoSignature.js.html">utils/vc/crypto/common/DockCryptoSignature.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignature.js.html#line348">line 348</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;Array></span>
 
 
     </dd>
@@ -19077,6 +20628,345 @@ assumptions, throw an error. The return value may contain duplicate claims.
     
 
     
+    <h4 class="name" id="getJsonSchemaFromCredential"><span class="type-signature"></span>getJsonSchemaFromCredential<span class="signature">(credential, full)</span><span class="type-signature"> &rarr; {IEmbeddedJsonSchema|IJsonSchema}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get JSON-schema from the credential.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>credential</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>full</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">when set to true, returns the JSON schema with properties. This might be a fetched schema</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line507">line 507</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">IEmbeddedJsonSchema</span>
+|
+
+<span class="param-type">IJsonSchema</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getJsonSchemasFromPresentation"><span class="type-signature"></span>getJsonSchemasFromPresentation<span class="signature">(presentation, full)</span><span class="type-signature"> &rarr; {*}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get JSON-schemas of all credentials in the presentation
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>presentation</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>full</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">when set to true, returns the JSON schema of each credential with properties. This might be a fetched schema</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line331">line 331</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="getJSONSchemaSpec"><span class="type-signature">(async) </span>getJSONSchemaSpec<span class="signature">(json)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
     
 
@@ -20086,6 +21976,312 @@ using this</td>
     <dd>
         
 <span class="param-type">Promise.&lt;(undefined|*)></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getPrivateStatus"><span class="type-signature"></span>getPrivateStatus<span class="signature">(credential)</span><span class="type-signature"> &rarr; {*|Object|undefined}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get status of a credential issued with revocation type of private status list.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>credential</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line524">line 524</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
+|
+
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">undefined</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getPrivateStatuses"><span class="type-signature"></span>getPrivateStatuses<span class="signature">(presentation)</span><span class="type-signature"> &rarr; {Array.&lt;Object>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get status of all credentials from the presentation with revocation type of private status list.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>presentation</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line345">line 345</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array.&lt;Object></span>
 
 
     </dd>
@@ -21326,6 +23522,174 @@ or params were not found on chain which can happen if they were deleted after th
     
 
     
+    <h4 class="name" id="getTrimmedProofAndValue"><span class="type-signature"></span>getTrimmedProofAndValue<span class="signature">(document, explicitProof)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Remove actual value of proof (signature) from the object and return the trimmed object and the proof value
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>document</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>explicitProof</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_common_DockCryptoSignature.js.html">utils/vc/crypto/common/DockCryptoSignature.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignature.js.html#line321">line 321</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="getUniqueElementsFromArray"><span class="type-signature"></span>getUniqueElementsFromArray<span class="signature">(a, filterCallback)</span><span class="type-signature"> &rarr; {*}</span></h4>
     
 
@@ -22023,7 +24387,7 @@ not provided in the extrinsic.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_common_DockCryptoSignature.js.html">utils/vc/crypto/common/DockCryptoSignature.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignature.js.html#line211">line 211</a>
+        <a href="utils_vc_crypto_common_DockCryptoSignature.js.html">utils/vc/crypto/common/DockCryptoSignature.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignature.js.html#line433">line 433</a>
     </li></ul></dd>
     
 
@@ -22225,7 +24589,7 @@ not provided in the extrinsic.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_common_DockCryptoSignature.js.html">utils/vc/crypto/common/DockCryptoSignature.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignature.js.html#line250">line 250</a>
+        <a href="utils_vc_crypto_common_DockCryptoSignature.js.html">utils/vc/crypto/common/DockCryptoSignature.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignature.js.html#line472">line 472</a>
     </li></ul></dd>
     
 
@@ -23424,7 +25788,7 @@ not provided in the extrinsic.
     
 
     
-    <h4 class="name" id="issueCredential"><span class="type-signature"></span>issueCredential<span class="signature">(keyDoc, credential, compactProof<span class="signature-attributes">opt</span>, documentLoader, purpose, expansionMap, issuerObject<span class="signature-attributes">opt</span>, addSuiteContext<span class="signature-attributes">opt</span>, type<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
+    <h4 class="name" id="issueCredential"><span class="type-signature"></span>issueCredential<span class="signature">(keyDoc, credential, compactProof<span class="signature-attributes">opt</span>, documentLoader, purpose, expansionMap, issuerObject<span class="signature-attributes">opt</span>, addSuiteContext<span class="signature-attributes">opt</span>, type<span class="signature-attributes">opt</span>, resolver)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
     
 
     
@@ -23747,6 +26111,32 @@ not provided in the extrinsic.
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>resolver</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -23784,7 +26174,7 @@ not provided in the extrinsic.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line423">line 423</a>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line425">line 425</a>
     </li></ul></dd>
     
 
@@ -28614,6 +31004,156 @@ using this</td>
     
 
     
+    <h4 class="name" id="revealMandatoryFields"><span class="type-signature"></span>revealMandatoryFields<span class="signature">(credJson, document)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    To work with JSON-LD credentials/presentations, we must always reveal the context, type
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>credJson</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>document</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_common_DockCryptoSignature.js.html">utils/vc/crypto/common/DockCryptoSignature.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignature.js.html#line307">line 307</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="revoked"><span class="type-signature">(async) </span>revoked<span class="signature">(index)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
     
 
@@ -31434,7 +33974,7 @@ else only wait to be included in block.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_common_DockCryptoSignature.js.html">utils/vc/crypto/common/DockCryptoSignature.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignature.js.html#line263">line 263</a>
+        <a href="utils_vc_crypto_common_DockCryptoSignature.js.html">utils/vc/crypto/common/DockCryptoSignature.js</a>, <a href="utils_vc_crypto_common_DockCryptoSignature.js.html#line485">line 485</a>
     </li></ul></dd>
     
 
@@ -32137,7 +34677,7 @@ else only wait to be included in block.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line224">line 224</a>
+        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line225">line 225</a>
     </li></ul></dd>
     
 
@@ -39523,7 +42063,7 @@ schema `schema`
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line223">line 223</a>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line230">line 230</a>
     </li></ul></dd>
     
 
@@ -40626,7 +43166,7 @@ and hashed before verifying</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line121">line 121</a>
+        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line122">line 122</a>
     </li></ul></dd>
     
 
@@ -40669,6 +43209,247 @@ describe the error if any.
     <dd>
         
 <span class="param-type">Promise.&lt;object></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="verifyPrivateStatus"><span class="type-signature"></span>verifyPrivateStatus<span class="signature">(credentialStatus, privateStatusListCredential, documentLoader, suite, verifyStatusListCredential, expectedIssuer)</span><span class="type-signature"> &rarr; {Promise.&lt;{verified: boolean}>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Verify the credential status given the private status list credential
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>credentialStatus</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">`credentialStatus` field of the credential</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>privateStatusListCredential</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>documentLoader</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>suite</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>verifyStatusListCredential</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Whether to verify the status list credential. This isn't necessary when the caller
+of this function got the credential directly from the issuer.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>expectedIssuer</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Checks whether the issuer of the private status list credential matches the given</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line539">line 539</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;{verified: boolean}></span>
 
 
     </dd>
@@ -42792,7 +45573,7 @@ In case some property is missing, an error will be thrown.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line197">line 197</a>
+        <a href="utils_vc_credentials.js.html">utils/vc/credentials.js</a>, <a href="utils_vc_credentials.js.html#line204">line 204</a>
     </li></ul></dd>
     
 
@@ -43143,7 +45924,7 @@ In case some property is missing, an error will be thrown.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line101">line 101</a>
+        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line102">line 102</a>
     </li></ul></dd>
     
 
@@ -43215,7 +45996,7 @@ In case some property is missing, an error will be thrown.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line38">line 38</a>
+        <a href="utils_vc_presentations.js.html">utils/vc/presentations.js</a>, <a href="utils_vc_presentations.js.html#line39">line 39</a>
     </li></ul></dd>
     
 
@@ -43466,13 +46247,13 @@ In case some property is missing, an error will be thrown.
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockBlobResolver.html">DockBlobResolver</a></li><li><a href="DockDIDResolver.html">DockDIDResolver</a></li><li><a href="DockRevRegResolver.html">DockRevRegResolver</a></li><li><a href="DockStatusListResolver.html">DockStatusListResolver</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="NoOffchainDIDError.html">NoOffchainDIDError</a></li><li><a href="NoOnchainDIDError.html">NoOnchainDIDError</a></li><li><a href="Resolver.html">Resolver</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="setApi.html">setApi</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#accumulator">accumulator</a></li><li><a href="global.html#adaptKey">adaptKey</a></li><li><a href="global.html#addAttributeToReveal">addAttributeToReveal</a></li><li><a href="global.html#addCredentialToPresent">addCredentialToPresent</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#addParams">addParams</a></li><li><a href="global.html#addPositiveAccumulator">addPositiveAccumulator</a></li><li><a href="global.html#addPublicKey">addPublicKey</a></li><li><a href="global.html#addUniversalAccumulator">addUniversalAccumulator</a></li><li><a href="global.html#anchor">anchor</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#bbs">bbs</a></li><li><a href="global.html#bbsPlus">bbsPlus</a></li><li><a href="global.html#blob">blob</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildCreateStatusListCredentialTx">buildCreateStatusListCredentialTx</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#buildRemoveStatusListCredentialTx">buildRemoveStatusListCredentialTx</a></li><li><a href="global.html#buildResolversMap">buildResolversMap</a></li><li><a href="global.html#buildUpdateStatusListCredentialTx">buildUpdateStatusListCredentialTx</a></li><li><a href="global.html#bytesToWrappedBytes">bytesToWrappedBytes</a></li><li><a href="global.html#cacheLast">cacheLast</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationRegistryStatus">checkRevocationRegistryStatus</a></li><li><a href="global.html#claimgraphToStore">claimgraphToStore</a></li><li><a href="global.html#controllerIds">controllerIds</a></li><li><a href="global.html#convertToPresentation">convertToPresentation</a></li><li><a href="global.html#create">create</a></li><li><a href="global.html#createAddParamsTx">createAddParamsTx</a></li><li><a href="global.html#createAddPositiveAccumulatorTx">createAddPositiveAccumulatorTx</a></li><li><a href="global.html#createAddPublicKeyTx">createAddPublicKeyTx</a></li><li><a href="global.html#createAddUniversalAccumulatorTx">createAddUniversalAccumulatorTx</a></li><li><a href="global.html#createDidKey">createDidKey</a></li><li><a href="global.html#createDidSig">createDidSig</a></li><li><a href="global.html#createDidSignature">createDidSignature</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createParamsObjFromChainResponse">createParamsObjFromChainResponse</a></li><li><a href="global.html#createPresentation">createPresentation</a></li><li><a href="global.html#createPublicKeyObjFromChainResponse">createPublicKeyObjFromChainResponse</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createRemovePublicKeyTx">createRemovePublicKeyTx</a></li><li><a href="global.html#createResolver">createResolver</a></li><li><a href="global.html#createSignedRemoveStatusListCredential">createSignedRemoveStatusListCredential</a></li><li><a href="global.html#createSignedUpdateStatusListCredential">createSignedUpdateStatusListCredential</a></li><li><a href="global.html#createStatusListCredential">createStatusListCredential</a></li><li><a href="global.html#createVerifyData">createVerifyData</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#dereferenceFromIPFS">dereferenceFromIPFS</a></li><li><a href="global.html#did">did</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureArray">ensureArray</a></li><li><a href="global.html#ensureItemsAllowed">ensureItemsAllowed</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensureStatusListId">ensureStatusListId</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#fetchStatusList2021Credential">fetchStatusList2021Credential</a></li><li><a href="global.html#fmtIter">fmtIter</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromBytes">fromBytes</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromJsigProofValue">fromJsigProofValue</a></li><li><a href="global.html#fromJSON">fromJSON</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generate">generate</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccount">getAccount</a></li><li><a href="global.html#getAccumulator">getAccumulator</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAllParamsByDid">getAllParamsByDid</a></li><li><a href="global.html#getAllPublicKeysByDid">getAllPublicKeysByDid</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatus">getCredentialStatus</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyDoc">getKeyDoc</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getLastParamsWritten">getLastParamsWritten</a></li><li><a href="global.html#getNonce">getNonce</a></li><li><a href="global.html#getPublicKey">getPublicKey</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSerializedRemoveStatusListCredential">getSerializedRemoveStatusListCredential</a></li><li><a href="global.html#getSerializedUpdateStatusListCredential">getSerializedUpdateStatusListCredential</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#getUpdatesFromBlock">getUpdatesFromBlock</a></li><li><a href="global.html#getVerificationMethod">getVerificationMethod</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hasRegistryRevocationStatus">hasRegistryRevocationStatus</a></li><li><a href="global.html#HEX_ID_REG_EXP_PATTERN">HEX_ID_REG_EXP_PATTERN</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#isConnected">isConnected</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRegistryRevocationStatus">isRegistryRevocationStatus</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#matchingResolver">matchingResolver</a></li><li><a href="global.html#METHOD_REG_EXP_PATTERN">METHOD_REG_EXP_PATTERN</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#offchainSignatures">offchainSignatures</a></li><li><a href="global.html#parse">parse</a></li><li><a href="global.html#parseDid">parseDid</a></li><li><a href="global.html#parseEventAsAccumulatorUpdate">parseEventAsAccumulatorUpdate</a></li><li><a href="global.html#parseRDFDocument">parseRDFDocument</a></li><li><a href="global.html#parseRef">parseRef</a></li><li><a href="global.html#prepareAddParameters">prepareAddParameters</a></li><li><a href="global.html#prepareAddPublicKey">prepareAddPublicKey</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#ps">ps</a></li><li><a href="global.html#queryNextLookup">queryNextLookup</a></li><li><a href="global.html#removeAccumulator">removeAccumulator</a></li><li><a href="global.html#removeAccumulatorTx">removeAccumulatorTx</a></li><li><a href="global.html#removeParams">removeParams</a></li><li><a href="global.html#removeParamsTx">removeParamsTx</a></li><li><a href="global.html#removePublicKey">removePublicKey</a></li><li><a href="global.html#removeStatusListCredential">removeStatusListCredential</a></li><li><a href="global.html#removeStatusListCredentialWithOneOfPolicy">removeStatusListCredentialWithOneOfPolicy</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#revocation">revocation</a></li><li><a href="global.html#revoked">revoked</a></li><li><a href="global.html#revokedBatch">revokedBatch</a></li><li><a href="global.html#send">send</a></li><li><a href="global.html#setAccount">setAccount</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signAddParams">signAddParams</a></li><li><a href="global.html#signAddPublicKey">signAddPublicKey</a></li><li><a href="global.html#signAndSend">signAndSend</a></li><li><a href="global.html#signer">signer</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signExtrinsic">signExtrinsic</a></li><li><a href="global.html#signPrehashed">signPrehashed</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#signRemoveParams">signRemoveParams</a></li><li><a href="global.html#signRemovePublicKey">signRemovePublicKey</a></li><li><a href="global.html#statusListCredential">statusListCredential</a></li><li><a href="global.html#supports">supports</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toBytes">toBytes</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toJsonldjsNode">toJsonldjsNode</a></li><li><a href="global.html#toSubstrate">toSubstrate</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#updateAccumulator">updateAccumulator</a></li><li><a href="global.html#updateAccumulatorTx">updateAccumulatorTx</a></li><li><a href="global.html#updateStatusList">updateStatusList</a></li><li><a href="global.html#updateStatusListCredential">updateStatusListCredential</a></li><li><a href="global.html#updateStatusListCredentialWithOneOfPolicy">updateStatusListCredentialWithOneOfPolicy</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateAddress">validateAddress</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyEcdsaSecp256k1SigPrehashed">verifyEcdsaSecp256k1SigPrehashed</a></li><li><a href="global.html#verifyID">verifyID</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#verifySignature">verifySignature</a></li><li><a href="global.html#WILDCARD">WILDCARD</a></li><li><a href="global.html#withExtendedStaticProperties">withExtendedStaticProperties</a></li><li><a href="global.html#withInitializedDockAPI">withInitializedDockAPI</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockBlobResolver.html">DockBlobResolver</a></li><li><a href="DockDIDResolver.html">DockDIDResolver</a></li><li><a href="DockRevRegResolver.html">DockRevRegResolver</a></li><li><a href="DockStatusListResolver.html">DockStatusListResolver</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="NoOffchainDIDError.html">NoOffchainDIDError</a></li><li><a href="NoOnchainDIDError.html">NoOnchainDIDError</a></li><li><a href="Resolver.html">Resolver</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="setApi.html">setApi</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#accumulator">accumulator</a></li><li><a href="global.html#adaptKey">adaptKey</a></li><li><a href="global.html#addAttributeToReveal">addAttributeToReveal</a></li><li><a href="global.html#addCredentialToPresent">addCredentialToPresent</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#addParams">addParams</a></li><li><a href="global.html#addPositiveAccumulator">addPositiveAccumulator</a></li><li><a href="global.html#addPrivateStatusListEntryToCredential">addPrivateStatusListEntryToCredential</a></li><li><a href="global.html#addPublicKey">addPublicKey</a></li><li><a href="global.html#addRevRegIdToCredential">addRevRegIdToCredential</a></li><li><a href="global.html#addStatusList21EntryToCredential">addStatusList21EntryToCredential</a></li><li><a href="global.html#addUniversalAccumulator">addUniversalAccumulator</a></li><li><a href="global.html#anchor">anchor</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#bbs">bbs</a></li><li><a href="global.html#bbsPlus">bbsPlus</a></li><li><a href="global.html#blob">blob</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildCreateStatusListCredentialTx">buildCreateStatusListCredentialTx</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#buildRemoveStatusListCredentialTx">buildRemoveStatusListCredentialTx</a></li><li><a href="global.html#buildResolversMap">buildResolversMap</a></li><li><a href="global.html#buildUpdateStatusListCredentialTx">buildUpdateStatusListCredentialTx</a></li><li><a href="global.html#bytesToWrappedBytes">bytesToWrappedBytes</a></li><li><a href="global.html#cacheLast">cacheLast</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationRegistryStatus">checkRevocationRegistryStatus</a></li><li><a href="global.html#claimgraphToStore">claimgraphToStore</a></li><li><a href="global.html#controllerIds">controllerIds</a></li><li><a href="global.html#convertCredential">convertCredential</a></li><li><a href="global.html#convertCredentialForPresBuilding">convertCredentialForPresBuilding</a></li><li><a href="global.html#convertCredentialForVerification">convertCredentialForVerification</a></li><li><a href="global.html#convertCredentialToSerializedForSigning">convertCredentialToSerializedForSigning</a></li><li><a href="global.html#convertToPresentation">convertToPresentation</a></li><li><a href="global.html#create">create</a></li><li><a href="global.html#createAddParamsTx">createAddParamsTx</a></li><li><a href="global.html#createAddPositiveAccumulatorTx">createAddPositiveAccumulatorTx</a></li><li><a href="global.html#createAddPublicKeyTx">createAddPublicKeyTx</a></li><li><a href="global.html#createAddUniversalAccumulatorTx">createAddUniversalAccumulatorTx</a></li><li><a href="global.html#createDidKey">createDidKey</a></li><li><a href="global.html#createDidSig">createDidSig</a></li><li><a href="global.html#createDidSignature">createDidSignature</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createParamsObjFromChainResponse">createParamsObjFromChainResponse</a></li><li><a href="global.html#createPresentation">createPresentation</a></li><li><a href="global.html#createPublicKeyObjFromChainResponse">createPublicKeyObjFromChainResponse</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createRemovePublicKeyTx">createRemovePublicKeyTx</a></li><li><a href="global.html#createResolver">createResolver</a></li><li><a href="global.html#createSignedRemoveStatusListCredential">createSignedRemoveStatusListCredential</a></li><li><a href="global.html#createSignedUpdateStatusListCredential">createSignedUpdateStatusListCredential</a></li><li><a href="global.html#createStatusListCredential">createStatusListCredential</a></li><li><a href="global.html#createVerifyData">createVerifyData</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#dereferenceFromIPFS">dereferenceFromIPFS</a></li><li><a href="global.html#did">did</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureArray">ensureArray</a></li><li><a href="global.html#ensureItemsAllowed">ensureItemsAllowed</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensurePrivateStatusListId">ensurePrivateStatusListId</a></li><li><a href="global.html#ensureStatusListId">ensureStatusListId</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#extractSchemaForSigning">extractSchemaForSigning</a></li><li><a href="global.html#fetchStatusList2021Credential">fetchStatusList2021Credential</a></li><li><a href="global.html#fmtIter">fmtIter</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromBytes">fromBytes</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromJsigProofValue">fromJsigProofValue</a></li><li><a href="global.html#fromJSON">fromJSON</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generate">generate</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccount">getAccount</a></li><li><a href="global.html#getAccumulator">getAccumulator</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAllParamsByDid">getAllParamsByDid</a></li><li><a href="global.html#getAllPublicKeysByDid">getAllPublicKeysByDid</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatus">getCredentialStatus</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getHexIdentifierFromDID">getHexIdentifierFromDID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJsonSchemaFromCredential">getJsonSchemaFromCredential</a></li><li><a href="global.html#getJsonSchemasFromPresentation">getJsonSchemasFromPresentation</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyDoc">getKeyDoc</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getLastParamsWritten">getLastParamsWritten</a></li><li><a href="global.html#getNonce">getNonce</a></li><li><a href="global.html#getPrivateStatus">getPrivateStatus</a></li><li><a href="global.html#getPrivateStatuses">getPrivateStatuses</a></li><li><a href="global.html#getPublicKey">getPublicKey</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSerializedRemoveStatusListCredential">getSerializedRemoveStatusListCredential</a></li><li><a href="global.html#getSerializedUpdateStatusListCredential">getSerializedUpdateStatusListCredential</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getTrimmedProofAndValue">getTrimmedProofAndValue</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#getUpdatesFromBlock">getUpdatesFromBlock</a></li><li><a href="global.html#getVerificationMethod">getVerificationMethod</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hasRegistryRevocationStatus">hasRegistryRevocationStatus</a></li><li><a href="global.html#HEX_ID_REG_EXP_PATTERN">HEX_ID_REG_EXP_PATTERN</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#isConnected">isConnected</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRegistryRevocationStatus">isRegistryRevocationStatus</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#matchingResolver">matchingResolver</a></li><li><a href="global.html#METHOD_REG_EXP_PATTERN">METHOD_REG_EXP_PATTERN</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#offchainSignatures">offchainSignatures</a></li><li><a href="global.html#parse">parse</a></li><li><a href="global.html#parseDid">parseDid</a></li><li><a href="global.html#parseEventAsAccumulatorUpdate">parseEventAsAccumulatorUpdate</a></li><li><a href="global.html#parseRDFDocument">parseRDFDocument</a></li><li><a href="global.html#parseRef">parseRef</a></li><li><a href="global.html#prepareAddParameters">prepareAddParameters</a></li><li><a href="global.html#prepareAddPublicKey">prepareAddPublicKey</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#ps">ps</a></li><li><a href="global.html#queryNextLookup">queryNextLookup</a></li><li><a href="global.html#removeAccumulator">removeAccumulator</a></li><li><a href="global.html#removeAccumulatorTx">removeAccumulatorTx</a></li><li><a href="global.html#removeParams">removeParams</a></li><li><a href="global.html#removeParamsTx">removeParamsTx</a></li><li><a href="global.html#removePublicKey">removePublicKey</a></li><li><a href="global.html#removeStatusListCredential">removeStatusListCredential</a></li><li><a href="global.html#removeStatusListCredentialWithOneOfPolicy">removeStatusListCredentialWithOneOfPolicy</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#revealMandatoryFields">revealMandatoryFields</a></li><li><a href="global.html#revocation">revocation</a></li><li><a href="global.html#revoked">revoked</a></li><li><a href="global.html#revokedBatch">revokedBatch</a></li><li><a href="global.html#send">send</a></li><li><a href="global.html#setAccount">setAccount</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signAddParams">signAddParams</a></li><li><a href="global.html#signAddPublicKey">signAddPublicKey</a></li><li><a href="global.html#signAndSend">signAndSend</a></li><li><a href="global.html#signer">signer</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signExtrinsic">signExtrinsic</a></li><li><a href="global.html#signPrehashed">signPrehashed</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#signRemoveParams">signRemoveParams</a></li><li><a href="global.html#signRemovePublicKey">signRemovePublicKey</a></li><li><a href="global.html#statusListCredential">statusListCredential</a></li><li><a href="global.html#supports">supports</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toBytes">toBytes</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toJsonldjsNode">toJsonldjsNode</a></li><li><a href="global.html#toSubstrate">toSubstrate</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#updateAccumulator">updateAccumulator</a></li><li><a href="global.html#updateAccumulatorTx">updateAccumulatorTx</a></li><li><a href="global.html#updateStatusList">updateStatusList</a></li><li><a href="global.html#updateStatusListCredential">updateStatusListCredential</a></li><li><a href="global.html#updateStatusListCredentialWithOneOfPolicy">updateStatusListCredentialWithOneOfPolicy</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateAddress">validateAddress</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyEcdsaSecp256k1SigPrehashed">verifyEcdsaSecp256k1SigPrehashed</a></li><li><a href="global.html#verifyID">verifyID</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#verifyPrivateStatus">verifyPrivateStatus</a></li><li><a href="global.html#verifySignature">verifySignature</a></li><li><a href="global.html#WILDCARD">WILDCARD</a></li><li><a href="global.html#withExtendedStaticProperties">withExtendedStaticProperties</a></li><li><a href="global.html#withInitializedDockAPI">withInitializedDockAPI</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Fri Oct 20 2023 20:01:43 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Fri Oct 20 2023 20:53:21 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

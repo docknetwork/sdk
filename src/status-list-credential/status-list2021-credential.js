@@ -74,7 +74,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
     this.updateStatusList(statusPurpose, statusList, revokeIndices);
 
     const jsonCred = await createCredential({
-      id: `${DockStatusList2021Qualifier}${id}`,
+      id: `${this.qualifier}${id}`,
       list: statusList,
       statusPurpose,
     });
@@ -271,3 +271,4 @@ export default class StatusList2021Credential extends VerifiableCredential {
  * Allowed status purposes for this credential type.
  */
 StatusList2021Credential.statusPurposes = new Set(['revocation', 'suspension']);
+StatusList2021Credential.qualifier = DockStatusList2021Qualifier;

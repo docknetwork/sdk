@@ -24,6 +24,8 @@ import {
 } from './helpers';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
 import { createNewDockDID } from '../../src/utils/did';
+import { getPrivateStatus } from '../../src/utils/vc/credentials';
+import { getPrivateStatuses } from '../../src/utils/vc/presentations';
 
 const credId = 'A large credential id with size > 32 bytes';
 
@@ -105,6 +107,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
       compactProof: true,
     });
     expect(result.verified).toBe(true);
+    expect(getPrivateStatus(credential)).not.toBeDefined();
 
     // Revoke the credential
     await dockAPI.revocation.revokeCredentialWithOneOfPolicy(registryId, revId, issuerDID, issuerKeyPair, 1, { didModule: dockAPI.did }, false);
@@ -150,6 +153,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
       compactProof: true,
     });
     expect(result.verified).toBe(true);
+    expect(getPrivateStatuses(signedPres)[0]).not.toBeDefined();
 
     // Revoke credential
     await dockAPI.revocation.revokeCredentialWithOneOfPolicy(registryId, revId, issuerDID, issuerKeyPair, 1, { didModule: dockAPI.did }, false);

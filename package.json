@@ -99,7 +99,7 @@
   },
   "dependencies": {
     "@digitalbazaar/vc-status-list": "^4.0.0",
-    "@docknetwork/crypto-wasm-ts": "0.45.0",
+    "@docknetwork/crypto-wasm-ts": "0.48.0",
     "@docknetwork/node-types": "^0.16.0",
     "@juanelas/base64": "^1.0.5",
     "@polkadot/api": "9.7.1",
@@ -114,6 +114,7 @@
     "flat": "^5.0.2",
     "js-sha256": "0.9.0",
     "json-canonicalize": "1.0.4",
+    "json-stringify-deterministic": "^1.0.11",
     "jsonld": "^5.0.0",
     "jsonld-signatures": "^9.3.1",
     "jsonschema": "1.4.1",
@@ -121,6 +122,7 @@
     "mrklt": "^0.2.0",
     "n3": "1.16.2",
     "pako": "^2.1.0",
-    "rify": "^0.7.1"
+    "rify": "^0.7.1",
+    "underscore": "^1.13.6"
   }
 }

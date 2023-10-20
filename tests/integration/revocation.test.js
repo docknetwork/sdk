@@ -68,19 +68,58 @@ describe('Revocation Module', () => {
     expect(!!reg).toBe(true);
   }, 40000);
 
-  test('Can revoke from a registry', async () => {
+  test('Can revoke single from a registry', async () => {
     const [revoke, sig, nonce] = await dock.revocation.createSignedRevoke(registryId, revokeIds, ownerDID, pair, 1, { didModule: dock.did });
     await dock.revocation.revoke(revoke, [[sig, nonce]], false);
     const revocationStatus = await dock.revocation.getIsRevoked(registryId, revokeId);
     expect(revocationStatus).toBe(true);
   }, 40000);
 
-  test('Can unrevoke from a registry', async () => {
+
+  test('Can unrevoke single from a registry', async () => {
     const [unrevoke, sig, nonce] = await dock.revocation.createSignedUnRevoke(registryId, revokeIds, ownerDID, pair, 1, { didModule: dock.did });
     await dock.revocation.unrevoke(unrevoke, [[sig, nonce]], false);
 
     const revocationStatus = await dock.revocation.getIsRevoked(registryId, revokeId);
     expect(revocationStatus).toBe(false);
+  }, 40000);
+
+  test('Can revoke and unrevoke multiple from a registry', async () => {
+    const rIds = new Set();
+    rIds.add(randomAsHex(32));
+    rIds.add(randomAsHex(32));
+    rIds.add(randomAsHex(32));
+
+    const rIdsArr = Array.from(rIds);
+
+    const [revoke, sig, nonce] = await dock.revocation.createSignedRevoke(registryId, rIds, ownerDID, pair, 1, { didModule: dock.did });
+    await dock.revocation.revoke(revoke, [[sig, nonce]], false);
+
+    for (let i = 0; i < rIdsArr.length; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      const status = await dock.revocation.getIsRevoked(registryId, rIdsArr[i]);
+      expect(status).toBe(true);
+    }
+
+    const revocationStatuses = await dock.revocation.areRevoked(rIdsArr.map((r) => [registryId, r]));
+    expect(revocationStatuses.length).toBe(rIds.size);
+    revocationStatuses.forEach((s) => expect(s).toBe(true));
+
+    const [unrevoke, sig1, nonce1] = await dock.revocation.createSignedUnRevoke(registryId, rIds, ownerDID, pair, 1, { didModule: dock.did });
+
+    // Note: Intentionally passing true and waiting for finalization as not doing that makes the multi-query check fail.
+    // This seems like a bug since the single query check done in next loop work. Even the upgrade to @polkadot/api version 9.14 didn't fix
+    await dock.revocation.unrevoke(unrevoke, [[sig1, nonce1]], true);
+
+    for (let i = 0; i < rIdsArr.length; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      const status = await dock.revocation.getIsRevoked(registryId, rIdsArr[i]);
+      expect(status).toBe(false);
+    }
+
+    const revocationStatuses1 = await dock.revocation.areRevoked(rIdsArr.map((r) => [registryId, r]));
+    expect(revocationStatuses1.length).toBe(rIds.size);
+    revocationStatuses1.forEach((s) => expect(s).toBe(false));
   }, 40000);
 
   test('Can remove a registry', async () => {

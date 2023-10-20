@@ -1,15 +1,17 @@
 import jsonld from 'jsonld';
 import jsigs from 'jsonld-signatures';
-import { statusTypeMatches, checkStatus } from '@digitalbazaar/vc-status-list';
+import { statusTypeMatches, checkStatus, decodeList } from '@digitalbazaar/vc-status-list';
 
 import base64url from 'base64url';
+import { CredentialBuilder } from '@docknetwork/crypto-wasm-ts';
+import { CredentialSchema } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 import CredentialIssuancePurpose from './CredentialIssuancePurpose';
 import defaultDocumentLoader from './document-loader';
 import { getAndValidateSchemaIfPresent } from './schema';
 import {
   checkRevocationRegistryStatus,
   getCredentialStatus,
-  hasRegistryRevocationStatus,
+  isRegistryRevocationStatus,
 } from '../revocation';
 import { Resolver } from "../../resolver"; // eslint-disable-line
 
@@ -18,7 +20,7 @@ import {
   expandJSONLD,
   getKeyFromDIDDocument,
 } from './helpers';
-import { DEFAULT_CONTEXT_V1_URL, credentialContextField } from './constants';
+import { DEFAULT_CONTEXT_V1_URL, credentialContextField, PrivateStatusList2021EntryType } from './constants';
 import { ensureValidDatetime } from '../type-helpers';
 
 import {
@@ -241,11 +243,8 @@ export async function verifyCredential(
     blindedAttributesCircomOutputs = null,
   } = {},
 ) {
-  if (documentLoader && resolver) {
-    throw new Error(
-      'Passing resolver and documentLoader results in resolver being ignored, please re-factor.',
-    );
-  }
+  // Set document loader
+  const docLoader = getDocLoader(documentLoader, resolver);
 
   const isJWT = typeof vcJSONorString === 'string';
   const credential = isJWT
@@ -255,9 +254,6 @@ export async function verifyCredential(
   if (!credential) {
     throw new TypeError('A "credential" property is required for verifying.');
   }
-
-  // Set document loader
-  const docLoader = documentLoader || defaultDocumentLoader(resolver);
 
   // Check credential is valid
   checkCredential(credential);
@@ -383,8 +379,8 @@ export async function verifyCredential(
         }
       }
 
-      const isRegistryRevocationStatus = hasRegistryRevocationStatus(expandedCredential);
-      if (isRegistryRevocationStatus) {
+      const isRegRevStatus = isRegistryRevocationStatus(status);
+      if (isRegRevStatus) {
         const revResult = await checkRevocationRegistryStatus(
           expandedCredential,
           docLoader,
@@ -396,7 +392,7 @@ export async function verifyCredential(
         }
       }
 
-      if (!isStatusList2021Status && !isRegistryRevocationStatus) {
+      if (!isStatusList2021Status && !isRegRevStatus && getPrivateStatus(credential) === undefined) {
         throw new Error(`Unsupported \`credentialStatus\`: \`${status}\``);
       }
     }
@@ -418,6 +414,7 @@ export async function verifyCredential(
  *   behavior of each signature suite enforcing the presence of its own
  *   `@context` (if it is not present, it's added to the context list).
  * @param {(jsonld|jwt|proofValue)} [type] - Optional format/type of the credential (JSON-LD, JWT, proofValue)
+ * @param resolver
  * @return {Promise<object>} The signed credential object.
  */
 export async function issueCredential(
@@ -430,7 +427,11 @@ export async function issueCredential(
   issuerObject = null,
   addSuiteContext = true,
   type = VC_ISSUE_TYPE_DEFAULT,
+  resolver = null,
 ) {
+  // Set document loader
+  const docLoader = getDocLoader(documentLoader, resolver);
+
   const useProofValue = type === VC_ISSUE_TYPE_PROOFVALUE;
   const useJWT = type === VC_ISSUE_TYPE_JWT;
 
@@ -466,22 +467,125 @@ export async function issueCredential(
     throw new TypeError('"suite.verificationMethod" property is required.');
   }
 
-  // Some suites (such as Dock BBS+) require a schema to exist
-  // we intentionally dont set the ID here because it will be auto generated on signing
-  if (!cred.credentialSchema && suite.requireCredentialSchema) {
-    cred.credentialSchema = {
-      id: '',
-      type: 'JsonSchemaValidator2018',
-    };
+  if (suite.requireCredentialSchema) {
+    // BBS+, BBS and PS require `cryptoVersion` key to be set. This version wont be overwritten but doesn't matter if it
+    // does, we only want to set the key
+    cred.cryptoVersion = CredentialBuilder.VERSION;
+
+    // Some suites (such as Dock BBS+) require a schema to exist
+    // we intentionally dont set the ID here because it will be auto generated on signing
+    if (!cred.credentialSchema) {
+      cred.credentialSchema = {
+        id: '',
+        type: 'JsonSchemaValidator2018',
+      };
+    }
   }
 
   // Sign and return the credential with jsonld-signatures otherwise
   return jsigs.sign(cred, {
     purpose: purpose || new CredentialIssuancePurpose(),
-    documentLoader: documentLoader || defaultDocumentLoader(),
+    documentLoader: docLoader,
     suite,
     compactProof,
     expansionMap,
     addSuiteContext,
   });
+}
+
+/**
+ * Get JSON-schema from the credential.
+ * @param credential
+ * @param full - when set to true, returns the JSON schema with properties. This might be a fetched schema
+ * @returns {IEmbeddedJsonSchema | IJsonSchema}
+ */
+export function getJsonSchemaFromCredential(credential, full = false) {
+  if (credential.credentialSchema === undefined) {
+    throw new Error('`credentialSchema` key must be defined in the credential');
+  }
+  if (typeof credential.credentialSchema.id !== 'string') {
+    throw new Error(`credentialSchema was expected to be string but was ${typeof credential.credentialSchema}`);
+  }
+  // eslint-disable-next-line no-nested-ternary
+  const key = full ? (credential.credentialSchema.fullJsonSchema !== undefined ? 'fullJsonSchema' : 'id') : 'id';
+  return CredentialSchema.convertFromDataUri(credential.credentialSchema[key]);
+}
+
+/**
+ * Get status of a credential issued with revocation type of private status list.
+ * @param credential
+ * @returns {*|Object|undefined}
+ */
+export function getPrivateStatus(credential) {
+  return credential.credentialStatus && credential.credentialStatus.type === PrivateStatusList2021EntryType ? credential.credentialStatus : undefined;
+}
+
+/**
+ * Verify the credential status given the private status list credential
+ * @param credentialStatus - `credentialStatus` field of the credential
+ * @param privateStatusListCredential
+ * @param documentLoader
+ * @param suite
+ * @param verifyStatusListCredential - Whether to verify the status list credential. This isn't necessary when the caller
+ * of this function got the credential directly from the issuer.
+ * @param expectedIssuer - Checks whether the issuer of the private status list credential matches the given
+ * @returns {Promise<{verified: boolean}>}
+ */
+export async function verifyPrivateStatus(credentialStatus, privateStatusListCredential, {
+  documentLoader = null, suite = [], verifyStatusListCredential = true, expectedIssuer = null,
+}) {
+  const fullSuite = [
+    new Ed25519Signature2018(),
+    new EcdsaSepc256k1Signature2019(),
+    new Sr25519Signature2020(),
+    new JsonWebSignature2020(),
+    ...suite,
+  ];
+  const { statusPurpose: credentialStatusPurpose } = credentialStatus;
+  const { statusPurpose: slCredentialStatusPurpose } = privateStatusListCredential.credentialSubject;
+  if (slCredentialStatusPurpose !== credentialStatusPurpose) {
+    throw new Error(
+      `The status purpose "${slCredentialStatusPurpose}" of the status list credential does not match the status purpose "${credentialStatusPurpose}" in the credential.`,
+    );
+  }
+
+  // ensure that the issuer of the verifiable credential matches
+  if (typeof expectedIssuer === 'string') {
+    const issuer = typeof privateStatusListCredential.issuer === 'object' ? privateStatusListCredential.issuer.id : privateStatusListCredential.issuer;
+    if (issuer !== expectedIssuer) {
+      throw new Error(`Expected issuer to be ${expectedIssuer} but found ${issuer}`);
+    }
+  }
+
+  // verify VC
+  if (verifyStatusListCredential) {
+    const verifyResult = await verifyCredential(privateStatusListCredential, {
+      suite: fullSuite,
+      documentLoader,
+    });
+    if (!verifyResult.verified) {
+      throw new Error(`Status list credential failed to verify with error: ${verifyResult.error}`);
+    }
+  }
+
+  // decode list from SL VC
+  // get JSON StatusList
+  const { credentialSubject: sl } = privateStatusListCredential;
+  const { encodedList } = sl;
+  const list = await decodeList({ encodedList });
+
+  // check VC's SL index for the status
+  const { statusListIndex } = credentialStatus;
+  const index = parseInt(statusListIndex, 10);
+  const verified = !list.getStatus(index);
+  return { verified };
+}
+
+function getDocLoader(documentLoader, resolver) {
+  if (documentLoader && resolver) {
+    throw new Error(
+      'Passing resolver and documentLoader results in resolver being ignored, please re-factor.',
+    );
+  }
+  return documentLoader || defaultDocumentLoader(resolver);
 }

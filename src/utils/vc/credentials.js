@@ -657,7 +657,7 @@ export function addPrivateStatusListEntryToCredential(
 
 function validateStatusPurpose(purpose) {
   if (purpose !== 'suspension' && purpose !== 'revocation') {
-    throw new Error(`statusPurpose must 'suspension' or 'revocation' but was '${purpose}'`)
+    throw new Error(`statusPurpose must 'suspension' or 'revocation' but was '${purpose}'`);
   }
 }
 

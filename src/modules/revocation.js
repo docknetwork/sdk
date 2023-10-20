@@ -162,8 +162,10 @@ class RevocationModule {
    * Get revocation statuses of multiple ids. Note that this function sees changes a bit delayed after the actual write
    * so if this function is being called immediately after any concerned storage is written to, you should wait for block
    * finalization. See its usage in the test.
-   * @param {[string, string][]} regRevPairs - An array of pairs where the first item is the registry id and the
+   * @param {Array[]} regRevPairs - An array of pairs where the first item is the registry id and the
    * second is the revocation id.
+   * @param {String} regRevPairs[][0] - Registry id.
+   * @param {String} regRevPairs[][1] - Revocation id.
    * @returns {Promise<*>}
    */
   async areRevoked(regRevPairs) {

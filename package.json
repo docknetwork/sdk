@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "6.6.1",
+  "version": "6.7.0",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -122,7 +122,6 @@
     "mrklt": "^0.2.0",
     "n3": "1.16.2",
     "pako": "^2.1.0",
-    "rify": "^0.7.1",
-    "underscore": "^1.13.6"
+    "rify": "^0.7.1"
   }
 }

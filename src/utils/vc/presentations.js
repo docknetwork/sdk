@@ -340,7 +340,7 @@ export function getJsonSchemasFromPresentation(presentation, full = false) {
 /**
  * Get status of all credentials from the presentation with revocation type of private status list.
  * @param presentation
- * @returns {(*|Object|undefined)[]}
+ * @returns {Object[]}
  */
 export function getPrivateStatuses(presentation) {
   const credentials = jsonld.getValues(presentation, 'verifiableCredential');

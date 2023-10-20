@@ -4,56 +4,19 @@ import { DockResolver } from '../../src/resolver';
 import { createNewDockDID } from '../../src/utils/did';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-constants';
 import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
-import { issueCredential, signPresentation, verifyCredential, verifyPresentation } from '../../src/utils/vc';
+import {
+  issueCredential, signPresentation, verifyCredential, verifyPresentation,
+} from '../../src/utils/vc';
 import defaultDocumentLoader from '../../src/utils/vc/document-loader';
 import PrivateStatusList2021Credential from '../../src/status-list-credential/private-status-list2021-credential';
-import {
-  PrivateStatusList2021EntryType,
-  PrivateStatusList2021Qualifier,
-} from '../../src/utils/vc/constants';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
-import { getPrivateStatus, verifyPrivateStatus } from '../../src/utils/vc/credentials';
+import {
+  addPrivateStatusListEntryToCredential,
+  getPrivateStatus,
+  verifyPrivateStatus,
+} from '../../src/utils/vc/credentials';
 import { createPresentation } from '../create-presentation';
 import { getPrivateStatuses } from '../../src/utils/vc/presentations';
-
-const PRIVATE_STATUS_LIST_21_CONTEXT = {
-  '@context': {
-    PrivateStatusList2021Credential: {
-      '@id': 'https://ld.dock.io/security#PrivateStatusList2021Credential',
-      '@context': {
-        id: '@id',
-        type: '@type',
-        description: 'https://schema.org/description',
-        name: 'https://schema.org/name',
-      },
-    },
-
-    StatusList2021: {
-      '@id': 'https://w3id.org/vc/status-list#StatusList2021',
-      '@context': {
-        '@protected': true,
-        id: '@id',
-        type: '@type',
-        statusPurpose: 'https://w3id.org/vc/status-list#statusPurpose',
-        encodedList: 'https://w3id.org/vc/status-list#encodedList',
-      },
-    },
-
-    PrivateStatusList2021Entry: {
-      '@id': 'https://w3id.org/vc/status-list#StatusList2021Entry',
-      '@context': {
-        id: '@id',
-        type: '@type',
-        statusPurpose: 'https://w3id.org/vc/status-list#statusPurpose',
-        statusListIndex: 'https://w3id.org/vc/status-list#statusListIndex',
-        statusListCredential: {
-          '@id': 'https://ld.dock.io/security#PrivateStatusListCredential',
-          '@type': '@id',
-        },
-      },
-    },
-  },
-};
 
 const termsOfUseCtx = {
   '@context': {
@@ -67,23 +30,6 @@ const termsOfUseCtx = {
     },
   },
 };
-
-function addCredentialStatus(
-  cred,
-  statusListCredentialId,
-  statusListCredentialIndex,
-) {
-  return {
-    ...cred,
-    credentialStatus: {
-      id: `${PrivateStatusList2021Qualifier}${statusListCredentialId}#${statusListCredentialIndex}`,
-      type: PrivateStatusList2021EntryType,
-      statusListIndex: String(statusListCredentialIndex),
-      statusListCredential: `${PrivateStatusList2021Qualifier}${statusListCredentialId}`,
-      statusPurpose: 'suspension',
-    },
-  };
-}
 
 describe('PrivateStatusList2021Credential', () => {
   const dockAPI = new DockAPI();
@@ -141,7 +87,7 @@ describe('PrivateStatusList2021Credential', () => {
 
   test('Issuer can issue a revocable credential and holder can verify it successfully when it is not revoked else the verification fails', async () => {
     let unsignedCred = getUnsignedCred(credId, holderDID, [
-      PRIVATE_STATUS_LIST_21_CONTEXT,
+      'https://ld.dock.io/private-status-list-21',
       termsOfUseCtx,
     ]);
 
@@ -154,10 +100,11 @@ describe('PrivateStatusList2021Credential', () => {
     }];
 
     // Issuer issues the credential with a given status list id for revocation
-    unsignedCred = addCredentialStatus(
+    unsignedCred = addPrivateStatusListEntryToCredential(
       unsignedCred,
       statusListCredentialId,
       statusListCredentialIndex,
+      'suspension',
     );
 
     credential = await issueCredential(

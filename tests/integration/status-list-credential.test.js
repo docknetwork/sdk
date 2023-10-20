@@ -20,36 +20,19 @@ import { DockResolver } from '../../src/resolver';
 import { createPresentation } from '../create-presentation';
 
 import { OneOfPolicy } from '../../src/utils/revocation';
-import { DockStatusList2021Qualifier, StatusList2021EntryType } from '../../src/utils/vc/constants';
 import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
 import { createNewDockDID } from '../../src/utils/did';
 import StatusList2021Credential from '../../src/status-list-credential/status-list2021-credential';
+import { addStatusList21EntryToCredential } from '../../src/utils/vc/credentials';
 
 const credId = 'A large credential id with size > 32 bytes';
-
-function addCredentialStatus(
-  cred,
-  statusListCredentialId,
-  statusListCredentialIndex,
-) {
-  return {
-    ...cred,
-    credentialStatus: {
-      id: `${DockStatusList2021Qualifier}${statusListCredentialId}#${statusListCredentialIndex}`,
-      type: StatusList2021EntryType,
-      statusListIndex: String(statusListCredentialIndex),
-      statusListCredential: `${DockStatusList2021Qualifier}${statusListCredentialId}`,
-      statusPurpose: 'suspension',
-    },
-  };
-}
 
 const buildTest = DisableStatusListTests
   ? describe.skip
   : describe;
 
-describe('StatusList2021Credential', () => {
+buildTest('StatusList2021Credential', () => {
   const dockAPI = new DockAPI();
   const resolver = new DockResolver(dockAPI);
 
@@ -115,10 +98,11 @@ describe('StatusList2021Credential', () => {
     ]);
 
     // Issuer issues the credential with a given status list id for revocation
-    unsignedCred = addCredentialStatus(
+    unsignedCred = addStatusList21EntryToCredential(
       unsignedCred,
       statusListCredentialId,
       statusListCredentialIndex,
+      'suspension',
     );
 
     credential = await issueCredential(

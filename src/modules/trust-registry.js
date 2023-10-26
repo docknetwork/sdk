@@ -8,9 +8,9 @@ import {
 import { createDidSig, getHexIdentifierFromDID } from '../utils/did';
 
 /**
- * Module supporting `StatusList2021Credential` and `RevocationList2020Credential`.
+ * `Trust Registry` module.
  */
-export default class StatusListCredentialModule {
+export default class TrustRegistryModule {
   /**
    * Creates a new instance of `StatusListCredentialModule` and sets the api
    * @constructor
@@ -19,7 +19,7 @@ export default class StatusListCredentialModule {
    */
   constructor(api, signAndSend) {
     this.api = api;
-    this.module = api.tx.statusListCredential;
+    this.module = api.tx.trustRegistry;
     this.signAndSend = signAndSend;
   }
 
@@ -28,8 +28,8 @@ export default class StatusListCredentialModule {
    * @param {*} statusListCredentialId
    * @returns {Promise<StatusList2021Credential | null>}
    */
-  async fetchStatusList2021Credential(statusListCredentialId) {
-    let statusListCredential = await this.api.query.statusListCredential.statusListCredentials(
+  async initTrustRegistry(statusListCredentialId) {
+    let statusListCredential = await this.api.query.trustRegistry.initTrustRegistry(
       statusListCredentialId,
     );
 

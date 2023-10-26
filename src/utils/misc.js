@@ -1,6 +1,7 @@
 import elliptic from 'elliptic';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
+import { isHex } from '@polkadot/util';
 import { sha256 } from 'js-sha256';
 import {
   PublicKey, PublicKeyEd25519, PublicKeySecp256k1, PublicKeySr25519, // eslint-disable-line
@@ -168,12 +169,12 @@ export function bytesToWrappedBytes(bytes) {
  * using this
  * @returns {Promise<undefined|*>}
  */
-export async function getNonce(hexDid, nonce = undefined, didModule = undefined) {
+export async function getDidNonce(didOrDidMethodKey, nonce = undefined, didModule = undefined) {
   if (nonce === undefined && didModule === undefined) {
     throw new Error('Provide either nonce or didModule to fetch nonce but none provided');
   }
   if (nonce === undefined) {
-    return didModule.getNextNonceForDID(hexDid);
+    return didModule.getNextNonceForDID(didOrDidMethodKey);
   }
   return nonce;
 }

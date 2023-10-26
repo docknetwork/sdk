@@ -54,7 +54,7 @@ describe('Custom nonce', () => {
   }, 10000);
 
   test('Add key, controller, service endpoint, blob, BBS+ params and keys and accumulator in a batch', async () => {
-    const nonce = await dock.didModule.getNonceForDID(getHexIdentifierFromDID(did1));
+    const nonce = await dock.didModule.getDidNonceForDID(getHexIdentifierFromDID(did1));
 
     const pair = dock.keyring.addFromUri(seed1);
     const txs = [];
@@ -193,7 +193,7 @@ describe('Custom nonce', () => {
     await dock.revocation.newRegistry(registryId3, policy, false, false);
 
     const pair = dock.keyring.addFromUri(seed1);
-    let currentNonce = await dock.didModule.getNonceForDID(getHexIdentifierFromDID(did1));
+    let currentNonce = await dock.didModule.getDidNonceForDID(getHexIdentifierFromDID(did1));
     let txs = [];
 
     // Revoke from all 3 registries in the same transaction batch
@@ -218,7 +218,7 @@ describe('Custom nonce', () => {
     }
 
     // Remove from all 3 registries in the same transaction batch
-    currentNonce = await dock.didModule.getNonceForDID(getHexIdentifierFromDID(did1));
+    currentNonce = await dock.didModule.getDidNonceForDID(getHexIdentifierFromDID(did1));
     txs = [];
     for (const [regId, nonce] of [[registryId1, currentNonce + 1], [registryId2, currentNonce + 2], [registryId3, currentNonce + 3]]) {
       const [remove, sig, computedNonce] = await dock.revocation.createSignedRemove(regId, did1, pair, 1, { nonce });
@@ -257,7 +257,7 @@ describe('Custom nonce', () => {
 
     const pair = dock.keyring.addFromUri(seed1);
 
-    let nonce = await dock.didModule.getNonceForDID(getHexIdentifierFromDID(did1));
+    let nonce = await dock.didModule.getDidNonceForDID(getHexIdentifierFromDID(did1));
     let txs = [];
 
     // Add a key and a service endpoint to each DID
@@ -295,9 +295,9 @@ describe('Custom nonce', () => {
     await expect(dock.did.getServiceEndpoint(did5, spId5)).resolves.toEqual({ type: spType, origins: origins[2] });
 
     // Each DID adds 2 blobs
-    const nonce3 = await dock.didModule.getNonceForDID(getHexIdentifierFromDID(did3));
-    const nonce4 = await dock.didModule.getNonceForDID(getHexIdentifierFromDID(did4));
-    const nonce5 = await dock.didModule.getNonceForDID(getHexIdentifierFromDID(did5));
+    const nonce3 = await dock.didModule.getDidNonceForDID(getHexIdentifierFromDID(did3));
+    const nonce4 = await dock.didModule.getDidNonceForDID(getHexIdentifierFromDID(did4));
+    const nonce5 = await dock.didModule.getDidNonceForDID(getHexIdentifierFromDID(did5));
     txs = [];
 
     const [[blobId1, blobHex1, blob1], [blobId2, blobHex2, blob2], [blobId3, blobHex3, blob3], [blobId4, blobHex4, blob4], [blobId5, blobHex5, blob5], [blobId6, blobHex6, blob6]] = [1, 2, 3, 4, 5, 6].map((_) => {
@@ -336,7 +336,7 @@ describe('Custom nonce', () => {
     }
 
     // Remove all DIDs in a batch
-    nonce = await dock.didModule.getNonceForDID(getHexIdentifierFromDID(did1));
+    nonce = await dock.didModule.getDidNonceForDID(getHexIdentifierFromDID(did1));
     txs = [];
 
     const tx13 = await dock.did.createRemoveTx(did3, did1, pair, 1, nonce + 1);

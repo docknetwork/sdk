@@ -3,12 +3,12 @@ import {
   createList,
   createCredential,
   StatusList, // eslint-disable-line
-} from '@digitalbazaar/vc-status-list';
-import { u8aToHex, u8aToU8a } from '@polkadot/util';
-import { gzip, ungzip } from 'pako';
-import { DockStatusList2021Qualifier } from '../utils/vc/constants';
-import VerifiableCredential from '../verifiable-credential';
-import { ensureStatusListId } from '../utils/type-helpers';
+} from "@digitalbazaar/vc-status-list";
+import { u8aToHex, u8aToU8a } from "@polkadot/util";
+import { gzip, ungzip } from "pako";
+import { DockStatusList2021Qualifier } from "../utils/vc/constants";
+import VerifiableCredential from "../verifiable-credential";
+import { ensureStatusListId } from "../utils/type-helpers";
 import { KeyDoc } from "../utils/vc/helpers"; // eslint-disable-line
 
 /**
@@ -26,15 +26,15 @@ export default class StatusList2021Credential extends VerifiableCredential {
     let cachedDecodedStatusList;
 
     // Caches decoded status list.
-    Object.defineProperty(this, 'decodedStatusList', {
-      value: async function decodedStatusList() {
+    Object.defineProperty(this, "decodedStatusList", {
+      value: function decodedStatusList() {
         if (
-          encodedStatusList === this.credentialSubject.encodedList
-          && cachedDecodedStatusList !== void 0
+          encodedStatusList === this.credentialSubject.encodedList &&
+          cachedDecodedStatusList !== void 0
         ) {
           return cachedDecodedStatusList;
         } else {
-          cachedDecodedStatusList = await decodeList(this.credentialSubject);
+          cachedDecodedStatusList = decodeList(this.credentialSubject);
           encodedStatusList = this.credentialSubject.encodedList;
 
           return cachedDecodedStatusList;
@@ -68,7 +68,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
   static async create(
     keyDoc,
     id,
-    { statusPurpose = 'revocation', length = 1e4, revokeIndices = [] } = {},
+    { statusPurpose = "revocation", length = 1e4, revokeIndices = [] } = {}
   ) {
     const statusList = await createList({ length });
     this.updateStatusList(statusPurpose, statusList, revokeIndices);
@@ -104,7 +104,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
       this.credentialSubject.statusPurpose,
       statusList,
       revokeIndices,
-      unsuspendIndices,
+      unsuspendIndices
     );
 
     this.credentialSubject.encodedList = await statusList.encode();
@@ -149,7 +149,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
    */
   static fromBytes(bytes) {
     const gzipBufferCred = Buffer.from(u8aToU8a(bytes));
-    const stringifiedCred = ungzip(gzipBufferCred, { to: 'string' });
+    const stringifiedCred = ungzip(gzipBufferCred, { to: "string" });
     const parsedCred = JSON.parse(stringifiedCred);
 
     return this.fromJSON(parsedCred);
@@ -205,24 +205,24 @@ export default class StatusList2021Credential extends VerifiableCredential {
   validate() {
     const { credentialSubject } = this;
 
-    if (!credentialSubject) throw new Error('Missing `credentialSubject`');
+    if (!credentialSubject) throw new Error("Missing `credentialSubject`");
     if (!this.constructor.statusPurposes.has(credentialSubject.statusPurpose)) {
       throw new Error(
         `Invalid \`statusPurpose\`, expected one of \`${[
           ...this.constructor.statusPurposes,
-        ].join(', ')}\``,
+        ].join(", ")}\``
       );
     }
-    if (typeof credentialSubject.id !== 'string' || !credentialSubject.id) {
-      throw new Error('Missing `credentialSubject.id`');
+    if (typeof credentialSubject.id !== "string" || !credentialSubject.id) {
+      throw new Error("Missing `credentialSubject.id`");
     }
-    if (credentialSubject.type !== 'StatusList2021') {
+    if (credentialSubject.type !== "StatusList2021") {
       throw new Error(
-        '`credentialSubject.type` must be set to `StatusList2021`',
+        "`credentialSubject.type` must be set to `StatusList2021`"
       );
     }
     if (!credentialSubject.encodedList) {
-      throw new Error('`credentialSubject.encodedList` must be present');
+      throw new Error("`credentialSubject.encodedList` must be present");
     }
   }
 
@@ -243,19 +243,19 @@ export default class StatusList2021Credential extends VerifiableCredential {
     statusPurpose,
     statusList,
     revokeIndices = [],
-    unsuspendIndices = [],
+    unsuspendIndices = []
   ) {
     const unsuspendIndiceSet = new Set(unsuspendIndices);
-    if (statusPurpose !== 'suspension' && unsuspendIndiceSet.size > 0) {
+    if (statusPurpose !== "suspension" && unsuspendIndiceSet.size > 0) {
       throw new Error(
-        `Can't unsuspend indices for credential with \`statusPurpose\` = \`${statusPurpose}\`, it's only possible with \`statusPurpose\` = \`suspension\``,
+        `Can't unsuspend indices for credential with \`statusPurpose\` = \`${statusPurpose}\`, it's only possible with \`statusPurpose\` = \`suspension\``
       );
     }
 
     for (const idx of revokeIndices) {
       if (unsuspendIndiceSet.has(idx)) {
         throw new Error(
-          `Index \`${idx}\` appears in both revoke and unsuspend sets`,
+          `Index \`${idx}\` appears in both revoke and unsuspend sets`
         );
       }
 
@@ -270,5 +270,5 @@ export default class StatusList2021Credential extends VerifiableCredential {
 /**
  * Allowed status purposes for this credential type.
  */
-StatusList2021Credential.statusPurposes = new Set(['revocation', 'suspension']);
+StatusList2021Credential.statusPurposes = new Set(["revocation", "suspension"]);
 StatusList2021Credential.qualifier = DockStatusList2021Qualifier;

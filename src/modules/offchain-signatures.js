@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 
 import {
-  getNonce,
+  getDidNonce,
   getSignatureFromKeyringPair,
   getStateChange,
 } from '../utils/misc';
@@ -254,7 +254,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
     { nonce = undefined, didModule = undefined },
   ) {
     // eslint-disable-next-line no-param-reassign
-    nonce = await getNonce(signerHexDid, nonce, didModule);
+    nonce = await getDidNonce(signerHexDid, nonce, didModule);
     const addPk = { key: publicKey, did: targetHexDid, nonce };
     const signature = this.signAddPublicKey(keyPair, addPk);
     const didSig = createDidSig(signerHexDid, keyId, signature);
@@ -270,7 +270,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
     { nonce = undefined, didModule = undefined },
   ) {
     // eslint-disable-next-line no-param-reassign
-    nonce = await getNonce(signerHexDid, nonce, didModule);
+    nonce = await getDidNonce(signerHexDid, nonce, didModule);
     const removeKey = {
       keyRef: [targetHexDid, removeKeyId],
       did: targetHexDid,

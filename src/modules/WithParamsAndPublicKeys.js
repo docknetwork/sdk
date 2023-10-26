@@ -2,7 +2,7 @@
 
 import { u8aToHex } from '@polkadot/util';
 import { createDidSig, getHexIdentifierFromDID } from '../utils/did';
-import { getNonce } from '../utils/misc';
+import { getDidNonce } from '../utils/misc';
 
 /**
  * Class with logic for public keys and corresponding setup parameters.
@@ -225,7 +225,7 @@ export default class WithParamsAndPublicKeys {
     { nonce = undefined, didModule = undefined },
   ) {
     // eslint-disable-next-line no-param-reassign
-    nonce = await getNonce(hexDid, nonce, didModule);
+    nonce = await getDidNonce(hexDid, nonce, didModule);
     const addParams = { params, nonce };
     const signature = this.signAddParams(keyPair, addParams);
     const didSig = createDidSig(hexDid, keyId, signature);
@@ -240,7 +240,7 @@ export default class WithParamsAndPublicKeys {
     { nonce = undefined, didModule = undefined },
   ) {
     // eslint-disable-next-line no-param-reassign
-    nonce = await getNonce(hexDid, nonce, didModule);
+    nonce = await getDidNonce(hexDid, nonce, didModule);
     const removeParams = { paramsRef: [hexDid, index], nonce };
     const signature = this.signRemoveParams(keyPair, removeParams);
     const didSig = createDidSig(hexDid, keyId, signature);

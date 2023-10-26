@@ -3,7 +3,7 @@ import {
   u8aToString, stringToHex, bufferToU8a, u8aToHex,
 } from '@polkadot/util';
 
-import { getNonce, getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
+import { getDidNonce, getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from '../utils/codec';
 import NoBlobError from '../utils/errors/no-blob-error';
 import { createDidSig, getHexIdentifierFromDID } from '../utils/did';
@@ -80,9 +80,8 @@ class BlobModule {
    * using this
    * @returns {Promise<*>}
    */
-  async createNewTx(blob, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
-    const hexDid = getHexIdentifierFromDID(signerDid);
-    const [addBlob, didSig] = await this.createSignedAddBlob(blob, hexDid, keyPair, keyId, { nonce, didModule });
+  async createNewTx(blob, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+    const [addBlob, didSig] = await this.createSignedAddBlob(blob, signerDid, signingKeyRef, { nonce, didModule });
     return this.module.new(addBlob, didSig);
   }
 
@@ -99,9 +98,9 @@ class BlobModule {
    * @param params
    * @returns {Promise<*>}
    */
-  async new(blob, signerDid, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
+  async new(blob, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
     return this.signAndSend(
-      (await this.createNewTx(blob, signerDid, keyPair, keyId, { nonce, didModule })), waitForFinalization, params,
+      (await this.createNewTx(blob, signerDid, signingKeyRef, { nonce, didModule })), waitForFinalization, params,
     );
   }
 
@@ -147,12 +146,12 @@ class BlobModule {
    * using this
    * @returns {Promise}
    */
-  async createSignedAddBlob(blob, hexDid, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
+  async createSignedAddBlob(blob, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
     if (!blob.blob) {
       throw new Error('Blob must have a value!');
     }
     // eslint-disable-next-line no-param-reassign
-    nonce = await getNonce(hexDid, nonce, didModule);
+    nonce = await getDidNonce(signerDid, nonce, didModule);
 
     const blobObj = {
       ...blob,
@@ -164,7 +163,7 @@ class BlobModule {
     };
     const serializedAddBlob = this.getSerializedBlob(addBlob);
     const signature = getSignatureFromKeyringPair(keyPair, serializedAddBlob);
-    const didSig = createDidSig(hexDid, keyId, signature);
+    const didSig = createDidSig(signerDid, keyId, signature);
     return [addBlob, didSig];
   }
 

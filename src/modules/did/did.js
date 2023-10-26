@@ -1035,7 +1035,7 @@ class DIDModule {
    * methods are used internally
    * @return {Promise<number>}
    */
-  async getNonceForDID(didIdentifier) {
+  async getDidNonceForDID(didIdentifier) {
     return (await this.getOnchainDidDetail(didIdentifier)).nonce;
   }
 
@@ -1045,7 +1045,7 @@ class DIDModule {
    * @returns {Promise<*>}
    */
   async getNextNonceForDID(didIdentifier) {
-    return (await this.getNonceForDID(didIdentifier)) + 1;
+    return (await this.getDidNonceForDID(didIdentifier)) + 1;
   }
 
   /**

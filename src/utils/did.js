@@ -130,3 +130,16 @@ export function createDidSig(did, keyId = 1, sig) {
     did, keyId, sig: sig.toJSON(),
   };
 }
+
+/**
+ *
+ * @param {string} did - DID as hex
+ * @param {number} keyId -
+ * @param {Signature} sig
+ * @returns {{sig: *, keyId, did}}
+ */
+export function createDidMethodKeySig(didKey, sig) {
+  return {
+    didKey, sig: sig.toJSON(),
+  };
+}

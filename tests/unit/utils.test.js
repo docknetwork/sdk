@@ -11,6 +11,8 @@ import {
 import { PublicKeyEd25519, PublicKeySr25519, PublicKeySecp256k1 } from '../../src/public-keys';
 import { SignatureEd25519, SignatureSr25519, SignatureSecp256k1 } from '../../src/signatures';
 import { isHexWithGivenByteSize } from '../../src/utils/codec';
+import { expandJSONLD } from '../../src/utils/vc';
+import { getCredentialStatus, isAccumulatorRevocationStatus } from '../../src/utils/revocation';
 
 describe('Testing isHexWithGivenByteSize', () => {
   test('isHexWithGivenByteSize rejects strings not starting with 0x', () => {
@@ -115,5 +117,63 @@ describe('Testing Ecdsa with secp256k1', () => {
     expect(verifyEcdsaSecp256k1Sig(msg2, sig2, pk)).toBe(true);
     expect(msg2 !== msg1).toBe(true);
     expect(sig2 !== sig1).toBe(true);
+  });
+});
+
+describe('Detecting accumulator status', () => {
+  test('works', async () => {
+    const credential = {
+      '@context': [
+        'https://www.w3.org/2018/credentials/v1',
+        {
+          dk: 'https://ld.dock.io/credentials#',
+          PermanentResidentCard: 'dk:PermanentResidentCard',
+          PermanentResident: 'dk:PermanentResident',
+          Person: 'dk:Person',
+          givenName: 'dk:givenName',
+          familyName: 'dk:familyName',
+          lprNumber: 'dk:lprNumber',
+          name: 'http://schema.org/name',
+          description: 'http://schema.org/description',
+        },
+      ],
+      credentialStatus: {
+        id: 'dock:accumulator:0x4e8ae3b33f1601844f31dd9d121adb0157bd609b04d3449d0fabe45bd057c93f',
+        type: 'DockVBAccumulator2022',
+        revocationCheck: 'membership',
+        revocationId: '4',
+      },
+      id: 'http://localhost:3001/8c818a2fbf84bb14720ceea764af21a7023141b231b319e45f0753d57955ecf8',
+      type: [
+        'VerifiableCredential',
+        'PermanentResidentCard',
+      ],
+      credentialSubject: {
+        id: 'did:dock:5GLu8vCdG2CUTpuq3f7TehjYbM3izoo64vovKgwbAdrv6Dq2',
+        type: [
+          'PermanentResident',
+          'Person',
+        ],
+        givenName: 'JOHN',
+        familyName: 'SMITH',
+        lprNumber: 1234,
+      },
+      issuer: 'did:dock:5GLu8vCdG2CUTpuq3f7TehjYbM3izoo64vovKgwbAdrv6Dq2',
+      name: 'Permanent Resident Card',
+      description: 'Government of Example Permanent Resident Card.',
+    };
+
+    let expandedCredential = await expandJSONLD(credential);
+    let status = getCredentialStatus(expandedCredential);
+    expect(isAccumulatorRevocationStatus(status)).toEqual(true);
+
+    credential.credentialStatus = {
+      id: 'rev-reg:dock:0x0194',
+      type: 'CredentialStatusList2017',
+    };
+
+    expandedCredential = await expandJSONLD(credential);
+    status = getCredentialStatus(expandedCredential);
+    expect(isAccumulatorRevocationStatus(status)).toEqual(false);
   });
 });

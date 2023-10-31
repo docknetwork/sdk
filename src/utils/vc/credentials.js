@@ -10,7 +10,7 @@ import defaultDocumentLoader from './document-loader';
 import { getAndValidateSchemaIfPresent } from './schema';
 import {
   checkRevocationRegistryStatus, DockRevRegQualifier,
-  getCredentialStatus,
+  getCredentialStatus, isAccumulatorRevocationStatus,
   isRegistryRevocationStatus, RevRegType,
 } from '../revocation';
 import { Resolver } from "../../resolver"; // eslint-disable-line
@@ -397,7 +397,11 @@ export async function verifyCredential(
         }
       }
 
-      if (!isStatusList2021Status && !isRegRevStatus && getPrivateStatus(credential) === undefined) {
+      // For credentials supporting revocation with accumulator, the revocation check happens using witness which is not
+      // part of the credential and evolves over time
+      const isAccumStatus = isAccumulatorRevocationStatus(status);
+
+      if (!isStatusList2021Status && !isRegRevStatus && getPrivateStatus(credential) === undefined && isAccumStatus === false) {
         throw new Error(`Unsupported \`credentialStatus\`: \`${status}\``);
       }
     }

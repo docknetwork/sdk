@@ -4,11 +4,8 @@ import {
   BBSPlusSecretKey,
   BBSPlusSignatureParamsG1,
   BBSPlusPublicKeyG2,
-} from '@docknetwork/crypto-wasm-ts';
-
-import {
   BBS_PLUS_SIGNATURE_PARAMS_LABEL_BYTES,
-} from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
+} from '@docknetwork/crypto-wasm-ts';
 
 import { Bls12381BBSDockVerKeyName } from './constants';
 import DockCryptoKeyPair from './common/DockCryptoKeyPair';

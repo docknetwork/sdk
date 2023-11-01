@@ -4,12 +4,10 @@ import {
   isWasmInitialized,
   BBSPublicKey,
   PSPublicKey,
+  PresentationBuilder,
 } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
 import { stringToU8a } from '@polkadot/util';
-import {
-  PresentationBuilder,
-} from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 import { ensureArray } from './utils/type-helpers';
 
 import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';

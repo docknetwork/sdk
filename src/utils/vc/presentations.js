@@ -4,10 +4,10 @@ import {
   BBSPlusPublicKeyG2,
   BBSPublicKey,
   PSPublicKey,
+  Presentation,
+  CredentialSchema,
 } from '@docknetwork/crypto-wasm-ts';
-import { Presentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
 import b58 from 'bs58';
-import { CredentialSchema } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 import { getPrivateStatus, verifyCredential } from './credentials';
 import DIDResolver from "../../resolver/did/did-resolver"; // eslint-disable-line
 

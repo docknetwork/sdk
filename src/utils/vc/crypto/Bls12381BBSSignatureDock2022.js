@@ -1,7 +1,7 @@
 import {
   BBSPlusCredential,
   BBSPlusCredentialBuilder,
-} from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
+} from '@docknetwork/crypto-wasm-ts';
 
 import { Bls12381BBSSigDockSigName } from './constants';
 

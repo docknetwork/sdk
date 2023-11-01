@@ -1,6 +1,5 @@
-import { CredentialSchema, DefaultSchemaParsingOpts } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
+import { initializeWasm, CredentialSchema, DefaultSchemaParsingOpts } from '@docknetwork/crypto-wasm-ts';
 import * as _ from 'underscore';
-import { initializeWasm } from '@docknetwork/crypto-wasm-ts';
 
 import jsonld from 'jsonld';
 import { SECURITY_CONTEXT_URL } from 'jsonld-signatures';

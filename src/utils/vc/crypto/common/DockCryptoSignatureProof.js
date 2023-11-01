@@ -1,4 +1,4 @@
-import { Presentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
+import { Presentation } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
 import { withExtendedStaticProperties } from '../../../inheritance';
 

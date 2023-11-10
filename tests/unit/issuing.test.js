@@ -1,5 +1,5 @@
-// Mock axios
-import mockAxios from '../mocks/axios';
+// Mock fetch
+import mockFetch from '../mocks/fetch';
 
 import {
   issueCredential,
@@ -12,7 +12,7 @@ import VerifiableCredential from '../../src/verifiable-credential';
 import VerifiablePresentation from '../../src/verifiable-presentation';
 import testingKeys from '../test-keys';
 
-mockAxios();
+mockFetch();
 
 // Test constants
 const issuanceDate = '2020-04-15T09:05:35Z';

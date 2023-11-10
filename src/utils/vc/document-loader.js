@@ -1,6 +1,6 @@
-import axios from 'axios';
 import cachedUris from './contexts';
 import Resolver from "../../resolver/generic/resolver"; // eslint-disable-line
+import jsonFetch from '../json-fetch';
 
 function parseEmbeddedDataURI(embedded) {
   // Strip new lines
@@ -63,7 +63,7 @@ function documentLoader(resolver = null) {
       if (cachedData) {
         document = cachedData;
       } else {
-        const { data: doc } = await axios.get(uriString);
+        const doc = await jsonFetch(uriString);
         cachedUris.set(cacheKey, doc);
         document = doc;
       }

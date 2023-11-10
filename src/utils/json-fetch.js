@@ -7,6 +7,10 @@ export class JSONFetchError extends Error {
 }
 
 export default async function jsonFetch(url, options) {
+  if (url.startsWith('blob:')) {
+    throw new Error('Unsupported protocol blob:');
+  }
+
   let response;
   try {
     response = await fetch(url, options);

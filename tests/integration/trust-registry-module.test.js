@@ -231,7 +231,7 @@ buildTest("Trust Registry", () => {
         .sort((a, b) => a.did.localeCompare(b.did)),
     });
 
-    schemas = new BTreeMap();
+    let schemasUpdate = new BTreeMap();
 
     verifiers = new BTreeSet();
     verifiers.add(typedHexDID(dock.api, issuerDID));
@@ -246,17 +246,16 @@ buildTest("Trust Registry", () => {
     issuers.set(typedHexDID(dock.api, issuerDID), issuerPrices);
     issuers.set(typedHexDID(dock.api, issuerDID2), issuer2Prices);
 
-    schemas.set(schemaId, {
-      Set: {
-        issuers,
-        verifiers
+    schemasUpdate.set(schemaId, {
+      issuers: {
+        Set: issuers,
       },
     });
 
     await dock.trustRegistry.updateSchemaMetadata(
       convenerDID,
       trustRegistryId,
-      schemas,
+      schemasUpdate,
       convenerPair,
       dock
     );
@@ -280,26 +279,27 @@ buildTest("Trust Registry", () => {
         .sort((a, b) => a.did.localeCompare(b.did)),
     });
 
-    schemas = new BTreeMap();
+    schemasUpdate = new BTreeMap();
     issuer2Prices = new BTreeMap();
-    issuer2Prices.set("A", 60);
+    issuer2Prices.set("A", 25);
+    issuer2Prices.set("B", 36);
 
     let issuersUpdate = new BTreeMap();
-    issuer2Prices.set("A", 75);
-    issuer2Prices.set("B", 60);
-    issuersUpdate.set(issuerDID2, issuer2Prices);
-    schemas.set(schemaId, {
-      Modify: {
-        issuers: {
-          Set: issuersUpdate,
-        },
+    issuersUpdate.set(typedHexDID(dock.api, issuerDID2), { Set: issuer2Prices });
+    schemasUpdate.set(schemaId, {
+      issuers: {
+        Modify: issuersUpdate,
       },
     });
+    issuers = new BTreeMap();
+    issuers.set(typedHexDID(dock.api, issuerDID2), issuer2Prices);
+    issuers.set(typedHexDID(dock.api, issuerDID), issuerPrices);
+    schemas.set(schemaId, { issuers, verifiers: schemas.get(schemaId).verifiers });
 
     await dock.trustRegistry.updateSchemaMetadata(
       issuerDID2,
       trustRegistryId,
-      schemas,
+      schemasUpdate,
       issuerPair2,
       dock
     );

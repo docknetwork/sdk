@@ -1,7 +1,7 @@
-import { encodeAddress } from "@polkadot/util-crypto";
-import { u8aToString, hexToU8a, u8aToHex } from "@polkadot/util";
-import { BTreeSet } from "@polkadot/types";
-import b58 from "bs58";
+import { encodeAddress } from '@polkadot/util-crypto';
+import { u8aToString, hexToU8a, u8aToHex } from '@polkadot/util';
+import { BTreeSet } from '@polkadot/types';
+import b58 from 'bs58';
 import {
   typedHexDID,
   DockDIDQualifier,
@@ -11,10 +11,10 @@ import {
   NoOffchainDIDError,
   createDidSig,
   DockDIDMethodKeyQualifier,
-} from "../../utils/did";
-import { getStateChange } from "../../utils/misc";
+} from '../../utils/did';
+import { getStateChange } from '../../utils/misc';
 
-import OffChainDidDocRef from "./offchain-did-doc-ref";
+import OffChainDidDocRef from './offchain-did-doc-ref';
 import {
   PublicKeyEd25519,
   PublicKeySecp256k1,
@@ -22,12 +22,11 @@ import {
   PublicKeyX25519,
   DidKey,
   VerificationRelationship,
-} from "../../public-keys";
-import { ServiceEndpointType } from "./service-endpoint";
-import WithParamsAndPublicKeys from "../WithParamsAndPublicKeys";
+} from '../../public-keys';
+import { ServiceEndpointType } from './service-endpoint';
+import WithParamsAndPublicKeys from '../WithParamsAndPublicKeys';
 
-export const ATTESTS_IRI =
-  "https://rdf.dock.io/alpha/2021#attestsDocumentContents";
+export const ATTESTS_IRI = 'https://rdf.dock.io/alpha/2021#attestsDocumentContents';
 
 const valuePropOrIdentity = (val) => val.value || val;
 
@@ -67,7 +66,7 @@ class DIDModule {
     return this.signAndSend(
       this.createNewOffchainTx(did, didDocRef),
       waitForFinalization,
-      params
+      params,
     );
   }
 
@@ -94,12 +93,12 @@ class DIDModule {
     did,
     didDocRef,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     return this.signAndSend(
       this.createSetOffchainDidRefTx(did, didDocRef),
       waitForFinalization,
-      params
+      params,
     );
   }
 
@@ -124,7 +123,7 @@ class DIDModule {
     return this.signAndSend(
       this.createRemoveOffchainDidTx(did),
       waitForFinalization,
-      params
+      params,
     );
   }
 
@@ -146,7 +145,7 @@ class DIDModule {
     return this.module.newOnchain(
       hexId,
       didKeys.map((d) => d.toJSON()),
-      cnts
+      cnts,
     );
   }
 
@@ -164,12 +163,12 @@ class DIDModule {
     didKeys,
     controllers,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     return this.signAndSend(
       this.createNewOnchainTx(did, didKeys, controllers),
       waitForFinalization,
-      params
+      params,
     );
   }
 
@@ -188,7 +187,7 @@ class DIDModule {
     targetDid,
     signerDid,
     signingKeyRef,
-    nonce = undefined
+    nonce = undefined,
   ) {
     const targetHexDid = typedHexDID(this.api, targetDid).asDid;
     const signerHexDid = typedHexDID(this.api, signerDid);
@@ -197,7 +196,7 @@ class DIDModule {
       targetHexDid,
       signerHexDid,
       signingKeyRef,
-      nonce
+      nonce,
     );
     return this.module.addKeys(addKeys, signature);
   }
@@ -221,7 +220,7 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     return this.signAndSend(
       await this.createAddKeysTx(
@@ -229,10 +228,10 @@ class DIDModule {
         targetDid,
         signerDid,
         signingKeyRef,
-        nonce
+        nonce,
       ),
       waitForFinalization,
-      params
+      params,
     );
   }
 
@@ -251,7 +250,7 @@ class DIDModule {
     targetDid,
     signerDid,
     signingKeyRef,
-    nonce = undefined
+    nonce = undefined,
   ) {
     const targetHexDid = typedHexDID(this.api, targetDid).asDid;
     const signerHexDid = typedHexDID(this.api, signerDid);
@@ -260,7 +259,7 @@ class DIDModule {
       targetHexDid,
       signerHexDid,
       signingKeyRef,
-      nonce
+      nonce,
     );
     return this.module.addControllers(addControllers, signature);
   }
@@ -284,14 +283,14 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     const tx = await this.createAddControllersTx(
       controllers,
       targetDid,
       signerDid,
       signingKeyRef,
-      nonce
+      nonce,
     );
     return this.signAndSend(tx, waitForFinalization, params);
   }
@@ -315,20 +314,19 @@ class DIDModule {
     targetDid,
     signerDid,
     signingKeyRef,
-    nonce = undefined
+    nonce = undefined,
   ) {
     const targetHexDid = typedHexDID(this.api, targetDid).asDid;
     const signerHexDid = typedHexDID(this.api, signerDid);
-    const [addServiceEndpoint, signature] =
-      await this.createSignedAddServiceEndpoint(
-        endpointId,
-        endpointType,
-        origins,
-        targetHexDid,
-        signerHexDid,
-        signingKeyRef,
-        nonce
-      );
+    const [addServiceEndpoint, signature] = await this.createSignedAddServiceEndpoint(
+      endpointId,
+      endpointType,
+      origins,
+      targetHexDid,
+      signerHexDid,
+      signingKeyRef,
+      nonce,
+    );
     return this.module.addServiceEndpoint(addServiceEndpoint, signature);
   }
 
@@ -355,7 +353,7 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     const tx = await this.createAddServiceEndpointTx(
       endpointId,
@@ -364,7 +362,7 @@ class DIDModule {
       targetDid,
       signerDid,
       signingKeyRef,
-      nonce
+      nonce,
     );
     return this.signAndSend(tx, waitForFinalization, params);
   }
@@ -384,7 +382,7 @@ class DIDModule {
     targetDid,
     signerDid,
     signingKeyRef,
-    nonce = undefined
+    nonce = undefined,
   ) {
     const targetHexDid = typedHexDID(this.api, targetDid).asDid;
     const signerHexDid = typedHexDID(this.api, signerDid);
@@ -393,7 +391,7 @@ class DIDModule {
       targetHexDid,
       signerHexDid,
       signingKeyRef,
-      nonce
+      nonce,
     );
     return this.module.removeKeys(removeKeys, signature);
   }
@@ -417,14 +415,14 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     const tx = await this.createRemoveKeysTx(
       keyIds,
       targetDid,
       signerDid,
       signingKeyRef,
-      nonce
+      nonce,
     );
     return this.signAndSend(tx, waitForFinalization, params);
   }
@@ -444,18 +442,17 @@ class DIDModule {
     targetDid,
     signerDid,
     signingKeyRef,
-    nonce = undefined
+    nonce = undefined,
   ) {
     const targetHexDid = typedHexDID(this.api, targetDid);
     const signerHexDid = typedHexDID(this.api, signerDid);
-    const [removeControllers, signature] =
-      await this.createSignedRemoveControllers(
-        controllers,
-        targetHexDid,
-        signerHexDid,
-        signingKeyRef,
-        nonce
-      );
+    const [removeControllers, signature] = await this.createSignedRemoveControllers(
+      controllers,
+      targetHexDid,
+      signerHexDid,
+      signingKeyRef,
+      nonce,
+    );
     return this.module.removeControllers(removeControllers, signature);
   }
 
@@ -478,14 +475,14 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     const tx = await this.removeControllersTx(
       controllers,
       targetDid,
       signerDid,
       signingKeyRef,
-      nonce
+      nonce,
     );
     return this.signAndSend(tx, waitForFinalization, params);
   }
@@ -505,18 +502,17 @@ class DIDModule {
     targetDid,
     signerDid,
     signingKeyRef,
-    nonce = undefined
+    nonce = undefined,
   ) {
     const targetHexDid = typedHexDID(this.api, targetDid).asDid;
     const signerHexDid = typedHexDID(this.api, signerDid);
-    const [removeServiceEndpoint, signature] =
-      await this.createSignedRemoveServiceEndpoint(
-        endpointId,
-        targetHexDid,
-        signerHexDid,
-        signingKeyRef,
-        nonce
-      );
+    const [removeServiceEndpoint, signature] = await this.createSignedRemoveServiceEndpoint(
+      endpointId,
+      targetHexDid,
+      signerHexDid,
+      signingKeyRef,
+      nonce,
+    );
     return this.module.removeServiceEndpoint(removeServiceEndpoint, signature);
   }
 
@@ -539,14 +535,14 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     const tx = await this.createRemoveServiceEndpointTx(
       endpointId,
       targetDid,
       signerDid,
       signingKeyRef,
-      nonce
+      nonce,
     );
     return this.signAndSend(tx, waitForFinalization, params);
   }
@@ -567,7 +563,7 @@ class DIDModule {
       hexDid,
       signerHexDid,
       signingKeyRef,
-      nonce
+      nonce,
     );
     return this.module.removeOnchainDid(didRemoval, signature);
   }
@@ -589,13 +585,13 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     const tx = await this.createRemoveTx(
       targetDid,
       signerDid,
       signingKeyRef,
-      nonce
+      nonce,
     );
     return this.signAndSend(tx, waitForFinalization, params);
   }
@@ -616,7 +612,7 @@ class DIDModule {
       iri,
       hexDid,
       signingKeyRef,
-      nonce
+      nonce,
     );
     return this.api.tx.attest.setClaim(setAttestation, signature);
   }
@@ -638,14 +634,14 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     const attestTx = await this.createSetClaimTx(
       priority,
       iri,
       did,
       signingKeyRef,
-      nonce
+      nonce,
     );
     return this.signAndSend(attestTx, waitForFinalization, params);
   }
@@ -698,21 +694,20 @@ class DIDModule {
     const attests = await this.getAttests(typedDid);
 
     // If given DID was in hex, encode to SS58 and then construct fully qualified DID else the DID was already fully qualified
-    const id =
-      did === hexDid ? this.getFullyQualifiedDID(encodeAddress(hexDid)) : did;
+    const id = did === hexDid ? this.getFullyQualifiedDID(encodeAddress(hexDid)) : did;
 
     // Get controllers
     const controllers = [];
     if (didDetails.activeControllers > 0) {
       const cnts = await this.api.query.didModule.didControllers.entries(
-        hexDid
+        hexDid,
       );
       cnts.forEach(([key, value]) => {
         if (value.isSome) {
           const [controlled, controller] = key.toHuman();
           if (controlled !== hexDid) {
             throw new Error(
-              `Controlled DID ${controlled[0]} was found to be different than queried DID ${hexDid}`
+              `Controlled DID ${controlled[0]} was found to be different than queried DID ${hexDid}`,
             );
           }
           controllers.push(controller);
@@ -723,7 +718,7 @@ class DIDModule {
     // Get service endpoints
     const serviceEndpoints = [];
     const sps = await this.api.query.didModule.didServiceEndpoints.entries(
-      hexDid
+      hexDid,
     );
     sps.forEach(([key, value]) => {
       if (value.isSome) {
@@ -734,7 +729,7 @@ class DIDModule {
         const d_ = u8aToHex(d);
         if (d_ !== hexDid) {
           throw new Error(
-            `DID ${d_} was found to be different than queried DID ${hexDid}`
+            `DID ${d_} was found to be different than queried DID ${hexDid}`,
           );
         }
         serviceEndpoints.push([spId, sp]);
@@ -758,7 +753,7 @@ class DIDModule {
           const d_ = u8aToHex(d);
           if (d_ !== hexDid) {
             throw new Error(
-              `DID ${d_} was found to be different than queried DID ${hexDid}`
+              `DID ${d_} was found to be different than queried DID ${hexDid}`,
             );
           }
           const index = i.toNumber();
@@ -766,16 +761,16 @@ class DIDModule {
           let publicKeyRaw;
           let typ;
           if (pk.isSr25519) {
-            typ = "Sr25519VerificationKey2020";
+            typ = 'Sr25519VerificationKey2020';
             publicKeyRaw = valuePropOrIdentity(pk.asSr25519);
           } else if (pk.isEd25519) {
-            typ = "Ed25519VerificationKey2018";
+            typ = 'Ed25519VerificationKey2018';
             publicKeyRaw = valuePropOrIdentity(pk.asEd25519);
           } else if (pk.isSecp256k1) {
-            typ = "EcdsaSecp256k1VerificationKey2019";
+            typ = 'EcdsaSecp256k1VerificationKey2019';
             publicKeyRaw = valuePropOrIdentity(pk.asSecp256k1);
           } else if (pk.isX25519) {
-            typ = "X25519KeyAgreementKey2019";
+            typ = 'X25519KeyAgreementKey2019';
             publicKeyRaw = valuePropOrIdentity(pk.asX25519);
           } else {
             throw new Error(`Cannot parse public key ${pk}`);
@@ -820,7 +815,7 @@ class DIDModule {
         }
         if (this.api.query.offchainSignatures != null) {
           const resp = await this.api.query.offchainSignatures.publicKeys.multi(
-            queryKeys
+            queryKeys,
           );
           let currentIter = 0;
           for (let r of resp) {
@@ -831,23 +826,22 @@ class DIDModule {
               r = r.unwrap();
 
               if (r.isBbs) {
-                keyType = "Bls12381BBSVerificationKeyDock2023";
+                keyType = 'Bls12381BBSVerificationKeyDock2023';
                 rawKey = r.asBbs;
               } else if (r.isBbsPlus) {
-                keyType = "Bls12381G2VerificationKeyDock2022";
+                keyType = 'Bls12381G2VerificationKeyDock2022';
                 rawKey = r.asBbsPlus;
               } else if (r.isPs) {
-                keyType = "Bls12381PSVerificationKeyDock2023";
+                keyType = 'Bls12381PSVerificationKeyDock2023';
                 rawKey = r.asPs;
               }
               // Don't care about signature params for now
-              const pkObj =
-                WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(
-                  rawKey
-                );
-              if (pkObj.curveType !== "Bls12381") {
+              const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(
+                rawKey,
+              );
+              if (pkObj.curveType !== 'Bls12381') {
                 throw new Error(
-                  `Curve type should have been Bls12381 but was ${pkObj.curveType}`
+                  `Curve type should have been Bls12381 but was ${pkObj.curveType}`,
                 );
               }
               const keyIndex = queryKeys[currentIter][1];
@@ -858,23 +852,22 @@ class DIDModule {
           }
         } else {
           const resp = await this.api.query.bbsPlus.bbsPlusKeys.multi(
-            queryKeys
+            queryKeys,
           );
           let currentIter = 0;
           for (const r of resp) {
             // The gaps in `keyId` might correspond to removed keys
             if (r.isSome) {
-              const keyType = "Bls12381G2VerificationKeyDock2022";
+              const keyType = 'Bls12381G2VerificationKeyDock2022';
               const rawKey = r.unwrap();
 
               // Don't care about signature params for now
-              const pkObj =
-                WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(
-                  rawKey
-                );
-              if (pkObj.curveType !== "Bls12381") {
+              const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(
+                rawKey,
+              );
+              if (pkObj.curveType !== 'Bls12381') {
                 throw new Error(
-                  `Curve type should have been Bls12381 but was ${pkObj.curveType}`
+                  `Curve type should have been Bls12381 but was ${pkObj.curveType}`,
                 );
               }
               const keyIndex = queryKeys[currentIter][1];
@@ -906,13 +899,11 @@ class DIDModule {
 
     // Construct document
     const document = {
-      "@context": ["https://www.w3.org/ns/did/v1"],
+      '@context': ['https://www.w3.org/ns/did/v1'],
       id,
-      controller: [...controllers].map((c) =>
-        c.Did
-          ? this.getFullyQualifiedDID(encodeAddress(c.Did))
-          : this.getFullyQualifiedDIDMethodKey(encodeAddress(c.DidMethodKey))
-      ),
+      controller: [...controllers].map((c) => (c.Did
+        ? this.getFullyQualifiedDID(encodeAddress(c.Did))
+        : this.getFullyQualifiedDIDMethodKey(encodeAddress(c.DidMethodKey)))),
       publicKey: verificationMethod,
     };
 
@@ -935,12 +926,12 @@ class DIDModule {
         const spType = sp.types.toNumber();
         if (spType !== 1) {
           throw new Error(
-            `Only "LinkedDomains" supported as service endpoint type for now but found ${spType}`
+            `Only "LinkedDomains" supported as service endpoint type for now but found ${spType}`,
           );
         }
         return {
           id: decoder.decode(spId),
-          type: "LinkedDomains",
+          type: 'LinkedDomains',
           serviceEndpoint: sp.origins.map((o) => decoder.decode(o)),
         };
       });
@@ -1038,7 +1029,7 @@ class DIDModule {
     } else if (did.isDidMethodKey) {
       return (await this.getDidMethodKeyDetail(did.asDidMethodKey)).nonce;
     } else {
-      throw new Error("Invalid DID provided");
+      throw new Error('Invalid DID provided');
     }
   }
 
@@ -1070,26 +1061,26 @@ class DIDModule {
     let publicKey;
     if (pk.isSr25519) {
       publicKey = new PublicKeySr25519(
-        u8aToHex(valuePropOrIdentity(pk.asSr25519))
+        u8aToHex(valuePropOrIdentity(pk.asSr25519)),
       );
     } else if (pk.isEd25519) {
       publicKey = new PublicKeyEd25519(
-        u8aToHex(valuePropOrIdentity(pk.asEd25519))
+        u8aToHex(valuePropOrIdentity(pk.asEd25519)),
       );
     } else if (pk.isSecp256k1) {
       publicKey = new PublicKeySecp256k1(
-        u8aToHex(valuePropOrIdentity(pk.asSecp256k1))
+        u8aToHex(valuePropOrIdentity(pk.asSecp256k1)),
       );
     } else if (pk.isX25519) {
       publicKey = new PublicKeyX25519(
-        u8aToHex(valuePropOrIdentity(pk.asX25519))
+        u8aToHex(valuePropOrIdentity(pk.asX25519)),
       );
     } else {
       throw new Error(`Cannot parse public key ${pk}`);
     }
     return new DidKey(
       publicKey,
-      new VerificationRelationship(resp.verRels.toNumber())
+      new VerificationRelationship(resp.verRels.toNumber()),
     );
   }
 
@@ -1104,7 +1095,7 @@ class DIDModule {
     const controllerDid = typedHexDID(this.api, controller);
     const resp = await this.api.query.didModule.didControllers(
       controlledDid,
-      controllerDid
+      controllerDid,
     );
     return resp.isSome;
   }
@@ -1119,11 +1110,11 @@ class DIDModule {
     const hexId = typedHexDID(this.api, did).asDid;
     let resp = await this.api.query.didModule.didServiceEndpoints(
       hexId,
-      endpointId
+      endpointId,
     );
     if (resp.isNone) {
       throw new Error(
-        `No service endpoint found for did ${did} and with id ${endpointId}`
+        `No service endpoint found for did ${did} and with id ${endpointId}`,
       );
     }
     resp = resp.unwrap();
@@ -1138,7 +1129,7 @@ class DIDModule {
     did,
     controllerDid,
     signingKeyRef,
-    nonce = undefined
+    nonce = undefined,
   ) {
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
@@ -1158,7 +1149,7 @@ class DIDModule {
     hexDid,
     controllerHexDid,
     signingKeyRef,
-    nonce = undefined
+    nonce = undefined,
   ) {
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
@@ -1170,8 +1161,7 @@ class DIDModule {
       cnts.add(typedHexDID(this.api, c));
     });
     const addControllers = { did: hexDid, controllers: cnts, nonce };
-    const serializedAddControllers =
-      this.getSerializedAddControllers(addControllers);
+    const serializedAddControllers = this.getSerializedAddControllers(addControllers);
     const signature = signingKeyRef.sign(serializedAddControllers);
     const didSig = createDidSig(controllerHexDid, signingKeyRef, signature);
     return [addControllers, didSig];
@@ -1184,7 +1174,7 @@ class DIDModule {
     hexDid,
     controllerHexDid,
     signingKeyRef,
-    nonce = undefined
+    nonce = undefined,
   ) {
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
@@ -1198,8 +1188,7 @@ class DIDModule {
       endpoint,
       nonce,
     };
-    const serializedServiceEndpoint =
-      this.getSerializedAddServiceEndpoint(addServiceEndpoint);
+    const serializedServiceEndpoint = this.getSerializedAddServiceEndpoint(addServiceEndpoint);
     const signature = signingKeyRef.sign(serializedServiceEndpoint);
     const didSig = createDidSig(controllerHexDid, signingKeyRef, signature);
     return [addServiceEndpoint, didSig];
@@ -1210,7 +1199,7 @@ class DIDModule {
     did,
     controllerDid,
     signingKeyRef,
-    nonce = undefined
+    nonce = undefined,
   ) {
     const hexDid = typedHexDID(this.api, did).asDid;
     const controllerHexDid = typedHexDID(this.api, controllerDid);
@@ -1236,7 +1225,7 @@ class DIDModule {
     did,
     controllerDid,
     signingKeyRef,
-    nonce = undefined
+    nonce = undefined,
   ) {
     const hexDid = typedHexDID(this.api, did).asDid;
     const controllerHexDid = typedHexDID(this.api, controllerDid);
@@ -1252,8 +1241,7 @@ class DIDModule {
     });
 
     const removeControllers = { did: hexDid, controllers: cnts, nonce };
-    const serializedRemoveControllers =
-      this.getSerializedRemoveControllers(removeControllers);
+    const serializedRemoveControllers = this.getSerializedRemoveControllers(removeControllers);
     const signature = signingKeyRef.sign(serializedRemoveControllers);
     const didSig = createDidSig(controllerHexDid, signingKeyRef, signature);
     return [removeControllers, didSig];
@@ -1264,7 +1252,7 @@ class DIDModule {
     hexDid,
     controllerHexDid,
     signingKeyRef,
-    nonce = undefined
+    nonce = undefined,
   ) {
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
@@ -1272,8 +1260,7 @@ class DIDModule {
     }
 
     const removeServiceEndpoint = { did: hexDid, id: endpointId, nonce };
-    const serializedRemoveServiceEndpoint =
-      this.getSerializedRemoveServiceEndpoint(removeServiceEndpoint);
+    const serializedRemoveServiceEndpoint = this.getSerializedRemoveServiceEndpoint(removeServiceEndpoint);
     const signature = signingKeyRef.sign(serializedRemoveServiceEndpoint);
     const didSig = createDidSig(controllerHexDid, signingKeyRef, signature);
     return [removeServiceEndpoint, didSig];
@@ -1283,7 +1270,7 @@ class DIDModule {
     did,
     controllerDid,
     signingKeyRef,
-    nonce = undefined
+    nonce = undefined,
   ) {
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
@@ -1302,7 +1289,7 @@ class DIDModule {
     iri,
     hexDid,
     signingKeyRef,
-    nonce = undefined
+    nonce = undefined,
   ) {
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
@@ -1327,30 +1314,30 @@ class DIDModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedAddKeys(addKeys) {
-    return getStateChange(this.api, "AddKeys", addKeys);
+    return getStateChange(this.api, 'AddKeys', addKeys);
   }
 
   getSerializedAddControllers(addControllers) {
-    return getStateChange(this.api, "AddControllers", addControllers);
+    return getStateChange(this.api, 'AddControllers', addControllers);
   }
 
   getSerializedAddServiceEndpoint(addServiceEndpoint) {
-    return getStateChange(this.api, "AddServiceEndpoint", addServiceEndpoint);
+    return getStateChange(this.api, 'AddServiceEndpoint', addServiceEndpoint);
   }
 
   getSerializedRemoveKeys(removeKeys) {
-    return getStateChange(this.api, "RemoveKeys", removeKeys);
+    return getStateChange(this.api, 'RemoveKeys', removeKeys);
   }
 
   getSerializedRemoveControllers(removeControllers) {
-    return getStateChange(this.api, "RemoveControllers", removeControllers);
+    return getStateChange(this.api, 'RemoveControllers', removeControllers);
   }
 
   getSerializedRemoveServiceEndpoint(removeServiceEndpoint) {
     return getStateChange(
       this.api,
-      "RemoveServiceEndpoint",
-      removeServiceEndpoint
+      'RemoveServiceEndpoint',
+      removeServiceEndpoint,
     );
   }
 
@@ -1360,7 +1347,7 @@ class DIDModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedDidRemoval(didRemoval) {
-    return getStateChange(this.api, "DidRemoval", didRemoval);
+    return getStateChange(this.api, 'DidRemoval', didRemoval);
   }
 
   /**
@@ -1369,7 +1356,7 @@ class DIDModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedAttestation(setAttestation) {
-    return getStateChange(this.api, "SetAttestationClaim", setAttestation);
+    return getStateChange(this.api, 'SetAttestationClaim', setAttestation);
   }
 }
 

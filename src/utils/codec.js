@@ -1,6 +1,5 @@
-import { u8aToHex } from "@polkadot/util";
-import { decodeAddress, encodeAddress } from "@polkadot/util-crypto";
-import { DockDIDQualifier } from "../../dist/utils/did.cjs";
+import { u8aToHex } from '@polkadot/util';
+import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 
 /**
  * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
@@ -9,7 +8,7 @@ import { DockDIDQualifier } from "../../dist/utils/did.cjs";
  * @return {Boolean} True if hex (with given size) else false
  */
 export function isHexWithGivenByteSize(value, byteSize = undefined) {
-  if (typeof value !== "string") {
+  if (typeof value !== 'string') {
     return false;
   }
   const match = value.match(/^0x([0-9a-f]+$)/i);
@@ -38,7 +37,7 @@ export function getHexIdentifier(id, qualifiers, byteSize) {
         const hex = u8aToHex(decodeAddress(ss58Did));
         // 2 characters for `0x` and 2*byte size of ID
         if (hex.length !== 2 + 2 * byteSize) {
-          throw new Error("Unexpected byte size");
+          throw new Error('Unexpected byte size');
         }
         return hex;
       } catch (e) {
@@ -50,8 +49,8 @@ export function getHexIdentifier(id, qualifiers, byteSize) {
   try {
     // Check if hex and of correct size and return the hex value if successful.
     if (!isHexWithGivenByteSize(id, byteSize)) {
-      throw new Error(`Expected ${byteSize}-byte sequence`)
-    };
+      throw new Error(`Expected ${byteSize}-byte sequence`);
+    }
 
     return id;
   } catch (error) {
@@ -65,17 +64,17 @@ export function getHexIdentifier(id, qualifiers, byteSize) {
  * @param addr - address to convert
  * @param network - the network to use, allowed values are `main`, `test` and `dev` corresponding to mainnet, testnet and dev node
  */
-export function asDockAddress(addr, network = "test") {
+export function asDockAddress(addr, network = 'test') {
   switch (network) {
-    case "dev":
+    case 'dev':
       return encodeAddress(addr, 42);
-    case "test":
+    case 'test':
       return encodeAddress(addr, 21);
-    case "main":
+    case 'main':
       return encodeAddress(addr, 22);
     default:
       throw new Error(
-        `Network can be either test or main or dev but was passed as ${network}`
+        `Network can be either test or main or dev but was passed as ${network}`,
       );
   }
 }
@@ -91,7 +90,7 @@ export function normalizeToHex(data) {
   } else if (isHexWithGivenByteSize(data)) {
     hex = data;
   } else {
-    throw new Error("Require a hex string or a byte array");
+    throw new Error('Require a hex string or a byte array');
   }
   return hex;
 }

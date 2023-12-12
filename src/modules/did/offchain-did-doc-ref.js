@@ -1,4 +1,4 @@
-export const FORMATS = new Set(["CID", "URL", "Custom"]);
+export const FORMATS = new Set(['CID', 'URL', 'Custom']);
 
 /**
  * An off-chain DID Doc reference stored on chain. The reference may be
@@ -16,14 +16,14 @@ export default class OffChainDidDocRef {
   }
 
   static cid(bytes) {
-    return new this("CID", bytes);
+    return new this('CID', bytes);
   }
 
   static url(bytes) {
-    return new this("URL", bytes);
+    return new this('URL', bytes);
   }
 
   static custom(bytes) {
-    return new this("Custom", bytes);
+    return new this('Custom', bytes);
   }
 }

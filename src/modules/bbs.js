@@ -6,7 +6,6 @@ import BBSParams from '../offchain-signatures/params/bbs';
 
 /** Class to write `BBS` parameters and keys on chain */
 export default class BBSModule extends OffchainSignaturesModule {
-
   /**
    * Builds `BBS` params from the provided value.
    */

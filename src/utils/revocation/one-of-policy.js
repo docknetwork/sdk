@@ -26,7 +26,7 @@ export default class OneOfPolicy extends Policy {
    * @param {string} ownerDID - Owner's DID
    */
   controllerIds() {
-    const controllerIds = [...this.controllers].map(controller => typedHexDID(null, controller));
+    const controllerIds = [...this.controllers].map((controller) => typedHexDID(null, controller));
     // Sort the controller ids as the node is expecting sorted ids and keeping ids unsorted is giving a signature
     // verification error. This is a workaround and is needed for now. It maybe fixed later
     controllerIds.sort();

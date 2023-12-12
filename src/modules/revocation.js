@@ -1,6 +1,5 @@
 import {
   getDidNonce,
-  getSignatureFromKeyringPair,
   getStateChange,
 } from '../utils/misc';
 

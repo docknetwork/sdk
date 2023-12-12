@@ -145,7 +145,7 @@ export default class DockAPI {
     );
     this.trustRegistryModule = new TrustRegistryModule(
       this.api,
-      this.signAndSend.bind(this)
+      this.signAndSend.bind(this),
     );
     this.statusListCredentialModule = new StatusListCredentialModule(
       this.api,
@@ -375,7 +375,7 @@ export default class DockAPI {
     return this.statusListCredentialModule;
   }
 
-    /**
+  /**
    * Gets the SDK's TrustRegistryModule module
    * @return {TrustRegistryModule} The module to use
    */

@@ -2,7 +2,6 @@
 
 import {
   getDidNonce,
-  getSignatureFromKeyringPair,
   getStateChange,
 } from '../utils/misc';
 import WithParamsAndPublicKeys from './WithParamsAndPublicKeys';

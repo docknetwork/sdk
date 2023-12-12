@@ -1,7 +1,6 @@
 import StatusList2021Credential from '../status-list-credential/status-list2021-credential';
 import {
   getDidNonce,
-  getSignatureFromKeyringPair,
   getStateChange,
 } from '../utils/misc';
 

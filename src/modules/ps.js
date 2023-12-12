@@ -6,7 +6,6 @@ import PSParams from '../offchain-signatures/params/ps';
 
 /** Class to write `Pointcheval-Sanders` parameters and keys on chain */
 export default class PSModule extends OffchainSignaturesModule {
-
   /**
    * Builds `Pointcheval-Sanders` params from the provided value.
    */

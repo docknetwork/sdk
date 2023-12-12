@@ -9,7 +9,6 @@ import { getDidNonce } from '../utils/misc';
  * This logic is common in offchain signatures modules and accumulator
  */
 export default class WithParamsAndPublicKeys {
-
   /**
    * Builds module-specific params from the provided value.
    */

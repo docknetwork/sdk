@@ -1,4 +1,4 @@
-import { typedHexDID } from "../utils/did";
+import { typedHexDID } from '../utils/did';
 import { getDidNonce } from '../utils/misc';
 
 /**
@@ -35,20 +35,20 @@ export default class TrustRegistryModule {
     signingKeyRef,
     { nonce = undefined, didModule = undefined } = {},
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     const convenerHexDid = typedHexDID(this.api, convenerDid);
-    nonce ??= await getDidNonce(convenerHexDid, nonce, didModule);
+    const lastNonce = nonce ?? await getDidNonce(convenerHexDid, nonce, didModule);
 
     return this.signAndSend(
       convenerHexDid.changeState(
         this.module.initTrustRegistry.bind(this.module),
         'InitTrustRegistry',
-        { registryId, name, nonce },
+        { registryId, name, nonce: lastNonce },
         signingKeyRef,
       ),
       waitForFinalization,
-      params
+      params,
     );
   }
 
@@ -70,20 +70,20 @@ export default class TrustRegistryModule {
     signingKeyRef,
     { nonce = undefined, didModule = undefined } = {},
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     const convenerHexDid = typedHexDID(this.api, convenerDid);
-    nonce ??= await getDidNonce(convenerHexDid, nonce, didModule);
+    const lastNonce = nonce ?? await getDidNonce(convenerHexDid, nonce, didModule);
 
     return this.signAndSend(
       convenerHexDid.changeState(
         this.module.addSchemaMetadata,
         'AddSchemaMetadata',
-        { registryId, schemas, nonce },
+        { registryId, schemas, nonce: lastNonce },
         signingKeyRef,
       ),
       waitForFinalization,
-      params
+      params,
     );
   }
 
@@ -105,20 +105,20 @@ export default class TrustRegistryModule {
     signingKeyRef,
     { nonce = undefined, didModule = undefined } = {},
     waitForFinalization = true,
-    params = {}
+    params = {},
   ) {
     const convenerOrIssuerOrVerifierHexDid = typedHexDID(this.api, convenerOrIssuerOrVerifierDid);
-    nonce ??= await getDidNonce(convenerOrIssuerOrVerifierHexDid, nonce, didModule);
+    const lastNonce = nonce ?? await getDidNonce(convenerOrIssuerOrVerifierHexDid, nonce, didModule);
 
     return this.signAndSend(
       convenerOrIssuerOrVerifierHexDid.changeState(
         this.module.updateSchemaMetadata,
         'UpdateSchemaMetadata',
-        { registryId, schemas, nonce },
+        { registryId, schemas, nonce: lastNonce },
         signingKeyRef,
       ),
       waitForFinalization,
-      params
+      params,
     );
   }
 }

@@ -3,7 +3,6 @@ import { validate } from 'jsonschema';
 import axios from 'axios';
 
 import { hexDIDToQualified } from '../utils/did';
-import { getSignatureFromKeyringPair } from '../utils/misc';
 
 import {
   createNewDockBlobId,

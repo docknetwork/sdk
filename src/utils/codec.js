@@ -29,10 +29,11 @@ export function isHexWithGivenByteSize(value, byteSize = undefined) {
  * @return {string} Returns the hexadecimal representation of the ID.
  */
 export function getHexIdentifier(id, qualifiers, byteSize) {
+  const strId = String(id);
   for (const qualifier of [].concat(qualifiers)) {
-    if (id.startsWith(qualifier)) {
+    if (strId.startsWith(qualifier)) {
       // Fully qualified ID. Remove the qualifier
-      const ss58Did = id.slice(qualifier.length);
+      const ss58Did = strId.slice(qualifier.length);
       try {
         const hex = u8aToHex(decodeAddress(ss58Did));
         // 2 characters for `0x` and 2*byte size of ID
@@ -41,21 +42,21 @@ export function getHexIdentifier(id, qualifiers, byteSize) {
         }
         return hex;
       } catch (e) {
-        throw new Error(`Invalid SS58 ID ${id}. ${e}`);
+        throw new Error(`Invalid SS58 ID ${strId}. ${e}`);
       }
     }
   }
 
   try {
     // Check if hex and of correct size and return the hex value if successful.
-    if (!isHexWithGivenByteSize(id, byteSize)) {
+    if (!isHexWithGivenByteSize(strId, byteSize)) {
       throw new Error(`Expected ${byteSize}-byte sequence`);
     }
 
-    return id;
+    return strId;
   } catch (error) {
     // Cannot parse as hex
-    throw new Error(`Invalid hex Did \`${id}\`: ${error}`);
+    throw new Error(`Invalid hex Did \`${id}\`, stringified \`${strId}\`: ${error}`);
   }
 }
 

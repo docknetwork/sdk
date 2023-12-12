@@ -7,7 +7,7 @@ import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-const
 import {
   OneOfPolicy,
 } from '../../src/utils/revocation';
-import { DidKeypair } from '../../src/utils/did'
+import { DidKeypair, typedHexDID, typedHexDIDFromSubstrate } from '../../src/utils/did'
 import { registerNewDIDUsingPair } from './helpers';
 
 describe('Revocation Module', () => {
@@ -115,7 +115,7 @@ describe('Revocation Module', () => {
 
     // Note: Intentionally passing true and waiting for finalization as not doing that makes the multi-query check fail.
     // This seems like a bug since the single query check done in next loop work. Even the upgrade to @polkadot/api version 9.14 didn't fix
-    await dock.revocation.unrevoke(unrevoke, [[sig1, nonce1]], true);
+    await dock.revocation.unrevoke(unrevoke, [[nonce1, sig1]], true);
 
     for (let i = 0; i < rIdsArr.length; i++) {
       // eslint-disable-next-line no-await-in-loop
@@ -187,15 +187,22 @@ describe('Revocation Module', () => {
     const reg = await dock.revocation.getRevocationRegistry(multipleControllerRegistryID);
     expect(reg.policy.isOneOf).toBe(true);
 
-    const controllerSet = reg.policy.toJSON().oneOf;
-    expect(controllerSet.length).toBe(2);
+    const controllerSet = reg.policy.asOneOf;
+    expect(controllerSet.toJSON().length).toBe(2);
 
     let hasFirstDID = false;
     let hasSecondDID = false;
-    controllerSet.forEach((controller) => {
-      if (controller === ownerDID) {
+    [...controllerSet.entries()]
+      .flatMap((v) => v)
+      .map(typedHexDIDFromSubstrate)
+      .forEach((controller) => {
+      if (
+        controller.toString() === typedHexDID(dock.api, ownerDID).toString()
+      ) {
         hasFirstDID = true;
-      } else if (controller === ownerDID2) {
+      } else if (
+        controller.toString() === typedHexDID(dock.api, ownerDID2).toString()
+      ) {
         hasSecondDID = true;
       }
     });
@@ -211,7 +218,7 @@ describe('Revocation Module', () => {
     expect(revocationStatus).toBe(true);
 
     // Unrevoke from another DID
-    await dock.revocation.unrevokeCredentialWithOneOfPolicy(multipleControllerRegistryID, revId, ownerDID2, pair2, 1, { didModule: dock.did }, false);
+    await dock.revocation.unrevokeCredentialWithOneOfPolicy(multipleControllerRegistryID, revId, ownerDID2, pair2, { didModule: dock.did }, false);
     const revocationStatus1 = await dock.revocation.getIsRevoked(multipleControllerRegistryID, revId);
     expect(revocationStatus1).toBe(false);
 

@@ -21,7 +21,6 @@ import { registerNewDIDUsingPair } from './helpers';
 let account;
 let pair;
 let dockDID;
-let hexDid;
 let blobId;
 let keyDoc;
 let validCredential;
@@ -58,7 +57,7 @@ describe('Schema Blob Module Integration', () => {
     dockApi.setAccount(account);
     pair = new DidKeypair(dockApi.keyring.addFromUri(firstKeySeed), 1);
     dockDID = createNewDockDID();
-    hexDid = typedHexDID(dock.api, dockDID);
+    hexDid = typedHexDID(dockApi.api, dockDID);
     await registerNewDIDUsingPair(dockApi, dockDID, pair);
     blobId = randomAsHex(DockBlobIdByteSize);
 
@@ -122,11 +121,11 @@ describe('Schema Blob Module Integration', () => {
   test('Set and get schema', async () => {
     const schema = new Schema();
     await schema.setJSONSchema(exampleSchema);
-    await dockApi.blob.new(schema.toBlob(), hexDid, pair, { didModule: dockApi.didModule }, false);
+    await dockApi.blob.new(schema.toBlob(), dockDID, pair, { didModule: dockApi.didModule }, false);
     await expect(Schema.get(blobId, dockApi)).resolves.toMatchObject({
       ...exampleSchema,
       id: blobId,
-      author: hexDIDToQualified(typedHexDID(dock.api, dockDID)),
+      author: hexDIDToQualified(typedHexDID(dockApi.api, dockDID)),
     });
   }, 20000);
 

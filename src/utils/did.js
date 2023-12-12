@@ -5,10 +5,9 @@
 import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
 import { isHexWithGivenByteSize, getHexIdentifier } from './codec';
-import { PublicKeyEd25519, PublicKeySecp256k1 } from '../public-keys';
+import { PublicKeyEd25519, PublicKeySecp256k1, PublicKey, VerificationRelationship } from '../public-keys';
 
 import { Signature } from "../signatures"; // eslint-disable-line
-import { PublicKey, VerificationRelationship } from "../public-keys"; // eslint-disable-line
 import {
   getPublicKeyFromKeyringPair,
   getSignatureFromKeyringPair,

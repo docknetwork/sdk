@@ -3,13 +3,11 @@ import { blake2AsHex } from '@polkadot/util-crypto';
 
 import { sha256 } from 'js-sha256';
 import {
-  PublicKey,
   PublicKeyEd25519,
   PublicKeySecp256k1,
   PublicKeySr25519, // eslint-disable-line
 } from '../public-keys';
 import {
-  Signature,
   SignatureEd25519,
   SignatureSecp256k1,
   SignatureSr25519, // eslint-disable-line

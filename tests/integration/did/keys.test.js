@@ -51,7 +51,7 @@ describe('Key support for DIDs', () => {
 
     await dock.did.new(dockDid, [didKey1, didKey2, didKey3], [], false);
 
-    const didDetail = await dock.did.getOnchainDidDetail(hexDid);
+    const didDetail = await dock.did.getOnchainDidDetail(hexDid.asDid);
     expect(didDetail.lastKeyId).toBe(3);
     expect(didDetail.activeControllerKeys).toBe(2);
     expect(didDetail.activeControllers).toBe(1);
@@ -113,9 +113,9 @@ describe('Key support for DIDs', () => {
     const didKey1 = new DidKey(publicKey1, verRels1);
 
     const pair = dock.keyring.addFromUri(seed2, null, 'ed25519');
-    await dock.did.addKeys([didKey1], dockDid, dockDid, pair, 2);
+    await dock.did.addKeys([didKey1], dockDid, dockDid, pair);
 
-    const didDetail = await dock.did.getOnchainDidDetail(hexDid);
+    const didDetail = await dock.did.getOnchainDidDetail(hexDid.asDid);
     expect(didDetail.lastKeyId).toBe(4);
     expect(didDetail.activeControllerKeys).toBe(3);
     expect(didDetail.activeControllers).toBe(1);
@@ -166,9 +166,9 @@ describe('Key support for DIDs', () => {
 
   test('Remove keys from DID', async () => {
     const pair = generateEcdsaSecp256k1Keypair(seed4);
-    await dock.did.removeKeys([1, 3], dockDid, dockDid, pair, 4);
+    await dock.did.removeKeys([1, 3], dockDid, dockDid, pair);
 
-    const didDetail = await dock.did.getOnchainDidDetail(hexDid);
+    const didDetail = await dock.did.getOnchainDidDetail(hexDid.asDid);
     expect(didDetail.lastKeyId).toBe(4);
     expect(didDetail.activeControllerKeys).toBe(2);
     expect(didDetail.activeControllers).toBe(1);
@@ -221,8 +221,8 @@ describe('Key support for DIDs', () => {
     const didKey = new DidKey(publicKey, verRels);
 
     const pair = dock.keyring.addFromUri(seed2, null, 'ed25519');
-    await dock.did.addKeys([didKey], dockDid, dockDid, pair, 2);
-    const didDetail = await dock.did.getOnchainDidDetail(hexDid);
+    await dock.did.addKeys([didKey], dockDid, dockDid, pair);
+    const didDetail = await dock.did.getOnchainDidDetail(hexDid.asDid);
     expect(didDetail.lastKeyId).toBe(5);
     const dk = await dock.did.getDidKey(dockDid, 5);
     expect(dk.publicKey).toEqual(publicKey);

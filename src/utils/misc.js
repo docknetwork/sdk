@@ -1,17 +1,22 @@
-import elliptic from 'elliptic';
-import { blake2AsHex } from '@polkadot/util-crypto';
+import elliptic from "elliptic";
+import { blake2AsHex } from "@polkadot/util-crypto";
 
-import { isHex } from '@polkadot/util';
-import { sha256 } from 'js-sha256';
+import { sha256 } from "js-sha256";
 import {
-  PublicKey, PublicKeyEd25519, PublicKeySecp256k1, PublicKeySr25519, // eslint-disable-line
-} from '../public-keys';
+  PublicKey,
+  PublicKeyEd25519,
+  PublicKeySecp256k1,
+  PublicKeySr25519, // eslint-disable-line
+} from "../public-keys";
 import {
-  Signature, SignatureEd25519, SignatureSecp256k1, SignatureSr25519, // eslint-disable-line
-} from '../signatures';
+  Signature,
+  SignatureEd25519,
+  SignatureSecp256k1,
+  SignatureSr25519, // eslint-disable-line
+} from "../signatures";
 
 const EC = elliptic.ec;
-const secp256k1Curve = new EC('secp256k1');
+const secp256k1Curve = new EC("secp256k1");
 
 /** // TODO: Error handling when `stateChange` is not registered
  * Helper function to return bytes of a `StateChange` enum. Updates like key change, DID removal, revocation, etc
@@ -21,7 +26,7 @@ const secp256k1Curve = new EC('secp256k1');
  * @return {array} An array of Uint8
  */
 export function getBytesForStateChange(api, stateChange) {
-  return api.createType('StateChange', stateChange).toU8a();
+  return api.createType("StateChange", stateChange).toU8a();
 }
 
 export function getStateChange(api, name, value) {
@@ -61,7 +66,11 @@ export function verifyEcdsaSecp256k1Sig(message, signature, publicKey) {
  * @param {PublicKeySecp256k1} publicKey - Secp256k1 public key for verification
  * @returns {boolean} True when signature is valid, false otherwise
  */
-export function verifyEcdsaSecp256k1SigPrehashed(messageHash, signature, publicKey) {
+export function verifyEcdsaSecp256k1SigPrehashed(
+  messageHash,
+  signature,
+  publicKey
+) {
   // Remove the leading `0x`
   const sigHex = signature.value.slice(2);
   // Break it in 2 chunks of 32 bytes each
@@ -70,7 +79,7 @@ export function verifyEcdsaSecp256k1SigPrehashed(messageHash, signature, publicK
   const pkHex = publicKey.value.slice(2);
   // Generate public key object. Not extracting the public key for signature as the verifier
   // should always know what public key is being used.
-  const pk = secp256k1Curve.keyFromPublic(pkHex, 'hex');
+  const pk = secp256k1Curve.keyFromPublic(pkHex, "hex");
   return secp256k1Curve.verify(messageHash, sig, pk);
 }
 
@@ -86,9 +95,9 @@ export function getKeyPairType(pair) {
 
   if (pair.ec && pair.priv) {
     // elliptic library's pair has `ec`, `priv` and `pub`. There is not a cleaner way to detect that
-    return 'secp256k1';
+    return "secp256k1";
   }
-  throw new Error('Cannot detect key pair type');
+  throw new Error("Cannot detect key pair type");
 }
 
 /**
@@ -99,9 +108,9 @@ export function getKeyPairType(pair) {
 export function getPublicKeyFromKeyringPair(pair) {
   const type = getKeyPairType(pair);
   let Cls;
-  if (type === 'ed25519') {
+  if (type === "ed25519") {
     Cls = PublicKeyEd25519;
-  } else if (type === 'sr25519') {
+  } else if (type === "sr25519") {
     Cls = PublicKeySr25519;
   } else {
     Cls = PublicKeySecp256k1;
@@ -118,9 +127,9 @@ export function getPublicKeyFromKeyringPair(pair) {
 export function getSignatureFromKeyringPair(pair, message) {
   const type = getKeyPairType(pair);
   let Cls;
-  if (type === 'ed25519') {
+  if (type === "ed25519") {
     Cls = SignatureEd25519;
-  } else if (type === 'sr25519') {
+  } else if (type === "sr25519") {
     Cls = SignatureSr25519;
   } else {
     Cls = SignatureSecp256k1;
@@ -149,16 +158,7 @@ export function getUniqueElementsFromArray(a, filterCallback) {
  * @returns {string}
  */
 export function encodeExtrinsicAsHash(api, tx) {
-  return blake2AsHex(api.createType('Call', tx).toU8a());
-}
-
-/**
- * Convert bytes to struct `WrappedBytes` expected by chain
- * @param bytes
- * @returns {{'0'}}
- */
-export function bytesToWrappedBytes(bytes) {
-  return bytes;
+  return blake2AsHex(api.createType("Call", tx).toU8a());
 }
 
 /**
@@ -169,12 +169,18 @@ export function bytesToWrappedBytes(bytes) {
  * using this
  * @returns {Promise<undefined|*>}
  */
-export async function getDidNonce(didOrDidMethodKey, nonce = undefined, didModule = undefined) {
+export async function getDidNonce(
+  didOrDidMethodKey,
+  nonce = undefined,
+  didModule = undefined
+) {
   if (nonce === undefined && didModule === undefined) {
-    throw new Error('Provide either nonce or didModule to fetch nonce but none provided');
+    throw new Error(
+      "Provide either nonce or didModule to fetch nonce but none provided"
+    );
   }
   if (nonce === undefined) {
-    return didModule.getNextNonceForDID(didOrDidMethodKey);
+    return didModule.getNextNonceForDid(didOrDidMethodKey);
   }
   return nonce;
 }

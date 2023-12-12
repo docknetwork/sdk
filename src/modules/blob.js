@@ -1,12 +1,12 @@
 import { encodeAddress, randomAsHex } from '@polkadot/util-crypto';
 import {
-  u8aToString, stringToHex, bufferToU8a, u8aToHex,
+  u8aToString, stringToHex, bufferToU8a,
 } from '@polkadot/util';
 
-import { getDidNonce, getSignatureFromKeyringPair, getStateChange } from '../utils/misc';
+import { getDidNonce, getStateChange } from '../utils/misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from '../utils/codec';
 import NoBlobError from '../utils/errors/no-blob-error';
-import { createDidSig, getHexIdentifierFromDID } from '../utils/did';
+import { typedHexDIDFromSubstrate, createDidSig, typedHexDID } from '../utils/did';
 
 export const DockBlobQualifier = 'blob:dock:';
 export const DockBlobIdByteSize = 32;
@@ -33,7 +33,10 @@ export function validateBlobIDHexIdentifier(identifier) {
  * @return {string} Returns the hexadecimal representation of the ID.
  */
 export function getHexIdentifierFromBlobID(id) {
-  return getHexIdentifier(id, DockBlobQualifier, validateBlobIDHexIdentifier, DockBlobIdByteSize);
+  const hexId = getHexIdentifier(id, DockBlobQualifier, DockBlobIdByteSize);
+  validateBlobIDHexIdentifier(hexId);
+
+  return hexId;
 }
 
 /**
@@ -74,14 +77,15 @@ class BlobModule {
    * @param blob
    * @param signerDid - Signer of the blob
    * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
    * using this
    * @returns {Promise<*>}
    */
   async createNewTx(blob, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
-    const [addBlob, didSig] = await this.createSignedAddBlob(blob, signerDid, signingKeyRef, { nonce, didModule });
+    const signerHexDid = typedHexDID(this.api, signerDid);
+    const [addBlob, didSig] = await this.createSignedAddBlob(blob, signerHexDid, signingKeyRef, { nonce, didModule });
     return this.module.new(addBlob, didSig);
   }
 
@@ -90,7 +94,7 @@ class BlobModule {
    * @param blob
    * @param signerDid - Signer of the blob
    * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
    * using this
@@ -130,7 +134,7 @@ class BlobModule {
         // no-op, just use default Uint8 array value
       }
 
-      return [u8aToHex(respTuple[0]), value];
+      return [typedHexDIDFromSubstrate(respTuple[0]), value];
     }
     throw new Error(`Needed 2 items in response but got${respTuple.length}`);
   }
@@ -140,7 +144,7 @@ class BlobModule {
    * @param blob
    * @param hexDid - Signer DID in hex form
    * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
    * using this
@@ -162,8 +166,8 @@ class BlobModule {
       nonce,
     };
     const serializedAddBlob = this.getSerializedBlob(addBlob);
-    const signature = getSignatureFromKeyringPair(keyPair, serializedAddBlob);
-    const didSig = createDidSig(signerDid, keyId, signature);
+    const signature = signingKeyRef.sign(serializedAddBlob);
+    const didSig = createDidSig(signerDid, signingKeyRef, signature);
     return [addBlob, didSig];
   }
 

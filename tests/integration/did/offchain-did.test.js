@@ -3,7 +3,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
 import { DockAPI } from '../../../src';
 import {
-  createNewDockDID, getHexIdentifierFromDID, NoDIDError, NoOnchainDIDError,
+  createNewDockDID, typedHexDID, NoDIDError, NoOnchainDIDError,
 } from '../../../src/utils/did';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { OffChainDidDocRef } from '../../../src/modules/did';
@@ -13,7 +13,7 @@ describe('Off-chain DIDs', () => {
 
   // Generate a random DID
   const dockDID = createNewDockDID();
-  const hexDID = getHexIdentifierFromDID(dockDID);
+  const hexDID = typedHexDID(dock.api, dockDID);
 
   const firstDocRef = randomAsHex(100);
   const secondDocRef = randomAsHex(110);

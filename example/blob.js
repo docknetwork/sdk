@@ -20,7 +20,7 @@ async function writeAndReadBlob(dock, blobValue, dockDID, pair) {
     blob: blobValue,
   };
 
-  await dock.blob.new(blob, dockDID, pair, 1, { didModule: dock.did }, false);
+  await dock.blob.new(blob, dockDID, pair, { didModule: dock.did }, false);
 
   console.log('Blob written, reading from chain...');
 

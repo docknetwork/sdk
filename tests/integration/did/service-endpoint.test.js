@@ -1,7 +1,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
 import { DockAPI } from '../../../src';
-import { createNewDockDID, getHexIdentifierFromDID, NoDIDError } from '../../../src/utils/did';
+import { createNewDockDID, typedHexDID, NoDIDError } from '../../../src/utils/did';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
 import { DidKey, VerificationRelationship } from '../../../src/public-keys';
@@ -13,11 +13,11 @@ describe('DID service endpoints', () => {
   const dock = new DockAPI();
 
   const dockDid1 = createNewDockDID();
-  const hexDid1 = getHexIdentifierFromDID(dockDid1);
+  const hexDid1 = typedHexDID(dock.api, dockDid1);
 
   // This DID will not be controlled by itself
   const dockDid2 = createNewDockDID();
-  const hexDid2 = getHexIdentifierFromDID(dockDid2);
+  const hexDid2 = typedHexDID(dock.api, dockDid2);
 
   const seed1 = randomAsHex(32);
   const seed2 = randomAsHex(32);

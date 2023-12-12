@@ -77,7 +77,7 @@ async function sendAddKeyTxns(count, didPairs) {
     const newPair = dock.keyring.addFromUri(seed, null, 'sr25519');
     const publicKey = getPublicKeyFromKeyringPair(newPair);
     const didKey = new DidKey(publicKey, new VerificationRelationship());
-    const tx = await dock.did.createAddKeysTx([didKey], did, did, currentPair, 1);
+    const tx = await dock.did.createAddKeysTx([didKey], did, did, currentpair);
     txs.push(tx);
     j++;
   }
@@ -105,7 +105,7 @@ async function sendAddControllerTxns(count, didPairs) {
   while (txs.length < count) {
     const did = didPairs[j][0];
     const currentPair = didPairs[j][1];
-    const tx = await dock.did.createAddControllersTx([createNewDockDID()], did, did, currentPair, 1);
+    const tx = await dock.did.createAddControllersTx([createNewDockDID()], did, did, currentpair);
     txs.push(tx);
     j++;
   }
@@ -133,7 +133,7 @@ async function sendRemoveTxns(count, didPairs, waitForFinalization = true) {
   while (txs.length < count) {
     const did = didPairs[j][0];
     const currentPair = didPairs[j][1];
-    const tx = await dock.did.createRemoveTx(did, did, currentPair, 1);
+    const tx = await dock.did.createRemoveTx(did, did, currentpair);
     txs.push(tx);
     j++;
   }
@@ -166,7 +166,7 @@ async function sendBlobTxns(count, didPairs) {
       id: blobId,
       blob: randomAsHex(995),
     };
-    const tx = await dock.blob.createNewTx(blob, did, pair, 1, { didModule: dock.did });
+    const tx = await dock.blob.createNewTx(blob, did, pair, { didModule: dock.did });
     txs.push(tx);
     blobIds.push(blobId);
     j++;

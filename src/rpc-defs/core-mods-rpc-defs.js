@@ -17,7 +17,7 @@ export default {
       params: [
         {
           name: 'did',
-          type: 'Did',
+          type: 'DidOrDidMethodKey',
         },
       ],
       type: 'BTreeMap<IncId, PsParameters>',
@@ -47,7 +47,7 @@ export default {
       params: [
         {
           name: 'did',
-          type: 'Did',
+          type: 'DidOrDidMethodKey',
         },
       ],
       type: 'BTreeMap<IncId, BbsParameters>',
@@ -77,7 +77,7 @@ export default {
       params: [
         {
           name: 'did',
-          type: 'Did',
+          type: 'DidOrDidMethodKey',
         },
       ],
       type: 'BTreeMap<IncId, BbsPlusParameters>',

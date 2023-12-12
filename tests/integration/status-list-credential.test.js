@@ -21,7 +21,7 @@ import { createPresentation } from '../create-presentation';
 import { OneOfPolicy } from '../../src/utils/revocation';
 import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
-import { createNewDockDID } from '../../src/utils/did';
+import { createNewDockDID, DidKeypair } from '../../src/utils/did';
 import StatusList2021Credential from '../../src/status-list-credential/status-list2021-credential';
 import { addStatusList21EntryToCredential } from '../../src/utils/vc/credentials';
 
@@ -62,11 +62,11 @@ buildTest('StatusList2021Credential', () => {
     dockAPI.setAccount(account);
 
     // Register issuer DID
-    issuerKeyPair = dockAPI.keyring.addFromUri(issuerSeed, null, 'ed25519');
+    issuerKeyPair = new DidKeypair(dockAPI.keyring.addFromUri(issuerSeed, null, 'ed25519'), 1);
     await registerNewDIDUsingPair(dockAPI, issuerDID, issuerKeyPair);
 
     // Register holder DID
-    const pair1 = dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519');
+    const pair1 = new DidKeypair(dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'), 1);
     await registerNewDIDUsingPair(dockAPI, holderDID, pair1);
 
     // Create a new policy
@@ -144,7 +144,6 @@ buildTest('StatusList2021Credential', () => {
       fetchedCred,
       issuerDID,
       issuerKeyPair,
-      1,
       dockAPI,
     );
 
@@ -175,7 +174,6 @@ buildTest('StatusList2021Credential', () => {
       fetchedCred,
       issuerDID,
       issuerKeyPair,
-      1,
       dockAPI,
     );
     const holderKey = getKeyDoc(
@@ -219,7 +217,6 @@ buildTest('StatusList2021Credential', () => {
       fetchedCred,
       issuerDID,
       issuerKeyPair,
-      1,
       dockAPI,
     );
 

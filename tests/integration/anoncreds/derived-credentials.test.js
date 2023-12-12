@@ -8,7 +8,7 @@ import {
   TestKeyringOpts,
   Schemes,
 } from '../../test-constants';
-import { createNewDockDID } from '../../../src/utils/did';
+import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
 import { registerNewDIDUsingPair } from '../helpers';
 import { getKeyDoc } from '../../../src/utils/vc/helpers';
 import {
@@ -122,7 +122,7 @@ describe.each(Schemes)('Derived Credentials', ({
     account = dock.keyring.addFromUri(TestAccountURI);
 
     dock.setAccount(account);
-    pair1 = dock.keyring.addFromUri(randomAsHex(32));
+    pair1 = new DidKeypair(dock.keyring.addFromUri(randomAsHex(32)), 1);
     did1 = createNewDockDID();
     await registerNewDIDUsingPair(dock, did1, pair1);
 
@@ -136,7 +136,6 @@ describe.each(Schemes)('Derived Credentials', ({
       did1,
       did1,
       pair1,
-      1,
       { didModule: dock.did },
       false,
     );
@@ -151,14 +150,14 @@ describe.each(Schemes)('Derived Credentials', ({
     await registerNewDIDUsingPair(
       dock,
       holder3DID,
-      dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'),
+      new DidKeypair(dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'), 1),
     );
   }, 30000);
 
   async function createAndVerifyPresentation(credentials, verifyOptions = {}) {
     const holderKey = getKeyDoc(
       holder3DID,
-      dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'),
+      new DidKeypair(dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'), 1),
       'Sr25519VerificationKey2020',
     );
 

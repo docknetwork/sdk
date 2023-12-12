@@ -2,7 +2,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
 import { CredentialBuilder, CredentialSchema, initializeWasm } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI } from '../../../src';
-import { createNewDockDID } from '../../../src/utils/did';
+import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
 import { DockResolver } from '../../../src/resolver';
 import {
   registerNewDIDUsingPair,
@@ -47,9 +47,9 @@ describe.each(Schemes)('Issuance', ({
       address: FullNodeEndpoint,
     });
     chainModule = getModule(dock);
-    account = dock.keyring.addFromUri(TestAccountURI);
+    account = new DidKeypair(dock.keyring.addFromUri(TestAccountURI), 1);
     dock.setAccount(account);
-    pair1 = dock.keyring.addFromUri(randomAsHex(32));
+    pair1 = new DidKeypair(dock.keyring.addFromUri(randomAsHex(32)), 1);
     did1 = createNewDockDID();
     await registerNewDIDUsingPair(dock, did1, pair1);
   }, 20000);

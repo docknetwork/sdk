@@ -56,7 +56,7 @@ export default class Schema {
    */
   sign(pair, blobModule) {
     const serializedBlob = blobModule.getSerializedBlob(this.toBlob());
-    this.signature = getSignatureFromKeyringPair(pair, serializedBlob);
+    this.signature = pair.sign(serializedBlob);
     return this;
   }
 

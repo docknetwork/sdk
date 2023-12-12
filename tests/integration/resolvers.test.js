@@ -1,6 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { DockResolver, DockStatusList2021Resolver } from '../../src/resolver';
-import { getHexIdentifierFromDID, createNewDockDID } from '../../src/utils/did';
+import { typedHexDID, createNewDockDID } from '../../src/utils/did';
 
 import { DockAPI } from '../../src/index';
 
@@ -54,7 +54,7 @@ describe('Resolvers', () => {
     dock.setAccount(account);
 
     // Thees DIDs should be written before any test begins
-    pair = dock.keyring.addFromUri(ownerSeed, null, 'sr25519');
+    pair = new DidKeypair(dock.keyring.addFromUri(ownerSeed, null, 'sr25519'), 1);
 
     // The controller is same as the DID
     await registerNewDIDUsingPair(dock, ownerDID, pair);
@@ -88,7 +88,7 @@ describe('Resolvers', () => {
     expect(resolver.supports('status-list2021:*:')).toBe(false);
     expect(resolver.supports('status-list2020:doc:')).toBe(false);
     expect(await resolver.resolve(ownerDID)).toEqual(
-      await dock.did.getDocument(getHexIdentifierFromDID(ownerDID)),
+      await dock.did.getDocument(typedHexDID(dock.api, ownerDID)),
     );
     if (!DisableStatusListTests) {
       expect(await resolver.resolve(statusListCred.id)).toEqual(
@@ -124,7 +124,7 @@ describe('Resolvers', () => {
     expect(resolver.supports('status-list2021:*:')).toBe(false);
     expect(resolver.supports('status-list2020:doc:')).toBe(false);
     expect(await resolver.resolve(ownerDID)).toEqual(
-      await dock.did.getDocument(getHexIdentifierFromDID(ownerDID)),
+      await dock.did.getDocument(typedHexDID(dock.api, ownerDID)),
     );
     if (!DisableStatusListTests) {
       expect(resolver.resolve(statusListCred.id)).rejects.toThrowError(

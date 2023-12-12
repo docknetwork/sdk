@@ -27,7 +27,7 @@ import {
   TestKeyringOpts,
   Schemes,
 } from '../../test-constants';
-import { createNewDockDID } from '../../../src/utils/did';
+import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
 import { getWasmBytes, parseR1CSFile } from './utils';
 import { checkMapsEqual, registerNewDIDUsingPair } from '../helpers';
 
@@ -119,7 +119,7 @@ for (const {
       account = dock.keyring.addFromUri(TestAccountURI);
       dock.setAccount(account);
 
-      issuerKeypair = dock.keyring.addFromUri(randomAsHex(32));
+      issuerKeypair = new DidKeypair(dock.keyring.addFromUri(randomAsHex(32)), 1);
       issuerDid = createNewDockDID();
       await registerNewDIDUsingPair(dock, issuerDid, issuerKeypair);
 
@@ -152,7 +152,6 @@ for (const {
         issuerDid,
         issuerDid,
         issuerKeypair,
-        1,
         { didModule: dock.didModule },
         false,
       );

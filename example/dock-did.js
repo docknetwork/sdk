@@ -33,7 +33,7 @@ async function removeDID() {
   // Sign the DID removal with this key pair as this is the current key of the DID
   const pair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
 
-  return dock.did.remove(dockDID, dockDID, pair, 1, undefined, false);
+  return dock.did.remove(dockDID, dockDID, pair, undefined, false);
 }
 
 // This function assumes the DID has been written.
@@ -50,7 +50,7 @@ async function addServiceEndpoint() {
   const spId = u8aToHex(encoder.encode(spIdText));
   const originsText = ['https://foo.example.com'];
   const origins = originsText.map((u) => u8aToHex(encoder.encode(u)));
-  return dock.did.addServiceEndpoint(spId, spType, origins, dockDID, dockDID, pair, 1, undefined, false);
+  return dock.did.addServiceEndpoint(spId, spType, origins, dockDID, dockDID, pair, undefined, false);
 }
 
 // This function assumes the DID has been written.
@@ -62,7 +62,7 @@ async function addController() {
 
   const newController = createNewDockDID();
 
-  return dock.did.addControllers([newController], dockDID, dockDID, pair, 1, undefined, false);
+  return dock.did.addControllers([newController], dockDID, dockDID, pair, undefined, false);
 }
 
 // This function assumes the DID has been written.
@@ -81,7 +81,7 @@ async function addKey() {
   vr.setAuthentication();
   const newDidKey = new DidKey(newPk, vr);
 
-  return dock.did.addKeys([newDidKey], dockDID, dockDID, pair, 1, undefined, false);
+  return dock.did.addKeys([newDidKey], dockDID, dockDID, pair, undefined, false);
 }
 
 async function getDIDDoc() {

@@ -50,7 +50,7 @@ export async function parseR1CSFile(r1csName) {
  * @param dock
  * @returns {Promise<[{id: string, type: string},{$schema: string, title, type: string, $id: string},string]>}
  */
-export async function setupExternalSchema(fullSchema, title, did, pair, keyId, dock) {
+export async function setupExternalSchema(fullSchema, title, did, pair, dock) {
   const blobId = randomAsHex(DockBlobIdByteSize);
   const schemaExternal = {
     $schema: 'http://json-schema.org/draft-07/schema#',
@@ -64,7 +64,7 @@ export async function setupExternalSchema(fullSchema, title, did, pair, keyId, d
     id: blobId,
     blob: stringToHex(blobStr),
   };
-  await dock.blob.new(blob, did, pair, keyId, { didModule: dock.didModule }, false);
+  await dock.blob.new(blob, did, pair, { didModule: dock.didModule }, false);
 
   return [{
     id: `data:application/json;charset=utf-8,${encodeURIComponent(

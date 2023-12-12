@@ -1,6 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { DockAPI, PublicKeySecp256k1 } from '../../../src';
-import { createNewDockDID, getHexIdentifierFromDID } from '../../../src/utils/did';
+import { createNewDockDID, typedHexDID } from '../../../src/utils/did';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
 import { DidKey, VerificationRelationship } from '../../../src/public-keys';
@@ -12,7 +12,7 @@ describe('Key support for DIDs', () => {
 
   // Generate a random DID
   const dockDid = createNewDockDID();
-  const hexDid = getHexIdentifierFromDID(dockDid);
+  const hexDid = typedHexDID(dock.api, dockDid);
 
   const seed1 = randomAsHex(32);
   const seed2 = randomAsHex(32);

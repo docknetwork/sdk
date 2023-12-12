@@ -88,7 +88,7 @@ async function main() {
   console.log('The schema is:', JSON.stringify(schema.toJSON(), null, 2));
   console.log('Writing schema to the chain with blob id of', schema.id, '...');
 
-  await schema.writeToChain(dock, dockDID, pair, 1, undefined, false);
+  await schema.writeToChain(dock, dockDID, pair, undefined, false);
 
   console.log(`Schema written, reading from chain (${schema.id})...`);
 

@@ -2,15 +2,129 @@
 
 // Import some utils from Polkadot JS
 // eslint-disable-next-line max-classes-per-file
-import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
-import { isHexWithGivenByteSize, getHexIdentifier } from './codec';
+import { randomAsHex, encodeAddress } from "@polkadot/util-crypto";
+import { isHexWithGivenByteSize, getHexIdentifier } from "./codec";
+import { PublicKeyEd25519, PublicKeySecp256k1 } from "../public-keys";
+import { u8aToHex } from "@polkadot/util";
 
-import { Signature } from '../signatures'; // eslint-disable-line
-import { PublicKey, VerificationRelationship } from '../public-keys'; // eslint-disable-line
+import { Signature } from "../signatures"; // eslint-disable-line
+import { PublicKey, VerificationRelationship } from "../public-keys"; // eslint-disable-line
+import {
+  getPublicKeyFromKeyringPair,
+  getSignatureFromKeyringPair,
+  getStateChange,
+} from "../utils/misc";
 
-export const DockDIDMethod = 'dock';
+export const DockDIDMethod = "dock";
 export const DockDIDQualifier = `did:${DockDIDMethod}:`;
+export const DockDIDMethodKeyQualifier = `did:key:${DockDIDMethod}:`;
 export const DockDIDByteSize = 32;
+
+export class DidKeypair {
+  constructor(keyPair, keyId) {
+    this.keyPair = keyPair;
+    this.keyId = keyId;
+  }
+
+  publicKey() {
+    return getPublicKeyFromKeyringPair(this.keyPair);
+  }
+
+  sign(message) {
+    return getSignatureFromKeyringPair(this.keyPair, message);
+  }
+}
+
+const SECP256K1_PUBLIC_KEY_PREFIX = "zQ3";
+const ED_25519_PUBLIC_KEY_PREFIX = "z6Mk";
+
+const DockDidMethodKeySecp256k1Prefix = `${DockDIDQualifier}${SECP256K1_PUBLIC_KEY_PREFIX}`;
+const DockDidMethodKeyEd25519Prefix = `${DockDIDMethodKeyQualifier}${ED_25519_PUBLIC_KEY_PREFIX}`;
+
+export class DockDidOrDidMethodKey {
+  constructor(api) {
+    Object.defineProperty(this, 'api', { value: api });
+  }
+
+  get asDid() {
+    throw new Error("Not a `Did`");
+  }
+
+  get asDidMethodKey() {
+    throw new Error("Not a `DidMethodKey`");
+  }
+
+  get isDid() {
+    return false;
+  }
+
+  get isDidMethodKey() {
+    return false;
+  }
+
+  signStateChange(name, payload, keyRef) {
+    const stateChange = getStateChange(this.api, name, payload);
+    const keySignature = keyRef.sign(stateChange);
+
+    return createDidSig(this, keyRef, keySignature);
+  }
+
+  changeState(method, name, payload, keyRef) {
+    const signature = this.signStateChange(
+      name,
+      payload,
+      keyRef
+    );
+
+    return method(payload, signature);
+  }
+}
+
+export class DockDid extends DockDidOrDidMethodKey {
+  constructor(did, api) {
+    super(api);
+    this.did = did;
+  }
+
+  get isDid() {
+    return true;
+  }
+
+  get asDid() {
+    return this.did;
+  }
+
+  toJSON() {
+    return { Did: this.did };
+  }
+
+  toString() {
+    return `${DockDIDQualifier}${this.asDid}`;
+  }
+}
+
+export class DockDidMethodKey extends DockDidOrDidMethodKey {
+  constructor(didMethodKey, api) {
+    super(api);
+    this.didMethodKey = didMethodKey;
+  }
+
+  get isDidMethodKey() {
+    return true;
+  }
+
+  get asDidMethodKey() {
+    return this.didMethodKey;
+  }
+
+  toJSON() {
+    return { DidMethodKey: this.didMethodKey };
+  }
+
+  toString() {
+    return `${DockDIDMethodKeyQualifier}${this.asDidMethodKey}`;
+  }
+}
 
 /**
  * Error thrown when a DID document lookup was successful, but the DID in question does not exist.
@@ -19,9 +133,10 @@ export const DockDIDByteSize = 32;
 export class NoDIDError extends Error {
   constructor(did) {
     super(`DID (${did}) does not exist`);
-    this.name = 'NoDIDError';
+    this.name = "NoDIDError";
     this.did = did;
-    this.message = 'A DID document lookup was successful, but the DID in question does not exist. This is different from a network error.';
+    this.message =
+      "A DID document lookup was successful, but the DID in question does not exist. This is different from a network error.";
   }
 }
 
@@ -31,9 +146,10 @@ export class NoDIDError extends Error {
 export class NoOnchainDIDError extends Error {
   constructor(did) {
     super(`DID (${did}) is an off-chain DID`);
-    this.name = 'NoOnchainDIDError';
+    this.name = "NoOnchainDIDError";
     this.did = did;
-    this.message = 'The DID exists on chain but is an off-chain DID, meaning the DID document exists off-chain.';
+    this.message =
+      "The DID exists on chain but is an off-chain DID, meaning the DID document exists off-chain.";
   }
 }
 
@@ -43,9 +159,10 @@ export class NoOnchainDIDError extends Error {
 export class NoOffchainDIDError extends Error {
   constructor(did) {
     super(`DID (${did}) is an on-chain DID`);
-    this.name = 'NoOffchainDIDError';
+    this.name = "NoOffchainDIDError";
     this.did = did;
-    this.message = 'The DID exists on chain and is an on-chain DID but the lookup was performed for an off-chain DID.';
+    this.message =
+      "The DID exists on chain and is an on-chain DID but the lookup was performed for an off-chain DID.";
   }
 }
 
@@ -71,7 +188,7 @@ export function validateDockDIDSS58Identifier(identifier) {
   const regex = new RegExp(/^[5KL][1-9A-HJ-NP-Za-km-z]{47}$/);
   const matches = regex.exec(identifier);
   if (!matches) {
-    throw new Error('The identifier must be 32 bytes and valid SS58 string');
+    throw new Error("The identifier must be 32 bytes and valid SS58 string");
   }
 }
 
@@ -81,8 +198,36 @@ export function validateDockDIDSS58Identifier(identifier) {
  * a 32 byte hex string
  * @return {string} Returns the hexadecimal representation of the DID.
  */
-export function getHexIdentifierFromDID(did) {
-  return getHexIdentifier(did, DockDIDQualifier, validateDockDIDHexIdentifier, DockDIDByteSize);
+export function typedHexDID(api, did) {
+  const hex = getHexIdentifier(
+    did,
+    [DockDIDQualifier, DockDIDMethodKeyQualifier],
+    DockDIDByteSize
+  );
+
+  if (did.startsWith(DockDidMethodKeySecp256k1Prefix)) {
+    return new DockDidMethodKey(new PublicKeySecp256k1(hex), api);
+  } else if (did.startsWith(DockDidMethodKeyEd25519Prefix)) {
+    return new DockDidMethodKey(new PublicKeyEd25519(hex), api);
+  } else {
+    validateDockDIDHexIdentifier(hex, 32);
+    return new DockDid(hex, api);
+  }
+}
+
+export function typedHexDIDFromSubstrate(did) {
+  const hex = getHexIdentifier(
+    u8aToHex(did.isDid ? did.asDid : did.asDidMethodKey),
+    [],
+    DockDIDByteSize
+  );
+  throw JSON.stringify({ did });
+
+  if (did.isDid) {
+    return new DockDid(hex);
+  } else {
+    return new DockDidMethodKey(hex);
+  }
 }
 
 /**
@@ -125,21 +270,27 @@ export function createDidKey(publicKey, verRel) {
  * @param {Signature} sig
  * @returns {{sig: *, keyId, did}}
  */
-export function createDidSig(did, keyId = 1, sig) {
-  return {
-    did, keyId, sig: sig.toJSON(),
-  };
-}
+export function createDidSig(did, { keyId }, rawSig) {
+  const sig = rawSig.toJSON();
 
-/**
- *
- * @param {string} did - DID as hex
- * @param {number} keyId -
- * @param {Signature} sig
- * @returns {{sig: *, keyId, did}}
- */
-export function createDidMethodKeySig(didKey, sig) {
-  return {
-    didKey, sig: sig.toJSON(),
-  };
+  if (did instanceof DockDid) {
+    return {
+      DidSignature: {
+        did: did.asDid,
+        keyId,
+        sig,
+      },
+    };
+  } else if (did instanceof DockDidMethodKey) {
+    return {
+      DidMethodKeySignature: {
+        didKey: did.asDidMethodKey,
+        sig,
+      },
+    };
+  } else {
+    throw new Error(
+      `Incorrect DID passed: \`${did}\`, expected instance of either \`DockDid\` or \`DockDidMethodKey\``
+    );
+  }
 }

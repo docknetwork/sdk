@@ -1,6 +1,6 @@
-import { u8aToHex, isHex } from "@polkadot/util";
+import { u8aToHex } from "@polkadot/util";
 import { decodeAddress, encodeAddress } from "@polkadot/util-crypto";
-import { PublicKeyEd25519, PublicKeySecp256k1, PublicKey } from "../public-keys";
+import { DockDIDQualifier } from "../../dist/utils/did.cjs";
 
 /**
  * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
@@ -25,52 +25,22 @@ export function isHexWithGivenByteSize(value, byteSize = undefined) {
   return false;
 }
 
-class Did {
-  constructor(rawDid) {
-    if (!isHex(rawDid)) {
-      throw new Error(
-        `Expected a hexadecimal DID, received: \`${rawDid}\``
-      );
-    }
-    this.Did = rawDid;
-  }
-}
-
-class DidMethodKey {
-  constructor(rawDidMethodKey) {
-    if (!(rawDidMethodKey instanceof PublicKey)) {
-      throw new Error(
-        `Expected an instance of the \`PublicKey\`, received: \`${rawDidMethodKey}\``
-      );
-    }
-    this.DidMethodKey = rawDidMethodKey;
-  }
-}
-
-const SECP_256_K1_PUBLIC_KEY_PREFIX = "zQ3";
-const ED_25519_PUBLIC_KEY_PREFIX = "z6Mk";
-
 /**
  * Gets the hexadecimal value of the given string.
  * @return {string} Returns the hexadecimal representation of the ID.
  */
-export function getHexIdentifier(id, qualifiers, validate, byteSize) {
+export function getHexIdentifier(id, qualifiers, byteSize) {
   for (const qualifier of [].concat(qualifiers)) {
     if (id.startsWith(qualifier)) {
       // Fully qualified ID. Remove the qualifier
       const ss58Did = id.slice(qualifier.length);
       try {
         const hex = u8aToHex(decodeAddress(ss58Did));
-        if (ss58Did.startsWith(SECP_256_K1_PUBLIC_KEY_PREFIX)) {
-          return new DidMethodKey(new PublicKeySecp256k1(hex));
-        } else if (ss58Did.startsWith(ED_25519_PUBLIC_KEY_PREFIX)) {
-          return new DidMethodKey(new PublicKeyEd25519(hex));
-        }
         // 2 characters for `0x` and 2*byte size of ID
         if (hex.length !== 2 + 2 * byteSize) {
           throw new Error("Unexpected byte size");
         }
-        return new Did(hex);
+        return hex;
       } catch (e) {
         throw new Error(`Invalid SS58 ID ${id}. ${e}`);
       }
@@ -79,11 +49,14 @@ export function getHexIdentifier(id, qualifiers, validate, byteSize) {
 
   try {
     // Check if hex and of correct size and return the hex value if successful.
-    validate(id);
+    if (!isHexWithGivenByteSize(id, byteSize)) {
+      throw new Error(`Expected ${byteSize}-byte sequence`)
+    };
+
     return id;
-  } catch (e) {
+  } catch (error) {
     // Cannot parse as hex
-    throw new Error(`Invalid hexadecimal ID ${id}. ${e}`);
+    throw new Error(`Invalid hex Did \`${id}\`: ${error}`);
   }
 }
 

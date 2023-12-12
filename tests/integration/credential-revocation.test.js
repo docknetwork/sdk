@@ -21,7 +21,7 @@ import {
   registerNewDIDUsingPair,
 } from './helpers';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
-import { createNewDockDID } from '../../src/utils/did';
+import { createNewDockDID, DidKeypair } from '../../src/utils/did';
 import { addRevRegIdToCredential, getPrivateStatus } from '../../src/utils/vc/credentials';
 import { getPrivateStatuses } from '../../src/utils/vc/presentations';
 
@@ -59,11 +59,11 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     dockAPI.setAccount(account);
 
     // Register issuer DID
-    issuerKeyPair = dockAPI.keyring.addFromUri(issuerSeed, null, 'ed25519');
+    issuerKeyPair = new DidKeypair(dockAPI.keyring.addFromUri(issuerSeed, null, 'ed25519'), 1);
     await registerNewDIDUsingPair(dockAPI, issuerDID, issuerKeyPair);
 
     // Register holder DID
-    const pair1 = dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519');
+    const pair1 = new DidKeypair(dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'), 1);
     await registerNewDIDUsingPair(dockAPI, holderDID, pair1);
 
     // Create a new policy
@@ -99,7 +99,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     expect(getPrivateStatus(credential)).not.toBeDefined();
 
     // Revoke the credential
-    await dockAPI.revocation.revokeCredentialWithOneOfPolicy(registryId, revId, issuerDID, issuerKeyPair, 1, { didModule: dockAPI.did }, false);
+    await dockAPI.revocation.revokeCredentialWithOneOfPolicy(registryId, revId, issuerDID, issuerKeyPair, { didModule: dockAPI.did }, false);
 
     // The credential verification should fail as the credential has been revoked.
     const result1 = await verifyCredential(credential, {
@@ -114,7 +114,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
   test('Holder can create a presentation and verifier can verify it successfully when it is not revoked else the verification fails', async () => {
     // The previous test revokes credential so unrevoke it. Its fine if the previous test is not run as unrevoking does not
     // throw error if the credential is not revoked.
-    await dockAPI.revocation.unrevokeCredentialWithOneOfPolicy(registryId, revId, issuerDID, issuerKeyPair, 1, { didModule: dockAPI.did }, false);
+    await dockAPI.revocation.unrevokeCredentialWithOneOfPolicy(registryId, revId, issuerDID, issuerKeyPair, { didModule: dockAPI.did }, false);
 
     const holderKey = getKeyDoc(holderDID, dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
 
@@ -145,7 +145,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     expect(getPrivateStatuses(signedPres)[0]).not.toBeDefined();
 
     // Revoke credential
-    await dockAPI.revocation.revokeCredentialWithOneOfPolicy(registryId, revId, issuerDID, issuerKeyPair, 1, { didModule: dockAPI.did }, false);
+    await dockAPI.revocation.revokeCredentialWithOneOfPolicy(registryId, revId, issuerDID, issuerKeyPair, { didModule: dockAPI.did }, false);
 
     // As the credential is revoked, the presentation should verify successfully.
     const result1 = await verifyPresentation(signedPres, {

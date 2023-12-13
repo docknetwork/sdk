@@ -3,13 +3,14 @@ import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
 import {
   validateDockDIDHexIdentifier,
   validateDockDIDSS58Identifier,
-  DockDIDQualifier,
+  DockDIDQualifier, DockDIDByteSize, DockDIDMethodKeyQualifier,
 } from '../../src/utils/did';
+import { getHexIdentifier } from '../../src/utils/codec';
 
-const hexDid = did => getHexIdentifier(
+const hexDid = (did) => getHexIdentifier(
   did,
   [DockDIDQualifier, DockDIDMethodKeyQualifier],
-  DockDIDByteSize
+  DockDIDByteSize,
 );
 
 describe('DID utilities', () => {

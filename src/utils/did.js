@@ -5,7 +5,9 @@
 import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
 import { isHexWithGivenByteSize, getHexIdentifier } from './codec';
-import { PublicKeyEd25519, PublicKeySecp256k1, PublicKey, VerificationRelationship } from '../public-keys';
+import {
+  PublicKeyEd25519, PublicKeySecp256k1, PublicKey, VerificationRelationship,
+} from '../public-keys';
 
 import { Signature } from "../signatures"; // eslint-disable-line
 import {
@@ -207,7 +209,7 @@ export function typedHexDID(api, did) {
   } else if (did.startsWith(DockDidMethodKeyEd25519Prefix)) {
     return new DockDidMethodKey(new PublicKeyEd25519(hex), api);
   } else {
-    validateDockDIDHexIdentifier(hex, 32);
+    validateDockDIDHexIdentifier(hex);
     return new DockDid(hex, api);
   }
 }

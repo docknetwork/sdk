@@ -76,7 +76,6 @@ class BlobModule {
    * Create a signed transaction for adding a new blob
    * @param blob
    * @param signerDid - Signer of the blob
-   * @param keyPair - Signer's keypair
    * @param signingKeyRef - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
@@ -93,7 +92,6 @@ class BlobModule {
    * Write a new blob on chain.
    * @param blob
    * @param signerDid - Signer of the blob
-   * @param keyPair - Signer's keypair
    * @param signingKeyRef - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
@@ -142,8 +140,7 @@ class BlobModule {
   /**
    * Create an `AddBlob` struct as expected by node and return along with signature.
    * @param blob
-   * @param hexDid - Signer DID in hex form
-   * @param keyPair - Signer's keypair
+   * @param {DockDidOrDidMethodKey} signerDid - Signer DID
    * @param signingKeyRef - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by

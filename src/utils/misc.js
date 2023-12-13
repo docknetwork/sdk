@@ -161,7 +161,7 @@ export function encodeExtrinsicAsHash(api, tx) {
 
 /**
  * Get the nonce to be used for sending the next transaction if not provided already.
- * @param hexDid - DID whose nonce is needed
+ * @param {DockDidOrDidMethodKey} didOrDidMethodKey - DID whose nonce is needed
  * @param nonce - If provided, returned as it is.
  * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
  * using this

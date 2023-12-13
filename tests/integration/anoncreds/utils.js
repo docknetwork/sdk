@@ -46,7 +46,6 @@ export async function parseR1CSFile(r1csName) {
  * @param title
  * @param did
  * @param pair
- * @param keyId
  * @param dock
  * @returns {Promise<[{id: string, type: string},{$schema: string, title, type: string, $id: string},string]>}
  */

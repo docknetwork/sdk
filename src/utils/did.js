@@ -269,7 +269,7 @@ export function createDidKey(publicKey, verRel) {
 
 /**
  *
- * @param {string} did - DID as hex
+ * @param {DockDidOrDidMethodKey} did - DID as hex
  * @param {number} keyId -
  * @param {Signature} sig
  * @returns {{sig: *, keyId, did}}

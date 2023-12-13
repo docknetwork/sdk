@@ -36,6 +36,7 @@ class DIDModule {
    * Creates a new instance of DIDModule and sets the api
    * @constructor
    * @param {object} api - PolkadotJS API Reference
+   * @param signAndSend - Function to sign and send transaction
    */
   constructor(api, signAndSend) {
     this.api = api;
@@ -1019,7 +1020,7 @@ class DIDModule {
   /**
    * Gets the current nonce for the DID. It will throw error if the DID does not exist on
    * chain or chain returns null response.
-   * @param {string} did - DID identifier as hex. Not accepting full DID intentionally for efficiency as these
+   * @param {DockDidOrDidMethodKey} did - DID identifier as hex. Not accepting full DID intentionally for efficiency as these
    * methods are used internally
    * @return {Promise<number>}
    */
@@ -1035,7 +1036,7 @@ class DIDModule {
 
   /**
    * Gets the nonce that should be used for sending the next transaction by this DID. Its 1 more than the current nonce.
-   * @param did
+   * @param {DockDidOrDidMethodKey} did
    * @returns {Promise<*>}
    */
   async getNextNonceForDid(did) {

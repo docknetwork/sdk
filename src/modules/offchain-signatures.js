@@ -115,7 +115,6 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
    * @param targetDid - The DID to which key is being added
    * @param signerDid - The DID that is adding the key by signing the payload because it controls `targetDid`
    * @param signingKeyRef - Signer's signingKeyRef
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
    * using this
@@ -147,7 +146,6 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
    * @param targetDid - The DID from which key is being removed
    * @param signerDid - The DID that is removing the key by signing the payload because it controls `targetDid`
    * @param signingKeyRef - Signer's signingKeyRef
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
    * using this
@@ -178,7 +176,6 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
    * @param targetDid - The DID to which key is being added
    * @param signerDid - The DID that is adding the key by signing the payload because it controls `targetDid`
    * @param signingKeyRef - Signer's signingKeyRef
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
    * using this

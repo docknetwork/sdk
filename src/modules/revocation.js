@@ -179,7 +179,6 @@ class RevocationModule {
    * @param revId - The revocation id that is being revoked
    * @param did
    * @param signingKeyRef
-   * @param keyId
    * @param nonce
    * @param didModule
    * @param waitForFinalization
@@ -197,7 +196,6 @@ class RevocationModule {
    * @param revId
    * @param did
    * @param signingKeyRef
-   * @param keyId
    * @param nonce
    * @param didModule
    * @param waitForFinalization

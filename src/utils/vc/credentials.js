@@ -3,8 +3,7 @@ import jsigs from 'jsonld-signatures';
 import { statusTypeMatches, checkStatus } from '@digitalbazaar/vc-status-list';
 
 import base64url from 'base64url';
-import { CredentialBuilder } from '@docknetwork/crypto-wasm-ts';
-import { CredentialSchema } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
+import { CredentialBuilder, CredentialSchema } from '@docknetwork/crypto-wasm-ts';
 import CredentialIssuancePurpose from './CredentialIssuancePurpose';
 import defaultDocumentLoader from './document-loader';
 import { getAndValidateSchemaIfPresent } from './schema';

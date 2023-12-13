@@ -1,7 +1,7 @@
 import {
   PSCredential,
   PSCredentialBuilder,
-} from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
+} from '@docknetwork/crypto-wasm-ts';
 
 import { Bls12381PSSigDockSigName } from './constants';
 

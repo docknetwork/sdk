@@ -4,9 +4,8 @@ import {
   PSPublicKey,
   PSSecretKey,
   PSSignatureParams,
+  PS_SIGNATURE_PARAMS_LABEL_BYTES,
 } from '@docknetwork/crypto-wasm-ts';
-
-import { PS_SIGNATURE_PARAMS_LABEL_BYTES } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials';
 
 import { Bls12381PSDockVerKeyName } from './constants';
 import DockCryptoKeyPair from './common/DockCryptoKeyPair';

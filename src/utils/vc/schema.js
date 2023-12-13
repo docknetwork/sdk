@@ -16,6 +16,7 @@ import {
  * @param {object} credential - The credential to use, must be expanded JSON-LD
  * @param {object} schema - The schema to use
  * @param context
+ * @param documentLoader
  * @returns {Promise<Boolean>} - Returns promise to a boolean or throws error
  */
 export async function validateCredentialSchema(

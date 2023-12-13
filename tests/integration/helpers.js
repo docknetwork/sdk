@@ -16,6 +16,7 @@ import { createNewDockDID } from '../../src/utils/did';
  */
 export async function registerNewDIDUsingPair(dockAPI, did, pair, verRels = undefined, controllers = []) {
   if (verRels === undefined) {
+    // eslint-disable-next-line no-param-reassign
     verRels = new VerificationRelationship();
   }
   // No additional controller

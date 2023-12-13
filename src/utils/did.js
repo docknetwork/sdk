@@ -165,7 +165,7 @@ export class NoOffchainDIDError extends Error {
 }
 
 /**
- * Check if the given identifier is 32 byte hex
+ * Check if the given identifier is the hex representation of a Dock DID.
  * @param {string} identifier - The identifier to check.
  * @return {void} Throws exception if invalid identifier
  */
@@ -191,11 +191,11 @@ export function validateDockDIDSS58Identifier(identifier) {
 }
 
 /**
- * Gets the hexadecimal value of the given DID.
+ * Takes a DID string, gets the hexadecimal value of that and returns a `DockDidMethodKey` or `DockDid` object.
  * @param {*} api
  * @param {string} did -  The DID can be passed as fully qualified DID like `did:dock:<SS58 string>` or
- * a 32 byte hex string
- * @return {string} Returns the hexadecimal representation of the DID.
+ * `did:key:<value>` or a 32 byte hex string
+ * @return {DockDidOrDidMethodKey} Returns a `DockDidMethodKey` or `DockDid` object.
  */
 export function typedHexDID(api, did) {
   const hex = getHexIdentifier(

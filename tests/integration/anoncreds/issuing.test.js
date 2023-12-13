@@ -11,7 +11,7 @@ import {
 } from '../helpers';
 import { issueCredential, verifyCredential } from '../../../src/utils/vc/index';
 import { getKeyDoc } from '../../../src/utils/vc/helpers';
-import { getJsonSchemaFromCredential, } from '../../../src/utils/vc/credentials';
+import { getJsonSchemaFromCredential } from '../../../src/utils/vc/credentials';
 import { getResidentCardCredentialAndSchema, setupExternalSchema } from './utils';
 import {
   FullNodeEndpoint,
@@ -66,7 +66,6 @@ describe.each(Schemes)('Issuance', ({
       did1,
       did1,
       pair1,
-      1,
       { didModule: dock.did },
       false,
     );

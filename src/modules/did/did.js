@@ -682,6 +682,7 @@ class DIDModule {
    * Throws NoDID if the DID does not exist on chain.
    * @param {string} did - The DID can be passed as fully qualified DID like `did:dock:<SS58 string>` or
    * a 32 byte hex string
+   * @param getOffchainSigKeys
    * @return {Promise<object>} The DID document.
    */
   // eslint-disable-next-line sonarjs/cognitive-complexity

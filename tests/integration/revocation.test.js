@@ -193,9 +193,9 @@ describe('Revocation Module', () => {
     let hasFirstDID = false;
     let hasSecondDID = false;
     controllerSet.forEach((controller) => {
-      if (controller === ownerDID) {
+      if (controller.did === ownerDID) {
         hasFirstDID = true;
-      } else if (controller === ownerDID2) {
+      } else if (controller.did === ownerDID2) {
         hasSecondDID = true;
       }
     });

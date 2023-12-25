@@ -445,7 +445,7 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = typedHexDID(this.api, targetDid);
+    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
     const signerHexDid = typedHexDID(this.api, signerDid);
     const [removeControllers, signature] = await this.createSignedRemoveControllers(
       controllers,
@@ -1031,7 +1031,7 @@ class DIDModule {
     } else if (did.isDidMethodKey) {
       return (await this.getDidMethodKeyDetail(did.asDidMethodKey)).nonce;
     } else {
-      throw new Error('Invalid DID provided');
+      return (await this.getOnchainDidDetail(did)).nonce;
     }
   }
 
@@ -1199,13 +1199,10 @@ class DIDModule {
   async createSignedRemoveKeys(
     keyIds,
     did,
-    controllerDid,
+    controllerHexDid,
     signingKeyRef,
     nonce = undefined,
   ) {
-    const hexDid = typedHexDID(this.api, did).asDid;
-    const controllerHexDid = typedHexDID(this.api, controllerDid);
-
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
       nonce = await this.getNextNonceForDid(controllerHexDid);
@@ -1215,7 +1212,7 @@ class DIDModule {
     keyIds.forEach((k) => {
       keys.add(k);
     });
-    const removeKeys = { did: hexDid, keys, nonce };
+    const removeKeys = { did, keys, nonce };
     const serializedRemoveKeys = this.getSerializedRemoveKeys(removeKeys);
     const signature = signingKeyRef.sign(serializedRemoveKeys);
     const didSig = createDidSig(controllerHexDid, signingKeyRef, signature);
@@ -1224,14 +1221,11 @@ class DIDModule {
 
   async createSignedRemoveControllers(
     controllers,
-    did,
-    controllerDid,
+    hexDid,
+    controllerHexDid,
     signingKeyRef,
     nonce = undefined,
   ) {
-    const hexDid = typedHexDID(this.api, did).asDid;
-    const controllerHexDid = typedHexDID(this.api, controllerDid);
-
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
       nonce = await this.getNextNonceForDid(controllerHexDid);

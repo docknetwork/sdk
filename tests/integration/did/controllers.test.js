@@ -64,14 +64,14 @@ describe('DID controllers', () => {
     await expect(dock.did.isController(dockDid2, dockDid2)).resolves.toEqual(true);
     await expect(dock.did.isController(dockDid2, dockDid1)).resolves.toEqual(true);
 
-    for (const [newSeed, signer, pair, keyCount] of [[seed3, hexDid1, pair1, 2], [seed4, hexDid2, pair2, 3]]) {
+    for (const [newSeed, signer, pair, keyCount] of [[seed3, dockDid1, pair1, 2], [seed4, dockDid2, pair2, 3]]) {
       const newPair = dock.keyring.addFromUri(newSeed);
       const publicKey = getPublicKeyFromKeyringPair(newPair);
       const verRels = new VerificationRelationship();
       verRels.setAssertion();
       const didKey = new DidKey(publicKey, verRels);
 
-      await dock.did.addKeys([didKey], dockDid2, signer, new DidKeypair(pair));
+      await dock.did.addKeys([didKey], dockDid2, signer, new DidKeypair(pair, 1));
       const didDetail = await dock.did.getOnchainDidDetail(hexDid2.asDid);
       expect(didDetail.lastKeyId).toBe(keyCount);
       expect(didDetail.activeControllerKeys).toBe(1);

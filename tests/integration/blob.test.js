@@ -3,7 +3,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 
 import { DockAPI } from '../../src/index';
 
-import { createNewDockDID, typedHexDID } from '../../src/utils/did';
+import { createNewDockDID, typedHexDID, DidKeypair } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { DockBlobIdByteSize, BLOB_MAX_BYTE_SIZE } from '../../src/modules/blob';
 import { registerNewDIDUsingPair } from './helpers';
@@ -34,9 +34,9 @@ describe('Blob Module', () => {
     });
     account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
-    pair = dock.keyring.addFromUri(firstKeySeed);
+    pair = new DidKeypair(dock.keyring.addFromUri(firstKeySeed), 1);
     dockDID = createNewDockDID();
-    await registerNewDIDUsingPair(dock, dockDID, pair);
+    await registerNewDIDUsingPair(dock, typedHexDID(dock.api, dockDID), pair);
   });
 
   afterAll(async () => {
@@ -55,7 +55,7 @@ describe('Blob Module', () => {
       id: blobId,
       blob: blobJSON,
     };
-    const result = await dock.blob.new(blob, dockDID, pair, { didModule: dock.didModule }, false);
+    const result = await dock.blob.new(blob, dockDID, pair, dock, false);
 
     expect(!!result).toBe(true);
 
@@ -71,7 +71,7 @@ describe('Blob Module', () => {
       id: blobId,
       blob: blobHex,
     };
-    const result = await dock.blob.new(blob, dockDID, pair, { didModule: dock.didModule }, false);
+    const result = await dock.blob.new(blob, dockDID, pair, dock, false);
 
     expect(!!result).toBe(true);
 
@@ -88,7 +88,7 @@ describe('Blob Module', () => {
       blob: blobHex,
     };
 
-    const result = await dock.blob.new(blob, dockDID, pair, { didModule: dock.didModule }, false);
+    const result = await dock.blob.new(blob, dockDID, pair, dock, false);
 
     expect(!!result).toBe(true);
 
@@ -105,7 +105,7 @@ describe('Blob Module', () => {
       blob: blobVect,
     };
 
-    const result = await dock.blob.new(blob, dockDID, pair, { didModule: dock.didModule }, false);
+    const result = await dock.blob.new(blob, dockDID, pair, dock, false);
 
     expect(!!result).toBe(true);
 
@@ -121,7 +121,7 @@ describe('Blob Module', () => {
       id: blobId,
       blob: blobHex,
     };
-    await expect(dock.blob.new(blob, dockDID, pair, { didModule: dock.didModule }, false)).rejects.toThrow();
+    await expect(dock.blob.new(blob, dockDID, pair, dock, false)).rejects.toThrow();
 
     await expect(
       dock.blob.get(blobId),
@@ -134,7 +134,7 @@ describe('Blob Module', () => {
       id: blobId,
       blob: blobHexFirst,
     };
-    const resultFirst = await dock.blob.new(blob, dockDID, pair, { didModule: dock.didModule }, false);
+    const resultFirst = await dock.blob.new(blob, dockDID, pair, dock, false);
 
     expect(!!resultFirst).toBe(true);
     expect(errorInResult(resultFirst)).toBe(false);
@@ -144,7 +144,7 @@ describe('Blob Module', () => {
       blob: randomAsHex(123),
     };
 
-    await expect(dock.blob.new(blob, dockDID, pair, { didModule: dock.didModule }, false)).rejects.toThrow();
+    await expect(dock.blob.new(blob, dockDID, pair, dock, false)).rejects.toThrow();
   }, 60000);
 
   test('Should throw error when cannot read blob with given id from chain.', async () => {

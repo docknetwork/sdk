@@ -6,7 +6,10 @@ import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
 import { isHexWithGivenByteSize, getHexIdentifier } from './codec';
 import {
-  PublicKeyEd25519, PublicKeySecp256k1, PublicKey, VerificationRelationship,
+  PublicKeyEd25519,
+  PublicKeySecp256k1,
+  PublicKey, // eslint-disable-line
+  VerificationRelationship, // eslint-disable-line
 } from '../public-keys';
 
 import { Signature } from "../signatures"; // eslint-disable-line
@@ -17,9 +20,15 @@ import {
 } from './misc';
 
 export const DockDIDMethod = 'dock';
+export const Secp256k1PublicKeyPrefix = 'zQ3';
+export const Ed25519PublicKeyPrefix = 'z6Mk';
+
 export const DockDIDQualifier = `did:${DockDIDMethod}:`;
 export const DockDIDMethodKeyQualifier = `did:key:${DockDIDMethod}:`;
 export const DockDIDByteSize = 32;
+
+export const DockDidMethodKeySecp256k1Prefix = `${DockDIDQualifier}${Secp256k1PublicKeyPrefix}`;
+export const DockDidMethodKeyEd25519Prefix = `${DockDIDMethodKeyQualifier}${Ed25519PublicKeyPrefix}`;
 
 export class DidKeypair {
   constructor(keyPair, keyId) {
@@ -35,12 +44,6 @@ export class DidKeypair {
     return getSignatureFromKeyringPair(this.keyPair, message);
   }
 }
-
-const SECP256K1_PUBLIC_KEY_PREFIX = 'zQ3';
-const ED_25519_PUBLIC_KEY_PREFIX = 'z6Mk';
-
-const DockDidMethodKeySecp256k1Prefix = `${DockDIDQualifier}${SECP256K1_PUBLIC_KEY_PREFIX}`;
-const DockDidMethodKeyEd25519Prefix = `${DockDIDMethodKeyQualifier}${ED_25519_PUBLIC_KEY_PREFIX}`;
 
 export class DockDidOrDidMethodKey {
   constructor(api) {
@@ -71,11 +74,7 @@ export class DockDidOrDidMethodKey {
   }
 
   changeState(method, name, payload, keyRef) {
-    const signature = this.signStateChange(
-      name,
-      payload,
-      keyRef,
-    );
+    const signature = this.signStateChange(name, payload, keyRef);
 
     return method(payload, signature);
   }
@@ -102,6 +101,10 @@ export class DockDid extends DockDidOrDidMethodKey {
   toString() {
     return `${DockDIDQualifier}${this.asDid}`;
   }
+
+  toStringSS58() {
+    return `${DockDIDQualifier}${encodeAddress(this.asDid)}`;
+  }
 }
 
 export class DockDidMethodKey extends DockDidOrDidMethodKey {
@@ -124,6 +127,10 @@ export class DockDidMethodKey extends DockDidOrDidMethodKey {
 
   toString() {
     return `${DockDIDMethodKeyQualifier}${this.asDidMethodKey}`;
+  }
+
+  toStringSS58() {
+    return `${DockDIDMethodKeyQualifier}${encodeAddress(this.asDidMethodKey)}`;
   }
 }
 
@@ -198,15 +205,16 @@ export function validateDockDIDSS58Identifier(identifier) {
  * @return {DockDidOrDidMethodKey} Returns a `DockDidMethodKey` or `DockDid` object.
  */
 export function typedHexDID(api, did) {
+  const strDid = did.toString();
   const hex = getHexIdentifier(
     did,
     [DockDIDQualifier, DockDIDMethodKeyQualifier],
     DockDIDByteSize,
   );
 
-  if (did.startsWith(DockDidMethodKeySecp256k1Prefix)) {
+  if (strDid.startsWith(DockDidMethodKeySecp256k1Prefix)) {
     return new DockDidMethodKey(new PublicKeySecp256k1(hex), api);
-  } else if (did.startsWith(DockDidMethodKeyEd25519Prefix)) {
+  } else if (strDid.startsWith(DockDidMethodKeyEd25519Prefix)) {
     return new DockDidMethodKey(new PublicKeyEd25519(hex), api);
   } else {
     validateDockDIDHexIdentifier(hex);
@@ -236,12 +244,17 @@ export function typedHexDIDFromSubstrate(did) {
 
 /**
  * Return a fully qualified Dock DID id, i.e. "did:dock:<SS58 string>"
- * @param {string} hexId - The hex blob id (without the qualifier)
+ * @param {string|object} hexDid - The hex blob id (without the qualifier)
  * @returns {string} - The fully qualified Blob id
  */
-export function hexDIDToQualified(hexId) {
-  const ss58Id = encodeAddress(hexId);
-  return `${DockDIDQualifier}${ss58Id}`;
+export function hexDIDToQualified(hexDid) {
+  if (typeof hexDid?.toStringSS58 === 'function') {
+    return hexDid.toStringSS58();
+  } else {
+    const ss58Address = encodeAddress(hexDid);
+
+    return `${DockDIDQualifier}${ss58Address}`;
+  }
 }
 
 /**
@@ -277,7 +290,7 @@ export function createDidKey(publicKey, verRel) {
 export function createDidSig(did, { keyId }, rawSig) {
   const sig = rawSig.toJSON();
 
-  if (did instanceof DockDid) {
+  if (did.isDid) {
     return {
       DidSignature: {
         did: did.asDid,
@@ -285,7 +298,7 @@ export function createDidSig(did, { keyId }, rawSig) {
         sig,
       },
     };
-  } else if (did instanceof DockDidMethodKey) {
+  } else if (did.isDidMethodKey) {
     return {
       DidMethodKeySignature: {
         didKey: did.asDidMethodKey,

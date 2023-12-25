@@ -20,8 +20,8 @@ import { registerNewDIDUsingPair } from './helpers';
 
 let account;
 let pair;
-let dockDID;
 let hexDid;
+let dockDID;
 let blobId;
 let keyDoc;
 let validCredential;
@@ -122,11 +122,11 @@ describe('Schema Blob Module Integration', () => {
   test('Set and get schema', async () => {
     const schema = new Schema();
     await schema.setJSONSchema(exampleSchema);
-    await dockApi.blob.new(schema.toBlob(), hexDid.did, pair, { didModule: dockApi.didModule }, false);
+    await dockApi.blob.new(schema.toBlob(), dockDID, pair, { didModule: dockApi.didModule }, false);
     await expect(Schema.get(blobId, dockApi)).resolves.toMatchObject({
       ...exampleSchema,
       id: blobId,
-      author: dockDID,
+      author: hexDIDToQualified(typedHexDID(dockApi.api, dockDID)),
     });
   }, 20000);
 

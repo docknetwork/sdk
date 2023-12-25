@@ -1,6 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { DockAPI, PublicKeySecp256k1 } from '../../../src';
-import { createNewDockDID, typedHexDID } from '../../../src/utils/did';
+import { createNewDockDID, typedHexDID, DidKeypair } from '../../../src/utils/did';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
 import { DidKey, VerificationRelationship } from '../../../src/public-keys';
@@ -112,7 +112,7 @@ describe('Key support for DIDs', () => {
     verRels1.setAssertion();
     const didKey1 = new DidKey(publicKey1, verRels1);
 
-    const pair = dock.keyring.addFromUri(seed2, null, 'ed25519');
+    const pair = new DidKeypair(dock.keyring.addFromUri(seed2, null, 'ed25519'), 2);
     await dock.did.addKeys([didKey1], dockDid, dockDid, pair);
 
     const didDetail = await dock.did.getOnchainDidDetail(hexDid.asDid);
@@ -165,7 +165,7 @@ describe('Key support for DIDs', () => {
   });
 
   test('Remove keys from DID', async () => {
-    const pair = generateEcdsaSecp256k1Keypair(seed4);
+    const pair = new DidKeypair(generateEcdsaSecp256k1Keypair(seed4), 4);
     await dock.did.removeKeys([1, 3], dockDid, dockDid, pair);
 
     const didDetail = await dock.did.getOnchainDidDetail(hexDid.asDid);
@@ -220,7 +220,7 @@ describe('Key support for DIDs', () => {
     const publicKey = new PublicKeyX25519(randomAsHex(32));
     const didKey = new DidKey(publicKey, verRels);
 
-    const pair = dock.keyring.addFromUri(seed2, null, 'ed25519');
+    const pair = new DidKeypair(dock.keyring.addFromUri(seed2, null, 'ed25519'), 2);
     await dock.did.addKeys([didKey], dockDid, dockDid, pair);
     const didDetail = await dock.did.getOnchainDidDetail(hexDid.asDid);
     expect(didDetail.lastKeyId).toBe(5);

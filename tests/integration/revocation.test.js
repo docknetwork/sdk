@@ -7,7 +7,7 @@ import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-const
 import {
   OneOfPolicy,
 } from '../../src/utils/revocation';
-import { DidKeypair } from '../../src/utils/did';
+import { DidKeypair, typedHexDID, typedHexDIDFromSubstrate } from '../../src/utils/did'
 import { registerNewDIDUsingPair } from './helpers';
 
 describe('Revocation Module', () => {
@@ -187,15 +187,22 @@ describe('Revocation Module', () => {
     const reg = await dock.revocation.getRevocationRegistry(multipleControllerRegistryID);
     expect(reg.policy.isOneOf).toBe(true);
 
-    const controllerSet = reg.policy.toJSON().oneOf;
-    expect(controllerSet.length).toBe(2);
+    const controllerSet = reg.policy.asOneOf;
+    expect(controllerSet.toJSON().length).toBe(2);
 
     let hasFirstDID = false;
     let hasSecondDID = false;
-    controllerSet.forEach((controller) => {
-      if (controller.did === ownerDID) {
+    [...controllerSet.entries()]
+      .flatMap((v) => v)
+      .map(typedHexDIDFromSubstrate)
+      .forEach((controller) => {
+      if (
+        controller.toString() === typedHexDID(dock.api, ownerDID).toString()
+      ) {
         hasFirstDID = true;
-      } else if (controller.did === ownerDID2) {
+      } else if (
+        controller.toString() === typedHexDID(dock.api, ownerDID2).toString()
+      ) {
         hasSecondDID = true;
       }
     });

@@ -47,7 +47,7 @@ describe.each(Schemes)('Issuance', ({
       address: FullNodeEndpoint,
     });
     chainModule = getModule(dock);
-    account = new DidKeypair(dock.keyring.addFromUri(TestAccountURI), 1);
+    account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
     pair1 = new DidKeypair(dock.keyring.addFromUri(randomAsHex(32)), 1);
     did1 = createNewDockDID();
@@ -80,7 +80,7 @@ describe.each(Schemes)('Issuance', ({
   }, 30000);
 
   test(`Can issue+verify a ${Name} credential with external schema reference`, async () => {
-    const [externalSchemaEncoded, schemaId] = await setupExternalSchema(residentCardSchema, 'Resident Card Example', did1, pair1, 1, dock);
+    const [externalSchemaEncoded, schemaId] = await setupExternalSchema(residentCardSchema, 'Resident Card Example', did1, pair1, dock);
 
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
     const unsignedCred = {

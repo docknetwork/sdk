@@ -1,5 +1,6 @@
 import { encodeAddress, randomAsHex } from '@polkadot/util-crypto';
 import {
+  u8aToHex,
   u8aToString, stringToHex, bufferToU8a,
 } from '@polkadot/util';
 
@@ -170,7 +171,7 @@ class BlobModule {
 
   getSerializedBlobValue(blobValue) {
     if (blobValue instanceof Uint8Array) {
-      return [...blobValue];
+      return u8aToHex(blobValue);
     } else if (typeof blobValue === 'object') {
       return stringToHex(JSON.stringify(blobValue));
     } else if (typeof blobValue === 'string' && !isHexWithGivenByteSize(blobValue)) {

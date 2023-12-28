@@ -84,7 +84,7 @@ class BlobModule {
    * @returns {Promise<*>}
    */
   async createNewTx(blob, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const signerHexDid = typedHexDID(signerDid);
     const [addBlob, didSig] = await this.createSignedAddBlob(blob, signerHexDid, signingKeyRef, { nonce, didModule });
     return this.module.new(addBlob, didSig);
   }

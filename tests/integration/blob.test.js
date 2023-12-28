@@ -36,7 +36,7 @@ describe('Blob Module', () => {
     dock.setAccount(account);
     pair = new DidKeypair(dock.keyring.addFromUri(firstKeySeed), 1);
     dockDID = createNewDockDID();
-    await registerNewDIDUsingPair(dock, typedHexDID(dock.api, dockDID), pair);
+    await registerNewDIDUsingPair(dock, typedHexDID(dockDID), pair);
   });
 
   afterAll(async () => {
@@ -61,7 +61,7 @@ describe('Blob Module', () => {
 
     const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
-    expect(chainBlob[0]).toEqual(typedHexDID(dock.api, dockDID));
+    expect(chainBlob[0]).toEqual(typedHexDID(dockDID));
     expect(chainBlob[1]).toEqual(blobJSON);
   }, 30000);
 
@@ -77,7 +77,7 @@ describe('Blob Module', () => {
 
     const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
-    expect(chainBlob[0]).toEqual(typedHexDID(dock.api, dockDID));
+    expect(chainBlob[0]).toEqual(typedHexDID(dockDID));
     expect(u8aToString(chainBlob[1])).toEqual(blobHex);
   }, 30000);
 
@@ -94,7 +94,7 @@ describe('Blob Module', () => {
 
     const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
-    expect(chainBlob[0]).toEqual(typedHexDID(dock.api, dockDID));
+    expect(chainBlob[0]).toEqual(typedHexDID(dockDID));
     expect(u8aToHex(chainBlob[1])).toEqual(blobHex);
   }, 30000);
 
@@ -111,7 +111,7 @@ describe('Blob Module', () => {
 
     const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
-    expect(chainBlob[0]).toEqual(typedHexDID(dock.api, dockDID));
+    expect(chainBlob[0]).toEqual(typedHexDID(dockDID));
     expect(chainBlob[1]).toEqual(blobVect);
   }, 30000);
 

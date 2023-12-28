@@ -50,7 +50,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
    * @returns {Promise<{bytes: string}|null>}
    */
   async getLastParamsWritten(did) {
-    const hexId = typedHexDID(this.api, did);
+    const hexId = typedHexDID(did);
     const counter = await this.api.query[this.moduleName].paramsCounter(hexId);
     if (counter > 0) {
       const resp = await this.queryParamsFromChain(hexId, counter);
@@ -67,7 +67,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
    * @returns {Promise<object[]>}
    */
   async getAllParamsByDid(did) {
-    const hexId = typedHexDID(this.api, did);
+    const hexId = typedHexDID(did);
 
     const params = [];
     const counter = await this.api.query[this.moduleName].paramsCounter(hexId);
@@ -128,8 +128,8 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
     { nonce = undefined, didModule = undefined },
   ) {
     const offchainPublicKey = this.constructor.buildPublicKey(publicKey);
-    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const targetHexDid = typedHexDID(targetDid).asDid;
+    const signerHexDid = typedHexDID(signerDid);
     const [addPk, signature] = await this.createSignedAddPublicKey(
       offchainPublicKey,
       targetHexDid,
@@ -158,8 +158,8 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
     signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const targetHexDid = typedHexDID(targetDid).asDid;
+    const signerHexDid = typedHexDID(signerDid);
     const [removePk, signature] = await this.createSignedRemovePublicKey(
       removeKeyId,
       targetHexDid,

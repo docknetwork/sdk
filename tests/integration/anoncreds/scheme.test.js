@@ -86,7 +86,7 @@ for (const {
       expect(paramsWritten1.label).toEqual(params1.label);
       const allParams = await getParamsByDid(
         dock.api,
-        typedHexDID(dock.api, did1),
+        typedHexDID(did1),
       );
       expect(Object.values(allParams.toJSON())).toEqual([params1]);
 
@@ -181,9 +181,9 @@ for (const {
       );
       const queriedPk2 = await chainModule.getPublicKey(did2, 2);
       expect(queriedPk2.bytes).toEqual(pk2.bytes);
-      expect(queriedPk2.paramsRef).toEqual([typedHexDID(dock.api, did1), 1]);
+      expect(queriedPk2.paramsRef).toEqual([typedHexDID(did1), 1]);
       const keyWithParams = await getPublicKeyWithParamsByStorageKey(dock.api, [
-        typedHexDID(dock.api, did2).asDid,
+        typedHexDID(did2).asDid,
         2,
       ]);
       const jsonKeyWithParams = keyWithParams.toJSON();
@@ -222,7 +222,7 @@ for (const {
 
       const queriedPk3 = await chainModule.getPublicKey(did2, 3);
       expect(queriedPk3.bytes).toEqual(pk3.bytes);
-      expect(queriedPk3.paramsRef).toEqual([typedHexDID(dock.api, did1), 2]);
+      expect(queriedPk3.paramsRef).toEqual([typedHexDID(did1), 2]);
 
       const queriedPk3WithParams = await chainModule.getPublicKey(
         did2,
@@ -232,7 +232,7 @@ for (const {
       expect(queriedPk3WithParams.params).toEqual(queriedParams2);
       const allPks = await getPublicKeysByDid(
         dock.api,
-        typedHexDID(dock.api, did2),
+        typedHexDID(did2),
       );
       expect(
         Object.values(allPks.toJSON()).map((keyWithParams) => {

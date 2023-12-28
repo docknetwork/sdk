@@ -244,7 +244,7 @@ export default class StatusListCredentialModule {
     signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const hexDid = typedHexDID(this.api, did);
+    const hexDid = typedHexDID(did);
     // eslint-disable-next-line no-param-reassign
     nonce = await getDidNonce(hexDid, nonce, didModule);
 

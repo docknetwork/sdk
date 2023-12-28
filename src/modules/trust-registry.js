@@ -37,11 +37,12 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const convenerHexDid = typedHexDID(this.api, convenerDid);
+    const convenerHexDid = typedHexDID(convenerDid);
     const lastNonce = nonce ?? await getDidNonce(convenerHexDid, nonce, didModule);
 
     return this.signAndSend(
       convenerHexDid.changeState(
+        this.api,
         this.module.initTrustRegistry.bind(this.module),
         'InitTrustRegistry',
         { registryId, name, nonce: lastNonce },
@@ -72,11 +73,12 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const convenerHexDid = typedHexDID(this.api, convenerDid);
+    const convenerHexDid = typedHexDID(convenerDid);
     const lastNonce = nonce ?? await getDidNonce(convenerHexDid, nonce, didModule);
 
     return this.signAndSend(
       convenerHexDid.changeState(
+        this.api,
         this.module.addSchemaMetadata,
         'AddSchemaMetadata',
         { registryId, schemas, nonce: lastNonce },
@@ -107,11 +109,12 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const convenerOrIssuerOrVerifierHexDid = typedHexDID(this.api, convenerOrIssuerOrVerifierDid);
+    const convenerOrIssuerOrVerifierHexDid = typedHexDID(convenerOrIssuerOrVerifierDid);
     const lastNonce = nonce ?? await getDidNonce(convenerOrIssuerOrVerifierHexDid, nonce, didModule);
 
     return this.signAndSend(
       convenerOrIssuerOrVerifierHexDid.changeState(
+        this.api,
         this.module.updateSchemaMetadata,
         'UpdateSchemaMetadata',
         { registryId, schemas, nonce: lastNonce },

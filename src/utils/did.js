@@ -24,10 +24,10 @@ export const Secp256k1PublicKeyPrefix = 'zQ3';
 export const Ed25519PublicKeyPrefix = 'z6Mk';
 
 export const DockDIDQualifier = `did:${DockDIDMethod}:`;
-export const DockDIDMethodKeyQualifier = `did:key:${DockDIDMethod}:`;
+export const DockDIDMethodKeyQualifier = `did:key:`;
 export const DockDIDByteSize = 32;
 
-export const DockDidMethodKeySecp256k1Prefix = `${DockDIDQualifier}${Secp256k1PublicKeyPrefix}`;
+export const DockDidMethodKeySecp256k1Prefix = `${DockDIDMethodKeyQualifier}${Secp256k1PublicKeyPrefix}`;
 export const DockDidMethodKeyEd25519Prefix = `${DockDIDMethodKeyQualifier}${Ed25519PublicKeyPrefix}`;
 
 export class DidKeypair {
@@ -45,11 +45,22 @@ export class DidKeypair {
   }
 }
 
-export class DockDidOrDidMethodKey {
-  constructor(api) {
-    Object.defineProperty(this, 'api', { value: api });
+export class DidActor {
+  signStateChange(api, name, payload, keyRef) {
+    const stateChange = getStateChange(api, name, payload);
+    const keySignature = keyRef.sign(stateChange);
+
+    return createDidSig(this, keyRef, keySignature);
   }
 
+  changeState(api, method, name, payload, keyRef) {
+    const signature = this.signStateChange(api, name, payload, keyRef);
+
+    return method(payload, signature);
+  }
+}
+
+export class DockDidOrDidMethodKey extends DidActor {
   get asDid() {
     throw new Error('Not a `Did`');
   }
@@ -65,24 +76,11 @@ export class DockDidOrDidMethodKey {
   get isDidMethodKey() {
     return false;
   }
-
-  signStateChange(name, payload, keyRef) {
-    const stateChange = getStateChange(this.api, name, payload);
-    const keySignature = keyRef.sign(stateChange);
-
-    return createDidSig(this, keyRef, keySignature);
-  }
-
-  changeState(method, name, payload, keyRef) {
-    const signature = this.signStateChange(name, payload, keyRef);
-
-    return method(payload, signature);
-  }
 }
 
 export class DockDid extends DockDidOrDidMethodKey {
-  constructor(did, api) {
-    super(api);
+  constructor(did) {
+    super();
     this.did = did;
   }
 
@@ -108,8 +106,8 @@ export class DockDid extends DockDidOrDidMethodKey {
 }
 
 export class DockDidMethodKey extends DockDidOrDidMethodKey {
-  constructor(didMethodKey, api) {
-    super(api);
+  constructor(didMethodKey) {
+    super();
     this.didMethodKey = didMethodKey;
   }
 
@@ -199,12 +197,11 @@ export function validateDockDIDSS58Identifier(identifier) {
 
 /**
  * Takes a DID string, gets the hexadecimal value of that and returns a `DockDidMethodKey` or `DockDid` object.
- * @param {*} api
  * @param {string} did -  The DID can be passed as fully qualified DID like `did:dock:<SS58 string>` or
  * `did:key:<value>` or a 32 byte hex string
  * @return {DockDidOrDidMethodKey} Returns a `DockDidMethodKey` or `DockDid` object.
  */
-export function typedHexDID(api, did) {
+export function typedHexDID(did) {
   const strDid = did.toString();
   const hex = getHexIdentifier(
     did,
@@ -213,12 +210,12 @@ export function typedHexDID(api, did) {
   );
 
   if (strDid.startsWith(DockDidMethodKeySecp256k1Prefix)) {
-    return new DockDidMethodKey(new PublicKeySecp256k1(hex), api);
+    return new DockDidMethodKey(new PublicKeySecp256k1(hex));
   } else if (strDid.startsWith(DockDidMethodKeyEd25519Prefix)) {
-    return new DockDidMethodKey(new PublicKeyEd25519(hex), api);
+    return new DockDidMethodKey(new PublicKeyEd25519(hex));
   } else {
     validateDockDIDHexIdentifier(hex);
-    return new DockDid(hex, api);
+    return new DockDid(hex);
   }
 }
 
@@ -237,8 +234,10 @@ export function typedHexDIDFromSubstrate(did) {
 
   if (did.isDid) {
     return new DockDid(hex);
-  } else {
+  } else if (did.isDidMethodKey) {
     return new DockDidMethodKey(hex);
+  } else {
+    throw new Error(`Invalid did provided: \`${did}\``)
   }
 }
 

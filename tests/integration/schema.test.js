@@ -58,7 +58,7 @@ describe('Schema Blob Module Integration', () => {
     dockApi.setAccount(account);
     pair = new DidKeypair(dockApi.keyring.addFromUri(firstKeySeed), 1);
     dockDID = createNewDockDID();
-    hexDid = typedHexDID(dockApi.api, dockDID);
+    hexDid = typedHexDID(dockDID);
     await registerNewDIDUsingPair(dockApi, dockDID, pair);
     blobId = randomAsHex(DockBlobIdByteSize);
 
@@ -126,7 +126,7 @@ describe('Schema Blob Module Integration', () => {
     await expect(Schema.get(blobId, dockApi)).resolves.toMatchObject({
       ...exampleSchema,
       id: blobId,
-      author: hexDIDToQualified(typedHexDID(dockApi.api, dockDID)),
+      author: hexDIDToQualified(typedHexDID(dockDID)),
     });
   }, 20000);
 

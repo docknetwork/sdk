@@ -45,7 +45,7 @@ async function main() {
 
   const round_no = parseIntChecked(process.argv[2]);
 
-  const did = typedHexDID(dock.api, did);
+  const did = typedHexDID(did);
 
   const proposal_filename = process.argv[3];
   const proposal_unparsed = await fsp.readFile(proposal_filename);

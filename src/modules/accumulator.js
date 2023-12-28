@@ -84,7 +84,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise<*>}
    */
   async createAddPublicKeyTx(publicKey, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const signerHexDid = typedHexDID(signerDid);
     const [addPk, signature] = await this.createSignedAddPublicKey(publicKey, signerHexDid, signingKeyRef, { nonce, didModule });
     return this.module.addPublicKey(addPk, signature);
   }
@@ -100,7 +100,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise<*>}
    */
   async createRemovePublicKeyTx(removeKeyId, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const signerHexDid = typedHexDID(signerDid);
     const [remPk, signature] = await this.createSignedRemovePublicKey(removeKeyId, signerHexDid, signingKeyRef, { nonce, didModule });
     return this.module.removePublicKey(remPk, signature);
   }
@@ -118,7 +118,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise<*>}
    */
   async createAddPositiveAccumulatorTx(id, accumulated, publicKeyRef, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const signerHexDid = typedHexDID(signerDid);
     const [addAccumulator, signature] = await this.createSignedAddPositiveAccumulator(id, accumulated, publicKeyRef, signerHexDid, signingKeyRef, { nonce, didModule });
     return this.module.addAccumulator(addAccumulator, signature);
   }
@@ -137,7 +137,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise<*>}
    */
   async createAddUniversalAccumulatorTx(id, accumulated, publicKeyRef, maxSize, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const signerHexDid = typedHexDID(signerDid);
     const [addAccumulator, signature] = await this.createSignedAddUniversalAccumulator(id, accumulated, publicKeyRef, maxSize, signerHexDid, signingKeyRef, { nonce, didModule });
     return this.module.addAccumulator(addAccumulator, signature);
   }
@@ -160,7 +160,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     id, newAccumulated,
     { additions = undefined, removals = undefined, witnessUpdateInfo = undefined }, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined },
   ) {
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const signerHexDid = typedHexDID(signerDid);
     const [update, signature] = await this.createSignedUpdateAccumulator(id, newAccumulated,
       { additions, removals, witnessUpdateInfo }, signerHexDid, signingKeyRef, { nonce, didModule });
     return this.module.updateAccumulator(update, signature);
@@ -177,7 +177,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise<object>}
    */
   async removeAccumulatorTx(id, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const signerHexDid = typedHexDID(signerDid);
     const [removal, signature] = await this.createSignedRemoveAccumulator(id, signerHexDid, signingKeyRef, { nonce, didModule });
     return this.module.removeAccumulator(removal, signature);
   }
@@ -460,7 +460,8 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise<{bytes: string}|null>}
    */
   async getLastParamsWritten(did) {
-    const hexId = typedHexDID(this.api, did);
+    const hexId = typedHexDID(did);
+
     const counters = await this.api.query[this.moduleName].accumulatorOwnerCounters(hexId);
     const counter = counters.paramsCounter.toNumber();
     if (counter > 0) {
@@ -478,7 +479,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise<object[]>}
    */
   async getAllParamsByDid(did) {
-    const hexId = typedHexDID(this.api, did);
+    const hexId = typedHexDID(did);
 
     const params = [];
     const counters = await this.api.query[this.moduleName].accumulatorOwnerCounters(hexId);
@@ -502,7 +503,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise< object[]>}
    */
   async getAllPublicKeysByDid(did, withParams = false) {
-    const hexId = typedHexDID(this.api, did);
+    const hexId = typedHexDID(did);
 
     const pks = [];
     const counters = await this.api.query[this.moduleName].accumulatorOwnerCounters(hexId);

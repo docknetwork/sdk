@@ -13,7 +13,7 @@ describe('Off-chain DIDs', () => {
 
   // Generate a random DID
   const dockDID = createNewDockDID();
-  const hexDID = typedHexDID(dock.api, dockDID);
+  const hexDID = typedHexDID(dockDID);
 
   const firstDocRef = randomAsHex(100);
   const secondDocRef = randomAsHex(110);

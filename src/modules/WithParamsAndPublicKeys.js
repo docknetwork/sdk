@@ -86,7 +86,7 @@ export default class WithParamsAndPublicKeys {
       throw new Error('Reference should be an array of 2 items');
     }
     try {
-      parsed[0] = typedHexDID(this.api, ref[0]);
+      parsed[0] = typedHexDID(ref[0]);
     } catch (e) {
       throw new Error(
         `First item of reference should be a DID but was ${ref[0]}`,
@@ -120,7 +120,7 @@ export default class WithParamsAndPublicKeys {
     { nonce = undefined, didModule = undefined },
   ) {
     const offchainParams = this.constructor.buildParams(params);
-    const hexDid = typedHexDID(this.api, signerDid);
+    const hexDid = typedHexDID(signerDid);
     const [addParams, signature] = await this.createSignedAddParams(
       offchainParams,
       hexDid,
@@ -147,7 +147,7 @@ export default class WithParamsAndPublicKeys {
     signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const hexDid = typedHexDID(this.api, signerDid);
+    const hexDid = typedHexDID(signerDid);
     const [removeParams, signature] = await this.createSignedRemoveParams(
       index,
       hexDid,
@@ -252,7 +252,7 @@ export default class WithParamsAndPublicKeys {
   }
 
   async getParams(did, counter) {
-    const hexId = typedHexDID(this.api, did);
+    const hexId = typedHexDID(did);
     return this.getParamsByHexDid(hexId, counter);
   }
 
@@ -265,7 +265,7 @@ export default class WithParamsAndPublicKeys {
    * @returns {Promise<{bytes: string}|null>}
    */
   async getPublicKey(did, keyId, withParams = false) {
-    const hexId = typedHexDID(this.api, did);
+    const hexId = typedHexDID(did);
     return this.getPublicKeyByHexDid(hexId, keyId, withParams);
   }
 

@@ -12,7 +12,7 @@ describe('Key support for DIDs', () => {
 
   // Generate a random DID
   const dockDid = createNewDockDID();
-  const hexDid = typedHexDID(dock.api, dockDid);
+  const hexDid = typedHexDID(dockDid);
 
   const seed1 = randomAsHex(32);
   const seed2 = randomAsHex(32);

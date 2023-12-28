@@ -197,11 +197,11 @@ describe('Revocation Module', () => {
       .map(typedHexDIDFromSubstrate)
       .forEach((controller) => {
       if (
-        controller.toString() === typedHexDID(dock.api, ownerDID).toString()
+        controller.toString() === typedHexDID(ownerDID).toString()
       ) {
         hasFirstDID = true;
       } else if (
-        controller.toString() === typedHexDID(dock.api, ownerDID2).toString()
+        controller.toString() === typedHexDID(ownerDID2).toString()
       ) {
         hasSecondDID = true;
       }

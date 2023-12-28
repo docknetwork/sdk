@@ -21,7 +21,7 @@ describe('Basic DID tests', () => {
 
   // Generate a random DID
   const dockDid = createNewDockDID();
-  const typedDid = typedHexDID(dock.api, dockDid);
+  const typedDid = typedHexDID(dockDid);
   const hexDid = typedDid.asDid;
 
   // Generate first key with this seed. The key type is Sr25519

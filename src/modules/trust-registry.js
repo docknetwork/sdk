@@ -23,7 +23,10 @@ export default class TrustRegistryModule {
    * @param convenerDid
    * @param registryId
    * @param name
+   * @param govFramework
    * @param signingKeyRef
+   * @param nonce
+   * @param didModule
    * @param params
    * @param waitForFinalization
    * @param params
@@ -63,6 +66,8 @@ export default class TrustRegistryModule {
    * @param registryId
    * @param schemas
    * @param signingKeyRef
+   * @param nonce
+   * @param didModule
    * @param params
    * @param waitForFinalization
    * @param params
@@ -95,10 +100,12 @@ export default class TrustRegistryModule {
 
   /**
    * Updates schemas metadatas in the registry.
-   * @param convenerDid
+   * @param convenerOrIssuerOrVerifierDid
    * @param registryId
    * @param schemas
    * @param signingKeyRef
+   * @param nonce
+   * @param didModule
    * @param params
    * @param waitForFinalization
    * @param params
@@ -138,6 +145,8 @@ export default class TrustRegistryModule {
    * @param registryId
    * @param issuers
    * @param signingKeyRef
+   * @param nonce
+   * @param didModule
    * @param params
    * @param waitForFinalization
    * @param params
@@ -179,6 +188,8 @@ export default class TrustRegistryModule {
    * @param registryId
    * @param issuers
    * @param signingKeyRef
+   * @param nonce
+   * @param didModule
    * @param params
    * @param waitForFinalization
    * @param params
@@ -219,6 +230,7 @@ export default class TrustRegistryModule {
    * @param issuerDid
    * @param registryId
    * @param issuers
+   * @param delegated
    * @param signingKeyRef
    * @param params
    * @param waitForFinalization

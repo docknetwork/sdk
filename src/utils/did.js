@@ -223,7 +223,7 @@ export function typedHexDID(did) {
  * Gets the hexadecimal value of the given DID received from the substrate side.
  * @param {string} did -  The DID can be passed as fully qualified DID like `did:dock:<SS58 string>` or
  * a 32 byte hex string
- * @return {string} Returns the hexadecimal representation of the DID.
+ * @return {DockDidOrDidMethodKey} Returns an object wrapping the DID.
  */
 export function typedHexDIDFromSubstrate(did) {
   const hex = getHexIdentifier(
@@ -243,8 +243,8 @@ export function typedHexDIDFromSubstrate(did) {
 
 /**
  * Return a fully qualified Dock DID id, i.e. "did:dock:<SS58 string>"
- * @param {string|object} hexDid - The hex blob id (without the qualifier)
- * @returns {string} - The fully qualified Blob id
+ * @param {string|object} hexDid - The hex DID (without the qualifier) or wrapper on DID
+ * @returns {string} - The fully qualified DID
  */
 export function hexDIDToQualified(hexDid) {
   if (typeof hexDid?.toStringSS58 === 'function') {

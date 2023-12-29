@@ -23,7 +23,7 @@ export default class OneOfPolicy extends Policy {
 
   /**
    * Returns list containing unique sorted owner DIDs.
-   * @param {string} ownerDID - Owner's DID
+   * @returns {DockDidOrDidMethodKey[]}
    */
   controllerIds() {
     const controllerIds = [...this.controllers].map(typedHexDID);

@@ -259,7 +259,7 @@ export default class WithParamsAndPublicKeys {
   /**
    *
    * @param did
-   * @param signingKeyRef
+   * @param keyId
    * @param withParams - If true, return the params referenced by the public key. It will throw an error if paramsRef is null
    * or params were not found on chain which can happen if they were deleted after this public key was added.
    * @returns {Promise<{bytes: string}|null>}

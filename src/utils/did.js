@@ -20,11 +20,11 @@ import {
 } from './misc';
 
 export const DockDIDMethod = 'dock';
-export const Secp256k1PublicKeyPrefix = 'zQ3';
+export const Secp256k1PublicKeyPrefix = 'zQ3s';
 export const Ed25519PublicKeyPrefix = 'z6Mk';
 
 export const DockDIDQualifier = `did:${DockDIDMethod}:`;
-export const DockDIDMethodKeyQualifier = `did:key:`;
+export const DockDIDMethodKeyQualifier = 'did:key:';
 export const DockDIDByteSize = 32;
 
 export const DockDidMethodKeySecp256k1Prefix = `${DockDIDMethodKeyQualifier}${Secp256k1PublicKeyPrefix}`;
@@ -237,7 +237,7 @@ export function typedHexDIDFromSubstrate(did) {
   } else if (did.isDidMethodKey) {
     return new DockDidMethodKey(hex);
   } else {
-    throw new Error(`Invalid did provided: \`${did}\``)
+    throw new Error(`Invalid did provided: \`${did}\``);
   }
 }
 

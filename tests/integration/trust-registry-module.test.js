@@ -1,5 +1,6 @@
 import { randomAsHex } from "@polkadot/util-crypto";
 import { BTreeSet, BTreeMap } from "@polkadot/types";
+import { u8aToHex, stringToU8a } from '@polkadot/util';
 
 import { DockAPI } from "../../src/index";
 
@@ -78,7 +79,7 @@ buildTest("Trust Registry", () => {
       1
     );
 
-    // The keyring should be initialized before any test begins as this suite is testing statusListCredentialModule
+    // The keyring should be initialized before any test begins as this suite is testing trustRegistry
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
 
@@ -101,6 +102,7 @@ buildTest("Trust Registry", () => {
       convenerDID,
       trustRegistryId,
       "Test Registry",
+      "Gov framework",
       convenerPair,
       dock
     );
@@ -111,6 +113,7 @@ buildTest("Trust Registry", () => {
     expect(registryInfo).toEqual({
       convener: typedHexDID(convenerDID),
       name: "Test Registry",
+      govFramework: u8aToHex(stringToU8a("Gov framework"))
     });
   });
 
@@ -122,6 +125,7 @@ buildTest("Trust Registry", () => {
       convenerDID,
       trustRegistryId,
       "Test Registry",
+      "Gov framework",
       convenerPair,
       dock
     );
@@ -173,6 +177,117 @@ buildTest("Trust Registry", () => {
     });
   });
 
+  it("Suspends issuers in the existing Trust Registry", async () => {
+    // Create a random status list id
+    const schemaId = randomAsHex(32);
+
+    await dock.trustRegistry.init(
+      convenerDID,
+      trustRegistryId,
+      "Test Registry",
+      "Gov framework",
+      convenerPair,
+      dock
+    );
+
+    const verifiers = new BTreeSet();
+    verifiers.add(typedHexDID(issuerDID));
+    verifiers.add(typedHexDID(issuerDID2));
+
+    const issuers = new BTreeMap();
+    const issuerPrices = new BTreeMap();
+    issuerPrices.set("A", 20);
+    const issuer2Prices = new BTreeMap();
+    issuer2Prices.set("A", 20);
+
+    issuers.set(typedHexDID(issuerDID), issuerPrices);
+    issuers.set(typedHexDID(issuerDID2), issuer2Prices);
+
+    const schemas = new BTreeMap();
+    schemas.set(schemaId, {
+      issuers,
+      verifiers,
+    });
+
+    await dock.trustRegistry.addSchemaMetadata(
+      convenerDID,
+      trustRegistryId,
+      schemas,
+      convenerPair,
+      dock
+    );
+
+    await dock.trustRegistry.suspendIssuers(
+      convenerDID,
+      trustRegistryId,
+      [issuerDID, issuerDID2],
+      convenerPair,
+      dock
+    );
+
+    for (const issuer of [issuerDID, issuerDID2]) {
+      expect((await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(trustRegistryId, typedHexDID(issuer))).toJSON()).toEqual({
+        suspended: true,
+        delegated: []
+      });
+    }
+
+    await dock.trustRegistry.unsuspendIssuers(
+      convenerDID,
+      trustRegistryId,
+      [issuerDID],
+      convenerPair,
+      dock
+    );
+
+    for (const issuer of [issuerDID]) {
+      expect((await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(trustRegistryId, typedHexDID(issuer))).toJSON()).toEqual({
+        suspended: false,
+        delegated: []
+      });
+    }
+
+    for (const issuer of [issuerDID2]) {
+      expect((await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(trustRegistryId, typedHexDID(issuer))).toJSON()).toEqual({
+        suspended: true,
+        delegated: []
+      });
+    }
+  });
+
+  it("Updates delegated issuers in the existing Trust Registry", async () => {
+    // Create a random status list id
+    await dock.trustRegistry.init(
+      convenerDID,
+      trustRegistryId,
+      "Test Registry",
+      "Gov framework",
+      convenerPair,
+      dock
+    );
+
+    expect((await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(trustRegistryId, typedHexDID(issuerDID))).toJSON()).toEqual({
+      suspended: false,
+      delegated: []
+    });
+
+    const issuers = new BTreeSet();
+    issuers.add(typedHexDID(issuerDID2));
+
+    await dock.trustRegistry.updateDelegatedIssuers(
+      issuerDID,
+      trustRegistryId,
+      { Set: issuers },
+      issuerPair,
+      dock
+    );
+
+    expect((await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(trustRegistryId, typedHexDID(issuerDID))).toJSON()).toEqual({
+      suspended: false,
+      delegated: [typedHexDID(issuerDID2)]
+    });
+  });
+
   it("Updates schemas to the existing Trust Registry", async () => {
     // Create a random status list id
     const schemaId = randomAsHex(32);
@@ -181,6 +296,7 @@ buildTest("Trust Registry", () => {
       convenerDID,
       trustRegistryId,
       "Test Registry",
+      "Gov framework",
       convenerPair,
       dock
     );

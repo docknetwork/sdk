@@ -1,6 +1,5 @@
 import { canonicalize } from 'json-canonicalize';
 import { validate } from 'jsonschema';
-import axios from 'axios';
 
 import { hexDIDToQualified } from '../utils/did';
 
@@ -11,6 +10,7 @@ import {
 
 // Supported schemas
 import JSONSchema07 from '../utils/vc/schemas/schema-draft-07';
+import jsonFetch from '../utils/json-fetch';
 
 export default class Schema {
   /**
@@ -163,7 +163,7 @@ export default class Schema {
         return JSONSchema07;
       }
       // Fetch the URI and expect a JSON response
-      const { data: doc } = await axios.get(schemaUrl);
+      const doc = await jsonFetch(schemaUrl);
       if (typeof doc === 'object') {
         return doc;
       }

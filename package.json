@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "6.7.0",
+  "version": "6.8.2",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -36,6 +36,7 @@
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-jest": "^24.5.0",
     "eslint-plugin-sonarjs": "0.5.0",
+    "eslint-plugin-unused-imports": "^3.0.0",
     "eth-revert-reason": "^1.0.3",
     "ethers": "^5.4",
     "ethr-did-resolver": "^2.2.0",
@@ -104,7 +105,6 @@
     "@juanelas/base64": "^1.0.5",
     "@polkadot/api": "9.7.1",
     "@transmute/json-web-signature": "^0.7.0-unstable.80",
-    "axios": "0.27.2",
     "base64url": "3.0.1",
     "blake2b": "2.1.4",
     "bs58": "5.0.0",

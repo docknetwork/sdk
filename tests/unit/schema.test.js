@@ -1,4 +1,4 @@
-// Mock axios
+// Mock fetch
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 
 import VerifiableCredential from '../../src/verifiable-credential';

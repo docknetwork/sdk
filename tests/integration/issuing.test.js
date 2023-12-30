@@ -1,6 +1,6 @@
-// Mock axios
+// Mock fetch
 import { randomAsHex } from '@polkadot/util-crypto';
-import mockAxios from '../mocks/axios';
+import mockFetch from '../mocks/fetch';
 
 import { createNewDockDID, DidKeypair } from '../../src/utils/did';
 
@@ -15,7 +15,7 @@ import { generateEcdsaSecp256k1Keypair } from '../../src/utils/misc';
 import { issueCredential, verifyCredential } from '../../src/utils/vc/index';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
 
-mockAxios();
+mockFetch();
 
 // 1st issuer's DID.
 const issuer1DID = createNewDockDID();

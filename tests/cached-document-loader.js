@@ -1,6 +1,6 @@
-import axios from 'axios';
 import contexts from '../src/utils/vc/contexts';
 import network_cache from './network-cache';
+import jsonFetch from '../src/utils/json-fetch';
 
 // global document cache, replaces the internet and acts as a did method
 const documentRegistry = {};
@@ -17,7 +17,7 @@ export async function documentLoader(url) {
     if (!(url.startsWith('http://') || url.startsWith('https://'))) {
       throw new Error(`failed to resolve ${url}`);
     }
-    documentRegistry[url] = (await axios.get(url)).data;
+    documentRegistry[url] = await jsonFetch(url);
     console.warn(
       'Unit test is making web requests. This is slow. Please update ./test/network-cache.js',
       'with: ',

@@ -1,6 +1,7 @@
 import { randomAsHex, blake2AsHex } from '@polkadot/util-crypto';
 import jsonld from 'jsonld';
 
+import { VB_ACCUMULATOR_22 } from '@docknetwork/crypto-wasm-ts';
 import OneOfPolicy from './revocation/one-of-policy';
 
 import {
@@ -76,6 +77,13 @@ export function getCredentialStatus(expanded) {
  * @returns {boolean}
  */
 export const isRegistryRevocationStatus = ({ [credentialTypeField]: type }) => type.includes(RevRegType) || type.includes(`/${RevRegType}`);
+
+/**
+ * Returns `true` if supplied status is a accumulator revocation status.
+ * @param status
+ * @returns {boolean}
+ */
+export const isAccumulatorRevocationStatus = ({ [credentialTypeField]: type }) => type.includes(VB_ACCUMULATOR_22) || type.includes(`/${VB_ACCUMULATOR_22}`);
 
 /**
  * Checks if a credential status has a registry revocation.

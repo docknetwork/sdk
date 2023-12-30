@@ -1,7 +1,7 @@
-// Mock axios
+// Mock fetch
 import { randomAsHex } from '@polkadot/util-crypto';
 import jsonld from 'jsonld';
-import mockAxios from '../mocks/axios';
+import mockFetch from '../mocks/fetch';
 
 import {
   createNewDockDID, DidKeypair,
@@ -18,7 +18,7 @@ import {
 import { getKeyDoc } from '../../src/utils/vc/helpers';
 import { createPresentation } from '../create-presentation';
 
-mockAxios();
+mockFetch();
 
 // DID and seed for
 const issuerDID = createNewDockDID();

@@ -1,11 +1,11 @@
-// Mock axios
-import mockAxios from '../mocks/axios';
+// Mock fetch
+import mockFetch from '../mocks/fetch';
 
 import {
   verifyCredential,
 } from '../../src/utils/vc/index';
 
-mockAxios();
+mockFetch();
 
 const controllerUrl = 'https://gist.githubusercontent.com/lovesh/312d407e3a16be0e7d5e43169e824958/raw';
 const keyUrl = 'https://gist.githubusercontent.com/lovesh/67bdfd354cfaf4fb853df4d6713f4610/raw';

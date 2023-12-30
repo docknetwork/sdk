@@ -3,8 +3,7 @@ import { u8aToString } from '@polkadot/util';
 
 import { DockAPI } from '../src/index';
 import { DockBlobIdByteSize } from '../src/modules/blob';
-import { createNewDockDID } from '../src/utils/did';
-import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
+import { createNewDockDID, DidKeypair } from '../src/utils/did';
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
@@ -33,7 +32,7 @@ async function createAuthorDID(dock, pair) {
   console.log('Creating new author DID', dockDID);
 
   // Create an author DID to write with
-  const publicKey = getPublicKeyFromKeyringPair(pair);
+  const publicKey = pair.publicKey();
   const didKey = new DidKey(publicKey, new VerificationRelationship());
   await dock.did.new(dockDID, [didKey], [], false);
   return dockDID;
@@ -57,7 +56,7 @@ async function main() {
   const dock = await connectToNode();
 
   // Generate keypair for DID
-  const pair = dock.keyring.addFromUri(randomAsHex(32));
+  const pair = new DidKeypair(dock.keyring.addFromUri(randomAsHex(32)), 1);
 
   // Generate a DID to be used as author
   const dockDID = await createAuthorDID(dock, pair);

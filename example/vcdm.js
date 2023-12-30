@@ -3,7 +3,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import dock from '../src/index';
 import VerifiableCredential from '../src/verifiable-credential';
 import VerifiablePresentation from '../src/verifiable-presentation';
-import { createNewDockDID } from '../src/utils/did';
+import { createNewDockDID, DidKeypair } from '../src/utils/did';
 import { registerNewDIDUsingPair } from '../tests/integration/helpers';
 import { createRandomRegistryId, OneOfPolicy, buildDockCredentialStatus } from '../src/utils/revocation';
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
@@ -44,12 +44,12 @@ async function setup() {
 
   // Register issuer DID
   console.log('Registering issuer DID...');
-  const pair = dock.keyring.addFromUri(issuerSeed, null, 'ed25519');
+  const pair = new DidKeypair(dock.keyring.addFromUri(issuerSeed, null, 'ed25519'), 1);
   await registerNewDIDUsingPair(dock, issuerDID, pair);
 
   // Register holder DID
   console.log('Registering holder DID...');
-  const pair1 = dock.keyring.addFromUri(holderSeed, null, 'ed25519');
+  const pair1 = new DidKeypair(dock.keyring.addFromUri(holderSeed, null, 'ed25519'), 1);
   await registerNewDIDUsingPair(dock, holderDID, pair1);
 
   // Create a new policy

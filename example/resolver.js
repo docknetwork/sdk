@@ -2,7 +2,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import ethr from 'ethr-did-resolver';
 import { DockAPI } from '../src/index';
-import { createNewDockDID, NoDIDError } from '../src/utils/did';
+import { createNewDockDID, NoDIDError, DidKeypair } from '../src/utils/did';
 import {
   DIDResolver, DIDKeyResolver, UniversalResolver, WILDCARD, DockDIDResolver,
 } from '../src/resolver';
@@ -54,7 +54,7 @@ async function createDockDID() {
   dock.setAccount(account);
 
   const dockDID = createNewDockDID();
-  const pair = dock.keyring.addFromUri(randomAsHex(32), null, 'sr25519');
+  const pair = new DidKeypair(dock.keyring.addFromUri(randomAsHex(32), null, 'sr25519'), 1);
   await registerNewDIDUsingPair(dock, dockDID, pair);
   return dockDID;
 }

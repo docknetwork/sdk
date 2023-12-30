@@ -1,8 +1,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 
 import dock from '../src/index';
-import { createNewDockDID } from '../src/utils/did';
-import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
+import { createNewDockDID, DidKeypair } from '../src/utils/did';
 
 import {
   OneOfPolicy,
@@ -65,13 +64,13 @@ async function main() {
   dock.setAccount(account);
 
   // The DID should be written before creating a registry
-  const pair = dock.keyring.addFromUri(controllerSeed, null, 'sr25519');
+  const pair = new DidKeypair(dock.keyring.addFromUri(controllerSeed, null, 'sr25519'), 1);
 
   // Set our controller DID and associated keypair to be used for generating proof
   console.log(`Creating controller DID (${controllerDID}) using sr25519 pair from seed (${controllerSeed})...`);
 
   // The controller is same as the DID
-  const publicKey = getPublicKeyFromKeyringPair(pair);
+  const publicKey = pair.publicKey();
   const didKey = new DidKey(publicKey, new VerificationRelationship());
   await dock.did.new(controllerDID, [didKey], [], false);
 

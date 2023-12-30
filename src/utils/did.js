@@ -296,6 +296,9 @@ export function createDidSig(did, { keyId }, rawSig) {
         keyId,
         sig,
       },
+      did: did.asDid,
+      keyId,
+      sig,
     };
   } else if (did.isDidMethodKey) {
     return {

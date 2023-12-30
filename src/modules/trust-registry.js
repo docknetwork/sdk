@@ -51,7 +51,10 @@ export default class TrustRegistryModule {
         this.module.initOrUpdateTrustRegistry.bind(this.module),
         'InitOrUpdateTrustRegistry',
         {
-          registryId, name, govFramework, nonce: lastNonce,
+          registryId,
+          name,
+          govFramework,
+          nonce: lastNonce,
         },
         signingKeyRef,
       ),

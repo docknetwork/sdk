@@ -56,7 +56,7 @@ describe('Schema Blob Module Integration', () => {
     });
     account = dockApi.keyring.addFromUri(TestAccountURI);
     dockApi.setAccount(account);
-    pair = new DidKeypair(dockApi.keyring.addFromUri(firstKeySeed), 1);
+    pair = DidKeypair.fromApi(dockApi);
     dockDID = createNewDockDID();
     hexDid = typedHexDID(dockDID);
     await registerNewDIDUsingPair(dockApi, dockDID, pair);

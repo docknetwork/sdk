@@ -7,7 +7,7 @@ import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-const
 import {
   OneOfPolicy,
 } from '../../src/utils/revocation';
-import { DidKeypair, typedHexDID, typedHexDIDFromSubstrate } from '../../src/utils/did'
+import { DidKeypair, typedHexDID, typedHexDIDFromSubstrate } from '../../src/utils/did';
 import { registerNewDIDUsingPair } from './helpers';
 
 describe('Revocation Module', () => {
@@ -50,8 +50,8 @@ describe('Revocation Module', () => {
     dock.setAccount(account);
 
     // Thees DIDs should be written before any test begins
-    pair = new DidKeypair(dock.keyring.addFromUri(ownerSeed, null, 'sr25519'), 1);
-    pair2 = new DidKeypair(dock.keyring.addFromUri(ownerSeed2, null, 'sr25519'), 1);
+    pair = DidKeypair.fromApi(dock, { seed: ownerSeed, keypairType: 'sr25519' });
+    pair2 = DidKeypair.fromApi(dock, { seed: ownerSeed2, keypairType: 'sr25519' });
 
     // The controller is same as the DID
     await registerNewDIDUsingPair(dock, ownerDID, pair);
@@ -196,16 +196,16 @@ describe('Revocation Module', () => {
       .flatMap((v) => v)
       .map(typedHexDIDFromSubstrate)
       .forEach((controller) => {
-      if (
-        controller.toString() === typedHexDID(ownerDID).toString()
-      ) {
-        hasFirstDID = true;
-      } else if (
-        controller.toString() === typedHexDID(ownerDID2).toString()
-      ) {
-        hasSecondDID = true;
-      }
-    });
+        if (
+          controller.toString() === typedHexDID(ownerDID).toString()
+        ) {
+          hasFirstDID = true;
+        } else if (
+          controller.toString() === typedHexDID(ownerDID2).toString()
+        ) {
+          hasSecondDID = true;
+        }
+      });
     expect(hasFirstDID && hasSecondDID).toBe(true);
   }, 40000);
 

@@ -56,7 +56,7 @@ async function main() {
   const dock = await connectToNode();
 
   // Generate keypair for DID
-  const pair = new DidKeypair(dock.keyring.addFromUri(randomAsHex(32)), 1);
+  const pair = DidKeypair.fromApi(dock);
 
   // Generate a DID to be used as author
   const dockDID = await createAuthorDID(dock, pair);

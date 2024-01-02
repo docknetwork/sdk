@@ -34,7 +34,7 @@ describe('Blob Module', () => {
     });
     account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
-    pair = new DidKeypair(dock.keyring.addFromUri(firstKeySeed), 1);
+    pair = DidKeypair.fromApi(dock, {seed: firstKeySeed});
     dockDID = createNewDockDID();
     await registerNewDIDUsingPair(dock, typedHexDID(dockDID), pair);
   });

@@ -43,6 +43,24 @@ export class DidKeypair {
   sign(message) {
     return getSignatureFromKeyringPair(this.keyPair, message);
   }
+
+  /**
+   * Create a new keypair from a DockAPI object.
+   * @param {DockAPI} dockApi
+   * @param seed - Generates 32 byte random seed if not provided
+   * @param keypairType - Defaults to ed25519.
+   * @param meta
+   * @param keyId - Defaults to 1
+   * @returns {DidKeypair}
+   */
+  static fromApi(dockApi, {
+    seed = randomAsHex(32),
+    keypairType = 'ed25519',
+    meta = null,
+    keyId = 1,
+  } = {}) {
+    return new DidKeypair(dockApi.keyring.addFromUri(seed, meta, keypairType), keyId);
+  }
 }
 
 export class DidActor {
@@ -283,6 +301,7 @@ export function createDidKey(publicKey, verRel) {
  *
  * @param {DockDidOrDidMethodKey} did - DID as hex
  * @param {number} keyId -
+ * @param rawSig
  * @param {Signature} sig
  * @returns {{sig: *, keyId, did}}
  */
@@ -291,6 +310,8 @@ export function createDidSig(did, { keyId }, rawSig) {
 
   if (did.isDid) {
     return {
+      // Note: The following repeats the 3 fields to ensure backward compatibility. Once nodes have been upgraded,
+      // fields outside `DidSignature` must be removed.
       DidSignature: {
         did: did.asDid,
         keyId,

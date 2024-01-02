@@ -1,6 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { DockResolver, DockStatusList2021Resolver } from '../../src/resolver';
-import { typedHexDID, createNewDockDID, DidKeypair } from '../../src/utils/did';
+import { createNewDockDID, DidKeypair } from '../../src/utils/did';
 
 import { DockAPI } from '../../src/index';
 
@@ -54,7 +54,7 @@ describe('Resolvers', () => {
     dock.setAccount(account);
 
     // Thees DIDs should be written before any test begins
-    pair = new DidKeypair(dock.keyring.addFromUri(ownerSeed, null, 'sr25519'), 1);
+    pair = DidKeypair.fromApi(dock, { seed: ownerSeed, keypairType: 'sr25519' });
 
     // The controller is same as the DID
     await registerNewDIDUsingPair(dock, ownerDID, pair);

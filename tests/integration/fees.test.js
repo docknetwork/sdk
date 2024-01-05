@@ -303,7 +303,7 @@ describe.skip('Fees', () => {
         1,
         { didModule: dock.did },
       );
-      const revTx = dock.revocation.createRevokeTx(update, [[nonce, sig]]);
+      const revTx = dock.revocation.createRevokeTx(update, [{ nonce, sig }]);
 
       await withPaidFeeMatchingSnapshot(async () => {
         await dock.signAndSend(revTx, false);
@@ -318,11 +318,11 @@ describe.skip('Fees', () => {
       { didModule: dock.did },
     );
     const revTx = dock.revocation.createRemoveRegistryTx(update, [
-      [nonce, sig],
+      { nonce, sig },
     ]);
 
     await withPaidFeeMatchingSnapshot(() => dock.signAndSend(revTx, false));
-  }, 40000);-
+  }, 40000);
 
   test('anchors', async () => {
     const anc = randomAsHex(32);

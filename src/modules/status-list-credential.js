@@ -139,7 +139,7 @@ export default class StatusListCredentialModule {
     );
     return this.updateStatusListCredential(
       payload,
-      [[sigNonce, sig]],
+      [{ nonce: sigNonce, sig }],
       waitForFinalization,
       params,
     );
@@ -173,7 +173,7 @@ export default class StatusListCredentialModule {
     );
     return this.removeStatusListCredential(
       payload,
-      [[sigNonce, sig]],
+      [{ nonce: sigNonce, sig }],
       waitForFinalization,
       params,
     );

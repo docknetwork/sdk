@@ -137,7 +137,7 @@ buildTest("StatusListCredential Module", () => {
       );
     await dock.statusListCredential.updateStatusListCredential(
       revoke,
-      [[nonce, sig]],
+      [{ nonce, sig }],
       false
     );
     const fetchedCred =
@@ -187,7 +187,7 @@ buildTest("StatusListCredential Module", () => {
       );
     await dock.statusListCredential.updateStatusListCredential(
       update,
-      [[nonce, sig]],
+      [{ nonce, sig }],
       false
     );
     let fetchedCred =
@@ -209,7 +209,7 @@ buildTest("StatusListCredential Module", () => {
       );
     await dock.statusListCredential.updateStatusListCredential(
       update,
-      [[nonce, sig]],
+      [{ nonce, sig }],
       false
     );
 
@@ -229,7 +229,7 @@ buildTest("StatusListCredential Module", () => {
       );
     await dock.statusListCredential.removeStatusListCredential(
       remove,
-      [[nonce, sig]],
+      [{ nonce, sig }],
       false
     );
     expect(

@@ -233,7 +233,7 @@ async function revocation() {
     }
 
     const [update, sig, nonce] = await dock.revocation.createSignedRevoke(registryId, revokeIds, did, pair, { didModule: dock.did });
-    const revTx = dock.revocation.createRevokeTx(update, [[nonce, sig]]);
+    const revTx = dock.revocation.createRevokeTx(update, [{ nonce, sig }]);
     console.info(`Payment info of ${count} revocation is ${(await revTx.paymentInfo(account.address))}`);
     await printFeePaid(dock.api, account.address, async () => {
       await dock.signAndSend(revTx, false);
@@ -241,7 +241,7 @@ async function revocation() {
   }
 
   const [update, sig, nonce] = await dock.revocation.createSignedRemove(registryId, did, pair, { didModule: dock.did });
-  const revTx = dock.revocation.createRemoveRegistryTx(update, [[nonce, sig]]);
+  const revTx = dock.revocation.createRemoveRegistryTx(update, [{ nonce, sig }]);
   console.info(`Payment info of removing registry is ${(await revTx.paymentInfo(account.address))}`);
 
   await printFeePaid(dock.api, account.address, async () => {

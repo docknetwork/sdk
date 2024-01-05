@@ -200,7 +200,7 @@ describe('Custom nonce', () => {
     for (const [regId, revs, nonce] of [[registryId1, revokeIds1, currentNonce + 1], [registryId2, revokeIds2, currentNonce + 2], [registryId3, revokeIds3, currentNonce + 3]]) {
       const [revoke, sig, computedNonce] = await dock.revocation.createSignedRevoke(regId, revs, did1, pair, { nonce });
       expect(computedNonce).toEqual(nonce);
-      const tx = await dock.revocation.createRevokeTx(revoke, [{ nonce, data: sig }]);
+      const tx = await dock.revocation.createRevokeTx(revoke, [{ nonce, sig }]);
       txs.push(tx);
     }
 
@@ -223,7 +223,7 @@ describe('Custom nonce', () => {
     for (const [regId, nonce] of [[registryId1, currentNonce + 1], [registryId2, currentNonce + 2], [registryId3, currentNonce + 3]]) {
       const [remove, sig, computedNonce] = await dock.revocation.createSignedRemove(regId, did1, pair, { nonce });
       expect(computedNonce).toEqual(nonce);
-      const tx = await dock.revocation.createRemoveRegistryTx(remove, [{ nonce, data: sig }]);
+      const tx = await dock.revocation.createRemoveRegistryTx(remove, [{ nonce, sig }]);
       txs.push(tx);
     }
 

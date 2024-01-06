@@ -12,7 +12,7 @@ describe('Key support for DIDs', () => {
 
   // Generate a random DID
   const dockDid = createNewDockDID();
-  const hexDid = typedHexDID(dockDid);
+  let hexDid;
 
   const seed1 = randomAsHex(32);
   const seed2 = randomAsHex(32);
@@ -26,6 +26,8 @@ describe('Key support for DIDs', () => {
     });
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
+
+    hexDid = typedHexDID(dock.api, dockDid);
   });
 
   afterAll(async () => {

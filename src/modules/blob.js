@@ -84,7 +84,7 @@ class BlobModule {
    * @returns {Promise<*>}
    */
   async createNewTx(blob, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
-    const signerHexDid = typedHexDID(signerDid);
+    const signerHexDid = typedHexDID(this.api, signerDid);
     const [addBlob, didSig] = await this.createSignedAddBlob(blob, signerHexDid, signingKeyRef, { nonce, didModule });
     return this.module.new(addBlob, didSig);
   }
@@ -133,7 +133,7 @@ class BlobModule {
         // no-op, just use default Uint8 array value
       }
 
-      return [typedHexDIDFromSubstrate(respTuple[0]), value];
+      return [typedHexDIDFromSubstrate(this.api, respTuple[0]), value];
     }
     throw new Error(`Needed 2 items in response but got${respTuple.length}`);
   }

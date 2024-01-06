@@ -32,16 +32,18 @@ describe('Resolvers', () => {
 
   // Create  owners
   const owners = new Set();
-  owners.add(ownerDID);
 
   // Create a status list policy
-  const policy = new OneOfPolicy(owners);
+  let policy;
 
   beforeAll(async () => {
     await dock.init({
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
+
+    owners.add(typedHexDID(dock.api, ownerDID));
+    policy = new OneOfPolicy(owners);
 
     ownerKey = getKeyDoc(
       ownerDID,

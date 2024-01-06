@@ -13,7 +13,7 @@ describe('Off-chain DIDs', () => {
 
   // Generate a random DID
   const dockDID = createNewDockDID();
-  const hexDID = typedHexDID(dockDID);
+  let hexDID;
 
   const firstDocRef = randomAsHex(100);
   const secondDocRef = randomAsHex(110);
@@ -26,6 +26,8 @@ describe('Off-chain DIDs', () => {
     });
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
+
+    hexDID = typedHexDID(dock.api, dockDID);
   });
 
   afterAll(async () => {

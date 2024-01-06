@@ -3,7 +3,6 @@ import { u8aToHex } from '@polkadot/util';
 import { DockAPI } from '../../../src';
 import { createNewDockDID, typedHexDID, NoDIDError, DidKeypair } from '../../../src/utils/did';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
-import { getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
 import { DidKey, VerificationRelationship } from '../../../src/public-keys';
 import { ServiceEndpointType } from '../../../src/modules/did/service-endpoint';
 
@@ -13,11 +12,11 @@ describe('DID service endpoints', () => {
   const dock = new DockAPI();
 
   const dockDid1 = createNewDockDID();
-  const hexDid1 = typedHexDID(dockDid1);
+  let hexDid1;
 
   // This DID will not be controlled by itself
   const dockDid2 = createNewDockDID();
-  const hexDid2 = typedHexDID(dockDid2);
+  let hexDid2;
 
   const seed1 = randomAsHex(32);
   const seed2 = randomAsHex(32);
@@ -40,6 +39,9 @@ describe('DID service endpoints', () => {
     });
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
+
+    hexDid1 = typedHexDID(dock.api, dockDid1);
+    hexDid2 = typedHexDID(dock.api, dockDid2);
   });
 
   afterAll(async () => {

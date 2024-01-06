@@ -21,7 +21,7 @@ import {
   registerNewDIDUsingPair,
 } from './helpers';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
-import { createNewDockDID, DidKeypair } from '../../src/utils/did';
+import { createNewDockDID, DidKeypair, typedHexDID } from '../../src/utils/did';
 import { addRevRegIdToCredential, getPrivateStatus } from '../../src/utils/vc/credentials';
 import { getPrivateStatuses } from '../../src/utils/vc/presentations';
 
@@ -68,7 +68,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
 
     // Create a new policy
     const policy = new OneOfPolicy();
-    policy.addOwner(issuerDID);
+    policy.addOwner(typedHexDID(dockAPI.api, issuerDID));
 
     // Add a new revocation registry with above policy
     await dockAPI.revocation.newRegistry(registryId, policy, false, false);

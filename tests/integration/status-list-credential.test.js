@@ -21,7 +21,7 @@ import { createPresentation } from '../create-presentation';
 import { OneOfPolicy } from '../../src/utils/revocation';
 import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
-import { createNewDockDID, DidKeypair } from '../../src/utils/did';
+import { createNewDockDID, DidKeypair, typedHexDID } from '../../src/utils/did';
 import StatusList2021Credential from '../../src/status-list-credential/status-list2021-credential';
 import { addStatusList21EntryToCredential } from '../../src/utils/vc/credentials';
 
@@ -71,7 +71,7 @@ buildTest('StatusList2021Credential', () => {
 
     // Create a new policy
     const policy = new OneOfPolicy();
-    policy.addOwner(issuerDID);
+    policy.addOwner(typedHexDID(dockAPI.api, issuerDID));
     issuerKey = getKeyDoc(
       issuerDID,
       issuerKeyPair,

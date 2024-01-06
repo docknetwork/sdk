@@ -130,7 +130,7 @@ describe.each(Schemes)('Derived Credentials', ({
       controller: did1, msgCount: 100,
     });
 
-    const pk1 = Module.prepareAddPublicKey(u8aToHex(keypair.publicKeyBuffer));
+    const pk1 = Module.prepareAddPublicKey(dock.api, u8aToHex(keypair.publicKeyBuffer));
     await chainModule.addPublicKey(
       pk1,
       did1,

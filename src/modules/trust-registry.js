@@ -42,7 +42,7 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const convenerHexDid = typedHexDID(convenerDid);
+    const convenerHexDid = typedHexDID(this.api, convenerDid);
     const lastNonce = nonce ?? (await getDidNonce(convenerHexDid, nonce, didModule));
 
     return this.signAndSend(
@@ -85,7 +85,7 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const convenerHexDid = typedHexDID(convenerDid);
+    const convenerHexDid = typedHexDID(this.api, convenerDid);
     const lastNonce = nonce ?? (await getDidNonce(convenerHexDid, nonce, didModule));
 
     return this.signAndSend(
@@ -123,9 +123,8 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const convenerOrIssuerOrVerifierHexDid = typedHexDID(
-      convenerOrIssuerOrVerifierDid,
-    );
+    const convenerOrIssuerOrVerifierHexDid = typedHexDID(this.api,
+      convenerOrIssuerOrVerifierDid);
     const lastNonce = nonce
       ?? (await getDidNonce(convenerOrIssuerOrVerifierHexDid, nonce, didModule));
 
@@ -164,12 +163,12 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const convenerHexDid = typedHexDID(convenerDid);
+    const convenerHexDid = typedHexDID(this.api, convenerDid);
     const lastNonce = nonce ?? (await getDidNonce(convenerHexDid, nonce, didModule));
 
     const hexIssuers = new BTreeSet();
     for (const issuer of issuers) {
-      hexIssuers.add(typedHexDID(issuer));
+      hexIssuers.add(typedHexDID(this.api, issuer));
     }
 
     return this.signAndSend(
@@ -207,12 +206,12 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const convenerHexDid = typedHexDID(convenerDid);
+    const convenerHexDid = typedHexDID(this.api, convenerDid);
     const lastNonce = nonce ?? (await getDidNonce(convenerHexDid, nonce, didModule));
 
     const hexIssuers = new BTreeSet();
     for (const issuer of issuers) {
-      hexIssuers.add(typedHexDID(issuer));
+      hexIssuers.add(typedHexDID(this.api, issuer));
     }
 
     return this.signAndSend(
@@ -249,7 +248,7 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const issuerHexDid = typedHexDID(issuerDid);
+    const issuerHexDid = typedHexDID(this.api, issuerDid);
     const lastNonce = nonce ?? (await getDidNonce(issuerHexDid, nonce, didModule));
 
     return this.signAndSend(

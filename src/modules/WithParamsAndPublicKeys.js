@@ -49,6 +49,7 @@ export default class WithParamsAndPublicKeys {
    * @returns {{}}
    */
   static prepareAddPublicKey(
+    api,
     bytes,
     curveType = undefined,
     paramsRef = undefined,
@@ -67,7 +68,7 @@ export default class WithParamsAndPublicKeys {
       throw new Error(`Invalid curve type ${curveType}`);
     }
     publicKey.paramsRef = paramsRef !== undefined
-      ? WithParamsAndPublicKeys.parseRef(paramsRef)
+      ? WithParamsAndPublicKeys.parseRef(api, paramsRef)
       : undefined;
     return publicKey;
   }
@@ -78,7 +79,7 @@ export default class WithParamsAndPublicKeys {
    * @param ref
    * @returns {any[]}
    */
-  static parseRef(ref) {
+  static parseRef(api, ref) {
     const parsed = new Array(2);
     if (
       !(typeof ref === 'object' && ref instanceof Array && ref.length === 2)
@@ -86,7 +87,7 @@ export default class WithParamsAndPublicKeys {
       throw new Error('Reference should be an array of 2 items');
     }
     try {
-      parsed[0] = typedHexDID(ref[0]);
+      parsed[0] = typedHexDID(api, ref[0]);
     } catch (e) {
       throw new Error(
         `First item of reference should be a DID but was ${ref[0]}`,
@@ -120,7 +121,7 @@ export default class WithParamsAndPublicKeys {
     { nonce = undefined, didModule = undefined },
   ) {
     const offchainParams = this.constructor.buildParams(params);
-    const hexDid = typedHexDID(signerDid);
+    const hexDid = typedHexDID(this.api, signerDid);
     const [addParams, signature] = await this.createSignedAddParams(
       offchainParams,
       hexDid,
@@ -147,7 +148,7 @@ export default class WithParamsAndPublicKeys {
     signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const hexDid = typedHexDID(signerDid);
+    const hexDid = typedHexDID(this.api, signerDid);
     const [removeParams, signature] = await this.createSignedRemoveParams(
       index,
       hexDid,
@@ -252,7 +253,7 @@ export default class WithParamsAndPublicKeys {
   }
 
   async getParams(did, counter) {
-    const hexId = typedHexDID(did);
+    const hexId = typedHexDID(this.api, did);
     return this.getParamsByHexDid(hexId, counter);
   }
 
@@ -265,7 +266,7 @@ export default class WithParamsAndPublicKeys {
    * @returns {Promise<{bytes: string}|null>}
    */
   async getPublicKey(did, keyId, withParams = false) {
-    const hexId = typedHexDID(did);
+    const hexId = typedHexDID(this.api, did);
     return this.getPublicKeyByHexDid(hexId, keyId, withParams);
   }
 
@@ -336,7 +337,7 @@ export default class WithParamsAndPublicKeys {
     }
     if (pk.paramsRef.isSome) {
       const pr = pk.paramsRef.unwrap();
-      pkObj.paramsRef = [typedHexDIDFromSubstrate(pr[0]), pr[1].toNumber()];
+      pkObj.paramsRef = [typedHexDIDFromSubstrate(this.api, pr[0]), pr[1].toNumber()];
     } else {
       pkObj.paramsRef = null;
     }

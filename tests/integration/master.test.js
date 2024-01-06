@@ -244,11 +244,11 @@ async function allVote(
 
   const votes = [];
   for (const [did, key] of did_to_key) {
-    const nonce = await nc.didModule.getNextNonceForDid(typedHexDID(did));
+    const nonce = await nc.didModule.getNextNonceForDid(typedHexDID(dock.api, did));
     const vote = { nonce, data: { proposal: encodedProposal, roundNo } };
     const encodedStateChange = getStateChange(nc.api, 'MasterVote', vote);
     const signature = getSignatureFromKeyringPair(key, encodedStateChange);
-    const didSig = createDidSig(typedHexDID(did), 1, signature);
+    const didSig = createDidSig(typedHexDID(dock.api, did), 1, signature);
     votes.push({ sig: didSig, nonce });
   }
   return votes;

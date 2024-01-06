@@ -29,10 +29,7 @@ describe('Revocation Module', () => {
 
   // Create  owners
   const owners = new Set();
-  owners.add(ownerDID);
-
-  // Create a registry policy
-  const policy = new OneOfPolicy(owners);
+  let policy;
 
   // Create revoke IDs
   const revokeId = randomAsHex(32);
@@ -44,6 +41,11 @@ describe('Revocation Module', () => {
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
+
+    owners.add(typedHexDID(dock.api, ownerDID));
+
+    // Create a registry policy
+    policy = new OneOfPolicy(owners);
 
     // The keyring should be initialized before any test begins as this suite is testing revocation
     const account = dock.keyring.addFromUri(TestAccountURI);
@@ -178,8 +180,8 @@ describe('Revocation Module', () => {
 
   test('Can create a registry with multiple owners', async () => {
     const controllersNew = new Set();
-    controllersNew.add(ownerDID);
-    controllersNew.add(ownerDID2);
+    controllersNew.add(typedHexDID(dock.api, ownerDID));
+    controllersNew.add(typedHexDID(dock.api, ownerDID2));
 
     // Create policy and registry with multiple owners
     const policyNew = new OneOfPolicy(controllersNew);
@@ -194,14 +196,14 @@ describe('Revocation Module', () => {
     let hasSecondDID = false;
     [...controllerSet.entries()]
       .flatMap((v) => v)
-      .map(typedHexDIDFromSubstrate)
+      .map(cnt => typedHexDIDFromSubstrate(dock.api, cnt))
       .forEach((controller) => {
       if (
-        controller.toString() === typedHexDID(ownerDID).toString()
+        controller.toString() === typedHexDID(dock.api, ownerDID).toString()
       ) {
         hasFirstDID = true;
       } else if (
-        controller.toString() === typedHexDID(ownerDID2).toString()
+        controller.toString() === typedHexDID(dock.api, ownerDID2).toString()
       ) {
         hasSecondDID = true;
       }

@@ -126,7 +126,7 @@ for (const {
       expect(paramsWritten.label).toEqual(params.label);
 
       issuerSchemeKeypair = KeyPair.generate(sigParams);
-      const pk = Module.prepareAddPublicKey(
+      const pk = Module.prepareAddPublicKey(dock.api,
         u8aToHex(issuerSchemeKeypair.publicKey.bytes),
         undefined,
         [issuerDid, 1],

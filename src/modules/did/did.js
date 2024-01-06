@@ -51,7 +51,7 @@ class DIDModule {
    * @returns {*}
    */
   createNewOffchainTx(did, didDocRef) {
-    const hexId = typedHexDID(did).asDid;
+    const hexId = typedHexDID(this.api, did).asDid;
     return this.module.newOffchain(hexId, didDocRef);
   }
 
@@ -78,7 +78,7 @@ class DIDModule {
    * @returns {*}
    */
   createSetOffchainDidRefTx(did, didDocRef) {
-    const hexId = typedHexDID(did).asDid;
+    const hexId = typedHexDID(this.api, did).asDid;
     return this.module.setOffchainDidDocRef(hexId, didDocRef);
   }
 
@@ -109,7 +109,7 @@ class DIDModule {
    * @returns {Promise<*>}
    */
   createRemoveOffchainDidTx(did) {
-    const hexId = typedHexDID(did).asDid;
+    const hexId = typedHexDID(this.api, did).asDid;
     return this.module.removeOffchainDid(hexId);
   }
 
@@ -139,10 +139,10 @@ class DIDModule {
     const cnts = new BTreeSet();
     if (controllers !== undefined) {
       controllers.forEach((c) => {
-        cnts.add(typedHexDID(c));
+        cnts.add(typedHexDID(this.api, c));
       });
     }
-    const hexId = typedHexDID(did).asDid;
+    const hexId = typedHexDID(this.api, did).asDid;
     return this.module.newOnchain(
       hexId,
       didKeys.map((d) => d.toJSON()),
@@ -190,8 +190,8 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = typedHexDID(targetDid).asDid;
-    const signerHexDid = typedHexDID(signerDid);
+    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
+    const signerHexDid = typedHexDID(this.api, signerDid);
     const [addKeys, signature] = await this.createSignedAddKeys(
       didKeys,
       targetHexDid,
@@ -253,8 +253,8 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = typedHexDID(targetDid).asDid;
-    const signerHexDid = typedHexDID(signerDid);
+    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
+    const signerHexDid = typedHexDID(this.api, signerDid);
     const [addControllers, signature] = await this.createSignedAddControllers(
       controllers,
       targetHexDid,
@@ -317,8 +317,8 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = typedHexDID(targetDid).asDid;
-    const signerHexDid = typedHexDID(signerDid);
+    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
+    const signerHexDid = typedHexDID(this.api, signerDid);
     const [addServiceEndpoint, signature] = await this.createSignedAddServiceEndpoint(
       endpointId,
       endpointType,
@@ -385,8 +385,8 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = typedHexDID(targetDid).asDid;
-    const signerHexDid = typedHexDID(signerDid);
+    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
+    const signerHexDid = typedHexDID(this.api, signerDid);
     const [removeKeys, signature] = await this.createSignedRemoveKeys(
       keyIds,
       targetHexDid,
@@ -445,8 +445,8 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = typedHexDID(targetDid).asDid;
-    const signerHexDid = typedHexDID(signerDid);
+    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
+    const signerHexDid = typedHexDID(this.api, signerDid);
     const [removeControllers, signature] = await this.createSignedRemoveControllers(
       controllers,
       targetHexDid,
@@ -505,8 +505,8 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = typedHexDID(targetDid).asDid;
-    const signerHexDid = typedHexDID(signerDid);
+    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
+    const signerHexDid = typedHexDID(this.api, signerDid);
     const [removeServiceEndpoint, signature] = await this.createSignedRemoveServiceEndpoint(
       endpointId,
       targetHexDid,
@@ -558,8 +558,8 @@ class DIDModule {
    * @return {Promise<object>} The extrinsic to sign and send.
    */
   async createRemoveTx(targetDid, signerDid, signingKeyRef, nonce = undefined) {
-    const hexDid = typedHexDID(targetDid).asDid;
-    const signerHexDid = typedHexDID(signerDid);
+    const hexDid = typedHexDID(this.api, targetDid).asDid;
+    const signerHexDid = typedHexDID(this.api, signerDid);
     const [didRemoval, signature] = await this.createSignedDidRemoval(
       hexDid,
       signerHexDid,
@@ -607,7 +607,7 @@ class DIDModule {
    * @returns {Promise<SubmittableExtrinsic<ApiType>>}
    */
   async createSetClaimTx(priority, iri, did, signingKeyRef, nonce = undefined) {
-    const hexDid = typedHexDID(did);
+    const hexDid = typedHexDID(this.api, did);
     const [setAttestation, signature] = await this.createSignedAttestation(
       priority,
       iri,
@@ -687,7 +687,7 @@ class DIDModule {
    */
   // eslint-disable-next-line sonarjs/cognitive-complexity
   async getDocument(did, { getOffchainSigKeys = true } = {}) {
-    const typedDid = typedHexDID(did);
+    const typedDid = typedHexDID(this.api, did);
     const hexDid = typedDid.asDid;
     let didDetails = await this.getOnchainDidDetail(hexDid);
     didDetails = didDetails.data || didDetails;
@@ -1051,7 +1051,7 @@ class DIDModule {
    * @returns {Promise<DidKey>}
    */
   async getDidKey(did, keyIndex) {
-    const hexId = typedHexDID(did).asDid;
+    const hexId = typedHexDID(this.api, did).asDid;
     let resp = await this.api.query.didModule.didKeys(hexId, keyIndex);
     if (resp.isNone) {
       throw new Error(`No key for found did ${did} and key index ${keyIndex}`);
@@ -1093,8 +1093,8 @@ class DIDModule {
    * @returns {Promise<boolean>}
    */
   async isController(controlled, controller) {
-    const controlledDid = typedHexDID(controlled).asDid;
-    const controllerDid = typedHexDID(controller);
+    const controlledDid = typedHexDID(this.api, controlled).asDid;
+    const controllerDid = typedHexDID(this.api, controller);
     const resp = await this.api.query.didModule.didControllers(
       controlledDid,
       controllerDid,
@@ -1109,7 +1109,7 @@ class DIDModule {
    * @returns {Promise}
    */
   async getServiceEndpoint(did, endpointId) {
-    const hexId = typedHexDID(did).asDid;
+    const hexId = typedHexDID(this.api, did).asDid;
     let resp = await this.api.query.didModule.didServiceEndpoints(
       hexId,
       endpointId,
@@ -1160,7 +1160,7 @@ class DIDModule {
 
     const cnts = new BTreeSet();
     controllers.forEach((c) => {
-      cnts.add(typedHexDID(c));
+      cnts.add(typedHexDID(this.api, c));
     });
     const addControllers = { did: hexDid, controllers: cnts, nonce };
     const serializedAddControllers = this.getSerializedAddControllers(addControllers);
@@ -1233,7 +1233,7 @@ class DIDModule {
 
     const cnts = new BTreeSet();
     controllers.forEach((c) => {
-      cnts.add(typedHexDID(c));
+      cnts.add(typedHexDID(this.api, c));
     });
 
     const removeControllers = { did: hexDid, controllers: cnts, nonce };

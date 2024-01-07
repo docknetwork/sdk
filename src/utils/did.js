@@ -126,11 +126,20 @@ export class DockDidMethodKey extends DockDidOrDidMethodKey {
   }
 
   toString() {
-    return `${DockDIDMethodKeyQualifier}${this.asDidMethodKey}`;
+    return this.toStringSS58();
   }
 
   toStringSS58() {
-    return `${DockDIDMethodKeyQualifier}${encodeAddress(this.asDidMethodKey)}`;
+    let prefix;
+    if (this.didMethodKey instanceof PublicKeyEd25519) {
+      prefix = DockDidMethodKeyEd25519Prefix;
+    } else if (this.didMethodKey instanceof PublicKeySecp256k1) {
+      prefix = DockDidMethodKeySecp256k1Prefix;
+    } else {
+      throw new Error('Unsopported public key type');
+    }
+
+    return `${prefix}${encodeAddress(this.asDidMethodKey.toJSON())}`;
   }
 }
 
@@ -198,6 +207,32 @@ export function validateDockDIDSS58Identifier(identifier) {
 }
 
 /**
+ * Temporary solution for the DID's backward compatibility.
+ *
+ * --------------------------------------------------------
+ */
+
+Object.defineProperty(String.prototype, 'asDid', {
+  get() {
+    if (this.isDid) {
+      return String(this);
+    } else {
+      throw new Error('Not a `Did`');
+    }
+  },
+});
+
+Object.defineProperty(String.prototype, 'isDid', {
+  get() {
+    return isHexWithGivenByteSize(String(this), DockDIDByteSize);
+  },
+});
+
+/**
+ * --------------------------------------------------------
+ */
+
+/**
  * Takes a DID string, gets the hexadecimal value of that and returns a `DockDidMethodKey` or `DockDid` object.
  * @param {string} did -  The DID can be passed as fully qualified DID like `did:dock:<SS58 string>` or
  * `did:key:<value>` or a 32 byte hex string
@@ -205,7 +240,7 @@ export function validateDockDIDSS58Identifier(identifier) {
  */
 export function typedHexDID(api, did) {
   const strDid = did.toString();
-  if (api.specVersion < 44) {
+  if (api.specVersion < 50) {
     return getHexIdentifier(strDid, DockDIDQualifier, DockDIDByteSize);
   }
 
@@ -239,20 +274,10 @@ export function typedHexDID(api, did) {
  * @return {DockDidOrDidMethodKey} Returns an object wrapping the DID.
  */
 export function typedHexDIDFromSubstrate(api, did) {
-  if (!did.isDid) {
-    const hex = getHexIdentifier(
-      u8aToHex(did),
-      [],
-      DockDIDByteSize,
-    );
-
-    return new DockDid(hex);
+  if (api.specVersion < 50) {
+    return getHexIdentifier(did, DockDIDQualifier, DockDIDByteSize);
   } else if (did.isDid) {
-    const hex = getHexIdentifier(
-      u8aToHex(did.asDid),
-      [],
-      DockDIDByteSize,
-    );
+    const hex = getHexIdentifier(u8aToHex(did.asDid), [], DockDIDByteSize);
 
     return new DockDid(hex);
   } else if (did.isDidMethodKey) {
@@ -330,16 +355,19 @@ export function createDidKey(publicKey, verRel) {
 export function createDidSig(did, { keyId }, rawSig) {
   const sig = rawSig.toJSON();
 
-  if (did.isDid) {
+  if (typeof did === 'string') {
+    return {
+      did: did.asDid,
+      keyId,
+      sig,
+    };
+  } else if (did.isDid) {
     return {
       DidSignature: {
         did: did.asDid,
         keyId,
         sig,
       },
-      did: did.asDid,
-      keyId,
-      sig,
     };
   } else if (did.isDidMethodKey) {
     return {

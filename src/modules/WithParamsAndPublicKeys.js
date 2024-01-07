@@ -281,7 +281,7 @@ export default class WithParamsAndPublicKeys {
   async getPublicKeyByHexDid(hexDid, keyId, withParams = false) {
     const resp = await this.queryPublicKeyFromChain(hexDid, keyId);
     if (resp) {
-      const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(resp);
+      const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(this.api, resp);
       if (withParams) {
         if (pkObj.paramsRef === null) {
           throw new Error('No reference to parameters for the public key');
@@ -328,7 +328,7 @@ export default class WithParamsAndPublicKeys {
    * @param pk
    * @returns {{bytes: string}}
    */
-  static createPublicKeyObjFromChainResponse(pk) {
+  static createPublicKeyObjFromChainResponse(api, pk) {
     const pkObj = {
       bytes: u8aToHex(pk.bytes),
     };
@@ -337,7 +337,7 @@ export default class WithParamsAndPublicKeys {
     }
     if (pk.paramsRef.isSome) {
       const pr = pk.paramsRef.unwrap();
-      pkObj.paramsRef = [typedHexDIDFromSubstrate(this.api, pr[0]), pr[1].toNumber()];
+      pkObj.paramsRef = [typedHexDIDFromSubstrate(api, pr[0]), pr[1].toNumber()];
     } else {
       pkObj.paramsRef = null;
     }

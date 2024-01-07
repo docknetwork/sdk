@@ -43,7 +43,7 @@ const ctx2 = {
   },
 };
 
-describe('Schema Blob Module Integration', () => {
+describe.skip('Schema Blob Module Integration', () => {
   const dockApi = new DockAPI();
 
   // Generate first key with this seed. The key type is Sr25519

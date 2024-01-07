@@ -10,15 +10,15 @@ describe('DID controllers', () => {
   const dock = new DockAPI();
 
   const dockDid1 = createNewDockDID();
-  const hexDid1 = typedHexDID(dockDid1);
+  let hexDid1;
 
   // This DID will be controlled by itself and dockDid1
   const dockDid2 = createNewDockDID();
-  const hexDid2 = typedHexDID(dockDid2);
+  let hexDid2;
 
   // This DID will not control itself but will be controlled by dockDid1 and dockDid2
   const dockDid3 = createNewDockDID();
-  const hexDid3 = typedHexDID(dockDid3);
+  let hexDid3;
 
   const seed1 = randomAsHex(32);
   const seed2 = randomAsHex(32);
@@ -32,6 +32,10 @@ describe('DID controllers', () => {
     });
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
+
+    hexDid1 = typedHexDID(dock.api, dockDid1);
+    hexDid2 = typedHexDID(dock.api, dockDid2);
+    hexDid3 = typedHexDID(dock.api, dockDid3);
   });
 
   afterAll(async () => {

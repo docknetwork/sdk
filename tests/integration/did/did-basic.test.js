@@ -21,8 +21,8 @@ describe('Basic DID tests', () => {
 
   // Generate a random DID
   const dockDid = createNewDockDID();
-  const typedDid = typedHexDID(dockDid);
-  const hexDid = typedDid.asDid;
+  let typedDid;
+  let hexDid;
 
   // Generate first key with this seed. The key type is Sr25519
   const seed = randomAsHex(32);
@@ -32,6 +32,9 @@ describe('Basic DID tests', () => {
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
+
+    typedDid = typedHexDID(dock.api, dockDid);
+    hexDid = typedDid.asDid;
   });
 
   afterAll(async () => {

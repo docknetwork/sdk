@@ -139,7 +139,7 @@ export default class StatusListCredentialModule {
     );
     return this.updateStatusListCredential(
       payload,
-      [[sigNonce, sig]],
+      [{ nonce: sigNonce, sig }],
       waitForFinalization,
       params,
     );
@@ -173,7 +173,7 @@ export default class StatusListCredentialModule {
     );
     return this.removeStatusListCredential(
       payload,
-      [[sigNonce, sig]],
+      [{ nonce: sigNonce, sig }],
       waitForFinalization,
       params,
     );
@@ -244,7 +244,7 @@ export default class StatusListCredentialModule {
     signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const hexDid = typedHexDID(did);
+    const hexDid = typedHexDID(this.api, did);
     // eslint-disable-next-line no-param-reassign
     nonce = await getDidNonce(hexDid, nonce, didModule);
 

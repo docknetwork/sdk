@@ -68,7 +68,7 @@ describe('Prefilled positive accumulator', () => {
 
     keypair = Accumulator.generateKeypair(params, seedAccum);
     const bytes2 = u8aToHex(keypair.publicKey.bytes);
-    const pk1 = chainModuleClass.prepareAddPublicKey(bytes2, undefined, [did, 1]);
+    const pk1 = chainModuleClass.prepareAddPublicKey(dock.api, bytes2, undefined, [did, 1]);
     await chainModule.addPublicKey(pk1, did, pair, { didModule: dock.didModule }, false);
 
     accumulator = PositiveAccumulator.initialize(params, keypair.secretKey);

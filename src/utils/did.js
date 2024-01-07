@@ -26,6 +26,8 @@ export const Ed25519PublicKeyPrefix = 'z6Mk';
 export const DockDIDQualifier = `did:${DockDIDMethod}:`;
 export const DockDIDMethodKeyQualifier = 'did:key:';
 export const DockDIDByteSize = 32;
+export const DockDIDMethodKeySecp256k1ByteSize = 33;
+export const DockDIDMethodKeyEd25519ByteSize = 32;
 
 export const DockDidMethodKeySecp256k1Prefix = `${DockDIDMethodKeyQualifier}${Secp256k1PublicKeyPrefix}`;
 export const DockDidMethodKeyEd25519Prefix = `${DockDIDMethodKeyQualifier}${Ed25519PublicKeyPrefix}`;
@@ -142,11 +144,20 @@ export class DockDidMethodKey extends DockDidOrDidMethodKey {
   }
 
   toString() {
-    return `${DockDIDMethodKeyQualifier}${this.asDidMethodKey}`;
+    return this.toStringSS58();
   }
 
   toStringSS58() {
-    return `${DockDIDMethodKeyQualifier}${encodeAddress(this.asDidMethodKey)}`;
+    let prefix;
+    if (this.didMethodKey instanceof PublicKeyEd25519) {
+      prefix = DockDidMethodKeyEd25519Prefix;
+    } else if (this.didMethodKey instanceof PublicKeySecp256k1) {
+      prefix = DockDidMethodKeySecp256k1Prefix;
+    } else {
+      throw new Error('Unsopported public key type');
+    }
+
+    return `${prefix}${encodeAddress(this.asDidMethodKey.toJSON())}`;
   }
 }
 
@@ -214,25 +225,62 @@ export function validateDockDIDSS58Identifier(identifier) {
 }
 
 /**
+ * Temporary solution for the DID's backward compatibility.
+ *
+ * --------------------------------------------------------
+ */
+
+Object.defineProperty(String.prototype, 'asDid', {
+  get() {
+    if (this.isDid) {
+      return String(this);
+    } else {
+      throw new Error('Not a `Did`');
+    }
+  },
+});
+
+Object.defineProperty(String.prototype, 'isDid', {
+  get() {
+    return isHexWithGivenByteSize(String(this), DockDIDByteSize);
+  },
+});
+
+/**
+ * --------------------------------------------------------
+ */
+
+/**
  * Takes a DID string, gets the hexadecimal value of that and returns a `DockDidMethodKey` or `DockDid` object.
  * @param {string} did -  The DID can be passed as fully qualified DID like `did:dock:<SS58 string>` or
  * `did:key:<value>` or a 32 byte hex string
  * @return {DockDidOrDidMethodKey} Returns a `DockDidMethodKey` or `DockDid` object.
  */
-export function typedHexDID(did) {
+export function typedHexDID(api, did) {
   const strDid = did.toString();
-  const hex = getHexIdentifier(
-    did,
-    [DockDIDQualifier, DockDIDMethodKeyQualifier],
-    DockDIDByteSize,
-  );
+  if (api.specVersion < 50) {
+    return getHexIdentifier(strDid, DockDIDQualifier, DockDIDByteSize);
+  }
 
   if (strDid.startsWith(DockDidMethodKeySecp256k1Prefix)) {
+    const hex = getHexIdentifier(
+      strDid,
+      DockDIDMethodKeyQualifier,
+      DockDIDMethodKeySecp256k1ByteSize,
+    );
+
     return new DockDidMethodKey(new PublicKeySecp256k1(hex));
   } else if (strDid.startsWith(DockDidMethodKeyEd25519Prefix)) {
+    const hex = getHexIdentifier(
+      strDid,
+      DockDIDMethodKeyQualifier,
+      DockDIDMethodKeyEd25519ByteSize,
+    );
+
     return new DockDidMethodKey(new PublicKeyEd25519(hex));
   } else {
-    validateDockDIDHexIdentifier(hex);
+    const hex = getHexIdentifier(strDid, DockDIDQualifier, DockDIDByteSize);
+
     return new DockDid(hex);
   }
 }
@@ -243,17 +291,35 @@ export function typedHexDID(did) {
  * a 32 byte hex string
  * @return {DockDidOrDidMethodKey} Returns an object wrapping the DID.
  */
-export function typedHexDIDFromSubstrate(did) {
-  const hex = getHexIdentifier(
-    u8aToHex(did.isDid ? did.asDid : did.asDidMethodKey),
-    [],
-    DockDIDByteSize,
-  );
+export function typedHexDIDFromSubstrate(api, did) {
+  if (api.specVersion < 50) {
+    return getHexIdentifier(did, DockDIDQualifier, DockDIDByteSize);
+  } else if (did.isDid) {
+    const hex = getHexIdentifier(u8aToHex(did.asDid), [], DockDIDByteSize);
 
-  if (did.isDid) {
     return new DockDid(hex);
   } else if (did.isDidMethodKey) {
-    return new DockDidMethodKey(hex);
+    const key = did.asDidMethodKey;
+
+    if (key.isSecp256k1) {
+      const hex = getHexIdentifier(
+        u8aToHex(did.asSecp256k1),
+        [],
+        DockDIDMethodKeySecp256k1ByteSize,
+      );
+
+      return new DockDidMethodKey(hex);
+    } else if (key.isEd25519) {
+      const hex = getHexIdentifier(
+        u8aToHex(did.asEd25519),
+        [],
+        DockDIDMethodKeyEd25519ByteSize,
+      );
+
+      return new DockDidMethodKey(hex);
+    } else {
+      throw new Error(`Invalid did key: provided: \`${key}\``);
+    }
   } else {
     throw new Error(`Invalid did provided: \`${did}\``);
   }
@@ -308,7 +374,13 @@ export function createDidKey(publicKey, verRel) {
 export function createDidSig(did, { keyId }, rawSig) {
   const sig = rawSig.toJSON();
 
-  if (did.isDid) {
+  if (typeof did === 'string') {
+    return {
+      did: did.asDid,
+      keyId,
+      sig,
+    };
+  } else if (did.isDid) {
     return {
       // Note: The following repeats the 3 fields to ensure backward compatibility. Once nodes have been upgraded,
       // fields outside `DidSignature` must be removed.
@@ -317,9 +389,6 @@ export function createDidSig(did, { keyId }, rawSig) {
         keyId,
         sig,
       },
-      did: did.asDid,
-      keyId,
-      sig,
     };
   } else if (did.isDidMethodKey) {
     return {

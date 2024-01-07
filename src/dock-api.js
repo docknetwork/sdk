@@ -134,6 +134,9 @@ export default class DockAPI {
 
     this.api = await ApiPromise.create(apiOptions);
 
+    const runtimeVersion = await this.api.rpc.state.getRuntimeVersion();
+    this.api.specVersion = runtimeVersion.specVersion.toNumber();
+
     await this.initKeyring(keyring);
 
     this.anchorModule.setApi(this.api, this.signAndSend.bind(this));

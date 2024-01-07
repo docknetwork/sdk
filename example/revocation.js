@@ -1,7 +1,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 
 import dock from '../src/index';
-import { createNewDockDID, DidKeypair } from '../src/utils/did';
+import { createNewDockDID, DidKeypair, typedHexDID } from '../src/utils/did';
 
 import {
   OneOfPolicy,
@@ -22,7 +22,7 @@ const controllerSeed = randomAsHex(32);
 
 // Create a list of controllers
 const controllers = new Set();
-controllers.add(controllerDID);
+controllers.add(typedHexDID(dock.api, controllerDID));
 
 // Create a registry policy
 const policy = new OneOfPolicy(controllers);

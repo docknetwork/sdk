@@ -54,7 +54,7 @@ describe('Custom nonce', () => {
   }, 10000);
 
   test('Add key, controller, service endpoint, blob, BBS+ params and keys and accumulator in a batch', async () => {
-    const nonce = await dock.didModule.getNonceForDid(typedHexDID(did1));
+    const nonce = await dock.didModule.getNonceForDid(typedHexDID(dock.api, did1));
 
     const pair = new DidKeypair(dock.keyring.addFromUri(seed1), 1);
     const txs = [];
@@ -98,7 +98,7 @@ describe('Custom nonce', () => {
     txs.push(tx5);
 
     const keypair = BBSPlusKeypairG2.generate(params);
-    const pk = BBSPlusModule.prepareAddPublicKey(u8aToHex(keypair.publicKey.bytes), undefined, [did1, 1]);
+    const pk = BBSPlusModule.prepareAddPublicKey(dock.api, u8aToHex(keypair.publicKey.bytes), undefined, [did1, 1]);
     const tx6 = await dock.bbsPlusModule.createAddPublicKeyTx(pk, did1, did1, pair, { nonce: nonce + 6 });
     txs.push(tx6);
 
@@ -109,7 +109,7 @@ describe('Custom nonce', () => {
     txs.push(tx7);
 
     const keypair1 = Accumulator.generateKeypair(params1);
-    const pk1 = AccumulatorModule.prepareAddPublicKey(u8aToHex(keypair1.publicKey.bytes), undefined, [did1, 1]);
+    const pk1 = AccumulatorModule.prepareAddPublicKey(dock.api, u8aToHex(keypair1.publicKey.bytes), undefined, [did1, 1]);
     const tx8 = await dock.accumulatorModule.createAddPublicKeyTx(pk1, did1, pair, { nonce: nonce + 8 });
     txs.push(tx8);
 
@@ -148,7 +148,7 @@ describe('Custom nonce', () => {
 
     const queriedPk = await dock.bbsPlusModule.getPublicKey(did1, 3);
     expect(queriedPk.bytes).toEqual(pk.bytes);
-    expect(queriedPk.paramsRef).toEqual([typedHexDID(did1), 1]);
+    expect(queriedPk.paramsRef).toEqual([typedHexDID(dock.api, did1), 1]);
 
     const queriedParams1 = await dock.accumulatorModule.getParams(did1, 1);
     expect(queriedParams1.bytes).toEqual(addParams1.bytes);
@@ -156,24 +156,24 @@ describe('Custom nonce', () => {
 
     const queriedPk1 = await dock.accumulatorModule.getPublicKey(did1, 1);
     expect(queriedPk1.bytes).toEqual(pk1.bytes);
-    expect(queriedPk1.paramsRef).toEqual([typedHexDID(did1), 1]);
+    expect(queriedPk1.paramsRef).toEqual([typedHexDID(dock.api, did1), 1]);
 
     const accum1 = await dock.accumulatorModule.getAccumulator(id1, true);
     expect(accum1.type).toEqual('positive');
     expect(accum1.accumulated).toEqual(accumulated1);
-    expect(accum1.keyRef).toEqual([typedHexDID(did1), 1]);
+    expect(accum1.keyRef).toEqual([typedHexDID(dock.api, did1), 1]);
 
     const accum2 = await dock.accumulatorModule.getAccumulator(id2, true);
     expect(accum2.type).toEqual('universal');
     expect(accum2.accumulated).toEqual(accumulated2);
-    expect(accum2.keyRef).toEqual([typedHexDID(did1), 1]);
+    expect(accum2.keyRef).toEqual([typedHexDID(dock.api, did1), 1]);
     expect(accum1.created).toEqual(accum2.created);
     expect(accum1.lastModified).toEqual(accum2.lastModified);
   }, 20000);
 
   test('Add 3 registries and submit revocations for all in a batch', async () => {
     const owners = new Set();
-    owners.add(did1);
+    owners.add(typedHexDID(dock.api, did1));
 
     const [revokeIds1, revokeIds2, revokeIds3] = [1, 2, 3].map((_) => {
       const r = new Set();
@@ -193,14 +193,14 @@ describe('Custom nonce', () => {
     await dock.revocation.newRegistry(registryId3, policy, false, false);
 
     const pair = new DidKeypair(dock.keyring.addFromUri(seed1), 1);
-    let currentNonce = await dock.didModule.getNonceForDid(typedHexDID(did1));
+    let currentNonce = await dock.didModule.getNonceForDid(typedHexDID(dock.api, did1));
     let txs = [];
 
     // Revoke from all 3 registries in the same transaction batch
     for (const [regId, revs, nonce] of [[registryId1, revokeIds1, currentNonce + 1], [registryId2, revokeIds2, currentNonce + 2], [registryId3, revokeIds3, currentNonce + 3]]) {
       const [revoke, sig, computedNonce] = await dock.revocation.createSignedRevoke(regId, revs, did1, pair, { nonce });
       expect(computedNonce).toEqual(nonce);
-      const tx = await dock.revocation.createRevokeTx(revoke, [{ nonce, data: sig }]);
+      const tx = await dock.revocation.createRevokeTx(revoke, [{ nonce, sig }]);
       txs.push(tx);
     }
 
@@ -218,12 +218,12 @@ describe('Custom nonce', () => {
     }
 
     // Remove from all 3 registries in the same transaction batch
-    currentNonce = await dock.didModule.getNonceForDid(typedHexDID(did1));
+    currentNonce = await dock.didModule.getNonceForDid(typedHexDID(dock.api, did1));
     txs = [];
     for (const [regId, nonce] of [[registryId1, currentNonce + 1], [registryId2, currentNonce + 2], [registryId3, currentNonce + 3]]) {
       const [remove, sig, computedNonce] = await dock.revocation.createSignedRemove(regId, did1, pair, { nonce });
       expect(computedNonce).toEqual(nonce);
-      const tx = await dock.revocation.createRemoveRegistryTx(remove, [{ nonce, data: sig }]);
+      const tx = await dock.revocation.createRemoveRegistryTx(remove, [{ nonce, sig }]);
       txs.push(tx);
     }
 
@@ -257,7 +257,7 @@ describe('Custom nonce', () => {
 
     const pair = new DidKeypair(dock.keyring.addFromUri(seed1), 1);
 
-    let nonce = await dock.didModule.getNonceForDid(typedHexDID(did1));
+    let nonce = await dock.didModule.getNonceForDid(typedHexDID(dock.api, did1));
     let txs = [];
 
     // Add a key and a service endpoint to each DID
@@ -295,9 +295,9 @@ describe('Custom nonce', () => {
     await expect(dock.did.getServiceEndpoint(did5, spId5)).resolves.toEqual({ type: spType, origins: origins[2] });
 
     // Each DID adds 2 blobs
-    const nonce3 = await dock.didModule.getNonceForDid(typedHexDID(did3));
-    const nonce4 = await dock.didModule.getNonceForDid(typedHexDID(did4));
-    const nonce5 = await dock.didModule.getNonceForDid(typedHexDID(did5));
+    const nonce3 = await dock.didModule.getNonceForDid(typedHexDID(dock.api, did3));
+    const nonce4 = await dock.didModule.getNonceForDid(typedHexDID(dock.api, did4));
+    const nonce5 = await dock.didModule.getNonceForDid(typedHexDID(dock.api, did5));
     txs = [];
 
     const [[blobId1, blobHex1, blob1], [blobId2, blobHex2, blob2], [blobId3, blobHex3, blob3], [blobId4, blobHex4, blob4], [blobId5, blobHex5, blob5], [blobId6, blobHex6, blob6]] = [1, 2, 3, 4, 5, 6].map((_) => {
@@ -332,11 +332,11 @@ describe('Custom nonce', () => {
       const chainBlob = await dock.blob.get(bi);
       expect(!!chainBlob).toBe(true);
       expect(u8aToHex(chainBlob[1])).toEqual(bh);
-      expect(chainBlob[0]).toEqual(typedHexDID(d));
+      expect(chainBlob[0]).toEqual(typedHexDID(dock.api, d));
     }
 
     // Remove all DIDs in a batch
-    nonce = await dock.didModule.getNonceForDid(typedHexDID(did1));
+    nonce = await dock.didModule.getNonceForDid(typedHexDID(dock.api, did1));
     txs = [];
 
     const tx13 = await dock.did.createRemoveTx(did3, did1, pair, nonce + 1);

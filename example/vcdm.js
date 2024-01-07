@@ -3,7 +3,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import dock from '../src/index';
 import VerifiableCredential from '../src/verifiable-credential';
 import VerifiablePresentation from '../src/verifiable-presentation';
-import { createNewDockDID, DidKeypair } from '../src/utils/did';
+import { createNewDockDID, DidKeypair, typedHexDID } from '../src/utils/did';
 import { registerNewDIDUsingPair } from '../tests/integration/helpers';
 import { createRandomRegistryId, OneOfPolicy, buildDockCredentialStatus } from '../src/utils/revocation';
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
@@ -54,7 +54,7 @@ async function setup() {
 
   // Create a new policy
   const policy = new OneOfPolicy();
-  policy.addOwner(issuerDID);
+  policy.addOwner(typedHexDID(dock.api, issuerDID));
 
   // Add a new revocation registry with above policy
   console.log('Creating registry...');

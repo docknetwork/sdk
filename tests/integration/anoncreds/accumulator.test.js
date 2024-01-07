@@ -127,7 +127,7 @@ describe("Accumulator Module", () => {
     const params = Accumulator.generateParams();
     let keypair = Accumulator.generateKeypair(params);
     const bytes1 = u8aToHex(keypair.publicKey.bytes);
-    const pk1 = chainModuleClass.prepareAddPublicKey(bytes1);
+    const pk1 = chainModuleClass.prepareAddPublicKey(dock.api, bytes1);
     await chainModule.addPublicKey(
       pk1,
       did1,
@@ -144,7 +144,7 @@ describe("Accumulator Module", () => {
     const aparams1 = new AccumulatorParams(hexToU8a(params1.bytes));
     keypair = Accumulator.generateKeypair(aparams1, hexToU8a(seedAccum));
     const bytes2 = u8aToHex(keypair.publicKey.bytes);
-    const pk2 = chainModuleClass.prepareAddPublicKey(bytes2, undefined, [
+    const pk2 = chainModuleClass.prepareAddPublicKey(dock.api, bytes2, undefined, [
       did1,
       1,
     ]);
@@ -158,7 +158,7 @@ describe("Accumulator Module", () => {
 
     const queriedPk2 = await chainModule.getPublicKey(did2, 1);
     expect(queriedPk2.bytes).toEqual(pk2.bytes);
-    expect(queriedPk2.paramsRef).toEqual([typedHexDID(did1), 1]);
+    expect(queriedPk2.paramsRef).toEqual([typedHexDID(dock.api, did1), 1]);
 
     const queriedPk2WithParams = await chainModule.getPublicKey(did2, 1, true);
     expect(queriedPk2WithParams.params).toEqual(params1);
@@ -167,7 +167,7 @@ describe("Accumulator Module", () => {
     const aparams2 = new AccumulatorParams(hexToU8a(params2.bytes));
     keypair = Accumulator.generateKeypair(aparams2);
     const bytes3 = u8aToHex(keypair.publicKey.bytes);
-    const pk3 = chainModuleClass.prepareAddPublicKey(bytes3, undefined, [
+    const pk3 = chainModuleClass.prepareAddPublicKey(dock.api, bytes3, undefined, [
       did1,
       2,
     ]);
@@ -181,7 +181,7 @@ describe("Accumulator Module", () => {
 
     const queriedPk3 = await chainModule.getPublicKey(did2, 2);
     expect(queriedPk3.bytes).toEqual(pk3.bytes);
-    expect(queriedPk3.paramsRef).toEqual([typedHexDID(did1), 2]);
+    expect(queriedPk3.paramsRef).toEqual([typedHexDID(dock.api, did1), 2]);
 
     const queriedPk3WithParams = await chainModule.getPublicKey(did2, 2, true);
     expect(queriedPk3WithParams.params).toEqual(params2);
@@ -234,7 +234,7 @@ describe("Accumulator Module", () => {
     expect(accum1.created).toEqual(accum1.lastModified);
     expect(accum1.type).toEqual("positive");
     expect(accum1.accumulated).toEqual(accumulated1);
-    expect(accum1.keyRef).toEqual([typedHexDID(did1), 1]);
+    expect(accum1.keyRef).toEqual([typedHexDID(dock.api, did1), 1]);
     expect(accum1.publicKey).toBeUndefined();
 
     const accum2 = await chainModule.getAccumulator(id2, false);
@@ -243,7 +243,7 @@ describe("Accumulator Module", () => {
     expect(accum2.created).toEqual(accum2.lastModified);
     expect(accum2.type).toEqual("universal");
     expect(accum2.accumulated).toEqual(accumulated2);
-    expect(accum2.keyRef).toEqual([typedHexDID(did2), 1]);
+    expect(accum2.keyRef).toEqual([typedHexDID(dock.api, did2), 1]);
     expect(accum2.publicKey).toBeUndefined();
 
     const keyWithParams = await chainModule.getPublicKey(did2, 1, true);
@@ -255,7 +255,7 @@ describe("Accumulator Module", () => {
     );
     expect(accum2WithKeyAndParams.type).toEqual("universal");
     expect(accum2WithKeyAndParams.accumulated).toEqual(accumulated2);
-    expect(accum2WithKeyAndParams.keyRef).toEqual([typedHexDID(did2), 1]);
+    expect(accum2WithKeyAndParams.keyRef).toEqual([typedHexDID(dock.api, did2), 1]);
     expect(accum2WithKeyAndParams.publicKey).toEqual(keyWithParams);
 
     await chainModule.removeAccumulator(

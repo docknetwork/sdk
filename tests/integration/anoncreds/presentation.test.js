@@ -60,7 +60,7 @@ describe.each(Schemes)('Presentation', ({
 
     chainModule = getModule(dock);
 
-    const pk1 = Module.prepareAddPublicKey(u8aToHex(keypair.publicKeyBuffer));
+    const pk1 = Module.prepareAddPublicKey(dock.api, u8aToHex(keypair.publicKeyBuffer));
     await chainModule.addPublicKey(
       pk1,
       did1,

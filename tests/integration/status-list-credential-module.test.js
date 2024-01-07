@@ -50,10 +50,7 @@ buildTest("StatusListCredential Module", () => {
 
   // Create  owners
   const owners = new Set();
-  owners.add(ownerDID);
-
-  // Create a status list policy
-  const policy = new OneOfPolicy(owners);
+  let policy;
 
   // Create revoke IDs
   const revokeId = (Math.random() * 10e3) | 0;
@@ -65,6 +62,11 @@ buildTest("StatusListCredential Module", () => {
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
+
+    // Create a status list policy
+    owners.add(typedHexDID(dock.api, ownerDID));
+
+    policy = new OneOfPolicy(owners);
 
     ownerKey = getKeyDoc(
       ownerDID,
@@ -137,7 +139,7 @@ buildTest("StatusListCredential Module", () => {
       );
     await dock.statusListCredential.updateStatusListCredential(
       revoke,
-      [[nonce, sig]],
+      [{ nonce, sig }],
       false
     );
     const fetchedCred =
@@ -187,7 +189,7 @@ buildTest("StatusListCredential Module", () => {
       );
     await dock.statusListCredential.updateStatusListCredential(
       update,
-      [[nonce, sig]],
+      [{ nonce, sig }],
       false
     );
     let fetchedCred =
@@ -209,7 +211,7 @@ buildTest("StatusListCredential Module", () => {
       );
     await dock.statusListCredential.updateStatusListCredential(
       update,
-      [[nonce, sig]],
+      [{ nonce, sig }],
       false
     );
 
@@ -229,7 +231,7 @@ buildTest("StatusListCredential Module", () => {
       );
     await dock.statusListCredential.removeStatusListCredential(
       remove,
-      [[nonce, sig]],
+      [{ nonce, sig }],
       false
     );
     expect(
@@ -241,8 +243,8 @@ buildTest("StatusListCredential Module", () => {
 
   test("Can create a status list with multiple owners", async () => {
     const controllersNew = new Set();
-    controllersNew.add(ownerDID);
-    controllersNew.add(ownerDID2);
+    controllersNew.add(typedHexDID(dock.api, ownerDID));
+    controllersNew.add(typedHexDID(dock.api, ownerDID2));
 
     const cred = await StatusList2021Credential.create(
       ownerKey,
@@ -275,14 +277,14 @@ buildTest("StatusListCredential Module", () => {
     let hasSecondDID = false;
     [...controllerSet.entries()]
       .flatMap((v) => v)
-      .map(typedHexDIDFromSubstrate)
+      .map(cnt => typedHexDIDFromSubstrate(dock.api, cnt))
       .forEach((controller) => {
         if (
-          controller.toString() === typedHexDID(ownerDID).toString()
+          controller.toString() === typedHexDID(dock.api, ownerDID).toString()
         ) {
           hasFirstDID = true;
         } else if (
-          controller.toString() === typedHexDID(ownerDID2).toString()
+          controller.toString() === typedHexDID(dock.api, ownerDID2).toString()
         ) {
           hasSecondDID = true;
         }

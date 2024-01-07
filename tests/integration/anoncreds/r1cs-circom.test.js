@@ -144,7 +144,7 @@ for (const {
       // Not writing the params on chain as its assumed that the label is hardcoded in the code as system parameter
 
       issuerSchemeKeypair = KeyPair.generate(sigParams);
-      const pk = Module.prepareAddPublicKey(
+      const pk = Module.prepareAddPublicKey(dock.api,
         u8aToHex(issuerSchemeKeypair.publicKey.bytes),
       );
       await getModule(dock).addPublicKey(

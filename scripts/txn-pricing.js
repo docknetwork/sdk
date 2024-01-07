@@ -5,7 +5,7 @@ import { BTreeSet } from '@polkadot/types';
 import { randomAsHex } from '@polkadot/util-crypto';
 import dock from '../src/index';
 import {
-  createNewDockDID,
+  createNewDockDID, typedHexDID,
 } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { createRandomRegistryId, OneOfPolicy } from '../src/utils/revocation';
@@ -217,7 +217,7 @@ async function revocation() {
   const registryId = createRandomRegistryId();
   // Create owners
   const owners = new Set();
-  owners.add(did);
+  owners.add(typedHexDID(dock.api, did));
 
   const policy = new OneOfPolicy(owners);
   await printFeePaid(dock.api, account.address, async () => {
@@ -233,7 +233,7 @@ async function revocation() {
     }
 
     const [update, sig, nonce] = await dock.revocation.createSignedRevoke(registryId, revokeIds, did, pair, { didModule: dock.did });
-    const revTx = dock.revocation.createRevokeTx(update, [[nonce, sig]]);
+    const revTx = dock.revocation.createRevokeTx(update, [{ nonce, sig }]);
     console.info(`Payment info of ${count} revocation is ${(await revTx.paymentInfo(account.address))}`);
     await printFeePaid(dock.api, account.address, async () => {
       await dock.signAndSend(revTx, false);
@@ -241,7 +241,7 @@ async function revocation() {
   }
 
   const [update, sig, nonce] = await dock.revocation.createSignedRemove(registryId, did, pair, { didModule: dock.did });
-  const revTx = dock.revocation.createRemoveRegistryTx(update, [[nonce, sig]]);
+  const revTx = dock.revocation.createRemoveRegistryTx(update, [{ nonce, sig }]);
   console.info(`Payment info of removing registry is ${(await revTx.paymentInfo(account.address))}`);
 
   await printFeePaid(dock.api, account.address, async () => {
@@ -301,7 +301,7 @@ async function bbsPlus() {
 
   // Add a public key
   const kp = BBSPlusKeypairG2.generate(BBSPlusSignatureParamsG1.generate(10, hexToU8a(label)));
-  const pk = BBSPlusModule.prepareAddPublicKey(u8aToHex(kp.publicKey.bytes), undefined, [did, 1]);
+  const pk = BBSPlusModule.prepareAddPublicKey(dock.api, u8aToHex(kp.publicKey.bytes), undefined, [did, 1]);
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Add a BBS+ key');
     await dock.bbsPlusModule.addPublicKey(pk, did, did, pair, { didModule: dock.did }, false);
@@ -339,7 +339,7 @@ async function accumulator() {
 
   const kp = Accumulator.generateKeypair(new AccumulatorParams(hexToU8a(params.bytes)));
 
-  const pk = AccumulatorModule.prepareAddPublicKey(u8aToHex(kp.publicKey.bytes), undefined, [did, 1]);
+  const pk = AccumulatorModule.prepareAddPublicKey(dock.api, u8aToHex(kp.publicKey.bytes), undefined, [did, 1]);
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Accumulator key write');
     await dock.accumulatorModule.addPublicKey(pk, did, pair, { didModule: dock.did }, false);

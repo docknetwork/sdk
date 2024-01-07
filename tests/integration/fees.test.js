@@ -13,7 +13,7 @@ import {
 } from '@polkadot/util';
 import { randomAsHex } from '@polkadot/util-crypto';
 import { DockAPI } from '../../src/index';
-import { createNewDockDID } from '../../src/utils/did';
+import { createNewDockDID, typedHexDID } from '../../src/utils/did';
 import { createDidPair, getBalance } from './helpers';
 import {
   createRandomRegistryId,
@@ -283,7 +283,7 @@ describe.skip('Fees', () => {
     const registryId = createRandomRegistryId();
     // Create owners
     const owners = new Set();
-    owners.add(did);
+    owners.add(typedHexDID(dock.api, did));
 
     const policy = new OneOfPolicy(owners);
     await withPaidFeeMatchingSnapshot(() => dock.revocation.newRegistry(registryId, policy, false, false));
@@ -303,7 +303,7 @@ describe.skip('Fees', () => {
         1,
         { didModule: dock.did },
       );
-      const revTx = dock.revocation.createRevokeTx(update, [[nonce, sig]]);
+      const revTx = dock.revocation.createRevokeTx(update, [{ nonce, sig }]);
 
       await withPaidFeeMatchingSnapshot(async () => {
         await dock.signAndSend(revTx, false);
@@ -318,11 +318,11 @@ describe.skip('Fees', () => {
       { didModule: dock.did },
     );
     const revTx = dock.revocation.createRemoveRegistryTx(update, [
-      [nonce, sig],
+      { nonce, sig },
     ]);
 
     await withPaidFeeMatchingSnapshot(() => dock.signAndSend(revTx, false));
-  }, 40000);-
+  }, 40000);
 
   test('anchors', async () => {
     const anc = randomAsHex(32);
@@ -373,7 +373,7 @@ describe.skip('Fees', () => {
     const kp = BBSPlusKeypairG2.generate(
       BBSPlusSignatureParamsG1.generate(10, hexToU8a(label)),
     );
-    const pk = BBSPlusModule.prepareAddPublicKey(
+    const pk = BBSPlusModule.prepareAddPublicKey(dock.api,
       u8aToHex(kp.publicKey.bytes),
       undefined,
       [did, 1],
@@ -434,7 +434,7 @@ describe.skip('Fees', () => {
       new AccumulatorParams(hexToU8a(params.bytes)),
     );
 
-    const pk = AccumulatorModule.prepareAddPublicKey(
+    const pk = AccumulatorModule.prepareAddPublicKey(dock.api,
       u8aToHex(kp.publicKey.bytes),
       undefined,
       [did, 1],

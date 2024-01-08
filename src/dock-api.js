@@ -135,12 +135,13 @@ export default class DockAPI {
     this.api = await ApiPromise.create(apiOptions);
 
     const runtimeVersion = await this.api.rpc.state.getRuntimeVersion();
-    this.api.specVersion = runtimeVersion.specVersion.toNumber();
+    const specVersion = runtimeVersion.specVersion.toNumber();
 
-    if (this.api.specVersion < 50) {
-      apiOptions.types = { DidOrDidMethodKey: 'Did' };
+    if (specVersion < 50) {
+      apiOptions.types = { ...(apiOptions.types || {}), DidOrDidMethodKey: 'Did' };
       this.api = await ApiPromise.create(apiOptions);
     }
+    this.api.specVersion = specVersion;
 
     await this.initKeyring(keyring);
 

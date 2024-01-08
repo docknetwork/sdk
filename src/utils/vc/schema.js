@@ -89,7 +89,7 @@ export async function getAndValidateSchemaIfPresent(
         schemaObj = {
           ...data,
           id: schemaUri,
-          author: hexDIDToQualified(author.did),
+          author: hexDIDToQualified(author),
         };
       } else {
         schemaObj = document;

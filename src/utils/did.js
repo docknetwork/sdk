@@ -266,6 +266,12 @@ Object.defineProperty(String.prototype, 'isDid', {
     return isHexWithGivenByteSize(String(this), DockDIDByteSize);
   },
 });
+// eslint-disable-next-line no-extend-native
+Object.defineProperty(String.prototype, 'toStringSS58', {
+  get() {
+    return new DockDid(this.asDid).toStringSS58();
+  },
+});
 
 /**
  * --------------------------------------------------------

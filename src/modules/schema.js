@@ -140,7 +140,7 @@ export default class Schema {
       return {
         ...chainValue,
         id,
-        author: hexDIDToQualified(chainBlob[0].did),
+        author: hexDIDToQualified(chainBlob[0]),
       };
     }
     throw new Error('Incorrect schema format');

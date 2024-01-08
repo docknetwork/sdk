@@ -4,7 +4,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import { DockAPI } from '../../src/index';
 
 import {
-  createNewDockDID, typedHexDID, hexDIDToQualified, DidKeypair,
+  createNewDockDID, typedHexDID, DidKeypair, hexDIDToQualified,
 } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { verifyCredential, verifyPresentation } from '../../src/utils/vc/index';
@@ -43,7 +43,7 @@ const ctx2 = {
   },
 };
 
-describe.skip('Schema Blob Module Integration', () => {
+describe('Schema Blob Module Integration', () => {
   const dockApi = new DockAPI();
 
   // Generate first key with this seed. The key type is Sr25519
@@ -123,10 +123,11 @@ describe.skip('Schema Blob Module Integration', () => {
     const schema = new Schema();
     await schema.setJSONSchema(exampleSchema);
     await dockApi.blob.new(schema.toBlob(), dockDID, pair, { didModule: dockApi.didModule }, false);
-    await expect(Schema.get(blobId, dockApi)).resolves.toMatchObject({
+    const schemaObj = await Schema.get(blobId, dockApi);
+    expect(schemaObj).toMatchObject({
       ...exampleSchema,
       id: blobId,
-      author: hexDIDToQualified(typedHexDID(dockApi.api, dockDID)),
+      author: hexDIDToQualified(hexDid),
     });
   }, 20000);
 

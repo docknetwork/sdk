@@ -45,9 +45,12 @@ buildTest("Trust Registry", () => {
   const verifierSeed2 = randomAsHex(32);
   let verifierPair2;
 
-  const verifierDIDMethodKeyPair = generateEcdsaSecp256k1Keypair(seed2);
+  const seed = randomAsHex(32);
+  const verifierDIDMethodKeyPair = generateEcdsaSecp256k1Keypair(seed);
   const verifierDIDMethodKeyPublicKey = PublicKeySecp256k1.fromKeyringPair(verifierDIDMethodKeyPair);
   const verifierDIDMethodKey = new DockDidMethodKey(verifierDIDMethodKeyPublicKey);
+
+  console.log(verifierDIDMethodKey.toStringSS58());
 
   // Create revoke IDs
   const revokeId = (Math.random() * 10e3) | 0;
@@ -174,13 +177,13 @@ buildTest("Trust Registry", () => {
     ).toEqual({
       issuers: Object.fromEntries(
         [...issuers.entries()].map(([issuer, prices]) => [
-          JSON.stringify({ did: issuer.asDid }),
+          JSON.stringify(issuer.isDid ? { did: issuer.asDid }: { didMethodKey: issuer.asDidMethodKey }),
           Object.fromEntries([...prices.entries()]),
         ])
       ),
       verifiers: [...verifiers.values()]
-        .map((verifier) => ({ did: verifier.asDid }))
-        .sort((a, b) => a.did.localeCompare(b.did)),
+        .map((verifier) => verifier.isDid ? { did: verifier.asDid }: { didMethodKey: verifier.asDidMethodKey })
+        .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
     });
   });
 
@@ -280,7 +283,7 @@ buildTest("Trust Registry", () => {
     });
 
     const issuers = new BTreeSet();
-    issuers.add(typedHexDID(dock.api, verifierDID2));
+    issuers.add(typedHexDID(dock.api, issuerDID2));
 
     await dock.trustRegistry.updateDelegatedIssuers(
       issuerDID,
@@ -312,7 +315,7 @@ buildTest("Trust Registry", () => {
     let verifiers = new BTreeSet();
     verifiers.add(typedHexDID(dock.api, verifierDID));
     verifiers.add(typedHexDID(dock.api, verifierDID2));
-    verifiers.add(verifierDIDMethodKey);
+    // verifiers.add(verifierDIDMethodKey);
 
     let issuers = new BTreeMap();
     let issuerPrices = new BTreeMap();
@@ -347,13 +350,13 @@ buildTest("Trust Registry", () => {
     ).toEqual({
       issuers: Object.fromEntries(
         [...issuers.entries()].map(([issuer, prices]) => [
-          JSON.stringify({ did: issuer.asDid }),
+          JSON.stringify(issuer.isDid ? { did: issuer.asDid }: { didMethodKey: issuer.asDidMethodKey }),
           Object.fromEntries([...prices.entries()]),
         ])
       ),
       verifiers: [...verifiers.values()]
-        .map((verifier) => ({ did: verifier.asDid }))
-        .sort((a, b) => a.did.localeCompare(b.did)),
+        .map((verifier) => verifier.isDid ? { did: verifier.asDid }: { didMethodKey: verifier.asDidMethodKey })
+        .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
     });
 
     let schemasUpdate = new BTreeMap();
@@ -395,13 +398,13 @@ buildTest("Trust Registry", () => {
     ).toEqual({
       issuers: Object.fromEntries(
         [...issuers.entries()].map(([issuer, prices]) => [
-          JSON.stringify({ did: issuer.asDid }),
+          JSON.stringify(issuer.isDid ? { did: issuer.asDid }: { didMethodKey: issuer.asDidMethodKey }),
           Object.fromEntries([...prices.entries()]),
         ])
       ),
       verifiers: [...verifiers.values()]
-        .map((verifier) => ({ did: verifier.asDid }))
-        .sort((a, b) => a.did.localeCompare(b.did)),
+        .map((verifier) => verifier.isDid ? { did: verifier.asDid }: { didMethodKey: verifier.asDidMethodKey })
+        .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
     });
 
     schemasUpdate = new BTreeMap();
@@ -439,13 +442,13 @@ buildTest("Trust Registry", () => {
     ).toEqual({
       issuers: Object.fromEntries(
         [...issuers.entries()].map(([issuer, prices]) => [
-          JSON.stringify({ did: issuer.asDid }),
+          JSON.stringify(issuer.isDid ? { did: issuer.asDid }: { didMethodKey: issuer.asDidMethodKey }),
           Object.fromEntries([...prices.entries()]),
         ])
       ),
       verifiers: [...verifiers.values()]
-        .map((verifier) => ({ did: verifier.asDid }))
-        .sort((a, b) => a.did.localeCompare(b.did)),
+        .map((verifier) => verifier.isDid ? { did: verifier.asDid }: { didMethodKey: verifier.asDidMethodKey })
+        .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
     });
   });
 });

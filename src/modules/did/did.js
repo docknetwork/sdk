@@ -905,11 +905,15 @@ class DIDModule {
     const document = {
       '@context': ['https://www.w3.org/ns/did/v1'],
       id,
-      controller: [...controllers].map((c) => (c.Did
-        ? this.getFullyQualifiedDID(encodeAddress(c.Did))
-        : c.DidMethodKey
-          ? this.getFullyQualifiedDIDMethodKey(encodeAddress(c.DidMethodKey))
-          : this.getFullyQualifiedDID(encodeAddress(c)))),
+      controller: [...controllers].map((c) => {
+        if (c.Did) {
+          return this.getFullyQualifiedDID(encodeAddress(c.Did));
+        } else if (c.DidMethodKey) {
+          return this.getFullyQualifiedDIDMethodKey(encodeAddress(c.DidMethodKey));
+        } else {
+          return this.getFullyQualifiedDID(encodeAddress(c));
+        }
+      }),
       publicKey: verificationMethod,
     };
 

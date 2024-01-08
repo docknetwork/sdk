@@ -55,13 +55,19 @@ export class DidKeypair {
    * @param keyId - Defaults to 1
    * @returns {DidKeypair}
    */
-  static fromApi(dockApi, {
-    seed = randomAsHex(32),
-    keypairType = 'ed25519',
-    meta = null,
-    keyId = 1,
-  } = {}) {
-    return new DidKeypair(dockApi.keyring.addFromUri(seed, meta, keypairType), keyId);
+  static fromApi(
+    dockApi,
+    {
+      seed = randomAsHex(32),
+      keypairType = 'ed25519',
+      meta = null,
+      keyId = 1,
+    } = {},
+  ) {
+    return new DidKeypair(
+      dockApi.keyring.addFromUri(seed, meta, keypairType),
+      keyId,
+    );
   }
 }
 
@@ -129,6 +135,14 @@ export class DockDidMethodKey extends DockDidOrDidMethodKey {
   constructor(didMethodKey) {
     super();
     this.didMethodKey = didMethodKey;
+
+    if (didMethodKey instanceof PublicKeyEd25519) {
+      this.didMethodKey = { ed25519: didMethodKey.value };
+    } else if (didMethodKey instanceof PublicKeySecp256k1) {
+      this.didMethodKey = { secp256k1: didMethodKey.value };
+    } else {
+      throw new Error('Unsopported public key type');
+    }
   }
 
   get isDidMethodKey() {
@@ -140,7 +154,11 @@ export class DockDidMethodKey extends DockDidOrDidMethodKey {
   }
 
   toJSON() {
-    return { DidMethodKey: this.didMethodKey };
+    return {
+      DidMethodKey: this.didMethodKey.ed25519
+        ? { Ed25519: this.didMethodKey.ed25519 }
+        : { Secp256k1: this.didMethodKey.secp256k1 },
+    };
   }
 
   toString() {
@@ -148,16 +166,19 @@ export class DockDidMethodKey extends DockDidOrDidMethodKey {
   }
 
   toStringSS58() {
-    let prefix;
-    if (this.didMethodKey instanceof PublicKeyEd25519) {
+    let prefix; let
+      address;
+    if (this.didMethodKey.ed25519) {
       prefix = DockDidMethodKeyEd25519Prefix;
-    } else if (this.didMethodKey instanceof PublicKeySecp256k1) {
+      address = this.didMethodKey.ed25519;
+    } else if (this.didMethodKey.secp256k1) {
       prefix = DockDidMethodKeySecp256k1Prefix;
+      address = this.didMethodKey.secp256k1;
     } else {
       throw new Error('Unsopported public key type');
     }
 
-    return `${prefix}${encodeAddress(this.asDidMethodKey.toJSON())}`;
+    return `${prefix}${encodeAddress(address)}`;
   }
 }
 
@@ -229,7 +250,7 @@ export function validateDockDIDSS58Identifier(identifier) {
  *
  * --------------------------------------------------------
  */
-
+// eslint-disable-next-line no-extend-native
 Object.defineProperty(String.prototype, 'asDid', {
   get() {
     if (this.isDid) {
@@ -239,7 +260,7 @@ Object.defineProperty(String.prototype, 'asDid', {
     }
   },
 });
-
+// eslint-disable-next-line no-extend-native
 Object.defineProperty(String.prototype, 'isDid', {
   get() {
     return isHexWithGivenByteSize(String(this), DockDIDByteSize);

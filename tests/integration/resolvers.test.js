@@ -1,6 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { DockResolver, DockStatusList2021Resolver } from '../../src/resolver';
-import { createNewDockDID, DidKeypair } from '../../src/utils/did';
+import { createNewDockDID, DidKeypair, typedHexDID } from '../../src/utils/did';
 
 import { DockAPI } from '../../src/index';
 

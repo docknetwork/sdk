@@ -138,7 +138,6 @@ export default class DockAPI {
     this.api.specVersion = runtimeVersion.specVersion.toNumber();
 
     if (this.api.specVersion < 50) {
-      console.log('???', this.api.specVersion);
       apiOptions.types = { DidOrDidMethodKey: 'Did' };
       this.api = await ApiPromise.create(apiOptions);
     }

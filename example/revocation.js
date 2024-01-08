@@ -20,17 +20,17 @@ const registryId = createRandomRegistryId();
 const controllerDID = createNewDockDID();
 const controllerSeed = randomAsHex(32);
 
-// Create a list of controllers
-const controllers = new Set();
-controllers.add(typedHexDID(dock.api, controllerDID));
-
-// Create a registry policy
-const policy = new OneOfPolicy(controllers);
-
 // Create revoke IDs
 const revokeId = randomAsHex(32);
 
 async function createRegistry() {
+  // Create a list of controllers
+  const controllers = new Set();
+
+  controllers.add(typedHexDID(dock.api, controllerDID));
+
+  // Create a registry policy
+  const policy = new OneOfPolicy(controllers);
   console.log(`Creating a registry with owner DID (${controllerDID}) with policy type:`, policy.constructor.name);
   await dock.revocation.newRegistry(registryId, policy, false, false);
   console.log('Created registry');

@@ -152,7 +152,7 @@ class DIDModule {
 
   /**
    * Creates a new DID on the Dock chain.
-   * @param {string} did - The new DID. Can be aw full DID or hex identifier
+   * @param {string} did - The new DID. Can be a full DID or hex identifier
    * @param {DidKey[]} didKeys - Array of `DidKey`s as expected by the Substrate node
    * @param {array} controllers - Array of `Did`s as expected by the Substrate node.
    * @param waitForFinalization
@@ -168,6 +168,25 @@ class DIDModule {
   ) {
     return this.signAndSend(
       this.createNewOnchainTx(did, didKeys, controllers),
+      waitForFinalization,
+      params,
+    );
+  }
+
+  /**
+   * Creates a new `did:key:` on the Dock chain.
+   * @param {string} did - The new DID. Can be a full DID or hex identifier
+   * @param waitForFinalization
+   * @param params
+   * @return {Promise<object>} Promise to the pending transaction
+   */
+  async newDidMethodKey(
+    didMethodKey,
+    waitForFinalization = true,
+    params = {},
+  ) {
+    return this.signAndSend(
+      this.module.newDidMethodKey(didMethodKey),
       waitForFinalization,
       params,
     );

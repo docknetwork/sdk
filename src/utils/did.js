@@ -134,7 +134,6 @@ export class DockDid extends DockDidOrDidMethodKey {
 export class DockDidMethodKey extends DockDidOrDidMethodKey {
   constructor(didMethodKey) {
     super();
-    this.didMethodKey = didMethodKey;
 
     if (didMethodKey instanceof PublicKeyEd25519) {
       this.didMethodKey = { ed25519: didMethodKey.value };
@@ -292,7 +291,7 @@ export function typedHexDID(api, did) {
   if (strDid.startsWith(DockDidMethodKeySecp256k1Prefix)) {
     const hex = getHexIdentifier(
       strDid,
-      DockDIDMethodKeyQualifier,
+      DockDidMethodKeySecp256k1Prefix,
       DockDIDMethodKeySecp256k1ByteSize,
     );
 
@@ -300,7 +299,7 @@ export function typedHexDID(api, did) {
   } else if (strDid.startsWith(DockDidMethodKeyEd25519Prefix)) {
     const hex = getHexIdentifier(
       strDid,
-      DockDIDMethodKeyQualifier,
+      DockDidMethodKeyEd25519Prefix,
       DockDIDMethodKeyEd25519ByteSize,
     );
 
@@ -409,8 +408,6 @@ export function createDidSig(did, { keyId }, rawSig) {
     };
   } else if (did.isDid) {
     return {
-      // Note: The following repeats the 3 fields to ensure backward compatibility. Once nodes have been upgraded,
-      // fields outside `DidSignature` must be removed.
       DidSignature: {
         did: did.asDid,
         keyId,
@@ -420,7 +417,7 @@ export function createDidSig(did, { keyId }, rawSig) {
   } else if (did.isDidMethodKey) {
     return {
       DidMethodKeySignature: {
-        didKey: did.asDidMethodKey,
+        didMethodKey: did.asDidMethodKey,
         sig,
       },
     };

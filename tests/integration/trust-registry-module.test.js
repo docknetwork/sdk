@@ -1,6 +1,6 @@
 import { randomAsHex } from "@polkadot/util-crypto";
 import { BTreeSet, BTreeMap } from "@polkadot/types";
-import { u8aToHex, stringToU8a } from '@polkadot/util';
+import { u8aToHex, stringToU8a } from "@polkadot/util";
 
 import { DockAPI } from "../../src/index";
 
@@ -11,8 +11,13 @@ import {
   DisableTrustRegistryTests,
 } from "../test-constants";
 
-import { createNewDockDID, DidKeypair, DockDidMethodKey, typedHexDID } from "../../src/utils/did";
-import { generateEcdsaSecp256k1Keypair } from '../../src/utils/misc';
+import {
+  createNewDockDID,
+  DidKeypair,
+  DockDidMethodKey,
+  typedHexDID,
+} from "../../src/utils/did";
+import { generateEcdsaSecp256k1Keypair } from "../../src/utils/misc";
 import { PublicKeySecp256k1 } from "../../src";
 import { registerNewDIDUsingPair } from "./helpers";
 
@@ -45,12 +50,9 @@ buildTest("Trust Registry", () => {
   const verifierSeed2 = randomAsHex(32);
   let verifierPair2;
 
-  const seed = randomAsHex(32);
-  const verifierDIDMethodKeyPair = generateEcdsaSecp256k1Keypair(seed);
-  const verifierDIDMethodKeyPublicKey = PublicKeySecp256k1.fromKeyringPair(verifierDIDMethodKeyPair);
-  const verifierDIDMethodKey = new DockDidMethodKey(verifierDIDMethodKeyPublicKey);
-
-  console.log(verifierDIDMethodKey.toStringSS58());
+  const verifierDIDMethodKeySeed = randomAsHex(32);
+  let verifierDIDMethodKeyPair;
+  let verifierDIDMethodKey;
 
   // Create revoke IDs
   const revokeId = (Math.random() * 10e3) | 0;
@@ -88,6 +90,11 @@ buildTest("Trust Registry", () => {
       1
     );
 
+    verifierDIDMethodKeyPair = new DidKeypair(
+      dock.keyring.addFromUri(verifierDIDMethodKeySeed, null, "ed25519")
+    );
+    verifierDIDMethodKey = new DockDidMethodKey(verifierDIDMethodKeyPair.publicKey());
+
     // The keyring should be initialized before any test begins as this suite is testing trustRegistry
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
@@ -99,6 +106,7 @@ buildTest("Trust Registry", () => {
     await registerNewDIDUsingPair(dock, issuerDID2, issuerPair2);
     await registerNewDIDUsingPair(dock, verifierDID, verifierPair);
     await registerNewDIDUsingPair(dock, verifierDID2, verifierPair2);
+    await dock.did.newDidMethodKey(verifierDIDMethodKey.asDidMethodKey);
   }, 40000);
 
   it("Initializes Trust Registry", async () => {
@@ -315,7 +323,7 @@ buildTest("Trust Registry", () => {
     let verifiers = new BTreeSet();
     verifiers.add(typedHexDID(dock.api, verifierDID));
     verifiers.add(typedHexDID(dock.api, verifierDID2));
-    // verifiers.add(verifierDIDMethodKey);
+    verifiers.add(verifierDIDMethodKey);
 
     let issuers = new BTreeMap();
     let issuerPrices = new BTreeMap();
@@ -350,20 +358,24 @@ buildTest("Trust Registry", () => {
     ).toEqual({
       issuers: Object.fromEntries(
         [...issuers.entries()].map(([issuer, prices]) => [
-          JSON.stringify(issuer.isDid ? { did: issuer.asDid }: { didMethodKey: issuer.asDidMethodKey }),
+          JSON.stringify(
+            issuer.isDid
+              ? { did: issuer.asDid }
+              : { didMethodKey: issuer.asDidMethodKey }
+          ),
           Object.fromEntries([...prices.entries()]),
         ])
       ),
       verifiers: [...verifiers.values()]
-        .map((verifier) => verifier.isDid ? { did: verifier.asDid }: { didMethodKey: verifier.asDidMethodKey })
+        .map((verifier) =>
+          verifier.isDid
+            ? { did: verifier.asDid }
+            : { didMethodKey: verifier.asDidMethodKey }
+        )
         .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
     });
 
     let schemasUpdate = new BTreeMap();
-
-    verifiers = new BTreeSet();
-    verifiers.add(typedHexDID(dock.api, verifierDID));
-    verifiers.add(typedHexDID(dock.api, verifierDID2));
 
     issuers = new BTreeMap();
     issuerPrices = new BTreeMap();
@@ -398,12 +410,20 @@ buildTest("Trust Registry", () => {
     ).toEqual({
       issuers: Object.fromEntries(
         [...issuers.entries()].map(([issuer, prices]) => [
-          JSON.stringify(issuer.isDid ? { did: issuer.asDid }: { didMethodKey: issuer.asDidMethodKey }),
+          JSON.stringify(
+            issuer.isDid
+              ? { did: issuer.asDid }
+              : { didMethodKey: issuer.asDidMethodKey }
+          ),
           Object.fromEntries([...prices.entries()]),
         ])
       ),
       verifiers: [...verifiers.values()]
-        .map((verifier) => verifier.isDid ? { did: verifier.asDid }: { didMethodKey: verifier.asDidMethodKey })
+        .map((verifier) =>
+          verifier.isDid
+            ? { did: verifier.asDid }
+            : { didMethodKey: verifier.asDidMethodKey }
+        )
         .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
     });
 
@@ -413,7 +433,9 @@ buildTest("Trust Registry", () => {
     issuer2Prices.set("B", 36);
 
     let issuersUpdate = new BTreeMap();
-    issuersUpdate.set(typedHexDID(dock.api, issuerDID2), { Set: issuer2Prices });
+    issuersUpdate.set(typedHexDID(dock.api, issuerDID2), {
+      Set: issuer2Prices,
+    });
     schemasUpdate.set(schemaId, {
       issuers: {
         Modify: issuersUpdate,
@@ -422,7 +444,10 @@ buildTest("Trust Registry", () => {
     issuers = new BTreeMap();
     issuers.set(typedHexDID(dock.api, issuerDID2), issuer2Prices);
     issuers.set(typedHexDID(dock.api, issuerDID), issuerPrices);
-    schemas.set(schemaId, { issuers, verifiers: schemas.get(schemaId).verifiers });
+    schemas.set(schemaId, {
+      issuers,
+      verifiers: schemas.get(schemaId).verifiers,
+    });
 
     await dock.trustRegistry.updateSchemaMetadata(
       issuerDID2,
@@ -442,12 +467,67 @@ buildTest("Trust Registry", () => {
     ).toEqual({
       issuers: Object.fromEntries(
         [...issuers.entries()].map(([issuer, prices]) => [
-          JSON.stringify(issuer.isDid ? { did: issuer.asDid }: { didMethodKey: issuer.asDidMethodKey }),
+          JSON.stringify(
+            issuer.isDid
+              ? { did: issuer.asDid }
+              : { didMethodKey: issuer.asDidMethodKey }
+          ),
           Object.fromEntries([...prices.entries()]),
         ])
       ),
       verifiers: [...verifiers.values()]
-        .map((verifier) => verifier.isDid ? { did: verifier.asDid }: { didMethodKey: verifier.asDidMethodKey })
+        .map((verifier) =>
+          verifier.isDid
+            ? { did: verifier.asDid }
+            : { didMethodKey: verifier.asDidMethodKey }
+        )
+        .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
+    });
+
+    schemasUpdate = new BTreeMap();
+    let verifiersUpdate = new BTreeMap();
+    const innerUpdate = new BTreeSet();
+    innerUpdate.add(verifierDIDMethodKey);
+    verifiersUpdate.set(verifierDIDMethodKey, { Remove: innerUpdate });
+    schemasUpdate.set(schemaId, {
+      verifiers: {
+        Modify: verifiersUpdate,
+      },
+    });
+
+    await dock.trustRegistry.updateSchemaMetadata(
+      verifierDIDMethodKey,
+      trustRegistryId,
+      schemasUpdate,
+      verifierDIDMethodKeyPair,
+      dock
+    );
+
+    verifiers.delete(verifierDIDMethodKey);
+    expect(
+      (
+        await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
+          schemaId,
+          trustRegistryId
+        )
+      ).toJSON()
+    ).toEqual({
+      issuers: Object.fromEntries(
+        [...issuers.entries()].map(([issuer, prices]) => [
+          JSON.stringify(
+            issuer.isDid
+              ? { did: issuer.asDid }
+              : { didMethodKey: issuer.asDidMethodKey }
+          ),
+          Object.fromEntries([...prices.entries()]),
+        ])
+      ),
+      verifiers: [...verifiers.values()]
+        .map((verifier) =>
+          verifier.isDid
+            ? { did: verifier.asDid }
+            : { didMethodKey: verifier.asDidMethodKey }
+        )
         .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
     });
   });

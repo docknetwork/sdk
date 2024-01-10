@@ -24,10 +24,10 @@ const buildTest = DisableTrustRegistryTests ? describe.skip : describe;
 buildTest('Trust Registry', () => {
   const dock = new DockAPI();
 
-  // Create a random status list id
+  // Create a random trust registry id
   const trustRegistryId = randomAsHex(32);
 
-  // Create a new owner DID, the DID will be registered on the network and own the status list
+  // Create a new convener DID, the DID will be registered on the network and own the trust registry
   const convenerDID = createNewDockDID();
   const ownerSeed = randomAsHex(32);
   let convenerPair;
@@ -88,7 +88,7 @@ buildTest('Trust Registry', () => {
     );
     verifierDIDMethodKey = new DockDidMethodKey(verifierDIDMethodKeyPair.publicKey());
 
-    // The keyring should be initialized before any test begins as this suite is testing trustRegistry
+    // The keyring should be initialized before any test begins as this suite is testing trust registry
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
 
@@ -128,7 +128,7 @@ buildTest('Trust Registry', () => {
   });
 
   it('Adds schemas to the existing Trust Registry', async () => {
-    // Create a random status list id
+    // Create a random trust registry id
     const schemaId = randomAsHex(32);
 
     await dock.trustRegistry.init(
@@ -176,20 +176,13 @@ buildTest('Trust Registry', () => {
         )
       ).toJSON(),
     ).toEqual({
-      issuers: Object.fromEntries(
-        [...issuers.entries()].map(([issuer, prices]) => [
-          JSON.stringify(issuer.isDid ? { did: issuer.asDid } : { didMethodKey: issuer.asDidMethodKey }),
-          Object.fromEntries([...prices.entries()]),
-        ]),
-      ),
-      verifiers: [...verifiers.values()]
-        .map((verifier) => (verifier.isDid ? { did: verifier.asDid } : { didMethodKey: verifier.asDidMethodKey }))
-        .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
+      issuers: expectedFormattedIssuers(issuers),
+      verifiers: expectedFormattedVerifiers(verifiers),
     });
   });
 
   it('Suspends issuers in the existing Trust Registry', async () => {
-    // Create a random status list id
+    // Create a random trust registry id
     const schemaId = randomAsHex(32);
 
     await dock.trustRegistry.init(
@@ -268,7 +261,7 @@ buildTest('Trust Registry', () => {
   });
 
   it('Updates delegated issuers in the existing Trust Registry', async () => {
-    // Create a random status list id
+    // Create a random trust registry id
     await dock.trustRegistry.init(
       convenerDID,
       trustRegistryId,
@@ -301,7 +294,7 @@ buildTest('Trust Registry', () => {
   });
 
   it('Updates schemas in the existing Trust Registry', async () => {
-    // Create a random status list id
+    // Create a random trust registry id
     const schemaId = randomAsHex(32);
 
     await dock.trustRegistry.init(
@@ -349,21 +342,8 @@ buildTest('Trust Registry', () => {
         )
       ).toJSON(),
     ).toEqual({
-      issuers: Object.fromEntries(
-        [...issuers.entries()].map(([issuer, prices]) => [
-          JSON.stringify(
-            issuer.isDid
-              ? { did: issuer.asDid }
-              : { didMethodKey: issuer.asDidMethodKey },
-          ),
-          Object.fromEntries([...prices.entries()]),
-        ]),
-      ),
-      verifiers: [...verifiers.values()]
-        .map((verifier) => (verifier.isDid
-          ? { did: verifier.asDid }
-          : { didMethodKey: verifier.asDidMethodKey }))
-        .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
+      issuers: expectedFormattedIssuers(issuers),
+      verifiers: expectedFormattedVerifiers(verifiers),
     });
 
     let schemasUpdate = new BTreeMap();
@@ -399,21 +379,8 @@ buildTest('Trust Registry', () => {
         )
       ).toJSON(),
     ).toEqual({
-      issuers: Object.fromEntries(
-        [...issuers.entries()].map(([issuer, prices]) => [
-          JSON.stringify(
-            issuer.isDid
-              ? { did: issuer.asDid }
-              : { didMethodKey: issuer.asDidMethodKey },
-          ),
-          Object.fromEntries([...prices.entries()]),
-        ]),
-      ),
-      verifiers: [...verifiers.values()]
-        .map((verifier) => (verifier.isDid
-          ? { did: verifier.asDid }
-          : { didMethodKey: verifier.asDidMethodKey }))
-        .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
+      issuers: expectedFormattedIssuers(issuers),
+      verifiers: expectedFormattedVerifiers(verifiers),
     });
 
     schemasUpdate = new BTreeMap();
@@ -454,21 +421,8 @@ buildTest('Trust Registry', () => {
         )
       ).toJSON(),
     ).toEqual({
-      issuers: Object.fromEntries(
-        [...issuers.entries()].map(([issuer, prices]) => [
-          JSON.stringify(
-            issuer.isDid
-              ? { did: issuer.asDid }
-              : { didMethodKey: issuer.asDidMethodKey },
-          ),
-          Object.fromEntries([...prices.entries()]),
-        ]),
-      ),
-      verifiers: [...verifiers.values()]
-        .map((verifier) => (verifier.isDid
-          ? { did: verifier.asDid }
-          : { didMethodKey: verifier.asDidMethodKey }))
-        .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
+      issuers: expectedFormattedIssuers(issuers),
+      verifiers: expectedFormattedVerifiers(verifiers),
     });
 
     schemasUpdate = new BTreeMap();
@@ -499,21 +453,27 @@ buildTest('Trust Registry', () => {
         )
       ).toJSON(),
     ).toEqual({
-      issuers: Object.fromEntries(
-        [...issuers.entries()].map(([issuer, prices]) => [
-          JSON.stringify(
-            issuer.isDid
-              ? { did: issuer.asDid }
-              : { didMethodKey: issuer.asDidMethodKey },
-          ),
-          Object.fromEntries([...prices.entries()]),
-        ]),
-      ),
-      verifiers: [...verifiers.values()]
-        .map((verifier) => (verifier.isDid
-          ? { did: verifier.asDid }
-          : { didMethodKey: verifier.asDidMethodKey }))
-        .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
+      issuers: expectedFormattedIssuers(issuers),
+      verifiers: expectedFormattedVerifiers(verifiers),
     });
   });
 });
+
+function expectedFormattedIssuers(issuers) {
+  return Object.fromEntries(
+    [...issuers.entries()].map(([issuer, prices]) => [
+      JSON.stringify(
+        issuer.isDid
+          ? { did: issuer.asDid }
+          : { didMethodKey: issuer.asDidMethodKey },
+      ),
+      Object.fromEntries([...prices.entries()]),
+    ]),
+  );
+}
+
+function expectedFormattedVerifiers(verifiers) {
+  return [...verifiers.values()]
+    .map((verifier) => (verifier.isDid ? { did: verifier.asDid } : { didMethodKey: verifier.asDidMethodKey }))
+    .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+}

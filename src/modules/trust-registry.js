@@ -42,8 +42,7 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const convenerHexDid = typedHexDID(this.api, convenerDid);
-    const lastNonce = nonce ?? (await getDidNonce(convenerHexDid, nonce, didModule));
+    const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(convenerDid, { nonce, didModule });
 
     return this.signAndSend(
       convenerHexDid.changeState(
@@ -85,8 +84,7 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const convenerHexDid = typedHexDID(this.api, convenerDid);
-    const lastNonce = nonce ?? (await getDidNonce(convenerHexDid, nonce, didModule));
+    const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(convenerDid, { nonce, didModule });
 
     return this.signAndSend(
       convenerHexDid.changeState(
@@ -123,10 +121,7 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const convenerOrIssuerOrVerifierHexDid = typedHexDID(this.api,
-      convenerOrIssuerOrVerifierDid);
-    const lastNonce = nonce
-      ?? (await getDidNonce(convenerOrIssuerOrVerifierHexDid, nonce, didModule));
+    const [convenerOrIssuerOrVerifierHexDid, lastNonce] = await this.getActorDidAndNonce(convenerOrIssuerOrVerifierDid, { nonce, didModule });
 
     return this.signAndSend(
       convenerOrIssuerOrVerifierHexDid.changeState(
@@ -163,8 +158,7 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const convenerHexDid = typedHexDID(this.api, convenerDid);
-    const lastNonce = nonce ?? (await getDidNonce(convenerHexDid, nonce, didModule));
+    const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(convenerDid, { nonce, didModule });
 
     const hexIssuers = new BTreeSet();
     for (const issuer of issuers) {
@@ -206,8 +200,7 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const convenerHexDid = typedHexDID(this.api, convenerDid);
-    const lastNonce = nonce ?? (await getDidNonce(convenerHexDid, nonce, didModule));
+    const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(convenerDid, { nonce, didModule });
 
     const hexIssuers = new BTreeSet();
     for (const issuer of issuers) {
@@ -248,8 +241,7 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const issuerHexDid = typedHexDID(this.api, issuerDid);
-    const lastNonce = nonce ?? (await getDidNonce(issuerHexDid, nonce, didModule));
+    const [issuerHexDid, lastNonce] = await this.getActorDidAndNonce(issuerDid, { nonce, didModule });
 
     return this.signAndSend(
       issuerHexDid.changeState(
@@ -262,5 +254,18 @@ export default class TrustRegistryModule {
       waitForFinalization,
       params,
     );
+  }
+
+  /**
+   * Get the DID doing the action and its corresponding nonce.
+   * @param actorDid
+   * @param nonce
+   * @param didModule
+   * @returns {Promise}
+   */
+  async getActorDidAndNonce(actorDid, { nonce = undefined, didModule = undefined } = {}) {
+    const convenerHexDid = typedHexDID(this.api, actorDid);
+    const lastNonce = nonce ?? (await getDidNonce(convenerHexDid, nonce, didModule));
+    return [convenerHexDid, lastNonce];
   }
 }

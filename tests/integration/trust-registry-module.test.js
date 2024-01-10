@@ -102,6 +102,10 @@ buildTest('Trust Registry', () => {
     await dock.did.newDidMethodKey(verifierDIDMethodKey.asDidMethodKey);
   }, 40000);
 
+  afterAll(async () => {
+    await dock.disconnect();
+  }, 10000);
+
   it('Initializes Trust Registry', async () => {
     expect(
       (await dock.api.query.trustRegistry.trustRegistriesInfo(trustRegistryId))

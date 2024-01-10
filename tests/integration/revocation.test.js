@@ -196,18 +196,18 @@ describe('Revocation Module', () => {
     let hasSecondDID = false;
     [...controllerSet.entries()]
       .flatMap((v) => v)
-      .map(cnt => typedHexDIDFromSubstrate(dock.api, cnt))
+      .map((cnt) => typedHexDIDFromSubstrate(dock.api, cnt))
       .forEach((controller) => {
-      if (
-        controller.toString() === typedHexDID(dock.api, ownerDID).toString()
-      ) {
-        hasFirstDID = true;
-      } else if (
-        controller.toString() === typedHexDID(dock.api, ownerDID2).toString()
-      ) {
-        hasSecondDID = true;
-      }
-    });
+        if (
+          controller.toString() === typedHexDID(dock.api, ownerDID).toString()
+        ) {
+          hasFirstDID = true;
+        } else if (
+          controller.toString() === typedHexDID(dock.api, ownerDID2).toString()
+        ) {
+          hasSecondDID = true;
+        }
+      });
     expect(hasFirstDID && hasSecondDID).toBe(true);
   }, 40000);
 

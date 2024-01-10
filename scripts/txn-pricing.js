@@ -5,7 +5,7 @@ import { BTreeSet } from '@polkadot/types';
 import { randomAsHex } from '@polkadot/util-crypto';
 import dock from '../src/index';
 import {
-  createNewDockDID, typedHexDID,
+  createNewDockDID, DidKeypair, typedHexDID,
 } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { createRandomRegistryId, OneOfPolicy } from '../src/utils/revocation';
@@ -34,7 +34,7 @@ function getDidPair() {
   const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
   const publicKey = getPublicKeyFromKeyringPair(pair);
   const didKey = new DidKey(publicKey, new VerificationRelationship());
-  return [did, pair, didKey];
+  return [did, new DidKeypair(pair, 1), didKey];
 }
 
 async function printFeePaid(dockApi, address, fn) {

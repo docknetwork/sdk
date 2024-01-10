@@ -1,7 +1,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import dock, { DockAPI } from '../src/index';
 import {
-  createNewDockDID,
+  createNewDockDID, DidKeypair,
 } from '../src/utils/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { sendBatch } from './helpers';
@@ -47,7 +47,7 @@ async function sendOnChainDIDTxns(count, waitForFinalization = true) {
     const didKey = new DidKey(publicKey, new VerificationRelationship());
     const tx = dock.did.createNewOnchainTx(did, [didKey], []);
     txs.push(tx);
-    didPairs.push([did, pair]);
+    didPairs.push([did, new DidKeypair(pair, 1)]);
   }
 
   await sendBatch(dock, txs, account.address, waitForFinalization);
@@ -77,7 +77,7 @@ async function sendAddKeyTxns(count, didPairs) {
     const newPair = dock.keyring.addFromUri(seed, null, 'sr25519');
     const publicKey = getPublicKeyFromKeyringPair(newPair);
     const didKey = new DidKey(publicKey, new VerificationRelationship());
-    const tx = await dock.did.createAddKeysTx([didKey], did, did, currentpair);
+    const tx = await dock.did.createAddKeysTx([didKey], did, did, currentPair);
     txs.push(tx);
     j++;
   }
@@ -105,7 +105,7 @@ async function sendAddControllerTxns(count, didPairs) {
   while (txs.length < count) {
     const did = didPairs[j][0];
     const currentPair = didPairs[j][1];
-    const tx = await dock.did.createAddControllersTx([createNewDockDID()], did, did, currentpair);
+    const tx = await dock.did.createAddControllersTx([createNewDockDID()], did, did, currentPair);
     txs.push(tx);
     j++;
   }
@@ -133,7 +133,7 @@ async function sendRemoveTxns(count, didPairs, waitForFinalization = true) {
   while (txs.length < count) {
     const did = didPairs[j][0];
     const currentPair = didPairs[j][1];
-    const tx = await dock.did.createRemoveTx(did, did, currentpair);
+    const tx = await dock.did.createRemoveTx(did, did, currentPair);
     txs.push(tx);
     j++;
   }
@@ -207,15 +207,16 @@ async function sendAnchorTxns(count) {
 }
 
 async function runOnce() {
-  let didPairs = await sendOnChainDIDTxns(1950);
+  const count = 1000;
+  let didPairs = await sendOnChainDIDTxns(count);
   console.log('');
-  didPairs = await sendAddKeyTxns(1950, didPairs);
+  didPairs = await sendAddKeyTxns(count, didPairs);
   console.log('');
-  await sendAddControllerTxns(1950, didPairs);
+  await sendAddControllerTxns(count, didPairs);
   console.log('');
-  await sendBlobTxns(1500, didPairs);
+  await sendBlobTxns(800, didPairs);
   console.log('');
-  await sendRemoveTxns(1950, didPairs);
+  await sendRemoveTxns(count, didPairs);
 }
 
 async function runInLoop(limit) {

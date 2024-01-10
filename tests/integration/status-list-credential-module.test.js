@@ -1,35 +1,35 @@
-import { randomAsHex } from "@polkadot/util-crypto";
+import { randomAsHex } from '@polkadot/util-crypto';
 
-import { DockAPI } from "../../src/index";
+import { DockAPI } from '../../src/index';
 
 import {
   FullNodeEndpoint,
   TestKeyringOpts,
   TestAccountURI,
   DisableStatusListTests,
-} from "../test-constants";
+} from '../test-constants';
 
 import {
   typedHexDID,
   createNewDockDID,
   DidKeypair,
   typedHexDIDFromSubstrate,
-} from "../../src/utils/did";
-import { OneOfPolicy } from "../../src/utils/revocation";
-import { registerNewDIDUsingPair } from "./helpers";
-import { getKeyDoc } from "../../src/utils/vc/helpers";
-import StatusList2021Credential from "../../src/status-list-credential/status-list2021-credential";
+} from '../../src/utils/did';
+import { OneOfPolicy } from '../../src/utils/revocation';
+import { registerNewDIDUsingPair } from './helpers';
+import { getKeyDoc } from '../../src/utils/vc/helpers';
+import StatusList2021Credential from '../../src/status-list-credential/status-list2021-credential';
 
 const expectEqualCreds = (cred1, cred2) => {
   expect(cred1).toEqual(cred2);
   expect(cred1.toJSON()).toEqual(cred2.toJSON());
   expect(StatusList2021Credential.fromJSON(cred1.toJSON())).toEqual(
-    StatusList2021Credential.fromJSON(cred2.toJSON())
+    StatusList2021Credential.fromJSON(cred2.toJSON()),
   );
 };
 const buildTest = DisableStatusListTests ? describe.skip : describe;
 
-buildTest("StatusListCredential Module", () => {
+buildTest('StatusListCredential Module', () => {
   const dock = new DockAPI();
   let pair;
   let pair2;
@@ -70,14 +70,14 @@ buildTest("StatusListCredential Module", () => {
 
     ownerKey = getKeyDoc(
       ownerDID,
-      dock.keyring.addFromUri(ownerSeed, null, "ed25519"),
-      "Ed25519VerificationKey2018"
+      dock.keyring.addFromUri(ownerSeed, null, 'ed25519'),
+      'Ed25519VerificationKey2018',
     );
 
     ownerKey2 = getKeyDoc(
       ownerDID2,
-      dock.keyring.addFromUri(ownerSeed2, null, "ed25519"),
-      "Ed25519VerificationKey2018"
+      dock.keyring.addFromUri(ownerSeed2, null, 'ed25519'),
+      'Ed25519VerificationKey2018',
     );
 
     // The keyring should be initialized before any test begins as this suite is testing statusListCredentialModule
@@ -86,12 +86,12 @@ buildTest("StatusListCredential Module", () => {
 
     // Thees DIDs should be written before any test begins
     pair = new DidKeypair(
-      dock.keyring.addFromUri(ownerSeed, null, "sr25519"),
-      1
+      dock.keyring.addFromUri(ownerSeed, null, 'sr25519'),
+      1,
     );
     pair2 = new DidKeypair(
-      dock.keyring.addFromUri(ownerSeed2, null, "sr25519"),
-      1
+      dock.keyring.addFromUri(ownerSeed2, null, 'sr25519'),
+      1,
     );
 
     // The controller is same as the DID
@@ -104,144 +104,137 @@ buildTest("StatusListCredential Module", () => {
     await dock.disconnect();
   }, 10000);
 
-  test("Can create a status list with a OneOf policy", async () => {
+  test('Can create a status list with a OneOf policy', async () => {
     const cred = await StatusList2021Credential.create(
       ownerKey,
-      statusListCredId
+      statusListCredId,
     );
     await expect(
       dock.statusListCredential.createStatusListCredential(
         statusListCredId,
         cred,
         policy,
-        false
-      )
+        false,
+      ),
     ).resolves.toBeDefined();
-    const fetchedCred =
-      await dock.statusListCredential.fetchStatusList2021Credential(
-        statusListCredId
-      );
+    const fetchedCred = await dock.statusListCredential.fetchStatusList2021Credential(
+      statusListCredId,
+    );
     expectEqualCreds(cred, fetchedCred);
   }, 40000);
 
-  test("Can revoke index from a status list credential", async () => {
+  test('Can revoke index from a status list credential', async () => {
     const cred = await dock.statusListCredential.fetchStatusList2021Credential(
-      statusListCredId
+      statusListCredId,
     );
     await cred.update(ownerKey, { revokeIndices: revokeIds });
-    const [revoke, sig, nonce] =
-      await dock.statusListCredential.createSignedUpdateStatusListCredential(
-        statusListCredId,
-        cred,
-        ownerDID,
-        pair,
-        { didModule: dock.did }
-      );
+    const [revoke, sig, nonce] = await dock.statusListCredential.createSignedUpdateStatusListCredential(
+      statusListCredId,
+      cred,
+      ownerDID,
+      pair,
+      { didModule: dock.did },
+    );
     await dock.statusListCredential.updateStatusListCredential(
       revoke,
       [{ nonce, sig }],
-      false
+      false,
     );
-    const fetchedCred =
-      await dock.statusListCredential.fetchStatusList2021Credential(
-        statusListCredId
-      );
+    const fetchedCred = await dock.statusListCredential.fetchStatusList2021Credential(
+      statusListCredId,
+    );
     expectEqualCreds(cred, fetchedCred);
     expect(await fetchedCred.revoked(revokeId)).toBe(true);
   }, 40000);
 
-  test("Cant unsuspend from a status list credential with `statusPurpose` = `revocation`", async () => {
+  test('Cant unsuspend from a status list credential with `statusPurpose` = `revocation`', async () => {
     const cred = await dock.statusListCredential.fetchStatusList2021Credential(
-      statusListCredId
+      statusListCredId,
     );
-    expect(
-      cred.update(ownerKey, { unsuspendIndices: revokeIds })
+    await expect(
+      cred.update(ownerKey, { unsuspendIndices: revokeIds }),
     ).rejects.toEqual(
       new Error(
-        "Can't unsuspend indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`"
-      )
+        "Can't unsuspend indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`",
+      ),
     );
-    expect(
-      cred.update(ownerKey, { unsuspendIndices: revokeIds })
+    await expect(
+      cred.update(ownerKey, { unsuspendIndices: revokeIds }),
     ).rejects.toEqual(
       new Error(
-        "Can't unsuspend indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`"
-      )
+        "Can't unsuspend indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`",
+      ),
     );
     expect(await cred.revokedBatch(revokeIds)).toEqual(
-      Array.from(revokeIds, () => true)
+      Array.from(revokeIds, () => true),
     );
   }, 40000);
 
-  test("Can unsuspend from a status list credential", async () => {
+  test('Can unsuspend from a status list credential', async () => {
     const credential = await StatusList2021Credential.create(
       ownerKey,
       statusListCredId,
-      { statusPurpose: "suspension", revokeIndices: revokeIds }
+      { statusPurpose: 'suspension', revokeIndices: revokeIds },
     );
-    let [update, sig, nonce] =
-      await dock.statusListCredential.createSignedUpdateStatusListCredential(
-        statusListCredId,
-        credential,
-        ownerDID,
-        pair,
-        { didModule: dock.did }
-      );
+    let [update, sig, nonce] = await dock.statusListCredential.createSignedUpdateStatusListCredential(
+      statusListCredId,
+      credential,
+      ownerDID,
+      pair,
+      { didModule: dock.did },
+    );
     await dock.statusListCredential.updateStatusListCredential(
       update,
       [{ nonce, sig }],
-      false
+      false,
     );
-    let fetchedCred =
-      await dock.statusListCredential.fetchStatusList2021Credential(
-        statusListCredId
-      );
+    let fetchedCred = await dock.statusListCredential.fetchStatusList2021Credential(
+      statusListCredId,
+    );
     expectEqualCreds(credential, fetchedCred);
     await fetchedCred.update(ownerKey, { unsuspendIndices: revokeIds });
     expect(await fetchedCred.revokedBatch(revokeIds)).toEqual(
-      Array.from(revokeIds, () => false)
+      Array.from(revokeIds, () => false),
     );
-    [update, sig, nonce] =
-      await dock.statusListCredential.createSignedUpdateStatusListCredential(
-        statusListCredId,
-        fetchedCred,
-        ownerDID,
-        pair,
-        { didModule: dock.did }
-      );
+    [update, sig, nonce] = await dock.statusListCredential.createSignedUpdateStatusListCredential(
+      statusListCredId,
+      fetchedCred,
+      ownerDID,
+      pair,
+      { didModule: dock.did },
+    );
     await dock.statusListCredential.updateStatusListCredential(
       update,
       [{ nonce, sig }],
-      false
+      false,
     );
 
     fetchedCred = await dock.statusListCredential.fetchStatusList2021Credential(
-      statusListCredId
+      statusListCredId,
     );
     expect(await fetchedCred.revoked(revokeId)).toBe(false);
   }, 40000);
 
-  test("Can remove a status list", async () => {
-    const [remove, sig, nonce] =
-      await dock.statusListCredential.createSignedRemoveStatusListCredential(
-        statusListCredId,
-        ownerDID,
-        pair,
-        { didModule: dock.did }
-      );
+  test('Can remove a status list', async () => {
+    const [remove, sig, nonce] = await dock.statusListCredential.createSignedRemoveStatusListCredential(
+      statusListCredId,
+      ownerDID,
+      pair,
+      { didModule: dock.did },
+    );
     await dock.statusListCredential.removeStatusListCredential(
       remove,
       [{ nonce, sig }],
-      false
+      false,
     );
     expect(
       await dock.statusListCredential.fetchStatusList2021Credential(
-        statusListCredId
-      )
+        statusListCredId,
+      ),
     ).toBe(null);
   }, 40000);
 
-  test("Can create a status list with multiple owners", async () => {
+  test('Can create a status list with multiple owners', async () => {
     const controllersNew = new Set();
     controllersNew.add(typedHexDID(dock.api, ownerDID));
     controllersNew.add(typedHexDID(dock.api, ownerDID2));
@@ -249,7 +242,7 @@ buildTest("StatusListCredential Module", () => {
     const cred = await StatusList2021Credential.create(
       ownerKey,
       multipleControllerstatusListCredID,
-      { statusPurpose: "suspension" }
+      { statusPurpose: 'suspension' },
     );
 
     // Create policy and status list with multiple owners
@@ -260,12 +253,12 @@ buildTest("StatusListCredential Module", () => {
         cred,
         policyNew,
         false,
-        false
-      )
+        false,
+      ),
     ).resolves.toBeDefined();
     const fetchedCred = (
       await dock.api.query.statusListCredential.statusListCredentials(
-        multipleControllerstatusListCredID
+        multipleControllerstatusListCredID,
       )
     ).unwrap();
     expect(fetchedCred.policy.isOneOf).toBe(true);
@@ -277,7 +270,7 @@ buildTest("StatusListCredential Module", () => {
     let hasSecondDID = false;
     [...controllerSet.entries()]
       .flatMap((v) => v)
-      .map(cnt => typedHexDIDFromSubstrate(dock.api, cnt))
+      .map((cnt) => typedHexDIDFromSubstrate(dock.api, cnt))
       .forEach((controller) => {
         if (
           controller.toString() === typedHexDID(dock.api, ownerDID).toString()
@@ -292,13 +285,12 @@ buildTest("StatusListCredential Module", () => {
     expect(hasFirstDID && hasSecondDID).toBe(true);
   }, 40000);
 
-  test("Can revoke, unsuspend and remove status list with multiple owners", async () => {
+  test('Can revoke, unsuspend and remove status list with multiple owners', async () => {
     const revId = (Math.random() * 10e3) | 0;
 
-    let fetchedCred =
-      await dock.statusListCredential.fetchStatusList2021Credential(
-        multipleControllerstatusListCredID
-      );
+    let fetchedCred = await dock.statusListCredential.fetchStatusList2021Credential(
+      multipleControllerstatusListCredID,
+    );
     await fetchedCred.update(ownerKey, { revokeIndices: [revId] });
     // Revoke
     await dock.statusListCredential.updateStatusListCredentialWithOneOfPolicy(
@@ -307,11 +299,11 @@ buildTest("StatusListCredential Module", () => {
       ownerDID,
       pair,
       { didModule: dock.did },
-      false
+      false,
     );
     fetchedCred = await dock.statusListCredential.fetchStatusList2021Credential(
       multipleControllerstatusListCredID,
-      revId
+      revId,
     );
     expect(await fetchedCred.revoked(revId)).toBe(true);
 
@@ -324,10 +316,10 @@ buildTest("StatusListCredential Module", () => {
       ownerDID2,
       pair2,
       { didModule: dock.did },
-      false
+      false,
     );
     fetchedCred = await dock.statusListCredential.fetchStatusList2021Credential(
-      multipleControllerstatusListCredID
+      multipleControllerstatusListCredID,
     );
     expect(await fetchedCred.revoked(revId)).toBe(false);
 
@@ -337,10 +329,10 @@ buildTest("StatusListCredential Module", () => {
       ownerDID,
       pair,
       { didModule: dock.did },
-      false
+      false,
     );
     fetchedCred = await dock.statusListCredential.fetchStatusList2021Credential(
-      multipleControllerstatusListCredID
+      multipleControllerstatusListCredID,
     );
     expect(fetchedCred).toBe(null);
   }, 30000);

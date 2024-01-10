@@ -278,9 +278,10 @@ Object.defineProperty(String.prototype, 'toStringSS58', {
 
 /**
  * Takes a DID string, gets the hexadecimal value of that and returns a `DockDidMethodKey` or `DockDid` object.
+ * @param api
  * @param {string} did -  The DID can be passed as fully qualified DID like `did:dock:<SS58 string>` or
  * `did:key:<value>` or a 32 byte hex string
- * @return {DockDidOrDidMethodKey} Returns a `DockDidMethodKey` or `DockDid` object.
+ * @return {string|DockDidOrDidMethodKey} Returns a `string` or `DockDidMethodKey` or `DockDid` object.
  */
 export function typedHexDID(api, did) {
   const strDid = did.toString();
@@ -313,9 +314,10 @@ export function typedHexDID(api, did) {
 
 /**
  * Gets the hexadecimal value of the given DID received from the substrate side.
+ * @param api
  * @param {string} did -  The DID can be passed as fully qualified DID like `did:dock:<SS58 string>` or
  * a 32 byte hex string
- * @return {DockDidOrDidMethodKey} Returns an object wrapping the DID.
+ * @return {string|DockDidOrDidMethodKey} Returns an object wrapping the DID.
  */
 export function typedHexDIDFromSubstrate(api, did) {
   if (api.specVersion < 50) {
@@ -391,7 +393,7 @@ export function createDidKey(publicKey, verRel) {
 
 /**
  *
- * @param {DockDidOrDidMethodKey} did - DID as hex
+ * @param {string|DockDidOrDidMethodKey} did - DID as string or an object
  * @param {number} keyId -
  * @param rawSig
  * @param {Signature} sig
@@ -402,7 +404,7 @@ export function createDidSig(did, { keyId }, rawSig) {
 
   if (typeof did === 'string') {
     return {
-      did: did.asDid,
+      did,
       keyId,
       sig,
     };

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: presentation.js</title>
+    <title>JSDoc: Source: modules/trust-registry.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: presentation.js</h1>
+    <h1 class="page-title">Source: modules/trust-registry.js</h1>
 
     
 
@@ -26,201 +26,275 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import {
-  BBSPlusPublicKeyG2,
-  initializeWasm,
-  isWasmInitialized,
-  BBSPublicKey,
-  PSPublicKey,
-  PresentationBuilder,
-} from '@docknetwork/crypto-wasm-ts';
-import b58 from 'bs58';
-import { stringToU8a } from '@polkadot/util';
-import { ensureArray } from './utils/type-helpers';
+            <pre class="prettyprint source linenums"><code>import { BTreeSet } from '@polkadot/types';
+import { typedHexDID } from '../utils/did';
+import { getDidNonce } from '../utils/misc';
 
-import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';
-import {
-  Bls12381BBSSigDockSigName,
-  Bls12381PSSigDockSigName,
-  Bls12381BBS23SigDockSigName,
-  Bls12381PSSigProofDockSigName,
-  Bls12381BBS23SigProofDockSigName,
-  Bls12381BBSSigProofDockSigName,
-} from './utils/vc/crypto/constants';
-import defaultDocumentLoader from './utils/vc/document-loader';
-import {
-  Bls12381BBSSignatureDock2023,
-  Bls12381PSSignatureDock2023,
-} from './utils/vc/custom_crypto';
-
-const SIG_NAME_TO_PROOF_NAME = Object.setPrototypeOf(
-  {
-    [Bls12381BBSSigDockSigName]: Bls12381BBSSigProofDockSigName,
-    [Bls12381BBS23SigDockSigName]: Bls12381BBS23SigProofDockSigName,
-    [Bls12381PSSigDockSigName]: Bls12381PSSigProofDockSigName,
-  },
-  null,
-);
-
-export default class Presentation {
+/**
+ * `Trust Registry` module.
+ */
+export default class TrustRegistryModule {
   /**
-   * Create a new BbsPlusPresentation instance.
+   * Creates a new instance of `StatusListCredentialModule` and sets the api
    * @constructor
+   * @param {object} api - PolkadotJS API Reference
+   * @param signAndSend
    */
-  constructor() {
-    this.presBuilder = new PresentationBuilder();
+  constructor(api, signAndSend) {
+    this.api = api;
+    this.module = api.tx.trustRegistry;
+    this.signAndSend = signAndSend;
   }
 
   /**
-   * Species attributes to be revealed in the credential
-   * @param {number} credentialIndex
-   * @param {Array.&lt;string>} attributes
+   * Initializes Trust Registry with the supplied parameters.
+   * @param convenerDid
+   * @param registryId
+   * @param name
+   * @param govFramework
+   * @param signingKeyRef
+   * @param nonce
+   * @param didModule
+   * @param params
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise&lt;null>}
    */
-  addAttributeToReveal(credentialIndex, attributes = []) {
-    ensureArray(attributes);
-    this.presBuilder.markAttributesRevealed(
-      credentialIndex,
-      new Set(attributes),
+  async init(
+    convenerDid,
+    registryId,
+    name,
+    govFramework,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined } = {},
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(convenerDid, { nonce, didModule });
+
+    return this.signAndSend(
+      convenerHexDid.changeState(
+        this.api,
+        this.module.initOrUpdateTrustRegistry.bind(this.module),
+        'InitOrUpdateTrustRegistry',
+        {
+          registryId,
+          name,
+          govFramework,
+          nonce: lastNonce,
+        },
+        signingKeyRef,
+      ),
+      waitForFinalization,
+      params,
     );
   }
 
   /**
-   * Create a presentation
-   * @param options
-   * @returns {object}
+   * Appends new schemas to the registry.
+   * @param convenerDid
+   * @param registryId
+   * @param schemas
+   * @param signingKeyRef
+   * @param nonce
+   * @param didModule
+   * @param params
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise&lt;null>}
    */
-  createPresentation(options = {}) {
-    const { nonce, context } = options;
-    if (nonce) {
-      this.presBuilder.nonce = stringToU8a(nonce);
-    }
-    if (context) {
-      this.presBuilder.context = context;
-    }
-    const pres = this.presBuilder.finalize();
-    return pres.toJSON();
+  async addSchemaMetadata(
+    convenerDid,
+    registryId,
+    schemas,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined } = {},
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(convenerDid, { nonce, didModule });
+
+    return this.signAndSend(
+      convenerHexDid.changeState(
+        this.api,
+        this.module.addSchemaMetadata,
+        'AddSchemaMetadata',
+        { registryId, schemas, nonce: lastNonce },
+        signingKeyRef,
+      ),
+      waitForFinalization,
+      params,
+    );
   }
 
   /**
-   * Adds a JSON-LD credential to be presented
-   * @param credentialLD
-   * @param options
-   * @returns {Promise&lt;number>}
+   * Updates schemas metadatas in the registry.
+   * @param convenerOrIssuerOrVerifierDid
+   * @param registryId
+   * @param schemas
+   * @param signingKeyRef
+   * @param nonce
+   * @param didModule
+   * @param params
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise&lt;null>}
    */
-  async addCredentialToPresent(credentialLD, options = {}) {
-    if (options.documentLoader &amp;&amp; options.resolver) {
-      throw new Error(
-        'Passing resolver and documentLoader results in resolver being ignored, please re-factor.',
-      );
-    }
-    if (!isWasmInitialized()) {
-      await initializeWasm();
-    }
+  async updateSchemaMetadata(
+    convenerOrIssuerOrVerifierDid,
+    registryId,
+    schemas,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined } = {},
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const [convenerOrIssuerOrVerifierHexDid, lastNonce] = await this.getActorDidAndNonce(convenerOrIssuerOrVerifierDid, { nonce, didModule });
 
-    const documentLoader = options.documentLoader || defaultDocumentLoader(options.resolver);
-
-    const json = typeof credentialLD === 'string'
-      ? JSON.parse(credentialLD)
-      : credentialLD;
-
-    const { proof } = json;
-
-    if (!proof) {
-      throw new Error('Credential does not have a proof');
-    }
-
-    let Signature;
-    let PublicKey;
-
-    switch (proof.type) {
-      case Bls12381BBSSigDockSigName:
-        Signature = Bls12381BBSSignatureDock2022;
-        PublicKey = BBSPlusPublicKeyG2;
-        break;
-      case Bls12381BBS23SigDockSigName:
-        Signature = Bls12381BBSSignatureDock2023;
-        PublicKey = BBSPublicKey;
-        break;
-      case Bls12381PSSigDockSigName:
-        Signature = Bls12381PSSignatureDock2023;
-        PublicKey = PSPublicKey;
-        break;
-      default:
-        throw new Error(`Invalid proof type ${proof.type}`);
-    }
-
-    const keyDocument = await Signature.getVerificationMethod({
-      proof,
-      documentLoader,
-    });
-
-    const pkRaw = b58.decode(keyDocument.publicKeyBase58);
-    const pk = new PublicKey(pkRaw);
-
-    const convertedCredential = Signature.convertCredentialForPresBuilding({ document: json });
-    const idx = this.presBuilder.addCredential(convertedCredential, pk);
-
-    // Enforce revealing of verificationMethod and type
-    // We also require context and type for JSON-LD
-    this.addAttributeToReveal(idx, [
-      'proof.type',
-      'proof.verificationMethod',
-      '@context',
-      'type',
-    ]);
-    return idx;
+    return this.signAndSend(
+      convenerOrIssuerOrVerifierHexDid.changeState(
+        this.api,
+        this.module.updateSchemaMetadata,
+        'UpdateSchemaMetadata',
+        { registryId, schemas, nonce: lastNonce },
+        signingKeyRef,
+      ),
+      waitForFinalization,
+      params,
+    );
   }
 
-  deriveCredentials(options) {
-    const presentation = this.createPresentation(options);
-    const { credentials } = presentation.spec;
-    if (credentials.length > 1) {
-      throw new Error(
-        'Cannot derive from multiple credentials in a presentation',
-      );
+  /**
+   * Suspends issuers in the registry.
+   * @param convenerDid
+   * @param registryId
+   * @param issuers
+   * @param signingKeyRef
+   * @param nonce
+   * @param didModule
+   * @param params
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise&lt;null>}
+   */
+  async suspendIssuers(
+    convenerDid,
+    registryId,
+    issuers,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined } = {},
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(convenerDid, { nonce, didModule });
+
+    const hexIssuers = new BTreeSet();
+    for (const issuer of issuers) {
+      hexIssuers.add(typedHexDID(this.api, issuer));
     }
 
-    return credentials.map((credential) => {
-      if (!credential.revealedAttributes.proof) {
-        throw new Error('Credential proof is not revealed, it should be');
-      }
+    return this.signAndSend(
+      convenerHexDid.changeState(
+        this.api,
+        this.module.suspendIssuers,
+        'SuspendIssuers',
+        { registryId, issuers: hexIssuers, nonce: lastNonce },
+        signingKeyRef,
+      ),
+      waitForFinalization,
+      params,
+    );
+  }
 
-      const date = new Date().toISOString();
-      const type = SIG_NAME_TO_PROOF_NAME[credential.revealedAttributes.proof.type];
-      if (type == null) {
-        throw new Error(
-          `Failed to map credential signature type to the proof type: ${credential.revealedAttributes.proof.type}`,
-        );
-      }
+  /**
+   * Unsuspends issuers in the registry.
+   * @param convenerDid
+   * @param registryId
+   * @param issuers
+   * @param signingKeyRef
+   * @param nonce
+   * @param didModule
+   * @param params
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise&lt;null>}
+   */
+  async unsuspendIssuers(
+    convenerDid,
+    registryId,
+    issuers,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined } = {},
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(convenerDid, { nonce, didModule });
 
-      return {
-        ...credential.revealedAttributes,
-        '@context': JSON.parse(credential.revealedAttributes['@context']),
-        type: JSON.parse(credential.revealedAttributes.type),
-        credentialSchema: JSON.parse(credential.schema),
-        issuer:
-          credential.revealedAttributes.issuer
-          || credential.revealedAttributes.proof.verificationMethod.split('#')[0],
-        issuanceDate: credential.revealedAttributes.issuanceDate || date,
-        proof: {
-          proofPurpose: 'assertionMethod',
-          created: date,
-          ...credential.revealedAttributes.proof,
-          type,
-          // Question: Why each cred will have the same proof, nonce, context, etc. They don't apply here. And is the same proof repeatedly verified?
-          proofValue: presentation.proof,
-          nonce: presentation.nonce,
-          context: presentation.context,
-          attributeCiphertexts: presentation.attributeCiphertexts,
-          attributeEqualities: presentation.spec.attributeEqualities,
-          boundedPseudonyms: presentation.spec.boundedPseudonyms,
-          unboundedPseudonyms: presentation.spec.unboundedPseudonyms,
-          version: credential.version,
-          sigType: credential.sigType,
-          bounds: credential.bounds,
-        },
-      };
-    });
+    const hexIssuers = new BTreeSet();
+    for (const issuer of issuers) {
+      hexIssuers.add(typedHexDID(this.api, issuer));
+    }
+
+    return this.signAndSend(
+      convenerHexDid.changeState(
+        this.api,
+        this.module.unsuspendIssuers,
+        'UnsuspendIssuers',
+        { registryId, issuers: hexIssuers, nonce: lastNonce },
+        signingKeyRef,
+      ),
+      waitForFinalization,
+      params,
+    );
+  }
+
+  /**
+   * Unsuspends issuers in the registry.
+   * @param issuerDid
+   * @param registryId
+   * @param issuers
+   * @param delegated
+   * @param signingKeyRef
+   * @param params
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise&lt;null>}
+   */
+  async updateDelegatedIssuers(
+    issuerDid,
+    registryId,
+    delegated,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined } = {},
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const [issuerHexDid, lastNonce] = await this.getActorDidAndNonce(issuerDid, { nonce, didModule });
+
+    return this.signAndSend(
+      issuerHexDid.changeState(
+        this.api,
+        this.module.updateDelegatedIssuers,
+        'UpdateDelegatedIssuers',
+        { registryId, delegated, nonce: lastNonce },
+        signingKeyRef,
+      ),
+      waitForFinalization,
+      params,
+    );
+  }
+
+  /**
+   * Get the DID doing the action and its corresponding nonce.
+   * @param actorDid
+   * @param nonce
+   * @param didModule
+   * @returns {Promise}
+   */
+  async getActorDidAndNonce(actorDid, { nonce = undefined, didModule = undefined } = {}) {
+    const convenerHexDid = typedHexDID(this.api, actorDid);
+    const lastNonce = nonce ?? (await getDidNonce(convenerHexDid, nonce, didModule));
+    return [convenerHexDid, lastNonce];
   }
 }
 </code></pre>

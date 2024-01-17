@@ -90,7 +90,9 @@
             <div class="sidebar-scrollbox">
                 <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="concepts_private_delegation.html"><strong aria-hidden="true">2.6.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="concepts_public_attestation.html"><strong aria-hidden="true">2.7.</strong> Public Attestation</a></li><li class="chapter-item expanded "><a href="concepts_public_delegation.html"><strong aria-hidden="true">2.8.</strong> Public Delegation</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html" class="active"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="tutorial_private_delegation.html"><strong aria-hidden="true">3.8.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="tutorial_public_delegation.html"><strong aria-hidden="true">3.9.</strong> Public Delegation</a></li><li class="chapter-item expanded "><a href="tutorial_evm.html"><strong aria-hidden="true">3.10.</strong> EVM</a></li><li class="chapter-item expanded "><a href="tutorial_anoncreds.html"><strong aria-hidden="true">3.11.</strong> Anonymous credentials using BBS+ signatures and accumulators</a></li></ol></li></ol>
             </div>
-            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
         </nav>
 
         <!-- Track and set sidebar scroll position -->
@@ -206,14 +208,14 @@ await dock.revocation.newRegistry(registryId, policy, false);
 <p>Revoking a credential requires a signature from the owner of the registry.
 Now get the registry id, <code>registryId</code> and the revocation id (the hash of credential id), <code>revokeId</code> and send the transaction on chain.
 Revoking an already revoked credential has no effect.</p>
-<pre><code class="language-js">await dock.revocation.revokeCredentialWithOneOfPolicy(registryId, revokeId, ownerDID, ownerKeypair, 1, {didModule: dock.did});
+<pre><code class="language-js">await dock.revocation.revokeCredentialWithOneOfPolicy(registryId, revokeId, ownerDID, ownerKeypair, {didModule: dock.did});
 </code></pre>
 <p>Revoking multiple ids in a single transaction is possible but with a lower level method <code>dock.revocation.revoke</code>. See tests for its usage</p>
 <h2 id="undoing-a-revocation"><a class="header" href="#undoing-a-revocation">Undoing a revocation</a></h2>
 <p>Similar to revocation, undoing the revocation also requires a signature from the owner of the registry.</p>
 <p>Get the registry id, <code>registryId</code> and the revocation id to undo, <code>revokeId</code> and send the transaction on chain.
 Unrevoking an unrevoked credential has no effect.</p>
-<pre><code class="language-js">await dock.revocation.unrevokeCredentialWithOneOfPolicy(registryId, revokeId, ownerDID, ownerKeypair, 1, {didModule: dock.did});
+<pre><code class="language-js">await dock.revocation.unrevokeCredentialWithOneOfPolicy(registryId, revokeId, ownerDID, ownerKeypair, {didModule: dock.did});
 </code></pre>
 <p>Undoing revocation for multiple ids in a single transaction is possible but with a lower level method <code>dock.revocation.unrevoke</code>. See tests for its usage</p>
 <h2 id="checking-the-revocation-status"><a class="header" href="#checking-the-revocation-status">Checking the revocation status</a></h2>
@@ -226,7 +228,7 @@ if revoked else <code>false</code>.</p>
 <h2 id="removing-the-registry"><a class="header" href="#removing-the-registry">Removing the registry</a></h2>
 <p>A registry can be deleted leading to all the corresponding revocation ids being deleted as well. This requires the signature
 from owner like other updates. Use the <code>dock.revocation.removeRegistry</code> method to remove a registry.</p>
-<pre><code class="language-js">await dock.revocation.removeRegistryWithOneOfPolicy(registryId, ownerDID, ownerKeypair, 1, {didModule: dock.did}, false);
+<pre><code class="language-js">await dock.revocation.removeRegistryWithOneOfPolicy(registryId, ownerDID, ownerKeypair, {didModule: dock.did}, false);
 </code></pre>
 
                     </main>

@@ -6,12 +6,16 @@ import BBSPlusParams from '../offchain-signatures/params/bbs-plus';
 
 /** Class to write `BBS+` parameters and keys on chain */
 export default class BBSPlusModule extends OffchainSignaturesModule {
-  /// Builds `BBS+` params from the provided value.
+  /**
+   * Builds `BBS+` params from the provided value.
+   */
   static buildParams(params) {
     return new BBSPlusParams(params);
   }
 
-  /// Builds `BBS+` public key from the provided value.
+  /**
+   * Builds `BBS+` public key from the provided value.
+   */
   static buildPublicKey(publicKey) {
     return new BBSPlusPublicKey(publicKey);
   }

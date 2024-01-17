@@ -1,7 +1,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 
 import {
-  createNewDockDID,
+  createNewDockDID, DidKeypair,
 } from '../../src/utils/did';
 
 import { DockAPI } from '../../src/index';
@@ -63,19 +63,19 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     // The DIDs should be written before any test begins
 
     // Register issuer DID with ed25519 key
-    const pair1 = dock.keyring.addFromUri(issuerKeySeed, null, 'ed25519');
+    const pair1 = new DidKeypair(dock.keyring.addFromUri(issuerKeySeed, null, 'ed25519'), 1);
     await registerNewDIDUsingPair(dock, issuerDID, pair1);
 
     // Register holder DID with ed25519 key
-    const pair2 = dock.keyring.addFromUri(holder1KeySeed, null, 'ed25519');
+    const pair2 = new DidKeypair(dock.keyring.addFromUri(holder1KeySeed, null, 'ed25519'), 1);
     await registerNewDIDUsingPair(dock, holder1DID, pair2);
 
     // Register holder DID with secp key
-    const pair3 = generateEcdsaSecp256k1Keypair(holder2KeyEntropy);
+    const pair3 = new DidKeypair(generateEcdsaSecp256k1Keypair(holder2KeyEntropy), 1);
     await registerNewDIDUsingPair(dock, holder2DID, pair3);
 
     // Register holder DID with sr25519 key
-    const pair4 = dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519');
+    const pair4 = new DidKeypair(dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'), 1);
     await registerNewDIDUsingPair(dock, holder3DID, pair4);
 
     const issuerKeyDoc = getKeyDoc(issuerDID, dock.keyring.addFromUri(issuerKeySeed, null, 'ed25519'), 'Ed25519VerificationKey2018');

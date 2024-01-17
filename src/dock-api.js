@@ -22,6 +22,7 @@ import PriceFeedRpcDefs from './rpc-defs/price-feed-rpc-defs';
 import CoreModsRpcDefs from './rpc-defs/core-mods-rpc-defs';
 
 import ExtrinsicError from './errors/extrinsic-error';
+import TrustRegistryModule from './modules/trust-registry';
 
 function getExtrinsicError(data, api) {
   // Loop through each of the parameters
@@ -133,12 +134,25 @@ export default class DockAPI {
 
     this.api = await ApiPromise.create(apiOptions);
 
+    const runtimeVersion = await this.api.rpc.state.getRuntimeVersion();
+    const specVersion = runtimeVersion.specVersion.toNumber();
+
+    if (specVersion < 50) {
+      apiOptions.types = { ...(apiOptions.types || {}), DidOrDidMethodKey: 'Did' };
+      this.api = await ApiPromise.create(apiOptions);
+    }
+    this.api.specVersion = specVersion;
+
     await this.initKeyring(keyring);
 
     this.anchorModule.setApi(this.api, this.signAndSend.bind(this));
     this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));
     this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
     this.revocationModule = new RevocationModule(
+      this.api,
+      this.signAndSend.bind(this),
+    );
+    this.trustRegistryModule = new TrustRegistryModule(
       this.api,
       this.signAndSend.bind(this),
     );
@@ -201,6 +215,7 @@ export default class DockAPI {
       delete this.migrationModule;
       delete this.legacyBBSPlus;
       delete this.statusListCredentialModule;
+      delete this.trustRegistryModule;
     }
   }
 
@@ -367,6 +382,19 @@ export default class DockAPI {
       );
     }
     return this.statusListCredentialModule;
+  }
+
+  /**
+   * Gets the SDK's TrustRegistryModule module
+   * @return {TrustRegistryModule} The module to use
+   */
+  get trustRegistry() {
+    if (!this.trustRegistryModule) {
+      throw new Error(
+        'Unable to get TrustRegistryModule module, SDK is not initialised',
+      );
+    }
+    return this.trustRegistryModule;
   }
 
   /**

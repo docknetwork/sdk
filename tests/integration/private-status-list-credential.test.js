@@ -1,7 +1,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { DockAPI } from '../../src';
 import { DockResolver } from '../../src/resolver';
-import { createNewDockDID } from '../../src/utils/did';
+import { createNewDockDID, DidKeypair } from '../../src/utils/did';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-constants';
 import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
 import {
@@ -65,11 +65,11 @@ describe('PrivateStatusList2021Credential', () => {
     dockAPI.setAccount(account);
 
     // Register issuer DID
-    issuerKeyPair = dockAPI.keyring.addFromUri(issuerSeed, null, 'ed25519');
+    issuerKeyPair = new DidKeypair(dockAPI.keyring.addFromUri(issuerSeed, null, 'ed25519'), 1);
     await registerNewDIDUsingPair(dockAPI, issuerDID, issuerKeyPair);
 
     // Register holder DID
-    const pair1 = dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519');
+    const pair1 = new DidKeypair(dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'), 1);
     await registerNewDIDUsingPair(dockAPI, holderDID, pair1);
 
     issuerKey = getKeyDoc(
@@ -159,7 +159,7 @@ describe('PrivateStatusList2021Credential', () => {
 
     const holderKey = getKeyDoc(
       holderDID,
-      dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'),
+      new DidKeypair(dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'), 1),
       'Ed25519VerificationKey2018',
     );
 

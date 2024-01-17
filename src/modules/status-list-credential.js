@@ -1,11 +1,10 @@
 import StatusList2021Credential from '../status-list-credential/status-list2021-credential';
 import {
-  getNonce,
-  getSignatureFromKeyringPair,
+  getDidNonce,
   getStateChange,
 } from '../utils/misc';
 
-import { createDidSig, getHexIdentifierFromDID } from '../utils/did';
+import { createDidSig, typedHexDID } from '../utils/did';
 
 /**
  * Module supporting `StatusList2021Credential` and `RevocationList2020Credential`.
@@ -114,8 +113,7 @@ export default class StatusListCredentialModule {
    * @param id - Unique identifier of the status list credential.
    * @param statusListCredential - Status list credential.
    * @param did - Signer of the transaction payload
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's signing key reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
    * using this
@@ -127,8 +125,7 @@ export default class StatusListCredentialModule {
     id,
     statusListCredential,
     did,
-    keyPair,
-    keyId,
+    signingKeyRef,
     { nonce = undefined, didModule = undefined },
     waitForFinalization = true,
     params = {},
@@ -137,13 +134,12 @@ export default class StatusListCredentialModule {
       id,
       statusListCredential,
       did,
-      keyPair,
-      keyId,
+      signingKeyRef,
       { nonce, didModule },
     );
     return this.updateStatusListCredential(
       payload,
-      [[sig, sigNonce]],
+      [{ nonce: sigNonce, sig }],
       waitForFinalization,
       params,
     );
@@ -153,8 +149,7 @@ export default class StatusListCredentialModule {
    * Remove a single `StatusListCredential`. Works only with credentials having `OneOf` policy
    * @param id - Unique identifier of the status list credential.
    * @param did - Signer of the transaction payload
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's signing key reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
    * using this
@@ -165,8 +160,7 @@ export default class StatusListCredentialModule {
   async removeStatusListCredentialWithOneOfPolicy(
     id,
     did,
-    keyPair,
-    keyId,
+    signingKeyRef,
     { nonce = undefined, didModule = undefined },
     waitForFinalization = true,
     params = {},
@@ -174,13 +168,12 @@ export default class StatusListCredentialModule {
     const [payload, sig, sigNonce] = await this.createSignedRemoveStatusListCredential(
       id,
       did,
-      keyPair,
-      keyId,
+      signingKeyRef,
       { nonce, didModule },
     );
     return this.removeStatusListCredential(
       payload,
-      [[sig, sigNonce]],
+      [{ nonce: sigNonce, sig }],
       waitForFinalization,
       params,
     );
@@ -239,8 +232,7 @@ export default class StatusListCredentialModule {
    * @param createSerializedTx - Function to create a serialized transaction using supplied payload.
    * @param data - Payload data.
    * @param did - Signer of the transaction payload
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's signing key reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
    * @param params - parameters to be used
@@ -249,21 +241,20 @@ export default class StatusListCredentialModule {
     createSerializedTx,
     data,
     did,
-    keyPair,
-    keyId,
+    signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const hexDid = getHexIdentifierFromDID(did);
+    const hexDid = typedHexDID(this.api, did);
     // eslint-disable-next-line no-param-reassign
-    nonce = await getNonce(hexDid, nonce, didModule);
+    nonce = await getDidNonce(hexDid, nonce, didModule);
 
     const update = {
       data,
       nonce,
     };
     const serializedTx = createSerializedTx.call(this, update);
-    const signature = getSignatureFromKeyringPair(keyPair, serializedTx);
-    const didSig = createDidSig(hexDid, keyId, signature);
+    const signature = signingKeyRef.sign(serializedTx);
+    const didSig = createDidSig(hexDid, signingKeyRef, signature);
     return [data, didSig, nonce];
   }
 
@@ -273,8 +264,7 @@ export default class StatusListCredentialModule {
    * @param id - Unique identifier of the status list credential.
    * @param statusListCredential - Status list credential.
    * @param did - Signer of the transaction payload
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's signing key ref key reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
    * @param params - parameters to be used
@@ -283,16 +273,14 @@ export default class StatusListCredentialModule {
     id,
     statusListCredential,
     did,
-    keyPair,
-    keyId,
+    signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
     return this.createDidSignature(
       this.getSerializedUpdateStatusListCredential,
       { id, credential: statusListCredential.toSubstrate() },
       did,
-      keyPair,
-      keyId,
+      signingKeyRef,
       { nonce, didModule },
     );
   }
@@ -302,24 +290,21 @@ export default class StatusListCredentialModule {
    *
    * @param id - Unique identifier of the status list credential.
    * @param did - Signer of the transaction payload
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's signing key reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
    */
   async createSignedRemoveStatusListCredential(
     id,
     did,
-    keyPair,
-    keyId,
+    signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
     return this.createDidSignature(
       this.getSerializedRemoveStatusListCredential,
       { id },
       did,
-      keyPair,
-      keyId,
+      signingKeyRef,
       { nonce, didModule },
     );
   }

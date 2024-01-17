@@ -27,7 +27,7 @@ import {
   TestKeyringOpts,
   Schemes,
 } from '../../test-constants';
-import { createNewDockDID } from '../../../src/utils/did';
+import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
 import { getRevealedUnrevealed } from './utils';
 import { registerNewDIDUsingPair } from '../helpers';
 
@@ -93,11 +93,11 @@ for (const {
       account = dock.keyring.addFromUri(TestAccountURI);
       dock.setAccount(account);
 
-      issuerKeypair = dock.keyring.addFromUri(randomAsHex(32));
+      issuerKeypair = new DidKeypair(dock.keyring.addFromUri(randomAsHex(32)), 1);
       issuerDid = createNewDockDID();
       await registerNewDIDUsingPair(dock, issuerDid, issuerKeypair);
 
-      decryptorKeypair = dock.keyring.addFromUri(randomAsHex(32));
+      decryptorKeypair = new DidKeypair(dock.keyring.addFromUri(randomAsHex(32)), 1);
       decryptorDid = createNewDockDID();
       await registerNewDIDUsingPair(dock, decryptorDid, decryptorKeypair);
 
@@ -116,7 +116,6 @@ for (const {
         params,
         issuerDid,
         issuerKeypair,
-        1,
         { didModule: dock.didModule },
         false,
       );
@@ -127,7 +126,7 @@ for (const {
       expect(paramsWritten.label).toEqual(params.label);
 
       issuerSchemeKeypair = KeyPair.generate(sigParams);
-      const pk = Module.prepareAddPublicKey(
+      const pk = Module.prepareAddPublicKey(dock.api,
         u8aToHex(issuerSchemeKeypair.publicKey.bytes),
         undefined,
         [issuerDid, 1],
@@ -137,7 +136,6 @@ for (const {
         issuerDid,
         issuerDid,
         issuerKeypair,
-        1,
         { didModule: dock.didModule },
         false,
       );

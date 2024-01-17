@@ -2,7 +2,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
 import { CredentialBuilder, CredentialSchema, initializeWasm } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI } from '../../../src';
-import { createNewDockDID } from '../../../src/utils/did';
+import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
 import { DockResolver } from '../../../src/resolver';
 import {
   registerNewDIDUsingPair,
@@ -11,7 +11,7 @@ import {
 } from '../helpers';
 import { issueCredential, verifyCredential } from '../../../src/utils/vc/index';
 import { getKeyDoc } from '../../../src/utils/vc/helpers';
-import { getJsonSchemaFromCredential, } from '../../../src/utils/vc/credentials';
+import { getJsonSchemaFromCredential } from '../../../src/utils/vc/credentials';
 import { getResidentCardCredentialAndSchema, setupExternalSchema } from './utils';
 import {
   FullNodeEndpoint,
@@ -49,7 +49,7 @@ describe.each(Schemes)('Issuance', ({
     chainModule = getModule(dock);
     account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
-    pair1 = dock.keyring.addFromUri(randomAsHex(32));
+    pair1 = new DidKeypair(dock.keyring.addFromUri(randomAsHex(32)), 1);
     did1 = createNewDockDID();
     await registerNewDIDUsingPair(dock, did1, pair1);
   }, 20000);
@@ -60,13 +60,12 @@ describe.each(Schemes)('Issuance', ({
       msgCount: 100,
     });
 
-    const pk1 = Module.prepareAddPublicKey(u8aToHex(keypair.publicKeyBuffer));
+    const pk1 = Module.prepareAddPublicKey(dock.api, u8aToHex(keypair.publicKeyBuffer));
     await chainModule.addPublicKey(
       pk1,
       did1,
       did1,
       pair1,
-      1,
       { didModule: dock.did },
       false,
     );
@@ -81,7 +80,7 @@ describe.each(Schemes)('Issuance', ({
   }, 30000);
 
   test(`Can issue+verify a ${Name} credential with external schema reference`, async () => {
-    const [externalSchemaEncoded, schemaId] = await setupExternalSchema(residentCardSchema, 'Resident Card Example', did1, pair1, 1, dock);
+    const [externalSchemaEncoded, schemaId] = await setupExternalSchema(residentCardSchema, 'Resident Card Example', did1, pair1, dock);
 
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
     const unsignedCred = {

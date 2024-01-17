@@ -2,7 +2,7 @@
 
 import { u8aToHex } from '@polkadot/util';
 import { connect, keypair } from '../helpers';
-import { getHexIdentifierFromDID } from '../../src/utils/did';
+import { typedHexDID } from '../../src/utils/did';
 import { getStateChange } from '../../src/utils/misc';
 
 require('dotenv').config();
@@ -45,7 +45,7 @@ async function main() {
 
   const round_no = parseIntChecked(process.argv[2]);
 
-  const did = getHexIdentifierFromDID(did);
+  const did = typedHexDID(did);
 
   const proposal_filename = process.argv[3];
   const proposal_unparsed = await fsp.readFile(proposal_filename);
@@ -86,7 +86,7 @@ async function main() {
   console.log('');
 
   const encodedProposal = [...nc.api.createType('Call', proposal).toU8a()];
-  const nonce = await nc.didModule.getNextNonceForDID(did);
+  const nonce = await nc.didModule.getNextNonceForDid(did);
   const vote = { nonce, proposal: encodedProposal, round_no: actual_round_no };
   const encodedStateChange = getStateChange(nc.api, 'MasterVote', vote);
 

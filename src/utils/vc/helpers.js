@@ -41,7 +41,7 @@ export function getKeyDoc(did, keypair, type, id) {
     id: id || `${did}#keys-1`,
     controller: did,
     type,
-    keypair,
+    keypair: keypair.keyPair || keypair,
   };
 }
 

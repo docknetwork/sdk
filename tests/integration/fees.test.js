@@ -13,7 +13,7 @@ import {
 } from '@polkadot/util';
 import { randomAsHex } from '@polkadot/util-crypto';
 import { DockAPI } from '../../src/index';
-import { createNewDockDID } from '../../src/utils/did';
+import { createNewDockDID, typedHexDID } from '../../src/utils/did';
 import { createDidPair, getBalance } from './helpers';
 import {
   createRandomRegistryId,
@@ -114,32 +114,32 @@ describe.skip('Fees', () => {
 
     // Add DID key with all verification relationships
     const [, , dk1] = createDidPair(dock);
-    await withPaidFeeMatchingSnapshot(() => dock.did.addKeys([dk1], did, did, pair, 1, undefined, false));
+    await withPaidFeeMatchingSnapshot(() => dock.did.addKeys([dk1], did, did, pair, undefined, false));
 
     // Add DID key with only 1 verification relationship
     const [, , dk2] = createDidPair(dock);
     dk2.verRels.setAuthentication();
-    await withPaidFeeMatchingSnapshot(() => dock.did.addKeys([dk2], did, did, pair, 1, undefined, false));
+    await withPaidFeeMatchingSnapshot(() => dock.did.addKeys([dk2], did, did, pair, undefined, false));
 
     // Add DID key with only 2 verification relationships
     const [, , dk3] = createDidPair(dock);
     dk3.verRels.setAuthentication();
     dk3.verRels.setAssertion();
-    await withPaidFeeMatchingSnapshot(() => dock.did.addKeys([dk3], did, did, pair, 1, undefined, false));
+    await withPaidFeeMatchingSnapshot(() => dock.did.addKeys([dk3], did, did, pair, undefined, false));
 
     // Add DID key with 3 verification relationships
     const [, , dk4] = createDidPair(dock);
     dk4.verRels.setAuthentication();
     dk4.verRels.setAssertion();
     dk4.verRels.setCapabilityInvocation();
-    await withPaidFeeMatchingSnapshot(() => dock.did.addKeys([dk4], did, did, pair, 1, undefined, false));
+    await withPaidFeeMatchingSnapshot(() => dock.did.addKeys([dk4], did, did, pair, undefined, false));
 
     // Add 2 DID keys with only 1 verification relationship
     const [, , dk5] = createDidPair(dock);
     const [, , dk6] = createDidPair(dock);
     dk5.verRels.setAuthentication();
     dk6.verRels.setCapabilityInvocation();
-    await withPaidFeeMatchingSnapshot(() => dock.did.addKeys([dk5, dk6], did, did, pair, 1, undefined, false));
+    await withPaidFeeMatchingSnapshot(() => dock.did.addKeys([dk5, dk6], did, did, pair, undefined, false));
 
     // Add 3 DID keys with only 1 verification relationship
     const [, , dk7] = createDidPair(dock);
@@ -231,13 +231,13 @@ describe.skip('Fees', () => {
 
     // Add DID key with all verification relationships to a DID that doesn't control itself
     const [, , dk__] = createDidPair(dock);
-    await withPaidFeeMatchingSnapshot(() => dock.did.addKeys([dk__], did1, did, pair, 1, undefined, false));
+    await withPaidFeeMatchingSnapshot(() => dock.did.addKeys([dk__], did1, did, pair, undefined, false));
 
     // Removing 1 key
-    await withPaidFeeMatchingSnapshot(() => dock.did.removeKeys([2], did, did, pair, 1, undefined, false));
+    await withPaidFeeMatchingSnapshot(() => dock.did.removeKeys([2], did, did, pair, undefined, false));
 
     // Removing 2 keys
-    await withPaidFeeMatchingSnapshot(() => dock.did.removeKeys([3, 4], did, did, pair, 1, undefined, false));
+    await withPaidFeeMatchingSnapshot(() => dock.did.removeKeys([3, 4], did, did, pair, undefined, false));
 
     // Removing 1 controller
     await withPaidFeeMatchingSnapshot(() => dock.did.removeControllers(
@@ -273,7 +273,7 @@ describe.skip('Fees', () => {
     ));
 
     // Remove DID
-    await withPaidFeeMatchingSnapshot(() => dock.did.remove(did, did, pair, 1, undefined, false));
+    await withPaidFeeMatchingSnapshot(() => dock.did.remove(did, did, pair, undefined, false));
   }, 40000);
 
   test('revocation', async () => {
@@ -283,7 +283,7 @@ describe.skip('Fees', () => {
     const registryId = createRandomRegistryId();
     // Create owners
     const owners = new Set();
-    owners.add(did);
+    owners.add(typedHexDID(dock.api, did));
 
     const policy = new OneOfPolicy(owners);
     await withPaidFeeMatchingSnapshot(() => dock.revocation.newRegistry(registryId, policy, false, false));
@@ -303,7 +303,7 @@ describe.skip('Fees', () => {
         1,
         { didModule: dock.did },
       );
-      const revTx = dock.revocation.createRevokeTx(update, [[sig, nonce]]);
+      const revTx = dock.revocation.createRevokeTx(update, [{ nonce, sig }]);
 
       await withPaidFeeMatchingSnapshot(async () => {
         await dock.signAndSend(revTx, false);
@@ -318,7 +318,7 @@ describe.skip('Fees', () => {
       { didModule: dock.did },
     );
     const revTx = dock.revocation.createRemoveRegistryTx(update, [
-      [sig, nonce],
+      { nonce, sig },
     ]);
 
     await withPaidFeeMatchingSnapshot(() => dock.signAndSend(revTx, false));
@@ -338,7 +338,7 @@ describe.skip('Fees', () => {
       id: blobId,
       blob: randomAsHex(BLOB_MAX_BYTE_SIZE),
     };
-    await withPaidFeeMatchingSnapshot(() => dock.blob.new(blob, did, pair, 1, { didModule: dock.did }, false));
+    await withPaidFeeMatchingSnapshot(() => dock.blob.new(blob, did, pair, { didModule: dock.did }, false));
   }, 30000);
 
   test('bbsPlus', async () => {
@@ -373,7 +373,7 @@ describe.skip('Fees', () => {
     const kp = BBSPlusKeypairG2.generate(
       BBSPlusSignatureParamsG1.generate(10, hexToU8a(label)),
     );
-    const pk = BBSPlusModule.prepareAddPublicKey(
+    const pk = BBSPlusModule.prepareAddPublicKey(dock.api,
       u8aToHex(kp.publicKey.bytes),
       undefined,
       [did, 1],
@@ -434,7 +434,7 @@ describe.skip('Fees', () => {
       new AccumulatorParams(hexToU8a(params.bytes)),
     );
 
-    const pk = AccumulatorModule.prepareAddPublicKey(
+    const pk = AccumulatorModule.prepareAddPublicKey(dock.api,
       u8aToHex(kp.publicKey.bytes),
       undefined,
       [did, 1],

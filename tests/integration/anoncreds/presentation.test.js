@@ -11,7 +11,7 @@ import {
   TestKeyringOpts,
   Schemes,
 } from '../../test-constants';
-import { createNewDockDID } from '../../../src/utils/did';
+import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
 import { registerNewDIDUsingPair } from '../helpers';
 import { getKeyDoc } from '../../../src/utils/vc/helpers';
 import { issueCredential, verifyPresentation } from '../../../src/utils/vc';
@@ -49,7 +49,7 @@ describe.each(Schemes)('Presentation', ({
     account = dock.keyring.addFromUri(TestAccountURI);
 
     dock.setAccount(account);
-    pair1 = dock.keyring.addFromUri(randomAsHex(32));
+    pair1 = new DidKeypair(dock.keyring.addFromUri(randomAsHex(32)), 1);
     did1 = createNewDockDID();
     await registerNewDIDUsingPair(dock, did1, pair1);
 
@@ -60,13 +60,12 @@ describe.each(Schemes)('Presentation', ({
 
     chainModule = getModule(dock);
 
-    const pk1 = Module.prepareAddPublicKey(u8aToHex(keypair.publicKeyBuffer));
+    const pk1 = Module.prepareAddPublicKey(dock.api, u8aToHex(keypair.publicKeyBuffer));
     await chainModule.addPublicKey(
       pk1,
       did1,
       did1,
       pair1,
-      1,
       { didModule: dock.did },
       false,
     );
@@ -103,7 +102,7 @@ describe.each(Schemes)('Presentation', ({
   }
 
   test(`from ${Name} credentials with external schema reference and embedded schema`, async () => {
-    const [externalSchemaEncoded, schemaId] = await setupExternalSchema(residentCardSchema, 'Resident Card Example', did1, pair1, 1, dock);
+    const [externalSchemaEncoded, schemaId] = await setupExternalSchema(residentCardSchema, 'Resident Card Example', did1, pair1, dock);
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
 
     // This credential has external schema

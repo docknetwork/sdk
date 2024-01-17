@@ -31,7 +31,7 @@ const blobStruct = {
   id: blobId,
   blob: blobHexOrArray,  // Contents of your blob as a hex string or byte array
 }
-const result = await dock.blob.new(blobStruct, signerDid, keyPair, 1, { didModule: dock.didModule });
+const result = await dock.blob.new(blobStruct, signerDid, keypair, { didModule: dock.didModule });
 ```
 If everything worked properly `result` will indicate a successful transaction.
 We'll see how to retrieve the blob next.
@@ -117,7 +117,7 @@ to be able to use it. That's where the `toBlob` method comes in handy:
 Writing a Schema to the Dock chain is similar to writing any other Blob. `1` is the key id for the on-chain public key corresponding to `keyPair`
 ```javascript
 >  const formattedBlob = myNewSchema.toBlob(dockDID);
->  await myNewSchema.writeToChain(dock, dockDID, keyPair, 1);
+>  await myNewSchema.writeToChain(dock, dockDID, keypair);
 ```
 
 ### Reading a Schema from the Dock chain

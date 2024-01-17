@@ -1,10 +1,9 @@
 import {
-  getNonce,
-  getSignatureFromKeyringPair,
+  getDidNonce,
   getStateChange,
 } from '../utils/misc';
 
-import { createDidSig, getHexIdentifierFromDID } from '../utils/did'; // eslint-disable-line
+import { createDidSig, typedHexDID } from '../utils/did'; // eslint-disable-line
 
 /** Class to create, update and destroy revocations */
 class RevocationModule {
@@ -179,17 +178,16 @@ class RevocationModule {
    * @param registryId - The registry id being updated
    * @param revId - The revocation id that is being revoked
    * @param did
-   * @param keyPair
-   * @param keyId
+   * @param signingKeyRef
    * @param nonce
    * @param didModule
    * @param waitForFinalization
    * @param params
    * @returns {Promise<void>}
    */
-  async revokeCredentialWithOneOfPolicy(registryId, revId, did, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const [revoke, sig, sigNonce] = await this.createSignedRevoke(registryId, [revId], did, keyPair, keyId, { nonce, didModule });
-    return this.revoke(revoke, [[sig, sigNonce]], waitForFinalization, params);
+  async revokeCredentialWithOneOfPolicy(registryId, revId, did, signingKeyRef, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
+    const [revoke, sig, sigNonce] = await this.createSignedRevoke(registryId, [revId], did, signingKeyRef, { nonce, didModule });
+    return this.revoke(revoke, [{ sig, nonce: sigNonce }], waitForFinalization, params);
   }
 
   /**
@@ -197,28 +195,27 @@ class RevocationModule {
    * @param registryId
    * @param revId
    * @param did
-   * @param keyPair
-   * @param keyId
+   * @param signingKeyRef
    * @param nonce
    * @param didModule
    * @param waitForFinalization
    * @param params
    * @returns {Promise<Object>}
    */
-  async unrevokeCredentialWithOneOfPolicy(registryId, revId, did, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const [revoke, sig, sigNonce] = await this.createSignedUnRevoke(registryId, [revId], did, keyPair, keyId, { nonce, didModule });
-    return this.unrevoke(revoke, [[sig, sigNonce]], waitForFinalization, params);
+  async unrevokeCredentialWithOneOfPolicy(registryId, revId, did, signingKeyRef, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
+    const [revoke, sig, sigNonce] = await this.createSignedUnRevoke(registryId, [revId], did, signingKeyRef, { nonce, didModule });
+    return this.unrevoke(revoke, [{ sig, nonce: sigNonce }], waitForFinalization, params);
   }
 
-  async removeRegistryWithOneOfPolicy(registryId, did, keyPair, keyId, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const [removal, sig, sigNonce] = await this.createSignedRemove(registryId, did, keyPair, keyId, { nonce, didModule });
-    return this.removeRegistry(removal, [[sig, sigNonce]], waitForFinalization, params);
+  async removeRegistryWithOneOfPolicy(registryId, did, signingKeyRef, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
+    const [removal, sig, sigNonce] = await this.createSignedRemove(registryId, did, signingKeyRef, { nonce, didModule });
+    return this.removeRegistry(removal, [{ sig, nonce: sigNonce }], waitForFinalization, params);
   }
 
-  async createSignedUpdate(updateFunc, registryId, [...revokeIds], did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
-    const hexDid = getHexIdentifierFromDID(did);
+  async createSignedUpdate(updateFunc, registryId, [...revokeIds], did, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+    const hexDid = typedHexDID(this.api, did);
     // eslint-disable-next-line no-param-reassign
-    nonce = await getNonce(hexDid, nonce, didModule);
+    nonce = await getDidNonce(hexDid, nonce, didModule);
 
     const update = {
       data: {
@@ -227,32 +224,32 @@ class RevocationModule {
       },
       nonce,
     };
-    const serializedRevoke = updateFunc.bind(this)(update);
-    const signature = getSignatureFromKeyringPair(keyPair, serializedRevoke);
-    const didSig = createDidSig(hexDid, keyId, signature);
+    const serializedRevoke = updateFunc.call(this, update);
+    const signature = signingKeyRef.sign(serializedRevoke);
+    const didSig = createDidSig(hexDid, signingKeyRef, signature);
     return [{ registryId, revokeIds }, didSig, nonce];
   }
 
-  async createSignedRevoke(registryId, revokeIds, did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
-    return this.createSignedUpdate(this.getSerializedRevoke, registryId, revokeIds, did, keyPair, keyId, { nonce, didModule });
+  async createSignedRevoke(registryId, revokeIds, did, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+    return this.createSignedUpdate(this.getSerializedRevoke, registryId, revokeIds, did, signingKeyRef, { nonce, didModule });
   }
 
-  async createSignedUnRevoke(registryId, revokeIds, did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
-    return this.createSignedUpdate(this.getSerializedUnrevoke, registryId, revokeIds, did, keyPair, keyId, { nonce, didModule });
+  async createSignedUnRevoke(registryId, revokeIds, did, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+    return this.createSignedUpdate(this.getSerializedUnrevoke, registryId, revokeIds, did, signingKeyRef, { nonce, didModule });
   }
 
-  async createSignedRemove(registryId, did, keyPair, keyId, { nonce = undefined, didModule = undefined }) {
-    const hexDid = getHexIdentifierFromDID(did);
+  async createSignedRemove(registryId, did, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+    const hexDid = typedHexDID(this.api, did);
     // eslint-disable-next-line no-param-reassign
-    nonce = await getNonce(hexDid, nonce, didModule);
+    nonce = await getDidNonce(hexDid, nonce, didModule);
 
     const remove = {
       data: { registryId },
       nonce,
     };
     const serializedRemove = this.getSerializedRemoveRegistry(remove);
-    const signature = getSignatureFromKeyringPair(keyPair, serializedRemove);
-    const didSig = createDidSig(hexDid, keyId, signature);
+    const signature = signingKeyRef.sign(serializedRemove);
+    const didSig = createDidSig(hexDid, signingKeyRef, signature);
     return [{ registryId }, didSig, nonce];
   }
 

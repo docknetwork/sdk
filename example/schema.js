@@ -2,8 +2,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import Schema from '../src/modules/schema';
 
 import { DockAPI } from '../src/index';
-import { createNewDockDID } from '../src/utils/did';
-import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
+import { createNewDockDID, DidKeypair } from '../src/utils/did';
 import VerifiableCredential from '../src/verifiable-credential';
 import { Ed25519VerKeyName } from '../src/utils/vc/crypto/constants';
 import { getKeyDoc } from '../src/utils/vc/helpers';
@@ -27,7 +26,7 @@ async function createAuthorDID(dock, pair) {
   console.log('Creating new author DID', dockDID);
 
   // Create an author DID to write with
-  const publicKey = getPublicKeyFromKeyringPair(pair);
+  const publicKey = pair.publicKey();
   const didKey = new DidKey(publicKey, new VerificationRelationship());
   await dock.did.new(dockDID, [didKey], [], false);
   return dockDID;
@@ -47,7 +46,7 @@ async function main() {
   const subjectKeySeed = randomAsHex(32);
 
   // Generate first key with this seed. The key type is Sr25519
-  const pair = dock.keyring.addFromUri(keySeed, null, 'ed25519');
+  const pair = new DidKeypair(dock.keyring.addFromUri(keySeed, null, 'ed25519'), 1);
 
   // Generate a DID to be used as author
   const dockDID = await createAuthorDID(dock, pair);
@@ -59,7 +58,7 @@ async function main() {
     Ed25519VerKeyName,
   );
 
-  const subjectPair = dock.keyring.addFromUri(subjectKeySeed);
+  const subjectPair = new DidKeypair(dock.keyring.addFromUri(subjectKeySeed), 1);
   const subjectDID = createNewDockDID();
   await registerNewDIDUsingPair(dock, subjectDID, subjectPair);
 
@@ -88,7 +87,7 @@ async function main() {
   console.log('The schema is:', JSON.stringify(schema.toJSON(), null, 2));
   console.log('Writing schema to the chain with blob id of', schema.id, '...');
 
-  await schema.writeToChain(dock, dockDID, pair, 1, undefined, false);
+  await schema.writeToChain(dock, dockDID, pair, undefined, false);
 
   console.log(`Schema written, reading from chain (${schema.id})...`);
 

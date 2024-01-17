@@ -9,7 +9,12 @@ import {
   DisableStatusListTests,
 } from '../test-constants';
 
-import { getHexIdentifierFromDID, createNewDockDID } from '../../src/utils/did';
+import {
+  typedHexDID,
+  createNewDockDID,
+  DidKeypair,
+  typedHexDIDFromSubstrate,
+} from '../../src/utils/did';
 import { OneOfPolicy } from '../../src/utils/revocation';
 import { registerNewDIDUsingPair } from './helpers';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
@@ -45,10 +50,7 @@ buildTest('StatusListCredential Module', () => {
 
   // Create  owners
   const owners = new Set();
-  owners.add(ownerDID);
-
-  // Create a status list policy
-  const policy = new OneOfPolicy(owners);
+  let policy;
 
   // Create revoke IDs
   const revokeId = (Math.random() * 10e3) | 0;
@@ -60,6 +62,11 @@ buildTest('StatusListCredential Module', () => {
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
+
+    // Create a status list policy
+    owners.add(typedHexDID(dock.api, ownerDID));
+
+    policy = new OneOfPolicy(owners);
 
     ownerKey = getKeyDoc(
       ownerDID,
@@ -78,8 +85,14 @@ buildTest('StatusListCredential Module', () => {
     dock.setAccount(account);
 
     // Thees DIDs should be written before any test begins
-    pair = dock.keyring.addFromUri(ownerSeed, null, 'sr25519');
-    pair2 = dock.keyring.addFromUri(ownerSeed2, null, 'sr25519');
+    pair = new DidKeypair(
+      dock.keyring.addFromUri(ownerSeed, null, 'sr25519'),
+      1,
+    );
+    pair2 = new DidKeypair(
+      dock.keyring.addFromUri(ownerSeed2, null, 'sr25519'),
+      1,
+    );
 
     // The controller is same as the DID
     await registerNewDIDUsingPair(dock, ownerDID, pair);
@@ -120,12 +133,11 @@ buildTest('StatusListCredential Module', () => {
       cred,
       ownerDID,
       pair,
-      1,
       { didModule: dock.did },
     );
     await dock.statusListCredential.updateStatusListCredential(
       revoke,
-      [[sig, nonce]],
+      [{ nonce, sig }],
       false,
     );
     const fetchedCred = await dock.statusListCredential.fetchStatusList2021Credential(
@@ -139,14 +151,14 @@ buildTest('StatusListCredential Module', () => {
     const cred = await dock.statusListCredential.fetchStatusList2021Credential(
       statusListCredId,
     );
-    expect(
+    await expect(
       cred.update(ownerKey, { unsuspendIndices: revokeIds }),
     ).rejects.toEqual(
       new Error(
         "Can't unsuspend indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`",
       ),
     );
-    expect(
+    await expect(
       cred.update(ownerKey, { unsuspendIndices: revokeIds }),
     ).rejects.toEqual(
       new Error(
@@ -169,12 +181,11 @@ buildTest('StatusListCredential Module', () => {
       credential,
       ownerDID,
       pair,
-      1,
       { didModule: dock.did },
     );
     await dock.statusListCredential.updateStatusListCredential(
       update,
-      [[sig, nonce]],
+      [{ nonce, sig }],
       false,
     );
     let fetchedCred = await dock.statusListCredential.fetchStatusList2021Credential(
@@ -190,12 +201,11 @@ buildTest('StatusListCredential Module', () => {
       fetchedCred,
       ownerDID,
       pair,
-      1,
       { didModule: dock.did },
     );
     await dock.statusListCredential.updateStatusListCredential(
       update,
-      [[sig, nonce]],
+      [{ nonce, sig }],
       false,
     );
 
@@ -210,12 +220,11 @@ buildTest('StatusListCredential Module', () => {
       statusListCredId,
       ownerDID,
       pair,
-      1,
       { didModule: dock.did },
     );
     await dock.statusListCredential.removeStatusListCredential(
       remove,
-      [[sig, nonce]],
+      [{ nonce, sig }],
       false,
     );
     expect(
@@ -227,8 +236,8 @@ buildTest('StatusListCredential Module', () => {
 
   test('Can create a status list with multiple owners', async () => {
     const controllersNew = new Set();
-    controllersNew.add(ownerDID);
-    controllersNew.add(ownerDID2);
+    controllersNew.add(typedHexDID(dock.api, ownerDID));
+    controllersNew.add(typedHexDID(dock.api, ownerDID2));
 
     const cred = await StatusList2021Credential.create(
       ownerKey,
@@ -254,18 +263,25 @@ buildTest('StatusListCredential Module', () => {
     ).unwrap();
     expect(fetchedCred.policy.isOneOf).toBe(true);
 
-    const controllerSet = fetchedCred.policy.toJSON().oneOf;
-    expect(controllerSet.length).toBe(2);
+    const controllerSet = fetchedCred.policy.asOneOf;
+    expect(controllerSet.toJSON().length).toBe(2);
 
     let hasFirstDID = false;
     let hasSecondDID = false;
-    controllerSet.forEach((controller) => {
-      if (controller === getHexIdentifierFromDID(ownerDID)) {
-        hasFirstDID = true;
-      } else if (controller === getHexIdentifierFromDID(ownerDID2)) {
-        hasSecondDID = true;
-      }
-    });
+    [...controllerSet.entries()]
+      .flatMap((v) => v)
+      .map((cnt) => typedHexDIDFromSubstrate(dock.api, cnt))
+      .forEach((controller) => {
+        if (
+          controller.toString() === typedHexDID(dock.api, ownerDID).toString()
+        ) {
+          hasFirstDID = true;
+        } else if (
+          controller.toString() === typedHexDID(dock.api, ownerDID2).toString()
+        ) {
+          hasSecondDID = true;
+        }
+      });
     expect(hasFirstDID && hasSecondDID).toBe(true);
   }, 40000);
 
@@ -282,7 +298,6 @@ buildTest('StatusListCredential Module', () => {
       fetchedCred,
       ownerDID,
       pair,
-      1,
       { didModule: dock.did },
       false,
     );
@@ -300,7 +315,6 @@ buildTest('StatusListCredential Module', () => {
       fetchedCred,
       ownerDID2,
       pair2,
-      1,
       { didModule: dock.did },
       false,
     );
@@ -314,7 +328,6 @@ buildTest('StatusListCredential Module', () => {
       multipleControllerstatusListCredID,
       ownerDID,
       pair,
-      1,
       { didModule: dock.did },
       false,
     );

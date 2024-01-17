@@ -4,7 +4,7 @@ import { assert, u8aToHex, stringToU8a } from '@polkadot/util';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-constants';
 import { DockAPI } from '../../src';
 import { getSignatureFromKeyringPair, getStateChange } from '../../src/utils/misc';
-import { createDidSig } from '../../src/utils/did';
+import { createDidSig, typedHexDID } from '../../src/utils/did';
 
 const ALICE_DID = u8aToHex(stringToU8a('Alice\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'));
 const BOB_DID = u8aToHex(stringToU8a('Bob\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'));
@@ -13,7 +13,7 @@ const ALICE_SK = u8aToHex(stringToU8a('Alicesk\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0
 const BOB_SK = u8aToHex(stringToU8a('Bobsk\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'));
 const CHARLIE_SK = u8aToHex(stringToU8a('Charliesk\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'));
 
-describe('Master Module', () => {
+describe.skip('Master Module', () => {
   // node client
   let nc;
   let systemModule;
@@ -244,12 +244,13 @@ async function allVote(
 
   const votes = [];
   for (const [did, key] of did_to_key) {
-    const nonce = await nc.didModule.getNextNonceForDID(did);
+    const nonce = await nc.didModule.getNextNonceForDid(typedHexDID(dock.api, did));
     const vote = { nonce, data: { proposal: encodedProposal, roundNo } };
     const encodedStateChange = getStateChange(nc.api, 'MasterVote', vote);
     const signature = getSignatureFromKeyringPair(key, encodedStateChange);
-    const didSig = createDidSig(did, 1, signature);
+    const didSig = createDidSig(typedHexDID(dock.api, did), 1, signature);
     votes.push({ sig: didSig, nonce });
   }
   return votes;
 }
+

@@ -2,7 +2,6 @@ import { canonicalize } from 'json-canonicalize';
 import { validate } from 'jsonschema';
 
 import { hexDIDToQualified } from '../utils/did';
-import { getSignatureFromKeyringPair } from '../utils/misc';
 
 import {
   createNewDockBlobId,
@@ -56,7 +55,7 @@ export default class Schema {
    */
   sign(pair, blobModule) {
     const serializedBlob = blobModule.getSerializedBlob(this.toBlob());
-    this.signature = getSignatureFromKeyringPair(pair, serializedBlob);
+    this.signature = pair.sign(serializedBlob);
     return this;
   }
 
@@ -95,20 +94,19 @@ export default class Schema {
    * @param {object} dock - The dock API
    * @param signerDid
    * @param keyPair
-   * @param keyId
    * @param nonce
    * @param waitForFinalization
    * @param params
    * @return {Promise<object>} The extrinsic to sign and send.
    */
-  async writeToChain(dock, signerDid, keyPair, keyId, nonce = undefined, waitForFinalization, params = {}) {
+  async writeToChain(dock, signerDid, keyPair, nonce = undefined, waitForFinalization, params = {}) {
     let arg;
     if (nonce === undefined) {
       arg = { didModule: dock.did };
     } else {
       arg = { nonce };
     }
-    return dock.blob.new(this.toBlob(), signerDid, keyPair, keyId, arg, waitForFinalization, params);
+    return dock.blob.new(this.toBlob(), signerDid, keyPair, arg, waitForFinalization, params);
   }
 
   /**

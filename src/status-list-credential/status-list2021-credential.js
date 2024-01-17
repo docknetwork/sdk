@@ -64,6 +64,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * Can be either `revocation` or `suspension`.
    * @param {number} [params.length=1e4] - length of the underlying `StatusList`.
    * @param {Iterable<number>} [params.revokeIndices=[]] - iterable producing indices to be revoked or suspended initially
+   * @returns {Promise<StatusList2021Credential>}
    */
   static async create(
     keyDoc,
@@ -94,7 +95,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * @param {object} [update={}]
    * @param {Iterable<number>} update.revokeIndices - indices to be revoked or suspended
    * @param {Iterable<number>} update.unsuspendIndices - indices to be unsuspended
-   * @returns {this}
+   * @returns {Promise<this>}
    */
   async update(keyDoc, { revokeIndices = [], unsuspendIndices = [] }) {
     const statusList = new StatusList({
@@ -121,7 +122,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * Throws an error if the underlying status list can't be decoded or supplied index is out of range.
    *
    * @param {number} index
-   * @returns {boolean}
+   * @returns {Promise<boolean>}
    */
   async revoked(index) {
     const decodedStatusList = await this.decodedStatusList();
@@ -135,7 +136,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * Throws an error if the underlying status list can't be decoded or any of supplied indices is out of range.
    *
    * @param {Iterable<number>} indices
-   * @returns {Array<boolean>}
+   * @returns {Promise<Array<boolean>>}
    */
   async revokedBatch(indices) {
     const decodedStatusList = await this.decodedStatusList();

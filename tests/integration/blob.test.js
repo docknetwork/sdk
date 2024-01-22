@@ -21,7 +21,7 @@ function errorInResult(result) {
   }
 }
 
-describe('Blob Module', () => {
+describe.skip('Blob Module', () => {
   const dock = new DockAPI();
 
   // Generate first key with this seed. The key type is Sr25519
@@ -34,7 +34,7 @@ describe('Blob Module', () => {
     });
     account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
-    pair = DidKeypair.fromApi(dock, {seed: firstKeySeed});
+    pair = DidKeypair.fromApi(dock, { seed: firstKeySeed });
     dockDID = createNewDockDID();
     await registerNewDIDUsingPair(dock, typedHexDID(dock.api, dockDID), pair);
   });

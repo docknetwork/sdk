@@ -1,7 +1,9 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
 import { DockAPI } from '../../../src';
-import { createNewDockDID, typedHexDID, NoDIDError, DidKeypair } from '../../../src/utils/did';
+import {
+  createNewDockDID, typedHexDID, NoDIDError, DidKeypair,
+} from '../../../src/utils/did';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { DidKey, VerificationRelationship } from '../../../src/public-keys';
 import { ServiceEndpointType } from '../../../src/modules/did/service-endpoint';

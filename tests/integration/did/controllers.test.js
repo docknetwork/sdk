@@ -1,6 +1,8 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { DockAPI } from '../../../src';
-import { createNewDockDID, typedHexDID, NoDIDError, DidKeypair } from '../../../src/utils/did';
+import {
+  createNewDockDID, typedHexDID, NoDIDError, DidKeypair,
+} from '../../../src/utils/did';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
 import { DidKey, VerificationRelationship } from '../../../src/public-keys';

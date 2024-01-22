@@ -218,8 +218,7 @@ for (const {
       const pk = Module.prepareAddPublicKey(dock.api,
         u8aToHex(issuerBbsPlusKeypair.publicKey.bytes),
         undefined,
-        [issuerDid, 1],
-      );
+        [issuerDid, 1]);
       await getModule(dock).addPublicKey(
         pk,
         issuerDid,
@@ -265,8 +264,7 @@ for (const {
       const pk = AccumulatorModule.prepareAddPublicKey(dock.api,
         u8aToHex(accumulatorKeypair.publicKey.bytes),
         undefined,
-        [accumulatorManagerDid, 1],
-      );
+        [accumulatorManagerDid, 1]);
       await dock.accumulatorModule.addPublicKey(
         pk,
         accumulatorManagerDid,

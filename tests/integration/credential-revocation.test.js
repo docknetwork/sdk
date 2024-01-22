@@ -59,11 +59,11 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     dockAPI.setAccount(account);
 
     // Register issuer DID
-    issuerKeyPair = DidKeypair.fromApi(dockAPI, {seed: issuerSeed});
+    issuerKeyPair = DidKeypair.fromApi(dockAPI, { seed: issuerSeed });
     await registerNewDIDUsingPair(dockAPI, issuerDID, issuerKeyPair);
 
     // Register holder DID
-    const pair1 = DidKeypair.fromApi(dockAPI, {seed: holderSeed});
+    const pair1 = DidKeypair.fromApi(dockAPI, { seed: holderSeed });
     await registerNewDIDUsingPair(dockAPI, holderDID, pair1);
 
     // Create a new policy

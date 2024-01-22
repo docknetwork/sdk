@@ -145,8 +145,7 @@ for (const {
 
       issuerSchemeKeypair = KeyPair.generate(sigParams);
       const pk = Module.prepareAddPublicKey(dock.api,
-        u8aToHex(issuerSchemeKeypair.publicKey.bytes),
-      );
+        u8aToHex(issuerSchemeKeypair.publicKey.bytes));
       await getModule(dock).addPublicKey(
         pk,
         issuerDid,

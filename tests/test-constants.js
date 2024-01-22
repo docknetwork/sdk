@@ -78,8 +78,8 @@ export const TestSchemes = fromEnv('TestSchemes', DefaultTestSchemes);
 export const DisableStatusListTests = boolEnv(
   fromEnv('DisableStatusListTests', 'false'),
 );
-export const DisableTrustRegistryTests = boolEnv(
-  fromEnv('DisableTrustRegistryTests', 'false'),
+export const DisableDidKeyAndTrustRegistryTests = boolEnv(
+  fromEnv('DisableDidKeyAndTrustRegistryTests', 'false'),
 );
 
 export const BBS = {

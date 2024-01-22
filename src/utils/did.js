@@ -71,22 +71,10 @@ export class DidKeypair {
   }
 }
 
-export class DidActor {
-  signStateChange(api, name, payload, keyRef) {
-    const stateChange = getStateChange(api, name, payload);
-    const keySignature = keyRef.sign(stateChange);
-
-    return createDidSig(this, keyRef, keySignature);
-  }
-
-  changeState(api, method, name, payload, keyRef) {
-    const signature = this.signStateChange(api, name, payload, keyRef);
-
-    return method(payload, signature);
-  }
-}
-
-export class DockDidOrDidMethodKey extends DidActor {
+/**
+ * Either `did:*` or `did:key:*`.
+ */
+export class DockDidOrDidMethodKey {
   get asDid() {
     throw new Error('Not a `Did`');
   }
@@ -102,8 +90,42 @@ export class DockDidOrDidMethodKey extends DidActor {
   get isDidMethodKey() {
     return false;
   }
+
+  /**
+   * Creates signature for the state change with supplied arguments.
+   *
+   * @param api
+   * @param name
+   * @param payload
+   * @param keyRef
+   * @returns {object}
+   */
+  signStateChange(api, name, payload, keyRef) {
+    const stateChange = getStateChange(api, name, payload);
+    const keySignature = keyRef.sign(stateChange);
+
+    return createDidSig(this, keyRef, keySignature);
+  }
+
+  /**
+   * Creates a transaction that will modify the chain state.
+   *
+   * @param api
+   * @param method
+   * @param name
+   * @param payload
+   * @param keyRef
+   */
+  changeState(api, method, name, payload, keyRef) {
+    const signature = this.signStateChange(api, name, payload, keyRef);
+
+    return method(payload, signature);
+  }
 }
 
+/**
+ * `did:*`
+ */
 export class DockDid extends DockDidOrDidMethodKey {
   constructor(did) {
     super();
@@ -131,6 +153,9 @@ export class DockDid extends DockDidOrDidMethodKey {
   }
 }
 
+/**
+ * `did:key:*`
+ */
 export class DockDidMethodKey extends DockDidOrDidMethodKey {
   constructor(didMethodKey) {
     super();
@@ -140,7 +165,7 @@ export class DockDidMethodKey extends DockDidOrDidMethodKey {
     } else if (didMethodKey instanceof PublicKeySecp256k1) {
       this.didMethodKey = { secp256k1: didMethodKey.value };
     } else {
-      throw new Error('Unsopported public key type');
+      throw new Error('Unsupported public key type');
     }
   }
 
@@ -165,8 +190,8 @@ export class DockDidMethodKey extends DockDidOrDidMethodKey {
   }
 
   toStringSS58() {
-    let prefix; let
-      address;
+    let prefix;
+    let address;
     if (this.didMethodKey.ed25519) {
       prefix = DockDidMethodKeyEd25519Prefix;
       address = this.didMethodKey.ed25519;
@@ -174,7 +199,7 @@ export class DockDidMethodKey extends DockDidOrDidMethodKey {
       prefix = DockDidMethodKeySecp256k1Prefix;
       address = this.didMethodKey.secp256k1;
     } else {
-      throw new Error('Unsopported public key type');
+      throw new Error('Unsupported public key type');
     }
 
     return `${prefix}${encodeAddress(address)}`;
@@ -331,20 +356,20 @@ export function typedHexDIDFromSubstrate(api, did) {
 
     if (key.isSecp256k1) {
       const hex = getHexIdentifier(
-        u8aToHex(did.asSecp256k1),
+        u8aToHex(key.asSecp256k1),
         [],
         DockDIDMethodKeySecp256k1ByteSize,
       );
 
-      return new DockDidMethodKey(hex);
+      return new DockDidMethodKey(new PublicKeySecp256k1(hex));
     } else if (key.isEd25519) {
       const hex = getHexIdentifier(
-        u8aToHex(did.asEd25519),
+        u8aToHex(key.asEd25519),
         [],
         DockDIDMethodKeyEd25519ByteSize,
       );
 
-      return new DockDidMethodKey(hex);
+      return new DockDidMethodKey(new PublicKeyEd25519(hex));
     } else {
       throw new Error(`Invalid did key: provided: \`${key}\``);
     }
@@ -397,7 +422,7 @@ export function createDidKey(publicKey, verRel) {
  * @param {number} keyId -
  * @param rawSig
  * @param {Signature} sig
- * @returns {{sig: *, keyId, did}}
+ * @returns {object}
  */
 export function createDidSig(did, { keyId }, rawSig) {
   const sig = rawSig.toJSON();

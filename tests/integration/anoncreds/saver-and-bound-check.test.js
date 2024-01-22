@@ -129,8 +129,7 @@ for (const {
       const pk = Module.prepareAddPublicKey(dock.api,
         u8aToHex(issuerSchemeKeypair.publicKey.bytes),
         undefined,
-        [issuerDid, 1],
-      );
+        [issuerDid, 1]);
       await getModule(dock).addPublicKey(
         pk,
         issuerDid,

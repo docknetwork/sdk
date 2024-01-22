@@ -49,7 +49,7 @@ describe('Basic DID tests', () => {
   });
 
   test('Can create a DID', async () => {
-    // DID does not exist already
+    // DID does not exist
     await expect(dock.did.getOnchainDidDetail(hexDid)).rejects.toThrow(NoDIDError);
 
     const pair = new DidKeypair(dock.keyring.addFromUri(seed));

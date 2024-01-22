@@ -35,7 +35,7 @@ describe('Off-chain DIDs', () => {
   }, 10000);
 
   test('Can create an off-chain DID', async () => {
-    // DID does not exist already
+    // DID does not exist
     await expect(dock.did.getOffchainDidDetail(hexDID.asDid)).rejects.toThrow(NoDIDError);
 
     const docRef = OffChainDidDocRef.cid(firstDocRef);

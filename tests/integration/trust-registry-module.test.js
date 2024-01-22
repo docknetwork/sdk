@@ -8,7 +8,7 @@ import {
   FullNodeEndpoint,
   TestKeyringOpts,
   TestAccountURI,
-  DisableTrustRegistryTests,
+  DisableDidKeyAndTrustRegistryTests,
 } from '../test-constants';
 
 import {
@@ -19,7 +19,7 @@ import {
 } from '../../src/utils/did';
 import { registerNewDIDUsingPair } from './helpers';
 
-const buildTest = DisableTrustRegistryTests ? describe.skip : describe;
+const buildTest = DisableDidKeyAndTrustRegistryTests ? describe.skip : describe;
 
 buildTest('Trust Registry', () => {
   const dock = new DockAPI();

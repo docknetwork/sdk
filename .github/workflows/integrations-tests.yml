@@ -22,7 +22,7 @@ jobs:
   mainnet:
     runs-on: ubuntu-latest
     env:
-      DisableTrustRegistryTests: true
+      DisableDidKeyAndTrustRegistryTests: true
       CONFIG_DOCK_NODE_IMAGE_TAG: 'mainnet'
     steps:
       - uses: actions/checkout@v2
@@ -40,7 +40,7 @@ jobs:
   testnet:
     runs-on: ubuntu-latest
     env:
-      DisableTrustRegistryTests: true
+      DisableDidKeyAndTrustRegistryTests: true
       CONFIG_DOCK_NODE_IMAGE_TAG: 'testnet'
     steps:
       - uses: actions/checkout@v2

@@ -165,7 +165,7 @@ export class DockDidMethodKey extends DockDidOrDidMethodKey {
     } else if (didMethodKey instanceof PublicKeySecp256k1) {
       this.didMethodKey = { secp256k1: didMethodKey.value };
     } else {
-      throw new Error('Unsopported public key type');
+      throw new Error('Unsupported public key type');
     }
   }
 
@@ -199,7 +199,7 @@ export class DockDidMethodKey extends DockDidOrDidMethodKey {
       prefix = DockDidMethodKeySecp256k1Prefix;
       address = this.didMethodKey.secp256k1;
     } else {
-      throw new Error('Unsopported public key type');
+      throw new Error('Unsupported public key type');
     }
 
     return `${prefix}${encodeAddress(address)}`;

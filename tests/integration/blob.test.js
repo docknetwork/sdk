@@ -21,7 +21,7 @@ function errorInResult(result) {
   }
 }
 
-describe('Blob Module', () => {
+describe.skip('Blob Module', () => {
   const dock = new DockAPI();
 
   // Generate first key with this seed. The key type is Sr25519

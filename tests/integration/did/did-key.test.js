@@ -53,7 +53,7 @@ describe('Basic DID tests', () => {
   }, 10000);
 
   test('Can create a did:key', async () => {
-    // DID does not exist already
+    // DID does not exist
     await expect(dock.did.getDidMethodKeyDetail(testDidMethodKey2.asDidMethodKey)).rejects.toThrow(
       NoDIDError,
     );
@@ -80,10 +80,20 @@ describe('Basic DID tests', () => {
   test('Converts properly', () => {
     const substrateDid1 = dock.api.createType('DidOrDidMethodKey', testDidMethodKey1);
     expect(typedHexDIDFromSubstrate(dock.api, substrateDid1)).toEqual(testDidMethodKey1);
-    expect(testDidMethodKey1).toEqual(typedHexDID(dock.api, testDidMethodKey1.toString()));
+    expect(testDidMethodKey1).toEqual(typedHexDID(dock.api, testDidMethodKey1));
 
     const substrateDid2 = dock.api.createType('DidOrDidMethodKey', testDidMethodKey2);
     expect(typedHexDIDFromSubstrate(dock.api, substrateDid2)).toEqual(testDidMethodKey2);
-    expect(testDidMethodKey2).toEqual(typedHexDID(dock.api, testDidMethodKey2.toString()));
+    expect(testDidMethodKey2).toEqual(typedHexDID(dock.api, testDidMethodKey2));
+  });
+
+  test('SS58 presentation is correct', () => {
+    const substrateDid1 = dock.api.createType('DidOrDidMethodKey', testDidMethodKey1);
+    expect(typedHexDIDFromSubstrate(dock.api, substrateDid1)).toEqual(testDidMethodKey1);
+    expect(testDidMethodKey1).toEqual(typedHexDID(dock.api, testDidMethodKey1));
+
+    const substrateDid2 = dock.api.createType('DidOrDidMethodKey', testDidMethodKey2);
+    expect(typedHexDIDFromSubstrate(dock.api, substrateDid2)).toEqual(testDidMethodKey2);
+    expect(testDidMethodKey2).toEqual(typedHexDID(dock.api, testDidMethodKey2));
   });
 });

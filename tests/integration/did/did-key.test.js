@@ -80,17 +80,7 @@ buildTest('Basic DID tests', () => {
     expect(att2).toEqual(iri);
   }, 30000);
 
-  test('Converts properly', () => {
-    const substrateDid1 = dock.api.createType('DidOrDidMethodKey', testDidMethodKey1);
-    expect(typedHexDIDFromSubstrate(dock.api, substrateDid1)).toEqual(testDidMethodKey1);
-    expect(testDidMethodKey1).toEqual(typedHexDID(dock.api, testDidMethodKey1));
-
-    const substrateDid2 = dock.api.createType('DidOrDidMethodKey', testDidMethodKey2);
-    expect(typedHexDIDFromSubstrate(dock.api, substrateDid2)).toEqual(testDidMethodKey2);
-    expect(testDidMethodKey2).toEqual(typedHexDID(dock.api, testDidMethodKey2));
-  });
-
-  test('SS58 presentation is correct', () => {
+  test('Conversion works properly (including SS58 format)', () => {
     const substrateDid1 = dock.api.createType('DidOrDidMethodKey', testDidMethodKey1);
     expect(typedHexDIDFromSubstrate(dock.api, substrateDid1)).toEqual(testDidMethodKey1);
     expect(testDidMethodKey1).toEqual(typedHexDID(dock.api, testDidMethodKey1));

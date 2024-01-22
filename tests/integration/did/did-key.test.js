@@ -62,7 +62,8 @@ buildTest('Basic DID tests', () => {
     );
 
     await dock.did.newDidMethodKey(testDidMethodKey2.asDidMethodKey, false);
-    await dock.did.getDidMethodKeyDetail(testDidMethodKey2.asDidMethodKey);
+    const nonce = (await dock.did.getDidMethodKeyDetail(testDidMethodKey2.asDidMethodKey)).nonce;
+    expect(nonce).toBeGreaterThan(1);
   }, 30000);
 
   test('Can attest with a DID', async () => {

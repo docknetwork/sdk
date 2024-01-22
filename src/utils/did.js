@@ -98,7 +98,7 @@ export class DockDidOrDidMethodKey {
    * @param name
    * @param payload
    * @param keyRef
-   * @returns {}
+   * @returns {object}
    */
   signStateChange(api, name, payload, keyRef) {
     const stateChange = getStateChange(api, name, payload);
@@ -115,7 +115,6 @@ export class DockDidOrDidMethodKey {
    * @param name
    * @param payload
    * @param keyRef
-   * @returns
    */
   changeState(api, method, name, payload, keyRef) {
     const signature = this.signStateChange(api, name, payload, keyRef);

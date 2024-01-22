@@ -17,9 +17,9 @@ import {
   getIndicesForMsgNames,
   CircomInputs,
   encodeRevealedMsgs,
+  MessageEncoder,
 } from '@docknetwork/crypto-wasm-ts';
 
-import { generateFieldElementFromNumber } from '@docknetwork/crypto-wasm';
 import { DockAPI } from '../../../src';
 import {
   FullNodeEndpoint,
@@ -27,7 +27,7 @@ import {
   TestKeyringOpts,
   Schemes,
 } from '../../test-constants';
-import { createNewDockDID } from '../../../src/utils/did';
+import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
 import { getWasmBytes, parseR1CSFile } from './utils';
 import { checkMapsEqual, registerNewDIDUsingPair } from '../helpers';
 
@@ -119,7 +119,7 @@ for (const {
       account = dock.keyring.addFromUri(TestAccountURI);
       dock.setAccount(account);
 
-      issuerKeypair = dock.keyring.addFromUri(randomAsHex(32));
+      issuerKeypair = new DidKeypair(dock.keyring.addFromUri(randomAsHex(32)), 1);
       issuerDid = createNewDockDID();
       await registerNewDIDUsingPair(dock, issuerDid, issuerKeypair);
 
@@ -144,15 +144,13 @@ for (const {
       // Not writing the params on chain as its assumed that the label is hardcoded in the code as system parameter
 
       issuerSchemeKeypair = KeyPair.generate(sigParams);
-      const pk = Module.prepareAddPublicKey(
-        u8aToHex(issuerSchemeKeypair.publicKey.bytes),
-      );
+      const pk = Module.prepareAddPublicKey(dock.api,
+        u8aToHex(issuerSchemeKeypair.publicKey.bytes));
       await getModule(dock).addPublicKey(
         pk,
         issuerDid,
         issuerDid,
         issuerKeypair,
-        1,
         { didModule: dock.didModule },
         false,
       );
@@ -302,7 +300,7 @@ for (const {
         revealedMsgsFromVerifier,
         false,
       );
-      const pub = [generateFieldElementFromNumber(1), encodedABNeg];
+      const pub = [MessageEncoder.encodePositiveNumberForSigning(1), encodedABNeg];
       const statement4 = Statement.r1csCircomVerifier(pub, snarkVk);
 
       const statementsVerifier = new Statements();

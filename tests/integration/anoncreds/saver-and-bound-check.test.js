@@ -14,7 +14,7 @@ import {
   CompositeProofG1,
   SaverDecryptor,
   SaverEncryptionGens,
-  SaverChunkedCommitmentGens,
+  SaverChunkedCommitmentKey,
   QuasiProofSpecG1,
   BoundCheckSnarkSetup,
   initializeWasm,
@@ -27,7 +27,7 @@ import {
   TestKeyringOpts,
   Schemes,
 } from '../../test-constants';
-import { createNewDockDID } from '../../../src/utils/did';
+import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
 import { getRevealedUnrevealed } from './utils';
 import { registerNewDIDUsingPair } from '../helpers';
 
@@ -93,11 +93,11 @@ for (const {
       account = dock.keyring.addFromUri(TestAccountURI);
       dock.setAccount(account);
 
-      issuerKeypair = dock.keyring.addFromUri(randomAsHex(32));
+      issuerKeypair = new DidKeypair(dock.keyring.addFromUri(randomAsHex(32)), 1);
       issuerDid = createNewDockDID();
       await registerNewDIDUsingPair(dock, issuerDid, issuerKeypair);
 
-      decryptorKeypair = dock.keyring.addFromUri(randomAsHex(32));
+      decryptorKeypair = new DidKeypair(dock.keyring.addFromUri(randomAsHex(32)), 1);
       decryptorDid = createNewDockDID();
       await registerNewDIDUsingPair(dock, decryptorDid, decryptorKeypair);
 
@@ -116,7 +116,6 @@ for (const {
         params,
         issuerDid,
         issuerKeypair,
-        1,
         { didModule: dock.didModule },
         false,
       );
@@ -127,17 +126,15 @@ for (const {
       expect(paramsWritten.label).toEqual(params.label);
 
       issuerSchemeKeypair = KeyPair.generate(sigParams);
-      const pk = Module.prepareAddPublicKey(
+      const pk = Module.prepareAddPublicKey(dock.api,
         u8aToHex(issuerSchemeKeypair.publicKey.bytes),
         undefined,
-        [issuerDid, 1],
-      );
+        [issuerDid, 1]);
       await getModule(dock).addPublicKey(
         pk,
         issuerDid,
         issuerDid,
         issuerKeypair,
-        1,
         { didModule: dock.didModule },
         false,
       );
@@ -177,7 +174,7 @@ for (const {
 
     test('Encrypt attribute and prove verifiably encrypted', async () => {
       // Verifier creates and shares with the prover
-      const gens = SaverChunkedCommitmentGens.generate(
+      const gens = SaverChunkedCommitmentKey.generate(
         hexToU8a(stringToHex('some label')),
       );
       const commGens = gens.decompress();
@@ -303,7 +300,7 @@ for (const {
         revealedAttrs,
         false,
       );
-      const statement2 = Statement.boundCheckProver(min, max, snarkProvingKey);
+      const statement2 = Statement.boundCheckLegoProver(min, max, snarkProvingKey);
       const proverStatements = new Statements();
       proverStatements.add(statement1);
       proverStatements.add(statement2);
@@ -332,7 +329,7 @@ for (const {
       );
 
       const snarkVerifyingKey = pk.getVerifyingKeyUncompressed();
-      const statement3 = Statement.boundCheckVerifier(
+      const statement3 = Statement.boundCheckLegoVerifier(
         min,
         max,
         snarkVerifyingKey,

@@ -4,7 +4,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import { DockAPI } from '../../src/index';
 
 import {
-  createNewDockDID, getHexIdentifierFromDID, hexDIDToQualified,
+  createNewDockDID, typedHexDID, DidKeypair, hexDIDToQualified,
 } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { verifyCredential, verifyPresentation } from '../../src/utils/vc/index';
@@ -20,8 +20,8 @@ import { registerNewDIDUsingPair } from './helpers';
 
 let account;
 let pair;
-let dockDID;
 let hexDid;
+let dockDID;
 let blobId;
 let keyDoc;
 let validCredential;
@@ -56,9 +56,9 @@ describe('Schema Blob Module Integration', () => {
     });
     account = dockApi.keyring.addFromUri(TestAccountURI);
     dockApi.setAccount(account);
-    pair = dockApi.keyring.addFromUri(firstKeySeed);
+    pair = DidKeypair.fromApi(dockApi);
     dockDID = createNewDockDID();
-    hexDid = getHexIdentifierFromDID(dockDID);
+    hexDid = typedHexDID(dockApi.api, dockDID);
     await registerNewDIDUsingPair(dockApi, dockDID, pair);
     blobId = randomAsHex(DockBlobIdByteSize);
 
@@ -68,7 +68,7 @@ describe('Schema Blob Module Integration', () => {
       id: invalidFormatBlobId,
       blob: stringToHex('hello world'),
     };
-    await dockApi.blob.new(blob, dockDID, pair, 1, { didModule: dockApi.didModule }, false);
+    await dockApi.blob.new(blob, dockDID, pair, { didModule: dockApi.didModule }, false);
 
     // Write schema blob
     const blobStr = JSON.stringify(exampleSchema);
@@ -76,7 +76,7 @@ describe('Schema Blob Module Integration', () => {
       id: blobId,
       blob: stringToHex(blobStr),
     };
-    await dockApi.blob.new(blob, dockDID, pair, 1, { didModule: dockApi.didModule }, false);
+    await dockApi.blob.new(blob, dockDID, pair, { didModule: dockApi.didModule }, false);
 
     // Properly format a keyDoc to use for signing
     keyDoc = getKeyDoc(
@@ -122,11 +122,12 @@ describe('Schema Blob Module Integration', () => {
   test('Set and get schema', async () => {
     const schema = new Schema();
     await schema.setJSONSchema(exampleSchema);
-    await dockApi.blob.new(schema.toBlob(), hexDid, pair, 1, { didModule: dockApi.didModule }, false);
-    await expect(Schema.get(blobId, dockApi)).resolves.toMatchObject({
+    await dockApi.blob.new(schema.toBlob(), dockDID, pair, { didModule: dockApi.didModule }, false);
+    const schemaObj = await Schema.get(blobId, dockApi);
+    expect(schemaObj).toMatchObject({
       ...exampleSchema,
       id: blobId,
-      author: hexDIDToQualified(getHexIdentifierFromDID(dockDID)),
+      author: hexDIDToQualified(hexDid),
     });
   }, 20000);
 

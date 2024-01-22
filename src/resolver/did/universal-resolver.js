@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { NoDIDError } from '../../utils/did';
 import { Resolver, WILDCARD } from '../generic';
+import jsonFetch from '../../utils/json-fetch';
 
 /**
  * Resolves `DID`s with wildcard method: `did:*:`.
@@ -36,7 +36,7 @@ export default class UniversalResolver extends Resolver {
       hashIndex === -1 ? did : did.slice(0, hashIndex).trim(),
     );
     try {
-      const resp = await axios.get(`${this.idUrl}${encodedDid}`, {
+      const resp = await jsonFetch(`${this.idUrl}${encodedDid}`, {
         headers: {
           Accept:
             'application/ld+json;profile="https://w3id.org/did-resolution"',
@@ -44,9 +44,9 @@ export default class UniversalResolver extends Resolver {
       });
 
       // Sometimes didDocument doesnt exist, if so return data as document
-      return resp.data.didDocument || resp.data;
+      return resp.didDocument || resp;
     } catch (error) {
-      if (error.isAxiosError) {
+      if (error.statusCode === 404) {
         throw new NoDIDError(did);
       }
 

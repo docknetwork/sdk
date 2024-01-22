@@ -127,7 +127,7 @@ which 1 is greater than the last used index. Key indices start from 1.
    In the arguments, the first `did` specifies that a key must be added to DID `did` and the second `did` specifies that DID `did` is signing the payload
    The `1` below is for the key index.
     ```js
-    dock.did.addKeys([newDidKey], did, did, currentPair, 1, undefined, false);
+    dock.did.addKeys([newDidKey], did, did, currentpair, undefined, false);
     ```
 
 ## Removing an existing DID from chain
@@ -139,7 +139,7 @@ A DID can be removed from the chain by sending the corresponding message signed 
     ```
 1. Now send the message with the signature to the chain in a transaction
    ```js
-   dock.did.remove(did, did, pair, 1)
+   dock.did.remove(did, did, pair)
    ```
 
 For more details see example in `examples/dock-did.js` or the integration tests.

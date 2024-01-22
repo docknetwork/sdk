@@ -27,7 +27,7 @@ import {
   TestKeyringOpts,
   Schemes,
 } from '../../test-constants';
-import { createNewDockDID } from '../../../src/utils/did';
+import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
 import AccumulatorModule from '../../../src/modules/accumulator';
 import { getAllEventsFromBlock } from '../../../src/utils/chain-ops';
 import { getRevealedUnrevealed } from './utils';
@@ -165,10 +165,16 @@ for (const {
       });
       account = dock.keyring.addFromUri(TestAccountURI);
       dock.setAccount(account);
-      issuerKeypair = dock.keyring.addFromUri(randomAsHex(32));
+      issuerKeypair = new DidKeypair(
+        dock.keyring.addFromUri(randomAsHex(32)),
+        1,
+      );
       issuerDid = createNewDockDID();
       await registerNewDIDUsingPair(dock, issuerDid, issuerKeypair);
-      accumulatorManagerKeypair = dock.keyring.addFromUri(randomAsHex(32));
+      accumulatorManagerKeypair = new DidKeypair(
+        dock.keyring.addFromUri(randomAsHex(32)),
+        1,
+      );
       accumulatorManagerDid = createNewDockDID();
       await registerNewDIDUsingPair(
         dock,
@@ -188,7 +194,6 @@ for (const {
         params,
         issuerDid,
         issuerKeypair,
-        1,
         { didModule: dock.did },
         false,
       );
@@ -210,17 +215,15 @@ for (const {
       );
       issuerBbsPlusKeypair = KeyPair.generate(params);
 
-      const pk = Module.prepareAddPublicKey(
+      const pk = Module.prepareAddPublicKey(dock.api,
         u8aToHex(issuerBbsPlusKeypair.publicKey.bytes),
         undefined,
-        [issuerDid, 1],
-      );
+        [issuerDid, 1]);
       await getModule(dock).addPublicKey(
         pk,
         issuerDid,
         issuerDid,
         issuerKeypair,
-        1,
         { didModule: dock.did },
         false,
       );
@@ -238,7 +241,6 @@ for (const {
         params,
         accumulatorManagerDid,
         accumulatorManagerKeypair,
-        1,
         { didModule: dock.did },
         false,
       );
@@ -259,16 +261,14 @@ for (const {
         hexToU8a(seedAccum),
       );
 
-      const pk = AccumulatorModule.prepareAddPublicKey(
+      const pk = AccumulatorModule.prepareAddPublicKey(dock.api,
         u8aToHex(accumulatorKeypair.publicKey.bytes),
         undefined,
-        [accumulatorManagerDid, 1],
-      );
+        [accumulatorManagerDid, 1]);
       await dock.accumulatorModule.addPublicKey(
         pk,
         accumulatorManagerDid,
         accumulatorManagerKeypair,
-        1,
         { didModule: dock.did },
         false,
       );
@@ -292,7 +292,6 @@ for (const {
         [accumulatorManagerDid, 1],
         accumulatorManagerDid,
         accumulatorManagerKeypair,
-        1,
         { didModule: dock.did },
         false,
       );
@@ -349,7 +348,6 @@ for (const {
         { additions: [u8aToHex(encodedAttrs[attributeCount - 1])] },
         accumulatorManagerDid,
         accumulatorManagerKeypair,
-        1,
         { didModule: dock.did },
         false,
       );
@@ -406,7 +404,6 @@ for (const {
         },
         accumulatorManagerDid,
         accumulatorManagerKeypair,
-        1,
         { didModule: dock.did },
         false,
       );
@@ -498,7 +495,6 @@ for (const {
         },
         accumulatorManagerDid,
         accumulatorManagerKeypair,
-        1,
         { didModule: dock.did },
         false,
       );
@@ -531,7 +527,6 @@ for (const {
         },
         accumulatorManagerDid,
         accumulatorManagerKeypair,
-        1,
         { didModule: dock.did },
         false,
       );
@@ -563,7 +558,6 @@ for (const {
         },
         accumulatorManagerDid,
         accumulatorManagerKeypair,
-        1,
         { didModule: dock.did },
         false,
       );
@@ -658,7 +652,6 @@ for (const {
         },
         accumulatorManagerDid,
         accumulatorManagerKeypair,
-        1,
         { didModule: dock.did },
         false,
       );

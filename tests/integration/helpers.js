@@ -15,13 +15,12 @@ import { createNewDockDID } from '../../src/utils/did';
  * @returns {Promise<void>}
  */
 export async function registerNewDIDUsingPair(dockAPI, did, pair, verRels = undefined, controllers = []) {
-  const publicKey = getPublicKeyFromKeyringPair(pair);
-
   if (verRels === undefined) {
+    // eslint-disable-next-line no-param-reassign
     verRels = new VerificationRelationship();
   }
   // No additional controller
-  const didKey = new DidKey(publicKey, verRels);
+  const didKey = new DidKey(pair.publicKey(), verRels);
   return dockAPI.did.new(did, [didKey], controllers, false);
 }
 

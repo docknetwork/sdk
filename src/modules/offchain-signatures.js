@@ -1,12 +1,11 @@
 /* eslint-disable camelcase */
 
 import {
-  getNonce,
-  getSignatureFromKeyringPair,
+  getDidNonce,
   getStateChange,
 } from '../utils/misc';
 import WithParamsAndPublicKeys from './WithParamsAndPublicKeys';
-import { createDidSig, getHexIdentifierFromDID } from '../utils/did';
+import { createDidSig, typedHexDID } from '../utils/did';
 
 const STATE_CHANGES = {
   AddParams: 'AddOffchainSignatureParams',
@@ -38,7 +37,9 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
     this.signAndSend = signAndSend;
   }
 
-  /// Builds module-specific public key from the provided value.
+  /**
+   * Builds module-specific public key from the provided value.
+   */
   static buildPublicKey(publicKey) {
     return publicKey;
   }
@@ -49,7 +50,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
    * @returns {Promise<{bytes: string}|null>}
    */
   async getLastParamsWritten(did) {
-    const hexId = getHexIdentifierFromDID(did);
+    const hexId = typedHexDID(this.api, did);
     const counter = await this.api.query[this.moduleName].paramsCounter(hexId);
     if (counter > 0) {
       const resp = await this.queryParamsFromChain(hexId, counter);
@@ -66,7 +67,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
    * @returns {Promise<object[]>}
    */
   async getAllParamsByDid(did) {
-    const hexId = getHexIdentifierFromDID(did);
+    const hexId = typedHexDID(this.api, did);
 
     const params = [];
     const counter = await this.api.query[this.moduleName].paramsCounter(hexId);
@@ -97,7 +98,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
 
   async queryPublicKeyFromChain(hexDid, keyId) {
     const key = await this.api.query[this.moduleName][this.methods.PublicKeys](
-      hexDid,
+      hexDid.asDid,
       keyId,
     );
 
@@ -113,8 +114,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
    * @param publicKey - public key to add.
    * @param targetDid - The DID to which key is being added
    * @param signerDid - The DID that is adding the key by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's signingKeyRef
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
    * using this
@@ -124,19 +124,17 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
     publicKey,
     targetDid,
     signerDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
     const offchainPublicKey = this.constructor.buildPublicKey(publicKey);
-    const targetHexDid = getHexIdentifierFromDID(targetDid);
-    const signerHexDid = getHexIdentifierFromDID(signerDid);
+    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
+    const signerHexDid = typedHexDID(this.api, signerDid);
     const [addPk, signature] = await this.createSignedAddPublicKey(
       offchainPublicKey,
       targetHexDid,
       signerHexDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       { nonce, didModule },
     );
     return this.module.addPublicKey(addPk, signature);
@@ -147,8 +145,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
    * @param removeKeyId - The key index for key to remove.
    * @param targetDid - The DID from which key is being removed
    * @param signerDid - The DID that is removing the key by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's signingKeyRef
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
    * using this
@@ -158,18 +155,16 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
     removeKeyId,
     targetDid,
     signerDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const targetHexDid = getHexIdentifierFromDID(targetDid);
-    const signerHexDid = getHexIdentifierFromDID(signerDid);
+    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
+    const signerHexDid = typedHexDID(this.api, signerDid);
     const [removePk, signature] = await this.createSignedRemovePublicKey(
       removeKeyId,
       targetHexDid,
       signerHexDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       { nonce, didModule },
     );
     return this.module.removePublicKey(removePk, signature);
@@ -180,8 +175,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
    * @param publicKey - public key to add.
    * @param targetDid - The DID to which key is being added
    * @param signerDid - The DID that is adding the key by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's signingKeyRef
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
    * using this
@@ -193,8 +187,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
     publicKey,
     targetDid,
     signerDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     { nonce = undefined, didModule = undefined },
     waitForFinalization = true,
     params = {},
@@ -203,8 +196,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
       publicKey,
       targetDid,
       signerDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       { nonce, didModule },
     );
     return this.signAndSend(tx, waitForFinalization, params);
@@ -215,8 +207,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
    * @param removeKeyId - The key index for key to remove.
    * @param targetDid - The DID from which key is being removed
    * @param signerDid - The DID that is removing the key by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's signing key reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
    * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
    * using this
@@ -228,8 +219,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
     removeKeyId,
     targetDid,
     signerDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     { nonce = undefined, didModule = undefined },
     waitForFinalization = true,
     params = {},
@@ -238,8 +228,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
       removeKeyId,
       targetDid,
       signerDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       { nonce, didModule },
     );
     return this.signAndSend(tx, waitForFinalization, params);
@@ -249,15 +238,14 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
     publicKey,
     targetHexDid,
     signerHexDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
     // eslint-disable-next-line no-param-reassign
-    nonce = await getNonce(signerHexDid, nonce, didModule);
+    nonce = await getDidNonce(signerHexDid, nonce, didModule);
     const addPk = { key: publicKey, did: targetHexDid, nonce };
-    const signature = this.signAddPublicKey(keyPair, addPk);
-    const didSig = createDidSig(signerHexDid, keyId, signature);
+    const signature = this.signAddPublicKey(signingKeyRef, addPk);
+    const didSig = createDidSig(signerHexDid, signingKeyRef, signature);
     return [addPk, didSig];
   }
 
@@ -265,79 +253,78 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
     removeKeyId,
     targetHexDid,
     signerHexDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
     // eslint-disable-next-line no-param-reassign
-    nonce = await getNonce(signerHexDid, nonce, didModule);
+    nonce = await getDidNonce(signerHexDid, nonce, didModule);
     const removeKey = {
       keyRef: [targetHexDid, removeKeyId],
       did: targetHexDid,
       nonce,
     };
-    const signature = this.signRemovePublicKey(keyPair, removeKey);
-    const didSig = createDidSig(signerHexDid, keyId, signature);
+    const signature = this.signRemovePublicKey(signingKeyRef, removeKey);
+    const didSig = createDidSig(signerHexDid, signingKeyRef, signature);
     return [removeKey, didSig];
   }
 
   /**
    *
-   * @param keyPair
+   * @param signingKeyRef
    * @param params
    * @returns {Signature}
    */
-  signAddParams(keyPair, params) {
+  signAddParams(signingKeyRef, params) {
     const serialized = getStateChange(
       this.api,
       this.stateChanges.AddParams,
       params,
     );
-    return getSignatureFromKeyringPair(keyPair, serialized);
+    return signingKeyRef.sign(serialized);
   }
 
   /**
    *
-   * @param keyPair
+   * @param signingKeyRef
    * @param pk
    * @returns {Signature}
    */
-  signAddPublicKey(keyPair, pk) {
+  signAddPublicKey(signingKeyRef, pk) {
     const serialized = getStateChange(
       this.api,
       this.stateChanges.AddPublicKey,
       pk,
     );
-    return getSignatureFromKeyringPair(keyPair, serialized);
+    return signingKeyRef.sign(serialized);
   }
 
   /**
    *
-   * @param keyPair
+   * @param signingKeyRef
    * @param ref
    * @returns {Signature}
    */
-  signRemoveParams(keyPair, ref) {
+  signRemoveParams(signingKeyRef, ref) {
     const serialized = getStateChange(
       this.api,
       this.stateChanges.RemoveParams,
       ref,
     );
-    return getSignatureFromKeyringPair(keyPair, serialized);
+    return signingKeyRef.sign(serialized);
   }
 
   /**
    *
-   * @param keyPair
+   * @param signingKeyRef
    * @param ref
    * @returns {Signature}
    */
-  signRemovePublicKey(keyPair, ref) {
+  signRemovePublicKey(signingKeyRef, ref) {
     const serialized = getStateChange(
       this.api,
       this.stateChanges.RemovePublicKey,
       ref,
     );
-    return getSignatureFromKeyringPair(keyPair, serialized);
+    return signingKeyRef.sign(serialized);
   }
 }

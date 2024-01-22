@@ -6,12 +6,16 @@ import PSParams from '../offchain-signatures/params/ps';
 
 /** Class to write `Pointcheval-Sanders` parameters and keys on chain */
 export default class PSModule extends OffchainSignaturesModule {
-  /// Builds `Pointcheval-Sanders` params from the provided value.
+  /**
+   * Builds `Pointcheval-Sanders` params from the provided value.
+   */
   static buildParams(params) {
     return new PSParams(params);
   }
 
-  /// Builds `Pointcheval-Sanders` public key from the provided value.
+  /**
+   * Builds `Pointcheval-Sanders` public key from the provided value.
+   */
   static buildPublicKey(publicKey) {
     return new PSPublicKey(publicKey);
   }

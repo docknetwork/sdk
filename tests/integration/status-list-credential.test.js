@@ -13,37 +13,19 @@ import {
   signPresentation,
   verifyCredential,
   verifyPresentation,
-  expandJSONLD,
 } from '../../src/utils/vc/index';
 
 import { DockResolver } from '../../src/resolver';
 import { createPresentation } from '../create-presentation';
 
 import { OneOfPolicy } from '../../src/utils/revocation';
-import { DockStatusList2021Qualifier } from '../../src/utils/vc/constants';
 import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
-import { createNewDockDID } from '../../src/utils/did';
+import { createNewDockDID, DidKeypair, typedHexDID } from '../../src/utils/did';
 import StatusList2021Credential from '../../src/status-list-credential/status-list2021-credential';
+import { addStatusList21EntryToCredential } from '../../src/utils/vc/credentials';
 
 const credId = 'A large credential id with size > 32 bytes';
-
-function addCredentialStatus(
-  cred,
-  statusListCredentialId,
-  statusListCredentialIndex,
-) {
-  return {
-    ...cred,
-    credentialStatus: {
-      id: `${DockStatusList2021Qualifier}${statusListCredentialId}#${statusListCredentialIndex}`,
-      type: 'StatusList2021Entry',
-      statusListIndex: String(statusListCredentialIndex),
-      statusListCredential: `${DockStatusList2021Qualifier}${statusListCredentialId}`,
-      statusPurpose: 'suspension',
-    },
-  };
-}
 
 const buildTest = DisableStatusListTests
   ? describe.skip
@@ -68,7 +50,6 @@ buildTest('StatusList2021Credential', () => {
   let issuerKey;
   let issuerKeyPair;
   let credential;
-  let expanded;
 
   beforeAll(async () => {
     await dockAPI.init({
@@ -81,16 +62,16 @@ buildTest('StatusList2021Credential', () => {
     dockAPI.setAccount(account);
 
     // Register issuer DID
-    issuerKeyPair = dockAPI.keyring.addFromUri(issuerSeed, null, 'ed25519');
+    issuerKeyPair = new DidKeypair(dockAPI.keyring.addFromUri(issuerSeed, null, 'ed25519'), 1);
     await registerNewDIDUsingPair(dockAPI, issuerDID, issuerKeyPair);
 
     // Register holder DID
-    const pair1 = dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519');
+    const pair1 = new DidKeypair(dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'), 1);
     await registerNewDIDUsingPair(dockAPI, holderDID, pair1);
 
     // Create a new policy
     const policy = new OneOfPolicy();
-    policy.addOwner(issuerDID);
+    policy.addOwner(typedHexDID(dockAPI.api, issuerDID));
     issuerKey = getKeyDoc(
       issuerDID,
       issuerKeyPair,
@@ -114,11 +95,19 @@ buildTest('StatusList2021Credential', () => {
       'https://w3id.org/vc/status-list/2021/v1',
     ]);
 
-    // Issuer issues the credential with a given status list id for revocation
-    unsignedCred = addCredentialStatus(
+    expect(() => addStatusList21EntryToCredential(
       unsignedCred,
       statusListCredentialId,
       statusListCredentialIndex,
+      'wrongPurpose',
+    )).toThrow();
+
+    // Issuer issues the credential with a given status list id for revocation
+    unsignedCred = addStatusList21EntryToCredential(
+      unsignedCred,
+      statusListCredentialId,
+      statusListCredentialIndex,
+      'suspension',
     );
 
     credential = await issueCredential(
@@ -127,8 +116,6 @@ buildTest('StatusList2021Credential', () => {
       void 0,
       defaultDocumentLoader(resolver),
     );
-
-    expanded = await expandJSONLD(credential);
   }, 60000);
 
   afterAll(async () => {
@@ -157,7 +144,6 @@ buildTest('StatusList2021Credential', () => {
       fetchedCred,
       issuerDID,
       issuerKeyPair,
-      1,
       dockAPI,
     );
 
@@ -188,7 +174,6 @@ buildTest('StatusList2021Credential', () => {
       fetchedCred,
       issuerDID,
       issuerKeyPair,
-      1,
       dockAPI,
     );
     const holderKey = getKeyDoc(
@@ -232,7 +217,6 @@ buildTest('StatusList2021Credential', () => {
       fetchedCred,
       issuerDID,
       issuerKeyPair,
-      1,
       dockAPI,
     );
 

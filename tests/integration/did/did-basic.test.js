@@ -5,12 +5,12 @@ import { ATTESTS_IRI } from '../../../src/modules/did';
 
 import {
   createNewDockDID,
-  getHexIdentifierFromDID,
+  typedHexDID,
   NoDIDError,
   NoOffchainDIDError,
+  DidKeypair,
 } from '../../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../../test-constants';
-import { getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
 import {
   VerificationRelationship, DidKey,
 } from '../../../src/public-keys';
@@ -21,7 +21,8 @@ describe('Basic DID tests', () => {
 
   // Generate a random DID
   const dockDid = createNewDockDID();
-  const hexDid = getHexIdentifierFromDID(dockDid);
+  let typedDid;
+  let hexDid;
 
   // Generate first key with this seed. The key type is Sr25519
   const seed = randomAsHex(32);
@@ -31,6 +32,9 @@ describe('Basic DID tests', () => {
       keyring: TestKeyringOpts,
       address: FullNodeEndpoint,
     });
+
+    typedDid = typedHexDID(dock.api, dockDid);
+    hexDid = typedDid.asDid;
   });
 
   afterAll(async () => {
@@ -45,11 +49,11 @@ describe('Basic DID tests', () => {
   });
 
   test('Can create a DID', async () => {
-    // DID does not exist already
+    // DID does not exist
     await expect(dock.did.getOnchainDidDetail(hexDid)).rejects.toThrow(NoDIDError);
 
-    const pair = dock.keyring.addFromUri(seed);
-    const publicKey = getPublicKeyFromKeyringPair(pair);
+    const pair = new DidKeypair(dock.keyring.addFromUri(seed));
+    const publicKey = pair.publicKey();
 
     const verRels = new VerificationRelationship();
     const didKey = new DidKey(publicKey, verRels);
@@ -67,8 +71,8 @@ describe('Basic DID tests', () => {
 
   test('Get key for DID', async () => {
     const dk = await dock.did.getDidKey(dockDid, 1);
-    const pair = dock.keyring.addFromUri(seed);
-    expect(dk.publicKey).toEqual(getPublicKeyFromKeyringPair(pair));
+    const pair = new DidKeypair(dock.keyring.addFromUri(seed));
+    expect(dk.publicKey).toEqual(pair.publicKey());
     expect(dk.verRels.isAuthentication()).toEqual(true);
     expect(dk.verRels.isAssertion()).toEqual(true);
     expect(dk.verRels.isCapabilityInvocation()).toEqual(true);
@@ -102,11 +106,11 @@ describe('Basic DID tests', () => {
   test('Can attest with a DID', async () => {
     const priority = 1;
     const iri = 'my iri';
-    const pair = dock.keyring.addFromUri(seed);
+    const pair = new DidKeypair(dock.keyring.addFromUri(seed), 1);
 
-    await dock.did.setClaim(priority, iri, dockDid, pair, 1, undefined, false);
+    await dock.did.setClaim(priority, iri, dockDid, pair, undefined, false);
 
-    const att = await dock.did.getAttests(hexDid);
+    const att = await dock.did.getAttests(typedDid);
     expect(att).toEqual(iri);
 
     // Get document to verify the claim is there
@@ -117,12 +121,12 @@ describe('Basic DID tests', () => {
   }, 30000);
 
   test('Can remove DID', async () => {
-    const pair = dock.keyring.addFromUri(seed);
-    await dock.did.remove(dockDid, dockDid, pair, 1, undefined, false);
+    const pair = new DidKeypair(dock.keyring.addFromUri(seed), 1);
+    await dock.did.remove(dockDid, dockDid, pair, undefined, false);
     // DID removed
     await expect(dock.did.getDocument(dockDid)).rejects.toThrow(NoDIDError);
     await expect(dock.did.getOnchainDidDetail(hexDid)).rejects.toThrow(NoDIDError);
     await expect(dock.did.getDidKey(dockDid, 1)).rejects.toThrow();
-    await expect(dock.did.isController(hexDid, hexDid)).resolves.toEqual(false);
+    await expect(dock.did.isController(dockDid, dockDid)).resolves.toEqual(false);
   });
 });

@@ -4,10 +4,11 @@ import {
   BBSPlusPublicKeyG2,
   BBSPublicKey,
   PSPublicKey,
+  Presentation,
+  CredentialSchema,
 } from '@docknetwork/crypto-wasm-ts';
-import { Presentation } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/presentation';
 import b58 from 'bs58';
-import { verifyCredential } from './credentials';
+import { getPrivateStatus, verifyCredential } from './credentials';
 import DIDResolver from "../../resolver/did/did-resolver"; // eslint-disable-line
 
 import defaultDocumentLoader from './document-loader';
@@ -106,8 +107,6 @@ export async function verifyPresentationCredentials(
  * @property {DIDResolver} [resolver] - Resolver to resolve the issuer DID (optional)
  * @property {Boolean} [unsignedPresentation] - Whether to verify the proof or not
  * @property {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
- * @property {Boolean} [forceRevocationCheck] - Whether to force revocation check or not.
- * Warning, setting forceRevocationCheck to false can allow false positives when verifying revocable credentials.
  * @property {object} [presentationPurpose] - A purpose other than the default AuthenticationProofPurpose
  * @property {object} [documentLoader] - A document loader, can be null and use the default
  */
@@ -265,6 +264,10 @@ export function isAnoncreds(presentation) {
 
 export async function verifyAnoncreds(presentation, options = {}) {
   const documentLoader = options.documentLoader || defaultDocumentLoader(options.resolver);
+  const {
+    predicateParams, accumulatorPublicKeys,
+    circomOutputs, blindedAttributesCircomOutputs,
+  } = options;
 
   const keyDocuments = await Promise.all(
     presentation.spec.credentials.map((c, idx) => {
@@ -301,6 +304,7 @@ export async function verifyAnoncreds(presentation, options = {}) {
     if (!keyDocument.type) {
       throw new Error(`No type provided for key document ${JSON.stringify(keyDocument)}`);
     }
+    // Question: Why would keyDocument.type start with `did:`
     const keyType = keyDocument.type.startsWith('did:') ? keyDocument.type.slice(4) : keyDocument.type;
 
     switch (keyType) {
@@ -315,5 +319,30 @@ export async function verifyAnoncreds(presentation, options = {}) {
     }
   });
 
-  return recreatedPres.verify(pks);
+  return recreatedPres.verify(pks, accumulatorPublicKeys, predicateParams, circomOutputs, blindedAttributesCircomOutputs);
+}
+
+/**
+ * Get JSON-schemas of all credentials in the presentation
+ * @param presentation
+ * @param full - when set to true, returns the JSON schema of each credential with properties. This might be a fetched schema
+ * @returns {*}
+ */
+export function getJsonSchemasFromPresentation(presentation, full = false) {
+  return presentation.spec.credentials.map((cred) => {
+    const schema = CredentialSchema.fromJSON(JSON.parse(cred.schema));
+    // eslint-disable-next-line no-nested-ternary
+    const key = full ? (schema.fullJsonSchema !== undefined ? 'fullJsonSchema' : 'jsonSchema') : 'jsonSchema';
+    return schema[key];
+  });
+}
+
+/**
+ * Get status of all credentials from the presentation with revocation type of private status list.
+ * @param presentation
+ * @returns {Object[]}
+ */
+export function getPrivateStatuses(presentation) {
+  const credentials = jsonld.getValues(presentation, 'verifiableCredential');
+  return credentials.map((c) => getPrivateStatus(c));
 }

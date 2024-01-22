@@ -3,13 +3,14 @@ import jsigs from 'jsonld-signatures';
 import { statusTypeMatches, checkStatus } from '@digitalbazaar/vc-status-list';
 
 import base64url from 'base64url';
+import { CredentialBuilder, CredentialSchema } from '@docknetwork/crypto-wasm-ts';
 import CredentialIssuancePurpose from './CredentialIssuancePurpose';
 import defaultDocumentLoader from './document-loader';
 import { getAndValidateSchemaIfPresent } from './schema';
 import {
-  checkRevocationRegistryStatus,
-  getCredentialStatus,
-  hasRegistryRevocationStatus,
+  checkRevocationRegistryStatus, DockRevRegQualifier,
+  getCredentialStatus, isAccumulatorRevocationStatus,
+  isRegistryRevocationStatus, RevRegType,
 } from '../revocation';
 import { Resolver } from "../../resolver"; // eslint-disable-line
 
@@ -18,7 +19,12 @@ import {
   expandJSONLD,
   getKeyFromDIDDocument,
 } from './helpers';
-import { DEFAULT_CONTEXT_V1_URL, credentialContextField } from './constants';
+import {
+  DEFAULT_CONTEXT_V1_URL,
+  credentialContextField,
+  PrivateStatusList2021EntryType,
+  DockStatusList2021Qualifier, StatusList2021EntryType, PrivateStatusList2021Qualifier,
+} from './constants';
 import { ensureValidDatetime } from '../type-helpers';
 
 import {
@@ -233,13 +239,16 @@ export async function verifyCredential(
     controller = null,
     suite = [],
     verifyDates = true,
+
+    // Anoncreds params
+    predicateParams = null,
+    accumulatorPublicKeys = null,
+    circomOutputs = null,
+    blindedAttributesCircomOutputs = null,
   } = {},
 ) {
-  if (documentLoader && resolver) {
-    throw new Error(
-      'Passing resolver and documentLoader results in resolver being ignored, please re-factor.',
-    );
-  }
+  // Set document loader
+  const docLoader = getDocLoader(documentLoader, resolver);
 
   const isJWT = typeof vcJSONorString === 'string';
   const credential = isJWT
@@ -249,9 +258,6 @@ export async function verifyCredential(
   if (!credential) {
     throw new TypeError('A "credential" property is required for verifying.');
   }
-
-  // Set document loader
-  const docLoader = documentLoader || defaultDocumentLoader(resolver);
 
   // Check credential is valid
   checkCredential(credential);
@@ -321,17 +327,21 @@ export async function verifyCredential(
     return { verified };
   }
 
+  // Specify certain parameters for anoncreds
+  const anoncredsParams = {
+    accumulatorPublicKeys, predicateParams, circomOutputs, blindedAttributesCircomOutputs,
+  };
   const fullSuite = [
     new Ed25519Signature2018(),
     new EcdsaSepc256k1Signature2019(),
     new Sr25519Signature2020(),
-    new Bls12381BBSSignatureDock2022(),
-    new Bls12381BBSSignatureProofDock2022(),
-    new Bls12381BBSSignatureDock2023(),
-    new Bls12381BBSSignatureProofDock2023(),
-    new Bls12381PSSignatureDock2023(),
-    new Bls12381PSSignatureProofDock2023(),
     new JsonWebSignature2020(),
+    new Bls12381BBSSignatureDock2022(anoncredsParams),
+    new Bls12381BBSSignatureProofDock2022(anoncredsParams),
+    new Bls12381BBSSignatureDock2023(anoncredsParams),
+    new Bls12381BBSSignatureProofDock2023(anoncredsParams),
+    new Bls12381PSSignatureDock2023(anoncredsParams),
+    new Bls12381PSSignatureProofDock2023(anoncredsParams),
     ...suite,
   ];
 
@@ -373,8 +383,8 @@ export async function verifyCredential(
         }
       }
 
-      const isRegistryRevocationStatus = hasRegistryRevocationStatus(expandedCredential);
-      if (isRegistryRevocationStatus) {
+      const isRegRevStatus = isRegistryRevocationStatus(status);
+      if (isRegRevStatus) {
         const revResult = await checkRevocationRegistryStatus(
           expandedCredential,
           docLoader,
@@ -386,7 +396,14 @@ export async function verifyCredential(
         }
       }
 
-      if (!isStatusList2021Status && !isRegistryRevocationStatus) {
+      // Is using private status list or not
+      const isPrivStatus = getPrivateStatus(credential) !== undefined;
+
+      // For credentials supporting revocation with accumulator, the revocation check happens using witness which is not
+      // part of the credential and evolves over time
+      const isAccumStatus = isAccumulatorRevocationStatus(status);
+
+      if (!isStatusList2021Status && !isRegRevStatus && !isPrivStatus && !isAccumStatus) {
         throw new Error(`Unsupported \`credentialStatus\`: \`${status}\``);
       }
     }
@@ -408,6 +425,7 @@ export async function verifyCredential(
  *   behavior of each signature suite enforcing the presence of its own
  *   `@context` (if it is not present, it's added to the context list).
  * @param {(jsonld|jwt|proofValue)} [type] - Optional format/type of the credential (JSON-LD, JWT, proofValue)
+ * @param resolver
  * @return {Promise<object>} The signed credential object.
  */
 export async function issueCredential(
@@ -420,7 +438,11 @@ export async function issueCredential(
   issuerObject = null,
   addSuiteContext = true,
   type = VC_ISSUE_TYPE_DEFAULT,
+  resolver = null,
 ) {
+  // Set document loader
+  const docLoader = getDocLoader(documentLoader, resolver);
+
   const useProofValue = type === VC_ISSUE_TYPE_PROOFVALUE;
   const useJWT = type === VC_ISSUE_TYPE_JWT;
 
@@ -456,13 +478,195 @@ export async function issueCredential(
     throw new TypeError('"suite.verificationMethod" property is required.');
   }
 
+  if (suite.requireCredentialSchema) {
+    // BBS+, BBS and PS require `cryptoVersion` key to be set. This version wont be overwritten but doesn't matter if it
+    // does, we only want to set the key
+    cred.cryptoVersion = CredentialBuilder.VERSION;
+
+    // Some suites (such as Dock BBS+) require a schema to exist
+    // we intentionally dont set the ID here because it will be auto generated on signing
+    if (!cred.credentialSchema) {
+      cred.credentialSchema = {
+        id: '',
+        type: 'JsonSchemaValidator2018',
+      };
+    }
+  }
+
   // Sign and return the credential with jsonld-signatures otherwise
   return jsigs.sign(cred, {
     purpose: purpose || new CredentialIssuancePurpose(),
-    documentLoader: documentLoader || defaultDocumentLoader(),
+    documentLoader: docLoader,
     suite,
     compactProof,
     expansionMap,
     addSuiteContext,
   });
+}
+
+/**
+ * Get JSON-schema from the credential.
+ * @param credential
+ * @param full - when set to true, returns the JSON schema with properties. This might be a fetched schema
+ * @returns {IEmbeddedJsonSchema | IJsonSchema}
+ */
+export function getJsonSchemaFromCredential(credential, full = false) {
+  if (credential.credentialSchema === undefined) {
+    throw new Error('`credentialSchema` key must be defined in the credential');
+  }
+  if (typeof credential.credentialSchema.id !== 'string') {
+    throw new Error(`credentialSchema was expected to be string but was ${typeof credential.credentialSchema}`);
+  }
+  // eslint-disable-next-line no-nested-ternary
+  const key = full ? (credential.credentialSchema.fullJsonSchema !== undefined ? 'fullJsonSchema' : 'id') : 'id';
+  return CredentialSchema.convertFromDataUri(credential.credentialSchema[key]);
+}
+
+/**
+ * Get status of a credential issued with revocation type of private status list.
+ * @param credential
+ * @returns {*|Object|undefined}
+ */
+export function getPrivateStatus(credential) {
+  return credential.credentialStatus && credential.credentialStatus.type === PrivateStatusList2021EntryType ? credential.credentialStatus : undefined;
+}
+
+/**
+ * Verify the credential status given the private status list credential
+ * @param credentialStatus - `credentialStatus` field of the credential
+ * @param privateStatusListCredential
+ * @param documentLoader
+ * @param suite
+ * @param verifyStatusListCredential - Whether to verify the status list credential. This isn't necessary when the caller
+ * of this function got the credential directly from the issuer.
+ * @param expectedIssuer - Checks whether the issuer of the private status list credential matches the given
+ * @returns {Promise<{verified: boolean}>}
+ */
+export async function verifyPrivateStatus(credentialStatus, privateStatusListCredential, {
+  documentLoader = null, suite = [], verifyStatusListCredential = true, expectedIssuer = null,
+}) {
+  const fullSuite = [
+    new Ed25519Signature2018(),
+    new EcdsaSepc256k1Signature2019(),
+    new Sr25519Signature2020(),
+    new JsonWebSignature2020(),
+    ...suite,
+  ];
+  const { statusPurpose: credentialStatusPurpose } = credentialStatus;
+  const { statusPurpose: slCredentialStatusPurpose } = privateStatusListCredential.credentialSubject;
+  if (slCredentialStatusPurpose !== credentialStatusPurpose) {
+    throw new Error(
+      `The status purpose "${slCredentialStatusPurpose}" of the status list credential does not match the status purpose "${credentialStatusPurpose}" in the credential.`,
+    );
+  }
+
+  // ensure that the issuer of the verifiable credential matches
+  if (typeof expectedIssuer === 'string') {
+    const issuer = typeof privateStatusListCredential.issuer === 'object' ? privateStatusListCredential.issuer.id : privateStatusListCredential.issuer;
+    if (issuer !== expectedIssuer) {
+      throw new Error(`Expected issuer to be ${expectedIssuer} but found ${issuer}`);
+    }
+  }
+
+  // verify VC
+  if (verifyStatusListCredential) {
+    const verifyResult = await verifyCredential(privateStatusListCredential.toJSON(), {
+      suite: fullSuite,
+      documentLoader,
+    });
+    if (!verifyResult.verified) {
+      throw new Error(`Status list credential failed to verify with error: ${verifyResult.error}`);
+    }
+  }
+
+  // check VC's SL index for the status
+  const { statusListIndex } = credentialStatus;
+  const index = parseInt(statusListIndex, 10);
+  const list = await privateStatusListCredential.decodedStatusList();
+  const verified = !list.getStatus(index);
+  return { verified };
+}
+
+/**
+ * Add revocation registry id to credential
+ * @param cred
+ * @param regId
+ * @returns {*}
+ */
+export function addRevRegIdToCredential(cred, regId) {
+  const newCred = { ...cred };
+  newCred.credentialStatus = {
+    id: `${DockRevRegQualifier}${regId}`,
+    type: RevRegType,
+  };
+  return newCred;
+}
+
+/**
+ * For setting revocation type of credential to status list 21
+ * @param cred
+ * @param statusListCredentialId
+ * @param statusListCredentialIndex
+ * @param purpose
+ * @returns {Object}
+ */
+export function addStatusList21EntryToCredential(
+  cred,
+  statusListCredentialId,
+  statusListCredentialIndex,
+  purpose,
+) {
+  validateStatusPurpose(purpose);
+  return {
+    ...cred,
+    credentialStatus: {
+      id: `${DockStatusList2021Qualifier}${statusListCredentialId}#${statusListCredentialIndex}`,
+      type: StatusList2021EntryType,
+      statusListIndex: String(statusListCredentialIndex),
+      statusListCredential: `${DockStatusList2021Qualifier}${statusListCredentialId}`,
+      statusPurpose: purpose,
+    },
+  };
+}
+
+/**
+ * For setting revocation type of credential to private status list 21
+ * @param cred
+ * @param statusListCredentialId
+ * @param statusListCredentialIndex
+ * @param purpose
+ * @returns {Object}
+ */
+export function addPrivateStatusListEntryToCredential(
+  cred,
+  statusListCredentialId,
+  statusListCredentialIndex,
+  purpose,
+) {
+  validateStatusPurpose(purpose);
+  return {
+    ...cred,
+    credentialStatus: {
+      id: `${PrivateStatusList2021Qualifier}${statusListCredentialId}#${statusListCredentialIndex}`,
+      type: PrivateStatusList2021EntryType,
+      statusListIndex: String(statusListCredentialIndex),
+      statusListCredential: `${PrivateStatusList2021Qualifier}${statusListCredentialId}`,
+      statusPurpose: purpose,
+    },
+  };
+}
+
+function validateStatusPurpose(purpose) {
+  if (purpose !== 'suspension' && purpose !== 'revocation') {
+    throw new Error(`statusPurpose must 'suspension' or 'revocation' but was '${purpose}'`);
+  }
+}
+
+function getDocLoader(documentLoader, resolver) {
+  if (documentLoader && resolver) {
+    throw new Error(
+      'Passing resolver and documentLoader results in resolver being ignored, please re-factor.',
+    );
+  }
+  return documentLoader || defaultDocumentLoader(resolver);
 }

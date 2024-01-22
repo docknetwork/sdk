@@ -19,6 +19,11 @@
       "@type": "@id",
       "@container": "@graph"
     },
+    "defaultMinimumDate": {
+      "@id": "dockPS:defaultMinimumDate",
+      "@type": "@id",
+      "@container": "@graph"
+    },
     "useDefaults": {
       "@id": "dockPS:useDefaults",
       "@type": "@id",
@@ -43,6 +48,10 @@
         },
         "domain": "https://ld.dock.io/security#domain",
         "context": "https://ld.dock.io/security#context",
+        "bounds": {
+          "@id": "https://ld.dock.io/security#bounds",
+          "@context": {"@vocab": "https://ld.dock.io/security/bounds"}
+        },
         "sigType": "https://ld.dock.io/security#sigType",
         "boundedPseudonyms": "https://ld.dock.io/security#boundedPseudonyms",
         "unboundedPseudonyms": "https://ld.dock.io/security#unboundedPseudonyms",

@@ -8,8 +8,8 @@ import dock, {
 } from '../src/index';
 import {
   createNewDockDID,
+  DidKeypair,
 } from '../src/utils/did';
-import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
@@ -31,9 +31,9 @@ async function removeDID() {
   console.log('Removing DID now.');
 
   // Sign the DID removal with this key pair as this is the current key of the DID
-  const pair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
+  const pair = new DidKeypair(dock.keyring.addFromUri(firstKeySeed, null, 'sr25519'), 1);
 
-  return dock.did.remove(dockDID, dockDID, pair, 1, undefined, false);
+  return dock.did.remove(dockDID, dockDID, pair, undefined, false);
 }
 
 // This function assumes the DID has been written.
@@ -41,7 +41,7 @@ async function addServiceEndpoint() {
   console.log('Add new service endpoint now.');
 
   // Sign key update with this key pair as this is the current key of the DID
-  const pair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
+  const pair = new DidKeypair(dock.keyring.addFromUri(firstKeySeed, null, 'sr25519'), 1);
 
   const spType = new ServiceEndpointType();
   spType.setLinkedDomains();
@@ -50,7 +50,7 @@ async function addServiceEndpoint() {
   const spId = u8aToHex(encoder.encode(spIdText));
   const originsText = ['https://foo.example.com'];
   const origins = originsText.map((u) => u8aToHex(encoder.encode(u)));
-  return dock.did.addServiceEndpoint(spId, spType, origins, dockDID, dockDID, pair, 1, undefined, false);
+  return dock.did.addServiceEndpoint(spId, spType, origins, dockDID, dockDID, pair, undefined, false);
 }
 
 // This function assumes the DID has been written.
@@ -58,11 +58,11 @@ async function addController() {
   console.log('Add new controller now.');
 
   // Sign key update with this key pair as this is the current key of the DID
-  const pair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
+  const pair = new DidKeypair(dock.keyring.addFromUri(firstKeySeed, null, 'sr25519'), 1);
 
   const newController = createNewDockDID();
 
-  return dock.did.addControllers([newController], dockDID, dockDID, pair, 1, undefined, false);
+  return dock.did.addControllers([newController], dockDID, dockDID, pair, undefined, false);
 }
 
 // This function assumes the DID has been written.
@@ -70,18 +70,18 @@ async function addKey() {
   console.log('Add new key now.');
 
   // Sign key update with this key pair as this is the current key of the DID
-  const pair = dock.keyring.addFromUri(firstKeySeed, null, 'sr25519');
+  const pair = new DidKeypair(dock.keyring.addFromUri(firstKeySeed, null, 'sr25519'), 1);
 
   // Update DID key to the following
-  const newPair = dock.keyring.addFromUri(secondKeySeed, null, 'ed25519');
+  const newPair = new DidKeypair(dock.keyring.addFromUri(secondKeySeed, null, 'ed25519'), 1);
   // the following function will figure out the correct PublicKey type from the `type` property of `newPair`
-  const newPk = getPublicKeyFromKeyringPair(newPair);
+  const newPk = newPair.publicKey();
 
   const vr = new VerificationRelationship();
   vr.setAuthentication();
   const newDidKey = new DidKey(newPk, vr);
 
-  return dock.did.addKeys([newDidKey], dockDID, dockDID, pair, 1, undefined, false);
+  return dock.did.addKeys([newDidKey], dockDID, dockDID, pair, undefined, false);
 }
 
 async function getDIDDoc() {

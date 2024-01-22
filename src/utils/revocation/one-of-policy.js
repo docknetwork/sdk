@@ -1,4 +1,3 @@
-import { getHexIdentifierFromDID } from '../did';
 import Policy from './policy';
 
 // Revocation policy that allows one of the pre-decided controllers to update the registry.
@@ -10,7 +9,7 @@ export default class OneOfPolicy extends Policy {
    */
   constructor(controllers = []) {
     super();
-    this.controllers = new Set([...controllers].map((did) => getHexIdentifierFromDID(did)));
+    this.controllers = new Set(controllers);
   }
 
   /**
@@ -18,12 +17,12 @@ export default class OneOfPolicy extends Policy {
    * @param {string} ownerDID - Owner's DID
    */
   addOwner(ownerDID) {
-    this.controllers.add(getHexIdentifierFromDID(ownerDID));
+    this.controllers.add(ownerDID);
   }
 
   /**
    * Returns list containing unique sorted owner DIDs.
-   * @param {string} ownerDID - Owner's DID
+   * @returns {DockDidOrDidMethodKey[]}
    */
   controllerIds() {
     const controllerIds = [...this.controllers];

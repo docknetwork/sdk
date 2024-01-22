@@ -64,6 +64,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * Can be either `revocation` or `suspension`.
    * @param {number} [params.length=1e4] - length of the underlying `StatusList`.
    * @param {Iterable<number>} [params.revokeIndices=[]] - iterable producing indices to be revoked or suspended initially
+   * @returns {Promise<StatusList2021Credential>}
    */
   static async create(
     keyDoc,
@@ -74,7 +75,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
     this.updateStatusList(statusPurpose, statusList, revokeIndices);
 
     const jsonCred = await createCredential({
-      id: `${DockStatusList2021Qualifier}${id}`,
+      id: `${this.qualifier}${id}`,
       list: statusList,
       statusPurpose,
     });
@@ -86,15 +87,20 @@ export default class StatusList2021Credential extends VerifiableCredential {
   /**
    * Revokes indices and unsuspends other indices in the underlying status list, regenerating the proof.
    * If `statusPurpose` = `revocation`, indices can't be unsuspended.
+   * The status list revoked (suspended)/unsuspended indices will be set atomically and in case of an error,
+   * the underlying value won't be modified.
+   * Throws an error if the underlying status list can't be decoded or any of the supplied indices is out of range.
    *
    * @param {KeyDoc} keyDoc
    * @param {object} [update={}]
    * @param {Iterable<number>} update.revokeIndices - indices to be revoked or suspended
    * @param {Iterable<number>} update.unsuspendIndices - indices to be unsuspended
-   * @returns {this}
+   * @returns {Promise<this>}
    */
   async update(keyDoc, { revokeIndices = [], unsuspendIndices = [] }) {
-    const statusList = await this.decodedStatusList();
+    const statusList = new StatusList({
+      buffer: new Uint8Array((await this.decodedStatusList()).bitstring.bits),
+    });
     this.constructor.updateStatusList(
       this.credentialSubject.statusPurpose,
       statusList,
@@ -116,7 +122,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * Throws an error if the underlying status list can't be decoded or supplied index is out of range.
    *
    * @param {number} index
-   * @returns {boolean}
+   * @returns {Promise<boolean>}
    */
   async revoked(index) {
     const decodedStatusList = await this.decodedStatusList();
@@ -130,7 +136,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * Throws an error if the underlying status list can't be decoded or any of supplied indices is out of range.
    *
    * @param {Iterable<number>} indices
-   * @returns {Array<boolean>}
+   * @returns {Promise<Array<boolean>>}
    */
   async revokedBatch(indices) {
     const decodedStatusList = await this.decodedStatusList();
@@ -266,3 +272,4 @@ export default class StatusList2021Credential extends VerifiableCredential {
  * Allowed status purposes for this credential type.
  */
 StatusList2021Credential.statusPurposes = new Set(['revocation', 'suspension']);
+StatusList2021Credential.qualifier = DockStatusList2021Qualifier;

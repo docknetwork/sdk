@@ -2,9 +2,9 @@ module.exports = {
   bail: true,
   clearMocks: true,
   testTimeout: 30000,
-  testEnvironment: "./tests/test-environment",
+  testEnvironment: './tests/test-environment',
   transformIgnorePatterns: [
-    "/node_modules/(?!@polkadot|@babel|@digitalbazaar)",
+    '/node_modules/(?!@polkadot|@babel|@digitalbazaar)',
   ],
   verbose: true,
   globals: {

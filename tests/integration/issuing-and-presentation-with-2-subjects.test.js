@@ -1,10 +1,10 @@
-// Mock axios
+// Mock fetch
 import { randomAsHex } from '@polkadot/util-crypto';
 import jsonld from 'jsonld';
-import mockAxios from '../mocks/axios';
+import mockFetch from '../mocks/fetch';
 
 import {
-  createNewDockDID,
+  createNewDockDID, DidKeypair,
 } from '../../src/utils/did';
 
 import { DockAPI } from '../../src/index';
@@ -18,7 +18,7 @@ import {
 import { getKeyDoc } from '../../src/utils/vc/helpers';
 import { createPresentation } from '../create-presentation';
 
-mockAxios();
+mockFetch();
 
 // DID and seed for
 const issuerDID = createNewDockDID();
@@ -77,11 +77,11 @@ describe('Verifiable Credential issuance and presentation where the credential h
     // The DIDs should be written before any test begins
 
     // issuer DID
-    const pair1 = dock.keyring.addFromUri(issuerKeySeed, null, 'ed25519');
+    const pair1 = new DidKeypair(dock.keyring.addFromUri(issuerKeySeed, null, 'ed25519'), 1);
     await registerNewDIDUsingPair(dock, issuerDID, pair1);
 
     // 1st subject's DID
-    const pair2 = dock.keyring.addFromUri(subject1Seed, null, 'ed25519');
+    const pair2 = new DidKeypair(dock.keyring.addFromUri(subject1Seed, null, 'ed25519'), 1);
     await registerNewDIDUsingPair(dock, subject1DID, pair2);
 
     // 2nd subject's DID, has no key but is controlled by subject1DID

@@ -3,10 +3,14 @@ import { blake2AsHex } from '@polkadot/util-crypto';
 
 import { sha256 } from 'js-sha256';
 import {
-  PublicKey, PublicKeyEd25519, PublicKeySecp256k1, PublicKeySr25519, // eslint-disable-line
+  PublicKeyEd25519,
+  PublicKeySecp256k1,
+  PublicKeySr25519, // eslint-disable-line
 } from '../public-keys';
 import {
-  Signature, SignatureEd25519, SignatureSecp256k1, SignatureSr25519, // eslint-disable-line
+  SignatureEd25519,
+  SignatureSecp256k1,
+  SignatureSr25519, // eslint-disable-line
 } from '../signatures';
 
 const EC = elliptic.ec;
@@ -60,7 +64,11 @@ export function verifyEcdsaSecp256k1Sig(message, signature, publicKey) {
  * @param {PublicKeySecp256k1} publicKey - Secp256k1 public key for verification
  * @returns {boolean} True when signature is valid, false otherwise
  */
-export function verifyEcdsaSecp256k1SigPrehashed(messageHash, signature, publicKey) {
+export function verifyEcdsaSecp256k1SigPrehashed(
+  messageHash,
+  signature,
+  publicKey,
+) {
   // Remove the leading `0x`
   const sigHex = signature.value.slice(2);
   // Break it in 2 chunks of 32 bytes each
@@ -152,28 +160,25 @@ export function encodeExtrinsicAsHash(api, tx) {
 }
 
 /**
- * Convert bytes to struct `WrappedBytes` expected by chain
- * @param bytes
- * @returns {{'0'}}
- */
-export function bytesToWrappedBytes(bytes) {
-  return bytes;
-}
-
-/**
  * Get the nonce to be used for sending the next transaction if not provided already.
- * @param hexDid - DID whose nonce is needed
+ * @param {DockDidOrDidMethodKey} didOrDidMethodKey - DID whose nonce is needed
  * @param nonce - If provided, returned as it is.
  * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
  * using this
  * @returns {Promise<undefined|*>}
  */
-export async function getNonce(hexDid, nonce = undefined, didModule = undefined) {
+export async function getDidNonce(
+  didOrDidMethodKey,
+  nonce = undefined,
+  didModule = undefined,
+) {
   if (nonce === undefined && didModule === undefined) {
-    throw new Error('Provide either nonce or didModule to fetch nonce but none provided');
+    throw new Error(
+      'Provide either nonce or didModule to fetch nonce but none provided',
+    );
   }
   if (nonce === undefined) {
-    return didModule.getNextNonceForDID(hexDid);
+    return didModule.getNextNonceForDid(didOrDidMethodKey);
   }
   return nonce;
 }

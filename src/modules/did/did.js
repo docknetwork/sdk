@@ -3,15 +3,16 @@ import { u8aToString, hexToU8a, u8aToHex } from '@polkadot/util';
 import { BTreeSet } from '@polkadot/types';
 import b58 from 'bs58';
 import {
-  getHexIdentifierFromDID,
+  typedHexDID,
   DockDIDQualifier,
   NoDIDError,
   validateDockDIDHexIdentifier,
   NoOnchainDIDError,
   NoOffchainDIDError,
   createDidSig,
+  DockDIDMethodKeyQualifier,
 } from '../../utils/did';
-import { getSignatureFromKeyringPair, getStateChange } from '../../utils/misc';
+import { getStateChange } from '../../utils/misc';
 
 import OffChainDidDocRef from './offchain-did-doc-ref';
 import {
@@ -27,12 +28,15 @@ import WithParamsAndPublicKeys from '../WithParamsAndPublicKeys';
 
 export const ATTESTS_IRI = 'https://rdf.dock.io/alpha/2021#attestsDocumentContents';
 
+const valuePropOrIdentity = (val) => val.value || val;
+
 /** Class to create, update and destroy DIDs */
 class DIDModule {
   /**
    * Creates a new instance of DIDModule and sets the api
    * @constructor
    * @param {object} api - PolkadotJS API Reference
+   * @param signAndSend - Function to sign and send transaction
    */
   constructor(api, signAndSend) {
     this.api = api;
@@ -47,7 +51,7 @@ class DIDModule {
    * @returns {*}
    */
   createNewOffchainTx(did, didDocRef) {
-    const hexId = getHexIdentifierFromDID(did);
+    const hexId = typedHexDID(this.api, did).asDid;
     return this.module.newOffchain(hexId, didDocRef);
   }
 
@@ -74,7 +78,7 @@ class DIDModule {
    * @returns {*}
    */
   createSetOffchainDidRefTx(did, didDocRef) {
-    const hexId = getHexIdentifierFromDID(did);
+    const hexId = typedHexDID(this.api, did).asDid;
     return this.module.setOffchainDidDocRef(hexId, didDocRef);
   }
 
@@ -105,7 +109,7 @@ class DIDModule {
    * @returns {Promise<*>}
    */
   createRemoveOffchainDidTx(did) {
-    const hexId = getHexIdentifierFromDID(did);
+    const hexId = typedHexDID(this.api, did).asDid;
     return this.module.removeOffchainDid(hexId);
   }
 
@@ -135,10 +139,10 @@ class DIDModule {
     const cnts = new BTreeSet();
     if (controllers !== undefined) {
       controllers.forEach((c) => {
-        cnts.add(getHexIdentifierFromDID(c));
+        cnts.add(typedHexDID(this.api, c));
       });
     }
-    const hexId = getHexIdentifierFromDID(did);
+    const hexId = typedHexDID(this.api, did).asDid;
     return this.module.newOnchain(
       hexId,
       didKeys.map((d) => d.toJSON()),
@@ -170,12 +174,30 @@ class DIDModule {
   }
 
   /**
+   * Creates a new `did:key:` on the Dock chain.
+   * @param {string} did - The new DID. Can be a full DID or hex identifier
+   * @param waitForFinalization
+   * @param params
+   * @return {Promise<object>} Promise to the pending transaction
+   */
+  async newDidMethodKey(
+    didMethodKey,
+    waitForFinalization = true,
+    params = {},
+  ) {
+    return this.signAndSend(
+      this.module.newDidMethodKey(didMethodKey),
+      waitForFinalization,
+      params,
+    );
+  }
+
+  /**
    * Create transaction to add keys to an on-chain DID.
    * @param {DidKey[]} didKeys - Array of `DidKey`s as expected by the Substrate node
    * @param targetDid - The DID to which keys are being added
    * @param signerDid - The DID that is adding the keys by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's keypair reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
    * fetched from chain before creating the transaction
    * @returns {Promise<*>}
@@ -184,18 +206,16 @@ class DIDModule {
     didKeys,
     targetDid,
     signerDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = getHexIdentifierFromDID(targetDid);
-    const signerHexDid = getHexIdentifierFromDID(signerDid);
+    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
+    const signerHexDid = typedHexDID(this.api, signerDid);
     const [addKeys, signature] = await this.createSignedAddKeys(
       didKeys,
       targetHexDid,
       signerHexDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       nonce,
     );
     return this.module.addKeys(addKeys, signature);
@@ -206,8 +226,7 @@ class DIDModule {
    * @param {DidKey[]} didKeys - Array of `DidKey`s as expected by the Substrate node
    * @param targetDid - The DID to which keys are being added
    * @param signerDid - The DID that is adding the keys by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's keypair reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
    * fetched from chain before creating the transaction
    * @param waitForFinalization
@@ -218,8 +237,7 @@ class DIDModule {
     didKeys,
     targetDid,
     signerDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
     waitForFinalization = true,
     params = {},
@@ -229,8 +247,7 @@ class DIDModule {
         didKeys,
         targetDid,
         signerDid,
-        keyPair,
-        keyId,
+        signingKeyRef,
         nonce,
       ),
       waitForFinalization,
@@ -243,8 +260,7 @@ class DIDModule {
    * @param controllers - The DIDs that will control the `targetDid`
    * @param targetDid - The DID to which keys are being added
    * @param signerDid - The DID that is adding the controllers by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's keypair reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
    * fetched from chain before creating the transaction
    * @returns {Promise<*>}
@@ -253,18 +269,16 @@ class DIDModule {
     controllers,
     targetDid,
     signerDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = getHexIdentifierFromDID(targetDid);
-    const signerHexDid = getHexIdentifierFromDID(signerDid);
+    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
+    const signerHexDid = typedHexDID(this.api, signerDid);
     const [addControllers, signature] = await this.createSignedAddControllers(
       controllers,
       targetHexDid,
       signerHexDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       nonce,
     );
     return this.module.addControllers(addControllers, signature);
@@ -275,8 +289,7 @@ class DIDModule {
    * @param controllers - The DIDs that will control the `targetDid`
    * @param targetDid - The DID to which controllers are being added
    * @param signerDid - The DID that is adding the controllers by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's keypair reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
    * fetched from chain before creating the transaction
    * @param waitForFinalization
@@ -287,8 +300,7 @@ class DIDModule {
     controllers,
     targetDid,
     signerDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
     waitForFinalization = true,
     params = {},
@@ -297,8 +309,7 @@ class DIDModule {
       controllers,
       targetDid,
       signerDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       nonce,
     );
     return this.signAndSend(tx, waitForFinalization, params);
@@ -311,8 +322,7 @@ class DIDModule {
    * @param {Array} origins - An array of one of URIs encoded as hex.
    * @param targetDid - The DID to which service endpoint is being added
    * @param signerDid - The DID that is adding the service endpoint by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's keypair reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
    * fetched from chain before creating the transaction
    * @returns {Promise<*>}
@@ -323,20 +333,18 @@ class DIDModule {
     origins,
     targetDid,
     signerDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = getHexIdentifierFromDID(targetDid);
-    const signerHexDid = getHexIdentifierFromDID(signerDid);
+    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
+    const signerHexDid = typedHexDID(this.api, signerDid);
     const [addServiceEndpoint, signature] = await this.createSignedAddServiceEndpoint(
       endpointId,
       endpointType,
       origins,
       targetHexDid,
       signerHexDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       nonce,
     );
     return this.module.addServiceEndpoint(addServiceEndpoint, signature);
@@ -349,8 +357,7 @@ class DIDModule {
    * @param {Array} origins - An array of one of URIs encoded as hex.
    * @param targetDid - The DID to which service endpoint is being added
    * @param signerDid - The DID that is adding the service endpoint by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's keypair reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
    * fetched from chain before creating the transaction
    * @param waitForFinalization
@@ -363,8 +370,7 @@ class DIDModule {
     origins,
     targetDid,
     signerDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
     waitForFinalization = true,
     params = {},
@@ -375,8 +381,7 @@ class DIDModule {
       origins,
       targetDid,
       signerDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       nonce,
     );
     return this.signAndSend(tx, waitForFinalization, params);
@@ -387,8 +392,7 @@ class DIDModule {
    * @param keyIds - Key indices to remove
    * @param targetDid - The DID from which keys are being removed
    * @param signerDid - The DID that is removing the keys by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's keypair reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
    * fetched from chain before creating the transaction
    * @returns {Promise<*>}
@@ -397,18 +401,16 @@ class DIDModule {
     keyIds,
     targetDid,
     signerDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = getHexIdentifierFromDID(targetDid);
-    const signerHexDid = getHexIdentifierFromDID(signerDid);
+    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
+    const signerHexDid = typedHexDID(this.api, signerDid);
     const [removeKeys, signature] = await this.createSignedRemoveKeys(
       keyIds,
       targetHexDid,
       signerHexDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       nonce,
     );
     return this.module.removeKeys(removeKeys, signature);
@@ -419,8 +421,7 @@ class DIDModule {
    * @param keyIds - Key indices to remove
    * @param targetDid - The DID from which keys are being removed
    * @param signerDid - The DID that is removing the keys by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's keypair reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
    * fetched from chain before creating the transaction
    * @param waitForFinalization
@@ -431,8 +432,7 @@ class DIDModule {
     keyIds,
     targetDid,
     signerDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
     waitForFinalization = true,
     params = {},
@@ -441,8 +441,7 @@ class DIDModule {
       keyIds,
       targetDid,
       signerDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       nonce,
     );
     return this.signAndSend(tx, waitForFinalization, params);
@@ -453,8 +452,7 @@ class DIDModule {
    * @param controllers - Controller DIDs to remove.
    * @param targetDid - The DID from which controllers are being removed
    * @param signerDid - The DID that is removing the controllers by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's keypair reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
    * fetched from chain before creating the transaction
    * @returns {Promise<*>}
@@ -463,18 +461,16 @@ class DIDModule {
     controllers,
     targetDid,
     signerDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = getHexIdentifierFromDID(targetDid);
-    const signerHexDid = getHexIdentifierFromDID(signerDid);
+    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
+    const signerHexDid = typedHexDID(this.api, signerDid);
     const [removeControllers, signature] = await this.createSignedRemoveControllers(
       controllers,
       targetHexDid,
       signerHexDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       nonce,
     );
     return this.module.removeControllers(removeControllers, signature);
@@ -485,8 +481,7 @@ class DIDModule {
    * @param controllers - Controller DIDs to remove.
    * @param targetDid - The DID from which controllers are being removed
    * @param signerDid - The DID that is removing the controllers by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's keypair reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
    * fetched from chain before creating the transaction
    * @param waitForFinalization
@@ -497,8 +492,7 @@ class DIDModule {
     controllers,
     targetDid,
     signerDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
     waitForFinalization = true,
     params = {},
@@ -507,8 +501,7 @@ class DIDModule {
       controllers,
       targetDid,
       signerDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       nonce,
     );
     return this.signAndSend(tx, waitForFinalization, params);
@@ -519,8 +512,7 @@ class DIDModule {
    * @param endpointId - The endpoint to remove
    * @param targetDid - The DID from which endpoint is being removed
    * @param signerDid - The DID that is removing the endpoint by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's keypair reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
    * fetched from chain before creating the transaction
    * @returns {Promise<*>}
@@ -529,18 +521,16 @@ class DIDModule {
     endpointId,
     targetDid,
     signerDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = getHexIdentifierFromDID(targetDid);
-    const signerHexDid = getHexIdentifierFromDID(signerDid);
+    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
+    const signerHexDid = typedHexDID(this.api, signerDid);
     const [removeServiceEndpoint, signature] = await this.createSignedRemoveServiceEndpoint(
       endpointId,
       targetHexDid,
       signerHexDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       nonce,
     );
     return this.module.removeServiceEndpoint(removeServiceEndpoint, signature);
@@ -551,8 +541,7 @@ class DIDModule {
    * @param endpointId - The endpoint to remove
    * @param targetDid - The DID from which endpoint is being removed
    * @param signerDid - The DID that is removing the endpoint by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's keypair reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
    * fetched from chain before creating the transaction
    * @param waitForFinalization
@@ -563,8 +552,7 @@ class DIDModule {
     endpointId,
     targetDid,
     signerDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
     waitForFinalization = true,
     params = {},
@@ -573,8 +561,7 @@ class DIDModule {
       endpointId,
       targetDid,
       signerDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       nonce,
     );
     return this.signAndSend(tx, waitForFinalization, params);
@@ -584,26 +571,18 @@ class DIDModule {
    * Create a transaction to remove an on-chain DID
    * @param targetDid - The DID being removed
    * @param signerDid - The DID that is removing `targetDid` by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's keypair reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
    * fetched from chain before creating the transaction
    * @return {Promise<object>} The extrinsic to sign and send.
    */
-  async createRemoveTx(
-    targetDid,
-    signerDid,
-    keyPair,
-    keyId,
-    nonce = undefined,
-  ) {
-    const hexDid = getHexIdentifierFromDID(targetDid);
-    const signerHexDid = getHexIdentifierFromDID(signerDid);
+  async createRemoveTx(targetDid, signerDid, signingKeyRef, nonce = undefined) {
+    const hexDid = typedHexDID(this.api, targetDid).asDid;
+    const signerHexDid = typedHexDID(this.api, signerDid);
     const [didRemoval, signature] = await this.createSignedDidRemoval(
       hexDid,
       signerHexDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       nonce,
     );
     return this.module.removeOnchainDid(didRemoval, signature);
@@ -613,8 +592,7 @@ class DIDModule {
    * Removes an on-chain DID.
    * @param targetDid - The DID being removed
    * @param signerDid - The DID that is removing `targetDid` by signing the payload because it controls `targetDid`
-   * @param keyPair - Signer's keypair
-   * @param keyId - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param signingKeyRef - Signer's keypair reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then an appropriate nonce will be
    * fetched from chain before creating the transaction
    * @param waitForFinalization
@@ -624,8 +602,7 @@ class DIDModule {
   async remove(
     targetDid,
     signerDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
     waitForFinalization = true,
     params = {},
@@ -633,8 +610,7 @@ class DIDModule {
     const tx = await this.createRemoveTx(
       targetDid,
       signerDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       nonce,
     );
     return this.signAndSend(tx, waitForFinalization, params);
@@ -645,26 +621,17 @@ class DIDModule {
    * @param priority
    * @param iri
    * @param did
-   * @param keyPair
-   * @param keyId
+   * @param signingKeyRef
    * @param nonce
    * @returns {Promise<SubmittableExtrinsic<ApiType>>}
    */
-  async createSetClaimTx(
-    priority,
-    iri,
-    did,
-    keyPair,
-    keyId,
-    nonce = undefined,
-  ) {
-    const hexDid = getHexIdentifierFromDID(did);
+  async createSetClaimTx(priority, iri, did, signingKeyRef, nonce = undefined) {
+    const hexDid = typedHexDID(this.api, did);
     const [setAttestation, signature] = await this.createSignedAttestation(
       priority,
       iri,
       hexDid,
-      keyPair,
-      keyId,
+      signingKeyRef,
       nonce,
     );
     return this.api.tx.attest.setClaim(setAttestation, signature);
@@ -675,8 +642,7 @@ class DIDModule {
    * @param priority
    * @param iri
    * @param did
-   * @param keyPair
-   * @param keyId
+   * @param signingKeyRef
    * @param nonce
    * @param waitForFinalization
    * @param params
@@ -685,8 +651,7 @@ class DIDModule {
     priority,
     iri,
     did,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
     waitForFinalization = true,
     params = {},
@@ -695,8 +660,7 @@ class DIDModule {
       priority,
       iri,
       did,
-      keyPair,
-      keyId,
+      signingKeyRef,
       nonce,
     );
     return this.signAndSend(attestTx, waitForFinalization, params);
@@ -709,6 +673,15 @@ class DIDModule {
    */
   getFullyQualifiedDID(did) {
     return `${DockDIDQualifier}${did}`;
+  }
+
+  /**
+   * Create the fully qualified DID like "did:dock:..."
+   * @param {string} didMethodKey - DID
+   * @return {string} The DID identifier.
+   */
+  getFullyQualifiedDIDMethodKey(didMethodKey) {
+    return `${DockDIDMethodKeyQualifier}${didMethodKey}`;
   }
 
   /**
@@ -728,29 +701,35 @@ class DIDModule {
    * Throws NoDID if the DID does not exist on chain.
    * @param {string} did - The DID can be passed as fully qualified DID like `did:dock:<SS58 string>` or
    * a 32 byte hex string
+   * @param getOffchainSigKeys
    * @return {Promise<object>} The DID document.
    */
   // eslint-disable-next-line sonarjs/cognitive-complexity
   async getDocument(did, { getOffchainSigKeys = true } = {}) {
-    const hexId = getHexIdentifierFromDID(did);
-    let didDetails = await this.getOnchainDidDetail(hexId);
+    const typedDid = typedHexDID(this.api, did);
+    const hexDid = typedDid.asDid;
+    let didDetails = await this.getOnchainDidDetail(hexDid);
     didDetails = didDetails.data || didDetails;
 
     // Get DIDs attestations
-    const attests = await this.getAttests(hexId);
+    const attests = await this.getAttests(typedDid);
 
     // If given DID was in hex, encode to SS58 and then construct fully qualified DID else the DID was already fully qualified
-    const id = (did === hexId) ? this.getFullyQualifiedDID(encodeAddress(hexId)) : did;
+    const id = did === hexDid ? this.getFullyQualifiedDID(encodeAddress(hexDid)) : did;
 
     // Get controllers
     const controllers = [];
     if (didDetails.activeControllers > 0) {
-      const cnts = await this.api.query.didModule.didControllers.entries(hexId);
+      const cnts = await this.api.query.didModule.didControllers.entries(
+        hexDid,
+      );
       cnts.forEach(([key, value]) => {
         if (value.isSome) {
           const [controlled, controller] = key.toHuman();
-          if (controlled !== hexId) {
-            throw new Error(`Controlled DID ${controlled[0]} was found to be different than queried DID ${hexId}`);
+          if (controlled !== hexDid) {
+            throw new Error(
+              `Controlled DID ${controlled[0]} was found to be different than queried DID ${hexDid}`,
+            );
           }
           controllers.push(controller);
         }
@@ -759,7 +738,9 @@ class DIDModule {
 
     // Get service endpoints
     const serviceEndpoints = [];
-    const sps = await this.api.query.didModule.didServiceEndpoints.entries(hexId);
+    const sps = await this.api.query.didModule.didServiceEndpoints.entries(
+      hexDid,
+    );
     sps.forEach(([key, value]) => {
       if (value.isSome) {
         const sp = value.unwrap();
@@ -767,8 +748,10 @@ class DIDModule {
         const [d, spId] = key.args;
         // eslint-disable-next-line no-underscore-dangle
         const d_ = u8aToHex(d);
-        if (d_ !== hexId) {
-          throw new Error(`DID ${d_} was found to be different than queried DID ${hexId}`);
+        if (d_ !== hexDid) {
+          throw new Error(
+            `DID ${d_} was found to be different than queried DID ${hexDid}`,
+          );
         }
         serviceEndpoints.push([spId, sp]);
       }
@@ -781,7 +764,7 @@ class DIDModule {
     const capInv = [];
     const keyAgr = [];
     if (didDetails.lastKeyId > 0) {
-      const dks = await this.api.query.didModule.didKeys.entries(hexId);
+      const dks = await this.api.query.didModule.didKeys.entries(hexDid);
       dks.forEach(([key, value]) => {
         if (value.isSome) {
           const dk = value.unwrap();
@@ -789,8 +772,10 @@ class DIDModule {
           const [d, i] = key.args;
           // eslint-disable-next-line no-underscore-dangle
           const d_ = u8aToHex(d);
-          if (d_ !== hexId) {
-            throw new Error(`DID ${d_} was found to be different than queried DID ${hexId}`);
+          if (d_ !== hexDid) {
+            throw new Error(
+              `DID ${d_} was found to be different than queried DID ${hexDid}`,
+            );
           }
           const index = i.toNumber();
           const pk = dk.publicKey;
@@ -798,16 +783,16 @@ class DIDModule {
           let typ;
           if (pk.isSr25519) {
             typ = 'Sr25519VerificationKey2020';
-            publicKeyRaw = pk.asSr25519.value;
+            publicKeyRaw = valuePropOrIdentity(pk.asSr25519);
           } else if (pk.isEd25519) {
             typ = 'Ed25519VerificationKey2018';
-            publicKeyRaw = pk.asEd25519.value;
+            publicKeyRaw = valuePropOrIdentity(pk.asEd25519);
           } else if (pk.isSecp256k1) {
             typ = 'EcdsaSecp256k1VerificationKey2019';
-            publicKeyRaw = pk.asSecp256k1.value;
+            publicKeyRaw = valuePropOrIdentity(pk.asSecp256k1);
           } else if (pk.isX25519) {
             typ = 'X25519KeyAgreementKey2019';
-            publicKeyRaw = pk.asX25519.value;
+            publicKeyRaw = valuePropOrIdentity(pk.asX25519);
           } else {
             throw new Error(`Cannot parse public key ${pk}`);
           }
@@ -847,17 +832,18 @@ class DIDModule {
         // Query all BBS+ keys in a single RPC call to the node.
         const queryKeys = [];
         for (const k of possibleKeyIds) {
-          queryKeys.push([hexId, k]);
+          queryKeys.push([hexDid, k]);
         }
         if (this.api.query.offchainSignatures != null) {
-          const resp = await this.api.query.offchainSignatures.publicKeys.multi(queryKeys);
-
+          const resp = await this.api.query.offchainSignatures.publicKeys.multi(
+            queryKeys,
+          );
           let currentIter = 0;
           for (let r of resp) {
             // The gaps in `keyId` might correspond to removed keys
             if (r.isSome) {
-              let rawKey; let
-                keyType;
+              let rawKey;
+              let keyType;
               r = r.unwrap();
 
               if (r.isBbs) {
@@ -871,9 +857,14 @@ class DIDModule {
                 rawKey = r.asPs;
               }
               // Don't care about signature params for now
-              const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(rawKey);
+              const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(
+                this.api,
+                rawKey,
+              );
               if (pkObj.curveType !== 'Bls12381') {
-                throw new Error(`Curve type should have been Bls12381 but was ${pkObj.curveType}`);
+                throw new Error(
+                  `Curve type should have been Bls12381 but was ${pkObj.curveType}`,
+                );
               }
               const keyIndex = queryKeys[currentIter][1];
               keys.push([keyIndex, keyType, hexToU8a(pkObj.bytes)]);
@@ -882,8 +873,9 @@ class DIDModule {
             currentIter++;
           }
         } else {
-          const resp = await this.api.query.bbsPlus.bbsPlusKeys.multi(queryKeys);
-
+          const resp = await this.api.query.bbsPlus.bbsPlusKeys.multi(
+            queryKeys,
+          );
           let currentIter = 0;
           for (const r of resp) {
             // The gaps in `keyId` might correspond to removed keys
@@ -892,9 +884,14 @@ class DIDModule {
               const rawKey = r.unwrap();
 
               // Don't care about signature params for now
-              const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(rawKey);
+              const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(
+                this.api,
+                rawKey,
+              );
               if (pkObj.curveType !== 'Bls12381') {
-                throw new Error(`Curve type should have been Bls12381 but was ${pkObj.curveType}`);
+                throw new Error(
+                  `Curve type should have been Bls12381 but was ${pkObj.curveType}`,
+                );
               }
               const keyIndex = queryKeys[currentIter][1];
               keys.push([keyIndex, keyType, hexToU8a(pkObj.bytes)]);
@@ -927,7 +924,15 @@ class DIDModule {
     const document = {
       '@context': ['https://www.w3.org/ns/did/v1'],
       id,
-      controller: [...controllers].map((c) => this.getFullyQualifiedDID(encodeAddress(c))),
+      controller: [...controllers].map((c) => {
+        if (c.Did) {
+          return this.getFullyQualifiedDID(encodeAddress(c.Did));
+        } else if (c.DidMethodKey) {
+          return this.getFullyQualifiedDIDMethodKey(encodeAddress(c.DidMethodKey));
+        } else {
+          return this.getFullyQualifiedDID(encodeAddress(c));
+        }
+      }),
       publicKey: verificationMethod,
     };
 
@@ -998,6 +1003,18 @@ class DIDModule {
     };
   }
 
+  async getDidMethodKeyDetail(did) {
+    let resp = await this.api.query.didModule.didMethodKeys(did);
+    if (resp.isNone) {
+      throw new NoDIDError(`did:key:dock:${did}`);
+    }
+    resp = resp.unwrap();
+
+    return {
+      nonce: resp.nonce.toNumber(),
+    };
+  }
+
   /**
    * Gets the DID detail of an on chain DID
    * @param didIdentifier
@@ -1031,21 +1048,27 @@ class DIDModule {
   /**
    * Gets the current nonce for the DID. It will throw error if the DID does not exist on
    * chain or chain returns null response.
-   * @param {string} didIdentifier - DID identifier as hex. Not accepting full DID intentionally for efficiency as these
+   * @param {DockDidOrDidMethodKey} did - DID identifier as hex. Not accepting full DID intentionally for efficiency as these
    * methods are used internally
    * @return {Promise<number>}
    */
-  async getNonceForDID(didIdentifier) {
-    return (await this.getOnchainDidDetail(didIdentifier)).nonce;
+  async getNonceForDid(did) {
+    if (did.isDid) {
+      return (await this.getOnchainDidDetail(did.asDid)).nonce;
+    } else if (did.isDidMethodKey) {
+      return (await this.getDidMethodKeyDetail(did.asDidMethodKey)).nonce;
+    } else {
+      return (await this.getOnchainDidDetail(did)).nonce;
+    }
   }
 
   /**
    * Gets the nonce that should be used for sending the next transaction by this DID. Its 1 more than the current nonce.
-   * @param didIdentifier
+   * @param {DockDidOrDidMethodKey} did
    * @returns {Promise<*>}
    */
-  async getNextNonceForDID(didIdentifier) {
-    return (await this.getNonceForDID(didIdentifier)) + 1;
+  async getNextNonceForDid(did) {
+    return (await this.getNonceForDid(did)) + 1;
   }
 
   /**
@@ -1055,7 +1078,7 @@ class DIDModule {
    * @returns {Promise<DidKey>}
    */
   async getDidKey(did, keyIndex) {
-    const hexId = getHexIdentifierFromDID(did);
+    const hexId = typedHexDID(this.api, did).asDid;
     let resp = await this.api.query.didModule.didKeys(hexId, keyIndex);
     if (resp.isNone) {
       throw new Error(`No key for found did ${did} and key index ${keyIndex}`);
@@ -1066,13 +1089,21 @@ class DIDModule {
 
     let publicKey;
     if (pk.isSr25519) {
-      publicKey = new PublicKeySr25519(u8aToHex(pk.asSr25519.value));
+      publicKey = new PublicKeySr25519(
+        u8aToHex(valuePropOrIdentity(pk.asSr25519)),
+      );
     } else if (pk.isEd25519) {
-      publicKey = new PublicKeyEd25519(u8aToHex(pk.asEd25519.value));
+      publicKey = new PublicKeyEd25519(
+        u8aToHex(valuePropOrIdentity(pk.asEd25519)),
+      );
     } else if (pk.isSecp256k1) {
-      publicKey = new PublicKeySecp256k1(u8aToHex(pk.asSecp256k1.value));
+      publicKey = new PublicKeySecp256k1(
+        u8aToHex(valuePropOrIdentity(pk.asSecp256k1)),
+      );
     } else if (pk.isX25519) {
-      publicKey = new PublicKeyX25519(u8aToHex(pk.asX25519.value));
+      publicKey = new PublicKeyX25519(
+        u8aToHex(valuePropOrIdentity(pk.asX25519)),
+      );
     } else {
       throw new Error(`Cannot parse public key ${pk}`);
     }
@@ -1089,11 +1120,11 @@ class DIDModule {
    * @returns {Promise<boolean>}
    */
   async isController(controlled, controller) {
-    const controlledHexId = getHexIdentifierFromDID(controlled);
-    const controllerHexId = getHexIdentifierFromDID(controller);
+    const controlledDid = typedHexDID(this.api, controlled).asDid;
+    const controllerDid = typedHexDID(this.api, controller);
     const resp = await this.api.query.didModule.didControllers(
-      controlledHexId,
-      controllerHexId,
+      controlledDid,
+      controllerDid,
     );
     return resp.isSome;
   }
@@ -1105,7 +1136,7 @@ class DIDModule {
    * @returns {Promise}
    */
   async getServiceEndpoint(did, endpointId) {
-    const hexId = getHexIdentifierFromDID(did);
+    const hexId = typedHexDID(this.api, did).asDid;
     let resp = await this.api.query.didModule.didServiceEndpoints(
       hexId,
       endpointId,
@@ -1124,22 +1155,21 @@ class DIDModule {
 
   async createSignedAddKeys(
     didKeys,
-    hexDid,
-    controllerHexDid,
-    keyPair,
-    keyId,
+    did,
+    controllerDid,
+    signingKeyRef,
     nonce = undefined,
   ) {
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
-      nonce = await this.getNextNonceForDID(controllerHexDid);
+      nonce = await this.getNextNonceForDid(controllerDid);
     }
 
     const keys = didKeys.map((d) => d.toJSON());
-    const addKeys = { did: hexDid, keys, nonce };
+    const addKeys = { did, keys, nonce };
     const serializedAddKeys = this.getSerializedAddKeys(addKeys);
-    const signature = getSignatureFromKeyringPair(keyPair, serializedAddKeys);
-    const didSig = createDidSig(controllerHexDid, keyId, signature);
+    const signature = signingKeyRef.sign(serializedAddKeys);
+    const didSig = createDidSig(controllerDid, signingKeyRef, signature);
     return [addKeys, didSig];
   }
 
@@ -1147,26 +1177,22 @@ class DIDModule {
     controllers,
     hexDid,
     controllerHexDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
   ) {
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
-      nonce = await this.getNextNonceForDID(controllerHexDid);
+      nonce = await this.getNextNonceForDid(controllerHexDid);
     }
 
     const cnts = new BTreeSet();
     controllers.forEach((c) => {
-      cnts.add(getHexIdentifierFromDID(c));
+      cnts.add(typedHexDID(this.api, c));
     });
     const addControllers = { did: hexDid, controllers: cnts, nonce };
     const serializedAddControllers = this.getSerializedAddControllers(addControllers);
-    const signature = getSignatureFromKeyringPair(
-      keyPair,
-      serializedAddControllers,
-    );
-    const didSig = createDidSig(controllerHexDid, keyId, signature);
+    const signature = signingKeyRef.sign(serializedAddControllers);
+    const didSig = createDidSig(controllerHexDid, signingKeyRef, signature);
     return [addControllers, didSig];
   }
 
@@ -1176,13 +1202,12 @@ class DIDModule {
     origins,
     hexDid,
     controllerHexDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
   ) {
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
-      nonce = await this.getNextNonceForDID(controllerHexDid);
+      nonce = await this.getNextNonceForDid(controllerHexDid);
     }
 
     const endpoint = { types: endpointType.value, origins };
@@ -1193,72 +1218,55 @@ class DIDModule {
       nonce,
     };
     const serializedServiceEndpoint = this.getSerializedAddServiceEndpoint(addServiceEndpoint);
-    const signature = getSignatureFromKeyringPair(
-      keyPair,
-      serializedServiceEndpoint,
-    );
-    const didSig = createDidSig(controllerHexDid, keyId, signature);
+    const signature = signingKeyRef.sign(serializedServiceEndpoint);
+    const didSig = createDidSig(controllerHexDid, signingKeyRef, signature);
     return [addServiceEndpoint, didSig];
   }
 
   async createSignedRemoveKeys(
     keyIds,
     did,
-    controllerDid,
-    keyPair,
-    keyId,
+    controllerHexDid,
+    signingKeyRef,
     nonce = undefined,
   ) {
-    const hexDid = getHexIdentifierFromDID(did);
-    const controllerHexDid = getHexIdentifierFromDID(controllerDid);
-
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
-      nonce = await this.getNextNonceForDID(controllerHexDid);
+      nonce = await this.getNextNonceForDid(controllerHexDid);
     }
 
     const keys = new BTreeSet();
     keyIds.forEach((k) => {
       keys.add(k);
     });
-    const removeKeys = { did: hexDid, keys, nonce };
+    const removeKeys = { did, keys, nonce };
     const serializedRemoveKeys = this.getSerializedRemoveKeys(removeKeys);
-    const signature = getSignatureFromKeyringPair(
-      keyPair,
-      serializedRemoveKeys,
-    );
-    const didSig = createDidSig(controllerHexDid, keyId, signature);
+    const signature = signingKeyRef.sign(serializedRemoveKeys);
+    const didSig = createDidSig(controllerHexDid, signingKeyRef, signature);
     return [removeKeys, didSig];
   }
 
   async createSignedRemoveControllers(
     controllers,
-    did,
-    controllerDid,
-    keyPair,
-    keyId,
+    hexDid,
+    controllerHexDid,
+    signingKeyRef,
     nonce = undefined,
   ) {
-    const hexDid = getHexIdentifierFromDID(did);
-    const controllerHexDid = getHexIdentifierFromDID(controllerDid);
-
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
-      nonce = await this.getNextNonceForDID(controllerHexDid);
+      nonce = await this.getNextNonceForDid(controllerHexDid);
     }
 
     const cnts = new BTreeSet();
     controllers.forEach((c) => {
-      cnts.add(getHexIdentifierFromDID(c));
+      cnts.add(typedHexDID(this.api, c));
     });
 
     const removeControllers = { did: hexDid, controllers: cnts, nonce };
     const serializedRemoveControllers = this.getSerializedRemoveControllers(removeControllers);
-    const signature = getSignatureFromKeyringPair(
-      keyPair,
-      serializedRemoveControllers,
-    );
-    const didSig = createDidSig(controllerHexDid, keyId, signature);
+    const signature = signingKeyRef.sign(serializedRemoveControllers);
+    const didSig = createDidSig(controllerHexDid, signingKeyRef, signature);
     return [removeControllers, didSig];
   }
 
@@ -1266,41 +1274,36 @@ class DIDModule {
     endpointId,
     hexDid,
     controllerHexDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
   ) {
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
-      nonce = await this.getNextNonceForDID(controllerHexDid);
+      nonce = await this.getNextNonceForDid(controllerHexDid);
     }
 
     const removeServiceEndpoint = { did: hexDid, id: endpointId, nonce };
     const serializedRemoveServiceEndpoint = this.getSerializedRemoveServiceEndpoint(removeServiceEndpoint);
-    const signature = getSignatureFromKeyringPair(
-      keyPair,
-      serializedRemoveServiceEndpoint,
-    );
-    const didSig = createDidSig(controllerHexDid, keyId, signature);
+    const signature = signingKeyRef.sign(serializedRemoveServiceEndpoint);
+    const didSig = createDidSig(controllerHexDid, signingKeyRef, signature);
     return [removeServiceEndpoint, didSig];
   }
 
   async createSignedDidRemoval(
-    hexDid,
-    controllerHexDid,
-    keyPair,
-    keyId,
+    did,
+    controllerDid,
+    signingKeyRef,
     nonce = undefined,
   ) {
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
-      nonce = await this.getNextNonceForDID(controllerHexDid);
+      nonce = await this.getNextNonceForDid(controllerDid);
     }
 
-    const removal = { did: hexDid, nonce };
+    const removal = { did, nonce };
     const serializedRemoval = this.getSerializedDidRemoval(removal);
-    const signature = getSignatureFromKeyringPair(keyPair, serializedRemoval);
-    const didSig = createDidSig(controllerHexDid, keyId, signature);
+    const signature = signingKeyRef.sign(serializedRemoval);
+    const didSig = createDidSig(controllerDid, signingKeyRef, signature);
     return [removal, didSig];
   }
 
@@ -1308,13 +1311,12 @@ class DIDModule {
     priority,
     iri,
     hexDid,
-    keyPair,
-    keyId,
+    signingKeyRef,
     nonce = undefined,
   ) {
     if (nonce === undefined) {
       // eslint-disable-next-line no-param-reassign
-      nonce = await this.getNextNonceForDID(hexDid);
+      nonce = await this.getNextNonceForDid(hexDid);
     }
     const setAttestation = {
       attest: {
@@ -1324,11 +1326,8 @@ class DIDModule {
       nonce,
     };
     const serializedAttestation = this.getSerializedAttestation(setAttestation);
-    const signature = getSignatureFromKeyringPair(
-      keyPair,
-      serializedAttestation,
-    );
-    const didSig = createDidSig(hexDid, keyId, signature);
+    const signature = signingKeyRef.sign(serializedAttestation);
+    const didSig = createDidSig(hexDid, signingKeyRef, signature);
     return [setAttestation, didSig];
   }
 

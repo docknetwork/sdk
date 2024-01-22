@@ -112,7 +112,7 @@ buildTest('Trust Registry', () => {
         .isNone,
     ).toEqual(true);
 
-    await dock.trustRegistry.init(
+    await dock.trustRegistry.initOrUpdate(
       convenerDID,
       trustRegistryId,
       'Test Registry',
@@ -135,7 +135,7 @@ buildTest('Trust Registry', () => {
     // Create a random trust registry id
     const schemaId = randomAsHex(32);
 
-    await dock.trustRegistry.init(
+    await dock.trustRegistry.initOrUpdate(
       convenerDID,
       trustRegistryId,
       'Test Registry',
@@ -189,7 +189,7 @@ buildTest('Trust Registry', () => {
     // Create a random trust registry id
     const schemaId = randomAsHex(32);
 
-    await dock.trustRegistry.init(
+    await dock.trustRegistry.initOrUpdate(
       convenerDID,
       trustRegistryId,
       'Test Registry',
@@ -266,7 +266,7 @@ buildTest('Trust Registry', () => {
 
   it('Updates delegated issuers in the existing Trust Registry', async () => {
     // Create a random trust registry id
-    await dock.trustRegistry.init(
+    await dock.trustRegistry.initOrUpdate(
       convenerDID,
       trustRegistryId,
       'Test Registry',
@@ -301,7 +301,7 @@ buildTest('Trust Registry', () => {
     // Create a random trust registry id
     const schemaId = randomAsHex(32);
 
-    await dock.trustRegistry.init(
+    await dock.trustRegistry.initOrUpdate(
       convenerDID,
       trustRegistryId,
       'Test Registry',

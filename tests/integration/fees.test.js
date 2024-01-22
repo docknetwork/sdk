@@ -376,8 +376,7 @@ describe.skip('Fees', () => {
     const pk = BBSPlusModule.prepareAddPublicKey(dock.api,
       u8aToHex(kp.publicKey.bytes),
       undefined,
-      [did, 1],
-    );
+      [did, 1]);
     await withPaidFeeMatchingSnapshot(() => dock.bbsPlusModule.addPublicKey(
       pk,
       did,
@@ -437,8 +436,7 @@ describe.skip('Fees', () => {
     const pk = AccumulatorModule.prepareAddPublicKey(dock.api,
       u8aToHex(kp.publicKey.bytes),
       undefined,
-      [did, 1],
-    );
+      [did, 1]);
     await withPaidFeeMatchingSnapshot(() => dock.accumulatorModule.addPublicKey(
       pk,
       did,

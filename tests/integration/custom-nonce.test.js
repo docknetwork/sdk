@@ -7,7 +7,9 @@ import {
 } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI, PublicKeySecp256k1 } from '../../src';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-constants';
-import { createNewDockDID, typedHexDID, NoDIDError, DidKeypair } from '../../src/utils/did';
+import {
+  createNewDockDID, typedHexDID, NoDIDError, DidKeypair,
+} from '../../src/utils/did';
 import { registerNewDIDUsingPair } from './helpers';
 import { generateEcdsaSecp256k1Keypair } from '../../src/utils/misc';
 import { DidKey, VerificationRelationship } from '../../src/public-keys';

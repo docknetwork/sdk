@@ -253,4 +253,3 @@ async function allVote(
   }
   return votes;
 }
-

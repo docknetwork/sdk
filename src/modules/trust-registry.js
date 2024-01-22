@@ -32,7 +32,7 @@ export default class TrustRegistryModule {
    * @param params
    * @returns {Promise<null>}
    */
-  async init(
+  async initOrUpdate(
     convenerDid,
     registryId,
     name,
@@ -47,7 +47,7 @@ export default class TrustRegistryModule {
     return this.signAndSend(
       convenerHexDid.changeState(
         this.api,
-        this.module.initOrUpdateTrustRegistry.bind(this.module),
+        this.module.initOrUpdateTrustRegistry,
         'InitOrUpdateTrustRegistry',
         {
           registryId,

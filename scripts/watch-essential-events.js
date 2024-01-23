@@ -78,6 +78,7 @@ import {
   notNilAnd,
   finiteNumber,
   timestampLogger,
+  blockByNumber
 } from "./helpers";
 import dock from "../src";
 import { sendAlarmEmailText } from "./email_utils";
@@ -396,20 +397,6 @@ const syncPrevousBlocks = curry((dock, startBlock, currentBlocks$) => {
 
   return blocks$;
 });
-
-/**
- * Retrieves a block associated with the given number.
- *
- * @param {*} dock
- * @param {number} number
- * @returns {Observable<*>}
- */
-const blockByNumber = curry((dock, number) =>
-  of(number).pipe(
-    concatMap((number) => from(dock.api.rpc.chain.getBlockHash(number))),
-    concatMap((hash) => from(dock.api.derive.chain.getBlock(hash)))
-  )
-);
 
 /**
  * Post a message to the `Slack` and send alarm email.

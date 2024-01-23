@@ -2518,10 +2518,10 @@
   dependencies:
     buffer "^6.0.3"
 
-"@docknetwork/node-types@^0.16.0":
-  version "0.16.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/node-types/-/node-types-0.16.0.tgz#23570042c823a6320654ee2c5b8c0da5d7c43d21"
-  integrity sha512-VUZB8guX9161hDIEVn/UKJEUlXjIDE6vH5flx6uDHVc0QOhBy1bq6AGLayG4ZH19dCN39ta2sKGIFq9wLO4H2A==
+"@docknetwork/node-types@^0.17.0":
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/node-types/-/node-types-0.17.0.tgz#ca0ddb5b819e012e8f2f112353008325de4f3e33"
+  integrity sha512-aSRFtCwLhdhcY1wqX3WfhPpY2QXVqaB9kNB3e5+ajCWXtc0wuKJePpnSZEO4RqUEUKV5Y3LcsQ52ZB+aJ1PpFw==
 
 "@ethereumjs/common@^2.5.0", "@ethereumjs/common@^2.6.4":
   version "2.6.5"

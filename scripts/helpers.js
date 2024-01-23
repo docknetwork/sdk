@@ -21,8 +21,22 @@ import {
   unless,
   fromPairs,
 } from "ramda";
-import { Observable } from "rxjs";
+import { Observable, of, concatMap, from } from "rxjs";
 import { DockAPI } from "../src";
+
+/**
+ * Retrieves a block associated with the given number.
+ *
+ * @param {*} dock
+ * @param {number} number
+ * @returns {Observable<*>}
+ */
+export const blockByNumber = curry((dock, number) =>
+  of(number).pipe(
+    concatMap((number) => from(dock.api.rpc.chain.getBlockHash(number))),
+    concatMap((hash) => from(dock.api.derive.chain.getBlock(hash)))
+  )
+);
 
 /**
  * Send the give transaction with the given account URI (secret) and return the block hash

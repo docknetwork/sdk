@@ -23,15 +23,17 @@ describe('typedHexDID', () => {
   test('typedHexDID works for did:key secp256k1', () => {
     const result = typedHexDID({ specVersion: 100 }, 'did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme');
     expect(result.didMethodKey.secp256k1).toEqual('0x03874c15c7fda20e539c6e5ba573c139884c351188799f5458b4b41f7924f235cd');
+    expect(result.toString()).toEqual('did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme');
   });
 
   test('typedHexDID works for did:key ed25519', () => {
     const result = typedHexDID({ specVersion: 100 }, 'did:key:z6MktvqCyLxTsXUH1tUZncNdVeEZ7hNh7npPRbUU27GTrYb8');
     expect(result.didMethodKey.ed25519).toEqual('0xd713cb7f8624d8648496e01010f2bd72f0dcbbdecdb7036f38c20475f5f429bf');
+    expect(result.toString()).toEqual('did:key:z6MktvqCyLxTsXUH1tUZncNdVeEZ7hNh7npPRbUU27GTrYb8');
   });
 });
 
-describe.skip('DID utilities', () => {
+describe('DID utilities', () => {
   test('On input as 40 byte hex, validateDockDIDIdentifier throws error', () => {
     expect(() => validateDockDIDHexIdentifier(randomAsHex(40))).toThrow(/DID identifier must be 32 bytes/);
   });

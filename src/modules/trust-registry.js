@@ -264,8 +264,8 @@ export default class TrustRegistryModule {
    * @returns {Promise}
    */
   async getActorDidAndNonce(actorDid, { nonce = undefined, didModule = undefined } = {}) {
-    const convenerHexDid = typedHexDID(this.api, actorDid);
-    const lastNonce = nonce ?? (await getDidNonce(convenerHexDid, nonce, didModule));
-    return [convenerHexDid, lastNonce];
+    const hexDID = typedHexDID(this.api, actorDid);
+    const lastNonce = nonce ?? (await getDidNonce(hexDID, nonce, didModule));
+    return [hexDID, lastNonce];
   }
 }

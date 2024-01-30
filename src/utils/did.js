@@ -4,6 +4,9 @@
 // eslint-disable-next-line max-classes-per-file
 import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
+import { base58btc } from 'multiformats/bases/base58';
+import varint from 'varint';
+
 import { isHexWithGivenByteSize, getHexIdentifier } from './codec';
 import {
   PublicKeyEd25519,
@@ -18,6 +21,7 @@ import {
   getSignatureFromKeyringPair,
   getStateChange,
 } from './misc';
+import { parseDIDUrl } from '../resolver/did/did-resolver';
 
 export const DockDIDMethod = 'dock';
 export const Secp256k1PublicKeyPrefix = 'zQ3s';
@@ -301,6 +305,14 @@ Object.defineProperty(String.prototype, 'toStringSS58', {
  * --------------------------------------------------------
  */
 
+export function getDidKeyPublicKeyHex(did) {
+  const parsed = parseDIDUrl(did);
+  const multicodecPubKey = base58btc.decode(parsed.id);
+  varint.decode(multicodecPubKey); // NOTE: called to get byte length below
+  const pubKeyBytes = multicodecPubKey.slice(varint.decode.bytes);
+  return u8aToHex(pubKeyBytes);
+}
+
 /**
  * Takes a DID string, gets the hexadecimal value of that and returns a `DockDidMethodKey` or `DockDid` object.
  * @param api
@@ -315,20 +327,10 @@ export function typedHexDID(api, did) {
   }
 
   if (strDid.startsWith(DockDidMethodKeySecp256k1Prefix)) {
-    const hex = getHexIdentifier(
-      strDid,
-      DockDidMethodKeySecp256k1Prefix,
-      DockDIDMethodKeySecp256k1ByteSize,
-    );
-
+    const hex = getDidKeyPublicKeyHex(strDid);
     return new DockDidMethodKey(new PublicKeySecp256k1(hex));
   } else if (strDid.startsWith(DockDidMethodKeyEd25519Prefix)) {
-    const hex = getHexIdentifier(
-      strDid,
-      DockDidMethodKeyEd25519Prefix,
-      DockDIDMethodKeyEd25519ByteSize,
-    );
-
+    const hex = getDidKeyPublicKeyHex(strDid);
     return new DockDidMethodKey(new PublicKeyEd25519(hex));
   } else {
     const hex = getHexIdentifier(strDid, DockDIDQualifier, DockDIDByteSize);

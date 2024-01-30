@@ -42,7 +42,7 @@ export function getHexIdentifier(id, qualifiers, byteSize) {
         }
         return hex;
       } catch (e) {
-        throw new Error(`Invalid SS58 ID ${strId}. ${e}`);
+        throw new Error(`Invalid SS58 ID ${strId} with qualifier ${qualifier}. ${e}`);
       }
     }
   }

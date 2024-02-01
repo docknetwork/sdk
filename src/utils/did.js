@@ -3,7 +3,11 @@
 // Import some utils from Polkadot JS
 // eslint-disable-next-line max-classes-per-file
 import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
-import { u8aToHex } from '@polkadot/util';
+import { u8aToHex, hexToU8a } from '@polkadot/util';
+import { base58btc } from 'multiformats/bases/base58';
+import bs58 from 'bs58';
+import varint from 'varint';
+
 import { isHexWithGivenByteSize, getHexIdentifier } from './codec';
 import {
   PublicKeyEd25519,
@@ -18,6 +22,7 @@ import {
   getSignatureFromKeyringPair,
   getStateChange,
 } from './misc';
+import { parseDIDUrl } from '../resolver/did/did-resolver';
 
 export const DockDIDMethod = 'dock';
 export const Secp256k1PublicKeyPrefix = 'zQ3s';
@@ -31,6 +36,9 @@ export const DockDIDMethodKeyEd25519ByteSize = 32;
 
 export const DockDidMethodKeySecp256k1Prefix = `${DockDIDMethodKeyQualifier}${Secp256k1PublicKeyPrefix}`;
 export const DockDidMethodKeyEd25519Prefix = `${DockDIDMethodKeyQualifier}${Ed25519PublicKeyPrefix}`;
+
+const DidKeyBytePrefixED25519 = new Uint8Array([0xed, 0x01]);
+const DidKeyBytePrefixSecp256k1 = new Uint8Array([0xe7, 0x01]);
 
 export class DidKeypair {
   constructor(keyPair, keyId) {
@@ -186,23 +194,34 @@ export class DockDidMethodKey extends DockDidOrDidMethodKey {
   }
 
   toString() {
-    return this.toStringSS58();
+    return this.toStringBS58();
   }
 
-  toStringSS58() {
-    let prefix;
-    let address;
-    if (this.didMethodKey.ed25519) {
-      prefix = DockDidMethodKeyEd25519Prefix;
-      address = this.didMethodKey.ed25519;
-    } else if (this.didMethodKey.secp256k1) {
-      prefix = DockDidMethodKeySecp256k1Prefix;
-      address = this.didMethodKey.secp256k1;
-    } else {
+  toStringBS58() {
+    return `${DockDIDMethodKeyQualifier}${this.fingerprint()}`;
+  }
+
+  get publicKey() {
+    return this.didMethodKey.ed25519 || this.didMethodKey.secp256k1;
+  }
+
+  fingerprint() {
+    // Convert the hex public key to bytes
+    if (!this.publicKey) {
       throw new Error('Unsupported public key type');
     }
 
-    return `${prefix}${encodeAddress(address)}`;
+    // Define the prefix for ed25519 DID key
+    const publicKeyBytes = hexToU8a(this.publicKey);
+    const prefix = this.didMethodKey.ed25519 ? DidKeyBytePrefixED25519 : DidKeyBytePrefixSecp256k1;
+
+    // Concatenate the prefix and the public key bytes
+    const didKeyBytes = new Uint8Array(prefix.length + publicKeyBytes.length);
+    didKeyBytes.set(prefix);
+    didKeyBytes.set(publicKeyBytes, prefix.length);
+
+    // Encode the concatenated bytes to Base58 with z prefix
+    return `z${bs58.encode(didKeyBytes)}`;
   }
 }
 
@@ -215,7 +234,7 @@ export class NoDIDError extends Error {
     super(`DID (${did}) does not exist`);
     this.name = 'NoDIDError';
     this.did = did;
-    this.message = 'A DID document lookup was successful, but the DID in question does not exist. This is different from a network error.';
+    this.message = `A DID document lookup was successful, but the DID in question does not exist (${did}). This is different from a network error.`;
   }
 }
 
@@ -301,6 +320,14 @@ Object.defineProperty(String.prototype, 'toStringSS58', {
  * --------------------------------------------------------
  */
 
+export function getDidKeyPublicKeyHex(did) {
+  const parsed = parseDIDUrl(did);
+  const multicodecPubKey = base58btc.decode(parsed.id);
+  varint.decode(multicodecPubKey); // NOTE: called to get byte length below
+  const pubKeyBytes = multicodecPubKey.slice(varint.decode.bytes);
+  return u8aToHex(pubKeyBytes);
+}
+
 /**
  * Takes a DID string, gets the hexadecimal value of that and returns a `DockDidMethodKey` or `DockDid` object.
  * @param api
@@ -315,20 +342,10 @@ export function typedHexDID(api, did) {
   }
 
   if (strDid.startsWith(DockDidMethodKeySecp256k1Prefix)) {
-    const hex = getHexIdentifier(
-      strDid,
-      DockDidMethodKeySecp256k1Prefix,
-      DockDIDMethodKeySecp256k1ByteSize,
-    );
-
+    const hex = getDidKeyPublicKeyHex(strDid);
     return new DockDidMethodKey(new PublicKeySecp256k1(hex));
   } else if (strDid.startsWith(DockDidMethodKeyEd25519Prefix)) {
-    const hex = getHexIdentifier(
-      strDid,
-      DockDidMethodKeyEd25519Prefix,
-      DockDIDMethodKeyEd25519ByteSize,
-    );
-
+    const hex = getDidKeyPublicKeyHex(strDid);
     return new DockDidMethodKey(new PublicKeyEd25519(hex));
   } else {
     const hex = getHexIdentifier(strDid, DockDIDQualifier, DockDIDByteSize);

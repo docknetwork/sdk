@@ -20,7 +20,7 @@ export default class PublicKey {
    */
   validateByteSize(value, expectedByteSize) {
     if (!isHexWithGivenByteSize(value, expectedByteSize)) {
-      throw new Error(`Public key must be ${expectedByteSize} bytes`);
+      throw new Error(`Public key must be ${expectedByteSize} bytes, got ${value.replace('0x', '').length / 2} bytes from value: ${value}`);
     }
   }
 

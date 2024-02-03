@@ -32,7 +32,7 @@ const DID_MATCHER = new RegExp(
   `^did:${METHOD_REG_EXP_PATTERN}:${METHOD_ID}${PARAMS}${PATH}${QUERY}${FRAGMENT}$`,
 );
 
-function parse(didUrl) {
+export function parseDIDUrl(didUrl) {
   if (didUrl === '' || !didUrl) throw new Error('Missing DID');
   const sections = didUrl.match(DID_MATCHER);
   if (sections) {
@@ -70,6 +70,6 @@ export default class DIDResolver extends MultiResolver {
    * @param {string} did
    */
   parseDid(did) {
-    return parse(did);
+    return parseDIDUrl(did);
   }
 }

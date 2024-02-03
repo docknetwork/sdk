@@ -306,13 +306,18 @@ export const formatDock = (value, config = {}) =>
  * @param {function(dock: DockAPI, ...args: any[]): Promise<T>}
  * @returns {function(...args: any[]): Promise<T>}
  */
-export const withDockAPI = curry((params, fn) => async (...args) => {
+export const withDockAPI = curry(({ senderAccountURI, ...params }, fn) => async (...args) => {
   console.log("Connecting...");
   let err, res;
   const dockAPI = new DockAPI();
 
   try {
     await dockAPI.init(params);
+    if (senderAccountURI) {
+      const account = dockAPI.keyring.addFromUri(senderAccountURI);
+      dockAPI.setAccount(account);
+    }
+
     res = await fn(dockAPI, ...args);
   } catch (e) {
     err = e;
@@ -380,14 +385,14 @@ export const addLoggerPrefix = curry((buildPrefix, logger) =>
 );
 
 /**
- * Returns hash and number of the first block satisfying provided predicate.
- * Throws an error in case such block can't be found.
+ * Returns hash and number of the first block satisfying the provided predicate.
+ * Throws an error in case such a block can't be found.
  *
  * @template T
  * @param {*} api
- * @param {{ start: number, end: number, targetValue: T, fetchValue: (number) => Promise<T>, checkBlock: (block: any) => boolean }}
- * @param {{ maxBlocksPerUnit: number = null, debug = false }} targetEra
- * @returns {{ number: number, hash: * }}
+ * @param {{ start: number, end: number, targetValue: T, fetchValue: (number) => Promise<T>, checkBlock: (block: any) => Promise<boolean> }}
+ * @param {{ maxBlocksPerUnit: number = null, debug = false }}
+ * @returns {{ number: number, hash: any }}
  */
 export const binarySearchFirstSatisfyingBlock = curry(
   async (
@@ -405,7 +410,7 @@ export const binarySearchFirstSatisfyingBlock = curry(
       const midBlockHash = await api.rpc.chain.getBlockHash(midBlockNumber);
       const midValue = await fetchValue(midBlockHash);
 
-      if (debug)
+      if (debug) {
         timestampLogger.log(
           "target value:",
           targetValue,
@@ -418,6 +423,7 @@ export const binarySearchFirstSatisfyingBlock = curry(
           "jumps:",
           jumps
         );
+      }
 
       if (midValue < targetValue) {
         startBlockNumber = midBlockNumber + 1;
@@ -445,7 +451,7 @@ export const binarySearchFirstSatisfyingBlock = curry(
         }
 
         const midBlock = await api.derive.chain.getBlock(midBlockHash);
-        const found = checkBlock(midBlock);
+        const found = await checkBlock(midBlock);
 
         if (found) {
           if (debug)

@@ -14,8 +14,8 @@ import {
   DidMethodKeyBytePrefixSecp256k1,
   DidMethodKeyEd25519ByteSize,
   DidMethodKeySecp256k1ByteSize,
-  DidMethodKeyEd25519Prefix,
-  DidMethodKeySecp256k1Prefix,
+  Ed25519PublicKeyPrefix,
+  Secp256k1PublicKeyPrefix,
 } from '../constants';
 import DockDidOrDidMethodKey from './dock-did-or-did-method-key';
 
@@ -67,9 +67,9 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
     const pubKeyBytes = multicodecPubKey.slice(varint.decode.bytes);
     const pubkeyHex = u8aToHex(pubKeyBytes);
 
-    if (id.startsWith(DidMethodKeySecp256k1Prefix)) {
+    if (id.startsWith(Secp256k1PublicKeyPrefix)) {
       return new this(new PublicKeySecp256k1(pubkeyHex));
-    } else if (id.startsWith(DidMethodKeyEd25519Prefix)) {
+    } else if (id.startsWith(Ed25519PublicKeyPrefix)) {
       return new this(new PublicKeyEd25519(pubkeyHex));
     } else {
       throw new Error(`Unsupported \`did:key:*\`: \`${did}\``);

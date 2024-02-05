@@ -1,5 +1,5 @@
-import { randomAsHex } from "@polkadot/util-crypto";
-import { DockKeyPair } from "../misc";
+import { randomAsHex } from '@polkadot/util-crypto';
+import { DockKeyPair } from '../misc';
 
 /**
  * Signing keypair along with the optional key identifier.
@@ -29,14 +29,14 @@ export class DidKeypair extends DockKeyPair {
     dockApi,
     {
       seed = randomAsHex(32),
-      keypairType = "ed25519",
+      keypairType = 'ed25519',
       meta = null,
       keyId = 1,
-    } = {}
+    } = {},
   ) {
     return new DidKeypair(
       dockApi.keyring.addFromUri(seed, meta, keypairType),
-      keyId
+      keyId,
     );
   }
 

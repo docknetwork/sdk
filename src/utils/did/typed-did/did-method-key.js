@@ -1,12 +1,12 @@
-import { u8aToHex, hexToU8a } from "@polkadot/util";
-import { base58btc } from "multiformats/bases/base58";
-import bs58 from "bs58";
-import varint from "varint";
+import { u8aToHex, hexToU8a } from '@polkadot/util';
+import { base58btc } from 'multiformats/bases/base58';
+import bs58 from 'bs58';
+import varint from 'varint';
 
-import { getHexIdentifier } from "../../codec";
-import { PublicKeyEd25519, PublicKeySecp256k1 } from "../../../public-keys";
+import { getHexIdentifier } from '../../codec';
+import { PublicKeyEd25519, PublicKeySecp256k1 } from '../../../public-keys';
 
-import { parseDIDUrl } from "../../../resolver/did/did-resolver";
+import { parseDIDUrl } from '../../../resolver/did/did-resolver';
 
 import {
   DidMethodKeyQualifier,
@@ -14,8 +14,9 @@ import {
   DidMethodKeyBytePrefixSecp256k1,
   DidMethodKeyEd25519ByteSize,
   DidMethodKeySecp256k1ByteSize,
-} from "../constants";
-import { DockKeyPair } from "../../misc";
+  DidMethodKeyEd25519Prefix,
+  DidMethodKeySecp256k1Prefix,
+} from '../constants';
 import DockDidOrDidMethodKey from './dock-did-or-did-method-key';
 
 /**
@@ -38,7 +39,7 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
     } else if (didMethodKey instanceof PublicKeySecp256k1) {
       this.didMethodKey = { secp256k1: didMethodKey.value };
     } else {
-      throw new Error("Unsupported public key type");
+      throw new Error('Unsupported public key type');
     }
   }
 
@@ -70,7 +71,7 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
     } else if (id.startsWith(DidMethodKeyEd25519Prefix)) {
       return new this(new PublicKeyEd25519(pubkeyHex));
     } else {
-      throw new Error("Unsupported `did:key:*`");
+      throw new Error('Unsupported `did:key:*`');
     }
   }
 
@@ -86,7 +87,7 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
       const hex = getHexIdentifier(
         u8aToHex(key.asSecp256k1),
         [],
-        DidMethodKeySecp256k1ByteSize
+        DidMethodKeySecp256k1ByteSize,
       );
 
       return new this(new PublicKeySecp256k1(hex));
@@ -94,7 +95,7 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
       const hex = getHexIdentifier(
         u8aToHex(key.asEd25519),
         [],
-        DidMethodKeyEd25519ByteSize
+        DidMethodKeyEd25519ByteSize,
       );
 
       return new this(new PublicKeyEd25519(hex));
@@ -129,7 +130,7 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
   toQualifiedString() {
     // Convert the hex public key to bytes
     if (!this.publicKey) {
-      throw new Error("Unsupported public key type");
+      throw new Error('Unsupported public key type');
     }
 
     // Define the prefix for ed25519 DID key

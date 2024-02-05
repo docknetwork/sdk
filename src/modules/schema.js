@@ -1,7 +1,7 @@
 import { canonicalize } from 'json-canonicalize';
 import { validate } from 'jsonschema';
 
-import { typedHexDID, typedHexDIDFromSubstrate } from '../utils/did';
+import { typedHexDIDFromSubstrate } from '../utils/did';
 
 import {
   createNewDockBlobId,

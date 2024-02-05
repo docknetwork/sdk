@@ -1,7 +1,5 @@
+import { getHexIdentifier, isHexWithGivenByteSize } from '../../codec';
 
-import { getHexIdentifier } from "../../codec";
-
-import { ApiPromise } from "@polkadot/api";
 import DockDidOrDidMethodKey from './dock-did-or-did-method-key';
 import DockDid from './dock-did';
 import DidMethodKey from './did-method-key'; // eslint-disable-line
@@ -48,30 +46,29 @@ export function typedHexDIDFromSubstrate(api, did) {
  */
 export const createNewDockDID = () => DockDid.random().toQualifiedString();
 
-
 /**
  * Temporary solution for the DID's backward compatibility.
  *
  * --------------------------------------------------------
  */
 // eslint-disable-next-line no-extend-native
-Object.defineProperty(String.prototype, "asDid", {
+Object.defineProperty(String.prototype, 'asDid', {
   get() {
     if (this.isDid) {
       return String(this);
     } else {
-      throw new Error("Not a `Did`");
+      throw new Error('Not a `Did`');
     }
   },
 });
 // eslint-disable-next-line no-extend-native
-Object.defineProperty(String.prototype, "isDid", {
+Object.defineProperty(String.prototype, 'isDid', {
   get() {
     return isHexWithGivenByteSize(String(this), DockDIDByteSize);
   },
 });
 // eslint-disable-next-line no-extend-native
-Object.defineProperty(String.prototype, "toQualifiedString", {
+Object.defineProperty(String.prototype, 'toQualifiedString', {
   get() {
     return new DockDid(this.asDid).toQualifiedString();
   },

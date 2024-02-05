@@ -1,7 +1,7 @@
-import { getStateChange } from "../../misc";
-import { createDidSig } from "../utils";
+import { getStateChange } from '../../misc';
+import { createDidSig } from '../utils';
 
-import { DockDIDQualifier, DidMethodKeyQualifier } from "../constants";
+import { DockDIDQualifier, DidMethodKeyQualifier } from '../constants';
 
 /**
  * Either `did:dock:*` or `did:key:*`.
@@ -22,7 +22,7 @@ export default class DockDidOrDidMethodKey {
    * @returns {this}
    */
   static fromString(did) {
-    if (did.startsWith("0x")) {
+    if (did.startsWith('0x')) {
       return new this.DockDid(did);
     } else {
       return DockDidOrDidMethodKey.fromQualifiedString(did);
@@ -41,7 +41,7 @@ export default class DockDidOrDidMethodKey {
       return this.DidMethodKey.fromQualifiedString(did);
     } else {
       throw new Error(
-        `Unsupported did string: ${did}, expected either \`dock:did:<SS58 DID>\` or \`dock:key:<BS58 public key>\``
+        `Unsupported did string: ${did}, expected either \`dock:did:<SS58 DID>\` or \`dock:key:<BS58 public key>\``,
       );
     }
   }
@@ -65,14 +65,14 @@ export default class DockDidOrDidMethodKey {
    * Extracts raw underlying value if it's `did:dock:*`, throws an error otherwise.
    */
   get asDid() {
-    throw new Error("Not a `Did`");
+    throw new Error('Not a `Did`');
   }
 
   /**
    *  Extracts raw underlying value if it's `did:key:*`, throws an error otherwise.
    */
   get asDidMethodKey() {
-    throw new Error("Not a `DidMethodKey`");
+    throw new Error('Not a `DidMethodKey`');
   }
 
   /**
@@ -124,13 +124,13 @@ export default class DockDidOrDidMethodKey {
    * Converts underlying object to the `JSON` representation suitable for substrate JSON-RPC.
    */
   toJSON() {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 
-    /**
+  /**
    * Returns fully qualified `did:dock:*` encoded in SS58 or `did:key:* encoded in BS58.
    */
-    toQualifiedString() {
-      throw new Error("Unimplemented");
-    }
+  toQualifiedString() {
+    throw new Error('Unimplemented');
+  }
 }

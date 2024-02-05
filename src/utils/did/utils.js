@@ -1,8 +1,10 @@
-import { isHexWithGivenByteSize } from "../codec";
+/* eslint-disable max-classes-per-file */
+
+import { isHexWithGivenByteSize } from '../codec';
 import {
   PublicKey, // eslint-disable-line
   VerificationRelationship, // eslint-disable-line
-} from "../../public-keys";
+} from '../../public-keys';
 
 import { Signature } from "../../signatures"; // eslint-disable-line
 
@@ -15,7 +17,7 @@ import { DockDIDByteSize } from './constants';
 export class NoDIDError extends Error {
   constructor(did) {
     super(`DID (${did}) does not exist`);
-    this.name = "NoDIDError";
+    this.name = 'NoDIDError';
     this.did = did;
     this.message = `A DID document lookup was successful, but the DID in question does not exist (${did}). This is different from a network error.`;
   }
@@ -27,10 +29,9 @@ export class NoDIDError extends Error {
 export class NoOnchainDIDError extends Error {
   constructor(did) {
     super(`DID (${did}) is an off-chain DID`);
-    this.name = "NoOnchainDIDError";
+    this.name = 'NoOnchainDIDError';
     this.did = did;
-    this.message =
-      "The DID exists on chain but is an off-chain DID, meaning the DID document exists off-chain.";
+    this.message = 'The DID exists on chain but is an off-chain DID, meaning the DID document exists off-chain.';
   }
 }
 
@@ -40,10 +41,9 @@ export class NoOnchainDIDError extends Error {
 export class NoOffchainDIDError extends Error {
   constructor(did) {
     super(`DID (${did}) is an on-chain DID`);
-    this.name = "NoOffchainDIDError";
+    this.name = 'NoOffchainDIDError';
     this.did = did;
-    this.message =
-      "The DID exists on chain and is an on-chain DID but the lookup was performed for an off-chain DID.";
+    this.message = 'The DID exists on chain and is an on-chain DID but the lookup was performed for an off-chain DID.';
   }
 }
 
@@ -69,7 +69,7 @@ export function validateDockDIDSS58Identifier(identifier) {
   const regex = new RegExp(/^[5KL][1-9A-HJ-NP-Za-km-z]{47}$/);
   const matches = regex.exec(identifier);
   if (!matches) {
-    throw new Error("The identifier must be 32 bytes and valid SS58 string");
+    throw new Error('The identifier must be 32 bytes and valid SS58 string');
   }
 }
 
@@ -98,7 +98,7 @@ export function createDidKey(publicKey, verRel) {
 export function createDidSig(did, { keyId }, rawSig) {
   const sig = rawSig.toJSON();
 
-  if (typeof did === "string") {
+  if (typeof did === 'string') {
     return {
       did,
       keyId,
@@ -121,7 +121,7 @@ export function createDidSig(did, { keyId }, rawSig) {
     };
   } else {
     throw new Error(
-      `Incorrect DID passed: \`${did}\`, expected instance of either \`DockDid\` or \`DidMethodKey\``
+      `Incorrect DID passed: \`${did}\`, expected instance of either \`DockDid\` or \`DidMethodKey\``,
     );
   }
 }

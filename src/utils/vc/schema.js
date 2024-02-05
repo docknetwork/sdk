@@ -8,7 +8,6 @@ import {
   credentialIDField,
   credentialContextField,
 } from './constants';
-import { DockDid } from '../did';
 
 /**
  * The function uses `jsonschema` package to verify that the expanded `credential`'s subject `credentialSubject` has the JSON

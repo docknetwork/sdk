@@ -3,14 +3,14 @@ import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
 import {
   validateDockDIDHexIdentifier,
   validateDockDIDSS58Identifier,
-  DockDIDQualifier, DockDIDByteSize, DockDIDMethodKeyQualifier,
+  DockDIDQualifier, DockDIDByteSize, DidMethodKeyQualifier,
   typedHexDID,
 } from '../../src/utils/did';
 import { getHexIdentifier } from '../../src/utils/codec';
 
 const hexDid = (did) => getHexIdentifier(
   did,
-  [DockDIDQualifier, DockDIDMethodKeyQualifier],
+  [DockDIDQualifier, DidMethodKeyQualifier],
   DockDIDByteSize,
 );
 

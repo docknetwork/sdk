@@ -14,7 +14,7 @@ import {
 import {
   createNewDockDID,
   DidKeypair,
-  DockDidMethodKey,
+  DidMethodKey,
   typedHexDID,
 } from '../../src/utils/did';
 import { registerNewDIDUsingPair } from './helpers';
@@ -86,7 +86,7 @@ buildTest('Trust Registry', () => {
     verifierDIDMethodKeyPair = new DidKeypair(
       dock.keyring.addFromUri(verifierDIDMethodKeySeed, null, 'ed25519'),
     );
-    verifierDIDMethodKey = new DockDidMethodKey(verifierDIDMethodKeyPair.publicKey());
+    verifierDIDMethodKey = new DidMethodKey(verifierDIDMethodKeyPair.publicKey());
 
     // The keyring should be initialized before any test begins as this suite is testing trust registry
     const account = dock.keyring.addFromUri(TestAccountURI);

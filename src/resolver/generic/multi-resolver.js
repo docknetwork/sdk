@@ -23,14 +23,14 @@ import { ensureString } from '../../utils/type-helpers';
  */
 export default class MultiResolver extends Resolver {
   /**
-   * Matching string prefix, array of string prefixes, or wildcard pattern.
+   * Matching string prefix, an array of string prefixes, or wildcard pattern.
    * @type {Array<string> | string | symbol}
    * @abstract
    * @static
    */
   static PREFIX;
   /**
-   * Matching string method, array of string methods, or wildcard pattern.
+   * Matching string method, an array of string methods, or wildcard pattern.
    * @type {Array<string> | string | symbol}
    * @abstract
    * @static
@@ -58,7 +58,7 @@ export default class MultiResolver extends Resolver {
 
       if (!resolverList.length) {
         throw new Error(
-          'No resolvers were provided. You need to either implement `resolve` or provide a list of resolvers.',
+          'No resolvers were provided. You need to either implement `resolve` or provide a list of resolvers',
         );
       }
     }

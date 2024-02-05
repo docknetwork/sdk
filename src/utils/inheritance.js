@@ -2,7 +2,7 @@
  * Enhances the provided class with the given list of static properties to require
  * in the inherited class.
  * All properties will be checked for presence during the object constructor call.
- * Each property on its own will be checked every time it will be accessed.
+ * Each property on its own will be checked every time it is accessed.
  * In case some property is missing, an error will be thrown.
  *
  * @template T
@@ -16,7 +16,7 @@ export function withExtendedStaticProperties(properties, parentClass) {
       super(...args);
 
       /*
-       * Ensures that properties were extended properly.
+       * Ensures that properties are extended properly.
        */
       for (const property of properties) {
         if (this.constructor[property] == null) {

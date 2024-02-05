@@ -1,7 +1,6 @@
 import jsonld from 'jsonld';
 import { validate } from 'jsonschema';
 import defaultDocumentLoader from './document-loader';
-import { hexDIDToQualified } from '../did';
 
 import {
   expandedSubjectProperty,
@@ -9,6 +8,7 @@ import {
   credentialIDField,
   credentialContextField,
 } from './constants';
+import { DockDid } from '../did';
 
 /**
  * The function uses `jsonschema` package to verify that the expanded `credential`'s subject `credentialSubject` has the JSON
@@ -89,7 +89,7 @@ export async function getAndValidateSchemaIfPresent(
         schemaObj = {
           ...data,
           id: schemaUri,
-          author: hexDIDToQualified(author),
+          author: author.toQualifiedString(),
         };
       } else {
         schemaObj = document;

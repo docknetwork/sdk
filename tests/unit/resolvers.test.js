@@ -83,7 +83,7 @@ describe('Resolvers', () => {
       "Static property `PREFIX` of `BMethod` isn't extended properly",
     );
     expect(() => new APrefixBMethod()).toThrowError(
-      'No resolvers were provided. You need to either implement `resolve` or provide a list of resolvers.',
+      'No resolvers were provided. You need to either implement `resolve` or provide a list of resolvers',
     );
     expect(() => new APrefix()).toThrowError(
       "Static property `METHOD` of `APrefix` isn't extended properly",

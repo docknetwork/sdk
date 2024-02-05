@@ -126,7 +126,7 @@ describe('Schema Blob Module Integration', () => {
     expect(schemaObj).toMatchObject({
       ...exampleSchema,
       id: blobId,
-      author: hexDid.toQualifiedString(),
+      author: hexDid.toQualifiedEncodedString(),
     });
   }, 20000);
 

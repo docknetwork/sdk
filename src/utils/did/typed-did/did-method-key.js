@@ -25,6 +25,7 @@ import DockDidOrDidMethodKey from './dock-did-or-did-method-key';
  * As of now, the public key can be either `PublicKeyEd25519` or `PublicKeySecp256k1`.
  */
 export default class DidMethodKey extends DockDidOrDidMethodKey {
+  static Qualifier = DidMethodKeyQualifier;
   /**
    * Instantiates `did:key:*` using supplied public key.
    * As of now, the public key can be either `PublicKeyEd25519` or `PublicKeySecp256k1`.
@@ -71,7 +72,7 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
     } else if (id.startsWith(DidMethodKeyEd25519Prefix)) {
       return new this(new PublicKeyEd25519(pubkeyHex));
     } else {
-      throw new Error('Unsupported `did:key:*`');
+      throw new Error(`Unsupported \`did:key:*\`: \`${did}\``);
     }
   }
 
@@ -80,7 +81,7 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
    * @param {object} key - substrate did method key
    * @returns {this}
    */
-  static fromSubstrate(did) {
+  static fromSubstrateValue(did) {
     const key = did.asDidMethodKey;
 
     if (key.isSecp256k1) {
@@ -112,6 +113,16 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
     return this.didMethodKey;
   }
 
+  /**
+   * Returns underlying public key.
+   * @returns {PublicKeyEd25519|PublicKeySecp256k1}
+   */
+  get publicKey() {
+    return this.didMethodKey.ed25519
+      ? new PublicKeyEd25519(this.didMethodKey.ed25519)
+      : new PublicKeySecp256k1(this.didMethodKey.secp256k1);
+  }
+
   toJSON() {
     return {
       DidMethodKey: this.didMethodKey.ed25519
@@ -121,18 +132,13 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
   }
 
   toString() {
-    return this.toQualifiedString();
+    return this.toQualifiedEncodedString();
   }
 
   /**
-   * Returns fully qualified public key encoded in `BS58` according to the `did:key:*` spec.
+   * Returns unqualified public key encoded in `BS58`.
    */
-  toQualifiedString() {
-    // Convert the hex public key to bytes
-    if (!this.publicKey) {
-      throw new Error('Unsupported public key type');
-    }
-
+  toEncodedString() {
     // Define the prefix for ed25519 DID key
     const publicKeyBytes = hexToU8a(this.publicKey.value);
     const prefix = this.didMethodKey.ed25519
@@ -145,19 +151,7 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
     didKeyBytes.set(publicKeyBytes, prefix.length);
 
     // Encode the concatenated bytes to Base58 with z prefix
-    const encodedDidKey = `z${bs58.encode(didKeyBytes)}`;
-
-    return `${DidMethodKeyQualifier}${encodedDidKey}`;
-  }
-
-  /**
-   * Returns underlying public key.
-   * @returns {PublicKeyEd25519|PublicKeySecp256k1}
-   */
-  get publicKey() {
-    return this.didMethodKey.ed25519
-      ? new PublicKeyEd25519(this.didMethodKey.ed25519)
-      : new PublicKeySecp256k1(this.didMethodKey.secp256k1);
+    return `z${bs58.encode(didKeyBytes)}`;
   }
 }
 

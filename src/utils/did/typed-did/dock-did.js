@@ -10,6 +10,8 @@ import DockDidOrDidMethodKey from './dock-did-or-did-method-key';
  * `did:dock:*`
  */
 export default class DockDid extends DockDidOrDidMethodKey {
+  static Qualifier = DockDIDQualifier;
+
   /**
    * Instantiates `DockDid` using supplied 32-byte hex sequence.
    * @param {*} did
@@ -44,7 +46,7 @@ export default class DockDid extends DockDidOrDidMethodKey {
    * @param {object} did - substrate did
    * @returns {this}
    */
-  static fromSubstrate(did) {
+  static fromSubstrateValue(did) {
     return new this(getHexIdentifier(did.asDid, [], DockDIDByteSize));
   }
 
@@ -65,10 +67,10 @@ export default class DockDid extends DockDidOrDidMethodKey {
   }
 
   /**
-   * Returns fully qualified DID encoded as a `SS58` address.
+   * Returns unqualified DID encoded as a `SS58` address.
    */
-  toQualifiedString() {
-    return `${DockDIDQualifier}${encodeAddress(this.asDid)}`;
+  toEncodedString() {
+    return encodeAddress(this.asDid);
   }
 }
 

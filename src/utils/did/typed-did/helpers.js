@@ -36,7 +36,7 @@ export function typedHexDIDFromSubstrate(api, did) {
   if (api.specVersion < 50) {
     return getHexIdentifier(did, DockDIDQualifier, DockDIDByteSize);
   } else {
-    return DockDidOrDidMethodKey.fromSubstrate(did);
+    return DockDidOrDidMethodKey.fromSubstrateValue(did);
   }
 }
 
@@ -44,7 +44,7 @@ export function typedHexDIDFromSubstrate(api, did) {
  * Create and return a fully qualified Dock DID, i.e. "did:dock:<SS58 string>"
  * @returns {string} - The DID
  */
-export const createNewDockDID = () => DockDid.random().toQualifiedString();
+export const createNewDockDID = () => DockDid.random().toQualifiedEncodedString();
 
 /**
  * Temporary solution for the DID's backward compatibility.
@@ -68,9 +68,9 @@ Object.defineProperty(String.prototype, 'isDid', {
   },
 });
 // eslint-disable-next-line no-extend-native
-Object.defineProperty(String.prototype, 'toQualifiedString', {
-  get() {
-    return new DockDid(this.asDid).toQualifiedString();
+Object.defineProperty(String.prototype, 'toQualifiedEncodedString', {
+  value: function toQualifiedEncodedString() {
+    return new DockDid(this.asDid).toQualifiedEncodedString();
   },
 });
 

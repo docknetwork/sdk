@@ -2,11 +2,18 @@ import { getStateChange } from '../../misc';
 import { createDidSig } from '../utils';
 
 import { DockDIDQualifier, DidMethodKeyQualifier } from '../constants';
+import { withExtendedStaticProperties } from '../../inheritance';
 
 /**
  * Either `did:dock:*` or `did:key:*`.
  */
-export default class DockDidOrDidMethodKey {
+class DockDidOrDidMethodKey {
+  /**
+   * Prefix to form the fully qualified string.
+   *
+   * @type {string}
+   */
+  static Qualifier;
   /**
    * @type {typeof this}
    */
@@ -25,7 +32,7 @@ export default class DockDidOrDidMethodKey {
     if (did.startsWith('0x')) {
       return new this.DockDid(did);
     } else {
-      return DockDidOrDidMethodKey.fromQualifiedString(did);
+      return this.fromQualifiedString(did);
     }
   }
 
@@ -51,11 +58,11 @@ export default class DockDidOrDidMethodKey {
    * @param {object} did - substrate did or did method key
    * @returns {this}
    */
-  static fromSubstrate(did) {
+  static fromSubstrateValue(did) {
     if (did.isDid) {
-      return this.DockDid.fromSubstrate(did);
+      return this.DockDid.fromSubstrateValue(did);
     } else if (did.isDidMethodKey) {
-      return this.DidMethodKey.fromSubstrate(did);
+      return this.DidMethodKey.fromSubstrateValue(did);
     } else {
       throw new Error(`Invalid \`did:*\` provided: \`${did}\``);
     }
@@ -128,9 +135,21 @@ export default class DockDidOrDidMethodKey {
   }
 
   /**
-   * Returns fully qualified `did:dock:*` encoded in SS58 or `did:key:* encoded in BS58.
+   * Returns underlying value encoded according to the specification.
    */
-  toQualifiedString() {
+  toEncodedString() {
     throw new Error('Unimplemented');
   }
+
+  /**
+   * Returns fully qualified `did:dock:*` encoded in SS58 or `did:key:*` encoded in BS58.
+   */
+  toQualifiedEncodedString() {
+    return `${this.constructor.Qualifier}${this.toEncodedString()}`;
+  }
 }
+
+export default withExtendedStaticProperties(
+  ['Qualifier'],
+  DockDidOrDidMethodKey,
+);

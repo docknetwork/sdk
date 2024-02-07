@@ -1,6 +1,6 @@
 import { BTreeSet, BTreeMap } from '@polkadot/types';
 import { DidMethodKey, DockDid, typedHexDID } from '../utils/did';
-import { getDidNonce, ensureMatchesStructurePattern } from '../utils/misc';
+import { getDidNonce, ensureMatchesPattern } from '../utils/misc';
 
 /**
  * `Trust Registry` module.
@@ -91,7 +91,7 @@ export default class TrustRegistryModule {
       nonce,
       didModule,
     });
-    ensureMatchesStructurePattern(
+    ensureMatchesPattern(
       this.constructor.SchemasUpdatePattern,
       schemas,
     );

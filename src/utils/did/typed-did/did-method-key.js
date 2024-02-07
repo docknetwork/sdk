@@ -47,7 +47,7 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
   /**
    * Creates a new `DidMethodKey` from the supplied keypair.
    *
-   * @param {DockKeyPair} keypair
+   * @param {DockKeypair} keypair
    * @returns {this}
    */
   static fromKeypair(keypair) {

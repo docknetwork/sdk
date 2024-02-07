@@ -5,7 +5,6 @@ import {
   notNilAnd,
   finiteNumber,
   parseBool,
-  timestampLogger,
   binarySearchFirstSatisfyingBlock,
 } from "./helpers";
 import { o, defaultTo, unless, either, curry, __, sum } from "ramda";
@@ -153,7 +152,7 @@ const main = withDockAPI(
       .sort(([i1], [i2]) => i1 - i2)
       .reduce(
         (acc, [index, { total, staking, commission, blocks, prefs }]) => {
-          timestampLogger.log(
+          console.log(
             `Era ${index}: paid = \`${formatDock(
               total
             )}\` (staking = ${formatDock(staking)}, commission = ${formatDock(
@@ -178,7 +177,7 @@ const main = withDockAPI(
         }
       );
 
-    timestampLogger.log(
+    console.log(
       `Summarised stash payout for ${Stash} in ${StartEra}-${
         StartEra + ErasCount - 1
       } eras - total = \`${formatDock(total, {
@@ -390,4 +389,4 @@ const validatorStashPayout = (
   };
 };
 
-main().catch(timestampLogger.error);
+main().catch(console.error);

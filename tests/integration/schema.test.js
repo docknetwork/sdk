@@ -3,8 +3,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 
 import { DockAPI } from '../../src/index';
 
-import {
-  createNewDockDID, typedHexDID, DidKeypair } from '../../src/utils/did';
+import { createNewDockDID, typedHexDID, DidKeypair } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { verifyCredential, verifyPresentation } from '../../src/utils/vc/index';
 import { blobHexIdToQualified, createNewDockBlobId, DockBlobIdByteSize } from '../../src/modules/blob';

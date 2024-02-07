@@ -298,7 +298,7 @@ export const formatDock = (value, config = {}) =>
 /**
  * Enhances supplied function by providing access to the initialized global dock API.
  *
- * Global dock API object will be initialized with the given params before passing to the function,
+ * Dock API object will be initialized with the given params before passing to the function,
  * and will be disconnected when the promise will be either resolved or rejected.
  *
  * @template T

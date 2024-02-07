@@ -1,6 +1,6 @@
-import { BTreeSet } from '@polkadot/types';
-import { typedHexDID } from '../utils/did';
-import { getDidNonce } from '../utils/misc';
+import { BTreeSet, BTreeMap } from '@polkadot/types';
+import { DidMethodKey, DockDid, typedHexDID } from '../utils/did';
+import { getDidNonce, ensureMatchesPattern } from '../utils/misc';
 
 /**
  * `Trust Registry` module.
@@ -42,7 +42,10 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(convenerDid, { nonce, didModule });
+    const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(
+      convenerDid,
+      { nonce, didModule },
+    );
 
     return this.signAndSend(
       convenerHexDid.changeState(
@@ -63,43 +66,6 @@ export default class TrustRegistryModule {
   }
 
   /**
-   * Appends new schemas to the registry.
-   * @param convenerDid
-   * @param registryId
-   * @param schemas
-   * @param signingKeyRef
-   * @param nonce
-   * @param didModule
-   * @param params
-   * @param waitForFinalization
-   * @param params
-   * @returns {Promise<null>}
-   */
-  async addSchemaMetadata(
-    convenerDid,
-    registryId,
-    schemas,
-    signingKeyRef,
-    { nonce = undefined, didModule = undefined } = {},
-    waitForFinalization = true,
-    params = {},
-  ) {
-    const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(convenerDid, { nonce, didModule });
-
-    return this.signAndSend(
-      convenerHexDid.changeState(
-        this.api,
-        this.module.addSchemaMetadata,
-        'AddSchemaMetadata',
-        { registryId, schemas, nonce: lastNonce },
-        signingKeyRef,
-      ),
-      waitForFinalization,
-      params,
-    );
-  }
-
-  /**
    * Updates schemas metadatas in the registry.
    * @param convenerOrIssuerOrVerifierDid
    * @param registryId
@@ -112,7 +78,7 @@ export default class TrustRegistryModule {
    * @param params
    * @returns {Promise<null>}
    */
-  async updateSchemaMetadata(
+  async setSchemasMetadata(
     convenerOrIssuerOrVerifierDid,
     registryId,
     schemas,
@@ -121,13 +87,20 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const [convenerOrIssuerOrVerifierHexDid, lastNonce] = await this.getActorDidAndNonce(convenerOrIssuerOrVerifierDid, { nonce, didModule });
+    const [convenerOrIssuerOrVerifierHexDid, lastNonce] = await this.getActorDidAndNonce(convenerOrIssuerOrVerifierDid, {
+      nonce,
+      didModule,
+    });
+    ensureMatchesPattern(
+      this.constructor.SchemasUpdatePattern,
+      schemas,
+    );
 
     return this.signAndSend(
       convenerOrIssuerOrVerifierHexDid.changeState(
         this.api,
-        this.module.updateSchemaMetadata,
-        'UpdateSchemaMetadata',
+        this.module.setSchemasMetadata,
+        'SetSchemasMetadata',
         { registryId, schemas, nonce: lastNonce },
         signingKeyRef,
       ),
@@ -158,7 +131,10 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(convenerDid, { nonce, didModule });
+    const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(
+      convenerDid,
+      { nonce, didModule },
+    );
 
     const hexIssuers = new BTreeSet();
     for (const issuer of issuers) {
@@ -200,7 +176,10 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(convenerDid, { nonce, didModule });
+    const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(
+      convenerDid,
+      { nonce, didModule },
+    );
 
     const hexIssuers = new BTreeSet();
     for (const issuer of issuers) {
@@ -241,7 +220,10 @@ export default class TrustRegistryModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const [issuerHexDid, lastNonce] = await this.getActorDidAndNonce(issuerDid, { nonce, didModule });
+    const [issuerHexDid, lastNonce] = await this.getActorDidAndNonce(
+      issuerDid,
+      { nonce, didModule },
+    );
 
     return this.signAndSend(
       issuerHexDid.changeState(
@@ -263,9 +245,124 @@ export default class TrustRegistryModule {
    * @param didModule
    * @returns {Promise}
    */
-  async getActorDidAndNonce(actorDid, { nonce = undefined, didModule = undefined } = {}) {
+  async getActorDidAndNonce(
+    actorDid,
+    { nonce = undefined, didModule = undefined } = {},
+  ) {
     const hexDID = typedHexDID(this.api, actorDid);
     const lastNonce = nonce ?? (await getDidNonce(hexDID, nonce, didModule));
     return [hexDID, lastNonce];
   }
 }
+
+const DockDidOrDidMethodKeyPattern = {
+  $anyOf: [{ $instanceOf: DockDid }, { $instanceOf: DidMethodKey }],
+};
+
+const VerificationPricePattern = {
+  $anyOf: [{ $matchType: 'number' }, { $matchType: 'object' }],
+};
+
+const VerifiersPattern = {
+  $instanceOf: BTreeSet,
+  $iterableOf: DockDidOrDidMethodKeyPattern,
+};
+
+const VerifiersUpdatePattern = {
+  $instanceOf: BTreeMap,
+  $mapOf: [
+    DockDidOrDidMethodKeyPattern,
+    {
+      $anyOf: [
+        { $matchValue: 'Remove' },
+        {
+          $matchValue: 'Add',
+        },
+      ],
+    },
+  ],
+};
+
+const IssuerPricesPattern = {
+  $instanceOf: BTreeMap,
+  $mapOf: [{ $matchType: 'string' }, VerificationPricePattern],
+};
+
+const IssuerPricesUpdatePattern = {
+  $instanceOf: BTreeMap,
+  $mapOf: [
+    { $matchType: 'string' },
+    {
+      $anyOf: [
+        { $matchValue: 'Remove' },
+        {
+          $objOf: {
+            Add: VerificationPricePattern,
+            Set: VerificationPricePattern,
+          },
+        },
+      ],
+    },
+  ],
+};
+
+const IssuersPattern = {
+  $instanceOf: BTreeMap,
+  $mapOf: [DockDidOrDidMethodKeyPattern, IssuerPricesPattern],
+};
+
+const IssuersUpdatePattern = {
+  $instanceOf: BTreeMap,
+  $mapOf: [
+    DockDidOrDidMethodKeyPattern,
+    {
+      $objOf: {
+        Modify: IssuerPricesUpdatePattern,
+        Set: IssuerPricesPattern,
+      },
+    },
+  ],
+};
+
+TrustRegistryModule.SchemasUpdatePattern = {
+  $instanceOf: BTreeMap,
+  $mapOf: [
+    { $matchType: 'string' },
+    {
+      $anyOf: [
+        {
+          $objOf: {
+            Add: {
+              $matchObject: {
+                issuers: IssuersPattern,
+                verifiers: VerifiersPattern,
+              },
+            },
+            Set: {
+              $matchObject: {
+                issuers: IssuersPattern,
+                verifiers: VerifiersPattern,
+              },
+            },
+            Modify: {
+              $matchObject: {
+                issuers: {
+                  $objOf: { Modify: IssuersUpdatePattern, Set: IssuersPattern },
+                },
+                verifiers: {
+                  $objOf: {
+                    Modify: VerifiersUpdatePattern,
+                    Set: VerifiersPattern,
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          $matchValue: 'Remove',
+        },
+      ],
+    },
+  ],
+};

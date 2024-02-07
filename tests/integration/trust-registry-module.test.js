@@ -83,10 +83,12 @@ buildTest('Trust Registry', () => {
       1,
     );
 
-    verifierDIDMethodKeyPair = new DidKeypair(
-      dock.keyring.addFromUri(verifierDIDMethodKeySeed, null, 'ed25519'),
-    );
-    verifierDIDMethodKey = new DidMethodKey(verifierDIDMethodKeyPair.publicKey());
+    verifierDIDMethodKeyPair = DidKeypair.fromApi(dock, {
+      seed: verifierDIDMethodKeySeed,
+      meta: null,
+      keypairType: 'ed25519',
+    });
+    verifierDIDMethodKey = DidMethodKey.fromKeypair(verifierDIDMethodKeyPair);
 
     // The keyring should be initialized before any test begins as this suite is testing trust registry
     const account = dock.keyring.addFromUri(TestAccountURI);
@@ -131,9 +133,10 @@ buildTest('Trust Registry', () => {
     });
   });
 
-  it('Adds schemas to the existing Trust Registry', async () => {
+  it('Adds schemas metadata to the existing Trust Registry', async () => {
     // Create a random trust registry id
     const schemaId = randomAsHex(32);
+    const otherSchemaId = randomAsHex(32);
 
     await dock.trustRegistry.initOrUpdate(
       convenerDID,
@@ -160,11 +163,18 @@ buildTest('Trust Registry', () => {
 
     const schemas = new BTreeMap();
     schemas.set(schemaId, {
-      issuers,
-      verifiers,
+      Set: {
+        issuers,
+        verifiers,
+      },
+    });
+    schemas.set(otherSchemaId, {
+      Add: {
+        issuers,
+      },
     });
 
-    await dock.trustRegistry.addSchemaMetadata(
+    await dock.trustRegistry.setSchemasMetadata(
       convenerDID,
       trustRegistryId,
       schemas,
@@ -183,6 +193,119 @@ buildTest('Trust Registry', () => {
       issuers: expectedFormattedIssuers(issuers),
       verifiers: expectedFormattedVerifiers(verifiers),
     });
+    expect(
+      (
+        await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
+          otherSchemaId,
+          trustRegistryId,
+        )
+      ).toJSON(),
+    ).toEqual({
+      issuers: expectedFormattedIssuers(issuers),
+      verifiers: expectedFormattedVerifiers(new BTreeSet()),
+    });
+  });
+
+  it('Removes schemas metadata from the Trust Registry', async () => {
+    // Create a random trust registry id
+    const schemaId = randomAsHex(32);
+    const otherSchemaId = randomAsHex(32);
+
+    await dock.trustRegistry.initOrUpdate(
+      convenerDID,
+      trustRegistryId,
+      'Test Registry',
+      'Gov framework',
+      convenerPair,
+      dock,
+    );
+
+    const verifiers = new BTreeSet();
+    verifiers.add(typedHexDID(dock.api, verifierDID));
+    verifiers.add(typedHexDID(dock.api, verifierDID2));
+    verifiers.add(verifierDIDMethodKey);
+
+    const issuers = new BTreeMap();
+    const issuerPrices = new BTreeMap();
+    issuerPrices.set('A', 20);
+    const issuer2Prices = new BTreeMap();
+    issuer2Prices.set('A', 20);
+
+    issuers.set(typedHexDID(dock.api, issuerDID), issuerPrices);
+    issuers.set(typedHexDID(dock.api, issuerDID2), issuer2Prices);
+
+    let schemas = new BTreeMap();
+    schemas.set(schemaId, {
+      Add: {
+        issuers,
+        verifiers,
+      },
+    });
+    schemas.set(otherSchemaId, {
+      Add: {
+        issuers,
+      },
+    });
+
+    await dock.trustRegistry.setSchemasMetadata(
+      convenerDID,
+      trustRegistryId,
+      schemas,
+      convenerPair,
+      dock,
+    );
+
+    expect(
+      (
+        await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
+          schemaId,
+          trustRegistryId,
+        )
+      ).toJSON(),
+    ).toEqual({
+      issuers: expectedFormattedIssuers(issuers),
+      verifiers: expectedFormattedVerifiers(verifiers),
+    });
+    expect(
+      (
+        await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
+          otherSchemaId,
+          trustRegistryId,
+        )
+      ).toJSON(),
+    ).toEqual({
+      issuers: expectedFormattedIssuers(issuers),
+      verifiers: expectedFormattedVerifiers(new BTreeSet()),
+    });
+
+    schemas = new BTreeMap();
+    schemas.set(schemaId, 'Remove');
+    schemas.set(otherSchemaId, 'Remove');
+
+    await dock.trustRegistry.setSchemasMetadata(
+      convenerDID,
+      trustRegistryId,
+      schemas,
+      convenerPair,
+      dock,
+    );
+
+    expect(
+      (
+        await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
+          schemaId,
+          trustRegistryId,
+        )
+      ).toJSON(),
+    ).toEqual(null);
+    expect(
+      (
+        await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
+          otherSchemaId,
+          trustRegistryId,
+        )
+      ).toJSON(),
+    ).toEqual(null);
   });
 
   it('Suspends issuers in the existing Trust Registry', async () => {
@@ -214,11 +337,13 @@ buildTest('Trust Registry', () => {
 
     const schemas = new BTreeMap();
     schemas.set(schemaId, {
-      issuers,
-      verifiers,
+      Set: {
+        issuers,
+        verifiers,
+      },
     });
 
-    await dock.trustRegistry.addSchemaMetadata(
+    await dock.trustRegistry.setSchemasMetadata(
       convenerDID,
       trustRegistryId,
       schemas,
@@ -235,7 +360,14 @@ buildTest('Trust Registry', () => {
     );
 
     for (const issuer of [issuerDID, issuerDID2]) {
-      expect((await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(trustRegistryId, typedHexDID(dock.api, issuer))).toJSON()).toEqual({
+      expect(
+        (
+          await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(
+            trustRegistryId,
+            typedHexDID(dock.api, issuer),
+          )
+        ).toJSON(),
+      ).toEqual({
         suspended: true,
         delegated: [],
       });
@@ -250,14 +382,28 @@ buildTest('Trust Registry', () => {
     );
 
     for (const issuer of [issuerDID]) {
-      expect((await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(trustRegistryId, typedHexDID(dock.api, issuer))).toJSON()).toEqual({
+      expect(
+        (
+          await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(
+            trustRegistryId,
+            typedHexDID(dock.api, issuer),
+          )
+        ).toJSON(),
+      ).toEqual({
         suspended: false,
         delegated: [],
       });
     }
 
     for (const issuer of [issuerDID2]) {
-      expect((await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(trustRegistryId, typedHexDID(dock.api, issuer))).toJSON()).toEqual({
+      expect(
+        (
+          await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(
+            trustRegistryId,
+            typedHexDID(dock.api, issuer),
+          )
+        ).toJSON(),
+      ).toEqual({
         suspended: true,
         delegated: [],
       });
@@ -275,7 +421,14 @@ buildTest('Trust Registry', () => {
       dock,
     );
 
-    expect((await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(trustRegistryId, typedHexDID(dock.api, issuerDID))).toJSON()).toEqual({
+    expect(
+      (
+        await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(
+          trustRegistryId,
+          typedHexDID(dock.api, issuerDID),
+        )
+      ).toJSON(),
+    ).toEqual({
       suspended: false,
       delegated: [],
     });
@@ -291,13 +444,20 @@ buildTest('Trust Registry', () => {
       dock,
     );
 
-    expect((await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(trustRegistryId, typedHexDID(dock.api, issuerDID))).toJSON()).toEqual({
+    expect(
+      (
+        await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(
+          trustRegistryId,
+          typedHexDID(dock.api, issuerDID),
+        )
+      ).toJSON(),
+    ).toEqual({
       suspended: false,
       delegated: [typedHexDID(dock.api, issuerDID2)],
     });
   });
 
-  it('Updates schemas in the existing Trust Registry', async () => {
+  it('Updates schemas metadata in the existing Trust Registry', async () => {
     // Create a random trust registry id
     const schemaId = randomAsHex(32);
 
@@ -330,44 +490,15 @@ buildTest('Trust Registry', () => {
       verifiers,
     });
 
-    await dock.trustRegistry.addSchemaMetadata(
-      convenerDID,
-      trustRegistryId,
-      schemas,
-      convenerPair,
-      dock,
-    );
-
-    expect(
-      (
-        await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
-          schemaId,
-          trustRegistryId,
-        )
-      ).toJSON(),
-    ).toEqual({
-      issuers: expectedFormattedIssuers(issuers),
-      verifiers: expectedFormattedVerifiers(verifiers),
-    });
-
     let schemasUpdate = new BTreeMap();
-
-    issuers = new BTreeMap();
-    issuerPrices = new BTreeMap();
-    issuerPrices.set('A', 65);
-    issuer2Prices = new BTreeMap();
-    issuer2Prices.set('A', 75);
-
-    issuers.set(typedHexDID(dock.api, issuerDID), issuerPrices);
-    issuers.set(typedHexDID(dock.api, issuerDID2), issuer2Prices);
-
     schemasUpdate.set(schemaId, {
-      issuers: {
-        Set: issuers,
+      Add: {
+        issuers,
+        verifiers,
       },
     });
 
-    await dock.trustRegistry.updateSchemaMetadata(
+    await dock.trustRegistry.setSchemasMetadata(
       convenerDID,
       trustRegistryId,
       schemasUpdate,
@@ -388,19 +519,68 @@ buildTest('Trust Registry', () => {
     });
 
     schemasUpdate = new BTreeMap();
+
+    issuers = new BTreeMap();
+    issuerPrices = new BTreeMap();
+    issuerPrices.set('A', 65);
     issuer2Prices = new BTreeMap();
-    issuer2Prices.set('A', 25);
+    issuer2Prices.set('A', 75);
+
+    issuers.set(typedHexDID(dock.api, issuerDID), issuerPrices);
+    issuers.set(typedHexDID(dock.api, issuerDID2), issuer2Prices);
+
+    schemasUpdate.set(schemaId, {
+      Modify: {
+        issuers: {
+          Set: issuers,
+        },
+      },
+    });
+
+    await dock.trustRegistry.setSchemasMetadata(
+      convenerDID,
+      trustRegistryId,
+      schemasUpdate,
+      convenerPair,
+      dock,
+    );
+
+    expect(
+      (
+        await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
+          schemaId,
+          trustRegistryId,
+        )
+      ).toJSON(),
+    ).toEqual({
+      issuers: expectedFormattedIssuers(issuers),
+      verifiers: expectedFormattedVerifiers(verifiers),
+    });
+
+    schemasUpdate = new BTreeMap();
+
+    const issuer2PricesUpdate = new BTreeMap();
+    issuer2PricesUpdate.set('C', { Add: 25 });
+    issuer2PricesUpdate.set('B', { Set: 36 });
+    issuer2PricesUpdate.set('A', 'Remove');
+
+    issuer2Prices = new BTreeMap();
+    issuer2Prices.set('C', 25);
     issuer2Prices.set('B', 36);
 
     const issuersUpdate = new BTreeMap();
     issuersUpdate.set(typedHexDID(dock.api, issuerDID2), {
-      Set: issuer2Prices,
+      Modify: issuer2PricesUpdate,
     });
+
     schemasUpdate.set(schemaId, {
-      issuers: {
-        Modify: issuersUpdate,
+      Modify: {
+        issuers: {
+          Modify: issuersUpdate,
+        },
       },
     });
+
     issuers = new BTreeMap();
     issuers.set(typedHexDID(dock.api, issuerDID2), issuer2Prices);
     issuers.set(typedHexDID(dock.api, issuerDID), issuerPrices);
@@ -409,7 +589,7 @@ buildTest('Trust Registry', () => {
       verifiers: schemas.get(schemaId).verifiers,
     });
 
-    await dock.trustRegistry.updateSchemaMetadata(
+    await dock.trustRegistry.setSchemasMetadata(
       issuerDID2,
       trustRegistryId,
       schemasUpdate,
@@ -431,16 +611,17 @@ buildTest('Trust Registry', () => {
 
     schemasUpdate = new BTreeMap();
     const verifiersUpdate = new BTreeMap();
-    const innerUpdate = new BTreeSet();
-    innerUpdate.add(verifierDIDMethodKey);
-    verifiersUpdate.set(verifierDIDMethodKey, { Remove: innerUpdate });
+    verifiersUpdate.set(verifierDIDMethodKey, 'Remove');
+
     schemasUpdate.set(schemaId, {
-      verifiers: {
-        Modify: verifiersUpdate,
+      Modify: {
+        verifiers: {
+          Modify: verifiersUpdate,
+        },
       },
     });
 
-    await dock.trustRegistry.updateSchemaMetadata(
+    await dock.trustRegistry.setSchemasMetadata(
       verifierDIDMethodKey,
       trustRegistryId,
       schemasUpdate,
@@ -449,6 +630,7 @@ buildTest('Trust Registry', () => {
     );
 
     verifiers.delete(verifierDIDMethodKey);
+
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
@@ -478,6 +660,8 @@ function expectedFormattedIssuers(issuers) {
 
 function expectedFormattedVerifiers(verifiers) {
   return [...verifiers.values()]
-    .map((verifier) => (verifier.isDid ? { did: verifier.asDid } : { didMethodKey: verifier.asDidMethodKey }))
+    .map((verifier) => (verifier.isDid
+      ? { did: verifier.asDid }
+      : { didMethodKey: verifier.asDidMethodKey }))
     .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
 }

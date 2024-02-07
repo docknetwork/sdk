@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: utils/codec.js</title>
+    <title>JSDoc: Class: DockKeyPair</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,116 +17,576 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: utils/codec.js</h1>
+    <h1 class="page-title">Class: DockKeyPair</h1>
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>import { u8aToHex } from '@polkadot/util';
-import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+        <h2><span class="attribs"><span class="type-signature"></span></span>DockKeyPair<span class="signature">(keyPair)</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description">Wrapped keypair used to interact with the dock blockchain.</div>
+        
+    
+</header>
 
-/**
- * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
- * @param {string} value - Hexadecimal value
- * @param {number} [byteSize] - Expected byte size of the input.
- * @return {Boolean} True if hex (with given size) else false
- */
-export function isHexWithGivenByteSize(value, byteSize = undefined) {
-  if (typeof value !== 'string') {
-    return false;
-  }
-  const match = value.match(/^0x([0-9a-f]+$)/i);
-  if (match &amp;&amp; match.length > 1) {
-    if (byteSize !== undefined) {
-      // If `byteSize` is not a positive integer type, then check will fail
-      // 2 hex digits make a byte
-      return match[1].length === 2 * byteSize;
-    }
-    // Don't care about byte size of the match but it must be full byte
-    return match[1].length % 2 === 0;
-  }
-  return false;
-}
+<article>
+    <div class="container-overview">
+    
+        
 
-/**
- * Gets the hexadecimal value of the given string.
- * @return {string} Returns the hexadecimal representation of the ID.
- */
-export function getHexIdentifier(id, qualifiers, byteSize) {
-  const strId = String(id);
+    
+    <h2>Constructor</h2>
+    
 
-  for (const qualifier of [].concat(qualifiers)) {
-    if (strId.startsWith(qualifier)) {
-      // Fully qualified ID. Remove the qualifier
-      const ss58Did = strId.slice(qualifier.length);
-      try {
-        const hex = u8aToHex(decodeAddress(ss58Did));
-        // 2 characters for `0x` and 2*byte size of ID
-        if (hex.length !== 2 + 2 * byteSize) {
-          throw new Error('Unexpected byte size');
-        }
-        return hex;
-      } catch (e) {
-        throw new Error(`Invalid SS58 ID ${strId} with qualifier ${qualifier}. ${e}`);
-      }
-    }
-  }
+    
+    <h4 class="name" id="DockKeyPair"><span class="type-signature"></span>new DockKeyPair<span class="signature">(keyPair)</span><span class="type-signature"></span></h4>
+    
 
-  try {
-    // Check if hex and of correct size and return the hex value if successful.
-    if (!isHexWithGivenByteSize(strId, byteSize)) {
-      throw new Error(`Expected ${byteSize}-byte sequence`);
-    }
+    
 
-    return strId;
-  } catch (error) {
-    // Cannot parse as hex
-    throw new Error(`Invalid hex Did \`${id}\`, stringified \`${strId}\`: ${error}`);
-  }
-}
 
-/**
- * Convert address to Dock appropriate network address.
- * @param addr - address to convert
- * @param network - the network to use, allowed values are `main`, `test` and `dev` corresponding to mainnet, testnet and dev node
- */
-export function asDockAddress(addr, network = 'test') {
-  switch (network) {
-    case 'dev':
-      return encodeAddress(addr, 42);
-    case 'test':
-      return encodeAddress(addr, 21);
-    case 'main':
-      return encodeAddress(addr, 22);
-    default:
-      throw new Error(
-        `Network can be either test or main or dev but was passed as ${network}`,
-      );
-  }
-}
 
-/**
- * Normalizes the given input to hex. Expects a Uint8Array or a hex string
- * @param {Uint8Array|string} data
- */
-export function normalizeToHex(data) {
-  let hex;
-  if (data instanceof Uint8Array) {
-    hex = u8aToHex(data);
-  } else if (isHexWithGivenByteSize(data)) {
-    hex = data;
-  } else {
-    throw new Error('Require a hex string or a byte array');
-  }
-  return hex;
-}
-</code></pre>
-        </article>
-    </section>
+<div class="description">
+    Wraps supplied keypair into a `DockKeyPair`.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_misc.js.html">utils/misc.js</a>, <a href="utils_misc.js.html#line141">line 141</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="DockKeyPair.html">DockKeyPair</a></dt>
+            <dd></dd>
+        </dl>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".randomSecp256k1"><span class="type-signature">(static) </span>randomSecp256k1<span class="signature">(params)</span><span class="type-signature"> &rarr; {this}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Generates random `Secp256k1` keypair.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_misc.js.html">utils/misc.js</a>, <a href="utils_misc.js.html#line172">line 172</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">this</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="publicKey"><span class="type-signature"></span>publicKey<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Returns underlying public key.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_misc.js.html">utils/misc.js</a>, <a href="utils_misc.js.html#line154">line 154</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="sign"><span class="type-signature"></span>sign<span class="signature">(message)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Signs supplied message using underlying keypair.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_misc.js.html">utils/misc.js</a>, <a href="utils_misc.js.html#line162">line 162</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -140,7 +600,7 @@ export function normalizeToHex(data) {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Wed Feb 07 2024 07:04:52 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Wed Feb 07 2024 07:04:53 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: utils/codec.js</title>
+    <title>JSDoc: Class: DidKeypair</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,116 +17,700 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: utils/codec.js</h1>
+    <h1 class="page-title">Class: DidKeypair</h1>
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>import { u8aToHex } from '@polkadot/util';
-import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+        <h2><span class="attribs"><span class="type-signature"></span></span>DidKeypair<span class="signature">(keyPair, keyId<span class="signature-attributes">nullable</span>)</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description">Signing keypair along with the optional key identifier.</div>
+        
+    
+</header>
 
-/**
- * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
- * @param {string} value - Hexadecimal value
- * @param {number} [byteSize] - Expected byte size of the input.
- * @return {Boolean} True if hex (with given size) else false
- */
-export function isHexWithGivenByteSize(value, byteSize = undefined) {
-  if (typeof value !== 'string') {
-    return false;
-  }
-  const match = value.match(/^0x([0-9a-f]+$)/i);
-  if (match &amp;&amp; match.length > 1) {
-    if (byteSize !== undefined) {
-      // If `byteSize` is not a positive integer type, then check will fail
-      // 2 hex digits make a byte
-      return match[1].length === 2 * byteSize;
-    }
-    // Don't care about byte size of the match but it must be full byte
-    return match[1].length % 2 === 0;
-  }
-  return false;
-}
+<article>
+    <div class="container-overview">
+    
+        
 
-/**
- * Gets the hexadecimal value of the given string.
- * @return {string} Returns the hexadecimal representation of the ID.
- */
-export function getHexIdentifier(id, qualifiers, byteSize) {
-  const strId = String(id);
+    
+    <h2>Constructor</h2>
+    
 
-  for (const qualifier of [].concat(qualifiers)) {
-    if (strId.startsWith(qualifier)) {
-      // Fully qualified ID. Remove the qualifier
-      const ss58Did = strId.slice(qualifier.length);
-      try {
-        const hex = u8aToHex(decodeAddress(ss58Did));
-        // 2 characters for `0x` and 2*byte size of ID
-        if (hex.length !== 2 + 2 * byteSize) {
-          throw new Error('Unexpected byte size');
-        }
-        return hex;
-      } catch (e) {
-        throw new Error(`Invalid SS58 ID ${strId} with qualifier ${qualifier}. ${e}`);
-      }
-    }
-  }
+    
+    <h4 class="name" id="DidKeypair"><span class="type-signature"></span>new DidKeypair<span class="signature">(keyPair, keyId<span class="signature-attributes">nullable</span>)</span><span class="type-signature"></span></h4>
+    
 
-  try {
-    // Check if hex and of correct size and return the hex value if successful.
-    if (!isHexWithGivenByteSize(strId, byteSize)) {
-      throw new Error(`Expected ${byteSize}-byte sequence`);
-    }
+    
 
-    return strId;
-  } catch (error) {
-    // Cannot parse as hex
-    throw new Error(`Invalid hex Did \`${id}\`, stringified \`${strId}\`: ${error}`);
-  }
-}
 
-/**
- * Convert address to Dock appropriate network address.
- * @param addr - address to convert
- * @param network - the network to use, allowed values are `main`, `test` and `dev` corresponding to mainnet, testnet and dev node
- */
-export function asDockAddress(addr, network = 'test') {
-  switch (network) {
-    case 'dev':
-      return encodeAddress(addr, 42);
-    case 'test':
-      return encodeAddress(addr, 21);
-    case 'main':
-      return encodeAddress(addr, 22);
-    default:
-      throw new Error(
-        `Network can be either test or main or dev but was passed as ${network}`,
-      );
-  }
-}
 
-/**
- * Normalizes the given input to hex. Expects a Uint8Array or a hex string
- * @param {Uint8Array|string} data
- */
-export function normalizeToHex(data) {
-  let hex;
-  if (data instanceof Uint8Array) {
-    hex = u8aToHex(data);
-  } else if (isHexWithGivenByteSize(data)) {
-    hex = data;
-  } else {
-    throw new Error('Require a hex string or a byte array');
-  }
-  return hex;
-}
-</code></pre>
-        </article>
-    </section>
+<div class="description">
+    Wraps supplied keypair into a `DidKeypair`.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>keyPair</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                    &lt;nullable><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_did_did-keypair.js.html">utils/did/did-keypair.js</a>, <a href="utils_did_did-keypair.js.html#line7">line 7</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="DidKeypair.html">DidKeypair</a></dt>
+            <dd></dd>
+        </dl>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".fromApi"><span class="type-signature">(static) </span>fromApi<span class="signature">(dockApi, seed, keypairType, meta, keyId)</span><span class="type-signature"> &rarr; {<a href="DidKeypair.html">DidKeypair</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Create a new keypair from a DockAPI object.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>dockApi</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">DockAPI</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>seed</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Generates 32-byte random seed if not provided</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keypairType</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Defaults to ed25519.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>meta</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Defaults to 1</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_did_did-keypair.js.html">utils/did/did-keypair.js</a>, <a href="utils_did_did-keypair.js.html#line28">line 28</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="DidKeypair.html">DidKeypair</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".randomSecp256k1"><span class="type-signature">(static) </span>randomSecp256k1<span class="signature">(params<span class="signature-attributes">nullable</span>)</span><span class="type-signature"> &rarr; {this}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Generates random `Secp256k1` keypair.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                    &lt;nullable><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>keyId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                    &lt;nullable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last">optional keypair identifier</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_did_did-keypair.js.html">utils/did/did-keypair.js</a>, <a href="utils_did_did-keypair.js.html#line50">line 50</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">this</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

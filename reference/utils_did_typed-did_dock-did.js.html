@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: utils/codec.js</title>
+    <title>JSDoc: Source: utils/did/typed-did/dock-did.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: utils/codec.js</h1>
+    <h1 class="page-title">Source: utils/did/typed-did/dock-did.js</h1>
 
     
 
@@ -26,104 +26,83 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import { u8aToHex } from '@polkadot/util';
-import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+            <pre class="prettyprint source linenums"><code>import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
+import { getHexIdentifier } from '../../codec';
+
+import { validateDockDIDHexIdentifier } from '../utils';
+
+import { DockDIDByteSize, DockDIDQualifier } from '../constants';
+import DockDidOrDidMethodKey from './dock-did-or-did-method-key';
 
 /**
- * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
- * @param {string} value - Hexadecimal value
- * @param {number} [byteSize] - Expected byte size of the input.
- * @return {Boolean} True if hex (with given size) else false
+ * `did:dock:*`
  */
-export function isHexWithGivenByteSize(value, byteSize = undefined) {
-  if (typeof value !== 'string') {
-    return false;
-  }
-  const match = value.match(/^0x([0-9a-f]+$)/i);
-  if (match &amp;&amp; match.length > 1) {
-    if (byteSize !== undefined) {
-      // If `byteSize` is not a positive integer type, then check will fail
-      // 2 hex digits make a byte
-      return match[1].length === 2 * byteSize;
-    }
-    // Don't care about byte size of the match but it must be full byte
-    return match[1].length % 2 === 0;
-  }
-  return false;
-}
+export default class DockDid extends DockDidOrDidMethodKey {
+  static Qualifier = DockDIDQualifier;
 
-/**
- * Gets the hexadecimal value of the given string.
- * @return {string} Returns the hexadecimal representation of the ID.
- */
-export function getHexIdentifier(id, qualifiers, byteSize) {
-  const strId = String(id);
+  /**
+   * Instantiates `DockDid` using supplied 32-byte hex sequence.
+   * @param {*} did
+   */
+  constructor(did) {
+    super();
+    validateDockDIDHexIdentifier(did);
 
-  for (const qualifier of [].concat(qualifiers)) {
-    if (strId.startsWith(qualifier)) {
-      // Fully qualified ID. Remove the qualifier
-      const ss58Did = strId.slice(qualifier.length);
-      try {
-        const hex = u8aToHex(decodeAddress(ss58Did));
-        // 2 characters for `0x` and 2*byte size of ID
-        if (hex.length !== 2 + 2 * byteSize) {
-          throw new Error('Unexpected byte size');
-        }
-        return hex;
-      } catch (e) {
-        throw new Error(`Invalid SS58 ID ${strId} with qualifier ${qualifier}. ${e}`);
-      }
-    }
+    this.did = did;
   }
 
-  try {
-    // Check if hex and of correct size and return the hex value if successful.
-    if (!isHexWithGivenByteSize(strId, byteSize)) {
-      throw new Error(`Expected ${byteSize}-byte sequence`);
-    }
-
-    return strId;
-  } catch (error) {
-    // Cannot parse as hex
-    throw new Error(`Invalid hex Did \`${id}\`, stringified \`${strId}\`: ${error}`);
+  /**
+   * Generates a random DID.
+   *
+   * @returns {this}
+   */
+  static random() {
+    return new this(randomAsHex(DockDIDByteSize));
   }
-}
 
-/**
- * Convert address to Dock appropriate network address.
- * @param addr - address to convert
- * @param network - the network to use, allowed values are `main`, `test` and `dev` corresponding to mainnet, testnet and dev node
- */
-export function asDockAddress(addr, network = 'test') {
-  switch (network) {
-    case 'dev':
-      return encodeAddress(addr, 42);
-    case 'test':
-      return encodeAddress(addr, 21);
-    case 'main':
-      return encodeAddress(addr, 22);
-    default:
-      throw new Error(
-        `Network can be either test or main or dev but was passed as ${network}`,
-      );
+  /**
+   * Instantiates `DockDid` from a fully qualified did string.
+   * @param {string} did - fully qualified `did:dock:*` string
+   * @returns {this}
+   */
+  static fromQualifiedString(did) {
+    return new this(getHexIdentifier(did, DockDIDQualifier, DockDIDByteSize));
+  }
+
+  /**
+   * Instantiates `DockDid` from a did object received from the substrate side.
+   * @param {object} did - substrate did
+   * @returns {this}
+   */
+  static fromSubstrateValue(did) {
+    return new this(getHexIdentifier(did.asDid, [], DockDIDByteSize));
+  }
+
+  get isDid() {
+    return true;
+  }
+
+  get asDid() {
+    return this.did;
+  }
+
+  toJSON() {
+    return { Did: this.did };
+  }
+
+  toString() {
+    return `${DockDIDQualifier}${this.asDid}`;
+  }
+
+  /**
+   * Returns unqualified DID encoded as a `SS58` address.
+   */
+  toEncodedString() {
+    return encodeAddress(this.asDid);
   }
 }
 
-/**
- * Normalizes the given input to hex. Expects a Uint8Array or a hex string
- * @param {Uint8Array|string} data
- */
-export function normalizeToHex(data) {
-  let hex;
-  if (data instanceof Uint8Array) {
-    hex = u8aToHex(data);
-  } else if (isHexWithGivenByteSize(data)) {
-    hex = data;
-  } else {
-    throw new Error('Require a hex string or a byte array');
-  }
-  return hex;
-}
+DockDidOrDidMethodKey.DockDid = DockDid;
 </code></pre>
         </article>
     </section>

@@ -470,6 +470,68 @@
 
         
             
+<h4 class="name" id="createNewDockDID"><span class="type-signature">(constant) </span>createNewDockDID<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Create and return a fully qualified Dock DID, i.e. "did:dock:<SS58 string>"
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_did_typed-did_helpers.js.html">utils/did/typed-did/helpers.js</a>, <a href="utils_did_typed-did_helpers.js.html#line47">line 47</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
 <h4 class="name" id="createResolver"><span class="type-signature">(constant) </span>createResolver<span class="type-signature"></span></h4>
 
 
@@ -1152,6 +1214,68 @@
 
         
             
+<h4 class="name" id="publicKey"><span class="type-signature"></span>publicKey<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Returns underlying public key.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_did_typed-did_did-method-key.js.html">utils/did/typed-did/did-method-key.js</a>, <a href="utils_did_typed-did_did-method-key.js.html#line120">line 120</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
 <h4 class="name" id="revocation"><span class="type-signature"></span>revocation<span class="type-signature"></span></h4>
 
 
@@ -1344,7 +1468,7 @@
 
 
 <div class="description">
-    Use to specify `PREFIX`/`METHOD` that will be dispatched in case no direct matches found.
+    Use to specify `PREFIX`/`METHOD` that will be dispatched in case no direct matches are found.
 </div>
 
 
@@ -4838,7 +4962,7 @@ using this</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_codec.js.html">utils/codec.js</a>, <a href="utils_codec.js.html#line68">line 68</a>
+        <a href="utils_codec.js.html">utils/codec.js</a>, <a href="utils_codec.js.html#line69">line 69</a>
     </li></ul></dd>
     
 
@@ -10348,7 +10472,7 @@ accessible always, like in case of hardware wallet</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line429">line 429</a>
+        <a href="utils_did_utils.js.html">utils/did/utils.js</a>, <a href="utils_did_utils.js.html#line83">line 83</a>
     </li></ul></dd>
     
 
@@ -10570,7 +10694,7 @@ accessible always, like in case of hardware wallet</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line444">line 444</a>
+        <a href="utils_did_utils.js.html">utils/did/utils.js</a>, <a href="utils_did_utils.js.html#line98">line 98</a>
     </li></ul></dd>
     
 
@@ -10946,116 +11070,6 @@ accessible always, like in case of hardware wallet</td>
         
 <div class="param-desc">
     - The Blob id
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">string</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="createNewDockDID"><span class="type-signature"></span>createNewDockDID<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Create and return a fully qualified Dock DID, i.e. "did:dock:<SS58 string>"
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line417">line 417</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    - The DID
 </div>
 
 
@@ -14206,7 +14220,7 @@ cannot be found.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_misc.js.html">utils/misc.js</a>, <a href="utils_misc.js.html#line158">line 158</a>
+        <a href="utils_misc.js.html">utils/misc.js</a>, <a href="utils_misc.js.html#line197">line 197</a>
     </li></ul></dd>
     
 
@@ -17649,6 +17663,161 @@ types only require validating the byte size.
     
 
     
+    <h4 class="name" id="fromKeypair"><span class="type-signature"></span>fromKeypair<span class="signature">(keypair)</span><span class="type-signature"> &rarr; {this}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Creates a new `DidMethodKey` from the supplied keypair.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>keypair</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="DockKeyPair.html">DockKeyPair</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_did_typed-did_did-method-key.js.html">utils/did/typed-did/did-method-key.js</a>, <a href="utils_did_typed-did_did-method-key.js.html#line53">line 53</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">this</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="fromKeyringPair"><span class="type-signature"></span>fromKeyringPair<span class="signature">(pair)</span><span class="type-signature"> &rarr; {PublicKeySecp256k1}</span></h4>
     
 
@@ -18111,6 +18280,626 @@ generate the instance correct subclass
 
 
 
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="fromQualifiedString"><span class="type-signature"></span>fromQualifiedString<span class="signature">(did)</span><span class="type-signature"> &rarr; {this}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Instantiates `DidMethodKey` from a fully qualified did string.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>did</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">fully qualified `did:key:*` string</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_did_typed-did_did-method-key.js.html">utils/did/typed-did/did-method-key.js</a>, <a href="utils_did_typed-did_did-method-key.js.html#line62">line 62</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">this</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="fromQualifiedString"><span class="type-signature"></span>fromQualifiedString<span class="signature">(did)</span><span class="type-signature"> &rarr; {this}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Instantiates `DockDid` from a fully qualified did string.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>did</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">fully qualified `did:dock:*` string</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_did_typed-did_dock-did.js.html">utils/did/typed-did/dock-did.js</a>, <a href="utils_did_typed-did_dock-did.js.html#line40">line 40</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">this</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="fromSubstrateValue"><span class="type-signature"></span>fromSubstrateValue<span class="signature">(key)</span><span class="type-signature"> &rarr; {this}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Instantiates `DockDid` from a did method key object received from the substrate side.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">substrate did method key</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_did_typed-did_did-method-key.js.html">utils/did/typed-did/did-method-key.js</a>, <a href="utils_did_typed-did_did-method-key.js.html#line84">line 84</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">this</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="fromSubstrateValue"><span class="type-signature"></span>fromSubstrateValue<span class="signature">(did)</span><span class="type-signature"> &rarr; {this}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Instantiates `DockDid` from a did object received from the substrate side.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>did</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">substrate did</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_did_typed-did_dock-did.js.html">utils/did/typed-did/dock-did.js</a>, <a href="utils_did_typed-did_dock-did.js.html#line49">line 49</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">this</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -20420,7 +21209,7 @@ Field `accumulated` contains the current accumulated value.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_schema.js.html">utils/vc/schema.js</a>, <a href="utils_vc_schema.js.html#line69">line 69</a>
+        <a href="utils_vc_schema.js.html">utils/vc/schema.js</a>, <a href="utils_vc_schema.js.html#line68">line 68</a>
     </li></ul></dd>
     
 
@@ -20791,94 +21580,6 @@ Returns `null` if no value is found.
     
 
     
-    <h4 class="name" id="getDidKeyPublicKeyHex"><span class="type-signature"></span>getDidKeyPublicKeyHex<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    --------------------------------------------------------
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line323">line 323</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id="getDidNonce"><span class="type-signature"></span>getDidNonce<span class="signature">(didOrDidMethodKey, nonce, didModule)</span><span class="type-signature"> &rarr; {Promise.&lt;(undefined|*)>}</span></h4>
     
 
@@ -21017,7 +21718,7 @@ using this</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_misc.js.html">utils/misc.js</a>, <a href="utils_misc.js.html#line170">line 170</a>
+        <a href="utils_misc.js.html">utils/misc.js</a>, <a href="utils_misc.js.html#line209">line 209</a>
     </li></ul></dd>
     
 
@@ -24679,7 +25380,7 @@ or params were not found on chain which can happen if they were deleted after th
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_misc.js.html">utils/misc.js</a>, <a href="utils_misc.js.html#line144">line 144</a>
+        <a href="utils_misc.js.html">utils/misc.js</a>, <a href="utils_misc.js.html#line183">line 183</a>
     </li></ul></dd>
     
 
@@ -25975,168 +26676,6 @@ not provided in the extrinsic.
     <dd>
         
 <span class="param-type">boolean</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="hexDIDToQualified"><span class="type-signature"></span>hexDIDToQualified<span class="signature">(hexDid)</span><span class="type-signature"> &rarr; {string}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Return a fully qualified Dock DID id, i.e. "did:dock:<SS58 string>"
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>hexDid</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-|
-
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The hex DID (without the qualifier) or wrapper on DID</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line403">line 403</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    - The fully qualified DID
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">string</span>
 
 
     </dd>
@@ -28056,7 +28595,7 @@ describe the error if any.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_codec.js.html">utils/codec.js</a>, <a href="utils_codec.js.html#line87">line 87</a>
+        <a href="utils_codec.js.html">utils/codec.js</a>, <a href="utils_codec.js.html#line88">line 88</a>
     </li></ul></dd>
     
 
@@ -29747,6 +30286,112 @@ This function throws an error if the requested composite claims are unprovable.
     <dd>
         
 <span class="param-type">array.&lt;any></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="random"><span class="type-signature"></span>random<span class="signature">()</span><span class="type-signature"> &rarr; {this}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Generates a random DID.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_did_typed-did_dock-did.js.html">utils/did/typed-did/dock-did.js</a>, <a href="utils_did_typed-did_dock-did.js.html#line31">line 31</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">this</span>
 
 
     </dd>
@@ -36796,6 +37441,182 @@ else only wait to be included in block.</td>
     
 
     
+    <h4 class="name" id="toEncodedString"><span class="type-signature"></span>toEncodedString<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Returns unqualified public key encoded in `BS58`.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_did_typed-did_did-method-key.js.html">utils/did/typed-did/did-method-key.js</a>, <a href="utils_did_typed-did_did-method-key.js.html#line141">line 141</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="toEncodedString"><span class="type-signature"></span>toEncodedString<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Returns unqualified DID encoded as a `SS58` address.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_did_typed-did_dock-did.js.html">utils/did/typed-did/dock-did.js</a>, <a href="utils_did_typed-did_dock-did.js.html#line72">line 72</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="toJSON"><span class="type-signature"></span>toJSON<span class="signature">()</span><span class="type-signature"> &rarr; {object}</span></h4>
     
 
@@ -38879,7 +39700,7 @@ else only wait to be included in block.</td>
     
 
     
-    <h4 class="name" id="typedHexDID"><span class="type-signature"></span>typedHexDID<span class="signature">(api, did)</span><span class="type-signature"> &rarr; {string|<a href="DockDidOrDidMethodKey.html">DockDidOrDidMethodKey</a>}</span></h4>
+    <h4 class="name" id="typedHexDID"><span class="type-signature"></span>typedHexDID<span class="signature">(api, did)</span><span class="type-signature"> &rarr; {string|DockDid|DidMethodKey}</span></h4>
     
 
     
@@ -38887,7 +39708,7 @@ else only wait to be included in block.</td>
 
 
 <div class="description">
-    Takes a DID string, gets the hexadecimal value of that and returns a `DockDidMethodKey` or `DockDid` object.
+    Takes a DID string, gets the hexadecimal value of that and returns either the `DockDid` or `DidMethodKey` object.
 </div>
 
 
@@ -38928,6 +39749,11 @@ else only wait to be included in block.</td>
 
             <td class="type">
             
+                
+<span class="param-type">ApiPromise</span>
+
+
+            
             </td>
 
             
@@ -38948,6 +39774,12 @@ else only wait to be included in block.</td>
             
                 
 <span class="param-type">string</span>
+|
+
+<span class="param-type">DockDid</span>
+|
+
+<span class="param-type">DidMethodKey</span>
 
 
             
@@ -38958,7 +39790,7 @@ else only wait to be included in block.</td>
             
 
             <td class="description last">The DID can be passed as fully qualified DID like `did:dock:<SS58 string>` or
-`did:key:<value>` or a 32 byte hex string</td>
+`did:key:<BS58 public key>` or a 32 byte hex string</td>
         </tr>
 
     
@@ -38999,7 +39831,7 @@ else only wait to be included in block.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line338">line 338</a>
+        <a href="utils_did_typed-did_helpers.js.html">utils/did/typed-did/helpers.js</a>, <a href="utils_did_typed-did_helpers.js.html#line16">line 16</a>
     </li></ul></dd>
     
 
@@ -39028,7 +39860,7 @@ else only wait to be included in block.</td>
 
         
 <div class="param-desc">
-    Returns a `string` or `DockDidMethodKey` or `DockDid` object.
+    Returns a `string` or `DockDid` or `DidMethodKey` object.
 </div>
 
 
@@ -39042,7 +39874,10 @@ else only wait to be included in block.</td>
 <span class="param-type">string</span>
 |
 
-<span class="param-type"><a href="DockDidOrDidMethodKey.html">DockDidOrDidMethodKey</a></span>
+<span class="param-type">DockDid</span>
+|
+
+<span class="param-type">DidMethodKey</span>
 
 
     </dd>
@@ -39060,7 +39895,7 @@ else only wait to be included in block.</td>
     
 
     
-    <h4 class="name" id="typedHexDIDFromSubstrate"><span class="type-signature"></span>typedHexDIDFromSubstrate<span class="signature">(api, did)</span><span class="type-signature"> &rarr; {string|<a href="DockDidOrDidMethodKey.html">DockDidOrDidMethodKey</a>}</span></h4>
+    <h4 class="name" id="typedHexDIDFromSubstrate"><span class="type-signature"></span>typedHexDIDFromSubstrate<span class="signature">(api, did)</span><span class="type-signature"> &rarr; {string|DockDid|DidMethodKey}</span></h4>
     
 
     
@@ -39109,6 +39944,11 @@ else only wait to be included in block.</td>
 
             <td class="type">
             
+                
+<span class="param-type">ApiPromise</span>
+
+
+            
             </td>
 
             
@@ -39128,7 +39968,7 @@ else only wait to be included in block.</td>
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">object</span>
 
 
             
@@ -39180,7 +40020,7 @@ a 32 byte hex string</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line364">line 364</a>
+        <a href="utils_did_typed-did_helpers.js.html">utils/did/typed-did/helpers.js</a>, <a href="utils_did_typed-did_helpers.js.html#line35">line 35</a>
     </li></ul></dd>
     
 
@@ -39209,7 +40049,7 @@ a 32 byte hex string</td>
 
         
 <div class="param-desc">
-    Returns an object wrapping the DID.
+    Returns a `string` or `DockDid` or `DidMethodKey` object.
 </div>
 
 
@@ -39223,7 +40063,10 @@ a 32 byte hex string</td>
 <span class="param-type">string</span>
 |
 
-<span class="param-type"><a href="DockDidOrDidMethodKey.html">DockDidOrDidMethodKey</a></span>
+<span class="param-type">DockDid</span>
+|
+
+<span class="param-type">DidMethodKey</span>
 
 
     </dd>
@@ -42912,7 +43755,7 @@ schema `schema`
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_schema.js.html">utils/vc/schema.js</a>, <a href="utils_vc_schema.js.html#line22">line 22</a>
+        <a href="utils_vc_schema.js.html">utils/vc/schema.js</a>, <a href="utils_vc_schema.js.html#line21">line 21</a>
     </li></ul></dd>
     
 
@@ -43071,7 +43914,7 @@ schema `schema`
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line270">line 270</a>
+        <a href="utils_did_utils.js.html">utils/did/utils.js</a>, <a href="utils_did_utils.js.html#line55">line 55</a>
     </li></ul></dd>
     
 
@@ -43230,7 +44073,7 @@ schema `schema`
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_did.js.html">utils/did.js</a>, <a href="utils_did.js.html#line282">line 282</a>
+        <a href="utils_did_utils.js.html">utils/did/utils.js</a>, <a href="utils_did_utils.js.html#line67">line 67</a>
     </li></ul></dd>
     
 
@@ -46542,7 +47385,7 @@ of this function got the credential directly from the issuer.</td>
     Enhances the provided class with the given list of static properties to require
 in the inherited class.
 All properties will be checked for presence during the object constructor call.
-Each property on its own will be checked every time it will be accessed.
+Each property on its own will be checked every time it is accessed.
 In case some property is missing, an error will be thrown.
 </div>
 
@@ -48785,13 +49628,13 @@ In case some property is missing, an error will be thrown.
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockBlobResolver.html">DockBlobResolver</a></li><li><a href="DockDid.html">DockDid</a></li><li><a href="DockDidMethodKey.html">DockDidMethodKey</a></li><li><a href="DockDidOrDidMethodKey.html">DockDidOrDidMethodKey</a></li><li><a href="DockDIDResolver.html">DockDIDResolver</a></li><li><a href="DockRevRegResolver.html">DockRevRegResolver</a></li><li><a href="DockStatusListResolver.html">DockStatusListResolver</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="NoOffchainDIDError.html">NoOffchainDIDError</a></li><li><a href="NoOnchainDIDError.html">NoOnchainDIDError</a></li><li><a href="Resolver.html">Resolver</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="setApi.html">setApi</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#accumulator">accumulator</a></li><li><a href="global.html#adaptKey">adaptKey</a></li><li><a href="global.html#addAttributeToReveal">addAttributeToReveal</a></li><li><a href="global.html#addCredentialToPresent">addCredentialToPresent</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#addParams">addParams</a></li><li><a href="global.html#addPositiveAccumulator">addPositiveAccumulator</a></li><li><a href="global.html#addPrivateStatusListEntryToCredential">addPrivateStatusListEntryToCredential</a></li><li><a href="global.html#addPublicKey">addPublicKey</a></li><li><a href="global.html#addRevRegIdToCredential">addRevRegIdToCredential</a></li><li><a href="global.html#addSchemaMetadata">addSchemaMetadata</a></li><li><a href="global.html#addStatusList21EntryToCredential">addStatusList21EntryToCredential</a></li><li><a href="global.html#addUniversalAccumulator">addUniversalAccumulator</a></li><li><a href="global.html#anchor">anchor</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#bbs">bbs</a></li><li><a href="global.html#bbsPlus">bbsPlus</a></li><li><a href="global.html#blob">blob</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildCreateStatusListCredentialTx">buildCreateStatusListCredentialTx</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#buildParams">buildParams</a></li><li><a href="global.html#buildPublicKey">buildPublicKey</a></li><li><a href="global.html#buildRemoveStatusListCredentialTx">buildRemoveStatusListCredentialTx</a></li><li><a href="global.html#buildResolversMap">buildResolversMap</a></li><li><a href="global.html#buildUpdateStatusListCredentialTx">buildUpdateStatusListCredentialTx</a></li><li><a href="global.html#cacheLast">cacheLast</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationRegistryStatus">checkRevocationRegistryStatus</a></li><li><a href="global.html#claimgraphToStore">claimgraphToStore</a></li><li><a href="global.html#controllerIds">controllerIds</a></li><li><a href="global.html#convertCredential">convertCredential</a></li><li><a href="global.html#convertCredentialForPresBuilding">convertCredentialForPresBuilding</a></li><li><a href="global.html#convertCredentialForVerification">convertCredentialForVerification</a></li><li><a href="global.html#convertCredentialToSerializedForSigning">convertCredentialToSerializedForSigning</a></li><li><a href="global.html#convertToPresentation">convertToPresentation</a></li><li><a href="global.html#create">create</a></li><li><a href="global.html#createAddParamsTx">createAddParamsTx</a></li><li><a href="global.html#createAddPositiveAccumulatorTx">createAddPositiveAccumulatorTx</a></li><li><a href="global.html#createAddPublicKeyTx">createAddPublicKeyTx</a></li><li><a href="global.html#createAddUniversalAccumulatorTx">createAddUniversalAccumulatorTx</a></li><li><a href="global.html#createDidKey">createDidKey</a></li><li><a href="global.html#createDidSig">createDidSig</a></li><li><a href="global.html#createDidSignature">createDidSignature</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createParamsObjFromChainResponse">createParamsObjFromChainResponse</a></li><li><a href="global.html#createPresentation">createPresentation</a></li><li><a href="global.html#createPublicKeyObjFromChainResponse">createPublicKeyObjFromChainResponse</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createRemovePublicKeyTx">createRemovePublicKeyTx</a></li><li><a href="global.html#createResolver">createResolver</a></li><li><a href="global.html#createSignedRemoveStatusListCredential">createSignedRemoveStatusListCredential</a></li><li><a href="global.html#createSignedUpdateStatusListCredential">createSignedUpdateStatusListCredential</a></li><li><a href="global.html#createStatusListCredential">createStatusListCredential</a></li><li><a href="global.html#createVerifyData">createVerifyData</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#dereferenceFromIPFS">dereferenceFromIPFS</a></li><li><a href="global.html#did">did</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureArray">ensureArray</a></li><li><a href="global.html#ensureItemsAllowed">ensureItemsAllowed</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensurePrivateStatusListId">ensurePrivateStatusListId</a></li><li><a href="global.html#ensureStatusListId">ensureStatusListId</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#extractSchemaForSigning">extractSchemaForSigning</a></li><li><a href="global.html#fetchStatusList2021Credential">fetchStatusList2021Credential</a></li><li><a href="global.html#fmtIter">fmtIter</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromBytes">fromBytes</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromJsigProofValue">fromJsigProofValue</a></li><li><a href="global.html#fromJSON">fromJSON</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#generate">generate</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccount">getAccount</a></li><li><a href="global.html#getAccumulator">getAccumulator</a></li><li><a href="global.html#getActorDidAndNonce">getActorDidAndNonce</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAllParamsByDid">getAllParamsByDid</a></li><li><a href="global.html#getAllPublicKeysByDid">getAllPublicKeysByDid</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatus">getCredentialStatus</a></li><li><a href="global.html#getDidKeyPublicKeyHex">getDidKeyPublicKeyHex</a></li><li><a href="global.html#getDidNonce">getDidNonce</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJsonSchemaFromCredential">getJsonSchemaFromCredential</a></li><li><a href="global.html#getJsonSchemasFromPresentation">getJsonSchemasFromPresentation</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyDoc">getKeyDoc</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getLastParamsWritten">getLastParamsWritten</a></li><li><a href="global.html#getPrivateStatus">getPrivateStatus</a></li><li><a href="global.html#getPrivateStatuses">getPrivateStatuses</a></li><li><a href="global.html#getPublicKey">getPublicKey</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSerializedRemoveStatusListCredential">getSerializedRemoveStatusListCredential</a></li><li><a href="global.html#getSerializedUpdateStatusListCredential">getSerializedUpdateStatusListCredential</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getTrimmedProofAndValue">getTrimmedProofAndValue</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#getUpdatesFromBlock">getUpdatesFromBlock</a></li><li><a href="global.html#getVerificationMethod">getVerificationMethod</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hasRegistryRevocationStatus">hasRegistryRevocationStatus</a></li><li><a href="global.html#HEX_ID_REG_EXP_PATTERN">HEX_ID_REG_EXP_PATTERN</a></li><li><a href="global.html#hexDIDToQualified">hexDIDToQualified</a></li><li><a href="global.html#initOrUpdate">initOrUpdate</a></li><li><a href="global.html#isAccumulatorRevocationStatus">isAccumulatorRevocationStatus</a></li><li><a href="global.html#isConnected">isConnected</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRegistryRevocationStatus">isRegistryRevocationStatus</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#matchingResolver">matchingResolver</a></li><li><a href="global.html#METHOD_REG_EXP_PATTERN">METHOD_REG_EXP_PATTERN</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#offchainSignatures">offchainSignatures</a></li><li><a href="global.html#parse">parse</a></li><li><a href="global.html#parseDid">parseDid</a></li><li><a href="global.html#parseEventAsAccumulatorUpdate">parseEventAsAccumulatorUpdate</a></li><li><a href="global.html#parseRDFDocument">parseRDFDocument</a></li><li><a href="global.html#parseRef">parseRef</a></li><li><a href="global.html#prepareAddParameters">prepareAddParameters</a></li><li><a href="global.html#prepareAddPublicKey">prepareAddPublicKey</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#ps">ps</a></li><li><a href="global.html#queryNextLookup">queryNextLookup</a></li><li><a href="global.html#removeAccumulator">removeAccumulator</a></li><li><a href="global.html#removeAccumulatorTx">removeAccumulatorTx</a></li><li><a href="global.html#removeParams">removeParams</a></li><li><a href="global.html#removeParamsTx">removeParamsTx</a></li><li><a href="global.html#removePublicKey">removePublicKey</a></li><li><a href="global.html#removeStatusListCredential">removeStatusListCredential</a></li><li><a href="global.html#removeStatusListCredentialWithOneOfPolicy">removeStatusListCredentialWithOneOfPolicy</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#revealMandatoryFields">revealMandatoryFields</a></li><li><a href="global.html#revocation">revocation</a></li><li><a href="global.html#revoked">revoked</a></li><li><a href="global.html#revokedBatch">revokedBatch</a></li><li><a href="global.html#send">send</a></li><li><a href="global.html#setAccount">setAccount</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signAddParams">signAddParams</a></li><li><a href="global.html#signAddPublicKey">signAddPublicKey</a></li><li><a href="global.html#signAndSend">signAndSend</a></li><li><a href="global.html#signer">signer</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signExtrinsic">signExtrinsic</a></li><li><a href="global.html#signPrehashed">signPrehashed</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#signRemoveParams">signRemoveParams</a></li><li><a href="global.html#signRemovePublicKey">signRemovePublicKey</a></li><li><a href="global.html#statusListCredential">statusListCredential</a></li><li><a href="global.html#supports">supports</a></li><li><a href="global.html#suspendIssuers">suspendIssuers</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toBytes">toBytes</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toJsonldjsNode">toJsonldjsNode</a></li><li><a href="global.html#toSubstrate">toSubstrate</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#trustRegistry">trustRegistry</a></li><li><a href="global.html#typedHexDID">typedHexDID</a></li><li><a href="global.html#typedHexDIDFromSubstrate">typedHexDIDFromSubstrate</a></li><li><a href="global.html#unsuspendIssuers">unsuspendIssuers</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#updateAccumulator">updateAccumulator</a></li><li><a href="global.html#updateAccumulatorTx">updateAccumulatorTx</a></li><li><a href="global.html#updateDelegatedIssuers">updateDelegatedIssuers</a></li><li><a href="global.html#updateSchemaMetadata">updateSchemaMetadata</a></li><li><a href="global.html#updateStatusList">updateStatusList</a></li><li><a href="global.html#updateStatusListCredential">updateStatusListCredential</a></li><li><a href="global.html#updateStatusListCredentialWithOneOfPolicy">updateStatusListCredentialWithOneOfPolicy</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateAddress">validateAddress</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyEcdsaSecp256k1SigPrehashed">verifyEcdsaSecp256k1SigPrehashed</a></li><li><a href="global.html#verifyID">verifyID</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#verifyPrivateStatus">verifyPrivateStatus</a></li><li><a href="global.html#verifySignature">verifySignature</a></li><li><a href="global.html#WILDCARD">WILDCARD</a></li><li><a href="global.html#withExtendedStaticProperties">withExtendedStaticProperties</a></li><li><a href="global.html#withInitializedDockAPI">withInitializedDockAPI</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="DidKeypair.html">DidKeypair</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockBlobResolver.html">DockBlobResolver</a></li><li><a href="DockDidOrDidMethodKey.html">DockDidOrDidMethodKey</a></li><li><a href="DockDIDResolver.html">DockDIDResolver</a></li><li><a href="DockKeyPair.html">DockKeyPair</a></li><li><a href="DockRevRegResolver.html">DockRevRegResolver</a></li><li><a href="DockStatusListResolver.html">DockStatusListResolver</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="NoOffchainDIDError.html">NoOffchainDIDError</a></li><li><a href="NoOnchainDIDError.html">NoOnchainDIDError</a></li><li><a href="Resolver.html">Resolver</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="setApi.html">setApi</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#accumulator">accumulator</a></li><li><a href="global.html#adaptKey">adaptKey</a></li><li><a href="global.html#addAttributeToReveal">addAttributeToReveal</a></li><li><a href="global.html#addCredentialToPresent">addCredentialToPresent</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#addParams">addParams</a></li><li><a href="global.html#addPositiveAccumulator">addPositiveAccumulator</a></li><li><a href="global.html#addPrivateStatusListEntryToCredential">addPrivateStatusListEntryToCredential</a></li><li><a href="global.html#addPublicKey">addPublicKey</a></li><li><a href="global.html#addRevRegIdToCredential">addRevRegIdToCredential</a></li><li><a href="global.html#addSchemaMetadata">addSchemaMetadata</a></li><li><a href="global.html#addStatusList21EntryToCredential">addStatusList21EntryToCredential</a></li><li><a href="global.html#addUniversalAccumulator">addUniversalAccumulator</a></li><li><a href="global.html#anchor">anchor</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#bbs">bbs</a></li><li><a href="global.html#bbsPlus">bbsPlus</a></li><li><a href="global.html#blob">blob</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildCreateStatusListCredentialTx">buildCreateStatusListCredentialTx</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#buildParams">buildParams</a></li><li><a href="global.html#buildPublicKey">buildPublicKey</a></li><li><a href="global.html#buildRemoveStatusListCredentialTx">buildRemoveStatusListCredentialTx</a></li><li><a href="global.html#buildResolversMap">buildResolversMap</a></li><li><a href="global.html#buildUpdateStatusListCredentialTx">buildUpdateStatusListCredentialTx</a></li><li><a href="global.html#cacheLast">cacheLast</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationRegistryStatus">checkRevocationRegistryStatus</a></li><li><a href="global.html#claimgraphToStore">claimgraphToStore</a></li><li><a href="global.html#controllerIds">controllerIds</a></li><li><a href="global.html#convertCredential">convertCredential</a></li><li><a href="global.html#convertCredentialForPresBuilding">convertCredentialForPresBuilding</a></li><li><a href="global.html#convertCredentialForVerification">convertCredentialForVerification</a></li><li><a href="global.html#convertCredentialToSerializedForSigning">convertCredentialToSerializedForSigning</a></li><li><a href="global.html#convertToPresentation">convertToPresentation</a></li><li><a href="global.html#create">create</a></li><li><a href="global.html#createAddParamsTx">createAddParamsTx</a></li><li><a href="global.html#createAddPositiveAccumulatorTx">createAddPositiveAccumulatorTx</a></li><li><a href="global.html#createAddPublicKeyTx">createAddPublicKeyTx</a></li><li><a href="global.html#createAddUniversalAccumulatorTx">createAddUniversalAccumulatorTx</a></li><li><a href="global.html#createDidKey">createDidKey</a></li><li><a href="global.html#createDidSig">createDidSig</a></li><li><a href="global.html#createDidSignature">createDidSignature</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createParamsObjFromChainResponse">createParamsObjFromChainResponse</a></li><li><a href="global.html#createPresentation">createPresentation</a></li><li><a href="global.html#createPublicKeyObjFromChainResponse">createPublicKeyObjFromChainResponse</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createRemovePublicKeyTx">createRemovePublicKeyTx</a></li><li><a href="global.html#createResolver">createResolver</a></li><li><a href="global.html#createSignedRemoveStatusListCredential">createSignedRemoveStatusListCredential</a></li><li><a href="global.html#createSignedUpdateStatusListCredential">createSignedUpdateStatusListCredential</a></li><li><a href="global.html#createStatusListCredential">createStatusListCredential</a></li><li><a href="global.html#createVerifyData">createVerifyData</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#dereferenceFromIPFS">dereferenceFromIPFS</a></li><li><a href="global.html#did">did</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureArray">ensureArray</a></li><li><a href="global.html#ensureItemsAllowed">ensureItemsAllowed</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensurePrivateStatusListId">ensurePrivateStatusListId</a></li><li><a href="global.html#ensureStatusListId">ensureStatusListId</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#extractSchemaForSigning">extractSchemaForSigning</a></li><li><a href="global.html#fetchStatusList2021Credential">fetchStatusList2021Credential</a></li><li><a href="global.html#fmtIter">fmtIter</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromBytes">fromBytes</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromJsigProofValue">fromJsigProofValue</a></li><li><a href="global.html#fromJSON">fromJSON</a></li><li><a href="global.html#fromKeypair">fromKeypair</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#fromQualifiedString">fromQualifiedString</a></li><li><a href="global.html#fromSubstrateValue">fromSubstrateValue</a></li><li><a href="global.html#generate">generate</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccount">getAccount</a></li><li><a href="global.html#getAccumulator">getAccumulator</a></li><li><a href="global.html#getActorDidAndNonce">getActorDidAndNonce</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAllParamsByDid">getAllParamsByDid</a></li><li><a href="global.html#getAllPublicKeysByDid">getAllPublicKeysByDid</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatus">getCredentialStatus</a></li><li><a href="global.html#getDidNonce">getDidNonce</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJsonSchemaFromCredential">getJsonSchemaFromCredential</a></li><li><a href="global.html#getJsonSchemasFromPresentation">getJsonSchemasFromPresentation</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyDoc">getKeyDoc</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getLastParamsWritten">getLastParamsWritten</a></li><li><a href="global.html#getPrivateStatus">getPrivateStatus</a></li><li><a href="global.html#getPrivateStatuses">getPrivateStatuses</a></li><li><a href="global.html#getPublicKey">getPublicKey</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSerializedRemoveStatusListCredential">getSerializedRemoveStatusListCredential</a></li><li><a href="global.html#getSerializedUpdateStatusListCredential">getSerializedUpdateStatusListCredential</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getTrimmedProofAndValue">getTrimmedProofAndValue</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#getUpdatesFromBlock">getUpdatesFromBlock</a></li><li><a href="global.html#getVerificationMethod">getVerificationMethod</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hasRegistryRevocationStatus">hasRegistryRevocationStatus</a></li><li><a href="global.html#HEX_ID_REG_EXP_PATTERN">HEX_ID_REG_EXP_PATTERN</a></li><li><a href="global.html#initOrUpdate">initOrUpdate</a></li><li><a href="global.html#isAccumulatorRevocationStatus">isAccumulatorRevocationStatus</a></li><li><a href="global.html#isConnected">isConnected</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRegistryRevocationStatus">isRegistryRevocationStatus</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#matchingResolver">matchingResolver</a></li><li><a href="global.html#METHOD_REG_EXP_PATTERN">METHOD_REG_EXP_PATTERN</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#offchainSignatures">offchainSignatures</a></li><li><a href="global.html#parse">parse</a></li><li><a href="global.html#parseDid">parseDid</a></li><li><a href="global.html#parseEventAsAccumulatorUpdate">parseEventAsAccumulatorUpdate</a></li><li><a href="global.html#parseRDFDocument">parseRDFDocument</a></li><li><a href="global.html#parseRef">parseRef</a></li><li><a href="global.html#prepareAddParameters">prepareAddParameters</a></li><li><a href="global.html#prepareAddPublicKey">prepareAddPublicKey</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#ps">ps</a></li><li><a href="global.html#publicKey">publicKey</a></li><li><a href="global.html#queryNextLookup">queryNextLookup</a></li><li><a href="global.html#random">random</a></li><li><a href="global.html#removeAccumulator">removeAccumulator</a></li><li><a href="global.html#removeAccumulatorTx">removeAccumulatorTx</a></li><li><a href="global.html#removeParams">removeParams</a></li><li><a href="global.html#removeParamsTx">removeParamsTx</a></li><li><a href="global.html#removePublicKey">removePublicKey</a></li><li><a href="global.html#removeStatusListCredential">removeStatusListCredential</a></li><li><a href="global.html#removeStatusListCredentialWithOneOfPolicy">removeStatusListCredentialWithOneOfPolicy</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#revealMandatoryFields">revealMandatoryFields</a></li><li><a href="global.html#revocation">revocation</a></li><li><a href="global.html#revoked">revoked</a></li><li><a href="global.html#revokedBatch">revokedBatch</a></li><li><a href="global.html#send">send</a></li><li><a href="global.html#setAccount">setAccount</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signAddParams">signAddParams</a></li><li><a href="global.html#signAddPublicKey">signAddPublicKey</a></li><li><a href="global.html#signAndSend">signAndSend</a></li><li><a href="global.html#signer">signer</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signExtrinsic">signExtrinsic</a></li><li><a href="global.html#signPrehashed">signPrehashed</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#signRemoveParams">signRemoveParams</a></li><li><a href="global.html#signRemovePublicKey">signRemovePublicKey</a></li><li><a href="global.html#statusListCredential">statusListCredential</a></li><li><a href="global.html#supports">supports</a></li><li><a href="global.html#suspendIssuers">suspendIssuers</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toBytes">toBytes</a></li><li><a href="global.html#toEncodedString">toEncodedString</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toJsonldjsNode">toJsonldjsNode</a></li><li><a href="global.html#toSubstrate">toSubstrate</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#trustRegistry">trustRegistry</a></li><li><a href="global.html#typedHexDID">typedHexDID</a></li><li><a href="global.html#typedHexDIDFromSubstrate">typedHexDIDFromSubstrate</a></li><li><a href="global.html#unsuspendIssuers">unsuspendIssuers</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#updateAccumulator">updateAccumulator</a></li><li><a href="global.html#updateAccumulatorTx">updateAccumulatorTx</a></li><li><a href="global.html#updateDelegatedIssuers">updateDelegatedIssuers</a></li><li><a href="global.html#updateSchemaMetadata">updateSchemaMetadata</a></li><li><a href="global.html#updateStatusList">updateStatusList</a></li><li><a href="global.html#updateStatusListCredential">updateStatusListCredential</a></li><li><a href="global.html#updateStatusListCredentialWithOneOfPolicy">updateStatusListCredentialWithOneOfPolicy</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateAddress">validateAddress</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyEcdsaSecp256k1SigPrehashed">verifyEcdsaSecp256k1SigPrehashed</a></li><li><a href="global.html#verifyID">verifyID</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#verifyPrivateStatus">verifyPrivateStatus</a></li><li><a href="global.html#verifySignature">verifySignature</a></li><li><a href="global.html#WILDCARD">WILDCARD</a></li><li><a href="global.html#withExtendedStaticProperties">withExtendedStaticProperties</a></li><li><a href="global.html#withInitializedDockAPI">withInitializedDockAPI</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Thu Feb 01 2024 15:50:04 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Wed Feb 07 2024 07:04:52 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

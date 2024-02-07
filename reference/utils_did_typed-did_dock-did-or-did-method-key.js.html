@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: utils/codec.js</title>
+    <title>JSDoc: Source: utils/did/typed-did/dock-did-or-did-method-key.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: utils/codec.js</h1>
+    <h1 class="page-title">Source: utils/did/typed-did/dock-did-or-did-method-key.js</h1>
 
     
 
@@ -26,104 +26,161 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import { u8aToHex } from '@polkadot/util';
-import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+            <pre class="prettyprint source linenums"><code>import { getStateChange } from '../../misc';
+import { createDidSig } from '../utils';
+
+import { DockDIDQualifier, DidMethodKeyQualifier } from '../constants';
+import { withExtendedStaticProperties } from '../../inheritance';
 
 /**
- * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
- * @param {string} value - Hexadecimal value
- * @param {number} [byteSize] - Expected byte size of the input.
- * @return {Boolean} True if hex (with given size) else false
+ * Either `did:dock:*` or `did:key:*`.
  */
-export function isHexWithGivenByteSize(value, byteSize = undefined) {
-  if (typeof value !== 'string') {
+class DockDidOrDidMethodKey {
+  /**
+   * Prefix to form the fully qualified string.
+   *
+   * @type {string}
+   */
+  static Qualifier;
+  /**
+   * @type {typeof this}
+   */
+  static DockDid;
+  /**
+   * @type {typeof this}
+   */
+  static DidMethodKey;
+
+  /**
+   * Instantiates `DockDid` or `DidMethodKey` from a fully qualified did string or a raw hex did.
+   * @param {string} did - fully qualified `dock:did:&lt;SS58 DID>` or `dock:key:&lt;BS58 public key>` or a raw hex DID
+   * @returns {this}
+   */
+  static fromString(did) {
+    if (did.startsWith('0x')) {
+      return new this.DockDid(did);
+    } else {
+      return this.fromQualifiedString(did);
+    }
+  }
+
+  /**
+   * Instantiates `DockDid` or `DidMethodKey` from a fully qualified did string.
+   * @param {string} did - fully qualified `dock:did:&lt;SS58 DID>` or `dock:key:&lt;BS58 public key>` string
+   * @returns {this}
+   */
+  static fromQualifiedString(did) {
+    if (did.startsWith(DockDIDQualifier)) {
+      return this.DockDid.fromQualifiedString(did);
+    } else if (did.startsWith(DidMethodKeyQualifier)) {
+      return this.DidMethodKey.fromQualifiedString(did);
+    } else {
+      throw new Error(
+        `Unsupported did string: ${did}, expected either \`dock:did:&lt;SS58 DID>\` or \`dock:key:&lt;BS58 public key>\``,
+      );
+    }
+  }
+
+  /**
+   * Instantiates `DockDid` or `DockDidMethodKey` from a did or did method key object received from the substrate side.
+   * @param {object} did - substrate did or did method key
+   * @returns {this}
+   */
+  static fromSubstrateValue(did) {
+    if (did.isDid) {
+      return this.DockDid.fromSubstrateValue(did);
+    } else if (did.isDidMethodKey) {
+      return this.DidMethodKey.fromSubstrateValue(did);
+    } else {
+      throw new Error(`Invalid \`did:*\` provided: \`${did}\``);
+    }
+  }
+
+  /**
+   * Extracts raw underlying value if it's `did:dock:*`, throws an error otherwise.
+   */
+  get asDid() {
+    throw new Error('Not a `Did`');
+  }
+
+  /**
+   *  Extracts raw underlying value if it's `did:key:*`, throws an error otherwise.
+   */
+  get asDidMethodKey() {
+    throw new Error('Not a `DidMethodKey`');
+  }
+
+  /**
+   *  Returns `true` if the underlying value is a `did:dock:*`.
+   */
+  get isDid() {
     return false;
   }
-  const match = value.match(/^0x([0-9a-f]+$)/i);
-  if (match &amp;&amp; match.length > 1) {
-    if (byteSize !== undefined) {
-      // If `byteSize` is not a positive integer type, then check will fail
-      // 2 hex digits make a byte
-      return match[1].length === 2 * byteSize;
-    }
-    // Don't care about byte size of the match but it must be full byte
-    return match[1].length % 2 === 0;
-  }
-  return false;
-}
 
-/**
- * Gets the hexadecimal value of the given string.
- * @return {string} Returns the hexadecimal representation of the ID.
- */
-export function getHexIdentifier(id, qualifiers, byteSize) {
-  const strId = String(id);
-
-  for (const qualifier of [].concat(qualifiers)) {
-    if (strId.startsWith(qualifier)) {
-      // Fully qualified ID. Remove the qualifier
-      const ss58Did = strId.slice(qualifier.length);
-      try {
-        const hex = u8aToHex(decodeAddress(ss58Did));
-        // 2 characters for `0x` and 2*byte size of ID
-        if (hex.length !== 2 + 2 * byteSize) {
-          throw new Error('Unexpected byte size');
-        }
-        return hex;
-      } catch (e) {
-        throw new Error(`Invalid SS58 ID ${strId} with qualifier ${qualifier}. ${e}`);
-      }
-    }
+  /**
+   *  Returns `true` if the underlying value is a `did:key:*`.
+   */
+  get isDidMethodKey() {
+    return false;
   }
 
-  try {
-    // Check if hex and of correct size and return the hex value if successful.
-    if (!isHexWithGivenByteSize(strId, byteSize)) {
-      throw new Error(`Expected ${byteSize}-byte sequence`);
-    }
+  /**
+   * Creates signature for the state change with supplied arguments.
+   *
+   * @param api
+   * @param name
+   * @param payload
+   * @param keyRef
+   * @returns {object}
+   */
+  signStateChange(api, name, payload, keyRef) {
+    const stateChange = getStateChange(api, name, payload);
+    const keySignature = keyRef.sign(stateChange);
 
-    return strId;
-  } catch (error) {
-    // Cannot parse as hex
-    throw new Error(`Invalid hex Did \`${id}\`, stringified \`${strId}\`: ${error}`);
+    return createDidSig(this, keyRef, keySignature);
   }
-}
 
-/**
- * Convert address to Dock appropriate network address.
- * @param addr - address to convert
- * @param network - the network to use, allowed values are `main`, `test` and `dev` corresponding to mainnet, testnet and dev node
- */
-export function asDockAddress(addr, network = 'test') {
-  switch (network) {
-    case 'dev':
-      return encodeAddress(addr, 42);
-    case 'test':
-      return encodeAddress(addr, 21);
-    case 'main':
-      return encodeAddress(addr, 22);
-    default:
-      throw new Error(
-        `Network can be either test or main or dev but was passed as ${network}`,
-      );
+  /**
+   * Creates a transaction that will modify the chain state.
+   *
+   * @param api
+   * @param method
+   * @param name
+   * @param payload
+   * @param keyRef
+   */
+  changeState(api, method, name, payload, keyRef) {
+    const signature = this.signStateChange(api, name, payload, keyRef);
+
+    return method(payload, signature);
+  }
+
+  /**
+   * Converts underlying object to the `JSON` representation suitable for substrate JSON-RPC.
+   */
+  toJSON() {
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * Returns underlying value encoded according to the specification.
+   */
+  toEncodedString() {
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * Returns fully qualified `did:dock:*` encoded in SS58 or `did:key:*` encoded in BS58.
+   */
+  toQualifiedEncodedString() {
+    return `${this.constructor.Qualifier}${this.toEncodedString()}`;
   }
 }
 
-/**
- * Normalizes the given input to hex. Expects a Uint8Array or a hex string
- * @param {Uint8Array|string} data
- */
-export function normalizeToHex(data) {
-  let hex;
-  if (data instanceof Uint8Array) {
-    hex = u8aToHex(data);
-  } else if (isHexWithGivenByteSize(data)) {
-    hex = data;
-  } else {
-    throw new Error('Require a hex string or a byte array');
-  }
-  return hex;
-}
+export default withExtendedStaticProperties(
+  ['Qualifier'],
+  DockDidOrDidMethodKey,
+);
 </code></pre>
         </article>
     </section>

@@ -138,9 +138,9 @@ export function getSignatureFromKeyringPair(pair, message) {
 /**
  * Wrapped keypair used to interact with the dock blockchain.
  */
-export class DockKeyPair {
+export class DockKeypair {
   /**
-   * Wraps supplied keypair into a `DockKeyPair`.
+   * Wraps supplied keypair into a `DockKeypair`.
    *
    * @param {*} keyPair
    */
@@ -257,9 +257,7 @@ export const ensureMatchesStructurePattern = (pattern, value, path = []) => {
   for (const key of patternAttrs) {
     if (!PatternAttrs.has(key)) {
       throw new Error(
-        `Invalid pattern modifier: ${key}, path: \`${path.join(
-          '.',
-        )}\`.`,
+        `Invalid pattern modifier: ${key}, path: \`${path.join('.')}\`.`,
       );
     }
   }
@@ -306,9 +304,7 @@ export const ensureMatchesStructurePattern = (pattern, value, path = []) => {
   if (patternAttrs.has('$matchIterable')) {
     if (typeof value[Symbol.iterator] !== 'function') {
       throw new Error(
-        `Iterable expected, received: ${value}, path: \`${path.join(
-          '.',
-        )}\`.`,
+        `Iterable expected, received: ${value}, path: \`${path.join('.')}\`.`,
       );
     }
     const objectIter = value[Symbol.iterator]();
@@ -318,9 +314,9 @@ export const ensureMatchesStructurePattern = (pattern, value, path = []) => {
       const { value: item, done } = objectIter.next();
       if (done) {
         throw new Error(
-          `Value iterable is shorter than expected, received: ${value}, path: \`${path.join(
-            '.',
-          )}\`.`,
+          `Value iterable is shorter than expected, received: ${fmtIter(
+            value,
+          )}, path: \`${path.join('.')}\`.`,
         );
       }
 
@@ -328,7 +324,10 @@ export const ensureMatchesStructurePattern = (pattern, value, path = []) => {
     }
   }
 
-  if (patternAttrs.has('$instanceOf') && !(value instanceof pattern.$instanceOf)) {
+  if (
+    patternAttrs.has('$instanceOf')
+    && !(value instanceof pattern.$instanceOf)
+  ) {
     throw new Error(
       `Invalid value provided, expected instance of \`${
         pattern.$instanceOf.name
@@ -341,9 +340,7 @@ export const ensureMatchesStructurePattern = (pattern, value, path = []) => {
   if (patternAttrs.has('$iterableOf')) {
     if (typeof value?.[Symbol.iterator] !== 'function') {
       throw new Error(
-        `Iterable expected, received \`${value}\`, path: \`${path.join(
-          '.',
-        )}\`.`,
+        `Iterable expected, received \`${value}\`, path: \`${path.join('.')}\`.`,
       );
     }
 
@@ -360,9 +357,7 @@ export const ensureMatchesStructurePattern = (pattern, value, path = []) => {
   if (patternAttrs.has('$mapOf')) {
     if (typeof value?.entries !== 'function') {
       throw new Error(
-        `Map expected, received \`${value}\`, path: \`${path.join(
-          '.',
-        )}\`.`,
+        `Map expected, received \`${value}\`, path: \`${path.join('.')}\`.`,
       );
     }
 
@@ -414,9 +409,7 @@ export const ensureMatchesStructurePattern = (pattern, value, path = []) => {
       throw new Error(
         `Invalid value key provided, expected one of \`${fmtIter(
           Object.keys(pattern.$objOf),
-        )}\`, received \`${keys[0]}\`, path: \`${path.join(
-          '.',
-        )}\`.`,
+        )}\`, received \`${keys[0]}\`, path: \`${path.join('.')}\`.`,
       );
     }
     ensureMatchesStructurePattern(

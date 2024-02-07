@@ -1,10 +1,10 @@
 import { randomAsHex } from '@polkadot/util-crypto';
-import { DockKeyPair } from '../misc';
+import { DockKeypair } from '../misc';
 
 /**
  * Signing keypair along with the optional key identifier.
  */
-export class DidKeypair extends DockKeyPair {
+export class DidKeypair extends DockKeypair {
   /**
    * Wraps supplied keypair into a `DidKeypair`.
    *

@@ -28,9 +28,9 @@ exports[`ensureMatchesStructurePattern $matchIterable 1`] = `"Unknown value \`3\
 
 exports[`ensureMatchesStructurePattern $matchIterable 2`] = `"Unknown value \`3\`, expected 2, path: \`@item#1\`."`;
 
-exports[`ensureMatchesStructurePattern $matchIterable 3`] = `"Value iterable is shorter than expected, received: , path: \`\`."`;
+exports[`ensureMatchesStructurePattern $matchIterable 3`] = `"Value iterable is shorter than expected, received: \`[]\`, path: \`\`."`;
 
-exports[`ensureMatchesStructurePattern $matchIterable 4`] = `"Value iterable is shorter than expected, received: 1, path: \`\`."`;
+exports[`ensureMatchesStructurePattern $matchIterable 4`] = `"Value iterable is shorter than expected, received: \`[1]\`, path: \`\`."`;
 
 exports[`ensureMatchesStructurePattern $matchIterable 5`] = `"Unknown value \`2\`, expected 1, path: \`@item#0\`."`;
 

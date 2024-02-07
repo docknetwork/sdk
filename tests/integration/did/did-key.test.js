@@ -1,7 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 
 import { DockAPI } from '../../../src';
-import { generateEcdsaSecp256k1Keypair } from '../../../src/utils/misc';
 import {
   typedHexDID,
   typedHexDIDFromSubstrate,
@@ -59,7 +58,7 @@ buildTest('Basic DID tests', () => {
     );
 
     await dock.did.newDidMethodKey(testDidMethodKey2.asDidMethodKey, false);
-    const nonce = (await dock.did.getDidMethodKeyDetail(testDidMethodKey2.asDidMethodKey)).nonce;
+    const { nonce } = await dock.did.getDidMethodKeyDetail(testDidMethodKey2.asDidMethodKey);
     expect(nonce).toBeGreaterThan(1);
     expect(testDidMethodKey2.toString().startsWith('did:key:z')).toBe(true);
   }, 30000);

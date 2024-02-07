@@ -260,7 +260,7 @@ export class PatternMatcher {
    *
    * @param pattern
    * @param value
-   * @param path
+   * @param {?Array} path
    */
   check(pattern, value, path = []) {
     for (const key of Object.keys(pattern)) {
@@ -483,6 +483,5 @@ export class PatternMatcher {
  *
  * @param pattern
  * @param value
- * @param path
  */
-export const ensureMatchesPattern = (pattern, value, path) => new PatternMatcher().check(pattern, value, path);
+export const ensureMatchesPattern = (pattern, value) => new PatternMatcher().check(pattern, value);

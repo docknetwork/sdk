@@ -469,7 +469,7 @@ export class Pattern {
   }
 
   /**
-   * Supplied value is an object with one key existing in `pattern` that matches the pattern under pattern key.
+   * Supplied value is an object with one key existing in `pattern` that matches the pattern under this key.
    *
    * @param pattern
    * @param value
@@ -481,6 +481,7 @@ export class Pattern {
       throw new Error('Expected a single key');
     }
     const [key] = keys;
+
     if (!Object.hasOwnProperty.call(pattern.$objOf, key)) {
       throw new Error(
         `Invalid value key provided, expected one of \`${fmtIter(

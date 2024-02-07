@@ -1,7 +1,7 @@
 import { canonicalize } from 'json-canonicalize';
 import { validate } from 'jsonschema';
 
-import { hexDIDToQualified } from '../utils/did';
+import { typedHexDIDFromSubstrate } from '../utils/did';
 
 import {
   createNewDockBlobId,
@@ -140,7 +140,7 @@ export default class Schema {
       return {
         ...chainValue,
         id,
-        author: hexDIDToQualified(chainBlob[0]),
+        author: typedHexDIDFromSubstrate(dockApi, chainBlob[0]).toQualifiedEncodedString(),
       };
     }
     throw new Error('Incorrect schema format');

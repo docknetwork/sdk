@@ -8930,6 +8930,11 @@ jsbn@~0.1.0:
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
   integrity sha512-UVU9dibq2JcFWxQPA6KCqj5O42VOmAY3zQUfEKxU0KpTGXwNoCjkX1e13eHNvw/xPynt6pU0rZ1htjWTNTSXsg==
 
+jsdoc-typeof-plugin@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/jsdoc-typeof-plugin/-/jsdoc-typeof-plugin-1.0.0.tgz#d9b621d1c63b607116d53b20d73f87a2f917a51f"
+  integrity sha512-iG/LKaVnwRgi+EET6oi6uWNi+hVSUNM1t1NAywfCPIayDgsbQ4LWynnqO4IDTOPS7qObEWLJOjoqNby8+oiqXg==
+
 jsdoc@^3.6.3:
   version "3.6.11"
   resolved "https://registry.yarnpkg.com/jsdoc/-/jsdoc-3.6.11.tgz#8bbb5747e6f579f141a5238cbad4e95e004458ce"

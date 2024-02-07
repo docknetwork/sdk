@@ -1,7 +1,6 @@
 import jsonld from 'jsonld';
 import { validate } from 'jsonschema';
 import defaultDocumentLoader from './document-loader';
-import { hexDIDToQualified } from '../did';
 
 import {
   expandedSubjectProperty,
@@ -89,7 +88,7 @@ export async function getAndValidateSchemaIfPresent(
         schemaObj = {
           ...data,
           id: schemaUri,
-          author: hexDIDToQualified(author),
+          author: author.toQualifiedEncodedString(),
         };
       } else {
         schemaObj = document;

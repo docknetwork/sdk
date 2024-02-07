@@ -10,7 +10,7 @@ import {
   NoOnchainDIDError,
   NoOffchainDIDError,
   createDidSig,
-  DockDIDMethodKeyQualifier,
+  DidMethodKeyQualifier,
 } from '../../utils/did';
 import { getStateChange } from '../../utils/misc';
 
@@ -681,7 +681,7 @@ class DIDModule {
    * @return {string} The DID identifier.
    */
   getFullyQualifiedDIDMethodKey(didMethodKey) {
-    return `${DockDIDMethodKeyQualifier}${didMethodKey}`;
+    return `${DidMethodKeyQualifier}${didMethodKey}`;
   }
 
   /**

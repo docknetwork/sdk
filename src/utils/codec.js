@@ -30,6 +30,7 @@ export function isHexWithGivenByteSize(value, byteSize = undefined) {
  */
 export function getHexIdentifier(id, qualifiers, byteSize) {
   const strId = String(id);
+
   for (const qualifier of [].concat(qualifiers)) {
     if (strId.startsWith(qualifier)) {
       // Fully qualified ID. Remove the qualifier

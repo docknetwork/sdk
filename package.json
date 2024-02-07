@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "7.2.1",
+  "version": "7.3.0",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -45,6 +45,7 @@
     "jest": "^24.5.0",
     "jest-environment-node": "^24.5.0",
     "jsdoc": "^3.6.3",
+    "jsdoc-typeof-plugin": "^1.0.0",
     "parity-scale-codec": "^0.5.3",
     "r1csfile": "0.0.41",
     "ramda": "^0.27.2",

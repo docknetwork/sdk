@@ -7,7 +7,7 @@ import {
   typedHexDIDFromSubstrate,
   NoDIDError,
   DidKeypair,
-  DockDidMethodKey,
+  DidMethodKey,
 } from '../../../src/utils/did';
 import {
   FullNodeEndpoint,
@@ -26,7 +26,6 @@ buildTest('Basic DID tests', () => {
   let testDidMethodKeyPair1;
   let testDidMethodKey1;
 
-  const testDidMethodKeySeed2 = randomAsHex(32);
   let testDidMethodKeyPair2;
   let testDidMethodKey2;
 
@@ -41,12 +40,10 @@ buildTest('Basic DID tests', () => {
     testDidMethodKeyPair1 = new DidKeypair(
       dock.keyring.addFromUri(testDidMethodKeySeed1, null, 'ed25519'),
     );
-    testDidMethodKey1 = new DockDidMethodKey(testDidMethodKeyPair1.publicKey());
+    testDidMethodKey1 = new DidMethodKey(testDidMethodKeyPair1.publicKey());
 
-    testDidMethodKeyPair2 = new DidKeypair(
-      generateEcdsaSecp256k1Keypair(testDidMethodKeySeed2),
-    );
-    testDidMethodKey2 = new DockDidMethodKey(testDidMethodKeyPair2.publicKey());
+    testDidMethodKeyPair2 = DidKeypair.randomSecp256k1();
+    testDidMethodKey2 = DidMethodKey.fromKeypair(testDidMethodKeyPair2);
 
     await dock.did.newDidMethodKey(testDidMethodKey1.asDidMethodKey, false);
   });

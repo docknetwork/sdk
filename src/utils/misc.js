@@ -1,5 +1,5 @@
 import elliptic from 'elliptic';
-import { blake2AsHex } from '@polkadot/util-crypto';
+import { blake2AsHex, randomAsHex } from '@polkadot/util-crypto';
 
 import { sha256 } from 'js-sha256';
 import {
@@ -133,6 +133,45 @@ export function getSignatureFromKeyringPair(pair, message) {
     Cls = SignatureSecp256k1;
   }
   return new Cls(message, pair);
+}
+
+/**
+ * Wrapped keypair used to interact with the dock blockchain.
+ */
+export class DockKeyPair {
+  /**
+   * Wraps supplied keypair into a `DockKeyPair`.
+   *
+   * @param {*} keyPair
+   */
+  constructor(keyPair) {
+    this.keyPair = keyPair;
+  }
+
+  /**
+   * Returns underlying public key.
+   */
+  publicKey() {
+    return getPublicKeyFromKeyringPair(this.keyPair);
+  }
+
+  /**
+   * Signs supplied message using underlying keypair.
+   * @param {*} message
+   */
+  sign(message) {
+    return getSignatureFromKeyringPair(this.keyPair, message);
+  }
+
+  /**
+   * Generates random `Secp256k1` keypair.
+   *
+   * @param params
+   * @returns {this}
+   */
+  static randomSecp256k1() {
+    return new this(generateEcdsaSecp256k1Keypair(randomAsHex(32)));
+  }
 }
 
 /**

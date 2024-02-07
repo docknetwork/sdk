@@ -252,24 +252,20 @@ export class PatternError extends Error {
 }
 
 /**
- * Entity used to ensure that provided value matches supplied descriptor(s), throws error(s) otherwise.
+ * Entity used to ensure that provided value matches supplied pattern(s), throws error(s) otherwise.
  */
-export class Pattern {
+export class PatternMatcher {
   /**
-   * Ensures that provided value matches supplied pattern descriptor(s), throws an error otherwise.
+   * Ensures that provided value matches supplied pattern(s), throws an error otherwise.
    *
-   * @param descriptor
+   * @param pattern
    * @param value
    * @param path
    */
-  static check(pattern, value, path = []) {
+  check(pattern, value, path = []) {
     for (const key of Object.keys(pattern)) {
       if (!key.startsWith('$') || this[key] == null) {
-        throw new PatternError(
-          `Invalid pattern key \`${key}\`, expected one of \`${fmtIter(
-            Object.getOwnPropertyNames(this).filter((prop) => prop.startsWith('$')),
-          )}\``,
-        );
+        throw new PatternError(`Invalid pattern key \`${key}\``, [], pattern);
       }
 
       try {
@@ -282,22 +278,10 @@ export class Pattern {
             ? `${error.message}, path: \`${path.join('.')}\``
             : error.message;
 
-          throw new PatternError(
-            message,
-            path,
-            pattern,
-            error.errors,
-          );
+          throw new PatternError(message, path, pattern, error.errors);
         }
       }
     }
-  }
-
-  /**
-   * Returns all an array of supported pattern matchers.
-   */
-  static matchers() {
-    return Object.getOwnPropertyNames(this).filter((prop) => prop.startsWith('$'));
   }
 
   /**
@@ -306,7 +290,7 @@ export class Pattern {
    * @param pattern
    * @param value
    */
-  static $matchType(pattern, value) {
+  $matchType(pattern, value) {
     // eslint-disable-next-line valid-typeof
     if (typeof value !== pattern.$matchType) {
       throw new Error(
@@ -323,7 +307,7 @@ export class Pattern {
    * @param pattern
    * @param value
    */
-  static $matchValue(pattern, value) {
+  $matchValue(pattern, value) {
     if (value !== pattern.$matchValue) {
       throw new Error(
         `Unknown value \`${value}\`, expected ${pattern.$matchValue}`,
@@ -338,7 +322,7 @@ export class Pattern {
    * @param value
    * @param path
    */
-  static $matchObject(pattern, value, path) {
+  $matchObject(pattern, value, path) {
     for (const key of Object.keys(value)) {
       if (!Object.hasOwnProperty.call(pattern.$matchObject, key)) {
         throw new Error(
@@ -359,7 +343,7 @@ export class Pattern {
    * @param value
    * @param path
    */
-  static $matchIterable(pattern, value, path) {
+  $matchIterable(pattern, value, path) {
     if (typeof value[Symbol.iterator] !== 'function') {
       throw new Error(`Iterable expected, received: ${value}`);
     }
@@ -384,7 +368,7 @@ export class Pattern {
    * @param pattern
    * @param value
    */
-  static $instanceOf(pattern, value) {
+  $instanceOf(pattern, value) {
     if (!(value instanceof pattern.$instanceOf)) {
       throw new Error(
         `Invalid value provided, expected instance of \`${pattern.$instanceOf.name}\`, received instance of \`${value?.constructor?.name}\``,
@@ -399,7 +383,7 @@ export class Pattern {
    * @param value
    * @param path
    */
-  static $iterableOf(pattern, value, path) {
+  $iterableOf(pattern, value, path) {
     if (typeof value?.[Symbol.iterator] !== 'function') {
       throw new Error(`Iterable expected, received \`${value}\``);
     }
@@ -417,7 +401,7 @@ export class Pattern {
    * @param value
    * @param path
    */
-  static $mapOf(pattern, value, path) {
+  $mapOf(pattern, value, path) {
     if (typeof value?.entries !== 'function') {
       throw new Error(`Map expected, received \`${value}\``);
     }
@@ -443,7 +427,7 @@ export class Pattern {
    * @param value
    * @param path
    */
-  static $anyOf(pattern, value, path) {
+  $anyOf(pattern, value, path) {
     let anySucceeded = false;
     const errors = [];
 
@@ -475,7 +459,7 @@ export class Pattern {
    * @param value
    * @param path
    */
-  static $objOf(pattern, value, path) {
+  $objOf(pattern, value, path) {
     const keys = Object.keys(value);
     if (keys.length !== 1) {
       throw new Error('Expected a single key');
@@ -495,10 +479,10 @@ export class Pattern {
 }
 
 /**
- * Ensures that provided value matches supplied pattern descriptor(s), throws an error otherwise.
+ * Ensures that provided value matches supplied pattern(s), throws an error otherwise.
  *
  * @param pattern
  * @param value
  * @param path
  */
-export const ensureMatchesPattern = Pattern.check.bind(Pattern);
+export const ensureMatchesPattern = (pattern, value, path) => new PatternMatcher().check(pattern, value, path);

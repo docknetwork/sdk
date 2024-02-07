@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ensureMatchesStructurePattern $anyOf 1`] = `"Neither of pattern succeeded for \`3\`: [\\"Unknown value \`3\`, expected 1, path: \`\`.\\",\\"Unknown value \`3\`, expected 2, path: \`\`.\\"], path: \`\`."`;
+
+exports[`ensureMatchesStructurePattern $instanceOf 1`] = `"Invalid value provided, expected instance of \`Function\`, received instance of \`Object\`, path: \`\`."`;
+
+exports[`ensureMatchesStructurePattern $iterableOf 1`] = `"Unknown value \`3\`, expected 1, path: \`@item#0\`."`;
+
+exports[`ensureMatchesStructurePattern $iterableOf 2`] = `"Unknown value \`3\`, expected 1, path: \`@item#1\`."`;
+
+exports[`ensureMatchesStructurePattern $iterableOf 3`] = `"Unknown value \`2\`, expected 1, path: \`@item#0\`."`;
+
+exports[`ensureMatchesStructurePattern $iterableOf 4`] = `"Unknown value \`2\`, expected 1, path: \`@item#1\`."`;
+
+exports[`ensureMatchesStructurePattern $mapOf 1`] = `"Unknown value \`3\`, expected 2, path: \`1\`."`;
+
+exports[`ensureMatchesStructurePattern $mapOf 2`] = `"Unknown value \`3\`, expected 1, path: \`3#key\`."`;
+
+exports[`ensureMatchesStructurePattern $mapOf 3`] = `"Unknown value \`3\`, expected 1, path: \`3#key\`."`;
+
+exports[`ensureMatchesStructurePattern $mapOf 4`] = `"Unknown value \`5\`, expected 1, path: \`A\`."`;
+
+exports[`ensureMatchesStructurePattern $mapOf 5`] = `"Invalid value key provided, expected one of \`\`[A]\`\`, received \`B\`, path: \`\`."`;
+
+exports[`ensureMatchesStructurePattern $mapOf 6`] = `"Expected a single key"`;
+
+exports[`ensureMatchesStructurePattern $matchIterable 1`] = `"Unknown value \`3\`, expected 1, path: \`@item#0\`."`;
+
+exports[`ensureMatchesStructurePattern $matchIterable 2`] = `"Unknown value \`3\`, expected 2, path: \`@item#1\`."`;
+
+exports[`ensureMatchesStructurePattern $matchIterable 3`] = `"Value iterable is shorter than expected, received: , path: \`\`."`;
+
+exports[`ensureMatchesStructurePattern $matchIterable 4`] = `"Value iterable is shorter than expected, received: 1, path: \`\`."`;
+
+exports[`ensureMatchesStructurePattern $matchIterable 5`] = `"Unknown value \`2\`, expected 1, path: \`@item#0\`."`;
+
+exports[`ensureMatchesStructurePattern $matchObject 1`] = `"Invalid property \`c\`, expected keys: \`\`[a, b]\`\`, path: \`\`, pattern: \`{\\"$matchObject\\":{\\"a\\":{\\"$matchValue\\":1},\\"b\\":{\\"$matchValue\\":2}}}\`"`;
+
+exports[`ensureMatchesStructurePattern $matchObject 2`] = `"Unknown value \`3\`, expected 1, path: \`a\`."`;
+
+exports[`ensureMatchesStructurePattern $matchObject 3`] = `"Unknown value \`3\`, expected 2, path: \`b\`."`;
+
+exports[`ensureMatchesStructurePattern $matchType 1`] = `"Invalid value provided, expected value with type \`number\`, received value with type \`string\`, path: \`\`."`;
+
+exports[`ensureMatchesStructurePattern $matchValue 1`] = `"Unknown value \`10\`, expected 11, path: \`\`."`;

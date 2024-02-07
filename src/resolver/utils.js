@@ -1,3 +1,5 @@
+import { fmtIter } from '../utils/misc';
+
 /**
  * Before resolving an entity, ensures that `DockAPI` is initialized, throws an error otherwise.
  * @template T
@@ -17,15 +19,6 @@ export const withInitializedDockAPI = (
     }
   }
 };
-
-/**
- * Returns string containing comma separated items of the provided iterable.
- *
- * @template V
- * @param {Iterable<V>} iter
- * @returns {string}
- */
-export const fmtIter = (iter) => `\`[${[...iter].map((item) => item.toString()).join(', ')}]\``;
 
 /**
  * Caches last function result and returns it if function called with the same args again.

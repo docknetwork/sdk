@@ -221,3 +221,208 @@ export async function getDidNonce(
   }
   return nonce;
 }
+
+/**
+ * Returns string containing comma separated items of the provided iterable.
+ *
+ * @template V
+ * @param {Iterable<V>} iter
+ * @returns {string}
+ */
+export const fmtIter = (iter) => `\`[${[...iter].map((item) => item.toString()).join(', ')}]\``;
+
+const PatternAttrs = new Set([
+  '$matchType',
+  '$matchValue',
+  '$matchObject',
+  '$matchIterable',
+  '$instanceOf',
+  '$iterableOf',
+  '$mapOf',
+  '$anyOf',
+  '$objOf',
+]);
+
+/**
+ * Ensures that provided value matches supplied pattern, throws an error otherwise.
+ *
+ * @param pattern
+ * @param value
+ * @param path
+ */
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export const ensureMatchesStructurePattern = (pattern, value, path = []) => {
+  const patternAttrs = new Set(Object.keys(pattern));
+
+  for (const key of patternAttrs) {
+    if (!PatternAttrs.has(key)) {
+      throw new Error(
+        `Invalid pattern modifier: ${key}, path: \`${path.join(
+          '.',
+        )}\`.`,
+      );
+    }
+  }
+
+  // eslint-disable-next-line valid-typeof
+  if (patternAttrs.has('$matchType') && typeof value !== pattern.$matchType) {
+    throw new Error(
+      `Invalid value provided, expected value with type \`${
+        pattern.$matchType
+      }\`, received value with type \`${typeof value}\`, path: \`${path.join(
+        '.',
+      )}\`.`,
+    );
+  }
+
+  if (patternAttrs.has('$matchValue') && value !== pattern.$matchValue) {
+    throw new Error(
+      `Unknown value \`${value}\`, expected ${
+        pattern.$matchValue
+      }, path: \`${path.join('.')}\`.`,
+    );
+  }
+
+  if (patternAttrs.has('$matchObject')) {
+    for (const key of Object.keys(value)) {
+      if (!Object.hasOwnProperty.call(pattern.$matchObject, key)) {
+        throw new Error(
+          `Invalid property \`${key}\`, expected keys: \`${fmtIter(
+            Object.keys(pattern.$matchObject),
+          )}\`, path: \`${path.join('.')}\`, pattern: \`${JSON.stringify(
+            pattern,
+          )}\``,
+        );
+      }
+
+      ensureMatchesStructurePattern(
+        pattern.$matchObject[key],
+        value[key],
+        path.concat(key),
+      );
+    }
+  }
+
+  if (patternAttrs.has('$matchIterable')) {
+    if (typeof value[Symbol.iterator] !== 'function') {
+      throw new Error(
+        `Iterable expected, received: ${value}, path: \`${path.join(
+          '.',
+        )}\`.`,
+      );
+    }
+    const objectIter = value[Symbol.iterator]();
+
+    let idx = 0;
+    for (const pat of pattern.$matchIterable) {
+      const { value: item, done } = objectIter.next();
+      if (done) {
+        throw new Error(
+          `Value iterable is shorter than expected, received: ${value}, path: \`${path.join(
+            '.',
+          )}\`.`,
+        );
+      }
+
+      ensureMatchesStructurePattern(pat, item, path.concat(`@item#${idx++}`));
+    }
+  }
+
+  if (patternAttrs.has('$instanceOf') && !(value instanceof pattern.$instanceOf)) {
+    throw new Error(
+      `Invalid value provided, expected instance of \`${
+        pattern.$instanceOf.name
+      }\`, received instance of \`${
+        value?.constructor?.name
+      }\`, path: \`${path.join('.')}\`.`,
+    );
+  }
+
+  if (patternAttrs.has('$iterableOf')) {
+    if (typeof value?.[Symbol.iterator] !== 'function') {
+      throw new Error(
+        `Iterable expected, received \`${value}\`, path: \`${path.join(
+          '.',
+        )}\`.`,
+      );
+    }
+
+    let idx = 0;
+    for (const entry of value) {
+      ensureMatchesStructurePattern(
+        pattern.$iterableOf,
+        entry,
+        path.concat(`@item#${idx++}`),
+      );
+    }
+  }
+
+  if (patternAttrs.has('$mapOf')) {
+    if (typeof value?.entries !== 'function') {
+      throw new Error(
+        `Map expected, received \`${value}\`, path: \`${path.join(
+          '.',
+        )}\`.`,
+      );
+    }
+
+    if (!Array.isArray(pattern.$mapOf) || pattern.$mapOf.length !== 2) {
+      throw new Error(
+        `\`$mapOf\` pattern should be an array with two items, received \`${JSON.stringify(
+          pattern,
+        )}\`, path: \`${path.join('.')}\``,
+      );
+    }
+
+    for (const [key, item] of value.entries()) {
+      ensureMatchesStructurePattern(
+        pattern.$mapOf[0],
+        key,
+        path.concat(`${key}#key`),
+      );
+      ensureMatchesStructurePattern(pattern.$mapOf[1], item, path.concat(key));
+    }
+  }
+
+  if (patternAttrs.has('$anyOf')) {
+    let anySucceeded = false;
+    const errors = [];
+    for (const patEntry of pattern.$anyOf) {
+      try {
+        ensureMatchesStructurePattern(patEntry, value, path);
+        anySucceeded = true;
+      } catch (err) {
+        errors.push(err);
+      }
+    }
+
+    if (!anySucceeded) {
+      throw new Error(
+        `Neither of pattern succeeded for \`${value}\`: ${JSON.stringify(
+          errors.map((err) => err.message),
+        )}, path: \`${path.join('.')}\`.`,
+      );
+    }
+  }
+
+  if (patternAttrs.has('$objOf')) {
+    const keys = Object.keys(value);
+    if (keys.length !== 1) {
+      throw new Error('Expected a single key');
+    }
+    if (!Object.hasOwnProperty.call(pattern.$objOf, keys[0])) {
+      throw new Error(
+        `Invalid value key provided, expected one of \`${fmtIter(
+          Object.keys(pattern.$objOf),
+        )}\`, received \`${keys[0]}\`, path: \`${path.join(
+          '.',
+        )}\`.`,
+      );
+    }
+    ensureMatchesStructurePattern(
+      pattern.$objOf[keys[0]],
+      value[keys[0]],
+      path.concat(keys[0]),
+    );
+  }
+};

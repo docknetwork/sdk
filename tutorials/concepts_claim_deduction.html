@@ -182,12 +182,12 @@
 <p>Imagine a signed credential issued by <strong>Alice</strong> claiming that <strong>Joe</strong> is a <strong>Member</strong>.</p>
 <pre><code class="language-json">{
   ...
-  &quot;issuer&quot;: &quot;Alice&quot;,
-  &quot;credentialSubject&quot;: {
-    &quot;id&quot;: &quot;Joe&quot;,
-    &quot;@type&quot;: &quot;Member&quot;
+  "issuer": "Alice",
+  "credentialSubject": {
+    "id": "Joe",
+    "@type": "Member"
   },
-  &quot;proof&quot;: ...,
+  "proof": ...,
   ...
 }
 </code></pre>
@@ -199,7 +199,7 @@
 <pre><code class="language-nquads">&lt;Joe&gt; &lt;type&gt; &lt;Member&gt; &lt;Alice&gt; .
 </code></pre>
 <p>The fourth and final element of the proven <em>quad</em> is used here to indicate the source of the information, Alice. The final element of a quad is its <a href="https://www.w3.org/TR/rdf11-concepts/#dfn-graph-name">graph name</a>.</p>
-<p>A signed credentials are <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos">ethos</a> arguments and a credential may be converted to a list of quads (a claimgraph). We call this representation &quot;Explicit Ethos&quot; form. If a credential is <em>verified</em>, then its explicit ethos form is <em>true</em>.</p>
+<p>A signed credentials are <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos">ethos</a> arguments and a credential may be converted to a list of quads (a claimgraph). We call this representation "Explicit Ethos" form. If a credential is <em>verified</em>, then its explicit ethos form is <em>true</em>.</p>
 <h2 id="rule-format"><a class="header" href="#rule-format">Rule Format</a></h2>
 <p>To perform reasoning and to accept proofs, the Verifier must select the list of logical rules wish to accept. Rules (or axioms if you prefer), are modeled as if-then relationships.</p>
 <pre><code class="language-js">const rules = [
@@ -209,7 +209,7 @@
   },
 ];
 </code></pre>
-<p>During reasoning, when an <code>if_all</code> pattern is matched, its corresponding <code>then</code> pattern will be implied. In logic terms, each &quot;rule&quot; is the conditional premise of a <a href="https://en.wikipedia.org/wiki/Modus_ponens">modus ponens</a>.</p>
+<p>During reasoning, when an <code>if_all</code> pattern is matched, its corresponding <code>then</code> pattern will be implied. In logic terms, each "rule" is the conditional premise of a <a href="https://en.wikipedia.org/wiki/Modus_ponens">modus ponens</a>.</p>
 <p><code>{ if_all: [A, B, C], then: [D, E] }</code> means that <code>if (A and B and C) then (D and E)</code>.</p>
 <p>Rules can contain Bound or Unbound entities. Unbound entities are named variables. Each rule has it's own unique scope, so Unbound entities introduced in the <code>if_all</code> pattern can be used in the <code>then</code> pattern.</p>
 <pre><code class="language-js">{
@@ -288,7 +288,7 @@ const defaultGraph = { DefaultGraph: true };
     ]
   ],
 }
-// all things named &quot;Bob&quot; like all things containing butter
+// all things named "Bob" like all things containing butter
 </code></pre>
 <p>See the <a href="tutorial_claim_deduction.html">claim deduction tutorial</a> for more another example.</p>
 <h2 id="limited-expresiveness"><a class="header" href="#limited-expresiveness">Limited Expresiveness</a></h2>
@@ -305,7 +305,7 @@ const defaultGraph = { DefaultGraph: true };
 <li><a href="https://www.w3.org/TR/rdf-primer/#rdfmodel">RDF graph</a>: A directed, labeled <a href="https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)">graph</a> with RDF triples as edges.</li>
 <li><a href="https://www.w3.org/TR/rdf-primer/#rdfmodel">RDF node</a></li>
 <li>Composite Claim: An rdf triple which was infered, rather than stated explicitly in a credential.</li>
-<li>Explicit <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos">Ethos</a> statement: A statement of the form &quot;A claims X.&quot; where X is also a statement. Explicit Ethos is encodable in natural human languages as well as in RDF.</li>
+<li>Explicit <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos">Ethos</a> statement: A statement of the form "A claims X." where X is also a statement. Explicit Ethos is encodable in natural human languages as well as in RDF.</li>
 </ul>
 <div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
 <p>If you ever decide to implement your own algorithm to merge RDF graphs, remember that <a href="https://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank nodes</a> exists and may need to be renamed depending on the type of graph representation in use.</p>

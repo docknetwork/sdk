@@ -220,20 +220,20 @@ Once the credential is initialized, you can sequentially call the different meth
 <p>You now have an unsigned Verifiable Credential in the <code>vc</code> variable!
 This Credential isn't signed since we only just initialized it. It brings however some useful defaults to make your life easier.</p>
 <pre><code class="language-javascript">&gt;    vc.context
-&lt;-   [&quot;https://www.w3.org/2018/credentials/v1&quot;]
+&lt;-   ["https://www.w3.org/2018/credentials/v1"]
 &gt;    vc.issuanceDate
-&lt;-   &quot;2020-04-14T14:48:48.486Z&quot;
+&lt;-   "2020-04-14T14:48:48.486Z"
 &gt;    vc.type
-&lt;-   [&quot;VerifiableCredential&quot;]
+&lt;-   ["VerifiableCredential"]
 &gt;    vc.credentialSubject
 &lt;-   []
 </code></pre>
 <p>The default <code>context</code> is an array with
-<code>&quot;https://www.w3.org/2018/credentials/v1&quot;</code> as first element. This is required
+<code>"https://www.w3.org/2018/credentials/v1"</code> as first element. This is required
 by the VCDMv1 specs so having it as default helps ensure your Verifiable
 Credentials will be valid in the end.</p>
 <p>A similar approach was taken on the <code>type</code> property, where the default is an
-array with <code>&quot;VerifiableCredential&quot;</code> already populated. This is also required
+array with <code>"VerifiableCredential"</code> already populated. This is also required
 by the specs. The <code>subject</code> property is required to exist, so this is already
 initialized for you as well although it is empty for now. Finally the
 <code>issuanceDate</code> is also set to the moment you initialized the
@@ -244,13 +244,13 @@ Verifiable Credential's JSON representation.</p>
 <p>This can be achieved by calling the <code>toJSON()</code> method on it:</p>
 <pre><code class="language-javascript">&gt;    vc.toJSON()
 &lt;-   {
-       &quot;@context&quot;: [ &quot;https://www.w3.org/2018/credentials/v1&quot; ],
-       &quot;credentialSubject&quot;: [],
-       &quot;id&quot;: &quot;http://example.edu/credentials/2803&quot;,
-       &quot;type&quot;: [
-         &quot;VerifiableCredential&quot;
+       "@context": [ "https://www.w3.org/2018/credentials/v1" ],
+       "credentialSubject": [],
+       "id": "http://example.edu/credentials/2803",
+       "type": [
+         "VerifiableCredential"
        ],
-       &quot;issuanceDate&quot;: &quot;2020-04-14T14:48:48.486Z&quot;
+       "issuanceDate": "2020-04-14T14:48:48.486Z"
      }
 </code></pre>
 <p>An interesting thing to note here is the transformation happening to some of
@@ -290,11 +290,11 @@ signing it.</p>
 </code></pre>
 <h4 id="setting-a-status"><a class="header" href="#setting-a-status">Setting a Status</a></h4>
 <p>A status can be set with the <code>setStatus</code> function. It accepts a single argument <code>status</code> that needs to be an object with an <code>id</code> property:</p>
-<pre><code class="language-javascript">&gt;   vc.setStatus({ id: &quot;https://example.edu/status/24&quot;, type: &quot;CredentialStatusList2017&quot; })
+<pre><code class="language-javascript">&gt;   vc.setStatus({ id: "https://example.edu/status/24", type: "CredentialStatusList2017" })
 &gt;   vc.status
 &lt;-  {
-        &quot;id&quot;: &quot;https://example.edu/status/24&quot;,
-        &quot;type&quot;: &quot;CredentialStatusList2017&quot;
+        "id": "https://example.edu/status/24",
+        "type": "CredentialStatusList2017"
     }
 </code></pre>
 <h4 id="setting-the-issuance-date"><a class="header" href="#setting-the-issuance-date">Setting the Issuance Date</a></h4>
@@ -307,19 +307,19 @@ to have an issuanceDate property).</p>
 method. It takes a single argument <code>issuanceDate</code> that needs to be a string
 with a valid ISO formatted datetime:</p>
 <pre><code class="language-javascript">&gt;   vc.issuanceDate
-&lt;-  &quot;2020-04-14T14:48:48.486Z&quot;
-&gt;   vc.setIssuanceDate(&quot;2019-01-01T14:48:48.486Z&quot;)
+&lt;-  "2020-04-14T14:48:48.486Z"
+&gt;   vc.setIssuanceDate("2019-01-01T14:48:48.486Z")
 &gt;   vc.issuanceDate
-&lt;-  &quot;2019-01-01T14:48:48.486Z&quot;
+&lt;-  "2019-01-01T14:48:48.486Z"
 </code></pre>
 <h4 id="setting-an-expiration-date"><a class="header" href="#setting-an-expiration-date">Setting an Expiration Date</a></h4>
 <p>An expiration date is not set by default as it isn't required by the specs.
 If you wish to set one, you can use the <code>setExpirationDate</code> method.</p>
 <p>It takes a single argument <code>expirationDate</code> that needs to be a string with a
 valid ISO formatted datetime:</p>
-<pre><code class="language-javascript">&gt;   vc.setExpirationDate(&quot;2029-01-01T14:48:48.486Z&quot;)
+<pre><code class="language-javascript">&gt;   vc.setExpirationDate("2029-01-01T14:48:48.486Z")
 &gt;   vc.expirationDate
-&lt;-  &quot;2029-01-01T14:48:48.486Z&quot;
+&lt;-  "2029-01-01T14:48:48.486Z"
 </code></pre>
 <h3 id="signing-a-verifiable-credential"><a class="header" href="#signing-a-verifiable-credential">Signing a Verifiable Credential</a></h3>
 <p>Once you've crafted your Verifiable Credential it is time to sign it. This
@@ -333,11 +333,11 @@ whether you want to compact the JSON-LD or not:</p>
 Once done, your <code>vc</code> object will have a new <code>proof</code> field:</p>
 <pre><code class="language-javascript">&gt;   vc.proof
 &lt;-  {
-        type: &quot;EcdsaSecp256k1Signature2019&quot;,
-        created: &quot;2020-04-14T14:48:48.486Z&quot;,
-        jws: &quot;eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEQCIAS8ZNVYIni3oShb0TFz4SMAybJcz3HkQPaTdz9OSszoAiA01w9ZkS4Zx5HEZk45QzxbqOr8eRlgMdhgFsFs1FnyMQ&quot;,
-        proofPurpose: &quot;assertionMethod&quot;,
-        verificationMethod: &quot;https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw&quot;
+        type: "EcdsaSecp256k1Signature2019",
+        created: "2020-04-14T14:48:48.486Z",
+        jws: "eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEQCIAS8ZNVYIni3oShb0TFz4SMAybJcz3HkQPaTdz9OSszoAiA01w9ZkS4Zx5HEZk45QzxbqOr8eRlgMdhgFsFs1FnyMQ",
+        proofPurpose: "assertionMethod",
+        verificationMethod: "https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw"
     }
 </code></pre>
 <h3 id="verifying-a-verifiable-credential"><a class="header" href="#verifying-a-verifiable-credential">Verifying a Verifiable Credential</a></h3>
@@ -357,11 +357,11 @@ not to be revoked unless you pass <code>skipRevocationCheck</code> flag.</p>
           proof: [
             {
                 '@context': 'https://w3id.org/security/v2',
-                type: &quot;EcdsaSecp256k1Signature2019&quot;,
-                created: &quot;2020-04-14T14:48:48.486Z&quot;,
-                jws: &quot;eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEQCIAS8ZNVYIni3oShb0TFz4SMAybJcz3HkQPaTdz9OSszoAiA01w9ZkS4Zx5HEZk45QzxbqOr8eRlgMdhgFsFs1FnyMQ&quot;,
-                proofPurpose: &quot;assertionMethod&quot;,
-                verificationMethod: &quot;https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw&quot;
+                type: "EcdsaSecp256k1Signature2019",
+                created: "2020-04-14T14:48:48.486Z",
+                jws: "eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEQCIAS8ZNVYIni3oShb0TFz4SMAybJcz3HkQPaTdz9OSszoAiA01w9ZkS4Zx5HEZk45QzxbqOr8eRlgMdhgFsFs1FnyMQ",
+                proofPurpose: "assertionMethod",
+                verificationMethod: "https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw"
             }
           ],
           verified: true
@@ -390,18 +390,18 @@ do that using the <code>VerifiablePresentation</code> class constructor which ta
 <p>This Presentation isn't signed since we only just initialized it. It brings
 however some useful defaults to make your life easier.</p>
 <pre><code class="language-javascript">&gt;    vp.context
-&lt;-   [&quot;https://www.w3.org/2018/credentials/v1&quot;]
+&lt;-   ["https://www.w3.org/2018/credentials/v1"]
 &gt;    vp.type
-&lt;-   [&quot;VerifiablePresentation&quot;]
+&lt;-   ["VerifiablePresentation"]
 &gt;    vp.credentials
 &lt;-   []
 </code></pre>
 <p>The default <code>context</code> is an array with
-<code>&quot;https://www.w3.org/2018/credentials/v1&quot;</code> as first element. This is required
+<code>"https://www.w3.org/2018/credentials/v1"</code> as first element. This is required
 by the VCDMv1 specs so having it as default helps ensure your Verifiable
 Presentations will be valid in the end.</p>
 <p>A similar approach was taken on the <code>type</code> property, where the default is an
-array with <code>&quot;VerifiablePresentation&quot;</code> already populated. This is also
+array with <code>"VerifiablePresentation"</code> already populated. This is also
 required by the specs.</p>
 <p>The <code>credentials</code> property is required to exist, so this is already
 initialized for you as well although it is empty for now.</p>
@@ -410,12 +410,12 @@ Verifiable Presentation's JSON representation.</p>
 <p>This can be achieved by calling the <code>toJSON()</code> method on it:</p>
 <pre><code class="language-javascript">&gt;    vp.toJSON()
 &lt;-   {
-       &quot;@context&quot;: [ &quot;https://www.w3.org/2018/credentials/v1&quot; ],
-       &quot;id&quot;: &quot;http://example.edu/credentials/1986&quot;,
-       &quot;type&quot;: [
-         &quot;VerifiablePresentation&quot;
+       "@context": [ "https://www.w3.org/2018/credentials/v1" ],
+       "id": "http://example.edu/credentials/1986",
+       "type": [
+         "VerifiablePresentation"
        ],
-       &quot;verifiableCredential&quot;: [],
+       "verifiableCredential": [],
      }
 </code></pre>
 <p>An interesting thing to note here is the transformation happening to some of
@@ -487,13 +487,13 @@ compact the JSON-LD or not:</p>
 Once done, your <code>vp</code> object will have a new <code>proof</code> field:</p>
 <pre><code class="language-javascript">&gt;   vp.proof
 &lt;-  {
-      &quot;type&quot;: &quot;EcdsaSecp256k1Signature2019&quot;,
-      &quot;created&quot;: &quot;2020-04-14T20:57:01Z&quot;,
-      &quot;challenge&quot;: &quot;some_challenge&quot;,
-      &quot;domain&quot;: &quot;some_domain&quot;,
-      &quot;jws&quot;: &quot;eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEUCIQCTTpivdcTKFDNdmzqe3l0nV6UjXgv0XvzCge--CTAV6wIgWfLqn_62U8jHkNSujrHFRmJ_ULj19b5rsNtjum09vbg&quot;,
-      &quot;proofPurpose&quot;: &quot;authentication&quot;,
-      &quot;verificationMethod&quot;: &quot;https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw&quot;
+      "type": "EcdsaSecp256k1Signature2019",
+      "created": "2020-04-14T20:57:01Z",
+      "challenge": "some_challenge",
+      "domain": "some_domain",
+      "jws": "eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEUCIQCTTpivdcTKFDNdmzqe3l0nV6UjXgv0XvzCge--CTAV6wIgWfLqn_62U8jHkNSujrHFRmJ_ULj19b5rsNtjum09vbg",
+      "proofPurpose": "authentication",
+      "verificationMethod": "https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw"
     }
 </code></pre>
 <h3 id="verifying-a-verifiable-presentation"><a class="header" href="#verifying-a-verifiable-presentation">Verifying a Verifiable Presentation</a></h3>
@@ -507,39 +507,39 @@ For the simplest cases you only need a <code>challenge</code> string and possibl
 <pre><code class="language-javascript">&gt;   const results = await vp.verify({ challenge: 'some_challenge', domain: 'some_domain' });
 &gt;   results
 &lt;-  {
-      &quot;presentationResult&quot;: {
-        &quot;verified&quot;: true,
-        &quot;results&quot;: [
+      "presentationResult": {
+        "verified": true,
+        "results": [
           {
-            &quot;proof&quot;: {
-              &quot;@context&quot;: &quot;https://w3id.org/security/v2&quot;,
-              &quot;type&quot;: &quot;EcdsaSecp256k1Signature2019&quot;,
-              &quot;created&quot;: &quot;2020-04-14T20:57:01Z&quot;,
-              &quot;challenge&quot;: &quot;some_challenge&quot;,
-              &quot;domain&quot;: &quot;some_domain&quot;,
-              &quot;jws&quot;: &quot;eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEUCIQCTTpivdcTKFDNdmzqe3l0nV6UjXgv0XvzCge--CTAV6wIgWfLqn_62U8jHkNSujrHFRmJ_ULj19b5rsNtjum09vbg&quot;,
-              &quot;proofPurpose&quot;: &quot;authentication&quot;,
-              &quot;verificationMethod&quot;: &quot;https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw&quot;
+            "proof": {
+              "@context": "https://w3id.org/security/v2",
+              "type": "EcdsaSecp256k1Signature2019",
+              "created": "2020-04-14T20:57:01Z",
+              "challenge": "some_challenge",
+              "domain": "some_domain",
+              "jws": "eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEUCIQCTTpivdcTKFDNdmzqe3l0nV6UjXgv0XvzCge--CTAV6wIgWfLqn_62U8jHkNSujrHFRmJ_ULj19b5rsNtjum09vbg",
+              "proofPurpose": "authentication",
+              "verificationMethod": "https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw"
             },
-            &quot;verified&quot;: true
+            "verified": true
           }
         ]
       },
-      &quot;verified&quot;: true,
-      &quot;credentialResults&quot;: [
+      "verified": true,
+      "credentialResults": [
         {
-          &quot;verified&quot;: true,
-          &quot;results&quot;: [
+          "verified": true,
+          "results": [
             {
-              &quot;proof&quot;: {
-                &quot;@context&quot;: &quot;https://w3id.org/security/v2&quot;,
-                &quot;type&quot;: &quot;EcdsaSecp256k1Signature2019&quot;,
-                &quot;created&quot;: &quot;2020-04-14T20:49:00Z&quot;,
-                &quot;jws&quot;: &quot;eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEUCIQCCCRuJbSUPePpOfkxsMJeQAqpydOFYWsA4cGiQRAR_QQIgehRZh8XE24hV0TPl5bMS6sNeKtC5rwZGfmflfY0eS-Y&quot;,
-                &quot;proofPurpose&quot;: &quot;assertionMethod&quot;,
-                &quot;verificationMethod&quot;: &quot;https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw&quot;
+              "proof": {
+                "@context": "https://w3id.org/security/v2",
+                "type": "EcdsaSecp256k1Signature2019",
+                "created": "2020-04-14T20:49:00Z",
+                "jws": "eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..MEUCIQCCCRuJbSUPePpOfkxsMJeQAqpydOFYWsA4cGiQRAR_QQIgehRZh8XE24hV0TPl5bMS6sNeKtC5rwZGfmflfY0eS-Y",
+                "proofPurpose": "assertionMethod",
+                "verificationMethod": "https://gist.githubusercontent.com/faustow/13f43164c571cf839044b60661173935/raw"
               },
-              &quot;verified&quot;: true
+              "verified": true
             }
           ]
         }

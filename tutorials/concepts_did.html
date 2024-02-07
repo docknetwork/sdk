@@ -212,36 +212,36 @@ update its DID document. A DID with a key with <code>capabilityInvocation</code>
 are 32 bytes in size.</p>
 <p>An example DID Document</p>
 <pre><code class="language-json">{
-  &quot;@context&quot;: [
-    &quot;https://www.w3.org/ns/did/v1&quot;
+  "@context": [
+    "https://www.w3.org/ns/did/v1"
   ],
-  &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
-  &quot;controller&quot;: [
-    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;
+  "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
+  "controller": [
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn"
   ],
-  &quot;publicKey&quot;: [
+  "publicKey": [
     {
-      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;,
-      &quot;type&quot;: &quot;Sr25519VerificationKey2020&quot;,
-      &quot;controller&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
-      &quot;publicKeyBase58&quot;: &quot;7d3QsaW6kP7bGiJtRZBxdyZsbJqp6HXv1owwr8aYBjbg&quot;
+      "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
+      "type": "Sr25519VerificationKey2020",
+      "controller": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
+      "publicKeyBase58": "7d3QsaW6kP7bGiJtRZBxdyZsbJqp6HXv1owwr8aYBjbg"
     },
     {
-      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2&quot;,
-      &quot;type&quot;: &quot;Ed25519VerificationKey2018&quot;,
-      &quot;controller&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
-      &quot;publicKeyBase58&quot;: &quot;p6gb7WNh9SWC4hkye4VV5epo1LYpLXKH21ojfwJLayg&quot;
+      "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2",
+      "type": "Ed25519VerificationKey2018",
+      "controller": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
+      "publicKeyBase58": "p6gb7WNh9SWC4hkye4VV5epo1LYpLXKH21ojfwJLayg"
     }
   ],
-  &quot;authentication&quot;: [
-    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;,
-    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2&quot;
+  "authentication": [
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2"
   ],
-  &quot;assertionMethod&quot;: [
-    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;
+  "assertionMethod": [
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1"
   ],
-  &quot;capabilityInvocation&quot;: [
-    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;
+  "capabilityInvocation": [
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1"
   ]
 }
 </code></pre>
@@ -252,37 +252,37 @@ The above document states that the DID <code>did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMB
 whose id is specified under <code>authentication</code>. When it attests to some fact (becomes issuer), it can only use 1 key, which is under <code>assertionMethod</code>.
 The keys specified under <code>capabilityInvocation</code> can be used to update the DID document, i.e. add/remove keys, etc.</p>
 <pre><code class="language-json">{
-  &quot;@context&quot;: [
-    &quot;https://www.w3.org/ns/did/v1&quot;
+  "@context": [
+    "https://www.w3.org/ns/did/v1"
   ],
-  &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
-  &quot;controller&quot;: [
-    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
-    &quot;did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz&quot;
+  "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
+  "controller": [
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
+    "did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"
   ],
-  &quot;publicKey&quot;: [
+  "publicKey": [
     {
-      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;,
-      &quot;type&quot;: &quot;Sr25519VerificationKey2020&quot;,
-      &quot;controller&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
-      &quot;publicKeyBase58&quot;: &quot;7d3QsaW6kP7bGiJtRZBxdyZsbJqp6HXv1owwr8aYBjbg&quot;
+      "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
+      "type": "Sr25519VerificationKey2020",
+      "controller": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
+      "publicKeyBase58": "7d3QsaW6kP7bGiJtRZBxdyZsbJqp6HXv1owwr8aYBjbg"
     },
     {
-      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2&quot;,
-      &quot;type&quot;: &quot;Ed25519VerificationKey2018&quot;,
-      &quot;controller&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
-      &quot;publicKeyBase58&quot;: &quot;p6gb7WNh9SWC4hkye4VV5epo1LYpLXKH21ojfwJLayg&quot;
+      "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2",
+      "type": "Ed25519VerificationKey2018",
+      "controller": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
+      "publicKeyBase58": "p6gb7WNh9SWC4hkye4VV5epo1LYpLXKH21ojfwJLayg"
     }
   ],
-  &quot;authentication&quot;: [
-    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;,
-    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2&quot;
+  "authentication": [
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2"
   ],
-  &quot;assertionMethod&quot;: [
-    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;
+  "assertionMethod": [
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1"
   ],
-  &quot;capabilityInvocation&quot;: [
-    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;
+  "capabilityInvocation": [
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1"
   ]
 }
 </code></pre>
@@ -290,44 +290,44 @@ The keys specified under <code>capabilityInvocation</code> can be used to update
 and the other is <code>did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz</code>. This means that DID <code>did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz</code>
 can also modify above DID document, i.e. add/remove keys, add/remove controller, etc.</p>
 <pre><code class="language-json">{
-  &quot;@context&quot;: [
-    &quot;https://www.w3.org/ns/did/v1&quot;
+  "@context": [
+    "https://www.w3.org/ns/did/v1"
   ],
-  &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
-  &quot;controller&quot;: [
-    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
-    &quot;did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz&quot;
+  "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
+  "controller": [
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
+    "did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"
   ],
-  &quot;publicKey&quot;: [
+  "publicKey": [
     {
-      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;,
-      &quot;type&quot;: &quot;Sr25519VerificationKey2020&quot;,
-      &quot;controller&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
-      &quot;publicKeyBase58&quot;: &quot;7d3QsaW6kP7bGiJtRZBxdyZsbJqp6HXv1owwr8aYBjbg&quot;
+      "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
+      "type": "Sr25519VerificationKey2020",
+      "controller": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
+      "publicKeyBase58": "7d3QsaW6kP7bGiJtRZBxdyZsbJqp6HXv1owwr8aYBjbg"
     },
     {
-      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2&quot;,
-      &quot;type&quot;: &quot;Ed25519VerificationKey2018&quot;,
-      &quot;controller&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
-      &quot;publicKeyBase58&quot;: &quot;p6gb7WNh9SWC4hkye4VV5epo1LYpLXKH21ojfwJLayg&quot;
+      "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2",
+      "type": "Ed25519VerificationKey2018",
+      "controller": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
+      "publicKeyBase58": "p6gb7WNh9SWC4hkye4VV5epo1LYpLXKH21ojfwJLayg"
     }
   ],
-  &quot;authentication&quot;: [
-    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;,
-    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2&quot;
+  "authentication": [
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-2"
   ],
-  &quot;assertionMethod&quot;: [
-    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;
+  "assertionMethod": [
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1"
   ],
-  &quot;capabilityInvocation&quot;: [
-    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;
+  "capabilityInvocation": [
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1"
   ],
-  &quot;service&quot;: [
+  "service": [
     {
-      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1&quot;,
-      &quot;type&quot;: &quot;LinkedDomains&quot;,
-      &quot;serviceEndpoint&quot;: [
-        &quot;https://foo.example.com&quot;
+      "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1",
+      "type": "LinkedDomains",
+      "serviceEndpoint": [
+        "https://foo.example.com"
       ]
     }
   ]
@@ -337,23 +337,23 @@ can also modify above DID document, i.e. add/remove keys, add/remove controller,
 <p>DIDs can also be keyless, i.e. not have any keys of its own. In this case the DID is not self-controlled by controlled by
 another DID(s) and the other DID could add/remove keys, controllers or remove the DID. An example keyless DID is shown below</p>
 <pre><code class="language-json">{
-  &quot;@context&quot;: [
-    &quot;https://www.w3.org/ns/did/v1&quot;
+  "@context": [
+    "https://www.w3.org/ns/did/v1"
   ],
-  &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
-  &quot;controller&quot;: [
-    &quot;did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz&quot;
+  "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
+  "controller": [
+    "did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"
   ],
-  &quot;publicKey&quot;: [],
-  &quot;authentication&quot;: [],
-  &quot;assertionMethod&quot;: [],
-  &quot;capabilityInvocation&quot;: [],
-  &quot;service&quot;: [
+  "publicKey": [],
+  "authentication": [],
+  "assertionMethod": [],
+  "capabilityInvocation": [],
+  "service": [
     {
-      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1&quot;,
-      &quot;type&quot;: &quot;LinkedDomains&quot;,
-      &quot;serviceEndpoint&quot;: [
-        &quot;https://bar.example.com&quot;
+      "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1",
+      "type": "LinkedDomains",
+      "serviceEndpoint": [
+        "https://bar.example.com"
       ]
     }
   ]
@@ -363,32 +363,32 @@ another DID(s) and the other DID could add/remove keys, controllers or remove th
 <code>did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz</code> add a key, say for authentication to <code>did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn</code> and the
 DID Doc will look like below</p>
 <pre><code class="language-json">{
-  &quot;@context&quot;: [
-    &quot;https://www.w3.org/ns/did/v1&quot;
+  "@context": [
+    "https://www.w3.org/ns/did/v1"
   ],
-  &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
-  &quot;controller&quot;: [
-    &quot;did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz&quot;
+  "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
+  "controller": [
+    "did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"
   ],
-  &quot;publicKey&quot;: [
+  "publicKey": [
     {
-      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;,
-      &quot;type&quot;: &quot;Ed25519VerificationKey2018&quot;,
-      &quot;controller&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn&quot;,
-      &quot;publicKeyBase58&quot;: &quot;p6gb7WNh9SWC4hkye4VV5epo1LYpLXKH21ojfwJLayg&quot;
+      "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
+      "type": "Ed25519VerificationKey2018",
+      "controller": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
+      "publicKeyBase58": "p6gb7WNh9SWC4hkye4VV5epo1LYpLXKH21ojfwJLayg"
     }
   ],
-  &quot;authentication&quot;: [
-    &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1&quot;,
+  "authentication": [
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
   ],
-  &quot;assertionMethod&quot;: [],
-  &quot;capabilityInvocation&quot;: [],
-  &quot;service&quot;: [
+  "assertionMethod": [],
+  "capabilityInvocation": [],
+  "service": [
     {
-      &quot;id&quot;: &quot;did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1&quot;,
-      &quot;type&quot;: &quot;LinkedDomains&quot;,
-      &quot;serviceEndpoint&quot;: [
-        &quot;https://bar.example.com&quot;
+      "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1",
+      "type": "LinkedDomains",
+      "serviceEndpoint": [
+        "https://bar.example.com"
       ]
     }
   ]

@@ -208,41 +208,41 @@ More about JSON schemas can be found <a href="http://json-schema.org/draft/2019-
 <a href="https://json-schema.org/understanding-json-schema/index.html">here</a>.</p>
 <p>Let's see an example JSON schema definition:</p>
 <pre><code class="language-json">{
-  &quot;$schema&quot;: &quot;http://json-schema.org/draft-07/schema#&quot;,
-  &quot;description&quot;: &quot;Alumni&quot;,
-  &quot;type&quot;: &quot;object&quot;,
-  &quot;properties&quot;: {
-    &quot;emailAddress&quot;: {
-      &quot;type&quot;: &quot;string&quot;,
-      &quot;format&quot;: &quot;email&quot;
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Alumni",
+  "type": "object",
+  "properties": {
+    "emailAddress": {
+      "type": "string",
+      "format": "email"
     },
-    &quot;alumniOf&quot;: {
-      &quot;type&quot;: &quot;string&quot;
+    "alumniOf": {
+      "type": "string"
     }
   },
-  &quot;required&quot;: [&quot;emailAddress&quot;, &quot;alumniOf&quot;],
-  &quot;additionalProperties&quot;: false
+  "required": ["emailAddress", "alumniOf"],
+  "additionalProperties": false
 }
 </code></pre>
 <p>In our context, these schemas are stored on-chain as a blob, which means they have a Blob Id as id and a DID as author:</p>
 <pre><code class="language-json">{
-   &quot;id&quot;: &quot;blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW&quot;,
-   &quot;author&quot;: &quot;did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW&quot;,
-   &quot;schema&quot;: {
-      &quot;$schema&quot;: &quot;http://json-schema.org/draft-07/schema#&quot;,
-      &quot;description&quot;: &quot;Alumni&quot;,
-      &quot;type&quot;: &quot;object&quot;,
-      &quot;properties&quot;: {
-        &quot;emailAddress&quot;: {
-          &quot;type&quot;: &quot;string&quot;,
-          &quot;format&quot;: &quot;email&quot;
+   "id": "blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW",
+   "author": "did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW",
+   "schema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "description": "Alumni",
+      "type": "object",
+      "properties": {
+        "emailAddress": {
+          "type": "string",
+          "format": "email"
         },
-        &quot;alumniOf&quot;: {
-          &quot;type&quot;: &quot;string&quot;
+        "alumniOf": {
+          "type": "string"
         }
       },
-      &quot;required&quot;: [&quot;emailAddress&quot;, &quot;alumniOf&quot;],
-      &quot;additionalProperties&quot;: false
+      "required": ["emailAddress", "alumniOf"],
+      "additionalProperties": false
     }
 }
 </code></pre>
@@ -252,7 +252,7 @@ property <code>alumniOf</code> with type string. It'd also fail if a subject con
 the <code>id</code> property which is popped out before validation).</p>
 <h2 id="schemas-in-verifiable-credentials"><a class="header" href="#schemas-in-verifiable-credentials">Schemas in Verifiable Credentials</a></h2>
 <p>In pursuit of <a href="https://w3c.github.io/vc-data-model/#extensibility">extensibility</a>, VCDM makes an Open World Assumption;
-a credential can state anything. Schemas allow issuers to &quot;opt-out&quot; of some of the freedom VCDM allows. Issuers can
+a credential can state anything. Schemas allow issuers to "opt-out" of some of the freedom VCDM allows. Issuers can
 concretely limit what a given credential will claim. In a closed world, a verifier can rely on the structure of a
 credential to enable new types of credential processing e.g. generating a complete and human-friendly graphical
 representation of a credential.</p>
@@ -264,76 +264,76 @@ and the protocols for evolving the schema.</p>
 <p>Following our example above, we could use the current SDK to store the Email schema above as a Blob in the Dock chain.
 Assuming we did that and our schema was stored as <code>blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW</code>, we
 can use it in a Verifiable Credential as follows:</p>
-<pre><code class="language-json">&quot;credentialSchema&quot;: {
-  &quot;id&quot;: &quot;blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW&quot;,
-  &quot;type&quot;: &quot;JsonSchemaValidator2018&quot;
+<pre><code class="language-json">"credentialSchema": {
+  "id": "blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW",
+  "type": "JsonSchemaValidator2018"
 }
 </code></pre>
 <p>The following is an example of a valid Verifiable Credential using the above schema:</p>
 <pre><code class="language-json">{
-   &quot;@context&quot;: [
-      &quot;https://www.w3.org/2018/credentials/v1&quot;,
-      &quot;https://www.w3.org/2018/credentials/examples/v1&quot;
+   "@context": [
+      "https://www.w3.org/2018/credentials/v1",
+      "https://www.w3.org/2018/credentials/examples/v1"
    ],
-   &quot;id&quot;: &quot;uuid:0x9b561796d3450eb2673fed26dd9c07192390177ad93e0835bc7a5fbb705d52bc&quot;,
-   &quot;type&quot;: [
-      &quot;VerifiableCredential&quot;,
-      &quot;AlumniCredential&quot;
+   "id": "uuid:0x9b561796d3450eb2673fed26dd9c07192390177ad93e0835bc7a5fbb705d52bc",
+   "type": [
+      "VerifiableCredential",
+      "AlumniCredential"
    ],
-   &quot;issuanceDate&quot;: &quot;2020-03-18T19:23:24Z&quot;,
-   &quot;credentialSchema&quot;: {
-      &quot;id&quot;: &quot;blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW&quot;,
-      &quot;type&quot;: &quot;JsonSchemaValidator2018&quot;
+   "issuanceDate": "2020-03-18T19:23:24Z",
+   "credentialSchema": {
+      "id": "blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW",
+      "type": "JsonSchemaValidator2018"
    },
-   &quot;credentialSubject&quot;: {
-      &quot;id&quot;: &quot;did:dock:5GL3xbkr3vfs4qJ94YUHwpVVsPSSAyvJcafHz1wNb5zrSPGi&quot;,
-      &quot;emailAddress&quot;: &quot;john.smith@example.com&quot;,
-      &quot;alumniOf&quot;: &quot;Example University&quot;
+   "credentialSubject": {
+      "id": "did:dock:5GL3xbkr3vfs4qJ94YUHwpVVsPSSAyvJcafHz1wNb5zrSPGi",
+      "emailAddress": "john.smith@example.com",
+      "alumniOf": "Example University"
    },
-   &quot;issuer&quot;: &quot;did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr&quot;,
-   &quot;proof&quot;: {
-      &quot;type&quot;: &quot;Ed25519Signature2018&quot;,
-      &quot;created&quot;: &quot;2020-04-22T07:50:13Z&quot;,
-      &quot;jws&quot;: &quot;eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..GBqyaiTMhVt4R5P2bMGcLNJPWEUq7WmGHG7Wc6mKBo9k3vSo7v7sRKwqS8-m0og_ANKcb5m-_YdXC2KMnZwLBg&quot;,
-      &quot;proofPurpose&quot;: &quot;assertionMethod&quot;,
-      &quot;verificationMethod&quot;: &quot;did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr#keys-1&quot;
+   "issuer": "did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr",
+   "proof": {
+      "type": "Ed25519Signature2018",
+      "created": "2020-04-22T07:50:13Z",
+      "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..GBqyaiTMhVt4R5P2bMGcLNJPWEUq7WmGHG7Wc6mKBo9k3vSo7v7sRKwqS8-m0og_ANKcb5m-_YdXC2KMnZwLBg",
+      "proofPurpose": "assertionMethod",
+      "verificationMethod": "did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr#keys-1"
    }
 }
 </code></pre>
 <p>In contrast, the following is an example of an invalid Verifiable Credential:</p>
 <pre><code class="language-json">{
-   &quot;@context&quot;: [
-      &quot;https://www.w3.org/2018/credentials/v1&quot;,
-      &quot;https://www.w3.org/2018/credentials/examples/v1&quot;
+   "@context": [
+      "https://www.w3.org/2018/credentials/v1",
+      "https://www.w3.org/2018/credentials/examples/v1"
    ],
-   &quot;id&quot;: &quot;uuid:0x9b561796d3450eb2673fed26dd9c07192390177ad93e0835bc7a5fbb705d52bc&quot;,
-   &quot;type&quot;: [
-      &quot;VerifiableCredential&quot;,
-      &quot;AlumniCredential&quot;
+   "id": "uuid:0x9b561796d3450eb2673fed26dd9c07192390177ad93e0835bc7a5fbb705d52bc",
+   "type": [
+      "VerifiableCredential",
+      "AlumniCredential"
    ],
-   &quot;issuanceDate&quot;: &quot;2020-03-18T19:23:24Z&quot;,
-   &quot;credentialSchema&quot;: {
-      &quot;id&quot;: &quot;blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW&quot;,
-      &quot;type&quot;: &quot;JsonSchemaValidator2018&quot;
+   "issuanceDate": "2020-03-18T19:23:24Z",
+   "credentialSchema": {
+      "id": "blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW",
+      "type": "JsonSchemaValidator2018"
    },
-   &quot;credentialSubject&quot;: [
+   "credentialSubject": [
       {
-        &quot;id&quot;: &quot;did:dock:5GL3xbkr3vfs4qJ94YUHwpVVsPSSAyvJcafHz1wNb5zrSPGi&quot;,
-        &quot;emailAddress&quot;: &quot;john.smith@example.com&quot;,
-        &quot;alumniOf&quot;: &quot;Example University&quot;
+        "id": "did:dock:5GL3xbkr3vfs4qJ94YUHwpVVsPSSAyvJcafHz1wNb5zrSPGi",
+        "emailAddress": "john.smith@example.com",
+        "alumniOf": "Example University"
       },
       {
-        &quot;id&quot;: &quot;did:dock:6DF3xbkr3vfs4qJ94YUHwpVVsPSSAyvJcafHz1wNb5zrSPGi&quot;,
+        "id": "did:dock:6DF3xbkr3vfs4qJ94YUHwpVVsPSSAyvJcafHz1wNb5zrSPGi",
       }
 
    ],
-   &quot;issuer&quot;: &quot;did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr&quot;,
-   &quot;proof&quot;: {
-      &quot;type&quot;: &quot;Ed25519Signature2018&quot;,
-      &quot;created&quot;: &quot;2020-04-22T07:50:13Z&quot;,
-      &quot;jws&quot;: &quot;eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..GBqyaiTMhVt4R5P2bMGcLNJPWEUq7WmGHG7Wc6mKBo9k3vSo7v7sRKwqS8-m0og_ANKcb5m-_YdXC2KMnZwLBg&quot;,
-      &quot;proofPurpose&quot;: &quot;assertionMethod&quot;,
-      &quot;verificationMethod&quot;: &quot;did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr#keys-1&quot;
+   "issuer": "did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr",
+   "proof": {
+      "type": "Ed25519Signature2018",
+      "created": "2020-04-22T07:50:13Z",
+      "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..GBqyaiTMhVt4R5P2bMGcLNJPWEUq7WmGHG7Wc6mKBo9k3vSo7v7sRKwqS8-m0og_ANKcb5m-_YdXC2KMnZwLBg",
+      "proofPurpose": "assertionMethod",
+      "verificationMethod": "did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr#keys-1"
    }
 }
 </code></pre>

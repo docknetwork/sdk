@@ -189,12 +189,12 @@ DIDs of those methods.</p>
 <p>The resolver for Dock DIDs <code>DockResolver</code> connects to the Dock blockchain to get the DID details.</p>
 <p>The resolver is constructed by passing it a Dock API object so that it can connect to a Dock node.
 This is how you resolve a Dock DID:</p>
-<pre><code class="language-js">import { DockResolver } from &quot;@docknetwork/sdk/resolver&quot;;
+<pre><code class="language-js">import { DockResolver } from "@docknetwork/sdk/resolver";
 
 // Assuming the presence of Dock API object `dock`
 const dockResolver = new DockResolver(dock);
 // Say you had a DID `did:dock:5D.....`
-const didDocument = dockResolver.resolve(&quot;did:dock:5D.....&quot;);
+const didDocument = dockResolver.resolve("did:dock:5D.....");
 </code></pre>
 <h2 id="creating-a-resolver-class-for-a-different-method"><a class="header" href="#creating-a-resolver-class-for-a-different-method">Creating a resolver class for a different method</a></h2>
 <p>If you want to resolve DIDs other than Dock and do not have/want access to the universal resolver, you can extend the
@@ -202,22 +202,22 @@ const didDocument = dockResolver.resolve(&quot;did:dock:5D.....&quot;);
 <p>Following is an example to build a custom Ethereum resolver. It uses the library
 <a href="https://github.com/decentralized-identity/ethr-did-resolver">ethr-did-resolver</a> and accepts a provider information
 as configuration. The example below uses Infura to get access to an Ethereum node and read the DID off Ethereum.</p>
-<pre><code class="language-js">import { DIDResolver } from &quot;@docknetwork/sdk/resolver&quot;;
-import ethr from &quot;ethr-did-resolver&quot;;
+<pre><code class="language-js">import { DIDResolver } from "@docknetwork/sdk/resolver";
+import ethr from "ethr-did-resolver";
 
 // Infura's Ethereum provider for the main net.
 const ethereumProviderConfig = {
   networks: [
     {
-      name: &quot;mainnet&quot;,
-      rpcUrl: &quot;https://mainnet.infura.io/v3/blahblahtoken&quot;,
+      name: "mainnet",
+      rpcUrl: "https://mainnet.infura.io/v3/blahblahtoken",
     },
   ],
 };
 
 // Custom ethereum resolver class
 class EtherResolver extends DIDResolver {
-  static METHOD = &quot;ethr&quot;;
+  static METHOD = "ethr";
 
   constructor(config) {
     super();
@@ -238,20 +238,20 @@ class EtherResolver extends DIDResolver {
 const ethResolver = new EtherResolver(ethereumProviderConfig);
 
 // Say you had a DID `did:ethr:0x6f....`
-const didDocument = ethResolver.resolve(&quot;did:ethr:0x6f....&quot;);
+const didDocument = ethResolver.resolve("did:ethr:0x6f....");
 </code></pre>
 <h2 id="universal-resolver"><a class="header" href="#universal-resolver">Universal resolver</a></h2>
 <p>To resolve DIDs using the <a href="https://uniresolver.io">Universal Resolver</a>, use the <code>UniversalResolver</code>. It needs the URL
 of the universal resolver and assumes the universal resolver from this <a href="https://github.com/decentralized-identity/universal-resolver">codebase</a>
 is running at the URL.</p>
-<pre><code class="language-js">import { UniversalResolver } from &quot;@docknetwork/sdk/resolver&quot;;
+<pre><code class="language-js">import { UniversalResolver } from "@docknetwork/sdk/resolver";
 
 // Change the resolver URL to something else in case you cannot use the resolver at https://uniresolver.io
-const universalResolverUrl = &quot;https://uniresolver.io&quot;;
+const universalResolverUrl = "https://uniresolver.io";
 const universalResolver = new UniversalResolver(universalResolverUrl);
 
 // Say you had a DID `did:btcr:xk....`
-const didDocument = universalResolver.resolve(&quot;did:btcr:xk....&quot;);
+const didDocument = universalResolver.resolve("did:btcr:xk....");
 </code></pre>
 <h2 id="resolving-dids-of-several-did-methods-with-a-single-resolver"><a class="header" href="#resolving-dids-of-several-did-methods-with-a-single-resolver">Resolving DIDs of several DID methods with a single resolver</a></h2>
 <p>In case you need to resolve DIDs from more than one method, a <code>DIDResolver</code> can be created by passing
@@ -260,7 +260,7 @@ resolvers of various DID methods to the derived class constructor.</p>
 will be dispatched according to their prefix and method configuration. The <code>resolvers</code> array below
 has resolvers for DID methods <code>dock</code> and <code>ethr</code>.</p>
 <p>For resolving DID of any other method, <code>UniversalResolver</code> object will be used.</p>
-<pre><code class="language-js">import { DockDIDResolver, DIDResolver, WILDCARD } from &quot;@docknetwork/sdk/resolver&quot;;
+<pre><code class="language-js">import { DockDIDResolver, DIDResolver, WILDCARD } from "@docknetwork/sdk/resolver";
 
 class MultiDIDResolver extends DIDResolver {
   static METHOD = WILDCARD;
@@ -277,10 +277,10 @@ class MultiDIDResolver extends DIDResolver {
 const multiResolver = new MultiDIDResolver(resolvers);
 
 // Say you had a DID `did:dock:5D....`, then the `DockResolver` will be used as there a resolver for Dock DID.
-const didDocumentDock = multiResolver.resolve(&quot;did:dock:5D....&quot;);
+const didDocumentDock = multiResolver.resolve("did:dock:5D....");
 
 // Say you had a DID `did:btcr:xk....`, then the `UniversalResolver` will be used as there is no resolver for BTC DID.
-const didDocumentBtc = multiResolver.resolve(&quot;did:btcr:xk....&quot;);
+const didDocumentBtc = multiResolver.resolve("did:btcr:xk....");
 </code></pre>
 
                     </main>

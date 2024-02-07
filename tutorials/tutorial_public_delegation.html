@@ -268,13 +268,13 @@ const RULES = [
   },
 ];
 
-// This query dictates what the crawler will be &quot;curious&quot; about. Any matches to
+// This query dictates what the crawler will be "curious" about. Any matches to
 // `?lookupNext` will be dereferenced as IRIs. When an IRI is successfully dereferenced
 // the resultant data is merged into the crawlers knowlege graph.
 const CURIOSITY = `
   prefix dockalpha: &lt;https://rdf.dock.io/alpha/2021#&gt;
 
-  # Any entity to which &quot;did:ex:a&quot; grants full delegation authority is interesting.
+  # Any entity to which "did:ex:a" grants full delegation authority is interesting.
   select ?lookupNext where {
     graph &lt;did:ex:a&gt; {
       ?lookupNext dockalpha:mayClaim dockalpha:ANYCLAIM .

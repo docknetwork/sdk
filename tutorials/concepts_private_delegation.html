@@ -177,19 +177,19 @@
 <p>Claim Deduction rules can express delegation of authority to issue credentials! It's expected to be a common enough use case that Dock has declared some rdf vocabulary and associated claim deduction rules aid potential delegators.</p>
 <p>An issuer may grant delegation authority to another issuer simply by issuing them a vcdm credential. Let's say <code>did:ex:a</code> wants to grant delegation authority to <code>did:ex:b</code>. <code>did:ex:a</code> simply issues the credential saying that <code>did:ex:b</code> may make any claim.</p>
 <pre><code class="language-json">{
-  &quot;@context&quot;: [ &quot;https://www.w3.org/2018/credentials/v1&quot; ],
-  &quot;id&quot;: &quot;urn:uuid:9b472d4e-492b-49f7-821c-d8c91e7fe767&quot;,
-  &quot;type&quot;: [ &quot;VerifiableCredential&quot; ],
-  &quot;issuer&quot;: &quot;did:dock:a&quot;,
-  &quot;credentialSubject&quot;: {
-    &quot;id&quot;: &quot;did:dock:b&quot;,
-    &quot;https://rdf.dock.io/alpha/2021#mayClaim&quot;: &quot;https://rdf.dock.io/alpha/2021#ANYCLAIM&quot;
+  "@context": [ "https://www.w3.org/2018/credentials/v1" ],
+  "id": "urn:uuid:9b472d4e-492b-49f7-821c-d8c91e7fe767",
+  "type": [ "VerifiableCredential" ],
+  "issuer": "did:dock:a",
+  "credentialSubject": {
+    "id": "did:dock:b",
+    "https://rdf.dock.io/alpha/2021#mayClaim": "https://rdf.dock.io/alpha/2021#ANYCLAIM"
   },
-  &quot;issuanceDate&quot;: &quot;2021-03-18T19:23:24Z&quot;,
-  &quot;proof&quot;: { ... }
+  "issuanceDate": "2021-03-18T19:23:24Z",
+  "proof": { ... }
 }
 </code></pre>
-<p>When <code>did:ex:b</code> wishes to issue a credential on behalf of <code>did:ex:a</code>, they should bundle it (e.g. in a presentation) with it this &quot;delegation&quot; credential. A delegation credential constitutes a proof of delegation. A proof of delegation bundled with a credential issued by the delegate can be prove that some statement[s] were made by authority of some root delegator.</p>
+<p>When <code>did:ex:b</code> wishes to issue a credential on behalf of <code>did:ex:a</code>, they should bundle it (e.g. in a presentation) with it this "delegation" credential. A delegation credential constitutes a proof of delegation. A proof of delegation bundled with a credential issued by the delegate can be prove that some statement[s] were made by authority of some root delegator.</p>
 <p>In order to process delegated credentials a verifier accepts a bundle. The bundle includes both delegations and credentials issued by delegates. After verifying every credential within the bundle (including the delegations) the verifier uses <a href="concepts_claim_deduction.html">Claim Deduction</a> to determine which statements are proven by the delegated credential.</p>
 <p>Dock's delegation ontology (i.e. rdf vocabulary) and ruleset are currently in alpha. See <a href="tutorial_private_delegation.html">Private Delegation</a> for an example of their use.</p>
 

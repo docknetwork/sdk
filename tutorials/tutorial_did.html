@@ -253,7 +253,7 @@ keyless DID <code>did2</code> as</p>
 <p>Moreover, a DID can have keys for certain functions like authentication but still be controlled by other DID(s).</p>
 <h2 id="fetching-a-did-from-chain"><a class="header" href="#fetching-a-did-from-chain">Fetching a DID from chain</a></h2>
 <p>To get a DID document, use <code>getDocument</code>
-<code>js const result = await dock.did.getDocument(did); </code></p>
+<code>js     const result = await dock.did.getDocument(did);     </code></p>
 <h2 id="adding-a-key-to-an-existing-did"><a class="header" href="#adding-a-key-to-an-existing-did">Adding a key to an existing DID</a></h2>
 <p>A DID's controller can add a public key to an on-chain DID by preparing a signed payload. Each new key is given a number key index
 which 1 is greater than the last used index. Key indices start from 1.</p>

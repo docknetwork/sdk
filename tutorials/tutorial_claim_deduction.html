@@ -200,7 +200,7 @@
   }
 ];
 </code></pre>
-<p>That single rule is enough for some use-cases but it's not scalable. What if we want to allow more than one issuer? Instead of copying the same rule for each issuer we trust, let's define &quot;trustworthiness&quot;.</p>
+<p>That single rule is enough for some use-cases but it's not scalable. What if we want to allow more than one issuer? Instead of copying the same rule for each issuer we trust, let's define "trustworthiness".</p>
 <h3 id="unwrapping-explicit-ethos-by-defining-trustworthiness"><a class="header" href="#unwrapping-explicit-ethos-by-defining-trustworthiness">Unwrapping Explicit Ethos by Defining Trustworthiness</a></h3>
 <pre><code class="language-js">const trustworthy = { Bound: { Iri: 'https://www.dock.io/rdf2020#Trustworthy' } };
 const type = { Bound: { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' } };
@@ -224,8 +224,8 @@ const rules = [
   }
 ];
 </code></pre>
-<p>You may ask &quot;So what's the difference? There is still only one issuer.&quot;</p>
-<p>By the primitive definition of &quot;trustworthiness&quot; written above, any claim made by a trustworthy issuer is true. <code>did:example:issuer</code> can claim whatever they want by issuing verifiable credentials. They can even claim that some other issuer is trustworthy. Together, the two rules defined in the above example implement a system analogous to TLS certificate chains with <code>did:example:issuer</code> as the single root authority.</p>
+<p>You may ask "So what's the difference? There is still only one issuer."</p>
+<p>By the primitive definition of "trustworthiness" written above, any claim made by a trustworthy issuer is true. <code>did:example:issuer</code> can claim whatever they want by issuing verifiable credentials. They can even claim that some other issuer is trustworthy. Together, the two rules defined in the above example implement a system analogous to TLS certificate chains with <code>did:example:issuer</code> as the single root authority.</p>
 <h2 id="proving-composite-claims"><a class="header" href="#proving-composite-claims">Proving Composite Claims</a></h2>
 <p>As a Holder of verifiable credentials, you'll want to prove specific claims to a Verifier. If those claims are composite, you'll sometimes need to bundle a deductive proof in your verifiable credentials presentation. This should be done after the presentation has been assembled. If the presentation is going to be signed, sign it <em>after</em> including the deductive proof.</p>
 <pre><code class="language-js">import { proveCompositeClaims } from '@docknetwork/sdk/utils/cd';

@@ -233,12 +233,12 @@ accepts an (optional) <code>id</code> string as sole argument:</p>
 </code></pre>
 <p>When an <code>id</code> isn't passed, a random <code>blobId</code> will be assigned as the schema's id.</p>
 <pre><code class="language-javascript">&gt; myNewSchema.id
-&lt;- &quot;blob:dock:5Ek98pDX61Dwo4EDmsogUkYMBqfFHtiS5hVS7xHuVvMByh3N&quot;
+&lt;- "blob:dock:5Ek98pDX61Dwo4EDmsogUkYMBqfFHtiS5hVS7xHuVvMByh3N"
 </code></pre>
 <p>Also worth noticing is the JSON representation of the schema as is right now, which can be achieved by calling
 the <code>toJSON</code> method on your new schema:</p>
 <pre><code class="language-javascript">&gt;  myNewSchema.toJSON()
-&lt;- {&quot;id&quot;:&quot;0x768c21de02890dad5dbf6f108b6822b865e4ea495bb7f43f8947714e90fcc060&quot;}
+&lt;- {"id":"0x768c21de02890dad5dbf6f108b6822b865e4ea495bb7f43f8947714e90fcc060"}
 </code></pre>
 <p>where you can see that the schema's <code>id</code> gets modified with <code>getHexIdentifierFromBlobID</code>.</p>
 <h4 id="setting-a-json-schema"><a class="header" href="#setting-a-json-schema">Setting a JSON Schema</a></h4>
@@ -283,7 +283,7 @@ to be able to use it. That's where the <code>toBlob</code> method comes in handy
 </code></pre>
 <h3 id="reading-a-schema-from-the-dock-chain"><a class="header" href="#reading-a-schema-from-the-dock-chain">Reading a Schema from the Dock chain</a></h3>
 <p>Reading a Schema from the Dock chain can easily be achieved by using the <code>get</code> method from the <code>Schema</code> class.
-It accepts a string <code>id</code> param (a fully-qualified blob id like &quot;blob:dock:0x...&quot; or just its hex identifier) and a
+It accepts a string <code>id</code> param (a fully-qualified blob id like "blob:dock:0x..." or just its hex identifier) and a
 <code>dockAPI</code> instance:</p>
 <pre><code class="language-javascript">&gt;  const result = await Schema.get(blob.id, dock);
 </code></pre>

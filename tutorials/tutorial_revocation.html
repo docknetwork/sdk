@@ -177,12 +177,12 @@
 <h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
 <p>Credential revocation is managed with on-chain revocation registries. To revoke a credential, its id (or hash of its id) must be
 added to the credential. It is advised to have one revocation registry per credential type. Each registry has a unique id and
-an associated policy. The policy determines who can update the revocation registry. The registry also has an &quot;add-only&quot; flag specifying
+an associated policy. The policy determines who can update the revocation registry. The registry also has an "add-only" flag specifying
 whether an id once added to the registry can be removed (leading to undoing the revocation) or not.
 Similar to the replay protection mechanism for DIDs, for each registry, the last modified block number is kept which is updated
 each time a credential is revoked or unrevoked.
 For now, only one policy is supported which is that each registry is owned by a single DID. Also, neither the policy
-nor the &quot;add-only&quot; flag can be updated post the creation of the registry for now.</p>
+nor the "add-only" flag can be updated post the creation of the registry for now.</p>
 <h2 id="registry-creation"><a class="header" href="#registry-creation">Registry creation</a></h2>
 <p>To create a registry, first a <code>Policy</code> object needs to be created for which a DID is needed. It is advised that the DID
 is registered on chain first (else someone can look at the registry a register the DID, thus controlling the registry).</p>

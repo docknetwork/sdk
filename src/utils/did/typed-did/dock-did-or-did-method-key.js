@@ -54,7 +54,7 @@ class DockDidOrDidMethodKey {
   }
 
   /**
-   * Instantiates `DockDid` or `DockDidMethodKey` from a did or did method key object received from the substrate side.
+   * Instantiates `DockDid` or `DidMethodKey` from a did or did method key object received from the substrate side.
    * @param {object} did - substrate did or did method key
    * @returns {this}
    */

@@ -25,9 +25,7 @@ export default class TrustRegistryModule {
    * @param name
    * @param govFramework
    * @param signingKeyRef
-   * @param nonce
-   * @param didModule
-   * @param params
+   * @param nonceOrDidModule
    * @param waitForFinalization
    * @param params
    * @returns {Promise<null>}
@@ -38,42 +36,71 @@ export default class TrustRegistryModule {
     name,
     govFramework,
     signingKeyRef,
-    { nonce = undefined, didModule = undefined } = {},
+    nonceOrDidModule,
     waitForFinalization = true,
     params = {},
   ) {
-    const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(
+    const tx = await this.initOrUpdateTx(
       convenerDid,
-      { nonce, didModule },
+      registryId,
+      name,
+      govFramework,
+      signingKeyRef,
+      nonceOrDidModule,
     );
-
     return this.signAndSend(
-      convenerHexDid.changeState(
-        this.api,
-        this.module.initOrUpdateTrustRegistry,
-        'InitOrUpdateTrustRegistry',
-        {
-          registryId,
-          name,
-          govFramework,
-          nonce: lastNonce,
-        },
-        signingKeyRef,
-      ),
+      tx,
       waitForFinalization,
       params,
     );
   }
 
   /**
-   * Updates schemas metadatas in the registry.
+   * Initializes Trust Registry with the supplied parameters.
+   * @param convenerDid
+   * @param registryId
+   * @param name
+   * @param govFramework
+   * @param signingKeyRef
+   * @param nonceOrDidModule
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<null>}
+   */
+  async initOrUpdateTx(
+    convenerDid,
+    registryId,
+    name,
+    govFramework,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined } = {},
+  ) {
+    const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(
+      convenerDid,
+      { nonce, didModule },
+    );
+
+    return convenerHexDid.changeState(
+      this.api,
+      this.module.initOrUpdateTrustRegistry,
+      'InitOrUpdateTrustRegistry',
+      {
+        registryId,
+        name,
+        govFramework,
+        nonce: lastNonce,
+      },
+      signingKeyRef,
+    );
+  }
+
+  /**
+   * Updates schema metadatas in the registry.
    * @param convenerOrIssuerOrVerifierDid
    * @param registryId
    * @param schemas
    * @param signingKeyRef
-   * @param nonce
-   * @param didModule
-   * @param params
+   * @param nonceOrDidModule
    * @param waitForFinalization
    * @param params
    * @returns {Promise<null>}
@@ -83,9 +110,40 @@ export default class TrustRegistryModule {
     registryId,
     schemas,
     signingKeyRef,
-    { nonce = undefined, didModule = undefined } = {},
+    nonceOrDidModule,
     waitForFinalization = true,
     params = {},
+  ) {
+    const tx = await this.setSchemasMetadataTx(
+      convenerOrIssuerOrVerifierDid,
+      registryId,
+      schemas,
+      signingKeyRef,
+      nonceOrDidModule,
+    );
+    return this.signAndSend(
+      tx,
+      waitForFinalization,
+      params,
+    );
+  }
+
+  /**
+   * Creates a transaction to update schema metadatas in the registry.
+   * @param convenerOrIssuerOrVerifierDid
+   * @param registryId
+   * @param schemas
+   * @param signingKeyRef
+   * @param nonce
+   * @param didModule
+   * @returns {Promise<null>}
+   */
+  async setSchemasMetadataTx(
+    convenerOrIssuerOrVerifierDid,
+    registryId,
+    schemas,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined } = {},
   ) {
     const [convenerOrIssuerOrVerifierHexDid, lastNonce] = await this.getActorDidAndNonce(convenerOrIssuerOrVerifierDid, {
       nonce,
@@ -96,14 +154,44 @@ export default class TrustRegistryModule {
       schemas,
     );
 
+    return convenerOrIssuerOrVerifierHexDid.changeState(
+      this.api,
+      this.module.setSchemasMetadata,
+      'SetSchemasMetadata',
+      { registryId, schemas, nonce: lastNonce },
+      signingKeyRef,
+    );
+  }
+
+  /**
+   * Suspends issuers in the registry.
+   * @param convenerDid
+   * @param registryId
+   * @param issuers
+   * @param signingKeyRef
+   * @param nonceOrDidModule
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<null>}
+   */
+  async suspendIssuers(
+    convenerDid,
+    registryId,
+    issuers,
+    signingKeyRef,
+    nonceOrDidModule,
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const tx = await this.suspendIssuersTx(
+      convenerDid,
+      registryId,
+      issuers,
+      signingKeyRef,
+      nonceOrDidModule,
+    );
     return this.signAndSend(
-      convenerOrIssuerOrVerifierHexDid.changeState(
-        this.api,
-        this.module.setSchemasMetadata,
-        'SetSchemasMetadata',
-        { registryId, schemas, nonce: lastNonce },
-        signingKeyRef,
-      ),
+      tx,
       waitForFinalization,
       params,
     );
@@ -115,21 +203,15 @@ export default class TrustRegistryModule {
    * @param registryId
    * @param issuers
    * @param signingKeyRef
-   * @param nonce
-   * @param didModule
-   * @param params
-   * @param waitForFinalization
-   * @param params
+   * @param nonceOrDidModule
    * @returns {Promise<null>}
    */
-  async suspendIssuers(
+  async suspendIssuersTx(
     convenerDid,
     registryId,
     issuers,
     signingKeyRef,
     { nonce = undefined, didModule = undefined } = {},
-    waitForFinalization = true,
-    params = {},
   ) {
     const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(
       convenerDid,
@@ -141,14 +223,44 @@ export default class TrustRegistryModule {
       hexIssuers.add(typedHexDID(this.api, issuer));
     }
 
+    return convenerHexDid.changeState(
+      this.api,
+      this.module.suspendIssuers,
+      'SuspendIssuers',
+      { registryId, issuers: hexIssuers, nonce: lastNonce },
+      signingKeyRef,
+    );
+  }
+
+  /**
+   * Unsuspends issuers in the registry.
+   * @param convenerDid
+   * @param registryId
+   * @param issuers
+   * @param signingKeyRef
+   * @param nonceOrDidModule
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<null>}
+   */
+  async unsuspendIssuers(
+    convenerDid,
+    registryId,
+    issuers,
+    signingKeyRef,
+    nonceOrDidModule,
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const tx = await this.unsuspendIssuersTx(
+      convenerDid,
+      registryId,
+      issuers,
+      signingKeyRef,
+      nonceOrDidModule,
+    );
     return this.signAndSend(
-      convenerHexDid.changeState(
-        this.api,
-        this.module.suspendIssuers,
-        'SuspendIssuers',
-        { registryId, issuers: hexIssuers, nonce: lastNonce },
-        signingKeyRef,
-      ),
+      tx,
       waitForFinalization,
       params,
     );
@@ -160,21 +272,15 @@ export default class TrustRegistryModule {
    * @param registryId
    * @param issuers
    * @param signingKeyRef
-   * @param nonce
-   * @param didModule
-   * @param params
-   * @param waitForFinalization
-   * @param params
+   * @param nonceOrDidModule
    * @returns {Promise<null>}
    */
-  async unsuspendIssuers(
+  async unsuspendIssuersTx(
     convenerDid,
     registryId,
     issuers,
     signingKeyRef,
     { nonce = undefined, didModule = undefined } = {},
-    waitForFinalization = true,
-    params = {},
   ) {
     const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(
       convenerDid,
@@ -186,16 +292,12 @@ export default class TrustRegistryModule {
       hexIssuers.add(typedHexDID(this.api, issuer));
     }
 
-    return this.signAndSend(
-      convenerHexDid.changeState(
-        this.api,
-        this.module.unsuspendIssuers,
-        'UnsuspendIssuers',
-        { registryId, issuers: hexIssuers, nonce: lastNonce },
-        signingKeyRef,
-      ),
-      waitForFinalization,
-      params,
+    return convenerHexDid.changeState(
+      this.api,
+      this.module.unsuspendIssuers,
+      'UnsuspendIssuers',
+      { registryId, issuers: hexIssuers, nonce: lastNonce },
+      signingKeyRef,
     );
   }
 

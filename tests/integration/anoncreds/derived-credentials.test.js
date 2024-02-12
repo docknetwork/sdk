@@ -308,6 +308,86 @@ describe.each(Schemes)('Derived Credentials', ({
     await createAndVerifyPresentation(credentials);
   }, 30000);
 
+  test(`For ${Name}, holder creates a derived verifiable credential from a credential with bbs+ revocation`, async () => {
+    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
+    const unsignedCred = {
+      ...credentialJSON,
+      issuer: did1,
+    };
+
+    const presentationOptions = {
+      nonce: stringToU8a('noncetest'),
+      context: 'my context',
+    };
+
+    // Create W3C credential
+    const credential = await issueCredential(issuerKey, unsignedCred);
+
+    // Begin to derive a credential from the above issued one
+    const presentationInstance = new Presentation();
+    const idx = await presentationInstance.addCredentialToPresent(
+      credential,
+      { resolver },
+    );
+
+    // Reveal subject attributes
+    presentationInstance.addAttributeToReveal(idx, [
+      'credentialSubject.lprNumber',
+    ]);
+
+
+    // Begin to derive a credential from the above issued one
+    const presentationInstance2 = new Presentation();
+    const idx2 = await presentationInstance2.addCredentialToPresent(
+      credential,
+      { resolver },
+    );
+
+    // Reveal subject attributes
+    presentationInstance2.addAttributeToReveal(idx2, [
+      'credentialSubject.lprNumber',
+    ]);
+
+    // Derive a W3C Verifiable Credential JSON from the above presentation
+    const credentials = await presentationInstance.deriveCredentials(
+      presentationOptions,
+    );
+    expect(credentials.length).toEqual(1);
+    expect(credentials[0].proof).toBeDefined();
+    expect(credentials[0]).toHaveProperty('credentialSubject');
+    expect(credentials[0].credentialSubject).toMatchObject(
+      expect.objectContaining({
+        type: unsignedCred.credentialSubject.type,
+        lprNumber: 1234,
+      }),
+    );
+
+    // Ensure reconstructing presentation from credential matches
+    // NOTE: ignoring proof here as itll differ when signed twice as above
+    const presentation = await presentationInstance2.createPresentation(
+      presentationOptions,
+    );
+
+    // Question: What is the point of this? A single credential cant be converted to a presentation and a presentation
+    // has other data that credential won't have
+    const reconstructedPres = convertToPresentation(credentials[0]);
+    expect(reconstructedPres.proof).toBeDefined();
+    expect({
+      ...reconstructedPres,
+      proof: '',
+    }).toMatchObject({ ...presentation, proof: '' });
+
+    // Try to verify the derived credential alone
+    const credentialResult = await verifyCredential(credentials[0], {
+      resolver,
+    });
+    expect(credentialResult.verified).toBe(true);
+    expect(credentialResult.error).toBe(undefined);
+
+    // Create a VP and verify it from this credential
+    await createAndVerifyPresentation(credentials);
+  }, 30000);
+
   test('Holder creates a derived verifiable credential from a credential with range proofs', async () => {
     const provingKeyId = 'provingKeyId';
     const pk = BoundCheckSnarkSetup();

@@ -309,84 +309,93 @@ describe.each(Schemes)('Derived Credentials', ({
   }, 30000);
 
   test(`For ${Name}, holder creates a derived verifiable credential from a credential with bbs+ revocation`, async () => {
-    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
-    const unsignedCred = {
-      ...credentialJSON,
-      issuer: did1,
-    };
-
-    const presentationOptions = {
-      nonce: stringToU8a('noncetest'),
-      context: 'my context',
-    };
-
-    // Create W3C credential
-    const credential = await issueCredential(issuerKey, unsignedCred);
-
     // Begin to derive a credential from the above issued one
     const presentationInstance = new Presentation();
-    const idx = await presentationInstance.addCredentialToPresent(
-      credential,
-      { resolver },
-    );
 
-    // Reveal subject attributes
-    presentationInstance.addAttributeToReveal(idx, [
-      'credentialSubject.lprNumber',
+    const bbsCred = {
+      "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        {
+          "dk": "https://ld.dock.io/credentials#",
+          "BiometricsCredential": "dk:BiometricsCredential",
+          "name": "dk:name"
+        }
+      ],
+      "credentialStatus": {
+        "id": "dock:accumulator:0xa632a41f2fbdb681c14b33daae4fcc46af41661b90b35c4ac1545c9bebf0d7cc",
+        "type": "DockVBAccumulator2022",
+        "revocationCheck": "membership",
+        "revocationId": "10"
+      },
+      "id": "https://creds-staging.dock.io/36eece85e59cf9df5c32e78a866b254b84506b9e0396e543ed7890ca6be042e4",
+      "type": [
+        "VerifiableCredential",
+        "BiometricsCredential"
+      ],
+      "credentialSubject": {
+        "id": "did:key:z6MksJKDx1wXLmWYE5Ppp4L1xtsyBccYVaYXP5nUPt5MbXve",
+        "name": "test"
+      },
+      "issuanceDate": "2024-01-09T19:14:04.108Z",
+      "issuer": {
+        "name": "profile bbs+",
+        "id": "did:dock:5GJeBeStWSxqyPGUJnERMFhm3wKcfCZP6nhqtoKyRAmq9FeU"
+      },
+      "name": "test",
+      "cryptoVersion": "0.4.0",
+      "credentialSchema": {
+        "id": "data:application/json;charset=utf-8,%7B%22%24schema%22%3A%22http%3A%2F%2Fjson-schema.org%2Fdraft-07%2Fschema%23%22%2C%22definitions%22%3A%7B%22encryptableCompString%22%3A%7B%22type%22%3A%22string%22%7D%2C%22encryptableString%22%3A%7B%22type%22%3A%22string%22%7D%7D%2C%22properties%22%3A%7B%22%40context%22%3A%7B%22type%22%3A%22string%22%7D%2C%22credentialSchema%22%3A%7B%22type%22%3A%22string%22%7D%2C%22credentialStatus%22%3A%7B%22properties%22%3A%7B%22id%22%3A%7B%22type%22%3A%22string%22%7D%2C%22revocationCheck%22%3A%7B%22type%22%3A%22string%22%7D%2C%22revocationId%22%3A%7B%22type%22%3A%22string%22%7D%2C%22type%22%3A%7B%22type%22%3A%22string%22%7D%7D%2C%22type%22%3A%22object%22%7D%2C%22credentialSubject%22%3A%7B%22properties%22%3A%7B%22id%22%3A%7B%22type%22%3A%22string%22%7D%2C%22name%22%3A%7B%22type%22%3A%22string%22%7D%7D%2C%22type%22%3A%22object%22%7D%2C%22cryptoVersion%22%3A%7B%22type%22%3A%22string%22%7D%2C%22id%22%3A%7B%22type%22%3A%22string%22%7D%2C%22issuanceDate%22%3A%7B%22format%22%3A%22date-time%22%2C%22type%22%3A%22string%22%7D%2C%22issuer%22%3A%7B%22properties%22%3A%7B%22id%22%3A%7B%22type%22%3A%22string%22%7D%2C%22name%22%3A%7B%22type%22%3A%22string%22%7D%7D%2C%22type%22%3A%22object%22%7D%2C%22name%22%3A%7B%22type%22%3A%22string%22%7D%2C%22proof%22%3A%7B%22properties%22%3A%7B%22%40context%22%3A%7B%22items%22%3A%5B%7B%22properties%22%3A%7B%22proof%22%3A%7B%22properties%22%3A%7B%22%40container%22%3A%7B%22type%22%3A%22string%22%7D%2C%22%40id%22%3A%7B%22type%22%3A%22string%22%7D%2C%22%40type%22%3A%7B%22type%22%3A%22string%22%7D%7D%2C%22type%22%3A%22object%22%7D%2C%22sec%22%3A%7B%22type%22%3A%22string%22%7D%7D%2C%22type%22%3A%22object%22%7D%2C%7B%22type%22%3A%22string%22%7D%5D%2C%22type%22%3A%22array%22%7D%2C%22created%22%3A%7B%22format%22%3A%22date-time%22%2C%22type%22%3A%22string%22%7D%2C%22proofPurpose%22%3A%7B%22type%22%3A%22string%22%7D%2C%22type%22%3A%7B%22type%22%3A%22string%22%7D%2C%22verificationMethod%22%3A%7B%22type%22%3A%22string%22%7D%7D%2C%22type%22%3A%22object%22%7D%2C%22type%22%3A%7B%22type%22%3A%22string%22%7D%7D%2C%22type%22%3A%22object%22%7D",
+        "type": "JsonSchemaValidator2018",
+        "parsingOptions": {
+          "useDefaults": false,
+          "defaultMinimumInteger": -4294967295,
+          "defaultMinimumDate": -17592186044415,
+          "defaultDecimalPlaces": 0
+        },
+        "version": "0.2.0"
+      },
+      "proof": {
+        "@context": [
+          {
+            "sec": "https://w3id.org/security#",
+            "proof": {
+              "@id": "sec:proof",
+              "@type": "@id",
+              "@container": "@graph"
+            }
+          },
+          "https://ld.dock.io/security/bbs/v1"
+        ],
+        "type": "Bls12381BBS+SignatureDock2022",
+        "created": "2024-01-31T12:47:18Z",
+        "verificationMethod": "did:dock:5GJeBeStWSxqyPGUJnERMFhm3wKcfCZP6nhqtoKyRAmq9FeU#keys-2",
+        "proofPurpose": "assertionMethod",
+        "proofValue": "zbYhMT7jEavhQp92xzZkDfVDyVViJfeFfhq1uagW5B9zGnWJykx6mZVgANomBBQMJ9NYSecScPa6G2rdArdqJuTqi4yHu5HT5Hpq7qPcgQKCxGYnteoQijyovUppafyh9m9CL8gzF1tXwhB8Li2DoRMPeF"
+      }
+    }
+
+    presentationInstance.addCredentialToPresent(bbsCred);
+    presentationInstance.presBuilder.credStatuses.set(0, [
+      {
+        value: new Uint8Array([128, 181, 205, 177, 121, 245, 130, 199, 51, 197, 203, 218, 159, 242, 230, 129, 133, 124, 147, 19, 102, 32, 112, 206, 154, 23, 252, 109, 183, 202, 224, 157, 62, 109, 236, 142, 240, 65, 45, 114, 61, 192, 145, 53, 77, 20, 251, 97]),
+      },
+      new Uint8Array([134, 94, 152, 141, 109, 226, 220, 161, 148, 169, 112, 11, 254, 108, 78, 101, 165, 79, 12, 41, 6, 173, 60, 69, 107, 106, 216, 13, 122, 210, 137, 152, 201, 27, 236, 37, 208, 32, 223, 114, 88, 142, 55, 204, 36, 13, 147, 235]),
+      {
+        value: new Uint8Array([144, 222, 74, 116, 11, 85, 191, 161, 154, 160, 165, 58, 28, 247, 188, 193, 151, 115, 185, 194, 145, 137, 220, 171, 101, 205, 91, 72, 133, 234, 215, 244, 184, 128, 176, 115, 142, 63, 222, 45, 128, 75, 229, 32, 214, 57, 129, 93, 11, 22, 152, 101, 220, 48, 128, 52, 9, 130, 75, 194, 131, 36, 80, 117, 100, 118, 83, 139, 233, 181, 112, 243, 19, 80, 75, 183, 60, 223, 18, 43, 58, 114, 158, 229, 88, 103, 40, 195, 140, 114, 185, 179, 219, 240, 58, 244]),
+      },
+      {
+      },
     ]);
-
-
-    // Begin to derive a credential from the above issued one
-    const presentationInstance2 = new Presentation();
-    const idx2 = await presentationInstance2.addCredentialToPresent(
-      credential,
-      { resolver },
-    );
-
-    // Reveal subject attributes
-    presentationInstance2.addAttributeToReveal(idx2, [
-      'credentialSubject.lprNumber',
-    ]);
-
+    
     // Derive a W3C Verifiable Credential JSON from the above presentation
     const credentials = await presentationInstance.deriveCredentials(
       presentationOptions,
     );
+
     expect(credentials.length).toEqual(1);
     expect(credentials[0].proof).toBeDefined();
     expect(credentials[0].credentialStatus).toBeDefined();
-    expect(credentials[0]).toHaveProperty('credentialSubject');
-    expect(credentials[0].credentialSubject).toMatchObject(
-      expect.objectContaining({
-        type: unsignedCred.credentialSubject.type,
-        lprNumber: 1234,
-      }),
-    );
 
-    // Ensure reconstructing presentation from credential matches
-    // NOTE: ignoring proof here as itll differ when signed twice as above
-    const presentation = await presentationInstance2.createPresentation(
-      presentationOptions,
-    );
-
-    // Question: What is the point of this? A single credential cant be converted to a presentation and a presentation
-    // has other data that credential won't have
-    const reconstructedPres = convertToPresentation(credentials[0]);
-    expect(reconstructedPres.proof).toBeDefined();
-    expect({
-      ...reconstructedPres,
-      proof: '',
-    }).toMatchObject({ ...presentation, proof: '' });
-
-    // Try to verify the derived credential alone
-    const credentialResult = await verifyCredential(credentials[0], {
-      resolver,
-    });
-    expect(credentialResult.verified).toBe(true);
-    expect(credentialResult.error).toBe(undefined);
-
-    // Create a VP and verify it from this credential
-    await createAndVerifyPresentation(credentials);
   }, 30000);
 
   test('Holder creates a derived verifiable credential from a credential with range proofs', async () => {

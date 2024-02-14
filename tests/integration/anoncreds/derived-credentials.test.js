@@ -354,6 +354,7 @@ describe.each(Schemes)('Derived Credentials', ({
     );
     expect(credentials.length).toEqual(1);
     expect(credentials[0].proof).toBeDefined();
+    expect(credentials[0].credentialStatus).toBeDefined();
     expect(credentials[0]).toHaveProperty('credentialSubject');
     expect(credentials[0].credentialSubject).toMatchObject(
       expect.objectContaining({

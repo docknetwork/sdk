@@ -196,6 +196,7 @@ class VerifiablePresentation {
       compactProof,
     );
     this.context = signedVP['@context'];
+    this.proof = signedVP.proof;
     return this;
   }
 

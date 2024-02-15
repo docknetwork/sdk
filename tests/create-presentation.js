@@ -9,8 +9,10 @@ import VerifiablePresentation from '../src/verifiable-presentation';
  */
 export function createPresentation(verifiableCredential, id = 'http://example.edu/presentation/2803', holder = null) {
   const presentation = new VerifiablePresentation(id);
-  if (verifiableCredential) {
-    presentation.addCredentials([].concat(verifiableCredential));
+  if (Array.isArray(verifiableCredential)) {
+    presentation.addCredentials(verifiableCredential);
+  } else {
+    presentation.addCredential(verifiableCredential);
   }
   if (holder) {
     presentation.setHolder(holder);

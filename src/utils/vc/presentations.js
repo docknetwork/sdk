@@ -249,8 +249,14 @@ export async function signPresentation(
     suite,
     addSuiteContext,
   });
+
+  // Sometimes jsigs returns proof like [null, { proof }]
+  // check for that case here and if there's only 1 proof store object instead
   if (Array.isArray(signed.proof)) {
-    signed.proof = signed.proof.pop();
+    const validProofs = signed.proof.filter((p) => !!p);
+    if (validProofs.length === 1) {
+      signed.proof = validProofs.pop();
+    }
   }
   return signed;
 }

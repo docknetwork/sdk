@@ -374,10 +374,11 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * Field `nonce` is the last accepted nonce by the chain, the next write to the accumulator should increment the nonce by 1.
    * Field `accumulated` contains the current accumulated value.
    * @param id
-   * @param withKeyAndParams
+   * @param withKeyAndParams - Fetch both keys and params.
+   * @param withKeyOnly - Fetch key only. This is useful when default params are used.
    * @returns {Promise<{created: *, lastModified: *}|null>}
    */
-  async getAccumulator(id, withKeyAndParams = false) {
+  async getAccumulator(id, withKeyAndParams = false, withKeyOnly = false) {
     const resp = await this.api.query[this.moduleName].accumulators(
       id,
     );
@@ -400,8 +401,8 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
       const keyId = common.keyRef[1].toNumber();
       accumulatorObj.keyRef = [typedHexDIDFromSubstrate(this.api, owner), keyId];
 
-      if (withKeyAndParams) {
-        const pk = await this.getPublicKeyByHexDid(owner, keyId, true);
+      if (withKeyAndParams || withKeyOnly) {
+        const pk = await this.getPublicKeyByHexDid(owner, keyId, withKeyAndParams);
         if (pk !== null) {
           accumulatorObj.publicKey = pk;
         }

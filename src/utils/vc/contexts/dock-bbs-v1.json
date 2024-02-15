@@ -57,6 +57,7 @@
         "unboundedPseudonyms": "https://ld.dock.io/security#unboundedPseudonyms",
         "attributeCiphertexts": "https://ld.dock.io/security#attributeCiphertexts",
         "attributeEqualities": "https://ld.dock.io/security#attributeEqualities",
+        "accumulated": "https://ld.dock.io/security#accumulated",
         "proofValue": "https://ld.dock.io/security#proofValue",
         "nonce": "https://ld.dock.io/security#nonce",
         "proofPurpose": {

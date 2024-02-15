@@ -1,6 +1,14 @@
 import { randomAsHex } from '@polkadot/util-crypto';
-import { stringToU8a, u8aToHex } from '@polkadot/util';
-import { initializeWasm, BoundCheckSnarkSetup, MembershipWitness } from '@docknetwork/crypto-wasm-ts';
+import b58 from 'bs58';
+import { hexToU8a, stringToU8a, u8aToHex } from '@polkadot/util';
+import {
+  initializeWasm,
+  BoundCheckSnarkSetup,
+  Accumulator,
+  PositiveAccumulator,
+  dockAccumulatorParams, AccumulatorPublicKey,
+} from '@docknetwork/crypto-wasm-ts';
+import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
 import { DockAPI } from '../../../src';
 import {
   FullNodeEndpoint,
@@ -19,6 +27,7 @@ import {
 } from '../../../src/utils/vc';
 import { DockResolver } from '../../../src/resolver';
 import { createPresentation } from '../../create-presentation';
+import AccumulatorModule from '../../../src/modules/accumulator';
 
 // TODO: move to fixtures
 const residentCardSchema = {
@@ -83,6 +92,7 @@ describe.each(Schemes)('Derived Credentials', ({
   let chainModule;
   let keypair;
   let didDocument;
+  let accumKeypair;
 
   const holder3DID = createNewDockDID();
   // seed used for 3rd holder keys
@@ -111,6 +121,10 @@ describe.each(Schemes)('Derived Credentials', ({
       lprNumber: 1234,
     },
   };
+
+  const accumulatorId = randomAsHex(32);
+  const accumState = new InMemoryState();
+  let accumMember;
 
   beforeAll(async () => {
     await initializeWasm();
@@ -152,6 +166,31 @@ describe.each(Schemes)('Derived Credentials', ({
       holder3DID,
       new DidKeypair(dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'), 1),
     );
+
+    const params = dockAccumulatorParams();
+    accumKeypair = Accumulator.generateKeypair(params);
+    const bytes1 = u8aToHex(accumKeypair.publicKey.bytes);
+    const accumPk = AccumulatorModule.prepareAddPublicKey(dock.api, bytes1);
+    await dock.accumulatorModule.addPublicKey(
+      accumPk,
+      did1,
+      pair1,
+      { didModule: dock.did },
+      false,
+    );
+
+    const accumulator = PositiveAccumulator.initialize(params, accumKeypair.secretKey);
+    const members = [];
+    for (let i = 1; i < 100; i++) {
+      members.push(Accumulator.encodePositiveNumberAsAccumulatorMember(i));
+    }
+    accumMember = members[10];
+    await accumulator.addBatch(members, accumKeypair.secretKey, accumState);
+
+    const accumulated = u8aToHex(accumulator.accumulated);
+    await dock.accumulatorModule.addPositiveAccumulator(accumulatorId, accumulated, [did1, 1], did1, pair1, { didModule: dock.didModule }, false);
+    const queriedAccum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
+    expect(queriedAccum.accumulated).toEqual(u8aToHex(accumulator.accumulated));
   }, 30000);
 
   async function createAndVerifyPresentation(credentials, verifyOptions = {}) {
@@ -309,14 +348,19 @@ describe.each(Schemes)('Derived Credentials', ({
   }, 30000);
 
   test(`For ${Name}, persist credential status when deriving`, async () => {
-    const provingKeyId = 'provingKeyId';
-    const pk = BoundCheckSnarkSetup();
-    const provingKey = pk.decompress();
+    const queriedAccum = await dock.accumulatorModule.getAccumulator(accumulatorId, false, true);
+    const verifAccumulator = PositiveAccumulator.fromAccumulated(hexToU8a(queriedAccum.accumulated));
+
+    // Witness created for member 1
+    const witness = await verifAccumulator.membershipWitness(accumMember, accumKeypair.secretKey, accumState);
+    const accumPk = new AccumulatorPublicKey(hexToU8a(queriedAccum.publicKey.bytes));
+    expect(verifAccumulator.verifyMembershipWitness(accumMember, witness, accumPk, dockAccumulatorParams())).toEqual(true);
+
     const credentialStatus = { // Mock data
-      "id": "dock:accumulator:0xa632a41f2fbdb681c14b33daae4fcc46af41661b90b35c4ac1545c9bebf0d7cc",
-      "type": "DockVBAccumulator2022",
-      "revocationCheck": "membership",
-      "revocationId": "10"
+      id: `dock:accumulator:${accumulatorId}`,
+      type: 'DockVBAccumulator2022',
+      revocationCheck: 'membership',
+      revocationId: accumMember.toString(),
     };
 
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
@@ -340,17 +384,7 @@ describe.each(Schemes)('Derived Credentials', ({
       credential,
       { resolver },
     );
-    
-    // Mock data
-    presentationInstance.presBuilder.credStatuses.set(0, [
-      new MembershipWitness(new Uint8Array([128, 181, 205, 177, 121, 245, 130, 199, 51, 197, 203, 218, 159, 242, 230, 129, 133, 124, 147, 19, 102, 32, 112, 206, 154, 23, 252, 109, 183, 202, 224, 157, 62, 109, 236, 142, 240, 65, 45, 114, 61, 192, 145, 53, 77, 20, 251, 97])),
-      new Uint8Array([134, 94, 152, 141, 109, 226, 220, 161, 148, 169, 112, 11, 254, 108, 78, 101, 165, 79, 12, 41, 6, 173, 60, 69, 107, 106, 216, 13, 122, 210, 137, 152, 201, 27, 236, 37, 208, 32, 223, 114, 88, 142, 55, 204, 36, 13, 147, 235]),
-      {
-        value: new Uint8Array([144, 222, 74, 116, 11, 85, 191, 161, 154, 160, 165, 58, 28, 247, 188, 193, 151, 115, 185, 194, 145, 137, 220, 171, 101, 205, 91, 72, 133, 234, 215, 244, 184, 128, 176, 115, 142, 63, 222, 45, 128, 75, 229, 32, 214, 57, 129, 93, 11, 22, 152, 101, 220, 48, 128, 52, 9, 130, 75, 194, 131, 36, 80, 117, 100, 118, 83, 139, 233, 181, 112, 243, 19, 80, 75, 183, 60, 223, 18, 43, 58, 114, 158, 229, 88, 103, 40, 195, 140, 114, 185, 179, 219, 240, 58, 244]),
-      },
-      {
-      },
-    ]);
+    presentationInstance.presBuilder.addAccumInfoForCredStatus(0, witness, hexToU8a(queriedAccum.accumulated), accumPk);
 
     // NOTE: revealing subject type because of JSON-LD processing for this certain credential
     // you may not always need to do this depending on your JSON-LD contexts
@@ -361,17 +395,6 @@ describe.each(Schemes)('Derived Credentials', ({
       'credentialSubject.type.1',
     ]);
 
-    // Enforce LPR number to be between values aswell as revealed
-    // NOTE: unlike other tests, we cannot "reveal" this value and enforce bounds at the same time!
-    presentationInstance.presBuilder.enforceBounds(
-      idx,
-      'credentialSubject.lprNumber',
-      1233,
-      1235,
-      provingKeyId,
-      provingKey,
-    );
-
     // Derive a W3C Verifiable Credential JSON from the above presentation
     const credentials = await presentationInstance.deriveCredentials(
       presentationOptions,
@@ -381,10 +404,23 @@ describe.each(Schemes)('Derived Credentials', ({
     expect(credentials[0].credentialStatus).toBeDefined();
     expect(credentials[0].credentialStatus).toEqual({
       ...credentialStatus,
-      revocationId: undefined,
-      accumulated: '5vtBeJk2aRi6J2KaVhg7hiVbcDoBWmnhRrWZ4ohnR37FsaFq1XquTBeneqMATg3HQv',
+      revocationId: undefined, // Because revocation id is never revealed
+      accumulated: b58.encode(hexToU8a(queriedAccum.accumulated)),
       extra: {},
     });
+
+    // TODO: Following checks fail. Fix them.
+    const accumulatorPublicKeys = new Map();
+    accumulatorPublicKeys.set(0, accumPk);
+    const credentialResult = await verifyCredential(credentials[0], {
+      resolver,
+      accumulatorPublicKeys,
+    });
+    expect(credentialResult.verified).toBe(true);
+    expect(credentialResult.error).toBe(undefined);
+
+    // Create a VP and verify it from this credential
+    await createAndVerifyPresentation(credentials, { accumulatorPublicKeys });
   });
 
   test('Holder creates a derived verifiable credential from a credential with range proofs', async () => {

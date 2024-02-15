@@ -249,7 +249,9 @@ export async function signPresentation(
     suite,
     addSuiteContext,
   });
-  signed.proof = signed.proof.pop();
+  if (Array.isArray(signed.proof)) {
+    signed.proof = signed.proof.pop();
+  }
   return signed;
 }
 

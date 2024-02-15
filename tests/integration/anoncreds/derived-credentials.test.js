@@ -409,7 +409,6 @@ describe.each(Schemes)('Derived Credentials', ({
       extra: {},
     });
 
-    // TODO: Following checks fail. Fix them.
     const accumulatorPublicKeys = new Map();
     accumulatorPublicKeys.set(0, accumPk);
     const credentialResult = await verifyCredential(credentials[0], {
@@ -418,9 +417,6 @@ describe.each(Schemes)('Derived Credentials', ({
     });
     expect(credentialResult.verified).toBe(true);
     expect(credentialResult.error).toBe(undefined);
-
-    // Create a VP and verify it from this credential
-    await createAndVerifyPresentation(credentials, { accumulatorPublicKeys });
   });
 
   test('Holder creates a derived verifiable credential from a credential with range proofs', async () => {

@@ -36,7 +36,7 @@ const DefaultTestAccountURI = '//Alice';
 const DefaultTestAccountCouncilMemberURI = '//Charlie';
 const DefaultMinGasPrice = 50;
 const DefaultMaxGas = 429496729;
-const DefaultTestSchemes = 'BBSPlus';
+const DefaultTestSchemes = 'BBS,BBSPlus,PS';
 
 const boolEnv = (value) => value === 'true' || !!+value;
 

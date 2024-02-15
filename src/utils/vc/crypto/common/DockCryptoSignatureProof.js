@@ -6,6 +6,8 @@ import CustomLinkedDataSignature from './CustomLinkedDataSignature';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
+export const DOCK_ANON_CREDENTIAL_ID = 'dock:anonymous:credential';
+
 /**
  * Defines commons for the `@docknetwork/crypto-wasm-ts` signature proofs.
  */
@@ -63,7 +65,7 @@ export default withExtendedStaticProperties(
           expansionMap,
         });
 
-        const presentationJSON = this.constructor.convertToPresentation({
+        const presentationJSON = this.constructor.derivedToAnoncredsPresentation({
           ...document,
           proof,
         });
@@ -93,7 +95,7 @@ export default withExtendedStaticProperties(
      * Converts a derived proof credential to the native presentation format
      * @param document
      */
-    static convertToPresentation(document) {
+    static derivedToAnoncredsPresentation(document) {
       const {
         '@context': context,
         type,
@@ -104,6 +106,11 @@ export default withExtendedStaticProperties(
         proof,
         ...revealedAttributes
       } = document;
+
+      // ID wasnt revealed but placeholder was used to conform to W3C spec, trim it
+      if (revealedAttributes.id === DOCK_ANON_CREDENTIAL_ID) {
+        delete revealedAttributes.id;
+      }
 
       // TODO: This is wrong. This won't work with presentation from 2 or more credentials
       const c = {

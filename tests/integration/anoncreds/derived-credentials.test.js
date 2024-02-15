@@ -82,7 +82,7 @@ describe.each(Schemes)('Derived Credentials', ({
   VerKey,
   getModule,
   Context,
-  convertToPresentation,
+  derivedToAnoncredsPresentation,
 }) => {
   const dock = new DockAPI();
   const resolver = new DockResolver(dock);
@@ -200,21 +200,22 @@ describe.each(Schemes)('Derived Credentials', ({
       'Sr25519VerificationKey2020',
     );
 
-    const presId = randomAsHex(32);
+    const presId = `https://example.com/pres/${randomAsHex(32)}`;
     const chal = randomAsHex(32);
     const domain = 'test domain';
     const presentation = createPresentation(credentials, presId);
 
     expect(presentation).toMatchObject(
-      expect.objectContaining({
+      // NOTE: json parse+stringify to remove any undefined properties
+      expect.objectContaining(JSON.parse(JSON.stringify({
         type: ['VerifiablePresentation'],
         verifiableCredential: credentials,
         id: presId,
-      }),
+      }))),
     );
 
-    // Question: What is the point of this? Verifying this would require knowing the holder's public key which makes
-    // the holder linkable and defeats the purpose of BBS+
+    // NOTE: typically for BBS+ presentations you shouldnt sign it by the holder, but we do it here just to make sure it works
+    // Verifying this would require knowing the holder's public key which makes the holder linkable and defeats the purpose of BBS+
     const signedPres = await signPresentation(
       presentation,
       holderKey,
@@ -329,7 +330,7 @@ describe.each(Schemes)('Derived Credentials', ({
 
     // Question: What is the point of this? A single credential cant be converted to a presentation and a presentation
     // has other data that credential won't have
-    const reconstructedPres = convertToPresentation(credentials[0]);
+    const reconstructedPres = derivedToAnoncredsPresentation(credentials[0]);
     expect(reconstructedPres.proof).toBeDefined();
     expect({
       ...reconstructedPres,
@@ -377,6 +378,7 @@ describe.each(Schemes)('Derived Credentials', ({
 
     // Create W3C credential
     const credential = await issueCredential(issuerKey, unsignedCred);
+    expect(credential.id).toBeDefined();
 
     // Begin to derive a credential from the above issued one
     const presentationInstance = new Presentation();
@@ -411,12 +413,19 @@ describe.each(Schemes)('Derived Credentials', ({
 
     const accumulatorPublicKeys = new Map();
     accumulatorPublicKeys.set(0, accumPk);
-    const credentialResult = await verifyCredential(credentials[0], {
+
+    // const credentialResult = await verifyCredential(credentials[0], {
+    //   resolver,
+    //   accumulatorPublicKeys,
+    // });
+    // expect(credentialResult.verified).toBe(true);
+    // expect(credentialResult.error).toBe(undefined);
+
+    // Create a VP and verify it from this credential
+    await createAndVerifyPresentation(credentials, {
       resolver,
       accumulatorPublicKeys,
     });
-    expect(credentialResult.verified).toBe(true);
-    expect(credentialResult.error).toBe(undefined);
   });
 
   test('Holder creates a derived verifiable credential from a credential with range proofs', async () => {
@@ -506,7 +515,7 @@ describe.each(Schemes)('Derived Credentials', ({
       }),
     );
 
-    const reconstructedPres = convertToPresentation(credentials[0]);
+    const reconstructedPres = derivedToAnoncredsPresentation(credentials[0]);
     expect(reconstructedPres.proof).toBeDefined();
     expect(reconstructedPres.spec.credentials[0].bounds).toEqual(credentials[0].proof.bounds);
 

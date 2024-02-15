@@ -240,7 +240,7 @@ export async function signPresentation(
     });
 
   const documentLoader = defaultDocumentLoader(resolver);
-  return jsigs.sign(presentation, {
+  const signed = await jsigs.sign(presentation, {
     purpose,
     documentLoader,
     domain,
@@ -249,6 +249,8 @@ export async function signPresentation(
     suite,
     addSuiteContext,
   });
+  signed.proof = signed.proof.pop();
+  return signed;
 }
 
 export function isAnoncreds(presentation) {

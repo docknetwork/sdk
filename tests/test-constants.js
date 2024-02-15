@@ -94,8 +94,8 @@ export const BBS = {
   Signature: BBSSignature,
   KeyPair: BBSKeypair,
   CryptoKeyPair: Bls12381BBSKeyPairDock2023,
-  convertToPresentation:
-    Bls12381BBSSignatureProofDock2023.convertToPresentation.bind(
+  derivedToAnoncredsPresentation:
+    Bls12381BBSSignatureProofDock2023.derivedToAnoncredsPresentation.bind(
       Bls12381BBSSignatureProofDock2023,
     ),
   SigType: 'Bls12381BBSSignatureDock2023',
@@ -117,8 +117,8 @@ export const BBSPlus = {
   Signature: BBSPlusSignatureG1,
   KeyPair: BBSPlusKeypairG2,
   CryptoKeyPair: Bls12381G2KeyPairDock2022,
-  convertToPresentation:
-    Bls12381BBSSignatureProofDock2022.convertToPresentation.bind(
+  derivedToAnoncredsPresentation:
+    Bls12381BBSSignatureProofDock2022.derivedToAnoncredsPresentation.bind(
       Bls12381BBSSignatureProofDock2022,
     ),
   Context: 'https://ld.dock.io/security/bbs/v1',
@@ -140,8 +140,8 @@ export const PS = {
   Signature: PSSignature,
   KeyPair: PSKeypair,
   CryptoKeyPair: Bls12381PSKeyPairDock2023,
-  convertToPresentation:
-    Bls12381PSSignatureProofDock2023.convertToPresentation.bind(
+  derivedToAnoncredsPresentation:
+    Bls12381PSSignatureProofDock2023.derivedToAnoncredsPresentation.bind(
       Bls12381PSSignatureProofDock2023,
     ),
   SigType: 'Bls12381PSSignatureDock2023',

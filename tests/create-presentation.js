@@ -1,6 +1,4 @@
-import {
-  DEFAULT_CONTEXT_V1_URL,
-} from '../src/utils/vc/constants';
+import VerifiablePresentation from '../src/verifiable-presentation';
 
 /**
  * Create an unsigned Verifiable Presentation
@@ -9,22 +7,13 @@ import {
  * @param {string} [holder] - optional presentation holder url
  * @return {object} verifiable presentation.
  */
-export function createPresentation(verifiableCredential, id, holder = null) {
-  const presentation = {
-    '@context': [DEFAULT_CONTEXT_V1_URL],
-    type: ['VerifiablePresentation'],
-  };
-
+export function createPresentation(verifiableCredential, id = 'http://example.edu/presentation/2803', holder = null) {
+  const presentation = new VerifiablePresentation(id);
   if (verifiableCredential) {
-    const credentials = [].concat(verifiableCredential);
-    presentation.verifiableCredential = credentials;
-  }
-  if (id) {
-    presentation.id = id;
+    presentation.addCredentials([].concat(verifiableCredential));
   }
   if (holder) {
-    presentation.holder = holder;
+    presentation.setHolder(holder);
   }
-
-  return presentation;
+  return presentation.toJSON();
 }

@@ -98,33 +98,39 @@ export default withExtendedStaticProperties(
         '@context': context,
         type,
         credentialSchema,
+        credentialStatus,
         issuer: _issuer,
         issuanceDate: _issuanceDate,
         proof,
         ...revealedAttributes
       } = document;
 
+      // TODO: This is wrong. This won't work with presentation from 2 or more credentials
+      const c = {
+        sigType: proof.sigType,
+        version: proof.version,
+        bounds: proof.bounds,
+        schema: JSON.stringify(credentialSchema),
+        revealedAttributes: {
+          proof: {
+            type: this.sigName,
+            verificationMethod: proof.verificationMethod,
+          },
+          '@context': JSON.stringify(context),
+          type: JSON.stringify(type),
+          ...revealedAttributes,
+        },
+      };
+      if (credentialStatus !== undefined) {
+        c.status = credentialStatus;
+      }
       return {
         version: proof.version,
         nonce: proof.nonce,
         context: proof.context,
         spec: {
           credentials: [
-            {
-              sigType: proof.sigType,
-              version: proof.version,
-              bounds: proof.bounds,
-              schema: JSON.stringify(credentialSchema),
-              revealedAttributes: {
-                proof: {
-                  type: this.sigName,
-                  verificationMethod: proof.verificationMethod,
-                },
-                '@context': JSON.stringify(context),
-                type: JSON.stringify(type),
-                ...revealedAttributes,
-              },
-            },
+            c,
           ],
           attributeEqualities: proof.attributeEqualities,
           boundedPseudonyms: proof.boundedPseudonyms,

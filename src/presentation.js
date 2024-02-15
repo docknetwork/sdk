@@ -165,7 +165,7 @@ export default class Presentation {
         );
       }
 
-      return {
+      const w3cFormattedCredential = {
         ...credential.revealedAttributes,
         '@context': JSON.parse(credential.revealedAttributes['@context']),
         type: JSON.parse(credential.revealedAttributes.type),
@@ -192,6 +192,12 @@ export default class Presentation {
           bounds: credential.bounds,
         },
       };
+
+      if (credential.status) {
+        w3cFormattedCredential.credentialStatus = credential.status;
+      }
+
+      return w3cFormattedCredential;
     });
   }
 }

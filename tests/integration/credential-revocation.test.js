@@ -119,7 +119,7 @@ describe('Credential revocation with issuer as the revocation authority', () => 
     const holderKey = getKeyDoc(holderDID, dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
 
     // Create presentation for unrevoked credential
-    const presId = randomAsHex(32);
+    const presId = `https://pres.com/${randomAsHex(32)}`;
     const chal = randomAsHex(32);
     const domain = 'test domain';
     const presentation = createPresentation(

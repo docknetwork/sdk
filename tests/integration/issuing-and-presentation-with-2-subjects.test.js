@@ -125,7 +125,7 @@ describe('Verifiable Credential issuance and presentation where the credential h
   test('Holder creates a verifiable presentation and verifier verifies it and does some other checks', async () => {
     const holderKey = getKeyDoc(subject1DID, dock.keyring.addFromUri(subject1Seed, null, 'ed25519'), 'Ed25519VerificationKey2018');
 
-    const presId = randomAsHex(32);
+    const presId = `https://pres.com/${randomAsHex(32)}`;
     const challenge = randomAsHex(32);
     const domain = 'test domain';
 

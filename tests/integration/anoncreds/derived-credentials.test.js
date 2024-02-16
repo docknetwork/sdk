@@ -7,6 +7,7 @@ import {
   Accumulator,
   PositiveAccumulator,
   dockAccumulatorParams, AccumulatorPublicKey, deepClone,
+  Encoder,
 } from '@docknetwork/crypto-wasm-ts';
 import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
 import { DockAPI } from '../../../src';
@@ -182,9 +183,11 @@ describe.each(Schemes)('Derived Credentials', ({
     const accumulator = PositiveAccumulator.initialize(params, accumKeypair.secretKey);
     const members = [];
     for (let i = 1; i < 100; i++) {
-      members.push(Accumulator.encodePositiveNumberAsAccumulatorMember(i));
+      // Using default encoder since thats what the is used in credential by default. Ideally, the encoder specified in
+      // the particular schema should be used but for that is the default one
+      members.push(Encoder.defaultEncodeFunc()(i.toString()));
     }
-    accumMember = members[10];
+    accumMember = '10';
     await accumulator.addBatch(members, accumKeypair.secretKey, accumState);
 
     const accumulated = u8aToHex(accumulator.accumulated);
@@ -357,19 +360,20 @@ describe.each(Schemes)('Derived Credentials', ({
   }, 30000);
 
   test(`For ${Name}, persist credential status when deriving`, async () => {
+    const encodedMember = Encoder.defaultEncodeFunc()(accumMember);
     const queriedAccum = await dock.accumulatorModule.getAccumulator(accumulatorId, false, true);
     const verifAccumulator = PositiveAccumulator.fromAccumulated(hexToU8a(queriedAccum.accumulated));
 
     // Witness created for member 1
-    const witness = await verifAccumulator.membershipWitness(accumMember, accumKeypair.secretKey, accumState);
+    const witness = await verifAccumulator.membershipWitness(encodedMember, accumKeypair.secretKey, accumState);
     const accumPk = new AccumulatorPublicKey(hexToU8a(queriedAccum.publicKey.bytes));
-    expect(verifAccumulator.verifyMembershipWitness(accumMember, witness, accumPk, dockAccumulatorParams())).toEqual(true);
+    expect(verifAccumulator.verifyMembershipWitness(encodedMember, witness, accumPk, dockAccumulatorParams())).toEqual(true);
 
-    const credentialStatus = { // Mock data
+    const credentialStatus = {
       id: `dock:accumulator:${accumulatorId}`,
       type: 'DockVBAccumulator2022',
       revocationCheck: 'membership',
-      revocationId: accumMember.toString(),
+      revocationId: accumMember,
     };
 
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
@@ -421,13 +425,6 @@ describe.each(Schemes)('Derived Credentials', ({
 
     const accumulatorPublicKeys = new Map();
     accumulatorPublicKeys.set(0, accumPk);
-
-    // const credentialResult = await verifyCredential(credentials[0], {
-    //   resolver,
-    //   accumulatorPublicKeys,
-    // });
-    // expect(credentialResult.verified).toBe(true);
-    // expect(credentialResult.error).toBe(undefined);
 
     // Create a VP and verify it from this credential
     await createAndVerifyPresentation(credentials, {

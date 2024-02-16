@@ -6,7 +6,7 @@ import {
   BoundCheckSnarkSetup,
   Accumulator,
   PositiveAccumulator,
-  dockAccumulatorParams, AccumulatorPublicKey,
+  dockAccumulatorParams, AccumulatorPublicKey, deepClone,
 } from '@docknetwork/crypto-wasm-ts';
 import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
 import { DockAPI } from '../../../src';
@@ -343,6 +343,14 @@ describe.each(Schemes)('Derived Credentials', ({
     });
     expect(credentialResult.verified).toBe(true);
     expect(credentialResult.error).toBe(undefined);
+
+    // Modify the credential after issuance, verification should fail
+    const modifiedCred = deepClone(credentials[0]);
+    modifiedCred.credentialSubject.lprNumber = 0xdeadbeef;
+    const credentialResult1 = await verifyCredential(modifiedCred, {
+      resolver,
+    });
+    expect(credentialResult1.verified).toBe(false);
 
     // Create a VP and verify it from this credential
     await createAndVerifyPresentation(credentials);

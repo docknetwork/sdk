@@ -81,8 +81,9 @@ export default withExtendedStaticProperties(
           circomOutputs, blindedAttributesCircomOutputs,
         } = this;
 
-        if (!recreatedPres.verify(pks, accumulatorPublicKeys, predicateParams, circomOutputs, blindedAttributesCircomOutputs)) {
-          throw new Error('Invalid signature');
+        const res = recreatedPres.verify(pks, accumulatorPublicKeys, predicateParams, circomOutputs, blindedAttributesCircomOutputs);
+        if (!res.verified) {
+          throw new Error(`Invalid anoncreds presentation due to error: ${res.error}`);
         }
 
         return { verified: true, verificationMethod };

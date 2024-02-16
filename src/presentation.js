@@ -11,6 +11,7 @@ import { stringToU8a } from '@polkadot/util';
 import { ensureArray } from './utils/type-helpers';
 
 import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';
+import { DOCK_ANON_CREDENTIAL_ID } from './utils/vc/crypto/common/DockCryptoSignatureProof';
 import {
   Bls12381BBSSigDockSigName,
   Bls12381PSSigDockSigName,
@@ -165,8 +166,10 @@ export default class Presentation {
         );
       }
 
-      return {
+      const w3cFormattedCredential = {
         ...credential.revealedAttributes,
+        // ID required for W£C formatted credentials, if not revealed used a static URI
+        id: credential.revealedAttributes.id || DOCK_ANON_CREDENTIAL_ID,
         '@context': JSON.parse(credential.revealedAttributes['@context']),
         type: JSON.parse(credential.revealedAttributes.type),
         credentialSchema: JSON.parse(credential.schema),
@@ -192,6 +195,12 @@ export default class Presentation {
           bounds: credential.bounds,
         },
       };
+
+      if (credential.status) {
+        w3cFormattedCredential.credentialStatus = credential.status;
+      }
+
+      return w3cFormattedCredential;
     });
   }
 }

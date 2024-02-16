@@ -116,7 +116,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
       });
       expect(res).toBe(true);
 
-      const presId = randomAsHex(32);
+      const presId = `https://pres.com/${randomAsHex(32)}`;
       const chal = randomAsHex(32);
       const domain = 'test domain';
       const presentation = createPresentation(
@@ -186,7 +186,7 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     });
     expect(res1).toBe(true);
 
-    const presId = randomAsHex(32);
+    const presId = `https://pres.com/${randomAsHex(32)}`;
     const chal = randomAsHex(32);
     const domain = 'test domain';
 

@@ -183,7 +183,7 @@ buildTest('StatusList2021Credential', () => {
     );
 
     // Create presentation for unsuspended credential
-    const presId = randomAsHex(32);
+    const presId = `https://pres.com/${randomAsHex(32)}`;
     const chal = randomAsHex(32);
     const domain = 'test domain';
     const presentation = createPresentation(credential, presId);

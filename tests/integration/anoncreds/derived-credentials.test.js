@@ -1,6 +1,15 @@
 import { randomAsHex } from '@polkadot/util-crypto';
-import { stringToU8a, u8aToHex } from '@polkadot/util';
-import { initializeWasm, BoundCheckSnarkSetup } from '@docknetwork/crypto-wasm-ts';
+import b58 from 'bs58';
+import { hexToU8a, stringToU8a, u8aToHex } from '@polkadot/util';
+import {
+  initializeWasm,
+  BoundCheckSnarkSetup,
+  Accumulator,
+  PositiveAccumulator,
+  dockAccumulatorParams, AccumulatorPublicKey, deepClone,
+  Encoder,
+} from '@docknetwork/crypto-wasm-ts';
+import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
 import { DockAPI } from '../../../src';
 import {
   FullNodeEndpoint,
@@ -19,6 +28,7 @@ import {
 } from '../../../src/utils/vc';
 import { DockResolver } from '../../../src/resolver';
 import { createPresentation } from '../../create-presentation';
+import AccumulatorModule from '../../../src/modules/accumulator';
 
 // TODO: move to fixtures
 const residentCardSchema = {
@@ -73,7 +83,7 @@ describe.each(Schemes)('Derived Credentials', ({
   VerKey,
   getModule,
   Context,
-  convertToPresentation,
+  derivedToAnoncredsPresentation,
 }) => {
   const dock = new DockAPI();
   const resolver = new DockResolver(dock);
@@ -83,6 +93,7 @@ describe.each(Schemes)('Derived Credentials', ({
   let chainModule;
   let keypair;
   let didDocument;
+  let accumKeypair;
 
   const holder3DID = createNewDockDID();
   // seed used for 3rd holder keys
@@ -111,6 +122,10 @@ describe.each(Schemes)('Derived Credentials', ({
       lprNumber: 1234,
     },
   };
+
+  const accumulatorId = randomAsHex(32);
+  const accumState = new InMemoryState();
+  let accumMember;
 
   beforeAll(async () => {
     await initializeWasm();
@@ -152,6 +167,33 @@ describe.each(Schemes)('Derived Credentials', ({
       holder3DID,
       new DidKeypair(dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'), 1),
     );
+
+    const params = dockAccumulatorParams();
+    accumKeypair = Accumulator.generateKeypair(params);
+    const bytes1 = u8aToHex(accumKeypair.publicKey.bytes);
+    const accumPk = AccumulatorModule.prepareAddPublicKey(dock.api, bytes1);
+    await dock.accumulatorModule.addPublicKey(
+      accumPk,
+      did1,
+      pair1,
+      { didModule: dock.did },
+      false,
+    );
+
+    const accumulator = PositiveAccumulator.initialize(params, accumKeypair.secretKey);
+    const members = [];
+    for (let i = 1; i < 100; i++) {
+      // Using default encoder since thats what the is used in credential by default. Ideally, the encoder specified in
+      // the particular schema should be used but for that is the default one
+      members.push(Encoder.defaultEncodeFunc()(i.toString()));
+    }
+    accumMember = '10';
+    await accumulator.addBatch(members, accumKeypair.secretKey, accumState);
+
+    const accumulated = u8aToHex(accumulator.accumulated);
+    await dock.accumulatorModule.addPositiveAccumulator(accumulatorId, accumulated, [did1, 1], did1, pair1, { didModule: dock.didModule }, false);
+    const queriedAccum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
+    expect(queriedAccum.accumulated).toEqual(u8aToHex(accumulator.accumulated));
   }, 30000);
 
   async function createAndVerifyPresentation(credentials, verifyOptions = {}) {
@@ -161,21 +203,22 @@ describe.each(Schemes)('Derived Credentials', ({
       'Sr25519VerificationKey2020',
     );
 
-    const presId = randomAsHex(32);
+    const presId = `https://example.com/pres/${randomAsHex(32)}`;
     const chal = randomAsHex(32);
     const domain = 'test domain';
     const presentation = createPresentation(credentials, presId);
 
     expect(presentation).toMatchObject(
-      expect.objectContaining({
+      // NOTE: json parse+stringify to remove any undefined properties
+      expect.objectContaining(JSON.parse(JSON.stringify({
         type: ['VerifiablePresentation'],
         verifiableCredential: credentials,
         id: presId,
-      }),
+      }))),
     );
 
-    // Question: What is the point of this? Verifying this would require knowing the holder's public key which makes
-    // the holder linkable and defeats the purpose of BBS+
+    // NOTE: typically for BBS+ presentations you shouldnt sign it by the holder, but we do it here just to make sure it works
+    // Verifying this would require knowing the holder's public key which makes the holder linkable and defeats the purpose of BBS+
     const signedPres = await signPresentation(
       presentation,
       holderKey,
@@ -290,7 +333,7 @@ describe.each(Schemes)('Derived Credentials', ({
 
     // Question: What is the point of this? A single credential cant be converted to a presentation and a presentation
     // has other data that credential won't have
-    const reconstructedPres = convertToPresentation(credentials[0]);
+    const reconstructedPres = derivedToAnoncredsPresentation(credentials[0]);
     expect(reconstructedPres.proof).toBeDefined();
     expect({
       ...reconstructedPres,
@@ -304,9 +347,91 @@ describe.each(Schemes)('Derived Credentials', ({
     expect(credentialResult.verified).toBe(true);
     expect(credentialResult.error).toBe(undefined);
 
+    // Modify the credential after issuance, verification should fail
+    const modifiedCred = deepClone(credentials[0]);
+    modifiedCred.credentialSubject.lprNumber = 0xdeadbeef;
+    const credentialResult1 = await verifyCredential(modifiedCred, {
+      resolver,
+    });
+    expect(credentialResult1.verified).toBe(false);
+
     // Create a VP and verify it from this credential
     await createAndVerifyPresentation(credentials);
   }, 30000);
+
+  test(`For ${Name}, persist credential status when deriving`, async () => {
+    const encodedMember = Encoder.defaultEncodeFunc()(accumMember);
+    const queriedAccum = await dock.accumulatorModule.getAccumulator(accumulatorId, false, true);
+    const verifAccumulator = PositiveAccumulator.fromAccumulated(hexToU8a(queriedAccum.accumulated));
+
+    // Witness created for member 1
+    const witness = await verifAccumulator.membershipWitness(encodedMember, accumKeypair.secretKey, accumState);
+    const accumPk = new AccumulatorPublicKey(hexToU8a(queriedAccum.publicKey.bytes));
+    expect(verifAccumulator.verifyMembershipWitness(encodedMember, witness, accumPk, dockAccumulatorParams())).toEqual(true);
+
+    const credentialStatus = {
+      id: `dock:accumulator:${accumulatorId}`,
+      type: 'DockVBAccumulator2022',
+      revocationCheck: 'membership',
+      revocationId: accumMember,
+    };
+
+    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
+    const unsignedCred = {
+      ...credentialJSON,
+      credentialStatus,
+      issuer: did1,
+    };
+
+    const presentationOptions = {
+      nonce: stringToU8a('noncetest'),
+      context: 'my context',
+    };
+
+    // Create W3C credential
+    const credential = await issueCredential(issuerKey, unsignedCred);
+    expect(credential.id).toBeDefined();
+
+    // Begin to derive a credential from the above issued one
+    const presentationInstance = new Presentation();
+    const idx = await presentationInstance.addCredentialToPresent(
+      credential,
+      { resolver },
+    );
+    presentationInstance.presBuilder.addAccumInfoForCredStatus(0, witness, hexToU8a(queriedAccum.accumulated), accumPk);
+
+    // NOTE: revealing subject type because of JSON-LD processing for this certain credential
+    // you may not always need to do this depending on your JSON-LD contexts
+    await presentationInstance.addAttributeToReveal(idx, [
+      'credentialSubject.type.0',
+    ]);
+    await presentationInstance.addAttributeToReveal(idx, [
+      'credentialSubject.type.1',
+    ]);
+
+    // Derive a W3C Verifiable Credential JSON from the above presentation
+    const credentials = await presentationInstance.deriveCredentials(
+      presentationOptions,
+    );
+
+    expect(credentials.length).toEqual(1);
+    expect(credentials[0].credentialStatus).toBeDefined();
+    expect(credentials[0].credentialStatus).toEqual({
+      ...credentialStatus,
+      revocationId: undefined, // Because revocation id is never revealed
+      accumulated: b58.encode(hexToU8a(queriedAccum.accumulated)),
+      extra: {},
+    });
+
+    const accumulatorPublicKeys = new Map();
+    accumulatorPublicKeys.set(0, accumPk);
+
+    // Create a VP and verify it from this credential
+    await createAndVerifyPresentation(credentials, {
+      resolver,
+      accumulatorPublicKeys,
+    });
+  });
 
   test('Holder creates a derived verifiable credential from a credential with range proofs', async () => {
     const provingKeyId = 'provingKeyId';
@@ -395,7 +520,7 @@ describe.each(Schemes)('Derived Credentials', ({
       }),
     );
 
-    const reconstructedPres = convertToPresentation(credentials[0]);
+    const reconstructedPres = derivedToAnoncredsPresentation(credentials[0]);
     expect(reconstructedPres.proof).toBeDefined();
     expect(reconstructedPres.spec.credentials[0].bounds).toEqual(credentials[0].proof.bounds);
 

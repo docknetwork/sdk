@@ -91,10 +91,7 @@ export default class TrustRegistryModule {
       nonce,
       didModule,
     });
-    ensureMatchesPattern(
-      this.constructor.SchemasUpdatePattern,
-      schemas,
-    );
+    ensureMatchesPattern(this.constructor.SchemasUpdatePattern, schemas);
 
     return this.signAndSend(
       convenerOrIssuerOrVerifierHexDid.changeState(
@@ -324,7 +321,20 @@ const IssuersUpdatePattern = {
   ],
 };
 
-TrustRegistryModule.SchemasUpdatePattern = {
+const SetAllSchemasPattern = {
+  $instanceOf: BTreeMap,
+  $mapOf: [
+    { $matchType: 'string' },
+    {
+      $matchObject: {
+        issuers: IssuersPattern,
+        verifiers: VerifiersPattern,
+      },
+    },
+  ],
+};
+
+const ModifySchemasPattern = {
   $instanceOf: BTreeMap,
   $mapOf: [
     { $matchType: 'string' },
@@ -365,4 +375,11 @@ TrustRegistryModule.SchemasUpdatePattern = {
       ],
     },
   ],
+};
+
+TrustRegistryModule.SchemasUpdatePattern = {
+  $matchObject: {
+    Set: SetAllSchemasPattern,
+    Modify: ModifySchemasPattern,
+  },
 };

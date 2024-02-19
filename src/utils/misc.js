@@ -476,6 +476,17 @@ export class PatternMatcher {
 
     this.check(pattern.$objOf[key], value[key], path.concat(key));
   }
+
+  /**
+   * Ensures that supplied value satisfies provided function.
+   *
+   * @param pattern
+   * @param value
+   * @param path
+   */
+  $ensure(pattern, value) {
+    pattern.$ensure(value);
+  }
 }
 
 /**

@@ -27,14 +27,14 @@ export default class StatusList2021Credential extends VerifiableCredential {
 
     // Caches decoded status list.
     Object.defineProperty(this, 'decodedStatusList', {
-      value: async function decodedStatusList() {
+      value: function decodedStatusList() {
         if (
           encodedStatusList === this.credentialSubject.encodedList
           && cachedDecodedStatusList !== void 0
         ) {
           return cachedDecodedStatusList;
         } else {
-          cachedDecodedStatusList = await decodeList(this.credentialSubject);
+          cachedDecodedStatusList = decodeList(this.credentialSubject);
           encodedStatusList = this.credentialSubject.encodedList;
 
           return cachedDecodedStatusList;

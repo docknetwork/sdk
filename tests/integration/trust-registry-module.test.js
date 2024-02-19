@@ -985,14 +985,14 @@ buildTest('Trust Registry', () => {
 
     const RegInfo = {
       [trustRegistryId]: {
-        convener: typedHexDID(dock.api, convenerDID),
+        convener: typedHexDID(dock.api, convenerDID).toQualifiedEncodedString(),
         name: 'Test Registry',
         govFramework: u8aToHex(stringToU8a('Gov framework')),
       },
     };
     const Reg2Info = {
       [trustRegistryId2]: {
-        convener: typedHexDID(dock.api, convenerDID),
+        convener: typedHexDID(dock.api, convenerDID).toQualifiedEncodedString(),
         name: 'Test Registry 2',
         govFramework: u8aToHex(stringToU8a('Gov framework')),
       },

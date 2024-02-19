@@ -37,7 +37,7 @@ export default class TrustRegistryModule {
     return Object.fromEntries(
       [...registriesInfo.entries()].map(([id, info]) => [
         id.toString(),
-        this.fmtRegistryInfo(info),
+        this.parseRegistryInfo(info),
       ]),
     );
   }
@@ -362,13 +362,16 @@ export default class TrustRegistryModule {
   }
 
   /**
-   * Formats Trust Registry information received from the substrate side.
+   * Parses Trust Registry information received from the substrate side.
    * @param registryInfo
    */
-  fmtRegistryInfo({ name, convener, govFramework }) {
+  parseRegistryInfo({ name, convener, govFramework }) {
     return {
       name: name.toString(),
-      convener: typedHexDIDFromSubstrate(this.api, convener),
+      convener: typedHexDIDFromSubstrate(
+        this.api,
+        convener,
+      ).toQualifiedEncodedString(),
       govFramework: u8aToHex(govFramework),
     };
   }

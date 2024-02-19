@@ -1,21 +1,21 @@
 import { ensureMatchesPattern } from '../../src/utils/misc';
 
-const checkError = fn => {
+const checkError = (fn) => {
   let thrown = false;
 
   try {
-    fn()
-  } catch(err) {
+    fn();
+  } catch (err) {
     for (const key of ['message', 'path', 'pattern', 'errors']) {
-      expect(err[key]).toMatchSnapshot()
+      expect(err[key]).toMatchSnapshot();
     }
     thrown = true;
   }
 
   if (!thrown) {
-    throw new Error('Expected an error to be thrown')
+    throw new Error('Expected an error to be thrown');
   }
-}
+};
 
 describe('ensureMatchesPattern', () => {
   test('$matchType', () => {
@@ -86,7 +86,7 @@ describe('ensureMatchesPattern', () => {
       new Map([
         [1, 2],
         [3, 1],
-      ])
+      ]),
     ));
     ensureMatchesPattern(pat, new Map([]));
     ensureMatchesPattern(pat, new Map([[1, 2]]));

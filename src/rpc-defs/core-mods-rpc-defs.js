@@ -143,4 +143,108 @@ export default {
       type: 'Vec<Option<AggregatedDidDetailsResponse>>',
     },
   },
+  trustRegistry: {
+    schemaMetadata: {
+      params: [
+        {
+          name: 'id',
+          type: 'TrustRegistrySchemaId',
+        },
+      ],
+      type: 'BTreeMap<TrustRegistryId, AggregatedTrustRegistrySchemaMetadata>',
+    },
+    schemaIssuers: {
+      params: [
+        {
+          name: 'id',
+          type: 'TrustRegistrySchemaId',
+        },
+      ],
+      type: 'BTreeMap<TrustRegistryId, AggregatedTrustRegistrySchemaIssuers>',
+    },
+    schemaVerifiers: {
+      params: [
+        {
+          name: 'id',
+          type: 'TrustRegistrySchemaId',
+        },
+      ],
+      type: 'BTreeMap<TrustRegistryId, TrustRegistrySchemaVerifiers>',
+    },
+    schemaMetadataInRegistry: {
+      params: [
+        {
+          name: 'id',
+          type: 'TrustRegistrySchemaId',
+        },
+        {
+          name: 'registry_id',
+          type: 'TrustRegistryId',
+        },
+      ],
+      type: 'Option<AggregatedTrustRegistrySchemaMetadata>',
+    },
+    schemaIssuersInRegistry: {
+      params: [
+        {
+          name: 'id',
+          type: 'TrustRegistrySchemaId',
+        },
+        {
+          name: 'registry_id',
+          type: 'TrustRegistryId',
+        },
+      ],
+      type: 'Option<AggregatedTrustRegistrySchemaIssuers>',
+    },
+    schemaVerifiersInRegistry: {
+      params: [
+        {
+          name: 'id',
+          type: 'TrustRegistrySchemaId',
+        },
+        {
+          name: 'registry_id',
+          type: 'TrustRegistryId',
+        },
+      ],
+      type: 'Option<TrustRegistrySchemaVerifiers>',
+    },
+    allRegistrySchemaMetadata: {
+      params: [
+        {
+          name: 'registry_id',
+          type: 'TrustRegistryId',
+        },
+      ],
+      type: 'BTreeMap<TrustRegistrySchemaId, AggregatedTrustRegistrySchemaMetadata>',
+    },
+    allRegistrySchemaIssuers: {
+      params: [
+        {
+          name: 'registry_id',
+          type: 'TrustRegistryId',
+        },
+      ],
+      type: 'BTreeMap<TrustRegistrySchemaId, AggregatedTrustRegistrySchemaIssuers>',
+    },
+    allRegistrySchemaVerifiers: {
+      params: [
+        {
+          name: 'registry_id',
+          type: 'TrustRegistryId',
+        },
+      ],
+      type: 'BTreeMap<TrustRegistrySchemaId, TrustRegistrySchemaVerifiers>',
+    },
+    registriesInfoBy: {
+      params: [
+        {
+          name: 'by',
+          type: 'TrustRegistriesInfoBy',
+        },
+      ],
+      type: 'BTreeMap<TrustRegistryId, TrustRegistryInfo>',
+    },
+  },
 };

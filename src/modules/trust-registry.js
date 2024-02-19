@@ -1,5 +1,12 @@
 import { BTreeSet, BTreeMap } from '@polkadot/types';
-import { DidMethodKey, DockDid, typedHexDID } from '../utils/did';
+import { u8aToHex } from '@polkadot/util';
+import {
+  DidMethodKey,
+  DockDid,
+  typedHexDID,
+  typedHexDIDFromSubstrate,
+} from '../utils/did';
+import { isHexWithGivenByteSize } from '../utils/codec';
 import { getDidNonce, ensureMatchesPattern } from '../utils/misc';
 
 /**
@@ -16,6 +23,23 @@ export default class TrustRegistryModule {
     this.api = api;
     this.module = api.tx.trustRegistry;
     this.signAndSend = signAndSend;
+  }
+
+  /**
+   * Returns Trust Registries information according to the supplied `by` argument.
+   * @param by
+   */
+  async registriesInfo(by) {
+    ensureMatchesPattern(this.constructor.TrustRegistriesInfoByPattern, by);
+
+    const registriesInfo = await this.api.rpc.trustRegistry.registriesInfoBy(by);
+
+    return Object.fromEntries(
+      [...registriesInfo.entries()].map(([id, info]) => [
+        id.toString(),
+        this.parseRegistryInfo(info),
+      ]),
+    );
   }
 
   /**
@@ -48,11 +72,7 @@ export default class TrustRegistryModule {
       signingKeyRef,
       nonceOrDidModule,
     );
-    return this.signAndSend(
-      tx,
-      waitForFinalization,
-      params,
-    );
+    return this.signAndSend(tx, waitForFinalization, params);
   }
 
   /**
@@ -121,11 +141,7 @@ export default class TrustRegistryModule {
       signingKeyRef,
       nonceOrDidModule,
     );
-    return this.signAndSend(
-      tx,
-      waitForFinalization,
-      params,
-    );
+    return this.signAndSend(tx, waitForFinalization, params);
   }
 
   /**
@@ -149,10 +165,7 @@ export default class TrustRegistryModule {
       nonce,
       didModule,
     });
-    ensureMatchesPattern(
-      this.constructor.SchemasUpdatePattern,
-      schemas,
-    );
+    ensureMatchesPattern(this.constructor.SchemasUpdatePattern, schemas);
 
     return convenerOrIssuerOrVerifierHexDid.changeState(
       this.api,
@@ -190,11 +203,7 @@ export default class TrustRegistryModule {
       signingKeyRef,
       nonceOrDidModule,
     );
-    return this.signAndSend(
-      tx,
-      waitForFinalization,
-      params,
-    );
+    return this.signAndSend(tx, waitForFinalization, params);
   }
 
   /**
@@ -259,11 +268,7 @@ export default class TrustRegistryModule {
       signingKeyRef,
       nonceOrDidModule,
     );
-    return this.signAndSend(
-      tx,
-      waitForFinalization,
-      params,
-    );
+    return this.signAndSend(tx, waitForFinalization, params);
   }
 
   /**
@@ -355,6 +360,21 @@ export default class TrustRegistryModule {
     const lastNonce = nonce ?? (await getDidNonce(hexDID, nonce, didModule));
     return [hexDID, lastNonce];
   }
+
+  /**
+   * Parses Trust Registry information received from the substrate side.
+   * @param registryInfo
+   */
+  parseRegistryInfo({ name, convener, govFramework }) {
+    return {
+      name: name.toString(),
+      convener: typedHexDIDFromSubstrate(
+        this.api,
+        convener,
+      ).toQualifiedEncodedString(),
+      govFramework: u8aToHex(govFramework),
+    };
+  }
 }
 
 const DockDidOrDidMethodKeyPattern = {
@@ -363,6 +383,14 @@ const DockDidOrDidMethodKeyPattern = {
 
 const VerificationPricePattern = {
   $anyOf: [{ $matchType: 'number' }, { $matchType: 'object' }],
+};
+
+const Hex32Pattern = {
+  $ensure: (value) => {
+    if (!isHexWithGivenByteSize(value, 32)) {
+      throw new Error(`Expected 32-byte hex sequence, received: ${value}`);
+    }
+  },
 };
 
 const VerifiersPattern = {
@@ -426,10 +454,23 @@ const IssuersUpdatePattern = {
   ],
 };
 
-TrustRegistryModule.SchemasUpdatePattern = {
+const SetAllSchemasPattern = {
   $instanceOf: BTreeMap,
   $mapOf: [
-    { $matchType: 'string' },
+    Hex32Pattern,
+    {
+      $matchObject: {
+        issuers: IssuersPattern,
+        verifiers: VerifiersPattern,
+      },
+    },
+  ],
+};
+
+const ModifySchemasPattern = {
+  $instanceOf: BTreeMap,
+  $mapOf: [
+    Hex32Pattern,
     {
       $anyOf: [
         {
@@ -467,4 +508,32 @@ TrustRegistryModule.SchemasUpdatePattern = {
       ],
     },
   ],
+};
+
+TrustRegistryModule.SchemasUpdatePattern = {
+  $matchObject: {
+    Set: SetAllSchemasPattern,
+    Modify: ModifySchemasPattern,
+  },
+};
+TrustRegistryModule.TrustRegistriesInfoByPattern = {
+  $matchObject: {
+    Issuer: DockDidOrDidMethodKeyPattern,
+    Verifier: DockDidOrDidMethodKeyPattern,
+    SchemaId: Hex32Pattern,
+    IssuerOrVerifier: DockDidOrDidMethodKeyPattern,
+    IssuerAndVerifier: DockDidOrDidMethodKeyPattern,
+    IssuerAndSchemaId: {
+      $matchIterable: [DockDidOrDidMethodKeyPattern, Hex32Pattern],
+    },
+    VerifierAndSchemaId: {
+      $matchIterable: [DockDidOrDidMethodKeyPattern, Hex32Pattern],
+    },
+    IssuerOrVerifierAndSchemaId: {
+      $matchIterable: [DockDidOrDidMethodKeyPattern, Hex32Pattern],
+    },
+    IssuerAndVerifierAndSchemaId: {
+      $matchIterable: [DockDidOrDidMethodKeyPattern, Hex32Pattern],
+    },
+  },
 };

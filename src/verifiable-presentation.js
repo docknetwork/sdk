@@ -156,6 +156,15 @@ class VerifiablePresentation {
   }
 
   /**
+   * Add multiple Verifiable Credentials to this Presentation. Duplicates will be ignored.
+   * @param {Array<object>} credentials -  Verifiable Credential for the presentation
+   * @returns {VerifiablePresentation}
+   */
+  addCredentials(credentials) {
+    credentials.forEach(this.addCredential.bind(this));
+  }
+
+  /**
    * Define the JSON representation of a Verifiable Presentation.
    * @returns {object}
    */
@@ -186,8 +195,8 @@ class VerifiablePresentation {
       resolver,
       compactProof,
     );
-    this.proof = signedVP.proof.pop();
     this.context = signedVP['@context'];
+    this.proof = signedVP.proof;
     return this;
   }
 

@@ -240,7 +240,7 @@ export async function signPresentation(
     });
 
   const documentLoader = defaultDocumentLoader(resolver);
-  return jsigs.sign(presentation, {
+  const signed = await jsigs.sign(presentation, {
     purpose,
     documentLoader,
     domain,
@@ -249,6 +249,16 @@ export async function signPresentation(
     suite,
     addSuiteContext,
   });
+
+  // Sometimes jsigs returns proof like [null, { proof }]
+  // check for that case here and if there's only 1 proof store object instead
+  if (Array.isArray(signed.proof)) {
+    const validProofs = signed.proof.filter((p) => !!p);
+    if (validProofs.length === 1) {
+      signed.proof = validProofs.pop();
+    }
+  }
+  return signed;
 }
 
 export function isAnoncreds(presentation) {

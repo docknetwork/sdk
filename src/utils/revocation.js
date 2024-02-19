@@ -17,6 +17,8 @@ export const RevRegIdByteSize = 32;
 // Each entry in revocation registry has byte size `RevEntryByteSize`
 export const RevEntryByteSize = 32;
 
+const LD_SEC_TERM = 'https://ld.dock.io/security#';
+
 /**
  * Return `credentialStatus` according to W3C spec when the revocation status is checked on Dock
  * @param registryId - Revocation registry id
@@ -76,14 +78,14 @@ export function getCredentialStatus(expanded) {
  * @param status
  * @returns {boolean}
  */
-export const isRegistryRevocationStatus = ({ [credentialTypeField]: type }) => type.includes(RevRegType) || type.includes(`/${RevRegType}`);
+export const isRegistryRevocationStatus = ({ [credentialTypeField]: type }) => type.includes(RevRegType) || type.includes(`${LD_SEC_TERM}${RevRegType}`) || type.includes(`/${RevRegType}`);
 
 /**
  * Returns `true` if supplied status is a accumulator revocation status.
  * @param status
  * @returns {boolean}
  */
-export const isAccumulatorRevocationStatus = ({ [credentialTypeField]: type }) => type.includes(VB_ACCUMULATOR_22) || type.includes(`/${VB_ACCUMULATOR_22}`);
+export const isAccumulatorRevocationStatus = ({ [credentialTypeField]: type }) => type.includes(VB_ACCUMULATOR_22) || type.includes(`${LD_SEC_TERM}${VB_ACCUMULATOR_22}`) || type.includes(`/${VB_ACCUMULATOR_22}`);
 
 /**
  * Checks if a credential status has a registry revocation.

@@ -6,6 +6,8 @@ import CustomLinkedDataSignature from './CustomLinkedDataSignature';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
+export const DOCK_ANON_CREDENTIAL_ID = 'dock:anonymous:credential';
+
 /**
  * Defines commons for the `@docknetwork/crypto-wasm-ts` signature proofs.
  */
@@ -63,7 +65,7 @@ export default withExtendedStaticProperties(
           expansionMap,
         });
 
-        const presentationJSON = this.constructor.convertToPresentation({
+        const presentationJSON = this.constructor.derivedToAnoncredsPresentation({
           ...document,
           proof,
         });
@@ -79,8 +81,9 @@ export default withExtendedStaticProperties(
           circomOutputs, blindedAttributesCircomOutputs,
         } = this;
 
-        if (!recreatedPres.verify(pks, accumulatorPublicKeys, predicateParams, circomOutputs, blindedAttributesCircomOutputs)) {
-          throw new Error('Invalid signature');
+        const res = recreatedPres.verify(pks, accumulatorPublicKeys, predicateParams, circomOutputs, blindedAttributesCircomOutputs);
+        if (!res.verified) {
+          throw new Error(`Invalid anoncreds presentation due to error: ${res.error}`);
         }
 
         return { verified: true, verificationMethod };
@@ -93,38 +96,49 @@ export default withExtendedStaticProperties(
      * Converts a derived proof credential to the native presentation format
      * @param document
      */
-    static convertToPresentation(document) {
+    static derivedToAnoncredsPresentation(document) {
       const {
         '@context': context,
         type,
         credentialSchema,
+        credentialStatus,
         issuer: _issuer,
         issuanceDate: _issuanceDate,
         proof,
         ...revealedAttributes
       } = document;
 
+      // ID wasnt revealed but placeholder was used to conform to W3C spec, trim it
+      if (revealedAttributes.id === DOCK_ANON_CREDENTIAL_ID) {
+        delete revealedAttributes.id;
+      }
+
+      // TODO: This is wrong. This won't work with presentation from 2 or more credentials
+      const c = {
+        sigType: proof.sigType,
+        version: proof.version,
+        bounds: proof.bounds,
+        schema: JSON.stringify(credentialSchema),
+        revealedAttributes: {
+          proof: {
+            type: this.sigName,
+            verificationMethod: proof.verificationMethod,
+          },
+          '@context': JSON.stringify(context),
+          type: JSON.stringify(type),
+          ...revealedAttributes,
+        },
+      };
+      if (credentialStatus !== undefined) {
+        c.status = credentialStatus;
+      }
       return {
         version: proof.version,
         nonce: proof.nonce,
         context: proof.context,
         spec: {
           credentials: [
-            {
-              sigType: proof.sigType,
-              version: proof.version,
-              bounds: proof.bounds,
-              schema: JSON.stringify(credentialSchema),
-              revealedAttributes: {
-                proof: {
-                  type: this.sigName,
-                  verificationMethod: proof.verificationMethod,
-                },
-                '@context': JSON.stringify(context),
-                type: JSON.stringify(type),
-                ...revealedAttributes,
-              },
-            },
+            c,
           ],
           attributeEqualities: proof.attributeEqualities,
           boundedPseudonyms: proof.boundedPseudonyms,

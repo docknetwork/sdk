@@ -34,6 +34,22 @@
       "@type": "@id",
       "@container": "@graph"
     },
+    "DockVBAccumulator2022": {
+      "@id": "https://ld.dock.io/security#DockVBAccumulator2022",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "accumulated": "https://ld.dock.io/security#accumulated",
+        "revocationCheck": "https://ld.dock.io/security#revocationCheck",
+        "revocationId": "https://ld.dock.io/security#revocationId",
+        "extra": {
+          "@id": "https://ld.dock.io/security#extra",
+          "@context": {"@vocab": "https://ld.dock.io/security/extra"}
+        }
+      }
+    },
     "Bls12381PSSignatureProofDock2023": {
       "@id": "https://ld.dock.io/security#Bls12381PSSignatureDock2023",
       "@context": {
@@ -57,6 +73,7 @@
         "unboundedPseudonyms": "https://ld.dock.io/security#unboundedPseudonyms",
         "attributeCiphertexts": "https://ld.dock.io/security#attributeCiphertexts",
         "attributeEqualities": "https://ld.dock.io/security#attributeEqualities",
+        "accumulated": "https://ld.dock.io/security#accumulated",
         "proofValue": "https://ld.dock.io/security#proofValue",
         "nonce": "https://ld.dock.io/security#nonce",
         "proofPurpose": {

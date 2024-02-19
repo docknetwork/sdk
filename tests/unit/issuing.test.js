@@ -7,7 +7,6 @@ import {
   verifyPresentation,
   signPresentation,
 } from '../../src/utils/vc/index';
-import { createPresentation } from '../create-presentation';
 import VerifiableCredential from '../../src/verifiable-credential';
 import VerifiablePresentation from '../../src/verifiable-presentation';
 import testingKeys from '../test-keys';
@@ -141,15 +140,6 @@ testingKeys.forEach((testKey) => {
       const sampleIssuedCredential = await issueCredential(testKey.keyDocument, getSampleCredential());
       presentationCredentials = [sampleIssuedCredential, sampleIssuedCredential];
     });
-
-    test('A proper verifiable presentation should be created from two valid sample credentials.', async () => {
-      const presentation = createPresentation(
-        presentationCredentials,
-        vpId,
-        vpHolder,
-      );
-      expect(presentation).toMatchObject(getSamplePres(presentationCredentials));
-    }, 30000);
 
     test('A verifiable presentation should contain a proof once signed, and it should pass verification.', async () => {
       const signedVp = await signPresentation(

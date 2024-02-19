@@ -1,27 +1,27 @@
-import { randomAsHex } from '@polkadot/util-crypto';
-import { BTreeSet, BTreeMap } from '@polkadot/types';
-import { u8aToHex, stringToU8a } from '@polkadot/util';
+import { randomAsHex } from "@polkadot/util-crypto";
+import { BTreeSet, BTreeMap } from "@polkadot/types";
+import { u8aToHex, stringToU8a } from "@polkadot/util";
 
-import { DockAPI } from '../../src/index';
+import { DockAPI } from "../../src/index";
 
 import {
   FullNodeEndpoint,
   TestKeyringOpts,
   TestAccountURI,
   DisableDidKeyAndTrustRegistryTests,
-} from '../test-constants';
+} from "../test-constants";
 
 import {
   createNewDockDID,
   DidKeypair,
   DidMethodKey,
   typedHexDID,
-} from '../../src/utils/did';
-import { registerNewDIDUsingPair } from './helpers';
+} from "../../src/utils/did";
+import { registerNewDIDUsingPair } from "./helpers";
 
 const buildTest = DisableDidKeyAndTrustRegistryTests ? describe.skip : describe;
 
-buildTest('Trust Registry', () => {
+buildTest("Trust Registry", () => {
   const dock = new DockAPI();
 
   // Create a random trust registry id
@@ -59,34 +59,34 @@ buildTest('Trust Registry', () => {
     });
 
     convenerPair = new DidKeypair(
-      dock.keyring.addFromUri(ownerSeed, null, 'ed25519'),
-      1,
+      dock.keyring.addFromUri(ownerSeed, null, "ed25519"),
+      1
     );
 
     issuerPair = new DidKeypair(
-      dock.keyring.addFromUri(issuerSeed, null, 'ed25519'),
-      1,
+      dock.keyring.addFromUri(issuerSeed, null, "ed25519"),
+      1
     );
 
     issuerPair2 = new DidKeypair(
-      dock.keyring.addFromUri(issuerSeed2, null, 'ed25519'),
-      1,
+      dock.keyring.addFromUri(issuerSeed2, null, "ed25519"),
+      1
     );
 
     verifierPair = new DidKeypair(
-      dock.keyring.addFromUri(verifierSeed, null, 'ed25519'),
-      1,
+      dock.keyring.addFromUri(verifierSeed, null, "ed25519"),
+      1
     );
 
     verifierPair2 = new DidKeypair(
-      dock.keyring.addFromUri(verifierSeed2, null, 'ed25519'),
-      1,
+      dock.keyring.addFromUri(verifierSeed2, null, "ed25519"),
+      1
     );
 
     verifierDIDMethodKeyPair = DidKeypair.fromApi(dock, {
       seed: verifierDIDMethodKeySeed,
       meta: null,
-      keypairType: 'ed25519',
+      keypairType: "ed25519",
     });
     verifierDIDMethodKey = DidMethodKey.fromKeypair(verifierDIDMethodKeyPair);
 
@@ -850,6 +850,113 @@ buildTest('Trust Registry', () => {
       ).toJSON(),
     ).toEqual(null);
   });
+
+  it("Fetches information about all trust registry where given issuer/verifier exists", async () => {
+    // Create a random trust registry id
+    const schemaId = randomAsHex(32);
+    const trustRegistryId2 = randomAsHex(32);
+
+    await dock.trustRegistry.initOrUpdate(
+      convenerDID,
+      trustRegistryId,
+      "Test Registry",
+      "Gov framework",
+      convenerPair,
+      dock
+    );
+
+    await dock.trustRegistry.initOrUpdate(
+      convenerDID,
+      trustRegistryId2,
+      "Test Registry 2",
+      "Gov framework",
+      convenerPair,
+      dock
+    );
+
+    const verifiers = new BTreeSet();
+    verifiers.add(typedHexDID(dock.api, verifierDID));
+    verifiers.add(typedHexDID(dock.api, verifierDID2));
+
+    const issuers = new BTreeMap();
+    const issuerPrices = new BTreeMap();
+    issuerPrices.set("A", 20);
+    const issuer2Prices = new BTreeMap();
+    issuer2Prices.set("A", 20);
+
+    issuers.set(typedHexDID(dock.api, issuerDID), issuerPrices);
+    issuers.set(typedHexDID(dock.api, issuerDID2), issuer2Prices);
+
+    const schemas = new BTreeMap();
+    schemas.set(schemaId, {
+      issuers,
+      verifiers,
+    });
+
+    await dock.trustRegistry.setSchemasMetadata(
+      convenerDID,
+      trustRegistryId,
+      { Set: schemas },
+      convenerPair,
+      dock
+    );
+
+    expect(
+      (await dock.api.query.trustRegistry.verifiersTrustRegistries(
+        verifierDIDMethodKey
+      )).toJSON()
+    ).toEqual([]);
+    expect(
+      (await dock.api.query.trustRegistry.issuersTrustRegistries(
+        typedHexDID(dock.api, issuerDID)
+      )).toJSON()
+    ).toEqual([trustRegistryId]);
+    expect(
+      (await dock.api.query.trustRegistry.verifiersTrustRegistries(
+        typedHexDID(dock.api, verifierDID2)
+      )).toJSON()
+    ).toEqual([trustRegistryId]);
+
+    await dock.trustRegistry.setSchemasMetadata(
+      convenerDID,
+      trustRegistryId2,
+      { Set: schemas },
+      convenerPair,
+      dock
+    );
+
+    expect(
+      (await dock.api.query.trustRegistry.verifiersTrustRegistries(
+        verifierDIDMethodKey
+      )).toJSON()
+    ).toEqual([]);
+    expect(
+      (await dock.api.query.trustRegistry.issuersTrustRegistries(
+        typedHexDID(dock.api, issuerDID)
+      )).toJSON()
+    ).toEqual([trustRegistryId, trustRegistryId2]);
+    expect(
+      (await dock.api.query.trustRegistry.verifiersTrustRegistries(
+        typedHexDID(dock.api, verifierDID2)
+      )).toJSON()
+    ).toEqual([trustRegistryId, trustRegistryId2]);
+
+    verifiers.add(verifierDIDMethodKey);
+
+    await dock.trustRegistry.setSchemasMetadata(
+      convenerDID,
+      trustRegistryId2,
+      { Set: schemas },
+      convenerPair,
+      dock
+    );
+
+    expect(
+      (await dock.api.query.trustRegistry.verifiersTrustRegistries(
+        verifierDIDMethodKey
+      )).toJSON()
+    ).toEqual([trustRegistryId2]);
+  });
 });
 
 function expectedFormattedIssuers(issuers) {
@@ -858,17 +965,19 @@ function expectedFormattedIssuers(issuers) {
       JSON.stringify(
         issuer.isDid
           ? { did: issuer.asDid }
-          : { didMethodKey: issuer.asDidMethodKey },
+          : { didMethodKey: issuer.asDidMethodKey }
       ),
       Object.fromEntries([...prices.entries()]),
-    ]),
+    ])
   );
 }
 
 function expectedFormattedVerifiers(verifiers) {
   return [...verifiers.values()]
-    .map((verifier) => (verifier.isDid
-      ? { did: verifier.asDid }
-      : { didMethodKey: verifier.asDidMethodKey }))
+    .map((verifier) =>
+      verifier.isDid
+        ? { did: verifier.asDid }
+        : { didMethodKey: verifier.asDidMethodKey }
+    )
     .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
 }

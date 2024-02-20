@@ -9,6 +9,11 @@
       "@type": "@id",
       "@container": "@graph"
     },
+    "cryptoVersion": {
+      "@id": "dockBBS:cryptoVersion",
+      "@type": "@id",
+      "@container": "@graph"
+    },
     "defaultDecimalPlaces": {
       "@id": "dockBBS:defaultDecimalPlaces",
       "@type": "@id",

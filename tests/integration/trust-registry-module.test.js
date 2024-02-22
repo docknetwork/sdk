@@ -1028,22 +1028,22 @@ buildTest('Trust Registry', () => {
     ).toEqual(BothRegsInfo);
     expect(
       await dock.trustRegistry.registriesInfo({
-        VerifierAndSchemaId: [typedHexDID(dock.api, verifierDID), schemaId],
+        SchemaIdWithVerifier: [schemaId, typedHexDID(dock.api, verifierDID)],
       }),
     ).toEqual(BothRegsInfo);
     expect(
       await dock.trustRegistry.registriesInfo({
-        IssuerAndVerifierAndSchemaId: [
-          typedHexDID(dock.api, verifierDID),
+        SchemaIdWithIssuerAndVerifier: [
           schemaId,
+          typedHexDID(dock.api, verifierDID),
         ],
       }),
     ).toEqual({});
     expect(
       await dock.trustRegistry.registriesInfo({
-        IssuerOrVerifierAndSchemaId: [
-          typedHexDID(dock.api, verifierDID),
+        SchemaIdWithIssuerOrVerifier: [
           schemaId,
+          typedHexDID(dock.api, verifierDID),
         ],
       }),
     ).toEqual(BothRegsInfo);

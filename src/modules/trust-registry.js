@@ -523,17 +523,17 @@ TrustRegistryModule.TrustRegistriesInfoByPattern = {
     SchemaId: Hex32Pattern,
     IssuerOrVerifier: DockDidOrDidMethodKeyPattern,
     IssuerAndVerifier: DockDidOrDidMethodKeyPattern,
-    IssuerAndSchemaId: {
-      $matchIterable: [DockDidOrDidMethodKeyPattern, Hex32Pattern],
+    SchemaIdWithIssuer: {
+      $matchIterable: [Hex32Pattern, DockDidOrDidMethodKeyPattern],
     },
-    VerifierAndSchemaId: {
-      $matchIterable: [DockDidOrDidMethodKeyPattern, Hex32Pattern],
+    SchemaIdWithVerifier: {
+      $matchIterable: [Hex32Pattern, DockDidOrDidMethodKeyPattern],
     },
-    IssuerOrVerifierAndSchemaId: {
-      $matchIterable: [DockDidOrDidMethodKeyPattern, Hex32Pattern],
+    SchemaIdWithIssuerOrVerifier: {
+      $matchIterable: [Hex32Pattern, DockDidOrDidMethodKeyPattern],
     },
-    IssuerAndVerifierAndSchemaId: {
-      $matchIterable: [DockDidOrDidMethodKeyPattern, Hex32Pattern],
+    SchemaIdWithIssuerAndVerifier: {
+      $matchIterable: [Hex32Pattern, DockDidOrDidMethodKeyPattern],
     },
   },
 };

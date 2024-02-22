@@ -241,7 +241,7 @@ export default {
       params: [
         {
           name: 'by',
-          type: 'TrustRegistriesInfoBy',
+          type: 'QueryTrustRegistriesBy',
         },
       ],
       type: 'BTreeMap<TrustRegistryId, TrustRegistryInfo>',

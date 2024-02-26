@@ -25,7 +25,7 @@ buildTest('Trust Registry', () => {
   const dock = new DockAPI();
 
   // Create a random trust registry id
-  const trustRegistryId = randomAsHex(32);
+  let trustRegistryId = randomAsHex(32);
 
   // Create a new convener DID, the DID will be registered on the network and own the trust registry
   const convenerDID = createNewDockDID();
@@ -96,7 +96,7 @@ buildTest('Trust Registry', () => {
 
     // Register convener
     await registerNewDIDUsingPair(dock, convenerDID, convenerPair);
-    // Register issuer DID
+    // Register issuer DIDs
     await registerNewDIDUsingPair(dock, issuerDID, issuerPair);
     await registerNewDIDUsingPair(dock, issuerDID2, issuerPair2);
     await registerNewDIDUsingPair(dock, verifierDID, verifierPair);
@@ -134,7 +134,6 @@ buildTest('Trust Registry', () => {
   });
 
   it('Adds schemas metadata to the existing Trust Registry', async () => {
-    // Create a random trust registry id
     const schemaId = randomAsHex(32);
     const otherSchemaId = randomAsHex(32);
 
@@ -207,7 +206,6 @@ buildTest('Trust Registry', () => {
   });
 
   it('Removes schemas metadata from the Trust Registry', async () => {
-    // Create a random trust registry id
     const schemaId = randomAsHex(32);
     const otherSchemaId = randomAsHex(32);
 
@@ -309,7 +307,6 @@ buildTest('Trust Registry', () => {
   });
 
   it('Suspends issuers in the existing Trust Registry', async () => {
-    // Create a random trust registry id
     const schemaId = randomAsHex(32);
 
     await dock.trustRegistry.initOrUpdate(
@@ -411,7 +408,6 @@ buildTest('Trust Registry', () => {
   });
 
   it('Updates delegated issuers in the existing Trust Registry', async () => {
-    // Create a random trust registry id
     await dock.trustRegistry.initOrUpdate(
       convenerDID,
       trustRegistryId,
@@ -458,7 +454,6 @@ buildTest('Trust Registry', () => {
   });
 
   it('Updates schemas metadata in the existing Trust Registry', async () => {
-    // Create a random trust registry id
     const schemaId = randomAsHex(32);
 
     await dock.trustRegistry.initOrUpdate(
@@ -645,7 +640,6 @@ buildTest('Trust Registry', () => {
   });
 
   it('Overrides Trust Registry', async () => {
-    // Create a random trust registry id
     const schemaId = randomAsHex(32);
     const secondSchemaId = randomAsHex(32);
     const thirdSchemaId = randomAsHex(32);
@@ -864,8 +858,8 @@ buildTest('Trust Registry', () => {
   });
 
   it('Fetches information about all trust registry where given issuer/verifier exists', async () => {
-    // Create a random trust registry id
     const schemaId = randomAsHex(32);
+    trustRegistryId = randomAsHex(32);
     const trustRegistryId2 = randomAsHex(32);
 
     await dock.trustRegistry.initOrUpdate(

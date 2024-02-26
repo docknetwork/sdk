@@ -2,7 +2,7 @@ import { getHexIdentifier, isHexWithGivenByteSize } from '../../codec';
 
 import DockDidOrDidMethodKey from './dock-did-or-did-method-key';
 import DockDid from './dock-did';
-import DidMethodKey from "./did-method-key"; // eslint-disable-line
+import DidMethodKey from './did-method-key'; // eslint-disable-line
 
 import { DockDIDQualifier, DockDIDByteSize } from '../constants';
 

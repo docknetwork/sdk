@@ -505,14 +505,10 @@ export default class TrustRegistryModule {
    * @returns {{ issuers: object, verifiers: Array }}
    */
   parseSchemaMetadata({ issuers, verifiers }) {
-    try {
-      return {
-        issuers: this.parseSchemaIssuers(issuers),
-        verifiers: this.parseSchemaVerifiers(verifiers),
-      };
-    } catch (err) {
-      throw new Error(JSON.stringify({ issuers, verifiers }));
-    }
+    return {
+      issuers: this.parseSchemaIssuers(issuers),
+      verifiers: this.parseSchemaVerifiers(verifiers),
+    };
   }
 
   /**

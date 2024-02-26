@@ -1,13 +1,15 @@
 import { encodeAddress, randomAsHex } from '@polkadot/util-crypto';
 import {
   u8aToHex,
-  u8aToString, stringToHex, bufferToU8a,
+  u8aToString,
+  stringToHex,
+  bufferToU8a,
 } from '@polkadot/util';
 
 import { getDidNonce, getStateChange } from '../utils/misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from '../utils/codec';
 import NoBlobError from '../utils/errors/no-blob-error';
-import { typedHexDIDFromSubstrate, createDidSig, typedHexDID } from '../utils/did';
+import { typedHexDID, createDidSig } from '../utils/did';
 
 export const DockBlobQualifier = 'blob:dock:';
 export const DockBlobIdByteSize = 32;
@@ -83,9 +85,19 @@ class BlobModule {
    * using this
    * @returns {Promise<*>}
    */
-  async createNewTx(blob, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+  async createNewTx(
+    blob,
+    signerDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
     const signerHexDid = typedHexDID(this.api, signerDid);
-    const [addBlob, didSig] = await this.createSignedAddBlob(blob, signerHexDid, signingKeyRef, { nonce, didModule });
+    const [addBlob, didSig] = await this.createSignedAddBlob(
+      blob,
+      signerHexDid,
+      signingKeyRef,
+      { nonce, didModule },
+    );
     return this.module.new(addBlob, didSig);
   }
 
@@ -101,9 +113,21 @@ class BlobModule {
    * @param params
    * @returns {Promise<*>}
    */
-  async new(blob, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
+  async new(
+    blob,
+    signerDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+    waitForFinalization = true,
+    params = {},
+  ) {
     return this.signAndSend(
-      (await this.createNewTx(blob, signerDid, signingKeyRef, { nonce, didModule })), waitForFinalization, params,
+      await this.createNewTx(blob, signerDid, signingKeyRef, {
+        nonce,
+        didModule,
+      }),
+      waitForFinalization,
+      params,
     );
   }
 
@@ -133,7 +157,7 @@ class BlobModule {
         // no-op, just use default Uint8 array value
       }
 
-      return [typedHexDIDFromSubstrate(this.api, respTuple[0]), value];
+      return [typedHexDID(this.api, respTuple[0]), value];
     }
     throw new Error(`Needed 2 items in response but got${respTuple.length}`);
   }
@@ -148,7 +172,12 @@ class BlobModule {
    * using this
    * @returns {Promise}
    */
-  async createSignedAddBlob(blob, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+  async createSignedAddBlob(
+    blob,
+    signerDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
     if (!blob.blob) {
       throw new Error('Blob must have a value!');
     }
@@ -174,7 +203,10 @@ class BlobModule {
       return u8aToHex(blobValue);
     } else if (typeof blobValue === 'object') {
       return stringToHex(JSON.stringify(blobValue));
-    } else if (typeof blobValue === 'string' && !isHexWithGivenByteSize(blobValue)) {
+    } else if (
+      typeof blobValue === 'string'
+      && !isHexWithGivenByteSize(blobValue)
+    ) {
       return stringToHex(blobValue);
     }
     // Assuming `blobValue` is in hex

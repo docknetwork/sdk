@@ -4,7 +4,7 @@ import { isHex, u8aToHex } from '@polkadot/util';
 import { getDidNonce, getStateChange } from '../utils/misc';
 import WithParamsAndPublicKeys from './WithParamsAndPublicKeys';
 import { getAllExtrinsicsFromBlock } from '../utils/chain-ops';
-import { createDidSig, typedHexDID, typedHexDIDFromSubstrate } from '../utils/did';
+import { createDidSig, typedHexDID } from '../utils/did';
 
 /** Class to manage accumulators on chain */
 export default class AccumulatorModule extends WithParamsAndPublicKeys {
@@ -29,7 +29,13 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     };
   }
 
-  static prepareAddUniversalAccumulator(api, id, accumulated, publicKeyRef, maxSize) {
+  static prepareAddUniversalAccumulator(
+    api,
+    id,
+    accumulated,
+    publicKeyRef,
+    maxSize,
+  ) {
     const keyRef = AccumulatorModule.parseRef(api, publicKeyRef);
     return {
       id,
@@ -83,9 +89,19 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * using this
    * @returns {Promise<*>}
    */
-  async createAddPublicKeyTx(publicKey, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+  async createAddPublicKeyTx(
+    publicKey,
+    signerDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
     const signerHexDid = typedHexDID(this.api, signerDid);
-    const [addPk, signature] = await this.createSignedAddPublicKey(publicKey, signerHexDid, signingKeyRef, { nonce, didModule });
+    const [addPk, signature] = await this.createSignedAddPublicKey(
+      publicKey,
+      signerHexDid,
+      signingKeyRef,
+      { nonce, didModule },
+    );
     return this.module.addPublicKey(addPk, signature);
   }
 
@@ -99,9 +115,19 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * using this
    * @returns {Promise<*>}
    */
-  async createRemovePublicKeyTx(removeKeyId, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+  async createRemovePublicKeyTx(
+    removeKeyId,
+    signerDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
     const signerHexDid = typedHexDID(this.api, signerDid);
-    const [remPk, signature] = await this.createSignedRemovePublicKey(removeKeyId, signerHexDid, signingKeyRef, { nonce, didModule });
+    const [remPk, signature] = await this.createSignedRemovePublicKey(
+      removeKeyId,
+      signerHexDid,
+      signingKeyRef,
+      { nonce, didModule },
+    );
     return this.module.removePublicKey(remPk, signature);
   }
 
@@ -117,9 +143,23 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * using this
    * @returns {Promise<*>}
    */
-  async createAddPositiveAccumulatorTx(id, accumulated, publicKeyRef, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+  async createAddPositiveAccumulatorTx(
+    id,
+    accumulated,
+    publicKeyRef,
+    signerDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
     const signerHexDid = typedHexDID(this.api, signerDid);
-    const [addAccumulator, signature] = await this.createSignedAddPositiveAccumulator(id, accumulated, publicKeyRef, signerHexDid, signingKeyRef, { nonce, didModule });
+    const [addAccumulator, signature] = await this.createSignedAddPositiveAccumulator(
+      id,
+      accumulated,
+      publicKeyRef,
+      signerHexDid,
+      signingKeyRef,
+      { nonce, didModule },
+    );
     return this.module.addAccumulator(addAccumulator, signature);
   }
 
@@ -136,9 +176,25 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * using this
    * @returns {Promise<*>}
    */
-  async createAddUniversalAccumulatorTx(id, accumulated, publicKeyRef, maxSize, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+  async createAddUniversalAccumulatorTx(
+    id,
+    accumulated,
+    publicKeyRef,
+    maxSize,
+    signerDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
     const signerHexDid = typedHexDID(this.api, signerDid);
-    const [addAccumulator, signature] = await this.createSignedAddUniversalAccumulator(id, accumulated, publicKeyRef, maxSize, signerHexDid, signingKeyRef, { nonce, didModule });
+    const [addAccumulator, signature] = await this.createSignedAddUniversalAccumulator(
+      id,
+      accumulated,
+      publicKeyRef,
+      maxSize,
+      signerHexDid,
+      signingKeyRef,
+      { nonce, didModule },
+    );
     return this.module.addAccumulator(addAccumulator, signature);
   }
 
@@ -157,12 +213,26 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise<object>}
    */
   async updateAccumulatorTx(
-    id, newAccumulated,
-    { additions = undefined, removals = undefined, witnessUpdateInfo = undefined }, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined },
+    id,
+    newAccumulated,
+    {
+      additions = undefined,
+      removals = undefined,
+      witnessUpdateInfo = undefined,
+    },
+    signerDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
   ) {
     const signerHexDid = typedHexDID(this.api, signerDid);
-    const [update, signature] = await this.createSignedUpdateAccumulator(id, newAccumulated,
-      { additions, removals, witnessUpdateInfo }, signerHexDid, signingKeyRef, { nonce, didModule });
+    const [update, signature] = await this.createSignedUpdateAccumulator(
+      id,
+      newAccumulated,
+      { additions, removals, witnessUpdateInfo },
+      signerHexDid,
+      signingKeyRef,
+      { nonce, didModule },
+    );
     return this.module.updateAccumulator(update, signature);
   }
 
@@ -176,9 +246,19 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * using this
    * @returns {Promise<object>}
    */
-  async removeAccumulatorTx(id, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+  async removeAccumulatorTx(
+    id,
+    signerDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
     const signerHexDid = typedHexDID(this.api, signerDid);
-    const [removal, signature] = await this.createSignedRemoveAccumulator(id, signerHexDid, signingKeyRef, { nonce, didModule });
+    const [removal, signature] = await this.createSignedRemoveAccumulator(
+      id,
+      signerHexDid,
+      signingKeyRef,
+      { nonce, didModule },
+    );
     return this.module.removeAccumulator(removal, signature);
   }
 
@@ -194,8 +274,20 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @param params
    * @returns {Promise<*>}
    */
-  async addPublicKey(publicKey, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const tx = await this.createAddPublicKeyTx(publicKey, signerDid, signingKeyRef, { nonce, didModule });
+  async addPublicKey(
+    publicKey,
+    signerDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const tx = await this.createAddPublicKeyTx(
+      publicKey,
+      signerDid,
+      signingKeyRef,
+      { nonce, didModule },
+    );
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
@@ -211,8 +303,20 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @param params
    * @returns {Promise<*>}
    */
-  async removePublicKey(removeKeyId, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const tx = await this.createRemovePublicKeyTx(removeKeyId, signerDid, signingKeyRef, { nonce, didModule });
+  async removePublicKey(
+    removeKeyId,
+    signerDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const tx = await this.createRemovePublicKeyTx(
+      removeKeyId,
+      signerDid,
+      signingKeyRef,
+      { nonce, didModule },
+    );
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
@@ -230,8 +334,24 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @param params
    * @returns {Promise<*>}
    */
-  async addPositiveAccumulator(id, accumulated, publicKeyRef, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const tx = await this.createAddPositiveAccumulatorTx(id, accumulated, publicKeyRef, signerDid, signingKeyRef, { nonce, didModule });
+  async addPositiveAccumulator(
+    id,
+    accumulated,
+    publicKeyRef,
+    signerDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const tx = await this.createAddPositiveAccumulatorTx(
+      id,
+      accumulated,
+      publicKeyRef,
+      signerDid,
+      signingKeyRef,
+      { nonce, didModule },
+    );
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
@@ -250,8 +370,26 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @param params
    * @returns {Promise<*>}
    */
-  async addUniversalAccumulator(id, accumulated, publicKeyRef, maxSize, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const tx = await this.createAddUniversalAccumulatorTx(id, accumulated, publicKeyRef, maxSize, signerDid, signingKeyRef, { nonce, didModule });
+  async addUniversalAccumulator(
+    id,
+    accumulated,
+    publicKeyRef,
+    maxSize,
+    signerDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const tx = await this.createAddUniversalAccumulatorTx(
+      id,
+      accumulated,
+      publicKeyRef,
+      maxSize,
+      signerDid,
+      signingKeyRef,
+      { nonce, didModule },
+    );
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
@@ -271,10 +409,28 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @param params
    * @returns {Promise< object>}
    */
-  async updateAccumulator(id, newAccumulated,
-    { additions = undefined, removals = undefined, witnessUpdateInfo = undefined }, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const tx = await this.updateAccumulatorTx(id, newAccumulated,
-      { additions, removals, witnessUpdateInfo }, signerDid, signingKeyRef, { nonce, didModule });
+  async updateAccumulator(
+    id,
+    newAccumulated,
+    {
+      additions = undefined,
+      removals = undefined,
+      witnessUpdateInfo = undefined,
+    },
+    signerDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const tx = await this.updateAccumulatorTx(
+      id,
+      newAccumulated,
+      { additions, removals, witnessUpdateInfo },
+      signerDid,
+      signingKeyRef,
+      { nonce, didModule },
+    );
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
@@ -290,12 +446,27 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @param params
    * @returns {Promise<*>}
    */
-  async removeAccumulator(id, signerDid, signingKeyRef, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const tx = await this.removeAccumulatorTx(id, signerDid, signingKeyRef, { nonce, didModule });
+  async removeAccumulator(
+    id,
+    signerDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const tx = await this.removeAccumulatorTx(id, signerDid, signingKeyRef, {
+      nonce,
+      didModule,
+    });
     return this.signAndSend(tx, waitForFinalization, params);
   }
 
-  async createSignedAddPublicKey(publicKey, signerHexDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+  async createSignedAddPublicKey(
+    publicKey,
+    signerHexDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getDidNonce(signerHexDid, nonce, didModule);
     const addPk = { publicKey, nonce };
@@ -304,7 +475,12 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     return [addPk, didSig];
   }
 
-  async createSignedRemovePublicKey(removeKeyId, signerHexDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+  async createSignedRemovePublicKey(
+    removeKeyId,
+    signerHexDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getDidNonce(signerHexDid, nonce, didModule);
     const removeKey = { keyRef: [signerHexDid, removeKeyId], nonce };
@@ -313,28 +489,64 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     return [removeKey, didSig];
   }
 
-  async createSignedAddPositiveAccumulator(id, accumulated, publicKeyRef, signerHexDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+  async createSignedAddPositiveAccumulator(
+    id,
+    accumulated,
+    publicKeyRef,
+    signerHexDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getDidNonce(signerHexDid, nonce, didModule);
-    const accum = AccumulatorModule.prepareAddPositiveAccumulator(this.api, id, accumulated, publicKeyRef);
+    const accum = AccumulatorModule.prepareAddPositiveAccumulator(
+      this.api,
+      id,
+      accumulated,
+      publicKeyRef,
+    );
     const addAccum = { ...accum, nonce };
     const signature = this.signAddAccumulator(signingKeyRef, addAccum);
     const didSig = createDidSig(signerHexDid, signingKeyRef, signature);
     return [addAccum, didSig];
   }
 
-  async createSignedAddUniversalAccumulator(id, accumulated, publicKeyRef, maxSize, signerHexDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+  async createSignedAddUniversalAccumulator(
+    id,
+    accumulated,
+    publicKeyRef,
+    maxSize,
+    signerHexDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getDidNonce(signerHexDid, nonce, didModule);
-    const accum = AccumulatorModule.prepareAddUniversalAccumulator(this.api, id, accumulated, publicKeyRef, maxSize);
+    const accum = AccumulatorModule.prepareAddUniversalAccumulator(
+      this.api,
+      id,
+      accumulated,
+      publicKeyRef,
+      maxSize,
+    );
     const addAccum = { ...accum, nonce };
     const signature = this.signAddAccumulator(signingKeyRef, addAccum);
     const didSig = createDidSig(signerHexDid, signingKeyRef, signature);
     return [addAccum, didSig];
   }
 
-  async createSignedUpdateAccumulator(id, newAccumulated,
-    { additions = undefined, removals = undefined, witnessUpdateInfo = undefined }, signerHexDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+  async createSignedUpdateAccumulator(
+    id,
+    newAccumulated,
+    {
+      additions = undefined,
+      removals = undefined,
+      witnessUpdateInfo = undefined,
+    },
+    signerHexDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getDidNonce(signerHexDid, nonce, didModule);
     if (additions !== undefined) {
@@ -359,7 +571,12 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     return [updateAccum, didSig];
   }
 
-  async createSignedRemoveAccumulator(id, signerHexDid, signingKeyRef, { nonce = undefined, didModule = undefined }) {
+  async createSignedRemoveAccumulator(
+    id,
+    signerHexDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
     // eslint-disable-next-line no-param-reassign
     nonce = await getDidNonce(signerHexDid, nonce, didModule);
     const remAccum = { id, nonce };
@@ -379,13 +596,12 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise<{created: *, lastModified: *}|null>}
    */
   async getAccumulator(id, withKeyAndParams = false, withKeyOnly = false) {
-    const resp = await this.api.query[this.moduleName].accumulators(
-      id,
-    );
+    const resp = await this.api.query[this.moduleName].accumulators(id);
     if (resp.isSome) {
       const accumInfo = resp.unwrap();
       const accumulatorObj = {
-        created: accumInfo.createdAt.toNumber(), lastModified: accumInfo.lastUpdatedAt.toNumber(),
+        created: accumInfo.createdAt.toNumber(),
+        lastModified: accumInfo.lastUpdatedAt.toNumber(),
       };
       let common;
       if (accumInfo.accumulator.isPositive) {
@@ -399,10 +615,14 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
       accumulatorObj.accumulated = u8aToHex(common.accumulated);
       const owner = common.keyRef[0];
       const keyId = common.keyRef[1].toNumber();
-      accumulatorObj.keyRef = [typedHexDIDFromSubstrate(this.api, owner), keyId];
+      accumulatorObj.keyRef = [typedHexDID(this.api, owner), keyId];
 
       if (withKeyAndParams || withKeyOnly) {
-        const pk = await this.getPublicKeyByHexDid(owner, keyId, withKeyAndParams);
+        const pk = await this.getPublicKeyByHexDid(
+          owner,
+          keyId,
+          withKeyAndParams,
+        );
         if (pk !== null) {
           accumulatorObj.publicKey = pk;
         }
@@ -428,8 +648,15 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     );
     const updates = [];
     extrinsics.forEach((ext) => {
-      if (ext.method && (ext.method.section === 'accumulator') && (ext.method.method === 'updateAccumulator')) {
-        const update = this.api.createType('UpdateAccumulator', ext.method.args[0]);
+      if (
+        ext.method
+        && ext.method.section === 'accumulator'
+        && ext.method.method === 'updateAccumulator'
+      ) {
+        const update = this.api.createType(
+          'UpdateAccumulator',
+          ext.method.args[0],
+        );
         if (u8aToHex(update.id) === accumulatorId) {
           // The following commented line produces truncated hex strings. Don't know why
           // const additions = update.additions.isSome ? update.additions.unwrap().map(u8aToHex) : null;

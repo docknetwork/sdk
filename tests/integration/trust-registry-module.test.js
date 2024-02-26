@@ -1047,6 +1047,151 @@ buildTest('Trust Registry', () => {
         ],
       }),
     ).toEqual(BothRegsInfo);
+
+    const schema1MetadataInTrustRegistry1 = dock.trustRegistry.parseSchemaMetadata({
+      issuers: [
+        [
+          issuerDID,
+          {
+            delegated: [],
+            suspended: false,
+            verificationPrices: {
+              A: 20,
+            },
+          },
+        ],
+        [
+          issuerDID2,
+          {
+            delegated: [],
+            suspended: false,
+            verificationPrices: {
+              A: 20,
+            },
+          },
+        ],
+      ],
+      verifiers: [verifierDID, verifierDID2],
+    });
+
+    expect(
+      await dock.trustRegistry.schemaMetadata(schemaId, trustRegistryId),
+    ).toEqual(schema1MetadataInTrustRegistry1);
+    expect(
+      await dock.trustRegistry.schemaIssuers(schemaId, trustRegistryId),
+    ).toEqual(schema1MetadataInTrustRegistry1.issuers);
+    expect(
+      await dock.trustRegistry.schemaVerifiers(schemaId, trustRegistryId),
+    ).toEqual(schema1MetadataInTrustRegistry1.verifiers);
+
+    expect(
+      await dock.trustRegistry.schemaMetadataInAllRegistries(schemaId),
+    ).toEqual(
+      dock.trustRegistry.parseMapEntries(
+        dock.trustRegistry.parseSchemaMetadata,
+        new Map([
+          [trustRegistryId, schema1MetadataInTrustRegistry1],
+          [
+            trustRegistryId2,
+            {
+              issuers: [
+                [
+                  issuerDID,
+                  {
+                    delegated: [],
+                    suspended: false,
+                    verificationPrices: {
+                      A: 20,
+                    },
+                  },
+                ],
+                [
+                  issuerDID2,
+                  {
+                    delegated: [],
+                    suspended: false,
+                    verificationPrices: {
+                      A: 20,
+                    },
+                  },
+                ],
+              ],
+              verifiers: [verifierDID, verifierDID2, verifierDIDMethodKey],
+            },
+          ],
+        ]),
+      ),
+    );
+    expect(
+      await dock.trustRegistry.schemaVerifiersInAllRegistries(schemaId),
+    ).toEqual(
+      dock.trustRegistry.parseMapEntries(
+        dock.trustRegistry.parseSchemaVerifiers,
+        new Map([
+          [trustRegistryId, [verifierDID, verifierDID2]],
+          [trustRegistryId2, [verifierDID, verifierDID2, verifierDIDMethodKey]],
+        ]),
+      ),
+    );
+    expect(
+      await dock.trustRegistry.schemaIssuersInAllRegistries(schemaId),
+    ).toEqual(
+      dock.trustRegistry.parseMapEntries(
+        dock.trustRegistry.parseSchemaIssuers,
+        new Map([
+          [
+            trustRegistryId,
+            [
+              [
+                issuerDID,
+                {
+                  delegated: [],
+                  suspended: false,
+                  verificationPrices: {
+                    A: 20,
+                  },
+                },
+              ],
+              [
+                issuerDID2,
+                {
+                  delegated: [],
+                  suspended: false,
+                  verificationPrices: {
+                    A: 20,
+                  },
+                },
+              ],
+            ],
+          ],
+          [
+            trustRegistryId2,
+            [
+              [
+                issuerDID,
+                {
+                  delegated: [],
+                  suspended: false,
+                  verificationPrices: {
+                    A: 20,
+                  },
+                },
+              ],
+              [
+                issuerDID2,
+                {
+                  delegated: [],
+                  suspended: false,
+                  verificationPrices: {
+                    A: 20,
+                  },
+                },
+              ],
+            ],
+          ],
+        ]),
+      ),
+    );
   });
 });
 

@@ -1,13 +1,15 @@
 import { BTreeSet, BTreeMap } from '@polkadot/types';
 import { u8aToHex } from '@polkadot/util';
-import {
-  DidMethodKey,
-  DockDid,
-  typedHexDID,
-  typedHexDIDFromSubstrate,
-} from '../utils/did';
+import { DidMethodKey, DockDid, typedHexDID } from '../utils/did';
 import { isHexWithGivenByteSize } from '../utils/codec';
 import { getDidNonce, ensureMatchesPattern } from '../utils/misc';
+
+const callValueMethodOrObjectMethod = (method) => (value) => (typeof value[method] === 'function'
+  ? [...value[method]()]
+  : Object[method](value));
+
+const entries = callValueMethodOrObjectMethod('entries');
+const values = callValueMethodOrObjectMethod('values');
 
 /**
  * `Trust Registry` module.
@@ -32,13 +34,96 @@ export default class TrustRegistryModule {
   async registriesInfo(by) {
     ensureMatchesPattern(this.constructor.TrustRegistriesInfoByPattern, by);
 
-    const registriesInfo = await this.api.rpc.trustRegistry.registriesInfoBy(by);
+    return this.parseMapEntries(
+      this.parseRegistryInfo,
+      await this.api.rpc.trustRegistry.registriesInfoBy(by),
+    );
+  }
 
-    return Object.fromEntries(
-      [...registriesInfo.entries()].map(([id, info]) => [
-        id.toString(),
-        this.parseRegistryInfo(info),
-      ]),
+  /**
+   * Retrieves metadata for the supplied `schemaId`/`regId` combination.
+   *
+   * @param {string} schemaId
+   * @param {string} regId
+   * @returns {Promise<object>}
+   */
+  async schemaMetadata(schemaId, regId) {
+    return this.parseSingleEntry(
+      this.parseSchemaMetadata,
+      await this.api.rpc.trustRegistry.schemaMetadataInRegistry(
+        schemaId,
+        regId,
+      ),
+    );
+  }
+
+  /**
+   * Retrieves metadata for the supplied `schemaId` from all registries.
+   *
+   * @param {string} schemaId
+   * @returns {Promise<object>}
+   */
+  async schemaMetadataInAllRegistries(schemaId) {
+    return this.parseMapEntries(
+      this.parseSchemaMetadata,
+      await this.api.rpc.trustRegistry.schemaMetadata(schemaId),
+    );
+  }
+
+  /**
+   * Retrieves issuers for the supplied `schemaId`/`regId` combination.
+   *
+   * @param {string} schemaId
+   * @param {string} regId
+   * @returns {Promise<object>}
+   */
+  async schemaIssuers(schemaId, regId) {
+    return this.parseSingleEntry(
+      this.parseSchemaIssuers,
+      await this.api.rpc.trustRegistry.schemaIssuersInRegistry(schemaId, regId),
+    );
+  }
+
+  /**
+   * Retrieves issuers for the supplied `schemaId` from all registries.
+   *
+   * @param {string} schemaId
+   * @returns {Promise<object>}
+   */
+  async schemaIssuersInAllRegistries(schemaId) {
+    return this.parseMapEntries(
+      this.parseSchemaIssuers,
+      await this.api.rpc.trustRegistry.schemaIssuers(schemaId),
+    );
+  }
+
+  /**
+   * Retrieves verifiers for the supplied `schemaId`/`regId` combination.
+   *
+   * @param {string} schemaId
+   * @param {string} regId
+   * @returns {Promise<object>}
+   */
+  async schemaVerifiers(schemaId, regId) {
+    return this.parseSingleEntry(
+      this.parseSchemaVerifiers,
+      await this.api.rpc.trustRegistry.schemaVerifiersInRegistry(
+        schemaId,
+        regId,
+      ),
+    );
+  }
+
+  /**
+   * Retrieves verifiers for the supplied `schemaId` from all registries.
+   *
+   * @param {string} schemaId
+   * @returns {Promise<object>}
+   */
+  async schemaVerifiersInAllRegistries(schemaId) {
+    return this.parseMapEntries(
+      this.parseSchemaVerifiers,
+      await this.api.rpc.trustRegistry.schemaVerifiers(schemaId),
     );
   }
 
@@ -368,12 +453,96 @@ export default class TrustRegistryModule {
   parseRegistryInfo({ name, convener, govFramework }) {
     return {
       name: name.toString(),
-      convener: typedHexDIDFromSubstrate(
-        this.api,
-        convener,
-      ).toQualifiedEncodedString(),
+      convener: typedHexDID(this.api, convener).toQualifiedEncodedString(),
       govFramework: u8aToHex(govFramework),
     };
+  }
+
+  /**
+   * Parses map entries by converting keys to `string`s and applying supplied parser to the value.
+   * @template {RegId}
+   * @template {Value}
+   * @template {ParsedValue}
+   *
+   * @param {function(Value): ParsedValue} valueParser
+   * @param {Map<RegId, Value>} regs
+   * @returns {Object<string, ParsedValue>}
+   */
+  parseMapEntries(valueParser, regs) {
+    return Object.fromEntries(
+      entries(regs)
+        .map(([key, value]) => [String(key), valueParser.call(this, value)])
+        .sort(([key1], [key2]) => key1.localeCompare(key2)),
+    );
+  }
+
+  /**
+   * Parses a single entry.
+   *
+   * @template {Value}
+   * @template {ParsedValue}
+   * @param {function(Value): ParsedValue}
+   * @returns {ParsedValue}
+   */
+  parseSingleEntry(parser, valueOpt) {
+    let value;
+
+    if (valueOpt.isNone) {
+      return null;
+    } else if (typeof valueOpt.isSome === 'boolean') {
+      value = valueOpt.unwrap();
+    } else {
+      value = valueOpt;
+    }
+
+    return parser.call(this, value);
+  }
+
+  /**
+   * Parses schema metadata.
+   *
+   * @param {{ issuers: Map, verifiers: Set }} metadata
+   * @returns {{ issuers: object, verifiers: Array }}
+   */
+  parseSchemaMetadata({ issuers, verifiers }) {
+    try {
+      return {
+        issuers: this.parseSchemaIssuers(issuers),
+        verifiers: this.parseSchemaVerifiers(verifiers),
+      };
+    } catch (err) {
+      throw new Error(JSON.stringify({ issuers, verifiers }));
+    }
+  }
+
+  /**
+   * Parses schema issuers.
+   *
+   * @param {Map} issuers
+   * @returns {object}
+   */
+  parseSchemaIssuers(issuers) {
+    return Object.fromEntries(
+      (Array.isArray(issuers) ? values(issuers) : entries(issuers))
+        .map((issuerWithInfo) => values(issuerWithInfo))
+        .map(([issuer, info]) => [
+          typedHexDID(this.api, issuer).toQualifiedEncodedString(),
+          typeof info.toJSON === 'function' ? info.toJSON() : info,
+        ])
+        .sort(([iss1], [iss2]) => iss1.localeCompare(iss2)),
+    );
+  }
+
+  /**
+   * Parses schema verifiers.
+   *
+   * @param {Array} verifiers
+   * @returns {object}
+   */
+  parseSchemaVerifiers(verifiers) {
+    return values(verifiers)
+      .map((verifier) => typedHexDID(this.api, verifier).toQualifiedEncodedString())
+      .sort((ver1, ver2) => ver1.localeCompare(ver2));
   }
 }
 

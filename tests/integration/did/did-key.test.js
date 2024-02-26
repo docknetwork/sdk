@@ -1,23 +1,23 @@
-import { randomAsHex } from '@polkadot/util-crypto';
+import { randomAsHex } from "@polkadot/util-crypto";
 
-import { DockAPI } from '../../../src';
+import { DockAPI } from "../../../src";
 import {
   typedHexDID,
-  typedHexDIDFromSubstrate,
+  typedHexDID,
   NoDIDError,
   DidKeypair,
   DidMethodKey,
-} from '../../../src/utils/did';
+} from "../../../src/utils/did";
 import {
   FullNodeEndpoint,
   TestKeyringOpts,
   TestAccountURI,
   DisableDidKeyAndTrustRegistryTests,
-} from '../../test-constants';
+} from "../../test-constants";
 
 const buildTest = DisableDidKeyAndTrustRegistryTests ? describe.skip : describe;
 
-buildTest('Basic DID tests', () => {
+buildTest("Basic DID tests", () => {
   const dock = new DockAPI();
 
   // Generate a random DID
@@ -37,7 +37,7 @@ buildTest('Basic DID tests', () => {
     dock.setAccount(account);
 
     testDidMethodKeyPair1 = new DidKeypair(
-      dock.keyring.addFromUri(testDidMethodKeySeed1, null, 'ed25519'),
+      dock.keyring.addFromUri(testDidMethodKeySeed1, null, "ed25519"),
     );
     testDidMethodKey1 = new DidMethodKey(testDidMethodKeyPair1.publicKey());
 
@@ -51,40 +51,62 @@ buildTest('Basic DID tests', () => {
     await dock.disconnect();
   }, 10000);
 
-  test('Can create a did:key', async () => {
+  test("Can create a did:key", async () => {
     // DID does not exist
-    await expect(dock.did.getDidMethodKeyDetail(testDidMethodKey2.asDidMethodKey)).rejects.toThrow(
-      NoDIDError,
-    );
+    await expect(
+      dock.did.getDidMethodKeyDetail(testDidMethodKey2.asDidMethodKey),
+    ).rejects.toThrow(NoDIDError);
 
     await dock.did.newDidMethodKey(testDidMethodKey2.asDidMethodKey, false);
-    const { nonce } = await dock.did.getDidMethodKeyDetail(testDidMethodKey2.asDidMethodKey);
+    const { nonce } = await dock.did.getDidMethodKeyDetail(
+      testDidMethodKey2.asDidMethodKey,
+    );
     expect(nonce).toBeGreaterThan(1);
-    expect(testDidMethodKey2.toString().startsWith('did:key:z')).toBe(true);
+    expect(testDidMethodKey2.toString().startsWith("did:key:z")).toBe(true);
   }, 30000);
 
-  test('Can attest with a DID', async () => {
+  test("Can attest with a DID", async () => {
     const priority = 1;
-    const iri = 'my iri';
+    const iri = "my iri";
 
-    await dock.did.setClaim(priority, iri, testDidMethodKey1, testDidMethodKeyPair1, undefined, false);
+    await dock.did.setClaim(
+      priority,
+      iri,
+      testDidMethodKey1,
+      testDidMethodKeyPair1,
+      undefined,
+      false,
+    );
 
     const att1 = await dock.did.getAttests(testDidMethodKey1);
     expect(att1).toEqual(iri);
 
-    await dock.did.setClaim(priority, iri, testDidMethodKey2, testDidMethodKeyPair2, undefined, false);
+    await dock.did.setClaim(
+      priority,
+      iri,
+      testDidMethodKey2,
+      testDidMethodKeyPair2,
+      undefined,
+      false,
+    );
 
     const att2 = await dock.did.getAttests(testDidMethodKey2);
     expect(att2).toEqual(iri);
   }, 30000);
 
-  test('Conversion works properly (including SS58 format)', () => {
-    const substrateDid1 = dock.api.createType('DidOrDidMethodKey', testDidMethodKey1);
-    expect(typedHexDIDFromSubstrate(dock.api, substrateDid1)).toEqual(testDidMethodKey1);
+  test("Conversion works properly (including SS58 format)", () => {
+    const substrateDid1 = dock.api.createType(
+      "DidOrDidMethodKey",
+      testDidMethodKey1,
+    );
+    expect(typedHexDID(dock.api, substrateDid1)).toEqual(testDidMethodKey1);
     expect(testDidMethodKey1).toEqual(typedHexDID(dock.api, testDidMethodKey1));
 
-    const substrateDid2 = dock.api.createType('DidOrDidMethodKey', testDidMethodKey2);
-    expect(typedHexDIDFromSubstrate(dock.api, substrateDid2)).toEqual(testDidMethodKey2);
+    const substrateDid2 = dock.api.createType(
+      "DidOrDidMethodKey",
+      testDidMethodKey2,
+    );
+    expect(typedHexDID(dock.api, substrateDid2)).toEqual(testDidMethodKey2);
     expect(testDidMethodKey2).toEqual(typedHexDID(dock.api, testDidMethodKey2));
   });
 });

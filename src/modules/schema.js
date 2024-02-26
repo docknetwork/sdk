@@ -1,12 +1,9 @@
 import { canonicalize } from 'json-canonicalize';
 import { validate } from 'jsonschema';
 
-import { typedHexDIDFromSubstrate } from '../utils/did';
+import { typedHexDID } from '../utils/did';
 
-import {
-  createNewDockBlobId,
-  getHexIdentifierFromBlobID,
-} from './blob';
+import { createNewDockBlobId, getHexIdentifierFromBlobID } from './blob';
 
 // Supported schemas
 import JSONSchema07 from '../utils/vc/schemas/schema-draft-07';
@@ -23,9 +20,7 @@ export default class Schema {
   }
 
   static fromJSON(json) {
-    const {
-      id, schema,
-    } = json;
+    const { id, schema } = json;
 
     const schemaObj = new Schema(id);
 
@@ -64,10 +59,7 @@ export default class Schema {
    * @returns {object}
    */
   toJSON() {
-    const {
-      signature: _signature,
-      ...rest
-    } = this;
+    const { signature: _signature, ...rest } = this;
 
     return {
       ...rest,
@@ -80,7 +72,9 @@ export default class Schema {
    */
   toBlob() {
     if (!this.schema) {
-      throw new Error('Schema requires schema property to be serialized to blob');
+      throw new Error(
+        'Schema requires schema property to be serialized to blob',
+      );
     }
 
     return {
@@ -99,14 +93,28 @@ export default class Schema {
    * @param params
    * @return {Promise<object>} The extrinsic to sign and send.
    */
-  async writeToChain(dock, signerDid, keyPair, nonce = undefined, waitForFinalization, params = {}) {
+  async writeToChain(
+    dock,
+    signerDid,
+    keyPair,
+    nonce = undefined,
+    waitForFinalization,
+    params = {},
+  ) {
     let arg;
     if (nonce === undefined) {
       arg = { didModule: dock.did };
     } else {
       arg = { nonce };
     }
-    return dock.blob.new(this.toBlob(), signerDid, keyPair, arg, waitForFinalization, params);
+    return dock.blob.new(
+      this.toBlob(),
+      signerDid,
+      keyPair,
+      arg,
+      waitForFinalization,
+      params,
+    );
   }
 
   /**
@@ -140,7 +148,7 @@ export default class Schema {
       return {
         ...chainValue,
         id,
-        author: typedHexDIDFromSubstrate(dockApi, chainBlob[0]).toQualifiedEncodedString(),
+        author: typedHexDID(dockApi, chainBlob[0]).toQualifiedEncodedString(),
       };
     }
     throw new Error('Incorrect schema format');
@@ -158,7 +166,10 @@ export default class Schema {
     if (schemaUrl) {
       // The URL might be 'http://json-schema.org/draft-07/schema' or 'http://json-schema.org/draft-07/schema#'
       // In that case, the schema is already stored in the SDK as this is the latest JSON schema spec
-      if (schemaUrl === 'http://json-schema.org/draft-07/schema' || schemaUrl === 'http://json-schema.org/draft-07/schema#') {
+      if (
+        schemaUrl === 'http://json-schema.org/draft-07/schema'
+        || schemaUrl === 'http://json-schema.org/draft-07/schema#'
+      ) {
         // Return stored JSON schema
         return JSONSchema07;
       }

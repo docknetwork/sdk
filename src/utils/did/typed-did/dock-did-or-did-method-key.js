@@ -26,7 +26,7 @@ class DockDidOrDidMethodKey {
   /**
    * Instantiates `DockDid` or `DidMethodKey` from a fully qualified did string or a raw hex did.
    * @param {string} did - fully qualified `dock:did:<SS58 DID>` or `dock:key:<BS58 public key>` or a raw hex DID
-   * @returns {this}
+   * @returns {DockDid|DidMethodKey}
    */
   static fromString(did) {
     if (did.startsWith('0x')) {
@@ -39,7 +39,7 @@ class DockDidOrDidMethodKey {
   /**
    * Instantiates `DockDid` or `DidMethodKey` from a fully qualified did string.
    * @param {string} did - fully qualified `dock:did:<SS58 DID>` or `dock:key:<BS58 public key>` string
-   * @returns {this}
+   * @returns {DockDid|DidMethodKey}
    */
   static fromQualifiedString(did) {
     if (did.startsWith(DockDIDQualifier)) {
@@ -56,7 +56,7 @@ class DockDidOrDidMethodKey {
   /**
    * Instantiates `DockDid` or `DidMethodKey` from a did or did method key object received from the substrate side.
    * @param {object} did - substrate did or did method key
-   * @returns {this}
+   * @returns {DockDid|DidMethodKey}
    */
   static fromSubstrateValue(did) {
     if (did.isDid) {
@@ -64,33 +64,54 @@ class DockDidOrDidMethodKey {
     } else if (did.isDidMethodKey) {
       return this.DidMethodKey.fromSubstrateValue(did);
     } else {
-      throw new Error(`Invalid \`did:*\` provided: \`${did}\``);
+      throw new Error(`Invalid \`did:*\` provided: \`${JSON.stringify(did)}\``);
     }
   }
 
   /**
-   * Extracts raw underlying value if it's `did:dock:*`, throws an error otherwise.
+   * Attempts to parse provided DID as an object or string.
+   * @param {string|DockDid|DidMethodKey|object} did
+   * @returns {DockDid|DidMethodKey}
+   */
+  static from(did) {
+    if (typeof did === 'object') {
+      if (did instanceof this) {
+        return did;
+      } else {
+        return this.fromSubstrateValue(did);
+      }
+    } else if (typeof did === 'string') {
+      return this.fromString(did);
+    } else {
+      throw new TypeError(
+        `Unsupported DID value: \`${did}\` with type \`${typeof did}\`, expected a string or an object`,
+      );
+    }
+  }
+
+  /**
+   * Extracts raw underlying value if it's `did: dock:* `, throws an error otherwise.
    */
   get asDid() {
     throw new Error('Not a `Did`');
   }
 
   /**
-   *  Extracts raw underlying value if it's `did:key:*`, throws an error otherwise.
+   *  Extracts raw underlying value if it's `did: key:* `, throws an error otherwise.
    */
   get asDidMethodKey() {
     throw new Error('Not a `DidMethodKey`');
   }
 
   /**
-   *  Returns `true` if the underlying value is a `did:dock:*`.
+   *  Returns `true` if the underlying value is a `did: dock:* `.
    */
   get isDid() {
     return false;
   }
 
   /**
-   *  Returns `true` if the underlying value is a `did:key:*`.
+   *  Returns `true` if the underlying value is a `did: key:* `.
    */
   get isDidMethodKey() {
     return false;
@@ -142,7 +163,7 @@ class DockDidOrDidMethodKey {
   }
 
   /**
-   * Returns fully qualified `did:dock:*` encoded in SS58 or `did:key:*` encoded in BS58.
+   * Returns fully qualified `did: dock:* ` encoded in SS58 or `did: key:* ` encoded in BS58.
    */
   toQualifiedEncodedString() {
     return `${this.constructor.Qualifier}${this.toEncodedString()}`;

@@ -3,8 +3,9 @@ export const Secp256k1PublicKeyPrefix = 'zQ3s';
 export const Ed25519PublicKeyPrefix = 'z6Mk';
 
 export const DockDIDQualifier = `did:${DockDIDMethod}:`;
-export const DidMethodKeyQualifier = 'did:key:';
 export const DockDIDByteSize = 32;
+
+export const DidMethodKeyQualifier = 'did:key:';
 export const DidMethodKeySecp256k1ByteSize = 33;
 export const DidMethodKeyEd25519ByteSize = 32;
 

@@ -160,7 +160,7 @@ export default {
           type: 'TrustRegistrySchemaId',
         },
       ],
-      type: 'BTreeMap<TrustRegistryId, AggregatedTrustRegistrySchemaIssuers>',
+      type: 'BTreeMap<TrustRegistryId, Vec<(Issuer, AggregatedIssuerInfo)>>',
     },
     schemaVerifiers: {
       params: [
@@ -195,7 +195,7 @@ export default {
           type: 'TrustRegistryId',
         },
       ],
-      type: 'Option<AggregatedTrustRegistrySchemaIssuers>',
+      type: 'Option<Vec<(Issuer, AggregatedIssuerInfo)>>',
     },
     schemaVerifiersInRegistry: {
       params: [
@@ -226,7 +226,7 @@ export default {
           type: 'TrustRegistryId',
         },
       ],
-      type: 'BTreeMap<TrustRegistrySchemaId, AggregatedTrustRegistrySchemaIssuers>',
+      type: 'BTreeMap<TrustRegistrySchemaId, Vec<(Issuer, AggregatedIssuerInfo)>>',
     },
     allRegistrySchemaVerifiers: {
       params: [

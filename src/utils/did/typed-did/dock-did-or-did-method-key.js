@@ -90,28 +90,28 @@ class DockDidOrDidMethodKey {
   }
 
   /**
-   * Extracts raw underlying value if it's `did: dock:* `, throws an error otherwise.
+   * Extracts raw underlying value if it's `did:dock:*`, throws an error otherwise.
    */
   get asDid() {
     throw new Error('Not a `Did`');
   }
 
   /**
-   *  Extracts raw underlying value if it's `did: key:* `, throws an error otherwise.
+   *  Extracts raw underlying value if it's `did:key:*`, throws an error otherwise.
    */
   get asDidMethodKey() {
     throw new Error('Not a `DidMethodKey`');
   }
 
   /**
-   *  Returns `true` if the underlying value is a `did: dock:* `.
+   *  Returns `true` if the underlying value is a `did:dock:*`.
    */
   get isDid() {
     return false;
   }
 
   /**
-   *  Returns `true` if the underlying value is a `did: key:* `.
+   *  Returns `true` if the underlying value is a `did:key:* `.
    */
   get isDidMethodKey() {
     return false;
@@ -163,7 +163,7 @@ class DockDidOrDidMethodKey {
   }
 
   /**
-   * Returns fully qualified `did: dock:* ` encoded in SS58 or `did: key:* ` encoded in BS58.
+   * Returns fully qualified `did:dock:*` encoded in SS58 or `did:key:*` encoded in BS58.
    */
   toQualifiedEncodedString() {
     return `${this.constructor.Qualifier}${this.toEncodedString()}`;

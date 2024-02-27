@@ -10,6 +10,7 @@ import {
 import {initializeWasm} from '@docknetwork/crypto-wasm/lib/index';
 import VerifiablePresentation from "../src/verifiable-presentation";
 import { keyDocToKeypair } from "./wallet-util";
+import axios from "axios";
 
 const credential = {
   "@context": [
@@ -138,6 +139,11 @@ async function verifyCredential() {
 
   console.log(presentation);
 
+  const templateResponseURL = 'https://api-staging.dock.io/proof-requests/d3c0c23e-efb5-41fc-a8a9-6213507f419a/send-presentation';
+
+  const result = await axios
+      .post(templateResponseURL, presentation)
+      .then(res => res.data);
 }
 
 dock

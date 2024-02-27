@@ -1,13 +1,13 @@
 import dock from "../src/index";
 import BbsPlusPresentation from "../src/presentation";
-import VerifiableCredential from '../src/verifiable-credential';
+import VerifiableCredential from "../src/verifiable-credential";
 import {
   DIDKeyResolver,
   DockResolver,
   UniversalResolver,
   WildcardMultiResolver,
 } from "../src/resolver";
-import {initializeWasm} from '@docknetwork/crypto-wasm/lib/index';
+import { initializeWasm } from "@docknetwork/crypto-wasm/lib/index";
 import VerifiablePresentation from "../src/verifiable-presentation";
 import { keyDocToKeypair } from "./wallet-util";
 import axios from "axios";
@@ -85,7 +85,6 @@ const credential = {
   },
 };
 
-
 const keyDoc = {
   id: "did:key:z6MkhQc8mYYTjrw8dfarS8AKcSqAEhoPZCE81YJz6hRJJmHU#z6MkhQc8mYYTjrw8dfarS8AKcSqAEhoPZCE81YJz6hRJJmHU",
   controller: "did:key:z6MkhQc8mYYTjrw8dfarS8AKcSqAEhoPZCE81YJz6hRJJmHU",
@@ -122,28 +121,34 @@ async function verifyCredential() {
     }
   );
 
-  const id = keyDoc.controller.startsWith('did:key:') ? keyDoc.id : `${keyDoc.controller}#keys-1`;
+  const id = keyDoc.controller.startsWith("did:key:")
+    ? keyDoc.id
+    : `${keyDoc.controller}#keys-1`;
   const vp = new VerifiablePresentation(id);
 
   for (const _vc of derivedCredentials) {
     vp.addCredential(_vc);
   }
 
-  (keyDoc).keypair = keyDocToKeypair(keyDoc, dock);
-  
-  const challenge = '08ec5ca2e2446b50b25a55e1b6b21f2b';
-  const domain = 'dock.io';
-  
+  keyDoc.keypair = keyDocToKeypair(keyDoc, dock);
+
+  const challenge = "08ec5ca2e2446b50b25a55e1b6b21f2b";
+  const domain = "dock.io";
+
   const presentation = await vp.sign(keyDoc, challenge, domain, resolver);
 
-
+  console.log("Presentation:");
   console.log(presentation);
 
-  const templateResponseURL = 'https://api-staging.dock.io/proof-requests/d3c0c23e-efb5-41fc-a8a9-6213507f419a/send-presentation';
+  const templateResponseURL =
+    "https://api-staging.dock.io/proof-requests/d3c0c23e-efb5-41fc-a8a9-6213507f419a/send-presentation";
 
   const result = await axios
-      .post(templateResponseURL, presentation)
-      .then(res => res.data);
+    .post(templateResponseURL, presentation)
+    .then((res) => res.data);
+
+  console.log("Certs response:");
+  console.log(result);
 }
 
 dock

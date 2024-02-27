@@ -1,5 +1,6 @@
 import dock from "../src/index";
 import BbsPlusPresentation from "../src/presentation";
+import VerifiableCredential from '../src/verifiable-credential';
 import {
   DIDKeyResolver,
   DockResolver,
@@ -8,6 +9,7 @@ import {
 } from "../src/resolver";
 import {initializeWasm} from '@docknetwork/crypto-wasm/lib/index';
 import VerifiablePresentation from "../src/verifiable-presentation";
+import { keyDocToKeypair } from "./wallet-util";
 
 const credential = {
   "@context": [
@@ -119,18 +121,19 @@ async function verifyCredential() {
     }
   );
 
+  const id = keyDoc.controller.startsWith('did:key:') ? keyDoc.id : `${keyDoc.controller}#keys-1`;
   const vp = new VerifiablePresentation(id);
 
   for (const _vc of derivedCredentials) {
     vp.addCredential(_vc);
   }
 
-  keyDoc.keypair = keyDocToKeypair(keyDoc, dock);
+  (keyDoc).keypair = keyDocToKeypair(keyDoc, dock);
   
   const challenge = '08ec5ca2e2446b50b25a55e1b6b21f2b';
   const domain = 'dock.io';
   
-  const presentation = vp.sign(keyDoc, challenge, domain, resolver);
+  const presentation = await vp.sign(keyDoc, challenge, domain, resolver);
 
 
   console.log(presentation);

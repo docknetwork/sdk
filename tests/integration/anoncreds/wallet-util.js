@@ -1,11 +1,11 @@
 
 
 
-import * as bs58 from 'base58-universal';
-import {generateEcdsaSecp256k1Keypair} from '../src/utils/misc';
+import b58 from 'bs58';
+import {generateEcdsaSecp256k1Keypair} from '../../../src/utils/misc';
 import {randomAsHex} from '@polkadot/util-crypto';
 import {u8aToHex} from '@polkadot/util';
-import Bls12381G2KeyPairDock2022 from '../src/utils/vc/crypto/Bls12381G2KeyPairDock2022';
+import Bls12381G2KeyPairDock2022 from '../../../src/utils/vc/crypto/Bls12381G2KeyPairDock2022';
 function createSecp256k1Keypair(privateKeyHex) {
   const pk = privateKeyHex || randomAsHex(32);
   const kp = generateEcdsaSecp256k1Keypair(pk);

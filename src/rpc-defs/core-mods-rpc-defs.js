@@ -250,7 +250,7 @@ export default {
       params: [
         {
           name: 'by',
-          type: 'QueryTrustRegistriesBy',
+          type: 'QueryTrustRegistryBy',
         },
         {
           name: 'registry_id',

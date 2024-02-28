@@ -32,7 +32,7 @@ export default class TrustRegistryModule {
    * @param by
    */
   async registriesInfo(by) {
-    ensureMatchesPattern(this.constructor.QueryByPattern, by);
+    ensureMatchesPattern(this.constructor.RegistriesQueryByPattern, by);
 
     return this.parseMapEntries(
       this.parseRegistryInfo,
@@ -47,11 +47,11 @@ export default class TrustRegistryModule {
    * @returns {Promise<object>}
    */
   async schemasMetadata(by, regId) {
-    ensureMatchesPattern(this.constructor.QueryByPattern, by);
+    ensureMatchesPattern(this.constructor.RegistryQueryByPattern, by);
 
     return this.parseMapEntries(
       this.parseSchemaMetadata,
-      await this.api.rpc.trustRegistry.schemasMetadataBy(by, regId),
+      await this.api.rpc.trustRegistry.registrySchemaMetadataBy(by, regId),
     );
   }
 
@@ -215,7 +215,8 @@ export default class TrustRegistryModule {
   }
 
   /**
-   * Updates schema metadatas in the registry.
+   * Sets schema metadatas in the registry.
+   *
    * @param convenerOrIssuerOrVerifierDid
    * @param registryId
    * @param schemas
@@ -504,7 +505,7 @@ export default class TrustRegistryModule {
 
     if (valueOpt.isNone) {
       return null;
-    } else if (typeof valueOpt.isSome === 'boolean') {
+    } else if (valueOpt.isSome) {
       value = valueOpt.unwrap();
     } else {
       value = valueOpt;
@@ -689,31 +690,47 @@ const ModifySchemasPattern = {
     },
   ],
 };
+const AnyOfOrAllDockDidOrDidMethodKeyPattern = {
+  $objOf: {
+    All: {
+      $iterableOf: DockDidOrDidMethodKeyPattern,
+    },
+    AnyOf: {
+      $iterableOf: DockDidOrDidMethodKeyPattern,
+    },
+  },
+};
 
 TrustRegistryModule.SchemasUpdatePattern = {
-  $matchObject: {
+  $objOf: {
     Set: SetAllSchemasPattern,
     Modify: ModifySchemasPattern,
   },
 };
-TrustRegistryModule.QueryByPattern = {
+TrustRegistryModule.RegistryQueryByPattern = {
   $matchObject: {
-    Issuer: DockDidOrDidMethodKeyPattern,
-    Verifier: DockDidOrDidMethodKeyPattern,
-    SchemaId: Hex32Pattern,
-    IssuerOrVerifier: DockDidOrDidMethodKeyPattern,
-    IssuerAndVerifier: DockDidOrDidMethodKeyPattern,
-    SchemaIdWithIssuer: {
-      $matchIterable: [Hex32Pattern, DockDidOrDidMethodKeyPattern],
+    issuers: AnyOfOrAllDockDidOrDidMethodKeyPattern,
+    verifiers: AnyOfOrAllDockDidOrDidMethodKeyPattern,
+    issuersOrVerifiers: AnyOfOrAllDockDidOrDidMethodKeyPattern,
+    schemaIds: {
+      $iterableOf: Hex32Pattern,
     },
-    SchemaIdWithVerifier: {
-      $matchIterable: [Hex32Pattern, DockDidOrDidMethodKeyPattern],
-    },
-    SchemaIdWithIssuerOrVerifier: {
-      $matchIterable: [Hex32Pattern, DockDidOrDidMethodKeyPattern],
-    },
-    SchemaIdWithIssuerAndVerifier: {
-      $matchIterable: [Hex32Pattern, DockDidOrDidMethodKeyPattern],
+  },
+};
+TrustRegistryModule.RegistriesQueryByPattern = {
+  $matchObject: {
+    issuers: AnyOfOrAllDockDidOrDidMethodKeyPattern,
+    verifiers: AnyOfOrAllDockDidOrDidMethodKeyPattern,
+    issuersOrVerifiers: AnyOfOrAllDockDidOrDidMethodKeyPattern,
+    schemaIds: {
+      $objOf: {
+        All: {
+          $iterableOf: Hex32Pattern,
+        },
+        AnyOf: {
+          $iterableOf: Hex32Pattern,
+        },
+      },
     },
   },
 };

@@ -32,11 +32,26 @@ export default class TrustRegistryModule {
    * @param by
    */
   async registriesInfo(by) {
-    ensureMatchesPattern(this.constructor.TrustRegistriesInfoByPattern, by);
+    ensureMatchesPattern(this.constructor.QueryByPattern, by);
 
     return this.parseMapEntries(
       this.parseRegistryInfo,
       await this.api.rpc.trustRegistry.registriesInfoBy(by),
+    );
+  }
+
+  /**
+   * Returns schemas metadata for the registry according to the supplied `by` argument.
+   * @param by
+   * @param {string} regId
+   * @returns {Promise<object>}
+   */
+  async schemasMetadata(by, regId) {
+    ensureMatchesPattern(this.constructor.QueryByPattern, by);
+
+    return this.parseMapEntries(
+      this.parseSchemaMetadata,
+      await this.api.rpc.trustRegistry.schemasMetadataBy(by, regId),
     );
   }
 
@@ -681,7 +696,7 @@ TrustRegistryModule.SchemasUpdatePattern = {
     Modify: ModifySchemasPattern,
   },
 };
-TrustRegistryModule.TrustRegistriesInfoByPattern = {
+TrustRegistryModule.QueryByPattern = {
   $matchObject: {
     Issuer: DockDidOrDidMethodKeyPattern,
     Verifier: DockDidOrDidMethodKeyPattern,

@@ -246,5 +246,18 @@ export default {
       ],
       type: 'BTreeMap<TrustRegistryId, TrustRegistryInfo>',
     },
+    registrySchemaMetadataBy: {
+      params: [
+        {
+          name: 'by',
+          type: 'QueryTrustRegistriesBy',
+        },
+        {
+          name: 'registry_id',
+          type: 'TrustRegistryId',
+        },
+      ],
+      type: 'BTreeMap<TrustRegistrySchemaId, AggregatedTrustRegistrySchemaMetadata>',
+    },
   },
 };

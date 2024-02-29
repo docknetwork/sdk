@@ -26,7 +26,7 @@ class DockDidOrDidMethodKey {
   /**
    * Instantiates `DockDid` or `DidMethodKey` from a fully qualified did string or a raw hex did.
    * @param {string} did - fully qualified `dock:did:<SS58 DID>` or `dock:key:<BS58 public key>` or a raw hex DID
-   * @returns {this}
+   * @returns {DockDid|DidMethodKey}
    */
   static fromString(did) {
     if (did.startsWith('0x')) {
@@ -39,7 +39,7 @@ class DockDidOrDidMethodKey {
   /**
    * Instantiates `DockDid` or `DidMethodKey` from a fully qualified did string.
    * @param {string} did - fully qualified `dock:did:<SS58 DID>` or `dock:key:<BS58 public key>` string
-   * @returns {this}
+   * @returns {DockDid|DidMethodKey}
    */
   static fromQualifiedString(did) {
     if (did.startsWith(DockDIDQualifier)) {
@@ -56,7 +56,7 @@ class DockDidOrDidMethodKey {
   /**
    * Instantiates `DockDid` or `DidMethodKey` from a did or did method key object received from the substrate side.
    * @param {object} did - substrate did or did method key
-   * @returns {this}
+   * @returns {DockDid|DidMethodKey}
    */
   static fromSubstrateValue(did) {
     if (did.isDid) {
@@ -64,7 +64,28 @@ class DockDidOrDidMethodKey {
     } else if (did.isDidMethodKey) {
       return this.DidMethodKey.fromSubstrateValue(did);
     } else {
-      throw new Error(`Invalid \`did:*\` provided: \`${did}\``);
+      throw new Error(`Invalid \`did:*\` provided: \`${JSON.stringify(did)}\``);
+    }
+  }
+
+  /**
+   * Attempts to parse provided DID as an object or string.
+   * @param {string|DockDid|DidMethodKey|object} did
+   * @returns {DockDid|DidMethodKey}
+   */
+  static from(did) {
+    if (typeof did === 'object') {
+      if (did instanceof this) {
+        return did;
+      } else {
+        return this.fromSubstrateValue(did);
+      }
+    } else if (typeof did === 'string') {
+      return this.fromString(did);
+    } else {
+      throw new TypeError(
+        `Unsupported DID value: \`${did}\` with type \`${typeof did}\`, expected a string or an object`,
+      );
     }
   }
 
@@ -90,7 +111,7 @@ class DockDidOrDidMethodKey {
   }
 
   /**
-   *  Returns `true` if the underlying value is a `did:key:*`.
+   *  Returns `true` if the underlying value is a `did:key:* `.
    */
   get isDidMethodKey() {
     return false;

@@ -2,12 +2,14 @@ import { randomAsHex } from '@polkadot/util-crypto';
 
 import { DockAPI } from '../../src/index';
 
-import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
-
 import {
-  OneOfPolicy,
-} from '../../src/utils/revocation';
-import { DidKeypair, typedHexDID, typedHexDIDFromSubstrate } from '../../src/utils/did';
+  FullNodeEndpoint,
+  TestKeyringOpts,
+  TestAccountURI,
+} from '../test-constants';
+
+import { OneOfPolicy } from '../../src/utils/revocation';
+import { DidKeypair, typedHexDID } from '../../src/utils/did';
 import { registerNewDIDUsingPair } from './helpers';
 
 describe('Revocation Module', () => {
@@ -52,8 +54,14 @@ describe('Revocation Module', () => {
     dock.setAccount(account);
 
     // Thees DIDs should be written before any test begins
-    pair = DidKeypair.fromApi(dock, { seed: ownerSeed, keypairType: 'sr25519' });
-    pair2 = DidKeypair.fromApi(dock, { seed: ownerSeed2, keypairType: 'sr25519' });
+    pair = DidKeypair.fromApi(dock, {
+      seed: ownerSeed,
+      keypairType: 'sr25519',
+    });
+    pair2 = DidKeypair.fromApi(dock, {
+      seed: ownerSeed2,
+      keypairType: 'sr25519',
+    });
 
     // The controller is same as the DID
     await registerNewDIDUsingPair(dock, ownerDID, pair);
@@ -66,23 +74,43 @@ describe('Revocation Module', () => {
   }, 10000);
 
   test('Can create a registry with a OneOf policy', async () => {
-    await expect(dock.revocation.newRegistry(registryId, policy, false, false)).resolves.toBeDefined();
+    await expect(
+      dock.revocation.newRegistry(registryId, policy, false, false),
+    ).resolves.toBeDefined();
     const reg = await dock.revocation.getRevocationRegistry(registryId);
     expect(!!reg).toBe(true);
   }, 40000);
 
   test('Can revoke single from a registry', async () => {
-    const [revoke, sig, nonce] = await dock.revocation.createSignedRevoke(registryId, revokeIds, ownerDID, pair, { didModule: dock.did });
+    const [revoke, sig, nonce] = await dock.revocation.createSignedRevoke(
+      registryId,
+      revokeIds,
+      ownerDID,
+      pair,
+      { didModule: dock.did },
+    );
     await dock.revocation.revoke(revoke, [{ nonce, sig }], false);
-    const revocationStatus = await dock.revocation.getIsRevoked(registryId, revokeId);
+    const revocationStatus = await dock.revocation.getIsRevoked(
+      registryId,
+      revokeId,
+    );
     expect(revocationStatus).toBe(true);
   }, 40000);
 
   test('Can unrevoke single from a registry', async () => {
-    const [unrevoke, sig, nonce] = await dock.revocation.createSignedUnRevoke(registryId, revokeIds, ownerDID, pair, { didModule: dock.did });
+    const [unrevoke, sig, nonce] = await dock.revocation.createSignedUnRevoke(
+      registryId,
+      revokeIds,
+      ownerDID,
+      pair,
+      { didModule: dock.did },
+    );
     await dock.revocation.unrevoke(unrevoke, [{ nonce, sig }], false);
 
-    const revocationStatus = await dock.revocation.getIsRevoked(registryId, revokeId);
+    const revocationStatus = await dock.revocation.getIsRevoked(
+      registryId,
+      revokeId,
+    );
     expect(revocationStatus).toBe(false);
   }, 40000);
 
@@ -96,7 +124,13 @@ describe('Revocation Module', () => {
 
     const rIdsArr = Array.from(rIds);
 
-    const [revoke, sig, nonce] = await dock.revocation.createSignedRevoke(registryId, rIds, ownerDID, pair, { didModule: dock.did });
+    const [revoke, sig, nonce] = await dock.revocation.createSignedRevoke(
+      registryId,
+      rIds,
+      ownerDID,
+      pair,
+      { didModule: dock.did },
+    );
     await dock.revocation.revoke(revoke, [{ nonce, sig }], false);
 
     console.time(`Check ${count} revocation status one by one`);
@@ -108,16 +142,28 @@ describe('Revocation Module', () => {
     console.timeEnd(`Check ${count} revocation status one by one`);
 
     console.time(`Check ${count} revocation status in a batch`);
-    const revocationStatuses = await dock.revocation.areRevoked(rIdsArr.map((r) => [registryId, r]));
+    const revocationStatuses = await dock.revocation.areRevoked(
+      rIdsArr.map((r) => [registryId, r]),
+    );
     expect(revocationStatuses.length).toBe(rIds.size);
     revocationStatuses.forEach((s) => expect(s).toBe(true));
     console.timeEnd(`Check ${count} revocation status in a batch`);
 
-    const [unrevoke, sig1, nonce1] = await dock.revocation.createSignedUnRevoke(registryId, rIds, ownerDID, pair, { didModule: dock.did });
+    const [unrevoke, sig1, nonce1] = await dock.revocation.createSignedUnRevoke(
+      registryId,
+      rIds,
+      ownerDID,
+      pair,
+      { didModule: dock.did },
+    );
 
     // Note: Intentionally passing true and waiting for finalization as not doing that makes the multi-query check fail.
     // This seems like a bug since the single query check done in next loop work. Even the upgrade to @polkadot/api version 9.14 didn't fix
-    await dock.revocation.unrevoke(unrevoke, [{ nonce: nonce1, sig: sig1 }], true);
+    await dock.revocation.unrevoke(
+      unrevoke,
+      [{ nonce: nonce1, sig: sig1 }],
+      true,
+    );
 
     for (let i = 0; i < rIdsArr.length; i++) {
       // eslint-disable-next-line no-await-in-loop
@@ -125,19 +171,30 @@ describe('Revocation Module', () => {
       expect(status).toBe(false);
     }
 
-    const revocationStatuses1 = await dock.revocation.areRevoked(rIdsArr.map((r) => [registryId, r]));
+    const revocationStatuses1 = await dock.revocation.areRevoked(
+      rIdsArr.map((r) => [registryId, r]),
+    );
     expect(revocationStatuses1.length).toBe(rIds.size);
     revocationStatuses1.forEach((s) => expect(s).toBe(false));
   }, 40000);
 
   test('Can remove a registry', async () => {
-    const [remove, sig, nonce] = await dock.revocation.createSignedRemove(registryId, ownerDID, pair, { didModule: dock.did });
+    const [remove, sig, nonce] = await dock.revocation.createSignedRemove(
+      registryId,
+      ownerDID,
+      pair,
+      { didModule: dock.did },
+    );
     await dock.revocation.removeRegistry(remove, [{ nonce, sig }], false);
-    await expect(dock.revocation.getRevocationRegistry(registryId)).rejects.toThrow(/Could not find revocation registry/);
+    await expect(
+      dock.revocation.getRevocationRegistry(registryId),
+    ).rejects.toThrow(/Could not find revocation registry/);
   }, 40000);
 
   test('Can create an add only registry', async () => {
-    await expect(dock.revocation.newRegistry(registryId, policy, true, false)).resolves.toBeDefined();
+    await expect(
+      dock.revocation.newRegistry(registryId, policy, true, false),
+    ).resolves.toBeDefined();
     const reg = await dock.revocation.getRevocationRegistry(registryId);
     expect(!!reg).toBe(true);
   }, 40000);
@@ -146,10 +203,19 @@ describe('Revocation Module', () => {
     const reg = await dock.revocation.getRevocationRegistry(registryId);
     expect(!!reg).toBe(true);
 
-    const [revoke, sig, nonce] = await dock.revocation.createSignedRevoke(registryId, revokeIds, ownerDID, pair, { didModule: dock.did });
+    const [revoke, sig, nonce] = await dock.revocation.createSignedRevoke(
+      registryId,
+      revokeIds,
+      ownerDID,
+      pair,
+      { didModule: dock.did },
+    );
     await dock.revocation.revoke(revoke, [{ nonce, sig }], false);
 
-    const revocationStatus = await dock.revocation.getIsRevoked(registryId, revokeId);
+    const revocationStatus = await dock.revocation.getIsRevoked(
+      registryId,
+      revokeId,
+    );
     expect(revocationStatus).toBe(true);
   }, 40000);
 
@@ -157,12 +223,21 @@ describe('Revocation Module', () => {
     const reg = await dock.revocation.getRevocationRegistry(registryId);
     expect(!!reg).toBe(true);
 
-    const [unrevoke, sig, nonce] = await dock.revocation.createSignedUnRevoke(registryId, revokeIds, ownerDID, pair, { didModule: dock.did });
+    const [unrevoke, sig, nonce] = await dock.revocation.createSignedUnRevoke(
+      registryId,
+      revokeIds,
+      ownerDID,
+      pair,
+      { didModule: dock.did },
+    );
     await expect(
       dock.revocation.unrevoke(unrevoke, [{ nonce, sig }], false),
     ).rejects.toThrow();
 
-    const revocationStatus = await dock.revocation.getIsRevoked(registryId, revokeId);
+    const revocationStatus = await dock.revocation.getIsRevoked(
+      registryId,
+      revokeId,
+    );
     expect(revocationStatus).toBe(true);
   }, 40000);
 
@@ -170,12 +245,19 @@ describe('Revocation Module', () => {
     const reg = await dock.revocation.getRevocationRegistry(registryId);
     expect(!!reg).toBe(true);
 
-    const [remove, sig, nonce] = await dock.revocation.createSignedRemove(registryId, ownerDID, pair, { didModule: dock.did });
+    const [remove, sig, nonce] = await dock.revocation.createSignedRemove(
+      registryId,
+      ownerDID,
+      pair,
+      { didModule: dock.did },
+    );
     await expect(
       dock.revocation.removeRegistry(remove, [{ nonce, sig }], false),
     ).rejects.toThrow();
 
-    await expect(dock.revocation.getRevocationRegistry(registryId)).resolves.toBeDefined();
+    await expect(
+      dock.revocation.getRevocationRegistry(registryId),
+    ).resolves.toBeDefined();
   }, 40000);
 
   test('Can create a registry with multiple owners', async () => {
@@ -185,8 +267,17 @@ describe('Revocation Module', () => {
 
     // Create policy and registry with multiple owners
     const policyNew = new OneOfPolicy(controllersNew);
-    await expect(dock.revocation.newRegistry(multipleControllerRegistryID, policyNew, false, false)).resolves.toBeDefined();
-    const reg = await dock.revocation.getRevocationRegistry(multipleControllerRegistryID);
+    await expect(
+      dock.revocation.newRegistry(
+        multipleControllerRegistryID,
+        policyNew,
+        false,
+        false,
+      ),
+    ).resolves.toBeDefined();
+    const reg = await dock.revocation.getRevocationRegistry(
+      multipleControllerRegistryID,
+    );
     expect(reg.policy.isOneOf).toBe(true);
 
     const controllerSet = reg.policy.asOneOf;
@@ -196,7 +287,7 @@ describe('Revocation Module', () => {
     let hasSecondDID = false;
     [...controllerSet.entries()]
       .flatMap((v) => v)
-      .map((cnt) => typedHexDIDFromSubstrate(dock.api, cnt))
+      .map((cnt) => typedHexDID(dock.api, cnt))
       .forEach((controller) => {
         if (
           controller.toString() === typedHexDID(dock.api, ownerDID).toString()
@@ -215,17 +306,45 @@ describe('Revocation Module', () => {
     const revId = randomAsHex(32);
 
     // Revoke
-    await dock.revocation.revokeCredentialWithOneOfPolicy(multipleControllerRegistryID, revId, ownerDID, pair, { didModule: dock.did }, false);
-    const revocationStatus = await dock.revocation.getIsRevoked(multipleControllerRegistryID, revId);
+    await dock.revocation.revokeCredentialWithOneOfPolicy(
+      multipleControllerRegistryID,
+      revId,
+      ownerDID,
+      pair,
+      { didModule: dock.did },
+      false,
+    );
+    const revocationStatus = await dock.revocation.getIsRevoked(
+      multipleControllerRegistryID,
+      revId,
+    );
     expect(revocationStatus).toBe(true);
 
     // Unrevoke from another DID
-    await dock.revocation.unrevokeCredentialWithOneOfPolicy(multipleControllerRegistryID, revId, ownerDID2, pair2, { didModule: dock.did }, false);
-    const revocationStatus1 = await dock.revocation.getIsRevoked(multipleControllerRegistryID, revId);
+    await dock.revocation.unrevokeCredentialWithOneOfPolicy(
+      multipleControllerRegistryID,
+      revId,
+      ownerDID2,
+      pair2,
+      { didModule: dock.did },
+      false,
+    );
+    const revocationStatus1 = await dock.revocation.getIsRevoked(
+      multipleControllerRegistryID,
+      revId,
+    );
     expect(revocationStatus1).toBe(false);
 
     // Remove
-    await dock.revocation.removeRegistryWithOneOfPolicy(multipleControllerRegistryID, ownerDID, pair, { didModule: dock.did }, false);
-    await expect(dock.revocation.getRevocationRegistry(multipleControllerRegistryID)).rejects.toThrow(/Could not find revocation registry/);
+    await dock.revocation.removeRegistryWithOneOfPolicy(
+      multipleControllerRegistryID,
+      ownerDID,
+      pair,
+      { didModule: dock.did },
+      false,
+    );
+    await expect(
+      dock.revocation.getRevocationRegistry(multipleControllerRegistryID),
+    ).rejects.toThrow(/Could not find revocation registry/);
   }, 30000);
 });

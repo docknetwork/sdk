@@ -265,7 +265,7 @@ export class PatternMatcher {
   check(pattern, value, path = []) {
     for (const key of Object.keys(pattern)) {
       if (!key.startsWith('$') || this[key] == null) {
-        throw new PatternError(`Invalid pattern key \`${key}\``, [], pattern);
+        throw new PatternError(`Invalid pattern key \`${key}\``, path, pattern);
       }
 
       try {
@@ -326,9 +326,9 @@ export class PatternMatcher {
     for (const key of Object.keys(value)) {
       if (!Object.hasOwnProperty.call(pattern.$matchObject, key)) {
         throw new Error(
-          `Invalid property \`${key}\`, expected keys: \`${fmtIter(
+          `Invalid property \`${key}\`, expected keys: ${fmtIter(
             Object.keys(pattern.$matchObject),
-          )}\``,
+          )}`,
         );
       }
 

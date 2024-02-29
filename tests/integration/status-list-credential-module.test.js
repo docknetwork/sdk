@@ -9,12 +9,7 @@ import {
   DisableStatusListTests,
 } from '../test-constants';
 
-import {
-  typedHexDID,
-  createNewDockDID,
-  DidKeypair,
-  typedHexDIDFromSubstrate,
-} from '../../src/utils/did';
+import { createNewDockDID, DidKeypair, typedHexDID } from '../../src/utils/did';
 import { OneOfPolicy } from '../../src/utils/revocation';
 import { registerNewDIDUsingPair } from './helpers';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
@@ -270,7 +265,7 @@ buildTest('StatusListCredential Module', () => {
     let hasSecondDID = false;
     [...controllerSet.entries()]
       .flatMap((v) => v)
-      .map((cnt) => typedHexDIDFromSubstrate(dock.api, cnt))
+      .map((cnt) => typedHexDID(dock.api, cnt))
       .forEach((controller) => {
         if (
           controller.toString() === typedHexDID(dock.api, ownerDID).toString()

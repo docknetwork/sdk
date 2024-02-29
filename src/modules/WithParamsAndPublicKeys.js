@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 
 import { u8aToHex } from '@polkadot/util';
-import { createDidSig, typedHexDID, typedHexDIDFromSubstrate } from '../utils/did';
+import { createDidSig, typedHexDID } from '../utils/did';
 import { getDidNonce } from '../utils/misc';
 
 /**
@@ -281,7 +281,10 @@ export default class WithParamsAndPublicKeys {
   async getPublicKeyByHexDid(hexDid, keyId, withParams = false) {
     const resp = await this.queryPublicKeyFromChain(hexDid, keyId);
     if (resp) {
-      const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(this.api, resp);
+      const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(
+        this.api,
+        resp,
+      );
       if (withParams) {
         if (pkObj.paramsRef === null) {
           throw new Error('No reference to parameters for the public key');
@@ -337,7 +340,7 @@ export default class WithParamsAndPublicKeys {
     }
     if (pk.paramsRef.isSome) {
       const pr = pk.paramsRef.unwrap();
-      pkObj.paramsRef = [typedHexDIDFromSubstrate(api, pr[0]), pr[1].toNumber()];
+      pkObj.paramsRef = [typedHexDID(api, pr[0]), pr[1].toNumber()];
     } else {
       pkObj.paramsRef = null;
     }

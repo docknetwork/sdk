@@ -282,7 +282,7 @@ Object {
 
 exports[`ensureMatchesPattern $matchIterable 20`] = `Array []`;
 
-exports[`ensureMatchesPattern $matchObject 1`] = `"Invalid property \`c\`, expected keys: \`\`[a, b]\`\`"`;
+exports[`ensureMatchesPattern $matchObject 1`] = `"Invalid property \`c\`, expected keys: \`[a, b]\`"`;
 
 exports[`ensureMatchesPattern $matchObject 2`] = `Array []`;
 

@@ -412,7 +412,7 @@ buildTest('Trust Registry', () => {
     });
 
     expect(
-      await dock.trustRegistry.schemasMetadata(
+      await dock.trustRegistry.registrySchemasMetadata(
         {
           verifiers: { AnyOf: [verifierDIDMethodKey] },
         },
@@ -420,7 +420,7 @@ buildTest('Trust Registry', () => {
       ),
     ).toEqual({ [schemaId]: schema1MetadataInTrustRegistry2 });
     expect(
-      await dock.trustRegistry.schemasMetadata(
+      await dock.trustRegistry.registrySchemasMetadata(
         {
           issuersOrVerifiers: { AnyOf: [verifierDIDMethodKey] },
         },
@@ -428,7 +428,7 @@ buildTest('Trust Registry', () => {
       ),
     ).toEqual({ [schemaId]: schema1MetadataInTrustRegistry2 });
     expect(
-      await dock.trustRegistry.schemasMetadata(
+      await dock.trustRegistry.registrySchemasMetadata(
         {
           issuers: { AnyOf: [verifierDIDMethodKey] },
         },
@@ -436,7 +436,7 @@ buildTest('Trust Registry', () => {
       ),
     ).toEqual({});
     expect(
-      await dock.trustRegistry.schemasMetadata(
+      await dock.trustRegistry.registrySchemasMetadata(
         {
           issuers: {
             AnyOf: [verifierDIDMethodKey, issuerDID],
@@ -449,7 +449,7 @@ buildTest('Trust Registry', () => {
       [schemaId2]: schema2MetadataInTrustRegistry1,
     });
     expect(
-      await dock.trustRegistry.schemasMetadata(
+      await dock.trustRegistry.registrySchemasMetadata(
         {
           issuersOrVerifiers: { AnyOf: [verifierDIDMethodKey] },
         },
@@ -457,7 +457,7 @@ buildTest('Trust Registry', () => {
       ),
     ).toEqual({});
     expect(
-      await dock.trustRegistry.schemasMetadata(
+      await dock.trustRegistry.registrySchemasMetadata(
         {
           issuers: { AnyOf: [issuerDID] },
           verifiers: { AnyOf: [verifierDIDMethodKey] },
@@ -466,7 +466,7 @@ buildTest('Trust Registry', () => {
       ),
     ).toEqual({ [schemaId]: schema1MetadataInTrustRegistry2 });
     expect(
-      await dock.trustRegistry.schemasMetadata(
+      await dock.trustRegistry.registrySchemasMetadata(
         {
           schemaIds: [schemaId],
         },
@@ -474,7 +474,7 @@ buildTest('Trust Registry', () => {
       ),
     ).toEqual({ [schemaId]: schema1MetadataInTrustRegistry1 });
     expect(
-      await dock.trustRegistry.schemasMetadata(
+      await dock.trustRegistry.registrySchemasMetadata(
         {
           issuers: {
             AnyOf: [issuerDID, issuerDID2],
@@ -485,24 +485,24 @@ buildTest('Trust Registry', () => {
       ),
     ).toEqual({ [schemaId]: schema1MetadataInTrustRegistry1 });
     expect(
-      await dock.trustRegistry.schemasMetadata({
+      await dock.trustRegistry.registrySchemasMetadata({
         issuers: { AnyOf: [verifierDID] },
         schemaIds: [schemaId2],
       }),
     ).toEqual({});
 
     expect(
-      await dock.trustRegistry.schemaMetadata(schemaId, trustRegistryId),
+      await dock.trustRegistry.schemaMetadataInRegistry(schemaId, trustRegistryId),
     ).toEqual(schema1MetadataInTrustRegistry1);
     expect(
-      await dock.trustRegistry.schemaIssuers(schemaId, trustRegistryId),
+      await dock.trustRegistry.schemaIssuersInRegistry(schemaId, trustRegistryId),
     ).toEqual(schema1MetadataInTrustRegistry1.issuers);
     expect(
-      await dock.trustRegistry.schemaVerifiers(schemaId, trustRegistryId),
+      await dock.trustRegistry.schemaVerifiersInRegistry(schemaId, trustRegistryId),
     ).toEqual(schema1MetadataInTrustRegistry1.verifiers);
 
     expect(
-      await dock.trustRegistry.schemaMetadataInAllRegistries(schemaId),
+      await dock.trustRegistry.schemaMetadata(schemaId),
     ).toEqual(
       dock.trustRegistry.parseMapEntries(
         dock.trustRegistry.parseSchemaMetadata,
@@ -513,7 +513,7 @@ buildTest('Trust Registry', () => {
       ),
     );
     expect(
-      await dock.trustRegistry.schemaVerifiersInAllRegistries(schemaId),
+      await dock.trustRegistry.schemaVerifiers(schemaId),
     ).toEqual(
       dock.trustRegistry.parseMapEntries(
         dock.trustRegistry.parseSchemaVerifiers,
@@ -524,7 +524,7 @@ buildTest('Trust Registry', () => {
       ),
     );
     expect(
-      await dock.trustRegistry.schemaIssuersInAllRegistries(schemaId),
+      await dock.trustRegistry.schemaIssuers(schemaId),
     ).toEqual(
       dock.trustRegistry.parseMapEntries(
         dock.trustRegistry.parseSchemaIssuers,

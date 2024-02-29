@@ -46,7 +46,7 @@ export default class TrustRegistryModule {
    * @param {string} regId
    * @returns {Promise<object>}
    */
-  async schemasMetadata(by, regId) {
+  async registrySchemasMetadata(by, regId) {
     ensureMatchesPattern(this.constructor.RegistryQueryByPattern, by);
 
     return this.parseMapEntries(
@@ -62,7 +62,7 @@ export default class TrustRegistryModule {
    * @param {string} regId
    * @returns {Promise<object>}
    */
-  async schemaMetadata(schemaId, regId) {
+  async schemaMetadataInRegistry(schemaId, regId) {
     return this.parseSingleEntry(
       this.parseSchemaMetadata,
       await this.api.rpc.trustRegistry.schemaMetadataInRegistry(
@@ -78,7 +78,7 @@ export default class TrustRegistryModule {
    * @param {string} schemaId
    * @returns {Promise<object>}
    */
-  async schemaMetadataInAllRegistries(schemaId) {
+  async schemaMetadata(schemaId) {
     return this.parseMapEntries(
       this.parseSchemaMetadata,
       await this.api.rpc.trustRegistry.schemaMetadata(schemaId),
@@ -92,7 +92,7 @@ export default class TrustRegistryModule {
    * @param {string} regId
    * @returns {Promise<object>}
    */
-  async schemaIssuers(schemaId, regId) {
+  async schemaIssuersInRegistry(schemaId, regId) {
     return this.parseSingleEntry(
       this.parseSchemaIssuers,
       await this.api.rpc.trustRegistry.schemaIssuersInRegistry(schemaId, regId),
@@ -105,7 +105,7 @@ export default class TrustRegistryModule {
    * @param {string} schemaId
    * @returns {Promise<object>}
    */
-  async schemaIssuersInAllRegistries(schemaId) {
+  async schemaIssuers(schemaId) {
     return this.parseMapEntries(
       this.parseSchemaIssuers,
       await this.api.rpc.trustRegistry.schemaIssuers(schemaId),
@@ -119,7 +119,7 @@ export default class TrustRegistryModule {
    * @param {string} regId
    * @returns {Promise<object>}
    */
-  async schemaVerifiers(schemaId, regId) {
+  async schemaVerifiersInRegistry(schemaId, regId) {
     return this.parseSingleEntry(
       this.parseSchemaVerifiers,
       await this.api.rpc.trustRegistry.schemaVerifiersInRegistry(
@@ -135,7 +135,7 @@ export default class TrustRegistryModule {
    * @param {string} schemaId
    * @returns {Promise<object>}
    */
-  async schemaVerifiersInAllRegistries(schemaId) {
+  async schemaVerifiers(schemaId) {
     return this.parseMapEntries(
       this.parseSchemaVerifiers,
       await this.api.rpc.trustRegistry.schemaVerifiers(schemaId),

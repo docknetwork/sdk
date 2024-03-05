@@ -175,7 +175,7 @@ class DIDModule {
 
   /**
    * Creates a new `did:key:` on the Dock chain.
-   * @param {string} did - The new DID. Can be a full DID or hex identifier
+   * @param {{ ed25519: Uint8Array } | { secp256k1: Uint8Array }} did - The new DID. Can be either `PublicKeyEd25519` or `PublicKeySecp256k1`.
    * @param waitForFinalization
    * @param params
    * @return {Promise<object>} Promise to the pending transaction

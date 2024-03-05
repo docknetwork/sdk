@@ -130,7 +130,7 @@ buildTest('Trust Registry', () => {
     });
   });
 
-  it('Fetches information about all trust registry where given issuer/verifier exists', async () => {
+  it('Fetches information about all trust registries/schemas metadata where given issuer/verifier exists', async () => {
     const schemaId = randomAsHex(32);
     const schemaId2 = randomAsHex(32);
     const trustRegistryId = randomAsHex(32);

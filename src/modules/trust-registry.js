@@ -333,7 +333,7 @@ export default class TrustRegistryModule {
       { nonce, didModule },
     );
 
-    const hexIssuers = new BTreeSet();
+    const hexIssuers = new BTreeSet(this.api.registry, 'Issuer');
     for (const issuer of issuers) {
       hexIssuers.add(typedHexDID(this.api, issuer));
     }
@@ -400,7 +400,7 @@ export default class TrustRegistryModule {
       { nonce, didModule },
     );
 
-    const hexIssuers = new BTreeSet();
+    const hexIssuers = new BTreeSet(this.api.registry, 'Issuer');
     for (const issuer of issuers) {
       hexIssuers.add(typedHexDID(this.api, issuer));
     }

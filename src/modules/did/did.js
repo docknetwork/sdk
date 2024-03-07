@@ -136,7 +136,7 @@ class DIDModule {
    * @return {object} The extrinsic to sign and send.
    */
   createNewOnchainTx(did, didKeys, controllers) {
-    const cnts = new BTreeSet();
+    const cnts = new BTreeSet(this.api.registry, 'Controller');
     if (controllers !== undefined) {
       controllers.forEach((c) => {
         cnts.add(typedHexDID(this.api, c));
@@ -1185,7 +1185,7 @@ class DIDModule {
       nonce = await this.getNextNonceForDid(controllerHexDid);
     }
 
-    const cnts = new BTreeSet();
+    const cnts = new BTreeSet(this.api.registry, 'Controller');
     controllers.forEach((c) => {
       cnts.add(typedHexDID(this.api, c));
     });
@@ -1235,7 +1235,7 @@ class DIDModule {
       nonce = await this.getNextNonceForDid(controllerHexDid);
     }
 
-    const keys = new BTreeSet();
+    const keys = new BTreeSet(this.api.registry, 'DidKey');
     keyIds.forEach((k) => {
       keys.add(k);
     });
@@ -1258,7 +1258,7 @@ class DIDModule {
       nonce = await this.getNextNonceForDid(controllerHexDid);
     }
 
-    const cnts = new BTreeSet();
+    const cnts = new BTreeSet(this.api.registry, 'Controller');
     controllers.forEach((c) => {
       cnts.add(typedHexDID(this.api, c));
     });

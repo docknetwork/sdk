@@ -94,14 +94,14 @@
     "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
   },
   "resolutions": {
-    "@polkadot/api": "9.11.1"
+    "@polkadot/api": "10.11.3"
   },
   "dependencies": {
     "@digitalbazaar/vc-status-list": "^4.0.0",
     "@docknetwork/crypto-wasm-ts": "0.48.0",
     "@docknetwork/node-types": "^0.17.0",
     "@juanelas/base64": "^1.0.5",
-    "@polkadot/api": "9.11.1",
+    "@polkadot/api": "10.11.3",
     "@transmute/json-web-signature": "^0.7.0-unstable.80",
     "base64url": "3.0.1",
     "blake2b": "2.1.4",

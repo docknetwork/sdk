@@ -6,6 +6,7 @@ module.exports = {
   transformIgnorePatterns: [
     '/node_modules/(?!@polkadot|@babel|@digitalbazaar)',
   ],
+  workerIdleMemoryLimit: '1G',
   verbose: true,
   globals: {
     Uint8Array,

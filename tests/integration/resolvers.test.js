@@ -65,6 +65,7 @@ describe('Resolvers', () => {
       statusListCred = await StatusList2021Credential.create(
         ownerKey,
         statusListCredId,
+        dock.api,
       );
       await expect(
         dock.statusListCredential.createStatusListCredential(

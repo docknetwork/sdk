@@ -14,7 +14,6 @@ Like in the Private Delegation tutorial, let's assume a root authority, `did:ex:
 <summary>Boilerplate</summary>
 
 ```js
-import createClient from 'ipfs-http-client';
 import { graphResolver } from '@docknetwork/sdk/crawl.js';
 const { v4: uuidv4 } = require('uuid');
 
@@ -41,8 +40,10 @@ async function setAttestation(did, didKey, iri) { ... }
 // See the DID resolver tutorial For information about implementing a documentLoader.
 const documentLoader = ...;
 
-const ipfsClient = createClient(ipfsUrl);
-const resolveGraph = graphResolver(ipfsClient, documentLoader);
+const { createHelia } = await import('helia');
+const { strings } = await import('@helia/strings');
+const ipfsClient = strings(await createHelia(ipfsUrl));
+const resolveGraph = await graphResolver(ipfsClient, documentLoader);
 ```
 
 </details>

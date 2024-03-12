@@ -7,7 +7,7 @@ import jsonld from 'jsonld';
 import assert from 'assert';
 import deepEqual from 'deep-equal';
 import { deepClone, assertValidNode } from './utils/common';
-import { queryNextLookup, dereferenceFromIPFS, parseRDFDocument } from './utils/rdf';
+import { queryNextLookup, parseRDFDocument } from './utils/rdf';
 import { inferh } from './utils/cd';
 import { canon } from './utils/canonicalize';
 import { Namer, fromJsonldjsCg } from './utils/claimgraph';
@@ -60,11 +60,13 @@ export async function crawl(
 }
 
 // construct a document fetcher for use in the crawler
-export function graphResolver(
+export async function graphResolver(
   ipfsClient,
   documentLoader,
   onFailedLookup = (_term, err) => { throw err; },
 ) {
+  const { CID } = await import('multiformats/cid');
+
   async function resolve(term) {
     assertValidNode(term);
     if (!('Iri' in term)) {
@@ -74,8 +76,8 @@ export function graphResolver(
     let triples;
     const ipfsPrefix = 'ipfs://';
     if (iri.startsWith(ipfsPrefix)) {
-      const cid = iri.slice(ipfsPrefix.length);
-      const body = await dereferenceFromIPFS(cid, ipfsClient);
+      const cid = CID.parse(iri.slice(ipfsPrefix.length));
+      const body = await ipfsClient.get(cid);
       triples = await parseRDFDocument(body, { format: 'text/turtle' });
     } else {
       const jld = (await documentLoader(iri)).document;

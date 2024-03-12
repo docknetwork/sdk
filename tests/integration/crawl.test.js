@@ -1,4 +1,3 @@
-import { create } from 'ipfs-http-client';
 import { newEngine } from '@comunica/actor-init-sparql-rdfjs';
 import { crawl, graphResolver } from '../../src/crawl.js';
 import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from '../../src/rdf-defs.js';
@@ -21,7 +20,7 @@ const ipfs_content = {
 };
 
 async function ipfsAdd(ipfsClient, content) {
-  const { cid } = await ipfsClient.add(content);
+  const cid = await ipfsClient.add(content);
   return `ipfs://${cid.toV1()}`;
 }
 
@@ -31,7 +30,9 @@ describe('Crawler', () => {
   let batt_iri;
 
   beforeAll(async () => {
-    ipfsClient = create(ipfsDefaultConfig);
+    const { createHelia } = await import('helia');
+    const { strings } = await import('@helia/strings');
+    ipfsClient = strings(await createHelia(ipfsDefaultConfig));
 
     rootatt_iri = await ipfsAdd(ipfsClient, ipfs_content.rootatt);
     batt_iri = await ipfsAdd(ipfsClient, ipfs_content.batt);
@@ -79,7 +80,7 @@ describe('Crawler', () => {
     `;
 
     const failedLookups = [];
-    const resolveGraph = graphResolver(
+    const resolveGraph = await graphResolver(
       ipfsClient,
       documentLoader,
       (term, _err) => failedLookups.push(term),
@@ -202,13 +203,13 @@ describe('Crawler', () => {
   });
 
   test('graphResolver', async () => {
-    const resolveGraph = graphResolver(ipfsClient, documentLoader);
+    const resolveGraph = await graphResolver(ipfsClient, documentLoader);
     const initialfacts = await resolveGraph({ Iri: 'did:root' });
     expect(initialfacts).toEqual([
       [
         { Iri: 'did:root' },
         { Iri: 'https://rdf.dock.io/alpha/2021#attestsDocumentContents' },
-        { Iri: 'ipfs://bafybeifrrafsw7gs7mwlzooxejrv6hljun46c7j4zfyc4mep3vn73zbkxa' },
+        { Iri: 'ipfs://bafkreiddpez3cqhuje7j3b3xwuhyydis5lzsihdavxnigejhtpnod6eiha' },
         { Iri: 'did:root' },
       ],
     ]);

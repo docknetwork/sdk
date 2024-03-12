@@ -9,17 +9,22 @@ import {
   DisableStatusListTests,
 } from '../test-constants';
 
-import { createNewDockDID, DidKeypair, typedHexDID } from '../../src/utils/did';
+import {
+  typedHexDID,
+  createNewDockDID,
+  DidKeypair,
+  typedHexDIDFromSubstrate,
+} from '../../src/utils/did';
 import { OneOfPolicy } from '../../src/utils/revocation';
 import { registerNewDIDUsingPair } from './helpers';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
 import StatusList2021Credential from '../../src/status-list-credential/status-list2021-credential';
 
-const expectEqualCreds = (cred1, cred2) => {
+const expectEqualCreds = (cred1, cred2, api) => {
   expect(cred1).toEqual(cred2);
   expect(cred1.toJSON()).toEqual(cred2.toJSON());
-  expect(StatusList2021Credential.fromJSON(cred1.toJSON())).toEqual(
-    StatusList2021Credential.fromJSON(cred2.toJSON()),
+  expect(StatusList2021Credential.fromJSON(cred1.toJSON(), api)).toEqual(
+    StatusList2021Credential.fromJSON(cred2.toJSON(), api),
   );
 };
 const buildTest = DisableStatusListTests ? describe.skip : describe;
@@ -60,7 +65,6 @@ buildTest('StatusListCredential Module', () => {
 
     // Create a status list policy
     owners.add(typedHexDID(dock.api, ownerDID));
-
     policy = new OneOfPolicy(owners);
 
     ownerKey = getKeyDoc(
@@ -103,6 +107,7 @@ buildTest('StatusListCredential Module', () => {
     const cred = await StatusList2021Credential.create(
       ownerKey,
       statusListCredId,
+      dock.api,
     );
     await expect(
       dock.statusListCredential.createStatusListCredential(
@@ -115,7 +120,7 @@ buildTest('StatusListCredential Module', () => {
     const fetchedCred = await dock.statusListCredential.fetchStatusList2021Credential(
       statusListCredId,
     );
-    expectEqualCreds(cred, fetchedCred);
+    expectEqualCreds(cred, fetchedCred, dock.api);
   }, 40000);
 
   test('Can revoke index from a status list credential', async () => {
@@ -138,7 +143,7 @@ buildTest('StatusListCredential Module', () => {
     const fetchedCred = await dock.statusListCredential.fetchStatusList2021Credential(
       statusListCredId,
     );
-    expectEqualCreds(cred, fetchedCred);
+    expectEqualCreds(cred, fetchedCred, dock.api);
     expect(await fetchedCred.revoked(revokeId)).toBe(true);
   }, 40000);
 
@@ -146,14 +151,14 @@ buildTest('StatusListCredential Module', () => {
     const cred = await dock.statusListCredential.fetchStatusList2021Credential(
       statusListCredId,
     );
-    await expect(
+    expect(
       cred.update(ownerKey, { unsuspendIndices: revokeIds }),
     ).rejects.toEqual(
       new Error(
         "Can't unsuspend indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`",
       ),
     );
-    await expect(
+    expect(
       cred.update(ownerKey, { unsuspendIndices: revokeIds }),
     ).rejects.toEqual(
       new Error(
@@ -170,6 +175,7 @@ buildTest('StatusListCredential Module', () => {
       ownerKey,
       statusListCredId,
       { statusPurpose: 'suspension', revokeIndices: revokeIds },
+      dock.api,
     );
     let [update, sig, nonce] = await dock.statusListCredential.createSignedUpdateStatusListCredential(
       statusListCredId,
@@ -186,7 +192,7 @@ buildTest('StatusListCredential Module', () => {
     let fetchedCred = await dock.statusListCredential.fetchStatusList2021Credential(
       statusListCredId,
     );
-    expectEqualCreds(credential, fetchedCred);
+    expectEqualCreds(credential, fetchedCred, dock.api);
     await fetchedCred.update(ownerKey, { unsuspendIndices: revokeIds });
     expect(await fetchedCred.revokedBatch(revokeIds)).toEqual(
       Array.from(revokeIds, () => false),
@@ -238,6 +244,7 @@ buildTest('StatusListCredential Module', () => {
       ownerKey,
       multipleControllerstatusListCredID,
       { statusPurpose: 'suspension' },
+      dock.api,
     );
 
     // Create policy and status list with multiple owners
@@ -265,7 +272,7 @@ buildTest('StatusListCredential Module', () => {
     let hasSecondDID = false;
     [...controllerSet.entries()]
       .flatMap((v) => v)
-      .map((cnt) => typedHexDID(dock.api, cnt))
+      .map((cnt) => typedHexDIDFromSubstrate(dock.api, cnt))
       .forEach((controller) => {
         if (
           controller.toString() === typedHexDID(dock.api, ownerDID).toString()

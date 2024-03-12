@@ -38,6 +38,7 @@ export default class StatusListCredentialModule {
       if (statusListCredential.isStatusList2021Credential) {
         return StatusList2021Credential.fromBytes(
           statusListCredential.asStatusList2021Credential,
+          this.api,
         );
       } else {
         throw new Error(

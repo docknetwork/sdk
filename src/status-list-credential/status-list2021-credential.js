@@ -22,10 +22,6 @@ export default class StatusList2021Credential extends VerifiableCredential {
   constructor(id) {
     super(id);
 
-    if (this.credentialSubject) {
-      this.credentialSubject.littleEndian = true;
-    }
-
     // Caches decoded status list.
     Object.defineProperty(this, 'internalCachedStatusList', {
       value: { encoded: void 0, decoded: void 0 },
@@ -60,6 +56,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
     keyDoc,
     id,
     { statusPurpose = 'revocation', length = 1e4, revokeIndices = [] } = {},
+    api,
   ) {
     const statusList = await createList({ length });
     this.updateStatusList(statusPurpose, statusList, revokeIndices);
@@ -69,7 +66,8 @@ export default class StatusList2021Credential extends VerifiableCredential {
       list: statusList,
       statusPurpose,
     });
-    const cred = this.fromJSON(jsonCred);
+
+    const cred = this.fromJSON(jsonCred, api);
 
     return await cred.sign(keyDoc);
   }
@@ -92,7 +90,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
     const statusList = new StatusList({
       buffer: new Uint8Array((currentStatusList).bitstring.bits),
     });
-    if (!currentStatusList.bitstring.leftToRightIndexing) {
+    if (this.bigEndianEncoding) {
       statusList.bitstring.leftToRightIndexing = false;
     }
 
@@ -126,11 +124,10 @@ export default class StatusList2021Credential extends VerifiableCredential {
     ) {
       return decoded;
     } else {
-      const overrideEncoding = !this.credentialSubject?.littleEndian;
       this.internalCachedStatusList = {
         encoded: this.credentialSubject.encodedList,
         decoded: decodeList(this.credentialSubject).then((list) => {
-          if (overrideEncoding) {
+          if (this.bigEndianEncoding) {
             // eslint-disable-next-line
             list.bitstring.leftToRightIndexing = false;
           }
@@ -174,12 +171,12 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * Decodes `StatusList2021Credential` from provided bytes.
    * @param {Uint8Array} bytes
    */
-  static fromBytes(bytes) {
+  static fromBytes(bytes, api) {
     const gzipBufferCred = Buffer.from(u8aToU8a(bytes));
     const stringifiedCred = ungzip(gzipBufferCred, { to: 'string' });
     const parsedCred = JSON.parse(stringifiedCred);
 
-    return this.fromJSON(parsedCred);
+    return this.fromJSON(parsedCred, api);
   }
 
   /**
@@ -188,9 +185,12 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * @param {object} json
    * @returns {StatusList2021Credential}
    */
-  static fromJSON(json) {
+  static fromJSON(json, api) {
     const cred = super.fromJSON(json);
     cred.validate();
+    if (api.specVersion < 54) {
+      Object.defineProperty(cred, 'bigEndianEncoding', { value: true });
+    }
 
     return cred;
   }

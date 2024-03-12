@@ -1,5 +1,4 @@
 import { u8aToHex, hexToU8a } from '@polkadot/util';
-import { base58btc } from 'multiformats/bases/base58';
 import bs58 from 'bs58';
 import varint from 'varint';
 
@@ -59,7 +58,8 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
    * @param {string} did - fully qualified `did:key:*` string
    * @returns {this}
    */
-  static fromQualifiedString(did) {
+  async static fromQualifiedString(did) {
+    const { base58btc } = await import('multiformats/bases/base58');
     const { id } = parseDIDUrl(did);
 
     const multicodecPubKey = base58btc.decode(id);

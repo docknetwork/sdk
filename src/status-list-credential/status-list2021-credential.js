@@ -3,7 +3,7 @@ import {
   createList,
   createCredential,
   StatusList, // eslint-disable-line
-} from '@digitalbazaar/vc-status-list';
+} from '@digitalcredentials/vc-status-list';
 import { u8aToHex, u8aToU8a } from '@polkadot/util';
 import { gzip, ungzip } from 'pako';
 import { DockStatusList2021Qualifier } from '../utils/vc/constants';
@@ -22,24 +22,10 @@ export default class StatusList2021Credential extends VerifiableCredential {
   constructor(id) {
     super(id);
 
-    let encodedStatusList;
-    let cachedDecodedStatusList;
-
     // Caches decoded status list.
-    Object.defineProperty(this, 'decodedStatusList', {
-      value: function decodedStatusList() {
-        if (
-          encodedStatusList === this.credentialSubject.encodedList
-          && cachedDecodedStatusList !== void 0
-        ) {
-          return cachedDecodedStatusList;
-        } else {
-          cachedDecodedStatusList = decodeList(this.credentialSubject);
-          encodedStatusList = this.credentialSubject.encodedList;
-
-          return cachedDecodedStatusList;
-        }
-      },
+    Object.defineProperty(this, 'internalCachedStatusList', {
+      value: { encoded: void 0, decoded: void 0 },
+      writable: true,
     });
   }
 
@@ -115,6 +101,26 @@ export default class StatusList2021Credential extends VerifiableCredential {
     await this.sign(keyDoc);
 
     return this;
+  }
+
+  /**
+   * Returns a `Promise` resolving to the decoded `StatusList`.
+   *
+   * @returns {Promise<StatusList>}
+   */
+  async decodedStatusList() {
+    const { encoded, decoded } = this.internalCachedStatusList;
+
+    if (
+      encoded === this.credentialSubject.encodedList
+      && decoded !== void 0
+    ) {
+      return decoded;
+    } else {
+      this.internalCachedStatusList = { encoded: this.credentialSubject.encodedList, decoded: decodeList(this.credentialSubject) };
+
+      return this.internalCachedStatusList.decoded;
+    }
   }
 
   /**

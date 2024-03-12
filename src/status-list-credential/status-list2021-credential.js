@@ -22,6 +22,10 @@ export default class StatusList2021Credential extends VerifiableCredential {
   constructor(id) {
     super(id);
 
+    if (this.credentialSubject) {
+      this.credentialSubject.littleEndian = true;
+    }
+
     // Caches decoded status list.
     Object.defineProperty(this, 'internalCachedStatusList', {
       value: { encoded: void 0, decoded: void 0 },
@@ -84,9 +88,14 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * @returns {Promise<this>}
    */
   async update(keyDoc, { revokeIndices = [], unsuspendIndices = [] }) {
+    const currentStatusList = await this.decodeStatusList();
     const statusList = new StatusList({
-      buffer: new Uint8Array((await this.decodedStatusList()).bitstring.bits),
+      buffer: new Uint8Array((currentStatusList).bitstring.bits),
     });
+    if (!currentStatusList.bitstring.leftToRightIndexing) {
+      statusList.bitstring.leftToRightIndexing = false;
+    }
+
     this.constructor.updateStatusList(
       this.credentialSubject.statusPurpose,
       statusList,
@@ -108,7 +117,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
    *
    * @returns {Promise<StatusList>}
    */
-  async decodedStatusList() {
+  async decodeStatusList() {
     const { encoded, decoded } = this.internalCachedStatusList;
 
     if (
@@ -117,7 +126,18 @@ export default class StatusList2021Credential extends VerifiableCredential {
     ) {
       return decoded;
     } else {
-      this.internalCachedStatusList = { encoded: this.credentialSubject.encodedList, decoded: decodeList(this.credentialSubject) };
+      const overrideEncoding = !this.credentialSubject?.littleEndian;
+      this.internalCachedStatusList = {
+        encoded: this.credentialSubject.encodedList,
+        decoded: decodeList(this.credentialSubject).then((list) => {
+          if (overrideEncoding) {
+            // eslint-disable-next-line
+            list.bitstring.leftToRightIndexing = false;
+          }
+
+          return list;
+        }),
+      };
 
       return this.internalCachedStatusList.decoded;
     }
@@ -131,9 +151,9 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * @returns {Promise<boolean>}
    */
   async revoked(index) {
-    const decodedStatusList = await this.decodedStatusList();
+    const decodeStatusList = await this.decodeStatusList();
 
-    return decodedStatusList.getStatus(index);
+    return decodeStatusList.getStatus(index);
   }
 
   /**
@@ -145,9 +165,9 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * @returns {Promise<Array<boolean>>}
    */
   async revokedBatch(indices) {
-    const decodedStatusList = await this.decodedStatusList();
+    const decodeStatusList = await this.decodeStatusList();
 
-    return [...indices].map((index) => decodedStatusList.getStatus(index));
+    return [...indices].map((index) => decodeStatusList.getStatus(index));
   }
 
   /**

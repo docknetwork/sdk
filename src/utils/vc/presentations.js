@@ -19,7 +19,7 @@ import {
   Bls12381BBS23SigDockSigName,
   Bls12381BBSDockVerKeyName,
   Bls12381PSDockVerKeyName,
-  Bls12381BBS23DockVerKeyName, Bls12381BDDT16MacProofDockName, Bls12381BDDT16DockVerKeyName, Bls12381BDDT16MacDockName,
+  Bls12381BBS23DockVerKeyName, Bls12381BDDT16DockVerKeyName, Bls12381BDDT16MacDockName,
 } from './crypto/constants';
 
 import { DEFAULT_CONTEXT_V1_URL } from './constants';

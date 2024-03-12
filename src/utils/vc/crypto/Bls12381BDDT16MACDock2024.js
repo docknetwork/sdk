@@ -9,7 +9,7 @@ import DockCryptoSignature from './common/DockCryptoSignature';
 import Bls12381BDDT16KeyPairDock2024 from './Bls12381BDDT16KeyPairDock2024';
 
 /**
- * A BBS signature suite for use with BLS12-381 Dock key pairs
+ * A BDDT16 signature suite for use with BLS12-381 Dock key pairs
  */
 export default class Bls12381BDDT16MACDock2024 extends DockCryptoSignature {
   /**

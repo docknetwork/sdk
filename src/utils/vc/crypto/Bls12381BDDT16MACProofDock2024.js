@@ -7,7 +7,7 @@ import Bls12381BDDT16KeyPairDock2024 from './Bls12381BDDT16KeyPairDock2024';
 import Bls12381BDDT16MACDock2024 from './Bls12381BDDT16MACDock2024';
 
 /**
- * A BBS+ signature suite for use with derived BBS+ credentials aka BBS+ presentations
+ * A BDDT16 signature suite for use with derived BDDT16 credentials aka BDDT16 presentations
  */
 export default class Bls12381BDDT16MACProofDock2024 extends DockCryptoSignatureProof {
   /**

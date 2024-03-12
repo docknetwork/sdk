@@ -96,7 +96,6 @@ describe.each(Schemes)('Derived Credentials', ({
   let keypair;
   let didDocument;
   let accumKeypair;
-  let accumKvKeypair;
 
   const holder3DID = createNewDockDID();
   // seed used for 3rd holder keys

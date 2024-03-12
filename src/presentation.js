@@ -4,7 +4,7 @@ import {
   isWasmInitialized,
   BBSPublicKey,
   PSPublicKey,
-  PresentationBuilder,
+  PresentationBuilder, flattenObjectToKeyValuesList,
 } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
 import { stringToU8a } from '@polkadot/util';
@@ -18,19 +18,21 @@ import {
   Bls12381BBS23SigDockSigName,
   Bls12381PSSigProofDockSigName,
   Bls12381BBS23SigProofDockSigName,
-  Bls12381BBSSigProofDockSigName,
+  Bls12381BBSSigProofDockSigName, Bls12381BDDT16MacDockName, Bls12381BDDT16MacProofDockName,
 } from './utils/vc/crypto/constants';
 import defaultDocumentLoader from './utils/vc/document-loader';
 import {
   Bls12381BBSSignatureDock2023,
   Bls12381PSSignatureDock2023,
 } from './utils/vc/custom_crypto';
+import Bls12381BDDT16MACDock2024 from './utils/vc/crypto/Bls12381BDDT16MACDock2024';
 
 const SIG_NAME_TO_PROOF_NAME = Object.setPrototypeOf(
   {
     [Bls12381BBSSigDockSigName]: Bls12381BBSSigProofDockSigName,
     [Bls12381BBS23SigDockSigName]: Bls12381BBS23SigProofDockSigName,
     [Bls12381PSSigDockSigName]: Bls12381PSSigProofDockSigName,
+    [Bls12381BDDT16MacDockName]: Bls12381BDDT16MacProofDockName,
   },
   null,
 );
@@ -104,6 +106,8 @@ export default class Presentation {
 
     let Signature;
     let PublicKey;
+    let isKvac = false;
+    let pk;
 
     switch (proof.type) {
       case Bls12381BBSSigDockSigName:
@@ -118,29 +122,49 @@ export default class Presentation {
         Signature = Bls12381PSSignatureDock2023;
         PublicKey = PSPublicKey;
         break;
+      case Bls12381BDDT16MacDockName:
+        Signature = Bls12381BDDT16MACDock2024;
+        PublicKey = undefined;
+        isKvac = true;
+        break;
       default:
         throw new Error(`Invalid proof type ${proof.type}`);
     }
 
-    const keyDocument = await Signature.getVerificationMethod({
-      proof,
-      documentLoader,
-    });
+    if (!isKvac) {
+      const keyDocument = await Signature.getVerificationMethod({
+        proof,
+        documentLoader,
+      });
 
-    const pkRaw = b58.decode(keyDocument.publicKeyBase58);
-    const pk = new PublicKey(pkRaw);
+      const pkRaw = b58.decode(keyDocument.publicKeyBase58);
+      pk = new PublicKey(pkRaw);
+    }
 
     const convertedCredential = Signature.convertCredentialForPresBuilding({ document: json });
     const idx = this.presBuilder.addCredential(convertedCredential, pk);
 
     // Enforce revealing of verificationMethod and type
     // We also require context and type for JSON-LD
-    this.addAttributeToReveal(idx, [
+    const toReveal = [
       'proof.type',
       'proof.verificationMethod',
       '@context',
       'type',
-    ]);
+    ];
+    if (json.issuer !== undefined) {
+      if (typeof json.issuer === 'string') {
+        toReveal.push('issuer');
+      } else if (Array.isArray(json.issuer)) {
+        throw new Error(`"issuer" cant be an array but was ${json.issuer}`);
+      } else if (typeof json.issuer === 'object') {
+        const [names, _] = flattenObjectToKeyValuesList(json.issuer);
+        toReveal.push(...names);
+      } else {
+        throw new Error(`Unexpected value for "issuer" ${json.issuer}`);
+      }
+    }
+    this.addAttributeToReveal(idx, toReveal);
     return idx;
   }
 
@@ -191,6 +215,8 @@ export default class Presentation {
           boundedPseudonyms: presentation.spec.boundedPseudonyms,
           unboundedPseudonyms: presentation.spec.unboundedPseudonyms,
           version: credential.version,
+          // This is the presentation version and not the credential version. Continuing the stupidity by adding presentation version to the credential version so that it can be later retrieved
+          presVersion: presentation.version,
           sigType: credential.sigType,
           bounds: credential.bounds,
         },

@@ -7,7 +7,7 @@ import {
   Accumulator,
   PositiveAccumulator,
   dockAccumulatorParams, AccumulatorPublicKey, deepClone,
-  Encoder,
+  Encoder, BDDT16MacSecretKey, MEM_CHECK_STR,
 } from '@docknetwork/crypto-wasm-ts';
 import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
 import { DockAPI } from '../../../src';
@@ -18,7 +18,7 @@ import {
   Schemes,
 } from '../../test-constants';
 import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
-import { registerNewDIDUsingPair } from '../helpers';
+import { getProofMatcherDoc, registerNewDIDUsingPair } from '../helpers';
 import { getKeyDoc } from '../../../src/utils/vc/helpers';
 import {
   issueCredential,
@@ -29,6 +29,8 @@ import {
 import { DockResolver } from '../../../src/resolver';
 import { createPresentation } from '../../create-presentation';
 import AccumulatorModule from '../../../src/modules/accumulator';
+import { getDelegatedProofsFromVerifiedPresentation } from '../../../src/utils/vc/presentations';
+import { RevocationStatusProtocol } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/types-and-consts';
 
 // TODO: move to fixtures
 const residentCardSchema = {
@@ -94,6 +96,7 @@ describe.each(Schemes)('Derived Credentials', ({
   let keypair;
   let didDocument;
   let accumKeypair;
+  let accumKvKeypair;
 
   const holder3DID = createNewDockDID();
   // seed used for 3rd holder keys
@@ -127,6 +130,13 @@ describe.each(Schemes)('Derived Credentials', ({
   const accumState = new InMemoryState();
   let accumMember;
 
+  async function checkQueriedAccum(accumId, accumulator) {
+    const accumulated = u8aToHex(accumulator.accumulated);
+    await dock.accumulatorModule.addPositiveAccumulator(accumId, accumulated, [did1, 1], did1, pair1, { didModule: dock.didModule }, false);
+    const queriedAccum = await dock.accumulatorModule.getAccumulator(accumId, false);
+    expect(queriedAccum.accumulated).toEqual(u8aToHex(accumulator.accumulated));
+  }
+
   beforeAll(async () => {
     await initializeWasm();
     await dock.init({
@@ -145,21 +155,27 @@ describe.each(Schemes)('Derived Credentials', ({
       controller: did1, msgCount: 100,
     });
 
-    const pk1 = Module.prepareAddPublicKey(dock.api, u8aToHex(keypair.publicKeyBuffer));
-    await chainModule.addPublicKey(
-      pk1,
-      did1,
-      did1,
-      pair1,
-      { didModule: dock.did },
-      false,
-    );
+    if (Name !== 'BDDT16') {
+      const pk1 = Module.prepareAddPublicKey(dock.api, u8aToHex(keypair.publicKeyBuffer));
+      await chainModule.addPublicKey(
+        pk1,
+        did1,
+        did1,
+        pair1,
+        { didModule: dock.did },
+        false,
+      );
 
-    didDocument = await dock.did.getDocument(did1);
-    const { publicKey } = didDocument;
-    expect(publicKey.length).toEqual(2);
-    expect(publicKey[1].type).toEqual(VerKey);
-    keypair.id = publicKey[1].id;
+      didDocument = await dock.did.getDocument(did1);
+      const { publicKey } = didDocument;
+      expect(publicKey.length).toEqual(2);
+      expect(publicKey[1].type).toEqual(VerKey);
+      keypair.id = publicKey[1].id;
+    } else {
+      // For KVAC, the public doesn't need to published as its not used in credential or presentation verification (except issuers).
+      // But the signer still adds a key identifier in the credential to determine which key will be used for verification
+      keypair.id = 'my-key-id';
+    }
 
     // Register holder DID with sr25519 key
     await registerNewDIDUsingPair(
@@ -190,10 +206,8 @@ describe.each(Schemes)('Derived Credentials', ({
     accumMember = '10';
     await accumulator.addBatch(members, accumKeypair.secretKey, accumState);
 
-    const accumulated = u8aToHex(accumulator.accumulated);
-    await dock.accumulatorModule.addPositiveAccumulator(accumulatorId, accumulated, [did1, 1], did1, pair1, { didModule: dock.didModule }, false);
-    const queriedAccum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
-    expect(queriedAccum.accumulated).toEqual(u8aToHex(accumulator.accumulated));
+    await checkQueriedAccum(accumulatorId, accumulator);
+
   }, 30000);
 
   async function createAndVerifyPresentation(credentials, verifyOptions = {}) {
@@ -207,6 +221,17 @@ describe.each(Schemes)('Derived Credentials', ({
     const chal = randomAsHex(32);
     const domain = 'test domain';
     const presentation = createPresentation(credentials, presId);
+
+    const reconstructedPres = derivedToAnoncredsPresentation(presentation.verifiableCredential[0]);
+    const delegatedProofs = getDelegatedProofsFromVerifiedPresentation(reconstructedPres);
+    const isKvac = Name === 'BDDT16';
+    // Delegated proofs only exist for KVAC
+    expect(delegatedProofs.size).toEqual(isKvac ? 1 : 0);
+    if (isKvac) {
+      const sk = new BDDT16MacSecretKey(keypair.privateKeyBuffer);
+      // eslint-disable-next-line jest/no-conditional-expect
+      expect(delegatedProofs.get(0)?.credential?.proof.verify(sk).verified).toEqual(true);
+    }
 
     expect(presentation).toMatchObject(
       // NOTE: json parse+stringify to remove any undefined properties
@@ -268,6 +293,10 @@ describe.each(Schemes)('Derived Credentials', ({
 
     // Create W3C credential
     const credential = await issueCredential(issuerKey, unsignedCred);
+    const result = await verifyCredential(credential, { resolver });
+    expect(result).toMatchObject(
+      expect.objectContaining(getProofMatcherDoc()),
+    );
 
     // Begin to derive a credential from the above issued one
     const presentationInstance = new Presentation();
@@ -355,6 +384,15 @@ describe.each(Schemes)('Derived Credentials', ({
     });
     expect(credentialResult1.verified).toBe(false);
 
+    const delegatedProofs = getDelegatedProofsFromVerifiedPresentation(reconstructedPres);
+    const isKvac = Name === 'BDDT16';
+    // Delegated proofs only exist for KVAC
+    expect(delegatedProofs.size).toEqual(isKvac ? 1 : 0);
+    if (isKvac) {
+      const sk = new BDDT16MacSecretKey(keypair.privateKeyBuffer);
+      // eslint-disable-next-line jest/no-conditional-expect
+      expect(delegatedProofs.get(0)?.credential?.proof.verify(sk).verified).toEqual(true);
+    }
     // Create a VP and verify it from this credential
     await createAndVerifyPresentation(credentials);
   }, 30000);
@@ -371,8 +409,8 @@ describe.each(Schemes)('Derived Credentials', ({
 
     const credentialStatus = {
       id: `dock:accumulator:${accumulatorId}`,
-      type: 'DockVBAccumulator2022',
-      revocationCheck: 'membership',
+      type: RevocationStatusProtocol.Vb22,
+      revocationCheck: MEM_CHECK_STR,
       revocationId: accumMember,
     };
 
@@ -468,7 +506,7 @@ describe.each(Schemes)('Derived Credentials', ({
       'credentialSubject.type.1',
     ]);
 
-    // Enforce LPR number to be between values aswell as revealed
+    // Enforce LPR number to be between values as well as revealed
     // NOTE: unlike other tests, we cannot "reveal" this value and enforce bounds at the same time!
     presentationInstance.presBuilder.enforceBounds(
       idx,
@@ -498,19 +536,19 @@ describe.each(Schemes)('Derived Credentials', ({
     expect(credentials[0].proof).toBeDefined();
     expect(credentials[0].proof.bounds).toBeDefined();
     expect(credentials[0].proof.bounds).toEqual({
-      issuanceDate: {
+      issuanceDate: [{
         min: 1569888000000,
         max: 1577836800000,
         paramId: 'provingKeyId',
         protocol: 'LegoGroth16',
-      },
+      }],
       credentialSubject: {
-        lprNumber: {
+        lprNumber: [{
           min: 1233,
           max: 1235,
           paramId: 'provingKeyId',
           protocol: 'LegoGroth16',
-        },
+        }],
       },
     });
     expect(credentials[0]).toHaveProperty('credentialSubject');

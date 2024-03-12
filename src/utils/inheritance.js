@@ -34,20 +34,21 @@ export function withExtendedStaticProperties(properties, parentClass) {
     Object.defineProperty(extendedClass, property, {
       get() {
         const value = this[propertySymbol];
-        if (value == null) {
-          throw new Error(
-            `Static property \`${property}\` of \`${this.name}\` isn't extended properly`,
-          );
-        }
+        // if (value == null) {
+        //   throw new Error(
+        //     `Static property \`${property}\` of \`${this.name}\` isn't extended properly`,
+        //   );
+        // }
 
         return value;
       },
       set(newValue) {
-        if (newValue == null) {
+        /*if (newValue == null) {
           throw new Error(
             `Attempt to set \`null\`ish value to the property \`${property}\` of \`${this.name}\``,
           );
-        } else if (this[propertySymbol] != null) {
+        } else */
+        if (this[propertySymbol] != null) {
           throw new Error(
             `Can't override the property \`${property}\` of \`${this.name}\``,
           );

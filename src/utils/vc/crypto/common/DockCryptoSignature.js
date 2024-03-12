@@ -488,6 +488,7 @@ export default withExtendedStaticProperties(
      */
     static signerFactory(keypair, verificationMethod) {
       const { KeyPair } = this;
+      const paramGetter = this.paramGenerator();
 
       return {
         id: verificationMethod,
@@ -497,7 +498,7 @@ export default withExtendedStaticProperties(
           }
 
           const msgCount = data.length;
-          const sigParams = KeyPair.SignatureParams.getSigParamsOfRequiredSize(
+          const sigParams = paramGetter(
             msgCount,
             KeyPair.defaultLabelBytes,
           );
@@ -509,6 +510,10 @@ export default withExtendedStaticProperties(
           return signature.value;
         },
       };
+    }
+
+    static paramGenerator() {
+      return this.KeyPair.SignatureParams.getSigParamsOfRequiredSize;
     }
 
     ensureSuiteContext() {

@@ -71,10 +71,11 @@ export default withExtendedStaticProperties(
         });
         const recreatedPres = Presentation.fromJSON(presentationJSON);
 
-        const pks = [verificationMethod].map((keyDocument) => {
+        // NOTE: Another example that this credential derivation doesn't work for presentation with more than 1 credential
+        const pks = verificationMethod !== undefined ? [verificationMethod].map((keyDocument) => {
           const pkRaw = b58.decode(keyDocument.publicKeyBase58);
           return new this.constructor.Signature.KeyPair.PublicKey(pkRaw);
-        });
+        }) : [];
 
         const {
           accumulatorPublicKeys, predicateParams,
@@ -102,7 +103,6 @@ export default withExtendedStaticProperties(
         type,
         credentialSchema,
         credentialStatus,
-        issuer: _issuer,
         issuanceDate: _issuanceDate,
         proof,
         ...revealedAttributes
@@ -133,7 +133,7 @@ export default withExtendedStaticProperties(
         c.status = credentialStatus;
       }
       return {
-        version: proof.version,
+        version: proof.presVersion,
         nonce: proof.nonce,
         context: proof.context,
         spec: {

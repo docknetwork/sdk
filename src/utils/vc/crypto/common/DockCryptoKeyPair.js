@@ -37,7 +37,7 @@ export default withExtendedStaticProperties(
       return new this(options);
     }
 
-    static paramGenerator() {
+    static get paramGenerator() {
       return this.SignatureParams.getSigParamsOfRequiredSize;
     }
 
@@ -56,7 +56,7 @@ export default withExtendedStaticProperties(
     } = {}) {
       const keypair = this.KeyPair.generate(
         params
-          || this.paramGenerator()(
+          || this.paramGenerator(
             msgCount,
             this.defaultLabelBytes,
           ),
@@ -95,7 +95,7 @@ export default withExtendedStaticProperties(
       return {
         async sign({ data }) {
           const msgCount = data.length;
-          const sigParams = keypairClass.paramGenerator()(
+          const sigParams = keypairClass.paramGenerator(
             msgCount,
             defaultLabelBytes,
           );
@@ -138,7 +138,7 @@ export default withExtendedStaticProperties(
       return {
         async verify({ data, signature: rawSignature }) {
           const msgCount = data.length;
-          const sigParams = keypairClass.paramGenerator()(
+          const sigParams = keypairClass.paramGenerator(
             msgCount,
             defaultLabelBytes,
           );

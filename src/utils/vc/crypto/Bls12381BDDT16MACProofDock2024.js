@@ -23,10 +23,13 @@ export default class Bls12381BDDT16MACProofDock2024 extends DockCryptoSignatureP
     );
   }
 
-  async getVerificationMethod(_) {
-    // Public key isn't used for verifying KVACs
-    return Promise.resolve(undefined);
-  }
+  /**
+   *
+   * @param _
+   * @returns {Promise<void>} - Public key isn't used for verifying KVACs
+   */
+  // eslint-disable-next-line no-empty-function
+  async getVerificationMethod(_) {}
 }
 
 Bls12381BDDT16MACProofDock2024.Signature = Bls12381BDDT16MACDock2024;

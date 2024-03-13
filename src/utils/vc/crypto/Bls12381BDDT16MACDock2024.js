@@ -33,7 +33,7 @@ export default class Bls12381BDDT16MACDock2024 extends DockCryptoSignature {
     );
   }
 
-  static paramGenerator() {
+  static get paramGenerator() {
     return this.KeyPair.SignatureParams.getMacParamsOfRequiredSize;
   }
 }

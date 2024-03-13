@@ -11,7 +11,7 @@ export default class Bls12381BDDT16KeyPairDock2024 extends DockCryptoKeyPair {
     super(options, Bls12381BDDT16DockVerKeyName);
   }
 
-  static paramGenerator() {
+  static get paramGenerator() {
     return this.SignatureParams.getMacParamsOfRequiredSize;
   }
 }

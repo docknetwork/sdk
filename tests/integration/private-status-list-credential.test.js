@@ -82,7 +82,7 @@ describe('PrivateStatusList2021Credential', () => {
       issuerKey,
       statusListCredentialId,
       { statusPurpose: 'suspension' },
-      dock.api,
+      dockAPI.api,
     );
   }, 60000);
 

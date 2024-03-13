@@ -59,6 +59,9 @@ export default class StatusList2021Credential extends VerifiableCredential {
     api,
   ) {
     const statusList = await createList({ length });
+    if (api.specVersion < 54) {
+      statusList.bitstring.leftToRightIndexing = false;
+    }
     this.updateStatusList(statusPurpose, statusList, revokeIndices);
 
     const jsonCred = await createCredential({

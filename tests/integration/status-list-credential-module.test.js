@@ -151,14 +151,14 @@ buildTest('StatusListCredential Module', () => {
     const cred = await dock.statusListCredential.fetchStatusList2021Credential(
       statusListCredId,
     );
-    expect(
+    await expect(
       cred.update(ownerKey, { unsuspendIndices: revokeIds }),
     ).rejects.toEqual(
       new Error(
         "Can't unsuspend indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`",
       ),
     );
-    expect(
+    await expect(
       cred.update(ownerKey, { unsuspendIndices: revokeIds }),
     ).rejects.toEqual(
       new Error(

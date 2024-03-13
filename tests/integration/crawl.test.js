@@ -80,7 +80,7 @@ describe('Crawler', () => {
     `;
 
     const failedLookups = [];
-    const resolveGraph = await graphResolver(
+    const resolveGraph = graphResolver(
       ipfsClient,
       documentLoader,
       (term, _err) => failedLookups.push(term),
@@ -203,7 +203,7 @@ describe('Crawler', () => {
   });
 
   test('graphResolver', async () => {
-    const resolveGraph = await graphResolver(ipfsClient, documentLoader);
+    const resolveGraph = graphResolver(ipfsClient, documentLoader);
     const initialfacts = await resolveGraph({ Iri: 'did:root' });
     expect(initialfacts).toEqual([
       [

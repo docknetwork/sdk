@@ -61,7 +61,7 @@ export async function crawl(
 }
 
 // construct a document fetcher for use in the crawler
-export async function graphResolver(
+export function graphResolver(
   ipfsClient,
   documentLoader,
   onFailedLookup = (_term, err) => { throw err; },

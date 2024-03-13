@@ -43,7 +43,7 @@ const documentLoader = ...;
 const { createHelia } = await import('helia');
 const { strings } = await import('@helia/strings');
 const ipfsClient = strings(await createHelia(ipfsUrl));
-const resolveGraph = await graphResolver(ipfsClient, documentLoader);
+const resolveGraph = graphResolver(ipfsClient, documentLoader);
 ```
 
 </details>

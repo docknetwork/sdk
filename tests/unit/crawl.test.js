@@ -66,7 +66,7 @@ describe('Crawler unit tests', () => {
       ],
       // did:c makes no attestations
     };
-    const resolveGraph = await graphResolver(supergraph);
+    const resolveGraph = graphResolver(supergraph);
 
     const initialFacts = await resolveGraph({ Iri: 'did:root' });
     const allFacts = await crawl(initialFacts, RULES, CURIOSITY, resolveGraph, newEngine());

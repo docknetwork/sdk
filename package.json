@@ -44,7 +44,6 @@
     "jest-environment-node": "^29.7.0",
     "jsdoc": "^3.6.3",
     "jsdoc-typeof-plugin": "^1.0.0",
-    "multiformats": "^13.1.0",
     "parity-scale-codec": "^0.5.3",
     "r1csfile": "0.0.41",
     "ramda": "^0.27.2",
@@ -121,6 +120,7 @@
     "jsonschema": "1.4.1",
     "key-did-resolver": "^1.4.0",
     "mrklt": "^0.2.0",
+    "multiformats": "^9.5.4",
     "n3": "1.16.2",
     "pako": "^2.1.0",
     "rify": "^0.7.1"

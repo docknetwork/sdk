@@ -12,8 +12,7 @@ import {
 import {
   typedHexDID,
   createNewDockDID,
-  DidKeypair,
-  typedHexDIDFromSubstrate,
+  DidKeypair
 } from '../../src/utils/did';
 import { OneOfPolicy } from '../../src/utils/revocation';
 import { registerNewDIDUsingPair } from './helpers';
@@ -107,6 +106,7 @@ buildTest('StatusListCredential Module', () => {
     const cred = await StatusList2021Credential.create(
       ownerKey,
       statusListCredId,
+      {},
       dock.api,
     );
     await expect(
@@ -272,7 +272,7 @@ buildTest('StatusListCredential Module', () => {
     let hasSecondDID = false;
     [...controllerSet.entries()]
       .flatMap((v) => v)
-      .map((cnt) => typedHexDIDFromSubstrate(dock.api, cnt))
+      .map((cnt) => typedHexDID(dock.api, cnt))
       .forEach((controller) => {
         if (
           controller.toString() === typedHexDID(dock.api, ownerDID).toString()

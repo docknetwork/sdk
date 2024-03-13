@@ -1,18 +1,18 @@
 import { StatusList2021Credential } from "../src";
 import { withDockAPI } from "./helpers";
 
-const { FullNodeEndpoint } = process.env;
+const { FullNodeEndpoint, ShowEmpty } = process.env;
 
 async function main(dock) {
   console.log("Revoked:");
 
-  for (const [
-    id,
-    unparsedCredential,
-  ] of await dock.api.query.statusListCredential.statusListCredentials.entries()) {
+  const statusListCreds =
+    await dock.api.query.statusListCredential.statusListCredentials.entries();
+  for (const [id, unparsedCredential] of statusListCreds) {
     const credential = StatusList2021Credential.fromBytes(
       unparsedCredential.unwrap().statusListCredential
-        .asStatusList2021Credential
+        .asStatusList2021Credential,
+      dock.api
     );
     const decoded = await credential.decodeStatusList();
     const revoked = await credential.revokedBatch(
@@ -23,8 +23,8 @@ async function main(dock) {
       .map((revoked, idx) => (revoked ? idx : null))
       .filter((v) => v != null);
 
-    if (toShow.length !== 0) {
-      console.log(id.toHuman()[0], ":", toShow.join(", "));
+    if (toShow.length || ShowEmpty) {
+      console.log(id.toHuman()[0], ":", toShow.join(", ") || "-");
     }
   }
 }

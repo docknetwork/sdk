@@ -10,10 +10,12 @@ function createSecp256k1Keypair(privateKeyHex) {
   kp.pk = pk;
   return kp;
 }
+
 const docToKeyMap = {
   Sr25519VerificationKey2020: 'sr25519',
   Ed25519VerificationKey2018: 'ed25519',
 };
+
 export function keyDocToKeypair(keyDoc, dock) {
   // For now we expect multibase to just be b58, this needs fixing later if/when we support more keys
   const {

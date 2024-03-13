@@ -152,6 +152,7 @@ export default class Presentation {
       '@context',
       'type',
     ];
+    // If the issuer field is defined in the credential, reveal it.
     if (json.issuer !== undefined) {
       if (typeof json.issuer === 'string') {
         toReveal.push('issuer');

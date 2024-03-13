@@ -4,7 +4,7 @@ import {
   Accumulator, AccumulatorParams,
   AccumulatorPublicKey,
   PositiveAccumulator,
-  WitnessUpdatePublicInfo,
+  VBWitnessUpdatePublicInfo,
 } from '@docknetwork/crypto-wasm-ts';
 import { randomAsHex } from '@polkadot/util-crypto';
 import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
@@ -112,7 +112,7 @@ describe('Prefilled positive accumulator', () => {
     expect(verifAccumulator.verifyMembershipWitness(member2, witness2, accumPk, accumParams)).toEqual(true);
 
     // Manager decides to remove a member, the new accumulated value will be published along with witness update info
-    const witnessUpdInfo = WitnessUpdatePublicInfo.new(accumulator.accumulated, [], [member2], keypair.secretKey);
+    const witnessUpdInfo = VBWitnessUpdatePublicInfo.new(accumulator.accumulated, [], [member2], keypair.secretKey);
     await accumulator.remove(member2, keypair.secretKey, accumState);
 
     let accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
@@ -148,7 +148,7 @@ describe('Prefilled positive accumulator', () => {
         removals.push(hexToU8a(a));
       }
     }
-    const queriedWitnessInfo = new WitnessUpdatePublicInfo(hexToU8a(updates[0].witnessUpdateInfo));
+    const queriedWitnessInfo = new VBWitnessUpdatePublicInfo(hexToU8a(updates[0].witnessUpdateInfo));
 
     witness1.updateUsingPublicInfoPostBatchUpdate(member1, additions, removals, queriedWitnessInfo);
     expect(verifAccumulator.verifyMembershipWitness(member1, witness1, accumPk, accumParams)).toEqual(true);

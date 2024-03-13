@@ -19,7 +19,7 @@ import {
   Bls12381BBS23SigDockSigName,
   Bls12381BBSDockVerKeyName,
   Bls12381PSDockVerKeyName,
-  Bls12381BBS23DockVerKeyName,
+  Bls12381BBS23DockVerKeyName, Bls12381BDDT16DockVerKeyName, Bls12381BDDT16MacDockName,
 } from './crypto/constants';
 
 import { DEFAULT_CONTEXT_V1_URL } from './constants';
@@ -272,6 +272,12 @@ export function isAnoncreds(presentation) {
   );
 }
 
+/**
+ * Verify an anoncreds presentation given in JSON format
+ * @param presentation - object
+ * @param options - Any accumulator public keys, predicate params, etc required to verify the presentation.
+ * @returns {Promise<VerifyResult>}
+ */
 export async function verifyAnoncreds(presentation, options = {}) {
   const documentLoader = options.documentLoader || defaultDocumentLoader(options.resolver);
   const {
@@ -299,6 +305,8 @@ export async function verifyAnoncreds(presentation, options = {}) {
         case Bls12381PSSigDockSigName:
           sigClass = Bls12381PSSignatureDock2023;
           break;
+        case Bls12381BDDT16MacDockName:
+          return { type: Bls12381BDDT16DockVerKeyName };
         default:
           throw new Error(`Invalid proof type ${proof.type}`);
       }
@@ -308,28 +316,46 @@ export async function verifyAnoncreds(presentation, options = {}) {
   );
 
   const recreatedPres = Presentation.fromJSON(presentation);
-  const pks = keyDocuments.map((keyDocument) => {
-    const pkRaw = b58.decode(keyDocument.publicKeyBase58);
+  const pks = new Map();
 
+  keyDocuments.forEach((keyDocument, i) => {
     if (!keyDocument.type) {
       throw new Error(`No type provided for key document ${JSON.stringify(keyDocument)}`);
     }
+
     // Question: Why would keyDocument.type start with `did:`
     const keyType = keyDocument.type.startsWith('did:') ? keyDocument.type.slice(4) : keyDocument.type;
+    let Cls;
 
     switch (keyType) {
       case Bls12381BBSDockVerKeyName:
-        return new BBSPlusPublicKeyG2(pkRaw);
+        Cls = BBSPlusPublicKeyG2;
+        break;
       case Bls12381BBS23DockVerKeyName:
-        return new BBSPublicKey(pkRaw);
+        Cls = BBSPublicKey;
+        break;
       case Bls12381PSDockVerKeyName:
-        return new PSPublicKey(pkRaw);
+        Cls = PSPublicKey;
+        break;
+      case Bls12381BDDT16DockVerKeyName:
+        return;
       default:
         throw new Error(`Invalid key document type: ${keyType}`);
     }
+
+    const pkRaw = b58.decode(keyDocument.publicKeyBase58);
+    pks.set(i, new Cls(pkRaw));
   });
 
   return recreatedPres.verify(pks, accumulatorPublicKeys, predicateParams, circomOutputs, blindedAttributesCircomOutputs);
+}
+
+export function getDelegatedProofsFromVerifiedPresentation(presentation) {
+  if (!isAnoncreds(presentation)) {
+    throw new Error('Only anoncreds presentation supported');
+  }
+  const presObject = Presentation.fromJSON(presentation);
+  return presObject.getDelegatedProofs();
 }
 
 /**

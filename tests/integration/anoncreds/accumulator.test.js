@@ -3,7 +3,7 @@ import {
   initializeWasm,
   Accumulator,
   PositiveAccumulator,
-  WitnessUpdatePublicInfo,
+  VBWitnessUpdatePublicInfo,
   AccumulatorParams,
 } from '@docknetwork/crypto-wasm-ts';
 import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
@@ -330,7 +330,7 @@ describe('Accumulator Module', () => {
     const additions1 = [u8aToHex(member2), u8aToHex(member3)];
     const removals1 = [u8aToHex(member1)];
     const witUpd1 = u8aToHex(
-      WitnessUpdatePublicInfo.new(
+      VBWitnessUpdatePublicInfo.new(
         hexToU8a(accumulated2),
         [member2, member3],
         [member1],
@@ -362,7 +362,7 @@ describe('Accumulator Module', () => {
     const accumulated4 = u8aToHex(accumulator.accumulated);
     const additions2 = [u8aToHex(member4), u8aToHex(member5)];
     const witUpd2 = u8aToHex(
-      WitnessUpdatePublicInfo.new(
+      VBWitnessUpdatePublicInfo.new(
         hexToU8a(accumulated3),
         [member4, member5],
         [],
@@ -387,7 +387,7 @@ describe('Accumulator Module', () => {
     const accumulated5 = u8aToHex(accumulator.accumulated);
     const removals3 = [u8aToHex(member2), u8aToHex(member4)];
     const witUpd3 = u8aToHex(
-      WitnessUpdatePublicInfo.new(
+      VBWitnessUpdatePublicInfo.new(
         hexToU8a(accumulated4),
         [],
         [member2, member4],

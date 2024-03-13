@@ -71,10 +71,11 @@ export default withExtendedStaticProperties(
         });
         const recreatedPres = Presentation.fromJSON(presentationJSON);
 
-        const pks = [verificationMethod].map((keyDocument) => {
+        // NOTE: Another example that this credential derivation doesn't work for presentation with more than 1 credential
+        const pks = verificationMethod !== undefined ? [verificationMethod].map((keyDocument) => {
           const pkRaw = b58.decode(keyDocument.publicKeyBase58);
           return new this.constructor.Signature.KeyPair.PublicKey(pkRaw);
-        });
+        }) : [];
 
         const {
           accumulatorPublicKeys, predicateParams,
@@ -102,11 +103,18 @@ export default withExtendedStaticProperties(
         type,
         credentialSchema,
         credentialStatus,
-        issuer: _issuer,
+        // issuance date isn't revealed in presentations but for W3C style credential or for the frontend, it needs to be
+        // present in the derived credential. Popping it out so that it doesn't end up in `revealedAttributes`. Note that this
+        // can be a problem when `issuanceDate` is actually revealed which is rare but a possibility
         issuanceDate: _issuanceDate,
         proof,
         ...revealedAttributes
       } = document;
+
+      // Old prover don't reveal the issuer so remove this field from the revealed attributes
+      if (proof.presVersion === undefined) {
+        delete revealedAttributes.issuer;
+      }
 
       // ID wasnt revealed but placeholder was used to conform to W3C spec, trim it
       if (revealedAttributes.id === DOCK_ANON_CREDENTIAL_ID) {
@@ -133,7 +141,10 @@ export default withExtendedStaticProperties(
         c.status = credentialStatus;
       }
       return {
-        version: proof.version,
+        // Old credentials incorrectly set the presentation version as credential version which was fine because coincidentally
+        // both versions were same. Correcting this mistake now. Once all dependents have upgraded and old presentations don't
+        // need to be supported, `proof.presVersion` should be used.
+        version: proof.presVersion !== undefined ? proof.presVersion : proof.version,
         nonce: proof.nonce,
         context: proof.context,
         spec: {

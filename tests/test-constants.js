@@ -14,9 +14,10 @@ import {
   PSSignatureParams,
   PSSignature,
   BBSSignature,
-  BBSPlusSignatureG1,
+  BBSPlusSignatureG1, BDDT16KeypairG1,
 } from '@docknetwork/crypto-wasm-ts';
 import dotenv from 'dotenv';
+import { BDDT16Mac, BDDT16MacParams } from '@docknetwork/crypto-wasm-ts/lib/bddt16-mac';
 import BBSModule from '../src/modules/bbs';
 import BBSPlusModule from '../src/modules/bbs-plus';
 import PSModule from '../src/modules/ps';
@@ -27,6 +28,8 @@ import Bls12381BBSSignatureProofDock2022 from '../src/utils/vc/crypto/Bls12381BB
 import Bls12381BBSKeyPairDock2023 from '../src/utils/vc/crypto/Bls12381BBSKeyPairDock2023';
 import Bls12381G2KeyPairDock2022 from '../src/utils/vc/crypto/Bls12381G2KeyPairDock2022';
 import Bls12381PSKeyPairDock2023 from '../src/utils/vc/crypto/Bls12381PSKeyPairDock2023';
+import Bls12381BDDT16KeyPairDock2024 from '../src/utils/vc/crypto/Bls12381BDDT16KeyPairDock2024';
+import Bls12381BDDT16MACProofDock2024 from '../src/utils/vc/crypto/Bls12381BDDT16MACProofDock2024';
 
 dotenv.config();
 const DefaultFullNodeEndpoint = 'ws://localhost:9944';
@@ -36,7 +39,7 @@ const DefaultTestAccountURI = '//Alice';
 const DefaultTestAccountCouncilMemberURI = '//Charlie';
 const DefaultMinGasPrice = 50;
 const DefaultMaxGas = 429496729;
-const DefaultTestSchemes = 'BBS,BBSPlus,PS';
+const DefaultTestSchemes = 'BBS,BBSPlus,PS,BDDT16';
 
 const boolEnv = (value) => value === 'true' || !!+value;
 
@@ -87,7 +90,8 @@ export const BBS = {
   Module: BBSModule,
   PublicKey: BBSPublicKey,
   Presentation,
-  buildStatement: Statement.bbsSignature,
+  buildProverStatement: Statement.bbsSignatureProver,
+  buildVerifierStatement: Statement.bbsSignatureVerifier,
   buildWitness: Witness.bbsSignature,
   getModule: (dock) => dock.bbs,
   SignatureParams: BBSSignatureParams,
@@ -110,7 +114,8 @@ export const BBSPlus = {
   Module: BBSPlusModule,
   PublicKey: BBSPlusPublicKeyG2,
   Presentation,
-  buildStatement: Statement.bbsPlusSignature,
+  buildProverStatement: Statement.bbsPlusSignatureProver,
+  buildVerifierStatement: Statement.bbsPlusSignatureVerifier,
   buildWitness: Witness.bbsPlusSignature,
   getModule: (dock) => dock.bbsPlus,
   SignatureParams: BBSPlusSignatureParamsG1,
@@ -133,7 +138,8 @@ export const PS = {
   Module: PSModule,
   PublicKey: PSPublicKey,
   Presentation,
-  buildStatement: Statement.psSignature,
+  buildProverStatement: Statement.psSignature,
+  buildVerifierStatement: Statement.psSignature,
   buildWitness: Witness.psSignature,
   getModule: (dock) => dock.ps,
   SignatureParams: PSSignatureParams,
@@ -151,7 +157,35 @@ export const PS = {
   getPublicKeyWithParamsByStorageKey: (api, storageKey) => api.rpc.core_mods.psPublicKeyWithParams(storageKey),
   getPublicKeysByDid: (api, did) => api.rpc.core_mods.psPublicKeysByDid(did.asDid),
 };
-export const AllSchemes = Object.setPrototypeOf({ BBS, BBSPlus, PS }, null);
+
+export const BDDT16 = {
+  Name: 'BDDT16',
+  Module: undefined,
+  PublicKey: undefined,
+  Presentation,
+  buildProverStatement: Statement.bddt16Mac,
+  buildVerifierStatement: Statement.bddt16Mac,
+  buildWitness: Witness.bddt16Mac,
+  getModule: (_) => undefined,
+  SignatureParams: BDDT16MacParams,
+  Signature: BDDT16Mac,
+  KeyPair: BDDT16KeypairG1,
+  CryptoKeyPair: Bls12381BDDT16KeyPairDock2024,
+  derivedToAnoncredsPresentation:
+    Bls12381BDDT16MACProofDock2024.derivedToAnoncredsPresentation.bind(
+      Bls12381BDDT16MACProofDock2024,
+    ),
+  SigType: 'Bls12381BDDT16MACDock2024',
+  Context: 'https://ld.dock.io/security/bddt16/v1',
+  VerKey: undefined,
+  getParamsByDid: (_, __) => undefined,
+  getPublicKeyWithParamsByStorageKey: (_, __) => undefined,
+  getPublicKeysByDid: (_, __) => undefined,
+};
+
+export const AllSchemes = Object.setPrototypeOf({
+  BBS, BBSPlus, PS, BDDT16,
+}, null);
 
 export const Schemes = TestSchemes.split(',').map((key) => {
   if (AllSchemes[key] == null) {

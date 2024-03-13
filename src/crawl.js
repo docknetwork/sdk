@@ -6,6 +6,7 @@ no-constant-condition: ["error", { "checkLoops": false }]
 import jsonld from 'jsonld';
 import assert from 'assert';
 import deepEqual from 'deep-equal';
+import { CID } from 'multiformats/cid';
 import { deepClone, assertValidNode } from './utils/common';
 import { queryNextLookup, parseRDFDocument } from './utils/rdf';
 import { inferh } from './utils/cd';
@@ -65,8 +66,6 @@ export async function graphResolver(
   documentLoader,
   onFailedLookup = (_term, err) => { throw err; },
 ) {
-  const { CID } = await import('multiformats/cid');
-
   async function resolve(term) {
     assertValidNode(term);
     if (!('Iri' in term)) {

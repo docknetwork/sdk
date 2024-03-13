@@ -12,7 +12,7 @@ import {
 import {
   typedHexDID,
   createNewDockDID,
-  DidKeypair
+  DidKeypair,
 } from '../../src/utils/did';
 import { OneOfPolicy } from '../../src/utils/revocation';
 import { registerNewDIDUsingPair } from './helpers';

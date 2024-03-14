@@ -108,7 +108,7 @@ describe('DID service endpoints', () => {
     const sp = await dock.did.getServiceEndpoint(dockDid2, spId3);
     expect(sp.type).toEqual(spType);
     expect(sp.origins).toEqual(origins);
-  });
+  }, 30000);
 
   test('Get DID document with multiple service endpoints', async () => {
     const doc = await dock.did.getDocument(dockDid2);

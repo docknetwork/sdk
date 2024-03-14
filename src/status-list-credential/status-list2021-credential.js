@@ -59,7 +59,9 @@ export default class StatusList2021Credential extends VerifiableCredential {
     api,
   ) {
     const statusList = await createList({ length });
-    if (api.specVersion < 54) {
+    if (!('specVersion' in api)) {
+      throw new Error('No `specVersion` field found in the provided `api`');
+    } else if (api.specVersion < 54) {
       statusList.bitstring.leftToRightIndexing = false;
     }
     this.updateStatusList(statusPurpose, statusList, revokeIndices);
@@ -192,7 +194,9 @@ export default class StatusList2021Credential extends VerifiableCredential {
   static fromJSON(json, api) {
     const cred = super.fromJSON(json);
     cred.validate();
-    if (api.specVersion < 54) {
+    if (!('specVersion' in api)) {
+      throw new Error('No `specVersion` field found in the provided `api`');
+    } else if (api.specVersion < 54) {
       Object.defineProperty(cred, 'bigEndianEncoding', { value: true });
     }
 

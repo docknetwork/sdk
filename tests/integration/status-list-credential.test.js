@@ -82,7 +82,6 @@ buildTest('StatusList2021Credential', () => {
       issuerKey,
       statusListCredentialId,
       { statusPurpose: 'suspension' },
-      dockAPI.api,
     );
 
     // Add a new revocation status list with above policy
@@ -122,15 +121,6 @@ buildTest('StatusList2021Credential', () => {
   afterAll(async () => {
     await dockAPI.disconnect();
   }, 10000);
-
-  test('Backward compatibility', async () => {
-    const credential = StatusList2021Credential.fromBytes('0x1f8b0800000000000003b5925b739b301085ff0b7df505899be1a90ec194b8b143f0359d4c46480a16c6c88364639ac97fafb09bcb74fad6294fb06775cea75d5eb4af9897929ea4e6fdd03652ee85d7efd775ddab8d1eafb23ed4c1a08f2b4a6829192a44ff08b4ce47a3c1c8b9ed88fb42227910dd8209a94e41d0763e763446344ffba4b5924738de7afa09a6ba0d0de820dbc50302741b1060410be903dba09649b19d3a0e047aea126b9022d7754cd7709061519db844c78a44367bdaa22f68c59e194a0beabfc32a3939077fff9dfb4952641fb74a0e694eb11ac1cb7fc5fdd21abe33ffc1a6eab4c49c50d25694fccd14d1f0ed81932c1c2ef3f5880d377c046b3f5be7aa5c2c1abb9e46817a55e72fd877876acf451b50d123c748325e6aaf6a11421c5089e93592ada832cdae6e74019ce98e67b99e65f6ac017c503efb8af36735d4f250149d9737dc8040cb026ec2b252c554b4fd33b4f3149521f9bb63eb763c6fe6c2714be586b7bd8491cb54ad70b30a4c3c30278b6bb9dc9b61cc6bc266f36679c3b8f8198fc5edeaeefafe94cd8e599ce4f6972d6d4417bc517e5c160941ab4f191d2daf85aad3e6669386984dd9cde821b89fc54924a25d04277e643fec4602c3b9fa9e346815b36921d83a5feb5101dc5ecf91e06a3299eed639c7d2ec0ee757a75c84ab7817d2a7f92081603386e3f5d672223328a51b2cc1362015f2e3b041247bda051c8b459460ffee16d3ed38f3ab67d71f6aaf8f975dd0ea5fe6a0bdfe02c3273489bb030000', { specVersion: 53 });
-    const decoded = await credential.decodeStatusList();
-    const revoked = await credential.revokedBatch(Array.from({ length: decoded.length }, (_, idx) => idx));
-
-    expect(decoded.length).toBe(1e4);
-    expect(revoked).toEqual(Array.from({ length: decoded.length }, (_, idx) => idx == 5727));
-  });
 
   test('Issuer can issue a revocable credential and holder can verify it successfully when it is not revoked else the verification fails', async () => {
     // The credential verification should pass as the credential has not been revoked.

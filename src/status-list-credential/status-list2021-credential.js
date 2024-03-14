@@ -56,14 +56,8 @@ export default class StatusList2021Credential extends VerifiableCredential {
     keyDoc,
     id,
     { statusPurpose = 'revocation', length = 1e4, revokeIndices = [] } = {},
-    api,
   ) {
     const statusList = await createList({ length });
-    if (!('specVersion' in api)) {
-      throw new Error('No `specVersion` field found in the provided `api`');
-    } else if (api.specVersion < 54) {
-      statusList.bitstring.leftToRightIndexing = false;
-    }
     this.updateStatusList(statusPurpose, statusList, revokeIndices);
 
     const jsonCred = await createCredential({
@@ -72,7 +66,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
       statusPurpose,
     });
 
-    const cred = this.fromJSON(jsonCred, api);
+    const cred = this.fromJSON(jsonCred);
 
     return await cred.sign(keyDoc);
   }
@@ -95,9 +89,6 @@ export default class StatusList2021Credential extends VerifiableCredential {
     const statusList = new StatusList({
       buffer: new Uint8Array((currentStatusList).bitstring.bits),
     });
-    if (this.bigEndianEncoding) {
-      statusList.bitstring.leftToRightIndexing = false;
-    }
 
     this.constructor.updateStatusList(
       this.credentialSubject.statusPurpose,
@@ -132,14 +123,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
     } else {
       this.internalCachedStatusList = {
         encoded: this.credentialSubject.encodedList,
-        decoded: decodeList(this.credentialSubject).then((list) => {
-          if (this.bigEndianEncoding) {
-            // eslint-disable-next-line
-            list.bitstring.leftToRightIndexing = false;
-          }
-
-          return list;
-        }),
+        decoded: decodeList(this.credentialSubject),
       };
 
       return this.internalCachedStatusList.decoded;
@@ -177,12 +161,12 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * Decodes `StatusList2021Credential` from provided bytes.
    * @param {Uint8Array} bytes
    */
-  static fromBytes(bytes, api) {
+  static fromBytes(bytes) {
     const gzipBufferCred = Buffer.from(u8aToU8a(bytes));
     const stringifiedCred = ungzip(gzipBufferCred, { to: 'string' });
     const parsedCred = JSON.parse(stringifiedCred);
 
-    return this.fromJSON(parsedCred, api);
+    return this.fromJSON(parsedCred);
   }
 
   /**
@@ -191,14 +175,9 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * @param {object} json
    * @returns {StatusList2021Credential}
    */
-  static fromJSON(json, api) {
+  static fromJSON(json) {
     const cred = super.fromJSON(json);
     cred.validate();
-    if (!('specVersion' in api)) {
-      throw new Error('No `specVersion` field found in the provided `api`');
-    } else if (api.specVersion < 54) {
-      Object.defineProperty(cred, 'bigEndianEncoding', { value: true });
-    }
 
     return cred;
   }

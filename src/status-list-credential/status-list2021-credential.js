@@ -105,7 +105,8 @@ export default class StatusList2021Credential extends VerifiableCredential {
     );
 
     this.credentialSubject.encodedList = await statusList.encode();
-    this.setProof(null);
+    // Remove `proof` so that an array of `proof`s is not created by the following `sign` call.
+    delete this.proof;
     this.setIssuanceDate(new Date().toISOString());
 
     await this.sign(keyDoc);

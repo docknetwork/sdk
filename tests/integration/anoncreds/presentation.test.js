@@ -2,6 +2,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import { u8aToHex, stringToU8a } from '@polkadot/util';
 import b58 from 'bs58';
 import {
+  BDDT16MacSecretKey,
   BoundCheckSnarkSetup, CredentialBuilder, initializeWasm, PresentationBuilder,
 } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI } from '../../../src';
@@ -17,7 +18,10 @@ import { getKeyDoc } from '../../../src/utils/vc/helpers';
 import { issueCredential, verifyPresentation } from '../../../src/utils/vc';
 import { DockResolver } from '../../../src/resolver';
 import { getResidentCardCredentialAndSchema, setupExternalSchema } from './utils';
-import { getJsonSchemasFromPresentation } from '../../../src/utils/vc/presentations';
+import {
+  getDelegatedProofsFromVerifiedPresentation,
+  getJsonSchemasFromPresentation
+} from '../../../src/utils/vc/presentations';
 import defaultDocumentLoader from '../../../src/utils/vc/document-loader';
 
 describe.each(Schemes)('Presentation', ({
@@ -58,23 +62,29 @@ describe.each(Schemes)('Presentation', ({
       msgCount: 100,
     });
 
-    chainModule = getModule(dock);
+    if (Name !== 'BDDT16') {
+      chainModule = getModule(dock);
 
-    const pk1 = Module.prepareAddPublicKey(dock.api, u8aToHex(keypair.publicKeyBuffer));
-    await chainModule.addPublicKey(
-      pk1,
-      did1,
-      did1,
-      pair1,
-      { didModule: dock.did },
-      false,
-    );
+      const pk1 = Module.prepareAddPublicKey(dock.api, u8aToHex(keypair.publicKeyBuffer));
+      await chainModule.addPublicKey(
+        pk1,
+        did1,
+        did1,
+        pair1,
+        { didModule: dock.did },
+        false,
+      );
 
-    didDocument = await dock.did.getDocument(did1);
-    const { publicKey } = didDocument;
-    expect(publicKey.length).toEqual(2);
-    expect(publicKey[1].type).toEqual(VerKey);
-    keypair.id = publicKey[1].id;
+      didDocument = await dock.did.getDocument(did1);
+      const { publicKey } = didDocument;
+      expect(publicKey.length).toEqual(2);
+      expect(publicKey[1].type).toEqual(VerKey);
+      keypair.id = publicKey[1].id;
+    } else {
+      // For KVAC, the public doesn't need to published as its not used in credential or presentation verification (except issuers).
+      // But the signer still adds a key identifier in the credential to determine which key will be used for verification
+      keypair.id = 'my-key-id';
+    }
   }, 30000);
 
   function checkCommonRevealedFields(presentation, credentials) {
@@ -164,6 +174,18 @@ describe.each(Schemes)('Presentation', ({
 
     const { verified } = await verifyPresentation(presentation, { resolver });
     expect(verified).toEqual(true);
+
+    const delegatedProofs = getDelegatedProofsFromVerifiedPresentation(presentation);
+    const isKvac = Name === 'BDDT16';
+    // Delegated proofs only exist for KVAC
+    expect(delegatedProofs.size).toEqual(isKvac ? 2 : 0);
+    if (isKvac) {
+      const sk = new BDDT16MacSecretKey(keypair.privateKeyBuffer);
+      // eslint-disable-next-line jest/no-conditional-expect
+      expect(delegatedProofs.get(0)?.credential?.proof.verify(sk).verified).toEqual(true);
+      // eslint-disable-next-line jest/no-conditional-expect
+      expect(delegatedProofs.get(1)?.credential?.proof.verify(sk).verified).toEqual(true);
+    }
   }, 40000);
 
   test('expect to reveal specified attributes', async () => {
@@ -198,6 +220,16 @@ describe.each(Schemes)('Presentation', ({
 
     const { verified } = await verifyPresentation(presentation, { resolver });
     expect(verified).toEqual(true);
+
+    const delegatedProofs = getDelegatedProofsFromVerifiedPresentation(presentation);
+    const isKvac = Name === 'BDDT16';
+    // Delegated proofs only exist for KVAC
+    expect(delegatedProofs.size).toEqual(isKvac ? 1 : 0);
+    if (isKvac) {
+      const sk = new BDDT16MacSecretKey(keypair.privateKeyBuffer);
+      // eslint-disable-next-line jest/no-conditional-expect
+      expect(delegatedProofs.get(0)?.credential?.proof.verify(sk).verified).toEqual(true);
+    }
   }, 30000);
 
   test('expect to create presentation from multiple credentials', async () => {
@@ -285,12 +317,12 @@ describe.each(Schemes)('Presentation', ({
 
     expect(presentation.spec.credentials[0].bounds).toBeDefined();
     expect(presentation.spec.credentials[0].bounds).toEqual({
-      issuanceDate: {
+      issuanceDate: [{
         min: 1569888000000,
         max: 1577836800000,
         paramId: 'provingKeyId',
         protocol: 'LegoGroth16',
-      },
+      }],
     });
 
     expect(

@@ -10,11 +10,11 @@ import {
   WitnessEqualityMetaStatement,
   MetaStatement,
   MetaStatements,
-  ProofSpecG1,
+  ProofSpec,
   Witness,
   Witnesses,
-  CompositeProofG1,
-  WitnessUpdatePublicInfo,
+  CompositeProof,
+  VBWitnessUpdatePublicInfo,
   AccumulatorParams,
   AccumulatorPublicKey,
   initializeWasm,
@@ -42,9 +42,13 @@ for (const {
   Signature,
   KeyPair,
   buildWitness,
-  buildStatement,
+  buildProverStatement,
+  buildVerifierStatement,
 } of Schemes) {
-  describe(`Complete demo of anonymous credentials using ${Name} and accumulator`, () => {
+  const isKvac = Name === 'BDDT16';
+  const skipIfKvac = isKvac ? describe.skip : describe;
+
+  skipIfKvac(`Complete demo of anonymous credentials using ${Name} and accumulator`, () => {
     const dock = new DockAPI();
     let account;
     let issuerDid;
@@ -116,8 +120,17 @@ for (const {
       const accumulated = hexToU8a(accum.accumulated);
       const provingKey = Accumulator.generateMembershipProvingKey();
 
-      const statement1 = buildStatement(sigParams, sigPk, revealedAttrs, false);
-      const statement2 = Statement.accumulatorMembership(
+      const statement1 = 'adaptForLess' in sigPk ? buildProverStatement(
+        sigParams,
+        sigPk.adaptForLess(sigParams.supportedMessageCount()),
+        revealedAttrs,
+        false,
+      ) : buildProverStatement(
+        sigParams,
+        revealedAttrs,
+        false,
+      );
+      const statement2 = Statement.vbAccumulatorMembership(
         accumParams,
         accumPk,
         provingKey,
@@ -137,7 +150,7 @@ for (const {
 
       const context = stringToU8a('some context');
 
-      const proofSpec = new ProofSpecG1(
+      const proofSpec = new ProofSpec(
         statements,
         metaStatements,
         [],
@@ -145,7 +158,7 @@ for (const {
       );
 
       const witness1 = buildWitness(signature, unrevealedAttrs, false);
-      const witness2 = Witness.accumulatorMembership(
+      const witness2 = Witness.vbAccumulatorMembership(
         encodedAttrs[attributeCount - 1],
         membershipWitness,
       );
@@ -153,9 +166,28 @@ for (const {
       witnesses.add(witness1);
       witnesses.add(witness2);
 
-      const proof = CompositeProofG1.generate(proofSpec, witnesses);
+      const proof = CompositeProof.generate(proofSpec, witnesses);
+      const statement3 = !isKvac ? buildVerifierStatement(
+        sigParams,
+        'adaptForLess' in sigPk ? sigPk.adaptForLess(sigParams.supportedMessageCount()) : sigPk,
+        revealedAttrs,
+        false,
+      ) : buildVerifierStatement(
+        sigParams,
+        revealedAttrs,
+        false,
+      );
+      const verifierStatements = new Statements();
+      verifierStatements.add(statement3);
+      verifierStatements.add(statement2);
 
-      expect(proof.verify(proofSpec).verified).toEqual(true);
+      const verifierProofSpec = new ProofSpec(
+        verifierStatements,
+        metaStatements,
+        [],
+        context,
+      );
+      expect(proof.verify(verifierProofSpec).verified).toEqual(true);
     }
 
     beforeAll(async () => {
@@ -389,7 +421,7 @@ for (const {
         accumulatorId,
         false,
       );
-      const witnessUpdInfo = WitnessUpdatePublicInfo.new(
+      const witnessUpdInfo = VBWitnessUpdatePublicInfo.new(
         hexToU8a(accum.accumulated),
         [member1, member2],
         [],
@@ -414,7 +446,7 @@ for (const {
         accum.lastModified,
       );
       expect(updates.length).toEqual(1);
-      const queriedWitnessInfo = new WitnessUpdatePublicInfo(
+      const queriedWitnessInfo = new VBWitnessUpdatePublicInfo(
         hexToU8a(updates[0].witnessUpdateInfo),
       );
       const additions = [];
@@ -479,7 +511,7 @@ for (const {
         accumulatorId,
         false,
       );
-      let witnessUpdInfo = WitnessUpdatePublicInfo.new(
+      let witnessUpdInfo = VBWitnessUpdatePublicInfo.new(
         hexToU8a(accum.accumulated),
         [member3, member4],
         [member1, member2],
@@ -511,7 +543,7 @@ for (const {
 
       accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
       const startingBlock = accum.lastModified;
-      witnessUpdInfo = WitnessUpdatePublicInfo.new(
+      witnessUpdInfo = VBWitnessUpdatePublicInfo.new(
         hexToU8a(accum.accumulated),
         [member5, member6],
         [member4],
@@ -542,7 +574,7 @@ for (const {
       );
 
       accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
-      witnessUpdInfo = WitnessUpdatePublicInfo.new(
+      witnessUpdInfo = VBWitnessUpdatePublicInfo.new(
         hexToU8a(accum.accumulated),
         [member7, member8, member9],
         [],
@@ -592,7 +624,7 @@ for (const {
           accumulatorId,
           blockNo,
         );
-        const wi = new WitnessUpdatePublicInfo(
+        const wi = new VBWitnessUpdatePublicInfo(
           hexToU8a(updates[0].witnessUpdateInfo),
         );
         updateInfo.push(wi);
@@ -636,7 +668,7 @@ for (const {
         accumulatorId,
         false,
       );
-      const witnessUpdInfo = WitnessUpdatePublicInfo.new(
+      const witnessUpdInfo = VBWitnessUpdatePublicInfo.new(
         hexToU8a(accum.accumulated),
         [],
         [encodedAttrs[attributeCount - 1]],
@@ -668,7 +700,7 @@ for (const {
         accum.lastModified,
       );
       expect(updates.length).toEqual(1);
-      const queriedWitnessInfo = new WitnessUpdatePublicInfo(
+      const queriedWitnessInfo = new VBWitnessUpdatePublicInfo(
         hexToU8a(updates[0].witnessUpdateInfo),
       );
       expect(() => membershipWitness.updateUsingPublicInfoPostBatchUpdate(

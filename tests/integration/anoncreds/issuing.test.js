@@ -60,23 +60,29 @@ describe.each(Schemes)('Issuance', ({
       msgCount: 100,
     });
 
-    const pk1 = Module.prepareAddPublicKey(dock.api, u8aToHex(keypair.publicKeyBuffer));
-    await chainModule.addPublicKey(
-      pk1,
-      did1,
-      did1,
-      pair1,
-      { didModule: dock.did },
-      false,
-    );
+    if (Name !== 'BDDT16') {
+      const pk1 = Module.prepareAddPublicKey(dock.api, u8aToHex(keypair.publicKeyBuffer));
+      await chainModule.addPublicKey(
+        pk1,
+        did1,
+        did1,
+        pair1,
+        { didModule: dock.did },
+        false,
+      );
 
-    const didDocument = await dock.did.getDocument(did1);
-    const { publicKey } = didDocument;
+      const didDocument = await dock.did.getDocument(did1);
+      const { publicKey } = didDocument;
 
-    expect(publicKey.length).toEqual(2);
-    expect(publicKey[1].type).toEqual(VerKey);
+      expect(publicKey.length).toEqual(2);
+      expect(publicKey[1].type).toEqual(VerKey);
 
-    keypair.id = publicKey[1].id;
+      keypair.id = publicKey[1].id;
+    } else {
+      // For KVAC, the public doesn't need to published as its not used in credential or presentation verification (except issuers).
+      // But the signer still adds a key identifier in the credential to determine which key will be used for verification
+      keypair.id = 'my-key-id';
+    }
   }, 30000);
 
   test(`Can issue+verify a ${Name} credential with external schema reference`, async () => {

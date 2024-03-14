@@ -19,7 +19,7 @@ import {
   AccumulatorParams,
   initializeWasm,
   BBSPlusKeypairG2, PositiveAccumulator,
-  BBSPlusSignatureParamsG1, WitnessUpdatePublicInfo
+  BBSPlusSignatureParamsG1, VBWitnessUpdatePublicInfo
 } from '@docknetwork/crypto-wasm-ts';
 import BBSPlusModule from '../src/modules/bbs-plus';
 import AccumulatorModule from '../src/modules/accumulator';
@@ -369,13 +369,13 @@ async function accumulator() {
       const member = Accumulator.encodePositiveNumberAsAccumulatorMember(start * 10 * i + j);
       members.push(member);
     }
-    let witUpd = u8aToHex(WitnessUpdatePublicInfo.new(hexToU8a(accumulated), members, [], kp.secretKey).value);
+    let witUpd = u8aToHex(VBWitnessUpdatePublicInfo.new(hexToU8a(accumulated), members, [], kp.secretKey).value);
     await printFeePaid(dock.api, account.address, async () => {
       console.info(`Updating a positive accumulator with ${members.length} additions`);
       await dock.accumulatorModule.updateAccumulator(accumulatorIdPos, accumulated, { additions: members.map((m) => u8aToHex(m)), witnessUpdateInfo: witUpd }, did, pair, { didModule: dock.did }, false);
     });
 
-    witUpd = u8aToHex(WitnessUpdatePublicInfo.new(hexToU8a(accumulated), [], members, kp.secretKey).value);
+    witUpd = u8aToHex(VBWitnessUpdatePublicInfo.new(hexToU8a(accumulated), [], members, kp.secretKey).value);
 
     await printFeePaid(dock.api, account.address, async () => {
       console.info(`Updating a positive accumulator with ${members.length} removals`);

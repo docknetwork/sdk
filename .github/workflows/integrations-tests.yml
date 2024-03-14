@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '20.x'
-      - run: yarn install --frozen-lockfile --ignore-scripts
+      - run: yarn install --frozen-lockfile
       - run: yarn build
       - run: yarn test-with-node
   mainnet:
@@ -34,7 +34,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '20.x'
-      - run: yarn install --frozen-lockfile --ignore-scripts
+      - run: yarn install --frozen-lockfile
       - run: yarn build
       - run: yarn test-with-node
   testnet:
@@ -52,6 +52,6 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '20.x'
-      - run: yarn install --frozen-lockfile --ignore-scripts
+      - run: yarn install --frozen-lockfile
       - run: yarn build
       - run: yarn test-with-node

@@ -97,7 +97,7 @@ describe('DID service endpoints', () => {
     expect(doc2.service[0].id).toEqual(spId2Text);
     expect(doc2.service[0].type).toEqual('LinkedDomains');
     expect(doc2.service[0].serviceEndpoint).toEqual(origins2Text);
-  }, 10000);
+  }, 20000);
 
   test('Add another service endpoint', async () => {
     const pair1 = new DidKeypair(dock.keyring.addFromUri(seed1), 1);

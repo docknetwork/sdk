@@ -1,17 +1,13 @@
 import { canonicalize } from 'json-canonicalize';
 import { validate } from 'jsonschema';
-import axios from 'axios';
 
-import { hexDIDToQualified } from '../utils/did';
-import { getSignatureFromKeyringPair } from '../utils/misc';
+import { typedHexDID } from '../utils/did';
 
-import {
-  createNewDockBlobId,
-  getHexIdentifierFromBlobID,
-} from './blob';
+import { createNewDockBlobId, getHexIdentifierFromBlobID } from './blob';
 
 // Supported schemas
 import JSONSchema07 from '../utils/vc/schemas/schema-draft-07';
+import jsonFetch from '../utils/json-fetch';
 
 export default class Schema {
   /**
@@ -24,9 +20,7 @@ export default class Schema {
   }
 
   static fromJSON(json) {
-    const {
-      id, schema,
-    } = json;
+    const { id, schema } = json;
 
     const schemaObj = new Schema(id);
 
@@ -56,7 +50,7 @@ export default class Schema {
    */
   sign(pair, blobModule) {
     const serializedBlob = blobModule.getSerializedBlob(this.toBlob());
-    this.signature = getSignatureFromKeyringPair(pair, serializedBlob);
+    this.signature = pair.sign(serializedBlob);
     return this;
   }
 
@@ -65,10 +59,7 @@ export default class Schema {
    * @returns {object}
    */
   toJSON() {
-    const {
-      signature,
-      ...rest
-    } = this;
+    const { signature: _signature, ...rest } = this;
 
     return {
       ...rest,
@@ -81,7 +72,9 @@ export default class Schema {
    */
   toBlob() {
     if (!this.schema) {
-      throw new Error('Schema requires schema property to be serialized to blob');
+      throw new Error(
+        'Schema requires schema property to be serialized to blob',
+      );
     }
 
     return {
@@ -95,20 +88,33 @@ export default class Schema {
    * @param {object} dock - The dock API
    * @param signerDid
    * @param keyPair
-   * @param keyId
    * @param nonce
    * @param waitForFinalization
    * @param params
    * @return {Promise<object>} The extrinsic to sign and send.
    */
-  async writeToChain(dock, signerDid, keyPair, keyId, nonce = undefined, waitForFinalization, params = {}) {
+  async writeToChain(
+    dock,
+    signerDid,
+    keyPair,
+    nonce = undefined,
+    waitForFinalization,
+    params = {},
+  ) {
     let arg;
     if (nonce === undefined) {
       arg = { didModule: dock.did };
     } else {
       arg = { nonce };
     }
-    return dock.blob.new(this.toBlob(), signerDid, keyPair, keyId, arg, waitForFinalization, params);
+    return dock.blob.new(
+      this.toBlob(),
+      signerDid,
+      keyPair,
+      arg,
+      waitForFinalization,
+      params,
+    );
   }
 
   /**
@@ -142,7 +148,7 @@ export default class Schema {
       return {
         ...chainValue,
         id,
-        author: hexDIDToQualified(chainBlob[0]),
+        author: typedHexDID(dockApi, chainBlob[0]).toQualifiedEncodedString(),
       };
     }
     throw new Error('Incorrect schema format');
@@ -160,12 +166,15 @@ export default class Schema {
     if (schemaUrl) {
       // The URL might be 'http://json-schema.org/draft-07/schema' or 'http://json-schema.org/draft-07/schema#'
       // In that case, the schema is already stored in the SDK as this is the latest JSON schema spec
-      if (schemaUrl === 'http://json-schema.org/draft-07/schema' || schemaUrl === 'http://json-schema.org/draft-07/schema#') {
+      if (
+        schemaUrl === 'http://json-schema.org/draft-07/schema'
+        || schemaUrl === 'http://json-schema.org/draft-07/schema#'
+      ) {
         // Return stored JSON schema
         return JSONSchema07;
       }
       // Fetch the URI and expect a JSON response
-      const { data: doc } = await axios.get(schemaUrl);
+      const doc = await jsonFetch(schemaUrl);
       if (typeof doc === 'object') {
         return doc;
       }

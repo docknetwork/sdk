@@ -1,0 +1,358 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ensureMatchesPattern $anyOf 1`] = `"Neither of patterns succeeded for \`3\`"`;
+
+exports[`ensureMatchesPattern $anyOf 2`] = `Array []`;
+
+exports[`ensureMatchesPattern $anyOf 3`] = `
+Object {
+  "$anyOf": Array [
+    Object {
+      "$matchValue": 1,
+    },
+    Object {
+      "$matchValue": 2,
+    },
+  ],
+}
+`;
+
+exports[`ensureMatchesPattern $anyOf 4`] = `
+Array [
+  [Error: Unknown value \`3\`, expected 1],
+  [Error: Unknown value \`3\`, expected 2],
+]
+`;
+
+exports[`ensureMatchesPattern $instanceOf 1`] = `"Invalid value provided, expected instance of \`Function\`, received instance of \`Object\`"`;
+
+exports[`ensureMatchesPattern $instanceOf 2`] = `Array []`;
+
+exports[`ensureMatchesPattern $instanceOf 3`] = `
+Object {
+  "$instanceOf": [Function],
+}
+`;
+
+exports[`ensureMatchesPattern $instanceOf 4`] = `Array []`;
+
+exports[`ensureMatchesPattern $iterableOf 1`] = `"Unknown value \`3\`, expected 1, path: \`0\`"`;
+
+exports[`ensureMatchesPattern $iterableOf 2`] = `
+Array [
+  0,
+]
+`;
+
+exports[`ensureMatchesPattern $iterableOf 3`] = `
+Object {
+  "$matchValue": 1,
+}
+`;
+
+exports[`ensureMatchesPattern $iterableOf 4`] = `Array []`;
+
+exports[`ensureMatchesPattern $iterableOf 5`] = `"Unknown value \`3\`, expected 1, path: \`1\`"`;
+
+exports[`ensureMatchesPattern $iterableOf 6`] = `
+Array [
+  1,
+]
+`;
+
+exports[`ensureMatchesPattern $iterableOf 7`] = `
+Object {
+  "$matchValue": 1,
+}
+`;
+
+exports[`ensureMatchesPattern $iterableOf 8`] = `Array []`;
+
+exports[`ensureMatchesPattern $iterableOf 9`] = `"Unknown value \`2\`, expected 1, path: \`0\`"`;
+
+exports[`ensureMatchesPattern $iterableOf 10`] = `
+Array [
+  0,
+]
+`;
+
+exports[`ensureMatchesPattern $iterableOf 11`] = `
+Object {
+  "$matchValue": 1,
+}
+`;
+
+exports[`ensureMatchesPattern $iterableOf 12`] = `Array []`;
+
+exports[`ensureMatchesPattern $iterableOf 13`] = `"Unknown value \`2\`, expected 1, path: \`1\`"`;
+
+exports[`ensureMatchesPattern $iterableOf 14`] = `
+Array [
+  1,
+]
+`;
+
+exports[`ensureMatchesPattern $iterableOf 15`] = `
+Object {
+  "$matchValue": 1,
+}
+`;
+
+exports[`ensureMatchesPattern $iterableOf 16`] = `Array []`;
+
+exports[`ensureMatchesPattern $mapOf 1`] = `"Unknown value \`3\`, expected 2, path: \`1\`"`;
+
+exports[`ensureMatchesPattern $mapOf 2`] = `
+Array [
+  1,
+]
+`;
+
+exports[`ensureMatchesPattern $mapOf 3`] = `
+Object {
+  "$matchValue": 2,
+}
+`;
+
+exports[`ensureMatchesPattern $mapOf 4`] = `Array []`;
+
+exports[`ensureMatchesPattern $mapOf 5`] = `"Unknown value \`3\`, expected 1, path: \`3#key\`"`;
+
+exports[`ensureMatchesPattern $mapOf 6`] = `
+Array [
+  "3#key",
+]
+`;
+
+exports[`ensureMatchesPattern $mapOf 7`] = `
+Object {
+  "$matchValue": 1,
+}
+`;
+
+exports[`ensureMatchesPattern $mapOf 8`] = `Array []`;
+
+exports[`ensureMatchesPattern $mapOf 9`] = `"Unknown value \`3\`, expected 1, path: \`3#key\`"`;
+
+exports[`ensureMatchesPattern $mapOf 10`] = `
+Array [
+  "3#key",
+]
+`;
+
+exports[`ensureMatchesPattern $mapOf 11`] = `
+Object {
+  "$matchValue": 1,
+}
+`;
+
+exports[`ensureMatchesPattern $mapOf 12`] = `Array []`;
+
+exports[`ensureMatchesPattern $mapOf 13`] = `"Unknown value \`5\`, expected 1, path: \`A\`"`;
+
+exports[`ensureMatchesPattern $mapOf 14`] = `
+Array [
+  "A",
+]
+`;
+
+exports[`ensureMatchesPattern $mapOf 15`] = `
+Object {
+  "$matchValue": 1,
+}
+`;
+
+exports[`ensureMatchesPattern $mapOf 16`] = `Array []`;
+
+exports[`ensureMatchesPattern $mapOf 17`] = `"Invalid value key provided, expected one of \`\`[A]\`\`, received \`B\`"`;
+
+exports[`ensureMatchesPattern $mapOf 18`] = `Array []`;
+
+exports[`ensureMatchesPattern $mapOf 19`] = `
+Object {
+  "$objOf": Object {
+    "A": Object {
+      "$matchValue": 1,
+    },
+  },
+}
+`;
+
+exports[`ensureMatchesPattern $mapOf 20`] = `Array []`;
+
+exports[`ensureMatchesPattern $mapOf 21`] = `"Expected a single key"`;
+
+exports[`ensureMatchesPattern $mapOf 22`] = `Array []`;
+
+exports[`ensureMatchesPattern $mapOf 23`] = `
+Object {
+  "$objOf": Object {
+    "A": Object {
+      "$matchValue": 1,
+    },
+  },
+}
+`;
+
+exports[`ensureMatchesPattern $mapOf 24`] = `Array []`;
+
+exports[`ensureMatchesPattern $matchIterable 1`] = `"Unknown value \`3\`, expected 1, path: \`0\`"`;
+
+exports[`ensureMatchesPattern $matchIterable 2`] = `
+Array [
+  0,
+]
+`;
+
+exports[`ensureMatchesPattern $matchIterable 3`] = `
+Object {
+  "$matchValue": 1,
+}
+`;
+
+exports[`ensureMatchesPattern $matchIterable 4`] = `Array []`;
+
+exports[`ensureMatchesPattern $matchIterable 5`] = `"Unknown value \`3\`, expected 2, path: \`1\`"`;
+
+exports[`ensureMatchesPattern $matchIterable 6`] = `
+Array [
+  1,
+]
+`;
+
+exports[`ensureMatchesPattern $matchIterable 7`] = `
+Object {
+  "$matchValue": 2,
+}
+`;
+
+exports[`ensureMatchesPattern $matchIterable 8`] = `Array []`;
+
+exports[`ensureMatchesPattern $matchIterable 9`] = `"Value iterable is shorter than expected, received: \`[]\`"`;
+
+exports[`ensureMatchesPattern $matchIterable 10`] = `Array []`;
+
+exports[`ensureMatchesPattern $matchIterable 11`] = `
+Object {
+  "$matchIterable": Array [
+    Object {
+      "$matchValue": 1,
+    },
+    Object {
+      "$matchValue": 2,
+    },
+  ],
+}
+`;
+
+exports[`ensureMatchesPattern $matchIterable 12`] = `Array []`;
+
+exports[`ensureMatchesPattern $matchIterable 13`] = `"Value iterable is shorter than expected, received: \`[1]\`"`;
+
+exports[`ensureMatchesPattern $matchIterable 14`] = `Array []`;
+
+exports[`ensureMatchesPattern $matchIterable 15`] = `
+Object {
+  "$matchIterable": Array [
+    Object {
+      "$matchValue": 1,
+    },
+    Object {
+      "$matchValue": 2,
+    },
+  ],
+}
+`;
+
+exports[`ensureMatchesPattern $matchIterable 16`] = `Array []`;
+
+exports[`ensureMatchesPattern $matchIterable 17`] = `"Unknown value \`2\`, expected 1, path: \`0\`"`;
+
+exports[`ensureMatchesPattern $matchIterable 18`] = `
+Array [
+  0,
+]
+`;
+
+exports[`ensureMatchesPattern $matchIterable 19`] = `
+Object {
+  "$matchValue": 1,
+}
+`;
+
+exports[`ensureMatchesPattern $matchIterable 20`] = `Array []`;
+
+exports[`ensureMatchesPattern $matchObject 1`] = `"Invalid property \`c\`, expected keys: \`[a, b]\`"`;
+
+exports[`ensureMatchesPattern $matchObject 2`] = `Array []`;
+
+exports[`ensureMatchesPattern $matchObject 3`] = `
+Object {
+  "$matchObject": Object {
+    "a": Object {
+      "$matchValue": 1,
+    },
+    "b": Object {
+      "$matchValue": 2,
+    },
+  },
+}
+`;
+
+exports[`ensureMatchesPattern $matchObject 4`] = `Array []`;
+
+exports[`ensureMatchesPattern $matchObject 5`] = `"Unknown value \`3\`, expected 1, path: \`a\`"`;
+
+exports[`ensureMatchesPattern $matchObject 6`] = `
+Array [
+  "a",
+]
+`;
+
+exports[`ensureMatchesPattern $matchObject 7`] = `
+Object {
+  "$matchValue": 1,
+}
+`;
+
+exports[`ensureMatchesPattern $matchObject 8`] = `Array []`;
+
+exports[`ensureMatchesPattern $matchObject 9`] = `"Unknown value \`3\`, expected 2, path: \`b\`"`;
+
+exports[`ensureMatchesPattern $matchObject 10`] = `
+Array [
+  "b",
+]
+`;
+
+exports[`ensureMatchesPattern $matchObject 11`] = `
+Object {
+  "$matchValue": 2,
+}
+`;
+
+exports[`ensureMatchesPattern $matchObject 12`] = `Array []`;
+
+exports[`ensureMatchesPattern $matchType 1`] = `"Invalid value provided, expected value with type \`number\`, received value with type \`string\`"`;
+
+exports[`ensureMatchesPattern $matchType 2`] = `Array []`;
+
+exports[`ensureMatchesPattern $matchType 3`] = `
+Object {
+  "$matchType": "number",
+}
+`;
+
+exports[`ensureMatchesPattern $matchType 4`] = `Array []`;
+
+exports[`ensureMatchesPattern $matchValue 1`] = `"Unknown value \`10\`, expected 11"`;
+
+exports[`ensureMatchesPattern $matchValue 2`] = `Array []`;
+
+exports[`ensureMatchesPattern $matchValue 3`] = `
+Object {
+  "$matchValue": 11,
+}
+`;
+
+exports[`ensureMatchesPattern $matchValue 4`] = `Array []`;

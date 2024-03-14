@@ -1,6 +1,6 @@
-import axios from 'axios';
 import cachedUris from './contexts';
-import DIDResolver from '../../did-resolver'; // eslint-disable-line
+import Resolver from "../../resolver/generic/resolver"; // eslint-disable-line
+import jsonFetch from '../json-fetch';
 
 function parseEmbeddedDataURI(embedded) {
   // Strip new lines
@@ -31,7 +31,8 @@ function parseEmbeddedDataURI(embedded) {
 /**
  * Takes a resolver and returns a function that returns a document or throws an error when the document
  * cannot be found.
- * @param {DIDResolver} [resolver] - The resolver is optional but should be passed when DIDs need to be resolved.
+ * @param {Resolver} [resolver] - The resolver is optional but should be passed when
+ * `DID`s / `StatusList2021Credential`s / `Blob`s / revocation registries and other documents need to be resolved.
  * @returns {loadDocument} - the returned function
  */
 function documentLoader(resolver = null) {
@@ -48,19 +49,21 @@ function documentLoader(resolver = null) {
 
     if (uriString.startsWith('data:')) {
       document = parseEmbeddedDataURI(uriString);
-    } else if (resolver && uriString.startsWith('did:')) {
+    } else if (resolver?.supports(uriString)) {
       // Try to resolve a DID and throw if cannot resolve
       document = await resolver.resolve(uriString);
     } else {
       // Strip ending slash from uri to determine cache key
-      const cacheKey = uriString.endsWith('/') ? uriString.substring(0, uri.length - 1) : uriString;
+      const cacheKey = uriString.endsWith('/')
+        ? uriString.substring(0, uri.length - 1)
+        : uriString;
 
       // Check its not in data cache
       const cachedData = cachedUris.get(cacheKey);
       if (cachedData) {
         document = cachedData;
       } else {
-        const { data: doc } = await axios.get(uriString);
+        const doc = await jsonFetch(uriString);
         cachedUris.set(cacheKey, doc);
         document = doc;
       }

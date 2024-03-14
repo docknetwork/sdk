@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export
 export class ServiceEndpointType {
   constructor(value = 0) {
     this.value = value;

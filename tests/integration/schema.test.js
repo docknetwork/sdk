@@ -3,9 +3,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 
 import { DockAPI } from '../../src/index';
 
-import {
-  createNewDockDID, getHexIdentifierFromDID, hexDIDToQualified,
-} from '../../src/utils/did';
+import { createNewDockDID, typedHexDID, DidKeypair } from '../../src/utils/did';
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { verifyCredential, verifyPresentation } from '../../src/utils/vc/index';
 import { blobHexIdToQualified, createNewDockBlobId, DockBlobIdByteSize } from '../../src/modules/blob';
@@ -13,15 +11,15 @@ import Schema from '../../src/modules/schema';
 import VerifiableCredential from '../../src/verifiable-credential';
 import exampleSchema from '../example-schema';
 import VerifiablePresentation from '../../src/verifiable-presentation';
-import getKeyDoc from '../../src/utils/vc/helpers';
-import DockResolver from '../../src/dock-resolver';
+import { getKeyDoc } from '../../src/utils/vc/helpers';
+import { DockResolver } from '../../src/resolver';
 import { Sr25519VerKeyName } from '../../src/utils/vc/crypto/constants';
 import { registerNewDIDUsingPair } from './helpers';
 
 let account;
 let pair;
-let dockDID;
 let hexDid;
+let dockDID;
 let blobId;
 let keyDoc;
 let validCredential;
@@ -56,9 +54,9 @@ describe('Schema Blob Module Integration', () => {
     });
     account = dockApi.keyring.addFromUri(TestAccountURI);
     dockApi.setAccount(account);
-    pair = dockApi.keyring.addFromUri(firstKeySeed);
+    pair = DidKeypair.fromApi(dockApi);
     dockDID = createNewDockDID();
-    hexDid = getHexIdentifierFromDID(dockDID);
+    hexDid = typedHexDID(dockApi.api, dockDID);
     await registerNewDIDUsingPair(dockApi, dockDID, pair);
     blobId = randomAsHex(DockBlobIdByteSize);
 
@@ -68,7 +66,7 @@ describe('Schema Blob Module Integration', () => {
       id: invalidFormatBlobId,
       blob: stringToHex('hello world'),
     };
-    await dockApi.blob.new(blob, dockDID, pair, 1, { didModule: dockApi.didModule }, false);
+    await dockApi.blob.new(blob, dockDID, pair, { didModule: dockApi.didModule }, false);
 
     // Write schema blob
     const blobStr = JSON.stringify(exampleSchema);
@@ -76,7 +74,7 @@ describe('Schema Blob Module Integration', () => {
       id: blobId,
       blob: stringToHex(blobStr),
     };
-    await dockApi.blob.new(blob, dockDID, pair, 1, { didModule: dockApi.didModule }, false);
+    await dockApi.blob.new(blob, dockDID, pair, { didModule: dockApi.didModule }, false);
 
     // Properly format a keyDoc to use for signing
     keyDoc = getKeyDoc(
@@ -122,11 +120,12 @@ describe('Schema Blob Module Integration', () => {
   test('Set and get schema', async () => {
     const schema = new Schema();
     await schema.setJSONSchema(exampleSchema);
-    await dockApi.blob.new(schema.toBlob(), hexDid, pair, 1, { didModule: dockApi.didModule }, false);
-    await expect(Schema.get(blobId, dockApi)).resolves.toMatchObject({
+    await dockApi.blob.new(schema.toBlob(), dockDID, pair, { didModule: dockApi.didModule }, false);
+    const schemaObj = await Schema.get(blobId, dockApi);
+    expect(schemaObj).toMatchObject({
       ...exampleSchema,
       id: blobId,
-      author: hexDIDToQualified(getHexIdentifierFromDID(dockDID)),
+      author: hexDid.toQualifiedEncodedString(),
     });
   }, 20000);
 
@@ -143,8 +142,6 @@ describe('Schema Blob Module Integration', () => {
       verifyCredential(validCredential.toJSON(), {
         resolver: dockResolver,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { dock: dockApi },
       }),
     ).resolves.toBeDefined();
   }, 30000);
@@ -154,8 +151,6 @@ describe('Schema Blob Module Integration', () => {
       validCredential.verify({
         resolver: dockResolver,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { dock: dockApi },
       }),
     ).resolves.toBeDefined();
   }, 30000);
@@ -165,17 +160,13 @@ describe('Schema Blob Module Integration', () => {
       verifyCredential(invalidCredential.toJSON(), {
         resolver: null,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { notDock: dockApi },
       }),
-    ).rejects.toThrow('Only Dock schemas are supported as of now.');
+    ).rejects.toThrow(/Unsupported protocol blob:/);
 
     await expect(
       verifyCredential(invalidCredential.toJSON(), {
-        resolver: null,
+        resolver: dockResolver,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { dock: dockApi },
       }),
     ).rejects.toThrow(/Schema validation failed/);
   }, 30000);
@@ -185,8 +176,6 @@ describe('Schema Blob Module Integration', () => {
       invalidCredential.verify({
         resolver: dockResolver,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { dock: dockApi },
       }),
     ).rejects.toThrow(/Schema validation failed/);
   }, 30000);
@@ -207,12 +196,10 @@ describe('Schema Blob Module Integration', () => {
       verifyPresentation(vpInvalid.toJSON(), {
         challenge: 'some_challenge',
         domain: 'some_domain',
-        resolver: dockResolver,
+        resolver: null,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { notDock: dockApi },
       }),
-    ).rejects.toThrow('Only Dock schemas are supported as of now.');
+    ).rejects.toThrow(/Unsupported protocol blob:/);
 
     await expect(
       verifyPresentation(vpInvalid.toJSON(), {
@@ -220,8 +207,6 @@ describe('Schema Blob Module Integration', () => {
         domain: 'some_domain',
         resolver: dockResolver,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { dock: dockApi },
       }),
     ).rejects.toThrow(/Schema validation failed/);
   }, 90000);
@@ -244,8 +229,6 @@ describe('Schema Blob Module Integration', () => {
         domain: 'some_domain',
         resolver: dockResolver,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { dock: dockApi },
       }),
     ).resolves.toBeDefined();
   }, 90000);
@@ -266,12 +249,10 @@ describe('Schema Blob Module Integration', () => {
       vpInvalid.verify({
         challenge: 'some_challenge',
         domain: 'some_domain',
-        resolver: dockResolver,
+        resolver: null,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { notDock: dockApi },
       }),
-    ).rejects.toThrow('Only Dock schemas are supported as of now.');
+    ).rejects.toThrow(/Unsupported protocol blob:/);
 
     await expect(
       vpInvalid.verify({
@@ -279,8 +260,6 @@ describe('Schema Blob Module Integration', () => {
         domain: 'some_domain',
         resolver: dockResolver,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { dock: dockApi },
       }),
     ).rejects.toThrow(/Schema validation failed/);
   }, 90000);
@@ -303,8 +282,6 @@ describe('Schema Blob Module Integration', () => {
         domain: 'some_domain',
         resolver: dockResolver,
         compactProof: true,
-        forceRevocationCheck: false,
-        schemaApi: { dock: dockApi },
       }),
     ).resolves.toBeDefined();
   }, 90000);

@@ -9,7 +9,13 @@ import schema from './contexts/schema.json';
 import odrl from './contexts/odrl.json';
 import bbsV1Context from './contexts/bbs-v1.json';
 import dockBBSV1Context from './contexts/dock-bbs-v1.json';
+import dockBBS23V1Context from './contexts/dock-bbs23-v1.json';
+import dockPSV1Context from './contexts/dock-ps-v1.json';
+import dockBDDT16V1Context from './contexts/dock-bddt16-v1.json';
 import dockPrettyVCContext from './contexts/prettyvc.json';
+import jws2020V1Context from './contexts/jws-2020-v1.json';
+import statusList21Context from './contexts/status-list-21';
+import privateStatusList21Context from './contexts/private-status-list-21';
 
 // Lookup of following URLs will lead to loading data from the context directory, this is done as the Sr25519 keys are not
 // supported in any W3C standard and vc-js has them stored locally. This is a temporary solution.
@@ -21,6 +27,18 @@ export default new Map([
   [
     'https://ld.dock.io/security/bbs/v1',
     dockBBSV1Context,
+  ],
+  [
+    'https://ld.dock.io/security/bbs23/v1',
+    dockBBS23V1Context,
+  ],
+  [
+    'https://ld.dock.io/security/ps/v1',
+    dockPSV1Context,
+  ],
+  [
+    'https://ld.dock.io/security/bddt16/v1',
+    dockBDDT16V1Context,
   ],
   [
     'https://w3id.org/security/bbs/v1',
@@ -73,5 +91,18 @@ export default new Map([
   [
     'https://w3id.org/security/suites/ed25519-2020/v1',
     ed25519V1Context,
+  ],
+  [
+    'https://w3id.org/security/suites/jws-2020/v1',
+    jws2020V1Context,
+  ],
+  // This is overridden because the URL is 404 now, likely because domain name change. But the status-list library still uses the old domain name
+  [
+    'https://w3id.org/vc/status-list/2021/v1',
+    statusList21Context,
+  ],
+  [
+    'https://ld.dock.io/private-status-list-21',
+    privateStatusList21Context,
   ],
 ]);

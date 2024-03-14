@@ -16,10 +16,10 @@ export function isHexWithGivenByteSize(value, byteSize = undefined) {
     if (byteSize !== undefined) {
       // If `byteSize` is not a positive integer type, then check will fail
       // 2 hex digits make a byte
-      return match[1].length === (2 * byteSize);
+      return match[1].length === 2 * byteSize;
     }
     // Don't care about byte size of the match but it must be full byte
-    return (match[1].length % 2) === 0;
+    return match[1].length % 2 === 0;
   }
   return false;
 }
@@ -28,29 +28,36 @@ export function isHexWithGivenByteSize(value, byteSize = undefined) {
  * Gets the hexadecimal value of the given string.
  * @return {string} Returns the hexadecimal representation of the ID.
  */
-export function getHexIdentifier(id, qualifier, validate, byteSize) {
-  if (id.startsWith(qualifier)) {
-    // Fully qualified ID. Remove the qualifier
-    const ss58Did = id.slice(qualifier.length);
-    try {
-      const hex = u8aToHex(decodeAddress(ss58Did));
-      // 2 characters for `0x` and 2*byte size of ID
-      if (hex.length !== (2 + 2 * byteSize)) {
-        throw new Error('Unexpected byte size');
+export function getHexIdentifier(id, qualifiers, byteSize) {
+  const strId = String(id);
+
+  for (const qualifier of [].concat(qualifiers)) {
+    if (strId.startsWith(qualifier)) {
+      // Fully qualified ID. Remove the qualifier
+      const ss58Did = strId.slice(qualifier.length);
+      try {
+        const hex = u8aToHex(decodeAddress(ss58Did));
+        // 2 characters for `0x` and 2*byte size of ID
+        if (hex.length !== 2 + 2 * byteSize) {
+          throw new Error('Unexpected byte size');
+        }
+        return hex;
+      } catch (e) {
+        throw new Error(`Invalid SS58 ID ${strId} with qualifier ${qualifier}. ${e}`);
       }
-      return hex;
-    } catch (e) {
-      throw new Error(`Invalid SS58 ID ${id}. ${e}`);
     }
-  } else {
-    try {
-      // Check if hex and of correct size and return the hex value if successful.
-      validate(id);
-      return id;
-    } catch (e) {
-      // Cannot parse as hex
-      throw new Error(`Invalid hexadecimal ID ${id}. ${e}`);
+  }
+
+  try {
+    // Check if hex and of correct size and return the hex value if successful.
+    if (!isHexWithGivenByteSize(strId, byteSize)) {
+      throw new Error(`Expected ${byteSize}-byte sequence`);
     }
+
+    return strId;
+  } catch (error) {
+    // Cannot parse as hex
+    throw new Error(`Invalid hex Did \`${id}\`, stringified \`${strId}\`: ${error}`);
   }
 }
 
@@ -68,7 +75,9 @@ export function asDockAddress(addr, network = 'test') {
     case 'main':
       return encodeAddress(addr, 22);
     default:
-      throw new Error(`Network can be either test or main or dev but was passed as ${network}`);
+      throw new Error(
+        `Network can be either test or main or dev but was passed as ${network}`,
+      );
   }
 }
 

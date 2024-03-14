@@ -1,0 +1,195 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "id": "@id",
+    "type": "@type",
+    "dockBBS": "https://ld.dock.io/dock-bbs23",
+    "parsingOptions": {
+      "@id": "dockBBS23:parsingOptions",
+      "@type": "@id",
+      "@container": "@graph"
+    },
+    "cryptoVersion": {
+      "@id": "dockBBS23:cryptoVersion",
+      "@type": "@id",
+      "@container": "@graph"
+    },
+    "presVersion": {
+      "@id": "dockBBS23:presVersion",
+      "@type": "@id",
+      "@container": "@graph"
+    },
+    "defaultDecimalPlaces": {
+      "@id": "dockBBS23:defaultDecimalPlaces",
+      "@type": "@id",
+      "@container": "@graph"
+    },
+    "defaultMinimumInteger": {
+      "@id": "dockBBS23:defaultMinimumInteger",
+      "@type": "@id",
+      "@container": "@graph"
+    },
+    "defaultMinimumDate": {
+      "@id": "dockBBS23:defaultMinimumDate",
+      "@type": "@id",
+      "@container": "@graph"
+    },
+    "useDefaults": {
+      "@id": "dockBBS23:useDefaults",
+      "@type": "@id",
+      "@container": "@graph"
+    },
+    "version": {
+      "@id": "dockBBS23:useDefaults",
+      "@type": "@id",
+      "@container": "@graph"
+    },
+    "DockVBAccumulator2022": {
+      "@id": "https://ld.dock.io/security#DockVBAccumulator2022",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "accumulated": "https://ld.dock.io/security#accumulated",
+        "revocationCheck": "https://ld.dock.io/security#revocationCheck",
+        "revocationId": "https://ld.dock.io/security#revocationId",
+        "extra": {
+          "@id": "https://ld.dock.io/security#extra",
+          "@context": {"@vocab": "https://ld.dock.io/security/extra"}
+        }
+      }
+    },
+    "Bls12381BBSSignatureProofDock2023": {
+      "@id": "https://ld.dock.io/security#Bls12381BBSSignatureDock2023",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "challenge": "https://ld.dock.io/security#challenge",
+        "created": {
+          "@id": "http://purl.org/dc/terms/created",
+          "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+        },
+        "domain": "https://ld.dock.io/security#domain",
+        "context": "https://ld.dock.io/security#context",
+        "bounds": {
+          "@id": "https://ld.dock.io/security#bounds",
+          "@context": {"@vocab": "https://ld.dock.io/security/bounds"}
+        },
+        "sigType": "https://ld.dock.io/security#sigType",
+        "boundedPseudonyms": "https://ld.dock.io/security#boundedPseudonyms",
+        "unboundedPseudonyms": "https://ld.dock.io/security#unboundedPseudonyms",
+        "attributeCiphertexts": "https://ld.dock.io/security#attributeCiphertexts",
+        "attributeEqualities": "https://ld.dock.io/security#attributeEqualities",
+        "accumulated": "https://ld.dock.io/security#accumulated",
+        "proofValue": "https://ld.dock.io/security#proofValue",
+        "nonce": "https://ld.dock.io/security#nonce",
+        "proofPurpose": {
+          "@id": "https://ld.dock.io/security#proofPurpose",
+          "@type": "@vocab",
+          "@context": {
+            "@version": 1.1,
+            "@protected": true,
+            "id": "@id",
+            "type": "@type",
+            "assertionMethod": {
+              "@id": "https://ld.dock.io/security#assertionMethod",
+              "@type": "@id",
+              "@container": "@set"
+            },
+            "authentication": {
+              "@id": "https://ld.dock.io/security#authenticationMethod",
+              "@type": "@id",
+              "@container": "@set"
+            }
+          }
+        },
+        "verificationMethod": {
+          "@id": "https://ld.dock.io/security#verificationMethod",
+          "@type": "@id"
+        }
+      }
+    },
+    "Bls12381BBSSignatureDock2023": {
+      "@id": "https://ld.dock.io/security#Bls12381BBSSignatureDock2023",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "challenge": "https://ld.dock.io/security#challenge",
+        "created": {
+          "@id": "http://purl.org/dc/terms/created",
+          "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+        },
+        "domain": "https://ld.dock.io/security#domain",
+        "proofValue": "https://ld.dock.io/security#proofValue",
+        "nonce": "https://ld.dock.io/security#nonce",
+        "proofPurpose": {
+          "@id": "https://ld.dock.io/security#proofPurpose",
+          "@type": "@vocab",
+          "@context": {
+            "@version": 1.1,
+            "@protected": true,
+            "id": "@id",
+            "type": "@type",
+            "assertionMethod": {
+              "@id": "https://ld.dock.io/security#assertionMethod",
+              "@type": "@id",
+              "@container": "@set"
+            },
+            "authentication": {
+              "@id": "https://ld.dock.io/security#authenticationMethod",
+              "@type": "@id",
+              "@container": "@set"
+            }
+          }
+        },
+        "verificationMethod": {
+          "@id": "https://ld.dock.io/security#verificationMethod",
+          "@type": "@id"
+        }
+      }
+    },
+    "Bls12381BBSKey2023": {
+      "@id": "https://ld.dock.io/security#Bls12381BBSKey2023",
+      "@context": {
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "controller": {
+          "@id": "https://ld.dock.io/security#controller",
+          "@type": "@id"
+        },
+        "revoked": {
+          "@id": "https://ld.dock.io/security#revoked",
+          "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+        },
+        "publicKeyBase58": {
+          "@id": "https://ld.dock.io/security#publicKeyBase58"
+        }
+      }
+    },
+    "Bls12381BBSKeyPairDock2023": {
+      "@id": "https://ld.dock.io/security#Bls12381BBSKeyPairDock2023",
+      "@context": {
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "controller": {
+          "@id": "https://ld.dock.io/security#controller",
+          "@type": "@id"
+        },
+        "revoked": {
+          "@id": "https://ld.dock.io/security#revoked",
+          "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+        },
+        "publicKeyBase58": {
+          "@id": "https://ld.dock.io/security#publicKeyBase58"
+        }
+      }
+    }
+  }
+}

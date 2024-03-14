@@ -3,11 +3,11 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import dock from '../src/index';
 import VerifiableCredential from '../src/verifiable-credential';
 import VerifiablePresentation from '../src/verifiable-presentation';
-import { createNewDockDID } from '../src/utils/did';
+import { createNewDockDID, DidKeypair, typedHexDID } from '../src/utils/did';
 import { registerNewDIDUsingPair } from '../tests/integration/helpers';
 import { createRandomRegistryId, OneOfPolicy, buildDockCredentialStatus } from '../src/utils/revocation';
 import { FullNodeEndpoint, TestAccountURI } from '../tests/test-constants';
-import getKeyDoc from '../src/utils/vc/helpers';
+import { getKeyDoc } from '../src/utils/vc/helpers';
 import { DockResolver } from '../src/resolver';
 
 // Both issuer and holder have DIDs
@@ -44,17 +44,17 @@ async function setup() {
 
   // Register issuer DID
   console.log('Registering issuer DID...');
-  const pair = dock.keyring.addFromUri(issuerSeed, null, 'ed25519');
+  const pair = new DidKeypair(dock.keyring.addFromUri(issuerSeed, null, 'ed25519'), 1);
   await registerNewDIDUsingPair(dock, issuerDID, pair);
 
   // Register holder DID
   console.log('Registering holder DID...');
-  const pair1 = dock.keyring.addFromUri(holderSeed, null, 'ed25519');
+  const pair1 = new DidKeypair(dock.keyring.addFromUri(holderSeed, null, 'ed25519'), 1);
   await registerNewDIDUsingPair(dock, holderDID, pair1);
 
   // Create a new policy
   const policy = new OneOfPolicy();
-  policy.addOwner(issuerDID);
+  policy.addOwner(typedHexDID(dock.api, issuerDID));
 
   // Add a new revocation registry with above policy
   console.log('Creating registry...');
@@ -88,8 +88,6 @@ async function main() {
     const verifyResult = await signedCredential.verify({
       resolver,
       compactProof: true,
-      forceRevocationCheck: true,
-      revocationApi: { dock },
     });
     if (verifyResult.verified) {
       console.log('Credential has been verified! Result:', verifyResult);
@@ -109,7 +107,6 @@ async function main() {
         domain,
         resolver,
         compactProof: true,
-        forceRevocationCheck: false,
       });
 
       if (ver.verified) {

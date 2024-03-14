@@ -1,7 +1,7 @@
 import { sha256 } from 'js-sha256';
 import { EcdsaSecp256k1SigName, EcdsaSecp256k1VerKeyName } from './constants';
 import EcdsaSecp256k1VerificationKey2019 from './EcdsaSecp256k1VerificationKey2019';
-import CustomLinkedDataSignature from './custom-linkeddatasignature';
+import CustomLinkedDataSignature from './common/CustomLinkedDataSignature';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
@@ -29,6 +29,7 @@ export default class EcdsaSepc256k1Signature2019 extends CustomLinkedDataSignatu
   /**
    * Generate object with `sign` method
    * @param keypair
+   * @param verificationMethod
    * @returns {object}
    */
   static signerFactory(keypair, verificationMethod) {

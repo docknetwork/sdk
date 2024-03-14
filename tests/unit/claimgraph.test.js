@@ -1,5 +1,5 @@
 import jsonld from 'jsonld';
-import { fromJsonldjsCg, asEE, merge } from '../../src/utils/claimgraph';
+import { fromJsonldjsCg, merge } from '../../src/utils/claimgraph';
 
 describe('Claimgraph operations.', () => {
   test('merge', async () => {

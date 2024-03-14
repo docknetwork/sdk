@@ -9,6 +9,16 @@
       "@type": "@id",
       "@container": "@graph"
     },
+    "cryptoVersion": {
+      "@id": "dockBBS:cryptoVersion",
+      "@type": "@id",
+      "@container": "@graph"
+    },
+    "presVersion": {
+      "@id": "dockBBS:presVersion",
+      "@type": "@id",
+      "@container": "@graph"
+    },
     "defaultDecimalPlaces": {
       "@id": "dockBBS:defaultDecimalPlaces",
       "@type": "@id",
@@ -16,6 +26,11 @@
     },
     "defaultMinimumInteger": {
       "@id": "dockBBS:defaultMinimumInteger",
+      "@type": "@id",
+      "@container": "@graph"
+    },
+    "defaultMinimumDate": {
+      "@id": "dockBBS:defaultMinimumDate",
       "@type": "@id",
       "@container": "@graph"
     },
@@ -28,6 +43,22 @@
       "@id": "dockBBS:useDefaults",
       "@type": "@id",
       "@container": "@graph"
+    },
+    "DockVBAccumulator2022": {
+      "@id": "https://ld.dock.io/security#DockVBAccumulator2022",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "accumulated": "https://ld.dock.io/security#accumulated",
+        "revocationCheck": "https://ld.dock.io/security#revocationCheck",
+        "revocationId": "https://ld.dock.io/security#revocationId",
+        "extra": {
+          "@id": "https://ld.dock.io/security#extra",
+          "@context": {"@vocab": "https://ld.dock.io/security/extra"}
+        }
+      }
     },
     "Bls12381BBS+SignatureProofDock2022": {
       "@id": "https://ld.dock.io/security#Bls12381BBS+SignatureDock2022",
@@ -43,6 +74,13 @@
         },
         "domain": "https://ld.dock.io/security#domain",
         "context": "https://ld.dock.io/security#context",
+        "bounds": {
+          "@id": "https://ld.dock.io/security#bounds",
+          "@context": {"@vocab": "https://ld.dock.io/security/bounds"}
+        },
+        "sigType": "https://ld.dock.io/security#sigType",
+        "boundedPseudonyms": "https://ld.dock.io/security#boundedPseudonyms",
+        "unboundedPseudonyms": "https://ld.dock.io/security#unboundedPseudonyms",
         "attributeCiphertexts": "https://ld.dock.io/security#attributeCiphertexts",
         "attributeEqualities": "https://ld.dock.io/security#attributeEqualities",
         "proofValue": "https://ld.dock.io/security#proofValue",

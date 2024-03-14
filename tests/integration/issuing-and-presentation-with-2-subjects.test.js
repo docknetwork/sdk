@@ -1,10 +1,10 @@
-// Mock axios
+// Mock fetch
 import { randomAsHex } from '@polkadot/util-crypto';
 import jsonld from 'jsonld';
-import mockAxios from '../mocks/axios';
+import mockFetch from '../mocks/fetch';
 
 import {
-  createNewDockDID,
+  createNewDockDID, DidKeypair,
 } from '../../src/utils/did';
 
 import { DockAPI } from '../../src/index';
@@ -12,11 +12,13 @@ import { DockResolver } from '../../src/resolver';
 
 import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
 import { getCredMatcherDoc, getProofMatcherDoc, registerNewDIDUsingPair } from './helpers';
-import { issueCredential, signPresentation, verifyCredential, verifyPresentation } from '../../src/utils/vc/index';
-import getKeyDoc from '../../src/utils/vc/helpers';
+import {
+  issueCredential, signPresentation, verifyCredential, verifyPresentation,
+} from '../../src/utils/vc/index';
+import { getKeyDoc } from '../../src/utils/vc/helpers';
 import { createPresentation } from '../create-presentation';
 
-mockAxios();
+mockFetch();
 
 // DID and seed for
 const issuerDID = createNewDockDID();
@@ -42,11 +44,11 @@ const unsignedCred = {
   issuanceDate: '2020-03-18T19:23:24Z',
   credentialSubject: [
     {
-      id: subject1DID,  // DID of the user who is given read access to the document
+      id: subject1DID, // DID of the user who is given read access to the document
       type: 'reader',
     },
     {
-      id: subject2DID,  // DID of the document
+      id: subject2DID, // DID of the document
       type: 'document',
     },
   ],
@@ -75,11 +77,11 @@ describe('Verifiable Credential issuance and presentation where the credential h
     // The DIDs should be written before any test begins
 
     // issuer DID
-    const pair1 = dock.keyring.addFromUri(issuerKeySeed, null, 'ed25519');
+    const pair1 = new DidKeypair(dock.keyring.addFromUri(issuerKeySeed, null, 'ed25519'), 1);
     await registerNewDIDUsingPair(dock, issuerDID, pair1);
 
     // 1st subject's DID
-    const pair2 = dock.keyring.addFromUri(subject1Seed, null, 'ed25519');
+    const pair2 = new DidKeypair(dock.keyring.addFromUri(subject1Seed, null, 'ed25519'), 1);
     await registerNewDIDUsingPair(dock, subject1DID, pair2);
 
     // 2nd subject's DID, has no key but is controlled by subject1DID
@@ -123,7 +125,7 @@ describe('Verifiable Credential issuance and presentation where the credential h
   test('Holder creates a verifiable presentation and verifier verifies it and does some other checks', async () => {
     const holderKey = getKeyDoc(subject1DID, dock.keyring.addFromUri(subject1Seed, null, 'ed25519'), 'Ed25519VerificationKey2018');
 
-    const presId = randomAsHex(32);
+    const presId = `https://pres.com/${randomAsHex(32)}`;
     const challenge = randomAsHex(32);
     const domain = 'test domain';
 

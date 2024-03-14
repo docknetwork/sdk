@@ -1,19 +1,21 @@
-// Mock axios
+// Mock fetch
 import { randomAsHex } from '@polkadot/util-crypto';
-import mockAxios from '../mocks/axios';
+import mockFetch from '../mocks/fetch';
 
-import { createNewDockDID, } from '../../src/utils/did';
+import { createNewDockDID, DidKeypair } from '../../src/utils/did';
 
 import { DockAPI } from '../../src/index';
 import { DockResolver } from '../../src/resolver';
 
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-constants';
-import { getCredMatcherDoc, getProofMatcherDoc, getUnsignedCred, registerNewDIDUsingPair } from './helpers';
+import {
+  getCredMatcherDoc, getProofMatcherDoc, getUnsignedCred, registerNewDIDUsingPair,
+} from './helpers';
 import { generateEcdsaSecp256k1Keypair } from '../../src/utils/misc';
 import { issueCredential, verifyCredential } from '../../src/utils/vc/index';
-import getKeyDoc from '../../src/utils/vc/helpers';
+import { getKeyDoc } from '../../src/utils/vc/helpers';
 
-mockAxios();
+mockFetch();
 
 // 1st issuer's DID.
 const issuer1DID = createNewDockDID();
@@ -52,15 +54,15 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
     // The DIDs should be written before any test begins
 
     // DID with ed25519 key
-    const pair1 = dock.keyring.addFromUri(issuer1KeySeed, null, 'ed25519');
+    const pair1 = new DidKeypair(dock.keyring.addFromUri(issuer1KeySeed, null, 'ed25519'), 1);
     await registerNewDIDUsingPair(dock, issuer1DID, pair1);
 
     // DID with secp key
-    const pair2 = generateEcdsaSecp256k1Keypair(issuer2KeyEntropy);
+    const pair2 = new DidKeypair(generateEcdsaSecp256k1Keypair(issuer2KeyEntropy), 1);
     await registerNewDIDUsingPair(dock, issuer2DID, pair2);
 
     // DID with sr25519 key
-    const pair3 = dock.keyring.addFromUri(issuer3KeySeed, null, 'sr25519');
+    const pair3 = new DidKeypair(dock.keyring.addFromUri(issuer3KeySeed, null, 'sr25519'), 1);
     await registerNewDIDUsingPair(dock, issuer3DID, pair3);
   }, 60000);
 
@@ -118,5 +120,26 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
         getProofMatcherDoc(),
       ),
     );
+  }, 40000);
+
+  test('(JWT) Issue a verifiable credential with ed25519 key and verify it', async () => {
+    const issuerKey = getKeyDoc(issuer1DID, dock.keyring.addFromUri(issuer1KeySeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
+    const credential = await issueCredential(issuerKey, unsignedCred, true, null, null, null, null, false, 'jwt');
+    const result = await verifyCredential(credential, { resolver });
+    expect(result.verified).toBeTruthy();
+  }, 40000);
+
+  test('(JWT) Issue a verifiable credential with secp256k1 key and verify it', async () => {
+    const issuerKey = getKeyDoc(issuer2DID, generateEcdsaSecp256k1Keypair(issuer2KeyEntropy), 'EcdsaSecp256k1VerificationKey2019');
+    const credential = await issueCredential(issuerKey, unsignedCred, true, null, null, null, null, false, 'jwt');
+    const result = await verifyCredential(credential, { resolver });
+    expect(result.verified).toBeTruthy();
+  }, 40000);
+
+  test('(JWT) Issue a verifiable credential with sr25519 key and verify it', async () => {
+    const issuerKey = getKeyDoc(issuer3DID, dock.keyring.addFromUri(issuer3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
+    const credential = await issueCredential(issuerKey, unsignedCred, true, null, null, null, null, false, 'jwt');
+    const result = await verifyCredential(credential, { resolver });
+    expect(result.verified).toBeTruthy();
   }, 40000);
 });

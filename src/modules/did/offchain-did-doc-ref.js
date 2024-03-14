@@ -1,4 +1,4 @@
-import { bytesToWrappedBytes } from '../../utils/misc';
+export const FORMATS = new Set(['CID', 'URL', 'Custom']);
 
 /**
  * An off-chain DID Doc reference stored on chain. The reference may be
@@ -7,21 +7,23 @@ import { bytesToWrappedBytes } from '../../utils/misc';
  *  - any other format
  */
 export default class OffChainDidDocRef {
+  constructor(type, bytes) {
+    if (!FORMATS.has(type)) {
+      throw new Error(`Unsupported type: ${type}`);
+    }
+
+    this[type] = bytes;
+  }
+
   static cid(bytes) {
-    return {
-      CID: bytesToWrappedBytes(bytes),
-    };
+    return new this('CID', bytes);
   }
 
   static url(bytes) {
-    return {
-      URL: bytesToWrappedBytes(bytes),
-    };
+    return new this('URL', bytes);
   }
 
   static custom(bytes) {
-    return {
-      Custom: bytesToWrappedBytes(bytes),
-    };
+    return new this('Custom', bytes);
   }
 }

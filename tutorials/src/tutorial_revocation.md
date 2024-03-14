@@ -43,7 +43,7 @@ Now get the registry id, `registryId` and the revocation id (the hash of credent
 Revoking an already revoked credential has no effect.
 
 ```js
-await dock.revocation.revokeCredentialWithOneOfPolicy(registryId, revokeId, ownerDID, ownerKeypair, 1, {didModule: dock.did});
+await dock.revocation.revokeCredentialWithOneOfPolicy(registryId, revokeId, ownerDID, ownerKeypair, {didModule: dock.did});
 ```
 Revoking multiple ids in a single transaction is possible but with a lower level method `dock.revocation.revoke`. See tests for its usage
 
@@ -54,7 +54,7 @@ Get the registry id, `registryId` and the revocation id to undo, `revokeId` and 
 Unrevoking an unrevoked credential has no effect.
 
 ```js
-await dock.revocation.unrevokeCredentialWithOneOfPolicy(registryId, revokeId, ownerDID, ownerKeypair, 1, {didModule: dock.did});
+await dock.revocation.unrevokeCredentialWithOneOfPolicy(registryId, revokeId, ownerDID, ownerKeypair, {didModule: dock.did});
 ```
 Undoing revocation for multiple ids in a single transaction is possible but with a lower level method `dock.revocation.unrevoke`. See tests for its usage
 
@@ -72,5 +72,5 @@ To get the details of the registry like policy, add-only status and block number
 A registry can be deleted leading to all the corresponding revocation ids being deleted as well. This requires the signature
 from owner like other updates. Use the `dock.revocation.removeRegistry` method to remove a registry.
 ```js
-await dock.revocation.removeRegistryWithOneOfPolicy(registryId, ownerDID, ownerKeypair, 1, {didModule: dock.did}, false);
+await dock.revocation.removeRegistryWithOneOfPolicy(registryId, ownerDID, ownerKeypair, {didModule: dock.did}, false);
 ```

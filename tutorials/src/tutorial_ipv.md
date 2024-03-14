@@ -190,18 +190,10 @@ with the `verify` method. The `verify` method takes an object of arguments,
 and is optional.
 
 If you've used DIDs you need to pass a `resolver` for them.
-You can also use the booleans `compactProof` (to compact the JSON-LD) and
-`forceRevocationCheck` (to force revocation check). Please beware that
-setting `forceRevocationCheck` to false can allow false positives when
-verifying revocable credentials.
+You can also use the booleans `compactProof` (to compact the JSON-LD).
 
-If your credential has uses the `status` field, you can pass a
-`revocationApi` param that accepts an object describing the API to use for
-the revocation check. No params are required for the simplest cases:
-
-If your credential uses schema and requires blob resolution, you can pass a
-`schemaApi` param that accepts an object describing the API to pull the
-schema from chain. No params are required for the simplest cases:
+If your credential has uses the `credentialStatus` field, the credential will be checked
+not to be revoked unless you pass `skipRevocationCheck` flag.
 ```javascript
 >   const result = await vc.verify({ ... })
 >   result
@@ -387,14 +379,9 @@ Once your Verifiable Presentation has been signed you can proceed to verify
 it with the `verify` method.
 
 If you've used DIDs you need to pass a `resolver` for them. You can also use
-the booleans `compactProof` (to compact the JSON-LD) and
-`forceRevocationCheck` (to force revocation check). Please beware that
-setting `forceRevocationCheck` to false can allow false positives when
-verifying revocable credentials.
+the booleans `compactProof` (to compact the JSON-LD).
 
-If your credential has uses the `status` field, you can pass a
-`revocationApi` param that accepts an object describing the API to use for
-the revocation check.
+If your credential uses the `credentialStatus` field, the credential will be checked to be not revoked unless you pass `skipRevocationCheck`.
 For the simplest cases you only need a `challenge` string and possibly a
 `domain` string:
 ```javascript
@@ -466,7 +453,7 @@ Here's an example of issuing a Verifiable Credential using DIDs, provided that y
 ```javascript
 const issuerKey = getKeyDoc(issuerDID, dock.keyring.addFromUri(issuerSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
 await vc.sign(issuerKey);
-const verificationResult = await signedCredential.verify({ resolver, compactProof: true, forceRevocationCheck: true, revocationApi: { dock } });
+const verificationResult = await signedCredential.verify({ resolver, compactProof: true });
 console.log(verificationResult.verified); // Should print `true`
 ```
 

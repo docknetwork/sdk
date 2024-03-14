@@ -9,6 +9,7 @@
     "allowUnknownTags": true,
     "dictionaries": ["jsdoc","closure"]
   },
+  "plugins": ["node_modules/jsdoc-typeof-plugin"],
   "templates": {
     "cleverLinks": false,
     "monospaceLinks": false

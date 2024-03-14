@@ -1,9 +1,9 @@
 import { bnToBn } from '@polkadot/util';
-import { randomAsHex } from "@polkadot/util-crypto";
+import { randomAsHex } from '@polkadot/util-crypto';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { MaxGas, MinGasPrice } from '../test-constants';
 import { DidKey, VerificationRelationship } from '../../src/public-keys';
-import { createNewDockDID } from "../../src/utils/did";
+import { createNewDockDID } from '../../src/utils/did';
 
 /**
  * Registers a new DID on dock chain, keeps the controller same as the DID
@@ -15,13 +15,12 @@ import { createNewDockDID } from "../../src/utils/did";
  * @returns {Promise<void>}
  */
 export async function registerNewDIDUsingPair(dockAPI, did, pair, verRels = undefined, controllers = []) {
-  const publicKey = getPublicKeyFromKeyringPair(pair);
-
   if (verRels === undefined) {
+    // eslint-disable-next-line no-param-reassign
     verRels = new VerificationRelationship();
   }
   // No additional controller
-  const didKey = new DidKey(publicKey, verRels);
+  const didKey = new DidKey(pair.publicKey(), verRels);
   return dockAPI.did.new(did, [didKey], controllers, false);
 }
 
@@ -29,13 +28,15 @@ export async function registerNewDIDUsingPair(dockAPI, did, pair, verRels = unde
  * Test helper to get an unsigned cred with given credential id and holder DID
  * @param credId - Credential id
  * @param holderDID - Holder DID
+ * @param additionalContext - Additional `URI`s to be added to the `@context` property.
  * @returns {{issuanceDate: string, credentialSubject: {alumniOf: string, id: *}, id: *, type: [string, string], '@context': [string, string]}}
  */
-export function getUnsignedCred(credId, holderDID) {
+export function getUnsignedCred(credId, holderDID, additionalContext = []) {
   return {
     '@context': [
       'https://www.w3.org/2018/credentials/v1',
       'https://www.w3.org/2018/credentials/examples/v1',
+      ...additionalContext,
     ],
     id: credId,
     type: ['VerifiableCredential', 'AlumniCredential'],
@@ -129,7 +130,7 @@ export async function getBalance(api, account) {
 export function createDidPair(dock) {
   const did = createNewDockDID();
   const seed = randomAsHex(32);
-  const pair = dock.keyring.addFromUri(seed, null, "sr25519");
+  const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
   const publicKey = getPublicKeyFromKeyringPair(pair);
   const didKey = new DidKey(publicKey, new VerificationRelationship());
   return [did, pair, didKey];

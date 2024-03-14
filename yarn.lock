@@ -2495,28 +2495,22 @@
     jsonld "^5.2.0"
     jsonld-signatures "^9.3.0"
 
-"@docknetwork/crypto-wasm-ts@0.48.0":
-  version "0.48.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.48.0.tgz#1d63d20fbb2ae101ab5ade50ddbaaa8737aa508c"
-  integrity sha512-6YhqNPgI42vgd+nhH/Sydlc46uPAQcVOHv0alhA4VSMN+Ujv9IZ3oRG2x2zJdYf+62nC9SvnFmFA5mDGOfPYMA==
+"@docknetwork/crypto-wasm-ts@0.55.0":
+  version "0.55.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.55.0.tgz#eb3fc5e6831ee21ba485ce7366456d35aa717272"
+  integrity sha512-RyyjyUcDWLA+xh8NgecJJoAT3yIkLrdAsBYIBpdFgN9AhuxMPo92llEEtDIzA9qDojwW4B8QDZnRpTArykrdLw==
   dependencies:
-    "@docknetwork/crypto-wasm" "0.23.0"
     "@types/flat" "^5.0.2"
     "@types/lodash" "^4.14.195"
     bs58 "5.0.0"
+    crypto-wasm-new "npm:@docknetwork/crypto-wasm@0.25.0"
+    crypto-wasm-old "npm:@docknetwork/crypto-wasm@0.23.0"
     flat "^5.0.2"
     json-pointer "^0.6.2"
     json-stringify-deterministic "^1.0.11"
     lodash "^4.17.21"
     lzutf8 "0.6.3"
-    semver "^7.5.4"
-
-"@docknetwork/crypto-wasm@0.23.0":
-  version "0.23.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.23.0.tgz#5ae04db0f7990fb6fc9c7ad3f0a1cb7255518169"
-  integrity sha512-/bDSy05HkIZIZL9HDHowjCKxTDf9Cf04e1ElIY0o/q9ewbxHQ4/r8Ppv5V5bOnVkxcFG9lWQQstKXQDV86UWRw==
-  dependencies:
-    buffer "^6.0.3"
+    semver "^7.6.0"
 
 "@docknetwork/crypto-wasm@^0.22.0":
   version "0.22.0"
@@ -5633,6 +5627,20 @@ crypto-browserify@3.12.0:
     randombytes "^2.0.0"
     randomfill "^1.0.3"
 
+"crypto-wasm-new@npm:@docknetwork/crypto-wasm@0.25.0":
+  version "0.25.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.25.0.tgz#679e38d7656f11c9417b602fc6fccf239c9d116e"
+  integrity sha512-iKoM390iG2ohwbmaMNlYDh7hYtwoGKjj8zikU+Oh5DkFaPpPofhq1yzoPiaU2DRZiYZox/38MRattdXcaCi0Kw==
+  dependencies:
+    buffer "^6.0.3"
+
+"crypto-wasm-old@npm:@docknetwork/crypto-wasm@0.23.0":
+  version "0.23.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.23.0.tgz#5ae04db0f7990fb6fc9c7ad3f0a1cb7255518169"
+  integrity sha512-/bDSy05HkIZIZL9HDHowjCKxTDf9Cf04e1ElIY0o/q9ewbxHQ4/r8Ppv5V5bOnVkxcFG9lWQQstKXQDV86UWRw==
+  dependencies:
+    buffer "^6.0.3"
+
 cssom@0.3.x, "cssom@>= 0.3.2 < 0.4.0":
   version "0.3.8"
   resolved "https://registry.yarnpkg.com/cssom/-/cssom-0.3.8.tgz#9f1276f5b2b463f2114d3f2c75250af8c1a36f4a"
@@ -7041,9 +7049,9 @@ fn.name@1.x.x:
   integrity sha512-GRnmB5gPyJpAhTQdSZTSp9uaPSvl09KoYcMQtsB9rQoOmzs9dH6ffeccH+Z+cv6P68Hu5bC6JjRh4Ah/mHSNRw==
 
 follow-redirects@^1.5.1:
-  version "1.15.2"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.2.tgz#b460864144ba63f2681096f274c4e57026da2c13"
-  integrity sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==
+  version "1.15.6"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.6.tgz#7f815c0cda4249c74ff09e95ef97c23b5fd0399b"
+  integrity sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==
 
 for-each@^0.3.3:
   version "0.3.3"
@@ -11236,10 +11244,10 @@ semver@^7.3.2, semver@^7.3.5:
   dependencies:
     lru-cache "^6.0.0"
 
-semver@^7.5.4:
-  version "7.5.4"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-7.5.4.tgz#483986ec4ed38e1c6c48c34894a9182dbff68a6e"
-  integrity sha512-1bCSESV6Pv+i21Hvpxp3Dx+pSD8lIPt8uVjRrxAUt/nbswYc+tK6Y2btiULjd4+fnq15PX+nqQDC7Oft7WkwcA==
+semver@^7.6.0:
+  version "7.6.0"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.6.0.tgz#1a46a4db4bffcccd97b743b5005c8325f23d4e2d"
+  integrity sha512-EnwXhrlwXMk9gKu5/flx5sv/an57AkRplG3hTK68W7FRDN+k+OWBj65M7719OkA82XLBxrcX0KSHj+X5COhOVg==
   dependencies:
     lru-cache "^6.0.0"
 

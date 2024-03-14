@@ -17,13 +17,15 @@ import { Resolver } from "../../resolver"; // eslint-disable-line
 import {
   getSuiteFromKeyDoc,
   expandJSONLD,
-  getKeyFromDIDDocument,
+  getKeyFromDIDDocument, processIfKvac,
 } from './helpers';
 import {
   DEFAULT_CONTEXT_V1_URL,
   credentialContextField,
   PrivateStatusList2021EntryType,
-  DockStatusList2021Qualifier, StatusList2021EntryType, PrivateStatusList2021Qualifier,
+  DockStatusList2021Qualifier,
+  StatusList2021EntryType,
+  PrivateStatusList2021Qualifier,
 } from './constants';
 import { ensureValidDatetime } from '../type-helpers';
 
@@ -40,6 +42,7 @@ import {
   JsonWebSignature2020,
 } from './custom_crypto';
 import { signJWS } from './jws';
+import Bls12381BDDT16MACProofDock2024 from './crypto/Bls12381BDDT16MACProofDock2024';
 
 export const VC_ISSUE_TYPE_JSONLD = 'jsonld';
 export const VC_ISSUE_TYPE_PROOFVALUE = 'proofValue';
@@ -327,6 +330,12 @@ export async function verifyCredential(
     return { verified };
   }
 
+  // Process and return the result if a KVAC credential
+  const r = processIfKvac(credential);
+  if (r) {
+    return r;
+  }
+
   // Specify certain parameters for anoncreds
   const anoncredsParams = {
     accumulatorPublicKeys, predicateParams, circomOutputs, blindedAttributesCircomOutputs,
@@ -342,6 +351,8 @@ export async function verifyCredential(
     new Bls12381BBSSignatureProofDock2023(anoncredsParams),
     new Bls12381PSSignatureDock2023(anoncredsParams),
     new Bls12381PSSignatureProofDock2023(anoncredsParams),
+    // Only BDDT16MACProof is present and not BDDT16MAC since those aren't verified by the following
+    new Bls12381BDDT16MACProofDock2024(anoncredsParams),
     ...suite,
   ];
 

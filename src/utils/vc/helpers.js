@@ -17,6 +17,8 @@ import {
   Bls12381PSDockVerKeyName,
   JsonWebSignature2020,
 } from './custom_crypto';
+import { Bls12381BDDT16DockVerKeyName, Bls12381BDDT16MacDockName } from './crypto/constants';
+import Bls12381BDDT16MACDock2024 from './crypto/Bls12381BDDT16MACDock2024';
 
 /**
  * @typedef {object} KeyDoc The Options to use in the function createUser.
@@ -76,6 +78,9 @@ export async function getSuiteFromKeyDoc(keyDoc, useProofValue, options) {
       break;
     case Bls12381PSDockVerKeyName:
       Cls = Bls12381PSSignatureDock2023;
+      break;
+    case Bls12381BDDT16DockVerKeyName:
+      Cls = Bls12381BDDT16MACDock2024;
       break;
     case 'JsonWebKey2020':
       Cls = JsonWebSignature2020;
@@ -137,4 +142,27 @@ export function getKeyFromDIDDocument(didDocument, didUrl) {
     ...potentialToArray(didDocument.publicKey),
   ];
   return possibleKeys.filter((key) => key.id === didUrl)[0];
+}
+
+/**
+ * For KVAC, public key is not present so the holder assumes that the given credential is valid.
+ * Secondly, these credentials are never shared as it is with the verifier so this function returns true if the credential is
+ * a KVAC, else returns undefined.
+ * @param credential
+ * @returns {object | undefined}
+ */
+export function processIfKvac(credential) {
+  const { proof } = credential;
+  if (proof === undefined || proof.type === undefined) {
+    throw new Error(`Credential should have a non-null type field but found ${proof.type}`);
+  }
+  if (proof.type === Bls12381BDDT16MacDockName) {
+    return {
+      results: [{
+        verified: true, proof, verificationMethod: {}, purposeResult: {},
+      }],
+      verified: true,
+    };
+  }
+  return undefined;
 }

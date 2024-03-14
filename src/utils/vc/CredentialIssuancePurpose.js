@@ -5,6 +5,7 @@
 import jsonld from 'jsonld';
 import jsigs from 'jsonld-signatures';
 import { expandJSONLD } from './helpers';
+import { Bls12381BDDT16MacProofDockName } from './crypto/constants';
 
 const { AssertionProofPurpose } = jsigs.purposes;
 
@@ -53,6 +54,9 @@ export default class CredentialIssuancePurpose extends AssertionProofPurpose {
     document, suite, verificationMethod, documentLoader, expansionMap,
   }) {
     try {
+      if (proof.type === Bls12381BDDT16MacProofDockName) {
+        return { valid: true, error: null };
+      }
       const result = await super.validate(proof, {
         document, suite, verificationMethod, documentLoader, expansionMap,
       });

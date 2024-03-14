@@ -80,7 +80,7 @@ export default withExtendedStaticProperties(
       await initializeWasm();
 
       // If this function is being called for credential verification or not
-      const forVerification = options.proof && options.proof.proofValue;
+      const forVerification = !!(options.proof && options.proof.proofValue);
 
       let serializedCredential;
       let credSchema;
@@ -182,15 +182,21 @@ export default withExtendedStaticProperties(
     }) {
       const [trimmedProof, proofVal] = this.getTrimmedProofAndValue(document, explicitProof);
 
-      const [credSchema, wasLegacySchema] = this.extractSchema(document);
+      const [credSchema, wasExactSchema] = this.extractSchema(document);
 
       const credJson = {
         ...document,
         proof: trimmedProof,
       };
-      this.revealMandatoryFields(credJson, document);
+
+      // Old credentials don't include the version number but it was set while signing. So add it here if missing.
+      if (credJson.cryptoVersion === undefined) {
+        credJson.cryptoVersion = '0.2.0';
+      }
+
+      this.formatMandatoryFields(credJson, document);
       const cred = this.Credential.fromJSON(credJson, CustomLinkedDataSignature.fromJsigProofValue(proofVal));
-      if (!wasLegacySchema) {
+      if (!wasExactSchema) {
         cred.schema = CredentialSchema.generateAppropriateSchema(credJson, credSchema);
       }
 
@@ -217,7 +223,7 @@ export default withExtendedStaticProperties(
         ...document,
         proof: trimmedProof,
       };
-      this.revealMandatoryFields(credJson, document);
+      this.formatMandatoryFields(credJson, document);
       if (!wasLegacySchema) {
         // Older credentials didn't include the version field in the final credential but they did while signing
         credJson.cryptoVersion = '0.2.0';
@@ -302,7 +308,7 @@ export default withExtendedStaticProperties(
      * @param credJson
      * @param document
      */
-    static revealMandatoryFields(credJson, document) {
+    static formatMandatoryFields(credJson, document) {
       // NOTE: that they are encoded as JSON strings here to reduce message count and so its *always known*
       // eslint-disable-next-line no-param-reassign
       credJson['@context'] = JSON.stringify(document['@context']);
@@ -356,12 +362,12 @@ export default withExtendedStaticProperties(
          */
         // eslint-disable-next-line no-inner-declarations
         async function getSchema(schemaId) {
-          if (!schemaId.startsWith('blob:dock:')) {
-            throw new Error(`Can only fetch schemas stored on Dock for now. Got schema id ${schemaId}`);
-          }
           const { document: schema } = await documentLoader(schemaId);
-          // schema[0] is the schema/blob id
-          return schema[1];
+          // schema[0] is the schema/blob id if stored on chain
+          if (schemaId.startsWith('blob:dock:')) {
+            return schema[1];
+          }
+          return schema;
         }
 
         // If we already have a schema to use, add that first and then generate relaxed values later on
@@ -482,6 +488,7 @@ export default withExtendedStaticProperties(
      */
     static signerFactory(keypair, verificationMethod) {
       const { KeyPair } = this;
+      const paramGetter = this.paramGenerator;
 
       return {
         id: verificationMethod,
@@ -491,7 +498,7 @@ export default withExtendedStaticProperties(
           }
 
           const msgCount = data.length;
-          const sigParams = KeyPair.SignatureParams.getSigParamsOfRequiredSize(
+          const sigParams = paramGetter(
             msgCount,
             KeyPair.defaultLabelBytes,
           );
@@ -503,6 +510,10 @@ export default withExtendedStaticProperties(
           return signature.value;
         },
       };
+    }
+
+    static get paramGenerator() {
+      return this.KeyPair.SignatureParams.getSigParamsOfRequiredSize;
     }
 
     ensureSuiteContext() {

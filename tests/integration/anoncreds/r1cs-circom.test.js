@@ -9,8 +9,8 @@ import {
   MetaStatements,
   Witness,
   Witnesses,
-  CompositeProofG1,
-  ProofSpecG1,
+  CompositeProof,
+  ProofSpec,
   R1CSSnarkSetup,
   initializeWasm,
   getRevealedAndUnrevealed,
@@ -41,10 +41,12 @@ for (const {
   Signature,
   SignatureParams,
   KeyPair,
-  buildStatement,
+  buildProverStatement,
+  buildVerifierStatement,
   buildWitness,
   getModule,
 } of Schemes) {
+  const attrName = 'physical.bloodGroup';
   describe(`${Name} Proving that blood group is not AB-`, () => {
     const dock = new DockAPI();
     let account;
@@ -65,6 +67,7 @@ for (const {
     let wasm;
     let snarkPk;
     let snarkVk;
+    const isKvac = Name === 'BDDT16';
 
     // Structure of credential that has the blood group attribute
     const attributesStruct = {
@@ -136,40 +139,46 @@ for (const {
       // prover can check that the same R1CS and WASM are generated.
       r1cs = await parseR1CSFile('not_equal_public.r1cs');
       wasm = getWasmBytes('not_equal_public.wasm');
-    }, 10000);
 
-    test('Create params and keys', async () => {
       // Message count shouldn't matter as `label` is known
       const sigParams = SignatureParams.generate(100, labelBytes);
       // Not writing the params on chain as its assumed that the label is hardcoded in the code as system parameter
 
       issuerSchemeKeypair = KeyPair.generate(sigParams);
-      const pk = Module.prepareAddPublicKey(dock.api,
-        u8aToHex(issuerSchemeKeypair.publicKey.bytes));
-      await getModule(dock).addPublicKey(
-        pk,
-        issuerDid,
-        issuerDid,
-        issuerKeypair,
-        { didModule: dock.didModule },
-        false,
-      );
-    });
+
+      if (!isKvac) {
+        const pk = Module.prepareAddPublicKey(dock.api,
+          u8aToHex(issuerSchemeKeypair.publicKey.bytes));
+        await getModule(dock).addPublicKey(
+          pk,
+          issuerDid,
+          issuerDid,
+          issuerKeypair,
+          { didModule: dock.didModule },
+          false,
+        );
+      }
+    }, 10000);
 
     test('Sign attributes, i.e. issue credentials', async () => {
-      const queriedPk = await getModule(dock).getPublicKey(issuerDid, 2, false);
-      const sigPk = new PublicKey(hexToU8a(queriedPk.bytes));
+      let verifParam;
+      if (isKvac) {
+        verifParam = issuerSchemeKeypair.sk;
+      } else {
+        const queriedPk = await getModule(dock).getPublicKey(issuerDid, 2, false);
+        verifParam = new PublicKey(hexToU8a(queriedPk.bytes));
+      }
 
       credential1 = Signature.signMessageObject(
         attributes1,
-        issuerSchemeKeypair.secretKey,
+        issuerSchemeKeypair.sk,
         labelBytes,
         encoder,
       );
       expect(
         credential1.signature.verifyMessageObject(
           attributes1,
-          sigPk,
+          verifParam,
           labelBytes,
           encoder,
         ).verified,
@@ -177,14 +186,14 @@ for (const {
 
       credential2 = Signature.signMessageObject(
         attributes2,
-        issuerSchemeKeypair.secretKey,
+        issuerSchemeKeypair.sk,
         labelBytes,
         encoder,
       );
       expect(
         credential2.signature.verifyMessageObject(
           attributes2,
-          sigPk,
+          verifParam,
           labelBytes,
           encoder,
         ).verified,
@@ -199,7 +208,7 @@ for (const {
 
     it('proof verifies when blood groups is not AB-', async () => {
       expect(JSON.stringify(encodedABNeg)).not.toEqual(
-        JSON.stringify(credential1.encodedMessages['physical.bloodGroup']),
+        JSON.stringify(credential1.encodedMessages[attrName]),
       );
 
       await check(attributes1, credential1, 'John', true);
@@ -207,7 +216,7 @@ for (const {
 
     it('proof does not verify when blood groups is AB-', async () => {
       expect(JSON.stringify(encodedABNeg)).toEqual(
-        JSON.stringify(credential2.encodedMessages['physical.bloodGroup']),
+        JSON.stringify(credential2.encodedMessages[attrName]),
       );
 
       await check(attributes2, credential2, 'Carol', false);
@@ -219,13 +228,19 @@ for (const {
       expectedFirstName,
       shouldProofVerify,
     ) {
-      const queriedPk = await getModule(dock).getPublicKey(issuerDid, 2, false);
-      const sigPk = new PublicKey(hexToU8a(queriedPk.bytes));
+      let sigPk;
+      if (!isKvac) {
+        const queriedPk = await getModule(dock).getPublicKey(issuerDid, 2, false);
+        sigPk = new PublicKey(hexToU8a(queriedPk.bytes));
+      }
 
       const revealedNames = new Set();
       revealedNames.add('fname');
 
-      const sigParams = SignatureParams.getSigParamsForMsgStructure(
+      const sigParams = !isKvac ? SignatureParams.getSigParamsForMsgStructure(
+        attributesStruct,
+        labelBytes,
+      ) : SignatureParams.getMacParamsForMsgStructure(
         attributesStruct,
         labelBytes,
       );
@@ -236,9 +251,13 @@ for (const {
       );
       expect(revealedMsgsRaw).toEqual({ fname: expectedFirstName });
 
-      const statement1 = buildStatement(
+      const statement1 = !isKvac && 'adaptForLess' in sigPk ? buildProverStatement(
         sigParams,
-        'adaptForLess' in sigPk ? sigPk.adaptForLess(sigParams.supportedMessageCount()) : sigPk,
+        sigPk.adaptForLess(sigParams.supportedMessageCount()),
+        revealedMsgs,
+        false,
+      ) : buildProverStatement(
+        sigParams,
         revealedMsgs,
         false,
       );
@@ -252,7 +271,7 @@ for (const {
       const witnessEq1 = new WitnessEqualityMetaStatement();
       witnessEq1.addWitnessRef(
         sIdx1,
-        getIndicesForMsgNames(['physical.bloodGroup'], attributesStruct)[0],
+        getIndicesForMsgNames([attrName], attributesStruct)[0],
       );
       witnessEq1.addWitnessRef(sIdx2, 0);
 
@@ -260,7 +279,7 @@ for (const {
       metaStmtsProver.addWitnessEquality(witnessEq1);
 
       // The prover should independently construct this `ProofSpec`
-      const proofSpecProver = new ProofSpecG1(
+      const proofSpecProver = new ProofSpec(
         statementsProver,
         metaStmtsProver,
       );
@@ -275,7 +294,7 @@ for (const {
       const inputs = new CircomInputs();
       inputs.setPrivateInput(
         'in',
-        credential.encodedMessages['physical.bloodGroup'],
+        credential.encodedMessages[attrName],
       );
       inputs.setPublicInput('pub', encodedABNeg);
       const witness2 = Witness.r1csCircomWitness(inputs);
@@ -284,7 +303,7 @@ for (const {
       witnesses.add(witness1);
       witnesses.add(witness2);
 
-      const proof = CompositeProofG1.generate(proofSpecProver, witnesses);
+      const proof = CompositeProof.generate(proofSpecProver, witnesses);
 
       // Verifier independently encodes revealed messages
       const revealedMsgsFromVerifier = encodeRevealedMsgs(
@@ -294,9 +313,13 @@ for (const {
       );
       checkMapsEqual(revealedMsgs, revealedMsgsFromVerifier);
 
-      const statement3 = buildStatement(
+      const statement3 = !isKvac ? buildVerifierStatement(
         sigParams,
         'adaptForLess' in sigPk ? sigPk.adaptForLess(sigParams.supportedMessageCount()) : sigPk,
+        revealedMsgsFromVerifier,
+        false,
+      ) : buildVerifierStatement(
+        sigParams,
         revealedMsgsFromVerifier,
         false,
       );
@@ -310,14 +333,14 @@ for (const {
       const witnessEq2 = new WitnessEqualityMetaStatement();
       witnessEq2.addWitnessRef(
         sIdx3,
-        getIndicesForMsgNames(['physical.bloodGroup'], attributesStruct)[0],
+        getIndicesForMsgNames([attrName], attributesStruct)[0],
       );
       witnessEq2.addWitnessRef(sIdx4, 0);
 
       const metaStmtsVerifier = new MetaStatements();
       metaStmtsVerifier.addWitnessEquality(witnessEq2);
 
-      const proofSpecVerifier = new ProofSpecG1(
+      const proofSpecVerifier = new ProofSpec(
         statementsVerifier,
         metaStmtsVerifier,
       );

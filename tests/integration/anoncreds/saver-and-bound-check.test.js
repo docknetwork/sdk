@@ -11,11 +11,11 @@ import {
   MetaStatements,
   Witness,
   Witnesses,
-  CompositeProofG1,
+  CompositeProof,
   SaverDecryptor,
   SaverEncryptionGens,
   SaverChunkedCommitmentKey,
-  QuasiProofSpecG1,
+  QuasiProofSpec,
   BoundCheckSnarkSetup,
   initializeWasm,
 } from '@docknetwork/crypto-wasm-ts';
@@ -38,11 +38,14 @@ for (const {
   Signature,
   SignatureParams,
   KeyPair,
-  buildStatement,
+  buildProverStatement,
+  buildVerifierStatement,
   buildWitness,
   getModule,
 } of Schemes) {
-  describe(`${Name} Complete demo of verifiable encryption using SAVER and bound check using LegoGroth16`, () => {
+  const isKvac = Name === 'BDDT16';
+  const skipIfKvac = isKvac ? describe.skip : describe;
+  skipIfKvac(`${Name} Complete demo of verifiable encryption using SAVER and bound check using LegoGroth16`, () => {
     const dock = new DockAPI();
     let account;
     let issuerDid;
@@ -202,11 +205,13 @@ for (const {
         revealedAttrIndices,
       );
 
-      const statement1 = buildStatement(
+      const statement1 = 'adaptForLess' in sigPk ? buildProverStatement(
         sigParams,
-        'adaptForLess' in sigPk
-          ? sigPk.adaptForLess(sigParams.supportedMessageCount())
-          : sigPk,
+        sigPk.adaptForLess(sigParams.supportedMessageCount()),
+        revealedAttrs,
+        false,
+      ) : buildProverStatement(
+        sigParams,
         revealedAttrs,
         false,
       );
@@ -234,11 +239,11 @@ for (const {
       witnesses.add(witness1);
       witnesses.add(witness2);
 
-      const proverProofSpec = new QuasiProofSpecG1(
+      const proverProofSpec = new QuasiProofSpec(
         proverStatements,
         metaStatements,
       );
-      const proof = CompositeProofG1.generateUsingQuasiProofSpec(
+      const proof = CompositeProof.generateUsingQuasiProofSpec(
         proverProofSpec,
         witnesses,
       );
@@ -252,11 +257,21 @@ for (const {
         vk,
         chunkBitSize,
       );
+      const statement4 = !isKvac ? buildVerifierStatement(
+        sigParams,
+        'adaptForLess' in sigPk ? sigPk.adaptForLess(sigParams.supportedMessageCount()) : sigPk,
+        revealedAttrs,
+        false,
+      ) : buildVerifierStatement(
+        sigParams,
+        revealedAttrs,
+        false,
+      );
       const verifierStatements = new Statements();
-      verifierStatements.add(statement1);
+      verifierStatements.add(statement4);
       verifierStatements.add(statement3);
 
-      const verifierProofSpec = new QuasiProofSpecG1(
+      const verifierProofSpec = new QuasiProofSpec(
         verifierStatements,
         metaStatements,
       );
@@ -292,11 +307,13 @@ for (const {
         revealedAttrIndices,
       );
 
-      const statement1 = buildStatement(
+      const statement1 = 'adaptForLess' in sigPk ? buildProverStatement(
         sigParams,
-        'adaptForLess' in sigPk
-          ? sigPk.adaptForLess(sigParams.supportedMessageCount())
-          : sigPk,
+        sigPk.adaptForLess(sigParams.supportedMessageCount()),
+        revealedAttrs,
+        false,
+      ) : buildProverStatement(
+        sigParams,
         revealedAttrs,
         false,
       );
@@ -319,11 +336,11 @@ for (const {
       witnesses.add(witness1);
       witnesses.add(witness2);
 
-      const proverProofSpec = new QuasiProofSpecG1(
+      const proverProofSpec = new QuasiProofSpec(
         proverStatements,
         metaStatements,
       );
-      const proof = CompositeProofG1.generateUsingQuasiProofSpec(
+      const proof = CompositeProof.generateUsingQuasiProofSpec(
         proverProofSpec,
         witnesses,
       );
@@ -334,11 +351,21 @@ for (const {
         max,
         snarkVerifyingKey,
       );
+      const statement4 = !isKvac ? buildVerifierStatement(
+        sigParams,
+        'adaptForLess' in sigPk ? sigPk.adaptForLess(sigParams.supportedMessageCount()) : sigPk,
+        revealedAttrs,
+        false,
+      ) : buildVerifierStatement(
+        sigParams,
+        revealedAttrs,
+        false,
+      );
       const verifierStatements = new Statements();
-      verifierStatements.add(statement1);
+      verifierStatements.add(statement4);
       verifierStatements.add(statement3);
 
-      const verifierProofSpec = new QuasiProofSpecG1(
+      const verifierProofSpec = new QuasiProofSpec(
         verifierStatements,
         metaStatements,
       );

@@ -10,6 +10,7 @@ import {
   Encoder, BDDT16MacSecretKey, MEM_CHECK_STR,
 } from '@docknetwork/crypto-wasm-ts';
 import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
+import { RevocationStatusProtocol } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/types-and-consts';
 import { DockAPI } from '../../../src';
 import {
   FullNodeEndpoint,
@@ -30,7 +31,6 @@ import { DockResolver } from '../../../src/resolver';
 import { createPresentation } from '../../create-presentation';
 import AccumulatorModule from '../../../src/modules/accumulator';
 import { getDelegatedProofsFromVerifiedPresentation } from '../../../src/utils/vc/presentations';
-import { RevocationStatusProtocol } from '@docknetwork/crypto-wasm-ts/lib/anonymous-credentials/types-and-consts';
 
 // TODO: move to fixtures
 const residentCardSchema = {
@@ -206,7 +206,6 @@ describe.each(Schemes)('Derived Credentials', ({
     await accumulator.addBatch(members, accumKeypair.secretKey, accumState);
 
     await checkQueriedAccum(accumulatorId, accumulator);
-
   }, 30000);
 
   async function createAndVerifyPresentation(credentials, verifyOptions = {}) {

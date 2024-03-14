@@ -10386,6 +10386,14 @@ node-datachannel@^0.5.3:
     node-domexception "^2.0.1"
     prebuild-install "^7.0.1"
 
+node-datachannel@^0.5.4:
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/node-datachannel/-/node-datachannel-0.5.4.tgz#4b4341892c33b2e56c3cda1d944a6439258ab878"
+  integrity sha512-kMdkt3QRzKEQsaI+CdxFchh0c/KiKMNuttNitHx8YSWDmdd39vJoTcAvVyam9WFOGkc+H8oM6fYRPclYOy5EdA==
+  dependencies:
+    node-domexception "^2.0.1"
+    prebuild-install "^7.0.1"
+
 node-domexception@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/node-domexception/-/node-domexception-1.0.0.tgz#6888db46a1f71c0b76b3f7555016b63fe64766e5"

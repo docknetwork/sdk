@@ -362,12 +362,12 @@ export default withExtendedStaticProperties(
          */
         // eslint-disable-next-line no-inner-declarations
         async function getSchema(schemaId) {
-          if (!schemaId.startsWith('blob:dock:')) {
-            throw new Error(`Can only fetch schemas stored on Dock for now. Got schema id ${schemaId}`);
-          }
           const { document: schema } = await documentLoader(schemaId);
-          // schema[0] is the schema/blob id
-          return schema[1];
+          // schema[0] is the schema/blob id if stored on chain
+          if (schemaId.startsWith('blob:dock:')) {
+            return schema[1];
+          }
+          return schema;
         }
 
         // If we already have a schema to use, add that first and then generate relaxed values later on

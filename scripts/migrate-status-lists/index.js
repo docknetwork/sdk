@@ -41,18 +41,13 @@ async function main(dock) {
 
   console.log(`Required owners: ${fmtIter(owners)}`);
 
-  for (const owner of owners) {
-    if (!keypairs[owner]) {
-      throw new Error(`Missing key for \`${owner}\``);
-    }
-  }
-
   const txs = await Promise.all(
     parsedCreds.map(async ({ id, revoked, credential, owner }) => {
       const keyPair = keypairs[owner];
       if (!keyPair) {
         throw new Error(`Missing keyPair for \`${owner}\``);
       }
+
       const keyDoc = getKeyDoc(owner, keyPair);
       const decoded = await credential.decodedStatusList();
       Object.defineProperty(credential, "decodedStatusList", {

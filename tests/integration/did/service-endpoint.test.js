@@ -131,7 +131,7 @@ describe('DID service endpoints', () => {
     // `dockDid1` removes service endpoint of `dockDid2`
     await dock.did.removeServiceEndpoint(spId2, hexDid2, hexDid1, pair1, undefined, false);
     await expect(dock.did.getServiceEndpoint(dockDid2, spId2)).rejects.toThrow();
-  });
+  }, 50000);
 
   test('Removing DID removes service endpoint as well', async () => {
     const pair1 = new DidKeypair(dock.keyring.addFromUri(seed1), 1);

@@ -38,15 +38,16 @@ async function main(dock) {
         .filter((v) => v != null);
 
       if (ShowDeprecated) {
+        console.log(id.toHuman()[0], ":");
         console.log(
-          id.toHuman()[0],
-          "left to right encoding (correct):",
-          toShow.join(", ") || "-",
-          "right to left encoding (deprecated):",
-          toShowBigEndian.join(", "),
-          "; owners:",
-          owners.join(",")
+          " - revoked indices with left to right indexing (correct):",
+          toShow.join(", ") || "-"
         );
+        console.log(
+          " - revoked indices with right to left indexing (deprecated):",
+          toShowBigEndian.join(", ") || "-"
+        );
+        console.log(" - owners:", owners.join(","));
       } else {
         console.log(
           id.toHuman()[0],

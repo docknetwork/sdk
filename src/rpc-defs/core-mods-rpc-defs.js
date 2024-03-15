@@ -1,6 +1,17 @@
 const SignaturePublicKeyStorageKey = '(Did, IncId)';
 
 export default {
+  price_feed: {
+    price: {
+      params: [
+        {
+          name: 'price',
+          type: 'PriceProviderCurrencyPairBoundedCurrencySymbolPair',
+        },
+      ],
+      type: 'Option<PriceProviderPriceRecord>',
+    },
+  },
   core_mods: {
     psPublicKeyWithParams: {
       description: 'Return PS public key with params',
@@ -258,6 +269,40 @@ export default {
         },
       ],
       type: 'BTreeMap<TrustRegistrySchemaId, AggregatedTrustRegistrySchemaMetadata>',
+    },
+    registriesIdsBy: {
+      params: [
+        {
+          name: 'by',
+          type: 'QueryTrustRegistriesBy',
+        },
+      ],
+      type: 'BTreeSet<TrustRegistryId>',
+    },
+    registrySchemaIdsBy: {
+      params: [
+        {
+          name: 'by',
+          type: 'QueryTrustRegistryBy',
+        },
+        {
+          name: 'registry_id',
+          type: 'TrustRegistryId',
+        },
+      ],
+      type: 'BTreeSet<TrustRegistrySchemaId>',
+    },
+  },
+  basicOutboundChannel: {
+    getMerkleProof: {
+      params: [],
+      type: 'Option<u32>',
+    },
+  },
+  mmr: {
+    generateBatchProof: {
+      params: [],
+      type: 'Option<u32>',
     },
   },
 };

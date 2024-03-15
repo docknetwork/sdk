@@ -31,8 +31,6 @@ const parseCred = async ([id, rawCred]) => {
 };
 
 async function main(dock) {
-  console.log("Revoked:");
-
   const keypairs = getKeypairs(dock);
   const statusListCreds =
     await dock.api.query.statusListCredential.statusListCredentials.entries();

@@ -13,6 +13,7 @@ import {
   SignatureSecp256k1,
   SignatureSr25519, // eslint-disable-line
 } from '../signatures';
+import { EcdsaSecp256k1VerKeyName, Ed25519VerKeyName, Sr25519VerKeyName } from './vc/custom_crypto';
 
 const EC = elliptic.ec;
 const secp256k1Curve = new EC('secp256k1');
@@ -100,6 +101,22 @@ export function getKeyPairType(pair) {
 }
 
 /**
+ * Return the crypto type of the verification key for the given keypair.
+ * @param {object} pair - Can be a keypair from polkadot-js or elliptic library.
+ * @returns {string|*}
+ */
+export function getVerKeyTypeForKeypair(pair) {
+  const ty = getKeyPairType(pair);
+
+  switch (ty) {
+    case 'ed25519': return Ed25519VerKeyName;
+    case 'sr25519': return Sr25519VerKeyName;
+    case 'secp256k1': return EcdsaSecp256k1VerKeyName;
+    default: throw new Error(`Unsupported key type: \`${ty}\``);
+  }
+}
+
+/**
  * Inspect the `type` of the `KeyringPair` to generate the correct kind of PublicKey.
  * @param {object} pair - A polkadot-js KeyringPair.
  * @return {PublicKey} An instance of the correct subclass of PublicKey
@@ -125,14 +142,22 @@ export function getPublicKeyFromKeyringPair(pair) {
  */
 export function getSignatureFromKeyringPair(pair, message) {
   const type = getKeyPairType(pair);
+
   let Cls;
-  if (type === 'ed25519') {
-    Cls = SignatureEd25519;
-  } else if (type === 'sr25519') {
-    Cls = SignatureSr25519;
-  } else {
-    Cls = SignatureSecp256k1;
+  switch (type) {
+    case 'ed25519':
+      Cls = SignatureEd25519;
+      break;
+    case 'sr25519':
+      Cls = SignatureSr25519;
+      break;
+    case 'secp256k1':
+      Cls = SignatureSecp256k1;
+      break;
+    default:
+      throw new Error(`Unsupported keypair type: \`${type}\``);
   }
+
   return new Cls(message, pair);
 }
 
@@ -147,6 +172,7 @@ export class DockKeypair {
    */
   constructor(keyPair) {
     this.keyPair = keyPair;
+    this.verKeyType = getVerKeyTypeForKeypair(keyPair);
   }
 
   /**

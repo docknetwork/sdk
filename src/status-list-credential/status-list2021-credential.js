@@ -85,7 +85,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * @returns {Promise<this>}
    */
   async update(keyDoc, { revokeIndices = [], unsuspendIndices = [] }) {
-    const currentStatusList = await this.decodeStatusList();
+    const currentStatusList = await this.decodedStatusList();
     const statusList = new StatusList({
       buffer: new Uint8Array((currentStatusList).bitstring.bits),
     });
@@ -112,7 +112,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
    *
    * @returns {Promise<StatusList>}
    */
-  async decodeStatusList() {
+  async decodedStatusList() {
     const { encoded, decoded } = this.internalCachedStatusList;
 
     if (
@@ -138,9 +138,9 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * @returns {Promise<boolean>}
    */
   async revoked(index) {
-    const decodeStatusList = await this.decodeStatusList();
+    const decodedStatusList = await this.decodedStatusList();
 
-    return decodeStatusList.getStatus(index);
+    return decodedStatusList.getStatus(index);
   }
 
   /**
@@ -152,9 +152,9 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * @returns {Promise<Array<boolean>>}
    */
   async revokedBatch(indices) {
-    const decodeStatusList = await this.decodeStatusList();
+    const decodedStatusList = await this.decodedStatusList();
 
-    return [...indices].map((index) => decodeStatusList.getStatus(index));
+    return [...indices].map((index) => decodedStatusList.getStatus(index));
   }
 
   /**

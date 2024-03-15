@@ -593,7 +593,7 @@ export async function verifyPrivateStatus(credentialStatus, privateStatusListCre
   // check VC's SL index for the status
   const { statusListIndex } = credentialStatus;
   const index = parseInt(statusListIndex, 10);
-  const list = await privateStatusListCredential.decodeStatusList();
+  const list = await privateStatusListCredential.decodedStatusList();
   const verified = !list.getStatus(index);
   return { verified };
 }

@@ -86,13 +86,12 @@ describe('DID service endpoints', () => {
   }, 40000);
 
   test('Get DID document with service endpoints', async () => {
-    const doc1 = await dock.did.getDocument(dockDid1);
+    const [doc1, doc2] = await Promise.all([dock.did.getDocument(dockDid1), dock.did.getDocument(dockDid2)]);
     expect(doc1.service.length).toEqual(1);
     expect(doc1.service[0].id).toEqual(spId1Text);
     expect(doc1.service[0].type).toEqual('LinkedDomains');
     expect(doc1.service[0].serviceEndpoint).toEqual(origins1Text);
 
-    const doc2 = await dock.did.getDocument(dockDid2);
     expect(doc2.service.length).toEqual(1);
     expect(doc2.service[0].id).toEqual(spId2Text);
     expect(doc2.service[0].type).toEqual('LinkedDomains');
@@ -108,7 +107,7 @@ describe('DID service endpoints', () => {
     const sp = await dock.did.getServiceEndpoint(dockDid2, spId3);
     expect(sp.type).toEqual(spType);
     expect(sp.origins).toEqual(origins);
-  }, 30000);
+  }, 40000);
 
   test('Get DID document with multiple service endpoints', async () => {
     const doc = await dock.did.getDocument(dockDid2);

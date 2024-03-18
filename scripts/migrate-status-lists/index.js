@@ -3,12 +3,12 @@ import { StatusList2021Credential } from "../../src";
 import { withDockAPI } from "../helpers";
 import getKeypairs from "./keypairs";
 import { fmtIter } from "../../src/utils/misc";
-import { DockDidOrDidMethodKey } from "../../src/utils/did/typed-did";
+import { typedHexDID } from "../../src/utils/did/typed-did";
 import { getKeyDoc } from "../../src/utils/vc/helpers";
 
 const { FullNodeEndpoint, SenderAccountURI } = process.env;
 
-const parseCred = async ([id, rawCred]) => {
+const parseCred = async (dock, [id, rawCred]) => {
   const credential = StatusList2021Credential.fromBytes(
     rawCred.unwrap().statusListCredential.asStatusList2021Credential
   );
@@ -22,7 +22,7 @@ const parseCred = async ([id, rawCred]) => {
     .filter((v) => v != null);
 
   const [owner] = [...(await rawCred.unwrap().policy.asOneOf.values())]
-    .map((did) => DockDidOrDidMethodKey.from(did))
+    .map((did) => typedHexDID(dock.api, did))
     .map((did) => did.toQualifiedEncodedString());
 
   return (
@@ -35,7 +35,7 @@ async function main(dock) {
   const statusListCreds =
     await dock.api.query.statusListCredential.statusListCredentials.entries();
   const parsedCreds = (
-    await Promise.all(statusListCreds.map(parseCred))
+    await Promise.all(statusListCreds.map((cred) => parseCred(dock, cred)))
   ).filter(Boolean);
   const owners = new Set(parsedCreds.map(({ owner }) => owner).filter(Boolean));
 

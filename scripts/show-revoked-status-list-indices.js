@@ -1,5 +1,5 @@
 import { StatusList2021Credential } from "../src";
-import { DockDidOrDidMethodKey } from "../src/utils/did";
+import { typedHexDID } from "../src/utils/did";
 import { withDockAPI } from "./helpers";
 
 const { FullNodeEndpoint, ShowEmpty, ShowDeprecated } = process.env;
@@ -17,7 +17,7 @@ async function main(dock) {
     const owners = [
       ...(await unparsedCredential.unwrap().policy.asOneOf.values()),
     ]
-      .map((did) => DockDidOrDidMethodKey.from(did))
+      .map((did) => typedHexDID(dock.api, did))
       .map((did) => did.toQualifiedEncodedString());
     const decoded = await credential.decodedStatusList();
     const revoked = await credential.revokedBatch(

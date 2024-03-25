@@ -1,12 +1,13 @@
-import VerifiableCredential from '../src/verifiable-credential';
+import { initializeWasm } from '@docknetwork/crypto-wasm-ts';
 import { DIDResolver } from '../src/resolver';
 import Bls12381G2KeyPairDock2022 from '../src/utils/vc/crypto/Bls12381G2KeyPairDock2022';
+import { issueCredential, verifyCredential } from '../src/utils/vc';
 
 const keypairOpts = {
   id: 'did:example:489398593#keys-1',
   controller: 'did:example:489398593',
   privateKeyBase58: '23fKPbbSJ7tCJVDYynRZQ1wPs6GannD2dEMjKZnFtKxy',
-  publicKeyBase58: 'GzJYyMYXQyAdmRK3JcfQnHJtz5TyRiYyYtfj6SZD9LQ4zDapQ3qeC1AaBwCtzhQ8En6EGiLe7ke2RaeLNTxJ9GVompK6j6kHB8e5m2ya5qdCB2bbNMVii99QfmYsbj36J3B',
+  publicKeyBase58: 'przwNdX6Bn5TzwmX56fYKQr6vk5U2DsfJJHZJQzr1Sxd9oJUg1rEEoUP7Bz33WNpykvkkqoTByMwnceCx9yvTW8CG1V5XpSwHPSN222cwMe9xr4mViyLWkKtoraybEPeLHT',
 };
 
 class ExampleDIDResolver extends DIDResolver {
@@ -94,23 +95,16 @@ const example = {
 };
 
 async function signAndVerify(credentialJSON) {
-  // Incrementally build a verifiable credential
-  const credential = new VerifiableCredential();
-  credential.setFromJSON(credentialJSON);
-  credential.setIssuer(keypairOpts.controller);
-
   // Create the keypair
   const keyPair = new Bls12381G2KeyPairDock2022(keypairOpts);
 
   // Sign and print the results
-  console.log('Signing credential:', JSON.stringify(credential.toJSON(), null, 2));
-  await credential.sign({ keypair: keyPair, type: keyPair.type });
-  console.log('Signed credential:', JSON.stringify(credential.toJSON(), null, 2));
+  console.log('Signing credential:', JSON.stringify(credentialJSON, null, 2));
+  const signedCred = await issueCredential({ keypair: keyPair, type: keyPair.type }, credentialJSON, resolver);
+  console.log('Signed credential:', JSON.stringify(signedCred, null, 2));
 
   // Verify the credential
-  const verifyResult = await credential.verify({
-    resolver,
-  });
+  const verifyResult = await verifyCredential(signedCred, { resolver });
 
   if (verifyResult.verified) {
     console.log('Credential has been verified!', verifyResult.results);
@@ -118,11 +112,12 @@ async function signAndVerify(credentialJSON) {
     throw verifyResult.error;
   }
 
-  return credential.toJSON();
+  return signedCred;
 }
 
 async function main() {
   let exitCode = 0;
+  await initializeWasm();
   try {
     await signAndVerify(example);
   } catch (e) {

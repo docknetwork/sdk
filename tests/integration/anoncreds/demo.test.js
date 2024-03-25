@@ -14,7 +14,7 @@ import {
   Witness,
   Witnesses,
   CompositeProof,
-  VBWitnessUpdatePublicInfo,
+  VBWitnessUpdateInfo,
   AccumulatorParams,
   AccumulatorPublicKey,
   initializeWasm,
@@ -421,7 +421,7 @@ for (const {
         accumulatorId,
         false,
       );
-      const witnessUpdInfo = VBWitnessUpdatePublicInfo.new(
+      const witnessUpdInfo = VBWitnessUpdateInfo.new(
         hexToU8a(accum.accumulated),
         [member1, member2],
         [],
@@ -446,7 +446,7 @@ for (const {
         accum.lastModified,
       );
       expect(updates.length).toEqual(1);
-      const queriedWitnessInfo = new VBWitnessUpdatePublicInfo(
+      const queriedWitnessInfo = new VBWitnessUpdateInfo(
         hexToU8a(updates[0].witnessUpdateInfo),
       );
       const additions = [];
@@ -511,7 +511,7 @@ for (const {
         accumulatorId,
         false,
       );
-      let witnessUpdInfo = VBWitnessUpdatePublicInfo.new(
+      let witnessUpdInfo = VBWitnessUpdateInfo.new(
         hexToU8a(accum.accumulated),
         [member3, member4],
         [member1, member2],
@@ -543,7 +543,7 @@ for (const {
 
       accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
       const startingBlock = accum.lastModified;
-      witnessUpdInfo = VBWitnessUpdatePublicInfo.new(
+      witnessUpdInfo = VBWitnessUpdateInfo.new(
         hexToU8a(accum.accumulated),
         [member5, member6],
         [member4],
@@ -574,7 +574,7 @@ for (const {
       );
 
       accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
-      witnessUpdInfo = VBWitnessUpdatePublicInfo.new(
+      witnessUpdInfo = VBWitnessUpdateInfo.new(
         hexToU8a(accum.accumulated),
         [member7, member8, member9],
         [],
@@ -624,7 +624,7 @@ for (const {
           accumulatorId,
           blockNo,
         );
-        const wi = new VBWitnessUpdatePublicInfo(
+        const wi = new VBWitnessUpdateInfo(
           hexToU8a(updates[0].witnessUpdateInfo),
         );
         updateInfo.push(wi);
@@ -668,7 +668,7 @@ for (const {
         accumulatorId,
         false,
       );
-      const witnessUpdInfo = VBWitnessUpdatePublicInfo.new(
+      const witnessUpdInfo = VBWitnessUpdateInfo.new(
         hexToU8a(accum.accumulated),
         [],
         [encodedAttrs[attributeCount - 1]],
@@ -700,7 +700,7 @@ for (const {
         accum.lastModified,
       );
       expect(updates.length).toEqual(1);
-      const queriedWitnessInfo = new VBWitnessUpdatePublicInfo(
+      const queriedWitnessInfo = new VBWitnessUpdateInfo(
         hexToU8a(updates[0].witnessUpdateInfo),
       );
       expect(() => membershipWitness.updateUsingPublicInfoPostBatchUpdate(

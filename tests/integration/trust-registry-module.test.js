@@ -612,7 +612,7 @@ buildTest('Trust Registry', () => {
     issuers.set(issuerDID, issuerPrices);
     issuers.set(issuerDID2, issuer2Prices);
 
-    const schemas = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'SetOrAddOrRemoveOrModifyTrustRegistrySchemaMetadataOnlyExistentTrustRegistrySchemaMetadataUpdate');
+    const schemas = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'SetOrAddOrRemoveOrModify');
     schemas.set(schemaId, {
       Set: {
         issuers,
@@ -685,7 +685,7 @@ buildTest('Trust Registry', () => {
     issuers.set(issuerDID, issuerPrices);
     issuers.set(issuerDID2, issuer2Prices);
 
-    let schemas = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'SetOrAddOrRemoveOrModifyTrustRegistrySchemaMetadataOnlyExistentTrustRegistrySchemaMetadataUpdate');
+    let schemas = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'SetOrAddOrRemoveOrModify');
     schemas.set(schemaId, {
       Add: {
         issuers,
@@ -729,7 +729,7 @@ buildTest('Trust Registry', () => {
       verifiers: expectedFormattedVerifiers(new BTreeSet(dock.api.registry, 'Verifier')),
     });
 
-    schemas = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'SetOrAddOrRemoveOrModifyTrustRegistrySchemaMetadataOnlyExistentTrustRegistrySchemaMetadataUpdate');
+    schemas = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'SetOrAddOrRemoveOrModify');
     schemas.set(schemaId, 'Remove');
     schemas.set(otherSchemaId, 'Remove');
 
@@ -786,7 +786,7 @@ buildTest('Trust Registry', () => {
     issuers.set(issuerDID, issuerPrices);
     issuers.set(issuerDID2, issuer2Prices);
 
-    const schemas = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'SetOrAddOrRemoveOrModifyTrustRegistrySchemaMetadataOnlyExistentTrustRegistrySchemaMetadataUpdate');
+    const schemas = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'SetOrAddOrRemoveOrModify');
     schemas.set(schemaId, {
       Set: {
         issuers,
@@ -881,7 +881,7 @@ buildTest('Trust Registry', () => {
     schemaIssuers.set(issuerDID, schemaIssuerPrices);
     schemaIssuers.set(issuerDID2, schemaIssuerPrices);
 
-    const schemas = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'SetOrAddOrRemoveOrModifyTrustRegistrySchemaMetadataOnlyExistentTrustRegistrySchemaMetadataUpdate');
+    const schemas = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'SetOrAddOrRemoveOrModify');
     schemas.set(schemaId, {
       Set: {
         issuers: schemaIssuers,
@@ -965,7 +965,7 @@ buildTest('Trust Registry', () => {
       verifiers,
     });
 
-    let schemasUpdate = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'SetOrAddOrRemoveOrModifyTrustRegistrySchemaMetadataOnlyExistentTrustRegistrySchemaMetadataUpdate');
+    let schemasUpdate = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'SetOrAddOrRemoveOrModify');
     schemasUpdate.set(schemaId, {
       Add: {
         issuers,
@@ -1084,7 +1084,7 @@ buildTest('Trust Registry', () => {
       verifiers: expectedFormattedVerifiers(verifiers),
     });
 
-    schemasUpdate = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'SetOrAddOrRemoveOrModifyTrustRegistrySchemaMetadataOnlyExistentTrustRegistrySchemaMetadataUpdate');
+    schemasUpdate = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'SetOrAddOrRemoveOrModify');
     const verifiersUpdate = new BTreeMap(dock.api.registry, 'Verifier', 'AddOrRemoveOrModify');
     verifiersUpdate.set(verifierDIDMethodKey, 'Remove');
 
@@ -1297,7 +1297,7 @@ buildTest('Trust Registry', () => {
     await dock.trustRegistry.setSchemasMetadata(
       convenerDID,
       trustRegistryId,
-      { Set: new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'SetOrAddOrRemoveOrModifyTrustRegistrySchemaMetadataOnlyExistentTrustRegistrySchemaMetadataUpdate') },
+      { Set: new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'SetOrAddOrRemoveOrModify') },
       convenerPair,
       dock,
     );

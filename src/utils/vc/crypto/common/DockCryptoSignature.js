@@ -432,7 +432,6 @@ export default withExtendedStaticProperties(
      * @param document {object} to be signed.
      * @param proof {object}
      * @param documentLoader {function}
-     * @param expansionMap {function}
      */
     static async getVerificationMethod({ proof, documentLoader }) {
       let { verificationMethod } = proof;
@@ -471,7 +470,6 @@ export default withExtendedStaticProperties(
      * @param document {object} to be signed.
      * @param proof {object}
      * @param documentLoader {function}
-     * @param expansionMap {function}
      */
     async getVerificationMethod({ proof, documentLoader }) {
       return this.constructor.getVerificationMethod({

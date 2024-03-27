@@ -11,11 +11,11 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.23.9",
-    "@babel/core": "^7.23.9",
+    "@babel/cli": "^7.24.1",
+    "@babel/core": "^7.24.3",
     "@babel/node": "^7.23.9",
-    "@babel/plugin-transform-modules-commonjs": "^7.23.3",
-    "@babel/preset-env": "^7.23.9",
+    "@babel/plugin-transform-modules-commonjs": "^7.24.1",
+    "@babel/preset-env": "^7.24.3",
     "@comunica/actor-init-sparql-rdfjs": "^1.22.3",
     "@comunica/types": "^1.0.0",
     "@docknetwork/crypto-wasm": "^0.22.0",
@@ -71,7 +71,7 @@
     "blob-example": "npx babel-node example/blob.js",
     "claim-deduction-example": "npx babel-node example/claim-deduction.js",
     "anchor-example": "npx babel-node example/anchor.js",
-    "test-examples": "yarn dock-did-example && yarn did-resolver-example && yarn revocation-example && yarn vcdm-example && yarn standard-schemas-example && yarn schema-example && yarn schema-validation-example && yarn blob-example && yarn claim-deduction-example && yarn anchor-example",
+    "test-examples": "yarn dock-did-example && yarn did-resolver-example && yarn revocation-example && yarn vcdm-example && yarn standard-schemas-example && yarn schema-example && yarn schema-validation-example && yarn blob-example && yarn claim-deduction-example && yarn anchor-example && yarn bbs-dock-example",
     "get-did": "npx babel-node scripts/get_did_doc.js",
     "upgrade_with_sudo": "npx babel-node scripts/runtime_upgrade_with_sudo.js",
     "onboard_with_sudo": "npx babel-node scripts/onboard_validator_with_sudo.js",
@@ -100,7 +100,7 @@
   },
   "dependencies": {
     "@digitalcredentials/vc-status-list": "^8.0.0",
-    "@docknetwork/crypto-wasm-ts": "0.56.0",
+    "@docknetwork/crypto-wasm-ts": "0.58.0",
     "@docknetwork/node-types": "^0.17.0",
     "@juanelas/base64": "^1.0.5",
     "@polkadot/api": "10.12.2",

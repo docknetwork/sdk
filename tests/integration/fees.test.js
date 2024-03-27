@@ -6,7 +6,7 @@ import {
   BBSPlusKeypairG2,
   PositiveAccumulator,
   BBSPlusSignatureParamsG1,
-  VBWitnessUpdatePublicInfo,
+  VBWitnessUpdateInfo,
 } from '@docknetwork/crypto-wasm-ts';
 import {
   BN, hexToU8a, stringToHex, u8aToHex,
@@ -489,7 +489,7 @@ describe.skip('Fees', () => {
         members.push(member);
       }
       let witUpd = u8aToHex(
-        VBWitnessUpdatePublicInfo.new(
+        VBWitnessUpdateInfo.new(
           hexToU8a(accumulated),
           members,
           [],
@@ -513,7 +513,7 @@ describe.skip('Fees', () => {
       });
 
       witUpd = u8aToHex(
-        VBWitnessUpdatePublicInfo.new(
+        VBWitnessUpdateInfo.new(
           hexToU8a(accumulated),
           [],
           members,

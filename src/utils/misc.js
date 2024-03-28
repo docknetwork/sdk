@@ -285,7 +285,7 @@ export const timeout = (time, f = () => {}) => new Promise((resolve, reject) => 
 
 /**
  * Calls supplied function `fn` and waits for its completion up to `timeLimit`, retries in case timeout was fired.
- * Additionally, `delay` between retries, `maxAttempts` count, and `handleError` can be specified.
+ * Additionally, `delay` between retries, `maxAttempts` count, `logs` and `onError` can be specified.
  *
  * `onError` callback will be called once an error is encountered, and it can be
  * - resolved to some value, so the underlying promise will be resolved
@@ -295,32 +295,57 @@ export const timeout = (time, f = () => {}) => new Promise((resolve, reject) => 
  * @template T
  * @param {function(): Promise<T>} fn
  * @param {number} timeLimit
- * @param {object} params
- * @param {number} params.delay
- * @param {number} params.maxAttempts
- * @param {function(Error, RETRY_SYM): Promise<T | RETRY_SYM>} params.onError
+ * @param {object} [params={}]
+ * @param {number} [params.delay=null]
+ * @param {number} [params.maxAttempts=Infinity]
+ * @param {string} [params.logsContext='']
+ * @param {boolean} [params.logs=false]
+ * @param {function(Error, RETRY_SYM): Promise<T | RETRY_SYM>} [params.onError=null]
  * @returns {Promise<T>}
  */
+/* eslint-disable sonarjs/cognitive-complexity */
 export const retry = async (
   fn,
   timeLimit,
-  { delay = null, maxAttempts = Infinity, onError = null } = {},
+  {
+    delay = null,
+    maxAttempts = Infinity,
+    onError = null,
+    logs = false,
+    logsContext = '',
+  } = {},
 ) => {
   const RETRY_SYM = Symbol('retry');
 
   for (let i = 0; i <= maxAttempts; i++) {
-    const promise = Promise.race([timeout(timeLimit, () => RETRY_SYM), fn()]);
+    const timer = timeout(timeLimit, () => RETRY_SYM);
 
     let res;
+    let timeoutExceeded = false;
     /* eslint-disable no-await-in-loop */
     if (onError != null) {
       try {
-        res = await promise;
+        res = await Promise.race([timer, fn()]);
+        timeoutExceeded = res === RETRY_SYM;
       } catch (error) {
+        if (logs) {
+          console.error(
+            `An error \`${error}\` thrown for \`${fn}\` on ${i} iteration`,
+          );
+        }
         res = await onError(error, RETRY_SYM);
       }
     } else {
-      res = await promise;
+      res = await Promise.race([timer, fn()]);
+      timeoutExceeded = res === RETRY_SYM;
+    }
+
+    if (timeoutExceeded && logs) {
+      console.error(
+        `Timeout of ${timeLimit} ms exceeded for \`${fn}\`${
+          i > 0 ? ` ${i} times` : ''
+        }${logsContext && `, context: \`${logsContext}\``}`,
+      );
     }
 
     if (res !== RETRY_SYM) {
@@ -335,6 +360,7 @@ export const retry = async (
     `Promise created by \`${fn}\` didn't resolve within the specified timeout of ${timeLimit} ms ${maxAttempts} times`,
   );
 };
+/* eslint-enable sonarjs/cognitive-complexity */
 
 /**
  * Pattern matching error.

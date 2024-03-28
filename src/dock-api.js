@@ -49,6 +49,77 @@ function getExtrinsicError(data, api) {
   return errorMsg;
 }
 
+const BlacklistedProperties = new Set([
+  'meta',
+  'registry',
+  'toJSON',
+  'is',
+  'creator',
+  'hash',
+  'key',
+  'keyPrefix',
+]);
+
+/**
+ * Recirsively patches supplied object functions props, so they will throw an error if there's no result within the `8 seconds` timeout after `2` retries.
+ *
+ * @param {*} obj
+ * @param {*} prop
+ * @param {string[]} [path=[]]
+ */
+const patchFn = (obj, prop, path = []) => {
+  const value = obj[prop];
+  if (
+    BlacklistedProperties.has(prop)
+    || !value
+    || (typeof value !== 'object' && typeof value !== 'function')
+  ) {
+    return;
+  }
+
+  if (typeof value !== 'function') {
+    for (const key of Object.keys(value)) {
+      patchFn(value, key, path.concat(key));
+    }
+
+    return;
+  }
+
+  const fn = value;
+  const newFn = async function with8SecsTimeoutAnd2Retries(...args) {
+    const that = this;
+    const wrappedFn = () => fn.apply(that, args);
+    wrappedFn.toString = () => fn.toString();
+
+    return retry(wrappedFn, 8e3, {
+      maxAttempts: 2,
+      delay: 5e2,
+      logs: true,
+      logsContext: path.join('.'),
+    });
+  };
+
+  try {
+    for (const fnProp of Object.keys(fn)) {
+      newFn[fnProp] = fn[fnProp];
+      patchFn(newFn, fnProp, path.concat(fnProp));
+    }
+    Object.setPrototypeOf(newFn, Object.getPrototypeOf(fn));
+
+    // eslint-disable-next-line no-param-reassign
+    delete obj[prop];
+    Object.defineProperty(obj, prop, {
+      value: newFn,
+    });
+  } catch (err) {
+    console.error(
+      `Failed to wrap the prop \`${prop}\` of \`${obj}\`: \`${
+        err.message || err
+      }\``,
+    );
+  }
+};
+
 /**
  * Patches the query API methods, so they will throw an error if there's no result within the `8 seconds` timeout after `2` retries.
  *
@@ -63,31 +134,8 @@ const patchQueryApi = (queryApi) => {
     for (const method of Object.keys(mod)) {
       const path = `${modName}.${method}`;
 
-      try {
-        if (typeof mod[method] === 'function' && !exclude.has(path)) {
-          const fn = mod[method];
-          const newFn = async function with8SecsTimeoutAnd2Retries(...args) {
-            const that = this;
-
-            return retry(() => fn.apply(that, args), 8e3, {
-              maxAttempts: 2,
-              delay: 5e2,
-            });
-          };
-          for (const prop of Object.keys(fn)) {
-            newFn[prop] = fn[prop];
-          }
-          Object.setPrototypeOf(newFn, Object.getPrototypeOf(fn));
-
-          delete method[method];
-          Object.defineProperty(mod, method, {
-            value: newFn,
-          });
-        }
-      } catch (err) {
-        console.error(
-          `Failed to wrap the method \`${path}\`: \`${err.message || err}\``,
-        );
+      if (!exclude.has(path)) {
+        patchFn(mod, method, [modName, method]);
       }
     }
   }

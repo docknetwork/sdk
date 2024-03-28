@@ -144,6 +144,7 @@ export default class TrustRegistryModule {
 
   /**
    * Initializes Trust Registry with the supplied parameters.
+   *
    * @param convenerDid
    * @param registryId
    * @param name
@@ -177,6 +178,7 @@ export default class TrustRegistryModule {
 
   /**
    * Initializes Trust Registry with the supplied parameters.
+   *
    * @param convenerDid
    * @param registryId
    * @param name
@@ -247,6 +249,7 @@ export default class TrustRegistryModule {
 
   /**
    * Creates a transaction to update schema metadatas in the registry.
+   *
    * @param convenerOrIssuerOrVerifierDid
    * @param registryId
    * @param schemas
@@ -279,6 +282,7 @@ export default class TrustRegistryModule {
 
   /**
    * Suspends issuers in the registry.
+   *
    * @param convenerDid
    * @param registryId
    * @param issuers
@@ -309,6 +313,7 @@ export default class TrustRegistryModule {
 
   /**
    * Suspends issuers in the registry.
+   *
    * @param convenerDid
    * @param registryId
    * @param issuers
@@ -328,7 +333,7 @@ export default class TrustRegistryModule {
       { nonce, didModule },
     );
 
-    const hexIssuers = new BTreeSet();
+    const hexIssuers = new BTreeSet(this.api.registry, 'Issuer');
     for (const issuer of issuers) {
       hexIssuers.add(typedHexDID(this.api, issuer));
     }
@@ -344,6 +349,7 @@ export default class TrustRegistryModule {
 
   /**
    * Unsuspends issuers in the registry.
+   *
    * @param convenerDid
    * @param registryId
    * @param issuers
@@ -374,6 +380,7 @@ export default class TrustRegistryModule {
 
   /**
    * Unsuspends issuers in the registry.
+   *
    * @param convenerDid
    * @param registryId
    * @param issuers
@@ -393,7 +400,7 @@ export default class TrustRegistryModule {
       { nonce, didModule },
     );
 
-    const hexIssuers = new BTreeSet();
+    const hexIssuers = new BTreeSet(this.api.registry, 'Issuer');
     for (const issuer of issuers) {
       hexIssuers.add(typedHexDID(this.api, issuer));
     }
@@ -408,7 +415,8 @@ export default class TrustRegistryModule {
   }
 
   /**
-   * Unsuspends issuers in the registry.
+   * Sets delegated issuers for the caller DID.
+   *
    * @param issuerDid
    * @param registryId
    * @param issuers
@@ -448,6 +456,7 @@ export default class TrustRegistryModule {
 
   /**
    * Get the DID doing the action and its corresponding nonce.
+   *
    * @param actorDid
    * @param nonce
    * @param didModule
@@ -464,6 +473,7 @@ export default class TrustRegistryModule {
 
   /**
    * Parses Trust Registry information received from the substrate side.
+   *
    * @param registryInfo
    */
   parseRegistryInfo({ name, convener, govFramework }) {
@@ -476,6 +486,7 @@ export default class TrustRegistryModule {
 
   /**
    * Parses map entries by converting keys to `string`s and applying supplied parser to the value.
+   *
    * @template {RegId}
    * @template {Value}
    * @template {ParsedValue}

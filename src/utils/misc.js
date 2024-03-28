@@ -13,6 +13,11 @@ import {
   SignatureSecp256k1,
   SignatureSr25519, // eslint-disable-line
 } from '../signatures';
+import {
+  EcdsaSecp256k1VerKeyName,
+  Ed25519VerKeyName,
+  Sr25519VerKeyName,
+} from './vc/custom_crypto';
 
 const EC = elliptic.ec;
 const secp256k1Curve = new EC('secp256k1');
@@ -100,6 +105,26 @@ export function getKeyPairType(pair) {
 }
 
 /**
+ * Return the crypto type of the verification key for the given keypair.
+ * @param {object} pair - Can be a keypair from polkadot-js or elliptic library.
+ * @returns {string|*}
+ */
+export function getVerKeyTypeForKeypair(pair) {
+  const ty = getKeyPairType(pair);
+
+  switch (ty) {
+    case 'ed25519':
+      return Ed25519VerKeyName;
+    case 'sr25519':
+      return Sr25519VerKeyName;
+    case 'secp256k1':
+      return EcdsaSecp256k1VerKeyName;
+    default:
+      throw new Error(`Unsupported key type: \`${ty}\``);
+  }
+}
+
+/**
  * Inspect the `type` of the `KeyringPair` to generate the correct kind of PublicKey.
  * @param {object} pair - A polkadot-js KeyringPair.
  * @return {PublicKey} An instance of the correct subclass of PublicKey
@@ -125,14 +150,22 @@ export function getPublicKeyFromKeyringPair(pair) {
  */
 export function getSignatureFromKeyringPair(pair, message) {
   const type = getKeyPairType(pair);
+
   let Cls;
-  if (type === 'ed25519') {
-    Cls = SignatureEd25519;
-  } else if (type === 'sr25519') {
-    Cls = SignatureSr25519;
-  } else {
-    Cls = SignatureSecp256k1;
+  switch (type) {
+    case 'ed25519':
+      Cls = SignatureEd25519;
+      break;
+    case 'sr25519':
+      Cls = SignatureSr25519;
+      break;
+    case 'secp256k1':
+      Cls = SignatureSecp256k1;
+      break;
+    default:
+      throw new Error(`Unsupported keypair type: \`${type}\``);
   }
+
   return new Cls(message, pair);
 }
 
@@ -147,6 +180,7 @@ export class DockKeypair {
    */
   constructor(keyPair) {
     this.keyPair = keyPair;
+    this.verKeyType = getVerKeyTypeForKeypair(keyPair);
   }
 
   /**
@@ -224,13 +258,99 @@ export async function getDidNonce(
 }
 
 /**
- * Returns string containing comma separated items of the provided iterable.
+ * Returns string containing comma-separated items of the provided iterable.
  *
  * @template V
  * @param {Iterable<V>} iter
  * @returns {string}
  */
 export const fmtIter = (iter) => `\`[${[...iter].map((item) => item.toString()).join(', ')}]\``;
+
+/**
+ * Creates a promise that will call the optional supplied function `f` and return its result after `time` passes.
+ * If no function is provided, the promise will be resolved to `undefined`.
+ *
+ * @template T
+ * @param {number} time
+ * @param {function(): Promise<T>} f
+ * @returns {Promise<T>}
+ */
+export const timeout = (time, f = () => {}) => new Promise((resolve, reject) => setTimeout(async () => {
+  try {
+    resolve(await f());
+  } catch (err) {
+    reject(err);
+  }
+}, time));
+
+/**
+ * Calls supplied function `fn` and waits for its completion up to `timeLimit`, retries in case timeout was fired.
+ * Additionally, `delay` between retries, `maxAttempts` count, `onTimeoutExceeded` and `onError` can be specified.
+ *
+ * `onError` callback will be called once an error is encountered, and it can be
+ * - resolved to some value, so the underlying promise will be resolved
+ * - rejected, so then underlying promise will be rejected
+ * - resolved to `RETRY_SYM` (second argument), so the retries will be continued
+ *
+ * @template T
+ * @param {function(): Promise<T>} fn
+ * @param {number} timeLimit
+ * @param {object} [params={}]
+ * @param {number} [params.delay=null]
+ * @param {number} [params.maxAttempts=Infinity]
+ * @param {function(): Promise<T | RETRY_SYM>} [params.onTimeoutExceeded=null]
+ * @param {function(Error, RETRY_SYM): Promise<T | RETRY_SYM>} [params.onError=null]
+ * @returns {Promise<T>}
+ */
+/* eslint-disable sonarjs/cognitive-complexity */
+export const retry = async (
+  fn,
+  timeLimit,
+  {
+    delay = null,
+    maxAttempts = Infinity,
+    onTimeoutExceeded = null,
+    onError = null,
+  } = {},
+) => {
+  const RETRY_SYM = Symbol('retry');
+
+  for (let i = 0; i <= maxAttempts; i++) {
+    let timeoutExceeded = false;
+    const timer = timeout(timeLimit, () => {
+      timeoutExceeded = true;
+
+      return RETRY_SYM;
+    });
+
+    let res;
+    /* eslint-disable no-await-in-loop */
+    if (onError != null) {
+      try {
+        res = await Promise.race([timer, fn()]);
+      } catch (error) {
+        res = await onError(error, RETRY_SYM);
+      }
+    } else {
+      res = await Promise.race([timer, fn()]);
+    }
+
+    if (timeoutExceeded && onTimeoutExceeded != null) {
+      res = await onTimeoutExceeded(RETRY_SYM);
+    }
+    if (res !== RETRY_SYM) {
+      return res;
+    } else if (delay != null) {
+      await timeout(delay);
+    }
+    /* eslint-enable no-await-in-loop */
+  }
+
+  throw new Error(
+    `Promise created by \`${fn}\` didn't resolve within the specified timeout of ${timeLimit} ms ${maxAttempts} times`,
+  );
+};
+/* eslint-enable sonarjs/cognitive-complexity */
 
 /**
  * Pattern matching error.

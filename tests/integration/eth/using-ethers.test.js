@@ -37,10 +37,6 @@ describe('Deploy an ERC-20 contract and transfer ERC-20 tokens', () => {
     await endowEVMAddressWithDefault(bob.address, defaultEVMAccountEndowment(), FullNodeEndpoint, TestAccountURI);
   });
 
-  afterAll(async () => {
-    await ethersProvider.disconnect();
-  }, 10000);
-
   test('Deploy contract and transfer tokens', async () => {
     // NOTE: This test is not checking any balance changes. Most likely there is some issue with the Frontier implementation
     // as the logic is straightforward and the same works with web3

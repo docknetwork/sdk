@@ -1,4 +1,4 @@
-const NodeEnvironment = require('jest-environment-node');
+const NodeEnvironment = require('jest-environment-node').TestEnvironment;
 
 class MyEnvironment extends NodeEnvironment {
   constructor(config, context) {

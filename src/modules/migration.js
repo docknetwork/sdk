@@ -42,7 +42,7 @@ class TokenMigration {
    */
   migrateRecipAsList(recipients) {
     // @ts-ignore
-    const recipMap = new BTreeMap();
+    const recipMap = new BTreeMap(this.api.registry, 'AccountId', 'BalanceOf');
     [...recipients].sort().forEach(([address, amount]) => {
       const existingVal = recipMap.get(address);
       let value = amount;

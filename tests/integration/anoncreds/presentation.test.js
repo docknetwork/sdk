@@ -20,7 +20,7 @@ import { DockResolver } from '../../../src/resolver';
 import { getResidentCardCredentialAndSchema, setupExternalSchema } from './utils';
 import {
   getDelegatedProofsFromVerifiedPresentation,
-  getJsonSchemasFromPresentation
+  getJsonSchemasFromPresentation,
 } from '../../../src/utils/vc/presentations';
 import defaultDocumentLoader from '../../../src/utils/vc/document-loader';
 

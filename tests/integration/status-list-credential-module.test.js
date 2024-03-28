@@ -9,7 +9,11 @@ import {
   DisableStatusListTests,
 } from '../test-constants';
 
-import { createNewDockDID, DidKeypair, typedHexDID } from '../../src/utils/did';
+import {
+  typedHexDID,
+  createNewDockDID,
+  DidKeypair,
+} from '../../src/utils/did';
 import { OneOfPolicy } from '../../src/utils/revocation';
 import { registerNewDIDUsingPair } from './helpers';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
@@ -60,7 +64,6 @@ buildTest('StatusListCredential Module', () => {
 
     // Create a status list policy
     owners.add(typedHexDID(dock.api, ownerDID));
-
     policy = new OneOfPolicy(owners);
 
     ownerKey = getKeyDoc(
@@ -103,6 +106,7 @@ buildTest('StatusListCredential Module', () => {
     const cred = await StatusList2021Credential.create(
       ownerKey,
       statusListCredId,
+      {},
     );
     await expect(
       dock.statusListCredential.createStatusListCredential(

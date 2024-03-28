@@ -23,6 +23,7 @@ import CoreModsRpcDefs from './rpc-defs/core-mods-rpc-defs';
 
 import ExtrinsicError from './errors/extrinsic-error';
 import TrustRegistryModule from './modules/trust-registry';
+import { retry } from './utils/misc';
 
 function getExtrinsicError(data, api) {
   // Loop through each of the parameters
@@ -47,6 +48,101 @@ function getExtrinsicError(data, api) {
   });
   return errorMsg;
 }
+
+const BlacklistedProperties = new Set([
+  'meta',
+  'registry',
+  'toJSON',
+  'is',
+  'creator',
+  'hash',
+  'key',
+  'keyPrefix',
+]);
+
+/**
+ * Recirsively patches supplied object functions props, so they will throw an error if there's no result within the `8 seconds` timeout after `2` retries.
+ *
+ * @param {*} obj
+ * @param {*} prop
+ * @param {string[]} [path=[]]
+ */
+const patchFn = (obj, prop, path = []) => {
+  const value = obj[prop];
+  if (
+    BlacklistedProperties.has(prop)
+    || !value
+    || (typeof value !== 'object' && typeof value !== 'function')
+  ) {
+    return;
+  }
+
+  if (typeof value !== 'function') {
+    for (const key of Object.keys(value)) {
+      patchFn(value, key, path.concat(key));
+    }
+
+    return;
+  }
+
+  const fn = value;
+  const newFn = async function with8SecsTimeoutAnd2Retries(...args) {
+    const that = this;
+    const wrappedFn = () => fn.apply(that, args);
+    wrappedFn.toString = () => fn.toString();
+
+    return retry(wrappedFn, 8e3, {
+      maxAttempts: 2,
+      delay: 5e2,
+      onTimeoutExceeded: (retrySym) => {
+        console.error(`${path.concat('.')} exceeded timeout`);
+
+        return retrySym;
+      },
+    });
+  };
+
+  try {
+    for (const fnProp of Object.keys(fn)) {
+      newFn[fnProp] = fn[fnProp];
+      patchFn(newFn, fnProp, path.concat(fnProp));
+    }
+    Object.setPrototypeOf(newFn, Object.getPrototypeOf(fn));
+
+    // eslint-disable-next-line no-param-reassign
+    delete obj[prop];
+    Object.defineProperty(obj, prop, {
+      value: newFn,
+    });
+  } catch (err) {
+    console.error(
+      `Failed to wrap the prop \`${prop}\` of \`${obj}\`: \`${
+        err.message || err
+      }\``,
+    );
+  }
+};
+
+/**
+ * Patches the query API methods, so they will throw an error if there's no result within the `8 seconds` timeout after `2` retries.
+ *
+ * @param {*} queryApi
+ */
+const patchQueryApi = (queryApi) => {
+  const exclude = new Set(['substrate.code']);
+
+  for (const modName of Object.keys(queryApi)) {
+    const mod = queryApi[modName];
+
+    for (const method of Object.keys(mod)) {
+      const path = `${modName}.${method}`;
+
+      if (!exclude.has(path)) {
+        patchFn(mod, method, [modName, method]);
+      }
+    }
+  }
+};
 
 /**
  * @typedef {object} Options The Options to use in the function DockAPI.
@@ -138,12 +234,18 @@ export default class DockAPI {
     const specVersion = runtimeVersion.specVersion.toNumber();
 
     if (specVersion < 50) {
-      apiOptions.types = { ...(apiOptions.types || {}), DidOrDidMethodKey: 'Did' };
+      apiOptions.types = {
+        ...(apiOptions.types || {}),
+        DidOrDidMethodKey: 'Did',
+      };
       this.api = await ApiPromise.create(apiOptions);
     }
     this.api.specVersion = specVersion;
 
     await this.initKeyring(keyring);
+
+    patchQueryApi(this.api.query);
+    patchQueryApi(this.api.queryMulti);
 
     this.anchorModule.setApi(this.api, this.signAndSend.bind(this));
     this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));

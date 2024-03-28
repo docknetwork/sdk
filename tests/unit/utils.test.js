@@ -102,8 +102,12 @@ describe('Testing isHexWithGivenByteSize', () => {
     await Promise.all(
       [
         async () => {
-          expect(await retry(makeCtrFn(5), 3e2, { delay: 2e2 })).toBe(0);
+          const onTimeoutExceeded = jest.fn((retrySym) => retrySym);
+
+          expect(await retry(makeCtrFn(5), 3e2, { delay: 2e2, onTimeoutExceeded })).toBe(0);
           expectElapsedTimeSec(2.5);
+
+          expect(onTimeoutExceeded).toBeCalledTimes(5);
         },
         async () => {
           expect(await retry(makeCtrFn(5), 3e2)).toBe(0);

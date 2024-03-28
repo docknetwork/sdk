@@ -94,8 +94,11 @@ const patchFn = (obj, prop, path = []) => {
     return retry(wrappedFn, 8e3, {
       maxAttempts: 2,
       delay: 5e2,
-      logs: true,
-      logsContext: path.join('.'),
+      onTimeoutExceeded: (retrySym) => {
+        console.error(`${path.concat('.')} exceeded timeout`);
+
+        return retrySym;
+      },
     });
   };
 

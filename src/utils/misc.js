@@ -268,9 +268,9 @@ export const fmtIter = (iter) => `\`[${[...iter].map((item) => item.toString()).
 
 /**
  * Creates a promise that will call the optional supplied function `f` and return its result after `time` passes.
- * If not function provided, the promise will be resolved to `undefined`.
+ * If no function is provided, the promise will be resolved to `undefined`.
  *
- * @template {T}
+ * @template T
  * @param {number} time
  * @param {function(): Promise<T>} f
  * @returns {Promise<T>}
@@ -285,7 +285,7 @@ export const timeout = (time, f = () => {}) => new Promise((resolve, reject) => 
 
 /**
  * Calls supplied function `fn` and waits for its completion up to `timeLimit`, retries in case timeout was fired.
- * Additionally, `delay` between retries, `maxAttempts` count, `logs` and `onError` can be specified.
+ * Additionally, `delay` between retries, `maxAttempts` count, `onTimeoutExceeded` and `onError` can be specified.
  *
  * `onError` callback will be called once an error is encountered, and it can be
  * - resolved to some value, so the underlying promise will be resolved
@@ -298,8 +298,7 @@ export const timeout = (time, f = () => {}) => new Promise((resolve, reject) => 
  * @param {object} [params={}]
  * @param {number} [params.delay=null]
  * @param {number} [params.maxAttempts=Infinity]
- * @param {string} [params.logsContext='']
- * @param {boolean} [params.logs=false]
+ * @param {function(): Promise<T | RETRY_SYM>} [params.onTimeoutExceeded=null]
  * @param {function(Error, RETRY_SYM): Promise<T | RETRY_SYM>} [params.onError=null]
  * @returns {Promise<T>}
  */
@@ -310,44 +309,35 @@ export const retry = async (
   {
     delay = null,
     maxAttempts = Infinity,
+    onTimeoutExceeded = null,
     onError = null,
-    logs = false,
-    logsContext = '',
   } = {},
 ) => {
   const RETRY_SYM = Symbol('retry');
 
   for (let i = 0; i <= maxAttempts; i++) {
-    const timer = timeout(timeLimit, () => RETRY_SYM);
+    let timeoutExceeded = false;
+    const timer = timeout(timeLimit, () => {
+      timeoutExceeded = true;
+
+      return RETRY_SYM;
+    });
 
     let res;
-    let timeoutExceeded = false;
     /* eslint-disable no-await-in-loop */
     if (onError != null) {
       try {
         res = await Promise.race([timer, fn()]);
-        timeoutExceeded = res === RETRY_SYM;
       } catch (error) {
-        if (logs) {
-          console.error(
-            `An error \`${error}\` thrown for \`${fn}\` on ${i} iteration`,
-          );
-        }
         res = await onError(error, RETRY_SYM);
       }
     } else {
       res = await Promise.race([timer, fn()]);
-      timeoutExceeded = res === RETRY_SYM;
     }
 
-    if (timeoutExceeded && logs) {
-      console.error(
-        `Timeout of ${timeLimit} ms exceeded for \`${fn}\`${
-          i > 0 ? ` ${i} times` : ''
-        }${logsContext && `, context: \`${logsContext}\``}`,
-      );
+    if (timeoutExceeded && onTimeoutExceeded != null) {
+      res = await onTimeoutExceeded(RETRY_SYM);
     }
-
     if (res !== RETRY_SYM) {
       return res;
     } else if (delay != null) {

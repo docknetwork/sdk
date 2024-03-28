@@ -332,7 +332,7 @@ export const retry = async (
   }
 
   throw new Error(
-    `Promise created by \`${fn}\` didn't resolve within the specified timeout ${maxAttempts} times`,
+    `Promise created by \`${fn}\` didn't resolve within the specified timeout of ${timeLimit} ms ${maxAttempts} times`,
   );
 };
 

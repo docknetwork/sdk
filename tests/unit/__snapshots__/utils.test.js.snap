@@ -9,7 +9,7 @@ exports[`Testing isHexWithGivenByteSize \`retry\` works properly 2`] = `
       } else {
         return placeholder;
       }
-    }\` didn't resolve within the specified timeout 99 times"
+    }\` didn't resolve within the specified timeout of 1 ms 99 times"
 `;
 
 exports[`Testing isHexWithGivenByteSize \`retry\` works properly 3`] = `
@@ -19,7 +19,7 @@ exports[`Testing isHexWithGivenByteSize \`retry\` works properly 3`] = `
       } else {
         return placeholder;
       }
-    }\` didn't resolve within the specified timeout 3 times"
+    }\` didn't resolve within the specified timeout of 300 ms 3 times"
 `;
 
 exports[`Testing isHexWithGivenByteSize \`timeout\` works properly 1`] = `"Rejected timeout"`;

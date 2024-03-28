@@ -83,7 +83,7 @@ describe('DID service endpoints', () => {
     const sp1 = await dock.did.getServiceEndpoint(dockDid2, spId2);
     expect(sp1.type).toEqual(spType);
     expect(sp1.origins).toEqual(origins2);
-  }, 6e4);
+  }, 1e4);
 
   test('Get DID document with service endpoints', async () => {
     const [doc1, doc2] = await Promise.all([dock.did.getDocument(dockDid1), dock.did.getDocument(dockDid2)]);
@@ -96,7 +96,7 @@ describe('DID service endpoints', () => {
     expect(doc2.service[0].id).toEqual(spId2Text);
     expect(doc2.service[0].type).toEqual('LinkedDomains');
     expect(doc2.service[0].serviceEndpoint).toEqual(origins2Text);
-  }, 2e4);
+  }, 1e4);
 
   test('Add another service endpoint', async () => {
     const pair1 = new DidKeypair(dock.keyring.addFromUri(seed1), 1);
@@ -107,7 +107,7 @@ describe('DID service endpoints', () => {
     const sp = await dock.did.getServiceEndpoint(dockDid2, spId3);
     expect(sp.type).toEqual(spType);
     expect(sp.origins).toEqual(origins);
-  }, 6e4);
+  }, 1e4);
 
   test('Get DID document with multiple service endpoints', async () => {
     const doc = await dock.did.getDocument(dockDid2);
@@ -130,7 +130,7 @@ describe('DID service endpoints', () => {
     // `dockDid1` removes service endpoint of `dockDid2`
     await dock.did.removeServiceEndpoint(spId2, hexDid2, hexDid1, pair1, undefined, false);
     await expect(dock.did.getServiceEndpoint(dockDid2, spId2)).rejects.toThrow();
-  }, 6e4);
+  }, 1e4);
 
   test('Removing DID removes service endpoint as well', async () => {
     const pair1 = new DidKeypair(dock.keyring.addFromUri(seed1), 1);
@@ -139,5 +139,5 @@ describe('DID service endpoints', () => {
 
     await expect(dock.did.getOnchainDidDetail(hexDid1.asDid)).rejects.toThrow(NoDIDError);
     await expect(dock.did.getServiceEndpoint(dockDid1, spId1)).rejects.toThrow();
-  }, 6e4);
+  }, 1e4);
 });

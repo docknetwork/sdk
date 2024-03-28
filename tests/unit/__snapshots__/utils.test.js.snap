@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Testing isHexWithGivenByteSize \`retry\` works properly 1`] = `"From \`onError\` callback"`;
+
+exports[`Testing isHexWithGivenByteSize \`retry\` works properly 2`] = `
+"Promise created by \`async () => {
+      if (!ctr--) {
+        return 0;
+      } else {
+        return placeholder;
+      }
+    }\` didn't resolve within the specified timeout 99 times"
+`;
+
+exports[`Testing isHexWithGivenByteSize \`retry\` works properly 3`] = `
+"Promise created by \`async () => {
+      if (!ctr--) {
+        return 0;
+      } else {
+        return placeholder;
+      }
+    }\` didn't resolve within the specified timeout 3 times"
+`;
+
+exports[`Testing isHexWithGivenByteSize \`timeout\` works properly 1`] = `"Rejected timeout"`;

@@ -23,6 +23,7 @@ import CoreModsRpcDefs from './rpc-defs/core-mods-rpc-defs';
 
 import ExtrinsicError from './errors/extrinsic-error';
 import TrustRegistryModule from './modules/trust-registry';
+import { retry } from './utils/misc';
 
 function getExtrinsicError(data, api) {
   // Loop through each of the parameters
@@ -47,6 +48,34 @@ function getExtrinsicError(data, api) {
   });
   return errorMsg;
 }
+
+/**
+ * Patches the query API methods, so they will throw an error if there's no result within the `8 seconds` timeout after `2` retries.
+ *
+ * @param {*} queryApi
+ */
+const patchQueryApi = (queryApi) => {
+  const exclude = new Set(['substrate.code']);
+
+  for (const modName of Object.keys(queryApi)) {
+    const mod = queryApi[modName];
+
+    for (const method of Object.keys(mod)) {
+      if (typeof mod[method] === 'function' && !exclude.has(`${modName}.${method}`)) {
+        const fn = mod[method];
+        delete method[method];
+
+        Object.defineProperty(mod, method, {
+          value: async function with8SecsTimeoutAnd2Retries(...args) {
+            const that = this;
+
+            return retry(() => fn.apply(that, args), 8e3, { maxAttempts: 2, delay: 5e2 });
+          },
+        });
+      }
+    }
+  }
+};
 
 /**
  * @typedef {object} Options The Options to use in the function DockAPI.
@@ -138,12 +167,18 @@ export default class DockAPI {
     const specVersion = runtimeVersion.specVersion.toNumber();
 
     if (specVersion < 50) {
-      apiOptions.types = { ...(apiOptions.types || {}), DidOrDidMethodKey: 'Did' };
+      apiOptions.types = {
+        ...(apiOptions.types || {}),
+        DidOrDidMethodKey: 'Did',
+      };
       this.api = await ApiPromise.create(apiOptions);
     }
     this.api.specVersion = specVersion;
 
     await this.initKeyring(keyring);
+
+    patchQueryApi(this.api.query);
+    patchQueryApi(this.api.queryMulti);
 
     this.anchorModule.setApi(this.api, this.signAndSend.bind(this));
     this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));

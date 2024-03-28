@@ -1,47 +1,47 @@
-import { ApiPromise, WsProvider, Keyring } from "@polkadot/api";
-import { HttpProvider } from "@polkadot/rpc-provider";
-import { cryptoWaitReady } from "@polkadot/util-crypto";
-import typesBundle from "@docknetwork/node-types";
+import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
+import { HttpProvider } from '@polkadot/rpc-provider';
+import { cryptoWaitReady } from '@polkadot/util-crypto';
+import typesBundle from '@docknetwork/node-types';
 import { KeyringPair } from "@polkadot/keyring/types"; // eslint-disable-line
 
-import AnchorModule from "./modules/anchor";
-import BlobModule from "./modules/blob";
-import { DIDModule } from "./modules/did";
-import RevocationModule from "./modules/revocation";
-import TokenMigration from "./modules/migration";
-import StatusListCredentialModule from "./modules/status-list-credential";
-import BBSModule from "./modules/bbs";
-import BBSPlusModule from "./modules/bbs-plus";
-import LegacyBBSPlusModule from "./modules/legacy-bbs-plus";
-import PSModule from "./modules/ps";
-import OffchainSignaturesModule from "./modules/offchain-signatures";
-import AccumulatorModule from "./modules/accumulator";
+import AnchorModule from './modules/anchor';
+import BlobModule from './modules/blob';
+import { DIDModule } from './modules/did';
+import RevocationModule from './modules/revocation';
+import TokenMigration from './modules/migration';
+import StatusListCredentialModule from './modules/status-list-credential';
+import BBSModule from './modules/bbs';
+import BBSPlusModule from './modules/bbs-plus';
+import LegacyBBSPlusModule from './modules/legacy-bbs-plus';
+import PSModule from './modules/ps';
+import OffchainSignaturesModule from './modules/offchain-signatures';
+import AccumulatorModule from './modules/accumulator';
 
-import PoaRpcDefs from "./rpc-defs/poa-rpc-defs";
-import PriceFeedRpcDefs from "./rpc-defs/price-feed-rpc-defs";
-import CoreModsRpcDefs from "./rpc-defs/core-mods-rpc-defs";
+import PoaRpcDefs from './rpc-defs/poa-rpc-defs';
+import PriceFeedRpcDefs from './rpc-defs/price-feed-rpc-defs';
+import CoreModsRpcDefs from './rpc-defs/core-mods-rpc-defs';
 
-import ExtrinsicError from "./errors/extrinsic-error";
-import TrustRegistryModule from "./modules/trust-registry";
-import { retry } from "./utils/misc";
+import ExtrinsicError from './errors/extrinsic-error';
+import TrustRegistryModule from './modules/trust-registry';
+import { retry } from './utils/misc';
 
 function getExtrinsicError(data, api) {
   // Loop through each of the parameters
   // trying to find module error information
-  let errorMsg = "Extrinsic failed submission:";
+  let errorMsg = 'Extrinsic failed submission:';
   data.forEach((error) => {
     if (error.isModule) {
       // for module errors, we have the section indexed, lookup
       try {
         const decoded = api.registry.findMetaError(error.asModule);
         const { docs, method, section } = decoded;
-        errorMsg += `\n${section}.${method}: ${docs.join(" ")}`;
+        errorMsg += `\n${section}.${method}: ${docs.join(' ')}`;
       } catch (e) {
         errorMsg += `\nError at module index: ${error.asModule.index} Error: ${error.asModule.error}`;
       }
     } else {
       const errorStr = error.toString();
-      if (errorStr !== "0") {
+      if (errorStr !== '0') {
         errorMsg += `\n${errorStr}`; // Other, CannotLookup, BadOrigin, no extra info
       }
     }
@@ -55,7 +55,7 @@ function getExtrinsicError(data, api) {
  * @param {*} queryApi
  */
 const patchQueryApi = (queryApi) => {
-  const exclude = new Set(["substrate.code"]);
+  const exclude = new Set(['substrate.code']);
 
   for (const modName of Object.keys(queryApi)) {
     const mod = queryApi[modName];
@@ -64,7 +64,7 @@ const patchQueryApi = (queryApi) => {
       const path = `${modName}.${method}`;
 
       try {
-        if (typeof mod[method] === "function" && !exclude.has(path)) {
+        if (typeof mod[method] === 'function' && !exclude.has(path)) {
           const fn = mod[method];
           const newFn = async function with8SecsTimeoutAnd2Retries(...args) {
             const that = this;
@@ -86,7 +86,7 @@ const patchQueryApi = (queryApi) => {
         }
       } catch (err) {
         console.error(
-          `Failed to wrap the method \`${path}\`: \`${err.message || err}\``
+          `Failed to wrap the method \`${path}\`: \`${err.message || err}\``,
         );
       }
     }
@@ -122,14 +122,16 @@ export default class DockAPI {
    */
   /* eslint-disable sonarjs/cognitive-complexity */
   async init(
-    { address, keyring, chainTypes, chainRpc, loadPoaModules = true } = {
+    {
+      address, keyring, chainTypes, chainRpc, loadPoaModules = true,
+    } = {
       address: null,
       keyring: null,
-    }
+    },
   ) {
     if (this.api) {
       if (this.api.isConnected) {
-        throw new Error("API is already connected");
+        throw new Error('API is already connected');
       } else {
         await this.disconnect();
       }
@@ -137,9 +139,9 @@ export default class DockAPI {
 
     this.address = address || this.address;
     if (
-      this.address &&
-      this.address.indexOf("wss://") === -1 &&
-      this.address.indexOf("https://") === -1
+      this.address
+      && this.address.indexOf('wss://') === -1
+      && this.address.indexOf('https://') === -1
     ) {
       console.warn(`WARNING: Using non-secure endpoint: ${this.address}`);
     }
@@ -158,7 +160,7 @@ export default class DockAPI {
       rpc = Object.assign(rpc, PoaRpcDefs);
     }
 
-    const isWebsocket = this.address && this.address.indexOf("http") === -1;
+    const isWebsocket = this.address && this.address.indexOf('http') === -1;
     const provider = isWebsocket
       ? new WsProvider(this.address)
       : new HttpProvider(this.address);
@@ -183,7 +185,7 @@ export default class DockAPI {
     if (specVersion < 50) {
       apiOptions.types = {
         ...(apiOptions.types || {}),
-        DidOrDidMethodKey: "Did",
+        DidOrDidMethodKey: 'Did',
       };
       this.api = await ApiPromise.create(apiOptions);
     }
@@ -199,37 +201,37 @@ export default class DockAPI {
     this.didModule = new DIDModule(this.api, this.signAndSend.bind(this));
     this.revocationModule = new RevocationModule(
       this.api,
-      this.signAndSend.bind(this)
+      this.signAndSend.bind(this),
     );
     this.trustRegistryModule = new TrustRegistryModule(
       this.api,
-      this.signAndSend.bind(this)
+      this.signAndSend.bind(this),
     );
     this.statusListCredentialModule = new StatusListCredentialModule(
       this.api,
-      this.signAndSend.bind(this)
+      this.signAndSend.bind(this),
     );
     this.legacyBBSPlus = this.api.tx.offchainSignatures == null;
     if (this.legacyBBSPlus) {
       this.bbsPlusModule = new LegacyBBSPlusModule(
         this.api,
-        this.signAndSend.bind(this)
+        this.signAndSend.bind(this),
       );
     } else {
       this.offchainSignaturesModule = new OffchainSignaturesModule(
         this.api,
-        this.signAndSend.bind(this)
+        this.signAndSend.bind(this),
       );
       this.bbsModule = new BBSModule(this.api, this.signAndSend.bind(this));
       this.bbsPlusModule = new BBSPlusModule(
         this.api,
-        this.signAndSend.bind(this)
+        this.signAndSend.bind(this),
       );
       this.psModule = new PSModule(this.api, this.signAndSend.bind(this));
     }
     this.accumulatorModule = new AccumulatorModule(
       this.api,
-      this.signAndSend.bind(this)
+      this.signAndSend.bind(this),
     );
 
     if (loadPoaModules) {
@@ -243,7 +245,7 @@ export default class DockAPI {
   async initKeyring(keyring = null) {
     if (!this.keyring || keyring) {
       await cryptoWaitReady();
-      this.keyring = new Keyring(keyring || { type: "sr25519" });
+      this.keyring = new Keyring(keyring || { type: 'sr25519' });
     }
   }
 
@@ -335,8 +337,8 @@ export default class DockAPI {
                 event: { data, method },
               } = events[i];
               if (
-                method === "ExtrinsicFailed" ||
-                method === "BatchInterrupted"
+                method === 'ExtrinsicFailed'
+                || method === 'BatchInterrupted'
               ) {
                 const errorMsg = getExtrinsicError(data, this.api);
                 const error = new ExtrinsicError(
@@ -344,7 +346,7 @@ export default class DockAPI {
                   method,
                   data,
                   status,
-                  events
+                  events,
                 );
                 reject(error);
                 return error;
@@ -353,8 +355,8 @@ export default class DockAPI {
 
             // If waiting for finalization or if not waiting for finalization, wait for inclusion in block.
             if (
-              (waitForFinalization && status.isFinalized) ||
-              (!waitForFinalization && status.isInBlock)
+              (waitForFinalization && status.isFinalized)
+              || (!waitForFinalization && status.isInBlock)
             ) {
               unsubFunc();
               resolve(extrResult);
@@ -404,7 +406,7 @@ export default class DockAPI {
    */
   get blob() {
     if (!this.blobModule) {
-      throw new Error("Unable to get Blob module, SDK is not initialised");
+      throw new Error('Unable to get Blob module, SDK is not initialised');
     }
     return this.blobModule;
   }
@@ -415,7 +417,7 @@ export default class DockAPI {
    */
   get did() {
     if (!this.didModule) {
-      throw new Error("Unable to get DID module, SDK is not initialised");
+      throw new Error('Unable to get DID module, SDK is not initialised');
     }
     return this.didModule;
   }
@@ -427,7 +429,7 @@ export default class DockAPI {
   get statusListCredential() {
     if (!this.statusListCredentialModule) {
       throw new Error(
-        "Unable to get StatusListCredentialModule module, SDK is not initialised"
+        'Unable to get StatusListCredentialModule module, SDK is not initialised',
       );
     }
     return this.statusListCredentialModule;
@@ -440,7 +442,7 @@ export default class DockAPI {
   get trustRegistry() {
     if (!this.trustRegistryModule) {
       throw new Error(
-        "Unable to get TrustRegistryModule module, SDK is not initialised"
+        'Unable to get TrustRegistryModule module, SDK is not initialised',
       );
     }
     return this.trustRegistryModule;
@@ -453,7 +455,7 @@ export default class DockAPI {
   get offchainSignatures() {
     if (!this.didModule) {
       throw new Error(
-        "Unable to get OffchainSignatures module, SDK is not initialised"
+        'Unable to get OffchainSignatures module, SDK is not initialised',
       );
     }
     return this.offchainSignaturesModule;
@@ -466,7 +468,7 @@ export default class DockAPI {
   get revocation() {
     if (!this.revocationModule) {
       throw new Error(
-        "Unable to get revocation module, SDK is not initialised"
+        'Unable to get revocation module, SDK is not initialised',
       );
     }
     return this.revocationModule;
@@ -481,7 +483,7 @@ export default class DockAPI {
       throw new Error("BBS isn't supported by the chain");
     }
     if (!this.bbsModule) {
-      throw new Error("Unable to get BBS module, SDK is not initialised");
+      throw new Error('Unable to get BBS module, SDK is not initialised');
     }
     return this.bbsModule;
   }
@@ -492,7 +494,7 @@ export default class DockAPI {
    */
   get bbsPlus() {
     if (!this.bbsPlusModule) {
-      throw new Error("Unable to get BBS+ module, SDK is not initialised");
+      throw new Error('Unable to get BBS+ module, SDK is not initialised');
     }
     return this.bbsPlusModule;
   }
@@ -506,7 +508,7 @@ export default class DockAPI {
       throw new Error("PS isn't supported by the chain");
     }
     if (!this.psModule) {
-      throw new Error("Unable to get PS module, SDK is not initialised");
+      throw new Error('Unable to get PS module, SDK is not initialised');
     }
     return this.psModule;
   }
@@ -518,7 +520,7 @@ export default class DockAPI {
   get accumulator() {
     if (!this.accumulatorModule) {
       throw new Error(
-        "Unable to get Accumulator module, SDK is not initialised"
+        'Unable to get Accumulator module, SDK is not initialised',
       );
     }
     return this.bbsPlusModule;

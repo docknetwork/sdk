@@ -95,7 +95,7 @@ const patchFn = (obj, prop, path = []) => {
       maxAttempts: 2,
       delay: 5e2,
       onTimeoutExceeded: (retrySym) => {
-        console.error(`${path.concat('.')} exceeded timeout`);
+        console.error(`\`${path.concat('.')}\` exceeded timeout`);
 
         return retrySym;
       },

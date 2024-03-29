@@ -195,7 +195,7 @@ export default class DockAPI {
       fn.toString = () => send.toString();
 
       return await retry(fn, waitForFinalization ? 13e3 : 7e3, {
-        maxAttempts: 1,
+        maxAttempts: 2,
         delay: 3e3,
         onTimeoutExceeded,
       });

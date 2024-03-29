@@ -446,14 +446,15 @@ export default class DockAPI {
       .catch(async (err) => {
         if (
           /Transaction is (temporarily banned|outdated)/.test(
-            err.message || '',
+            err?.message || '',
           )
         ) {
           try {
             const txHash = extrinsic.hash;
+            const finalizedHash = await this.api.rpc.chain.getFinalizedHead();
             const blockNumber = (
-              await this.api.query.system.number()
-            ).toNumber();
+              await this.api.derive.chain.getBlock(finalizedHash)
+            ).block.header.number.toNumber();
             const blockNumbersToCheck = Array.from(
               { length: 10 },
               (_, idx) => blockNumber - idx,

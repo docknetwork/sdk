@@ -164,6 +164,30 @@ export default class DockAPI {
   constructor(customSignTx) {
     this.customSignTx = customSignTx;
     this.anchorModule = new AnchorModule();
+
+    const { send } = this;
+    this.send = async function sendWithRetries(
+      extrinsic,
+      waitForFinalization = true,
+    ) {
+      let sent;
+      const onTimeoutExceeded = (retrySym) => {
+        sent.unsubscribe();
+        console.error(`Timeout exceeded for \`${extrinsic}\``);
+
+        return retrySym;
+      };
+
+      return await retry(
+        () => {
+          sent = send.call(this, extrinsic, waitForFinalization);
+
+          return sent;
+        },
+        waitForFinalization ? 13e3 : 7e3,
+        { maxAttempts: 2, onTimeoutExceeded },
+      );
+    };
   }
 
   /**
@@ -365,23 +389,7 @@ export default class DockAPI {
   async signAndSend(extrinsic, waitForFinalization = true, params = {}) {
     const signedExtrinsic = await this.signExtrinsic(extrinsic, params);
 
-    let sent;
-    const onTimeoutExceeded = (retrySym) => {
-      sent.unsubscribe();
-      console.error(`Timeout exceeded for \`${extrinsic}\``);
-
-      return retrySym;
-    };
-
-    return await retry(
-      () => {
-        sent = this.send(signedExtrinsic, waitForFinalization);
-
-        return sent;
-      },
-      waitForFinalization ? 13e3 : 7e3,
-      { maxAttempts: 2, onTimeoutExceeded },
-    );
+    return await this.send(signedExtrinsic, waitForFinalization);
   }
 
   /**
@@ -393,18 +401,12 @@ export default class DockAPI {
    */
   /* eslint-disable sonarjs/cognitive-complexity */
   send(extrinsic, waitForFinalization = true) {
-    let unsubFunc = null;
+    let unsubFn = null;
     let unsubscribed = false;
 
     const promise = new Promise((resolve, reject) => extrinsic
       .send((extrResult) => {
         const { events = [], status } = extrResult;
-        const toJSONOrToString = (value) => (value?.toJSON ? value.toJSON() : String(value));
-        console.log(
-          'Extrinsic',
-          toJSONOrToString(events),
-          toJSONOrToString(status),
-        );
 
         // Ensure ExtrinsicFailed event doesnt exist
         for (let i = 0; i < events.length; i++) {
@@ -440,7 +442,7 @@ export default class DockAPI {
         if (unsubscribed) {
           unsub();
         } else {
-          unsubFunc = unsub;
+          unsubFn = unsub;
         }
       })).finally(() => promise.unsubscribe());
 
@@ -448,10 +450,8 @@ export default class DockAPI {
       if (!unsubscribed) {
         unsubscribed = true;
 
-        const fn = unsubFunc;
-        unsubFunc = null;
-        if (fn != null) {
-          fn();
+        if (unsubFn != null) {
+          unsubFn();
         }
 
         return true;

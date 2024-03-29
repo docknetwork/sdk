@@ -2,9 +2,11 @@ import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { HttpProvider } from '@polkadot/rpc-provider';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import typesBundle from '@docknetwork/node-types';
+import { filterEvents } from '@polkadot/api/util';
 import { KeyringPair } from "@polkadot/keyring/types"; // eslint-disable-line
 
 import { createSubmittable } from '@polkadot/api/submittable';
+import { SubmittableResult } from '@polkadot/api/cjs/submittable/Result';
 import AnchorModule from './modules/anchor';
 import BlobModule from './modules/blob';
 import { DIDModule } from './modules/did';
@@ -24,7 +26,7 @@ import CoreModsRpcDefs from './rpc-defs/core-mods-rpc-defs';
 
 import ExtrinsicError from './errors/extrinsic-error';
 import TrustRegistryModule from './modules/trust-registry';
-import { retry } from './utils/misc';
+import { findExtrinsicBlock, retry } from './utils/misc';
 
 function getExtrinsicError(data, api) {
   // Loop through each of the parameters
@@ -175,9 +177,14 @@ export default class DockAPI {
       let sent;
       const onTimeoutExceeded = (retrySym) => {
         sent.unsubscribe();
-        // eslint-disable-next-line no-param-reassign,no-underscore-dangle
-        extrinsic = createSubmittable(this.api._type, this.api._rx, this.api._decorateMethod)(extrinsic.toU8a());
-        console.error(`Timeout exceeded for the extrinsic \`${extrinsic.hash}\``);
+        const { api } = this;
+        // eslint-disable-next-line no-underscore-dangle
+        const Sub = createSubmittable(api._type, api._rx, api._decorateMethod);
+        // eslint-disable-next-line no-param-reassign
+        extrinsic = Sub(extrinsic.toU8a());
+        console.error(
+          `Timeout exceeded for the extrinsic \`${extrinsic.hash}\``,
+        );
 
         return retrySym;
       };
@@ -187,11 +194,11 @@ export default class DockAPI {
       };
       fn.toString = () => send.toString();
 
-      return await retry(
-        fn,
-        waitForFinalization ? 13e3 : 7e3,
-        { maxAttempts: 2, delay: 3e3, onTimeoutExceeded },
-      );
+      return await retry(fn, waitForFinalization ? 13e3 : 7e3, {
+        maxAttempts: 2,
+        delay: 3e3,
+        onTimeoutExceeded,
+      });
     };
   }
 
@@ -409,28 +416,24 @@ export default class DockAPI {
     let unsubFn = null;
     let unsubscribed = false;
 
+    const checkEvents = (events, status) => {
+      // Ensure ExtrinsicFailed event doesnt exist
+      for (let i = 0; i < events.length; i++) {
+        const {
+          event: { data, method },
+        } = events[i];
+        if (method === 'ExtrinsicFailed' || method === 'BatchInterrupted') {
+          const errorMsg = getExtrinsicError(data, this.api);
+          throw new ExtrinsicError(errorMsg, method, data, status, events);
+        }
+      }
+    };
+
     const promise = new Promise((resolve, reject) => extrinsic
       .send((extrResult) => {
         const { events = [], status } = extrResult;
 
-        // Ensure ExtrinsicFailed event doesnt exist
-        for (let i = 0; i < events.length; i++) {
-          const {
-            event: { data, method },
-          } = events[i];
-          if (method === 'ExtrinsicFailed' || method === 'BatchInterrupted') {
-            const errorMsg = getExtrinsicError(data, this.api);
-            const error = new ExtrinsicError(
-              errorMsg,
-              method,
-              data,
-              status,
-              events,
-            );
-            reject(error);
-            return error;
-          }
-        }
+        checkEvents(events, status);
 
         // If waiting for finalization or if not waiting for finalization, wait for inclusion in block.
         if (
@@ -439,17 +442,69 @@ export default class DockAPI {
         ) {
           resolve(extrResult);
         }
-
-        return extrResult;
       })
-      .catch(reject)
-      .then((unsub) => {
-        if (unsubscribed) {
-          unsub();
+      .catch(async (err) => {
+        if (
+          /Transaction is (temporarily banned|outdated)/.test(
+            err.message || '',
+          )
+        ) {
+          try {
+            const txHash = extrinsic.hash;
+            const blockNumber = (
+              await this.api.query.system.number()
+            ).toNumber();
+            const blockNumbersToCheck = Array.from(
+              { length: 10 },
+              (_, idx) => blockNumber - idx,
+            );
+
+            const block = await findExtrinsicBlock(
+              this.api,
+              blockNumbersToCheck,
+              txHash,
+            );
+
+            if (block == null) {
+              reject(err);
+            } else {
+              const status = this.api.createType('ExtrinsicStatus', {
+                finalized: block.block.header.hash,
+              });
+              const filtered = filterEvents(
+                txHash,
+                block,
+                block.events,
+                status,
+              );
+
+              checkEvents(filtered.events, status);
+
+              const result = new SubmittableResult({
+                ...filtered,
+                status,
+                txHash,
+              });
+
+              resolve(result);
+            }
+          } catch (internalErr) {
+            console.error(internalErr);
+            reject(err);
+          }
         } else {
-          unsubFn = unsub;
+          reject(err);
         }
-      })).finally(() => promise.unsubscribe());
+      })
+      .then((unsub) => {
+        if (typeof unsub === 'function') {
+          if (unsubscribed) {
+            unsub();
+          } else {
+            unsubFn = unsub;
+          }
+        }
+      })).finally(() => void promise.unsubscribe());
 
     promise.unsubscribe = () => {
       if (unsubscribed) {

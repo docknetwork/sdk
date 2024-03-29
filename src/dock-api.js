@@ -91,7 +91,7 @@ const patchFn = (obj, prop, path = []) => {
     const wrappedFn = () => fn.apply(that, args);
     wrappedFn.toString = () => fn.toString();
 
-    return retry(wrappedFn, 8e3, {
+    return await retry(wrappedFn, 8e3, {
       maxAttempts: 2,
       delay: 5e2,
       onTimeoutExceeded: (retrySym) => {

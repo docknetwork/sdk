@@ -49,6 +49,9 @@ function getExtrinsicError(data, api) {
   return errorMsg;
 }
 
+/**
+ * Properties that won't be patched/visited during the patching.
+ */
 const BlacklistedProperties = new Set([
   'meta',
   'registry',
@@ -61,13 +64,14 @@ const BlacklistedProperties = new Set([
 ]);
 
 /**
- * Recirsively patches supplied object functions props, so they will throw an error if there's no result within the `8 seconds` timeout after `2` retries.
+ * Recursively patches supplied object property and all underlying objects, so all functions will attempt to retry 2 times and
+ * will throw an error if there's no result within the `8 seconds` timeout.
  *
  * @param {*} obj
  * @param {*} prop
  * @param {string[]} [path=[]]
  */
-const patchFn = (obj, prop, path = []) => {
+const wrapFnWithRetries = (obj, prop, path = []) => {
   const value = obj[prop];
   if (
     BlacklistedProperties.has(prop)
@@ -77,42 +81,39 @@ const patchFn = (obj, prop, path = []) => {
     return;
   }
 
-  if (typeof value !== 'function') {
-    for (const key of Object.keys(value)) {
-      patchFn(value, key, path.concat(key));
-    }
-
-    return;
-  }
-
-  const fn = value;
-  const newFn = async function with8SecsTimeoutAnd2Retries(...args) {
-    const that = this;
-    const wrappedFn = () => fn.apply(that, args);
-    wrappedFn.toString = () => fn.toString();
-
-    return await retry(wrappedFn, 8e3, {
-      maxAttempts: 2,
-      delay: 5e2,
-      onTimeoutExceeded: (retrySym) => {
-        console.error(`\`${path.concat('.')}\` exceeded timeout`);
-
-        return retrySym;
-      },
-    });
-  };
-
   try {
-    for (const fnProp of Object.keys(fn)) {
-      newFn[fnProp] = fn[fnProp];
-      patchFn(newFn, fnProp, path.concat(fnProp));
+    let newValue;
+    if (typeof value !== 'function') {
+      newValue = Object.create(Object.getPrototypeOf(value));
+    } else {
+      newValue = async function with8SecsTimeoutAnd2Retries(...args) {
+        const that = this;
+        const wrappedFn = () => value.apply(that, args);
+        wrappedFn.toString = () => value.toString();
+
+        return await retry(wrappedFn, 8e3, {
+          maxAttempts: 2,
+          delay: 5e2,
+          onTimeoutExceeded: (retrySym) => {
+            console.error(`\`${path.concat('.')}\` exceeded timeout`);
+
+            return retrySym;
+          },
+        });
+      };
+
+      Object.setPrototypeOf(newValue, Object.getPrototypeOf(value));
     }
-    Object.setPrototypeOf(newFn, Object.getPrototypeOf(fn));
+
+    for (const key of Object.keys(value)) {
+      newValue[key] = value[key]; // eslint-disable-line no-param-reassign
+      wrapFnWithRetries(newValue, key, path.concat(key));
+    }
 
     // eslint-disable-next-line no-param-reassign
     delete obj[prop];
     Object.defineProperty(obj, prop, {
-      value: newFn,
+      value: newValue,
     });
   } catch (err) {
     console.error(
@@ -138,7 +139,7 @@ const patchQueryApi = (queryApi) => {
       const path = `${modName}.${method}`;
 
       if (!exclude.has(path)) {
-        patchFn(mod, method, [modName, method]);
+        wrapFnWithRetries(mod, method, [modName, method]);
       }
     }
   }

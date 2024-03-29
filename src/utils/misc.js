@@ -264,7 +264,7 @@ export async function getDidNonce(
  * @param {Iterable<V>} iter
  * @returns {string}
  */
-export const fmtIter = (iter) => `\`[${[...iter].map((item) => item.toString()).join(', ')}]\``;
+export const fmtIter = (iter) => `\`[${[...iter].map(String).join(', ')}]\``;
 
 /**
  * Creates a promise that will call the optional supplied function `f` and return its result after `time` passes.
@@ -275,13 +275,31 @@ export const fmtIter = (iter) => `\`[${[...iter].map((item) => item.toString()).
  * @param {function(): Promise<T>} f
  * @returns {Promise<T>}
  */
-export const timeout = (time, f = () => {}) => new Promise((resolve, reject) => setTimeout(async () => {
+export const timeout = async (time, f = () => {}) => await new Promise((resolve, reject) => setTimeout(async () => {
   try {
     resolve(await f());
   } catch (err) {
     reject(err);
   }
 }, time));
+
+/**
+ * Combines supplied `promise` with a `timeout` that will call supplied `f` after `time` passes.
+ * Resolves to the earliest produced value.
+ *
+ * @template T
+ * @param {Promise<T>} promise
+ * @param {number} time
+ * @param {function(): Promise<T>} [f=()=>{throw new Error("Timeout exceeded")}]
+ * @returns {Promise<T>}
+ */
+export const withTimeout = async (
+  promise,
+  time,
+  f = () => {
+    throw new Error('Timeout exceeded');
+  },
+) => await Promise.race([promise, timeout(time, f)]);
 
 /**
  * Calls supplied function `fn` and waits for its completion up to `timeLimit`, retries in case timeout was fired.
@@ -298,7 +316,7 @@ export const timeout = (time, f = () => {}) => new Promise((resolve, reject) => 
  * @param {object} [params={}]
  * @param {number} [params.delay=null]
  * @param {number} [params.maxAttempts=Infinity]
- * @param {function(): Promise<T | RETRY_SYM>} [params.onTimeoutExceeded=null]
+ * @param {function(RETRY_SYM): Promise<T | RETRY_SYM>} [params.onTimeoutExceeded=null]
  * @param {function(Error, RETRY_SYM): Promise<T | RETRY_SYM>} [params.onError=null]
  * @returns {Promise<T>}
  */
@@ -317,22 +335,22 @@ export const retry = async (
 
   for (let i = 0; i <= maxAttempts; i++) {
     let timeoutExceeded = false;
-    const timer = timeout(timeLimit, () => {
+    const timerFn = () => {
       timeoutExceeded = true;
 
       return RETRY_SYM;
-    });
+    };
 
     let res;
     /* eslint-disable no-await-in-loop */
     if (onError != null) {
       try {
-        res = await Promise.race([timer, fn()]);
+        res = await withTimeout(fn(), timeLimit, timerFn);
       } catch (error) {
         res = await onError(error, RETRY_SYM);
       }
     } else {
-      res = await Promise.race([timer, fn()]);
+      res = await withTimeout(fn(), timeLimit, timerFn);
     }
 
     if (timeoutExceeded && onTimeoutExceeded != null) {
@@ -347,7 +365,9 @@ export const retry = async (
   }
 
   throw new Error(
-    `Promise created by \`${fn}\` didn't resolve within the specified timeout of ${timeLimit} ms ${maxAttempts} times`,
+    `Promise created by \`${fn}\` didn't resolve within the specified timeout of ${timeLimit} ms ${
+      maxAttempts + 1
+    } times`,
   );
 };
 /* eslint-enable sonarjs/cognitive-complexity */

@@ -364,7 +364,17 @@ export default class DockAPI {
    */
   async signAndSend(extrinsic, waitForFinalization = true, params = {}) {
     const signedExtrinsic = await this.signExtrinsic(extrinsic, params);
-    return this.send(signedExtrinsic, waitForFinalization);
+    const onTimeoutExceeded = (retrySym) => {
+      console.error(`Timeout exceeded for \`${extrinsic}\``);
+
+      return retrySym;
+    };
+
+    return await retry(
+      () => this.send(signedExtrinsic, waitForFinalization),
+      waitForFinalization ? 10e3 : 7e3,
+      { maxAttempts: 1, onTimeoutExceeded },
+    );
   }
 
   /**
@@ -375,60 +385,47 @@ export default class DockAPI {
    * @returns {Promise<unknown>}
    */
   async send(extrinsic, waitForFinalization = true) {
-    const promise = new Promise((resolve, reject) => {
-      try {
-        let unsubFunc = null;
-        return extrinsic
-          .send((extrResult) => {
-            const { events = [], status } = extrResult;
+    let unsubFunc = () => {};
 
-            // Ensure ExtrinsicFailed event doesnt exist
-            for (let i = 0; i < events.length; i++) {
-              const {
-                event: { data, method },
-              } = events[i];
-              if (
-                method === 'ExtrinsicFailed'
-                || method === 'BatchInterrupted'
-              ) {
-                const errorMsg = getExtrinsicError(data, this.api);
-                const error = new ExtrinsicError(
-                  errorMsg,
-                  method,
-                  data,
-                  status,
-                  events,
-                );
-                reject(error);
-                return error;
-              }
-            }
+    return await new Promise((resolve, reject) => extrinsic
+      .send((extrResult) => {
+        const { events = [], status } = extrResult;
+        const toJSONOrToString = (value) => (value?.toJSON ? value.toJSON() : String(value));
+        console.log('Extrinsic', toJSONOrToString(events), toJSONOrToString(status));
 
-            // If waiting for finalization or if not waiting for finalization, wait for inclusion in block.
-            if (
-              (waitForFinalization && status.isFinalized)
-              || (!waitForFinalization && status.isInBlock)
-            ) {
-              unsubFunc();
-              resolve(extrResult);
-            }
-
-            return extrResult;
-          })
-          .catch((error) => {
+        // Ensure ExtrinsicFailed event doesnt exist
+        for (let i = 0; i < events.length; i++) {
+          const {
+            event: { data, method },
+          } = events[i];
+          if (method === 'ExtrinsicFailed' || method === 'BatchInterrupted') {
+            const errorMsg = getExtrinsicError(data, this.api);
+            const error = new ExtrinsicError(
+              errorMsg,
+              method,
+              data,
+              status,
+              events,
+            );
             reject(error);
-          })
-          .then((unsub) => {
-            unsubFunc = unsub;
-          });
-      } catch (error) {
-        reject(error);
-      }
+            return error;
+          }
+        }
 
-      return this;
-    });
+        // If waiting for finalization or if not waiting for finalization, wait for inclusion in block.
+        if (
+          (waitForFinalization && status.isFinalized)
+            || (!waitForFinalization && status.isInBlock)
+        ) {
+          resolve(extrResult);
+        }
 
-    return await promise;
+        return extrResult;
+      })
+      .catch(reject)
+      .then((unsub) => {
+        unsubFunc = unsub;
+      })).finally(unsubFunc);
   }
 
   /**

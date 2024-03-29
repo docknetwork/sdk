@@ -4,6 +4,7 @@ import { cryptoWaitReady } from '@polkadot/util-crypto';
 import typesBundle from '@docknetwork/node-types';
 import { KeyringPair } from "@polkadot/keyring/types"; // eslint-disable-line
 
+import { createSubmittable } from '@polkadot/api/submittable';
 import AnchorModule from './modules/anchor';
 import BlobModule from './modules/blob';
 import { DIDModule } from './modules/did';
@@ -174,19 +175,23 @@ export default class DockAPI {
       let sent;
       const onTimeoutExceeded = (retrySym) => {
         sent.unsubscribe();
-        console.error(`Timeout exceeded for \`${extrinsic}\``);
+        // eslint-disable-next-line no-param-reassign,no-underscore-dangle
+        extrinsic = createSubmittable(this.api._type, this.api._rx, this.api._decorateMethod)(extrinsic.toU8a());
+        console.error(`Timeout exceeded for the extrinsic \`${extrinsic.hash}\``);
 
         return retrySym;
       };
+      const fn = async () => {
+        sent = send.call(this, extrinsic, waitForFinalization);
+
+        return sent;
+      };
+      fn.toString = () => send.toString();
 
       return await retry(
-        () => {
-          sent = send.call(this, extrinsic, waitForFinalization);
-
-          return sent;
-        },
-        waitForFinalization ? 16e3 : 1e4,
-        { maxAttempts: 2, onTimeoutExceeded },
+        fn,
+        waitForFinalization ? 13e3 : 7e3,
+        { maxAttempts: 2, delay: 5e2, onTimeoutExceeded },
       );
     };
   }
@@ -448,17 +453,16 @@ export default class DockAPI {
       })).finally(() => promise.unsubscribe());
 
     promise.unsubscribe = () => {
-      if (!unsubscribed) {
-        unsubscribed = true;
+      if (unsubscribed) {
+        return false;
+      }
+      unsubscribed = true;
 
-        if (unsubFn != null) {
-          unsubFn();
-        }
-
-        return true;
+      if (unsubFn != null) {
+        unsubFn();
       }
 
-      return false;
+      return true;
     };
 
     return promise;

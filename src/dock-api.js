@@ -194,8 +194,11 @@ export default class DockAPI {
       };
       fn.toString = () => send.toString();
 
-      return await retry(fn, waitForFinalization ? 12e3 : 7e3, {
+      const blockTime = this.api.consts.babe.expectedBlockTime.toNumber();
+
+      return await retry(fn, 1e3 + (waitForFinalization ? 4 * blockTime : 2 * blockTime), {
         maxAttempts: 2,
+        delay: blockTime,
         onTimeoutExceeded,
       });
     };

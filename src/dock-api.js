@@ -184,7 +184,7 @@ export default class DockAPI {
 
           return sent;
         },
-        waitForFinalization ? 13e3 : 7e3,
+        waitForFinalization ? 16e3 : 1e4,
         { maxAttempts: 2, onTimeoutExceeded },
       );
     };

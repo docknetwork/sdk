@@ -364,16 +364,23 @@ export default class DockAPI {
    */
   async signAndSend(extrinsic, waitForFinalization = true, params = {}) {
     const signedExtrinsic = await this.signExtrinsic(extrinsic, params);
+
+    let sent;
     const onTimeoutExceeded = (retrySym) => {
+      sent.unsubscribe();
       console.error(`Timeout exceeded for \`${extrinsic}\``);
 
       return retrySym;
     };
 
     return await retry(
-      () => this.send(signedExtrinsic, waitForFinalization),
-      waitForFinalization ? 10e3 : 7e3,
-      { maxAttempts: 1, onTimeoutExceeded },
+      () => {
+        sent = this.send(signedExtrinsic, waitForFinalization);
+
+        return sent;
+      },
+      waitForFinalization ? 13e3 : 7e3,
+      { maxAttempts: 2, onTimeoutExceeded },
     );
   }
 
@@ -384,14 +391,20 @@ export default class DockAPI {
    * else only wait to be included in block.
    * @returns {Promise<unknown>}
    */
-  async send(extrinsic, waitForFinalization = true) {
-    let unsubFunc = () => {};
+  /* eslint-disable sonarjs/cognitive-complexity */
+  send(extrinsic, waitForFinalization = true) {
+    let unsubFunc = null;
+    let unsubscribed = false;
 
-    return await new Promise((resolve, reject) => extrinsic
+    const promise = new Promise((resolve, reject) => extrinsic
       .send((extrResult) => {
         const { events = [], status } = extrResult;
         const toJSONOrToString = (value) => (value?.toJSON ? value.toJSON() : String(value));
-        console.log('Extrinsic', toJSONOrToString(events), toJSONOrToString(status));
+        console.log(
+          'Extrinsic',
+          toJSONOrToString(events),
+          toJSONOrToString(status),
+        );
 
         // Ensure ExtrinsicFailed event doesnt exist
         for (let i = 0; i < events.length; i++) {
@@ -424,9 +437,32 @@ export default class DockAPI {
       })
       .catch(reject)
       .then((unsub) => {
-        unsubFunc = unsub;
-      })).finally(unsubFunc);
+        if (unsubscribed) {
+          unsub();
+        } else {
+          unsubFunc = unsub;
+        }
+      })).finally(() => promise.unsubscribe());
+
+    promise.unsubscribe = () => {
+      if (!unsubscribed) {
+        unsubscribed = true;
+
+        const fn = unsubFunc;
+        unsubFunc = null;
+        if (fn != null) {
+          fn();
+        }
+
+        return true;
+      }
+
+      return false;
+    };
+
+    return promise;
   }
+  /* eslint-enable sonarjs/cognitive-complexity */
 
   /**
    * Checks if the API instance is connected to the node

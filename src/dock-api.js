@@ -183,7 +183,6 @@ export default class DockAPI {
       };
       const fn = async () => {
         sent = send.call(this, extrinsic, waitForFinalization);
-
         return sent;
       };
       fn.toString = () => send.toString();
@@ -191,7 +190,7 @@ export default class DockAPI {
       return await retry(
         fn,
         waitForFinalization ? 13e3 : 7e3,
-        { maxAttempts: 2, delay: 5e2, onTimeoutExceeded },
+        { maxAttempts: 2, delay: 3e3, onTimeoutExceeded },
       );
     };
   }

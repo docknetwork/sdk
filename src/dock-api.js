@@ -466,9 +466,7 @@ export default class DockAPI {
               txHash,
             );
 
-            if (block == null) {
-              reject(err);
-            } else {
+            if (block != null) {
               const status = this.api.createType('ExtrinsicStatus', {
                 finalized: block.block.header.hash,
               });
@@ -490,8 +488,7 @@ export default class DockAPI {
               resolve(result);
             }
           } catch (internalErr) {
-            console.error(internalErr);
-            reject(err);
+            reject(internalErr);
           }
         } else {
           reject(err);

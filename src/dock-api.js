@@ -457,8 +457,10 @@ export default class DockAPI {
             const blockNumber = (
               await this.api.derive.chain.getBlock(finalizedHash)
             ).block.header.number.toNumber();
+            const blockTime = this.api.consts.babe.expectedBlockTime.toNumber();
+
             const blockNumbersToCheck = Array.from(
-              { length: 10 },
+              { length: blockTime === 3e3 ? 10 : 15 },
               (_, idx) => blockNumber - idx,
             );
 

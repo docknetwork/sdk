@@ -462,7 +462,7 @@ export default class DockAPI {
             const blockTime = this.api.consts.babe.expectedBlockTime.toNumber();
 
             const blockNumbersToCheck = Array.from(
-              { length: blockTime === 3e3 ? 10 : 20 },
+              { length: blockTime === 3e3 ? 10 : 40 },
               (_, idx) => blockNumber - idx,
             );
 

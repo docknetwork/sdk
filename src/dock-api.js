@@ -200,7 +200,7 @@ export default class DockAPI {
 
       return await retry(fn, 1e3 + (waitForFinalization ? finalizedTimeout : inBlockTimeout), {
         maxAttempts: 2,
-        delay: blockTime,
+        delay: 3e3,
         onTimeoutExceeded,
       });
     };

@@ -196,7 +196,7 @@ export default class DockAPI {
 
       const blockTime = this.api.consts.babe.expectedBlockTime.toNumber();
 
-      return await retry(fn, 1e3 + (waitForFinalization ? 4 * blockTime : 2 * blockTime), {
+      return await retry(fn, 1e3 + (waitForFinalization ? 5 * blockTime : 3 * blockTime), {
         maxAttempts: 2,
         delay: blockTime,
         onTimeoutExceeded,

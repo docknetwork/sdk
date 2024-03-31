@@ -215,7 +215,7 @@ export default class DockAPI {
           const blockTime = api.consts.babe.expectedBlockTime.toNumber();
 
           const blockNumbersToCheck = Array.from(
-            { length: blockTime === 3e3 ? 10 : 20 },
+            { length: blockTime === 3e3 ? 10 : 25 },
             (_, idx) => blockNumber - idx,
           );
 
@@ -259,7 +259,7 @@ export default class DockAPI {
         : inBlockTimeout;
 
       return await retry(fn, 1e3 + baseTimeout, {
-        maxAttempts: 2,
+        maxAttempts: 3,
         delay: 3e3,
         onTimeoutExceeded,
         onError,
@@ -504,8 +504,7 @@ export default class DockAPI {
           }
         }
       })
-      .catch(reject))
-      .finally(() => void promise.unsubscribe());
+      .catch(reject)).finally(() => void promise.unsubscribe());
 
     promise.unsubscribe = () => {
       if (unsubscribed) {

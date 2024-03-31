@@ -52,6 +52,19 @@ function getExtrinsicError(data, api) {
   return errorMsg;
 }
 
+const checkEvents = (api, events, status) => {
+  // Ensure ExtrinsicFailed event doesnt exist
+  for (let i = 0; i < events.length; i++) {
+    const {
+      event: { data, method },
+    } = events[i];
+    if (method === 'ExtrinsicFailed' || method === 'BatchInterrupted') {
+      const errorMsg = getExtrinsicError(data, api);
+      throw new ExtrinsicError(errorMsg, method, data, status, events);
+    }
+  }
+};
+
 /**
  * Properties that won't be patched/visited during the patching.
  */
@@ -170,14 +183,15 @@ export default class DockAPI {
     this.anchorModule = new AnchorModule();
 
     const { send } = this;
+    /* eslint-disable sonarjs/cognitive-complexity */
     this.send = async function sendWithRetries(
       extrinsic,
       waitForFinalization = true,
     ) {
+      const { api } = this;
       let sent;
       const onTimeoutExceeded = (retrySym) => {
         sent.unsubscribe();
-        const { api } = this;
         // eslint-disable-next-line no-underscore-dangle
         const Sub = createSubmittable(api._type, api._rx, api._decorateMethod);
         // eslint-disable-next-line no-param-reassign
@@ -188,22 +202,70 @@ export default class DockAPI {
 
         return retrySym;
       };
+      const errorRegExp = /Transaction is (temporarily banned|outdated)/;
+      const onError = async (err, retrySym) => {
+        sent.unsubscribe();
+
+        if (errorRegExp.test(err?.message || '')) {
+          const txHash = extrinsic.hash;
+          const finalizedHash = await api.rpc.chain.getFinalizedHead();
+          const blockNumber = (
+            await api.derive.chain.getBlock(finalizedHash)
+          ).block.header.number.toNumber();
+          const blockTime = api.consts.babe.expectedBlockTime.toNumber();
+
+          const blockNumbersToCheck = Array.from(
+            { length: blockTime === 3e3 ? 10 : 20 },
+            (_, idx) => blockNumber - idx,
+          );
+
+          const block = await findExtrinsicBlock(
+            api,
+            blockNumbersToCheck,
+            txHash,
+          );
+
+          if (block != null) {
+            const status = api.createType('ExtrinsicStatus', {
+              finalized: block.block.header.hash,
+            });
+            const filtered = filterEvents(txHash, block, block.events, status);
+
+            checkEvents(api, filtered.events, status);
+
+            return new SubmittableResult({
+              ...filtered,
+              status,
+              txHash,
+            });
+          }
+        } else {
+          throw err;
+        }
+
+        return retrySym;
+      };
       const fn = async () => {
         sent = send.call(this, extrinsic, waitForFinalization);
         return sent;
       };
       fn.toString = () => send.toString();
 
-      const blockTime = this.api.consts.babe.expectedBlockTime.toNumber();
+      const blockTime = api.consts.babe.expectedBlockTime.toNumber();
       const finalizedTimeout = blockTime === 3e3 ? 12e3 : 6e3;
-      const inBlockTimeout = blockTime === 3e3 ? 9e3 : 6e3;
+      const inBlockTimeout = blockTime === 3e3 ? 6e3 : 3e3;
+      const baseTimeout = waitForFinalization
+        ? finalizedTimeout
+        : inBlockTimeout;
 
-      return await retry(fn, 1e3 + (waitForFinalization ? finalizedTimeout : inBlockTimeout), {
+      return await retry(fn, 1e3 + baseTimeout, {
         maxAttempts: 2,
         delay: 3e3,
         onTimeoutExceeded,
+        onError,
       });
     };
+    /* eslint-enable sonarjs/cognitive-complexity */
   }
 
   /**
@@ -415,29 +477,15 @@ export default class DockAPI {
    * else only wait to be included in block.
    * @returns {Promise<unknown>}
    */
-  /* eslint-disable sonarjs/cognitive-complexity */
   send(extrinsic, waitForFinalization = true) {
-    let unsubFn = null;
+    let unsubscribe = null;
     let unsubscribed = false;
-
-    const checkEvents = (events, status) => {
-      // Ensure ExtrinsicFailed event doesnt exist
-      for (let i = 0; i < events.length; i++) {
-        const {
-          event: { data, method },
-        } = events[i];
-        if (method === 'ExtrinsicFailed' || method === 'BatchInterrupted') {
-          const errorMsg = getExtrinsicError(data, this.api);
-          throw new ExtrinsicError(errorMsg, method, data, status, events);
-        }
-      }
-    };
 
     const promise = new Promise((resolve, reject) => extrinsic
       .send((extrResult) => {
         const { events = [], status } = extrResult;
 
-        checkEvents(events, status);
+        checkEvents(this.api, events, status);
 
         // If waiting for finalization or if not waiting for finalization, wait for inclusion in block.
         if (
@@ -447,68 +495,17 @@ export default class DockAPI {
           resolve(extrResult);
         }
       })
-      .catch(async (err) => {
-        if (
-          /Transaction is (temporarily banned|outdated)/.test(
-            err?.message || '',
-          )
-        ) {
-          try {
-            const txHash = extrinsic.hash;
-            const finalizedHash = await this.api.rpc.chain.getFinalizedHead();
-            const blockNumber = (
-              await this.api.derive.chain.getBlock(finalizedHash)
-            ).block.header.number.toNumber();
-            const blockTime = this.api.consts.babe.expectedBlockTime.toNumber();
-
-            const blockNumbersToCheck = Array.from(
-              { length: blockTime === 3e3 ? 10 : 40 },
-              (_, idx) => blockNumber - idx,
-            );
-
-            const block = await findExtrinsicBlock(
-              this.api,
-              blockNumbersToCheck,
-              txHash,
-            );
-
-            if (block != null) {
-              const status = this.api.createType('ExtrinsicStatus', {
-                finalized: block.block.header.hash,
-              });
-              const filtered = filterEvents(
-                txHash,
-                block,
-                block.events,
-                status,
-              );
-
-              checkEvents(filtered.events, status);
-
-              const result = new SubmittableResult({
-                ...filtered,
-                status,
-                txHash,
-              });
-
-              resolve(result);
-            }
-          } catch (internalErr) {
-            reject(internalErr);
-          }
-        } else {
-          reject(err);
-        }
-      })
       .then((unsub) => {
         if (typeof unsub === 'function') {
           if (unsubscribed) {
             unsub();
           } else {
-            unsubFn = unsub;
+            unsubscribe = unsub;
           }
         }
-      })).finally(() => void promise.unsubscribe());
+      })
+      .catch(reject))
+      .finally(() => void promise.unsubscribe());
 
     promise.unsubscribe = () => {
       if (unsubscribed) {
@@ -516,8 +513,8 @@ export default class DockAPI {
       }
       unsubscribed = true;
 
-      if (unsubFn != null) {
-        unsubFn();
+      if (unsubscribe != null) {
+        unsubscribe();
       }
 
       return true;
@@ -525,7 +522,6 @@ export default class DockAPI {
 
     return promise;
   }
-  /* eslint-enable sonarjs/cognitive-complexity */
 
   /**
    * Checks if the API instance is connected to the node

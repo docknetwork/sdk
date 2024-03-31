@@ -202,7 +202,7 @@ export default class DockAPI {
 
         return retrySym;
       };
-      const errorRegExp = /Transaction is (temporarily banned|outdated)/;
+      const errorRegExp = /Transaction is (temporarily banned|outdated)|The operation was aborted/;
       const onError = async (err, retrySym) => {
         sent.unsubscribe();
 
@@ -210,7 +210,7 @@ export default class DockAPI {
           const txHash = extrinsic.hash;
           const finalizedHash = await api.rpc.chain.getFinalizedHead();
           const blockNumber = (
-            await api.derive.chain.getBlock(finalizedHash)
+            await api.rpc.chain.getBlock(finalizedHash)
           ).block.header.number.toNumber();
           const blockTime = api.consts.babe.expectedBlockTime.toNumber();
 

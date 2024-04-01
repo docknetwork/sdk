@@ -5,21 +5,21 @@ import { retry } from './utils/misc';
 import { ensureExtrinsicSucceeded, findExtrinsicBlock } from './utils/extrinsic';
 
 const STANDARD_BLOCK_TIME = 3e3;
-const FASTBLOCK_TIME = 500;
+const FASTBLOCK_TIME = 5e2;
 
 const STANDARD_CONFIG = {
-  FINALIZED_TIMEOUT: 12e3,
-  IN_BLOCK_TIMEOUT: 6e3,
+  FINALIZED_TIMEOUT: 1e3 + 12e3,
+  IN_BLOCK_TIMEOUT: 1e3 + 6e3,
   DELAY: STANDARD_BLOCK_TIME,
   FETCH_BLOCKS_COUNT: 10,
   MAX_ATTEMPTS: 2,
 };
 
 const FASTBLOCK_CONFIG = {
-  FINALIZED_TIMEOUT: 4e3,
-  IN_BLOCK_TIMEOUT: 2e3,
+  FINALIZED_TIMEOUT: 1e3 + 4e3,
+  IN_BLOCK_TIMEOUT: 1e3 + 2e3,
   DELAY: STANDARD_BLOCK_TIME,
-  FETCH_BLOCKS_COUNT: 25,
+  FETCH_BLOCKS_COUNT: 32,
   MAX_ATTEMPTS: 3,
 };
 
@@ -132,10 +132,10 @@ export async function sendWithRetries(dock, extrinsic, waitForFinalization = tru
   const { api } = dock;
 
   const blockTime = api.consts.babe.expectedBlockTime.toNumber();
-  const isFastBlock = blockTime === FASTBLOCK_TIME;
-  if (!isFastBlock && blockTime !== STANDARD_BLOCK_TIME) {
+  if (blockTime !== STANDARD_BLOCK_TIME && blockTime !== FASTBLOCK_TIME) {
     throw new Error(`Unexpected block time: ${blockTime}, expected either ${STANDARD_BLOCK_TIME} or ${FASTBLOCK_TIME}`);
   }
+  const isFastBlock = blockTime === FASTBLOCK_TIME;
   const config = isFastBlock ? FASTBLOCK_CONFIG : STANDARD_CONFIG;
 
   let sent;
@@ -166,7 +166,7 @@ export async function sendWithRetries(dock, extrinsic, waitForFinalization = tru
 
       block = await findExtrinsicBlock(api, blockNumbersToCheck, txHash);
     } catch (txErr) {
-      console.error(`Failed to find transaction's block: \`${txErr}\``);
+      console.error(`Failed to find extrinsic's block: \`${txErr}\``);
     }
 
     if (block != null) {
@@ -189,6 +189,8 @@ export async function sendWithRetries(dock, extrinsic, waitForFinalization = tru
         status,
         txHash,
       });
+    } else {
+      console.error(`Transaction \`${txHash}\` is not yet ${waitForFinalization ? 'finalized' : 'included in the block'}`);
     }
 
     return retrySym;
@@ -210,11 +212,11 @@ export async function sendWithRetries(dock, extrinsic, waitForFinalization = tru
     return retrySym;
   };
 
-  const baseTimeout = waitForFinalization
+  const timeout = waitForFinalization
     ? config.FINALIZED_TIMEOUT
     : config.IN_BLOCK_TIMEOUT;
 
-  return await retry(sendExtrinsic, 1e3 + baseTimeout, {
+  return await retry(sendExtrinsic, timeout, {
     maxAttempts: config.MAX_ATTEMPTS,
     delay: config.DELAY,
     onTimeoutExceeded,

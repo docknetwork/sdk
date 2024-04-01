@@ -302,40 +302,6 @@ export const withTimeout = async (
 ) => await Promise.race([promise, timeout(time, f)]);
 
 /**
- * Attempts to find extrinsic with the given hash across the blocks with the supplied numbers.
- * Returns the found block in case of success.
- * **This method will concurrently request all candidate blocks at the same time.**
- *
- * @param {ApiPromise} api
- * @param {Iterable<number>} blockNumbers
- * @param {Uint8Array|string} txHash
- * @returns {?object}
- */
-// eslint-disable-next-line no-async-promise-executor
-export const findExtrinsicBlock = async (api, blockNumbers, txHash) => await new Promise(async (resolve, reject) => {
-  try {
-    await Promise.all(
-      [...blockNumbers].map(async (number) => {
-        const blockHash = await api.rpc.chain.getBlockHash(number);
-        const block = await api.derive.chain.getBlock(blockHash);
-
-        const found = block.block.extrinsics.some(
-          (extr) => String(extr.hash) === String(txHash),
-        );
-
-        if (found) {
-          resolve(block);
-        }
-      }),
-    );
-
-    resolve(null);
-  } catch (err) {
-    reject(err);
-  }
-});
-
-/**
  * Calls supplied function `fn` and waits for its completion up to `timeLimit`, retries in case timeout was fired.
  * Additionally, `delay` between retries, `maxAttempts` count, `onTimeoutExceeded` and `onError` can be specified.
  *

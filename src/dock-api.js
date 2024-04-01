@@ -2,11 +2,8 @@ import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { HttpProvider } from '@polkadot/rpc-provider';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import typesBundle from '@docknetwork/node-types';
-import { filterEvents } from '@polkadot/api/util';
 import { KeyringPair } from "@polkadot/keyring/types"; // eslint-disable-line
 
-import { createSubmittable } from '@polkadot/api/submittable';
-import { SubmittableResult } from '@polkadot/api/cjs/submittable/Result';
 import AnchorModule from './modules/anchor';
 import BlobModule from './modules/blob';
 import { DIDModule } from './modules/did';
@@ -24,142 +21,9 @@ import PoaRpcDefs from './rpc-defs/poa-rpc-defs';
 import PriceFeedRpcDefs from './rpc-defs/price-feed-rpc-defs';
 import CoreModsRpcDefs from './rpc-defs/core-mods-rpc-defs';
 
-import ExtrinsicError from './errors/extrinsic-error';
 import TrustRegistryModule from './modules/trust-registry';
-import { findExtrinsicBlock, retry } from './utils/misc';
-
-function getExtrinsicError(data, api) {
-  // Loop through each of the parameters
-  // trying to find module error information
-  let errorMsg = 'Extrinsic failed submission:';
-  data.forEach((error) => {
-    if (error.isModule) {
-      // for module errors, we have the section indexed, lookup
-      try {
-        const decoded = api.registry.findMetaError(error.asModule);
-        const { docs, method, section } = decoded;
-        errorMsg += `\n${section}.${method}: ${docs.join(' ')}`;
-      } catch (e) {
-        errorMsg += `\nError at module index: ${error.asModule.index} Error: ${error.asModule.error}`;
-      }
-    } else {
-      const errorStr = error.toString();
-      if (errorStr !== '0') {
-        errorMsg += `\n${errorStr}`; // Other, CannotLookup, BadOrigin, no extra info
-      }
-    }
-  });
-  return errorMsg;
-}
-
-const checkEvents = (api, events, status) => {
-  // Ensure ExtrinsicFailed event doesnt exist
-  for (let i = 0; i < events.length; i++) {
-    const {
-      event: { data, method },
-    } = events[i];
-    if (method === 'ExtrinsicFailed' || method === 'BatchInterrupted') {
-      const errorMsg = getExtrinsicError(data, api);
-      throw new ExtrinsicError(errorMsg, method, data, status, events);
-    }
-  }
-};
-
-/**
- * Properties that won't be patched/visited during the patching.
- */
-const BlacklistedProperties = new Set([
-  'meta',
-  'registry',
-  'toJSON',
-  'is',
-  'creator',
-  'hash',
-  'key',
-  'keyPrefix',
-]);
-
-/**
- * Recursively patches supplied object property and all underlying objects, so all functions will attempt to retry 2 times and
- * will throw an error if there's no result within the `8 seconds` timeout.
- *
- * @param {*} obj
- * @param {*} prop
- * @param {string[]} [path=[]]
- */
-const wrapFnWithRetries = (obj, prop, path = []) => {
-  const value = obj[prop];
-  if (
-    BlacklistedProperties.has(prop)
-    || !value
-    || (typeof value !== 'object' && typeof value !== 'function')
-  ) {
-    return;
-  }
-
-  try {
-    let newValue;
-    if (typeof value !== 'function') {
-      newValue = Object.create(Object.getPrototypeOf(value));
-    } else {
-      newValue = async function with8SecsTimeoutAnd2Retries(...args) {
-        const that = this;
-        const wrappedFn = () => value.apply(that, args);
-        wrappedFn.toString = () => value.toString();
-
-        return await retry(wrappedFn, 8e3, {
-          maxAttempts: 2,
-          delay: 5e2,
-          onTimeoutExceeded: (retrySym) => {
-            console.error(`\`${path.concat('.')}\` exceeded timeout`);
-
-            return retrySym;
-          },
-        });
-      };
-
-      Object.setPrototypeOf(newValue, Object.getPrototypeOf(value));
-    }
-
-    for (const key of Object.keys(value)) {
-      newValue[key] = value[key]; // eslint-disable-line no-param-reassign
-      wrapFnWithRetries(newValue, key, path.concat(key));
-    }
-
-    // eslint-disable-next-line no-param-reassign
-    delete obj[prop];
-    Object.defineProperty(obj, prop, {
-      value: newValue,
-    });
-  } catch (err) {
-    console.error(
-      `Failed to wrap the prop \`${prop}\` of \`${obj}\`: \`${
-        err.message || err
-      }\``,
-    );
-  }
-};
-
-/**
- * Patches the query API methods, so they will throw an error if there's no result within the `8 seconds` timeout after `2` retries.
- *
- * @param {*} queryApi
- */
-const patchQueryApi = (queryApi) => {
-  const exclude = new Set(['substrate.code']);
-
-  for (const modName of Object.keys(queryApi)) {
-    const mod = queryApi[modName];
-
-    for (const method of Object.keys(mod)) {
-      const path = `${modName}.${method}`;
-
-      if (!exclude.has(path)) {
-        wrapFnWithRetries(mod, method, [modName, method]);
-      }
-    }
-  }
-};
+import { createTxSenderWithRetries, patchQueryApi } from './dock-api-retry';
+import { ensureExtrinsicSucceeded } from './utils/extrinsic';
 
 /**
  * @typedef {object} Options The Options to use in the function DockAPI.
@@ -182,100 +46,7 @@ export default class DockAPI {
     this.customSignTx = customSignTx;
     this.anchorModule = new AnchorModule();
 
-    const { send } = this;
-    /* eslint-disable sonarjs/cognitive-complexity */
-    this.send = async function sendWithRetries(
-      extrinsic,
-      waitForFinalization = true,
-    ) {
-      const { api } = this;
-      let sent;
-      const onTimeoutExceeded = (retrySym) => {
-        sent.unsubscribe();
-        // eslint-disable-next-line no-underscore-dangle
-        const Sub = createSubmittable(api._type, api._rx, api._decorateMethod);
-        // eslint-disable-next-line no-param-reassign
-        extrinsic = Sub(extrinsic.toU8a());
-        console.error(
-          `Timeout exceeded for the extrinsic \`${extrinsic.hash}\``,
-        );
-
-        return retrySym;
-      };
-      const errorRegExp = /Transaction is (temporarily banned|outdated)|The operation was aborted/;
-      const onError = async (err, retrySym) => {
-        sent.unsubscribe();
-
-        if (!errorRegExp.test(err?.message || '')) {
-          throw err;
-        }
-
-        const txHash = extrinsic.hash;
-        const blockTime = api.consts.babe.expectedBlockTime.toNumber();
-
-        let block;
-        try {
-          const lastHash = await (waitForFinalization
-            ? api.rpc.chain.getFinalizedHead()
-            : api.rpc.chain.getBlockHash());
-          const blockNumber = (
-            await api.rpc.chain.getBlock(lastHash)
-          ).block.header.number.toNumber();
-
-          const blockNumbersToCheck = Array.from(
-            { length: blockTime === 3e3 ? 10 : 25 },
-            (_, idx) => blockNumber - idx,
-          );
-
-          block = await findExtrinsicBlock(api, blockNumbersToCheck, txHash);
-        } catch (txErr) {
-          console.error(`Failed to find transaction's block: \`${txErr}\``);
-        }
-
-        if (block != null) {
-          const blockHash = block.block.header.hash;
-          const status = api.createType(
-            'ExtrinsicStatus',
-            waitForFinalization
-              ? {
-                finalized: blockHash,
-              }
-              : { inBlock: blockHash },
-          );
-          const filtered = filterEvents(txHash, block, block.events, status);
-
-          checkEvents(api, filtered.events, status);
-
-          return new SubmittableResult({
-            ...filtered,
-            status,
-            txHash,
-          });
-        }
-
-        return retrySym;
-      };
-      const fn = async () => {
-        sent = send.call(this, extrinsic, waitForFinalization);
-        return sent;
-      };
-      fn.toString = () => send.toString();
-
-      const blockTime = api.consts.babe.expectedBlockTime.toNumber();
-      const finalizedTimeout = blockTime === 3e3 ? 12e3 : 6e3;
-      const inBlockTimeout = blockTime === 3e3 ? 6e3 : 3e3;
-      const baseTimeout = waitForFinalization
-        ? finalizedTimeout
-        : inBlockTimeout;
-
-      return await retry(fn, 1e3 + baseTimeout, {
-        maxAttempts: 3,
-        delay: 3e3,
-        onTimeoutExceeded,
-        onError,
-      });
-    };
-    /* eslint-enable sonarjs/cognitive-complexity */
+    this.send = createTxSenderWithRetries(this.send);
   }
 
   /**
@@ -495,7 +266,7 @@ export default class DockAPI {
       .send((extrResult) => {
         const { events = [], status } = extrResult;
 
-        checkEvents(this.api, events, status);
+        ensureExtrinsicSucceeded(this.api, events, status);
 
         // If waiting for finalization or if not waiting for finalization, wait for inclusion in block.
         if (

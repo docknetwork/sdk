@@ -24,7 +24,7 @@ async function ipfsAdd(ipfsClient, content) {
   return `ipfs://${cid.toV1()}`;
 }
 
-describe.skip('Crawler', () => {
+describe('Crawler', () => {
   let ipfsClient;
   let rootatt_iri;
   let batt_iri;

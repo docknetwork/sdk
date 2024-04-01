@@ -7,7 +7,7 @@ const rdfInput = `
 
 const rdfCID = 'bafkreia2fxwzy4hs6pkl7aygxl4t7ws2euxs7jbkp7qacmljqful2anwei';
 
-describe.skip('IPFS', () => {
+describe('IPFS', () => {
   let ipfsClient;
   beforeAll(async () => {
     const { createHelia } = await import('helia');

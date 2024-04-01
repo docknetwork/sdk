@@ -206,41 +206,51 @@ export default class DockAPI {
       const onError = async (err, retrySym) => {
         sent.unsubscribe();
 
-        if (errorRegExp.test(err?.message || '')) {
-          const txHash = extrinsic.hash;
-          const finalizedHash = await api.rpc.chain.getFinalizedHead();
+        if (!errorRegExp.test(err?.message || '')) {
+          throw err;
+        }
+
+        const txHash = extrinsic.hash;
+        const blockTime = api.consts.babe.expectedBlockTime.toNumber();
+
+        let block;
+        try {
+          const lastHash = await (waitForFinalization
+            ? api.rpc.chain.getFinalizedHead()
+            : api.rpc.chain.getBlockHash());
           const blockNumber = (
-            await api.rpc.chain.getBlock(finalizedHash)
+            await api.rpc.chain.getBlock(lastHash)
           ).block.header.number.toNumber();
-          const blockTime = api.consts.babe.expectedBlockTime.toNumber();
 
           const blockNumbersToCheck = Array.from(
             { length: blockTime === 3e3 ? 10 : 25 },
             (_, idx) => blockNumber - idx,
           );
 
-          const block = await findExtrinsicBlock(
-            api,
-            blockNumbersToCheck,
-            txHash,
+          block = await findExtrinsicBlock(api, blockNumbersToCheck, txHash);
+        } catch (txErr) {
+          console.error(`Failed to find transaction's block: \`${txErr}\``);
+        }
+
+        if (block != null) {
+          const blockHash = block.block.header.hash;
+          const status = api.createType(
+            'ExtrinsicStatus',
+            waitForFinalization
+              ? {
+                finalized: blockHash,
+              }
+              : { inBlock: blockHash },
           );
+          const filtered = filterEvents(txHash, block, block.events, status);
 
-          if (block != null) {
-            const status = api.createType('ExtrinsicStatus', {
-              finalized: block.block.header.hash,
-            });
-            const filtered = filterEvents(txHash, block, block.events, status);
+          checkEvents(api, filtered.events, status);
 
-            checkEvents(api, filtered.events, status);
-
-            return new SubmittableResult({
-              ...filtered,
-              status,
-              txHash,
-            });
-          }
-        } else {
-          throw err;
+          return new SubmittableResult({
+            ...filtered,
+            status,
+            txHash,
+          });
         }
 
         return retrySym;
@@ -513,7 +523,13 @@ export default class DockAPI {
       unsubscribed = true;
 
       if (unsubscribe != null) {
-        unsubscribe();
+        try {
+          unsubscribe();
+        } catch (err) {
+          throw new Error(
+            `Failed to unsubscribe from watching extrinsic's status: \`${err}\``,
+          );
+        }
       }
 
       return true;

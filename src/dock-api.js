@@ -22,7 +22,7 @@ import PriceFeedRpcDefs from './rpc-defs/price-feed-rpc-defs';
 import CoreModsRpcDefs from './rpc-defs/core-mods-rpc-defs';
 
 import TrustRegistryModule from './modules/trust-registry';
-import { createTxSenderWithRetries, patchQueryApi } from './dock-api-retry';
+import { sendWithRetries, patchQueryApi } from './dock-api-retry';
 import { ensureExtrinsicSucceeded } from './utils/extrinsic';
 
 /**
@@ -45,8 +45,6 @@ export default class DockAPI {
   constructor(customSignTx) {
     this.customSignTx = customSignTx;
     this.anchorModule = new AnchorModule();
-
-    this.send = createTxSenderWithRetries(this.send);
   }
 
   /**
@@ -252,13 +250,24 @@ export default class DockAPI {
   }
 
   /**
-   * Helper function to send a transaction that has already been signed
+   * Helper function to send with retries a transaction that has already been signed.
    * @param extrinsic - Extrinsic to send
    * @param waitForFinalization - If true, waits for extrinsic's block to be finalized,
-   * else only wait to be included in block.
-   * @returns {Promise<unknown>}
+   * else only wait to be included in the block.
+   * @returns {Promise<SubmittableResult>}
    */
-  send(extrinsic, waitForFinalization = true) {
+  async send(extrinsic, waitForFinalization = true) {
+    return sendWithRetries(this, extrinsic, waitForFinalization);
+  }
+
+  /**
+   * Helper function to send without retries a transaction that has already been signed.
+   * @param extrinsic - Extrinsic to send
+   * @param waitForFinalization - If true, waits for extrinsic's block to be finalized,
+   * else only wait to be included in the block.
+   * @returns {Promise<SubmittableResult>}
+   */
+  sendNoRetry(extrinsic, waitForFinalization) {
     let unsubscribe = null;
     let unsubscribed = false;
 

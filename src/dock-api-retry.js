@@ -122,12 +122,14 @@ export const patchQueryApi = (queryApi) => {
  * Wraps provided `send` function into the function that will retry to send transaction again in case of failure.
  * Timeouts and other configuration details are based on the block times.
  *
- * @param {function(*, boolean): Promise<SubmittableResult>} send
- * @returns {function(*, boolean): Promise<SubmittableResult>}
+ * @param {DockAPI} dock
+ * @param {*} extrinsic
+ * @param {?boolean} waitForFinalization
+ * @returns {Promise<SubmittableResult>}
  */
 /* eslint-disable sonarjs/cognitive-complexity */
-export const createTxSenderWithRetries = (send) => async function sendWithRetries(extrinsic, waitForFinalization = true) {
-  const { api } = this;
+export async function sendWithRetries(dock, extrinsic, waitForFinalization = true) {
+  const { api } = dock;
 
   const blockTime = api.consts.babe.expectedBlockTime.toNumber();
   const isFastBlock = blockTime === FASTBLOCK_TIME;
@@ -193,7 +195,7 @@ export const createTxSenderWithRetries = (send) => async function sendWithRetrie
   };
 
   const sendExtrinsic = async () => {
-    sent = send.call(this, extrinsic, waitForFinalization);
+    sent = dock.sendNoRetry(extrinsic, waitForFinalization);
     return await sent;
   };
 
@@ -218,5 +220,5 @@ export const createTxSenderWithRetries = (send) => async function sendWithRetrie
     onTimeoutExceeded,
     onError,
   });
-};
-  /* eslint-enable sonarjs/cognitive-complexity */
+}
+/* eslint-enable sonarjs/cognitive-complexity */

@@ -25,7 +25,7 @@ const STANDARD_CONFIG = {
   /** Max retry attempts (doesn't include initial request). */
   MAX_ATTEMPTS: 2,
   /** Amount of blocks to be fetched in addition to the strict amount of blocks. It will cover timing for fetching the block data. */
-  FETCH_GAP_BLOCKS: 2,
+  FETCH_GAP_BLOCKS: 1,
 };
 
 const FASTBLOCK_CONFIG = {
@@ -40,7 +40,7 @@ const FASTBLOCK_CONFIG = {
   /** Max retry attempts (doesn't include initial request). */
   MAX_ATTEMPTS: 3,
   /** Amount of blocks to be fetched in addition to the strict amount of blocks. It will cover timing for fetching the block data. */
-  FETCH_GAP_BLOCKS: 10,
+  FETCH_GAP_BLOCKS: 5,
 };
 
 /**

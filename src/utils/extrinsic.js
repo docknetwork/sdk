@@ -33,8 +33,13 @@ export class BlocksCache {
  * @param {Uint8Array|string} txHash
  * @returns {?object}
  */
-// eslint-disable-next-line no-async-promise-executor
-export const findExtrinsicBlock = async (api, blockNumbers, txHash, blocksCache = null) => await new Promise(async (resolve, reject) => {
+export const findExtrinsicBlock = async (
+  api,
+  blockNumbers,
+  txHash,
+  blocksCache = null,
+  // eslint-disable-next-line no-async-promise-executor
+) => await new Promise(async (resolve, reject) => {
   const blockHashByNumber = async (number) => await api.rpc.chain.getBlockHash(number);
   const blockByHash = async (hash) => await api.derive.chain.getBlock(hash);
 
@@ -46,7 +51,8 @@ export const findExtrinsicBlock = async (api, blockNumbers, txHash, blocksCache 
           block = blocksCache.blockByNumber(number);
           if (!block) {
             const blockHash = await blockHashByNumber(number);
-            block = blocksCache.blockByHash(blockHash) ?? await blockByHash(blockHash);
+            block = blocksCache.blockByHash(blockHash)
+                ?? (await blockByHash(blockHash));
             blocksCache.set(blockHash, number, block);
           }
         } else {

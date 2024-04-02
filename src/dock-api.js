@@ -257,7 +257,7 @@ export default class DockAPI {
    * @returns {Promise<SubmittableResult>}
    */
   async send(extrinsic, waitForFinalization = true) {
-    return sendWithRetries(this, extrinsic, waitForFinalization);
+    return await sendWithRetries(this, extrinsic, waitForFinalization);
   }
 
   /**

@@ -99,7 +99,7 @@ const wrapFnWithRetries = (obj, prop, path = []) => {
     }
 
     for (const key of Object.keys(value)) {
-      newValue[key] = value[key]; // eslint-disable-line no-param-reassign
+      newValue[key] = value[key];
       wrapFnWithRetries(newValue, key, path.concat(key));
     }
 
@@ -165,8 +165,8 @@ export async function sendWithRetries(
   const extrTimeout = waitForFinalization ? config.FINALIZED_TIMEOUT_BLOCKS : config.IN_BLOCK_TIMEOUT_BLOCKS;
   const blocksCache = new BlocksCache({ finalized: waitForFinalization });
 
-  let sent; let
-    attempt = 0;
+  let sent;
+  const startTimestamp = +new Date();
 
   const errorRegExp = /Transaction is (temporarily banned|outdated)|The operation was aborted/;
   const onError = async (err, retrySym) => {
@@ -188,7 +188,7 @@ export async function sendWithRetries(
       ).block.header.number.toNumber();
 
       const blockNumbersToCheck = Array.from(
-        { length: (config.FETCH_GAP_BLOCKS + config.RETRY_DELAY_BLOCKS + extrTimeout) * attempt },
+        { length: config.FETCH_GAP_BLOCKS + ((+new Date() - startTimestamp) / config.BLOCK_TIME_MS | 0) }, // eslint-disable-line no-bitwise
         (_, idx) => blockNumber - idx,
       );
 
@@ -234,7 +234,6 @@ export async function sendWithRetries(
   };
 
   const sendExtrinsic = async () => {
-    attempt++;
     sent = dock.sendNoRetries(extrinsic, waitForFinalization);
     return await sent;
   };

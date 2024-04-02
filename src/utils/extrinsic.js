@@ -11,7 +11,7 @@ export class BlocksCache {
     if (this.finalized) {
       this.byNumber.set(number, block);
     }
-    this.byHash.set(hash, block);
+    this.byHash.set(String(hash), block);
   }
 
   blockByNumber(number) {
@@ -19,7 +19,7 @@ export class BlocksCache {
   }
 
   blockByHash(hash) {
-    return this.byHash.get(hash);
+    return this.byHash.get(String(hash));
   }
 }
 

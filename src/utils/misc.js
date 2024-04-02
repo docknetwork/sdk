@@ -372,6 +372,46 @@ export const retry = async (
 };
 /* eslint-enable sonarjs/cognitive-complexity */
 
+export class PromiseMap {
+  constructor() {
+    this.map = new Map();
+  }
+
+  /**
+   * Checks if a promise with the supplied key exists, if so, `await`s it, otherwise inserts a new `Promise` produced by
+   * calling `createPromise` function.
+   *
+   * @template T
+   * @param {*} key
+   * @param {function(): Promise<T>} createPromise
+   * @returns {Promise<T>}
+   */
+  async useKey(key, createPromise) {
+    let res;
+    if (!this.map.has(key)) {
+      const promise = createPromise();
+      this.map.set(key, promise);
+
+      let err;
+      try {
+        res = await promise;
+      } catch (e) {
+        err = e;
+      } finally {
+        this.map.delete(key);
+      }
+
+      if (err != null) {
+        throw err;
+      }
+    } else {
+      res = await this.map.get(key);
+    }
+
+    return res;
+  }
+}
+
 /**
  * Pattern matching error.
  *

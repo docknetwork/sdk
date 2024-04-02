@@ -3,6 +3,7 @@ import { Keyring } from '@polkadot/api';
 import { initializeWasm } from '@docknetwork/crypto-wasm-ts';
 
 import {
+  PromiseMap,
   generateEcdsaSecp256k1Keypair,
   getPublicKeyFromKeyringPair,
   getSignatureFromKeyringPair,
@@ -71,22 +72,42 @@ describe('Testing isHexWithGivenByteSize', () => {
   test('`timeout` works properly', async () => {
     const expectElapsedTimeSec = crateElapsedTimeSec();
 
-    await Promise.all([
-      async () => {
-        expect(await timeout(1e2)).toBe(void 0);
-        expectElapsedTimeSec(0.1);
-      },
-      async () => {
-        expect(await timeout(3e2, () => 'a')).toBe('a');
-        expectElapsedTimeSec(0.3);
-      },
-      async () => {
-        await expect(() => timeout(2e2, () => {
-          throw new Error('Rejected timeout');
-        })).rejects.toThrowErrorMatchingSnapshot();
-        expectElapsedTimeSec(0.2);
-      },
-    ].map((f) => f()));
+    await Promise.all(
+      [
+        async () => {
+          expect(await timeout(1e2)).toBe(void 0);
+          expectElapsedTimeSec(0.1);
+        },
+        async () => {
+          expect(await timeout(3e2, () => 'a')).toBe('a');
+          expectElapsedTimeSec(0.3);
+        },
+        async () => {
+          await expect(() => timeout(2e2, () => {
+            throw new Error('Rejected timeout');
+          })).rejects.toThrowErrorMatchingSnapshot();
+          expectElapsedTimeSec(0.2);
+        },
+      ].map((f) => f()),
+    );
+  });
+
+  test('`PromiseMap` works properly', async () => {
+    const map = new PromiseMap();
+
+    const results = await Promise.all([
+      map.useKey(
+        1,
+        () => timeout(5e2, () => 10),
+      ),
+      timeout(2e2, () => map.useKey(1, () => Promise.resolve(2))),
+      timeout(7e2, () => map.useKey(1, () => Promise.resolve(1))),
+    ]);
+
+    expect(results).toEqual([10, 10, 1]);
+
+    await expect(() => map.useKey(10, () => Promise.reject(1))).rejects;
+    expect(map.map.size).toBe(0);
   });
 
   test('`retry` works properly', async () => {
@@ -104,7 +125,9 @@ describe('Testing isHexWithGivenByteSize', () => {
         async () => {
           const onTimeoutExceeded = jest.fn((retrySym) => retrySym);
 
-          expect(await retry(makeCtrFn(5), 3e2, { delay: 2e2, onTimeoutExceeded })).toBe(0);
+          expect(
+            await retry(makeCtrFn(5), 3e2, { delay: 2e2, onTimeoutExceeded }),
+          ).toBe(0);
           expectElapsedTimeSec(2.5);
 
           expect(onTimeoutExceeded).toBeCalledTimes(5);

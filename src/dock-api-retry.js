@@ -184,7 +184,7 @@ export async function sendWithRetries(
 
     let block;
     try {
-      const lastBlockNumber = await blocksProvider.lastNumber();
+      const lastBlockNumber = (await blocksProvider.lastNumber()).toNumber();
 
       const blockNumbersToCheck = Array.from(
         { length: config.FETCH_GAP_BLOCKS + ((+new Date() - startTimestamp) / config.BLOCK_TIME_MS | 0) }, // eslint-disable-line no-bitwise

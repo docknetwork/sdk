@@ -1,5 +1,28 @@
 import ExtrinsicError from '../errors/extrinsic-error';
 
+export class BlocksCache {
+  constructor({ finalized = false } = {}) {
+    this.finalized = finalized;
+    this.byNumber = new Map();
+    this.byHash = new Map();
+  }
+
+  set(hash, number, block) {
+    if (this.finalized) {
+      this.byNumber.set(number, block);
+    }
+    this.byHash.set(hash, block);
+  }
+
+  blockByNumber(number) {
+    return this.byNumber.get(number);
+  }
+
+  blockByHash(hash) {
+    return this.byHash.get(hash);
+  }
+}
+
 /**
  * Attempts to find extrinsic with the given hash across the blocks with the supplied numbers.
  * Returns the found block in case of success.
@@ -11,12 +34,24 @@ import ExtrinsicError from '../errors/extrinsic-error';
  * @returns {?object}
  */
 // eslint-disable-next-line no-async-promise-executor
-export const findExtrinsicBlock = async (api, blockNumbers, txHash) => await new Promise(async (resolve, reject) => {
+export const findExtrinsicBlock = async (api, blockNumbers, txHash, blocksCache = null) => await new Promise(async (resolve, reject) => {
+  const blockHashByNumber = async (number) => await api.rpc.chain.getBlockHash(number);
+  const blockByHash = async (hash) => await api.derive.chain.getBlock(hash);
+
   try {
     await Promise.all(
-      [...blockNumbers].map(async (number) => {
-        const blockHash = await api.rpc.chain.getBlockHash(number);
-        const block = await api.derive.chain.getBlock(blockHash);
+      [...new Set(blockNumbers)].map(async (number) => {
+        let block;
+        if (blocksCache != null) {
+          block = blocksCache.blockByNumber(number);
+          if (!block) {
+            const blockHash = await blockHashByNumber(number);
+            block = blocksCache.blockByHash(blockHash) ?? await blockByHash(blockHash);
+            blocksCache.set(blockHash, number, block);
+          }
+        } else {
+          block = await blockByHash(await blockHashByNumber(number));
+        }
 
         const found = block.block.extrinsics.some(
           (extr) => String(extr.hash) === String(txHash),

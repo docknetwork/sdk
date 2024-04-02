@@ -261,13 +261,14 @@ export default class DockAPI {
   }
 
   /**
-   * Helper function to send without retries a transaction that has already been signed.
-   * @param extrinsic - Extrinsic to send
-   * @param waitForFinalization - If true, waits for extrinsic's block to be finalized,
+   * Helper function to send without retrying a transaction that has already been signed.
+   * @param {DockAPI} dock
+   * @param {*} extrinsic - Extrinsic to send
+   * @param {boolean} waitForFinalization - If true, waits for extrinsic's block to be finalized,
    * else only wait to be included in the block.
    * @returns {Promise<SubmittableResult>}
    */
-  sendNoRetry(extrinsic, waitForFinalization) {
+  sendNoRetries(extrinsic, waitForFinalization) {
     let unsubscribe = null;
     let unsubscribed = false;
 

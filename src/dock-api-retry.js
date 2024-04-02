@@ -2,25 +2,45 @@ import { createSubmittable } from '@polkadot/api/submittable';
 import { SubmittableResult } from '@polkadot/api/cjs/submittable/Result';
 import { filterEvents } from '@polkadot/api/util';
 import { retry } from './utils/misc';
-import { ensureExtrinsicSucceeded, findExtrinsicBlock } from './utils/extrinsic';
+import {
+  BlocksCache,
+  ensureExtrinsicSucceeded,
+  findExtrinsicBlock,
+} from './utils/extrinsic';
 
-const STANDARD_BLOCK_TIME = 3e3;
-const FASTBLOCK_TIME = 5e2;
+/** Block time in ms for the standard build configuration. */
+const STANDARD_BLOCK_TIME_MS = 3e3;
+/** Block time in ms for the fastblock build configuration. */
+const FASTBLOCK_TIME_MS = 5e2;
 
 const STANDARD_CONFIG = {
-  FINALIZED_TIMEOUT: 1e3 + 12e3,
-  IN_BLOCK_TIMEOUT: 1e3 + 6e3,
-  DELAY: STANDARD_BLOCK_TIME,
-  FETCH_BLOCKS_COUNT: 10,
+  /** Amount of blocks to wait for the extrinsic to be finalized before retrying. */
+  FINALIZED_TIMEOUT_BLOCKS: 5,
+  /** Amount of blocks to wait for the extrinsic to be included in the block before retrying. */
+  IN_BLOCK_TIMEOUT_BLOCKS: 3,
+  /** Amount of blocks to wait before a retry attempt. */
+  RETRY_DELAY_BLOCKS: 1,
+  /** Block time in ms. */
+  BLOCK_TIME_MS: STANDARD_BLOCK_TIME_MS,
+  /** Max retry attempts (doesn't include initial request). */
   MAX_ATTEMPTS: 2,
+  /** Amount of blocks to be fetched in addition to the strict amount of blocks. It will cover timing for fetching the block data. */
+  FETCH_GAP_BLOCKS: 2,
 };
 
 const FASTBLOCK_CONFIG = {
-  FINALIZED_TIMEOUT: 1e3 + 4e3,
-  IN_BLOCK_TIMEOUT: 1e3 + 2e3,
-  DELAY: STANDARD_BLOCK_TIME,
-  FETCH_BLOCKS_COUNT: 20,
+  /** Amount of blocks to wait for the extrinsic to be finalized before retrying. */
+  FINALIZED_TIMEOUT_BLOCKS: 8,
+  /** Amount of blocks to wait for the extrinsic to be included in the block before retrying. */
+  IN_BLOCK_TIMEOUT_BLOCKS: 4,
+  /** Amount of blocks to wait before a retry attempt. */
+  RETRY_DELAY_BLOCKS: 6,
+  /** Block time in ms. */
+  BLOCK_TIME_MS: FASTBLOCK_TIME_MS,
+  /** Max retry attempts (doesn't include initial request). */
   MAX_ATTEMPTS: 3,
+  /** Amount of blocks to be fetched in addition to the strict amount of blocks. It will cover timing for fetching the block data. */
+  FETCH_GAP_BLOCKS: 10,
 };
 
 /**
@@ -119,26 +139,34 @@ export const patchQueryApi = (queryApi) => {
 };
 
 /**
- * Wraps provided `send` function into the function that will retry to send transaction again in case of failure.
- * Timeouts and other configuration details are based on the block times.
- *
+ * Helper function to send with retries a transaction that has already been signed.
  * @param {DockAPI} dock
- * @param {*} extrinsic
- * @param {?boolean} waitForFinalization
+ * @param {*} extrinsic - Extrinsic to send
+ * @param {boolean} waitForFinalization - If true, waits for extrinsic's block to be finalized,
+ * else only wait to be included in the block.
  * @returns {Promise<SubmittableResult>}
  */
 /* eslint-disable sonarjs/cognitive-complexity */
-export async function sendWithRetries(dock, extrinsic, waitForFinalization = true) {
+export async function sendWithRetries(
+  dock,
+  extrinsic,
+  waitForFinalization = true,
+) {
   const { api } = dock;
 
   const blockTime = api.consts.babe.expectedBlockTime.toNumber();
-  if (blockTime !== STANDARD_BLOCK_TIME && blockTime !== FASTBLOCK_TIME) {
-    throw new Error(`Unexpected block time: ${blockTime}, expected either ${STANDARD_BLOCK_TIME} or ${FASTBLOCK_TIME}`);
+  if (blockTime !== STANDARD_BLOCK_TIME_MS && blockTime !== FASTBLOCK_TIME_MS) {
+    throw new Error(
+      `Unexpected block time: ${blockTime}, expected either ${STANDARD_BLOCK_TIME_MS} or ${FASTBLOCK_TIME_MS}`,
+    );
   }
-  const isFastBlock = blockTime === FASTBLOCK_TIME;
+  const isFastBlock = blockTime === FASTBLOCK_TIME_MS;
   const config = isFastBlock ? FASTBLOCK_CONFIG : STANDARD_CONFIG;
+  const extrTimeout = waitForFinalization ? config.FINALIZED_TIMEOUT_BLOCKS : config.IN_BLOCK_TIMEOUT_BLOCKS;
+  const blocksCache = new BlocksCache({ finalized: waitForFinalization });
 
-  let sent;
+  let sent; let
+    attempt = 0;
 
   const errorRegExp = /Transaction is (temporarily banned|outdated)|The operation was aborted/;
   const onError = async (err, retrySym) => {
@@ -160,11 +188,16 @@ export async function sendWithRetries(dock, extrinsic, waitForFinalization = tru
       ).block.header.number.toNumber();
 
       const blockNumbersToCheck = Array.from(
-        { length: config.FETCH_BLOCKS_COUNT },
+        { length: (config.FETCH_GAP_BLOCKS + config.RETRY_DELAY_BLOCKS + extrTimeout) * attempt },
         (_, idx) => blockNumber - idx,
       );
 
-      block = await findExtrinsicBlock(api, blockNumbersToCheck, txHash);
+      block = await findExtrinsicBlock(
+        api,
+        blockNumbersToCheck,
+        txHash,
+        blocksCache,
+      );
     } catch (txErr) {
       console.error(`Failed to find extrinsic's block: \`${txErr}\``);
     }
@@ -190,14 +223,19 @@ export async function sendWithRetries(dock, extrinsic, waitForFinalization = tru
         txHash,
       });
     } else {
-      console.error(`Transaction \`${txHash}\` is not yet ${waitForFinalization ? 'finalized' : 'included in the block'}`);
+      console.error(
+        `Transaction \`${txHash}\` is not yet ${
+          waitForFinalization ? 'finalized' : 'included in the block'
+        }`,
+      );
     }
 
     return retrySym;
   };
 
   const sendExtrinsic = async () => {
-    sent = dock.sendNoRetry(extrinsic, waitForFinalization);
+    attempt++;
+    sent = dock.sendNoRetries(extrinsic, waitForFinalization);
     return await sent;
   };
 
@@ -212,13 +250,11 @@ export async function sendWithRetries(dock, extrinsic, waitForFinalization = tru
     return retrySym;
   };
 
-  const timeout = waitForFinalization
-    ? config.FINALIZED_TIMEOUT
-    : config.IN_BLOCK_TIMEOUT;
+  const timeout = config.BLOCK_TIME_MS * extrTimeout;
 
-  return await retry(sendExtrinsic, timeout, {
+  return await retry(sendExtrinsic, 1e3 + timeout, {
     maxAttempts: config.MAX_ATTEMPTS,
-    delay: config.DELAY,
+    delay: config.BLOCK_TIME_MS * config.RETRY_DELAY_BLOCKS,
     onTimeoutExceeded,
     onError,
   });

@@ -3,10 +3,12 @@ import { SubmittableResult } from '@polkadot/api/cjs/submittable/Result';
 import { filterEvents } from '@polkadot/api/util';
 import { retry } from './utils/misc';
 import {
-  BlocksProvider,
   ensureExtrinsicSucceeded,
   findExtrinsicBlock,
 } from './utils/extrinsic';
+import {
+  BlocksProvider,
+} from './utils/block';
 
 /** Block time in ms for the standard build configuration. */
 const STANDARD_BLOCK_TIME_MS = 3e3;

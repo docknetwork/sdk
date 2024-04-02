@@ -6,9 +6,7 @@ import {
   ensureExtrinsicSucceeded,
   findExtrinsicBlock,
 } from './utils/extrinsic';
-import {
-  BlocksProvider,
-} from './utils/block';
+import { BlocksProvider } from './utils/block';
 
 /** Block time in ms for the standard build configuration. */
 const STANDARD_BLOCK_TIME_MS = 3e3;
@@ -166,8 +164,13 @@ export async function sendWithRetries(
   }
   const isFastBlock = blockTime === FASTBLOCK_TIME_MS;
   const config = isFastBlock ? retryConfig.fastblock : retryConfig.standard;
-  const extrTimeout = waitForFinalization ? config.FINALIZED_TIMEOUT_BLOCKS : config.IN_BLOCK_TIMEOUT_BLOCKS;
-  const blocksProvider = new BlocksProvider({ api, finalized: waitForFinalization });
+  const extrTimeout = waitForFinalization
+    ? config.FINALIZED_TIMEOUT_BLOCKS
+    : config.IN_BLOCK_TIMEOUT_BLOCKS;
+  const blocksProvider = new BlocksProvider({
+    api,
+    finalized: waitForFinalization,
+  });
 
   let sent;
   const startTimestamp = +new Date();
@@ -185,9 +188,11 @@ export async function sendWithRetries(
     let block;
     try {
       const lastBlockNumber = (await blocksProvider.lastNumber()).toNumber();
+      const requestAmount = config.FETCH_GAP_BLOCKS
+        + (((+new Date() - startTimestamp) / config.BLOCK_TIME_MS) | 0); // eslint-disable-line no-bitwise
 
       const blockNumbersToCheck = Array.from(
-        { length: config.FETCH_GAP_BLOCKS + ((+new Date() - startTimestamp) / config.BLOCK_TIME_MS | 0) }, // eslint-disable-line no-bitwise
+        { length: Math.min(lastBlockNumber + 1, requestAmount) },
         (_, idx) => lastBlockNumber - idx,
       );
 

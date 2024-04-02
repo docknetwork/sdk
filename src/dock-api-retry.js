@@ -3,7 +3,7 @@ import { SubmittableResult } from '@polkadot/api/cjs/submittable/Result';
 import { filterEvents } from '@polkadot/api/util';
 import { retry } from './utils/misc';
 import {
-  BlocksCache,
+  BlocksProvider,
   ensureExtrinsicSucceeded,
   findExtrinsicBlock,
 } from './utils/extrinsic';
@@ -142,7 +142,8 @@ export const patchQueryApi = (queryApi) => {
  * Helper function to send with retries a transaction that has already been signed.
  * @param {DockAPI} dock
  * @param {*} extrinsic - Extrinsic to send
- * @param {boolean} waitForFinalization - If true, waits for extrinsic's block to be finalized,
+ * @param {boolean} [waitForFinalization=true] - If true, waits for extrinsic's block to be finalized,
+ * @param {?object} retryConfig
  * else only wait to be included in the block.
  * @returns {Promise<SubmittableResult>}
  */
@@ -151,6 +152,7 @@ export async function sendWithRetries(
   dock,
   extrinsic,
   waitForFinalization = true,
+  retryConfig = { standard: STANDARD_CONFIG, fastblock: FASTBLOCK_CONFIG },
 ) {
   const { api } = dock;
 
@@ -161,9 +163,9 @@ export async function sendWithRetries(
     );
   }
   const isFastBlock = blockTime === FASTBLOCK_TIME_MS;
-  const config = isFastBlock ? FASTBLOCK_CONFIG : STANDARD_CONFIG;
+  const config = isFastBlock ? retryConfig.fastblock : retryConfig.standard;
   const extrTimeout = waitForFinalization ? config.FINALIZED_TIMEOUT_BLOCKS : config.IN_BLOCK_TIMEOUT_BLOCKS;
-  const blocksCache = new BlocksCache({ finalized: waitForFinalization });
+  const blocksProvider = new BlocksProvider({ api, finalized: waitForFinalization });
 
   let sent;
   const startTimestamp = +new Date();
@@ -180,23 +182,17 @@ export async function sendWithRetries(
 
     let block;
     try {
-      const lastHash = await (waitForFinalization
-        ? api.rpc.chain.getFinalizedHead()
-        : api.rpc.chain.getBlockHash());
-      const blockNumber = (
-        await api.rpc.chain.getBlock(lastHash)
-      ).block.header.number.toNumber();
+      const lastBlockNumber = await blocksProvider.lastNumber();
 
       const blockNumbersToCheck = Array.from(
         { length: config.FETCH_GAP_BLOCKS + ((+new Date() - startTimestamp) / config.BLOCK_TIME_MS | 0) }, // eslint-disable-line no-bitwise
-        (_, idx) => blockNumber - idx,
+        (_, idx) => lastBlockNumber - idx,
       );
 
       block = await findExtrinsicBlock(
-        api,
+        blocksProvider,
         blockNumbersToCheck,
         txHash,
-        blocksCache,
       );
     } catch (txErr) {
       console.error(`Failed to find extrinsic's block: \`${txErr}\``);

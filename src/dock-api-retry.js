@@ -164,7 +164,7 @@ export async function sendWithRetries(
   }
   const isFastBlock = blockTime === FASTBLOCK_TIME_MS;
   const config = isFastBlock ? retryConfig.fastblock : retryConfig.standard;
-  const extrTimeout = waitForFinalization
+  const extrTimeoutBlocks = waitForFinalization
     ? config.FINALIZED_TIMEOUT_BLOCKS
     : config.IN_BLOCK_TIMEOUT_BLOCKS;
   const blocksProvider = new BlocksProvider({
@@ -252,7 +252,7 @@ export async function sendWithRetries(
     return retrySym;
   };
 
-  const timeout = config.BLOCK_TIME_MS * extrTimeout;
+  const timeout = config.BLOCK_TIME_MS * extrTimeoutBlocks;
 
   return await retry(sendExtrinsic, 1e3 + timeout, {
     maxAttempts: config.MAX_ATTEMPTS,

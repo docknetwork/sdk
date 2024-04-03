@@ -115,15 +115,15 @@ export const timeout = async (time, f = () => { }) => await new Promise((resolve
 }, time));
 
 /**
-   * Combines supplied `promise` with a `timeout` that will call supplied `f` after `time` passes.
-   * Resolves to the earliest produced value.
-   *
-   * @template T
-   * @param {Promise<T>} promise
-   * @param {number} time
-   * @param {function(): Promise<T>} [f=()=>{throw new Error("Timeout exceeded")}]
-   * @returns {Promise<T>}
-   */
+ * Combines supplied `promise` with a `timeout` that will call supplied `f` after `time` passes.
+ * Resolves to the earliest produced value.
+ *
+ * @template T
+ * @param {Promise<T>} promise
+ * @param {number} time
+ * @param {function(): Promise<T>} [f=()=>{throw new Error("Timeout exceeded")}]
+ * @returns {Promise<T>}
+ */
 export const withTimeout = async (
   promise,
   time,
@@ -133,24 +133,24 @@ export const withTimeout = async (
 ) => await Promise.race([promise, timeout(time, f)]);
 
 /**
-   * Calls supplied function `fn` and waits for its completion up to `timeLimit`, retries in case timeout was fired.
-   * Additionally, `delay` between retries, `maxAttempts` count, `onTimeoutExceeded` and `onError` can be specified.
-   *
-   * `onError` callback will be called once an error is encountered, and it can be
-   * - resolved to some value, so the underlying promise will be resolved
-   * - rejected, so then underlying promise will be rejected
-   * - resolved to `RETRY_SYM` (second argument), so the retries will be continued
-   *
-   * @template T
-   * @param {function(): Promise<T>} fn
-   * @param {number} timeLimit
-   * @param {object} [params={}]
-   * @param {number} [params.delay=null]
-   * @param {number} [params.maxAttempts=Infinity]
-   * @param {function(RETRY_SYM): Promise<T | RETRY_SYM>} [params.onTimeoutExceeded=null]
-   * @param {function(Error, RETRY_SYM): Promise<T | RETRY_SYM>} [params.onError=null]
-   * @returns {Promise<T>}
-   */
+ * Calls supplied function `fn` and waits for its completion up to `timeLimit`, retries in case timeout was fired.
+ * Additionally, `delay` between retries, `maxAttempts` count, `onTimeoutExceeded` and `onError` can be specified.
+ *
+ * `onError` callback will be called once an error is encountered, and it can be
+ * - resolved to some value, so the underlying promise will be resolved
+ * - rejected, so then underlying promise will be rejected
+ * - resolved to `RETRY_SYM` (second argument), so the retries will be continued
+ *
+ * @template T
+ * @param {function(): Promise<T>} fn
+ * @param {number} timeLimit
+ * @param {object} [params={}]
+ * @param {number} [params.delay=null]
+ * @param {number} [params.maxAttempts=Infinity]
+ * @param {function(RETRY_SYM): Promise<T | RETRY_SYM>} [params.onTimeoutExceeded=null]
+ * @param {function(Error, RETRY_SYM): Promise<T | RETRY_SYM>} [params.onError=null]
+ * @returns {Promise<T>}
+ */
 /* eslint-disable sonarjs/cognitive-complexity */
 export const retry = async (
   fn,

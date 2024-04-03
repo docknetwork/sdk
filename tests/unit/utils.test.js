@@ -3,14 +3,15 @@ import { Keyring } from '@polkadot/api';
 import { initializeWasm } from '@docknetwork/crypto-wasm-ts';
 
 import {
-  PromiseMap,
   generateEcdsaSecp256k1Keypair,
   getPublicKeyFromKeyringPair,
   getSignatureFromKeyringPair,
-  retry,
-  timeout,
   verifyEcdsaSecp256k1Sig,
 } from '../../src/utils/misc';
+import {
+  PromiseMap, retry,
+  timeout,
+} from '../../src/utils/async';
 import {
   PublicKeyEd25519,
   PublicKeySr25519,
@@ -96,17 +97,17 @@ describe('Testing isHexWithGivenByteSize', () => {
     const map = new PromiseMap();
 
     const results = await Promise.all([
-      map.useKey(
+      map.callByKey(
         1,
         () => timeout(5e2, () => 10),
       ),
-      timeout(2e2, () => map.useKey(1, () => Promise.resolve(2))),
-      timeout(7e2, () => map.useKey(1, () => Promise.resolve(1))),
+      timeout(2e2, () => map.callByKey(1, () => Promise.resolve(2))),
+      timeout(7e2, () => map.callByKey(1, () => Promise.resolve(1))),
     ]);
 
     expect(results).toEqual([10, 10, 1]);
 
-    await expect(() => map.useKey(10, () => Promise.reject(1))).rejects;
+    await expect(() => map.callByKey(10, () => Promise.reject(1))).rejects;
     expect(map.map.size).toBe(0);
   });
 

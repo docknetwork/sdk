@@ -1,11 +1,9 @@
 import { BlockHash, BlockNumber } from "@polkadot/types/interfaces"; // eslint-disable-line
 import { SignedBlockExtended } from "@polkadot/types/types"; // eslint-disable-line
-import { PromiseMap } from './misc';
-
-const LAST_HASH = Symbol('LAST_HASH');
+import { PromiseMap, Single } from './async';
 
 /**
- * Fetches and caches requestMap blocks by their hashes and optionally numbers.
+ * Fetches and caches blocks by their hashes and optionally numbers.
  * `finalized` flag determines the last hash/number querying algorithms and whether blocks
  * can be cached by their numbers or not.
  *
@@ -17,15 +15,16 @@ export class BlocksProvider {
    * @param {*} [configuration.api]
    * @param {boolean} [configuration.finalized=false]
    */
-  constructor({ api, finalized = false } = {}) {
+  constructor({ api, cacheCapacity = 100, finalized = false } = {}) {
     this.api = api;
     this.finalized = finalized;
+    this.lastHashCall = new Single();
+    this.lastNumberCall = new Single();
 
-    this.byNumber = new Map();
-    this.byHash = new Map();
+    this.byNumberCalls = new PromiseMap({ capacity: cacheCapacity, save: finalized });
+    this.byHashCalls = new PromiseMap({ capacity: cacheCapacity, save: true });
+    this.numberToHashCalls = new PromiseMap({ capacity: cacheCapacity, save: true });
     this.maxBlockNumber = 0;
-
-    this.requestMap = new PromiseMap();
   }
 
   /**
@@ -34,9 +33,9 @@ export class BlocksProvider {
    * @returns {Promise<BlockHash>}
    */
   async lastHash() {
-    return await (this.finalized
+    return this.lastHashCall.call(() => (this.finalized
       ? this.api.rpc.chain.getFinalizedHead()
-      : this.api.rpc.chain.getBlockHash());
+      : this.api.rpc.chain.getBlockHash()));
   }
 
   /**
@@ -45,7 +44,7 @@ export class BlocksProvider {
    * @returns {Promise<BlockNumber>}
    */
   async lastNumber() {
-    const hash = await this.requestMap.useKey(LAST_HASH, () => this.lastHash());
+    const hash = await this.lastHash();
 
     const {
       block: {
@@ -58,16 +57,17 @@ export class BlocksProvider {
   }
 
   /**
-   * Adds supplied block to the local cache.
+   * Retrieves blocks by hash from either the local cache or by querying the node.
    *
-   * @param {SignedBlockExtended} block
+   * @param {BlockHash|string} hash
    * @param {object} configuration
    * @param {boolean} [configuration.skipCheck=false]
+   * @returns {Promise<SignedBlockExtended>}
    */
-  async setBlock(block, { skipCheck = false } = {}) {
+  async blockByHash(hash, { skipCheck = false } = {}) {
+    const block = await this.byHashCalls.callByKey(String(hash), () => this.api.derive.chain.getBlock(hash));
     const {
       block: {
-        hash,
         header: { number },
       },
     } = block;
@@ -82,28 +82,6 @@ export class BlocksProvider {
       }
     }
 
-    if (this.finalized) {
-      this.byNumber.set(String(number), block);
-    }
-    this.byHash.set(String(hash), block);
-  }
-
-  /**
-   * Retrieves blocks by hash from either the local cache or by querying the node.
-   *
-   * @param {BlockHash|string} hash
-   * @param {object} configuration
-   * @param {boolean} [configuration.skipCheck=false]
-   * @returns {Promise<SignedBlockExtended>}
-   */
-  async blockByHash(hash, { skipCheck = false } = {}) {
-    let block = this.cachedBlockByHash(hash);
-
-    if (block == null) {
-      block = await this.requestMap.useKey(String(hash), () => this.api.derive.chain.getBlock(hash));
-      await this.setBlock(block, { skipCheck });
-    }
-
     return block;
   }
 
@@ -114,29 +92,7 @@ export class BlocksProvider {
    * @returns {Promise<SignedBlockExtended>}
    */
   async blockByNumber(number) {
-    return (
-      this.cachedBlockByNumber(number)
-      ?? (await this.blockByHash(await this.api.rpc.chain.getBlockHash(number)))
-    );
-  }
-
-  /**
-   * Retrieves blocks by hash from the local cache.
-   *
-   * @param {number} number
-   * @returns {SignedBlockExtended}
-   */
-  cachedBlockByHash(hash) {
-    return this.byHash.get(String(hash));
-  }
-
-  /**
-   * Retrieves blocks by number from the local cache.
-   *
-   * @param {number} number
-   * @returns {SignedBlockExtended}
-   */
-  cachedBlockByNumber(number) {
-    return this.byNumber.get(String(number));
+    const hash = await this.numberToHashCalls.callByKey(String(number), () => this.api.rpc.chain.getBlockHash(number));
+    return await this.blockByHash(hash);
   }
 }

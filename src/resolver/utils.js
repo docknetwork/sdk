@@ -1,4 +1,4 @@
-import { fmtIter } from '../utils/misc';
+import { fmtIter } from '../utils/generic';
 
 /**
  * Before resolving an entity, ensures that `DockAPI` is initialized, throws an error otherwise.

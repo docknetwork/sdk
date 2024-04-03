@@ -22,7 +22,9 @@ import PriceFeedRpcDefs from './rpc-defs/price-feed-rpc-defs';
 import CoreModsRpcDefs from './rpc-defs/core-mods-rpc-defs';
 
 import TrustRegistryModule from './modules/trust-registry';
-import { sendWithRetries, patchQueryApi } from './dock-api-retry';
+import {
+  sendWithRetries, patchQueryApi, STANDARD_BLOCK_TIME_MS, FASTBLOCK_TIME_MS, FASTBLOCK_CONFIG, STANDARD_CONFIG,
+} from './dock-api-retry';
 import { ensureExtrinsicSucceeded } from './utils/extrinsic';
 
 /**
@@ -122,6 +124,13 @@ export default class DockAPI {
       this.api = await ApiPromise.create(apiOptions);
     }
     this.api.specVersion = specVersion;
+    const blockTime = this.api.consts.babe.expectedBlockTime.toNumber();
+    if (blockTime !== STANDARD_BLOCK_TIME_MS && blockTime !== FASTBLOCK_TIME_MS) {
+      throw new Error(
+        `Unexpected block time: ${blockTime}, expected either ${STANDARD_BLOCK_TIME_MS} or ${FASTBLOCK_TIME_MS}`,
+      );
+    }
+    this.api.isFastBlock = blockTime === FASTBLOCK_TIME_MS;
 
     await this.initKeyring(keyring);
 
@@ -257,7 +266,7 @@ export default class DockAPI {
    * @returns {Promise<SubmittableResult>}
    */
   async send(extrinsic, waitForFinalization = true) {
-    return await sendWithRetries(this, extrinsic, waitForFinalization);
+    return await sendWithRetries(this, extrinsic, waitForFinalization, this.api.isFastBlock ? FASTBLOCK_CONFIG : STANDARD_CONFIG);
   }
 
   /**
@@ -301,11 +310,11 @@ export default class DockAPI {
       if (unsubscribed) {
         return false;
       }
-      unsubscribed = true;
 
       if (unsubscribe != null) {
         try {
           unsubscribe();
+          unsubscribed = true;
         } catch (err) {
           throw new Error(
             `Failed to unsubscribe from watching extrinsic's status: \`${err}\``,

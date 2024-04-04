@@ -5,8 +5,7 @@ import { ReusablePromiseMap, ReusablePromise } from './async';
 
 /**
  * Fetches and caches blocks by their hashes and optionally numbers.
- * `finalized` flag determines the last hash/number querying algorithms and whether blocks
- * can be cached by their numbers or not.
+ * `finalized` flag determines the last hash/number querying algorithms.
  *
  */
 export class BlocksProvider {
@@ -22,17 +21,12 @@ export class BlocksProvider {
     this.finalized = finalized;
 
     this.lastHashCall = new ReusablePromise();
-    this.byNumberCalls = new ReusablePromiseMap({
-      capacity: cacheCapacity,
-      save: finalized,
-    });
-    this.byHashCalls = new ReusablePromiseMap({
+    this.blockByHashCalls = new ReusablePromiseMap({
       capacity: cacheCapacity,
       save: true,
     });
     this.numberToHashCalls = new ReusablePromiseMap({
-      capacity: cacheCapacity,
-      save: true,
+      capacity: cacheCapacity
     });
 
     this.maxBlockNumber = 0;
@@ -76,7 +70,7 @@ export class BlocksProvider {
    * @returns {Promise<SignedBlockExtended>}
    */
   async blockByHash(hash, { skipCheck = false } = {}) {
-    const block = await this.byHashCalls.callByKey(String(hash), () => this.api.derive.chain.getBlock(hash));
+    const block = await this.blockByHashCalls.callByKey(String(hash), () => this.api.derive.chain.getBlock(hash));
     const {
       block: {
         header: { number },
@@ -88,7 +82,7 @@ export class BlocksProvider {
 
       if (number.toNumber() > this.maxBlockNumber) {
         throw new Error(
-          "Provided block's number is higher than the latest known block number",
+          `Provided block's number ${number.toNumber()} is higher than the latest known block number ${this.maxBlockNumber}`,
         );
       }
     }

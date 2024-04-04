@@ -5,8 +5,8 @@ import { ReusablePromiseMap, ReusablePromise } from './async';
 
 /**
  * Fetches and caches blocks by their hashes and optionally numbers.
- * `finalized` flag determines the last hash/number querying algorithms.
- *
+ * `finalized` flag determines the last hash/number querying algorithms
+ * and whether blocks will be cached by their numbers or not.
  */
 export class BlocksProvider {
   /**
@@ -25,8 +25,9 @@ export class BlocksProvider {
       capacity: cacheCapacity,
       save: true,
     });
-    this.numberToHashCalls = new ReusablePromiseMap({
-      capacity: cacheCapacity
+    this.blockByNumberCalls = new ReusablePromiseMap({
+      capacity: cacheCapacity,
+      save: finalized,
     });
 
     this.maxBlockNumber = 0;
@@ -97,7 +98,9 @@ export class BlocksProvider {
    * @returns {Promise<SignedBlockExtended>}
    */
   async blockByNumber(number) {
-    const hash = await this.numberToHashCalls.callByKey(String(number), () => this.api.rpc.chain.getBlockHash(number));
-    return await this.blockByHash(hash);
+    return await this.blockByNumberCalls.callByKey(String(number), async () => {
+      const hash = await this.api.rpc.chain.getBlockHash(number);
+      return await this.blockByHash(hash);
+    });
   }
 }

@@ -1,5 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Testing isHexWithGivenByteSize \`ReusablePromiseMap\` capacity 1`] = `"\`ReusablePromiseMap\`'s queue reached its capacity"`;
+
 exports[`Testing isHexWithGivenByteSize \`retry\` works properly 1`] = `"From \`onError\` callback"`;
 
 exports[`Testing isHexWithGivenByteSize \`retry\` works properly 2`] = `

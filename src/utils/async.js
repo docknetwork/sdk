@@ -62,10 +62,12 @@ export class ReusablePromiseMap {
    * @param {object} configuration
    * @param {boolean} [configuration.save=false] - if set to `true`, stores the result of the first successful promise for each key.
    * @param {?number} [configuration.capacity] - max capacity of the underlying container.
+   * @param {?number} [configuration.queueCapacity] - max capacity of the queue.
    */
-  constructor({ capacity, save = false } = {}) {
+  constructor({ capacity, queueCapacity, save = false } = {}) {
     this.map = capacity != null ? new MapWithCapacity(capacity) : new Map();
     this.queue = [];
+    this.queueCapacity = queueCapacity;
     this.save = save;
   }
 
@@ -85,6 +87,9 @@ export class ReusablePromiseMap {
     }
 
     if (this.reachedCapacity()) {
+      if (this.queue.length === this.queueCapacity) {
+        throw new Error('`ReusablePromiseMap`\'s queue reached its capacity');
+      }
       await new Promise((resolve, reject) => this.queue.push({ resolve, reject }));
     }
 

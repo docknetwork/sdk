@@ -8,10 +8,7 @@ import {
   getSignatureFromKeyringPair,
   verifyEcdsaSecp256k1Sig,
 } from '../../src/utils/misc';
-import {
-  ReusablePromiseMap, retry,
-  timeout,
-} from '../../src/utils/async';
+import { ReusablePromiseMap, retry, timeout } from '../../src/utils/async';
 import {
   PublicKeyEd25519,
   PublicKeySr25519,
@@ -97,10 +94,7 @@ describe('Testing isHexWithGivenByteSize', () => {
     const map = new ReusablePromiseMap();
 
     const results = await Promise.all([
-      map.callByKey(
-        1,
-        () => timeout(5e2, () => 10),
-      ),
+      map.callByKey(1, () => timeout(5e2, () => 10)),
       timeout(2e2, () => map.callByKey(1, () => Promise.resolve(2))),
       timeout(7e2, () => map.callByKey(1, () => Promise.resolve(1))),
     ]);
@@ -116,13 +110,45 @@ describe('Testing isHexWithGivenByteSize', () => {
 
     const expectElapsedTimeSec = crateElapsedTimeSec();
 
-    const results = await Promise.all(Array.from({ length: 10 }, (_, i) => map.callByKey(i, () => timeout(5e2, () => i))));
+    let results = await Promise.all(
+      Array.from({ length: 10 }, (_, i) => map.callByKey(i, () => timeout(5e2, () => i))),
+    );
 
     expect(results).toEqual(Array.from({ length: 10 }, (_, i) => i));
     expect(map.map.size).toBe(0);
     expect(map.queue.length).toBe(0);
 
     expectElapsedTimeSec(2.5);
+
+    const mapWithBoundQueue = new ReusablePromiseMap({
+      capacity: 1,
+      queueCapacity: 3,
+    });
+
+    results = await Promise.all([
+      () => mapWithBoundQueue.callByKey(
+        1,
+        () => timeout(5e2, () => 1),
+      ),
+      () => mapWithBoundQueue.callByKey(
+        2,
+        () => timeout(5e2, () => 2),
+      ),
+      () => mapWithBoundQueue.callByKey(
+        3,
+        () => timeout(5e2, () => 3),
+      ),
+      () => mapWithBoundQueue.callByKey(
+        3,
+        () => timeout(5e2, () => 4),
+      ),
+      () => expect(() => mapWithBoundQueue.callByKey(
+        4,
+        () => timeout(5e2, () => 5),
+      )).rejects.toThrowErrorMatchingSnapshot(),
+    ].map((f) => f()));
+
+    expect(results).toEqual([1, 2, 3, 4, undefined]);
   });
 
   test('`retry` works properly', async () => {

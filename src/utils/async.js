@@ -60,7 +60,7 @@ export class ReusablePromiseMap {
    *
    * @param {object} configuration
    * @param {boolean} [configuration.save=false] - if set to `true`, stores the result of the first successful promise for each key.
-   * @param {?number} capacity - max capacity of the underlying container.
+   * @param {?number} [configuration.capacity] - max capacity of the underlying container.
    */
   constructor({ capacity, save = false } = {}) {
     this.map = capacity != null ? new MapWithCapacity(capacity) : new Map();

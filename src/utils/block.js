@@ -22,9 +22,18 @@ export class BlocksProvider {
     this.finalized = finalized;
 
     this.lastHashCall = new ReusablePromise();
-    this.byNumberCalls = new ReusablePromiseMap({ capacity: cacheCapacity, save: finalized });
-    this.byHashCalls = new ReusablePromiseMap({ capacity: cacheCapacity, save: true });
-    this.numberToHashCalls = new ReusablePromiseMap({ capacity: cacheCapacity, save: true });
+    this.byNumberCalls = new ReusablePromiseMap({
+      capacity: cacheCapacity,
+      save: finalized,
+    });
+    this.byHashCalls = new ReusablePromiseMap({
+      capacity: cacheCapacity,
+      save: true,
+    });
+    this.numberToHashCalls = new ReusablePromiseMap({
+      capacity: cacheCapacity,
+      save: true,
+    });
 
     this.maxBlockNumber = 0;
   }
@@ -35,7 +44,7 @@ export class BlocksProvider {
    * @returns {Promise<BlockHash>}
    */
   async lastHash() {
-    return this.lastHashCall.call(() => (this.finalized
+    return await this.lastHashCall.call(() => (this.finalized
       ? this.api.rpc.chain.getFinalizedHead()
       : this.api.rpc.chain.getBlockHash()));
   }

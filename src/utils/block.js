@@ -1,5 +1,6 @@
 import { BlockHash, BlockNumber } from "@polkadot/types/interfaces"; // eslint-disable-line
 import { SignedBlockExtended } from "@polkadot/types/types"; // eslint-disable-line
+import { ApiPromise } from "@polkadot/api"; // eslint-disable-line
 import { ReusablePromiseMap, ReusablePromise } from './async';
 
 /**
@@ -12,7 +13,8 @@ export class BlocksProvider {
   /**
    *
    * @param {object} configuration
-   * @param {*} [configuration.api]
+   * @param {ApiPromise} [configuration.api]
+   * @param {boolean} [configuration.cacheCapacity=100]
    * @param {boolean} [configuration.finalized=false]
    */
   constructor({ api, cacheCapacity = 100, finalized = false } = {}) {

@@ -5,9 +5,8 @@ import { ReusablePromiseMap, ReusablePromise } from './async';
 
 /**
  * Fetches and caches blocks by their hashes and optionally numbers.
- * `finalized` flag determines the last hash/number querying algorithms and whether blocks
- * can be cached by their numbers or not.
- *
+ * `finalized` flag determines the last hash/number querying algorithms
+ * and whether blocks will be cached by their numbers or not.
  */
 export class BlocksProvider {
   /**
@@ -22,17 +21,13 @@ export class BlocksProvider {
     this.finalized = finalized;
 
     this.lastHashCall = new ReusablePromise();
-    this.byNumberCalls = new ReusablePromiseMap({
+    this.blockByHashCalls = new ReusablePromiseMap({
+      capacity: cacheCapacity,
+      save: true,
+    });
+    this.blockByNumberCalls = new ReusablePromiseMap({
       capacity: cacheCapacity,
       save: finalized,
-    });
-    this.byHashCalls = new ReusablePromiseMap({
-      capacity: cacheCapacity,
-      save: true,
-    });
-    this.numberToHashCalls = new ReusablePromiseMap({
-      capacity: cacheCapacity,
-      save: true,
     });
 
     this.maxBlockNumber = 0;
@@ -76,7 +71,7 @@ export class BlocksProvider {
    * @returns {Promise<SignedBlockExtended>}
    */
   async blockByHash(hash, { skipCheck = false } = {}) {
-    const block = await this.byHashCalls.callByKey(String(hash), () => this.api.derive.chain.getBlock(hash));
+    const block = await this.blockByHashCalls.callByKey(String(hash), () => this.api.derive.chain.getBlock(hash));
     const {
       block: {
         header: { number },
@@ -88,7 +83,7 @@ export class BlocksProvider {
 
       if (number.toNumber() > this.maxBlockNumber) {
         throw new Error(
-          "Provided block's number is higher than the latest known block number",
+          `Provided block's number ${number.toNumber()} is higher than the latest known block number ${this.maxBlockNumber}`,
         );
       }
     }
@@ -103,7 +98,13 @@ export class BlocksProvider {
    * @returns {Promise<SignedBlockExtended>}
    */
   async blockByNumber(number) {
-    const hash = await this.numberToHashCalls.callByKey(String(number), () => this.api.rpc.chain.getBlockHash(number));
-    return await this.blockByHash(hash);
+    return await this.blockByNumberCalls.callByKey(String(number), async () => {
+      const hash = await this.api.rpc.chain.getBlockHash(number);
+      if (hash.isNone) {
+        throw new Error(`No hash found for the block ${number}`);
+      }
+
+      return await this.blockByHash(hash);
+    });
   }
 }

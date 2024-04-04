@@ -116,13 +116,13 @@ describe('Testing isHexWithGivenByteSize', () => {
 
     const expectElapsedTimeSec = crateElapsedTimeSec();
 
-    const results = await Promise.all(Array.from({ length: 98 }, (_, i) => map.callByKey(i, () => timeout(1e2, () => i))));
+    const results = await Promise.all(Array.from({ length: 10 }, (_, i) => map.callByKey(i, () => timeout(5e2, () => i))));
 
-    expect(results).toEqual(Array.from({ length: 98 }, (_, i) => i));
+    expect(results).toEqual(Array.from({ length: 10 }, (_, i) => i));
     expect(map.map.size).toBe(0);
     expect(map.queue.length).toBe(0);
 
-    expectElapsedTimeSec(5);
+    expectElapsedTimeSec(2.5);
   });
 
   test('`retry` works properly', async () => {

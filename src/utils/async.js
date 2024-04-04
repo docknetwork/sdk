@@ -27,7 +27,8 @@ export class ReusablePromise {
     if (this.promise != null) {
       return await this.promise;
     }
-    this.promise = createPromise();
+    const promise = createPromise();
+    this.promise = promise;
 
     let res;
     let err;
@@ -36,7 +37,7 @@ export class ReusablePromise {
     } catch (e) {
       err = e;
     } finally {
-      if (!this.save || err != null) {
+      if ((!this.save || err != null) && this.promise === promise) {
         this.clear();
       }
     }
@@ -98,12 +99,13 @@ export class ReusablePromiseMap {
       err = e;
     } finally {
       const hasQueued = Boolean(this.queue.length);
+      let deleted = false;
 
       if (hasQueued || !this.save || err != null) {
-        this.map.delete(key);
+        deleted = this.map.get(key) === promise && this.map.delete(key);
       }
 
-      if (hasQueued) {
+      if (hasQueued && deleted) {
         this.queue.shift().resolve();
       }
     }

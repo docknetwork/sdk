@@ -25,7 +25,7 @@ export class ReusablePromise {
    */
   async call(createPromise) {
     if (this.promise != null) {
-      return this.promise;
+      return await this.promise;
     }
     this.promise = createPromise();
 
@@ -77,27 +77,27 @@ export class ReusablePromiseMap {
    * @returns {Promise<T>}
    */
   async callByKey(key, createPromise) {
+    if (this.map.has(key)) {
+      return await this.map.get(key);
+    }
+
+    const promise = createPromise();
+    this.map.set(key, promise);
+
     let res;
-    if (!this.map.has(key)) {
-      const promise = createPromise();
-      this.map.set(key, promise);
-
-      let err;
-      try {
-        res = await promise;
-      } catch (e) {
-        err = e;
-      } finally {
-        if (!this.save || err != null) {
-          this.map.delete(key);
-        }
+    let err;
+    try {
+      res = await promise;
+    } catch (e) {
+      err = e;
+    } finally {
+      if (!this.save || err != null) {
+        this.map.delete(key);
       }
+    }
 
-      if (err != null) {
-        throw err;
-      }
-    } else {
-      res = await this.map.get(key);
+    if (err != null) {
+      throw err;
     }
 
     return res;

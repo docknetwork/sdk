@@ -20,11 +20,12 @@ export class BlocksProvider {
   constructor({ api, cacheCapacity = 100, finalized = false } = {}) {
     this.api = api;
     this.finalized = finalized;
-    this.lastHashCall = new ReusablePromise();
 
+    this.lastHashCall = new ReusablePromise();
     this.byNumberCalls = new ReusablePromiseMap({ capacity: cacheCapacity, save: finalized });
     this.byHashCalls = new ReusablePromiseMap({ capacity: cacheCapacity, save: true });
     this.numberToHashCalls = new ReusablePromiseMap({ capacity: cacheCapacity, save: true });
+
     this.maxBlockNumber = 0;
   }
 

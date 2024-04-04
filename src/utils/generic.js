@@ -17,6 +17,7 @@ export class MapWithCapacity extends Map {
   }
 
   set(key, value) {
+    this.delete(key);
     const res = super.set(key, value);
     this.adjustSize();
 

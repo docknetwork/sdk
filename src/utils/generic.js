@@ -27,13 +27,16 @@ export class MapWithCapacity extends Map {
    * Adjusts the size of the underlying map, so it will fit the capacity.
    */
   adjustSize() {
-    const keys = this.keys();
+    while (this.size > this.capacity) { this.removeFirstAdded(); }
+  }
 
-    while (this.size > this.capacity) {
-      const { value: key } = keys.next();
+  /**
+   * Removes the earliest item added to the map.
+   */
+  removeFirstAdded() {
+    const { value: key, done } = this.keys().next();
 
-      this.delete(key);
-    }
+    return !done && this.delete(key);
   }
 }
 

@@ -64,12 +64,14 @@ export class ReusablePromiseMap {
    */
   constructor({ capacity, save = false } = {}) {
     this.map = capacity != null ? new MapWithCapacity(capacity) : new Map();
+    this.queue = [];
     this.save = save;
   }
 
   /**
    * Checks if a promise with the supplied key exists, if so, `await`s it, otherwise inserts a new `Promise` produced by
    * calling `createPromise` function.
+   * In case capacity is reached, the current call will be paused until the next promise(s) is resolved.
    *
    * @template T
    * @param {*} key
@@ -79,6 +81,10 @@ export class ReusablePromiseMap {
   async callByKey(key, createPromise) {
     if (this.map.has(key)) {
       return await this.map.get(key);
+    }
+
+    if (this.reachedCapacity()) {
+      await new Promise((resolve, reject) => this.queue.push({ resolve, reject }));
     }
 
     const promise = createPromise();
@@ -91,8 +97,14 @@ export class ReusablePromiseMap {
     } catch (e) {
       err = e;
     } finally {
-      if (!this.save || err != null) {
+      const hasQueued = Boolean(this.queue.length);
+
+      if (hasQueued || !this.save || err != null) {
         this.map.delete(key);
+      }
+
+      if (hasQueued) {
+        this.queue.shift().resolve();
       }
     }
 
@@ -103,8 +115,24 @@ export class ReusablePromiseMap {
     return res;
   }
 
+  /**
+   * Returns `true` if capacity is reached.
+   *
+   * @returns {boolean}
+   */
+  reachedCapacity() {
+    return 'capacity' in this.map && this.map.size === this.map.capacity;
+  }
+
+  /**
+   * Clears the underlying `Promise` map and `reject`s all queued items.
+   */
   clear() {
     this.map.clear();
+
+    while (this.queue.length) {
+      this.queue.shift().reject(new Error('`ReusablePromiseMap` was cleared'));
+    }
   }
 }
 

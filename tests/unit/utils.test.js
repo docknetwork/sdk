@@ -111,6 +111,20 @@ describe('Testing isHexWithGivenByteSize', () => {
     expect(map.map.size).toBe(0);
   });
 
+  test('`ReusablePromiseMap` capacity', async () => {
+    const map = new ReusablePromiseMap({ capacity: 2 });
+
+    const expectElapsedTimeSec = crateElapsedTimeSec();
+
+    const results = await Promise.all(Array.from({ length: 98 }, (_, i) => map.callByKey(i, () => timeout(1e2, () => i))));
+
+    expect(results).toEqual(Array.from({ length: 98 }, (_, i) => i));
+    expect(map.map.size).toBe(0);
+    expect(map.queue.length).toBe(0);
+
+    expectElapsedTimeSec(5);
+  });
+
   test('`retry` works properly', async () => {
     const makeCtrFn = (ctr, placeholder = new Promise((_) => {})) => async () => {
       if (!ctr--) {

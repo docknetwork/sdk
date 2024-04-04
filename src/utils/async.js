@@ -4,7 +4,12 @@ import { MapWithCapacity } from './generic';
 /**
  * A promise that can be reused.
  */
-export class Single {
+export class ReusablePromise {
+  /**
+   *
+   * @param {object} configuration
+   * @param {boolean} [configuration.save=false] - if set to `true`, stores the result of the first successful promise forever.
+   */
   constructor({ save = false } = {}) {
     this.promise = null;
     this.save = save;
@@ -24,8 +29,8 @@ export class Single {
     }
     this.promise = createPromise();
 
-    let res; let
-      err;
+    let res;
+    let err;
     try {
       res = await this.promise;
     } catch (e) {
@@ -50,9 +55,15 @@ export class Single {
 /**
  * A map where each entry represents a keyed promise that can be reused.
  */
-export class PromiseMap {
+export class ReusablePromiseMap {
+  /**
+   *
+   * @param {object} configuration
+   * @param {boolean} [configuration.save=false] - if set to `true`, stores the result of the first successful promise for each key.
+   * @param {?number} capacity - max capacity of the underlying container.
+   */
   constructor({ capacity, save = false } = {}) {
-    this.map = new MapWithCapacity([], capacity);
+    this.map = capacity != null ? new MapWithCapacity(capacity) : new Map();
     this.save = save;
   }
 
@@ -106,7 +117,7 @@ export class PromiseMap {
  * @param {function(): Promise<T>} f
  * @returns {Promise<T>}
  */
-export const timeout = async (time, f = () => { }) => await new Promise((resolve, reject) => setTimeout(async () => {
+export const timeout = async (time, f = () => {}) => await new Promise((resolve, reject) => setTimeout(async () => {
   try {
     resolve(await f());
   } catch (err) {
@@ -196,7 +207,8 @@ export const retry = async (
   }
 
   throw new Error(
-    `Promise created by \`${fn}\` didn't resolve within the specified timeout of ${timeLimit} ms ${maxAttempts + 1
+    `Promise created by \`${fn}\` didn't resolve within the specified timeout of ${timeLimit} ms ${
+      maxAttempts + 1
     } times`,
   );
 };

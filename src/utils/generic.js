@@ -1,10 +1,17 @@
 /* eslint-disable max-classes-per-file */
+/**
+ * A `Map` that has a capacity.
+ */
 export class MapWithCapacity extends Map {
-  constructor(entries, capacity) {
+  /**
+   *
+   * @param {number} capacity
+   */
+  constructor(capacity, ...args) {
     if (capacity < 1) {
       throw new Error(`Capacity must be greater than 0, received: ${capacity}`);
     }
-    super(entries);
+    super(...args);
     this.capacity = capacity;
     this.adjustSize();
   }
@@ -16,6 +23,9 @@ export class MapWithCapacity extends Map {
     return res;
   }
 
+  /**
+   * Adjusts the size of the underlying map, so it will fit the capacity.
+   */
   adjustSize() {
     const keys = this.keys();
 
@@ -56,16 +66,16 @@ export class PatternError extends Error {
 }
 
 /**
-   * Entity used to ensure that provided value matches supplied pattern(s), throws error(s) otherwise.
-   */
+ * Entity used to ensure that provided value matches supplied pattern(s), throws error(s) otherwise.
+ */
 export class PatternMatcher {
   /**
-     * Ensures that provided value matches supplied pattern(s), throws an error otherwise.
-     *
-     * @param pattern
-     * @param value
-     * @param {?Array} path
-     */
+   * Ensures that provided value matches supplied pattern(s), throws an error otherwise.
+   *
+   * @param pattern
+   * @param value
+   * @param {?Array} path
+   */
   check(pattern, value, path = []) {
     for (const key of Object.keys(pattern)) {
       if (!key.startsWith('$') || this[key] == null) {
@@ -89,11 +99,11 @@ export class PatternMatcher {
   }
 
   /**
-     * Supplied value matches pattern's type.
-     *
-     * @param pattern
-     * @param value
-     */
+   * Supplied value matches pattern's type.
+   *
+   * @param pattern
+   * @param value
+   */
   $matchType(pattern, value) {
     // eslint-disable-next-line valid-typeof
     if (typeof value !== pattern.$matchType) {
@@ -106,11 +116,11 @@ export class PatternMatcher {
   }
 
   /**
-     * Supplied value matches pattern's value.
-     *
-     * @param pattern
-     * @param value
-     */
+   * Supplied value matches pattern's value.
+   *
+   * @param pattern
+   * @param value
+   */
   $matchValue(pattern, value) {
     if (value !== pattern.$matchValue) {
       throw new Error(
@@ -120,12 +130,12 @@ export class PatternMatcher {
   }
 
   /**
-     * Supplied value is an object that matches pattern's object patterns.
-     *
-     * @param pattern
-     * @param value
-     * @param path
-     */
+   * Supplied value is an object that matches pattern's object patterns.
+   *
+   * @param pattern
+   * @param value
+   * @param path
+   */
   $matchObject(pattern, value, path) {
     for (const key of Object.keys(value)) {
       if (!Object.hasOwnProperty.call(pattern.$matchObject, key)) {
@@ -141,12 +151,12 @@ export class PatternMatcher {
   }
 
   /**
-     * Supplied value is an iterable that matches the pattern's iterable's patterns.
-     *
-     * @param pattern
-     * @param value
-     * @param path
-     */
+   * Supplied value is an iterable that matches the pattern's iterable's patterns.
+   *
+   * @param pattern
+   * @param value
+   * @param path
+   */
   $matchIterable(pattern, value, path) {
     if (typeof value[Symbol.iterator] !== 'function') {
       throw new Error(`Iterable expected, received: ${value}`);
@@ -167,11 +177,11 @@ export class PatternMatcher {
   }
 
   /**
-     * Supplied value is an instance of the pattern's specified constructor.
-     *
-     * @param pattern
-     * @param value
-     */
+   * Supplied value is an instance of the pattern's specified constructor.
+   *
+   * @param pattern
+   * @param value
+   */
   $instanceOf(pattern, value) {
     if (!(value instanceof pattern.$instanceOf)) {
       throw new Error(
@@ -181,12 +191,12 @@ export class PatternMatcher {
   }
 
   /**
-     * Supplied value is an iterable each item of which matches `pattern`'s pattern.
-     *
-     * @param pattern
-     * @param value
-     * @param path
-     */
+   * Supplied value is an iterable each item of which matches `pattern`'s pattern.
+   *
+   * @param pattern
+   * @param value
+   * @param path
+   */
   $iterableOf(pattern, value, path) {
     if (typeof value?.[Symbol.iterator] !== 'function') {
       throw new Error(`Iterable expected, received \`${value}\``);
@@ -199,12 +209,12 @@ export class PatternMatcher {
   }
 
   /**
-     * Supplied value is a map in which keys and values match `pattern`'s patterns.
-     *
-     * @param pattern
-     * @param value
-     * @param path
-     */
+   * Supplied value is a map in which keys and values match `pattern`'s patterns.
+   *
+   * @param pattern
+   * @param value
+   * @param path
+   */
   $mapOf(pattern, value, path) {
     if (typeof value?.entries !== 'function') {
       throw new Error(`Map expected, received \`${value}\``);
@@ -225,12 +235,12 @@ export class PatternMatcher {
   }
 
   /**
-     * Supplied value matches at least one of `pattern`'s patterns.
-     *
-     * @param pattern
-     * @param value
-     * @param path
-     */
+   * Supplied value matches at least one of `pattern`'s patterns.
+   *
+   * @param pattern
+   * @param value
+   * @param path
+   */
   $anyOf(pattern, value, path) {
     let anySucceeded = false;
     const errors = [];
@@ -257,12 +267,12 @@ export class PatternMatcher {
   }
 
   /**
-     * Supplied value is an object with one key existing in `pattern` that matches the pattern under this key.
-     *
-     * @param pattern
-     * @param value
-     * @param path
-     */
+   * Supplied value is an object with one key existing in `pattern` that matches the pattern under this key.
+   *
+   * @param pattern
+   * @param value
+   * @param path
+   */
   $objOf(pattern, value, path) {
     const keys = Object.keys(value);
     if (keys.length !== 1) {
@@ -282,12 +292,12 @@ export class PatternMatcher {
   }
 
   /**
-     * Ensures that supplied value satisfies provided function.
-     *
-     * @param pattern
-     * @param value
-     * @param path
-     */
+   * Ensures that supplied value satisfies provided function.
+   *
+   * @param pattern
+   * @param value
+   * @param path
+   */
   $ensure(pattern, value) {
     pattern.$ensure(value);
   }

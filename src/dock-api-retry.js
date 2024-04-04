@@ -15,18 +15,12 @@ export const FASTBLOCK_TIME_MS = 5e2;
 
 /**
  * @typedef {object} RetryConfig
- * Amount of blocks to wait for the extrinsic to be finalized before retrying.
- * @prop {number} finalizedTimeoutBlocks
- * Amount of blocks to wait for the extrinsic to be included in the block before retrying.
- * @prop {number} inBlockTimeoutBlocks
- * Amount of blocks to wait before a retry attempt.
- * @prop {number} retryDelayBlocks
- * Block time in ms.
- * @prop {number} BLOCK_TIME_MS
- * Max retry attempts (doesn't include initial request).
- * @prop {number} maxAttempts
- * Amount of blocks to be fetched in addition to the strict amount of blocks. It will cover timing for fetching the block data.
- * @prop {number} fetchGapBlocks
+ * @prop {number} finalizedTimeoutBlocks - Amount of blocks to wait for the extrinsic to be finalized before retrying.
+ * @prop {number} inBlockTimeoutBlocks - Amount of blocks to wait for the extrinsic to be included in the block before retrying.
+ * @prop {number} retryDelayBlocks - Amount of blocks to wait before a retry attempt.
+ * @prop {number} BLOCK_TIME_MS - Block time in ms.
+ * @prop {number} maxAttempts - Max retry attempts (doesn't include initial request).
+ * @prop {number} fetchGapBlocks - Amount of blocks to be fetched in addition to the strict amount of blocks. It will cover timing for fetching the block data.
  */
 
 export const STANDARD_CONFIG = {

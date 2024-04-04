@@ -9,7 +9,7 @@ import {
   verifyEcdsaSecp256k1Sig,
 } from '../../src/utils/misc';
 import {
-  PromiseMap, retry,
+  ReusablePromiseMap, retry,
   timeout,
 } from '../../src/utils/async';
 import {
@@ -93,8 +93,8 @@ describe('Testing isHexWithGivenByteSize', () => {
     );
   });
 
-  test('`PromiseMap` works properly', async () => {
-    const map = new PromiseMap();
+  test('`ReusablePromiseMap` works properly', async () => {
+    const map = new ReusablePromiseMap();
 
     const results = await Promise.all([
       map.callByKey(

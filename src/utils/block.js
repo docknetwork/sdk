@@ -1,6 +1,6 @@
 import { BlockHash, BlockNumber } from "@polkadot/types/interfaces"; // eslint-disable-line
 import { SignedBlockExtended } from "@polkadot/types/types"; // eslint-disable-line
-import { PromiseMap, Single } from './async';
+import { ReusablePromiseMap, ReusablePromise } from './async';
 
 /**
  * Fetches and caches blocks by their hashes and optionally numbers.
@@ -18,12 +18,11 @@ export class BlocksProvider {
   constructor({ api, cacheCapacity = 100, finalized = false } = {}) {
     this.api = api;
     this.finalized = finalized;
-    this.lastHashCall = new Single();
-    this.lastNumberCall = new Single();
+    this.lastHashCall = new ReusablePromise();
 
-    this.byNumberCalls = new PromiseMap({ capacity: cacheCapacity, save: finalized });
-    this.byHashCalls = new PromiseMap({ capacity: cacheCapacity, save: true });
-    this.numberToHashCalls = new PromiseMap({ capacity: cacheCapacity, save: true });
+    this.byNumberCalls = new ReusablePromiseMap({ capacity: cacheCapacity, save: finalized });
+    this.byHashCalls = new ReusablePromiseMap({ capacity: cacheCapacity, save: true });
+    this.numberToHashCalls = new ReusablePromiseMap({ capacity: cacheCapacity, save: true });
     this.maxBlockNumber = 0;
   }
 

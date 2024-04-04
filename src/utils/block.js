@@ -100,6 +100,10 @@ export class BlocksProvider {
   async blockByNumber(number) {
     return await this.blockByNumberCalls.callByKey(String(number), async () => {
       const hash = await this.api.rpc.chain.getBlockHash(number);
+      if (hash.isNone) {
+        throw new Error(`No hash found for the block ${number}`);
+      }
+
       return await this.blockByHash(hash);
     });
   }

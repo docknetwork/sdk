@@ -1,7 +1,7 @@
 import { u8aToHex, hexToU8a } from '@polkadot/util';
-import { base58btc } from 'multiformats/bases/base58';
 import bs58 from 'bs58';
 import varint from 'varint';
+import { base58btc } from 'multiformats/bases/base58';
 
 import { getHexIdentifier } from '../../codec';
 import { PublicKeyEd25519, PublicKeySecp256k1 } from '../../../public-keys';

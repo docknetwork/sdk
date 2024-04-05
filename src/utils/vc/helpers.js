@@ -42,7 +42,7 @@ export function getKeyDoc(did, keypair, type, id) {
   return {
     id: id || `${did}#keys-1`,
     controller: did,
-    type,
+    type: type || keypair.verKeyType,
     keypair: keypair.keyPair || keypair,
   };
 }

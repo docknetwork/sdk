@@ -82,15 +82,17 @@ describe('Deploy a `PalletStorageAccessor` contract and read storage using its m
       contractAddress,
     );
 
-    const { 0: success, 1: rawData } = await contract.methods
-      .getStorage('System', 'Number', 0, '0x', '0x')
-      .call();
+    const [{ 0: success, 1: rawData }, { block }] = await Promise.all([
+      contract.methods
+        .getStorage('System', 'Number', 0, '0x', '0x')
+        .call(),
+      dock.api.rpc.chain.getBlock(),
+    ]);
 
     expect(success).toBe(true);
     const buffer = Buffer.from(rawData.slice(2), 'hex');
     const [found, ...data] = Array.from(buffer);
     const blockNumber = $.u32.decode(new Uint8Array(data)).toFixed();
-    const { block } = await dock.api.rpc.chain.getBlock();
     expect(!!found).toBe(true);
     expect(+blockNumber).toBe(+block.header.number);
   }, 2000);
@@ -147,15 +149,17 @@ describe('Deploy a `PalletStorageAccessor` contract and read storage using its m
       165, 193, 177, 154, 183, 160, 79, 83, 108, 81, 154, 202, 73, 131, 172,
     ]);
 
-    const { 0: success, 1: rawData } = await contract.methods
-      .getStorageRaw(key)
-      .call();
+    const [{ 0: success, 1: rawData }, { block }] = await Promise.all([
+      contract.methods
+        .getStorageRaw(key)
+        .call(),
+      dock.api.rpc.chain.getBlock(),
+    ]);
 
     expect(success).toBe(true);
     const buffer = Buffer.from(rawData.slice(2), 'hex');
     const [found, ...data] = Array.from(buffer);
     const blockNumber = $.u32.decode(new Uint8Array(data)).toFixed();
-    const { block } = await dock.api.rpc.chain.getBlock();
     expect(!!found).toBe(true);
     expect(+blockNumber).toBe(+block.header.number);
   }, 2000);

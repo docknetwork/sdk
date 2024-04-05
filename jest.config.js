@@ -2,10 +2,9 @@ module.exports = {
   bail: true,
   clearMocks: true,
   testTimeout: 30000,
-  testEnvironment: './tests/test-environment',
-  transformIgnorePatterns: [
-    '/node_modules/(?!@polkadot|@babel|@digitalbazaar)',
-  ],
+  testEnvironment: "./tests/test-environment",
+  transformIgnorePatterns: ["/node_modules/(?!@polkadot|@babel|multiformats)"],
+  workerIdleMemoryLimit: "1G",
   verbose: true,
   globals: {
     Uint8Array,

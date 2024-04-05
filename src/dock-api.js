@@ -21,32 +21,16 @@ import PoaRpcDefs from './rpc-defs/poa-rpc-defs';
 import PriceFeedRpcDefs from './rpc-defs/price-feed-rpc-defs';
 import CoreModsRpcDefs from './rpc-defs/core-mods-rpc-defs';
 
-import ExtrinsicError from './errors/extrinsic-error';
 import TrustRegistryModule from './modules/trust-registry';
-
-function getExtrinsicError(data, api) {
-  // Loop through each of the parameters
-  // trying to find module error information
-  let errorMsg = 'Extrinsic failed submission:';
-  data.forEach((error) => {
-    if (error.isModule) {
-      // for module errors, we have the section indexed, lookup
-      try {
-        const decoded = api.registry.findMetaError(error.asModule);
-        const { docs, method, section } = decoded;
-        errorMsg += `\n${section}.${method}: ${docs.join(' ')}`;
-      } catch (e) {
-        errorMsg += `\nError at module index: ${error.asModule.index} Error: ${error.asModule.error}`;
-      }
-    } else {
-      const errorStr = error.toString();
-      if (errorStr !== '0') {
-        errorMsg += `\n${errorStr}`; // Other, CannotLookup, BadOrigin, no extra info
-      }
-    }
-  });
-  return errorMsg;
-}
+import {
+  sendWithRetries,
+  patchQueryApi,
+  STANDARD_BLOCK_TIME_MS,
+  FASTBLOCK_TIME_MS,
+  FASTBLOCK_CONFIG,
+  STANDARD_CONFIG,
+} from './dock-api-retry';
+import { ensureExtrinsicSucceeded } from './utils/extrinsic';
 
 /**
  * @typedef {object} Options The Options to use in the function DockAPI.
@@ -138,12 +122,28 @@ export default class DockAPI {
     const specVersion = runtimeVersion.specVersion.toNumber();
 
     if (specVersion < 50) {
-      apiOptions.types = { ...(apiOptions.types || {}), DidOrDidMethodKey: 'Did' };
+      apiOptions.types = {
+        ...(apiOptions.types || {}),
+        DidOrDidMethodKey: 'Did',
+      };
       this.api = await ApiPromise.create(apiOptions);
     }
     this.api.specVersion = specVersion;
+    const blockTime = this.api.consts.babe.expectedBlockTime.toNumber();
+    if (
+      blockTime !== STANDARD_BLOCK_TIME_MS
+      && blockTime !== FASTBLOCK_TIME_MS
+    ) {
+      throw new Error(
+        `Unexpected block time: ${blockTime}, expected either ${STANDARD_BLOCK_TIME_MS} or ${FASTBLOCK_TIME_MS}`,
+      );
+    }
+    this.api.isFastBlock = blockTime === FASTBLOCK_TIME_MS;
 
     await this.initKeyring(keyring);
+
+    patchQueryApi(this.api.query);
+    patchQueryApi(this.api.queryMulti);
 
     this.anchorModule.setApi(this.api, this.signAndSend.bind(this));
     this.blobModule = new BlobModule(this.api, this.signAndSend.bind(this));
@@ -262,71 +262,85 @@ export default class DockAPI {
    */
   async signAndSend(extrinsic, waitForFinalization = true, params = {}) {
     const signedExtrinsic = await this.signExtrinsic(extrinsic, params);
-    return this.send(signedExtrinsic, waitForFinalization);
+
+    return await this.send(signedExtrinsic, waitForFinalization);
   }
 
   /**
-   * Helper function to send a transaction that has already been signed
+   * Helper function to send with retries a transaction that has already been signed.
    * @param extrinsic - Extrinsic to send
    * @param waitForFinalization - If true, waits for extrinsic's block to be finalized,
-   * else only wait to be included in block.
-   * @returns {Promise<unknown>}
+   * else only wait to be included in the block.
+   * @returns {Promise<SubmittableResult>}
    */
   async send(extrinsic, waitForFinalization = true) {
-    const promise = new Promise((resolve, reject) => {
-      try {
-        let unsubFunc = null;
-        return extrinsic
-          .send((extrResult) => {
-            const { events = [], status } = extrResult;
+    return await sendWithRetries(
+      this,
+      extrinsic,
+      waitForFinalization,
+      this.api.isFastBlock ? FASTBLOCK_CONFIG : STANDARD_CONFIG,
+    );
+  }
 
-            // Ensure ExtrinsicFailed event doesnt exist
-            for (let i = 0; i < events.length; i++) {
-              const {
-                event: { data, method },
-              } = events[i];
-              if (
-                method === 'ExtrinsicFailed'
-                || method === 'BatchInterrupted'
-              ) {
-                const errorMsg = getExtrinsicError(data, this.api);
-                const error = new ExtrinsicError(
-                  errorMsg,
-                  method,
-                  data,
-                  status,
-                  events,
-                );
-                reject(error);
-                return error;
-              }
-            }
+  /**
+   * Helper function to send without retrying a transaction that has already been signed.
+   * @param {DockAPI} dock
+   * @param {*} extrinsic - Extrinsic to send
+   * @param {boolean} waitForFinalization - If true, waits for extrinsic's block to be finalized,
+   * else only wait to be included in the block.
+   * @returns {Promise<SubmittableResult>}
+   */
+  sendNoRetries(extrinsic, waitForFinalization) {
+    let unsubscribe = null;
+    let unsubscribed = false;
 
-            // If waiting for finalization or if not waiting for finalization, wait for inclusion in block.
-            if (
-              (waitForFinalization && status.isFinalized)
-              || (!waitForFinalization && status.isInBlock)
-            ) {
-              unsubFunc();
-              resolve(extrResult);
-            }
+    const promise = new Promise((resolve, reject) => extrinsic
+      .send((extrResult) => {
+        const { events = [], status } = extrResult;
 
-            return extrResult;
-          })
-          .catch((error) => {
-            reject(error);
-          })
-          .then((unsub) => {
-            unsubFunc = unsub;
-          });
-      } catch (error) {
-        reject(error);
+        ensureExtrinsicSucceeded(this.api, events, status);
+
+        // If waiting for finalization or if not waiting for finalization, wait for inclusion in the block.
+        if (
+          (waitForFinalization && status.isFinalized)
+            || (!waitForFinalization && status.isInBlock)
+        ) {
+          resolve(extrResult);
+        }
+      })
+      .then((unsub) => {
+        if (typeof unsub === 'function') {
+          // `unsubscribed=true` here means that we unsubscribed from this function even before we had a callback set.
+          // Thus we just call this function to unsubscribe.
+          if (unsubscribed) {
+            unsub();
+          } else {
+            unsubscribe = unsub;
+          }
+        }
+      })
+      .catch(reject)).finally(() => void promise.unsubscribe());
+
+    promise.unsubscribe = () => {
+      if (unsubscribed) {
+        return false;
       }
 
-      return this;
-    });
+      if (unsubscribe != null) {
+        try {
+          unsubscribe();
+          unsubscribed = true;
+        } catch (err) {
+          throw new Error(
+            `Failed to unsubscribe from watching extrinsic's status: \`${err}\``,
+          );
+        }
+      }
 
-    return await promise;
+      return true;
+    };
+
+    return promise;
   }
 
   /**

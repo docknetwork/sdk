@@ -1,0 +1,57 @@
+name: Integration tests
+
+on: [pull_request]
+jobs:
+  master:
+    runs-on: ubuntu-latest
+    env:
+      CONFIG_DOCK_NODE_IMAGE_TAG: 'master'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ibnesayeed/setup-ipfs@0.6.0
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        with:
+          run_daemon: true
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '18.x'
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - run: yarn test-with-node
+  mainnet:
+    runs-on: ubuntu-latest
+    env:
+      DisableDidKeyAndTrustRegistryTests: true
+      CONFIG_DOCK_NODE_IMAGE_TAG: 'mainnet'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ibnesayeed/setup-ipfs@0.6.0
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        with:
+          run_daemon: true
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '18.x'
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - run: yarn test-with-node
+  testnet:
+    runs-on: ubuntu-latest
+    env:
+      DisableDidKeyAndTrustRegistryTests: true
+      CONFIG_DOCK_NODE_IMAGE_TAG: 'testnet'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ibnesayeed/setup-ipfs@0.6.0
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        with:
+          run_daemon: true
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '18.x'
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - run: yarn test-with-node

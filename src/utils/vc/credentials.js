@@ -1,6 +1,6 @@
 import jsonld from 'jsonld';
 import jsigs from 'jsonld-signatures';
-import { statusTypeMatches, checkStatus } from '@digitalbazaar/vc-status-list';
+import { statusTypeMatches, checkStatus } from '@digitalcredentials/vc-status-list';
 
 import base64url from 'base64url';
 import { CredentialBuilder, CredentialSchema } from '@docknetwork/crypto-wasm-ts';

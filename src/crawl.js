@@ -6,8 +6,9 @@ no-constant-condition: ["error", { "checkLoops": false }]
 import jsonld from 'jsonld';
 import assert from 'assert';
 import deepEqual from 'deep-equal';
+import { CID } from 'multiformats/cid';
 import { deepClone, assertValidNode } from './utils/common';
-import { queryNextLookup, dereferenceFromIPFS, parseRDFDocument } from './utils/rdf';
+import { queryNextLookup, parseRDFDocument } from './utils/rdf';
 import { inferh } from './utils/cd';
 import { canon } from './utils/canonicalize';
 import { Namer, fromJsonldjsCg } from './utils/claimgraph';
@@ -74,8 +75,8 @@ export function graphResolver(
     let triples;
     const ipfsPrefix = 'ipfs://';
     if (iri.startsWith(ipfsPrefix)) {
-      const cid = iri.slice(ipfsPrefix.length);
-      const body = await dereferenceFromIPFS(cid, ipfsClient);
+      const cid = CID.parse(iri.slice(ipfsPrefix.length));
+      const body = await ipfsClient.get(cid);
       triples = await parseRDFDocument(body, { format: 'text/turtle' });
     } else {
       const jld = (await documentLoader(iri)).document;

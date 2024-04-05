@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Testing isHexWithGivenByteSize \`ReusablePromiseMap\` capacity 1`] = `"\`ReusablePromiseMap\`'s queue reached its capacity"`;
+
+exports[`Testing isHexWithGivenByteSize \`retry\` works properly 1`] = `"From \`onError\` callback"`;
+
+exports[`Testing isHexWithGivenByteSize \`retry\` works properly 2`] = `
+"Promise created by \`async () => {
+      if (!ctr--) {
+        return 0;
+      } else {
+        return placeholder;
+      }
+    }\` didn't resolve within the specified timeout of 1 ms 100 times"
+`;
+
+exports[`Testing isHexWithGivenByteSize \`retry\` works properly 3`] = `
+"Promise created by \`async () => {
+      if (!ctr--) {
+        return 0;
+      } else {
+        return placeholder;
+      }
+    }\` didn't resolve within the specified timeout of 300 ms 4 times"
+`;
+
+exports[`Testing isHexWithGivenByteSize \`timeout\` works properly 1`] = `"Rejected timeout"`;

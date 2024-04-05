@@ -2165,8 +2165,7 @@ try {
 <p>Like in the Private Delegation tutorial, let's assume a root authority, <code>did:ex:a</code>, wants to grant <code>did:ex:b</code> full authority to make claims on behalf of <code>did:ex:a</code>. <code>did:ex:a</code> will post an attestation delegating to <code>did:ex:b</code>.</p>
 <details>
 <summary>Boilerplate</summary>
-<pre><code class="language-js">import createClient from 'ipfs-http-client';
-import { graphResolver } from '@docknetwork/sdk/crawl.js';
+<pre><code class="language-js">import { graphResolver } from '@docknetwork/sdk/crawl.js';
 const { v4: uuidv4 } = require('uuid');
 
 // A running ipfs node is required for crawling.
@@ -2192,7 +2191,9 @@ async function setAttestation(did, didKey, iri) { ... }
 // See the DID resolver tutorial For information about implementing a documentLoader.
 const documentLoader = ...;
 
-const ipfsClient = createClient(ipfsUrl);
+const { createHelia } = await import('helia');
+const { strings } = await import('@helia/strings');
+const ipfsClient = strings(await createHelia(ipfsUrl));
 const resolveGraph = graphResolver(ipfsClient, documentLoader);
 </code></pre>
 </details>

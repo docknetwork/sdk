@@ -16,7 +16,7 @@ export class ReusablePromise {
   }
 
   /**
-   * Checks if a promise exists, if so, `await`s it, otherwise inserts a new `Promise` produced by
+   * Checks if a promise exists, if so, `await`s it, otherwise sets a new `Promise` produced by
    * calling `createPromise` function.
    *
    * @template T
@@ -74,8 +74,9 @@ export class ReusablePromiseMap {
   }
 
   /**
-   * Checks if a promise with the supplied key exists, if so, `await`s it, otherwise inserts a new `Promise` produced by
+   * Checks if a promise with the supplied key exists, if so, `await`s it, otherwise sets a new `Promise` produced by
    * calling `createPromise` function.
+   *
    * In case capacity is reached, the current call will be paused until the next promise(s) is resolved.
    *
    * @template T
@@ -90,11 +91,14 @@ export class ReusablePromiseMap {
 
     if (this.reachedCapacity()) {
       if (this.queue.length === this.queueCapacity) {
-        throw new Error('`ReusablePromiseMap`\'s queue reached its capacity');
+        throw new Error("`ReusablePromiseMap`'s queue reached its capacity");
       }
+      // We have no remaining places in the map, thus the promise can't be executed at the moment and will be queued.
       await new Promise((resolve, reject) => this.queue.push({ resolve, reject }));
 
       if (this.map.has(key)) {
+        this.shiftQueuedItems(1);
+
         return await this.map.get(key);
       }
     }
@@ -116,8 +120,8 @@ export class ReusablePromiseMap {
         deleted = this.map.get(key) === promise && this.map.delete(key);
       }
 
-      if (hasQueued && deleted) {
-        this.queue.shift().resolve();
+      if (deleted) {
+        this.shiftQueuedItems(1);
       }
     }
 
@@ -143,8 +147,20 @@ export class ReusablePromiseMap {
   clear() {
     this.map.clear();
 
-    while (this.queue.length) {
-      this.queue.shift().reject(new Error('`ReusablePromiseMap` was cleared'));
+    this.shiftQueuedItems(Infinity, ({ reject }) => reject(new Error('`ReusablePromiseMap` was cleared')));
+  }
+
+  /**
+   * Shifts up to `limit` items from the queue applying the supplied function to each.
+   *
+   * @param {number} limit
+   * @param {function({ resolve: Function, reject: Function }): void} [f=({ resolve, reject: _ }) => resolve()]
+   */
+  shiftQueuedItems(limit, f = ({ resolve, reject: _ }) => resolve()) {
+    let remaining = limit;
+
+    while (this.queue.length && remaining-- > 0) {
+      f(this.queue.shift());
     }
   }
 }

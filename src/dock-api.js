@@ -23,7 +23,12 @@ import CoreModsRpcDefs from './rpc-defs/core-mods-rpc-defs';
 
 import TrustRegistryModule from './modules/trust-registry';
 import {
-  sendWithRetries, patchQueryApi, STANDARD_BLOCK_TIME_MS, FASTBLOCK_TIME_MS, FASTBLOCK_CONFIG, STANDARD_CONFIG,
+  sendWithRetries,
+  patchQueryApi,
+  STANDARD_BLOCK_TIME_MS,
+  FASTBLOCK_TIME_MS,
+  FASTBLOCK_CONFIG,
+  STANDARD_CONFIG,
 } from './dock-api-retry';
 import { ensureExtrinsicSucceeded } from './utils/extrinsic';
 
@@ -125,7 +130,10 @@ export default class DockAPI {
     }
     this.api.specVersion = specVersion;
     const blockTime = this.api.consts.babe.expectedBlockTime.toNumber();
-    if (blockTime !== STANDARD_BLOCK_TIME_MS && blockTime !== FASTBLOCK_TIME_MS) {
+    if (
+      blockTime !== STANDARD_BLOCK_TIME_MS
+      && blockTime !== FASTBLOCK_TIME_MS
+    ) {
       throw new Error(
         `Unexpected block time: ${blockTime}, expected either ${STANDARD_BLOCK_TIME_MS} or ${FASTBLOCK_TIME_MS}`,
       );
@@ -266,7 +274,12 @@ export default class DockAPI {
    * @returns {Promise<SubmittableResult>}
    */
   async send(extrinsic, waitForFinalization = true) {
-    return await sendWithRetries(this, extrinsic, waitForFinalization, this.api.isFastBlock ? FASTBLOCK_CONFIG : STANDARD_CONFIG);
+    return await sendWithRetries(
+      this,
+      extrinsic,
+      waitForFinalization,
+      this.api.isFastBlock ? FASTBLOCK_CONFIG : STANDARD_CONFIG,
+    );
   }
 
   /**
@@ -287,7 +300,7 @@ export default class DockAPI {
 
         ensureExtrinsicSucceeded(this.api, events, status);
 
-        // If waiting for finalization or if not waiting for finalization, wait for inclusion in block.
+        // If waiting for finalization or if not waiting for finalization, wait for inclusion in the block.
         if (
           (waitForFinalization && status.isFinalized)
             || (!waitForFinalization && status.isInBlock)
@@ -297,6 +310,8 @@ export default class DockAPI {
       })
       .then((unsub) => {
         if (typeof unsub === 'function') {
+          // `unsubscribed=true` here means that we unsubscribed from this function even before we had a callback set.
+          // Thus we just call this function to unsubscribe.
           if (unsubscribed) {
             unsub();
           } else {

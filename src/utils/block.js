@@ -56,7 +56,7 @@ export class BlocksProvider {
       block: {
         header: { number },
       },
-    } = await this.blockByHash(hash, { skipCheck: true });
+    } = await this.blockByHash(hash);
     this.maxBlockNumber = Math.max(number.toNumber(), this.maxBlockNumber);
 
     return number;
@@ -66,45 +66,43 @@ export class BlocksProvider {
    * Retrieves blocks by hash from either the local cache or by querying the node.
    *
    * @param {BlockHash|string} hash
-   * @param {object} configuration
-   * @param {boolean} [configuration.skipCheck=false]
    * @returns {Promise<SignedBlockExtended>}
    */
-  async blockByHash(hash, { skipCheck = false } = {}) {
-    const block = await this.blockByHashCalls.callByKey(String(hash), () => this.api.derive.chain.getBlock(hash));
-    const {
-      block: {
-        header: { number },
-      },
-    } = block;
-
-    if (!skipCheck && number.toNumber() > this.maxBlockNumber) {
-      await this.lastNumber();
-
-      if (number.toNumber() > this.maxBlockNumber) {
-        throw new Error(
-          `Provided block's number ${number.toNumber()} is higher than the latest known block number ${this.maxBlockNumber}`,
-        );
-      }
-    }
-
-    return block;
+  async blockByHash(hash) {
+    return await this.blockByHashCalls.callByKey(String(hash), () => this.api.derive.chain.getBlock(hash));
   }
 
   /**
    * Retrieves blocks by number from either the local cache or by querying the node.
+   * This function will check that the provided block number is less than the latest known
+   * (best or finalized depending on the `finalized` flag).
    *
-   * @param {BlockNumber|number} number
+   * @param {BlockNumber|number} numberOrBlockNumber
+   * @param {object} [configuration={}]
+   * @param {boolean} [configuration.skipCheck=false] - forces number check to be skipped.
    * @returns {Promise<SignedBlockExtended>}
    */
-  async blockByNumber(number) {
-    return await this.blockByNumberCalls.callByKey(String(number), async () => {
-      const hash = await this.api.rpc.chain.getBlockHash(number);
-      if (hash.isNone) {
-        throw new Error(`No hash found for the block ${number}`);
-      }
+  async blockByNumber(numberOrBlockNumber, { skipCheck = false } = {}) {
+    const number = Number(String(numberOrBlockNumber));
 
-      return await this.blockByHash(hash);
-    });
+    // If `skipCheck=true` isn't supplied, check that the provided block number is less than the latest known
+    // (best or finalized depending on the `finalized` flag).
+    if (!skipCheck && number > this.maxBlockNumber) {
+      // Fetch the latest block number. It will be recorded in the `this.maxBlockNumber`.
+      await this.lastNumber();
+
+      if (number.toNumber() > this.maxBlockNumber) {
+        throw new Error(
+          `Provided block's number ${number} is higher than the latest known block number ${this.maxBlockNumber}`,
+        );
+      }
+    }
+
+    return await this.blockByNumberCalls.callByKey(
+      String(numberOrBlockNumber),
+      async () => await this.blockByHash(
+        await this.api.rpc.chain.getBlockHash(numberOrBlockNumber),
+      ),
+    );
   }
 }

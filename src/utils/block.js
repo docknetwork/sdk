@@ -91,7 +91,7 @@ export class BlocksProvider {
       // Fetch the latest block number. It will be recorded in the `this.maxBlockNumber`.
       await this.lastNumber();
 
-      if (number.toNumber() > this.maxBlockNumber) {
+      if (number > this.maxBlockNumber) {
         throw new Error(
           `Provided block's number ${number} is higher than the latest known block number ${this.maxBlockNumber}`,
         );

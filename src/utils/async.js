@@ -55,6 +55,8 @@ export class ReusablePromise {
 
 /**
  * A map where each entry represents a keyed promise that can be reused.
+ * While the underlying map capacity is reached, every new call will be put in the queue
+ * that will be processed every time one of the promises is fulfilled.
  */
 export class ReusablePromiseMap {
   /**
@@ -91,6 +93,10 @@ export class ReusablePromiseMap {
         throw new Error('`ReusablePromiseMap`\'s queue reached its capacity');
       }
       await new Promise((resolve, reject) => this.queue.push({ resolve, reject }));
+
+      if (this.map.has(key)) {
+        return await this.map.get(key);
+      }
     }
 
     const promise = createPromise();

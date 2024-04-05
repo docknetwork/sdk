@@ -114,14 +114,13 @@ export class ReusablePromiseMap {
       err = e;
     } finally {
       const hasQueued = Boolean(this.queue.length);
-      let deleted = false;
 
       if (hasQueued || !this.save || err != null) {
-        deleted = this.map.get(key) === promise && this.map.delete(key);
-      }
+        const deleted = this.map.get(key) === promise && this.map.delete(key);
 
-      if (deleted) {
-        this.shiftQueuedItems(1);
+        if (deleted) {
+          this.shiftQueuedItems(1);
+        }
       }
     }
 
@@ -174,7 +173,7 @@ export class ReusablePromiseMap {
  * @param {function(): Promise<T>} f
  * @returns {Promise<T>}
  */
-export const timeout = async (time, f = () => {}) => await new Promise((resolve, reject) => setTimeout(async () => {
+export const timeout = async (time, f = () => { }) => await new Promise((resolve, reject) => setTimeout(async () => {
   try {
     resolve(await f());
   } catch (err) {
@@ -264,8 +263,7 @@ export const retry = async (
   }
 
   throw new Error(
-    `Promise created by \`${fn}\` didn't resolve within the specified timeout of ${timeLimit} ms ${
-      maxAttempts + 1
+    `Promise created by \`${fn}\` didn't resolve within the specified timeout of ${timeLimit} ms ${maxAttempts + 1
     } times`,
   );
 };

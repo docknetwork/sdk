@@ -8,7 +8,6 @@ import {
   FullNodeEndpoint,
   TestKeyringOpts,
   TestAccountURI,
-  DisableStatusListTests,
 } from '../test-constants';
 
 import { OneOfPolicy } from '../../src/utils/revocation';
@@ -61,21 +60,18 @@ describe('Resolvers', () => {
     // The controller is same as the DID
     await registerNewDIDUsingPair(dock, ownerDID, pair);
 
-    if (!DisableStatusListTests) {
-      statusListCred = await StatusList2021Credential.create(
-        ownerKey,
+    statusListCred = await StatusList2021Credential.create(
+      ownerKey,
+      statusListCredId,
+    {},
+    );await expect(
+      dock.statusListCredential.createStatusListCredential(
         statusListCredId,
-        {},
-      );
-      await expect(
-        dock.statusListCredential.createStatusListCredential(
-          statusListCredId,
-          statusListCred,
-          policy,
-          false,
-        ),
-      ).resolves.toBeDefined();
-    }
+        statusListCred,
+        policy,
+        false,
+      ),
+    ).resolves.toBeDefined();
   }, 40000);
 
   afterAll(async () => {
@@ -93,16 +89,12 @@ describe('Resolvers', () => {
     expect(await resolver.resolve(ownerDID)).toEqual(
       await dock.did.getDocument(ownerDID),
     );
-    if (!DisableStatusListTests) {
-      expect(await resolver.resolve(statusListCred.id)).toEqual(
-        statusListCred.toJSON(),
-      );
-    }
+    expect(await resolver.resolve(statusListCred.id)).toEqual(
+      statusListCred.toJSON(),
+    );
   });
 
   it('checks `DockStatusList2021Resolver`', async () => {
-    if (DisableStatusListTests) return;
-
     const resolver = new DockStatusList2021Resolver(dock);
 
     expect(resolver.supports('did:dock:')).toBe(false);
@@ -129,10 +121,8 @@ describe('Resolvers', () => {
     expect(await resolver.resolve(ownerDID)).toEqual(
       await dock.did.getDocument(ownerDID),
     );
-    if (!DisableStatusListTests) {
-      expect(resolver.resolve(statusListCred.id)).rejects.toThrowError(
-        `Invalid DID: \`${statusListCred.id}\``,
-      );
-    }
+    expect(resolver.resolve(statusListCred.id)).rejects.toThrowError(
+      `Invalid DID: \`${statusListCred.id}\``,
+    );
   });
 });

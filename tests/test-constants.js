@@ -32,8 +32,8 @@ import Bls12381BDDT16KeyPairDock2024 from '../src/utils/vc/crypto/Bls12381BDDT16
 import Bls12381BDDT16MACProofDock2024 from '../src/utils/vc/crypto/Bls12381BDDT16MACProofDock2024';
 
 dotenv.config();
-const DefaultFullNodeEndpoint = 'ws://localhost:9944';
-const DefaultFullNodeTCPEndpoint = 'http://localhost:9933';
+const DefaultFullNodeEndpoint = 'ws://127.0.0.1:9944';
+const DefaultFullNodeTCPEndpoint = 'http://127.0.0.1:9933';
 const DefaultTestKeyringType = 'sr25519';
 const DefaultTestAccountURI = '//Alice';
 const DefaultTestAccountCouncilMemberURI = '//Charlie';
@@ -78,11 +78,11 @@ export const TestAccountCouncilMemberURI = fromEnv(
 export const MinGasPrice = fromEnv('MinGasPrice', DefaultMinGasPrice);
 export const MaxGas = fromEnv('MaxGas', DefaultMaxGas);
 export const TestSchemes = fromEnv('TestSchemes', DefaultTestSchemes);
-export const DisableStatusListTests = boolEnv(
-  fromEnv('DisableStatusListTests', 'false'),
-);
 export const DisableDidKeyAndTrustRegistryTests = boolEnv(
   fromEnv('DisableDidKeyAndTrustRegistryTests', 'false'),
+);
+export const DisableNewAccumulatorTests = boolEnv(
+  fromEnv('DisableNewAccumulatorTests', 'false'),
 );
 
 export const BBS = {

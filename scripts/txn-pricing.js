@@ -1,37 +1,41 @@
 // Txn pricing and weights
 
-import { BTreeSet } from '@polkadot/types';
+import { BTreeMap, BTreeSet } from '@polkadot/types';
 
 import { randomAsHex } from '@polkadot/util-crypto';
-import dock from '../src/index';
-import {
-  createNewDockDID, DidKeypair, typedHexDID,
-} from '../src/utils/did';
-import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
-import { createRandomRegistryId, OneOfPolicy } from '../src/utils/revocation';
-import { BLOB_MAX_BYTE_SIZE } from '../src/modules/blob';
-import { getBalance } from './helpers';
-import { DidKey, VerificationRelationship } from '../src/public-keys';
-import { ServiceEndpointType } from '../src/modules/did/service-endpoint';
 import { hexToU8a, stringToHex, u8aToHex } from '@polkadot/util';
 import {
   Accumulator,
   AccumulatorParams,
   initializeWasm,
   BBSPlusKeypairG2, PositiveAccumulator,
-  BBSPlusSignatureParamsG1, VBWitnessUpdateInfo
+  BBSPlusSignatureParamsG1, VBWitnessUpdateInfo,
 } from '@docknetwork/crypto-wasm-ts';
+import dock from '../src/index';
+import {
+  createNewDockDID, DidKeypair, DidMethodKey, typedHexDID,
+} from '../src/utils/did';
+import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../src/utils/misc';
+import { createRandomRegistryId, OneOfPolicy } from '../src/utils/revocation';
+import { getBalance } from './helpers';
+import { DidKey, VerificationRelationship } from '../src/public-keys';
+import { ServiceEndpointType } from '../src/modules/did/service-endpoint';
 import BBSPlusModule from '../src/modules/bbs-plus';
 import AccumulatorModule from '../src/modules/accumulator';
+import StatusList2021Credential from '../src/status-list-credential/status-list2021-credential';
+import { getKeyDoc } from '../src/utils/vc/helpers';
+import DockDid from '../src/utils/did/typed-did/dock-did';
 
 require('dotenv').config();
 
 const { FullNodeEndpoint, EndowedSecretURI } = process.env;
 
+const unit = 1e6;
+
 function getDidPair() {
   const did = createNewDockDID();
-  const seed = randomAsHex(32);
-  const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
+  // Creating ECDSA pair because its most expensive to verify and thus gives max fees
+  const pair = generateEcdsaSecp256k1Keypair(randomAsHex(32));
   const publicKey = getPublicKeyFromKeyringPair(pair);
   const didKey = new DidKey(publicKey, new VerificationRelationship());
   return [did, new DidKeypair(pair, 1), didKey];
@@ -41,17 +45,26 @@ async function printFeePaid(dockApi, address, fn) {
   const before = await getBalance(dockApi, address);
   await fn();
   const after = await getBalance(dockApi, address);
-  console.info(`Fee paid is ${parseInt(before[0]) - parseInt(after[0])}`);
+  console.info(`Fee paid is ${(parseInt(before[0]) - parseInt(after[0])) / unit}`);
 }
 
 async function dids() {
   const account = dock.keyring.addFromUri(EndowedSecretURI);
   dock.setAccount(account);
 
+  // Using secp curve as its most expensive to verify on node
+  const didMethodKeyPair = DidKeypair.randomSecp256k1();
+  const didMethodKey = DidMethodKey.fromKeypair(didMethodKeyPair);
+
+  await printFeePaid(dock.api, account.address, async () => {
+    console.info('Writing did:key');
+    await dock.did.newDidMethodKey(didMethodKey.asDidMethodKey, false);
+  });
+
   const [did, pair, didKey] = getDidPair();
 
   await printFeePaid(dock.api, account.address, async () => {
-    console.info('Writing DID');
+    console.info('Writing did:dock');
     await dock.did.new(did, [didKey], [], false, undefined, false);
   });
 
@@ -267,15 +280,17 @@ async function blobs() {
   const [did, pair, dk] = getDidPair();
   await dock.did.new(did, [dk], [], false);
 
-  const blobId = randomAsHex(32);
-  const blob = {
-    id: blobId,
-    blob: randomAsHex(BLOB_MAX_BYTE_SIZE),
-  };
-  await printFeePaid(dock.api, account.address, async () => {
-    console.info('Blob write');
-    await dock.blob.new(blob, did, pair, { didModule: dock.did }, false);
-  });
+  for (const blobSize of [100, 200, 300]) {
+    await printFeePaid(dock.api, account.address, async () => {
+      console.info(`Blob write of ${blobSize} bytes`);
+      const blobId = randomAsHex(32);
+      const blob = {
+        id: blobId,
+        blob: randomAsHex(blobSize),
+      };
+      await dock.blob.new(blob, did, pair, { didModule: dock.did }, false);
+    });
+  }
 }
 
 async function bbsPlus() {
@@ -397,21 +412,361 @@ async function transfers() {
 
   const bal1 = await getBalance(dock.api, account.address);
 
-  const transfer = dock.api.tx.balances.transfer(BOB, 100);
+  const amount = 10 * unit;
+  const transfer = dock.api.tx.balances.transfer(BOB, amount);
 
   console.info(`Payment info of 1 transfer is ${(await transfer.paymentInfo(account.address))}`);
-
-  const txs = Array(3).fill(dock.api.tx.balances.transfer(BOB, 100));
-
-  const txBatch = dock.api.tx.utility.batch(txs);
-  console.log(`Batch of ${txs.length} transfers`);
-  console.info(`Payment info of batch is ${(await txBatch.paymentInfo(account.address))}`);
-
   await dock.signAndSend(transfer, false);
 
   const bal2 = await getBalance(dock.api, account.address);
 
-  console.info(`Fee paid is ${parseInt(bal1[0]) - parseInt(bal2[0]) + 100}`);
+  console.log(parseInt(bal1[0]));
+  console.log(parseInt(bal2[0]));
+
+  console.info(`Fee paid is ${(parseInt(bal1[0]) - parseInt(bal2[0]) - amount) / unit}`);
+
+  const txs = Array(3).fill(dock.api.tx.balances.transfer(BOB, amount));
+
+  const txBatch = dock.api.tx.utility.batch(txs);
+  console.log(`Batch of ${txs.length} transfers`);
+  console.info(`Payment info of batch is ${(await txBatch.paymentInfo(account.address))}`);
+}
+
+async function statusList() {
+  const account = dock.keyring.addFromUri(EndowedSecretURI);
+  dock.setAccount(account);
+
+  const [did, pair, dk] = getDidPair();
+  await dock.did.new(did, [dk], [], false);
+
+  const statusListCredId = randomAsHex(32);
+  const ownerKey = getKeyDoc(
+    did,
+    pair.keyPair,
+    'EcdsaSecp256k1VerificationKey2019',
+  );
+
+  const owners = new Set();
+  owners.add(typedHexDID(dock.api, did));
+  const policy = new OneOfPolicy(owners);
+
+  const cred = await StatusList2021Credential.create(
+    ownerKey,
+    statusListCredId,
+  );
+
+  await printFeePaid(dock.api, account.address, async () => {
+    console.info('Creating status list credential');
+    await dock.statusListCredential.createStatusListCredential(
+      statusListCredId,
+      cred,
+      policy,
+      false,
+    );
+  });
+
+  const revokeIds = new Set();
+
+  revokeIds.add((Math.random() * 10e3) | 0);
+
+  await printFeePaid(dock.api, account.address, async () => {
+    console.info('Updating status list credential with 1 item');
+    await cred.update(ownerKey, { revokeIndices: revokeIds });
+    const [revoke, sig, nonce] = await dock.statusListCredential.createSignedUpdateStatusListCredential(
+      statusListCredId,
+      cred,
+      did,
+      pair,
+      { didModule: dock.did },
+    );
+    await dock.statusListCredential.updateStatusListCredential(
+      revoke,
+      [{ nonce, sig }],
+      false,
+    );
+  });
+
+  revokeIds.add((Math.random() * 10e3) | 0);
+
+  await printFeePaid(dock.api, account.address, async () => {
+    console.info('Updating status list credential with 2 items');
+    await cred.update(ownerKey, { revokeIndices: revokeIds });
+    const [revoke, sig, nonce] = await dock.statusListCredential.createSignedUpdateStatusListCredential(
+      statusListCredId,
+      cred,
+      did,
+      pair,
+      { didModule: dock.did },
+    );
+    await dock.statusListCredential.updateStatusListCredential(
+      revoke,
+      [{ nonce, sig }],
+      false,
+    );
+  });
+
+  revokeIds.add((Math.random() * 10e3) | 0);
+
+  await printFeePaid(dock.api, account.address, async () => {
+    console.info('Updating status list credential with 3 items');
+    await cred.update(ownerKey, { revokeIndices: revokeIds });
+    const [revoke, sig, nonce] = await dock.statusListCredential.createSignedUpdateStatusListCredential(
+      statusListCredId,
+      cred,
+      did,
+      pair,
+      { didModule: dock.did },
+    );
+    await dock.statusListCredential.updateStatusListCredential(
+      revoke,
+      [{ nonce, sig }],
+      false,
+    );
+  });
+
+  for (let i = 0; i < 98; i++) {
+    revokeIds.add((Math.random() * 10e3) | 0);
+  }
+
+  await printFeePaid(dock.api, account.address, async () => {
+    console.info('Updating status list credential with 100 items');
+    await cred.update(ownerKey, { revokeIndices: revokeIds });
+    const [revoke, sig, nonce] = await dock.statusListCredential.createSignedUpdateStatusListCredential(
+      statusListCredId,
+      cred,
+      did,
+      pair,
+      { didModule: dock.did },
+    );
+    await dock.statusListCredential.updateStatusListCredential(
+      revoke,
+      [{ nonce, sig }],
+      false,
+    );
+  });
+
+  await printFeePaid(dock.api, account.address, async () => {
+    console.info('Removing status list credential');
+    const [remove, sig, nonce] = await dock.statusListCredential.createSignedRemoveStatusListCredential(
+      statusListCredId,
+      did,
+      pair,
+      { didModule: dock.did },
+    );
+    await dock.statusListCredential.removeStatusListCredential(
+      remove,
+      [{ nonce, sig }],
+      false,
+    );
+  });
+}
+
+async function trustRegistry() {
+  const account = dock.keyring.addFromUri(EndowedSecretURI);
+  dock.setAccount(account);
+
+  let [cDid, cPair, cDk] = getDidPair();
+  await dock.did.new(cDid, [cDk], [], false);
+
+  let [i1Did, i1Pair, i1Dk] = getDidPair();
+  await dock.did.new(i1Did, [i1Dk], [], false);
+
+  let [i2Did, i2Pair, i2Dk] = getDidPair();
+  await dock.did.new(i2Did, [i2Dk], [], false);
+
+  let [i3Did, i3Pair, i3Dk] = getDidPair();
+  await dock.did.new(i3Did, [i3Dk], [], false);
+
+  let [v1Did, v1Pair, v1Dk] = getDidPair();
+  await dock.did.new(v1Did, [v1Dk], [], false);
+
+  let [v2Did, v2Pair, v2Dk] = getDidPair();
+  await dock.did.new(v2Did, [v2Dk], [], false);
+
+  cDid = DockDid.fromQualifiedString(cDid);
+  i1Did = DockDid.fromQualifiedString(i1Did);
+  i2Did = DockDid.fromQualifiedString(i2Did);
+  i3Did = DockDid.fromQualifiedString(i3Did);
+  v1Did = DockDid.fromQualifiedString(v1Did);
+  v2Did = DockDid.fromQualifiedString(v2Did);
+
+  const trustRegistryId = randomAsHex(32);
+  await printFeePaid(dock.api, account.address, async () => {
+    console.info('Creating trust registry');
+    await dock.trustRegistry.initOrUpdate(
+      cDid,
+      trustRegistryId,
+      randomAsHex(20).toString(),
+      randomAsHex(450).toString(),
+      cPair,
+      dock,
+    );
+  });
+
+  const schemaId1 = randomAsHex(32);
+  const schemaId2 = randomAsHex(32);
+
+  const schemas = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'TrustRegistrySchemaMetadata');
+  const issuers = new BTreeMap(dock.api.registry, 'Issuer', 'VerificationPrices');
+  const verifiers = new BTreeSet(dock.api.registry, 'Verifier');
+
+  const issuerPrices1 = new BTreeMap(dock.api.registry, 'String', 'VerificationPrice');
+  issuerPrices1.set('A', 20);
+  const issuerPrices2 = new BTreeMap(dock.api.registry, 'String', 'VerificationPrice');
+  issuerPrices2.set('A', 20);
+  issuerPrices2.set('B', 30);
+
+  await printFeePaid(dock.api, account.address, async () => {
+    console.info('Adding 1 issuer with 1 price');
+    issuers.set(i1Did, issuerPrices1);
+    schemas.set(schemaId1, {
+      issuers,
+    });
+    await dock.trustRegistry.setSchemasMetadata(
+      cDid,
+      trustRegistryId,
+      { Set: schemas },
+      cPair,
+      dock,
+    );
+  });
+
+  await printFeePaid(dock.api, account.address, async () => {
+    console.info('Adding second issuer with 1 price');
+    issuers.set(i2Did, issuerPrices1);
+    schemas.set(schemaId1, {
+      issuers,
+    });
+    await dock.trustRegistry.setSchemasMetadata(
+      cDid,
+      trustRegistryId,
+      { Set: schemas },
+      cPair,
+      dock,
+    );
+  });
+
+  await printFeePaid(dock.api, account.address, async () => {
+    // This will be less costly than previous because this doesn't add a new issuer
+    console.info('Adding 2 prices for both issuers');
+    issuers.set(i1Did, issuerPrices2);
+    issuers.set(i2Did, issuerPrices2);
+    schemas.set(schemaId1, {
+      issuers,
+    });
+    await dock.trustRegistry.setSchemasMetadata(
+      cDid,
+      trustRegistryId,
+      { Set: schemas },
+      cPair,
+      dock,
+    );
+  });
+
+  await printFeePaid(dock.api, account.address, async () => {
+    console.info('Adding 1 verifier');
+    verifiers.add(v1Did);
+    schemas.set(schemaId1, {
+      verifiers,
+    });
+    await dock.trustRegistry.setSchemasMetadata(
+      cDid,
+      trustRegistryId,
+      { Set: schemas },
+      cPair,
+      dock,
+    );
+  });
+
+  await printFeePaid(dock.api, account.address, async () => {
+    console.info('Adding 1 more verifier to the same schema');
+    verifiers.add(v2Did);
+    schemas.set(schemaId1, {
+      verifiers,
+    });
+    await dock.trustRegistry.setSchemasMetadata(
+      cDid,
+      trustRegistryId,
+      { Set: schemas },
+      cPair,
+      dock,
+    );
+  });
+
+  await printFeePaid(dock.api, account.address, async () => {
+    console.info('Adding 1 delegated issuer');
+    const issuers = new BTreeSet(dock.api.registry, 'Issuer');
+    issuers.add(i3Did);
+    await dock.trustRegistry.updateDelegatedIssuers(
+      i1Did,
+      trustRegistryId,
+      { Set: issuers },
+      i1Pair,
+      dock,
+    );
+  });
+
+  await printFeePaid(dock.api, account.address, async () => {
+    console.info('Suspending 1 issuer');
+    await dock.trustRegistry.suspendIssuers(
+      cDid,
+      trustRegistryId,
+      [i1Did],
+      cPair,
+      dock,
+    );
+  });
+
+  const schemas2 = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'TrustRegistrySchemaMetadata');
+  let issuers2 = new BTreeMap(dock.api.registry, 'Issuer', 'VerificationPrices');
+
+  await printFeePaid(dock.api, account.address, async () => {
+    console.info('Adding issuer with 1 price to a new schema using `Modify`');
+    issuers2.set(i2Did, issuerPrices1);
+    schemas2.set(schemaId2, {
+      Add: {
+        issuers: issuers2,
+      },
+    });
+    await dock.trustRegistry.setSchemasMetadata(
+      cDid,
+      trustRegistryId,
+      { Modify: schemas2 },
+      cPair,
+      dock,
+    );
+  });
+
+  const schemaId3 = randomAsHex(32);
+  await printFeePaid(dock.api, account.address, async () => {
+    console.info('Adding issuer with 1 price to a new schema');
+    const schemas3 = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'TrustRegistrySchemaMetadata');
+    issuers2 = new BTreeMap(dock.api.registry, 'Issuer', 'VerificationPrices');
+    issuers2.set(i2Did, issuerPrices1);
+    schemas3.set(schemaId3, {
+      issuers: issuers2,
+    });
+    await dock.trustRegistry.setSchemasMetadata(
+      cDid,
+      trustRegistryId,
+      { Set: schemas3 },
+      cPair,
+      dock,
+    );
+  });
+
+  await printFeePaid(dock.api, account.address, async () => {
+    console.info('Removing 1 existing schema');
+    const schemas = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'TrustRegistrySchemaMetadata');
+    schemas.set(schemaId3, 'Remove');
+    await dock.trustRegistry.setSchemasMetadata(
+      cDid,
+      trustRegistryId,
+      { Modify: schemas },
+      cPair,
+      dock,
+    );
+  });
 }
 
 async function main() {
@@ -440,6 +795,12 @@ async function main() {
       break;
     case 6:
       await accumulator();
+      break;
+    case 7:
+      await statusList();
+      break;
+    case 8:
+      await trustRegistry();
       break;
     default:
       console.error('Invalid value for argument');

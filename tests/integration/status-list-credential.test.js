@@ -4,7 +4,6 @@ import {
   FullNodeEndpoint,
   TestKeyringOpts,
   TestAccountURI,
-  DisableStatusListTests,
 } from '../test-constants';
 import { DockAPI } from '../../src/index';
 import defaultDocumentLoader from '../../src/utils/vc/document-loader';
@@ -27,11 +26,7 @@ import { addStatusList21EntryToCredential } from '../../src/utils/vc/credentials
 
 const credId = 'A large credential id with size > 32 bytes';
 
-const buildTest = DisableStatusListTests
-  ? describe.skip
-  : describe;
-
-buildTest('StatusList2021Credential', () => {
+describe('StatusList2021Credential', () => {
   const dockAPI = new DockAPI();
   const resolver = new DockResolver(dockAPI);
 

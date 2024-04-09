@@ -1,10 +1,17 @@
 /* eslint-disable camelcase */
 
-import { isHex, u8aToHex } from '@polkadot/util';
+import { hexToU8a, isHex, u8aToHex } from '@polkadot/util';
+import { KBUniversalAccumulatorValue } from '@docknetwork/crypto-wasm-ts';
 import { getDidNonce, getStateChange } from '../utils/misc';
 import WithParamsAndPublicKeys from './WithParamsAndPublicKeys';
 import { getAllExtrinsicsFromBlock } from '../utils/chain-ops';
 import { createDidSig, typedHexDID } from '../utils/did';
+
+export const AccumulatorType = {
+  VBPos: 0,
+  VBUni: 1,
+  KBUni: 2,
+};
 
 /** Class to manage accumulators on chain */
 export default class AccumulatorModule extends WithParamsAndPublicKeys {
@@ -51,6 +58,19 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     };
   }
 
+  static prepareAddKBUniversalAccumulator(api, id, accumulated, publicKeyRef) {
+    const keyRef = AccumulatorModule.parseRef(api, publicKeyRef);
+    return {
+      id,
+      accumulator: {
+        KBUniversal: {
+          accumulated,
+          keyRef,
+        },
+      },
+    };
+  }
+
   static ensureArrayOfBytearrays(arr) {
     if (!(typeof arr === 'object' && arr instanceof Array)) {
       throw new Error(`Require an array but got ${arr}`);
@@ -77,6 +97,46 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
       return [u8aToHex(event.data[0]), u8aToHex(event.data[1])];
     }
     return null;
+  }
+
+  /**
+   * Return the accumulated value as hex
+   * @param accumulated {Uint8Array|KBUniversalAccumulatorValue}
+   * @param typ {number} - Type of the accumulator
+   * @returns {string}
+   */
+  static accumulatedAsHex(accumulated, typ = AccumulatorType.VBPos) {
+    if (typ === AccumulatorType.VBPos || typ === AccumulatorType.VBUni) {
+      return u8aToHex(accumulated);
+    } else if (typ === AccumulatorType.KBUni) {
+      // Create a single Uint8Array and convert it to hex. The 2 are guaranteed to be of the same length
+      const merged = new Uint8Array(accumulated.mem.length + accumulated.nonMem.length);
+      merged.set(accumulated.mem);
+      merged.set(accumulated.nonMem, accumulated.mem.length);
+      return u8aToHex(merged);
+    } else {
+      throw new Error(`Unknown accumulator type ${typ}`);
+    }
+  }
+
+  /**
+   * Parse the given accumulated value in hex form
+   * @param accumulated {string}
+   * @param typ {number} - Type of the accumulator
+   * @returns {Uint8Array|KBUniversalAccumulatorValue}
+   */
+  static accumulatedFromHex(accumulated, typ = AccumulatorType.VBPos) {
+    if (typ === AccumulatorType.VBPos || typ === AccumulatorType.VBUni) {
+      return hexToU8a(accumulated);
+    } else if (typ === AccumulatorType.KBUni) {
+      // Create 2 Uint8Array from this hex. The 2 are guaranteed to be of the same length
+      const merged = hexToU8a(accumulated);
+      const mem = merged.subarray(0, merged.length / 2);
+      const nonMem = merged.subarray(merged.length / 2);
+      return new KBUniversalAccumulatorValue(mem, nonMem);
+    } else {
+      throw new Error(`Unknown accumulator type ${typ}`);
+    }
   }
 
   /**
@@ -135,7 +195,8 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * Create a transaction to add positive (add-only) accumulator
    * @param id - Unique accumulator id
    * @param accumulated - Current accumulated value.
-   * @param publicKeyRef - Reference to accumulator public key
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
    * @param signerDid - Signer of the transaction payload
    * @param signingKeyRef - Signer's keypair reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
@@ -167,7 +228,8 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * Create a transaction to add universal (supports add/remove) accumulator
    * @param id - Unique accumulator id
    * @param accumulated - Current accumulated value.
-   * @param publicKeyRef - Reference to accumulator public key
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
    * @param maxSize - Maximum size of the accumulator
    * @param signerDid - Signer of the transaction payload
    * @param signingKeyRef - Signer's keypair reference
@@ -191,6 +253,39 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
       accumulated,
       publicKeyRef,
       maxSize,
+      signerHexDid,
+      signingKeyRef,
+      { nonce, didModule },
+    );
+    return this.module.addAccumulator(addAccumulator, signature);
+  }
+
+  /**
+   * Create a transaction to add KB universal (supports add/remove) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
+   * @param signerDid - Signer of the transaction payload
+   * @param signingKeyRef - Signer's keypair reference
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @returns {Promise<*>}
+   */
+  async createAddKBUniversalAccumulatorTx(
+    id,
+    accumulated,
+    publicKeyRef,
+    signerDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
+    const signerHexDid = typedHexDID(this.api, signerDid);
+    const [addAccumulator, signature] = await this.createSignedAddKBUniversalAccumulator(
+      id,
+      accumulated,
+      publicKeyRef,
       signerHexDid,
       signingKeyRef,
       { nonce, didModule },
@@ -324,7 +419,8 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * Add a positive (add-only) accumulator
    * @param id - Unique accumulator id
    * @param accumulated - Current accumulated value.
-   * @param publicKeyRef - Reference to accumulator public key
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
    * @param signerDid - Signer of the transaction payload
    * @param signingKeyRef - Signer's keypair reference
    * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
@@ -359,7 +455,8 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * Add universal (supports add/remove) accumulator
    * @param id - Unique accumulator id
    * @param accumulated - Current accumulated value.
-   * @param publicKeyRef - Reference to accumulator public key
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
    * @param maxSize - Maximum size of the accumulator
    * @param signerDid - Signer of the transaction payload
    * @param signingKeyRef - Signer's keypair reference
@@ -386,6 +483,42 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
       accumulated,
       publicKeyRef,
       maxSize,
+      signerDid,
+      signingKeyRef,
+      { nonce, didModule },
+    );
+    return this.signAndSend(tx, waitForFinalization, params);
+  }
+
+  /**
+   * Add KB universal (supports add/remove) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
+   * @param signerDid - Signer of the transaction payload
+   * @param signingKeyRef - Signer's keypair reference
+   * @param nonce - The nonce to be used for sending this transaction. If not provided then `didModule` must be provided.
+   * @param didModule - Reference to the DID module. If nonce is not provided then the next nonce for the DID is fetched by
+   * using this
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<*>}
+   */
+  async addKBUniversalAccumulator(
+    id,
+    accumulated,
+    publicKeyRef,
+    signerDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const tx = await this.createAddKBUniversalAccumulatorTx(
+      id,
+      accumulated,
+      publicKeyRef,
       signerDid,
       signingKeyRef,
       { nonce, didModule },
@@ -535,6 +668,28 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     return [addAccum, didSig];
   }
 
+  async createSignedAddKBUniversalAccumulator(
+    id,
+    accumulated,
+    publicKeyRef,
+    signerHexDid,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
+    // eslint-disable-next-line no-param-reassign
+    nonce = await getDidNonce(signerHexDid, nonce, didModule);
+    const accum = AccumulatorModule.prepareAddKBUniversalAccumulator(
+      this.api,
+      id,
+      accumulated,
+      publicKeyRef,
+    );
+    const addAccum = { ...accum, nonce };
+    const signature = this.signAddAccumulator(signingKeyRef, addAccum);
+    const didSig = createDidSig(signerHexDid, signingKeyRef, signature);
+    return [addAccum, didSig];
+  }
+
   async createSignedUpdateAccumulator(
     id,
     newAccumulated,
@@ -607,10 +762,13 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
       if (accumInfo.accumulator.isPositive) {
         accumulatorObj.type = 'positive';
         common = accumInfo.accumulator.asPositive;
-      } else {
+      } else if (accumInfo.accumulator.isUniversal) {
         accumulatorObj.type = 'universal';
         common = accumInfo.accumulator.asUniversal.common;
         accumulatorObj.maxSize = accumInfo.accumulator.asUniversal.maxSize.toNumber();
+      } else {
+        accumulatorObj.type = 'kb-universal';
+        common = accumInfo.accumulator.asKbUniversal;
       }
       accumulatorObj.accumulated = u8aToHex(common.accumulated);
       const owner = common.keyRef[0];
@@ -618,6 +776,9 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
       accumulatorObj.keyRef = [typedHexDID(this.api, owner), keyId];
 
       if (withKeyAndParams || withKeyOnly) {
+        if (keyId === 0) {
+          throw new Error('Key id is 0 which means no public key exists for the accumulator on chain');
+        }
         const pk = await this.getPublicKeyByHexDid(
           owner,
           keyId,

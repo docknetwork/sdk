@@ -9,7 +9,7 @@ import {
 import { randomAsHex } from '@polkadot/util-crypto';
 import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
 import { DockAPI } from '../../../src';
-import AccumulatorModule from '../../../src/modules/accumulator';
+import AccumulatorModule, { AccumulatorType } from '../../../src/modules/accumulator';
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
 import { registerNewDIDUsingPair } from '../helpers';
@@ -80,15 +80,15 @@ describe('Prefilled positive accumulator', () => {
     expect(accumState.state.size).toEqual(totalMembers);
 
     accumulatorId = randomAsHex(32);
-    const accumulated = u8aToHex(accumulator.accumulated);
+    const accumulated = AccumulatorModule.accumulatedAsHex(accumulator.accumulated, AccumulatorType.VBPos);
     await dock.accumulatorModule.addPositiveAccumulator(accumulatorId, accumulated, [did, 1], did, pair, { didModule: dock.didModule }, false);
     const queriedAccum = await dock.accumulatorModule.getAccumulator(accumulatorId, true);
-    expect(queriedAccum.accumulated).toEqual(u8aToHex(accumulator.accumulated));
+    expect(queriedAccum.accumulated).toEqual(accumulated);
   });
 
   test('Witness creation, verification should work', async () => {
     let queriedAccum = await dock.accumulatorModule.getAccumulator(accumulatorId, true);
-    let verifAccumulator = PositiveAccumulator.fromAccumulated(hexToU8a(queriedAccum.accumulated));
+    let verifAccumulator = PositiveAccumulator.fromAccumulated(AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated, AccumulatorType.VBPos));
 
     // Witness created for member 1
     const member1 = members[10];
@@ -116,14 +116,14 @@ describe('Prefilled positive accumulator', () => {
     await accumulator.remove(member2, keypair.secretKey, accumState);
 
     let accum = await dock.accumulatorModule.getAccumulator(accumulatorId, false);
-    const accumulated = u8aToHex(accumulator.accumulated);
+    const accumulated = AccumulatorModule.accumulatedAsHex(accumulator.accumulated, AccumulatorType.VBPos);
     const witUpdBytes = u8aToHex(witnessUpdInfo.value);
     await dock.accumulatorModule.updateAccumulator(accumulatorId, accumulated, { removals: [u8aToHex(member2)], witnessUpdateInfo: witUpdBytes }, did, pair, { didModule: dock.didModule }, false);
 
     queriedAccum = await dock.accumulatorModule.getAccumulator(accumulatorId, true);
     expect(queriedAccum.accumulated).toEqual(accumulated);
 
-    verifAccumulator = PositiveAccumulator.fromAccumulated(hexToU8a(queriedAccum.accumulated));
+    verifAccumulator = PositiveAccumulator.fromAccumulated(AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated, AccumulatorType.VBPos));
 
     accumPk = new AccumulatorPublicKey(hexToU8a(queriedAccum.publicKey.bytes));
     accumParams = new AccumulatorParams(hexToU8a(queriedAccum.publicKey.params.bytes));

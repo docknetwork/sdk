@@ -6,7 +6,6 @@ import {
   FullNodeEndpoint,
   TestKeyringOpts,
   TestAccountURI,
-  DisableStatusListTests,
 } from '../test-constants';
 
 import {
@@ -26,9 +25,8 @@ const expectEqualCreds = (cred1, cred2) => {
     StatusList2021Credential.fromJSON(cred2.toJSON()),
   );
 };
-const buildTest = DisableStatusListTests ? describe.skip : describe;
 
-buildTest('StatusListCredential Module', () => {
+describe('StatusListCredential Module', () => {
   const dock = new DockAPI();
   let pair;
   let pair2;

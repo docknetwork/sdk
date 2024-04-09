@@ -8,7 +8,7 @@ const getRevertReason = require('eth-revert-reason');
 
 const { FullNodeEndpoint } = process.env;
 
-const web3 = new Web3('http://localhost:9933');
+const web3 = new Web3('http://127.0.0.1:9933');
 
 async function main() {
   const [alice, bob] = getTestEVMAccountsFromWeb3(web3);

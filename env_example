@@ -1,7 +1,7 @@
 # This is an example .env file to show different params
 
 # The node to connect to for sending RPC commands
-FullNodeEndpoint = "ws://localhost:9944"
+FullNodeEndpoint = "ws://127.0.0.1:9944"
 
 # Whether connecting to a testnet or mainnet. Possible values are `test` and `main`
 Network = "test"

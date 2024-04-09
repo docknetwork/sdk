@@ -8,11 +8,6 @@ jobs:
       CONFIG_DOCK_NODE_IMAGE_TAG: 'master'
     steps:
       - uses: actions/checkout@v2
-      - uses: ibnesayeed/setup-ipfs@0.6.0
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-        with:
-          run_daemon: true
       - uses: actions/setup-node@v1
         with:
           node-version: '18.x'
@@ -27,11 +22,6 @@ jobs:
       CONFIG_DOCK_NODE_IMAGE_TAG: 'mainnet'
     steps:
       - uses: actions/checkout@v2
-      - uses: ibnesayeed/setup-ipfs@0.6.0
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-        with:
-          run_daemon: true
       - uses: actions/setup-node@v1
         with:
           node-version: '18.x'
@@ -45,11 +35,6 @@ jobs:
       CONFIG_DOCK_NODE_IMAGE_TAG: 'testnet'
     steps:
       - uses: actions/checkout@v2
-      - uses: ibnesayeed/setup-ipfs@0.6.0
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-        with:
-          run_daemon: true
       - uses: actions/setup-node@v1
         with:
           node-version: '18.x'

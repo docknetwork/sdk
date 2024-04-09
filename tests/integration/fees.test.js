@@ -290,7 +290,7 @@ describe.skip('Fees', () => {
 
     let revokeIds;
     for (const count of [1, 2, 3, 5, 10]) {
-      revokeIds = new BTreeSet();
+      revokeIds = new BTreeSet(dock.api.registry, 'RevokeId');
       for (let i = 0; i < count; i++) {
         revokeIds.add(randomAsHex(32));
       }

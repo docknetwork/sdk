@@ -78,27 +78,6 @@ export async function queryNextLookup(claimgraph, query, engine) {
 }
 
 /**
- * Dereferences a CID from IPFS into a string, expects a running node to be connected to
- * @param {string} cid - IPFS document cid hash
- * @param {object} ipfsClient - The IPFS HTTP Client
- * @param {object} options - IPFS HTTP Client options passed to cat
- * @returns {Promise<string>}
- */
-export async function dereferenceFromIPFS(cid, ipfsClient, options = {}) {
-  if (cid.indexOf('/ipns/') !== -1) {
-    throw new Error(`Dereferencing of IPNS documents is disabled in this method, cid: ${cid}`);
-  }
-
-  const result = [];
-  const document = await ipfsClient.cat(cid, options);
-  for await (const entry of document) {
-    result.push(entry.toString());
-  }
-
-  return result.join('\n');
-}
-
-/**
  * Parses an RDF document string and formats it according to rify requirements
  * @param {string} document - RDF document in turtle or other form
  * @param {object} parserOptions - N3 Parser configuration object

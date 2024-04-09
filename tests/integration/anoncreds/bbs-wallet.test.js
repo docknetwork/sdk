@@ -242,6 +242,10 @@ describe('Presentation from older credentials', () => {
     await initializeWasm();
   });
 
+  afterAll(async () => {
+    await dock.disconnect();
+  });
+
   test('works', async () => {
     await verifyDerivedCredential();
   });

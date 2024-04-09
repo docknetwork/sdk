@@ -25,7 +25,7 @@ import {
 import { DEFAULT_CONTEXT_V1_URL } from './constants';
 
 import {
-  EcdsaSepc256k1Signature2019,
+  EcdsaSecp256k1Signature2019,
   Ed25519Signature2018,
   Sr25519Signature2020,
   JsonWebSignature2020,
@@ -55,7 +55,7 @@ function checkPresentation(presentation) {
   if (context[0] !== DEFAULT_CONTEXT_V1_URL) {
     throw new Error(
       `"${DEFAULT_CONTEXT_V1_URL}" needs to be first in the `
-        + 'list of contexts.',
+      + 'list of contexts.',
     );
   }
 
@@ -156,7 +156,7 @@ export async function verifyPresentation(presentation, options = {}) {
     resolver: null,
     suite: [
       new Ed25519Signature2018(),
-      new EcdsaSepc256k1Signature2019(),
+      new EcdsaSecp256k1Signature2019(),
       new Sr25519Signature2020(),
       new JsonWebSignature2020(),
       ...suite,

@@ -126,6 +126,8 @@ describe.each(Schemes)('Derived Credentials', ({
     },
   };
 
+  // Setup 4 accumulators, 2 with keyed verification and 2 with public key verification
+
   const posAccumulatorId = randomAsHex(32);
   const posAccumState = new InMemoryState();
   let posAccumKeypair;
@@ -239,9 +241,11 @@ describe.each(Schemes)('Derived Credentials', ({
     // For keyed-verification accumulator, public key is not written on chain.
     const uniKvAccumKeypair = Accumulator.generateKeypair(params);
 
+    // All 4 accumulators will have the same member
     accumMember = '10';
     encodedMember = Encoder.defaultEncodeFunc()(accumMember);
 
+    // The 2 positive accumulators are pre-filled with the following members and the other 2 have the domain set to these
     const members = [];
     for (let i = 1; i < 100; i++) {
       // Using default encoder since thats what the is used in credential by default. Ideally, the encoder specified in
@@ -597,7 +601,7 @@ describe.each(Schemes)('Derived Credentials', ({
     };
     const [presentationInstance, presentationOptions] = await getPresentationInstance(credentialStatus);
 
-    presentationInstance.presBuilder.addAccumInfoForCredStatus(0, uniAccumWitness, AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated, AccumulatorType.KBUni), accumPk);
+    presentationInstance.presBuilder.addAccumInfoForCredStatus(0, uniAccumWitness, AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated, AccumulatorType.KBUni));
 
     // Derive a W3C Verifiable Credential JSON from the above presentation
     const credentials = await presentationInstance.deriveCredentials(

@@ -6,11 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ibnesayeed/setup-ipfs@0.6.0
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-        with:
-          run_daemon: true
       - uses: actions/setup-node@v1
         with:
           node-version: '18.x'

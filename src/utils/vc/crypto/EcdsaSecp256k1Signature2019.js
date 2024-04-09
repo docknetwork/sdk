@@ -5,9 +5,9 @@ import CustomLinkedDataSignature from './common/CustomLinkedDataSignature';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
-export default class EcdsaSepc256k1Signature2019 extends CustomLinkedDataSignature {
+export default class EcdsaSecp256k1Signature2019 extends CustomLinkedDataSignature {
   /**
-   * Creates a new EcdsaSepc256k1Signature2019 instance
+   * Creates a new EcdsaSecp256k1Signature2019 instance
    * @constructor
    * @param {object} config - Configuration options
    */
@@ -19,7 +19,7 @@ export default class EcdsaSepc256k1Signature2019 extends CustomLinkedDataSignatu
       LDKeyClass: EcdsaSecp256k1VerificationKey2019,
       contextUrl: SUITE_CONTEXT_URL,
       alg: 'ES256K',
-      signer: signer || EcdsaSepc256k1Signature2019.signerFactory(keypair, verificationMethod),
+      signer: signer || EcdsaSecp256k1Signature2019.signerFactory(keypair, verificationMethod),
       verifier,
       useProofValue,
     });

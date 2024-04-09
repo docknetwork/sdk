@@ -30,7 +30,7 @@ import {
 import { ensureValidDatetime } from '../type-helpers';
 
 import {
-  EcdsaSepc256k1Signature2019,
+  EcdsaSecp256k1Signature2019,
   Ed25519Signature2018,
   Sr25519Signature2020,
   Bls12381PSSignatureDock2023,
@@ -342,7 +342,7 @@ export async function verifyCredential(
   };
   const fullSuite = [
     new Ed25519Signature2018(),
-    new EcdsaSepc256k1Signature2019(),
+    new EcdsaSecp256k1Signature2019(),
     new Sr25519Signature2020(),
     new JsonWebSignature2020(),
     new Bls12381BBSSignatureDock2022(anoncredsParams),
@@ -558,7 +558,7 @@ export async function verifyPrivateStatus(credentialStatus, privateStatusListCre
 }) {
   const fullSuite = [
     new Ed25519Signature2018(),
-    new EcdsaSepc256k1Signature2019(),
+    new EcdsaSecp256k1Signature2019(),
     new Sr25519Signature2020(),
     new JsonWebSignature2020(),
     ...suite,

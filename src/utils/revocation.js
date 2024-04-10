@@ -73,24 +73,23 @@ export function getCredentialStatus(expanded) {
   return status;
 }
 
+const ldTypeGen = (typ) => [typ, `${LD_SEC_TERM}${typ}`, `/${typ}`];
+const REV_REG_LD_TYPES = [RevRegType].flatMap(ldTypeGen);
+const ACCUMULATOR_LD_TYPES = [VB_ACCUMULATOR_22, KB_UNI_ACCUMULATOR_24].flatMap(ldTypeGen);
+
 /**
  * Returns `true` if supplied status is a registry revocation status.
  * @param status
  * @returns {boolean}
  */
-export const isRegistryRevocationStatus = ({ [credentialTypeField]: type }) => type.includes(RevRegType) || type.includes(`${LD_SEC_TERM}${RevRegType}`) || type.includes(`/${RevRegType}`);
+export const isRegistryRevocationStatus = ({ [credentialTypeField]: type }) => REV_REG_LD_TYPES.some((t) => type.includes(t));
 
 /**
  * Returns `true` if supplied status is a accumulator revocation status.
  * @param status
  * @returns {boolean}
  */
-export const isAccumulatorRevocationStatus = ({ [credentialTypeField]: type }) => type.includes(VB_ACCUMULATOR_22)
-  || type.includes(`${LD_SEC_TERM}${VB_ACCUMULATOR_22}`)
-  || type.includes(`/${VB_ACCUMULATOR_22}`)
-  || type.includes(KB_UNI_ACCUMULATOR_24)
-  || type.includes(`${LD_SEC_TERM}${KB_UNI_ACCUMULATOR_24}`)
-  || type.includes(`/${KB_UNI_ACCUMULATOR_24}`);
+export const isAccumulatorRevocationStatus = ({ [credentialTypeField]: type }) => ACCUMULATOR_LD_TYPES.some((t) => type.includes(t));
 
 /**
  * Checks if a credential status has a registry revocation.

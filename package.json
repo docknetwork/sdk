@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "8.1.0",
+  "version": "8.1.1",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -18,7 +18,6 @@
     "@babel/preset-env": "^7.24.3",
     "@comunica/actor-init-sparql-rdfjs": "^1.22.3",
     "@comunica/types": "^1.0.0",
-    "@docknetwork/crypto-wasm": "^0.22.0",
     "@helia/strings": "^3.0.1",
     "@rollup/plugin-alias": "^4.0.2",
     "@rollup/plugin-commonjs": "^24.0.0",

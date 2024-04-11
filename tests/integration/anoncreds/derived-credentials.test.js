@@ -467,6 +467,7 @@ describe.each(Schemes)('Derived Credentials', ({
         lprNumber: 1234,
       }),
     );
+    expect(credentials[0].issuer).toEqual(credential.issuer);
 
     // Ensure reconstructing presentation from credential matches
     // NOTE: ignoring proof here as itll differ when signed twice as above
@@ -534,6 +535,7 @@ describe.each(Schemes)('Derived Credentials', ({
     );
 
     expect(credentials.length).toEqual(1);
+    expect(credentials[0].issuer).toEqual(did1);
     expect(credentials[0].credentialStatus).toBeDefined();
     expect(credentials[0].credentialStatus).toEqual({
       ...credentialStatus,
@@ -572,6 +574,7 @@ describe.each(Schemes)('Derived Credentials', ({
     );
 
     expect(credentials.length).toEqual(1);
+    expect(credentials[0].issuer).toEqual(did1);
     expect(credentials[0].credentialStatus).toBeDefined();
     expect(credentials[0].credentialStatus).toEqual({
       ...credentialStatus,
@@ -610,6 +613,7 @@ describe.each(Schemes)('Derived Credentials', ({
 
     const accAsU8 = AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated, AccumulatorType.KBUni);
     expect(credentials.length).toEqual(1);
+    expect(credentials[0].issuer).toEqual(did1);
     expect(credentials[0].credentialStatus).toBeDefined();
     expect(credentials[0].credentialStatus).toEqual({
       ...credentialStatus,
@@ -649,6 +653,7 @@ describe.each(Schemes)('Derived Credentials', ({
 
     const accAsU8 = AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated, AccumulatorType.KBUni);
     expect(credentials.length).toEqual(1);
+    expect(credentials[0].issuer).toEqual(did1);
     expect(credentials[0].credentialStatus).toBeDefined();
     expect(credentials[0].credentialStatus).toEqual({
       ...credentialStatus,
@@ -726,6 +731,7 @@ describe.each(Schemes)('Derived Credentials', ({
     );
     expect(credentials.length).toEqual(1);
     expect(credentials[0].proof).toBeDefined();
+    expect(credentials[0].issuer).toEqual(credential.issuer);
     expect(credentials[0].proof.bounds).toBeDefined();
     expect(credentials[0].proof.bounds).toEqual({
       issuanceDate: [{

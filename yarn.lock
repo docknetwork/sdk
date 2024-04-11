@@ -2895,13 +2895,6 @@
     lzutf8 "0.6.3"
     semver "^7.6.0"
 
-"@docknetwork/crypto-wasm@^0.22.0":
-  version "0.22.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.22.0.tgz#be7f42b7877a53ba328b69cdd55c390b823e53b5"
-  integrity sha512-A9n+osu+TmPD/stztB+VBHaoTV8cSjur0oIVqiu9XRit2ZSIDPvdZ8dxkGWfV7EuavoVAM5OrZRDDwCzFhk+SQ==
-  dependencies:
-    buffer "^6.0.3"
-
 "@docknetwork/node-types@^0.17.0":
   version "0.17.0"
   resolved "https://registry.yarnpkg.com/@docknetwork/node-types/-/node-types-0.17.0.tgz#ca0ddb5b819e012e8f2f112353008325de4f3e33"

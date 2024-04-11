@@ -160,7 +160,7 @@ export default class Presentation {
         throw new Error(`"issuer" cant be an array but was ${json.issuer}`);
       } else if (typeof json.issuer === 'object') {
         const [names, _] = flattenObjectToKeyValuesList(json.issuer);
-        toReveal.push(...names);
+        toReveal.push(...names.map((n) => `issuer.${n}`));
       } else {
         throw new Error(`Unexpected value for "issuer" ${json.issuer}`);
       }

@@ -15,9 +15,9 @@ import {
   PSSignature,
   BBSSignature,
   BBSPlusSignatureG1, BDDT16KeypairG1,
+  BDDT16Mac, BDDT16MacParams,
 } from '@docknetwork/crypto-wasm-ts';
 import dotenv from 'dotenv';
-import { BDDT16Mac, BDDT16MacParams } from '@docknetwork/crypto-wasm-ts/lib/bddt16-mac';
 import BBSModule from '../src/modules/bbs';
 import BBSPlusModule from '../src/modules/bbs-plus';
 import PSModule from '../src/modules/ps';

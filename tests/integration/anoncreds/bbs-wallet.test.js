@@ -1,5 +1,4 @@
-import { initializeWasm } from '@docknetwork/crypto-wasm/lib/index';
-// import axios from 'axios';
+import { initializeWasm } from '@docknetwork/crypto-wasm-ts';
 import dock from '../../../src';
 import BbsPlusPresentation from '../../../src/presentation';
 import VerifiableCredential from '../../../src/verifiable-credential';
@@ -150,6 +149,63 @@ const credential2 = {
   },
 };
 
+const credential3 = {
+  '@context': [
+    'https://www.w3.org/2018/credentials/v1',
+    'https://ld.dock.io/security/bbs/v1',
+    {
+      dk: 'https://ld.dock.io/credentials#',
+      BasicCredential: 'dk:BasicCredential',
+      name: 'dk:name',
+    },
+  ],
+  id: 'https://creds-staging.dock.io/5aad81cbb67125fb9c35142201a304aa7d4fc06c4ed76152f94e0564d3fefa70',
+  type: [
+    'VerifiableCredential',
+    'BasicCredential',
+  ],
+  credentialSubject: {
+    id: 'did:key:z6MksGZrsWeNpmEjpCAPaFRNZ4Ho7Yfrd93tYFfJr2gd4izj',
+    name: 'Test',
+  },
+  issuanceDate: '2023-11-01T15:43:59.361Z',
+  issuer: {
+    name: 'profile bbs+',
+    id: 'did:dock:5GJeBeStWSxqyPGUJnERMFhm3wKcfCZP6nhqtoKyRAmq9FeU',
+  },
+  name: 'Test2',
+  cryptoVersion: '0.5.0',
+  credentialSchema: {
+    id: 'data:application/json;charset=utf-8,%7B%22%24schema%22%3A%22http%3A%2F%2Fjson-schema.org%2Fdraft-07%2Fschema%23%22%2C%22definitions%22%3A%7B%22encryptableCompString%22%3A%7B%22type%22%3A%22string%22%7D%2C%22encryptableString%22%3A%7B%22type%22%3A%22string%22%7D%7D%2C%22properties%22%3A%7B%22%40context%22%3A%7B%22type%22%3A%22string%22%7D%2C%22credentialSchema%22%3A%7B%22type%22%3A%22string%22%7D%2C%22credentialSubject%22%3A%7B%22properties%22%3A%7B%22id%22%3A%7B%22type%22%3A%22string%22%7D%2C%22name%22%3A%7B%22type%22%3A%22string%22%7D%7D%2C%22type%22%3A%22object%22%7D%2C%22cryptoVersion%22%3A%7B%22type%22%3A%22string%22%7D%2C%22id%22%3A%7B%22type%22%3A%22string%22%7D%2C%22issuanceDate%22%3A%7B%22format%22%3A%22date-time%22%2C%22type%22%3A%22string%22%7D%2C%22issuer%22%3A%7B%22properties%22%3A%7B%22id%22%3A%7B%22type%22%3A%22string%22%7D%2C%22name%22%3A%7B%22type%22%3A%22string%22%7D%7D%2C%22type%22%3A%22object%22%7D%2C%22name%22%3A%7B%22type%22%3A%22string%22%7D%2C%22proof%22%3A%7B%22properties%22%3A%7B%22%40context%22%3A%7B%22items%22%3A%5B%7B%22properties%22%3A%7B%22proof%22%3A%7B%22properties%22%3A%7B%22%40container%22%3A%7B%22type%22%3A%22string%22%7D%2C%22%40id%22%3A%7B%22type%22%3A%22string%22%7D%2C%22%40type%22%3A%7B%22type%22%3A%22string%22%7D%7D%2C%22type%22%3A%22object%22%7D%2C%22sec%22%3A%7B%22type%22%3A%22string%22%7D%7D%2C%22type%22%3A%22object%22%7D%2C%7B%22type%22%3A%22string%22%7D%5D%2C%22type%22%3A%22array%22%7D%2C%22created%22%3A%7B%22format%22%3A%22date-time%22%2C%22type%22%3A%22string%22%7D%2C%22proofPurpose%22%3A%7B%22type%22%3A%22string%22%7D%2C%22type%22%3A%7B%22type%22%3A%22string%22%7D%2C%22verificationMethod%22%3A%7B%22type%22%3A%22string%22%7D%7D%2C%22type%22%3A%22object%22%7D%2C%22type%22%3A%7B%22type%22%3A%22string%22%7D%7D%2C%22type%22%3A%22object%22%7D',
+    type: 'JsonSchemaValidator2018',
+    parsingOptions: {
+      useDefaults: false,
+      defaultMinimumInteger: -4294967295,
+      defaultMinimumDate: -17592186044415,
+      defaultDecimalPlaces: 0,
+    },
+    version: '0.3.0',
+  },
+  proof: {
+    '@context': [
+      {
+        sec: 'https://w3id.org/security#',
+        proof: {
+          '@id': 'sec:proof',
+          '@type': '@id',
+          '@container': '@graph',
+        },
+      },
+      'https://ld.dock.io/security/bbs/v1',
+    ],
+    type: 'Bls12381BBS+SignatureDock2022',
+    created: '2024-04-10T19:00:24Z',
+    verificationMethod: 'did:dock:5GJeBeStWSxqyPGUJnERMFhm3wKcfCZP6nhqtoKyRAmq9FeU#keys-2',
+    proofPurpose: 'assertionMethod',
+    proofValue: 'zV8Wtta6j4yfyHtQUpMr2XbdNUFQ2eA65djFcj41T5A9FFVpkGSx23k5fNCpKvdB3FpK6t7e4p7tMm6CD3GTebmNCiKDxx5ZLkS3kjM426Zav7gmn7RjVFTR1KpNRewv2s8Jd8KWsKEpZN8andwFFakpLg',
+  },
+};
+
 const keyDoc = {
   id: 'did:key:z6MkhQc8mYYTjrw8dfarS8AKcSqAEhoPZCE81YJz6hRJJmHU#z6MkhQc8mYYTjrw8dfarS8AKcSqAEhoPZCE81YJz6hRJJmHU',
   controller: 'did:key:z6MkhQc8mYYTjrw8dfarS8AKcSqAEhoPZCE81YJz6hRJJmHU',
@@ -162,91 +218,104 @@ const keyDoc = {
     'z3jisssjec4StaeRNpbdLR6o1UWVn4iLBYLujah6GfcxTiQHHkSKgMmJcTtf3P7F2BqMdd9PDMwSuNgHkP6WuhcFk',
 };
 
-async function verifyDerivedCredential() {
-  const resolver = new WildcardMultiResolver([
-    new DockResolver(dock),
-    new DIDKeyResolver(),
-    // new UniversalResolver('https://uniresolver.io'),
-  ]);
-  for (const credential of [credential1, credential2]) {
-    // eslint-disable-next-line no-await-in-loop
-    const result = await verifyCredential(credential, { resolver });
-    expect(result.verified).toEqual(true);
+async function verifyDerivedCredential(credential, resolver) {
+  // eslint-disable-next-line no-await-in-loop
+  const result = await verifyCredential(credential, { resolver });
+  expect(result.verified).toEqual(true);
 
-    const bbsPlusPresentation = new BbsPlusPresentation();
+  const bbsPlusPresentation = new BbsPlusPresentation();
 
-    await bbsPlusPresentation.addCredentialToPresent(credential, {
-      resolver,
-    });
+  await bbsPlusPresentation.addCredentialToPresent(credential, {
+    resolver,
+  });
 
-    bbsPlusPresentation.addAttributeToReveal(0, ['credentialSubject.name']);
+  bbsPlusPresentation.addAttributeToReveal(0, ['credentialSubject.name']);
 
-    const pres = await bbsPlusPresentation.createPresentation();
-    const { verified } = await verifyPresentation(pres, { resolver });
-    expect(verified).toEqual(true);
+  const pres = await bbsPlusPresentation.createPresentation();
+  const { verified } = await verifyPresentation(pres, { resolver });
+  expect(verified).toEqual(true);
+  expect(pres.spec.credentials[0].revealedAttributes.issuer).toEqual(credential.issuer);
 
-    const bbsPlusPresentation2 = new BbsPlusPresentation();
+  const bbsPlusPresentation2 = new BbsPlusPresentation();
 
-    await bbsPlusPresentation2.addCredentialToPresent(credential, {
-      resolver,
-    });
+  await bbsPlusPresentation2.addCredentialToPresent(credential, {
+    resolver,
+  });
 
-    bbsPlusPresentation2.addAttributeToReveal(0, ['credentialSubject.name']);
+  bbsPlusPresentation2.addAttributeToReveal(0, ['credentialSubject.name']);
 
-    const credentialsFromPresentation = await bbsPlusPresentation2.deriveCredentials({});
+  const credentialsFromPresentation = await bbsPlusPresentation2.deriveCredentials({});
+  expect(credentialsFromPresentation[0].issuer).toEqual(credential.issuer);
 
-    // Question: Why is context being modified in a signed credential?
-    const derivedCredentials = credentialsFromPresentation.map(
-      (credentialJSON) => {
-        credentialJSON['@context'].push('https://ld.dock.io/security/bbs/v1');
-        return VerifiableCredential.fromJSON(credentialJSON);
-      },
-    );
+  const credentialResult = await verifyCredential(credentialsFromPresentation[0], {
+    resolver,
+  });
+  expect(credentialResult.verified).toBe(true);
 
-    const id = keyDoc.controller.startsWith('did:key:')
-      ? keyDoc.id
-      : `${keyDoc.controller}#keys-1`;
-    const vp = new VerifiablePresentation(id);
+  // Question: Why is context being modified in a signed credential?
+  const derivedCredentials = credentialsFromPresentation.map(
+    (credentialJSON) => {
+      credentialJSON['@context'].push('https://ld.dock.io/security/bbs/v1');
+      return VerifiableCredential.fromJSON(credentialJSON);
+    },
+  );
 
-    for (const _vc of derivedCredentials) {
-      vp.addCredential(_vc);
-    }
+  const id = keyDoc.controller.startsWith('did:key:')
+    ? keyDoc.id
+    : `${keyDoc.controller}#keys-1`;
+  const vp = new VerifiablePresentation(id);
 
-    keyDoc.keypair = keyDocToKeypair(keyDoc, dock);
-
-    const challenge = '08ec5ca2e2446b50b25a55e1b6b21f2b';
-    const domain = 'dock.io';
-
-    const presentation = await vp.sign(keyDoc, challenge, domain, resolver);
-
-    console.log('Presentation:');
-    console.log(presentation);
-
-    const templateResponseURL = 'https://api-staging.dock.io/proof-requests/d3c0c23e-efb5-41fc-a8a9-6213507f419a/send-presentation';
-
-    // const result = await axios
-    //   .post(templateResponseURL, presentation)
-    //   .then((res) => res.data);
-    //
-    // console.log('Certs response:');
-    // console.log(result);
+  for (const _vc of derivedCredentials) {
+    vp.addCredential(_vc);
   }
+
+  keyDoc.keypair = keyDocToKeypair(keyDoc, dock);
+
+  const challenge = '08ec5ca2e2446b50b25a55e1b6b21f2b';
+  const domain = 'dock.io';
+
+  const presentation = await vp.sign(keyDoc, challenge, domain, resolver);
+
+  console.log('Presentation:');
+  console.log(presentation);
+
+  const templateResponseURL = 'https://api-staging.dock.io/proof-requests/d3c0c23e-efb5-41fc-a8a9-6213507f419a/send-presentation';
+
+  // const result = await axios
+  //   .post(templateResponseURL, presentation)
+  //   .then((res) => res.data);
+  //
+  // console.log('Certs response:');
+  // console.log(result);
 }
 
 describe('Presentation from older credentials', () => {
+  let resolver;
   beforeAll(async () => {
     await dock
       .init({
         address: 'wss://knox-1.dock.io',
       });
     await initializeWasm();
+    resolver = new WildcardMultiResolver([
+      new DockResolver(dock),
+      new DIDKeyResolver(),
+    ]);
   });
 
   afterAll(async () => {
     await dock.disconnect();
   });
 
-  test('works', async () => {
-    await verifyDerivedCredential();
+  test('works for credential1', async () => {
+    await verifyDerivedCredential(credential1, resolver);
+  });
+
+  test('works for credential2', async () => {
+    await verifyDerivedCredential(credential2, resolver);
+  });
+
+  test('works for credential3', async () => {
+    await verifyDerivedCredential(credential3, resolver);
   });
 });

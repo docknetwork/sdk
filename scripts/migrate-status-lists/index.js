@@ -2,11 +2,13 @@ import { StatusList } from "@digitalcredentials/vc-status-list";
 import { StatusList2021Credential } from "../../src";
 import { withDockAPI } from "../helpers";
 import getKeypairs from "./keypairs";
-import { fmtIter } from "../../src/utils/misc";
+import { fmtIter } from "../../src/utils/generic";
 import { typedHexDID } from "../../src/utils/did/typed-did";
 import { getKeyDoc } from "../../src/utils/vc/helpers";
 
-const { FullNodeEndpoint, SenderAccountURI } = process.env;
+const { FullNodeEndpoint, SenderAccountURI, IgnoreDids = '' } = process.env;
+
+const IgnoreDidsSet = new Set(IgnoreDids.split(','))
 
 const parseCred = async (dock, [id, rawCred]) => {
   const credential = StatusList2021Credential.fromBytes(
@@ -26,7 +28,7 @@ const parseCred = async (dock, [id, rawCred]) => {
     .map((did) => did.toQualifiedEncodedString());
 
   return (
-    revoked.length !== 0 && { id: id.toHuman()[0], credential, revoked, owner }
+    revoked.length !== 0 && !IgnoreDidsSet.has(owner) && { id: id.toHuman()[0], credential, revoked, owner }
   );
 };
 

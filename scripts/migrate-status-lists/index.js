@@ -2,7 +2,7 @@ import { StatusList } from "@digitalcredentials/vc-status-list";
 import { StatusList2021Credential } from "../../src";
 import { withDockAPI } from "../helpers";
 import getKeypairs from "./keypairs";
-import { fmtIter } from "../../src/utils/misc";
+import { fmtIter } from "../../src/utils/generic";
 import { typedHexDID } from "../../src/utils/did/typed-did";
 import { getKeyDoc } from "../../src/utils/vc/helpers";
 

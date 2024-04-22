@@ -104,6 +104,7 @@ export default class DockAPI {
       rpc = Object.assign(rpc, PoaRpcDefs);
     }
 
+    // NOTE: The correct way to handle would be to raise error if a mix of URL types is provided or accept a preference of websocket vs http.
     const addressStr = addressArray[0];
     const isWebsocket = addressStr && addressStr.indexOf('http') === -1;
 

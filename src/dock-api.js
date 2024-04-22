@@ -77,13 +77,18 @@ export default class DockAPI {
     }
 
     this.address = address || this.address;
-    if (
-      this.address
-      && this.address.indexOf('wss://') === -1
-      && this.address.indexOf('https://') === -1
-    ) {
-      console.warn(`WARNING: Using non-secure endpoint: ${this.address}`);
-    }
+
+    const addressArray = Array.isArray(this.address) ? this.address : [this.address];
+
+    addressArray.forEach((addr) => {
+      if (
+        typeof addr === 'string'
+        && addr.indexOf('wss://') === -1
+        && addr.indexOf('https://') === -1
+      ) {
+        console.warn(`WARNING: Using non-secure endpoint: ${addr}`);
+      }
+    });
 
     // If RPC methods given, use them else set it to empty object.
     let rpc = chainRpc || {};
@@ -99,10 +104,17 @@ export default class DockAPI {
       rpc = Object.assign(rpc, PoaRpcDefs);
     }
 
-    const isWebsocket = this.address && this.address.indexOf('http') === -1;
+    // NOTE: The correct way to handle would be to raise error if a mix of URL types is provided or accept a preference of websocket vs http.
+    const addressStr = addressArray[0];
+    const isWebsocket = addressStr && addressStr.indexOf('http') === -1;
+
+    if (!isWebsocket && addressArray.length > 1) {
+      console.warn('WARNING: HTTP connections do not support more than one URL, ignoring rest');
+    }
+
     const provider = isWebsocket
-      ? new WsProvider(this.address)
-      : new HttpProvider(this.address);
+      ? new WsProvider(addressArray)
+      : new HttpProvider(addressStr);
 
     const apiOptions = {
       provider,

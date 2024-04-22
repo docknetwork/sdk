@@ -108,7 +108,7 @@ export default class DockAPI {
     const isWebsocket = addressStr && addressStr.indexOf('http') === -1;
 
     if (!isWebsocket && addressArray.length > 1) {
-      console.warn('WARNINGL HTTP connections do not support more than one URL, ignoring rest');
+      console.warn('WARNING: HTTP connections do not support more than one URL, ignoring rest');
     }
 
     const provider = isWebsocket

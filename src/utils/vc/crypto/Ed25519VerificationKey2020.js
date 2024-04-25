@@ -26,4 +26,6 @@ export default class Ed25519VerificationKey2020 extends Ed25519VerificationKey20
 
     throw new Error(`Unsupported signature encoding for ${Ed255192020VerKeyName}`);
   }
+
+  // NOTE: Ed255192020 has the same cryptography as Ed255192018, so we inherit the verifier methods
 }

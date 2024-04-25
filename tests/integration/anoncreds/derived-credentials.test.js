@@ -67,7 +67,7 @@ const residentCardSchema = {
           minimum: 0,
         },
       },
-      required: [],
+      required: ['givenName', 'familyName', 'lprNumber'],
     },
   },
 };

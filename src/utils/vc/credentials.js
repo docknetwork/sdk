@@ -39,9 +39,12 @@ import {
   Bls12381BBSSignatureProofDock2022,
   Bls12381BBSSignatureDock2023,
   Bls12381BBSSignatureProofDock2023,
+  Bls12381BBS23SigProofDockSigName,
+  Bls12381PSSigProofDockSigName,
   JsonWebSignature2020,
   Bls12381PSSigDockSigName,
   Bls12381BBSSigDockSigName,
+  Bls12381BBSSigProofDockSigName,
   Bls12381BBS23SigDockSigName,
   Bls12381BDDT16MacDockName,
   Bls12381BDDT16MacProofDockName,
@@ -77,6 +80,9 @@ export function isAnoncredsProofType(verifiableCredential) {
   const proofType = verifiableCredential.proof && verifiableCredential.proof.type;
   return (
     proofType === Bls12381BBSSigDockSigName
+    || proofType === Bls12381BBSSigProofDockSigName
+    || proofType === Bls12381BBS23SigProofDockSigName
+    || proofType === Bls12381PSSigProofDockSigName
     || proofType === Bls12381BBS23SigDockSigName
     || proofType === Bls12381BDDT16MacDockName
     || proofType === Bls12381BDDT16MacProofDockName

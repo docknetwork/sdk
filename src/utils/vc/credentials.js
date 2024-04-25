@@ -39,7 +39,15 @@ import {
   Bls12381BBSSignatureProofDock2022,
   Bls12381BBSSignatureDock2023,
   Bls12381BBSSignatureProofDock2023,
+  Bls12381BBS23SigProofDockSigName,
+  Bls12381PSSigProofDockSigName,
   JsonWebSignature2020,
+  Bls12381PSSigDockSigName,
+  Bls12381BBSSigDockSigName,
+  Bls12381BBSSigProofDockSigName,
+  Bls12381BBS23SigDockSigName,
+  Bls12381BDDT16MacDockName,
+  Bls12381BDDT16MacProofDockName,
 } from './custom_crypto';
 import { signJWS } from './jws';
 import Bls12381BDDT16MACProofDock2024 from './crypto/Bls12381BDDT16MACProofDock2024';
@@ -66,6 +74,20 @@ function getId(obj) {
 
 function dateStringToTimestamp(dateStr) {
   return Math.floor(Date.parse(dateStr) / 1000);
+}
+
+export function isAnoncredsProofType(verifiableCredential) {
+  const proofType = verifiableCredential.proof && verifiableCredential.proof.type;
+  return (
+    proofType === Bls12381BBSSigDockSigName
+    || proofType === Bls12381BBSSigProofDockSigName
+    || proofType === Bls12381BBS23SigProofDockSigName
+    || proofType === Bls12381PSSigProofDockSigName
+    || proofType === Bls12381BBS23SigDockSigName
+    || proofType === Bls12381BDDT16MacDockName
+    || proofType === Bls12381BDDT16MacProofDockName
+    || proofType === Bls12381PSSigDockSigName
+  );
 }
 
 export function formatToJWTPayload(keyDoc, cred) {
@@ -293,7 +315,11 @@ export async function verifyCredential(
     documentLoader: docLoader,
   });
 
-  if (!skipSchemaCheck) {
+  // Determine if we should validate the schema when verifying
+  // NOTE: derived anoncreds do not need JSON schema validation as the anoncreds library validates it
+  // and it can fail when required attributes are not revealed
+  const isAnoncredsDerived = isAnoncredsProofType(credential);
+  if (!skipSchemaCheck && !isAnoncredsDerived) {
     await getAndValidateSchemaIfPresent(
       expandedCredential,
       credential[credentialContextField],

@@ -64,6 +64,7 @@
     "did-resolver-example": "npx babel-node example/resolver.js",
     "revocation-example": "npx babel-node example/revocation.js",
     "vcdm-example": "npx babel-node example/vcdm.js",
+    "open-badges-example": "npx babel-node example/open-badges.js",
     "standard-schemas-example": "npx babel-node example/standard_schemas.js",
     "schema-example": "npx babel-node example/schema.js",
     "schema-validation-example": "npx babel-node example/schema-validation.js",

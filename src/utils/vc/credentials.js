@@ -32,6 +32,7 @@ import { ensureValidDatetime } from '../type-helpers';
 import {
   EcdsaSecp256k1Signature2019,
   Ed25519Signature2018,
+  Ed25519Signature2020,
   Sr25519Signature2020,
   Bls12381PSSignatureDock2023,
   Bls12381PSSignatureProofDock2023,
@@ -368,6 +369,7 @@ export async function verifyCredential(
   };
   const fullSuite = [
     new Ed25519Signature2018(),
+    new Ed25519Signature2020(),
     new EcdsaSecp256k1Signature2019(),
     new Sr25519Signature2020(),
     new JsonWebSignature2020(),

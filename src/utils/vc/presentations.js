@@ -27,6 +27,7 @@ import { DEFAULT_CONTEXT_V1_URL } from './constants';
 import {
   EcdsaSecp256k1Signature2019,
   Ed25519Signature2018,
+  Ed25519Signature2020,
   Sr25519Signature2020,
   JsonWebSignature2020,
   Bls12381BBSSignatureDock2022,
@@ -156,6 +157,7 @@ export async function verifyPresentation(presentation, options = {}) {
     resolver: null,
     suite: [
       new Ed25519Signature2018(),
+      new Ed25519Signature2020(),
       new EcdsaSecp256k1Signature2019(),
       new Sr25519Signature2020(),
       new JsonWebSignature2020(),

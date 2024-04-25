@@ -309,6 +309,9 @@ export async function verifyCredential(
     documentLoader: docLoader,
   });
 
+  // Determine if we should validate the schema when verifying
+  // NOTE: derived anoncreds do not need JSON schema validation as the anoncreds library validates it
+  // and it can fail when required attributes are not revealed
   const isAnoncredsDerived = isAnoncredsProofType(credential);
   if (!skipSchemaCheck && !isAnoncredsDerived) {
     await getAndValidateSchemaIfPresent(

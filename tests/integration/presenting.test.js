@@ -101,11 +101,13 @@ describe('Verifiable Presentation where both issuer and holder have a Dock DID',
     const holder1Key = getKeyDoc(holder1DID, dock.keyring.addFromUri(holder1KeySeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
     const holder2Key = getKeyDoc(holder2DID, generateEcdsaSecp256k1Keypair(holder2KeyEntropy), 'EcdsaSecp256k1VerificationKey2019');
     const holder3Key = getKeyDoc(holder3DID, dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'), 'Sr25519VerificationKey2020');
+    const holder4Key = getKeyDoc(holder1DID, dock.keyring.addFromUri(holder1KeySeed, null, 'ed25519'), 'Ed25519VerificationKey2020');
 
     for (const elem of [
       [cred1, 'Ed25519Signature2018', holder1Key],
       [cred2, 'EcdsaSecp256k1Signature2019', holder2Key],
       [cred3, 'Sr25519Signature2020', holder3Key],
+      [cred4, 'Ed25519Signature2020', holder4Key],
     ]) {
       const cred = elem[0];
       const sigType = elem[1];

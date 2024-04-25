@@ -70,12 +70,29 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
     await dock.disconnect();
   }, 10000);
 
-  test('Issue a verifiable credential with ed25519 key and verify it', async () => {
+  test('Issue a verifiable credential with ed25519 key and verify it (2018)', async () => {
     const issuerKey = getKeyDoc(issuer1DID, dock.keyring.addFromUri(issuer1KeySeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
     const credential = await issueCredential(issuerKey, unsignedCred);
     expect(credential).toMatchObject(
       expect.objectContaining(
         getCredMatcherDoc(unsignedCred, issuer1DID, issuerKey.id, 'Ed25519Signature2018'),
+      ),
+    );
+
+    const result = await verifyCredential(credential, { resolver });
+    expect(result).toMatchObject(
+      expect.objectContaining(
+        getProofMatcherDoc(),
+      ),
+    );
+  }, 40000);
+
+  test('Issue a verifiable credential with ed25519 key and verify it (2020)', async () => {
+    const issuerKey = getKeyDoc(issuer1DID, dock.keyring.addFromUri(issuer1KeySeed, null, 'ed25519'), 'Ed25519VerificationKey2020');
+    const credential = await issueCredential(issuerKey, unsignedCred);
+    expect(credential).toMatchObject(
+      expect.objectContaining(
+        getCredMatcherDoc(unsignedCred, issuer1DID, issuerKey.id, 'Ed25519Signature2020'),
       ),
     );
 
@@ -122,8 +139,15 @@ describe('Verifiable Credential issuance where issuer has a Dock DID', () => {
     );
   }, 40000);
 
-  test('(JWT) Issue a verifiable credential with ed25519 key and verify it', async () => {
+  test('(JWT) Issue a verifiable credential with ed25519 key and verify it (2018)', async () => {
     const issuerKey = getKeyDoc(issuer1DID, dock.keyring.addFromUri(issuer1KeySeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
+    const credential = await issueCredential(issuerKey, unsignedCred, true, null, null, null, null, false, 'jwt');
+    const result = await verifyCredential(credential, { resolver });
+    expect(result.verified).toBeTruthy();
+  }, 40000);
+
+  test('(JWT) Issue a verifiable credential with ed25519 key and verify it (2020)', async () => {
+    const issuerKey = getKeyDoc(issuer1DID, dock.keyring.addFromUri(issuer1KeySeed, null, 'ed25519'), 'Ed25519VerificationKey2020');
     const credential = await issueCredential(issuerKey, unsignedCred, true, null, null, null, null, false, 'jwt');
     const result = await verifyCredential(credential, { resolver });
     expect(result.verified).toBeTruthy();

@@ -16,8 +16,9 @@ import {
   Bls12381PSSignatureDock2023,
   Bls12381PSDockVerKeyName,
   JsonWebSignature2020,
+  Ed25519Signature2020,
 } from './custom_crypto';
-import { Bls12381BDDT16DockVerKeyName, Bls12381BDDT16MacDockName } from './crypto/constants';
+import { Bls12381BDDT16DockVerKeyName, Bls12381BDDT16MacDockName, Ed255192020VerKeyName } from './crypto/constants';
 import Bls12381BDDT16MACDock2024 from './crypto/Bls12381BDDT16MACDock2024';
 
 /**
@@ -66,6 +67,9 @@ export async function getSuiteFromKeyDoc(keyDoc, useProofValue, options) {
       break;
     case Ed25519VerKeyName:
       Cls = Ed25519Signature2018;
+      break;
+    case Ed255192020VerKeyName:
+      Cls = Ed25519Signature2020;
       break;
     case Sr25519VerKeyName:
       Cls = Sr25519Signature2020;

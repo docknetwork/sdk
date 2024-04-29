@@ -17,7 +17,7 @@ export default class Sr25519Signature2020 extends CustomLinkedDataSignature {
       type: Sr25519SigName,
       LDKeyClass: Sr25519VerificationKey2020,
       contextUrl: SUITE_CONTEXT_URL,
-      alg: 'EdDSA',
+      alg: 'Schnorr',
       signer: signer || Sr25519Signature2020.signerFactory(keypair, verificationMethod),
       verifier,
       useProofValue,

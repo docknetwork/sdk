@@ -239,21 +239,22 @@ describe.each(Schemes)('Issuance', ({
   }, 30000);
 
   test(`Can issue+verify a ${Name} credential with blank schema and custom parsingOptions`, async () => {
+    const parsingOptions = {
+      ...DefaultSchemaParsingOpts,
+      defaultDecimalPlaces: 5,
+      useDefaults: true,
+    };
+
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
     const unsignedCred = {
       ...credentialJSON,
       issuer: did1,
     };
-    delete unsignedCred.credentialSchema;
 
     unsignedCred.credentialSchema = {
       id: '',
       type: 'JsonSchemaValidator2018',
-      parsingOptions: {
-        ...DefaultSchemaParsingOpts,
-        defaultDecimalPlaces: 4,
-        useDefaults: true,
-      },
+      parsingOptions,
     };
 
     const credential = await issueCredential(issuerKey, unsignedCred);
@@ -261,12 +262,43 @@ describe.each(Schemes)('Issuance', ({
     // Ensure schema was now defined, added by crypto-wasm-ts
     expect(credential.credentialSchema).toBeDefined();
     expect(credential.credentialSchema).toMatchObject({
-      parsingOptions: {
-        useDefaults: true,
-        defaultMinimumInteger: -4294967295,
-        defaultMinimumDate: -17592186044415,
-        defaultDecimalPlaces: 4,
+      parsingOptions,
+      version: CredentialSchema.VERSION,
+    });
+
+    const result = await verifyCredential(credential, { resolver });
+    expect(result).toMatchObject(
+      expect.objectContaining(getProofMatcherDoc()),
+    );
+  }, 30000);
+
+  test(`Can issue+verify a ${Name} credential with embedded schema and custom parsingOptions`, async () => {
+    const parsingOptions = {
+      ...DefaultSchemaParsingOpts,
+      defaultDecimalPlaces: 5,
+      useDefaults: true,
+    };
+
+    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
+    const unsignedCred = {
+      ...credentialJSON,
+      credentialSchema: {
+        id: credentialJSON.credentialSchema.id,
+        type: 'JsonSchemaValidator2018',
+        parsingOptions,
       },
+      issuer: did1,
+    };
+
+    expect(unsignedCred.credentialSchema.id).toBeDefined();
+    expect(unsignedCred.credentialSchema.id).not.toEqual('');
+
+    const credential = await issueCredential(issuerKey, unsignedCred);
+
+    // Ensure schema was now defined, added by crypto-wasm-ts
+    expect(credential.credentialSchema).toBeDefined();
+    expect(credential.credentialSchema).toMatchObject({
+      parsingOptions,
       version: CredentialSchema.VERSION,
     });
 

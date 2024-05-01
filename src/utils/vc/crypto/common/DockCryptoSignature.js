@@ -406,7 +406,7 @@ export default withExtendedStaticProperties(
       let credSchema;
       if (document.credentialSchema) {
         // schema object exists but no ID means the SDK is signalling for the suite to generate a schema
-        credSchema = new CredentialSchema(CredentialSchema.essential());
+        credSchema = new CredentialSchema(CredentialSchema.essential(), document.credentialSchema.parsingOptions);
       } else {
         // Else, no schema was found so just use the essentials and v0.0.1 schema version
         // NOTE: version is important here and MUST be 0.0.1 otherwise it will invalidate BBS+ credentials

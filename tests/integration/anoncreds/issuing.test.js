@@ -1,6 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
-import { CredentialBuilder, CredentialSchema, initializeWasm } from '@docknetwork/crypto-wasm-ts';
+import { DefaultSchemaParsingOpts, CredentialBuilder, CredentialSchema, initializeWasm } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI } from '../../../src';
 import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
 import { DockResolver } from '../../../src/resolver';
@@ -228,6 +228,44 @@ describe.each(Schemes)('Issuance', ({
         defaultMinimumInteger: -4294967295,
         defaultMinimumDate: -17592186044415,
         defaultDecimalPlaces: 0,
+      },
+      version: CredentialSchema.VERSION,
+    });
+
+    const result = await verifyCredential(credential, { resolver });
+    expect(result).toMatchObject(
+      expect.objectContaining(getProofMatcherDoc()),
+    );
+  }, 30000);
+
+  test(`Can issue+verify a ${Name} credential with blank schema and custom parsingOptions`, async () => {
+    const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
+    const unsignedCred = {
+      ...credentialJSON,
+      issuer: did1,
+    };
+    delete unsignedCred.credentialSchema;
+
+    unsignedCred.credentialSchema = {
+      id: '',
+      type: 'JsonSchemaValidator2018',
+      parsingOptions: {
+        ...DefaultSchemaParsingOpts,
+        defaultDecimalPlaces: 4,
+        useDefaults: true,
+      },
+    };
+
+    const credential = await issueCredential(issuerKey, unsignedCred);
+
+    // Ensure schema was now defined, added by crypto-wasm-ts
+    expect(credential.credentialSchema).toBeDefined();
+    expect(credential.credentialSchema).toMatchObject({
+      parsingOptions: {
+        useDefaults: true,
+        defaultMinimumInteger: -4294967295,
+        defaultMinimumDate: -17592186044415,
+        defaultDecimalPlaces: 4,
       },
       version: CredentialSchema.VERSION,
     });

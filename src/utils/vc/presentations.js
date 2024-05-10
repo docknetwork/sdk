@@ -352,12 +352,18 @@ export async function verifyAnoncreds(presentation, options = {}) {
   return recreatedPres.verify(pks, accumulatorPublicKeys, predicateParams, circomOutputs, blindedAttributesCircomOutputs);
 }
 
-export function getDelegatedProofsFromVerifiedPresentation(presentation) {
+/**
+ * Get the keyed proofs from the given anoncreds presentation. This is supposed to be called by the verifier to
+ * get the keyed-proofs and send them for verification to the issuer or the entity having the corresponding secret key
+ * @param presentation
+ * @returns {Map<number, KeyedProof>}
+ */
+export function getKeyedProofsFromVerifiedPresentation(presentation) {
   if (!isAnoncreds(presentation)) {
     throw new Error('Only anoncreds presentation supported');
   }
   const presObject = Presentation.fromJSON(presentation);
-  return presObject.getDelegatedProofs();
+  return presObject.getKeyedProofs();
 }
 
 /**

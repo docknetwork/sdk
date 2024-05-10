@@ -19,7 +19,7 @@ import { issueCredential, verifyPresentation } from '../../../src/utils/vc';
 import { DockResolver } from '../../../src/resolver';
 import { getResidentCardCredentialAndSchema, setupExternalSchema } from './utils';
 import {
-  getDelegatedProofsFromVerifiedPresentation,
+  getKeyedProofsFromVerifiedPresentation,
   getJsonSchemasFromPresentation,
 } from '../../../src/utils/vc/presentations';
 import defaultDocumentLoader from '../../../src/utils/vc/document-loader';
@@ -175,16 +175,16 @@ describe.each(Schemes)('Presentation', ({
     const { verified } = await verifyPresentation(presentation, { resolver });
     expect(verified).toEqual(true);
 
-    const delegatedProofs = getDelegatedProofsFromVerifiedPresentation(presentation);
+    const keyedProofs = getKeyedProofsFromVerifiedPresentation(presentation);
     const isKvac = Name === 'BDDT16';
-    // Delegated proofs only exist for KVAC
-    expect(delegatedProofs.size).toEqual(isKvac ? 2 : 0);
+    // Keyed proofs only exist for KVAC
+    expect(keyedProofs.size).toEqual(isKvac ? 2 : 0);
     if (isKvac) {
       const sk = new BDDT16MacSecretKey(keypair.privateKeyBuffer);
       // eslint-disable-next-line jest/no-conditional-expect
-      expect(delegatedProofs.get(0)?.credential?.proof.verify(sk).verified).toEqual(true);
+      expect(keyedProofs.get(0)?.credential?.proof.verify(sk).verified).toEqual(true);
       // eslint-disable-next-line jest/no-conditional-expect
-      expect(delegatedProofs.get(1)?.credential?.proof.verify(sk).verified).toEqual(true);
+      expect(keyedProofs.get(1)?.credential?.proof.verify(sk).verified).toEqual(true);
     }
   }, 40000);
 
@@ -221,14 +221,14 @@ describe.each(Schemes)('Presentation', ({
     const { verified } = await verifyPresentation(presentation, { resolver });
     expect(verified).toEqual(true);
 
-    const delegatedProofs = getDelegatedProofsFromVerifiedPresentation(presentation);
+    const keyedProofs = getKeyedProofsFromVerifiedPresentation(presentation);
     const isKvac = Name === 'BDDT16';
-    // Delegated proofs only exist for KVAC
-    expect(delegatedProofs.size).toEqual(isKvac ? 1 : 0);
+    // Keyed proofs only exist for KVAC
+    expect(keyedProofs.size).toEqual(isKvac ? 1 : 0);
     if (isKvac) {
       const sk = new BDDT16MacSecretKey(keypair.privateKeyBuffer);
       // eslint-disable-next-line jest/no-conditional-expect
-      expect(delegatedProofs.get(0)?.credential?.proof.verify(sk).verified).toEqual(true);
+      expect(keyedProofs.get(0)?.credential?.proof.verify(sk).verified).toEqual(true);
     }
   }, 30000);
 

@@ -32,7 +32,7 @@ import {
 import { DockResolver } from '../../../src/resolver';
 import { createPresentation } from '../../create-presentation';
 import AccumulatorModule, { AccumulatorType } from '../../../src/modules/accumulator';
-import { getDelegatedProofsFromVerifiedPresentation } from '../../../src/utils/vc/presentations';
+import { getKeyedProofsFromVerifiedPresentation } from '../../../src/utils/vc/presentations';
 
 // TODO: move to fixtures
 const residentCardSchema = {
@@ -294,19 +294,22 @@ describe.each(Schemes)('Derived Credentials', ({
     const domain = 'test domain';
     const presentation = createPresentation(credentials, presId);
 
+    // This is done by the verifier
     const reconstructedPres = derivedToAnoncredsPresentation(presentation.verifiableCredential[0]);
-    const delegatedProofs = getDelegatedProofsFromVerifiedPresentation(reconstructedPres);
+    const keyedProofs = getKeyedProofsFromVerifiedPresentation(reconstructedPres);
     const isKvac = Name === 'BDDT16';
     const isKvacStatus = accumSecretKey ? 1 : 0;
-    // Delegated proofs only exist for KVAC
-    expect(delegatedProofs.size).toEqual(isKvac || isKvacStatus ? 1 : 0);
+    // Keyed proofs only exist for KVAC
+    expect(keyedProofs.size).toEqual(isKvac || isKvacStatus ? 1 : 0);
     if (isKvac) {
+      // This block is executed by the issuer or anyone having the secret key but not by the verifier
       const sk = new BDDT16MacSecretKey(keypair.privateKeyBuffer);
       // eslint-disable-next-line jest/no-conditional-expect
-      expect(delegatedProofs.get(0)?.credential?.proof.verify(sk).verified).toEqual(true);
+      expect(keyedProofs.get(0)?.credential?.proof.verify(sk).verified).toEqual(true);
     }
     if (isKvacStatus) {
-      expect(delegatedProofs.get(0)?.status?.proof.verify(accumSecretKey).verified).toEqual(true);
+      // This block is executed by the issuer or anyone having the secret key but not by the verifier
+      expect(keyedProofs.get(0)?.status?.proof.verify(accumSecretKey).verified).toEqual(true);
     }
 
     expect(presentation).toMatchObject(
@@ -499,14 +502,16 @@ describe.each(Schemes)('Derived Credentials', ({
     });
     expect(credentialResult1.verified).toBe(false);
 
-    const delegatedProofs = getDelegatedProofsFromVerifiedPresentation(reconstructedPres);
+    // This is done by the verifier
+    const keyedProofs = getKeyedProofsFromVerifiedPresentation(reconstructedPres);
     const isKvac = Name === 'BDDT16';
-    // Delegated proofs only exist for KVAC
-    expect(delegatedProofs.size).toEqual(isKvac ? 1 : 0);
+    // Keyed proofs only exist for KVAC
+    expect(keyedProofs.size).toEqual(isKvac ? 1 : 0);
     if (isKvac) {
+      // This block is executed by the issuer or anyone having the secret key but not by the verifier
       const sk = new BDDT16MacSecretKey(keypair.privateKeyBuffer);
       // eslint-disable-next-line jest/no-conditional-expect
-      expect(delegatedProofs.get(0)?.credential?.proof.verify(sk).verified).toEqual(true);
+      expect(keyedProofs.get(0)?.credential?.proof.verify(sk).verified).toEqual(true);
     }
     // Create a VP and verify it from this credential
     await createAndVerifyPresentation(credentials);

@@ -72,7 +72,7 @@
     "txn-pricing": "npx babel-node scripts/txn-pricing.js",
     "claim-deduction-example": "npx babel-node example/claim-deduction.js",
     "anchor-example": "npx babel-node example/anchor.js",
-    "test-examples": "yarn dock-did-example && yarn did-resolver-example && yarn revocation-example && yarn vcdm-example && yarn standard-schemas-example && yarn schema-example && yarn schema-validation-example && yarn blob-example && yarn claim-deduction-example && yarn anchor-example && yarn bbs-dock-example && open-badges-example",
+    "test-examples": "yarn dock-did-example && yarn did-resolver-example && yarn revocation-example && yarn vcdm-example && yarn standard-schemas-example && yarn schema-example && yarn schema-validation-example && yarn blob-example && yarn claim-deduction-example && yarn anchor-example && yarn bbs-dock-example && yarn open-badges-example",
     "get-did": "npx babel-node scripts/get_did_doc.js",
     "upgrade_with_sudo": "npx babel-node scripts/runtime_upgrade_with_sudo.js",
     "onboard_with_sudo": "npx babel-node scripts/onboard_validator_with_sudo.js",

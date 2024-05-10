@@ -11,12 +11,9 @@ import {
   FullNodeEndpoint,
   TestKeyringOpts,
   TestAccountURI,
-  DisableDidKeyAndTrustRegistryTests,
 } from '../../test-constants';
 
-const buildTest = DisableDidKeyAndTrustRegistryTests ? describe.skip : describe;
-
-buildTest('Basic DID tests', () => {
+describe('Basic DID tests', () => {
   const dock = new DockAPI();
 
   // Generate a random DID

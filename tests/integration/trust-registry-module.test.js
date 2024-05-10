@@ -8,7 +8,6 @@ import {
   FullNodeEndpoint,
   TestKeyringOpts,
   TestAccountURI,
-  DisableDidKeyAndTrustRegistryTests,
 } from '../test-constants';
 
 import {
@@ -18,9 +17,7 @@ import {
 } from '../../src/utils/did';
 import { registerNewDIDUsingPair } from './helpers';
 
-const buildTest = DisableDidKeyAndTrustRegistryTests ? describe.skip : describe;
-
-buildTest('Trust Registry', () => {
+describe('Trust Registry', () => {
   const dock = new DockAPI();
 
   // Create a new convener DID, the DID will be registered on the network and own the trust registry

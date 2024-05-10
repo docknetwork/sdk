@@ -6,7 +6,7 @@ import {
   BoundCheckSnarkSetup,
   Accumulator,
   PositiveAccumulator,
-  dockAccumulatorParams, AccumulatorPublicKey, deepClone,
+  dockAccumulatorParams, AccumulatorPublicKey,
   Encoder, BDDT16MacSecretKey, MEM_CHECK_STR, KBUniversalAccumulator,
   MEM_CHECK_KV_STR,
   RevocationStatusProtocol,
@@ -18,7 +18,6 @@ import {
   TestAccountURI,
   TestKeyringOpts,
   Schemes,
-  DisableNewAccumulatorTests,
 } from '../../test-constants';
 import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
 import { getProofMatcherDoc, registerNewDIDUsingPair } from '../helpers';
@@ -33,6 +32,7 @@ import { DockResolver } from '../../../src/resolver';
 import { createPresentation } from '../../create-presentation';
 import AccumulatorModule, { AccumulatorType } from '../../../src/modules/accumulator';
 import { getKeyedProofsFromVerifiedPresentation } from '../../../src/utils/vc/presentations';
+import { deepClone } from '../../../src/utils/common';
 
 // TODO: move to fixtures
 const residentCardSchema = {
@@ -259,27 +259,25 @@ describe.each(Schemes)('Derived Credentials', ({
     posAccumWitness = await accumulator.membershipWitness(encodedMember, posAccumKeypair.secretKey, posAccumState);
     expect(accumulator.verifyMembershipWitness(encodedMember, posAccumWitness, posAccumKeypair.publicKey, params)).toEqual(true);
 
-    if (!DisableNewAccumulatorTests) {
-      const accumulator1 = PositiveAccumulator.initialize(params, posKvAccumKeypair.secretKey);
-      await accumulator1.addBatch(members, posKvAccumKeypair.secretKey, posKvAccumState);
-      // For KV accumulator, keyId is 0
-      await writeAccumToChain(posKvAccumulatorId, 0, accumulator1);
-      posKvAccumWitness = await accumulator1.membershipWitness(encodedMember, posKvAccumKeypair.secretKey, posKvAccumState);
-      posKvAccumSecretKey = posKvAccumKeypair.secretKey;
+    const accumulator1 = PositiveAccumulator.initialize(params, posKvAccumKeypair.secretKey);
+    await accumulator1.addBatch(members, posKvAccumKeypair.secretKey, posKvAccumState);
+    // For KV accumulator, keyId is 0
+    await writeAccumToChain(posKvAccumulatorId, 0, accumulator1);
+    posKvAccumWitness = await accumulator1.membershipWitness(encodedMember, posKvAccumKeypair.secretKey, posKvAccumState);
+    posKvAccumSecretKey = posKvAccumKeypair.secretKey;
 
-      const accumulator2 = await KBUniversalAccumulator.initialize(members, params, uniAccumKeypair.secretKey, uniAccumState);
-      await accumulator2.add(encodedMember, uniAccumKeypair.secretKey, uniAccumState);
-      await writeAccumToChain(uniAccumulatorId, 2, accumulator2);
-      uniAccumWitness = await accumulator2.membershipWitness(encodedMember, uniAccumKeypair.secretKey, uniAccumState);
-      expect(accumulator2.verifyMembershipWitness(encodedMember, uniAccumWitness, uniAccumKeypair.publicKey, params)).toEqual(true);
+    const accumulator2 = await KBUniversalAccumulator.initialize(members, params, uniAccumKeypair.secretKey, uniAccumState);
+    await accumulator2.add(encodedMember, uniAccumKeypair.secretKey, uniAccumState);
+    await writeAccumToChain(uniAccumulatorId, 2, accumulator2);
+    uniAccumWitness = await accumulator2.membershipWitness(encodedMember, uniAccumKeypair.secretKey, uniAccumState);
+    expect(accumulator2.verifyMembershipWitness(encodedMember, uniAccumWitness, uniAccumKeypair.publicKey, params)).toEqual(true);
 
-      const accumulator3 = await KBUniversalAccumulator.initialize(members, params, uniKvAccumKeypair.secretKey, uniKvAccumState);
-      await accumulator3.add(encodedMember, uniKvAccumKeypair.secretKey, uniKvAccumState);
-      // For KV accumulator, keyId is 0
-      await writeAccumToChain(uniKvAccumulatorId, 0, accumulator3);
-      uniKvAccumWitness = await accumulator3.membershipWitness(encodedMember, uniKvAccumKeypair.secretKey, uniKvAccumState);
-      uniKvAccumSecretKey = uniKvAccumKeypair.secretKey;
-    }
+    const accumulator3 = await KBUniversalAccumulator.initialize(members, params, uniKvAccumKeypair.secretKey, uniKvAccumState);
+    await accumulator3.add(encodedMember, uniKvAccumKeypair.secretKey, uniKvAccumState);
+    // For KV accumulator, keyId is 0
+    await writeAccumToChain(uniKvAccumulatorId, 0, accumulator3);
+    uniKvAccumWitness = await accumulator3.membershipWitness(encodedMember, uniKvAccumKeypair.secretKey, uniKvAccumState);
+    uniKvAccumSecretKey = uniKvAccumKeypair.secretKey;
   }, 30000);
 
   async function createAndVerifyPresentation(credentials, verifyOptions = {}, accumSecretKey = undefined) {
@@ -393,8 +391,6 @@ describe.each(Schemes)('Derived Credentials', ({
 
     return [presentationInstance, presentationOptions];
   }
-
-  const buildTest = DisableNewAccumulatorTests ? test.skip : test;
 
   test(`For ${Name}, holder creates a derived verifiable credential from a credential with selective disclosure`, async () => {
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
@@ -559,7 +555,7 @@ describe.each(Schemes)('Derived Credentials', ({
     });
   });
 
-  buildTest(`For ${Name}, persist credential status using VB positive accumulator with keyed-verification when deriving`, async () => {
+  test(`For ${Name}, persist credential status using VB positive accumulator with keyed-verification when deriving`, async () => {
     // No public key exists
     const queriedAccum = await dock.accumulatorModule.getAccumulator(posKvAccumulatorId, false, false);
 
@@ -594,7 +590,7 @@ describe.each(Schemes)('Derived Credentials', ({
     }, posKvAccumSecretKey);
   });
 
-  buildTest(`For ${Name}, persist credential status using KB universal accumulator when deriving`, async () => {
+  test(`For ${Name}, persist credential status using KB universal accumulator when deriving`, async () => {
     const queriedAccum = await dock.accumulatorModule.getAccumulator(uniAccumulatorId, false, true);
     const verifAccumulator = KBUniversalAccumulator.fromAccumulated(AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated, AccumulatorType.KBUni));
 
@@ -623,7 +619,7 @@ describe.each(Schemes)('Derived Credentials', ({
     expect(credentials[0].credentialStatus).toEqual({
       ...credentialStatus,
       revocationId: undefined, // Because revocation id is never revealed
-      accumulated: `${b58.encode(accAsU8.mem)},${b58.encode(accAsU8.nonMem)}`,
+      accumulated: `${b58.encode(accAsU8.toBytes())}`,
       extra: {},
     });
 
@@ -637,7 +633,7 @@ describe.each(Schemes)('Derived Credentials', ({
     });
   });
 
-  buildTest(`For ${Name}, persist credential status using KB universal accumulator with keyed-verification when deriving`, async () => {
+  test(`For ${Name}, persist credential status using KB universal accumulator with keyed-verification when deriving`, async () => {
     // No public key exists
     const queriedAccum = await dock.accumulatorModule.getAccumulator(uniKvAccumulatorId, false, false);
 
@@ -663,7 +659,7 @@ describe.each(Schemes)('Derived Credentials', ({
     expect(credentials[0].credentialStatus).toEqual({
       ...credentialStatus,
       revocationId: undefined, // Because revocation id is never revealed
-      accumulated: `${b58.encode(accAsU8.mem)},${b58.encode(accAsU8.nonMem)}`,
+      accumulated: `${b58.encode(accAsU8.toBytes())}`,
       extra: {},
     });
 

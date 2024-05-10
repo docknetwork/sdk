@@ -78,12 +78,6 @@ export const TestAccountCouncilMemberURI = fromEnv(
 export const MinGasPrice = fromEnv('MinGasPrice', DefaultMinGasPrice);
 export const MaxGas = fromEnv('MaxGas', DefaultMaxGas);
 export const TestSchemes = fromEnv('TestSchemes', DefaultTestSchemes);
-export const DisableDidKeyAndTrustRegistryTests = boolEnv(
-  fromEnv('DisableDidKeyAndTrustRegistryTests', 'false'),
-);
-export const DisableNewAccumulatorTests = boolEnv(
-  fromEnv('DisableNewAccumulatorTests', 'false'),
-);
 
 export const BBS = {
   Name: 'BBS',

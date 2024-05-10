@@ -17,7 +17,6 @@ import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
-  DisableNewAccumulatorTests,
 } from '../../test-constants';
 import {
   DidKeypair,
@@ -42,8 +41,6 @@ describe('Accumulator Module', () => {
   const seed1 = randomAsHex(32);
   const seed2 = randomAsHex(32);
   const seedAccum = randomAsHex(32);
-
-  const buildTest = DisableNewAccumulatorTests ? test.skip : test;
 
   beforeAll(async () => {
     await dock.init({
@@ -286,37 +283,35 @@ describe('Accumulator Module', () => {
     );
     expect(await chainModule.getAccumulator(id2, false)).toEqual(null);
 
-    if (!DisableNewAccumulatorTests) {
-      const id3 = randomAsHex(32);
-      const accumulated3 = randomAsHex(100);
-      await chainModule.addKBUniversalAccumulator(
-        id3,
-        accumulated3,
-        [did2, keyId],
-        did2,
-        pair2,
-        { didModule: dock.did },
-        false,
-      );
+    const id3 = randomAsHex(32);
+    const accumulated3 = randomAsHex(100);
+    await chainModule.addKBUniversalAccumulator(
+      id3,
+      accumulated3,
+      [did2, keyId],
+      did2,
+      pair2,
+      { didModule: dock.did },
+      false,
+    );
 
-      const accum3 = await chainModule.getAccumulator(id3, false);
-      expect(accum3.created > 0).toBe(true);
-      expect(accum3.lastModified > 0).toBe(true);
-      expect(accum3.created).toEqual(accum3.lastModified);
-      expect(accum3.type).toEqual('kb-universal');
-      expect(accum3.accumulated).toEqual(accumulated3);
-      expect(accum3.keyRef).toEqual([typedHexDID(dock.api, did2), keyId]);
-      expect(accum3.publicKey).toBeUndefined();
+    const accum3 = await chainModule.getAccumulator(id3, false);
+    expect(accum3.created > 0).toBe(true);
+    expect(accum3.lastModified > 0).toBe(true);
+    expect(accum3.created).toEqual(accum3.lastModified);
+    expect(accum3.type).toEqual('kb-universal');
+    expect(accum3.accumulated).toEqual(accumulated3);
+    expect(accum3.keyRef).toEqual([typedHexDID(dock.api, did2), keyId]);
+    expect(accum3.publicKey).toBeUndefined();
 
-      await chainModule.removeAccumulator(
-        id3,
-        did2,
-        pair2,
-        { didModule: dock.did },
-        false,
-      );
-      expect(await chainModule.getAccumulator(id3, false)).toEqual(null);
-    }
+    await chainModule.removeAccumulator(
+      id3,
+      did2,
+      pair2,
+      { didModule: dock.did },
+      false,
+    );
+    expect(await chainModule.getAccumulator(id3, false)).toEqual(null);
   }
 
   async function checkUpdate(keyId) {
@@ -534,9 +529,7 @@ describe('Accumulator Module', () => {
     }
 
     await check(0);
-    if (!DisableNewAccumulatorTests) {
-      await check(1);
-    }
+    await check(1);
   }
 
   test('Can add and remove accumulator', async () => {
@@ -620,11 +613,11 @@ describe('Accumulator Module', () => {
     expect(params3).toEqual(null);
   }, 50000);
 
-  buildTest('Can add and remove accumulator without public key', async () => {
+  test('Can add and remove accumulator without public key', async () => {
     await checkAddRemove(0);
   }, 50000);
 
-  buildTest('Update accumulator without public key', async () => {
+  test('Update accumulator without public key', async () => {
     await checkUpdate(0);
   }, 50000);
 

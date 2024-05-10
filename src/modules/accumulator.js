@@ -109,11 +109,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     if (typ === AccumulatorType.VBPos || typ === AccumulatorType.VBUni) {
       return u8aToHex(accumulated);
     } else if (typ === AccumulatorType.KBUni) {
-      // Create a single Uint8Array and convert it to hex. The 2 are guaranteed to be of the same length
-      const merged = new Uint8Array(accumulated.mem.length + accumulated.nonMem.length);
-      merged.set(accumulated.mem);
-      merged.set(accumulated.nonMem, accumulated.mem.length);
-      return u8aToHex(merged);
+      return u8aToHex(accumulated.toBytes());
     } else {
       throw new Error(`Unknown accumulator type ${typ}`);
     }
@@ -129,11 +125,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     if (typ === AccumulatorType.VBPos || typ === AccumulatorType.VBUni) {
       return hexToU8a(accumulated);
     } else if (typ === AccumulatorType.KBUni) {
-      // Create 2 Uint8Array from this hex. The 2 are guaranteed to be of the same length
-      const merged = hexToU8a(accumulated);
-      const mem = merged.subarray(0, merged.length / 2);
-      const nonMem = merged.subarray(merged.length / 2);
-      return new KBUniversalAccumulatorValue(mem, nonMem);
+      return KBUniversalAccumulatorValue.fromBytes(hexToU8a(accumulated));
     } else {
       throw new Error(`Unknown accumulator type ${typ}`);
     }

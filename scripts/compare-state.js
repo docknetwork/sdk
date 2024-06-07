@@ -2,7 +2,12 @@ import dock from "../src";
 import { timestampLogger } from "./helpers";
 import R from "ramda";
 
-const { FullNodeEndpoint, TargetBlockNumber } = process.env;
+const {
+  FullNodeEndpoint,
+  FirstBlockNumber,
+  SecondBlockNumber = +FirstBlockNumber + 1,
+  Transform = "toHuman",
+} = process.env;
 
 const info = timestampLogger.error;
 const output = console.log;
@@ -10,43 +15,38 @@ const output = console.log;
 async function main() {
   await dock.init({ address: FullNodeEndpoint });
 
-  info("Scanning the target block state");
-  const prev = await grabState(
-    await dock.api.at(
-      await dock.api.rpc.chain.getBlockHash(+TargetBlockNumber),
-    ),
+  info("Scanning the first block state");
+  const first = await grabState(
+    await dock.api.at(await dock.api.rpc.chain.getBlockHash(+FirstBlockNumber)),
   );
   info("-".repeat(50));
-  info("Scanning the next block state");
-  const cur = await grabState(
+  info("Scanning the second block state");
+  const second = await grabState(
     await dock.api.at(
-      await dock.api.rpc.chain.getBlockHash(+TargetBlockNumber + 1),
+      await dock.api.rpc.chain.getBlockHash(+SecondBlockNumber),
     ),
   );
   info("-".repeat(50));
 
-  const keys = new Set([...Object.keys(prev), ...Object.keys(cur)]);
-  keys.delete("substrate::code");
-  keys.delete("democracy::preimages");
-  keys.delete("grandpa");
+  const keys = new Set([...Object.keys(first), ...Object.keys(second)]);
 
-  const diff = Object.create(null);
+  const diff = {};
   for (const key of keys) {
-    if (key in prev && key in cur) {
-      if (!R.equals(prev[key], cur[key])) {
-        if (Array.isArray(prev[key]) && Array.isArray(cur[key])) {
+    if (key in first && key in second) {
+      if (!R.equals(first[key], second[key])) {
+        if (Array.isArray(first[key]) && Array.isArray(second[key])) {
           diff[key] = {
-            beforeDifference: R.difference(prev[key], cur[key]),
-            afterDifference: R.difference(cur[key], prev[key]),
+            beforeDifference: R.difference(first[key], second[key]),
+            afterDifference: R.difference(second[key], first[key]),
           };
         } else {
           diff[key] = {
-            before: prev[key],
-            after: cur[key],
+            before: first[key],
+            after: second[key],
           };
         }
       }
-    } else if (key in prev) {
+    } else if (key in first) {
       diff[key] = "REMOVED";
       info(`${key} doesn't exit anymore`);
     } else {
@@ -59,7 +59,7 @@ async function main() {
 }
 
 const grabState = async (api) => {
-  let data = Object.create(null);
+  const data = {};
 
   for (const moduleName of Object.keys(api.query)) {
     const module = api.query[moduleName];
@@ -77,12 +77,15 @@ const grabState = async (api) => {
       if (key === "substrate::code" || key === "democracy::preimages") continue;
       if (typeof member === "function") {
         try {
-          const value = await member();
+          const value = (await member())[Transform]();
 
           data[key] = value;
         } catch {
           try {
-            const value = await member.entries();
+            const value = [...(await member.entries())].map(([key, value]) => [
+              key[Transform](),
+              value[Transform](),
+            ]);
 
             data[key] = value;
           } catch (e) {
@@ -90,7 +93,7 @@ const grabState = async (api) => {
           }
         }
       } else {
-        throw key;
+        throw new Error(`Invalid type for the key: ${key}`);
       }
     }
   }
@@ -99,5 +102,5 @@ const grabState = async (api) => {
 };
 
 main()
-  .catch(console.error)
+  .catch(timestampLogger.error)
   .finally(() => process.exit());

@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 
 import { hexToU8a, isHex, u8aToHex } from '@polkadot/util';
-import { KBUniversalAccumulatorValue } from '@docknetwork/crypto-wasm-ts';
+import { KBUniversalAccumulatorValue, VBWitnessUpdateInfo } from '@docknetwork/crypto-wasm-ts';
 import { getDidNonce, getStateChange } from '../utils/misc';
 import WithParamsAndPublicKeys from './WithParamsAndPublicKeys';
 import { getAllExtrinsicsFromBlock } from '../utils/chain-ops';
@@ -924,6 +924,49 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
       return key.unwrap();
     } else {
       return null;
+    }
+  }
+
+  /**
+   * Update given witness by downloading necessary blocks and applying the updates if found. Both start and end are inclusive
+   * @param accumulatorId
+   * @param member
+   * @param witness - this will be updated to the latest witness
+   * @param startBlock - block number to start from
+   * @param endBlock - block number to end at. If not specified, it will pick the `lastUpdated` field of the accumulator.
+   * @returns {Promise<void>}
+   */
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  async updateVbAccumulatorWitnessFromUpdatesInBlocks(accumulatorId, member, witness, startBlock, endBlock = undefined) {
+    if (endBlock === undefined) {
+      const accum = await this.accumulatorModule.getAccumulator(accumulatorId, false);
+      // eslint-disable-next-line no-param-reassign
+      endBlock = accum.lastModified;
+    }
+    console.debug(`Will start updating witness from block ${startBlock} to ${endBlock}`);
+    let current = startBlock;
+    while (current <= endBlock) {
+      // eslint-disable-next-line no-await-in-loop
+      const updates = await this.getUpdatesFromBlock(accumulatorId, current);
+      for (const update of updates) {
+        const additions = [];
+        const removals = [];
+        if (update.additions !== null) {
+          for (const a of update.additions) {
+            additions.push(hexToU8a(a));
+          }
+        }
+        if (update.removals !== null) {
+          for (const a of update.removals) {
+            removals.push(hexToU8a(a));
+          }
+        }
+        console.debug(`Found ${additions.length} additions and ${removals.length} removals in block no ${current}`);
+        const queriedWitnessInfo = new VBWitnessUpdateInfo(hexToU8a(update.witnessUpdateInfo));
+
+        witness.updateUsingPublicInfoPostBatchUpdate(member, additions, removals, queriedWitnessInfo);
+      }
+      current++;
     }
   }
 

@@ -13,6 +13,7 @@ import AccumulatorModule, { AccumulatorType } from '../../../src/modules/accumul
 import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
 import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
 import { registerNewDIDUsingPair } from '../helpers';
+import { getLastBlockNo, waitForBlocks } from '../../../src/utils/chain-ops';
 
 describe('Prefilled positive accumulator', () => {
   // Incase updating an accumulator is expensive like making a blockchain txn, a cheaper strategy
@@ -156,6 +157,84 @@ describe('Prefilled positive accumulator', () => {
     witness3.updateUsingPublicInfoPostBatchUpdate(member3, additions, removals, queriedWitnessInfo);
     expect(verifAccumulator.verifyMembershipWitness(member3, witness3, accumPk, accumParams)).toEqual(true);
   });
+
+  test('Witness update after several batch upgrades', async () => {
+    let queriedAccum = await dock.accumulatorModule.getAccumulator(accumulatorId, true);
+    let verifAccumulator = PositiveAccumulator.fromAccumulated(AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated, AccumulatorType.VBPos));
+    const member = members[10];
+    let witness = await accumulator.membershipWitness(member, keypair.secretKey, accumState);
+
+    const accumPk = new AccumulatorPublicKey(hexToU8a(queriedAccum.publicKey.bytes));
+    const accumParams = new AccumulatorParams(hexToU8a(queriedAccum.publicKey.params.bytes));
+    expect(verifAccumulator.verifyMembershipWitness(member, witness, accumPk, accumParams)).toEqual(true);
+
+    await waitForBlocks(dock.api, 2);
+
+    // Do some updates to the accumulator
+
+    const removals1 = [members[85], members[86]];
+    const witnessUpdInfo1 = VBWitnessUpdateInfo.new(accumulator.accumulated, [], removals1, keypair.secretKey);
+    await accumulator.removeBatch(removals1, keypair.secretKey, accumState);
+    const accumulated1 = AccumulatorModule.accumulatedAsHex(accumulator.accumulated, AccumulatorType.VBPos);
+    const witUpdBytes1 = u8aToHex(witnessUpdInfo1.value);
+    await dock.accumulatorModule.updateAccumulator(accumulatorId, accumulated1, { removals: removals1.map((r) => u8aToHex(r)), witnessUpdateInfo: witUpdBytes1 }, did, pair, { didModule: dock.didModule }, false);
+
+    await waitForBlocks(dock.api, 5);
+
+    const removals2 = [members[87], members[88]];
+    const witnessUpdInfo2 = VBWitnessUpdateInfo.new(accumulator.accumulated, [], removals2, keypair.secretKey);
+    await accumulator.removeBatch(removals2, keypair.secretKey, accumState);
+    const accumulated2 = AccumulatorModule.accumulatedAsHex(accumulator.accumulated, AccumulatorType.VBPos);
+    const witUpdBytes2 = u8aToHex(witnessUpdInfo2.value);
+    await dock.accumulatorModule.updateAccumulator(accumulatorId, accumulated2, { removals: removals2.map((r) => u8aToHex(r)), witnessUpdateInfo: witUpdBytes2 }, did, pair, { didModule: dock.didModule }, false);
+
+    await waitForBlocks(dock.api, 5);
+
+    const removals3 = [members[89], members[90], members[91]];
+    const witnessUpdInfo3 = VBWitnessUpdateInfo.new(accumulator.accumulated, [], removals3, keypair.secretKey);
+    await accumulator.removeBatch(removals3, keypair.secretKey, accumState);
+    const accumulated3 = AccumulatorModule.accumulatedAsHex(accumulator.accumulated, AccumulatorType.VBPos);
+    const witUpdBytes3 = u8aToHex(witnessUpdInfo3.value);
+    await dock.accumulatorModule.updateAccumulator(accumulatorId, accumulated3, { removals: removals3.map((r) => u8aToHex(r)), witnessUpdateInfo: witUpdBytes3 }, did, pair, { didModule: dock.didModule }, false);
+
+    // Get a witness from the accumulator manager. This will be updated after the following updates.
+    witness = await accumulator.membershipWitness(member, keypair.secretKey, accumState);
+    // The user should be told the block number from which he is supposed to update the witnesses from. It will be one block
+    // ahead from where the last update was posted.
+    const blockNoToUpdateFrom = (await getLastBlockNo(dock.api)) + 1;
+
+    await waitForBlocks(dock.api, 5);
+
+    // Do some more updates to the accumulator
+    const removals4 = [members[92], members[93]];
+    const witnessUpdInfo4 = VBWitnessUpdateInfo.new(accumulator.accumulated, [], removals4, keypair.secretKey);
+    await accumulator.removeBatch(removals4, keypair.secretKey, accumState);
+    const accumulated4 = AccumulatorModule.accumulatedAsHex(accumulator.accumulated, AccumulatorType.VBPos);
+    const witUpdBytes4 = u8aToHex(witnessUpdInfo4.value);
+    await dock.accumulatorModule.updateAccumulator(accumulatorId, accumulated4, { removals: removals4.map((r) => u8aToHex(r)), witnessUpdateInfo: witUpdBytes4 }, did, pair, { didModule: dock.didModule }, false);
+    console.log(`Updated witness at block ${(await getLastBlockNo(dock.api))}`);
+    await waitForBlocks(dock.api, 5);
+
+    const removals5 = [members[94], members[95], members[96]];
+    const witnessUpdInfo5 = VBWitnessUpdateInfo.new(accumulator.accumulated, [], removals5, keypair.secretKey);
+    await accumulator.removeBatch(removals5, keypair.secretKey, accumState);
+    const accumulated5 = AccumulatorModule.accumulatedAsHex(accumulator.accumulated, AccumulatorType.VBPos);
+    const witUpdBytes5 = u8aToHex(witnessUpdInfo5.value);
+    await dock.accumulatorModule.updateAccumulator(accumulatorId, accumulated5, { removals: removals5.map((r) => u8aToHex(r)), witnessUpdateInfo: witUpdBytes5 }, did, pair, { didModule: dock.didModule }, false);
+    console.log(`Updated witness at block ${(await getLastBlockNo(dock.api))}`);
+    await waitForBlocks(dock.api, 5);
+
+    queriedAccum = await dock.accumulatorModule.getAccumulator(accumulatorId, true);
+    verifAccumulator = PositiveAccumulator.fromAccumulated(AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated, AccumulatorType.VBPos));
+    // Old witness doesn't verify with new accumulator
+    expect(verifAccumulator.verifyMembershipWitness(member, witness, accumPk, accumParams)).toEqual(false);
+
+    // Update witness by downloading necessary blocks and applying the updates if found
+    await dock.accumulatorModule.updateVbAccumulatorWitnessFromUpdatesInBlocks(accumulatorId, member, witness, blockNoToUpdateFrom, queriedAccum.lastModified);
+
+    // Updated witness verifies with new accumulator
+    expect(verifAccumulator.verifyMembershipWitness(member, witness, accumPk, accumParams)).toEqual(true);
+  }, 60000);
 
   afterAll(async () => {
     await dock.disconnect();

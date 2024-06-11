@@ -2,7 +2,7 @@
 
 import { hexToU8a, isHex, u8aToHex } from '@polkadot/util';
 import { KBUniversalAccumulatorValue, VBWitnessUpdateInfo } from '@docknetwork/crypto-wasm-ts';
-import { getDidNonce, getStateChange } from '../utils/misc';
+import { getDidNonce, getStateChange, inclusiveRange } from '../utils/misc';
 import WithParamsAndPublicKeys from './WithParamsAndPublicKeys';
 import { getAllExtrinsicsFromBlock } from '../utils/chain-ops';
 import { createDidSig, typedHexDID } from '../utils/did';
@@ -799,40 +799,66 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
       blockNoOrBlockHash,
       false,
     );
-    const updates = [];
-    extrinsics.forEach((ext) => {
-      if (
-        ext.method
-        && ext.method.section === 'accumulator'
-        && ext.method.method === 'updateAccumulator'
-      ) {
-        const update = this.api.createType(
-          'UpdateAccumulator',
-          ext.method.args[0],
-        );
-        if (u8aToHex(update.id) === accumulatorId) {
-          // The following commented line produces truncated hex strings. Don't know why
-          // const additions = update.additions.isSome ? update.additions.unwrap().map(u8aToHex) : null;
-          const additions = update.additions.isSome
-            ? update.additions.unwrap().map((i) => u8aToHex(i))
-            : null;
-          const removals = update.removals.isSome
-            ? update.removals.unwrap().map((i) => u8aToHex(i))
-            : null;
-          const witnessUpdateInfo = update.witnessUpdateInfo.isSome
-            ? u8aToHex(update.witnessUpdateInfo.unwrap())
-            : null;
+    return extrinsics.map((e) => this.getUpdatesFromExtrinsic(e, accumulatorId)).filter((u) => u !== undefined);
+  }
 
-          updates.push({
-            newAccumulated: u8aToHex(update.newAccumulated),
-            additions,
-            removals,
-            witnessUpdateInfo,
-          });
-        }
+  /**
+   * Fetch blocks corresponding to the given block numbers or hashes and get all accumulator updates made in those blocks' extrinsics corresponding to accumulator id `accumulatorId`
+   * @param accumulatorId
+   * @param blockNosOrBlockHashes {number[]|string[]}
+   * @returns {Promise<object[]>} - Resolves to an array of `update`s where each `update` is an object with keys
+   * `newAccumulated`, `additions`, `removals` and `witnessUpdateInfo`. The last keys have value null if they were
+   * not provided in the extrinsic.
+   */
+  async getUpdatesFromBlocks(accumulatorId, blockNosOrBlockHashes) {
+    // NOTE: polkadot-js doesn't allow to fetch more than one block in 1 RPC call.
+    const extrinsics = await Promise.all(blockNosOrBlockHashes.map(async (b) => await getAllExtrinsicsFromBlock(
+      this.api,
+      b,
+      false,
+    )));
+    return extrinsics.flat().map((e) => this.getUpdatesFromExtrinsic(e, accumulatorId)).filter((u) => u !== undefined);
+  }
+
+  /**
+   * Get accumulator updates corresponding to accumulator id `accumulatorId`
+   * @param ext
+   * @param accumulatorId
+   * @returns {Promise<object|undefined>} - Resolves to an `update` object with keys `newAccumulated`, `additions`, `removals` and `witnessUpdateInfo`.
+   * The last keys have value null if they were not provided in the extrinsic.
+   */
+  getUpdatesFromExtrinsic(ext, accumulatorId) {
+    if (
+      ext.method
+      && ext.method.section === 'accumulator'
+      && ext.method.method === 'updateAccumulator'
+    ) {
+      const update = this.api.createType(
+        'UpdateAccumulator',
+        ext.method.args[0],
+      );
+      if (u8aToHex(update.id) === accumulatorId) {
+        // The following commented line produces truncated hex strings. Don't know why
+        // const additions = update.additions.isSome ? update.additions.unwrap().map(u8aToHex) : null;
+        const additions = update.additions.isSome
+          ? update.additions.unwrap().map((i) => u8aToHex(i))
+          : null;
+        const removals = update.removals.isSome
+          ? update.removals.unwrap().map((i) => u8aToHex(i))
+          : null;
+        const witnessUpdateInfo = update.witnessUpdateInfo.isSome
+          ? u8aToHex(update.witnessUpdateInfo.unwrap())
+          : null;
+
+        return {
+          newAccumulated: u8aToHex(update.newAccumulated),
+          additions,
+          removals,
+          witnessUpdateInfo,
+        };
       }
-    });
-    return updates;
+    }
+    return undefined;
   }
 
   /**
@@ -934,20 +960,24 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @param witness - this will be updated to the latest witness
    * @param startBlock - block number to start from
    * @param endBlock - block number to end at. If not specified, it will pick the `lastUpdated` field of the accumulator.
+   * @param batchSize - the number of blocks to fetch in one go
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  async updateVbAccumulatorWitnessFromUpdatesInBlocks(accumulatorId, member, witness, startBlock, endBlock = undefined) {
+  async updateVbAccumulatorWitnessFromUpdatesInBlocks(accumulatorId, member, witness, startBlock, endBlock = undefined, batchSize = 10) {
     if (endBlock === undefined) {
       const accum = await this.accumulatorModule.getAccumulator(accumulatorId, false);
       // eslint-disable-next-line no-param-reassign
       endBlock = accum.lastModified;
     }
+    // If endBlock < startBlock, it won't throw an error but won't fetch any updates and witness won't be updated.
     console.debug(`Will start updating witness from block ${startBlock} to ${endBlock}`);
     let current = startBlock;
     while (current <= endBlock) {
+      const till = (current + batchSize) <= endBlock ? (current + batchSize) : endBlock;
+      // Get updates from blocks [current, current + 1, current + 2, ..., till]
       // eslint-disable-next-line no-await-in-loop
-      const updates = await this.getUpdatesFromBlock(accumulatorId, current);
+      const updates = await this.getUpdatesFromBlocks(accumulatorId, inclusiveRange(current, till, 1));
       for (const update of updates) {
         const additions = [];
         const removals = [];
@@ -966,7 +996,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
 
         witness.updateUsingPublicInfoPostBatchUpdate(member, additions, removals, queriedWitnessInfo);
       }
-      current++;
+      current = till + 1;
     }
   }
 

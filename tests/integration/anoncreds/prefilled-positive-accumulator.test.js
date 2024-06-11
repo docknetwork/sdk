@@ -5,6 +5,7 @@ import {
   AccumulatorPublicKey,
   PositiveAccumulator,
   VBWitnessUpdateInfo,
+  VBMembershipWitness,
 } from '@docknetwork/crypto-wasm-ts';
 import { randomAsHex } from '@polkadot/util-crypto';
 import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
@@ -229,11 +230,26 @@ describe('Prefilled positive accumulator', () => {
     // Old witness doesn't verify with new accumulator
     expect(verifAccumulator.verifyMembershipWitness(member, witness, accumPk, accumParams)).toEqual(false);
 
+    const oldWitness1 = new VBMembershipWitness(witness.value);
+    const oldWitness2 = new VBMembershipWitness(witness.value);
+    const oldWitness3 = new VBMembershipWitness(witness.value);
+
     // Update witness by downloading necessary blocks and applying the updates if found
     await dock.accumulatorModule.updateVbAccumulatorWitnessFromUpdatesInBlocks(accumulatorId, member, witness, blockNoToUpdateFrom, queriedAccum.lastModified);
 
     // Updated witness verifies with new accumulator
     expect(verifAccumulator.verifyMembershipWitness(member, witness, accumPk, accumParams)).toEqual(true);
+
+    // Test again with a batch size bigger than the total number of blocks
+    await dock.accumulatorModule.updateVbAccumulatorWitnessFromUpdatesInBlocks(accumulatorId, member, oldWitness1, blockNoToUpdateFrom, queriedAccum.lastModified, queriedAccum.lastModified - blockNoToUpdateFrom + 10);
+    expect(verifAccumulator.verifyMembershipWitness(member, oldWitness1, accumPk, accumParams)).toEqual(true);
+
+    // Test again with few other batch sizes
+    await dock.accumulatorModule.updateVbAccumulatorWitnessFromUpdatesInBlocks(accumulatorId, member, oldWitness2, blockNoToUpdateFrom, queriedAccum.lastModified, 3);
+    expect(verifAccumulator.verifyMembershipWitness(member, oldWitness2, accumPk, accumParams)).toEqual(true);
+
+    await dock.accumulatorModule.updateVbAccumulatorWitnessFromUpdatesInBlocks(accumulatorId, member, oldWitness3, blockNoToUpdateFrom, queriedAccum.lastModified, 4);
+    expect(verifAccumulator.verifyMembershipWitness(member, oldWitness3, accumPk, accumParams)).toEqual(true);
   }, 60000);
 
   afterAll(async () => {

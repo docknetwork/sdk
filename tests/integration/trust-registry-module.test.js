@@ -8,6 +8,7 @@ import {
   FullNodeEndpoint,
   TestKeyringOpts,
   TestAccountURI,
+  DisableTrustRegistryParticipantsTests,
 } from '../test-constants';
 
 import { DidKeypair, DidMethodKey, DockDid } from '../../src/utils/did';
@@ -69,31 +70,33 @@ describe('Trust Registry', () => {
       dock,
     );
 
-    const participants = new BTreeMap(
-      dock.api.registry,
-      'IssuerOrVerifier',
-      'AddOrRemoveOrModify',
-    );
+    if (!DisableTrustRegistryParticipantsTests) {
+      const participants = new BTreeMap(
+        dock.api.registry,
+        'IssuerOrVerifier',
+        'AddOrRemoveOrModify',
+      );
 
-    for (const [did, _] of participantDidsWithKeys) {
-      participants.set(did, 'Add');
-    }
+      for (const [did, _] of participantDidsWithKeys) {
+        participants.set(did, 'Add');
+      }
 
-    const sigs = await Promise.all(
-      [...participantDidsWithKeys, convener].map(([did, signingKeyRef]) => dock.trustRegistry.signChangeParticipants(
-        did,
+      const sigs = await Promise.all(
+        [...participantDidsWithKeys, convener].map(([did, signingKeyRef]) => dock.trustRegistry.signChangeParticipants(
+          did,
+          trustRegistryId,
+          participants,
+          signingKeyRef,
+          dock,
+        )),
+      );
+
+      await dock.trustRegistry.changeParticipants(
         trustRegistryId,
         participants,
-        signingKeyRef,
-        dock,
-      )),
-    );
-
-    await dock.trustRegistry.changeParticipants(
-      trustRegistryId,
-      participants,
-      sigs,
-    );
+        sigs,
+      );
+    }
 
     return trustRegistryId;
   };

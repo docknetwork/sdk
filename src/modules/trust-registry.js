@@ -274,7 +274,6 @@ export default class TrustRegistryModule {
   /**
    * Creates a transaction to change participants in the registry.
    *
-   * @param convenerOrIssuerOrVerifierDid
    * @param registryId
    * @param participants
    * @param sigs

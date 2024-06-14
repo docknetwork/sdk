@@ -5,36 +5,38 @@ jobs:
   master:
     runs-on: ubuntu-latest
     env:
-      CONFIG_DOCK_NODE_IMAGE_TAG: 'master'
+      CONFIG_DOCK_NODE_IMAGE_TAG: "master"
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: '18.x'
+          node-version: "18.x"
       - run: yarn install --frozen-lockfile
       - run: yarn build
       - run: yarn test-with-node
   mainnet:
     runs-on: ubuntu-latest
     env:
-      CONFIG_DOCK_NODE_IMAGE_TAG: 'mainnet'
+      CONFIG_DOCK_NODE_IMAGE_TAG: "mainnet"
+      DisableTrustRegistryParticipantsTests: true
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: '18.x'
+          node-version: "18.x"
       - run: yarn install --frozen-lockfile
       - run: yarn build
       - run: yarn test-with-node
   testnet:
     runs-on: ubuntu-latest
     env:
-      CONFIG_DOCK_NODE_IMAGE_TAG: 'testnet'
+      CONFIG_DOCK_NODE_IMAGE_TAG: "testnet"
+      DisableTrustRegistryParticipantsTests: true
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: '18.x'
+          node-version: "18.x"
       - run: yarn install --frozen-lockfile
       - run: yarn build
       - run: yarn test-with-node

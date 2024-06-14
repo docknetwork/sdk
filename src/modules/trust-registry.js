@@ -217,6 +217,85 @@ export default class TrustRegistryModule {
   }
 
   /**
+   * Creates a signature for participants change produced by given `convenerOrIssuerOrVerifierDid` using supplied `signingKeyRef`.
+   *
+   * @param convenerOrIssuerOrVerifierDid
+   * @param registryId
+   * @param participants
+   * @param signingKeyRef
+   */
+  async signChangeParticipants(
+    convenerOrIssuerOrVerifierDid,
+    registryId,
+    participants,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined } = {},
+  ) {
+    const [convenerOrIssuerOrVerifierHexDid, lastNonce] = await this.getActorDidAndNonce(convenerOrIssuerOrVerifierDid, {
+      nonce,
+      didModule,
+    });
+
+    return {
+      sig: convenerOrIssuerOrVerifierHexDid.signStateChange(
+        this.api,
+        'ChangeParticipants',
+        { data: { registryId, participants }, nonce: lastNonce },
+        signingKeyRef,
+      ),
+      nonce: lastNonce,
+    };
+  }
+
+  /**
+   * Changes participants in the provided registry.
+   *
+   * @param registryId
+   * @param participants
+   * @param sigs
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<null>}
+   */
+  async changeParticipants(
+    registryId,
+    participants,
+    sigs,
+    waitForFinalization = true,
+    params = {},
+  ) {
+    return this.signAndSend(
+      await this.changeParticipantsTx(registryId, participants, sigs),
+      waitForFinalization,
+      params,
+    );
+  }
+
+  /**
+   * Creates a transaction to change participants in the registry.
+   *
+   * @param convenerOrIssuerOrVerifierDid
+   * @param registryId
+   * @param participants
+   * @param sigs
+   * @returns {Promise<null>}
+   */
+  async changeParticipantsTx(registryId, participants, sigs) {
+    ensureMatchesPattern(
+      this.constructor.ChangeParticipantsPattern,
+      participants,
+    );
+
+    return this.module.changeParticipants(
+      {
+        registryId,
+        participants,
+      },
+      sigs,
+    );
+  }
+
+  /**
    * Sets schema metadatas in the registry.
    *
    * @param convenerOrIssuerOrVerifierDid
@@ -717,6 +796,21 @@ TrustRegistryModule.SchemasUpdatePattern = {
     Set: SetAllSchemasPattern,
     Modify: ModifySchemasPattern,
   },
+};
+TrustRegistryModule.ChangeParticipantsPattern = {
+  $mapOf: [
+    DockDidOrDidMethodKeyPattern,
+    {
+      $anyOf: [
+        {
+          $matchValue: 'Add',
+        },
+        {
+          $matchValue: 'Remove',
+        },
+      ],
+    },
+  ],
 };
 TrustRegistryModule.RegistryQueryByPattern = {
   $matchObject: {

@@ -98,13 +98,7 @@ export function createDidKey(publicKey, verRel) {
 export function createDidSig(did, { keyId }, rawSig) {
   const sig = rawSig.toJSON();
 
-  if (typeof did === 'string') {
-    return {
-      did,
-      keyId,
-      sig,
-    };
-  } else if (did.isDid) {
+  if (did.isDid) {
     return {
       DidSignature: {
         did: did.asDid,

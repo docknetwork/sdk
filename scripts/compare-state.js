@@ -27,7 +27,7 @@ const ToSkip = new Set([
  *
  * ## Success
  * Each migrated storage entry must have:
- * - For iterable entries (`Vec`s, `Set`s): `differenceBefore` containing old values and `differenceAfter` showing new values.
+ * - For iterable entries (`Vec`s, `Set`s): `diffBefore` containing old values that don't exist anymore and `diffAfter` showing new values that didn't exist before.
  * - For non-iterable entries: `stateBefore` containing old value and `stateAfter` showing new value.
  * - If the storage entry didn't exist before, it will have the `ADDED` value.
  * - If the storage entry will be removed during the upgrade and existed before, it will have the `REMOVED` value.
@@ -39,25 +39,25 @@ const ToSkip = new Set([
  *
  * ## Success
  * Each migrated storage entry must have:
- * - A `keys` field with two properties: `differenceBefore` containing old keys and `differenceAfter` showing new keys.
+ * - A `keys` field with two properties: `diffBefore` containing old keys that don't exist anymore and `diffAfter` showing new keys that didn't exist before.
  * - If the storage entry didn't exist before, it will have the `ADDED` value.
  * - If the storage entry will be removed during the upgrade and existed before, it will have the `REMOVED` value.
  *
  * ## Failures
  * - If there's no migrated key in the difference output, the data wasn't changed.
- * - If there's no associated `keys` field but `differenceAfter`/`differenceBefore` instead, the data was also modified.
+ * - If there's no associated `keys` field but `diffBefore`/`diffAfter` instead, the values were also modified.
  *
  * # Storage entry values translation
  *
  * ## Success
  * Each migrated storage entry must have:
- * - A `values` field with two properties: `differenceBefore` containing old keys and `differenceAfter` showing new keys.
+ * - A `values` field with two properties: `diffBefore` containing old values that don't exist anymore and `diffAfter` showing new values that didn't exist before.
  * - If the storage entry didn't exist before, it will have the `ADDED` value.
  * - If the storage entry will be removed during the upgrade and existed before, it will have the `REMOVED` value.
  *
  * ## Failures
  * - If there's no migrated key in the difference output, the data wasn't changed.
- * - If there's no associated `values` field but `differenceAfter`/`differenceBefore` instead, the data was also modified.
+ * - If there's no associated `values` field but `diffBefore`/`diffAfter` instead, the keys were also modified.
  */
 async function main() {
   await dock.init({ address: FullNodeEndpoint });
@@ -75,58 +75,64 @@ async function main() {
   );
   info("-".repeat(50));
 
-  const keys = new Set([...Object.keys(first), ...Object.keys(second)]);
-  const calcDiff = R.curry((a, b) => ({
-    differenceBefore: R.difference(a, b),
-    differenceAfter: R.difference(b, a),
-  }));
+  const entries = new Set([...Object.keys(first), ...Object.keys(second)]);
 
-  const diff = {};
-  for (const key of keys) {
-    if (key in first && key in second) {
-      if (!R.equals(first[key], second[key])) {
-        if (Array.isArray(first[key]) && Array.isArray(second[key])) {
-          if (first[key][KeyedSymbol] && second[key][KeyedSymbol]) {
-            const { keys, values } = R.pipe(
-              R.addIndex(R.reduce)(
-                (acc, cur, idx) => ({
-                  ...acc,
-                  [cur]: R.map(R.o(R.defaultTo([]), R.map(R.nth(idx))), [
-                    first[key],
-                    second[key],
-                  ]),
-                }),
-                {},
-              ),
-              R.map(R.o(R.reject(R.isEmpty), R.apply(calcDiff))),
-            )(["keys", "values"]);
-
-            if (R.isEmpty(keys) || R.isEmpty(values)) {
-              diff[key] = R.reject(R.isEmpty, { keys, values });
-            } else {
-              diff[key] = calcDiff(first[key], second[key]);
-            }
-          } else {
-            diff[key] = calcDiff(first[key], second[key]);
-          }
-        } else {
-          diff[key] = {
-            stateBefore: first[key],
-            stateAfter: second[key],
-          };
-        }
+  const res = {};
+  for (const entry of entries) {
+    if (entry in first && entry in second) {
+      if (!R.equals(first[entry], second[entry])) {
+        res[entry] = buildDiff(first[entry], second[entry]);
       }
-    } else if (key in first) {
-      diff[key] = "REMOVED";
-      info(`${key} doesn't exit anymore`);
+    } else if (entry in first) {
+      res[entry] = "REMOVED";
+      info(`Removed storage entry: ${entry}`);
     } else {
-      diff[key] = "ADDED";
-      info(`New key: ${key}`);
+      res[entry] = "ADDED";
+      info(`New storage entry: ${entry}`);
     }
   }
 
-  output(JSON.stringify(diff, null, 2));
+  output(JSON.stringify(res, null, 2));
 }
+
+/**
+ * Calculates difference between first and second states.
+ */
+const buildDiff = R.curry((first, second) => {
+  const diff = R.curry((a, b) => ({
+    diffBefore: R.difference(a, b),
+    diffAfter: R.difference(b, a),
+  }));
+
+  if (Array.isArray(first) && Array.isArray(second)) {
+    if (first[KeyedSymbol] && second[KeyedSymbol]) {
+      const { keys, values } = R.pipe(
+        R.addIndex(R.reduce)(
+          (acc, cur, idx) => ({
+            ...acc,
+            [cur]: R.map(R.o(R.defaultTo([]), R.map(R.nth(idx))), [
+              first,
+              second,
+            ]),
+          }),
+          {},
+        ),
+        R.map(R.o(R.reject(R.isEmpty), R.apply(diff))),
+      )(["keys", "values"]);
+
+      if (R.isEmpty(keys) || R.isEmpty(values)) {
+        return R.reject(R.isEmpty, { keys, values });
+      }
+    }
+
+    return diff(first, second);
+  } else {
+    return {
+      stateBefore: first,
+      stateAfter: second,
+    };
+  }
+});
 
 /**
  * Grabs the state of the blockchain at a given API instance.
@@ -138,6 +144,7 @@ async function main() {
  */
 const grabState = async (api) => {
   const data = {};
+  const parseObj = R.o(JSON.parse, JSON.stringify);
 
   for (const moduleName of Object.keys(api.query)) {
     const module = api.query[moduleName];
@@ -159,17 +166,13 @@ const grabState = async (api) => {
 
       if (typeof member === "function") {
         try {
-          const value = (await member())[Transform]();
-
-          data[key] = value;
+          data[key] = parseObj((await member())[Transform]());
         } catch {
           try {
-            const value = [...(await member.entries())].map(([key, value]) => [
-              key[Transform](),
-              value[Transform](),
+            data[key] = [...(await member.entries())].map(([key, value]) => [
+              parseObj(key[Transform]()),
+              parseObj(value[Transform]()),
             ]);
-
-            data[key] = value;
             data[key][KeyedSymbol] = true;
           } catch (e) {
             info(`Skipped ${key}`);

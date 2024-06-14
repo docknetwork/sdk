@@ -20,4 +20,4 @@ export function typedHexDID(_api, did) {
  * Create and return a fully qualified Dock DID, i.e. "did:dock:<SS58 string>"
  * @returns {string} - The DID
  */
-export const createNewDockDID = () => DockDid.random().toQualifiedEncodedString();
+export const createNewDockDID = () => DockDid.random();

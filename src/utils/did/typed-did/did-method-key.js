@@ -48,7 +48,7 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
    * Creates a new `DidMethodKey` from the supplied keypair.
    *
    * @param {DockKeypair} keypair
-   * @returns {this}
+   * @returns {DidMethodKey}
    */
   static fromKeypair(keypair) {
     return new this(keypair.publicKey());
@@ -57,7 +57,7 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
   /**
    * Instantiates `DidMethodKey` from a fully qualified did string.
    * @param {string} did - fully qualified `did:key:*` string
-   * @returns {this}
+   * @returns {DidMethodKey}
    */
   static fromQualifiedString(did) {
     const { id } = parseDIDUrl(did);
@@ -79,7 +79,7 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
   /**
    * Instantiates `DockDid` from a did method key object received from the substrate side.
    * @param {object} key - substrate did method key
-   * @returns {this}
+   * @returns {DidMethodKey}
    */
   static fromSubstrateValue(did) {
     const key = did.asDidMethodKey;

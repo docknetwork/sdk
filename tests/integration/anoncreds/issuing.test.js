@@ -1,6 +1,8 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
-import { DefaultSchemaParsingOpts, CredentialBuilder, CredentialSchema, initializeWasm } from '@docknetwork/crypto-wasm-ts';
+import {
+  DefaultSchemaParsingOpts, CredentialBuilder, CredentialSchema, initializeWasm,
+} from '@docknetwork/crypto-wasm-ts';
 import { DockAPI } from '../../../src';
 import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
 import { DockResolver } from '../../../src/resolver';

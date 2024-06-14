@@ -26,7 +26,7 @@ export default class DockDid extends DockDidOrDidMethodKey {
   /**
    * Generates a random DID.
    *
-   * @returns {this}
+   * @returns {DockDid}
    */
   static random() {
     return new this(randomAsHex(DockDIDByteSize));
@@ -35,7 +35,7 @@ export default class DockDid extends DockDidOrDidMethodKey {
   /**
    * Instantiates `DockDid` from a fully qualified did string.
    * @param {string} did - fully qualified `did:dock:*` string
-   * @returns {this}
+   * @returns {DockDid}
    */
   static fromQualifiedString(did) {
     return new this(getHexIdentifier(did, DockDIDQualifier, DockDIDByteSize));
@@ -44,7 +44,7 @@ export default class DockDid extends DockDidOrDidMethodKey {
   /**
    * Instantiates `DockDid` from a did object received from the substrate side.
    * @param {object} did - substrate did
-   * @returns {this}
+   * @returns {DockDid}
    */
   static fromSubstrateValue(did) {
     return new this(getHexIdentifier(did.asDid, [], DockDIDByteSize));

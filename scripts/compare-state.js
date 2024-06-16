@@ -2,7 +2,6 @@ import { ApiPromise } from "@polkadot/api";
 import dock from "../src";
 import { timestampLogger } from "./helpers";
 import R from "ramda";
-import { nth } from "ramda";
 
 const {
   FullNodeEndpoint,
@@ -95,44 +94,49 @@ async function main() {
   output(JSON.stringify(res, null, 2));
 }
 
-/**
- * Calculates difference between first and second states.
- */
-const buildDiff = R.curry((first, second) => {
-  const diff = R.curry((a, b) => ({
-    diffBefore: R.difference(a, b),
-    diffAfter: R.difference(b, a),
-  }));
+/** Calculates the difference for two values, returning the before- and after-looking differences. */
+const diff = R.curry((a, b) => ({
+  diffBefore: R.difference(a, b),
+  diffAfter: R.difference(b, a),
+}));
 
-  if (Array.isArray(first) && Array.isArray(second)) {
-    if (first[KeyedSymbol] && second[KeyedSymbol]) {
-      const { keys, values } = R.pipe(
-        R.addIndex(R.reduce)(
-          (acc, cur, idx) => ({
-            ...acc,
-            [cur]: R.map(R.o(R.defaultTo([]), R.map(R.nth(idx))), [
-              first,
-              second,
-            ]),
-          }),
-          {},
+/** Extracts keys and values from the supplied objects then calculates the difference for keys and values. */
+const keysValuesDiff = R.pipe(
+  R.addIndex(R.map)((key, idx) => ({
+    [key]: R.pipe(
+      R.map(R.o(R.defaultTo([]), R.map(R.nth(idx)))),
+      R.apply(diff),
+      R.reject(R.isEmpty),
+    ),
+  })),
+  R.mergeAll,
+  R.applySpec,
+)(["keys", "values"]);
+
+/** Calculates the difference between the first and second states. */
+const buildDiff = R.curryN(
+  2,
+  R.unapply(
+    R.ifElse(
+      R.all(Array.isArray),
+      R.either(
+        R.both(
+          R.all(R.prop(KeyedSymbol)),
+          R.pipe(
+            keysValuesDiff,
+            R.reject(R.isEmpty),
+            R.unless(R.pipe(R.keys, R.length, R.equals(1)), R.F),
+          ),
         ),
-        R.map(R.o(R.reject(R.isEmpty), R.apply(diff))),
-      )(["keys", "values"]);
-
-      if (R.isEmpty(keys) || R.isEmpty(values)) {
-        return R.reject(R.isEmpty, { keys, values });
-      }
-    }
-
-    return diff(first, second);
-  } else {
-    return {
-      stateBefore: first,
-      stateAfter: second,
-    };
-  }
-});
+        R.apply(diff),
+      ),
+      R.applySpec({
+        stateBefore: R.nth(0),
+        stateAfter: R.nth(1),
+      }),
+    ),
+  ),
+);
 
 /**
  * Grabs the state of the blockchain at a given API instance.

@@ -57,13 +57,21 @@ export async function generateAccount({ secretUri, type = 'sr25519', network = '
   return [secretUri, keypair.address, keypair];
 }
 
-// Get the last authored block
+/**
+ * Get the last authored block
+ * @param api
+ * @returns {Promise<*>}
+ */
 export async function getLastBlock(api) {
   const { block } = await api.rpc.chain.getBlock();
   return block;
 }
 
-// Get the last finalized block
+/**
+ * Get the last finalized block
+ * @param api
+ * @returns {Promise<*|{author: *, block: *}>}
+ */
 export async function getLastFinalizedBlock(api) {
   const h = await api.rpc.chain.getFinalizedHead();
   return getBlock(api, u8aToHex(h));
@@ -78,7 +86,13 @@ export async function blockNumberToHash(api, number) {
   throw new Error(`${number} is not a valid block number`);
 }
 
-// Fetch a block by block number or block hash
+/**
+ * Fetch a block by block number or block hash
+ * @param api
+ * @param numberOrHash
+ * @param withAuthor
+ * @returns {Promise<*|{author: *, block: *}>}
+ */
 export async function getBlock(api, numberOrHash, withAuthor = false) {
   const hash = isHexWithGivenByteSize(numberOrHash, 32) ? numberOrHash : (await blockNumberToHash(api, numberOrHash));
   if (withAuthor) {
@@ -89,12 +103,44 @@ export async function getBlock(api, numberOrHash, withAuthor = false) {
   return block;
 }
 
-// Given a block header or block, extract the block number
+/**
+ * Given a block header or block, extract the block number
+ * @param headerOrBlock
+ * @returns {*}
+ */
 export function getBlockNo(headerOrBlock) {
   if ((typeof headerOrBlock.header) === 'object') {
     return headerOrBlock.header.number.toNumber();
   }
   return headerOrBlock.number.toNumber();
+}
+
+/**
+ * Get the last authored block's number
+ * @param api
+ * @returns {Promise<number>}
+ */
+export async function getLastBlockNo(api) {
+  const { block } = await api.rpc.chain.getBlock();
+  return block.header.number.toNumber();
+}
+
+/**
+ * Wait for some blocks to be produced
+ * @param api
+ * @param n - the number of blocks to wait for
+ * @returns {Promise<void>}
+ */
+export async function waitForBlocks(api, n) {
+  let currentBlockNo = await getLastBlockNo(api);
+  const targetBlockNo = currentBlockNo + n;
+  const blockTime = api.consts.babe.expectedBlockTime.toNumber();
+  while (currentBlockNo < targetBlockNo) {
+    // eslint-disable-next-line no-await-in-loop,no-loop-func
+    await new Promise((r) => setTimeout(r, blockTime * (targetBlockNo - currentBlockNo)));
+    // eslint-disable-next-line no-await-in-loop
+    currentBlockNo = await getLastBlockNo(api);
+  }
 }
 
 /**

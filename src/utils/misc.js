@@ -265,3 +265,12 @@ export async function getDidNonce(
    * @param value
    */
 export const ensureMatchesPattern = (pattern, value) => new PatternMatcher().check(pattern, value);
+
+/**
+ * Get a list of numbers in the range [start, stop], i.e. both are inclusive. Taken from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from#sequence_generator_range
+ * @param start
+ * @param stop
+ * @param step
+ * @returns {number[]}
+ */
+export const inclusiveRange = (start, stop, step) => Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);

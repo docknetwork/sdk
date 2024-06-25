@@ -563,6 +563,7 @@ describe('Trust Registry', () => {
 
     expect(await dock.trustRegistry.schemaMetadata(schemaId)).toEqual(
       dock.trustRegistry.parseMapEntries(
+        String,
         dock.trustRegistry.parseSchemaMetadata,
         new Map([
           [trustRegistryId, schema1MetadataInTrustRegistry1],
@@ -572,6 +573,7 @@ describe('Trust Registry', () => {
     );
     expect(await dock.trustRegistry.schemaVerifiers(schemaId)).toEqual(
       dock.trustRegistry.parseMapEntries(
+        String,
         dock.trustRegistry.parseSchemaVerifiers,
         new Map([
           [trustRegistryId, [verifierDID, verifierDID2]],
@@ -581,6 +583,7 @@ describe('Trust Registry', () => {
     );
     expect(await dock.trustRegistry.schemaIssuers(schemaId)).toEqual(
       dock.trustRegistry.parseMapEntries(
+        String,
         dock.trustRegistry.parseSchemaIssuers,
         new Map([
           [

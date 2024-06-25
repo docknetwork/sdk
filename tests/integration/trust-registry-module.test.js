@@ -563,6 +563,7 @@ describe('Trust Registry', () => {
 
     expect(await dock.trustRegistry.schemaMetadata(schemaId)).toEqual(
       dock.trustRegistry.parseMapEntries(
+        String,
         dock.trustRegistry.parseSchemaMetadata,
         new Map([
           [trustRegistryId, schema1MetadataInTrustRegistry1],
@@ -572,6 +573,7 @@ describe('Trust Registry', () => {
     );
     expect(await dock.trustRegistry.schemaVerifiers(schemaId)).toEqual(
       dock.trustRegistry.parseMapEntries(
+        String,
         dock.trustRegistry.parseSchemaVerifiers,
         new Map([
           [trustRegistryId, [verifierDID, verifierDID2]],
@@ -581,6 +583,7 @@ describe('Trust Registry', () => {
     );
     expect(await dock.trustRegistry.schemaIssuers(schemaId)).toEqual(
       dock.trustRegistry.parseMapEntries(
+        String,
         dock.trustRegistry.parseSchemaIssuers,
         new Map([
           [
@@ -835,7 +838,55 @@ describe('Trust Registry', () => {
     ).toEqual(null);
   });
 
-  it('Suspends issuers in the existing Trust Registry', async () => {
+  it('Changes participant information', async () => {
+    if (DisableTrustRegistryParticipantsTests) {
+      return;
+    }
+
+    const trustRegistryId = await createRegistry();
+    const participant = issuerDID;
+
+    expect(
+      await dock.trustRegistry.registryParticipantsInfo(trustRegistryId, [
+        participant,
+      ]),
+    ).toEqual({ [participant]: null });
+
+    const information = {
+      orgName: 'Org Name',
+      logo: 'Logo',
+      description: 'Description',
+    };
+
+    const sigs = await Promise.all(
+      [
+        [issuerDID, issuerPair],
+        [convenerDID, convenerPair],
+      ].map(([did, signingKeyRef]) => dock.trustRegistry.signSetParticipantInformation(
+        did,
+        trustRegistryId,
+        participant,
+        information,
+        signingKeyRef,
+        dock,
+      )),
+    );
+
+    await dock.trustRegistry.setParticipantInformation(
+      trustRegistryId,
+      participant,
+      information,
+      sigs,
+    );
+
+    expect(
+      await dock.trustRegistry.registryParticipantsInfo(trustRegistryId, [
+        participant,
+      ]),
+    ).toEqual({ [participant]: information });
+  });
+
+  it('Changes issuer information', async () => {
     const trustRegistryId = await createRegistry();
     const schemaId = randomAsHex(32);
 
@@ -944,7 +995,7 @@ describe('Trust Registry', () => {
     }
   });
 
-  it('Updates delegated issuers in the existing Trust Registry', async () => {
+  it('Updates delegated issuers', async () => {
     const trustRegistryId = await createRegistry();
     const schemaId = randomAsHex(32);
 
@@ -1018,7 +1069,7 @@ describe('Trust Registry', () => {
     });
   });
 
-  it('Updates schemas metadata in the existing Trust Registry', async () => {
+  it('Updates schemas metadata', async () => {
     const trustRegistryId = await createRegistry();
     const schemaId = randomAsHex(32);
 

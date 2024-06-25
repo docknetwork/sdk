@@ -1,6 +1,6 @@
 import { BTreeSet, BTreeMap } from '@polkadot/types';
 import { u8aToHex } from '@polkadot/util';
-import { DidMethodKey, DockDid, typedHexDID } from '../utils/did';
+import { DidMethodKey, DockDid, DockDidOrDidMethodKey } from '../utils/did';
 import { isHexWithGivenByteSize } from '../utils/codec';
 import { getDidNonce, ensureMatchesPattern } from '../utils/misc';
 
@@ -35,6 +35,7 @@ export default class TrustRegistryModule {
     ensureMatchesPattern(this.constructor.RegistriesQueryByPattern, by);
 
     return this.parseMapEntries(
+      String,
       this.parseRegistryInfo,
       await this.api.rpc.trustRegistry.registriesInfoBy(by),
     );
@@ -50,6 +51,7 @@ export default class TrustRegistryModule {
     ensureMatchesPattern(this.constructor.RegistryQueryByPattern, by);
 
     return this.parseMapEntries(
+      String,
       this.parseSchemaMetadata,
       await this.api.rpc.trustRegistry.registrySchemaMetadataBy(by, regId),
     );
@@ -80,6 +82,7 @@ export default class TrustRegistryModule {
    */
   async schemaMetadata(schemaId) {
     return this.parseMapEntries(
+      String,
       this.parseSchemaMetadata,
       await this.api.rpc.trustRegistry.schemaMetadata(schemaId),
     );
@@ -107,6 +110,7 @@ export default class TrustRegistryModule {
    */
   async schemaIssuers(schemaId) {
     return this.parseMapEntries(
+      String,
       this.parseSchemaIssuers,
       await this.api.rpc.trustRegistry.schemaIssuers(schemaId),
     );
@@ -137,8 +141,52 @@ export default class TrustRegistryModule {
    */
   async schemaVerifiers(schemaId) {
     return this.parseMapEntries(
+      String,
       this.parseSchemaVerifiers,
       await this.api.rpc.trustRegistry.schemaVerifiers(schemaId),
+    );
+  }
+
+  /**
+   * Returns an Array containing `TrustRegistry` participant DIDs.
+   *
+   * @param registryId
+   * @returns {Promise<Array<DidOrDidMethodKey>>}
+   */
+  async registryParticipants(registryId) {
+    return [
+      ...(
+        await this.api.query.trustRegistry.trustRegistriesParticipants(
+          registryId,
+        )
+      ).values(),
+    ].map((did) => DockDidOrDidMethodKey.from(did));
+  }
+
+  /**
+   * Returns an Object containing `TrustRegistry` participant DIDs mapped to their informations.
+   *
+   * @param registryId
+   * @param participantDIDs
+   *
+   * @returns {Promise<Object<string, object>>}
+   */
+  async registryParticipantsInfo(registryId, participantDIDs = null) {
+    const participants = participantDIDs
+      ? [...participantDIDs].map((did) => DockDidOrDidMethodKey.from(did))
+      : await this.registryParticipants(registryId);
+
+    const participantWithInfo = async (did) => {
+      const info = await this.api.query.trustRegistry.trustRegistryParticipantsInformation(
+        registryId,
+        did,
+      );
+
+      return [did, info.isSome ? info.unwrap().toJSON() : null];
+    };
+
+    return Object.fromEntries(
+      await Promise.all(participants.map(participantWithInfo)),
     );
   }
 
@@ -218,6 +266,9 @@ export default class TrustRegistryModule {
 
   /**
    * Creates a signature for participants change produced by given `convenerOrIssuerOrVerifierDid` using supplied `signingKeyRef`.
+   * To add participant(s), the action must be signed by both the `Convener` and all participants to be added.
+   * To remove participant(s), the action must be signed by all participants who wish to be removed.
+   * In summary, if at least one participant is being added, the `Convener`'s signature is required.
    *
    * @param convenerOrIssuerOrVerifierDid
    * @param registryId
@@ -249,6 +300,11 @@ export default class TrustRegistryModule {
 
   /**
    * Changes participants in the provided registry.
+   * This method is used to add or remove `Verifier`s and `Issuer`s, allowing the `Convener` to
+   * include them in the schema metadata.
+   * To add participant(s), the action must be signed by both the `Convener` and all participants to be added.
+   * To remove participant(s), the action must be signed by all participants who wish to be removed.
+   * In summary, if at least one participant is being added, the `Convener`'s signature is required.
    *
    * @param registryId
    * @param participants
@@ -289,6 +345,105 @@ export default class TrustRegistryModule {
       {
         registryId,
         participants,
+      },
+      sigs,
+    );
+  }
+
+  /**
+   * Creates a signature for setting a participant's information produced by given `convenerOrIssuerOrVerifierDid` using supplied `signingKeyRef`.
+   * This transaction requires signatures from both the Convener and the participant.
+   *
+   * @param convenerOrIssuerOrVerifierDid
+   * @param registryId
+   * @param participant
+   * @param participants
+   * @param signingKeyRef
+   */
+  async signSetParticipantInformation(
+    convenerOrIssuerOrVerifierDid,
+    registryId,
+    participant,
+    participantInformation,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined } = {},
+  ) {
+    const [convenerOrIssuerOrVerifierHexDid, lastNonce] = await this.getActorDidAndNonce(convenerOrIssuerOrVerifierDid, {
+      nonce,
+      didModule,
+    });
+
+    return {
+      sig: convenerOrIssuerOrVerifierHexDid.signStateChange(
+        this.api,
+        'SetParticipantInformation',
+        {
+          data: { registryId, participant, participantInformation },
+          nonce: lastNonce,
+        },
+        signingKeyRef,
+      ),
+      nonce: lastNonce,
+    };
+  }
+
+  /**
+   * Changes participant information in the provided registry.
+   * This transaction requires signatures from both the Convener and the participant.
+   *
+   * @param registryId
+   * @param participant
+   * @param participantInformation
+   * @param sigs
+   * @param waitForFinalization
+   * @param params
+   * @returns {Promise<null>}
+   */
+  async setParticipantInformation(
+    registryId,
+    participant,
+    participantInformation,
+    sigs,
+    waitForFinalization = true,
+    params = {},
+  ) {
+    return this.signAndSend(
+      await this.setParticipantInformationTx(
+        registryId,
+        participant,
+        participantInformation,
+        sigs,
+      ),
+      waitForFinalization,
+      params,
+    );
+  }
+
+  /**
+   * Creates a transaction to set participant information in the supplied registry.
+   *
+   * @param registryId
+   * @param participant
+   * @param participants
+   * @param sigs
+   * @returns {Promise<null>}
+   */
+  async setParticipantInformationTx(
+    registryId,
+    participant,
+    participantInformation,
+    sigs,
+  ) {
+    ensureMatchesPattern(
+      this.constructor.SetParticipantInformationPattern,
+      participantInformation,
+    );
+
+    return this.module.setParticipantInformation(
+      {
+        registryId,
+        participant,
+        participantInformation,
       },
       sigs,
     );
@@ -413,7 +568,7 @@ export default class TrustRegistryModule {
 
     const hexIssuers = new BTreeSet(this.api.registry, 'Issuer');
     for (const issuer of issuers) {
-      hexIssuers.add(typedHexDID(this.api, issuer));
+      hexIssuers.add(DockDidOrDidMethodKey.from(issuer));
     }
 
     return convenerHexDid.changeState(
@@ -480,7 +635,7 @@ export default class TrustRegistryModule {
 
     const hexIssuers = new BTreeSet(this.api.registry, 'Issuer');
     for (const issuer of issuers) {
-      hexIssuers.add(typedHexDID(this.api, issuer));
+      hexIssuers.add(DockDidOrDidMethodKey.from(issuer));
     }
 
     return convenerHexDid.changeState(
@@ -544,7 +699,7 @@ export default class TrustRegistryModule {
     actorDid,
     { nonce = undefined, didModule = undefined } = {},
   ) {
-    const hexDID = typedHexDID(this.api, actorDid);
+    const hexDID = DockDidOrDidMethodKey.from(actorDid);
     const lastNonce = nonce ?? (await getDidNonce(hexDID, nonce, didModule));
     return [hexDID, lastNonce];
   }
@@ -557,7 +712,7 @@ export default class TrustRegistryModule {
   parseRegistryInfo({ name, convener, govFramework }) {
     return {
       name: name.toString(),
-      convener: typedHexDID(this.api, convener).toQualifiedEncodedString(),
+      convener: DockDidOrDidMethodKey.from(convener).toQualifiedEncodedString(),
       govFramework: u8aToHex(govFramework),
     };
   }
@@ -565,18 +720,23 @@ export default class TrustRegistryModule {
   /**
    * Parses map entries by converting keys to `string`s and applying supplied parser to the value.
    *
-   * @template {RegId}
+   * @template {Key}
    * @template {Value}
+   * @template {ParsedKey}
    * @template {ParsedValue}
    *
+   * @param {function(Key): ParsedKey} keyParser
    * @param {function(Value): ParsedValue} valueParser
-   * @param {Map<RegId, Value>} regs
-   * @returns {Object<string, ParsedValue>}
+   * @param {Map<Key, Value>} regs
+   * @returns {Object<ParsedKey, ParsedValue>}
    */
-  parseMapEntries(valueParser, regs) {
+  parseMapEntries(keyParser, valueParser, map) {
     return Object.fromEntries(
-      entries(regs)
-        .map(([key, value]) => [String(key), valueParser.call(this, value)])
+      entries(map)
+        .map(([key, value]) => [
+          keyParser.call(this, key),
+          valueParser.call(this, value),
+        ])
         .sort(([key1], [key2]) => key1.localeCompare(key2)),
     );
   }
@@ -627,7 +787,7 @@ export default class TrustRegistryModule {
       (Array.isArray(issuers) ? values(issuers) : entries(issuers))
         .map((issuerWithInfo) => values(issuerWithInfo))
         .map(([issuer, info]) => [
-          typedHexDID(this.api, issuer).toQualifiedEncodedString(),
+          DockDidOrDidMethodKey.from(issuer).toQualifiedEncodedString(),
           typeof info.toJSON === 'function' ? info.toJSON() : info,
         ])
         .sort(([iss1], [iss2]) => iss1.localeCompare(iss2)),
@@ -642,7 +802,7 @@ export default class TrustRegistryModule {
    */
   parseSchemaVerifiers(verifiers) {
     return values(verifiers)
-      .map((verifier) => typedHexDID(this.api, verifier).toQualifiedEncodedString())
+      .map((verifier) => DockDidOrDidMethodKey.from(verifier).toQualifiedEncodedString())
       .sort((ver1, ver2) => ver1.localeCompare(ver2));
   }
 }
@@ -790,6 +950,19 @@ const AnyOfOrAllDockDidOrDidMethodKeyPattern = {
   },
 };
 
+TrustRegistryModule.SetParticipantInformationPattern = {
+  $matchObject: {
+    orgName: {
+      $matchType: 'string',
+    },
+    logo: {
+      $matchType: 'string',
+    },
+    description: {
+      $matchType: 'string',
+    },
+  },
+};
 TrustRegistryModule.SchemasUpdatePattern = {
   $objOf: {
     Set: SetAllSchemasPattern,

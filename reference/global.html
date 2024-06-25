@@ -7854,6 +7854,11 @@ each document.
 
 <div class="description">
     Changes participants in the provided registry.
+This method is used to add or remove `Verifier`s and `Issuer`s, allowing the `Convener` to
+include them in the schema metadata.
+To add participant(s), the action must be signed by both the `Convener` and all participants to be added.
+To remove participant(s), the action must be signed by all participants who wish to be removed.
+In summary, if at least one participant is being added, the `Convener`'s signature is required.
 </div>
 
 
@@ -8037,7 +8042,7 @@ each document.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line260">line 260</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line316">line 316</a>
     </li></ul></dd>
     
 
@@ -8223,7 +8228,7 @@ each document.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line282">line 282</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line338">line 338</a>
     </li></ul></dd>
     
 
@@ -22253,7 +22258,7 @@ Field `accumulated` contains the current accumulated value.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line543">line 543</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line698">line 698</a>
     </li></ul></dd>
     
 
@@ -30596,7 +30601,7 @@ The last keys have value null if they were not provided in the extrinsic.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line158">line 158</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line206">line 206</a>
     </li></ul></dd>
     
 
@@ -30872,7 +30877,7 @@ The last keys have value null if they were not provided in the extrinsic.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line192">line 192</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line240">line 240</a>
     </li></ul></dd>
     
 
@@ -32977,7 +32982,7 @@ of `api.query.system.events`, the argument to this function is `event.event`.</t
     
 
     
-    <h4 class="name" id="parseMapEntries"><span class="type-signature"></span>parseMapEntries<span class="signature">(valueParser, regs)</span><span class="type-signature"> &rarr; {Object.&lt;string, ParsedValue>}</span></h4>
+    <h4 class="name" id="parseMapEntries"><span class="type-signature"></span>parseMapEntries<span class="signature">(keyParser, valueParser, regs)</span><span class="type-signature"> &rarr; {Object.&lt;ParsedKey, ParsedValue>}</span></h4>
     
 
     
@@ -33021,6 +33026,29 @@ of `api.query.system.events`, the argument to this function is `event.event`.</t
 
         <tr>
             
+                <td class="name"><code>keyParser</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>valueParser</code></td>
             
 
@@ -33050,7 +33078,7 @@ of `api.query.system.events`, the argument to this function is `event.event`.</t
             <td class="type">
             
                 
-<span class="param-type">Map.&lt;RegId, Value></span>
+<span class="param-type">Map.&lt;Key, Value></span>
 
 
             
@@ -33101,7 +33129,7 @@ of `api.query.system.events`, the argument to this function is `event.event`.</t
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line576">line 576</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line733">line 733</a>
     </li></ul></dd>
     
 
@@ -33137,7 +33165,7 @@ of `api.query.system.events`, the argument to this function is `event.event`.</t
     </dt>
     <dd>
         
-<span class="param-type">Object.&lt;string, ParsedValue></span>
+<span class="param-type">Object.&lt;ParsedKey, ParsedValue></span>
 
 
     </dd>
@@ -33580,7 +33608,7 @@ of a DID and a positive number starting from 1.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line557">line 557</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line712">line 712</a>
     </li></ul></dd>
     
 
@@ -33717,7 +33745,7 @@ of a DID and a positive number starting from 1.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line625">line 625</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line785">line 785</a>
     </li></ul></dd>
     
 
@@ -33872,7 +33900,7 @@ of a DID and a positive number starting from 1.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line612">line 612</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line772">line 772</a>
     </li></ul></dd>
     
 
@@ -34027,7 +34055,7 @@ of a DID and a positive number starting from 1.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line643">line 643</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line803">line 803</a>
     </li></ul></dd>
     
 
@@ -34182,7 +34210,7 @@ of a DID and a positive number starting from 1.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line592">line 592</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line752">line 752</a>
     </li></ul></dd>
     
 
@@ -35547,6 +35575,336 @@ This function throws an error if the requested composite claims are unprovable.
     
 
     
+    <h4 class="name" id="registryParticipants"><span class="type-signature">(async) </span>registryParticipants<span class="signature">(registryId)</span><span class="type-signature"> &rarr; {Promise.&lt;Array.&lt;DidOrDidMethodKey>>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Returns an Array containing `TrustRegistry` participant DIDs.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>registryId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line156">line 156</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;Array.&lt;DidOrDidMethodKey>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="registryParticipantsInfo"><span class="type-signature">(async) </span>registryParticipantsInfo<span class="signature">(registryId, participantDIDs)</span><span class="type-signature"> &rarr; {Promise.&lt;Object.&lt;string, object>>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Returns an Object containing `TrustRegistry` participant DIDs mapped to their informations.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>registryId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>participantDIDs</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    null
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line174">line 174</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;Object.&lt;string, object>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="registrySchemasMetadata"><span class="type-signature">(async) </span>registrySchemasMetadata<span class="signature">(by, regId)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
     
 
@@ -35666,7 +36024,7 @@ This function throws an error if the requested composite claims are unprovable.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line49">line 49</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line50">line 50</a>
     </li></ul></dd>
     
 
@@ -38446,7 +38804,7 @@ Throws an error if the underlying status list can't be decoded or any of supplie
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line108">line 108</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line111">line 111</a>
     </li></ul></dd>
     
 
@@ -38624,7 +38982,7 @@ Throws an error if the underlying status list can't be decoded or any of supplie
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line95">line 95</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line98">line 98</a>
     </li></ul></dd>
     
 
@@ -38779,7 +39137,7 @@ Throws an error if the underlying status list can't be decoded or any of supplie
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line81">line 81</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line83">line 83</a>
     </li></ul></dd>
     
 
@@ -38957,7 +39315,7 @@ Throws an error if the underlying status list can't be decoded or any of supplie
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line65">line 65</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line67">line 67</a>
     </li></ul></dd>
     
 
@@ -39112,7 +39470,7 @@ Throws an error if the underlying status list can't be decoded or any of supplie
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line138">line 138</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line142">line 142</a>
     </li></ul></dd>
     
 
@@ -39290,7 +39648,7 @@ Throws an error if the underlying status list can't be decoded or any of supplie
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line122">line 122</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line126">line 126</a>
     </li></ul></dd>
     
 
@@ -40002,6 +40360,479 @@ Sets the account used to sign transactions
     
 
     
+    <h4 class="name" id="setParticipantInformation"><span class="type-signature">(async) </span>setParticipantInformation<span class="signature">(registryId, participant, participantInformation, sigs, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;null>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Changes participant information in the provided registry.
+This transaction requires signatures from both the Convener and the participant.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>registryId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>participant</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>participantInformation</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sigs</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waitForFinalization</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line402">line 402</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;null></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setParticipantInformationTx"><span class="type-signature">(async) </span>setParticipantInformationTx<span class="signature">(registryId, participant, participants, sigs)</span><span class="type-signature"> &rarr; {Promise.&lt;null>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Creates a transaction to set participant information in the supplied registry.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>registryId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>participant</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>participants</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sigs</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line431">line 431</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;null></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="setSchemasMetadata"><span class="type-signature">(async) </span>setSchemasMetadata<span class="signature">(convenerOrIssuerOrVerifierDid, registryId, schemas, signingKeyRef, nonceOrDidModule, waitForFinalization, params)</span><span class="type-signature"> &rarr; {Promise.&lt;null>}</span></h4>
     
 
@@ -40238,7 +41069,7 @@ Sets the account used to sign transactions
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line309">line 309</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line464">line 464</a>
     </li></ul></dd>
     
 
@@ -40478,7 +41309,7 @@ Sets the account used to sign transactions
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line339">line 339</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line494">line 494</a>
     </li></ul></dd>
     
 
@@ -41714,6 +42545,9 @@ else only wait to be included in block.</td>
 
 <div class="description">
     Creates a signature for participants change produced by given `convenerOrIssuerOrVerifierDid` using supplied `signingKeyRef`.
+To add participant(s), the action must be signed by both the `Convener` and all participants to be added.
+To remove participant(s), the action must be signed by all participants who wish to be removed.
+In summary, if at least one participant is being added, the `Convener`'s signature is required.
 </div>
 
 
@@ -41855,7 +42689,7 @@ else only wait to be included in block.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line227">line 227</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line278">line 278</a>
     </li></ul></dd>
     
 
@@ -44026,6 +44860,211 @@ else only wait to be included in block.</td>
     
 
     
+    <h4 class="name" id="signSetParticipantInformation"><span class="type-signature">(async) </span>signSetParticipantInformation<span class="signature">(convenerOrIssuerOrVerifierDid, registryId, participant, participants, signingKeyRef)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Creates a signature for setting a participant's information produced by given `convenerOrIssuerOrVerifierDid` using supplied `signingKeyRef`.
+This transaction requires signatures from both the Convener and the participant.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>convenerOrIssuerOrVerifierDid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>registryId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>participant</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>participants</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signingKeyRef</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line363">line 363</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="supports"><span class="type-signature"></span>supports<span class="signature">(id)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
     
 
@@ -44417,7 +45456,7 @@ else only wait to be included in block.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line373">line 373</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line528">line 528</a>
     </li></ul></dd>
     
 
@@ -44639,7 +45678,7 @@ else only wait to be included in block.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line402">line 402</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line557">line 557</a>
     </li></ul></dd>
     
 
@@ -47607,7 +48646,7 @@ else only wait to be included in block.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line440">line 440</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line595">line 595</a>
     </li></ul></dd>
     
 
@@ -47829,7 +48868,7 @@ else only wait to be included in block.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line469">line 469</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line624">line 624</a>
     </li></ul></dd>
     
 
@@ -49017,7 +50056,7 @@ using this</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line508">line 508</a>
+        <a href="modules_trust-registry.js.html">modules/trust-registry.js</a>, <a href="modules_trust-registry.js.html#line663">line 663</a>
     </li></ul></dd>
     
 
@@ -57906,13 +58945,13 @@ will throw an error if there's no result within the `8 seconds` timeout.
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="BlocksProvider.html">BlocksProvider</a></li><li><a href="DidKeypair.html">DidKeypair</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockBlobResolver.html">DockBlobResolver</a></li><li><a href="DockDidOrDidMethodKey.html">DockDidOrDidMethodKey</a></li><li><a href="DockDIDResolver.html">DockDIDResolver</a></li><li><a href="DockKeypair.html">DockKeypair</a></li><li><a href="DockRevRegResolver.html">DockRevRegResolver</a></li><li><a href="DockStatusListResolver.html">DockStatusListResolver</a></li><li><a href="MapWithCapacity.html">MapWithCapacity</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="NoOffchainDIDError.html">NoOffchainDIDError</a></li><li><a href="NoOnchainDIDError.html">NoOnchainDIDError</a></li><li><a href="PatternError.html">PatternError</a></li><li><a href="PatternMatcher.html">PatternMatcher</a></li><li><a href="Resolver.html">Resolver</a></li><li><a href="ReusablePromise.html">ReusablePromise</a></li><li><a href="ReusablePromiseMap.html">ReusablePromiseMap</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="setApi.html">setApi</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#accumulatedAsHex">accumulatedAsHex</a></li><li><a href="global.html#accumulatedFromHex">accumulatedFromHex</a></li><li><a href="global.html#accumulator">accumulator</a></li><li><a href="global.html#adaptKey">adaptKey</a></li><li><a href="global.html#addAttributeToReveal">addAttributeToReveal</a></li><li><a href="global.html#addCredentialToPresent">addCredentialToPresent</a></li><li><a href="global.html#addKBUniversalAccumulator">addKBUniversalAccumulator</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#addParams">addParams</a></li><li><a href="global.html#addPositiveAccumulator">addPositiveAccumulator</a></li><li><a href="global.html#addPrivateStatusListEntryToCredential">addPrivateStatusListEntryToCredential</a></li><li><a href="global.html#addPublicKey">addPublicKey</a></li><li><a href="global.html#addRevRegIdToCredential">addRevRegIdToCredential</a></li><li><a href="global.html#addStatusList21EntryToCredential">addStatusList21EntryToCredential</a></li><li><a href="global.html#addUniversalAccumulator">addUniversalAccumulator</a></li><li><a href="global.html#anchor">anchor</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#bbs">bbs</a></li><li><a href="global.html#bbsPlus">bbsPlus</a></li><li><a href="global.html#BlacklistedProperties">BlacklistedProperties</a></li><li><a href="global.html#blob">blob</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildCreateStatusListCredentialTx">buildCreateStatusListCredentialTx</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#buildParams">buildParams</a></li><li><a href="global.html#buildPublicKey">buildPublicKey</a></li><li><a href="global.html#buildRemoveStatusListCredentialTx">buildRemoveStatusListCredentialTx</a></li><li><a href="global.html#buildResolversMap">buildResolversMap</a></li><li><a href="global.html#buildUpdateStatusListCredentialTx">buildUpdateStatusListCredentialTx</a></li><li><a href="global.html#cacheLast">cacheLast</a></li><li><a href="global.html#changeParticipants">changeParticipants</a></li><li><a href="global.html#changeParticipantsTx">changeParticipantsTx</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationRegistryStatus">checkRevocationRegistryStatus</a></li><li><a href="global.html#claimgraphToStore">claimgraphToStore</a></li><li><a href="global.html#controllerIds">controllerIds</a></li><li><a href="global.html#convertCredential">convertCredential</a></li><li><a href="global.html#convertCredentialForPresBuilding">convertCredentialForPresBuilding</a></li><li><a href="global.html#convertCredentialForVerification">convertCredentialForVerification</a></li><li><a href="global.html#convertCredentialToSerializedForSigning">convertCredentialToSerializedForSigning</a></li><li><a href="global.html#create">create</a></li><li><a href="global.html#createAddKBUniversalAccumulatorTx">createAddKBUniversalAccumulatorTx</a></li><li><a href="global.html#createAddParamsTx">createAddParamsTx</a></li><li><a href="global.html#createAddPositiveAccumulatorTx">createAddPositiveAccumulatorTx</a></li><li><a href="global.html#createAddPublicKeyTx">createAddPublicKeyTx</a></li><li><a href="global.html#createAddUniversalAccumulatorTx">createAddUniversalAccumulatorTx</a></li><li><a href="global.html#createDidKey">createDidKey</a></li><li><a href="global.html#createDidSig">createDidSig</a></li><li><a href="global.html#createDidSignature">createDidSignature</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createParamsObjFromChainResponse">createParamsObjFromChainResponse</a></li><li><a href="global.html#createPresentation">createPresentation</a></li><li><a href="global.html#createPublicKeyObjFromChainResponse">createPublicKeyObjFromChainResponse</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createRemovePublicKeyTx">createRemovePublicKeyTx</a></li><li><a href="global.html#createResolver">createResolver</a></li><li><a href="global.html#createSignedRemoveStatusListCredential">createSignedRemoveStatusListCredential</a></li><li><a href="global.html#createSignedUpdateStatusListCredential">createSignedUpdateStatusListCredential</a></li><li><a href="global.html#createStatusListCredential">createStatusListCredential</a></li><li><a href="global.html#createVerifyData">createVerifyData</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#decodedStatusList">decodedStatusList</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#derivedToAnoncredsPresentation">derivedToAnoncredsPresentation</a></li><li><a href="global.html#did">did</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureArray">ensureArray</a></li><li><a href="global.html#ensureExtrinsicSucceeded">ensureExtrinsicSucceeded</a></li><li><a href="global.html#ensureItemsAllowed">ensureItemsAllowed</a></li><li><a href="global.html#ensureMatchesPattern">ensureMatchesPattern</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensurePrivateStatusListId">ensurePrivateStatusListId</a></li><li><a href="global.html#ensureStatusListId">ensureStatusListId</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#errorMsgFromEventData">errorMsgFromEventData</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#extractSchemaForSigning">extractSchemaForSigning</a></li><li><a href="global.html#FASTBLOCK_TIME_MS">FASTBLOCK_TIME_MS</a></li><li><a href="global.html#fetchStatusList2021Credential">fetchStatusList2021Credential</a></li><li><a href="global.html#findExtrinsicBlock">findExtrinsicBlock</a></li><li><a href="global.html#fmtIter">fmtIter</a></li><li><a href="global.html#formatMandatoryFields">formatMandatoryFields</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromBytes">fromBytes</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromJsigProofValue">fromJsigProofValue</a></li><li><a href="global.html#fromJSON">fromJSON</a></li><li><a href="global.html#fromKeypair">fromKeypair</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#fromQualifiedString">fromQualifiedString</a></li><li><a href="global.html#fromSubstrateValue">fromSubstrateValue</a></li><li><a href="global.html#generate">generate</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccount">getAccount</a></li><li><a href="global.html#getAccumulator">getAccumulator</a></li><li><a href="global.html#getActorDidAndNonce">getActorDidAndNonce</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAllParamsByDid">getAllParamsByDid</a></li><li><a href="global.html#getAllPublicKeysByDid">getAllPublicKeysByDid</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBlock">getBlock</a></li><li><a href="global.html#getBlockNo">getBlockNo</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatus">getCredentialStatus</a></li><li><a href="global.html#getDidNonce">getDidNonce</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJsonSchemaFromCredential">getJsonSchemaFromCredential</a></li><li><a href="global.html#getJsonSchemasFromPresentation">getJsonSchemasFromPresentation</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyDoc">getKeyDoc</a></li><li><a href="global.html#getKeyedProofsFromVerifiedPresentation">getKeyedProofsFromVerifiedPresentation</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getLastBlock">getLastBlock</a></li><li><a href="global.html#getLastBlockNo">getLastBlockNo</a></li><li><a href="global.html#getLastFinalizedBlock">getLastFinalizedBlock</a></li><li><a href="global.html#getLastParamsWritten">getLastParamsWritten</a></li><li><a href="global.html#getPrivateStatus">getPrivateStatus</a></li><li><a href="global.html#getPrivateStatuses">getPrivateStatuses</a></li><li><a href="global.html#getPublicKey">getPublicKey</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSerializedRemoveStatusListCredential">getSerializedRemoveStatusListCredential</a></li><li><a href="global.html#getSerializedUpdateStatusListCredential">getSerializedUpdateStatusListCredential</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getTrimmedProofAndValue">getTrimmedProofAndValue</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#getUpdatesFromBlock">getUpdatesFromBlock</a></li><li><a href="global.html#getUpdatesFromBlocks">getUpdatesFromBlocks</a></li><li><a href="global.html#getUpdatesFromExtrinsic">getUpdatesFromExtrinsic</a></li><li><a href="global.html#getVerificationMethod">getVerificationMethod</a></li><li><a href="global.html#getVerKeyTypeForKeypair">getVerKeyTypeForKeypair</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hasRegistryRevocationStatus">hasRegistryRevocationStatus</a></li><li><a href="global.html#HEX_ID_REG_EXP_PATTERN">HEX_ID_REG_EXP_PATTERN</a></li><li><a href="global.html#inclusiveRange">inclusiveRange</a></li><li><a href="global.html#initOrUpdate">initOrUpdate</a></li><li><a href="global.html#initOrUpdateTx">initOrUpdateTx</a></li><li><a href="global.html#isAccumulatorRevocationStatus">isAccumulatorRevocationStatus</a></li><li><a href="global.html#isConnected">isConnected</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRegistryRevocationStatus">isRegistryRevocationStatus</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#matchingResolver">matchingResolver</a></li><li><a href="global.html#METHOD_REG_EXP_PATTERN">METHOD_REG_EXP_PATTERN</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#offchainSignatures">offchainSignatures</a></li><li><a href="global.html#parse">parse</a></li><li><a href="global.html#parseDid">parseDid</a></li><li><a href="global.html#parseEventAsAccumulatorUpdate">parseEventAsAccumulatorUpdate</a></li><li><a href="global.html#parseMapEntries">parseMapEntries</a></li><li><a href="global.html#parseRDFDocument">parseRDFDocument</a></li><li><a href="global.html#parseRef">parseRef</a></li><li><a href="global.html#parseRegistryInfo">parseRegistryInfo</a></li><li><a href="global.html#parseSchemaIssuers">parseSchemaIssuers</a></li><li><a href="global.html#parseSchemaMetadata">parseSchemaMetadata</a></li><li><a href="global.html#parseSchemaVerifiers">parseSchemaVerifiers</a></li><li><a href="global.html#parseSingleEntry">parseSingleEntry</a></li><li><a href="global.html#patchQueryApi">patchQueryApi</a></li><li><a href="global.html#prepareAddParameters">prepareAddParameters</a></li><li><a href="global.html#prepareAddPublicKey">prepareAddPublicKey</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#processIfKvac">processIfKvac</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#ps">ps</a></li><li><a href="global.html#publicKey">publicKey</a></li><li><a href="global.html#queryNextLookup">queryNextLookup</a></li><li><a href="global.html#random">random</a></li><li><a href="global.html#registriesInfo">registriesInfo</a></li><li><a href="global.html#registrySchemasMetadata">registrySchemasMetadata</a></li><li><a href="global.html#removeAccumulator">removeAccumulator</a></li><li><a href="global.html#removeAccumulatorTx">removeAccumulatorTx</a></li><li><a href="global.html#removeParams">removeParams</a></li><li><a href="global.html#removeParamsTx">removeParamsTx</a></li><li><a href="global.html#removePublicKey">removePublicKey</a></li><li><a href="global.html#removeStatusListCredential">removeStatusListCredential</a></li><li><a href="global.html#removeStatusListCredentialWithOneOfPolicy">removeStatusListCredentialWithOneOfPolicy</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#revocation">revocation</a></li><li><a href="global.html#revoked">revoked</a></li><li><a href="global.html#revokedBatch">revokedBatch</a></li><li><a href="global.html#schemaIssuers">schemaIssuers</a></li><li><a href="global.html#schemaIssuersInRegistry">schemaIssuersInRegistry</a></li><li><a href="global.html#schemaMetadata">schemaMetadata</a></li><li><a href="global.html#schemaMetadataInRegistry">schemaMetadataInRegistry</a></li><li><a href="global.html#schemaVerifiers">schemaVerifiers</a></li><li><a href="global.html#schemaVerifiersInRegistry">schemaVerifiersInRegistry</a></li><li><a href="global.html#send">send</a></li><li><a href="global.html#sendNoRetries">sendNoRetries</a></li><li><a href="global.html#setAccount">setAccount</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#setSchemasMetadata">setSchemasMetadata</a></li><li><a href="global.html#setSchemasMetadataTx">setSchemasMetadataTx</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signAddParams">signAddParams</a></li><li><a href="global.html#signAddPublicKey">signAddPublicKey</a></li><li><a href="global.html#signAndSend">signAndSend</a></li><li><a href="global.html#signChangeParticipants">signChangeParticipants</a></li><li><a href="global.html#signer">signer</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signExtrinsic">signExtrinsic</a></li><li><a href="global.html#signPrehashed">signPrehashed</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#signRemoveParams">signRemoveParams</a></li><li><a href="global.html#signRemovePublicKey">signRemovePublicKey</a></li><li><a href="global.html#STANDARD_BLOCK_TIME_MS">STANDARD_BLOCK_TIME_MS</a></li><li><a href="global.html#statusListCredential">statusListCredential</a></li><li><a href="global.html#supports">supports</a></li><li><a href="global.html#suspendIssuers">suspendIssuers</a></li><li><a href="global.html#suspendIssuersTx">suspendIssuersTx</a></li><li><a href="global.html#timeout">timeout</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toBytes">toBytes</a></li><li><a href="global.html#toEncodedString">toEncodedString</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toJsonldjsNode">toJsonldjsNode</a></li><li><a href="global.html#toSubstrate">toSubstrate</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#trustRegistry">trustRegistry</a></li><li><a href="global.html#typedHexDID">typedHexDID</a></li><li><a href="global.html#unsuspendIssuers">unsuspendIssuers</a></li><li><a href="global.html#unsuspendIssuersTx">unsuspendIssuersTx</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#updateAccumulator">updateAccumulator</a></li><li><a href="global.html#updateAccumulatorTx">updateAccumulatorTx</a></li><li><a href="global.html#updateDelegatedIssuers">updateDelegatedIssuers</a></li><li><a href="global.html#updateStatusList">updateStatusList</a></li><li><a href="global.html#updateStatusListCredential">updateStatusListCredential</a></li><li><a href="global.html#updateStatusListCredentialWithOneOfPolicy">updateStatusListCredentialWithOneOfPolicy</a></li><li><a href="global.html#updateVbAccumulatorWitnessFromUpdatesInBlocks">updateVbAccumulatorWitnessFromUpdatesInBlocks</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateAddress">validateAddress</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyAnoncreds">verifyAnoncreds</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyEcdsaSecp256k1SigPrehashed">verifyEcdsaSecp256k1SigPrehashed</a></li><li><a href="global.html#verifyID">verifyID</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#verifyPrivateStatus">verifyPrivateStatus</a></li><li><a href="global.html#verifySignature">verifySignature</a></li><li><a href="global.html#waitForBlocks">waitForBlocks</a></li><li><a href="global.html#WILDCARD">WILDCARD</a></li><li><a href="global.html#withExtendedStaticProperties">withExtendedStaticProperties</a></li><li><a href="global.html#withInitializedDockAPI">withInitializedDockAPI</a></li><li><a href="global.html#withTimeout">withTimeout</a></li><li><a href="global.html#wrapFnWithRetries">wrapFnWithRetries</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlobModule.html">BlobModule</a></li><li><a href="BlocksProvider.html">BlocksProvider</a></li><li><a href="DidKeypair.html">DidKeypair</a></li><li><a href="DIDModule.html">DIDModule</a></li><li><a href="DockBlobResolver.html">DockBlobResolver</a></li><li><a href="DockDidOrDidMethodKey.html">DockDidOrDidMethodKey</a></li><li><a href="DockDIDResolver.html">DockDIDResolver</a></li><li><a href="DockKeypair.html">DockKeypair</a></li><li><a href="DockRevRegResolver.html">DockRevRegResolver</a></li><li><a href="DockStatusListResolver.html">DockStatusListResolver</a></li><li><a href="MapWithCapacity.html">MapWithCapacity</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="NoDIDError.html">NoDIDError</a></li><li><a href="NoOffchainDIDError.html">NoOffchainDIDError</a></li><li><a href="NoOnchainDIDError.html">NoOnchainDIDError</a></li><li><a href="PatternError.html">PatternError</a></li><li><a href="PatternMatcher.html">PatternMatcher</a></li><li><a href="Resolver.html">Resolver</a></li><li><a href="ReusablePromise.html">ReusablePromise</a></li><li><a href="ReusablePromiseMap.html">ReusablePromiseMap</a></li><li><a href="RevocationModule.html">RevocationModule</a></li><li><a href="setApi.html">setApi</a></li><li><a href="TokenMigration.html">TokenMigration</a></li><li><a href="VerifiableCredential.html">VerifiableCredential</a></li><li><a href="global.html#VerifiablePresentation">VerifiablePresentation</a></li></ul><h3>Global</h3><ul><li><a href="global.html#acceptCompositeClaims">acceptCompositeClaims</a></li><li><a href="global.html#accumulatedAsHex">accumulatedAsHex</a></li><li><a href="global.html#accumulatedFromHex">accumulatedFromHex</a></li><li><a href="global.html#accumulator">accumulator</a></li><li><a href="global.html#adaptKey">adaptKey</a></li><li><a href="global.html#addAttributeToReveal">addAttributeToReveal</a></li><li><a href="global.html#addCredentialToPresent">addCredentialToPresent</a></li><li><a href="global.html#addKBUniversalAccumulator">addKBUniversalAccumulator</a></li><li><a href="global.html#addOwner">addOwner</a></li><li><a href="global.html#addParams">addParams</a></li><li><a href="global.html#addPositiveAccumulator">addPositiveAccumulator</a></li><li><a href="global.html#addPrivateStatusListEntryToCredential">addPrivateStatusListEntryToCredential</a></li><li><a href="global.html#addPublicKey">addPublicKey</a></li><li><a href="global.html#addRevRegIdToCredential">addRevRegIdToCredential</a></li><li><a href="global.html#addStatusList21EntryToCredential">addStatusList21EntryToCredential</a></li><li><a href="global.html#addUniversalAccumulator">addUniversalAccumulator</a></li><li><a href="global.html#anchor">anchor</a></li><li><a href="global.html#asDockAddress">asDockAddress</a></li><li><a href="global.html#batchDocumentsInMerkleTree">batchDocumentsInMerkleTree</a></li><li><a href="global.html#bbs">bbs</a></li><li><a href="global.html#bbsPlus">bbsPlus</a></li><li><a href="global.html#BlacklistedProperties">BlacklistedProperties</a></li><li><a href="global.html#blob">blob</a></li><li><a href="global.html#blobHexIdToQualified">blobHexIdToQualified</a></li><li><a href="global.html#buildCreateStatusListCredentialTx">buildCreateStatusListCredentialTx</a></li><li><a href="global.html#buildDockCredentialStatus">buildDockCredentialStatus</a></li><li><a href="global.html#buildParams">buildParams</a></li><li><a href="global.html#buildPublicKey">buildPublicKey</a></li><li><a href="global.html#buildRemoveStatusListCredentialTx">buildRemoveStatusListCredentialTx</a></li><li><a href="global.html#buildResolversMap">buildResolversMap</a></li><li><a href="global.html#buildUpdateStatusListCredentialTx">buildUpdateStatusListCredentialTx</a></li><li><a href="global.html#cacheLast">cacheLast</a></li><li><a href="global.html#changeParticipants">changeParticipants</a></li><li><a href="global.html#changeParticipantsTx">changeParticipantsTx</a></li><li><a href="global.html#checkCredential">checkCredential</a></li><li><a href="global.html#checkCredentialJSONLD">checkCredentialJSONLD</a></li><li><a href="global.html#checkCredentialOptional">checkCredentialOptional</a></li><li><a href="global.html#checkCredentialRequired">checkCredentialRequired</a></li><li><a href="global.html#checkRevocationRegistryStatus">checkRevocationRegistryStatus</a></li><li><a href="global.html#claimgraphToStore">claimgraphToStore</a></li><li><a href="global.html#controllerIds">controllerIds</a></li><li><a href="global.html#convertCredential">convertCredential</a></li><li><a href="global.html#convertCredentialForPresBuilding">convertCredentialForPresBuilding</a></li><li><a href="global.html#convertCredentialForVerification">convertCredentialForVerification</a></li><li><a href="global.html#convertCredentialToSerializedForSigning">convertCredentialToSerializedForSigning</a></li><li><a href="global.html#create">create</a></li><li><a href="global.html#createAddKBUniversalAccumulatorTx">createAddKBUniversalAccumulatorTx</a></li><li><a href="global.html#createAddParamsTx">createAddParamsTx</a></li><li><a href="global.html#createAddPositiveAccumulatorTx">createAddPositiveAccumulatorTx</a></li><li><a href="global.html#createAddPublicKeyTx">createAddPublicKeyTx</a></li><li><a href="global.html#createAddUniversalAccumulatorTx">createAddUniversalAccumulatorTx</a></li><li><a href="global.html#createDidKey">createDidKey</a></li><li><a href="global.html#createDidSig">createDidSig</a></li><li><a href="global.html#createDidSignature">createDidSignature</a></li><li><a href="global.html#createNewDockBlobId">createNewDockBlobId</a></li><li><a href="global.html#createNewDockDID">createNewDockDID</a></li><li><a href="global.html#createParamsObjFromChainResponse">createParamsObjFromChainResponse</a></li><li><a href="global.html#createPresentation">createPresentation</a></li><li><a href="global.html#createPublicKeyObjFromChainResponse">createPublicKeyObjFromChainResponse</a></li><li><a href="global.html#createRandomRegistryId">createRandomRegistryId</a></li><li><a href="global.html#createRemovePublicKeyTx">createRemovePublicKeyTx</a></li><li><a href="global.html#createResolver">createResolver</a></li><li><a href="global.html#createSignedRemoveStatusListCredential">createSignedRemoveStatusListCredential</a></li><li><a href="global.html#createSignedUpdateStatusListCredential">createSignedUpdateStatusListCredential</a></li><li><a href="global.html#createStatusListCredential">createStatusListCredential</a></li><li><a href="global.html#createVerifyData">createVerifyData</a></li><li><a href="global.html#credsToEEClaimGraph">credsToEEClaimGraph</a></li><li><a href="global.html#credToEECG">credToEECG</a></li><li><a href="global.html#decodedStatusList">decodedStatusList</a></li><li><a href="global.html#deploy">deploy</a></li><li><a href="global.html#deployTx">deployTx</a></li><li><a href="global.html#derivedToAnoncredsPresentation">derivedToAnoncredsPresentation</a></li><li><a href="global.html#did">did</a></li><li><a href="global.html#documentLoader">documentLoader</a></li><li><a href="global.html#encodeExtrinsicAsHash">encodeExtrinsicAsHash</a></li><li><a href="global.html#ensureArray">ensureArray</a></li><li><a href="global.html#ensureExtrinsicSucceeded">ensureExtrinsicSucceeded</a></li><li><a href="global.html#ensureItemsAllowed">ensureItemsAllowed</a></li><li><a href="global.html#ensureMatchesPattern">ensureMatchesPattern</a></li><li><a href="global.html#ensureObject">ensureObject</a></li><li><a href="global.html#ensureObjectWithId">ensureObjectWithId</a></li><li><a href="global.html#ensureObjectWithKey">ensureObjectWithKey</a></li><li><a href="global.html#ensurePrivateStatusListId">ensurePrivateStatusListId</a></li><li><a href="global.html#ensureStatusListId">ensureStatusListId</a></li><li><a href="global.html#ensureString">ensureString</a></li><li><a href="global.html#ensureURI">ensureURI</a></li><li><a href="global.html#ensureValidDatetime">ensureValidDatetime</a></li><li><a href="global.html#errorMsgFromEventData">errorMsgFromEventData</a></li><li><a href="global.html#expandJSONLD">expandJSONLD</a></li><li><a href="global.html#extractProof">extractProof</a></li><li><a href="global.html#extractSchemaForSigning">extractSchemaForSigning</a></li><li><a href="global.html#FASTBLOCK_TIME_MS">FASTBLOCK_TIME_MS</a></li><li><a href="global.html#fetchStatusList2021Credential">fetchStatusList2021Credential</a></li><li><a href="global.html#findExtrinsicBlock">findExtrinsicBlock</a></li><li><a href="global.html#fmtIter">fmtIter</a></li><li><a href="global.html#formatMandatoryFields">formatMandatoryFields</a></li><li><a href="global.html#from">from</a></li><li><a href="global.html#fromBytes">fromBytes</a></li><li><a href="global.html#fromHex">fromHex</a></li><li><a href="global.html#fromJsigProofValue">fromJsigProofValue</a></li><li><a href="global.html#fromJSON">fromJSON</a></li><li><a href="global.html#fromKeypair">fromKeypair</a></li><li><a href="global.html#fromKeyringPair">fromKeyringPair</a></li><li><a href="global.html#fromPolkadotJSKeyringPair">fromPolkadotJSKeyringPair</a></li><li><a href="global.html#fromQualifiedString">fromQualifiedString</a></li><li><a href="global.html#fromSubstrateValue">fromSubstrateValue</a></li><li><a href="global.html#generate">generate</a></li><li><a href="global.html#generateEcdsaSecp256k1Keypair">generateEcdsaSecp256k1Keypair</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccount">getAccount</a></li><li><a href="global.html#getAccumulator">getAccumulator</a></li><li><a href="global.html#getActorDidAndNonce">getActorDidAndNonce</a></li><li><a href="global.html#getAllEventsFromBlock">getAllEventsFromBlock</a></li><li><a href="global.html#getAllExtrinsicsFromBlock">getAllExtrinsicsFromBlock</a></li><li><a href="global.html#getAllParamsByDid">getAllParamsByDid</a></li><li><a href="global.html#getAllPublicKeysByDid">getAllPublicKeysByDid</a></li><li><a href="global.html#getAndValidateSchemaIfPresent">getAndValidateSchemaIfPresent</a></li><li><a href="global.html#getBlock">getBlock</a></li><li><a href="global.html#getBlockNo">getBlockNo</a></li><li><a href="global.html#getBytesForStateChange">getBytesForStateChange</a></li><li><a href="global.html#getCredentialStatus">getCredentialStatus</a></li><li><a href="global.html#getDidNonce">getDidNonce</a></li><li><a href="global.html#getDockRevIdFromCredential">getDockRevIdFromCredential</a></li><li><a href="global.html#getHexIdentifier">getHexIdentifier</a></li><li><a href="global.html#getHexIdentifierFromBlobID">getHexIdentifierFromBlobID</a></li><li><a href="global.html#getImplications">getImplications</a></li><li><a href="global.html#getJsonSchemaFromCredential">getJsonSchemaFromCredential</a></li><li><a href="global.html#getJsonSchemasFromPresentation">getJsonSchemasFromPresentation</a></li><li><a href="global.html#getJSONSchemaSpec">getJSONSchemaSpec</a></li><li><a href="global.html#getKeyDoc">getKeyDoc</a></li><li><a href="global.html#getKeyedProofsFromVerifiedPresentation">getKeyedProofsFromVerifiedPresentation</a></li><li><a href="global.html#getKeyPairType">getKeyPairType</a></li><li><a href="global.html#getLastBlock">getLastBlock</a></li><li><a href="global.html#getLastBlockNo">getLastBlockNo</a></li><li><a href="global.html#getLastFinalizedBlock">getLastFinalizedBlock</a></li><li><a href="global.html#getLastParamsWritten">getLastParamsWritten</a></li><li><a href="global.html#getPrivateStatus">getPrivateStatus</a></li><li><a href="global.html#getPrivateStatuses">getPrivateStatuses</a></li><li><a href="global.html#getPublicKey">getPublicKey</a></li><li><a href="global.html#getPublicKeyFromKeyringPair">getPublicKeyFromKeyringPair</a></li><li><a href="global.html#getSerializedRemoveStatusListCredential">getSerializedRemoveStatusListCredential</a></li><li><a href="global.html#getSerializedUpdateStatusListCredential">getSerializedUpdateStatusListCredential</a></li><li><a href="global.html#getSignatureFromKeyringPair">getSignatureFromKeyringPair</a></li><li><a href="global.html#getSuiteFromKeyDoc">getSuiteFromKeyDoc</a></li><li><a href="global.html#getTransferExtrinsicsFromBlock">getTransferExtrinsicsFromBlock</a></li><li><a href="global.html#getTrimmedProofAndValue">getTrimmedProofAndValue</a></li><li><a href="global.html#getUniqueElementsFromArray">getUniqueElementsFromArray</a></li><li><a href="global.html#getUpdatesFromBlock">getUpdatesFromBlock</a></li><li><a href="global.html#getUpdatesFromBlocks">getUpdatesFromBlocks</a></li><li><a href="global.html#getUpdatesFromExtrinsic">getUpdatesFromExtrinsic</a></li><li><a href="global.html#getVerificationMethod">getVerificationMethod</a></li><li><a href="global.html#getVerKeyTypeForKeypair">getVerKeyTypeForKeypair</a></li><li><a href="global.html#hash">hash</a></li><li><a href="global.html#hasRegistryRevocationStatus">hasRegistryRevocationStatus</a></li><li><a href="global.html#HEX_ID_REG_EXP_PATTERN">HEX_ID_REG_EXP_PATTERN</a></li><li><a href="global.html#inclusiveRange">inclusiveRange</a></li><li><a href="global.html#initOrUpdate">initOrUpdate</a></li><li><a href="global.html#initOrUpdateTx">initOrUpdateTx</a></li><li><a href="global.html#isAccumulatorRevocationStatus">isAccumulatorRevocationStatus</a></li><li><a href="global.html#isConnected">isConnected</a></li><li><a href="global.html#isHexWithGivenByteSize">isHexWithGivenByteSize</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isRegistryRevocationStatus">isRegistryRevocationStatus</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#issueCredential">issueCredential</a></li><li><a href="global.html#isVerifiedCredential">isVerifiedCredential</a></li><li><a href="global.html#isVerifiedPresentation">isVerifiedPresentation</a></li><li><a href="global.html#matchingResolver">matchingResolver</a></li><li><a href="global.html#METHOD_REG_EXP_PATTERN">METHOD_REG_EXP_PATTERN</a></li><li><a href="global.html#normalizeToHex">normalizeToHex</a></li><li><a href="global.html#offchainSignatures">offchainSignatures</a></li><li><a href="global.html#parse">parse</a></li><li><a href="global.html#parseDid">parseDid</a></li><li><a href="global.html#parseEventAsAccumulatorUpdate">parseEventAsAccumulatorUpdate</a></li><li><a href="global.html#parseMapEntries">parseMapEntries</a></li><li><a href="global.html#parseRDFDocument">parseRDFDocument</a></li><li><a href="global.html#parseRef">parseRef</a></li><li><a href="global.html#parseRegistryInfo">parseRegistryInfo</a></li><li><a href="global.html#parseSchemaIssuers">parseSchemaIssuers</a></li><li><a href="global.html#parseSchemaMetadata">parseSchemaMetadata</a></li><li><a href="global.html#parseSchemaVerifiers">parseSchemaVerifiers</a></li><li><a href="global.html#parseSingleEntry">parseSingleEntry</a></li><li><a href="global.html#patchQueryApi">patchQueryApi</a></li><li><a href="global.html#prepareAddParameters">prepareAddParameters</a></li><li><a href="global.html#prepareAddPublicKey">prepareAddPublicKey</a></li><li><a href="global.html#presentationToEEClaimGraph">presentationToEEClaimGraph</a></li><li><a href="global.html#processIfKvac">processIfKvac</a></li><li><a href="global.html#proveCompositeClaims">proveCompositeClaims</a></li><li><a href="global.html#ps">ps</a></li><li><a href="global.html#publicKey">publicKey</a></li><li><a href="global.html#queryNextLookup">queryNextLookup</a></li><li><a href="global.html#random">random</a></li><li><a href="global.html#registriesInfo">registriesInfo</a></li><li><a href="global.html#registryParticipants">registryParticipants</a></li><li><a href="global.html#registryParticipantsInfo">registryParticipantsInfo</a></li><li><a href="global.html#registrySchemasMetadata">registrySchemasMetadata</a></li><li><a href="global.html#removeAccumulator">removeAccumulator</a></li><li><a href="global.html#removeAccumulatorTx">removeAccumulatorTx</a></li><li><a href="global.html#removeParams">removeParams</a></li><li><a href="global.html#removeParamsTx">removeParamsTx</a></li><li><a href="global.html#removePublicKey">removePublicKey</a></li><li><a href="global.html#removeStatusListCredential">removeStatusListCredential</a></li><li><a href="global.html#removeStatusListCredentialWithOneOfPolicy">removeStatusListCredentialWithOneOfPolicy</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#revocation">revocation</a></li><li><a href="global.html#revoked">revoked</a></li><li><a href="global.html#revokedBatch">revokedBatch</a></li><li><a href="global.html#schemaIssuers">schemaIssuers</a></li><li><a href="global.html#schemaIssuersInRegistry">schemaIssuersInRegistry</a></li><li><a href="global.html#schemaMetadata">schemaMetadata</a></li><li><a href="global.html#schemaMetadataInRegistry">schemaMetadataInRegistry</a></li><li><a href="global.html#schemaVerifiers">schemaVerifiers</a></li><li><a href="global.html#schemaVerifiersInRegistry">schemaVerifiersInRegistry</a></li><li><a href="global.html#send">send</a></li><li><a href="global.html#sendNoRetries">sendNoRetries</a></li><li><a href="global.html#setAccount">setAccount</a></li><li><a href="global.html#setJSONSchema">setJSONSchema</a></li><li><a href="global.html#setParticipantInformation">setParticipantInformation</a></li><li><a href="global.html#setParticipantInformationTx">setParticipantInformationTx</a></li><li><a href="global.html#setSchemasMetadata">setSchemasMetadata</a></li><li><a href="global.html#setSchemasMetadataTx">setSchemasMetadataTx</a></li><li><a href="global.html#sign">sign</a></li><li><a href="global.html#signAddParams">signAddParams</a></li><li><a href="global.html#signAddPublicKey">signAddPublicKey</a></li><li><a href="global.html#signAndSend">signAndSend</a></li><li><a href="global.html#signChangeParticipants">signChangeParticipants</a></li><li><a href="global.html#signer">signer</a></li><li><a href="global.html#signerFactory">signerFactory</a></li><li><a href="global.html#signExtrinsic">signExtrinsic</a></li><li><a href="global.html#signPrehashed">signPrehashed</a></li><li><a href="global.html#signPresentation">signPresentation</a></li><li><a href="global.html#signRemoveParams">signRemoveParams</a></li><li><a href="global.html#signRemovePublicKey">signRemovePublicKey</a></li><li><a href="global.html#signSetParticipantInformation">signSetParticipantInformation</a></li><li><a href="global.html#STANDARD_BLOCK_TIME_MS">STANDARD_BLOCK_TIME_MS</a></li><li><a href="global.html#statusListCredential">statusListCredential</a></li><li><a href="global.html#supports">supports</a></li><li><a href="global.html#suspendIssuers">suspendIssuers</a></li><li><a href="global.html#suspendIssuersTx">suspendIssuersTx</a></li><li><a href="global.html#timeout">timeout</a></li><li><a href="global.html#toBlob">toBlob</a></li><li><a href="global.html#toBytes">toBytes</a></li><li><a href="global.html#toEncodedString">toEncodedString</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#toJsonldjsNode">toJsonldjsNode</a></li><li><a href="global.html#toSubstrate">toSubstrate</a></li><li><a href="global.html#transferDock">transferDock</a></li><li><a href="global.html#transferMicroDock">transferMicroDock</a></li><li><a href="global.html#trustRegistry">trustRegistry</a></li><li><a href="global.html#typedHexDID">typedHexDID</a></li><li><a href="global.html#unsuspendIssuers">unsuspendIssuers</a></li><li><a href="global.html#unsuspendIssuersTx">unsuspendIssuersTx</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#updateAccumulator">updateAccumulator</a></li><li><a href="global.html#updateAccumulatorTx">updateAccumulatorTx</a></li><li><a href="global.html#updateDelegatedIssuers">updateDelegatedIssuers</a></li><li><a href="global.html#updateStatusList">updateStatusList</a></li><li><a href="global.html#updateStatusListCredential">updateStatusListCredential</a></li><li><a href="global.html#updateStatusListCredentialWithOneOfPolicy">updateStatusListCredentialWithOneOfPolicy</a></li><li><a href="global.html#updateVbAccumulatorWitnessFromUpdatesInBlocks">updateVbAccumulatorWitnessFromUpdatesInBlocks</a></li><li><a href="global.html#validate">validate</a></li><li><a href="global.html#validateAddress">validateAddress</a></li><li><a href="global.html#validateBlobIDHexIdentifier">validateBlobIDHexIdentifier</a></li><li><a href="global.html#validateByteSize">validateByteSize</a></li><li><a href="global.html#validateCredentialSchema">validateCredentialSchema</a></li><li><a href="global.html#validateDockDIDHexIdentifier">validateDockDIDHexIdentifier</a></li><li><a href="global.html#validateDockDIDSS58Identifier">validateDockDIDSS58Identifier</a></li><li><a href="global.html#validateSchema">validateSchema</a></li><li><a href="global.html#verifier">verifier</a></li><li><a href="global.html#verifierFactory">verifierFactory</a></li><li><a href="global.html#verifyAnoncreds">verifyAnoncreds</a></li><li><a href="global.html#verifyCredential">verifyCredential</a></li><li><a href="global.html#verifyEcdsaSecp256k1Sig">verifyEcdsaSecp256k1Sig</a></li><li><a href="global.html#verifyEcdsaSecp256k1SigPrehashed">verifyEcdsaSecp256k1SigPrehashed</a></li><li><a href="global.html#verifyID">verifyID</a></li><li><a href="global.html#verifyMerkleProofOfDocument">verifyMerkleProofOfDocument</a></li><li><a href="global.html#verifyMerkleProofOfLeaf">verifyMerkleProofOfLeaf</a></li><li><a href="global.html#verifyPresentation">verifyPresentation</a></li><li><a href="global.html#verifyPrivateStatus">verifyPrivateStatus</a></li><li><a href="global.html#verifySignature">verifySignature</a></li><li><a href="global.html#waitForBlocks">waitForBlocks</a></li><li><a href="global.html#WILDCARD">WILDCARD</a></li><li><a href="global.html#withExtendedStaticProperties">withExtendedStaticProperties</a></li><li><a href="global.html#withInitializedDockAPI">withInitializedDockAPI</a></li><li><a href="global.html#withTimeout">withTimeout</a></li><li><a href="global.html#wrapFnWithRetries">wrapFnWithRetries</a></li><li><a href="global.html#writeToChain">writeToChain</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Tue Jun 25 2024 12:16:06 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Tue Jun 25 2024 12:19:10 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

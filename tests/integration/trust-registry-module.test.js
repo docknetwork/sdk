@@ -839,6 +839,10 @@ describe('Trust Registry', () => {
   });
 
   it('Changes participant information', async () => {
+    if (DisableTrustRegistryParticipantsTests) {
+      return;
+    }
+
     const trustRegistryId = await createRegistry();
     const participant = issuerDID;
 

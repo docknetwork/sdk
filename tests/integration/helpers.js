@@ -71,7 +71,7 @@ export function checkVerificationMethods(
       keyNo = index + 1;
     }
     expect(doc.publicKey[index].id).toEqual(`${did}#keys-${keyNo}`);
-    expect(doc.publicKey[index].controller).toEqual(did);
+    expect(doc.publicKey[index].controller).toEqual(String(did));
     expect(doc.publicKey[index].publicKeyBase58).toBeDefined();
   }
 }

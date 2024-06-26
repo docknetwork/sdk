@@ -1,12 +1,12 @@
-import { u8aToHex, hexToU8a } from '@polkadot/util';
-import bs58 from 'bs58';
-import varint from 'varint';
-import { base58btc } from 'multiformats/bases/base58';
+import { u8aToHex, hexToU8a } from "@polkadot/util";
+import bs58 from "bs58";
+import varint from "varint";
+import { base58btc } from "multiformats/bases/base58";
 
-import { getHexIdentifier } from '../../codec';
-import { PublicKeyEd25519, PublicKeySecp256k1 } from '../../../public-keys';
+import { getHexIdentifier } from "../../codec";
+import { PublicKeyEd25519, PublicKeySecp256k1 } from "../../../public-keys";
 
-import { parseDIDUrl } from '../../../resolver/did/did-resolver';
+import { parseDIDUrl } from "../../../resolver/did/did-resolver";
 
 import {
   DidMethodKeyQualifier,
@@ -16,8 +16,8 @@ import {
   DidMethodKeySecp256k1ByteSize,
   Ed25519PublicKeyPrefix,
   Secp256k1PublicKeyPrefix,
-} from '../constants';
-import DockDidOrDidMethodKey from './dock-did-or-did-method-key';
+} from "../constants";
+import DockDidOrDidMethodKey from "./dock-did-or-did-method-key";
 
 /**
  * `did:key:*`
@@ -40,7 +40,7 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
     } else if (didMethodKey instanceof PublicKeySecp256k1) {
       this.didMethodKey = { secp256k1: didMethodKey.value };
     } else {
-      throw new Error('Unsupported public key type');
+      throw new Error("Unsupported public key type");
     }
   }
 

@@ -1,23 +1,25 @@
-import { randomAsHex } from '@polkadot/util-crypto';
-import { u8aToHex } from '@polkadot/util';
-import { DockAPI } from '../../../src';
+import { randomAsHex } from "@polkadot/util-crypto";
+import { u8aToHex } from "@polkadot/util";
+import { DockAPI } from "../../../src";
+import { DockDid, NoDIDError, DidKeypair } from "../../../src/utils/did";
 import {
-  createNewDockDID, typedHexDID, NoDIDError, DidKeypair,
-} from '../../../src/utils/did';
-import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
-import { DidKey, VerificationRelationship } from '../../../src/public-keys';
-import { ServiceEndpointType } from '../../../src/modules/did/service-endpoint';
+  FullNodeEndpoint,
+  TestAccountURI,
+  TestKeyringOpts,
+} from "../../test-constants";
+import { DidKey, VerificationRelationship } from "../../../src/public-keys";
+import { ServiceEndpointType } from "../../../src/modules/did/service-endpoint";
 
-describe('DID service endpoints', () => {
+describe("DID service endpoints", () => {
   const encoder = new TextEncoder();
 
   const dock = new DockAPI();
 
-  const dockDid1 = createNewDockDID();
+  const dockDid1 = DockDid.random();
   let hexDid1;
 
   // This DID will not be controlled by itself
-  const dockDid2 = createNewDockDID();
+  const dockDid2 = DockDid.random();
   let hexDid2;
 
   const seed1 = randomAsHex(32);
@@ -30,9 +32,13 @@ describe('DID service endpoints', () => {
   const spId2 = u8aToHex(encoder.encode(spId2Text));
   const spId3 = u8aToHex(encoder.encode(spId3Text));
 
-  const origins1Text = ['https://foo.example.com'];
-  const origins2Text = ['https://foo.example.com', 'https://bar.example.com', 'https://baz.example.com'];
-  const origins3Text = ['https://biz.example.com'];
+  const origins1Text = ["https://foo.example.com"];
+  const origins2Text = [
+    "https://foo.example.com",
+    "https://bar.example.com",
+    "https://baz.example.com",
+  ];
+  const origins3Text = ["https://biz.example.com"];
 
   beforeAll(async () => {
     await dock.init({
@@ -42,15 +48,15 @@ describe('DID service endpoints', () => {
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
 
-    hexDid1 = typedHexDID(dock.api, dockDid1);
-    hexDid2 = typedHexDID(dock.api, dockDid2);
+    hexDid1 = DockDid.from(dockDid1);
+    hexDid2 = DockDid.from(dockDid2);
   });
 
   afterAll(async () => {
     await dock.disconnect();
   }, 10000);
 
-  test('Create DIDs and add service endpoint', async () => {
+  test("Create DIDs and add service endpoint", async () => {
     const pair1 = new DidKeypair(dock.keyring.addFromUri(seed1), 1);
     const publicKey1 = pair1.publicKey();
     const didKey1 = new DidKey(publicKey1, new VerificationRelationship());
@@ -62,7 +68,16 @@ describe('DID service endpoints', () => {
 
     // `dockDid1` adds service endpoint for itself
     const origins1 = origins1Text.map((u) => u8aToHex(encoder.encode(u)));
-    await dock.did.addServiceEndpoint(spId1, spType, origins1, hexDid1, hexDid1, pair1, undefined, false);
+    await dock.did.addServiceEndpoint(
+      spId1,
+      spType,
+      origins1,
+      hexDid1,
+      hexDid1,
+      pair1,
+      undefined,
+      false,
+    );
 
     const sp = await dock.did.getServiceEndpoint(dockDid1, spId1);
     expect(sp.type).toEqual(spType);
@@ -78,66 +93,106 @@ describe('DID service endpoints', () => {
 
     // `dockDid1` adds service endpoint to `dockDid2`
     const origins2 = origins2Text.map((u) => u8aToHex(encoder.encode(u)));
-    await dock.did.addServiceEndpoint(spId2, spType, origins2, hexDid2, hexDid1, pair1, undefined, false);
+    await dock.did.addServiceEndpoint(
+      spId2,
+      spType,
+      origins2,
+      hexDid2,
+      hexDid1,
+      pair1,
+      undefined,
+      false,
+    );
 
     const sp1 = await dock.did.getServiceEndpoint(dockDid2, spId2);
     expect(sp1.type).toEqual(spType);
     expect(sp1.origins).toEqual(origins2);
   }, 3e4);
 
-  test('Get DID document with service endpoints', async () => {
-    const [doc1, doc2] = await Promise.all([dock.did.getDocument(dockDid1), dock.did.getDocument(dockDid2)]);
+  test("Get DID document with service endpoints", async () => {
+    const [doc1, doc2] = await Promise.all([
+      dock.did.getDocument(dockDid1),
+      dock.did.getDocument(dockDid2),
+    ]);
     expect(doc1.service.length).toEqual(1);
     expect(doc1.service[0].id).toEqual(spId1Text);
-    expect(doc1.service[0].type).toEqual('LinkedDomains');
+    expect(doc1.service[0].type).toEqual("LinkedDomains");
     expect(doc1.service[0].serviceEndpoint).toEqual(origins1Text);
 
     expect(doc2.service.length).toEqual(1);
     expect(doc2.service[0].id).toEqual(spId2Text);
-    expect(doc2.service[0].type).toEqual('LinkedDomains');
+    expect(doc2.service[0].type).toEqual("LinkedDomains");
     expect(doc2.service[0].serviceEndpoint).toEqual(origins2Text);
   }, 3e4);
 
-  test('Add another service endpoint', async () => {
+  test("Add another service endpoint", async () => {
     const pair1 = new DidKeypair(dock.keyring.addFromUri(seed1), 1);
     const spType = new ServiceEndpointType();
     spType.setLinkedDomains();
     const origins = origins3Text.map((u) => u8aToHex(encoder.encode(u)));
-    await dock.did.addServiceEndpoint(spId3, spType, origins, hexDid2, hexDid1, pair1, undefined, false);
+    await dock.did.addServiceEndpoint(
+      spId3,
+      spType,
+      origins,
+      hexDid2,
+      hexDid1,
+      pair1,
+      undefined,
+      false,
+    );
     const sp = await dock.did.getServiceEndpoint(dockDid2, spId3);
     expect(sp.type).toEqual(spType);
     expect(sp.origins).toEqual(origins);
   }, 3e4);
 
-  test('Get DID document with multiple service endpoints', async () => {
+  test("Get DID document with multiple service endpoints", async () => {
     const doc = await dock.did.getDocument(dockDid2);
     expect(doc.service.length).toEqual(2);
-    expect(doc.service[0].type).toEqual('LinkedDomains');
-    expect(doc.service[1].type).toEqual('LinkedDomains');
+    expect(doc.service[0].type).toEqual("LinkedDomains");
+    expect(doc.service[1].type).toEqual("LinkedDomains");
     expect(
-      (doc.service[0].id === spId2Text && doc.service[1].id === spId3Text)
-      || (doc.service[0].id === spId3Text && doc.service[1].id === spId2Text),
+      (doc.service[0].id === spId2Text && doc.service[1].id === spId3Text) ||
+        (doc.service[0].id === spId3Text && doc.service[1].id === spId2Text),
     ).toBe(true);
 
     expect(
-      (JSON.stringify(doc.service[0].serviceEndpoint) === JSON.stringify(origins2Text) && JSON.stringify(doc.service[1].serviceEndpoint) === JSON.stringify(origins3Text))
-      || (JSON.stringify(doc.service[0].serviceEndpoint) === JSON.stringify(origins3Text) && JSON.stringify(doc.service[1].serviceEndpoint) === JSON.stringify(origins2Text)),
+      (JSON.stringify(doc.service[0].serviceEndpoint) ===
+        JSON.stringify(origins2Text) &&
+        JSON.stringify(doc.service[1].serviceEndpoint) ===
+          JSON.stringify(origins3Text)) ||
+        (JSON.stringify(doc.service[0].serviceEndpoint) ===
+          JSON.stringify(origins3Text) &&
+          JSON.stringify(doc.service[1].serviceEndpoint) ===
+            JSON.stringify(origins2Text)),
     ).toBe(true);
   });
 
-  test('Remove service endpoint', async () => {
+  test("Remove service endpoint", async () => {
     const pair1 = new DidKeypair(dock.keyring.addFromUri(seed1), 1);
     // `dockDid1` removes service endpoint of `dockDid2`
-    await dock.did.removeServiceEndpoint(spId2, hexDid2, hexDid1, pair1, undefined, false);
-    await expect(dock.did.getServiceEndpoint(dockDid2, spId2)).rejects.toThrow();
+    await dock.did.removeServiceEndpoint(
+      spId2,
+      hexDid2,
+      hexDid1,
+      pair1,
+      undefined,
+      false,
+    );
+    await expect(
+      dock.did.getServiceEndpoint(dockDid2, spId2),
+    ).rejects.toThrow();
   }, 3e4);
 
-  test('Removing DID removes service endpoint as well', async () => {
+  test("Removing DID removes service endpoint as well", async () => {
     const pair1 = new DidKeypair(dock.keyring.addFromUri(seed1), 1);
 
     await dock.did.remove(dockDid1, dockDid1, pair1);
 
-    await expect(dock.did.getOnchainDidDetail(hexDid1.asDid)).rejects.toThrow(NoDIDError);
-    await expect(dock.did.getServiceEndpoint(dockDid1, spId1)).rejects.toThrow();
+    await expect(dock.did.getOnchainDidDetail(hexDid1.asDid)).rejects.toThrow(
+      NoDIDError,
+    );
+    await expect(
+      dock.did.getServiceEndpoint(dockDid1, spId1),
+    ).rejects.toThrow();
   }, 3e4);
 });

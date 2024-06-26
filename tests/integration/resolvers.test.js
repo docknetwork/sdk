@@ -1,22 +1,26 @@
-import { randomAsHex } from '@polkadot/util-crypto';
-import { DockResolver, DockStatusList2021Resolver } from '../../src/resolver';
-import { createNewDockDID, DidKeypair, typedHexDID } from '../../src/utils/did';
+import { randomAsHex } from "@polkadot/util-crypto";
+import { DockResolver, DockStatusList2021Resolver } from "../../src/resolver";
+import {
+  DockDid,
+  DidKeypair,
+  DockDidOrDidMethodKey,
+} from "../../src/utils/did";
 
-import { DockAPI } from '../../src/index';
+import { DockAPI } from "../../src/index";
 
 import {
   FullNodeEndpoint,
   TestKeyringOpts,
   TestAccountURI,
-} from '../test-constants';
+} from "../test-constants";
 
-import { OneOfPolicy } from '../../src/utils/revocation';
-import { registerNewDIDUsingPair } from './helpers';
-import { getKeyDoc } from '../../src/utils/vc/helpers';
-import StatusList2021Credential from '../../src/status-list-credential/status-list2021-credential';
-import dockDidResolver from '../../src/resolver/did/dock-did-resolver';
+import { OneOfPolicy } from "../../src/utils/revocation";
+import { registerNewDIDUsingPair } from "./helpers";
+import { getKeyDoc } from "../../src/utils/vc/helpers";
+import StatusList2021Credential from "../../src/status-list-credential/status-list2021-credential";
+import dockDidResolver from "../../src/resolver/did/dock-did-resolver";
 
-describe('Resolvers', () => {
+describe("Resolvers", () => {
   const dock = new DockAPI();
   let pair;
 
@@ -25,7 +29,7 @@ describe('Resolvers', () => {
   let statusListCred;
 
   // Create a new owner DID, the DID will be registered on the network and own the status list
-  const ownerDID = createNewDockDID();
+  const ownerDID = DockDid.random();
   const ownerSeed = randomAsHex(32);
   let ownerKey;
 
@@ -41,13 +45,13 @@ describe('Resolvers', () => {
       address: FullNodeEndpoint,
     });
 
-    owners.add(typedHexDID(dock.api, ownerDID));
+    owners.add(DockDid.from(ownerDID));
     policy = new OneOfPolicy(owners);
 
     ownerKey = getKeyDoc(
       ownerDID,
-      dock.keyring.addFromUri(ownerSeed, null, 'ed25519'),
-      'Ed25519VerificationKey2018',
+      dock.keyring.addFromUri(ownerSeed, null, "ed25519"),
+      "Ed25519VerificationKey2018",
     );
 
     // The keyring should be initialized before any test begins as this suite is testing statusListCredentialModule
@@ -55,7 +59,10 @@ describe('Resolvers', () => {
     dock.setAccount(account);
 
     // Thees DIDs should be written before any test begins
-    pair = DidKeypair.fromApi(dock, { seed: ownerSeed, keypairType: 'sr25519' });
+    pair = DidKeypair.fromApi(dock, {
+      seed: ownerSeed,
+      keypairType: "sr25519",
+    });
 
     // The controller is same as the DID
     await registerNewDIDUsingPair(dock, ownerDID, pair);
@@ -64,7 +71,8 @@ describe('Resolvers', () => {
       ownerKey,
       statusListCredId,
       {},
-    ); await expect(
+    );
+    await expect(
       dock.statusListCredential.createStatusListCredential(
         statusListCredId,
         statusListCred,
@@ -78,14 +86,14 @@ describe('Resolvers', () => {
     await dock.disconnect();
   }, 10000);
 
-  it('checks `DockResolver`', async () => {
+  it("checks `DockResolver`", async () => {
     const resolver = new DockResolver(dock);
 
-    expect(resolver.supports('did:dock:')).toBe(true);
-    expect(resolver.supports('did:doc:')).toBe(false);
-    expect(resolver.supports('status-list2021:dock:')).toBe(true);
-    expect(resolver.supports('status-list2021:*:')).toBe(false);
-    expect(resolver.supports('status-list2020:doc:')).toBe(false);
+    expect(resolver.supports("did:dock:")).toBe(true);
+    expect(resolver.supports("did:doc:")).toBe(false);
+    expect(resolver.supports("status-list2021:dock:")).toBe(true);
+    expect(resolver.supports("status-list2021:*:")).toBe(false);
+    expect(resolver.supports("status-list2020:doc:")).toBe(false);
     expect(await resolver.resolve(ownerDID)).toEqual(
       await dock.did.getDocument(ownerDID),
     );
@@ -94,14 +102,14 @@ describe('Resolvers', () => {
     );
   });
 
-  it('checks `DockStatusList2021Resolver`', async () => {
+  it("checks `DockStatusList2021Resolver`", async () => {
     const resolver = new DockStatusList2021Resolver(dock);
 
-    expect(resolver.supports('did:dock:')).toBe(false);
-    expect(resolver.supports('did:doc:')).toBe(false);
-    expect(resolver.supports('status-list2021:dock:')).toBe(true);
-    expect(resolver.supports('status-list2021:*:')).toBe(false);
-    expect(resolver.supports('status-list2020:doc:')).toBe(false);
+    expect(resolver.supports("did:dock:")).toBe(false);
+    expect(resolver.supports("did:doc:")).toBe(false);
+    expect(resolver.supports("status-list2021:dock:")).toBe(true);
+    expect(resolver.supports("status-list2021:*:")).toBe(false);
+    expect(resolver.supports("status-list2020:doc:")).toBe(false);
     expect(resolver.resolve(ownerDID)).rejects.toThrowError(
       `Invalid \`StatusList2021Credential\` id: \`${ownerDID}\``,
     );
@@ -110,14 +118,14 @@ describe('Resolvers', () => {
     );
   });
 
-  it('checks `DockDidResolver`', async () => {
+  it("checks `DockDidResolver`", async () => {
     const resolver = new dockDidResolver(dock);
 
-    expect(resolver.supports('did:dock:')).toBe(true);
-    expect(resolver.supports('did:doc:')).toBe(false);
-    expect(resolver.supports('status-list2021:dock:')).toBe(false);
-    expect(resolver.supports('status-list2021:*:')).toBe(false);
-    expect(resolver.supports('status-list2020:doc:')).toBe(false);
+    expect(resolver.supports("did:dock:")).toBe(true);
+    expect(resolver.supports("did:doc:")).toBe(false);
+    expect(resolver.supports("status-list2021:dock:")).toBe(false);
+    expect(resolver.supports("status-list2021:*:")).toBe(false);
+    expect(resolver.supports("status-list2020:doc:")).toBe(false);
     expect(await resolver.resolve(ownerDID)).toEqual(
       await dock.did.getDocument(ownerDID),
     );

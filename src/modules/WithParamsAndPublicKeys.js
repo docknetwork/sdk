@@ -1,8 +1,8 @@
 /* eslint-disable camelcase */
 
-import { u8aToHex } from '@polkadot/util';
-import { createDidSig, typedHexDID } from '../utils/did';
-import { getDidNonce } from '../utils/misc';
+import { u8aToHex } from "@polkadot/util";
+import { createDidSig, DockDidOrDidMethodKey } from "../utils/did";
+import { getDidNonce } from "../utils/misc";
 
 /**
  * Class with logic for public keys and corresponding setup parameters.
@@ -26,13 +26,13 @@ export default class WithParamsAndPublicKeys {
   static prepareAddParameters(bytes, curveType = undefined, label = undefined) {
     const params = {};
     if (bytes === undefined) {
-      throw new Error('bytes must be provided');
+      throw new Error("bytes must be provided");
     } else {
       params.bytes = bytes;
     }
     if (curveType === undefined) {
-      params.curveType = 'Bls12381';
-    } else if (curveType === 'Bls12381') {
+      params.curveType = "Bls12381";
+    } else if (curveType === "Bls12381") {
       params.curveType = curveType;
     } else {
       throw new Error(`Invalid curve type ${curveType}`);
@@ -56,20 +56,21 @@ export default class WithParamsAndPublicKeys {
   ) {
     const publicKey = {};
     if (bytes === undefined) {
-      throw new Error('bytes must be provided');
+      throw new Error("bytes must be provided");
     } else {
       publicKey.bytes = bytes;
     }
     if (curveType === undefined) {
-      publicKey.curveType = 'Bls12381';
-    } else if (curveType === 'Bls12381') {
+      publicKey.curveType = "Bls12381";
+    } else if (curveType === "Bls12381") {
       publicKey.curveType = curveType;
     } else {
       throw new Error(`Invalid curve type ${curveType}`);
     }
-    publicKey.paramsRef = paramsRef !== undefined
-      ? WithParamsAndPublicKeys.parseRef(api, paramsRef)
-      : undefined;
+    publicKey.paramsRef =
+      paramsRef !== undefined
+        ? WithParamsAndPublicKeys.parseRef(paramsRef)
+        : undefined;
     return publicKey;
   }
 
@@ -79,21 +80,21 @@ export default class WithParamsAndPublicKeys {
    * @param ref
    * @returns {any[]}
    */
-  static parseRef(api, ref) {
+  static parseRef(ref) {
     const parsed = new Array(2);
     if (
-      !(typeof ref === 'object' && ref instanceof Array && ref.length === 2)
+      !(typeof ref === "object" && ref instanceof Array && ref.length === 2)
     ) {
-      throw new Error('Reference should be an array of 2 items');
+      throw new Error("Reference should be an array of 2 items");
     }
     try {
-      parsed[0] = typedHexDID(api, ref[0]);
-    } catch (e) {
+      parsed[0] = DockDidOrDidMethodKey.from(ref[0]);
+    } catch (error) {
       throw new Error(
-        `First item of reference should be a DID but was ${ref[0]}`,
+        `First item of reference should be a DID but was ${ref[0]}, error: ${error}`,
       );
     }
-    if (typeof ref[1] !== 'number') {
+    if (typeof ref[1] !== "number") {
       throw new Error(
         `Second item of reference should be a number but was ${ref[1]}`,
       );
@@ -121,7 +122,7 @@ export default class WithParamsAndPublicKeys {
     { nonce = undefined, didModule = undefined },
   ) {
     const offchainParams = this.constructor.buildParams(params);
-    const hexDid = typedHexDID(this.api, signerDid);
+    const hexDid = DockDidOrDidMethodKey.from(signerDid);
     const [addParams, signature] = await this.createSignedAddParams(
       offchainParams,
       hexDid,
@@ -148,7 +149,7 @@ export default class WithParamsAndPublicKeys {
     signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const hexDid = typedHexDID(this.api, signerDid);
+    const hexDid = DockDidOrDidMethodKey.from(signerDid);
     const [removeParams, signature] = await this.createSignedRemoveParams(
       index,
       hexDid,
@@ -244,16 +245,16 @@ export default class WithParamsAndPublicKeys {
 
   // eslint-disable-next-line no-unused-vars
   async queryParamsFromChain(hexDid, counter) {
-    throw new Error('Extending class should implement queryParamsFromChain');
+    throw new Error("Extending class should implement queryParamsFromChain");
   }
 
   // eslint-disable-next-line no-unused-vars
   async queryPublicKeyFromChain(hexDid, keyId) {
-    throw new Error('Extending class should implement queryPublicKeyFromChain');
+    throw new Error("Extending class should implement queryPublicKeyFromChain");
   }
 
   async getParams(did, counter) {
-    const hexId = typedHexDID(this.api, did);
+    const hexId = DockDidOrDidMethodKey.from(did);
     return this.getParamsByHexDid(hexId, counter);
   }
 
@@ -266,7 +267,7 @@ export default class WithParamsAndPublicKeys {
    * @returns {Promise<{bytes: string}|null>}
    */
   async getPublicKey(did, keyId, withParams = false) {
-    const hexId = typedHexDID(this.api, did);
+    const hexId = DockDidOrDidMethodKey.from(did);
     return this.getPublicKeyByHexDid(hexId, keyId, withParams);
   }
 
@@ -287,7 +288,7 @@ export default class WithParamsAndPublicKeys {
       );
       if (withParams) {
         if (pkObj.paramsRef === null) {
-          throw new Error('No reference to parameters for the public key');
+          throw new Error("No reference to parameters for the public key");
         } else {
           const params = await this.getParamsByHexDid(
             pkObj.paramsRef[0],
@@ -316,7 +317,7 @@ export default class WithParamsAndPublicKeys {
       bytes: u8aToHex(params.bytes),
     };
     if (params.curveType.isBls12381) {
-      paramsObj.curveType = 'Bls12381';
+      paramsObj.curveType = "Bls12381";
     }
     if (params.label.isSome) {
       paramsObj.label = u8aToHex(params.label.unwrap());
@@ -336,11 +337,11 @@ export default class WithParamsAndPublicKeys {
       bytes: u8aToHex(pk.bytes),
     };
     if (pk.curveType.isBls12381) {
-      pkObj.curveType = 'Bls12381';
+      pkObj.curveType = "Bls12381";
     }
     if (pk.paramsRef.isSome) {
       const pr = pk.paramsRef.unwrap();
-      pkObj.paramsRef = [typedHexDID(api, pr[0]), pr[1].toNumber()];
+      pkObj.paramsRef = [DockDidOrDidMethodKey.from(pr[0]), pr[1].toNumber()];
     } else {
       pkObj.paramsRef = null;
     }
@@ -350,11 +351,11 @@ export default class WithParamsAndPublicKeys {
 
   // eslint-disable-next-line no-unused-vars
   signAddParams(keyPair, params) {
-    throw new Error('Extending class should implement signAddParams');
+    throw new Error("Extending class should implement signAddParams");
   }
 
   // eslint-disable-next-line no-unused-vars
   signRemoveParams(keyPair, ref) {
-    throw new Error('Extending class should implement signRemoveParams');
+    throw new Error("Extending class should implement signRemoveParams");
   }
 }

@@ -1,34 +1,37 @@
-import { randomAsHex } from '@polkadot/util-crypto';
+import { randomAsHex } from "@polkadot/util-crypto";
 import {
   initializeWasm,
   Accumulator,
   PositiveAccumulator,
   VBWitnessUpdateInfo,
-  AccumulatorParams, KBUniversalAccumulator,
+  AccumulatorParams,
+  KBUniversalAccumulator,
   KBUniversalMembershipWitnessUpdateInfo,
-} from '@docknetwork/crypto-wasm-ts';
+} from "@docknetwork/crypto-wasm-ts";
 import {
   InMemoryKBUniversalState,
   InMemoryState,
-} from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
-import { hexToU8a, stringToHex, u8aToHex } from '@polkadot/util';
-import { DockAPI } from '../../../src';
+} from "@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence";
+import { hexToU8a, stringToHex, u8aToHex } from "@polkadot/util";
+import { DockAPI } from "../../../src";
 import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
-} from '../../test-constants';
+} from "../../test-constants";
 import {
   DidKeypair,
-  createNewDockDID,
-  typedHexDID,
-} from '../../../src/utils/did';
+  DockDid,
+  DockDidOrDidMethodKey,
+} from "../../../src/utils/did";
 
-import AccumulatorModule, { AccumulatorType } from '../../../src/modules/accumulator';
-import { getAllEventsFromBlock } from '../../../src/utils/chain-ops';
-import { registerNewDIDUsingPair } from '../helpers';
+import AccumulatorModule, {
+  AccumulatorType,
+} from "../../../src/modules/accumulator";
+import { getAllEventsFromBlock } from "../../../src/utils/chain-ops";
+import { registerNewDIDUsingPair } from "../helpers";
 
-describe('Accumulator Module', () => {
+describe("Accumulator Module", () => {
   const dock = new DockAPI();
   let account;
   let did1;
@@ -52,15 +55,15 @@ describe('Accumulator Module', () => {
     dock.setAccount(account);
     pair1 = new DidKeypair(dock.keyring.addFromUri(seed1), 1);
     pair2 = new DidKeypair(dock.keyring.addFromUri(seed2), 1);
-    did1 = createNewDockDID();
-    did2 = createNewDockDID();
+    did1 = DockDid.random();
+    did2 = DockDid.random();
     await registerNewDIDUsingPair(dock, did1, pair1);
     await registerNewDIDUsingPair(dock, did2, pair2);
     await initializeWasm();
   }, 20000);
 
-  test('Can create new params', async () => {
-    let label = stringToHex('accumulator-params-label');
+  test("Can create new params", async () => {
+    let label = stringToHex("accumulator-params-label");
     let params = Accumulator.generateParams(hexToU8a(label));
     const bytes1 = u8aToHex(params.bytes);
     const params1 = chainModuleClass.prepareAddParameters(
@@ -82,7 +85,7 @@ describe('Accumulator Module', () => {
     const queriedParams1 = await chainModule.getParams(did1, 1);
     expect(paramsWritten1).toEqual(queriedParams1);
 
-    label = stringToHex('some label');
+    label = stringToHex("some label");
     params = Accumulator.generateParams(hexToU8a(label));
     const bytes2 = u8aToHex(params.bytes);
     const params2 = chainModuleClass.prepareAddParameters(bytes2);
@@ -100,7 +103,7 @@ describe('Accumulator Module', () => {
     const queriedParams2 = await chainModule.getParams(did2, 1);
     expect(paramsWritten2).toEqual(queriedParams2);
 
-    label = stringToHex('some label');
+    label = stringToHex("some label");
     params = Accumulator.generateParams(hexToU8a(label));
     const bytes3 = u8aToHex(params.bytes);
     const params3 = chainModuleClass.prepareAddParameters(bytes3);
@@ -126,7 +129,7 @@ describe('Accumulator Module', () => {
     expect(paramsByDid2[0]).toEqual(paramsWritten2);
   }, 30000);
 
-  test('Can create public keys', async () => {
+  test("Can create public keys", async () => {
     const params = Accumulator.generateParams();
     let keypair = Accumulator.generateKeypair(params);
     const bytes1 = u8aToHex(keypair.publicKey.bytes);
@@ -147,10 +150,12 @@ describe('Accumulator Module', () => {
     const aparams1 = new AccumulatorParams(hexToU8a(params1.bytes));
     keypair = Accumulator.generateKeypair(aparams1, hexToU8a(seedAccum));
     const bytes2 = u8aToHex(keypair.publicKey.bytes);
-    const pk2 = chainModuleClass.prepareAddPublicKey(dock.api, bytes2, undefined, [
-      did1,
-      1,
-    ]);
+    const pk2 = chainModuleClass.prepareAddPublicKey(
+      dock.api,
+      bytes2,
+      undefined,
+      [did1, 1],
+    );
     await chainModule.addPublicKey(
       pk2,
       did2,
@@ -161,7 +166,7 @@ describe('Accumulator Module', () => {
 
     const queriedPk2 = await chainModule.getPublicKey(did2, 1);
     expect(queriedPk2.bytes).toEqual(pk2.bytes);
-    expect(queriedPk2.paramsRef).toEqual([typedHexDID(dock.api, did1), 1]);
+    expect(queriedPk2.paramsRef).toEqual([DockDid.from(did1), 1]);
 
     const queriedPk2WithParams = await chainModule.getPublicKey(did2, 1, true);
     expect(queriedPk2WithParams.params).toEqual(params1);
@@ -170,10 +175,12 @@ describe('Accumulator Module', () => {
     const aparams2 = new AccumulatorParams(hexToU8a(params2.bytes));
     keypair = Accumulator.generateKeypair(aparams2);
     const bytes3 = u8aToHex(keypair.publicKey.bytes);
-    const pk3 = chainModuleClass.prepareAddPublicKey(dock.api, bytes3, undefined, [
-      did1,
-      2,
-    ]);
+    const pk3 = chainModuleClass.prepareAddPublicKey(
+      dock.api,
+      bytes3,
+      undefined,
+      [did1, 2],
+    );
     await chainModule.addPublicKey(
       pk3,
       did2,
@@ -184,7 +191,7 @@ describe('Accumulator Module', () => {
 
     const queriedPk3 = await chainModule.getPublicKey(did2, 2);
     expect(queriedPk3.bytes).toEqual(pk3.bytes);
-    expect(queriedPk3.paramsRef).toEqual([typedHexDID(dock.api, did1), 2]);
+    expect(queriedPk3.paramsRef).toEqual([DockDid.from(did1), 2]);
 
     const queriedPk3WithParams = await chainModule.getPublicKey(did2, 2, true);
     expect(queriedPk3WithParams.params).toEqual(params2);
@@ -235,30 +242,34 @@ describe('Accumulator Module', () => {
     expect(accum1.created > 0).toBe(true);
     expect(accum1.lastModified > 0).toBe(true);
     expect(accum1.created).toEqual(accum1.lastModified);
-    expect(accum1.type).toEqual('positive');
+    expect(accum1.type).toEqual("positive");
     expect(accum1.accumulated).toEqual(accumulated1);
-    expect(accum1.keyRef).toEqual([typedHexDID(dock.api, did1), keyId]);
+    expect(accum1.keyRef).toEqual([DockDid.from(did1), keyId]);
     expect(accum1.publicKey).toBeUndefined();
 
     const accum2 = await chainModule.getAccumulator(id2, false);
     expect(accum2.created > 0).toBe(true);
     expect(accum2.lastModified > 0).toBe(true);
     expect(accum2.created).toEqual(accum2.lastModified);
-    expect(accum2.type).toEqual('universal');
+    expect(accum2.type).toEqual("universal");
     expect(accum2.accumulated).toEqual(accumulated2);
-    expect(accum2.keyRef).toEqual([typedHexDID(dock.api, did2), keyId]);
+    expect(accum2.keyRef).toEqual([DockDid.from(did2), keyId]);
     expect(accum2.publicKey).toBeUndefined();
 
-    const keyWithParams = keyId > 0 ? await chainModule.getPublicKey(did2, keyId, true) : null;
-    const accum2WithKeyAndParams = keyId > 0 ? await chainModule.getAccumulator(id2, true) : await chainModule.getAccumulator(id2, false, false);
+    const keyWithParams =
+      keyId > 0 ? await chainModule.getPublicKey(did2, keyId, true) : null;
+    const accum2WithKeyAndParams =
+      keyId > 0
+        ? await chainModule.getAccumulator(id2, true)
+        : await chainModule.getAccumulator(id2, false, false);
     expect(accum2WithKeyAndParams.created > 0).toBe(true);
     expect(accum2WithKeyAndParams.lastModified > 0).toBe(true);
     expect(accum2WithKeyAndParams.created).toEqual(
       accum2WithKeyAndParams.lastModified,
     );
-    expect(accum2WithKeyAndParams.type).toEqual('universal');
+    expect(accum2WithKeyAndParams.type).toEqual("universal");
     expect(accum2WithKeyAndParams.accumulated).toEqual(accumulated2);
-    expect(accum2WithKeyAndParams.keyRef).toEqual([typedHexDID(dock.api, did2), keyId]);
+    expect(accum2WithKeyAndParams.keyRef).toEqual([DockDid.from(did2), keyId]);
     if (keyId > 0) {
       expect(accum2WithKeyAndParams.publicKey).toEqual(keyWithParams);
     } else {
@@ -299,9 +310,9 @@ describe('Accumulator Module', () => {
     expect(accum3.created > 0).toBe(true);
     expect(accum3.lastModified > 0).toBe(true);
     expect(accum3.created).toEqual(accum3.lastModified);
-    expect(accum3.type).toEqual('kb-universal');
+    expect(accum3.type).toEqual("kb-universal");
     expect(accum3.accumulated).toEqual(accumulated3);
-    expect(accum3.keyRef).toEqual([typedHexDID(dock.api, did2), keyId]);
+    expect(accum3.keyRef).toEqual([DockDid.from(did2), keyId]);
     expect(accum3.publicKey).toBeUndefined();
 
     await chainModule.removeAccumulator(
@@ -316,15 +327,24 @@ describe('Accumulator Module', () => {
 
   async function checkUpdate(keyId) {
     async function check(typ) {
-      const accumState = typ === 0 ? new InMemoryState() : new InMemoryKBUniversalState();
+      const accumState =
+        typ === 0 ? new InMemoryState() : new InMemoryKBUniversalState();
 
-      const queriedPkWithParams = keyId > 0 ? await chainModule.getPublicKey(did2, keyId, true) : null;
-      const aparams = keyId > 0 ? new AccumulatorParams(
-        hexToU8a(queriedPkWithParams.params.bytes),
-      ) : Accumulator.generateParams();
+      const queriedPkWithParams =
+        keyId > 0 ? await chainModule.getPublicKey(did2, keyId, true) : null;
+      const aparams =
+        keyId > 0
+          ? new AccumulatorParams(hexToU8a(queriedPkWithParams.params.bytes))
+          : Accumulator.generateParams();
       const keypair = Accumulator.generateKeypair(aparams, hexToU8a(seedAccum));
       let accumulator;
-      const members = [Accumulator.encodePositiveNumberAsAccumulatorMember(25), Accumulator.encodePositiveNumberAsAccumulatorMember(31), Accumulator.encodePositiveNumberAsAccumulatorMember(7), Accumulator.encodePositiveNumberAsAccumulatorMember(93), Accumulator.encodePositiveNumberAsAccumulatorMember(50)];
+      const members = [
+        Accumulator.encodePositiveNumberAsAccumulatorMember(25),
+        Accumulator.encodePositiveNumberAsAccumulatorMember(31),
+        Accumulator.encodePositiveNumberAsAccumulatorMember(7),
+        Accumulator.encodePositiveNumberAsAccumulatorMember(93),
+        Accumulator.encodePositiveNumberAsAccumulatorMember(50),
+      ];
       if (typ === 0) {
         accumulator = PositiveAccumulator.initialize(
           aparams,
@@ -346,7 +366,10 @@ describe('Accumulator Module', () => {
       const member1 = members.pop();
       await accumulator.add(member1, keypair.secretKey, accumState);
 
-      const accumulated1 = AccumulatorModule.accumulatedAsHex(accumulator.accumulated, typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni);
+      const accumulated1 = AccumulatorModule.accumulatedAsHex(
+        accumulator.accumulated,
+        typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni,
+      );
       const id = randomAsHex(32);
       if (typ === 0) {
         await chainModule.addPositiveAccumulator(
@@ -373,7 +396,10 @@ describe('Accumulator Module', () => {
       const accum1 = await chainModule.getAccumulator(id, false);
       expect(accum1.accumulated).toEqual(accumulated1);
 
-      const accumulated2 = AccumulatorModule.accumulatedAsHex(accumulator.accumulated, typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni);
+      const accumulated2 = AccumulatorModule.accumulatedAsHex(
+        accumulator.accumulated,
+        typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni,
+      );
       await chainModule.updateAccumulator(
         id,
         accumulated2,
@@ -394,14 +420,23 @@ describe('Accumulator Module', () => {
 
       await accumulator.remove(member1, keypair.secretKey, accumState);
 
-      const witUpdCls = typ === 0 ? VBWitnessUpdateInfo : KBUniversalMembershipWitnessUpdateInfo;
+      const witUpdCls =
+        typ === 0
+          ? VBWitnessUpdateInfo
+          : KBUniversalMembershipWitnessUpdateInfo;
 
-      const accumulated3 = AccumulatorModule.accumulatedAsHex(accumulator.accumulated, typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni);
+      const accumulated3 = AccumulatorModule.accumulatedAsHex(
+        accumulator.accumulated,
+        typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni,
+      );
       const additions1 = [u8aToHex(member2), u8aToHex(member3)];
       const removals1 = [u8aToHex(member1)];
       const witUpd1 = u8aToHex(
         witUpdCls.new(
-          AccumulatorModule.accumulatedFromHex(accumulated2, typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni),
+          AccumulatorModule.accumulatedFromHex(
+            accumulated2,
+            typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni,
+          ),
           [member2, member3],
           [member1],
           keypair.secretKey,
@@ -429,11 +464,17 @@ describe('Accumulator Module', () => {
       const member5 = members.pop();
       await accumulator.add(member5, keypair.secretKey, accumState);
 
-      const accumulated4 = AccumulatorModule.accumulatedAsHex(accumulator.accumulated, typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni);
+      const accumulated4 = AccumulatorModule.accumulatedAsHex(
+        accumulator.accumulated,
+        typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni,
+      );
       const additions2 = [u8aToHex(member4), u8aToHex(member5)];
       const witUpd2 = u8aToHex(
         witUpdCls.new(
-          AccumulatorModule.accumulatedFromHex(accumulated3, typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni),
+          AccumulatorModule.accumulatedFromHex(
+            accumulated3,
+            typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni,
+          ),
           [member4, member5],
           [],
           keypair.secretKey,
@@ -454,11 +495,17 @@ describe('Accumulator Module', () => {
       await accumulator.remove(member2, keypair.secretKey, accumState);
       await accumulator.remove(member4, keypair.secretKey, accumState);
 
-      const accumulated5 = AccumulatorModule.accumulatedAsHex(accumulator.accumulated, typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni);
+      const accumulated5 = AccumulatorModule.accumulatedAsHex(
+        accumulator.accumulated,
+        typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni,
+      );
       const removals3 = [u8aToHex(member2), u8aToHex(member4)];
       const witUpd3 = u8aToHex(
         witUpdCls.new(
-          AccumulatorModule.accumulatedFromHex(accumulated4, typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni),
+          AccumulatorModule.accumulatedFromHex(
+            accumulated4,
+            typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni,
+          ),
           [],
           [member2, member4],
           keypair.secretKey,
@@ -487,7 +534,7 @@ describe('Accumulator Module', () => {
 
       const events1 = (
         await getAllEventsFromBlock(chainModule.api, accum2.lastModified, false)
-      ).filter(({ event }) => event.section === 'accumulator');
+      ).filter(({ event }) => event.section === "accumulator");
 
       expect(
         chainModuleClass.parseEventAsAccumulatorUpdate(events1[0].event),
@@ -504,7 +551,7 @@ describe('Accumulator Module', () => {
 
       const events2 = (
         await getAllEventsFromBlock(chainModule.api, accum3.lastModified, false)
-      ).filter(({ event }) => event.section === 'accumulator');
+      ).filter(({ event }) => event.section === "accumulator");
       expect(
         chainModuleClass.parseEventAsAccumulatorUpdate(events2[0].event),
       ).toEqual([id, accumulated3]);
@@ -532,15 +579,15 @@ describe('Accumulator Module', () => {
     await check(1);
   }
 
-  test('Can add and remove accumulator', async () => {
+  test("Can add and remove accumulator", async () => {
     await checkAddRemove(1);
   }, 50000);
 
-  test('Update accumulator', async () => {
+  test("Update accumulator", async () => {
     await checkUpdate(1);
   }, 50000);
 
-  test('Can remove public keys and params', async () => {
+  test("Can remove public keys and params", async () => {
     await chainModule.removePublicKey(
       1,
       did1,
@@ -613,11 +660,11 @@ describe('Accumulator Module', () => {
     expect(params3).toEqual(null);
   }, 50000);
 
-  test('Can add and remove accumulator without public key', async () => {
+  test("Can add and remove accumulator without public key", async () => {
     await checkAddRemove(0);
   }, 50000);
 
-  test('Update accumulator without public key', async () => {
+  test("Update accumulator without public key", async () => {
     await checkUpdate(0);
   }, 50000);
 

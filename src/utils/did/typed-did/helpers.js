@@ -1,5 +1,5 @@
-import DockDidOrDidMethodKey from './dock-did-or-did-method-key';
-import DockDid from './dock-did';
+import DockDidOrDidMethodKey from "./dock-did-or-did-method-key";
+import DockDid from "./dock-did";
 import DidMethodKey from "./did-method-key"; // eslint-disable-line
 
 /**
@@ -19,6 +19,6 @@ export function typedHexDID(_api, did) {
 /**
  * Create and return a fully qualified Dock DID, i.e. "did:dock:<SS58 string>"
  *
- * @returns {string} - The DID
+ * @returns {DockDid} - The DID
  */
-export const createNewDockDID = () => DockDid.random().toQualifiedEncodedString();
+export const createNewDockDID = () => DockDid.random();

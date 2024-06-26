@@ -1,13 +1,11 @@
-import { randomAsHex } from '@polkadot/util-crypto';
-import dock, { DockAPI } from '../src/index';
-import {
-  createNewDockDID, DidKeypair,
-} from '../src/utils/did';
-import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
-import { sendBatch } from './helpers';
-import { DidKey, VerificationRelationship } from '../src/public-keys';
+import { randomAsHex } from "@polkadot/util-crypto";
+import dock, { DockAPI } from "../src/index";
+import { DockDid, DidKeypair } from "../src/utils/did";
+import { getPublicKeyFromKeyringPair } from "../src/utils/misc";
+import { sendBatch } from "./helpers";
+import { DidKey, VerificationRelationship } from "../src/public-keys";
 
-require('dotenv').config();
+require("dotenv").config();
 
 const { FullNodeEndpoint, SudoSecretURI, EndowedSecretURI } = process.env;
 
@@ -40,9 +38,9 @@ async function sendOnChainDIDTxns(count, waitForFinalization = true) {
   const txs = [];
   const didPairs = [];
   while (txs.length < count) {
-    const did = createNewDockDID();
+    const did = DockDid.random();
     const seed = randomAsHex(32);
-    const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
+    const pair = dock.keyring.addFromUri(seed, null, "sr25519");
     const publicKey = getPublicKeyFromKeyringPair(pair);
     const didKey = new DidKey(publicKey, new VerificationRelationship());
     const tx = dock.did.createNewOnchainTx(did, [didKey], []);
@@ -74,7 +72,7 @@ async function sendAddKeyTxns(count, didPairs) {
     const did = didPairs[j][0];
     const currentPair = didPairs[j][1];
     const seed = randomAsHex(32);
-    const newPair = dock.keyring.addFromUri(seed, null, 'sr25519');
+    const newPair = dock.keyring.addFromUri(seed, null, "sr25519");
     const publicKey = getPublicKeyFromKeyringPair(newPair);
     const didKey = new DidKey(publicKey, new VerificationRelationship());
     const tx = await dock.did.createAddKeysTx([didKey], did, did, currentPair);
@@ -105,7 +103,12 @@ async function sendAddControllerTxns(count, didPairs) {
   while (txs.length < count) {
     const did = didPairs[j][0];
     const currentPair = didPairs[j][1];
-    const tx = await dock.did.createAddControllersTx([createNewDockDID()], did, did, currentPair);
+    const tx = await dock.did.createAddControllersTx(
+      [DockDid.random()],
+      did,
+      did,
+      currentPair,
+    );
     txs.push(tx);
     j++;
   }
@@ -166,7 +169,9 @@ async function sendBlobTxns(count, didPairs) {
       id: blobId,
       blob: randomAsHex(995),
     };
-    const tx = await dock.blob.createNewTx(blob, did, pair, { didModule: dock.did });
+    const tx = await dock.blob.createNewTx(blob, did, pair, {
+      didModule: dock.did,
+    });
     txs.push(tx);
     blobIds.push(blobId);
     j++;
@@ -209,13 +214,13 @@ async function sendAnchorTxns(count) {
 async function runOnce() {
   const count = 1000;
   let didPairs = await sendOnChainDIDTxns(count);
-  console.log('');
+  console.log("");
   didPairs = await sendAddKeyTxns(count, didPairs);
-  console.log('');
+  console.log("");
   await sendAddControllerTxns(count, didPairs);
-  console.log('');
+  console.log("");
   await sendBlobTxns(800, didPairs);
-  console.log('');
+  console.log("");
   await sendRemoveTxns(count, didPairs);
 }
 
@@ -223,27 +228,27 @@ async function runInLoop(limit) {
   if (limit) {
     console.info(`Will do ${limit} iterations`);
   }
-  console.time('loop');
+  console.time("loop");
   let count = 0;
   while (true) {
-    console.time('iteration');
-    console.time('WriteDID');
+    console.time("iteration");
+    console.time("WriteDID");
     const didPairs = await sendOnChainDIDTxns(1950, false);
-    console.timeEnd('WriteDID');
-    console.log('Added 1950 DIDs in a batch');
-    console.log('');
-    console.time('RemoveDID');
+    console.timeEnd("WriteDID");
+    console.log("Added 1950 DIDs in a batch");
+    console.log("");
+    console.time("RemoveDID");
     await sendRemoveTxns(1950, didPairs, false);
-    console.timeEnd('RemoveDID');
-    console.log('Remove 1950 DIDs in a batch');
+    console.timeEnd("RemoveDID");
+    console.log("Remove 1950 DIDs in a batch");
     count++;
     console.info(`Iteration ${count} done`);
-    if (limit && (count >= limit)) {
+    if (limit && count >= limit) {
       break;
     }
-    console.timeEnd('iteration');
+    console.timeEnd("iteration");
   }
-  console.timeEnd('loop');
+  console.timeEnd("loop");
 }
 
 async function main() {
@@ -265,17 +270,18 @@ async function main() {
       await sendAnchorTxns(7000);
       break;
     default:
-      console.error('Argument should be 0, 1 or 2');
+      console.error("Argument should be 0, 1 or 2");
       process.exit(1);
   }
   process.exit(0);
 }
 
-dock.init({
-  address: FullNodeEndpoint,
-})
+dock
+  .init({
+    address: FullNodeEndpoint,
+  })
   .then(main)
   .catch((error) => {
-    console.error('Error occurred somewhere, it was caught!', error);
+    console.error("Error occurred somewhere, it was caught!", error);
     process.exit(1);
   });

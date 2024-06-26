@@ -1,37 +1,44 @@
-import { randomAsHex } from '@polkadot/util-crypto';
-import { DockAPI } from '../../src';
-import { DockResolver } from '../../src/resolver';
-import { createNewDockDID, DidKeypair } from '../../src/utils/did';
-import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../test-constants';
-import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
+import { randomAsHex } from "@polkadot/util-crypto";
+import { DockAPI } from "../../src";
+import { DockResolver } from "../../src/resolver";
+import { DockDid, DidKeypair } from "../../src/utils/did";
 import {
-  issueCredential, signPresentation, verifyCredential, verifyPresentation,
-} from '../../src/utils/vc';
-import defaultDocumentLoader from '../../src/utils/vc/document-loader';
-import PrivateStatusList2021Credential from '../../src/status-list-credential/private-status-list2021-credential';
-import { getKeyDoc } from '../../src/utils/vc/helpers';
+  FullNodeEndpoint,
+  TestAccountURI,
+  TestKeyringOpts,
+} from "../test-constants";
+import { getUnsignedCred, registerNewDIDUsingPair } from "./helpers";
+import {
+  issueCredential,
+  signPresentation,
+  verifyCredential,
+  verifyPresentation,
+} from "../../src/utils/vc";
+import defaultDocumentLoader from "../../src/utils/vc/document-loader";
+import PrivateStatusList2021Credential from "../../src/status-list-credential/private-status-list2021-credential";
+import { getKeyDoc } from "../../src/utils/vc/helpers";
 import {
   addPrivateStatusListEntryToCredential,
   getPrivateStatus,
   verifyPrivateStatus,
-} from '../../src/utils/vc/credentials';
-import { createPresentation } from '../create-presentation';
-import { getPrivateStatuses } from '../../src/utils/vc/presentations';
+} from "../../src/utils/vc/credentials";
+import { createPresentation } from "../create-presentation";
+import { getPrivateStatuses } from "../../src/utils/vc/presentations";
 
 const termsOfUseCtx = {
-  '@context': {
+  "@context": {
     details: {
-      '@id': 'https://ld.dock.io/security#details',
-      '@context': {
-        id: '@id',
-        price: 'https://schema.org/price',
-        currency: 'https://schema.org/priceCurrency',
+      "@id": "https://ld.dock.io/security#details",
+      "@context": {
+        id: "@id",
+        price: "https://schema.org/price",
+        currency: "https://schema.org/priceCurrency",
       },
     },
   },
 };
 
-describe('PrivateStatusList2021Credential', () => {
+describe("PrivateStatusList2021Credential", () => {
   const dockAPI = new DockAPI();
   const resolver = new DockResolver(dockAPI);
 
@@ -40,14 +47,14 @@ describe('PrivateStatusList2021Credential', () => {
   const statusListCredentialIndex = (Math.random() * 10e3) | 0;
 
   // Register a new DID for issuer
-  const issuerDID = createNewDockDID();
+  const issuerDID = DockDid.random();
   const issuerSeed = randomAsHex(32);
 
   // Register a new DID for holder
-  const holderDID = createNewDockDID();
+  const holderDID = DockDid.random();
   const holderSeed = randomAsHex(32);
 
-  const credId = 'test_cred';
+  const credId = "test_cred";
 
   let issuerKey;
   let issuerKeyPair;
@@ -65,53 +72,64 @@ describe('PrivateStatusList2021Credential', () => {
     dockAPI.setAccount(account);
 
     // Register issuer DID
-    issuerKeyPair = new DidKeypair(dockAPI.keyring.addFromUri(issuerSeed, null, 'ed25519'), 1);
+    issuerKeyPair = new DidKeypair(
+      dockAPI.keyring.addFromUri(issuerSeed, null, "ed25519"),
+      1,
+    );
     await registerNewDIDUsingPair(dockAPI, issuerDID, issuerKeyPair);
 
     // Register holder DID
-    const pair1 = new DidKeypair(dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'), 1);
+    const pair1 = new DidKeypair(
+      dockAPI.keyring.addFromUri(holderSeed, null, "ed25519"),
+      1,
+    );
     await registerNewDIDUsingPair(dockAPI, holderDID, pair1);
 
     issuerKey = getKeyDoc(
       issuerDID,
       issuerKeyPair,
-      'Ed25519VerificationKey2018',
+      "Ed25519VerificationKey2018",
     );
 
     privateStatusListCredential = await PrivateStatusList2021Credential.create(
       issuerKey,
       statusListCredentialId,
-      { statusPurpose: 'suspension' },
+      { statusPurpose: "suspension" },
     );
   }, 60000);
 
-  test('Issuer can issue a revocable credential and holder can verify it successfully when it is not revoked else the verification fails', async () => {
+  test("Issuer can issue a revocable credential and holder can verify it successfully when it is not revoked else the verification fails", async () => {
     let unsignedCred = getUnsignedCred(credId, holderDID, [
-      'https://ld.dock.io/private-status-list-21',
+      "https://ld.dock.io/private-status-list-21",
       termsOfUseCtx,
     ]);
 
     // Adding payment terms to the credential. This isn't mandatory as it could be communicated out of band.
-    unsignedCred.termsOfUse = [{
-      type: 'Payment',
-      details: {
-        price: 10, currency: 'USD',
+    unsignedCred.termsOfUse = [
+      {
+        type: "Payment",
+        details: {
+          price: 10,
+          currency: "USD",
+        },
       },
-    }];
+    ];
 
-    expect(() => addPrivateStatusListEntryToCredential(
-      unsignedCred,
-      statusListCredentialId,
-      statusListCredentialIndex,
-      'wrongPurpose',
-    )).toThrow();
+    expect(() =>
+      addPrivateStatusListEntryToCredential(
+        unsignedCred,
+        statusListCredentialId,
+        statusListCredentialIndex,
+        "wrongPurpose",
+      ),
+    ).toThrow();
 
     // Issuer issues the credential with a given status list id for revocation
     unsignedCred = addPrivateStatusListEntryToCredential(
       unsignedCred,
       statusListCredentialId,
       statusListCredentialIndex,
-      'suspension',
+      "suspension",
     );
 
     credential = await issueCredential(
@@ -132,7 +150,14 @@ describe('PrivateStatusList2021Credential', () => {
     const status = getPrivateStatus(credential);
 
     // The status is given to a party capable of checking revocation. Revocation check passes.
-    const { verified: v } = await verifyPrivateStatus(status, privateStatusListCredential, { documentLoader: defaultDocumentLoader(resolver), expectedIssuer: credential.issuer });
+    const { verified: v } = await verifyPrivateStatus(
+      status,
+      privateStatusListCredential,
+      {
+        documentLoader: defaultDocumentLoader(resolver),
+        expectedIssuer: credential.issuer,
+      },
+    );
     expect(v).toEqual(true);
 
     // Revoke credential
@@ -148,25 +173,35 @@ describe('PrivateStatusList2021Credential', () => {
     expect(v1).toEqual(true);
 
     // The revocation check fails now
-    const { verified: v2 } = await verifyPrivateStatus(status, privateStatusListCredential, { documentLoader: defaultDocumentLoader(resolver), expectedIssuer: credential.issuer });
+    const { verified: v2 } = await verifyPrivateStatus(
+      status,
+      privateStatusListCredential,
+      {
+        documentLoader: defaultDocumentLoader(resolver),
+        expectedIssuer: credential.issuer,
+      },
+    );
     expect(v2).toEqual(false);
   });
 
-  test('Holder can create a presentation and verifier can verify it successfully when it is not revoked else the verification fails', async () => {
+  test("Holder can create a presentation and verifier can verify it successfully when it is not revoked else the verification fails", async () => {
     await privateStatusListCredential.update(issuerKey, {
       unsuspendIndices: [statusListCredentialIndex],
     });
 
     const holderKey = getKeyDoc(
       holderDID,
-      new DidKeypair(dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'), 1),
-      'Ed25519VerificationKey2018',
+      new DidKeypair(
+        dockAPI.keyring.addFromUri(holderSeed, null, "ed25519"),
+        1,
+      ),
+      "Ed25519VerificationKey2018",
     );
 
     // Create presentation for unsuspended credential
     const presId = `https://pres.com/${randomAsHex(32)}`;
     const chal = randomAsHex(32);
-    const domain = 'test domain';
+    const domain = "test domain";
     const presentation = createPresentation(credential, presId);
     const signedPres = await signPresentation(
       presentation,
@@ -188,7 +223,14 @@ describe('PrivateStatusList2021Credential', () => {
     const statuses = getPrivateStatuses(signedPres);
 
     // The status will be verified by the parties in charge of revocation and these can be distinct
-    const { verified: v } = await verifyPrivateStatus(statuses[0], privateStatusListCredential, { documentLoader: defaultDocumentLoader(resolver), expectedIssuer: credential.issuer });
+    const { verified: v } = await verifyPrivateStatus(
+      statuses[0],
+      privateStatusListCredential,
+      {
+        documentLoader: defaultDocumentLoader(resolver),
+        expectedIssuer: credential.issuer,
+      },
+    );
     expect(v).toEqual(true);
 
     // Revoke credential
@@ -206,7 +248,14 @@ describe('PrivateStatusList2021Credential', () => {
     expect(v1).toBe(true);
 
     // Status check fails now.
-    const { verified: v2 } = await verifyPrivateStatus(statuses[0], privateStatusListCredential, { documentLoader: defaultDocumentLoader(resolver), expectedIssuer: credential.issuer });
+    const { verified: v2 } = await verifyPrivateStatus(
+      statuses[0],
+      privateStatusListCredential,
+      {
+        documentLoader: defaultDocumentLoader(resolver),
+        expectedIssuer: credential.issuer,
+      },
+    );
     expect(v2).toEqual(false);
   });
 

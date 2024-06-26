@@ -1,9 +1,6 @@
-import {
-  getDidNonce,
-  getStateChange,
-} from '../utils/misc';
+import { getDidNonce, getStateChange } from "../utils/misc";
 
-import { createDidSig, typedHexDID } from '../utils/did'; // eslint-disable-line
+import { createDidSig, DockDidOrDidMethodKey } from "../utils/did"; // eslint-disable-line
 
 /** Class to create, update and destroy revocations */
 class RevocationModule {
@@ -80,8 +77,17 @@ class RevocationModule {
    * @param waitForFinalization
    * @param params
    */
-  async removeRegistry(removal, didSigs, waitForFinalization = true, params = {}) {
-    return this.signAndSend(this.createRemoveRegistryTx(removal, didSigs), waitForFinalization, params);
+  async removeRegistry(
+    removal,
+    didSigs,
+    waitForFinalization = true,
+    params = {},
+  ) {
+    return this.signAndSend(
+      this.createRemoveRegistryTx(removal, didSigs),
+      waitForFinalization,
+      params,
+    );
   }
 
   /**
@@ -104,7 +110,11 @@ class RevocationModule {
    * @param params
    */
   async revoke(revoke, didSigs, waitForFinalization = true, params = {}) {
-    return this.signAndSend(this.createRevokeTx(revoke, didSigs), waitForFinalization, params);
+    return this.signAndSend(
+      this.createRevokeTx(revoke, didSigs),
+      waitForFinalization,
+      params,
+    );
   }
 
   /**
@@ -128,7 +138,11 @@ class RevocationModule {
    * @param params
    */
   async unrevoke(unrevoke, didSigs, waitForFinalization = true, params = {}) {
-    return this.signAndSend(this.createUnrevokeTx(unrevoke, didSigs), waitForFinalization, params);
+    return this.signAndSend(
+      this.createUnrevokeTx(unrevoke, didSigs),
+      waitForFinalization,
+      params,
+    );
   }
 
   /**
@@ -185,9 +199,28 @@ class RevocationModule {
    * @param params
    * @returns {Promise<void>}
    */
-  async revokeCredentialWithOneOfPolicy(registryId, revId, did, signingKeyRef, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const [revoke, sig, sigNonce] = await this.createSignedRevoke(registryId, [revId], did, signingKeyRef, { nonce, didModule });
-    return this.revoke(revoke, [{ sig, nonce: sigNonce }], waitForFinalization, params);
+  async revokeCredentialWithOneOfPolicy(
+    registryId,
+    revId,
+    did,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const [revoke, sig, sigNonce] = await this.createSignedRevoke(
+      registryId,
+      [revId],
+      did,
+      signingKeyRef,
+      { nonce, didModule },
+    );
+    return this.revoke(
+      revoke,
+      [{ sig, nonce: sigNonce }],
+      waitForFinalization,
+      params,
+    );
   }
 
   /**
@@ -202,18 +235,61 @@ class RevocationModule {
    * @param params
    * @returns {Promise<Object>}
    */
-  async unrevokeCredentialWithOneOfPolicy(registryId, revId, did, signingKeyRef, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const [revoke, sig, sigNonce] = await this.createSignedUnRevoke(registryId, [revId], did, signingKeyRef, { nonce, didModule });
-    return this.unrevoke(revoke, [{ sig, nonce: sigNonce }], waitForFinalization, params);
+  async unrevokeCredentialWithOneOfPolicy(
+    registryId,
+    revId,
+    did,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const [revoke, sig, sigNonce] = await this.createSignedUnRevoke(
+      registryId,
+      [revId],
+      did,
+      signingKeyRef,
+      { nonce, didModule },
+    );
+    return this.unrevoke(
+      revoke,
+      [{ sig, nonce: sigNonce }],
+      waitForFinalization,
+      params,
+    );
   }
 
-  async removeRegistryWithOneOfPolicy(registryId, did, signingKeyRef, { nonce = undefined, didModule = undefined }, waitForFinalization = true, params = {}) {
-    const [removal, sig, sigNonce] = await this.createSignedRemove(registryId, did, signingKeyRef, { nonce, didModule });
-    return this.removeRegistry(removal, [{ sig, nonce: sigNonce }], waitForFinalization, params);
+  async removeRegistryWithOneOfPolicy(
+    registryId,
+    did,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+    waitForFinalization = true,
+    params = {},
+  ) {
+    const [removal, sig, sigNonce] = await this.createSignedRemove(
+      registryId,
+      did,
+      signingKeyRef,
+      { nonce, didModule },
+    );
+    return this.removeRegistry(
+      removal,
+      [{ sig, nonce: sigNonce }],
+      waitForFinalization,
+      params,
+    );
   }
 
-  async createSignedUpdate(updateFunc, registryId, [...revokeIds], did, signingKeyRef, { nonce = undefined, didModule = undefined }) {
-    const hexDid = typedHexDID(this.api, did);
+  async createSignedUpdate(
+    updateFunc,
+    registryId,
+    [...revokeIds],
+    did,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
+    const hexDid = DockDidOrDidMethodKey.from(did);
     // eslint-disable-next-line no-param-reassign
     nonce = await getDidNonce(hexDid, nonce, didModule);
 
@@ -230,16 +306,47 @@ class RevocationModule {
     return [{ registryId, revokeIds }, didSig, nonce];
   }
 
-  async createSignedRevoke(registryId, revokeIds, did, signingKeyRef, { nonce = undefined, didModule = undefined }) {
-    return this.createSignedUpdate(this.getSerializedRevoke, registryId, revokeIds, did, signingKeyRef, { nonce, didModule });
+  async createSignedRevoke(
+    registryId,
+    revokeIds,
+    did,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
+    return this.createSignedUpdate(
+      this.getSerializedRevoke,
+      registryId,
+      revokeIds,
+      did,
+      signingKeyRef,
+      { nonce, didModule },
+    );
   }
 
-  async createSignedUnRevoke(registryId, revokeIds, did, signingKeyRef, { nonce = undefined, didModule = undefined }) {
-    return this.createSignedUpdate(this.getSerializedUnrevoke, registryId, revokeIds, did, signingKeyRef, { nonce, didModule });
+  async createSignedUnRevoke(
+    registryId,
+    revokeIds,
+    did,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
+    return this.createSignedUpdate(
+      this.getSerializedUnrevoke,
+      registryId,
+      revokeIds,
+      did,
+      signingKeyRef,
+      { nonce, didModule },
+    );
   }
 
-  async createSignedRemove(registryId, did, signingKeyRef, { nonce = undefined, didModule = undefined }) {
-    const hexDid = typedHexDID(this.api, did);
+  async createSignedRemove(
+    registryId,
+    did,
+    signingKeyRef,
+    { nonce = undefined, didModule = undefined },
+  ) {
+    const hexDid = DockDidOrDidMethodKey.from(did);
     // eslint-disable-next-line no-param-reassign
     nonce = await getDidNonce(hexDid, nonce, didModule);
 
@@ -259,7 +366,7 @@ class RevocationModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedRevoke(revoke) {
-    return getStateChange(this.api, 'Revoke', revoke);
+    return getStateChange(this.api, "Revoke", revoke);
   }
 
   /**
@@ -268,7 +375,7 @@ class RevocationModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedUnrevoke(unrevoke) {
-    return getStateChange(this.api, 'UnRevoke', unrevoke);
+    return getStateChange(this.api, "UnRevoke", unrevoke);
   }
 
   /**
@@ -277,7 +384,7 @@ class RevocationModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedRemoveRegistry(removeReg) {
-    return getStateChange(this.api, 'RemoveRegistry', removeReg);
+    return getStateChange(this.api, "RemoveRegistry", removeReg);
   }
 }
 

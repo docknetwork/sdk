@@ -1,23 +1,19 @@
-import { randomAsHex } from '@polkadot/util-crypto';
-import { hexToU8a, u8aToHex, stringToHex } from '@polkadot/util';
-import { initializeWasm } from '@docknetwork/crypto-wasm-ts';
-import { DockAPI } from '../../../src';
+import { randomAsHex } from "@polkadot/util-crypto";
+import { hexToU8a, u8aToHex, stringToHex } from "@polkadot/util";
+import { initializeWasm } from "@docknetwork/crypto-wasm-ts";
+import { DockAPI } from "../../../src";
 import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
   Schemes,
-} from '../../test-constants';
-import {
-  createNewDockDID,
-  typedHexDID,
-  DidKeypair,
-} from '../../../src/utils/did';
+} from "../../test-constants";
+import { DockDid, DidKeypair } from "../../../src/utils/did";
 
-import { registerNewDIDUsingPair } from '../helpers';
+import { registerNewDIDUsingPair } from "../helpers";
 
 const addParticipantIdIfNotPresent = (key) => {
-  if (!('participantId' in key)) {
+  if (!("participantId" in key)) {
     key.participantId = null;
   }
   return key;
@@ -34,7 +30,7 @@ for (const {
   getPublicKeyWithParamsByStorageKey,
   getPublicKeysByDid,
 } of Schemes) {
-  const skipIfKvac = Name === 'BDDT16' ? describe.skip : describe;
+  const skipIfKvac = Name === "BDDT16" ? describe.skip : describe;
   skipIfKvac(`${Name} Module`, () => {
     const dock = new DockAPI();
     let account;
@@ -58,15 +54,15 @@ for (const {
       dock.setAccount(account);
       pair1 = new DidKeypair(dock.keyring.addFromUri(seed1), 1);
       pair2 = new DidKeypair(dock.keyring.addFromUri(seed2), 1);
-      did1 = createNewDockDID();
-      did2 = createNewDockDID();
+      did1 = DockDid.random();
+      did2 = DockDid.random();
       await registerNewDIDUsingPair(dock, did1, pair1);
       await registerNewDIDUsingPair(dock, did2, pair2);
       await initializeWasm();
     }, 20000);
 
-    test('Can create new params', async () => {
-      let label = stringToHex('test-params-label');
+    test("Can create new params", async () => {
+      let label = stringToHex("test-params-label");
       let params = SignatureParams.generate(10, hexToU8a(label));
       const bytes1 = u8aToHex(params.toBytes());
       const params1 = chainModuleClass.prepareAddParameters(
@@ -85,10 +81,7 @@ for (const {
       const paramsWritten1 = await chainModule.getLastParamsWritten(did1);
       expect(paramsWritten1.bytes).toEqual(params1.bytes);
       expect(paramsWritten1.label).toEqual(params1.label);
-      const allParams = await getParamsByDid(
-        dock.api,
-        typedHexDID(dock.api, did1),
-      );
+      const allParams = await getParamsByDid(dock.api, DockDid.from(did1));
       expect(Object.values(allParams.toJSON())).toEqual([params1]);
 
       const queriedParams1 = await chainModule.getParams(did1, 1);
@@ -111,7 +104,7 @@ for (const {
       const queriedParams2 = await chainModule.getParams(did2, 1);
       expect(paramsWritten2).toEqual(queriedParams2);
 
-      label = stringToHex('test-params-label-2');
+      label = stringToHex("test-params-label-2");
       params = SignatureParams.generate(23, hexToU8a(label));
       const bytes3 = u8aToHex(params.toBytes());
       const params3 = chainModuleClass.prepareAddParameters(
@@ -141,7 +134,7 @@ for (const {
       expect(paramsByDid2[0]).toEqual(paramsWritten2);
     }, 30000);
 
-    test('Can create public keys', async () => {
+    test("Can create public keys", async () => {
       const params = SignatureParams.generate(5);
       let keypair = KeyPair.generate(params);
       const bytes1 = u8aToHex(keypair.publicKey.bytes);
@@ -168,10 +161,12 @@ for (const {
       );
       keypair = KeyPair.generate(params1);
       const bytes2 = u8aToHex(keypair.publicKey.bytes);
-      const pk2 = chainModuleClass.prepareAddPublicKey(dock.api, bytes2, undefined, [
-        did1,
-        1,
-      ]);
+      const pk2 = chainModuleClass.prepareAddPublicKey(
+        dock.api,
+        bytes2,
+        undefined,
+        [did1, 1],
+      );
       await chainModule.addPublicKey(
         pk2,
         did2,
@@ -182,9 +177,9 @@ for (const {
       );
       const queriedPk2 = await chainModule.getPublicKey(did2, 2);
       expect(queriedPk2.bytes).toEqual(pk2.bytes);
-      expect(queriedPk2.paramsRef).toEqual([typedHexDID(dock.api, did1), 1]);
+      expect(queriedPk2.paramsRef).toEqual([DockDid.from(did1), 1]);
       const keyWithParams = await getPublicKeyWithParamsByStorageKey(dock.api, [
-        typedHexDID(dock.api, did2).asDid,
+        DockDid.from(did2).asDid,
         2,
       ]);
       const jsonKeyWithParams = keyWithParams.toJSON();
@@ -208,10 +203,12 @@ for (const {
       );
       keypair = KeyPair.generate(params2);
       const bytes3 = u8aToHex(keypair.publicKey.bytes);
-      const pk3 = chainModuleClass.prepareAddPublicKey(dock.api, bytes3, undefined, [
-        did1,
-        2,
-      ]);
+      const pk3 = chainModuleClass.prepareAddPublicKey(
+        dock.api,
+        bytes3,
+        undefined,
+        [did1, 2],
+      );
       await chainModule.addPublicKey(
         pk3,
         did2,
@@ -223,7 +220,7 @@ for (const {
 
       const queriedPk3 = await chainModule.getPublicKey(did2, 3);
       expect(queriedPk3.bytes).toEqual(pk3.bytes);
-      expect(queriedPk3.paramsRef).toEqual([typedHexDID(dock.api, did1), 2]);
+      expect(queriedPk3.paramsRef).toEqual([DockDid.from(did1), 2]);
 
       const queriedPk3WithParams = await chainModule.getPublicKey(
         did2,
@@ -231,10 +228,7 @@ for (const {
         true,
       );
       expect(queriedPk3WithParams.params).toEqual(queriedParams2);
-      const allPks = await getPublicKeysByDid(
-        dock.api,
-        typedHexDID(dock.api, did2),
-      );
+      const allPks = await getPublicKeysByDid(dock.api, DockDid.from(did2));
       expect(
         Object.values(allPks.toJSON()).map((keyWithParams) => {
           addParticipantIdIfNotPresent(keyWithParams[0]);
@@ -246,30 +240,30 @@ for (const {
       ]);
     }, 30000);
 
-    test('Get public keys with DID resolution', async () => {
+    test("Get public keys with DID resolution", async () => {
       const document1 = await dock.did.getDocument(did1, {
         getOffchainSigKeys: true,
       });
       expect(document1.publicKey.length).toEqual(2);
       expect(document1.assertionMethod.length).toEqual(2);
-      expect(document1.publicKey[1].id.endsWith('#keys-2')).toEqual(true);
+      expect(document1.publicKey[1].id.endsWith("#keys-2")).toEqual(true);
       expect(document1.publicKey[1].type).toEqual(VerKey);
-      expect(document1.assertionMethod[1].endsWith('#keys-2')).toEqual(true);
+      expect(document1.assertionMethod[1].endsWith("#keys-2")).toEqual(true);
 
       const document2 = await dock.did.getDocument(did2, {
         getOffchainSigKeys: true,
       });
       expect(document2.publicKey.length).toEqual(3);
       expect(document2.assertionMethod.length).toEqual(3);
-      expect(document2.publicKey[1].id.endsWith('#keys-2')).toEqual(true);
+      expect(document2.publicKey[1].id.endsWith("#keys-2")).toEqual(true);
       expect(document2.publicKey[1].type).toEqual(VerKey);
-      expect(document2.publicKey[2].id.endsWith('#keys-3')).toEqual(true);
+      expect(document2.publicKey[2].id.endsWith("#keys-3")).toEqual(true);
       expect(document2.publicKey[2].type).toEqual(VerKey);
-      expect(document2.assertionMethod[1].endsWith('#keys-2')).toEqual(true);
-      expect(document2.assertionMethod[2].endsWith('#keys-3')).toEqual(true);
+      expect(document2.assertionMethod[1].endsWith("#keys-2")).toEqual(true);
+      expect(document2.assertionMethod[2].endsWith("#keys-3")).toEqual(true);
     });
 
-    test('Can remove public keys and params', async () => {
+    test("Can remove public keys and params", async () => {
       await chainModule.removePublicKey(
         2,
         did1,
@@ -286,9 +280,9 @@ for (const {
       });
       expect(document1.publicKey.length).toEqual(1);
       expect(document1.assertionMethod.length).toEqual(1);
-      expect(document1.publicKey[0].id.endsWith('#keys-1')).toEqual(true);
+      expect(document1.publicKey[0].id.endsWith("#keys-1")).toEqual(true);
       expect(document1.publicKey[0].type).not.toEqual(VerKey);
-      expect(document1.assertionMethod[0].endsWith('#keys-1')).toEqual(true);
+      expect(document1.assertionMethod[0].endsWith("#keys-1")).toEqual(true);
 
       await chainModule.removeParams(
         1,
@@ -318,12 +312,12 @@ for (const {
       });
       expect(document2.publicKey.length).toEqual(2);
       expect(document2.assertionMethod.length).toEqual(2);
-      expect(document2.publicKey[0].id.endsWith('#keys-1')).toEqual(true);
+      expect(document2.publicKey[0].id.endsWith("#keys-1")).toEqual(true);
       expect(document2.publicKey[0].type).not.toEqual(VerKey);
-      expect(document2.assertionMethod[0].endsWith('#keys-1')).toEqual(true);
-      expect(document2.publicKey[1].id.endsWith('#keys-3')).toEqual(true);
+      expect(document2.assertionMethod[0].endsWith("#keys-1")).toEqual(true);
+      expect(document2.publicKey[1].id.endsWith("#keys-3")).toEqual(true);
       expect(document2.publicKey[1].type).toEqual(VerKey);
-      expect(document2.assertionMethod[1].endsWith('#keys-3')).toEqual(true);
+      expect(document2.assertionMethod[1].endsWith("#keys-3")).toEqual(true);
 
       await chainModule.removePublicKey(
         3,
@@ -341,9 +335,9 @@ for (const {
       });
       expect(document2.publicKey.length).toEqual(1);
       expect(document2.assertionMethod.length).toEqual(1);
-      expect(document2.publicKey[0].id.endsWith('#keys-1')).toEqual(true);
+      expect(document2.publicKey[0].id.endsWith("#keys-1")).toEqual(true);
       expect(document2.publicKey[0].type).not.toEqual(VerKey);
-      expect(document2.assertionMethod[0].endsWith('#keys-1')).toEqual(true);
+      expect(document2.assertionMethod[0].endsWith("#keys-1")).toEqual(true);
 
       await chainModule.removeParams(
         2,

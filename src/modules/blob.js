@@ -1,17 +1,17 @@
-import { encodeAddress, randomAsHex } from "@polkadot/util-crypto";
+import { encodeAddress, randomAsHex } from '@polkadot/util-crypto';
 import {
   u8aToHex,
   u8aToString,
   stringToHex,
   bufferToU8a,
-} from "@polkadot/util";
+} from '@polkadot/util';
 
-import { getDidNonce, getStateChange } from "../utils/misc";
-import { isHexWithGivenByteSize, getHexIdentifier } from "../utils/codec";
-import NoBlobError from "../utils/errors/no-blob-error";
-import { DockDidOrDidMethodKey, createDidSig } from "../utils/did";
+import { getDidNonce, getStateChange } from '../utils/misc';
+import { isHexWithGivenByteSize, getHexIdentifier } from '../utils/codec';
+import NoBlobError from '../utils/errors/no-blob-error';
+import { DockDidOrDidMethodKey, createDidSig } from '../utils/did';
 
-export const DockBlobQualifier = "blob:dock:";
+export const DockBlobQualifier = 'blob:dock:';
 export const DockBlobIdByteSize = 32;
 
 // Maximum size of the blob in bytes
@@ -150,7 +150,7 @@ class BlobModule {
       // Try to convert the value to a JSON object
       try {
         const strValue = u8aToString(value);
-        if (strValue.substring(0, 1) === "{") {
+        if (strValue.substring(0, 1) === '{') {
           value = JSON.parse(strValue);
         }
       } catch (e) {
@@ -179,7 +179,7 @@ class BlobModule {
     { nonce = undefined, didModule = undefined },
   ) {
     if (!blob.blob) {
-      throw new Error("Blob must have a value!");
+      throw new Error('Blob must have a value!');
     }
     // eslint-disable-next-line no-param-reassign
     nonce = await getDidNonce(signerDid, nonce, didModule);
@@ -201,11 +201,11 @@ class BlobModule {
   getSerializedBlobValue(blobValue) {
     if (blobValue instanceof Uint8Array) {
       return u8aToHex(blobValue);
-    } else if (typeof blobValue === "object") {
+    } else if (typeof blobValue === 'object') {
       return stringToHex(JSON.stringify(blobValue));
     } else if (
-      typeof blobValue === "string" &&
-      !isHexWithGivenByteSize(blobValue)
+      typeof blobValue === 'string'
+      && !isHexWithGivenByteSize(blobValue)
     ) {
       return stringToHex(blobValue);
     }
@@ -219,7 +219,7 @@ class BlobModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedBlob(blob) {
-    return getStateChange(this.api, "AddBlob", blob);
+    return getStateChange(this.api, 'AddBlob', blob);
   }
 }
 

@@ -3,7 +3,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { MaxGas, MinGasPrice } from '../test-constants';
 import { DidKey, VerificationRelationship } from '../../src/public-keys';
-import { createNewDockDID } from '../../src/utils/did';
+import { DockDid } from '../../src/utils/did';
 
 /**
  * Registers a new DID on dock chain, keeps the controller same as the DID
@@ -14,7 +14,13 @@ import { createNewDockDID } from '../../src/utils/did';
  * @param controllers
  * @returns {Promise<void>}
  */
-export async function registerNewDIDUsingPair(dockAPI, did, pair, verRels = undefined, controllers = []) {
+export async function registerNewDIDUsingPair(
+  dockAPI,
+  did,
+  pair,
+  verRels = undefined,
+  controllers = [],
+) {
   if (verRels === undefined) {
     // eslint-disable-next-line no-param-reassign
     verRels = new VerificationRelationship();
@@ -52,7 +58,13 @@ export function defaultEVMAccountEndowment() {
   return bnToBn(MinGasPrice).mul(bnToBn(MaxGas)).muln(2);
 }
 
-export function checkVerificationMethods(did, doc, length, index = undefined, keyNo = undefined) {
+export function checkVerificationMethods(
+  did,
+  doc,
+  length,
+  index = undefined,
+  keyNo = undefined,
+) {
   expect(doc.publicKey.length).toEqual(length);
   if (length > 0 && index !== undefined) {
     if (keyNo === undefined) {
@@ -85,7 +97,7 @@ export function getCredMatcherDoc(cred, issuer, issuerKeyId, sigType) {
     type: cred.type,
     issuanceDate: cred.issuanceDate,
     credentialSubject: cred.credentialSubject,
-    issuer,
+    issuer: String(issuer),
     proof: expect.objectContaining({
       type: sigType,
       proofPurpose: 'assertionMethod',
@@ -128,7 +140,7 @@ export async function getBalance(api, account) {
  * @returns {[DID, KeyPair, DidKey]}
  * */
 export function createDidPair(dock) {
-  const did = createNewDockDID();
+  const did = DockDid.random();
   const seed = randomAsHex(32);
   const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
   const publicKey = getPublicKeyFromKeyringPair(pair);

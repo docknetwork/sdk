@@ -1,8 +1,8 @@
-import { getStateChange } from "../../misc";
-import { createDidSig } from "../utils";
+import { getStateChange } from '../../misc';
+import { createDidSig } from '../utils';
 
-import { DockDIDQualifier, DidMethodKeyQualifier } from "../constants";
-import { withExtendedStaticProperties } from "../../inheritance";
+import { DockDIDQualifier, DidMethodKeyQualifier } from '../constants';
+import { withExtendedStaticProperties } from '../../inheritance';
 
 /**
  * Either `did:dock:*` or `did:key:*`.
@@ -22,6 +22,18 @@ class DockDidOrDidMethodKey {
    * @type {typeof this}
    */
   static DidMethodKey;
+
+  /**
+   * Checks whether provided string is qualified.
+   * @param {string} did
+   * @returns {boolean}
+   */
+  static isQualifiedString(did) {
+    return this.Qualifier
+      ? did.startsWith(this.Qualifier)
+      : this.DockDid.isQualifiedString(did)
+          || this.DidMethodKey.isQualifiedString(did);
+  }
 
   /**
    * Instantiates `DockDid` or `DidMethodKey` from a fully qualified did string.
@@ -61,14 +73,18 @@ class DockDidOrDidMethodKey {
    * @returns {DockDid|DidMethodKey}
    */
   static from(did) {
-    if (typeof did === "object") {
+    if (typeof did === 'object') {
       if (did instanceof this) {
         return did;
       } else {
         return this.fromSubstrateValue(did);
       }
-    } else if (typeof did === "string") {
-      return this.fromQualifiedString(did);
+    } else if (typeof did === 'string') {
+      if (this.Qualifier && !this.isQualifiedString(did)) {
+        return this.fromUnqualifiedString(did);
+      } else {
+        return this.fromQualifiedString(did);
+      }
     } else {
       throw new TypeError(
         `Unsupported DID value: \`${did}\` with type \`${typeof did}\`, expected a string or an object`,
@@ -80,14 +96,14 @@ class DockDidOrDidMethodKey {
    * Extracts raw underlying value if it's `did:dock:*`, throws an error otherwise.
    */
   get asDid() {
-    throw new Error("Not a `Did`");
+    throw new Error('Not a `Did`');
   }
 
   /**
    *  Extracts raw underlying value if it's `did:key:*`, throws an error otherwise.
    */
   get asDidMethodKey() {
-    throw new Error("Not a `DidMethodKey`");
+    throw new Error('Not a `DidMethodKey`');
   }
 
   /**
@@ -139,14 +155,21 @@ class DockDidOrDidMethodKey {
    * Converts underlying object to the `JSON` representation suitable for substrate JSON-RPC.
    */
   toJSON() {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 
   /**
    * Returns underlying value encoded according to the specification.
    */
   toEncodedString() {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * Returns fully qualified `did:dock:*` encoded in SS58 or `did:key:*` encoded in BS58.
+   */
+  toString() {
+    return this.toQualifiedEncodedString();
   }
 
   /**
@@ -158,6 +181,6 @@ class DockDidOrDidMethodKey {
 }
 
 export default withExtendedStaticProperties(
-  ["Qualifier"],
+  ['Qualifier', 'fromUnqualifiedString'],
   DockDidOrDidMethodKey,
 );

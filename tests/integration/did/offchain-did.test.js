@@ -1,16 +1,16 @@
-import { randomAsHex } from "@polkadot/util-crypto";
+import { randomAsHex } from '@polkadot/util-crypto';
 
-import { u8aToHex } from "@polkadot/util";
-import { DockAPI } from "../../../src";
-import { DockDid, NoDIDError, NoOnchainDIDError } from "../../../src/utils/did";
+import { u8aToHex } from '@polkadot/util';
+import { DockAPI } from '../../../src';
+import { DockDid, NoDIDError, NoOnchainDIDError } from '../../../src/utils/did';
 import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
-} from "../../test-constants";
-import { OffChainDidDocRef } from "../../../src/modules/did";
+} from '../../test-constants';
+import { OffChainDidDocRef } from '../../../src/modules/did';
 
-describe("Off-chain DIDs", () => {
+describe('Off-chain DIDs', () => {
   const dock = new DockAPI();
 
   // Generate a random DID
@@ -36,7 +36,7 @@ describe("Off-chain DIDs", () => {
     await dock.disconnect();
   }, 10000);
 
-  test("Can create an off-chain DID", async () => {
+  test('Can create an off-chain DID', async () => {
     // DID does not exist
     await expect(dock.did.getOffchainDidDetail(hexDID.asDid)).rejects.toThrow(
       NoDIDError,
@@ -54,7 +54,7 @@ describe("Off-chain DIDs", () => {
     );
   });
 
-  test("Can update DIDDoc reference for the DID to URL", async () => {
+  test('Can update DIDDoc reference for the DID to URL', async () => {
     const docRef = OffChainDidDocRef.url(secondDocRef);
     await dock.did.setOffchainDidRef(dockDID, docRef, false);
     const didDetail = await dock.did.getOffchainDidDetail(hexDID.asDid);
@@ -62,7 +62,7 @@ describe("Off-chain DIDs", () => {
     expect(didDetail.accountId).toEqual(u8aToHex(dock.account.addressRaw));
   });
 
-  test("Can update DIDDoc reference for the DID to Custom", async () => {
+  test('Can update DIDDoc reference for the DID to Custom', async () => {
     const docRef = OffChainDidDocRef.custom(thirdDocRef);
     await dock.did.setOffchainDidRef(dockDID, docRef, false);
     const didDetail = await dock.did.getOffchainDidDetail(hexDID.asDid);
@@ -70,7 +70,7 @@ describe("Off-chain DIDs", () => {
     expect(didDetail.accountId).toEqual(u8aToHex(dock.account.addressRaw));
   });
 
-  test("Can remove the DID", async () => {
+  test('Can remove the DID', async () => {
     await dock.did.removeOffchainDid(dockDID, false);
     await expect(dock.did.getOffchainDidDetail(hexDID.asDid)).rejects.toThrow(
       NoDIDError,

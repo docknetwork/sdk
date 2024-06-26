@@ -1,4 +1,4 @@
-import { hexToU8a, stringToHex, u8aToHex } from "@polkadot/util";
+import { hexToU8a, stringToHex, u8aToHex } from '@polkadot/util';
 import {
   initializeWasm,
   Accumulator,
@@ -7,23 +7,23 @@ import {
   PositiveAccumulator,
   VBWitnessUpdateInfo,
   VBMembershipWitness,
-} from "@docknetwork/crypto-wasm-ts";
-import { randomAsHex } from "@polkadot/util-crypto";
-import { InMemoryState } from "@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence";
-import { DockAPI } from "../../../src";
+} from '@docknetwork/crypto-wasm-ts';
+import { randomAsHex } from '@polkadot/util-crypto';
+import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
+import { DockAPI } from '../../../src';
 import AccumulatorModule, {
   AccumulatorType,
-} from "../../../src/modules/accumulator";
+} from '../../../src/modules/accumulator';
 import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
-} from "../../test-constants";
-import { DockDid, DidKeypair } from "../../../src/utils/did";
-import { registerNewDIDUsingPair } from "../helpers";
-import { getLastBlockNo, waitForBlocks } from "../../../src/utils/chain-ops";
+} from '../../test-constants';
+import { DockDid, DidKeypair } from '../../../src/utils/did';
+import { registerNewDIDUsingPair } from '../helpers';
+import { getLastBlockNo, waitForBlocks } from '../../../src/utils/chain-ops';
 
-describe("Prefilled positive accumulator", () => {
+describe('Prefilled positive accumulator', () => {
   // Incase updating an accumulator is expensive like making a blockchain txn, a cheaper strategy
   // is to add the members to the accumulator beforehand but not giving out the witnesses yet.
   // Eg. accumulator manager wants to add a million members over an year, rather than publishing
@@ -68,8 +68,8 @@ describe("Prefilled positive accumulator", () => {
     await initializeWasm();
   }, 20000);
 
-  test("Prefill", async () => {
-    const label = stringToHex("accumulator-params-label");
+  test('Prefill', async () => {
+    const label = stringToHex('accumulator-params-label');
     const params = Accumulator.generateParams(hexToU8a(label));
     const bytes1 = u8aToHex(params.bytes);
     const params1 = chainModuleClass.prepareAddParameters(
@@ -130,7 +130,7 @@ describe("Prefilled positive accumulator", () => {
     expect(queriedAccum.accumulated).toEqual(accumulated);
   });
 
-  test("Witness creation, verification should work", async () => {
+  test('Witness creation, verification should work', async () => {
     let queriedAccum = await dock.accumulatorModule.getAccumulator(
       accumulatorId,
       true,
@@ -329,7 +329,7 @@ describe("Prefilled positive accumulator", () => {
     ).toEqual(true);
   });
 
-  test("Witness update after several batch upgrades", async () => {
+  test('Witness update after several batch upgrades', async () => {
     let queriedAccum = await dock.accumulatorModule.getAccumulator(
       accumulatorId,
       true,

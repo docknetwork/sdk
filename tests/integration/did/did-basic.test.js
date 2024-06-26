@@ -1,23 +1,23 @@
-import { randomAsHex } from "@polkadot/util-crypto";
+import { randomAsHex } from '@polkadot/util-crypto';
 
-import { DockAPI } from "../../../src";
-import { ATTESTS_IRI } from "../../../src/modules/did";
+import { DockAPI } from '../../../src';
+import { ATTESTS_IRI } from '../../../src/modules/did';
 
 import {
   DockDid,
   NoDIDError,
   NoOffchainDIDError,
   DidKeypair,
-} from "../../../src/utils/did";
+} from '../../../src/utils/did';
 import {
   FullNodeEndpoint,
   TestKeyringOpts,
   TestAccountURI,
-} from "../../test-constants";
-import { VerificationRelationship, DidKey } from "../../../src/public-keys";
-import { checkVerificationMethods } from "../helpers";
+} from '../../test-constants';
+import { VerificationRelationship, DidKey } from '../../../src/public-keys';
+import { checkVerificationMethods } from '../helpers';
 
-describe("Basic DID tests", () => {
+describe('Basic DID tests', () => {
   const dock = new DockAPI();
 
   // Generate a random DID
@@ -42,14 +42,14 @@ describe("Basic DID tests", () => {
     await dock.disconnect();
   }, 10000);
 
-  test("Has keyring and account", () => {
+  test('Has keyring and account', () => {
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
     expect(!!dock.keyring).toBe(true);
     expect(!!dock.account).toBe(true);
   });
 
-  test("Can create a DID", async () => {
+  test('Can create a DID', async () => {
     // DID does not exist
     await expect(dock.did.getOnchainDidDetail(hexDid)).rejects.toThrow(
       NoDIDError,
@@ -76,7 +76,7 @@ describe("Basic DID tests", () => {
     );
   }, 30000);
 
-  test("Get key for DID", async () => {
+  test('Get key for DID', async () => {
     const dk = await dock.did.getDidKey(dockDid, 1);
     const pair = new DidKeypair(dock.keyring.addFromUri(seed));
     expect(dk.publicKey).toEqual(pair.publicKey());
@@ -86,7 +86,7 @@ describe("Basic DID tests", () => {
     expect(dk.verRels.isKeyAgreement()).toEqual(false);
   });
 
-  test("Can get a DID document", async () => {
+  test('Can get a DID document', async () => {
     function check(doc) {
       expect(!!doc).toBe(true);
       expect(doc.controller.length).toEqual(1);
@@ -114,9 +114,9 @@ describe("Basic DID tests", () => {
     check(doc2);
   }, 10000);
 
-  test("Can attest with a DID", async () => {
+  test('Can attest with a DID', async () => {
     const priority = 1;
-    const iri = "my iri";
+    const iri = 'my iri';
     const pair = new DidKeypair(dock.keyring.addFromUri(seed), 1);
 
     await dock.did.setClaim(priority, iri, dockDid, pair, undefined, false);
@@ -131,7 +131,7 @@ describe("Basic DID tests", () => {
     expect(didDocument[ATTESTS_IRI]).toEqual(iri);
   }, 30000);
 
-  test("Can remove DID", async () => {
+  test('Can remove DID', async () => {
     const pair = new DidKeypair(dock.keyring.addFromUri(seed), 1);
     await dock.did.remove(dockDid, dockDid, pair, undefined, false);
     // DID removed

@@ -1,5 +1,7 @@
-import { randomAsHex } from "@polkadot/util-crypto";
-import { hexToU8a, stringToHex, stringToU8a, u8aToHex } from "@polkadot/util";
+import { randomAsHex } from '@polkadot/util-crypto';
+import {
+  hexToU8a, stringToHex, stringToU8a, u8aToHex,
+} from '@polkadot/util';
 import {
   Accumulator,
   PositiveAccumulator,
@@ -16,20 +18,20 @@ import {
   AccumulatorParams,
   AccumulatorPublicKey,
   initializeWasm,
-} from "@docknetwork/crypto-wasm-ts";
-import { InMemoryState } from "@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence";
-import { DockAPI } from "../../../src";
+} from '@docknetwork/crypto-wasm-ts';
+import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
+import { DockAPI } from '../../../src';
 import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
   Schemes,
-} from "../../test-constants";
-import { DockDid, DidKeypair } from "../../../src/utils/did";
-import AccumulatorModule from "../../../src/modules/accumulator";
-import { getAllEventsFromBlock } from "../../../src/utils/chain-ops";
-import { getRevealedUnrevealed } from "./utils";
-import { registerNewDIDUsingPair } from "../helpers";
+} from '../../test-constants';
+import { DockDid, DidKeypair } from '../../../src/utils/did';
+import AccumulatorModule from '../../../src/modules/accumulator';
+import { getAllEventsFromBlock } from '../../../src/utils/chain-ops';
+import { getRevealedUnrevealed } from './utils';
+import { registerNewDIDUsingPair } from '../helpers';
 
 for (const {
   Name,
@@ -43,7 +45,7 @@ for (const {
   buildProverStatement,
   buildVerifierStatement,
 } of Schemes) {
-  const isKvac = Name === "BDDT16";
+  const isKvac = Name === 'BDDT16';
   const skipIfKvac = isKvac ? describe.skip : describe;
 
   skipIfKvac(
@@ -69,12 +71,12 @@ for (const {
 
       // User's attributes which will be signed by the issuer of the credential
       const attributes = [
-        stringToU8a("John"), // First name
-        stringToU8a("Smith"), // Last name
-        stringToU8a("M"), // Gender
-        stringToU8a("New York"), // City
-        stringToU8a("129086521911"), // SSN
-        stringToU8a("userid-xyz"), // user/credential id, this is put in the accumulator and used for revocation
+        stringToU8a('John'), // First name
+        stringToU8a('Smith'), // Last name
+        stringToU8a('M'), // Gender
+        stringToU8a('New York'), // City
+        stringToU8a('129086521911'), // SSN
+        stringToU8a('userid-xyz'), // user/credential id, this is put in the accumulator and used for revocation
       ];
       const attributeCount = attributes.length;
 
@@ -126,15 +128,14 @@ for (const {
         const accumulated = hexToU8a(accum.accumulated);
         const provingKey = Accumulator.generateMembershipProvingKey();
 
-        const statement1 =
-          "adaptForLess" in sigPk
-            ? buildProverStatement(
-                sigParams,
-                sigPk.adaptForLess(sigParams.supportedMessageCount()),
-                revealedAttrs,
-                false,
-              )
-            : buildProverStatement(sigParams, revealedAttrs, false);
+        const statement1 = 'adaptForLess' in sigPk
+          ? buildProverStatement(
+            sigParams,
+            sigPk.adaptForLess(sigParams.supportedMessageCount()),
+            revealedAttrs,
+            false,
+          )
+          : buildProverStatement(sigParams, revealedAttrs, false);
         const statement2 = Statement.vbAccumulatorMembership(
           accumParams,
           accumPk,
@@ -153,7 +154,7 @@ for (const {
         const metaStatements = new MetaStatements();
         metaStatements.add(ms);
 
-        const context = stringToU8a("some context");
+        const context = stringToU8a('some context');
 
         const proofSpec = new ProofSpec(
           statements,
@@ -174,13 +175,13 @@ for (const {
         const proof = CompositeProof.generate(proofSpec, witnesses);
         const statement3 = !isKvac
           ? buildVerifierStatement(
-              sigParams,
-              "adaptForLess" in sigPk
-                ? sigPk.adaptForLess(sigParams.supportedMessageCount())
-                : sigPk,
-              revealedAttrs,
-              false,
-            )
+            sigParams,
+            'adaptForLess' in sigPk
+              ? sigPk.adaptForLess(sigParams.supportedMessageCount())
+              : sigPk,
+            revealedAttrs,
+            false,
+          )
           : buildVerifierStatement(sigParams, revealedAttrs, false);
         const verifierStatements = new Statements();
         verifierStatements.add(statement3);
@@ -221,8 +222,8 @@ for (const {
         await initializeWasm();
       }, 20000);
 
-      test("Create params", async () => {
-        const label = stringToHex("My params");
+      test('Create params', async () => {
+        const label = stringToHex('My params');
         const bytes = u8aToHex(
           SignatureParams.generate(attributeCount, hexToU8a(label)).toBytes(),
         );
@@ -234,13 +235,12 @@ for (const {
           { didModule: dock.did },
           false,
         );
-        const paramsWritten =
-          await getModule(dock).getLastParamsWritten(issuerDid);
+        const paramsWritten = await getModule(dock).getLastParamsWritten(issuerDid);
         expect(paramsWritten.bytes).toEqual(params.bytes);
         expect(paramsWritten.label).toEqual(params.label);
       }, 10000);
 
-      test("Create keypair", async () => {
+      test('Create keypair', async () => {
         const queriedParams = await getModule(dock).getParams(issuerDid, 1);
         const paramsVal = SignatureParams.valueFromBytes(
           hexToU8a(queriedParams.bytes),
@@ -267,8 +267,8 @@ for (const {
         );
       }, 10000);
 
-      test("Create Accumulator params", async () => {
-        const label = stringToHex("My Accumulator params");
+      test('Create Accumulator params', async () => {
+        const label = stringToHex('My Accumulator params');
         const bytes = u8aToHex(
           Accumulator.generateParams(hexToU8a(label)).bytes,
         );
@@ -291,7 +291,7 @@ for (const {
         expect(paramsWritten.label).toEqual(params.label);
       }, 10000);
 
-      test("Create Accumulator keypair", async () => {
+      test('Create Accumulator keypair', async () => {
         const queriedParams = await dock.accumulatorModule.getParams(
           accumulatorManagerDid,
           1,
@@ -316,7 +316,7 @@ for (const {
         );
       }, 10000);
 
-      test("Create Accumulator", async () => {
+      test('Create Accumulator', async () => {
         const queriedParams = await dock.accumulatorModule.getParams(
           accumulatorManagerDid,
           1,
@@ -339,7 +339,7 @@ for (const {
         );
       }, 10000);
 
-      test("Sign attributes, i.e. issue credential", async () => {
+      test('Sign attributes, i.e. issue credential', async () => {
         const encodedAttrs = encodedAttributes(attributes);
         const queriedPk = await getModule(dock).getPublicKey(
           issuerDid,
@@ -370,7 +370,7 @@ for (const {
         expect(result.verified).toEqual(true);
       });
 
-      test("Add attribute to accumulator for checking revocation later", async () => {
+      test('Add attribute to accumulator for checking revocation later', async () => {
         const encodedAttrs = encodedAttributes(attributes);
         await accumulator.add(
           encodedAttrs[attributeCount - 1],
@@ -419,16 +419,14 @@ for (const {
         ).toEqual(true);
       }, 20000);
 
-      test("Prove knowledge of signature, i.e. possession of credential and accumulator membership", async () => {
+      test('Prove knowledge of signature, i.e. possession of credential and accumulator membership', async () => {
         await proveAndVerify();
       });
 
-      test("Add new members to the accumulator and update witness", async () => {
+      test('Add new members to the accumulator and update witness', async () => {
         const encodedAttrs = encodedAttributes(attributes);
-        const member1 =
-          Accumulator.encodePositiveNumberAsAccumulatorMember(100);
-        const member2 =
-          Accumulator.encodePositiveNumberAsAccumulatorMember(105);
+        const member1 = Accumulator.encodePositiveNumberAsAccumulatorMember(100);
+        const member2 = Accumulator.encodePositiveNumberAsAccumulatorMember(105);
         await accumulator.addBatch(
           [member1, member2],
           accumulatorKeypair.secretKey,
@@ -508,22 +506,18 @@ for (const {
         ).toEqual(true);
       });
 
-      test("After witness update, prove knowledge of signature, i.e. possession of credential and accumulator membership", async () => {
+      test('After witness update, prove knowledge of signature, i.e. possession of credential and accumulator membership', async () => {
         await proveAndVerify();
       });
 
-      test("Do several updates to the accumulator and update witness", async () => {
+      test('Do several updates to the accumulator and update witness', async () => {
         const encodedAttrs = encodedAttributes(attributes);
 
-        const member1 =
-          Accumulator.encodePositiveNumberAsAccumulatorMember(100);
-        const member2 =
-          Accumulator.encodePositiveNumberAsAccumulatorMember(105);
+        const member1 = Accumulator.encodePositiveNumberAsAccumulatorMember(100);
+        const member2 = Accumulator.encodePositiveNumberAsAccumulatorMember(105);
 
-        const member3 =
-          Accumulator.encodePositiveNumberAsAccumulatorMember(110);
-        const member4 =
-          Accumulator.encodePositiveNumberAsAccumulatorMember(111);
+        const member3 = Accumulator.encodePositiveNumberAsAccumulatorMember(110);
+        const member4 = Accumulator.encodePositiveNumberAsAccumulatorMember(111);
 
         await expect(accumulatorState.has(member1)).resolves.toEqual(true);
         await expect(accumulatorState.has(member2)).resolves.toEqual(true);
@@ -558,8 +552,7 @@ for (const {
           false,
         );
 
-        const member5 =
-          Accumulator.encodePositiveNumberAsAccumulatorMember(200);
+        const member5 = Accumulator.encodePositiveNumberAsAccumulatorMember(200);
         const member6 = Accumulator.encodePositiveNumberAsAccumulatorMember(25);
 
         await accumulator.addRemoveBatches(
@@ -594,12 +587,9 @@ for (const {
           false,
         );
 
-        const member7 =
-          Accumulator.encodePositiveNumberAsAccumulatorMember(201);
-        const member8 =
-          Accumulator.encodePositiveNumberAsAccumulatorMember(202);
-        const member9 =
-          Accumulator.encodePositiveNumberAsAccumulatorMember(203);
+        const member7 = Accumulator.encodePositiveNumberAsAccumulatorMember(201);
+        const member8 = Accumulator.encodePositiveNumberAsAccumulatorMember(202);
+        const member9 = Accumulator.encodePositiveNumberAsAccumulatorMember(203);
 
         await accumulator.addBatch(
           [member7, member8, member9],
@@ -698,11 +688,11 @@ for (const {
         ).toEqual(true);
       }, 30000);
 
-      test("After another witness update, prove knowledge of signature, i.e. possession of credential and accumulator membership", async () => {
+      test('After another witness update, prove knowledge of signature, i.e. possession of credential and accumulator membership', async () => {
         await proveAndVerify();
       });
 
-      test("Revoke by removing from the accumulator", async () => {
+      test('Revoke by removing from the accumulator', async () => {
         const encodedAttrs = encodedAttributes(attributes);
         await accumulator.remove(
           encodedAttrs[attributeCount - 1],
@@ -733,7 +723,7 @@ for (const {
         );
       });
 
-      test("Witness update should not be possible after removal from accumulator", async () => {
+      test('Witness update should not be possible after removal from accumulator', async () => {
         const encodedAttrs = encodedAttributes(attributes);
         const accum = await dock.accumulatorModule.getAccumulator(
           accumulatorId,
@@ -747,17 +737,15 @@ for (const {
         const queriedWitnessInfo = new VBWitnessUpdateInfo(
           hexToU8a(updates[0].witnessUpdateInfo),
         );
-        expect(() =>
-          membershipWitness.updateUsingPublicInfoPostBatchUpdate(
-            encodedAttrs[attributeCount - 1],
-            [],
-            [hexToU8a(updates[0].removals[0])],
-            queriedWitnessInfo,
-          ),
-        ).toThrow();
+        expect(() => membershipWitness.updateUsingPublicInfoPostBatchUpdate(
+          encodedAttrs[attributeCount - 1],
+          [],
+          [hexToU8a(updates[0].removals[0])],
+          queriedWitnessInfo,
+        )).toThrow();
       });
 
-      test("After revocation, i.e. removing from accumulator, prove verification should fail", async () => {
+      test('After revocation, i.e. removing from accumulator, prove verification should fail', async () => {
         let failed = false;
         try {
           await proveAndVerify();

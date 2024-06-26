@@ -1,19 +1,19 @@
 /* eslint-disable camelcase */
 
-import { getDidNonce, getStateChange } from "../utils/misc";
-import WithParamsAndPublicKeys from "./WithParamsAndPublicKeys";
-import { createDidSig, DockDidOrDidMethodKey } from "../utils/did";
+import { getDidNonce, getStateChange } from '../utils/misc';
+import WithParamsAndPublicKeys from './WithParamsAndPublicKeys';
+import { createDidSig, DockDidOrDidMethodKey } from '../utils/did';
 
 const STATE_CHANGES = {
-  AddParams: "AddOffchainSignatureParams",
-  RemoveParams: "RemoveOffchainSignatureParams",
-  AddPublicKey: "AddOffchainSignaturePublicKey",
-  RemovePublicKey: "RemoveOffchainSignaturePublicKey",
+  AddParams: 'AddOffchainSignatureParams',
+  RemoveParams: 'RemoveOffchainSignatureParams',
+  AddPublicKey: 'AddOffchainSignaturePublicKey',
+  RemovePublicKey: 'RemoveOffchainSignaturePublicKey',
 };
 
 const METHODS = {
-  Params: "signatureParams",
-  PublicKeys: "publicKeys",
+  Params: 'signatureParams',
+  PublicKeys: 'publicKeys',
 };
 
 /** Class to write offchain signature parameters and keys on chain */
@@ -27,7 +27,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
   constructor(api, signAndSend) {
     super();
     this.api = api;
-    this.moduleName = "offchainSignatures";
+    this.moduleName = 'offchainSignatures';
     this.stateChanges = STATE_CHANGES;
     this.methods = METHODS;
     this.module = api.tx[this.moduleName];

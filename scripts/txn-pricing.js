@@ -14,12 +14,7 @@ import {
   VBWitnessUpdateInfo,
 } from "@docknetwork/crypto-wasm-ts";
 import dock from "../src/index";
-import {
-  DockDid,
-  DidKeypair,
-  DidMethodKey,
-  typedHexDID,
-} from "../src/utils/did";
+import { DockDid, DidKeypair, DidMethodKey } from "../src/utils/did";
 import {
   generateEcdsaSecp256k1Keypair,
   getPublicKeyFromKeyringPair,
@@ -32,7 +27,6 @@ import BBSPlusModule from "../src/modules/bbs-plus";
 import AccumulatorModule from "../src/modules/accumulator";
 import StatusList2021Credential from "../src/status-list-credential/status-list2021-credential";
 import { getKeyDoc } from "../src/utils/vc/helpers";
-import DockDid from "../src/utils/did/typed-did/dock-did";
 
 require("dotenv").config();
 

@@ -1,7 +1,7 @@
-import StatusList2021Credential from "../status-list-credential/status-list2021-credential";
-import { getDidNonce, getStateChange } from "../utils/misc";
+import StatusList2021Credential from '../status-list-credential/status-list2021-credential';
+import { getDidNonce, getStateChange } from '../utils/misc';
 
-import { createDidSig, DockDidOrDidMethodKey } from "../utils/did";
+import { createDidSig, DockDidOrDidMethodKey } from '../utils/did';
 
 /**
  * Module supporting `StatusList2021Credential` and `RevocationList2020Credential`.
@@ -25,10 +25,9 @@ export default class StatusListCredentialModule {
    * @returns {Promise<StatusList2021Credential | null>}
    */
   async fetchStatusList2021Credential(statusListCredentialId) {
-    let statusListCredential =
-      await this.api.query.statusListCredential.statusListCredentials(
-        statusListCredentialId,
-      );
+    let statusListCredential = await this.api.query.statusListCredential.statusListCredentials(
+      statusListCredentialId,
+    );
 
     if (statusListCredential.isSome) {
       statusListCredential = statusListCredential.unwrap().statusListCredential;
@@ -128,14 +127,13 @@ export default class StatusListCredentialModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const [payload, sig, sigNonce] =
-      await this.createSignedUpdateStatusListCredential(
-        id,
-        statusListCredential,
-        did,
-        signingKeyRef,
-        { nonce, didModule },
-      );
+    const [payload, sig, sigNonce] = await this.createSignedUpdateStatusListCredential(
+      id,
+      statusListCredential,
+      did,
+      signingKeyRef,
+      { nonce, didModule },
+    );
     return this.updateStatusListCredential(
       payload,
       [{ nonce: sigNonce, sig }],
@@ -164,13 +162,12 @@ export default class StatusListCredentialModule {
     waitForFinalization = true,
     params = {},
   ) {
-    const [payload, sig, sigNonce] =
-      await this.createSignedRemoveStatusListCredential(
-        id,
-        did,
-        signingKeyRef,
-        { nonce, didModule },
-      );
+    const [payload, sig, sigNonce] = await this.createSignedRemoveStatusListCredential(
+      id,
+      did,
+      signingKeyRef,
+      { nonce, didModule },
+    );
     return this.removeStatusListCredential(
       payload,
       [{ nonce: sigNonce, sig }],
@@ -315,7 +312,7 @@ export default class StatusListCredentialModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedUpdateStatusListCredential(update) {
-    return getStateChange(this.api, "UpdateStatusListCredential", update);
+    return getStateChange(this.api, 'UpdateStatusListCredential', update);
   }
 
   /**
@@ -324,6 +321,6 @@ export default class StatusListCredentialModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedRemoveStatusListCredential(removal) {
-    return getStateChange(this.api, "RemoveStatusListCredential", removal);
+    return getStateChange(this.api, 'RemoveStatusListCredential', removal);
   }
 }

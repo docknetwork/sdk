@@ -1,38 +1,38 @@
-import { Keyring } from "@polkadot/api";
-import { cryptoWaitReady, randomAsU8a } from "@polkadot/util-crypto";
-import { assert, u8aToHex, stringToU8a } from "@polkadot/util";
+import { Keyring } from '@polkadot/api';
+import { cryptoWaitReady, randomAsU8a } from '@polkadot/util-crypto';
+import { assert, u8aToHex, stringToU8a } from '@polkadot/util';
 import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
-} from "../test-constants";
-import { DockAPI } from "../../src";
+} from '../test-constants';
+import { DockAPI } from '../../src';
 import {
   getSignatureFromKeyringPair,
   getStateChange,
-} from "../../src/utils/misc";
-import { createDidSig, DockDidOrDidMethodKey } from "../../src/utils/did";
+} from '../../src/utils/misc';
+import { createDidSig } from '../../src/utils/did';
 
 const ALICE_DID = u8aToHex(
-  stringToU8a("Alice\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"),
+  stringToU8a('Alice\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'),
 );
 const BOB_DID = u8aToHex(
-  stringToU8a("Bob\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"),
+  stringToU8a('Bob\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'),
 );
 const CHARLIE_DID = u8aToHex(
-  stringToU8a("Charlie\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"),
+  stringToU8a('Charlie\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'),
 );
 const ALICE_SK = u8aToHex(
-  stringToU8a("Alicesk\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"),
+  stringToU8a('Alicesk\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'),
 );
 const BOB_SK = u8aToHex(
-  stringToU8a("Bobsk\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"),
+  stringToU8a('Bobsk\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'),
 );
 const CHARLIE_SK = u8aToHex(
-  stringToU8a("Charliesk\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"),
+  stringToU8a('Charliesk\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'),
 );
 
-describe.skip("Master Module", () => {
+describe.skip('Master Module', () => {
   // node client
   let nc;
   let systemModule;
@@ -56,7 +56,7 @@ describe.skip("Master Module", () => {
     return nc.api.rpc.state.getStorage(key);
   }
 
-  test("control: set and get bytes as sudo", async () => {
+  test('control: set and get bytes as sudo', async () => {
     const key = u8aToHex(randomAsU8a(32));
     const val = u8aToHex(randomAsU8a(32));
     const sudocall = sudoModule.sudo(systemModule.setStorage([[key, val]]));
@@ -65,15 +65,15 @@ describe.skip("Master Module", () => {
     expect(u8aToHex(bs)).toEqual(val);
   }, 20000);
 
-  test("Root call with no votes", async () => {
+  test('Root call with no votes', async () => {
     const key = u8aToHex(randomAsU8a(32));
     const val = u8aToHex(randomAsU8a(32));
     await masterSetStorage(nc, systemModule, masterModule, key, val, []);
     const sto = await getStorage(key);
-    assert(sto.isNone, "storage item should not have been set");
+    assert(sto.isNone, 'storage item should not have been set');
   }, 20000);
 
-  test("Root call with invalid votes", async () => {
+  test('Root call with invalid votes', async () => {
     const key = u8aToHex(randomAsU8a(32));
     const val = u8aToHex(randomAsU8a(32));
     const did_to_key = [
@@ -89,10 +89,10 @@ describe.skip("Master Module", () => {
       did_to_key,
     );
     const sto = await getStorage(key);
-    assert(sto.isNone, "storage item should not have been set");
+    assert(sto.isNone, 'storage item should not have been set');
   }, 20000);
 
-  test("Root call with valid votes", async () => {
+  test('Root call with valid votes', async () => {
     const key = u8aToHex(randomAsU8a(32));
     const val = u8aToHex(randomAsU8a(32));
     const did_to_key = [
@@ -112,7 +112,7 @@ describe.skip("Master Module", () => {
     expect(u8aToHex(u8a)).toEqual(val);
   }, 20000);
 
-  test("Root call with valid votes but insufficient vote count", async () => {
+  test('Root call with valid votes but insufficient vote count', async () => {
     const key = u8aToHex(randomAsU8a(32));
     const val = u8aToHex(randomAsU8a(32));
     const did_to_key = [[ALICE_DID, await keypair(ALICE_SK)]];
@@ -125,10 +125,10 @@ describe.skip("Master Module", () => {
       did_to_key,
     );
     const sto = await getStorage(key);
-    assert(sto.isNone, "storage item should not have been set");
+    assert(sto.isNone, 'storage item should not have been set');
   }, 20000);
 
-  test("Root call with valid votes and oversufficient vote count", async () => {
+  test('Root call with valid votes and oversufficient vote count', async () => {
     const key = u8aToHex(randomAsU8a(32));
     const val = u8aToHex(randomAsU8a(32));
     const did_to_key = [
@@ -149,7 +149,7 @@ describe.skip("Master Module", () => {
     expect(u8aToHex(u8a)).toEqual(val);
   }, 20000);
 
-  test("Root call with votes not sorted lexically", async () => {
+  test('Root call with votes not sorted lexically', async () => {
     const key = u8aToHex(randomAsU8a(32));
     const val = u8aToHex(randomAsU8a(32));
     const did_to_key = [
@@ -169,9 +169,9 @@ describe.skip("Master Module", () => {
     expect(u8aToHex(u8a)).toEqual(val);
   }, 20000);
 
-  test("Use a master call to modify master membership.", async () => {
+  test('Use a master call to modify master membership.', async () => {
     const fourth_did = u8aToHex(randomAsU8a(32));
-    const newMembership = nc.api.createType("Membership", {
+    const newMembership = nc.api.createType('Membership', {
       members: sortedSet([ALICE_DID, BOB_DID, CHARLIE_DID, fourth_did]),
       voteRequirement: 2,
     });
@@ -209,7 +209,7 @@ async function connect() {
 // or seed phrase or "//DevKey/Derivation/Path".
 async function keypair(seed) {
   await cryptoWaitReady();
-  const keyring = new Keyring({ type: "sr25519" });
+  const keyring = new Keyring({ type: 'sr25519' });
   return keyring.addFromUri(seed);
 }
 
@@ -253,8 +253,8 @@ async function masterSetStorage(
   val, // hex encoded bytes
   did_to_key, // list of [did, key] pairs with which to vote. dids are hex encoded
 ) {
-  assert(key.startsWith("0x"), "should prefixed with 0x");
-  assert(val.startsWith("0x"), "should prefixed with 0x");
+  assert(key.startsWith('0x'), 'should prefixed with 0x');
+  assert(val.startsWith('0x'), 'should prefixed with 0x');
 
   const call = systemModule.setStorage([[key, val]]); // this is a root-only extrinsic
   const votes = await allVote(nc, call, did_to_key);
@@ -282,18 +282,18 @@ async function allVote(
   did_to_key, // list of [did, key] pairs with which to vote. dids are hex encoded
 ) {
   for (const [did, _key] of did_to_key) {
-    assert(did.startsWith("0x"), "should prefixed with 0x");
-    assert(did.length === 66, "should be 32 bytes");
+    assert(did.startsWith('0x'), 'should prefixed with 0x');
+    assert(did.length === 66, 'should be 32 bytes');
   }
 
-  const encodedProposal = [...nc.api.createType("Call", proposal).toU8a()];
+  const encodedProposal = [...nc.api.createType('Call', proposal).toU8a()];
   const roundNo = await nc.api.query.master.round();
 
   const votes = [];
   for (const [did, key] of did_to_key) {
     const nonce = await nc.didModule.getNextNonceForDid(DockDid.from(did));
     const vote = { nonce, data: { proposal: encodedProposal, roundNo } };
-    const encodedStateChange = getStateChange(nc.api, "MasterVote", vote);
+    const encodedStateChange = getStateChange(nc.api, 'MasterVote', vote);
     const signature = getSignatureFromKeyringPair(key, encodedStateChange);
     const didSig = createDidSig(DockDid.from(did), 1, signature);
     votes.push({ sig: didSig, nonce });

@@ -1,16 +1,16 @@
-import { randomAsHex } from "@polkadot/util-crypto";
-import { DockAPI } from "../../../src";
-import { DockDid, NoDIDError, DidKeypair } from "../../../src/utils/did";
+import { randomAsHex } from '@polkadot/util-crypto';
+import { DockAPI } from '../../../src';
+import { DockDid, NoDIDError, DidKeypair } from '../../../src/utils/did';
 import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
-} from "../../test-constants";
-import { getPublicKeyFromKeyringPair } from "../../../src/utils/misc";
-import { DidKey, VerificationRelationship } from "../../../src/public-keys";
-import { checkVerificationMethods } from "../helpers";
+} from '../../test-constants';
+import { getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
+import { DidKey, VerificationRelationship } from '../../../src/public-keys';
+import { checkVerificationMethods } from '../helpers';
 
-describe("DID controllers", () => {
+describe('DID controllers', () => {
   const dock = new DockAPI();
 
   const dockDid1 = DockDid.random();
@@ -46,7 +46,7 @@ describe("DID controllers", () => {
     await dock.disconnect();
   }, 10000);
 
-  test("Create self controlled DIDs", async () => {
+  test('Create self controlled DIDs', async () => {
     const pair1 = dock.keyring.addFromUri(seed1);
     const publicKey1 = getPublicKeyFromKeyringPair(pair1);
     const verRels1 = new VerificationRelationship();
@@ -101,7 +101,7 @@ describe("DID controllers", () => {
     }
   }, 60000);
 
-  test("Get DID documents", async () => {
+  test('Get DID documents', async () => {
     const doc1 = await dock.did.getDocument(dockDid1);
     expect(doc1.controller.length).toEqual(1);
 
@@ -131,7 +131,7 @@ describe("DID controllers", () => {
     expect(doc2.capabilityInvocation[0]).toEqual(`${dockDid2}#keys-1`);
   }, 10000);
 
-  test("Create DID controlled by other", async () => {
+  test('Create DID controlled by other', async () => {
     await dock.did.new(dockDid3, [], [dockDid1], false);
 
     const didDetail1 = await dock.did.getOnchainDidDetail(hexDid3.asDid);
@@ -146,7 +146,7 @@ describe("DID controllers", () => {
     );
   });
 
-  test("Get DID document", async () => {
+  test('Get DID document', async () => {
     const doc3 = await dock.did.getDocument(dockDid3);
     expect(doc3.controller.length).toEqual(1);
     checkVerificationMethods(dockDid3, doc3, 0);
@@ -155,7 +155,7 @@ describe("DID controllers", () => {
     expect(doc3.capabilityInvocation).not.toBeDefined();
   }, 10000);
 
-  test("Add keys and more controllers to a DID by its other controller", async () => {
+  test('Add keys and more controllers to a DID by its other controller', async () => {
     const pair1 = new DidKeypair(dock.keyring.addFromUri(seed1), 1);
 
     // Add key to the DID using its controller
@@ -203,7 +203,7 @@ describe("DID controllers", () => {
     );
   });
 
-  test("Get DID document after update", async () => {
+  test('Get DID document after update', async () => {
     const doc3 = await dock.did.getDocument(dockDid3);
     expect(doc3.controller.length).toEqual(2);
     // expect(doc3.verificationMethod.length).toEqual(1);
@@ -214,7 +214,7 @@ describe("DID controllers", () => {
     expect(doc3.capabilityInvocation).not.toBeDefined();
   }, 10000);
 
-  test("Remove existing controllers from a DID by its controller", async () => {
+  test('Remove existing controllers from a DID by its controller', async () => {
     const pair2 = new DidKeypair(dock.keyring.addFromUri(seed2), 1);
     await dock.did.removeControllers([dockDid1], dockDid3, dockDid2, pair2);
 
@@ -233,7 +233,7 @@ describe("DID controllers", () => {
     );
   });
 
-  test("Remove DID using its controller", async () => {
+  test('Remove DID using its controller', async () => {
     const pair2 = new DidKeypair(dock.keyring.addFromUri(seed2), 1);
     await dock.did.remove(dockDid3, dockDid2, pair2);
     await expect(dock.did.getDocument(dockDid3)).rejects.toThrow(NoDIDError);
@@ -246,7 +246,7 @@ describe("DID controllers", () => {
     );
   });
 
-  test("Add and remove multiple controllers", async () => {
+  test('Add and remove multiple controllers', async () => {
     const pair1 = new DidKeypair(dock.keyring.addFromUri(seed1), 1);
     const pair2 = new DidKeypair(dock.keyring.addFromUri(seed2), 1);
 

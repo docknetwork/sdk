@@ -1,10 +1,10 @@
-import { randomAsHex, encodeAddress } from "@polkadot/util-crypto";
-import { getHexIdentifier } from "../../codec";
+import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
+import { getHexIdentifier } from '../../codec';
 
-import { validateDockDIDHexIdentifier } from "../utils";
+import { validateDockDIDHexIdentifier } from '../utils';
 
-import { DockDIDByteSize, DockDIDQualifier } from "../constants";
-import DockDidOrDidMethodKey from "./dock-did-or-did-method-key";
+import { DockDIDByteSize, DockDIDQualifier } from '../constants';
+import DockDidOrDidMethodKey from './dock-did-or-did-method-key';
 
 /**
  * `did:dock:*`
@@ -42,12 +42,21 @@ export default class DockDid extends DockDidOrDidMethodKey {
   }
 
   /**
+   * Instantiates `DockDid` from an unqualified did string.
+   * @param {string} did - SS58-encoded or hex did.
+   * @returns {DockDid}
+   */
+  static fromUnqualifiedString(did) {
+    return new this(getHexIdentifier(did, '', DockDIDByteSize));
+  }
+
+  /**
    * Instantiates `DockDid` from a did object received from the substrate side.
    * @param {object} did - substrate did
    * @returns {DockDid}
    */
   static fromSubstrateValue(did) {
-    return new this(getHexIdentifier(did.asDid, [], DockDIDByteSize));
+    return new this(did.asDid);
   }
 
   get isDid() {
@@ -62,11 +71,10 @@ export default class DockDid extends DockDidOrDidMethodKey {
     return { Did: this.did };
   }
 
-  toString() {
-    return this.toQualifiedEncodedString();
-  }
-
-  toHexString() {
+  /**
+   * Returns fully qualified `did:dock:*` with did represented as a hex value.
+   */
+  toQualifiedHexString() {
     return `${DockDIDQualifier}${this.asDid}`;
   }
 

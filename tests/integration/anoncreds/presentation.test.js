@@ -1,37 +1,37 @@
-import { randomAsHex } from "@polkadot/util-crypto";
-import { u8aToHex, stringToU8a } from "@polkadot/util";
-import b58 from "bs58";
+import { randomAsHex } from '@polkadot/util-crypto';
+import { u8aToHex, stringToU8a } from '@polkadot/util';
+import b58 from 'bs58';
 import {
   BDDT16MacSecretKey,
   BoundCheckSnarkSetup,
   CredentialBuilder,
   initializeWasm,
   PresentationBuilder,
-} from "@docknetwork/crypto-wasm-ts";
-import { DockAPI } from "../../../src";
+} from '@docknetwork/crypto-wasm-ts';
+import { DockAPI } from '../../../src';
 import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
   Schemes,
-} from "../../test-constants";
-import { DockDid, DidKeypair } from "../../../src/utils/did";
-import { registerNewDIDUsingPair } from "../helpers";
-import { getKeyDoc } from "../../../src/utils/vc/helpers";
-import { issueCredential, verifyPresentation } from "../../../src/utils/vc";
-import { DockResolver } from "../../../src/resolver";
+} from '../../test-constants';
+import { DockDid, DidKeypair } from '../../../src/utils/did';
+import { registerNewDIDUsingPair } from '../helpers';
+import { getKeyDoc } from '../../../src/utils/vc/helpers';
+import { issueCredential, verifyPresentation } from '../../../src/utils/vc';
+import { DockResolver } from '../../../src/resolver';
 import {
   getResidentCardCredentialAndSchema,
   setupExternalSchema,
-} from "./utils";
+} from './utils';
 import {
   getKeyedProofsFromVerifiedPresentation,
   getJsonSchemasFromPresentation,
-} from "../../../src/utils/vc/presentations";
-import defaultDocumentLoader from "../../../src/utils/vc/document-loader";
+} from '../../../src/utils/vc/presentations';
+import defaultDocumentLoader from '../../../src/utils/vc/document-loader';
 
 describe.each(Schemes)(
-  "Presentation",
+  'Presentation',
   ({
     Name,
     Module,
@@ -50,8 +50,7 @@ describe.each(Schemes)(
     let didDocument;
     let chainModule;
 
-    const [credentialJSON, residentCardSchema] =
-      getResidentCardCredentialAndSchema(Context);
+    const [credentialJSON, residentCardSchema] = getResidentCardCredentialAndSchema(Context);
 
     beforeAll(async () => {
       await initializeWasm();
@@ -71,7 +70,7 @@ describe.each(Schemes)(
         msgCount: 100,
       });
 
-      if (Name !== "BDDT16") {
+      if (Name !== 'BDDT16') {
         chainModule = getModule(dock);
 
         const pk1 = Module.prepareAddPublicKey(
@@ -95,7 +94,7 @@ describe.each(Schemes)(
       } else {
         // For KVAC, the public doesn't need to published as its not used in credential or presentation verification (except issuers).
         // But the signer still adds a key identifier in the credential to determine which key will be used for verification
-        keypair.id = "my-key-id";
+        keypair.id = 'my-key-id';
       }
     }, 30000);
 
@@ -110,12 +109,12 @@ describe.each(Schemes)(
         expect(
           presentation.spec.credentials[i].revealedAttributes.proof,
         ).toHaveProperty(
-          "verificationMethod",
+          'verificationMethod',
           credentials[i].proof.verificationMethod,
         );
         expect(
           presentation.spec.credentials[0].revealedAttributes.proof,
-        ).toHaveProperty("type", credentials[i].proof.type);
+        ).toHaveProperty('type', credentials[i].proof.type);
 
         expect(presentation.spec.credentials[i].schema).toBeDefined();
         expect(presentation.spec.credentials[i].sigType).toBeDefined();
@@ -128,7 +127,7 @@ describe.each(Schemes)(
     test(`from ${Name} credentials with external schema reference and embedded schema`, async () => {
       const [externalSchemaEncoded, schemaId] = await setupExternalSchema(
         residentCardSchema,
-        "Resident Card Example",
+        'Resident Card Example',
         did1,
         pair1,
         dock,
@@ -167,27 +166,27 @@ describe.each(Schemes)(
       );
 
       await presentationInstance.addAttributeToReveal(idx, [
-        "credentialSubject.lprNumber",
+        'credentialSubject.lprNumber',
       ]);
 
       await presentationInstance.addAttributeToReveal(idx2, [
-        "credentialSubject.lprNumber",
+        'credentialSubject.lprNumber',
       ]);
 
       const presentation = await presentationInstance.createPresentation();
 
       expect(
         presentation.spec.credentials[0].revealedAttributes,
-      ).toHaveProperty("credentialSubject");
+      ).toHaveProperty('credentialSubject');
       expect(
         presentation.spec.credentials[0].revealedAttributes.credentialSubject,
-      ).toHaveProperty("lprNumber", 1234);
+      ).toHaveProperty('lprNumber', 1234);
       expect(
         presentation.spec.credentials[1].revealedAttributes,
-      ).toHaveProperty("credentialSubject");
+      ).toHaveProperty('credentialSubject');
       expect(
         presentation.spec.credentials[1].revealedAttributes.credentialSubject,
-      ).toHaveProperty("lprNumber", 1234);
+      ).toHaveProperty('lprNumber', 1234);
 
       const schemas = getJsonSchemasFromPresentation(presentation, false);
       // For schema with external reference, it should be equal to the reference id (on-chain id here)
@@ -201,7 +200,7 @@ describe.each(Schemes)(
       expect(verified).toEqual(true);
 
       const keyedProofs = getKeyedProofsFromVerifiedPresentation(presentation);
-      const isKvac = Name === "BDDT16";
+      const isKvac = Name === 'BDDT16';
       // Keyed proofs only exist for KVAC
       expect(keyedProofs.size).toEqual(isKvac ? 2 : 0);
       if (isKvac) {
@@ -217,7 +216,7 @@ describe.each(Schemes)(
       }
     }, 40000);
 
-    test("expect to reveal specified attributes", async () => {
+    test('expect to reveal specified attributes', async () => {
       const presentationInstance = new Presentation();
       const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
       const unsignedCred = {
@@ -233,17 +232,17 @@ describe.each(Schemes)(
       );
 
       await presentationInstance.addAttributeToReveal(idx, [
-        "credentialSubject.lprNumber",
+        'credentialSubject.lprNumber',
       ]);
 
       const presentation = await presentationInstance.createPresentation();
 
       expect(
         presentation.spec.credentials[0].revealedAttributes,
-      ).toHaveProperty("credentialSubject");
+      ).toHaveProperty('credentialSubject');
       expect(
         presentation.spec.credentials[0].revealedAttributes.credentialSubject,
-      ).toHaveProperty("lprNumber", 1234);
+      ).toHaveProperty('lprNumber', 1234);
 
       checkCommonRevealedFields(presentation, [credential]);
 
@@ -251,7 +250,7 @@ describe.each(Schemes)(
       expect(verified).toEqual(true);
 
       const keyedProofs = getKeyedProofsFromVerifiedPresentation(presentation);
-      const isKvac = Name === "BDDT16";
+      const isKvac = Name === 'BDDT16';
       // Keyed proofs only exist for KVAC
       expect(keyedProofs.size).toEqual(isKvac ? 1 : 0);
       if (isKvac) {
@@ -263,7 +262,7 @@ describe.each(Schemes)(
       }
     }, 30000);
 
-    test("expect to create presentation from multiple credentials", async () => {
+    test('expect to create presentation from multiple credentials', async () => {
       const presentationInstance = new Presentation();
 
       const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
@@ -284,27 +283,27 @@ describe.each(Schemes)(
         { resolver },
       );
       await presentationInstance.addAttributeToReveal(idx, [
-        "credentialSubject.lprNumber",
+        'credentialSubject.lprNumber',
       ]);
       await presentationInstance.addAttributeToReveal(idx2, [
-        "credentialSubject.familyName",
+        'credentialSubject.familyName',
       ]);
 
       const presentation = await presentationInstance.createPresentation();
 
       expect(
         presentation.spec.credentials[0].revealedAttributes,
-      ).toHaveProperty("credentialSubject");
+      ).toHaveProperty('credentialSubject');
       expect(
         presentation.spec.credentials[0].revealedAttributes.credentialSubject,
-      ).toHaveProperty("lprNumber", 1234);
+      ).toHaveProperty('lprNumber', 1234);
 
       expect(
         presentation.spec.credentials[1].revealedAttributes,
-      ).toHaveProperty("credentialSubject");
+      ).toHaveProperty('credentialSubject');
       expect(
         presentation.spec.credentials[1].revealedAttributes.credentialSubject,
-      ).toHaveProperty("familyName", "SMITH");
+      ).toHaveProperty('familyName', 'SMITH');
 
       checkCommonRevealedFields(presentation, [credential, credential2]);
 
@@ -312,8 +311,8 @@ describe.each(Schemes)(
       expect(verified).toEqual(true);
     }, 30000);
 
-    test("expect to range proofs", async () => {
-      const provingKeyId = "provingKeyId";
+    test('expect to range proofs', async () => {
+      const provingKeyId = 'provingKeyId';
       const pk = BoundCheckSnarkSetup();
       const provingKey = pk.decompress();
       const presentationInstance = new Presentation();
@@ -331,15 +330,15 @@ describe.each(Schemes)(
       );
 
       await presentationInstance.addAttributeToReveal(idx, [
-        "credentialSubject.lprNumber",
+        'credentialSubject.lprNumber',
       ]);
 
       // Enforce issuance date to be between values
       presentationInstance.presBuilder.enforceBounds(
         idx,
-        "issuanceDate",
-        new Date("2019-10-01"),
-        new Date("2020-01-01"),
+        'issuanceDate',
+        new Date('2019-10-01'),
+        new Date('2020-01-01'),
         provingKeyId,
         provingKey,
       );
@@ -352,18 +351,18 @@ describe.each(Schemes)(
           {
             min: 1569888000000,
             max: 1577836800000,
-            paramId: "provingKeyId",
-            protocol: "LegoGroth16",
+            paramId: 'provingKeyId',
+            protocol: 'LegoGroth16',
           },
         ],
       });
 
       expect(
         presentation.spec.credentials[0].revealedAttributes,
-      ).toHaveProperty("credentialSubject");
+      ).toHaveProperty('credentialSubject');
       expect(
         presentation.spec.credentials[0].revealedAttributes.credentialSubject,
-      ).toHaveProperty("lprNumber", 1234);
+      ).toHaveProperty('lprNumber', 1234);
 
       checkCommonRevealedFields(presentation, [credential]);
 
@@ -379,7 +378,7 @@ describe.each(Schemes)(
       expect(verified).toEqual(true);
     }, 60000);
 
-    test("expect to throw exception when attributes provided is not an array", async () => {
+    test('expect to throw exception when attributes provided is not an array', async () => {
       const presentationInstance = new Presentation();
       const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
       const unsignedCred = {
@@ -398,7 +397,7 @@ describe.each(Schemes)(
       }).toThrow();
     }, 30000);
 
-    test("expect to create presentation with nonce", async () => {
+    test('expect to create presentation with nonce', async () => {
       const presentationInstance = new Presentation();
 
       const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
@@ -414,19 +413,19 @@ describe.each(Schemes)(
         { resolver },
       );
       await presentationInstance.addAttributeToReveal(idx, [
-        "credentialSubject.lprNumber",
+        'credentialSubject.lprNumber',
       ]);
 
       const presentation = await presentationInstance.createPresentation({
-        nonce: "1234",
+        nonce: '1234',
       });
-      expect(presentation.nonce).toEqual(b58.encode(stringToU8a("1234")));
+      expect(presentation.nonce).toEqual(b58.encode(stringToU8a('1234')));
       expect(
         presentation.spec.credentials[0].revealedAttributes,
-      ).toHaveProperty("credentialSubject");
+      ).toHaveProperty('credentialSubject');
       expect(
         presentation.spec.credentials[0].revealedAttributes.credentialSubject,
-      ).toHaveProperty("lprNumber", 1234);
+      ).toHaveProperty('lprNumber', 1234);
 
       const { verified } = await verifyPresentation(presentation, { resolver });
       expect(verified).toEqual(true);

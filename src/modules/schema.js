@@ -1,7 +1,7 @@
 import { canonicalize } from 'json-canonicalize';
 import { validate } from 'jsonschema';
 
-import { typedHexDID } from '../utils/did';
+import { DockDidOrDidMethodKey } from '../utils/did';
 
 import { createNewDockBlobId, getHexIdentifierFromBlobID } from './blob';
 
@@ -148,7 +148,9 @@ export default class Schema {
       return {
         ...chainValue,
         id,
-        author: typedHexDID(dockApi, chainBlob[0]).toQualifiedEncodedString(),
+        author: DockDidOrDidMethodKey.from(
+          chainBlob[0],
+        ).toQualifiedEncodedString(),
       };
     }
     throw new Error('Incorrect schema format');

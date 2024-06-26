@@ -1,6 +1,6 @@
-import { randomAsHex } from "@polkadot/util-crypto";
-import b58 from "bs58";
-import { hexToU8a, stringToU8a, u8aToHex } from "@polkadot/util";
+import { randomAsHex } from '@polkadot/util-crypto';
+import b58 from 'bs58';
+import { hexToU8a, stringToU8a, u8aToHex } from '@polkadot/util';
 import {
   initializeWasm,
   BoundCheckSnarkSetup,
@@ -14,41 +14,41 @@ import {
   KBUniversalAccumulator,
   MEM_CHECK_KV_STR,
   RevocationStatusProtocol,
-} from "@docknetwork/crypto-wasm-ts";
+} from '@docknetwork/crypto-wasm-ts';
 import {
   InMemoryState,
   InMemoryKBUniversalState,
-} from "@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence";
-import { DockAPI } from "../../../src";
+} from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
+import { DockAPI } from '../../../src';
 import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
   Schemes,
-} from "../../test-constants";
-import { DockDid, DidKeypair } from "../../../src/utils/did";
-import { getProofMatcherDoc, registerNewDIDUsingPair } from "../helpers";
-import { getKeyDoc } from "../../../src/utils/vc/helpers";
+} from '../../test-constants';
+import { DockDid, DidKeypair } from '../../../src/utils/did';
+import { getProofMatcherDoc, registerNewDIDUsingPair } from '../helpers';
+import { getKeyDoc } from '../../../src/utils/vc/helpers';
 import {
   issueCredential,
   signPresentation,
   verifyPresentation,
   verifyCredential,
-} from "../../../src/utils/vc";
-import { DockResolver } from "../../../src/resolver";
-import { createPresentation } from "../../create-presentation";
+} from '../../../src/utils/vc';
+import { DockResolver } from '../../../src/resolver';
+import { createPresentation } from '../../create-presentation';
 import AccumulatorModule, {
   AccumulatorType,
-} from "../../../src/modules/accumulator";
-import { getKeyedProofsFromVerifiedPresentation } from "../../../src/utils/vc/presentations";
-import { deepClone } from "../../../src/utils/common";
+} from '../../../src/modules/accumulator';
+import { getKeyedProofsFromVerifiedPresentation } from '../../../src/utils/vc/presentations';
+import { deepClone } from '../../../src/utils/common';
 
 // TODO: move to fixtures
 const residentCardSchema = {
-  $schema: "http://json-schema.org/draft-07/schema#",
-  $id: "https://ld.dock.io/examples/resident-card-schema.json",
-  title: "Resident Card Example",
-  type: "object",
+  $schema: 'http://json-schema.org/draft-07/schema#',
+  $id: 'https://ld.dock.io/examples/resident-card-schema.json',
+  title: 'Resident Card Example',
+  type: 'object',
   properties: {
     // TOOD: fix and restore below for future
     // // NOTE: schema here defines context/type to make sure
@@ -60,23 +60,23 @@ const residentCardSchema = {
     //   type: 'array',
     // },
     credentialSubject: {
-      type: "object",
+      type: 'object',
       properties: {
         givenName: {
-          title: "Given Name",
-          type: "string",
+          title: 'Given Name',
+          type: 'string',
         },
         familyName: {
-          title: "Family Name",
-          type: "string",
+          title: 'Family Name',
+          type: 'string',
         },
         lprNumber: {
-          title: "LPR Number",
-          type: "integer",
+          title: 'LPR Number',
+          type: 'integer',
           minimum: 0,
         },
       },
-      required: ["givenName", "familyName", "lprNumber"],
+      required: ['givenName', 'familyName', 'lprNumber'],
     },
   },
 };
@@ -85,11 +85,11 @@ const embeddedSchema = {
   id: `data:application/json;charset=utf-8,${encodeURIComponent(
     JSON.stringify(residentCardSchema),
   )}`,
-  type: "JsonSchemaValidator2018",
+  type: 'JsonSchemaValidator2018',
 };
 
 describe.each(Schemes)(
-  "Derived Credentials",
+  'Derived Credentials',
   ({
     Name,
     Module,
@@ -115,24 +115,24 @@ describe.each(Schemes)(
 
     // TODO: move to fixtures
     const credentialJSON = {
-      "@context": [
-        "https://www.w3.org/2018/credentials/v1",
-        "https://w3id.org/citizenship/v1",
+      '@context': [
+        'https://www.w3.org/2018/credentials/v1',
+        'https://w3id.org/citizenship/v1',
         Context,
       ],
-      id: "https://issuer.oidp.uscis.gov/credentials/83627465",
-      type: ["VerifiableCredential", "PermanentResidentCard"],
+      id: 'https://issuer.oidp.uscis.gov/credentials/83627465',
+      type: ['VerifiableCredential', 'PermanentResidentCard'],
       credentialSchema: embeddedSchema,
-      identifier: "83627465",
-      name: "Permanent Resident Card",
-      description: "Government of Example Permanent Resident Card.",
-      issuanceDate: "2019-12-03T12:19:52Z",
-      expirationDate: "2029-12-03T12:19:52Z",
+      identifier: '83627465',
+      name: 'Permanent Resident Card',
+      description: 'Government of Example Permanent Resident Card.',
+      issuanceDate: '2019-12-03T12:19:52Z',
+      expirationDate: '2029-12-03T12:19:52Z',
       credentialSubject: {
-        id: "did:example:b34ca6cd37bbf23",
-        type: ["PermanentResident", "Person"],
-        givenName: "JOHN",
-        familyName: "SMITH",
+        id: 'did:example:b34ca6cd37bbf23',
+        type: ['PermanentResident', 'Person'],
+        givenName: 'JOHN',
+        familyName: 'SMITH',
         lprNumber: 1234,
       },
     };
@@ -218,7 +218,7 @@ describe.each(Schemes)(
         msgCount: 100,
       });
 
-      if (Name !== "BDDT16") {
+      if (Name !== 'BDDT16') {
         const pk1 = Module.prepareAddPublicKey(
           dock.api,
           u8aToHex(keypair.publicKeyBuffer),
@@ -240,7 +240,7 @@ describe.each(Schemes)(
       } else {
         // For KVAC, the public doesn't need to published as its not used in credential or presentation verification (except issuers).
         // But the signer still adds a key identifier in the credential to determine which key will be used for verification
-        keypair.id = "my-key-id";
+        keypair.id = 'my-key-id';
       }
 
       // Register holder DID with sr25519 key
@@ -248,7 +248,7 @@ describe.each(Schemes)(
         dock,
         holder3DID,
         new DidKeypair(
-          dock.keyring.addFromUri(holder3KeySeed, null, "sr25519"),
+          dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'),
           1,
         ),
       );
@@ -290,7 +290,7 @@ describe.each(Schemes)(
       const uniKvAccumKeypair = Accumulator.generateKeypair(params);
 
       // All 4 accumulators will have the same member
-      accumMember = "10";
+      accumMember = '10';
       encodedMember = Encoder.defaultEncodeFunc()(accumMember);
 
       // The 2 positive accumulators are pre-filled with the following members and the other 2 have the domain set to these
@@ -398,24 +398,23 @@ describe.each(Schemes)(
       const holderKey = getKeyDoc(
         holder3DID,
         new DidKeypair(
-          dock.keyring.addFromUri(holder3KeySeed, null, "sr25519"),
+          dock.keyring.addFromUri(holder3KeySeed, null, 'sr25519'),
           1,
         ),
-        "Sr25519VerificationKey2020",
+        'Sr25519VerificationKey2020',
       );
 
       const presId = `https://example.com/pres/${randomAsHex(32)}`;
       const chal = randomAsHex(32);
-      const domain = "test domain";
+      const domain = 'test domain';
       const presentation = createPresentation(credentials, presId);
 
       // This is done by the verifier
       const reconstructedPres = derivedToAnoncredsPresentation(
         presentation.verifiableCredential[0],
       );
-      const keyedProofs =
-        getKeyedProofsFromVerifiedPresentation(reconstructedPres);
-      const isKvac = Name === "BDDT16";
+      const keyedProofs = getKeyedProofsFromVerifiedPresentation(reconstructedPres);
+      const isKvac = Name === 'BDDT16';
       const isKvacStatus = accumSecretKey ? 1 : 0;
       // Keyed proofs only exist for KVAC
       expect(keyedProofs.size).toEqual(isKvac || isKvacStatus ? 1 : 0);
@@ -439,7 +438,7 @@ describe.each(Schemes)(
         expect.objectContaining(
           JSON.parse(
             JSON.stringify({
-              type: ["VerifiablePresentation"],
+              type: ['VerifiablePresentation'],
               verifiableCredential: credentials,
               id: presId,
             }),
@@ -459,14 +458,14 @@ describe.each(Schemes)(
 
       expect(signedPres).toMatchObject(
         expect.objectContaining({
-          type: ["VerifiablePresentation"],
+          type: ['VerifiablePresentation'],
           verifiableCredential: credentials,
           id: presId,
           proof: expect.objectContaining({
-            type: "Sr25519Signature2020",
+            type: 'Sr25519Signature2020',
             challenge: chal,
             domain,
-            proofPurpose: "authentication",
+            proofPurpose: 'authentication',
           }),
         }),
       );
@@ -493,8 +492,8 @@ describe.each(Schemes)(
       };
 
       const presentationOptions = {
-        nonce: stringToU8a("noncetest"),
-        context: "my context",
+        nonce: stringToU8a('noncetest'),
+        context: 'my context',
       };
 
       // Create W3C credential
@@ -511,10 +510,10 @@ describe.each(Schemes)(
       // NOTE: revealing subject type because of JSON-LD processing for this certain credential
       // you may not always need to do this depending on your JSON-LD contexts
       await presentationInstance.addAttributeToReveal(idx, [
-        "credentialSubject.type.0",
+        'credentialSubject.type.0',
       ]);
       await presentationInstance.addAttributeToReveal(idx, [
-        "credentialSubject.type.1",
+        'credentialSubject.type.1',
       ]);
 
       return [presentationInstance, presentationOptions];
@@ -528,8 +527,8 @@ describe.each(Schemes)(
       };
 
       const presentationOptions = {
-        nonce: stringToU8a("noncetest"),
-        context: "my context",
+        nonce: stringToU8a('noncetest'),
+        context: 'my context',
       };
 
       // Create W3C credential
@@ -548,16 +547,16 @@ describe.each(Schemes)(
 
       // Reveal subject attributes
       presentationInstance.addAttributeToReveal(idx, [
-        "credentialSubject.lprNumber",
+        'credentialSubject.lprNumber',
       ]);
 
       // NOTE: revealing subject type because of JSON-LD processing for this certain credential
       // you may not always need to do this depending on your JSON-LD contexts
       presentationInstance.addAttributeToReveal(idx, [
-        "credentialSubject.type.0",
+        'credentialSubject.type.0',
       ]);
       presentationInstance.addAttributeToReveal(idx, [
-        "credentialSubject.type.1",
+        'credentialSubject.type.1',
       ]);
 
       // Begin to derive a credential from the above issued one
@@ -569,24 +568,23 @@ describe.each(Schemes)(
 
       // Reveal subject attributes
       presentationInstance2.addAttributeToReveal(idx2, [
-        "credentialSubject.lprNumber",
+        'credentialSubject.lprNumber',
       ]);
 
       // NOTE: revealing subject type because of JSON-LD processing for this certain credential
       // you may not always need to do this depending on your JSON-LD contexts
       presentationInstance2.addAttributeToReveal(idx2, [
-        "credentialSubject.type.0",
+        'credentialSubject.type.0',
       ]);
       presentationInstance2.addAttributeToReveal(idx2, [
-        "credentialSubject.type.1",
+        'credentialSubject.type.1',
       ]);
 
       // Derive a W3C Verifiable Credential JSON from the above presentation
-      const credentials =
-        await presentationInstance.deriveCredentials(presentationOptions);
+      const credentials = await presentationInstance.deriveCredentials(presentationOptions);
       expect(credentials.length).toEqual(1);
       expect(credentials[0].proof).toBeDefined();
-      expect(credentials[0]).toHaveProperty("credentialSubject");
+      expect(credentials[0]).toHaveProperty('credentialSubject');
       expect(credentials[0].credentialSubject).toMatchObject(
         expect.objectContaining({
           type: unsignedCred.credentialSubject.type,
@@ -597,8 +595,7 @@ describe.each(Schemes)(
 
       // Ensure reconstructing presentation from credential matches
       // NOTE: ignoring proof here as itll differ when signed twice as above
-      const presentation =
-        await presentationInstance2.createPresentation(presentationOptions);
+      const presentation = await presentationInstance2.createPresentation(presentationOptions);
 
       // Question: What is the point of this? A single credential cant be converted to a presentation and a presentation
       // has other data that credential won't have
@@ -606,8 +603,8 @@ describe.each(Schemes)(
       expect(reconstructedPres.proof).toBeDefined();
       expect({
         ...reconstructedPres,
-        proof: "",
-      }).toMatchObject({ ...presentation, proof: "" });
+        proof: '',
+      }).toMatchObject({ ...presentation, proof: '' });
 
       // Try to verify the derived credential alone
       const credentialResult = await verifyCredential(credentials[0], {
@@ -625,9 +622,8 @@ describe.each(Schemes)(
       expect(credentialResult1.verified).toBe(false);
 
       // This is done by the verifier
-      const keyedProofs =
-        getKeyedProofsFromVerifiedPresentation(reconstructedPres);
-      const isKvac = Name === "BDDT16";
+      const keyedProofs = getKeyedProofsFromVerifiedPresentation(reconstructedPres);
+      const isKvac = Name === 'BDDT16';
       // Keyed proofs only exist for KVAC
       expect(keyedProofs.size).toEqual(isKvac ? 1 : 0);
       if (isKvac) {
@@ -670,8 +666,7 @@ describe.each(Schemes)(
         revocationCheck: MEM_CHECK_STR,
         revocationId: accumMember,
       };
-      const [presentationInstance, presentationOptions] =
-        await getPresentationInstance(credentialStatus);
+      const [presentationInstance, presentationOptions] = await getPresentationInstance(credentialStatus);
 
       presentationInstance.presBuilder.addAccumInfoForCredStatus(
         0,
@@ -681,11 +676,10 @@ describe.each(Schemes)(
       );
 
       // Derive a W3C Verifiable Credential JSON from the above presentation
-      const credentials =
-        await presentationInstance.deriveCredentials(presentationOptions);
+      const credentials = await presentationInstance.deriveCredentials(presentationOptions);
 
       expect(credentials.length).toEqual(1);
-      expect(credentials[0].issuer).toEqual(did1);
+      expect(credentials[0].issuer).toEqual(String(did1));
       expect(credentials[0].credentialStatus).toBeDefined();
       expect(credentials[0].credentialStatus).toEqual({
         ...credentialStatus,
@@ -720,8 +714,7 @@ describe.each(Schemes)(
         revocationCheck: MEM_CHECK_KV_STR,
         revocationId: accumMember,
       };
-      const [presentationInstance, presentationOptions] =
-        await getPresentationInstance(credentialStatus);
+      const [presentationInstance, presentationOptions] = await getPresentationInstance(credentialStatus);
 
       presentationInstance.presBuilder.addAccumInfoForCredStatus(
         0,
@@ -730,11 +723,10 @@ describe.each(Schemes)(
       );
 
       // Derive a W3C Verifiable Credential JSON from the above presentation
-      const credentials =
-        await presentationInstance.deriveCredentials(presentationOptions);
+      const credentials = await presentationInstance.deriveCredentials(presentationOptions);
 
       expect(credentials.length).toEqual(1);
-      expect(credentials[0].issuer).toEqual(did1);
+      expect(credentials[0].issuer).toEqual(String(did1));
       expect(credentials[0].credentialStatus).toBeDefined();
       expect(credentials[0].credentialStatus).toEqual({
         ...credentialStatus,
@@ -786,8 +778,7 @@ describe.each(Schemes)(
         revocationCheck: MEM_CHECK_STR,
         revocationId: accumMember,
       };
-      const [presentationInstance, presentationOptions] =
-        await getPresentationInstance(credentialStatus);
+      const [presentationInstance, presentationOptions] = await getPresentationInstance(credentialStatus);
 
       presentationInstance.presBuilder.addAccumInfoForCredStatus(
         0,
@@ -799,15 +790,14 @@ describe.each(Schemes)(
       );
 
       // Derive a W3C Verifiable Credential JSON from the above presentation
-      const credentials =
-        await presentationInstance.deriveCredentials(presentationOptions);
+      const credentials = await presentationInstance.deriveCredentials(presentationOptions);
 
       const accAsU8 = AccumulatorModule.accumulatedFromHex(
         queriedAccum.accumulated,
         AccumulatorType.KBUni,
       );
       expect(credentials.length).toEqual(1);
-      expect(credentials[0].issuer).toEqual(did1);
+      expect(credentials[0].issuer).toEqual(String(did1));
       expect(credentials[0].credentialStatus).toBeDefined();
       expect(credentials[0].credentialStatus).toEqual({
         ...credentialStatus,
@@ -840,8 +830,7 @@ describe.each(Schemes)(
         revocationCheck: MEM_CHECK_KV_STR,
         revocationId: accumMember,
       };
-      const [presentationInstance, presentationOptions] =
-        await getPresentationInstance(credentialStatus);
+      const [presentationInstance, presentationOptions] = await getPresentationInstance(credentialStatus);
 
       presentationInstance.presBuilder.addAccumInfoForCredStatus(
         0,
@@ -853,15 +842,14 @@ describe.each(Schemes)(
       );
 
       // Derive a W3C Verifiable Credential JSON from the above presentation
-      const credentials =
-        await presentationInstance.deriveCredentials(presentationOptions);
+      const credentials = await presentationInstance.deriveCredentials(presentationOptions);
 
       const accAsU8 = AccumulatorModule.accumulatedFromHex(
         queriedAccum.accumulated,
         AccumulatorType.KBUni,
       );
       expect(credentials.length).toEqual(1);
-      expect(credentials[0].issuer).toEqual(did1);
+      expect(credentials[0].issuer).toEqual(String(did1));
       expect(credentials[0].credentialStatus).toBeDefined();
       expect(credentials[0].credentialStatus).toEqual({
         ...credentialStatus,
@@ -880,8 +868,8 @@ describe.each(Schemes)(
       );
     });
 
-    test("Holder creates a derived verifiable credential from a credential with range proofs", async () => {
-      const provingKeyId = "provingKeyId";
+    test('Holder creates a derived verifiable credential from a credential with range proofs', async () => {
+      const provingKeyId = 'provingKeyId';
       const pk = BoundCheckSnarkSetup();
       const provingKey = pk.decompress();
 
@@ -892,8 +880,8 @@ describe.each(Schemes)(
       };
 
       const presentationOptions = {
-        nonce: stringToU8a("noncetest"),
-        context: "my context",
+        nonce: stringToU8a('noncetest'),
+        context: 'my context',
       };
 
       // Create W3C credential
@@ -909,17 +897,17 @@ describe.each(Schemes)(
       // NOTE: revealing subject type because of JSON-LD processing for this certain credential
       // you may not always need to do this depending on your JSON-LD contexts
       await presentationInstance.addAttributeToReveal(idx, [
-        "credentialSubject.type.0",
+        'credentialSubject.type.0',
       ]);
       await presentationInstance.addAttributeToReveal(idx, [
-        "credentialSubject.type.1",
+        'credentialSubject.type.1',
       ]);
 
       // Enforce LPR number to be between values as well as revealed
       // NOTE: unlike other tests, we cannot "reveal" this value and enforce bounds at the same time!
       presentationInstance.presBuilder.enforceBounds(
         idx,
-        "credentialSubject.lprNumber",
+        'credentialSubject.lprNumber',
         1233,
         1235,
         provingKeyId,
@@ -930,16 +918,15 @@ describe.each(Schemes)(
       // NOTE: we dont need to set proving key value here (must still set ID though!) as its done above, should pass undefined
       presentationInstance.presBuilder.enforceBounds(
         idx,
-        "issuanceDate",
-        new Date("2019-10-01"),
-        new Date("2020-01-01"),
+        'issuanceDate',
+        new Date('2019-10-01'),
+        new Date('2020-01-01'),
         provingKeyId,
         undefined,
       );
 
       // Derive a W3C Verifiable Credential JSON from the above presentation
-      const credentials =
-        await presentationInstance.deriveCredentials(presentationOptions);
+      const credentials = await presentationInstance.deriveCredentials(presentationOptions);
       expect(credentials.length).toEqual(1);
       expect(credentials[0].proof).toBeDefined();
       expect(credentials[0].issuer).toEqual(credential.issuer);
@@ -949,8 +936,8 @@ describe.each(Schemes)(
           {
             min: 1569888000000,
             max: 1577836800000,
-            paramId: "provingKeyId",
-            protocol: "LegoGroth16",
+            paramId: 'provingKeyId',
+            protocol: 'LegoGroth16',
           },
         ],
         credentialSubject: {
@@ -958,13 +945,13 @@ describe.each(Schemes)(
             {
               min: 1233,
               max: 1235,
-              paramId: "provingKeyId",
-              protocol: "LegoGroth16",
+              paramId: 'provingKeyId',
+              protocol: 'LegoGroth16',
             },
           ],
         },
       });
-      expect(credentials[0]).toHaveProperty("credentialSubject");
+      expect(credentials[0]).toHaveProperty('credentialSubject');
       expect(credentials[0].credentialSubject).toMatchObject(
         expect.objectContaining({
           type: unsignedCred.credentialSubject.type,
@@ -988,7 +975,7 @@ describe.each(Schemes)(
       });
       if (credentialResult.error) {
         console.log(
-          "credentialResult.error",
+          'credentialResult.error',
           JSON.stringify(credentialResult.error, null, 2),
         );
       }

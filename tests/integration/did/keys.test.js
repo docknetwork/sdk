@@ -1,20 +1,20 @@
-import { randomAsHex } from "@polkadot/util-crypto";
-import { DockAPI, PublicKeySecp256k1 } from "../../../src";
-import { DockDid, DidKeypair } from "../../../src/utils/did";
+import { randomAsHex } from '@polkadot/util-crypto';
+import { DockAPI, PublicKeySecp256k1 } from '../../../src';
+import { DockDid, DidKeypair } from '../../../src/utils/did';
 import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
-} from "../../test-constants";
+} from '../../test-constants';
 import {
   generateEcdsaSecp256k1Keypair,
   getPublicKeyFromKeyringPair,
-} from "../../../src/utils/misc";
-import { DidKey, VerificationRelationship } from "../../../src/public-keys";
-import { checkVerificationMethods } from "../helpers";
-import PublicKeyX25519 from "../../../src/public-keys/public-key-x25519";
+} from '../../../src/utils/misc';
+import { DidKey, VerificationRelationship } from '../../../src/public-keys';
+import { checkVerificationMethods } from '../helpers';
+import PublicKeyX25519 from '../../../src/public-keys/public-key-x25519';
 
-describe("Key support for DIDs", () => {
+describe('Key support for DIDs', () => {
   const dock = new DockAPI();
 
   // Generate a random DID
@@ -41,18 +41,18 @@ describe("Key support for DIDs", () => {
     await dock.disconnect();
   }, 10000);
 
-  test("Create a DID with many keys", async () => {
+  test('Create a DID with many keys', async () => {
     const pair1 = dock.keyring.addFromUri(seed1);
     const publicKey1 = getPublicKeyFromKeyringPair(pair1);
     const verRels1 = new VerificationRelationship();
     const didKey1 = new DidKey(publicKey1, verRels1);
 
-    const pair2 = dock.keyring.addFromUri(seed2, null, "ed25519");
+    const pair2 = dock.keyring.addFromUri(seed2, null, 'ed25519');
     const publicKey2 = getPublicKeyFromKeyringPair(pair2);
     const verRels2 = new VerificationRelationship();
     const didKey2 = new DidKey(publicKey2, verRels2);
 
-    const pair3 = dock.keyring.addFromUri(seed3, null, "ed25519");
+    const pair3 = dock.keyring.addFromUri(seed3, null, 'ed25519');
     const publicKey3 = getPublicKeyFromKeyringPair(pair3);
     const verRels3 = new VerificationRelationship();
     verRels3.setAssertion();
@@ -89,7 +89,7 @@ describe("Key support for DIDs", () => {
     expect(dk.verRels.isKeyAgreement()).toEqual(false);
   });
 
-  test("Get DID document", async () => {
+  test('Get DID document', async () => {
     function check(doc) {
       expect(doc.controller.length).toEqual(1);
       checkVerificationMethods(dockDid, doc, 3, 0);
@@ -122,7 +122,7 @@ describe("Key support for DIDs", () => {
     check(doc2);
   });
 
-  test("Add more keys to DID", async () => {
+  test('Add more keys to DID', async () => {
     const pair1 = generateEcdsaSecp256k1Keypair(seed4);
     const publicKey1 = PublicKeySecp256k1.fromKeyringPair(pair1);
     const verRels1 = new VerificationRelationship();
@@ -131,7 +131,7 @@ describe("Key support for DIDs", () => {
     const didKey1 = new DidKey(publicKey1, verRels1);
 
     const pair = new DidKeypair(
-      dock.keyring.addFromUri(seed2, null, "ed25519"),
+      dock.keyring.addFromUri(seed2, null, 'ed25519'),
       2,
     );
     await dock.did.addKeys([didKey1], dockDid, dockDid, pair);
@@ -149,7 +149,7 @@ describe("Key support for DIDs", () => {
     expect(dk1.verRels.isKeyAgreement()).toEqual(false);
   });
 
-  test("Get DID document after key addition", async () => {
+  test('Get DID document after key addition', async () => {
     function check(doc) {
       expect(doc.controller.length).toEqual(1);
 
@@ -189,7 +189,7 @@ describe("Key support for DIDs", () => {
     check(doc2);
   });
 
-  test("Remove keys from DID", async () => {
+  test('Remove keys from DID', async () => {
     const pair = new DidKeypair(generateEcdsaSecp256k1Keypair(seed4), 4);
     await dock.did.removeKeys([1, 3], dockDid, dockDid, pair);
 
@@ -201,7 +201,7 @@ describe("Key support for DIDs", () => {
     await expect(dock.did.getDidKey(dockDid, 1)).rejects.toThrow();
     await expect(dock.did.getDidKey(dockDid, 3)).rejects.toThrow();
 
-    const pair2 = dock.keyring.addFromUri(seed2, null, "ed25519");
+    const pair2 = dock.keyring.addFromUri(seed2, null, 'ed25519');
     const publicKey2 = getPublicKeyFromKeyringPair(pair2);
     const dk2 = await dock.did.getDidKey(dockDid, 2);
     expect(dk2.publicKey).toEqual(publicKey2);
@@ -220,7 +220,7 @@ describe("Key support for DIDs", () => {
     expect(dk4.verRels.isKeyAgreement()).toEqual(false);
   });
 
-  test("Get DID document after key removal", async () => {
+  test('Get DID document after key removal', async () => {
     function check(doc) {
       expect(doc.controller.length).toEqual(1);
       checkVerificationMethods(dockDid, doc, 2, 0, 2);
@@ -242,7 +242,7 @@ describe("Key support for DIDs", () => {
     check(doc2);
   });
 
-  test("Add x25519 key-agreement to DID", async () => {
+  test('Add x25519 key-agreement to DID', async () => {
     const verRels = new VerificationRelationship();
     verRels.setKeyAgreement();
     // Generating a random X25519 public key
@@ -250,7 +250,7 @@ describe("Key support for DIDs", () => {
     const didKey = new DidKey(publicKey, verRels);
 
     const pair = new DidKeypair(
-      dock.keyring.addFromUri(seed2, null, "ed25519"),
+      dock.keyring.addFromUri(seed2, null, 'ed25519'),
       2,
     );
     await dock.did.addKeys([didKey], dockDid, dockDid, pair);

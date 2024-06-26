@@ -1,5 +1,7 @@
-import { randomAsHex } from "@polkadot/util-crypto";
-import { hexToU8a, stringToHex, stringToU8a, u8aToHex } from "@polkadot/util";
+import { randomAsHex } from '@polkadot/util-crypto';
+import {
+  hexToU8a, stringToHex, stringToU8a, u8aToHex,
+} from '@polkadot/util';
 
 import {
   Statement,
@@ -16,18 +18,18 @@ import {
   QuasiProofSpec,
   BoundCheckSnarkSetup,
   initializeWasm,
-} from "@docknetwork/crypto-wasm-ts";
+} from '@docknetwork/crypto-wasm-ts';
 
-import { DockAPI } from "../../../src";
+import { DockAPI } from '../../../src';
 import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
   Schemes,
-} from "../../test-constants";
-import { DockDid, DidKeypair } from "../../../src/utils/did";
-import { getRevealedUnrevealed } from "./utils";
-import { registerNewDIDUsingPair } from "../helpers";
+} from '../../test-constants';
+import { DockDid, DidKeypair } from '../../../src/utils/did';
+import { getRevealedUnrevealed } from './utils';
+import { registerNewDIDUsingPair } from '../helpers';
 
 for (const {
   Name,
@@ -41,7 +43,7 @@ for (const {
   buildWitness,
   getModule,
 } of Schemes) {
-  const isKvac = Name === "BDDT16";
+  const isKvac = Name === 'BDDT16';
   const skipIfKvac = isKvac ? describe.skip : describe;
   skipIfKvac(
     `${Name} Complete demo of verifiable encryption using SAVER and bound check using LegoGroth16`,
@@ -63,11 +65,11 @@ for (const {
 
       // User's attributes which will be signed by the issuer of the credential
       const attributes = [
-        stringToU8a("John"), // First name
-        stringToU8a("Smith"), // Last name
+        stringToU8a('John'), // First name
+        stringToU8a('Smith'), // Last name
         10000, // Salary
-        stringToU8a("New York"), // City
-        "129086521911", // SSN
+        stringToU8a('New York'), // City
+        '129086521911', // SSN
       ];
       const attributeCount = attributes.length;
 
@@ -113,8 +115,8 @@ for (const {
         await initializeWasm();
       }, 20000);
 
-      test("Create params and keys", async () => {
-        const label = stringToHex("My params");
+      test('Create params and keys', async () => {
+        const label = stringToHex('My params');
         const sigParams = SignatureParams.generate(
           attributeCount,
           hexToU8a(label),
@@ -128,8 +130,7 @@ for (const {
           { didModule: dock.didModule },
           false,
         );
-        const paramsWritten =
-          await getModule(dock).getLastParamsWritten(issuerDid);
+        const paramsWritten = await getModule(dock).getLastParamsWritten(issuerDid);
         expect(paramsWritten.bytes).toEqual(params.bytes);
         expect(paramsWritten.label).toEqual(params.label);
 
@@ -150,7 +151,7 @@ for (const {
         );
       }, 10000);
 
-      test("Sign attributes, i.e. issue credential", async () => {
+      test('Sign attributes, i.e. issue credential', async () => {
         const encodedAttrs = encodedAttributes(attributes);
         const queriedPk = await getModule(dock).getPublicKey(
           issuerDid,
@@ -181,7 +182,7 @@ for (const {
         expect(result.verified).toEqual(true);
       });
 
-      test("Setup for decryptor", async () => {
+      test('Setup for decryptor', async () => {
         encryptionGens = SaverEncryptionGens.generate();
         [snarkPk, , encryptionKey] = SaverDecryptor.setup(
           encryptionGens,
@@ -189,10 +190,10 @@ for (const {
         );
       }, 20000);
 
-      test("Encrypt attribute and prove verifiably encrypted", async () => {
+      test('Encrypt attribute and prove verifiably encrypted', async () => {
         // Verifier creates and shares with the prover
         const gens = SaverChunkedCommitmentKey.generate(
-          hexToU8a(stringToHex("some label")),
+          hexToU8a(stringToHex('some label')),
         );
         const commGens = gens.decompress();
 
@@ -223,15 +224,14 @@ for (const {
           revealedAttrIndices,
         );
 
-        const statement1 =
-          "adaptForLess" in sigPk
-            ? buildProverStatement(
-                sigParams,
-                sigPk.adaptForLess(sigParams.supportedMessageCount()),
-                revealedAttrs,
-                false,
-              )
-            : buildProverStatement(sigParams, revealedAttrs, false);
+        const statement1 = 'adaptForLess' in sigPk
+          ? buildProverStatement(
+            sigParams,
+            sigPk.adaptForLess(sigParams.supportedMessageCount()),
+            revealedAttrs,
+            false,
+          )
+          : buildProverStatement(sigParams, revealedAttrs, false);
         const statement2 = Statement.saverProver(
           encGens,
           commGens,
@@ -276,13 +276,13 @@ for (const {
         );
         const statement4 = !isKvac
           ? buildVerifierStatement(
-              sigParams,
-              "adaptForLess" in sigPk
-                ? sigPk.adaptForLess(sigParams.supportedMessageCount())
-                : sigPk,
-              revealedAttrs,
-              false,
-            )
+            sigParams,
+            'adaptForLess' in sigPk
+              ? sigPk.adaptForLess(sigParams.supportedMessageCount())
+              : sigPk,
+            revealedAttrs,
+            false,
+          )
           : buildVerifierStatement(sigParams, revealedAttrs, false);
         const verifierStatements = new Statements();
         verifierStatements.add(statement4);
@@ -297,7 +297,7 @@ for (const {
         ).toEqual(true);
       }, 180000);
 
-      test("Prove bounded message", async () => {
+      test('Prove bounded message', async () => {
         // Verifier does setup and shares proving key with prover. This key does not need to be published on chain.
         const pk = BoundCheckSnarkSetup();
 
@@ -328,15 +328,14 @@ for (const {
           revealedAttrIndices,
         );
 
-        const statement1 =
-          "adaptForLess" in sigPk
-            ? buildProverStatement(
-                sigParams,
-                sigPk.adaptForLess(sigParams.supportedMessageCount()),
-                revealedAttrs,
-                false,
-              )
-            : buildProverStatement(sigParams, revealedAttrs, false);
+        const statement1 = 'adaptForLess' in sigPk
+          ? buildProverStatement(
+            sigParams,
+            sigPk.adaptForLess(sigParams.supportedMessageCount()),
+            revealedAttrs,
+            false,
+          )
+          : buildProverStatement(sigParams, revealedAttrs, false);
         const statement2 = Statement.boundCheckLegoProver(
           min,
           max,
@@ -377,13 +376,13 @@ for (const {
         );
         const statement4 = !isKvac
           ? buildVerifierStatement(
-              sigParams,
-              "adaptForLess" in sigPk
-                ? sigPk.adaptForLess(sigParams.supportedMessageCount())
-                : sigPk,
-              revealedAttrs,
-              false,
-            )
+            sigParams,
+            'adaptForLess' in sigPk
+              ? sigPk.adaptForLess(sigParams.supportedMessageCount())
+              : sigPk,
+            revealedAttrs,
+            false,
+          )
           : buildVerifierStatement(sigParams, revealedAttrs, false);
         const verifierStatements = new Statements();
         verifierStatements.add(statement4);

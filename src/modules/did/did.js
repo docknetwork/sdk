@@ -1,7 +1,7 @@
-import { encodeAddress } from "@polkadot/util-crypto";
-import { u8aToString, hexToU8a, u8aToHex } from "@polkadot/util";
-import { BTreeSet } from "@polkadot/types";
-import b58 from "bs58";
+import { encodeAddress } from '@polkadot/util-crypto';
+import { u8aToString, hexToU8a, u8aToHex } from '@polkadot/util';
+import { BTreeSet } from '@polkadot/types';
+import b58 from 'bs58';
 import {
   DockDidOrDidMethodKey,
   DockDIDQualifier,
@@ -11,10 +11,10 @@ import {
   NoOffchainDIDError,
   createDidSig,
   DidMethodKeyQualifier,
-} from "../../utils/did";
-import { getStateChange } from "../../utils/misc";
+} from '../../utils/did';
+import { getStateChange } from '../../utils/misc';
 
-import OffChainDidDocRef from "./offchain-did-doc-ref";
+import OffChainDidDocRef from './offchain-did-doc-ref';
 import {
   PublicKeyEd25519,
   PublicKeySecp256k1,
@@ -22,12 +22,11 @@ import {
   PublicKeyX25519,
   DidKey,
   VerificationRelationship,
-} from "../../public-keys";
-import { ServiceEndpointType } from "./service-endpoint";
-import WithParamsAndPublicKeys from "../WithParamsAndPublicKeys";
+} from '../../public-keys';
+import { ServiceEndpointType } from './service-endpoint';
+import WithParamsAndPublicKeys from '../WithParamsAndPublicKeys';
 
-export const ATTESTS_IRI =
-  "https://rdf.dock.io/alpha/2021#attestsDocumentContents";
+export const ATTESTS_IRI = 'https://rdf.dock.io/alpha/2021#attestsDocumentContents';
 
 const valuePropOrIdentity = (val) => val.value || val;
 
@@ -137,7 +136,7 @@ class DIDModule {
    * @return {object} The extrinsic to sign and send.
    */
   createNewOnchainTx(did, didKeys, controllers) {
-    const cnts = new BTreeSet(this.api.registry, "Controller");
+    const cnts = new BTreeSet(this.api.registry, 'Controller');
     if (controllers !== undefined) {
       controllers.forEach((c) => {
         cnts.add(DockDidOrDidMethodKey.from(c));
@@ -335,16 +334,15 @@ class DIDModule {
   ) {
     const targetHexDid = DockDidOrDidMethodKey.from(targetDid).asDid;
     const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
-    const [addServiceEndpoint, signature] =
-      await this.createSignedAddServiceEndpoint(
-        endpointId,
-        endpointType,
-        origins,
-        targetHexDid,
-        signerHexDid,
-        signingKeyRef,
-        nonce,
-      );
+    const [addServiceEndpoint, signature] = await this.createSignedAddServiceEndpoint(
+      endpointId,
+      endpointType,
+      origins,
+      targetHexDid,
+      signerHexDid,
+      signingKeyRef,
+      nonce,
+    );
     return this.module.addServiceEndpoint(addServiceEndpoint, signature);
   }
 
@@ -464,14 +462,13 @@ class DIDModule {
   ) {
     const targetHexDid = DockDidOrDidMethodKey.from(targetDid).asDid;
     const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
-    const [removeControllers, signature] =
-      await this.createSignedRemoveControllers(
-        controllers,
-        targetHexDid,
-        signerHexDid,
-        signingKeyRef,
-        nonce,
-      );
+    const [removeControllers, signature] = await this.createSignedRemoveControllers(
+      controllers,
+      targetHexDid,
+      signerHexDid,
+      signingKeyRef,
+      nonce,
+    );
     return this.module.removeControllers(removeControllers, signature);
   }
 
@@ -525,14 +522,13 @@ class DIDModule {
   ) {
     const targetHexDid = DockDidOrDidMethodKey.from(targetDid).asDid;
     const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
-    const [removeServiceEndpoint, signature] =
-      await this.createSignedRemoveServiceEndpoint(
-        endpointId,
-        targetHexDid,
-        signerHexDid,
-        signingKeyRef,
-        nonce,
-      );
+    const [removeServiceEndpoint, signature] = await this.createSignedRemoveServiceEndpoint(
+      endpointId,
+      targetHexDid,
+      signerHexDid,
+      signingKeyRef,
+      nonce,
+    );
     return this.module.removeServiceEndpoint(removeServiceEndpoint, signature);
   }
 
@@ -715,14 +711,12 @@ class DIDModule {
     const attests = await this.getAttests(typedDid);
 
     // If given DID was in hex, encode to SS58 and then construct fully qualified DID else the DID was already fully qualified
-    const id =
-      did === hexDid ? this.getFullyQualifiedDID(encodeAddress(hexDid)) : did;
+    const id = did === hexDid ? this.getFullyQualifiedDID(encodeAddress(hexDid)) : did;
 
     // Get controllers
     const controllers = [];
     if (didDetails.activeControllers > 0) {
-      const cnts =
-        await this.api.query.didModule.didControllers.entries(hexDid);
+      const cnts = await this.api.query.didModule.didControllers.entries(hexDid);
       cnts.forEach(([key, value]) => {
         if (value.isSome) {
           const [controlled, controller] = key.toHuman();
@@ -738,8 +732,7 @@ class DIDModule {
 
     // Get service endpoints
     const serviceEndpoints = [];
-    const sps =
-      await this.api.query.didModule.didServiceEndpoints.entries(hexDid);
+    const sps = await this.api.query.didModule.didServiceEndpoints.entries(hexDid);
     sps.forEach(([key, value]) => {
       if (value.isSome) {
         const sp = value.unwrap();
@@ -781,16 +774,16 @@ class DIDModule {
           let publicKeyRaw;
           let typ;
           if (pk.isSr25519) {
-            typ = "Sr25519VerificationKey2020";
+            typ = 'Sr25519VerificationKey2020';
             publicKeyRaw = valuePropOrIdentity(pk.asSr25519);
           } else if (pk.isEd25519) {
-            typ = "Ed25519VerificationKey2018";
+            typ = 'Ed25519VerificationKey2018';
             publicKeyRaw = valuePropOrIdentity(pk.asEd25519);
           } else if (pk.isSecp256k1) {
-            typ = "EcdsaSecp256k1VerificationKey2019";
+            typ = 'EcdsaSecp256k1VerificationKey2019';
             publicKeyRaw = valuePropOrIdentity(pk.asSecp256k1);
           } else if (pk.isX25519) {
-            typ = "X25519KeyAgreementKey2019";
+            typ = 'X25519KeyAgreementKey2019';
             publicKeyRaw = valuePropOrIdentity(pk.asX25519);
           } else {
             throw new Error(`Cannot parse public key ${pk}`);
@@ -834,8 +827,7 @@ class DIDModule {
           queryKeys.push([hexDid, k]);
         }
         if (this.api.query.offchainSignatures != null) {
-          const resp =
-            await this.api.query.offchainSignatures.publicKeys.multi(queryKeys);
+          const resp = await this.api.query.offchainSignatures.publicKeys.multi(queryKeys);
           let currentIter = 0;
           for (let r of resp) {
             // The gaps in `keyId` might correspond to removed keys
@@ -845,22 +837,21 @@ class DIDModule {
               r = r.unwrap();
 
               if (r.isBbs) {
-                keyType = "Bls12381BBSVerificationKeyDock2023";
+                keyType = 'Bls12381BBSVerificationKeyDock2023';
                 rawKey = r.asBbs;
               } else if (r.isBbsPlus) {
-                keyType = "Bls12381G2VerificationKeyDock2022";
+                keyType = 'Bls12381G2VerificationKeyDock2022';
                 rawKey = r.asBbsPlus;
               } else if (r.isPs) {
-                keyType = "Bls12381PSVerificationKeyDock2023";
+                keyType = 'Bls12381PSVerificationKeyDock2023';
                 rawKey = r.asPs;
               }
               // Don't care about signature params for now
-              const pkObj =
-                WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(
-                  this.api,
-                  rawKey,
-                );
-              if (pkObj.curveType !== "Bls12381") {
+              const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(
+                this.api,
+                rawKey,
+              );
+              if (pkObj.curveType !== 'Bls12381') {
                 throw new Error(
                   `Curve type should have been Bls12381 but was ${pkObj.curveType}`,
                 );
@@ -872,22 +863,20 @@ class DIDModule {
             currentIter++;
           }
         } else {
-          const resp =
-            await this.api.query.bbsPlus.bbsPlusKeys.multi(queryKeys);
+          const resp = await this.api.query.bbsPlus.bbsPlusKeys.multi(queryKeys);
           let currentIter = 0;
           for (const r of resp) {
             // The gaps in `keyId` might correspond to removed keys
             if (r.isSome) {
-              const keyType = "Bls12381G2VerificationKeyDock2022";
+              const keyType = 'Bls12381G2VerificationKeyDock2022';
               const rawKey = r.unwrap();
 
               // Don't care about signature params for now
-              const pkObj =
-                WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(
-                  this.api,
-                  rawKey,
-                );
-              if (pkObj.curveType !== "Bls12381") {
+              const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(
+                this.api,
+                rawKey,
+              );
+              if (pkObj.curveType !== 'Bls12381') {
                 throw new Error(
                   `Curve type should have been Bls12381 but was ${pkObj.curveType}`,
                 );
@@ -921,7 +910,7 @@ class DIDModule {
 
     // Construct document
     const document = {
-      "@context": ["https://www.w3.org/ns/did/v1"],
+      '@context': ['https://www.w3.org/ns/did/v1'],
       id,
       controller: [...controllers].map((c) => {
         if (c.Did) {
@@ -961,7 +950,7 @@ class DIDModule {
         }
         return {
           id: decoder.decode(spId),
-          type: "LinkedDomains",
+          type: 'LinkedDomains',
           serviceEndpoint: sp.origins.map((o) => decoder.decode(o)),
         };
       });
@@ -1186,13 +1175,12 @@ class DIDModule {
       nonce = await this.getNextNonceForDid(controllerHexDid);
     }
 
-    const cnts = new BTreeSet(this.api.registry, "Controller");
+    const cnts = new BTreeSet(this.api.registry, 'Controller');
     controllers.forEach((c) => {
       cnts.add(DockDidOrDidMethodKey.from(c));
     });
     const addControllers = { did: hexDid, controllers: cnts, nonce };
-    const serializedAddControllers =
-      this.getSerializedAddControllers(addControllers);
+    const serializedAddControllers = this.getSerializedAddControllers(addControllers);
     const signature = signingKeyRef.sign(serializedAddControllers);
     const didSig = createDidSig(controllerHexDid, signingKeyRef, signature);
     return [addControllers, didSig];
@@ -1219,8 +1207,7 @@ class DIDModule {
       endpoint,
       nonce,
     };
-    const serializedServiceEndpoint =
-      this.getSerializedAddServiceEndpoint(addServiceEndpoint);
+    const serializedServiceEndpoint = this.getSerializedAddServiceEndpoint(addServiceEndpoint);
     const signature = signingKeyRef.sign(serializedServiceEndpoint);
     const didSig = createDidSig(controllerHexDid, signingKeyRef, signature);
     return [addServiceEndpoint, didSig];
@@ -1238,7 +1225,7 @@ class DIDModule {
       nonce = await this.getNextNonceForDid(controllerHexDid);
     }
 
-    const keys = new BTreeSet(this.api.registry, "DidKey");
+    const keys = new BTreeSet(this.api.registry, 'DidKey');
     keyIds.forEach((k) => {
       keys.add(k);
     });
@@ -1261,14 +1248,13 @@ class DIDModule {
       nonce = await this.getNextNonceForDid(controllerHexDid);
     }
 
-    const cnts = new BTreeSet(this.api.registry, "Controller");
+    const cnts = new BTreeSet(this.api.registry, 'Controller');
     controllers.forEach((c) => {
       cnts.add(DockDidOrDidMethodKey.from(c));
     });
 
     const removeControllers = { did: hexDid, controllers: cnts, nonce };
-    const serializedRemoveControllers =
-      this.getSerializedRemoveControllers(removeControllers);
+    const serializedRemoveControllers = this.getSerializedRemoveControllers(removeControllers);
     const signature = signingKeyRef.sign(serializedRemoveControllers);
     const didSig = createDidSig(controllerHexDid, signingKeyRef, signature);
     return [removeControllers, didSig];
@@ -1287,8 +1273,7 @@ class DIDModule {
     }
 
     const removeServiceEndpoint = { did: hexDid, id: endpointId, nonce };
-    const serializedRemoveServiceEndpoint =
-      this.getSerializedRemoveServiceEndpoint(removeServiceEndpoint);
+    const serializedRemoveServiceEndpoint = this.getSerializedRemoveServiceEndpoint(removeServiceEndpoint);
     const signature = signingKeyRef.sign(serializedRemoveServiceEndpoint);
     const didSig = createDidSig(controllerHexDid, signingKeyRef, signature);
     return [removeServiceEndpoint, didSig];
@@ -1342,29 +1327,29 @@ class DIDModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedAddKeys(addKeys) {
-    return getStateChange(this.api, "AddKeys", addKeys);
+    return getStateChange(this.api, 'AddKeys', addKeys);
   }
 
   getSerializedAddControllers(addControllers) {
-    return getStateChange(this.api, "AddControllers", addControllers);
+    return getStateChange(this.api, 'AddControllers', addControllers);
   }
 
   getSerializedAddServiceEndpoint(addServiceEndpoint) {
-    return getStateChange(this.api, "AddServiceEndpoint", addServiceEndpoint);
+    return getStateChange(this.api, 'AddServiceEndpoint', addServiceEndpoint);
   }
 
   getSerializedRemoveKeys(removeKeys) {
-    return getStateChange(this.api, "RemoveKeys", removeKeys);
+    return getStateChange(this.api, 'RemoveKeys', removeKeys);
   }
 
   getSerializedRemoveControllers(removeControllers) {
-    return getStateChange(this.api, "RemoveControllers", removeControllers);
+    return getStateChange(this.api, 'RemoveControllers', removeControllers);
   }
 
   getSerializedRemoveServiceEndpoint(removeServiceEndpoint) {
     return getStateChange(
       this.api,
-      "RemoveServiceEndpoint",
+      'RemoveServiceEndpoint',
       removeServiceEndpoint,
     );
   }
@@ -1375,7 +1360,7 @@ class DIDModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedDidRemoval(didRemoval) {
-    return getStateChange(this.api, "DidRemoval", didRemoval);
+    return getStateChange(this.api, 'DidRemoval', didRemoval);
   }
 
   /**
@@ -1384,7 +1369,7 @@ class DIDModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedAttestation(setAttestation) {
-    return getStateChange(this.api, "SetAttestationClaim", setAttestation);
+    return getStateChange(this.api, 'SetAttestationClaim', setAttestation);
   }
 }
 

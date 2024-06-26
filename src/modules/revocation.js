@@ -1,4 +1,4 @@
-import { getDidNonce, getStateChange } from "../utils/misc";
+import { getDidNonce, getStateChange } from '../utils/misc';
 
 import { createDidSig, DockDidOrDidMethodKey } from "../utils/did"; // eslint-disable-line
 
@@ -366,7 +366,7 @@ class RevocationModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedRevoke(revoke) {
-    return getStateChange(this.api, "Revoke", revoke);
+    return getStateChange(this.api, 'Revoke', revoke);
   }
 
   /**
@@ -375,7 +375,7 @@ class RevocationModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedUnrevoke(unrevoke) {
-    return getStateChange(this.api, "UnRevoke", unrevoke);
+    return getStateChange(this.api, 'UnRevoke', unrevoke);
   }
 
   /**
@@ -384,7 +384,7 @@ class RevocationModule {
    * @returns {Array} An array of Uint8
    */
   getSerializedRemoveRegistry(removeReg) {
-    return getStateChange(this.api, "RemoveRegistry", removeReg);
+    return getStateChange(this.api, 'RemoveRegistry', removeReg);
   }
 }
 

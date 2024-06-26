@@ -1,37 +1,39 @@
-import { randomAsHex } from "@polkadot/util-crypto";
-import { u8aToHex } from "@polkadot/util";
+import { randomAsHex } from '@polkadot/util-crypto';
+import { u8aToHex } from '@polkadot/util';
 import {
   DefaultSchemaParsingOpts,
   CredentialBuilder,
   CredentialSchema,
   initializeWasm,
-} from "@docknetwork/crypto-wasm-ts";
-import { DockAPI } from "../../../src";
-import { DockDid, DidKeypair } from "../../../src/utils/did";
-import { DockResolver } from "../../../src/resolver";
+} from '@docknetwork/crypto-wasm-ts';
+import { DockAPI } from '../../../src';
+import { DockDid, DidKeypair } from '../../../src/utils/did';
+import { DockResolver } from '../../../src/resolver';
 import {
   registerNewDIDUsingPair,
   getCredMatcherDoc,
   getProofMatcherDoc,
-} from "../helpers";
-import { issueCredential, verifyCredential } from "../../../src/utils/vc/index";
-import { getKeyDoc } from "../../../src/utils/vc/helpers";
-import { getJsonSchemaFromCredential } from "../../../src/utils/vc/credentials";
+} from '../helpers';
+import { issueCredential, verifyCredential } from '../../../src/utils/vc/index';
+import { getKeyDoc } from '../../../src/utils/vc/helpers';
+import { getJsonSchemaFromCredential } from '../../../src/utils/vc/credentials';
 import {
   getResidentCardCredentialAndSchema,
   setupExternalSchema,
-} from "./utils";
+} from './utils';
 import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
   Schemes,
-} from "../../test-constants";
-import defaultDocumentLoader from "../../../src/utils/vc/document-loader";
+} from '../../test-constants';
+import defaultDocumentLoader from '../../../src/utils/vc/document-loader';
 
 describe.each(Schemes)(
-  "Issuance",
-  ({ Name, Module, Context, CryptoKeyPair, getModule, VerKey, SigType }) => {
+  'Issuance',
+  ({
+    Name, Module, Context, CryptoKeyPair, getModule, VerKey, SigType,
+  }) => {
     const dock = new DockAPI();
     const resolver = new DockResolver(dock);
     let account;
@@ -40,8 +42,7 @@ describe.each(Schemes)(
     let chainModule;
     let keypair;
 
-    const [credentialJSON, residentCardSchema] =
-      getResidentCardCredentialAndSchema(Context);
+    const [credentialJSON, residentCardSchema] = getResidentCardCredentialAndSchema(Context);
 
     beforeAll(async () => {
       await initializeWasm();
@@ -63,7 +64,7 @@ describe.each(Schemes)(
         msgCount: 100,
       });
 
-      if (Name !== "BDDT16") {
+      if (Name !== 'BDDT16') {
         const pk1 = Module.prepareAddPublicKey(
           dock.api,
           u8aToHex(keypair.publicKeyBuffer),
@@ -87,14 +88,14 @@ describe.each(Schemes)(
       } else {
         // For KVAC, the public doesn't need to published as its not used in credential or presentation verification (except issuers).
         // But the signer still adds a key identifier in the credential to determine which key will be used for verification
-        keypair.id = "my-key-id";
+        keypair.id = 'my-key-id';
       }
     }, 30000);
 
     test(`Can issue+verify a ${Name} credential with external schema reference`, async () => {
       const [externalSchemaEncoded, schemaId] = await setupExternalSchema(
         residentCardSchema,
-        "Resident Card Example",
+        'Resident Card Example',
         did1,
         pair1,
         dock,
@@ -103,7 +104,7 @@ describe.each(Schemes)(
       const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
       const unsignedCred = {
         ...credentialJSON,
-        issuer: did1.toQualifiedEncodedString(),
+        issuer: String(did1),
       };
       unsignedCred.credentialSchema = externalSchemaEncoded;
 
@@ -156,7 +157,7 @@ describe.each(Schemes)(
       const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
       const unsignedCred = {
         ...credentialJSON,
-        issuer: did1.toQualifiedEncodedString(),
+        issuer: String(did1),
       };
 
       const credential = await issueCredential(issuerKey, unsignedCred);
@@ -208,7 +209,7 @@ describe.each(Schemes)(
       const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
       const unsignedCred = {
         ...credentialJSON,
-        issuer: did1.toQualifiedEncodedString(),
+        issuer: String(did1),
       };
       delete unsignedCred.credentialSchema;
 
@@ -266,12 +267,12 @@ describe.each(Schemes)(
       const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
       const unsignedCred = {
         ...credentialJSON,
-        issuer: did1.toQualifiedEncodedString(),
+        issuer: String(did1),
       };
 
       unsignedCred.credentialSchema = {
-        id: "",
-        type: "JsonSchemaValidator2018",
+        id: '',
+        type: 'JsonSchemaValidator2018',
         parsingOptions,
       };
 
@@ -302,14 +303,14 @@ describe.each(Schemes)(
         ...credentialJSON,
         credentialSchema: {
           id: credentialJSON.credentialSchema.id,
-          type: "JsonSchemaValidator2018",
+          type: 'JsonSchemaValidator2018',
           parsingOptions,
         },
-        issuer: did1.toQualifiedEncodedString(),
+        issuer: String(did1),
       };
 
       expect(unsignedCred.credentialSchema.id).toBeDefined();
-      expect(unsignedCred.credentialSchema.id).not.toEqual("");
+      expect(unsignedCred.credentialSchema.id).not.toEqual('');
 
       const credential = await issueCredential(issuerKey, unsignedCred);
 

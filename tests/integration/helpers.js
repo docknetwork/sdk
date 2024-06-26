@@ -48,7 +48,7 @@ export function getUnsignedCred(credId, holderDID, additionalContext = []) {
     type: ['VerifiableCredential', 'AlumniCredential'],
     issuanceDate: '2020-03-18T19:23:24Z',
     credentialSubject: {
-      id: holderDID,
+      id: String(holderDID),
       alumniOf: 'Example University',
     },
   };

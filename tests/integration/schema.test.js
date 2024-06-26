@@ -114,7 +114,7 @@ describe('Schema Blob Module Integration', () => {
     validCredential.addContext(ctx1);
     validCredential.addType('AlumniCredential');
     validCredential.addSubject({
-      id: dockDID,
+      id: String(dockDID),
       alumniOf: 'Example University',
       emailAddress: 'john@gmail.com',
     });
@@ -134,7 +134,7 @@ describe('Schema Blob Module Integration', () => {
     invalidCredential.addContext(ctx2);
     invalidCredential.addType('AlumniCredential');
     invalidCredential.addSubject({
-      id: dockDID,
+      id: String(dockDID),
       notAlumniOf: 'Example University',
       emailAddress: 'john@gmail.com',
     });

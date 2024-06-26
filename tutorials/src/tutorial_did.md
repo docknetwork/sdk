@@ -18,9 +18,9 @@ This is done for replay protection but this detail however is hidden in the API 
 ## DID creation
 Create a new random DID.
 ```js
-import {createNewDockDID} from '@docknetwork/sdk/utils/did';
+import {DockDid} from '@docknetwork/sdk/utils/did';
 
-const did = createNewDockDID();
+const did = DockDid.random();
 ```
 
 The DID is not yet registered on the chain. Before the DID can be registered, a public key needs to created as well.

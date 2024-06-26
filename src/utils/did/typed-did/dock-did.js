@@ -1,4 +1,5 @@
 import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
+import { u8aToHex } from '@polkadot/util';
 import { getHexIdentifier } from '../../codec';
 
 import { validateDockDIDHexIdentifier } from '../utils';
@@ -56,7 +57,7 @@ export default class DockDid extends DockDidOrDidMethodKey {
    * @returns {DockDid}
    */
   static fromSubstrateValue(did) {
-    return new this(did.asDid);
+    return new this(u8aToHex(did.asDid));
   }
 
   get isDid() {

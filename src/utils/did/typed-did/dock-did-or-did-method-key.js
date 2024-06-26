@@ -24,7 +24,7 @@ class DockDidOrDidMethodKey {
   static DidMethodKey;
 
   /**
-   * Checks whether provided string is qualified.
+   * Checks whether provided string is qualified according to the caller class.
    * @param {string} did
    * @returns {boolean}
    */
@@ -68,12 +68,15 @@ class DockDidOrDidMethodKey {
   }
 
   /**
-   * Attempts to parse provided DID as an object or string.
+   * Attempts to instantiate `DockDid` or `DidMethodKey` from the provided object or string.
+   *
    * @param {string|DockDid|DidMethodKey|object} did
    * @returns {DockDid|DidMethodKey}
    */
   static from(did) {
-    if (typeof did === 'object') {
+    if (!did) {
+      throw new Error(`Invalid DID: ${did}`);
+    } else if (typeof did === 'object') {
       if (did instanceof this) {
         return did;
       } else {

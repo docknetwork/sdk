@@ -129,7 +129,7 @@ describe('Accumulator Module', () => {
     const params = Accumulator.generateParams();
     let keypair = Accumulator.generateKeypair(params);
     const bytes1 = u8aToHex(keypair.publicKey.bytes);
-    const pk1 = chainModuleClass.prepareAddPublicKey(dock.api, bytes1);
+    const pk1 = chainModuleClass.prepareAddPublicKey(bytes1);
     await chainModule.addPublicKey(
       pk1,
       did1,

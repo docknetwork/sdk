@@ -138,7 +138,7 @@ for (const {
       const params = SignatureParams.generate(5);
       let keypair = KeyPair.generate(params);
       const bytes1 = u8aToHex(keypair.publicKey.bytes);
-      const pk1 = chainModuleClass.prepareAddPublicKey(dock.api, bytes1);
+      const pk1 = chainModuleClass.prepareAddPublicKey(bytes1);
       await chainModule.addPublicKey(
         pk1,
         did1,

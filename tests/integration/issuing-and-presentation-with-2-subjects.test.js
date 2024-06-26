@@ -53,11 +53,11 @@ const unsignedCred = {
   issuanceDate: '2020-03-18T19:23:24Z',
   credentialSubject: [
     {
-      id: subject1DID, // DID of the user who is given read access to the document
+      id: String(subject1DID), // DID of the user who is given read access to the document
       type: 'reader',
     },
     {
-      id: subject2DID, // DID of the document
+      id: String(subject2DID), // DID of the document
       type: 'document',
     },
   ],
@@ -127,11 +127,11 @@ describe('Verifiable Credential issuance and presentation where the credential h
 
     expect(credential.credentialSubject).toMatchObject([
       {
-        id: subject1DID,
+        id: String(subject1DID),
         type: 'reader',
       },
       {
-        id: subject2DID,
+        id: String(subject2DID),
         type: 'document',
       },
     ]);

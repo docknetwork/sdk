@@ -63,7 +63,7 @@ async function createDockDID() {
     1,
   );
   await registerNewDIDUsingPair(dock, dockDID, pair);
-  return dockDID;
+  return String(dockDID);
 }
 
 async function main() {

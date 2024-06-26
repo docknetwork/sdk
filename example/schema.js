@@ -112,7 +112,7 @@ async function main() {
   });
   vc.addType("AlumniCredential");
   vc.addSubject({
-    id: subjectDID,
+    id: String(subjectDID),
     alumniOf: "Example University",
     emailAddress: "abc@example.com",
   });

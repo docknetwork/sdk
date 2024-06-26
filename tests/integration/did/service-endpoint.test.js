@@ -16,11 +16,9 @@ describe('DID service endpoints', () => {
   const dock = new DockAPI();
 
   const dockDid1 = DockDid.random();
-  let hexDid1;
 
   // This DID will not be controlled by itself
   const dockDid2 = DockDid.random();
-  let hexDid2;
 
   const seed1 = randomAsHex(32);
   const seed2 = randomAsHex(32);
@@ -47,9 +45,6 @@ describe('DID service endpoints', () => {
     });
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
-
-    hexDid1 = DockDid.from(dockDid1);
-    hexDid2 = DockDid.from(dockDid2);
   });
 
   afterAll(async () => {
@@ -72,8 +67,8 @@ describe('DID service endpoints', () => {
       spId1,
       spType,
       origins1,
-      hexDid1,
-      hexDid1,
+      dockDid1,
+      dockDid1,
       pair1,
       undefined,
       false,
@@ -89,7 +84,7 @@ describe('DID service endpoints', () => {
     vr.setAssertion();
     const didKey2 = new DidKey(publicKey2, vr);
 
-    await dock.did.new(dockDid2, [didKey2], [hexDid1], false);
+    await dock.did.new(dockDid2, [didKey2], [dockDid1], false);
 
     // `dockDid1` adds service endpoint to `dockDid2`
     const origins2 = origins2Text.map((u) => u8aToHex(encoder.encode(u)));
@@ -97,8 +92,8 @@ describe('DID service endpoints', () => {
       spId2,
       spType,
       origins2,
-      hexDid2,
-      hexDid1,
+      dockDid2,
+      dockDid1,
       pair1,
       undefined,
       false,
@@ -134,8 +129,8 @@ describe('DID service endpoints', () => {
       spId3,
       spType,
       origins,
-      hexDid2,
-      hexDid1,
+      dockDid2,
+      dockDid1,
       pair1,
       undefined,
       false,
@@ -172,8 +167,8 @@ describe('DID service endpoints', () => {
     // `dockDid1` removes service endpoint of `dockDid2`
     await dock.did.removeServiceEndpoint(
       spId2,
-      hexDid2,
-      hexDid1,
+      dockDid2,
+      dockDid1,
       pair1,
       undefined,
       false,
@@ -188,7 +183,7 @@ describe('DID service endpoints', () => {
 
     await dock.did.remove(dockDid1, dockDid1, pair1);
 
-    await expect(dock.did.getOnchainDidDetail(hexDid1.asDid)).rejects.toThrow(
+    await expect(dock.did.getOnchainDidDetail(dockDid1.asDid)).rejects.toThrow(
       NoDIDError,
     );
     await expect(

@@ -27,7 +27,10 @@ const registryId = createRandomRegistryId();
 const credentialId = "http://example.edu/credentials/1986";
 const credentialContext = "https://www.w3.org/2018/credentials/examples/v1";
 const credentialType = "AlumniCredential";
-const credentialSubject = { id: holderDID, alumniOf: "Example University" };
+const credentialSubject = {
+  id: String(holderDID),
+  alumniOf: "Example University",
+};
 const credentialStatus = buildDockCredentialStatus(registryId);
 const credentialIssuanceDate = "2020-03-18T19:23:24Z";
 const credentialExpirationDate = "2999-03-18T19:23:24Z";

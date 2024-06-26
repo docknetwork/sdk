@@ -18,7 +18,7 @@ const hexDid = (did) => getHexIdentifier(
   DockDIDByteSize,
 );
 
-describe('typedHexDID', () => {
+describe('`DockDidOrDidMethodKey.from`', () => {
   test('`DockDid.from` work for a raw did', () => {
     const result = DockDid.from(
       '5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk',

@@ -15,7 +15,6 @@ describe('Off-chain DIDs', () => {
 
   // Generate a random DID
   const dockDID = DockDid.random();
-  let hexDID;
 
   const firstDocRef = randomAsHex(100);
   const secondDocRef = randomAsHex(110);
@@ -28,8 +27,6 @@ describe('Off-chain DIDs', () => {
     });
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
-
-    hexDID = DockDid.from(dockDID);
   });
 
   afterAll(async () => {
@@ -38,18 +35,18 @@ describe('Off-chain DIDs', () => {
 
   test('Can create an off-chain DID', async () => {
     // DID does not exist
-    await expect(dock.did.getOffchainDidDetail(hexDID.asDid)).rejects.toThrow(
+    await expect(dock.did.getOffchainDidDetail(dockDid.asDid)).rejects.toThrow(
       NoDIDError,
     );
 
     const docRef = OffChainDidDocRef.cid(firstDocRef);
     await dock.did.newOffchain(dockDID, docRef, false);
-    const didDetail = await dock.did.getOffchainDidDetail(hexDID.asDid);
+    const didDetail = await dock.did.getOffchainDidDetail(dockDid.asDid);
     expect(didDetail.docRef).toEqual(docRef);
     expect(didDetail.accountId).toEqual(u8aToHex(dock.account.addressRaw));
 
     // DID cannot be fetched as on-chain DID
-    await expect(dock.did.getOnchainDidDetail(hexDID.asDid)).rejects.toThrow(
+    await expect(dock.did.getOnchainDidDetail(dockDid.asDid)).rejects.toThrow(
       NoOnchainDIDError,
     );
   });
@@ -57,7 +54,7 @@ describe('Off-chain DIDs', () => {
   test('Can update DIDDoc reference for the DID to URL', async () => {
     const docRef = OffChainDidDocRef.url(secondDocRef);
     await dock.did.setOffchainDidRef(dockDID, docRef, false);
-    const didDetail = await dock.did.getOffchainDidDetail(hexDID.asDid);
+    const didDetail = await dock.did.getOffchainDidDetail(dockDid.asDid);
     expect(didDetail.docRef).toEqual(docRef);
     expect(didDetail.accountId).toEqual(u8aToHex(dock.account.addressRaw));
   });
@@ -65,14 +62,14 @@ describe('Off-chain DIDs', () => {
   test('Can update DIDDoc reference for the DID to Custom', async () => {
     const docRef = OffChainDidDocRef.custom(thirdDocRef);
     await dock.did.setOffchainDidRef(dockDID, docRef, false);
-    const didDetail = await dock.did.getOffchainDidDetail(hexDID.asDid);
+    const didDetail = await dock.did.getOffchainDidDetail(dockDid.asDid);
     expect(didDetail.docRef).toEqual(docRef);
     expect(didDetail.accountId).toEqual(u8aToHex(dock.account.addressRaw));
   });
 
   test('Can remove the DID', async () => {
     await dock.did.removeOffchainDid(dockDID, false);
-    await expect(dock.did.getOffchainDidDetail(hexDID.asDid)).rejects.toThrow(
+    await expect(dock.did.getOffchainDidDetail(dockDid.asDid)).rejects.toThrow(
       NoDIDError,
     );
   });

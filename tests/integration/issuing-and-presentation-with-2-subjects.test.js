@@ -193,8 +193,8 @@ describe('Verifiable Credential issuance and presentation where the credential h
     expect(jsonld.getValues(credSubject[0], 'type')[0]).toEqual('reader');
     const documentDid = jsonld.getValues(credSubject[1], 'id')[0];
     expect(jsonld.getValues(credSubject[1], 'type')[0]).toEqual('document');
-    expect(recipientDid).toEqual(subject1DID);
-    expect(documentDid).toEqual(subject2DID);
+    expect(recipientDid).toEqual(String(subject1DID));
+    expect(documentDid).toEqual(String(subject2DID));
 
     // Check that presentation signer is the recipient of the credential
     const proofs = jsonld.getValues(signedPres, 'proof');

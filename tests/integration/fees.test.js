@@ -369,7 +369,6 @@ describe.skip('Fees', () => {
       BBSPlusSignatureParamsG1.generate(10, hexToU8a(label)),
     );
     const pk = BBSPlusModule.prepareAddPublicKey(
-      dock.api,
       u8aToHex(kp.publicKey.bytes),
       undefined,
       [did, 1],
@@ -431,7 +430,6 @@ describe.skip('Fees', () => {
     );
 
     const pk = AccumulatorModule.prepareAddPublicKey(
-      dock.api,
       u8aToHex(kp.publicKey.bytes),
       undefined,
       [did, 1],

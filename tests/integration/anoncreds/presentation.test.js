@@ -74,7 +74,6 @@ describe.each(Schemes)(
         chainModule = getModule(dock);
 
         const pk1 = Module.prepareAddPublicKey(
-          dock.api,
           u8aToHex(keypair.publicKeyBuffer),
         );
         await chainModule.addPublicKey(

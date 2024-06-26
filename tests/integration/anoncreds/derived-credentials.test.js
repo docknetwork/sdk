@@ -220,7 +220,6 @@ describe.each(Schemes)(
 
       if (Name !== 'BDDT16') {
         const pk1 = Module.prepareAddPublicKey(
-          dock.api,
           u8aToHex(keypair.publicKeyBuffer),
         );
         await chainModule.addPublicKey(
@@ -257,10 +256,7 @@ describe.each(Schemes)(
 
       posAccumKeypair = Accumulator.generateKeypair(params);
       const bytes1 = u8aToHex(posAccumKeypair.publicKey.bytes);
-      const posAccumPk = AccumulatorModule.prepareAddPublicKey(
-        dock.api,
-        bytes1,
-      );
+      const posAccumPk = AccumulatorModule.prepareAddPublicKey(bytes1);
       await dock.accumulatorModule.addPublicKey(
         posAccumPk,
         did1,
@@ -274,10 +270,7 @@ describe.each(Schemes)(
 
       uniAccumKeypair = Accumulator.generateKeypair(params);
       const bytes2 = u8aToHex(uniAccumKeypair.publicKey.bytes);
-      const uniAccumPk = AccumulatorModule.prepareAddPublicKey(
-        dock.api,
-        bytes2,
-      );
+      const uniAccumPk = AccumulatorModule.prepareAddPublicKey(bytes2);
       await dock.accumulatorModule.addPublicKey(
         uniAccumPk,
         did1,

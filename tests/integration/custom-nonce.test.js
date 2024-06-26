@@ -135,7 +135,6 @@ describe('Custom nonce', () => {
 
     const keypair = BBSPlusKeypairG2.generate(params);
     const pk = BBSPlusModule.prepareAddPublicKey(
-      dock.api,
       u8aToHex(keypair.publicKey.bytes),
       undefined,
       [did1, 1],
@@ -166,7 +165,6 @@ describe('Custom nonce', () => {
 
     const keypair1 = Accumulator.generateKeypair(params1);
     const pk1 = AccumulatorModule.prepareAddPublicKey(
-      dock.api,
       u8aToHex(keypair1.publicKey.bytes),
       undefined,
       [did1, 1],

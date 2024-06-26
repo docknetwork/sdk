@@ -161,12 +161,10 @@ for (const {
       );
       keypair = KeyPair.generate(params1);
       const bytes2 = u8aToHex(keypair.publicKey.bytes);
-      const pk2 = chainModuleClass.prepareAddPublicKey(
-        dock.api,
-        bytes2,
-        undefined,
-        [did1, 1],
-      );
+      const pk2 = chainModuleClass.prepareAddPublicKey(bytes2, undefined, [
+        did1,
+        1,
+      ]);
       await chainModule.addPublicKey(
         pk2,
         did2,
@@ -203,12 +201,10 @@ for (const {
       );
       keypair = KeyPair.generate(params2);
       const bytes3 = u8aToHex(keypair.publicKey.bytes);
-      const pk3 = chainModuleClass.prepareAddPublicKey(
-        dock.api,
-        bytes3,
-        undefined,
-        [did1, 2],
-      );
+      const pk3 = chainModuleClass.prepareAddPublicKey(bytes3, undefined, [
+        did1,
+        2,
+      ]);
       await chainModule.addPublicKey(
         pk3,
         did2,

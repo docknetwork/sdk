@@ -19,10 +19,7 @@ import {
   TestAccountURI,
   TestKeyringOpts,
 } from '../../test-constants';
-import {
-  DidKeypair,
-  DockDid,
-} from '../../../src/utils/did';
+import { DidKeypair, DockDid } from '../../../src/utils/did';
 
 import AccumulatorModule, {
   AccumulatorType,
@@ -149,12 +146,10 @@ describe('Accumulator Module', () => {
     const aparams1 = new AccumulatorParams(hexToU8a(params1.bytes));
     keypair = Accumulator.generateKeypair(aparams1, hexToU8a(seedAccum));
     const bytes2 = u8aToHex(keypair.publicKey.bytes);
-    const pk2 = chainModuleClass.prepareAddPublicKey(
-      dock.api,
-      bytes2,
-      undefined,
-      [did1, 1],
-    );
+    const pk2 = chainModuleClass.prepareAddPublicKey(bytes2, undefined, [
+      did1,
+      1,
+    ]);
     await chainModule.addPublicKey(
       pk2,
       did2,
@@ -174,12 +169,10 @@ describe('Accumulator Module', () => {
     const aparams2 = new AccumulatorParams(hexToU8a(params2.bytes));
     keypair = Accumulator.generateKeypair(aparams2);
     const bytes3 = u8aToHex(keypair.publicKey.bytes);
-    const pk3 = chainModuleClass.prepareAddPublicKey(
-      dock.api,
-      bytes3,
-      undefined,
-      [did1, 2],
-    );
+    const pk3 = chainModuleClass.prepareAddPublicKey(bytes3, undefined, [
+      did1,
+      2,
+    ]);
     await chainModule.addPublicKey(
       pk3,
       did2,

@@ -151,7 +151,6 @@ for (const {
 
       if (!isKvac) {
         const pk = Module.prepareAddPublicKey(
-          dock.api,
           u8aToHex(issuerSchemeKeypair.publicKey.bytes),
         );
         await getModule(dock).addPublicKey(

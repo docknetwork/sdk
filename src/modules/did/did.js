@@ -848,7 +848,6 @@ class DIDModule {
               }
               // Don't care about signature params for now
               const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(
-                this.api,
                 rawKey,
               );
               if (pkObj.curveType !== 'Bls12381') {
@@ -873,7 +872,6 @@ class DIDModule {
 
               // Don't care about signature params for now
               const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(
-                this.api,
                 rawKey,
               );
               if (pkObj.curveType !== 'Bls12381') {

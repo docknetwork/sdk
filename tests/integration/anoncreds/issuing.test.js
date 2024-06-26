@@ -66,7 +66,6 @@ describe.each(Schemes)(
 
       if (Name !== 'BDDT16') {
         const pk1 = Module.prepareAddPublicKey(
-          dock.api,
           u8aToHex(keypair.publicKeyBuffer),
         );
         await chainModule.addPublicKey(

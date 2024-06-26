@@ -136,7 +136,6 @@ for (const {
 
         issuerSchemeKeypair = KeyPair.generate(sigParams);
         const pk = Module.prepareAddPublicKey(
-          dock.api,
           u8aToHex(issuerSchemeKeypair.publicKey.bytes),
           undefined,
           [issuerDid, 1],

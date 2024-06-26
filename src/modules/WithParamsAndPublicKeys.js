@@ -49,7 +49,6 @@ export default class WithParamsAndPublicKeys {
    * @returns {{}}
    */
   static prepareAddPublicKey(
-    api,
     bytes,
     curveType = undefined,
     paramsRef = undefined,
@@ -281,10 +280,7 @@ export default class WithParamsAndPublicKeys {
   async getPublicKeyByHexDid(hexDid, keyId, withParams = false) {
     const resp = await this.queryPublicKeyFromChain(hexDid, keyId);
     if (resp) {
-      const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(
-        this.api,
-        resp,
-      );
+      const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(resp);
       if (withParams) {
         if (pkObj.paramsRef === null) {
           throw new Error('No reference to parameters for the public key');
@@ -331,7 +327,7 @@ export default class WithParamsAndPublicKeys {
    * @param pk
    * @returns {{bytes: string}}
    */
-  static createPublicKeyObjFromChainResponse(api, pk) {
+  static createPublicKeyObjFromChainResponse(pk) {
     const pkObj = {
       bytes: u8aToHex(pk.bytes),
     };

@@ -711,7 +711,7 @@ class DIDModule {
     const attests = await this.getAttests(typedDid);
 
     // If given DID was in hex, encode to SS58 and then construct fully qualified DID else the DID was already fully qualified
-    const id = did === hexDid ? this.getFullyQualifiedDID(encodeAddress(hexDid)) : did;
+    const id = String(typedDid);
 
     // Get controllers
     const controllers = [];

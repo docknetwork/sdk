@@ -1,9 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { DockResolver, DockStatusList2021Resolver } from '../../src/resolver';
-import {
-  DockDid,
-  DidKeypair,
-} from '../../src/utils/did';
+import { DockDid, DidKeypair } from '../../src/utils/did';
 
 import { DockAPI } from '../../src/index';
 
@@ -44,7 +41,7 @@ describe('Resolvers', () => {
       address: FullNodeEndpoint,
     });
 
-    owners.add(DockDid.from(ownerDID));
+    owners.add(ownerDID);
     policy = new OneOfPolicy(owners);
 
     ownerKey = getKeyDoc(
@@ -69,7 +66,6 @@ describe('Resolvers', () => {
     statusListCred = await StatusList2021Credential.create(
       ownerKey,
       statusListCredId,
-      {},
     );
     await expect(
       dock.statusListCredential.createStatusListCredential(
@@ -93,7 +89,7 @@ describe('Resolvers', () => {
     expect(resolver.supports('status-list2021:dock:')).toBe(true);
     expect(resolver.supports('status-list2021:*:')).toBe(false);
     expect(resolver.supports('status-list2020:doc:')).toBe(false);
-    expect(await resolver.resolve(ownerDID)).toEqual(
+    expect(await resolver.resolve(String(ownerDID))).toEqual(
       await dock.did.getDocument(ownerDID),
     );
     expect(await resolver.resolve(statusListCred.id)).toEqual(
@@ -109,7 +105,7 @@ describe('Resolvers', () => {
     expect(resolver.supports('status-list2021:dock:')).toBe(true);
     expect(resolver.supports('status-list2021:*:')).toBe(false);
     expect(resolver.supports('status-list2020:doc:')).toBe(false);
-    expect(resolver.resolve(ownerDID)).rejects.toThrowError(
+    expect(resolver.resolve(String(ownerDID))).rejects.toThrowError(
       `Invalid \`StatusList2021Credential\` id: \`${ownerDID}\``,
     );
     expect(await resolver.resolve(statusListCred.id)).toEqual(
@@ -125,7 +121,7 @@ describe('Resolvers', () => {
     expect(resolver.supports('status-list2021:dock:')).toBe(false);
     expect(resolver.supports('status-list2021:*:')).toBe(false);
     expect(resolver.supports('status-list2020:doc:')).toBe(false);
-    expect(await resolver.resolve(ownerDID)).toEqual(
+    expect(await resolver.resolve(String(ownerDID))).toEqual(
       await dock.did.getDocument(ownerDID),
     );
     expect(resolver.resolve(statusListCred.id)).rejects.toThrowError(

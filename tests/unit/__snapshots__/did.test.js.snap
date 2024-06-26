@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`\`DockDidOrDidMethodKey.from\` \`DidMethodKey.from\` work for a raw did:key 1`] = `"Unsupported did string: zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme, expected either \`dock:did:<SS58 DID>\` or \`dock:key:<BS58 public key>\`"`;
+
+exports[`\`DockDidOrDidMethodKey.from\` \`DockDid.from\` work for a raw did 1`] = `"Unsupported did string: 5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk, expected either \`dock:did:<SS58 DID>\` or \`dock:key:<BS58 public key>\`"`;

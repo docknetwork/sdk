@@ -26,6 +26,10 @@ describe('`DockDidOrDidMethodKey.from`', () => {
     expect(result.did).toEqual(
       '0x338afad72761cffcd0619b8e00fe64a32f79463143e0e812a76b1030c593bb4e',
     );
+
+    expect(() => DockDidOrDidMethodKey.from(
+      '5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk',
+    )).toThrowErrorMatchingSnapshot();
   });
 
   test('`DidMethodKey.from` work for a raw did:key', () => {
@@ -38,6 +42,10 @@ describe('`DockDidOrDidMethodKey.from`', () => {
     expect(result.toString()).toEqual(
       'did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme',
     );
+
+    expect(() => DockDidOrDidMethodKey.from(
+      'zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme',
+    )).toThrowErrorMatchingSnapshot();
   });
 
   test('`DockDidOrDidMethodKey.from`/`DockDid.from` work for did:dock', () => {

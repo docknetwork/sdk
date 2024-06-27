@@ -252,7 +252,7 @@ describe('Custom nonce', () => {
 
   test('Add 3 registries and submit revocations for all in a batch', async () => {
     const owners = new Set();
-    owners.add(DockDid.from(did1));
+    owners.add(did1);
 
     const [revokeIds1, revokeIds2, revokeIds3] = [1, 2, 3].map((_) => {
       const r = new Set();

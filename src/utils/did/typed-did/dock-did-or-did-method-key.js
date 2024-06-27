@@ -3,11 +3,12 @@ import { createDidSig } from '../utils';
 
 import { DockDIDQualifier, DidMethodKeyQualifier } from '../constants';
 import { withExtendedStaticProperties } from '../../inheritance';
+import { TypedEnum } from '../../typed-enum';
 
 /**
  * Either `did:dock:*` or `did:key:*`.
  */
-class DockDidOrDidMethodKey {
+class DockDidOrDidMethodKey extends TypedEnum {
   /**
    * Prefix to form the fully qualified string.
    *
@@ -152,13 +153,6 @@ class DockDidOrDidMethodKey {
     const signature = this.signStateChange(api, name, payload, keyRef);
 
     return method(payload, signature);
-  }
-
-  /**
-   * Converts underlying object to the `JSON` representation suitable for substrate JSON-RPC.
-   */
-  toJSON() {
-    throw new Error('Unimplemented');
   }
 
   /**

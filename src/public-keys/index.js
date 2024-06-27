@@ -1,4 +1,4 @@
-import PublicKey from './public-key';
+import PublicKey, { getKeyPairType } from './public-key';
 
 import PublicKeySr25519 from './public-key-sr25519';
 import PublicKeyEd25519 from './public-key-ed25519';
@@ -8,6 +8,7 @@ import VerificationRelationship from './verification-relationship';
 import DidKey from './did-key';
 
 export {
+  getKeyPairType,
   PublicKey,
   PublicKeySr25519,
   PublicKeyEd25519,

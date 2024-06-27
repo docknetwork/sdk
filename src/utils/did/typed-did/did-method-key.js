@@ -23,6 +23,7 @@ import DockDidOrDidMethodKey from './dock-did-or-did-method-key';
  */
 export default class DidMethodKey extends DockDidOrDidMethodKey {
   static Qualifier = DidMethodKeyQualifier;
+  static Type = 'didMethodKey';
   /**
    * Instantiates `did:key:*` using supplied public key.
    * As of now, the public key can be either `PublicKeyEd25519` or `PublicKeySecp256k1`.
@@ -30,13 +31,14 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
    * @param {PublicKeyEd25519|PublicKeySecp256k1} didMethodKey
    */
   constructor(didMethodKey) {
-    super();
+    super(didMethodKey);
 
-    if (didMethodKey instanceof PublicKeyEd25519) {
-      this.didMethodKey = { ed25519: didMethodKey.value };
-    } else if (didMethodKey instanceof PublicKeySecp256k1) {
-      this.didMethodKey = { secp256k1: didMethodKey.value };
-    } else {
+    if (
+      !(
+        didMethodKey instanceof PublicKeyEd25519
+        || didMethodKey instanceof PublicKeySecp256k1
+      )
+    ) {
       throw new Error('Unsupported public key type');
     }
   }
@@ -112,17 +114,7 @@ export default class DidMethodKey extends DockDidOrDidMethodKey {
    * @returns {PublicKeyEd25519|PublicKeySecp256k1}
    */
   get publicKey() {
-    return this.didMethodKey.ed25519
-      ? new PublicKeyEd25519(this.didMethodKey.ed25519)
-      : new PublicKeySecp256k1(this.didMethodKey.secp256k1);
-  }
-
-  toJSON() {
-    return {
-      DidMethodKey: this.didMethodKey.ed25519
-        ? { Ed25519: this.didMethodKey.ed25519 }
-        : { Secp256k1: this.didMethodKey.secp256k1 },
-    };
+    return this.didMethodKey;
   }
 
   /**

@@ -12,16 +12,15 @@ import DockDidOrDidMethodKey from './dock-did-or-did-method-key';
  */
 export default class DockDid extends DockDidOrDidMethodKey {
   static Qualifier = DockDIDQualifier;
+  static Type = 'did';
 
   /**
    * Instantiates `DockDid` using supplied 32-byte hex sequence.
    * @param {*} did
    */
   constructor(did) {
-    super();
+    super(did);
     validateDockDIDHexIdentifier(did);
-
-    this.did = did;
   }
 
   /**
@@ -66,10 +65,6 @@ export default class DockDid extends DockDidOrDidMethodKey {
 
   get asDid() {
     return this.did;
-  }
-
-  toJSON() {
-    return { Did: this.did };
   }
 
   /**

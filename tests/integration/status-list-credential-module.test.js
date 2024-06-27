@@ -57,7 +57,7 @@ describe('StatusListCredential Module', () => {
     });
 
     // Create a status list policy
-    owners.add(DockDid.from(ownerDID));
+    owners.add(ownerDID);
     policy = new OneOfPolicy(owners);
 
     ownerKey = getKeyDoc(
@@ -229,8 +229,8 @@ describe('StatusListCredential Module', () => {
 
   test('Can create a status list with multiple owners', async () => {
     const controllersNew = new Set();
-    controllersNew.add(DockDid.from(ownerDID));
-    controllersNew.add(DockDid.from(ownerDID2));
+    controllersNew.add(ownerDID);
+    controllersNew.add(ownerDID2);
 
     const cred = await StatusList2021Credential.create(
       ownerKey,

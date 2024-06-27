@@ -24,7 +24,7 @@ async function createRegistry() {
   // Create a list of controllers
   const controllers = new Set();
 
-  controllers.add(DockDid.from(controllerDID));
+  controllers.add(controllerDID);
 
   // Create a registry policy
   const policy = new OneOfPolicy(controllers);

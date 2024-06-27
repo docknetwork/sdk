@@ -295,7 +295,7 @@ async function revocation() {
   const registryId = createRandomRegistryId();
   // Create owners
   const owners = new Set();
-  owners.add(DockDid.from(did));
+  owners.add(did);
 
   const policy = new OneOfPolicy(owners);
   await printFeePaid(dock.api, account.address, async () => {
@@ -654,7 +654,7 @@ async function statusList() {
   );
 
   const owners = new Set();
-  owners.add(DockDid.from(did));
+  owners.add(did);
   const policy = new OneOfPolicy(owners);
 
   const cred = await StatusList2021Credential.create(

@@ -275,7 +275,7 @@ describe.skip('Fees', () => {
     const registryId = createRandomRegistryId();
     // Create owners
     const owners = new Set();
-    owners.add(DockDid.from(did));
+    owners.add(did);
 
     const policy = new OneOfPolicy(owners);
     await withPaidFeeMatchingSnapshot(() => dock.revocation.newRegistry(registryId, policy, false, false));

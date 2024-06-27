@@ -203,11 +203,11 @@ describe('Verifiable Credential issuance and presentation where the credential h
       'verificationMethod',
     );
     const didOfPresSigner = verificationMethod[0].split('#')[0];
-    expect(didOfPresSigner).toEqual(String(recipientDid));
+    expect(didOfPresSigner).toEqual(recipientDid);
 
     // This check isn't mandatory or sufficient as the signer can put whatever it wants as the "holder"
     const presHolder = jsonld.getValues(signedPres, 'holder');
-    expect(presHolder).toEqual([String(recipientDid)]);
+    expect(presHolder).toEqual([recipientDid]);
 
     const result = await verifyPresentation(signedPres, {
       challenge,

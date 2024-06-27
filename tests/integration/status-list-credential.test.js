@@ -20,11 +20,7 @@ import { createPresentation } from '../create-presentation';
 import { OneOfPolicy } from '../../src/utils/revocation';
 import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
-import {
-  DockDid,
-  DidKeypair,
-  DockDidOrDidMethodKey,
-} from '../../src/utils/did';
+import { DockDid, DidKeypair, DockDidOrDidMethodKey } from '../../src/did';
 import StatusList2021Credential from '../../src/status-list-credential/status-list2021-credential';
 import { addStatusList21EntryToCredential } from '../../src/utils/vc/credentials';
 

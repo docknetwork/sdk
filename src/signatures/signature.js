@@ -28,10 +28,15 @@ export default withExtendedStaticProperties(
     }
 
     /**
+     * Signs supplied message using the provided keyring pair.
+     *
+     * @param message
+     * @param keyringPair
+     * @param signingOpts
      * @returns {Signature}
      */
-    static signWithKeyringPair(message, signingPair, signingOpts = {}) {
-      const signed = this.PublicKey.validateKeyringPair(signingPair).sign(
+    static signWithKeyringPair(message, keyringPair, signingOpts = {}) {
+      const signed = this.PublicKey.validateKeyringPair(keyringPair).sign(
         message,
         signingOpts,
       );

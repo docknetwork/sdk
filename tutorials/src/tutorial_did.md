@@ -18,7 +18,7 @@ This is done for replay protection but this detail however is hidden in the API 
 ## DID creation
 Create a new random DID.
 ```js
-import {DockDid} from '@docknetwork/sdk/utils/did';
+import {DockDid} from '@docknetwork/sdk/did';
 
 const did = DockDid.random();
 ```

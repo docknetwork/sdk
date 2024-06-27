@@ -8,7 +8,7 @@ import {
   TestAccountURI,
 } from '../test-constants';
 
-import { DockDid, DidKeypair } from '../../src/utils/did';
+import { DockDid, DidKeypair } from '../../src/did';
 import { OneOfPolicy } from '../../src/utils/revocation';
 import { registerNewDIDUsingPair } from './helpers';
 import { getKeyDoc } from '../../src/utils/vc/helpers';

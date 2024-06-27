@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 
 import { u8aToHex } from '@polkadot/util';
-import { createDidSig, DockDidOrDidMethodKey } from '../utils/did';
+import { createDidSig, DockDidOrDidMethodKey } from '../did';
 import { getDidNonce } from '../utils/misc';
 
 /**

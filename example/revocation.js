@@ -1,7 +1,7 @@
 import { randomAsHex } from "@polkadot/util-crypto";
 
 import dock from "../src/index";
-import { DockDid, DidKeypair, DockDidOrDidMethodKey } from "../src/utils/did";
+import { DockDid, DidKeypair, DockDidOrDidMethodKey } from "../src/did";
 
 import { OneOfPolicy, createRandomRegistryId } from "../src/utils/revocation";
 

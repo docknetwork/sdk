@@ -27,7 +27,7 @@ import {
   TestKeyringOpts,
   Schemes,
 } from '../../test-constants';
-import { DockDid, DidKeypair } from '../../../src/utils/did';
+import { DockDid, DidKeypair } from '../../../src/did';
 import { getRevealedUnrevealed } from './utils';
 import { registerNewDIDUsingPair } from '../helpers';
 

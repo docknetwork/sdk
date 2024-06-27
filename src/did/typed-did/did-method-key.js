@@ -3,9 +3,9 @@ import bs58 from 'bs58';
 import varint from 'varint';
 import { base58btc } from 'multiformats/bases/base58';
 
-import { PublicKeyEd25519, PublicKeySecp256k1 } from '../../../public-keys';
+import { PublicKeyEd25519, PublicKeySecp256k1 } from '../../public-keys';
 
-import { parseDIDUrl } from '../../../resolver/did/did-resolver';
+import { parseDIDUrl } from '../../resolver/did/did-resolver';
 
 import {
   DidMethodKeyQualifier,

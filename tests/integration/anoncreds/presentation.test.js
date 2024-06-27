@@ -15,7 +15,7 @@ import {
   TestKeyringOpts,
   Schemes,
 } from '../../test-constants';
-import { DockDid, DidKeypair } from '../../../src/utils/did';
+import { DockDid, DidKeypair } from '../../../src/did';
 import { registerNewDIDUsingPair } from '../helpers';
 import { getKeyDoc } from '../../../src/utils/vc/helpers';
 import { issueCredential, verifyPresentation } from '../../../src/utils/vc';

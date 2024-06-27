@@ -11,7 +11,7 @@ import {
   getSignatureFromKeyringPair,
   getStateChange,
 } from '../../src/utils/misc';
-import { createDidSig } from '../../src/utils/did';
+import { createDidSig } from '../../src/did';
 
 const ALICE_DID = u8aToHex(
   stringToU8a('Alice\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'),

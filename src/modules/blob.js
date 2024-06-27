@@ -9,7 +9,7 @@ import {
 import { getDidNonce, getStateChange } from '../utils/misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from '../utils/codec';
 import NoBlobError from '../utils/errors/no-blob-error';
-import { DockDidOrDidMethodKey, createDidSig } from '../utils/did';
+import { DockDidOrDidMethodKey, createDidSig } from '../did';
 
 export const DockBlobQualifier = 'blob:dock:';
 export const DockBlobIdByteSize = 32;

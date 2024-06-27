@@ -13,7 +13,7 @@ import {
 } from '@polkadot/util';
 import { randomAsHex } from '@polkadot/util-crypto';
 import { DockAPI } from '../../src/index';
-import { DockDid } from '../../src/utils/did';
+import { DockDid } from '../../src/did';
 import { createDidPair, getBalance } from './helpers';
 import {
   createRandomRegistryId,

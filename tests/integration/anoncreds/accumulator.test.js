@@ -19,7 +19,7 @@ import {
   TestAccountURI,
   TestKeyringOpts,
 } from '../../test-constants';
-import { DidKeypair, DockDid } from '../../../src/utils/did';
+import { DidKeypair, DockDid } from '../../../src/did';
 
 import AccumulatorModule, {
   AccumulatorType,

@@ -9,7 +9,7 @@ import {
 } from '../test-constants';
 
 import { OneOfPolicy } from '../../src/utils/revocation';
-import { DidKeypair, DockDid } from '../../src/utils/did';
+import { DidKeypair, DockDid } from '../../src/did';
 import { registerNewDIDUsingPair } from './helpers';
 
 describe('Revocation Module', () => {

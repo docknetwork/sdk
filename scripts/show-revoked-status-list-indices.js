@@ -1,5 +1,5 @@
 import { StatusList2021Credential } from "../src";
-import { DockDidOrDidMethodKey } from "../src/utils/did";
+import { DockDidOrDidMethodKey } from "../src/did";
 import { withDockAPI } from "./helpers";
 
 const { FullNodeEndpoint, ShowEmpty, ShowDeprecated } = process.env;

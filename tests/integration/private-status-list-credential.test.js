@@ -1,7 +1,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { DockAPI } from '../../src';
 import { DockResolver } from '../../src/resolver';
-import { DockDid, DidKeypair } from '../../src/utils/did';
+import { DockDid, DidKeypair } from '../../src/did';
 import {
   FullNodeEndpoint,
   TestAccountURI,

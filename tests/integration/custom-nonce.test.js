@@ -12,7 +12,7 @@ import {
   TestAccountURI,
   TestKeyringOpts,
 } from '../test-constants';
-import { DockDid, NoDIDError, DidKeypair } from '../../src/utils/did';
+import { DockDid, NoDIDError, DidKeypair } from '../../src/did';
 import { registerNewDIDUsingPair } from './helpers';
 import { generateEcdsaSecp256k1Keypair } from '../../src/utils/misc';
 import { DidKey, VerificationRelationship } from '../../src/public-keys';

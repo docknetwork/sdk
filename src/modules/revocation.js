@@ -1,6 +1,6 @@
 import { getDidNonce, getStateChange } from '../utils/misc';
 
-import { createDidSig, DockDidOrDidMethodKey } from "../utils/did"; // eslint-disable-line
+import { createDidSig, DockDidOrDidMethodKey } from "../did"; // eslint-disable-line
 
 /** Class to create, update and destroy revocations */
 class RevocationModule {

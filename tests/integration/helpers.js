@@ -3,7 +3,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import { getPublicKeyFromKeyringPair } from '../../src/utils/misc';
 import { MaxGas, MinGasPrice } from '../test-constants';
 import { DidKey, VerificationRelationship } from '../../src/public-keys';
-import { DockDid } from '../../src/utils/did';
+import { DockDid } from '../../src/did';
 
 /**
  * Registers a new DID on dock chain, keeps the controller same as the DID

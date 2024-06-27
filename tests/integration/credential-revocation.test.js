@@ -27,7 +27,7 @@ import {
   DockDid,
   DidKeypair,
   DockDidOrDidMethodKey,
-} from '../../src/utils/did';
+} from '../../src/did';
 import {
   addRevRegIdToCredential,
   getPrivateStatus,

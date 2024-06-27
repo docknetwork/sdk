@@ -7,7 +7,7 @@ import {
   initializeWasm,
 } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI } from '../../../src';
-import { DockDid, DidKeypair } from '../../../src/utils/did';
+import { DockDid, DidKeypair } from '../../../src/did';
 import { DockResolver } from '../../../src/resolver';
 import {
   registerNewDIDUsingPair,

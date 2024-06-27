@@ -8,7 +8,7 @@ import {
   NoDIDError,
   NoOffchainDIDError,
   DidKeypair,
-} from '../../../src/utils/did';
+} from '../../../src/did';
 import {
   FullNodeEndpoint,
   TestKeyringOpts,

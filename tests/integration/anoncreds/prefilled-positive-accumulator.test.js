@@ -19,7 +19,7 @@ import {
   TestAccountURI,
   TestKeyringOpts,
 } from '../../test-constants';
-import { DockDid, DidKeypair } from '../../../src/utils/did';
+import { DockDid, DidKeypair } from '../../../src/did';
 import { registerNewDIDUsingPair } from '../helpers';
 import { getLastBlockNo, waitForBlocks } from '../../../src/utils/chain-ops';
 

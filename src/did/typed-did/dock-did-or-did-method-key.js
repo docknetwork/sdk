@@ -1,9 +1,9 @@
-import { getStateChange } from '../../misc';
+import { getStateChange } from '../../utils/misc';
 import { createDidSig } from '../utils';
 
 import { DockDIDQualifier, DidMethodKeyQualifier } from '../constants';
-import { withExtendedStaticProperties } from '../../inheritance';
-import { TypedEnum } from '../../typed-enum';
+import { withExtendedStaticProperties } from '../../utils/inheritance';
+import { TypedEnum } from '../../utils/typed-enum';
 
 /**
  * Either `did:dock:*` or `did:key:*`.

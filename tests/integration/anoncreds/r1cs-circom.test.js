@@ -27,7 +27,7 @@ import {
   TestKeyringOpts,
   Schemes,
 } from '../../test-constants';
-import { DockDid, DidKeypair } from '../../../src/utils/did';
+import { DockDid, DidKeypair } from '../../../src/did';
 import { getWasmBytes, parseR1CSFile } from './utils';
 import { checkMapsEqual, registerNewDIDUsingPair } from '../helpers';
 

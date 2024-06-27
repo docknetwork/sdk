@@ -14,7 +14,7 @@ import {
   VBWitnessUpdateInfo,
 } from "@docknetwork/crypto-wasm-ts";
 import dock from "../src/index";
-import { DockDid, DidKeypair, DidMethodKey } from "../src/utils/did";
+import { DockDid, DidKeypair, DidMethodKey } from "../src/did";
 import {
   generateEcdsaSecp256k1Keypair,
   getPublicKeyFromKeyringPair,

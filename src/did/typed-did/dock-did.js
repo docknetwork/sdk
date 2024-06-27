@@ -1,6 +1,6 @@
 import { randomAsHex, encodeAddress } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
-import { getHexIdentifier } from '../../codec';
+import { getHexIdentifier } from '../../utils/codec';
 
 import { validateDockDIDHexIdentifier } from '../utils';
 

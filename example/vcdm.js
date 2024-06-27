@@ -3,7 +3,7 @@ import { randomAsHex } from "@polkadot/util-crypto";
 import dock from "../src/index";
 import VerifiableCredential from "../src/verifiable-credential";
 import VerifiablePresentation from "../src/verifiable-presentation";
-import { DockDid, DidKeypair, DockDidOrDidMethodKey } from "../src/utils/did";
+import { DockDid, DidKeypair, DockDidOrDidMethodKey } from "../src/did";
 import { registerNewDIDUsingPair } from "../tests/integration/helpers";
 import {
   createRandomRegistryId,

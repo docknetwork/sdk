@@ -2,7 +2,7 @@ import { randomAsHex } from "@polkadot/util-crypto";
 import Schema from "../src/modules/schema";
 
 import { DockAPI } from "../src/index";
-import { DockDid, DidKeypair } from "../src/utils/did";
+import { DockDid, DidKeypair } from "../src/did";
 import VerifiableCredential from "../src/verifiable-credential";
 import { Ed25519VerKeyName } from "../src/utils/vc/crypto/constants";
 import { getKeyDoc } from "../src/utils/vc/helpers";

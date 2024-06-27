@@ -6,7 +6,7 @@ import {
   DidKeypair,
   DidMethodKey,
   DockDidOrDidMethodKey,
-} from '../../../src/utils/did';
+} from '../../../src/did';
 import {
   FullNodeEndpoint,
   TestKeyringOpts,

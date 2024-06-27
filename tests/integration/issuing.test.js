@@ -2,7 +2,7 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import mockFetch from '../mocks/fetch';
 
-import { DockDid, DidKeypair } from '../../src/utils/did';
+import { DockDid, DidKeypair } from '../../src/did';
 
 import { DockAPI } from '../../src/index';
 import { DockResolver } from '../../src/resolver';

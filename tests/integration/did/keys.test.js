@@ -1,6 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { DockAPI, PublicKeySecp256k1 } from '../../../src';
-import { DockDid, DidKeypair } from '../../../src/utils/did';
+import { DockDid, DidKeypair } from '../../../src/did';
 import {
   FullNodeEndpoint,
   TestAccountURI,

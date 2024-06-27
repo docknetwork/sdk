@@ -3,7 +3,7 @@ import { u8aToString } from "@polkadot/util";
 
 import { DockAPI } from "../src/index";
 import { DockBlobIdByteSize } from "../src/modules/blob";
-import { DockDid, DidKeypair } from "../src/utils/did";
+import { DockDid, DidKeypair } from "../src/did";
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.

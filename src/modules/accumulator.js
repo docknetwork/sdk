@@ -8,7 +8,7 @@ import {
 import { getDidNonce, getStateChange, inclusiveRange } from '../utils/misc';
 import WithParamsAndPublicKeys from './WithParamsAndPublicKeys';
 import { getAllExtrinsicsFromBlock } from '../utils/chain-ops';
-import { createDidSig, DockDidOrDidMethodKey } from '../utils/did';
+import { createDidSig, DockDidOrDidMethodKey } from '../did';
 
 export const AccumulatorType = {
   VBPos: 0,

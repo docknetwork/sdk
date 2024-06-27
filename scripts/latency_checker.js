@@ -1,5 +1,5 @@
 import dock from "../src/index";
-import { DockDid } from "../src/utils/did";
+import { DockDid } from "../src/did";
 import { getPublicKeyFromKeyringPair } from "../src/utils/misc";
 import { median } from "./helpers";
 import { DidKey, VerificationRelationship } from "../src/public-keys";

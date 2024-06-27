@@ -11,7 +11,7 @@ import {
   NoOffchainDIDError,
   createDidSig,
   DidMethodKeyQualifier,
-} from '../../utils/did';
+} from '../../did';
 import { getStateChange } from '../../utils/misc';
 
 import OffChainDidDocRef from './offchain-did-doc-ref';

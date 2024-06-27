@@ -1,6 +1,6 @@
 import { BTreeSet, BTreeMap } from '@polkadot/types';
 import { u8aToHex } from '@polkadot/util';
-import { DidMethodKey, DockDid, DockDidOrDidMethodKey } from '../utils/did';
+import { DidMethodKey, DockDid, DockDidOrDidMethodKey } from '../did';
 import { isHexWithGivenByteSize } from '../utils/codec';
 import { getDidNonce, ensureMatchesPattern } from '../utils/misc';
 

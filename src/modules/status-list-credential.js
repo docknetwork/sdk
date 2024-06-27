@@ -1,7 +1,7 @@
 import StatusList2021Credential from '../status-list-credential/status-list2021-credential';
 import { getDidNonce, getStateChange } from '../utils/misc';
 
-import { createDidSig, DockDidOrDidMethodKey } from '../utils/did';
+import { createDidSig, DockDidOrDidMethodKey } from '../did';
 
 /**
  * Module supporting `StatusList2021Credential` and `RevocationList2020Credential`.

@@ -4,7 +4,7 @@ import { randomAsHex } from "@polkadot/util-crypto";
 // Import Dock API
 import { u8aToHex } from "@polkadot/util";
 import dock, { PublicKeySr25519 } from "../src/index";
-import { DockDid, DidKeypair } from "../src/utils/did";
+import { DockDid, DidKeypair } from "../src/did";
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.

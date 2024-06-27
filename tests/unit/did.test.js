@@ -9,7 +9,7 @@ import {
   DockDidOrDidMethodKey,
   DockDid,
   DidMethodKey,
-} from '../../src/utils/did';
+} from '../../src/did';
 import { getHexIdentifier } from '../../src/utils/codec';
 
 const hexDid = (did) => getHexIdentifier(

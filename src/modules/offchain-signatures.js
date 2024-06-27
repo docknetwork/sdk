@@ -2,7 +2,7 @@
 
 import { getDidNonce, getStateChange } from '../utils/misc';
 import WithParamsAndPublicKeys from './WithParamsAndPublicKeys';
-import { createDidSig, DockDidOrDidMethodKey } from '../utils/did';
+import { createDidSig, DockDidOrDidMethodKey } from '../did';
 
 const STATE_CHANGES = {
   AddParams: 'AddOffchainSignatureParams',

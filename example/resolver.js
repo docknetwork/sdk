@@ -2,7 +2,7 @@
 import { randomAsHex } from "@polkadot/util-crypto";
 import ethr from "ethr-did-resolver";
 import { DockAPI } from "../src/index";
-import { DockDid, NoDIDError, DidKeypair } from "../src/utils/did";
+import { DockDid, NoDIDError, DidKeypair } from "../src/did";
 import {
   DIDResolver,
   DIDKeyResolver,

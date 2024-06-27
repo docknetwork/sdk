@@ -1,7 +1,7 @@
 import { canonicalize } from 'json-canonicalize';
 import { validate } from 'jsonschema';
 
-import { DockDidOrDidMethodKey } from '../utils/did';
+import { DockDidOrDidMethodKey } from '../did';
 
 import { createNewDockBlobId, getHexIdentifierFromBlobID } from './blob';
 

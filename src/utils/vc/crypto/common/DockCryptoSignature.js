@@ -5,8 +5,10 @@ import { SECURITY_CONTEXT_URL } from 'jsonld-signatures';
 
 import { u8aToU8a } from '@polkadot/util';
 import stringify from 'json-stringify-deterministic';
+import semver from 'semver/preload';
 import { withExtendedStaticProperties } from '../../../inheritance';
 import CustomLinkedDataSignature from './CustomLinkedDataSignature';
+import { deepClone } from '../../../common';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
@@ -91,7 +93,7 @@ export default withExtendedStaticProperties(
         } else {
           // Legacy. Cannot use `convertCredentialForVerification` because JSON.stringify is not deterministic
           // and credentialSchema string becomes different. See https://stackoverflow.com/a/43049877
-          [serializedCredential, credSchema] = this.constructor.convertCredential(options);
+          [serializedCredential, credSchema] = this.constructor.convertLegacyCredential(options);
         }
       } else {
         // Serialize the data for signing
@@ -113,7 +115,7 @@ export default withExtendedStaticProperties(
      * @param signingOptions
      * @returns {Array} - Returns [serialized cred object, cred schema]
      */
-    static convertCredential({
+    static convertLegacyCredential({
       document,
       proof: explicitProof /* documentLoader */,
       signingOptions = { requireAllFieldsFromSchema: false },
@@ -157,7 +159,7 @@ export default withExtendedStaticProperties(
       credBuilder.setTopLevelField('type', JSON.stringify(document.type));
 
       // Allow for relaxed schema generation, then embed the generated schema directly into the credential
-      const builtAnoncreds = credBuilder.updateSchemaIfNeeded(signingOptions);
+      const builtAnoncreds = credBuilder.updateSchemaIfNeededLegacy(signingOptions);
 
       // Re-assign the embedded schema to the document schema object
       // this is a bit hacky, but its the only way right now
@@ -217,14 +219,14 @@ export default withExtendedStaticProperties(
 
       const s = this.extractSchema(document);
       let credSchema = s[0];
-      const wasLegacySchema = s[1];
+      const wasExactSchema = s[1];
 
       const credJson = {
         ...document,
         proof: trimmedProof,
       };
       this.formatMandatoryFields(credJson, document);
-      if (!wasLegacySchema) {
+      if (!wasExactSchema) {
         // Older credentials didn't include the version field in the final credential but they did while signing
         credJson.cryptoVersion = '0.2.0';
         if (credJson.credentialSchema === undefined) {
@@ -232,9 +234,13 @@ export default withExtendedStaticProperties(
         }
         credSchema = CredentialSchema.generateAppropriateSchema(credJson, credSchema);
       }
-      const schemaJson = credSchema.toJSON();
-      // Older versions used JSON.stringify but newer use deterministic conversion
-      credJson.credentialSchema = wasLegacySchema ? stringify(schemaJson) : JSON.stringify(schemaJson);
+      const schemaJson = semver.gte(credSchema.version, '0.4.0') ? credSchema.toJSON() : credSchema.toJSONOlder();
+      if (credJson.cryptoVersion && semver.gte(credJson.cryptoVersion, '0.6.0')) {
+        credJson.credentialSchema = schemaJson;
+      } else {
+        // Older versions used JSON.stringify but newer use deterministic conversion
+        credJson.credentialSchema = wasExactSchema ? stringify(schemaJson) : JSON.stringify(schemaJson);
+      }
 
       if (document.credentialSchema) {
         Object.assign(document.credentialSchema, schemaJson);
@@ -283,10 +289,13 @@ export default withExtendedStaticProperties(
 
       // To work with JSON-LD credentials/presentations, we must always reveal the context and type
       // NOTE: that they are encoded as JSON strings here to reduce message count and so its *always known*
+      // TODO: `stringify` should be used which is deterministic since @context can be an object
       credBuilder.setTopLevelField(
         '@context',
-        JSON.stringify(document['@context']),
+        stringify(document['@context']),
       );
+      // TODO: type is never an object? Or use `stringify` to be safe
+      // Not adding the TODOs here since verification code also uses JSON.stringify and will need to check versions and then use the appropriate call.
       credBuilder.setTopLevelField('type', JSON.stringify(document.type));
 
       const serializedCred = credBuilder.serializeForSigning();
@@ -295,7 +304,7 @@ export default withExtendedStaticProperties(
 
       // Update `document` so that generated credential has `credentialSchema` and `cryptoVersion` set
       const updatedSchemaJson = credBuilder.schema.toJSON();
-      serializedCred.credentialSchema = stringify(updatedSchemaJson);
+      serializedCred.credentialSchema = updatedSchemaJson;
       Object.assign(document.credentialSchema, updatedSchemaJson);
       // eslint-disable-next-line no-param-reassign
       document.cryptoVersion = serializedCred.cryptoVersion;
@@ -370,12 +379,17 @@ export default withExtendedStaticProperties(
           return schema;
         }
 
+        const schemaJson = deepClone(document.credentialSchema);
+        // Passing all the default parsing options. Ideally `document.credentialSchema` should contain these
+        if (schemaJson.details === undefined) {
+          schemaJson.details = stringify({ parsingOptions: DefaultSchemaParsingOpts });
+        } else {
+          const details = JSON.parse(schemaJson.details);
+          details.parsingOptions = { ...DefaultSchemaParsingOpts, ...details.parsingOptions };
+          schemaJson.details = stringify(details);
+        }
         // If we already have a schema to use, add that first and then generate relaxed values later on
-        credSchema = await CredentialSchema.fromJSONWithPotentiallyExternalSchema({
-          // Passing all the default parsing options. Ideally `document.credentialSchema` should contain these
-          parsingOptions: DefaultSchemaParsingOpts,
-          ...document.credentialSchema,
-        }, getSchema);
+        credSchema = await CredentialSchema.fromJSONWithPotentiallyExternalSchema(schemaJson, getSchema);
       } else {
         credSchema = this.extractSchemaWhenIdNotSet(document);
         wasExactSchema = false;
@@ -406,7 +420,7 @@ export default withExtendedStaticProperties(
       let credSchema;
       if (document.credentialSchema) {
         // schema object exists but no ID means the SDK is signalling for the suite to generate a schema
-        credSchema = new CredentialSchema(CredentialSchema.essential(), document.credentialSchema.parsingOptions);
+        credSchema = new CredentialSchema(CredentialSchema.essential(), this.getParsingOptions(document));
       } else {
         // Else, no schema was found so just use the essentials and v0.0.1 schema version
         // NOTE: version is important here and MUST be 0.0.1 otherwise it will invalidate BBS+ credentials
@@ -426,6 +440,26 @@ export default withExtendedStaticProperties(
       }
 
       return credSchema;
+    }
+
+    static getParsingOptions(document) {
+      if (document.credentialSchema && document.credentialSchema.details !== undefined) {
+        const details = JSON.parse(document.credentialSchema.details);
+        return details.parsingOptions;
+      }
+      return DefaultSchemaParsingOpts;
+    }
+
+    static withUpdatedParsingOptions(schemaJson, parsingOptions) {
+      const newSchemaJson = deepClone(schemaJson);
+      if (schemaJson.details === undefined) {
+        newSchemaJson.details = stringify({ parsingOptions });
+      } else {
+        const details = JSON.parse(schemaJson.details);
+        details.parsingOptions = { ...details.parsingOptions, ...parsingOptions };
+        newSchemaJson.details = stringify(details);
+      }
+      return newSchemaJson;
     }
 
     /**

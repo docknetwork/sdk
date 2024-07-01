@@ -8,6 +8,7 @@ import {
 } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
 import { stringToU8a } from '@polkadot/util';
+import semver from 'semver/preload';
 import { ensureArray } from './utils/type-helpers';
 
 import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';
@@ -197,7 +198,7 @@ export default class Presentation {
         id: credential.revealedAttributes.id || DOCK_ANON_CREDENTIAL_ID,
         '@context': JSON.parse(credential.revealedAttributes['@context']),
         type: JSON.parse(credential.revealedAttributes.type),
-        credentialSchema: JSON.parse(credential.schema),
+        credentialSchema: semver.gte(credential.version, '0.6.0') ? credential.schema : JSON.parse(credential.schema),
         issuer:
           credential.revealedAttributes.issuer
           || credential.revealedAttributes.proof.verificationMethod.split('#')[0],

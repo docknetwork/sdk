@@ -8,6 +8,7 @@ import {
   CredentialSchema,
 } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
+import semver from 'semver/preload';
 import { getPrivateStatus, verifyCredential } from './credentials';
 import DIDResolver from "../../resolver/did/did-resolver"; // eslint-disable-line
 
@@ -374,10 +375,8 @@ export function getKeyedProofsFromVerifiedPresentation(presentation) {
  */
 export function getJsonSchemasFromPresentation(presentation, full = false) {
   return presentation.spec.credentials.map((cred) => {
-    const schema = CredentialSchema.fromJSON(JSON.parse(cred.schema));
-    // eslint-disable-next-line no-nested-ternary
-    const key = full ? (schema.fullJsonSchema !== undefined ? 'fullJsonSchema' : 'jsonSchema') : 'jsonSchema';
-    return schema[key];
+    const schema = semver.gte(cred.version, '0.6.0') ? CredentialSchema.fromJSON(cred.schema) : CredentialSchema.fromJSON(JSON.parse(cred.schema));
+    return full ? schema.getEmbeddedJsonSchema() : schema.jsonSchema;
   });
 }
 

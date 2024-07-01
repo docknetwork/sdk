@@ -3,6 +3,7 @@ import * as r1csf from 'r1csfile';
 import * as fs from 'fs';
 import { randomAsHex } from '@polkadot/util-crypto';
 import { stringToHex } from '@polkadot/util';
+import stringify from 'json-stringify-deterministic';
 import { blobHexIdToQualified, DockBlobIdByteSize } from '../../../src/modules/blob';
 
 /**
@@ -51,9 +52,10 @@ export async function parseR1CSFile(r1csName) {
  */
 export async function setupExternalSchema(fullSchema, title, did, pair, dock) {
   const blobId = randomAsHex(DockBlobIdByteSize);
+  const qualifiedBlobId = blobHexIdToQualified(blobId);
   const schemaExternal = {
     $schema: 'http://json-schema.org/draft-07/schema#',
-    $id: blobHexIdToQualified(blobId),
+    $id: qualifiedBlobId,
     title,
     type: 'object',
   };
@@ -66,17 +68,19 @@ export async function setupExternalSchema(fullSchema, title, did, pair, dock) {
   await dock.blob.new(blob, did, pair, { didModule: dock.didModule }, false);
 
   return [{
-    id: `data:application/json;charset=utf-8,${encodeURIComponent(
-      JSON.stringify(schemaExternal),
-    )}`,
+    id: qualifiedBlobId,
     type: 'JsonSchemaValidator2018',
+    details: stringify({
+      jsonSchema: schemaExternal,
+    }),
   }, blobHexIdToQualified(blobId)];
 }
 
 export function getResidentCardCredentialAndSchema(context) {
+  const id = 'https://ld.dock.io/examples/resident-card-schema.json';
   const residentCardSchema = {
     $schema: 'http://json-schema.org/draft-07/schema#',
-    $id: 'https://ld.dock.io/examples/resident-card-schema.json',
+    $id: id,
     title: 'Resident Card Example',
     type: 'object',
     properties: {
@@ -103,10 +107,9 @@ export function getResidentCardCredentialAndSchema(context) {
   };
 
   const encodedSchema = {
-    id: `data:application/json;charset=utf-8,${encodeURIComponent(
-      JSON.stringify(residentCardSchema),
-    )}`,
+    id,
     type: 'JsonSchemaValidator2018',
+    details: stringify({ jsonSchema: residentCardSchema }),
   };
 
   const credentialJSON = {

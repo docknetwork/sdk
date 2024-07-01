@@ -2,6 +2,7 @@ import { initializeWasm } from '@docknetwork/crypto-wasm-ts';
 import { DIDResolver } from '../src/resolver';
 import Bls12381G2KeyPairDock2022 from '../src/utils/vc/crypto/Bls12381G2KeyPairDock2022';
 import { issueCredential, verifyCredential } from '../src/utils/vc';
+import stringify from 'json-stringify-deterministic';
 
 const keypairOpts = {
   id: 'did:example:489398593#keys-1',
@@ -34,9 +35,10 @@ class ExampleDIDResolver extends DIDResolver {
 
 const resolver = new ExampleDIDResolver();
 
+const id = 'https://ld.dock.io/examples/resident-card-schema.json';
 const residentCardSchema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
-  $id: 'https://ld.dock.io/examples/resident-card-schema.json',
+  $id: id,
   title: 'Resident Card Example',
   type: 'object',
   properties: {
@@ -63,8 +65,9 @@ const residentCardSchema = {
 };
 
 const embeddedSchema = {
-  id: `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(residentCardSchema))}`,
+  id,
   type: 'JsonSchemaValidator2018',
+  details: stringify({ jsonSchema: residentCardSchema }),
 };
 
 // Defining schema allows to specify custom encoding

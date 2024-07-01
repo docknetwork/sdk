@@ -1,5 +1,6 @@
 import { Presentation } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
+import semver from 'semver/preload';
 import { withExtendedStaticProperties } from '../../../inheritance';
 
 import CustomLinkedDataSignature from './CustomLinkedDataSignature';
@@ -121,12 +122,14 @@ export default withExtendedStaticProperties(
         delete revealedAttributes.id;
       }
 
+      const credVersion = proof.version;
+
       // TODO: This is wrong. This won't work with presentation from 2 or more credentials
       const c = {
         sigType: proof.sigType,
-        version: proof.version,
+        version: credVersion,
         bounds: proof.bounds,
-        schema: JSON.stringify(credentialSchema),
+        schema: semver.gte(credVersion, '0.6.0') ? credentialSchema : JSON.stringify(credentialSchema),
         revealedAttributes: {
           proof: {
             type: this.sigName,

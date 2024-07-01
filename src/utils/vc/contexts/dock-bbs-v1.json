@@ -44,6 +44,11 @@
       "@type": "@id",
       "@container": "@graph"
     },
+    "details": {
+      "@id": "dockBBS:details",
+      "@type": "@id",
+      "@container": "@graph"
+    },
     "DockVBAccumulator2022": {
       "@id": "https://ld.dock.io/security#DockVBAccumulator2022",
       "@context": {

@@ -78,6 +78,7 @@
     "onboard_with_sudo": "npx babel-node scripts/onboard_validator_with_sudo.js",
     "lint": "eslint \"src/**/*.js\"",
     "lint-examples": "eslint \"{src,example}/**/*.js\"",
+    "lint-scripts": "eslint \"scripts/**/*.js\"",
     "lint-tests": "eslint \"{tests/unit,tests/integration}/**/*.js\"",
     "build": "rollup -c",
     "build-scripts": "rollup -c rollup.scripts.config.mjs",

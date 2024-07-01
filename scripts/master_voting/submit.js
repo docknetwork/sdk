@@ -116,8 +116,8 @@ async function assertValidAuth(nodeClient, proposal, mpauth) {
   // * - all signatures are valid over proposal for current voting round
   const roundNo = (await nodeClient.api.query.master.round()).toJSON();
   for (const [didSig, nonce] of mpauth) {
-    const sig = didSig.sig;
-    const did = didSig.did;
+    const { sig } = didSig;
+    const { did } = didSig;
     const didKey = await nodeClient.didModule.getDidKey(did, didSig.keyId);
     const pk = didKey.publicKey;
     if (!pk.isSr25519) {

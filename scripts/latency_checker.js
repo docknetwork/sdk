@@ -1,10 +1,10 @@
-import dock from "../src/index";
-import { DockDid } from "../src/did";
-import { getPublicKeyFromKeyringPair } from "../src/utils/misc";
-import { median } from "./helpers";
-import { DidKey, VerificationRelationship } from "../src/public-keys";
+import dock from '../src/index';
+import { DockDid } from '../src/did';
+import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
+import { median } from './helpers';
+import { DidKey, VerificationRelationship } from '../src/public-keys';
 
-require("dotenv").config();
+require('dotenv').config();
 
 const { FullNodeEndpoint, EndowedSecretURI } = process.env;
 
@@ -14,7 +14,7 @@ async function sendTxn(baseSeed, seedPath) {
   // DID will be generated randomly
   const dockDID = DockDid.random();
   const seed = `${baseSeed}/${seedPath}`;
-  const pair = dock.keyring.addFromUri(seed, null, "sr25519");
+  const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
   const publicKey = getPublicKeyFromKeyringPair(pair);
   const didKey = new DidKey(publicKey, new VerificationRelationship());
   const start = new Date().getTime();
@@ -29,8 +29,7 @@ async function main(countReqs) {
   const account = dock.keyring.addFromUri(EndowedSecretURI);
   dock.setAccount(account);
 
-  const baseSeed =
-    "0x3f7b9516b38f6bb8c3241e58eaa37d318c03d4facdf03c9ce61507b9bc1c34ea";
+  const baseSeed = '0x3f7b9516b38f6bb8c3241e58eaa37d318c03d4facdf03c9ce61507b9bc1c34ea';
   // Send `count` requests and calculate for each request
   const durations = [];
   let counter = 0;
@@ -66,6 +65,6 @@ dock
     return main(count);
   })
   .catch((error) => {
-    console.error("Error occurred somewhere, it was caught!", error);
+    console.error('Error occurred somewhere, it was caught!', error);
     process.exit(1);
   });

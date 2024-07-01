@@ -1,13 +1,13 @@
 // Signs a master proposal using sr25519, prints the signature as hex.
 
-import { u8aToHex } from "@polkadot/util";
-import { connect, keypair } from "../helpers";
-import { DockDidOrDidMethodKey } from "../../src/did";
-import { getStateChange } from "../../src/utils/misc";
+import { u8aToHex } from '@polkadot/util';
+import { connect, keypair } from '../helpers';
+import { DockDidOrDidMethodKey } from '../../src/did';
+import { getStateChange } from '../../src/utils/misc';
 
-require("dotenv").config();
+require('dotenv').config();
 
-const fsp = require("fs").promises;
+const fsp = require('fs').promises;
 
 const USAGE = `
 Use:
@@ -54,7 +54,7 @@ async function main() {
 
   let do_vote_yes = false;
   if (process.argv.length === 5) {
-    if (process.argv[4] !== "yes") {
+    if (process.argv[4] !== 'yes') {
       throw 'final argument must be either omitted or "yes"';
     }
     do_vote_yes = true;
@@ -64,7 +64,7 @@ async function main() {
   try {
     proposal = JSON.parse(proposal_unparsed);
   } catch (e) {
-    console.error("Proposal is not valid json.");
+    console.error('Proposal is not valid json.');
     throw e;
   }
 
@@ -73,24 +73,24 @@ async function main() {
   const actual_round_no = (await nc.api.query.master.round()).toJSON();
   if (actual_round_no !== round_no) {
     throw (
-      "Round number passed as argument is not equal to round number reported by node.\n" +
-      `Passed as argument: ${round_no}\n` +
-      `Reported by node: ${actual_round_no}`
+      'Round number passed as argument is not equal to round number reported by node.\n'
+      + `Passed as argument: ${round_no}\n`
+      + `Reported by node: ${actual_round_no}`
     );
   }
 
   // encode proposal as call
-  const call = nc.api.createType("Call", proposal);
+  const call = nc.api.createType('Call', proposal);
 
-  console.log("");
+  console.log('');
   console.log(`This proposal calls "${call._meta.name}" with arguments:`);
   console.dir(JSON.parse(JSON.stringify(call.args)), { depth: null });
-  console.log("");
+  console.log('');
 
-  const encodedProposal = [...nc.api.createType("Call", proposal).toU8a()];
+  const encodedProposal = [...nc.api.createType('Call', proposal).toU8a()];
   const nonce = await nc.didModule.getNextNonceForDid(did);
   const vote = { nonce, proposal: encodedProposal, round_no: actual_round_no };
-  const encodedStateChange = getStateChange(nc.api, "MasterVote", vote);
+  const encodedStateChange = getStateChange(nc.api, 'MasterVote', vote);
 
   if (do_vote_yes) {
     // sign and print signature

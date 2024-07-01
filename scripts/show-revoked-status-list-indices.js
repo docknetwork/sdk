@@ -1,14 +1,13 @@
-import { StatusList2021Credential } from "../src";
-import { DockDidOrDidMethodKey } from "../src/did";
-import { withDockAPI } from "./helpers";
+import { StatusList2021Credential } from '../src';
+import { DockDidOrDidMethodKey } from '../src/did';
+import { withDockAPI } from './helpers';
 
 const { FullNodeEndpoint, ShowEmpty, ShowDeprecated } = process.env;
 
 async function main(dock) {
-  console.log("Revoked:");
+  console.log('Revoked:');
 
-  const statusListCreds =
-    await dock.api.query.statusListCredential.statusListCredentials.entries();
+  const statusListCreds = await dock.api.query.statusListCredential.statusListCredentials.entries();
   for (const [id, unparsedCredential] of statusListCreds) {
     const credential = StatusList2021Credential.fromBytes(
       unparsedCredential.unwrap().statusListCredential
@@ -38,23 +37,23 @@ async function main(dock) {
         .filter((v) => v != null);
 
       if (ShowDeprecated) {
-        console.log(id.toHuman()[0], ":");
+        console.log(id.toHuman()[0], ':');
         console.log(
-          " - revoked indices with left to right indexing (correct):",
-          toShow.join(", ") || "-",
+          ' - revoked indices with left to right indexing (correct):',
+          toShow.join(', ') || '-',
         );
         console.log(
-          " - revoked indices with right to left indexing (deprecated):",
-          toShowBigEndian.join(", ") || "-",
+          ' - revoked indices with right to left indexing (deprecated):',
+          toShowBigEndian.join(', ') || '-',
         );
-        console.log(" - owners:", owners.join(","));
+        console.log(' - owners:', owners.join(','));
       } else {
         console.log(
           id.toHuman()[0],
-          ":",
-          toShow.join(", ") || "-",
-          "; owners:",
-          owners.join(","),
+          ':',
+          toShow.join(', ') || '-',
+          '; owners:',
+          owners.join(','),
         );
       }
     }

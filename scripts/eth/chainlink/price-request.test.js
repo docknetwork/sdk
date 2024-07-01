@@ -1,8 +1,6 @@
 import Web3 from 'web3';
-import {
-  OracleABI, LinkTokenABI, PriceQueryBytecode, PriceQueryABI,
-} from './bytecodes-and-abis';
-import { getTestEVMAccountsFromWeb3, getTokenBalance, sendTokens } from '../helpers';
+import { LinkTokenABI, PriceQueryABI } from './bytecodes-and-abis';
+import { getTestEVMAccountsFromWeb3, getTokenBalance } from '../helpers';
 
 const getRevertReason = require('eth-revert-reason');
 

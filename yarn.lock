@@ -2878,16 +2878,15 @@
     fix-esm "^1.0.1"
     jsonld digitalcredentials/jsonld.js#v10.x
 
-"@docknetwork/crypto-wasm-ts@0.60.0":
-  version "0.60.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.60.0.tgz#094d094003e71a03d030301ccdc7c4bfe18290b7"
-  integrity sha512-pY/SyfhEAJ42KXVq41JFW/WACThTwSuiOioXmltcgruga3kZ7SpCgGy7Dr06sldTDl58bsYVZwCZuUVGM8lQ0A==
+"@docknetwork/crypto-wasm-ts@0.62.0":
+  version "0.62.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.62.0.tgz#c0b08039ff49379d5b1d8bcd10dbc4e899acd972"
+  integrity sha512-wiFOSLtJUHuB/FxBBeP9m9vitN5DZgE6Xkc49lUm65qSrUMsdrf4WHxuY2bnthTHv2ZmrLbD7MoIAwCAlT8Saw==
   dependencies:
     "@types/flat" "^5.0.2"
     "@types/lodash" "^4.14.195"
     bs58 "5.0.0"
     crypto-wasm-new "npm:@docknetwork/crypto-wasm@0.30.0"
-    crypto-wasm-old "npm:@docknetwork/crypto-wasm@0.23.0"
     flat "^5.0.2"
     json-pointer "^0.6.2"
     json-stringify-deterministic "^1.0.11"
@@ -6710,13 +6709,6 @@ crypto-ld@^6.0.0:
   version "0.30.0"
   resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.30.0.tgz#d54a56989cf98847e6e4ebe8119b6eb6012d8da4"
   integrity sha512-xwDtakDBaiOf0Cm6H74JsJ2I610rc+d9tSrgjuACE7QBpmkTug6QX4Q4OzxXA12wp86K5QqRMHoCzc6geS1Z0g==
-  dependencies:
-    buffer "^6.0.3"
-
-"crypto-wasm-old@npm:@docknetwork/crypto-wasm@0.23.0":
-  version "0.23.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.23.0.tgz#5ae04db0f7990fb6fc9c7ad3f0a1cb7255518169"
-  integrity sha512-/bDSy05HkIZIZL9HDHowjCKxTDf9Cf04e1ElIY0o/q9ewbxHQ4/r8Ppv5V5bOnVkxcFG9lWQQstKXQDV86UWRw==
   dependencies:
     buffer "^6.0.3"
 

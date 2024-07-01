@@ -556,9 +556,8 @@ export function getJsonSchemaFromCredential(credential, full = false) {
   if (typeof credential.credentialSchema.id !== 'string') {
     throw new Error(`credentialSchema was expected to be string but was ${typeof credential.credentialSchema}`);
   }
-  // eslint-disable-next-line no-nested-ternary
-  const key = full ? (credential.credentialSchema.fullJsonSchema !== undefined ? 'fullJsonSchema' : 'id') : 'id';
-  return CredentialSchema.convertFromDataUri(credential.credentialSchema[key]);
+  const schema = CredentialSchema.fromJSON(credential.credentialSchema);
+  return full ? schema.getEmbeddedJsonSchema() : schema.jsonSchema;
 }
 
 /**

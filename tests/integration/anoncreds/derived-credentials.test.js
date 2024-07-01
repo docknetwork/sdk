@@ -12,6 +12,7 @@ import {
   RevocationStatusProtocol,
 } from '@docknetwork/crypto-wasm-ts';
 import { InMemoryState, InMemoryKBUniversalState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
+import stringify from 'json-stringify-deterministic';
 import { DockAPI } from '../../../src';
 import {
   FullNodeEndpoint,
@@ -35,9 +36,10 @@ import { getKeyedProofsFromVerifiedPresentation } from '../../../src/utils/vc/pr
 import { deepClone } from '../../../src/utils/common';
 
 // TODO: move to fixtures
+const id = 'https://ld.dock.io/examples/resident-card-schema.json';
 const residentCardSchema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
-  $id: 'https://ld.dock.io/examples/resident-card-schema.json',
+  $id: id,
   title: 'Resident Card Example',
   type: 'object',
   properties: {
@@ -73,10 +75,9 @@ const residentCardSchema = {
 };
 
 const embeddedSchema = {
-  id: `data:application/json;charset=utf-8,${encodeURIComponent(
-    JSON.stringify(residentCardSchema),
-  )}`,
+  id,
   type: 'JsonSchemaValidator2018',
+  details: stringify({ jsonSchema: residentCardSchema }),
 };
 
 describe.each(Schemes)('Derived Credentials', ({
@@ -467,6 +468,7 @@ describe.each(Schemes)('Derived Credentials', ({
       }),
     );
     expect(credentials[0].issuer).toEqual(credential.issuer);
+    expect(credentials[0].credentialSchema.id).toEqual(residentCardSchema.$id);
 
     // Ensure reconstructing presentation from credential matches
     // NOTE: ignoring proof here as itll differ when signed twice as above

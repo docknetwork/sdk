@@ -362,7 +362,7 @@ describe.each(Schemes)('Derived Credentials', ({
     const unsignedCred = {
       ...credentialJSON,
       credentialStatus,
-      issuer: did1,
+      issuer: String(did1),
     };
 
     const presentationOptions = {
@@ -397,7 +397,7 @@ describe.each(Schemes)('Derived Credentials', ({
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
     const unsignedCred = {
       ...credentialJSON,
-      issuer: did1,
+      issuer: String(did1),
     };
 
     const presentationOptions = {
@@ -538,7 +538,7 @@ describe.each(Schemes)('Derived Credentials', ({
     );
 
     expect(credentials.length).toEqual(1);
-    expect(credentials[0].issuer).toEqual(did1);
+    expect(credentials[0].issuer).toEqual(String(did1));
     expect(credentials[0].credentialStatus).toBeDefined();
     expect(credentials[0].credentialStatus).toEqual({
       ...credentialStatus,
@@ -577,7 +577,7 @@ describe.each(Schemes)('Derived Credentials', ({
     );
 
     expect(credentials.length).toEqual(1);
-    expect(credentials[0].issuer).toEqual(did1);
+    expect(credentials[0].issuer).toEqual(String(did1));
     expect(credentials[0].credentialStatus).toBeDefined();
     expect(credentials[0].credentialStatus).toEqual({
       ...credentialStatus,
@@ -616,7 +616,7 @@ describe.each(Schemes)('Derived Credentials', ({
 
     const accAsU8 = AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated, AccumulatorType.KBUni);
     expect(credentials.length).toEqual(1);
-    expect(credentials[0].issuer).toEqual(did1);
+    expect(credentials[0].issuer).toEqual(String(did1));
     expect(credentials[0].credentialStatus).toBeDefined();
     expect(credentials[0].credentialStatus).toEqual({
       ...credentialStatus,
@@ -656,7 +656,7 @@ describe.each(Schemes)('Derived Credentials', ({
 
     const accAsU8 = AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated, AccumulatorType.KBUni);
     expect(credentials.length).toEqual(1);
-    expect(credentials[0].issuer).toEqual(did1);
+    expect(credentials[0].issuer).toEqual(String(did1));
     expect(credentials[0].credentialStatus).toBeDefined();
     expect(credentials[0].credentialStatus).toEqual({
       ...credentialStatus,
@@ -679,7 +679,7 @@ describe.each(Schemes)('Derived Credentials', ({
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
     const unsignedCred = {
       ...credentialJSON,
-      issuer: did1,
+      issuer: String(did1),
     };
 
     const presentationOptions = {

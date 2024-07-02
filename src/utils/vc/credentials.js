@@ -1,6 +1,6 @@
 import jsonld from 'jsonld';
 import jsigs from 'jsonld-signatures';
-import { statusTypeMatches, checkStatus } from '@digitalcredentials/vc-status-list';
+import { checkStatus, statusTypeMatches } from '@digitalcredentials/vc-status-list';
 
 import base64url from 'base64url';
 import { CredentialBuilder, CredentialSchema } from '@docknetwork/crypto-wasm-ts';
@@ -8,47 +8,46 @@ import CredentialIssuancePurpose from './CredentialIssuancePurpose';
 import defaultDocumentLoader from './document-loader';
 import { getAndValidateSchemaIfPresent } from './schema';
 import {
-  checkRevocationRegistryStatus, DockRevRegQualifier,
-  getCredentialStatus, isAccumulatorRevocationStatus,
-  isRegistryRevocationStatus, RevRegType,
+  checkRevocationRegistryStatus,
+  DockRevRegQualifier,
+  getCredentialStatus,
+  isAccumulatorRevocationStatus,
+  isRegistryRevocationStatus,
+  RevRegType,
 } from '../revocation';
-import { Resolver } from "../../resolver"; // eslint-disable-line
-
 import {
-  getSuiteFromKeyDoc,
-  expandJSONLD,
-  getKeyFromDIDDocument, processIfKvac,
+  expandJSONLD, getKeyFromDIDDocument, getSuiteFromKeyDoc, processIfKvac,
 } from './helpers';
 import {
-  DEFAULT_CONTEXT_V1_URL,
   credentialContextField,
-  PrivateStatusList2021EntryType,
+  DEFAULT_CONTEXT_V1_URL,
   DockStatusList2021Qualifier,
-  StatusList2021EntryType,
+  PrivateStatusList2021EntryType,
   PrivateStatusList2021Qualifier,
+  StatusList2021EntryType,
 } from './constants';
 import { ensureValidDatetime } from '../type-helpers';
 
 import {
+  Bls12381BBS23SigDockSigName,
+  Bls12381BBS23SigProofDockSigName,
+  Bls12381BBSSigDockSigName,
+  Bls12381BBSSignatureDock2022,
+  Bls12381BBSSignatureDock2023,
+  Bls12381BBSSignatureProofDock2022,
+  Bls12381BBSSignatureProofDock2023,
+  Bls12381BBSSigProofDockSigName,
+  Bls12381BDDT16MacDockName,
+  Bls12381BDDT16MacProofDockName,
+  Bls12381PSSigDockSigName,
+  Bls12381PSSignatureDock2023,
+  Bls12381PSSignatureProofDock2023,
+  Bls12381PSSigProofDockSigName,
   EcdsaSecp256k1Signature2019,
   Ed25519Signature2018,
   Ed25519Signature2020,
-  Sr25519Signature2020,
-  Bls12381PSSignatureDock2023,
-  Bls12381PSSignatureProofDock2023,
-  Bls12381BBSSignatureDock2022,
-  Bls12381BBSSignatureProofDock2022,
-  Bls12381BBSSignatureDock2023,
-  Bls12381BBSSignatureProofDock2023,
-  Bls12381BBS23SigProofDockSigName,
-  Bls12381PSSigProofDockSigName,
   JsonWebSignature2020,
-  Bls12381PSSigDockSigName,
-  Bls12381BBSSigDockSigName,
-  Bls12381BBSSigProofDockSigName,
-  Bls12381BBS23SigDockSigName,
-  Bls12381BDDT16MacDockName,
-  Bls12381BDDT16MacProofDockName,
+  Sr25519Signature2020,
 } from './custom_crypto';
 import { signJWS } from './jws';
 import Bls12381BDDT16MACProofDock2024 from './crypto/Bls12381BDDT16MACProofDock2024';

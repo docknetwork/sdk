@@ -79,7 +79,6 @@ const example = {
     {
       // You can also use any embedded context
       dk: 'https://ld.dock.io/credentials#',
-      name: 'dk:name',
       numberField: 'dk:numberField',
       numberFieldNegative: 'dk:numberFieldNegative',
       numberFieldOneDecimal: 'dk:numberFieldOneDecimal',
@@ -88,7 +87,6 @@ const example = {
       integerFieldBig: 'dk:integerFieldBig',
       dateField: 'dk:dateField',
       logo: 'dk:logo',
-      description: 'dk:description',
     },
   ],
   id: 'https://issuer.oidp.uscis.gov/credentials/83627465',

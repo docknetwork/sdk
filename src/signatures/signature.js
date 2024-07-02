@@ -1,45 +1,54 @@
-import { u8aToHex } from '@polkadot/util';
 import { isHexWithGivenByteSize } from '../utils/codec';
+import { TypedEnum } from '../utils/typed-enum';
+import { withExtendedStaticProperties } from '../utils/inheritance';
 
 /** Class representing a Signature. This export class should always be extended (abstract export class in some languages) */
-export default class Signature {
-  /**
-   * Creates a new DidSignature object. Validates the given value. Currently supported signature
-   * types only require validating the byte size.
-   * @param {string} value - Value of the signature. This is validated
-   * @return {Signature} The Signature object if the given value is valid.
-   */
-  fromHex(value, expectedByteSize) {
-    this.validateByteSize(value, expectedByteSize);
+export default withExtendedStaticProperties(
+  ['Size', 'PublicKey'],
+  class Signature extends TypedEnum {
+    /**
+     * Public key associated with the signature.
+     * @type {typeof PublicKey}
+     */
+    static PublicKey;
 
-    // @ts-ignore
-    const sig = Object.create(this.prototype);
-    sig.value = value;
-    return sig;
-  }
-
-  /**
-   * Check that the given signature has the expected byte size. Assumes the signature is in hex.
-   */
-  validateByteSize(value, expectedByteSize) {
-    if (!isHexWithGivenByteSize(value, expectedByteSize)) {
-      throw new Error(`Signature must be ${expectedByteSize} bytes`);
+    static get Type() {
+      return this.PublicKey.Type;
     }
-  }
 
-  /**
-   * Signs the given message and wraps it in the Signature
-   * @param {array} message - The message to sign as bytearray
-   * @param {object} signingPair -The pair from Polkadot-js containing the signing key
-   */
-  fromPolkadotJSKeyringPair(message, signingPair) {
-    this.value = u8aToHex(signingPair.sign(message));
-  }
+    /**
+     * Check that the given public key has the expected byte size. Assumes the signature is in hex.
+     */
+    static validateSize(value) {
+      if (!isHexWithGivenByteSize(value, this.Size)) {
+        throw new Error(`Signature must be ${this.Size} bytes`);
+      }
 
-  /**
-   * @return {Object} The correct DidSignature JSON variant. The extending export class should implement it.
-   */
-  toJSON() {
-    throw new Error('Not implemented. The extending export class should implement it');
-  }
-}
+      return value;
+    }
+
+    /**
+     * Signs supplied message using the provided keyring pair.
+     *
+     * @param message
+     * @param keyringPair
+     * @param signingOpts
+     * @returns {Signature}
+     */
+    static signWithKeyringPair(message, keyringPair, signingOpts = {}) {
+      const signed = this.PublicKey.validateKeyringPair(keyringPair).sign(
+        message,
+        signingOpts,
+      );
+
+      return new this(signed);
+    }
+
+    /**
+     * Returns the size of the underlying signature.
+     */
+    get size() {
+      return this.constructor.Size;
+    }
+  },
+);

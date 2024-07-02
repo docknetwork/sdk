@@ -1,7 +1,6 @@
 import VerifiableCredential from '../../src/verifiable-credential';
 import VerifiablePresentation from '../../src/verifiable-presentation';
 import Schema from '../../src/modules/schema';
-import { createNewDockDID } from '../../src/utils/did';
 
 import exampleCredential from '../example-credential';
 
@@ -75,9 +74,6 @@ describe('Serialization', () => {
       required: ['emailAddress', 'alumniOf'],
       additionalProperties: false,
     });
-
-    // Set schema author
-    const dockDID = createNewDockDID();
 
     const shemaJSON = schema.toJSON();
     const constructedSchema = Schema.fromJSON(shemaJSON);

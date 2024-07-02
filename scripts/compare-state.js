@@ -1,22 +1,21 @@
-import { ApiPromise } from "@polkadot/api";
-import dock from "../src";
-import { timestampLogger } from "./helpers";
-import R from "ramda";
+import R from 'ramda';
+import dock from '../src';
+import { timestampLogger } from './helpers';
 
 const {
   FullNodeEndpoint,
   FirstBlockNumber,
   SecondBlockNumber = +FirstBlockNumber + 1,
-  Transform = "toHuman",
+  Transform = 'toHuman',
 } = process.env;
 
 const info = timestampLogger.error;
 const output = console.log;
-const KeyedSymbol = Symbol("Keyed");
+const KeyedSymbol = Symbol('Keyed');
 const ToSkip = new Set([
-  "offences::reports",
-  "substrate::code",
-  "democracy::preimages",
+  'offences::reports',
+  'substrate::code',
+  'democracy::preimages',
 ]);
 
 /**
@@ -61,18 +60,18 @@ const ToSkip = new Set([
 async function main() {
   await dock.init({ address: FullNodeEndpoint });
 
-  info("Scanning the first block state");
+  info('Scanning the first block state');
   const first = await grabState(
     await dock.api.at(await dock.api.rpc.chain.getBlockHash(+FirstBlockNumber)),
   );
-  info("-".repeat(50));
-  info("Scanning the second block state");
+  info('-'.repeat(50));
+  info('Scanning the second block state');
   const second = await grabState(
     await dock.api.at(
       await dock.api.rpc.chain.getBlockHash(+SecondBlockNumber),
     ),
   );
-  info("-".repeat(50));
+  info('-'.repeat(50));
 
   const entries = new Set([...Object.keys(first), ...Object.keys(second)]);
 
@@ -83,10 +82,10 @@ async function main() {
         res[entry] = buildDiff(first[entry], second[entry]);
       }
     } else if (entry in first) {
-      res[entry] = "REMOVED";
+      res[entry] = 'REMOVED';
       info(`Removed storage entry: ${entry}`);
     } else {
-      res[entry] = "ADDED";
+      res[entry] = 'ADDED';
       info(`New storage entry: ${entry}`);
     }
   }
@@ -111,7 +110,7 @@ const keysValuesDiff = R.pipe(
   })),
   R.mergeAll,
   R.applySpec,
-)(["keys", "values"]);
+)(['keys', 'values']);
 
 /** Calculates the difference between the first and second states. */
 const buildDiff = R.curryN(
@@ -168,7 +167,7 @@ const grabState = async (api) => {
       }
       info(`Scanning ${key}`);
 
-      if (typeof member === "function") {
+      if (typeof member === 'function') {
         try {
           data[key] = parseObj((await member())[Transform]());
         } catch {

@@ -1,5 +1,5 @@
 import { randomAsHex } from '@polkadot/util-crypto';
-import { DockKeypair } from '../misc';
+import { DockKeypair } from '../utils/misc';
 
 /**
  * Signing keypair along with the optional key identifier.

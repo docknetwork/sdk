@@ -27,7 +27,7 @@ import {
   TestKeyringOpts,
   Schemes,
 } from '../../test-constants';
-import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
+import { DockDid, DidKeypair } from '../../../src/did';
 import { getWasmBytes, parseR1CSFile } from './utils';
 import { checkMapsEqual, registerNewDIDUsingPair } from '../helpers';
 
@@ -122,8 +122,11 @@ for (const {
       account = dock.keyring.addFromUri(TestAccountURI);
       dock.setAccount(account);
 
-      issuerKeypair = new DidKeypair(dock.keyring.addFromUri(randomAsHex(32)), 1);
-      issuerDid = createNewDockDID();
+      issuerKeypair = new DidKeypair(
+        dock.keyring.addFromUri(randomAsHex(32)),
+        1,
+      );
+      issuerDid = DockDid.random();
       await registerNewDIDUsingPair(dock, issuerDid, issuerKeypair);
 
       await initializeWasm();
@@ -147,8 +150,9 @@ for (const {
       issuerSchemeKeypair = KeyPair.generate(sigParams);
 
       if (!isKvac) {
-        const pk = Module.prepareAddPublicKey(dock.api,
-          u8aToHex(issuerSchemeKeypair.publicKey.bytes));
+        const pk = Module.prepareAddPublicKey(
+          u8aToHex(issuerSchemeKeypair.publicKey.bytes),
+        );
         await getModule(dock).addPublicKey(
           pk,
           issuerDid,
@@ -165,7 +169,11 @@ for (const {
       if (isKvac) {
         verifParam = issuerSchemeKeypair.sk;
       } else {
-        const queriedPk = await getModule(dock).getPublicKey(issuerDid, 2, false);
+        const queriedPk = await getModule(dock).getPublicKey(
+          issuerDid,
+          2,
+          false,
+        );
         verifParam = new PublicKey(hexToU8a(queriedPk.bytes));
       }
 
@@ -230,20 +238,26 @@ for (const {
     ) {
       let sigPk;
       if (!isKvac) {
-        const queriedPk = await getModule(dock).getPublicKey(issuerDid, 2, false);
+        const queriedPk = await getModule(dock).getPublicKey(
+          issuerDid,
+          2,
+          false,
+        );
         sigPk = new PublicKey(hexToU8a(queriedPk.bytes));
       }
 
       const revealedNames = new Set();
       revealedNames.add('fname');
 
-      const sigParams = !isKvac ? SignatureParams.getSigParamsForMsgStructure(
-        attributesStruct,
-        labelBytes,
-      ) : SignatureParams.getMacParamsForMsgStructure(
-        attributesStruct,
-        labelBytes,
-      );
+      const sigParams = !isKvac
+        ? SignatureParams.getSigParamsForMsgStructure(
+          attributesStruct,
+          labelBytes,
+        )
+        : SignatureParams.getMacParamsForMsgStructure(
+          attributesStruct,
+          labelBytes,
+        );
       const [revealedMsgs, unrevealedMsgs, revealedMsgsRaw] = getRevealedAndUnrevealed(
         credentialAttributesRaw,
         revealedNames,
@@ -251,16 +265,14 @@ for (const {
       );
       expect(revealedMsgsRaw).toEqual({ fname: expectedFirstName });
 
-      const statement1 = !isKvac && 'adaptForLess' in sigPk ? buildProverStatement(
-        sigParams,
-        sigPk.adaptForLess(sigParams.supportedMessageCount()),
-        revealedMsgs,
-        false,
-      ) : buildProverStatement(
-        sigParams,
-        revealedMsgs,
-        false,
-      );
+      const statement1 = !isKvac && 'adaptForLess' in sigPk
+        ? buildProverStatement(
+          sigParams,
+          sigPk.adaptForLess(sigParams.supportedMessageCount()),
+          revealedMsgs,
+          false,
+        )
+        : buildProverStatement(sigParams, revealedMsgs, false);
       const statement2 = Statement.r1csCircomProver(r1cs, wasm, snarkPk);
 
       const statementsProver = new Statements();
@@ -279,10 +291,7 @@ for (const {
       metaStmtsProver.addWitnessEquality(witnessEq1);
 
       // The prover should independently construct this `ProofSpec`
-      const proofSpecProver = new ProofSpec(
-        statementsProver,
-        metaStmtsProver,
-      );
+      const proofSpecProver = new ProofSpec(statementsProver, metaStmtsProver);
       expect(proofSpecProver.isValid()).toEqual(true);
 
       const witness1 = buildWitness(
@@ -292,10 +301,7 @@ for (const {
       );
 
       const inputs = new CircomInputs();
-      inputs.setPrivateInput(
-        'in',
-        credential.encodedMessages[attrName],
-      );
+      inputs.setPrivateInput('in', credential.encodedMessages[attrName]);
       inputs.setPublicInput('pub', encodedABNeg);
       const witness2 = Witness.r1csCircomWitness(inputs);
 
@@ -313,17 +319,20 @@ for (const {
       );
       checkMapsEqual(revealedMsgs, revealedMsgsFromVerifier);
 
-      const statement3 = !isKvac ? buildVerifierStatement(
-        sigParams,
-        'adaptForLess' in sigPk ? sigPk.adaptForLess(sigParams.supportedMessageCount()) : sigPk,
-        revealedMsgsFromVerifier,
-        false,
-      ) : buildVerifierStatement(
-        sigParams,
-        revealedMsgsFromVerifier,
-        false,
-      );
-      const pub = [MessageEncoder.encodePositiveNumberForSigning(1), encodedABNeg];
+      const statement3 = !isKvac
+        ? buildVerifierStatement(
+          sigParams,
+          'adaptForLess' in sigPk
+            ? sigPk.adaptForLess(sigParams.supportedMessageCount())
+            : sigPk,
+          revealedMsgsFromVerifier,
+          false,
+        )
+        : buildVerifierStatement(sigParams, revealedMsgsFromVerifier, false);
+      const pub = [
+        MessageEncoder.encodePositiveNumberForSigning(1),
+        encodedABNeg,
+      ];
       const statement4 = Statement.r1csCircomVerifier(pub, snarkVk);
 
       const statementsVerifier = new Statements();

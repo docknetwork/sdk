@@ -9,7 +9,7 @@ import {
 } from '../test-constants';
 
 import { OneOfPolicy } from '../../src/utils/revocation';
-import { DidKeypair, typedHexDID } from '../../src/utils/did';
+import { DidKeypair, DockDid } from '../../src/did';
 import { registerNewDIDUsingPair } from './helpers';
 
 describe('Revocation Module', () => {
@@ -23,10 +23,10 @@ describe('Revocation Module', () => {
   const multipleControllerRegistryID = randomAsHex(32);
 
   // Create a new owner DID, the DID will be registered on the network and own the registry
-  const ownerDID = randomAsHex(32);
+  const ownerDID = DockDid.random();
   const ownerSeed = randomAsHex(32);
 
-  const ownerDID2 = randomAsHex(32);
+  const ownerDID2 = DockDid.random();
   const ownerSeed2 = randomAsHex(32);
 
   // Create  owners
@@ -44,7 +44,7 @@ describe('Revocation Module', () => {
       address: FullNodeEndpoint,
     });
 
-    owners.add(typedHexDID(dock.api, ownerDID));
+    owners.add(ownerDID);
 
     // Create a registry policy
     policy = new OneOfPolicy(owners);
@@ -262,8 +262,8 @@ describe('Revocation Module', () => {
 
   test('Can create a registry with multiple owners', async () => {
     const controllersNew = new Set();
-    controllersNew.add(typedHexDID(dock.api, ownerDID));
-    controllersNew.add(typedHexDID(dock.api, ownerDID2));
+    controllersNew.add(ownerDID);
+    controllersNew.add(ownerDID2);
 
     // Create policy and registry with multiple owners
     const policyNew = new OneOfPolicy(controllersNew);
@@ -287,15 +287,11 @@ describe('Revocation Module', () => {
     let hasSecondDID = false;
     [...controllerSet.entries()]
       .flatMap((v) => v)
-      .map((cnt) => typedHexDID(dock.api, cnt))
+      .map((cnt) => DockDid.from(cnt))
       .forEach((controller) => {
-        if (
-          controller.toString() === typedHexDID(dock.api, ownerDID).toString()
-        ) {
+        if (controller.toString() === ownerDID.toString()) {
           hasFirstDID = true;
-        } else if (
-          controller.toString() === typedHexDID(dock.api, ownerDID2).toString()
-        ) {
+        } else if (controller.toString() === ownerDID2.toString()) {
           hasSecondDID = true;
         }
       });

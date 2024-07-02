@@ -1,5 +1,5 @@
 import dock from '../src/index';
-import { createNewDockDID } from '../src/utils/did';
+import { DockDid } from '../src/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { median } from './helpers';
 import { DidKey, VerificationRelationship } from '../src/public-keys';
@@ -12,14 +12,14 @@ const { FullNodeEndpoint, EndowedSecretURI } = process.env;
 
 async function sendTxn(baseSeed, seedPath) {
   // DID will be generated randomly
-  const dockDID = createNewDockDID();
+  const dockDID = DockDid.random();
   const seed = `${baseSeed}/${seedPath}`;
   const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
   const publicKey = getPublicKeyFromKeyringPair(pair);
   const didKey = new DidKey(publicKey, new VerificationRelationship());
   const start = new Date().getTime();
   await dock.did.new(dockDID, [didKey], [], false);
-  return (new Date().getTime()) - start;
+  return new Date().getTime() - start;
 }
 
 async function main(countReqs) {
@@ -45,13 +45,16 @@ async function main(countReqs) {
   const total = durations.reduce((a, b) => a + b, 0);
   const mean = Math.round(total / durations.length);
   const med = median(durations);
-  console.log(`After sending ${durations.length} requests, mean latency is ${mean}ms and median is ${med}ms`);
+  console.log(
+    `After sending ${durations.length} requests, mean latency is ${mean}ms and median is ${med}ms`,
+  );
   process.exit(1);
 }
 
-dock.init({
-  address: FullNodeEndpoint,
-})
+dock
+  .init({
+    address: FullNodeEndpoint,
+  })
   .then(() => {
     let count;
     if (process.argv.length >= 3) {

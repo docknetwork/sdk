@@ -8,11 +8,7 @@ import {
   TestKeyringOpts,
   Schemes,
 } from '../../test-constants';
-import {
-  createNewDockDID,
-  typedHexDID,
-  DidKeypair,
-} from '../../../src/utils/did';
+import { DockDid, DidKeypair } from '../../../src/did';
 
 import { registerNewDIDUsingPair } from '../helpers';
 
@@ -58,8 +54,8 @@ for (const {
       dock.setAccount(account);
       pair1 = new DidKeypair(dock.keyring.addFromUri(seed1), 1);
       pair2 = new DidKeypair(dock.keyring.addFromUri(seed2), 1);
-      did1 = createNewDockDID();
-      did2 = createNewDockDID();
+      did1 = DockDid.random();
+      did2 = DockDid.random();
       await registerNewDIDUsingPair(dock, did1, pair1);
       await registerNewDIDUsingPair(dock, did2, pair2);
       await initializeWasm();
@@ -85,10 +81,7 @@ for (const {
       const paramsWritten1 = await chainModule.getLastParamsWritten(did1);
       expect(paramsWritten1.bytes).toEqual(params1.bytes);
       expect(paramsWritten1.label).toEqual(params1.label);
-      const allParams = await getParamsByDid(
-        dock.api,
-        typedHexDID(dock.api, did1),
-      );
+      const allParams = await getParamsByDid(dock.api, DockDid.from(did1));
       expect(Object.values(allParams.toJSON())).toEqual([params1]);
 
       const queriedParams1 = await chainModule.getParams(did1, 1);
@@ -145,7 +138,7 @@ for (const {
       const params = SignatureParams.generate(5);
       let keypair = KeyPair.generate(params);
       const bytes1 = u8aToHex(keypair.publicKey.bytes);
-      const pk1 = chainModuleClass.prepareAddPublicKey(dock.api, bytes1);
+      const pk1 = chainModuleClass.prepareAddPublicKey(bytes1);
       await chainModule.addPublicKey(
         pk1,
         did1,
@@ -168,7 +161,7 @@ for (const {
       );
       keypair = KeyPair.generate(params1);
       const bytes2 = u8aToHex(keypair.publicKey.bytes);
-      const pk2 = chainModuleClass.prepareAddPublicKey(dock.api, bytes2, undefined, [
+      const pk2 = chainModuleClass.prepareAddPublicKey(bytes2, undefined, [
         did1,
         1,
       ]);
@@ -182,9 +175,9 @@ for (const {
       );
       const queriedPk2 = await chainModule.getPublicKey(did2, 2);
       expect(queriedPk2.bytes).toEqual(pk2.bytes);
-      expect(queriedPk2.paramsRef).toEqual([typedHexDID(dock.api, did1), 1]);
+      expect(queriedPk2.paramsRef).toEqual([DockDid.from(did1), 1]);
       const keyWithParams = await getPublicKeyWithParamsByStorageKey(dock.api, [
-        typedHexDID(dock.api, did2).asDid,
+        DockDid.from(did2).asDid,
         2,
       ]);
       const jsonKeyWithParams = keyWithParams.toJSON();
@@ -208,7 +201,7 @@ for (const {
       );
       keypair = KeyPair.generate(params2);
       const bytes3 = u8aToHex(keypair.publicKey.bytes);
-      const pk3 = chainModuleClass.prepareAddPublicKey(dock.api, bytes3, undefined, [
+      const pk3 = chainModuleClass.prepareAddPublicKey(bytes3, undefined, [
         did1,
         2,
       ]);
@@ -223,7 +216,7 @@ for (const {
 
       const queriedPk3 = await chainModule.getPublicKey(did2, 3);
       expect(queriedPk3.bytes).toEqual(pk3.bytes);
-      expect(queriedPk3.paramsRef).toEqual([typedHexDID(dock.api, did1), 2]);
+      expect(queriedPk3.paramsRef).toEqual([DockDid.from(did1), 2]);
 
       const queriedPk3WithParams = await chainModule.getPublicKey(
         did2,
@@ -231,10 +224,7 @@ for (const {
         true,
       );
       expect(queriedPk3WithParams.params).toEqual(queriedParams2);
-      const allPks = await getPublicKeysByDid(
-        dock.api,
-        typedHexDID(dock.api, did2),
-      );
+      const allPks = await getPublicKeysByDid(dock.api, DockDid.from(did2));
       expect(
         Object.values(allPks.toJSON()).map((keyWithParams) => {
           addParticipantIdIfNotPresent(keyWithParams[0]);

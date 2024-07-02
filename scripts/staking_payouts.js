@@ -1,5 +1,7 @@
-import BN from "bn.js";
-import { from, lastValueFrom, timer, Observable, EMPTY, defer } from "rxjs";
+import BN from 'bn.js';
+import {
+  from, lastValueFrom, timer, EMPTY, defer,
+} from 'rxjs';
 import {
   tap,
   map as mapRx,
@@ -10,7 +12,7 @@ import {
   toArray,
   concatMapTo,
   catchError,
-} from "rxjs/operators";
+} from 'rxjs/operators';
 import {
   prop,
   indexBy,
@@ -33,9 +35,10 @@ import {
   split,
   reduceBy,
   either,
-} from "ramda";
+} from 'ramda';
 
-import { sendAlarmEmailText } from "./email_utils";
+import dotenv from 'dotenv';
+import { sendAlarmEmailText } from './email_utils';
 import {
   batchExtrinsics,
   envObj,
@@ -45,8 +48,7 @@ import {
   formatDock,
   parseBool,
   withDockAPI,
-} from "./helpers";
-import dotenv from "dotenv";
+} from './helpers';
 
 dotenv.config();
 
@@ -69,7 +71,7 @@ const {
   // Address of the node RPC.
   FullNodeEndpoint: notNilAnd(String),
   // List of email addresses separated by comma to send alarm email to.
-  StakingPayoutsAlarmEmailTo: notNilAnd(split(",")),
+  StakingPayoutsAlarmEmailTo: notNilAnd(split(',')),
   // Account to send transactions from.
   InitiatorAccountURI: notNilAnd(String),
   // Max batch size.
@@ -81,7 +83,7 @@ const {
   // Timeout to wait before retry transaction. In ms.
   RetryTimeout: o(finiteNumber, defaultTo(5e3)),
   // Max commission allowed to be set for validators. Default is 5%. Used as a criteria if `TargetAllValidatorsMatchingCriteria` is enabled.
-  MaxCommission: o((val) => new BN(val), defaultTo("50000000")),
+  MaxCommission: o((val) => new BN(val), defaultTo('50000000')),
   // Min account balance to ring the alarm.
   AlarmBalance: notNilAnd((val) => new BN(val)),
   // Time to wait for transaction to be finalized. In ms.
@@ -91,14 +93,14 @@ const {
   // Finalize the transaction or just wait for it to be included in the block.
   FinalizeTx: parseBool,
   // List of validator stashes to make payouts to independently of matching criteria or not.
-  TargetStashIds: pipe(defaultTo(""), split(","), reject(isEmpty)),
+  TargetStashIds: pipe(defaultTo(''), split(','), reject(isEmpty)),
   // Target all validators matching criteria along with targeting supplied stash id list.
   TargetAllValidatorsMatchingCriteria: parseBool,
 });
 
 if (!TargetAllValidatorsMatchingCriteria && TargetStashIds.length === 0) {
   throw new Error(
-    `No target validators were found. You can provide list of validator stash ids by specifying \`TargetStashIds\` or force all validators to be checked by setting \`TargetAllValidatorsMatchingCriteria\` to \`true\``
+    'No target validators were found. You can provide list of validator stash ids by specifying `TargetStashIds` or force all validators to be checked by setting `TargetAllValidatorsMatchingCriteria` to `true`',
   );
 }
 
@@ -109,24 +111,24 @@ const main = withDockAPI(
   async (dock) => {
     const initiator = dock.keyring.addFromUri(InitiatorAccountURI);
 
-    console.log("Pre-work balance check.");
-    let balanceIsOk = await checkBalance(
+    console.log('Pre-work balance check.');
+    const balanceIsOk = await checkBalance(
       dock.api,
       StakingPayoutsAlarmEmailTo,
       initiator.address,
-      AlarmBalance
+      AlarmBalance,
     );
 
-    console.log("Fetching eras info...");
+    console.log('Fetching eras info...');
     const erasInfo = await fetchErasInfo(dock.api);
 
-    console.log("Calculating and sending payouts:");
+    console.log('Calculating and sending payouts:');
     let needToRecheck;
 
     try {
       needToRecheck = await timeout(
         IterationTimeout,
-        sendStakingPayouts(dock, erasInfo, initiator, BatchSize)
+        sendStakingPayouts(dock, erasInfo, initiator, BatchSize),
       );
     } catch (err) {
       needToRecheck = true;
@@ -136,25 +138,25 @@ const main = withDockAPI(
     if (needToRecheck) {
       // Check payouts again with a batch size of 1
       // This is needed to execute valid transactions packed in invalid batches
-      console.log("Checking payouts again:");
+      console.log('Checking payouts again:');
       await timeout(
         IterationTimeout,
-        sendStakingPayouts(dock, erasInfo, initiator, 1)
+        sendStakingPayouts(dock, erasInfo, initiator, 1),
       );
     }
 
     if (balanceIsOk) {
-      console.log("Post-work balance check.");
+      console.log('Post-work balance check.');
       await checkBalance(
         dock.api,
         StakingPayoutsAlarmEmailTo,
         initiator.address,
-        AlarmBalance
+        AlarmBalance,
       );
     }
 
-    console.log("Done!");
-  }
+    console.log('Done!');
+  },
 );
 
 /**
@@ -172,8 +174,7 @@ const main = withDockAPI(
  * @returns {bool}
  */
 const ensureCommissionLessOrEqualTo = curry(
-  (maxCommission, stashId, { prefs }) =>
-    prefs.validators[stashId]?.commission?.toBn().lte(maxCommission)
+  (maxCommission, stashId, { prefs }) => prefs.validators[stashId]?.commission?.toBn().lte(maxCommission),
 );
 
 /**
@@ -193,60 +194,60 @@ async function sendStakingPayouts(dock, erasInfo, initiator, batchSize) {
     console.log(
       `- Payouts will be made to target validator stashes ${JSON.stringify([
         ...targetValidatorStashIds,
-      ])} and all validators matching criteria`
+      ])} and all validators matching criteria`,
     );
 
     validatorStashIds = pipe(
       values,
-      pluck("validators"),
+      pluck('validators'),
       chain(keys),
-      (valitors) => new Set(valitors)
+      (valitors) => new Set(valitors),
     )(erasInfo.pointsByEra);
   } else {
     console.log(
       `- Payouts will be made only to target validator stashes ${JSON.stringify(
-        [...targetValidatorStashIds]
-      )}`
+        [...targetValidatorStashIds],
+      )}`,
     );
     validatorStashIds = targetValidatorStashIds;
   }
 
   if (!validatorStashIds.size) {
-    console.log("- Validator set is empty.");
+    console.log('- Validator set is empty.');
     return false;
   }
 
-  console.log("- Retrieving validator eras...");
+  console.log('- Retrieving validator eras...');
   const erasToBePaid = await lastValueFrom(
     from(validatorStashIds).pipe(
       getUnclaimedStashesEras(dock.api, erasInfo),
-      toArray()
-    )
+      toArray(),
+    ),
   );
 
   // Payout validator if it's either in a target list or satisfies criteria.
   const checkValidator = either(
     (validatorStashId) => targetValidatorStashIds.has(validatorStashId),
-    ensureCommissionLessOrEqualTo(MaxCommission)
+    ensureCommissionLessOrEqualTo(MaxCommission),
   );
 
   const rewards = pipe(buildValidatorRewards, toPairs)(
     checkValidator,
     erasInfo,
-    erasToBePaid
+    erasToBePaid,
   );
 
   if (isEmpty(rewards)) {
-    console.log("- No unpaid validator rewards found for recent eras.");
+    console.log('- No unpaid validator rewards found for recent eras.');
     return false;
   }
 
-  console.log("- Payouts need to be made:");
+  console.log('- Payouts need to be made:');
 
   for (const [stashId, eras] of rewards) {
     const total = eras.reduce(
       (total, { reward }) => (total != null ? total.add(reward) : reward),
-      null
+      null,
     );
 
     console.log(` * To \`${stashId}\`: ${formatDock(total)}`);
@@ -256,9 +257,9 @@ async function sendStakingPayouts(dock, erasInfo, initiator, batchSize) {
     // There's a much better way to check this...
     const isBatch = tx.method.args?.[0]?.[0] instanceof Map;
 
-    let msg = " * ";
-    if (isBatch) msg += `Batch transaction`;
-    else msg += `Transaction`;
+    let msg = ' * ';
+    if (isBatch) msg += 'Batch transaction';
+    else msg += 'Transaction';
 
     if (FinalizeTx) {
       msg += ` finalized at block \`${result.status.asFinalized}\`: `;
@@ -267,12 +268,11 @@ async function sendStakingPayouts(dock, erasInfo, initiator, batchSize) {
     }
 
     const payoutsSummary = (isBatch ? tx.method.args[0] : [tx.method])
-      .map((payout) => payout.get("args"))
+      .map((payout) => payout.get('args'))
       .map(
-        ({ validator_stash, era }) =>
-          `\`${validator_stash}\` rewarded for era ${era}`
+        ({ validator_stash, era }) => `\`${validator_stash}\` rewarded for era ${era}`,
       )
-      .join(isBatch ? ",\n    " : ",");
+      .join(isBatch ? ',\n    ' : ',');
 
     msg += isBatch ? `[\n    ${payoutsSummary}\n ]` : payoutsSummary;
 
@@ -280,21 +280,17 @@ async function sendStakingPayouts(dock, erasInfo, initiator, batchSize) {
   };
 
   const payoutTxs$ = from(rewards).pipe(
-    concatMap(([stashId, eras]) => from(eras.map(assoc("stashId", stashId)))),
-    mapRx(({ stashId, era }) =>
-      dock.api.tx.staking.payoutStakers(stashId, era)
-    ),
+    concatMap(([stashId, eras]) => from(eras.map(assoc('stashId', stashId)))),
+    mapRx(({ stashId, era }) => dock.api.tx.staking.payoutStakers(stashId, era)),
     batchExtrinsics(dock.api, batchSize),
     signAndSendExtrinsics(dock, initiator),
-    tap(logResult)
+    tap(logResult),
   );
 
-  await new Promise((resolve, reject) =>
-    payoutTxs$.subscribe({
-      error: reject,
-      complete: resolve,
-    })
-  );
+  await new Promise((resolve, reject) => payoutTxs$.subscribe({
+    error: reject,
+    complete: resolve,
+  }));
 
   return true;
 }
@@ -316,16 +312,16 @@ async function checkBalance(api, emailAddr, accountAddress, min) {
   if (balance.lt(min)) {
     console.error(
       `Balance of the \`${accountAddress}\` - ${formatDock(
-        balance
-      )} is less than ${formatDock(min)}.`
+        balance,
+      )} is less than ${formatDock(min)}.`,
     );
 
     await sendAlarmEmailText(
       emailAddr,
-      "Low balance of the staking payouts sender",
+      'Low balance of the staking payouts sender',
       `Balance of the \`${accountAddress}\` - ${formatDock(
-        balance
-      )} is less than ${formatDock(min)}.`
+        balance,
+      )} is less than ${formatDock(min)}.`,
     );
 
     return false;
@@ -350,7 +346,7 @@ async function checkBalance(api, emailAddr, accountAddress, min) {
  */
 const fetchErasInfo = async (api) => {
   const eras = await api.derive.staking.erasHistoric();
-  const indexByEra = indexBy(o((era) => era.toString(), prop("era")));
+  const indexByEra = indexBy(o((era) => era.toString(), prop('era')));
 
   const [pointsByEra, rewardsByEra, prefsByEra] = await Promise.all([
     api.derive.staking._erasPoints(eras),
@@ -407,16 +403,14 @@ const getUnclaimedStashesEras = curry((api, { eras }, stashIds$) =>
   // Concurrently get unclaimed eras for each of stashes
   stashIds$.pipe(
     mergeMap(
-      (stashId) =>
-        from(getUnclaimedStashEras(api, eras, stashId)).pipe(
-          // Filter out stashes with no unclaimed eras
-          filterRx(complement(isEmpty)),
-          mapRx(assoc("eras", __, { stashId }))
-        ),
-      ConcurrentRequestsLimit
-    )
-  )
-);
+      (stashId) => from(getUnclaimedStashEras(api, eras, stashId)).pipe(
+        // Filter out stashes with no unclaimed eras
+        filterRx(complement(isEmpty)),
+        mapRx(assoc('eras', __, { stashId })),
+      ),
+      ConcurrentRequestsLimit,
+    ),
+  ));
 
 /**
  * Signs and sends extrinsics produced by the given observable.
@@ -427,44 +421,42 @@ const getUnclaimedStashesEras = curry((api, { eras }, stashIds$) =>
  *
  * @returns {Observable<{ result: *, tx: * }>} executed transaction with result
  */
-const signAndSendExtrinsics = curry((dock, initiator, txs$) => {
+const signAndSendExtrinsics = curry((dock, initiator, txs$) =>
   // The first nonce to be used will come from the API call
   // To send several extrinsics simultaneously, we need to emulate increasing nonce
-  return from(dock.api.rpc.system.accountNextIndex(initiator.address)).pipe(
+  from(dock.api.rpc.system.accountNextIndex(initiator.address)).pipe(
     switchMap((nonce) => {
-      const sendExtrinsic = (tx) =>
-        defer(() => {
-          dock.setAccount(initiator);
-          const sentTx = dock.signAndSend(tx, FinalizeTx, { nonce });
-          // Increase nonce by hand
-          nonce = nonce.add(new BN(1));
+      const sendExtrinsic = (tx) => defer(() => {
+        dock.setAccount(initiator);
+        const sentTx = dock.signAndSend(tx, FinalizeTx, { nonce });
+        // Increase nonce by hand
+        nonce = nonce.add(new BN(1));
 
-          return from(timeout(TxFinalizationTimeout, sentTx));
-        }).pipe(
-          mapRx((result) => ({ tx, result })),
-          catchError((error, caught) => {
-            console.error(` * Transaction failed: ${error}`);
-            const stringified = error.toString().toLowerCase();
+        return from(timeout(TxFinalizationTimeout, sentTx));
+      }).pipe(
+        mapRx((result) => ({ tx, result })),
+        catchError((error, caught) => {
+          console.error(` * Transaction failed: ${error}`);
+          const stringified = error.toString().toLowerCase();
 
-            // Filter out errors related to balance, election and double-claim
-            if (
-              stringified.includes("balance") ||
-              stringified.includes("alreadyclaimed") ||
-              stringified.includes("invalid transaction") ||
-              stringified.includes("election")
-            ) {
-              return EMPTY;
-            } else {
-              // Retry an observable after the given timeout
-              return timer(RetryTimeout).pipe(concatMapTo(caught));
-            }
-          })
-        );
+          // Filter out errors related to balance, election and double-claim
+          if (
+            stringified.includes('balance')
+              || stringified.includes('alreadyclaimed')
+              || stringified.includes('invalid transaction')
+              || stringified.includes('election')
+          ) {
+            return EMPTY;
+          } else {
+            // Retry an observable after the given timeout
+            return timer(RetryTimeout).pipe(concatMapTo(caught));
+          }
+        }),
+      );
 
       return txs$.pipe(mergeMap(sendExtrinsic, ConcurrentTxLimit));
-    })
-  );
-});
+    }),
+  ));
 
 /**
  * Groups eras having some reward to be paid by validator stash accounts.
@@ -479,7 +471,7 @@ const buildValidatorRewards = curry(
   (
     checkValidatorInEra,
     { pointsByEra, rewardsByEra, prefsByEra },
-    validatorEras
+    validatorEras,
   ) => {
     const stashErasReducer = (acc, { eras, stashId }) => {
       const eraReducer = (acc, era) => {
@@ -495,24 +487,25 @@ const buildValidatorRewards = curry(
 
         if (
           // Points must be greater than 0
-          eraPoints?.eraPoints.gt(new BN(0)) &&
+          eraPoints?.eraPoints.gt(new BN(0))
           // We must have a stash as a validator in the given era
-          eraPoints?.validators[stashId] &&
+          && eraPoints?.validators[stashId]
           // Era rewards and prefs should be defined
-          eraRewards &&
-          eraPrefs &&
+          && eraRewards
+          && eraPrefs
           // Validator configuration in the era should be acceptable
-          checkValidatorInEra(stashId, eraInfo)
+          && checkValidatorInEra(stashId, eraInfo)
         ) {
           const reward = eraPoints.validators[stashId]
             .mul(eraRewards.eraReward)
             .div(eraPoints.eraPoints);
 
-          if (!reward.isZero())
+          if (!reward.isZero()) {
             return acc.concat({
               era,
               reward,
             });
+          }
         }
 
         return acc;
@@ -525,19 +518,19 @@ const buildValidatorRewards = curry(
       // Filter out stashes with no rewards
       reject(isEmpty),
       // Reduce given stash eras by the stash id
-      reduceBy(stashErasReducer, [], prop("stashId"))
+      reduceBy(stashErasReducer, [], prop('stashId')),
     )(validatorEras);
-  }
+  },
 );
 
 export const handler = async () => {
   await timeout(IterationTimeout * 2.5, main());
 
-  return "Done";
+  return 'Done';
 };
 
 if (require.main === module) {
-  console.log("Executing the script...");
+  console.log('Executing the script...');
 
   handler()
     .catch((error) => {

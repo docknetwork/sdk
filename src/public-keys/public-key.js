@@ -1,27 +1,37 @@
 import { u8aToHex } from '@polkadot/util';
 import { isHexWithGivenByteSize } from '../utils/codec';
+import { SizedTypedEnum } from '../utils/typed-enum';
 
 /** Class representing a PublicKey. This export class should always be extended (abstract export class in some languages) */
-export default class PublicKey {
-  /**
-   * Creates a new PublicKey object. Validates the given value. Currently supported key
-   * types only require validating the byte size.
-   * @param {string} value - Value of the public key. This is validated
-   * @param {number} expectedByteSize - Expected byte size of the key
-   * @constructor
-   */
-  constructor(value, expectedByteSize) {
-    this.validateByteSize(value, expectedByteSize);
-    this.value = value;
-  }
-
+export default class PublicKey extends SizedTypedEnum {
   /**
    * Check that the given public key has the expected byte size. Assumes the public key is in hex.
    */
-  validateByteSize(value, expectedByteSize) {
-    if (!isHexWithGivenByteSize(value, expectedByteSize)) {
-      throw new Error(`Public key must be ${expectedByteSize} bytes, got ${value.replace('0x', '').length / 2} bytes from value: ${value}`);
+  static validateSize(value) {
+    if (!isHexWithGivenByteSize(value, this.Size)) {
+      throw new Error(
+        `Public key must be ${this.Size} bytes, got ${value.replace('0x', '').length / 2} bytes from value: ${value}`,
+      );
     }
+
+    return value;
+  }
+
+  /**
+   * Validates the provided keyring pair and returns it in case of success.
+   * @param {object} keyringPair
+   * @returns {object}
+   */
+  static validateKeyringPair(keyringPair) {
+    const pairType = getKeyPairType(keyringPair);
+
+    if (this.Type !== pairType) {
+      throw new Error(
+        `Invalid keypair type - expected: ${this.Type}, received: ${pairType}`,
+      );
+    }
+
+    return keyringPair;
   }
 
   /**
@@ -31,15 +41,24 @@ export default class PublicKey {
    * @param {object} pair A polkadot-js KeyringPair.
    * @returns {PublicKey}
    */
-  static fromKeyringPair(pair) {
-    // Use of `this` is legal in static methods, https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#Boxing_with_prototype_and_static_methods
-    return new this(u8aToHex(pair.publicKey), 32);
+  static fromKeyringPair(keyringPair) {
+    return new this(u8aToHex(this.validateKeyringPair(keyringPair).publicKey));
+  }
+}
+
+/**
+ * Return the type of signature from a given keypair
+ * @param {object} pair - Can be a keypair from polkadot-js or elliptic library.
+ * @returns {string|*}
+ */
+export function getKeyPairType(pair) {
+  if (pair.type) {
+    return pair.type;
   }
 
-  /**
-   * @return {Object} The correct PublicKey JSON variant. The extending export class should implement it.
-   */
-  toJSON() {
-    throw new Error('Not implemented. The extending export class should implement it');
+  if (pair.ec && pair.priv) {
+    // elliptic library's pair has `ec`, `priv` and `pub`. There is not a cleaner way to detect that
+    return 'secp256k1';
   }
+  throw new Error('Cannot detect key pair type');
 }

@@ -2,18 +2,8 @@ import PublicKey from './public-key';
 
 /** Class representing a compressed Secp256k1 PublicKey */
 export default class PublicKeySecp256k1 extends PublicKey {
-  constructor(value) {
-    super(value, 33);
-  }
-
-  /**
-   * @return {Object} The PublicKey JSON variant Secp256k1.
-   */
-  toJSON() {
-    return {
-      Secp256k1: this.value,
-    };
-  }
+  static Type = 'secp256k1';
+  static Size = 33;
 
   /**
    * Returns a compressed public key for Secp256k1 curve. The name is intentionally kept same with the base export class to
@@ -21,10 +11,13 @@ export default class PublicKeySecp256k1 extends PublicKey {
    * @param {object} pair - A KeyPair from elliptic library
    * @returns {PublicKeySecp256k1}
    */
-  static fromKeyringPair(pair) {
+  static fromKeyringPair(keyringPair) {
     // `true` is for compressed
-    const pk = pair.getPublic(true, 'hex');
-    // `pk` is hex but does not contain the leading `0x`
-    return new this(`0x${pk}`);
+    const publicKey = this.validateKeyringPair(keyringPair).getPublic(
+      true,
+      'hex',
+    );
+    // public key is in hex but doesn't contain a leading zero
+    return new this(`0x${publicKey}`);
   }
 }

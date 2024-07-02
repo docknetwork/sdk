@@ -1,6 +1,6 @@
 import { BTreeSet, BTreeMap } from '@polkadot/types';
 import { u8aToHex } from '@polkadot/util';
-import { DidMethodKey, DockDid, DockDidOrDidMethodKey } from '../utils/did';
+import { DidMethodKey, DockDid, DockDidOrDidMethodKey } from '../did';
 import { isHexWithGivenByteSize } from '../utils/codec';
 import { getDidNonce, ensureMatchesPattern } from '../utils/misc';
 
@@ -712,7 +712,7 @@ export default class TrustRegistryModule {
   parseRegistryInfo({ name, convener, govFramework }) {
     return {
       name: name.toString(),
-      convener: DockDidOrDidMethodKey.from(convener).toQualifiedEncodedString(),
+      convener: DockDidOrDidMethodKey.from(convener).toString(),
       govFramework: u8aToHex(govFramework),
     };
   }
@@ -787,7 +787,7 @@ export default class TrustRegistryModule {
       (Array.isArray(issuers) ? values(issuers) : entries(issuers))
         .map((issuerWithInfo) => values(issuerWithInfo))
         .map(([issuer, info]) => [
-          DockDidOrDidMethodKey.from(issuer).toQualifiedEncodedString(),
+          DockDidOrDidMethodKey.from(issuer).toString(),
           typeof info.toJSON === 'function' ? info.toJSON() : info,
         ])
         .sort(([iss1], [iss2]) => iss1.localeCompare(iss2)),
@@ -802,7 +802,7 @@ export default class TrustRegistryModule {
    */
   parseSchemaVerifiers(verifiers) {
     return values(verifiers)
-      .map((verifier) => DockDidOrDidMethodKey.from(verifier).toQualifiedEncodedString())
+      .map((verifier) => DockDidOrDidMethodKey.from(verifier).toString())
       .sort((ver1, ver2) => ver1.localeCompare(ver2));
   }
 }

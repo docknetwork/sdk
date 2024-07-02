@@ -3,8 +3,12 @@ import { randomAsHex } from '@polkadot/util-crypto';
 
 import { DockAPI } from '../../src/index';
 
-import { createNewDockDID, typedHexDID, DidKeypair } from '../../src/utils/did';
-import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
+import { DockDid, DidKeypair } from '../../src/did';
+import {
+  FullNodeEndpoint,
+  TestKeyringOpts,
+  TestAccountURI,
+} from '../test-constants';
 import { DockBlobIdByteSize, BLOB_MAX_BYTE_SIZE } from '../../src/modules/blob';
 import { registerNewDIDUsingPair } from './helpers';
 
@@ -35,8 +39,8 @@ describe.skip('Blob Module', () => {
     account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
     pair = DidKeypair.fromApi(dock, { seed: firstKeySeed });
-    dockDID = createNewDockDID();
-    await registerNewDIDUsingPair(dock, typedHexDID(dock.api, dockDID), pair);
+    dockDID = DockDid.random();
+    await registerNewDIDUsingPair(dock, DockDid.from(dockDID), pair);
   });
 
   afterAll(async () => {
@@ -61,7 +65,7 @@ describe.skip('Blob Module', () => {
 
     const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
-    expect(chainBlob[0]).toEqual(typedHexDID(dock.api, dockDID));
+    expect(chainBlob[0]).toEqual(DockDid.from(dockDID));
     expect(chainBlob[1]).toEqual(blobJSON);
   }, 30000);
 
@@ -77,7 +81,7 @@ describe.skip('Blob Module', () => {
 
     const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
-    expect(chainBlob[0]).toEqual(typedHexDID(dock.api, dockDID));
+    expect(chainBlob[0]).toEqual(DockDid.from(dockDID));
     expect(u8aToString(chainBlob[1])).toEqual(blobHex);
   }, 30000);
 
@@ -94,7 +98,7 @@ describe.skip('Blob Module', () => {
 
     const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
-    expect(chainBlob[0]).toEqual(typedHexDID(dock.api, dockDID));
+    expect(chainBlob[0]).toEqual(DockDid.from(dockDID));
     expect(u8aToHex(chainBlob[1])).toEqual(blobHex);
   }, 30000);
 
@@ -111,7 +115,7 @@ describe.skip('Blob Module', () => {
 
     const chainBlob = await dock.blob.get(blobId);
     expect(!!chainBlob).toBe(true);
-    expect(chainBlob[0]).toEqual(typedHexDID(dock.api, dockDID));
+    expect(chainBlob[0]).toEqual(DockDid.from(dockDID));
     expect(chainBlob[1]).toEqual(blobVect);
   }, 30000);
 
@@ -121,11 +125,11 @@ describe.skip('Blob Module', () => {
       id: blobId,
       blob: blobHex,
     };
-    await expect(dock.blob.new(blob, dockDID, pair, dock, false)).rejects.toThrow();
-
     await expect(
-      dock.blob.get(blobId),
-    ).rejects.toThrowError('does not exist');
+      dock.blob.new(blob, dockDID, pair, dock, false),
+    ).rejects.toThrow();
+
+    await expect(dock.blob.get(blobId)).rejects.toThrowError('does not exist');
   }, 30000);
 
   test('Fails to write blob with id already used.', async () => {
@@ -144,13 +148,15 @@ describe.skip('Blob Module', () => {
       blob: randomAsHex(123),
     };
 
-    await expect(dock.blob.new(blob, dockDID, pair, dock, false)).rejects.toThrow();
+    await expect(
+      dock.blob.new(blob, dockDID, pair, dock, false),
+    ).rejects.toThrow();
   }, 60000);
 
   test('Should throw error when cannot read blob with given id from chain.', async () => {
     const nonExistentBlobId = randomAsHex(DockBlobIdByteSize);
-    await expect(
-      dock.blob.get(nonExistentBlobId),
-    ).rejects.toThrowError('does not exist');
+    await expect(dock.blob.get(nonExistentBlobId)).rejects.toThrowError(
+      'does not exist',
+    );
   }, 30000);
 });

@@ -1,12 +1,12 @@
 /* eslint-disable max-classes-per-file */
 
-import { isHexWithGivenByteSize } from '../codec';
+import { isHexWithGivenByteSize } from '../utils/codec';
 import {
   PublicKey, // eslint-disable-line
   VerificationRelationship, // eslint-disable-line
-} from '../../public-keys';
+} from '../public-keys';
 
-import { Signature } from "../../signatures"; // eslint-disable-line
+import { Signature } from "../signatures"; // eslint-disable-line
 
 import { DockDIDByteSize } from './constants';
 

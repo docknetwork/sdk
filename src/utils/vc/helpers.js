@@ -18,7 +18,11 @@ import {
   JsonWebSignature2020,
   Ed25519Signature2020,
 } from './custom_crypto';
-import { Bls12381BDDT16DockVerKeyName, Bls12381BDDT16MacDockName, Ed255192020VerKeyName } from './crypto/constants';
+import {
+  Bls12381BDDT16DockVerKeyName,
+  Bls12381BDDT16MacDockName,
+  Ed255192020VerKeyName,
+} from './crypto/constants';
 import Bls12381BDDT16MACDock2024 from './crypto/Bls12381BDDT16MACDock2024';
 
 /**
@@ -42,7 +46,7 @@ import Bls12381BDDT16MACDock2024 from './crypto/Bls12381BDDT16MACDock2024';
 export function getKeyDoc(did, keypair, type, id) {
   return {
     id: id || `${did}#keys-1`,
-    controller: did,
+    controller: String(did),
     type: type || keypair.verKeyType,
     keypair: keypair.keyPair || keypair,
   };
@@ -158,13 +162,20 @@ export function getKeyFromDIDDocument(didDocument, didUrl) {
 export function processIfKvac(credential) {
   const { proof } = credential;
   if (proof === undefined || proof.type === undefined) {
-    throw new Error(`Credential should have a non-null type field but found ${proof.type}`);
+    throw new Error(
+      `Credential should have a non-null type field but found ${proof.type}`,
+    );
   }
   if (proof.type === Bls12381BDDT16MacDockName) {
     return {
-      results: [{
-        verified: true, proof, verificationMethod: {}, purposeResult: {},
-      }],
+      results: [
+        {
+          verified: true,
+          proof,
+          verificationMethod: {},
+          purposeResult: {},
+        },
+      ],
       verified: true,
     };
   }

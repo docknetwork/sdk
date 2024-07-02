@@ -4,23 +4,24 @@ import { DockAPI } from '../../../src';
 import { ATTESTS_IRI } from '../../../src/modules/did';
 
 import {
-  createNewDockDID,
-  typedHexDID,
+  DockDid,
   NoDIDError,
   NoOffchainDIDError,
   DidKeypair,
-} from '../../../src/utils/did';
-import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../../test-constants';
+} from '../../../src/did';
 import {
-  VerificationRelationship, DidKey,
-} from '../../../src/public-keys';
+  FullNodeEndpoint,
+  TestKeyringOpts,
+  TestAccountURI,
+} from '../../test-constants';
+import { VerificationRelationship, DidKey } from '../../../src/public-keys';
 import { checkVerificationMethods } from '../helpers';
 
 describe('Basic DID tests', () => {
   const dock = new DockAPI();
 
   // Generate a random DID
-  const dockDid = createNewDockDID();
+  const dockDid = DockDid.random();
   let typedDid;
   let hexDid;
 
@@ -33,7 +34,7 @@ describe('Basic DID tests', () => {
       address: FullNodeEndpoint,
     });
 
-    typedDid = typedHexDID(dock.api, dockDid);
+    typedDid = DockDid.from(dockDid);
     hexDid = typedDid.asDid;
   });
 
@@ -50,7 +51,9 @@ describe('Basic DID tests', () => {
 
   test('Can create a DID', async () => {
     // DID does not exist
-    await expect(dock.did.getOnchainDidDetail(hexDid)).rejects.toThrow(NoDIDError);
+    await expect(dock.did.getOnchainDidDetail(hexDid)).rejects.toThrow(
+      NoDIDError,
+    );
 
     const pair = new DidKeypair(dock.keyring.addFromUri(seed));
     const publicKey = pair.publicKey();
@@ -63,10 +66,14 @@ describe('Basic DID tests', () => {
     expect(didDetail.lastKeyId).toBe(1);
     expect(didDetail.activeControllerKeys).toBe(1);
     expect(didDetail.activeControllers).toBe(1);
-    await expect(dock.did.isController(dockDid, dockDid)).resolves.toEqual(true);
+    await expect(dock.did.isController(dockDid, dockDid)).resolves.toEqual(
+      true,
+    );
 
     // DID cannot be fetched as off-chain DID
-    await expect(dock.did.getOffchainDidDetail(hexDid)).rejects.toThrow(NoOffchainDIDError);
+    await expect(dock.did.getOffchainDidDetail(hexDid)).rejects.toThrow(
+      NoOffchainDIDError,
+    );
   }, 30000);
 
   test('Get key for DID', async () => {
@@ -96,10 +103,14 @@ describe('Basic DID tests', () => {
     check(doc);
 
     // The same checks should pass when passing the flag for keys
-    const doc1 = await dock.did.getDocument(dockDid, { getOffchainSigKeys: false });
+    const doc1 = await dock.did.getDocument(dockDid, {
+      getOffchainSigKeys: false,
+    });
     check(doc1);
 
-    const doc2 = await dock.did.getDocument(dockDid, { getOffchainSigKeys: true });
+    const doc2 = await dock.did.getDocument(dockDid, {
+      getOffchainSigKeys: true,
+    });
     check(doc2);
   }, 10000);
 
@@ -125,8 +136,12 @@ describe('Basic DID tests', () => {
     await dock.did.remove(dockDid, dockDid, pair, undefined, false);
     // DID removed
     await expect(dock.did.getDocument(dockDid)).rejects.toThrow(NoDIDError);
-    await expect(dock.did.getOnchainDidDetail(hexDid)).rejects.toThrow(NoDIDError);
+    await expect(dock.did.getOnchainDidDetail(hexDid)).rejects.toThrow(
+      NoDIDError,
+    );
     await expect(dock.did.getDidKey(dockDid, 1)).rejects.toThrow();
-    await expect(dock.did.isController(dockDid, dockDid)).resolves.toEqual(false);
+    await expect(dock.did.isController(dockDid, dockDid)).resolves.toEqual(
+      false,
+    );
   });
 });

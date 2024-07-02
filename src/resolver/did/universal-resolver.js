@@ -1,4 +1,4 @@
-import { NoDIDError } from '../../utils/did';
+import { NoDIDError } from '../../did';
 import { Resolver, WILDCARD } from '../generic';
 import jsonFetch from '../../utils/json-fetch';
 

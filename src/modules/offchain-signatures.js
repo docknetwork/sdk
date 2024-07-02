@@ -1,11 +1,8 @@
 /* eslint-disable camelcase */
 
-import {
-  getDidNonce,
-  getStateChange,
-} from '../utils/misc';
+import { getDidNonce, getStateChange } from '../utils/misc';
 import WithParamsAndPublicKeys from './WithParamsAndPublicKeys';
-import { createDidSig, typedHexDID } from '../utils/did';
+import { createDidSig, DockDidOrDidMethodKey } from '../did';
 
 const STATE_CHANGES = {
   AddParams: 'AddOffchainSignatureParams',
@@ -50,7 +47,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
    * @returns {Promise<{bytes: string}|null>}
    */
   async getLastParamsWritten(did) {
-    const hexId = typedHexDID(this.api, did);
+    const hexId = DockDidOrDidMethodKey.from(did);
     const counter = await this.api.query[this.moduleName].paramsCounter(hexId);
     if (counter > 0) {
       const resp = await this.queryParamsFromChain(hexId, counter);
@@ -67,7 +64,7 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
    * @returns {Promise<object[]>}
    */
   async getAllParamsByDid(did) {
-    const hexId = typedHexDID(this.api, did);
+    const hexId = DockDidOrDidMethodKey.from(did);
 
     const params = [];
     const counter = await this.api.query[this.moduleName].paramsCounter(hexId);
@@ -128,8 +125,8 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
     { nonce = undefined, didModule = undefined },
   ) {
     const offchainPublicKey = this.constructor.buildPublicKey(publicKey);
-    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const targetHexDid = DockDidOrDidMethodKey.from(targetDid).asDid;
+    const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
     const [addPk, signature] = await this.createSignedAddPublicKey(
       offchainPublicKey,
       targetHexDid,
@@ -158,8 +155,8 @@ export default class OffchainSignaturesModule extends WithParamsAndPublicKeys {
     signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const targetHexDid = DockDidOrDidMethodKey.from(targetDid).asDid;
+    const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
     const [removePk, signature] = await this.createSignedRemovePublicKey(
       removeKeyId,
       targetHexDid,

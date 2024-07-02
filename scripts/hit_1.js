@@ -1,8 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
-import dock, { DockAPI } from '../src/index';
-import {
-  createNewDockDID, DidKeypair,
-} from '../src/utils/did';
+import dock from '../src/index';
+import { DockDid, DidKeypair } from '../src/did';
 import { getPublicKeyFromKeyringPair } from '../src/utils/misc';
 import { sendBatch } from './helpers';
 import { DidKey, VerificationRelationship } from '../src/public-keys';
@@ -40,7 +38,7 @@ async function sendOnChainDIDTxns(count, waitForFinalization = true) {
   const txs = [];
   const didPairs = [];
   while (txs.length < count) {
-    const did = createNewDockDID();
+    const did = DockDid.random();
     const seed = randomAsHex(32);
     const pair = dock.keyring.addFromUri(seed, null, 'sr25519');
     const publicKey = getPublicKeyFromKeyringPair(pair);
@@ -105,7 +103,12 @@ async function sendAddControllerTxns(count, didPairs) {
   while (txs.length < count) {
     const did = didPairs[j][0];
     const currentPair = didPairs[j][1];
-    const tx = await dock.did.createAddControllersTx([createNewDockDID()], did, did, currentPair);
+    const tx = await dock.did.createAddControllersTx(
+      [DockDid.random()],
+      did,
+      did,
+      currentPair,
+    );
     txs.push(tx);
     j++;
   }
@@ -166,7 +169,9 @@ async function sendBlobTxns(count, didPairs) {
       id: blobId,
       blob: randomAsHex(995),
     };
-    const tx = await dock.blob.createNewTx(blob, did, pair, { didModule: dock.did });
+    const tx = await dock.blob.createNewTx(blob, did, pair, {
+      didModule: dock.did,
+    });
     txs.push(tx);
     blobIds.push(blobId);
     j++;
@@ -238,7 +243,7 @@ async function runInLoop(limit) {
     console.log('Remove 1950 DIDs in a batch');
     count++;
     console.info(`Iteration ${count} done`);
-    if (limit && (count >= limit)) {
+    if (limit && count >= limit) {
       break;
     }
     console.timeEnd('iteration');
@@ -271,9 +276,10 @@ async function main() {
   process.exit(0);
 }
 
-dock.init({
-  address: FullNodeEndpoint,
-})
+dock
+  .init({
+    address: FullNodeEndpoint,
+  })
   .then(main)
   .catch((error) => {
     console.error('Error occurred somewhere, it was caught!', error);

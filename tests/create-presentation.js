@@ -1,4 +1,4 @@
-import VerifiablePresentation from '../src/verifiable-presentation';
+import VerifiablePresentation from "../src/verifiable-presentation";
 
 /**
  * Create an unsigned Verifiable Presentation
@@ -7,7 +7,11 @@ import VerifiablePresentation from '../src/verifiable-presentation';
  * @param {string} [holder] - optional presentation holder url
  * @return {object} verifiable presentation.
  */
-export function createPresentation(verifiableCredential, id = 'http://example.edu/presentation/2803', holder = null) {
+export function createPresentation(
+  verifiableCredential,
+  id = "http://example.edu/presentation/2803",
+  holder = null,
+) {
   const presentation = new VerifiablePresentation(id);
   if (Array.isArray(verifiableCredential)) {
     presentation.addCredentials(verifiableCredential);
@@ -15,7 +19,7 @@ export function createPresentation(verifiableCredential, id = 'http://example.ed
     presentation.addCredential(verifiableCredential);
   }
   if (holder) {
-    presentation.setHolder(holder);
+    presentation.setHolder(String(holder));
   }
   return presentation.toJSON();
 }

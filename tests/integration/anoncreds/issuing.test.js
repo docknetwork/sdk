@@ -64,7 +64,7 @@ describe.each(Schemes)('Issuance', ({
 
     if (Name !== 'BDDT16') {
       // Setup public key on blockchain
-      const pk1 = Module.prepareAddPublicKey(dock.api, u8aToHex(keypair.publicKeyBuffer));
+      const pk1 = Module.prepareAddPublicKey(u8aToHex(keypair.publicKeyBuffer));
       await chainModule.addPublicKey(
         pk1,
         did1,

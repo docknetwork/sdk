@@ -13936,6 +13936,694 @@ proof's purpose.</div>
     
         <h2><span class="attribs"><span class="type-signature"></span></span>exports<span class="signature">(options)</span><span class="type-signature"></span></h2>
         
+            <div class="class-description">A BBDT16 signature suite for use with BLS12-381 Dock key pairs</div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    
+    <h4 class="name" id=".exports"><span class="type-signature"></span>new exports<span class="signature">(options)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Default constructor
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">SignatureSuiteOptions</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">options for constructing the signature suite</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_Bls12381BBDT16MACDock2024.js.html">utils/vc/crypto/Bls12381BBDT16MACDock2024.js</a>, <a href="utils_vc_crypto_Bls12381BBDT16MACDock2024.js.html#line14">line 14</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="METHOD"><span class="type-signature">(abstract) </span>METHOD<span class="type-signature"> :Array.&lt;string>|string|symbol</span></h4>
+
+
+
+
+<div class="description">
+    Matching string method, an array of string methods, or wildcard pattern.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array.&lt;string></span>
+|
+
+<span class="param-type">string</span>
+|
+
+<span class="param-type">symbol</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="resolver_generic_multi-resolver.js.html">resolver/generic/multi-resolver.js</a>, <a href="resolver_generic_multi-resolver.js.html#line38">line 38</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="PREFIX"><span class="type-signature">(abstract) </span>PREFIX<span class="type-signature"> :Array.&lt;string>|string|symbol</span></h4>
+
+
+
+
+<div class="description">
+    Matching string prefix, an array of string prefixes, or wildcard pattern.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array.&lt;string></span>
+|
+
+<span class="param-type">string</span>
+|
+
+<span class="param-type">symbol</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="resolver_generic_multi-resolver.js.html">resolver/generic/multi-resolver.js</a>, <a href="resolver_generic_multi-resolver.js.html#line31">line 31</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>exports<span class="signature">(options)</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description">A BBDT16 signature suite for use with derived BBDT16 credentials aka BBDT16 presentations</div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    
+    <h4 class="name" id=".exports"><span class="type-signature"></span>new exports<span class="signature">(options)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Default constructor
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">SignatureSuiteOptions</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">options for constructing the signature suite</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_vc_crypto_Bls12381BBDT16MACProofDock2024.js.html">utils/vc/crypto/Bls12381BBDT16MACProofDock2024.js</a>, <a href="utils_vc_crypto_Bls12381BBDT16MACProofDock2024.js.html#line12">line 12</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="METHOD"><span class="type-signature">(abstract) </span>METHOD<span class="type-signature"> :Array.&lt;string>|string|symbol</span></h4>
+
+
+
+
+<div class="description">
+    Matching string method, an array of string methods, or wildcard pattern.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array.&lt;string></span>
+|
+
+<span class="param-type">string</span>
+|
+
+<span class="param-type">symbol</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="resolver_generic_multi-resolver.js.html">resolver/generic/multi-resolver.js</a>, <a href="resolver_generic_multi-resolver.js.html#line38">line 38</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="PREFIX"><span class="type-signature">(abstract) </span>PREFIX<span class="type-signature"> :Array.&lt;string>|string|symbol</span></h4>
+
+
+
+
+<div class="description">
+    Matching string prefix, an array of string prefixes, or wildcard pattern.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array.&lt;string></span>
+|
+
+<span class="param-type">string</span>
+|
+
+<span class="param-type">symbol</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="resolver_generic_multi-resolver.js.html">resolver/generic/multi-resolver.js</a>, <a href="resolver_generic_multi-resolver.js.html#line31">line 31</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>exports<span class="signature">(options)</span><span class="type-signature"></span></h2>
+        
             <div class="class-description">A BBS+ signature suite for use with BLS12-381 Dock key pairs</div>
         
     
@@ -15312,694 +16000,6 @@ proof's purpose.</div>
     
         <h2><span class="attribs"><span class="type-signature"></span></span>exports<span class="signature">(options)</span><span class="type-signature"></span></h2>
         
-            <div class="class-description">A BDDT16 signature suite for use with BLS12-381 Dock key pairs</div>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-
-    
-    <h2>Constructor</h2>
-    
-
-    
-    <h4 class="name" id=".exports"><span class="type-signature"></span>new exports<span class="signature">(options)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Default constructor
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">SignatureSuiteOptions</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">options for constructing the signature suite</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_Bls12381BDDT16MACDock2024.js.html">utils/vc/crypto/Bls12381BDDT16MACDock2024.js</a>, <a href="utils_vc_crypto_Bls12381BDDT16MACDock2024.js.html#line14">line 14</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Members</h3>
-
-        
-            
-<h4 class="name" id="METHOD"><span class="type-signature">(abstract) </span>METHOD<span class="type-signature"> :Array.&lt;string>|string|symbol</span></h4>
-
-
-
-
-<div class="description">
-    Matching string method, an array of string methods, or wildcard pattern.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Array.&lt;string></span>
-|
-
-<span class="param-type">string</span>
-|
-
-<span class="param-type">symbol</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="resolver_generic_multi-resolver.js.html">resolver/generic/multi-resolver.js</a>, <a href="resolver_generic_multi-resolver.js.html#line38">line 38</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="PREFIX"><span class="type-signature">(abstract) </span>PREFIX<span class="type-signature"> :Array.&lt;string>|string|symbol</span></h4>
-
-
-
-
-<div class="description">
-    Matching string prefix, an array of string prefixes, or wildcard pattern.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Array.&lt;string></span>
-|
-
-<span class="param-type">string</span>
-|
-
-<span class="param-type">symbol</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="resolver_generic_multi-resolver.js.html">resolver/generic/multi-resolver.js</a>, <a href="resolver_generic_multi-resolver.js.html#line31">line 31</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
-
-
-
-
-
-
-
-<section>
-
-<header>
-    
-        <h2><span class="attribs"><span class="type-signature"></span></span>exports<span class="signature">(options)</span><span class="type-signature"></span></h2>
-        
-            <div class="class-description">A BDDT16 signature suite for use with derived BDDT16 credentials aka BDDT16 presentations</div>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-
-    
-    <h2>Constructor</h2>
-    
-
-    
-    <h4 class="name" id=".exports"><span class="type-signature"></span>new exports<span class="signature">(options)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Default constructor
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">SignatureSuiteOptions</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">options for constructing the signature suite</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_vc_crypto_Bls12381BDDT16MACProofDock2024.js.html">utils/vc/crypto/Bls12381BDDT16MACProofDock2024.js</a>, <a href="utils_vc_crypto_Bls12381BDDT16MACProofDock2024.js.html#line12">line 12</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Members</h3>
-
-        
-            
-<h4 class="name" id="METHOD"><span class="type-signature">(abstract) </span>METHOD<span class="type-signature"> :Array.&lt;string>|string|symbol</span></h4>
-
-
-
-
-<div class="description">
-    Matching string method, an array of string methods, or wildcard pattern.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Array.&lt;string></span>
-|
-
-<span class="param-type">string</span>
-|
-
-<span class="param-type">symbol</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="resolver_generic_multi-resolver.js.html">resolver/generic/multi-resolver.js</a>, <a href="resolver_generic_multi-resolver.js.html#line38">line 38</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="PREFIX"><span class="type-signature">(abstract) </span>PREFIX<span class="type-signature"> :Array.&lt;string>|string|symbol</span></h4>
-
-
-
-
-<div class="description">
-    Matching string prefix, an array of string prefixes, or wildcard pattern.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Array.&lt;string></span>
-|
-
-<span class="param-type">string</span>
-|
-
-<span class="param-type">symbol</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="resolver_generic_multi-resolver.js.html">resolver/generic/multi-resolver.js</a>, <a href="resolver_generic_multi-resolver.js.html#line31">line 31</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
-
-
-
-
-
-
-
-<section>
-
-<header>
-    
-        <h2><span class="attribs"><span class="type-signature"></span></span>exports<span class="signature">(options)</span><span class="type-signature"></span></h2>
-        
             <div class="class-description">A PS signature suite for use with BLS12-381 Dock key pairs</div>
         
     
@@ -16688,7 +16688,7 @@ proof's purpose.</div>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Tue Jul 02 2024 15:59:18 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Tue Jul 02 2024 17:23:28 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

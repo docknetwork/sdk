@@ -1,9 +1,11 @@
 import { Presentation } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
-import semver from 'semver/preload';
+import stringify from 'json-stringify-deterministic';
 import { withExtendedStaticProperties } from '../../../inheritance';
 
 import CustomLinkedDataSignature from './CustomLinkedDataSignature';
+
+import { isCredVerGte060 } from './DockCryptoSignature';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
@@ -123,20 +125,20 @@ export default withExtendedStaticProperties(
       }
 
       const credVersion = proof.version;
-
+      const newCredVersion = isCredVerGte060(credVersion);
       // TODO: This is wrong. This won't work with presentation from 2 or more credentials
       const c = {
         sigType: proof.sigType,
         version: credVersion,
         bounds: proof.bounds,
-        schema: semver.gte(credVersion, '0.6.0') ? credentialSchema : JSON.stringify(credentialSchema),
+        schema: newCredVersion ? credentialSchema : JSON.stringify(credentialSchema),
         revealedAttributes: {
           proof: {
             type: this.sigName,
             verificationMethod: proof.verificationMethod,
           },
-          '@context': JSON.stringify(context),
-          type: JSON.stringify(type),
+          '@context': newCredVersion ? stringify(context) : JSON.stringify(context),
+          type: newCredVersion ? stringify(type) : JSON.stringify(type),
           ...revealedAttributes,
         },
       };

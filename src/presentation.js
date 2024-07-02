@@ -8,7 +8,6 @@ import {
 } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
 import { stringToU8a } from '@polkadot/util';
-import semver from 'semver/preload';
 import { ensureArray } from './utils/type-helpers';
 
 import Bls12381BBSSignatureDock2022 from './utils/vc/crypto/Bls12381BBSSignatureDock2022';
@@ -27,6 +26,8 @@ import {
   Bls12381PSSignatureDock2023,
 } from './utils/vc/custom_crypto';
 import Bls12381BDDT16MACDock2024 from './utils/vc/crypto/Bls12381BDDT16MACDock2024';
+
+import { isCredVerGte060 } from './utils/vc/crypto/common/DockCryptoSignature';
 
 const SIG_NAME_TO_PROOF_NAME = Object.setPrototypeOf(
   {
@@ -198,7 +199,7 @@ export default class Presentation {
         id: credential.revealedAttributes.id || DOCK_ANON_CREDENTIAL_ID,
         '@context': JSON.parse(credential.revealedAttributes['@context']),
         type: JSON.parse(credential.revealedAttributes.type),
-        credentialSchema: semver.gte(credential.version, '0.6.0') ? credential.schema : JSON.parse(credential.schema),
+        credentialSchema: isCredVerGte060(credential.version) ? credential.schema : JSON.parse(credential.schema),
         issuer:
           credential.revealedAttributes.issuer
           || credential.revealedAttributes.proof.verificationMethod.split('#')[0],

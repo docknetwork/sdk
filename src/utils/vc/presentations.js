@@ -19,7 +19,7 @@ import {
   Bls12381BBS23SigDockSigName,
   Bls12381BBSDockVerKeyName,
   Bls12381PSDockVerKeyName,
-  Bls12381BBS23DockVerKeyName, Bls12381BDDT16DockVerKeyName, Bls12381BDDT16MacDockName,
+  Bls12381BBS23DockVerKeyName, Bls12381BBDT16DockVerKeyName, Bls12381BBDT16MacDockName,
 } from './crypto/constants';
 
 import { DEFAULT_CONTEXT_V1_URL } from './constants';
@@ -308,8 +308,8 @@ export async function verifyAnoncreds(presentation, options = {}) {
         case Bls12381PSSigDockSigName:
           sigClass = Bls12381PSSignatureDock2023;
           break;
-        case Bls12381BDDT16MacDockName:
-          return { type: Bls12381BDDT16DockVerKeyName };
+        case Bls12381BBDT16MacDockName:
+          return { type: Bls12381BBDT16DockVerKeyName };
         default:
           throw new Error(`Invalid proof type ${proof.type}`);
       }
@@ -340,7 +340,7 @@ export async function verifyAnoncreds(presentation, options = {}) {
       case Bls12381PSDockVerKeyName:
         Cls = PSPublicKey;
         break;
-      case Bls12381BDDT16DockVerKeyName:
+      case Bls12381BBDT16DockVerKeyName:
         return;
       default:
         throw new Error(`Invalid key document type: ${keyType}`);

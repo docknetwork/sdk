@@ -37,8 +37,8 @@ import {
   Bls12381BBSSignatureProofDock2022,
   Bls12381BBSSignatureProofDock2023,
   Bls12381BBSSigProofDockSigName,
-  Bls12381BDDT16MacDockName,
-  Bls12381BDDT16MacProofDockName,
+  Bls12381BBDT16MacDockName,
+  Bls12381BBDT16MacProofDockName,
   Bls12381PSSigDockSigName,
   Bls12381PSSignatureDock2023,
   Bls12381PSSignatureProofDock2023,
@@ -50,7 +50,7 @@ import {
   Sr25519Signature2020,
 } from './custom_crypto';
 import { signJWS } from './jws';
-import Bls12381BDDT16MACProofDock2024 from './crypto/Bls12381BDDT16MACProofDock2024';
+import Bls12381BBDT16MACProofDock2024 from './crypto/Bls12381BBDT16MACProofDock2024';
 
 export const VC_ISSUE_TYPE_JSONLD = 'jsonld';
 export const VC_ISSUE_TYPE_PROOFVALUE = 'proofValue';
@@ -84,8 +84,8 @@ export function isAnoncredsProofType(verifiableCredential) {
     || proofType === Bls12381BBS23SigProofDockSigName
     || proofType === Bls12381PSSigProofDockSigName
     || proofType === Bls12381BBS23SigDockSigName
-    || proofType === Bls12381BDDT16MacDockName
-    || proofType === Bls12381BDDT16MacProofDockName
+    || proofType === Bls12381BBDT16MacDockName
+    || proofType === Bls12381BBDT16MacProofDockName
     || proofType === Bls12381PSSigDockSigName
   );
 }
@@ -378,8 +378,8 @@ export async function verifyCredential(
     new Bls12381BBSSignatureProofDock2023(anoncredsParams),
     new Bls12381PSSignatureDock2023(anoncredsParams),
     new Bls12381PSSignatureProofDock2023(anoncredsParams),
-    // Only BDDT16MACProof is present and not BDDT16MAC since those aren't verified by the following
-    new Bls12381BDDT16MACProofDock2024(anoncredsParams),
+    // Only BBDT16MACProof is present and not BBDT16MAC since those aren't verified by the following
+    new Bls12381BBDT16MACProofDock2024(anoncredsParams),
     ...suite,
   ];
 

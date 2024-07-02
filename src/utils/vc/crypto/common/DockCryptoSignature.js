@@ -299,13 +299,10 @@ export default withExtendedStaticProperties(
 
       // To work with JSON-LD credentials/presentations, we must always reveal the context and type
       // NOTE: that they are encoded as JSON strings here to reduce message count and so its *always known*
-      // TODO: `stringify` should be used which is deterministic since @context can be an object
       credBuilder.setTopLevelField(
         '@context',
         stringify(document['@context']),
       );
-      // TODO: type is never an object? Or use `stringify` to be safe
-      // Not adding the TODOs here since verification code also uses JSON.stringify and will need to check versions and then use the appropriate call.
       credBuilder.setTopLevelField('type', stringify(document.type));
 
       const serializedCred = credBuilder.serializeForSigning();

@@ -7,7 +7,7 @@ import {
   Accumulator,
   PositiveAccumulator,
   dockAccumulatorParams, AccumulatorPublicKey,
-  Encoder, BDDT16MacSecretKey, MEM_CHECK_STR, KBUniversalAccumulator,
+  Encoder, BBDT16MacSecretKey, MEM_CHECK_STR, KBUniversalAccumulator,
   MEM_CHECK_KV_STR,
   RevocationStatusProtocol,
 } from '@docknetwork/crypto-wasm-ts';
@@ -183,7 +183,7 @@ describe.each(Schemes)('Derived Credentials', ({
       controller: did1, msgCount: 100,
     });
 
-    if (Name !== 'BDDT16') {
+    if (Name !== 'BBDT16') {
       const pk1 = Module.prepareAddPublicKey(dock.api, u8aToHex(keypair.publicKeyBuffer));
       await chainModule.addPublicKey(
         pk1,
@@ -296,13 +296,13 @@ describe.each(Schemes)('Derived Credentials', ({
     // This is done by the verifier
     const reconstructedPres = derivedToAnoncredsPresentation(presentation.verifiableCredential[0]);
     const keyedProofs = getKeyedProofsFromVerifiedPresentation(reconstructedPres);
-    const isKvac = Name === 'BDDT16';
+    const isKvac = Name === 'BBDT16';
     const isKvacStatus = accumSecretKey ? 1 : 0;
     // Keyed proofs only exist for KVAC
     expect(keyedProofs.size).toEqual(isKvac || isKvacStatus ? 1 : 0);
     if (isKvac) {
       // This block is executed by the issuer or anyone having the secret key but not by the verifier
-      const sk = new BDDT16MacSecretKey(keypair.privateKeyBuffer);
+      const sk = new BBDT16MacSecretKey(keypair.privateKeyBuffer);
       // eslint-disable-next-line jest/no-conditional-expect
       expect(keyedProofs.get(0)?.credential?.proof.verify(sk).verified).toEqual(true);
     }
@@ -502,12 +502,12 @@ describe.each(Schemes)('Derived Credentials', ({
 
     // This is done by the verifier
     const keyedProofs = getKeyedProofsFromVerifiedPresentation(reconstructedPres);
-    const isKvac = Name === 'BDDT16';
+    const isKvac = Name === 'BBDT16';
     // Keyed proofs only exist for KVAC
     expect(keyedProofs.size).toEqual(isKvac ? 1 : 0);
     if (isKvac) {
       // This block is executed by the issuer or anyone having the secret key but not by the verifier
-      const sk = new BDDT16MacSecretKey(keypair.privateKeyBuffer);
+      const sk = new BBDT16MacSecretKey(keypair.privateKeyBuffer);
       // eslint-disable-next-line jest/no-conditional-expect
       expect(keyedProofs.get(0)?.credential?.proof.verify(sk).verified).toEqual(true);
     }

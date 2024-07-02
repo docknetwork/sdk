@@ -18,14 +18,14 @@ import {
   Bls12381BBS23SigDockSigName,
   Bls12381PSSigProofDockSigName,
   Bls12381BBS23SigProofDockSigName,
-  Bls12381BBSSigProofDockSigName, Bls12381BDDT16MacDockName, Bls12381BDDT16MacProofDockName,
+  Bls12381BBSSigProofDockSigName, Bls12381BBDT16MacDockName, Bls12381BBDT16MacProofDockName,
 } from './utils/vc/crypto/constants';
 import defaultDocumentLoader from './utils/vc/document-loader';
 import {
   Bls12381BBSSignatureDock2023,
   Bls12381PSSignatureDock2023,
 } from './utils/vc/custom_crypto';
-import Bls12381BDDT16MACDock2024 from './utils/vc/crypto/Bls12381BDDT16MACDock2024';
+import Bls12381BBDT16MACDock2024 from './utils/vc/crypto/Bls12381BBDT16MACDock2024';
 
 import { isCredVerGte060 } from './utils/vc/crypto/common/DockCryptoSignature';
 
@@ -34,7 +34,7 @@ const SIG_NAME_TO_PROOF_NAME = Object.setPrototypeOf(
     [Bls12381BBSSigDockSigName]: Bls12381BBSSigProofDockSigName,
     [Bls12381BBS23SigDockSigName]: Bls12381BBS23SigProofDockSigName,
     [Bls12381PSSigDockSigName]: Bls12381PSSigProofDockSigName,
-    [Bls12381BDDT16MacDockName]: Bls12381BDDT16MacProofDockName,
+    [Bls12381BBDT16MacDockName]: Bls12381BBDT16MacProofDockName,
   },
   null,
 );
@@ -124,8 +124,8 @@ export default class Presentation {
         Signature = Bls12381PSSignatureDock2023;
         PublicKey = PSPublicKey;
         break;
-      case Bls12381BDDT16MacDockName:
-        Signature = Bls12381BDDT16MACDock2024;
+      case Bls12381BBDT16MacDockName:
+        Signature = Bls12381BBDT16MACDock2024;
         PublicKey = undefined;
         isKvac = true;
         break;

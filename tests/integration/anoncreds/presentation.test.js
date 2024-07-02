@@ -2,7 +2,7 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import { u8aToHex, stringToU8a } from '@polkadot/util';
 import b58 from 'bs58';
 import {
-  BDDT16MacSecretKey,
+  BBDT16MacSecretKey,
   BoundCheckSnarkSetup, CredentialBuilder, initializeWasm, PresentationBuilder,
 } from '@docknetwork/crypto-wasm-ts';
 import { DockAPI } from '../../../src';
@@ -62,7 +62,7 @@ describe.each(Schemes)('Presentation', ({
       msgCount: 100,
     });
 
-    if (Name !== 'BDDT16') {
+    if (Name !== 'BBDT16') {
       chainModule = getModule(dock);
 
       const pk1 = Module.prepareAddPublicKey(dock.api, u8aToHex(keypair.publicKeyBuffer));
@@ -176,11 +176,11 @@ describe.each(Schemes)('Presentation', ({
     expect(verified).toEqual(true);
 
     const keyedProofs = getKeyedProofsFromVerifiedPresentation(presentation);
-    const isKvac = Name === 'BDDT16';
+    const isKvac = Name === 'BBDT16';
     // Keyed proofs only exist for KVAC
     expect(keyedProofs.size).toEqual(isKvac ? 2 : 0);
     if (isKvac) {
-      const sk = new BDDT16MacSecretKey(keypair.privateKeyBuffer);
+      const sk = new BBDT16MacSecretKey(keypair.privateKeyBuffer);
       // eslint-disable-next-line jest/no-conditional-expect
       expect(keyedProofs.get(0)?.credential?.proof.verify(sk).verified).toEqual(true);
       // eslint-disable-next-line jest/no-conditional-expect
@@ -222,11 +222,11 @@ describe.each(Schemes)('Presentation', ({
     expect(verified).toEqual(true);
 
     const keyedProofs = getKeyedProofsFromVerifiedPresentation(presentation);
-    const isKvac = Name === 'BDDT16';
+    const isKvac = Name === 'BBDT16';
     // Keyed proofs only exist for KVAC
     expect(keyedProofs.size).toEqual(isKvac ? 1 : 0);
     if (isKvac) {
-      const sk = new BDDT16MacSecretKey(keypair.privateKeyBuffer);
+      const sk = new BBDT16MacSecretKey(keypair.privateKeyBuffer);
       // eslint-disable-next-line jest/no-conditional-expect
       expect(keyedProofs.get(0)?.credential?.proof.verify(sk).verified).toEqual(true);
     }

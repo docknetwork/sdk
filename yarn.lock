@@ -2878,10 +2878,10 @@
     fix-esm "^1.0.1"
     jsonld digitalcredentials/jsonld.js#v10.x
 
-"@docknetwork/crypto-wasm-ts@0.62.0":
-  version "0.62.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.62.0.tgz#c0b08039ff49379d5b1d8bcd10dbc4e899acd972"
-  integrity sha512-wiFOSLtJUHuB/FxBBeP9m9vitN5DZgE6Xkc49lUm65qSrUMsdrf4WHxuY2bnthTHv2ZmrLbD7MoIAwCAlT8Saw==
+"@docknetwork/crypto-wasm-ts@0.63.0":
+  version "0.63.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.63.0.tgz#f1ab39693b63e70d682d362e9eacd85842ae56e0"
+  integrity sha512-KryDPIf6suwi5NS1iqA76vpuLmZv4PLV1Dt7I6Z4YS3rDKK43m7j8mox6lhQgkVL7QZdJ1DdZGxcPLekXZYQ1w==
   dependencies:
     "@types/flat" "^5.0.2"
     "@types/lodash" "^4.14.195"

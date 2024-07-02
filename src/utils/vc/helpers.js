@@ -18,8 +18,8 @@ import {
   Sr25519Signature2020,
   Sr25519VerKeyName,
 } from './custom_crypto';
-import { Bls12381BDDT16DockVerKeyName, Bls12381BDDT16MacDockName, Ed255192020VerKeyName } from './crypto/constants';
-import Bls12381BDDT16MACDock2024 from './crypto/Bls12381BDDT16MACDock2024';
+import { Bls12381BBDT16DockVerKeyName, Bls12381BBDT16MacDockName, Ed255192020VerKeyName } from './crypto/constants';
+import Bls12381BBDT16MACDock2024 from './crypto/Bls12381BBDT16MACDock2024';
 
 /**
  * @typedef {object} KeyDoc The Options to use in the function createUser.
@@ -83,8 +83,8 @@ export async function getSuiteFromKeyDoc(keyDoc, useProofValue, options) {
     case Bls12381PSDockVerKeyName:
       Cls = Bls12381PSSignatureDock2023;
       break;
-    case Bls12381BDDT16DockVerKeyName:
-      Cls = Bls12381BDDT16MACDock2024;
+    case Bls12381BBDT16DockVerKeyName:
+      Cls = Bls12381BBDT16MACDock2024;
       break;
     case 'JsonWebKey2020':
       Cls = JsonWebSignature2020;
@@ -160,7 +160,7 @@ export function processIfKvac(credential) {
   if (proof === undefined || proof.type === undefined) {
     throw new Error(`Credential should have a non-null type field but found ${proof.type}`);
   }
-  if (proof.type === Bls12381BDDT16MacDockName) {
+  if (proof.type === Bls12381BBDT16MacDockName) {
     return {
       results: [{
         verified: true, proof, verificationMethod: {}, purposeResult: {},

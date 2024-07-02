@@ -11,7 +11,7 @@ import bbsV1Context from './contexts/bbs-v1.json';
 import dockBBSV1Context from './contexts/dock-bbs-v1.json';
 import dockBBS23V1Context from './contexts/dock-bbs23-v1.json';
 import dockPSV1Context from './contexts/dock-ps-v1.json';
-import dockBDDT16V1Context from './contexts/dock-bddt16-v1.json';
+import dockBBDT16V1Context from './contexts/dock-bbdt16-v1.json';
 import dockPrettyVCContext from './contexts/prettyvc.json';
 import jws2020V1Context from './contexts/jws-2020-v1.json';
 import statusList21Context from './contexts/status-list-21';
@@ -37,8 +37,8 @@ export default new Map([
     dockPSV1Context,
   ],
   [
-    'https://ld.dock.io/security/bddt16/v1',
-    dockBDDT16V1Context,
+    'https://ld.dock.io/security/bbdt16/v1',
+    dockBBDT16V1Context,
   ],
   [
     'https://w3id.org/security/bbs/v1',

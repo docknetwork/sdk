@@ -3,49 +3,49 @@
     "@version": 1.1,
     "id": "@id",
     "type": "@type",
-    "dockBBS": "https://ld.dock.io/dock-bddt16",
+    "dockBBDT16": "https://ld.dock.io/dock-bbdt16",
     "parsingOptions": {
-      "@id": "dockBDDT16:parsingOptions",
+      "@id": "dockBBDT16:parsingOptions",
       "@type": "@id",
       "@container": "@graph"
     },
     "cryptoVersion": {
-      "@id": "dockBDDT16:cryptoVersion",
+      "@id": "dockBBDT16:cryptoVersion",
       "@type": "@id",
       "@container": "@graph"
     },
     "presVersion": {
-      "@id": "dockBDDT16:presVersion",
+      "@id": "dockBBDT16:presVersion",
       "@type": "@id",
       "@container": "@graph"
     },
     "defaultDecimalPlaces": {
-      "@id": "dockBDDT16:defaultDecimalPlaces",
+      "@id": "dockBBDT16:defaultDecimalPlaces",
       "@type": "@id",
       "@container": "@graph"
     },
     "defaultMinimumInteger": {
-      "@id": "dockBDDT16:defaultMinimumInteger",
+      "@id": "dockBBDT16:defaultMinimumInteger",
       "@type": "@id",
       "@container": "@graph"
     },
     "defaultMinimumDate": {
-      "@id": "dockBDDT16:defaultMinimumDate",
+      "@id": "dockBBDT16:defaultMinimumDate",
       "@type": "@id",
       "@container": "@graph"
     },
     "useDefaults": {
-      "@id": "dockBDDT16:useDefaults",
+      "@id": "dockBBDT16:useDefaults",
       "@type": "@id",
       "@container": "@graph"
     },
     "version": {
-      "@id": "dockBDDT16:useDefaults",
+      "@id": "dockBBDT16:useDefaults",
       "@type": "@id",
       "@container": "@graph"
     },
     "details": {
-      "@id": "dockBDDT16:details",
+      "@id": "dockBBDT16:details",
       "@type": "@id",
       "@container": "@graph"
     },
@@ -81,8 +81,8 @@
         }
       }
     },
-    "Bls12381BDDT16MACProofDock2024": {
-      "@id": "https://ld.dock.io/security#Bls12381BDDT16Dock2024",
+    "Bls12381BBDT16MACProofDock2024": {
+      "@id": "https://ld.dock.io/security#Bls12381BBDT16Dock2024",
       "@context": {
         "@version": 1.1,
         "@protected": true,
@@ -133,8 +133,8 @@
         }
       }
     },
-    "Bls12381BDDT16MACDock2024": {
-      "@id": "https://ld.dock.io/security#Bls12381BDDT16MACDock2024",
+    "Bls12381BBDT16MACDock2024": {
+      "@id": "https://ld.dock.io/security#Bls12381BBDT16MACDock2024",
       "@context": {
         "@version": 1.1,
         "@protected": true,

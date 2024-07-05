@@ -3,27 +3,23 @@ import { JsonWebKey } from '@transmute/json-web-signature';
 import defaultDocumentLoader from './document-loader';
 
 import {
-  EcdsaSecp256k1VerKeyName,
-  Ed25519VerKeyName,
-  Sr25519VerKeyName,
-  EcdsaSecp256k1Signature2019,
-  Ed25519Signature2018,
-  Sr25519Signature2020,
-  Bls12381BBSSignatureDock2022,
-  Bls12381BBSDockVerKeyName,
   Bls12381BBS23DockVerKeyName,
+  Bls12381BBSDockVerKeyName,
+  Bls12381BBSSignatureDock2022,
   Bls12381BBSSignatureDock2023,
-  Bls12381PSSignatureDock2023,
   Bls12381PSDockVerKeyName,
-  JsonWebSignature2020,
+  Bls12381PSSignatureDock2023,
+  EcdsaSecp256k1Signature2019,
+  EcdsaSecp256k1VerKeyName,
+  Ed25519Signature2018,
   Ed25519Signature2020,
+  Ed25519VerKeyName,
+  JsonWebSignature2020,
+  Sr25519Signature2020,
+  Sr25519VerKeyName,
 } from './custom_crypto';
-import {
-  Bls12381BDDT16DockVerKeyName,
-  Bls12381BDDT16MacDockName,
-  Ed255192020VerKeyName,
-} from './crypto/constants';
-import Bls12381BDDT16MACDock2024 from './crypto/Bls12381BDDT16MACDock2024';
+import { Bls12381BBDT16DockVerKeyName, Bls12381BBDT16MacDockName, Ed255192020VerKeyName } from './crypto/constants';
+import Bls12381BBDT16MACDock2024 from './crypto/Bls12381BBDT16MACDock2024';
 
 /**
  * @typedef {object} KeyDoc The Options to use in the function createUser.
@@ -87,8 +83,8 @@ export async function getSuiteFromKeyDoc(keyDoc, useProofValue, options) {
     case Bls12381PSDockVerKeyName:
       Cls = Bls12381PSSignatureDock2023;
       break;
-    case Bls12381BDDT16DockVerKeyName:
-      Cls = Bls12381BDDT16MACDock2024;
+    case Bls12381BBDT16DockVerKeyName:
+      Cls = Bls12381BBDT16MACDock2024;
       break;
     case 'JsonWebKey2020':
       Cls = JsonWebSignature2020;
@@ -166,7 +162,7 @@ export function processIfKvac(credential) {
       `Credential should have a non-null type field but found ${proof.type}`,
     );
   }
-  if (proof.type === Bls12381BDDT16MacDockName) {
+  if (proof.type === Bls12381BBDT16MacDockName) {
     return {
       results: [
         {

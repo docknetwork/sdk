@@ -76,6 +76,18 @@ const example = {
     'https://www.w3.org/2018/credentials/v1',
     'https://w3id.org/citizenship/v1',
     'https://ld.dock.io/security/bbs/v1',
+    {
+      // You can also use any embedded context
+      dk: 'https://ld.dock.io/credentials#',
+      numberField: 'dk:numberField',
+      numberFieldNegative: 'dk:numberFieldNegative',
+      numberFieldOneDecimal: 'dk:numberFieldOneDecimal',
+      integerField: 'dk:integerField',
+      integerFieldNegative: 'dk:integerFieldNegative',
+      integerFieldBig: 'dk:integerFieldBig',
+      dateField: 'dk:dateField',
+      logo: 'dk:logo',
+    },
   ],
   id: 'https://issuer.oidp.uscis.gov/credentials/83627465',
   type: ['VerifiableCredential', 'PermanentResidentCard'],

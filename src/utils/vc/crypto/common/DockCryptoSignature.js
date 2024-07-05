@@ -1,4 +1,4 @@
-import { initializeWasm, CredentialSchema, DefaultSchemaParsingOpts } from '@docknetwork/crypto-wasm-ts';
+import { CredentialSchema, DefaultSchemaParsingOpts, initializeWasm } from '@docknetwork/crypto-wasm-ts';
 
 import jsonld from 'jsonld';
 import { SECURITY_CONTEXT_URL } from 'jsonld-signatures';
@@ -15,6 +15,16 @@ const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 export const DEFAULT_PARSING_OPTS = {
   useDefaults: false,
 };
+
+/**
+ * Checks if given credential version is greater than or equal to 0.6.0. This version changed `credentialSchema` property
+ * from data-uri to object and started using a deterministic JSON stringify for context and some other properties.
+ * @param credVersion
+ * @returns {boolean}
+ */
+export function isCredVerGte060(credVersion) {
+  return semver.gte(credVersion, '0.6.0');
+}
 
 /**
  * Defines commons for the `@docknetwork/crypto-wasm-ts` signatures.
@@ -235,7 +245,7 @@ export default withExtendedStaticProperties(
         credSchema = CredentialSchema.generateAppropriateSchema(credJson, credSchema);
       }
       const schemaJson = semver.gte(credSchema.version, '0.4.0') ? credSchema.toJSON() : credSchema.toJSONOlder();
-      if (credJson.cryptoVersion && semver.gte(credJson.cryptoVersion, '0.6.0')) {
+      if (credJson.cryptoVersion && isCredVerGte060(credJson.cryptoVersion)) {
         credJson.credentialSchema = schemaJson;
       } else {
         // Older versions used JSON.stringify but newer use deterministic conversion
@@ -289,14 +299,11 @@ export default withExtendedStaticProperties(
 
       // To work with JSON-LD credentials/presentations, we must always reveal the context and type
       // NOTE: that they are encoded as JSON strings here to reduce message count and so its *always known*
-      // TODO: `stringify` should be used which is deterministic since @context can be an object
       credBuilder.setTopLevelField(
         '@context',
         stringify(document['@context']),
       );
-      // TODO: type is never an object? Or use `stringify` to be safe
-      // Not adding the TODOs here since verification code also uses JSON.stringify and will need to check versions and then use the appropriate call.
-      credBuilder.setTopLevelField('type', JSON.stringify(document.type));
+      credBuilder.setTopLevelField('type', stringify(document.type));
 
       const serializedCred = credBuilder.serializeForSigning();
 
@@ -319,10 +326,11 @@ export default withExtendedStaticProperties(
      */
     static formatMandatoryFields(credJson, document) {
       // NOTE: that they are encoded as JSON strings here to reduce message count and so its *always known*
+      const newVersion = credJson.cryptoVersion && isCredVerGte060(credJson.cryptoVersion);
       // eslint-disable-next-line no-param-reassign
-      credJson['@context'] = JSON.stringify(document['@context']);
+      credJson['@context'] = newVersion ? stringify(document['@context']) : JSON.stringify(document['@context']);
       // eslint-disable-next-line no-param-reassign
-      credJson.type = JSON.stringify(document.type);
+      credJson.type = newVersion ? stringify(document.type) : JSON.stringify(document.type);
     }
 
     /**

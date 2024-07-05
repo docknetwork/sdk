@@ -8,7 +8,6 @@ import {
   CredentialSchema,
 } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
-import semver from 'semver/preload';
 import { getPrivateStatus, verifyCredential } from './credentials';
 import DIDResolver from "../../resolver/did/did-resolver"; // eslint-disable-line
 
@@ -20,7 +19,7 @@ import {
   Bls12381BBS23SigDockSigName,
   Bls12381BBSDockVerKeyName,
   Bls12381PSDockVerKeyName,
-  Bls12381BBS23DockVerKeyName, Bls12381BDDT16DockVerKeyName, Bls12381BDDT16MacDockName,
+  Bls12381BBS23DockVerKeyName, Bls12381BBDT16DockVerKeyName, Bls12381BBDT16MacDockName,
 } from './crypto/constants';
 
 import { DEFAULT_CONTEXT_V1_URL } from './constants';
@@ -35,6 +34,7 @@ import {
   Bls12381BBSSignatureDock2023,
   Bls12381PSSignatureDock2023,
 } from './custom_crypto';
+import { isCredVerGte060 } from './crypto/common/DockCryptoSignature';
 
 const { AuthenticationProofPurpose } = jsigs.purposes;
 
@@ -308,8 +308,8 @@ export async function verifyAnoncreds(presentation, options = {}) {
         case Bls12381PSSigDockSigName:
           sigClass = Bls12381PSSignatureDock2023;
           break;
-        case Bls12381BDDT16MacDockName:
-          return { type: Bls12381BDDT16DockVerKeyName };
+        case Bls12381BBDT16MacDockName:
+          return { type: Bls12381BBDT16DockVerKeyName };
         default:
           throw new Error(`Invalid proof type ${proof.type}`);
       }
@@ -340,7 +340,7 @@ export async function verifyAnoncreds(presentation, options = {}) {
       case Bls12381PSDockVerKeyName:
         Cls = PSPublicKey;
         break;
-      case Bls12381BDDT16DockVerKeyName:
+      case Bls12381BBDT16DockVerKeyName:
         return;
       default:
         throw new Error(`Invalid key document type: ${keyType}`);
@@ -375,7 +375,7 @@ export function getKeyedProofsFromVerifiedPresentation(presentation) {
  */
 export function getJsonSchemasFromPresentation(presentation, full = false) {
   return presentation.spec.credentials.map((cred) => {
-    const schema = semver.gte(cred.version, '0.6.0') ? CredentialSchema.fromJSON(cred.schema) : CredentialSchema.fromJSON(JSON.parse(cred.schema));
+    const schema = isCredVerGte060(cred.version) ? CredentialSchema.fromJSON(cred.schema) : CredentialSchema.fromJSON(JSON.parse(cred.schema));
     return full ? schema.getEmbeddedJsonSchema() : schema.jsonSchema;
   });
 }

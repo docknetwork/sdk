@@ -45,7 +45,7 @@ for (const {
   buildProverStatement,
   buildVerifierStatement,
 } of Schemes) {
-  const isKvac = Name === 'BDDT16';
+  const isKvac = Name === 'BBDT16';
   const skipIfKvac = isKvac ? describe.skip : describe;
 
   skipIfKvac(

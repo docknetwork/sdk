@@ -30,7 +30,7 @@ for (const {
   getPublicKeyWithParamsByStorageKey,
   getPublicKeysByDid,
 } of Schemes) {
-  const skipIfKvac = Name === 'BDDT16' ? describe.skip : describe;
+  const skipIfKvac = Name === 'BBDT16' ? describe.skip : describe;
   skipIfKvac(`${Name} Module`, () => {
     const dock = new DockAPI();
     let account;

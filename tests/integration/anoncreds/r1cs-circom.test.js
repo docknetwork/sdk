@@ -67,7 +67,7 @@ for (const {
     let wasm;
     let snarkPk;
     let snarkVk;
-    const isKvac = Name === 'BDDT16';
+    const isKvac = Name === 'BBDT16';
 
     // Structure of credential that has the blood group attribute
     const attributesStruct = {

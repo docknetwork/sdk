@@ -104,7 +104,7 @@
   },
   "dependencies": {
     "@digitalcredentials/vc-status-list": "^8.0.0",
-    "@docknetwork/crypto-wasm-ts": "0.62.0",
+    "@docknetwork/crypto-wasm-ts": "0.63.0",
     "@docknetwork/node-types": "^0.17.0",
     "@juanelas/base64": "^1.0.5",
     "@polkadot/api": "10.12.4",

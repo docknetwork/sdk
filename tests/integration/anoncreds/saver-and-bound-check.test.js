@@ -43,7 +43,7 @@ for (const {
   buildWitness,
   getModule,
 } of Schemes) {
-  const isKvac = Name === 'BDDT16';
+  const isKvac = Name === 'BBDT16';
   const skipIfKvac = isKvac ? describe.skip : describe;
   skipIfKvac(
     `${Name} Complete demo of verifiable encryption using SAVER and bound check using LegoGroth16`,

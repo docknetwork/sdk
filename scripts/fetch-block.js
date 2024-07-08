@@ -1,5 +1,5 @@
-import { blockByNumber, withDockAPI } from "./helpers";
-import { firstValueFrom } from "rxjs";
+import { firstValueFrom } from 'rxjs';
+import { blockByNumber, withDockAPI } from './helpers';
 
 const { FullNodeEndpoint, BlockNumber } = process.env;
 

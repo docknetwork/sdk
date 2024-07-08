@@ -9,7 +9,7 @@ import {
 import { getDidNonce, getStateChange } from '../utils/misc';
 import { isHexWithGivenByteSize, getHexIdentifier } from '../utils/codec';
 import NoBlobError from '../utils/errors/no-blob-error';
-import { typedHexDID, createDidSig } from '../utils/did';
+import { DockDidOrDidMethodKey, createDidSig } from '../did';
 
 export const DockBlobQualifier = 'blob:dock:';
 export const DockBlobIdByteSize = 32;
@@ -91,7 +91,7 @@ class BlobModule {
     signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
     const [addBlob, didSig] = await this.createSignedAddBlob(
       blob,
       signerHexDid,
@@ -157,7 +157,7 @@ class BlobModule {
         // no-op, just use default Uint8 array value
       }
 
-      return [typedHexDID(this.api, respTuple[0]), value];
+      return [DockDidOrDidMethodKey.from(respTuple[0]), value];
     }
     throw new Error(`Needed 2 items in response but got${respTuple.length}`);
   }

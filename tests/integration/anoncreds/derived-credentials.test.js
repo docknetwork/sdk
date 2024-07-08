@@ -20,7 +20,7 @@ import {
   TestKeyringOpts,
   Schemes,
 } from '../../test-constants';
-import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
+import { DockDid, DidKeypair } from '../../../src/did';
 import { getProofMatcherDoc, registerNewDIDUsingPair } from '../helpers';
 import { getKeyDoc } from '../../../src/utils/vc/helpers';
 import {
@@ -99,7 +99,7 @@ describe.each(Schemes)('Derived Credentials', ({
   let keypair;
   let didDocument;
 
-  const holder3DID = createNewDockDID();
+  const holder3DID = DockDid.random();
   // seed used for 3rd holder keys
   const holder3KeySeed = randomAsHex(32);
 
@@ -176,7 +176,7 @@ describe.each(Schemes)('Derived Credentials', ({
 
     dock.setAccount(account);
     pair1 = new DidKeypair(dock.keyring.addFromUri(randomAsHex(32)), 1);
-    did1 = createNewDockDID();
+    did1 = DockDid.random();
     await registerNewDIDUsingPair(dock, did1, pair1);
 
     keypair = CryptoKeyPair.generate({
@@ -184,7 +184,7 @@ describe.each(Schemes)('Derived Credentials', ({
     });
 
     if (Name !== 'BBDT16') {
-      const pk1 = Module.prepareAddPublicKey(dock.api, u8aToHex(keypair.publicKeyBuffer));
+      const pk1 = Module.prepareAddPublicKey(u8aToHex(keypair.publicKeyBuffer));
       await chainModule.addPublicKey(
         pk1,
         did1,
@@ -216,7 +216,7 @@ describe.each(Schemes)('Derived Credentials', ({
 
     posAccumKeypair = Accumulator.generateKeypair(params);
     const bytes1 = u8aToHex(posAccumKeypair.publicKey.bytes);
-    const posAccumPk = AccumulatorModule.prepareAddPublicKey(dock.api, bytes1);
+    const posAccumPk = AccumulatorModule.prepareAddPublicKey(bytes1);
     await dock.accumulatorModule.addPublicKey(
       posAccumPk,
       did1,
@@ -230,7 +230,7 @@ describe.each(Schemes)('Derived Credentials', ({
 
     uniAccumKeypair = Accumulator.generateKeypair(params);
     const bytes2 = u8aToHex(uniAccumKeypair.publicKey.bytes);
-    const uniAccumPk = AccumulatorModule.prepareAddPublicKey(dock.api, bytes2);
+    const uniAccumPk = AccumulatorModule.prepareAddPublicKey(bytes2);
     await dock.accumulatorModule.addPublicKey(
       uniAccumPk,
       did1,
@@ -362,7 +362,7 @@ describe.each(Schemes)('Derived Credentials', ({
     const unsignedCred = {
       ...credentialJSON,
       credentialStatus,
-      issuer: did1,
+      issuer: String(did1),
     };
 
     const presentationOptions = {
@@ -397,7 +397,7 @@ describe.each(Schemes)('Derived Credentials', ({
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
     const unsignedCred = {
       ...credentialJSON,
-      issuer: did1,
+      issuer: String(did1),
     };
 
     const presentationOptions = {
@@ -538,7 +538,7 @@ describe.each(Schemes)('Derived Credentials', ({
     );
 
     expect(credentials.length).toEqual(1);
-    expect(credentials[0].issuer).toEqual(did1);
+    expect(credentials[0].issuer).toEqual(String(did1));
     expect(credentials[0].credentialStatus).toBeDefined();
     expect(credentials[0].credentialStatus).toEqual({
       ...credentialStatus,
@@ -577,7 +577,7 @@ describe.each(Schemes)('Derived Credentials', ({
     );
 
     expect(credentials.length).toEqual(1);
-    expect(credentials[0].issuer).toEqual(did1);
+    expect(credentials[0].issuer).toEqual(String(did1));
     expect(credentials[0].credentialStatus).toBeDefined();
     expect(credentials[0].credentialStatus).toEqual({
       ...credentialStatus,
@@ -616,7 +616,7 @@ describe.each(Schemes)('Derived Credentials', ({
 
     const accAsU8 = AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated, AccumulatorType.KBUni);
     expect(credentials.length).toEqual(1);
-    expect(credentials[0].issuer).toEqual(did1);
+    expect(credentials[0].issuer).toEqual(String(did1));
     expect(credentials[0].credentialStatus).toBeDefined();
     expect(credentials[0].credentialStatus).toEqual({
       ...credentialStatus,
@@ -656,7 +656,7 @@ describe.each(Schemes)('Derived Credentials', ({
 
     const accAsU8 = AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated, AccumulatorType.KBUni);
     expect(credentials.length).toEqual(1);
-    expect(credentials[0].issuer).toEqual(did1);
+    expect(credentials[0].issuer).toEqual(String(did1));
     expect(credentials[0].credentialStatus).toBeDefined();
     expect(credentials[0].credentialStatus).toEqual({
       ...credentialStatus,
@@ -679,7 +679,7 @@ describe.each(Schemes)('Derived Credentials', ({
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
     const unsignedCred = {
       ...credentialJSON,
-      issuer: did1,
+      issuer: String(did1),
     };
 
     const presentationOptions = {

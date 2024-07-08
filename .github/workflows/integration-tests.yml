@@ -18,7 +18,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CONFIG_DOCK_NODE_IMAGE_TAG: "mainnet"
-      DisableTrustRegistryParticipantsTests: true
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1

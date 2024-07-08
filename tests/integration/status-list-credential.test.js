@@ -20,7 +20,7 @@ import { createPresentation } from '../create-presentation';
 import { OneOfPolicy } from '../../src/utils/revocation';
 import { getUnsignedCred, registerNewDIDUsingPair } from './helpers';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
-import { createNewDockDID, DidKeypair, typedHexDID } from '../../src/utils/did';
+import { DockDid, DidKeypair, DockDidOrDidMethodKey } from '../../src/did';
 import StatusList2021Credential from '../../src/status-list-credential/status-list2021-credential';
 import { addStatusList21EntryToCredential } from '../../src/utils/vc/credentials';
 
@@ -35,11 +35,11 @@ describe('StatusList2021Credential', () => {
   const statusListCredentialIndex = (Math.random() * 10e3) | 0;
 
   // Register a new DID for issuer
-  const issuerDID = createNewDockDID();
+  const issuerDID = DockDid.random();
   const issuerSeed = randomAsHex(32);
 
   // Register a new DID for holder
-  const holderDID = createNewDockDID();
+  const holderDID = DockDid.random();
   const holderSeed = randomAsHex(32);
 
   let issuerKey;
@@ -57,16 +57,22 @@ describe('StatusList2021Credential', () => {
     dockAPI.setAccount(account);
 
     // Register issuer DID
-    issuerKeyPair = new DidKeypair(dockAPI.keyring.addFromUri(issuerSeed, null, 'ed25519'), 1);
+    issuerKeyPair = new DidKeypair(
+      dockAPI.keyring.addFromUri(issuerSeed, null, 'ed25519'),
+      1,
+    );
     await registerNewDIDUsingPair(dockAPI, issuerDID, issuerKeyPair);
 
     // Register holder DID
-    const pair1 = new DidKeypair(dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'), 1);
+    const pair1 = new DidKeypair(
+      dockAPI.keyring.addFromUri(holderSeed, null, 'ed25519'),
+      1,
+    );
     await registerNewDIDUsingPair(dockAPI, holderDID, pair1);
 
     // Create a new policy
     const policy = new OneOfPolicy();
-    policy.addOwner(typedHexDID(dockAPI.api, issuerDID));
+    policy.addOwner(DockDidOrDidMethodKey.from(issuerDID));
     issuerKey = getKeyDoc(
       issuerDID,
       issuerKeyPair,

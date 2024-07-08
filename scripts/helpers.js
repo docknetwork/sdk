@@ -1,9 +1,9 @@
 // Helpers for scripts
 
-import { Keyring } from "@polkadot/api";
-import { cryptoWaitReady } from "@polkadot/util-crypto";
-import { formatBalance } from "@polkadot/util";
-import { bufferCount, map as mapRx } from "rxjs/operators";
+import { Keyring } from '@polkadot/api';
+import { cryptoWaitReady } from '@polkadot/util-crypto';
+import { formatBalance } from '@polkadot/util';
+import { bufferCount, map as mapRx } from 'rxjs/operators';
 import {
   always,
   ifElse,
@@ -20,9 +20,9 @@ import {
   __,
   unless,
   fromPairs,
-} from "ramda";
-import { Observable, of, concatMap, from } from "rxjs";
-import { DockAPI } from "../src";
+} from 'ramda';
+import { of, concatMap, from } from 'rxjs';
+import { DockAPI } from '../src';
 
 /**
  * Retrieves a block associated with the given number.
@@ -31,12 +31,10 @@ import { DockAPI } from "../src";
  * @param {number} number
  * @returns {Observable<*>}
  */
-export const blockByNumber = curry((dock, number) =>
-  of(number).pipe(
-    concatMap((number) => from(dock.api.rpc.chain.getBlockHash(number))),
-    concatMap((hash) => from(dock.api.derive.chain.getBlock(hash)))
-  )
-);
+export const blockByNumber = curry((dock, number) => of(number).pipe(
+  concatMap((number) => from(dock.api.rpc.chain.getBlockHash(number))),
+  concatMap((hash) => from(dock.api.derive.chain.getBlock(hash))),
+));
 
 /**
  * Send the give transaction with the given account URI (secret) and return the block hash
@@ -49,7 +47,7 @@ export async function sendTxnWithAccount(
   dock,
   senderAccountUri,
   txn,
-  waitForFinalization = true
+  waitForFinalization = true,
 ) {
   const account = dock.keyring.addFromUri(senderAccountUri);
   dock.setAccount(account);
@@ -69,9 +67,9 @@ export async function sendTxnWithAccount(
 export async function validatorChange(dock, argv, func, senderAccountUri) {
   let shortCircuit;
   if (argv.length === 4) {
-    if (argv[3].toLowerCase() === "true") {
+    if (argv[3].toLowerCase() === 'true') {
       shortCircuit = true;
-    } else if (argv[3].toLowerCase() === "false") {
+    } else if (argv[3].toLowerCase() === 'false') {
       shortCircuit = false;
     } else {
       throw new Error(`Should be true or false but was ${argv[3]}`);
@@ -97,12 +95,12 @@ export async function sendBatch(
   dock,
   txs,
   senderAddress,
-  waitForFinalization = false
+  waitForFinalization = false,
 ) {
   const txBatch = dock.api.tx.utility.batch(txs);
   console.log(`Batch size is ${txBatch.encodedLength}`);
   console.info(
-    `Payment info of batch is ${await txBatch.paymentInfo(senderAddress)}`
+    `Payment info of batch is ${await txBatch.paymentInfo(senderAddress)}`,
   );
 
   const bal1 = await getBalance(dock.api, senderAddress);
@@ -129,7 +127,7 @@ export async function sendBatch(
  */
 export async function keypair(seed) {
   await cryptoWaitReady();
-  const keyring = new Keyring({ type: "sr25519" });
+  const keyring = new Keyring({ type: 'sr25519' });
   return keyring.addFromUri(seed);
 }
 
@@ -139,10 +137,10 @@ export async function keypair(seed) {
  * @returns {Promise}
  */
 export async function connect(wsUrl) {
-  /*return await ApiPromise.create({
+  /* return await ApiPromise.create({
     provider: new WsProvider(wsUrl),
     typesBundle,
-  });*/
+  }); */
   const dock = new DockAPI();
   await dock.init({
     address: wsUrl,
@@ -156,8 +154,8 @@ export function median(numbers) {
   numbers.sort();
 
   if (
-    numsLen % 2 ===
-    0 // is even
+    numsLen % 2
+    === 0 // is even
   ) {
     // average of two middle numbers
     mid = (numbers[numsLen / 2 - 1] + numbers[numsLen / 2]) / 2;
@@ -197,7 +195,7 @@ export const finiteNumber = o(
   unless(isFinite, (value) => {
     throw new Error(`Invalid number provided: ${value}`);
   }),
-  Number
+  Number,
 );
 
 /**
@@ -247,14 +245,10 @@ export const envObj = mapObjIndexed(parseEnv);
  * @param {Observable<import("@polkadot/types/interfaces").Extrinsic>} extrs$
  * @returns {Observable<import("@polkadot/types/interfaces").Extrinsic>}
  */
-export const batchExtrinsics = curry((api, limit, extrs$) =>
-  extrs$.pipe(
-    bufferCount(limit),
-    mapRx((batch) =>
-      batch.length === 1 ? batch[0] : api.tx.utility.batch(batch)
-    )
-  )
-);
+export const batchExtrinsics = curry((api, limit, extrs$) => extrs$.pipe(
+  bufferCount(limit),
+  mapRx((batch) => (batch.length === 1 ? batch[0] : api.tx.utility.batch(batch))),
+));
 
 /**
  * Creates a promise that will be rejected after the given time.
@@ -262,10 +256,7 @@ export const batchExtrinsics = curry((api, limit, extrs$) =>
  * @param {number} time
  * @returns {Promise<void>}
  */
-export const rejectTimeout = (time) =>
-  new Promise((_, reject) =>
-    setTimeout(() => reject(new Error("Timeout is exceeded")), time)
-  );
+export const rejectTimeout = (time) => new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout is exceeded')), time));
 
 /**
  * Creates a promise that will be either resolved before the specified
@@ -276,9 +267,7 @@ export const rejectTimeout = (time) =>
  * @param {Promise<T>} promise
  * @returns {Promise<T>}
  */
-export const timeout = curry((time, promise) =>
-  Promise.race([rejectTimeout(time), promise])
-);
+export const timeout = curry((time, promise) => Promise.race([rejectTimeout(time), promise]));
 
 /**
  * Formats given value as DOCK token amount.
@@ -287,13 +276,12 @@ export const timeout = curry((time, promise) =>
  * @param {?object} config
  * @returns {string}
  */
-export const formatDock = (value, config = {}) =>
-  formatBalance(value, {
-    decimals: 6,
-    withSi: true,
-    ...config,
-    withUnit: "DCK",
-  });
+export const formatDock = (value, config = {}) => formatBalance(value, {
+  decimals: 6,
+  withSi: true,
+  ...config,
+  withUnit: 'DCK',
+});
 
 /**
  * Enhances supplied function by providing access to the initialized global dock API.
@@ -307,8 +295,9 @@ export const formatDock = (value, config = {}) =>
  * @returns {function(...args: any[]): Promise<T>}
  */
 export const withDockAPI = curry(({ senderAccountURI, ...params }, fn) => async (...args) => {
-  console.log("Connecting...");
-  let err, res;
+  console.log('Connecting...');
+  let err; let
+    res;
   const dockAPI = new DockAPI();
 
   try {
@@ -322,7 +311,7 @@ export const withDockAPI = curry(({ senderAccountURI, ...params }, fn) => async 
   } catch (e) {
     err = e;
   } finally {
-    console.log("Disconnecting...");
+    console.log('Disconnecting...');
     await dockAPI.disconnect();
 
     if (err) {
@@ -339,7 +328,7 @@ export const withDockAPI = curry(({ senderAccountURI, ...params }, fn) => async 
  * @param {*} value
  * @returns {bool}
  */
-export const parseBool = either(equals("true"), o(Boolean, Number));
+export const parseBool = either(equals('true'), o(Boolean, Number));
 
 /**
  * Queries validator identity.
@@ -349,16 +338,16 @@ export const parseBool = either(equals("true"), o(Boolean, Number));
  */
 export const accountIdentity = curry(async (api, accountId) => {
   const val = api.createType(
-    "Option<Registration>",
-    await api.query.identity.identityOf(api.createType("AccountId", accountId))
+    'Option<Registration>',
+    await api.query.identity.identityOf(api.createType('AccountId', accountId)),
   );
 
   if (val.isSome) {
-    const info = val.unwrap().info;
+    const { info } = val.unwrap();
 
     return `\`${api.createType(
-      "String",
-      info.toHuman().display.Raw
+      'String',
+      info.toHuman().display.Raw,
     )} (${accountId.toString()})\``;
   } else {
     return `\`${accountId.toString()}\``;
@@ -371,18 +360,15 @@ export const accountIdentity = curry(async (api, accountId) => {
  * @param {*} date
  * @returns
  */
-export const formatAsISO = (date) =>
-  date.toISOString().replace(/T/, " ").replace(/\..+/, "");
+export const formatAsISO = (date) => date.toISOString().replace(/T/, ' ').replace(/\..+/, '');
 
 /**
  * Enhances logger by adding a prefix built by the supplied function on each call.
  */
-export const addLoggerPrefix = curry((buildPrefix, logger) =>
-  o(
-    fromPairs,
-    map((key) => [key, (...args) => logger[key](buildPrefix(...args), ...args)])
-  )(["error", "log", "info", "warn"])
-);
+export const addLoggerPrefix = curry((buildPrefix, logger) => o(
+  fromPairs,
+  map((key) => [key, (...args) => logger[key](buildPrefix(...args), ...args)]),
+)(['error', 'log', 'info', 'warn']));
 
 /**
  * Returns hash and number of the first block satisfying the provided predicate.
@@ -397,8 +383,10 @@ export const addLoggerPrefix = curry((buildPrefix, logger) =>
 export const binarySearchFirstSatisfyingBlock = curry(
   async (
     api,
-    { startBlockNumber, endBlockNumber, targetValue, fetchValue, checkBlock },
-    { maxBlocksPerUnit = null, debug = false } = {}
+    {
+      startBlockNumber, endBlockNumber, targetValue, fetchValue, checkBlock,
+    },
+    { maxBlocksPerUnit = null, debug = false } = {},
   ) => {
     for (
       // Number of iterations performed during binary search.
@@ -412,16 +400,16 @@ export const binarySearchFirstSatisfyingBlock = curry(
 
       if (debug) {
         timestampLogger.log(
-          "target value:",
+          'target value:',
           targetValue,
-          "current value:",
+          'current value:',
           midValue,
-          "start block:",
+          'start block:',
           startBlockNumber,
-          "end block:",
+          'end block:',
           endBlockNumber,
-          "jumps:",
-          jumps
+          'jumps:',
+          jumps,
         );
       }
 
@@ -430,7 +418,7 @@ export const binarySearchFirstSatisfyingBlock = curry(
         if (maxBlocksPerUnit != null) {
           endBlockNumber = Math.min(
             midBlockNumber + maxBlocksPerUnit * (1 + targetValue - midValue),
-            endBlockNumber
+            endBlockNumber,
           );
         }
       } else if (midValue > targetValue) {
@@ -438,7 +426,7 @@ export const binarySearchFirstSatisfyingBlock = curry(
         if (maxBlocksPerUnit != null) {
           startBlockNumber = Math.max(
             midBlockNumber - maxBlocksPerUnit * (1 + midValue - targetValue),
-            startBlockNumber
+            startBlockNumber,
           );
         }
       } else {
@@ -446,7 +434,7 @@ export const binarySearchFirstSatisfyingBlock = curry(
         if (maxBlocksPerUnit != null) {
           startBlockNumber = Math.max(
             midBlockNumber - maxBlocksPerUnit,
-            startBlockNumber
+            startBlockNumber,
           );
         }
 
@@ -454,19 +442,20 @@ export const binarySearchFirstSatisfyingBlock = curry(
         const found = await checkBlock(midBlock);
 
         if (found) {
-          if (debug)
+          if (debug) {
             timestampLogger.log(
               `First block that satisfied value \`${targetValue}\` found - \`${midBlockNumber}\` (${jumps} jumps)`,
-              found
+              found,
             );
+          }
 
           return { hash: midBlockHash, number: midBlockNumber };
         }
       }
     }
 
-    throw new Error(`No block found`);
-  }
+    throw new Error('No block found');
+  },
 );
 
 /**
@@ -479,5 +468,5 @@ export const binarySearchFirstSatisfyingBlock = curry(
  */
 export const timestampLogger = addLoggerPrefix(
   () => `[${formatAsISO(new Date())}]`,
-  console
+  console,
 );

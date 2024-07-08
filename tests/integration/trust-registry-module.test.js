@@ -11,7 +11,7 @@ import {
   DisableTrustRegistryParticipantsTests,
 } from '../test-constants';
 
-import { DidKeypair, DidMethodKey, DockDid } from '../../src/utils/did';
+import { DidKeypair, DidMethodKey, DockDid } from '../../src/did';
 import { registerNewDIDUsingPair } from './helpers';
 
 describe('Trust Registry', () => {

@@ -2,7 +2,7 @@
 
 import { u8aToHex } from '@polkadot/util';
 import { connect, keypair } from '../helpers';
-import { typedHexDID } from '../../src/utils/did';
+import { DockDidOrDidMethodKey } from '../../src/did';
 import { getStateChange } from '../../src/utils/misc';
 
 require('dotenv').config();
@@ -28,12 +28,14 @@ Expected Env vars:
     Did of the member in hex or fully qualified form.
 `;
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-}).then((_) => {
-  process.exit(0);
-});
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .then((_) => {
+    process.exit(0);
+  });
 
 async function main() {
   const { FullNodeEndpoint, MasterMemberSecret, Did } = process.env;
@@ -45,7 +47,7 @@ async function main() {
 
   const round_no = parseIntChecked(process.argv[2]);
 
-  const did = typedHexDID(did);
+  const did = DockDidOrDidMethodKey.from(did);
 
   const proposal_filename = process.argv[3];
   const proposal_unparsed = await fsp.readFile(proposal_filename);

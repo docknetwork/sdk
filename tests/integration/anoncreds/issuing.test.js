@@ -5,7 +5,7 @@ import {
 } from '@docknetwork/crypto-wasm-ts';
 import stringify from 'json-stringify-deterministic';
 import { DockAPI } from '../../../src';
-import { createNewDockDID, DidKeypair } from '../../../src/utils/did';
+import { DidKeypair, DockDid } from '../../../src/did';
 import { DockResolver } from '../../../src/resolver';
 import {
   registerNewDIDUsingPair,
@@ -37,7 +37,7 @@ describe.each(Schemes)('Issuance', ({
   const dock = new DockAPI();
   const resolver = new DockResolver(dock);
   let account;
-  let did1;
+  const did1 = DockDid.random();
   let pair1;
   let chainModule;
   let keypair;
@@ -54,7 +54,7 @@ describe.each(Schemes)('Issuance', ({
     account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
     pair1 = new DidKeypair(dock.keyring.addFromUri(randomAsHex(32)), 1);
-    did1 = createNewDockDID();
+
     await registerNewDIDUsingPair(dock, did1, pair1);
 
     keypair = CryptoKeyPair.generate({
@@ -64,7 +64,7 @@ describe.each(Schemes)('Issuance', ({
 
     if (Name !== 'BBDT16') {
       // Setup public key on blockchain
-      const pk1 = Module.prepareAddPublicKey(dock.api, u8aToHex(keypair.publicKeyBuffer));
+      const pk1 = Module.prepareAddPublicKey(u8aToHex(keypair.publicKeyBuffer));
       await chainModule.addPublicKey(
         pk1,
         did1,
@@ -94,7 +94,7 @@ describe.each(Schemes)('Issuance', ({
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
     const unsignedCred = {
       ...credentialJSON,
-      issuer: did1,
+      issuer: String(did1),
     };
     unsignedCred.credentialSchema = externalSchemaEncoded;
 
@@ -142,7 +142,7 @@ describe.each(Schemes)('Issuance', ({
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
     const unsignedCred = {
       ...credentialJSON,
-      issuer: did1,
+      issuer: String(did1),
     };
 
     const credential = await issueCredential(issuerKey, unsignedCred);
@@ -192,7 +192,7 @@ describe.each(Schemes)('Issuance', ({
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
     const unsignedCred = {
       ...credentialJSON,
-      issuer: did1,
+      issuer: String(did1),
     };
     delete unsignedCred.credentialSchema;
 
@@ -253,7 +253,7 @@ describe.each(Schemes)('Issuance', ({
     const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
     const unsignedCred = {
       ...credentialJSON,
-      issuer: did1,
+      issuer: String(did1),
     };
 
     unsignedCred.credentialSchema = {
@@ -290,7 +290,7 @@ describe.each(Schemes)('Issuance', ({
     const unsignedCred = {
       ...credentialJSON,
       credentialSchema: schemaWithGivenParsingOptions,
-      issuer: did1,
+      issuer: String(did1),
     };
 
     expect(unsignedCred.credentialSchema.id).toBeDefined();

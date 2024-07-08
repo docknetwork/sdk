@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 
 import { u8aToHex } from '@polkadot/util';
-import { createDidSig, typedHexDID } from '../utils/did';
+import { createDidSig, DockDidOrDidMethodKey } from '../did';
 import { getDidNonce } from '../utils/misc';
 
 /**
@@ -49,7 +49,6 @@ export default class WithParamsAndPublicKeys {
    * @returns {{}}
    */
   static prepareAddPublicKey(
-    api,
     bytes,
     curveType = undefined,
     paramsRef = undefined,
@@ -68,7 +67,7 @@ export default class WithParamsAndPublicKeys {
       throw new Error(`Invalid curve type ${curveType}`);
     }
     publicKey.paramsRef = paramsRef !== undefined
-      ? WithParamsAndPublicKeys.parseRef(api, paramsRef)
+      ? WithParamsAndPublicKeys.parseRef(paramsRef)
       : undefined;
     return publicKey;
   }
@@ -79,7 +78,7 @@ export default class WithParamsAndPublicKeys {
    * @param ref
    * @returns {any[]}
    */
-  static parseRef(api, ref) {
+  static parseRef(ref) {
     const parsed = new Array(2);
     if (
       !(typeof ref === 'object' && ref instanceof Array && ref.length === 2)
@@ -87,10 +86,10 @@ export default class WithParamsAndPublicKeys {
       throw new Error('Reference should be an array of 2 items');
     }
     try {
-      parsed[0] = typedHexDID(api, ref[0]);
-    } catch (e) {
+      parsed[0] = DockDidOrDidMethodKey.from(ref[0]);
+    } catch (error) {
       throw new Error(
-        `First item of reference should be a DID but was ${ref[0]}`,
+        `First item of reference should be a DID but was ${ref[0]}, error: ${error}`,
       );
     }
     if (typeof ref[1] !== 'number') {
@@ -121,7 +120,7 @@ export default class WithParamsAndPublicKeys {
     { nonce = undefined, didModule = undefined },
   ) {
     const offchainParams = this.constructor.buildParams(params);
-    const hexDid = typedHexDID(this.api, signerDid);
+    const hexDid = DockDidOrDidMethodKey.from(signerDid);
     const [addParams, signature] = await this.createSignedAddParams(
       offchainParams,
       hexDid,
@@ -148,7 +147,7 @@ export default class WithParamsAndPublicKeys {
     signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const hexDid = typedHexDID(this.api, signerDid);
+    const hexDid = DockDidOrDidMethodKey.from(signerDid);
     const [removeParams, signature] = await this.createSignedRemoveParams(
       index,
       hexDid,
@@ -253,7 +252,7 @@ export default class WithParamsAndPublicKeys {
   }
 
   async getParams(did, counter) {
-    const hexId = typedHexDID(this.api, did);
+    const hexId = DockDidOrDidMethodKey.from(did);
     return this.getParamsByHexDid(hexId, counter);
   }
 
@@ -266,7 +265,7 @@ export default class WithParamsAndPublicKeys {
    * @returns {Promise<{bytes: string}|null>}
    */
   async getPublicKey(did, keyId, withParams = false) {
-    const hexId = typedHexDID(this.api, did);
+    const hexId = DockDidOrDidMethodKey.from(did);
     return this.getPublicKeyByHexDid(hexId, keyId, withParams);
   }
 
@@ -281,10 +280,7 @@ export default class WithParamsAndPublicKeys {
   async getPublicKeyByHexDid(hexDid, keyId, withParams = false) {
     const resp = await this.queryPublicKeyFromChain(hexDid, keyId);
     if (resp) {
-      const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(
-        this.api,
-        resp,
-      );
+      const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(resp);
       if (withParams) {
         if (pkObj.paramsRef === null) {
           throw new Error('No reference to parameters for the public key');
@@ -331,7 +327,7 @@ export default class WithParamsAndPublicKeys {
    * @param pk
    * @returns {{bytes: string}}
    */
-  static createPublicKeyObjFromChainResponse(api, pk) {
+  static createPublicKeyObjFromChainResponse(pk) {
     const pkObj = {
       bytes: u8aToHex(pk.bytes),
     };
@@ -340,7 +336,7 @@ export default class WithParamsAndPublicKeys {
     }
     if (pk.paramsRef.isSome) {
       const pr = pk.paramsRef.unwrap();
-      pkObj.paramsRef = [typedHexDID(api, pr[0]), pr[1].toNumber()];
+      pkObj.paramsRef = [DockDidOrDidMethodKey.from(pr[0]), pr[1].toNumber()];
     } else {
       pkObj.paramsRef = null;
     }

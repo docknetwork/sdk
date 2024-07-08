@@ -1,11 +1,14 @@
 /* eslint-disable camelcase */
 
 import { hexToU8a, isHex, u8aToHex } from '@polkadot/util';
-import { KBUniversalAccumulatorValue, VBWitnessUpdateInfo } from '@docknetwork/crypto-wasm-ts';
+import {
+  KBUniversalAccumulatorValue,
+  VBWitnessUpdateInfo,
+} from '@docknetwork/crypto-wasm-ts';
 import { getDidNonce, getStateChange, inclusiveRange } from '../utils/misc';
 import WithParamsAndPublicKeys from './WithParamsAndPublicKeys';
 import { getAllExtrinsicsFromBlock } from '../utils/chain-ops';
-import { createDidSig, typedHexDID } from '../utils/did';
+import { createDidSig, DockDidOrDidMethodKey } from '../did';
 
 export const AccumulatorType = {
   VBPos: 0,
@@ -24,7 +27,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   }
 
   static prepareAddPositiveAccumulator(api, id, accumulated, publicKeyRef) {
-    const keyRef = AccumulatorModule.parseRef(api, publicKeyRef);
+    const keyRef = AccumulatorModule.parseRef(publicKeyRef);
     return {
       id,
       accumulator: {
@@ -43,7 +46,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     publicKeyRef,
     maxSize,
   ) {
-    const keyRef = AccumulatorModule.parseRef(api, publicKeyRef);
+    const keyRef = AccumulatorModule.parseRef(publicKeyRef);
     return {
       id,
       accumulator: {
@@ -59,7 +62,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
   }
 
   static prepareAddKBUniversalAccumulator(api, id, accumulated, publicKeyRef) {
-    const keyRef = AccumulatorModule.parseRef(api, publicKeyRef);
+    const keyRef = AccumulatorModule.parseRef(publicKeyRef);
     return {
       id,
       accumulator: {
@@ -147,7 +150,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
     const [addPk, signature] = await this.createSignedAddPublicKey(
       publicKey,
       signerHexDid,
@@ -173,7 +176,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
     const [remPk, signature] = await this.createSignedRemovePublicKey(
       removeKeyId,
       signerHexDid,
@@ -204,7 +207,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
     const [addAccumulator, signature] = await this.createSignedAddPositiveAccumulator(
       id,
       accumulated,
@@ -239,7 +242,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
     const [addAccumulator, signature] = await this.createSignedAddUniversalAccumulator(
       id,
       accumulated,
@@ -273,7 +276,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
     const [addAccumulator, signature] = await this.createSignedAddKBUniversalAccumulator(
       id,
       accumulated,
@@ -311,7 +314,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
     const [update, signature] = await this.createSignedUpdateAccumulator(
       id,
       newAccumulated,
@@ -339,7 +342,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
     signingKeyRef,
     { nonce = undefined, didModule = undefined },
   ) {
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
     const [removal, signature] = await this.createSignedRemoveAccumulator(
       id,
       signerHexDid,
@@ -765,11 +768,13 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
       accumulatorObj.accumulated = u8aToHex(common.accumulated);
       const owner = common.keyRef[0];
       const keyId = common.keyRef[1].toNumber();
-      accumulatorObj.keyRef = [typedHexDID(this.api, owner), keyId];
+      accumulatorObj.keyRef = [DockDidOrDidMethodKey.from(owner), keyId];
 
       if (withKeyAndParams || withKeyOnly) {
         if (keyId === 0) {
-          throw new Error('Key id is 0 which means no public key exists for the accumulator on chain');
+          throw new Error(
+            'Key id is 0 which means no public key exists for the accumulator on chain',
+          );
         }
         const pk = await this.getPublicKeyByHexDid(
           owner,
@@ -799,7 +804,9 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
       blockNoOrBlockHash,
       false,
     );
-    return extrinsics.map((e) => this.getUpdatesFromExtrinsic(e, accumulatorId)).filter((u) => u !== undefined);
+    return extrinsics
+      .map((e) => this.getUpdatesFromExtrinsic(e, accumulatorId))
+      .filter((u) => u !== undefined);
   }
 
   /**
@@ -812,12 +819,15 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    */
   async getUpdatesFromBlocks(accumulatorId, blockNosOrBlockHashes) {
     // NOTE: polkadot-js doesn't allow to fetch more than one block in 1 RPC call.
-    const extrinsics = await Promise.all(blockNosOrBlockHashes.map(async (b) => await getAllExtrinsicsFromBlock(
-      this.api,
-      b,
-      false,
-    )));
-    return extrinsics.flat().map((e) => this.getUpdatesFromExtrinsic(e, accumulatorId)).filter((u) => u !== undefined);
+    const extrinsics = await Promise.all(
+      blockNosOrBlockHashes.map(
+        async (b) => await getAllExtrinsicsFromBlock(this.api, b, false),
+      ),
+    );
+    return extrinsics
+      .flat()
+      .map((e) => this.getUpdatesFromExtrinsic(e, accumulatorId))
+      .filter((u) => u !== undefined);
   }
 
   /**
@@ -867,7 +877,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise<{bytes: string}|null>}
    */
   async getLastParamsWritten(did) {
-    const hexId = typedHexDID(this.api, did);
+    const hexId = DockDidOrDidMethodKey.from(did);
 
     const counters = await this.api.query[this.moduleName].accumulatorOwnerCounters(hexId);
     const counter = counters.paramsCounter.toNumber();
@@ -886,7 +896,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise<object[]>}
    */
   async getAllParamsByDid(did) {
-    const hexId = typedHexDID(this.api, did);
+    const hexId = DockDidOrDidMethodKey.from(did);
 
     const params = [];
     const counters = await this.api.query[this.moduleName].accumulatorOwnerCounters(hexId);
@@ -910,7 +920,7 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise< object[]>}
    */
   async getAllPublicKeysByDid(did, withParams = false) {
-    const hexId = typedHexDID(this.api, did);
+    const hexId = DockDidOrDidMethodKey.from(did);
 
     const pks = [];
     const counters = await this.api.query[this.moduleName].accumulatorOwnerCounters(hexId);
@@ -964,20 +974,35 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  async updateVbAccumulatorWitnessFromUpdatesInBlocks(accumulatorId, member, witness, startBlock, endBlock = undefined, batchSize = 10) {
+  async updateVbAccumulatorWitnessFromUpdatesInBlocks(
+    accumulatorId,
+    member,
+    witness,
+    startBlock,
+    endBlock = undefined,
+    batchSize = 10,
+  ) {
     if (endBlock === undefined) {
-      const accum = await this.accumulatorModule.getAccumulator(accumulatorId, false);
+      const accum = await this.accumulatorModule.getAccumulator(
+        accumulatorId,
+        false,
+      );
       // eslint-disable-next-line no-param-reassign
       endBlock = accum.lastModified;
     }
     // If endBlock < startBlock, it won't throw an error but won't fetch any updates and witness won't be updated.
-    console.debug(`Will start updating witness from block ${startBlock} to ${endBlock}`);
+    console.debug(
+      `Will start updating witness from block ${startBlock} to ${endBlock}`,
+    );
     let current = startBlock;
     while (current <= endBlock) {
-      const till = (current + batchSize) <= endBlock ? (current + batchSize) : endBlock;
+      const till = current + batchSize <= endBlock ? current + batchSize : endBlock;
       // Get updates from blocks [current, current + 1, current + 2, ..., till]
       // eslint-disable-next-line no-await-in-loop
-      const updates = await this.getUpdatesFromBlocks(accumulatorId, inclusiveRange(current, till, 1));
+      const updates = await this.getUpdatesFromBlocks(
+        accumulatorId,
+        inclusiveRange(current, till, 1),
+      );
       for (const update of updates) {
         const additions = [];
         const removals = [];
@@ -991,10 +1016,19 @@ export default class AccumulatorModule extends WithParamsAndPublicKeys {
             removals.push(hexToU8a(a));
           }
         }
-        console.debug(`Found ${additions.length} additions and ${removals.length} removals in block no ${current}`);
-        const queriedWitnessInfo = new VBWitnessUpdateInfo(hexToU8a(update.witnessUpdateInfo));
+        console.debug(
+          `Found ${additions.length} additions and ${removals.length} removals in block no ${current}`,
+        );
+        const queriedWitnessInfo = new VBWitnessUpdateInfo(
+          hexToU8a(update.witnessUpdateInfo),
+        );
 
-        witness.updateUsingPublicInfoPostBatchUpdate(member, additions, removals, queriedWitnessInfo);
+        witness.updateUsingPublicInfoPostBatchUpdate(
+          member,
+          additions,
+          removals,
+          queriedWitnessInfo,
+        );
       }
       current = till + 1;
     }

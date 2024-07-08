@@ -2,11 +2,11 @@ import { randomAsHex } from '@polkadot/util-crypto';
 
 import { DockAPI } from '../../../src';
 import {
-  typedHexDID,
   NoDIDError,
   DidKeypair,
   DidMethodKey,
-} from '../../../src/utils/did';
+  DockDidOrDidMethodKey,
+} from '../../../src/did';
 import {
   FullNodeEndpoint,
   TestKeyringOpts,
@@ -95,14 +95,22 @@ describe('Basic DID tests', () => {
       'DidOrDidMethodKey',
       testDidMethodKey1,
     );
-    expect(typedHexDID(dock.api, substrateDid1)).toEqual(testDidMethodKey1);
-    expect(testDidMethodKey1).toEqual(typedHexDID(dock.api, testDidMethodKey1));
+    expect(DockDidOrDidMethodKey.from(substrateDid1)).toEqual(
+      testDidMethodKey1,
+    );
+    expect(testDidMethodKey1).toEqual(
+      DockDidOrDidMethodKey.from(testDidMethodKey1),
+    );
 
     const substrateDid2 = dock.api.createType(
       'DidOrDidMethodKey',
       testDidMethodKey2,
     );
-    expect(typedHexDID(dock.api, substrateDid2)).toEqual(testDidMethodKey2);
-    expect(testDidMethodKey2).toEqual(typedHexDID(dock.api, testDidMethodKey2));
+    expect(DockDidOrDidMethodKey.from(substrateDid2)).toEqual(
+      testDidMethodKey2,
+    );
+    expect(testDidMethodKey2).toEqual(
+      DockDidOrDidMethodKey.from(testDidMethodKey2),
+    );
   });
 });

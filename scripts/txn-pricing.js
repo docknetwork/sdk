@@ -8,14 +8,17 @@ import {
   Accumulator,
   AccumulatorParams,
   initializeWasm,
-  BBSPlusKeypairG2, PositiveAccumulator,
-  BBSPlusSignatureParamsG1, VBWitnessUpdateInfo,
+  BBSPlusKeypairG2,
+  PositiveAccumulator,
+  BBSPlusSignatureParamsG1,
+  VBWitnessUpdateInfo,
 } from '@docknetwork/crypto-wasm-ts';
 import dock from '../src/index';
+import { DockDid, DidKeypair, DidMethodKey } from '../src/did';
 import {
-  createNewDockDID, DidKeypair, DidMethodKey, typedHexDID,
-} from '../src/utils/did';
-import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../src/utils/misc';
+  generateEcdsaSecp256k1Keypair,
+  getPublicKeyFromKeyringPair,
+} from '../src/utils/misc';
 import { createRandomRegistryId, OneOfPolicy } from '../src/utils/revocation';
 import { getBalance } from './helpers';
 import { DidKey, VerificationRelationship } from '../src/public-keys';
@@ -24,7 +27,6 @@ import BBSPlusModule from '../src/modules/bbs-plus';
 import AccumulatorModule from '../src/modules/accumulator';
 import StatusList2021Credential from '../src/status-list-credential/status-list2021-credential';
 import { getKeyDoc } from '../src/utils/vc/helpers';
-import DockDid from '../src/utils/did/typed-did/dock-did';
 
 require('dotenv').config();
 
@@ -33,7 +35,7 @@ const { FullNodeEndpoint, EndowedSecretURI } = process.env;
 const unit = 1e6;
 
 function getDidPair() {
-  const did = createNewDockDID();
+  const did = DockDid.random();
   // Creating ECDSA pair because its most expensive to verify and thus gives max fees
   const pair = generateEcdsaSecp256k1Keypair(randomAsHex(32));
   const publicKey = getPublicKeyFromKeyringPair(pair);
@@ -45,7 +47,9 @@ async function printFeePaid(dockApi, address, fn) {
   const before = await getBalance(dockApi, address);
   await fn();
   const after = await getBalance(dockApi, address);
-  console.info(`Fee paid is ${(parseInt(before[0]) - parseInt(after[0])) / unit}`);
+  console.info(
+    `Fee paid is ${(parseInt(before[0]) - parseInt(after[0])) / unit}`,
+  );
 }
 
 async function dids() {
@@ -124,17 +128,31 @@ async function dids() {
     await dock.did.addKeys([dk7, dk8, dk9], did, did, pair, undefined, false);
   });
 
-  const newControllers = [createNewDockDID(), createNewDockDID(), createNewDockDID()];
+  const newControllers = [DockDid.random(), DockDid.random(), DockDid.random()];
   // Add 1 controller
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Adding 1 controller');
-    await dock.did.addControllers([newControllers[0]], did, did, pair, undefined, false);
+    await dock.did.addControllers(
+      [newControllers[0]],
+      did,
+      did,
+      pair,
+      undefined,
+      false,
+    );
   });
 
   // Add 2 controllers
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Adding 2 controllers');
-    await dock.did.addControllers([newControllers[1], newControllers[2]], did, did, pair, undefined, false);
+    await dock.did.addControllers(
+      [newControllers[1], newControllers[2]],
+      did,
+      did,
+      pair,
+      undefined,
+      false,
+    );
   });
 
   const spType = new ServiceEndpointType();
@@ -146,40 +164,66 @@ async function dids() {
   // Add 1 service endpoint with 1 origin
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Adding 1 service endpoint with 1 origin');
-    await dock.did.addServiceEndpoint(spId1, spType, origins1, did, did, pair, undefined, false);
+    await dock.did.addServiceEndpoint(
+      spId1,
+      spType,
+      origins1,
+      did,
+      did,
+      pair,
+      undefined,
+      false,
+    );
   });
 
   // Add 1 service endpoint with 2 origins
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Adding 1 service endpoint with 2 origins');
-    await dock.did.addServiceEndpoint(spId2, spType, origins2, did, did, pair, undefined, false);
+    await dock.did.addServiceEndpoint(
+      spId2,
+      spType,
+      origins2,
+      did,
+      did,
+      pair,
+      undefined,
+      false,
+    );
   });
 
   // Adding a new DID which doesn't control itself but controlled by one other controller
   const [did1] = getDidPair();
   await printFeePaid(dock.api, account.address, async () => {
-    console.info('Writing a DID that has no key is controlled by 1 other controller');
+    console.info(
+      'Writing a DID that has no key is controlled by 1 other controller',
+    );
     await dock.did.new(did1, [], [did], false);
   });
 
   // Adding a new DID which doesn't control itself but controlled by 2 other controllers
   const [did2] = getDidPair();
   await printFeePaid(dock.api, account.address, async () => {
-    console.info('Writing a DID that has no key is controlled by 2 other controllers');
+    console.info(
+      'Writing a DID that has no key is controlled by 2 other controllers',
+    );
     await dock.did.new(did2, [], [did, did1], false);
   });
 
   // Adding a new DID which doesn't control itself but has a key and controlled by one other controller
   const [did3, , dk_] = getDidPair();
   await printFeePaid(dock.api, account.address, async () => {
-    console.info('Writing a DID that has 1 key is controlled by 1 other controller');
+    console.info(
+      'Writing a DID that has 1 key is controlled by 1 other controller',
+    );
     await dock.did.new(did3, [dk_], [did], false);
   });
 
   // Add DID key with all verification relationships to a DID that doesn't control itself
   const [, , dk__] = getDidPair();
   await printFeePaid(dock.api, account.address, async () => {
-    console.info('Adding DID key with all verification relationships to a DID that doesnt control itself');
+    console.info(
+      'Adding DID key with all verification relationships to a DID that doesnt control itself',
+    );
     await dock.did.addKeys([dk__], did1, did, pair, undefined, false);
   });
 
@@ -198,19 +242,40 @@ async function dids() {
   // Removing 1 controller
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Removing 1 controller');
-    await dock.did.removeControllers([newControllers[0]], did, did, pair, undefined, false);
+    await dock.did.removeControllers(
+      [newControllers[0]],
+      did,
+      did,
+      pair,
+      undefined,
+      false,
+    );
   });
 
   // Removing 2 controllers
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Removing 2 controllers');
-    await dock.did.removeControllers([newControllers[1], newControllers[2]], did, did, pair, undefined, false);
+    await dock.did.removeControllers(
+      [newControllers[1], newControllers[2]],
+      did,
+      did,
+      pair,
+      undefined,
+      false,
+    );
   });
 
   // Removing 1 service endpoint
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Removing service endpoint');
-    await dock.did.removeServiceEndpoint(spId1, did, did, pair, undefined, false);
+    await dock.did.removeServiceEndpoint(
+      spId1,
+      did,
+      did,
+      pair,
+      undefined,
+      false,
+    );
   });
 
   // Remove DID
@@ -230,7 +295,7 @@ async function revocation() {
   const registryId = createRandomRegistryId();
   // Create owners
   const owners = new Set();
-  owners.add(typedHexDID(dock.api, did));
+  owners.add(did);
 
   const policy = new OneOfPolicy(owners);
   await printFeePaid(dock.api, account.address, async () => {
@@ -245,17 +310,34 @@ async function revocation() {
       revokeIds.add(randomAsHex(32));
     }
 
-    const [update, sig, nonce] = await dock.revocation.createSignedRevoke(registryId, revokeIds, did, pair, { didModule: dock.did });
+    const [update, sig, nonce] = await dock.revocation.createSignedRevoke(
+      registryId,
+      revokeIds,
+      did,
+      pair,
+      { didModule: dock.did },
+    );
     const revTx = dock.revocation.createRevokeTx(update, [{ nonce, sig }]);
-    console.info(`Payment info of ${count} revocation is ${(await revTx.paymentInfo(account.address))}`);
+    console.info(
+      `Payment info of ${count} revocation is ${await revTx.paymentInfo(account.address)}`,
+    );
     await printFeePaid(dock.api, account.address, async () => {
       await dock.signAndSend(revTx, false);
     });
   }
 
-  const [update, sig, nonce] = await dock.revocation.createSignedRemove(registryId, did, pair, { didModule: dock.did });
-  const revTx = dock.revocation.createRemoveRegistryTx(update, [{ nonce, sig }]);
-  console.info(`Payment info of removing registry is ${(await revTx.paymentInfo(account.address))}`);
+  const [update, sig, nonce] = await dock.revocation.createSignedRemove(
+    registryId,
+    did,
+    pair,
+    { didModule: dock.did },
+  );
+  const revTx = dock.revocation.createRemoveRegistryTx(update, [
+    { nonce, sig },
+  ]);
+  console.info(
+    `Payment info of removing registry is ${await revTx.paymentInfo(account.address)}`,
+  );
 
   await printFeePaid(dock.api, account.address, async () => {
     await dock.signAndSend(revTx, false);
@@ -306,32 +388,69 @@ async function bbsPlus() {
 
   // Add params with different attribute sizes
   for (const attributeCount of [10, 11, 12, 13, 14, 15]) {
-    const bytes = u8aToHex(BBSPlusSignatureParamsG1.generate(attributeCount, hexToU8a(label)).toBytes());
+    const bytes = u8aToHex(
+      BBSPlusSignatureParamsG1.generate(
+        attributeCount,
+        hexToU8a(label),
+      ).toBytes(),
+    );
     const params = BBSPlusModule.prepareAddParameters(bytes, undefined, label);
     await printFeePaid(dock.api, account.address, async () => {
       console.info(`Add BBS+ params with ${attributeCount} attributes`);
-      await dock.bbsPlusModule.addParams(params, did, pair, { didModule: dock.did }, false);
+      await dock.bbsPlusModule.addParams(
+        params,
+        did,
+        pair,
+        { didModule: dock.did },
+        false,
+      );
     });
   }
 
   // Add a public key
-  const kp = BBSPlusKeypairG2.generate(BBSPlusSignatureParamsG1.generate(10, hexToU8a(label)));
-  const pk = BBSPlusModule.prepareAddPublicKey(dock.api, u8aToHex(kp.publicKey.bytes), undefined, [did, 1]);
+  const kp = BBSPlusKeypairG2.generate(
+    BBSPlusSignatureParamsG1.generate(10, hexToU8a(label)),
+  );
+  const pk = BBSPlusModule.prepareAddPublicKey(
+    u8aToHex(kp.publicKey.bytes),
+    undefined,
+    [did, 1],
+  );
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Add a BBS+ key');
-    await dock.bbsPlusModule.addPublicKey(pk, did, did, pair, { didModule: dock.did }, false);
+    await dock.bbsPlusModule.addPublicKey(
+      pk,
+      did,
+      did,
+      pair,
+      { didModule: dock.did },
+      false,
+    );
   });
 
   // Remove public key
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Remove BBS+ key');
-    await dock.bbsPlusModule.removePublicKey(2, did, did, pair, { didModule: dock.did }, false);
+    await dock.bbsPlusModule.removePublicKey(
+      2,
+      did,
+      did,
+      pair,
+      { didModule: dock.did },
+      false,
+    );
   });
 
   // Remove params
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Remove BBS+ params');
-    await dock.bbsPlusModule.removeParams(1, did, pair, { didModule: dock.did }, false);
+    await dock.bbsPlusModule.removeParams(
+      1,
+      did,
+      pair,
+      { didModule: dock.did },
+      false,
+    );
   });
 }
 
@@ -346,33 +465,75 @@ async function accumulator() {
 
   const label = stringToHex('My Accumulator params');
   const bytes = u8aToHex(Accumulator.generateParams(hexToU8a(label)).bytes);
-  const params = AccumulatorModule.prepareAddParameters(bytes, undefined, label);
+  const params = AccumulatorModule.prepareAddParameters(
+    bytes,
+    undefined,
+    label,
+  );
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Accumulator params write');
-    await dock.accumulatorModule.addParams(params, did, pair, { didModule: dock.did }, false);
+    await dock.accumulatorModule.addParams(
+      params,
+      did,
+      pair,
+      { didModule: dock.did },
+      false,
+    );
   });
 
-  const kp = Accumulator.generateKeypair(new AccumulatorParams(hexToU8a(params.bytes)));
+  const kp = Accumulator.generateKeypair(
+    new AccumulatorParams(hexToU8a(params.bytes)),
+  );
 
-  const pk = AccumulatorModule.prepareAddPublicKey(dock.api, u8aToHex(kp.publicKey.bytes), undefined, [did, 1]);
+  const pk = AccumulatorModule.prepareAddPublicKey(
+    u8aToHex(kp.publicKey.bytes),
+    undefined,
+    [did, 1],
+  );
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Accumulator key write');
-    await dock.accumulatorModule.addPublicKey(pk, did, pair, { didModule: dock.did }, false);
+    await dock.accumulatorModule.addPublicKey(
+      pk,
+      did,
+      pair,
+      { didModule: dock.did },
+      false,
+    );
   });
 
-  const accumulatorPos = PositiveAccumulator.initialize(new AccumulatorParams(hexToU8a(params.bytes)), kp.secretKey);
+  const accumulatorPos = PositiveAccumulator.initialize(
+    new AccumulatorParams(hexToU8a(params.bytes)),
+    kp.secretKey,
+  );
   const accumulatorIdPos = randomAsHex(32);
   const accumulatedPos = u8aToHex(accumulatorPos.accumulated);
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Adding a positive accumulator');
-    await dock.accumulatorModule.addPositiveAccumulator(accumulatorIdPos, accumulatedPos, [did, 1], did, pair, { didModule: dock.did }, false);
+    await dock.accumulatorModule.addPositiveAccumulator(
+      accumulatorIdPos,
+      accumulatedPos,
+      [did, 1],
+      did,
+      pair,
+      { didModule: dock.did },
+      false,
+    );
   });
 
   const accumulatorIdUni = randomAsHex(32);
   const accumulatedUni = u8aToHex(accumulatorPos.accumulated);
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Adding a universal accumulator');
-    await dock.accumulatorModule.addUniversalAccumulator(accumulatorIdUni, accumulatedUni, [did, 1], 10000, did, pair, { didModule: dock.did }, false);
+    await dock.accumulatorModule.addUniversalAccumulator(
+      accumulatorIdUni,
+      accumulatedUni,
+      [did, 1],
+      10000,
+      did,
+      pair,
+      { didModule: dock.did },
+      false,
+    );
   });
 
   const start = 10;
@@ -381,26 +542,66 @@ async function accumulator() {
   for (let i = 1; i <= 5; i++) {
     const members = [];
     for (let j = 0; j < i; j++) {
-      const member = Accumulator.encodePositiveNumberAsAccumulatorMember(start * 10 * i + j);
+      const member = Accumulator.encodePositiveNumberAsAccumulatorMember(
+        start * 10 * i + j,
+      );
       members.push(member);
     }
-    let witUpd = u8aToHex(VBWitnessUpdateInfo.new(hexToU8a(accumulated), members, [], kp.secretKey).value);
+    let witUpd = u8aToHex(
+      VBWitnessUpdateInfo.new(hexToU8a(accumulated), members, [], kp.secretKey)
+        .value,
+    );
     await printFeePaid(dock.api, account.address, async () => {
-      console.info(`Updating a positive accumulator with ${members.length} additions`);
-      await dock.accumulatorModule.updateAccumulator(accumulatorIdPos, accumulated, { additions: members.map((m) => u8aToHex(m)), witnessUpdateInfo: witUpd }, did, pair, { didModule: dock.did }, false);
+      console.info(
+        `Updating a positive accumulator with ${members.length} additions`,
+      );
+      await dock.accumulatorModule.updateAccumulator(
+        accumulatorIdPos,
+        accumulated,
+        {
+          additions: members.map((m) => u8aToHex(m)),
+          witnessUpdateInfo: witUpd,
+        },
+        did,
+        pair,
+        { didModule: dock.did },
+        false,
+      );
     });
 
-    witUpd = u8aToHex(VBWitnessUpdateInfo.new(hexToU8a(accumulated), [], members, kp.secretKey).value);
+    witUpd = u8aToHex(
+      VBWitnessUpdateInfo.new(hexToU8a(accumulated), [], members, kp.secretKey)
+        .value,
+    );
 
     await printFeePaid(dock.api, account.address, async () => {
-      console.info(`Updating a positive accumulator with ${members.length} removals`);
-      await dock.accumulatorModule.updateAccumulator(accumulatorIdPos, accumulated, { removals: members.map((m) => u8aToHex(m)), witnessUpdateInfo: witUpd }, did, pair, { didModule: dock.did }, false);
+      console.info(
+        `Updating a positive accumulator with ${members.length} removals`,
+      );
+      await dock.accumulatorModule.updateAccumulator(
+        accumulatorIdPos,
+        accumulated,
+        {
+          removals: members.map((m) => u8aToHex(m)),
+          witnessUpdateInfo: witUpd,
+        },
+        did,
+        pair,
+        { didModule: dock.did },
+        false,
+      );
     });
   }
 
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Removing a positive accumulator');
-    await dock.accumulatorModule.removeAccumulator(accumulatorIdPos, did, pair, { didModule: dock.did }, false);
+    await dock.accumulatorModule.removeAccumulator(
+      accumulatorIdPos,
+      did,
+      pair,
+      { didModule: dock.did },
+      false,
+    );
   });
 }
 
@@ -415,7 +616,9 @@ async function transfers() {
   const amount = 10 * unit;
   const transfer = dock.api.tx.balances.transfer(BOB, amount);
 
-  console.info(`Payment info of 1 transfer is ${(await transfer.paymentInfo(account.address))}`);
+  console.info(
+    `Payment info of 1 transfer is ${await transfer.paymentInfo(account.address)}`,
+  );
   await dock.signAndSend(transfer, false);
 
   const bal2 = await getBalance(dock.api, account.address);
@@ -423,13 +626,17 @@ async function transfers() {
   console.log(parseInt(bal1[0]));
   console.log(parseInt(bal2[0]));
 
-  console.info(`Fee paid is ${(parseInt(bal1[0]) - parseInt(bal2[0]) - amount) / unit}`);
+  console.info(
+    `Fee paid is ${(parseInt(bal1[0]) - parseInt(bal2[0]) - amount) / unit}`,
+  );
 
   const txs = Array(3).fill(dock.api.tx.balances.transfer(BOB, amount));
 
   const txBatch = dock.api.tx.utility.batch(txs);
   console.log(`Batch of ${txs.length} transfers`);
-  console.info(`Payment info of batch is ${(await txBatch.paymentInfo(account.address))}`);
+  console.info(
+    `Payment info of batch is ${await txBatch.paymentInfo(account.address)}`,
+  );
 }
 
 async function statusList() {
@@ -447,7 +654,7 @@ async function statusList() {
   );
 
   const owners = new Set();
-  owners.add(typedHexDID(dock.api, did));
+  owners.add(did);
   const policy = new OneOfPolicy(owners);
 
   const cred = await StatusList2021Credential.create(
@@ -606,13 +813,29 @@ async function trustRegistry() {
   const schemaId1 = randomAsHex(32);
   const schemaId2 = randomAsHex(32);
 
-  const schemas = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'TrustRegistrySchemaMetadata');
-  const issuers = new BTreeMap(dock.api.registry, 'Issuer', 'VerificationPrices');
+  const schemas = new BTreeMap(
+    dock.api.registry,
+    'TrustRegistrySchemaId',
+    'TrustRegistrySchemaMetadata',
+  );
+  const issuers = new BTreeMap(
+    dock.api.registry,
+    'Issuer',
+    'VerificationPrices',
+  );
   const verifiers = new BTreeSet(dock.api.registry, 'Verifier');
 
-  const issuerPrices1 = new BTreeMap(dock.api.registry, 'String', 'VerificationPrice');
+  const issuerPrices1 = new BTreeMap(
+    dock.api.registry,
+    'String',
+    'VerificationPrice',
+  );
   issuerPrices1.set('A', 20);
-  const issuerPrices2 = new BTreeMap(dock.api.registry, 'String', 'VerificationPrice');
+  const issuerPrices2 = new BTreeMap(
+    dock.api.registry,
+    'String',
+    'VerificationPrice',
+  );
   issuerPrices2.set('A', 20);
   issuerPrices2.set('B', 30);
 
@@ -717,8 +940,16 @@ async function trustRegistry() {
     );
   });
 
-  const schemas2 = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'TrustRegistrySchemaMetadata');
-  let issuers2 = new BTreeMap(dock.api.registry, 'Issuer', 'VerificationPrices');
+  const schemas2 = new BTreeMap(
+    dock.api.registry,
+    'TrustRegistrySchemaId',
+    'TrustRegistrySchemaMetadata',
+  );
+  let issuers2 = new BTreeMap(
+    dock.api.registry,
+    'Issuer',
+    'VerificationPrices',
+  );
 
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Adding issuer with 1 price to a new schema using `Modify`');
@@ -740,7 +971,11 @@ async function trustRegistry() {
   const schemaId3 = randomAsHex(32);
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Adding issuer with 1 price to a new schema');
-    const schemas3 = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'TrustRegistrySchemaMetadata');
+    const schemas3 = new BTreeMap(
+      dock.api.registry,
+      'TrustRegistrySchemaId',
+      'TrustRegistrySchemaMetadata',
+    );
     issuers2 = new BTreeMap(dock.api.registry, 'Issuer', 'VerificationPrices');
     issuers2.set(i2Did, issuerPrices1);
     schemas3.set(schemaId3, {
@@ -757,7 +992,11 @@ async function trustRegistry() {
 
   await printFeePaid(dock.api, account.address, async () => {
     console.info('Removing 1 existing schema');
-    const schemas = new BTreeMap(dock.api.registry, 'TrustRegistrySchemaId', 'TrustRegistrySchemaMetadata');
+    const schemas = new BTreeMap(
+      dock.api.registry,
+      'TrustRegistrySchemaId',
+      'TrustRegistrySchemaMetadata',
+    );
     schemas.set(schemaId3, 'Remove');
     await dock.trustRegistry.setSchemasMetadata(
       cDid,
@@ -809,9 +1048,10 @@ async function main() {
   process.exit(0);
 }
 
-dock.init({
-  address: FullNodeEndpoint,
-})
+dock
+  .init({
+    address: FullNodeEndpoint,
+  })
   .then(main)
   .catch((error) => {
     console.error('Error occurred somewhere, it was caught!', error);

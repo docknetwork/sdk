@@ -125,28 +125,15 @@ describe('Testing isHexWithGivenByteSize', () => {
       queueCapacity: 3,
     });
 
-    results = await Promise.all([
-      () => mapWithBoundQueue.callByKey(
-        1,
-        () => timeout(5e2, () => 1),
-      ),
-      () => mapWithBoundQueue.callByKey(
-        2,
-        () => timeout(5e2, () => 2),
-      ),
-      () => mapWithBoundQueue.callByKey(
-        3,
-        () => timeout(5e2, () => 3),
-      ),
-      () => mapWithBoundQueue.callByKey(
-        3,
-        () => timeout(5e2, () => 4),
-      ),
-      () => expect(() => mapWithBoundQueue.callByKey(
-        4,
-        () => timeout(5e2, () => 5),
-      )).rejects.toThrowErrorMatchingSnapshot(),
-    ].map((f) => f()));
+    results = await Promise.all(
+      [
+        () => mapWithBoundQueue.callByKey(1, () => timeout(5e2, () => 1)),
+        () => mapWithBoundQueue.callByKey(2, () => timeout(5e2, () => 2)),
+        () => mapWithBoundQueue.callByKey(3, () => timeout(5e2, () => 3)),
+        () => mapWithBoundQueue.callByKey(3, () => timeout(5e2, () => 4)),
+        () => expect(() => mapWithBoundQueue.callByKey(4, () => timeout(5e2, () => 5))).rejects.toThrowErrorMatchingSnapshot(),
+      ].map((f) => f()),
+    );
 
     expect(results).toEqual([1, 2, 3, 4, undefined]);
   });
@@ -280,14 +267,14 @@ describe('Testing Ecdsa with secp256k1', () => {
     const entropy = '0x4c94485e0c21ae6c41ce1dfe7b6bfaceea5ab68e40a2476f50208e526f506080';
     const pair = generateEcdsaSecp256k1Keypair(entropy);
     const pk = PublicKeySecp256k1.fromKeyringPair(pair);
-    const sig = new SignatureSecp256k1(msg, pair);
+    const sig = SignatureSecp256k1.signWithKeyringPair(msg, pair);
     expect(verifyEcdsaSecp256k1Sig(msg, sig, pk)).toBe(true);
 
     const msg1 = [
       1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1,
       2, 3, 4, 5, 6, 7, 8, 9,
     ];
-    const sig1 = new SignatureSecp256k1(msg1, pair);
+    const sig1 = SignatureSecp256k1.signWithKeyringPair(msg1, pair);
     expect(verifyEcdsaSecp256k1Sig(msg1, sig1, pk)).toBe(true);
     expect(msg !== msg1).toBe(true);
     expect(sig !== sig1).toBe(true);
@@ -296,7 +283,7 @@ describe('Testing Ecdsa with secp256k1', () => {
       1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1,
       2, 3, 4, 5, 6, 7,
     ];
-    const sig2 = new SignatureSecp256k1(msg2, pair);
+    const sig2 = SignatureSecp256k1.signWithKeyringPair(msg2, pair);
     expect(verifyEcdsaSecp256k1Sig(msg2, sig2, pk)).toBe(true);
     expect(msg2 !== msg1).toBe(true);
     expect(sig2 !== sig1).toBe(true);

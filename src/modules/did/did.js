@@ -3,7 +3,7 @@ import { u8aToString, hexToU8a, u8aToHex } from '@polkadot/util';
 import { BTreeSet } from '@polkadot/types';
 import b58 from 'bs58';
 import {
-  typedHexDID,
+  DockDidOrDidMethodKey,
   DockDIDQualifier,
   NoDIDError,
   validateDockDIDHexIdentifier,
@@ -11,7 +11,7 @@ import {
   NoOffchainDIDError,
   createDidSig,
   DidMethodKeyQualifier,
-} from '../../utils/did';
+} from '../../did';
 import { getStateChange } from '../../utils/misc';
 
 import OffChainDidDocRef from './offchain-did-doc-ref';
@@ -51,7 +51,7 @@ class DIDModule {
    * @returns {*}
    */
   createNewOffchainTx(did, didDocRef) {
-    const hexId = typedHexDID(this.api, did).asDid;
+    const hexId = DockDidOrDidMethodKey.from(did).asDid;
     return this.module.newOffchain(hexId, didDocRef);
   }
 
@@ -78,7 +78,7 @@ class DIDModule {
    * @returns {*}
    */
   createSetOffchainDidRefTx(did, didDocRef) {
-    const hexId = typedHexDID(this.api, did).asDid;
+    const hexId = DockDidOrDidMethodKey.from(did).asDid;
     return this.module.setOffchainDidDocRef(hexId, didDocRef);
   }
 
@@ -109,7 +109,7 @@ class DIDModule {
    * @returns {Promise<*>}
    */
   createRemoveOffchainDidTx(did) {
-    const hexId = typedHexDID(this.api, did).asDid;
+    const hexId = DockDidOrDidMethodKey.from(did).asDid;
     return this.module.removeOffchainDid(hexId);
   }
 
@@ -139,10 +139,10 @@ class DIDModule {
     const cnts = new BTreeSet(this.api.registry, 'Controller');
     if (controllers !== undefined) {
       controllers.forEach((c) => {
-        cnts.add(typedHexDID(this.api, c));
+        cnts.add(DockDidOrDidMethodKey.from(c));
       });
     }
-    const hexId = typedHexDID(this.api, did).asDid;
+    const hexId = DockDidOrDidMethodKey.from(did).asDid;
     return this.module.newOnchain(
       hexId,
       didKeys.map((d) => d.toJSON()),
@@ -180,11 +180,7 @@ class DIDModule {
    * @param params
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async newDidMethodKey(
-    didMethodKey,
-    waitForFinalization = true,
-    params = {},
-  ) {
+  async newDidMethodKey(didMethodKey, waitForFinalization = true, params = {}) {
     return this.signAndSend(
       this.module.newDidMethodKey(didMethodKey),
       waitForFinalization,
@@ -209,8 +205,8 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const targetHexDid = DockDidOrDidMethodKey.from(targetDid).asDid;
+    const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
     const [addKeys, signature] = await this.createSignedAddKeys(
       didKeys,
       targetHexDid,
@@ -272,8 +268,8 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const targetHexDid = DockDidOrDidMethodKey.from(targetDid).asDid;
+    const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
     const [addControllers, signature] = await this.createSignedAddControllers(
       controllers,
       targetHexDid,
@@ -336,8 +332,8 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const targetHexDid = DockDidOrDidMethodKey.from(targetDid).asDid;
+    const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
     const [addServiceEndpoint, signature] = await this.createSignedAddServiceEndpoint(
       endpointId,
       endpointType,
@@ -404,8 +400,8 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const targetHexDid = DockDidOrDidMethodKey.from(targetDid).asDid;
+    const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
     const [removeKeys, signature] = await this.createSignedRemoveKeys(
       keyIds,
       targetHexDid,
@@ -464,8 +460,8 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const targetHexDid = DockDidOrDidMethodKey.from(targetDid).asDid;
+    const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
     const [removeControllers, signature] = await this.createSignedRemoveControllers(
       controllers,
       targetHexDid,
@@ -524,8 +520,8 @@ class DIDModule {
     signingKeyRef,
     nonce = undefined,
   ) {
-    const targetHexDid = typedHexDID(this.api, targetDid).asDid;
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const targetHexDid = DockDidOrDidMethodKey.from(targetDid).asDid;
+    const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
     const [removeServiceEndpoint, signature] = await this.createSignedRemoveServiceEndpoint(
       endpointId,
       targetHexDid,
@@ -577,8 +573,8 @@ class DIDModule {
    * @return {Promise<object>} The extrinsic to sign and send.
    */
   async createRemoveTx(targetDid, signerDid, signingKeyRef, nonce = undefined) {
-    const hexDid = typedHexDID(this.api, targetDid).asDid;
-    const signerHexDid = typedHexDID(this.api, signerDid);
+    const hexDid = DockDidOrDidMethodKey.from(targetDid).asDid;
+    const signerHexDid = DockDidOrDidMethodKey.from(signerDid);
     const [didRemoval, signature] = await this.createSignedDidRemoval(
       hexDid,
       signerHexDid,
@@ -626,7 +622,7 @@ class DIDModule {
    * @returns {Promise<SubmittableExtrinsic<ApiType>>}
    */
   async createSetClaimTx(priority, iri, did, signingKeyRef, nonce = undefined) {
-    const hexDid = typedHexDID(this.api, did);
+    const hexDid = DockDidOrDidMethodKey.from(did);
     const [setAttestation, signature] = await this.createSignedAttestation(
       priority,
       iri,
@@ -706,7 +702,7 @@ class DIDModule {
    */
   // eslint-disable-next-line sonarjs/cognitive-complexity
   async getDocument(did, { getOffchainSigKeys = true } = {}) {
-    const typedDid = typedHexDID(this.api, did);
+    const typedDid = DockDidOrDidMethodKey.from(did);
     const hexDid = typedDid.asDid;
     let didDetails = await this.getOnchainDidDetail(hexDid);
     didDetails = didDetails.data || didDetails;
@@ -715,14 +711,12 @@ class DIDModule {
     const attests = await this.getAttests(typedDid);
 
     // If given DID was in hex, encode to SS58 and then construct fully qualified DID else the DID was already fully qualified
-    const id = did === hexDid ? this.getFullyQualifiedDID(encodeAddress(hexDid)) : did;
+    const id = String(typedDid);
 
     // Get controllers
     const controllers = [];
     if (didDetails.activeControllers > 0) {
-      const cnts = await this.api.query.didModule.didControllers.entries(
-        hexDid,
-      );
+      const cnts = await this.api.query.didModule.didControllers.entries(hexDid);
       cnts.forEach(([key, value]) => {
         if (value.isSome) {
           const [controlled, controller] = key.toHuman();
@@ -738,9 +732,7 @@ class DIDModule {
 
     // Get service endpoints
     const serviceEndpoints = [];
-    const sps = await this.api.query.didModule.didServiceEndpoints.entries(
-      hexDid,
-    );
+    const sps = await this.api.query.didModule.didServiceEndpoints.entries(hexDid);
     sps.forEach(([key, value]) => {
       if (value.isSome) {
         const sp = value.unwrap();
@@ -835,9 +827,7 @@ class DIDModule {
           queryKeys.push([hexDid, k]);
         }
         if (this.api.query.offchainSignatures != null) {
-          const resp = await this.api.query.offchainSignatures.publicKeys.multi(
-            queryKeys,
-          );
+          const resp = await this.api.query.offchainSignatures.publicKeys.multi(queryKeys);
           let currentIter = 0;
           for (let r of resp) {
             // The gaps in `keyId` might correspond to removed keys
@@ -858,7 +848,6 @@ class DIDModule {
               }
               // Don't care about signature params for now
               const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(
-                this.api,
                 rawKey,
               );
               if (pkObj.curveType !== 'Bls12381') {
@@ -873,9 +862,7 @@ class DIDModule {
             currentIter++;
           }
         } else {
-          const resp = await this.api.query.bbsPlus.bbsPlusKeys.multi(
-            queryKeys,
-          );
+          const resp = await this.api.query.bbsPlus.bbsPlusKeys.multi(queryKeys);
           let currentIter = 0;
           for (const r of resp) {
             // The gaps in `keyId` might correspond to removed keys
@@ -885,7 +872,6 @@ class DIDModule {
 
               // Don't care about signature params for now
               const pkObj = WithParamsAndPublicKeys.createPublicKeyObjFromChainResponse(
-                this.api,
                 rawKey,
               );
               if (pkObj.curveType !== 'Bls12381') {
@@ -928,7 +914,9 @@ class DIDModule {
         if (c.Did) {
           return this.getFullyQualifiedDID(encodeAddress(c.Did));
         } else if (c.DidMethodKey) {
-          return this.getFullyQualifiedDIDMethodKey(encodeAddress(c.DidMethodKey));
+          return this.getFullyQualifiedDIDMethodKey(
+            encodeAddress(c.DidMethodKey),
+          );
         } else {
           return this.getFullyQualifiedDID(encodeAddress(c));
         }
@@ -1078,7 +1066,7 @@ class DIDModule {
    * @returns {Promise<DidKey>}
    */
   async getDidKey(did, keyIndex) {
-    const hexId = typedHexDID(this.api, did).asDid;
+    const hexId = DockDidOrDidMethodKey.from(did).asDid;
     let resp = await this.api.query.didModule.didKeys(hexId, keyIndex);
     if (resp.isNone) {
       throw new Error(`No key for found did ${did} and key index ${keyIndex}`);
@@ -1120,8 +1108,8 @@ class DIDModule {
    * @returns {Promise<boolean>}
    */
   async isController(controlled, controller) {
-    const controlledDid = typedHexDID(this.api, controlled).asDid;
-    const controllerDid = typedHexDID(this.api, controller);
+    const controlledDid = DockDidOrDidMethodKey.from(controlled).asDid;
+    const controllerDid = DockDidOrDidMethodKey.from(controller);
     const resp = await this.api.query.didModule.didControllers(
       controlledDid,
       controllerDid,
@@ -1136,7 +1124,7 @@ class DIDModule {
    * @returns {Promise}
    */
   async getServiceEndpoint(did, endpointId) {
-    const hexId = typedHexDID(this.api, did).asDid;
+    const hexId = DockDidOrDidMethodKey.from(did).asDid;
     let resp = await this.api.query.didModule.didServiceEndpoints(
       hexId,
       endpointId,
@@ -1187,7 +1175,7 @@ class DIDModule {
 
     const cnts = new BTreeSet(this.api.registry, 'Controller');
     controllers.forEach((c) => {
-      cnts.add(typedHexDID(this.api, c));
+      cnts.add(DockDidOrDidMethodKey.from(c));
     });
     const addControllers = { did: hexDid, controllers: cnts, nonce };
     const serializedAddControllers = this.getSerializedAddControllers(addControllers);
@@ -1260,7 +1248,7 @@ class DIDModule {
 
     const cnts = new BTreeSet(this.api.registry, 'Controller');
     controllers.forEach((c) => {
-      cnts.add(typedHexDID(this.api, c));
+      cnts.add(DockDidOrDidMethodKey.from(c));
     });
 
     const removeControllers = { did: hexDid, controllers: cnts, nonce };

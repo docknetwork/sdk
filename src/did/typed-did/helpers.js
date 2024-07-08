@@ -5,7 +5,6 @@ import DidMethodKey from "./did-method-key"; // eslint-disable-line
 /**
  * Takes a DID string, gets the hexadecimal value of that and returns either the `DockDid` or `DidMethodKey` object.
  * @deprecated Use `DockDidOrDidMethodKey.from`/`DockDid.from`/`DidMethodKey.from` instead.
- * @todo remove `api` parameter
  *
  * @param {*} api - unused
  * @param {string|DockDid|DidMethodKey|object} did -  The DID can be passed as fully qualified DID like `did:dock:<SS58 string>` or
@@ -17,8 +16,9 @@ export function typedHexDID(_api, did) {
 }
 
 /**
- * Create and return a fully qualified Dock DID, i.e. "did:dock:<SS58 string>"
+ * Create and return a new Dock DID.
+ * @deprecated Use `DockDid.random` instead.
  *
- * @returns {string} - The DID
+ * @returns {DockDid} - The DID
  */
-export const createNewDockDID = () => DockDid.random().toQualifiedEncodedString();
+export const createNewDockDID = () => DockDid.random();

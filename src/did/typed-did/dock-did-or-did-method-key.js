@@ -1,13 +1,14 @@
-import { getStateChange } from '../../misc';
+import { getStateChange } from '../../utils/misc';
 import { createDidSig } from '../utils';
 
 import { DockDIDQualifier, DidMethodKeyQualifier } from '../constants';
-import { withExtendedStaticProperties } from '../../inheritance';
+import { withExtendedStaticProperties } from '../../utils/inheritance';
+import { TypedEnum } from '../../utils/typed-enum';
 
 /**
  * Either `did:dock:*` or `did:key:*`.
  */
-class DockDidOrDidMethodKey {
+class DockDidOrDidMethodKey extends TypedEnum {
   /**
    * Prefix to form the fully qualified string.
    *
@@ -24,16 +25,15 @@ class DockDidOrDidMethodKey {
   static DidMethodKey;
 
   /**
-   * Instantiates `DockDid` or `DidMethodKey` from a fully qualified did string or a raw hex did.
-   * @param {string} did - fully qualified `dock:did:<SS58 DID>` or `dock:key:<BS58 public key>` or a raw hex DID
-   * @returns {DockDid|DidMethodKey}
+   * Checks whether provided string is qualified according to the caller class.
+   * @param {string} did
+   * @returns {boolean}
    */
-  static fromString(did) {
-    if (did.startsWith('0x')) {
-      return new this.DockDid(did);
-    } else {
-      return this.fromQualifiedString(did);
-    }
+  static isQualifiedString(did) {
+    return this.Qualifier
+      ? did.startsWith(this.Qualifier)
+      : this.DockDid.isQualifiedString(did)
+          || this.DidMethodKey.isQualifiedString(did);
   }
 
   /**
@@ -69,19 +69,26 @@ class DockDidOrDidMethodKey {
   }
 
   /**
-   * Attempts to parse provided DID as an object or string.
+   * Attempts to instantiate `DockDid` or `DidMethodKey` from the provided object or string.
+   *
    * @param {string|DockDid|DidMethodKey|object} did
    * @returns {DockDid|DidMethodKey}
    */
   static from(did) {
-    if (typeof did === 'object') {
+    if (!did) {
+      throw new Error(`Invalid DID: ${did}`);
+    } else if (typeof did === 'object') {
       if (did instanceof this) {
         return did;
       } else {
         return this.fromSubstrateValue(did);
       }
     } else if (typeof did === 'string') {
-      return this.fromString(did);
+      if (this.Qualifier && !this.isQualifiedString(did)) {
+        return this.fromUnqualifiedString(did);
+      } else {
+        return this.fromQualifiedString(did);
+      }
     } else {
       throw new TypeError(
         `Unsupported DID value: \`${did}\` with type \`${typeof did}\`, expected a string or an object`,
@@ -149,17 +156,17 @@ class DockDidOrDidMethodKey {
   }
 
   /**
-   * Converts underlying object to the `JSON` representation suitable for substrate JSON-RPC.
-   */
-  toJSON() {
-    throw new Error('Unimplemented');
-  }
-
-  /**
    * Returns underlying value encoded according to the specification.
    */
   toEncodedString() {
     throw new Error('Unimplemented');
+  }
+
+  /**
+   * Returns fully qualified `did:dock:*` encoded in SS58 or `did:key:*` encoded in BS58.
+   */
+  toString() {
+    return this.toQualifiedEncodedString();
   }
 
   /**
@@ -171,6 +178,6 @@ class DockDidOrDidMethodKey {
 }
 
 export default withExtendedStaticProperties(
-  ['Qualifier'],
+  ['Qualifier', 'fromUnqualifiedString'],
   DockDidOrDidMethodKey,
 );

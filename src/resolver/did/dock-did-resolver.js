@@ -1,5 +1,5 @@
 import { withInitializedDockAPI } from '../utils';
-import { validateDockDIDSS58Identifier } from '../../utils/did';
+import { validateDockDIDSS58Identifier } from '../../did';
 import DIDResolver from './did-resolver';
 
 class DockDIDResolver extends DIDResolver {

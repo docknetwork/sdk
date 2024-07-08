@@ -8,11 +8,7 @@ import {
   TestAccountURI,
 } from '../test-constants';
 
-import {
-  typedHexDID,
-  createNewDockDID,
-  DidKeypair,
-} from '../../src/utils/did';
+import { DockDid, DidKeypair } from '../../src/did';
 import { OneOfPolicy } from '../../src/utils/revocation';
 import { registerNewDIDUsingPair } from './helpers';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
@@ -37,11 +33,11 @@ describe('StatusListCredential Module', () => {
   const multipleControllerstatusListCredID = randomAsHex(32);
 
   // Create a new owner DID, the DID will be registered on the network and own the status list
-  const ownerDID = createNewDockDID();
+  const ownerDID = DockDid.random();
   const ownerSeed = randomAsHex(32);
   let ownerKey;
 
-  const ownerDID2 = createNewDockDID();
+  const ownerDID2 = DockDid.random();
   const ownerSeed2 = randomAsHex(32);
   let ownerKey2;
 
@@ -61,7 +57,7 @@ describe('StatusListCredential Module', () => {
     });
 
     // Create a status list policy
-    owners.add(typedHexDID(dock.api, ownerDID));
+    owners.add(ownerDID);
     policy = new OneOfPolicy(owners);
 
     ownerKey = getKeyDoc(
@@ -233,8 +229,8 @@ describe('StatusListCredential Module', () => {
 
   test('Can create a status list with multiple owners', async () => {
     const controllersNew = new Set();
-    controllersNew.add(typedHexDID(dock.api, ownerDID));
-    controllersNew.add(typedHexDID(dock.api, ownerDID2));
+    controllersNew.add(ownerDID);
+    controllersNew.add(ownerDID2);
 
     const cred = await StatusList2021Credential.create(
       ownerKey,
@@ -267,14 +263,12 @@ describe('StatusListCredential Module', () => {
     let hasSecondDID = false;
     [...controllerSet.entries()]
       .flatMap((v) => v)
-      .map((cnt) => typedHexDID(dock.api, cnt))
+      .map((cnt) => DockDid.from(cnt))
       .forEach((controller) => {
-        if (
-          controller.toString() === typedHexDID(dock.api, ownerDID).toString()
-        ) {
+        if (controller.toString() === DockDid.from(ownerDID).toString()) {
           hasFirstDID = true;
         } else if (
-          controller.toString() === typedHexDID(dock.api, ownerDID2).toString()
+          controller.toString() === DockDid.from(ownerDID2).toString()
         ) {
           hasSecondDID = true;
         }

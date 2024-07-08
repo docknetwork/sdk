@@ -1,6 +1,6 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { DockResolver, DockStatusList2021Resolver } from '../../src/resolver';
-import { createNewDockDID, DidKeypair, typedHexDID } from '../../src/utils/did';
+import { DockDid, DidKeypair } from '../../src/did';
 
 import { DockAPI } from '../../src/index';
 
@@ -25,7 +25,7 @@ describe('Resolvers', () => {
   let statusListCred;
 
   // Create a new owner DID, the DID will be registered on the network and own the status list
-  const ownerDID = createNewDockDID();
+  const ownerDID = DockDid.random();
   const ownerSeed = randomAsHex(32);
   let ownerKey;
 
@@ -41,7 +41,7 @@ describe('Resolvers', () => {
       address: FullNodeEndpoint,
     });
 
-    owners.add(typedHexDID(dock.api, ownerDID));
+    owners.add(ownerDID);
     policy = new OneOfPolicy(owners);
 
     ownerKey = getKeyDoc(
@@ -55,7 +55,10 @@ describe('Resolvers', () => {
     dock.setAccount(account);
 
     // Thees DIDs should be written before any test begins
-    pair = DidKeypair.fromApi(dock, { seed: ownerSeed, keypairType: 'sr25519' });
+    pair = DidKeypair.fromApi(dock, {
+      seed: ownerSeed,
+      keypairType: 'sr25519',
+    });
 
     // The controller is same as the DID
     await registerNewDIDUsingPair(dock, ownerDID, pair);
@@ -63,8 +66,8 @@ describe('Resolvers', () => {
     statusListCred = await StatusList2021Credential.create(
       ownerKey,
       statusListCredId,
-      {},
-    ); await expect(
+    );
+    await expect(
       dock.statusListCredential.createStatusListCredential(
         statusListCredId,
         statusListCred,
@@ -86,7 +89,7 @@ describe('Resolvers', () => {
     expect(resolver.supports('status-list2021:dock:')).toBe(true);
     expect(resolver.supports('status-list2021:*:')).toBe(false);
     expect(resolver.supports('status-list2020:doc:')).toBe(false);
-    expect(await resolver.resolve(ownerDID)).toEqual(
+    expect(await resolver.resolve(String(ownerDID))).toEqual(
       await dock.did.getDocument(ownerDID),
     );
     expect(await resolver.resolve(statusListCred.id)).toEqual(
@@ -102,7 +105,7 @@ describe('Resolvers', () => {
     expect(resolver.supports('status-list2021:dock:')).toBe(true);
     expect(resolver.supports('status-list2021:*:')).toBe(false);
     expect(resolver.supports('status-list2020:doc:')).toBe(false);
-    expect(resolver.resolve(ownerDID)).rejects.toThrowError(
+    expect(resolver.resolve(String(ownerDID))).rejects.toThrowError(
       `Invalid \`StatusList2021Credential\` id: \`${ownerDID}\``,
     );
     expect(await resolver.resolve(statusListCred.id)).toEqual(
@@ -118,7 +121,7 @@ describe('Resolvers', () => {
     expect(resolver.supports('status-list2021:dock:')).toBe(false);
     expect(resolver.supports('status-list2021:*:')).toBe(false);
     expect(resolver.supports('status-list2020:doc:')).toBe(false);
-    expect(await resolver.resolve(ownerDID)).toEqual(
+    expect(await resolver.resolve(String(ownerDID))).toEqual(
       await dock.did.getDocument(ownerDID),
     );
     expect(resolver.resolve(statusListCred.id)).rejects.toThrowError(

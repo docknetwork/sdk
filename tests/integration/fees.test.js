@@ -13,7 +13,7 @@ import {
 } from '@polkadot/util';
 import { randomAsHex } from '@polkadot/util-crypto';
 import { DockAPI } from '../../src/index';
-import { createNewDockDID, typedHexDID } from '../../src/utils/did';
+import { DockDid } from '../../src/did';
 import { createDidPair, getBalance } from './helpers';
 import {
   createRandomRegistryId,
@@ -148,20 +148,12 @@ describe.skip('Fees', () => {
     dk7.verRels.setAuthentication();
     dk8.verRels.setCapabilityInvocation();
     dk9.verRels.setAssertion();
-    await withPaidFeeMatchingSnapshot(() => dock.did.addKeys(
-      [dk7, dk8, dk9],
-      did,
-      did,
-      pair,
-      1,
-      undefined,
-      false,
-    ));
+    await withPaidFeeMatchingSnapshot(() => dock.did.addKeys([dk7, dk8, dk9], did, did, pair, 1, undefined, false));
 
     const newControllers = [
-      createNewDockDID(),
-      createNewDockDID(),
-      createNewDockDID(),
+      DockDid.random(),
+      DockDid.random(),
+      DockDid.random(),
     ];
     // Add 1 controller
     await withPaidFeeMatchingSnapshot(() => dock.did.addControllers(
@@ -283,7 +275,7 @@ describe.skip('Fees', () => {
     const registryId = createRandomRegistryId();
     // Create owners
     const owners = new Set();
-    owners.add(typedHexDID(dock.api, did));
+    owners.add(did);
 
     const policy = new OneOfPolicy(owners);
     await withPaidFeeMatchingSnapshot(() => dock.revocation.newRegistry(registryId, policy, false, false));
@@ -350,7 +342,10 @@ describe.skip('Fees', () => {
     // Add params with different attribute sizes
     for (const attributeCount of [10, 11, 12, 13, 14, 15]) {
       const bytes = u8aToHex(
-        BBSPlusSignatureParamsG1.generate(attributeCount, hexToU8a(label)).toBytes(),
+        BBSPlusSignatureParamsG1.generate(
+          attributeCount,
+          hexToU8a(label),
+        ).toBytes(),
       );
       const params = BBSPlusModule.prepareAddParameters(
         bytes,
@@ -373,10 +368,11 @@ describe.skip('Fees', () => {
     const kp = BBSPlusKeypairG2.generate(
       BBSPlusSignatureParamsG1.generate(10, hexToU8a(label)),
     );
-    const pk = BBSPlusModule.prepareAddPublicKey(dock.api,
+    const pk = BBSPlusModule.prepareAddPublicKey(
       u8aToHex(kp.publicKey.bytes),
       undefined,
-      [did, 1]);
+      [did, 1],
+    );
     await withPaidFeeMatchingSnapshot(() => dock.bbsPlusModule.addPublicKey(
       pk,
       did,
@@ -433,10 +429,11 @@ describe.skip('Fees', () => {
       new AccumulatorParams(hexToU8a(params.bytes)),
     );
 
-    const pk = AccumulatorModule.prepareAddPublicKey(dock.api,
+    const pk = AccumulatorModule.prepareAddPublicKey(
       u8aToHex(kp.publicKey.bytes),
       undefined,
-      [did, 1]);
+      [did, 1],
+    );
     await withPaidFeeMatchingSnapshot(() => dock.accumulatorModule.addPublicKey(
       pk,
       did,

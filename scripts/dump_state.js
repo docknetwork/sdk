@@ -1,16 +1,16 @@
 // Download important state from node and write to JSON file in the same directory
 
-import dock from "../src/index";
-import { asDockAddress } from "../src/utils/codec";
+import dock from '../src/index';
+import { asDockAddress } from '../src/utils/codec';
 
-require("dotenv").config();
+require('dotenv').config();
 
-const fs = require("fs");
+const fs = require('fs');
 
 const { FullNodeEndpoint, Network } = process.env;
 
 if (process.argv.length !== 3) {
-  console.error("Need only 1 argument which is the name of dump file");
+  console.error('Need only 1 argument which is the name of dump file');
   process.exit(1);
 }
 
@@ -39,7 +39,7 @@ async function downloadAccounts() {
   const accounts = await dock.api.query.system.account.entries();
   const ret = {};
   accounts.forEach((entry) => {
-    console.log(entry[0].args)
+    console.log(entry[0].args);
     ret[asDockAddress(entry[0].args[0], Network)] = entry[1].toJSON();
   });
   return ret;
@@ -115,7 +115,7 @@ async function downloadBbsPlus() {
   const paramsCounter = await dock.api.query.bbsPlus.paramsCounter.entries();
   const params = await dock.api.query.bbsPlus.bbsPlusParams.entries();
   const keys = await dock.api.query.bbsPlus.bbsPlusKeys.entries();
-  return { bbsPlusParamsCounter: storageMapEntriesToObject(paramsCounter), bbsPlusParams: storageDoubleMapEntriesToObject(params), bbsPlusKeys: storageDoubleMapEntriesToObject(keys)};
+  return { bbsPlusParamsCounter: storageMapEntriesToObject(paramsCounter), bbsPlusParams: storageDoubleMapEntriesToObject(params), bbsPlusKeys: storageDoubleMapEntriesToObject(keys) };
 }
 
 async function downloadAccum() {
@@ -123,7 +123,9 @@ async function downloadAccum() {
   const params = await dock.api.query.accumulator.accumulatorParams.entries();
   const keys = await dock.api.query.accumulator.accumulatorKeys.entries();
   const accum = await dock.api.query.accumulator.accumulators.entries();
-  return { accumulatorCounter: storageMapEntriesToObject(counter), accumulatorParams: storageDoubleMapEntriesToObject(params), accumulatorKeys: storageDoubleMapEntriesToObject(keys), accumulators: storageMapEntriesToObject(accum)};
+  return {
+    accumulatorCounter: storageMapEntriesToObject(counter), accumulatorParams: storageDoubleMapEntriesToObject(params), accumulatorKeys: storageDoubleMapEntriesToObject(keys), accumulators: storageMapEntriesToObject(accum),
+  };
 }
 
 async function downloadState() {
@@ -191,6 +193,6 @@ dock.init({
 })
   .then(downloadState)
   .catch((error) => {
-    console.error("Error occurred somewhere, it was caught!", error);
+    console.error('Error occurred somewhere, it was caught!', error);
     process.exit(1);
   });

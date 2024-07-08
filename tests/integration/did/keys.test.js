@@ -1,8 +1,15 @@
 import { randomAsHex } from '@polkadot/util-crypto';
 import { DockAPI, PublicKeySecp256k1 } from '../../../src';
-import { createNewDockDID, typedHexDID, DidKeypair } from '../../../src/utils/did';
-import { FullNodeEndpoint, TestAccountURI, TestKeyringOpts } from '../../test-constants';
-import { generateEcdsaSecp256k1Keypair, getPublicKeyFromKeyringPair } from '../../../src/utils/misc';
+import { DockDid, DidKeypair } from '../../../src/did';
+import {
+  FullNodeEndpoint,
+  TestAccountURI,
+  TestKeyringOpts,
+} from '../../test-constants';
+import {
+  generateEcdsaSecp256k1Keypair,
+  getPublicKeyFromKeyringPair,
+} from '../../../src/utils/misc';
 import { DidKey, VerificationRelationship } from '../../../src/public-keys';
 import { checkVerificationMethods } from '../helpers';
 import PublicKeyX25519 from '../../../src/public-keys/public-key-x25519';
@@ -11,7 +18,7 @@ describe('Key support for DIDs', () => {
   const dock = new DockAPI();
 
   // Generate a random DID
-  const dockDid = createNewDockDID();
+  const dockDid = DockDid.random();
   let hexDid;
 
   const seed1 = randomAsHex(32);
@@ -27,7 +34,7 @@ describe('Key support for DIDs', () => {
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
 
-    hexDid = typedHexDID(dock.api, dockDid);
+    hexDid = DockDid.from(dockDid);
   });
 
   afterAll(async () => {
@@ -57,9 +64,14 @@ describe('Key support for DIDs', () => {
     expect(didDetail.lastKeyId).toBe(3);
     expect(didDetail.activeControllerKeys).toBe(2);
     expect(didDetail.activeControllers).toBe(1);
-    await expect(dock.did.isController(dockDid, dockDid)).resolves.toEqual(true);
+    await expect(dock.did.isController(dockDid, dockDid)).resolves.toEqual(
+      true,
+    );
 
-    for (const [i, pk] of [[1, publicKey1], [2, publicKey2]]) {
+    for (const [i, pk] of [
+      [1, publicKey1],
+      [2, publicKey2],
+    ]) {
       // eslint-disable-next-line no-await-in-loop
       const dk = await dock.did.getDidKey(dockDid, i);
       expect(dk.publicKey).toEqual(pk);
@@ -99,10 +111,14 @@ describe('Key support for DIDs', () => {
     check(doc);
 
     // The same checks should pass when passing the flag for keys
-    const doc1 = await dock.did.getDocument(dockDid, { getOffchainSigKeys: false });
+    const doc1 = await dock.did.getDocument(dockDid, {
+      getOffchainSigKeys: false,
+    });
     check(doc1);
 
-    const doc2 = await dock.did.getDocument(dockDid, { getOffchainSigKeys: true });
+    const doc2 = await dock.did.getDocument(dockDid, {
+      getOffchainSigKeys: true,
+    });
     check(doc2);
   });
 
@@ -114,7 +130,10 @@ describe('Key support for DIDs', () => {
     verRels1.setAssertion();
     const didKey1 = new DidKey(publicKey1, verRels1);
 
-    const pair = new DidKeypair(dock.keyring.addFromUri(seed2, null, 'ed25519'), 2);
+    const pair = new DidKeypair(
+      dock.keyring.addFromUri(seed2, null, 'ed25519'),
+      2,
+    );
     await dock.did.addKeys([didKey1], dockDid, dockDid, pair);
 
     const didDetail = await dock.did.getOnchainDidDetail(hexDid.asDid);
@@ -159,10 +178,14 @@ describe('Key support for DIDs', () => {
     check(doc);
 
     // The same checks should pass when passing the flag for keys
-    const doc1 = await dock.did.getDocument(dockDid, { getOffchainSigKeys: false });
+    const doc1 = await dock.did.getDocument(dockDid, {
+      getOffchainSigKeys: false,
+    });
     check(doc1);
 
-    const doc2 = await dock.did.getDocument(dockDid, { getOffchainSigKeys: true });
+    const doc2 = await dock.did.getDocument(dockDid, {
+      getOffchainSigKeys: true,
+    });
     check(doc2);
   });
 
@@ -208,10 +231,14 @@ describe('Key support for DIDs', () => {
     check(doc);
 
     // The same checks should pass when passing the flag for keys
-    const doc1 = await dock.did.getDocument(dockDid, { getOffchainSigKeys: false });
+    const doc1 = await dock.did.getDocument(dockDid, {
+      getOffchainSigKeys: false,
+    });
     check(doc1);
 
-    const doc2 = await dock.did.getDocument(dockDid, { getOffchainSigKeys: true });
+    const doc2 = await dock.did.getDocument(dockDid, {
+      getOffchainSigKeys: true,
+    });
     check(doc2);
   });
 
@@ -222,7 +249,10 @@ describe('Key support for DIDs', () => {
     const publicKey = new PublicKeyX25519(randomAsHex(32));
     const didKey = new DidKey(publicKey, verRels);
 
-    const pair = new DidKeypair(dock.keyring.addFromUri(seed2, null, 'ed25519'), 2);
+    const pair = new DidKeypair(
+      dock.keyring.addFromUri(seed2, null, 'ed25519'),
+      2,
+    );
     await dock.did.addKeys([didKey], dockDid, dockDid, pair);
     const didDetail = await dock.did.getOnchainDidDetail(hexDid.asDid);
     expect(didDetail.lastKeyId).toBe(5);

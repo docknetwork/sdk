@@ -1,6 +1,6 @@
-import SESV2 from "aws-sdk/clients/sesv2";
-import { curry, identity } from "ramda";
-import { envObj, notNilAnd } from "./helpers";
+import SESV2 from 'aws-sdk/clients/sesv2';
+import { curry, identity } from 'ramda';
+import { envObj, notNilAnd } from './helpers';
 
 const {
   AWS_ACCESS_KEY_ID,
@@ -22,14 +22,12 @@ const {
  * @param {string} body
  * @returns {Promise}
  */
-export const sendAlarmEmailText = curry(async (toAddr, subject, text) =>
- sendAlarmEmailWithBody(toAddr, subject, {
-   Text: {
-     Data: text,
-     Charset: "UTF-8",
-   },
- })
-);
+export const sendAlarmEmailText = curry(async (toAddr, subject, text) => sendAlarmEmailWithBody(toAddr, subject, {
+  Text: {
+    Data: text,
+    Charset: 'UTF-8',
+  },
+}));
 
 /**
  * Sends an email with the given subject and html body to the supplied addresses.
@@ -39,18 +37,16 @@ export const sendAlarmEmailText = curry(async (toAddr, subject, text) =>
  * @param {string} body
  * @returns {Promise}
  */
-export const sendAlarmEmailHtml = curry(async (toAddr, subject, html) =>
-  sendAlarmEmailWithBody(toAddr, subject, {
-    Html: {
-      Data: html,
-      Charset: "UTF-8",
-    },
-  })
-);
+export const sendAlarmEmailHtml = curry(async (toAddr, subject, html) => sendAlarmEmailWithBody(toAddr, subject, {
+  Html: {
+    Data: html,
+    Charset: 'UTF-8',
+  },
+}));
 
 const sendAlarmEmailWithBody = curry(async (toAddr, subject, body) => {
   const ses = new SESV2({
-    apiVersion: "2019-09-27",
+    apiVersion: '2019-09-27',
     accessKeyId: AWS_ACCESS_KEY_ID,
     secretAccessKey: AWS_SECRET_ACCESS_KEY,
     sessionToken: AWS_SESSION_TOKEN,
@@ -68,7 +64,7 @@ const sendAlarmEmailWithBody = curry(async (toAddr, subject, body) => {
         Body: body,
         Subject: {
           Data: subject,
-          Charset: "UTF-8",
+          Charset: 'UTF-8',
         },
       },
     },
@@ -76,7 +72,7 @@ const sendAlarmEmailWithBody = curry(async (toAddr, subject, body) => {
   };
 
   const res = await ses.sendEmail(params).promise();
-  console.log("Email sent.");
+  console.log('Email sent.');
   console.log(res);
 
   return res;

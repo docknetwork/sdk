@@ -3,17 +3,26 @@ import { randomAsHex } from '@polkadot/util-crypto';
 import jsonld from 'jsonld';
 import mockFetch from '../mocks/fetch';
 
-import {
-  createNewDockDID, DidKeypair,
-} from '../../src/utils/did';
+import { DockDid, DidKeypair } from '../../src/did';
 
 import { DockAPI } from '../../src/index';
 import { DockResolver } from '../../src/resolver';
 
-import { FullNodeEndpoint, TestKeyringOpts, TestAccountURI } from '../test-constants';
-import { getCredMatcherDoc, getProofMatcherDoc, registerNewDIDUsingPair } from './helpers';
 import {
-  issueCredential, signPresentation, verifyCredential, verifyPresentation,
+  FullNodeEndpoint,
+  TestKeyringOpts,
+  TestAccountURI,
+} from '../test-constants';
+import {
+  getCredMatcherDoc,
+  getProofMatcherDoc,
+  registerNewDIDUsingPair,
+} from './helpers';
+import {
+  issueCredential,
+  signPresentation,
+  verifyCredential,
+  verifyPresentation,
 } from '../../src/utils/vc/index';
 import { getKeyDoc } from '../../src/utils/vc/helpers';
 import { createPresentation } from '../create-presentation';
@@ -21,15 +30,15 @@ import { createPresentation } from '../create-presentation';
 mockFetch();
 
 // DID and seed for
-const issuerDID = createNewDockDID();
+const issuerDID = DockDid.random();
 const issuerKeySeed = randomAsHex(32);
 
 // DID and seed for 1st subject
-const subject1DID = createNewDockDID();
+const subject1DID = DockDid.random();
 const subject1Seed = randomAsHex(32);
 
 // DID for 2nd subject. It has no keys and controlled by subject1DID
-const subject2DID = createNewDockDID();
+const subject2DID = DockDid.random();
 
 const credId = randomAsHex(32);
 let credential;
@@ -44,11 +53,11 @@ const unsignedCred = {
   issuanceDate: '2020-03-18T19:23:24Z',
   credentialSubject: [
     {
-      id: subject1DID, // DID of the user who is given read access to the document
+      id: String(subject1DID), // DID of the user who is given read access to the document
       type: 'reader',
     },
     {
-      id: subject2DID, // DID of the document
+      id: String(subject2DID), // DID of the document
       type: 'document',
     },
   ],
@@ -77,11 +86,17 @@ describe('Verifiable Credential issuance and presentation where the credential h
     // The DIDs should be written before any test begins
 
     // issuer DID
-    const pair1 = new DidKeypair(dock.keyring.addFromUri(issuerKeySeed, null, 'ed25519'), 1);
+    const pair1 = new DidKeypair(
+      dock.keyring.addFromUri(issuerKeySeed, null, 'ed25519'),
+      1,
+    );
     await registerNewDIDUsingPair(dock, issuerDID, pair1);
 
     // 1st subject's DID
-    const pair2 = new DidKeypair(dock.keyring.addFromUri(subject1Seed, null, 'ed25519'), 1);
+    const pair2 = new DidKeypair(
+      dock.keyring.addFromUri(subject1Seed, null, 'ed25519'),
+      1,
+    );
     await registerNewDIDUsingPair(dock, subject1DID, pair2);
 
     // 2nd subject's DID, has no key but is controlled by subject1DID
@@ -93,37 +108,44 @@ describe('Verifiable Credential issuance and presentation where the credential h
   }, 10000);
 
   test('Issue a verifiable credential with 2 subjects and verify it', async () => {
-    const issuerKey = getKeyDoc(issuerDID, dock.keyring.addFromUri(issuerKeySeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
+    const issuerKey = getKeyDoc(
+      issuerDID,
+      dock.keyring.addFromUri(issuerKeySeed, null, 'ed25519'),
+      'Ed25519VerificationKey2018',
+    );
     credential = await issueCredential(issuerKey, unsignedCred);
-    expect(credential)
-      .toMatchObject(
-        expect.objectContaining(
-          getCredMatcherDoc(unsignedCred, issuerDID, issuerKey.id, 'Ed25519Signature2018'),
+    expect(credential).toMatchObject(
+      expect.objectContaining(
+        getCredMatcherDoc(
+          unsignedCred,
+          issuerDID,
+          issuerKey.id,
+          'Ed25519Signature2018',
         ),
-      );
+      ),
+    );
 
     expect(credential.credentialSubject).toMatchObject([
       {
-        id: subject1DID,
+        id: String(subject1DID),
         type: 'reader',
       },
       {
-        id: subject2DID,
+        id: String(subject2DID),
         type: 'document',
       },
     ]);
 
     const result = await verifyCredential(credential, { resolver });
-    expect(result)
-      .toMatchObject(
-        expect.objectContaining(
-          getProofMatcherDoc(),
-        ),
-      );
+    expect(result).toMatchObject(expect.objectContaining(getProofMatcherDoc()));
   }, 40000);
 
   test('Holder creates a verifiable presentation and verifier verifies it and does some other checks', async () => {
-    const holderKey = getKeyDoc(subject1DID, dock.keyring.addFromUri(subject1Seed, null, 'ed25519'), 'Ed25519VerificationKey2018');
+    const holderKey = getKeyDoc(
+      subject1DID,
+      dock.keyring.addFromUri(subject1Seed, null, 'ed25519'),
+      'Ed25519VerificationKey2018',
+    );
 
     const presId = `https://pres.com/${randomAsHex(32)}`;
     const challenge = randomAsHex(32);
@@ -132,13 +154,11 @@ describe('Verifiable Credential issuance and presentation where the credential h
     const presentation = createPresentation(credential, presId, subject1DID);
 
     expect(presentation).toMatchObject(
-      expect.objectContaining(
-        {
-          type: ['VerifiablePresentation'],
-          verifiableCredential: [credential],
-          id: presId,
-        },
-      ),
+      expect.objectContaining({
+        type: ['VerifiablePresentation'],
+        verifiableCredential: [credential],
+        id: presId,
+      }),
     );
 
     const signedPres = await signPresentation(
@@ -150,19 +170,17 @@ describe('Verifiable Credential issuance and presentation where the credential h
     );
 
     expect(signedPres).toMatchObject(
-      expect.objectContaining(
-        {
-          type: ['VerifiablePresentation'],
-          verifiableCredential: [credential],
-          id: presId,
-          proof: expect.objectContaining({
-            type: 'Ed25519Signature2018',
-            challenge,
-            domain,
-            proofPurpose: 'authentication',
-          }),
-        },
-      ),
+      expect.objectContaining({
+        type: ['VerifiablePresentation'],
+        verifiableCredential: [credential],
+        id: presId,
+        proof: expect.objectContaining({
+          type: 'Ed25519Signature2018',
+          challenge,
+          domain,
+          proofPurpose: 'authentication',
+        }),
+      }),
     );
 
     // Before verifying the presentation, check that the holder is a specific subject of the credential and the
@@ -175,12 +193,15 @@ describe('Verifiable Credential issuance and presentation where the credential h
     expect(jsonld.getValues(credSubject[0], 'type')[0]).toEqual('reader');
     const documentDid = jsonld.getValues(credSubject[1], 'id')[0];
     expect(jsonld.getValues(credSubject[1], 'type')[0]).toEqual('document');
-    expect(recipientDid).toEqual(subject1DID);
-    expect(documentDid).toEqual(subject2DID);
+    expect(recipientDid).toEqual(String(subject1DID));
+    expect(documentDid).toEqual(String(subject2DID));
 
     // Check that presentation signer is the recipient of the credential
     const proofs = jsonld.getValues(signedPres, 'proof');
-    const verificationMethod = jsonld.getValues(proofs[0], 'verificationMethod');
+    const verificationMethod = jsonld.getValues(
+      proofs[0],
+      'verificationMethod',
+    );
     const didOfPresSigner = verificationMethod[0].split('#')[0];
     expect(didOfPresSigner).toEqual(recipientDid);
 

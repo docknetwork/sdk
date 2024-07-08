@@ -1066,9 +1066,9 @@ for itself or any DID it controls, adding a blob, etc should supply a nonce 1 hi
 <p>This is done for replay protection but this detail however is hidden in the API so the caller should not have to worry about this.</p>
 <h2 id="did-creation"><a class="header" href="#did-creation">DID creation</a></h2>
 <p>Create a new random DID.</p>
-<pre><code class="language-js">import {createNewDockDID} from '@docknetwork/sdk/utils/did';
+<pre><code class="language-js">import {DockDid} from '@docknetwork/sdk/did';
 
-const did = createNewDockDID();
+const did = DockDid.random();
 </code></pre>
 <p>The DID is not yet registered on the chain. Before the DID can be registered, a public key needs to created as well.</p>
 <h2 id="public-key-creation"><a class="header" href="#public-key-creation">Public key creation</a></h2>

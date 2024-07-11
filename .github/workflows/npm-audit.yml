@@ -39,4 +39,4 @@ jobs:
         run: npx --yes license-checker --production --failOn "${{ env.AVOID_LICENSES }}" --excludePackages "${{ env.IGNORE_PACKAGES }}"
 
       - name: Run audit
-        run: yarn audit --groups dependencies --level critical
+        run: /bin/bash -c "(yarn audit --groups 'dependencies' --level critical; [[ $? -ge 16 ]] && exit 1 || exit 0)" && \

@@ -994,7 +994,7 @@ class DIDModule {
   async getDidMethodKeyDetail(did) {
     let resp = await this.api.query.didModule.didMethodKeys(did);
     if (resp.isNone) {
-      throw new NoDIDError(`did:key:dock:${did}`);
+      throw new NoDIDError(String(did));
     }
     resp = resp.unwrap();
 

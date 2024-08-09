@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/sdk",
-  "version": "9.1.0",
+  "version": "9.2.0",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -108,6 +108,7 @@
     "@docknetwork/node-types": "^0.17.0",
     "@juanelas/base64": "^1.0.5",
     "@polkadot/api": "10.12.4",
+    "@sphereon/ssi-sdk-ext.did-resolver-jwk": "^0.24.0",
     "@transmute/json-web-signature": "^0.7.0-unstable.80",
     "base64url": "3.0.1",
     "blake2b": "2.1.4",

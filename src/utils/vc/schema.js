@@ -42,17 +42,16 @@ export async function validateCredentialSchema(
     });
     delete compacted[credentialContextField];
 
-    if (Object.keys(compacted).length === 0) {
-      throw new Error('Compacted subject is empty, likely invalid');
+    // Only validate if has non-id fields in compacted schema, otherwise its empty
+    if (Object.keys(compacted).length > 0) {
+      const schemaObj = schema.schema || schema;
+      const subjectSchema = (schemaObj.properties && schemaObj.properties.credentialSubject)
+        || schemaObj;
+
+      validate(compacted, subjectSchema, {
+        throwError: true,
+      });
     }
-
-    const schemaObj = schema.schema || schema;
-    const subjectSchema = (schemaObj.properties && schemaObj.properties.credentialSubject)
-      || schemaObj;
-
-    validate(compacted, subjectSchema, {
-      throwError: true,
-    });
   }
   return true;
 }

@@ -1,12 +1,8 @@
-import jsonld from 'jsonld';
 import { validate } from 'jsonschema';
-import defaultDocumentLoader from './document-loader';
 
 import {
-  expandedSubjectProperty,
   expandedSchemaProperty,
   credentialIDField,
-  credentialContextField,
 } from './constants';
 
 /**
@@ -14,18 +10,14 @@ import {
  * schema `schema`
  * @param {object} credential - The credential to use, must be expanded JSON-LD
  * @param {object} schema - The schema to use
- * @param context
- * @param documentLoader
- * @returns {Promise<Boolean>} - Returns promise to a boolean or throws error
+ * @returns {Boolean} - Returns a boolean or throws error
  */
-export async function validateCredentialSchema(
+export function validateCredentialSchema(
   credential,
   schema,
-  context,
-  documentLoader,
 ) {
   const requiresID = schema.required && schema.required.indexOf('id') > -1;
-  const credentialSubject = credential[expandedSubjectProperty] || [];
+  const credentialSubject = credential.credentialSubject || [];
   const subjects = credentialSubject.length
     ? credentialSubject
     : [credentialSubject];
@@ -36,22 +28,14 @@ export async function validateCredentialSchema(
       delete subject[credentialIDField];
     }
 
-    // eslint-disable-next-line
-    const compacted = await jsonld.compact(subject, context, {
-      documentLoader: documentLoader || defaultDocumentLoader(),
+    const schemaObj = schema.schema || schema;
+    const subjectSchema = (schemaObj.properties && schemaObj.properties.credentialSubject)
+      || schemaObj;
+
+    validate(subject, subjectSchema, {
+      throwError: true,
+      throwFirst: true,
     });
-    delete compacted[credentialContextField];
-
-    // Only validate if has non-id fields in compacted schema, otherwise its empty
-    if (Object.keys(compacted).length > 0) {
-      const schemaObj = schema.schema || schema;
-      const subjectSchema = (schemaObj.properties && schemaObj.properties.credentialSubject)
-        || schemaObj;
-
-      validate(compacted, subjectSchema, {
-        throwError: true,
-      });
-    }
   }
   return true;
 }
@@ -72,7 +56,7 @@ export async function getAndValidateSchemaIfPresent(
   const schemaList = credential[expandedSchemaProperty];
   if (schemaList) {
     const schema = schemaList[0];
-    if (credential[expandedSubjectProperty] && schema) {
+    if (credential.credentialSubject && schema) {
       const schemaUri = schema[credentialIDField];
       let schemaObj;
 
@@ -94,11 +78,9 @@ export async function getAndValidateSchemaIfPresent(
       }
 
       try {
-        await validateCredentialSchema(
+        validateCredentialSchema(
           credential,
           schemaObj,
-          context,
-          documentLoader,
         );
       } catch (e) {
         throw new Error(`Schema validation failed: ${e}`);

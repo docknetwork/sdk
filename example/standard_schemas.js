@@ -178,8 +178,7 @@ async function validateSchema(schema, credential) {
   await Schema.validateSchema(schema);
   console.log('Validating credential against schema...');
 
-  const expanded = await expandJSONLD(credential);
-  await validateCredentialSchema(expanded, schema, credential['@context']);
+  await validateCredentialSchema(credential, schema);
   console.log('Success!');
 }
 

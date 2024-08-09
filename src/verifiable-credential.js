@@ -1,5 +1,4 @@
 import {
-  expandJSONLD,
   issueCredential,
   verifyCredential,
   DEFAULT_CONTEXT,
@@ -107,8 +106,7 @@ class VerifiableCredential {
       throw new Error('No credential subject defined');
     }
 
-    const expanded = await expandJSONLD(this.toJSON());
-    return validateCredentialSchema(expanded, schema, this.context);
+    return validateCredentialSchema(this.toJSON(), schema);
   }
 
   /**

@@ -1,7 +1,6 @@
 import { validate } from 'jsonschema';
 
 import {
-  expandedSchemaProperty,
   credentialIDField,
 } from './constants';
 
@@ -43,21 +42,19 @@ export function validateCredentialSchema(
 /**
  * Get schema and run validation on credential if it contains both a credentialSubject and credentialSchema
  * @param {object} credential - a verifiable credential JSON object
- * @param {object} context - the context
  * @param {object} documentLoader - the document loader
  * @returns {Promise<void>}
  */
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export async function getAndValidateSchemaIfPresent(
   credential,
-  context,
   documentLoader,
 ) {
-  const schemaList = credential[expandedSchemaProperty];
+  const schemaList = Array.isArray(credential.credentialSchema) ? credential.credentialSchema : [credential.credentialSchema];
   if (schemaList) {
     const schema = schemaList[0];
     if (credential.credentialSubject && schema) {
-      const schemaUri = schema[credentialIDField];
+      const schemaUri = schema.id;
       let schemaObj;
 
       const { document } = await documentLoader(schemaUri);

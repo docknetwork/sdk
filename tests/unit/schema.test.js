@@ -6,16 +6,8 @@ import Schema from '../../src/modules/schema';
 import { DockBlobQualifier } from '../../src/modules/blob';
 
 import {
-  expandJSONLD,
-} from '../../src/utils/vc/helpers';
-
-import {
   validateCredentialSchema,
 } from '../../src/utils/vc/schema';
-
-import {
-  expandedSubjectProperty,
-} from '../../src/utils/vc/constants';
 
 import exampleCredential from '../example-credential';
 import exampleSchema from '../example-schema';
@@ -92,29 +84,24 @@ describe('Validate Credential Schema utility', () => {
   const schema = new Schema();
   schema.setJSONSchema(exampleSchema);
 
-  let expandedCredential;
-  beforeAll(async () => {
-    expandedCredential = await expandJSONLD(exampleCredential);
-  }, 10000);
-
   test('credentialSubject has same fields and fields have same types as JSON-schema', () => {
-    expect(validateCredentialSchema(expandedCredential, schema, exampleCredential['@context'])).toBeDefined();
+    expect(validateCredentialSchema(exampleCredential, schema, exampleCredential['@context'])).toBe(true);
   });
 
   test('credentialSubject has same fields but fields have different type than JSON-schema', async () => {
-    await expect(validateCredentialSchema({
-      [`${expandedSubjectProperty}`]: {
-        invalid: true,
+    expect(() => validateCredentialSchema({
+      credentialSubject: {
+        emailAddress: true,
       },
-    }, schema, exampleCredential['@context'])).rejects.toThrow();
+    }, schema, exampleCredential['@context'])).toThrow();
   }, 100000);
 
   test('credentialSubject is missing required fields from the JSON-schema and it should fail to validate.', async () => {
-    const credentialSubject = { ...expandedCredential[expandedSubjectProperty] };
-    delete credentialSubject['https://schema.org/alumniOf'];
-    await expect(validateCredentialSchema({
-      [`${expandedSubjectProperty}`]: credentialSubject,
-    }, schema, exampleCredential['@context'])).rejects.toThrow();
+    const credentialSubject = { ...exampleCredential.credentialSubject };
+    delete credentialSubject.alumniOf;
+    expect(() => validateCredentialSchema({
+      credentialSubject,
+    }, schema, exampleCredential['@context'])).toThrow();
   }, 100000);
 
   test('The schema\'s properties is missing the required key and credentialSubject can omit some of the properties.', async () => {
@@ -122,29 +109,29 @@ describe('Validate Credential Schema utility', () => {
     delete nonRequiredSchema.required;
     await schema.setJSONSchema(nonRequiredSchema);
 
-    const credentialSubject = { ...expandedCredential[expandedSubjectProperty][0] };
-    delete credentialSubject['https://schema.org/alumniOf'];
+    const credentialSubject = { ...exampleCredential.credentialSubject };
+    delete credentialSubject.alumniOf;
 
-    await expect(validateCredentialSchema({
-      [`${expandedSubjectProperty}`]: credentialSubject,
-    }, schema, exampleCredential['@context'])).resolves.toBeDefined();
+    expect(validateCredentialSchema({
+      credentialSubject,
+    }, schema, exampleCredential['@context'])).toBe(true);
   });
 
   test('credentialSubject has extra fields than given schema specifies and additionalProperties has certain type.', async () => {
-    const credentialSubject = { ...expandedCredential[expandedSubjectProperty][0], additionalString: 'mystring' };
+    const credentialSubject = { ...exampleCredential.credentialSubject, additionalString: 'mystring' };
     await schema.setJSONSchema({
       ...exampleSchema,
       additionalProperties: { type: 'string' },
     });
 
-    await expect(validateCredentialSchema({
-      [`${expandedSubjectProperty}`]: credentialSubject,
-    }, schema, exampleCredential['@context'])).resolves.toBeDefined();
+    expect(validateCredentialSchema({
+      credentialSubject,
+    }, schema, exampleCredential['@context'])).toBe(true);
   });
 
   test('credentialSubject has nested fields and given schema specifies the nested structure.', async () => {
     const credentialSubject = {
-      ...expandedCredential[expandedSubjectProperty][0],
+      ...exampleCredential.credentialSubject,
       nestedFields: {
         test: true,
       },
@@ -164,8 +151,8 @@ describe('Validate Credential Schema utility', () => {
       },
     });
 
-    await expect(validateCredentialSchema({
-      [`${expandedSubjectProperty}`]: credentialSubject,
-    }, schema, exampleCredential['@context'])).resolves.toBeDefined();
+    expect(validateCredentialSchema({
+      credentialSubject,
+    }, schema, exampleCredential['@context'])).toBe(true);
   });
 });

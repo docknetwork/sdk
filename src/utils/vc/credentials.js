@@ -19,7 +19,6 @@ import {
   expandJSONLD, getKeyFromDIDDocument, getSuiteFromKeyDoc, processIfKvac,
 } from './helpers';
 import {
-  credentialContextField,
   DEFAULT_CONTEXT_V1_URL,
   DockStatusList2021Qualifier,
   PrivateStatusList2021EntryType,
@@ -323,8 +322,7 @@ export async function verifyCredential(
   const isAnoncredsDerived = isAnoncredsProofType(credential);
   if (!skipSchemaCheck && !isAnoncredsDerived) {
     await getAndValidateSchemaIfPresent(
-      expandedCredential,
-      credential[credentialContextField],
+      credential,
       docLoader,
     );
   }

@@ -1,12 +1,7 @@
-import jsonld from 'jsonld';
 import { validate } from 'jsonschema';
-import defaultDocumentLoader from './document-loader';
 
 import {
-  expandedSubjectProperty,
-  expandedSchemaProperty,
   credentialIDField,
-  credentialContextField,
 } from './constants';
 
 /**
@@ -14,18 +9,14 @@ import {
  * schema `schema`
  * @param {object} credential - The credential to use, must be expanded JSON-LD
  * @param {object} schema - The schema to use
- * @param context
- * @param documentLoader
- * @returns {Promise<Boolean>} - Returns promise to a boolean or throws error
+ * @returns {Boolean} - Returns a boolean or throws error
  */
-export async function validateCredentialSchema(
+export function validateCredentialSchema(
   credential,
   schema,
-  context,
-  documentLoader,
 ) {
   const requiresID = schema.required && schema.required.indexOf('id') > -1;
-  const credentialSubject = credential[expandedSubjectProperty] || [];
+  const credentialSubject = credential.credentialSubject || [];
   const subjects = credentialSubject.length
     ? credentialSubject
     : [credentialSubject];
@@ -36,22 +27,13 @@ export async function validateCredentialSchema(
       delete subject[credentialIDField];
     }
 
-    // eslint-disable-next-line
-    const compacted = await jsonld.compact(subject, context, {
-      documentLoader: documentLoader || defaultDocumentLoader(),
-    });
-    delete compacted[credentialContextField];
-
-    if (Object.keys(compacted).length === 0) {
-      throw new Error('Compacted subject is empty, likely invalid');
-    }
-
     const schemaObj = schema.schema || schema;
     const subjectSchema = (schemaObj.properties && schemaObj.properties.credentialSubject)
       || schemaObj;
 
-    validate(compacted, subjectSchema, {
+    validate(subject, subjectSchema, {
       throwError: true,
+      throwFirst: true,
     });
   }
   return true;
@@ -60,21 +42,19 @@ export async function validateCredentialSchema(
 /**
  * Get schema and run validation on credential if it contains both a credentialSubject and credentialSchema
  * @param {object} credential - a verifiable credential JSON object
- * @param {object} context - the context
  * @param {object} documentLoader - the document loader
  * @returns {Promise<void>}
  */
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export async function getAndValidateSchemaIfPresent(
   credential,
-  context,
   documentLoader,
 ) {
-  const schemaList = credential[expandedSchemaProperty];
+  const schemaList = Array.isArray(credential.credentialSchema) ? credential.credentialSchema : [credential.credentialSchema];
   if (schemaList) {
     const schema = schemaList[0];
-    if (credential[expandedSubjectProperty] && schema) {
-      const schemaUri = schema[credentialIDField];
+    if (credential.credentialSubject && schema) {
+      const schemaUri = schema.id;
       let schemaObj;
 
       const { document } = await documentLoader(schemaUri);
@@ -95,11 +75,9 @@ export async function getAndValidateSchemaIfPresent(
       }
 
       try {
-        await validateCredentialSchema(
+        validateCredentialSchema(
           credential,
           schemaObj,
-          context,
-          documentLoader,
         );
       } catch (e) {
         throw new Error(`Schema validation failed: ${e}`);

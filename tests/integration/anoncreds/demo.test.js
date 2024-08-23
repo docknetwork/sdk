@@ -88,7 +88,7 @@ for (const {
             // different way.
             encoded.push(Accumulator.encodeBytesAsAccumulatorMember(attrs[i]));
           } else {
-            encoded.push(Signature.encodeMessageForSigning(attrs[i]));
+            encoded.push(Signature.encodeMessageForSigningConstantTime(attrs[i]));
           }
         }
         return encoded;

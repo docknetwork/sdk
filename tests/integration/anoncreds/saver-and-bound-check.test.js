@@ -84,7 +84,7 @@ for (const {
           } else if (i === boundedAttrIdx) {
             encoded.push(Signature.encodePositiveNumberForSigning(attrs[i]));
           } else {
-            encoded.push(Signature.encodeMessageForSigningConstantTime(attrs[i]));
+            encoded.push(Signature.encodeMessageForSigning(attrs[i]));
           }
         }
         return encoded;

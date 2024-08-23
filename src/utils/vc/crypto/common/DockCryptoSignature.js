@@ -110,12 +110,8 @@ export default withExtendedStaticProperties(
         [serializedCredential, credSchema] = await this.constructor.convertCredentialToSerializedForSigning(options);
       }
 
-      const useConstantTimeEncoder = semver.gte(credSchema.version, '0.5.0');
       // Encode messages, retrieve names/values array
-      const nameValues = useConstantTimeEncoder ? credSchema.encoder.encodeMessageObjectConstantTime(
-        serializedCredential,
-        false,
-      ) : credSchema.encoder.encodeMessageObject(
+      const nameValues = credSchema.encoder.encodeMessageObject(
         serializedCredential,
         false,
       );
@@ -448,8 +444,6 @@ export default withExtendedStaticProperties(
           },
           false,
           { version: '0.0.1' },
-          undefined,
-          false,
         );
       }
 

@@ -132,7 +132,7 @@ for (const {
       await initializeWasm();
 
       // Setup encoder
-      const defaultEncoder = (v) => Signature.encodeMessageForSigningConstantTime(
+      const defaultEncoder = (v) => Signature.encodeMessageForSigning(
         Uint8Array.from(Buffer.from(v.toString(), 'utf-8')),
       );
       encoder = new Encoder(undefined, defaultEncoder);

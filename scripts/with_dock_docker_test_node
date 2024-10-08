@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -ueo pipefail
+
+source $(dirname $0)/config
+
+root_dir="$(dirname $0)/.."
+
+# pre-pull
+docker pull $CONFIG_DOCK_NODE_IMAGE
+
+# start a pos alice node
+alice_container_id=$(
+	docker run --rm -d --name alice                           \
+        -p 9944:9944 -p 9933:9933 -p 30333:30333            \
+        $CONFIG_DOCK_NODE_IMAGE                             \
+        --alice --rpc-external --ws-external
+)
+
+try_with_node() {
+	# Wait for nodes to start listening for RPC
+	"$root_dir"/scripts/wait_for_node_rpc_http
+	# Execute the commands, potentially against the nodes
+	$@
+}
+
+if try_with_node $@; then
+	exit_code=$?
+else
+	exit_code=$?
+fi
+
+# Kill nodes
+docker kill $alice_container_id
+
+exit $exit_code

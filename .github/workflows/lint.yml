@@ -1,0 +1,22 @@
+name: Linting and check docs generation
+on: [push, pull_request]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2 # If you're using actions/checkout@v2 you must set persist-credentials to false in most cases for the deployment to work correctly.
+        with:
+          persist-credentials: false
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "20.x"
+
+      - name: Install, lint, type check and generate docs # Not uploading the docs.
+        run: |
+          yarn install --frozen-lockfile --ignore-scripts
+          npm install -g turbo@2.0.5
+          turbo run lint --parallel
+          turbo run docs --parallel

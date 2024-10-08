@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# block until node responds to rpc or until a timeout occurs
+
+set -ueo pipefail
+
+ALICE_NODE_HTTP=${ALICE_NODE_HTTP:-http://localhost:9933}
+
+callrpc() {
+    curl $ALICE_NODE_HTTP -H "Content-Type:application/json;charset=utf-8" -d "$1"
+}
+
+wait_for_success() {
+    if [ $# -eq 0 ]; then
+        echo No command specified >&2
+        return 1
+    fi
+    while ! ($@); do :; done
+}
+
+with_timeout() {
+    local timeout="$1"
+    shift
+
+    sleep $timeout &
+    local sproc=$!
+	disown $sproc # keep the death of this command from being reported
+
+    ($@) &
+    local fproc=$!
+
+    # wait for one of the processes to end
+    while kill -0 $sproc 2>/dev/null && kill -0 $fproc 2>/dev/null; do :; done
+
+    # end the sleep process if it is still running
+    kill $sproc 2>/dev/null || true
+	wait $sproc || true
+
+    if kill $fproc 2>/dev/null; then
+        echo Command "'"$@"'" timed out. >&2
+        exit 124
+    fi
+
+    # success case, the command ran to completion, return it's status (could be nonzero)
+    wait $fproc
+}
+
+quietly() {
+    $@ >/dev/null 2>/dev/null
+}
+
+# Check that nodes' RPC server is ready
+with_timeout 15 wait_for_success quietly callrpc '[]'

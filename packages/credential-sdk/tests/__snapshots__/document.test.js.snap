@@ -1,0 +1,181 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`\`DIDDocument\` \`DIDDocument.create\` works 1`] = `
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+  ],
+  "alsoKnownAs": [],
+  "assertionMethod": [],
+  "authentication": [],
+  "capabilityDelegation": [],
+  "capabilityInvocation": [],
+  "controller": [],
+  "https://rdf.dock.io/alpha/2021#attestsDocumentContents": null,
+  "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+  "keyAgreement": [],
+  "service": [],
+  "verificationMethod": [],
+}
+`;
+
+exports[`\`DIDDocument\` \`DIDDocument.create\` works 2`] = `
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+  ],
+  "alsoKnownAs": [],
+  "assertionMethod": [
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-2",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-4",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-6",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-7",
+  ],
+  "authentication": [
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-1",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-4",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-5",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-7",
+  ],
+  "capabilityDelegation": [],
+  "capabilityInvocation": [
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-3",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-5",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-6",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-7",
+  ],
+  "controller": [
+    "did:key:z6MktvqCyLxTsXUH1tUZncNdVeEZ7hNh7npPRbUU27GTrYb8",
+  ],
+  "https://rdf.dock.io/alpha/2021#attestsDocumentContents": null,
+  "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+  "keyAgreement": [
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-8",
+  ],
+  "service": [],
+  "verificationMethod": [
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-1",
+      "publicKeyBase58": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-2",
+      "publicKeyBase58": "GxmaKA52SZGQtZS3Usa6Az48gky2AZRKzRKxsXM6ystc",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-3",
+      "publicKeyBase58": "5FBSa4xAs54osiMs75JcepL695v1XhccQmQePBZQaad9",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-4",
+      "publicKeyBase58": "EaNp37NGpe8KViTKxAdknyvUP44doH1fHnFpYqEcfUjE",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-5",
+      "publicKeyBase58": "A462rFkYENhY6kf9zLVPg6qvtQhXJ6RuL8CNdHTWzNqa",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-6",
+      "publicKeyBase58": "Amb3kf4if5Av1sz6UdYtEw2iy6DzufRAtch6hiXEWHcw",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-7",
+      "publicKeyBase58": "FwUvnTThdnNPv23Rbq2SXtxxYAT21Atvdd1cZBHPYue4",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-8",
+      "publicKeyBase58": "BaGbEav6KzvWhgBWPyZK2vWX5EDDFc4a8rfUwAZ3x8Jn",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+  ],
+}
+`;
+
+exports[`\`DIDDocument\` \`DIDDocument.create\` works 3`] = `
+{
+  "@context": [
+    "overriden",
+  ],
+  "alsoKnownAs": [],
+  "assertionMethod": [],
+  "authentication": [],
+  "capabilityDelegation": [],
+  "capabilityInvocation": [],
+  "controller": [],
+  "https://rdf.dock.io/alpha/2021#attestsDocumentContents": null,
+  "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+  "keyAgreement": [],
+  "service": [],
+  "verificationMethod": [],
+}
+`;
+
+exports[`\`DIDDocument\` DIDDocument.from works 1`] = `
+{
+  "@context": [
+    "test",
+  ],
+  "alsoKnownAs": null,
+  "assertionMethod": null,
+  "authentication": null,
+  "capabilityDelegation": null,
+  "capabilityInvocation": null,
+  "controller": [
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+  ],
+  "https://rdf.dock.io/alpha/2021#attestsDocumentContents": null,
+  "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+  "keyAgreement": null,
+  "service": null,
+  "verificationMethod": [
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-3",
+      "publicKeyBase58": "EaNp37NGpe8KViTKxAdknyvUP44doH1fHnFpYqEcfUjE",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+  ],
+}
+`;

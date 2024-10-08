@@ -1,0 +1,10 @@
+src/
+scripts/
+jest.config.js
+rollup.config.mjs
+out/
+node_modules/
+.vscode/
+.turbo/
+tests/
+*.log

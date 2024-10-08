@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Variables (you can modify these)
+CHAIN_ID="/tmp/cheqd-dev"
+NODE_NAME="cheqd-dev"
+KEY_NAME="my-key"
+MONIKER="local-node"
+STAKE_DENOM="stake"
+CHAIN_DIR="$HOME/.testnode"
+GENESIS_AMOUNT="100000000000000000000000000000ncheq,8246428745600000$STAKE_DENOM"  # Very large amount
+STAKE_AMOUNT="8246428745600000$STAKE_DENOM"  # Ensure this is >= DefaultPowerReduction
+COMMAND="cheqd-noded"
+
+# Install Cosmos SDK if not installed (replace this with your specific chain's SDK)
+# Uncomment if you need to install the SDK
+# echo "Installing Cosmos SDK..."
+# git clone https://github.com/cosmos/cosmos-sdk
+# cd cosmos-sdk
+# make install
+#
+rm -rf $CHAIN_DIR
+
+# Step 1: Initialize the chain
+echo "Initializing chain..."
+$COMMAND init $NODE_NAME --chain-id $CHAIN_ID --home $CHAIN_DIR
+
+# Step 2: Generate a keypair (if it doesn't exist already)
+if [ -z "$CHEQD_MNEMONIC" ]; then
+  echo "Creating key for node..."
+  $COMMAND keys add $KEY_NAME --keyring-backend test --home $CHAIN_DIR
+else
+  echo "Recovering key from mnemonic..."
+  printf "%s\n" "$CHEQD_MNEMONIC" | $COMMAND keys add $KEY_NAME --recover --keyring-backend test --home $CHAIN_DIR
+fi
+
+# Step 3: Add the generated key as a genesis account
+echo "Adding genesis account..."
+$COMMAND genesis add-genesis-account $($COMMAND keys show $KEY_NAME -a --keyring-backend test --home $CHAIN_DIR) $GENESIS_AMOUNT --home $CHAIN_DIR
+
+# Step 4: Generate a genesis transaction
+echo "Generating genesis transaction..."
+$COMMAND genesis gentx $KEY_NAME $STAKE_AMOUNT --keyring-backend test --chain-id $CHAIN_ID --home $CHAIN_DIR
+
+# Step 5: Collect genesis transactions into the genesis file
+echo "Collecting genesis transactions..."
+$COMMAND genesis collect-gentxs --home $CHAIN_DIR
+
+# Step 6: Validate the genesis file
+echo "Validating genesis file..."
+$COMMAND genesis validate-genesis --home $CHAIN_DIR
+
+# Step 7: Copy custom configuration
+cp /tmp/cheqd_config.toml $CHAIN_DIR/config/config.toml
+
+# Step 8: Starting the node
+echo "Starting Cosmos node..."
+$COMMAND start --home $CHAIN_DIR --moniker $MONIKER --log_level info

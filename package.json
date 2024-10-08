@@ -1,0 +1,22 @@
+{
+  "name": "root",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "examples"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "turbo": "2.0.5",
+    "@changesets/cli": "^2.x.x",
+    "@babel/cli": "^7.24.1",
+    "@babel/core": "^7.24.3",
+    "@babel/node": "^7.23.9",
+    "@babel/plugin-transform-modules-commonjs": "^7.24.1",
+    "@babel/preset-env": "^7.24.3"
+  },
+  "packageManager": "yarn@1.22.22",
+  "scripts": {
+    "publish-packages": "changeset version && changeset publish"
+  }
+}

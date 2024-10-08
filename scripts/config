@@ -1,0 +1,25 @@
+#!/bin/bash
+
+CONFIG_DOCK_NODE_MASTER_IMAGE=${CONFIG_DOCK_NODE_MASTER_IMAGE:-docknetwork/dock-substrate:fastblock_master}
+CONFIG_DOCK_NODE_MAINNET_IMAGE=${CONFIG_DOCK_NODE_MAINNET_IMAGE:-docknetwork/dock-substrate:fastblock_mainnet}
+CONFIG_DOCK_NODE_TESTNET_IMAGE=${CONFIG_DOCK_NODE_TESTNET_IMAGE:-docknetwork/dock-substrate:fastblock_testnet}
+
+if [ -z ${CONFIG_DOCK_NODE_IMAGE_TAG+x} ]; then
+    CONFIG_DOCK_NODE_IMAGE=${CONFIG_DOCK_NODE_IMAGE:-$CONFIG_DOCK_NODE_MAINNET_IMAGE}
+else
+    case $CONFIG_DOCK_NODE_IMAGE_TAG in
+        master)
+            CONFIG_DOCK_NODE_IMAGE=$CONFIG_DOCK_NODE_MASTER_IMAGE
+            ;;
+        mainnet)
+            CONFIG_DOCK_NODE_IMAGE=$CONFIG_DOCK_NODE_MAINNET_IMAGE
+            ;;
+        testnet)
+            CONFIG_DOCK_NODE_IMAGE=$CONFIG_DOCK_NODE_TESTNET_IMAGE
+            ;;
+        *)
+            echo "Invalid CONFIG_DOCK_NODE_IMAGE_TAG env"
+            exit 1
+            ;;
+    esac;
+fi

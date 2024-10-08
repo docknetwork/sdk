@@ -1,0 +1,67 @@
+{
+  "root": true,
+  "plugins": ["jest", "sonarjs"],
+  "globals": {
+    "process": "readonly"
+  },
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "extends": [
+    "plugin:sonarjs/recommended",
+    "eslint:recommended",
+    "plugin:jest/recommended",
+    "airbnb-base"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ],
+    "no-use-before-define": [
+      "error",
+      {
+        "functions": false,
+        "classes": true,
+        "variables": true
+      }
+    ],
+    "import/no-extraneous-dependencies": "off",
+    "class-methods-use-this": "off",
+    "no-return-await": "off",
+    "no-plusplus": "off",
+    "no-void": "off",
+    "max-len": "off",
+    "no-underscore-dangle": ["error", { "enforceInMethodNames": false }],
+    "max-classes-per-file": "off",
+    "import/prefer-default-export": "off",
+    "import/no-unresolved": "off",
+    "no-useless-constructor": "off",
+    "no-console": "off",
+    "no-else-return": "off",
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "ForInStatement",
+        "message": "for..in loops iterate over the entire prototype chain, which is virtually never what you want. Use Object.{keys,values,entries}, and iterate over the resulting array."
+      },
+      {
+        "selector": "LabeledStatement",
+        "message": "Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand."
+      },
+      {
+        "selector": "WithStatement",
+        "message": "`with` is disallowed in strict mode because it makes code impossible to predict and optimize."
+      }
+    ]
+  }
+}

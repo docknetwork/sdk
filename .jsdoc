@@ -1,0 +1,17 @@
+{
+  "recurseDepth": 10,
+  "source": {
+    "includePattern": ".+\\.js(doc|x)?$",
+    "excludePattern": "(^|\\/|\\\\)_"
+  },
+  "sourceType": "module",
+  "tags": {
+    "allowUnknownTags": true,
+    "dictionaries": ["jsdoc","closure"]
+  },
+  "plugins": ["node_modules/jsdoc-typeof-plugin"],
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": false
+  }
+}

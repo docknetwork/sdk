@@ -1,0 +1,42 @@
+name: npm audit
+
+on:
+  workflow_dispatch:
+
+  pull_request:
+    branches:
+      - master
+    paths:
+      - "yarn.lock"
+      - ".github/workflows/**"
+
+  schedule:
+    - cron: "0 0 * * 0" # Every sunday at midnight
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    env:
+      NODE_VERSION: 18.x
+      AVOID_LICENSES: "AGPL;GPL;AGPL-3.0"
+      IGNORE_PACKAGES: ""
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          yarn install --frozen-lockfile --ignore-scripts
+
+      - name: Check licenses
+        run: npx --yes license-checker --production --failOn "${{ env.AVOID_LICENSES }}" --excludePackages "${{ env.IGNORE_PACKAGES }}"
+
+      - name: Run audit
+        run: /bin/bash -c "(yarn audit --groups 'dependencies' --level critical; [[ $? -ge 16 ]] && exit 1 || exit 0)"

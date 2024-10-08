@@ -1,0 +1,43 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "cache": false,
+      "dependsOn": ["^build"],
+      "outputs": ["packages/**/dist/**"]
+    },
+    "docs": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "outputs": ["out/**"]
+    },
+    "lint": {
+      "cache": false,
+      "outputs": []
+    },
+    "publish": {
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "examples": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "test-with-node": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "env": ["CHEQD_MNEMONIC"]
+    },
+    "examples-with-node": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "publish-packages": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    }
+  }
+}

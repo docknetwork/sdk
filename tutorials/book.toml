@@ -1,0 +1,12 @@
+[book]
+authors = [
+    "Andrew Dirksen",
+    "Fausto Woelflin",
+    "Sam Hellawell",
+    "Lovesh Harchandani",
+    "Oleg Nosov",
+]
+language = "en"
+multilingual = false
+src = "src"
+title = "Dock SDK Tutorial"

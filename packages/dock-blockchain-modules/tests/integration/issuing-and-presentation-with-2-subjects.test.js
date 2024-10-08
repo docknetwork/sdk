@@ -94,14 +94,14 @@ describe("Verifiable Credential issuance and presentation where the credential h
     // issuer DID
     const pair1 = new DidKeypair(
       [issuerDID, 1],
-      new Ed25519Keypair(issuerKeySeed),
+      new Ed25519Keypair(issuerKeySeed)
     );
     await registerNewDIDUsingPair(dock, issuerDID, pair1);
 
     // 1st subject's DID
     const pair2 = new DidKeypair(
       [subject1DID, 1],
-      new Ed25519Keypair(subject1Seed),
+      new Ed25519Keypair(subject1Seed)
     );
     await registerNewDIDUsingPair(dock, subject1DID, pair2);
 
@@ -110,7 +110,7 @@ describe("Verifiable Credential issuance and presentation where the credential h
       subject2DID,
       [],
       [subject1DID],
-      false,
+      false
     );
   }, 60000);
 
@@ -122,7 +122,7 @@ describe("Verifiable Credential issuance and presentation where the credential h
     const issuerKey = getKeyDoc(
       issuerDID,
       new Ed25519Keypair(issuerKeySeed),
-      "Ed25519VerificationKey2018",
+      "Ed25519VerificationKey2018"
     );
     credential = await issueCredential(issuerKey, unsignedCred);
     expect(credential).toMatchObject(
@@ -131,9 +131,9 @@ describe("Verifiable Credential issuance and presentation where the credential h
           unsignedCred,
           issuerDID,
           issuerKey.id,
-          "Ed25519Signature2018",
-        ),
-      ),
+          "Ed25519Signature2018"
+        )
+      )
     );
 
     expect(credential.credentialSubject).toMatchObject([
@@ -155,7 +155,7 @@ describe("Verifiable Credential issuance and presentation where the credential h
     const holderKey = getKeyDoc(
       subject1DID,
       new Ed25519Keypair(subject1Seed),
-      "Ed25519VerificationKey2018",
+      "Ed25519VerificationKey2018"
     );
 
     const presId = `https://pres.com/${randomAsHex(32)}`;
@@ -169,7 +169,7 @@ describe("Verifiable Credential issuance and presentation where the credential h
         type: ["VerifiablePresentation"],
         verifiableCredential: [credential],
         id: presId,
-      }),
+      })
     );
 
     const signedPres = await signPresentation(
@@ -177,7 +177,7 @@ describe("Verifiable Credential issuance and presentation where the credential h
       holderKey,
       challenge,
       domain,
-      resolver,
+      resolver
     );
 
     expect(signedPres).toMatchObject(
@@ -191,7 +191,7 @@ describe("Verifiable Credential issuance and presentation where the credential h
           domain,
           proofPurpose: "authentication",
         }),
-      }),
+      })
     );
 
     // Before verifying the presentation, check that the holder is a specific subject of the credential and the
@@ -211,7 +211,7 @@ describe("Verifiable Credential issuance and presentation where the credential h
     const proofs = jsonld.getValues(signedPres, "proof");
     const verificationMethod = jsonld.getValues(
       proofs[0],
-      "verificationMethod",
+      "verificationMethod"
     );
     const didOfPresSigner = verificationMethod[0].split("#")[0];
     expect(didOfPresSigner).toEqual(recipientDid);

@@ -17,17 +17,17 @@ async function main() {
   const [alice] = getTestEVMAccountsFromWeb3(web3);
 
   console.log(
-    "Deploying WriteAccessController contract to track who can raise flags",
+    "Deploying WriteAccessController contract to track who can raise flags"
   );
   const wacAddr = await deployContract(
     web3,
     alice,
-    WriteAccessControllerByteCode,
+    WriteAccessControllerByteCode
   );
   const wacContract = new web3.eth.Contract(WriteAccessControllerABI, wacAddr);
 
   console.log(
-    "Deploying Flags contract which will allow validator to raise flags",
+    "Deploying Flags contract which will allow validator to raise flags"
   );
   const flagsInitBytecode =
     FlagsByteCode +
@@ -35,7 +35,7 @@ async function main() {
   const flagsAddr = await deployContract(web3, alice, flagsInitBytecode);
 
   console.log(
-    "Deploying DeviationFlaggingValidator contract to raise a flag on deviation above threshold",
+    "Deploying DeviationFlaggingValidator contract to raise a flag on deviation above threshold"
   );
   // Setting the value of 100,000 is equivalent to tolerating a 100% change compared to the previous price.
   const flaggingThreshold = 10000; // 10%
@@ -47,13 +47,13 @@ async function main() {
   const validatorAddr = await deployContract(
     web3,
     alice,
-    validatorInitBytecode,
+    validatorInitBytecode
   );
   await sendEVMTxn(
     web3,
     alice,
     wacAddr,
-    wacContract.methods.addAccess(validatorAddr).encodeABI(),
+    wacContract.methods.addAccess(validatorAddr).encodeABI()
   );
 }
 

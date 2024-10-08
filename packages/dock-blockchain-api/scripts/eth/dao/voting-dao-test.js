@@ -28,13 +28,13 @@ async function createDaoFactory(web3, signer) {
   const kernelContractAddr = await deployContract(
     web3,
     signer,
-    KernelBytecode + web3.eth.abi.encodeParameters(["bool"], [true]).slice(2),
+    KernelBytecode + web3.eth.abi.encodeParameters(["bool"], [true]).slice(2)
   );
   const aclContractAddr = await deployContract(web3, signer, ACLBytecode);
   const evmRegContractAddr = await deployContract(
     web3,
     signer,
-    EVMScriptRegistryFactoryBytecode,
+    EVMScriptRegistryFactoryBytecode
   );
   const daoFactContractAddr = await deployContract(
     web3,
@@ -43,12 +43,12 @@ async function createDaoFactory(web3, signer) {
       web3.eth.abi
         .encodeParameters(
           ["address", "address", "address"],
-          [kernelContractAddr, aclContractAddr, evmRegContractAddr],
+          [kernelContractAddr, aclContractAddr, evmRegContractAddr]
         )
-        .slice(2),
+        .slice(2)
   );
   console.log(
-    `Creating Kernel ${kernelContractAddr}, ACL ${aclContractAddr}, EVM Script registry ${evmRegContractAddr} and DAO factory ${daoFactContractAddr}`,
+    `Creating Kernel ${kernelContractAddr}, ACL ${aclContractAddr}, EVM Script registry ${evmRegContractAddr} and DAO factory ${daoFactContractAddr}`
   );
   return [
     kernelContractAddr,
@@ -64,12 +64,12 @@ async function createNewDao(web3, signer, root, daoFactAddr) {
     web3,
     signer,
     daoFactAddr,
-    daoFactContract.methods.newDAO(root).encodeABI(),
+    daoFactContract.methods.newDAO(root).encodeABI()
   );
   // The last log contains the address of the DAO
   const decoded = web3.eth.abi.decodeLog(
     [{ type: "address", name: "dao" }],
-    receipt.logs[receipt.logs.length - 1].data,
+    receipt.logs[receipt.logs.length - 1].data
   );
   console.log(`Created new DAO ${decoded.dao} from factory`);
   return decoded.dao;
@@ -87,7 +87,7 @@ async function setupAcl(web3, signer, root, daoAddr) {
     acl.options.address,
     acl.methods
       .createPermission(root, dao.options.address, managerRole, root)
-      .encodeABI(),
+      .encodeABI()
   );
   console.log(`Kernel ACL is ${aclAddr}`);
   return aclAddr;
@@ -102,19 +102,19 @@ async function setupVotingApp(web3, signer, root, appId, daoAddr, aclAddr) {
   const votingBaseAddress = await deployContract(
     web3,
     signer,
-    VotingDAOBytecode,
+    VotingDAOBytecode
   );
   const votingBase = new web3.eth.Contract(VotingDAOABI, votingBaseAddress);
   const receipt = await sendEVMTxn(
     web3,
     signer,
     dao.options.address,
-    dao.methods.newAppInstance(appId, votingBaseAddress).encodeABI(),
+    dao.methods.newAppInstance(appId, votingBaseAddress).encodeABI()
   );
   // The last log contains the address of the voting app
   const decoded = web3.eth.abi.decodeLog(
     [{ type: "address", name: "proxy" }],
-    receipt.logs[receipt.logs.length - 1].data,
+    receipt.logs[receipt.logs.length - 1].data
   );
   const votingAppAddress = decoded.proxy;
   console.log(`Installed voting app at ${votingAppAddress}`);
@@ -129,9 +129,9 @@ async function setupVotingApp(web3, signer, root, appId, daoAddr, aclAddr) {
         anyOne,
         votingAppAddress,
         await votingBase.methods.CREATE_VOTES_ROLE().call(),
-        root,
+        root
       )
-      .encodeABI(),
+      .encodeABI()
   );
   return votingAppAddress;
 }
@@ -139,21 +139,21 @@ async function setupVotingApp(web3, signer, root, appId, daoAddr, aclAddr) {
 async function deployToken(web3, signer, voters) {
   const zeroAddress = `0x${"0".repeat(40)}`; // 0x0000...0000
   console.log(
-    "Deploying MiniMeToken token and giving tokens to holders to vote with",
+    "Deploying MiniMeToken token and giving tokens to holders to vote with"
   );
   const tokenArgsABI = web3.eth.abi.encodeParameters(
     ["address", "address", "uint", "string", "uint8", "string", "bool"],
-    [zeroAddress, zeroAddress, 0, "MiniMeToken", 0, "mm", true],
+    [zeroAddress, zeroAddress, 0, "MiniMeToken", 0, "mm", true]
   );
   const tokenContractBytecode = MiniMeTokenBytecode + tokenArgsABI.slice(2);
   const tokenContractAddr = await deployContract(
     web3,
     signer,
-    tokenContractBytecode,
+    tokenContractBytecode
   );
   const tokenContract = new web3.eth.Contract(
     MiniMeTokenABI,
-    tokenContractAddr,
+    tokenContractAddr
   );
 
   /* eslint-disable no-await-in-loop */
@@ -163,7 +163,7 @@ async function deployToken(web3, signer, voters) {
       web3,
       signer,
       tokenContractAddr,
-      tokenContract.methods.generateTokens(address, amount).encodeABI(),
+      tokenContract.methods.generateTokens(address, amount).encodeABI()
     );
   }
 
@@ -175,7 +175,7 @@ async function initializeVotingApp(
   web3,
   signer,
   votingAppAddress,
-  tokenContractAddr,
+  tokenContractAddr
 ) {
   console.log("Initializing voting app with token");
 
@@ -196,15 +196,15 @@ async function initializeVotingApp(
         tokenContractAddr,
         supportRequiredPct,
         minAcceptQuorumPct,
-        votingDuration,
+        votingDuration
       )
-      .encodeABI(),
+      .encodeABI()
   );
 }
 
 async function setupVotingExecutor(web3, signer) {
   console.log(
-    "Setting up Counter contract whose methods will be called through voting",
+    "Setting up Counter contract whose methods will be called through voting"
   );
 
   const counterAddr = await deployContract(web3, signer, CounterBytecode);
@@ -234,7 +234,7 @@ async function setupVotingExecutor(web3, signer) {
   const decrementScript = encode(decrementCall);
 
   console.log(
-    `Counter deployed at ${counterAddr}, incrementer script is ${incrementScript}, decrementer script is ${decrementScript}`,
+    `Counter deployed at ${counterAddr}, incrementer script is ${incrementScript}, decrementer script is ${decrementScript}`
   );
 
   return [counterAddr, incrementScript, decrementScript];
@@ -247,7 +247,7 @@ async function createNewVote(web3, signer, votingAppAddress, execScript) {
     web3,
     signer,
     votingAppAddress,
-    votingApp.methods.newVote(execScript, "").encodeABI(),
+    votingApp.methods.newVote(execScript, "").encodeABI()
   );
 
   // Extract `voteId` from the first log
@@ -258,7 +258,7 @@ async function createNewVote(web3, signer, votingAppAddress, execScript) {
       { type: "string", name: "metadata" },
     ],
     receipt.logs[0].data,
-    [receipt.logs[0].topics[1], receipt.logs[0].topics[2]],
+    [receipt.logs[0].topics[1], receipt.logs[0].topics[2]]
   );
   console.log(`Created a new vote with id: ${decodedLog.voteId}`);
   return decodedLog.voteId;
@@ -289,7 +289,7 @@ async function main() {
     web3,
     alice,
     alice.address,
-    daoFactContractAddr,
+    daoFactContractAddr
   );
 
   // Set access control and set Alice as DAO's manager
@@ -306,7 +306,7 @@ async function main() {
     alice.address,
     appId,
     daoAddr,
-    aclAddr,
+    aclAddr
   );
   const votingApp = new web3.eth.Contract(VotingDAOABI, votingAppAddress);
 
@@ -325,16 +325,16 @@ async function main() {
 
   // Bob alone can increment the Counter as he has 51% tokens
   console.log(
-    `Counter before increment from Bob ${await getCounter(web3, counterAddr)}`,
+    `Counter before increment from Bob ${await getCounter(web3, counterAddr)}`
   );
   await sendEVMTxn(
     web3,
     bob,
     votingAppAddress,
-    votingApp.methods.newVote(incrementScript, "").encodeABI(),
+    votingApp.methods.newVote(incrementScript, "").encodeABI()
   );
   console.log(
-    `Counter after increment from Bob ${await getCounter(web3, counterAddr)}`,
+    `Counter after increment from Bob ${await getCounter(web3, counterAddr)}`
   );
 
   // Carol creates a new vote
@@ -342,17 +342,17 @@ async function main() {
     web3,
     carol,
     votingAppAddress,
-    incrementScript,
+    incrementScript
   );
   // Dave seconds Carol's vote
   await sendEVMTxn(
     web3,
     dave,
     votingAppAddress,
-    votingApp.methods.vote(voteId, true, true).encodeABI(),
+    votingApp.methods.vote(voteId, true, true).encodeABI()
   );
   console.log(
-    "Counter after attempted increment from Carol and Dave. Counter will not change as Bob and Carol don't have enough voting power",
+    "Counter after attempted increment from Carol and Dave. Counter will not change as Bob and Carol don't have enough voting power"
   );
 
   process.exit(0);

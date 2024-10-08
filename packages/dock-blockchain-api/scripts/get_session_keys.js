@@ -19,7 +19,7 @@ async function printSessionKeys() {
     }
     /* eslint no-underscore-dangle: ["error", { "allow": ["_args"] }] */
     addresses[addr][u8aToString(bnToU8a(keyOwner[0]._args[0][0]))] = u8aToHex(
-      keyOwner[0]._args[0][1],
+      keyOwner[0]._args[0][1]
     );
   });
 
@@ -33,7 +33,12 @@ async function printSessionKeys() {
     console.log(`Authority Discovery key is ${addresses[addr].audi}`);
     console.log(`Imonline key is ${addresses[addr].imon}`);
     console.log(
-      `Session key is ${addresses[addr].babe + addresses[addr].gran.substring(2) + addresses[addr].audi.substring(2) + addresses[addr].imon.substring(2)}`,
+      `Session key is ${
+        addresses[addr].babe +
+        addresses[addr].gran.substring(2) +
+        addresses[addr].audi.substring(2) +
+        addresses[addr].imon.substring(2)
+      }`
     );
     console.log("");
   });

@@ -21,13 +21,13 @@ describe("VerifiableCredential Tests", () => {
   test("VerifiableCredential's setSchema should appropriately set credentialSchema.", () => {
     vc.setSchema(
       exampleCredential.credentialSchema.id,
-      exampleCredential.credentialSchema.type,
+      exampleCredential.credentialSchema.type
     );
     expect(vc.credentialSchema).toMatchObject(
       expect.objectContaining({
         id: expect.anything(),
         type: expect.anything(),
-      }),
+      })
     );
   });
 
@@ -47,7 +47,7 @@ describe("Basic Schema Tests", () => {
     const schemaNoID = new Schema();
     const encodedIDByteSize = 48;
     expect(String(schemaNoID.id).length).toBe(
-      encodedIDByteSize + BlobId.Qualifier.length,
+      encodedIDByteSize + BlobId.Qualifier.length
     );
   });
 
@@ -55,7 +55,7 @@ describe("Basic Schema Tests", () => {
     await expect(
       schema.setJSONSchema({
         invalidSchema: true,
-      }),
+      })
     ).rejects.toThrow();
 
     await schema.setJSONSchema(exampleSchema);
@@ -72,7 +72,7 @@ describe("Basic Schema Tests", () => {
       expect.objectContaining({
         id: expect.anything(),
         schema: expect.anything(),
-      }),
+      })
     );
   });
 
@@ -82,7 +82,7 @@ describe("Basic Schema Tests", () => {
       expect.objectContaining({
         id: expect.anything(),
         blob: expect.anything(),
-      }),
+      })
     );
   });
 });
@@ -101,8 +101,8 @@ describe("Validate Credential Schema utility", () => {
       validateCredentialSchema(
         expandedCredential,
         schema,
-        exampleCredential["@context"],
-      ),
+        exampleCredential["@context"]
+      )
     ).toBeDefined();
   });
 
@@ -115,8 +115,8 @@ describe("Validate Credential Schema utility", () => {
           },
         },
         schema,
-        exampleCredential["@context"],
-      ),
+        exampleCredential["@context"]
+      )
     ).rejects.toThrow();
   }, 100000);
 
@@ -131,8 +131,8 @@ describe("Validate Credential Schema utility", () => {
           [`${expandedSubjectProperty}`]: credentialSubject,
         },
         schema,
-        exampleCredential["@context"],
-      ),
+        exampleCredential["@context"]
+      )
     ).rejects.toThrow();
   }, 100000);
 
@@ -152,8 +152,8 @@ describe("Validate Credential Schema utility", () => {
           [`${expandedSubjectProperty}`]: credentialSubject,
         },
         schema,
-        exampleCredential["@context"],
-      ),
+        exampleCredential["@context"]
+      )
     ).resolves.toBeDefined();
   });
 
@@ -173,8 +173,8 @@ describe("Validate Credential Schema utility", () => {
           [`${expandedSubjectProperty}`]: credentialSubject,
         },
         schema,
-        exampleCredential["@context"],
-      ),
+        exampleCredential["@context"]
+      )
     ).resolves.toBeDefined();
   });
 
@@ -206,8 +206,8 @@ describe("Validate Credential Schema utility", () => {
           [`${expandedSubjectProperty}`]: credentialSubject,
         },
         schema,
-        exampleCredential["@context"],
-      ),
+        exampleCredential["@context"]
+      )
     ).resolves.toBeDefined();
   });
 });

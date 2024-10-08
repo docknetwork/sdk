@@ -10,7 +10,7 @@ import VerifiablePresentation from "@docknetwork/credential-sdk/vc/verifiable-pr
 export function createPresentation(
   verifiableCredential,
   id = "http://example.edu/presentation/2803",
-  holder = null,
+  holder = null
 ) {
   const presentation = new VerifiablePresentation(id);
   if (Array.isArray(verifiableCredential)) {

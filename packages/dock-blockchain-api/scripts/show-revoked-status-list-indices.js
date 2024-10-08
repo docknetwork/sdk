@@ -14,7 +14,7 @@ async function main(dock) {
   for (const [id, unparsedCredential] of statusListCreds) {
     const credential = StatusList2021Credential.fromBytes(
       unparsedCredential.unwrap().statusListCredential
-        .asStatusList2021Credential,
+        .asStatusList2021Credential
     );
     const owners = [
       ...(await unparsedCredential.unwrap().policy.asOneOf.values()),
@@ -23,7 +23,7 @@ async function main(dock) {
       .map(String);
     const decoded = await credential.decodedStatusList();
     const revoked = await credential.revokedBatch(
-      Array.from({ length: decoded.length }, (_, idx) => idx),
+      Array.from({ length: decoded.length }, (_, idx) => idx)
     );
 
     const toShow = revoked
@@ -33,7 +33,7 @@ async function main(dock) {
     if (toShow.length || ShowEmpty) {
       decoded.bitstring.leftToRightIndexing = false;
       const revoked = await credential.revokedBatch(
-        Array.from({ length: decoded.length }, (_, idx) => idx),
+        Array.from({ length: decoded.length }, (_, idx) => idx)
       );
       const toShowBigEndian = revoked
         .map((revoked, idx) => (revoked ? idx : null))
@@ -43,11 +43,11 @@ async function main(dock) {
         console.log(id.toHuman()[0], ":");
         console.log(
           " - revoked indices with left to right indexing (correct):",
-          toShow.join(", ") || "-",
+          toShow.join(", ") || "-"
         );
         console.log(
           " - revoked indices with right to left indexing (deprecated):",
-          toShowBigEndian.join(", ") || "-",
+          toShowBigEndian.join(", ") || "-"
         );
         console.log(" - owners:", owners.join(","));
       } else {
@@ -56,7 +56,7 @@ async function main(dock) {
           ":",
           toShow.join(", ") || "-",
           "; owners:",
-          owners.join(","),
+          owners.join(",")
         );
       }
     }

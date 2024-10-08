@@ -241,7 +241,7 @@ async function verifyDerivedCredential(dock, credential, resolver) {
   const { verified } = await verifyPresentation(pres, { resolver });
   expect(verified).toEqual(true);
   expect(pres.spec.credentials[0].revealedAttributes.issuer).toEqual(
-    credential.issuer,
+    credential.issuer
   );
 
   const bbsPlusPresentation2 = new BbsPlusPresentation();
@@ -260,7 +260,7 @@ async function verifyDerivedCredential(dock, credential, resolver) {
     credentialsFromPresentation[0],
     {
       resolver,
-    },
+    }
   );
   expect(credentialResult.verified).toBe(true);
 
@@ -269,7 +269,7 @@ async function verifyDerivedCredential(dock, credential, resolver) {
     (credentialJSON) => {
       credentialJSON["@context"].push("https://ld.dock.io/security/bbs/v1");
       return VerifiableCredential.fromJSON(credentialJSON);
-    },
+    }
   );
 
   const id = keyDoc.controller.startsWith("did:key:")

@@ -45,7 +45,7 @@ async function insertKeys(seed) {
   const hasKey = await dock.api.rpc.author.hasSessionKeys(sessKey);
   if (!hasKey) {
     throw new Error(
-      "Inserted session key not found in keystore. This is a bug and should be reported",
+      "Inserted session key not found in keystore. This is a bug and should be reported"
     );
   }
   console.log(`The generated session key is ${sessKey}`);

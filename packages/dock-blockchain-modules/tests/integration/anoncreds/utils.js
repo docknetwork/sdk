@@ -54,7 +54,7 @@ export async function setupExternalSchema(
   title,
   did,
   pair,
-  blobModule,
+  blobModule
 ) {
   const blobId = DockBlobId.random();
   const qualifiedBlobId = String(blobId);

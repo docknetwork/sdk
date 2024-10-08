@@ -46,7 +46,7 @@ describe("Off-chain DIDs", () => {
   test("Can create an off-chain DID", async () => {
     // DID does not exist
     await expect(
-      modules.did.dockOnly.getOffchainDidDetail(dockDID),
+      modules.did.dockOnly.getOffchainDidDetail(dockDID)
     ).rejects.toThrow(NoDIDError);
 
     const docRef = new CIDOffchainDocRef(firstDocRef);
@@ -54,12 +54,12 @@ describe("Off-chain DIDs", () => {
     const didDetail = await modules.did.dockOnly.getOffchainDidDetail(dockDID);
     expect(didDetail.docRef).toEqual(docRef);
     expect(didDetail.accountId.value).toEqual(
-      u8aToHex(dock.account.addressRaw),
+      u8aToHex(dock.account.addressRaw)
     );
 
     // DID cannot be fetched as on-chain DID
     await expect(
-      modules.did.dockOnly.getOnchainDidDetail(dockDID),
+      modules.did.dockOnly.getOnchainDidDetail(dockDID)
     ).rejects.toThrow(NoOnchainDIDError);
   });
 
@@ -69,7 +69,7 @@ describe("Off-chain DIDs", () => {
     const didDetail = await modules.did.dockOnly.getOffchainDidDetail(dockDID);
     expect(didDetail.docRef).toEqual(docRef);
     expect(didDetail.accountId.value).toEqual(
-      u8aToHex(dock.account.addressRaw),
+      u8aToHex(dock.account.addressRaw)
     );
   });
 
@@ -79,14 +79,14 @@ describe("Off-chain DIDs", () => {
     const didDetail = await modules.did.dockOnly.getOffchainDidDetail(dockDID);
     expect(didDetail.docRef).toEqual(docRef);
     expect(didDetail.accountId.value).toEqual(
-      u8aToHex(dock.account.addressRaw),
+      u8aToHex(dock.account.addressRaw)
     );
   });
 
   test("Can remove the DID", async () => {
     await modules.did.dockOnly.removeOffchainDid(dockDID, false);
     await expect(
-      modules.did.dockOnly.getOffchainDidDetail(dockDID),
+      modules.did.dockOnly.getOffchainDidDetail(dockDID)
     ).rejects.toThrow(NoDIDError);
   });
 });

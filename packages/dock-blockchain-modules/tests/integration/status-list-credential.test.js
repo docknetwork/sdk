@@ -64,14 +64,14 @@ describe("StatusList2021Credential", () => {
     // Register issuer DID
     issuerKeyPair = new DidKeypair(
       [issuerDID, 1],
-      new Ed25519Keypair(issuerSeed),
+      new Ed25519Keypair(issuerSeed)
     );
     await registerNewDIDUsingPair(dockAPI, issuerDID, issuerKeyPair);
 
     // Register holder DID
     const pair1 = new DidKeypair(
       [holderDID, 1],
-      new Ed25519Keypair(holderSeed),
+      new Ed25519Keypair(holderSeed)
     );
     await registerNewDIDUsingPair(dockAPI, holderDID, pair1);
 
@@ -79,13 +79,13 @@ describe("StatusList2021Credential", () => {
     issuerKey = getKeyDoc(
       issuerDID,
       issuerKeyPair,
-      "Ed25519VerificationKey2018",
+      "Ed25519VerificationKey2018"
     );
 
     const statusListCred = await StatusList2021Credential.create(
       issuerKey,
       statusListCredentialId,
-      { statusPurpose: "suspension" },
+      { statusPurpose: "suspension" }
     );
 
     // Add a new revocation status list with above policy
@@ -93,7 +93,7 @@ describe("StatusList2021Credential", () => {
       statusListCredentialId,
       statusListCred,
       issuerDID,
-      issuerKeyPair,
+      issuerKeyPair
     );
 
     let unsignedCred = getUnsignedCred(credId, holderDID, [
@@ -105,8 +105,8 @@ describe("StatusList2021Credential", () => {
         unsignedCred,
         statusListCredentialId,
         statusListCredentialIndex,
-        "wrongPurpose",
-      ),
+        "wrongPurpose"
+      )
     ).toThrow();
 
     // Issuer issues the credential with a given status list id for revocation
@@ -114,14 +114,14 @@ describe("StatusList2021Credential", () => {
       unsignedCred,
       statusListCredentialId,
       statusListCredentialIndex,
-      "suspension",
+      "suspension"
     );
 
     credential = await issueCredential(
       issuerKey,
       unsignedCred,
       void 0,
-      defaultDocumentLoader(resolver),
+      defaultDocumentLoader(resolver)
     );
   }, 60000);
 
@@ -141,7 +141,7 @@ describe("StatusList2021Credential", () => {
     // Revoke the credential
     const fetchedCred =
       await modules.statusListCredential.getStatusListCredential(
-        statusListCredentialId,
+        statusListCredentialId
       );
     await fetchedCred.update(issuerKey, {
       revokeIndices: [statusListCredentialIndex],
@@ -151,7 +151,7 @@ describe("StatusList2021Credential", () => {
       statusListCredentialId,
       fetchedCred,
       issuerDID,
-      issuerKeyPair,
+      issuerKeyPair
     );
 
     // The credential verification should fail as the credential has been revoked.
@@ -162,7 +162,7 @@ describe("StatusList2021Credential", () => {
 
     expect(result1.verified).toBe(false);
     expect(result1.error).toBe(
-      "Credential was revoked (or suspended) according to the status list referenced in `credentialStatus`",
+      "Credential was revoked (or suspended) according to the status list referenced in `credentialStatus`"
     );
   }, 50000);
 
@@ -171,7 +171,7 @@ describe("StatusList2021Credential", () => {
     // throw error if the credential is not revoked.
     let fetchedCred =
       await modules.statusListCredential.getStatusListCredential(
-        statusListCredentialId,
+        statusListCredentialId
       );
     await fetchedCred.update(issuerKey, {
       unsuspendIndices: [statusListCredentialIndex],
@@ -181,12 +181,12 @@ describe("StatusList2021Credential", () => {
       statusListCredentialId,
       fetchedCred,
       issuerDID,
-      issuerKeyPair,
+      issuerKeyPair
     );
     const holderKey = getKeyDoc(
       holderDID,
       new Ed25519Keypair(holderSeed),
-      "Ed25519VerificationKey2018",
+      "Ed25519VerificationKey2018"
     );
 
     // Create presentation for unsuspended credential
@@ -199,7 +199,7 @@ describe("StatusList2021Credential", () => {
       holderKey,
       chal,
       domain,
-      resolver,
+      resolver
     );
 
     // As the credential is unsuspended, the presentation should verify successfully.
@@ -213,7 +213,7 @@ describe("StatusList2021Credential", () => {
 
     // Revoke credential
     fetchedCred = await modules.statusListCredential.getStatusListCredential(
-      statusListCredentialId,
+      statusListCredentialId
     );
     await fetchedCred.update(issuerKey, {
       revokeIndices: [statusListCredentialIndex],
@@ -223,7 +223,7 @@ describe("StatusList2021Credential", () => {
       statusListCredentialId,
       fetchedCred,
       issuerDID,
-      issuerKeyPair,
+      issuerKeyPair
     );
 
     // As the credential is revoked, the presentation should verify successfully.

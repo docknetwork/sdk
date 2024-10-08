@@ -65,7 +65,7 @@ async function getTxnsStatsInLastBlocks(count) {
   const avgWeight = weight / count;
   const blPc = Math.round((avgWeight * 100) / blockCap);
   console.log(
-    `For ${blocks.length} blocks, total extrinsic count is ${total}, mean is ${mean} and median is ${mid}. Block fill % is ${blPc}`,
+    `For ${blocks.length} blocks, total extrinsic count is ${total}, mean is ${mean} and median is ${mid}. Block fill % is ${blPc}`
   );
   return [blocks.length, total, mean, mid];
 }

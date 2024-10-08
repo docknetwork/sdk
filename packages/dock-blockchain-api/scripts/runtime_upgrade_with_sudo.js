@@ -49,7 +49,9 @@ async function doRuntimeUpgrade() {
   const runtimeVerBeforeUpgrade = await getRuntimeVersion(dock);
   console.log("Before upgrade");
   console.log(
-    `Authoring version, Spec version, Impl version, Transaction version -> (${[...runtimeVerBeforeUpgrade]})`,
+    `Authoring version, Spec version, Impl version, Transaction version -> (${[
+      ...runtimeVerBeforeUpgrade,
+    ]})`
   );
 
   console.log("Going to send node upgrade transaction");
@@ -59,7 +61,9 @@ async function doRuntimeUpgrade() {
   const runtimeVerAfterUpgrade = await getRuntimeVersion(dock);
   console.log("After upgrade");
   console.log(
-    `Authoring version, Spec version, Impl version, Transaction version -> (${[...runtimeVerAfterUpgrade]})`,
+    `Authoring version, Spec version, Impl version, Transaction version -> (${[
+      ...runtimeVerAfterUpgrade,
+    ]})`
   );
 
   // Runtime version should change.
@@ -68,7 +72,7 @@ async function doRuntimeUpgrade() {
     JSON.stringify(runtimeVerAfterUpgrade)
   ) {
     throw new Error(
-      "Runtime version did not change post upgrade. Update did not happen, maybe the node was already running the version",
+      "Runtime version did not change post upgrade. Update did not happen, maybe the node was already running the version"
     );
   }
   process.exit(0);

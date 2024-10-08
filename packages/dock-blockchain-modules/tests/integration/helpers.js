@@ -20,12 +20,12 @@ export async function registerNewDIDUsingPair(
   did,
   pair,
   verRels,
-  controllers = [],
+  controllers = []
 ) {
   // No additional controller
   const didKey = new DidKey(pair.publicKey(), verRels);
   return await new DockDIDModule(dockAPI).createDocument(
-    DIDDocument.create(did, [didKey], controllers),
+    DIDDocument.create(did, [didKey], controllers)
   );
 }
 
@@ -62,7 +62,7 @@ export function checkVerificationMethods(
   doc,
   length,
   index = undefined,
-  keyNo = undefined,
+  keyNo = undefined
 ) {
   expect(doc.verificationMethod.length).toEqual(length);
   if (length > 0 && index !== undefined) {
@@ -70,10 +70,10 @@ export function checkVerificationMethods(
       keyNo = index + 1;
     }
     expect(String(doc.verificationMethod[index].id)).toEqual(
-      `${did}#keys-${keyNo}`,
+      `${did}#keys-${keyNo}`
     );
     expect(String(doc.verificationMethod[index].controller)).toEqual(
-      String(did),
+      String(did)
     );
     expect(doc.verificationMethod[index].publicKeyBase58).toBeDefined();
   }

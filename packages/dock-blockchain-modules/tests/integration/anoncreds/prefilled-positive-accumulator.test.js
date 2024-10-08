@@ -100,18 +100,18 @@ describe("Prefilled positive accumulator", () => {
     accumulatorId = DockAccumulatorId.random(did);
     const accumulated = AccumulatorModule.accumulatedAsHex(
       accumulator.accumulated,
-      AccumulatorType.VBPos,
+      AccumulatorType.VBPos
     );
     await modules.accumulator.addPositiveAccumulator(
       accumulatorId,
       accumulated,
       [did, 1],
-      pair,
+      pair
     );
     const queriedAccum = await modules.accumulator.getAccumulator(
       accumulatorId,
       true,
-      true,
+      true
     );
     expect(queriedAccum.accumulated.value).toEqual(accumulated);
   });
@@ -120,13 +120,13 @@ describe("Prefilled positive accumulator", () => {
     let queriedAccum = await modules.accumulator.getAccumulator(
       accumulatorId,
       true,
-      true,
+      true
     );
     let verifAccumulator = PositiveAccumulator.fromAccumulated(
       AccumulatorModule.accumulatedFromHex(
         queriedAccum.accumulated,
-        AccumulatorType.VBPos,
-      ),
+        AccumulatorType.VBPos
+      )
     );
 
     // Witness created for member 1
@@ -134,19 +134,19 @@ describe("Prefilled positive accumulator", () => {
     const witness1 = await accumulator.membershipWitness(
       member1,
       keypair.secretKey,
-      accumState,
+      accumState
     );
     let accumPk = new AccumulatorPublicKey(queriedAccum.publicKey.bytes.bytes);
     let accumParams = new AccumulatorParams(
-      queriedAccum.publicKey.params.bytes.bytes,
+      queriedAccum.publicKey.params.bytes.bytes
     );
     expect(
       verifAccumulator.verifyMembershipWitness(
         member1,
         witness1,
         accumPk,
-        accumParams,
-      ),
+        accumParams
+      )
     ).toEqual(true);
 
     // Witness created for member 2
@@ -154,15 +154,15 @@ describe("Prefilled positive accumulator", () => {
     const witness2 = await accumulator.membershipWitness(
       member2,
       keypair.secretKey,
-      accumState,
+      accumState
     );
     expect(
       verifAccumulator.verifyMembershipWitness(
         member2,
         witness2,
         accumPk,
-        accumParams,
-      ),
+        accumParams
+      )
     ).toEqual(true);
 
     // Witness created for member 3
@@ -170,15 +170,15 @@ describe("Prefilled positive accumulator", () => {
     const witness3 = await accumulator.membershipWitness(
       member3,
       keypair.secretKey,
-      accumState,
+      accumState
     );
     expect(
       verifAccumulator.verifyMembershipWitness(
         member3,
         witness3,
         accumPk,
-        accumParams,
-      ),
+        accumParams
+      )
     ).toEqual(true);
 
     // Previous users' witness still works
@@ -187,16 +187,16 @@ describe("Prefilled positive accumulator", () => {
         member1,
         witness1,
         accumPk,
-        accumParams,
-      ),
+        accumParams
+      )
     ).toEqual(true);
     expect(
       verifAccumulator.verifyMembershipWitness(
         member2,
         witness2,
         accumPk,
-        accumParams,
-      ),
+        accumParams
+      )
     ).toEqual(true);
 
     // Manager decides to remove a member, the new accumulated value will be published along with witness update info
@@ -204,40 +204,40 @@ describe("Prefilled positive accumulator", () => {
       accumulator.accumulated,
       [],
       [member2],
-      keypair.secretKey,
+      keypair.secretKey
     );
     await accumulator.remove(member2, keypair.secretKey, accumState);
 
     let accum = await modules.accumulator.getAccumulator(accumulatorId, false);
     const accumulated = AccumulatorModule.accumulatedAsHex(
       accumulator.accumulated,
-      AccumulatorType.VBPos,
+      AccumulatorType.VBPos
     );
     const witUpdBytes = u8aToHex(witnessUpdInfo.value);
     await modules.accumulator.updateAccumulator(
       accumulatorId,
       accumulated,
       { removals: [u8aToHex(member2)], witnessUpdateInfo: witUpdBytes },
-      pair,
+      pair
     );
 
     queriedAccum = await modules.accumulator.getAccumulator(
       accumulatorId,
       true,
-      true,
+      true
     );
     expect(queriedAccum.accumulated.value).toEqual(accumulated);
 
     verifAccumulator = PositiveAccumulator.fromAccumulated(
       AccumulatorModule.accumulatedFromHex(
         queriedAccum.accumulated,
-        AccumulatorType.VBPos,
-      ),
+        AccumulatorType.VBPos
+      )
     );
 
     accumPk = new AccumulatorPublicKey(queriedAccum.publicKey.bytes.bytes);
     accumParams = new AccumulatorParams(
-      queriedAccum.publicKey.params.bytes.bytes,
+      queriedAccum.publicKey.params.bytes.bytes
     );
 
     // Witness created for member 3
@@ -245,22 +245,22 @@ describe("Prefilled positive accumulator", () => {
     const witness4 = await accumulator.membershipWitness(
       member4,
       keypair.secretKey,
-      accumState,
+      accumState
     );
     expect(
       verifAccumulator.verifyMembershipWitness(
         member4,
         witness4,
         accumPk,
-        accumParams,
-      ),
+        accumParams
+      )
     ).toEqual(true);
 
     // Older witnesses need to be updated
     accum = await modules.accumulator.getAccumulator(accumulatorId);
     const updates = await modules.accumulator.dockOnly.getUpdatesFromBlock(
       accumulatorId,
-      accum.lastModified,
+      accum.lastModified
     );
     const additions = [];
     const removals = [];
@@ -275,37 +275,37 @@ describe("Prefilled positive accumulator", () => {
       }
     }
     const queriedWitnessInfo = new VBWitnessUpdateInfo(
-      updates[0].witnessUpdateInfo.bytes,
+      updates[0].witnessUpdateInfo.bytes
     );
 
     witness1.updateUsingPublicInfoPostBatchUpdate(
       member1,
       additions,
       removals,
-      queriedWitnessInfo,
+      queriedWitnessInfo
     );
     expect(
       verifAccumulator.verifyMembershipWitness(
         member1,
         witness1,
         accumPk,
-        accumParams,
-      ),
+        accumParams
+      )
     ).toEqual(true);
 
     witness3.updateUsingPublicInfoPostBatchUpdate(
       member3,
       additions,
       removals,
-      queriedWitnessInfo,
+      queriedWitnessInfo
     );
     expect(
       verifAccumulator.verifyMembershipWitness(
         member3,
         witness3,
         accumPk,
-        accumParams,
-      ),
+        accumParams
+      )
     ).toEqual(true);
   });
 
@@ -313,34 +313,34 @@ describe("Prefilled positive accumulator", () => {
     let queriedAccum = await modules.accumulator.getAccumulator(
       accumulatorId,
       true,
-      true,
+      true
     );
     let verifAccumulator = PositiveAccumulator.fromAccumulated(
       AccumulatorModule.accumulatedFromHex(
         queriedAccum.accumulated,
-        AccumulatorType.VBPos,
-      ),
+        AccumulatorType.VBPos
+      )
     );
     const member = members[10];
     let witness = await accumulator.membershipWitness(
       member,
       keypair.secretKey,
-      accumState,
+      accumState
     );
 
     const accumPk = new AccumulatorPublicKey(
-      queriedAccum.publicKey.bytes.bytes,
+      queriedAccum.publicKey.bytes.bytes
     );
     const accumParams = new AccumulatorParams(
-      queriedAccum.publicKey.params.bytes.bytes,
+      queriedAccum.publicKey.params.bytes.bytes
     );
     expect(
       verifAccumulator.verifyMembershipWitness(
         member,
         witness,
         accumPk,
-        accumParams,
-      ),
+        accumParams
+      )
     ).toEqual(true);
 
     await waitForBlocks(dock.api, 2);
@@ -352,12 +352,12 @@ describe("Prefilled positive accumulator", () => {
       accumulator.accumulated,
       [],
       removals1,
-      keypair.secretKey,
+      keypair.secretKey
     );
     await accumulator.removeBatch(removals1, keypair.secretKey, accumState);
     const accumulated1 = AccumulatorModule.accumulatedAsHex(
       accumulator.accumulated,
-      AccumulatorType.VBPos,
+      AccumulatorType.VBPos
     );
     const witUpdBytes1 = u8aToHex(witnessUpdInfo1.value);
     await modules.accumulator.updateAccumulator(
@@ -367,7 +367,7 @@ describe("Prefilled positive accumulator", () => {
         removals: removals1.map((r) => u8aToHex(r)),
         witnessUpdateInfo: witUpdBytes1,
       },
-      pair,
+      pair
     );
 
     await waitForBlocks(dock.api, 5);
@@ -377,12 +377,12 @@ describe("Prefilled positive accumulator", () => {
       accumulator.accumulated,
       [],
       removals2,
-      keypair.secretKey,
+      keypair.secretKey
     );
     await accumulator.removeBatch(removals2, keypair.secretKey, accumState);
     const accumulated2 = AccumulatorModule.accumulatedAsHex(
       accumulator.accumulated,
-      AccumulatorType.VBPos,
+      AccumulatorType.VBPos
     );
     const witUpdBytes2 = u8aToHex(witnessUpdInfo2.value);
     await modules.accumulator.updateAccumulator(
@@ -392,7 +392,7 @@ describe("Prefilled positive accumulator", () => {
         removals: removals2.map((r) => u8aToHex(r)),
         witnessUpdateInfo: witUpdBytes2,
       },
-      pair,
+      pair
     );
 
     await waitForBlocks(dock.api, 5);
@@ -402,12 +402,12 @@ describe("Prefilled positive accumulator", () => {
       accumulator.accumulated,
       [],
       removals3,
-      keypair.secretKey,
+      keypair.secretKey
     );
     await accumulator.removeBatch(removals3, keypair.secretKey, accumState);
     const accumulated3 = AccumulatorModule.accumulatedAsHex(
       accumulator.accumulated,
-      AccumulatorType.VBPos,
+      AccumulatorType.VBPos
     );
     const witUpdBytes3 = u8aToHex(witnessUpdInfo3.value);
     await modules.accumulator.updateAccumulator(
@@ -417,14 +417,14 @@ describe("Prefilled positive accumulator", () => {
         removals: removals3.map((r) => u8aToHex(r)),
         witnessUpdateInfo: witUpdBytes3,
       },
-      pair,
+      pair
     );
 
     // Get a witness from the accumulator manager. This will be updated after the following updates.
     witness = await accumulator.membershipWitness(
       member,
       keypair.secretKey,
-      accumState,
+      accumState
     );
     // The user should be told the block number from which he is supposed to update the witnesses from. It will be one block
     // ahead from where the last update was posted.
@@ -438,12 +438,12 @@ describe("Prefilled positive accumulator", () => {
       accumulator.accumulated,
       [],
       removals4,
-      keypair.secretKey,
+      keypair.secretKey
     );
     await accumulator.removeBatch(removals4, keypair.secretKey, accumState);
     const accumulated4 = AccumulatorModule.accumulatedAsHex(
       accumulator.accumulated,
-      AccumulatorType.VBPos,
+      AccumulatorType.VBPos
     );
     const witUpdBytes4 = u8aToHex(witnessUpdInfo4.value);
     await modules.accumulator.updateAccumulator(
@@ -453,7 +453,7 @@ describe("Prefilled positive accumulator", () => {
         removals: removals4.map((r) => u8aToHex(r)),
         witnessUpdateInfo: witUpdBytes4,
       },
-      pair,
+      pair
     );
     console.log(`Updated witness at block ${await getLastBlockNo(dock.api)}`);
     await waitForBlocks(dock.api, 5);
@@ -463,12 +463,12 @@ describe("Prefilled positive accumulator", () => {
       accumulator.accumulated,
       [],
       removals5,
-      keypair.secretKey,
+      keypair.secretKey
     );
     await accumulator.removeBatch(removals5, keypair.secretKey, accumState);
     const accumulated5 = AccumulatorModule.accumulatedAsHex(
       accumulator.accumulated,
-      AccumulatorType.VBPos,
+      AccumulatorType.VBPos
     );
     const witUpdBytes5 = u8aToHex(witnessUpdInfo5.value);
     await modules.accumulator.updateAccumulator(
@@ -478,7 +478,7 @@ describe("Prefilled positive accumulator", () => {
         removals: removals5.map((r) => u8aToHex(r)),
         witnessUpdateInfo: witUpdBytes5,
       },
-      pair,
+      pair
     );
     console.log(`Updated witness at block ${await getLastBlockNo(dock.api)}`);
     await waitForBlocks(dock.api, 5);
@@ -486,13 +486,13 @@ describe("Prefilled positive accumulator", () => {
     queriedAccum = await modules.accumulator.getAccumulator(
       accumulatorId,
       true,
-      true,
+      true
     );
     verifAccumulator = PositiveAccumulator.fromAccumulated(
       AccumulatorModule.accumulatedFromHex(
         queriedAccum.accumulated,
-        AccumulatorType.VBPos,
-      ),
+        AccumulatorType.VBPos
+      )
     );
     // Old witness doesn't verify with new accumulator
     expect(
@@ -500,8 +500,8 @@ describe("Prefilled positive accumulator", () => {
         member,
         witness,
         accumPk,
-        accumParams,
-      ),
+        accumParams
+      )
     ).toEqual(false);
 
     const oldWitness1 = new VBMembershipWitness(witness.value);
@@ -514,7 +514,7 @@ describe("Prefilled positive accumulator", () => {
       member,
       witness,
       blockNoToUpdateFrom,
-      queriedAccum.lastModified,
+      queriedAccum.lastModified
     );
 
     // Updated witness verifies with new accumulator
@@ -523,8 +523,8 @@ describe("Prefilled positive accumulator", () => {
         member,
         witness,
         accumPk,
-        accumParams,
-      ),
+        accumParams
+      )
     ).toEqual(true);
 
     // Test again with a batch size bigger than the total number of blocks
@@ -534,15 +534,15 @@ describe("Prefilled positive accumulator", () => {
       oldWitness1,
       blockNoToUpdateFrom,
       queriedAccum.lastModified,
-      queriedAccum.lastModified - blockNoToUpdateFrom + 10,
+      queriedAccum.lastModified - blockNoToUpdateFrom + 10
     );
     expect(
       verifAccumulator.verifyMembershipWitness(
         member,
         oldWitness1,
         accumPk,
-        accumParams,
-      ),
+        accumParams
+      )
     ).toEqual(true);
 
     // Test again with few other batch sizes
@@ -552,15 +552,15 @@ describe("Prefilled positive accumulator", () => {
       oldWitness2,
       blockNoToUpdateFrom,
       queriedAccum.lastModified,
-      3,
+      3
     );
     expect(
       verifAccumulator.verifyMembershipWitness(
         member,
         oldWitness2,
         accumPk,
-        accumParams,
-      ),
+        accumParams
+      )
     ).toEqual(true);
 
     await modules.accumulator.updateWitness(
@@ -569,15 +569,15 @@ describe("Prefilled positive accumulator", () => {
       oldWitness3,
       blockNoToUpdateFrom,
       queriedAccum.lastModified,
-      4,
+      4
     );
     expect(
       verifAccumulator.verifyMembershipWitness(
         member,
         oldWitness3,
         accumPk,
-        accumParams,
-      ),
+        accumParams
+      )
     ).toEqual(true);
   }, 60000);
 

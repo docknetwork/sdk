@@ -15,7 +15,7 @@ class MyEnvironment extends NodeEnvironment {
           Buffer,
         },
       },
-      context,
+      context
     );
   }
 

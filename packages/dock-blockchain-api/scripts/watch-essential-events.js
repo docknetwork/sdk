@@ -106,7 +106,7 @@ const {
     isNil,
     unless(includes(__, ["debug"]), () => {
       throw new Error('Allowed options: ["debug"]');
-    }),
+    })
   ),
   // Amount of time used to accumulate notifications into a single email.
   BatchNoficationTimeout: o(finiteNumber, defaultTo(3e3)),
@@ -148,10 +148,10 @@ const main = async (dock, startBlock) => {
 
                 return throwError(() => "Timeout exceeded");
               },
-            }),
+            })
           );
-        }),
-      ),
+        })
+      )
     )
       .pipe(
         retry({ delay: RetryDelay, count: RetryAttempts }),
@@ -160,9 +160,9 @@ const main = async (dock, startBlock) => {
             void timestampLogger.error(error) ||
             sendMessage(
               "Mainnet watcher was restarted",
-              `Due to either connection or node API problems, the dock blockchain essential notifications watcher was restarted with the last unprocessed block ${minUnprocessed}.`,
-            ),
-        ),
+              `Due to either connection or node API problems, the dock blockchain essential notifications watcher was restarted with the last unprocessed block ${minUnprocessed}.`
+            )
+        )
       )
       .subscribe({ complete: () => resolve(null), error: reject });
   });
@@ -193,7 +193,7 @@ const trackSeqProcessed = curry((startBlock, missedBlocksSink, blocks$) => {
           "Received skipped block - ",
           received,
           "maxReceived - ",
-          maxReceived,
+          maxReceived
         );
       }
 
@@ -207,7 +207,7 @@ const trackSeqProcessed = curry((startBlock, missedBlocksSink, blocks$) => {
       const maxSeqProcessed = reduce(min, maxReceived, [...skipped]);
 
       return { maxReceived, maxSeqProcessed, block };
-    }),
+    })
   );
 });
 
@@ -232,7 +232,7 @@ const processBlocks = (dock, startBlock) => {
 
   const missedBlocksSink = new Subject();
   const missedBlocks$ = missedBlocksSink.pipe(
-    mergeMap(blockByNumber(dock), ConcurrentBlocksSyncLimit),
+    mergeMap(blockByNumber(dock), ConcurrentBlocksSyncLimit)
   );
 
   return merge(subscribeBlocks(dock, startBlock), missedBlocks$).pipe(
@@ -246,8 +246,8 @@ const processBlocks = (dock, startBlock) => {
             : mergeEventsWithExtrs(events, extrinsic, {
                 rootTx: extrinsic,
                 config: 0,
-              }).extrinsics,
-        ),
+              }).extrinsics
+        )
       )
         .pipe(mapRx(assoc("block", block)))
         .pipe(share());
@@ -255,20 +255,20 @@ const processBlocks = (dock, startBlock) => {
       // Each event repeats its transaction
       const events$ = txs$.pipe(
         concatMap(({ events, ...rest }) =>
-          from(events).pipe(mapRx((event) => ({ event, events, ...rest }))),
-        ),
+          from(events).pipe(mapRx((event) => ({ event, events, ...rest })))
+        )
       );
 
       const handleBlock$ = merge(
         txs$.pipe(
           tap(LogLevel === "debug" ? logTx : identity),
-          applyFilters(txFilters),
+          applyFilters(txFilters)
         ),
-        events$.pipe(applyFilters(eventFilters)),
+        events$.pipe(applyFilters(eventFilters))
       ).pipe(
         batchNotifications(BatchNoficationTimeout),
         tap((email) => timestampLogger.log("Sending email: ", email)),
-        mergeMap(o(from, sendMessage("Mainnet alarm notification"))),
+        mergeMap(o(from, sendMessage("Mainnet alarm notification")))
       );
 
       const number = block.block.header.number.toNumber();
@@ -276,13 +276,13 @@ const processBlocks = (dock, startBlock) => {
       return concat(
         of({ maxSeqProcessed, number, state: 0 }),
         handleBlock$.pipe(tap(timestampLogger.log), filterRx(F)),
-        of({ number, state: 1 }),
+        of({ number, state: 1 })
       );
     }),
     scan(
       (
         { minUnprocessed, maxReceived, processing },
-        { maxSeqProcessed = minUnprocessed, number, state },
+        { maxSeqProcessed = minUnprocessed, number, state }
       ) => {
         if (!state) processing.add(number);
         else processing.delete(number);
@@ -297,9 +297,9 @@ const processBlocks = (dock, startBlock) => {
         minUnprocessed: startBlock,
         maxReceived: startBlock,
         processing: new Set(),
-      },
+      }
     ),
-    mapRx(prop("minUnprocessed")),
+    mapRx(prop("minUnprocessed"))
   );
 };
 
@@ -347,18 +347,18 @@ export const subscribeBlocks = curry((dock, startBlock) => {
               } else {
                 return of(latestSyncedBlock);
               }
-            },
+            }
           ),
-          takeWhile(Boolean),
+          takeWhile(Boolean)
         ),
         defer(() => {
           timestampLogger.log("Listening for new blocks");
 
           return EMPTY;
         }),
-        currentBlocks$,
-      ),
-    ),
+        currentBlocks$
+      )
+    )
   );
 });
 
@@ -392,7 +392,7 @@ const syncPrevousBlocks = curry((dock, startBlock, currentBlocks$) => {
     }, null),
     distinctUntilChanged(),
     mergeMap(blockByNumber(dock), ConcurrentBlocksSyncLimit),
-    share(),
+    share()
   );
 
   return blocks$;
@@ -413,10 +413,10 @@ const sendMessage = curry((header, message) =>
           value: message,
           short: false,
         },
-      ]),
+      ])
     ),
-    from(sendAlarmEmailText(TxWatcherAlarmEmailTo, header, message)),
-  ),
+    from(sendAlarmEmailText(TxWatcherAlarmEmailTo, header, message))
+  )
 );
 
 /**
@@ -426,8 +426,8 @@ export const batchNotifications = curry((timeLimit, notifications$) =>
   notifications$.pipe(
     bufferTime(timeLimit, null),
     filterRx(complement(isEmpty)),
-    mapRx((batch) => batch.join("\n")),
-  ),
+    mapRx((batch) => batch.join("\n"))
+  )
 );
 
 const sectionLens = lensProp("section");
@@ -440,7 +440,7 @@ const methodFilter = curry((section, methods) =>
   allPass([
     o(equals(section), view(sectionLens)),
     o(includes(__, [].concat(methods)), view(methodLens)),
-  ]),
+  ])
 );
 
 /**
@@ -451,7 +451,7 @@ const eventByMethodFilter = curry(pipe(methodFilter, o(__, prop("event"))));
  * Filters extrinsics to contain at least one event with the given `section`/`method(s)`
  */
 const anyEventByMethodFilter = curry(
-  pipe(methodFilter, any, o(__, prop("events"))),
+  pipe(methodFilter, any, o(__, prop("events")))
 );
 /**
  * Filters extrinsics by its `section`/`method(s)`.
@@ -463,10 +463,10 @@ const txByMethodFilter = curry(
       __,
       o(
         when(({ method }) => typeof method === "object", view(methodLens)),
-        prop("tx"),
-      ),
-    ),
-  ),
+        prop("tx")
+      )
+    )
+  )
 );
 
 /**
@@ -478,8 +478,8 @@ const isValidSudo = pipe(
   ifElse(
     isEmpty,
     F,
-    all((event) => event.data.toJSON()[0].err == null),
-  ),
+    all((event) => event.data.toJSON()[0].err == null)
+  )
 );
 
 /**
@@ -488,20 +488,20 @@ const isValidSudo = pipe(
 const successfulTx = both(
   either(
     complement(anyEventByMethodFilter("sudo", ["Sudid", "SudoAsDone"])),
-    isValidSudo,
+    isValidSudo
   ),
   complement(
     either(
       anyEventByMethodFilter("utility", "BatchInterrupted"),
-      anyEventByMethodFilter("system", "ExtrinsicFailed"),
-    ),
-  ),
+      anyEventByMethodFilter("system", "ExtrinsicFailed")
+    )
+  )
 );
 /**
  * Filters successful extrinsics by its `section`/`method(s)`.
  */
 const successfulTxByMethodFilter = curry(
-  pipe(txByMethodFilter, both(successfulTx)),
+  pipe(txByMethodFilter, both(successfulTx))
 );
 /**
  * Validates given input against supplied predicate producing an observable.
@@ -513,7 +513,7 @@ const checkMap = ifElse(__, __, always(EMPTY));
  */
 const buildExtrinsicUrl = curry(
   (blockNumber, txHash) =>
-    `<${BaseBlockExplorerUrl}/${blockNumber.toString()} | block #${blockNumber.toString()}> as <${BaseExtrinsicExplorerUrl}/${txHash.toString()} | extrinsic ${txHash.toString()}>.`,
+    `<${BaseBlockExplorerUrl}/${blockNumber.toString()} | block #${blockNumber.toString()}> as <${BaseExtrinsicExplorerUrl}/${txHash.toString()} | extrinsic ${txHash.toString()}>.`
 );
 /**
  * Enhances observable returned by the given function by adding url to the extrinsic and its block.
@@ -529,22 +529,22 @@ const withExtrinsicUrl = (fn) =>
           args[0].rootTx?.signer?.toString();
 
         return from(
-          args[1].api.query.timestamp.now.at(args[0].block.block.header.hash),
+          args[1].api.query.timestamp.now.at(args[0].block.block.header.hash)
         ).pipe(
           mapRx(
             (timestamp) =>
               `${msg} ${
                 signer ? `by \`${signer}\`` : "sent unsigned"
               } at ${new Date(
-                +timestamp.toString(),
+                +timestamp.toString()
               ).toUTCString()} in ${buildExtrinsicUrl(
                 args[0].block.block.header.number,
-                args[0].rootTx?.hash,
-              )}`,
-          ),
+                args[0].rootTx?.hash
+              )}`
+          )
         );
-      }),
-    ),
+      })
+    )
   );
 
 /**
@@ -567,7 +567,7 @@ const technicalCommitteeEvent = eventByMethodFilter("technicalCommittee");
  * Filter events produced by `technicalCommitteeMembership` pallet.
  */
 const technicalCommitteeMembershipEvent = eventByMethodFilter(
-  "technicalCommitteeMembership",
+  "technicalCommitteeMembership"
 );
 /**
  * Filter events produced by `elections` pallet.
@@ -578,7 +578,7 @@ const electionsEvent = eventByMethodFilter("elections");
  * Filter extrinsics produced by `technicalCommitteeMembership` pallet.
  */
 const technicalCommitteeMembershipTx = successfulTxByMethodFilter(
-  "technicalCommitteeMembership",
+  "technicalCommitteeMembership"
 );
 /**
  * Filter extrinsics from `democracy` pallet.
@@ -601,7 +601,7 @@ const txFilters = [
   checkMap(isValidSudo, () => of("`sudo` transaction executed")),
   // Council candidacy submission
   checkMap(electionsTx("submitCandidacy"), () =>
-    of("Self-submitted as a council candidate"),
+    of("Self-submitted as a council candidate")
   ),
 
   // Council member removal
@@ -611,7 +611,7 @@ const txFilters = [
       tx: {
         args: [member],
       },
-    }) => of(`Council member removed ${member.toString()}`),
+    }) => of(`Council member removed ${member.toString()}`)
   ),
 
   // `set_code` call
@@ -619,7 +619,7 @@ const txFilters = [
 
   // `set_code_without_checks` call
   checkMap(systemTx("setCodeWithoutChecks"), () =>
-    of("New runtime code was set without checks"),
+    of("New runtime code was set without checks")
   ),
 
   // `set_storage` call
@@ -632,7 +632,7 @@ const txFilters = [
       tx: {
         args: [idx],
       },
-    }) => of(`Proposal #${idx.toString()} is seconded`),
+    }) => of(`Proposal #${idx.toString()} is seconded`)
   ),
 
   // Democracy proposal fast-tracked
@@ -642,7 +642,7 @@ const txFilters = [
       tx: {
         args: [proposalHash],
       },
-    }) => of(`Proposal is fast-tracked: ${proposalHash.toString()}`),
+    }) => of(`Proposal is fast-tracked: ${proposalHash.toString()}`)
   ),
 
   // `force_transfer` call
@@ -651,8 +651,8 @@ const txFilters = [
 
     return of(
       `\`force_transfer\` was made from ${source} to ${dest} with amount of ${formatDock(
-        value,
-      )}`,
+        value
+      )}`
     );
   }),
 
@@ -663,7 +663,7 @@ const txFilters = [
       tx: {
         args: [proposalIndex],
       },
-    }) => of(`Proposal #${proposalIndex.toString()} was cancelled`),
+    }) => of(`Proposal #${proposalIndex.toString()} was cancelled`)
   ),
 ];
 
@@ -675,7 +675,7 @@ const eventFilters = [
       tx: {
         args: [hash],
       },
-    }) => of(`New Democracy proposal: ${hash}`),
+    }) => of(`New Democracy proposal: ${hash}`)
   ),
 
   // Democracy preimage noted for the proposal
@@ -687,14 +687,14 @@ const eventFilters = [
           data: [proposalHash],
         },
       },
-      dock,
+      dock
     ) =>
       from(dock.api.query.democracy.preimages(proposalHash)).pipe(
         switchMap((preimageOpt) => {
           if (preimageOpt.isSome && preimageOpt.unwrap().isAvailable) {
             const proposal = dock.api.createType(
               "Call",
-              preimageOpt.unwrap().asAvailable.data,
+              preimageOpt.unwrap().asAvailable.data
             );
             const metadata = dock.api.registry.findMetaCall(proposal.callIndex);
             const args = pipe(
@@ -702,23 +702,23 @@ const eventFilters = [
               map((value) =>
                 value.length > 100
                   ? `${value.slice(0, 100)}... (truncated)`
-                  : value,
+                  : value
               ),
-              JSON.stringify,
+              JSON.stringify
             )(proposal.toJSON().args);
 
             return of(
               `Proposal preimage is noted for ${proposalHash.toString()}: \`${
                 metadata.section
-              }::${metadata.method}\` with args ${args}`,
+              }::${metadata.method}\` with args ${args}`
             );
           } else {
             return of(
-              `Proposal preimage is noted for ${proposalHash.toString()}`,
+              `Proposal preimage is noted for ${proposalHash.toString()}`
             );
           }
-        }),
-      ),
+        })
+      )
   ),
 
   // Council proposal created
@@ -735,10 +735,10 @@ const eventFilters = [
           const { args, section, method } = proposal.unwrap();
 
           return `New Council proposal ${section}::${method}(${JSON.stringify(
-            args,
+            args
           )})`;
         }
-      }),
+      })
     );
   }),
 
@@ -749,7 +749,7 @@ const eventFilters = [
     } = event.toJSON();
 
     return of(
-      `Council proposal ${hash} closed with ${yesVotes} yes/${noVotes} no`,
+      `Council proposal ${hash} closed with ${yesVotes} yes/${noVotes} no`
     );
   }),
 
@@ -760,7 +760,7 @@ const eventFilters = [
       event: {
         data: [member],
       },
-    }) => of(`Council member renounced: ${member.toString()}`),
+    }) => of(`Council member renounced: ${member.toString()}`)
   ),
 
   // Council members changed
@@ -774,8 +774,8 @@ const eventFilters = [
       of(
         `Council membership changed. New members: ${newMembers
           .toJSON()
-          .map(head)}`,
-      ),
+          .map(head)}`
+      )
   ),
 
   // `set_balance` call
@@ -784,8 +784,8 @@ const eventFilters = [
 
     return of(
       `\`set_balance\` was called on ${who}: free: ${formatDock(
-        free,
-      )}, reserved: ${formatDock(reserved)}`,
+        free
+      )}, reserved: ${formatDock(reserved)}`
     );
   }),
 
@@ -803,10 +803,10 @@ const eventFilters = [
           const { args, section, method } = proposal.unwrap();
 
           return `New Technical Committee proposal ${section}::${method}(${JSON.stringify(
-            args,
+            args
           )})`;
         }
-      }),
+      })
     );
   }),
 
@@ -814,26 +814,26 @@ const eventFilters = [
   checkMap(
     both(
       technicalCommitteeMembershipEvent("MemberAdded"),
-      technicalCommitteeMembershipTx("addMember"),
+      technicalCommitteeMembershipTx("addMember")
     ),
     ({
       tx: {
         args: [member],
       },
-    }) => of(`New technical committee member added: ${member.toString()}`),
+    }) => of(`New technical committee member added: ${member.toString()}`)
   ),
 
   // Techinal Committee member removed
   checkMap(
     both(
       technicalCommitteeMembershipEvent("MemberRemoved"),
-      technicalCommitteeMembershipTx("removeMember"),
+      technicalCommitteeMembershipTx("removeMember")
     ),
     ({
       tx: {
         args: [member],
       },
-    }) => of(`Technical committee member removed: ${member.toString()}`),
+    }) => of(`Technical committee member removed: ${member.toString()}`)
   ),
 ];
 
@@ -851,7 +851,7 @@ const logTx = ({ tx, rootTx, events, block }) => {
 
   timestampLogger.log(
     msg,
-    events.map((e) => `${e.section}::${e.method}`),
+    events.map((e) => `${e.section}::${e.method}`)
   );
 };
 
@@ -880,14 +880,14 @@ const createTxWithEventsCombinator = (dock) => {
     appendExtrinsics(extrinsics) {
       return new TxWithEventsAccumulator(
         this.extrinsics.concat(extrinsics),
-        this.nextEvents,
+        this.nextEvents
       );
     }
 
     prependExtrinsics(extrinsics) {
       return new TxWithEventsAccumulator(
         extrinsics.concat(this.extrinsics),
-        this.nextEvents,
+        this.nextEvents
       );
     }
   }
@@ -912,7 +912,7 @@ const createTxWithEventsCombinator = (dock) => {
     if (config & BATCH) {
       batchIdx = findIndex(
         anyPass([ItemCompleted.is, BatchCompleted.is, BatchInterrupted.is]),
-        events,
+        events
       );
       if (~batchIdx && ItemCompleted.is(events[batchIdx])) {
         batchIdx++;
@@ -929,23 +929,23 @@ const createTxWithEventsCombinator = (dock) => {
 
     const minIdx = Math.min(
       events.length,
-      ...[batchIdx, sudoIdx, sudoAsIdx].filter((idx) => ~idx),
+      ...[batchIdx, sudoIdx, sudoAsIdx].filter((idx) => ~idx)
     );
     const [curEvents, nextEvents] = splitAt(minIdx, events);
 
     return new TxWithEventsAccumulator(
       [{ events: curEvents, tx, rootTx }],
-      nextEvents,
+      nextEvents
     );
   };
 
   const isBatch = o(
     txByMethodFilter("utility", ["batch", "batchAll"]),
-    assoc("tx", __, {}),
+    assoc("tx", __, {})
   );
   const isSudo = o(
     txByMethodFilter("sudo", ["sudo", "sudoUncheckedWeight"]),
-    assoc("tx", __, {}),
+    assoc("tx", __, {})
   );
   const isSudoAs = o(txByMethodFilter("sudo", "sudoAs"), assoc("tx", __, {}));
 
@@ -963,7 +963,7 @@ const createTxWithEventsCombinator = (dock) => {
               rootTx,
             }).prependExtrinsics(extrinsics),
           new TxWithEventsAccumulator([], events),
-          tx.args[0],
+          tx.args[0]
         );
 
         const selfAcc = pickEventsForExtrinsic(acc.nextEvents, tx, {
@@ -979,7 +979,7 @@ const createTxWithEventsCombinator = (dock) => {
           }
 
           return selfAcc.prependExtrinsics(
-            acc.extrinsics.slice(0, acc.nextEvents[0].toJSON().data[0]),
+            acc.extrinsics.slice(0, acc.nextEvents[0].toJSON().data[0])
           );
         }
       },

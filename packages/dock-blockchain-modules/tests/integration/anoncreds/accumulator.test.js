@@ -78,7 +78,7 @@ describe("Accumulator Module", () => {
     await chainModule.addParams(null, params1, did1, pair1);
     const paramsWritten1 = await chainModule.getParams(
       did1,
-      await chainModule.dockOnly.paramsCounter(did1),
+      await chainModule.dockOnly.paramsCounter(did1)
     );
     expect(paramsWritten1.bytes).toEqual(params1.bytes);
     expect(paramsWritten1.label).toEqual(params1.label);
@@ -93,7 +93,7 @@ describe("Accumulator Module", () => {
     await chainModule.addParams(null, params2, did2, pair2);
     const paramsWritten2 = await chainModule.getParams(
       did2,
-      await chainModule.dockOnly.paramsCounter(did2),
+      await chainModule.dockOnly.paramsCounter(did2)
     );
     expect(paramsWritten2.bytes).toEqual(params2.bytes);
     expect(paramsWritten2.label).toBe(null);
@@ -108,7 +108,7 @@ describe("Accumulator Module", () => {
     await chainModule.addParams(null, params3, did1, pair1);
     const paramsWritten3 = await chainModule.getParams(
       did1,
-      await chainModule.dockOnly.paramsCounter(did1),
+      await chainModule.dockOnly.paramsCounter(did1)
     );
     expect(paramsWritten3.bytes).toEqual(params3.bytes);
     expect(paramsWritten3.label).toBe(null);
@@ -149,7 +149,7 @@ describe("Accumulator Module", () => {
     const queriedPk2 = await chainModule.getPublicKey(did2, 1);
     expect(queriedPk2.bytes).toEqual(pk2.bytes);
     expect(
-      queriedPk2.paramsRef.eq(new DockAccumulatorPublicKeyRef(did1, 1)),
+      queriedPk2.paramsRef.eq(new DockAccumulatorPublicKeyRef(did1, 1))
     ).toBe(true);
 
     const queriedPk2WithParams = await chainModule.getPublicKey(did2, 1, true);
@@ -165,7 +165,7 @@ describe("Accumulator Module", () => {
     const queriedPk3 = await chainModule.getPublicKey(did2, 2);
     expect(queriedPk3.bytes).toEqual(pk3.bytes);
     expect(
-      queriedPk3.paramsRef.eq(new DockAccumulatorPublicKeyRef(did1, 2)),
+      queriedPk3.paramsRef.eq(new DockAccumulatorPublicKeyRef(did1, 2))
     ).toBe(true);
 
     const queriedPk3WithParams = await chainModule.getPublicKey(did2, 2, true);
@@ -186,10 +186,10 @@ describe("Accumulator Module", () => {
       ...(await chainModule.getAllPublicKeysByDid(did2, true)).values(),
     ];
     expect(pksWithParamsByDid2[0].toJSON()).toEqual(
-      queriedPk2WithParams.toJSON(),
+      queriedPk2WithParams.toJSON()
     );
     expect(pksWithParamsByDid2[1].toJSON()).toEqual(
-      queriedPk3WithParams.toJSON(),
+      queriedPk3WithParams.toJSON()
     );
   }, 30000);
 
@@ -200,7 +200,7 @@ describe("Accumulator Module", () => {
       id1,
       accumulated1,
       [did1, keyId],
-      pair1,
+      pair1
     );
 
     const id2 = DockAccumulatorId.random(did2);
@@ -211,7 +211,7 @@ describe("Accumulator Module", () => {
       accumulated2,
       [did2, keyId],
       maxSize,
-      pair2,
+      pair2
     );
 
     const accum1 = await chainModule.getAccumulator(id1, false);
@@ -221,7 +221,7 @@ describe("Accumulator Module", () => {
     expect(accum1.type).toEqual("positive");
     expect(accum1.accumulated.value).toEqual(accumulated1);
     expect(accum1.keyRef.eq(new DockAccumulatorPublicKeyRef(did1, keyId))).toBe(
-      true,
+      true
     );
     expect(accum1.publicKey).toBeUndefined();
 
@@ -232,7 +232,7 @@ describe("Accumulator Module", () => {
     expect(accum2.type).toEqual("universal");
     expect(accum2.accumulated.value).toEqual(accumulated2);
     expect(accum2.keyRef.eq(new DockAccumulatorPublicKeyRef(did2, keyId))).toBe(
-      true,
+      true
     );
     expect(accum2.publicKey).toBeUndefined();
 
@@ -241,19 +241,19 @@ describe("Accumulator Module", () => {
     const accum2WithKeyAndParams = await chainModule.getAccumulator(
       id2,
       true,
-      true,
+      true
     );
     expect(accum2WithKeyAndParams.created > 0).toBe(true);
     expect(accum2WithKeyAndParams.lastModified > 0).toBe(true);
     expect(accum2WithKeyAndParams.created).toEqual(
-      accum2WithKeyAndParams.lastModified,
+      accum2WithKeyAndParams.lastModified
     );
     expect(accum2WithKeyAndParams.type).toEqual("universal");
     expect(accum2WithKeyAndParams.accumulated.value).toEqual(accumulated2);
     expect(
       accum2WithKeyAndParams.keyRef.eq(
-        new DockAccumulatorPublicKeyRef(did2, keyId),
-      ),
+        new DockAccumulatorPublicKeyRef(did2, keyId)
+      )
     ).toBe(true);
     if (keyId > 0) {
       expect(accum2WithKeyAndParams.publicKey.eq(keyWithParams)).toBe(true);
@@ -273,7 +273,7 @@ describe("Accumulator Module", () => {
       id3,
       accumulated3,
       [did2, keyId],
-      pair2,
+      pair2
     );
 
     const accum3 = await chainModule.getAccumulator(id3, false);
@@ -283,7 +283,7 @@ describe("Accumulator Module", () => {
     expect(accum3.type).toEqual("kbUniversal");
     expect(accum3.accumulated.value).toEqual(accumulated3);
     expect(accum3.keyRef.eq(new DockAccumulatorPublicKeyRef(did2, keyId))).toBe(
-      true,
+      true
     );
     expect(accum3.publicKey).toBeUndefined();
 
@@ -314,7 +314,7 @@ describe("Accumulator Module", () => {
       if (typ === 0) {
         accumulator = PositiveAccumulator.initialize(
           aparams,
-          keypair.secretKey,
+          keypair.secretKey
         );
       } else {
         const domain = [];
@@ -325,7 +325,7 @@ describe("Accumulator Module", () => {
           domain,
           aparams,
           keypair.secretKey,
-          accumState,
+          accumState
         );
       }
 
@@ -334,7 +334,7 @@ describe("Accumulator Module", () => {
 
       const accumulated1 = AbstractAccumulatorModule.accumulatedAsHex(
         accumulator.accumulated,
-        typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni,
+        typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni
       );
       const id = DockAccumulatorId.random(did2);
       if (typ === 0) {
@@ -342,14 +342,14 @@ describe("Accumulator Module", () => {
           id,
           accumulated1,
           [did2, keyId],
-          pair2,
+          pair2
         );
       } else {
         await chainModule.addKBUniversalAccumulator(
           id,
           accumulated1,
           [did2, keyId],
-          pair2,
+          pair2
         );
       }
 
@@ -358,7 +358,7 @@ describe("Accumulator Module", () => {
 
       const accumulated2 = AbstractAccumulatorModule.accumulatedAsHex(
         accumulator.accumulated,
-        typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni,
+        typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni
       );
       await chainModule.updateAccumulator(id, accumulated2, {}, pair2);
       const accum2 = await chainModule.getAccumulator(id, false);
@@ -379,7 +379,7 @@ describe("Accumulator Module", () => {
 
       const accumulated3 = AbstractAccumulatorModule.accumulatedAsHex(
         accumulator.accumulated,
-        typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni,
+        typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni
       );
       const additions1 = [u8aToHex(member2), u8aToHex(member3)];
       const removals1 = [u8aToHex(member1)];
@@ -387,12 +387,12 @@ describe("Accumulator Module", () => {
         witUpdCls.new(
           AbstractAccumulatorModule.accumulatedFromHex(
             accumulated2,
-            typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni,
+            typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni
           ),
           [member2, member3],
           [member1],
-          keypair.secretKey,
-        ).value,
+          keypair.secretKey
+        ).value
       );
       await chainModule.updateAccumulator(
         id,
@@ -402,7 +402,7 @@ describe("Accumulator Module", () => {
           removals: removals1,
           witnessUpdateInfo: witUpd1,
         },
-        pair2,
+        pair2
       );
       const accum3 = await chainModule.getAccumulator(id, false);
       expect(accum3.accumulated.value).toEqual(accumulated3);
@@ -415,25 +415,25 @@ describe("Accumulator Module", () => {
 
       const accumulated4 = AbstractAccumulatorModule.accumulatedAsHex(
         accumulator.accumulated,
-        typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni,
+        typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni
       );
       const additions2 = [u8aToHex(member4), u8aToHex(member5)];
       const witUpd2 = u8aToHex(
         witUpdCls.new(
           AbstractAccumulatorModule.accumulatedFromHex(
             accumulated3,
-            typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni,
+            typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni
           ),
           [member4, member5],
           [],
-          keypair.secretKey,
-        ).value,
+          keypair.secretKey
+        ).value
       );
       await chainModule.updateAccumulator(
         id,
         accumulated4,
         { additions: additions2, witnessUpdateInfo: witUpd2 },
-        pair2,
+        pair2
       );
       const accum4 = await chainModule.getAccumulator(id, false);
       expect(accum4.accumulated.value).toEqual(accumulated4);
@@ -443,32 +443,32 @@ describe("Accumulator Module", () => {
 
       const accumulated5 = AbstractAccumulatorModule.accumulatedAsHex(
         accumulator.accumulated,
-        typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni,
+        typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni
       );
       const removals3 = [u8aToHex(member2), u8aToHex(member4)];
       const witUpd3 = u8aToHex(
         witUpdCls.new(
           AbstractAccumulatorModule.accumulatedFromHex(
             accumulated4,
-            typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni,
+            typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni
           ),
           [],
           [member2, member4],
-          keypair.secretKey,
-        ).value,
+          keypair.secretKey
+        ).value
       );
       await chainModule.updateAccumulator(
         id,
         accumulated5,
         { removals: removals3, witnessUpdateInfo: witUpd3 },
-        pair2,
+        pair2
       );
       const accum5 = await chainModule.getAccumulator(id, false);
       expect(accum5.accumulated.value).toEqual(accumulated5);
 
       const updates1 = await chainModule.dockOnly.getUpdatesFromBlock(
         id,
-        accum2.lastModified,
+        accum2.lastModified
       );
       expect(updates1[0].newAccumulated.value).toEqual(accumulated2);
       expect(updates1[0].additions).toEqual(null);
@@ -481,20 +481,20 @@ describe("Accumulator Module", () => {
 
       expect(
         chainModule.dockOnly.constructor.parseEventAsAccumulatorUpdate(
-          events1[0].event,
-        ),
+          events1[0].event
+        )
       ).toEqual([id[1].value, accumulated2]);
 
       const updates2 = await chainModule.dockOnly.getUpdatesFromBlock(
         id,
-        accum3.lastModified,
+        accum3.lastModified
       );
       expect(updates2[0].newAccumulated.value).toEqual(accumulated3);
       expect(updates2[0].additions.eq(ListOfByteArrays.from(additions1))).toBe(
-        true,
+        true
       );
       expect(updates2[0].removals.eq(ListOfByteArrays.from(removals1))).toBe(
-        true,
+        true
       );
       expect(updates2[0].witnessUpdateInfo.value).toEqual(witUpd1);
 
@@ -503,29 +503,29 @@ describe("Accumulator Module", () => {
       ).filter(({ event }) => event.section === "accumulator");
       expect(
         chainModule.dockOnly.constructor.parseEventAsAccumulatorUpdate(
-          events2[0].event,
-        ),
+          events2[0].event
+        )
       ).toEqual([id[1].value, accumulated3]);
 
       const updates3 = await chainModule.dockOnly.getUpdatesFromBlock(
         id,
-        accum4.lastModified,
+        accum4.lastModified
       );
       expect(updates3[0].newAccumulated.value).toEqual(accumulated4);
       expect(updates3[0].additions.eq(ListOfByteArrays.from(additions2))).toBe(
-        true,
+        true
       );
       expect(updates3[0].removals).toEqual(null);
       expect(updates3[0].witnessUpdateInfo.value).toEqual(witUpd2);
 
       const updates4 = await chainModule.dockOnly.getUpdatesFromBlock(
         id,
-        accum5.lastModified,
+        accum5.lastModified
       );
       expect(updates4[0].newAccumulated.value).toEqual(accumulated5);
       expect(updates4[0].additions).toEqual(null);
       expect(updates4[0].removals.eq(ListOfByteArrays.from(removals3))).toBe(
-        true,
+        true
       );
       expect(updates4[0].witnessUpdateInfo.value).toEqual(witUpd3);
     }

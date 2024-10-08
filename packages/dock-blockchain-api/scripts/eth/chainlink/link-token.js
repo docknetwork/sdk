@@ -23,19 +23,29 @@ async function main() {
   const value = amount.mul(web3.utils.toBN(10).pow(decimals));
 
   console.log(
-    `Alice's balance using web3 ${await web3.eth.getBalance(alice.address)}`,
+    `Alice's balance using web3 ${await web3.eth.getBalance(alice.address)}`
   );
 
   const contractAddr = await deployContract(web3, alice, LinkTokenByteCode);
 
   console.log(
-    `Alice's balance using web3 ${await web3.eth.getBalance(alice.address)}`,
+    `Alice's balance using web3 ${await web3.eth.getBalance(alice.address)}`
   );
   console.log(
-    `Alice's ERC-20 token balance ${await getTokenBalance(web3, contractAddr, LinkTokenABI, alice.address)}`,
+    `Alice's ERC-20 token balance ${await getTokenBalance(
+      web3,
+      contractAddr,
+      LinkTokenABI,
+      alice.address
+    )}`
   );
   console.log(
-    `Bob's ERC-20 token balance ${await getTokenBalance(web3, contractAddr, LinkTokenABI, bob.address)}`,
+    `Bob's ERC-20 token balance ${await getTokenBalance(
+      web3,
+      contractAddr,
+      LinkTokenABI,
+      bob.address
+    )}`
   );
 
   const receipt = await sendTokens(
@@ -44,18 +54,28 @@ async function main() {
     contractAddr,
     LinkTokenABI,
     bob.address,
-    value,
+    value
   );
   console.log(receipt);
 
   console.log(
-    `Alice's balance using web3 ${await web3.eth.getBalance(alice.address)}`,
+    `Alice's balance using web3 ${await web3.eth.getBalance(alice.address)}`
   );
   console.log(
-    `Alice's ERC-20 token balance ${await getTokenBalance(web3, contractAddr, LinkTokenABI, alice.address)}`,
+    `Alice's ERC-20 token balance ${await getTokenBalance(
+      web3,
+      contractAddr,
+      LinkTokenABI,
+      alice.address
+    )}`
   );
   console.log(
-    `Bob's ERC-20 token balance ${await getTokenBalance(web3, contractAddr, LinkTokenABI, bob.address)}`,
+    `Bob's ERC-20 token balance ${await getTokenBalance(
+      web3,
+      contractAddr,
+      LinkTokenABI,
+      bob.address
+    )}`
   );
   process.exit(0);
 }

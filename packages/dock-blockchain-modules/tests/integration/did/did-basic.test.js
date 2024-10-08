@@ -100,7 +100,7 @@ describe("Basic DID tests", () => {
   test("Can create a DID", async () => {
     // DID does not exist
     await expect(
-      modules.did.dockOnly.getOnchainDidDetail(dockDid),
+      modules.did.dockOnly.getOnchainDidDetail(dockDid)
     ).rejects.toThrow(NoDIDError);
 
     const pair = new Ed25519Keypair(seed);
@@ -115,12 +115,12 @@ describe("Basic DID tests", () => {
     expect(didDetail.activeControllerKeys).toBe(1);
     expect(didDetail.activeControllers).toBe(1);
     await expect(
-      modules.did.dockOnly.isController(dockDid, dockDid),
+      modules.did.dockOnly.isController(dockDid, dockDid)
     ).resolves.toEqual(true);
 
     // DID cannot be fetched as off-chain DID
     await expect(
-      modules.did.dockOnly.getOffchainDidDetail(dockDid),
+      modules.did.dockOnly.getOffchainDidDetail(dockDid)
     ).rejects.toThrow(NoOffchainDIDError);
   }, 30000);
 
@@ -185,11 +185,11 @@ describe("Basic DID tests", () => {
     // DID removed
     await expect(modules.did.getDocument(dockDid)).rejects.toThrow(NoDIDError);
     await expect(
-      modules.did.dockOnly.getOnchainDidDetail(dockDid),
+      modules.did.dockOnly.getOnchainDidDetail(dockDid)
     ).rejects.toThrow(NoDIDError);
     await expect(modules.did.dockOnly.getDidKey(dockDid, 1)).rejects.toThrow();
     await expect(
-      modules.did.dockOnly.isController(dockDid, dockDid),
+      modules.did.dockOnly.isController(dockDid, dockDid)
     ).resolves.toEqual(false);
   });
 });

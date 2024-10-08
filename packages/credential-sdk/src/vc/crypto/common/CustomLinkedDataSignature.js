@@ -118,7 +118,9 @@ export default class CustomLinkedDataSignature extends jsigs.suites
       const encodedHeader = base64url.encode(JSON.stringify(header));
       const jwsData = createJws({ encodedHeader, verifyData });
       const signatureBytesJWS = await getSigBytes(jwsData);
-      finalProof.jws = `${encodedHeader}..${base64url.encode(signatureBytesJWS)}`;
+      finalProof.jws = `${encodedHeader}..${base64url.encode(
+        signatureBytesJWS,
+      )}`;
     }
 
     return finalProof;

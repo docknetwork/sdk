@@ -79,7 +79,7 @@ for (const {
       await chainModule.addParams(null, params1, did1, pair1);
       const paramsWritten1 = await chainModule.getParams(
         did1,
-        await chainModule.dockOnly.paramsCounter(did1),
+        await chainModule.dockOnly.paramsCounter(did1)
       );
       expect(paramsWritten1.bytes).toEqual(params1.bytes);
       expect(paramsWritten1.label).toEqual(params1.label);
@@ -98,7 +98,7 @@ for (const {
       await chainModule.addParams(null, params2, did2, pair2);
       const paramsWritten2 = await chainModule.getParams(
         did2,
-        await chainModule.dockOnly.paramsCounter(did2),
+        await chainModule.dockOnly.paramsCounter(did2)
       );
       expect(paramsWritten2.bytes).toEqual(params2.bytes);
       expect(paramsWritten2.label).toBe(null);
@@ -113,7 +113,7 @@ for (const {
       await chainModule.addParams(null, params3, did1, pair1);
       const paramsWritten3 = await chainModule.getParams(
         did1,
-        await chainModule.dockOnly.paramsCounter(did1),
+        await chainModule.dockOnly.paramsCounter(did1)
       );
       expect(paramsWritten3.bytes).toEqual(params3.bytes);
       expect(paramsWritten3.label).toEqual(params3.label);
@@ -145,11 +145,11 @@ for (const {
 
       const queriedParams1 = await chainModule.getParams(did1, 1);
       const params1Val = SignatureParams.valueFromBytes(
-        queriedParams1.bytes.bytes,
+        queriedParams1.bytes.bytes
       );
       const params1 = new SignatureParams(
         params1Val,
-        queriedParams1.label.bytes,
+        queriedParams1.label.bytes
       );
       keypair = KeyPair.generate(params1);
       const bytes2 = u8aToHex(keypair.publicKey.bytes);
@@ -169,24 +169,24 @@ for (const {
       expect(jsonKeyWithParams).toEqual(
         new OffchainSignaturePublicKeyValueWithParamsValue(
           queriedPk2.value,
-          queriedParams1.value,
-        ).toJSON(),
+          queriedParams1.value
+        ).toJSON()
       );
 
       const queriedPk2WithParams = await chainModule.getPublicKey(
         did2,
         2,
-        true,
+        true
       );
       expect(queriedPk2WithParams.params.eq(queriedParams1)).toBe(true);
 
       const queriedParams2 = await chainModule.getParams(did1, 2);
       const params2Val = SignatureParams.valueFromBytes(
-        queriedParams2.bytes.bytes,
+        queriedParams2.bytes.bytes
       );
       const params2 = new SignatureParams(
         params2Val,
-        queriedParams2.label.bytes,
+        queriedParams2.label.bytes
       );
       keypair = KeyPair.generate(params2);
       const bytes3 = u8aToHex(keypair.publicKey.bytes);
@@ -200,7 +200,7 @@ for (const {
       const queriedPk3WithParams = await chainModule.getPublicKey(
         did2,
         3,
-        true,
+        true
       );
       expect(queriedPk3WithParams.params.eq(queriedParams2)).toBe(true);
       const allPks = await getPublicKeysByDid(dock.api, DockDid.from(did2));
@@ -208,15 +208,15 @@ for (const {
         Object.values(allPks.toJSON()).map((keyWithParams) => {
           addParticipantIdIfNotPresent(keyWithParams[0]);
           return keyWithParams;
-        }),
+        })
       ).toEqual([
         new OffchainSignaturePublicKeyValueWithParamsValue(
           queriedPk2.value,
-          queriedParams1.value,
+          queriedParams1.value
         ).toJSON(),
         new OffchainSignaturePublicKeyValueWithParamsValue(
           queriedPk3.value,
-          queriedParams2.value,
+          queriedParams2.value
         ).toJSON(),
       ]);
     }, 30000);
@@ -226,7 +226,7 @@ for (const {
       expect(document1.verificationMethod.length).toEqual(2);
       expect(document1.assertionMethod.length).toEqual(2);
       expect(document1.verificationMethod[1].id.endsWith("#keys-2")).toEqual(
-        true,
+        true
       );
       expect(document1.verificationMethod[1].type).toEqual(VerKey);
       expect(document1.assertionMethod[1].endsWith("#keys-2")).toEqual(true);
@@ -235,11 +235,11 @@ for (const {
       expect(document2.verificationMethod.length).toEqual(3);
       expect(document2.assertionMethod.length).toEqual(3);
       expect(document2.verificationMethod[1].id.endsWith("#keys-2")).toEqual(
-        true,
+        true
       );
       expect(document2.verificationMethod[1].type).toEqual(VerKey);
       expect(document2.verificationMethod[2].id.endsWith("#keys-3")).toEqual(
-        true,
+        true
       );
       expect(document2.verificationMethod[2].type).toEqual(VerKey);
       expect(document2.assertionMethod[1].endsWith("#keys-2")).toEqual(true);
@@ -255,7 +255,7 @@ for (const {
       expect(document1.verificationMethod.length).toEqual(1);
       expect(document1.assertionMethod.length).toEqual(1);
       expect(document1.verificationMethod[0].id.endsWith("#keys-1")).toEqual(
-        true,
+        true
       );
       expect(document1.verificationMethod[0].type).not.toEqual(VerKey);
       expect(document1.assertionMethod[0].endsWith("#keys-1")).toEqual(true);
@@ -274,12 +274,12 @@ for (const {
       expect(document2.verificationMethod.length).toEqual(2);
       expect(document2.assertionMethod.length).toEqual(2);
       expect(document2.verificationMethod[0].id.endsWith("#keys-1")).toEqual(
-        true,
+        true
       );
       expect(document2.verificationMethod[0].type).not.toEqual(VerKey);
       expect(document2.assertionMethod[0].endsWith("#keys-1")).toEqual(true);
       expect(document2.verificationMethod[1].id.endsWith("#keys-3")).toEqual(
-        true,
+        true
       );
       expect(document2.verificationMethod[1].type).toEqual(VerKey);
       expect(document2.assertionMethod[1].endsWith("#keys-3")).toEqual(true);
@@ -292,7 +292,7 @@ for (const {
       expect(document2.verificationMethod.length).toEqual(1);
       expect(document2.assertionMethod.length).toEqual(1);
       expect(document2.verificationMethod[0].id.endsWith("#keys-1")).toEqual(
-        true,
+        true
       );
       expect(document2.verificationMethod[0].type).not.toEqual(VerKey);
       expect(document2.assertionMethod[0].endsWith("#keys-1")).toEqual(true);

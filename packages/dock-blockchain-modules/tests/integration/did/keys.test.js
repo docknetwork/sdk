@@ -60,7 +60,7 @@ describe("Key support for DIDs", () => {
       dockDid,
       [didKey1, didKey2, didKey3],
       [],
-      false,
+      false
     );
 
     const didDetail = await modules.did.dockOnly.getOnchainDidDetail(dockDid);
@@ -68,7 +68,7 @@ describe("Key support for DIDs", () => {
     expect(didDetail.activeControllerKeys).toBe(2);
     expect(didDetail.activeControllers).toBe(1);
     await expect(
-      modules.did.dockOnly.isController(dockDid, dockDid),
+      modules.did.dockOnly.isController(dockDid, dockDid)
     ).resolves.toEqual(true);
 
     for (const [i, pk] of [

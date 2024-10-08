@@ -98,7 +98,7 @@ const {
 
 if (!TargetAllValidatorsMatchingCriteria && TargetStashIds.length === 0) {
   throw new Error(
-    "No target validators were found. You can provide list of validator stash ids by specifying `TargetStashIds` or force all validators to be checked by setting `TargetAllValidatorsMatchingCriteria` to `true`",
+    "No target validators were found. You can provide list of validator stash ids by specifying `TargetStashIds` or force all validators to be checked by setting `TargetAllValidatorsMatchingCriteria` to `true`"
   );
 }
 
@@ -114,7 +114,7 @@ const main = withDockAPI(
       dock.api,
       StakingPayoutsAlarmEmailTo,
       initiator.address,
-      AlarmBalance,
+      AlarmBalance
     );
 
     console.log("Fetching eras info...");
@@ -126,7 +126,7 @@ const main = withDockAPI(
     try {
       needToRecheck = await timeout(
         IterationTimeout,
-        sendStakingPayouts(dock, erasInfo, initiator, BatchSize),
+        sendStakingPayouts(dock, erasInfo, initiator, BatchSize)
       );
     } catch (err) {
       needToRecheck = true;
@@ -139,7 +139,7 @@ const main = withDockAPI(
       console.log("Checking payouts again:");
       await timeout(
         IterationTimeout,
-        sendStakingPayouts(dock, erasInfo, initiator, 1),
+        sendStakingPayouts(dock, erasInfo, initiator, 1)
       );
     }
 
@@ -149,12 +149,12 @@ const main = withDockAPI(
         dock.api,
         StakingPayoutsAlarmEmailTo,
         initiator.address,
-        AlarmBalance,
+        AlarmBalance
       );
     }
 
     console.log("Done!");
-  },
+  }
 );
 
 /**
@@ -173,7 +173,7 @@ const main = withDockAPI(
  */
 const ensureCommissionLessOrEqualTo = curry(
   (maxCommission, stashId, { prefs }) =>
-    prefs.validators[stashId]?.commission?.toBn().lte(maxCommission),
+    prefs.validators[stashId]?.commission?.toBn().lte(maxCommission)
 );
 
 /**
@@ -193,20 +193,20 @@ async function sendStakingPayouts(dock, erasInfo, initiator, batchSize) {
     console.log(
       `- Payouts will be made to target validator stashes ${JSON.stringify([
         ...targetValidatorStashIds,
-      ])} and all validators matching criteria`,
+      ])} and all validators matching criteria`
     );
 
     validatorStashIds = pipe(
       values,
       pluck("validators"),
       chain(keys),
-      (valitors) => new Set(valitors),
+      (valitors) => new Set(valitors)
     )(erasInfo.pointsByEra);
   } else {
     console.log(
       `- Payouts will be made only to target validator stashes ${JSON.stringify(
-        [...targetValidatorStashIds],
-      )}`,
+        [...targetValidatorStashIds]
+      )}`
     );
     validatorStashIds = targetValidatorStashIds;
   }
@@ -220,20 +220,20 @@ async function sendStakingPayouts(dock, erasInfo, initiator, batchSize) {
   const erasToBePaid = await lastValueFrom(
     from(validatorStashIds).pipe(
       getUnclaimedStashesEras(dock.api, erasInfo),
-      toArray(),
-    ),
+      toArray()
+    )
   );
 
   // Payout validator if it's either in a target list or satisfies criteria.
   const checkValidator = either(
     (validatorStashId) => targetValidatorStashIds.has(validatorStashId),
-    ensureCommissionLessOrEqualTo(MaxCommission),
+    ensureCommissionLessOrEqualTo(MaxCommission)
   );
 
   const rewards = pipe(buildValidatorRewards, toPairs)(
     checkValidator,
     erasInfo,
-    erasToBePaid,
+    erasToBePaid
   );
 
   if (isEmpty(rewards)) {
@@ -246,7 +246,7 @@ async function sendStakingPayouts(dock, erasInfo, initiator, batchSize) {
   for (const [stashId, eras] of rewards) {
     const total = eras.reduce(
       (total, { reward }) => (total != null ? total.add(reward) : reward),
-      null,
+      null
     );
 
     console.log(` * To \`${stashId}\`: ${formatDock(total)}`);
@@ -270,7 +270,7 @@ async function sendStakingPayouts(dock, erasInfo, initiator, batchSize) {
       .map((payout) => payout.get("args"))
       .map(
         ({ validator_stash, era }) =>
-          `\`${validator_stash}\` rewarded for era ${era}`,
+          `\`${validator_stash}\` rewarded for era ${era}`
       )
       .join(isBatch ? ",\n    " : ",");
 
@@ -282,18 +282,18 @@ async function sendStakingPayouts(dock, erasInfo, initiator, batchSize) {
   const payoutTxs$ = from(rewards).pipe(
     concatMap(([stashId, eras]) => from(eras.map(assoc("stashId", stashId)))),
     mapRx(({ stashId, era }) =>
-      dock.api.tx.staking.payoutStakers(stashId, era),
+      dock.api.tx.staking.payoutStakers(stashId, era)
     ),
     batchExtrinsics(dock.api, batchSize),
     signAndSendExtrinsics(dock, initiator),
-    tap(logResult),
+    tap(logResult)
   );
 
   await new Promise((resolve, reject) =>
     payoutTxs$.subscribe({
       error: reject,
       complete: resolve,
-    }),
+    })
   );
 
   return true;
@@ -316,16 +316,16 @@ async function checkBalance(api, emailAddr, accountAddress, min) {
   if (balance.lt(min)) {
     console.error(
       `Balance of the \`${accountAddress}\` - ${formatDock(
-        balance,
-      )} is less than ${formatDock(min)}.`,
+        balance
+      )} is less than ${formatDock(min)}.`
     );
 
     await sendAlarmEmailText(
       emailAddr,
       "Low balance of the staking payouts sender",
       `Balance of the \`${accountAddress}\` - ${formatDock(
-        balance,
-      )} is less than ${formatDock(min)}.`,
+        balance
+      )} is less than ${formatDock(min)}.`
     );
 
     return false;
@@ -411,11 +411,11 @@ const getUnclaimedStashesEras = curry((api, { eras }, stashIds$) =>
         from(getUnclaimedStashEras(api, eras, stashId)).pipe(
           // Filter out stashes with no unclaimed eras
           filterRx(complement(isEmpty)),
-          mapRx(assoc("eras", __, { stashId })),
+          mapRx(assoc("eras", __, { stashId }))
         ),
-      ConcurrentRequestsLimit,
-    ),
-  ),
+      ConcurrentRequestsLimit
+    )
+  )
 );
 
 /**
@@ -458,12 +458,12 @@ const signAndSendExtrinsics = curry((dock, initiator, txs$) =>
               // Retry an observable after the given timeout
               return timer(RetryTimeout).pipe(concatMapTo(caught));
             }
-          }),
+          })
         );
 
       return txs$.pipe(mergeMap(sendExtrinsic, ConcurrentTxLimit));
-    }),
-  ),
+    })
+  )
 );
 
 /**
@@ -479,7 +479,7 @@ const buildValidatorRewards = curry(
   (
     checkValidatorInEra,
     { pointsByEra, rewardsByEra, prefsByEra },
-    validatorEras,
+    validatorEras
   ) => {
     const stashErasReducer = (acc, { eras, stashId }) => {
       const eraReducer = (acc, era) => {
@@ -526,9 +526,9 @@ const buildValidatorRewards = curry(
       // Filter out stashes with no rewards
       reject(isEmpty),
       // Reduce given stash eras by the stash id
-      reduceBy(stashErasReducer, [], prop("stashId")),
+      reduceBy(stashErasReducer, [], prop("stashId"))
     )(validatorEras);
-  },
+  }
 );
 
 export const handler = async () => {

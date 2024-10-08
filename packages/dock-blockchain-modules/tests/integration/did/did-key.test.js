@@ -51,12 +51,13 @@ describe("Basic DID tests", () => {
   test("Can create a did:key", async () => {
     // DID does not exist
     await expect(
-      modules.did.dockOnly.getDidMethodKeyDetail(testDidMethodKey2),
+      modules.did.dockOnly.getDidMethodKeyDetail(testDidMethodKey2)
     ).rejects.toThrow(NoDIDError);
 
     await modules.did.dockOnly.newDidMethodKey(testDidMethodKey2, false);
-    const { nonce } =
-      await modules.did.dockOnly.getDidMethodKeyDetail(testDidMethodKey2);
+    const { nonce } = await modules.did.dockOnly.getDidMethodKeyDetail(
+      testDidMethodKey2
+    );
     expect(+nonce).toBeGreaterThan(1);
     expect(testDidMethodKey2.toString().startsWith("did:key:z")).toBe(true);
   }, 30000);
@@ -67,7 +68,7 @@ describe("Basic DID tests", () => {
     await modules.attest.setClaim(
       iri,
       testDidMethodKey1,
-      DidKeypair.didMethodKey(testDidMethodKeyPair1),
+      DidKeypair.didMethodKey(testDidMethodKeyPair1)
     );
 
     const att1 = await modules.attest.getAttests(testDidMethodKey1);
@@ -76,7 +77,7 @@ describe("Basic DID tests", () => {
     await modules.attest.setClaim(
       iri,
       testDidMethodKey2,
-      DidKeypair.didMethodKey(testDidMethodKeyPair2),
+      DidKeypair.didMethodKey(testDidMethodKeyPair2)
     );
 
     const att2 = await modules.attest.getAttests(testDidMethodKey2);
@@ -86,24 +87,24 @@ describe("Basic DID tests", () => {
   test("Conversion works properly (including SS58 format)", () => {
     const substrateDid1 = dock.api.createType(
       "DidOrDidMethodKey",
-      testDidMethodKey1,
+      testDidMethodKey1
     );
     expect(DockDidOrDidMethodKey.from(substrateDid1)).toEqual(
-      testDidMethodKey1,
+      testDidMethodKey1
     );
     expect(testDidMethodKey1).toEqual(
-      DockDidOrDidMethodKey.from(testDidMethodKey1),
+      DockDidOrDidMethodKey.from(testDidMethodKey1)
     );
 
     const substrateDid2 = dock.api.createType(
       "DidOrDidMethodKey",
-      testDidMethodKey2,
+      testDidMethodKey2
     );
     expect(DockDidOrDidMethodKey.from(substrateDid2)).toEqual(
-      testDidMethodKey2,
+      testDidMethodKey2
     );
     expect(testDidMethodKey2).toEqual(
-      DockDidOrDidMethodKey.from(testDidMethodKey2),
+      DockDidOrDidMethodKey.from(testDidMethodKey2)
     );
   });
 });

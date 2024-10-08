@@ -44,7 +44,7 @@ export function keyDocToKeypair(keyDoc, dock) {
         secretKey: privateKeyBytes,
       },
       {},
-      keyType,
+      keyType
     );
   }
 }

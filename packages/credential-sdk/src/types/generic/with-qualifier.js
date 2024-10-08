@@ -32,11 +32,11 @@ export default function withQualifier(klass, wrapper = false) {
             this.Qualifier ??
               this.Variants.flatMap((variant) =>
                 [].concat(
-                  (variant.Qualifier ?? variant !== this)
+                  variant.Qualifier ?? variant !== this
                     ? variant.Qualifiers
-                    : [],
-                ),
-              ),
+                    : []
+                )
+              )
           );
         }
 
@@ -59,7 +59,9 @@ export default function withQualifier(klass, wrapper = false) {
           }
 
           throw new Error(
-            `Unsupported qualified string: \`${value}\`, expected with either prefix: ${fmtIter(this.Qualifiers)}`,
+            `Unsupported qualified string: \`${value}\`, expected with either prefix: ${fmtIter(
+              this.Qualifiers
+            )}`
           );
         }
 
@@ -75,7 +77,7 @@ export default function withQualifier(klass, wrapper = false) {
 
         static fromUnqualifiedString(str) {
           throw new Error(
-            `Can't build an instance of \`${this.name}\` from unqualified string: ${ID_STR}`,
+            `Can't build an instance of \`${this.name}\` from unqualified string: ${ID_STR}`
           );
         }
 
@@ -171,8 +173,8 @@ export default function withQualifier(klass, wrapper = false) {
         ["toEncodedString"],
         withExtendedStaticProperties(
           ["Qualifier", "fromUnqualifiedString"],
-          classes[name],
-        ),
+          classes[name]
+        )
       ),
       function (value, from) {
         if (typeof value === "string" || value instanceof TypedString) {
@@ -184,7 +186,7 @@ export default function withQualifier(klass, wrapper = false) {
         } else {
           return from(value);
         }
-      },
+      }
     );
   }
 }

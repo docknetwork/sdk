@@ -113,23 +113,23 @@ for (const {
         revealedAttrIndices.add(1);
         const [revealedAttrs, unrevealedAttrs] = getRevealedUnrevealed(
           encodedAttrs,
-          revealedAttrIndices,
+          revealedAttrIndices
         );
 
         const queriedPk = await getModule(dock).getPublicKey(
           issuerDid,
           2,
-          true,
+          true
         );
         const sigParams = new SignatureParams(
-          SignatureParams.valueFromBytes(queriedPk.params.bytes),
+          SignatureParams.valueFromBytes(queriedPk.params.bytes)
         );
         const sigPk = new PublicKey(queriedPk.bytes.bytes);
 
         const accum = await modules.accumulator.getAccumulator(
           accumulatorId,
           true,
-          true,
+          true
         );
         const accumParams = new AccumulatorParams(accum.publicKey.params.bytes);
         const accumPk = new AccumulatorPublicKey(accum.publicKey.bytes.bytes);
@@ -142,14 +142,14 @@ for (const {
                 sigParams,
                 sigPk.adaptForLess(sigParams.supportedMessageCount()),
                 revealedAttrs,
-                false,
+                false
               )
             : buildProverStatement(sigParams, revealedAttrs, false);
         const statement2 = Statement.vbAccumulatorMembership(
           accumParams,
           accumPk,
           provingKey,
-          accumulated,
+          accumulated
         );
         const statements = new Statements();
         statements.add(statement1);
@@ -169,13 +169,13 @@ for (const {
           statements,
           metaStatements,
           [],
-          context,
+          context
         );
 
         const witness1 = buildWitness(signature, unrevealedAttrs, false);
         const witness2 = Witness.vbAccumulatorMembership(
           encodedAttrs[attributeCount - 1],
-          membershipWitness,
+          membershipWitness
         );
         const witnesses = new Witnesses();
         witnesses.add(witness1);
@@ -189,7 +189,7 @@ for (const {
                 ? sigPk.adaptForLess(sigParams.supportedMessageCount())
                 : sigPk,
               revealedAttrs,
-              false,
+              false
             )
           : buildVerifierStatement(sigParams, revealedAttrs, false);
         const verifierStatements = new Statements();
@@ -200,7 +200,7 @@ for (const {
           verifierStatements,
           metaStatements,
           [],
-          context,
+          context
         );
         expect(proof.verify(verifierProofSpec).verified).toEqual(true);
       }
@@ -218,12 +218,12 @@ for (const {
         accumulatorManagerDid = DockDid.random();
         accumulatorManagerKeypair = new DidKeypair(
           [accumulatorManagerDid, 1],
-          Ed25519Keypair.random(),
+          Ed25519Keypair.random()
         );
         await registerNewDIDUsingPair(
           dock,
           accumulatorManagerDid,
-          accumulatorManagerKeypair,
+          accumulatorManagerKeypair
         );
         await initializeWasm();
       }, 20000);
@@ -231,13 +231,13 @@ for (const {
       test("Create params", async () => {
         const label = stringToHex("My params");
         const bytes = u8aToHex(
-          SignatureParams.generate(attributeCount, hexToU8a(label)).toBytes(),
+          SignatureParams.generate(attributeCount, hexToU8a(label)).toBytes()
         );
         const params = Module.prepareAddParameters(bytes, label);
         await getModule(dock).addParams(null, params, issuerDid, issuerKeypair);
         const paramsWritten = await getModule(dock).getParams(
           issuerDid,
-          await getModule(dock).dockOnly.paramsCounter(issuerDid),
+          await getModule(dock).dockOnly.paramsCounter(issuerDid)
         );
         expect(paramsWritten.bytes).toEqual(params.bytes);
         expect(paramsWritten.label).toEqual(params.label);
@@ -246,17 +246,17 @@ for (const {
       test("Create keypair", async () => {
         const queriedParams = await getModule(dock).getParams(issuerDid, 1);
         const paramsVal = SignatureParams.valueFromBytes(
-          queriedParams.bytes.bytes,
+          queriedParams.bytes.bytes
         );
         const params = new SignatureParams(
           paramsVal,
-          queriedParams.label.bytes,
+          queriedParams.label.bytes
         );
         issuerBbsPlusKeypair = KeyPair.generate(params);
 
         const pk = Module.prepareAddPublicKey(
           u8aToHex(issuerBbsPlusKeypair.publicKey.bytes),
-          [issuerDid, 1],
+          [issuerDid, 1]
         );
         await getModule(dock).addPublicKey(null, pk, issuerDid, issuerKeypair);
       }, 10000);
@@ -264,23 +264,23 @@ for (const {
       test("Create Accumulator params", async () => {
         const label = stringToHex("My Accumulator params");
         const bytes = u8aToHex(
-          Accumulator.generateParams(hexToU8a(label)).bytes,
+          Accumulator.generateParams(hexToU8a(label)).bytes
         );
         const params = AbstractAccumulatorModule.prepareAddParameters(
           bytes,
-          label,
+          label
         );
         await modules.accumulator.addParams(
           null,
           params,
           accumulatorManagerDid,
-          accumulatorManagerKeypair,
+          accumulatorManagerKeypair
         );
         const paramsWritten = await modules.accumulator.getParams(
           accumulatorManagerDid,
           await modules.accumulator.dockOnly.paramsCounter(
-            accumulatorManagerDid,
-          ),
+            accumulatorManagerDid
+          )
         );
         expect(paramsWritten.bytes).toEqual(params.bytes);
         expect(paramsWritten.label).toEqual(params.label);
@@ -289,33 +289,33 @@ for (const {
       test("Create Accumulator keypair", async () => {
         const queriedParams = await modules.accumulator.getParams(
           accumulatorManagerDid,
-          1,
+          1
         );
         accumulatorKeypair = Accumulator.generateKeypair(
           new AccumulatorParams(queriedParams.bytes.bytes),
-          hexToU8a(seedAccum),
+          hexToU8a(seedAccum)
         );
 
         const pk = AbstractAccumulatorModule.prepareAddPublicKey(
           u8aToHex(accumulatorKeypair.publicKey.bytes),
-          [accumulatorManagerDid, 1],
+          [accumulatorManagerDid, 1]
         );
         await modules.accumulator.addPublicKey(
           null,
           pk,
           accumulatorManagerDid,
-          accumulatorManagerKeypair,
+          accumulatorManagerKeypair
         );
       }, 10000);
 
       test("Create Accumulator", async () => {
         const queriedParams = await modules.accumulator.getParams(
           accumulatorManagerDid,
-          1,
+          1
         );
         accumulator = PositiveAccumulator.initialize(
           new AccumulatorParams(queriedParams.bytes.bytes),
-          accumulatorKeypair.secretKey,
+          accumulatorKeypair.secretKey
         );
 
         accumulatorId = DockAccumulatorId.random(accumulatorManagerDid);
@@ -324,7 +324,7 @@ for (const {
           accumulatorId,
           accumulated,
           [accumulatorManagerDid, 1],
-          accumulatorManagerKeypair,
+          accumulatorManagerKeypair
         );
       }, 10000);
 
@@ -333,20 +333,20 @@ for (const {
         const queriedPk = await getModule(dock).getPublicKey(
           issuerDid,
           2,
-          true,
+          true
         );
         const paramsVal = SignatureParams.valueFromBytes(
-          queriedPk.params.bytes.bytes,
+          queriedPk.params.bytes.bytes
         );
         const params = new SignatureParams(
           paramsVal,
-          queriedPk.params.label.bytes,
+          queriedPk.params.label.bytes
         );
         signature = Signature.generate(
           encodedAttrs,
           issuerBbsPlusKeypair.secretKey,
           params,
-          false,
+          false
         );
 
         // User verifies the credential (signature)
@@ -354,7 +354,7 @@ for (const {
           encodedAttrs,
           new PublicKey(queriedPk.bytes.bytes),
           params,
-          false,
+          false
         );
         expect(result.verified).toEqual(true);
       });
@@ -364,16 +364,16 @@ for (const {
         await accumulator.add(
           encodedAttrs[attributeCount - 1],
           accumulatorKeypair.secretKey,
-          accumulatorState,
+          accumulatorState
         );
         await expect(
-          accumulatorState.has(encodedAttrs[attributeCount - 1]),
+          accumulatorState.has(encodedAttrs[attributeCount - 1])
         ).resolves.toEqual(true);
 
         membershipWitness = await accumulator.membershipWitness(
           encodedAttrs[attributeCount - 1],
           accumulatorKeypair.secretKey,
-          accumulatorState,
+          accumulatorState
         );
 
         const accumulated = u8aToHex(accumulator.accumulated);
@@ -381,26 +381,26 @@ for (const {
           accumulatorId,
           accumulated,
           { additions: [u8aToHex(encodedAttrs[attributeCount - 1])] },
-          accumulatorManagerKeypair,
+          accumulatorManagerKeypair
         );
 
         const queriedAccum = await modules.accumulator.getAccumulator(
           accumulatorId,
           true,
-          true,
+          true
         );
         expect(queriedAccum.accumulated.value).toEqual(accumulated);
 
         const tempAccumulator = PositiveAccumulator.fromAccumulated(
-          queriedAccum.accumulated.bytes,
+          queriedAccum.accumulated.bytes
         );
         expect(
           tempAccumulator.verifyMembershipWitness(
             encodedAttrs[attributeCount - 1],
             membershipWitness,
             new AccumulatorPublicKey(queriedAccum.publicKey.bytes.bytes),
-            new AccumulatorParams(queriedAccum.publicKey.params.bytes),
-          ),
+            new AccumulatorParams(queriedAccum.publicKey.params.bytes)
+          )
         ).toEqual(true);
       }, 20000);
 
@@ -417,18 +417,18 @@ for (const {
         await accumulator.addBatch(
           [member1, member2],
           accumulatorKeypair.secretKey,
-          accumulatorState,
+          accumulatorState
         );
 
         let accum = await modules.accumulator.getAccumulator(
           accumulatorId,
-          false,
+          false
         );
         const witnessUpdInfo = VBWitnessUpdateInfo.new(
           accum.accumulated.bytes,
           [member1, member2],
           [],
-          accumulatorKeypair.secretKey,
+          accumulatorKeypair.secretKey
         );
         await modules.accumulator.updateAccumulator(
           accumulatorId,
@@ -437,17 +437,17 @@ for (const {
             additions: [u8aToHex(member1), u8aToHex(member2)],
             witnessUpdateInfo: u8aToHex(witnessUpdInfo.value),
           },
-          accumulatorManagerKeypair,
+          accumulatorManagerKeypair
         );
 
         accum = await modules.accumulator.getAccumulator(accumulatorId, false);
         const updates = await modules.accumulator.dockOnly.getUpdatesFromBlock(
           accumulatorId,
-          accum.lastModified,
+          accum.lastModified
         );
         expect(updates.length).toEqual(1);
         const queriedWitnessInfo = new VBWitnessUpdateInfo(
-          updates[0].witnessUpdateInfo.bytes,
+          updates[0].witnessUpdateInfo.bytes
         );
         const additions = [];
         const removals = [];
@@ -465,24 +465,24 @@ for (const {
           encodedAttrs[attributeCount - 1],
           additions,
           removals,
-          queriedWitnessInfo,
+          queriedWitnessInfo
         );
 
         const queriedAccum = await modules.accumulator.getAccumulator(
           accumulatorId,
           true,
-          true,
+          true
         );
         const tempAccumulator = PositiveAccumulator.fromAccumulated(
-          queriedAccum.accumulated.bytes,
+          queriedAccum.accumulated.bytes
         );
         expect(
           tempAccumulator.verifyMembershipWitness(
             encodedAttrs[attributeCount - 1],
             membershipWitness,
             new AccumulatorPublicKey(queriedAccum.publicKey.bytes.bytes),
-            new AccumulatorParams(queriedAccum.publicKey.params.bytes),
-          ),
+            new AccumulatorParams(queriedAccum.publicKey.params.bytes)
+          )
         ).toEqual(true);
       });
 
@@ -509,18 +509,18 @@ for (const {
           [member3, member4],
           [member1, member2],
           accumulatorKeypair.secret_key,
-          accumulatorState,
+          accumulatorState
         );
 
         let accum = await modules.accumulator.getAccumulator(
           accumulatorId,
-          false,
+          false
         );
         let witnessUpdInfo = VBWitnessUpdateInfo.new(
           accum.accumulated.bytes,
           [member3, member4],
           [member1, member2],
-          accumulatorKeypair.secretKey,
+          accumulatorKeypair.secretKey
         );
         await modules.accumulator.updateAccumulator(
           accumulatorId,
@@ -530,7 +530,7 @@ for (const {
             removals: [u8aToHex(member1), u8aToHex(member2)],
             witnessUpdateInfo: u8aToHex(witnessUpdInfo.value),
           },
-          accumulatorManagerKeypair,
+          accumulatorManagerKeypair
         );
 
         const member5 =
@@ -541,7 +541,7 @@ for (const {
           [member5, member6],
           [member4],
           accumulatorKeypair.secret_key,
-          accumulatorState,
+          accumulatorState
         );
 
         accum = await modules.accumulator.getAccumulator(accumulatorId, false);
@@ -550,7 +550,7 @@ for (const {
           accum.accumulated.bytes,
           [member5, member6],
           [member4],
-          accumulatorKeypair.secretKey,
+          accumulatorKeypair.secretKey
         );
         await modules.accumulator.updateAccumulator(
           accumulatorId,
@@ -560,7 +560,7 @@ for (const {
             removals: [u8aToHex(member4)],
             witnessUpdateInfo: u8aToHex(witnessUpdInfo.value),
           },
-          accumulatorManagerKeypair,
+          accumulatorManagerKeypair
         );
 
         const member7 =
@@ -573,7 +573,7 @@ for (const {
         await accumulator.addBatch(
           [member7, member8, member9],
           accumulatorKeypair.secret_key,
-          accumulatorState,
+          accumulatorState
         );
 
         accum = await modules.accumulator.getAccumulator(accumulatorId, false);
@@ -581,7 +581,7 @@ for (const {
           accum.accumulated.bytes,
           [member7, member8, member9],
           [],
-          accumulatorKeypair.secretKey,
+          accumulatorKeypair.secretKey
         );
         await modules.accumulator.updateAccumulator(
           accumulatorId,
@@ -595,13 +595,13 @@ for (const {
             removals: [],
             witnessUpdateInfo: u8aToHex(witnessUpdInfo.value),
           },
-          accumulatorManagerKeypair,
+          accumulatorManagerKeypair
         );
 
         accum = await modules.accumulator.getAccumulator(
           accumulatorId,
           true,
-          true,
+          true
         );
 
         const latestUpdateBlockNo = accum.lastModified;
@@ -612,12 +612,12 @@ for (const {
           const evs = await getAllEventsFromBlock(
             dock.api,
             currentBlockNo,
-            false,
+            false
           );
           for (const event of evs) {
             const ret =
               DockInternalAccumulatorModule.parseEventAsAccumulatorUpdate(
-                event.event,
+                event.event
               );
             // console.log(ret?.toJSON(), accumulatorId.toJSON());
             if (ret !== null && accumulatorId[1].eq(ret[0])) {
@@ -633,10 +633,10 @@ for (const {
           const updates =
             await modules.accumulator.dockOnly.getUpdatesFromBlock(
               accumulatorId,
-              blockNo,
+              blockNo
             );
           const wi = new VBWitnessUpdateInfo(
-            updates[0].witnessUpdateInfo.bytes,
+            updates[0].witnessUpdateInfo.bytes
           );
           updateInfo.push(wi);
         }
@@ -649,19 +649,19 @@ for (const {
             [member7, member8, member9],
           ],
           [[member1, member2], [member4], []],
-          [updateInfo[0], updateInfo[1], updateInfo[2]],
+          [updateInfo[0], updateInfo[1], updateInfo[2]]
         );
 
         const tempAccumulator = PositiveAccumulator.fromAccumulated(
-          accum.accumulated.bytes,
+          accum.accumulated.bytes
         );
         expect(
           tempAccumulator.verifyMembershipWitness(
             encodedAttrs[attributeCount - 1],
             membershipWitness,
             new AccumulatorPublicKey(accum.publicKey.bytes.bytes),
-            new AccumulatorParams(accum.publicKey.params.bytes.bytes),
-          ),
+            new AccumulatorParams(accum.publicKey.params.bytes.bytes)
+          )
         ).toEqual(true);
       }, 30000);
 
@@ -673,17 +673,17 @@ for (const {
         const encodedAttrs = encodedAttributes(attributes);
         await accumulator.remove(
           encodedAttrs[attributeCount - 1],
-          accumulatorKeypair.secretKey,
+          accumulatorKeypair.secretKey
         );
         const accum = await modules.accumulator.getAccumulator(
           accumulatorId,
-          false,
+          false
         );
         const witnessUpdInfo = VBWitnessUpdateInfo.new(
           accum.accumulated.bytes,
           [],
           [encodedAttrs[attributeCount - 1]],
-          accumulatorKeypair.secretKey,
+          accumulatorKeypair.secretKey
         );
         await modules.accumulator.updateAccumulator(
           accumulatorId,
@@ -693,7 +693,7 @@ for (const {
             removals: [u8aToHex(encodedAttrs[attributeCount - 1])],
             witnessUpdateInfo: u8aToHex(witnessUpdInfo.value),
           },
-          accumulatorManagerKeypair,
+          accumulatorManagerKeypair
         );
       });
 
@@ -701,23 +701,23 @@ for (const {
         const encodedAttrs = encodedAttributes(attributes);
         const accum = await modules.accumulator.getAccumulator(
           accumulatorId,
-          false,
+          false
         );
         const updates = await modules.accumulator.dockOnly.getUpdatesFromBlock(
           accumulatorId,
-          accum.lastModified,
+          accum.lastModified
         );
         expect(updates.length).toEqual(1);
         const queriedWitnessInfo = new VBWitnessUpdateInfo(
-          updates[0].witnessUpdateInfo.bytes,
+          updates[0].witnessUpdateInfo.bytes
         );
         expect(() =>
           membershipWitness.updateUsingPublicInfoPostBatchUpdate(
             encodedAttrs[attributeCount - 1],
             [],
             [hexToU8a(updates[0].removals[0])],
-            queriedWitnessInfo,
-          ),
+            queriedWitnessInfo
+          )
         ).toThrow();
       });
 
@@ -734,6 +734,6 @@ for (const {
       afterAll(async () => {
         await dock.disconnect();
       }, 10000);
-    },
+    }
   );
 }

@@ -59,7 +59,7 @@
   "scripts": {
     "build": "rollup -c",
     "lint": "eslint \"src/**/*.js\"",
-    "docs": "rm -rf out && mkdir out && touch out/.nojekyll && jsdoc src -r -c .jsdoc -d out/reference",
+    "docs": "rm -rf out && mkdir out && touch out/.nojekyll && jsdoc src -r -c ../../.jsdoc -d out/reference",
     "prepublishOnly": "yarn build",
     "dev-node": "../../scripts/run_dock_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
     "test": "LOG_STATE_CHANGE=1 NODE_ENV=production jest --verbose --runInBand --forceExit ./tests/*",

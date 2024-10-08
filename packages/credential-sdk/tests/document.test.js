@@ -47,8 +47,8 @@ describe("`DIDDocument`", () => {
         "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
         [],
         [],
-        [],
-      ),
+        []
+      )
     ).toMatchSnapshot();
 
     expect(
@@ -65,8 +65,8 @@ describe("`DIDDocument`", () => {
           new DidKey(RANDOM_PKS[7], KEY_AGR),
         ],
         ["did:key:z6MktvqCyLxTsXUH1tUZncNdVeEZ7hNh7npPRbUU27GTrYb8"],
-        [],
-      ),
+        []
+      )
     ).toMatchSnapshot();
 
     expect(
@@ -75,8 +75,8 @@ describe("`DIDDocument`", () => {
         [],
         [],
         [],
-        { context: ["overriden"] },
-      ),
+        { context: ["overriden"] }
+      )
     ).toMatchSnapshot();
   });
 });

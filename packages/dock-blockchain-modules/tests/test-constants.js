@@ -61,11 +61,11 @@ function fromEnv(varName, defaultVal) {
 
 export const FullNodeEndpoint = fromEnv(
   "FullNodeEndpoint",
-  DefaultFullNodeEndpoint,
+  DefaultFullNodeEndpoint
 );
 export const FullNodeTCPEndpoint = fromEnv(
   "FullNodeTCPEndpoint",
-  DefaultFullNodeTCPEndpoint,
+  DefaultFullNodeTCPEndpoint
 );
 export const TestKeyringOpts = {
   type: fromEnv("TestKeyringType", DefaultTestKeyringType),
@@ -73,13 +73,13 @@ export const TestKeyringOpts = {
 export const TestAccountURI = fromEnv("TestAccountURI", DefaultTestAccountURI);
 export const TestAccountCouncilMemberURI = fromEnv(
   "TestAccountCouncilMemberURI",
-  DefaultTestAccountCouncilMemberURI,
+  DefaultTestAccountCouncilMemberURI
 );
 export const MinGasPrice = fromEnv("MinGasPrice", DefaultMinGasPrice);
 export const MaxGas = fromEnv("MaxGas", DefaultMaxGas);
 export const TestSchemes = fromEnv("TestSchemes", DefaultTestSchemes);
 export const DisableTrustRegistryParticipantsTests = boolEnv(
-  fromEnv("DisableTrustRegistryParticipantsTests", "false"),
+  fromEnv("DisableTrustRegistryParticipantsTests", "false")
 );
 
 export const BBS = {
@@ -97,7 +97,7 @@ export const BBS = {
   CryptoKeyPair: Bls12381BBSKeyPairDock2023,
   derivedToAnoncredsPresentation:
     Bls12381BBSSignatureProofDock2023.derivedToAnoncredsPresentation.bind(
-      Bls12381BBSSignatureProofDock2023,
+      Bls12381BBSSignatureProofDock2023
     ),
   SigType: "Bls12381BBSSignatureDock2023",
   Context: "https://ld.dock.io/security/bbs23/v1",
@@ -123,7 +123,7 @@ export const BBSPlus = {
   CryptoKeyPair: Bls12381G2KeyPairDock2022,
   derivedToAnoncredsPresentation:
     Bls12381BBSSignatureProofDock2022.derivedToAnoncredsPresentation.bind(
-      Bls12381BBSSignatureProofDock2022,
+      Bls12381BBSSignatureProofDock2022
     ),
   Context: "https://ld.dock.io/security/bbs/v1",
   VerKey: "Bls12381G2VerificationKeyDock2022",
@@ -149,7 +149,7 @@ export const PS = {
   CryptoKeyPair: Bls12381PSKeyPairDock2023,
   derivedToAnoncredsPresentation:
     Bls12381PSSignatureProofDock2023.derivedToAnoncredsPresentation.bind(
-      Bls12381PSSignatureProofDock2023,
+      Bls12381PSSignatureProofDock2023
     ),
   SigType: "Bls12381PSSignatureDock2023",
   Context: "https://ld.dock.io/security/ps/v1",
@@ -176,7 +176,7 @@ export const BBDT16 = {
   CryptoKeyPair: Bls12381BBDT16KeyPairDock2024,
   derivedToAnoncredsPresentation:
     Bls12381BBDT16MACProofDock2024.derivedToAnoncredsPresentation.bind(
-      Bls12381BBDT16MACProofDock2024,
+      Bls12381BBDT16MACProofDock2024
     ),
   SigType: "Bls12381BBDT16MACDock2024",
   Context: "https://ld.dock.io/security/bbdt16/v1",
@@ -193,7 +193,7 @@ export const AllSchemes = Object.setPrototypeOf(
     PS,
     BBDT16,
   },
-  null,
+  null
 );
 
 export const Schemes = TestSchemes.split(",").map((key) => {

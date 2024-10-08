@@ -21,7 +21,7 @@ export async function documentLoader(url) {
     console.warn(
       "Unit test is making web requests. This is slow. Please update ./test/network-cache.js",
       "with: ",
-      JSON.stringify({ [url]: documentRegistry[url] }, null, 2),
+      JSON.stringify({ [url]: documentRegistry[url] }, null, 2)
     );
   }
   return {

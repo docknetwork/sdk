@@ -39,7 +39,7 @@ describe("DIDModule", () => {
     await didModule.createDocument(document, didKeypair);
 
     expect((await didModule.getDocument(did)).toJSON()).toEqual(
-      document.toJSON(),
+      document.toJSON()
     );
 
     const iri = "some iri";
@@ -48,7 +48,7 @@ describe("DIDModule", () => {
     expect((await attestModule.getAttests(did)).toString()).toBe(iri);
     document.setAttests(iri);
     expect((await didModule.getDocument(did)).toJSON()).toEqual(
-      document.toJSON(),
+      document.toJSON()
     );
 
     const iri2 = "other iri";
@@ -57,7 +57,7 @@ describe("DIDModule", () => {
     expect((await attestModule.getAttests(did)).toString()).toBe(iri2);
     document.setAttests(iri2);
     expect((await didModule.getDocument(did)).toJSON()).toEqual(
-      document.toJSON(),
+      document.toJSON()
     );
   });
 });

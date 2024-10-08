@@ -88,7 +88,7 @@ describe("Crawler", () => {
     const resolveGraph = graphResolver(
       ipfsClient,
       documentLoader,
-      (term, _err) => failedLookups.push(term),
+      (term, _err) => failedLookups.push(term)
     );
     const initialFacts = await resolveGraph({ Iri: "did:root" });
     const allFacts = await crawl(
@@ -96,7 +96,7 @@ describe("Crawler", () => {
       RULES,
       CURIOSITY,
       resolveGraph,
-      newEngine(),
+      newEngine()
     );
     expect(failedLookups).toEqual([{ Iri: "did:c" }]);
     expect(allFacts).toEqual([

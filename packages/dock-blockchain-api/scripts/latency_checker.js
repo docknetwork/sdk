@@ -48,7 +48,7 @@ async function main(countReqs) {
   const mean = Math.round(total / durations.length);
   const med = median(durations);
   console.log(
-    `After sending ${durations.length} requests, mean latency is ${mean}ms and median is ${med}ms`,
+    `After sending ${durations.length} requests, mean latency is ${mean}ms and median is ${med}ms`
   );
   process.exit(1);
 }

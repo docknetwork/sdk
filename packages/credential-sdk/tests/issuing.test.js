@@ -62,14 +62,14 @@ testingKeys.forEach((testKey) => {
     test("Issuing should return an object with a proof, and it must pass validation.", async () => {
       const credential = await issueCredential(
         testKey.keyDocument,
-        getSampleCredential(),
+        getSampleCredential()
       );
       expect(credential.id).toBe("https://example.com/credentials/1872");
       expect(credential.type).toContain("VerifiableCredential");
       expect(credential.type).toContain("AlumniCredential");
       expect(credential.issuanceDate).toBe(issuanceDate);
       expect(credential.credentialSubject.id).toBe(
-        "did:example:ebfeb1f712ebc6f1c276e12ec21",
+        "did:example:ebfeb1f712ebc6f1c276e12ec21"
       );
       expect(credential.credentialSubject.alumniOf).toBe("Example University");
       expect(credential.issuer).toBe(controllerUrl);
@@ -99,7 +99,7 @@ testingKeys.forEach((testKey) => {
           null,
           null,
           false,
-          "proofValue",
+          "proofValue"
         );
         expect(credential.proof.proofValue).toBeDefined();
         const result = await verifyCredential(credential);
@@ -117,7 +117,7 @@ testingKeys.forEach((testKey) => {
         null,
         null,
         false,
-        "jwt",
+        "jwt"
       );
       expect(typeof credential).toEqual("string");
       const result = await verifyCredential(credential);
@@ -127,7 +127,7 @@ testingKeys.forEach((testKey) => {
     test("Tampered Credential should not pass validation.", async () => {
       const credential = await issueCredential(
         testKey.keyDocument,
-        getSampleCredential(),
+        getSampleCredential()
       );
       credential.issuanceDate = "9020-04-15T09:05:35Z";
       const result = await verifyCredential(credential);
@@ -167,7 +167,7 @@ testingKeys.forEach((testKey) => {
     beforeAll(async () => {
       const sampleIssuedCredential = await issueCredential(
         testKey.keyDocument,
-        getSampleCredential(),
+        getSampleCredential()
       );
       presentationCredentials = [
         sampleIssuedCredential,
@@ -180,7 +180,7 @@ testingKeys.forEach((testKey) => {
         getSamplePres(presentationCredentials),
         testKey.keyDocument,
         "some_challenge",
-        "some_domain",
+        "some_domain"
       );
 
       const results = await verifyPresentation(signedVp, {
@@ -194,16 +194,16 @@ testingKeys.forEach((testKey) => {
       // expect(results.presentationResult.results[0].proof['@context']).toBe('https://w3id.org/security/v2');
       expect(results.presentationResult.results[0].proof.type).toBe(sigType);
       expect(results.presentationResult.results[0].proof.challenge).toBe(
-        "some_challenge",
+        "some_challenge"
       );
       expect(results.presentationResult.results[0].proof.domain).toBe(
-        "some_domain",
+        "some_domain"
       );
       expect(results.presentationResult.results[0].proof.proofPurpose).toBe(
-        "authentication",
+        "authentication"
       );
       expect(
-        results.presentationResult.results[0].proof.verificationMethod,
+        results.presentationResult.results[0].proof.verificationMethod
       ).toBe(keyUrl);
       expect(results.presentationResult.results[0].verified).toBe(true);
       expect(results.credentialResults[0].verified).toBe(true);
@@ -237,7 +237,7 @@ testingKeys.forEach((testKey) => {
       const credential = new VerifiableCredential(sampleId);
       const credentialJSON = credential.toJSON();
       expect(credentialJSON["@context"]).toContain(
-        "https://www.w3.org/2018/credentials/v1",
+        "https://www.w3.org/2018/credentials/v1"
       );
       expect(credentialJSON.id).toBe(sampleId);
       expect(credentialJSON.credentialSubject).toEqual([]);
@@ -347,19 +347,19 @@ testingKeys.forEach((testKey) => {
       }).toThrowError("needs to be a valid datetime.");
 
       await expect(credential.verify()).rejects.toThrowError(
-        "The current Verifiable Credential has no proof.",
+        "The current Verifiable Credential has no proof."
       );
     });
 
     test("Issuing an incrementally-created VC should return an object with a proof, and it must pass validation.", async () => {
       const unsignedCredential = new VerifiableCredential(
-        "https://example.com/credentials/1872",
+        "https://example.com/credentials/1872"
       );
       unsignedCredential.addContext(
-        "https://www.w3.org/2018/credentials/examples/v1",
+        "https://www.w3.org/2018/credentials/examples/v1"
       );
       const signedCredential = await unsignedCredential.sign(
-        testKey.keyDocument,
+        testKey.keyDocument
       );
       expect(signedCredential.proof).toBeDefined();
       const result = await signedCredential.verify();
@@ -374,7 +374,7 @@ testingKeys.forEach((testKey) => {
     beforeAll(async () => {
       const sampleIssuedCredential = await issueCredential(
         testKey.keyDocument,
-        getSampleCredential(),
+        getSampleCredential()
       );
       presentationCredentials = [
         sampleIssuedCredential,
@@ -403,7 +403,7 @@ testingKeys.forEach((testKey) => {
       const vp = new VerifiablePresentation(sampleId);
       const vpJSON = vp.toJSON();
       expect(vpJSON["@context"]).toContain(
-        "https://www.w3.org/2018/credentials/v1",
+        "https://www.w3.org/2018/credentials/v1"
       );
       expect(vpJSON.id).toBe(sampleId);
       expect(vpJSON.type).toEqual(["VerifiablePresentation"]);
@@ -442,9 +442,9 @@ testingKeys.forEach((testKey) => {
         vp.verify({
           challenge: "some_challenge",
           domain: "some_domain",
-        }),
+        })
       ).rejects.toThrowError(
-        "The current VerifiablePresentation has no proof.",
+        "The current VerifiablePresentation has no proof."
       );
     });
 
@@ -481,7 +481,7 @@ testingKeys.forEach((testKey) => {
 
     test("Issuing an incrementally-created VP from an incrementally created VC should return an object with a proof, and it must pass validation.", async () => {
       const vc = new VerifiableCredential(
-        "https://example.com/credentials/1872",
+        "https://example.com/credentials/1872"
       );
       vc.addContext("https://www.w3.org/2018/credentials/examples/v1");
       vc.addType("AlumniCredential");

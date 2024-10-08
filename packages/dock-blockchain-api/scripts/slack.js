@@ -26,7 +26,7 @@ export const postMessage = curry(async (type, header, fields) => {
           ts: new Date().getTime() / 1e3,
         },
       ],
-    }),
+    })
   );
   const headers = {
     "Content-Type": "application/json",

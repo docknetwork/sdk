@@ -72,7 +72,7 @@ describe("Crawler unit tests", () => {
       RULES,
       CURIOSITY,
       resolveGraph,
-      newEngine(),
+      newEngine()
     );
     expect(allFacts).toEqual([
       [

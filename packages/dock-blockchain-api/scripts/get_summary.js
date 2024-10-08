@@ -35,7 +35,7 @@ async function getSummary(handle) {
       handle.api.query.stakingRewards.stakingEmissionStatus,
       handle.api.query.stakingRewards.stakingEmissionSupply,
       handle.api.query.balances.totalIssuance,
-    ],
+    ]
   );
 
   // const accounts = await dock.api.query.system.account.entries();

@@ -180,29 +180,29 @@ describe.each(Schemes)(
       let accumulated;
       if (accumulator instanceof PositiveAccumulator) {
         accumulated = AccumulatorModule.accumulatedAsHex(
-          accumulator.accumulated,
+          accumulator.accumulated
         );
         await modules.accumulator.addPositiveAccumulator(
           accumId,
           accumulated,
           [did1, keyId],
-          pair1,
+          pair1
         );
       } else {
         accumulated = AccumulatorModule.accumulatedAsHex(
           accumulator.accumulated,
-          AccumulatorType.KBUni,
+          AccumulatorType.KBUni
         );
         await modules.accumulator.addKBUniversalAccumulator(
           accumId,
           accumulated,
           [did1, keyId],
-          pair1,
+          pair1
         );
       }
       const queriedAccum = await modules.accumulator.getAccumulator(
         accumId,
-        false,
+        false
       );
       expect(queriedAccum.accumulated.value).toEqual(accumulated);
     }
@@ -227,7 +227,7 @@ describe.each(Schemes)(
 
       if (Name !== "BBDT16") {
         const pk1 = Module.prepareAddPublicKey(
-          u8aToHex(keypair.publicKeyBuffer),
+          u8aToHex(keypair.publicKeyBuffer)
         );
         await chainModule.addPublicKey(null, pk1, did1, pair1);
 
@@ -246,7 +246,7 @@ describe.each(Schemes)(
       await registerNewDIDUsingPair(
         dock,
         holder3DID,
-        new Ed25519Keypair(holder3KeySeed),
+        new Ed25519Keypair(holder3KeySeed)
       );
 
       const params = dockAccumulatorParams();
@@ -281,43 +281,43 @@ describe.each(Schemes)(
 
       const accumulator = PositiveAccumulator.initialize(
         params,
-        posAccumKeypair.secretKey,
+        posAccumKeypair.secretKey
       );
       await accumulator.addBatch(
         members,
         posAccumKeypair.secretKey,
-        posAccumState,
+        posAccumState
       );
       await writeAccumToChain(posAccumulatorId, 1, accumulator);
       posAccumWitness = await accumulator.membershipWitness(
         encodedMember,
         posAccumKeypair.secretKey,
-        posAccumState,
+        posAccumState
       );
       expect(
         accumulator.verifyMembershipWitness(
           encodedMember,
           posAccumWitness,
           posAccumKeypair.publicKey,
-          params,
-        ),
+          params
+        )
       ).toEqual(true);
 
       const accumulator1 = PositiveAccumulator.initialize(
         params,
-        posKvAccumKeypair.secretKey,
+        posKvAccumKeypair.secretKey
       );
       await accumulator1.addBatch(
         members,
         posKvAccumKeypair.secretKey,
-        posKvAccumState,
+        posKvAccumState
       );
       // For KV accumulator, keyId is 0
       await writeAccumToChain(posKvAccumulatorId, 0, accumulator1);
       posKvAccumWitness = await accumulator1.membershipWitness(
         encodedMember,
         posKvAccumKeypair.secretKey,
-        posKvAccumState,
+        posKvAccumState
       );
       posKvAccumSecretKey = posKvAccumKeypair.secretKey;
 
@@ -325,45 +325,45 @@ describe.each(Schemes)(
         members,
         params,
         uniAccumKeypair.secretKey,
-        uniAccumState,
+        uniAccumState
       );
       await accumulator2.add(
         encodedMember,
         uniAccumKeypair.secretKey,
-        uniAccumState,
+        uniAccumState
       );
       await writeAccumToChain(uniAccumulatorId, 2, accumulator2);
       uniAccumWitness = await accumulator2.membershipWitness(
         encodedMember,
         uniAccumKeypair.secretKey,
-        uniAccumState,
+        uniAccumState
       );
       expect(
         accumulator2.verifyMembershipWitness(
           encodedMember,
           uniAccumWitness,
           uniAccumKeypair.publicKey,
-          params,
-        ),
+          params
+        )
       ).toEqual(true);
 
       const accumulator3 = await KBUniversalAccumulator.initialize(
         members,
         params,
         uniKvAccumKeypair.secretKey,
-        uniKvAccumState,
+        uniKvAccumState
       );
       await accumulator3.add(
         encodedMember,
         uniKvAccumKeypair.secretKey,
-        uniKvAccumState,
+        uniKvAccumState
       );
       // For KV accumulator, keyId is 0
       await writeAccumToChain(uniKvAccumulatorId, 0, accumulator3);
       uniKvAccumWitness = await accumulator3.membershipWitness(
         encodedMember,
         uniKvAccumKeypair.secretKey,
-        uniKvAccumState,
+        uniKvAccumState
       );
       uniKvAccumSecretKey = uniKvAccumKeypair.secretKey;
     }, 30000);
@@ -371,11 +371,11 @@ describe.each(Schemes)(
     async function createAndVerifyPresentation(
       credentials,
       verifyOptions = {},
-      accumSecretKey = undefined,
+      accumSecretKey = undefined
     ) {
       const holderKey = getKeyDoc(
         holder3DID,
-        new Ed25519Keypair(holder3KeySeed),
+        new Ed25519Keypair(holder3KeySeed)
       );
 
       const presId = `https://example.com/pres/${randomAsHex(32)}`;
@@ -385,7 +385,7 @@ describe.each(Schemes)(
 
       // This is done by the verifier
       const reconstructedPres = derivedToAnoncredsPresentation(
-        presentation.verifiableCredential[0],
+        presentation.verifiableCredential[0]
       );
       const keyedProofs =
         getKeyedProofsFromVerifiedPresentation(reconstructedPres);
@@ -398,13 +398,13 @@ describe.each(Schemes)(
         const sk = new BBDT16MacSecretKey(keypair.privateKeyBuffer);
         // eslint-disable-next-line jest/no-conditional-expect
         expect(
-          keyedProofs.get(0)?.credential?.proof.verify(sk).verified,
+          keyedProofs.get(0)?.credential?.proof.verify(sk).verified
         ).toEqual(true);
       }
       if (isKvacStatus) {
         // This block is executed by the issuer or anyone having the secret key but not by the verifier
         expect(
-          keyedProofs.get(0)?.status?.proof.verify(accumSecretKey).verified,
+          keyedProofs.get(0)?.status?.proof.verify(accumSecretKey).verified
         ).toEqual(true);
       }
 
@@ -416,9 +416,9 @@ describe.each(Schemes)(
               type: ["VerifiablePresentation"],
               verifiableCredential: credentials,
               id: presId,
-            }),
-          ),
-        ),
+            })
+          )
+        )
       );
 
       // NOTE: typically for BBS+ presentations you shouldnt sign it by the holder, but we do it here just to make sure it works
@@ -428,7 +428,7 @@ describe.each(Schemes)(
         holderKey,
         chal,
         domain,
-        resolver,
+        resolver
       );
 
       expect(signedPres).toMatchObject(
@@ -442,7 +442,7 @@ describe.each(Schemes)(
             domain,
             proofPurpose: "authentication",
           }),
-        }),
+        })
       );
 
       const result = await verifyPresentation(signedPres, {
@@ -479,7 +479,7 @@ describe.each(Schemes)(
       const presentationInstance = new Presentation();
       const idx = await presentationInstance.addCredentialToPresent(
         credential,
-        { resolver },
+        { resolver }
       );
 
       // NOTE: revealing subject type because of JSON-LD processing for this certain credential
@@ -510,14 +510,14 @@ describe.each(Schemes)(
       const credential = await issueCredential(issuerKey, unsignedCred);
       const result = await verifyCredential(credential, { resolver });
       expect(result).toMatchObject(
-        expect.objectContaining(getProofMatcherDoc()),
+        expect.objectContaining(getProofMatcherDoc())
       );
 
       // Begin to derive a credential from the above issued one
       const presentationInstance = new Presentation();
       const idx = await presentationInstance.addCredentialToPresent(
         credential,
-        { resolver },
+        { resolver }
       );
 
       // Reveal subject attributes
@@ -538,7 +538,7 @@ describe.each(Schemes)(
       const presentationInstance2 = new Presentation();
       const idx2 = await presentationInstance2.addCredentialToPresent(
         credential,
-        { resolver },
+        { resolver }
       );
 
       // Reveal subject attributes
@@ -556,8 +556,9 @@ describe.each(Schemes)(
       ]);
 
       // Derive a W3C Verifiable Credential JSON from the above presentation
-      const credentials =
-        await presentationInstance.deriveCredentials(presentationOptions);
+      const credentials = await presentationInstance.deriveCredentials(
+        presentationOptions
+      );
       expect(credentials.length).toEqual(1);
       expect(credentials[0].proof).toBeDefined();
       expect(credentials[0]).toHaveProperty("credentialSubject");
@@ -565,17 +566,18 @@ describe.each(Schemes)(
         expect.objectContaining({
           type: unsignedCred.credentialSubject.type,
           lprNumber: 1234,
-        }),
+        })
       );
       expect(credentials[0].issuer).toEqual(credential.issuer);
       expect(credentials[0].credentialSchema.id).toEqual(
-        residentCardSchema.$id,
+        residentCardSchema.$id
       );
 
       // Ensure reconstructing presentation from credential matches
       // NOTE: ignoring proof here as itll differ when signed twice as above
-      const presentation =
-        await presentationInstance2.createPresentation(presentationOptions);
+      const presentation = await presentationInstance2.createPresentation(
+        presentationOptions
+      );
 
       // Question: What is the point of this? A single credential cant be converted to a presentation and a presentation
       // has other data that credential won't have
@@ -612,7 +614,7 @@ describe.each(Schemes)(
         const sk = new BBDT16MacSecretKey(keypair.privateKeyBuffer);
         // eslint-disable-next-line jest/no-conditional-expect
         expect(
-          keyedProofs.get(0)?.credential?.proof.verify(sk).verified,
+          keyedProofs.get(0)?.credential?.proof.verify(sk).verified
         ).toEqual(true);
       }
       // Create a VP and verify it from this credential
@@ -622,22 +624,22 @@ describe.each(Schemes)(
     test(`For ${Name}, persist credential status using VB positive accumulator when deriving`, async () => {
       const queriedAccum = await modules.accumulator.getAccumulator(
         posAccumulatorId,
-        true,
+        true
       );
       const verifAccumulator = PositiveAccumulator.fromAccumulated(
-        AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated),
+        AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated)
       );
 
       const accumPk = new AccumulatorPublicKey(
-        queriedAccum.publicKey.bytes.bytes,
+        queriedAccum.publicKey.bytes.bytes
       );
       expect(
         verifAccumulator.verifyMembershipWitness(
           encodedMember,
           posAccumWitness,
           accumPk,
-          dockAccumulatorParams(),
-        ),
+          dockAccumulatorParams()
+        )
       ).toEqual(true);
 
       const credentialStatus = {
@@ -653,12 +655,13 @@ describe.each(Schemes)(
         0,
         posAccumWitness,
         AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated),
-        accumPk,
+        accumPk
       );
 
       // Derive a W3C Verifiable Credential JSON from the above presentation
-      const credentials =
-        await presentationInstance.deriveCredentials(presentationOptions);
+      const credentials = await presentationInstance.deriveCredentials(
+        presentationOptions
+      );
 
       expect(credentials.length).toEqual(1);
       expect(credentials[0].issuer).toEqual(String(did1));
@@ -667,7 +670,7 @@ describe.each(Schemes)(
         ...credentialStatus,
         revocationId: undefined, // Because revocation id is never revealed
         accumulated: b58.encode(
-          AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated),
+          AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated)
         ),
         extra: {},
       });
@@ -687,7 +690,7 @@ describe.each(Schemes)(
       const queriedAccum = await modules.accumulator.getAccumulator(
         posKvAccumulatorId,
         false,
-        false,
+        false
       );
 
       const credentialStatus = {
@@ -702,12 +705,13 @@ describe.each(Schemes)(
       presentationInstance.presBuilder.addAccumInfoForCredStatus(
         0,
         posKvAccumWitness,
-        AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated),
+        AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated)
       );
 
       // Derive a W3C Verifiable Credential JSON from the above presentation
-      const credentials =
-        await presentationInstance.deriveCredentials(presentationOptions);
+      const credentials = await presentationInstance.deriveCredentials(
+        presentationOptions
+      );
 
       expect(credentials.length).toEqual(1);
       expect(credentials[0].issuer).toEqual(String(did1));
@@ -716,7 +720,7 @@ describe.each(Schemes)(
         ...credentialStatus,
         revocationId: undefined, // Because revocation id is never revealed
         accumulated: b58.encode(
-          AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated),
+          AccumulatorModule.accumulatedFromHex(queriedAccum.accumulated)
         ),
         extra: {},
       });
@@ -727,32 +731,32 @@ describe.each(Schemes)(
         {
           resolver,
         },
-        posKvAccumSecretKey,
+        posKvAccumSecretKey
       );
     });
 
     test(`For ${Name}, persist credential status using KB universal accumulator when deriving`, async () => {
       const queriedAccum = await modules.accumulator.getAccumulator(
         uniAccumulatorId,
-        true,
+        true
       );
       const verifAccumulator = KBUniversalAccumulator.fromAccumulated(
         AccumulatorModule.accumulatedFromHex(
           queriedAccum.accumulated,
-          AccumulatorType.KBUni,
-        ),
+          AccumulatorType.KBUni
+        )
       );
 
       const accumPk = new AccumulatorPublicKey(
-        queriedAccum.publicKey.bytes.bytes,
+        queriedAccum.publicKey.bytes.bytes
       );
       expect(
         verifAccumulator.verifyMembershipWitness(
           encodedMember,
           uniAccumWitness,
           accumPk,
-          dockAccumulatorParams(),
-        ),
+          dockAccumulatorParams()
+        )
       ).toEqual(true);
 
       const credentialStatus = {
@@ -769,17 +773,18 @@ describe.each(Schemes)(
         uniAccumWitness,
         AccumulatorModule.accumulatedFromHex(
           queriedAccum.accumulated,
-          AccumulatorType.KBUni,
-        ),
+          AccumulatorType.KBUni
+        )
       );
 
       // Derive a W3C Verifiable Credential JSON from the above presentation
-      const credentials =
-        await presentationInstance.deriveCredentials(presentationOptions);
+      const credentials = await presentationInstance.deriveCredentials(
+        presentationOptions
+      );
 
       const accAsU8 = AccumulatorModule.accumulatedFromHex(
         queriedAccum.accumulated,
-        AccumulatorType.KBUni,
+        AccumulatorType.KBUni
       );
       expect(credentials.length).toEqual(1);
       expect(credentials[0].issuer).toEqual(String(did1));
@@ -806,7 +811,7 @@ describe.each(Schemes)(
       const queriedAccum = await modules.accumulator.getAccumulator(
         uniKvAccumulatorId,
         false,
-        false,
+        false
       );
 
       const credentialStatus = {
@@ -823,17 +828,18 @@ describe.each(Schemes)(
         uniKvAccumWitness,
         AccumulatorModule.accumulatedFromHex(
           queriedAccum.accumulated,
-          AccumulatorType.KBUni,
-        ),
+          AccumulatorType.KBUni
+        )
       );
 
       // Derive a W3C Verifiable Credential JSON from the above presentation
-      const credentials =
-        await presentationInstance.deriveCredentials(presentationOptions);
+      const credentials = await presentationInstance.deriveCredentials(
+        presentationOptions
+      );
 
       const accAsU8 = AccumulatorModule.accumulatedFromHex(
         queriedAccum.accumulated,
-        AccumulatorType.KBUni,
+        AccumulatorType.KBUni
       );
       expect(credentials.length).toEqual(1);
       expect(credentials[0].issuer).toEqual(String(did1));
@@ -851,7 +857,7 @@ describe.each(Schemes)(
         {
           resolver,
         },
-        uniKvAccumSecretKey,
+        uniKvAccumSecretKey
       );
     });
 
@@ -881,7 +887,7 @@ describe.each(Schemes)(
         const presentationInstance = new Presentation();
         const idx = await presentationInstance.addCredentialToPresent(
           credential,
-          { resolver },
+          { resolver }
         );
 
         // NOTE: revealing subject type because of JSON-LD processing for this certain credential
@@ -901,7 +907,7 @@ describe.each(Schemes)(
           1233,
           1235,
           provingKeyId,
-          provingKey,
+          provingKey
         );
 
         // Enforce issuance date to be between values
@@ -912,12 +918,13 @@ describe.each(Schemes)(
           new Date("2019-10-01"),
           new Date("2020-01-01"),
           provingKeyId,
-          undefined,
+          undefined
         );
 
         // Derive a W3C Verifiable Credential JSON from the above presentation
-        const credentials =
-          await presentationInstance.deriveCredentials(presentationOptions);
+        const credentials = await presentationInstance.deriveCredentials(
+          presentationOptions
+        );
         expect(credentials.length).toEqual(1);
         expect(credentials[0].proof).toBeDefined();
         expect(credentials[0].issuer).toEqual(credential.issuer);
@@ -946,15 +953,15 @@ describe.each(Schemes)(
         expect(credentials[0].credentialSubject).toMatchObject(
           expect.objectContaining({
             type: unsignedCred.credentialSubject.type,
-          }),
+          })
         );
 
         const reconstructedPres = derivedToAnoncredsPresentation(
-          credentials[0],
+          credentials[0]
         );
         expect(reconstructedPres.proof).toBeDefined();
         expect(reconstructedPres.spec.credentials[0].bounds).toEqual(
-          credentials[0].proof.bounds,
+          credentials[0].proof.bounds
         );
 
         // Setup predicate params with the verifying key for range proofs
@@ -969,7 +976,7 @@ describe.each(Schemes)(
         if (credentialResult.error) {
           console.log(
             "credentialResult.error",
-            JSON.stringify(credentialResult.error, null, 2),
+            JSON.stringify(credentialResult.error, null, 2)
           );
         }
         expect(credentialResult.error).toBe(undefined);
@@ -978,11 +985,11 @@ describe.each(Schemes)(
         // Create a VP and verify it from this credential
         await createAndVerifyPresentation(credentials, { predicateParams });
       },
-      60000,
+      60000
     );
 
     afterAll(async () => {
       await dock.disconnect();
     }, 10000);
-  },
+  }
 );

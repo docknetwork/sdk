@@ -50,7 +50,7 @@ async function getBalancesWithAllHandles(handles, addresses) {
 
 async function getBalancesWithAllHandlesRepeat(handles, addresses, count) {
   return Promise.all(
-    handles.map((h) => getBalancesRepeatedly(count, h, addresses)),
+    handles.map((h) => getBalancesRepeatedly(count, h, addresses))
   ).then(() => {
     console.log("done getting balances");
   });
@@ -82,7 +82,7 @@ async function main() {
   await getBalancesWithAllHandlesRepeat(
     handles,
     [alice, bob, charlie, dave, eve, ferdie],
-    100,
+    100
   );
 }
 

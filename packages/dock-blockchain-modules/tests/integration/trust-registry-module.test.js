@@ -36,42 +36,42 @@ describe("Trust Registry", () => {
   const ownerSeed = randomAsHex(32);
   const convenerPair = new DidKeypair(
     [convenerDID, 1],
-    new Ed25519Keypair(ownerSeed),
+    new Ed25519Keypair(ownerSeed)
   );
 
   const issuerDID = DockDid.random();
   const issuerSeed = randomAsHex(32);
   const issuerPair = new DidKeypair(
     [issuerDID, 1],
-    new Ed25519Keypair(issuerSeed),
+    new Ed25519Keypair(issuerSeed)
   );
 
   const issuerDID2 = DockDid.random();
   const issuerSeed2 = randomAsHex(32);
   const issuerPair2 = new DidKeypair(
     [issuerDID2, 1],
-    new Ed25519Keypair(issuerSeed2),
+    new Ed25519Keypair(issuerSeed2)
   );
 
   const verifierDID = DockDid.random();
   const verifierSeed = randomAsHex(32);
   const verifierPair = new DidKeypair(
     [verifierDID, 1],
-    new Ed25519Keypair(verifierSeed),
+    new Ed25519Keypair(verifierSeed)
   );
 
   const verifierDID2 = DockDid.random();
   const verifierSeed2 = randomAsHex(32);
   const verifierPair2 = new DidKeypair(
     [verifierDID2, 1],
-    new Ed25519Keypair(verifierSeed2),
+    new Ed25519Keypair(verifierSeed2)
   );
 
   const verifierDIDMethodKeySeed = randomAsHex(32);
 
   const verifierDIDMethodKeyPair = new Ed25519Keypair(verifierDIDMethodKeySeed);
   const verifierDIDMethodKey = DidMethodKey.fromKeypair(
-    verifierDIDMethodKeyPair,
+    verifierDIDMethodKeyPair
   );
 
   const createRegistry = async (
@@ -84,20 +84,20 @@ describe("Trust Registry", () => {
       [verifierDID, verifierPair],
       [verifierDID2, verifierPair2],
       [verifierDIDMethodKey, verifierDIDMethodKeyPair],
-    ],
+    ]
   ) => {
     const trustRegistryId = DockTrustRegistryId.random();
 
     expect(
       (await dock.api.query.trustRegistry.trustRegistriesInfo(trustRegistryId))
-        .isNone,
+        .isNone
     ).toEqual(true);
 
     await modules.trustRegistry.createRegistry(
       trustRegistryId,
       new TrustRegistryInfo(name, govFramework, convener[0]),
       new Map(),
-      convener[1],
+      convener[1]
     );
 
     if (!DisableTrustRegistryParticipantsTests) {
@@ -113,15 +113,15 @@ describe("Trust Registry", () => {
             did,
             trustRegistryId,
             participants,
-            signingKeyRef,
-          ),
-        ),
+            signingKeyRef
+          )
+        )
       );
 
       await modules.trustRegistry.dockOnly.changeParticipants(
         trustRegistryId,
         participants,
-        sigs,
+        sigs
       );
     }
 
@@ -237,54 +237,54 @@ describe("Trust Registry", () => {
       convenerDID,
       trustRegistryId,
       { Set: schemas },
-      convenerPair,
+      convenerPair
     );
 
     expect(
       (
         await dock.api.query.trustRegistry.verifiersTrustRegistries(
-          verifierDIDMethodKey,
+          verifierDIDMethodKey
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual([]);
     expect(
       (
         await dock.api.query.trustRegistry.issuersTrustRegistries(issuerDID)
-      ).toJSON(),
+      ).toJSON()
     ).toEqual([trustRegistryId.toJSON()]);
     expect(
       (
         await dock.api.query.trustRegistry.verifiersTrustRegistries(
-          verifierDID2,
+          verifierDID2
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual([trustRegistryId.toJSON()]);
 
     await modules.trustRegistry.dockOnly.setSchemasMetadata(
       convenerDID,
       trustRegistryId2,
       { Set: schemas },
-      convenerPair,
+      convenerPair
     );
 
     expect(
       (
         await dock.api.query.trustRegistry.verifiersTrustRegistries(
-          verifierDIDMethodKey,
+          verifierDIDMethodKey
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual([]);
     expect(
       (
         await dock.api.query.trustRegistry.issuersTrustRegistries(issuerDID)
-      ).toJSON(),
+      ).toJSON()
     ).toEqual([trustRegistryId.toJSON(), trustRegistryId2.toJSON()].sort());
     expect(
       (
         await dock.api.query.trustRegistry.verifiersTrustRegistries(
-          verifierDID2,
+          verifierDID2
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual([trustRegistryId.toJSON(), trustRegistryId2.toJSON()].sort());
 
     verifiers.add(verifierDIDMethodKey);
@@ -293,15 +293,15 @@ describe("Trust Registry", () => {
       convenerDID,
       trustRegistryId2,
       { Set: schemas },
-      convenerPair,
+      convenerPair
     );
 
     expect(
       (
         await dock.api.query.trustRegistry.verifiersTrustRegistries(
-          verifierDIDMethodKey,
+          verifierDIDMethodKey
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual([trustRegistryId2.toJSON()]);
 
     const RegInfo = {
@@ -328,21 +328,21 @@ describe("Trust Registry", () => {
         verifiers: {
           AnyOf: [verifierDIDMethodKey],
         },
-      }),
+      })
     ).toEqual(Reg2Info);
     expect(
       await modules.trustRegistry.dockOnly.registriesInfo({
         issuers: {
           AnyOf: [verifierDIDMethodKey],
         },
-      }),
+      })
     ).toEqual({});
     expect(
       await modules.trustRegistry.dockOnly.registriesInfo({
         issuersOrVerifiers: {
           AnyOf: [verifierDIDMethodKey],
         },
-      }),
+      })
     ).toEqual(Reg2Info);
     expect(
       await modules.trustRegistry.dockOnly.registriesInfo({
@@ -352,12 +352,12 @@ describe("Trust Registry", () => {
         verifiers: {
           AnyOf: [verifierDIDMethodKey],
         },
-      }),
+      })
     ).toEqual({});
     expect(
       await modules.trustRegistry.dockOnly.registriesInfo({
         schemaIds: { AnyOf: [schemaId] },
-      }),
+      })
     ).toEqual(BothRegsInfo);
 
     expect(
@@ -368,7 +368,7 @@ describe("Trust Registry", () => {
         verifiers: {
           AnyOf: [verifierDID],
         },
-      }),
+      })
     ).toEqual(BothRegsInfo);
     expect(
       await modules.trustRegistry.dockOnly.registriesInfo({
@@ -381,7 +381,7 @@ describe("Trust Registry", () => {
         issuers: {
           AnyOf: [verifierDID],
         },
-      }),
+      })
     ).toEqual({});
     expect(
       await modules.trustRegistry.dockOnly.registriesInfo({
@@ -391,7 +391,7 @@ describe("Trust Registry", () => {
         issuersOrVerifiers: {
           AnyOf: [verifierDID, issuerDID2],
         },
-      }),
+      })
     ).toEqual(BothRegsInfo);
 
     const schema1MetadataInTrustRegistry1 =
@@ -468,24 +468,24 @@ describe("Trust Registry", () => {
         {
           verifiers: { AnyOf: [verifierDIDMethodKey] },
         },
-        trustRegistryId2,
-      ),
+        trustRegistryId2
+      )
     ).toEqual({ [schemaId]: schema1MetadataInTrustRegistry2 });
     expect(
       await modules.trustRegistry.dockOnly.registrySchemasMetadata(
         {
           issuersOrVerifiers: { AnyOf: [verifierDIDMethodKey] },
         },
-        trustRegistryId2,
-      ),
+        trustRegistryId2
+      )
     ).toEqual({ [schemaId]: schema1MetadataInTrustRegistry2 });
     expect(
       await modules.trustRegistry.dockOnly.registrySchemasMetadata(
         {
           issuers: { AnyOf: [verifierDIDMethodKey] },
         },
-        trustRegistryId,
-      ),
+        trustRegistryId
+      )
     ).toEqual({});
     expect(
       await modules.trustRegistry.dockOnly.registrySchemasMetadata(
@@ -494,8 +494,8 @@ describe("Trust Registry", () => {
             AnyOf: [verifierDIDMethodKey, issuerDID],
           },
         },
-        trustRegistryId,
-      ),
+        trustRegistryId
+      )
     ).toEqual({
       [schemaId]: schema1MetadataInTrustRegistry1,
       [schemaId2]: schema2MetadataInTrustRegistry1,
@@ -505,8 +505,8 @@ describe("Trust Registry", () => {
         {
           issuersOrVerifiers: { AnyOf: [verifierDIDMethodKey] },
         },
-        trustRegistryId,
-      ),
+        trustRegistryId
+      )
     ).toEqual({});
     expect(
       await modules.trustRegistry.dockOnly.registrySchemasMetadata(
@@ -514,16 +514,16 @@ describe("Trust Registry", () => {
           issuers: { AnyOf: [issuerDID] },
           verifiers: { AnyOf: [verifierDIDMethodKey] },
         },
-        trustRegistryId2,
-      ),
+        trustRegistryId2
+      )
     ).toEqual({ [schemaId]: schema1MetadataInTrustRegistry2 });
     expect(
       await modules.trustRegistry.dockOnly.registrySchemasMetadata(
         {
           schemaIds: [schemaId],
         },
-        trustRegistryId,
-      ),
+        trustRegistryId
+      )
     ).toEqual({ [schemaId]: schema1MetadataInTrustRegistry1 });
     expect(
       await modules.trustRegistry.dockOnly.registrySchemasMetadata(
@@ -533,37 +533,37 @@ describe("Trust Registry", () => {
           },
           schemaIds: [schemaId],
         },
-        trustRegistryId,
-      ),
+        trustRegistryId
+      )
     ).toEqual({ [schemaId]: schema1MetadataInTrustRegistry1 });
     expect(
       await modules.trustRegistry.dockOnly.registrySchemasMetadata({
         issuers: { AnyOf: [verifierDID] },
         schemaIds: [schemaId2],
-      }),
+      })
     ).toEqual({});
 
     expect(
       await modules.trustRegistry.dockOnly.schemaMetadataInRegistry(
         schemaId,
-        trustRegistryId,
-      ),
+        trustRegistryId
+      )
     ).toEqual(schema1MetadataInTrustRegistry1);
     expect(
       await modules.trustRegistry.dockOnly.schemaIssuersInRegistry(
         schemaId,
-        trustRegistryId,
-      ),
+        trustRegistryId
+      )
     ).toEqual(schema1MetadataInTrustRegistry1.issuers);
     expect(
       await modules.trustRegistry.dockOnly.schemaVerifiersInRegistry(
         schemaId,
-        trustRegistryId,
-      ),
+        trustRegistryId
+      )
     ).toEqual(schema1MetadataInTrustRegistry1.verifiers);
 
     expect(
-      await modules.trustRegistry.dockOnly.schemaMetadata(schemaId),
+      await modules.trustRegistry.dockOnly.schemaMetadata(schemaId)
     ).toEqual(
       modules.trustRegistry.dockOnly.parseMapEntries(
         String,
@@ -571,11 +571,11 @@ describe("Trust Registry", () => {
         new Map([
           [trustRegistryId, schema1MetadataInTrustRegistry1],
           [trustRegistryId2, schema1MetadataInTrustRegistry2],
-        ]),
-      ),
+        ])
+      )
     );
     expect(
-      await modules.trustRegistry.dockOnly.schemaVerifiers(schemaId),
+      await modules.trustRegistry.dockOnly.schemaVerifiers(schemaId)
     ).toEqual(
       modules.trustRegistry.dockOnly.parseMapEntries(
         String,
@@ -583,11 +583,11 @@ describe("Trust Registry", () => {
         new Map([
           [trustRegistryId, [verifierDID, verifierDID2]],
           [trustRegistryId2, [verifierDID, verifierDID2, verifierDIDMethodKey]],
-        ]),
-      ),
+        ])
+      )
     );
     expect(
-      await modules.trustRegistry.dockOnly.schemaIssuers(schemaId),
+      await modules.trustRegistry.dockOnly.schemaIssuers(schemaId)
     ).toEqual(
       modules.trustRegistry.dockOnly.parseMapEntries(
         String,
@@ -643,8 +643,8 @@ describe("Trust Registry", () => {
               ],
             ],
           ],
-        ]),
-      ),
+        ])
+      )
     );
   });
 
@@ -684,16 +684,16 @@ describe("Trust Registry", () => {
       convenerDID,
       trustRegistryId,
       { Modify: schemas },
-      convenerPair,
+      convenerPair
     );
 
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           schemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual({
       issuers: expectedFormattedIssuers(issuers),
       verifiers: expectedFormattedVerifiers(verifiers),
@@ -702,9 +702,9 @@ describe("Trust Registry", () => {
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           otherSchemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual({
       issuers: expectedFormattedIssuers(issuers),
       verifiers: expectedFormattedVerifiers(new Set()),
@@ -747,16 +747,16 @@ describe("Trust Registry", () => {
       convenerDID,
       trustRegistryId,
       { Modify: schemas },
-      convenerPair,
+      convenerPair
     );
 
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           schemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual({
       issuers: expectedFormattedIssuers(issuers),
       verifiers: expectedFormattedVerifiers(verifiers),
@@ -765,9 +765,9 @@ describe("Trust Registry", () => {
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           otherSchemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual({
       issuers: expectedFormattedIssuers(issuers),
       verifiers: expectedFormattedVerifiers(new Set()),
@@ -781,24 +781,24 @@ describe("Trust Registry", () => {
       convenerDID,
       trustRegistryId,
       { Modify: schemas },
-      convenerPair,
+      convenerPair
     );
 
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           schemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual(null);
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           otherSchemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual(null);
   });
 
@@ -813,8 +813,8 @@ describe("Trust Registry", () => {
     expect(
       await modules.trustRegistry.dockOnly.registryParticipantsInfo(
         trustRegistryId,
-        [participant],
-      ),
+        [participant]
+      )
     ).toEqual({ [participant]: null });
 
     const information = {
@@ -833,23 +833,23 @@ describe("Trust Registry", () => {
           trustRegistryId,
           participant,
           information,
-          signingKeyRef,
-        ),
-      ),
+          signingKeyRef
+        )
+      )
     );
 
     await modules.trustRegistry.dockOnly.setParticipantInformation(
       trustRegistryId,
       participant,
       information,
-      sigs,
+      sigs
     );
 
     expect(
       await modules.trustRegistry.dockOnly.registryParticipantsInfo(
         trustRegistryId,
-        [participant],
-      ),
+        [participant]
+      )
     ).toEqual({ [participant]: information });
   });
 
@@ -883,14 +883,14 @@ describe("Trust Registry", () => {
       convenerDID,
       trustRegistryId,
       { Modify: schemas },
-      convenerPair,
+      convenerPair
     );
 
     await modules.trustRegistry.dockOnly.suspendIssuers(
       convenerDID,
       trustRegistryId,
       [issuerDID, issuerDID2],
-      convenerPair,
+      convenerPair
     );
 
     for (const issuer of [issuerDID, issuerDID2]) {
@@ -898,9 +898,9 @@ describe("Trust Registry", () => {
         (
           await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(
             trustRegistryId,
-            issuer,
+            issuer
           )
-        ).toJSON(),
+        ).toJSON()
       ).toEqual({
         suspended: true,
         delegated: [],
@@ -911,7 +911,7 @@ describe("Trust Registry", () => {
       convenerDID,
       trustRegistryId,
       [issuerDID],
-      convenerPair,
+      convenerPair
     );
 
     for (const issuer of [issuerDID]) {
@@ -919,9 +919,9 @@ describe("Trust Registry", () => {
         (
           await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(
             trustRegistryId,
-            issuer,
+            issuer
           )
-        ).toJSON(),
+        ).toJSON()
       ).toEqual({
         suspended: false,
         delegated: [],
@@ -933,9 +933,9 @@ describe("Trust Registry", () => {
         (
           await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(
             trustRegistryId,
-            issuer,
+            issuer
           )
-        ).toJSON(),
+        ).toJSON()
       ).toEqual({
         suspended: true,
         delegated: [],
@@ -965,16 +965,16 @@ describe("Trust Registry", () => {
       convenerDID,
       trustRegistryId,
       { Modify: schemas },
-      convenerPair,
+      convenerPair
     );
 
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(
           trustRegistryId,
-          issuerDID,
+          issuerDID
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual({
       suspended: false,
       delegated: [],
@@ -987,16 +987,16 @@ describe("Trust Registry", () => {
       issuerDID,
       trustRegistryId,
       { Set: issuers },
-      issuerPair,
+      issuerPair
     );
 
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistryIssuerConfigurations(
           trustRegistryId,
-          issuerDID,
+          issuerDID
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual({
       suspended: false,
       delegated: [issuerDID2.toJSON()],
@@ -1039,16 +1039,16 @@ describe("Trust Registry", () => {
       convenerDID,
       trustRegistryId,
       { Modify: schemasUpdate },
-      convenerPair,
+      convenerPair
     );
 
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           schemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual({
       issuers: expectedFormattedIssuers(issuers),
       verifiers: expectedFormattedVerifiers(verifiers),
@@ -1077,16 +1077,16 @@ describe("Trust Registry", () => {
       convenerDID,
       trustRegistryId,
       { Modify: schemasUpdate },
-      convenerPair,
+      convenerPair
     );
 
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           schemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual({
       issuers: expectedFormattedIssuers(issuers),
       verifiers: expectedFormattedVerifiers(verifiers),
@@ -1128,16 +1128,16 @@ describe("Trust Registry", () => {
       issuerDID2,
       trustRegistryId,
       { Modify: schemasUpdate },
-      issuerPair2,
+      issuerPair2
     );
 
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           schemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual({
       issuers: expectedFormattedIssuers(issuers),
       verifiers: expectedFormattedVerifiers(verifiers),
@@ -1159,7 +1159,7 @@ describe("Trust Registry", () => {
       verifierDIDMethodKey,
       trustRegistryId,
       { Modify: schemasUpdate },
-      verifierDIDMethodKeyPair,
+      verifierDIDMethodKeyPair
     );
 
     verifiers.delete(verifierDIDMethodKey);
@@ -1168,9 +1168,9 @@ describe("Trust Registry", () => {
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           schemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual({
       issuers: expectedFormattedIssuers(issuers),
       verifiers: expectedFormattedVerifiers(verifiers),
@@ -1208,16 +1208,16 @@ describe("Trust Registry", () => {
       convenerDID,
       trustRegistryId,
       { Set: schemas },
-      convenerPair,
+      convenerPair
     );
 
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           schemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual({
       issuers: expectedFormattedIssuers(schemas.get(schemaId).issuers),
       verifiers: expectedFormattedVerifiers(schemas.get(schemaId).verifiers),
@@ -1242,16 +1242,16 @@ describe("Trust Registry", () => {
       convenerDID,
       trustRegistryId,
       { Set: schemas },
-      convenerPair,
+      convenerPair
     );
 
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           schemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual({
       issuers: expectedFormattedIssuers(schemas.get(schemaId).issuers),
       verifiers: expectedFormattedVerifiers(schemas.get(schemaId).verifiers),
@@ -1261,21 +1261,21 @@ describe("Trust Registry", () => {
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           secondSchemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual({
       issuers: expectedFormattedIssuers(schemas.get(secondSchemaId).issuers),
       verifiers: expectedFormattedVerifiers(
-        schemas.get(secondSchemaId).verifiers,
+        schemas.get(secondSchemaId).verifiers
       ),
     });
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistriesStoredSchemas(
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual([schemaId, secondSchemaId].sort());
 
     schemas.delete(schemaId);
@@ -1295,48 +1295,48 @@ describe("Trust Registry", () => {
       convenerDID,
       trustRegistryId,
       { Set: schemas },
-      convenerPair,
+      convenerPair
     );
 
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistriesStoredSchemas(
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual([secondSchemaId, thirdSchemaId].sort());
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           schemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual(null);
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           secondSchemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual({
       issuers: expectedFormattedIssuers(schemas.get(secondSchemaId).issuers),
       verifiers: expectedFormattedVerifiers(
-        schemas.get(secondSchemaId).verifiers,
+        schemas.get(secondSchemaId).verifiers
       ),
     });
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           thirdSchemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual({
       issuers: expectedFormattedIssuers(schemas.get(thirdSchemaId).issuers),
       verifiers: expectedFormattedVerifiers(
-        schemas.get(thirdSchemaId).verifiers,
+        schemas.get(thirdSchemaId).verifiers
       ),
     });
 
@@ -1346,42 +1346,42 @@ describe("Trust Registry", () => {
       {
         Set: new Map(),
       },
-      convenerPair,
+      convenerPair
     );
 
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistriesStoredSchemas(
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual([]);
 
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           schemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual(null);
 
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           secondSchemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual(null);
 
     expect(
       (
         await dock.api.query.trustRegistry.trustRegistrySchemasMetadata(
           thirdSchemaId,
-          trustRegistryId,
+          trustRegistryId
         )
-      ).toJSON(),
+      ).toJSON()
     ).toEqual(null);
   });
 });
@@ -1391,7 +1391,7 @@ function expectedFormattedIssuers(issuers) {
     [...issuers.entries()].map(([issuer, prices]) => [
       JSON.stringify(maybeToJSON(issuer)),
       Object.fromEntries([...prices.entries()]),
-    ]),
+    ])
   );
 }
 

@@ -135,7 +135,7 @@ describe("DIDModule", () => {
     expect((await module.getDocument(did)).toJSON()).toEqual(document.toJSON());
 
     await expect(() =>
-      module.updateDocument(document, didKeypair2),
+      module.updateDocument(document, didKeypair2)
     ).rejects.toThrow();
 
     document.addKey([did, 3], didKeypair3.didKey());
@@ -154,14 +154,14 @@ describe("DIDModule", () => {
     await module.createDocument(document, didKeypair);
     expect(
       (await module.cheqdOnly.getDidDocumentWithMetadata(did)).metadata
-        .deactivated,
+        .deactivated
     ).toBe(false);
     expect((await module.getDocument(did)).toJSON()).toEqual(document.toJSON());
 
     await module.removeDocument(did, didKeypair);
     expect(
       (await module.cheqdOnly.getDidDocumentWithMetadata(did)).metadata
-        .deactivated,
+        .deactivated
     ).toBe(true);
     expect(() => module.getDocument(did)).rejects.toThrow(new NoDIDError(did));
   });

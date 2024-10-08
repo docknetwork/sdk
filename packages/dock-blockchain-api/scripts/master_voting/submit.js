@@ -38,7 +38,7 @@ async function main() {
   const { FullNodeEndpoint, PayerSecret } = process.env;
   assert(
     FullNodeEndpoint !== undefined,
-    "env var FullNodeEndpoint must be defined",
+    "env var FullNodeEndpoint must be defined"
   );
   assert(PayerSecret !== undefined, "env var PayerSecret must be defined");
 
@@ -129,7 +129,7 @@ async function assertValidAuth(nodeClient, proposal, mpauth) {
       nodeClient,
       roundNo,
       proposal,
-      nonce,
+      nonce
     );
     const ver = sr25519Verify(encoded_state_change, srsig, srpk);
     if (!ver) {
@@ -147,7 +147,7 @@ async function assertValidAuth(nodeClient, proposal, mpauth) {
   const membership = await nodeClient.api.query.master.members();
   for (const [did, _sig] of mpauth) {
     const is_member = [...membership.members].some(
-      (member) => u8aToHex(member) === u8aToHex(did),
+      (member) => u8aToHex(member) === u8aToHex(did)
     );
     if (!is_member) {
       throw `${did} is not a member of master`;

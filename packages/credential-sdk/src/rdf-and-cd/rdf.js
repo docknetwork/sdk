@@ -101,7 +101,9 @@ export function parseRDFDocument(document, parserOptions = {}) {
     // Reject if graph isnt default as rify doesnt support it otherwise
     if (graph.termType !== 'DefaultGraph') {
       throw new Error(
-        `Unexpected graph, expecting DefaultGraph: ${JSON.stringify(graph.toJSON())}`,
+        `Unexpected graph, expecting DefaultGraph: ${JSON.stringify(
+          graph.toJSON(),
+        )}`,
       );
     }
 

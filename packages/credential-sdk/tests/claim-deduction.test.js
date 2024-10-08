@@ -72,16 +72,16 @@ describe("Composite claim soundness checker", () => {
     });
 
     expect(
-      await verifyC(await issueCredential(kpa, cred(), true, documentLoader)),
+      await verifyC(await issueCredential(kpa, cred(), true, documentLoader))
     ).toHaveProperty("verified", true);
 
     let err;
     err = await verifyC(
-      await issueCredential(kpb, cred(), true, documentLoader),
+      await issueCredential(kpb, cred(), true, documentLoader)
     );
     expect(err).toHaveProperty("verified", false);
     expect(err.results[0].error.toString()).toMatch(
-      "Error: Credential issuer must match the verification method controller.",
+      "Error: Credential issuer must match the verification method controller."
     );
 
     // modify the attackers keydoc to assert it's controller is issuera
@@ -90,15 +90,15 @@ describe("Composite claim soundness checker", () => {
       controller: issuera,
     }));
     expect(
-      (await documentLoader(`${issuerb}#keys-1`)).document.controller,
+      (await documentLoader(`${issuerb}#keys-1`)).document.controller
     ).toBe(issuera);
 
     err = await verifyC(
-      await issueCredential(kpb, cred(), true, documentLoader),
+      await issueCredential(kpb, cred(), true, documentLoader)
     );
     expect(err).toHaveProperty("verified", false);
     expect(err.results[0].error.toString()).toMatch(
-      /not authorized by controller/,
+      /not authorized by controller/
     );
   });
 
@@ -201,7 +201,7 @@ describe("Composite claim soundness checker", () => {
         { Iri: "https://example.com/Ability" },
         { Iri: "https://example.com/Flight" },
         { DefaultGraph: true },
-      ],
+      ]
     );
   });
 
@@ -228,8 +228,8 @@ describe("Composite claim soundness checker", () => {
     ]);
     await expect(
       checkSoundness(presentation, rules).catch((err) =>
-        Promise.reject(JSON.stringify(err)),
-      ),
+        Promise.reject(JSON.stringify(err))
+      )
     ).rejects.toMatch(/Invalid signature/);
   });
 
@@ -370,7 +370,7 @@ describe("Composite claim soundness checker", () => {
         },
       },
       true,
-      documentLoader,
+      documentLoader
     );
 
     const joe_can_fly = await issueCredential(
@@ -389,18 +389,18 @@ describe("Composite claim soundness checker", () => {
         },
       },
       true,
-      documentLoader,
+      documentLoader
     );
 
     const presentation = createPresentation(
       [joe_can_fly, joe_is_a_pig],
       "uuid:ce0d9145-934a-42b3-aa48-af1d27f33c2a",
-      "uuid:078644cf-de19-436c-9691-fbe8a569a1d4",
+      "uuid:078644cf-de19-436c-9691-fbe8a569a1d4"
     );
 
     // create a proof that bddap is Gorgadon
     const presentation_claimgraph = await presentationToEEClaimGraph(
-      await jsonld.expand(presentation, { documentLoader }),
+      await jsonld.expand(presentation, { documentLoader })
     );
     const claim_to_prove = [
       { Iri: "did:dock:bddap" },
@@ -436,14 +436,14 @@ describe("Composite claim soundness checker", () => {
     const proof = await proveCompositeClaims(
       expandedPresentation,
       [compositeClaim],
-      rules,
+      rules
     );
     expect(await checkSoundness(presentation, rules)).not.toContainEqual(
-      compositeClaim,
+      compositeClaim
     );
     presentation[expandedLogicProperty] = proof;
     expect(await checkSoundness(presentation, rules)).toContainEqual(
-      compositeClaim,
+      compositeClaim
     );
   }, 30000);
 });
@@ -556,7 +556,7 @@ async function validPresentation() {
   const presentation = createPresentation(
     creds,
     `urn:${randomAsHex(16)}`,
-    holder,
+    holder
   );
   expect(await verifyP(presentation)).toHaveProperty("verified", true);
   return presentation;

@@ -11,5 +11,5 @@ async function main(dock, number) {
 }
 
 withDockAPI({ address: FullNodeEndpoint })(main)(BlockNumber).catch(
-  console.error,
+  console.error
 );

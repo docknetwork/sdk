@@ -1,7 +1,7 @@
 import { Secp256k1Keypair } from "../../src/keypairs";
 
 const keypairEcdsaSecp256k1 = new Secp256k1Keypair(
-  "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
 );
 
 // TODO: add more testing keys (ed25519 etc)

@@ -28,7 +28,7 @@ export const sendAlarmEmailText = curry(async (toAddr, subject, text) =>
       Data: text,
       Charset: "UTF-8",
     },
-  }),
+  })
 );
 
 /**
@@ -45,7 +45,7 @@ export const sendAlarmEmailHtml = curry(async (toAddr, subject, html) =>
       Data: html,
       Charset: "UTF-8",
     },
-  }),
+  })
 );
 
 const sendAlarmEmailWithBody = curry(async (toAddr, subject, body) => {

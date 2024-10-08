@@ -354,7 +354,12 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (
     )?.bytes;
     if (bytes == null) {
       throw new Error(
-        `Expected either of ${fmtIter(['publicKeyBase58', 'publicKeyBase64', 'publicKeyJwk', 'publicKeyHex'])} to be specified`,
+        `Expected either of ${fmtIter([
+          'publicKeyBase58',
+          'publicKeyBase64',
+          'publicKeyJwk',
+          'publicKeyHex',
+        ])} to be specified`,
       );
     }
 

@@ -16,7 +16,7 @@ const greaterThanZero = unless(
   (value) => value > 0,
   () => {
     throw new Error("Must be greater than zero");
-  },
+  }
 );
 
 const {
@@ -37,13 +37,13 @@ const {
     unless(
       either(
         (addr) => validateAddress(addr, "test"),
-        (addr) => validateAddress(addr, "main"),
+        (addr) => validateAddress(addr, "main")
       ),
       (addr) => {
         throw new Error(`Invalid stash address: ${addr}`);
-      },
+      }
     ),
-    notNilAnd(String),
+    notNilAnd(String)
   ),
   // Start era to summarise payouts from.
   StartEra: o(greaterThanZero, notNilAnd(finiteNumber)),
@@ -72,18 +72,18 @@ const main = withDockAPI(
 
     if (activeEraIndex < StartEra + ErasCount) {
       throw new Error(
-        `\`StartEra\` + \`ErasCount\` must be less or equal to ${activeEraIndex}`,
+        `\`StartEra\` + \`ErasCount\` must be less or equal to ${activeEraIndex}`
       );
     }
     if (BlocksPerEra % SessionsPerEra) {
       throw new Error(
-        "Failed to calculate blocks per session, `BlocksPerEra` should be divisible by `SessionsPerEra` with zero remainder",
+        "Failed to calculate blocks per session, `BlocksPerEra` should be divisible by `SessionsPerEra` with zero remainder"
       );
     }
 
     const eraIndices = Array.from(
       { length: ErasCount },
-      (_, idx) => StartEra + idx,
+      (_, idx) => StartEra + idx
     );
     const lastBlock = (await dock.api.query.system.number()).toNumber();
 
@@ -92,14 +92,14 @@ const main = withDockAPI(
         o(from, async (eraIndex) => {
           const startBlock = Math.max(
             lastBlock - BlocksPerEra * (activeEraIndex - eraIndex),
-            0,
+            0
           );
 
           const { hash: eraPaidBlockHash, number } = await findEraPaidBlock(
             dock,
             startBlock,
             lastBlock,
-            eraIndex,
+            eraIndex
           );
 
           const eraPaidApi = await dock.api.at(eraPaidBlockHash);
@@ -111,7 +111,7 @@ const main = withDockAPI(
           const eraValidatorInfo = await fetchValidatorStashEraInfo(
             eraPaidApi,
             new BN(eraIndex),
-            Stash,
+            Stash
           );
 
           let validatorPoints = new BN(0);
@@ -132,7 +132,7 @@ const main = withDockAPI(
                 validatorPoints,
                 eraValidatorInfo.exposure,
                 eraValidatorInfo.points.total,
-                eraValidatorInfo.rewards,
+                eraValidatorInfo.rewards
               );
 
           return [
@@ -140,11 +140,11 @@ const main = withDockAPI(
             { ...eraValidatorPayout, blocks, prefs: eraValidatorInfo.prefs },
           ];
         }),
-        ConcurrentErasLimit,
-      ),
+        ConcurrentErasLimit
+      )
     );
     const validatorEraResults = await lastValueFrom(
-      validatorEraResults$.pipe(toArray()),
+      validatorEraResults$.pipe(toArray())
     );
 
     const { total, staking, commission, blocks } = validatorEraResults
@@ -153,12 +153,12 @@ const main = withDockAPI(
         (acc, [index, { total, staking, commission, blocks, prefs }]) => {
           console.log(
             `Era ${index}: paid = \`${formatDock(
-              total,
+              total
             )}\` (staking = ${formatDock(staking)}, commission = ${formatDock(
-              commission,
+              commission
             )}), commission = ${prefs.commission.toNumber() / 1e7}%${
               blocks != null ? `, blocks produced = ${blocks.join("/")}` : ""
-            }`,
+            }`
           );
 
           return {
@@ -173,7 +173,7 @@ const main = withDockAPI(
           staking: new BN(0),
           commission: new BN(0),
           blocks: 0,
-        },
+        }
       );
 
     console.log(
@@ -189,9 +189,9 @@ const main = withDockAPI(
               blocks / eraIndices.length / SessionsPerEra
             }`
           : ""
-      }`,
+      }`
     );
-  },
+  }
 );
 
 const fetchProducedBlockCounts = async (dock, number) => {
@@ -204,14 +204,14 @@ const fetchProducedBlockCounts = async (dock, number) => {
         dock,
         (number - (BlocksPerEra * (idx + 1)) / SessionsPerEra) | 0,
         number,
-        lastSessionIndex.toNumber() - idx - 1,
-      ),
-    ).reverse(),
+        lastSessionIndex.toNumber() - idx - 1
+      )
+    ).reverse()
   );
 
   const sessionAPIs = [
     ...(await Promise.all(
-      sessionEnds.map(({ number }) => apiAtBlock(dock, number - 1)),
+      sessionEnds.map(({ number }) => apiAtBlock(dock, number - 1))
     )),
     api,
   ];
@@ -238,7 +238,7 @@ const countStashSessionBlocks = curry(async (api, stash) => {
   const sessionIndex = await api.query.session.currentIndex();
   const authoredBlocks = await api.query.imOnline.authoredBlocks(
     sessionIndex,
-    stash,
+    stash
   );
 
   return authoredBlocks.toNumber();
@@ -257,7 +257,7 @@ const findEraPaidBlock = async (
   dock,
   startBlockNumber,
   endBlockNumber,
-  targetEra,
+  targetEra
 ) =>
   binarySearchFirstSatisfyingBlock(
     dock.api,
@@ -276,10 +276,10 @@ const findEraPaidBlock = async (
           .find(
             ({ event: { method, section } }) =>
               section === "staking" &&
-              (method === "EraPayout" || method === "EraPaid"),
+              (method === "EraPayout" || method === "EraPaid")
           ),
     },
-    { maxBlocksPerUnit: BlocksPerEra, debug: Debug },
+    { maxBlocksPerUnit: BlocksPerEra, debug: Debug }
   );
 
 /**
@@ -295,7 +295,7 @@ const findNewSession = async (
   dock,
   startBlockNumber,
   endBlockNumber,
-  targetSession,
+  targetSession
 ) =>
   binarySearchFirstSatisfyingBlock(
     dock.api,
@@ -303,8 +303,9 @@ const findNewSession = async (
       startBlockNumber,
       endBlockNumber,
       fetchValue: async (blockHash) => {
-        const sessionIndex =
-          await dock.api.query.session.currentIndex.at(blockHash);
+        const sessionIndex = await dock.api.query.session.currentIndex.at(
+          blockHash
+        );
 
         return sessionIndex.toNumber();
       },
@@ -314,10 +315,10 @@ const findNewSession = async (
           .toHuman()
           .find(
             ({ event: { method, section } }) =>
-              section === "session" && method === "NewSession",
+              section === "session" && method === "NewSession"
           ),
     },
-    { maxBlocksPerUnit: BlocksPerEra / SessionsPerEra, debug: Debug },
+    { maxBlocksPerUnit: BlocksPerEra / SessionsPerEra, debug: Debug }
   );
 /**
  * Fetches information about the era for the supplied validator.
@@ -357,7 +358,7 @@ const validatorStashPayout = (
   validatorRewardPoints,
   validatorExposure,
   eraRewardPoints,
-  eraPayout,
+  eraPayout
 ) => {
   // This is how much validator + nominators are entitled to.
   const validatorTotalPayout = eraPayout
@@ -367,10 +368,10 @@ const validatorStashPayout = (
   // Validator first gets a cut off the top.
   const validatorCommissionPayout = new BN(
     validatorTotalPayout.toNumber() *
-      (validatorPref.commission.toNumber() / 1e9),
+      (validatorPref.commission.toNumber() / 1e9)
   );
   const validatorLeftOverPart = validatorTotalPayout.sub(
-    validatorCommissionPayout,
+    validatorCommissionPayout
   );
 
   // Now let's calculate how this is split to the validator.

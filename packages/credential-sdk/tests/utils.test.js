@@ -76,11 +76,11 @@ describe("Testing isHexWithGivenByteSize", () => {
           await expect(() =>
             timeout(2e2, () => {
               throw new Error("Rejected timeout");
-            }),
+            })
           ).rejects.toThrowErrorMatchingSnapshot();
           expectElapsedTimeSec(0.2);
         },
-      ].map((f) => f()),
+      ].map((f) => f())
     );
   });
 
@@ -106,8 +106,8 @@ describe("Testing isHexWithGivenByteSize", () => {
 
     let results = await Promise.all(
       Array.from({ length: 10 }, (_, i) =>
-        map.callByKey(i, () => timeout(5e2, () => i)),
-      ),
+        map.callByKey(i, () => timeout(5e2, () => i))
+      )
     );
 
     expect(results).toEqual(Array.from({ length: 10 }, (_, i) => i));
@@ -129,9 +129,9 @@ describe("Testing isHexWithGivenByteSize", () => {
         () => mapWithBoundQueue.callByKey(3, () => timeout(5e2, () => 4)),
         () =>
           expect(() =>
-            mapWithBoundQueue.callByKey(4, () => timeout(5e2, () => 5)),
+            mapWithBoundQueue.callByKey(4, () => timeout(5e2, () => 5))
           ).rejects.toThrowErrorMatchingSnapshot(),
-      ].map((f) => f()),
+      ].map((f) => f())
     );
 
     expect(results).toEqual([1, 2, 3, 4, undefined]);
@@ -155,7 +155,7 @@ describe("Testing isHexWithGivenByteSize", () => {
           const onTimeoutExceeded = jest.fn((retrySym) => retrySym);
 
           expect(
-            await retry(makeCtrFn(5), 3e2, { delay: 2e2, onTimeoutExceeded }),
+            await retry(makeCtrFn(5), 3e2, { delay: 2e2, onTimeoutExceeded })
           ).toBe(0);
           expectElapsedTimeSec(2.5);
 
@@ -171,19 +171,19 @@ describe("Testing isHexWithGivenByteSize", () => {
         },
         async () => {
           await expect(() =>
-            retry(makeCtrFn(5), 3e2, { maxAttempts: 3 }),
+            retry(makeCtrFn(5), 3e2, { maxAttempts: 3 })
           ).rejects.toThrowErrorMatchingSnapshot();
           expectElapsedTimeSec(1.2);
         },
         async () => {
           expect(
-            await retry(makeCtrFn(5), 3e2, { maxAttempts: 5, delay: 2e2 }),
+            await retry(makeCtrFn(5), 3e2, { maxAttempts: 5, delay: 2e2 })
           ).toBe(0);
           expectElapsedTimeSec(2.5);
         },
         async () => {
           await expect(() =>
-            retry(makeCtrFn(100), 1, { maxAttempts: 99 }),
+            retry(makeCtrFn(100), 1, { maxAttempts: 99 })
           ).rejects.toThrowErrorMatchingSnapshot();
           expectElapsedTimeSec(0.1);
         },
@@ -191,7 +191,7 @@ describe("Testing isHexWithGivenByteSize", () => {
           expect(
             await retry(makeCtrFn(4, Promise.reject(1)), 3e2, {
               onError: (_, next) => next,
-            }),
+            })
           ).toBe(0);
           expectElapsedTimeSec(0);
         },
@@ -199,7 +199,7 @@ describe("Testing isHexWithGivenByteSize", () => {
           expect(
             await retry(makeCtrFn(4, Promise.reject(1)), 3e2, {
               onError: (error) => error,
-            }),
+            })
           ).toBe(1);
           expectElapsedTimeSec(0);
         },
@@ -209,11 +209,11 @@ describe("Testing isHexWithGivenByteSize", () => {
               onError: () => {
                 throw new Error("From `onError` callback");
               },
-            }),
+            })
           ).rejects.toThrowErrorMatchingSnapshot();
           expectElapsedTimeSec(0);
         },
-      ].map((f) => f()),
+      ].map((f) => f())
     );
   });
 });
@@ -259,7 +259,7 @@ describe("Testing Ecdsa with secp256k1", () => {
     const pair = new Secp256k1Keypair(entropy);
     const pk = pair.publicKey();
     const sig = new Uint8Array(
-      pair.keyPair.sign(Secp256k1Keypair.hash(msg)).toDER(),
+      pair.keyPair.sign(Secp256k1Keypair.hash(msg)).toDER()
     );
     expect(Secp256k1Keypair.verify(msg, sig, pk)).toBe(true);
 
@@ -268,7 +268,7 @@ describe("Testing Ecdsa with secp256k1", () => {
       2, 3, 4, 5, 6, 7, 8, 9,
     ];
     const sig1 = new Uint8Array(
-      pair.keyPair.sign(Secp256k1Keypair.hash(msg1)).toDER(),
+      pair.keyPair.sign(Secp256k1Keypair.hash(msg1)).toDER()
     );
     expect(Secp256k1Keypair.verify(msg1, sig1, pk)).toBe(true);
     expect(msg !== msg1).toBe(true);
@@ -279,7 +279,7 @@ describe("Testing Ecdsa with secp256k1", () => {
       2, 3, 4, 5, 6, 7,
     ];
     const sig2 = new Uint8Array(
-      pair.keyPair.sign(Secp256k1Keypair.hash(msg2)).toDER(),
+      pair.keyPair.sign(Secp256k1Keypair.hash(msg2)).toDER()
     );
     expect(Secp256k1Keypair.verify(msg2, sig2, pk)).toBe(true);
     expect(msg2 !== msg1).toBe(true);

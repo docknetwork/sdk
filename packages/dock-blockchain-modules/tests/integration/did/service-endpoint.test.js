@@ -74,14 +74,14 @@ describe("DID service endpoints", () => {
 
     // `dockDid1` adds service endpoint for itself
     const origins1 = new ServiceEndpointOrigins(
-      ...origins1Text.map((u) => u8aToHex(encoder.encode(u))),
+      ...origins1Text.map((u) => u8aToHex(encoder.encode(u)))
     );
     await modules.did.dockOnly.addServiceEndpoint(
       spId1,
       spType,
       origins1,
       dockDid1,
-      pair1,
+      pair1
     );
 
     const sp = await modules.did.dockOnly.getServiceEndpoint(spId1);
@@ -98,19 +98,19 @@ describe("DID service endpoints", () => {
       dockDid2,
       [didKey2],
       [dockDid1],
-      false,
+      false
     );
 
     // `dockDid1` adds service endpoint to `dockDid2`
     const origins2 = new ServiceEndpointOrigins(
-      ...origins2Text.map((u) => u8aToHex(encoder.encode(u))),
+      ...origins2Text.map((u) => u8aToHex(encoder.encode(u)))
     );
     await modules.did.dockOnly.addServiceEndpoint(
       spId2,
       spType,
       origins2,
       dockDid2,
-      pair2,
+      pair2
     );
 
     const sp1 = await modules.did.dockOnly.getServiceEndpoint(spId2);
@@ -139,14 +139,14 @@ describe("DID service endpoints", () => {
   test("Add another service endpoint", async () => {
     const spType = new LinkedDomains();
     const origins = new ServiceEndpointOrigins(
-      ...origins3Text.map((u) => u8aToHex(encoder.encode(u))),
+      ...origins3Text.map((u) => u8aToHex(encoder.encode(u)))
     );
     await modules.did.dockOnly.addServiceEndpoint(
       spId3,
       spType,
       origins,
       dockDid2,
-      pair1,
+      pair1
     );
     const sp = await modules.did.dockOnly.getServiceEndpoint(spId3);
     expect(sp.types).toEqual(spType);
@@ -160,7 +160,7 @@ describe("DID service endpoints", () => {
     expect(doc.service[1].type).toEqual("LinkedDomains");
     expect(
       (doc.service[0].id === spId2Text && doc.service[1].id === spId3Text) ||
-        (doc.service[0].id === spId3Text && doc.service[1].id === spId2Text),
+        (doc.service[0].id === spId3Text && doc.service[1].id === spId2Text)
     ).toBe(true);
 
     expect(
@@ -171,7 +171,7 @@ describe("DID service endpoints", () => {
         (JSON.stringify(doc.service[0].serviceEndpoint) ===
           JSON.stringify(origins3Text) &&
           JSON.stringify(doc.service[1].serviceEndpoint) ===
-            JSON.stringify(origins2Text)),
+            JSON.stringify(origins2Text))
     ).toBe(true);
   });
 
@@ -180,7 +180,7 @@ describe("DID service endpoints", () => {
     // `dockDid1` removes service endpoint of `dockDid2`
     await modules.did.dockOnly.removeServiceEndpoint(spId2, pair1);
     await expect(
-      modules.did.dockOnly.getServiceEndpoint(spId2),
+      modules.did.dockOnly.getServiceEndpoint(spId2)
     ).rejects.toThrow();
   }, 3e4);
 
@@ -188,10 +188,10 @@ describe("DID service endpoints", () => {
     await modules.did.removeDocument(dockDid1, pair1);
 
     await expect(
-      modules.did.dockOnly.getOnchainDidDetail(dockDid1.asDid),
+      modules.did.dockOnly.getOnchainDidDetail(dockDid1.asDid)
     ).rejects.toThrow(NoDIDError);
     await expect(
-      modules.did.dockOnly.getServiceEndpoint(spId1),
+      modules.did.dockOnly.getServiceEndpoint(spId1)
     ).rejects.toThrow();
   }, 3e4);
 });

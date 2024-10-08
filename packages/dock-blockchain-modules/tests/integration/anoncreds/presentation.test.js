@@ -83,7 +83,7 @@ describe.each(Schemes)(
         chainModule = getModule(dock);
 
         const pk1 = Module.prepareAddPublicKey(
-          u8aToHex(keypair.publicKeyBuffer),
+          u8aToHex(keypair.publicKeyBuffer)
         );
         await chainModule.addPublicKey(null, pk1, did1, pair1);
 
@@ -105,22 +105,22 @@ describe.each(Schemes)(
       for (let i = 0; i < presentation.spec.credentials.length; i++) {
         // Ensure verificationMethod & type is revealed always
         expect(
-          presentation.spec.credentials[i].revealedAttributes.proof,
+          presentation.spec.credentials[i].revealedAttributes.proof
         ).toBeDefined();
         expect(
-          presentation.spec.credentials[i].revealedAttributes.proof,
+          presentation.spec.credentials[i].revealedAttributes.proof
         ).toHaveProperty(
           "verificationMethod",
-          credentials[i].proof.verificationMethod,
+          credentials[i].proof.verificationMethod
         );
         expect(
-          presentation.spec.credentials[0].revealedAttributes.proof,
+          presentation.spec.credentials[0].revealedAttributes.proof
         ).toHaveProperty("type", credentials[i].proof.type);
 
         expect(presentation.spec.credentials[i].schema).toBeDefined();
         expect(presentation.spec.credentials[i].sigType).toBeDefined();
         expect(presentation.spec.credentials[i].version).toEqual(
-          CredentialBuilder.VERSION,
+          CredentialBuilder.VERSION
         );
       }
     }
@@ -131,7 +131,7 @@ describe.each(Schemes)(
         "Resident Card Example",
         did1,
         pair1,
-        modules.blob,
+        modules.blob
       );
       const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
 
@@ -145,7 +145,7 @@ describe.each(Schemes)(
         issuerKey,
         unsignedCred,
         true,
-        defaultDocumentLoader(resolver),
+        defaultDocumentLoader(resolver)
       );
 
       // This credential has embedded schema
@@ -158,12 +158,12 @@ describe.each(Schemes)(
       const presentationInstance = new Presentation();
       const idx = await presentationInstance.addCredentialToPresent(
         credential,
-        { resolver },
+        { resolver }
       );
 
       const idx2 = await presentationInstance.addCredentialToPresent(
         credential2,
-        { resolver },
+        { resolver }
       );
 
       await presentationInstance.addAttributeToReveal(idx, [
@@ -177,16 +177,16 @@ describe.each(Schemes)(
       const presentation = await presentationInstance.createPresentation();
 
       expect(
-        presentation.spec.credentials[0].revealedAttributes,
+        presentation.spec.credentials[0].revealedAttributes
       ).toHaveProperty("credentialSubject");
       expect(
-        presentation.spec.credentials[0].revealedAttributes.credentialSubject,
+        presentation.spec.credentials[0].revealedAttributes.credentialSubject
       ).toHaveProperty("lprNumber", 1234);
       expect(
-        presentation.spec.credentials[1].revealedAttributes,
+        presentation.spec.credentials[1].revealedAttributes
       ).toHaveProperty("credentialSubject");
       expect(
-        presentation.spec.credentials[1].revealedAttributes.credentialSubject,
+        presentation.spec.credentials[1].revealedAttributes.credentialSubject
       ).toHaveProperty("lprNumber", 1234);
 
       const schemas = getJsonSchemasFromPresentation(presentation, false);
@@ -208,11 +208,11 @@ describe.each(Schemes)(
         const sk = new BBDT16MacSecretKey(keypair.privateKeyBuffer);
         // eslint-disable-next-line jest/no-conditional-expect
         expect(
-          keyedProofs.get(0)?.credential?.proof.verify(sk).verified,
+          keyedProofs.get(0)?.credential?.proof.verify(sk).verified
         ).toEqual(true);
         // eslint-disable-next-line jest/no-conditional-expect
         expect(
-          keyedProofs.get(1)?.credential?.proof.verify(sk).verified,
+          keyedProofs.get(1)?.credential?.proof.verify(sk).verified
         ).toEqual(true);
       }
     }, 40000);
@@ -229,7 +229,7 @@ describe.each(Schemes)(
 
       const idx = await presentationInstance.addCredentialToPresent(
         credential,
-        { resolver },
+        { resolver }
       );
 
       await presentationInstance.addAttributeToReveal(idx, [
@@ -239,10 +239,10 @@ describe.each(Schemes)(
       const presentation = await presentationInstance.createPresentation();
 
       expect(
-        presentation.spec.credentials[0].revealedAttributes,
+        presentation.spec.credentials[0].revealedAttributes
       ).toHaveProperty("credentialSubject");
       expect(
-        presentation.spec.credentials[0].revealedAttributes.credentialSubject,
+        presentation.spec.credentials[0].revealedAttributes.credentialSubject
       ).toHaveProperty("lprNumber", 1234);
 
       checkCommonRevealedFields(presentation, [credential]);
@@ -258,7 +258,7 @@ describe.each(Schemes)(
         const sk = new BBDT16MacSecretKey(keypair.privateKeyBuffer);
         // eslint-disable-next-line jest/no-conditional-expect
         expect(
-          keyedProofs.get(0)?.credential?.proof.verify(sk).verified,
+          keyedProofs.get(0)?.credential?.proof.verify(sk).verified
         ).toEqual(true);
       }
     }, 30000);
@@ -277,11 +277,11 @@ describe.each(Schemes)(
 
       const idx = await presentationInstance.addCredentialToPresent(
         credential,
-        { resolver },
+        { resolver }
       );
       const idx2 = await presentationInstance.addCredentialToPresent(
         credential2,
-        { resolver },
+        { resolver }
       );
       await presentationInstance.addAttributeToReveal(idx, [
         "credentialSubject.lprNumber",
@@ -293,17 +293,17 @@ describe.each(Schemes)(
       const presentation = await presentationInstance.createPresentation();
 
       expect(
-        presentation.spec.credentials[0].revealedAttributes,
+        presentation.spec.credentials[0].revealedAttributes
       ).toHaveProperty("credentialSubject");
       expect(
-        presentation.spec.credentials[0].revealedAttributes.credentialSubject,
+        presentation.spec.credentials[0].revealedAttributes.credentialSubject
       ).toHaveProperty("lprNumber", 1234);
 
       expect(
-        presentation.spec.credentials[1].revealedAttributes,
+        presentation.spec.credentials[1].revealedAttributes
       ).toHaveProperty("credentialSubject");
       expect(
-        presentation.spec.credentials[1].revealedAttributes.credentialSubject,
+        presentation.spec.credentials[1].revealedAttributes.credentialSubject
       ).toHaveProperty("familyName", "SMITH");
 
       checkCommonRevealedFields(presentation, [credential, credential2]);
@@ -327,7 +327,7 @@ describe.each(Schemes)(
 
       const idx = await presentationInstance.addCredentialToPresent(
         credential,
-        { resolver },
+        { resolver }
       );
 
       await presentationInstance.addAttributeToReveal(idx, [
@@ -341,7 +341,7 @@ describe.each(Schemes)(
         new Date("2019-10-01"),
         new Date("2020-01-01"),
         provingKeyId,
-        provingKey,
+        provingKey
       );
 
       const presentation = await presentationInstance.createPresentation();
@@ -359,10 +359,10 @@ describe.each(Schemes)(
       });
 
       expect(
-        presentation.spec.credentials[0].revealedAttributes,
+        presentation.spec.credentials[0].revealedAttributes
       ).toHaveProperty("credentialSubject");
       expect(
-        presentation.spec.credentials[0].revealedAttributes.credentialSubject,
+        presentation.spec.credentials[0].revealedAttributes.credentialSubject
       ).toHaveProperty("lprNumber", 1234);
 
       checkCommonRevealedFields(presentation, [credential]);
@@ -390,7 +390,7 @@ describe.each(Schemes)(
 
       const idx = await presentationInstance.addCredentialToPresent(
         credential,
-        { resolver },
+        { resolver }
       );
 
       expect(() => {
@@ -411,7 +411,7 @@ describe.each(Schemes)(
 
       const idx = await presentationInstance.addCredentialToPresent(
         credential,
-        { resolver },
+        { resolver }
       );
       await presentationInstance.addAttributeToReveal(idx, [
         "credentialSubject.lprNumber",
@@ -422,10 +422,10 @@ describe.each(Schemes)(
       });
       expect(presentation.nonce).toEqual(b58.encode(stringToU8a("1234")));
       expect(
-        presentation.spec.credentials[0].revealedAttributes,
+        presentation.spec.credentials[0].revealedAttributes
       ).toHaveProperty("credentialSubject");
       expect(
-        presentation.spec.credentials[0].revealedAttributes.credentialSubject,
+        presentation.spec.credentials[0].revealedAttributes.credentialSubject
       ).toHaveProperty("lprNumber", 1234);
 
       const { verified } = await verifyPresentation(presentation, { resolver });
@@ -435,5 +435,5 @@ describe.each(Schemes)(
     afterAll(async () => {
       await dock.disconnect();
     }, 10000);
-  },
+  }
 );

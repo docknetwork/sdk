@@ -69,9 +69,7 @@ export default class DockInternalAccumulatorModule extends createInternalDockMod
 
   async counters(did) {
     return DockAccumulatorCounters.from(
-      await this.query.accumulatorOwnerCounters(
-        DockDidOrDidMethodKey.from(did),
-      ),
+      await this.query.accumulatorOwnerCounters(DockDidOrDidMethodKey.from(did)),
     );
   }
 
@@ -222,10 +220,7 @@ export default class DockInternalAccumulatorModule extends createInternalDockMod
       && ext.method.method === 'updateAccumulator'
     ) {
       const update = UpdateAccumulator.from(
-        this.apiProvider.api.createType(
-          'UpdateAccumulator',
-          ext.method.args[0],
-        ),
+        this.apiProvider.api.createType('UpdateAccumulator', ext.method.args[0]),
       );
 
       if (update.id.eq(accId)) {

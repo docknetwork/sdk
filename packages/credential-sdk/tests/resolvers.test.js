@@ -77,31 +77,28 @@ class WildcardPrefixAndMethodFull extends WildcardPrefixAndMethod {
 describe("Resolvers", () => {
   it("checks `MultiResolver`", async () => {
     expect(() => new MultiResolver()).toThrowError(
-      "Static property `PREFIX` of `MultiResolver` isn't extended properly",
+      "Static property `PREFIX` of `MultiResolver` isn't extended properly"
     );
     expect(() => new BMethod()).toThrowError(
-      "Static property `PREFIX` of `BMethod` isn't extended properly",
+      "Static property `PREFIX` of `BMethod` isn't extended properly"
     );
     expect(() => new APrefixBMethod()).toThrowError(
-      "No resolvers were provided. You need to either implement `resolve` or provide a list of resolvers",
+      "No resolvers were provided. You need to either implement `resolve` or provide a list of resolvers"
     );
     expect(() => new APrefix()).toThrowError(
-      "Static property `METHOD` of `APrefix` isn't extended properly",
+      "Static property `METHOD` of `APrefix` isn't extended properly"
     );
     expect(() => new MultiResolver([new APrefixBMethodFull()])).toThrowError(
-      "Static property `PREFIX` of `MultiResolver` isn't extended properly",
+      "Static property `PREFIX` of `MultiResolver` isn't extended properly"
     );
     expect(
       () =>
-        new APrefixBMethod([
-          new APrefixBMethodFull(),
-          new APrefixBMethodFull(),
-        ]),
+        new APrefixBMethod([new APrefixBMethodFull(), new APrefixBMethodFull()])
     ).toThrowError(
-      "Two resolvers for the same prefix and method - `a:b:`: `APrefixBMethodFull` and `APrefixBMethodFull`",
+      "Two resolvers for the same prefix and method - `a:b:`: `APrefixBMethodFull` and `APrefixBMethodFull`"
     );
     expect(await new APrefixBMethodFull().resolve("a:b:123")).toBe(
-      "ab-full-a:b:123",
+      "ab-full-a:b:123"
     );
     expect(new APrefixBMethodFull().supports("a:b:123")).toBe(true);
     expect(new APrefixBMethodFull().supports("a:c:123")).toBe(false);
@@ -111,15 +108,15 @@ describe("Resolvers", () => {
     expect(new APrefixBMethodFull().supports("c:b:123")).toBe(false);
 
     expect(await new APrefixBMethodFullExtended().resolve("a:b:456")).toBe(
-      "ab-extended-a:b:456",
+      "ab-extended-a:b:456"
     );
     expect(
-      await new APrefixBMethod([new APrefixBMethodFull()]).resolve("a:b:456"),
+      await new APrefixBMethod([new APrefixBMethodFull()]).resolve("a:b:456")
     ).toBe("ab-full-a:b:456");
     expect(
       await new APrefixBMethod([new APrefixBMethodFullExtended()]).resolve(
-        "a:b:456",
-      ),
+        "a:b:456"
+      )
     ).toBe("ab-extended-a:b:456");
 
     const wildcard = new WildcardPrefixAndMethod([
@@ -132,14 +129,14 @@ describe("Resolvers", () => {
 
     expect(await wildcard.resolve("a:b:")).toBe("ab-full-a:b:");
     expect(await wildcard.resolve("a:asdasdas:")).toBe(
-      "a-wildcard-a:asdasdas:",
+      "a-wildcard-a:asdasdas:"
     );
     expect(await wildcard.resolve("asdasdasd:b:")).toBe(
-      "wildcard-b-asdasdasd:b:",
+      "wildcard-b-asdasdasd:b:"
     );
     expect(await wildcard.resolve("c:d:")).toBe("cd-full-c:d:");
     expect(await wildcard.resolve("asdasdasd:asdasdasd:")).toBe(
-      "wildcard-wildcard-asdasdasd:asdasdasd:",
+      "wildcard-wildcard-asdasdasd:asdasdasd:"
     );
 
     const nestedWildcard = new WildcardPrefixAndMethod([
@@ -149,10 +146,10 @@ describe("Resolvers", () => {
     expect(await nestedWildcard.resolve("a:b:")).toBe("ab-extended-a:b:");
     expect(await nestedWildcard.resolve("c:d:")).toBe("cd-full-c:d:");
     expect(await wildcard.resolve("a:asdasdas:")).toBe(
-      "a-wildcard-a:asdasdas:",
+      "a-wildcard-a:asdasdas:"
     );
     expect(await nestedWildcard.resolve("asdasdasd:asdasdasd:")).toBe(
-      "wildcard-wildcard-asdasdasd:asdasdasd:",
+      "wildcard-wildcard-asdasdasd:asdasdasd:"
     );
 
     const abTop = new APrefixBMethodFullExtended();
@@ -172,20 +169,20 @@ describe("Resolvers", () => {
     expect(
       discreteWrappedInWildcard
         .matchingResolver("c:d:")
-        .matchingResolver("c:d:"),
+        .matchingResolver("c:d:")
     ).toBe(cd);
     expect(discreteWrappedInWildcard.matchingResolver("a:c:")).toBe(acdTop);
     expect(discreteWrappedInWildcard.matchingResolver("a:d:")).toBe(acdTop);
     expect(
       discreteWrappedInWildcard
         .matchingResolver("a:e:")
-        .matchingResolver("a:e:"),
+        .matchingResolver("a:e:")
     ).toBe(awildcard);
     expect(discreteWrappedInWildcard.matchingResolver("c:f:")).toBe(null);
     expect(
       discreteWrappedInWildcard
         .matchingResolver("x:b:")
-        .matchingResolver("x:b:"),
+        .matchingResolver("x:b:")
     ).toBe(widlcardb);
     expect(discreteWrappedInWildcard.matchingResolver("e:a:")).toBe(null);
   });
@@ -194,11 +191,11 @@ describe("Resolvers", () => {
     const resolve = async () => 1;
 
     expect(() =>
-      createResolver(new APrefixBMethodFull(), { prefix: "c" }),
+      createResolver(new APrefixBMethodFull(), { prefix: "c" })
     ).toThrowError("Item not found in [c]: `a`");
 
     expect(() =>
-      createResolver(new APrefixBMethodFull(), { method: "c" }),
+      createResolver(new APrefixBMethodFull(), { method: "c" })
     ).toThrowError("Item not found in [c]: `b`");
 
     const singleResolver = createResolver(resolve, {
@@ -211,7 +208,7 @@ describe("Resolvers", () => {
     expect(singleResolver.supports("abc:de:1")).toBe(false);
 
     const wildcardResolver = createResolver(
-      createResolver(resolve, { prefix: "abc", method: "cde" }),
+      createResolver(resolve, { prefix: "abc", method: "cde" })
     );
 
     expect(await wildcardResolver.resolve("abc:cde:1")).toBe(1);

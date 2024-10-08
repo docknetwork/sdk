@@ -87,8 +87,8 @@ describe("ensureMatchesPattern", () => {
         new Map([
           [1, 2],
           [3, 1],
-        ]),
-      ),
+        ])
+      )
     );
     ensureMatchesPattern(pat, new Map([]));
     ensureMatchesPattern(pat, new Map([[1, 2]]));

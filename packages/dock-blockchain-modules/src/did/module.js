@@ -38,7 +38,9 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
     }
     if (context.length !== 1 || context[0].value !== CONTEXT_URI) {
       throw new Error(
-        `Context must be equal to \`${[CONTEXT_URI]}\`, received: \`${context}\``,
+        `Context must be equal to \`${[
+          CONTEXT_URI,
+        ]}\`, received: \`${context}\``,
       );
     }
 
@@ -78,7 +80,9 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
 
     if (context.length !== 1 || context[0].value !== CONTEXT_URI) {
       throw new Error(
-        `Context must be equal to \`${[CONTEXT_URI]}\`, received: \`${context}\``,
+        `Context must be equal to \`${[
+          CONTEXT_URI,
+        ]}\`, received: \`${context}\``,
       );
     }
 
@@ -144,7 +148,9 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
     const typedDid = DockDid.from(did);
     const hexDid = typedDid.asDid;
 
-    const { data: didDetails } = await this.dockOnly.getOnchainDidDetail(hexDid);
+    const { data: didDetails } = await this.dockOnly.getOnchainDidDetail(
+      hexDid,
+    );
 
     // Get DIDs attestations
     const attests = await this.attest.getAttests(typedDid);

@@ -28,13 +28,13 @@ export function getTestPrivKeysForEVMAccounts() {
 // Returns some test EVM accounts
 export function getTestEVMAccountsFromWeb3(web3) {
   return getTestPrivKeysForEVMAccounts().map((k) =>
-    web3.eth.accounts.privateKeyToAccount(k),
+    web3.eth.accounts.privateKeyToAccount(k)
   );
 }
 
 export function getTestEVMAccountsFromEthers(provider) {
   return getTestPrivKeysForEVMAccounts().map(
-    (k) => new ethers.Wallet(k, provider),
+    (k) => new ethers.Wallet(k, provider)
   );
 }
 
@@ -44,14 +44,14 @@ export async function endowEVMAddressWithDefault(
   evmAddr,
   amount,
   nodeEndpoint,
-  accountUri,
+  accountUri
 ) {
   const dock = new DockAPI();
   await dock.init({
     address: nodeEndpoint !== undefined ? nodeEndpoint : FullNodeEndpoint,
   });
   const keypair = dock.keyring.addFromUri(
-    accountUri !== undefined ? accountUri : EndowedSecretURI,
+    accountUri !== undefined ? accountUri : EndowedSecretURI
   );
   dock.setAccount(keypair);
 
@@ -79,7 +79,7 @@ export async function deployContract(
   bytecode,
   value,
   gasPrice,
-  gas,
+  gas
 ) {
   const createTransaction = await signer.signTransaction({
     data: bytecode,
@@ -88,7 +88,7 @@ export async function deployContract(
     gas: gas !== undefined ? gas : web3.utils.toBN(MaxGas),
   });
   const createReceipt = await web3.eth.sendSignedTransaction(
-    createTransaction.rawTransaction,
+    createTransaction.rawTransaction
   );
   console.log(`Contract deployed at address ${createReceipt.contractAddress}`);
   return createReceipt.contractAddress;
@@ -101,7 +101,7 @@ export async function sendEVMTxn(
   bytecode,
   value,
   gasPrice,
-  gas,
+  gas
 ) {
   const txn = await signer.signTransaction({
     to,
@@ -122,7 +122,7 @@ export async function sendTokensToEVMAddress(
   to,
   amount,
   gasPrice,
-  gas,
+  gas
 ) {
   // A transfer is an EVM transaction with no data.
   return sendEVMTxn(web3, signer, to, 0, amount, gasPrice, gas);
@@ -143,7 +143,7 @@ export async function sendTokens(
   to,
   amount,
   gasPrice,
-  gas,
+  gas
 ) {
   const contract = new web3.eth.Contract(abi, contractAddress);
   const encoded = contract.methods.transfer(to, amount).encodeABI();
@@ -157,10 +157,10 @@ export async function sendTokens(
   });
 
   const transferReceipt = await web3.eth.sendSignedTransaction(
-    transferTransaction.rawTransaction,
+    transferTransaction.rawTransaction
   );
   console.log(
-    `Transfer executed to ${transferReceipt.to} (H: ${transferReceipt.transactionHash})`,
+    `Transfer executed to ${transferReceipt.to} (H: ${transferReceipt.transactionHash})`
   );
   return transferReceipt;
 }

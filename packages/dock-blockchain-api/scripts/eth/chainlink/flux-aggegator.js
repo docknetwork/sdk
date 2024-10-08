@@ -24,7 +24,7 @@ async function deploy(
   minSubmissionValue,
   maxSubmissionValue,
   decimals,
-  description,
+  description
 ) {
   console.log("Deploying FluxAggregator");
   const argsABI = web3.eth.abi.encodeParameters(
@@ -47,7 +47,7 @@ async function deploy(
       maxSubmissionValue,
       decimals,
       description,
-    ],
+    ]
   );
   const contractBytecode = FluxAggregatorByteCode + argsABI.slice(2);
 
@@ -82,7 +82,7 @@ async function main() {
     minSubmissionValue,
     maxSubmissionValue,
     decimals,
-    description,
+    description
   );
 
   const contract = new web3.eth.Contract(FluxAggregatorABI, contractAddr);

@@ -35,7 +35,7 @@ async function main() {
   dock.setAccount(account);
 
   console.log(
-    `Written in block ${await loadFromFileAndSet(dock, anchorsPath)}`,
+    `Written in block ${await loadFromFileAndSet(dock, anchorsPath)}`
   );
 
   console.log(`Written in block ${await loadFromFileAndSet(dock, blobsPath)}`);

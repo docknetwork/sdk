@@ -6,11 +6,16 @@ export async function fund(
   signer,
   linkTokenAddr,
   contractAddr,
-  contract,
+  contract
 ) {
   // Send Link to Aggregator
   console.log(
-    `Aggregator's token balance: ${await getTokenBalance(web3, linkTokenAddr, LinkTokenABI, contractAddr)}`,
+    `Aggregator's token balance: ${await getTokenBalance(
+      web3,
+      linkTokenAddr,
+      LinkTokenABI,
+      contractAddr
+    )}`
   );
   await sendTokens(
     web3,
@@ -18,10 +23,15 @@ export async function fund(
     linkTokenAddr,
     LinkTokenABI,
     contractAddr,
-    web3.utils.toBN(1000000),
+    web3.utils.toBN(1000000)
   );
   console.log(
-    `Aggregator's token balance: ${await getTokenBalance(web3, linkTokenAddr, LinkTokenABI, contractAddr)}`,
+    `Aggregator's token balance: ${await getTokenBalance(
+      web3,
+      linkTokenAddr,
+      LinkTokenABI,
+      contractAddr
+    )}`
   );
 
   // Let Aggregator update its state to reflect the transferred ether
@@ -35,7 +45,7 @@ export async function addOracles(
   contractAddr,
   contract,
   oracle1,
-  oracle2,
+  oracle2
 ) {
   // Add oracles
   // Keeping the admin same as oracle node as its an example

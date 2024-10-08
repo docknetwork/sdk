@@ -34,8 +34,8 @@ import { DockAPI } from "../src";
 export const blockByNumber = curry((dock, number) =>
   of(number).pipe(
     concatMap((number) => from(dock.api.rpc.chain.getBlockHash(number))),
-    concatMap((hash) => from(dock.api.derive.chain.getBlock(hash))),
-  ),
+    concatMap((hash) => from(dock.api.derive.chain.getBlock(hash)))
+  )
 );
 
 /**
@@ -49,7 +49,7 @@ export async function sendTxnWithAccount(
   dock,
   senderAccountUri,
   txn,
-  waitForFinalization = true,
+  waitForFinalization = true
 ) {
   const account = dock.keyring.addFromUri(senderAccountUri);
   dock.setAccount(account);
@@ -97,12 +97,12 @@ export async function sendBatch(
   dock,
   txs,
   senderAddress,
-  waitForFinalization = false,
+  waitForFinalization = false
 ) {
   const txBatch = dock.api.tx.utility.batch(txs);
   console.log(`Batch size is ${txBatch.encodedLength}`);
   console.info(
-    `Payment info of batch is ${await txBatch.paymentInfo(senderAddress)}`,
+    `Payment info of batch is ${await txBatch.paymentInfo(senderAddress)}`
   );
 
   const bal1 = await getBalance(dock.api, senderAddress);
@@ -197,7 +197,7 @@ export const finiteNumber = o(
   unless(isFinite, (value) => {
     throw new Error(`Invalid number provided: ${value}`);
   }),
-  Number,
+  Number
 );
 
 /**
@@ -251,9 +251,9 @@ export const batchExtrinsics = curry((api, limit, extrs$) =>
   extrs$.pipe(
     bufferCount(limit),
     mapRx((batch) =>
-      batch.length === 1 ? batch[0] : api.tx.utility.batch(batch),
-    ),
-  ),
+      batch.length === 1 ? batch[0] : api.tx.utility.batch(batch)
+    )
+  )
 );
 
 /**
@@ -264,7 +264,7 @@ export const batchExtrinsics = curry((api, limit, extrs$) =>
  */
 export const rejectTimeout = (time) =>
   new Promise((_, reject) =>
-    setTimeout(() => reject(new Error("Timeout is exceeded")), time),
+    setTimeout(() => reject(new Error("Timeout is exceeded")), time)
   );
 
 /**
@@ -277,7 +277,7 @@ export const rejectTimeout = (time) =>
  * @returns {Promise<T>}
  */
 export const timeout = curry((time, promise) =>
-  Promise.race([rejectTimeout(time), promise]),
+  Promise.race([rejectTimeout(time), promise])
 );
 
 /**
@@ -334,7 +334,7 @@ export const withDockAPI = curry(
           return res;
         }
       }
-    },
+    }
 );
 
 /**
@@ -354,7 +354,7 @@ export const parseBool = either(equals("true"), o(Boolean, Number));
 export const accountIdentity = curry(async (api, accountId) => {
   const val = api.createType(
     "Option<Registration>",
-    await api.query.identity.identityOf(api.createType("AccountId", accountId)),
+    await api.query.identity.identityOf(api.createType("AccountId", accountId))
   );
 
   if (val.isSome) {
@@ -362,7 +362,7 @@ export const accountIdentity = curry(async (api, accountId) => {
 
     return `\`${api.createType(
       "String",
-      info.toHuman().display.Raw,
+      info.toHuman().display.Raw
     )} (${accountId.toString()})\``;
   } else {
     return `\`${accountId.toString()}\``;
@@ -384,11 +384,8 @@ export const formatAsISO = (date) =>
 export const addLoggerPrefix = curry((buildPrefix, logger) =>
   o(
     fromPairs,
-    map((key) => [
-      key,
-      (...args) => logger[key](buildPrefix(...args), ...args),
-    ]),
-  )(["error", "log", "info", "warn"]),
+    map((key) => [key, (...args) => logger[key](buildPrefix(...args), ...args)])
+  )(["error", "log", "info", "warn"])
 );
 
 /**
@@ -405,7 +402,7 @@ export const binarySearchFirstSatisfyingBlock = curry(
   async (
     api,
     { startBlockNumber, endBlockNumber, targetValue, fetchValue, checkBlock },
-    { maxBlocksPerUnit = null, debug = false } = {},
+    { maxBlocksPerUnit = null, debug = false } = {}
   ) => {
     for (
       // Number of iterations performed during binary search.
@@ -428,7 +425,7 @@ export const binarySearchFirstSatisfyingBlock = curry(
           "end block:",
           endBlockNumber,
           "jumps:",
-          jumps,
+          jumps
         );
       }
 
@@ -437,7 +434,7 @@ export const binarySearchFirstSatisfyingBlock = curry(
         if (maxBlocksPerUnit != null) {
           endBlockNumber = Math.min(
             midBlockNumber + maxBlocksPerUnit * (1 + targetValue - midValue),
-            endBlockNumber,
+            endBlockNumber
           );
         }
       } else if (midValue > targetValue) {
@@ -445,7 +442,7 @@ export const binarySearchFirstSatisfyingBlock = curry(
         if (maxBlocksPerUnit != null) {
           startBlockNumber = Math.max(
             midBlockNumber - maxBlocksPerUnit * (1 + midValue - targetValue),
-            startBlockNumber,
+            startBlockNumber
           );
         }
       } else {
@@ -453,7 +450,7 @@ export const binarySearchFirstSatisfyingBlock = curry(
         if (maxBlocksPerUnit != null) {
           startBlockNumber = Math.max(
             midBlockNumber - maxBlocksPerUnit,
-            startBlockNumber,
+            startBlockNumber
           );
         }
 
@@ -464,7 +461,7 @@ export const binarySearchFirstSatisfyingBlock = curry(
           if (debug) {
             timestampLogger.log(
               `First block that satisfied value \`${targetValue}\` found - \`${midBlockNumber}\` (${jumps} jumps)`,
-              found,
+              found
             );
           }
 
@@ -474,7 +471,7 @@ export const binarySearchFirstSatisfyingBlock = curry(
     }
 
     throw new Error("No block found");
-  },
+  }
 );
 
 /**
@@ -487,5 +484,5 @@ export const binarySearchFirstSatisfyingBlock = curry(
  */
 export const timestampLogger = addLoggerPrefix(
   () => `[${formatAsISO(new Date())}]`,
-  console,
+  console
 );

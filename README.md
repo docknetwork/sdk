@@ -11,6 +11,7 @@ Features five packages, such as
 You are welcome to explore the [examples](./examples) to get a basic understanding.
 
 In essence, the architecture is structured as follows:
+
 - The fundamentals of VC, including types, cryptography, and abstract modules, are housed in `@docknetwork/credential-sdk`.
 - Specific implementations for the `Dock` and `Cheqd` blockchain modules can be found in `@docknetwork/dock-blockchain-modules` and `@docknetwork/cheqd-blockchain-modules`, respectively.
 - Basic blockchain connectors for the `Dock` and `Cheqd` blockchain are available through `@docknetwork/dock-blockchain-api` and `@docknetwork/cheqd-blockchain-api`.

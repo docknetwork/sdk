@@ -63,14 +63,12 @@ async function main() {
 
   info(`Scanning the first block state ${+FirstBlockNumber}`);
   const first = await grabState(
-    await dock.api.at(await dock.api.rpc.chain.getBlockHash(+FirstBlockNumber)),
+    await dock.api.at(await dock.api.rpc.chain.getBlockHash(+FirstBlockNumber))
   );
   info("-".repeat(50));
   info(`Scanning the second block state ${+SecondBlockNumber}`);
   const second = await grabState(
-    await dock.api.at(
-      await dock.api.rpc.chain.getBlockHash(+SecondBlockNumber),
-    ),
+    await dock.api.at(await dock.api.rpc.chain.getBlockHash(+SecondBlockNumber))
   );
   info("-".repeat(50));
 
@@ -96,11 +94,11 @@ const keysValuesDiff = R.pipe(
     [key]: R.pipe(
       R.map(R.o(R.defaultTo([]), R.map(R.nth(idx)))),
       R.apply(diff),
-      R.reject(R.isEmpty),
+      R.reject(R.isEmpty)
     ),
   })),
   R.mergeAll,
-  R.applySpec,
+  R.applySpec
 )(["keys", "values"]);
 
 /** Calculates the difference between the first and second states. */
@@ -115,17 +113,17 @@ const buildDiff = R.curryN(
           R.pipe(
             keysValuesDiff,
             R.reject(R.isEmpty),
-            R.unless(R.pipe(R.keys, R.length, R.equals(1)), R.F),
-          ),
+            R.unless(R.pipe(R.keys, R.length, R.equals(1)), R.F)
+          )
         ),
-        R.apply(diff),
+        R.apply(diff)
       ),
       R.applySpec({
         stateBefore: R.nth(0),
         stateAfter: R.nth(1),
-      }),
-    ),
-  ),
+      })
+    )
+  )
 );
 
 /**

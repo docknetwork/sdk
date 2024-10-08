@@ -8,12 +8,7 @@ class CheqdApiProvider extends ApiProvider {
   }
 
   get sdk() {
-    const { sdk } = this.cheqd;
-    if (sdk == null) {
-      throw new Error('SDK is not initialized');
-    }
-
-    return sdk;
+    return this.cheqd.ensureInitialized().sdk;
   }
 
   get fees() {

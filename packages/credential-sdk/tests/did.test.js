@@ -7,34 +7,34 @@ const hexDid = (did) => DockDid.from(did).toHex();
 describe("`DockDidOrDidMethodKey.from`", () => {
   test("`DockDid.from` work for a raw did", () => {
     const result = DockDid.from(
-      "5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk"
     );
     expect(result.did.value).toEqual(
-      "0x338afad72761cffcd0619b8e00fe64a32f79463143e0e812a76b1030c593bb4e",
+      "0x338afad72761cffcd0619b8e00fe64a32f79463143e0e812a76b1030c593bb4e"
     );
 
     expect(() =>
       DockDidOrDidMethodKey.from(
-        "5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
-      ),
+        "5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk"
+      )
     ).toThrowErrorMatchingSnapshot();
   });
 
   test("`DidMethodKey.from` work for a raw did:key", () => {
     const result = DidMethodKey.from(
-      "zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme",
+      "zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme"
     );
     expect(result.didMethodKey.secp256k1.value).toEqual(
-      "0x03874c15c7fda20e539c6e5ba573c139884c351188799f5458b4b41f7924f235cd",
+      "0x03874c15c7fda20e539c6e5ba573c139884c351188799f5458b4b41f7924f235cd"
     );
     expect(result.toString()).toEqual(
-      "did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme",
+      "did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme"
     );
 
     expect(() =>
       DockDidOrDidMethodKey.from(
-        "zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme",
-      ),
+        "zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme"
+      )
     ).toThrowErrorMatchingSnapshot();
   });
 
@@ -43,10 +43,10 @@ describe("`DockDidOrDidMethodKey.from`", () => {
 
     for (const Did of classes) {
       const result = Did.from(
-        "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+        "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk"
       );
       expect(result.did.value).toEqual(
-        "0x338afad72761cffcd0619b8e00fe64a32f79463143e0e812a76b1030c593bb4e",
+        "0x338afad72761cffcd0619b8e00fe64a32f79463143e0e812a76b1030c593bb4e"
       );
     }
   });
@@ -56,13 +56,13 @@ describe("`DockDidOrDidMethodKey.from`", () => {
 
     for (const Did of classes) {
       const result = Did.from(
-        "did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme",
+        "did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme"
       );
       expect(result.didMethodKey.secp256k1.value).toEqual(
-        "0x03874c15c7fda20e539c6e5ba573c139884c351188799f5458b4b41f7924f235cd",
+        "0x03874c15c7fda20e539c6e5ba573c139884c351188799f5458b4b41f7924f235cd"
       );
       expect(result.toString()).toEqual(
-        "did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme",
+        "did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme"
       );
     }
   });
@@ -72,13 +72,13 @@ describe("`DockDidOrDidMethodKey.from`", () => {
 
     for (const Did of classes) {
       const result = Did.from(
-        "did:key:z6MktvqCyLxTsXUH1tUZncNdVeEZ7hNh7npPRbUU27GTrYb8",
+        "did:key:z6MktvqCyLxTsXUH1tUZncNdVeEZ7hNh7npPRbUU27GTrYb8"
       );
       expect(result.didMethodKey.ed25519.value).toEqual(
-        "0xd713cb7f8624d8648496e01010f2bd72f0dcbbdecdb7036f38c20475f5f429bf",
+        "0xd713cb7f8624d8648496e01010f2bd72f0dcbbdecdb7036f38c20475f5f429bf"
       );
       expect(result.toString()).toEqual(
-        "did:key:z6MktvqCyLxTsXUH1tUZncNdVeEZ7hNh7npPRbUU27GTrYb8",
+        "did:key:z6MktvqCyLxTsXUH1tUZncNdVeEZ7hNh7npPRbUU27GTrYb8"
       );
     }
   });
@@ -87,13 +87,13 @@ describe("`DockDidOrDidMethodKey.from`", () => {
 describe("DID utilities", () => {
   test("On input as 40 byte hex, validateDockDIDIdentifier throws error", () => {
     expect(() => new DockDid(randomAsHex(40))).toThrow(
-      /Received `40` items while expected `32` by `DockDidValue`/,
+      /Received `40` items while expected `32` by `DockDidValue`/
     );
   });
 
   test("On input as 30 byte hex, validateDockDIDIdentifier throws error", () => {
     expect(() => new DockDid(randomAsHex(30))).toThrow(
-      /Received `30` items while expected `32` by `DockDidValue`/,
+      /Received `30` items while expected `32` by `DockDidValue`/
     );
   });
 
@@ -104,7 +104,7 @@ describe("DID utilities", () => {
   test("On input as 33 byte hex, hexDid throws error", () => {
     const hex = randomAsHex(33);
     expect(() => hexDid(hex)).toThrow(
-      /Received `33` items while expected `32` by `DockDidValue`/,
+      /Received `33` items while expected `32` by `DockDidValue`/
     );
   });
 
@@ -131,7 +131,7 @@ describe("DID utilities", () => {
     const did = `${DockDid.Qualifier}${encodeAsSS58(hex)}`;
     // Without the qualifier, the function tries to parse as hex
     expect(() => hexDid(did)).toThrow(
-      /Received `8` items while expected `32` by `DockDidValue`/,
+      /Received `8` items while expected `32` by `DockDidValue`/
     );
   });
 
@@ -145,7 +145,7 @@ describe("DID utilities", () => {
   test("On input valid SS58 identifier but smaller than 32 bytes, validateDockDIDSS58Identifier throws error", () => {
     const ss58 = encodeAsSS58(randomAsHex(8));
     expect(() => DockDid.fromQualifiedString(ss58)).toThrow(
-      /Received `8` items while expected `32` by `DockDidValue`/,
+      /Received `8` items while expected `32` by `DockDidValue`/
     );
   });
 
@@ -153,7 +153,7 @@ describe("DID utilities", () => {
     const ss58 = encodeAsSS58(randomAsHex(32));
     const did = `${ss58}${ss58}`;
     expect(() => DockDid.fromQualifiedString(did)).toThrow(
-      /Invalid ss58 address/,
+      /Invalid ss58 address/
     );
   });
 

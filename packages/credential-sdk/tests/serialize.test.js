@@ -10,7 +10,7 @@ describe("Serialization", () => {
       VerifiableCredential.fromJSON({
         ...exampleCredential,
         type: undefined,
-      }),
+      })
     ).toThrow();
   });
 
@@ -19,7 +19,7 @@ describe("Serialization", () => {
       VerifiableCredential.fromJSON({
         ...exampleCredential,
         "@context": undefined,
-      }),
+      })
     ).toThrow();
   });
 
@@ -28,7 +28,7 @@ describe("Serialization", () => {
       VerifiablePresentation.fromJSON({
         "@context": "https://www.w3.org/2018/credentials/v1",
         type: undefined,
-      }),
+      })
     ).toThrow();
   });
 
@@ -36,7 +36,7 @@ describe("Serialization", () => {
     expect(() =>
       VerifiablePresentation.fromJSON({
         "@context": undefined,
-      }),
+      })
     ).toThrow();
   });
 

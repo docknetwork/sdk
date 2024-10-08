@@ -125,7 +125,7 @@ describe("Blob Module", () => {
     await expect(modules.blob.new(blob, dockDID, pair)).rejects.toThrow();
 
     await expect(modules.blob.get(blobId)).rejects.toThrowError(
-      "does not exist",
+      "does not exist"
     );
   }, 30000);
 
@@ -145,7 +145,7 @@ describe("Blob Module", () => {
   test("Should throw error when cannot read blob with given id from chain.", async () => {
     const nonExistentBlobId = DockBlobId.random();
     await expect(modules.blob.get(nonExistentBlobId)).rejects.toThrowError(
-      "does not exist",
+      "does not exist"
     );
   }, 30000);
 });

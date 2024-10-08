@@ -76,7 +76,7 @@ describe.each(Schemes)(
       if (Name !== "BBDT16") {
         // Setup public key on blockchain
         const pk1 = Module.prepareAddPublicKey(
-          u8aToHex(keypair.publicKeyBuffer),
+          u8aToHex(keypair.publicKeyBuffer)
         );
         await chainModule.addPublicKey(null, pk1, did1, pair1);
 
@@ -100,7 +100,7 @@ describe.each(Schemes)(
         "Resident Card Example",
         did1,
         pair1,
-        modules.blob,
+        modules.blob
       );
 
       const issuerKey = getKeyDoc(did1, keypair, keypair.type, keypair.id);
@@ -115,12 +115,12 @@ describe.each(Schemes)(
         issuerKey,
         unsignedCred,
         true,
-        defaultDocumentLoader(resolver),
+        defaultDocumentLoader(resolver)
       );
       expect(credential).toMatchObject(
         expect.objectContaining(
-          getCredMatcherDoc(unsignedCred, did1, issuerKey.id, SigType),
-        ),
+          getCredMatcherDoc(unsignedCred, did1, issuerKey.id, SigType)
+        )
       );
 
       // Get JSON schema from the credential
@@ -132,14 +132,14 @@ describe.each(Schemes)(
       // properties don't match exactly because some are generated while signing
       expect(fullSchema.properties.credentialSubject.properties).toMatchObject(
         expect.objectContaining(
-          residentCardSchema.properties.credentialSubject.properties,
-        ),
+          residentCardSchema.properties.credentialSubject.properties
+        )
       );
 
       // Ensure extra properties from crypto-wasm-ts are assigned to schema object
       expect(credential.cryptoVersion).toEqual(CredentialBuilder.VERSION);
       expect(credential.credentialSchema.version).toEqual(
-        CredentialSchema.VERSION,
+        CredentialSchema.VERSION
       );
       expect(credential.credentialSchema.id).toEqual(schemaId);
       const details = JSON.parse(credential.credentialSchema.details);
@@ -153,7 +153,7 @@ describe.each(Schemes)(
 
       const result = await verifyCredential(credential, { resolver });
       expect(result).toMatchObject(
-        expect.objectContaining(getProofMatcherDoc()),
+        expect.objectContaining(getProofMatcherDoc())
       );
     }, 30000);
 
@@ -167,8 +167,8 @@ describe.each(Schemes)(
       const credential = await issueCredential(issuerKey, unsignedCred);
       expect(credential).toMatchObject(
         expect.objectContaining(
-          getCredMatcherDoc(unsignedCred, did1, issuerKey.id, SigType),
-        ),
+          getCredMatcherDoc(unsignedCred, did1, issuerKey.id, SigType)
+        )
       );
 
       const fullSchema = getJsonSchemaFromCredential(credential, true);
@@ -179,21 +179,21 @@ describe.each(Schemes)(
       // properties don't match exactly because some are generated while signing
       expect(fullSchema.properties.credentialSubject.properties).toMatchObject(
         expect.objectContaining(
-          residentCardSchema.properties.credentialSubject.properties,
-        ),
+          residentCardSchema.properties.credentialSubject.properties
+        )
       );
       expect(
-        externalSchema.properties.credentialSubject.properties,
+        externalSchema.properties.credentialSubject.properties
       ).toMatchObject(
         expect.objectContaining(
-          residentCardSchema.properties.credentialSubject.properties,
-        ),
+          residentCardSchema.properties.credentialSubject.properties
+        )
       );
 
       // Ensure extra properties from crypto-wasm-ts are assigned to schema object
       expect(credential.cryptoVersion).toEqual(CredentialBuilder.VERSION);
       expect(credential.credentialSchema.version).toEqual(
-        CredentialSchema.VERSION,
+        CredentialSchema.VERSION
       );
       expect(credential.credentialSchema.id).toEqual(residentCardSchema.$id);
       const details = JSON.parse(credential.credentialSchema.details);
@@ -207,7 +207,7 @@ describe.each(Schemes)(
 
       const result = await verifyCredential(credential, { resolver });
       expect(result).toMatchObject(
-        expect.objectContaining(getProofMatcherDoc()),
+        expect.objectContaining(getProofMatcherDoc())
       );
     }, 30000);
 
@@ -222,8 +222,8 @@ describe.each(Schemes)(
       const credential = await issueCredential(issuerKey, unsignedCred);
       expect(credential).toMatchObject(
         expect.objectContaining(
-          getCredMatcherDoc(unsignedCred, did1, issuerKey.id, SigType),
-        ),
+          getCredMatcherDoc(unsignedCred, did1, issuerKey.id, SigType)
+        )
       );
 
       const fullSchema = getJsonSchemaFromCredential(credential, true);
@@ -239,10 +239,10 @@ describe.each(Schemes)(
       ]) {
         // properties don't match exactly because some are generated while signing
         expect(
-          residentCardSchema.properties.credentialSubject.properties.familyName,
+          residentCardSchema.properties.credentialSubject.properties.familyName
         ).toMatchObject(expect.objectContaining(props.familyName));
         expect(
-          residentCardSchema.properties.credentialSubject.properties.givenName,
+          residentCardSchema.properties.credentialSubject.properties.givenName
         ).toMatchObject(expect.objectContaining(props.givenName));
       }
 
@@ -250,7 +250,7 @@ describe.each(Schemes)(
       expect(credential.cryptoVersion).toEqual(CredentialBuilder.VERSION);
       expect(credential.credentialSchema).toBeDefined();
       expect(credential.credentialSchema.version).toEqual(
-        CredentialSchema.VERSION,
+        CredentialSchema.VERSION
       );
       const details = JSON.parse(credential.credentialSchema.details);
       expect(details.parsingOptions).toEqual({
@@ -263,7 +263,7 @@ describe.each(Schemes)(
 
       const result = await verifyCredential(credential, { resolver });
       expect(result).toMatchObject(
-        expect.objectContaining(getProofMatcherDoc()),
+        expect.objectContaining(getProofMatcherDoc())
       );
     }, 30000);
 
@@ -298,7 +298,7 @@ describe.each(Schemes)(
 
       const result = await verifyCredential(credential, { resolver });
       expect(result).toMatchObject(
-        expect.objectContaining(getProofMatcherDoc()),
+        expect.objectContaining(getProofMatcherDoc())
       );
     }, 30000);
 
@@ -313,7 +313,7 @@ describe.each(Schemes)(
       const schemaWithGivenParsingOptions =
         DockCryptoSignature.withUpdatedParsingOptions(
           credentialJSON.credentialSchema,
-          parsingOptions,
+          parsingOptions
         );
       const unsignedCred = {
         ...credentialJSON,
@@ -334,12 +334,12 @@ describe.each(Schemes)(
 
       const result = await verifyCredential(credential, { resolver });
       expect(result).toMatchObject(
-        expect.objectContaining(getProofMatcherDoc()),
+        expect.objectContaining(getProofMatcherDoc())
       );
     }, 30000);
 
     afterAll(async () => {
       await dock.disconnect();
     }, 10000);
-  },
+  }
 );

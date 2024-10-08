@@ -42,7 +42,12 @@ async function main() {
   // console.log((await oracleContract.methods.getChainlinkToken().call()));
 
   console.log(
-    `Bob's balance ${await getTokenBalance(web3, tokenAddr, LinkTokenABI, bob.address)}`,
+    `Bob's balance ${await getTokenBalance(
+      web3,
+      tokenAddr,
+      LinkTokenABI,
+      bob.address
+    )}`
   );
   const payment = web3.utils.toWei(".00000000000000001", "ether");
   console.log(payment);

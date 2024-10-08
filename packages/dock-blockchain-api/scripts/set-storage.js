@@ -13,5 +13,5 @@ async function main(dock, filePath) {
 }
 
 withDockAPI({ senderAccountURI: SudoSecretURI, address: FullNodeEndpoint })(
-  main,
+  main
 )(filePath).catch(console.error);

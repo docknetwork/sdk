@@ -78,7 +78,7 @@ async function sendAddKeyTxns(count, didPairs) {
     const tx = await dock.modules.did.createAddKeysTx(
       [didKey],
       did,
-      currentPair,
+      currentPair
     );
     txs.push(tx);
     j++;
@@ -110,7 +110,7 @@ async function sendAddControllerTxns(count, didPairs) {
     const tx = await dock.modules.did.createAddControllersTx(
       [DockDid.random()],
       did,
-      currentPair,
+      currentPair
     );
     txs.push(tx);
     j++;

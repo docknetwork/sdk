@@ -22,7 +22,7 @@ const expectEqualCreds = (cred1, cred2) => {
   expect(cred1.eq(cred2)).toBe(true);
   expect(cred1.toJSON()).toEqual(cred2.toJSON());
   expect(StatusList2021Credential.fromJSON(cred1.toJSON())).toEqual(
-    StatusList2021Credential.fromJSON(cred2.toJSON()),
+    StatusList2021Credential.fromJSON(cred2.toJSON())
   );
 };
 
@@ -55,7 +55,7 @@ describe("StatusListCredential Module", () => {
     ownerKey = getKeyDoc(
       ownerDID,
       new Ed25519Keypair(ownerSeed),
-      "Ed25519VerificationKey2018",
+      "Ed25519VerificationKey2018"
     );
 
     // The keyring should be initialized before any test begins as this suite is testing statusListCredentialModule
@@ -77,64 +77,62 @@ describe("StatusListCredential Module", () => {
     const cred = await StatusList2021Credential.create(
       ownerKey,
       statusListCredId,
-      {},
+      {}
     );
     await expect(
       modules.statusListCredential.createStatusListCredential(
         statusListCredId,
         cred,
         ownerDID,
-        pair,
-      ),
+        pair
+      )
     ).resolves.toBeDefined();
     const fetchedCred =
       await modules.statusListCredential.getStatusListCredential(
-        statusListCredId,
+        statusListCredId
       );
     expectEqualCreds(cred, fetchedCred);
   }, 40000);
 
   test("Can revoke index from a status list credential", async () => {
-    const cred =
-      await modules.statusListCredential.getStatusListCredential(
-        statusListCredId,
-      );
+    const cred = await modules.statusListCredential.getStatusListCredential(
+      statusListCredId
+    );
     await cred.update(ownerKey, { revokeIndices: revokeIds });
     await modules.statusListCredential.updateStatusListCredential(
       statusListCredId,
       cred,
       ownerDID,
-      pair,
+      pair
     );
     const fetchedCred =
       await modules.statusListCredential.getStatusListCredential(
-        statusListCredId,
+        statusListCredId
       );
     expectEqualCreds(cred, fetchedCred);
     expect(await fetchedCred.revoked(revokeId)).toBe(true);
   }, 40000);
 
   test("Cant unsuspend from a status list credential with `statusPurpose` = `revocation`", async () => {
-    const cred =
-      await modules.statusListCredential.getStatusListCredential(
-        statusListCredId,
-      );
-    await expect(
-      cred.update(ownerKey, { unsuspendIndices: revokeIds }),
-    ).rejects.toEqual(
-      new Error(
-        "Can't unsuspend indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`",
-      ),
+    const cred = await modules.statusListCredential.getStatusListCredential(
+      statusListCredId
     );
     await expect(
-      cred.update(ownerKey, { unsuspendIndices: revokeIds }),
+      cred.update(ownerKey, { unsuspendIndices: revokeIds })
     ).rejects.toEqual(
       new Error(
-        "Can't unsuspend indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`",
-      ),
+        "Can't unsuspend indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`"
+      )
+    );
+    await expect(
+      cred.update(ownerKey, { unsuspendIndices: revokeIds })
+    ).rejects.toEqual(
+      new Error(
+        "Can't unsuspend indices for credential with `statusPurpose` = `revocation`, it's only possible with `statusPurpose` = `suspension`"
+      )
     );
     expect(await cred.revokedBatch(revokeIds)).toEqual(
-      Array.from(revokeIds, () => true),
+      Array.from(revokeIds, () => true)
     );
   }, 40000);
 
@@ -142,34 +140,33 @@ describe("StatusListCredential Module", () => {
     const credential = await StatusList2021Credential.create(
       ownerKey,
       statusListCredId,
-      { statusPurpose: "suspension", revokeIndices: revokeIds },
+      { statusPurpose: "suspension", revokeIndices: revokeIds }
     );
     await modules.statusListCredential.updateStatusListCredential(
       statusListCredId,
       credential,
       ownerDID,
-      pair,
+      pair
     );
     let fetchedCred =
       await modules.statusListCredential.getStatusListCredential(
-        statusListCredId,
+        statusListCredId
       );
     expectEqualCreds(credential, fetchedCred);
     await fetchedCred.update(ownerKey, { unsuspendIndices: revokeIds });
     expect(await fetchedCred.revokedBatch(revokeIds)).toEqual(
-      Array.from(revokeIds, () => false),
+      Array.from(revokeIds, () => false)
     );
     await modules.statusListCredential.updateStatusListCredential(
       statusListCredId,
       fetchedCred,
       ownerDID,
-      pair,
+      pair
     );
 
-    fetchedCred =
-      await modules.statusListCredential.getStatusListCredential(
-        statusListCredId,
-      );
+    fetchedCred = await modules.statusListCredential.getStatusListCredential(
+      statusListCredId
+    );
     expect(await fetchedCred.revoked(revokeId)).toBe(false);
   }, 40000);
 
@@ -177,12 +174,12 @@ describe("StatusListCredential Module", () => {
     await modules.statusListCredential.removeStatusListCredential(
       statusListCredId,
       ownerDID,
-      pair,
+      pair
     );
     expect(
       await modules.statusListCredential.getStatusListCredential(
-        statusListCredId,
-      ),
+        statusListCredId
+      )
     ).toBe(null);
   }, 40000);
 
@@ -190,7 +187,7 @@ describe("StatusListCredential Module", () => {
     const cred = await StatusList2021Credential.create(
       ownerKey,
       multipleControllerstatusListCredID,
-      { statusPurpose: "suspension" },
+      { statusPurpose: "suspension" }
     );
 
     await expect(
@@ -198,12 +195,12 @@ describe("StatusListCredential Module", () => {
         multipleControllerstatusListCredID,
         cred,
         ownerDID,
-        pair,
-      ),
+        pair
+      )
     ).resolves.toBeDefined();
     const fetchedCred = (
       await dock.api.query.statusListCredential.statusListCredentials(
-        multipleControllerstatusListCredID,
+        multipleControllerstatusListCredID
       )
     ).unwrap();
     expect(fetchedCred.policy.isOneOf).toBe(true);

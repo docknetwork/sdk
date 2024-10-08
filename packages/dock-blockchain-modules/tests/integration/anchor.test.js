@@ -37,7 +37,7 @@ describe("Anchoring Module", () => {
       const r = DockAnchorModule.verifyMerkleProofOfDocument(
         d,
         proofs[i],
-        root,
+        root
       );
       expect(r).toBe(true);
     });
@@ -45,8 +45,8 @@ describe("Anchoring Module", () => {
     const resp = await modules.anchor.deploy(root);
     const block = await provider.blockByHash(
       u8aToHex(
-        resp.status.isInBlock ? resp.status.asInBlock : resp.status.asFinalized,
-      ),
+        resp.status.isInBlock ? resp.status.asInBlock : resp.status.asFinalized
+      )
     );
     const blockNumber = await modules.anchor.get(root);
     expect(block.toJSON().block.header.number).toBe(+blockNumber);

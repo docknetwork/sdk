@@ -15,7 +15,7 @@ class TestEnvironment extends NodeEnvironment {
           Buffer,
         },
       },
-      context,
+      context
     );
   }
 

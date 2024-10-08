@@ -27,7 +27,7 @@ describe("IPFS", () => {
 
   test("Dereference from IPNS fails", async () => {
     await expect(
-      ipfsClient.get("/ipns/QmSrPmbaUKA3ZodhzPWZnpFgcPMFWF4QsxXbkWfEptTBJd"),
+      ipfsClient.get("/ipns/QmSrPmbaUKA3ZodhzPWZnpFgcPMFWF4QsxXbkWfEptTBJd")
     ).rejects.toThrow();
   }, 10000);
 });

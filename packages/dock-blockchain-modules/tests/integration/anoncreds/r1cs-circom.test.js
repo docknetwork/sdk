@@ -138,7 +138,7 @@ for (const {
       // Setup encoder
       const defaultEncoder = (v) =>
         Signature.encodeMessageForSigning(
-          Uint8Array.from(Buffer.from(v.toString(), "utf-8")),
+          Uint8Array.from(Buffer.from(v.toString(), "utf-8"))
         );
       encoder = new Encoder(undefined, defaultEncoder);
       encodedABNeg = encoder.encodeDefault("AB-");
@@ -156,7 +156,7 @@ for (const {
 
       if (!isKvac) {
         const pk = Module.prepareAddPublicKey(
-          u8aToHex(issuerSchemeKeypair.publicKey.bytes),
+          u8aToHex(issuerSchemeKeypair.publicKey.bytes)
         );
         await getModule(dock).addPublicKey(null, pk, issuerDid, issuerKeypair);
       }
@@ -170,7 +170,7 @@ for (const {
         const queriedPk = await getModule(dock).getPublicKey(
           issuerDid,
           2,
-          false,
+          false
         );
         verifParam = new PublicKey(queriedPk.bytes.bytes);
       }
@@ -179,30 +179,30 @@ for (const {
         attributes1,
         issuerSchemeKeypair.sk,
         labelBytes,
-        encoder,
+        encoder
       );
       expect(
         credential1.signature.verifyMessageObject(
           attributes1,
           verifParam,
           labelBytes,
-          encoder,
-        ).verified,
+          encoder
+        ).verified
       ).toBe(true);
 
       credential2 = Signature.signMessageObject(
         attributes2,
         issuerSchemeKeypair.sk,
         labelBytes,
-        encoder,
+        encoder
       );
       expect(
         credential2.signature.verifyMessageObject(
           attributes2,
           verifParam,
           labelBytes,
-          encoder,
-        ).verified,
+          encoder
+        ).verified
       ).toBe(true);
     });
 
@@ -214,7 +214,7 @@ for (const {
 
     it("proof verifies when blood groups is not AB-", async () => {
       expect(JSON.stringify(encodedABNeg)).not.toEqual(
-        JSON.stringify(credential1.encodedMessages[attrName]),
+        JSON.stringify(credential1.encodedMessages[attrName])
       );
 
       await check(attributes1, credential1, "John", true);
@@ -222,7 +222,7 @@ for (const {
 
     it("proof does not verify when blood groups is AB-", async () => {
       expect(JSON.stringify(encodedABNeg)).toEqual(
-        JSON.stringify(credential2.encodedMessages[attrName]),
+        JSON.stringify(credential2.encodedMessages[attrName])
       );
 
       await check(attributes2, credential2, "Carol", false);
@@ -232,14 +232,14 @@ for (const {
       credentialAttributesRaw,
       credential,
       expectedFirstName,
-      shouldProofVerify,
+      shouldProofVerify
     ) {
       let sigPk;
       if (!isKvac) {
         const queriedPk = await getModule(dock).getPublicKey(
           issuerDid,
           2,
-          false,
+          false
         );
         sigPk = new PublicKey(queriedPk.bytes.bytes);
       }
@@ -250,17 +250,17 @@ for (const {
       const sigParams = !isKvac
         ? SignatureParams.getSigParamsForMsgStructure(
             attributesStruct,
-            labelBytes,
+            labelBytes
           )
         : SignatureParams.getMacParamsForMsgStructure(
             attributesStruct,
-            labelBytes,
+            labelBytes
           );
       const [revealedMsgs, unrevealedMsgs, revealedMsgsRaw] =
         getRevealedAndUnrevealed(
           credentialAttributesRaw,
           revealedNames,
-          encoder,
+          encoder
         );
       expect(revealedMsgsRaw).toEqual({ fname: expectedFirstName });
 
@@ -270,7 +270,7 @@ for (const {
               sigParams,
               sigPk.adaptForLess(sigParams.supportedMessageCount()),
               revealedMsgs,
-              false,
+              false
             )
           : buildProverStatement(sigParams, revealedMsgs, false);
       const statement2 = Statement.r1csCircomProver(r1cs, wasm, snarkPk);
@@ -283,7 +283,7 @@ for (const {
       const witnessEq1 = new WitnessEqualityMetaStatement();
       witnessEq1.addWitnessRef(
         sIdx1,
-        getIndicesForMsgNames([attrName], attributesStruct)[0],
+        getIndicesForMsgNames([attrName], attributesStruct)[0]
       );
       witnessEq1.addWitnessRef(sIdx2, 0);
 
@@ -297,7 +297,7 @@ for (const {
       const witness1 = buildWitness(
         credential.signature,
         unrevealedMsgs,
-        false,
+        false
       );
 
       const inputs = new CircomInputs();
@@ -315,7 +315,7 @@ for (const {
       const revealedMsgsFromVerifier = encodeRevealedMsgs(
         revealedMsgsRaw,
         attributesStruct,
-        encoder,
+        encoder
       );
       checkMapsEqual(revealedMsgs, revealedMsgsFromVerifier);
 
@@ -326,7 +326,7 @@ for (const {
               ? sigPk.adaptForLess(sigParams.supportedMessageCount())
               : sigPk,
             revealedMsgsFromVerifier,
-            false,
+            false
           )
         : buildVerifierStatement(sigParams, revealedMsgsFromVerifier, false);
       const pub = [
@@ -342,7 +342,7 @@ for (const {
       const witnessEq2 = new WitnessEqualityMetaStatement();
       witnessEq2.addWitnessRef(
         sIdx3,
-        getIndicesForMsgNames([attrName], attributesStruct)[0],
+        getIndicesForMsgNames([attrName], attributesStruct)[0]
       );
       witnessEq2.addWitnessRef(sIdx4, 0);
 
@@ -351,12 +351,12 @@ for (const {
 
       const proofSpecVerifier = new ProofSpec(
         statementsVerifier,
-        metaStmtsVerifier,
+        metaStmtsVerifier
       );
       expect(proofSpecVerifier.isValid()).toEqual(true);
 
       expect(proof.verify(proofSpecVerifier).verified).toEqual(
-        shouldProofVerify,
+        shouldProofVerify
       );
     }
 

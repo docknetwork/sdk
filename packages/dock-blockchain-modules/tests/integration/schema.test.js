@@ -92,10 +92,10 @@ describe("Schema Blob Module Integration", () => {
 
     // Create a valid credential with a schema
     validCredential = new VerifiableCredential(
-      "https://example.com/credentials/123",
+      "https://example.com/credentials/123"
     );
     validCredential.addContext(
-      "https://www.w3.org/2018/credentials/examples/v1",
+      "https://www.w3.org/2018/credentials/examples/v1"
     );
     validCredential.addContext(ctx1);
     validCredential.addType("AlumniCredential");
@@ -106,16 +106,16 @@ describe("Schema Blob Module Integration", () => {
     });
     validCredential.setSchema(
       String(new DockBlobId(blobId)),
-      "JsonSchemaValidator2018",
+      "JsonSchemaValidator2018"
     );
     await validCredential.sign(keyDoc);
 
     // Create a valid credential that doesn't follow the schema
     invalidCredential = new VerifiableCredential(
-      "https://example.com/credentials/1234",
+      "https://example.com/credentials/1234"
     );
     invalidCredential.addContext(
-      "https://www.w3.org/2018/credentials/examples/v1",
+      "https://www.w3.org/2018/credentials/examples/v1"
     );
     invalidCredential.addContext(ctx2);
     invalidCredential.addType("AlumniCredential");
@@ -126,7 +126,7 @@ describe("Schema Blob Module Integration", () => {
     });
     invalidCredential.setSchema(
       String(new DockBlobId(blobId)),
-      "JsonSchemaValidator2018",
+      "JsonSchemaValidator2018"
     );
     await invalidCredential.sign(keyDoc);
   }, 90000);
@@ -149,13 +149,13 @@ describe("Schema Blob Module Integration", () => {
 
   test("Schema.get throws error when schema not in correct format.", async () => {
     await expect(Schema.get(invalidFormatBlobId, modules.blob)).rejects.toThrow(
-      /Underlying value is not a valid JSON/,
+      /Underlying value is not a valid JSON/
     );
   }, 30000);
 
   test("Schema.get throws error when no blob exists at the given id.", async () => {
     await expect(Schema.get(DockBlobId.random(), modules.blob)).rejects.toThrow(
-      /does not exist/,
+      /does not exist/
     );
   }, 30000);
 
@@ -164,7 +164,7 @@ describe("Schema Blob Module Integration", () => {
       verifyCredential(validCredential.toJSON(), {
         resolver: dockResolver,
         compactProof: true,
-      }),
+      })
     ).resolves.toBeDefined();
   }, 30000);
 
@@ -173,7 +173,7 @@ describe("Schema Blob Module Integration", () => {
       validCredential.verify({
         resolver: dockResolver,
         compactProof: true,
-      }),
+      })
     ).resolves.toBeDefined();
   }, 30000);
 
@@ -182,14 +182,14 @@ describe("Schema Blob Module Integration", () => {
       verifyCredential(invalidCredential.toJSON(), {
         resolver: null,
         compactProof: true,
-      }),
+      })
     ).rejects.toThrow(/Unsupported protocol blob:/);
 
     await expect(
       verifyCredential(invalidCredential.toJSON(), {
         resolver: dockResolver,
         compactProof: true,
-      }),
+      })
     ).rejects.toThrow(/Schema validation failed/);
   }, 30000);
 
@@ -198,13 +198,13 @@ describe("Schema Blob Module Integration", () => {
       invalidCredential.verify({
         resolver: dockResolver,
         compactProof: true,
-      }),
+      })
     ).rejects.toThrow(/Schema validation failed/);
   }, 30000);
 
   test("Utility method verifyPresentation should check if schema is incompatible with the credentialSubject.", async () => {
     let vpInvalid = new VerifiablePresentation(
-      "https://example.com/credentials/12345",
+      "https://example.com/credentials/12345"
     );
     vpInvalid.addCredential(invalidCredential);
     vpInvalid.addContext(ctx2);
@@ -216,7 +216,7 @@ describe("Schema Blob Module Integration", () => {
         domain: "some_domain",
         resolver: null,
         compactProof: true,
-      }),
+      })
     ).rejects.toThrow(/Unsupported protocol blob:/);
 
     await expect(
@@ -225,13 +225,13 @@ describe("Schema Blob Module Integration", () => {
         domain: "some_domain",
         resolver: dockResolver,
         compactProof: true,
-      }),
+      })
     ).rejects.toThrow(/Schema validation failed/);
   }, 90000);
 
   test("Utility method verifyPresentation should check if schema is compatible with the credentialSubject.", async () => {
     let vpValid = new VerifiablePresentation(
-      "https://example.com/credentials/12345",
+      "https://example.com/credentials/12345"
     );
     vpValid.addCredential(validCredential);
     vpValid.addContext(ctx1);
@@ -243,13 +243,13 @@ describe("Schema Blob Module Integration", () => {
         domain: "some_domain",
         resolver: dockResolver,
         compactProof: true,
-      }),
+      })
     ).resolves.toBeDefined();
   }, 90000);
 
   test("VerifiablePresentation's verify should check if the schema is incompatible with the credentialSubject.", async () => {
     let vpInvalid = new VerifiablePresentation(
-      "https://example.com/credentials/12345",
+      "https://example.com/credentials/12345"
     );
     vpInvalid.addCredential(invalidCredential);
     vpInvalid.addContext(ctx2);
@@ -261,7 +261,7 @@ describe("Schema Blob Module Integration", () => {
         domain: "some_domain",
         resolver: null,
         compactProof: true,
-      }),
+      })
     ).rejects.toThrow(/Unsupported protocol blob:/);
 
     await expect(
@@ -270,13 +270,13 @@ describe("Schema Blob Module Integration", () => {
         domain: "some_domain",
         resolver: dockResolver,
         compactProof: true,
-      }),
+      })
     ).rejects.toThrow(/Schema validation failed/);
   }, 90000);
 
   test("VerifiablePresentation's verify should check if the schema is compatible with the credentialSubject.", async () => {
     let vpValid = new VerifiablePresentation(
-      "https://example.com/credentials/12345",
+      "https://example.com/credentials/12345"
     );
     vpValid.addCredential(validCredential);
     vpValid.addContext(ctx1);
@@ -288,7 +288,7 @@ describe("Schema Blob Module Integration", () => {
         domain: "some_domain",
         resolver: dockResolver,
         compactProof: true,
-      }),
+      })
     ).resolves.toBeDefined();
   }, 90000);
 });

@@ -25,7 +25,7 @@ async function deployAggregator(
   minSubmissionValue,
   maxSubmissionValue,
   decimals,
-  description,
+  description
 ) {
   console.log("Deploying AccessControlledAggregator");
   const argsABI = web3.eth.abi.encodeParameters(
@@ -48,7 +48,7 @@ async function deployAggregator(
       maxSubmissionValue,
       decimals,
       description,
-    ],
+    ]
   );
   const contractBytecode =
     AccessControlledAggregatorByteCode + argsABI.slice(2);
@@ -63,7 +63,7 @@ async function deployProxy(web3, signer, aggregatorAddr) {
     web3.eth.abi
       .encodeParameters(
         ["address", "address"],
-        [aggregatorAddr, aggregatorAddr],
+        [aggregatorAddr, aggregatorAddr]
       )
       .slice(2);
   return deployContract(web3, signer, contractBytecode);
@@ -98,11 +98,11 @@ async function main() {
     minSubmissionValue,
     maxSubmissionValue,
     decimals,
-    description,
+    description
   );
   const aggregator = new web3.eth.Contract(
     AccessControlledAggregatorABI,
-    aggregatorAddr,
+    aggregatorAddr
   );
 
   // Fund the aggregator
@@ -118,7 +118,7 @@ async function main() {
     aggregatorAddr,
     aggregator.methods
       .addAccess("0x0000000000000000000000000000000000000000")
-      .encodeABI(),
+      .encodeABI()
   );
 
   const proxyAddr = await deployProxy(web3, alice, aggregatorAddr);
@@ -128,27 +128,27 @@ async function main() {
   const aggrFromProxyAddr = await proxy.methods.aggregator().call();
   const aggrFromProxyContract = new web3.eth.Contract(
     AccessControlledAggregatorABI,
-    aggrFromProxyAddr,
+    aggrFromProxyAddr
   );
 
   console.log(
     await aggrFromProxyContract.methods
       .hasAccess("0x0000000000000000000000000000000000000000", [])
-      .call(),
+      .call()
   );
   console.log(
     await aggrFromProxyContract.methods
       .hasAccess("0x0000000000000000000000000000000000000001", [])
-      .call(),
+      .call()
   );
   console.log(
-    await aggrFromProxyContract.methods.hasAccess(alice.address, []).call(),
+    await aggrFromProxyContract.methods.hasAccess(alice.address, []).call()
   );
 
   // Load Flags contract
   const validator = new web3.eth.Contract(
     DeviationFlaggingValidatorABI,
-    validatorAddr,
+    validatorAddr
   );
   const flagsAddr = await validator.methods.flags().call();
   const flagsContract = new web3.eth.Contract(FlagsABI, flagsAddr);

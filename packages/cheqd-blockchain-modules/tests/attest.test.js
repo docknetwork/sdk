@@ -28,7 +28,7 @@ describe("DIDModule", () => {
     await cheqd.disconnect();
   });
 
-  it("Creates `DIDDocument` and attaches attestation for it", async () => {
+  it("Generates a `DIDDocument` and appends an attestation to it", async () => {
     const did = CheqdTestnetDid.random();
 
     const keyPair = Ed25519Keypair.random();

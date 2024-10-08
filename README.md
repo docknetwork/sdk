@@ -8,7 +8,7 @@ Features five packages, such as
 - [`@docknetwork/cheqd-blockchain-api`](./packages/cheqd-blockchain-api) - A Javascript library built atop of `@cheqd/sdk` that allows to interact with the `Cheqd` blockchain.
 - [`@docknetwork/cheqd-blockchain-modules`](./packages/cheqd-blockchain-modules) - A JavaScript library created for managing credential SDK components such as DIDs and accumulators etc on the Cheqd blockchain.
 
-You are welcome to explore the [examples](./examples) to get a basic understanding.
+You are welcome to explore the [tutorials](./tutorials) and [examples](./examples) to get a basic understanding.
 
 In essence, the architecture is structured as follows:
 

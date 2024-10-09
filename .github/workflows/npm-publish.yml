@@ -1,9 +1,9 @@
 name: NPM Publish
 
-on:
-  release:
-    types: [published]
-# on: [pull_request]
+#on:
+#  release:
+#    types: [published]
+on: [pull_request]
 
 jobs:
   build:

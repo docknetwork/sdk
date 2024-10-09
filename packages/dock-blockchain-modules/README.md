@@ -1,4 +1,4 @@
-# `Dock` blockchain modules
+# @docknetwork/dock-blockchain-modules
 
 A JavaScript library designed for handling the following elements on the Dock blockchain:
 

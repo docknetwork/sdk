@@ -1,4 +1,4 @@
-# `Dock` blockchain API
+# @docknetwork/dock-blockchain-api
 
 Built with PolkadotJS, for use with the Dock Substrate Node or our public main/test networks.
 

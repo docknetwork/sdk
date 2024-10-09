@@ -1,4 +1,6 @@
-# Cheqd Blockchain Modules
+# @docknetwork/cheqd-blockchain-modules
+
+A JavaScript library created for managing credential SDK components such as DIDs and accumulators etc on the Cheqd blockchain.
 
 ## Setup
 

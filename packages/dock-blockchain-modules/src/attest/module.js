@@ -23,7 +23,6 @@ export default class DockAttestModule extends injectDock(AbstractAttestModule) {
    * @param params
    */
   async setClaimTx(iri, targetDid, didKeypair) {
-    console.log(iri, targetDid, didKeypair);
     ensureTargetKeypair(targetDid, didKeypair);
     const currentPriority = (await this.dockOnly.attest(targetDid)).priority?.value ?? 0;
 

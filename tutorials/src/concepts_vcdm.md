@@ -22,26 +22,29 @@ way that is cryptographically secure, privacy respecting, and
 machine-verifiable.
 
 ## Participants and workflow
+
 - Credentials are issued by an entity called the **issuer**.
 - **Issuer** issues the credential about a **subject** by signing the credential with his key. If the credential is revocable,
-the issuer must specify how and from where revocation status must be checked. It is not necessary that revocation is managed by
-the issuer, the issuer might designate a different authority for revocation.
+  the issuer must specify how and from where revocation status must be checked. It is not necessary that revocation is managed by
+  the issuer, the issuer might designate a different authority for revocation.
 - **Issuer** gives the credential to the **holder**. The **holder** might be the same as the **subject**.
 - A service provider or anyone willing to check if the **holder** possesses certain credentials requests a **presentation** about those
-credentials. This entity requesting the **presentation** is called the **verifier**. To protect against replay attacks, (a
-verifier receiving the presentation and replaying the same presentation at some other verifier), a verifier must supply a
-challenge that must be embedded in the presentation.
+  credentials. This entity requesting the **presentation** is called the **verifier**. To protect against replay attacks, (a
+  verifier receiving the presentation and replaying the same presentation at some other verifier), a verifier must supply a
+  challenge that must be embedded in the presentation.
 - **Holder** creates a **presentation** for the required credentials. The **presentation** must indicate which
-credentials it is about and must be signed by the **holder** of the credentials.
+  credentials it is about and must be signed by the **holder** of the credentials.
 - **Verifier** on receiving the presentation verifies the validity of each credential in the **presentation**. This includes
-checking correctness of the data model of the credential, the authenticity by verifying the issuer's signature and revocation
-status if the credential is revocable. It then checks whether the presentation contains the signature from the
-**holder** on the presentation which also includes his given challenge.
+  checking correctness of the data model of the credential, the authenticity by verifying the issuer's signature and revocation
+  status if the credential is revocable. It then checks whether the presentation contains the signature from the
+  **holder** on the presentation which also includes his given challenge.
 
 ## Issuing
+
 To issue a verifiable credential, the issuer needs to have a public key that is accessible by the holder and verifier to verify the
 signature (in `proof`) in the credential. Though the VCDM spec does not mandate it, an issuer in Dock must have a DID on chain.
 This DID is present in the credential in the `issuer` field. An example credential where both the issuer and holder have Dock DIDs
+
 ```js
 {
     '@context': [
@@ -67,10 +70,12 @@ This DID is present in the credential in the `issuer` field. An example credenti
 ```
 
 ## Presentation
+
 The holder while creating the presentation signs it with his private key. For the verifier to verify the presentation, in
 addition to verifying the issuer's signature, he needs to verify this signature as well, and for that he must know the
 holder's public key. One way to achieve this is to make the holder have a DID too so that the verifier can look up the DID
 on chain and learn the public key. An example presentation signed by the holder
+
 ```js
 {
     '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
@@ -116,11 +121,13 @@ on chain and learn the public key. An example presentation signed by the holder
 ```
 
 ## Revocation
+
 If the credential is revocable, the issuer must specify how the revocation check must be done in the `credentialStatus` field.
 On Dock, credential revocation is managed with a revocation registry. There can be multiple registries on chain and each
 registry has a unique id. It is recommended that the revocation authority creates a new registry for each credential type.
 While issuing the credential, issuer embeds the revocation registry's id in the credential in the `credentialStatus` field.
 An example credential with Dock revocation registry
+
 ```js
 {
     '@context': [

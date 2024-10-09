@@ -35,9 +35,11 @@ add/remove service endpoints and remove the DID. Also a DID can have 1 or more c
 update its DID document. A DID with a key with `capabilityInvocation` verification relationship is its own controller.
 
 An example on-chain Dock DID.
+
 ```
 did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW
 ```
+
 Above DID has method `dock` and the DID identifier is `5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW`. Dock DID identifiers
 are 32 bytes in size.
 
@@ -45,13 +47,9 @@ An example DID Document
 
 ```json
 {
-  "@context": [
-    "https://www.w3.org/ns/did/v1"
-  ],
+  "@context": ["https://www.w3.org/ns/did/v1"],
   "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
-  "controller": [
-    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn"
-  ],
+  "controller": ["did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn"],
   "verificationMethod": [
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
@@ -81,16 +79,14 @@ An example DID Document
 
 Dock DIDs support multiple keys. The keys are present in the `publicKey` section. As per the above DID document, the DID `did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn`
 has 2 public keys and 1 controller which is itself.
-Note how that public key  is referred to using its `id` in `authentication`, `assertionMethod` and `capabilityInvocation` sections.
+Note how that public key is referred to using its `id` in `authentication`, `assertionMethod` and `capabilityInvocation` sections.
 The above document states that the DID `did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn` can authenticate with 2 public keys
 whose id is specified under `authentication`. When it attests to some fact (becomes issuer), it can only use 1 key, which is under `assertionMethod`.
 The keys specified under `capabilityInvocation` can be used to update the DID document, i.e. add/remove keys, etc.
 
 ```json
 {
-  "@context": [
-    "https://www.w3.org/ns/did/v1"
-  ],
+  "@context": ["https://www.w3.org/ns/did/v1"],
   "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
   "controller": [
     "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
@@ -129,9 +125,7 @@ can also modify above DID document, i.e. add/remove keys, add/remove controller,
 
 ```json
 {
-  "@context": [
-    "https://www.w3.org/ns/did/v1"
-  ],
+  "@context": ["https://www.w3.org/ns/did/v1"],
   "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
   "controller": [
     "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
@@ -165,9 +159,7 @@ can also modify above DID document, i.e. add/remove keys, add/remove controller,
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1",
       "type": "LinkedDomains",
-      "serviceEndpoint": [
-        "https://foo.example.com"
-      ]
+      "serviceEndpoint": ["https://foo.example.com"]
     }
   ]
 }
@@ -180,13 +172,9 @@ another DID(s) and the other DID could add/remove keys, controllers or remove th
 
 ```json
 {
-  "@context": [
-    "https://www.w3.org/ns/did/v1"
-  ],
+  "@context": ["https://www.w3.org/ns/did/v1"],
   "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
-  "controller": [
-    "did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"
-  ],
+  "controller": ["did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"],
   "verificationMethod": [],
   "authentication": [],
   "assertionMethod": [],
@@ -195,9 +183,7 @@ another DID(s) and the other DID could add/remove keys, controllers or remove th
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1",
       "type": "LinkedDomains",
-      "serviceEndpoint": [
-        "https://bar.example.com"
-      ]
+      "serviceEndpoint": ["https://bar.example.com"]
     }
   ]
 }
@@ -209,13 +195,9 @@ DID Doc will look like below
 
 ```json
 {
-  "@context": [
-    "https://www.w3.org/ns/did/v1"
-  ],
+  "@context": ["https://www.w3.org/ns/did/v1"],
   "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
-  "controller": [
-    "did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"
-  ],
+  "controller": ["did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"],
   "verificationMethod": [
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
@@ -225,7 +207,7 @@ DID Doc will look like below
     }
   ],
   "authentication": [
-    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1"
   ],
   "assertionMethod": [],
   "capabilityInvocation": [],
@@ -233,9 +215,7 @@ DID Doc will look like below
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1",
       "type": "LinkedDomains",
-      "serviceEndpoint": [
-        "https://bar.example.com"
-      ]
+      "serviceEndpoint": ["https://bar.example.com"]
     }
   ]
 }

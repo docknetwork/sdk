@@ -1,6 +1,6 @@
 # Public Delegation
 
-This feature should be considered *Alpha*.
+This feature should be considered _Alpha_.
 
 [RFC](https://github.com/docknetwork/planning/blob/master/rfc/0013-public-delegation.md)
 

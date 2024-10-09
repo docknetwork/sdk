@@ -15,6 +15,7 @@ accumulator public keys and some accumulator details like current accumulated va
 to the cryptographic details and treat the values as bytes with some size bounds.
 
 - **BBS+ module**
+
   - At path `src/modules/bbs-plus.js` in the repo.
   - Used to create and remove signature parameters and public keys.
   - The public keys can either refer the signature params or not pass the reference while creating.
@@ -22,6 +23,7 @@ to the cryptographic details and treat the values as bytes with some size bounds
   - See the tests at `tests/integration/anoncreds/bbs-plus.test.js` on how to create, query and remove these.
 
 - **Accumulator module**
+
   - At path `src/modules/accumulator.js` in the repo.
   - The parameters and public keys are managed in the same way as BBS+ signatures.
   - Accumulators are owned by a DID and can be only removed by that DID.
@@ -36,6 +38,7 @@ to the cryptographic details and treat the values as bytes with some size bounds
     the accumulator.
 
 - Composite proofs
+
   - Proofs that use BBS+ signatures and accumulator
   - The SDK itself doesn't include the Typescript package containing the crypto as a dependency. But it can be used with the SDK to issue, prove,
     verify and revoke credentials as shown in tests mentioned below.
@@ -44,6 +47,7 @@ to the cryptographic details and treat the values as bytes with some size bounds
     means the credential is valid and absence means invalid.
 
 - Verifiable encryption
+
   - Encrypt messages from BBS+ signatures for a 3rd party and prove that the encryption was done correctly.
   - See the test `tests/integration/anoncreds/saver-and-bound-check.test.js`
 

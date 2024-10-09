@@ -1,10 +1,10 @@
 # Public Attestation
 
-This feature should be considered *Alpha*.
+This feature should be considered _Alpha_.
 
 [RFC](https://github.com/docknetwork/planning/blob/master/rfc/0014-public-attestation.md)
 
-VCDM Verifiable credentials are a way to prove an *attestation*. Valid credentials prove statements of the form `Issuer claims X`, where `X` is itself a statement. One property of verifiable credentials is that the holder may keep them private simply by not sharing them with other parties. That property will be sometimes useful, sometimes not. VCDM crededentials are private and therefore not automatically discoverable but Public Attestations give a decentralized identity the ability to post claims that *are* discoverable by any party. For Dock DIDs, attestations are linked on-chain but Public Attestations are not specicfic to Dock. Other DID methods can implement public attestations by including them in DID documents.
+VCDM Verifiable credentials are a way to prove an _attestation_. Valid credentials prove statements of the form `Issuer claims X`, where `X` is itself a statement. One property of verifiable credentials is that the holder may keep them private simply by not sharing them with other parties. That property will be sometimes useful, sometimes not. VCDM crededentials are private and therefore not automatically discoverable but Public Attestations give a decentralized identity the ability to post claims that _are_ discoverable by any party. For Dock DIDs, attestations are linked on-chain but Public Attestations are not specicfic to Dock. Other DID methods can implement public attestations by including them in DID documents.
 
 Public Attestations are posted as RDF documents. Since RDF can represent, or link to, arbitrary types of data, Public Attestations can be used to publish arbitrary content.
 
@@ -90,8 +90,8 @@ While it is valid DIDs to include multiple attested IRIs in a single DID documen
 
 Two properties of RDF have the potential to supercharge Public Attestations.
 
-1) It's a semantic knowlege representation, it can be [reasoned over](https://github.com/docknetwork/rify).
-2) It's [queryable](https://en.wikipedia.org/wiki/SPARQL) in it's native form.
+1. It's a semantic knowlege representation, it can be [reasoned over](https://github.com/docknetwork/rify).
+2. It's [queryable](https://en.wikipedia.org/wiki/SPARQL) in it's native form.
 
 Via these properties the sdk implements a "Curious Agent". The Curious Agent seeks out information. It starts with an initial kernel of knowlege (an RDF dataset) and it follows a sense of curiosity, gradually building it's knowlege graph by dereferencing IRIs, stopping when it finds nothing new to be curious about. As it crawls, it reasons over the information it's found, deducing new facts, which may in turn spark new curiosity. The Curious Agent accepts it's curiosity as Sparql queries. The logical rules it uses to reason are also configurable, axioms are provided to the Agent as conjunctive if-then statements (like in [Claim Deduction](./concepts_claim_deduction.md)). Within the sdk, the Curious Agent is simply called `crawl()`.
 

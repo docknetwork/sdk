@@ -158,7 +158,6 @@ for (const {
       const queriedPk2 = await chainModule.getPublicKey(did2, 2);
       expect(queriedPk2.bytes).toEqual(pk2.bytes);
 
-      console.log(queriedPk2);
       expect(queriedPk2.paramsRef.eq([did1, 1])).toBe(true);
       const keyWithParams = await getPublicKeyWithParamsByStorageKey(dock.api, [
         DockDid.from(did2).asDid,

@@ -66,7 +66,6 @@ describe("DID service endpoints", () => {
   test("Create DIDs and add service endpoint", async () => {
     const publicKey1 = pair1.publicKey();
     const didKey1 = new DidKey(publicKey1);
-    console.log(didKey1);
 
     await modules.did.dockOnly.send.newOnchain(dockDid1, [didKey1], [], false);
 

@@ -29,14 +29,14 @@ async function verifyPresentation(presentation) { ... }
 
 ```js
 const delegation = {
-  '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
+  "@context": ["https://www.w3.org/2018/credentials/v1"],
   id: uuid(),
-  type: [ 'VerifiableCredential' ],
-  issuer: 'did:ex:a',
+  type: ["VerifiableCredential"],
+  issuer: "did:ex:a",
   credentialSubject: {
-    id: 'did:ex:b',
-    'https://rdf.dock.io/alpha/2021#mayClaim':
-      'https://rdf.dock.io/alpha/2021#ANYCLAIM'
+    id: "did:ex:b",
+    "https://rdf.dock.io/alpha/2021#mayClaim":
+      "https://rdf.dock.io/alpha/2021#ANYCLAIM",
   },
   issuanceDate: new Date().toISOString(),
 };
@@ -51,13 +51,13 @@ Next `did:ex:a` sends the signed credential to `did:ex:b`.
 
 ```js
 const newcred = {
-  '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
+  "@context": ["https://www.w3.org/2018/credentials/v1"],
   id: uuid(),
-  type: [ 'VerifiableCredential' ],
-  issuer: 'did:ex:b',
+  type: ["VerifiableCredential"],
+  issuer: "did:ex:b",
   credentialSubject: {
-    id: 'did:ex:c',
-    'https://example.com/score': 100,
+    id: "did:ex:c",
+    "https://example.com/score": 100,
   },
   issuanceDate: new Date().toISOString(),
 };
@@ -66,19 +66,19 @@ const signed_newcred = signCredential(newcred, didb_secret);
 
 So far we have two credentials, `signed_delegation` and `signed_newcred`. `signed_delegation` proves that any claim made by `did:ex:b` is effectively a claim made by `did:ex:a`. `signed_newcred` proves tha `did:ex:b` claims that `did:ex:c` has a score of 100. By applying one of the logical rules provided by the sdk, we can infer that `did:ex:a` claims `did:ex:c` has a score of 100. The logical rule named `MAYCLAIM_DEF_1` will work for this use-case. `MAYCLAIM_DEF_1` will be used by the verifier.
 
-Now `did:ex:b` has both signed credentials. `did:ex:b` may now pass both credentials to the *holder*. In this case the holder is `did:ex:c`. `did:ex:c` also happens to be the *subject* of one of the credentials.
+Now `did:ex:b` has both signed credentials. `did:ex:b` may now pass both credentials to the _holder_. In this case the holder is `did:ex:c`. `did:ex:c` also happens to be the _subject_ of one of the credentials.
 
 ## Present a Delegated Credential
 
-`did:ex:c` now holds two credentials, `signed_delegation` and `signed_newcred`. Together they prove that `did:ex:a` indirectly claims `did:ex:c` to have a score of 100. `did:ex:c` wants to prove this statement to another party, a *verifier*. `did:ex:c` must bundle the two credentials into a VCDM *presentation*.
+`did:ex:c` now holds two credentials, `signed_delegation` and `signed_newcred`. Together they prove that `did:ex:a` indirectly claims `did:ex:c` to have a score of 100. `did:ex:c` wants to prove this statement to another party, a _verifier_. `did:ex:c` must bundle the two credentials into a VCDM _presentation_.
 
 ```js
 let presentation = {
-  '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
-  type: [ 'VerifiablePresentation' ],
+  "@context": ["https://www.w3.org/2018/credentials/v1"],
+  type: ["VerifiablePresentation"],
   id: uuid(),
   holder: `did:ex:c`,
-  verifiableCredential: [ signed_delegation, signed_newcred ],
+  verifiableCredential: [signed_delegation, signed_newcred],
 };
 ```
 
@@ -86,7 +86,7 @@ let presentation = {
 
 ## Accept a Delegated Credential
 
-The verifier receives `presentation`, *verifies the enclosed credentials*, then reasons over the union of all the credentials in the bundle using the rule `MAYCLAIM_DEF_1`. The process is the one outlined in [Verifier-Side Reasoning](./tutorial_claim_deduction.md#verifier-side-reasoning) but using a different composite claim and a different rule list.
+The verifier receives `presentation`, _verifies the enclosed credentials_, then reasons over the union of all the credentials in the bundle using the rule `MAYCLAIM_DEF_1`. The process is the one outlined in [Verifier-Side Reasoning](./tutorial_claim_deduction.md#verifier-side-reasoning) but using a different composite claim and a different rule list.
 
 ```js
 import { MAYCLAIM_DEF_1 } from '@docknetwork/sdk/rdf-defs';

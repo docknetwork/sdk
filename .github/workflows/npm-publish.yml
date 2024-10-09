@@ -1,8 +1,9 @@
 name: NPM Publish
 
-on:
-  release:
-    types: [published]
+#on:
+#  release:
+#    types: [published]
+on: [pull_request]
 
 jobs:
   build:
@@ -14,6 +15,6 @@ jobs:
           node-version: "20.x"
           registry-url: https://registry.npmjs.org/
       - run: yarn install --frozen-lockfile --ignore-scripts
-      - run: turbo run publish-packages
+      - run: yarn changeset publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

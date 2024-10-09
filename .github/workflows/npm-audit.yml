@@ -11,13 +11,13 @@ on:
       - ".github/workflows/**"
 
   schedule:
-    - cron: '0 0 * * 0' # Every sunday at midnight
+    - cron: "0 0 * * 0" # Every sunday at midnight
 
 jobs:
   audit:
     runs-on: ubuntu-latest
     env:
-      NODE_VERSION: 18.x
+      NODE_VERSION: 20.x
       AVOID_LICENSES: "AGPL;GPL;AGPL-3.0"
       IGNORE_PACKAGES: ""
 

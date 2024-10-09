@@ -1,0 +1,17 @@
+name: Cheqd blockchain modules tests
+
+on: [pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      CHEQD_MNEMONIC: "steak come surprise obvious remain black trouble measure design volume retreat float coach amused match album moment radio stuff crack orphan ranch dose endorse"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "20.x"
+      - run: yarn install --frozen-lockfile --ignore-scripts
+      - run: npm install -g turbo@2.0.5
+      - run: turbo telemetry disable
+      - run: CHEQD_MNEMONIC=$CHEQD_MNEMONIC turbo run test-with-node --filter @docknetwork/cheqd-blockchain-modules

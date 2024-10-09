@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`\`DockDidOrDidMethodKey.from\` \`DidMethodKey.from\` work for a raw did:key 1`] = `"Unsupported qualified string: \`zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme\`, expected with either prefix: [did:dock:, did:key:]"`;
+
+exports[`\`DockDidOrDidMethodKey.from\` \`DockDid.from\` work for a raw did 1`] = `"Unsupported qualified string: \`5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk\`, expected with either prefix: [did:dock:, did:key:]"`;

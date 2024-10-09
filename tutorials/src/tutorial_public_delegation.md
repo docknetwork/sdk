@@ -1,6 +1,6 @@
 # Public Delegation
 
-This feature should be considered *Alpha*.
+This feature should be considered _Alpha_.
 
 Public Delegations use the same data model as Private Delegations. A delegator attests to some delegation. The verifier somehow gets and verifies that attestation then reasons over it in conjuction with a some credential. The difference is that while Private Delegations are passed around as credentials, Public Delegations are linked from the DID document of the delegator.
 
@@ -61,7 +61,7 @@ A link to this ipfs document is then added to the delegators DID document. For a
 await setAttestation(
   delegatorDid,
   delegatorSk,
-  'ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p'
+  "ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p"
 );
 ```
 
@@ -82,15 +82,15 @@ As with any Public Attestations, delegation information is revocable by removing
 The following example shows how a verifier might
 
 ```js
-import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from '@docknetwork/sdk/rdf-defs';
-import { crawl } from '@docknetwork/sdk/crawl.js';
+import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from "@docknetwork/sdk/rdf-defs";
+import { crawl } from "@docknetwork/sdk/crawl.js";
 import {
   proveCompositeClaims,
   presentationToEEClaimGraph,
   inferh,
-} from '@docknetwork/sdk/utils/cd';
-import { merge } from '@docknetwork/sdk/utils/claimgraph';
-import jsonld from 'jsonld';
+} from "@docknetwork/sdk/utils/cd";
+import { merge } from "@docknetwork/sdk/utils/claimgraph";
+import jsonld from "jsonld";
 
 // These logical rules will be used for reasoning during both crawing and verifiying
 // credentials.
@@ -102,18 +102,18 @@ const RULES = [
   {
     if_all: [
       [
-        { Unbound: 'a' },
+        { Unbound: "a" },
         { Bound: { Iri: ATTESTS } },
-        { Unbound: 'doc' },
-        { Unbound: 'a' },
+        { Unbound: "doc" },
+        { Unbound: "a" },
       ],
     ],
     then: [
       [
-        { Unbound: 'doc' },
+        { Unbound: "doc" },
         { Bound: { Iri: MAYCLAIM } },
         { Bound: { Iri: ANYCLAIM } },
-        { Unbound: 'a' },
+        { Unbound: "a" },
       ],
     ],
   },
@@ -134,7 +134,7 @@ const CURIOSITY = `
 `;
 
 // To spark the crawlers interest we'll feed it some initial knowlege about did:ex:a .
-const initialFacts = await resolveGraph({ Iri: 'did:ex:a' });
+const initialFacts = await resolveGraph({ Iri: "did:ex:a" });
 
 // `allFact` contains our delegation information, it will be merged with verified
 // credentials in order to reason over delegations

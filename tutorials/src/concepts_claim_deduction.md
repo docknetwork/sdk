@@ -1,12 +1,12 @@
 # Claim Deduction
 
-The [verifiable credentials data model](https://www.w3.org/TR/vc-data-model/) is based on a machine comprehensible language called [RDF](https://www.w3.org/TR/rdf-primer/). RDF represents arbitrary semantic knowledge as [graph](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics))s. Computers can perform automatic deductive reasoning over RDF; given assumptions (represented as an RDF graph) and axioms (represented as logical rules), a computer can infer new conclusions and even prove them to other computers using deductive derivations (proofs).
+The [verifiable credentials data model](https://www.w3.org/TR/vc-data-model/) is based on a machine comprehensible language called [RDF](https://www.w3.org/TR/rdf-primer/). RDF represents arbitrary semantic knowledge as [graph](<https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)>)s. Computers can perform automatic deductive reasoning over RDF; given assumptions (represented as an RDF graph) and axioms (represented as logical rules), a computer can infer new conclusions and even prove them to other computers using deductive derivations (proofs).
 
 Every VCDM credential is representable as an RDF graph. So computers can reason about them, deriving new conclusions that weren't explicitly stated by the issuer.
 
 The Dock SDK exposes utilities for primitive deductive reasoning over verified credentials. The Verifier has a choice to perform deduction themself (expensive), or offload that responsibility to the Presenter of the credential[s] by accepting deductive proofs of composite claims.
 
-In RDF, if graph A is true and graph B is true, then the [union](https://en.wikipedia.org/wiki/Union_(set_theory)) of those graphs, is also true `A∧B->A∪B` [^1]. Using this property we can combine multiple credentials and reason over their union.
+In RDF, if graph A is true and graph B is true, then the [union](<https://en.wikipedia.org/wiki/Union_(set_theory)>) of those graphs, is also true `A∧B->A∪B` [^1]. Using this property we can combine multiple credentials and reason over their union.
 
 ## Explicit Ethos
 
@@ -39,9 +39,9 @@ Proven:
 <Joe> <type> <Member> <Alice> .
 ```
 
-The fourth and final element of the proven *quad* is used here to indicate the source of the information, Alice. The final element of a quad is its [graph name](https://www.w3.org/TR/rdf11-concepts/#dfn-graph-name).
+The fourth and final element of the proven _quad_ is used here to indicate the source of the information, Alice. The final element of a quad is its [graph name](https://www.w3.org/TR/rdf11-concepts/#dfn-graph-name).
 
-A signed credentials are [ethos](https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos) arguments and a credential may be converted to a list of quads (a claimgraph). We call this representation "Explicit Ethos" form. If a credential is *verified*, then its explicit ethos form is *true*.
+A signed credentials are [ethos](https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos) arguments and a credential may be converted to a list of quads (a claimgraph). We call this representation "Explicit Ethos" form. If a credential is _verified_, then its explicit ethos form is _true_.
 
 ## Rule Format
 
@@ -112,15 +112,15 @@ enum RdfNode {
 The SDK represents RDF nodes like so:
 
 ```js
-const alice = { Iri: 'did:sample:alice' };
+const alice = { Iri: "did:sample:alice" };
 const literal = {
   Literal: {
-    value: '{}',
-    datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#JSON',
-  }
+    value: "{}",
+    datatype: "http://www.w3.org/1999/02/22-rdf-syntax-ns#JSON",
+  },
 };
 // blank nodes are generally not useful in rule definitions
-const blank = { Blank: '_:b0' };
+const blank = { Blank: "_:b0" };
 const defaultGraph = { DefaultGraph: true };
 ```
 
@@ -173,7 +173,7 @@ The rule language is expected to be expressive enough to implement [OWL 2 EL](ht
 - [RDF](https://en.wikipedia.org/wiki/Resource_Description_Framework): A model for representing general knowledge in a machine friendly way.
 - RDF triple: A single sentence consisting of subject, predicate and object. Each element of the triple is an RDF node.
 - RDF quad: A single sentence consisting of subject, predicate, object, graph. Each element of the quad is an RDF term.
-- [RDF graph](https://www.w3.org/TR/rdf-primer/#rdfmodel): A directed, labeled [graph](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)) with RDF triples as edges.
+- [RDF graph](https://www.w3.org/TR/rdf-primer/#rdfmodel): A directed, labeled [graph](<https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)>) with RDF triples as edges.
 - [RDF node](https://www.w3.org/TR/rdf-primer/#rdfmodel)
 - Composite Claim: An rdf triple which was infered, rather than stated explicitly in a credential.
 - Explicit [Ethos](https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos) statement: A statement of the form "A claims X." where X is also a statement. Explicit Ethos is encodable in natural human languages as well as in RDF.

@@ -12,10 +12,11 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: '18.x'
+          node-version: "20.x"
 
       - name: Install, lint, type check and generate docs # Not uploading the docs.
         run: |
           yarn install --frozen-lockfile --ignore-scripts
-          yarn lint
-          yarn docs
+          npm install -g turbo@2.0.5
+          turbo run lint --parallel
+          turbo run docs --parallel

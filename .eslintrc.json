@@ -1,5 +1,6 @@
 {
-  "plugins": ["jest", "sonarjs", "unused-imports"],
+  "root": true,
+  "plugins": ["jest", "sonarjs"],
   "globals": {
     "process": "readonly"
   },
@@ -7,14 +8,25 @@
     "browser": true,
     "es6": true
   },
-  "extends": ["plugin:sonarjs/recommended", "eslint:recommended", "plugin:jest/recommended", "airbnb-base"],
-  "parser": "babel-eslint",
+  "extends": [
+    "plugin:sonarjs/recommended",
+    "eslint:recommended",
+    "plugin:jest/recommended",
+    "airbnb-base"
+  ],
   "parserOptions": {
-    "ecmaVersion": 2018,
+    "ecmaVersion": 2022,
     "sourceType": "module"
   },
   "rules": {
-    "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ],
     "no-use-before-define": [
       "error",
       {
@@ -23,17 +35,17 @@
         "variables": true
       }
     ],
-    "unused-imports/no-unused-imports": "error",
-    "no-void": "off",
-    "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
     "import/no-extraneous-dependencies": "off",
-    "import/prefer-default-export": "off",
     "class-methods-use-this": "off",
     "no-return-await": "off",
-    "no-bitwise": ["error", { "allow": ["~"] }],
     "no-plusplus": "off",
-    "no-restricted-properties": "off",
+    "no-void": "off",
     "max-len": "off",
+    "no-underscore-dangle": ["error", { "enforceInMethodNames": false }],
+    "max-classes-per-file": "off",
+    "import/prefer-default-export": "off",
+    "import/no-unresolved": "off",
+    "no-useless-constructor": "off",
     "no-console": "off",
     "no-else-return": "off",
     "no-restricted-syntax": [

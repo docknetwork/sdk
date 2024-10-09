@@ -15,20 +15,20 @@ jobs:
       - name: Setup Node JS
         uses: actions/setup-node@v1
         with:
-          node-version: '18.x'
+          node-version: "20.x"
 
       - name: Install and Build 🔧 # Only need to install jsdoc package here and then run docs script
         run: |
           yarn install --frozen-lockfile --ignore-scripts
-          yarn docs
+          turbo run docs
 
       - name: Setup mdBook
         uses: peaceiris/actions-mdbook@v1
         with:
-          mdbook-version: 'latest'
+          mdbook-version: "latest"
 
       - name: Generate mdBook
-        run: yarn mdbook
+        run: turbo run mdbook
 
       - name: Install SSH Client 🔑
         uses: webfactory/ssh-agent@v0.4.1

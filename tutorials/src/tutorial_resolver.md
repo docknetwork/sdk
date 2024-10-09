@@ -110,7 +110,11 @@ has resolvers for DID methods `dock` and `ethr`.
 For resolving DID of any other method, `UniversalResolver` object will be used.
 
 ```js
-import { DockDIDResolver, DIDResolver, WILDCARD } from "@docknetwork/sdk/resolver";
+import {
+  DockDIDResolver,
+  DIDResolver,
+  WILDCARD,
+} from "@docknetwork/sdk/resolver";
 
 class MultiDIDResolver extends DIDResolver {
   static METHOD = WILDCARD;
@@ -119,7 +123,7 @@ class MultiDIDResolver extends DIDResolver {
     super([
       new DockDIDResolver(dock),
       new EtherResolver(ethereumProviderConfig),
-      new UniversalResolver(universalResolverUrl)
+      new UniversalResolver(universalResolverUrl),
     ]);
   }
 }

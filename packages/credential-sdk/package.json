@@ -36,7 +36,7 @@
     "blakejs": "^1.2.1",
     "bs58": "^5.0.0",
     "deep-equal": "^2.2.3",
-    "elliptic": "^6.5.5",
+    "elliptic": "6.5.7",
     "js-sha256": "^0.11.0",
     "json-canonicalize": "1.0.4",
     "json-stringify-deterministic": "^1.0.12",

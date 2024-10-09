@@ -212,14 +212,10 @@ update its DID document. A DID with a key with <code>capabilityInvocation</code>
 are 32 bytes in size.</p>
 <p>An example DID Document</p>
 <pre><code class="language-json">{
-  "@context": [
-    "https://www.w3.org/ns/did/v1"
-  ],
+  "@context": ["https://www.w3.org/ns/did/v1"],
   "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
-  "controller": [
-    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn"
-  ],
-  "publicKey": [
+  "controller": ["did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn"],
+  "verificationMethod": [
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
       "type": "Sr25519VerificationKey2020",
@@ -247,20 +243,18 @@ are 32 bytes in size.</p>
 </code></pre>
 <p>Dock DIDs support multiple keys. The keys are present in the <code>publicKey</code> section. As per the above DID document, the DID <code>did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn</code>
 has 2 public keys and 1 controller which is itself.
-Note how that public key  is referred to using its <code>id</code> in <code>authentication</code>, <code>assertionMethod</code> and <code>capabilityInvocation</code> sections.
+Note how that public key is referred to using its <code>id</code> in <code>authentication</code>, <code>assertionMethod</code> and <code>capabilityInvocation</code> sections.
 The above document states that the DID <code>did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn</code> can authenticate with 2 public keys
 whose id is specified under <code>authentication</code>. When it attests to some fact (becomes issuer), it can only use 1 key, which is under <code>assertionMethod</code>.
 The keys specified under <code>capabilityInvocation</code> can be used to update the DID document, i.e. add/remove keys, etc.</p>
 <pre><code class="language-json">{
-  "@context": [
-    "https://www.w3.org/ns/did/v1"
-  ],
+  "@context": ["https://www.w3.org/ns/did/v1"],
   "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
   "controller": [
     "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
     "did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"
   ],
-  "publicKey": [
+  "verificationMethod": [
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
       "type": "Sr25519VerificationKey2020",
@@ -290,15 +284,13 @@ The keys specified under <code>capabilityInvocation</code> can be used to update
 and the other is <code>did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz</code>. This means that DID <code>did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz</code>
 can also modify above DID document, i.e. add/remove keys, add/remove controller, etc.</p>
 <pre><code class="language-json">{
-  "@context": [
-    "https://www.w3.org/ns/did/v1"
-  ],
+  "@context": ["https://www.w3.org/ns/did/v1"],
   "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
   "controller": [
     "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
     "did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"
   ],
-  "publicKey": [
+  "verificationMethod": [
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
       "type": "Sr25519VerificationKey2020",
@@ -326,9 +318,7 @@ can also modify above DID document, i.e. add/remove keys, add/remove controller,
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1",
       "type": "LinkedDomains",
-      "serviceEndpoint": [
-        "https://foo.example.com"
-      ]
+      "serviceEndpoint": ["https://foo.example.com"]
     }
   ]
 }
@@ -337,14 +327,10 @@ can also modify above DID document, i.e. add/remove keys, add/remove controller,
 <p>DIDs can also be keyless, i.e. not have any keys of its own. In this case the DID is not self-controlled by controlled by
 another DID(s) and the other DID could add/remove keys, controllers or remove the DID. An example keyless DID is shown below</p>
 <pre><code class="language-json">{
-  "@context": [
-    "https://www.w3.org/ns/did/v1"
-  ],
+  "@context": ["https://www.w3.org/ns/did/v1"],
   "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
-  "controller": [
-    "did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"
-  ],
-  "publicKey": [],
+  "controller": ["did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"],
+  "verificationMethod": [],
   "authentication": [],
   "assertionMethod": [],
   "capabilityInvocation": [],
@@ -352,9 +338,7 @@ another DID(s) and the other DID could add/remove keys, controllers or remove th
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1",
       "type": "LinkedDomains",
-      "serviceEndpoint": [
-        "https://bar.example.com"
-      ]
+      "serviceEndpoint": ["https://bar.example.com"]
     }
   ]
 }
@@ -363,14 +347,10 @@ another DID(s) and the other DID could add/remove keys, controllers or remove th
 <code>did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz</code> add a key, say for authentication to <code>did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn</code> and the
 DID Doc will look like below</p>
 <pre><code class="language-json">{
-  "@context": [
-    "https://www.w3.org/ns/did/v1"
-  ],
+  "@context": ["https://www.w3.org/ns/did/v1"],
   "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
-  "controller": [
-    "did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"
-  ],
-  "publicKey": [
+  "controller": ["did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"],
+  "verificationMethod": [
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
       "type": "Ed25519VerificationKey2018",
@@ -379,7 +359,7 @@ DID Doc will look like below</p>
     }
   ],
   "authentication": [
-    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1"
   ],
   "assertionMethod": [],
   "capabilityInvocation": [],
@@ -387,9 +367,7 @@ DID Doc will look like below</p>
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1",
       "type": "LinkedDomains",
-      "serviceEndpoint": [
-        "https://bar.example.com"
-      ]
+      "serviceEndpoint": ["https://bar.example.com"]
     }
   ]
 }

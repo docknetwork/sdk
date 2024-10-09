@@ -182,26 +182,24 @@
 <h1 id="importing"><a class="header" href="#importing">Importing</a></h1>
 <p>In this tutorial series we will be using NodeJS with babel for ES6 support, however the same code should work in browsers too once it is transpiled. To begin with, we should import the Dock SDK. Importing the default reference will give us a DockAPI instance. With this we will communicate with the blockchain. You can also import the DockAPI class instanciate your own objects if you prefer. Simply do:</p>
 <pre><code class="language-javascript">// Import the dock SDK
-import dock from '@docknetwork/sdk';
+import dock from "@docknetwork/sdk";
 </code></pre>
 <p>We will add one more import here for some shared constants across each tutorial, just the node address and account secret:</p>
 <pre><code class="language-javascript">// Import some shared variables
-import { address, secretUri } from './shared-constants';
+import { address, secretUri } from "./shared-constants";
 </code></pre>
 <p>Lets also create this file, creating <code>shared-constants.js</code> with the contents:</p>
-<pre><code class="language-javascript">export const address = 'ws://localhost:9944'; // Websocket address of your Dock node
-export const secretUri = '//Alice'; // Account secret in uri format, we will use Alice for local testing
+<pre><code class="language-javascript">export const address = "ws://localhost:9944"; // Websocket address of your Dock node
+export const secretUri = "//Alice"; // Account secret in uri format, we will use Alice for local testing
 </code></pre>
 <h1 id="connecting-to-a-node"><a class="header" href="#connecting-to-a-node">Connecting to a node</a></h1>
 <p>With the required packages and variables imported, we can go ahead and connect to our node. If you don't have a local testnet running alraedy, go to https://github.com/docknetwork/dock-substrate and follow the steps in the readme to start one. You could use the Dock testnet given a proper account with enough funds. First, create a method named <code>connectToNode</code> with an empty body for now:</p>
-<pre><code class="language-javascript">export async function connectToNode() {
-
-}
+<pre><code class="language-javascript">export async function connectToNode() {}
 </code></pre>
 <p>Before working with the SDK, we need to initialize it. Upon initialization the SDK will connect to the node with the supplied address and create a keyring to manage accounts. Simply call <code>dock.init</code> and wait for the promise to resolve to connect to your node:</p>
 <pre><code class="language-javascript">// Initialize the SDK and connect to the node
 await dock.init({ address });
-console.log('Connected to the node and ready to go!');
+console.log("Connected to the node and ready to go!");
 </code></pre>
 <h1 id="creating-an-account"><a class="header" href="#creating-an-account">Creating an account</a></h1>
 <p>In order to write to the chain we will need to set an account. We can perform read operations with no account set, but for our purposes we will need one. Accounts can be generated using the <code>dock.keyring</code> object through multiple methods such as URI, memonic phrase and raw seeds. See the polkadot keyring documentation (https://polkadot.js.org/api/start/keyring.html) for more information.</p>
@@ -213,12 +211,12 @@ const account = dock.keyring.addFromUri(secretUri);
 dock.setAccount(account);
 
 // We are now ready to transact!
-console.log('Connected to the node and ready to go!');
+console.log("Connected to the node and ready to go!");
 </code></pre>
 <p>If all has gone well, you should be able to run this script and see that you are connected to the node. If any errors occur, the promise will fail and they will be outputted to the console.</p>
 <h1 id="basic-usage"><a class="header" href="#basic-usage">Basic usage</a></h1>
 <p>To construct your own API object, once the SDK has been installed, import the Dock API object as</p>
-<pre><code class="language-js">import { DockAPI } from '@docknetwork/sdk/api';
+<pre><code class="language-js">import { DockAPI } from "@docknetwork/sdk/api";
 const dock = new DockAPI();
 </code></pre>
 <p>To make the API object connect to the node call <code>init</code> method. This method accepts the Websocket RPC endpoint of the node is

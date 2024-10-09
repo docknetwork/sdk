@@ -260,7 +260,11 @@ resolvers of various DID methods to the derived class constructor.</p>
 will be dispatched according to their prefix and method configuration. The <code>resolvers</code> array below
 has resolvers for DID methods <code>dock</code> and <code>ethr</code>.</p>
 <p>For resolving DID of any other method, <code>UniversalResolver</code> object will be used.</p>
-<pre><code class="language-js">import { DockDIDResolver, DIDResolver, WILDCARD } from "@docknetwork/sdk/resolver";
+<pre><code class="language-js">import {
+  DockDIDResolver,
+  DIDResolver,
+  WILDCARD,
+} from "@docknetwork/sdk/resolver";
 
 class MultiDIDResolver extends DIDResolver {
   static METHOD = WILDCARD;
@@ -269,7 +273,7 @@ class MultiDIDResolver extends DIDResolver {
     super([
       new DockDIDResolver(dock),
       new EtherResolver(ethereumProviderConfig),
-      new UniversalResolver(universalResolverUrl)
+      new UniversalResolver(universalResolverUrl),
     ]);
   }
 }

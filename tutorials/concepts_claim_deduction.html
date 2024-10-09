@@ -249,15 +249,15 @@
   DefaultGraph,
 }</code></pre>
 <p>The SDK represents RDF nodes like so:</p>
-<pre><code class="language-js">const alice = { Iri: 'did:sample:alice' };
+<pre><code class="language-js">const alice = { Iri: "did:sample:alice" };
 const literal = {
   Literal: {
-    value: '{}',
-    datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#JSON',
-  }
+    value: "{}",
+    datatype: "http://www.w3.org/1999/02/22-rdf-syntax-ns#JSON",
+  },
 };
 // blank nodes are generally not useful in rule definitions
-const blank = { Blank: '_:b0' };
+const blank = { Blank: "_:b0" };
 const defaultGraph = { DefaultGraph: true };
 </code></pre>
 <p>Here is an example of a complete rule definition:</p>

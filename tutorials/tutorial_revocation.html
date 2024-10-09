@@ -174,62 +174,6 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="revocation"><a class="header" href="#revocation">Revocation</a></h1>
-<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
-<p>Credential revocation is managed with on-chain revocation registries. To revoke a credential, its id (or hash of its id) must be
-added to the credential. It is advised to have one revocation registry per credential type. Each registry has a unique id and
-an associated policy. The policy determines who can update the revocation registry. The registry also has an "add-only" flag specifying
-whether an id once added to the registry can be removed (leading to undoing the revocation) or not.
-Similar to the replay protection mechanism for DIDs, for each registry, the last modified block number is kept which is updated
-each time a credential is revoked or unrevoked.
-For now, only one policy is supported which is that each registry is owned by a single DID. Also, neither the policy
-nor the "add-only" flag can be updated post the creation of the registry for now.</p>
-<h2 id="registry-creation"><a class="header" href="#registry-creation">Registry creation</a></h2>
-<p>To create a registry, first a <code>Policy</code> object needs to be created for which a DID is needed. It is advised that the DID
-is registered on chain first (else someone can look at the registry a register the DID, thus controlling the registry).</p>
-<pre><code class="language-js">import {OneOfPolicy} from '@docknetwork/sdk/utils/revocation';
-const policy = new OneOfPolicy();
-policy.addOwner(ownerDID);
-
-// Or in a single step
-const policy = new OneOfPolicy([ownerDID]);
-</code></pre>
-<p>Now create a random registry id. The registry id supposed to be unique among all registries on chain.</p>
-<pre><code class="language-js">import {createRandomRegistryId} from '@docknetwork/sdk/utils/revocation';
-const registryId = createRandomRegistryId();
-</code></pre>
-<p>Now send the transaction to create a registry on-chain using <code>dock.revocation.newRegistry</code>. This method accepts the registry id,
-the policy object and a boolean that specifies whether the registry is add-only or not meaning that whether undoing revocations
-is allowed or not. Ifs <code>true</code>, it makes the registry add-only meaning that undoing revocations is not allowed, if <code>false</code>,
-undoing is allowed.</p>
-<pre><code class="language-js">// Setting the last argument to false to allow unrevoking the credential (undoing revocation)
-await dock.revocation.newRegistry(registryId, policy, false);
-</code></pre>
-<h2 id="revoking-a-credential"><a class="header" href="#revoking-a-credential">Revoking a credential</a></h2>
-<p>Revoking a credential requires a signature from the owner of the registry.
-Now get the registry id, <code>registryId</code> and the revocation id (the hash of credential id), <code>revokeId</code> and send the transaction on chain.
-Revoking an already revoked credential has no effect.</p>
-<pre><code class="language-js">await dock.revocation.revokeCredentialWithOneOfPolicy(registryId, revokeId, ownerDID, ownerKeypair, {didModule: dock.did});
-</code></pre>
-<p>Revoking multiple ids in a single transaction is possible but with a lower level method <code>dock.revocation.revoke</code>. See tests for its usage</p>
-<h2 id="undoing-a-revocation"><a class="header" href="#undoing-a-revocation">Undoing a revocation</a></h2>
-<p>Similar to revocation, undoing the revocation also requires a signature from the owner of the registry.</p>
-<p>Get the registry id, <code>registryId</code> and the revocation id to undo, <code>revokeId</code> and send the transaction on chain.
-Unrevoking an unrevoked credential has no effect.</p>
-<pre><code class="language-js">await dock.revocation.unrevokeCredentialWithOneOfPolicy(registryId, revokeId, ownerDID, ownerKeypair, {didModule: dock.did});
-</code></pre>
-<p>Undoing revocation for multiple ids in a single transaction is possible but with a lower level method <code>dock.revocation.unrevoke</code>. See tests for its usage</p>
-<h2 id="checking-the-revocation-status"><a class="header" href="#checking-the-revocation-status">Checking the revocation status</a></h2>
-<p>To check an id is revoked or not, call <code>dock.revocation.getIsRevoked</code> with the registry id and revocation id. Returns <code>true</code>
-if revoked else <code>false</code>.</p>
-<pre><code class="language-js">const isRevoked = await dock.revocation.getIsRevoked(registryId, revokeId);
-</code></pre>
-<h2 id="fetching-the-registry-details"><a class="header" href="#fetching-the-registry-details">Fetching the registry details</a></h2>
-<p>To get the details of the registry like policy, add-only status and block number when it was last updated, use <code>dock.revocation.getRegistryDetail</code></p>
-<h2 id="removing-the-registry"><a class="header" href="#removing-the-registry">Removing the registry</a></h2>
-<p>A registry can be deleted leading to all the corresponding revocation ids being deleted as well. This requires the signature
-from owner like other updates. Use the <code>dock.revocation.removeRegistry</code> method to remove a registry.</p>
-<pre><code class="language-js">await dock.revocation.removeRegistryWithOneOfPolicy(registryId, ownerDID, ownerKeypair, {didModule: dock.did}, false);
-</code></pre>
 
                     </main>
 

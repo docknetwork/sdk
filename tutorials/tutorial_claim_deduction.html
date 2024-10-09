@@ -183,45 +183,59 @@
   {
     if_all: [
       [
-        { Unbound: 'subject' },
-        { Unbound: 'predicate' },
-        { Unbound: 'object' },
-        { Bound: { Iri: 'did:example:issuer' } },
+        { Unbound: "subject" },
+        { Unbound: "predicate" },
+        { Unbound: "object" },
+        { Bound: { Iri: "did:example:issuer" } },
       ],
     ],
     then: [
       [
-        { Unbound: 'subject' },
-        { Unbound: 'predicate' },
-        { Unbound: 'object' },
+        { Unbound: "subject" },
+        { Unbound: "predicate" },
+        { Unbound: "object" },
         { Bound: { DefaultGraph: true } },
       ],
     ],
-  }
+  },
 ];
 </code></pre>
 <p>That single rule is enough for some use-cases but it's not scalable. What if we want to allow more than one issuer? Instead of copying the same rule for each issuer we trust, let's define "trustworthiness".</p>
 <h3 id="unwrapping-explicit-ethos-by-defining-trustworthiness"><a class="header" href="#unwrapping-explicit-ethos-by-defining-trustworthiness">Unwrapping Explicit Ethos by Defining Trustworthiness</a></h3>
-<pre><code class="language-js">const trustworthy = { Bound: { Iri: 'https://www.dock.io/rdf2020#Trustworthy' } };
-const type = { Bound: { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' } };
+<pre><code class="language-js">const trustworthy = {
+  Bound: { Iri: "https://www.dock.io/rdf2020#Trustworthy" },
+};
+const type = {
+  Bound: { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" },
+};
 const defaultGraph = { Bound: { DefaultGraph: true } };
 
 const rules = [
   {
     if_all: [
-      [{ Unbound: 'issuer' }, type, trustworthy, defaultGraph],
-      [{ Unbound: 's' }, { Unbound: 'p' }, { Unbound: 'o' }, { Unbound: 'issuer' }],
+      [{ Unbound: "issuer" }, type, trustworthy, defaultGraph],
+      [
+        { Unbound: "s" },
+        { Unbound: "p" },
+        { Unbound: "o" },
+        { Unbound: "issuer" },
+      ],
     ],
     then: [
-      [{ Unbound: 's' }, { Unbound: 'p' }, { Unbound: 'o' }, defaultGraph],
+      [{ Unbound: "s" }, { Unbound: "p" }, { Unbound: "o" }, defaultGraph],
     ],
   },
   {
     if_all: [],
     then: [
-      [{ Bound: { Iri: 'did:example:issuer' } }, type, trustworthy, defaultGraph]
+      [
+        { Bound: { Iri: "did:example:issuer" } },
+        type,
+        trustworthy,
+        defaultGraph,
+      ],
     ],
-  }
+  },
 ];
 </code></pre>
 <p>You may ask "So what's the difference? There is still only one issuer."</p>

@@ -215,7 +215,7 @@
 Once the credential is initialized, you can sequentially call the different methods provided by the class to add contexts, types, issuance dates and everything else.</p>
 <h3 id="building-a-verifiable-credential"><a class="header" href="#building-a-verifiable-credential">Building a Verifiable Credential</a></h3>
 <p>The first step to build a Verifiable Credential is to initialize it, we can do that using the <code>VerifiableCredential</code> class constructor which takes a <code>credentialId</code> as sole argument:</p>
-<pre><code class="language-javascript">let vc = new VerifiableCredential('http://example.edu/credentials/2803');
+<pre><code class="language-javascript">let vc = new VerifiableCredential("http://example.edu/credentials/2803");
 </code></pre>
 <p>You now have an unsigned Verifiable Credential in the <code>vc</code> variable!
 This Credential isn't signed since we only just initialized it. It brings however some useful defaults to make your life easier.</p>
@@ -384,7 +384,7 @@ methods provided by the class to add <code>contexts</code>, <code>types</code>, 
 <p>The first step to build a Verifiable Presentation is to initialize it, we can
 do that using the <code>VerifiablePresentation</code> class constructor which takes an
 <code>id</code> as sole argument:</p>
-<pre><code class="language-javascript">let vp = new VerifiablePresentation('http://example.edu/credentials/1986');
+<pre><code class="language-javascript">let vp = new VerifiablePresentation("http://example.edu/credentials/1986");
 </code></pre>
 <p>You now have an unsigned Verifiable Presentation in the <code>vp</code> variable!</p>
 <p>This Presentation isn't signed since we only just initialized it. It brings
@@ -561,9 +561,16 @@ supported but also encouraged.</p>
 <p>If you don't know how to create a DID there's a specific <a href="tutorial_did.html">tutorial on DIDs</a> you can read.</p>
 <p>Bear in mind that you will need to provide a <code>resolver</code> method if you decide to use DIDs in your Verifiable Credentials or Verifiable Presentations. More on resolvers can be found in the <a href="tutorial_resolver.html">tutorial on Resolvers</a>.</p>
 <p>Here's an example of issuing a Verifiable Credential using DIDs, provided that you've created and a DID that you store in <code>issuerDID</code>:</p>
-<pre><code class="language-javascript">const issuerKey = getKeyDoc(issuerDID, dock.keyring.addFromUri(issuerSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
+<pre><code class="language-javascript">const issuerKey = getKeyDoc(
+  issuerDID,
+  dock.keyring.addFromUri(issuerSeed, null, "ed25519"),
+  "Ed25519VerificationKey2018"
+);
 await vc.sign(issuerKey);
-const verificationResult = await signedCredential.verify({ resolver, compactProof: true });
+const verificationResult = await signedCredential.verify({
+  resolver,
+  compactProof: true,
+});
 console.log(verificationResult.verified); // Should print `true`
 </code></pre>
 <h2 id="creating-a-keydoc"><a class="header" href="#creating-a-keydoc">Creating a keyDoc</a></h2>
@@ -578,7 +585,7 @@ keyring for Sr25519 and Ed25519 or keypair generated with
 and a <code>type</code> string containing the type of the provided key (one of the
 supported 'Sr25519VerificationKey2020', 'Ed25519VerificationKey2018' or
 'EcdsaSecp256k1VerificationKey2019'):</p>
-<pre><code class="language-javascript">  const keyDoc = getKeyDoc(did, keypair, type)
+<pre><code class="language-javascript">const keyDoc = getKeyDoc(did, keypair, type);
 </code></pre>
 <p>Please check the example on the <a href="#using-dids">previous section</a> or refer to the <a href="../../tests/integration/presenting.test.js">presenting integration tests</a> for a live example.</p>
 

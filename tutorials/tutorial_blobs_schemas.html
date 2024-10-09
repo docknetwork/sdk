@@ -208,9 +208,11 @@ keyPair to sign the payload with). You'll get a signed extrinsic that you can se
 <pre><code class="language-javascript">const blobId = randomAsHex(DockBlobIdByteSize); // 32-bytes long hex string to use as the blob's id
 const blobStruct = {
   id: blobId,
-  blob: blobHexOrArray,  // Contents of your blob as a hex string or byte array
-}
-const result = await dock.blob.new(blobStruct, signerDid, keypair, { didModule: dock.didModule });
+  blob: blobHexOrArray, // Contents of your blob as a hex string or byte array
+};
+const result = await dock.blob.new(blobStruct, signerDid, keypair, {
+  didModule: dock.didModule,
+});
 </code></pre>
 <p>If everything worked properly <code>result</code> will indicate a successful transaction.
 We'll see how to retrieve the blob next.</p>

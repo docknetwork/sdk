@@ -183,26 +183,24 @@
 <h1 id="importing"><a class="header" href="#importing">Importing</a></h1>
 <p>In this tutorial series we will be using NodeJS with babel for ES6 support, however the same code should work in browsers too once it is transpiled. To begin with, we should import the Dock SDK. Importing the default reference will give us a DockAPI instance. With this we will communicate with the blockchain. You can also import the DockAPI class instanciate your own objects if you prefer. Simply do:</p>
 <pre><code class="language-javascript">// Import the dock SDK
-import dock from '@docknetwork/sdk';
+import dock from "@docknetwork/sdk";
 </code></pre>
 <p>We will add one more import here for some shared constants across each tutorial, just the node address and account secret:</p>
 <pre><code class="language-javascript">// Import some shared variables
-import { address, secretUri } from './shared-constants';
+import { address, secretUri } from "./shared-constants";
 </code></pre>
 <p>Lets also create this file, creating <code>shared-constants.js</code> with the contents:</p>
-<pre><code class="language-javascript">export const address = 'ws://localhost:9944'; // Websocket address of your Dock node
-export const secretUri = '//Alice'; // Account secret in uri format, we will use Alice for local testing
+<pre><code class="language-javascript">export const address = "ws://localhost:9944"; // Websocket address of your Dock node
+export const secretUri = "//Alice"; // Account secret in uri format, we will use Alice for local testing
 </code></pre>
 <h1 id="connecting-to-a-node"><a class="header" href="#connecting-to-a-node">Connecting to a node</a></h1>
 <p>With the required packages and variables imported, we can go ahead and connect to our node. If you don't have a local testnet running alraedy, go to https://github.com/docknetwork/dock-substrate and follow the steps in the readme to start one. You could use the Dock testnet given a proper account with enough funds. First, create a method named <code>connectToNode</code> with an empty body for now:</p>
-<pre><code class="language-javascript">export async function connectToNode() {
-
-}
+<pre><code class="language-javascript">export async function connectToNode() {}
 </code></pre>
 <p>Before working with the SDK, we need to initialize it. Upon initialization the SDK will connect to the node with the supplied address and create a keyring to manage accounts. Simply call <code>dock.init</code> and wait for the promise to resolve to connect to your node:</p>
 <pre><code class="language-javascript">// Initialize the SDK and connect to the node
 await dock.init({ address });
-console.log('Connected to the node and ready to go!');
+console.log("Connected to the node and ready to go!");
 </code></pre>
 <h1 id="creating-an-account"><a class="header" href="#creating-an-account">Creating an account</a></h1>
 <p>In order to write to the chain we will need to set an account. We can perform read operations with no account set, but for our purposes we will need one. Accounts can be generated using the <code>dock.keyring</code> object through multiple methods such as URI, memonic phrase and raw seeds. See the polkadot keyring documentation (https://polkadot.js.org/api/start/keyring.html) for more information.</p>
@@ -214,12 +212,12 @@ const account = dock.keyring.addFromUri(secretUri);
 dock.setAccount(account);
 
 // We are now ready to transact!
-console.log('Connected to the node and ready to go!');
+console.log("Connected to the node and ready to go!");
 </code></pre>
 <p>If all has gone well, you should be able to run this script and see that you are connected to the node. If any errors occur, the promise will fail and they will be outputted to the console.</p>
 <h1 id="basic-usage"><a class="header" href="#basic-usage">Basic usage</a></h1>
 <p>To construct your own API object, once the SDK has been installed, import the Dock API object as</p>
-<pre><code class="language-js">import { DockAPI } from '@docknetwork/sdk/api';
+<pre><code class="language-js">import { DockAPI } from "@docknetwork/sdk/api";
 const dock = new DockAPI();
 </code></pre>
 <p>To make the API object connect to the node call <code>init</code> method. This method accepts the Websocket RPC endpoint of the node is
@@ -292,14 +290,10 @@ update its DID document. A DID with a key with <code>capabilityInvocation</code>
 are 32 bytes in size.</p>
 <p>An example DID Document</p>
 <pre><code class="language-json">{
-  "@context": [
-    "https://www.w3.org/ns/did/v1"
-  ],
+  "@context": ["https://www.w3.org/ns/did/v1"],
   "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
-  "controller": [
-    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn"
-  ],
-  "publicKey": [
+  "controller": ["did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn"],
+  "verificationMethod": [
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
       "type": "Sr25519VerificationKey2020",
@@ -327,20 +321,18 @@ are 32 bytes in size.</p>
 </code></pre>
 <p>Dock DIDs support multiple keys. The keys are present in the <code>publicKey</code> section. As per the above DID document, the DID <code>did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn</code>
 has 2 public keys and 1 controller which is itself.
-Note how that public key  is referred to using its <code>id</code> in <code>authentication</code>, <code>assertionMethod</code> and <code>capabilityInvocation</code> sections.
+Note how that public key is referred to using its <code>id</code> in <code>authentication</code>, <code>assertionMethod</code> and <code>capabilityInvocation</code> sections.
 The above document states that the DID <code>did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn</code> can authenticate with 2 public keys
 whose id is specified under <code>authentication</code>. When it attests to some fact (becomes issuer), it can only use 1 key, which is under <code>assertionMethod</code>.
 The keys specified under <code>capabilityInvocation</code> can be used to update the DID document, i.e. add/remove keys, etc.</p>
 <pre><code class="language-json">{
-  "@context": [
-    "https://www.w3.org/ns/did/v1"
-  ],
+  "@context": ["https://www.w3.org/ns/did/v1"],
   "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
   "controller": [
     "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
     "did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"
   ],
-  "publicKey": [
+  "verificationMethod": [
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
       "type": "Sr25519VerificationKey2020",
@@ -370,15 +362,13 @@ The keys specified under <code>capabilityInvocation</code> can be used to update
 and the other is <code>did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz</code>. This means that DID <code>did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz</code>
 can also modify above DID document, i.e. add/remove keys, add/remove controller, etc.</p>
 <pre><code class="language-json">{
-  "@context": [
-    "https://www.w3.org/ns/did/v1"
-  ],
+  "@context": ["https://www.w3.org/ns/did/v1"],
   "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
   "controller": [
     "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
     "did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"
   ],
-  "publicKey": [
+  "verificationMethod": [
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
       "type": "Sr25519VerificationKey2020",
@@ -406,9 +396,7 @@ can also modify above DID document, i.e. add/remove keys, add/remove controller,
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1",
       "type": "LinkedDomains",
-      "serviceEndpoint": [
-        "https://foo.example.com"
-      ]
+      "serviceEndpoint": ["https://foo.example.com"]
     }
   ]
 }
@@ -417,14 +405,10 @@ can also modify above DID document, i.e. add/remove keys, add/remove controller,
 <p>DIDs can also be keyless, i.e. not have any keys of its own. In this case the DID is not self-controlled by controlled by
 another DID(s) and the other DID could add/remove keys, controllers or remove the DID. An example keyless DID is shown below</p>
 <pre><code class="language-json">{
-  "@context": [
-    "https://www.w3.org/ns/did/v1"
-  ],
+  "@context": ["https://www.w3.org/ns/did/v1"],
   "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
-  "controller": [
-    "did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"
-  ],
-  "publicKey": [],
+  "controller": ["did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"],
+  "verificationMethod": [],
   "authentication": [],
   "assertionMethod": [],
   "capabilityInvocation": [],
@@ -432,9 +416,7 @@ another DID(s) and the other DID could add/remove keys, controllers or remove th
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1",
       "type": "LinkedDomains",
-      "serviceEndpoint": [
-        "https://bar.example.com"
-      ]
+      "serviceEndpoint": ["https://bar.example.com"]
     }
   ]
 }
@@ -443,14 +425,10 @@ another DID(s) and the other DID could add/remove keys, controllers or remove th
 <code>did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz</code> add a key, say for authentication to <code>did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn</code> and the
 DID Doc will look like below</p>
 <pre><code class="language-json">{
-  "@context": [
-    "https://www.w3.org/ns/did/v1"
-  ],
+  "@context": ["https://www.w3.org/ns/did/v1"],
   "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn",
-  "controller": [
-    "did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"
-  ],
-  "publicKey": [
+  "controller": ["did:dock:5Hc3RZyfJd98QbFENrDP57Lga8mSofDFwKQpodN2g2ZcYscz"],
+  "verificationMethod": [
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
       "type": "Ed25519VerificationKey2018",
@@ -459,7 +437,7 @@ DID Doc will look like below</p>
     }
   ],
   "authentication": [
-    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1",
+    "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#keys-1"
   ],
   "assertionMethod": [],
   "capabilityInvocation": [],
@@ -467,9 +445,7 @@ DID Doc will look like below</p>
     {
       "id": "did:dock:5Hhnorjqd7vXPKdT7Y1ZpHksMBHsVRNewntZjMF2NHm3PoFn#linked-domain-1",
       "type": "LinkedDomains",
-      "serviceEndpoint": [
-        "https://bar.example.com"
-      ]
+      "serviceEndpoint": ["https://bar.example.com"]
     }
   ]
 }
@@ -680,24 +656,24 @@ More about JSON schemas can be found <a href="http://json-schema.org/draft/2019-
 </code></pre>
 <p>In our context, these schemas are stored on-chain as a blob, which means they have a Blob Id as id and a DID as author:</p>
 <pre><code class="language-json">{
-   "id": "blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW",
-   "author": "did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW",
-   "schema": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "description": "Alumni",
-      "type": "object",
-      "properties": {
-        "emailAddress": {
-          "type": "string",
-          "format": "email"
-        },
-        "alumniOf": {
-          "type": "string"
-        }
+  "id": "blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW",
+  "author": "did:dock:5CEdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW",
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "Alumni",
+    "type": "object",
+    "properties": {
+      "emailAddress": {
+        "type": "string",
+        "format": "email"
       },
-      "required": ["emailAddress", "alumniOf"],
-      "additionalProperties": false
-    }
+      "alumniOf": {
+        "type": "string"
+      }
+    },
+    "required": ["emailAddress", "alumniOf"],
+    "additionalProperties": false
+  }
 }
 </code></pre>
 <p>Had we referenced this JSON schema from within a Verifiable Credential, validation would fail if the <code>credentialSubject</code>
@@ -725,70 +701,63 @@ can use it in a Verifiable Credential as follows:</p>
 </code></pre>
 <p>The following is an example of a valid Verifiable Credential using the above schema:</p>
 <pre><code class="language-json">{
-   "@context": [
-      "https://www.w3.org/2018/credentials/v1",
-      "https://www.w3.org/2018/credentials/examples/v1"
-   ],
-   "id": "uuid:0x9b561796d3450eb2673fed26dd9c07192390177ad93e0835bc7a5fbb705d52bc",
-   "type": [
-      "VerifiableCredential",
-      "AlumniCredential"
-   ],
-   "issuanceDate": "2020-03-18T19:23:24Z",
-   "credentialSchema": {
-      "id": "blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW",
-      "type": "JsonSchemaValidator2018"
-   },
-   "credentialSubject": {
-      "id": "did:dock:5GL3xbkr3vfs4qJ94YUHwpVVsPSSAyvJcafHz1wNb5zrSPGi",
-      "emailAddress": "john.smith@example.com",
-      "alumniOf": "Example University"
-   },
-   "issuer": "did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr",
-   "proof": {
-      "type": "Ed25519Signature2018",
-      "created": "2020-04-22T07:50:13Z",
-      "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..GBqyaiTMhVt4R5P2bMGcLNJPWEUq7WmGHG7Wc6mKBo9k3vSo7v7sRKwqS8-m0og_ANKcb5m-_YdXC2KMnZwLBg",
-      "proofPurpose": "assertionMethod",
-      "verificationMethod": "did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr#keys-1"
-   }
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://www.w3.org/2018/credentials/examples/v1"
+  ],
+  "id": "uuid:0x9b561796d3450eb2673fed26dd9c07192390177ad93e0835bc7a5fbb705d52bc",
+  "type": ["VerifiableCredential", "AlumniCredential"],
+  "issuanceDate": "2020-03-18T19:23:24Z",
+  "credentialSchema": {
+    "id": "blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW",
+    "type": "JsonSchemaValidator2018"
+  },
+  "credentialSubject": {
+    "id": "did:dock:5GL3xbkr3vfs4qJ94YUHwpVVsPSSAyvJcafHz1wNb5zrSPGi",
+    "emailAddress": "john.smith@example.com",
+    "alumniOf": "Example University"
+  },
+  "issuer": "did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr",
+  "proof": {
+    "type": "Ed25519Signature2018",
+    "created": "2020-04-22T07:50:13Z",
+    "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..GBqyaiTMhVt4R5P2bMGcLNJPWEUq7WmGHG7Wc6mKBo9k3vSo7v7sRKwqS8-m0og_ANKcb5m-_YdXC2KMnZwLBg",
+    "proofPurpose": "assertionMethod",
+    "verificationMethod": "did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr#keys-1"
+  }
 }
 </code></pre>
 <p>In contrast, the following is an example of an invalid Verifiable Credential:</p>
 <pre><code class="language-json">{
-   "@context": [
-      "https://www.w3.org/2018/credentials/v1",
-      "https://www.w3.org/2018/credentials/examples/v1"
-   ],
-   "id": "uuid:0x9b561796d3450eb2673fed26dd9c07192390177ad93e0835bc7a5fbb705d52bc",
-   "type": [
-      "VerifiableCredential",
-      "AlumniCredential"
-   ],
-   "issuanceDate": "2020-03-18T19:23:24Z",
-   "credentialSchema": {
-      "id": "blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW",
-      "type": "JsonSchemaValidator2018"
-   },
-   "credentialSubject": [
-      {
-        "id": "did:dock:5GL3xbkr3vfs4qJ94YUHwpVVsPSSAyvJcafHz1wNb5zrSPGi",
-        "emailAddress": "john.smith@example.com",
-        "alumniOf": "Example University"
-      },
-      {
-        "id": "did:dock:6DF3xbkr3vfs4qJ94YUHwpVVsPSSAyvJcafHz1wNb5zrSPGi",
-      }
-
-   ],
-   "issuer": "did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr",
-   "proof": {
-      "type": "Ed25519Signature2018",
-      "created": "2020-04-22T07:50:13Z",
-      "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..GBqyaiTMhVt4R5P2bMGcLNJPWEUq7WmGHG7Wc6mKBo9k3vSo7v7sRKwqS8-m0og_ANKcb5m-_YdXC2KMnZwLBg",
-      "proofPurpose": "assertionMethod",
-      "verificationMethod": "did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr#keys-1"
-   }
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://www.w3.org/2018/credentials/examples/v1"
+  ],
+  "id": "uuid:0x9b561796d3450eb2673fed26dd9c07192390177ad93e0835bc7a5fbb705d52bc",
+  "type": ["VerifiableCredential", "AlumniCredential"],
+  "issuanceDate": "2020-03-18T19:23:24Z",
+  "credentialSchema": {
+    "id": "blob:dock:1DFdyZkZnALDdCAp7crTRiaCq6KViprTM6kHUQCD8X6VqGPW",
+    "type": "JsonSchemaValidator2018"
+  },
+  "credentialSubject": [
+    {
+      "id": "did:dock:5GL3xbkr3vfs4qJ94YUHwpVVsPSSAyvJcafHz1wNb5zrSPGi",
+      "emailAddress": "john.smith@example.com",
+      "alumniOf": "Example University"
+    },
+    {
+      "id": "did:dock:6DF3xbkr3vfs4qJ94YUHwpVVsPSSAyvJcafHz1wNb5zrSPGi"
+    }
+  ],
+  "issuer": "did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr",
+  "proof": {
+    "type": "Ed25519Signature2018",
+    "created": "2020-04-22T07:50:13Z",
+    "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..GBqyaiTMhVt4R5P2bMGcLNJPWEUq7WmGHG7Wc6mKBo9k3vSo7v7sRKwqS8-m0og_ANKcb5m-_YdXC2KMnZwLBg",
+    "proofPurpose": "assertionMethod",
+    "verificationMethod": "did:dock:5GUBvwnV6UyRWZ7wjsBptSquiSHGr9dXAy8dZYUR9WdjmLUr#keys-1"
+  }
 }
 </code></pre>
 <p>the reason this last Credential is invalid is that only one of the subjects properly follow the Schema, the second
@@ -869,15 +838,15 @@ subject does not specify the fields <code>emailAddress</code> and <code>alumniOf
   DefaultGraph,
 }</code></pre>
 <p>The SDK represents RDF nodes like so:</p>
-<pre><code class="language-js">const alice = { Iri: 'did:sample:alice' };
+<pre><code class="language-js">const alice = { Iri: "did:sample:alice" };
 const literal = {
   Literal: {
-    value: '{}',
-    datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#JSON',
-  }
+    value: "{}",
+    datatype: "http://www.w3.org/1999/02/22-rdf-syntax-ns#JSON",
+  },
 };
 // blank nodes are generally not useful in rule definitions
-const blank = { Blank: '_:b0' };
+const blank = { Blank: "_:b0" };
 const defaultGraph = { DefaultGraph: true };
 </code></pre>
 <p>Here is an example of a complete rule definition:</p>
@@ -1048,10 +1017,8 @@ const defaultGraph = { DefaultGraph: true };
 <div style="break-before: page; page-break-before: always;"></div><h1 id="tutorials"><a class="header" href="#tutorials">Tutorials</a></h1>
 <ol>
 <li><a href="./tutorial_did.html">DID</a></li>
-<li><a href="./tutorial_revocation.html">Revocation</a></li>
 <li><a href="./tutorial_ipv.html">Verifiable credentials</a></li>
 <li><a href="./tutorial_blobs_schemas.html">Blobs and Schemas</a></li>
-<li><a href="./tutorial_evm.html">EVM integration</a></li>
 </ol>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="did"><a class="header" href="#did">DID</a></h1>
 <p>If you are not familiar with DIDs, you can get a conceptual overview <a href="./concepts_did.html">here</a>.</p>
@@ -1066,45 +1033,24 @@ for itself or any DID it controls, adding a blob, etc should supply a nonce 1 hi
 <p>This is done for replay protection but this detail however is hidden in the API so the caller should not have to worry about this.</p>
 <h2 id="did-creation"><a class="header" href="#did-creation">DID creation</a></h2>
 <p>Create a new random DID.</p>
-<pre><code class="language-js">import {DockDid} from '@docknetwork/sdk/did';
+<pre><code class="language-js">import { DockDid } from "@docknetwork/credential-sdk/types";
 
 const did = DockDid.random();
 </code></pre>
 <p>The DID is not yet registered on the chain. Before the DID can be registered, a public key needs to created as well.</p>
-<h2 id="public-key-creation"><a class="header" href="#public-key-creation">Public key creation</a></h2>
-<p>Dock supports 3 kinds of public keys, Sr25519, Ed25519 and EcdsaSecp256k1. These public keys are supported
-through 3 classes, <code>PublicKeySr25519</code>, <code>PublicKeyEd25519</code> and <code>PublicKeySecp256k1</code> respectively.</p>
-<p>These 3 classes extend from the same class called <code>PublicKey</code>. These can be instantiated directly by passing them as hex
-encoded bytes.</p>
-<pre><code class="language-js">import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from '@docknetwork/sdk/api';
+<h2 id="keypair-creation"><a class="header" href="#keypair-creation">Keypair creation</a></h2>
+<p>We can create a random <code>ed25519</code> keypair using <code>Ed25519Keypair</code> class.</p>
+<pre><code class="language-js">import { Ed25519Keypair } from "@docknetwork/credential-sdk/keypairs";
 
-const pk1 = new PublicKeySr25519(bytesAsHex);
-const pk2 = new PublicKeyEd25519(bytesAsHex);
-const pk3 = new PublicKeySecp256k1(bytesAsHex);
+const kp = Ed25519Keypair.random();
 </code></pre>
-<p>Or they can be created by first creating a keyring</p>
-<pre><code class="language-js">import {PublicKeySr25519, PublicKeyEd25519} from '@docknetwork/sdk/api';
+<p>The result pair can be used as following:</p>
+<pre><code class="language-javascript">const publicKey = kp.publicKey();
+const privateKey = kp.privateKey();
 
-// Assuming you had a keyring, you can create keypairs or used already created keypairs
-const pair1 = keyring.addFromUri(secretUri, someMetadata, 'ed25519');
-const pk1 = PublicKeyEd25519.fromKeyringPair(pair1);
-
-const pair2 = keyring.addFromUri(secretUri2, someMetadata, 'sr25519');
-const pk2 = PublicKeySr25519.fromKeyringPair(pair2);
-
-</code></pre>
-<p>Polkadot-js keyring does not support ECDSA with secp256k1 so there is a function <code>generateEcdsaSecp256k1Keypair</code> that
-takes some entropy and generate a keypair.</p>
-<pre><code class="language-js">import { generateEcdsaSecp256k1Keypair } from '@docknetwork/sdk/utils/misc';
-import {PublicKeySecp256k1} from '@docknetwork/sdk/api';
-// The pers and entropy are optional but must be used when keys need to be deterministic
-const pair3 = generateEcdsaSecp256k1Keypair(pers, entropy);
-const pk3 = PublicKeySecp256k1.fromKeyringPair(pair3);
-</code></pre>
-<p>Or you can directly pass any of the above keypairs in the function <code>getPublicKeyFromKeyringPair</code> and it will return an
-object of the proper child class of <code>PublicKey</code></p>
-<pre><code class="language-js">import { getPublicKeyFromKeyringPair } from '@docknetwork/sdk/utils/misc';
-const publicKey = getPublicKeyFromKeyringPair(pair);
+const message = Uint8Array.from([1, 2, 3]);
+const signature = kp.sign(message);
+assert(Ed25519Keypair.verify(message, signature, publicKey));
 </code></pre>
 <h2 id="registering-a-new-did-on-chain"><a class="header" href="#registering-a-new-did-on-chain">Registering a new DID on chain</a></h2>
 <p>Now that you have a DID and a public key, the DID can be registered on the Dock chain. Note that this public key associated
@@ -1113,61 +1059,60 @@ with DID is independent of the key used for sending the transaction and paying t
 <p>In most cases, a DID will have its own keys and will control itself, i.e. a self-controlled DID. Following is an example of DID creation in this scenario.</p>
 <ol>
 <li>
-<p>First create a <code>DidKey</code> object. The first argument of this function is a <code>PublicKey</code> and the second argument is
+<p>First, create a <code>DidKeypair</code> object. The first argument is a DID reference and the second is the underlying keypair.</p>
+<pre><code class="language-js">import { DidKeypair } from "@docknetwork/credential-sdk/keypair";
+
+const didKeypair = new DidKeypair([did, 1], kp);
+</code></pre>
+</li>
+<li>
+<p>Second, let's get a did key with verication relationship from the did's keypair. The only argument is
 the verification relationship. A verification relationship can be 1 or more of these <code>authentication</code>, <code>assertion</code>, <code>capabilityInvocation</code> or <code>keyAgreement</code></p>
-<pre><code class="language-js">import { DidKey, VerificationRelationship } from '@docknetwork/sdk/public-keys';
-const didKey = new DidKey(publicKey, new VerificationRelationship());
+<pre><code>```js
+const didKey = didKeypair.didKey();
+```
 </code></pre>
 </li>
 <li>
 <p>Now submit the transaction using a <code>DockAPI</code> object and the newly created DID <code>did</code> and <code>didKey</code>.</p>
-<pre><code class="language-js">await dock.did.new(did, [didKey], []);
+<pre><code class="language-js">const document = DIDDocument.create(did, [didKey]);
+await dock.did.createDocument(document, didKeypair);
 </code></pre>
 </li>
 </ol>
 <h3 id="keyless-dids"><a class="header" href="#keyless-dids">Keyless DIDs</a></h3>
-<p>A DID might not have any keys and thus be controlled by other DIDs. Assuming a DID <code>did1</code> already exists, it can register a
+<p>A DID might not have any keys and thus be controlled by other DIDs. Assuming a DID <code>did</code> already exists, it can register a
 keyless DID <code>did2</code> as</p>
-<pre><code class="language-js">await dock.did.new(did2, [], [did1]);
+<pre><code class="language-js">const document = DIDDocument.create(did2);
+await dock.did.createDocument(document, didKeypair);
 </code></pre>
 <p>Moreover, a DID can have keys for certain functions like authentication but still be controlled by other DID(s).</p>
 <h2 id="fetching-a-did-from-chain"><a class="header" href="#fetching-a-did-from-chain">Fetching a DID from chain</a></h2>
-<p>To get a DID document, use <code>getDocument</code>
-<code>js     const result = await dock.did.getDocument(did);     </code></p>
+<p>To get a DID document, use <code>getDocument</code></p>
+<pre><code class="language-js">const result = await dock.did.getDocument(did);
+</code></pre>
 <h2 id="adding-a-key-to-an-existing-did"><a class="header" href="#adding-a-key-to-an-existing-did">Adding a key to an existing DID</a></h2>
 <p>A DID's controller can add a public key to an on-chain DID by preparing a signed payload. Each new key is given a number key index
 which 1 is greater than the last used index. Key indices start from 1.</p>
 <ol>
 <li>Create a new public key and use the current keypair to sign the message
 <pre><code class="language-js">// the current pair, its a sr25519 in this example
-const currentPair = dock.keyring.addFromUri(secretUri, null, 'sr25519');
-const newPk = // Using any of the above methods
-</code></pre>
-</li>
-<li>The caller might directly create a signed key update
-<pre><code class="language-js">const vr = new VerificationRelationship();
-// This new key can only be used for issuance.
-vr.setAssertion();
-const newDidKey = new DidKey(newPk, vr);
+const newKp = Ed25519Keypair.random();
 </code></pre>
 </li>
 <li>Now send the signed payload in a transaction to the chain in a transaction.
-In the arguments, the first <code>did</code> specifies that a key must be added to DID <code>did</code> and the second <code>did</code> specifies that DID <code>did</code> is signing the payload
-The <code>1</code> below is for the key index.
-<pre><code class="language-js">dock.did.addKeys([newDidKey], did, did, currentpair, undefined, false);
+In the arguments, the first <code>did</code> specifies that a key must be added to DID <code>did</code> and the second <code>did</code> specifies that DID <code>did</code> is signing the payload.
+<pre><code class="language-js">const document = await dock.did.getDocument(did);
+document.addKey([did, 2], newKp.didKey());
+await dock.did.updateDocument(document, didKeypair);
 </code></pre>
 </li>
 </ol>
 <h2 id="removing-an-existing-did-from-chain"><a class="header" href="#removing-an-existing-did-from-chain">Removing an existing DID from chain</a></h2>
 <p>A DID can be removed from the chain by sending the corresponding message signed with an appropriate key.</p>
 <ol>
-<li>Fetch the current keypair to sign the DID removal message
-<pre><code class="language-js">// the current pair, its a sr25519 in this example
-const currentPair = dock.keyring.addFromUri(secretUri, null, 'sr25519');
-</code></pre>
-</li>
 <li>Now send the message with the signature to the chain in a transaction
-<pre><code class="language-js">dock.did.remove(did, did, pair)
+<pre><code class="language-js">dock.did.removeDocument(did, didKeypair);
 </code></pre>
 </li>
 </ol>
@@ -1262,7 +1207,11 @@ resolvers of various DID methods to the derived class constructor.</p>
 will be dispatched according to their prefix and method configuration. The <code>resolvers</code> array below
 has resolvers for DID methods <code>dock</code> and <code>ethr</code>.</p>
 <p>For resolving DID of any other method, <code>UniversalResolver</code> object will be used.</p>
-<pre><code class="language-js">import { DockDIDResolver, DIDResolver, WILDCARD } from "@docknetwork/sdk/resolver";
+<pre><code class="language-js">import {
+  DockDIDResolver,
+  DIDResolver,
+  WILDCARD,
+} from "@docknetwork/sdk/resolver";
 
 class MultiDIDResolver extends DIDResolver {
   static METHOD = WILDCARD;
@@ -1271,7 +1220,7 @@ class MultiDIDResolver extends DIDResolver {
     super([
       new DockDIDResolver(dock),
       new EtherResolver(ethereumProviderConfig),
-      new UniversalResolver(universalResolverUrl)
+      new UniversalResolver(universalResolverUrl),
     ]);
   }
 }
@@ -1326,7 +1275,7 @@ const didDocumentBtc = multiResolver.resolve("did:btcr:xk....");
 Once the credential is initialized, you can sequentially call the different methods provided by the class to add contexts, types, issuance dates and everything else.</p>
 <h3 id="building-a-verifiable-credential"><a class="header" href="#building-a-verifiable-credential">Building a Verifiable Credential</a></h3>
 <p>The first step to build a Verifiable Credential is to initialize it, we can do that using the <code>VerifiableCredential</code> class constructor which takes a <code>credentialId</code> as sole argument:</p>
-<pre><code class="language-javascript">let vc = new VerifiableCredential('http://example.edu/credentials/2803');
+<pre><code class="language-javascript">let vc = new VerifiableCredential("http://example.edu/credentials/2803");
 </code></pre>
 <p>You now have an unsigned Verifiable Credential in the <code>vc</code> variable!
 This Credential isn't signed since we only just initialized it. It brings however some useful defaults to make your life easier.</p>
@@ -1495,7 +1444,7 @@ methods provided by the class to add <code>contexts</code>, <code>types</code>, 
 <p>The first step to build a Verifiable Presentation is to initialize it, we can
 do that using the <code>VerifiablePresentation</code> class constructor which takes an
 <code>id</code> as sole argument:</p>
-<pre><code class="language-javascript">let vp = new VerifiablePresentation('http://example.edu/credentials/1986');
+<pre><code class="language-javascript">let vp = new VerifiablePresentation("http://example.edu/credentials/1986");
 </code></pre>
 <p>You now have an unsigned Verifiable Presentation in the <code>vp</code> variable!</p>
 <p>This Presentation isn't signed since we only just initialized it. It brings
@@ -1672,9 +1621,16 @@ supported but also encouraged.</p>
 <p>If you don't know how to create a DID there's a specific <a href="tutorial_did.html">tutorial on DIDs</a> you can read.</p>
 <p>Bear in mind that you will need to provide a <code>resolver</code> method if you decide to use DIDs in your Verifiable Credentials or Verifiable Presentations. More on resolvers can be found in the <a href="tutorial_resolver.html">tutorial on Resolvers</a>.</p>
 <p>Here's an example of issuing a Verifiable Credential using DIDs, provided that you've created and a DID that you store in <code>issuerDID</code>:</p>
-<pre><code class="language-javascript">const issuerKey = getKeyDoc(issuerDID, dock.keyring.addFromUri(issuerSeed, null, 'ed25519'), 'Ed25519VerificationKey2018');
+<pre><code class="language-javascript">const issuerKey = getKeyDoc(
+  issuerDID,
+  dock.keyring.addFromUri(issuerSeed, null, "ed25519"),
+  "Ed25519VerificationKey2018"
+);
 await vc.sign(issuerKey);
-const verificationResult = await signedCredential.verify({ resolver, compactProof: true });
+const verificationResult = await signedCredential.verify({
+  resolver,
+  compactProof: true,
+});
 console.log(verificationResult.verified); // Should print `true`
 </code></pre>
 <h2 id="creating-a-keydoc"><a class="header" href="#creating-a-keydoc">Creating a keyDoc</a></h2>
@@ -1689,66 +1645,10 @@ keyring for Sr25519 and Ed25519 or keypair generated with
 and a <code>type</code> string containing the type of the provided key (one of the
 supported 'Sr25519VerificationKey2020', 'Ed25519VerificationKey2018' or
 'EcdsaSecp256k1VerificationKey2019'):</p>
-<pre><code class="language-javascript">  const keyDoc = getKeyDoc(did, keypair, type)
+<pre><code class="language-javascript">const keyDoc = getKeyDoc(did, keypair, type);
 </code></pre>
 <p>Please check the example on the <a href="tutorial_ipv.html#using-dids">previous section</a> or refer to the <a href="../../tests/integration/presenting.test.js">presenting integration tests</a> for a live example.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="revocation-1"><a class="header" href="#revocation-1">Revocation</a></h1>
-<h2 id="overview-1"><a class="header" href="#overview-1">Overview</a></h2>
-<p>Credential revocation is managed with on-chain revocation registries. To revoke a credential, its id (or hash of its id) must be
-added to the credential. It is advised to have one revocation registry per credential type. Each registry has a unique id and
-an associated policy. The policy determines who can update the revocation registry. The registry also has an "add-only" flag specifying
-whether an id once added to the registry can be removed (leading to undoing the revocation) or not.
-Similar to the replay protection mechanism for DIDs, for each registry, the last modified block number is kept which is updated
-each time a credential is revoked or unrevoked.
-For now, only one policy is supported which is that each registry is owned by a single DID. Also, neither the policy
-nor the "add-only" flag can be updated post the creation of the registry for now.</p>
-<h2 id="registry-creation"><a class="header" href="#registry-creation">Registry creation</a></h2>
-<p>To create a registry, first a <code>Policy</code> object needs to be created for which a DID is needed. It is advised that the DID
-is registered on chain first (else someone can look at the registry a register the DID, thus controlling the registry).</p>
-<pre><code class="language-js">import {OneOfPolicy} from '@docknetwork/sdk/utils/revocation';
-const policy = new OneOfPolicy();
-policy.addOwner(ownerDID);
-
-// Or in a single step
-const policy = new OneOfPolicy([ownerDID]);
-</code></pre>
-<p>Now create a random registry id. The registry id supposed to be unique among all registries on chain.</p>
-<pre><code class="language-js">import {createRandomRegistryId} from '@docknetwork/sdk/utils/revocation';
-const registryId = createRandomRegistryId();
-</code></pre>
-<p>Now send the transaction to create a registry on-chain using <code>dock.revocation.newRegistry</code>. This method accepts the registry id,
-the policy object and a boolean that specifies whether the registry is add-only or not meaning that whether undoing revocations
-is allowed or not. Ifs <code>true</code>, it makes the registry add-only meaning that undoing revocations is not allowed, if <code>false</code>,
-undoing is allowed.</p>
-<pre><code class="language-js">// Setting the last argument to false to allow unrevoking the credential (undoing revocation)
-await dock.revocation.newRegistry(registryId, policy, false);
-</code></pre>
-<h2 id="revoking-a-credential"><a class="header" href="#revoking-a-credential">Revoking a credential</a></h2>
-<p>Revoking a credential requires a signature from the owner of the registry.
-Now get the registry id, <code>registryId</code> and the revocation id (the hash of credential id), <code>revokeId</code> and send the transaction on chain.
-Revoking an already revoked credential has no effect.</p>
-<pre><code class="language-js">await dock.revocation.revokeCredentialWithOneOfPolicy(registryId, revokeId, ownerDID, ownerKeypair, {didModule: dock.did});
-</code></pre>
-<p>Revoking multiple ids in a single transaction is possible but with a lower level method <code>dock.revocation.revoke</code>. See tests for its usage</p>
-<h2 id="undoing-a-revocation"><a class="header" href="#undoing-a-revocation">Undoing a revocation</a></h2>
-<p>Similar to revocation, undoing the revocation also requires a signature from the owner of the registry.</p>
-<p>Get the registry id, <code>registryId</code> and the revocation id to undo, <code>revokeId</code> and send the transaction on chain.
-Unrevoking an unrevoked credential has no effect.</p>
-<pre><code class="language-js">await dock.revocation.unrevokeCredentialWithOneOfPolicy(registryId, revokeId, ownerDID, ownerKeypair, {didModule: dock.did});
-</code></pre>
-<p>Undoing revocation for multiple ids in a single transaction is possible but with a lower level method <code>dock.revocation.unrevoke</code>. See tests for its usage</p>
-<h2 id="checking-the-revocation-status"><a class="header" href="#checking-the-revocation-status">Checking the revocation status</a></h2>
-<p>To check an id is revoked or not, call <code>dock.revocation.getIsRevoked</code> with the registry id and revocation id. Returns <code>true</code>
-if revoked else <code>false</code>.</p>
-<pre><code class="language-js">const isRevoked = await dock.revocation.getIsRevoked(registryId, revokeId);
-</code></pre>
-<h2 id="fetching-the-registry-details"><a class="header" href="#fetching-the-registry-details">Fetching the registry details</a></h2>
-<p>To get the details of the registry like policy, add-only status and block number when it was last updated, use <code>dock.revocation.getRegistryDetail</code></p>
-<h2 id="removing-the-registry"><a class="header" href="#removing-the-registry">Removing the registry</a></h2>
-<p>A registry can be deleted leading to all the corresponding revocation ids being deleted as well. This requires the signature
-from owner like other updates. Use the <code>dock.revocation.removeRegistry</code> method to remove a registry.</p>
-<pre><code class="language-js">await dock.revocation.removeRegistryWithOneOfPolicy(registryId, ownerDID, ownerKeypair, {didModule: dock.did}, false);
-</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="schemas-1"><a class="header" href="#schemas-1">Schemas</a></h1>
 <h2 id="table-of-contents-2"><a class="header" href="#table-of-contents-2">Table of contents</a></h2>
 <ol>
@@ -1784,9 +1684,11 @@ keyPair to sign the payload with). You'll get a signed extrinsic that you can se
 <pre><code class="language-javascript">const blobId = randomAsHex(DockBlobIdByteSize); // 32-bytes long hex string to use as the blob's id
 const blobStruct = {
   id: blobId,
-  blob: blobHexOrArray,  // Contents of your blob as a hex string or byte array
-}
-const result = await dock.blob.new(blobStruct, signerDid, keypair, { didModule: dock.didModule });
+  blob: blobHexOrArray, // Contents of your blob as a hex string or byte array
+};
+const result = await dock.blob.new(blobStruct, signerDid, keypair, {
+  didModule: dock.didModule,
+});
 </code></pre>
 <p>If everything worked properly <code>result</code> will indicate a successful transaction.
 We'll see how to retrieve the blob next.</p>
@@ -1911,45 +1813,59 @@ Credentials contained within it uses a Schema and fails to pass schema validatio
   {
     if_all: [
       [
-        { Unbound: 'subject' },
-        { Unbound: 'predicate' },
-        { Unbound: 'object' },
-        { Bound: { Iri: 'did:example:issuer' } },
+        { Unbound: "subject" },
+        { Unbound: "predicate" },
+        { Unbound: "object" },
+        { Bound: { Iri: "did:example:issuer" } },
       ],
     ],
     then: [
       [
-        { Unbound: 'subject' },
-        { Unbound: 'predicate' },
-        { Unbound: 'object' },
+        { Unbound: "subject" },
+        { Unbound: "predicate" },
+        { Unbound: "object" },
         { Bound: { DefaultGraph: true } },
       ],
     ],
-  }
+  },
 ];
 </code></pre>
 <p>That single rule is enough for some use-cases but it's not scalable. What if we want to allow more than one issuer? Instead of copying the same rule for each issuer we trust, let's define "trustworthiness".</p>
 <h3 id="unwrapping-explicit-ethos-by-defining-trustworthiness"><a class="header" href="#unwrapping-explicit-ethos-by-defining-trustworthiness">Unwrapping Explicit Ethos by Defining Trustworthiness</a></h3>
-<pre><code class="language-js">const trustworthy = { Bound: { Iri: 'https://www.dock.io/rdf2020#Trustworthy' } };
-const type = { Bound: { Iri: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' } };
+<pre><code class="language-js">const trustworthy = {
+  Bound: { Iri: "https://www.dock.io/rdf2020#Trustworthy" },
+};
+const type = {
+  Bound: { Iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" },
+};
 const defaultGraph = { Bound: { DefaultGraph: true } };
 
 const rules = [
   {
     if_all: [
-      [{ Unbound: 'issuer' }, type, trustworthy, defaultGraph],
-      [{ Unbound: 's' }, { Unbound: 'p' }, { Unbound: 'o' }, { Unbound: 'issuer' }],
+      [{ Unbound: "issuer" }, type, trustworthy, defaultGraph],
+      [
+        { Unbound: "s" },
+        { Unbound: "p" },
+        { Unbound: "o" },
+        { Unbound: "issuer" },
+      ],
     ],
     then: [
-      [{ Unbound: 's' }, { Unbound: 'p' }, { Unbound: 'o' }, defaultGraph],
+      [{ Unbound: "s" }, { Unbound: "p" }, { Unbound: "o" }, defaultGraph],
     ],
   },
   {
     if_all: [],
     then: [
-      [{ Bound: { Iri: 'did:example:issuer' } }, type, trustworthy, defaultGraph]
+      [
+        { Bound: { Iri: "did:example:issuer" } },
+        type,
+        trustworthy,
+        defaultGraph,
+      ],
     ],
-  }
+  },
 ];
 </code></pre>
 <p>You may ask "So what's the difference? There is still only one issuer."</p>
@@ -2088,14 +2004,14 @@ async function verifyPresentation(presentation) { ... }
 </code></pre>
 </details>
 <pre><code class="language-js">const delegation = {
-  '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
+  "@context": ["https://www.w3.org/2018/credentials/v1"],
   id: uuid(),
-  type: [ 'VerifiableCredential' ],
-  issuer: 'did:ex:a',
+  type: ["VerifiableCredential"],
+  issuer: "did:ex:a",
   credentialSubject: {
-    id: 'did:ex:b',
-    'https://rdf.dock.io/alpha/2021#mayClaim':
-      'https://rdf.dock.io/alpha/2021#ANYCLAIM'
+    id: "did:ex:b",
+    "https://rdf.dock.io/alpha/2021#mayClaim":
+      "https://rdf.dock.io/alpha/2021#ANYCLAIM",
   },
   issuanceDate: new Date().toISOString(),
 };
@@ -2105,13 +2021,13 @@ const signed_delegation = signCredential(delegation, dida_secret);
 <h2 id="issue-a-credential-as-a-delegate"><a class="header" href="#issue-a-credential-as-a-delegate">Issue a Credential as a Delegate</a></h2>
 <p><code>did:ex:b</code> accepts the delegation credential from <code>did:ex:a</code>. Now <code>did:ex:b</code> can use the delegation to make arbitrary attestations on behalf of <code>did:ex:a</code>.</p>
 <pre><code class="language-js">const newcred = {
-  '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
+  "@context": ["https://www.w3.org/2018/credentials/v1"],
   id: uuid(),
-  type: [ 'VerifiableCredential' ],
-  issuer: 'did:ex:b',
+  type: ["VerifiableCredential"],
+  issuer: "did:ex:b",
   credentialSubject: {
-    id: 'did:ex:c',
-    'https://example.com/score': 100,
+    id: "did:ex:c",
+    "https://example.com/score": 100,
   },
   issuanceDate: new Date().toISOString(),
 };
@@ -2122,11 +2038,11 @@ const signed_newcred = signCredential(newcred, didb_secret);
 <h2 id="present-a-delegated-credential"><a class="header" href="#present-a-delegated-credential">Present a Delegated Credential</a></h2>
 <p><code>did:ex:c</code> now holds two credentials, <code>signed_delegation</code> and <code>signed_newcred</code>. Together they prove that <code>did:ex:a</code> indirectly claims <code>did:ex:c</code> to have a score of 100. <code>did:ex:c</code> wants to prove this statement to another party, a <em>verifier</em>. <code>did:ex:c</code> must bundle the two credentials into a VCDM <em>presentation</em>.</p>
 <pre><code class="language-js">let presentation = {
-  '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
-  type: [ 'VerifiablePresentation' ],
+  "@context": ["https://www.w3.org/2018/credentials/v1"],
+  type: ["VerifiablePresentation"],
   id: uuid(),
   holder: `did:ex:c`,
-  verifiableCredential: [ signed_delegation, signed_newcred ],
+  verifiableCredential: [signed_delegation, signed_newcred],
 };
 </code></pre>
 <p><code>presentation</code> is sent to the verifier.</p>
@@ -2205,7 +2121,7 @@ const resolveGraph = graphResolver(ipfsClient, documentLoader);
 <pre><code class="language-js">await setAttestation(
   delegatorDid,
   delegatorSk,
-  'ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p'
+  "ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p"
 );
 </code></pre>
 <h2 id="issue-a-credential-as-a-delegate-1"><a class="header" href="#issue-a-credential-as-a-delegate-1">Issue a Credential as a Delegate</a></h2>
@@ -2216,15 +2132,15 @@ const resolveGraph = graphResolver(ipfsClient, documentLoader);
 <p>The verifier accepts Publicly delegated credentials by merging the credential's claimgraph representation with publically posted delegation information, then reasoning over the result. Once found, the delegation information is also a claimgraph. The delegation information is found by <a href="./concepts_public_attestation.html#uses">crawling the public attestation supergraph</a>. Crawling is potentially slow, so when verification speed is important it should be done early on, like at program startup. Delegation information can be re-used across multiple credential verifications.</p>
 <p>As with any Public Attestations, delegation information is revocable by removing the delegation attestation from the delegators DID doc. As such it is possible for cached delegation information to become out of date. Long running validator processes should devise a mechanism for invalidating out-of-date delegation information, such as re-crawing whenever a change is detected to the DID doc of a delegator (or sub-delegator). This tutorial does not cover invalidation of out-of-date delegations.</p>
 <p>The following example shows how a verifier might</p>
-<pre><code class="language-js">import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from '@docknetwork/sdk/rdf-defs';
-import { crawl } from '@docknetwork/sdk/crawl.js';
+<pre><code class="language-js">import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from "@docknetwork/sdk/rdf-defs";
+import { crawl } from "@docknetwork/sdk/crawl.js";
 import {
   proveCompositeClaims,
   presentationToEEClaimGraph,
   inferh,
-} from '@docknetwork/sdk/utils/cd';
-import { merge } from '@docknetwork/sdk/utils/claimgraph';
-import jsonld from 'jsonld';
+} from "@docknetwork/sdk/utils/cd";
+import { merge } from "@docknetwork/sdk/utils/claimgraph";
+import jsonld from "jsonld";
 
 // These logical rules will be used for reasoning during both crawing and verifiying
 // credentials.
@@ -2236,18 +2152,18 @@ const RULES = [
   {
     if_all: [
       [
-        { Unbound: 'a' },
+        { Unbound: "a" },
         { Bound: { Iri: ATTESTS } },
-        { Unbound: 'doc' },
-        { Unbound: 'a' },
+        { Unbound: "doc" },
+        { Unbound: "a" },
       ],
     ],
     then: [
       [
-        { Unbound: 'doc' },
+        { Unbound: "doc" },
         { Bound: { Iri: MAYCLAIM } },
         { Bound: { Iri: ANYCLAIM } },
-        { Unbound: 'a' },
+        { Unbound: "a" },
       ],
     ],
   },
@@ -2268,7 +2184,7 @@ const CURIOSITY = `
 `;
 
 // To spark the crawlers interest we'll feed it some initial knowlege about did:ex:a .
-const initialFacts = await resolveGraph({ Iri: 'did:ex:a' });
+const initialFacts = await resolveGraph({ Iri: "did:ex:a" });
 
 // `allFact` contains our delegation information, it will be merged with verified
 // credentials in order to reason over delegations
@@ -2291,196 +2207,9 @@ const cg = inferh(merge(presCg, allFacts), RULES);
 // doSomethingWithVerifiedData(cg);
 </code></pre>
 <p>More examples of <code>crawl()</code> usage can be found <a href="https://github.com/docknetwork/sdk/blob/master/tests/integration/crawl.test.js">here</a> and <a href="https://github.com/docknetwork/sdk/blob/master/tests/unit/crawl.test.js">here</a>.</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="ethereum-integration"><a class="header" href="#ethereum-integration">Ethereum integration</a></h1>
-<h2 id="table-of-contents-3"><a class="header" href="#table-of-contents-3">Table of contents</a></h2>
-<ol>
-<li><a href="tutorial_evm.html#intro">Intro</a></li>
-<li><a href="tutorial_evm.html#dock-and-evm-accounts">Dock and EVM accounts</a></li>
-<li><a href="tutorial_evm.html#dao">Deploying a DAO</a></li>
-<li><a href="tutorial_evm.html#chainlink">Chainlink integration</a></li>
-</ol>
-<p><strong>This document assumes hands-on experience with Ethereum and interaction with smart contracts using libraries like <a href="https://github.com/ChainSafe/web3.js">web3</a> or <a href="https://github.com/ethers-io/ethers.js">ethers-js</a>.</strong></p>
-<h2 id="intro-2"><a class="header" href="#intro-2">Intro</a></h2>
-<p>The chain allows you to deploy and interact with existing EVM smart contracts by using popular Ethereum client libraries like <a href="https://github.com/ChainSafe/web3.js">web3</a> or <a href="https://github.com/ethers-io/ethers.js">ethers-js</a>.
-You can directly send contract's bytecode as well if you don't want to use these libraries. This is possible because the chain integrates 2 modules <a href="https://github.com/paritytech/frontier/tree/master/frame/evm">pallet-evm</a> and <a href="https://github.com/paritytech/frontier/tree/master/frame/ethereum">pallet-ethereum</a> from <a href="https://github.com/paritytech/frontier">Parity's frontier</a> project.
-<code>pallet-evm</code> allows the chain to execute EVM bytecode and persist state like contract storage but does not understand how Ethereum transactions, blocks, etc are created and have to be parsed. Handling that is the job of <code>pallet-ethereum</code> which uses <code>pallet-evm</code> for executing the bytecode. More detailed docs of these pallets are available <a href="https://github.com/paritytech/frontier/tree/master/docs/frame">here</a>.</p>
-<p>The motivation for this integration was to support <a href="https://chain.link/">Chainlink</a> for providing <a href="https://docs.chain.link/docs/using-chainlink-reference-contracts">price feed</a> of the DOCK/USD pair which can then be used by the chain to charge transactions at a USD price.</p>
-<p>The document will however show how to deploy and use a different set of contracts. A <a href="https://academy.binance.com/en/glossary/decentralized-autonomous-organization">DAO</a>, which replicates <a href="https://github.com/aragon/aragon-apps/tree/master/apps/voting">Aragon's voting app</a>. The app lets token holders vote in proportion to the tokens they hold and the winning vote executes an action by calling a method on another contract.</p>
-<p>Most of the examples use web-3 but there is <a href="../../tests/integration/eth/using-ethers.test.js">a test</a> using ethers-js as well.</p>
-<h2 id="dock-and-evm-accounts"><a class="header" href="#dock-and-evm-accounts">Dock and EVM accounts</a></h2>
-<p>Accounts in Dock are 32 bytes (excluding network identifier and checksum) but EVM accounts are 20 bytes (last 20 bytes of the public key). As there is no direct conversion possible between these two and we don't support
-binding these two together in an onchain mapping, a separate Ethereum address has to be created and funded with tokens to send Ethereum style transactions. <code>pallet-evm</code> derives a Dock address from this Ethereum address
-and expects that Dock address to have tokens. The test <a href="../../tests/integration/eth/native-balance-to-eth.test.js">native-balance-to-eth.test</a> shows an Ethereum account <code>carol</code> created using web3 being given some tokens using function <code>endowEVMAddress</code>.</p>
-<pre><code class="language-js">  // An API object which will connect to node and send non-EVM transactions like balance transfer
-  const dock = new DockAPI();
-  await dock.init({
-    address: FullNodeEndpoint,
-  });
-
-  // Jacob has Dock tokens and will send tokens to Carol.
-  const jacob = dock.keyring.addFromUri(EndowedSecretURI);
-  dock.setAccount(jacob);
-
-  // ...
-  // ....
-
-  const carol = "&lt;Account created from web3&gt;";
-  await endowEVMAddress(dock, carol.address);
-</code></pre>
-<p>The substrate address can also be generated by function <code>evmAddrToSubstrateAddr</code>. Its balance can be queried either using <code>web3</code> or <code>polkadot-js</code>.</p>
-<pre><code class="language-js">  // Every EVM address has a mapping to Substrate address whose balance is deducted for fee when the EVM address does a transaction.
-  const carolSubsAddr = evmAddrToSubstrateAddr(carol.address);
-  console.log(`Querying balance of Carol's address using web3 ${(await web3.eth.getBalance(carol.address))}`);
-  console.log(`Querying balance of Carol's address using polkadot-js ${(await getBalance(dock.api, carolSubsAddr, false))}`);
-</code></pre>
-<p><code>endowEVMAddress</code> uses <code>evmAddrToSubstrateAddr</code> to covert the passed EVM address to the Substrate address and do a <code>transfer</code> as shown below</p>
-<pre><code class="language-js">// Give `amount` of Dock tokens to EVM address. `amount` defaults to the number of tokens required to pay of maximum gas
-export function endowEVMAddress(dock, evmAddr, amount) {
-  //  Convert EVM address to a Substrate address
-  const substrateAddr = evmAddrToSubstrateAddr(evmAddr);
-
-  // Selecting the amount such that it can pay fees for the upto the maximum gas allowed and some extra
-  const amt = amount !== undefined ? amount : bnToBn(MinGasPrice).mul(bnToBn(MaxGas)).muln(2);
-
-  // Transfer to the Substrate address created above
-  const transfer = dock.api.tx.balances.transfer(substrateAddr, amt);
-  return dock.signAndSend(transfer, false);
-}
-</code></pre>
-<p>To send arbitrary EVM transactions and deploy contracts using web3, look at the functions <code>sendEVMTxn</code> and <code>deployContract</code> respectively in <code>scripts/eth/helpers.js</code>.</p>
-<p>Withdrawing tokens back from an EVM address to a Substrate address is a 3-step process.</p>
-<ol>
-<li>Derive an intermediate EVM address from the receiving Substrate address.</li>
-<li>Send tokens using web3 to this intermediate EVM address.</li>
-<li>Send tokens using polkadot-js from intermediate address to target address.</li>
-</ol>
-<pre><code class="language-js">  // Withdraw some tokens from EVM address, i.e. Carol to Jacob.
-
-  // Jacob's account is set as signer in the API object `dock`
-
-  // Step-1
-  // Create an intermediate EVM address
-  const intermediateAddress = substrateAddrToEVMAddr(jacob.address);
-
-  // Step-2
-  // Carol sends 100 tokens to the intermediate EVM address. `sendTokensToEVMAddress` uses web3 to send an Ethereum style
-  // transfer transaction, i.e. `data` field is set to 0 and `value` field specifies the transfer amount.
-  await sendTokensToEVMAddress(web3, carol, intermediateAddress, 1000);
-
-  // Step-3
-  // Withdraw from the intermediate address to the Substrate address sending this transaction, i.e. Jacob
-  const withdraw = dock.api.tx.evm.withdraw(intermediateAddress, 1000);
-  await dock.signAndSend(withdraw, false);
-</code></pre>
-<p>The second step above of sending tokens in EVM requires to specify minimum gas price and maximum allowed gas. The function <code>sendTokensToEVMAddress</code> needs to
-know these values and accepts them as arguments. If not provided it will check for environment variables <code>MinGasPrice</code> and <code>MaxGas</code>. This behavior is
-common to all script helpers.</p>
-<h2 id="dao"><a class="header" href="#dao">DAO</a></h2>
-<p>This section shows how to deploy a voting DAO where tokens holder can vote to execute certain actions. This replicates <a href="https://github.com/aragon/aragon-apps/tree/master/apps/voting">Aragon's voting app</a>.
-The complete script is <a href="../../scripts/eth/dao/voting-dao-test.js">here</a> and below is an explainer of the script</p>
-<ol>
-<li>
-<p>Create some accounts that will send Ethereum style transactions and fund them with Dock tokens. The accounts generated in the code are only for testing
-so create your own accounts for real world apps.</p>
-<pre><code class="language-js">const web3 = getWeb3();
-
-// Create some test accounts. Alice will be the manager of the DAO while Bob, Carol and Dave will be voters.
-const [alice, bob, carol, dave] = getTestEVMAccountsFromWeb3(web3);
-
-// Endow accounts with tokens so they can pay fees for transactions
-await endowEVMAddressWithDefault(alice.address);
-await endowEVMAddressWithDefault(bob.address);
-await endowEVMAddressWithDefault(carol.address);
-await endowEVMAddressWithDefault(dave.address);
-</code></pre>
-<p><code>getTestEVMAccountsFromWeb3</code> uses web3 to create EVM accounts using some test private keys.</p>
-<pre><code class="language-js">// Returns some test EVM accounts
-export function getTestEVMAccountsFromWeb3(web3) {
-  return getTestPrivKeysForEVMAccounts().map((k) =&gt; web3.eth.accounts.privateKeyToAccount(k));
-}
-</code></pre>
-</li>
-<li>
-<p>Create a DAO factory contract which will then be used to initialize a new DAO instance. Also setup the access control list for the DAO and set the DAO manager (an admin role)</p>
-<pre><code class="language-js">// Create a contract factory to create new DAO instance.
-const [, , , daoFactContractAddr] = await createDaoFactory(web3, alice);
-
-// Create a new DAO instance
-const daoAddr = await createNewDao(web3, alice, alice.address, daoFactContractAddr);
-
-// Set access control and set Alice as DAO's manager
-const aclAddr = await setupAcl(web3, alice, alice.address, daoAddr);
-</code></pre>
-</li>
-<li>
-<p>A DAO can install several apps but here we will have only one app; for voting. Choose a unique app id.</p>
-<pre><code class="language-js">// Some unique app id
-const appId = '0x0000000000000000000000000000000000000000000000000000000000000100';
-</code></pre>
-</li>
-<li>
-<p>Create a voting app (contract) with the above app id. Install the app in the DAO and allow any token holder to vote using the DAO's access control list (ACL).</p>
-<pre><code class="language-js">// Create a voting contract, install it as an app in the DAO and allow any token holder to vote
-const votingAppAddress = await setupVotingApp(web3, alice, alice.address, appId, daoAddr, aclAddr);
-const votingApp = new web3.eth.Contract(VotingDAOABI, votingAppAddress);
-</code></pre>
-</li>
-<li>
-<p>Voting in this DAO requires voters to have tokens and their vote will carry weight proportional to their token balance. Deploy a token contract. This token contract is
-<a href="https://github.com/aragon/minime/blob/master/contracts/MiniMeToken.sol">Aragon's MiniMeToken</a> that extends ERC-20 interface. After deploying token, accounts <code>bob</code>, <code>carol</code>
-and <code>dave</code> are given 51, 29 and 20 tokens respectively. This makes the total supply of the <code>MiniMeToken</code> as 100 where <code>bob</code>, <code>carol</code> and <code>dave</code> hold 51%, 29% and 20% supply
-respectively.</p>
-<pre><code class="language-js">// Deploy a token contract where Bob, Carol and Dave will have 51%, 29% and 20% tokens as thus proportional voting power.
-const tokenContractAddr = await deployToken(web3, alice, [[bob.address, 51], [carol.address, 29], [dave.address, 20]]);
-</code></pre>
-</li>
-<li>
-<p>Now initialize the voting app by setting the token contract address and thresholds for voting. The example scripts set the winning percentage to 51%.
-As <code>bob</code>, <code>carol</code> and <code>dave</code> hold 51%, 29% and 20% token supply, they will have 51%, 29% and 20% voting power respectively.</p>
-<pre><code class="language-js">// Initialize the voting by supplying the token contract and thresholds for voting.
-await initializeVotingApp(web3, alice, votingAppAddress, tokenContractAddr);
-</code></pre>
-</li>
-<li>
-<p>For this example, we want successful voting to increment a counter in a contract. However, this contract is for demo purpose only. <code>counterAddr</code> is the
-address of the demo contract and <code>incrementScript</code> is the encoded call to a function to increment the counter.</p>
-<pre><code class="language-js">// A Counter contract as an example executor. In practice, the executor methods will only allow calls by the voting contract.
-const [counterAddr, incrementScript] = await setupVotingExecutor(web3, alice);
-</code></pre>
-</li>
-<li>
-<p>As <code>bob</code> has 51% of the voting power, it can create a new vote by calling contract method <code>newVote</code></p>
-<pre><code class="language-js">// Bob alone can increment the Counter as he has 51% tokens
-console.log(`Counter before increment from Bob ${(await getCounter(web3, counterAddr))}`);
-await sendEVMTxn(web3, bob, votingAppAddress, votingApp.methods.newVote(incrementScript, '').encodeABI());
-console.log(`Counter after increment from Bob ${(await getCounter(web3, counterAddr))}`);
-</code></pre>
-</li>
-<li>
-<p>As <code>carol</code> and <code>dave</code> together hold less than 51%, they cannot increment the counter by voting. Here <code>carol</code> creates a new vote by calling contract
-method <code>newVote</code> which returns the vote id and dave uses votes in approval of <code>carol</code> by calling contract method <code>vote</code> and passing the vote id and <code>true</code>.
-The other <code>true</code> indicates the vote should trigger the execution if successful.</p>
-<pre><code class="language-js">// Carol creates a new vote
-const voteId = await createNewVote(web3, carol, votingAppAddress, incrementScript);
-// Dave seconds Carol's vote
-await sendEVMTxn(web3, dave, votingAppAddress, votingApp.methods.vote(voteId, true, true).encodeABI());
-console.log("Counter after attempted increment from Carol and Dave. Counter will not change as Bob and Carol don't have enough voting power");
-</code></pre>
-</li>
-</ol>
-<h2 id="chainlink"><a class="header" href="#chainlink">Chainlink</a></h2>
-<p>The chain will have Chainlink contracts for price feed in addition to Link token and others. The contracts and scripts to interact
-with Chainlink contracts are at <code>scripts/eth/chainlink</code> in the repo. The scripts have some comments to explain the working.</p>
-<ul>
-<li>To deploy the Link token, check the script <code>link-token.js</code> at path <code>scripts/eth/chainlink/link-token.js</code> in the repo.</li>
-<li>To deploy the <a href="https://github.com/smartcontractkit/chainlink/blob/develop/evm-contracts/src/v0.6/FluxAggregator.sol">FluxAggregator</a> contract that is used by oracles to submit prices, check script <code>flux-aggegator.js</code> at path <code>scripts/eth/chainlink/flux-aggegator.js</code> in the repo.</li>
-<li>To deploy aggregator with access control on reads and with proxy, <a href="https://github.com/smartcontractkit/chainlink/blob/develop/evm-contracts/src/v0.6/AccessControlledAggregator.sol">AccessControlledAggregator</a> and <a href="https://github.com/smartcontractkit/chainlink/blob/develop/evm-contracts/src/v0.6/EACAggregatorProxy.sol">EACAggregatorProxy</a> are deployed.
-Check script <code>access-controlled-aggregator-proxy.js</code> at path <code>scripts/eth/chainlink/access-controlled-aggregator-proxy.js</code> in the repo. To deploy with <a href="https://github.com/smartcontractkit/chainlink/blob/develop/evm-contracts/src/v0.6/DeviationFlaggingValidator.sol">DeviationFlaggingValidator</a> that raises flag on price off by a threshold in either direction,
-use script <code>deviation-flag-validator.js</code> at path <code>scripts/eth/chainlink/deviation-flag-validator.js</code>. The set the validator address while deploying <code>AccessControlledAggregator</code>.</li>
-<li>To setup a contract for an Oracle (not needed for price feed though), check script <code>oracle.js</code> in <code>scripts/eth/chainlink/oracle.js</code>.</li>
-</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="evm"><a class="header" href="#evm">EVM</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="anonymous-credentials"><a class="header" href="#anonymous-credentials">Anonymous credentials</a></h1>
-<h2 id="overview-2"><a class="header" href="#overview-2">Overview</a></h2>
+<h2 id="overview-1"><a class="header" href="#overview-1">Overview</a></h2>
 <p>This document talks about building anonymous credentials using mainly 2 primitives, BBS+ signature scheme which issuer uses to sign the
 credential and accumulators for membership check needed for revocation. BBS+ implementation comes from <a href="https://github.com/docknetwork/crypto-wasm-ts/">this</a>
 Typescript package which uses <a href="https://github.com/docknetwork/crypto-wasm">this</a> WASM wrapper which itself uses <a href="https://github.com/docknetwork/crypto">our Rust crypto library</a>.</p>

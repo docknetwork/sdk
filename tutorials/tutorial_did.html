@@ -186,45 +186,24 @@ for itself or any DID it controls, adding a blob, etc should supply a nonce 1 hi
 <p>This is done for replay protection but this detail however is hidden in the API so the caller should not have to worry about this.</p>
 <h2 id="did-creation"><a class="header" href="#did-creation">DID creation</a></h2>
 <p>Create a new random DID.</p>
-<pre><code class="language-js">import {DockDid} from '@docknetwork/sdk/did';
+<pre><code class="language-js">import { DockDid } from "@docknetwork/credential-sdk/types";
 
 const did = DockDid.random();
 </code></pre>
 <p>The DID is not yet registered on the chain. Before the DID can be registered, a public key needs to created as well.</p>
-<h2 id="public-key-creation"><a class="header" href="#public-key-creation">Public key creation</a></h2>
-<p>Dock supports 3 kinds of public keys, Sr25519, Ed25519 and EcdsaSecp256k1. These public keys are supported
-through 3 classes, <code>PublicKeySr25519</code>, <code>PublicKeyEd25519</code> and <code>PublicKeySecp256k1</code> respectively.</p>
-<p>These 3 classes extend from the same class called <code>PublicKey</code>. These can be instantiated directly by passing them as hex
-encoded bytes.</p>
-<pre><code class="language-js">import {PublicKeySr25519, PublicKeyEd25519, PublicKeySecp256k1} from '@docknetwork/sdk/api';
+<h2 id="keypair-creation"><a class="header" href="#keypair-creation">Keypair creation</a></h2>
+<p>We can create a random <code>ed25519</code> keypair using <code>Ed25519Keypair</code> class.</p>
+<pre><code class="language-js">import { Ed25519Keypair } from "@docknetwork/credential-sdk/keypairs";
 
-const pk1 = new PublicKeySr25519(bytesAsHex);
-const pk2 = new PublicKeyEd25519(bytesAsHex);
-const pk3 = new PublicKeySecp256k1(bytesAsHex);
+const kp = Ed25519Keypair.random();
 </code></pre>
-<p>Or they can be created by first creating a keyring</p>
-<pre><code class="language-js">import {PublicKeySr25519, PublicKeyEd25519} from '@docknetwork/sdk/api';
+<p>The result pair can be used as following:</p>
+<pre><code class="language-javascript">const publicKey = kp.publicKey();
+const privateKey = kp.privateKey();
 
-// Assuming you had a keyring, you can create keypairs or used already created keypairs
-const pair1 = keyring.addFromUri(secretUri, someMetadata, 'ed25519');
-const pk1 = PublicKeyEd25519.fromKeyringPair(pair1);
-
-const pair2 = keyring.addFromUri(secretUri2, someMetadata, 'sr25519');
-const pk2 = PublicKeySr25519.fromKeyringPair(pair2);
-
-</code></pre>
-<p>Polkadot-js keyring does not support ECDSA with secp256k1 so there is a function <code>generateEcdsaSecp256k1Keypair</code> that
-takes some entropy and generate a keypair.</p>
-<pre><code class="language-js">import { generateEcdsaSecp256k1Keypair } from '@docknetwork/sdk/utils/misc';
-import {PublicKeySecp256k1} from '@docknetwork/sdk/api';
-// The pers and entropy are optional but must be used when keys need to be deterministic
-const pair3 = generateEcdsaSecp256k1Keypair(pers, entropy);
-const pk3 = PublicKeySecp256k1.fromKeyringPair(pair3);
-</code></pre>
-<p>Or you can directly pass any of the above keypairs in the function <code>getPublicKeyFromKeyringPair</code> and it will return an
-object of the proper child class of <code>PublicKey</code></p>
-<pre><code class="language-js">import { getPublicKeyFromKeyringPair } from '@docknetwork/sdk/utils/misc';
-const publicKey = getPublicKeyFromKeyringPair(pair);
+const message = Uint8Array.from([1, 2, 3]);
+const signature = kp.sign(message);
+assert(Ed25519Keypair.verify(message, signature, publicKey));
 </code></pre>
 <h2 id="registering-a-new-did-on-chain"><a class="header" href="#registering-a-new-did-on-chain">Registering a new DID on chain</a></h2>
 <p>Now that you have a DID and a public key, the DID can be registered on the Dock chain. Note that this public key associated
@@ -233,61 +212,60 @@ with DID is independent of the key used for sending the transaction and paying t
 <p>In most cases, a DID will have its own keys and will control itself, i.e. a self-controlled DID. Following is an example of DID creation in this scenario.</p>
 <ol>
 <li>
-<p>First create a <code>DidKey</code> object. The first argument of this function is a <code>PublicKey</code> and the second argument is
+<p>First, create a <code>DidKeypair</code> object. The first argument is a DID reference and the second is the underlying keypair.</p>
+<pre><code class="language-js">import { DidKeypair } from "@docknetwork/credential-sdk/keypair";
+
+const didKeypair = new DidKeypair([did, 1], kp);
+</code></pre>
+</li>
+<li>
+<p>Second, let's get a did key with verication relationship from the did's keypair. The only argument is
 the verification relationship. A verification relationship can be 1 or more of these <code>authentication</code>, <code>assertion</code>, <code>capabilityInvocation</code> or <code>keyAgreement</code></p>
-<pre><code class="language-js">import { DidKey, VerificationRelationship } from '@docknetwork/sdk/public-keys';
-const didKey = new DidKey(publicKey, new VerificationRelationship());
+<pre><code>```js
+const didKey = didKeypair.didKey();
+```
 </code></pre>
 </li>
 <li>
 <p>Now submit the transaction using a <code>DockAPI</code> object and the newly created DID <code>did</code> and <code>didKey</code>.</p>
-<pre><code class="language-js">await dock.did.new(did, [didKey], []);
+<pre><code class="language-js">const document = DIDDocument.create(did, [didKey]);
+await dock.did.createDocument(document, didKeypair);
 </code></pre>
 </li>
 </ol>
 <h3 id="keyless-dids"><a class="header" href="#keyless-dids">Keyless DIDs</a></h3>
-<p>A DID might not have any keys and thus be controlled by other DIDs. Assuming a DID <code>did1</code> already exists, it can register a
+<p>A DID might not have any keys and thus be controlled by other DIDs. Assuming a DID <code>did</code> already exists, it can register a
 keyless DID <code>did2</code> as</p>
-<pre><code class="language-js">await dock.did.new(did2, [], [did1]);
+<pre><code class="language-js">const document = DIDDocument.create(did2);
+await dock.did.createDocument(document, didKeypair);
 </code></pre>
 <p>Moreover, a DID can have keys for certain functions like authentication but still be controlled by other DID(s).</p>
 <h2 id="fetching-a-did-from-chain"><a class="header" href="#fetching-a-did-from-chain">Fetching a DID from chain</a></h2>
-<p>To get a DID document, use <code>getDocument</code>
-<code>js     const result = await dock.did.getDocument(did);     </code></p>
+<p>To get a DID document, use <code>getDocument</code></p>
+<pre><code class="language-js">const result = await dock.did.getDocument(did);
+</code></pre>
 <h2 id="adding-a-key-to-an-existing-did"><a class="header" href="#adding-a-key-to-an-existing-did">Adding a key to an existing DID</a></h2>
 <p>A DID's controller can add a public key to an on-chain DID by preparing a signed payload. Each new key is given a number key index
 which 1 is greater than the last used index. Key indices start from 1.</p>
 <ol>
 <li>Create a new public key and use the current keypair to sign the message
 <pre><code class="language-js">// the current pair, its a sr25519 in this example
-const currentPair = dock.keyring.addFromUri(secretUri, null, 'sr25519');
-const newPk = // Using any of the above methods
-</code></pre>
-</li>
-<li>The caller might directly create a signed key update
-<pre><code class="language-js">const vr = new VerificationRelationship();
-// This new key can only be used for issuance.
-vr.setAssertion();
-const newDidKey = new DidKey(newPk, vr);
+const newKp = Ed25519Keypair.random();
 </code></pre>
 </li>
 <li>Now send the signed payload in a transaction to the chain in a transaction.
-In the arguments, the first <code>did</code> specifies that a key must be added to DID <code>did</code> and the second <code>did</code> specifies that DID <code>did</code> is signing the payload
-The <code>1</code> below is for the key index.
-<pre><code class="language-js">dock.did.addKeys([newDidKey], did, did, currentpair, undefined, false);
+In the arguments, the first <code>did</code> specifies that a key must be added to DID <code>did</code> and the second <code>did</code> specifies that DID <code>did</code> is signing the payload.
+<pre><code class="language-js">const document = await dock.did.getDocument(did);
+document.addKey([did, 2], newKp.didKey());
+await dock.did.updateDocument(document, didKeypair);
 </code></pre>
 </li>
 </ol>
 <h2 id="removing-an-existing-did-from-chain"><a class="header" href="#removing-an-existing-did-from-chain">Removing an existing DID from chain</a></h2>
 <p>A DID can be removed from the chain by sending the corresponding message signed with an appropriate key.</p>
 <ol>
-<li>Fetch the current keypair to sign the DID removal message
-<pre><code class="language-js">// the current pair, its a sr25519 in this example
-const currentPair = dock.keyring.addFromUri(secretUri, null, 'sr25519');
-</code></pre>
-</li>
 <li>Now send the message with the signature to the chain in a transaction
-<pre><code class="language-js">dock.did.remove(did, did, pair)
+<pre><code class="language-js">dock.did.removeDocument(did, didKeypair);
 </code></pre>
 </li>
 </ol>

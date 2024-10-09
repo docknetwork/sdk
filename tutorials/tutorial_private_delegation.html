@@ -195,14 +195,14 @@ async function verifyPresentation(presentation) { ... }
 </code></pre>
 </details>
 <pre><code class="language-js">const delegation = {
-  '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
+  "@context": ["https://www.w3.org/2018/credentials/v1"],
   id: uuid(),
-  type: [ 'VerifiableCredential' ],
-  issuer: 'did:ex:a',
+  type: ["VerifiableCredential"],
+  issuer: "did:ex:a",
   credentialSubject: {
-    id: 'did:ex:b',
-    'https://rdf.dock.io/alpha/2021#mayClaim':
-      'https://rdf.dock.io/alpha/2021#ANYCLAIM'
+    id: "did:ex:b",
+    "https://rdf.dock.io/alpha/2021#mayClaim":
+      "https://rdf.dock.io/alpha/2021#ANYCLAIM",
   },
   issuanceDate: new Date().toISOString(),
 };
@@ -212,13 +212,13 @@ const signed_delegation = signCredential(delegation, dida_secret);
 <h2 id="issue-a-credential-as-a-delegate"><a class="header" href="#issue-a-credential-as-a-delegate">Issue a Credential as a Delegate</a></h2>
 <p><code>did:ex:b</code> accepts the delegation credential from <code>did:ex:a</code>. Now <code>did:ex:b</code> can use the delegation to make arbitrary attestations on behalf of <code>did:ex:a</code>.</p>
 <pre><code class="language-js">const newcred = {
-  '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
+  "@context": ["https://www.w3.org/2018/credentials/v1"],
   id: uuid(),
-  type: [ 'VerifiableCredential' ],
-  issuer: 'did:ex:b',
+  type: ["VerifiableCredential"],
+  issuer: "did:ex:b",
   credentialSubject: {
-    id: 'did:ex:c',
-    'https://example.com/score': 100,
+    id: "did:ex:c",
+    "https://example.com/score": 100,
   },
   issuanceDate: new Date().toISOString(),
 };
@@ -229,11 +229,11 @@ const signed_newcred = signCredential(newcred, didb_secret);
 <h2 id="present-a-delegated-credential"><a class="header" href="#present-a-delegated-credential">Present a Delegated Credential</a></h2>
 <p><code>did:ex:c</code> now holds two credentials, <code>signed_delegation</code> and <code>signed_newcred</code>. Together they prove that <code>did:ex:a</code> indirectly claims <code>did:ex:c</code> to have a score of 100. <code>did:ex:c</code> wants to prove this statement to another party, a <em>verifier</em>. <code>did:ex:c</code> must bundle the two credentials into a VCDM <em>presentation</em>.</p>
 <pre><code class="language-js">let presentation = {
-  '@context': [ 'https://www.w3.org/2018/credentials/v1' ],
-  type: [ 'VerifiablePresentation' ],
+  "@context": ["https://www.w3.org/2018/credentials/v1"],
+  type: ["VerifiablePresentation"],
   id: uuid(),
   holder: `did:ex:c`,
-  verifiableCredential: [ signed_delegation, signed_newcred ],
+  verifiableCredential: [signed_delegation, signed_newcred],
 };
 </code></pre>
 <p><code>presentation</code> is sent to the verifier.</p>

@@ -221,7 +221,7 @@ const resolveGraph = graphResolver(ipfsClient, documentLoader);
 <pre><code class="language-js">await setAttestation(
   delegatorDid,
   delegatorSk,
-  'ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p'
+  "ipfs://Qmeg1Hqu2Dxf35TxDg19b7StQTMwjCqhWigm8ANgm8wA3p"
 );
 </code></pre>
 <h2 id="issue-a-credential-as-a-delegate"><a class="header" href="#issue-a-credential-as-a-delegate">Issue a Credential as a Delegate</a></h2>
@@ -232,15 +232,15 @@ const resolveGraph = graphResolver(ipfsClient, documentLoader);
 <p>The verifier accepts Publicly delegated credentials by merging the credential's claimgraph representation with publically posted delegation information, then reasoning over the result. Once found, the delegation information is also a claimgraph. The delegation information is found by <a href="./concepts_public_attestation.html#uses">crawling the public attestation supergraph</a>. Crawling is potentially slow, so when verification speed is important it should be done early on, like at program startup. Delegation information can be re-used across multiple credential verifications.</p>
 <p>As with any Public Attestations, delegation information is revocable by removing the delegation attestation from the delegators DID doc. As such it is possible for cached delegation information to become out of date. Long running validator processes should devise a mechanism for invalidating out-of-date delegation information, such as re-crawing whenever a change is detected to the DID doc of a delegator (or sub-delegator). This tutorial does not cover invalidation of out-of-date delegations.</p>
 <p>The following example shows how a verifier might</p>
-<pre><code class="language-js">import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from '@docknetwork/sdk/rdf-defs';
-import { crawl } from '@docknetwork/sdk/crawl.js';
+<pre><code class="language-js">import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from "@docknetwork/sdk/rdf-defs";
+import { crawl } from "@docknetwork/sdk/crawl.js";
 import {
   proveCompositeClaims,
   presentationToEEClaimGraph,
   inferh,
-} from '@docknetwork/sdk/utils/cd';
-import { merge } from '@docknetwork/sdk/utils/claimgraph';
-import jsonld from 'jsonld';
+} from "@docknetwork/sdk/utils/cd";
+import { merge } from "@docknetwork/sdk/utils/claimgraph";
+import jsonld from "jsonld";
 
 // These logical rules will be used for reasoning during both crawing and verifiying
 // credentials.
@@ -252,18 +252,18 @@ const RULES = [
   {
     if_all: [
       [
-        { Unbound: 'a' },
+        { Unbound: "a" },
         { Bound: { Iri: ATTESTS } },
-        { Unbound: 'doc' },
-        { Unbound: 'a' },
+        { Unbound: "doc" },
+        { Unbound: "a" },
       ],
     ],
     then: [
       [
-        { Unbound: 'doc' },
+        { Unbound: "doc" },
         { Bound: { Iri: MAYCLAIM } },
         { Bound: { Iri: ANYCLAIM } },
-        { Unbound: 'a' },
+        { Unbound: "a" },
       ],
     ],
   },
@@ -284,7 +284,7 @@ const CURIOSITY = `
 `;
 
 // To spark the crawlers interest we'll feed it some initial knowlege about did:ex:a .
-const initialFacts = await resolveGraph({ Iri: 'did:ex:a' });
+const initialFacts = await resolveGraph({ Iri: "did:ex:a" });
 
 // `allFact` contains our delegation information, it will be merged with verified
 // credentials in order to reason over delegations

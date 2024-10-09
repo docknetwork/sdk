@@ -40,4 +40,4 @@ jobs:
         with:
           SSH: true
           BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: packages/credential-sdk/out # The folder the action should deploy.
+          FOLDER: out # The folder the action should deploy.

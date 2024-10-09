@@ -1,6 +1,7 @@
 {
   "name": "@docknetwork/dock-blockchain-modules",
   "version": "0.1.0",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/esm/index.js",
   "files": [
@@ -18,6 +19,13 @@
       "require": "./dist/cjs/*",
       "default": "./dist/esm/*"
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/docknetwork/sdk"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@docknetwork/credential-sdk": "0.1.0"

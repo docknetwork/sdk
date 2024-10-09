@@ -1,6 +1,7 @@
 {
   "name": "@docknetwork/credential-sdk",
   "version": "0.1.0",
+  "license": "MIT",
   "type": "module",
   "files": [
     "dist"
@@ -16,6 +17,13 @@
       "require": "./dist/cjs/*",
       "default": "./dist/esm/*"
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/docknetwork/sdk"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@comunica/actor-init-sparql-rdfjs": "^1.22.3",
@@ -88,7 +96,6 @@
     "test-with-node": "../../scripts/with_dock_docker_test_node yarn test",
     "test-with-all-nodes": "../../scripts/with_all_dock_docker_test_nodes yarn test-integration",
     "lint": "eslint \"src/**/*.js\"",
-    "lint-examples": "eslint \"{src,example}/**/*.js\"",
     "lint-scripts": "eslint \"scripts/**/*.js\"",
     "lint-tests": "eslint \"{tests/unit,tests/integration}/**/*.js\"",
     "docs": "rm -rf out && mkdir out && touch out/.nojekyll && jsdoc src -r -c ../../.jsdoc -d out/reference",

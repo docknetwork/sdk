@@ -74,18 +74,11 @@
   },
   "scripts": {
     "exc": "babel-node",
-    "staking_payouts": "babel-node scripts/staking_payouts.js",
-    "txn-pricing": "babel-node scripts/txn-pricing.js",
-    "get-did": "babel-node scripts/get_did_doc.js",
-    "upgrade_with_sudo": "babel-node scripts/runtime_upgrade_with_sudo.js",
-    "onboard_with_sudo": "babel-node scripts/onboard_validator_with_sudo.js",
     "lint": "eslint \"src/**/*.js\"",
-    "lint-tests": "eslint \"{tests/tests/integration}/**/*.js\"",
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "prepublishOnly": "yarn build",
     "docs": "rm -rf out && mkdir out && touch out/.nojekyll && jsdoc src -r -c ../../.jsdoc -d out/reference",
-    "mdbook": "mdbook build tutorials --dest-dir ../out/tutorials",
     "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
   },
   "resolutions": {

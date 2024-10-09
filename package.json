@@ -17,6 +17,7 @@
   },
   "packageManager": "yarn@1.22.22",
   "scripts": {
+    "mdbook": "mdbook build tutorials --dest-dir ../out/tutorials",
     "publish-packages": "changeset version && changeset publish"
   }
 }

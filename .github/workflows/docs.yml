@@ -30,7 +30,7 @@ jobs:
           mdbook-version: "latest"
 
       - name: Generate mdBook
-        run: turbo run mdbook
+        run: yarn run mdbook
 
       - name: Install SSH Client 🔑
         uses: webfactory/ssh-agent@v0.4.1

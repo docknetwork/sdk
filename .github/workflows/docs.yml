@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - fix/deploy-docs
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -19,6 +20,7 @@ jobs:
 
       - name: Install and Build 🔧 # Only need to install jsdoc package here and then run docs script
         run: |
+          npm install -g turbo
           yarn install --frozen-lockfile --ignore-scripts
           turbo run docs
 
@@ -28,7 +30,7 @@ jobs:
           mdbook-version: "latest"
 
       - name: Generate mdBook
-        run: turbo run mdbook
+        run: yarn run mdbook
 
       - name: Install SSH Client 🔑
         uses: webfactory/ssh-agent@v0.4.1

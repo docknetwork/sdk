@@ -641,14 +641,14 @@ export class DIDDocument extends TypedStruct {
       capabilityInvocation,
     } = this;
 
-    class VerificationMethodRefSet extends TypedSet {
-      static Class = VerificationMethodRef;
+    class VerificationMethodRefOrKeySet extends TypedSet {
+      static Class = VerificationMethodRefOrKey;
     }
 
-    const auth = new VerificationMethodRefSet(authentication);
-    const assertion = new VerificationMethodRefSet(assertionMethod);
-    const keyAgr = new VerificationMethodRefSet(keyAgreement);
-    const capInv = new VerificationMethodRefSet(capabilityInvocation);
+    const auth = new VerificationMethodRefOrKeySet(authentication);
+    const assertion = new VerificationMethodRefOrKeySet(assertionMethod);
+    const keyAgr = new VerificationMethodRefOrKeySet(keyAgreement);
+    const capInv = new VerificationMethodRefOrKeySet(capabilityInvocation);
 
     const keys = [...verificationMethod]
       .map((method) => {

@@ -46,7 +46,8 @@ const privateKey = kp.privateKey();
 
 const message = Uint8Array.from([1, 2, 3]);
 const signature = kp.sign(message);
-assert(Ed25519Keypair.verify(message, signature, publicKey));
+
+const verified = Ed25519Keypair.verify(message, signature, publicKey);
 ```
 
 ## Registering a new DID on chain
@@ -69,9 +70,9 @@ In most cases, a DID will have its own keys and will control itself, i.e. a self
 2.  Second, let's get a did key with verication relationship from the did's keypair. The only argument is
     the verification relationship. A verification relationship can be 1 or more of these `authentication`, `assertion`, `capabilityInvocation` or `keyAgreement`
 
-        ```js
-        const didKey = didKeypair.didKey();
-        ```
+    ```js
+    const didKey = didKeypair.didKey();
+    ```
 
 3.  Now submit the transaction using a `DockAPI` object and the newly created DID `did` and `didKey`.
     ```js

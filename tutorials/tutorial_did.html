@@ -203,7 +203,8 @@ const privateKey = kp.privateKey();
 
 const message = Uint8Array.from([1, 2, 3]);
 const signature = kp.sign(message);
-assert(Ed25519Keypair.verify(message, signature, publicKey));
+
+const verified = Ed25519Keypair.verify(message, signature, publicKey);
 </code></pre>
 <h2 id="registering-a-new-did-on-chain"><a class="header" href="#registering-a-new-did-on-chain">Registering a new DID on chain</a></h2>
 <p>Now that you have a DID and a public key, the DID can be registered on the Dock chain. Note that this public key associated
@@ -221,9 +222,7 @@ const didKeypair = new DidKeypair([did, 1], kp);
 <li>
 <p>Second, let's get a did key with verication relationship from the did's keypair. The only argument is
 the verification relationship. A verification relationship can be 1 or more of these <code>authentication</code>, <code>assertion</code>, <code>capabilityInvocation</code> or <code>keyAgreement</code></p>
-<pre><code>```js
-const didKey = didKeypair.didKey();
-```
+<pre><code class="language-js">const didKey = didKeypair.didKey();
 </code></pre>
 </li>
 <li>

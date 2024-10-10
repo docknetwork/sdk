@@ -205,14 +205,12 @@ important before diving into Schemas.</p>
 <p>A new Blob can be registered on the Dock Chain by using the method <code>writeToChain</code> in the BlobModule class.
 It accepts a <code>blob</code> object with the struct to store on chain (it can either be a hex string or a byte array), and one of <code>keyPair</code> (a
 keyPair to sign the payload with). You'll get a signed extrinsic that you can send to the Dock chain:</p>
-<pre><code class="language-javascript">const blobId = randomAsHex(DockBlobIdByteSize); // 32-bytes long hex string to use as the blob's id
+<pre><code class="language-javascript">const blobId = DockBlobId.random(); // 32-bytes long hex string to use as the blob's id
 const blobStruct = {
   id: blobId,
   blob: blobHexOrArray, // Contents of your blob as a hex string or byte array
 };
-const result = await dock.blob.new(blobStruct, signerDid, keypair, {
-  didModule: dock.didModule,
-});
+const result = await dock.blob.new(blobStruct, ownerDid, didKeypair);
 </code></pre>
 <p>If everything worked properly <code>result</code> will indicate a successful transaction.
 We'll see how to retrieve the blob next.</p>
@@ -281,13 +279,13 @@ to be able to use it. That's where the <code>toBlob</code> method comes in handy
 <h3 id="writing-a-schema-to-the-dock-chain"><a class="header" href="#writing-a-schema-to-the-dock-chain">Writing a Schema to the Dock chain</a></h3>
 <p>Writing a Schema to the Dock chain is similar to writing any other Blob. <code>1</code> is the key id for the on-chain public key corresponding to <code>keyPair</code></p>
 <pre><code class="language-javascript">&gt;  const formattedBlob = myNewSchema.toBlob(dockDID);
-&gt;  await myNewSchema.writeToChain(dock, dockDID, keypair);
+&gt;  await myNewSchema.writeToChain(modules.blob, dockDID, keypair);
 </code></pre>
 <h3 id="reading-a-schema-from-the-dock-chain"><a class="header" href="#reading-a-schema-from-the-dock-chain">Reading a Schema from the Dock chain</a></h3>
 <p>Reading a Schema from the Dock chain can easily be achieved by using the <code>get</code> method from the <code>Schema</code> class.
 It accepts a string <code>id</code> param (a fully-qualified blob id like "blob:dock:0x..." or just its hex identifier) and a
 <code>dockAPI</code> instance:</p>
-<pre><code class="language-javascript">&gt;  const result = await Schema.get(blob.id, dock);
+<pre><code class="language-javascript">&gt;  const result = await Schema.get(blob.id, modules.blob);
 </code></pre>
 <p><code>result[0]</code> will be the author of the Schema, and <code>result[1]</code> will be the contents of the schema itself.</p>
 <h3 id="schemas-in-verifiable-credentials"><a class="header" href="#schemas-in-verifiable-credentials">Schemas in Verifiable Credentials</a></h3>

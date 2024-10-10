@@ -1017,6 +1017,7 @@ const defaultGraph = { DefaultGraph: true };
 <div style="break-before: page; page-break-before: always;"></div><h1 id="tutorials"><a class="header" href="#tutorials">Tutorials</a></h1>
 <ol>
 <li><a href="./tutorial_did.html">DID</a></li>
+<li><a href="./tutorial_revocation.html">Revocation</a></li>
 <li><a href="./tutorial_ipv.html">Verifiable credentials</a></li>
 <li><a href="./tutorial_blobs_schemas.html">Blobs and Schemas</a></li>
 </ol>
@@ -1050,7 +1051,8 @@ const privateKey = kp.privateKey();
 
 const message = Uint8Array.from([1, 2, 3]);
 const signature = kp.sign(message);
-assert(Ed25519Keypair.verify(message, signature, publicKey));
+
+const verified = Ed25519Keypair.verify(message, signature, publicKey);
 </code></pre>
 <h2 id="registering-a-new-did-on-chain"><a class="header" href="#registering-a-new-did-on-chain">Registering a new DID on chain</a></h2>
 <p>Now that you have a DID and a public key, the DID can be registered on the Dock chain. Note that this public key associated
@@ -1068,9 +1070,7 @@ const didKeypair = new DidKeypair([did, 1], kp);
 <li>
 <p>Second, let's get a did key with verication relationship from the did's keypair. The only argument is
 the verification relationship. A verification relationship can be 1 or more of these <code>authentication</code>, <code>assertion</code>, <code>capabilityInvocation</code> or <code>keyAgreement</code></p>
-<pre><code>```js
-const didKey = didKeypair.didKey();
-```
+<pre><code class="language-js">const didKey = didKeypair.didKey();
 </code></pre>
 </li>
 <li>
@@ -1681,14 +1681,12 @@ important before diving into Schemas.</p>
 <p>A new Blob can be registered on the Dock Chain by using the method <code>writeToChain</code> in the BlobModule class.
 It accepts a <code>blob</code> object with the struct to store on chain (it can either be a hex string or a byte array), and one of <code>keyPair</code> (a
 keyPair to sign the payload with). You'll get a signed extrinsic that you can send to the Dock chain:</p>
-<pre><code class="language-javascript">const blobId = randomAsHex(DockBlobIdByteSize); // 32-bytes long hex string to use as the blob's id
+<pre><code class="language-javascript">const blobId = DockBlobId.random(); // 32-bytes long hex string to use as the blob's id
 const blobStruct = {
   id: blobId,
   blob: blobHexOrArray, // Contents of your blob as a hex string or byte array
 };
-const result = await dock.blob.new(blobStruct, signerDid, keypair, {
-  didModule: dock.didModule,
-});
+const result = await dock.blob.new(blobStruct, ownerDid, didKeypair);
 </code></pre>
 <p>If everything worked properly <code>result</code> will indicate a successful transaction.
 We'll see how to retrieve the blob next.</p>
@@ -1757,13 +1755,13 @@ to be able to use it. That's where the <code>toBlob</code> method comes in handy
 <h3 id="writing-a-schema-to-the-dock-chain"><a class="header" href="#writing-a-schema-to-the-dock-chain">Writing a Schema to the Dock chain</a></h3>
 <p>Writing a Schema to the Dock chain is similar to writing any other Blob. <code>1</code> is the key id for the on-chain public key corresponding to <code>keyPair</code></p>
 <pre><code class="language-javascript">&gt;  const formattedBlob = myNewSchema.toBlob(dockDID);
-&gt;  await myNewSchema.writeToChain(dock, dockDID, keypair);
+&gt;  await myNewSchema.writeToChain(modules.blob, dockDID, keypair);
 </code></pre>
 <h3 id="reading-a-schema-from-the-dock-chain"><a class="header" href="#reading-a-schema-from-the-dock-chain">Reading a Schema from the Dock chain</a></h3>
 <p>Reading a Schema from the Dock chain can easily be achieved by using the <code>get</code> method from the <code>Schema</code> class.
 It accepts a string <code>id</code> param (a fully-qualified blob id like "blob:dock:0x..." or just its hex identifier) and a
 <code>dockAPI</code> instance:</p>
-<pre><code class="language-javascript">&gt;  const result = await Schema.get(blob.id, dock);
+<pre><code class="language-javascript">&gt;  const result = await Schema.get(blob.id, modules.blob);
 </code></pre>
 <p><code>result[0]</code> will be the author of the Schema, and <code>result[1]</code> will be the contents of the schema itself.</p>
 <h3 id="schemas-in-verifiable-credentials-1"><a class="header" href="#schemas-in-verifiable-credentials-1">Schemas in Verifiable Credentials</a></h3>

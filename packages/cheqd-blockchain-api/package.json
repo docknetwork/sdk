@@ -33,7 +33,6 @@
     "@babel/node": "^7.23.9",
     "@babel/plugin-transform-modules-commonjs": "^7.24.1",
     "@babel/preset-env": "^7.24.3",
-    "@comunica/actor-init-sparql-rdfjs": "^1.22.3",
     "@comunica/types": "^1.0.0",
     "@helia/strings": "^3.0.1",
     "@rollup/plugin-alias": "^4.0.2",

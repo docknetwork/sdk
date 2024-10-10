@@ -337,6 +337,8 @@ const Ignore = new Set([
   'find',
   'findIndex',
   'splice',
+  'some',
+  'find',
 ]);
 for (const member of Object.getOwnPropertyNames(Array.prototype)) {
   if (!Ignore.has(member) && typeof Array.prototype[member] === 'function') {

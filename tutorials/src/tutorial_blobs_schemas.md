@@ -32,14 +32,12 @@ It accepts a `blob` object with the struct to store on chain (it can either be a
 keyPair to sign the payload with). You'll get a signed extrinsic that you can send to the Dock chain:
 
 ```javascript
-const blobId = randomAsHex(DockBlobIdByteSize); // 32-bytes long hex string to use as the blob's id
+const blobId = DockBlobId.random(); // 32-bytes long hex string to use as the blob's id
 const blobStruct = {
   id: blobId,
   blob: blobHexOrArray, // Contents of your blob as a hex string or byte array
 };
-const result = await dock.blob.new(blobStruct, signerDid, keypair, {
-  didModule: dock.didModule,
-});
+const result = await dock.blob.new(blobStruct, ownerDid, didKeypair);
 ```
 
 If everything worked properly `result` will indicate a successful transaction.
@@ -139,7 +137,7 @@ Writing a Schema to the Dock chain is similar to writing any other Blob. `1` is 
 
 ```javascript
 >  const formattedBlob = myNewSchema.toBlob(dockDID);
->  await myNewSchema.writeToChain(dock, dockDID, keypair);
+>  await myNewSchema.writeToChain(modules.blob, dockDID, keypair);
 ```
 
 ### Reading a Schema from the Dock chain
@@ -149,7 +147,7 @@ It accepts a string `id` param (a fully-qualified blob id like "blob:dock:0x..."
 `dockAPI` instance:
 
 ```javascript
->  const result = await Schema.get(blob.id, dock);
+>  const result = await Schema.get(blob.id, modules.blob);
 ```
 
 `result[0]` will be the author of the Schema, and `result[1]` will be the contents of the schema itself.

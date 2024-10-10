@@ -1,6 +1,4 @@
-# @docknetwork/cheqd-blockchain-modules
-
-A JavaScript library created for managing credential SDK components such as DIDs and accumulators etc on the Cheqd blockchain.
+# Cheqd Blockchain Modules
 
 ## Setup
 
@@ -76,9 +74,6 @@ expect((await attestModule.getDocument(did)).attests.toJSON()).toEqual(iri);
 - Accumulator
 - Anchor
 - Blob
-- OffchainSignatures
-- BBS
-- BBSPlus
-- PS
+- OffchainSignatures params (BBS/BBSPlus/PS)
 - StatusListCredential
 - TrustRegistry

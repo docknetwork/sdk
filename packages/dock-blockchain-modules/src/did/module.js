@@ -29,14 +29,24 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
 
     const keys = didDocument.didKeys();
     const {
-      controller, service, id, '@context': context,
+      controller,
+      service,
+      id,
+      '@context': context,
+      capabilityDelegation,
+      attests,
     } = document;
     if (service?.length) {
       throw new Error(
         '`service` is not supported in the `createDocument` transaction. Use `updateDocument` to add `service` to the existing document.',
       );
-    }
-    if (context.length !== 1 || context[0].value !== CONTEXT_URI) {
+    } else if (capabilityDelegation?.length) {
+      throw new Error('Capability delegation is not supported');
+    } else if (attests != null) {
+      throw new Error(
+        '`attests` are not supported in the `createDocument` transaction. Use `attest` module to attach `attests` to the existing document.',
+      );
+    } else if (context.length !== 1 || context[0].value !== CONTEXT_URI) {
       throw new Error(
         `Context must be equal to \`${[
           CONTEXT_URI,
@@ -63,6 +73,13 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
 
     if (modified.size) {
       throw new Error("Can't have modified verificationMethods");
+    } else if (
+      nextDocument.attests
+      && !nextDocument.attests.eq(currentDocument.attests)
+    ) {
+      throw new Error(
+        '`attests` modifications are not supported in the `updateDocument` transaction. Use `attest` module to attach `attests` to the existing document.',
+      );
     }
 
     if (

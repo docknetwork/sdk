@@ -7,6 +7,7 @@ import {
   TypedBytes,
   TypedEnum,
   TypedNumber,
+  TypedSet,
   TypedString,
   TypedStruct,
   TypedTuple,
@@ -574,12 +575,18 @@ export class DIDDocument extends TypedStruct {
   }
 
   addController(controller) {
+    if (this.controller.some((ctrl) => ctrl.eq(controller))) {
+      throw new Error(`Controller \`${controller}\` already exists`);
+    }
     this.controller.push(controller);
 
     return this;
   }
 
   addServiceEndpoint(id, serviceEndpoint) {
+    if (this.service.some((service) => service.id.eq(id))) {
+      throw new Error(`Service endpoint with id \`${id}\` already exists`);
+    }
     this.service.push(Service.fromServiceEndpoint(id, serviceEndpoint));
 
     return this;
@@ -632,31 +639,30 @@ export class DIDDocument extends TypedStruct {
       assertionMethod,
       keyAgreement,
       capabilityInvocation,
-      capabilityDelegation,
     } = this;
 
-    if (capabilityDelegation && capabilityDelegation.length > 0) {
-      throw new Error('Capability delegation is not supported');
+    class VerificationMethodRefSet extends TypedSet {
+      static Class = VerificationMethodRef;
     }
 
-    const auth = new Set([...authentication].map(String));
-    const assertion = new Set([...assertionMethod].map(String));
-    const keyAgr = new Set([...keyAgreement].map(String));
-    const capInv = new Set([...capabilityInvocation].map(String));
+    const auth = new VerificationMethodRefSet(authentication);
+    const assertion = new VerificationMethodRefSet(assertionMethod);
+    const keyAgr = new VerificationMethodRefSet(keyAgreement);
+    const capInv = new VerificationMethodRefSet(capabilityInvocation);
 
     const keys = [...verificationMethod]
       .map((method) => {
         const verRels = new VerificationRelationship();
-        if (auth.has(String(method.id))) {
+        if (auth.has(method.id)) {
           verRels.setAuthentication();
         }
-        if (assertion.has(String(method.id))) {
+        if (assertion.has(method.id)) {
           verRels.setAssertion();
         }
-        if (keyAgr.has(String(method.id))) {
+        if (keyAgr.has(method.id)) {
           verRels.setKeyAgreement();
         }
-        if (capInv.has(String(method.id))) {
+        if (capInv.has(method.id)) {
           verRels.setCapabilityInvocation();
         }
 

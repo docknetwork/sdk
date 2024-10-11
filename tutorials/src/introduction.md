@@ -1,124 +1,234 @@
-# Intro
+# Introduction
 
-[Dock](https://dock.io) is a blockchain built using [Substrate](https://www.parity.io/substrate/) to facilitate the use of [Verifiable Credentials Data Model 1.0](https://www.w3.org/TR/vc-data-model/) compliant documents, creating/managing [W3C spec](https://www.w3.org/TR/did-core) compliant DIDs and more. The client SDK contains a library and tooling to interact with the Dock chain and also other things such as verifying and issuing credentials. View the video verison of this tutorial here: [https://www.youtube.com/watch?v=jvgn9oSXBDQ](https://www.youtube.com/watch?v=jvgn9oSXBDQ)
+The client SDK packages include an API-agnostic library for verifying and issuing credentials, as well as tools to interact with the Dock and Cheqd blockchains.
 
-# Pre-requisites for these tutorials
+- [Dock](https://dock.io) is a blockchain built on [Substrate](https://www.parity.io/substrate/). It facilitates the use of [Verifiable Credentials Data Model 1.0](https://www.w3.org/TR/vc-data-model/) compliant documents and the creation/managing of [W3C spec](https://www.w3.org/TR/did-core) compliant DIDs, among other things.
+- [Cheqd](https://cheqd.io/) is a blockchain built with the [Cosmos SDK](https://docs.cosmos.network/). It provides the trust and payment infrastructure necessary for the creation of Self-Sovereign Identity (SSI), eID, and digital credential ecosystems.
 
-For these tutorials we will be a running our own local development node. Instructions to do this can be found at the [dock substrate repository](https://github.com/docknetwork/dock-substrate). Once you have followed the instructions and have your local node running, you can continue. Please note that you don't always need a node to use the Dock SDK, but certain features rely on it.
+# Dock
 
-# Installation
+## Installation
 
-Installation of the SDK is pretty simple, we use NPM and our source is also available at GitHub (links below). To install via NPM or Yarn, run either `npm install @docknetwork/sdk` or `yarn add @docknetwork/sdk` respectively. Once the package and dependencies are installed, you can import it like any ES6/CJS module. You can find the complete source for the SDK at https://github.com/docknetwork/sdk and the tutorials at https://github.com/docknetwork/dock-tutorials.
+Installing the SDK is straightforward. We use NPM, and the source is also available on GitHub (links below). To install via NPM or Yarn, run:
 
-# Importing
-
-In this tutorial series we will be using NodeJS with babel for ES6 support, however the same code should work in browsers too once it is transpiled. To begin with, we should import the Dock SDK. Importing the default reference will give us a DockAPI instance. With this we will communicate with the blockchain. You can also import the DockAPI class instanciate your own objects if you prefer. Simply do:
-
-```javascript
-// Import the dock SDK
-import dock from "@docknetwork/sdk";
+```bash
+npm install @docknetwork/credential-sdk @docknetwork/dock-blockchain-modules @docknetwork/dock-blockchain-api
 ```
 
-We will add one more import here for some shared constants across each tutorial, just the node address and account secret:
+or
+
+```bash
+yarn add @docknetwork/credential-sdk @docknetwork/dock-blockchain-modules @docknetwork/dock-blockchain-api
+```
+
+Once the package and dependencies are installed, you can import it as an ES6/CJS module. The complete source for the SDK can be found at [GitHub](https://github.com/docknetwork/sdk) along with [tutorials](https://github.com/docknetwork/dock-tutorials).
+
+## Running a Node
+
+The simplest way to run a node is to use the script provided by the [GitHub repository](https://github.com/docknetwork/sdk). It requires Docker to be installed.
+
+```bash
+bash scripts/run_dock_node_in_docker
+```
+
+## Importing
+
+In this tutorial series, we will use Node.js with Babel for ES6 support. This code will also work in browsers once transpiled. To start, import the Dock SDK. You can import the `DockAPI` class and instantiate your object:
 
 ```javascript
-// Import some shared variables
+// Import the Dock SDK
+import { DockAPI } from "@docknetwork/dock-blockchain-api";
+
+const dock = new DockAPI();
+```
+
+We will also import shared constants across each tutorial, such as the node address and account secret:
+
+```javascript
+// Import shared variables
 import { address, secretUri } from "./shared-constants";
 ```
 
-Lets also create this file, creating `shared-constants.js` with the contents:
+Create the `shared-constants.js` file with the following contents:
 
 ```javascript
-export const address = "ws://localhost:9944"; // Websocket address of your Dock node
-export const secretUri = "//Alice"; // Account secret in uri format, we will use Alice for local testing
+export const address = "ws://localhost:9944"; // WebSocket address of your Dock node
+export const secretUri = "//Alice"; // Account secret in URI format, for local testing
 ```
 
-# Connecting to a node
+## Connecting to a Node
 
-With the required packages and variables imported, we can go ahead and connect to our node. If you don't have a local testnet running alraedy, go to https://github.com/docknetwork/dock-substrate and follow the steps in the readme to start one. You could use the Dock testnet given a proper account with enough funds. First, create a method named `connectToNode` with an empty body for now:
+With the required packages and variables imported, we can connect to our node. If you don't have a local testnet running, go to [Docker Substrate](https://github.com/docknetwork/dock-substrate) for setup instructions. You could also use the Dock testnet if you have an account with sufficient funds. Begin by creating the following method:
 
 ```javascript
 export async function connectToNode() {}
 ```
 
-Before working with the SDK, we need to initialize it. Upon initialization the SDK will connect to the node with the supplied address and create a keyring to manage accounts. Simply call `dock.init` and wait for the promise to resolve to connect to your node:
+Initialize the SDK to connect to the node with the supplied address and create a keyring to manage accounts:
 
 ```javascript
 // Initialize the SDK and connect to the node
 await dock.init({ address });
+
 console.log("Connected to the node and ready to go!");
 ```
 
-# Creating an account
+## Creating an Account
 
-In order to write to the chain we will need to set an account. We can perform read operations with no account set, but for our purposes we will need one. Accounts can be generated using the `dock.keyring` object through multiple methods such as URI, memonic phrase and raw seeds. See the polkadot keyring documentation (https://polkadot.js.org/api/start/keyring.html) for more information.
+To write to the chain, you need to set up an account. Read operations are possible without an account, but for our examples, you'll need one. Accounts can be generated using the `dock.keyring` object with methods such as URI, mnemonic phrase, and raw seed. For more details, see the [Polkadot keyring documentation](https://polkadot.js.org/api/start/keyring.html).
 
-We will use our URI secret of `//Alice` which was imported from `shared-constants.js` to work with our local testnet. Add this code after `dock.init`:
+Use the URI secret `//Alice` for local testnet work. Add this code after `dock.init`:
 
 ```javascript
-// Create an Alice account for our local node
-// using the dock keyring. You don't -need this
-// to perform some read operations.
+// Create an Alice account for our local node using the dock keyring.
 const account = dock.keyring.addFromUri(secretUri);
+
 dock.setAccount(account);
 
-// We are now ready to transact!
-console.log("Connected to the node and ready to go!");
+// Ready to transact
+console.log("Account set and ready to go!");
 ```
 
-If all has gone well, you should be able to run this script and see that you are connected to the node. If any errors occur, the promise will fail and they will be outputted to the console.
+## Basic Usage
 
-# Basic usage
-
-To construct your own API object, once the SDK has been installed, import the Dock API object as
+To make the API object connect to the node, call the `init` method with the WebSocket RPC endpoint of the node:
 
 ```js
-import { DockAPI } from "@docknetwork/sdk/api";
-const dock = new DockAPI();
+await dock.init({ address });
 ```
 
-To make the API object connect to the node call `init` method. This method accepts the Websocket RPC endpoint of the node is
-needed. Say you have it in `address`. It also accepts a Polkadot-js keyring as well.
-
-```js
-await dock.init({ address, keyring });
-```
-
-To disconnect from the node
+Disconnect from the node with:
 
 ```js
 await dock.disconnect();
 ```
 
-To set the account used in sending the transaction and pay fees, call `setAccount` with the polkadot-js `account`
+Set the account to send transactions and pay fees:
 
 ```js
-// the `account` object might have been generated as
-const account = dock.keyring.addFromUri(secretURI);
-// Set the account to pay fees for transactions
+const account = dock.keyring.addFromUri(secretUri);
 dock.setAccount(account);
 ```
 
-To get the account, call `getAccount`
+Retrieve the account:
 
 ```js
 dock.getAccount();
 ```
 
-To send a transaction, use the `signAndSend` on the `DockAPI` object
+Send a transaction using `signAndSend`:
 
 ```js
 const res = await dock.signAndSend(transaction);
 ```
 
-For interacting with the DID module, i.e. creating, updating and removing them, get the `didModule` with `did` getter
+Instantiate Dock modules with `DockCoreModules`:
 
 ```js
-const didModule = dock.did;
+import { DockCoreModules } from "@docknetwork/dock-blockchain-modules";
+const dockModules = new DockCoreModules(dock);
 ```
 
-Similarly, for the revocation module, get the `revocationModule` with `revocation` getter
+For the DID module:
 
 ```js
-const revocationModule = dock.revocation;
+const didModule = dockModules.did;
+```
+
+For the accumulator module:
+
+```js
+const accumulator = dockModules.accumulator;
+```
+
+# Cheqd
+
+## Installation
+
+As with Dock, the process is simple. Use NPM to install:
+
+```bash
+npm install @docknetwork/credential-sdk @docknetwork/cheqd-blockchain-modules @docknetwork/cheqd-blockchain-api
+```
+
+or Yarn:
+
+```bash
+yarn add @docknetwork/credential-sdk @docknetwork/cheqd-blockchain-modules @docknetwork/cheqd-blockchain-api
+```
+
+The complete source for the SDK is available at [GitHub](https://github.com/docknetwork/sdk) and tutorials at [GitHub Tutorials](https://github.com/docknetwork/dock-tutorials).
+
+## Running a Node
+
+Use the provided script, requiring Docker:
+
+```bash
+CHEQD_MNEMONIC="steak come surprise obvious remain black trouble measure design volume retreat float coach amused match album moment radio stuff crack orphan ranch dose endorse" bash scripts/run_cheqd_node_in_docker
+```
+
+## Importing
+
+Similarly, use Node.js with Babel and import the Cheqd SDK:
+
+```javascript
+// Import the Cheqd SDK
+import { CheqdAPI } from "@docknetwork/cheqd-blockchain-api";
+
+const cheqd = new CheqdAPI();
+```
+
+Import shared constants:
+
+```javascript
+import { url, mnemonic } from "./shared-constants";
+```
+
+Create `shared-constants.js`:
+
+```javascript
+export const url = "http://localhost:26657"; // RPC URL of your Cheqd node
+export const mnemonic =
+  "steak come surprise obvious remain black trouble measure design volume retreat float coach amused match album moment radio stuff crack orphan ranch dose endorse"; // Mnemonic for testing
+```
+
+## Connecting to a Node
+
+Initialize and connect to the node using the SDK:
+
+```javascript
+await cheqd.init({ url, mnemonic });
+
+console.log("Connected to the node and ready to go!");
+```
+
+Disconnect from the node:
+
+```js
+await cheqd.disconnect();
+```
+
+Send a transaction:
+
+```js
+const res = await cheqd.signAndSend(transaction);
+```
+
+Instantiate Cheqd modules:
+
+```js
+import { CheqdCoreModules } from "@docknetwork/cheqd-blockchain-modules";
+const cheqdModules = new CheqdCoreModules(cheqd);
+```
+
+For interacting with the DID module:
+
+```js
+const didModule = cheqdModules.did;
+```
+
+For the accumulator module:
+
+```js
+const accumulator = cheqdModules.accumulator;
 ```

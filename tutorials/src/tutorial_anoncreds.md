@@ -1,4 +1,4 @@
-# Anonymous credentials
+# Anonymous Credentials
 
 ## Overview
 

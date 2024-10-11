@@ -84,7 +84,7 @@ By the primitive definition of "trustworthiness" written above, any claim made b
 As a Holder of verifiable credentials, you'll want to prove specific claims to a Verifier. If those claims are composite, you'll sometimes need to bundle a deductive proof in your verifiable credentials presentation. This should be done after the presentation has been assembled. If the presentation is going to be signed, sign it _after_ including the deductive proof.
 
 ```js
-import { proveCompositeClaims } from '@docknetwork/sdk/utils/cd';
+import { proveCompositeClaims } from '@docknetwork/credential-sdk/rdf-and-cd';
 import jsonld from 'jsonld';
 
 // Check out the Issuance, Presentation, Verification tutorial for info on creating

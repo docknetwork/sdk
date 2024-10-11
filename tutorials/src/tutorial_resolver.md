@@ -24,7 +24,7 @@ The resolver is constructed by passing it a Dock API object so that it can conne
 This is how you resolve a Dock DID:
 
 ```js
-import { DockResolver } from "@docknetwork/sdk/resolver";
+import { DockResolver } from "@docknetwork/credential-sdk/resolver";
 
 // Assuming the presence of Dock API object `dock`
 const dockResolver = new DockResolver(dock);
@@ -42,7 +42,7 @@ Following is an example to build a custom Ethereum resolver. It uses the library
 as configuration. The example below uses Infura to get access to an Ethereum node and read the DID off Ethereum.
 
 ```js
-import { DIDResolver } from "@docknetwork/sdk/resolver";
+import { DIDResolver } from "@docknetwork/credential-sdk/resolver";
 import ethr from "ethr-did-resolver";
 
 // Infura's Ethereum provider for the main net.
@@ -88,7 +88,7 @@ of the universal resolver and assumes the universal resolver from this [codebase
 is running at the URL.
 
 ```js
-import { UniversalResolver } from "@docknetwork/sdk/resolver";
+import { UniversalResolver } from "@docknetwork/credential-sdk/resolver";
 
 // Change the resolver URL to something else in case you cannot use the resolver at https://uniresolver.io
 const universalResolverUrl = "https://uniresolver.io";
@@ -114,7 +114,7 @@ import {
   DockDIDResolver,
   DIDResolver,
   WILDCARD,
-} from "@docknetwork/sdk/resolver";
+} from "@docknetwork/credential-sdk/resolver";
 
 class MultiDIDResolver extends DIDResolver {
   static METHOD = WILDCARD;

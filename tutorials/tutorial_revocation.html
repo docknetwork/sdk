@@ -88,7 +88,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="concepts_private_delegation.html"><strong aria-hidden="true">2.6.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="concepts_public_attestation.html"><strong aria-hidden="true">2.7.</strong> Public Attestation</a></li><li class="chapter-item expanded "><a href="concepts_public_delegation.html"><strong aria-hidden="true">2.8.</strong> Public Delegation</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html" class="active"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="tutorial_private_delegation.html"><strong aria-hidden="true">3.8.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="tutorial_public_delegation.html"><strong aria-hidden="true">3.9.</strong> Public Delegation</a></li><li class="chapter-item expanded "><a href="tutorial_evm.html"><strong aria-hidden="true">3.10.</strong> EVM</a></li><li class="chapter-item expanded "><a href="tutorial_anoncreds.html"><strong aria-hidden="true">3.11.</strong> Anonymous credentials using BBS+ signatures and accumulators</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="concepts_private_delegation.html"><strong aria-hidden="true">2.6.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="concepts_public_attestation.html"><strong aria-hidden="true">2.7.</strong> Public Attestation</a></li><li class="chapter-item expanded "><a href="concepts_public_delegation.html"><strong aria-hidden="true">2.8.</strong> Public Delegation</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html" class="active"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="tutorial_private_delegation.html"><strong aria-hidden="true">3.8.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="tutorial_public_delegation.html"><strong aria-hidden="true">3.9.</strong> Public Delegation</a></li><li class="chapter-item expanded "><a href="tutorial_anoncreds.html"><strong aria-hidden="true">3.10.</strong> Anonymous credentials using BBS+ signatures and accumulators</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -174,6 +174,109 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="revocation"><a class="header" href="#revocation">Revocation</a></h1>
+<p>This guide provides instructions for managing credential revocation using <code>StatusList2021Credential</code>.</p>
+<h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
+<ul>
+<li>Ensure you have access to Dock's Credential SDK and Blockchain API.</li>
+<li>The Dock API is initialized and connected to the blockchain.</li>
+<li>You have a valid issuer DID registered on the Dock network.</li>
+</ul>
+<h2 id="steps-to-manage-revocation"><a class="header" href="#steps-to-manage-revocation">Steps to Manage Revocation</a></h2>
+<h3 id="create-a-status-list-credential"><a class="header" href="#create-a-status-list-credential">Create a Status List Credential</a></h3>
+<ol>
+<li>
+<p><strong>Generate a Random Status List ID:</strong>
+Create a unique identifier for tracking revocation status.</p>
+<pre><code class="language-javascript">import { DockStatusListCredentialId } from '@docknetwork/credential-sdk/types';
+
+const statusListCredentialId = DockStatusListCredentialId.random();
+</code></pre>
+</li>
+<li>
+<p><strong>Create Status List Credential:</strong>
+Use the issuer's key to create a new status list credential with a specified purpose (e.g., "suspension").</p>
+<pre><code class="language-javascript">import { StatusList2021Credential } from '@docknetwork/credential-sdk/types';
+
+const issuerKey = /* Obtain issuer key document */;
+const statusListCred = await StatusList2021Credential.create(
+  issuerKey,
+  statusListCredentialId,
+  { statusPurpose: "suspension" },
+);
+
+await modules.statusListCredential.createStatusListCredential(
+  statusListCredentialId,
+  statusListCred,
+  issuerDID,
+  issuerKeyPair,
+);
+</code></pre>
+</li>
+</ol>
+<h3 id="issue-a-credential-with-revocation-data"><a class="header" href="#issue-a-credential-with-revocation-data">Issue a Credential with Revocation Data</a></h3>
+<ol>
+<li>
+<p><strong>Add Revocation Entry:</strong>
+Include a status list entry in the credential for potential revocation.</p>
+<pre><code class="language-javascript">import { addStatusList21EntryToCredential } from '@docknetwork/credential-sdk/vc';
+
+let unsignedCred = /* Obtain unsigned credential */;
+unsignedCred = addStatusList21EntryToCredential(
+  unsignedCred,
+  statusListCredentialId,
+  statusListCredentialIndex, // Unique index for the credential
+  "suspension", // Purpose matching the status list credential
+);
+</code></pre>
+</li>
+<li>
+<p><strong>Issue Credential:</strong>
+Sign and issue the credential with the added status list entry.</p>
+<pre><code class="language-javascript">import { addStatusList21EntryToCredential } from '@docknetwork/credential-sdk/vc';
+
+const credential = await issueCredential(
+  issuerKey,
+  unsignedCred,
+  void 0,
+  defaultDocumentLoader(resolver),
+);
+</code></pre>
+</li>
+</ol>
+<h3 id="revoke-the-credential"><a class="header" href="#revoke-the-credential">Revoke the Credential</a></h3>
+<ol>
+<li>
+<p><strong>Fetch and Update Status List:</strong>
+Retrieve the existing status list credential and update it to revoke the issued credential by its index.</p>
+<pre><code class="language-javascript">const fetchedCred = await modules.statusListCredential.getStatusListCredential(statusListCredentialId);
+await fetchedCred.update(issuerKey, {
+  revokeIndices: [statusListCredentialIndex], // Index of the credential to revoke
+});
+
+await modules.statusListCredential.updateStatusListCredential(
+  statusListCredentialId,
+  fetchedCred,
+  issuerDID,
+  issuerKeyPair,
+);
+</code></pre>
+</li>
+</ol>
+<h3 id="verify-the-revoked-credential"><a class="header" href="#verify-the-revoked-credential">Verify the Revoked Credential</a></h3>
+<ol>
+<li>
+<p><strong>Verify Credential Status:</strong>
+Check the validity of the credential post-revocation. Verification should indicate the credential is no longer valid.</p>
+<pre><code class="language-javascript">const result = await verifyCredential(credential, {
+  resolver,
+  compactProof: true,
+});
+if (!result.verified) {
+  console.error("Credential is revoked or suspended.");
+}
+</code></pre>
+</li>
+</ol>
 
                     </main>
 

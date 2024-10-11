@@ -88,7 +88,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="concepts_private_delegation.html"><strong aria-hidden="true">2.6.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="concepts_public_attestation.html"><strong aria-hidden="true">2.7.</strong> Public Attestation</a></li><li class="chapter-item expanded "><a href="concepts_public_delegation.html"><strong aria-hidden="true">2.8.</strong> Public Delegation</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html" class="active"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="tutorial_private_delegation.html"><strong aria-hidden="true">3.8.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="tutorial_public_delegation.html"><strong aria-hidden="true">3.9.</strong> Public Delegation</a></li><li class="chapter-item expanded "><a href="tutorial_evm.html"><strong aria-hidden="true">3.10.</strong> EVM</a></li><li class="chapter-item expanded "><a href="tutorial_anoncreds.html"><strong aria-hidden="true">3.11.</strong> Anonymous credentials using BBS+ signatures and accumulators</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts_did.html"><strong aria-hidden="true">2.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="concepts_vcdm.html"><strong aria-hidden="true">2.2.</strong> Verifiable credentials and presentations</a></li><li class="chapter-item expanded "><a href="concepts_blobs_schemas.html"><strong aria-hidden="true">2.3.</strong> Schema</a></li><li class="chapter-item expanded "><a href="concepts_claim_deduction.html"><strong aria-hidden="true">2.4.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="concepts_poe_anchors.html"><strong aria-hidden="true">2.5.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="concepts_private_delegation.html"><strong aria-hidden="true">2.6.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="concepts_public_attestation.html"><strong aria-hidden="true">2.7.</strong> Public Attestation</a></li><li class="chapter-item expanded "><a href="concepts_public_delegation.html"><strong aria-hidden="true">2.8.</strong> Public Delegation</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">3.</strong> Tutorials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorial_did.html"><strong aria-hidden="true">3.1.</strong> DID</a></li><li class="chapter-item expanded "><a href="tutorial_resolver.html" class="active"><strong aria-hidden="true">3.2.</strong> DID Resolver</a></li><li class="chapter-item expanded "><a href="tutorial_ipv.html"><strong aria-hidden="true">3.3.</strong> Credentials - Issuance, Presentation, Verification</a></li><li class="chapter-item expanded "><a href="tutorial_revocation.html"><strong aria-hidden="true">3.4.</strong> Revocation</a></li><li class="chapter-item expanded "><a href="tutorial_blobs_schemas.html"><strong aria-hidden="true">3.5.</strong> Schema</a></li><li class="chapter-item expanded "><a href="tutorial_claim_deduction.html"><strong aria-hidden="true">3.6.</strong> Claim Deduction</a></li><li class="chapter-item expanded "><a href="tutorial_poe_anchors.html"><strong aria-hidden="true">3.7.</strong> PoE Anchors</a></li><li class="chapter-item expanded "><a href="tutorial_private_delegation.html"><strong aria-hidden="true">3.8.</strong> Private Delegation</a></li><li class="chapter-item expanded "><a href="tutorial_public_delegation.html"><strong aria-hidden="true">3.9.</strong> Public Delegation</a></li><li class="chapter-item expanded "><a href="tutorial_anoncreds.html"><strong aria-hidden="true">3.10.</strong> Anonymous credentials using BBS+ signatures and accumulators</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -189,7 +189,7 @@ DIDs of those methods.</p>
 <p>The resolver for Dock DIDs <code>DockResolver</code> connects to the Dock blockchain to get the DID details.</p>
 <p>The resolver is constructed by passing it a Dock API object so that it can connect to a Dock node.
 This is how you resolve a Dock DID:</p>
-<pre><code class="language-js">import { DockResolver } from "@docknetwork/sdk/resolver";
+<pre><code class="language-js">import { DockResolver } from "@docknetwork/credential-sdk/resolver";
 
 // Assuming the presence of Dock API object `dock`
 const dockResolver = new DockResolver(dock);
@@ -202,7 +202,7 @@ const didDocument = dockResolver.resolve("did:dock:5D.....");
 <p>Following is an example to build a custom Ethereum resolver. It uses the library
 <a href="https://github.com/decentralized-identity/ethr-did-resolver">ethr-did-resolver</a> and accepts a provider information
 as configuration. The example below uses Infura to get access to an Ethereum node and read the DID off Ethereum.</p>
-<pre><code class="language-js">import { DIDResolver } from "@docknetwork/sdk/resolver";
+<pre><code class="language-js">import { DIDResolver } from "@docknetwork/credential-sdk/resolver";
 import ethr from "ethr-did-resolver";
 
 // Infura's Ethereum provider for the main net.
@@ -244,7 +244,7 @@ const didDocument = ethResolver.resolve("did:ethr:0x6f....");
 <p>To resolve DIDs using the <a href="https://uniresolver.io">Universal Resolver</a>, use the <code>UniversalResolver</code>. It needs the URL
 of the universal resolver and assumes the universal resolver from this <a href="https://github.com/decentralized-identity/universal-resolver">codebase</a>
 is running at the URL.</p>
-<pre><code class="language-js">import { UniversalResolver } from "@docknetwork/sdk/resolver";
+<pre><code class="language-js">import { UniversalResolver } from "@docknetwork/credential-sdk/resolver";
 
 // Change the resolver URL to something else in case you cannot use the resolver at https://uniresolver.io
 const universalResolverUrl = "https://uniresolver.io";
@@ -264,7 +264,7 @@ has resolvers for DID methods <code>dock</code> and <code>ethr</code>.</p>
   DockDIDResolver,
   DIDResolver,
   WILDCARD,
-} from "@docknetwork/sdk/resolver";
+} from "@docknetwork/credential-sdk/resolver";
 
 class MultiDIDResolver extends DIDResolver {
   static METHOD = WILDCARD;

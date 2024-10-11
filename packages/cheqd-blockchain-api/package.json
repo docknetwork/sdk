@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/cheqd-blockchain-api",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "main": "./dist/esm/index.js",
   "type": "module",
@@ -26,6 +26,9 @@
   },
   "engines": {
     "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@cheqd/sdk": "^4.0.4"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.1",
@@ -78,11 +81,5 @@
     "watch": "rollup -c -w",
     "docs": "rm -rf out && mkdir out && touch out/.nojekyll && jsdoc src -r -c ../../.jsdoc -d out/reference",
     "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
-  },
-  "resolutions": {
-    "@polkadot/api": "10.12.4"
-  },
-  "dependencies": {
-    "@cheqd/sdk": "^4.0.4"
   }
 }

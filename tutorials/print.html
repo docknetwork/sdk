@@ -175,10 +175,19 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
-<p>The client SDK packages include an API-agnostic library for verifying and issuing credentials, as well as tools to interact with the Dock and Cheqd blockchains.</p>
+<p>The client SDK packages include an API-agnostic library for verifying and issuing credentials, as well as modules to simplify API interaction.</p>
+<p>Currently, two blockchains are supported:</p>
 <ul>
 <li><a href="https://dock.io">Dock</a> is a blockchain built on <a href="https://www.parity.io/substrate/">Substrate</a>. It facilitates the use of <a href="https://www.w3.org/TR/vc-data-model/">Verifiable Credentials Data Model 1.0</a> compliant documents and the creation/managing of <a href="https://www.w3.org/TR/did-core">W3C spec</a> compliant DIDs, among other things.</li>
 <li><a href="https://cheqd.io/">Cheqd</a> is a blockchain built with the <a href="https://docs.cosmos.network/">Cosmos SDK</a>. It provides the trust and payment infrastructure necessary for the creation of Self-Sovereign Identity (SSI), eID, and digital credential ecosystems.</li>
+</ul>
+<p>Overall, there're five packages located in the <a href="https://github.com/docknetwork/sdk">GitHub repository</a>:</p>
+<ul>
+<li><a href="https://github.com/docknetwork/sdk/tree/master/packages/credential-sdk"><code>@docknetwork/credential-sdk</code></a> - An API-agnostic Javascript library for working with Verifiable Credentials, DIDs, Claim Deduction, and more.</li>
+<li><a href="https://github.com/docknetwork/sdk/tree/master/packages/dock-blockchain-api"><code>@docknetwork/dock-blockchain-api</code></a> - A Javascript library built with PolkadotJS, for use with the <a href="https://github.com/docknetwork/dock-substrate">Dock Substrate Node</a> or our public main/test networks.</li>
+<li><a href="https://github.com/docknetwork/sdk/tree/master/packages/dock-blockchain-modules"><code>@docknetwork/dock-blockchain-modules</code></a> - A JavaScript library designed for handling credential SDK elements (DIDS, Accumulators, etc) on the Dock blockchain.</li>
+<li><a href="https://github.com/docknetwork/sdk/tree/master/packages/cheqd-blockchain-api"><code>@docknetwork/cheqd-blockchain-api</code></a> - A Javascript library built atop of <code>@cheqd/sdk</code> that allows to interact with the <code>Cheqd</code> blockchain.</li>
+<li><a href="https://github.com/docknetwork/sdk/tree/master/packages/cheqd-blockchain-modules"><code>@docknetwork/cheqd-blockchain-modules</code></a> - A JavaScript library created for managing credential SDK components such as DIDs, accumulators etc on the Cheqd blockchain.</li>
 </ul>
 <h1 id="dock"><a class="header" href="#dock">Dock</a></h1>
 <h2 id="installation"><a class="header" href="#installation">Installation</a></h2>

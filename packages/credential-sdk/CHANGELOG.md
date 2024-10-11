@@ -5,3 +5,4 @@
 ### Minor Changes
 
 - Improved READMEs
+- `WILDCARD` symbol was changed to reflect the new project structure

@@ -14,7 +14,7 @@ Like in the Private Delegation tutorial, let's assume a root authority, `did:ex:
 <summary>Boilerplate</summary>
 
 ```js
-import { graphResolver } from '@docknetwork/sdk/crawl.js';
+import { graphResolver } from '@docknetwork/credential-sdk/rdf-and-cd';
 const { v4: uuidv4 } = require('uuid');
 
 // A running ipfs node is required for crawling.
@@ -82,14 +82,16 @@ As with any Public Attestations, delegation information is revocable by removing
 The following example shows how a verifier might
 
 ```js
-import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from "@docknetwork/sdk/rdf-defs";
-import { crawl } from "@docknetwork/sdk/crawl.js";
 import {
+  ANYCLAIM,
+  MAYCLAIM,
+  MAYCLAIM_DEF_1,
+  crawl,
   proveCompositeClaims,
   presentationToEEClaimGraph,
   inferh,
-} from "@docknetwork/sdk/utils/cd";
-import { merge } from "@docknetwork/sdk/utils/claimgraph";
+  merge,
+} from "@docknetwork/credential-sdk/rdf-and-cd";
 import jsonld from "jsonld";
 
 // These logical rules will be used for reasoning during both crawing and verifiying

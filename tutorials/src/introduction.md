@@ -1,9 +1,19 @@
 # Introduction
 
-The client SDK packages include an API-agnostic library for verifying and issuing credentials, as well as tools to interact with the Dock and Cheqd blockchains.
+The client SDK packages include an API-agnostic library for verifying and issuing credentials, as well as modules to simplify API interaction.
+
+Currently, two blockchains are supported:
 
 - [Dock](https://dock.io) is a blockchain built on [Substrate](https://www.parity.io/substrate/). It facilitates the use of [Verifiable Credentials Data Model 1.0](https://www.w3.org/TR/vc-data-model/) compliant documents and the creation/managing of [W3C spec](https://www.w3.org/TR/did-core) compliant DIDs, among other things.
 - [Cheqd](https://cheqd.io/) is a blockchain built with the [Cosmos SDK](https://docs.cosmos.network/). It provides the trust and payment infrastructure necessary for the creation of Self-Sovereign Identity (SSI), eID, and digital credential ecosystems.
+
+Overall, there're five packages located in the [GitHub repository](https://github.com/docknetwork/sdk):
+
+- [`@docknetwork/credential-sdk`](https://github.com/docknetwork/sdk/tree/master/packages/credential-sdk) - An API-agnostic Javascript library for working with Verifiable Credentials, DIDs, Claim Deduction, and more.
+- [`@docknetwork/dock-blockchain-api`](https://github.com/docknetwork/sdk/tree/master/packages/dock-blockchain-api) - A Javascript library built with PolkadotJS, for use with the [Dock Substrate Node](https://github.com/docknetwork/dock-substrate) or our public main/test networks.
+- [`@docknetwork/dock-blockchain-modules`](https://github.com/docknetwork/sdk/tree/master/packages/dock-blockchain-modules) - A JavaScript library designed for handling credential SDK elements (DIDS, Accumulators, etc) on the Dock blockchain.
+- [`@docknetwork/cheqd-blockchain-api`](https://github.com/docknetwork/sdk/tree/master/packages/cheqd-blockchain-api) - A Javascript library built atop of `@cheqd/sdk` that allows to interact with the `Cheqd` blockchain.
+- [`@docknetwork/cheqd-blockchain-modules`](https://github.com/docknetwork/sdk/tree/master/packages/cheqd-blockchain-modules) - A JavaScript library created for managing credential SDK components such as DIDs, accumulators etc on the Cheqd blockchain.
 
 # Dock
 

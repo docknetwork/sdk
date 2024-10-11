@@ -56,7 +56,7 @@ export const address = "ws://localhost:9944"; // WebSocket address of your Dock 
 export const secretUri = "//Alice"; // Account secret in URI format, for local testing
 ```
 
-# Connecting to a Node
+## Connecting to a Node
 
 With the required packages and variables imported, we can connect to our node. If you don't have a local testnet running, go to [Docker Substrate](https://github.com/docknetwork/dock-substrate) for setup instructions. You could also use the Dock testnet if you have an account with sufficient funds. Begin by creating the following method:
 
@@ -73,7 +73,7 @@ await dock.init({ address });
 console.log("Connected to the node and ready to go!");
 ```
 
-# Creating an Account
+## Creating an Account
 
 To write to the chain, you need to set up an account. Read operations are possible without an account, but for our examples, you'll need one. Accounts can be generated using the `dock.keyring` object with methods such as URI, mnemonic phrase, and raw seed. For more details, see the [Polkadot keyring documentation](https://polkadot.js.org/api/start/keyring.html).
 
@@ -89,7 +89,7 @@ dock.setAccount(account);
 console.log("Account set and ready to go!");
 ```
 
-# Basic Usage
+## Basic Usage
 
 To make the API object connect to the node, call the `init` method with the WebSocket RPC endpoint of the node:
 
@@ -192,7 +192,7 @@ export const mnemonic =
   "steak come surprise obvious remain black trouble measure design volume retreat float coach amused match album moment radio stuff crack orphan ranch dose endorse"; // Mnemonic for testing
 ```
 
-# Connecting to a Node
+## Connecting to a Node
 
 Initialize and connect to the node using the SDK:
 

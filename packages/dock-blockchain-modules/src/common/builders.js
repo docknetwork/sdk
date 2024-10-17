@@ -31,7 +31,7 @@ export const createDIDMethodWithPolicyTx = (fnName) => {
       const { did: signer } = ensureInstanceOf(didKeypair, DidKeypair);
       // eslint-disable-next-line no-param-reassign
       args[root.payload[fnName].length - 1]
-        ??= 1 + (await root.apiProvider.didNonce(didKeypair.did));
+        ??= await root.apiProvider.nextDidNonce(didKeypair.did);
       const { data, nonce } = root.payload[fnName].apply(this.root, args);
 
       const sig = await DockDidOrDidMethodKey.from(signer).signStateChange(
@@ -61,7 +61,7 @@ export const createDIDMethodTx = (fnName) => {
       ensureInstanceOf(didKeypair, DidKeypair);
       // eslint-disable-next-line no-param-reassign
       args[root.payload[fnName].length - 1]
-        ??= 1 + (await root.apiProvider.didNonce(didKeypair.did));
+        ??= await root.apiProvider.nextDidNonce(didKeypair.did);
 
       return await DockDidOrDidMethodKey.from(didKeypair.did).changeState(
         root.apiProvider,

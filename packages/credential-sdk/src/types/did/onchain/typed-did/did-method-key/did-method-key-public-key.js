@@ -1,23 +1,25 @@
-import bs58 from 'bs58';
-import { base58btc } from 'multiformats/bases/base58';
-import varint from 'varint';
-import { TypedEnum, withQualifier } from '../../../../generic';
+import bs58 from "bs58";
+import { base58btc } from "multiformats/bases/base58";
+import varint from "varint";
+import { TypedEnum, TypedStruct, withQualifier } from "../../../../generic";
 import {
   PublicKeyEd25519Value,
   PublicKeySecp256k1Value,
-} from '../../../../public-keys';
+} from "../../../../public-keys";
 import {
   DidMethodKeyBytePrefixEd25519,
   DidMethodKeyBytePrefixSecp256k1,
   DidMethodKeyQualifier,
   Ed25519PublicKeyPrefix,
   Secp256k1PublicKeyPrefix,
-} from '../../constants';
+} from "../../constants";
+import DidOrDidMethodKeySignature from "../signature";
+import { DidMethodKeySignatureValue } from "./did-method-key-signature";
 
 export class DidMethodKeyPublicKey extends withQualifier(TypedEnum) {
   static Qualifier = DidMethodKeyQualifier;
 
-  static Type = 'didMethodKey';
+  static Type = "didMethodKey";
 
   /**
    * Instantiates `DidMethodKey` from a fully qualified did string.
@@ -71,16 +73,28 @@ export class DidMethodKeyPublicKey extends withQualifier(TypedEnum) {
 
   signWith(keyPair, bytes) {
     if (!this.eq(this.constructor.fromKeypair(keyPair))) {
-      throw new Error('Expected keypair that has the same key as in `this`');
+      throw new Error("Expected keypair that has the same key as in `this`");
     }
 
-    return {
-      didMethodKeySignature: {
-        didMethodKey: this,
-        sig: keyPair.sign(bytes),
-      },
-    };
+    // eslint-disable-next-line no-use-before-define
+    return new DidMethodKeySignature(
+      // eslint-disable-next-line no-use-before-define
+      new DidMethodKeySignatureValueObject(this, keyPair.sign(bytes))
+    );
   }
+}
+
+export class DidMethodKeySignatureValueObject extends TypedStruct {
+  static Classes = {
+    didMethodKey: DidMethodKeyPublicKey,
+    sig: DidMethodKeySignatureValue,
+  };
+}
+
+export class DidMethodKeySignature extends DidOrDidMethodKeySignature {
+  static Type = "didMethodKeySignature";
+
+  static Class = DidMethodKeySignatureValueObject;
 }
 
 export class DidMethodKeyPublicKeyEd25519 extends DidMethodKeyPublicKey {
@@ -100,5 +114,5 @@ export class DidMethodKeyPublicKeySecp256k1 extends DidMethodKeyPublicKey {
 
 DidMethodKeyPublicKey.bindVariants(
   DidMethodKeyPublicKeyEd25519,
-  DidMethodKeyPublicKeySecp256k1,
+  DidMethodKeyPublicKeySecp256k1
 );

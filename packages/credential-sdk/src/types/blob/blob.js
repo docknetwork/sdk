@@ -37,6 +37,10 @@ export default class Blob extends TypedBytes {
     return new this(value);
   }
 
+  toUTF8String() {
+    return u8aToString(this);
+  }
+
   toObject() {
     try {
       return JSON.parse(u8aToString(this.bytes));

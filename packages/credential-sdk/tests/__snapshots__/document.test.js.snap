@@ -26,6 +26,43 @@ exports[`\`DIDDocument\` \`DIDDocument.create\` works 2`] = `
   ],
   "alsoKnownAs": [],
   "assertionMethod": [
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+  ],
+  "authentication": [
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+  ],
+  "capabilityDelegation": [],
+  "capabilityInvocation": [
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+  ],
+  "controller": [
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+  ],
+  "https://rdf.dock.io/alpha/2021#attestsDocumentContents": null,
+  "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+  "keyAgreement": [],
+  "service": [],
+  "verificationMethod": [
+    {
+      "controller": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+      "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+      "publicKeyBase58": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+  ],
+}
+`;
+
+exports[`\`DIDDocument\` \`DIDDocument.create\` works 3`] = `
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+  ],
+  "alsoKnownAs": [],
+  "assertionMethod": [
     "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-2",
     "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-4",
     "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-6",
@@ -46,6 +83,7 @@ exports[`\`DIDDocument\` \`DIDDocument.create\` works 2`] = `
   ],
   "controller": [
     "did:key:z6MktvqCyLxTsXUH1tUZncNdVeEZ7hNh7npPRbUU27GTrYb8",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
   ],
   "https://rdf.dock.io/alpha/2021#attestsDocumentContents": null,
   "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
@@ -130,7 +168,7 @@ exports[`\`DIDDocument\` \`DIDDocument.create\` works 2`] = `
 }
 `;
 
-exports[`\`DIDDocument\` \`DIDDocument.create\` works 3`] = `
+exports[`\`DIDDocument\` \`DIDDocument.create\` works 4`] = `
 {
   "@context": [
     "overriden",

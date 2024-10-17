@@ -1,13 +1,13 @@
-import { ID_STR } from '@docknetwork/crypto-wasm-ts';
-import TypedBytes from './typed-bytes';
+import { ID_STR } from "@docknetwork/crypto-wasm-ts";
+import TypedBytes from "./typed-bytes";
 import {
   withExtendedStaticProperties,
   withExtendedPrototypeProperties,
-} from '../../utils/inheritance';
-import { maybeFrom } from '../../utils/interfaces';
-import withFrom from './with-from';
-import { fmtIter } from '../../utils';
-import TypedString from './typed-string';
+} from "../../utils/inheritance";
+import { maybeFrom } from "../../utils/interfaces";
+import withFrom from "./with-from";
+import { fmtIter } from "../../utils";
+import TypedString from "./typed-string";
 
 /**
  * Extends supplied class.
@@ -95,6 +95,10 @@ export default function withQualifier(klass, wrapper = false) {
         toString() {
           return this.value.toString();
         }
+
+        eq(other) {
+          return String(this) === String(other);
+        }
       },
     };
 
@@ -164,6 +168,10 @@ export default function withQualifier(klass, wrapper = false) {
 
         toString() {
           return this.toQualifiedEncodedString();
+        }
+
+        eq(other) {
+          return String(this) === String(other);
         }
       },
     };

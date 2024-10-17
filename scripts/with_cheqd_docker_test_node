@@ -10,7 +10,7 @@ config="$(realpath $(dirname $0)/cheqd_config.toml)"
 docker pull --platform linux/amd64 ghcr.io/cheqd/cheqd-node
 
 # start a pos alice node
-alice_container_id=$(docker run --platform linux/amd64 -d --rm -p 26656:26656 -p 26657:26657 -p 1317:1317 -p 9090:9090 -e CHEQD_MNEMONIC="$CHEQD_MNEMONIC" -v $entrypoint:/usr/local/bin/entrypoint.sh -v $config:/tmp/cheqd_config.toml --entrypoint /usr/local/bin/entrypoint.sh ghcr.io/cheqd/cheqd-node start)
+alice_container_id=$(docker run --platform linux/amd64 -d --rm --name cheqd-dev -p 26656:26656 -p 26657:26657 -p 1317:1317 -p 9090:9090 -e CHEQD_MNEMONIC="$CHEQD_MNEMONIC" -v $entrypoint:/usr/local/bin/entrypoint.sh -v $config:/tmp/cheqd_config.toml --entrypoint /usr/local/bin/entrypoint.sh ghcr.io/cheqd/cheqd-node start)
 
 try_with_node() {
     sleep 10;

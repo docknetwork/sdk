@@ -43,8 +43,6 @@ export class DidKeyEd25519PublicKey extends DidKeyValue {
   static Type = 'ed25519';
 
   static Class = PublicKeyEd25519Value;
-
-  static VerificationMethod = true;
 }
 /**
  * Class representing Secp256k1 PublicKey
@@ -55,8 +53,6 @@ export class DidKeySecp256k1PublicKey extends DidKeyValue {
   static Type = 'secp256k1';
 
   static Class = PublicKeySecp256k1Value;
-
-  static VerificationMethod = true;
 }
 /**
  * Class representing Sr25519 PublicKey
@@ -67,8 +63,6 @@ export class DidKeySr25519PublicKey extends DidKeyValue {
   static Type = 'sr25519';
 
   static Class = PublicKeySr25519Value;
-
-  static VerificationMethod = true;
 }
 /**
  * Class representing X25519 PublicKey
@@ -79,8 +73,6 @@ export class DidKeyX25519PublicKey extends DidKeyValue {
   static Type = 'x25519';
 
   static Class = PublicKeyX25519Value;
-
-  static VerificationMethod = true;
 }
 export class DidKeyBBSPublicKey extends DidKeyValue {
   static Class = BBSPublicKeyValue;
@@ -88,8 +80,6 @@ export class DidKeyBBSPublicKey extends DidKeyValue {
   static Type = 'bbs';
 
   static VerKeyType = Bls12381BBS23DockVerKeyName;
-
-  static VerificationMethod = false;
 }
 export class DidKeyBBSPlusPublicKey extends DidKeyValue {
   static Class = BBSPlusPublicKeyValue;
@@ -97,8 +87,6 @@ export class DidKeyBBSPlusPublicKey extends DidKeyValue {
   static Type = 'bbsPlus';
 
   static VerKeyType = Bls12381BBSDockVerKeyName;
-
-  static VerificationMethod = false;
 }
 export class DidKeyPSPublicKey extends DidKeyValue {
   static Class = PSPublicKeyValue;
@@ -106,8 +94,6 @@ export class DidKeyPSPublicKey extends DidKeyValue {
   static Type = 'ps';
 
   static VerKeyType = Bls12381PSDockVerKeyName;
-
-  static VerificationMethod = false;
 }
 
 DidKeyValue.bindVariants(
@@ -169,6 +155,10 @@ export class DidKey extends TypedStruct {
 
   static fromKeypair(keyPair, verRels) {
     return new this(keyPair.publicKey(), verRels);
+  }
+
+  isOffchain() {
+    return Assertion.some((klass) => this.publicKey instanceof klass);
   }
 }
 

@@ -2,9 +2,9 @@ import {
   CheqdDIDQualifier,
   CheqdDIDTestnetQualifier,
   CheqdDIDMainnetQualifier,
-} from '../constants';
-import { TypedEnum, withQualifier } from '../../../generic';
-import TypedUUID from '../../../generic/typed-uuid';
+} from "../constants";
+import { TypedEnum, withQualifier } from "../../../generic";
+import TypedUUID from "../../../generic/typed-uuid";
 
 /**
  * `did:cheqd:*`
@@ -42,17 +42,12 @@ export class CheqdDid extends withQualifier(TypedEnum, true) {
 export class CheqdTestnetDid extends CheqdDid {
   static Class = CheqdTestnetDidValue;
 
-  static Type = 'testnet';
+  static Type = "testnet";
 }
 export class CheqdMainnetDid extends CheqdDid {
   static Class = CheqdMainnetDidValue;
 
-  static Type = 'mainnet';
-}
-export class CheqdGenericDid extends CheqdDid {
-  static Class = CheqdDidValue;
-
-  static Type = 'generic';
+  static Type = "mainnet";
 }
 
-CheqdDid.bindVariants(CheqdTestnetDid, CheqdMainnetDid, CheqdGenericDid);
+CheqdDid.bindVariants(CheqdTestnetDid, CheqdMainnetDid);

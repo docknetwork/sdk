@@ -11,7 +11,7 @@ docker pull $CONFIG_DOCK_NODE_IMAGE
 
 # start a pos alice node
 alice_container_id=$(
-	docker run --rm -d --name alice                           \
+	docker run --rm -d --name dock-dev                      \
         -p 9944:9944 -p 9933:9933 -p 30333:30333            \
         $CONFIG_DOCK_NODE_IMAGE                             \
         --alice --rpc-external --ws-external

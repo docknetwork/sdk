@@ -1,17 +1,17 @@
-import { AbstractTrustRegistryModule } from '@docknetwork/credential-sdk/modules/trust-registry';
+import { AbstractTrustRegistryModule } from "@docknetwork/credential-sdk/modules/trust-registry";
 import {
   TrustRegistryInfo,
   DockTrustRegistryId,
   TrustRegistries,
   TrustRegistry,
   DockDidOrDidMethodKey,
-} from '@docknetwork/credential-sdk/types';
-import { option } from '@docknetwork/credential-sdk/types/generic';
-import { injectDock } from '../common';
-import DockInternalTrustRegistryModule from './internal';
+} from "@docknetwork/credential-sdk/types";
+import { option } from "@docknetwork/credential-sdk/types/generic";
+import { injectDock } from "../common";
+import DockInternalTrustRegistryModule from "./internal";
 
 export default class DockTrustRegistryModule extends injectDock(
-  AbstractTrustRegistryModule,
+  AbstractTrustRegistryModule
 ) {
   static DockOnly = DockInternalTrustRegistryModule;
 
@@ -37,20 +37,20 @@ export default class DockTrustRegistryModule extends injectDock(
 
     return new TrustRegistries(
       await Promise.all(
-        [...ids].map(async (id) => [id, await this.getRegistry(id)]),
-      ),
+        [...ids].map(async (id) => [id, await this.getRegistry(id)])
+      )
     );
   }
 
   async createRegistryTx(id, info, schemas, didKeypair) {
-    const nonce = await this.dockOnly.apiProvider.didNonce(didKeypair.did);
+    const nonce = await this.dockOnly.apiProvider.nextDidNonce(didKeypair.did);
     const init = await this.dockOnly.initOrUpdateTx(
       info.convener,
       id,
       info.name,
       info.govFramework,
       didKeypair,
-      1 + nonce,
+      nonce
     );
 
     const setSchemas = await this.dockOnly.setSchemasMetadataTx(
@@ -58,13 +58,10 @@ export default class DockTrustRegistryModule extends injectDock(
       id,
       { Set: schemas },
       didKeypair,
-      2 + nonce,
+      nonce.inc()
     );
 
-    return await this.dockOnly.apiProvider.api.tx.utility.batchAll([
-      init,
-      setSchemas,
-    ]);
+    return await this.dockOnly.apiProvider.batchAll([init, setSchemas]);
   }
 
   async updateRegistryTx(id, info, schemas, didKeypair) {

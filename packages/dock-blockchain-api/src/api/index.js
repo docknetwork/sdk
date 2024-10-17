@@ -156,7 +156,7 @@ export default class DockAPI extends ApiProvider {
   }
 
   isInitialized() {
-    return !!this.api;
+    return this.api != null;
   }
 
   /** TODO: Should probably use set/get and rename account to _account
@@ -183,9 +183,9 @@ export default class DockAPI extends ApiProvider {
    */
   async signExtrinsic(extrinsic, params = {}) {
     if (this.customSignTx) {
-      return this.customSignTx(extrinsic, params, this);
+      return await this.customSignTx(extrinsic, params, this);
     }
-    return extrinsic.signAsync(this.getAccount(), params);
+    return await extrinsic.signAsync(this.getAccount(), params);
   }
 
   /**
@@ -233,8 +233,23 @@ export default class DockAPI extends ApiProvider {
     );
   }
 
+  /**
+   * Converts supplied payload to bytes representing state change with the provided name.
+   * @param {string} name
+   * @param {object} payload
+   * @returns {Uint8Array}
+   */
   async stateChangeBytes(name, payload) {
     return this.api.createType('StateChange', { [name]: payload }).toU8a();
+  }
+
+  /**
+   * Batches supplied transactions into a single call.
+   * @param {Array<SubmittableExtrinsic>}
+   * @returns {SubmittableExtrinsics}
+   */
+  async batchAll(transactions) {
+    return this.api.tx.utility.batchAll(transactions);
   }
 
   /**

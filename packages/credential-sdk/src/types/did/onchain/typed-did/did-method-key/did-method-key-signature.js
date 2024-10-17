@@ -1,18 +1,18 @@
-import { TypedEnum } from '../../../../generic';
+import { TypedEnum } from "../../../../generic";
 import {
   SignatureEd25519Value,
   SignatureSecp256k1Value,
-} from '../../../../signatures';
+} from "../../../../signatures";
 
-export class DidMethodKeySignature extends TypedEnum {}
-export class DidMethodKeySignatureEd25519 extends DidMethodKeySignature {
+export class DidMethodKeySignatureValue extends TypedEnum {}
+export class DidMethodKeySignatureValueEd25519 extends DidMethodKeySignatureValue {
   static Class = SignatureEd25519Value;
 }
-export class DidMethodKeySignatureSecp256k1 extends DidMethodKeySignature {
+export class DidMethodKeySignatureValueSecp256k1 extends DidMethodKeySignatureValue {
   static Class = SignatureSecp256k1Value;
 }
 
-DidMethodKeySignature.bindVariants(
-  DidMethodKeySignatureEd25519,
-  DidMethodKeySignatureSecp256k1,
+DidMethodKeySignatureValue.bindVariants(
+  DidMethodKeySignatureValueEd25519,
+  DidMethodKeySignatureValueSecp256k1
 );

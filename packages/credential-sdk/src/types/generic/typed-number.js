@@ -31,6 +31,18 @@ class TypedNumber extends withBase(class NumberBase {}) {
     return this.value;
   }
 
+  inc() {
+    this.value++;
+
+    return this;
+  }
+
+  dec() {
+    this.value--;
+
+    return this;
+  }
+
   static fromJSON(value) {
     return new this(value);
   }

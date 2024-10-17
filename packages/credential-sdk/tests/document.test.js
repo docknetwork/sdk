@@ -1,4 +1,8 @@
-import { VerificationRelationship, DidKey } from "../src/types/did";
+import {
+  VerificationRelationship,
+  DidKey,
+  CheqdTestnetDid,
+} from "../src/types/did";
 import { DIDDocument } from "../src/types/did/document";
 import { PublicKeyEd25519 } from "../src/types";
 
@@ -51,6 +55,14 @@ describe("`DIDDocument`", () => {
       )
     ).toMatchSnapshot();
 
+    const cheqdDid = CheqdTestnetDid.from(
+      "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54"
+    );
+
+    expect(
+      DIDDocument.create(cheqdDid, [new DidKey(RANDOM_PKS[0])], [cheqdDid], [])
+    ).toMatchSnapshot();
+
     expect(
       DIDDocument.create(
         "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
@@ -64,7 +76,10 @@ describe("`DIDDocument`", () => {
           new DidKey(RANDOM_PKS[6], AUTH | ASSERT | CAP_INV),
           new DidKey(RANDOM_PKS[7], KEY_AGR),
         ],
-        ["did:key:z6MktvqCyLxTsXUH1tUZncNdVeEZ7hNh7npPRbUU27GTrYb8"],
+        [
+          "did:key:z6MktvqCyLxTsXUH1tUZncNdVeEZ7hNh7npPRbUU27GTrYb8",
+          "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+        ],
         []
       )
     ).toMatchSnapshot();

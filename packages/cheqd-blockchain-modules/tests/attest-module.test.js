@@ -1,10 +1,11 @@
 import { CheqdAPI } from "@docknetwork/cheqd-blockchain-api";
 import { CheqdTestnetDid } from "@docknetwork/credential-sdk/types";
-import didModuleTests from "@docknetwork/credential-sdk/generate-tests/did-module";
+import generateAttestModuleTests from "@docknetwork/credential-sdk/generate-tests/attest-module";
 import CheqdDIDModule from "../src/did/module";
 import { faucet } from "./constants";
+import CheqdAttestModule from "../src/attest/module";
 
-describe("DIDModule", () => {
+describe("AttestModule", () => {
   const cheqd = new CheqdAPI();
 
   beforeAll(async () => {
@@ -18,5 +19,11 @@ describe("DIDModule", () => {
     await cheqd.disconnect();
   });
 
-  didModuleTests({ did: new CheqdDIDModule(cheqd) }, { DID: CheqdTestnetDid });
+  generateAttestModuleTests(
+    {
+      did: new CheqdDIDModule(cheqd),
+      attest: new CheqdAttestModule(cheqd),
+    },
+    { DID: CheqdTestnetDid }
+  );
 });

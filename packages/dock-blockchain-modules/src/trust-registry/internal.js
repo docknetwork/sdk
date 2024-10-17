@@ -2,28 +2,29 @@ import {
   DidMethodKey,
   DockDid,
   DockDidOrDidMethodKey,
-} from '@docknetwork/credential-sdk/types/did';
+} from "@docknetwork/credential-sdk/types/did";
 import {
   isHexWithGivenByteSize,
   u8aToHex,
-} from '@docknetwork/credential-sdk/utils/bytes';
-import { ensureMatchesPattern } from '@docknetwork/credential-sdk/utils/misc';
-import { IssuersSet } from '@docknetwork/credential-sdk/types/trust-registry';
-import { maybeToJSON } from '@docknetwork/credential-sdk/utils';
-import { createInternalDockModule } from '../common';
+} from "@docknetwork/credential-sdk/utils/bytes";
+import { ensureMatchesPattern } from "@docknetwork/credential-sdk/utils/misc";
+import { IssuersSet } from "@docknetwork/credential-sdk/types/trust-registry";
+import { maybeToJSON } from "@docknetwork/credential-sdk/utils";
+import { createInternalDockModule } from "../common";
 
-const callValueMethodOrObjectMethod = (method) => (value) => (typeof value[method] === 'function'
-  ? [...value[method]()]
-  : Object[method](value));
+const callValueMethodOrObjectMethod = (method) => (value) =>
+  typeof value[method] === "function"
+    ? [...value[method]()]
+    : Object[method](value);
 
-const entries = callValueMethodOrObjectMethod('entries');
-const values = callValueMethodOrObjectMethod('values');
+const entries = callValueMethodOrObjectMethod("entries");
+const values = callValueMethodOrObjectMethod("values");
 
 /**
  * `Trust Registry` module.
  */
 export default class DockInternalTrustRegistryModule extends createInternalDockModule() {
-  static Prop = 'trustRegistry';
+  static Prop = "trustRegistry";
 
   /**
    * Returns Trust Registries information according to the supplied `by` argument.
@@ -35,7 +36,7 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     return this.parseMapEntries(
       String,
       this.parseRegistryInfo,
-      await this.rpc.registriesInfoBy(by),
+      await this.rpc.registriesInfoBy(by)
     );
   }
 
@@ -51,7 +52,7 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     return this.parseMapEntries(
       String,
       this.parseSchemaMetadata,
-      await this.rpc.registrySchemaMetadataBy(by, regId),
+      await this.rpc.registrySchemaMetadataBy(by, regId)
     );
   }
 
@@ -65,7 +66,7 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
   async schemaMetadataInRegistry(schemaId, regId) {
     return this.parseSingleEntry(
       this.parseSchemaMetadata,
-      await this.rpc.schemaMetadataInRegistry(schemaId, regId),
+      await this.rpc.schemaMetadataInRegistry(schemaId, regId)
     );
   }
 
@@ -79,7 +80,7 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     return this.parseMapEntries(
       String,
       this.parseSchemaMetadata,
-      await this.rpc.schemaMetadata(schemaId),
+      await this.rpc.schemaMetadata(schemaId)
     );
   }
 
@@ -93,7 +94,7 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
   async schemaIssuersInRegistry(schemaId, regId) {
     return this.parseSingleEntry(
       this.parseSchemaIssuers,
-      await this.rpc.schemaIssuersInRegistry(schemaId, regId),
+      await this.rpc.schemaIssuersInRegistry(schemaId, regId)
     );
   }
 
@@ -107,7 +108,7 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     return this.parseMapEntries(
       String,
       this.parseSchemaIssuers,
-      await this.rpc.schemaIssuers(schemaId),
+      await this.rpc.schemaIssuers(schemaId)
     );
   }
 
@@ -121,7 +122,7 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
   async schemaVerifiersInRegistry(schemaId, regId) {
     return this.parseSingleEntry(
       this.parseSchemaVerifiers,
-      await this.rpc.schemaVerifiersInRegistry(schemaId, regId),
+      await this.rpc.schemaVerifiersInRegistry(schemaId, regId)
     );
   }
 
@@ -135,7 +136,7 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     return this.parseMapEntries(
       String,
       this.parseSchemaVerifiers,
-      await this.rpc.schemaVerifiers(schemaId),
+      await this.rpc.schemaVerifiers(schemaId)
     );
   }
 
@@ -167,14 +168,14 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     const participantWithInfo = async (did) => {
       const info = await this.query.trustRegistryParticipantsInformation(
         registryId,
-        did,
+        did
       );
 
       return [did, info.isSome ? info.unwrap().toJSON() : null];
     };
 
     return Object.fromEntries(
-      await Promise.all(participants.map(participantWithInfo)),
+      await Promise.all(participants.map(participantWithInfo))
     );
   }
 
@@ -194,14 +195,14 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     name,
     govFramework,
     signingKeyRef,
-    params = {},
+    params = {}
   ) {
     const tx = await this.initOrUpdateTx(
       convenerDid,
       registryId,
       name,
       govFramework,
-      signingKeyRef,
+      signingKeyRef
     );
     return await this.signAndSend(tx, params);
   }
@@ -222,24 +223,24 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     name,
     govFramework,
     signingKeyRef,
-    nonce,
+    nonce
   ) {
     const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(
       convenerDid,
-      nonce,
+      nonce
     );
 
     return await convenerHexDid.changeState(
       this.apiProvider,
       this.rawTx.initOrUpdateTrustRegistry,
-      'InitOrUpdateTrustRegistry',
+      "InitOrUpdateTrustRegistry",
       {
         registryId,
         name,
         govFramework,
         nonce: lastNonce,
       },
-      signingKeyRef,
+      signingKeyRef
     );
   }
 
@@ -259,16 +260,17 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     registryId,
     participants,
     signingKeyRef,
-    nonce,
+    nonce
   ) {
-    const [convenerOrIssuerOrVerifierHexDid, lastNonce] = await this.getActorDidAndNonce(convenerOrIssuerOrVerifierDid, nonce);
+    const [convenerOrIssuerOrVerifierHexDid, lastNonce] =
+      await this.getActorDidAndNonce(convenerOrIssuerOrVerifierDid, nonce);
 
     return {
       sig: await convenerOrIssuerOrVerifierHexDid.signStateChange(
         this.apiProvider,
-        'ChangeParticipants',
+        "ChangeParticipants",
         { data: { registryId, participants }, nonce: lastNonce },
-        signingKeyRef,
+        signingKeyRef
       ),
       nonce: lastNonce,
     };
@@ -292,12 +294,12 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     participants,
     sigs,
     waitForFinalization = true,
-    params = {},
+    params = {}
   ) {
     return await this.signAndSend(
       await this.changeParticipantsTx(registryId, participants, sigs),
       waitForFinalization,
-      params,
+      params
     );
   }
 
@@ -312,7 +314,7 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
   async changeParticipantsTx(registryId, participants, sigs) {
     ensureMatchesPattern(
       this.constructor.ChangeParticipantsPattern,
-      participants,
+      participants
     );
 
     return this.rawTx.changeParticipants(
@@ -320,7 +322,7 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
         registryId,
         participants,
       },
-      sigs,
+      sigs
     );
   }
 
@@ -340,19 +342,20 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     participant,
     participantInformation,
     signingKeyRef,
-    nonce,
+    nonce
   ) {
-    const [convenerOrIssuerOrVerifierHexDid, lastNonce] = await this.getActorDidAndNonce(convenerOrIssuerOrVerifierDid, nonce);
+    const [convenerOrIssuerOrVerifierHexDid, lastNonce] =
+      await this.getActorDidAndNonce(convenerOrIssuerOrVerifierDid, nonce);
 
     return {
       sig: await convenerOrIssuerOrVerifierHexDid.signStateChange(
         this.apiProvider,
-        'SetParticipantInformation',
+        "SetParticipantInformation",
         {
           data: { registryId, participant, participantInformation },
           nonce: lastNonce,
         },
-        signingKeyRef,
+        signingKeyRef
       ),
       nonce: lastNonce,
     };
@@ -374,17 +377,17 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     participantInformation,
     sigs,
     waitForFinalization = true,
-    params = {},
+    params = {}
   ) {
     return await this.signAndSend(
       await this.setParticipantInformationTx(
         registryId,
         participant,
         participantInformation,
-        sigs,
+        sigs
       ),
       waitForFinalization,
-      params,
+      params
     );
   }
 
@@ -401,11 +404,11 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     registryId,
     participant,
     participantInformation,
-    sigs,
+    sigs
   ) {
     ensureMatchesPattern(
       this.constructor.SetParticipantInformationPattern,
-      participantInformation,
+      participantInformation
     );
 
     return this.rawTx.setParticipantInformation(
@@ -414,7 +417,7 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
         participant,
         participantInformation,
       },
-      sigs,
+      sigs
     );
   }
 
@@ -432,13 +435,13 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     registryId,
     schemas,
     signingKeyRef,
-    params = {},
+    params = {}
   ) {
     const tx = await this.setSchemasMetadataTx(
       convenerOrIssuerOrVerifierDid,
       registryId,
       schemas,
-      signingKeyRef,
+      signingKeyRef
     );
     return await this.signAndSend(tx, params);
   }
@@ -459,17 +462,18 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     registryId,
     schemas,
     signingKeyRef,
-    nonce,
+    nonce
   ) {
-    const [convenerOrIssuerOrVerifierHexDid, lastNonce] = await this.getActorDidAndNonce(convenerOrIssuerOrVerifierDid, nonce);
+    const [convenerOrIssuerOrVerifierHexDid, lastNonce] =
+      await this.getActorDidAndNonce(convenerOrIssuerOrVerifierDid, nonce);
     ensureMatchesPattern(this.constructor.SchemasUpdatePattern, schemas);
 
     return await convenerOrIssuerOrVerifierHexDid.changeState(
       this.apiProvider,
       this.rawTx.setSchemasMetadata,
-      'SetSchemasMetadata',
+      "SetSchemasMetadata",
       { registryId, schemas, nonce: lastNonce },
-      signingKeyRef,
+      signingKeyRef
     );
   }
 
@@ -487,13 +491,13 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     registryId,
     issuers,
     signingKeyRef,
-    params = {},
+    params = {}
   ) {
     const tx = await this.suspendIssuersTx(
       convenerDid,
       registryId,
       issuers,
-      signingKeyRef,
+      signingKeyRef
     );
     return await this.signAndSend(tx, params);
   }
@@ -512,11 +516,11 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     registryId,
     rawIssuers,
     signingKeyRef,
-    nonce,
+    nonce
   ) {
     const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(
       convenerDid,
-      nonce,
+      nonce
     );
 
     const hexIssuers = IssuersSet.from(rawIssuers);
@@ -524,9 +528,9 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     return await convenerHexDid.changeState(
       this.apiProvider,
       this.rawTx.suspendIssuers,
-      'SuspendIssuers',
+      "SuspendIssuers",
       { registryId, issuers: hexIssuers, nonce: lastNonce },
-      signingKeyRef,
+      signingKeyRef
     );
   }
 
@@ -544,13 +548,13 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     registryId,
     issuers,
     signingKeyRef,
-    params = {},
+    params = {}
   ) {
     const tx = await this.unsuspendIssuersTx(
       convenerDid,
       registryId,
       issuers,
-      signingKeyRef,
+      signingKeyRef
     );
     return await this.signAndSend(tx, params);
   }
@@ -569,11 +573,11 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     registryId,
     rawIssuers,
     signingKeyRef,
-    nonce,
+    nonce
   ) {
     const [convenerHexDid, lastNonce] = await this.getActorDidAndNonce(
       convenerDid,
-      nonce,
+      nonce
     );
 
     const issuers = IssuersSet.from(rawIssuers);
@@ -581,9 +585,9 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     return await convenerHexDid.changeState(
       this.apiProvider,
       this.rawTx.unsuspendIssuers,
-      'UnsuspendIssuers',
+      "UnsuspendIssuers",
       { registryId, issuers, nonce: lastNonce },
-      signingKeyRef,
+      signingKeyRef
     );
   }
 
@@ -605,23 +609,23 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
     signingKeyRef,
     nonce,
     waitForFinalization = true,
-    params = {},
+    params = {}
   ) {
     const [issuerHexDid, lastNonce] = await this.getActorDidAndNonce(
       issuerDid,
-      nonce,
+      nonce
     );
 
     return await this.signAndSend(
       await issuerHexDid.changeState(
         this.apiProvider,
         this.rawTx.updateDelegatedIssuers,
-        'UpdateDelegatedIssuers',
+        "UpdateDelegatedIssuers",
         { registryId, delegated, nonce: lastNonce },
-        signingKeyRef,
+        signingKeyRef
       ),
       waitForFinalization,
-      params,
+      params
     );
   }
 
@@ -635,7 +639,7 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
    */
   async getActorDidAndNonce(actorDid, nonce) {
     const hexDID = DockDidOrDidMethodKey.from(actorDid);
-    const lastNonce = nonce ?? 1 + (await this.apiProvider.didNonce(hexDID));
+    const lastNonce = nonce ?? (await this.apiProvider.nextDidNonce(hexDID));
     return [hexDID, lastNonce];
   }
 
@@ -672,7 +676,7 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
           keyParser.call(this, key),
           valueParser.call(this, value),
         ])
-        .sort(([key1], [key2]) => key1.localeCompare(key2)),
+        .sort(([key1], [key2]) => key1.localeCompare(key2))
     );
   }
 
@@ -725,7 +729,7 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
           String(DockDidOrDidMethodKey.from(issuer)),
           maybeToJSON(info),
         ])
-        .sort(([iss1], [iss2]) => iss1.localeCompare(iss2)),
+        .sort(([iss1], [iss2]) => iss1.localeCompare(iss2))
     );
   }
 
@@ -747,7 +751,7 @@ const DockDidOrDidMethodKeyPattern = {
 };
 
 const VerificationPricePattern = {
-  $anyOf: [{ $matchType: 'number' }, { $matchType: 'object' }],
+  $anyOf: [{ $matchType: "number" }, { $matchType: "object" }],
 };
 
 const Hex32Pattern = {
@@ -769,9 +773,9 @@ const VerifiersUpdatePattern = {
     DockDidOrDidMethodKeyPattern,
     {
       $anyOf: [
-        { $matchValue: 'Remove' },
+        { $matchValue: "Remove" },
         {
-          $matchValue: 'Add',
+          $matchValue: "Add",
         },
       ],
     },
@@ -780,16 +784,16 @@ const VerifiersUpdatePattern = {
 
 const IssuerPricesPattern = {
   // $instanceOf: BTreeMap,
-  $mapOf: [{ $matchType: 'string' }, VerificationPricePattern],
+  $mapOf: [{ $matchType: "string" }, VerificationPricePattern],
 };
 
 const IssuerPricesUpdatePattern = {
   // $instanceOf: BTreeMap,
   $mapOf: [
-    { $matchType: 'string' },
+    { $matchType: "string" },
     {
       $anyOf: [
-        { $matchValue: 'Remove' },
+        { $matchValue: "Remove" },
         {
           $objOf: {
             Add: VerificationPricePattern,
@@ -868,7 +872,7 @@ const ModifySchemasPattern = {
           },
         },
         {
-          $matchValue: 'Remove',
+          $matchValue: "Remove",
         },
       ],
     },
@@ -888,13 +892,13 @@ const AnyOfOrAllDockDidOrDidMethodKeyPattern = {
 DockInternalTrustRegistryModule.SetParticipantInformationPattern = {
   $matchObject: {
     orgName: {
-      $matchType: 'string',
+      $matchType: "string",
     },
     logo: {
-      $matchType: 'string',
+      $matchType: "string",
     },
     description: {
-      $matchType: 'string',
+      $matchType: "string",
     },
   },
 };
@@ -910,10 +914,10 @@ DockInternalTrustRegistryModule.ChangeParticipantsPattern = {
     {
       $anyOf: [
         {
-          $matchValue: 'Add',
+          $matchValue: "Add",
         },
         {
-          $matchValue: 'Remove',
+          $matchValue: "Remove",
         },
       ],
     },

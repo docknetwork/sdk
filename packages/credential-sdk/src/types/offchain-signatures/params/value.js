@@ -21,3 +21,6 @@ export class BBSPlusParamsValue extends OffchainSignatureParamsValue {
 export class PSParamsValue extends OffchainSignatureParamsValue {
   static Type = 'ps';
 }
+export class BBDT16ParamsValue extends OffchainSignatureParamsValue {
+  static Type = 'bbdt16';
+}

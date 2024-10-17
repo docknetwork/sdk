@@ -145,7 +145,9 @@ export class CheqdAPI extends ApiProvider {
     if (res.code) {
       console.error(res);
 
-      throw new Error(`Error: ${JSON.stringify(res)}`);
+      throw new Error(
+        JSON.stringify(res, (_, value) => (typeof value === 'bigint' ? `${value.toString()}n` : value)),
+      );
     }
 
     return res;

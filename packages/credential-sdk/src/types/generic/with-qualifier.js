@@ -105,6 +105,19 @@ export default function withQualifier(klass, wrapper = false) {
         } else {
           return this.fromQualifiedString(String(value));
         }
+      } else if (
+        value?.constructor?.Qualifier != null &&
+        !this.Qualifiers.find((qualifier) =>
+          value.constructor.Qualifier.startsWith(qualifier)
+        )
+      ) {
+        throw new Error(
+          `Value has a different qualifier: \`${
+            value.constructor.Qualifier
+          }\` while expected one of \`${fmtIter(this.Qualifiers)}\` by \`${
+            this.name
+          }\``
+        );
       } else {
         return from(value);
       }
@@ -183,6 +196,13 @@ export default function withQualifier(klass, wrapper = false) {
           } else {
             return this.fromUnqualifiedString(String(value));
           }
+        } else if (
+          value?.constructor?.Qualifier != null &&
+          !value.constructor.Qualifier.startsWith(this.Qualifier)
+        ) {
+          throw new Error(
+            `Value has a different qualifier: \`${value.constructor.Qualifier}\` while expected \`${this.Qualifier}\` by \`${this.name}\``
+          );
         } else {
           return from(value);
         }

@@ -3,6 +3,7 @@ import VerifiablePresentation from "../src/vc/verifiable-presentation";
 import { Schema } from "../src/modules/schema";
 
 import exampleCredential from "./utils/example-credential";
+import { DockBlobId } from "../src/types";
 
 describe("Serialization", () => {
   test("VerifiableCredential fromJSON should fail if no type is provided", () => {
@@ -62,7 +63,7 @@ describe("Serialization", () => {
   });
 
   test("Schema from/to JSON serialization", async () => {
-    const schema = new Schema();
+    const schema = new Schema(DockBlobId.random());
     await schema.setJSONSchema({
       $schema: "http://json-schema.org/draft-07/schema#",
       description: "Dock Schema Example",

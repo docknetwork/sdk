@@ -37,7 +37,17 @@ class DockApiProvider extends ApiProvider {
   }
 
   async didNonce(did) {
-    return await new DockDIDModuleInternal(this).nonce(did);
+    return typeof this.dock.didNonce === 'function'
+      ? await this.dock.didNonce(did)
+      : await new DockDIDModuleInternal(this).nonce(did);
+  }
+
+  async nextDidNonce(did) {
+    return (await this.didNonce(did)).inc();
+  }
+
+  async batchAll(transactions) {
+    return await this.dock.batchAll(transactions);
   }
 }
 

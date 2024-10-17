@@ -136,7 +136,7 @@ describe("Schema Blob Module Integration", () => {
   }, 30000);
 
   test("Set and get schema", async () => {
-    const schema = new Schema();
+    const schema = new Schema(DockBlobId.random());
     await schema.setJSONSchema(exampleSchema);
     await modules.blob.new(schema.toBlob(), dockDID, pair);
     const schemaObj = await Schema.get(blobId, modules.blob);

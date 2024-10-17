@@ -18,10 +18,6 @@ export function getBytesForStateChange(api, stateChange) {
   return api.createType('StateChange', stateChange).toU8a();
 }
 
-export async function getDidNonce() {
-  throw new Error('Unimplemented');
-}
-
 export function getStateChange(api, name, value) {
   const stateChange = {};
   stateChange[name] = value;

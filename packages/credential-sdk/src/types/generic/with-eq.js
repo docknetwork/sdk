@@ -17,7 +17,9 @@ export default function withEq(klass) {
           return false;
         } else if (Object.is(this, other)) {
           return true;
-        } else if (!isEqualToOrPrototypeOf(klass, other.constructor)) {
+        } else if (
+          !isEqualToOrPrototypeOf(this.constructor, other.constructor)
+        ) {
           let compareWith;
           try {
             compareWith = this.constructor.from(other);

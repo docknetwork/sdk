@@ -1,6 +1,14 @@
 import { DockDIDQualifier } from '../constants';
 import { decodeFromSS58, encodeAsSS58, isHex } from '../../../../utils';
-import { withQualifier, TypedBytes, sized } from '../../../generic';
+import {
+  withQualifier,
+  TypedBytes,
+  sized,
+  TypedNumber,
+  TypedStruct,
+} from '../../../generic';
+import DidOrDidMethodKeySignature from './signature';
+import { Signature } from '../../../signatures';
 
 /**
  * `did:dock:*`
@@ -24,12 +32,24 @@ export default class DockDidValue extends sized(withQualifier(TypedBytes)) {
   }
 
   signWith(keyPair, bytes) {
-    return {
-      didSignature: {
-        did: this,
-        keyId: keyPair.keyId,
-        sig: keyPair.sign(bytes),
-      },
-    };
+    // eslint-disable-next-line no-use-before-define
+    return new DockDidSignature(
+      // eslint-disable-next-line no-use-before-define
+      new DockDidSignatureValue(this, keyPair.keyId, keyPair.sign(bytes)),
+    );
   }
+}
+
+export class DockDidSignatureValue extends TypedStruct {
+  static Classes = {
+    did: DockDidValue,
+    keyId: class KeyId extends TypedNumber {},
+    sig: Signature,
+  };
+}
+
+export class DockDidSignature extends DidOrDidMethodKeySignature {
+  static Type = 'didSignature';
+
+  static Class = DockDidSignatureValue;
 }

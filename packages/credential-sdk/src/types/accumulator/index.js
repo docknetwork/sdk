@@ -1,9 +1,9 @@
-import { IdentRef } from '../did';
+import { DIDRef } from '../did';
 import {
   TypedBytes, TypedUUID, sized, withFrom,
 } from '../generic';
 
-export class AccumulatorId extends IdentRef {}
+export class AccumulatorId extends DIDRef {}
 
 export class CheqdAccumulatorIdIdent extends TypedUUID {}
 

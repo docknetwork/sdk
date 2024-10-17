@@ -104,11 +104,10 @@ export default function withParamsAndPublicKeys(klass) {
        * Add a public key
        * @param publicKey - public key to add.
        * @param targetDid - The DID to which key is being added
-       * @param signerDid - The DID that is adding the key by signing the payload because it controls `targetDid`
-       * @param signingKeyRef - Signer's signingKeyRef
+       * @param didKeypair - Signer's didKeypair
        * @returns {Promise<*>}
        */
-      async addPublicKeyTx(id, publicKey, targetDid, didKeypair) {
+      async addPublicKeyTx(_id, publicKey, targetDid, didKeypair) {
         return await this.dockOnly.tx.addPublicKey(
           publicKey,
           targetDid,
@@ -120,8 +119,7 @@ export default function withParamsAndPublicKeys(klass) {
        * Remove public key
        * @param removeKeyId - Identifier of the public key to be removed.
        * @param targetDid - The DID from which key is being removed
-       * @param signerDid - The DID that is removing the key by signing the payload because it controls `targetDid`
-       * @param signingKeyRef - Signer's signing key reference
+       * @param didKeypair - Signer's signing key reference
        * @returns {Promise<*>}
        */
       async removePublicKeyTx(id, targetDid, didKeypair) {

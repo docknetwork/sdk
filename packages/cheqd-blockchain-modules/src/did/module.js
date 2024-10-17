@@ -34,9 +34,13 @@ export default class CheqdDIDModule extends injectCheqd(AbstractDIDModule) {
   async updateDocumentTx(document, didSigners) {
     const didDocument = DIDDocument.from(document);
     if (didDocument.attests != null) {
-      throw new Error(
-        `Non-null \`attest\` was provided for DID document \`${didDocument.id}\`. Use \`attest\` module to set attestations.`,
-      );
+      const currentDocument = await this.getDocument(didDocument.id);
+
+      if (!didDocument.attests.eq(currentDocument.attests)) {
+        throw new Error(
+          '`attests` modifications are not supported in the `updateDocument` transaction.',
+        );
+      }
     }
 
     return await this.cheqdOnly.tx.updateDidDocument(didDocument, didSigners);
@@ -71,9 +75,8 @@ export default class CheqdDIDModule extends injectCheqd(AbstractDIDModule) {
       throw new NoDIDError(cheqdDid);
     }
 
-    const document = CheqdDIDDocument.from(doc).toDIDDocument();
-    const attests = await this.attest.getAttests(did);
-
-    return document.setAttests(attests);
+    return CheqdDIDDocument.from(doc)
+      .toDIDDocument()
+      .setAttests(await this.attest.getAttests(cheqdDid));
   }
 }

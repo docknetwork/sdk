@@ -68,7 +68,7 @@ The first step to creating a Schema is to initialize it, we can do that using th
 accepts an (optional) `id` string as sole argument:
 
 ```javascript
-const myNewSchema = new Schema();
+const myNewSchema = new Schema(DockBlobId.random());
 ```
 
 When an `id` isn't passed, a random `blobId` will be assigned as the schema's id.

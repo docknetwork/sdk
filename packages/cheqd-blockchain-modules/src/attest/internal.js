@@ -4,7 +4,7 @@ import { CheqdCreateResource, createInternalCheqdModule } from '../common';
 
 const methods = {
   setClaim: (iri, targetDid) => new CheqdCreateResource(
-    targetDid.value,
+    CheqdDid.from(targetDid).value,
     TypedUUID.random(),
     '1.0',
     [],
@@ -24,29 +24,15 @@ export default class CheqdInternalAttestModule extends createInternalCheqdModule
   };
 
   async attest(did, attestId) {
-    const stringDid = CheqdDid.from(did).toEncodedString();
-    const stringAttestId = String(TypedUUID.from(attestId));
-    const item = await this.query.resource(stringDid, stringAttestId);
-
-    return option(Iri).from(item?.resource?.data);
+    return option(Iri).from(
+      (await this.resource(did, attestId))?.resource?.data,
+    );
   }
 
   async attestId(did) {
-    let resources = [];
-    let paginationKey;
-
-    do {
-      // eslint-disable-next-line no-await-in-loop
-      const res = await this.query.collectionResources(
-        CheqdDid.from(did).toEncodedString(),
-        paginationKey,
-      );
-      resources = resources.concat(
-        res.resources.filter((resource) => resource.resourceType === 'attest'),
-      );
-      ({ paginationKey } = res);
-    } while (!resources.length && paginationKey != null);
-
-    return resources.find((resource) => !resource.nextVersionId)?.id;
+    return await this.latestResourceIdBy(
+      did,
+      (resource) => resource.resourceType === 'attest',
+    );
   }
 }

@@ -43,14 +43,14 @@ export default class DockTrustRegistryModule extends injectDock(
   }
 
   async createRegistryTx(id, info, schemas, didKeypair) {
-    const nonce = await this.dockOnly.apiProvider.didNonce(didKeypair.did);
+    const nonce = await this.dockOnly.apiProvider.nextDidNonce(didKeypair.did);
     const init = await this.dockOnly.initOrUpdateTx(
       info.convener,
       id,
       info.name,
       info.govFramework,
       didKeypair,
-      1 + nonce,
+      nonce,
     );
 
     const setSchemas = await this.dockOnly.setSchemasMetadataTx(
@@ -58,13 +58,10 @@ export default class DockTrustRegistryModule extends injectDock(
       id,
       { Set: schemas },
       didKeypair,
-      2 + nonce,
+      nonce.inc(),
     );
 
-    return await this.dockOnly.apiProvider.api.tx.utility.batchAll([
-      init,
-      setSchemas,
-    ]);
+    return await this.dockOnly.apiProvider.batchAll([init, setSchemas]);
   }
 
   async updateRegistryTx(id, info, schemas, didKeypair) {

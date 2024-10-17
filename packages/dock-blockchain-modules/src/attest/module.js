@@ -7,8 +7,8 @@ export default class DockAttestModule extends injectDock(AbstractAttestModule) {
 
   /**
    * Fetches the DIDs attestations IRI from the chain
-   * @param {string} hexId - DID in hex format
-   * @return {Promise<string | null>} The DID's attestation, if any
+   * @param {*} did
+   * @return {Promise<Iri | null>} The DID's attestation, if any
    */
   async getAttests(did) {
     return (await this.dockOnly.attest(did)).iri?.value;
@@ -16,11 +16,9 @@ export default class DockAttestModule extends injectDock(AbstractAttestModule) {
 
   /**
    * Creates an attestation claim on chain for a specific DID
-   * @param priority
    * @param iri
    * @param did
    * @param signingKeyRef
-   * @param params
    */
   async setClaimTx(iri, targetDid, didKeypair) {
     ensureTargetKeypair(targetDid, didKeypair);

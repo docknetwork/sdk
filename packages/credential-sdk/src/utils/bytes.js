@@ -1,5 +1,5 @@
 import { applyToValue } from './interfaces';
-import { ensureBytes, ensureString, ensureUint8Array } from './type-helpers';
+import { ensureBytes, ensureString } from './type-helpers';
 
 /**
  * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
@@ -153,7 +153,7 @@ export const normalizeOrConvertStringToU8a = (bytesOrString) => (typeof bytesOrS
  */
 export const valueBytes = (value) => applyToValue(
   (inner) => Array.isArray(inner) || inner instanceof Uint8Array || 'bytes' in inner,
-  (inner) => ensureUint8Array(inner.bytes ?? u8aToU8a(inner)),
+  (inner) => normalizeToU8a(inner.bytes ?? inner),
   value,
 );
 

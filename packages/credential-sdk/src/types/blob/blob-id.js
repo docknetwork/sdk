@@ -1,8 +1,10 @@
-import { encodeAsSS58, decodeFromSS58 } from "../../utils/ss58";
-import { isHex } from "../../utils/bytes";
-import { TypedBytes, TypedUUID, sized, withQualifier } from "../generic";
-import { CheqdBlobQualifier, DockBlobQualifier } from "./const";
-import { CheqdMainnetDid, CheqdTestnetDid, DIDRef } from "../did";
+import { encodeAsSS58, decodeFromSS58 } from '../../utils/ss58';
+import { isHex } from '../../utils/bytes';
+import {
+  TypedBytes, TypedUUID, sized, withQualifier,
+} from '../generic';
+import { CheqdBlobQualifier, DockBlobQualifier } from './const';
+import { CheqdMainnetDid, CheqdTestnetDid, DIDRef } from '../did';
 
 export class CheqdBlobId extends DIDRef {
   static Qualifier = CheqdBlobQualifier;
@@ -10,11 +12,11 @@ export class CheqdBlobId extends DIDRef {
   static Ident = TypedUUID;
 
   toEncodedString() {
-    let prefix = "";
+    let prefix = '';
     if (this[0].value instanceof CheqdTestnetDid) {
-      prefix = "testnet";
+      prefix = 'testnet';
     } else if (this[0].value instanceof CheqdMainnetDid) {
-      prefix = "mainnet";
+      prefix = 'mainnet';
     }
 
     return `${prefix}:${this.value}`;

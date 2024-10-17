@@ -1,18 +1,18 @@
-import bs58 from "bs58";
-import { AbstractDIDModule } from "@docknetwork/credential-sdk/modules/did";
+import bs58 from 'bs58';
+import { AbstractDIDModule } from '@docknetwork/credential-sdk/modules/did';
 import {
   DockDid,
   DockDidOrDidMethodKey,
-} from "@docknetwork/credential-sdk/types";
+} from '@docknetwork/credential-sdk/types';
 import {
   DIDDocument,
   Service,
   CONTEXT_URI,
-} from "@docknetwork/credential-sdk/types/did/document";
-import { DockDIDModuleInternal } from "./internal";
-import injectDock from "../common/inject-dock";
-import DockAttestModule from "../attest/module";
-import DockOffchainSignaturesModule from "../offchain-signatures/module";
+} from '@docknetwork/credential-sdk/types/did/document';
+import { DockDIDModuleInternal } from './internal';
+import injectDock from '../common/inject-dock';
+import DockAttestModule from '../attest/module';
+import DockOffchainSignaturesModule from '../offchain-signatures/module';
 
 export default class DockDIDModule extends injectDock(AbstractDIDModule) {
   static DockOnly = DockDIDModuleInternal;
@@ -32,25 +32,25 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
       controller,
       service,
       id,
-      "@context": context,
+      '@context': context,
       capabilityDelegation,
       attests,
     } = document;
     if (service?.length) {
       throw new Error(
-        "`service` is not supported in the `createDocument` transaction. Use `updateDocument` to add `service` to the existing document."
+        '`service` is not supported in the `createDocument` transaction. Use `updateDocument` to add `service` to the existing document.',
       );
     } else if (capabilityDelegation?.length) {
-      throw new Error("Capability delegation is not supported");
+      throw new Error('Capability delegation is not supported');
     } else if (attests != null) {
       throw new Error(
-        "`attests` are not supported in the `createDocument` transaction. Use `attest` module to attach `attests` to the existing document."
+        '`attests` are not supported in the `createDocument` transaction. Use `attest` module to attach `attests` to the existing document.',
       );
     } else if (context.length !== 1 || context[0].value !== CONTEXT_URI) {
       throw new Error(
         `Context must be equal to \`${[
           CONTEXT_URI,
-        ]}\`, received: \`${context}\``
+        ]}\`, received: \`${context}\``,
       );
     }
 
@@ -68,113 +68,99 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
       removed: removedMethods,
       modified,
     } = nextDocument.didKeys().diff(currentDocument.didKeys());
-    const { added: newControllers, removed: removedControllers } =
-      nextDocument.controller.diff(currentDocument.controller);
-    const { added: newServices, removed: removedServices } =
-      nextDocument.service.diff(currentDocument.service);
+    const { added: newControllers, removed: removedControllers } = nextDocument.controller.diff(currentDocument.controller);
+    const { added: newServices, removed: removedServices } = nextDocument.service.diff(currentDocument.service);
     const newOnChainKeys = [...newMethods].filter(
-      ([_, key]) => !key.isOffchain()
+      ([_, key]) => !key.isOffchain(),
     );
-    const newOffchainKeys = [...newMethods].filter(([_, key]) =>
-      key.isOffchain()
-    );
+    const newOffchainKeys = [...newMethods].filter(([_, key]) => key.isOffchain());
     const removedOnChainKeys = [...removedMethods].filter(
-      ([_, key]) => !key.isOffchain()
+      ([_, key]) => !key.isOffchain(),
     );
-    const removedOffchainKeys = [...removedMethods].filter(([_, key]) =>
-      key.isOffchain()
-    );
+    const removedOffchainKeys = [...removedMethods].filter(([_, key]) => key.isOffchain());
 
     if (modified.size) {
       throw new Error("Can't have modified verificationMethods");
     } else if (
-      nextDocument.attests &&
-      !nextDocument.attests.eq(currentDocument.attests)
+      nextDocument.attests
+      && !nextDocument.attests.eq(currentDocument.attests)
     ) {
       throw new Error(
-        "`attests` modifications are not supported in the `updateDocument` transaction. Use `attest` module to attach `attests` to the existing document."
+        '`attests` modifications are not supported in the `updateDocument` transaction. Use `attest` module to attach `attests` to the existing document.',
       );
     }
 
     if (
-      [...newMethods.keys()].find((method) => !method.did.eq(didDocument.id)) ||
-      [...removedMethods.keys()].find(
-        (method) => !method.did.eq(didDocument.id)
+      [...newMethods.keys()].find((method) => !method.did.eq(didDocument.id))
+      || [...removedMethods.keys()].find(
+        (method) => !method.did.eq(didDocument.id),
       )
     ) {
       throw new Error("Can't change controller keys");
     }
 
-    const { id: docId, "@context": context } = nextDocument;
+    const { id: docId, '@context': context } = nextDocument;
     const did = DockDidOrDidMethodKey.from(docId);
 
     if (context.length !== 1 || context[0].value !== CONTEXT_URI) {
       throw new Error(
         `Context must be equal to \`${[
           CONTEXT_URI,
-        ]}\`, received: \`${context}\``
+        ]}\`, received: \`${context}\``,
       );
     }
 
     const nonce = await this.dockOnly.apiProvider.didNonce(signerDid);
 
     const txs = [
-      newOnChainKeys.length &&
-        this.dockOnly.tx.addKeys(
+      newOnChainKeys.length
+        && this.dockOnly.tx.addKeys(
           [...newOnChainKeys].map(([_, key]) => key),
           did,
           didKeypair,
-          nonce.inc()
+          nonce.inc(),
         ),
-      newControllers.length &&
-        this.dockOnly.tx.addControllers(
+      newControllers.length
+        && this.dockOnly.tx.addControllers(
           newControllers,
           did,
           didKeypair,
-          nonce.inc()
+          nonce.inc(),
         ),
-      ...newOffchainKeys.map(([_, key]) =>
-        this.offchainSignatures.dockOnly.tx.addPublicKey(
-          key.publicKey,
-          did,
-          didKeypair,
-          nonce.inc()
-        )
-      ),
-      ...[...newServices].map(({ id, type, serviceEndpoint }) =>
-        this.dockOnly.tx.addServiceEndpoint(
-          id,
-          type,
-          serviceEndpoint,
-          did,
-          didKeypair,
-          nonce.inc()
-        )
-      ),
-      ...[...removedServices].map(({ id }) =>
-        this.dockOnly.tx.removeServiceEndpoint(id, didKeypair, nonce.inc())
-      ),
-      ...removedOffchainKeys.map(([{ index }]) =>
-        this.offchainSignatures.dockOnly.tx.removePublicKey(
-          index,
-          did,
-          didKeypair,
-          nonce.inc()
-        )
-      ),
-      removedControllers.length &&
-        this.dockOnly.tx.removeControllers(
+      ...newOffchainKeys.map(([_, key]) => this.offchainSignatures.dockOnly.tx.addPublicKey(
+        key.publicKey,
+        did,
+        didKeypair,
+        nonce.inc(),
+      )),
+      ...[...newServices].map(({ id, type, serviceEndpoint }) => this.dockOnly.tx.addServiceEndpoint(
+        id,
+        type,
+        serviceEndpoint,
+        did,
+        didKeypair,
+        nonce.inc(),
+      )),
+      ...[...removedServices].map(({ id }) => this.dockOnly.tx.removeServiceEndpoint(id, didKeypair, nonce.inc())),
+      ...removedOffchainKeys.map(([{ index }]) => this.offchainSignatures.dockOnly.tx.removePublicKey(
+        index,
+        did,
+        didKeypair,
+        nonce.inc(),
+      )),
+      removedControllers.length
+        && this.dockOnly.tx.removeControllers(
           removedControllers,
           did,
           didKeypair,
-          nonce.inc()
+          nonce.inc(),
         ),
-      removedOnChainKeys.length &&
-        this.dockOnly.tx.removeKeys(
+      removedOnChainKeys.length
+        && this.dockOnly.tx.removeKeys(
           [...removedOnChainKeys].map(([{ index }]) => index),
           did,
           didKeypair,
-          nonce.inc()
+          nonce.inc(),
         ),
     ];
 
@@ -204,7 +190,7 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
     const hexDid = typedDid.asDid;
 
     const { data: didDetails } = await this.dockOnly.getOnchainDidDetail(
-      hexDid
+      hexDid,
     );
 
     // Get DIDs attestations
@@ -214,10 +200,9 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
     const id = String(typedDid);
 
     // Get controllers
-    const controllers =
-      didDetails.activeControllers > 0
-        ? await this.dockOnly.controllers(typedDid)
-        : [];
+    const controllers = didDetails.activeControllers > 0
+      ? await this.dockOnly.controllers(typedDid)
+      : [];
 
     // Get service endpoints
     const serviceEndpoints = await this.dockOnly.serviceEndpoints(hexDid);
@@ -281,9 +266,7 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
     const capabilityInvocation = capInv.map((i) => `${id}#keys-${i}`);
     const keyAgreement = keyAgr.map((i) => `${id}#keys-${i}`);
 
-    const service = [...serviceEndpoints].map(([spId, sp]) =>
-      Service.fromServiceEndpoint(spId, sp)
-    );
+    const service = [...serviceEndpoints].map(([spId, sp]) => Service.fromServiceEndpoint(spId, sp));
 
     // Construct document
     return new DIDDocument(
@@ -298,7 +281,7 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
       keyAgreement,
       capabilityInvocation,
       [],
-      attests
+      attests,
     );
   }
 }

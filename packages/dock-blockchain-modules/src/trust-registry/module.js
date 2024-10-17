@@ -1,17 +1,17 @@
-import { AbstractTrustRegistryModule } from "@docknetwork/credential-sdk/modules/trust-registry";
+import { AbstractTrustRegistryModule } from '@docknetwork/credential-sdk/modules/trust-registry';
 import {
   TrustRegistryInfo,
   DockTrustRegistryId,
   TrustRegistries,
   TrustRegistry,
   DockDidOrDidMethodKey,
-} from "@docknetwork/credential-sdk/types";
-import { option } from "@docknetwork/credential-sdk/types/generic";
-import { injectDock } from "../common";
-import DockInternalTrustRegistryModule from "./internal";
+} from '@docknetwork/credential-sdk/types';
+import { option } from '@docknetwork/credential-sdk/types/generic';
+import { injectDock } from '../common';
+import DockInternalTrustRegistryModule from './internal';
 
 export default class DockTrustRegistryModule extends injectDock(
-  AbstractTrustRegistryModule
+  AbstractTrustRegistryModule,
 ) {
   static DockOnly = DockInternalTrustRegistryModule;
 
@@ -37,8 +37,8 @@ export default class DockTrustRegistryModule extends injectDock(
 
     return new TrustRegistries(
       await Promise.all(
-        [...ids].map(async (id) => [id, await this.getRegistry(id)])
-      )
+        [...ids].map(async (id) => [id, await this.getRegistry(id)]),
+      ),
     );
   }
 
@@ -50,7 +50,7 @@ export default class DockTrustRegistryModule extends injectDock(
       info.name,
       info.govFramework,
       didKeypair,
-      nonce
+      nonce,
     );
 
     const setSchemas = await this.dockOnly.setSchemasMetadataTx(
@@ -58,7 +58,7 @@ export default class DockTrustRegistryModule extends injectDock(
       id,
       { Set: schemas },
       didKeypair,
-      nonce.inc()
+      nonce.inc(),
     );
 
     return await this.dockOnly.apiProvider.batchAll([init, setSchemas]);

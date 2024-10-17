@@ -1,11 +1,11 @@
-import { Null, TypedNumber, TypedStruct } from "../../generic";
+import { Null, TypedNumber, TypedStruct } from '../../generic';
 
-export * from "./constants";
-export * from "./typed-did";
-export * from "./controllers";
-export * from "./verification-relationship";
-export * from "./did-key";
-export * from "./verification-method-signature";
+export * from './constants';
+export * from './typed-did';
+export * from './controllers';
+export * from './verification-relationship';
+export * from './did-key';
+export * from './verification-method-signature';
 
 export class DidMethodKeyDetails extends TypedStruct {
   static Classes = {

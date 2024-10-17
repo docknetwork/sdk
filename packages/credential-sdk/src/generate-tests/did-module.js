@@ -54,7 +54,7 @@ export default function generateDIDModuleTests(
     expect((await module.getDocument(did)).toJSON()).toEqual(document.toJSON());
   });
 
-  test('Updates with `DIDDocument` containing BBS/BBSPlus/PS keys', async () => {
+  test('Updates `DIDDocument` containing BBS/BBSPlus/PS keys', async () => {
     const did = DID.random();
 
     const keyPair = Ed25519Keypair.random();
@@ -105,7 +105,6 @@ export default function generateDIDModuleTests(
       service1,
       service2,
     });
-    console.log(document.toJSON());
 
     await module.createDocument(document, didKeypair);
 

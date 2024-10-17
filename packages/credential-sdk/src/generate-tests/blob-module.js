@@ -7,7 +7,7 @@ export default function generateBlobModuleTests(
   { did: didModule, blob: blobModule },
   { DID, BlobId },
 ) {
-  it('Generates a `DIDDocument` and creates a blob owned by this DID', async () => {
+  it('Generates a `DIDDocument` and creates a `Blob` owned by this DID', async () => {
     const did = DID.random();
 
     const keyPair = Ed25519Keypair.random();

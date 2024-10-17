@@ -154,16 +154,22 @@ export const NamespaceDid = withQualifier(
 );
 
 class DockNamespaceDid extends NamespaceDid {
+  static Qualifier = 'did:dock:';
+
   static Type = 'dock';
 
   static Class = DockDidValueToString;
 }
 class DidNamespaceKey extends NamespaceDid {
+  static Qualifier = 'did:key:';
+
   static Type = 'didMethodKey';
 
   static Class = DidMethodKeyPublicKeyToString;
 }
 class CheqdNamespaceDid extends NamespaceDid {
+  static Qualifier = 'did:cheqd:';
+
   static Type = 'cheqd';
 
   static Class = CheqdDid;

@@ -26,7 +26,7 @@ describe("`DIDDocument`", () => {
   const CAP_INV = new VerificationRelationship().setCapabilityInvocation();
   const KEY_AGR = new VerificationRelationship().setKeyAgreement();
 
-  test(`DIDDocument.from works`, () => {
+  test(`\`DIDDocument.from\` works`, () => {
     const doc = {
       "@context": ["test"],
       id: "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",

@@ -10,7 +10,7 @@ export default function generateAttestModuleTests(
 ) {
   const test = itIf(filter);
 
-  test('Generates a `DIDDocument` and appends an attestation to it', async () => {
+  test('Generates a `DIDDocument` and appends an `Attest` to it', async () => {
     const did = DID.random();
 
     const keyPair = Ed25519Keypair.random();

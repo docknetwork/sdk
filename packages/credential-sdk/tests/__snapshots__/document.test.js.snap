@@ -187,7 +187,7 @@ exports[`\`DIDDocument\` \`DIDDocument.create\` works 4`] = `
 }
 `;
 
-exports[`\`DIDDocument\` DIDDocument.from works 1`] = `
+exports[`\`DIDDocument\` \`DIDDocument.from\` works 1`] = `
 {
   "@context": [
     "test",

@@ -72,7 +72,7 @@ describe("Basic DID tests", () => {
     );
 
     const att1 = await modules.attest.getAttests(testDidMethodKey1);
-    expect(att1).toEqual(iri);
+    expect(att1.value).toEqual(iri);
 
     await modules.attest.setClaim(
       iri,
@@ -81,7 +81,7 @@ describe("Basic DID tests", () => {
     );
 
     const att2 = await modules.attest.getAttests(testDidMethodKey2);
-    expect(att2).toEqual(iri);
+    expect(att2.value).toEqual(iri);
   }, 30000);
 
   test("Conversion works properly (including SS58 format)", () => {

@@ -1,7 +1,9 @@
-import { DidMethodKeyPublicKey } from './did-method-key';
-import DockDidValue from './dock-did-value';
-import { TypedEnum, withQualifier } from '../../../generic';
+import { DidMethodKeyPublicKey, DidMethodKeySignature } from './did-method-key';
+import DockDidValue, { DockDidSignature } from './dock-did-value';
+import { TypedEnum, TypedTuple, withQualifier } from '../../../generic';
 import { CheqdDid } from './cheqd-did';
+import { withExtendedStaticProperties } from '../../../../utils';
+import DidOrDidMethodKeySignature from './signature';
 
 export const DockDidOrDidMethodKey = withQualifier(
   class DockDidOrDidMethodKey extends TypedEnum {
@@ -19,20 +21,16 @@ export const DockDidOrDidMethodKey = withQualifier(
     /**
      * Creates signature for the state change with supplied arguments.
      *
-     * @param api
+     * @param apiProvider
      * @param name
      * @param payload
      * @param keyRef
      * @returns {object}
      */
     async signStateChange(apiProvider, name, payload, keyRef) {
-      // eslint-disable-next-line no-param-reassign
-      payload.nonce ??= 1 + (await apiProvider.nonce(this));
-      if (
-        Number(process.env.LOG_STATE_CHANGE)
-        || Boolean(process.env.LOG_STATE_CHANGE)
-      ) {
-        console.log('State change:', name, '=>', payload);
+      const { LOG_STATE_CHANGE } = process.env;
+      if (Number(LOG_STATE_CHANGE) || Boolean(LOG_STATE_CHANGE)) {
+        console.dir(payload, { depth: null });
       }
       const bytes = await apiProvider.stateChangeBytes(name, payload);
 
@@ -49,8 +47,10 @@ export const DockDidOrDidMethodKey = withQualifier(
      * @param keyRef
      */
     async changeState(api, method, name, payload, keyRef) {
-      const signature = await this.signStateChange(api, name, payload, keyRef);
-      return await method(payload, signature);
+      return await method(
+        payload,
+        await this.signStateChange(api, name, payload, keyRef),
+      );
     }
 
     toString() {
@@ -153,22 +153,78 @@ export const NamespaceDid = withQualifier(
 );
 
 class DockNamespaceDid extends NamespaceDid {
+  static Qualifier = 'did:dock:';
+
   static Type = 'dock';
 
   static Class = DockDidValueToString;
 }
 class DidNamespaceKey extends NamespaceDid {
+  static Qualifier = 'did:key:';
+
   static Type = 'didMethodKey';
 
   static Class = DidMethodKeyPublicKeyToString;
 }
 class CheqdNamespaceDid extends NamespaceDid {
+  static Qualifier = 'did:cheqd:';
+
   static Type = 'cheqd';
 
   static Class = CheqdDid;
 }
 
 NamespaceDid.bindVariants(DockNamespaceDid, DidNamespaceKey, CheqdNamespaceDid);
+
+export class DIDRef extends withExtendedStaticProperties(
+  ['Ident'],
+  withQualifier(TypedTuple),
+) {
+  static Qualifier = '';
+
+  static get Classes() {
+    return [NamespaceDid, this.Ident];
+  }
+
+  static random(did) {
+    return new this(did, this.Ident.random());
+  }
+
+  get did() {
+    return this[0];
+  }
+
+  get value() {
+    return this[1];
+  }
+
+  static fromUnqualifiedString(str) {
+    const regex = new RegExp(`^${this.Qualifier}([^#]+):(.+)$`);
+    const match = str.match(regex);
+
+    if (!match) {
+      throw new Error(`Invalid format for DID reference: \`${str}\``);
+    }
+
+    const [, did, value] = match;
+    return new this(did, value);
+  }
+
+  toEncodedString() {
+    const { did, value } = this;
+
+    return `${did}:${value}`;
+  }
+
+  toJSON() {
+    return this.toString();
+  }
+}
+
+DidOrDidMethodKeySignature.bindVariants(
+  DockDidSignature,
+  DidMethodKeySignature,
+);
 
 export { DockDidValue, DidMethodKeyPublicKey };
 export * from './cheqd-did';

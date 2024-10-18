@@ -2,7 +2,7 @@
 
 import VerifiableCredential from "../src/vc/verifiable-credential";
 import { Schema } from "../src/modules/schema";
-import { BlobId } from "../src/types/blob";
+import { DockBlobId } from "../src/types/blob";
 
 import { expandJSONLD } from "../src/vc/helpers";
 
@@ -39,17 +39,10 @@ describe("VerifiableCredential Tests", () => {
 
 describe("Basic Schema Tests", () => {
   let schema;
-  beforeAll(async () => {
-    schema = new Schema();
-  }, 10000);
 
-  test("accepts the id optionally and generates id of correct size when id is not given", () => {
-    const schemaNoID = new Schema();
-    const encodedIDByteSize = 48;
-    expect(String(schemaNoID.id).length).toBe(
-      encodedIDByteSize + BlobId.Qualifier.length
-    );
-  });
+  beforeAll(async () => {
+    schema = new Schema(DockBlobId.random());
+  }, 10000);
 
   test("setJSONSchema will only accept valid JSON schema and set the schema key of the object.", async () => {
     await expect(
@@ -88,7 +81,7 @@ describe("Basic Schema Tests", () => {
 });
 
 describe("Validate Credential Schema utility", () => {
-  const schema = new Schema();
+  const schema = new Schema(DockBlobId.random());
   schema.setJSONSchema(exampleSchema);
 
   let expandedCredential;

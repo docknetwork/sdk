@@ -49,10 +49,5 @@ export class CheqdMainnetDid extends CheqdDid {
 
   static Type = 'mainnet';
 }
-export class CheqdGenericDid extends CheqdDid {
-  static Class = CheqdDidValue;
 
-  static Type = 'generic';
-}
-
-CheqdDid.bindVariants(CheqdTestnetDid, CheqdMainnetDid, CheqdGenericDid);
+CheqdDid.bindVariants(CheqdTestnetDid, CheqdMainnetDid);

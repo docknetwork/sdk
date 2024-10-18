@@ -2,11 +2,11 @@ import {
   TypedStruct,
   TypedNumber,
 } from '@docknetwork/credential-sdk/types/generic';
-import { BlobWithDockId } from './types';
+import { DockBlobWithId } from '@docknetwork/credential-sdk/types';
 
 export class AddBlob extends TypedStruct {
   static Classes = {
-    blob: BlobWithDockId,
+    blob: DockBlobWithId,
     nonce: class Nonce extends TypedNumber {},
   };
 }

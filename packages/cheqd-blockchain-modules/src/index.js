@@ -1,9 +1,9 @@
 import { AbstractCoreModules } from '@docknetwork/credential-sdk/modules';
 import CheqdAttestModule from './attest/module';
+import CheqdBlobModule from './blob/module';
 import CheqdDIDModule from './did/module';
 // import CheqdAccumulatorModule from './accumulator/module';
 // import CheqdAnchorModule from './anchor/module';
-// import CheqdBlobModule from './blob/module';
 // import CheqdOffchainSignaturesModule from './offchain-signatures/module';
 // import CheqdBBSModule from './offchain-signatures/bbs';
 // import CheqdBBSPlusModule from './offchain-signatures/bbs-plus';
@@ -18,7 +18,7 @@ export class CheqdCoreModules extends AbstractCoreModules {
 
   static AttestModule = CheqdAttestModule;
 
-  // static BlobModule = CheqdBlobModule;
+  static BlobModule = CheqdBlobModule;
 
   static DIDModule = CheqdDIDModule;
 
@@ -38,9 +38,10 @@ export class CheqdCoreModules extends AbstractCoreModules {
 export {
   CheqdAttestModule,
   CheqdDIDModule,
+  CheqdBlobModule,
   // CheqdAccumulatorModule,
   // CheqdAnchorModule,
-  // CheqdBlobModule,
+  // ,
   // CheqdOffchainSignaturesModule,
   // CheqdBBSModule,
   // CheqdBBSPlusModule,

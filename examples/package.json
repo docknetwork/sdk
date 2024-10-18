@@ -2,7 +2,7 @@
   "name": "@docknetwork/sdk-examples",
   "private": true,
   "type": "module",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "scripts": {
     "bbs-dock-example": "babel-node --loader=./loader.mjs ./bbs-dock.js",
     "claim-deduction-example": "babel-node --loader=./loader.mjs ./claim-deduction.js",
@@ -19,9 +19,9 @@
     "lint": "eslint \"*.js\""
   },
   "dependencies": {
-    "@docknetwork/credential-sdk": "0.2.0",
-    "@docknetwork/dock-blockchain-api": "0.1.2",
-    "@docknetwork/dock-blockchain-modules": "0.2.0"
+    "@docknetwork/credential-sdk": "0.3.0",
+    "@docknetwork/dock-blockchain-api": "0.2.0",
+    "@docknetwork/dock-blockchain-modules": "0.3.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",

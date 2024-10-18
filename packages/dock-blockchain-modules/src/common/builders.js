@@ -29,10 +29,17 @@ export const createDIDMethodWithPolicyTx = (fnName) => {
 
       const [didKeypair] = args.slice(root.payload[fnName].length - 2);
       const { did: signer } = ensureInstanceOf(didKeypair, DidKeypair);
-      // eslint-disable-next-line no-param-reassign
-      args[root.payload[fnName].length - 1]
-        ??= 1 + (await root.apiProvider.didNonce(didKeypair.did));
-      const { data, nonce } = root.payload[fnName].apply(this.root, args);
+
+      const handlePayload = (maybeDidNonce) => {
+        // eslint-disable-next-line no-param-reassign
+        args[root.payload[fnName].length - 1] ??= maybeDidNonce.inc();
+
+        return root.payload[fnName].apply(this.root, args);
+      };
+
+      const { data, nonce } = args[root.payload[fnName].length - 1] == null
+        ? await root.apiProvider.withDidNonce(didKeypair.did, handlePayload)
+        : handlePayload();
 
       const sig = await DockDidOrDidMethodKey.from(signer).signStateChange(
         root.apiProvider,
@@ -59,16 +66,25 @@ export const createDIDMethodTx = (fnName) => {
 
       const [didKeypair] = args.slice(root.payload[fnName].length - 2);
       ensureInstanceOf(didKeypair, DidKeypair);
-      // eslint-disable-next-line no-param-reassign
-      args[root.payload[fnName].length - 1]
-        ??= 1 + (await root.apiProvider.didNonce(didKeypair.did));
+
+      // eslint-disable-next-line
+      const handlePayload = (maybeDidNonce) => {
+        // eslint-disable-next-line no-param-reassign
+        args[root.payload[fnName].length - 1] ??= maybeDidNonce.inc();
+
+        return root.payload[fnName].apply(this.root, args);
+      };
+
+      const payload = args[root.payload[fnName].length - 1] == null
+        ? await root.apiProvider.withDidNonce(didKeypair.did, handlePayload)
+        : handlePayload();
 
       return await DockDidOrDidMethodKey.from(didKeypair.did).changeState(
         root.apiProvider,
         root.rawTx[fnName],
         root.constructor.MethodNameOverrides?.[fnName]
           ?? fnNameToMethodName(fnName),
-        root.payload[fnName].apply(this.root, args),
+        payload,
         didKeypair,
       );
     },

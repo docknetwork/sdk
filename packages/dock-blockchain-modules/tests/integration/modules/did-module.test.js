@@ -26,7 +26,7 @@ describe("DIDModule", () => {
 
   didModuleTests(
     { did: new DockDIDModule(dock) },
-    DockDid,
+    { DID: DockDid },
     (name) =>
       name !== "Creates `DIDDocument` containing BBS/BBSPlus/PS keys" &&
       name !== "Creates `DIDDocument` containing services"

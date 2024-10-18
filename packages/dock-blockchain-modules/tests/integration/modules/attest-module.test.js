@@ -27,6 +27,6 @@ describe("AttestModule", () => {
 
   generateAttestModuleTests(
     { did: new DockDIDModule(dock), attest: new DockAttestModule(dock) },
-    DockDid
+    { DID: DockDid }
   );
 });

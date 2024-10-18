@@ -40,7 +40,7 @@ class DockApiProvider extends ApiProvider {
     if (typeof this.dock.withDidNonce === 'function') {
       return await this.dock.withDidNonce(did, fn);
     } else {
-      return await fn(await new DockDIDModuleInternal(this).nonce(did));
+      return fn(await new DockDIDModuleInternal(this).nonce(did));
     }
   }
 

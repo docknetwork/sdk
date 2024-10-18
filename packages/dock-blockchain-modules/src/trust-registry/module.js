@@ -52,7 +52,7 @@ export default class DockTrustRegistryModule extends injectDock(
           info.name,
           info.govFramework,
           didKeypair,
-          nonce,
+          nonce.inc(),
         );
 
         const setSchemas = await this.dockOnly.setSchemasMetadataTx(

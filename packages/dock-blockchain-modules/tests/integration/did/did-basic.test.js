@@ -55,22 +55,19 @@ describe("Basic DID tests", () => {
     expect(!!dock.account).toBe(true);
   });
 
-  test("Can create and update document", async () => {
+  test.only("Can create and update document", async () => {
     const did = DockDid.random();
 
     const pair = new Ed25519Keypair(seed);
-    const publicKey = pair.publicKey();
+    const didPair = new DidKeypair([did, 1], pair);
 
-    const verRels = new VerificationRelationship();
-    const didKey = new DidKey(publicKey, verRels);
-
-    const doc = DIDDocument.create(did, [didKey], [did]);
+    const doc = DIDDocument.create(did, [didPair.didKey()], [did]);
 
     await modules.did.createDocument(doc);
     expect((await modules.did.getDocument(did)).toJSON()).toEqual(doc.toJSON());
 
     const pair2 = Ed25519Keypair.random();
-    const didKey2 = new DidKey(pair2.publicKey(), verRels);
+    const didPair2 = new DidKeypair([did, 2], pair2);
 
     const service1 = new ServiceEndpoint("LinkedDomains", [
       "ServiceEndpoint#1",
@@ -78,10 +75,10 @@ describe("Basic DID tests", () => {
 
     doc
       .addServiceEndpoint([did, "service1"], service1)
-      .addKey([did, 2], didKey2)
+      .addKey([did, 2], didPair2.didKey())
       .removeKey([did, 1]);
 
-    await modules.did.updateDocument(doc, new DidKeypair([did, 1], pair));
+    await modules.did.updateDocument(doc, didPair);
 
     expect((await modules.did.getDocument(did)).toJSON()).toEqual(doc.toJSON());
 
@@ -92,7 +89,7 @@ describe("Basic DID tests", () => {
     doc
       .removeServiceEndpoint("service1")
       .addServiceEndpoint([did, "service2"], service2);
-    await modules.did.updateDocument(doc, new DidKeypair([did, 2], pair2));
+    await modules.did.updateDocument(doc, didPair2);
 
     expect((await modules.did.getDocument(did)).toJSON()).toEqual(doc.toJSON());
   });

@@ -17,12 +17,18 @@ alice_container_id=$(
         --alice --rpc-external --ws-external
 )
 
+cleanup() {
+  docker kill $alice_container_id
+}
+
 try_with_node() {
 	# Wait for nodes to start listening for RPC
 	"$root_dir"/scripts/wait_for_node_rpc_http
 	# Execute the commands, potentially against the nodes
 	$@
 }
+
+trap cleanup SIGINT
 
 if try_with_node $@; then
 	exit_code=$?
@@ -31,6 +37,6 @@ else
 fi
 
 # Kill nodes
-docker kill $alice_container_id
+cleanup
 
 exit $exit_code

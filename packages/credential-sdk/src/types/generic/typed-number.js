@@ -17,6 +17,18 @@ class TypedNumber extends withBase(class NumberBase {}) {
     this.value = num;
   }
 
+  inc() {
+    return new this.constructor(++this.value);
+  }
+
+  dec() {
+    return new this.constructor(--this.value);
+  }
+
+  toJSON() {
+    return this.value;
+  }
+
   static from(value) {
     if (value instanceof this) {
       return value;
@@ -25,22 +37,6 @@ class TypedNumber extends withBase(class NumberBase {}) {
     } else {
       return new this(value);
     }
-  }
-
-  toJSON() {
-    return this.value;
-  }
-
-  inc() {
-    this.value++;
-
-    return this;
-  }
-
-  dec() {
-    this.value--;
-
-    return this;
   }
 
   static fromJSON(value) {

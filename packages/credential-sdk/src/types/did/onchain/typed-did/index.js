@@ -29,7 +29,6 @@ export const DockDidOrDidMethodKey = withQualifier(
      */
     async signStateChange(apiProvider, name, payload, keyRef) {
       const { LOG_STATE_CHANGE } = process.env;
-
       if (Number(LOG_STATE_CHANGE) || Boolean(LOG_STATE_CHANGE)) {
         console.dir(payload, { depth: null });
       }

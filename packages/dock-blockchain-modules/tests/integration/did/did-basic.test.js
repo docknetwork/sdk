@@ -55,7 +55,7 @@ describe("Basic DID tests", () => {
     expect(!!dock.account).toBe(true);
   });
 
-  test.only("Can create and update document", async () => {
+  test("Can create and update document", async () => {
     const did = DockDid.random();
 
     const pair = new Ed25519Keypair(seed);

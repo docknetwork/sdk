@@ -167,7 +167,7 @@ describe("Basic DID tests", () => {
     await modules.attest.setClaim(iri, dockDid, pair);
 
     const att = await modules.attest.getAttests(dockDid);
-    expect(att).toEqual(iri);
+    expect(att.value).toEqual(iri);
 
     // Get document to verify the claim is there
     const didDocument = await modules.did.getDocument(dockDid);

@@ -11,7 +11,7 @@ export default class DockAttestModule extends injectDock(AbstractAttestModule) {
    * @return {Promise<Iri | null>} The DID's attestation, if any
    */
   async getAttests(did) {
-    return (await this.dockOnly.attest(did)).iri?.value;
+    return (await this.dockOnly.attest(did)).iri;
   }
 
   /**

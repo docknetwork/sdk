@@ -110,66 +110,65 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
       );
     }
 
-    const nonce = await this.dockOnly.apiProvider.didNonce(signerDid);
+    const txs = (
+      await this.dockOnly.apiProvider.withDidNonce(signerDid, (nonce) => Promise.all([
+        newOnChainKeys.length
+            && this.dockOnly.tx.addKeys(
+              [...newOnChainKeys].map(([_, key]) => key),
+              did,
+              didKeypair,
+              nonce.inc(),
+            ),
+        newControllers.length
+            && this.dockOnly.tx.addControllers(
+              newControllers,
+              did,
+              didKeypair,
+              nonce.inc(),
+            ),
+        ...newOffchainKeys.map(([_, key]) => this.offchainSignatures.dockOnly.tx.addPublicKey(
+          key.publicKey,
+          did,
+          didKeypair,
+          nonce.inc(),
+        )),
+        ...[...newServices].map(({ id, type, serviceEndpoint }) => this.dockOnly.tx.addServiceEndpoint(
+          id,
+          type,
+          serviceEndpoint,
+          did,
+          didKeypair,
+          nonce.inc(),
+        )),
+        ...[...removedServices].map(({ id }) => this.dockOnly.tx.removeServiceEndpoint(id, didKeypair, nonce.inc())),
+        ...removedOffchainKeys.map(([{ index }]) => this.offchainSignatures.dockOnly.tx.removePublicKey(
+          index,
+          did,
+          didKeypair,
+          nonce.inc(),
+        )),
+        removedControllers.length
+            && this.dockOnly.tx.removeControllers(
+              removedControllers,
+              did,
+              didKeypair,
+              nonce.inc(),
+            ),
+        removedOnChainKeys.length
+            && this.dockOnly.tx.removeKeys(
+              [...removedOnChainKeys].map(([{ index }]) => index),
+              did,
+              didKeypair,
+              nonce.inc(),
+            ),
+      ]))
+    ).filter(Boolean);
 
-    const txs = [
-      newOnChainKeys.length
-        && this.dockOnly.tx.addKeys(
-          [...newOnChainKeys].map(([_, key]) => key),
-          did,
-          didKeypair,
-          nonce.inc(),
-        ),
-      newControllers.length
-        && this.dockOnly.tx.addControllers(
-          newControllers,
-          did,
-          didKeypair,
-          nonce.inc(),
-        ),
-      ...newOffchainKeys.map(([_, key]) => this.offchainSignatures.dockOnly.tx.addPublicKey(
-        key.publicKey,
-        did,
-        didKeypair,
-        nonce.inc(),
-      )),
-      ...[...newServices].map(({ id, type, serviceEndpoint }) => this.dockOnly.tx.addServiceEndpoint(
-        id,
-        type,
-        serviceEndpoint,
-        did,
-        didKeypair,
-        nonce.inc(),
-      )),
-      ...[...removedServices].map(({ id }) => this.dockOnly.tx.removeServiceEndpoint(id, didKeypair, nonce.inc())),
-      ...removedOffchainKeys.map(([{ index }]) => this.offchainSignatures.dockOnly.tx.removePublicKey(
-        index,
-        did,
-        didKeypair,
-        nonce.inc(),
-      )),
-      removedControllers.length
-        && this.dockOnly.tx.removeControllers(
-          removedControllers,
-          did,
-          didKeypair,
-          nonce.inc(),
-        ),
-      removedOnChainKeys.length
-        && this.dockOnly.tx.removeKeys(
-          [...removedOnChainKeys].map(([{ index }]) => index),
-          did,
-          didKeypair,
-          nonce.inc(),
-        ),
-    ];
-
-    const filteredTxs = (await Promise.all(txs)).filter(Boolean);
-    if (!filteredTxs.length) {
+    if (!txs.length) {
       throw new Error(`No changes for ${did}`);
     }
 
-    return await this.dockOnly.apiProvider.batchAll(filteredTxs);
+    return await this.dockOnly.apiProvider.batchAll(txs);
   }
 
   async removeDocumentTx(did, didKeypair) {

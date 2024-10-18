@@ -29,20 +29,32 @@ export const createDIDMethodWithPolicyTx = (fnName) => {
 
       const [didKeypair] = args.slice(root.payload[fnName].length - 2);
       const { did: signer } = ensureInstanceOf(didKeypair, DidKeypair);
-      // eslint-disable-next-line no-param-reassign
-      args[root.payload[fnName].length - 1]
-        ??= await root.apiProvider.nextDidNonce(didKeypair.did);
-      const { data, nonce } = root.payload[fnName].apply(this.root, args);
 
-      const sig = await DockDidOrDidMethodKey.from(signer).signStateChange(
-        root.apiProvider,
-        root.constructor.MethodNameOverrides?.[fnName]
-          ?? fnNameToMethodName(fnName),
-        { data, nonce },
-        didKeypair,
-      );
+      const signStateChange = async (maybeDidNonce) => {
+        // eslint-disable-next-line no-param-reassign
+        args[root.payload[fnName].length - 1] ??= maybeDidNonce.inc();
 
-      return await root.rawTx[fnName](data, [{ sig, nonce }]);
+        const { data, nonce } = root.payload[fnName].apply(this.root, args);
+
+        const sig = await DockDidOrDidMethodKey.from(signer).signStateChange(
+          root.apiProvider,
+          root.constructor.MethodNameOverrides?.[fnName]
+            ?? fnNameToMethodName(fnName),
+          { data, nonce },
+          didKeypair,
+        );
+
+        return await root.rawTx[fnName](data, [{ sig, nonce }]);
+      };
+
+      if (args[root.payload[fnName].length - 1] == null) {
+        return await root.apiProvider.withDidNonce(
+          didKeypair.did,
+          signStateChange,
+        );
+      } else {
+        return await signStateChange();
+      }
     },
   };
 
@@ -59,18 +71,26 @@ export const createDIDMethodTx = (fnName) => {
 
       const [didKeypair] = args.slice(root.payload[fnName].length - 2);
       ensureInstanceOf(didKeypair, DidKeypair);
-      // eslint-disable-next-line no-param-reassign
-      args[root.payload[fnName].length - 1]
-        ??= await root.apiProvider.nextDidNonce(didKeypair.did);
 
-      return await DockDidOrDidMethodKey.from(didKeypair.did).changeState(
-        root.apiProvider,
-        root.rawTx[fnName],
-        root.constructor.MethodNameOverrides?.[fnName]
-          ?? fnNameToMethodName(fnName),
-        root.payload[fnName].apply(this.root, args),
-        didKeypair,
-      );
+      const changeState = async (maybeDidNonce) => {
+        // eslint-disable-next-line no-param-reassign
+        args[root.payload[fnName].length - 1] ??= maybeDidNonce.inc();
+
+        return await DockDidOrDidMethodKey.from(didKeypair.did).changeState(
+          root.apiProvider,
+          root.rawTx[fnName],
+          root.constructor.MethodNameOverrides?.[fnName]
+            ?? fnNameToMethodName(fnName),
+          root.payload[fnName].apply(this.root, args),
+          didKeypair,
+        );
+      };
+
+      if (args[root.payload[fnName].length - 1] == null) {
+        return await root.apiProvider.withDidNonce(didKeypair.did, changeState);
+      } else {
+        return await changeState();
+      }
     },
   };
 

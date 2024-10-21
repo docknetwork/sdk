@@ -187,7 +187,7 @@
 <li>
 <p><strong>Generate a Random Status List ID:</strong>
 Create a unique identifier for tracking revocation status.</p>
-<pre><code class="language-javascript">import { DockStatusListCredentialId } from '@docknetwork/credential-sdk/types';
+<pre><code class="language-javascript">import { DockStatusListCredentialId } from "@docknetwork/credential-sdk/types";
 
 const statusListCredentialId = DockStatusListCredentialId.random();
 </code></pre>
@@ -232,13 +232,13 @@ unsignedCred = addStatusList21EntryToCredential(
 <li>
 <p><strong>Issue Credential:</strong>
 Sign and issue the credential with the added status list entry.</p>
-<pre><code class="language-javascript">import { addStatusList21EntryToCredential } from '@docknetwork/credential-sdk/vc';
+<pre><code class="language-javascript">import { addStatusList21EntryToCredential } from "@docknetwork/credential-sdk/vc";
 
 const credential = await issueCredential(
   issuerKey,
   unsignedCred,
   void 0,
-  defaultDocumentLoader(resolver),
+  defaultDocumentLoader(resolver)
 );
 </code></pre>
 </li>
@@ -248,7 +248,10 @@ const credential = await issueCredential(
 <li>
 <p><strong>Fetch and Update Status List:</strong>
 Retrieve the existing status list credential and update it to revoke the issued credential by its index.</p>
-<pre><code class="language-javascript">const fetchedCred = await modules.statusListCredential.getStatusListCredential(statusListCredentialId);
+<pre><code class="language-javascript">const fetchedCred =
+  await modules.statusListCredential.getStatusListCredential(
+    statusListCredentialId
+  );
 await fetchedCred.update(issuerKey, {
   revokeIndices: [statusListCredentialIndex], // Index of the credential to revoke
 });
@@ -257,7 +260,7 @@ await modules.statusListCredential.updateStatusListCredential(
   statusListCredentialId,
   fetchedCred,
   issuerDID,
-  issuerKeyPair,
+  issuerKeyPair
 );
 </code></pre>
 </li>

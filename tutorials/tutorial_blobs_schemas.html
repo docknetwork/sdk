@@ -229,7 +229,7 @@ mentioned, the chain is agnostic to the contents of blobs and thus to schemas.</
 <h3 id="creating-a-schema"><a class="header" href="#creating-a-schema">Creating a Schema</a></h3>
 <p>The first step to creating a Schema is to initialize it, we can do that using the <code>Schema</code> class constructor which
 accepts an (optional) <code>id</code> string as sole argument:</p>
-<pre><code class="language-javascript">const myNewSchema = new Schema();
+<pre><code class="language-javascript">const myNewSchema = new Schema(DockBlobId.random());
 </code></pre>
 <p>When an <code>id</code> isn't passed, a random <code>blobId</code> will be assigned as the schema's id.</p>
 <pre><code class="language-javascript">&gt; myNewSchema.id

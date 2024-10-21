@@ -6,6 +6,7 @@ import {
   DIDDocument,
   DidKey,
   VerificationRelationship,
+  DockBlobId,
 } from '@docknetwork/credential-sdk/types';
 import { Schema } from '@docknetwork/credential-sdk/modules';
 import { DockCoreModules } from '@docknetwork/dock-blockchain-modules';
@@ -70,7 +71,7 @@ async function main() {
   await createDID(subjectDID, subjectPair);
 
   console.log('Creating a new schema...');
-  const schema = new Schema();
+  const schema = new Schema(DockBlobId.random());
   await schema.setJSONSchema({
     $schema: 'http://json-schema.org/draft-07/schema#',
     description: 'Dock Schema Example',

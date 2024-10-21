@@ -4,16 +4,16 @@ import { validate } from 'jsonschema';
 // Supported schemas
 import JSONSchema07 from '../../vc/schemas/schema-draft-07';
 import jsonFetch from '../../utils/json-fetch';
-import { BlobId, Blob, BlobWithId } from '../../types';
+import { Blob, BlobWithId } from '../../types';
 
 export default class Schema {
   /**
    * Creates a new `Schema` object
    * @constructor
-   * @param {string} [id] - optional schema ID, if not given, generate a random id
+   * @param {string} [id] - schema ID
    */
-  constructor(id = BlobId.random(32)) {
-    this.id = BlobId.from(id);
+  constructor(id) {
+    this.id = id;
   }
 
   static fromJSON(json) {

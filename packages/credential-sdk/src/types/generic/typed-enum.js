@@ -87,6 +87,22 @@ class TypedEnum extends withBase(class EnumBase {}) {
       });
 
       const that = this;
+
+      // TODO: revisit this
+      if (Class.Variants) {
+        const klassFrom = Class.from;
+
+        for (const Variant of Class.Variants) {
+          Variant.from = function from(value) {
+            if (value instanceof that) {
+              return klassFrom.call(this, value[asIdentifier]);
+            } else {
+              return klassFrom.call(this, value);
+            }
+          };
+        }
+      }
+
       const klassFrom = Class.from;
       Class.from = function from(value) {
         if (value instanceof that) {

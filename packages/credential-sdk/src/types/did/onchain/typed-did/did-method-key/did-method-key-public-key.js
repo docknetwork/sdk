@@ -1,7 +1,7 @@
 import bs58 from 'bs58';
 import { base58btc } from 'multiformats/bases/base58';
 import varint from 'varint';
-import { TypedEnum, withQualifier } from '../../../../generic';
+import { TypedEnum, TypedStruct, withQualifier } from '../../../../generic';
 import {
   PublicKeyEd25519Value,
   PublicKeySecp256k1Value,
@@ -13,6 +13,8 @@ import {
   Ed25519PublicKeyPrefix,
   Secp256k1PublicKeyPrefix,
 } from '../../constants';
+import DidOrDidMethodKeySignature from '../signature';
+import { DidMethodKeySignatureValue } from './did-method-key-signature';
 
 export class DidMethodKeyPublicKey extends withQualifier(TypedEnum) {
   static Qualifier = DidMethodKeyQualifier;
@@ -74,13 +76,25 @@ export class DidMethodKeyPublicKey extends withQualifier(TypedEnum) {
       throw new Error('Expected keypair that has the same key as in `this`');
     }
 
-    return {
-      didMethodKeySignature: {
-        didMethodKey: this,
-        sig: keyPair.sign(bytes),
-      },
-    };
+    // eslint-disable-next-line no-use-before-define
+    return new DidMethodKeySignature(
+      // eslint-disable-next-line no-use-before-define
+      new DidMethodKeySignatureValueObject(this, keyPair.sign(bytes)),
+    );
   }
+}
+
+export class DidMethodKeySignatureValueObject extends TypedStruct {
+  static Classes = {
+    didMethodKey: DidMethodKeyPublicKey,
+    sig: DidMethodKeySignatureValue,
+  };
+}
+
+export class DidMethodKeySignature extends DidOrDidMethodKeySignature {
+  static Type = 'didMethodKeySignature';
+
+  static Class = DidMethodKeySignatureValueObject;
 }
 
 export class DidMethodKeyPublicKeyEd25519 extends DidMethodKeyPublicKey {

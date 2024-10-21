@@ -1,5 +1,4 @@
 import { AbstractDIDModule } from '../../modules/did';
-import { validateDockDIDSS58Identifier } from '../../types/did';
 import DIDResolver from './did-resolver';
 import { ensureInstanceOf } from '../../utils';
 
@@ -20,8 +19,7 @@ class DockDIDResolver extends DIDResolver {
   }
 
   async resolve(qualifiedDid) {
-    const { id, did } = this.parseDid(qualifiedDid);
-    validateDockDIDSS58Identifier(id);
+    const { did } = this.parseDid(qualifiedDid);
 
     const document = await this.didModule.getDocument(did);
 

@@ -36,8 +36,19 @@ import {
   isBytes,
   stringToU8a,
   u8aToString,
+  valueBytes,
   withExtendedStaticProperties,
 } from '../../utils';
+import {
+  BBDT16PublicKey,
+  BBDT16PublicKeyValue,
+  BBSPlusPublicKey,
+  BBSPlusPublicKeyValue,
+  BBSPublicKey,
+  BBSPublicKeyValue,
+  PSPublicKey,
+  PSPublicKeyValue,
+} from '../offchain-signatures';
 
 export const ATTESTS_IRI = 'https://rdf.dock.io/alpha/2021#attestsDocumentContents';
 
@@ -232,6 +243,16 @@ export class DidKeyValueWithRef extends withFrom(
     key: DidKeyValue,
   };
 
+  toVerificationMethod() {
+    // eslint-disable-next-line no-use-before-define
+    return new VerificationMethod(
+      this.ref,
+      this.key.constructor.VerKeyType,
+      this.ref.did,
+      this.key.value.bytes,
+    );
+  }
+
   toJSON() {
     const { ref, key } = this;
 
@@ -346,6 +367,13 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (
     publicKeyHex: option(TypedBytes),
   };
 
+  isOffchain() {
+    return !(
+      this.type instanceof Ed25519Verification2018Method
+      || this.type instanceof Ed25519Verification2020Method
+    );
+  }
+
   publicKey() {
     const bytes = (
       this.publicKeyBase58
@@ -353,6 +381,7 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (
       || this.publicKeyJwk
       || this.publicKeyHex
     )?.bytes;
+
     if (bytes == null) {
       throw new Error(
         `Expected either of ${fmtIter([
@@ -364,25 +393,26 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (
       );
     }
 
-    let PublicKey;
     switch (this.type.type) {
       case Ed25519VerKeyName:
-        PublicKey = PublicKeyEd25519;
-        break;
+        return new PublicKeyEd25519(bytes);
       case Sr25519VerKeyName:
-        PublicKey = PublicKeySr25519;
-        break;
+        return new PublicKeySr25519(bytes);
       case Ed255192020VerKeyName:
-        PublicKey = PublicKeyEd25519;
-        break;
+        return new PublicKeyEd25519(bytes);
       case EcdsaSecp256k1VerKeyName:
-        PublicKey = PublicKeySecp256k1;
-        break;
+        return new PublicKeySecp256k1(bytes);
+      case Bls12381G2VerificationKeyDock2022.Type:
+        return new BBSPlusPublicKey(new BBSPlusPublicKeyValue(bytes));
+      case Bls12381BBSVerificationKeyDock2023.Type:
+        return new BBSPublicKey(new BBSPublicKeyValue(bytes));
+      case Bls12381PSVerificationKeyDock2023.Type:
+        return new PSPublicKey(new PSPublicKeyValue(bytes));
+      case Bls12381BBDT16VerificationKeyDock2024.Type:
+        return new BBDT16PublicKey(new BBDT16PublicKeyValue(bytes));
       default:
         throw new Error(`Unknown key type ${this.type.type}`);
     }
-
-    return new PublicKey(bytes);
   }
 
   static fromDidKey(keyRef, didKey) {
@@ -392,7 +422,7 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (
       ref,
       didKey.publicKey.constructor.VerKeyType,
       ref[0],
-      didKey.publicKey.value,
+      valueBytes(didKey.publicKey),
     );
   }
 
@@ -402,8 +432,12 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (
       this.id,
       this.controller,
       this.type,
-      this.publicKey().value.bytes,
+      valueBytes(this.publicKey()),
     );
+  }
+
+  toDidKeyValueWithRef() {
+    return new DidKeyValueWithRef(this.id, this.publicKey());
   }
 }
 
@@ -419,6 +453,13 @@ export class CheqdVerificationMethod extends withFrom(
     verificationMethodType: VerificationMethodType,
     verificationMaterial: PublicKeyBase58,
   };
+
+  isOffchain() {
+    return !(
+      this.verificationMethodType instanceof Ed25519Verification2018Method
+      || this.verificationMethodType instanceof Ed25519Verification2020Method
+    );
+  }
 
   toVerificationMethod() {
     return new VerificationMethod(
@@ -497,7 +538,7 @@ export class DIDDocument extends TypedStruct {
     verificationMethod: VerificationMethods,
     service: option(Services),
     authentication: option(VerificationMethodReferences),
-    assertionMethod: option(AssertionMethod),
+    assertionMethod: option(VerificationMethodReferences),
     keyAgreement: option(VerificationMethodReferences),
     capabilityInvocation: option(VerificationMethodReferences),
     capabilityDelegation: option(VerificationMethodReferences),
@@ -506,7 +547,7 @@ export class DIDDocument extends TypedStruct {
 
   static create(
     did,
-    keys,
+    keys = [],
     controllers = [],
     serviceEndpoints = {},
     {
@@ -516,7 +557,7 @@ export class DIDDocument extends TypedStruct {
       [ATTESTS_IRI]: attests = null,
     } = {},
   ) {
-    const obj = new this(
+    const doc = new this(
       context,
       did,
       alsoKnownAs,
@@ -532,44 +573,49 @@ export class DIDDocument extends TypedStruct {
     );
 
     let idx = 0;
+    let selfControlled = false;
     for (const key of keys) {
-      obj.addKey([did, ++idx], key);
+      const didKey = DidKey.from(key);
+      doc.addKey([did, ++idx], didKey);
+
+      selfControlled ||= didKey.verRels.isAuthentication();
     }
     for (const [id, serviceEndpoint] of Object.entries(serviceEndpoints)) {
-      obj.addServiceEndpoint([did, id], serviceEndpoint);
+      doc.addServiceEndpoint([did, id], serviceEndpoint);
+    }
+    if (selfControlled && !doc.controller.find((ctrl) => ctrl.eq(did))) {
+      doc.addController(did);
     }
 
-    return obj;
+    return doc;
   }
 
   addKey(keyRef, didKey) {
     const ref = VerificationMethodRef.from(keyRef);
     const key = DidKey.from(didKey);
-    const isVerificationMethod = key.publicKey.constructor.VerificationMethod;
-    const refOrKey = isVerificationMethod
-      ? ref
-      : new DidKeyValueWithRef(keyRef, key.publicKey);
+
+    if (this.verificationMethod.find((existing) => existing.eq(ref))) {
+      throw new Error(`Verification method \`${ref}\` already exists`);
+    }
 
     if (key.verRels.isAuthentication()) {
       this.authentication ||= [];
-      this.authentication.push(refOrKey);
+      this.authentication.push(ref);
     }
     if (key.verRels.isAssertion()) {
       this.assertionMethod ||= [];
-      this.assertionMethod.push(refOrKey);
+      this.assertionMethod.push(ref);
     }
     if (key.verRels.isKeyAgreement()) {
       this.keyAgreement ||= [];
-      this.keyAgreement.push(refOrKey);
+      this.keyAgreement.push(ref);
     }
     if (key.verRels.isCapabilityInvocation()) {
       this.capabilityInvocation ||= [];
-      this.capabilityInvocation.push(refOrKey);
+      this.capabilityInvocation.push(ref);
     }
 
-    if (isVerificationMethod) {
-      this.verificationMethod.push(VerificationMethod.fromDidKey(keyRef, key));
-    }
+    this.verificationMethod.push(VerificationMethod.fromDidKey(ref, key));
 
     return this;
   }
@@ -605,6 +651,8 @@ export class DIDDocument extends TypedStruct {
     // eslint-disable-next-line no-bitwise
     if (~keyIndex) {
       this.verificationMethod.splice(keyIndex, 1);
+    } else {
+      throw new Error(`Verification method with id \`${ref}\` doesn't exist`);
     }
 
     const isNotRef = (value) => !(value.ref ?? value).eq(ref);
@@ -618,6 +666,15 @@ export class DIDDocument extends TypedStruct {
     return this;
   }
 
+  nextKeyIndex() {
+    return (
+      [...this.verificationMethod].reduce(
+        (max, { id: { index } }) => Math.max(max, index ?? 0),
+        0,
+      ) + 1
+    );
+  }
+
   get attests() {
     return this[ATTESTS_IRI];
   }
@@ -626,8 +683,12 @@ export class DIDDocument extends TypedStruct {
     return this.verificationMethod;
   }
 
-  setAttests(iri) {
+  set attests(iri) {
     this[ATTESTS_IRI] = iri;
+  }
+
+  setAttests(iri) {
+    this.attests = iri;
 
     return this;
   }
@@ -668,11 +729,6 @@ export class DIDDocument extends TypedStruct {
 
         return [method.id, new DidKey(method.publicKey(), verRels)];
       })
-      .concat(
-        [...assertionMethod]
-          .filter((v) => v instanceof DidKeyValueWithRef)
-          .map((v) => [v.ref, new DidKey(v.key)]),
-      )
       .filter(Boolean);
 
     return new DidKeys(keys);
@@ -731,6 +787,22 @@ export class CheqdDIDDocument extends TypedStruct {
     versionId: option(VersionId),
   };
 
+  constructor(...args) {
+    super(...args);
+
+    const offchainVerMethod = [
+      ...this.verificationMethod.filter((verMethod) => verMethod.isOffchain()),
+    ].map((verMethod) => verMethod.toVerificationMethod());
+    this.verificationMethod = this.verificationMethod.filter(
+      (verMethod) => !verMethod.isOffchain(),
+    );
+
+    this.assertionMethod = [
+      ...this.assertionMethod,
+      ...[...offchainVerMethod].map((verMethod) => verMethod.toDidKeyValueWithRef()),
+    ];
+  }
+
   toDIDDocument() {
     const {
       context,
@@ -746,15 +818,24 @@ export class CheqdDIDDocument extends TypedStruct {
       service,
     } = this;
 
+    const offchainVerMethod = [
+      ...assertionMethod.filter(
+        (keyRefOrKey) => keyRefOrKey instanceof DidKeyValueWithRef,
+      ),
+    ].map((verMethod) => verMethod.toVerificationMethod());
+    const assertionMethodWithoutOffchainKeys = assertionMethod.filter(
+      (keyRefOrKey) => !(keyRefOrKey instanceof DidKeyValueWithRef),
+    );
+
     return new DIDDocument(
       context,
       id,
       alsoKnownAs,
       controller,
-      verificationMethod,
+      [...verificationMethod, ...offchainVerMethod],
       service,
       authentication,
-      assertionMethod,
+      assertionMethodWithoutOffchainKeys,
       keyAgreement,
       capabilityInvocation,
       capabilityDelegation,

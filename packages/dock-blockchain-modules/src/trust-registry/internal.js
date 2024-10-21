@@ -634,9 +634,11 @@ export default class DockInternalTrustRegistryModule extends createInternalDockM
    * @returns {Promise}
    */
   async getActorDidAndNonce(actorDid, nonce) {
-    const hexDID = DockDidOrDidMethodKey.from(actorDid);
-    const lastNonce = nonce ?? 1 + (await this.apiProvider.didNonce(hexDID));
-    return [hexDID, lastNonce];
+    const actor = DockDidOrDidMethodKey.from(actorDid);
+    const lastNonce = nonce
+      ?? (await this.apiProvider.withDidNonce(actor, (didNonce) => didNonce.inc()));
+
+    return [actor, lastNonce];
   }
 
   /**

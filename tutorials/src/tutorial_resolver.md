@@ -26,10 +26,10 @@ This is how you resolve a Dock DID:
 ```js
 import { DockResolver } from "@docknetwork/credential-sdk/resolver";
 
-// Assuming the presence of Dock API object `dock`
-const dockResolver = new DockResolver(dock);
+// Assuming the presence of modules created using `CheqdCoreModules` or `DockCoreModules` from the API object.
+const dockResolver = new DockResolver(modules);
 // Say you had a DID `did:dock:5D.....`
-const didDocument = dockResolver.resolve("did:dock:5D.....");
+const didDocument = await dockResolver.resolve("did:dock:5D.....");
 ```
 
 ## Creating a resolver class for a different method
@@ -78,7 +78,7 @@ class EtherResolver extends DIDResolver {
 const ethResolver = new EtherResolver(ethereumProviderConfig);
 
 // Say you had a DID `did:ethr:0x6f....`
-const didDocument = ethResolver.resolve("did:ethr:0x6f....");
+const didDocument = await ethResolver.resolve("did:ethr:0x6f....");
 ```
 
 ## Universal resolver
@@ -119,9 +119,9 @@ import {
 class MultiDIDResolver extends DIDResolver {
   static METHOD = WILDCARD;
 
-  constructor(dock) {
+  constructor(modules) {
     super([
-      new DockDIDResolver(dock),
+      new DockDIDResolver(modules.did),
       new EtherResolver(ethereumProviderConfig),
       new UniversalResolver(universalResolverUrl),
     ]);
@@ -131,8 +131,8 @@ class MultiDIDResolver extends DIDResolver {
 const multiResolver = new MultiDIDResolver(resolvers);
 
 // Say you had a DID `did:dock:5D....`, then the `DockResolver` will be used as there a resolver for Dock DID.
-const didDocumentDock = multiResolver.resolve("did:dock:5D....");
+const didDocumentDock = await multiResolver.resolve("did:dock:5D....");
 
 // Say you had a DID `did:btcr:xk....`, then the `UniversalResolver` will be used as there is no resolver for BTC DID.
-const didDocumentBtc = multiResolver.resolve("did:btcr:xk....");
+const didDocumentBtc = await multiResolver.resolve("did:btcr:xk....");
 ```

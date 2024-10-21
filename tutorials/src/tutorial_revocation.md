@@ -1,6 +1,5 @@
 # Revocation
 
-
 This guide provides instructions for managing credential revocation using `StatusList2021Credential`.
 
 ## Prerequisites
@@ -17,7 +16,7 @@ This guide provides instructions for managing credential revocation using `Statu
    Create a unique identifier for tracking revocation status.
 
    ```javascript
-   import { DockStatusListCredentialId } from '@docknetwork/credential-sdk/types';
+   import { DockStatusListCredentialId } from "@docknetwork/credential-sdk/types";
 
    const statusListCredentialId = DockStatusListCredentialId.random();
    ```
@@ -64,13 +63,13 @@ This guide provides instructions for managing credential revocation using `Statu
    Sign and issue the credential with the added status list entry.
 
    ```javascript
-   import { addStatusList21EntryToCredential } from '@docknetwork/credential-sdk/vc';
+   import { addStatusList21EntryToCredential } from "@docknetwork/credential-sdk/vc";
 
    const credential = await issueCredential(
      issuerKey,
      unsignedCred,
      void 0,
-     defaultDocumentLoader(resolver),
+     defaultDocumentLoader(resolver)
    );
    ```
 
@@ -80,7 +79,10 @@ This guide provides instructions for managing credential revocation using `Statu
    Retrieve the existing status list credential and update it to revoke the issued credential by its index.
 
    ```javascript
-   const fetchedCred = await modules.statusListCredential.getStatusListCredential(statusListCredentialId);
+   const fetchedCred =
+     await modules.statusListCredential.getStatusListCredential(
+       statusListCredentialId
+     );
    await fetchedCred.update(issuerKey, {
      revokeIndices: [statusListCredentialIndex], // Index of the credential to revoke
    });
@@ -89,7 +91,7 @@ This guide provides instructions for managing credential revocation using `Statu
      statusListCredentialId,
      fetchedCred,
      issuerDID,
-     issuerKeyPair,
+     issuerKeyPair
    );
    ```
 

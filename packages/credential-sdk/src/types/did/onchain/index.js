@@ -1,6 +1,5 @@
 import { Null, TypedNumber, TypedStruct } from '../../generic';
 
-export * from './utils';
 export * from './constants';
 export * from './typed-did';
 export * from './controllers';

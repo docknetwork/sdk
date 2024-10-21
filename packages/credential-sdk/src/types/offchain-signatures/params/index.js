@@ -29,6 +29,11 @@ export class PSParams extends OffchainSignatureParams {
 
   static Class = PSParamsValue;
 }
+export class BBDT16Params extends OffchainSignatureParams {
+  static Type = 'bbdt16';
+
+  static Class = BBDT16Params;
+}
 
 OffchainSignatureParams.bindVariants(BBSParams, BBSPlusParams, PSParams);
 

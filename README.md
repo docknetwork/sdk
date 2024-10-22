@@ -16,4 +16,4 @@ In essence, the architecture is structured as follows:
 - Specific implementations for the `Dock` and `Cheqd` blockchain modules can be found in `@docknetwork/dock-blockchain-modules`* and `@docknetwork/cheqd-blockchain-modules`, respectively.
 - Basic blockchain connectors for the `Dock` and `Cheqd` blockchain are available through `@docknetwork/dock-blockchain-api`* and `@docknetwork/cheqd-blockchain-api`.
 
-* Dock blockchain will be sunsetted in 2025. [More information.](https://www.dock.io/post/dock-and-cheqd-form-alliance-to-accelerate-global-adoption-of-decentralized-id#stronglong-termstrong)
+* Dock blockchain will be sunset in 2025. [More information.](https://www.dock.io/post/dock-and-cheqd-form-alliance-to-accelerate-global-adoption-of-decentralized-id#stronglong-termstrong)

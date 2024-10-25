@@ -3,61 +3,70 @@ import {
   ensurePrototypeOf,
   withExtendedPrototypeProperties,
   withExtendedStaticProperties,
-} from '../utils';
+} from "../../utils";
 
 /**
  * Base class that must be extended by all API providers.
  */
 export const ApiProvider = withExtendedPrototypeProperties(
-  ['stateChangeBytes', 'signAndSend'],
+  ["isInitialized", "stateChangeBytes", "signAndSend"],
   class ApiProvider {
-    async stateChangeBytes(name, payload) {
-      return await this.apiProvider.stateChangeBytes(name, payload);
+    /**
+     * @returns {boolean}
+     */
+    isInitialized() {
+      throw new Error("Unimplemented");
     }
 
-    async signAndSend(extrinsic, params) {
-      return await this.apiProvider.signAndSend(extrinsic, params);
+    /**
+     * Ensures that the SDK is initialized, throws an error otherwise.
+     *
+     * @returns {this}
+     */
+    ensureInitialized() {
+      if (!this.isInitialized()) {
+        throw new Error("SDK is not initialized.");
+      }
+
+      return this;
     }
-  },
+
+    /**
+     * Ensures that the SDK is not initialized, throws an error otherwise.
+     *
+     * @returns {this}
+     */
+    ensureNotInitialized() {
+      if (this.isInitialized()) {
+        throw new Error("SDK is already initialized.");
+      }
+
+      return this;
+    }
+  }
 );
 
 /**
  * Base module class that must be extended by all modules.
  */
-export const AbstractBaseModule = withExtendedStaticProperties(
-  ['ApiProvider'],
-  class AbstractBaseModule {
-    /**
-     * Class representing an API provider. Must be a successor of the `ApiProvider` class.
-     * @class
-     */
-    static ApiProvider;
-
-    /**
-     * Creates a new instance of the module and sets the api
-     * @constructor
-     * @param {object} apiProvider - API reference
-     * @param signAndSend
-     */
-    constructor(apiProvider) {
-      this.apiProvider = ensureInstanceOf(
-        apiProvider,
-        ensurePrototypeOf(ApiProvider, this.constructor.ApiProvider),
+export class AbstractBaseModule {
+  /**
+   * Signs and sends provided extrinsic.
+   *
+   * @param {*} extrinsic
+   * @param {*} params
+   * @returns {Promise<*>}
+   */
+  async signAndSend(extrinsic, params) {
+    if (this.apiProvider == null) {
+      throw new Error(
+        `Can't sign a transaction because the module doesn't have an \`apiProvider\``
       );
     }
 
-    /**
-     * Signs and sends provided extrinsic.
-     *
-     * @param {*} extrinsic
-     * @param {*} params
-     * @returns {Promise<*>}
-     */
-    async signAndSend(extrinsic, params) {
-      return await this.apiProvider.signAndSend(extrinsic, params);
-    }
-  },
-);
+    return await this.apiProvider.signAndSend(extrinsic, params);
+  }
+}
 
 /**
  * Abstract logic allowing to operate with public keys and parameters.
@@ -101,7 +110,7 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
   async addParams(id, param, targetDid, didKeypair, params) {
     return await this.signAndSend(
       await this.addParamsTx(id, param, targetDid, didKeypair),
-      params,
+      params
     );
   }
 
@@ -116,7 +125,7 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
   async removeParams(id, targetDid, didKeypair, params) {
     return await this.signAndSend(
       await this.removeParamsTx(id, targetDid, didKeypair),
-      params,
+      params
     );
   }
 
@@ -131,7 +140,7 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
   async addPublicKey(id, publicKey, targetDid, didKeypair, params) {
     return await this.signAndSend(
       await this.addPublicKeyTx(id, publicKey, targetDid, didKeypair),
-      params,
+      params
     );
   }
 
@@ -146,7 +155,7 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
   async removePublicKey(id, targetDid, didKeypair, params) {
     return await this.signAndSend(
       await this.removePublicKeyTx(id, targetDid, didKeypair),
-      params,
+      params
     );
   }
 
@@ -157,7 +166,7 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
    * @returns {Promise<Params>}
    */
   async getParams(_did, _id) {
-    throw new Error('Unimplemented');
+    throw new Error("Unimplemented");
   }
 
   /**
@@ -166,7 +175,7 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
    * @returns {Promise<Map<Id, Params>>}
    */
   async getAllParamsByDid(_did) {
-    throw new Error('Unimplemented');
+    throw new Error("Unimplemented");
   }
 
   /**
@@ -176,7 +185,7 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
    * @returns {Promise<Params>}
    */
   async getPublicKey(_did, _id, _includeParams = false) {
-    throw new Error('Unimplemented');
+    throw new Error("Unimplemented");
   }
 
   /**
@@ -185,23 +194,23 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
    * @returns {Promise<Map<Id, Params>>}
    */
   async getAllPublicKeysByDid(_did, _includeParams = false) {
-    throw new Error('Unimplemented');
+    throw new Error("Unimplemented");
   }
 }
 
 export const AbstractWithParamsAndPublicKeys = withExtendedPrototypeProperties(
   [
-    'addParamsTx',
-    'addPublicKeyTx',
-    'removeParamsTx',
-    'removePublicKeyTx',
-    'getParams',
-    'getPublicKey',
-    'getAllParamsByDid',
-    'getAllPublicKeysByDid',
+    "addParamsTx",
+    "addPublicKeyTx",
+    "removeParamsTx",
+    "removePublicKeyTx",
+    "getParams",
+    "getPublicKey",
+    "getAllParamsByDid",
+    "getAllPublicKeysByDid",
   ],
   withExtendedStaticProperties(
-    ['PublicKey', 'Params'],
-    AbstractWithParamsAndPublicKey,
-  ),
+    ["PublicKey", "Params"],
+    AbstractWithParamsAndPublicKey
+  )
 );

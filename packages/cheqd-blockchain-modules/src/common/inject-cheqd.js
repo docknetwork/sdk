@@ -1,5 +1,5 @@
-import { withExtendedStaticProperties } from '@docknetwork/credential-sdk/utils/inheritance';
-import CheqdAPIProvider from './cheqd-api-provider';
+import { withExtendedStaticProperties } from "@docknetwork/credential-sdk/utils/inheritance";
+import CheqdAPIProvider from "./cheqd-api-provider";
 
 export default function injectDock(klass) {
   const name = `withCheqd(${klass.name})`;
@@ -12,17 +12,18 @@ export default function injectDock(klass) {
        */
       static CheqdOnly;
 
-      static ApiProvider = CheqdAPIProvider;
+      constructor(cheqd) {
+        super();
 
-      constructor(dock) {
-        const apiProvider = new CheqdAPIProvider(dock);
+        this.apiProvider = new CheqdAPIProvider(cheqd);
+        this.cheqdOnly = new this.constructor.CheqdOnly(this.apiProvider);
+      }
 
-        super(apiProvider);
-
-        this.cheqdOnly = new this.constructor.CheqdOnly(apiProvider);
+      supportsIdentifier(id) {
+        return this.apiProvider.supportsIdentifier(id);
       }
     },
   };
 
-  return withExtendedStaticProperties(['CheqdOnly'], obj[name]);
+  return withExtendedStaticProperties(["CheqdOnly"], obj[name]);
 }

@@ -3,10 +3,12 @@ import {
   CheqdTestnetDid,
   CheqdBlobId,
 } from "@docknetwork/credential-sdk/types";
-import generateBlobModuleTests from "@docknetwork/credential-sdk/generate-tests/blob-module";
+import { MultiApiBlobModule } from "@docknetwork/credential-sdk/modules";
+import generateBlobModuleTests from "@docknetwork/credential-sdk/modules/tests/blob-module";
 import CheqdDIDModule from "../src/did/module";
 import { faucet } from "./constants";
 import CheqdBlobModule from "../src/blob/module";
+import { MultiApiDIDModule } from "@docknetwork/credential-sdk/modules";
 
 describe("BlobModule", () => {
   const cheqd = new CheqdAPI();
@@ -15,6 +17,7 @@ describe("BlobModule", () => {
     await cheqd.init({
       url: process.env.ENDPOINT_URL || "http://localhost:26657",
       mnemonic: faucet.mnemonic,
+      network: "testnet",
     });
   });
 
@@ -26,6 +29,17 @@ describe("BlobModule", () => {
     {
       did: new CheqdDIDModule(cheqd),
       blob: new CheqdBlobModule(cheqd),
+    },
+    {
+      DID: CheqdTestnetDid,
+      BlobId: CheqdBlobId,
+    }
+  );
+
+  generateBlobModuleTests(
+    {
+      did: new MultiApiDIDModule([new CheqdDIDModule(cheqd)]),
+      blob: new MultiApiBlobModule([new CheqdBlobModule(cheqd)]),
     },
     {
       DID: CheqdTestnetDid,

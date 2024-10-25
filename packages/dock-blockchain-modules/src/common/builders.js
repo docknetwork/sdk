@@ -1,17 +1,19 @@
 import {
   withExtendedStaticProperties,
   ensureInstanceOf,
-} from '@docknetwork/credential-sdk/utils';
-import { DockDidOrDidMethodKey } from '@docknetwork/credential-sdk/types/did';
-import DidKeypair from '@docknetwork/credential-sdk/keypairs/did-keypair';
+} from "@docknetwork/credential-sdk/utils";
+import { DockDidOrDidMethodKey } from "@docknetwork/credential-sdk/types/did";
+import DidKeypair from "@docknetwork/credential-sdk/keypairs/did-keypair";
 
-const fnNameToMethodName = (methodName) => `${methodName[0].toUpperCase()}${methodName.slice(1)}`;
+const fnNameToMethodName = (methodName) =>
+  `${methodName[0].toUpperCase()}${methodName.slice(1)}`;
 
 export const ensureTargetKeypair = (targetDid, didKeypair) => {
   const includes = []
     .concat(didKeypair)
     .some(
-      (keyPair) => String(ensureInstanceOf(keyPair, DidKeypair).did) === String(targetDid),
+      (keyPair) =>
+        String(ensureInstanceOf(keyPair, DidKeypair).did) === String(targetDid)
     );
 
   if (!includes) {
@@ -37,16 +39,17 @@ export const createDIDMethodWithPolicyTx = (fnName) => {
         return root.payload[fnName].apply(this.root, args);
       };
 
-      const { data, nonce } = args[root.payload[fnName].length - 1] == null
-        ? await root.apiProvider.withDidNonce(didKeypair.did, handlePayload)
-        : handlePayload();
+      const { data, nonce } =
+        args[root.payload[fnName].length - 1] == null
+          ? await root.apiProvider.withDidNonce(didKeypair.did, handlePayload)
+          : handlePayload();
 
       const sig = await DockDidOrDidMethodKey.from(signer).signStateChange(
         root.apiProvider,
-        root.constructor.MethodNameOverrides?.[fnName]
-          ?? fnNameToMethodName(fnName),
+        root.constructor.MethodNameOverrides?.[fnName] ??
+          fnNameToMethodName(fnName),
         { data, nonce },
-        didKeypair,
+        didKeypair
       );
 
       return await root.rawTx[fnName](data, [{ sig, nonce }]);
@@ -75,17 +78,18 @@ export const createDIDMethodTx = (fnName) => {
         return root.payload[fnName].apply(this.root, args);
       };
 
-      const payload = args[root.payload[fnName].length - 1] == null
-        ? await root.apiProvider.withDidNonce(didKeypair.did, handlePayload)
-        : handlePayload();
+      const payload =
+        args[root.payload[fnName].length - 1] == null
+          ? await root.apiProvider.withDidNonce(didKeypair.did, handlePayload)
+          : handlePayload();
 
       return await DockDidOrDidMethodKey.from(didKeypair.did).changeState(
         root.apiProvider,
         root.rawTx[fnName],
-        root.constructor.MethodNameOverrides?.[fnName]
-          ?? fnNameToMethodName(fnName),
+        root.constructor.MethodNameOverrides?.[fnName] ??
+          fnNameToMethodName(fnName),
         payload,
-        didKeypair,
+        didKeypair
       );
     },
   };
@@ -101,7 +105,7 @@ export const createCall = (fnName) => {
     async [fnName](...args) {
       const { root } = this;
       const tx = await root.tx[fnName](
-        ...args.slice(0, root.payload[fnName].length),
+        ...args.slice(0, root.payload[fnName].length)
       );
 
       return await root.signAndSend(tx, args[root.payload[fnName].length]);
@@ -119,7 +123,7 @@ export const createCallWithNonce = (fnName) => {
     async [fnName](...args) {
       const { root } = this;
       const tx = await root.tx[fnName](
-        ...args.slice(0, root.payload[fnName].length - 1),
+        ...args.slice(0, root.payload[fnName].length - 1)
       );
 
       return await root.signAndSend(tx, args[root.payload[fnName].length - 1]);
@@ -136,7 +140,7 @@ export const createAccountTx = (fnName) => {
   const obj = {
     async [fnName](...args) {
       return await this.root.rawTx[fnName](
-        ...this.root.payload[fnName].apply(this.root, args),
+        ...this.root.payload[fnName].apply(this.root, args)
       );
     },
   };
@@ -156,7 +160,7 @@ export function createInternalDockModule(
     didMethodsWithPolicy = Object.create(null),
     accountMethods = Object.create(null),
   } = {},
-  baseClass = class DockModuleBaseClass {},
+  baseClass = class DockModuleBaseClass {}
 ) {
   const name = `internalDockModule(${baseClass.name})`;
   class RootPayload extends (baseClass.RootPayload ?? Root) {}
@@ -203,6 +207,10 @@ export function createInternalDockModule(
         return new RootPayload(this);
       }
 
+      supportsIdentifier(id) {
+        return this.apiProvider.supportsIdentifier(id);
+      }
+
       async signAndSend(extrinsic, params) {
         return await this.apiProvider.signAndSend(extrinsic, params);
       }
@@ -227,5 +235,5 @@ export function createInternalDockModule(
     RootSender.prototype[key] = createCall(key);
   }
 
-  return withExtendedStaticProperties(['Prop'], obj[name]);
+  return withExtendedStaticProperties(["Prop"], obj[name]);
 }

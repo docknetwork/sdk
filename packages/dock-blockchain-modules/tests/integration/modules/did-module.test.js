@@ -1,4 +1,4 @@
-import didModuleTests from "@docknetwork/credential-sdk/generate-tests/did-module";
+import didModuleTests from "@docknetwork/credential-sdk/modules/tests/did-module";
 import { DockAPI } from "@docknetwork/dock-blockchain-api";
 import DockDIDModule from "../../../src/did/module";
 import {

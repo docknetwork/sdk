@@ -1,6 +1,7 @@
 import { CheqdAPI } from "@docknetwork/cheqd-blockchain-api";
 import { CheqdTestnetDid } from "@docknetwork/credential-sdk/types";
-import generateAttestModuleTests from "@docknetwork/credential-sdk/generate-tests/attest-module";
+import { MultiApiDIDModule } from "@docknetwork/credential-sdk/modules";
+import generateAttestModuleTests from "@docknetwork/credential-sdk/modules/tests/attest-module";
 import CheqdDIDModule from "../src/did/module";
 import { faucet } from "./constants";
 import CheqdAttestModule from "../src/attest/module";
@@ -12,6 +13,7 @@ describe("AttestModule", () => {
     await cheqd.init({
       url: process.env.ENDPOINT_URL || "http://localhost:26657",
       mnemonic: faucet.mnemonic,
+      network: "testnet",
     });
   });
 
@@ -22,6 +24,14 @@ describe("AttestModule", () => {
   generateAttestModuleTests(
     {
       did: new CheqdDIDModule(cheqd),
+      attest: new CheqdAttestModule(cheqd),
+    },
+    { DID: CheqdTestnetDid }
+  );
+
+  generateAttestModuleTests(
+    {
+      did: new MultiApiDIDModule([new CheqdDIDModule(cheqd)]),
       attest: new CheqdAttestModule(cheqd),
     },
     { DID: CheqdTestnetDid }

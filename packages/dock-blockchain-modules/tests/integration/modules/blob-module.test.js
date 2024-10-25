@@ -1,6 +1,6 @@
 import { DockAPI } from "@docknetwork/dock-blockchain-api";
 import { DockDid } from "@docknetwork/credential-sdk/types";
-import generateBlobModuleTests from "@docknetwork/credential-sdk/generate-tests/blob-module";
+import generateBlobModuleTests from "@docknetwork/credential-sdk/modules/tests/blob-module";
 import DockBlobModule from "../../../src/blob/module";
 import { DockDIDModule } from "../../../src";
 import {
@@ -8,7 +8,7 @@ import {
   TestAccountURI,
   TestKeyringOpts,
 } from "../../test-constants";
-import { DockBlobId } from "../../../../credential-sdk/src/types";
+import { DockBlobId } from "@docknetwork/credential-sdk/types";
 
 describe("BlobModule", () => {
   const dock = new DockAPI();

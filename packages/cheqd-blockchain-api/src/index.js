@@ -1,20 +1,24 @@
-import { ApiProvider } from '@docknetwork/credential-sdk/modules/common';
+import { ApiProvider } from "@docknetwork/credential-sdk/modules/abstract/common";
 import {
   maybeToJSON,
   maybeToJSONString,
-} from '@docknetwork/credential-sdk/utils';
-import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
-import { DIDModule, ResourceModule, createCheqdSDK } from '@cheqd/sdk';
+} from "@docknetwork/credential-sdk/utils";
+import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
+import { DIDModule, ResourceModule, createCheqdSDK } from "@cheqd/sdk";
 import {
   MsgCreateDidDocPayload,
   MsgUpdateDidDocPayload,
   MsgDeactivateDidDocPayload,
   protobufPackage as didProtobufPackage,
-} from '@cheqd/ts-proto/cheqd/did/v2/index';
+} from "@cheqd/ts-proto/cheqd/did/v2/index";
 import {
   MsgCreateResourcePayload,
   protobufPackage as resourceProtobufPackage,
-} from '@cheqd/ts-proto/cheqd/resource/v2/index';
+} from "@cheqd/ts-proto/cheqd/resource/v2/index";
+import { CheqdNetwork } from "@cheqd/sdk";
+import { fmtIter } from "@docknetwork/credential-sdk/utils";
+import { DIDRef, NamespaceDid } from "@docknetwork/credential-sdk/types";
+import { TypedEnum } from "@docknetwork/credential-sdk/types/generic";
 
 export class CheqdAPI extends ApiProvider {
   /**
@@ -53,19 +57,29 @@ export class CheqdAPI extends ApiProvider {
    * @param {string} [configuration.mnemonic]
    * @returns {this}
    */
-  async init({ url, mnemonic } = {}) {
-    const wallet = mnemonic
-      && (await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
-        prefix: 'cheqd',
+  async init({ url, mnemonic, network } = {}) {
+    if (network !== CheqdNetwork.Mainnet && network !== CheqdNetwork.Testnet) {
+      throw new Error(
+        `Invalid network provided: \`${network}\`, expected one of \`${fmtIter(
+          Object.values(CheqdNetwork)
+        )}\``
+      );
+    }
+
+    this.ensureNotInitialized();
+    const wallet =
+      mnemonic &&
+      (await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
+        prefix: "cheqd",
       }));
     const options = {
       modules: [DIDModule, ResourceModule],
       rpcUrl: url,
       wallet,
+      network,
     };
-    this.ensureNotInitialized();
-
     const sdk = await createCheqdSDK(options);
+
     this.ensureNotInitialized().sdk = sdk;
 
     return this;
@@ -81,7 +95,7 @@ export class CheqdAPI extends ApiProvider {
   /**
    * @returns {boolean}
    */
-  get isInitialized() {
+  isInitialized() {
     return this.sdk != null;
   }
 
@@ -96,7 +110,7 @@ export class CheqdAPI extends ApiProvider {
     const { [method]: Payload } = this.constructor.Payloads;
     if (Payload == null) {
       throw new Error(
-        `Can't find payload constructor for the provided method \`${method}\``,
+        `Can't find payload constructor for the provided method \`${method}\``
       );
     }
     const jsonPayload = maybeToJSON(payload);
@@ -106,7 +120,7 @@ export class CheqdAPI extends ApiProvider {
       return Payload.encode(sdkPayload).finish();
     } catch (err) {
       throw new Error(
-        `Failed to encode payload \`${maybeToJSONString(sdkPayload)}\`: ${err}`,
+        `Failed to encode payload \`${maybeToJSONString(sdkPayload)}\`: ${err}`
       );
     }
   }
@@ -121,14 +135,15 @@ export class CheqdAPI extends ApiProvider {
    * @returns {Promise<*>}
    */
   async signAndSend(tx, { from, fee, memo } = {}) {
-    const sender = from ?? (await this.sdk.options.wallet.getAccounts())[0].address;
+    const sender =
+      from ?? (await this.sdk.options.wallet.getAccounts())[0].address;
     const { typeUrl } = tx;
 
     const prefix = this.constructor.Prefixes[typeUrl];
     const amount = fee ?? this.constructor.Fees[typeUrl];
     const payment = {
       amount: [amount],
-      gas: '3600000', // TODO: dynamically calculate needed amount
+      gas: "3600000", // TODO: dynamically calculate needed amount
       payer: sender,
     };
 
@@ -139,43 +154,39 @@ export class CheqdAPI extends ApiProvider {
       sender,
       [txJSON],
       payment,
-      memo ?? '',
+      memo ?? ""
     );
 
     if (res.code) {
       console.error(res);
 
       throw new Error(
-        JSON.stringify(res, (_, value) => (typeof value === 'bigint' ? `${value.toString()}n` : value)),
+        JSON.stringify(res, (_, value) =>
+          typeof value === "bigint" ? `${value.toString()}n` : value
+        )
       );
     }
 
     return res;
   }
 
-  /**
-   * Ensures that the SDK is initialized, throws an error otherwise.
-   *
-   * @returns {this}
-   */
-  ensureInitialized() {
-    if (!this.isInitialized) {
-      throw new Error('SDK is not initialized.');
+  supportsIdentifier(id) {
+    this.ensureInitialized();
+
+    if (id instanceof NamespaceDid) {
+      if (id.isCheqd) {
+        if (id.asCheqd.isTestnet) {
+          return this.network === CheqdNetwork.Testnet;
+        } else if (id.asCheqd.isMainnet) {
+          return this.network === CheqdNetwork.Mainnet;
+        }
+      }
+    } else if (id instanceof DIDRef) {
+      return this.supportsIdentifier(id[0]);
+    } else if (id instanceof TypedEnum) {
+      return this.supportsIdentifier(this.value);
     }
 
-    return this;
-  }
-
-  /**
-   * Ensures that the SDK is not initialized, throws an error otherwise.
-   *
-   * @returns {this}
-   */
-  ensureNotInitialized() {
-    if (this.isInitialized) {
-      throw new Error('SDK is already initialized.');
-    }
-
-    return this;
+    return false;
   }
 }

@@ -1,9 +1,9 @@
-import { AbstractDIDModule } from '../../modules/did';
-import DIDResolver from './did-resolver';
-import { ensureInstanceOf } from '../../utils';
+import { AbstractDIDModule } from "../../modules/abstract/did";
+import DIDResolver from "./did-resolver";
+import { ensureInstanceOf } from "../../utils";
 
 class DockDIDResolver extends DIDResolver {
-  static METHOD = 'dock';
+  static METHOD = "dock";
 
   /**
    * @param {DockAPI} dock - An initialized connection to a dock full-node.

@@ -1,12 +1,18 @@
-import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
-import { HttpProvider } from '@polkadot/rpc-provider';
-import { cryptoWaitReady } from '@polkadot/util-crypto';
-import typesBundle from '@docknetwork/node-types';
+import { ApiPromise, WsProvider, Keyring } from "@polkadot/api";
+import { HttpProvider } from "@polkadot/rpc-provider";
+import { cryptoWaitReady } from "@polkadot/util-crypto";
+import typesBundle from "@docknetwork/node-types";
+import { TypedEnum } from "@docknetwork/credential-sdk/types/generic";
 
-import { ApiProvider } from '@docknetwork/credential-sdk/modules/common';
-import PoaRpcDefs from './rpc-defs/poa-rpc-defs';
-import PriceFeedRpcDefs from './rpc-defs/price-feed-rpc-defs';
-import CoreModsRpcDefs from './rpc-defs/core-mods-rpc-defs';
+import { ApiProvider } from "@docknetwork/credential-sdk/modules/abstract/common";
+import {
+  DIDRef,
+  DockDidOrDidMethodKey,
+  NamespaceDid,
+} from "@docknetwork/credential-sdk/types";
+import PoaRpcDefs from "./rpc-defs/poa-rpc-defs";
+import PriceFeedRpcDefs from "./rpc-defs/price-feed-rpc-defs";
+import CoreModsRpcDefs from "./rpc-defs/core-mods-rpc-defs";
 
 import {
   sendWithRetries,
@@ -15,13 +21,13 @@ import {
   FASTBLOCK_TIME_MS,
   FASTBLOCK_CONFIG,
   STANDARD_CONFIG,
-} from './retry';
+} from "./retry";
 import {
   ExtrinsicDispatchError,
   ensureExtrinsicSucceeded,
   errorMsgFromEventData,
-} from '../utils/extrinsic';
-import { getAllExtrinsicsFromBlock } from '../utils/chain-ops';
+} from "../utils/extrinsic";
+import { getAllExtrinsicsFromBlock } from "../utils/chain-ops";
 
 /**
  * @typedef {object} Options The Options to use in the function DockAPI.
@@ -53,15 +59,13 @@ export default class DockAPI extends ApiProvider {
    */
   /* eslint-disable sonarjs/cognitive-complexity */
   async init(
-    {
-      address, keyring, chainTypes, chainRpc, loadPoaModules = true,
-    } = {
+    { address, keyring, chainTypes, chainRpc, loadPoaModules = true } = {
       address: null,
       keyring: null,
-    },
+    }
   ) {
     if (this.isConnected) {
-      throw new Error('API is already connected');
+      throw new Error("API is already connected");
     }
 
     this.address = address || this.address;
@@ -72,9 +76,9 @@ export default class DockAPI extends ApiProvider {
 
     addressArray.forEach((addr) => {
       if (
-        typeof addr === 'string'
-        && addr.indexOf('wss://') === -1
-        && addr.indexOf('https://') === -1
+        typeof addr === "string" &&
+        addr.indexOf("wss://") === -1 &&
+        addr.indexOf("https://") === -1
       ) {
         console.warn(`WARNING: Using non-secure endpoint: ${addr}`);
       }
@@ -96,11 +100,11 @@ export default class DockAPI extends ApiProvider {
 
     // NOTE: The correct way to handle would be to raise error if a mix of URL types is provided or accept a preference of websocket vs http.
     const addressStr = addressArray[0];
-    const isWebsocket = addressStr && addressStr.indexOf('http') === -1;
+    const isWebsocket = addressStr && addressStr.indexOf("http") === -1;
 
     if (!isWebsocket && addressArray.length > 1) {
       console.warn(
-        'WARNING: HTTP connections do not support more than one URL, ignoring rest',
+        "WARNING: HTTP connections do not support more than one URL, ignoring rest"
       );
     }
 
@@ -124,11 +128,11 @@ export default class DockAPI extends ApiProvider {
 
     const blockTime = this.api.consts.babe.expectedBlockTime.toNumber();
     if (
-      blockTime !== STANDARD_BLOCK_TIME_MS
-      && blockTime !== FASTBLOCK_TIME_MS
+      blockTime !== STANDARD_BLOCK_TIME_MS &&
+      blockTime !== FASTBLOCK_TIME_MS
     ) {
       throw new Error(
-        `Unexpected block time: ${blockTime}, expected either ${STANDARD_BLOCK_TIME_MS} or ${FASTBLOCK_TIME_MS}`,
+        `Unexpected block time: ${blockTime}, expected either ${STANDARD_BLOCK_TIME_MS} or ${FASTBLOCK_TIME_MS}`
       );
     }
     this.api.isFastBlock = blockTime === FASTBLOCK_TIME_MS;
@@ -145,7 +149,7 @@ export default class DockAPI extends ApiProvider {
   async initKeyring(keyring = null) {
     if (!this.keyring || keyring) {
       await cryptoWaitReady();
-      this.keyring = new Keyring(keyring || { type: 'sr25519' });
+      this.keyring = new Keyring(keyring || { type: "sr25519" });
     }
   }
 
@@ -213,7 +217,7 @@ export default class DockAPI extends ApiProvider {
     return await getAllExtrinsicsFromBlock(
       this.api,
       blockNumberOrHash,
-      includeAllExtrinsics,
+      includeAllExtrinsics
     );
   }
 
@@ -229,7 +233,7 @@ export default class DockAPI extends ApiProvider {
       this,
       extrinsic,
       waitForFinalization,
-      this.api.isFastBlock ? FASTBLOCK_CONFIG : STANDARD_CONFIG,
+      this.api.isFastBlock ? FASTBLOCK_CONFIG : STANDARD_CONFIG
     );
   }
 
@@ -240,7 +244,7 @@ export default class DockAPI extends ApiProvider {
    * @returns {Uint8Array}
    */
   async stateChangeBytes(name, payload) {
-    return this.api.createType('StateChange', { [name]: payload }).toU8a();
+    return this.api.createType("StateChange", { [name]: payload }).toU8a();
   }
 
   /**
@@ -264,42 +268,44 @@ export default class DockAPI extends ApiProvider {
     let unsubscribe = null;
     let unsubscribed = false;
 
-    const promise = new Promise((resolve, reject) => extrinsic
-      .send((extrResult) => {
-        const { events = [], status, dispatchError } = extrResult;
+    const promise = new Promise((resolve, reject) =>
+      extrinsic
+        .send((extrResult) => {
+          const { events = [], status, dispatchError } = extrResult;
 
-        try {
-          if (dispatchError != null) {
-            const msg = errorMsgFromEventData(this.api, [dispatchError]);
+          try {
+            if (dispatchError != null) {
+              const msg = errorMsgFromEventData(this.api, [dispatchError]);
 
-            throw new ExtrinsicDispatchError(msg, status, dispatchError);
+              throw new ExtrinsicDispatchError(msg, status, dispatchError);
+            }
+
+            ensureExtrinsicSucceeded(this.api, events, status);
+          } catch (err) {
+            reject(err);
           }
 
-          ensureExtrinsicSucceeded(this.api, events, status);
-        } catch (err) {
-          reject(err);
-        }
-
-        // If waiting for finalization or if not waiting for finalization, wait for inclusion in the block.
-        if (
-          (waitForFinalization && status.isFinalized)
-            || (!waitForFinalization && status.isInBlock)
-        ) {
-          resolve(extrResult);
-        }
-      })
-      .then((unsub) => {
-        if (typeof unsub === 'function') {
-          // `unsubscribed=true` here means that we unsubscribed from this function even before we had a callback set.
-          // Thus we just call this function to unsubscribe.
-          if (unsubscribed) {
-            unsub();
-          } else {
-            unsubscribe = unsub;
+          // If waiting for finalization or if not waiting for finalization, wait for inclusion in the block.
+          if (
+            (waitForFinalization && status.isFinalized) ||
+            (!waitForFinalization && status.isInBlock)
+          ) {
+            resolve(extrResult);
           }
-        }
-      })
-      .catch(reject)).finally(() => void promise.unsubscribe());
+        })
+        .then((unsub) => {
+          if (typeof unsub === "function") {
+            // `unsubscribed=true` here means that we unsubscribed from this function even before we had a callback set.
+            // Thus we just call this function to unsubscribe.
+            if (unsubscribed) {
+              unsub();
+            } else {
+              unsubscribe = unsub;
+            }
+          }
+        })
+        .catch(reject)
+    ).finally(() => void promise.unsubscribe());
 
     promise.unsubscribe = () => {
       if (unsubscribed) {
@@ -312,7 +318,7 @@ export default class DockAPI extends ApiProvider {
           unsubscribed = true;
         } catch (err) {
           throw new Error(
-            `Failed to unsubscribe from watching extrinsic's status: \`${err}\``,
+            `Failed to unsubscribe from watching extrinsic's status: \`${err}\``
           );
         }
       }
@@ -329,5 +335,23 @@ export default class DockAPI extends ApiProvider {
    */
   get isConnected() {
     return Boolean(this.api) && this.api.isConnected;
+  }
+
+  supportsIdentifier(id) {
+    this.ensureInitialized();
+
+    if (id instanceof NamespaceDid) {
+      return id.isDock || id.isDidMethodKey;
+    } else if (id instanceof DockDidOrDidMethodKey) {
+      return true;
+    } else if (id instanceof DIDRef) {
+      return this.supportsIdentifier(id[0]);
+    } else if (id instanceof TypedEnum) {
+      return this.supportsIdentifier(this.value);
+    } else if (id.Qualifier?.contains("dock:")) {
+      return true;
+    }
+
+    return false;
   }
 }

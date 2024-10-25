@@ -1,7 +1,7 @@
-import { Schema } from '@docknetwork/credential-sdk/modules/schema';
+import { Schema } from "@docknetwork/credential-sdk/modules/abstract/schema";
 
 // BOL Schema, its valid
-import bolSchema from './schemas/bol';
+import bolSchema from "./schemas/bol";
 
 // Invalid example schema
 const invalidSchema = {
@@ -10,13 +10,13 @@ const invalidSchema = {
 
 async function main() {
   // Run validation for example BOL schema
-  console.log('Example schema should be valid:', bolSchema);
+  console.log("Example schema should be valid:", bolSchema);
 
   // This method would throw an error if its invalid
   await Schema.validateSchema(bolSchema);
 
   // Run validation for invalid schema
-  console.log('Example schema should be invalid:', invalidSchema);
+  console.log("Example schema should be invalid:", invalidSchema);
 
   let success = false;
   try {
@@ -24,11 +24,11 @@ async function main() {
     await Schema.validateSchema(invalidSchema);
   } catch (e) {
     success = true;
-    console.log('As expected, schema validation failed with error:', e);
+    console.log("As expected, schema validation failed with error:", e);
   }
 
   if (success === false) {
-    throw new Error('Invalid schema passed validation, something went wrong!');
+    throw new Error("Invalid schema passed validation, something went wrong!");
   }
 }
 
@@ -37,6 +37,6 @@ main()
     process.exit(0);
   })
   .catch((error) => {
-    console.error('Error occurred somewhere, it was caught!', error);
+    console.error("Error occurred somewhere, it was caught!", error);
     process.exit(1);
   });

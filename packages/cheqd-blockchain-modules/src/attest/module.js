@@ -1,9 +1,9 @@
-import AbstractAttestModule from '@docknetwork/credential-sdk/modules/attest/module';
-import { injectCheqd } from '../common';
-import CheqdInternalAttestModule from './internal';
+import AbstractAttestModule from "@docknetwork/credential-sdk/modules/abstract/attest/module";
+import { injectCheqd } from "../common";
+import CheqdInternalAttestModule from "./internal";
 
 export default class CheqdAttestModule extends injectCheqd(
-  AbstractAttestModule,
+  AbstractAttestModule
 ) {
   static CheqdOnly = CheqdInternalAttestModule;
 

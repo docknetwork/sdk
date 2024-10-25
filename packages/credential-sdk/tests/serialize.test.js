@@ -1,6 +1,6 @@
 import VerifiableCredential from "../src/vc/verifiable-credential";
 import VerifiablePresentation from "../src/vc/verifiable-presentation";
-import { Schema } from "../src/modules/schema";
+import { Schema } from "../src/modules/abstract/schema";
 
 import exampleCredential from "./utils/example-credential";
 import { DockBlobId } from "../src/types";

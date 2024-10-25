@@ -1,25 +1,19 @@
-import { option } from "@docknetwork/credential-sdk/types/generic";
-import { AbstractStatusListCredentialModule } from "@docknetwork/credential-sdk/modules/abstract/status-list-credential";
-import { DockStatusList2021CredentialWithPolicy } from "./types";
-import { injectDock } from "../common";
-import DockStatusListCredentialInternalModule from "./internal";
+import { AbstractStatusListCredentialModule } from "../abstract";
+import { StatusListCredentialId } from "../../types";
+import { injectDispatch } from "./common";
 
-export default class DockStatusListCredentialModule extends injectDock(
+export default class MultiApiStatusListCredentialModule extends injectDispatch(
   AbstractStatusListCredentialModule
 ) {
-  static DockOnly = DockStatusListCredentialInternalModule;
-
   /**
    * Fetches `StatusList2021Credential` with the supplied identifier.
    * @param {*} statusListCredentialId
    * @returns {Promise<StatusList2021Credential | null>}
    */
   async getStatusListCredential(statusListCredentialId) {
-    return (
-      option(DockStatusList2021CredentialWithPolicy).from(
-        await this.dockOnly.query.statusListCredentials(statusListCredentialId)
-      )?.statusListCredential ?? null
-    );
+    const id = StatusListCredentialId.from(statusListCredentialId);
+
+    return await this.moduleById(id).getStatusListCredential(id);
   }
 
   /**
@@ -29,12 +23,19 @@ export default class DockStatusListCredentialModule extends injectDock(
    * @return {Promise<object>} - the extrinsic to sign and send.
    */
   async createStatusListCredentialTx(
-    id,
+    statusListCredentialId,
     statusListCredential,
     signerDid,
-    _didKeypair
+    didKeypair
   ) {
-    return await this.dockOnly.tx.create(id, statusListCredential, signerDid);
+    const id = StatusListCredentialId.from(statusListCredentialId);
+
+    return await this.moduleById(id).createStatusListCredentialTx(
+      id,
+      statusListCredential,
+      signerDid,
+      didKeypair
+    );
   }
 
   /**
@@ -44,12 +45,14 @@ export default class DockStatusListCredentialModule extends injectDock(
    * @return {Promise<object>} - the extrinsic to sign and send.
    */
   async updateStatusListCredentialTx(
-    id,
+    statusListCredentialId,
     statusListCredential,
     targetDid,
     didKeypair
   ) {
-    return await this.dockOnly.tx.update(
+    const id = StatusListCredentialId.from(statusListCredentialId);
+
+    return await this.moduleById(id).updateStatusListCredentialTx(
       id,
       statusListCredential,
       targetDid,
@@ -68,8 +71,10 @@ export default class DockStatusListCredentialModule extends injectDock(
     targetDid,
     didKeypair
   ) {
-    return await this.dockOnly.tx.remove(
-      statusListCredentialId,
+    const id = StatusListCredentialId.from(statusListCredentialId);
+
+    return await this.moduleById(id).removeStatusListCredentialTx(
+      id,
       targetDid,
       didKeypair
     );

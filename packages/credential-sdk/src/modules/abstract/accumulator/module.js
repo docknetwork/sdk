@@ -1,10 +1,10 @@
 /* eslint-disable camelcase */
 
 import { KBUniversalAccumulatorValue } from '@docknetwork/crypto-wasm-ts';
-import { normalizeToHex, normalizeToU8a } from '../../utils/bytes';
+import { normalizeToHex, normalizeToU8a } from '../../../utils/bytes';
 import { AbstractWithParamsAndPublicKeys } from '../common';
-import { AccumulatorParams, AccumulatorPublicKey } from '../../types';
-import { withExtendedPrototypeProperties } from '../../utils';
+import { AccumulatorParams, AccumulatorPublicKey } from '../../../types';
+import { withExtendedPrototypeProperties } from '../../../utils';
 
 export const AccumulatorType = {
   VBPos: 0,

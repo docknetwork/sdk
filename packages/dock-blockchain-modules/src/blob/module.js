@@ -1,10 +1,10 @@
-import { NoBlobError } from '@docknetwork/credential-sdk/modules/blob/errors';
-import { option } from '@docknetwork/credential-sdk/types/generic';
-import { DockBlobId } from '@docknetwork/credential-sdk/types';
-import { AbstractBlobModule } from '@docknetwork/credential-sdk/modules/blob';
-import { injectDock } from '../common';
-import { OwnerWithBlob } from './types';
-import DockBlobModuleInternal from './internal';
+import { NoBlobError } from "@docknetwork/credential-sdk/modules/abstract/blob/errors";
+import { option } from "@docknetwork/credential-sdk/types/generic";
+import { DockBlobId } from "@docknetwork/credential-sdk/types";
+import { AbstractBlobModule } from "@docknetwork/credential-sdk/modules/abstract/blob";
+import { injectDock } from "../common";
+import { OwnerWithBlob } from "./types";
+import DockBlobModuleInternal from "./internal";
 
 /** Class to create and update Blobs on chain. */
 export default class BlobModule extends injectDock(AbstractBlobModule) {
@@ -29,7 +29,7 @@ export default class BlobModule extends injectDock(AbstractBlobModule) {
   async get(id) {
     const hexId = DockBlobId.from(id);
     const resp = option(OwnerWithBlob).from(
-      await this.dockOnly.query.blobs(hexId),
+      await this.dockOnly.query.blobs(hexId)
     );
     if (resp == null) {
       throw new NoBlobError(String(hexId));

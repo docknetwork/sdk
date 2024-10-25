@@ -1,6 +1,6 @@
-import AbstractAttestModule from '@docknetwork/credential-sdk/modules/attest/module';
-import { ensureTargetKeypair, injectDock } from '../common';
-import DockInternalAttestModule from './internal';
+import AbstractAttestModule from "@docknetwork/credential-sdk/modules/abstract/attest/module";
+import { ensureTargetKeypair, injectDock } from "../common";
+import DockInternalAttestModule from "./internal";
 
 export default class DockAttestModule extends injectDock(AbstractAttestModule) {
   static DockOnly = DockInternalAttestModule;
@@ -22,13 +22,14 @@ export default class DockAttestModule extends injectDock(AbstractAttestModule) {
    */
   async setClaimTx(iri, targetDid, didKeypair) {
     ensureTargetKeypair(targetDid, didKeypair);
-    const currentPriority = (await this.dockOnly.attest(targetDid)).priority?.value ?? 0;
+    const currentPriority =
+      (await this.dockOnly.attest(targetDid)).priority?.value ?? 0;
 
     return await this.dockOnly.tx.setClaim(
       1 + currentPriority,
       iri,
       targetDid,
-      didKeypair,
+      didKeypair
     );
   }
 }

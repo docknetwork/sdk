@@ -1,30 +1,58 @@
-import { DIDRef } from '../did';
+import { DIDRef } from "../did";
 import {
-  TypedBytes, TypedUUID, sized, withFrom,
-} from '../generic';
+  TypedBytes,
+  TypedEnum,
+  TypedUUID,
+  sized,
+  withFrom,
+  withQualifier,
+} from "../generic";
 
-export class AccumulatorId extends DIDRef {}
+export class AccumulatorId extends withQualifier(TypedEnum, true) {
+  static Qualifier = "accumulator:";
 
-export class CheqdAccumulatorIdIdent extends TypedUUID {}
-
-export class CheqdAccumulatorId extends AccumulatorId {
-  static Ident = CheqdAccumulatorIdIdent;
+  toJSON() {
+    return String(this);
+  }
 }
 
-export class DockAccumulatorIdIdent extends withFrom(
-  sized(TypedBytes),
-  // eslint-disable-next-line no-use-before-define
-  (value, from) => (value instanceof DockAccumulatorId ? value[1] : from(value)),
-) {
+export class CheqdAccumulatorIdValue extends withQualifier(DIDRef) {
+  static Qualifier = "accumulator:cheqd:";
+
+  static Ident = TypedUUID;
+}
+
+export class DockAccumulatorIdValue extends sized(TypedBytes) {
   static Size = 32;
 }
 
-export class DockAccumulatorId extends AccumulatorId {
-  static Ident = DockAccumulatorIdIdent;
+export class DockAccumulatorIdIdent extends withQualifier(
+  withFrom(
+    sized(TypedBytes),
+    // eslint-disable-next-line no-use-before-define
+    (value, from) =>
+      value instanceof DockAccumulatorId ? value[1] : from(value)
+  )
+) {
+  static Qualifier = "accumulator:dock:";
 }
 
-export * from './keys';
-export * from './params';
-export * from './public-key';
-export * from './accumulator';
-export * from './counters';
+export class CheqdAccumulatorId extends AccumulatorId {
+  static Class = CheqdAccumulatorIdValue;
+
+  static Type = "cheqd";
+}
+
+export class DockAccumulatorId extends AccumulatorId {
+  static Class = DockAccumulatorIdIdent;
+
+  static Type = "dock";
+}
+
+AccumulatorId.bindVariants(CheqdAccumulatorId, DockAccumulatorId);
+
+export * from "./keys";
+export * from "./params";
+export * from "./public-key";
+export * from "./accumulator";
+export * from "./counters";

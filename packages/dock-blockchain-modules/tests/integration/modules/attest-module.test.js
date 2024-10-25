@@ -1,6 +1,6 @@
 import { DockAPI } from "@docknetwork/dock-blockchain-api";
 import { DockDid } from "@docknetwork/credential-sdk/types";
-import generateAttestModuleTests from "@docknetwork/credential-sdk/generate-tests/attest-module";
+import generateAttestModuleTests from "@docknetwork/credential-sdk/modules/tests/attest-module";
 import DockAttestModule from "../../../src/attest/module";
 import { DockDIDModule } from "../../../src";
 import {

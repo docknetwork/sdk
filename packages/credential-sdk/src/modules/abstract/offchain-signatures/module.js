@@ -3,7 +3,7 @@
 import {
   OffchainSignatureParams,
   OffchainSignaturePublicKey,
-} from '../../types';
+} from '../../../types';
 import { AbstractWithParamsAndPublicKeys } from '../common';
 
 /** Class to write offchain signature parameters and keys on chain */

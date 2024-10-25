@@ -1,7 +1,7 @@
 import { AbstractBaseModule } from '../common';
-import { withExtendedPrototypeProperties } from '../../utils';
+import { withExtendedPrototypeProperties } from '../../../utils';
 // eslint-disable-next-line
-import { StatusListCredentialId } from "../../types";
+import { StatusListCredentialId } from "../../../types";
 
 /**
  * @typedef tx

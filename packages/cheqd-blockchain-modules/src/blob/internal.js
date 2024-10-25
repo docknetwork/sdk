@@ -2,7 +2,6 @@ import {
   Blob,
   CheqdBlobId,
   CheqdBlobWithId,
-  CheqdDid,
 } from "@docknetwork/credential-sdk/types";
 import { option } from "@docknetwork/credential-sdk/types/generic";
 import { CheqdCreateResource, createInternalCheqdModule } from "../common";
@@ -11,13 +10,11 @@ const methods = {
   new: (blobWithId) => {
     const {
       blob,
-      id: {
-        value: [did, uuid],
-      },
+      id: [did, uuid],
     } = CheqdBlobWithId.from(blobWithId);
 
     return new CheqdCreateResource(
-      CheqdDid.from(did).value,
+      did.value.value,
       uuid,
       "1.0",
       [],

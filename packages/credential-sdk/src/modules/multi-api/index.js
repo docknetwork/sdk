@@ -11,25 +11,25 @@ import MultiApiTrustRegistryModule from "./trust-registry";
  * Class representing a set of core modules each of which is an instance of its respective abstract module.
  */
 export class MultiApiCoreModules extends AbstractCoreModules {
-  static Accumulator = MultiApiAccumulatorModule;
+  static AccumulatorModule = MultiApiAccumulatorModule;
 
-  static Attest = MultiApiAttestModule;
+  static AttestModule = MultiApiAttestModule;
 
-  static Blob = MultiApiBlobModule;
+  static BlobModule = MultiApiBlobModule;
 
-  static Did = MultiApiDIDModule;
+  static DIDModule = MultiApiDIDModule;
 
-  static OffchainSignatures = MultiApiOffchainSignaturesModule;
+  static OffchainSignaturesModule = MultiApiOffchainSignaturesModule;
 
-  static BBS = MultiApiOffchainSignaturesModule;
+  static BBSModule = MultiApiOffchainSignaturesModule;
 
-  static BBSPlus = MultiApiOffchainSignaturesModule;
+  static BBSPlusModule = MultiApiOffchainSignaturesModule;
 
-  static PS = MultiApiOffchainSignaturesModule;
+  static PSModule = MultiApiOffchainSignaturesModule;
 
-  static StatusListCredential = MultiApiStatusListCredentialModule;
+  static StatusListCredentialModule = MultiApiStatusListCredentialModule;
 
-  static TrustRegistry = MultiApiTrustRegistryModule;
+  static TrustRegistryModule = MultiApiTrustRegistryModule;
 }
 
 export {

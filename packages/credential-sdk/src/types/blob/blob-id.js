@@ -5,12 +5,19 @@ import {
   TypedEnum,
   TypedUUID,
   sized,
+  withFrom,
   withQualifier,
 } from "../generic";
 import { CheqdBlobQualifier, DockBlobQualifier } from "./const";
 import { CheqdMainnetDid, CheqdTestnetDid, DIDRef } from "../did";
 
-export class BlobId extends withQualifier(TypedEnum, true) {
+export class BlobId extends withFrom(withQualifier(TypedEnum, true), (value, from) => {
+  try {
+    return DockBlobId.from(value);
+  } catch {
+    return from(value);
+  }
+}) {
   static Qualifier = "blob:";
 
   toJSON() {

@@ -12,27 +12,27 @@ import AbstractTrustRegistryModule from "./trust-registry/module";
  * Class representing a set of core modules each of which is an instance of its respective abstract module.
  */
 export class AbstractCoreModules {
-  static Accumulator;
+  static AccumulatorModule;
 
-  static Anchor;
+  static AnchorModule;
 
-  static Attest;
+  static AttestModule;
 
-  static Blob;
+  static BlobModule;
 
-  static Did;
+  static DIDModule;
 
-  static OffchainSignatures;
+  static OffchainSignaturesModule;
 
-  static BBS;
+  static BBSModule;
 
-  static BBSPlus;
+  static BBSPlusModule;
 
-  static PS;
+  static PSModule;
 
-  static StatusListCredential;
+  static StatusListCredentialModule;
 
-  static TrustRegistry;
+  static TrustRegistryModule;
 
   constructor(apiProvider) {
     const {
@@ -50,7 +50,9 @@ export class AbstractCoreModules {
     } = this.constructor;
 
     ensurePrototypeOf(AbstractAccumulatorModule, AccumulatorModule);
-    ensurePrototypeOf(AbstractAnchorModule, AnchorModule);
+    if (AnchorModule != null) {
+      ensurePrototypeOf(AbstractAnchorModule, AnchorModule);
+    }
     ensurePrototypeOf(AbstractAttestModule, AttestModule);
     ensurePrototypeOf(AbstractBlobModule, BlobModule);
     ensurePrototypeOf(AbstractDIDModule, DIDModule);
@@ -68,7 +70,9 @@ export class AbstractCoreModules {
     ensurePrototypeOf(AbstractTrustRegistryModule, TrustRegistryModule);
 
     this.accumulator = new AccumulatorModule(apiProvider);
-    this.anchor = new AnchorModule(apiProvider);
+    if (AnchorModule != null) {
+      this.anchor = new AnchorModule(apiProvider);
+    }
     this.attest = new AttestModule(apiProvider);
     this.blob = new BlobModule(apiProvider);
     this.did = new DIDModule(apiProvider);

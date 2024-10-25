@@ -1,9 +1,9 @@
-import { AbstractBlobModule } from "../abstract";
+import { AbstractAttestModule } from "../abstract";
 import { NamespaceDid } from "../../types";
 import { injectDispatch } from "./common";
 
-export default class MultiApiBlobModule extends injectDispatch(
-  AbstractBlobModule
+export default class MultiApiAttestModule extends injectDispatch(
+  AbstractAttestModule
 ) {
   /**
    * Fetches the DIDs attestations IRI from the chain

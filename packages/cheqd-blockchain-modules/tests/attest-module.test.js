@@ -1,6 +1,6 @@
 import { CheqdAPI } from "@docknetwork/cheqd-blockchain-api";
 import { CheqdTestnetDid } from "@docknetwork/credential-sdk/types";
-import { MultiApiDIDModule } from "@docknetwork/credential-sdk/modules";
+import { MultiApiDIDModule, MultiApiAttestModule } from "@docknetwork/credential-sdk/modules";
 import generateAttestModuleTests from "@docknetwork/credential-sdk/modules/tests/attest-module";
 import CheqdDIDModule from "../src/did/module";
 import { faucet } from "./constants";
@@ -32,7 +32,7 @@ describe("AttestModule", () => {
   generateAttestModuleTests(
     {
       did: new MultiApiDIDModule([new CheqdDIDModule(cheqd)]),
-      attest: new CheqdAttestModule(cheqd),
+      attest: new MultiApiAttestModule([new CheqdAttestModule(cheqd)]),
     },
     { DID: CheqdTestnetDid }
   );

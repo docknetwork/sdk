@@ -27,6 +27,6 @@ export default class CheqdBlobModule extends injectCheqd(AbstractBlobModule) {
       throw new NoBlobError(id);
     }
 
-    return new OwnerWithBlob(id[0], blob);
+    return new OwnerWithBlob(id.value[0], blob);
   }
 }

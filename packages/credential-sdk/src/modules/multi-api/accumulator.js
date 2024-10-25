@@ -225,6 +225,18 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
     return await this.moduleById(did).removePublicKeyTx(...args);
   }
 
+  async addParams(...args) {
+    const did = NamespaceDid.from(args[2]);
+
+    return await this.moduleById(did).addParamsTx(...args);
+  }
+
+  async addParamsTx(...args) {
+    const did = NamespaceDid.from(args[2]);
+
+    return await this.moduleById(did).addParamsTx(...args);
+  }
+
   /**
    * Add a positive (add-only) accumulator
    * @param id - Unique accumulator id

@@ -27,12 +27,12 @@ export default class BlobModule extends injectDock(AbstractBlobModule) {
    * @returns {Promise<Array>} - A 2-element array where the first is the author and the second is the blob contents.
    */
   async get(id) {
-    const hexId = DockBlobId.from(id);
+    const blobId = DockBlobId.from(id).asDock;
     const resp = option(OwnerWithBlob).from(
-      await this.dockOnly.query.blobs(hexId)
+      await this.dockOnly.query.blobs(blobId)
     );
     if (resp == null) {
-      throw new NoBlobError(String(hexId));
+      throw new NoBlobError(blobId);
     }
 
     return resp;

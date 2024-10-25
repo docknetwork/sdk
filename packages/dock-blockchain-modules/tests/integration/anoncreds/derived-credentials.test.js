@@ -41,9 +41,13 @@ import {
 } from "@docknetwork/credential-sdk/vc";
 import { DockResolver } from "@docknetwork/credential-sdk/resolver";
 import { createPresentation } from "../../create-presentation";
-import AccumulatorModule, {
+import {
   AccumulatorType,
-} from "@docknetwork/credential-sdk/modules/accumulator/module";
+} from "@docknetwork/credential-sdk/modules/abstract/accumulator/module";
+import {
+  AccumulatorModule,
+  MultiApiCoreModules
+} from '@docknetwork/credential-sdk/modules';
 import { getKeyedProofsFromVerifiedPresentation } from "@docknetwork/credential-sdk/vc/presentations";
 import { deepClone } from "@docknetwork/credential-sdk/rdf-and-cd/common";
 import {
@@ -110,7 +114,7 @@ describe.each(Schemes)(
     derivedToAnoncredsPresentation,
   }) => {
     const dock = new DockAPI();
-    const modules = new DockCoreModules(dock);
+    const modules = new MultiApiCoreModules([new DockCoreModules(dock)]);
     const resolver = new DockResolver(modules);
     const did1 = DockDid.random();
     if (Name === "PS") {

@@ -21,6 +21,10 @@ class DockApiProvider extends ApiProvider {
     return api;
   }
 
+  isInitialized() {
+    return this.dock.isInitialized();
+  }
+
   async stateChangeBytes(name, payload) {
     return await this.dock.stateChangeBytes(name, payload);
   }

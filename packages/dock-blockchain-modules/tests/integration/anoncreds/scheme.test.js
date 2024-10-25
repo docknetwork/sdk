@@ -12,15 +12,15 @@ import {
   TestKeyringOpts,
   Schemes,
 } from "../../test-constants";
-import { DockDid } from "@docknetwork/credential-sdk/types";
+import { DockDid, OffchainSignaturePublicKeyValueWithParamsValue } from "@docknetwork/credential-sdk/types";
 import {
   Ed25519Keypair,
   DidKeypair,
 } from "@docknetwork/credential-sdk/keypairs";
 
 import { registerNewDIDUsingPair } from "../helpers";
-import { OffchainSignaturePublicKeyValueWithParamsValue } from "@docknetwork/credential-sdk/types";
 import { DockCoreModules } from "../../../src";
+import { MultiApiCoreModules } from "@docknetwork/credential-sdk/modules";
 
 const addParticipantIdIfNotPresent = (key) => {
   if (!("participantId" in key)) {
@@ -43,7 +43,7 @@ for (const {
   const skipIfKvac = Name === "BBDT16" ? describe.skip : describe;
   skipIfKvac(`${Name} Module`, () => {
     const dock = new DockAPI();
-    const modules = new DockCoreModules(dock);
+    const modules = new MultiApiCoreModules([new DockCoreModules(dock)]);
     let account;
     let chainModule;
     const chainModuleClass = Module;

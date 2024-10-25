@@ -31,7 +31,7 @@ import {
   Schemes,
 } from "../../test-constants";
 import { DockDid, DockAccumulatorId } from "@docknetwork/credential-sdk/types";
-import { AbstractAccumulatorModule } from "@docknetwork/credential-sdk/modules/accumulator";
+import { AbstractAccumulatorModule, MultiApiCoreModules } from "@docknetwork/credential-sdk/modules";
 import { getAllEventsFromBlock } from "@docknetwork/dock-blockchain-api/utils/chain-ops";
 import { getRevealedUnrevealed } from "./utils";
 import { registerNewDIDUsingPair } from "../helpers";
@@ -61,7 +61,7 @@ for (const {
     `Complete demo of anonymous credentials using ${Name} and accumulator`,
     () => {
       const dock = new DockAPI();
-      const modules = new DockCoreModules(dock);
+      const modules = new MultiApiCoreModules([new DockCoreModules(dock)]);
 
       let account;
       let issuerDid;

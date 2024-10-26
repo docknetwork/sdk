@@ -1,4 +1,4 @@
-import { ensureInstanceOf, ensureIterable } from "../../utils";
+import { ensureInstanceOf, ensureIterable } from '../../utils';
 
 export function injectDispatch(klass) {
   const name = `withDispatch(${klass.name})`;

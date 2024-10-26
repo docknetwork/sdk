@@ -1,9 +1,9 @@
-import AbstractBlobModule from "@docknetwork/credential-sdk/modules/abstract/blob/module";
-import { NoBlobError } from "@docknetwork/credential-sdk/modules/abstract/blob/errors";
-import { CheqdBlobId } from "@docknetwork/credential-sdk/types";
-import { injectCheqd } from "../common";
-import CheqdInternalBlobModule from "./internal";
-import { OwnerWithBlob } from "./types";
+import AbstractBlobModule from '@docknetwork/credential-sdk/modules/abstract/blob/module';
+import { NoBlobError } from '@docknetwork/credential-sdk/modules/abstract/blob/errors';
+import { CheqdBlobId } from '@docknetwork/credential-sdk/types';
+import { injectCheqd } from '../common';
+import CheqdInternalBlobModule from './internal';
+import { OwnerWithBlob } from './types';
 
 export default class CheqdBlobModule extends injectCheqd(AbstractBlobModule) {
   static CheqdOnly = CheqdInternalBlobModule;

@@ -1,10 +1,10 @@
-import { canonicalize } from "json-canonicalize";
-import { validate } from "jsonschema";
+import { canonicalize } from 'json-canonicalize';
+import { validate } from 'jsonschema';
 
 // Supported schemas
-import JSONSchema07 from "../../../vc/schemas/schema-draft-07";
-import jsonFetch from "../../../utils/json-fetch";
-import { Blob, BlobWithId } from "../../../types";
+import JSONSchema07 from '../../../vc/schemas/schema-draft-07';
+import jsonFetch from '../../../utils/json-fetch';
+import { Blob, BlobWithId } from '../../../types';
 
 export default class Schema {
   /**
@@ -67,7 +67,7 @@ export default class Schema {
   toBlob() {
     if (!this.schema) {
       throw new Error(
-        "Schema requires schema property to be serialized to blob"
+        'Schema requires schema property to be serialized to blob',
       );
     }
 
@@ -125,28 +125,28 @@ export default class Schema {
    * @returns {Promise<object>}
    */
   static async getJSONSchemaSpec(json) {
-    const schemaKey = "$schema";
+    const schemaKey = '$schema';
     const schemaUrl = json[schemaKey];
     if (schemaUrl) {
       // The URL might be 'http://json-schema.org/draft-07/schema' or 'http://json-schema.org/draft-07/schema#'
       // In that case, the schema is already stored in the SDK as this is the latest JSON schema spec
       if (
-        schemaUrl === "http://json-schema.org/draft-07/schema" ||
-        schemaUrl === "http://json-schema.org/draft-07/schema#"
+        schemaUrl === 'http://json-schema.org/draft-07/schema'
+        || schemaUrl === 'http://json-schema.org/draft-07/schema#'
       ) {
         // Return stored JSON schema
         return JSONSchema07;
       }
       // Fetch the URI and expect a JSON response
       const doc = await jsonFetch(schemaUrl);
-      if (typeof doc === "object") {
+      if (typeof doc === 'object') {
         return doc;
       }
       // If MIME type did not indicate JSON, try to parse the response as JSON
       try {
         return JSON.parse(doc);
       } catch (e) {
-        throw new Error("Cannot parse response as JSON");
+        throw new Error('Cannot parse response as JSON');
       }
     } else {
       throw new Error(`${schemaKey} not found in the given JSON`);

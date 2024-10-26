@@ -1,5 +1,5 @@
-import { AbstractBaseModule } from "../common";
-import { withExtendedPrototypeProperties } from "../../../utils";
+import { AbstractBaseModule } from '../common';
+import { withExtendedPrototypeProperties } from '../../../utils';
 
 /** Class to create and update Blobs on chain. */
 class AbstractBlobModule extends AbstractBaseModule {
@@ -13,7 +13,7 @@ class AbstractBlobModule extends AbstractBaseModule {
   async new(blobWithId, targetDid, didKeypair, params = {}) {
     return await this.signAndSend(
       await this.newTx(blobWithId, targetDid, didKeypair),
-      params
+      params,
     );
   }
 
@@ -23,11 +23,11 @@ class AbstractBlobModule extends AbstractBaseModule {
    * @returns {Promise<Blob>} - A 2-element array where the first is the author and the second is the blob contents.
    */
   async get(_id) {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 }
 
 export default withExtendedPrototypeProperties(
-  ["newTx", "get"],
-  AbstractBlobModule
+  ['newTx', 'get'],
+  AbstractBlobModule,
 );

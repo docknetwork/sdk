@@ -1,5 +1,5 @@
-import { AbstractBaseModule } from "../common";
-import { withExtendedPrototypeProperties } from "../../../utils";
+import { AbstractBaseModule } from '../common';
+import { withExtendedPrototypeProperties } from '../../../utils';
 
 /** Class to create, update and destroy DIDs */
 class AbstractDIDModule extends AbstractBaseModule {
@@ -13,7 +13,7 @@ class AbstractDIDModule extends AbstractBaseModule {
   async createDocument(didDocument, didKeypair, params) {
     return await this.signAndSend(
       await this.createDocumentTx(didDocument, didKeypair),
-      params
+      params,
     );
   }
 
@@ -27,7 +27,7 @@ class AbstractDIDModule extends AbstractBaseModule {
   async updateDocument(didDocument, didKeypair, params) {
     return await this.signAndSend(
       await this.updateDocumentTx(didDocument, didKeypair),
-      params
+      params,
     );
   }
 
@@ -41,7 +41,7 @@ class AbstractDIDModule extends AbstractBaseModule {
   async removeDocument(did, didKeypair, params) {
     return await this.signAndSend(
       await this.removeDocumentTx(did, didKeypair),
-      params
+      params,
     );
   }
 
@@ -51,7 +51,7 @@ class AbstractDIDModule extends AbstractBaseModule {
    * @returns {Promise<DIDDocument>}
    */
   async getDocument(_did) {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 
   /**
@@ -60,7 +60,7 @@ class AbstractDIDModule extends AbstractBaseModule {
    * @returns {Promise<void>}
    */
   async createDocumentTx(_didDocument, _didKeypair) {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 
   /**
@@ -71,7 +71,7 @@ class AbstractDIDModule extends AbstractBaseModule {
    * @returns {Promise<void>}
    */
   async updateDocumentTx(_didDocument, _didKeypair) {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 
   /**
@@ -82,11 +82,11 @@ class AbstractDIDModule extends AbstractBaseModule {
    * @returns {Promise<void>}
    */
   async removeDocumentTx(_did, _didKeypair) {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 }
 
 export default withExtendedPrototypeProperties(
-  ["createDocumentTx", "updateDocumentTx", "removeDocumentTx", "getDocument"],
-  AbstractDIDModule
+  ['createDocumentTx', 'updateDocumentTx', 'removeDocumentTx', 'getDocument'],
+  AbstractDIDModule,
 );

@@ -1,12 +1,12 @@
-import { NamespaceDid, TrustRegistryInfo } from "../../types";
-import { AbstractTrustRegistryModule } from "../abstract";
-import { injectDispatch } from "./common";
+import { NamespaceDid, TrustRegistryInfo } from '../../types';
+import { AbstractTrustRegistryModule } from '../abstract';
+import { injectDispatch } from './common';
 
 /**
  * `Trust Registry` module.
  */
 export default class MultiApiTrustRegistryModule extends injectDispatch(
-  AbstractTrustRegistryModule
+  AbstractTrustRegistryModule,
 ) {
   /**
    * Retrieves registry with provided identifier owned by supplied convener did.
@@ -49,7 +49,7 @@ export default class MultiApiTrustRegistryModule extends injectDispatch(
       parsedInfo,
       schemas,
       didKeypair,
-      params
+      params,
     );
   }
 
@@ -72,7 +72,7 @@ export default class MultiApiTrustRegistryModule extends injectDispatch(
       parsedInfo,
       schemas,
       didKeypair,
-      params
+      params,
     );
   }
 
@@ -92,7 +92,7 @@ export default class MultiApiTrustRegistryModule extends injectDispatch(
       id,
       parsedInfo,
       schemas,
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -114,7 +114,7 @@ export default class MultiApiTrustRegistryModule extends injectDispatch(
       id,
       parsedInfo,
       schemas,
-      didKeypair
+      didKeypair,
     );
   }
 }

@@ -1,5 +1,5 @@
-import { withExtendedStaticProperties } from "@docknetwork/credential-sdk/utils/inheritance";
-import CheqdAPIProvider from "./cheqd-api-provider";
+import { withExtendedStaticProperties } from '@docknetwork/credential-sdk/utils/inheritance';
+import CheqdAPIProvider from './cheqd-api-provider';
 
 export default function injectDock(klass) {
   const name = `withCheqd(${klass.name})`;
@@ -25,5 +25,5 @@ export default function injectDock(klass) {
     },
   };
 
-  return withExtendedStaticProperties(["CheqdOnly"], obj[name]);
+  return withExtendedStaticProperties(['CheqdOnly'], obj[name]);
 }

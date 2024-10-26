@@ -3,19 +3,19 @@ import {
   ensurePrototypeOf,
   withExtendedPrototypeProperties,
   withExtendedStaticProperties,
-} from "../../utils";
+} from '../../utils';
 
 /**
  * Base class that must be extended by all API providers.
  */
 export const ApiProvider = withExtendedPrototypeProperties(
-  ["isInitialized", "stateChangeBytes", "signAndSend"],
+  ['isInitialized', 'stateChangeBytes', 'signAndSend'],
   class ApiProvider {
     /**
      * @returns {boolean}
      */
     isInitialized() {
-      throw new Error("Unimplemented");
+      throw new Error('Unimplemented');
     }
 
     /**
@@ -25,7 +25,7 @@ export const ApiProvider = withExtendedPrototypeProperties(
      */
     ensureInitialized() {
       if (!this.isInitialized()) {
-        throw new Error("SDK is not initialized.");
+        throw new Error('SDK is not initialized.');
       }
 
       return this;
@@ -38,12 +38,12 @@ export const ApiProvider = withExtendedPrototypeProperties(
      */
     ensureNotInitialized() {
       if (this.isInitialized()) {
-        throw new Error("SDK is already initialized.");
+        throw new Error('SDK is already initialized.');
       }
 
       return this;
     }
-  }
+  },
 );
 
 /**
@@ -60,7 +60,7 @@ export class AbstractBaseModule {
   async signAndSend(extrinsic, params) {
     if (this.apiProvider == null) {
       throw new Error(
-        `Can't sign a transaction because the module doesn't have an \`apiProvider\``
+        'Can\'t sign a transaction because the module doesn\'t have an `apiProvider`',
       );
     }
 
@@ -110,7 +110,7 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
   async addParams(id, param, targetDid, didKeypair, params) {
     return await this.signAndSend(
       await this.addParamsTx(id, param, targetDid, didKeypair),
-      params
+      params,
     );
   }
 
@@ -125,7 +125,7 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
   async removeParams(id, targetDid, didKeypair, params) {
     return await this.signAndSend(
       await this.removeParamsTx(id, targetDid, didKeypair),
-      params
+      params,
     );
   }
 
@@ -140,7 +140,7 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
   async addPublicKey(id, publicKey, targetDid, didKeypair, params) {
     return await this.signAndSend(
       await this.addPublicKeyTx(id, publicKey, targetDid, didKeypair),
-      params
+      params,
     );
   }
 
@@ -155,7 +155,7 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
   async removePublicKey(id, targetDid, didKeypair, params) {
     return await this.signAndSend(
       await this.removePublicKeyTx(id, targetDid, didKeypair),
-      params
+      params,
     );
   }
 
@@ -166,7 +166,7 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
    * @returns {Promise<Params>}
    */
   async getParams(_did, _id) {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 
   /**
@@ -175,7 +175,7 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
    * @returns {Promise<Map<Id, Params>>}
    */
   async getAllParamsByDid(_did) {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 
   /**
@@ -185,7 +185,7 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
    * @returns {Promise<Params>}
    */
   async getPublicKey(_did, _id, _includeParams = false) {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 
   /**
@@ -194,23 +194,23 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
    * @returns {Promise<Map<Id, Params>>}
    */
   async getAllPublicKeysByDid(_did, _includeParams = false) {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 }
 
 export const AbstractWithParamsAndPublicKeys = withExtendedPrototypeProperties(
   [
-    "addParamsTx",
-    "addPublicKeyTx",
-    "removeParamsTx",
-    "removePublicKeyTx",
-    "getParams",
-    "getPublicKey",
-    "getAllParamsByDid",
-    "getAllPublicKeysByDid",
+    'addParamsTx',
+    'addPublicKeyTx',
+    'removeParamsTx',
+    'removePublicKeyTx',
+    'getParams',
+    'getPublicKey',
+    'getAllParamsByDid',
+    'getAllPublicKeysByDid',
   ],
   withExtendedStaticProperties(
-    ["PublicKey", "Params"],
-    AbstractWithParamsAndPublicKey
-  )
+    ['PublicKey', 'Params'],
+    AbstractWithParamsAndPublicKey,
+  ),
 );

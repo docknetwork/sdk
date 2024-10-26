@@ -1,11 +1,11 @@
-import { option } from "@docknetwork/credential-sdk/types/generic";
-import { AbstractStatusListCredentialModule } from "@docknetwork/credential-sdk/modules/abstract/status-list-credential";
-import { DockStatusList2021CredentialWithPolicy } from "./types";
-import { injectDock } from "../common";
-import DockStatusListCredentialInternalModule from "./internal";
+import { option } from '@docknetwork/credential-sdk/types/generic';
+import { AbstractStatusListCredentialModule } from '@docknetwork/credential-sdk/modules/abstract/status-list-credential';
+import { DockStatusList2021CredentialWithPolicy } from './types';
+import { injectDock } from '../common';
+import DockStatusListCredentialInternalModule from './internal';
 
 export default class DockStatusListCredentialModule extends injectDock(
-  AbstractStatusListCredentialModule
+  AbstractStatusListCredentialModule,
 ) {
   static DockOnly = DockStatusListCredentialInternalModule;
 
@@ -17,7 +17,7 @@ export default class DockStatusListCredentialModule extends injectDock(
   async getStatusListCredential(statusListCredentialId) {
     return (
       option(DockStatusList2021CredentialWithPolicy).from(
-        await this.dockOnly.query.statusListCredentials(statusListCredentialId)
+        await this.dockOnly.query.statusListCredentials(statusListCredentialId),
       )?.statusListCredential ?? null
     );
   }
@@ -32,7 +32,7 @@ export default class DockStatusListCredentialModule extends injectDock(
     id,
     statusListCredential,
     signerDid,
-    _didKeypair
+    _didKeypair,
   ) {
     return await this.dockOnly.tx.create(id, statusListCredential, signerDid);
   }
@@ -47,13 +47,13 @@ export default class DockStatusListCredentialModule extends injectDock(
     id,
     statusListCredential,
     targetDid,
-    didKeypair
+    didKeypair,
   ) {
     return await this.dockOnly.tx.update(
       id,
       statusListCredential,
       targetDid,
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -66,12 +66,12 @@ export default class DockStatusListCredentialModule extends injectDock(
   async removeStatusListCredentialTx(
     statusListCredentialId,
     targetDid,
-    didKeypair
+    didKeypair,
   ) {
     return await this.dockOnly.tx.remove(
       statusListCredentialId,
       targetDid,
-      didKeypair
+      didKeypair,
     );
   }
 }

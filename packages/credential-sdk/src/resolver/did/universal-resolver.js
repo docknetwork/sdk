@@ -1,12 +1,12 @@
-import { NoDIDError } from "../../modules/abstract/did/errors";
-import { Resolver, WILDCARD } from "../generic";
-import jsonFetch from "../../utils/json-fetch";
+import { NoDIDError } from '../../modules/abstract/did/errors';
+import { Resolver, WILDCARD } from '../generic';
+import jsonFetch from '../../utils/json-fetch';
 
 /**
  * Resolves `DID`s with wildcard method: `did:*:`.
  */
 export default class UniversalResolver extends Resolver {
-  static PREFIX = "did";
+  static PREFIX = 'did';
 
   static METHOD = WILDCARD;
 
@@ -23,7 +23,7 @@ export default class UniversalResolver extends Resolver {
     this.url = new URL(url);
 
     // Remove trailing slash if any and append the string `/1.0/identifiers/`
-    this.idUrl = `${url.replace(/\/$/, "")}/1.0/identifiers/`;
+    this.idUrl = `${url.replace(/\/$/, '')}/1.0/identifiers/`;
   }
 
   /**
@@ -32,9 +32,9 @@ export default class UniversalResolver extends Resolver {
    * @returns {Promise<object>}
    */
   async resolve(did) {
-    const hashIndex = did.indexOf("#");
+    const hashIndex = did.indexOf('#');
     const encodedDid = encodeURIComponent(
-      hashIndex === -1 ? did : did.slice(0, hashIndex).trim()
+      hashIndex === -1 ? did : did.slice(0, hashIndex).trim(),
     );
     try {
       const resp = await jsonFetch(`${this.idUrl}${encodedDid}`, {

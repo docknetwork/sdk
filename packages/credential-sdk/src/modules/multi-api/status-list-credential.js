@@ -1,9 +1,9 @@
-import { AbstractStatusListCredentialModule } from "../abstract";
-import { StatusListCredentialId } from "../../types";
-import { injectDispatch } from "./common";
+import { AbstractStatusListCredentialModule } from '../abstract';
+import { StatusListCredentialId } from '../../types';
+import { injectDispatch } from './common';
 
 export default class MultiApiStatusListCredentialModule extends injectDispatch(
-  AbstractStatusListCredentialModule
+  AbstractStatusListCredentialModule,
 ) {
   /**
    * Fetches `StatusList2021Credential` with the supplied identifier.
@@ -26,7 +26,7 @@ export default class MultiApiStatusListCredentialModule extends injectDispatch(
     statusListCredentialId,
     statusListCredential,
     signerDid,
-    didKeypair
+    didKeypair,
   ) {
     const id = StatusListCredentialId.from(statusListCredentialId);
 
@@ -34,7 +34,7 @@ export default class MultiApiStatusListCredentialModule extends injectDispatch(
       id,
       statusListCredential,
       signerDid,
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -48,7 +48,7 @@ export default class MultiApiStatusListCredentialModule extends injectDispatch(
     statusListCredentialId,
     statusListCredential,
     targetDid,
-    didKeypair
+    didKeypair,
   ) {
     const id = StatusListCredentialId.from(statusListCredentialId);
 
@@ -56,7 +56,7 @@ export default class MultiApiStatusListCredentialModule extends injectDispatch(
       id,
       statusListCredential,
       targetDid,
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -69,14 +69,14 @@ export default class MultiApiStatusListCredentialModule extends injectDispatch(
   async removeStatusListCredentialTx(
     statusListCredentialId,
     targetDid,
-    didKeypair
+    didKeypair,
   ) {
     const id = StatusListCredentialId.from(statusListCredentialId);
 
     return await this.moduleById(id).removeStatusListCredentialTx(
       id,
       targetDid,
-      didKeypair
+      didKeypair,
     );
   }
 }

@@ -26,7 +26,7 @@ export default function generateBlobModuleTests(
         id: BlobId.random(did),
         blob: "abcdef",
       };
-      console.log(blob1);
+
       await blobModule.new(blob1, did, didKeypair);
 
       const written1 = await blobModule.get(blob1.id);

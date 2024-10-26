@@ -1,12 +1,12 @@
-import { ensurePrototypeOf } from "../../utils";
-import AbstractAccumulatorModule from "./accumulator/module";
-import AbstractAnchorModule from "./anchor/module";
-import AbstractAttestModule from "./attest/module";
-import AbstractBlobModule from "./blob/module";
-import AbstractDIDModule from "./did/module";
-import AbstractOffchainSignaturesModule from "./offchain-signatures/module";
-import AbstractStatusListCredentialModule from "./status-list-credential/module";
-import AbstractTrustRegistryModule from "./trust-registry/module";
+import { ensurePrototypeOf } from '../../utils';
+import AbstractAccumulatorModule from './accumulator/module';
+import AbstractAnchorModule from './anchor/module';
+import AbstractAttestModule from './attest/module';
+import AbstractBlobModule from './blob/module';
+import AbstractDIDModule from './did/module';
+import AbstractOffchainSignaturesModule from './offchain-signatures/module';
+import AbstractStatusListCredentialModule from './status-list-credential/module';
+import AbstractTrustRegistryModule from './trust-registry/module';
 
 /**
  * Class representing a set of core modules each of which is an instance of its respective abstract module.
@@ -58,14 +58,14 @@ export class AbstractCoreModules {
     ensurePrototypeOf(AbstractDIDModule, DIDModule);
     ensurePrototypeOf(
       AbstractOffchainSignaturesModule,
-      OffchainSignaturesModule
+      OffchainSignaturesModule,
     );
     ensurePrototypeOf(AbstractOffchainSignaturesModule, BBSModule);
     ensurePrototypeOf(AbstractOffchainSignaturesModule, BBSPlusModule);
     ensurePrototypeOf(AbstractOffchainSignaturesModule, PSModule);
     ensurePrototypeOf(
       AbstractStatusListCredentialModule,
-      StatusListCredentialModule
+      StatusListCredentialModule,
     );
     ensurePrototypeOf(AbstractTrustRegistryModule, TrustRegistryModule);
 
@@ -96,5 +96,5 @@ export {
   AbstractTrustRegistryModule,
 };
 
-export { default as Schema } from "./schema/module";
-export { AccumulatorType } from "./accumulator";
+export { default as Schema } from './schema/module';
+export { AccumulatorType } from './accumulator';

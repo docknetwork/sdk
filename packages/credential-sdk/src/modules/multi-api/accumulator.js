@@ -1,9 +1,9 @@
-import { AbstractAccumulatorModule } from "../abstract";
-import { AccumulatorId, NamespaceDid } from "../../types";
-import { injectDispatch } from "./common";
+import { AbstractAccumulatorModule } from '../abstract';
+import { AccumulatorId, NamespaceDid } from '../../types';
+import { injectDispatch } from './common';
 
 export default class MultiApiAccumulatorModule extends injectDispatch(
-  AbstractAccumulatorModule
+  AbstractAccumulatorModule,
 ) {
   async addPublicKey(id, publicKey, targetDid, didKeypair, params) {
     const did = NamespaceDid.from(targetDid);
@@ -13,7 +13,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
       publicKey,
       did,
       didKeypair,
-      params
+      params,
     );
   }
 
@@ -32,7 +32,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
       removeKeyId,
       did,
       didKeypair,
-      params
+      params,
     );
   }
 
@@ -50,7 +50,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
     accumulated,
     publicKeyRef,
     didKeypair,
-    params
+    params,
   ) {
     const accId = AccumulatorId.from(id);
 
@@ -59,7 +59,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
       accumulated,
       publicKeyRef,
       didKeypair,
-      params
+      params,
     );
   }
 
@@ -79,7 +79,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
     publicKeyRef,
     maxSize,
     didKeypair,
-    params
+    params,
   ) {
     const accId = AccumulatorId.from(id);
 
@@ -89,7 +89,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
       publicKeyRef,
       maxSize,
       didKeypair,
-      params
+      params,
     );
   }
 
@@ -107,7 +107,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
     accumulated,
     publicKeyRef,
     didKeypair,
-    params
+    params,
   ) {
     const accId = AccumulatorId.from(id);
 
@@ -116,7 +116,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
       accumulated,
       publicKeyRef,
       didKeypair,
-      params
+      params,
     );
   }
 
@@ -135,7 +135,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
     newAccumulated,
     { additions, removals, witnessUpdateInfo },
     didKeypair,
-    params
+    params,
   ) {
     const accId = AccumulatorId.from(id);
 
@@ -144,7 +144,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
       newAccumulated,
       { additions, removals, witnessUpdateInfo },
       didKeypair,
-      params
+      params,
     );
   }
 
@@ -160,7 +160,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
     return await this.moduleById(accId).removeAccumulator(
       id,
       didKeypair,
-      params
+      params,
     );
   }
 
@@ -178,7 +178,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
     return await this.moduleById(AccumulatorId.from(id)).getAccumulator(
       id,
       includeKey,
-      includeKeyParams
+      includeKeyParams,
     );
   }
 
@@ -201,7 +201,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
       member,
       witness,
       from,
-      to
+      to,
     );
   }
 
@@ -254,7 +254,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
       accId,
       accumulated,
       publicKeyRef,
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -274,7 +274,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
     accumulated,
     publicKeyRef,
     maxSize,
-    didKeypair
+    didKeypair,
   ) {
     const accId = AccumulatorId.from(id);
 
@@ -283,7 +283,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
       accumulated,
       publicKeyRef,
       maxSize,
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -304,7 +304,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
       accId,
       accumulated,
       publicKeyRef,
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -323,7 +323,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
     id,
     newAccumulated,
     { additions, removals, witnessUpdateInfo },
-    didKeypair
+    didKeypair,
   ) {
     const accId = AccumulatorId.from(id);
 
@@ -331,7 +331,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
       accId,
       newAccumulated,
       { additions, removals, witnessUpdateInfo },
-      didKeypair
+      didKeypair,
     );
   }
 

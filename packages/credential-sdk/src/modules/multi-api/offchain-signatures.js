@@ -1,5 +1,5 @@
-import { AbstractOffchainSignaturesModule } from "../abstract";
-import { NamespaceDid } from "../../types";
+import { AbstractOffchainSignaturesModule } from '../abstract';
+import { NamespaceDid } from '../../types';
 
 export default class MultiApiOffchainSignatures extends AbstractOffchainSignaturesModule {
   /**
@@ -44,7 +44,7 @@ export default class MultiApiOffchainSignatures extends AbstractOffchainSignatur
       id,
       publicKey,
       targetDid,
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -61,7 +61,7 @@ export default class MultiApiOffchainSignatures extends AbstractOffchainSignatur
     return await this.moduleBy(did).removePublicKeyTx(
       id,
       targetDid,
-      didKeypair
+      didKeypair,
     );
   }
 

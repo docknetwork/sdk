@@ -1,11 +1,11 @@
-import { AbstractCoreModules } from "../abstract";
-import MultiApiAccumulatorModule from "./accumulator";
-import MultiApiAttestModule from "./attest";
-import MultiApiBlobModule from "./blob";
-import MultiApiDIDModule from "./did";
-import MultiApiOffchainSignaturesModule from "./offchain-signatures";
-import MultiApiStatusListCredentialModule from "./status-list-credential";
-import MultiApiTrustRegistryModule from "./trust-registry";
+import { AbstractCoreModules } from '../abstract';
+import MultiApiAccumulatorModule from './accumulator';
+import MultiApiAttestModule from './attest';
+import MultiApiBlobModule from './blob';
+import MultiApiDIDModule from './did';
+import MultiApiOffchainSignaturesModule from './offchain-signatures';
+import MultiApiStatusListCredentialModule from './status-list-credential';
+import MultiApiTrustRegistryModule from './trust-registry';
 
 /**
  * Class representing a set of core modules each of which is an instance of its respective abstract module.

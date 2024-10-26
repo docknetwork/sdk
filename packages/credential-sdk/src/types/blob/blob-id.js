@@ -1,5 +1,5 @@
-import { encodeAsSS58, decodeFromSS58 } from "../../utils/ss58";
-import { isHex } from "../../utils/bytes";
+import { encodeAsSS58, decodeFromSS58 } from '../../utils/ss58';
+import { isHex } from '../../utils/bytes';
 import {
   TypedBytes,
   TypedEnum,
@@ -7,9 +7,9 @@ import {
   sized,
   withFrom,
   withQualifier,
-} from "../generic";
-import { CheqdBlobQualifier, DockBlobQualifier } from "./const";
-import { CheqdMainnetDid, CheqdTestnetDid, DIDRef } from "../did";
+} from '../generic';
+import { CheqdBlobQualifier, DockBlobQualifier } from './const';
+import { CheqdMainnetDid, CheqdTestnetDid, DIDRef } from '../did';
 
 export class BlobId extends withFrom(withQualifier(TypedEnum, true), (value, from) => {
   try {
@@ -18,7 +18,7 @@ export class BlobId extends withFrom(withQualifier(TypedEnum, true), (value, fro
     return from(value);
   }
 }) {
-  static Qualifier = "blob:";
+  static Qualifier = 'blob:';
 
   toJSON() {
     return String(this);
@@ -31,11 +31,11 @@ export class CheqdBlobIdValue extends withQualifier(DIDRef) {
   static Ident = TypedUUID;
 
   toEncodedString() {
-    let prefix = "";
+    let prefix = '';
     if (this[0].value instanceof CheqdTestnetDid) {
-      prefix = "testnet";
+      prefix = 'testnet';
     } else if (this[0].value instanceof CheqdMainnetDid) {
-      prefix = "mainnet";
+      prefix = 'mainnet';
     }
 
     return `${prefix}:${this.value}`;
@@ -61,7 +61,7 @@ export class CheqdBlobId extends BlobId {
 
   static Class = CheqdBlobIdValue;
 
-  static Type = "cheqd";
+  static Type = 'cheqd';
 
   static random(did) {
     return new this(this.Class.random(did));
@@ -73,7 +73,7 @@ export class DockBlobId extends BlobId {
 
   static Class = DockBlobIdValue;
 
-  static Type = "dock";
+  static Type = 'dock';
 
   static random() {
     return new this(this.Class.random());

@@ -1,4 +1,4 @@
-import { DIDRef } from "../did";
+import { DIDRef } from '../did';
 import {
   TypedBytes,
   TypedEnum,
@@ -6,10 +6,10 @@ import {
   sized,
   withFrom,
   withQualifier,
-} from "../generic";
+} from '../generic';
 
 export class AccumulatorId extends withQualifier(TypedEnum, true) {
-  static Qualifier = "accumulator:";
+  static Qualifier = 'accumulator:';
 
   toJSON() {
     return String(this);
@@ -17,7 +17,7 @@ export class AccumulatorId extends withQualifier(TypedEnum, true) {
 }
 
 export class CheqdAccumulatorIdValue extends withQualifier(DIDRef) {
-  static Qualifier = "accumulator:cheqd:";
+  static Qualifier = 'accumulator:cheqd:';
 
   static Ident = TypedUUID;
 }
@@ -30,29 +30,28 @@ export class DockAccumulatorIdIdent extends withQualifier(
   withFrom(
     sized(TypedBytes),
     // eslint-disable-next-line no-use-before-define
-    (value, from) =>
-      value instanceof DockAccumulatorId ? value[1] : from(value)
-  )
+    (value, from) => (value instanceof DockAccumulatorId ? value[1] : from(value)),
+  ),
 ) {
-  static Qualifier = "accumulator:dock:";
+  static Qualifier = 'accumulator:dock:';
 }
 
 export class CheqdAccumulatorId extends AccumulatorId {
   static Class = CheqdAccumulatorIdValue;
 
-  static Type = "cheqd";
+  static Type = 'cheqd';
 }
 
 export class DockAccumulatorId extends AccumulatorId {
   static Class = DockAccumulatorIdIdent;
 
-  static Type = "dock";
+  static Type = 'dock';
 }
 
 AccumulatorId.bindVariants(CheqdAccumulatorId, DockAccumulatorId);
 
-export * from "./keys";
-export * from "./params";
-export * from "./public-key";
-export * from "./accumulator";
-export * from "./counters";
+export * from './keys';
+export * from './params';
+export * from './public-key';
+export * from './accumulator';
+export * from './counters';

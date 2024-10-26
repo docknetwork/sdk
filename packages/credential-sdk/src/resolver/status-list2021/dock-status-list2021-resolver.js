@@ -1,9 +1,9 @@
-import { ensureInstanceOf } from "../../utils";
-import AbstractStatusListCredentialModule from "../../modules/abstract/status-list-credential/module";
-import StatusList2021Resolver from "./status-list2021-resolver";
+import { ensureInstanceOf } from '../../utils';
+import AbstractStatusListCredentialModule from '../../modules/abstract/status-list-credential/module';
+import StatusList2021Resolver from './status-list2021-resolver';
 
 class DockStatusListResolver extends StatusList2021Resolver {
-  static METHOD = "dock";
+  static METHOD = 'dock';
 
   /**
    * @param {AbstractStatusListCredentialModule} statusListCredentialModule
@@ -17,7 +17,7 @@ class DockStatusListResolver extends StatusList2021Resolver {
      */
     this.statusListCredentialModule = ensureInstanceOf(
       statusListCredentialModule,
-      AbstractStatusListCredentialModule
+      AbstractStatusListCredentialModule,
     );
   }
 
@@ -25,7 +25,7 @@ class DockStatusListResolver extends StatusList2021Resolver {
     const { id: dockStatusListId } = this.parse(fullyQualifiedStatusListId);
 
     const cred = await this.statusListCredentialModule.getStatusListCredential(
-      dockStatusListId
+      dockStatusListId,
     );
 
     return cred?.value.list.toJSON();

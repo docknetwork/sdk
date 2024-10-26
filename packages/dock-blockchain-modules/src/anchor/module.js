@@ -1,12 +1,12 @@
 /* eslint-disable camelcase */
-import { AnchorHash, Anchor } from "@docknetwork/credential-sdk/types/anchor";
-import { TypedNumber, option } from "@docknetwork/credential-sdk/types/generic";
+import { AnchorHash, Anchor } from '@docknetwork/credential-sdk/types/anchor';
+import { TypedNumber, option } from '@docknetwork/credential-sdk/types/generic';
 import {
   NoAnchorError,
   AbstractAnchorModule,
-} from "@docknetwork/credential-sdk/modules/abstract/anchor";
-import { injectDock } from "../common";
-import DockInternalAnchorModule from "./internal";
+} from '@docknetwork/credential-sdk/modules/abstract/anchor';
+import { injectDock } from '../common';
+import DockInternalAnchorModule from './internal';
 
 /** Class to create and query anchors from chain. */
 export default class DockAnchorModule extends injectDock(AbstractAnchorModule) {
@@ -32,7 +32,7 @@ export default class DockAnchorModule extends injectDock(AbstractAnchorModule) {
     const key = preHashed ? AnchorHash.from(anchorKey) : Anchor.hash(anchorKey);
 
     const anchor = option(TypedNumber).from(
-      await this.dockOnly.query.anchors(key)
+      await this.dockOnly.query.anchors(key),
     );
 
     if (anchor == null) {

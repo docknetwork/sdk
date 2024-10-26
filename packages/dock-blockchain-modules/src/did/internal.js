@@ -9,19 +9,19 @@ import {
   DidKeys,
   Controllers,
   StoredDidDetails,
-} from "@docknetwork/credential-sdk/types";
+} from '@docknetwork/credential-sdk/types';
 import {
   option,
   TypedNumber,
   TypedTuple,
-} from "@docknetwork/credential-sdk/types/generic";
+} from '@docknetwork/credential-sdk/types/generic';
 import {
   NoDIDError,
   NoOffchainDIDError,
   NoOnchainDIDError,
-} from "@docknetwork/credential-sdk/modules/abstract/did/errors";
-import { maybeToHuman } from "@docknetwork/credential-sdk/utils";
-import { DidMethodKeyDetails } from "@docknetwork/credential-sdk/types/did/onchain";
+} from '@docknetwork/credential-sdk/modules/abstract/did/errors';
+import { maybeToHuman } from '@docknetwork/credential-sdk/utils';
+import { DidMethodKeyDetails } from '@docknetwork/credential-sdk/types/did/onchain';
 import {
   AddServiceEndpoint,
   AddKeys,
@@ -30,8 +30,8 @@ import {
   RemoveControllers,
   RemoveServiceEndpoint,
   RemoveOnchainDid,
-} from "./actions";
-import { createInternalDockModule } from "../common/builders";
+} from './actions';
+import { createInternalDockModule } from '../common/builders';
 
 const didMethods = {
   addKeys: (keys, targetDid, _, nonce) => {
@@ -46,13 +46,12 @@ const didMethods = {
     return new AddControllers(did, controllers, nonce);
   },
 
-  addServiceEndpoint: (id, types, origins, targetDid, _, nonce) =>
-    new AddServiceEndpoint(
-      DockDid.from(targetDid).asDid,
-      id,
-      new ServiceEndpoint(types, origins),
-      nonce
-    ),
+  addServiceEndpoint: (id, types, origins, targetDid, _, nonce) => new AddServiceEndpoint(
+    DockDid.from(targetDid).asDid,
+    id,
+    new ServiceEndpoint(types, origins),
+    nonce,
+  ),
 
   removeKeys: (keys, targetDid, _, nonce) => {
     const did = DockDid.from(targetDid).asDid;
@@ -118,10 +117,10 @@ export class DockDIDModuleInternal extends createInternalDockModule({
   didMethods,
   accountMethods,
 }) {
-  static Prop = "didModule";
+  static Prop = 'didModule';
 
   static MethodNameOverrides = {
-    removeOnchainDid: "DidRemoval",
+    removeOnchainDid: 'DidRemoval',
   };
 
   /**
@@ -135,7 +134,7 @@ export class DockDIDModuleInternal extends createInternalDockModule({
       did,
       didDocRef,
 
-      params
+      params,
     );
   }
 
@@ -149,13 +148,13 @@ export class DockDIDModuleInternal extends createInternalDockModule({
     did,
     didDocRef,
 
-    params = {}
+    params = {},
   ) {
     return await this.send.setOffchainDidDocRef(
       did,
       didDocRef,
 
-      params
+      params,
     );
   }
 
@@ -180,7 +179,7 @@ export class DockDIDModuleInternal extends createInternalDockModule({
     didKeys,
     controllers,
 
-    params = {}
+    params = {},
   ) {
     return await this.send.newOnchain(did, didKeys, controllers, params);
   }
@@ -219,13 +218,13 @@ export class DockDIDModuleInternal extends createInternalDockModule({
     targetDid,
     didKeypair,
 
-    params = {}
+    params = {},
   ) {
     return await this.send.addControllers(
       controllers,
       targetDid,
       didKeypair,
-      params
+      params,
     );
   }
 
@@ -245,7 +244,7 @@ export class DockDIDModuleInternal extends createInternalDockModule({
     origins,
     targetDid,
     didKeypair,
-    params = {}
+    params = {},
   ) {
     return await this.send.addServiceEndpoint(
       endpointId,
@@ -253,7 +252,7 @@ export class DockDIDModuleInternal extends createInternalDockModule({
       origins,
       targetDid,
       didKeypair,
-      params
+      params,
     );
   }
 
@@ -282,7 +281,7 @@ export class DockDIDModuleInternal extends createInternalDockModule({
       controllers,
       targetDid,
       didKeypair,
-      params
+      params,
     );
   }
 
@@ -298,7 +297,7 @@ export class DockDIDModuleInternal extends createInternalDockModule({
     return await this.send.removeServiceEndpoint(
       endpointId,
       didKeypair,
-      params
+      params,
     );
   }
 
@@ -313,7 +312,7 @@ export class DockDIDModuleInternal extends createInternalDockModule({
     targetDid,
     didKeypair,
 
-    params = {}
+    params = {},
   ) {
     return await this.send.removeOnchainDid(targetDid, didKeypair, params);
   }
@@ -330,7 +329,7 @@ export class DockDIDModuleInternal extends createInternalDockModule({
 
     return (
       option(TypedNumber).from(
-        await this.query.didControllers(controlledDid, controllerDid)
+        await this.query.didControllers(controlledDid, controllerDid),
       ) != null
     );
   }
@@ -345,12 +344,12 @@ export class DockDIDModuleInternal extends createInternalDockModule({
     const [owner, id] = ServiceEndpointId.from(endpointId);
 
     const endpoint = option(ServiceEndpoint).from(
-      await this.query.didServiceEndpoints(owner.asDock, id)
+      await this.query.didServiceEndpoints(owner.asDock, id),
     );
 
     if (endpoint == null) {
       throw new Error(
-        `No service endpoint found for did ${owner} and with id ${endpointId}`
+        `No service endpoint found for did ${owner} and with id ${endpointId}`,
       );
     }
 
@@ -384,7 +383,7 @@ export class DockDIDModuleInternal extends createInternalDockModule({
   async getOnchainDidDetail(rawDid) {
     const did = DockDid.from(rawDid);
     const resp = option(StoredDidDetails).from(
-      await this.query.dids(did.asDid)
+      await this.query.dids(did.asDid),
     );
     if (resp == null) {
       throw new NoDIDError(String(did));
@@ -399,7 +398,7 @@ export class DockDIDModuleInternal extends createInternalDockModule({
   async getDidMethodKeyDetail(did) {
     const didKey = DidMethodKey.from(did);
     const resp = option(DidMethodKeyDetails).from(
-      await this.query.didMethodKeys(didKey.asDidMethodKey)
+      await this.query.didMethodKeys(didKey.asDidMethodKey),
     );
     if (resp == null) {
       throw new NoDIDError(String(didKey));
@@ -416,7 +415,7 @@ export class DockDIDModuleInternal extends createInternalDockModule({
   async getOffchainDidDetail(didIdentifier) {
     const did = DockDid.from(didIdentifier);
     const resp = option(StoredDidDetails).from(
-      await this.query.dids(did.asDid)
+      await this.query.dids(did.asDid),
     );
     if (resp == null) {
       throw new NoDIDError(String(did));
@@ -457,11 +456,11 @@ export class DockDIDModuleInternal extends createInternalDockModule({
 
   async controllers(did) {
     const controllers = await this.query.didControllers.entries(
-      DockDid.from(did).asDid
+      DockDid.from(did).asDid,
     );
 
     return Controllers.from(
-      controllers.map(([entry]) => maybeToHuman(entry)[1])
+      controllers.map(([entry]) => maybeToHuman(entry)[1]),
     );
   }
 
@@ -473,13 +472,11 @@ export class DockDIDModuleInternal extends createInternalDockModule({
 
     return new ServiceEndpoints(
       (await this.query.didServiceEndpoints.entries(typedDid.asDid))
-        .map(([key, value]) =>
-          ServiceEndpointEntry.from([
-            [typedDid, maybeToHuman(key)[1]],
-            maybeToHuman(value),
-          ])
-        )
-        .filter(([_, sp]) => sp)
+        .map(([key, value]) => ServiceEndpointEntry.from([
+          [typedDid, maybeToHuman(key)[1]],
+          maybeToHuman(value),
+        ]))
+        .filter(([_, sp]) => sp),
     );
   }
 
@@ -490,10 +487,8 @@ export class DockDIDModuleInternal extends createInternalDockModule({
 
     return new DidKeys(
       (await this.query.didKeys.entries(DockDid.from(did).asDid))
-        .map(([key, value]) =>
-          DidKeyWithId.from([maybeToHuman(key)[1], maybeToHuman(value)])
-        )
-        .filter(([_, pk]) => pk)
+        .map(([key, value]) => DidKeyWithId.from([maybeToHuman(key)[1], maybeToHuman(value)]))
+        .filter(([_, pk]) => pk),
     );
   }
 }

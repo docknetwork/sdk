@@ -1,9 +1,9 @@
-import { AbstractBlobModule } from "../abstract";
-import { BlobId, BlobWithId } from "../../types";
-import { injectDispatch } from "./common";
+import { AbstractBlobModule } from '../abstract';
+import { BlobId, BlobWithId } from '../../types';
+import { injectDispatch } from './common';
 
 export default class MultiApiBlobModule extends injectDispatch(
-  AbstractBlobModule
+  AbstractBlobModule,
 ) {
   /**
    * Write a new blob on chain.
@@ -19,7 +19,7 @@ export default class MultiApiBlobModule extends injectDispatch(
       parsedBlobWithId,
       targetDid,
       didKeypair,
-      params
+      params,
     );
   }
 
@@ -36,7 +36,7 @@ export default class MultiApiBlobModule extends injectDispatch(
     return await this.moduleById(parsedBlobWithId).new(
       parsedBlobWithId,
       targetDid,
-      didKeypair
+      didKeypair,
     );
   }
 

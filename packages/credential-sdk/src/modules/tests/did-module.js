@@ -12,6 +12,7 @@ import { TypedBytes } from "../../types/generic";
 import { NoDIDError } from "../abstract/did/errors";
 import { itIf } from "./common";
 
+// eslint-disable-next-line jest/no-export */
 export default function generateDIDModuleTests(
   { did: module },
   { DID },

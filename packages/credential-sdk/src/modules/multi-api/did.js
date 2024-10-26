@@ -1,9 +1,9 @@
-import { AbstractDIDModule } from "../abstract";
-import { DIDDocument, NamespaceDid } from "../../types";
-import { injectDispatch } from "./common";
+import { AbstractDIDModule } from '../abstract';
+import { DIDDocument, NamespaceDid } from '../../types';
+import { injectDispatch } from './common';
 
 export default class MultiApiDIDModule extends injectDispatch(
-  AbstractDIDModule
+  AbstractDIDModule,
 ) {
   /**
    *
@@ -17,7 +17,7 @@ export default class MultiApiDIDModule extends injectDispatch(
     return await this.moduleById(document.id).createDocument(
       document,
       didKeypair,
-      params
+      params,
     );
   }
 
@@ -33,7 +33,7 @@ export default class MultiApiDIDModule extends injectDispatch(
     return await this.moduleById(document.id).updateDocument(
       document,
       didKeypair,
-      params
+      params,
     );
   }
 
@@ -71,7 +71,7 @@ export default class MultiApiDIDModule extends injectDispatch(
 
     return await this.moduleById(document.id).createDocumentTx(
       document,
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -86,7 +86,7 @@ export default class MultiApiDIDModule extends injectDispatch(
 
     return await this.moduleById(document.id).updateDocumentTx(
       document,
-      didKeypair
+      didKeypair,
     );
   }
 

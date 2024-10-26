@@ -1,4 +1,4 @@
-import { AbstractWithParamsAndPublicKeys } from "@docknetwork/credential-sdk/modules/abstract/common";
+import { AbstractWithParamsAndPublicKeys } from '@docknetwork/credential-sdk/modules/abstract/common';
 import {
   TypedNumber,
   option,
@@ -6,13 +6,13 @@ import {
   TypedMap,
   TypedEnum,
   withNullIfNotAVariant,
-} from "@docknetwork/credential-sdk/types/generic";
-import { DockDidOrDidMethodKey } from "@docknetwork/credential-sdk/types";
+} from '@docknetwork/credential-sdk/types/generic';
+import { DockDidOrDidMethodKey } from '@docknetwork/credential-sdk/types';
 import {
   isEqualToOrPrototypeOf,
   withExtendedStaticProperties,
-} from "@docknetwork/credential-sdk/utils/inheritance";
-import injectDock from "./inject-dock";
+} from '@docknetwork/credential-sdk/utils/inheritance';
+import injectDock from './inject-dock';
 
 /**
  * Wraps supplied class into a class with logic for public keys and corresponding setup parameters.
@@ -23,7 +23,7 @@ export default function withParamsAndPublicKeys(klass) {
 
   if (!isEqualToOrPrototypeOf(AbstractWithParamsAndPublicKeys, klass)) {
     throw new Error(
-      `Class \`${klass.name}\` must extend \`${AbstractWithParamsAndPublicKeys}\``
+      `Class \`${klass.name}\` must extend \`${AbstractWithParamsAndPublicKeys}\``,
     );
   }
 
@@ -111,7 +111,7 @@ export default function withParamsAndPublicKeys(klass) {
         return await this.dockOnly.tx.addPublicKey(
           publicKey,
           targetDid,
-          didKeypair
+          didKeypair,
         );
       }
 
@@ -126,7 +126,7 @@ export default function withParamsAndPublicKeys(klass) {
         return await this.dockOnly.tx.removePublicKey(
           id,
           targetDid,
-          didKeypair
+          didKeypair,
         );
       }
 
@@ -140,8 +140,8 @@ export default function withParamsAndPublicKeys(klass) {
         return option(this.constructor.Params).from(
           await this.dockOnly.query[this.constructor.ParamsQuery](
             DockDidOrDidMethodKey.from(did),
-            TypedNumber.from(counter)
-          )
+            TypedNumber.from(counter),
+          ),
         );
       }
 
@@ -200,28 +200,28 @@ export default function withParamsAndPublicKeys(klass) {
        * @returns {Promise<{bytes: string}|null>}
        */
       async getPublicKey(did, keyId, includeParams = false) {
-        const { PublicKey, ParamsRef, Params, PublicKeyOwner, PublicKeyQuery } =
-          this.constructor;
+        const {
+          PublicKey, ParamsRef, Params, PublicKeyOwner, PublicKeyQuery,
+        } = this.constructor;
 
         const PublicKeyWithParamsRef = withProp(
           PublicKey,
-          "paramsRef",
-          option(ParamsRef)
+          'paramsRef',
+          option(ParamsRef),
         );
         const PublicKeyWithParams = includeParams
-          ? withProp(PublicKeyWithParamsRef, "params", option(Params))
+          ? withProp(PublicKeyWithParamsRef, 'params', option(Params))
           : PublicKeyWithParamsRef;
-        const MaybeNotAVariantPublicKey =
-          isEqualToOrPrototypeOf(TypedEnum, PublicKeyWithParams) &&
-          PublicKeyWithParams.Class != null
-            ? withNullIfNotAVariant(PublicKeyWithParams)
-            : PublicKeyWithParams;
+        const MaybeNotAVariantPublicKey = isEqualToOrPrototypeOf(TypedEnum, PublicKeyWithParams)
+          && PublicKeyWithParams.Class != null
+          ? withNullIfNotAVariant(PublicKeyWithParams)
+          : PublicKeyWithParams;
         const owner = PublicKeyOwner.from(did);
         const publicKey = await option(MaybeNotAVariantPublicKey).from(
           await this.dockOnly.query[PublicKeyQuery](
             owner,
-            TypedNumber.from(keyId)
-          )
+            TypedNumber.from(keyId),
+          ),
         );
 
         if (publicKey == null) {
@@ -232,7 +232,7 @@ export default function withParamsAndPublicKeys(klass) {
           const params = await this.getParams(...publicKey.paramsRef);
           if (params == null) {
             throw new Error(
-              `Parameters with reference (${publicKey.paramsRef[0]}, ${publicKey.paramsRef[1]}) not found on chain`
+              `Parameters with reference (${publicKey.paramsRef[0]}, ${publicKey.paramsRef[1]}) not found on chain`,
             );
           }
           publicKey.params = params;
@@ -243,5 +243,5 @@ export default function withParamsAndPublicKeys(klass) {
     },
   };
 
-  return withExtendedStaticProperties(["ParamsRef"], obj[name]);
+  return withExtendedStaticProperties(['ParamsRef'], obj[name]);
 }

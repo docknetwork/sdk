@@ -38,7 +38,7 @@ export default function generateBlobModuleTests(
         id: BlobId.random(did),
         blob: {
           example: 'content',
-        },  
+        },
       };
       await blobModule.new(blob2, did, didKeypair);
 

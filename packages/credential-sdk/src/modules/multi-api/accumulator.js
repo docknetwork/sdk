@@ -175,8 +175,10 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
    * @returns {Promise<Accumulator|null>}
    */
   async getAccumulator(id, includeKey = false, includeKeyParams = false) {
-    return await this.moduleById(AccumulatorId.from(id)).getAccumulator(
-      id,
+    const accId = AccumulatorId.from(id);
+
+    return await this.moduleById(accId).getAccumulator(
+      accId,
       includeKey,
       includeKeyParams,
     );
@@ -205,6 +207,23 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
     );
   }
 
+  async getPublicKey(did, id) {
+    const parsedDid = NamespaceDid.from(did);
+
+    return await this.moduleById(parsedDid).getPublicKey(parsedDid, id);
+  }
+
+  /**
+   * Retrieves all accumulator public keys by a DID.
+   * @param {*} did
+   * @returns {Promise<Map<*, AccumulatorPublicKey>>}
+   */
+  async getAllPublicKeysByDid(did) {
+    const id = NamespaceDid.from(did);
+
+    return await this.moduleById(id).getAllPublicKeysByDid(did);
+  }
+
   async addPublicKeyTx(...args) {
     const did = NamespaceDid.from(args[2]);
 
@@ -225,6 +244,38 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
     return await this.moduleById(did).removePublicKeyTx(...args);
   }
 
+  /**
+   * Retrieves accumulator params by a DID and unique idetnfier.
+   * @param {*} did
+   * @param {*} id
+   * @returns {Promise<AccumulatorParams>}
+   */
+  async getParams(did, id) {
+    const parsedDid = NamespaceDid.from(did);
+
+    return await this.moduleById(parsedDid).getParams(parsedDid, id);
+  }
+
+  /**
+   * Retrieves all accumulator params by a DID.
+   * @param {*} did
+   * @returns {Promise<Map<*, AccumulatorParams>>}
+   */
+  async getAllParamsByDid(did) {
+    const id = NamespaceDid.from(did);
+
+    return await this.moduleById(id).getAllParamsByDid(did);
+  }
+
+  /**
+   * Add new accumulator params.
+   * @param id - Unique identifier of the new params to be added.
+   * @param param - The signature params to add.
+   * @param targetDid
+   * @param keyPair - Signer's keypair
+
+   * @returns {Promise<*>}
+   */
   async addParams(...args) {
     const did = NamespaceDid.from(args[2]);
 

@@ -8,14 +8,17 @@ import {
   withQualifier,
 } from '../generic';
 
-export class AccumulatorId extends withFrom(withQualifier(TypedEnum, true), (value, from) => {
-  try {
-    // eslint-disable-next-line no-use-before-define
-    return DockAccumulatorId.from(value);
-  } catch {
-    return from(value);
-  }
-}) {
+export class AccumulatorId extends withFrom(
+  withQualifier(TypedEnum, true),
+  (value, from) => {
+    try {
+      // eslint-disable-next-line no-use-before-define
+      return DockAccumulatorId.from(value);
+    } catch {
+      return from(value);
+    }
+  },
+) {
   static Qualifier = 'accumulator:';
 
   toJSON() {
@@ -41,18 +44,32 @@ export class DockAccumulatorIdIdent extends withQualifier(
   ),
 ) {
   static Qualifier = 'accumulator:dock:';
+
+  static Size = 32;
+
+  toEncodedString() {
+    return this.value;
+  }
 }
 
 export class CheqdAccumulatorId extends AccumulatorId {
   static Class = CheqdAccumulatorIdValue;
 
   static Type = 'cheqd';
+
+  static random(did) {
+    return new this(this.Class.random(did));
+  }
 }
 
 export class DockAccumulatorId extends AccumulatorId {
   static Class = DockAccumulatorIdIdent;
 
   static Type = 'dock';
+
+  static random() {
+    return new this(this.Class.random());
+  }
 }
 
 AccumulatorId.bindVariants(CheqdAccumulatorId, DockAccumulatorId);

@@ -25,13 +25,11 @@ import {
 } from "../../test-constants";
 import { DockDid, DockAccumulatorId } from "@docknetwork/credential-sdk/types";
 
-import {
-  AccumulatorType,
-} from "@docknetwork/credential-sdk/modules/abstract/accumulator";
+import { AccumulatorType } from "@docknetwork/credential-sdk/modules/abstract/accumulator";
 import {
   AbstractAccumulatorModule,
-  MultiApiAccumulatorModule
-} from '@docknetwork/credential-sdk/modules';
+  MultiApiAccumulatorModule,
+} from "@docknetwork/credential-sdk/modules";
 import { getAllEventsFromBlock } from "@docknetwork/dock-blockchain-api/utils/chain-ops";
 import { registerNewDIDUsingPair } from "../helpers";
 import {
@@ -44,7 +42,7 @@ import { DockAccumulatorModule } from "../../../src";
 
 describe("Accumulator Module", () => {
   const dock = new DockAPI();
-  const chainModule = new MultiApiAccumulatorModule([new DockAccumulatorModule(dock)]);
+  const chainModule = new DockAccumulatorModule(dock);
   let account;
 
   const seed1 = randomAsHex(32);

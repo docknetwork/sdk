@@ -9,7 +9,7 @@ import {
   AccumulatorParams,
   DockAccumulatorPublicKey,
   DockAccumulatorParamsRef,
-  DockAccumulatorId,
+  DockAccumulatorIdIdent,
 } from '@docknetwork/credential-sdk/types';
 import { option, withProp } from '@docknetwork/credential-sdk/types/generic';
 import { AbstractAccumulatorModule } from '@docknetwork/credential-sdk/modules/abstract/accumulator';
@@ -187,7 +187,7 @@ export default class DockAccumulatorModule extends withParamsAndPublicKeys(
       : DockAccumulatorWithUpdateInfo;
 
     const acc = option(Accumulator).from(
-      await this.dockOnly.query.accumulators(DockAccumulatorId.from(id)[1]),
+      await this.dockOnly.query.accumulators(DockAccumulatorIdIdent.from(id)),
     );
 
     if (acc == null) {

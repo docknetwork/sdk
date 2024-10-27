@@ -11,12 +11,7 @@ import {
 import { randomAsHex } from "@polkadot/util-crypto";
 import { InMemoryState } from "@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence";
 import { DockAPI } from "@docknetwork/dock-blockchain-api";
-import {
-  AccumulatorType,
-} from "@docknetwork/credential-sdk/modules/abstract/accumulator/module";
-import {
-  MultiApiCoreModules
-} from '@docknetwork/credential-sdk/modules';
+import { AccumulatorType } from "@docknetwork/credential-sdk/modules/abstract/accumulator/module";
 import {
   FullNodeEndpoint,
   TestAccountURI,
@@ -54,7 +49,7 @@ describe("Prefilled positive accumulator", () => {
   const seedAccum = randomAsHex(32);
 
   const dock = new DockAPI();
-  const modules = new MultiApiCoreModules([new DockCoreModules(dock)]);
+  const modules = new DockCoreModules(dock);
   let account;
   const did = DockDid.random();
   const pair = new DidKeypair([did, 1], new Ed25519Keypair(seed1));

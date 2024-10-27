@@ -58,7 +58,7 @@ export class AbstractBaseModule {
   async signAndSend(extrinsic, params) {
     if (this.apiProvider == null) {
       throw new Error(
-        'Can\'t sign a transaction because the module doesn\'t have an `apiProvider`',
+        "Can't sign a transaction because the module doesn't have an `apiProvider`",
       );
     }
 
@@ -102,7 +102,6 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
    * @param param - The signature params to add.
    * @param targetDid
    * @param keyPair - Signer's keypair
-   * @param signingKeyRef - Reference to the keypair used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @returns {Promise<*>}
    */
   async addParams(id, param, targetDid, didKeypair, params) {
@@ -117,7 +116,7 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
    * @param id - Identifier of the parameters to be removed.
    * @param targetDid - Target DID associated with the params
    * @param keyPair - Signer's keypair
-   * @param signingKeyRef - Reference to the keypair used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+
    * @returns {Promise<*>}
    */
   async removeParams(id, targetDid, didKeypair, params) {

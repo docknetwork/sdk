@@ -8,7 +8,6 @@
     },
     "docs": {
       "cache": true,
-      "dependsOn": ["^build"],
       "outputs": ["out/**"]
     },
     "lint": {

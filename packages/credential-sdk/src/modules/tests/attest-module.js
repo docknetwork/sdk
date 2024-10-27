@@ -1,17 +1,17 @@
-import { DidKeypair, Ed25519Keypair } from "../../keypairs";
-import { DIDDocument } from "../../types";
-import { itIf } from "./common";
+import { DidKeypair, Ed25519Keypair } from '../../keypairs';
+import { DIDDocument } from '../../types';
+import { itIf } from './common';
 
 // eslint-disable-next-line jest/no-export
 export default function generateAttestModuleTests(
   { did: didModule, attest: attestModule },
   { DID },
-  filter = () => true
+  filter = () => true,
 ) {
   const test = itIf(filter);
 
   describe(`Using ${didModule.constructor.name} and ${attestModule.constructor.name}`, () => {
-    test("Generates a `DIDDocument` and appends an `Attest` to it", async () => {
+    test('Generates a `DIDDocument` and appends an `Attest` to it', async () => {
       const did = DID.random();
 
       const keyPair = Ed25519Keypair.random();
@@ -22,29 +22,29 @@ export default function generateAttestModuleTests(
       await didModule.createDocument(document, didKeypair);
 
       expect((await didModule.getDocument(did)).toJSON()).toEqual(
-        document.toJSON()
+        document.toJSON(),
       );
 
-      const iri = "some iri";
+      const iri = 'some iri';
       await attestModule.setClaim(iri, did, didKeypair);
 
       expect((await attestModule.getAttests(did)).toString()).toBe(iri);
       document.setAttests(iri);
       expect((await didModule.getDocument(did)).toJSON()).toEqual(
-        document.toJSON()
+        document.toJSON(),
       );
 
-      const iri2 = "other iri";
+      const iri2 = 'other iri';
       await attestModule.setClaim(iri2, did, didKeypair);
 
       expect((await attestModule.getAttests(did)).toString()).toBe(iri2);
       document.setAttests(iri2);
       expect((await didModule.getDocument(did)).toJSON()).toEqual(
-        document.toJSON()
+        document.toJSON(),
       );
     });
 
-    test("Returns `null` on missing attest", async () => {
+    test('Returns `null` on missing attest', async () => {
       expect(await attestModule.getAttests(DID.random())).toBe(null);
     });
   });

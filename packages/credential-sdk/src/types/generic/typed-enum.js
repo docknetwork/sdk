@@ -44,7 +44,6 @@ class TypedEnum extends withBase(class EnumBase {}) {
 
   /**
    * Associates enum parameters with the base enum class and vice versa.
-   * @template Class
    * @param {...this} classes
    */
   /* eslint-disable */

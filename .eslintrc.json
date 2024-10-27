@@ -41,6 +41,7 @@
     "no-plusplus": "off",
     "no-void": "off",
     "max-len": "off",
+    "jest/no-standalone-expect": "off",
     "no-underscore-dangle": ["error", { "enforceInMethodNames": false }],
     "max-classes-per-file": "off",
     "import/prefer-default-export": "off",

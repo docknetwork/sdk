@@ -13,6 +13,7 @@ import { CheqdMainnetDid, CheqdTestnetDid, DIDRef } from '../did';
 
 export class BlobId extends withFrom(withQualifier(TypedEnum, true), (value, from) => {
   try {
+    // eslint-disable-next-line no-use-before-define
     return DockBlobId.from(value);
   } catch {
     return from(value);

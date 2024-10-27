@@ -8,7 +8,14 @@ import {
   withQualifier,
 } from '../generic';
 
-export class AccumulatorId extends withQualifier(TypedEnum, true) {
+export class AccumulatorId extends withFrom(withQualifier(TypedEnum, true), (value, from) => {
+  try {
+    // eslint-disable-next-line no-use-before-define
+    return DockAccumulatorId.from(value);
+  } catch {
+    return from(value);
+  }
+}) {
   static Qualifier = 'accumulator:';
 
   toJSON() {

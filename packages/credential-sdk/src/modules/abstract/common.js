@@ -1,6 +1,4 @@
 import {
-  ensureInstanceOf,
-  ensurePrototypeOf,
   withExtendedPrototypeProperties,
   withExtendedStaticProperties,
 } from '../../utils';

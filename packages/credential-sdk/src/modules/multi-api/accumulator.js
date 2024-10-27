@@ -196,7 +196,7 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
   async updateWitness(accumulatorId, member, witness, from, to) {
     const accId = AccumulatorId.from(accumulatorId);
 
-    return await this.moduleById(accId).getAccumulator(
+    return await this.moduleById(accId).updateWitness(
       accId,
       member,
       witness,
@@ -228,13 +228,25 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
   async addParams(...args) {
     const did = NamespaceDid.from(args[2]);
 
-    return await this.moduleById(did).addParamsTx(...args);
+    return await this.moduleById(did).addParams(...args);
   }
 
   async addParamsTx(...args) {
     const did = NamespaceDid.from(args[2]);
 
     return await this.moduleById(did).addParamsTx(...args);
+  }
+
+  async removeParams(...args) {
+    const did = NamespaceDid.from(args[1]);
+
+    return await this.moduleById(did).removeParams(...args);
+  }
+
+  async removeParamsTx(...args) {
+    const did = NamespaceDid.from(args[1]);
+
+    return await this.moduleById(did).removeParamsTx(...args);
   }
 
   /**

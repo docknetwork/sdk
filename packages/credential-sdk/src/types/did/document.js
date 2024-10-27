@@ -573,18 +573,12 @@ export class DIDDocument extends TypedStruct {
     );
 
     let idx = 0;
-    let selfControlled = false;
     for (const key of keys) {
       const didKey = DidKey.from(key);
       doc.addKey([did, ++idx], didKey);
-
-      selfControlled ||= didKey.verRels.isAuthentication();
     }
     for (const [id, serviceEndpoint] of Object.entries(serviceEndpoints)) {
       doc.addServiceEndpoint([did, id], serviceEndpoint);
-    }
-    if (selfControlled && !doc.controller.find((ctrl) => ctrl.eq(did))) {
-      doc.addController(did);
     }
 
     return doc;
@@ -625,6 +619,17 @@ export class DIDDocument extends TypedStruct {
       throw new Error(`Controller \`${controller}\` already exists`);
     }
     this.controller.push(controller);
+
+    return this;
+  }
+
+  removeController(controller) {
+    const idx = this.controller.findIndex((ctrl) => ctrl.eq(controller));
+    // eslint-disable-next-line
+    if (~idx) {
+      throw new Error(`Controller \`${controller}\` doesn't exists`);
+    }
+    this.controller.splice(idx, 1);
 
     return this;
   }

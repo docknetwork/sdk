@@ -51,6 +51,12 @@ export class AbstractCoreModules {
     TrustRegistryModule: { key: 'trustRegistry', optional: false },
   };
 
+  constructor(...args) {
+    for (const [prop, key] of Object.entries(this.constructor.ModuleMap)) {
+      this.attachModule(prop, key, args);
+    }
+  }
+
   attachModule(prop, { key, optional }, args) {
     const { [prop]: Module } = this.constructor;
 
@@ -63,16 +69,9 @@ export class AbstractCoreModules {
     }
 
     ensurePrototypeOf(AbstractCoreModules[prop], Module);
-    const mod = new Module(...args);
-    this[key] = mod;
+    this[key] = new Module(...args);
 
     return this;
-  }
-
-  constructor(...args) {
-    for (const [prop, key] of Object.entries(this.constructor.ModuleMap)) {
-      this.attachModule(prop, key, args);
-    }
   }
 }
 

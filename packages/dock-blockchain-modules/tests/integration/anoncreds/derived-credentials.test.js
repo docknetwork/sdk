@@ -41,13 +41,11 @@ import {
 } from "@docknetwork/credential-sdk/vc";
 import { DockResolver } from "@docknetwork/credential-sdk/resolver";
 import { createPresentation } from "../../create-presentation";
+import { AccumulatorType } from "@docknetwork/credential-sdk/modules/abstract/accumulator/module";
 import {
-  AccumulatorType,
-} from "@docknetwork/credential-sdk/modules/abstract/accumulator/module";
-import {
-  AccumulatorModule,
-  MultiApiCoreModules
-} from '@docknetwork/credential-sdk/modules';
+  AbstractAccumulatorModule as AccumulatorModule,
+  MultiApiCoreModules,
+} from "@docknetwork/credential-sdk/modules";
 import { getKeyedProofsFromVerifiedPresentation } from "@docknetwork/credential-sdk/vc/presentations";
 import { deepClone } from "@docknetwork/credential-sdk/rdf-and-cd/common";
 import {

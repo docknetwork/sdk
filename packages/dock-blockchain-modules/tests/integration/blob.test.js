@@ -68,7 +68,7 @@ describe("Blob Module", () => {
       jsonBlob: true,
     });
     const blob = new BlobWithId(blobId, blobJSON);
-    const result = await modules.blob.new(blob, dockDID, pair);
+    const result = await modules.blob.new(blob, pair);
 
     expect(!!result).toBe(true);
 
@@ -81,7 +81,7 @@ describe("Blob Module", () => {
   test("Can create and read a string Blob.", async () => {
     const blobHex = "my string";
     const blob = new BlobWithId(blobId, blobHex);
-    const result = await modules.blob.new(blob, dockDID, pair);
+    const result = await modules.blob.new(blob, pair);
 
     expect(!!result).toBe(true);
 
@@ -95,7 +95,7 @@ describe("Blob Module", () => {
     const blobHex = randomAsHex(32);
     const blob = new BlobWithId(blobId, blobHex);
 
-    const result = await modules.blob.new(blob, dockDID, pair);
+    const result = await modules.blob.new(blob, pair);
 
     expect(!!result).toBe(true);
 
@@ -109,7 +109,7 @@ describe("Blob Module", () => {
     const blobVect = new Uint8Array([1, 2, 3]);
     const blob = new BlobWithId(blobId, blobVect);
 
-    const result = await modules.blob.new(blob, dockDID, pair);
+    const result = await modules.blob.new(blob, pair);
 
     expect(!!result).toBe(true);
 
@@ -122,7 +122,7 @@ describe("Blob Module", () => {
   test("Fails to write blob with size greater than allowed.", async () => {
     const blobHex = randomAsHex(8193); // Max size is 1024
     const blob = new BlobWithId(blobId, blobHex);
-    await expect(modules.blob.new(blob, dockDID, pair)).rejects.toThrow();
+    await expect(modules.blob.new(blob, pair)).rejects.toThrow();
 
     await expect(modules.blob.get(blobId)).rejects.toThrowError(
       "does not exist"
@@ -132,14 +132,14 @@ describe("Blob Module", () => {
   test("Fails to write blob with id already used.", async () => {
     const blobHexFirst = randomAsHex(12);
     let blob = new BlobWithId(blobId, blobHexFirst);
-    const resultFirst = await modules.blob.new(blob, dockDID, pair);
+    const resultFirst = await modules.blob.new(blob, pair);
 
     expect(!!resultFirst).toBe(true);
     expect(errorInResult(resultFirst)).toBe(false);
 
     blob = new BlobWithId(blobId, randomAsHex(123));
 
-    await expect(modules.blob.new(blob, dockDID, pair)).rejects.toThrow();
+    await expect(modules.blob.new(blob, pair)).rejects.toThrow();
   }, 60000);
 
   test("Should throw error when cannot read blob with given id from chain.", async () => {

@@ -12,12 +12,11 @@ export default class MultiApiBlobModule extends injectModuleRouter(
    * @param signingKeyRef - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @returns {Promise<*>}
    */
-  async new(blobWithId, targetDid, didKeypair, params = {}) {
+  async new(blobWithId, didKeypair, params = {}) {
     const parsedBlobWithId = BlobWithId.from(blobWithId);
 
     return await this.moduleById(parsedBlobWithId.id).new(
       parsedBlobWithId,
-      targetDid,
       didKeypair,
       params,
     );
@@ -30,12 +29,11 @@ export default class MultiApiBlobModule extends injectModuleRouter(
    * @param signingKeyRef - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @returns {Promise<*>}
    */
-  async newTx(blobWithId, targetDid, didKeypair) {
+  async newTx(blobWithId, didKeypair) {
     const parsedBlobWithId = BlobWithId.from(blobWithId);
 
     return await this.moduleById(parsedBlobWithId.id).new(
       parsedBlobWithId,
-      targetDid,
       didKeypair,
     );
   }

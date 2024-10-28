@@ -37,7 +37,7 @@ const blobStruct = {
   id: blobId,
   blob: blobHexOrArray, // Contents of your blob as a hex string or byte array
 };
-const result = await dock.blob.new(blobStruct, ownerDid, didKeypair);
+const result = await dock.blob.new(blobStruct, didKeypair);
 ```
 
 If everything worked properly `result` will indicate a successful transaction.

@@ -27,7 +27,7 @@ export default function generateBlobModuleTests(
         blob: 'abcdef',
       };
 
-      await blobModule.new(blob1, did, didKeypair);
+      await blobModule.new(blob1, didKeypair);
 
       const written1 = await blobModule.get(blob1.id);
 
@@ -40,13 +40,13 @@ export default function generateBlobModuleTests(
           example: 'content',
         },
       };
-      await blobModule.new(blob2, did, didKeypair);
+      await blobModule.new(blob2, didKeypair);
 
       const written2 = await blobModule.get(blob2.id);
       expect(written2[0].eq(did)).toBe(true);
       expect(written2[1].toObject()).toEqual(blob2.blob);
 
-      await expect(() => blobModule.new(blob2, did, didKeypair)).rejects.toThrow();
+      await expect(() => blobModule.new(blob2, didKeypair)).rejects.toThrow();
     });
 
     test('Throws an error on missing `Blob`', async () => {

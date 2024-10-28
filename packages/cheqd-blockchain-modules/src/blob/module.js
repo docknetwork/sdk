@@ -15,8 +15,8 @@ export default class CheqdBlobModule extends injectCheqd(AbstractBlobModule) {
    * @param signingKeyRef - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @returns {Promise<*>}
    */
-  async newTx(blobWithId, targetDid, didKeypair) {
-    return await this.cheqdOnly.tx.new(blobWithId, targetDid, didKeypair);
+  async newTx(blobWithId, didKeypair) {
+    return await this.cheqdOnly.tx.new(blobWithId, didKeypair);
   }
 
   async get(blobId) {

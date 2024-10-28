@@ -70,7 +70,7 @@ export async function setupExternalSchema(
     id: blobId,
     blob: stringToHex(blobStr),
   };
-  await blobModule.new(blob, did, pair);
+  await blobModule.new(blob, pair);
 
   return [
     {

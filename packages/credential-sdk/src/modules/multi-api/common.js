@@ -1,7 +1,7 @@
 import { ensureInstanceOf, ensureIterable } from '../../utils';
 
-export function injectDispatch(klass) {
-  const name = `withDispatch(${klass.name})`;
+export function injectModuleRouter(klass) {
+  const name = `withModuleRouter(${klass.name})`;
 
   const classes = {
     [name]: class extends klass {

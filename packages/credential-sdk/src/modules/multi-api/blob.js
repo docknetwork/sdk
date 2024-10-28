@@ -1,8 +1,8 @@
 import { AbstractBlobModule } from '../abstract';
 import { BlobId, BlobWithId } from '../../types';
-import { injectDispatch } from './common';
+import { injectModuleRouter } from './common';
 
-export default class MultiApiBlobModule extends injectDispatch(
+export default class MultiApiBlobModule extends injectModuleRouter(
   AbstractBlobModule,
 ) {
   /**
@@ -31,9 +31,9 @@ export default class MultiApiBlobModule extends injectDispatch(
    * @returns {Promise<*>}
    */
   async newTx(blobWithId, targetDid, didKeypair) {
-    const parsedBlobWithId = BlobWithId.from(blobWithId).id;
+    const parsedBlobWithId = BlobWithId.from(blobWithId);
 
-    return await this.moduleById(parsedBlobWithId).new(
+    return await this.moduleById(parsedBlobWithId.id).new(
       parsedBlobWithId,
       targetDid,
       didKeypair,

@@ -1,5 +1,11 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 0.3.0
+
+### Minor Changes
+
+- Implement `MultiApi` modules allowing to use different APIs in the same moment
+
 ## 0.2.0
 
 ### Minor Changes

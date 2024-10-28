@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.4.0
+
+### Minor Changes
+
+- Implement `MultiApi` modules allowing to use different APIs in the same moment
+
 ## 0.3.0
 
 ### Minor Changes

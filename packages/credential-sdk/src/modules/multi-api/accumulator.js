@@ -1,8 +1,8 @@
 import { AbstractAccumulatorModule } from '../abstract';
 import { AccumulatorId, NamespaceDid } from '../../types';
-import { injectDispatch } from './common';
+import { injectModuleRouter } from './common';
 
-export default class MultiApiAccumulatorModule extends injectDispatch(
+export default class MultiApiAccumulatorModule extends injectModuleRouter(
   AbstractAccumulatorModule,
 ) {
   async addPublicKey(id, publicKey, targetDid, didKeypair, params) {
@@ -409,5 +409,29 @@ export default class MultiApiAccumulatorModule extends injectDispatch(
     const accId = AccumulatorId.from(id);
 
     return await this.moduleById(accId).removeAccumulatorTx(accId, didKeypair);
+  }
+
+  async lastPublicKeyId(targetDid) {
+    const did = NamespaceDid.from(targetDid);
+
+    return await this.moduleById(did).lastPublicKeyId(did);
+  }
+
+  async nextPublicKeyId(targetDid) {
+    const did = NamespaceDid.from(targetDid);
+
+    return await this.moduleById(did).nextPublicKeyId(did);
+  }
+
+  async lastParamsId(targetDid) {
+    const did = NamespaceDid.from(targetDid);
+
+    return await this.moduleById(did).lastParamsId(did);
+  }
+
+  async nextParamsId(targetDid) {
+    const did = NamespaceDid.from(targetDid);
+
+    return await this.moduleById(did).nextParamsId(did);
   }
 }

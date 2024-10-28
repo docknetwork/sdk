@@ -237,7 +237,7 @@ for (const {
         await getModule(dock).addParams(null, params, issuerDid, issuerKeypair);
         const paramsWritten = await getModule(dock).getParams(
           issuerDid,
-          await getModule(dock).dockOnly.paramsCounter(issuerDid)
+          await getModule(dock).lastParamsId(issuerDid)
         );
         expect(paramsWritten.bytes).toEqual(params.bytes);
         expect(paramsWritten.label).toEqual(params.label);
@@ -278,9 +278,7 @@ for (const {
         );
         const paramsWritten = await modules.accumulator.getParams(
           accumulatorManagerDid,
-          await modules.accumulator.dockOnly.paramsCounter(
-            accumulatorManagerDid
-          )
+          await modules.accumulator.lastParamsId(accumulatorManagerDid)
         );
         expect(paramsWritten.bytes).toEqual(params.bytes);
         expect(paramsWritten.label).toEqual(params.label);
@@ -619,7 +617,7 @@ for (const {
               DockInternalAccumulatorModule.parseEventAsAccumulatorUpdate(
                 event.event
               );
-            if (ret !== null && accumulatorId.asDock.eq(ret[0])) {
+            if (ret !== null && accumulatorId.asDock.value === ret[0]) {
               blockNosWithUpdates.push(currentBlockNo);
             }
           }
@@ -634,6 +632,7 @@ for (const {
               accumulatorId,
               blockNo
             );
+          console.log("!!!!", updates);
           const wi = new VBWitnessUpdateInfo(
             updates[0].witnessUpdateInfo.bytes
           );

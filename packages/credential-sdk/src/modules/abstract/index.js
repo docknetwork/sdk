@@ -12,76 +12,67 @@ import AbstractTrustRegistryModule from './trust-registry/module';
  * Class representing a set of core modules each of which is an instance of its respective abstract module.
  */
 export class AbstractCoreModules {
-  static AccumulatorModule;
+  static AccumulatorModule = AbstractAccumulatorModule;
 
-  static AnchorModule;
+  static AnchorModule = AbstractAnchorModule;
 
-  static AttestModule;
+  static AttestModule = AbstractAttestModule;
 
-  static BlobModule;
+  static BlobModule = AbstractBlobModule;
 
-  static DIDModule;
+  static DIDModule = AbstractDIDModule;
 
-  static OffchainSignaturesModule;
+  static OffchainSignaturesModule = AbstractOffchainSignaturesModule;
 
-  static BBSModule;
+  static BBSModule = AbstractOffchainSignaturesModule;
 
-  static BBSPlusModule;
+  static BBSPlusModule = AbstractOffchainSignaturesModule;
 
-  static PSModule;
+  static PSModule = AbstractOffchainSignaturesModule;
 
-  static StatusListCredentialModule;
+  static StatusListCredentialModule = AbstractStatusListCredentialModule;
 
-  static TrustRegistryModule;
+  static TrustRegistryModule = AbstractTrustRegistryModule;
 
-  constructor(apiProvider) {
-    const {
-      AccumulatorModule,
-      AnchorModule,
-      AttestModule,
-      BlobModule,
-      DIDModule,
-      OffchainSignaturesModule,
-      BBSModule,
-      BBSPlusModule,
-      PSModule,
-      StatusListCredentialModule,
-      TrustRegistryModule,
-    } = this.constructor;
+  static ModuleMap = {
+    AccumulatorModule: { key: 'accumulator', optional: false },
+    AnchorModule: { key: 'anchor', optional: true },
+    AttestModule: { key: 'attest', optional: false },
+    BlobModule: { key: 'blob', optional: false },
+    DIDModule: { key: 'did', optional: false },
+    OffchainSignaturesModule: { key: 'offchainSignatures', optional: false },
+    BBSModule: { key: 'bbs', optional: false },
+    BBSPlusModule: { key: 'bbsPlus', optional: false },
+    PSModule: { key: 'ps', optional: false },
+    StatusListCredentialModule: {
+      key: 'statusListCredential',
+      optional: false,
+    },
+    TrustRegistryModule: { key: 'trustRegistry', optional: false },
+  };
 
-    ensurePrototypeOf(AbstractAccumulatorModule, AccumulatorModule);
-    if (AnchorModule != null) {
-      ensurePrototypeOf(AbstractAnchorModule, AnchorModule);
+  attachModule(prop, { key, optional }, args) {
+    const { [prop]: Module } = this.constructor;
+
+    if (Module == null) {
+      if (optional) {
+        return this;
+      }
+
+      throw new Error(`No such module: ${prop}`);
     }
-    ensurePrototypeOf(AbstractAttestModule, AttestModule);
-    ensurePrototypeOf(AbstractBlobModule, BlobModule);
-    ensurePrototypeOf(AbstractDIDModule, DIDModule);
-    ensurePrototypeOf(
-      AbstractOffchainSignaturesModule,
-      OffchainSignaturesModule,
-    );
-    ensurePrototypeOf(AbstractOffchainSignaturesModule, BBSModule);
-    ensurePrototypeOf(AbstractOffchainSignaturesModule, BBSPlusModule);
-    ensurePrototypeOf(AbstractOffchainSignaturesModule, PSModule);
-    ensurePrototypeOf(
-      AbstractStatusListCredentialModule,
-      StatusListCredentialModule,
-    );
-    ensurePrototypeOf(AbstractTrustRegistryModule, TrustRegistryModule);
 
-    this.accumulator = new AccumulatorModule(apiProvider);
-    if (AnchorModule != null) {
-      this.anchor = new AnchorModule(apiProvider);
+    ensurePrototypeOf(AbstractCoreModules[prop], Module);
+    const mod = new Module(...args);
+    this[key] = mod;
+
+    return this;
+  }
+
+  constructor(...args) {
+    for (const [prop, key] of Object.entries(this.constructor.ModuleMap)) {
+      this.attachModule(prop, key, args);
     }
-    this.attest = new AttestModule(apiProvider);
-    this.blob = new BlobModule(apiProvider);
-    this.did = new DIDModule(apiProvider);
-    this.offchainSignatures = new OffchainSignaturesModule(apiProvider);
-    this.bbs = new BBSModule(apiProvider);
-    this.bbsPlus = new BBSPlusModule(apiProvider);
-    this.ps = new PSModule(apiProvider);
-    this.statusListCredential = new StatusListCredentialModule(apiProvider);
-    this.trustRegistry = new TrustRegistryModule(apiProvider);
   }
 }
 

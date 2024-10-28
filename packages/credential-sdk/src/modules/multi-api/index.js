@@ -13,6 +13,8 @@ import MultiApiTrustRegistryModule from './trust-registry';
 export class MultiApiCoreModules extends AbstractCoreModules {
   static AccumulatorModule = MultiApiAccumulatorModule;
 
+  static AnchorModule = null;
+
   static AttestModule = MultiApiAttestModule;
 
   static BlobModule = MultiApiBlobModule;
@@ -30,6 +32,12 @@ export class MultiApiCoreModules extends AbstractCoreModules {
   static StatusListCredentialModule = MultiApiStatusListCredentialModule;
 
   static TrustRegistryModule = MultiApiTrustRegistryModule;
+
+  attachModule(prop, { key, optional }, [modules]) {
+    return super.attachModule(prop, { key, optional }, [
+      modules.map(({ [key]: module }) => module),
+    ]);
+  }
 }
 
 export {

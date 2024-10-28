@@ -12,7 +12,10 @@ import {
   TestKeyringOpts,
   Schemes,
 } from "../../test-constants";
-import { DockDid, OffchainSignaturePublicKeyValueWithParamsValue } from "@docknetwork/credential-sdk/types";
+import {
+  DockDid,
+  OffchainSignaturePublicKeyValueWithParamsValue,
+} from "@docknetwork/credential-sdk/types";
 import {
   Ed25519Keypair,
   DidKeypair,
@@ -39,7 +42,7 @@ for (const {
   getParamsByDid,
   getPublicKeyWithParamsByStorageKey,
   getPublicKeysByDid,
-} of Schemes.slice(0, 1)) {
+} of Schemes) {
   const skipIfKvac = Name === "BBDT16" ? describe.skip : describe;
   skipIfKvac(`${Name} Module`, () => {
     const dock = new DockAPI();
@@ -79,7 +82,7 @@ for (const {
       await chainModule.addParams(null, params1, did1, pair1);
       const paramsWritten1 = await chainModule.getParams(
         did1,
-        await chainModule.dockOnly.paramsCounter(did1)
+        await chainModule.lastParamsId(did1)
       );
       expect(paramsWritten1.bytes).toEqual(params1.bytes);
       expect(paramsWritten1.label).toEqual(params1.label);
@@ -98,7 +101,7 @@ for (const {
       await chainModule.addParams(null, params2, did2, pair2);
       const paramsWritten2 = await chainModule.getParams(
         did2,
-        await chainModule.dockOnly.paramsCounter(did2)
+        await chainModule.lastParamsId(did2)
       );
       expect(paramsWritten2.bytes).toEqual(params2.bytes);
       expect(paramsWritten2.label).toBe(null);
@@ -113,7 +116,7 @@ for (const {
       await chainModule.addParams(null, params3, did1, pair1);
       const paramsWritten3 = await chainModule.getParams(
         did1,
-        await chainModule.dockOnly.paramsCounter(did1)
+        await chainModule.lastParamsId(did1)
       );
       expect(paramsWritten3.bytes).toEqual(params3.bytes);
       expect(paramsWritten3.label).toEqual(params3.label);

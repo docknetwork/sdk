@@ -1,8 +1,8 @@
 import { AbstractAttestModule } from '../abstract';
 import { NamespaceDid } from '../../types';
-import { injectDispatch } from './common';
+import { injectModuleRouter } from './common';
 
-export default class MultiApiAttestModule extends injectDispatch(
+export default class MultiApiAttestModule extends injectModuleRouter(
   AbstractAttestModule,
 ) {
   /**

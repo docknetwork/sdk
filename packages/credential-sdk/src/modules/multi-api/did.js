@@ -1,8 +1,8 @@
 import { AbstractDIDModule } from '../abstract';
 import { DIDDocument, NamespaceDid } from '../../types';
-import { injectDispatch } from './common';
+import { injectModuleRouter } from './common';
 
-export default class MultiApiDIDModule extends injectDispatch(
+export default class MultiApiDIDModule extends injectModuleRouter(
   AbstractDIDModule,
 ) {
   /**

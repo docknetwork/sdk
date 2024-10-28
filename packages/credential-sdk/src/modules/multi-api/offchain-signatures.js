@@ -1,7 +1,10 @@
 import { AbstractOffchainSignaturesModule } from '../abstract';
 import { NamespaceDid } from '../../types';
+import { injectModuleRouter } from './common';
 
-export default class MultiApiOffchainSignatures extends AbstractOffchainSignaturesModule {
+export default class MultiApiOffchainSignatures extends injectModuleRouter(
+  AbstractOffchainSignaturesModule,
+) {
   /**
    * Add new signature params.
    * @param id - Unique identifier to be used by these params.
@@ -111,5 +114,29 @@ export default class MultiApiOffchainSignatures extends AbstractOffchainSignatur
     const id = NamespaceDid.from(did);
 
     return await this.moduleById(id).getPublicKey(did, keyId, includeParams);
+  }
+
+  async lastPublicKeyId(targetDid) {
+    const did = NamespaceDid.from(targetDid);
+
+    return await this.moduleById(did).lastPublicKeyId(did);
+  }
+
+  async nextPublicKeyId(targetDid) {
+    const did = NamespaceDid.from(targetDid);
+
+    return await this.moduleById(did).nextPublicKeyId(did);
+  }
+
+  async lastParamsId(targetDid) {
+    const did = NamespaceDid.from(targetDid);
+
+    return await this.moduleById(did).lastParamsId(did);
+  }
+
+  async nextParamsId(targetDid) {
+    const did = NamespaceDid.from(targetDid);
+
+    return await this.moduleById(did).nextParamsId(did);
   }
 }

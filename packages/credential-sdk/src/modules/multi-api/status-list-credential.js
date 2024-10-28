@@ -1,8 +1,8 @@
 import { AbstractStatusListCredentialModule } from '../abstract';
 import { StatusListCredentialId } from '../../types';
-import { injectDispatch } from './common';
+import { injectModuleRouter } from './common';
 
-export default class MultiApiStatusListCredentialModule extends injectDispatch(
+export default class MultiApiStatusListCredentialModule extends injectModuleRouter(
   AbstractStatusListCredentialModule,
 ) {
   /**

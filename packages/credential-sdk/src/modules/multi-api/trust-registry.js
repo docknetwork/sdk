@@ -1,11 +1,11 @@
 import { NamespaceDid, TrustRegistryInfo } from '../../types';
 import { AbstractTrustRegistryModule } from '../abstract';
-import { injectDispatch } from './common';
+import { injectModuleRouter } from './common';
 
 /**
  * `Trust Registry` module.
  */
-export default class MultiApiTrustRegistryModule extends injectDispatch(
+export default class MultiApiTrustRegistryModule extends injectModuleRouter(
   AbstractTrustRegistryModule,
 ) {
   /**

@@ -23,7 +23,7 @@ export default function withParamsAndPublicKeys(klass) {
 
   if (!isEqualToOrPrototypeOf(AbstractWithParamsAndPublicKeys, klass)) {
     throw new Error(
-      `Class \`${klass.name}\` must extend \`${AbstractWithParamsAndPublicKeys}\``,
+      `Class \`${klass.name}\` must extend \`${AbstractWithParamsAndPublicKeys.name}\``,
     );
   }
 
@@ -239,6 +239,22 @@ export default function withParamsAndPublicKeys(klass) {
         }
 
         return publicKey;
+      }
+
+      async lastPublicKeyId(targetDid) {
+        return await this.dockOnly.keysCounter(targetDid);
+      }
+
+      async nextPublicKeyId(targetDid) {
+        return (await this.lastPublicKeyId(targetDid)).inc();
+      }
+
+      async lastParamsId(targetDid) {
+        return await this.dockOnly.paramsCounter(targetDid);
+      }
+
+      async nextParamsId(targetDid) {
+        return (await this.lastParamsId(targetDid)).inc();
       }
     },
   };

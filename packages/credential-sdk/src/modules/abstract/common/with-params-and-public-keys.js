@@ -1,75 +1,10 @@
 import {
   withExtendedPrototypeProperties,
   withExtendedStaticProperties,
-} from '../../utils';
+} from '../../../utils';
+import AbstractBaseModule from './base-module';
 
-/**
- * Base class that must be extended by all API providers.
- */
-export const ApiProvider = withExtendedPrototypeProperties(
-  ['isInitialized', 'stateChangeBytes', 'signAndSend'],
-  class ApiProvider {
-    /**
-     * @returns {boolean}
-     */
-    isInitialized() {
-      throw new Error('Unimplemented');
-    }
-
-    /**
-     * Ensures that the SDK is initialized, throws an error otherwise.
-     *
-     * @returns {this}
-     */
-    ensureInitialized() {
-      if (!this.isInitialized()) {
-        throw new Error('SDK is not initialized.');
-      }
-
-      return this;
-    }
-
-    /**
-     * Ensures that the SDK is not initialized, throws an error otherwise.
-     *
-     * @returns {this}
-     */
-    ensureNotInitialized() {
-      if (this.isInitialized()) {
-        throw new Error('SDK is already initialized.');
-      }
-
-      return this;
-    }
-  },
-);
-
-/**
- * Base module class that must be extended by all modules.
- */
-export class AbstractBaseModule {
-  /**
-   * Signs and sends provided extrinsic.
-   *
-   * @param {*} extrinsic
-   * @param {*} params
-   * @returns {Promise<*>}
-   */
-  async signAndSend(extrinsic, params) {
-    if (this.apiProvider == null) {
-      throw new Error(
-        "Can't sign a transaction because the module doesn't have an `apiProvider`",
-      );
-    }
-
-    return await this.apiProvider.signAndSend(extrinsic, params);
-  }
-}
-
-/**
- * Abstract logic allowing to operate with public keys and parameters.
- */
-class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
+class AbstractWithParamsAndPublicKeys extends AbstractBaseModule {
   /**
    * Create object to add new parameters on chain
    * @param prepareAddPublicKey
@@ -193,9 +128,48 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
   async getAllPublicKeysByDid(_did, _includeParams = false) {
     throw new Error('Unimplemented');
   }
+
+  /**
+   * Retrieves latest public key identifier used by the supplied DID.
+   * @param {*} did
+   * @returns {Promise<Id>}
+   */
+  async lastPublicKeyId(_targetDid) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * Retrieves next public key identifier that can be used by the supplied DID.
+   * @param {*} did
+   * @returns {Promise<Id>}
+   */
+  async nextPublicKeyId(_targetDid) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * Retrieves latest params identifier used by the supplied DID.
+   * @param {*} did
+   * @returns {Promise<Id>}
+   */
+  async lastParamsId(_targetDid) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * Retrieves next params identifier that can be used by the supplied DID.
+   * @param {*} did
+   * @returns {Promise<Id>}
+   */
+  async nextParamsId(_targetDid) {
+    throw new Error('Unimplemented');
+  }
 }
 
-export const AbstractWithParamsAndPublicKeys = withExtendedPrototypeProperties(
+/**
+ * Abstract logic allowing to operate with public keys and parameters.
+ */
+export default withExtendedPrototypeProperties(
   [
     'addParamsTx',
     'addPublicKeyTx',
@@ -205,9 +179,13 @@ export const AbstractWithParamsAndPublicKeys = withExtendedPrototypeProperties(
     'getPublicKey',
     'getAllParamsByDid',
     'getAllPublicKeysByDid',
+    'lastPublicKeyId',
+    'nextPublicKeyId',
+    'lastParamsId',
+    'nextParamsId',
   ],
   withExtendedStaticProperties(
     ['PublicKey', 'Params'],
-    AbstractWithParamsAndPublicKey,
+    AbstractWithParamsAndPublicKeys,
   ),
 );

@@ -28,6 +28,7 @@ import {
   DidKeypair,
 } from "@docknetwork/credential-sdk/keypairs";
 import { DockCoreModules } from "../../../src";
+import { AbstractAccumulatorModule as AccumulatorModule } from "@docknetwork/credential-sdk/modules";
 
 describe("Prefilled positive accumulator", () => {
   // Incase updating an accumulator is expensive like making a blockchain txn, a cheaper strategy

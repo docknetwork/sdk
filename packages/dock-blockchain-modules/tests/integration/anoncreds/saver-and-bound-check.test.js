@@ -134,7 +134,7 @@ for (const {
         await getModule(dock).addParams(null, params, issuerDid, issuerKeypair);
         const paramsWritten = await getModule(dock).getParams(
           issuerDid,
-          await getModule(dock).dockOnly.paramsCounter(issuerDid)
+          await getModule(dock).lastParamsId(issuerDid)
         );
         expect(paramsWritten.bytes).toEqual(params.bytes);
         expect(paramsWritten.label).toEqual(params.label);

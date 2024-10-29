@@ -1,4 +1,4 @@
-import { withExtendedPrototypeProperties } from '../../utils';
+import { withExtendedPrototypeProperties } from '../../../utils';
 import { AbstractBaseModule } from '../common';
 
 class AbstractAttestModule extends AbstractBaseModule {

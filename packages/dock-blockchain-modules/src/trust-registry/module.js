@@ -1,4 +1,4 @@
-import { AbstractTrustRegistryModule } from '@docknetwork/credential-sdk/modules/trust-registry';
+import { AbstractTrustRegistryModule } from '@docknetwork/credential-sdk/modules/abstract/trust-registry';
 import {
   TrustRegistryInfo,
   DockTrustRegistryId,

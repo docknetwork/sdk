@@ -2,9 +2,9 @@ import { canonicalize } from 'json-canonicalize';
 import { validate } from 'jsonschema';
 
 // Supported schemas
-import JSONSchema07 from '../../vc/schemas/schema-draft-07';
-import jsonFetch from '../../utils/json-fetch';
-import { Blob, BlobWithId } from '../../types';
+import JSONSchema07 from '../../../vc/schemas/schema-draft-07';
+import jsonFetch from '../../../utils/json-fetch';
+import { Blob, BlobWithId } from '../../../types';
 
 export default class Schema {
   /**
@@ -83,7 +83,7 @@ export default class Schema {
    * @return {Promise<object>} The extrinsic to sign and send.
    */
   async writeToChain(blobModule, targetDid, keyPair, params) {
-    return await blobModule.new(this.toBlob(), targetDid, keyPair, params);
+    return await blobModule.new(this.toBlob(), keyPair, params);
   }
 
   /**

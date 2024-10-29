@@ -1,6 +1,6 @@
 import { ensureInstanceOf } from '../../utils';
 import BlobResolver from './blob-resolver';
-import { AbstractBlobModule } from '../../modules/blob';
+import { AbstractBlobModule } from '../../modules/abstract/blob';
 
 class DockBlobResolver extends BlobResolver {
   static METHOD = 'dock';

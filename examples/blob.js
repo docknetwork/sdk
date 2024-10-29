@@ -24,7 +24,7 @@ async function writeAndReadBlob(blobModule, blobValue, did, pair) {
     blob: blobValue,
   };
 
-  await blobModule.new(blob, did, pair);
+  await blobModule.new(blob, pair);
 
   console.log('Blob written, reading from chain...');
 

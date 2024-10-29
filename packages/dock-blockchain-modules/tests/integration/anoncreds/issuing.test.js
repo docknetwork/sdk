@@ -37,13 +37,14 @@ import {
   Ed25519Keypair,
   DidKeypair,
 } from "@docknetwork/credential-sdk/keypairs";
+import { MultiApiCoreModules } from "@docknetwork/credential-sdk/modules";
 import { DockCoreModules } from "../../../src";
 
 describe.each(Schemes)(
   "Issuance",
   ({ Name, Module, Context, CryptoKeyPair, getModule, VerKey, SigType }) => {
     const dock = new DockAPI();
-    const modules = new DockCoreModules(dock);
+    const modules = new MultiApiCoreModules([new DockCoreModules(dock)]);
     const resolver = new DockResolver(modules);
 
     const did1 = DockDid.random();

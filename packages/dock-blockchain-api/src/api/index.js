@@ -2,8 +2,14 @@ import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { HttpProvider } from '@polkadot/rpc-provider';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import typesBundle from '@docknetwork/node-types';
+import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 
-import { ApiProvider } from '@docknetwork/credential-sdk/modules/common';
+import { ApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
+import {
+  DIDRef,
+  DockDidOrDidMethodKey,
+  NamespaceDid,
+} from '@docknetwork/credential-sdk/types';
 import PoaRpcDefs from './rpc-defs/poa-rpc-defs';
 import PriceFeedRpcDefs from './rpc-defs/price-feed-rpc-defs';
 import CoreModsRpcDefs from './rpc-defs/core-mods-rpc-defs';
@@ -329,5 +335,23 @@ export default class DockAPI extends ApiProvider {
    */
   get isConnected() {
     return Boolean(this.api) && this.api.isConnected;
+  }
+
+  supportsIdentifier(id) {
+    this.ensureInitialized();
+
+    if (id instanceof NamespaceDid) {
+      return id.isDock || id.isDidMethodKey;
+    } else if (id instanceof DockDidOrDidMethodKey) {
+      return true;
+    } else if (id instanceof DIDRef) {
+      return this.supportsIdentifier(id[0]);
+    } else if (id instanceof TypedEnum) {
+      return this.supportsIdentifier(this.value);
+    } else if (id.Qualifier?.contains('dock:')) {
+      return true;
+    }
+
+    return false;
   }
 }

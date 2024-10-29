@@ -223,7 +223,7 @@ export default class DockInternalAccumulatorModule extends createInternalDockMod
         this.apiProvider.api.createType('UpdateAccumulator', ext.method.args[0]),
       );
 
-      if (update.id.eq(accId)) {
+      if (update.id.eq(accId.asDock)) {
         return update;
       }
     }

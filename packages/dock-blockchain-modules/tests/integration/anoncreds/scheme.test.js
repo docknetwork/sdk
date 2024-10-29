@@ -12,15 +12,18 @@ import {
   TestKeyringOpts,
   Schemes,
 } from "../../test-constants";
-import { DockDid } from "@docknetwork/credential-sdk/types";
+import {
+  DockDid,
+  OffchainSignaturePublicKeyValueWithParamsValue,
+} from "@docknetwork/credential-sdk/types";
 import {
   Ed25519Keypair,
   DidKeypair,
 } from "@docknetwork/credential-sdk/keypairs";
 
 import { registerNewDIDUsingPair } from "../helpers";
-import { OffchainSignaturePublicKeyValueWithParamsValue } from "@docknetwork/credential-sdk/types";
 import { DockCoreModules } from "../../../src";
+import { MultiApiCoreModules } from "@docknetwork/credential-sdk/modules";
 
 const addParticipantIdIfNotPresent = (key) => {
   if (!("participantId" in key)) {
@@ -39,11 +42,11 @@ for (const {
   getParamsByDid,
   getPublicKeyWithParamsByStorageKey,
   getPublicKeysByDid,
-} of Schemes.slice(0, 1)) {
+} of Schemes) {
   const skipIfKvac = Name === "BBDT16" ? describe.skip : describe;
   skipIfKvac(`${Name} Module`, () => {
     const dock = new DockAPI();
-    const modules = new DockCoreModules(dock);
+    const modules = new MultiApiCoreModules([new DockCoreModules(dock)]);
     let account;
     let chainModule;
     const chainModuleClass = Module;
@@ -79,7 +82,7 @@ for (const {
       await chainModule.addParams(null, params1, did1, pair1);
       const paramsWritten1 = await chainModule.getParams(
         did1,
-        await chainModule.dockOnly.paramsCounter(did1)
+        await chainModule.lastParamsId(did1)
       );
       expect(paramsWritten1.bytes).toEqual(params1.bytes);
       expect(paramsWritten1.label).toEqual(params1.label);
@@ -98,7 +101,7 @@ for (const {
       await chainModule.addParams(null, params2, did2, pair2);
       const paramsWritten2 = await chainModule.getParams(
         did2,
-        await chainModule.dockOnly.paramsCounter(did2)
+        await chainModule.lastParamsId(did2)
       );
       expect(paramsWritten2.bytes).toEqual(params2.bytes);
       expect(paramsWritten2.label).toBe(null);
@@ -113,7 +116,7 @@ for (const {
       await chainModule.addParams(null, params3, did1, pair1);
       const paramsWritten3 = await chainModule.getParams(
         did1,
-        await chainModule.dockOnly.paramsCounter(did1)
+        await chainModule.lastParamsId(did1)
       );
       expect(paramsWritten3.bytes).toEqual(params3.bytes);
       expect(paramsWritten3.label).toEqual(params3.label);

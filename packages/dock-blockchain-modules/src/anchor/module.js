@@ -4,7 +4,7 @@ import { TypedNumber, option } from '@docknetwork/credential-sdk/types/generic';
 import {
   NoAnchorError,
   AbstractAnchorModule,
-} from '@docknetwork/credential-sdk/modules/anchor';
+} from '@docknetwork/credential-sdk/modules/abstract/anchor';
 import { injectDock } from '../common';
 import DockInternalAnchorModule from './internal';
 

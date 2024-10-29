@@ -1,5 +1,5 @@
 import { AbstractBaseModule } from '../common';
-import { withExtendedPrototypeProperties } from '../../utils';
+import { withExtendedPrototypeProperties } from '../../../utils';
 
 /** Class to create and update Blobs on chain. */
 class AbstractBlobModule extends AbstractBaseModule {
@@ -10,9 +10,9 @@ class AbstractBlobModule extends AbstractBaseModule {
    * @param signingKeyRef - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @returns {Promise<*>}
    */
-  async new(blobWithId, targetDid, didKeypair, params = {}) {
+  async new(blobWithId, didKeypair, params = {}) {
     return await this.signAndSend(
-      await this.newTx(blobWithId, targetDid, didKeypair),
+      await this.newTx(blobWithId, didKeypair),
       params,
     );
   }

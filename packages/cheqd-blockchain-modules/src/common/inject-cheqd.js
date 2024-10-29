@@ -12,14 +12,15 @@ export default function injectDock(klass) {
        */
       static CheqdOnly;
 
-      static ApiProvider = CheqdAPIProvider;
+      constructor(cheqd) {
+        super();
 
-      constructor(dock) {
-        const apiProvider = new CheqdAPIProvider(dock);
+        this.apiProvider = new CheqdAPIProvider(cheqd);
+        this.cheqdOnly = new this.constructor.CheqdOnly(this.apiProvider);
+      }
 
-        super(apiProvider);
-
-        this.cheqdOnly = new this.constructor.CheqdOnly(apiProvider);
+      supportsIdentifier(id) {
+        return this.apiProvider.supportsIdentifier(id);
       }
     },
   };

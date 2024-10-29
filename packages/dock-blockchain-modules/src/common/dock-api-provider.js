@@ -1,4 +1,4 @@
-import { ApiProvider } from '@docknetwork/credential-sdk/modules/common';
+import { ApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
 import { ensureInstanceOf } from '@docknetwork/credential-sdk/utils/type-helpers';
 import { DockDIDModuleInternal } from '../did/internal';
 
@@ -19,6 +19,10 @@ class DockApiProvider extends ApiProvider {
     }
 
     return api;
+  }
+
+  isInitialized() {
+    return this.dock.isInitialized();
   }
 
   async stateChangeBytes(name, payload) {

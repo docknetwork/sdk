@@ -1,14 +1,14 @@
 import { DockAPI } from "@docknetwork/dock-blockchain-api";
 import { DockDid } from "@docknetwork/credential-sdk/types";
-import generateBlobModuleTests from "@docknetwork/credential-sdk/generate-tests/blob-module";
-import DockBlobModule from "../../../src/blob/module";
-import { DockDIDModule } from "../../../src";
+import generateBlobModuleTests from "@docknetwork/credential-sdk/modules/tests/blob-module";
+import { MultiApiBlobModule, MultiApiDIDModule } from "@docknetwork/credential-sdk/modules";
+import { DockDIDModule, DockBlobModule } from "../../../src";
 import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
 } from "../../test-constants";
-import { DockBlobId } from "../../../../credential-sdk/src/types";
+import { DockBlobId } from "@docknetwork/credential-sdk/types";
 
 describe("BlobModule", () => {
   const dock = new DockAPI();
@@ -28,6 +28,11 @@ describe("BlobModule", () => {
 
   generateBlobModuleTests(
     { did: new DockDIDModule(dock), blob: new DockBlobModule(dock) },
+    { DID: DockDid, BlobId: DockBlobId }
+  );
+
+  generateBlobModuleTests(
+    { did: new MultiApiDIDModule([new DockDIDModule(dock)]), blob: new MultiApiBlobModule([new DockBlobModule(dock)]) },
     { DID: DockDid, BlobId: DockBlobId }
   );
 });

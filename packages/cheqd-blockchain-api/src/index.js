@@ -1,10 +1,13 @@
-import { ApiProvider } from '@docknetwork/credential-sdk/modules/common';
+import { ApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
 import {
   maybeToJSON,
   maybeToJSONString,
+  fmtIter,
 } from '@docknetwork/credential-sdk/utils';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
-import { DIDModule, ResourceModule, createCheqdSDK } from '@cheqd/sdk';
+import {
+  DIDModule, ResourceModule, createCheqdSDK, CheqdNetwork,
+} from '@cheqd/sdk';
 import {
   MsgCreateDidDocPayload,
   MsgUpdateDidDocPayload,
@@ -15,6 +18,8 @@ import {
   MsgCreateResourcePayload,
   protobufPackage as resourceProtobufPackage,
 } from '@cheqd/ts-proto/cheqd/resource/v2/index';
+import { DIDRef, NamespaceDid } from '@docknetwork/credential-sdk/types';
+import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 
 export class CheqdAPI extends ApiProvider {
   /**
@@ -53,7 +58,16 @@ export class CheqdAPI extends ApiProvider {
    * @param {string} [configuration.mnemonic]
    * @returns {this}
    */
-  async init({ url, mnemonic } = {}) {
+  async init({ url, mnemonic, network } = {}) {
+    if (network !== CheqdNetwork.Mainnet && network !== CheqdNetwork.Testnet) {
+      throw new Error(
+        `Invalid network provided: \`${network}\`, expected one of \`${fmtIter(
+          Object.values(CheqdNetwork),
+        )}\``,
+      );
+    }
+
+    this.ensureNotInitialized();
     const wallet = mnemonic
       && (await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
         prefix: 'cheqd',
@@ -62,10 +76,10 @@ export class CheqdAPI extends ApiProvider {
       modules: [DIDModule, ResourceModule],
       rpcUrl: url,
       wallet,
+      network,
     };
-    this.ensureNotInitialized();
-
     const sdk = await createCheqdSDK(options);
+
     this.ensureNotInitialized().sdk = sdk;
 
     return this;
@@ -81,7 +95,7 @@ export class CheqdAPI extends ApiProvider {
   /**
    * @returns {boolean}
    */
-  get isInitialized() {
+  isInitialized() {
     return this.sdk != null;
   }
 
@@ -153,29 +167,23 @@ export class CheqdAPI extends ApiProvider {
     return res;
   }
 
-  /**
-   * Ensures that the SDK is initialized, throws an error otherwise.
-   *
-   * @returns {this}
-   */
-  ensureInitialized() {
-    if (!this.isInitialized) {
-      throw new Error('SDK is not initialized.');
+  supportsIdentifier(id) {
+    this.ensureInitialized();
+
+    if (id instanceof NamespaceDid) {
+      if (id.isCheqd) {
+        if (id.asCheqd.isTestnet) {
+          return this.network === CheqdNetwork.Testnet;
+        } else if (id.asCheqd.isMainnet) {
+          return this.network === CheqdNetwork.Mainnet;
+        }
+      }
+    } else if (id instanceof DIDRef) {
+      return this.supportsIdentifier(id[0]);
+    } else if (id instanceof TypedEnum) {
+      return this.supportsIdentifier(this.value);
     }
 
-    return this;
-  }
-
-  /**
-   * Ensures that the SDK is not initialized, throws an error otherwise.
-   *
-   * @returns {this}
-   */
-  ensureNotInitialized() {
-    if (this.isInitialized) {
-      throw new Error('SDK is already initialized.');
-    }
-
-    return this;
+    return false;
   }
 }

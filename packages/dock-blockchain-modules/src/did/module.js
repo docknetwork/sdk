@@ -1,5 +1,5 @@
 import bs58 from 'bs58';
-import { AbstractDIDModule } from '@docknetwork/credential-sdk/modules/did';
+import { AbstractDIDModule } from '@docknetwork/credential-sdk/modules/abstract/did';
 import {
   DockDid,
   DockDidOrDidMethodKey,
@@ -28,6 +28,13 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
     const document = DIDDocument.from(didDocument);
 
     const keys = didDocument.didKeys();
+    if (
+      [...keys.values()].some((key) => key.verRels.isAuthentication())
+      && !document.controller.some((ctrl) => ctrl.eq(document.id))
+    ) {
+      document.addController(document.id);
+    }
+
     const {
       controller,
       service,
@@ -53,10 +60,19 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
         ]}\`, received: \`${context}\``,
       );
     }
+    const nonSelfRef = [...keys.keys()].find(
+      (ref) => !ref[0].eq(didDocument.id),
+    );
+    if (nonSelfRef) {
+      throw new Error(
+        `Can't have keys that don't reference \`${didDocument.id}\`, received: \`${nonSelfRef}\``,
+      );
+    }
 
     return await this.dockOnly.tx.newOnchain(id, keys.values(), controller);
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   async updateDocumentTx(didDocument, didKeypair) {
     const nextDocument = DIDDocument.from(didDocument);
     const signerDid = DockDidOrDidMethodKey.from(didKeypair.did);
@@ -91,12 +107,25 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
     }
 
     if (
-      [...newMethods.keys()].find((method) => !method.did.eq(didDocument.id))
+      [...newMethods.keys()].find(
+        (method) => !method.did.eq(currentDocument.id),
+      )
       || [...removedMethods.keys()].find(
-        (method) => !method.did.eq(didDocument.id),
+        (method) => !method.did.eq(currentDocument.id),
       )
     ) {
       throw new Error("Can't change controller keys");
+    }
+
+    const hasControllerKey = [...currentDocument.didKeys().values()].some(
+      (key) => key.verRels.isAuthentication(),
+    );
+    const selfControlled = currentDocument.controller.some((ctrl) => ctrl.eq(currentDocument.id));
+
+    if (hasControllerKey && !selfControlled) {
+      currentDocument.addController(currentDocument.id);
+    } else if (!hasControllerKey && selfControlled) {
+      currentDocument.removeController(currentDocument.id);
     }
 
     const { id: docId, '@context': context } = nextDocument;

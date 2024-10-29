@@ -1,5 +1,5 @@
 /* eslint sonarjs/no-duplicate-string: 0 */
-import { Schema } from '@docknetwork/credential-sdk/modules/schema';
+import { Schema } from '@docknetwork/credential-sdk/modules/abstract/schema';
 import {
   expandJSONLD,
   validateCredentialSchema,

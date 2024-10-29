@@ -25,10 +25,8 @@ import {
 } from "../../test-constants";
 import { DockDid, DockAccumulatorId } from "@docknetwork/credential-sdk/types";
 
-import {
-  AbstractAccumulatorModule,
-  AccumulatorType,
-} from "@docknetwork/credential-sdk/modules/accumulator";
+import { AccumulatorType } from "@docknetwork/credential-sdk/modules/abstract/accumulator";
+import { AbstractAccumulatorModule } from "@docknetwork/credential-sdk/modules";
 import { getAllEventsFromBlock } from "@docknetwork/dock-blockchain-api/utils/chain-ops";
 import { registerNewDIDUsingPair } from "../helpers";
 import {
@@ -483,7 +481,7 @@ describe("Accumulator Module", () => {
         chainModule.dockOnly.constructor.parseEventAsAccumulatorUpdate(
           events1[0].event
         )
-      ).toEqual([id[1].value, accumulated2]);
+      ).toEqual([id.asDock.value, accumulated2]);
 
       const updates2 = await chainModule.dockOnly.getUpdatesFromBlock(
         id,
@@ -505,7 +503,7 @@ describe("Accumulator Module", () => {
         chainModule.dockOnly.constructor.parseEventAsAccumulatorUpdate(
           events2[0].event
         )
-      ).toEqual([id[1].value, accumulated3]);
+      ).toEqual([id.asDock.value, accumulated3]);
 
       const updates3 = await chainModule.dockOnly.getUpdatesFromBlock(
         id,

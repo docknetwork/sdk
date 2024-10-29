@@ -1,7 +1,7 @@
 import {
   AbstractDIDModule,
   NoDIDError,
-} from '@docknetwork/credential-sdk/modules/did';
+} from '@docknetwork/credential-sdk/modules/abstract/did';
 import {
   CheqdDIDDocument,
   CheqdDid,

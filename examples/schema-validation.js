@@ -1,4 +1,4 @@
-import { Schema } from '@docknetwork/credential-sdk/modules/schema';
+import { Schema } from '@docknetwork/credential-sdk/modules/abstract/schema';
 
 // BOL Schema, its valid
 import bolSchema from './schemas/bol';

@@ -1,8 +1,26 @@
 import { encode, decode } from '@subsquid/ss58-codec';
 import { normalizeToU8a, u8aToHex } from './bytes';
 
-export const encodeAsSS58 = (address, prefix = 42) => encode({ bytes: normalizeToU8a(address), prefix });
+/**
+ * Encodes an address in SS58 format, which includes a network prefix.
+ *
+ * @param {string | Uint8Array} address - The address to encode, which can be a string or a Uint8Array.
+ * @param {number} [prefix=42] - The network prefix to use for SS58 encoding. Defaults to 42 if not specified.
+ *
+ * @returns {string} - The SS58 encoded address.
+ */
+export const encodeAsSS58 = (address, prefix = 42) => encode({
+  bytes: normalizeToU8a(address),
+  prefix,
+});
 
+/**
+ * Decodes an SS58 encoded address and converts it to a hexadecimal format.
+ *
+ * @param {string} value - The SS58 encoded address to decode.
+ *
+ * @returns {string} - The decoded address in hexadecimal format.
+ */
 export const decodeFromSS58 = (value) => u8aToHex(decode(value).bytes);
 
 /**

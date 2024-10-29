@@ -2,18 +2,19 @@ import {
   Blob,
   CheqdBlobId,
   CheqdBlobWithId,
-  CheqdDid,
 } from '@docknetwork/credential-sdk/types';
 import { option } from '@docknetwork/credential-sdk/types/generic';
 import { CheqdCreateResource, createInternalCheqdModule } from '../common';
 
 const methods = {
   new: (blobWithId) => {
-    const { blob, id } = CheqdBlobWithId.from(blobWithId);
-    const [did, uuid] = id;
+    const {
+      blob,
+      id: [did, uuid],
+    } = CheqdBlobWithId.from(blobWithId);
 
     return new CheqdCreateResource(
-      CheqdDid.from(did).value,
+      did.value.value,
       uuid,
       '1.0',
       [],
@@ -35,7 +36,7 @@ export default class CheqdInternalBlobModule extends createInternalCheqdModule(
 
   async blob(blobId) {
     return option(Blob).from(
-      (await this.resource(...CheqdBlobId.from(blobId)))?.resource?.data,
+      (await this.resource(...CheqdBlobId.from(blobId).value))?.resource?.data,
     );
   }
 }

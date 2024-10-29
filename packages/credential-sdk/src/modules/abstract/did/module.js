@@ -1,5 +1,5 @@
 import { AbstractBaseModule } from '../common';
-import { withExtendedPrototypeProperties } from '../../utils';
+import { withExtendedPrototypeProperties } from '../../../utils';
 
 /** Class to create, update and destroy DIDs */
 class AbstractDIDModule extends AbstractBaseModule {

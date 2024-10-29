@@ -74,7 +74,7 @@ describe("Schema Blob Module Integration", () => {
       id: invalidFormatBlobId,
       blob: stringToHex("hello world"),
     };
-    await modules.blob.new(blob, dockDID, pair);
+    await modules.blob.new(blob, pair);
 
     // Write schema blob
     const blobStr = JSON.stringify(exampleSchema);
@@ -82,7 +82,7 @@ describe("Schema Blob Module Integration", () => {
       id: blobId,
       blob: stringToHex(blobStr),
     };
-    await modules.blob.new(blob, dockDID, pair);
+    await modules.blob.new(blob, pair);
 
     // Properly format a keyDoc to use for signing
     keyDoc = getKeyDoc(dockDID, new Ed25519Keypair(firstKeySeed));
@@ -138,7 +138,7 @@ describe("Schema Blob Module Integration", () => {
   test("Set and get schema", async () => {
     const schema = new Schema(DockBlobId.random());
     await schema.setJSONSchema(exampleSchema);
-    await modules.blob.new(schema.toBlob(), dockDID, pair);
+    await modules.blob.new(schema.toBlob(), pair);
     const schemaObj = await Schema.get(blobId, modules.blob);
     expect(schemaObj).toMatchObject({
       ...exampleSchema,

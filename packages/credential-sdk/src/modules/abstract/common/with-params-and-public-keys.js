@@ -1,68 +1,10 @@
 import {
-  ensureInstanceOf,
-  ensurePrototypeOf,
   withExtendedPrototypeProperties,
   withExtendedStaticProperties,
-} from '../utils';
+} from '../../../utils';
+import AbstractBaseModule from './base-module';
 
-/**
- * Base class that must be extended by all API providers.
- */
-export const ApiProvider = withExtendedPrototypeProperties(
-  ['stateChangeBytes', 'signAndSend'],
-  class ApiProvider {
-    async stateChangeBytes(name, payload) {
-      return await this.apiProvider.stateChangeBytes(name, payload);
-    }
-
-    async signAndSend(extrinsic, params) {
-      return await this.apiProvider.signAndSend(extrinsic, params);
-    }
-  },
-);
-
-/**
- * Base module class that must be extended by all modules.
- */
-export const AbstractBaseModule = withExtendedStaticProperties(
-  ['ApiProvider'],
-  class AbstractBaseModule {
-    /**
-     * Class representing an API provider. Must be a successor of the `ApiProvider` class.
-     * @class
-     */
-    static ApiProvider;
-
-    /**
-     * Creates a new instance of the module and sets the api
-     * @constructor
-     * @param {object} apiProvider - API reference
-     * @param signAndSend
-     */
-    constructor(apiProvider) {
-      this.apiProvider = ensureInstanceOf(
-        apiProvider,
-        ensurePrototypeOf(ApiProvider, this.constructor.ApiProvider),
-      );
-    }
-
-    /**
-     * Signs and sends provided extrinsic.
-     *
-     * @param {*} extrinsic
-     * @param {*} params
-     * @returns {Promise<*>}
-     */
-    async signAndSend(extrinsic, params) {
-      return await this.apiProvider.signAndSend(extrinsic, params);
-    }
-  },
-);
-
-/**
- * Abstract logic allowing to operate with public keys and parameters.
- */
-class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
+class AbstractWithParamsAndPublicKeys extends AbstractBaseModule {
   /**
    * Create object to add new parameters on chain
    * @param prepareAddPublicKey
@@ -95,7 +37,6 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
    * @param param - The signature params to add.
    * @param targetDid
    * @param keyPair - Signer's keypair
-   * @param signingKeyRef - Reference to the keypair used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @returns {Promise<*>}
    */
   async addParams(id, param, targetDid, didKeypair, params) {
@@ -110,7 +51,7 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
    * @param id - Identifier of the parameters to be removed.
    * @param targetDid - Target DID associated with the params
    * @param keyPair - Signer's keypair
-   * @param signingKeyRef - Reference to the keypair used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+
    * @returns {Promise<*>}
    */
   async removeParams(id, targetDid, didKeypair, params) {
@@ -187,9 +128,48 @@ class AbstractWithParamsAndPublicKey extends AbstractBaseModule {
   async getAllPublicKeysByDid(_did, _includeParams = false) {
     throw new Error('Unimplemented');
   }
+
+  /**
+   * Retrieves latest public key identifier used by the supplied DID.
+   * @param {*} did
+   * @returns {Promise<Id>}
+   */
+  async lastPublicKeyId(_targetDid) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * Retrieves next public key identifier that can be used by the supplied DID.
+   * @param {*} did
+   * @returns {Promise<Id>}
+   */
+  async nextPublicKeyId(_targetDid) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * Retrieves latest params identifier used by the supplied DID.
+   * @param {*} did
+   * @returns {Promise<Id>}
+   */
+  async lastParamsId(_targetDid) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * Retrieves next params identifier that can be used by the supplied DID.
+   * @param {*} did
+   * @returns {Promise<Id>}
+   */
+  async nextParamsId(_targetDid) {
+    throw new Error('Unimplemented');
+  }
 }
 
-export const AbstractWithParamsAndPublicKeys = withExtendedPrototypeProperties(
+/**
+ * Abstract logic allowing to operate with public keys and parameters.
+ */
+export default withExtendedPrototypeProperties(
   [
     'addParamsTx',
     'addPublicKeyTx',
@@ -199,9 +179,13 @@ export const AbstractWithParamsAndPublicKeys = withExtendedPrototypeProperties(
     'getPublicKey',
     'getAllParamsByDid',
     'getAllPublicKeysByDid',
+    'lastPublicKeyId',
+    'nextPublicKeyId',
+    'lastParamsId',
+    'nextParamsId',
   ],
   withExtendedStaticProperties(
     ['PublicKey', 'Params'],
-    AbstractWithParamsAndPublicKey,
+    AbstractWithParamsAndPublicKeys,
   ),
 );

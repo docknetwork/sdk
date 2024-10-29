@@ -1,8 +1,8 @@
 /* eslint-disable camelcase */
 import { construct, verify_proof } from 'mrklt';
 import { AbstractBaseModule } from '../common';
-import { Anchor } from '../../types/anchor';
-import { withExtendedPrototypeProperties } from '../../utils';
+import { Anchor } from '../../../types/anchor';
+import { withExtendedPrototypeProperties } from '../../../utils';
 
 /** Class to create and query anchors from chain. */
 class AbstractAnchorModule extends AbstractBaseModule {

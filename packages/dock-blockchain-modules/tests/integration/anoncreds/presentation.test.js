@@ -35,6 +35,9 @@ import {
   Ed25519Keypair,
   DidKeypair,
 } from "@docknetwork/credential-sdk/keypairs";
+import {
+  MultiApiCoreModules
+} from "@docknetwork/credential-sdk/modules";
 import { DockCoreModules } from "../../../src";
 
 describe.each(Schemes)(
@@ -49,7 +52,7 @@ describe.each(Schemes)(
     getModule,
   }) => {
     const dock = new DockAPI();
-    const modules = new DockCoreModules(dock);
+    const modules = new MultiApiCoreModules([new DockCoreModules(dock)]);
     const resolver = new DockResolver(modules);
     let account;
     let did1;

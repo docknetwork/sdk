@@ -11,9 +11,7 @@ import {
 import { randomAsHex } from "@polkadot/util-crypto";
 import { InMemoryState } from "@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence";
 import { DockAPI } from "@docknetwork/dock-blockchain-api";
-import AccumulatorModule, {
-  AccumulatorType,
-} from "@docknetwork/credential-sdk/modules/accumulator/module";
+import { AccumulatorType } from "@docknetwork/credential-sdk/modules/abstract/accumulator/module";
 import {
   FullNodeEndpoint,
   TestAccountURI,
@@ -30,6 +28,7 @@ import {
   DidKeypair,
 } from "@docknetwork/credential-sdk/keypairs";
 import { DockCoreModules } from "../../../src";
+import { AbstractAccumulatorModule as AccumulatorModule } from "@docknetwork/credential-sdk/modules";
 
 describe("Prefilled positive accumulator", () => {
   // Incase updating an accumulator is expensive like making a blockchain txn, a cheaper strategy

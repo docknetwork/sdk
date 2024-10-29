@@ -1,12 +1,32 @@
 import { encodeAsSS58, decodeFromSS58 } from '../../utils/ss58';
 import { isHex } from '../../utils/bytes';
 import {
-  TypedBytes, TypedUUID, sized, withQualifier,
+  TypedBytes,
+  TypedEnum,
+  TypedUUID,
+  sized,
+  withFrom,
+  withQualifier,
 } from '../generic';
 import { CheqdBlobQualifier, DockBlobQualifier } from './const';
 import { CheqdMainnetDid, CheqdTestnetDid, DIDRef } from '../did';
 
-export class CheqdBlobId extends DIDRef {
+export class BlobId extends withFrom(withQualifier(TypedEnum, true), (value, from) => {
+  try {
+    // eslint-disable-next-line no-use-before-define
+    return DockBlobId.from(value);
+  } catch {
+    return from(value);
+  }
+}) {
+  static Qualifier = 'blob:';
+
+  toJSON() {
+    return String(this);
+  }
+}
+
+export class CheqdBlobIdValue extends withQualifier(DIDRef) {
   static Qualifier = CheqdBlobQualifier;
 
   static Ident = TypedUUID;
@@ -23,10 +43,10 @@ export class CheqdBlobId extends DIDRef {
   }
 }
 
-export class DockBlobId extends sized(withQualifier(TypedBytes)) {
-  static Size = 32;
-
+export class DockBlobIdValue extends sized(withQualifier(TypedBytes)) {
   static Qualifier = DockBlobQualifier;
+
+  static Size = 32;
 
   static fromUnqualifiedString(bytes) {
     return new this(isHex(bytes) ? bytes : decodeFromSS58(bytes));
@@ -36,3 +56,29 @@ export class DockBlobId extends sized(withQualifier(TypedBytes)) {
     return encodeAsSS58(this.value);
   }
 }
+
+export class CheqdBlobId extends BlobId {
+  static Qualifier = CheqdBlobQualifier;
+
+  static Class = CheqdBlobIdValue;
+
+  static Type = 'cheqd';
+
+  static random(did) {
+    return new this(this.Class.random(did));
+  }
+}
+
+export class DockBlobId extends BlobId {
+  static Qualifier = DockBlobQualifier;
+
+  static Class = DockBlobIdValue;
+
+  static Type = 'dock';
+
+  static random() {
+    return new this(this.Class.random());
+  }
+}
+
+BlobId.bindVariants(CheqdBlobId, DockBlobId);

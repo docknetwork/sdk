@@ -1,4 +1,4 @@
-import { AbstractDIDModule } from '../../modules/did';
+import { AbstractDIDModule } from '../../modules/abstract/did';
 import DIDResolver from './did-resolver';
 import { ensureInstanceOf } from '../../utils';
 

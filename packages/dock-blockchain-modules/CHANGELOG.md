@@ -1,5 +1,16 @@
 # @docknetwork/dock-blockchain-modules
 
+## 0.4.0
+
+### Minor Changes
+
+- Implement `MultiApi` modules allowing to use different APIs in the same moment
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

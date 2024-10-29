@@ -19,7 +19,7 @@ import {
   NoDIDError,
   NoOffchainDIDError,
   NoOnchainDIDError,
-} from '@docknetwork/credential-sdk/modules/did/errors';
+} from '@docknetwork/credential-sdk/modules/abstract/did/errors';
 import { maybeToHuman } from '@docknetwork/credential-sdk/utils';
 import { DidMethodKeyDetails } from '@docknetwork/credential-sdk/types/did/onchain';
 import {

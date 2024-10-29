@@ -1,5 +1,5 @@
 import { ensureInstanceOf } from '../../utils';
-import AbstractStatusListCredentialModule from '../../modules/status-list-credential/module';
+import AbstractStatusListCredentialModule from '../../modules/abstract/status-list-credential/module';
 import StatusList2021Resolver from './status-list2021-resolver';
 
 class DockStatusListResolver extends StatusList2021Resolver {

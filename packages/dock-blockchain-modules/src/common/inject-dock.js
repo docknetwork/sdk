@@ -12,13 +12,11 @@ export default function injectDock(klass) {
        */
       static DockOnly;
 
-      static ApiProvider = DockApiProvider;
-
       constructor(dock) {
-        const apiProvider = new DockApiProvider(dock);
-        super(apiProvider);
+        super();
 
-        this.dockOnly = new this.constructor.DockOnly(apiProvider);
+        this.apiProvider = new DockApiProvider(dock);
+        this.dockOnly = new this.constructor.DockOnly(this.apiProvider);
       }
     },
   };

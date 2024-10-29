@@ -1,5 +1,5 @@
 import { option } from '@docknetwork/credential-sdk/types/generic';
-import { AbstractStatusListCredentialModule } from '@docknetwork/credential-sdk/modules/status-list-credential';
+import { AbstractStatusListCredentialModule } from '@docknetwork/credential-sdk/modules/abstract/status-list-credential';
 import { DockStatusList2021CredentialWithPolicy } from './types';
 import { injectDock } from '../common';
 import DockStatusListCredentialInternalModule from './internal';

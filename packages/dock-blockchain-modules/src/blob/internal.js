@@ -2,7 +2,7 @@ import { createInternalDockModule } from '../common';
 import { AddBlob } from './actions';
 
 const didMethods = {
-  new: (blobWithId, _, __, nonce) => new AddBlob(blobWithId, nonce),
+  new: (blobWithId, __, nonce) => new AddBlob(blobWithId, nonce),
 };
 
 export default class DockBlobModuleInternal extends createInternalDockModule({

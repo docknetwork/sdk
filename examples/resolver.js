@@ -6,7 +6,7 @@ import {
   DidKey,
   DIDDocument,
 } from '@docknetwork/credential-sdk/types';
-import { NoDIDError } from '@docknetwork/credential-sdk/modules/did';
+import { NoDIDError } from '@docknetwork/credential-sdk/modules/abstract/did';
 import {
   DIDResolver,
   DIDKeyResolver,

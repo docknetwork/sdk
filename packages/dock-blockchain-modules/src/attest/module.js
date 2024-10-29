@@ -1,4 +1,4 @@
-import AbstractAttestModule from '@docknetwork/credential-sdk/modules/attest/module';
+import AbstractAttestModule from '@docknetwork/credential-sdk/modules/abstract/attest/module';
 import { ensureTargetKeypair, injectDock } from '../common';
 import DockInternalAttestModule from './internal';
 

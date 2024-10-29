@@ -1,7 +1,7 @@
-import { NoBlobError } from '@docknetwork/credential-sdk/modules/blob/errors';
+import { NoBlobError } from '@docknetwork/credential-sdk/modules/abstract/blob/errors';
 import { option } from '@docknetwork/credential-sdk/types/generic';
 import { DockBlobId } from '@docknetwork/credential-sdk/types';
-import { AbstractBlobModule } from '@docknetwork/credential-sdk/modules/blob';
+import { AbstractBlobModule } from '@docknetwork/credential-sdk/modules/abstract/blob';
 import { injectDock } from '../common';
 import { OwnerWithBlob } from './types';
 import DockBlobModuleInternal from './internal';
@@ -17,8 +17,8 @@ export default class BlobModule extends injectDock(AbstractBlobModule) {
    * @param signingKeyRef - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @returns {Promise<*>}
    */
-  async newTx(blobWithId, targetDid, didKeypair) {
-    return await this.dockOnly.tx.new(blobWithId, targetDid, didKeypair);
+  async newTx(blobWithId, didKeypair) {
+    return await this.dockOnly.tx.new(blobWithId, didKeypair);
   }
 
   /**
@@ -27,12 +27,12 @@ export default class BlobModule extends injectDock(AbstractBlobModule) {
    * @returns {Promise<Array>} - A 2-element array where the first is the author and the second is the blob contents.
    */
   async get(id) {
-    const hexId = DockBlobId.from(id);
+    const blobId = DockBlobId.from(id).asDock;
     const resp = option(OwnerWithBlob).from(
-      await this.dockOnly.query.blobs(hexId),
+      await this.dockOnly.query.blobs(blobId),
     );
     if (resp == null) {
-      throw new NoBlobError(String(hexId));
+      throw new NoBlobError(blobId);
     }
 
     return resp;

@@ -203,6 +203,10 @@ export function createInternalDockModule(
         return new RootPayload(this);
       }
 
+      supportsIdentifier(id) {
+        return this.apiProvider.supportsIdentifier(id);
+      }
+
       async signAndSend(extrinsic, params) {
         return await this.apiProvider.signAndSend(extrinsic, params);
       }

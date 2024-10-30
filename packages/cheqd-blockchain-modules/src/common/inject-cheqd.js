@@ -1,7 +1,7 @@
 import { withExtendedStaticProperties } from '@docknetwork/credential-sdk/utils/inheritance';
 import CheqdAPIProvider from './cheqd-api-provider';
 
-export default function injectDock(klass) {
+export default function injectCheqd(klass) {
   const name = `withCheqd(${klass.name})`;
 
   const obj = {
@@ -21,6 +21,10 @@ export default function injectDock(klass) {
 
       supportsIdentifier(id) {
         return this.apiProvider.supportsIdentifier(id);
+      }
+
+      methods() {
+        return this.apiProvider.methods();
       }
     },
   };

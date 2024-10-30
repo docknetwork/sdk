@@ -9,7 +9,7 @@ import {
 import stringify from "json-stringify-deterministic";
 import { DockAPI } from "@docknetwork/dock-blockchain-api";
 import { DockDid } from "@docknetwork/credential-sdk/types";
-import { DockResolver } from "@docknetwork/credential-sdk/resolver";
+import { CoreResolver } from "@docknetwork/credential-sdk/resolver";
 import {
   registerNewDIDUsingPair,
   getCredMatcherDoc,
@@ -45,7 +45,7 @@ describe.each(Schemes)(
   ({ Name, Module, Context, CryptoKeyPair, getModule, VerKey, SigType }) => {
     const dock = new DockAPI();
     const modules = new MultiApiCoreModules([new DockCoreModules(dock)]);
-    const resolver = new DockResolver(modules);
+    const resolver = new CoreResolver(modules);
 
     const did1 = DockDid.random();
     const pair1 = new DidKeypair([did1, 1], Ed25519Keypair.random());

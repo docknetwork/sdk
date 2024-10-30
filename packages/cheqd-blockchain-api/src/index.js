@@ -6,7 +6,10 @@ import {
 } from '@docknetwork/credential-sdk/utils';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import {
-  DIDModule, ResourceModule, createCheqdSDK, CheqdNetwork,
+  DIDModule,
+  ResourceModule,
+  createCheqdSDK,
+  CheqdNetwork,
 } from '@cheqd/sdk';
 import {
   MsgCreateDidDocPayload,
@@ -167,6 +170,12 @@ export class CheqdAPI extends ApiProvider {
     return res;
   }
 
+  methods() {
+    this.ensureInitialized();
+
+    return ['cheqd'];
+  }
+
   supportsIdentifier(id) {
     this.ensureInitialized();
 
@@ -182,6 +191,8 @@ export class CheqdAPI extends ApiProvider {
       return this.supportsIdentifier(id[0]);
     } else if (id instanceof TypedEnum) {
       return this.supportsIdentifier(this.value);
+    } else if (id.Qualifier?.contains('cheqd:')) {
+      return true;
     }
 
     return false;

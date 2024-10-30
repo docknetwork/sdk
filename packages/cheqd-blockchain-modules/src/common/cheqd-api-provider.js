@@ -16,6 +16,10 @@ class CheqdApiProvider extends ApiProvider {
     return this.cheqd.fees;
   }
 
+  methods() {
+    return this.cheqd.methods();
+  }
+
   isInitialized() {
     return this.cheqd.isInitialized();
   }

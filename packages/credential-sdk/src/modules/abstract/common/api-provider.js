@@ -2,6 +2,15 @@ import { withExtendedPrototypeProperties } from '../../../utils';
 
 class ApiProvider {
   /**
+   * Returns array of the methods supported by the given API.
+   * @returns {Array<string>}
+   */
+  methods() {
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * Returns `true` is the API was initialized.
    * @returns {boolean}
    */
   isInitialized() {
@@ -39,6 +48,6 @@ class ApiProvider {
  * Base class that must be extended by all API providers.
  */
 export default withExtendedPrototypeProperties(
-  ['isInitialized', 'stateChangeBytes', 'signAndSend'],
+  ['methods', 'isInitialized', 'stateChangeBytes', 'signAndSend'],
   ApiProvider,
 );

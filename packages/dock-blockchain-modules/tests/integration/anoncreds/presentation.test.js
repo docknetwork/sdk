@@ -21,7 +21,7 @@ import {
   issueCredential,
   verifyPresentation,
 } from "@docknetwork/credential-sdk/vc";
-import { DockResolver } from "@docknetwork/credential-sdk/resolver";
+import { CoreResolver } from "@docknetwork/credential-sdk/resolver";
 import {
   getResidentCardCredentialAndSchema,
   setupExternalSchema,
@@ -35,9 +35,7 @@ import {
   Ed25519Keypair,
   DidKeypair,
 } from "@docknetwork/credential-sdk/keypairs";
-import {
-  MultiApiCoreModules
-} from "@docknetwork/credential-sdk/modules";
+import { MultiApiCoreModules } from "@docknetwork/credential-sdk/modules";
 import { DockCoreModules } from "../../../src";
 
 describe.each(Schemes)(
@@ -53,7 +51,7 @@ describe.each(Schemes)(
   }) => {
     const dock = new DockAPI();
     const modules = new MultiApiCoreModules([new DockCoreModules(dock)]);
-    const resolver = new DockResolver(modules);
+    const resolver = new CoreResolver(modules);
     let account;
     let did1;
     let pair1;

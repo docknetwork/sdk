@@ -1,34 +1,41 @@
-import {
-  MultiResolver,
-  METHOD_REG_EXP_PATTERN,
-  HEX_ID_REG_EXP_PATTERN,
-} from '../generic';
+import { ensureInstanceOf } from '../../utils';
+import AbstractStatusListCredentialModule from '../../modules/abstract/status-list-credential/module';
+import { Resolver } from '../generic';
 
-const STATUS_LIST_ID_MATCHER = new RegExp(
-  `^status-list2021:${METHOD_REG_EXP_PATTERN}:${HEX_ID_REG_EXP_PATTERN}$`,
-);
+class StatusListResolver extends Resolver {
+  prefix = 'status-list2021';
 
-/**
- * A `StatusList2021Credential` resolver.
- * Accepts identifiers in format `status-list2021:`.
- *
- * @abstract
- */
-export default class StatusList2021Resolver extends MultiResolver {
-  static PREFIX = 'status-list2021';
+  get method() {
+    return this.statusListCredentialModule.methods();
+  }
 
-  parse(statusListId) {
-    if (!statusListId) throw new Error('Missing `statusListId`');
+  /**
+   * @param {AbstractStatusListCredentialModule} statusListCredentialModule
+   * @constructor
+   */
+  constructor(statusListCredentialModule) {
+    super();
 
-    const sections = statusListId.match(STATUS_LIST_ID_MATCHER);
-    if (sections) {
-      const [, method, id] = sections;
-
-      return { method, id };
-    }
-
-    throw new Error(
-      `Invalid \`StatusList2021Credential\` id: \`${statusListId}\``,
+    /**
+     * @type {AbstractStatusListCredentialModule}
+     */
+    this.statusListCredentialModule = ensureInstanceOf(
+      statusListCredentialModule,
+      AbstractStatusListCredentialModule,
     );
   }
+
+  async resolve(id) {
+    const cred = await this.statusListCredentialModule.getStatusListCredential(
+      id,
+    );
+
+    return cred?.value.list.toJSON();
+  }
 }
+
+/**
+ * Resolves `StatusList2021Credential`s with identifier `status-list2021:dock:*`.
+ * @type {StatusListResolver}
+ */
+export default StatusListResolver;

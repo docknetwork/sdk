@@ -1,59 +1,47 @@
 import Resolver from './resolver';
-import { ensureItemsAllowed, cacheLast } from '../utils';
+import { cacheLast, itemsOrWildcard } from '../utils';
 import { WILDCARD } from './const';
 import { ensureString } from '../../utils/type-helpers';
 
 /**
- * Successor can either
- * - implement its own `resolve` and have multiple `PREFIX`/`METHOD`(s)
- * - act as a router and resolve an entity using a provided list of resolvers
+ * Acts as a router and resolves an entity using a provided list of resolvers.
  *
- * In the first case, it has to implement a `resolve` function and avoid providing any resolvers to the `super.constructor`.
+ * Each resolver must have properties `prefix` and `method` set.
  *
- * In the second case, it doesn't have to override `resolve` but instead provide a list of resolvers into the `super.constructor`.
- * Each resolver must have static properties `PREFIX` and `METHOD`, and unlike `Resolver`, `MultiResolver` can have `PREFIX`
- * and `METHOD` specified as Arrays of strings.
- *
- * If the resolver must be used for any `PREFIX`/`METHOD` as default, use the `WILDCARD` symbol.
+ * If the resolver must be used for any `prefix`/`method` as default, use the `WILDCARD` symbol.
  * In case no matching resolver is found, will be used first to match either the `WILDCARD` method, `WILDCARD` prefix, or both.
  *
  * @class
  * @abstract
  * @template T
  */
-export default class MultiResolver extends Resolver {
+export default class ResolverRouter extends Resolver {
   /**
    * Matching string prefix, an array of string prefixes, or wildcard pattern.
    * @type {Array<string> | string | symbol}
    * @abstract
-   * @static
    */
-  static PREFIX;
+  prefix;
 
   /**
    * Matching string method, an array of string methods, or wildcard pattern.
    * @type {Array<string> | string | symbol}
    * @abstract
-   * @static
    */
-  static METHOD;
+  method;
 
   /**
    *
-   * @param {Array<Resolver<T> | MultiResolver<T>>} [resolvers=[]]
+   * @param {Array<Resolver<T> | ResolverRouter<T>>} [resolvers=[]]
    */
   constructor(resolvers = []) {
     super();
 
     let resolverList;
-    if (this.resolve !== MultiResolver.prototype.resolve) {
-      if (!resolvers.length) {
-        resolverList = [this];
-      } else {
-        throw new Error(
-          `\`${this.constructor.name}\` has a custom \`resolve\` implementation, so it can't have any nested resolvers`,
-        );
-      }
+    if (this.resolve !== ResolverRouter.prototype.resolve) {
+      throw new Error(
+        `\`${this.constructor.name}\` has a custom \`resolve\` implementation, so it can't have any nested resolvers`,
+      );
     } else {
       resolverList = resolvers;
 
@@ -64,6 +52,14 @@ export default class MultiResolver extends Resolver {
       }
     }
 
+    this.prefix = itemsOrWildcard(
+      resolverList.flatMap((resolver) => [].concat(resolver.prefix)),
+      WILDCARD,
+    );
+    this.method = itemsOrWildcard(
+      resolverList.flatMap((resolver) => [].concat(resolver.method)),
+      WILDCARD,
+    );
     this.resolvers = this.buildResolversMap(resolverList);
     this.matchingResolver = cacheLast(this.matchingResolver);
   }
@@ -80,12 +76,12 @@ export default class MultiResolver extends Resolver {
   /**
    * Resolves an entity with the provided identifier.
    * @param {string} id - fully qualified identifier.
-   * @returns {Resolver<T> | MultiResolver<T> | null}
+   * @returns {Resolver<T> | ResolverRouter<T> | null}
    */
   matchingResolver(id) {
     ensureString(id);
-    const prefix = this.prefix(id);
-    const method = this.method(id);
+    const prefix = this.extractPrefix(id);
+    const method = this.extractMethod(id);
 
     for (const [currentPrefix, currentMethod] of [
       [prefix, method],
@@ -118,26 +114,19 @@ export default class MultiResolver extends Resolver {
       }
       if (
         this === resolver
-        && resolver.resolve === MultiResolver.prototype.resolve
+        && resolver.resolve === ResolverRouter.prototype.resolve
       ) {
         throw new Error(
           `Resolver \`${resolver.constructor.name}\` must implement its own \`resolve\``,
         );
       }
-      const { PREFIX, METHOD } = resolver.constructor;
-      const prefixArr = [].concat(PREFIX);
-      const methodArr = [].concat(METHOD);
-
-      ensureItemsAllowed(
-        prefixArr,
-        [].concat(this.constructor.PREFIX),
-        WILDCARD,
-      );
-      ensureItemsAllowed(
-        methodArr,
-        [].concat(this.constructor.METHOD),
-        WILDCARD,
-      );
+      if (resolver.prefix == null) {
+        throw new Error(`No prefix in \`${resolver.constructor.name}\``);
+      } else if (resolver.method == null) {
+        throw new Error(`No method in \`${resolver.constructor.name}\``);
+      }
+      const prefixArr = [].concat(resolver.prefix);
+      const methodArr = [].concat(resolver.method);
 
       for (const prefix of prefixArr) {
         for (const method of methodArr) {

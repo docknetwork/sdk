@@ -17,7 +17,7 @@ import VerifiableCredential from "@docknetwork/credential-sdk/vc/verifiable-cred
 import exampleSchema from "../example-schema";
 import VerifiablePresentation from "@docknetwork/credential-sdk/vc/verifiable-presentation";
 import { getKeyDoc } from "@docknetwork/credential-sdk/vc/helpers";
-import { DockResolver } from "@docknetwork/credential-sdk/resolver";
+import { CoreResolver } from "@docknetwork/credential-sdk/resolver";
 import { DockCoreModules } from "../../src";
 import { registerNewDIDUsingPair } from "./helpers";
 import {
@@ -33,7 +33,7 @@ let keyDoc;
 let validCredential;
 let invalidCredential;
 let invalidFormatBlobId;
-let dockResolver;
+let CoreResolver;
 
 const ctx1 = {
   "@context": {
@@ -88,7 +88,7 @@ describe("Schema Blob Module Integration", () => {
     keyDoc = getKeyDoc(dockDID, new Ed25519Keypair(firstKeySeed));
 
     // Create a resolver for dock DIDs
-    dockResolver = new DockResolver(modules);
+    CoreResolver = new CoreResolver(modules);
 
     // Create a valid credential with a schema
     validCredential = new VerifiableCredential(
@@ -162,7 +162,7 @@ describe("Schema Blob Module Integration", () => {
   test("Utility method verifyCredential should pass if the subject is compatible with the schema in credentialSchema.", async () => {
     await expect(
       verifyCredential(validCredential.toJSON(), {
-        resolver: dockResolver,
+        resolver: CoreResolver,
         compactProof: true,
       })
     ).resolves.toBeDefined();
@@ -171,7 +171,7 @@ describe("Schema Blob Module Integration", () => {
   test("The verify method should pass if the subject is compatible with the schema in credentialSchema.", async () => {
     await expect(
       validCredential.verify({
-        resolver: dockResolver,
+        resolver: CoreResolver,
         compactProof: true,
       })
     ).resolves.toBeDefined();
@@ -187,7 +187,7 @@ describe("Schema Blob Module Integration", () => {
 
     await expect(
       verifyCredential(invalidCredential.toJSON(), {
-        resolver: dockResolver,
+        resolver: CoreResolver,
         compactProof: true,
       })
     ).rejects.toThrow(/Schema validation failed/);
@@ -196,7 +196,7 @@ describe("Schema Blob Module Integration", () => {
   test("The verify method should detect a subject with incompatible schema in credentialSchema.", async () => {
     await expect(
       invalidCredential.verify({
-        resolver: dockResolver,
+        resolver: CoreResolver,
         compactProof: true,
       })
     ).rejects.toThrow(/Schema validation failed/);
@@ -223,7 +223,7 @@ describe("Schema Blob Module Integration", () => {
       verifyPresentation(vpInvalid.toJSON(), {
         challenge: "some_challenge",
         domain: "some_domain",
-        resolver: dockResolver,
+        resolver: CoreResolver,
         compactProof: true,
       })
     ).rejects.toThrow(/Schema validation failed/);
@@ -241,7 +241,7 @@ describe("Schema Blob Module Integration", () => {
       verifyPresentation(vpValid.toJSON(), {
         challenge: "some_challenge",
         domain: "some_domain",
-        resolver: dockResolver,
+        resolver: CoreResolver,
         compactProof: true,
       })
     ).resolves.toBeDefined();
@@ -268,7 +268,7 @@ describe("Schema Blob Module Integration", () => {
       vpInvalid.verify({
         challenge: "some_challenge",
         domain: "some_domain",
-        resolver: dockResolver,
+        resolver: CoreResolver,
         compactProof: true,
       })
     ).rejects.toThrow(/Schema validation failed/);
@@ -286,7 +286,7 @@ describe("Schema Blob Module Integration", () => {
       vpValid.verify({
         challenge: "some_challenge",
         domain: "some_domain",
-        resolver: dockResolver,
+        resolver: CoreResolver,
         compactProof: true,
       })
     ).resolves.toBeDefined();

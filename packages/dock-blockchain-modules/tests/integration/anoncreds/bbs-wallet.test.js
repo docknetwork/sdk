@@ -4,8 +4,8 @@ import BbsPlusPresentation from "@docknetwork/credential-sdk/vc/presentation";
 import VerifiableCredential from "@docknetwork/credential-sdk/vc/verifiable-credential";
 import {
   DIDKeyResolver,
-  DockResolver,
-  WildcardMultiResolver,
+  CoreResolver,
+  WildcardResolverRouter,
 } from "@docknetwork/credential-sdk/resolver";
 import VerifiablePresentation from "@docknetwork/credential-sdk/vc/verifiable-presentation";
 import { keyDocToKeypair } from "./wallet-util";
@@ -305,8 +305,8 @@ async function verifyDerivedCredential(dock, credential, resolver) {
 describe("Presentation from older credentials", () => {
   const dock = new DockAPI();
   const modules = new DockCoreModules(dock);
-  const resolver = new WildcardMultiResolver([
-    new DockResolver(modules),
+  const resolver = new WildcardResolverRouter([
+    new CoreResolver(modules),
     new DIDKeyResolver(),
   ]);
 

@@ -6,7 +6,7 @@ import mockFetch from "../mocks/fetch";
 import { DockDid } from "@docknetwork/credential-sdk/types";
 
 import { DockAPI } from "@docknetwork/dock-blockchain-api";
-import { DockResolver } from "@docknetwork/credential-sdk/resolver";
+import { CoreResolver } from "@docknetwork/credential-sdk/resolver";
 
 import {
   FullNodeEndpoint,
@@ -77,7 +77,7 @@ const unsignedCred = {
 describe("Verifiable Credential issuance and presentation where the credential has 2 subjects and of the subject acts as the holder of the presentation", () => {
   const dock = new DockAPI();
   const modules = new DockCoreModules(dock);
-  const resolver = new DockResolver(modules);
+  const resolver = new CoreResolver(modules);
 
   beforeAll(async () => {
     await dock.init({

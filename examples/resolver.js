@@ -8,11 +8,11 @@ import {
 } from '@docknetwork/credential-sdk/types';
 import { NoDIDError } from '@docknetwork/credential-sdk/modules/abstract/did';
 import {
-  DIDResolver,
   DIDKeyResolver,
   UniversalResolver,
   WILDCARD,
-  DockDIDResolver,
+  DIDResolver,
+  Resolver,
 } from '@docknetwork/credential-sdk/resolver';
 import { DockDIDModule } from '@docknetwork/dock-blockchain-modules';
 
@@ -39,8 +39,10 @@ const dock = new DockAPI();
 const didModule = new DockDIDModule(dock);
 
 // Custom ethereum resolver class
-class EtherResolver extends DIDResolver {
-  static METHOD = 'ethr';
+class EtherResolver extends Resolver {
+  prefix = 'did';
+
+  method = 'ethr';
 
   constructor(config) {
     super();
@@ -86,12 +88,12 @@ async function main() {
 
   const resolvers = [
     new DIDKeyResolver(), // did:key resolver
-    new DockDIDResolver(didModule), // Prebuilt resolver
+    new DIDResolver(didModule), // Prebuilt resolver
     new EtherResolver(ethereumProviderConfig), // Custom resolver
   ];
 
   class AnyDIDResolver extends DIDResolver {
-    static METHOD = WILDCARD;
+    method = WILDCARD;
   }
 
   const resolver = new AnyDIDResolver([

@@ -21,8 +21,8 @@ import {
 
 import {
   UniversalResolver,
-  DockResolver,
-  WildcardMultiResolver,
+  CoreResolver,
+  WildcardResolverRouter,
 } from '@docknetwork/credential-sdk/resolver';
 
 const dock = new DockAPI();
@@ -103,8 +103,8 @@ async function main() {
   console.log('Result from chain:', result);
 
   const universalResolverUrl = 'https://uniresolver.io';
-  const resolver = new WildcardMultiResolver([
-    new DockResolver(modules),
+  const resolver = new WildcardResolverRouter([
+    new CoreResolver(modules),
     new UniversalResolver(universalResolverUrl),
   ]);
 

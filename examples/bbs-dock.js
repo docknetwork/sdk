@@ -16,7 +16,7 @@ const keypairOpts = {
 };
 
 class ExampleDIDResolver extends DIDResolver {
-  static METHOD = 'example';
+  method = 'example';
 
   constructor() {
     super(void 0);

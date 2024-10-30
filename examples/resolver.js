@@ -13,6 +13,7 @@ import {
   UniversalResolver,
   WILDCARD,
   DIDResolver,
+  ResolverRouter,
   Resolver,
 } from '@docknetwork/credential-sdk/resolver';
 import { DockDIDModule } from '@docknetwork/dock-blockchain-modules';
@@ -93,7 +94,7 @@ async function main() {
     new EtherResolver(ethereumProviderConfig), // Custom resolver
   ];
 
-  class AnyDIDResolver extends DIDResolver {
+  class AnyDIDResolver extends ResolverRouter {
     method = WILDCARD;
   }
 

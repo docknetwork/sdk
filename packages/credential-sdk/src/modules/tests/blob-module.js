@@ -2,8 +2,8 @@ import { DidKeypair, Ed25519Keypair } from '../../keypairs';
 import { NoBlobError } from '../abstract/blob/errors';
 import { DIDDocument } from '../../types';
 import { itIf } from './common';
-import { BlobResolver } from '../../resolver/blob';
-import { stringToU8a } from '../../utils';
+// import { BlobResolver } from '../../resolver/blob';
+// import { stringToU8a } from '../../utils';
 
 // eslint-disable-next-line jest/no-export
 export default function generateBlobModuleTests(

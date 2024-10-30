@@ -1,5 +1,5 @@
 import { DidKeypair, Ed25519Keypair } from '../../keypairs';
-import { DIDResolver } from '../../resolver';
+// import { DIDResolver } from '../../resolver';
 import {
   DIDDocument,
   BBSPublicKeyValue,

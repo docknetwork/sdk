@@ -42,6 +42,7 @@ Following is an example to build a custom Ethereum resolver. It uses the library
 as configuration. The example below uses Infura to get access to an Ethereum node and read the DID off Ethereum.
 
 ```js
+import { Resolver } from "@docknetwork/credential-sdk/resolver";
 import { parseDIDUrl } from "@docknetwork/credential-sdk/utils";
 import ethr from "ethr-did-resolver";
 

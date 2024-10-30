@@ -27,9 +27,9 @@ This is how you resolve a Dock DID:
 import { CoreResolver } from "@docknetwork/credential-sdk/resolver";
 
 // Assuming the presence of modules created using `CheqdCoreModules` or `DockCoreModules` from the API object.
-const CoreResolver = new CoreResolver(modules);
+const dockResolver = new CoreResolver(modules);
 // Say you had a DID `did:dock:5D.....`
-const didDocument = await CoreResolver.resolve("did:dock:5D.....");
+const didDocument = await dockResolver.resolve("did:dock:5D.....");
 ```
 
 ## Creating a resolver class for a different method
@@ -56,7 +56,9 @@ const ethereumProviderConfig = {
 };
 
 // Custom ethereum resolver class
-class EtherResolver extends DIDResolver {
+class EtherResolver extends Resolver {
+  prefix = "did";
+
   method = "ethr";
 
   constructor(config) {
@@ -116,7 +118,9 @@ import {
   WILDCARD,
 } from "@docknetwork/credential-sdk/resolver";
 
-class MultiDIDResolver extends DIDResolver {
+class MultiDIDResolver extends Resolver {
+  prefix = "did";
+
   method = WILDCARD;
 
   constructor(modules) {

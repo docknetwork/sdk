@@ -99,7 +99,7 @@ const DID_MATCHER = new RegExp(
 /**
  * Parses supplied DID URL.
  * @param {string} didUrl
- * @returns
+ * @returns {object}
  */
 export function parseDIDUrl(didUrl) {
   if (didUrl === '' || !didUrl) throw new Error('Missing DID');

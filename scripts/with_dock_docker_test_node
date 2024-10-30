@@ -18,7 +18,7 @@ alice_container_id=$(
 )
 
 cleanup() {
-  docker kill $alice_container_id
+  docker kill $alice_container_id&
 }
 
 try_with_node() {

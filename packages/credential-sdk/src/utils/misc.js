@@ -3,6 +3,7 @@ import elliptic from 'elliptic';
 
 import { sha256 } from 'js-sha256';
 import { PatternMatcher } from './generic';
+import { METHOD_REG_EXP_PATTERN } from '../resolver/generic/const';
 
 const EC = elliptic.ec;
 const secp256k1Curve = new EC('secp256k1');
@@ -79,6 +80,54 @@ export function getUniqueElementsFromArray(a, filterCallback) {
     const k = filterCallback(item);
     return seen.has(k) ? false : seen.add(k);
   });
+}
+
+const ID_CHAR = '[a-zA-Z0-9_.-]';
+const METHOD_ID = `(${ID_CHAR}+(:${ID_CHAR}+)*)`;
+const PARAM_CHAR = '[a-zA-Z0-9_.:%-]';
+const PARAM = `;${PARAM_CHAR}+=${PARAM_CHAR}*`;
+const PARAMS = `((${PARAM})*)`;
+// eslint-disable-next-line no-useless-escape
+const PATH = '(/[^#?]*)?';
+const QUERY = '([?][^#]*)?';
+// eslint-disable-next-line no-useless-escape
+const FRAGMENT = '(#.*)?';
+const DID_MATCHER = new RegExp(
+  `^did:${METHOD_REG_EXP_PATTERN}:${METHOD_ID}${PARAMS}${PATH}${QUERY}${FRAGMENT}$`,
+);
+
+/**
+ * Parses supplied DID URL.
+ * @param {string} didUrl
+ * @returns
+ */
+export function parseDIDUrl(didUrl) {
+  if (didUrl === '' || !didUrl) throw new Error('Missing DID');
+  const sections = didUrl.match(DID_MATCHER);
+  if (sections) {
+    const parts = {
+      did: `did:${sections[1]}:${sections[2]}`,
+      method: sections[1],
+      id: sections[2],
+      didUrl,
+    };
+    if (sections[4]) {
+      const params = sections[4].slice(1).split(';');
+      parts.params = {};
+      for (const p of params) {
+        const kv = p.split('=');
+
+        // eslint-disable-next-line prefer-destructuring
+        parts.params[kv[0]] = kv[1];
+      }
+    }
+    // eslint-disable-next-line prefer-destructuring
+    if (sections[6]) parts.path = sections[6];
+    if (sections[7]) parts.query = sections[7].slice(1);
+    if (sections[8]) parts.fragment = sections[8].slice(1);
+    return parts;
+  }
+  throw new Error(`Invalid DID: \`${didUrl}\``);
 }
 
 /**

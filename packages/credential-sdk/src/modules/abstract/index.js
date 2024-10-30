@@ -1,8 +1,4 @@
-import {
-  ensurePrototypeOf,
-  withExtendedPrototypeProperties,
-  withExtendedStaticProperties,
-} from '../../utils';
+import { ensurePrototypeOf, withExtendedStaticProperties } from '../../utils';
 import AbstractAccumulatorModule from './accumulator/module';
 import AbstractAnchorModule from './anchor/module';
 import AbstractAttestModule from './attest/module';
@@ -15,89 +11,86 @@ import AbstractTrustRegistryModule from './trust-registry/module';
 /**
  * Class representing a set of core modules each of which is an instance of its respective abstract module.
  */
-export const AbstractCoreModules = withExtendedPrototypeProperties(
-  ['methods'],
-  withExtendedStaticProperties(
-    [
-      'AccumulatorModule',
-      'AnchorModule',
-      'AttestModule',
-      'BlobModule',
-      'DIDModule',
-      'OffchainSignaturesModule',
-      'BBSModule',
-      'BBSPlusModule',
-      'PSModule',
-      'StatusListCredentialModule',
-      'TrustRegistryModule',
-    ],
-    class AbstractCoreModules {
-      static AccumulatorModule = AbstractAccumulatorModule;
+export const AbstractCoreModules = withExtendedStaticProperties(
+  [
+    'AccumulatorModule',
+    'AnchorModule',
+    'AttestModule',
+    'BlobModule',
+    'DIDModule',
+    'OffchainSignaturesModule',
+    'BBSModule',
+    'BBSPlusModule',
+    'PSModule',
+    'StatusListCredentialModule',
+    'TrustRegistryModule',
+  ],
+  class AbstractCoreModules {
+    static AccumulatorModule = AbstractAccumulatorModule;
 
-      static AnchorModule = AbstractAnchorModule;
+    static AnchorModule = AbstractAnchorModule;
 
-      static AttestModule = AbstractAttestModule;
+    static AttestModule = AbstractAttestModule;
 
-      static BlobModule = AbstractBlobModule;
+    static BlobModule = AbstractBlobModule;
 
-      static DIDModule = AbstractDIDModule;
+    static DIDModule = AbstractDIDModule;
 
-      static OffchainSignaturesModule = AbstractOffchainSignaturesModule;
+    static OffchainSignaturesModule = AbstractOffchainSignaturesModule;
 
-      static BBSModule = AbstractOffchainSignaturesModule;
+    static BBSModule = AbstractOffchainSignaturesModule;
 
-      static BBSPlusModule = AbstractOffchainSignaturesModule;
+    static BBSPlusModule = AbstractOffchainSignaturesModule;
 
-      static PSModule = AbstractOffchainSignaturesModule;
+    static PSModule = AbstractOffchainSignaturesModule;
 
-      static StatusListCredentialModule = AbstractStatusListCredentialModule;
+    static StatusListCredentialModule = AbstractStatusListCredentialModule;
 
-      static TrustRegistryModule = AbstractTrustRegistryModule;
+    static TrustRegistryModule = AbstractTrustRegistryModule;
 
-      static ModuleMap = {
-        AccumulatorModule: { key: 'accumulator', optional: false },
-        AnchorModule: { key: 'anchor', optional: true },
-        AttestModule: { key: 'attest', optional: false },
-        BlobModule: { key: 'blob', optional: false },
-        DIDModule: { key: 'did', optional: false },
-        OffchainSignaturesModule: {
-          key: 'offchainSignatures',
-          optional: false,
-        },
-        BBSModule: { key: 'bbs', optional: false },
-        BBSPlusModule: { key: 'bbsPlus', optional: false },
-        PSModule: { key: 'ps', optional: false },
-        StatusListCredentialModule: {
-          key: 'statusListCredential',
-          optional: false,
-        },
-        TrustRegistryModule: { key: 'trustRegistry', optional: false },
-      };
+    static ModuleMap = {
+      AccumulatorModule: { key: 'accumulator', optional: false },
+      AnchorModule: { key: 'anchor', optional: true },
+      AttestModule: { key: 'attest', optional: false },
+      BlobModule: { key: 'blob', optional: false },
+      DIDModule: { key: 'did', optional: false },
+      OffchainSignaturesModule: {
+        key: 'offchainSignatures',
+        optional: false,
+      },
+      BBSModule: { key: 'bbs', optional: false },
+      BBSPlusModule: { key: 'bbsPlus', optional: false },
+      PSModule: { key: 'ps', optional: false },
+      StatusListCredentialModule: {
+        key: 'statusListCredential',
+        optional: false,
+      },
+      TrustRegistryModule: { key: 'trustRegistry', optional: false },
+    };
 
-      constructor(...args) {
-        for (const [prop, key] of Object.entries(this.constructor.ModuleMap)) {
-          this.attachModule(prop, key, args);
-        }
+    constructor(...args) {
+      for (const [prop, key] of Object.entries(this.constructor.ModuleMap)) {
+        this.attachModule(prop, key, args);
       }
+    }
 
-      attachModule(prop, { key, optional }, args) {
-        const { [prop]: Module } = this.constructor;
+    attachModule(prop, { key, optional }, args) {
+      const { [prop]: Module } = this.constructor;
 
-        if (Module == null) {
-          if (optional) {
-            return this;
-          }
-
-          throw new Error(`No such module: ${prop}`);
+      if (Module == null) {
+        if (optional) {
+          return this;
         }
 
-        ensurePrototypeOf(AbstractCoreModules[prop], Module);
-        this[key] = new Module(...args);
-
-        return this;
+        throw new Error(`No such module: ${prop}`);
       }
-    },
-  ),
+
+      ensurePrototypeOf(AbstractCoreModules[prop], Module);
+      this[key] = new Module(...args);
+
+      return this;
+    }
+  },
 );
 
 export {

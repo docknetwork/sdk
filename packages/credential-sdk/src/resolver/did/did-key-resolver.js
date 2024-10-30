@@ -1,5 +1,6 @@
 import { getResolver } from 'key-did-resolver';
 import { Resolver } from '../generic';
+import { parseDIDUrl } from '../../utils';
 
 const resolveMethod = getResolver().key;
 
@@ -16,7 +17,7 @@ export default class DIDKeyResolver extends Resolver {
   }
 
   async resolve(did) {
-    const parsed = this.parseDid(did);
+    const parsed = parseDIDUrl(did);
     const { didDocument } = await resolveMethod(did, parsed, null, {});
 
     return {

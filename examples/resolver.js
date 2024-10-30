@@ -6,6 +6,7 @@ import {
   DidKey,
   DIDDocument,
 } from '@docknetwork/credential-sdk/types';
+import { parseDIDUrl } from '@docknetwork/credential-sdk/utils';
 import { NoDIDError } from '@docknetwork/credential-sdk/modules/abstract/did';
 import {
   DIDKeyResolver,
@@ -50,7 +51,7 @@ class EtherResolver extends Resolver {
   }
 
   async resolve(did) {
-    const parsed = this.parseDid(did);
+    const parsed = parseDIDUrl(did);
     try {
       return this.ethres(did, parsed);
     } catch (e) {

@@ -19,16 +19,14 @@ export default class ResolverRouter extends Resolver {
   /**
    * Matching string prefix, an array of string prefixes, or wildcard pattern.
    * @type {Array<string> | string | symbol}
-   * @abstract
+   * @prop prefix
    */
-  prefix;
 
   /**
    * Matching string method, an array of string methods, or wildcard pattern.
    * @type {Array<string> | string | symbol}
-   * @abstract
+   * @prop method
    */
-  method;
 
   /**
    *

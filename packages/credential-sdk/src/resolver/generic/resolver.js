@@ -9,19 +9,15 @@ import { WILDCARD } from './const';
 class Resolver {
   /**
    * Matching prefix - either a string, array of strings or wildcard pattern.
-   * @type {string | symbol}
-   * @abstract
-   * @static
+   * @type {Array<string> | string | symbol}
+   * @prop prefix
    */
-  prefix;
 
   /**
    * Matching method - either a string, array of strings or wildcard pattern.
-   * @type {string | symbol}
-   * @abstract
-   * @static
-   */
-  method;
+   * @type {Array<string> | string | symbol}
+   * @prop method
+   *
 
   /**
    * Returns `true` if an entity with the provided identifier can be resolved using this resolver.

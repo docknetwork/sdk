@@ -1,5 +1,5 @@
 import { DidKeypair, Ed25519Keypair } from '../../keypairs';
-// import { DIDResolver } from '../../resolver';
+import { DIDResolver } from '../../resolver';
 import {
   DIDDocument,
   BBSPublicKeyValue,
@@ -231,7 +231,7 @@ export default function generateDIDModuleTests(
       );
     });
 
-    /* test('`DIDResolver`', async () => {
+    test('`DIDResolver`', async () => {
       const resolver = new DIDResolver(module);
       const did = DID.random();
 
@@ -243,6 +243,6 @@ export default function generateDIDModuleTests(
       await module.createDocument(document, didKeypair);
 
       expect(await resolver.resolve(did)).toEqual(document.toJSON());
-      }); */
+    });
   });
 }

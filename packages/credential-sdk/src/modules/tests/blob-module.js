@@ -2,8 +2,8 @@ import { DidKeypair, Ed25519Keypair } from '../../keypairs';
 import { NoBlobError } from '../abstract/blob/errors';
 import { DIDDocument } from '../../types';
 import { itIf } from './common';
-// import { BlobResolver } from '../../resolver/blob';
-// import { stringToU8a } from '../../utils';
+import { BlobResolver } from '../../resolver/blob';
+import { stringToU8a } from '../../utils';
 
 // eslint-disable-next-line jest/no-export
 export default function generateBlobModuleTests(
@@ -59,7 +59,7 @@ export default function generateBlobModuleTests(
       );
     });
 
-    /* test("`BlobResolver`", async () => {
+    test('`BlobResolver`', async () => {
       const resolver = new BlobResolver(blobModule);
       const did = DID.random();
 
@@ -72,7 +72,7 @@ export default function generateBlobModuleTests(
 
       const blob1 = {
         id: BlobId.random(did),
-        blob: "abcdef",
+        blob: 'abcdef',
       };
 
       await blobModule.new(blob1, didKeypair);
@@ -80,6 +80,6 @@ export default function generateBlobModuleTests(
         String(did),
         stringToU8a(blob1.blob),
       ]);
-    }); */
+    });
   });
 }

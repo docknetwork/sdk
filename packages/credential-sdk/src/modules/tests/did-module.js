@@ -242,7 +242,7 @@ export default function generateDIDModuleTests(
 
       await module.createDocument(document, didKeypair);
 
-      expect(await resolver.resolve(did)).toEqual(document.toJSON());
+      expect(await resolver.resolve(String(did))).toEqual(document.toJSON());
     });
   });
 }

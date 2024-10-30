@@ -76,7 +76,7 @@ export default function generateBlobModuleTests(
       };
 
       await blobModule.new(blob1, didKeypair);
-      expect(await resolver.resolve(blob1.id)).toEqual([
+      expect(await resolver.resolve(String(blob1.id))).toEqual([
         String(did),
         stringToU8a(blob1.blob),
       ]);

@@ -1,5 +1,5 @@
 import { AbstractDIDModule } from '../../modules/abstract/did';
-import { ensureInstanceOf } from '../../utils';
+import { ensureInstanceOf, parseDIDUrl } from '../../utils';
 import { Resolver } from '../generic';
 
 class DIDResolver extends Resolver {
@@ -22,7 +22,8 @@ class DIDResolver extends Resolver {
     this.didModule = ensureInstanceOf(didModule, AbstractDIDModule);
   }
 
-  async resolve(did) {
+  async resolve(didURL) {
+    const { did } = parseDIDUrl(didURL);
     const document = await this.didModule.getDocument(did);
 
     return document.toJSON();

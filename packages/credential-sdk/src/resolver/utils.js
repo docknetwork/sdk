@@ -65,3 +65,13 @@ export const ensureItemsAllowed = (items, allowed, wildcard) => {
     }
   }
 };
+
+export const itemsOrWildcard = (items, wildcard) => {
+  for (const item of items) {
+    if (item === wildcard) {
+      return wildcard;
+    }
+  }
+
+  return [...new Set(items)];
+};

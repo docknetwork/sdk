@@ -160,7 +160,7 @@ used when present. Basically, once you've created and stored your Schema on chai
 
 ```javascript
 >    const dockApi = new DockAPI();
->    const dockResolver = new DockResolver(dockApi);
+>    const CoreResolver = new CoreResolver(dockApi);
 >    let validCredential = new VerifiableCredential('https://example.com/credentials/123');
 >    validCredential.addContext('https://www.w3.org/2018/credentials/examples/v1');
 >    const ctx1 = {
@@ -178,7 +178,7 @@ used when present. Basically, once you've created and stored your Schema on chai
 >    validCredential.setSchema(blobHexIdToQualified(blobId), 'JsonSchemaValidator2018');
 >    await validCredential.sign(keyDoc);
 >    await validCredential.verify({
-       resolver: dockResolver,
+       resolver: CoreResolver,
        compactProof: true,
      });
 ```

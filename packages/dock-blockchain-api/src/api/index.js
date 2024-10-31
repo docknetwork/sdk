@@ -337,6 +337,10 @@ export default class DockAPI extends ApiProvider {
     return Boolean(this.api) && this.api.isConnected;
   }
 
+  methods() {
+    return ['dock'];
+  }
+
   supportsIdentifier(id) {
     this.ensureInitialized();
 

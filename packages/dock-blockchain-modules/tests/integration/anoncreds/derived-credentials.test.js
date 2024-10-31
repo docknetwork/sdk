@@ -39,7 +39,7 @@ import {
   verifyPresentation,
   verifyCredential,
 } from "@docknetwork/credential-sdk/vc";
-import { DockResolver } from "@docknetwork/credential-sdk/resolver";
+import { CoreResolver } from "@docknetwork/credential-sdk/resolver";
 import { createPresentation } from "../../create-presentation";
 import { AccumulatorType } from "@docknetwork/credential-sdk/modules/abstract/accumulator/module";
 import {
@@ -113,7 +113,7 @@ describe.each(Schemes)(
   }) => {
     const dock = new DockAPI();
     const modules = new MultiApiCoreModules([new DockCoreModules(dock)]);
-    const resolver = new DockResolver(modules);
+    const resolver = new CoreResolver(modules);
     const did1 = DockDid.random();
     if (Name === "PS") {
       return;

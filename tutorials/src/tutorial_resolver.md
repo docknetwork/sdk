@@ -12,22 +12,22 @@ The SDK supports resolving Dock DIDs natively. For other DIDs, resolving the DID
 Each resolver should extend the class `DIDResolver` and implement the `resolve` method that accepts a DID and returns the
 DID document.
 
-There is another class called `MultiResolver` that can accept several types of resolvers (objects of subclasses
-of `DIDResolver`) and once the `MultiResolver` is initialized with the resolvers of different DID methods, it can resolve
+There is another class called `ResolverRouter` that can accept several types of resolvers (objects of subclasses
+of `DIDResolver`) and once the `ResolverRouter` is initialized with the resolvers of different DID methods, it can resolve
 DIDs of those methods.
 
 ## Dock resolver
 
-The resolver for Dock DIDs `DockResolver` connects to the Dock blockchain to get the DID details.
+The resolver for Dock DIDs `CoreResolver` connects to the Dock blockchain to get the DID details.
 
 The resolver is constructed by passing it a Dock API object so that it can connect to a Dock node.
 This is how you resolve a Dock DID:
 
 ```js
-import { DockResolver } from "@docknetwork/credential-sdk/resolver";
+import { CoreResolver } from "@docknetwork/credential-sdk/resolver";
 
 // Assuming the presence of modules created using `CheqdCoreModules` or `DockCoreModules` from the API object.
-const dockResolver = new DockResolver(modules);
+const dockResolver = new CoreResolver(modules);
 // Say you had a DID `did:dock:5D.....`
 const didDocument = await dockResolver.resolve("did:dock:5D.....");
 ```
@@ -42,7 +42,8 @@ Following is an example to build a custom Ethereum resolver. It uses the library
 as configuration. The example below uses Infura to get access to an Ethereum node and read the DID off Ethereum.
 
 ```js
-import { DIDResolver } from "@docknetwork/credential-sdk/resolver";
+import { Resolver } from "@docknetwork/credential-sdk/resolver";
+import { parseDIDUrl } from "@docknetwork/credential-sdk/utils";
 import ethr from "ethr-did-resolver";
 
 // Infura's Ethereum provider for the main net.
@@ -56,8 +57,10 @@ const ethereumProviderConfig = {
 };
 
 // Custom ethereum resolver class
-class EtherResolver extends DIDResolver {
-  static METHOD = "ethr";
+class EtherResolver extends Resolver {
+  prefix = "did";
+
+  method = "ethr";
 
   constructor(config) {
     super();
@@ -65,7 +68,7 @@ class EtherResolver extends DIDResolver {
   }
 
   async resolve(did) {
-    const parsed = this.parseDid(did);
+    const parsed = parseDIDUrl(did);
     try {
       return this.ethres(did, parsed);
     } catch (e) {
@@ -111,17 +114,18 @@ For resolving DID of any other method, `UniversalResolver` object will be used.
 
 ```js
 import {
-  DockDIDResolver,
-  DIDResolver,
+  Resolver,
   WILDCARD,
 } from "@docknetwork/credential-sdk/resolver";
 
-class MultiDIDResolver extends DIDResolver {
-  static METHOD = WILDCARD;
+class MultiDIDResolver extends Resolver {
+  prefix = "did";
+
+  method = WILDCARD;
 
   constructor(modules) {
     super([
-      new DockDIDResolver(modules.did),
+      new DIDResolver(modules.did),
       new EtherResolver(ethereumProviderConfig),
       new UniversalResolver(universalResolverUrl),
     ]);
@@ -130,7 +134,7 @@ class MultiDIDResolver extends DIDResolver {
 
 const multiResolver = new MultiDIDResolver(resolvers);
 
-// Say you had a DID `did:dock:5D....`, then the `DockResolver` will be used as there a resolver for Dock DID.
+// Say you had a DID `did:dock:5D....`, then the `CoreResolver` will be used as there a resolver for Dock DID.
 const didDocumentDock = await multiResolver.resolve("did:dock:5D....");
 
 // Say you had a DID `did:btcr:xk....`, then the `UniversalResolver` will be used as there is no resolver for BTC DID.

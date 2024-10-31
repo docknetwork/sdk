@@ -14,7 +14,7 @@ import {
   verifyPresentation,
 } from "@docknetwork/credential-sdk/vc";
 
-import { DockResolver } from "@docknetwork/credential-sdk/resolver";
+import { CoreResolver } from "@docknetwork/credential-sdk/resolver";
 import { createPresentation } from "../create-presentation";
 
 import { DockCoreModules } from "../../src";
@@ -33,7 +33,7 @@ const credId = "A large credential id with size > 32 bytes";
 describe("StatusList2021Credential", () => {
   const dockAPI = new DockAPI();
   const modules = new DockCoreModules(dockAPI);
-  const resolver = new DockResolver(modules);
+  const resolver = new CoreResolver(modules);
 
   // Create a random status list id
   const statusListCredentialId = randomAsHex(32);

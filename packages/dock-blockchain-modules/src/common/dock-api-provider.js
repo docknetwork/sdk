@@ -21,6 +21,10 @@ class DockApiProvider extends ApiProvider {
     return api;
   }
 
+  methods() {
+    return this.dock.methods();
+  }
+
   isInitialized() {
     return this.dock.isInitialized();
   }

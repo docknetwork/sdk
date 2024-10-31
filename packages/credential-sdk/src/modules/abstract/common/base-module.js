@@ -1,7 +1,6 @@
-/**
- * Base module class that must be extended by all modules.
- */
-export default class AbstractBaseModule {
+import { withExtendedPrototypeProperties } from '../../../utils';
+
+class AbstractBaseModule {
   /**
    * Signs and sends provided extrinsic.
    *
@@ -19,3 +18,8 @@ export default class AbstractBaseModule {
     return await this.apiProvider.signAndSend(extrinsic, params);
   }
 }
+
+/**
+ * Base module class that must be extended by all modules.
+ */
+export default withExtendedPrototypeProperties(['methods'], AbstractBaseModule);

@@ -1,5 +1,5 @@
 import { initializeWasm } from '@docknetwork/credential-sdk/crypto';
-import { DIDResolver } from '@docknetwork/credential-sdk/resolver';
+import { Resolver } from '@docknetwork/credential-sdk/resolver';
 import Bls12381G2KeyPairDock2022 from '@docknetwork/credential-sdk/vc/crypto/Bls12381G2KeyPairDock2022';
 import {
   issueCredential,
@@ -15,8 +15,10 @@ const keypairOpts = {
     'przwNdX6Bn5TzwmX56fYKQr6vk5U2DsfJJHZJQzr1Sxd9oJUg1rEEoUP7Bz33WNpykvkkqoTByMwnceCx9yvTW8CG1V5XpSwHPSN222cwMe9xr4mViyLWkKtoraybEPeLHT',
 };
 
-class ExampleDIDResolver extends DIDResolver {
-  static METHOD = 'example';
+class ExampleDIDResolver extends Resolver {
+  prefix = 'did';
+
+  method = 'example';
 
   constructor() {
     super(void 0);

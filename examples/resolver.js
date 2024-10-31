@@ -6,13 +6,15 @@ import {
   DidKey,
   DIDDocument,
 } from '@docknetwork/credential-sdk/types';
+import { parseDIDUrl } from '@docknetwork/credential-sdk/utils';
 import { NoDIDError } from '@docknetwork/credential-sdk/modules/abstract/did';
 import {
-  DIDResolver,
   DIDKeyResolver,
   UniversalResolver,
   WILDCARD,
-  DockDIDResolver,
+  DIDResolver,
+  ResolverRouter,
+  Resolver,
 } from '@docknetwork/credential-sdk/resolver';
 import { DockDIDModule } from '@docknetwork/dock-blockchain-modules';
 
@@ -39,8 +41,10 @@ const dock = new DockAPI();
 const didModule = new DockDIDModule(dock);
 
 // Custom ethereum resolver class
-class EtherResolver extends DIDResolver {
-  static METHOD = 'ethr';
+class EtherResolver extends Resolver {
+  prefix = 'did';
+
+  method = 'ethr';
 
   constructor(config) {
     super();
@@ -48,7 +52,7 @@ class EtherResolver extends DIDResolver {
   }
 
   async resolve(did) {
-    const parsed = this.parseDid(did);
+    const parsed = parseDIDUrl(did);
     try {
       return this.ethres(did, parsed);
     } catch (e) {
@@ -86,12 +90,12 @@ async function main() {
 
   const resolvers = [
     new DIDKeyResolver(), // did:key resolver
-    new DockDIDResolver(didModule), // Prebuilt resolver
+    new DIDResolver(didModule), // Prebuilt resolver
     new EtherResolver(ethereumProviderConfig), // Custom resolver
   ];
 
-  class AnyDIDResolver extends DIDResolver {
-    static METHOD = WILDCARD;
+  class AnyDIDResolver extends ResolverRouter {
+    method = WILDCARD;
   }
 
   const resolver = new AnyDIDResolver([

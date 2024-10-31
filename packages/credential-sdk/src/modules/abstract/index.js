@@ -54,7 +54,10 @@ export const AbstractCoreModules = withExtendedStaticProperties(
       AttestModule: { key: 'attest', optional: false },
       BlobModule: { key: 'blob', optional: false },
       DIDModule: { key: 'did', optional: false },
-      OffchainSignaturesModule: { key: 'offchainSignatures', optional: false },
+      OffchainSignaturesModule: {
+        key: 'offchainSignatures',
+        optional: false,
+      },
       BBSModule: { key: 'bbs', optional: false },
       BBSPlusModule: { key: 'bbsPlus', optional: false },
       PSModule: { key: 'ps', optional: false },

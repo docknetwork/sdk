@@ -9,7 +9,7 @@ import {
 } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
 import { getPrivateStatus, verifyCredential } from './credentials';
-import DIDResolver from "../resolver/did/did-resolver"; // eslint-disable-line
+/// import DIDResolver from "../resolver/did/did-resolver"; // eslint-disable-line
 import { isCredVerGte060 } from './crypto/common/DockCryptoSignature';
 
 import defaultDocumentLoader from './document-loader';

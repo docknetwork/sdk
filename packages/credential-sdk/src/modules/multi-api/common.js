@@ -26,6 +26,10 @@ export function injectModuleRouter(klass) {
       dispatchById(id, fn) {
         return fn(this.moduleById(id));
       }
+
+      methods() {
+        return this.modules.flatMap((module) => module.methods());
+      }
     },
   };
 

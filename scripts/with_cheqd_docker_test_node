@@ -13,7 +13,7 @@ docker pull --platform linux/amd64 ghcr.io/cheqd/cheqd-node
 alice_container_id=$(docker run --platform linux/amd64 -d --rm --name cheqd-dev -p 26656:26656 -p 26657:26657 -p 1317:1317 -p 9090:9090 -e CHEQD_MNEMONIC="$CHEQD_MNEMONIC" -v $entrypoint:/usr/local/bin/entrypoint.sh -v $config:/tmp/cheqd_config.toml --entrypoint /usr/local/bin/entrypoint.sh ghcr.io/cheqd/cheqd-node start)
 
 cleanup() {
-  docker kill $alice_container_id&
+  docker kill $alice_container_id 2> /dev/null
 }
 
 try_with_node() {
@@ -22,15 +22,12 @@ try_with_node() {
 	$@
 }
 
-trap cleanup EXIT
+trap cleanup EXIT SIGINT SIGTERM
 
 if try_with_node $@; then
 	exit_code=$?
 else
 	exit_code=$?
 fi
-
-# Kill nodes
-cleanup
 
 exit $exit_code

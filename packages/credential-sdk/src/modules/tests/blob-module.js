@@ -2,6 +2,8 @@ import { DidKeypair, Ed25519Keypair } from '../../keypairs';
 import { NoBlobError } from '../abstract/blob/errors';
 import { DIDDocument } from '../../types';
 import { itIf } from './common';
+import { BlobResolver } from '../../resolver/blob';
+import { stringToU8a } from '../../utils';
 
 // eslint-disable-next-line jest/no-export
 export default function generateBlobModuleTests(
@@ -55,6 +57,29 @@ export default function generateBlobModuleTests(
       await expect(() => blobModule.get(id)).rejects.toThrow(
         new NoBlobError(id),
       );
+    });
+
+    test('`BlobResolver`', async () => {
+      const resolver = new BlobResolver(blobModule);
+      const did = DID.random();
+
+      const keyPair = Ed25519Keypair.random();
+      const didKeypair = new DidKeypair([did, 1], keyPair);
+
+      const document = DIDDocument.create(did, [didKeypair.didKey()]);
+
+      await didModule.createDocument(document, didKeypair);
+
+      const blob1 = {
+        id: BlobId.random(did),
+        blob: 'abcdef',
+      };
+
+      await blobModule.new(blob1, didKeypair);
+      expect(await resolver.resolve(String(blob1.id))).toEqual([
+        String(did),
+        stringToU8a(blob1.blob),
+      ]);
     });
   });
 }

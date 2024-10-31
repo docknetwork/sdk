@@ -79,8 +79,9 @@ import {
   finiteNumber,
   timestampLogger,
   blockByNumber,
+  accountIdentity,
 } from "./helpers";
-import dock from "../src";
+import { DockAPI } from "../src";
 import { sendAlarmEmailText } from "./email_utils";
 import { TYPES, postMessage } from "./slack";
 
@@ -96,6 +97,8 @@ const {
   BlockProcessingTimeOut,
   RetryDelay,
   RetryAttempts,
+  SlackNotificationsWebhookMainUrl,
+  SlackNotificationsWebhookMigrationUrl,
 } = envObj({
   // Email to send alarm emails to.
   TxWatcherAlarmEmailTo: notNilAnd(split(",")),
@@ -124,6 +127,8 @@ const {
   RetryDelay: o(finiteNumber, defaultTo(3e4)),
   // Amount of retry attempts before exiting with 1 code.
   RetryAttempts: o(finiteNumber, defaultTo(3)),
+  SlackNotificationsWebhookMainUrl: notNilAnd(String),
+  SlackNotificationsWebhookMigrationUrl: notNilAnd(String),
 });
 
 const main = async (dock, startBlock) => {
@@ -159,6 +164,7 @@ const main = async (dock, startBlock) => {
           (error) =>
             void timestampLogger.error(error) ||
             sendMessage(
+              SlackNotificationsWebhookMainUrl,
               "Mainnet watcher was restarted",
               `Due to either connection or node API problems, the dock blockchain essential notifications watcher was restarted with the last unprocessed block ${minUnprocessed}.`
             )
@@ -267,8 +273,33 @@ const processBlocks = (dock, startBlock) => {
         events$.pipe(applyFilters(eventFilters))
       ).pipe(
         batchNotifications(BatchNoficationTimeout),
-        tap((email) => timestampLogger.log("Sending email: ", email)),
-        mergeMap(o(from, sendMessage("Mainnet alarm notification")))
+        tap((email) => timestampLogger.log("Sending message: ", email)),
+        mergeMap((message) => {
+          if (!message.includes("migrated")) {
+            return from(
+              sendMessage(
+                SlackNotificationsWebhookMainUrl,
+                "Mainnet alarm notification",
+                message
+              )
+            );
+          } else {
+            return from(
+              postMessage(
+                SlackNotificationsWebhookMigrationUrl,
+                TYPES.SUCCESS,
+                "Token migration",
+                [
+                  {
+                    title: "Summary",
+                    value: message,
+                    short: false,
+                  },
+                ]
+              )
+            );
+          }
+        })
       );
 
       const number = block.block.header.number.toNumber();
@@ -404,10 +435,10 @@ const syncPrevousBlocks = curry((dock, startBlock, currentBlocks$) => {
  * @param {string} message
  * @returns {Observable<*>}
  */
-const sendMessage = curry((header, message) =>
+const sendMessage = curry((url, header, message) =>
   merge(
     from(
-      postMessage(TYPES.DANGER, header, [
+      postMessage(url, TYPES.DANGER, header, [
         {
           title: "Summary",
           value: message,
@@ -573,6 +604,16 @@ const technicalCommitteeMembershipEvent = eventByMethodFilter(
  * Filter events produced by `elections` pallet.
  */
 const electionsEvent = eventByMethodFilter("elections");
+
+/**
+ * Filter events produced by `staking` pallet.
+ */
+const stakingEvent = eventByMethodFilter("staking");
+
+/**
+ * Filter events produced by `cheqdMigration` pallet.
+ */
+const cheqdMigrationEvent = eventByMethodFilter("cheqdMigration");
 
 /**
  * Filter extrinsics produced by `technicalCommitteeMembership` pallet.
@@ -763,6 +804,62 @@ const eventFilters = [
     }) => of(`Council member renounced: ${member.toString()}`)
   ),
 
+  checkMap(
+    stakingEvent("Unbonded"),
+    (
+      {
+        event: {
+          data: [account, balance],
+        },
+      },
+      dock
+    ) =>
+      of({ account, balance }).pipe(
+        filterRx(({ balance }) => balance.toNumber() > 1e12),
+        concatMap(({ account, balance }) =>
+          from(accountIdentity(dock.api, account)).pipe(
+            mapRx((acc) => `Account ${acc} unbonded ${formatDock(balance)}`)
+          )
+        )
+      )
+  ),
+
+  checkMap(
+    stakingEvent("Chilled"),
+    (
+      {
+        event: {
+          data: [account],
+        },
+      },
+      dock
+    ) =>
+      from(accountIdentity(dock.api, account)).pipe(
+        mapRx((account) => `Account ${account} chilled`)
+      )
+  ),
+
+  checkMap(
+    cheqdMigrationEvent("Migrated"),
+    (
+      {
+        event: {
+          data: [dockAccount, cheqdAccount, tokensAmount],
+        },
+      },
+      dock
+    ) =>
+      from(accountIdentity(dock.api, dockAccount)).pipe(
+        mergeMap((account) =>
+          of(
+            `${account} migrated \`${formatDock(
+              tokensAmount
+            )}\` to \`${cheqdAccount}\``
+          )
+        )
+      )
+  ),
+
   // Council members changed
   checkMap(
     electionsEvent("NewTerm"),
@@ -903,7 +1000,7 @@ const createTxWithEventsCombinator = (dock) => {
    * @param {Array<*>} events
    * @param {*} tx
    * @param {{config: number, rootTx: *}} param2
-   * @returns Promise<*>
+   * @returns
    */
   const pickEventsForExtrinsic = (events, tx, { config, rootTx }) => {
     let batchIdx = -1;
@@ -1020,7 +1117,7 @@ const createTxWithEventsCombinator = (dock) => {
   return mergeEventsWithExtrs;
 };
 
-main(dock, StartBlock)
+main(new DockAPI(), StartBlock)
   .then(() => process.exit(0))
   .catch((err) => {
     timestampLogger.error(err);

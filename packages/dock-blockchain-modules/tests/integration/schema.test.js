@@ -17,7 +17,7 @@ import VerifiableCredential from "@docknetwork/credential-sdk/vc/verifiable-cred
 import exampleSchema from "../example-schema";
 import VerifiablePresentation from "@docknetwork/credential-sdk/vc/verifiable-presentation";
 import { getKeyDoc } from "@docknetwork/credential-sdk/vc/helpers";
-import { DockResolver } from "@docknetwork/credential-sdk/resolver";
+import { CoreResolver } from "@docknetwork/credential-sdk/resolver";
 import { DockCoreModules } from "../../src";
 import { registerNewDIDUsingPair } from "./helpers";
 import {
@@ -88,7 +88,7 @@ describe("Schema Blob Module Integration", () => {
     keyDoc = getKeyDoc(dockDID, new Ed25519Keypair(firstKeySeed));
 
     // Create a resolver for dock DIDs
-    dockResolver = new DockResolver(modules);
+    dockResolver = new CoreResolver(modules);
 
     // Create a valid credential with a schema
     validCredential = new VerifiableCredential(

@@ -30,6 +30,10 @@ export class CheqdMainnetDidValue extends CheqdDidValue {
 }
 
 export class CheqdDid extends withQualifier(TypedEnum, true) {
+  get Qualifier() {
+    return this.Class?.Qualifier;
+  }
+
   static random() {
     return new this(this.Class.random());
   }

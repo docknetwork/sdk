@@ -171,8 +171,6 @@ export class CheqdAPI extends ApiProvider {
   }
 
   methods() {
-    this.ensureInitialized();
-
     return ['cheqd'];
   }
 

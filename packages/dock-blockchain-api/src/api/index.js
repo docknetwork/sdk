@@ -338,8 +338,6 @@ export default class DockAPI extends ApiProvider {
   }
 
   methods() {
-    this.ensureInitialized();
-
     return ['dock'];
   }
 

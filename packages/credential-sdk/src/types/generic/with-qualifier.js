@@ -1,4 +1,3 @@
-import { ID_STR } from '@docknetwork/crypto-wasm-ts';
 import TypedBytes from './typed-bytes';
 import {
   withExtendedStaticProperties,
@@ -76,9 +75,13 @@ export default function withQualifier(klass, wrapper = false) {
         }
 
         static fromUnqualifiedString(str) {
-          throw new Error(
-            `Can't build an instance of \`${this.name}\` from unqualified string: ${ID_STR}`
-          );
+          if (this.Class == null) {
+            throw new Error(
+              `Can't build an instance of \`${this.name}\` from unqualified string: ${str}`
+            );
+          } else {
+            return new this(this.Class.fromUnqualifiedString(str));
+          }
         }
 
         /**

@@ -293,7 +293,7 @@ It accepts a string <code>id</code> param (a fully-qualified blob id like "blob:
 used when present. Basically, once you've created and stored your Schema on chain, you can reference to it by its
 <code>blobId</code> when issuing a Verifiable Credential. Let's see an example:</p>
 <pre><code class="language-javascript">&gt;    const dockApi = new DockAPI();
-&gt;    const dockResolver = new DockResolver(dockApi);
+&gt;    const CoreResolver = new CoreResolver(dockApi);
 &gt;    let validCredential = new VerifiableCredential('https://example.com/credentials/123');
 &gt;    validCredential.addContext('https://www.w3.org/2018/credentials/examples/v1');
 &gt;    const ctx1 = {
@@ -311,7 +311,7 @@ used when present. Basically, once you've created and stored your Schema on chai
 &gt;    validCredential.setSchema(blobHexIdToQualified(blobId), 'JsonSchemaValidator2018');
 &gt;    await validCredential.sign(keyDoc);
 &gt;    await validCredential.verify({
-       resolver: dockResolver,
+       resolver: CoreResolver,
        compactProof: true,
      });
 </code></pre>

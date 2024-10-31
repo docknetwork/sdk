@@ -1210,17 +1210,17 @@ might be a centralized database or a blockchain.</p>
 <a href="https://uniresolver.io">Universal Resolver</a> is supported.</p>
 <p>Each resolver should extend the class <code>DIDResolver</code> and implement the <code>resolve</code> method that accepts a DID and returns the
 DID document.</p>
-<p>There is another class called <code>MultiResolver</code> that can accept several types of resolvers (objects of subclasses
-of <code>DIDResolver</code>) and once the <code>MultiResolver</code> is initialized with the resolvers of different DID methods, it can resolve
+<p>There is another class called <code>ResolverRouter</code> that can accept several types of resolvers (objects of subclasses
+of <code>DIDResolver</code>) and once the <code>ResolverRouter</code> is initialized with the resolvers of different DID methods, it can resolve
 DIDs of those methods.</p>
 <h2 id="dock-resolver"><a class="header" href="#dock-resolver">Dock resolver</a></h2>
-<p>The resolver for Dock DIDs <code>DockResolver</code> connects to the Dock blockchain to get the DID details.</p>
+<p>The resolver for Dock DIDs <code>CoreResolver</code> connects to the Dock blockchain to get the DID details.</p>
 <p>The resolver is constructed by passing it a Dock API object so that it can connect to a Dock node.
 This is how you resolve a Dock DID:</p>
-<pre><code class="language-js">import { DockResolver } from "@docknetwork/credential-sdk/resolver";
+<pre><code class="language-js">import { CoreResolver } from "@docknetwork/credential-sdk/resolver";
 
 // Assuming the presence of modules created using `CheqdCoreModules` or `DockCoreModules` from the API object.
-const dockResolver = new DockResolver(modules);
+const dockResolver = new CoreResolver(modules);
 // Say you had a DID `did:dock:5D.....`
 const didDocument = await dockResolver.resolve("did:dock:5D.....");
 </code></pre>
@@ -1230,7 +1230,8 @@ const didDocument = await dockResolver.resolve("did:dock:5D.....");
 <p>Following is an example to build a custom Ethereum resolver. It uses the library
 <a href="https://github.com/decentralized-identity/ethr-did-resolver">ethr-did-resolver</a> and accepts a provider information
 as configuration. The example below uses Infura to get access to an Ethereum node and read the DID off Ethereum.</p>
-<pre><code class="language-js">import { DIDResolver } from "@docknetwork/credential-sdk/resolver";
+<pre><code class="language-js">import { Resolver } from "@docknetwork/credential-sdk/resolver";
+import { parseDIDUrl } from "@docknetwork/credential-sdk/utils";
 import ethr from "ethr-did-resolver";
 
 // Infura's Ethereum provider for the main net.
@@ -1244,8 +1245,10 @@ const ethereumProviderConfig = {
 };
 
 // Custom ethereum resolver class
-class EtherResolver extends DIDResolver {
-  static METHOD = "ethr";
+class EtherResolver extends Resolver {
+  prefix = "did";
+
+  method = "ethr";
 
   constructor(config) {
     super();
@@ -1253,7 +1256,7 @@ class EtherResolver extends DIDResolver {
   }
 
   async resolve(did) {
-    const parsed = this.parseDid(did);
+    const parsed = parseDIDUrl(did);
     try {
       return this.ethres(did, parsed);
     } catch (e) {
@@ -1289,17 +1292,18 @@ will be dispatched according to their prefix and method configuration. The <code
 has resolvers for DID methods <code>dock</code> and <code>ethr</code>.</p>
 <p>For resolving DID of any other method, <code>UniversalResolver</code> object will be used.</p>
 <pre><code class="language-js">import {
-  DockDIDResolver,
-  DIDResolver,
+  Resolver,
   WILDCARD,
 } from "@docknetwork/credential-sdk/resolver";
 
-class MultiDIDResolver extends DIDResolver {
-  static METHOD = WILDCARD;
+class MultiDIDResolver extends Resolver {
+  prefix = "did";
+
+  method = WILDCARD;
 
   constructor(modules) {
     super([
-      new DockDIDResolver(modules.did),
+      new DIDResolver(modules.did),
       new EtherResolver(ethereumProviderConfig),
       new UniversalResolver(universalResolverUrl),
     ]);
@@ -1308,7 +1312,7 @@ class MultiDIDResolver extends DIDResolver {
 
 const multiResolver = new MultiDIDResolver(resolvers);
 
-// Say you had a DID `did:dock:5D....`, then the `DockResolver` will be used as there a resolver for Dock DID.
+// Say you had a DID `did:dock:5D....`, then the `CoreResolver` will be used as there a resolver for Dock DID.
 const didDocumentDock = await multiResolver.resolve("did:dock:5D....");
 
 // Say you had a DID `did:btcr:xk....`, then the `UniversalResolver` will be used as there is no resolver for BTC DID.
@@ -1956,7 +1960,7 @@ It accepts a string <code>id</code> param (a fully-qualified blob id like "blob:
 used when present. Basically, once you've created and stored your Schema on chain, you can reference to it by its
 <code>blobId</code> when issuing a Verifiable Credential. Let's see an example:</p>
 <pre><code class="language-javascript">&gt;    const dockApi = new DockAPI();
-&gt;    const dockResolver = new DockResolver(dockApi);
+&gt;    const CoreResolver = new CoreResolver(dockApi);
 &gt;    let validCredential = new VerifiableCredential('https://example.com/credentials/123');
 &gt;    validCredential.addContext('https://www.w3.org/2018/credentials/examples/v1');
 &gt;    const ctx1 = {
@@ -1974,7 +1978,7 @@ used when present. Basically, once you've created and stored your Schema on chai
 &gt;    validCredential.setSchema(blobHexIdToQualified(blobId), 'JsonSchemaValidator2018');
 &gt;    await validCredential.sign(keyDoc);
 &gt;    await validCredential.verify({
-       resolver: dockResolver,
+       resolver: CoreResolver,
        compactProof: true,
      });
 </code></pre>

@@ -1,10 +1,5 @@
 import { curry } from "ramda";
 import fetch from "node-fetch";
-import { envObj, notNilAnd } from "./helpers";
-
-const { SlackNotificationWebhookUrl } = envObj({
-  SlackNotificationWebhookUrl: notNilAnd(String),
-});
 
 export const TYPES = {
   WARNING: "warning",
@@ -15,7 +10,7 @@ export const TYPES = {
 /**
  * Posts a message to Slack.
  */
-export const postMessage = curry(async (type, header, fields) => {
+export const postMessage = curry(async (url, type, header, fields) => {
   const body = Buffer.from(
     JSON.stringify({
       text: header,
@@ -33,7 +28,7 @@ export const postMessage = curry(async (type, header, fields) => {
     "Content-Length": body.byteLength,
   };
 
-  return await fetch(SlackNotificationWebhookUrl, {
+  return await fetch(url, {
     headers,
     method: "POST",
     body,

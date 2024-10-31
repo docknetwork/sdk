@@ -135,7 +135,7 @@ describe("StatusList2021Credential", () => {
       resolver,
       compactProof: true,
     });
-
+    console.log(result.error);
     expect(result.verified).toBe(true);
 
     // Revoke the credential

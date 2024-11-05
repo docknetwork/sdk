@@ -49,6 +49,7 @@
     "no-useless-constructor": "off",
     "no-console": "off",
     "no-else-return": "off",
+    "import/extensions": "off",
     "no-restricted-syntax": [
       "error",
       {

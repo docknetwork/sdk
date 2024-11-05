@@ -1,4 +1,4 @@
-import { withExtendedStaticProperties } from '@docknetwork/credential-sdk/utils/inheritance';
+import { withExtendedStaticProperties } from '@docknetwork/credential-sdk/utils';
 import CheqdAPIProvider from './cheqd-api-provider';
 
 export default function injectCheqd(klass) {

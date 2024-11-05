@@ -8,8 +8,8 @@ import {
   DIDDocument,
   Service,
   CONTEXT_URI,
-} from '@docknetwork/credential-sdk/types/did/document';
-import { DockDIDModuleInternal } from './internal';
+} from '@docknetwork/credential-sdk/types/did';
+import DockDIDModuleInternal from './internal';
 import injectDock from '../common/inject-dock';
 import DockAttestModule from '../attest/module';
 import DockOffchainSignaturesModule from '../offchain-signatures/module';

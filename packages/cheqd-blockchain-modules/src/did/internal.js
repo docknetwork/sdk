@@ -3,7 +3,7 @@ import {
   TypedUUID,
   TypedStruct,
 } from '@docknetwork/credential-sdk/types/generic';
-import { DIDDocument } from '@docknetwork/credential-sdk/types/did/document';
+import { DIDDocument } from '@docknetwork/credential-sdk/types/did';
 import { createInternalCheqdModule } from '../common';
 
 const parseDocument = (document) => DIDDocument.from(document).toCheqd();

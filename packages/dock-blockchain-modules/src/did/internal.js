@@ -19,7 +19,7 @@ import {
   NoDIDError,
   NoOffchainDIDError,
   NoOnchainDIDError,
-} from '@docknetwork/credential-sdk/modules/abstract/did/errors';
+} from '@docknetwork/credential-sdk/modules/abstract/did';
 import { maybeToHuman } from '@docknetwork/credential-sdk/utils';
 import { DidMethodKeyDetails } from '@docknetwork/credential-sdk/types/did/onchain';
 import {
@@ -113,7 +113,7 @@ const accountMethods = {
   ],
 };
 
-export class DockDIDModuleInternal extends createInternalDockModule({
+export default class DockDIDModuleInternal extends createInternalDockModule({
   didMethods,
   accountMethods,
 }) {

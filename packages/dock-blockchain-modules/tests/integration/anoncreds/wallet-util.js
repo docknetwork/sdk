@@ -1,6 +1,6 @@
 import b58 from "bs58";
 import { u8aToHex } from "@docknetwork/credential-sdk/utils";
-import Bls12381G2KeyPairDock2022 from "@docknetwork/credential-sdk/vc/crypto/Bls12381G2KeyPairDock2022";
+import { Bls12381G2KeyPairDock2022 } from "@docknetwork/credential-sdk/vc/crypto";
 import { Secp256k1Keypair } from "@docknetwork/credential-sdk/keypairs";
 
 function createSecp256k1Keypair(privateKeyHex) {

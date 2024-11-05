@@ -4,7 +4,7 @@ import { ApiPromise } from "@polkadot/api"; // eslint-disable-line
 import {
   ReusablePromiseMap,
   ReusablePromise,
-} from '@docknetwork/credential-sdk/utils/async';
+} from '@docknetwork/credential-sdk/utils';
 
 /**
  * Fetches and caches blocks by their hashes and optionally numbers.

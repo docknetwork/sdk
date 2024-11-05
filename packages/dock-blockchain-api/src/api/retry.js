@@ -1,7 +1,7 @@
 import { createSubmittable } from '@polkadot/api/submittable';
 import { SubmittableResult } from '@polkadot/api/cjs/submittable/Result';
 import { filterEvents } from '@polkadot/api/util';
-import { retry } from '@docknetwork/credential-sdk/utils/async';
+import { retry } from '@docknetwork/credential-sdk/utils';
 import {
   ensureExtrinsicSucceeded,
   findExtrinsicBlock,

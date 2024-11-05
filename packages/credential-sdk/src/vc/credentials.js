@@ -15,20 +15,12 @@ import defaultDocumentLoader from './document-loader';
 import { getAndValidateSchemaIfPresent } from './schema';
 import {
   checkRevocationRegistryStatus,
-  DockRevRegQualifier,
   getCredentialStatus,
   isAccumulatorRevocationStatus,
   isRegistryRevocationStatus,
-  RevRegType,
 } from './revocation';
-
 import {
-  getSuiteFromKeyDoc,
-  expandJSONLD,
-  getKeyFromDIDDocument,
-  processIfKvac,
-} from './helpers';
-import {
+  DockRevRegQualifier, RevRegType,
   DEFAULT_CONTEXT_V1_URL,
   credentialContextField,
   PrivateStatusList2021EntryType,
@@ -36,6 +28,13 @@ import {
   StatusList2021EntryType,
   PrivateStatusList2021Qualifier,
 } from './constants';
+
+import {
+  getSuiteFromKeyDoc,
+  expandJSONLD,
+  getKeyFromDIDDocument,
+  processIfKvac,
+} from './helpers';
 import { ensureValidDatetime } from '../utils/type-helpers';
 
 import {

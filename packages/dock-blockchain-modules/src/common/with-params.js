@@ -1,4 +1,4 @@
-import { withExtendedStaticProperties } from "@docknetwork/credential-sdk/utils/inheritance";
+import { withExtendedStaticProperties } from "@docknetwork/credential-sdk/utils";
 import injectDock from "./inject-dock";
 
 /**
@@ -9,7 +9,7 @@ export default function withParams(klass) {
   const name = `withParams(${klass.name})`;
 
   const obj = {
-    [name]: class extends injectDock(klass) {
+    [name]: class extends klass {
       /**
        * Add new signature params.
        * @param param - The signature params to add.

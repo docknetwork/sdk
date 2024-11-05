@@ -1,10 +1,15 @@
 /* eslint-disable camelcase */
 
-import { KBUniversalAccumulatorValue } from '@docknetwork/crypto-wasm-ts';
-import { normalizeToHex, normalizeToU8a } from '../../../utils/bytes';
-import { AbstractWithParamsAndPublicKeys } from '../common';
-import { AccumulatorParams, AccumulatorPublicKey } from '../../../types';
-import { withExtendedPrototypeProperties } from '../../../utils';
+import { KBUniversalAccumulatorValue } from "@docknetwork/crypto-wasm-ts";
+import { normalizeToHex, normalizeToU8a } from "../../../utils/bytes";
+import {
+  AbstractBaseModule,
+  AbstractWithParamsAndPublicKeys,
+  withParams,
+  withPublicKeys,
+} from "../common";
+import { AccumulatorParams, AccumulatorPublicKey } from "../../../types";
+import { withExtendedPrototypeProperties } from "../../../utils";
 
 export const AccumulatorType = {
   VBPos: 0,
@@ -13,7 +18,9 @@ export const AccumulatorType = {
 };
 
 /** Class to manage accumulators on chain */
-class AbstractAccumulatorModule extends AbstractWithParamsAndPublicKeys {
+class AbstractAccumulatorModule extends withParams(
+  withPublicKeys(AbstractBaseModule)
+) {
   static Params = AccumulatorParams;
 
   static PublicKey = AccumulatorPublicKey;
@@ -56,7 +63,7 @@ class AbstractAccumulatorModule extends AbstractWithParamsAndPublicKeys {
       publicKey,
       targetDid,
       didKeypair,
-      params,
+      params
     );
   }
 
@@ -73,7 +80,7 @@ class AbstractAccumulatorModule extends AbstractWithParamsAndPublicKeys {
       removeKeyId,
       targetDid,
       didKeypair,
-      params,
+      params
     );
   }
 
@@ -91,16 +98,16 @@ class AbstractAccumulatorModule extends AbstractWithParamsAndPublicKeys {
     accumulated,
     publicKeyRef,
     didKeypair,
-    params,
+    params
   ) {
     return await this.signAndSend(
       await this.addPositiveAccumulatorTx(
         id,
         accumulated,
         publicKeyRef,
-        didKeypair,
+        didKeypair
       ),
-      params,
+      params
     );
   }
 
@@ -120,7 +127,7 @@ class AbstractAccumulatorModule extends AbstractWithParamsAndPublicKeys {
     publicKeyRef,
     maxSize,
     didKeypair,
-    params,
+    params
   ) {
     return await this.signAndSend(
       await this.addUniversalAccumulatorTx(
@@ -128,9 +135,9 @@ class AbstractAccumulatorModule extends AbstractWithParamsAndPublicKeys {
         accumulated,
         publicKeyRef,
         maxSize,
-        didKeypair,
+        didKeypair
       ),
-      params,
+      params
     );
   }
 
@@ -148,16 +155,16 @@ class AbstractAccumulatorModule extends AbstractWithParamsAndPublicKeys {
     accumulated,
     publicKeyRef,
     didKeypair,
-    params,
+    params
   ) {
     return await this.signAndSend(
       await this.addKBUniversalAccumulatorTx(
         id,
         accumulated,
         publicKeyRef,
-        didKeypair,
+        didKeypair
       ),
-      params,
+      params
     );
   }
 
@@ -176,7 +183,7 @@ class AbstractAccumulatorModule extends AbstractWithParamsAndPublicKeys {
     newAccumulated,
     { additions, removals, witnessUpdateInfo },
     didKeypair,
-    params,
+    params
   ) {
     return await this.signAndSend(
       await this.updateAccumulatorTx(
@@ -187,9 +194,9 @@ class AbstractAccumulatorModule extends AbstractWithParamsAndPublicKeys {
           removals,
           witnessUpdateInfo,
         },
-        didKeypair,
+        didKeypair
       ),
-      params,
+      params
     );
   }
 
@@ -202,7 +209,7 @@ class AbstractAccumulatorModule extends AbstractWithParamsAndPublicKeys {
   async removeAccumulator(id, didKeypair, params) {
     return await this.signAndSend(
       await this.removeAccumulatorTx(id, didKeypair),
-      params,
+      params
     );
   }
 
@@ -217,7 +224,7 @@ class AbstractAccumulatorModule extends AbstractWithParamsAndPublicKeys {
    * @returns {Promise<Accumulator|null>}
    */
   async getAccumulator(id, _includeKey = false, _includeKeyParams = false) {
-    throw new Error('Unimplemented');
+    throw new Error("Unimplemented");
   }
 
   /**
@@ -232,19 +239,19 @@ class AbstractAccumulatorModule extends AbstractWithParamsAndPublicKeys {
    * @returns {Promise<void>}
    */
   async updateWitness(_accumulatorId, _member, _witness, _from, _to) {
-    throw new Error('Unimplemented');
+    throw new Error("Unimplemented");
   }
 }
 
 export default withExtendedPrototypeProperties(
   [
-    'getAccumulator',
-    'addPositiveAccumulatorTx',
-    'addUniversalAccumulatorTx',
-    'addKBUniversalAccumulatorTx',
-    'updateAccumulatorTx',
-    'removeAccumulatorTx',
-    'updateWitness',
+    "getAccumulator",
+    "addPositiveAccumulatorTx",
+    "addUniversalAccumulatorTx",
+    "addKBUniversalAccumulatorTx",
+    "updateAccumulatorTx",
+    "removeAccumulatorTx",
+    "updateWitness",
   ],
-  AbstractAccumulatorModule,
+  AbstractAccumulatorModule
 );

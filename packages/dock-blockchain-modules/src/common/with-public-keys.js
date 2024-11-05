@@ -12,7 +12,7 @@ export default function withPublicKeys(klass) {
   const name = `withPublicKeys(${klass.name})`;
 
   const obj = {
-    [name]: class extends injectDock(klass) {
+    [name]: class extends klass {
       /**
        * Add a public key
        * @param publicKey - public key to add.

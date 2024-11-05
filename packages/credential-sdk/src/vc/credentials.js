@@ -15,20 +15,13 @@ import defaultDocumentLoader from './document-loader';
 import { getAndValidateSchemaIfPresent } from './schema';
 import {
   checkRevocationRegistryStatus,
-  DockRevRegQualifier,
   getCredentialStatus,
   isAccumulatorRevocationStatus,
   isRegistryRevocationStatus,
-  RevRegType,
 } from './revocation';
-
 import {
-  getSuiteFromKeyDoc,
-  expandJSONLD,
-  getKeyFromDIDDocument,
-  processIfKvac,
-} from './helpers';
-import {
+  DockRevRegQualifier,
+  RevRegType,
   DEFAULT_CONTEXT_V1_URL,
   credentialContextField,
   PrivateStatusList2021EntryType,
@@ -36,6 +29,13 @@ import {
   StatusList2021EntryType,
   PrivateStatusList2021Qualifier,
 } from './constants';
+
+import {
+  getSuiteFromKeyDoc,
+  expandJSONLD,
+  getKeyFromDIDDocument,
+  processIfKvac,
+} from './helpers';
 import { ensureValidDatetime } from '../utils/type-helpers';
 
 import {
@@ -58,7 +58,7 @@ import {
   Bls12381BBS23SigDockSigName,
   Bls12381BBDT16MacDockName,
   Bls12381BBDT16MacProofDockName,
-} from './custom_crypto';
+} from './crypto';
 import { signJWS } from './jws';
 import Bls12381BBDT16MACProofDock2024 from './crypto/Bls12381BBDT16MACProofDock2024';
 

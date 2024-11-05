@@ -36,7 +36,7 @@ import {
   Bls12381BBSSignatureDock2022,
   Bls12381BBSSignatureDock2023,
   Bls12381PSSignatureDock2023,
-} from './custom_crypto';
+} from './crypto';
 
 const { AuthenticationProofPurpose } = jsigs.purposes;
 

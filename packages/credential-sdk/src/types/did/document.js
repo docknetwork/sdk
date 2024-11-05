@@ -25,7 +25,7 @@ import {
   Ed255192020VerKeyName,
   Ed25519VerKeyName,
   Sr25519VerKeyName,
-} from '../../vc/custom_crypto';
+} from '../../vc/crypto';
 import {
   PublicKeyEd25519,
   PublicKeySecp256k1,

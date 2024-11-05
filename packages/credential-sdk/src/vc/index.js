@@ -35,7 +35,6 @@ export * from './credentials';
 export * from './helpers';
 export * from './schema';
 export * from './constants';
-export * from './custom_crypto';
 export { default as CredentialIssuancePurpose } from './CredentialIssuancePurpose';
 export { default as documentLoader } from './document-loader';
 export * from './jws';

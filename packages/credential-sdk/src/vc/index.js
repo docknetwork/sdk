@@ -1,7 +1,7 @@
-import { signPresentation, verifyPresentation } from './presentations';
-import { issueCredential, verifyCredential } from './credentials';
+import { signPresentation, verifyPresentation } from "./presentations";
+import { issueCredential, verifyCredential } from "./credentials";
 
-import { DEFAULT_TYPE, DEFAULT_CONTEXT } from './constants';
+import { DEFAULT_TYPE, DEFAULT_CONTEXT } from "./constants";
 
 /**
  * Check that credential is verified, i.e. the credential has VCDM compliant structure and the `proof`
@@ -28,20 +28,19 @@ export async function isVerifiedPresentation(presentation, params) {
   return result.verified;
 }
 
-// TODO: export more methods supplied in revocation/credentials
-export {
-  verifyCredential,
-  issueCredential,
-  signPresentation,
-  verifyPresentation,
-  DEFAULT_TYPE,
-  DEFAULT_CONTEXT,
-};
-
-export { default as Presentation } from './presentation';
-export { default as VerifiableCredential } from './verifiable-credential';
-export { default as VerifiablePresentation } from './verifiable-presentation';
-export { default as StatusList2021Credential } from './status-list2021-credential';
-export { default as PrivateStatusList2021Credential } from './private-status-list2021-credential';
-export * from './helpers';
-export { validateCredentialSchema } from './schema';
+export { default as Presentation } from "./presentation";
+export { default as VerifiableCredential } from "./verifiable-credential";
+export { default as VerifiablePresentation } from "./verifiable-presentation";
+export { default as StatusList2021Credential } from "./status-list2021-credential";
+export { default as PrivateStatusList2021Credential } from "./private-status-list2021-credential";
+export * from "./credentials";
+export * from "./helpers";
+export * from "./schema";
+export * from "./constants";
+export * from "./custom_crypto";
+export * from "./document-loader";
+export * from "./jws";
+export * from "./presentation";
+export * from "./presentations";
+export * from "./revocation";
+export * from "./schema";

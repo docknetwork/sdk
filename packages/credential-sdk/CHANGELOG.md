@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.6.0
+
+### Minor Changes
+
+- Fix remaining exports from the `vc` module
+
 ## 0.5.0
 
 ### Minor Changes

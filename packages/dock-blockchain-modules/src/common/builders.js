@@ -3,7 +3,7 @@ import {
   ensureInstanceOf,
 } from '@docknetwork/credential-sdk/utils';
 import { DockDidOrDidMethodKey } from '@docknetwork/credential-sdk/types/did';
-import DidKeypair from '@docknetwork/credential-sdk/keypairs/did-keypair';
+import { DidKeypair } from '@docknetwork/credential-sdk/keypairs';
 
 const fnNameToMethodName = (methodName) => `${methodName[0].toUpperCase()}${methodName.slice(1)}`;
 

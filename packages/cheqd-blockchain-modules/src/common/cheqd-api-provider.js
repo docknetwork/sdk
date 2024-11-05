@@ -1,5 +1,5 @@
 import { ApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
-import { ensureInstanceOf } from '@docknetwork/credential-sdk/utils/type-helpers';
+import { ensureInstanceOf } from '@docknetwork/credential-sdk/utils';
 
 class CheqdApiProvider extends ApiProvider {
   constructor(cheqd) {

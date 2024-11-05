@@ -1,7 +1,7 @@
 import { Schema } from '@docknetwork/credential-sdk/modules/abstract/schema';
 
 // BOL Schema, its valid
-import bolSchema from './schemas/bol';
+import bolSchema from './schemas/bol.js';
 
 // Invalid example schema
 const invalidSchema = {

@@ -1,4 +1,4 @@
-import AbstractAttestModule from '@docknetwork/credential-sdk/modules/abstract/attest/module';
+import { AbstractAttestModule } from '@docknetwork/credential-sdk/modules';
 import { injectCheqd } from '../common';
 import CheqdInternalAttestModule from './internal';
 

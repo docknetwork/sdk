@@ -11,7 +11,7 @@ import { DockDidOrDidMethodKey } from '@docknetwork/credential-sdk/types';
 import {
   isEqualToOrPrototypeOf,
   withExtendedStaticProperties,
-} from '@docknetwork/credential-sdk/utils/inheritance';
+} from '@docknetwork/credential-sdk/utils';
 import injectDock from './inject-dock';
 
 /**

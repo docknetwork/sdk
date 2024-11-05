@@ -12,7 +12,7 @@ import {
   RemoveOffchainSignatureParams,
   RemoveOffchainSignaturePublicKey,
 } from './actions';
-import { DockDIDModuleInternal } from '../did/internal';
+import DockDIDModuleInternal from '../did/internal';
 
 export default class DockInternalOffchainSignaturesModule extends ParamsAndPublicKeys {
   static Prop = 'offchainSignatures';

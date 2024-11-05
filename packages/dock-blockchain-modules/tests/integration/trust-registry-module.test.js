@@ -2,7 +2,7 @@ import {
   randomAsHex,
   u8aToHex,
   stringToU8a,
-} from "@docknetwork/credential-sdk/utils/bytes";
+} from "@docknetwork/credential-sdk/utils";
 
 import { DockAPI } from "@docknetwork/dock-blockchain-api";
 

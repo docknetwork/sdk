@@ -1,22 +1,23 @@
-import { TypedTuple, TypedNumber, TypedUUID } from '../../generic';
+import { TypedTuple } from '../../generic';
 import {
   DockDidValue,
   DockDidOrDidMethodKey,
   CheqdDid,
 } from '../../did/onchain/typed-did';
+import { CheqdParamsId, DockParamsId } from '../params/id';
 
 export class DockOffchainSignatureKeyRef extends TypedTuple {
-  static Classes = [DockDidValue, TypedNumber];
+  static Classes = [DockDidValue, DockParamsId];
 }
 
 export class DockOffchainSignatureParamsRef extends TypedTuple {
-  static Classes = [DockDidOrDidMethodKey, TypedNumber];
+  static Classes = [DockDidOrDidMethodKey, DockParamsId];
 }
 
 export class CheqdOffchainSignatureKeyRef extends TypedTuple {
-  static Classes = [CheqdDid, TypedUUID];
+  static Classes = [CheqdDid, CheqdParamsId];
 }
 
 export class CheqdOffchainSignatureParamsRef extends TypedTuple {
-  static Classes = [CheqdDid, TypedUUID];
+  static Classes = [CheqdDid, CheqdParamsId];
 }

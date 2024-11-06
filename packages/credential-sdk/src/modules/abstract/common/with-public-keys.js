@@ -1,4 +1,4 @@
-import { withExtendedStaticProperties } from "../../../utils";
+import { withExtendedPrototypeProperties, withExtendedStaticProperties } from "../../../utils";
 
 export default function withPublicKeys(klass) {
   const name = `withPublicKeys(${klass.name})`;
@@ -30,21 +30,6 @@ export default function withPublicKeys(klass) {
       async addPublicKey(id, publicKey, targetDid, didKeypair, params) {
         return await this.signAndSend(
           await this.addPublicKeyTx(id, publicKey, targetDid, didKeypair),
-          params
-        );
-      }
-
-      /**
-       * Remove public key
-       * @param id - Identifier of the public key to be removed.
-       * @param targetDid - The DID from which key is being removed
-       * @param signerDid - The DID that is removing the key by signing the payload because it controls `targetDid`
-       * @param signingKeyRef - Signer's signing key reference
-       * @returns {Promise<*>}
-       */
-      async removePublicKey(id, targetDid, didKeypair, params) {
-        return await this.signAndSend(
-          await this.removePublicKeyTx(id, targetDid, didKeypair),
           params
         );
       }
@@ -95,7 +80,6 @@ export default function withPublicKeys(klass) {
     [
       "addPublicKeyTx",
       "removePublicKeyTx",
-      "getPublicKey",
       "getAllPublicKeysByDid",
       "lastPublicKeyId",
       "nextPublicKeyId",

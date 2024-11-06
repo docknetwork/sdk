@@ -1,48 +1,27 @@
-import {
-  Blob,
-  CheqdBlobId,
-  CheqdBlobWithId,
-} from "@docknetwork/credential-sdk/types";
-import { option } from "@docknetwork/credential-sdk/types/generic";
-import { CheqdCreateResource, createInternalCheqdModule } from "../common";
+import { CheqdCreateResource, createInternalCheqdModule } from '../common';
 
 const methods = {
-  addParams: (id, params, did) => {
-    return new CheqdCreateResource(
-      did.value.value,
-      id,
-      "1.0",
-      [],
-      "Blob",
-      "blob",
-      params.toJSON()
-    );
-  },
-  removeParams: (id, did) => {
-    new CheqdCreateResource(
-      did.value.value,
-      uuid,
-      "1.0",
-      [],
-      "Blob",
-      "blob",
-      null
-    );
-  },
+  addParams: (id, params, did) => new CheqdCreateResource(
+    did.value.value,
+    id,
+    '1.0',
+    [],
+    'OffchainSignatures',
+    'offchain-signature-params',
+    params.toJSON(),
+  )
 };
 
 export default class CheqdInternalOffchainSignatures extends createInternalCheqdModule(
-  methods
+  methods,
 ) {
-  static Prop = "resource";
+  static Prop = 'resource';
 
   static MsgNames = {
-    new: "MsgCreateResource",
+    addParams: 'MsgCreateResource',
   };
 
-  async blob(blobId) {
-    return option(Blob).from(
-      (await this.resource(...CheqdBlobId.from(blobId).value))?.resource?.data
-    );
+  filterMetadata(meta) {
+    return meta.resourceType === 'offchain-signature-params';
   }
 }

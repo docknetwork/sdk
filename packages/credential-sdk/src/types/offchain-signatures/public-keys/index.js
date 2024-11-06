@@ -32,6 +32,10 @@ export class OffchainSignaturePublicKey extends TypedEnum {
   get participantId() {
     return this.value.participantId;
   }
+
+  async withParams() {
+
+  }
 }
 export class BBSPublicKey extends OffchainSignaturePublicKey {
   static Class = BBSPublicKeyValue;

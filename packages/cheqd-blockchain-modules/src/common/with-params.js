@@ -1,5 +1,5 @@
 import { withExtendedStaticProperties } from "@docknetwork/credential-sdk/utils";
-import injectDock from "./inject-dock";
+import { TypedUUID, option } from "@docknetwork/credential-sdk/types";
 
 /**
  * Wraps supplied class into a class with logic for public keys and corresponding setup parameters.
@@ -12,13 +12,13 @@ export default function withParams(klass) {
     [name]: class extends klass {
       /**
        * Add new signature params.
+       * @param id - Unique identifier of the params.
        * @param param - The signature params to add.
-       * @param didKeypair - The signer DID's keypair
-
+       * @param didKeypair - The signer DID's keypair.
        * @returns {Promise<*>}
        */
       async addParamsTx(id, param, targetDid, didKeypair) {
-        return await this.dockOnly.tx.addParams(param, targetDid, didKeypair);
+        return await this.cheqdOnly.tx.addParams(id, param, targetDid, didKeypair);
       }
 
       /**
@@ -28,7 +28,7 @@ export default function withParams(klass) {
        * @returns {Promise<Params>}
        */
       async getParams(did, id) {
-        return await this.dockOnly.getParams(did, id);
+        return await this.cheqdOnly.getParams(did, id);
       }
 
       /**
@@ -37,15 +37,15 @@ export default function withParams(klass) {
        * @returns {Promise<Map<TypedNumber, Params>>}
        */
       async getAllParamsByDid(did) {
-        return await this.dockOnly.getAllParamsByDid(did);
+        return await this.cheqdOnly.getAllParamsByDid(did);
       }
 
       async lastParamsId(targetDid) {
-        return await this.dockOnly.paramsCounter(targetDid);
+        return option(TypedUUID).from((await this.cheqdOnly.latestResourceMetadataBy(targetDid, this.cheqdOnly.filterMetadata))?.id);
       }
 
-      async nextParamsId(targetDid) {
-        return (await this.lastParamsId(targetDid)).inc();
+      async nextParamsId(_) {
+        return TypedUUID.random();
       }
     },
   };

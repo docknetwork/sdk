@@ -1,9 +1,11 @@
 import { DidKeypair, Ed25519Keypair } from "../../keypairs";
 import { NoBlobError } from "../abstract/blob/errors";
-import { DIDDocument } from "../../types";
+import { BBSParamsValue, DIDDocument } from "../../types";
 import { itIf } from "./common";
 import { BlobResolver } from "../../resolver/blob";
 import { stringToU8a } from "../../utils";
+import { CheqdParamsId } from "../../types/offchain-signatures/params/id";
+import { TypedBytes } from "../../types/generic";
 
 // eslint-disable-next-line jest/no-export
 export default function generateBlobModuleTests(
@@ -20,35 +22,32 @@ export default function generateBlobModuleTests(
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
 
-      const document = DIDDocument.create(did, [didKeypair.didKey()]);
+      const bbsParamsId = CheqdParamsId.random();
+      const bbsPlusParamsId = CheqdParamsId.random();
+      const psParamsId = CheqdParamsId.random();
+
+      const bbsParams = new BBSParamsValue(TypedBytes.random(100), "bbs");
+      const bbsPlusParams = new BBSParamsValue(TypedBytes.random(100), "bbs+");
+      const psParams = new BBSParamsValue(TypedBytes.random(100), "ps");
+
+      await offchainSignatures.addParams(bbsParamsId, bbsParams, did);
+      await offchainSignatures.addParams(bbsPlusParamsId, bbsPlusParams, did);
+      await offchainSignatures.addParams(psParamsId, psParams, did);
+
+      const bbsKey = new BBSPublicKeyValue(TypedBytes.random(100), bbsParamsId);
+      const bbsPlusKey = new BBSPlusPublicKeyValue(TypedBytes.random(100), bbsPlusParamsId);
+      const psKey = new PSPublicKeyValue(TypedBytes.random(1000), psParamsId);
+
+      const document = DIDDocument.create(did, [
+        didKeypair.didKey(),
+        new DidKey(bbsKey),
+        new DidKey(bbsPlusKey),
+        new DidKey(psKey),
+      ]);
 
       await didModule.createDocument(document, didKeypair);
 
-      const blob1 = {
-        id: BlobId.random(did),
-        blob: "abcdef",
-      };
-
-      await blobModule.new(blob1, didKeypair);
-
-      const written1 = await blobModule.get(blob1.id);
-
-      expect(written1[0].eq(did)).toBe(true);
-      expect(written1[1].toUTF8String()).toEqual(blob1.blob);
-
-      const blob2 = {
-        id: BlobId.random(did),
-        blob: {
-          example: "content",
-        },
-      };
-      await blobModule.new(blob2, didKeypair);
-
-      const written2 = await blobModule.get(blob2.id);
-      expect(written2[0].eq(did)).toBe(true);
-      expect(written2[1].toObject()).toEqual(blob2.blob);
-
-      await expect(() => blobModule.new(blob2, didKeypair)).rejects.toThrow();
+      
     });
 
     test("Throws an error on missing `Blob`", async () => {

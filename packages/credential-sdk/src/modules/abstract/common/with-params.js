@@ -25,30 +25,15 @@ export default function withParams(klass) {
        * Add new params assiociated with the supplied DID.
        * @param id - Unique identifier of the new params to be added.
        * @param params - The params assiociated with the supplied DID to add.
-       * @param targetDid
-       * @param keyPair - Signer's keypair
-       * @param params
+       * @param targetDid - Params owner.
+       * @param didKeypair - Signer's keypair
+       * @param txParams - Special parameters for the transaction.
        * @returns {Promise<*>}
        */
       async addParams(id, params, targetDid, didKeypair, txParams) {
         return await this.signAndSend(
           await this.addParamsTx(id, params, targetDid, didKeypair),
           txParams
-        );
-      }
-
-      /**
-       * Remove existing BBS+ params.
-       * @param id - Identifier of the parameters to be removed.
-       * @param targetDid - Target DID associated with the params
-       * @param keyPair - Signer's keypair
-
-       * @returns {Promise<*>}
-       */
-      async removeParams(id, targetDid, didKeypair, params) {
-        return await this.signAndSend(
-          await this.removeParamsTx(id, targetDid, didKeypair),
-          params
         );
       }
 
@@ -97,7 +82,6 @@ export default function withParams(klass) {
   return withExtendedPrototypeProperties(
     [
       "addParamsTx",
-      "removeParamsTx",
       "getParams",
       "getAllParamsByDid",
       "lastParamsId",

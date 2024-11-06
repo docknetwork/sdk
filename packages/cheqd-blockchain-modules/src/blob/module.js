@@ -10,15 +10,19 @@ export default class CheqdBlobModule extends injectCheqd(AbstractBlobModule) {
 
   /**
    * Write a new blob on chain.
-   * @param blob
-   * @param signerDid - Signer of the blob
-   * @param signingKeyRef - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param blobWithId
+   * @param didKeypair - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @returns {Promise<*>}
    */
   async newTx(blobWithId, didKeypair) {
     return await this.cheqdOnly.tx.new(blobWithId, didKeypair);
   }
 
+  /**
+   * 
+   * @param {*} blobId 
+   * @returns 
+   */
   async get(blobId) {
     const id = CheqdBlobId.from(blobId);
     const blob = await this.cheqdOnly.blob(id);

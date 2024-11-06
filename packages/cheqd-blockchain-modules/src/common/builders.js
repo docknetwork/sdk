@@ -105,6 +105,25 @@ export function createInternalCheqdModule(
         this.apiProvider = apiProvider;
       }
 
+      async resourcesBy(did, cond) {
+        const ids = await this.resourcesMetadataBy(did, cond);
+
+        try {
+          const queries = ids.map(async id => [id, await this.apiProvider.sdk.querier.resource.resource(
+            did,
+            id,
+          )]);
+
+          return new Map(await Promise.all(queries));
+        } catch (err) {
+          if (!String(err).includes('DID Doc not found')) {
+            throw err;
+          }
+        }
+
+        return new Map();
+      }
+
       async resource(did, id) {
         const strDid = CheqdDid.from(did).toEncodedString();
         const strID = String(TypedUUID.from(id));
@@ -123,7 +142,8 @@ export function createInternalCheqdModule(
         return null;
       }
 
-      async latestResourceIdBy(did, cond) {
+      async resourcesMetadataBy(did, cond, stop = (_) => false) {
+        let res = [];
         let resources;
         let paginationKey;
         const encodedDid = CheqdDid.from(did).toEncodedString();
@@ -145,14 +165,20 @@ export function createInternalCheqdModule(
             }
           }
 
-          for (const resource of resources) {
-            if (cond(resource) && !resource.nextVersionId) {
-              return resource.id;
-            }
-          }
-        } while (paginationKey != null);
+          res = res.concat(resources.filter(cond));
+        } while (!stop(res) && paginationKey != null);
 
-        return null;
+        return res;
+      }
+
+      async latestResourcesMetadataBy(did, cond) {
+        return await this.resourcesMetadataBy(did, meta => cond(meta) && !meta.nextVersionId);
+      }
+
+      async latestResourceMetadataBy(did, cond) {
+        const meta = await this.resourcesMetadataBy(did, meta => cond(meta) && !meta.nextVersionId, res => res.length);
+
+        return meta[0] ?? null;
       }
 
       get query() {

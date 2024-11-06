@@ -29,21 +29,6 @@ export default function withPublicKeys(klass) {
       }
 
       /**
-       * Remove public key
-       * @param removeKeyId - Identifier of the public key to be removed.
-       * @param targetDid - The DID from which key is being removed
-       * @param didKeypair - Signer's signing key reference
-       * @returns {Promise<*>}
-       */
-      async removePublicKeyTx(id, targetDid, didKeypair) {
-        return await this.dockOnly.tx.removePublicKey(
-          id,
-          targetDid,
-          didKeypair
-        );
-      }
-
-      /**
        * Retrieves all public keys by a DID.
        * @param {*} did
        * @param {boolean} withParams - If true, return the params referenced by the public key.

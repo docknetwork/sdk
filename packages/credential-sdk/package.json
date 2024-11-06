@@ -16,6 +16,11 @@
       "import": "./dist/esm/*/index.js",
       "require": "./dist/cjs/*/index.cjs",
       "default": "./dist/esm/*/index.js"
+    },
+    "./src/*": {
+      "import": "./dist/esm/*",
+      "require": "./dist/cjs/*",
+      "default": "./dist/esm/*"
     }
   },
   "repository": {

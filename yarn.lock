@@ -2863,7 +2863,7 @@
     ky "^0.25.1"
     ky-universal "^0.8.2"
 
-"@digitalbazaar/http-client@^4.1.0", "@digitalbazaar/http-client@^4.1.1":
+"@digitalbazaar/http-client@^4.1.1":
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/@digitalbazaar/http-client/-/http-client-4.1.1.tgz#73d31af4782eadd2440cf0cd487ad591f45d137c"
   integrity sha512-PG0r9sAEzAmnCSrwKg+HhM6+GNMU24ttiFMBycqhM1vDi8enipuFpW45vn2lzr8+i7I2yLUzNyfrrkQTlzGLmQ==
@@ -2959,38 +2959,6 @@
     credentials-context "^2.0.0"
     fix-esm "^1.0.1"
     jsonld digitalcredentials/jsonld.js#v10.x
-
-"@docknetwork/credential-sdk@0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/credential-sdk/-/credential-sdk-0.6.0.tgz#6390cfcd17758c0f13ba26773dc898353f1299c7"
-  integrity sha512-ANbD5S+79ZJAkyuE8Hzgr89tVu5lhqmwWL7NYJnmG8kzjlRJafZwJqg15G88fkZ07Te0eTV9GMIfD8M7w0On9g==
-  dependencies:
-    "@comunica/actor-init-sparql-rdfjs" "^1.22.3"
-    "@digitalcredentials/vc-status-list" "^8.0.0"
-    "@docknetwork/crypto-wasm-ts" "^0.63.0"
-    "@juanelas/base64" "^1.1.5"
-    "@stablelib/ed25519" "^1.0.0"
-    "@subsquid/ss58-codec" latest
-    "@transmute/json-web-signature" "^0.7.0-unstable.82"
-    blakejs "^1.2.1"
-    bs58 "^5.0.0"
-    deep-equal "^2.2.3"
-    elliptic "6.6.0"
-    js-sha256 "^0.11.0"
-    json-canonicalize "1.0.4"
-    json-stringify-deterministic "^1.0.12"
-    jsonld "^5.0.0"
-    jsonld-signatures "^9.3.1"
-    jsonschema "1.4.1"
-    key-did-resolver "^1.4.0"
-    mrklt "^0.2.0"
-    multiformats "^9.5.4"
-    n3 "^1.17.4"
-    rify "^0.7.1"
-    semver "^7.6.0"
-    uuid "^10.0.0"
-    uuidv4 "^6.2.13"
-    varint "^6.0.0"
 
 "@docknetwork/crypto-wasm-ts@^0.63.0":
   version "0.63.0"

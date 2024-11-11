@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.7.0
+
+### Minor Changes
+
+- JWT fixes
+
 ## 0.6.0
 
 ### Minor Changes

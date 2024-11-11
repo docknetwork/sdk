@@ -83,10 +83,10 @@ describe.each(Schemes)(
       if (Name !== "BBDT16") {
         chainModule = getModule(dock);
 
-        const pk1 = Module.prepareAddPublicKey(
-          u8aToHex(keypair.publicKeyBuffer)
+        const pk1 = new Module.DockOnly.PublicKey(
+          new Module.DockOnly.PublicKey.Class(u8aToHex(keypair.publicKeyBuffer))
         );
-        await chainModule.addPublicKey(null, pk1, did1, pair1);
+        await chainModule.dockOnly.addPublicKey(pk1, did1, pair1);
 
         didDocument = (await modules.did.getDocument(did1)).toJSON();
         const { verificationMethod } = didDocument;

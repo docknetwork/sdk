@@ -44,6 +44,7 @@ for (const {
   getPublicKeysByDid,
 } of Schemes) {
   const skipIfKvac = Name === "BBDT16" ? describe.skip : describe;
+
   skipIfKvac(`${Name} Module`, () => {
     const dock = new DockAPI();
     const modules = new MultiApiCoreModules([new DockCoreModules(dock)]);
@@ -141,9 +142,9 @@ for (const {
       let keypair = KeyPair.generate(params);
       const bytes1 = u8aToHex(keypair.publicKey.bytes);
       const pk1 = new chainModuleClass.DockOnly.PublicKey(
-        new chainModuleClass.DockOnly.PulicKey.Class(bytes1)
+        new chainModuleClass.DockOnly.PublicKey.Class(bytes1)
       );
-      await chainModule.dockOnly.addPublicKey(pk1, did1, pair1);
+      await chainModule.dockOnly.send.addPublicKey(pk1, did1, pair1);
       const queriedPk1 = await chainModule.dockOnly.getPublicKey(did1, 2);
       expect(queriedPk1.bytes).toEqual(pk1.bytes);
       expect(queriedPk1.paramsRef).toBe(null);
@@ -159,9 +160,9 @@ for (const {
       keypair = KeyPair.generate(params1);
       const bytes2 = u8aToHex(keypair.publicKey.bytes);
       const pk2 = new chainModuleClass.DockOnly.PublicKey(
-        new chainModuleClass.DockOnly.PulicKey.Class(bytes2, [did1, 1])
+        new chainModuleClass.DockOnly.PublicKey.Class(bytes2, [did1, 1])
       );
-      await chainModule.dockOnly.addPublicKey(pk2, did2, pair2);
+      await chainModule.dockOnly.send.addPublicKey(pk2, did2, pair2);
       const queriedPk2 = await chainModule.dockOnly.getPublicKey(did2, 2);
       expect(queriedPk2.bytes).toEqual(pk2.bytes);
 
@@ -197,9 +198,9 @@ for (const {
       keypair = KeyPair.generate(params2);
       const bytes3 = u8aToHex(keypair.publicKey.bytes);
       const pk3 = new chainModuleClass.DockOnly.PublicKey(
-        new chainModuleClass.DockOnly.PulicKey.Class(bytes3, [did1, 2])
+        new chainModuleClass.DockOnly.PublicKey.Class(bytes3, [did1, 2])
       );
-      await chainModule.dockOnly.addPublicKey(pk3, did2, pair2);
+      await chainModule.dockOnly.send.addPublicKey(pk3, did2, pair2);
 
       const queriedPk3 = await chainModule.dockOnly.getPublicKey(did2, 3);
       expect(queriedPk3.bytes).toEqual(pk3.bytes);

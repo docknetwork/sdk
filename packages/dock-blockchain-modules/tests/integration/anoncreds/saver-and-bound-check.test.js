@@ -140,12 +140,13 @@ for (const {
         expect(paramsWritten.label).toEqual(params.label);
 
         issuerSchemeKeypair = KeyPair.generate(sigParams);
-        const pk = Module.prepareAddPublicKey(
-          u8aToHex(issuerSchemeKeypair.publicKey.bytes),
-          [issuerDid, 1]
+        const pk = new Module.DockOnly.PublicKey(
+          new Module.DockOnly.PublicKey.Class(
+            u8aToHex(issuerSchemeKeypair.publicKey.bytes),
+            [issuerDid, 1]
+          )
         );
-        await getModule(dock).dockOnly.addPublicKey(
-          null,
+        await getModule(dock).dockOnly.send.addPublicKey(
           pk,
           issuerDid,
           issuerKeypair

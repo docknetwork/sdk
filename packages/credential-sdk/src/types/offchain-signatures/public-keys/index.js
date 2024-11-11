@@ -16,6 +16,7 @@ import {
 } from "./ref";
 import { Bls12381BBDT16DockVerKeyName } from "../../../vc/crypto/constants";
 import { BBDT16Params, BBSParams, BBSPlusParams, PSParams } from "../params";
+import { maybeToJSONString } from "../../../utils";
 
 export class OffchainSignaturePublicKey extends TypedEnum {
   get bytes() {
@@ -32,6 +33,10 @@ export class OffchainSignaturePublicKey extends TypedEnum {
 
   get participantId() {
     return this.value.participantId;
+  }
+
+  get params() {
+    return this.value.params;
   }
 
   setParams(params) {
@@ -54,7 +59,9 @@ export class OffchainSignaturePublicKey extends TypedEnum {
 
       if (params == null) {
         throw new Error(
-          `Parameters with reference (${this.paramsRef[0]}, ${this.paramsRef[1]}) not found on chain`
+          `Parameters with reference (${maybeToJSONString(
+            this.paramsRef
+          )}) not found on chain`
         );
       }
     }

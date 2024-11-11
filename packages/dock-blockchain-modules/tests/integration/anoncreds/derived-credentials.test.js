@@ -228,9 +228,12 @@ describe.each(Schemes)(
       });
 
       if (Name !== "BBDT16") {
-        await chainModule.dockOnly.addPublicKey(
-          null,
-          new Module.DockOnly.PublicKey(u8aToHex(keypair.publicKeyBuffer)),
+        await chainModule.dockOnly.send.addPublicKey(
+          new Module.DockOnly.PublicKey(
+            new Module.DockOnly.PublicKey.Class(
+              u8aToHex(keypair.publicKeyBuffer)
+            )
+          ),
           did1,
           pair1
         );

@@ -1,11 +1,8 @@
-import {
-  TypedNumber,
-  TypedMap,
-} from "@docknetwork/credential-sdk/types/generic";
-import injectDock from "./inject-dock";
-
 /**
  * Wraps supplied class into a class with logic for public keys and corresponding setup parameters.
+ * @template C
+ * @param {C} klass
+ * @returns {C}
  */
 /* eslint-disable sonarjs/cognitive-complexity */
 export default function withPublicKeys(klass) {

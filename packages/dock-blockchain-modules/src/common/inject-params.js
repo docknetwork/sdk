@@ -1,4 +1,5 @@
-import { DockDidOrDidMethodKey } from "../../../credential-sdk/src/types";
+import { DockDidOrDidMethodKey } from "@docknetwork/credential-sdk/types";
+import { withExtendedStaticProperties } from "@docknetwork/credential-sdk/utils";
 import { createInternalDockModule } from "./builders";
 import {
   TypedMap,
@@ -22,53 +23,59 @@ const didMethods = {
 };
 
 export default function injectParams(klass) {
-  return class extends createInternalDockModule({ didMethods }, klass) {
-    static get ParamsMap() {
-      const { Params } = this;
+  const name = `withInternalParams(${klass.name})`;
 
-      return class ParamsMap extends TypedMap {
-        static KeyClass = TypedNumber;
+  const obj = {
+    [name]: class extends createInternalDockModule({ didMethods }, klass) {
+      static get ParamsMap() {
+        const { Params } = this;
 
-        static ValueClass = Params;
-      };
-    }
+        return class ParamsMap extends TypedMap {
+          static KeyClass = TypedNumber;
 
-    /**
-     * Retrieves params by DID and counter.
-     * @param {*} did
-     * @param {*} counter
-     * @returns {Promise<Params>}
-     */
-    async getParams(did, id) {
-      return option(this.constructor.Params).from(
-        await this.query[this.constructor.ParamsQuery](
-          DockDidOrDidMethodKey.from(did),
-          TypedNumber.from(id)
-        )
-      );
-    }
-
-    /**
-     * Retrieves all params by a DID.
-     * @param {*} did
-     * @returns {Promise<Map<TypedNumber, Params>>}
-     */
-    async getAllParamsByDid(did) {
-      // TODO: use `multi`
-      const hexDid = DockDidOrDidMethodKey.from(did);
-      const paramsMap = new this.constructor.ParamsMap();
-
-      const paramsCounter = await this.paramsCounter(hexDid);
-      for (let idx = 1; idx <= paramsCounter; idx++) {
-        // eslint-disable-next-line no-await-in-loop
-        const params = await this.getParams(hexDid, idx);
-
-        if (params != null) {
-          paramsMap.set(idx, params);
-        }
+          static ValueClass = Params;
+        };
       }
 
-      return paramsMap;
-    }
+      /**
+       * Retrieves params by DID and counter.
+       * @param {*} did
+       * @param {*} counter
+       * @returns {Promise<Params>}
+       */
+      async getParams(did, id) {
+        return option(this.constructor.Params).from(
+          await this.query[this.constructor.ParamsQuery](
+            DockDidOrDidMethodKey.from(did),
+            TypedNumber.from(id)
+          )
+        );
+      }
+
+      /**
+       * Retrieves all params by a DID.
+       * @param {*} did
+       * @returns {Promise<Map<TypedNumber, Params>>}
+       */
+      async getAllParamsByDid(did) {
+        // TODO: use `multi`
+        const hexDid = DockDidOrDidMethodKey.from(did);
+        const paramsMap = new this.constructor.ParamsMap();
+
+        const paramsCounter = await this.paramsCounter(hexDid);
+        for (let idx = 1; idx <= paramsCounter; idx++) {
+          // eslint-disable-next-line no-await-in-loop
+          const params = await this.getParams(hexDid, idx);
+
+          if (params != null) {
+            paramsMap.set(idx, params);
+          }
+        }
+
+        return paramsMap;
+      }
+    },
   };
+
+  return withExtendedStaticProperties(["Params", "ParamsQuery"], obj[name]);
 }

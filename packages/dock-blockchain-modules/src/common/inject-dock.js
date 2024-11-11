@@ -1,5 +1,5 @@
-import { withExtendedStaticProperties } from '@docknetwork/credential-sdk/utils/inheritance';
-import DockApiProvider from './dock-api-provider';
+import { withExtendedStaticProperties } from "@docknetwork/credential-sdk/utils/inheritance";
+import DockApiProvider from "./dock-api-provider";
 
 export default function injectDock(klass) {
   const name = `withDock(${klass.name})`;
@@ -22,8 +22,12 @@ export default function injectDock(klass) {
       methods() {
         return this.apiProvider.methods();
       }
+
+      supportsIdentifier(id) {
+        return this.apiProvider.supportsIdentifier(id);
+      }
     },
   };
 
-  return withExtendedStaticProperties(['DockOnly'], obj[name]);
+  return withExtendedStaticProperties(["DockOnly"], obj[name]);
 }

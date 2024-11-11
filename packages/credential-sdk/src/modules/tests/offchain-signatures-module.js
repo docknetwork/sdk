@@ -1,16 +1,28 @@
 import { DidKeypair, Ed25519Keypair } from "../../keypairs";
-import { NoBlobError } from "../abstract/blob/errors";
-import { BBSParamsValue, DIDDocument } from "../../types";
+import {
+  BBSParams,
+  BBSParamsValue,
+  BBSPlusParams,
+  BBSPlusParamsValue,
+  BBSPlusPublicKey,
+  BBSPlusPublicKeyValue,
+  BBSPublicKey,
+  BBSPublicKeyValue,
+  DIDDocument,
+  DidKey,
+  PSParams,
+  PSParamsValue,
+  PSPublicKey,
+  PSPublicKeyValue,
+} from "../../types";
 import { itIf } from "./common";
-import { BlobResolver } from "../../resolver/blob";
-import { stringToU8a } from "../../utils";
-import { CheqdParamsId } from "../../types/offchain-signatures/params/id";
 import { TypedBytes } from "../../types/generic";
+import { stringToU8a } from "../../utils";
 
 // eslint-disable-next-line jest/no-export
-export default function generateBlobModuleTests(
+export default function generateOffchainSignatureModuleTests(
   { did: didModule, offchainSignatures },
-  { DID, BlobId },
+  { DID, OffchainSignaturesParamsRef },
   filter = () => true
 ) {
   const test = itIf(filter);
@@ -22,21 +34,54 @@ export default function generateBlobModuleTests(
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
 
-      const bbsParamsId = CheqdParamsId.random();
-      const bbsPlusParamsId = CheqdParamsId.random();
-      const psParamsId = CheqdParamsId.random();
+      await didModule.createDocument(
+        DIDDocument.create(did, [didKeypair.didKey()]),
+        didKeypair
+      );
 
-      const bbsParams = new BBSParamsValue(TypedBytes.random(100), "bbs");
-      const bbsPlusParams = new BBSParamsValue(TypedBytes.random(100), "bbs+");
-      const psParams = new BBSParamsValue(TypedBytes.random(100), "ps");
+      const bbsParamsId = await offchainSignatures.nextParamsId(did);
+      const bbsParamsRef = new OffchainSignaturesParamsRef(did, bbsParamsId);
+      const bbsParams = new BBSParams(
+        new BBSParamsValue(TypedBytes.random(100), stringToU8a("bbs"))
+      );
+      await offchainSignatures.addParams(
+        bbsParamsId,
+        bbsParams,
+        did,
+        didKeypair
+      );
 
-      await offchainSignatures.addParams(bbsParamsId, bbsParams, did);
-      await offchainSignatures.addParams(bbsPlusParamsId, bbsPlusParams, did);
-      await offchainSignatures.addParams(psParamsId, psParams, did);
+      const bbsPlusParamsId = await offchainSignatures.nextParamsId(did);
+      const bbsPlusParamsRef = new OffchainSignaturesParamsRef(
+        did,
+        bbsPlusParamsId
+      );
+      const bbsPlusParams = new BBSPlusParams(
+        new BBSPlusParamsValue(TypedBytes.random(100), stringToU8a("bbs+"))
+      );
+      await offchainSignatures.addParams(
+        bbsPlusParamsId,
+        bbsPlusParams,
+        did,
+        didKeypair
+      );
 
-      const bbsKey = new BBSPublicKeyValue(TypedBytes.random(100), bbsParamsId);
-      const bbsPlusKey = new BBSPlusPublicKeyValue(TypedBytes.random(100), bbsPlusParamsId);
-      const psKey = new PSPublicKeyValue(TypedBytes.random(1000), psParamsId);
+      const psParamsId = await offchainSignatures.nextParamsId(did);
+      const psParamsRef = new OffchainSignaturesParamsRef(did, psParamsId);
+      const psParams = new PSParams(
+        new PSParamsValue(TypedBytes.random(100), stringToU8a("ps"))
+      );
+      await offchainSignatures.addParams(psParamsId, psParams, did, didKeypair);
+
+      const bbsKey = new BBSPublicKey(
+        new BBSPublicKeyValue(TypedBytes.random(100), bbsParamsRef)
+      );
+      const bbsPlusKey = new BBSPlusPublicKey(
+        new BBSPlusPublicKeyValue(TypedBytes.random(100), bbsPlusParamsRef)
+      );
+      const psKey = new PSPublicKey(
+        new PSPublicKeyValue(TypedBytes.random(1000), psParamsRef)
+      );
 
       const document = DIDDocument.create(did, [
         didKeypair.didKey(),
@@ -45,40 +90,68 @@ export default function generateBlobModuleTests(
         new DidKey(psKey),
       ]);
 
-      await didModule.createDocument(document, didKeypair);
+      await didModule.updateDocument(document, didKeypair);
 
-      
-    });
-
-    test("Throws an error on missing `Blob`", async () => {
-      const id = BlobId.random(DID.random());
-
-      await expect(() => blobModule.get(id)).rejects.toThrow(
-        new NoBlobError(id)
+      expect((await didModule.getDocument(did)).toJSON()).toEqual(
+        document.toJSON()
       );
+
+      expect(
+        (await offchainSignatures.getParams(did, bbsParamsId)).toJSON()
+      ).toEqual(bbsParams.toJSON());
+      expect(
+        (await offchainSignatures.getParams(did, bbsPlusParamsId)).toJSON()
+      ).toEqual(bbsPlusParams.toJSON());
+      expect(
+        (await offchainSignatures.getParams(did, psParamsId)).toJSON()
+      ).toEqual(psParams.toJSON());
+
+      expect((await bbsKey.withParams(offchainSignatures)).toJSON()).toEqual({
+        bbs: { ...bbsKey.toJSON().bbs, params: bbsParams.toJSON() },
+      });
+
+      expect(
+        (await bbsPlusKey.withParams(offchainSignatures)).toJSON()
+      ).toEqual({
+        bbsPlus: {
+          ...bbsPlusKey.toJSON().bbsPlus,
+          params: bbsPlusParams.toJSON(),
+        },
+      });
+
+      expect((await psKey.withParams(offchainSignatures)).toJSON()).toEqual({
+        ps: {
+          ...psKey.toJSON().ps,
+          params: psParams.toJSON(),
+        },
+      });
     });
 
-    test("`BlobResolver`", async () => {
-      const resolver = new BlobResolver(blobModule);
+    test("Returns `null` in case of missing params", async () => {
       const did = DID.random();
-
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
 
       const document = DIDDocument.create(did, [didKeypair.didKey()]);
 
+      const psParamsId = await offchainSignatures.nextParamsId(did);
+      const psParamsRef = new OffchainSignaturesParamsRef(did, psParamsId);
+
       await didModule.createDocument(document, didKeypair);
+      const psKey = new PSPublicKey(
+        new PSPublicKeyValue(TypedBytes.random(1000), psParamsRef)
+      );
 
-      const blob1 = {
-        id: BlobId.random(did),
-        blob: "abcdef",
-      };
+      expect(
+        await offchainSignatures.getParams(
+          did,
+          await offchainSignatures.nextParamsId(did)
+        )
+      ).toBe(null);
 
-      await blobModule.new(blob1, didKeypair);
-      expect(await resolver.resolve(String(blob1.id))).toEqual([
-        String(did),
-        stringToU8a(blob1.blob),
-      ]);
+      await expect(() =>
+        psKey.withParams(offchainSignatures)
+      ).rejects.toThrow();
     });
   });
 }

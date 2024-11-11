@@ -9,6 +9,7 @@ import {
 import { isEqualToOrPrototypeOf } from "@docknetwork/credential-sdk/utils";
 import { createInternalDockModule } from "./builders";
 import { DockDidOrDidMethodKey } from "@docknetwork/credential-sdk/types";
+import { withExtendedStaticProperties } from "@docknetwork/credential-sdk/utils";
 
 const didMethods = {
   addPublicKey(publicKey, targetDid, _, nonce) {
@@ -30,11 +31,10 @@ const didMethods = {
 };
 
 export default function injectPublicKeys(klass) {
-  const extended = createInternalDockModule({ didMethods }, klass);
-  const name = `withPublicKeys(${extended.name})`;
+  const name = `withInternalPublicKeys(${klass.name})`;
 
   const obj = {
-    [name]: class extends extended {
+    [name]: class extends klass {
       static get PublicKeysMap() {
         const { PublicKey } = this;
 
@@ -46,7 +46,7 @@ export default function injectPublicKeys(klass) {
       }
 
       async getPublicKey(did, keyId, includeParams = false) {
-        const { PublicKey, ParamsRef, Params, PublicKeyOwner, PublicKeyQuery } =
+        const { PublicKey, ParamsRef, PublicKeyOwner, PublicKeyQuery } =
           this.constructor;
 
         const PublicKeyWithParamsRef = withProp(
@@ -54,14 +54,12 @@ export default function injectPublicKeys(klass) {
           "paramsRef",
           option(ParamsRef)
         );
-        const PublicKeyWithParams = includeParams
-          ? withProp(PublicKeyWithParamsRef, "params", option(Params))
-          : PublicKeyWithParamsRef;
         const MaybeNotAVariantPublicKey =
-          isEqualToOrPrototypeOf(TypedEnum, PublicKeyWithParams) &&
-          PublicKeyWithParams.Class != null
-            ? withNullIfNotAVariant(PublicKeyWithParams)
-            : PublicKeyWithParams;
+          isEqualToOrPrototypeOf(TypedEnum, PublicKeyWithParamsRef) &&
+          PublicKeyWithParamsRef.Class != null
+            ? withNullIfNotAVariant(PublicKeyWithParamsRef)
+            : PublicKeyWithParamsRef;
+
         const owner = PublicKeyOwner.from(did);
         const publicKey = option(MaybeNotAVariantPublicKey).from(
           await this.query[PublicKeyQuery](owner, TypedNumber.from(keyId))
@@ -71,14 +69,8 @@ export default function injectPublicKeys(klass) {
           return null;
         }
 
-        if (includeParams && publicKey.paramsRef != null) {
-          const params = await this.getParams(...publicKey.paramsRef);
-          if (params == null) {
-            throw new Error(
-              `Parameters with reference (${publicKey.paramsRef[0]}, ${publicKey.paramsRef[1]}) not found on chain`
-            );
-          }
-          publicKey.params = params;
+        if (includeParams) {
+          return await publicKey.withParams(this);
         }
 
         return publicKey;
@@ -109,5 +101,11 @@ export default function injectPublicKeys(klass) {
     },
   };
 
-  return obj[name];
+  return createInternalDockModule(
+    { didMethods },
+    withExtendedStaticProperties(
+      ["PublicKey", "ParamsRef", "PublicKeyOwner", "PublicKeyQuery"],
+      obj[name]
+    )
+  );
 }

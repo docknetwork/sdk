@@ -1,7 +1,10 @@
-import { withExtendedPrototypeProperties, withExtendedStaticProperties } from "../../../utils";
+import {
+  withExtendedPrototypeProperties,
+  withExtendedStaticProperties,
+} from "../../../utils";
 
-export default function withPublicKeys(klass) {
-  const name = `withPublicKeys(${klass.name})`;
+export default function withAbstractPublicKeys(klass) {
+  const name = `withAbstractPublicKeys(${klass.name})`;
 
   const obj = {
     [name]: class extends klass {
@@ -79,7 +82,6 @@ export default function withPublicKeys(klass) {
   return withExtendedPrototypeProperties(
     [
       "addPublicKeyTx",
-      "removePublicKeyTx",
       "getAllPublicKeysByDid",
       "lastPublicKeyId",
       "nextPublicKeyId",

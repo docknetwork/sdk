@@ -1,11 +1,10 @@
 /* eslint-disable camelcase */
 
 import { OffchainSignatureParams } from "../../../types";
-import { AbstractBaseModule } from "../common";
-import withParams from "../common/with-params";
+import { AbstractBaseModule, withAbstractParams } from "../common";
 
-/** Class to write offchain signature parameters and keys on chain */
-export default class AbstractOffchainSignaturesModule extends withParams(
+/** Class to write offchain signature parameters on chain */
+export default class AbstractOffchainSignaturesModule extends withAbstractParams(
   AbstractBaseModule
 ) {
   static Params = OffchainSignatureParams;

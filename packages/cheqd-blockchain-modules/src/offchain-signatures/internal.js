@@ -1,27 +1,9 @@
-import { CheqdCreateResource, createInternalCheqdModule } from '../common';
+import injectParams from "../common/inject-params";
 
-const methods = {
-  addParams: (id, params, did) => new CheqdCreateResource(
-    did.value.value,
-    id,
-    '1.0',
-    [],
-    'OffchainSignatures',
-    'offchain-signature-params',
-    params.toJSON(),
-  )
-};
-
-export default class CheqdInternalOffchainSignatures extends createInternalCheqdModule(
-  methods,
+export default class CheqdOffchainSignaturesInternalModule extends injectParams(
+  class {}
 ) {
-  static Prop = 'resource';
-
-  static MsgNames = {
-    addParams: 'MsgCreateResource',
-  };
-
   filterMetadata(meta) {
-    return meta.resourceType === 'offchain-signature-params';
+    return meta.resourceType === "offchain-signature-params";
   }
 }

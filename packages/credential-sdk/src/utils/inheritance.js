@@ -1,4 +1,4 @@
-import { fmtIter } from './generic';
+import { fmtIter } from "./generic";
 
 /**
  * Enhances the provided class with the given list of static properties to require
@@ -26,7 +26,7 @@ export function withExtendedStaticProperties(properties, parentClass) {
         for (const property of properties) {
           if (this.constructor[property] === parentClass[property]) {
             throw new Error(
-              `Static property \`${property}\` of \`${this.constructor.name}\` isn't extended properly`,
+              `Static property \`${property}\` of \`${this.constructor.name}\` isn't extended properly`
             );
           }
         }
@@ -40,11 +40,11 @@ export function withExtendedStaticProperties(properties, parentClass) {
     Object.defineProperty(extendedClass[name], property, {
       get() {
         if (
-          this !== extendedClass[name]
-          && this[propertySymbol] === parentClass[property]
+          this !== extendedClass[name] &&
+          this[propertySymbol] === parentClass[property]
         ) {
           throw new Error(
-            `Property \`${property}\` of \`${this.name}\` isn't extended properly`,
+            `Property \`${property}\` of \`${this.name}\` isn't extended properly`
           );
         }
         return this[propertySymbol];
@@ -52,7 +52,7 @@ export function withExtendedStaticProperties(properties, parentClass) {
       set(newValue) {
         if (Object.hasOwnProperty.call(this, propertySymbol)) {
           throw new Error(
-            `Can't override the property \`${property}\` of \`${this.name}\``,
+            `Can't override the property \`${property}\` of \`${this.name}\``
           );
         }
 
@@ -90,7 +90,7 @@ export function withExtendedPrototypeProperties(properties, parentClass) {
         for (const property of properties) {
           if (proto[property] === parentClass.prototype[property]) {
             throw new Error(
-              `Property \`${property}\` of the object prototype of \`${this.constructor.name}\` isn't extended properly`,
+              `Property \`${property}\` of the object prototype of \`${this.constructor.name}\` isn't extended properly`
             );
           }
         }
@@ -109,28 +109,31 @@ export const ensurePropertiesAreUnique = (reservedFields, fields) => {
   }
 };
 
-const AllProperties = new WeakMap();
+const ObjectProperties = new WeakMap();
 
 export const allProperties = (obj) => {
   if (obj == null) return new Set();
 
-  let props = AllProperties.get(obj);
-  if (!props) {
-    props = new Set(
+  let props = ObjectProperties.get(obj);
+  if (props == null) {
+    props = new Set([
       ...Object.getOwnPropertyNames(obj),
       ...allProperties(Object.getPrototypeOf(obj)),
-    );
-    AllProperties.set(obj, props);
+    ]);
+    ObjectProperties.set(obj, props);
   }
 
   return props;
 };
 
-export const validateProperties = (obj) => ensurePropertiesAreUnique(
-  new Set(Object.getOwnPropertyNames(obj)),
-  allProperties(Object.getPrototypeOf(obj)),
-);
+export const validateProperties = (obj) =>
+  ensurePropertiesAreUnique(
+    new Set(Object.getOwnPropertyNames(obj)),
+    allProperties(Object.getPrototypeOf(obj))
+  );
 
-export const isPrototypeOf = (proto, obj) => Object.isPrototypeOf.call(proto, obj);
+export const isPrototypeOf = (proto, obj) =>
+  Object.isPrototypeOf.call(proto, obj);
 
-export const isEqualToOrPrototypeOf = (proto, obj) => Object.is(proto, obj) || isPrototypeOf(proto, obj);
+export const isEqualToOrPrototypeOf = (proto, obj) =>
+  Object.is(proto, obj) || isPrototypeOf(proto, obj);

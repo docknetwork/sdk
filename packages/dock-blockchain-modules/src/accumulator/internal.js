@@ -4,6 +4,7 @@ import {
   AccumulatorParams,
   AccumulatorPublicKey,
   DockAccumulatorId,
+  DockAccumulatorParamsRef,
 } from "@docknetwork/credential-sdk/types";
 import { inclusiveRange, u8aToHex } from "@docknetwork/credential-sdk/utils";
 import { VBWitnessUpdateInfo } from "@docknetwork/credential-sdk/crypto";
@@ -64,6 +65,8 @@ export default class DockInternalAccumulatorModule extends injectParams(
   static PublicKeyOwner = DockDidOrDidMethodKey;
 
   static Params = AccumulatorParams;
+
+  static ParamsRef = DockAccumulatorParamsRef;
 
   static PublicKeyAndParamsActions = {
     AddPublicKey: AddAccumulatorPublicKey,

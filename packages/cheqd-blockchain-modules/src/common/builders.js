@@ -1,9 +1,9 @@
 import {
   VerificationMethodSignature,
   CheqdDid,
-} from '@docknetwork/credential-sdk/types';
-import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
-import { CheqdPayloadWithTypeUrl } from './payload';
+} from "@docknetwork/credential-sdk/types";
+import { TypedUUID } from "@docknetwork/credential-sdk/types/generic";
+import { CheqdPayloadWithTypeUrl } from "./payload";
 
 /**
  * Creates DID method transaction builder.
@@ -18,12 +18,14 @@ export const createDIDMethodTx = (fnName) => {
       const payload = root.payload[fnName].apply(this.root, args);
       const bytes = await root.apiProvider.stateChangeBytes(
         root.constructor.MsgNames[fnName],
-        payload,
+        payload
       );
 
       const signatures = []
         .concat(didKeypairs)
-        .map((didKeypair) => VerificationMethodSignature.fromDidKeypair(didKeypair, bytes));
+        .map((didKeypair) =>
+          VerificationMethodSignature.fromDidKeypair(didKeypair, bytes)
+        );
 
       const value = {
         payload,
@@ -32,7 +34,7 @@ export const createDIDMethodTx = (fnName) => {
 
       return new CheqdPayloadWithTypeUrl(
         root.constructor.MsgNames[fnName],
-        value,
+        value
       );
     },
   };
@@ -48,7 +50,7 @@ export const createCall = (fnName) => {
     async [fnName](...args) {
       const { root } = this;
       const tx = await root.tx[fnName](
-        ...args.slice(0, root.payload[fnName].length),
+        ...args.slice(0, root.payload[fnName].length)
       );
 
       return await root.signAndSend(tx, args[root.payload[fnName].length]);
@@ -65,7 +67,7 @@ export const createAccountTx = (fnName) => {
   const obj = {
     async [fnName](...args) {
       return await this.root.rawTx[fnName](
-        ...this.root.payload[fnName].apply(this.root, args),
+        ...this.root.payload[fnName].apply(this.root, args)
       );
     },
   };
@@ -82,12 +84,29 @@ class Root {
 /* eslint-disable sonarjs/cognitive-complexity */
 export function createInternalCheqdModule(
   methods = Object.create(null),
-  baseClass = class CheqdModuleBaseClass {},
+  baseClass = class CheqdModuleBaseClass {}
 ) {
   const name = `internalCheqdModule(${baseClass.name})`;
   class RootPayload extends (baseClass.RootPayload ?? Root) {}
   class RootModule extends (baseClass.RootModule ?? Root) {}
   class RootSender extends (baseClass.RootSender ?? Root) {}
+
+  const filterError = async (promise) => {
+    try {
+      return await promise;
+    } catch (err) {
+      const strErr = String(err);
+
+      if (
+        !strErr.includes("DID Doc not found") &&
+        !strErr.includes("not found: unknown request")
+      ) {
+        throw err;
+      }
+    }
+
+    return void 0;
+  };
 
   const obj = {
     [name]: class extends baseClass {
@@ -108,38 +127,23 @@ export function createInternalCheqdModule(
       async resourcesBy(did, cond) {
         const ids = await this.resourcesMetadataBy(did, cond);
 
-        try {
-          const queries = ids.map(async id => [id, await this.apiProvider.sdk.querier.resource.resource(
-            did,
-            id,
-          )]);
+        const queries = ids.map(async (id) => [
+          id,
+          await this.apiProvider.sdk.querier.resource.resource(did, id),
+        ]);
 
-          return new Map(await Promise.all(queries));
-        } catch (err) {
-          if (!String(err).includes('DID Doc not found')) {
-            throw err;
-          }
-        }
-
-        return new Map();
+        return new Map(await filterError(Promise.all(queries)));
       }
 
       async resource(did, id) {
         const strDid = CheqdDid.from(did).toEncodedString();
         const strID = String(TypedUUID.from(id));
 
-        try {
-          return await this.apiProvider.sdk.querier.resource.resource(
-            strDid,
-            strID,
-          );
-        } catch (err) {
-          if (!String(err).includes('DID Doc not found')) {
-            throw err;
-          }
-        }
-
-        return null;
+        return (
+          (await filterError(
+            this.apiProvider.sdk.querier.resource.resource(strDid, strID)
+          )) ?? null
+        );
       }
 
       async resourcesMetadataBy(did, cond, stop = (_) => false) {
@@ -149,21 +153,15 @@ export function createInternalCheqdModule(
         const encodedDid = CheqdDid.from(did).toEncodedString();
 
         do {
-          try {
-            // eslint-disable-next-line operator-linebreak
-            ({ resources, paginationKey } =
-              // eslint-disable-next-line no-await-in-loop
-              await this.apiProvider.sdk.querier.resource.collectionResources(
+          // eslint-disable-next-line operator-linebreak
+          ({ resources, paginationKey } =
+            // eslint-disable-next-line no-await-in-loop
+            await filterError(
+              this.apiProvider.sdk.querier.resource.collectionResources(
                 encodedDid,
-                paginationKey,
-              ));
-          } catch (err) {
-            if (!String(err).includes('DID Doc not found')) {
-              throw err;
-            } else {
-              break;
-            }
-          }
+                paginationKey
+              )
+            )) ?? { resources: [], paginationKey: null };
 
           res = res.concat(resources.filter(cond));
         } while (!stop(res) && paginationKey != null);
@@ -172,11 +170,18 @@ export function createInternalCheqdModule(
       }
 
       async latestResourcesMetadataBy(did, cond) {
-        return await this.resourcesMetadataBy(did, meta => cond(meta) && !meta.nextVersionId);
+        return await this.resourcesMetadataBy(
+          did,
+          (meta) => cond(meta) && !meta.nextVersionId
+        );
       }
 
       async latestResourceMetadataBy(did, cond) {
-        const meta = await this.resourcesMetadataBy(did, meta => cond(meta) && !meta.nextVersionId, res => res.length);
+        const meta = await this.resourcesMetadataBy(
+          did,
+          (meta) => cond(meta) && !meta.nextVersionId,
+          (res) => res.length
+        );
 
         return meta[0] ?? null;
       }

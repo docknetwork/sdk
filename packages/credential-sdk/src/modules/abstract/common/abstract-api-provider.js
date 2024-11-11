@@ -1,12 +1,21 @@
-import { withExtendedPrototypeProperties } from '../../../utils';
+import { withExtendedPrototypeProperties } from "../../../utils";
 
-class ApiProvider {
+class AbstractApiProvider {
   /**
    * Returns array of the methods supported by the given API.
    * @returns {Array<string>}
    */
   methods() {
-    throw new Error('Unimplemented');
+    throw new Error("Unimplemented");
+  }
+
+  /**
+   * Returns `true` in case the provided identifier is supported by the given API.
+   * @param {*} id
+   * @returns {boolean}
+   */
+  supportsIdentifier(_id) {
+    throw new Error("Unimplemented");
   }
 
   /**
@@ -14,7 +23,7 @@ class ApiProvider {
    * @returns {boolean}
    */
   isInitialized() {
-    throw new Error('Unimplemented');
+    throw new Error("Unimplemented");
   }
 
   /**
@@ -24,7 +33,7 @@ class ApiProvider {
    */
   ensureInitialized() {
     if (!this.isInitialized()) {
-      throw new Error('SDK is not initialized');
+      throw new Error("SDK is not initialized");
     }
 
     return this;
@@ -37,7 +46,7 @@ class ApiProvider {
    */
   ensureNotInitialized() {
     if (this.isInitialized()) {
-      throw new Error('SDK is already initialized');
+      throw new Error("SDK is already initialized");
     }
 
     return this;
@@ -48,6 +57,12 @@ class ApiProvider {
  * Base class that must be extended by all API providers.
  */
 export default withExtendedPrototypeProperties(
-  ['methods', 'isInitialized', 'stateChangeBytes', 'signAndSend'],
-  ApiProvider,
+  [
+    "methods",
+    "isInitialized",
+    "supportsIdentifier",
+    "stateChangeBytes",
+    "signAndSend",
+  ],
+  AbstractApiProvider
 );

@@ -1,9 +1,9 @@
-import { AbstractAccumulatorModule } from '../abstract';
-import { AccumulatorId, NamespaceDid } from '../../types';
-import { injectModuleRouter } from './common';
+import { AbstractAccumulatorModule } from "../abstract";
+import { AccumulatorId, NamespaceDid } from "../../types";
+import { injectModuleRouter } from "./common";
 
 export default class MultiApiAccumulatorModule extends injectModuleRouter(
-  AbstractAccumulatorModule,
+  AbstractAccumulatorModule
 ) {
   async addPublicKey(id, publicKey, targetDid, didKeypair, params) {
     const did = NamespaceDid.from(targetDid);
@@ -13,26 +13,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
       publicKey,
       did,
       didKeypair,
-      params,
-    );
-  }
-
-  /**
-   * Remove public key
-   * @param removeKeyId - The key index for key to remove.
-   * @param targetDid - The DID from which key is being removed
-   * @param signerDid - The DID that is removing the key by signing the payload because it controls `targetDid`
-   * @param signingKeyRef - Signer's signing key reference
-   * @returns {Promise<*>}
-   */
-  async removePublicKey(removeKeyId, targetDid, didKeypair, params) {
-    const did = NamespaceDid.from(targetDid);
-
-    return await this.moduleById(did).removePublicKey(
-      removeKeyId,
-      did,
-      didKeypair,
-      params,
+      params
     );
   }
 
@@ -50,7 +31,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
     accumulated,
     publicKeyRef,
     didKeypair,
-    params,
+    params
   ) {
     const accId = AccumulatorId.from(id);
 
@@ -59,7 +40,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
       accumulated,
       publicKeyRef,
       didKeypair,
-      params,
+      params
     );
   }
 
@@ -79,7 +60,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
     publicKeyRef,
     maxSize,
     didKeypair,
-    params,
+    params
   ) {
     const accId = AccumulatorId.from(id);
 
@@ -89,7 +70,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
       publicKeyRef,
       maxSize,
       didKeypair,
-      params,
+      params
     );
   }
 
@@ -107,7 +88,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
     accumulated,
     publicKeyRef,
     didKeypair,
-    params,
+    params
   ) {
     const accId = AccumulatorId.from(id);
 
@@ -116,7 +97,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
       accumulated,
       publicKeyRef,
       didKeypair,
-      params,
+      params
     );
   }
 
@@ -135,7 +116,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
     newAccumulated,
     { additions, removals, witnessUpdateInfo },
     didKeypair,
-    params,
+    params
   ) {
     const accId = AccumulatorId.from(id);
 
@@ -144,7 +125,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
       newAccumulated,
       { additions, removals, witnessUpdateInfo },
       didKeypair,
-      params,
+      params
     );
   }
 
@@ -160,7 +141,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
     return await this.moduleById(accId).removeAccumulator(
       id,
       didKeypair,
-      params,
+      params
     );
   }
 
@@ -180,7 +161,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
     return await this.moduleById(accId).getAccumulator(
       accId,
       includeKey,
-      includeKeyParams,
+      includeKeyParams
     );
   }
 
@@ -203,7 +184,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
       member,
       witness,
       from,
-      to,
+      to
     );
   }
 
@@ -288,18 +269,6 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
     return await this.moduleById(did).addParamsTx(...args);
   }
 
-  async removeParams(...args) {
-    const did = NamespaceDid.from(args[1]);
-
-    return await this.moduleById(did).removeParams(...args);
-  }
-
-  async removeParamsTx(...args) {
-    const did = NamespaceDid.from(args[1]);
-
-    return await this.moduleById(did).removeParamsTx(...args);
-  }
-
   /**
    * Add a positive (add-only) accumulator
    * @param id - Unique accumulator id
@@ -317,7 +286,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
       accId,
       accumulated,
       publicKeyRef,
-      didKeypair,
+      didKeypair
     );
   }
 
@@ -337,7 +306,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
     accumulated,
     publicKeyRef,
     maxSize,
-    didKeypair,
+    didKeypair
   ) {
     const accId = AccumulatorId.from(id);
 
@@ -346,7 +315,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
       accumulated,
       publicKeyRef,
       maxSize,
-      didKeypair,
+      didKeypair
     );
   }
 
@@ -367,7 +336,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
       accId,
       accumulated,
       publicKeyRef,
-      didKeypair,
+      didKeypair
     );
   }
 
@@ -386,7 +355,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
     id,
     newAccumulated,
     { additions, removals, witnessUpdateInfo },
-    didKeypair,
+    didKeypair
   ) {
     const accId = AccumulatorId.from(id);
 
@@ -394,7 +363,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
       accId,
       newAccumulated,
       { additions, removals, witnessUpdateInfo },
-      didKeypair,
+      didKeypair
     );
   }
 

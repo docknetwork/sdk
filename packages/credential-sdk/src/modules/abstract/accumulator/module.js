@@ -4,9 +4,8 @@ import { KBUniversalAccumulatorValue } from "@docknetwork/crypto-wasm-ts";
 import { normalizeToHex, normalizeToU8a } from "../../../utils/bytes";
 import {
   AbstractBaseModule,
-  AbstractWithParamsAndPublicKeys,
-  withParams,
-  withPublicKeys,
+  withAbstractParams,
+  withAbstractPublicKeys,
 } from "../common";
 import { AccumulatorParams, AccumulatorPublicKey } from "../../../types";
 import { withExtendedPrototypeProperties } from "../../../utils";
@@ -18,8 +17,8 @@ export const AccumulatorType = {
 };
 
 /** Class to manage accumulators on chain */
-class AbstractAccumulatorModule extends withParams(
-  withPublicKeys(AbstractBaseModule)
+class AbstractAccumulatorModule extends withAbstractParams(
+  withAbstractPublicKeys(AbstractBaseModule)
 ) {
   static Params = AccumulatorParams;
 
@@ -61,23 +60,6 @@ class AbstractAccumulatorModule extends withParams(
     return await super.addPublicKey(
       id,
       publicKey,
-      targetDid,
-      didKeypair,
-      params
-    );
-  }
-
-  /**
-   * Remove public key
-   * @param removeKeyId - The key index for key to remove.
-   * @param targetDid - The DID from which key is being removed
-   * @param signerDid - The DID that is removing the key by signing the payload because it controls `targetDid`
-   * @param signingKeyRef - Signer's signing key reference
-   * @returns {Promise<*>}
-   */
-  async removePublicKey(removeKeyId, targetDid, didKeypair, params) {
-    return await super.removePublicKey(
-      removeKeyId,
       targetDid,
       didKeypair,
       params

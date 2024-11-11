@@ -3,8 +3,8 @@ import {
   withExtendedStaticProperties,
 } from "../../../utils";
 
-export default function withParams(klass) {
-  const name = `withParams(${klass.name})`;
+export default function withAbstractParams(klass) {
+  const name = `withAbstractParams(${klass.name})`;
 
   const obj = {
     [name]: class extends klass {

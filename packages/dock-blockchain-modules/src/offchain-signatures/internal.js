@@ -14,6 +14,7 @@ import {
 import injectParams from "../common/inject-params";
 import injectPublicKeys from "../common/inject-public-keys";
 import { DockDIDModuleInternal } from "../did/internal";
+import { DockOffchainSignatureParamsRef } from "@docknetwork/credential-sdk/types";
 
 export default class DockInternalOffchainSignaturesModule extends injectParams(
   injectPublicKeys(class OffchainSignatures {})
@@ -39,6 +40,8 @@ export default class DockInternalOffchainSignaturesModule extends injectParams(
   static Params = OffchainSignatureParams;
 
   static ParamsQuery = "signatureParams";
+
+  static ParamsRef = DockOffchainSignatureParamsRef;
 
   static PublicKeyQuery = "publicKeys";
 

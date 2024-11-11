@@ -1,37 +1,42 @@
 import {
   TypedMap,
   TypedNumber,
-  TypedNumber,
   option,
 } from "@docknetwork/credential-sdk/types/generic";
 import { createInternalCheqdModule } from "./builders";
+import { stringToU8a } from "@docknetwork/credential-sdk/utils";
+import { CheqdCreateResource } from "./payload";
+import {
+  maybeToJSONString,
+  u8aToString,
+} from "@docknetwork/credential-sdk/utils";
 
 const methods = {
-    addParams: (id, params, did) => new CheqdCreateResource(
-        did.value.value,
-        id,
-        '1.0',
-        [],
-        'OffchainSignatureParams',
-        'offchain-signature-params',
-        params.toJSON(),
-    )
+  addParams: (id, params, did) =>
+    new CheqdCreateResource(
+      did.value.value,
+      id,
+      "1.0",
+      [],
+      "OffchainParams",
+      "offchain-signature-params",
+      stringToU8a(maybeToJSONString(params))
+    ),
 };
-  
 
 export default function injectParams(klass) {
-  return class extends createInternalCheqdModule({ methods }, klass) {
-    static Prop = 'resource';
+  return class extends createInternalCheqdModule(methods, klass) {
+    static Prop = "resource";
 
     static get MsgNames() {
-        const names = super.MsgNames ?? {};
+      const names = super.MsgNames ?? {};
 
-        return {
-            ...names,
-            addParams: 'MsgCreateResource'
-        }
+      return {
+        ...names,
+        addParams: "MsgCreateResource",
+      };
     }
-  
+
     static get ParamsMap() {
       const { Params } = this;
 
@@ -49,8 +54,10 @@ export default function injectParams(klass) {
      * @returns {Promise<Params>}
      */
     async getParams(did, id) {
+      const bytes = (await this.resource(did, id))?.resource?.data;
+
       return option(this.constructor.Params).from(
-        (await this.resource(did, id))?.resource?.data
+        bytes && JSON.parse(u8aToString(bytes))
       );
     }
 

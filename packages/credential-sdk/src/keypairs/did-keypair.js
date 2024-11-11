@@ -1,8 +1,8 @@
-import DockKeypair from './keypair';
-import { DidKey } from '../types/did/onchain/did-key';
-import { VerificationMethodRefOrIdentRef } from '../types/did/document';
-import { ensureInstanceOf } from '../utils';
-import { DidMethodKey } from '../types/did/onchain/typed-did';
+import DockKeypair from "./keypair";
+import { DidKey } from "../types/did/onchain/did-key";
+import { VerificationMethodRefOrIdentRef } from "../types/did/document";
+import { ensureInstanceOf } from "../utils";
+import { DidMethodKey } from "../types/did/onchain/typed-did";
 
 /**
  * A class representation of DID Keypair which includes a signing keypair and its associated verification method reference identifier.
@@ -47,7 +47,7 @@ export default class DidKeypair {
   /**
    * Creates a new `DidKey` instance from the public key of the current key pair.
    *
-   * @param {Array} verRels - Array of verification relationships.
+   * @param {?number} verRels - Number indicating verification relationships.
    * @return The new instance of `DidKey`.
    */
   didKey(verRels) {

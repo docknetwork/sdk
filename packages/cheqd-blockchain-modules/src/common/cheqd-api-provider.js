@@ -1,11 +1,11 @@
-import { ApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
-import { ensureInstanceOf } from '@docknetwork/credential-sdk/utils/type-helpers';
+import { AbstractApiProvider } from "@docknetwork/credential-sdk/modules/abstract/common";
+import { ensureInstanceOf } from "@docknetwork/credential-sdk/utils/type-helpers";
 
-class CheqdApiProvider extends ApiProvider {
+class CheqdApiProvider extends AbstractApiProvider {
   constructor(cheqd) {
     super();
 
-    this.cheqd = ensureInstanceOf(cheqd, ApiProvider);
+    this.cheqd = ensureInstanceOf(cheqd, AbstractApiProvider);
   }
 
   get sdk() {
@@ -22,6 +22,10 @@ class CheqdApiProvider extends ApiProvider {
 
   isInitialized() {
     return this.cheqd.isInitialized();
+  }
+
+  supportsIdentifier(id) {
+    return this.cheqd.supportsIdentifier(id);
   }
 
   async stateChangeBytes(name, payload) {

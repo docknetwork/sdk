@@ -228,10 +228,12 @@ describe.each(Schemes)(
       });
 
       if (Name !== "BBDT16") {
-        const pk1 = Module.prepareAddPublicKey(
-          u8aToHex(keypair.publicKeyBuffer)
+        await chainModule.dockOnly.addPublicKey(
+          null,
+          new Module.DockOnly.PublicKey(u8aToHex(keypair.publicKeyBuffer)),
+          did1,
+          pair1
         );
-        await chainModule.addPublicKey(null, pk1, did1, pair1);
 
         didDocument = (await modules.did.getDocument(did1)).toJSON();
         const { verificationMethod } = didDocument;

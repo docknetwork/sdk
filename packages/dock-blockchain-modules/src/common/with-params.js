@@ -1,6 +1,3 @@
-import { withExtendedStaticProperties } from "@docknetwork/credential-sdk/utils";
-import injectDock from "./inject-dock";
-
 /**
  * Wraps supplied class into a class with logic for public keys and corresponding setup parameters.
  */
@@ -50,5 +47,5 @@ export default function withParams(klass) {
     },
   };
 
-  return withExtendedStaticProperties(["ParamsRef"], obj[name]);
+  return obj[name];
 }

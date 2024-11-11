@@ -8,7 +8,6 @@ import {
   DockPositiveAccumulator,
   AccumulatorParams,
   DockAccumulatorPublicKey,
-  DockAccumulatorParamsRef,
   DockAccumulatorIdIdent,
 } from "@docknetwork/credential-sdk/types";
 import { option, withProp } from "@docknetwork/credential-sdk/types/generic";
@@ -28,8 +27,6 @@ export default class DockAccumulatorModule extends withParams(
 ) {
   static DockOnly = DockInternalAccumulatorModule;
 
-  static ParamsRef = DockAccumulatorParamsRef;
-
   async addPublicKeyTx(...args) {
     if (args.length === 4) {
       const [id, publicKey, targetDid, didKeypair] = args;
@@ -37,24 +34,6 @@ export default class DockAccumulatorModule extends withParams(
       return await super.addPublicKeyTx(id, publicKey, targetDid, didKeypair);
     } else {
       return await super.addPublicKeyTx(...args);
-    }
-  }
-
-  /**
-   * Remove public key
-   * @param removeKeyId - The key index for key to remove.
-   * @param targetDid - The DID from which key is being removed
-   * @param signerDid - The DID that is removing the key by signing the payload because it controls `targetDid`
-   * @param signingKeyRef - Signer's signing key reference
-   * @returns {Promise<*>}
-   */
-  async removePublicKeyTx(...args) {
-    if (args.length === 3) {
-      const [id, did, didKeypair] = args;
-
-      return await super.removePublicKeyTx(id, did, didKeypair);
-    } else {
-      return await super.removePublicKeyTx(...args);
     }
   }
 

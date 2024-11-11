@@ -1,5 +1,5 @@
-import { withExtendedStaticProperties } from "@docknetwork/credential-sdk/utils";
-import { TypedUUID, option } from "@docknetwork/credential-sdk/types";
+import { TypedUUID, option } from "@docknetwork/credential-sdk/types/generic";
+import { CheqdParamsId } from "@docknetwork/credential-sdk/types";
 
 /**
  * Wraps supplied class into a class with logic for public keys and corresponding setup parameters.
@@ -18,7 +18,12 @@ export default function withParams(klass) {
        * @returns {Promise<*>}
        */
       async addParamsTx(id, param, targetDid, didKeypair) {
-        return await this.cheqdOnly.tx.addParams(id, param, targetDid, didKeypair);
+        return await this.cheqdOnly.tx.addParams(
+          id,
+          param,
+          targetDid,
+          didKeypair
+        );
       }
 
       /**
@@ -41,14 +46,21 @@ export default function withParams(klass) {
       }
 
       async lastParamsId(targetDid) {
-        return option(TypedUUID).from((await this.cheqdOnly.latestResourceMetadataBy(targetDid, this.cheqdOnly.filterMetadata))?.id);
+        return option(TypedUUID).from(
+          (
+            await this.cheqdOnly.latestResourceMetadataBy(
+              targetDid,
+              this.cheqdOnly.filterMetadata
+            )
+          )?.id
+        );
       }
 
       async nextParamsId(_) {
-        return TypedUUID.random();
+        return CheqdParamsId.random();
       }
     },
   };
 
-  return withExtendedStaticProperties(["ParamsRef"], obj[name]);
+  return obj[name];
 }

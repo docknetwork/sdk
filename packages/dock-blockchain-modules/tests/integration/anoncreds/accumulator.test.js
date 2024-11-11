@@ -540,47 +540,6 @@ describe("Accumulator Module", () => {
     await checkUpdate(1);
   }, 50000);
 
-  test("Can remove public keys and params", async () => {
-    await chainModule.removePublicKey(1, did1, pair1);
-    const pk1 = await chainModule.getPublicKey(did1, 1);
-    expect(pk1).toEqual(null);
-
-    const pksByDid1 = [
-      ...(await chainModule.getAllPublicKeysByDid(did1)).values(),
-    ];
-    expect(pksByDid1.length).toEqual(0);
-
-    await chainModule.removeParams(1, did1, pair1);
-    const params1 = await chainModule.getParams(did1, 1);
-    expect(params1).toEqual(null);
-
-    await expect(chainModule.getPublicKey(did2, 1, true)).rejects.toThrow();
-
-    await chainModule.removePublicKey(1, did2, pair2);
-    const pk2 = await chainModule.getPublicKey(did2, 1);
-    expect(pk2).toEqual(null);
-
-    const pksByDid2 = [
-      ...(await chainModule.getAllPublicKeysByDid(did2)).values(),
-    ];
-    expect(pksByDid2.length).toEqual(1);
-
-    const queriedPk2 = await chainModule.getPublicKey(did2, 2);
-    expect(pksByDid2[0].eq(queriedPk2)).toBe(true);
-
-    await chainModule.removePublicKey(2, did2, pair2);
-    const pk3 = await chainModule.getPublicKey(did2, 2);
-    expect(pk3).toEqual(null);
-
-    await chainModule.removeParams(2, did1, pair1);
-    const params2 = await chainModule.getParams(did1, 2);
-    expect(params2).toEqual(null);
-
-    await chainModule.removeParams(1, did2, pair2);
-    const params3 = await chainModule.getParams(did2, 1);
-    expect(params3).toEqual(null);
-  }, 50000);
-
   test("Can add and remove accumulator without public key", async () => {
     await checkAddRemove(0);
   }, 50000);

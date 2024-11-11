@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/credential-sdk",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "license": "MIT",
   "type": "module",
   "files": [
@@ -35,6 +35,7 @@
     "@digitalcredentials/vc-status-list": "^8.0.0",
     "@docknetwork/crypto-wasm-ts": "^0.63.0",
     "@juanelas/base64": "^1.1.5",
+    "@sphereon/ssi-sdk-ext.did-resolver-jwk": "^0.25.0",
     "@stablelib/ed25519": "^1.0.0",
     "@subsquid/ss58-codec": "latest",
     "@transmute/json-web-signature": "^0.7.0-unstable.82",

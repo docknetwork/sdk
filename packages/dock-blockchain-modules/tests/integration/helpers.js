@@ -3,7 +3,7 @@ import { randomAsHex } from "@docknetwork/credential-sdk/utils";
 import { MaxGas, MinGasPrice } from "../test-constants";
 import { DockDid, DidKey } from "@docknetwork/credential-sdk/types/did";
 import { Ed25519Keypair } from "@docknetwork/credential-sdk/keypairs";
-import { DIDDocument } from "@docknetwork/credential-sdk/types/did/document";
+import { DIDDocument } from "@docknetwork/credential-sdk/types/did";
 import DockDIDModule from "../../src/did/module";
 
 /**

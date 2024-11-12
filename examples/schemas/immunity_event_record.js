@@ -1,4 +1,4 @@
-import proofOfHealthCoreSchema from "./proof_of_health_core";
+import proofOfHealthCoreSchema from "./proof_of_health_core.js";
 
 const schema = {
   $schema: "http://json-schema.org/draft-07/schema#",

@@ -16,7 +16,7 @@ import {
   Bls12381PSDockVerKeyName,
   JsonWebSignature2020,
   Ed25519Signature2020,
-} from './custom_crypto';
+} from './crypto';
 import {
   Bls12381BBDT16DockVerKeyName,
   Bls12381BBDT16MacDockName,

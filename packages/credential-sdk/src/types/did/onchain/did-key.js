@@ -21,7 +21,7 @@ import {
   Bls12381BBS23DockVerKeyName,
   Bls12381BBSDockVerKeyName,
   Bls12381PSDockVerKeyName,
-} from '../../../vc/custom_crypto';
+} from '../../../vc/crypto';
 
 /**
  * Class representing either of possible DidKeys.

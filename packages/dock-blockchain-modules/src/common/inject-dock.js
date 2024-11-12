@@ -1,4 +1,4 @@
-import { withExtendedStaticProperties } from '@docknetwork/credential-sdk/utils/inheritance';
+import { withExtendedStaticProperties } from '@docknetwork/credential-sdk/utils';
 import DockApiProvider from './dock-api-provider';
 
 export default function injectDock(klass) {

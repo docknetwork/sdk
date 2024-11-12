@@ -5,10 +5,10 @@ import {
   validateCredentialSchema,
 } from '@docknetwork/credential-sdk/vc';
 
-import prCardSchema from './schemas/pr_card';
-import infectionDiagnosisSchema from './schemas/infection_diagnosis';
-import immunityEventRecordSchema from './schemas/immunity_event_record';
-import noInfectionSchema from './schemas/non_infection_check';
+import prCardSchema from './schemas/pr_card.js';
+import infectionDiagnosisSchema from './schemas/infection_diagnosis.js';
+import immunityEventRecordSchema from './schemas/immunity_event_record.js';
+import noInfectionSchema from './schemas/non_infection_check.js';
 
 // Schema from here https://github.com/w3c-ccg/vc-examples/blob/master/plugfest-2020/vendors/sicpa/credentials/PermanentResidentCard.json
 const credPRCard = {

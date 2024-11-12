@@ -14,7 +14,7 @@ import {
 } from './actions';
 import injectParams from '../common/inject-params';
 import injectPublicKeys from '../common/inject-public-keys';
-import { DockDIDModuleInternal } from '../did/internal';
+import DockDIDModuleInternal from '../did/internal';
 
 export default class DockInternalOffchainSignaturesModule extends injectParams(
   injectPublicKeys(class OffchainSignatures {}),

@@ -1,5 +1,5 @@
-import AbstractBlobModule from '@docknetwork/credential-sdk/modules/abstract/blob/module';
-import { NoBlobError } from '@docknetwork/credential-sdk/modules/abstract/blob/errors';
+import { AbstractBlobModule } from '@docknetwork/credential-sdk/modules';
+import { NoBlobError } from '@docknetwork/credential-sdk/modules/abstract/blob';
 import { CheqdBlobId } from '@docknetwork/credential-sdk/types';
 import { injectCheqd } from '../common';
 import CheqdInternalBlobModule from './internal';

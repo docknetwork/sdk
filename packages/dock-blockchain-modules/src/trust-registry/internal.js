@@ -6,10 +6,9 @@ import {
 import {
   isHexWithGivenByteSize,
   u8aToHex,
-} from '@docknetwork/credential-sdk/utils/bytes';
-import { ensureMatchesPattern } from '@docknetwork/credential-sdk/utils/misc';
+  ensureMatchesPattern, maybeToJSON,
+} from '@docknetwork/credential-sdk/utils';
 import { IssuersSet } from '@docknetwork/credential-sdk/types/trust-registry';
-import { maybeToJSON } from '@docknetwork/credential-sdk/utils';
 import { createInternalDockModule } from '../common';
 
 const callValueMethodOrObjectMethod = (method) => (value) => (typeof value[method] === 'function'

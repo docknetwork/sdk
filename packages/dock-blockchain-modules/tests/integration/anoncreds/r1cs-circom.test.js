@@ -2,7 +2,7 @@ import {
   hexToU8a,
   stringToHex,
   u8aToHex,
-} from "@docknetwork/credential-sdk/utils/bytes";
+} from "@docknetwork/credential-sdk/utils";
 
 import {
   Encoder,

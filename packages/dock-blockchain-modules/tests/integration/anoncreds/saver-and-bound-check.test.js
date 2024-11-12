@@ -3,7 +3,7 @@ import {
   stringToHex,
   stringToU8a,
   u8aToHex,
-} from "@docknetwork/credential-sdk/utils/bytes";
+} from "@docknetwork/credential-sdk/utils";
 
 import {
   Statement,

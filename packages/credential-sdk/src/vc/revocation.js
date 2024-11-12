@@ -6,7 +6,6 @@ import {
   KB_UNI_ACCUMULATOR_24,
 } from '@docknetwork/crypto-wasm-ts';
 import { randomAsHex, u8aToHex } from '../utils/bytes';
-import { OneOfPolicy } from '../types/policy';
 
 import {
   RevRegType,
@@ -142,5 +141,3 @@ export async function checkRevocationRegistryStatus(
 
   return { verified: true };
 }
-
-export { OneOfPolicy, RevRegType, DockRevRegQualifier };

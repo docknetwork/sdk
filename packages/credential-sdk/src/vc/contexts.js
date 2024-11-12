@@ -16,6 +16,7 @@ import dockPrettyVCContext from './contexts/prettyvc.json';
 import jws2020V1Context from './contexts/jws-2020-v1.json';
 import statusList21Context from './contexts/status-list-21';
 import privateStatusList21Context from './contexts/private-status-list-21';
+import sphereonId from './contexts/sphereon-wallet-identity-v1.json';
 
 // Lookup of following URLs will lead to loading data from the context directory, this is done as the Sr25519 keys are not
 // supported in any W3C standard and vc-js has them stored locally. This is a temporary solution.
@@ -42,4 +43,9 @@ export default new Map([
   // This is overridden because the URL is 404 now, likely because domain name change. But the status-list library still uses the old domain name
   ['https://w3id.org/vc/status-list/2021/v1', statusList21Context],
   ['https://ld.dock.io/private-status-list-21', privateStatusList21Context],
+  // Overriden due to 404ing
+  [
+    'https://sphereon-opensource.github.io/ssi-mobile-wallet/context/sphereon-wallet-identity-v1.jsonld',
+    sphereonId,
+  ],
 ]);

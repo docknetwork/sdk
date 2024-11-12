@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/credential-sdk",
-  "version": "0.4.0",
+  "version": "0.7.0",
   "license": "MIT",
   "type": "module",
   "files": [
@@ -9,10 +9,15 @@
   "exports": {
     ".": {
       "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js",
+      "require": "./dist/cjs/index.cjs",
       "default": "./dist/esm/index.js"
     },
     "./*": {
+      "import": "./dist/esm/*/index.js",
+      "require": "./dist/cjs/*/index.cjs",
+      "default": "./dist/esm/*/index.js"
+    },
+    "./src/*": {
       "import": "./dist/esm/*",
       "require": "./dist/cjs/*",
       "default": "./dist/esm/*"
@@ -30,7 +35,8 @@
     "@digitalcredentials/vc-status-list": "^8.0.0",
     "@docknetwork/crypto-wasm-ts": "^0.63.0",
     "@juanelas/base64": "^1.1.5",
-    "@stablelib/ed25519": "^2.0.0",
+    "@sphereon/ssi-sdk-ext.did-resolver-jwk": "^0.25.0",
+    "@stablelib/ed25519": "^1.0.0",
     "@subsquid/ss58-codec": "latest",
     "@transmute/json-web-signature": "^0.7.0-unstable.82",
     "blakejs": "^1.2.1",

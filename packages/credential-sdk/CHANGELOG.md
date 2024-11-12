@@ -1,5 +1,23 @@
 # @docknetwork/credential-sdk
 
+## 0.7.0
+
+### Minor Changes
+
+- JWT fixes
+
+## 0.6.0
+
+### Minor Changes
+
+- Fix remaining exports from the `vc` module
+
+## 0.5.0
+
+### Minor Changes
+
+- Fix exports
+
 ## 0.4.0
 
 ### Minor Changes

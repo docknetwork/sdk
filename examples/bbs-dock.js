@@ -1,6 +1,6 @@
 import { initializeWasm } from '@docknetwork/credential-sdk/crypto';
 import { Resolver } from '@docknetwork/credential-sdk/resolver';
-import Bls12381G2KeyPairDock2022 from '@docknetwork/credential-sdk/vc/crypto/Bls12381G2KeyPairDock2022';
+import { Bls12381G2KeyPairDock2022 } from '@docknetwork/credential-sdk/vc/crypto';
 import {
   issueCredential,
   verifyCredential,

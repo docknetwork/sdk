@@ -1,4 +1,4 @@
-import { u8aToHex, stringToU8a } from "@docknetwork/credential-sdk/utils/bytes";
+import { u8aToHex, stringToU8a } from "@docknetwork/credential-sdk/utils";
 import b58 from "bs58";
 import {
   BBDT16MacSecretKey,

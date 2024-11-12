@@ -8,7 +8,7 @@ import DockOffchainSignaturesModule from './module';
 import DockInternalOffchainSignaturesModule from './internal';
 
 /** Class to write `BBS+` parameters and keys on chain */
-export default class BBSPlusModule extends DockOffchainSignaturesModule {
+export default class DockBBSPlusModule extends DockOffchainSignaturesModule {
   static DockOnly = class DockInternalBBSPlusModuleOverrides extends DockInternalOffchainSignaturesModule {
     static PublicKey = BBSPlusPublicKey;
 

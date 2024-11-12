@@ -27,7 +27,7 @@ import defaultDocumentLoader from './document-loader';
 import {
   Bls12381BBSSignatureDock2023,
   Bls12381PSSignatureDock2023,
-} from './custom_crypto';
+} from './crypto';
 import Bls12381BBDT16MACDock2024 from './crypto/Bls12381BBDT16MACDock2024';
 
 import { isCredVerGte060 } from './crypto/common/DockCryptoSignature';

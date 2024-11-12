@@ -22,14 +22,16 @@ import {
 import dotenv from "dotenv";
 import { DockBBSModule, DockBBSPlusModule, DockPSModule } from "../src";
 import Presentation from "@docknetwork/credential-sdk/vc/presentation";
-import Bls12381PSSignatureProofDock2023 from "@docknetwork/credential-sdk/vc/crypto/Bls12381PSSignatureProofDock2023";
-import Bls12381BBSSignatureProofDock2023 from "@docknetwork/credential-sdk/vc/crypto/Bls12381BBSSignatureProofDock2023";
-import Bls12381BBSSignatureProofDock2022 from "@docknetwork/credential-sdk/vc/crypto/Bls12381BBSSignatureProofDock2022";
-import Bls12381BBSKeyPairDock2023 from "@docknetwork/credential-sdk/vc/crypto/Bls12381BBSKeyPairDock2023";
-import Bls12381G2KeyPairDock2022 from "@docknetwork/credential-sdk/vc/crypto/Bls12381G2KeyPairDock2022";
-import Bls12381PSKeyPairDock2023 from "@docknetwork/credential-sdk/vc/crypto/Bls12381PSKeyPairDock2023";
-import Bls12381BBDT16KeyPairDock2024 from "@docknetwork/credential-sdk/vc/crypto/Bls12381BBDT16KeyPairDock2024";
-import Bls12381BBDT16MACProofDock2024 from "@docknetwork/credential-sdk/vc/crypto/Bls12381BBDT16MACProofDock2024";
+import {
+  Bls12381PSSignatureProofDock2023,
+  Bls12381BBSSignatureProofDock2023,
+  Bls12381BBSSignatureProofDock2022,
+  Bls12381BBSKeyPairDock2023,
+  Bls12381G2KeyPairDock2022,
+  Bls12381PSKeyPairDock2023,
+  Bls12381BBDT16KeyPairDock2024,
+  Bls12381BBDT16MACProofDock2024,
+} from "@docknetwork/credential-sdk/vc/crypto";
 
 dotenv.config();
 const DefaultFullNodeEndpoint = "ws://127.0.0.1:9944";

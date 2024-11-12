@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.8.0
+
+### Minor Changes
+
+- Export CustomLinkedDataSignature
+
 ## 0.7.0
 
 ### Minor Changes

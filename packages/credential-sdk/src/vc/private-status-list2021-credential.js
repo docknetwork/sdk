@@ -1,6 +1,6 @@
 import StatusList2021Credential from './status-list2021-credential';
 import { PrivateStatusList2021Qualifier } from './constants';
-import { ensurePrivateStatusListId } from '../utils/type-helpers';
+import { ensurePrivateStatusListId } from '../utils';
 
 /**
  * Private Status list 2021 verifiable credential. Similar to Status list 2021 credential but isn't stored on chain.

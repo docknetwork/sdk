@@ -1,7 +1,7 @@
 import Resolver from './resolver';
 import { cacheLast, itemsOrWildcard } from '../utils';
 import { WILDCARD } from './const';
-import { ensureString } from '../../utils/type-helpers';
+import { ensureString } from '../../utils';
 
 /**
  * Acts as a router and resolves an entity using a provided list of resolvers.

@@ -36,7 +36,7 @@ import {
   getKeyFromDIDDocument,
   processIfKvac,
 } from './helpers';
-import { ensureValidDatetime } from '../utils/type-helpers';
+import { ensureValidDatetime } from '../utils';
 
 import {
   EcdsaSecp256k1Signature2019,

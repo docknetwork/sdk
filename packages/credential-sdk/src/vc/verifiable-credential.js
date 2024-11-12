@@ -10,7 +10,7 @@ import {
   ensureString,
   ensureURI,
   ensureValidDatetime,
-} from '../utils/type-helpers';
+} from '../utils';
 import { getUniqueElementsFromArray } from '../utils/misc';
 
 /**

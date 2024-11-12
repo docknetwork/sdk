@@ -1,4 +1,4 @@
-import { ensureString } from '../../utils/type-helpers';
+import { ensureString } from '../../utils';
 import { WILDCARD } from './const';
 
 /**

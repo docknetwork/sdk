@@ -1,5 +1,5 @@
 import { AbstractApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
-import { ensureInstanceOf } from '@docknetwork/credential-sdk/utils/type-helpers';
+import { ensureInstanceOf } from '@docknetwork/credential-sdk/utils';
 import DockDIDModuleInternal from '../did/internal';
 
 class DockApiProvider extends AbstractApiProvider {

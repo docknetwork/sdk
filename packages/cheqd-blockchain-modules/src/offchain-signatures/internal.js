@@ -1,9 +1,9 @@
-import injectParams from "../common/inject-params";
+import injectParams from '../common/inject-params';
 
 export default class CheqdOffchainSignaturesInternalModule extends injectParams(
-  class {}
+  class {},
 ) {
   filterMetadata(meta) {
-    return meta.resourceType === "offchain-signature-params";
+    return meta.resourceType === 'offchain-signature-params';
   }
 }

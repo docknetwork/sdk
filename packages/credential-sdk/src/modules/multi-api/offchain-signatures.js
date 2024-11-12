@@ -1,9 +1,9 @@
-import { AbstractOffchainSignaturesModule } from "../abstract";
-import { NamespaceDid } from "../../types";
-import { injectModuleRouter } from "./common";
+import { AbstractOffchainSignaturesModule } from '../abstract';
+import { NamespaceDid } from '../../types';
+import { injectModuleRouter } from './common';
 
 export default class MultiApiOffchainSignatures extends injectModuleRouter(
-  AbstractOffchainSignaturesModule
+  AbstractOffchainSignaturesModule,
 ) {
   /**
    * Add new signature params.
@@ -22,7 +22,7 @@ export default class MultiApiOffchainSignatures extends injectModuleRouter(
       params,
       did,
       didKeypair,
-      txParams
+      txParams,
     );
   }
 

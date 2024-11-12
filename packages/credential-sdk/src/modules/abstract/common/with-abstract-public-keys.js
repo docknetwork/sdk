@@ -1,7 +1,7 @@
 import {
   withExtendedPrototypeProperties,
   withExtendedStaticProperties,
-} from "../../../utils";
+} from '../../../utils';
 
 export default function withAbstractPublicKeys(klass) {
   const name = `withAbstractPublicKeys(${klass.name})`;
@@ -33,7 +33,7 @@ export default function withAbstractPublicKeys(klass) {
       async addPublicKey(id, publicKey, targetDid, didKeypair, params) {
         return await this.signAndSend(
           await this.addPublicKeyTx(id, publicKey, targetDid, didKeypair),
-          params
+          params,
         );
       }
 
@@ -44,7 +44,7 @@ export default function withAbstractPublicKeys(klass) {
        * @returns {Promise<Params>}
        */
       async getPublicKey(_did, _id, _includeParams = false) {
-        throw new Error("Unimplemented");
+        throw new Error('Unimplemented');
       }
 
       /**
@@ -53,7 +53,7 @@ export default function withAbstractPublicKeys(klass) {
        * @returns {Promise<Map<Id, Params>>}
        */
       async getAllPublicKeysByDid(_did, _includeParams = false) {
-        throw new Error("Unimplemented");
+        throw new Error('Unimplemented');
       }
 
       /**
@@ -62,7 +62,7 @@ export default function withAbstractPublicKeys(klass) {
        * @returns {Promise<Id>}
        */
       async lastPublicKeyId(_targetDid) {
-        throw new Error("Unimplemented");
+        throw new Error('Unimplemented');
       }
 
       /**
@@ -71,7 +71,7 @@ export default function withAbstractPublicKeys(klass) {
        * @returns {Promise<Id>}
        */
       async nextPublicKeyId(_targetDid) {
-        throw new Error("Unimplemented");
+        throw new Error('Unimplemented');
       }
     },
   };
@@ -81,11 +81,11 @@ export default function withAbstractPublicKeys(klass) {
    */
   return withExtendedPrototypeProperties(
     [
-      "addPublicKeyTx",
-      "getAllPublicKeysByDid",
-      "lastPublicKeyId",
-      "nextPublicKeyId",
+      'addPublicKeyTx',
+      'getAllPublicKeysByDid',
+      'lastPublicKeyId',
+      'nextPublicKeyId',
     ],
-    withExtendedStaticProperties(["PublicKey"], obj[name])
+    withExtendedStaticProperties(['PublicKey'], obj[name]),
   );
 }

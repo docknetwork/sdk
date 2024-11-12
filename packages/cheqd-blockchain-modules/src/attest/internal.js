@@ -30,11 +30,11 @@ export default class CheqdInternalAttestModule extends createInternalCheqdModule
   }
 
   async attestId(did) {
-    const meta = await this.latestResourceMetadataBy(
+    const res = await this.latestResourceMetadataBy(
       did,
       (meta) => meta.resourceType === 'attest',
     );
 
-    return meta?.id;
+    return res?.id;
   }
 }

@@ -2960,6 +2960,45 @@
     fix-esm "^1.0.1"
     jsonld digitalcredentials/jsonld.js#v10.x
 
+"@docknetwork/cheqd-blockchain-api@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/cheqd-blockchain-api/-/cheqd-blockchain-api-0.4.0.tgz#7c416d09f1bc71367cd7428fced083553123ccfe"
+  integrity sha512-d1ZoMf6/OQ1j1nmSzuK6RQxJEQkecFdgIiQOJaVkpnofX/O608+agpb3FE7RoN9vOrxT3suN4CLBZt8uo5+brQ==
+  dependencies:
+    "@cheqd/sdk" "^4.0.4"
+
+"@docknetwork/credential-sdk@0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/credential-sdk/-/credential-sdk-0.6.0.tgz#6390cfcd17758c0f13ba26773dc898353f1299c7"
+  integrity sha512-ANbD5S+79ZJAkyuE8Hzgr89tVu5lhqmwWL7NYJnmG8kzjlRJafZwJqg15G88fkZ07Te0eTV9GMIfD8M7w0On9g==
+  dependencies:
+    "@comunica/actor-init-sparql-rdfjs" "^1.22.3"
+    "@digitalcredentials/vc-status-list" "^8.0.0"
+    "@docknetwork/crypto-wasm-ts" "^0.63.0"
+    "@juanelas/base64" "^1.1.5"
+    "@stablelib/ed25519" "^1.0.0"
+    "@subsquid/ss58-codec" latest
+    "@transmute/json-web-signature" "^0.7.0-unstable.82"
+    blakejs "^1.2.1"
+    bs58 "^5.0.0"
+    deep-equal "^2.2.3"
+    elliptic "6.6.0"
+    js-sha256 "^0.11.0"
+    json-canonicalize "1.0.4"
+    json-stringify-deterministic "^1.0.12"
+    jsonld "^5.0.0"
+    jsonld-signatures "^9.3.1"
+    jsonschema "1.4.1"
+    key-did-resolver "^1.4.0"
+    mrklt "^0.2.0"
+    multiformats "^9.5.4"
+    n3 "^1.17.4"
+    rify "^0.7.1"
+    semver "^7.6.0"
+    uuid "^10.0.0"
+    uuidv4 "^6.2.13"
+    varint "^6.0.0"
+
 "@docknetwork/crypto-wasm-ts@^0.63.0":
   version "0.63.0"
   resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.63.0.tgz#f1ab39693b63e70d682d362e9eacd85842ae56e0"
@@ -5051,7 +5090,7 @@
   resolved "https://registry.yarnpkg.com/@stablelib/constant-time/-/constant-time-1.0.1.tgz#bde361465e1cf7b9753061b77e376b0ca4c77e35"
   integrity sha512-tNOs3uD0vSJcK6z1fvef4Y+buN7DXhzHDPqRLSXUel1UfqMB1PWNsnnAezrKfEwTLpN0cGH2p9NNjs6IqeD0eg==
 
-"@stablelib/ed25519@^1.0.1", "@stablelib/ed25519@^1.0.2", "@stablelib/ed25519@^1.0.3":
+"@stablelib/ed25519@^1.0.0", "@stablelib/ed25519@^1.0.1", "@stablelib/ed25519@^1.0.2", "@stablelib/ed25519@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@stablelib/ed25519/-/ed25519-1.0.3.tgz#f8fdeb6f77114897c887bb6a3138d659d3f35996"
   integrity sha512-puIMWaX9QlRsbhxfDc5i+mNPMY+0TmQEskunY1rZEBPi1acBCVQAhnsk/1Hk50DGPtVsZtAWQg4NHGlVaO9Hqg==
@@ -9558,7 +9597,7 @@ jsonld@digitalcredentials/jsonld.js#v10.x:
   version "8.3.3-0"
   resolved "https://codeload.github.com/digitalcredentials/jsonld.js/tar.gz/14357f7a1181ae769ecc50fee9303468f17665ff"
   dependencies:
-    "@digitalbazaar/http-client" "^4.1.1"
+    "@digitalbazaar/http-client" "^4.1.0"
     canonicalize "^1.0.1"
     lru-cache "^6.0.0"
     rdf-canonize "^4.0.1"

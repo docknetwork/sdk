@@ -1,5 +1,5 @@
-import { TypedUUID, option } from "@docknetwork/credential-sdk/types/generic";
-import { CheqdParamsId } from "@docknetwork/credential-sdk/types";
+import { TypedUUID, option } from '@docknetwork/credential-sdk/types/generic';
+import { CheqdParamsId } from '@docknetwork/credential-sdk/types';
 
 /**
  * Wraps supplied class into a class with logic for public keys and corresponding setup parameters.
@@ -22,7 +22,7 @@ export default function withParams(klass) {
           id,
           param,
           targetDid,
-          didKeypair
+          didKeypair,
         );
       }
 
@@ -50,9 +50,9 @@ export default function withParams(klass) {
           (
             await this.cheqdOnly.latestResourceMetadataBy(
               targetDid,
-              this.cheqdOnly.filterMetadata
+              this.cheqdOnly.filterMetadata,
             )
-          )?.id
+          )?.id,
         );
       }
 

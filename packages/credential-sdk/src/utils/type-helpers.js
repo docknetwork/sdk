@@ -1,15 +1,15 @@
 import {
   METHOD_REG_EXP_PATTERN,
   HEX_ID_REG_EXP_PATTERN,
-} from "../resolver/generic/const";
-import { isPrototypeOf } from "./inheritance";
+} from '../resolver/generic/const';
+import { isPrototypeOf } from './inheritance';
 /**
  * Return true if the given value is a string.
  * @param value
  * @returns {boolean}
  */
 export function isString(value) {
-  return typeof value === "string" || value instanceof String;
+  return typeof value === 'string' || value instanceof String;
 }
 
 /**
@@ -18,7 +18,7 @@ export function isString(value) {
  * @returns {boolean}
  */
 export function isObject(value) {
-  return value && typeof value === "object" && value.constructor === Object;
+  return value && typeof value === 'object' && value.constructor === Object;
 }
 
 /**
@@ -26,7 +26,7 @@ export function isObject(value) {
  * @param value
  * @returns {string}
  */
-export function ensureString(value, ctx = "") {
+export function ensureString(value, ctx = '') {
   if (!isString(value)) {
     throw new Error(`${value} needs to be a string. ${ctx}`);
   }
@@ -43,13 +43,13 @@ export function ensureObject(value) {
   }
 }
 
-export function ensureArrayLike(value, errCtx = "") {
+export function ensureArrayLike(value, errCtx = '') {
   if (
-    Array.isArray(value) ||
-    value instanceof Uint8Array ||
-    value instanceof Uint16Array ||
-    value instanceof Uint32Array ||
-    value instanceof Buffer
+    Array.isArray(value)
+    || value instanceof Uint8Array
+    || value instanceof Uint16Array
+    || value instanceof Uint32Array
+    || value instanceof Buffer
   ) {
     return value;
   } else {
@@ -57,8 +57,8 @@ export function ensureArrayLike(value, errCtx = "") {
   }
 }
 
-export function ensureIterable(value, errCtx = "") {
-  if (typeof value?.[Symbol.iterator] !== "function") {
+export function ensureIterable(value, errCtx = '') {
+  if (typeof value?.[Symbol.iterator] !== 'function') {
     throw new Error(`${value} needs to be an iterable. ${errCtx}`);
   }
 
@@ -71,16 +71,16 @@ export function ensureIterable(value, errCtx = "") {
  */
 export function ensureURI(uri) {
   ensureString(uri);
-  const pattern = new RegExp("^\\w+:\\/?\\/?[^\\s]+$");
+  const pattern = new RegExp('^\\w+:\\/?\\/?[^\\s]+$');
   if (!pattern.test(uri)) {
     throw new Error(`${uri} needs to be a valid URI.`);
   }
 }
 
 export function ensureByte(byte) {
-  if (typeof byte !== "number") {
+  if (typeof byte !== 'number') {
     throw new TypeError(
-      `Expected number in range 0-255, received \`${byte}\` with type \`${typeof byte}\``
+      `Expected number in range 0-255, received \`${byte}\` with type \`${typeof byte}\``,
     );
   }
   // eslint-disable-next-line no-bitwise
@@ -91,15 +91,14 @@ export function ensureByte(byte) {
   return byte;
 }
 
-export const ensureBytes = (bytes) =>
-  bytes instanceof Uint8Array
-    ? bytes
-    : [...ensureIterable(bytes)].map(ensureByte);
+export const ensureBytes = (bytes) => (bytes instanceof Uint8Array
+  ? bytes
+  : [...ensureIterable(bytes)].map(ensureByte));
 
 export const ensureUint8Array = (bytes) => {
   if (!(bytes instanceof Uint8Array)) {
     throw new Error(
-      `Expected instance of \`Uint8Array\`, received: \`${bytes}\``
+      `Expected instance of \`Uint8Array\`, received: \`${bytes}\``,
     );
   }
 
@@ -119,7 +118,7 @@ export const isBytes = (bytes) => {
 export const ensureInstanceOf = (value, klass) => {
   if (!(value instanceof klass)) {
     throw new Error(
-      `Expected \`${value}\` to be an instance of \`${klass.name}\``
+      `Expected \`${value}\` to be an instance of \`${klass.name}\``,
     );
   }
 
@@ -129,7 +128,7 @@ export const ensureInstanceOf = (value, klass) => {
 export const ensurePrototypeOf = (proto, value) => {
   if (!isPrototypeOf(proto, value)) {
     throw new Error(
-      `Expected \`${proto.name}\` to be a prototype of \`${value}\``
+      `Expected \`${proto.name}\` to be a prototype of \`${value}\``,
     );
   }
 
@@ -137,11 +136,11 @@ export const ensurePrototypeOf = (proto, value) => {
 };
 
 const STATUS_LIST_ID_MATCHER = new RegExp(
-  `^status-list2021:${METHOD_REG_EXP_PATTERN}:${HEX_ID_REG_EXP_PATTERN}$`
+  `^status-list2021:${METHOD_REG_EXP_PATTERN}:${HEX_ID_REG_EXP_PATTERN}$`,
 );
 
 const PRIVATE_STATUS_LIST_ID_MATCHER = new RegExp(
-  `^private-status-list2021:${HEX_ID_REG_EXP_PATTERN}$`
+  `^private-status-list2021:${HEX_ID_REG_EXP_PATTERN}$`,
 );
 
 /**
@@ -152,7 +151,7 @@ export function ensureStatusListId(statusListId) {
   ensureString(statusListId);
   if (!STATUS_LIST_ID_MATCHER.test(statusListId)) {
     throw new Error(
-      `\`${statusListId}\` needs to be a valid \`StatusList2021Credential\` identifier.`
+      `\`${statusListId}\` needs to be a valid \`StatusList2021Credential\` identifier.`,
     );
   }
 }
@@ -165,7 +164,7 @@ export function ensurePrivateStatusListId(statusListId) {
   ensureString(statusListId);
   if (!PRIVATE_STATUS_LIST_ID_MATCHER.test(statusListId)) {
     throw new Error(
-      `\`${statusListId}\` needs to be a valid \`PrivateStatusList2021Credential\` identifier.`
+      `\`${statusListId}\` needs to be a valid \`PrivateStatusList2021Credential\` identifier.`,
     );
   }
 }
@@ -189,7 +188,7 @@ export function ensureObjectWithKey(value, key, name) {
  * @param {string} name - Name of the object. Used in constructing error.
  */
 export function ensureObjectWithId(value, name) {
-  ensureObjectWithKey(value, "id", name);
+  ensureObjectWithKey(value, 'id', name);
 }
 
 /**
@@ -200,12 +199,12 @@ export function ensureValidDatetime(datetime) {
   // Z and T can be lowercase
   // RFC3339 regex
   const dateRegex = new RegExp(
-    "^(\\d{4})-(0[1-9]|1[0-2])-" +
-      "(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):" +
-      "([0-5][0-9]):([0-5][0-9]|60)" +
-      "(\\.[0-9]+)?(Z|(\\+|-)([01][0-9]|2[0-3]):" +
-      "([0-5][0-9]))$",
-    "i"
+    '^(\\d{4})-(0[1-9]|1[0-2])-'
+      + '(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):'
+      + '([0-5][0-9]):([0-5][0-9]|60)'
+      + '(\\.[0-9]+)?(Z|(\\+|-)([01][0-9]|2[0-3]):'
+      + '([0-5][0-9]))$',
+    'i',
   );
 
   if (!dateRegex.test(datetime)) {
@@ -221,7 +220,7 @@ export function ensureValidDatetime(datetime) {
  */
 export function ensureArray(value) {
   if (!Array.isArray(value)) {
-    throw new Error("The value provided must be an array");
+    throw new Error('The value provided must be an array');
   }
 
   return value;

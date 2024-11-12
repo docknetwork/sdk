@@ -1,31 +1,31 @@
-import { TypedNumber } from "@docknetwork/credential-sdk/types/generic";
+import { TypedNumber } from '@docknetwork/credential-sdk/types/generic';
 import {
   DockDidOrDidMethodKey,
   OffchainSignatureParams,
   DockOffchainSignaturePublicKey,
   DockDidValue,
-} from "@docknetwork/credential-sdk/types";
+  DockOffchainSignatureParamsRef,
+} from '@docknetwork/credential-sdk/types';
 import {
   AddOffchainSignatureParams,
   AddOffchainSignaturePublicKey,
   RemoveOffchainSignatureParams,
   RemoveOffchainSignaturePublicKey,
-} from "./actions";
-import injectParams from "../common/inject-params";
-import injectPublicKeys from "../common/inject-public-keys";
-import { DockDIDModuleInternal } from "../did/internal";
-import { DockOffchainSignatureParamsRef } from "@docknetwork/credential-sdk/types";
+} from './actions';
+import injectParams from '../common/inject-params';
+import injectPublicKeys from '../common/inject-public-keys';
+import { DockDIDModuleInternal } from '../did/internal';
 
 export default class DockInternalOffchainSignaturesModule extends injectParams(
-  injectPublicKeys(class OffchainSignatures {})
+  injectPublicKeys(class OffchainSignatures {}),
 ) {
-  static Prop = "offchainSignatures";
+  static Prop = 'offchainSignatures';
 
   static MethodNameOverrides = {
-    addPublicKey: "AddOffchainSignaturePublicKey",
-    removePublicKey: "RemoveOffchainSignaturePublicKey",
-    addParams: "AddOffchainSignatureParams",
-    removeParams: "RemoveOffchainSignatureParams",
+    addPublicKey: 'AddOffchainSignaturePublicKey',
+    removePublicKey: 'RemoveOffchainSignaturePublicKey',
+    addParams: 'AddOffchainSignatureParams',
+    removeParams: 'RemoveOffchainSignatureParams',
   };
 
   static PublicKeyAndParamsActions = {
@@ -39,11 +39,11 @@ export default class DockInternalOffchainSignaturesModule extends injectParams(
 
   static Params = OffchainSignatureParams;
 
-  static ParamsQuery = "signatureParams";
+  static ParamsQuery = 'signatureParams';
 
   static ParamsRef = DockOffchainSignatureParamsRef;
 
-  static PublicKeyQuery = "publicKeys";
+  static PublicKeyQuery = 'publicKeys';
 
   static PublicKeyOwner = DockDidValue;
 
@@ -54,7 +54,7 @@ export default class DockInternalOffchainSignaturesModule extends injectParams(
    */
   async paramsCounter(did) {
     return TypedNumber.from(
-      await this.query.paramsCounter(DockDidOrDidMethodKey.from(did))
+      await this.query.paramsCounter(DockDidOrDidMethodKey.from(did)),
     );
   }
 
@@ -66,7 +66,7 @@ export default class DockInternalOffchainSignaturesModule extends injectParams(
   async keysCounter(did) {
     return (
       await new DockDIDModuleInternal(this.apiProvider).getOnchainDidDetail(
-        DockDidOrDidMethodKey.from(did)
+        DockDidOrDidMethodKey.from(did),
       )
     ).lastKeyId;
   }

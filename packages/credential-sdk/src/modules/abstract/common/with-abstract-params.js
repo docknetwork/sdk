@@ -1,7 +1,7 @@
 import {
   withExtendedPrototypeProperties,
   withExtendedStaticProperties,
-} from "../../../utils";
+} from '../../../utils';
 
 export default function withAbstractParams(klass) {
   const name = `withAbstractParams(${klass.name})`;
@@ -33,7 +33,7 @@ export default function withAbstractParams(klass) {
       async addParams(id, params, targetDid, didKeypair, txParams) {
         return await this.signAndSend(
           await this.addParamsTx(id, params, targetDid, didKeypair),
-          txParams
+          txParams,
         );
       }
 
@@ -44,7 +44,7 @@ export default function withAbstractParams(klass) {
        * @returns {Promise<Params>}
        */
       async getParams(_did, _id) {
-        throw new Error("Unimplemented");
+        throw new Error('Unimplemented');
       }
 
       /**
@@ -53,7 +53,7 @@ export default function withAbstractParams(klass) {
        * @returns {Promise<Map<Id, Params>>}
        */
       async getAllParamsByDid(_did) {
-        throw new Error("Unimplemented");
+        throw new Error('Unimplemented');
       }
 
       /**
@@ -62,7 +62,7 @@ export default function withAbstractParams(klass) {
        * @returns {Promise<Id>}
        */
       async lastParamsId(_targetDid) {
-        throw new Error("Unimplemented");
+        throw new Error('Unimplemented');
       }
 
       /**
@@ -71,7 +71,7 @@ export default function withAbstractParams(klass) {
        * @returns {Promise<Id>}
        */
       async nextParamsId(_targetDid) {
-        throw new Error("Unimplemented");
+        throw new Error('Unimplemented');
       }
     },
   };
@@ -81,12 +81,12 @@ export default function withAbstractParams(klass) {
    */
   return withExtendedPrototypeProperties(
     [
-      "addParamsTx",
-      "getParams",
-      "getAllParamsByDid",
-      "lastParamsId",
-      "nextParamsId",
+      'addParamsTx',
+      'getParams',
+      'getAllParamsByDid',
+      'lastParamsId',
+      'nextParamsId',
     ],
-    withExtendedStaticProperties(["Params"], obj[name])
+    withExtendedStaticProperties(['Params'], obj[name]),
   );
 }

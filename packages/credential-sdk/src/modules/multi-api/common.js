@@ -1,9 +1,4 @@
-import {
-  ensureArray,
-  ensureInstanceOf,
-  ensureIterable,
-  fmtIter,
-} from "../../utils";
+import { ensureArray, ensureInstanceOf, fmtIter } from '../../utils';
 
 export function injectModuleRouter(klass) {
   const name = `withModuleRouter(${klass.name})`;
@@ -29,8 +24,8 @@ export function injectModuleRouter(klass) {
 
         throw new Error(
           `Identifier \`${id}\` is not supported by any of ${fmtIter(
-            this.modules.map((module) => module.constructor.name)
-          )}`
+            this.modules.map((module) => module.constructor.name),
+          )}`,
         );
       }
 

@@ -1,4 +1,4 @@
-import { withExtendedPrototypeProperties } from "../../../utils";
+import { withExtendedPrototypeProperties } from '../../../utils';
 
 class AbstractApiProvider {
   /**
@@ -6,7 +6,7 @@ class AbstractApiProvider {
    * @returns {Array<string>}
    */
   methods() {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 
   /**
@@ -15,7 +15,7 @@ class AbstractApiProvider {
    * @returns {boolean}
    */
   supportsIdentifier(_id) {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 
   /**
@@ -23,7 +23,7 @@ class AbstractApiProvider {
    * @returns {boolean}
    */
   isInitialized() {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 
   /**
@@ -33,7 +33,7 @@ class AbstractApiProvider {
    */
   ensureInitialized() {
     if (!this.isInitialized()) {
-      throw new Error("SDK is not initialized");
+      throw new Error('SDK is not initialized');
     }
 
     return this;
@@ -46,7 +46,7 @@ class AbstractApiProvider {
    */
   ensureNotInitialized() {
     if (this.isInitialized()) {
-      throw new Error("SDK is already initialized");
+      throw new Error('SDK is already initialized');
     }
 
     return this;
@@ -58,11 +58,11 @@ class AbstractApiProvider {
  */
 export default withExtendedPrototypeProperties(
   [
-    "methods",
-    "isInitialized",
-    "supportsIdentifier",
-    "stateChangeBytes",
-    "signAndSend",
+    'methods',
+    'isInitialized',
+    'supportsIdentifier',
+    'stateChangeBytes',
+    'signAndSend',
   ],
-  AbstractApiProvider
+  AbstractApiProvider,
 );

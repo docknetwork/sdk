@@ -1,23 +1,23 @@
-import { DockDidOrDidMethodKey } from "@docknetwork/credential-sdk/types";
-import { withExtendedStaticProperties } from "@docknetwork/credential-sdk/utils";
-import { createInternalDockModule } from "./builders";
+import { DockDidOrDidMethodKey } from '@docknetwork/credential-sdk/types';
+import { withExtendedStaticProperties } from '@docknetwork/credential-sdk/utils';
 import {
   TypedMap,
   TypedNumber,
   option,
-} from "@docknetwork/credential-sdk/types/generic";
+} from '@docknetwork/credential-sdk/types/generic';
+import { createInternalDockModule } from './builders';
 
 const didMethods = {
   addParams(params, _, __, nonce) {
     return new this.constructor.PublicKeyAndParamsActions.AddParams(
       this.constructor.Params.from(params),
-      nonce
+      nonce,
     );
   },
   removeParams(paramsId, did, __, nonce) {
     return new this.constructor.PublicKeyAndParamsActions.RemoveParams(
       [did, paramsId],
-      nonce
+      nonce,
     );
   },
 };
@@ -47,8 +47,8 @@ export default function injectParams(klass) {
         return option(this.constructor.Params).from(
           await this.query[this.constructor.ParamsQuery](
             DockDidOrDidMethodKey.from(did),
-            TypedNumber.from(id)
-          )
+            TypedNumber.from(id),
+          ),
         );
       }
 
@@ -77,5 +77,5 @@ export default function injectParams(klass) {
     },
   };
 
-  return withExtendedStaticProperties(["Params", "ParamsQuery"], obj[name]);
+  return withExtendedStaticProperties(['Params', 'ParamsQuery'], obj[name]);
 }

@@ -1,4 +1,4 @@
-import { TypedNumber, TypedUUID } from "../../generic";
+import { TypedNumber, TypedUUID } from '../../generic';
 
 export class DockParamsId extends TypedNumber {}
 

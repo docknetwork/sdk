@@ -86,7 +86,7 @@ describe.each(Schemes)(
         const pk1 = new Module.DockOnly.PublicKey(
           new Module.DockOnly.PublicKey.Class(u8aToHex(keypair.publicKeyBuffer))
         );
-        await chainModule.dockOnly.addPublicKey(pk1, did1, pair1);
+        await chainModule.dockOnly.send.addPublicKey(pk1, did1, pair1);
 
         didDocument = (await modules.did.getDocument(did1)).toJSON();
         const { verificationMethod } = didDocument;

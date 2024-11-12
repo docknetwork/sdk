@@ -21,7 +21,7 @@ export default function withPublicKeys(klass) {
         return await this.dockOnly.tx.addPublicKey(
           publicKey,
           targetDid,
-          didKeypair
+          didKeypair,
         );
       }
 

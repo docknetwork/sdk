@@ -1,5 +1,5 @@
-import { AbstractApiProvider } from "@docknetwork/credential-sdk/modules/abstract/common";
-import { ensureInstanceOf } from "@docknetwork/credential-sdk/utils/type-helpers";
+import { AbstractApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
+import { ensureInstanceOf } from '@docknetwork/credential-sdk/utils/type-helpers';
 
 class CheqdApiProvider extends AbstractApiProvider {
   constructor(cheqd) {

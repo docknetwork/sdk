@@ -19,9 +19,9 @@ export default class CheqdBlobModule extends injectCheqd(AbstractBlobModule) {
   }
 
   /**
-   * 
-   * @param {*} blobId 
-   * @returns 
+   *
+   * @param {*} blobId
+   * @returns
    */
   async get(blobId) {
     const id = CheqdBlobId.from(blobId);

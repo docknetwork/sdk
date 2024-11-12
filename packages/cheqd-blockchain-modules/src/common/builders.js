@@ -151,15 +151,15 @@ export function createInternalCheqdModule(
         const encodedDid = CheqdDid.from(did).toEncodedString();
 
         do {
-          // eslint-disable-next-line operator-linebreak,no-unused-expressions
+          // eslint-disable-next-line operator-linebreak
           ({ resources, paginationKey } =
             // eslint-disable-next-line no-await-in-loop
-            await filterError(
+            (await filterError(
               this.apiProvider.sdk.querier.resource.collectionResources(
                 encodedDid,
                 paginationKey,
               ),
-            )) ?? { resources: [], paginationKey: null };
+            )) ?? { resources: [], paginationKey: null });
 
           res = res.concat(resources.filter(cond));
         } while (!stop(res) && paginationKey != null);

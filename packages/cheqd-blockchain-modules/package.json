@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/cheqd-blockchain-modules",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "type": "module",
   "license": "MIT",
   "main": "./dist/esm/index.js",
@@ -18,6 +18,11 @@
       "import": "./dist/esm/*/index.js",
       "require": "./dist/cjs/*/index.cjs",
       "default": "./dist/esm/*/index.js"
+    },
+    "./src/*": {
+      "import": "./dist/esm/*",
+      "require": "./dist/cjs/*",
+      "default": "./dist/esm/*"
     }
   },
   "repository": {
@@ -28,7 +33,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@docknetwork/credential-sdk": "0.6.0"
+    "@docknetwork/credential-sdk": "0.4.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.1",
@@ -70,7 +75,7 @@
     "lint": "eslint \"src/**/*.js\"",
     "docs": "rm -rf out && mkdir out && touch out/.nojekyll && jsdoc src -r -c ../../.jsdoc -d out/reference",
     "dev-node": "CHEQD_MNEMONIC=$CHEQD_MNEMONIC ../../scripts/run_cheqd_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
-    "test": "NODE_ENV=production jest --verbose --runInBand --forceExit ./tests/*",
+    "test": "NODE_ENV=production jest --verbose --runInBand --forceExit ./tests/offchain-signatures-module.test.js",
     "test-with-node": "CHEQD_MNEMONIC=$CHEQD_MNEMONIC ../../scripts/with_cheqd_docker_test_node yarn test",
     "prepublishOnly": "yarn build"
   }

@@ -1,28 +1,28 @@
-import { AbstractApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
+import { AbstractApiProvider } from "@docknetwork/credential-sdk/modules/abstract/common";
 import {
   maybeToJSON,
   maybeToJSONString,
   fmtIter,
-} from '@docknetwork/credential-sdk/utils';
-import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
+} from "@docknetwork/credential-sdk/utils";
+import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import {
   DIDModule,
   ResourceModule,
   createCheqdSDK,
   CheqdNetwork,
-} from '@cheqd/sdk';
+} from "@cheqd/sdk";
 import {
   MsgCreateDidDocPayload,
   MsgUpdateDidDocPayload,
   MsgDeactivateDidDocPayload,
   protobufPackage as didProtobufPackage,
-} from '@cheqd/ts-proto/cheqd/did/v2/index';
+} from "@cheqd/ts-proto/cheqd/did/v2/index";
 import {
   MsgCreateResourcePayload,
   protobufPackage as resourceProtobufPackage,
-} from '@cheqd/ts-proto/cheqd/resource/v2/index';
-import { DIDRef, NamespaceDid } from '@docknetwork/credential-sdk/types';
-import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
+} from "@cheqd/ts-proto/cheqd/resource/v2/index";
+import { DIDRef, NamespaceDid } from "@docknetwork/credential-sdk/types";
+import { TypedEnum } from "@docknetwork/credential-sdk/types/generic";
 
 export class CheqdAPI extends AbstractApiProvider {
   /**
@@ -65,15 +65,16 @@ export class CheqdAPI extends AbstractApiProvider {
     if (network !== CheqdNetwork.Mainnet && network !== CheqdNetwork.Testnet) {
       throw new Error(
         `Invalid network provided: \`${network}\`, expected one of \`${fmtIter(
-          Object.values(CheqdNetwork),
-        )}\``,
+          Object.values(CheqdNetwork)
+        )}\``
       );
     }
 
     this.ensureNotInitialized();
-    const wallet = mnemonic
-      && (await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
-        prefix: 'cheqd',
+    const wallet =
+      mnemonic &&
+      (await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
+        prefix: "cheqd",
       }));
     const options = {
       modules: [DIDModule, ResourceModule],
@@ -115,7 +116,7 @@ export class CheqdAPI extends AbstractApiProvider {
     const { [method]: Payload } = this.constructor.Payloads;
     if (Payload == null) {
       throw new Error(
-        `Can't find payload constructor for the provided method \`${method}\``,
+        `Can't find payload constructor for the provided method \`${method}\``
       );
     }
     const jsonPayload = maybeToJSON(payload);
@@ -125,7 +126,7 @@ export class CheqdAPI extends AbstractApiProvider {
       return Payload.encode(sdkPayload).finish();
     } catch (err) {
       throw new Error(
-        `Failed to encode payload \`${maybeToJSONString(sdkPayload)}\`: ${err}`,
+        `Failed to encode payload \`${maybeToJSONString(sdkPayload)}\`: ${err}`
       );
     }
   }
@@ -140,14 +141,15 @@ export class CheqdAPI extends AbstractApiProvider {
    * @returns {Promise<*>}
    */
   async signAndSend(tx, { from, fee, memo } = {}) {
-    const sender = from ?? (await this.sdk.options.wallet.getAccounts())[0].address;
+    const sender =
+      from ?? (await this.sdk.options.wallet.getAccounts())[0].address;
     const { typeUrl } = tx;
 
     const prefix = this.constructor.Prefixes[typeUrl];
     const amount = fee ?? this.constructor.Fees[typeUrl];
     const payment = {
       amount: [amount],
-      gas: '3600000', // TODO: dynamically calculate needed amount
+      gas: "3600000", // TODO: dynamically calculate needed amount
       payer: sender,
     };
 
@@ -158,14 +160,16 @@ export class CheqdAPI extends AbstractApiProvider {
       sender,
       [txJSON],
       payment,
-      memo ?? '',
+      memo ?? ""
     );
 
     if (res.code) {
       console.error(res);
 
       throw new Error(
-        JSON.stringify(res, (_, value) => (typeof value === 'bigint' ? `${value.toString()}n` : value)),
+        JSON.stringify(res, (_, value) =>
+          typeof value === "bigint" ? `${value.toString()}n` : value
+        )
       );
     }
 
@@ -173,7 +177,7 @@ export class CheqdAPI extends AbstractApiProvider {
   }
 
   methods() {
-    return ['cheqd'];
+    return ["cheqd"];
   }
 
   supportsIdentifier(id) {
@@ -191,7 +195,7 @@ export class CheqdAPI extends AbstractApiProvider {
       return this.supportsIdentifier(id[0]);
     } else if (id instanceof TypedEnum) {
       return this.supportsIdentifier(id.value);
-    } else if (id.constructor?.Qualifier?.includes('cheqd:')) {
+    } else if (id.constructor?.Qualifier?.includes("cheqd:")) {
       return true;
     }
 

@@ -8,6 +8,9 @@ import generateOffchainSignaturesModuleTests from "@docknetwork/credential-sdk/m
 import { faucet } from "./constants";
 import { CheqdOffchainSignaturesModule, CheqdDIDModule } from "../src";
 import { MultiApiDIDModule } from "@docknetwork/credential-sdk/modules";
+import CheqdBBSModule from "../src/offchain-signatures/bbs";
+import CheqdBBSPlusModule from "../src/offchain-signatures/bbs-plus";
+import CheqdPSModule from "../src/offchain-signatures/ps";
 
 describe("OffchainSignaturesModule", () => {
   const cheqd = new CheqdAPI();
@@ -28,6 +31,9 @@ describe("OffchainSignaturesModule", () => {
     {
       did: new CheqdDIDModule(cheqd),
       offchainSignatures: new CheqdOffchainSignaturesModule(cheqd),
+      bbs: new CheqdBBSModule(cheqd),
+      bbsPlus: new CheqdBBSPlusModule(cheqd),
+      ps: new CheqdPSModule(cheqd),
     },
     {
       DID: CheqdTestnetDid,
@@ -41,6 +47,11 @@ describe("OffchainSignaturesModule", () => {
       offchainSignatures: new MultiApiOffchainSignaturesModule([
         new CheqdOffchainSignaturesModule(cheqd),
       ]),
+      bbs: new MultiApiOffchainSignaturesModule([new CheqdBBSModule(cheqd)]),
+      bbsPlus: new MultiApiOffchainSignaturesModule([
+        new CheqdBBSPlusModule(cheqd),
+      ]),
+      ps: new MultiApiOffchainSignaturesModule([new CheqdPSModule(cheqd)]),
     },
     {
       DID: CheqdTestnetDid,

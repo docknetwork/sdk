@@ -29,7 +29,7 @@ export default function generateOffchainSignatureModuleTests(
 ) {
   const test = itIf(filter);
 
-  describe(`Using ${didModule.constructor.name} and ${offchainSignatures.constructor.name}`, () => {
+  describe(`Checks ${didModule.constructor.name} and ${offchainSignatures.constructor.name} with all public keys and params`, () => {
     test('Generates a `DIDDocument` with `OffchainPublicKey` and creates a `OffchainParameters` owned by this DID', async () => {
       const did = DID.random();
 
@@ -129,56 +129,6 @@ export default function generateOffchainSignatureModuleTests(
       });
     });
 
-    const modules = [bbs, bbsPlus, ps];
-    const keysClasses = [BBSPublicKey, BBSPlusPublicKey, PSPublicKey];
-    const paramsClasses = [BBSParams, BBSPlusParams, PSParams];
-    for (let idx = 0; idx < keysClasses.length; idx++) {
-      const module = modules[idx];
-      const PublicKey = keysClasses[idx];
-      const Params = paramsClasses[idx];
-
-      test(`Checks ${module.constructor.name}`, async () => {
-        const did = DID.random();
-
-        const keyPair = Ed25519Keypair.random();
-        const didKeypair = new DidKeypair([did, 1], keyPair);
-
-        await didModule.createDocument(
-          DIDDocument.create(did, [didKeypair.didKey()]),
-          didKeypair,
-        );
-
-        const id = await offchainSignatures.nextParamsId(did);
-        const ref = new OffchainSignaturesParamsRef(did, id);
-        const params = new Params(
-          new Params.Class(
-            TypedBytes.random(100),
-            stringToU8a(module.constructor.name),
-          ),
-        );
-        await module.addParams(id, params, did, didKeypair);
-
-        const key = new PublicKey(
-          new PublicKey.Class(TypedBytes.random(100), ref),
-        );
-
-        const document = DIDDocument.create(did, [
-          didKeypair.didKey(),
-          new DidKey(key),
-        ]);
-
-        await didModule.updateDocument(document, didKeypair);
-
-        expect((await didModule.getDocument(did)).toJSON()).toEqual(
-          document.toJSON(),
-        );
-
-        expect((await module.getParams(did, id)).toJSON()).toEqual(
-          params.toJSON(),
-        );
-      });
-    }
-
     test('Returns `null` in case of missing params', async () => {
       const did = DID.random();
       const keyPair = Ed25519Keypair.random();
@@ -204,4 +154,71 @@ export default function generateOffchainSignatureModuleTests(
       await expect(() => psKey.withParams(offchainSignatures)).rejects.toThrow();
     });
   });
+
+  const cases = [
+    {
+      module: bbs,
+      PublicKey: BBSPublicKey,
+      Params: BBSParams,
+    },
+    {
+      module: bbsPlus,
+      PublicKey: BBSPlusPublicKey,
+      Params: BBSPlusParams,
+    },
+    {
+      module: ps,
+      PublicKey: PSPublicKey,
+      Params: PSParams,
+    },
+  ];
+
+  describe.each(cases)(
+    'Checks basic workflow for each module',
+    ({ module, PublicKey, Params }) => {
+      test(`Generates a \`DIDDocument\` with \`OffchainPublicKey\` and creates a \`OffchainParameters\` owned by this DID using ${module.constructor.name} with ${PublicKey.name} and ${Params.name}`, async () => {
+        const did = DID.random();
+
+        const keyPair = Ed25519Keypair.random();
+        const didKeypair = new DidKeypair([did, 1], keyPair);
+
+        await didModule.createDocument(
+          DIDDocument.create(did, [didKeypair.didKey()]),
+          didKeypair,
+        );
+
+        const id = await offchainSignatures.nextParamsId(did);
+        const ref = new OffchainSignaturesParamsRef(did, id);
+        const params = new Params(
+          new Params.Class(
+            TypedBytes.random(100),
+            stringToU8a(module.constructor.name),
+          ),
+        );
+
+        expect(await module.getParams(did, id)).toEqual(null);
+
+        await module.addParams(id, params, did, didKeypair);
+
+        const key = new PublicKey(
+          new PublicKey.Class(TypedBytes.random(100), ref),
+        );
+
+        const document = DIDDocument.create(did, [
+          didKeypair.didKey(),
+          new DidKey(key),
+        ]);
+
+        await didModule.updateDocument(document, didKeypair);
+
+        expect((await didModule.getDocument(did)).toJSON()).toEqual(
+          document.toJSON(),
+        );
+
+        expect((await module.getParams(did, id)).toJSON()).toEqual(
+          params.toJSON(),
+        );
+      });
+    },
+  );
 }

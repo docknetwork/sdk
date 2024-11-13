@@ -4,7 +4,13 @@ import {
   MultiApiOffchainSignaturesModule,
   MultiApiDIDModule,
 } from "@docknetwork/credential-sdk/modules";
-import { DockDIDModule, DockOffchainSignaturesModule } from "../../../src";
+import {
+  DockDIDModule,
+  DockOffchainSignaturesModule,
+  DockBBSModule,
+  DockBBSPlusModule,
+  DockPSModule,
+} from "../../../src";
 import {
   FullNodeEndpoint,
   TestAccountURI,
@@ -35,6 +41,9 @@ describe("BlobModule", () => {
     {
       did: new DockDIDModule(dock),
       offchainSignatures: new DockOffchainSignaturesModule(dock),
+      bbs: new DockBBSModule(dock),
+      bbsPlus: new DockBBSPlusModule(dock),
+      ps: new DockPSModule(dock),
     },
     {
       DID: DockDid,
@@ -48,6 +57,11 @@ describe("BlobModule", () => {
       offchainSignatures: new MultiApiOffchainSignaturesModule([
         new DockOffchainSignaturesModule(dock),
       ]),
+      bbs: new MultiApiOffchainSignaturesModule([new DockBBSModule(dock)]),
+      bbsPlus: new MultiApiOffchainSignaturesModule([
+        new DockBBSPlusModule(dock),
+      ]),
+      ps: new MultiApiOffchainSignaturesModule([new DockPSModule(dock)]),
     },
     {
       DID: DockDid,

@@ -2960,38 +2960,6 @@
     fix-esm "^1.0.1"
     jsonld digitalcredentials/jsonld.js#v10.x
 
-"@docknetwork/credential-sdk@0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/credential-sdk/-/credential-sdk-0.4.0.tgz#24986e97fa499ca795968838264ed3fcdcda1db9"
-  integrity sha512-Vxt5PV7sCfW04v3f3ecKvqofx5p5/E4PR50NQoJGUsDDDQIHY3KkRHS/HkQQknv78wT94ZAqJnHhaKyYmKtJJA==
-  dependencies:
-    "@comunica/actor-init-sparql-rdfjs" "^1.22.3"
-    "@digitalcredentials/vc-status-list" "^8.0.0"
-    "@docknetwork/crypto-wasm-ts" "^0.63.0"
-    "@juanelas/base64" "^1.1.5"
-    "@stablelib/ed25519" "^2.0.0"
-    "@subsquid/ss58-codec" latest
-    "@transmute/json-web-signature" "^0.7.0-unstable.82"
-    blakejs "^1.2.1"
-    bs58 "^5.0.0"
-    deep-equal "^2.2.3"
-    elliptic "6.6.0"
-    js-sha256 "^0.11.0"
-    json-canonicalize "1.0.4"
-    json-stringify-deterministic "^1.0.12"
-    jsonld "^5.0.0"
-    jsonld-signatures "^9.3.1"
-    jsonschema "1.4.1"
-    key-did-resolver "^1.4.0"
-    mrklt "^0.2.0"
-    multiformats "^9.5.4"
-    n3 "^1.17.4"
-    rify "^0.7.1"
-    semver "^7.6.0"
-    uuid "^10.0.0"
-    uuidv4 "^6.2.13"
-    varint "^6.0.0"
-
 "@docknetwork/crypto-wasm-ts@^0.63.0":
   version "0.63.0"
   resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.63.0.tgz#f1ab39693b63e70d682d362e9eacd85842ae56e0"
@@ -5292,13 +5260,6 @@
   dependencies:
     "@stablelib/int" "^1.0.1"
 
-"@stablelib/binary@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@stablelib/binary/-/binary-2.0.0.tgz#2f23f6f7d4fe11044f9108925b258a2c71f3c82f"
-  integrity sha512-dHejKHMtq5OtNwDSMcFx+djhixVAnZ76Rqga3WOOKe6KV3NlnE7JBXlmdLIn04G4FxqhRSEx+zkoO4Izdw10ZA==
-  dependencies:
-    "@stablelib/int" "^2.0.0"
-
 "@stablelib/blockcipher@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@stablelib/blockcipher/-/blockcipher-1.0.1.tgz#535f067d147ecdc9625ccd2b0d129f6d53d563d2"
@@ -5343,34 +5304,15 @@
     "@stablelib/sha512" "^1.0.1"
     "@stablelib/wipe" "^1.0.1"
 
-"@stablelib/ed25519@^2.0.0":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@stablelib/ed25519/-/ed25519-2.0.1.tgz#17168839c899aa105b618785aa1be814a95c3216"
-  integrity sha512-QSb4QBEZPDemoT87HWiQrUj+nvIcWa6qoBdJF29iiUvXMqBRQrTsuqsw6Fp1cCEY+OWZN9kJFv//Df1/y9Cwyw==
-  dependencies:
-    "@stablelib/random" "^2.0.0"
-    "@stablelib/sha512" "^2.0.0"
-    "@stablelib/wipe" "^2.0.0"
-
 "@stablelib/hash@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@stablelib/hash/-/hash-1.0.1.tgz#3c944403ff2239fad8ebb9015e33e98444058bc5"
   integrity sha512-eTPJc/stDkdtOcrNMZ6mcMK1e6yBbqRBaNW55XA1jU8w/7QdnCF0CmMmOD1m7VSkBR44PWrMHU2l6r8YEQHMgg==
 
-"@stablelib/hash@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@stablelib/hash/-/hash-2.0.0.tgz#7b74c372dc07187e273844e970a475f1338e92cf"
-  integrity sha512-u3WPSqGido8lwJuMcrBgM5K54LrPGhkWAdtsyccf7dGsLixAZUds77zOAbu7bvKPwQlmoByH0txBi5rTmEKuHg==
-
 "@stablelib/int@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@stablelib/int/-/int-1.0.1.tgz#75928cc25d59d73d75ae361f02128588c15fd008"
   integrity sha512-byr69X/sDtDiIjIV6m4roLVWnNNlRGzsvxw+agj8CIEazqWGOQp2dTYgQhtyVXV9wpO6WyXRQUzLV/JRNumT2w==
-
-"@stablelib/int@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@stablelib/int/-/int-2.0.0.tgz#2b19f82c7831e91ed1a00a75cb2f23839c767c9d"
-  integrity sha512-EiSYDisTYKk1wuCqoh7wuBySmE0A1isq7TQbsijQ6XFi6nIAozchgAT7Zv2PCl2iY8BTe0URScC4PdYHOe3Yow==
 
 "@stablelib/keyagreement@^1.0.1":
   version "1.0.1"
@@ -5395,14 +5337,6 @@
     "@stablelib/binary" "^1.0.1"
     "@stablelib/wipe" "^1.0.1"
 
-"@stablelib/random@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@stablelib/random/-/random-2.0.0.tgz#538f796e1689e2d24125a57bf03e7d44c9cd6ab7"
-  integrity sha512-qvOSbiPq2B3ajvn/IDftC1mzL/W89OGv59gdJ7klMjm327Yk/54NyGl4Jtrwcz35GjCPy/ScVnQXC8YQk8uAUQ==
-  dependencies:
-    "@stablelib/binary" "^2.0.0"
-    "@stablelib/wipe" "^2.0.0"
-
 "@stablelib/sha256@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@stablelib/sha256/-/sha256-1.0.1.tgz#77b6675b67f9b0ea081d2e31bda4866297a3ae4f"
@@ -5421,24 +5355,10 @@
     "@stablelib/hash" "^1.0.1"
     "@stablelib/wipe" "^1.0.1"
 
-"@stablelib/sha512@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@stablelib/sha512/-/sha512-2.0.0.tgz#ea75ffc36ff57507f482f285f45ab68e3142d80e"
-  integrity sha512-JiIub0BfK+dDsymA8b4mUdT9hnFMPfbXqEp/NXR3MUsunf1WMyUQPQr/dhCVL8tt63oYLV9ItUFDP7B2wyIRwA==
-  dependencies:
-    "@stablelib/binary" "^2.0.0"
-    "@stablelib/hash" "^2.0.0"
-    "@stablelib/wipe" "^2.0.0"
-
 "@stablelib/wipe@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@stablelib/wipe/-/wipe-1.0.1.tgz#d21401f1d59ade56a62e139462a97f104ed19a36"
   integrity sha512-WfqfX/eXGiAd3RJe4VU2snh/ZPwtSjLG4ynQ/vYzvghTh7dHFcI1wl+nrkWG6lGhukOxOsUHfv8dUXr58D0ayg==
-
-"@stablelib/wipe@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@stablelib/wipe/-/wipe-2.0.0.tgz#b4b17fedfad02dbfc7120c10160f2b71a7dadc41"
-  integrity sha512-VBMpCJx8py9j9F5DxV5dGmSSO+vkYDnXHXG4alkfpaD08UTfNTqsQoRlUh5obeqBNHiO+3Iv40GxKpM0gfd5xA==
 
 "@stablelib/x25519@^1.0.0", "@stablelib/x25519@^1.0.2":
   version "1.0.3"

@@ -1,5 +1,12 @@
 # @docknetwork/dock-blockchain-api
 
+## 0.4.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.8.0
+
 ## 0.4.2
 
 ### Patch Changes

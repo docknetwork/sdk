@@ -20,4 +20,5 @@ export { default as Ed25519Signature2020 } from './Ed25519Signature2020';
 export { default as Ed25519VerificationKey2018 } from './Ed25519VerificationKey2018';
 export { default as Ed25519VerificationKey2020 } from './Ed25519VerificationKey2020';
 export { default as JsonWebSignature2020 } from './JsonWebSignature2020';
+export { default as CustomLinkedDataSignature } from './common/CustomLinkedDataSignature';
 export * from './constants';

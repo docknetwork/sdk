@@ -89,7 +89,7 @@ export function createInternalCheqdModule(
   class RootModule extends (baseClass.RootModule ?? Root) {}
   class RootSender extends (baseClass.RootSender ?? Root) {}
 
-  const filterError = async (promise) => {
+  const filterNoResourceError = async (promise, placeholder) => {
     try {
       return await promise;
     } catch (err) {
@@ -103,7 +103,7 @@ export function createInternalCheqdModule(
       }
     }
 
-    return void 0;
+    return placeholder;
   };
 
   const obj = {
@@ -123,24 +123,24 @@ export function createInternalCheqdModule(
       }
 
       async resourcesBy(did, cond) {
-        const ids = await this.resourcesMetadataBy(did, cond);
+        const strDid = CheqdDid.from(did).toEncodedString();
+        const metas = await this.resourcesMetadataBy(did, cond);
 
-        const queries = ids.map(async (id) => [
-          id,
-          await this.apiProvider.sdk.querier.resource.resource(did, id),
+        const queries = metas.map(async (meta) => [
+          meta.id,
+          await this.apiProvider.sdk.querier.resource.resource(strDid, meta.id),
         ]);
 
-        return new Map(await filterError(Promise.all(queries)));
+        return new Map(await filterNoResourceError(Promise.all(queries)));
       }
 
       async resource(did, id) {
         const strDid = CheqdDid.from(did).toEncodedString();
         const strID = String(TypedUUID.from(id));
 
-        return (
-          (await filterError(
-            this.apiProvider.sdk.querier.resource.resource(strDid, strID),
-          )) ?? null
+        return await filterNoResourceError(
+          this.apiProvider.sdk.querier.resource.resource(strDid, strID),
+          null,
         );
       }
 
@@ -154,12 +154,13 @@ export function createInternalCheqdModule(
           // eslint-disable-next-line operator-linebreak
           ({ resources, paginationKey } =
             // eslint-disable-next-line no-await-in-loop
-            (await filterError(
+            await filterNoResourceError(
               this.apiProvider.sdk.querier.resource.collectionResources(
                 encodedDid,
                 paginationKey,
               ),
-            )) ?? { resources: [], paginationKey: null });
+              { resources: [], paginationKey: null },
+            ));
 
           res = res.concat(resources.filter(cond));
         } while (!stop(res) && paginationKey != null);

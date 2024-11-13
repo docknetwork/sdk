@@ -29,7 +29,7 @@ export default async function () {
           sourcemap: true,
           dir: "dist/cjs",
           format: "cjs",
-          entryFileNames: "[name].js",
+          entryFileNames: "[name].cjs",
         },
       ],
     },

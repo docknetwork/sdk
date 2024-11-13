@@ -1,13 +1,10 @@
-import {
-  TypedMap,
-  TypedNumber,
-  option,
-} from '@docknetwork/credential-sdk/types/generic';
+import { TypedMap, option } from '@docknetwork/credential-sdk/types/generic';
 import {
   stringToU8a,
   maybeToJSONString,
   u8aToString,
 } from '@docknetwork/credential-sdk/utils';
+import { CheqdParamsId } from '@docknetwork/credential-sdk/types';
 import { createInternalCheqdModule } from './builders';
 import { CheqdCreateResource } from './payload';
 
@@ -24,53 +21,62 @@ const methods = {
 };
 
 export default function injectParams(klass) {
-  return class extends createInternalCheqdModule(methods, klass) {
-    static Prop = 'resource';
+  const name = `withInternalParams(${klass.name})`;
 
-    static get MsgNames() {
-      const names = super.MsgNames ?? {};
+  const obj = {
+    [name]: class extends createInternalCheqdModule(methods, klass) {
+      static Prop = 'resource';
 
-      return {
-        ...names,
-        addParams: 'MsgCreateResource',
-      };
-    }
+      static get MsgNames() {
+        const names = super.MsgNames ?? {};
 
-    static get ParamsMap() {
-      const { Params } = this;
+        return {
+          ...names,
+          addParams: 'MsgCreateResource',
+        };
+      }
 
-      return class ParamsMap extends TypedMap {
-        static KeyClass = TypedNumber;
+      static get ParamsMap() {
+        const { Params } = this;
 
-        static ValueClass = Params;
-      };
-    }
+        return class ParamsMap extends TypedMap {
+          static KeyClass = CheqdParamsId;
 
-    /**
-     * Retrieves params by DID and counter.
-     * @param {*} did
-     * @param {*} counter
-     * @returns {Promise<Params>}
-     */
-    async getParams(did, id) {
-      const bytes = (await this.resource(did, id))?.resource?.data;
+          static ValueClass = Params;
+        };
+      }
 
-      return option(this.constructor.Params).from(
-        bytes && JSON.parse(u8aToString(bytes)),
-      );
-    }
+      /**
+       * Retrieves params by DID and counter.
+       * @param {*} did
+       * @param {*} counter
+       * @returns {Promise<Params>}
+       */
+      async getParams(did, id) {
+        const item = await this.resource(did, id);
 
-    /**
-     * Retrieves all params by a DID.
-     * @param {*} did
-     * @returns {Promise<Map<TypedNumber, Params>>}
-     */
-    async getAllParamsByDid(did) {
-      const resources = await this.resourcesBy(did, this.filterMetadata);
+        return option(this.constructor.Params).from(
+          item && JSON.parse(u8aToString(item.resource.data)),
+        );
+      }
 
-      return new this.constructor.ParamsMap(
-        [...resources].map(([key, item]) => [key, item.resource.data]),
-      );
-    }
+      /**
+       * Retrieves all params by a DID.
+       * @param {*} did
+       * @returns {Promise<Map<CheqdParamsId, Params>>}
+       */
+      async getAllParamsByDid(did) {
+        const resources = await this.resourcesBy(did, this.filterMetadata);
+
+        return new this.constructor.ParamsMap(
+          [...resources].map(([key, item]) => [
+            key,
+            JSON.parse(u8aToString(item.resource.data)),
+          ]),
+        );
+      }
+    },
   };
+
+  return obj[name];
 }

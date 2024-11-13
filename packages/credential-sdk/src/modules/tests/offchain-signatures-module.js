@@ -108,6 +108,16 @@ export default function generateOffchainSignatureModuleTests(
         (await offchainSignatures.getParams(did, psParamsId)).toJSON(),
       ).toEqual(psParams.toJSON());
 
+      expect(
+        (await offchainSignatures.getAllParamsByDid(did)).toJSON().sort(),
+      ).toEqual(
+        [
+          [bbsParamsId.toJSON(), bbsParams.toJSON()],
+          [bbsPlusParamsId.toJSON(), bbsPlusParams.toJSON()],
+          [psParamsId.toJSON(), psParams.toJSON()],
+        ].sort(),
+      );
+
       expect((await bbsKey.withParams(offchainSignatures)).toJSON()).toEqual({
         bbs: { ...bbsKey.toJSON().bbs, params: bbsParams.toJSON() },
       });

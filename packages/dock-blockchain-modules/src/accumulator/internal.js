@@ -4,10 +4,15 @@ import {
   AccumulatorParams,
   AccumulatorPublicKey,
   DockAccumulatorId,
+  DockAccumulatorParamsRef,
 } from '@docknetwork/credential-sdk/types';
 import { inclusiveRange, u8aToHex } from '@docknetwork/credential-sdk/utils';
 import { VBWitnessUpdateInfo } from '@docknetwork/credential-sdk/crypto';
-import { ParamsAndPublicKeys, createInternalDockModule } from '../common';
+import {
+  injectParams,
+  injectPublicKeys,
+  createInternalDockModule,
+} from '../common';
 import {
   AddAccumulator,
   AddAccumulatorParams,
@@ -37,9 +42,8 @@ const didMethods = {
   removeAccumulator: (id, _, nonce) => new RemoveAccumulator(id, nonce),
 };
 
-export default class DockInternalAccumulatorModule extends createInternalDockModule(
-  { didMethods },
-  ParamsAndPublicKeys,
+export default class DockInternalAccumulatorModule extends injectParams(
+  injectPublicKeys(createInternalDockModule({ didMethods })),
 ) {
   static Prop = 'accumulator';
 
@@ -59,6 +63,8 @@ export default class DockInternalAccumulatorModule extends createInternalDockMod
   static PublicKeyOwner = DockDidOrDidMethodKey;
 
   static Params = AccumulatorParams;
+
+  static ParamsRef = DockAccumulatorParamsRef;
 
   static PublicKeyAndParamsActions = {
     AddPublicKey: AddAccumulatorPublicKey,

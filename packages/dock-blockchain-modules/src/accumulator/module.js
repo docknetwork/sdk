@@ -8,13 +8,12 @@ import {
   DockPositiveAccumulator,
   AccumulatorParams,
   DockAccumulatorPublicKey,
-  DockAccumulatorParamsRef,
   DockAccumulatorIdIdent,
 } from '@docknetwork/credential-sdk/types';
 import { option, withProp } from '@docknetwork/credential-sdk/types/generic';
 import { AbstractAccumulatorModule } from '@docknetwork/credential-sdk/modules/abstract';
 import DockInternalAccumulatorModule from './internal';
-import { withParamsAndPublicKeys } from '../common';
+import { injectDock, withParams, withPublicKeys } from '../common';
 
 export const AccumulatorType = {
   VBPos: 0,
@@ -23,12 +22,10 @@ export const AccumulatorType = {
 };
 
 /** Class to manage accumulators on chain */
-export default class DockAccumulatorModule extends withParamsAndPublicKeys(
-  AbstractAccumulatorModule,
+export default class DockAccumulatorModule extends withParams(
+  withPublicKeys(injectDock(AbstractAccumulatorModule)),
 ) {
   static DockOnly = DockInternalAccumulatorModule;
-
-  static ParamsRef = DockAccumulatorParamsRef;
 
   async addPublicKeyTx(...args) {
     if (args.length === 4) {
@@ -37,24 +34,6 @@ export default class DockAccumulatorModule extends withParamsAndPublicKeys(
       return await super.addPublicKeyTx(id, publicKey, targetDid, didKeypair);
     } else {
       return await super.addPublicKeyTx(...args);
-    }
-  }
-
-  /**
-   * Remove public key
-   * @param removeKeyId - The key index for key to remove.
-   * @param targetDid - The DID from which key is being removed
-   * @param signerDid - The DID that is removing the key by signing the payload because it controls `targetDid`
-   * @param signingKeyRef - Signer's signing key reference
-   * @returns {Promise<*>}
-   */
-  async removePublicKeyTx(...args) {
-    if (args.length === 3) {
-      const [id, did, didKeypair] = args;
-
-      return await super.removePublicKeyTx(id, did, didKeypair);
-    } else {
-      return await super.removePublicKeyTx(...args);
     }
   }
 

@@ -18,25 +18,6 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
   }
 
   /**
-   * Remove public key
-   * @param removeKeyId - The key index for key to remove.
-   * @param targetDid - The DID from which key is being removed
-   * @param signerDid - The DID that is removing the key by signing the payload because it controls `targetDid`
-   * @param signingKeyRef - Signer's signing key reference
-   * @returns {Promise<*>}
-   */
-  async removePublicKey(removeKeyId, targetDid, didKeypair, params) {
-    const did = NamespaceDid.from(targetDid);
-
-    return await this.moduleById(did).removePublicKey(
-      removeKeyId,
-      did,
-      didKeypair,
-      params,
-    );
-  }
-
-  /**
    * Add a positive (add-only) accumulator
    * @param id - Unique accumulator id
    * @param accumulated - Current accumulated value.
@@ -286,18 +267,6 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
     const did = NamespaceDid.from(args[2]);
 
     return await this.moduleById(did).addParamsTx(...args);
-  }
-
-  async removeParams(...args) {
-    const did = NamespaceDid.from(args[1]);
-
-    return await this.moduleById(did).removeParams(...args);
-  }
-
-  async removeParamsTx(...args) {
-    const did = NamespaceDid.from(args[1]);
-
-    return await this.moduleById(did).removeParamsTx(...args);
   }
 
   /**

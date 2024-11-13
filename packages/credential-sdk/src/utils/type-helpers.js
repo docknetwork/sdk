@@ -222,4 +222,6 @@ export function ensureArray(value) {
   if (!Array.isArray(value)) {
     throw new Error('The value provided must be an array');
   }
+
+  return value;
 }

@@ -47,7 +47,7 @@ export default class DidKeypair {
   /**
    * Creates a new `DidKey` instance from the public key of the current key pair.
    *
-   * @param {Array} verRels - Array of verification relationships.
+   * @param {?number} verRels - Number indicating verification relationships.
    * @return The new instance of `DidKey`.
    */
   didKey(verRels) {

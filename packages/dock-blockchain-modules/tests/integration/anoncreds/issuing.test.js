@@ -76,10 +76,10 @@ describe.each(Schemes)(
 
       if (Name !== "BBDT16") {
         // Setup public key on blockchain
-        const pk1 = Module.prepareAddPublicKey(
-          u8aToHex(keypair.publicKeyBuffer)
+        const pk1 = new Module.DockOnly.PublicKey(
+          new Module.DockOnly.PublicKey.Class(u8aToHex(keypair.publicKeyBuffer))
         );
-        await chainModule.addPublicKey(null, pk1, did1, pair1);
+        await chainModule.dockOnly.send.addPublicKey(pk1, did1, pair1);
 
         const didDocument = (await modules.did.getDocument(did1)).toJSON();
         const { verificationMethod } = didDocument;

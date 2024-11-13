@@ -109,18 +109,18 @@ export const ensurePropertiesAreUnique = (reservedFields, fields) => {
   }
 };
 
-const AllProperties = new WeakMap();
+const ObjectProperties = new WeakMap();
 
 export const allProperties = (obj) => {
   if (obj == null) return new Set();
 
-  let props = AllProperties.get(obj);
-  if (!props) {
-    props = new Set(
+  let props = ObjectProperties.get(obj);
+  if (props == null) {
+    props = new Set([
       ...Object.getOwnPropertyNames(obj),
       ...allProperties(Object.getPrototypeOf(obj)),
-    );
-    AllProperties.set(obj, props);
+    ]);
+    ObjectProperties.set(obj, props);
   }
 
   return props;

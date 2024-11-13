@@ -155,10 +155,16 @@ for (const {
       issuerSchemeKeypair = KeyPair.generate(sigParams);
 
       if (!isKvac) {
-        const pk = Module.prepareAddPublicKey(
-          u8aToHex(issuerSchemeKeypair.publicKey.bytes)
+        const pk = new Module.DockOnly.PublicKey(
+          new Module.DockOnly.PublicKey.Class(
+            u8aToHex(issuerSchemeKeypair.publicKey.bytes)
+          )
         );
-        await getModule(dock).addPublicKey(null, pk, issuerDid, issuerKeypair);
+        await getModule(dock).dockOnly.send.addPublicKey(
+          pk,
+          issuerDid,
+          issuerKeypair
+        );
       }
     }, 10000);
 
@@ -167,7 +173,7 @@ for (const {
       if (isKvac) {
         verifParam = issuerSchemeKeypair.sk;
       } else {
-        const queriedPk = await getModule(dock).getPublicKey(
+        const queriedPk = await getModule(dock).dockOnly.getPublicKey(
           issuerDid,
           2,
           false
@@ -236,7 +242,7 @@ for (const {
     ) {
       let sigPk;
       if (!isKvac) {
-        const queriedPk = await getModule(dock).getPublicKey(
+        const queriedPk = await getModule(dock).dockOnly.getPublicKey(
           issuerDid,
           2,
           false

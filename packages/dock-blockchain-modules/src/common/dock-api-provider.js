@@ -1,11 +1,11 @@
-import { ApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
+import { AbstractApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
 import { ensureInstanceOf } from '@docknetwork/credential-sdk/utils';
 import DockDIDModuleInternal from '../did/internal';
 
-class DockApiProvider extends ApiProvider {
+class DockApiProvider extends AbstractApiProvider {
   constructor(dock) {
     super();
-    this.dock = ensureInstanceOf(dock, ApiProvider);
+    this.dock = ensureInstanceOf(dock, AbstractApiProvider);
 
     if (typeof dock.getAllExtrinsicsFromBlock !== 'function') {
       throw new Error('`getAllExtrinsicsFromBlock` must be a function');
@@ -23,6 +23,10 @@ class DockApiProvider extends ApiProvider {
 
   methods() {
     return this.dock.methods();
+  }
+
+  supportsIdentifier(id) {
+    return this.dock.supportsIdentifier(id);
   }
 
   isInitialized() {

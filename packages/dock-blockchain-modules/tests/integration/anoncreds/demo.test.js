@@ -116,7 +116,7 @@ for (const {
           revealedAttrIndices
         );
 
-        const queriedPk = await getModule(dock).getPublicKey(
+        const queriedPk = await getModule(dock).dockOnly.getPublicKey(
           issuerDid,
           2,
           true
@@ -254,11 +254,17 @@ for (const {
         );
         issuerBbsPlusKeypair = KeyPair.generate(params);
 
-        const pk = Module.prepareAddPublicKey(
-          u8aToHex(issuerBbsPlusKeypair.publicKey.bytes),
-          [issuerDid, 1]
+        const pk = new Module.DockOnly.PublicKey(
+          new Module.DockOnly.PublicKey.Class(
+            u8aToHex(issuerBbsPlusKeypair.publicKey.bytes),
+            [issuerDid, 1]
+          )
         );
-        await getModule(dock).addPublicKey(null, pk, issuerDid, issuerKeypair);
+        await getModule(dock).dockOnly.send.addPublicKey(
+          pk,
+          issuerDid,
+          issuerKeypair
+        );
       }, 10000);
 
       test("Create Accumulator params", async () => {
@@ -328,7 +334,7 @@ for (const {
 
       test("Sign attributes, i.e. issue credential", async () => {
         const encodedAttrs = encodedAttributes(attributes);
-        const queriedPk = await getModule(dock).getPublicKey(
+        const queriedPk = await getModule(dock).dockOnly.getPublicKey(
           issuerDid,
           2,
           true

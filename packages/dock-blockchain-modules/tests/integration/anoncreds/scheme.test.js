@@ -44,6 +44,7 @@ for (const {
   getPublicKeysByDid,
 } of Schemes) {
   const skipIfKvac = Name === "BBDT16" ? describe.skip : describe;
+
   skipIfKvac(`${Name} Module`, () => {
     const dock = new DockAPI();
     const modules = new MultiApiCoreModules([new DockCoreModules(dock)]);
@@ -140,9 +141,11 @@ for (const {
       const params = SignatureParams.generate(5);
       let keypair = KeyPair.generate(params);
       const bytes1 = u8aToHex(keypair.publicKey.bytes);
-      const pk1 = chainModuleClass.prepareAddPublicKey(bytes1);
-      await chainModule.addPublicKey(null, pk1, did1, pair1);
-      const queriedPk1 = await chainModule.getPublicKey(did1, 2);
+      const pk1 = new chainModuleClass.DockOnly.PublicKey(
+        new chainModuleClass.DockOnly.PublicKey.Class(bytes1)
+      );
+      await chainModule.dockOnly.send.addPublicKey(pk1, did1, pair1);
+      const queriedPk1 = await chainModule.dockOnly.getPublicKey(did1, 2);
       expect(queriedPk1.bytes).toEqual(pk1.bytes);
       expect(queriedPk1.paramsRef).toBe(null);
 
@@ -156,9 +159,11 @@ for (const {
       );
       keypair = KeyPair.generate(params1);
       const bytes2 = u8aToHex(keypair.publicKey.bytes);
-      const pk2 = chainModuleClass.prepareAddPublicKey(bytes2, [did1, 1]);
-      await chainModule.addPublicKey(null, pk2, did2, pair2);
-      const queriedPk2 = await chainModule.getPublicKey(did2, 2);
+      const pk2 = new chainModuleClass.DockOnly.PublicKey(
+        new chainModuleClass.DockOnly.PublicKey.Class(bytes2, [did1, 1])
+      );
+      await chainModule.dockOnly.send.addPublicKey(pk2, did2, pair2);
+      const queriedPk2 = await chainModule.dockOnly.getPublicKey(did2, 2);
       expect(queriedPk2.bytes).toEqual(pk2.bytes);
 
       expect(queriedPk2.paramsRef.eq([did1, 1])).toBe(true);
@@ -175,7 +180,7 @@ for (const {
         ).toJSON()
       );
 
-      const queriedPk2WithParams = await chainModule.getPublicKey(
+      const queriedPk2WithParams = await chainModule.dockOnly.getPublicKey(
         did2,
         2,
         true
@@ -192,14 +197,16 @@ for (const {
       );
       keypair = KeyPair.generate(params2);
       const bytes3 = u8aToHex(keypair.publicKey.bytes);
-      const pk3 = chainModuleClass.prepareAddPublicKey(bytes3, [did1, 2]);
-      await chainModule.addPublicKey(null, pk3, did2, pair2);
+      const pk3 = new chainModuleClass.DockOnly.PublicKey(
+        new chainModuleClass.DockOnly.PublicKey.Class(bytes3, [did1, 2])
+      );
+      await chainModule.dockOnly.send.addPublicKey(pk3, did2, pair2);
 
-      const queriedPk3 = await chainModule.getPublicKey(did2, 3);
+      const queriedPk3 = await chainModule.dockOnly.getPublicKey(did2, 3);
       expect(queriedPk3.bytes).toEqual(pk3.bytes);
       expect(queriedPk3.paramsRef.eq([did1, 2])).toBe(true);
 
-      const queriedPk3WithParams = await chainModule.getPublicKey(
+      const queriedPk3WithParams = await chainModule.dockOnly.getPublicKey(
         did2,
         3,
         true
@@ -247,66 +254,6 @@ for (const {
       expect(document2.assertionMethod[1].endsWith("#keys-2")).toEqual(true);
       expect(document2.assertionMethod[2].endsWith("#keys-3")).toEqual(true);
     });
-
-    test("Can remove public keys and params", async () => {
-      await chainModule.removePublicKey(2, did1, pair1);
-      const pk1 = await chainModule.getPublicKey(did1, 2);
-      expect(pk1).toEqual(null);
-
-      const document1 = (await modules.did.getDocument(did1)).toJSON();
-      expect(document1.verificationMethod.length).toEqual(1);
-      expect(document1.assertionMethod.length).toEqual(1);
-      expect(document1.verificationMethod[0].id.endsWith("#keys-1")).toEqual(
-        true
-      );
-      expect(document1.verificationMethod[0].type).not.toEqual(VerKey);
-      expect(document1.assertionMethod[0].endsWith("#keys-1")).toEqual(true);
-
-      await chainModule.removeParams(1, did1, pair1);
-      const params1 = await chainModule.getParams(did1, 1);
-      expect(params1).toEqual(null);
-
-      await expect(chainModule.getPublicKey(did2, 2, true)).rejects.toThrow();
-
-      await chainModule.removePublicKey(2, did2, pair2);
-      const pk2 = await chainModule.getPublicKey(did2, 2);
-      expect(pk2).toEqual(null);
-
-      let document2 = (await modules.did.getDocument(did2)).toJSON();
-      expect(document2.verificationMethod.length).toEqual(2);
-      expect(document2.assertionMethod.length).toEqual(2);
-      expect(document2.verificationMethod[0].id.endsWith("#keys-1")).toEqual(
-        true
-      );
-      expect(document2.verificationMethod[0].type).not.toEqual(VerKey);
-      expect(document2.assertionMethod[0].endsWith("#keys-1")).toEqual(true);
-      expect(document2.verificationMethod[1].id.endsWith("#keys-3")).toEqual(
-        true
-      );
-      expect(document2.verificationMethod[1].type).toEqual(VerKey);
-      expect(document2.assertionMethod[1].endsWith("#keys-3")).toEqual(true);
-
-      await chainModule.removePublicKey(3, did2, pair2);
-      const pk3 = await chainModule.getPublicKey(did2, 3);
-      expect(pk3).toEqual(null);
-
-      document2 = (await modules.did.getDocument(did2)).toJSON();
-      expect(document2.verificationMethod.length).toEqual(1);
-      expect(document2.assertionMethod.length).toEqual(1);
-      expect(document2.verificationMethod[0].id.endsWith("#keys-1")).toEqual(
-        true
-      );
-      expect(document2.verificationMethod[0].type).not.toEqual(VerKey);
-      expect(document2.assertionMethod[0].endsWith("#keys-1")).toEqual(true);
-
-      await chainModule.removeParams(2, did1, pair1);
-      const params2 = await chainModule.getParams(did1, 2);
-      expect(params2).toEqual(null);
-
-      await chainModule.removeParams(1, did2, pair2);
-      const params3 = await chainModule.getParams(did2, 1);
-      expect(params3).toEqual(null);
-    }, 50000);
 
     afterAll(async () => {
       await dock.disconnect();

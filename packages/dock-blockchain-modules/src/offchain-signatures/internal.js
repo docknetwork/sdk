@@ -4,17 +4,21 @@ import {
   OffchainSignatureParams,
   DockOffchainSignaturePublicKey,
   DockDidValue,
+  DockOffchainSignatureParamsRef,
 } from '@docknetwork/credential-sdk/types';
-import { ParamsAndPublicKeys } from '../common';
 import {
   AddOffchainSignatureParams,
   AddOffchainSignaturePublicKey,
   RemoveOffchainSignatureParams,
   RemoveOffchainSignaturePublicKey,
 } from './actions';
+import injectParams from '../common/inject-params';
+import injectPublicKeys from '../common/inject-public-keys';
 import DockDIDModuleInternal from '../did/internal';
 
-export default class DockInternalOffchainSignaturesModule extends ParamsAndPublicKeys {
+export default class DockInternalOffchainSignaturesModule extends injectParams(
+  injectPublicKeys(class OffchainSignatures {}),
+) {
   static Prop = 'offchainSignatures';
 
   static MethodNameOverrides = {
@@ -36,6 +40,8 @@ export default class DockInternalOffchainSignaturesModule extends ParamsAndPubli
   static Params = OffchainSignatureParams;
 
   static ParamsQuery = 'signatureParams';
+
+  static ParamsRef = DockOffchainSignatureParamsRef;
 
   static PublicKeyQuery = 'publicKeys';
 

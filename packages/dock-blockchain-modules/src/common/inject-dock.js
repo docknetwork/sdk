@@ -22,6 +22,10 @@ export default function injectDock(klass) {
       methods() {
         return this.apiProvider.methods();
       }
+
+      supportsIdentifier(id) {
+        return this.apiProvider.supportsIdentifier(id);
+      }
     },
   };
 

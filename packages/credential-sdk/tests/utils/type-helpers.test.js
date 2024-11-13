@@ -1,4 +1,4 @@
-import { ensureValidDatetime } from "../../src/utils/type-helpers";
+import { ensureValidDatetime } from "../../src/utils";
 
 describe("ensureValidDatetime.", () => {
   test("happy path", () => {

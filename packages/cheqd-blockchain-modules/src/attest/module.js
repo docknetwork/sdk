@@ -25,8 +25,7 @@ export default class CheqdAttestModule extends injectCheqd(
    * Creates an attestation claim on chain for a specific DID
    * @param iri
    * @param did
-   * @param signingKeyRef
-   * @param params
+   * @param didKeypair
    */
   async setClaimTx(iri, targetDid, didKeypair) {
     return await this.cheqdOnly.tx.setClaim(iri, targetDid, didKeypair);

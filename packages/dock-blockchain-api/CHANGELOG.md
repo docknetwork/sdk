@@ -1,5 +1,16 @@
 # @docknetwork/dock-blockchain-api
 
+## 0.5.0
+
+### Minor Changes
+
+- Implement `OffchainSignatures` module for `cheqd`
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.9.0
+
 ## 0.4.3
 
 ### Patch Changes

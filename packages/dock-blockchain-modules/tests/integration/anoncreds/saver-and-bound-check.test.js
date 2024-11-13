@@ -140,16 +140,22 @@ for (const {
         expect(paramsWritten.label).toEqual(params.label);
 
         issuerSchemeKeypair = KeyPair.generate(sigParams);
-        const pk = Module.prepareAddPublicKey(
-          u8aToHex(issuerSchemeKeypair.publicKey.bytes),
-          [issuerDid, 1]
+        const pk = new Module.DockOnly.PublicKey(
+          new Module.DockOnly.PublicKey.Class(
+            u8aToHex(issuerSchemeKeypair.publicKey.bytes),
+            [issuerDid, 1]
+          )
         );
-        await getModule(dock).addPublicKey(null, pk, issuerDid, issuerKeypair);
+        await getModule(dock).dockOnly.send.addPublicKey(
+          pk,
+          issuerDid,
+          issuerKeypair
+        );
       }, 10000);
 
       test("Sign attributes, i.e. issue credential", async () => {
         const encodedAttrs = encodedAttributes(attributes);
-        const queriedPk = await getModule(dock).getPublicKey(
+        const queriedPk = await getModule(dock).dockOnly.getPublicKey(
           issuerDid,
           2,
           true
@@ -202,7 +208,7 @@ for (const {
         const ek = encryptionKey.decompress();
         const pk = snarkPk.decompress();
 
-        const queriedPk = await getModule(dock).getPublicKey(
+        const queriedPk = await getModule(dock).dockOnly.getPublicKey(
           issuerDid,
           2,
           true
@@ -306,7 +312,7 @@ for (const {
         // Prover decompresses the proving key
         const snarkProvingKey = pk.decompress();
 
-        const queriedPk = await getModule(dock).getPublicKey(
+        const queriedPk = await getModule(dock).dockOnly.getPublicKey(
           issuerDid,
           2,
           true

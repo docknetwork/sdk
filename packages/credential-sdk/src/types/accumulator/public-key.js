@@ -1,3 +1,4 @@
+import { maybeToJSONString } from '../../utils';
 import {
   option, TypedBytes, TypedStruct, Any, withProp,
 } from '../generic';
@@ -19,6 +20,36 @@ export class AccumulatorPublicKey extends TypedStruct {
 
   constructor(bytes, paramsRef, curveType = new CurveTypeBls12381(), ...rest) {
     super(bytes, paramsRef, curveType, ...rest);
+  }
+
+  setParams(params) {
+    const WithParams = withProp(
+      this.constructor,
+      'params',
+      option(this.constructor.Params),
+    );
+
+    const withParams = WithParams.from(this);
+    withParams.params = params;
+
+    return withParams;
+  }
+
+  async withParams(paramsModule) {
+    let params = null;
+    if (this.paramsRef != null) {
+      params = await paramsModule.getParams(...this.paramsRef);
+
+      if (params == null) {
+        throw new Error(
+          `Parameters with reference (${maybeToJSONString(
+            this.paramsRef,
+          )}) not found on chain`,
+        );
+      }
+    }
+
+    return this.setParams(params);
   }
 }
 

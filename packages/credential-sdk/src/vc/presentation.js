@@ -9,7 +9,7 @@ import {
 } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
 import { normalizeOrConvertStringToU8a } from '../utils/bytes';
-import { ensureArray } from '../utils/type-helpers';
+import { ensureArray } from '../utils';
 
 import Bls12381BBSSignatureDock2022 from './crypto/Bls12381BBSSignatureDock2022';
 import { DOCK_ANON_CREDENTIAL_ID } from './crypto/common/DockCryptoSignatureProof';

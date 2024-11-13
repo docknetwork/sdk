@@ -89,6 +89,23 @@ export function createInternalCheqdModule(
   class RootModule extends (baseClass.RootModule ?? Root) {}
   class RootSender extends (baseClass.RootSender ?? Root) {}
 
+  const filterNoResourceError = async (promise, placeholder) => {
+    try {
+      return await promise;
+    } catch (err) {
+      const strErr = String(err);
+
+      if (
+        !strErr.includes('DID Doc not found')
+        && !strErr.includes('not found: unknown request')
+      ) {
+        throw err;
+      }
+    }
+
+    return placeholder;
+  };
+
   const obj = {
     [name]: class extends baseClass {
       static Prop;
@@ -105,54 +122,67 @@ export function createInternalCheqdModule(
         this.apiProvider = apiProvider;
       }
 
+      async resourcesBy(did, cond) {
+        const strDid = CheqdDid.from(did).toEncodedString();
+        const metas = await this.resourcesMetadataBy(did, cond);
+
+        const queries = metas.map(async (meta) => [
+          meta.id,
+          await this.apiProvider.sdk.querier.resource.resource(strDid, meta.id),
+        ]);
+
+        return new Map(await filterNoResourceError(Promise.all(queries)));
+      }
+
       async resource(did, id) {
         const strDid = CheqdDid.from(did).toEncodedString();
         const strID = String(TypedUUID.from(id));
 
-        try {
-          return await this.apiProvider.sdk.querier.resource.resource(
-            strDid,
-            strID,
-          );
-        } catch (err) {
-          if (!String(err).includes('DID Doc not found')) {
-            throw err;
-          }
-        }
-
-        return null;
+        return await filterNoResourceError(
+          this.apiProvider.sdk.querier.resource.resource(strDid, strID),
+          null,
+        );
       }
 
-      async latestResourceIdBy(did, cond) {
+      async resourcesMetadataBy(did, cond, stop = (_) => false) {
+        let res = [];
         let resources;
         let paginationKey;
         const encodedDid = CheqdDid.from(did).toEncodedString();
 
         do {
-          try {
-            // eslint-disable-next-line operator-linebreak
-            ({ resources, paginationKey } =
-              // eslint-disable-next-line no-await-in-loop
-              await this.apiProvider.sdk.querier.resource.collectionResources(
+          // eslint-disable-next-line operator-linebreak
+          ({ resources, paginationKey } =
+            // eslint-disable-next-line no-await-in-loop
+            await filterNoResourceError(
+              this.apiProvider.sdk.querier.resource.collectionResources(
                 encodedDid,
                 paginationKey,
-              ));
-          } catch (err) {
-            if (!String(err).includes('DID Doc not found')) {
-              throw err;
-            } else {
-              break;
-            }
-          }
+              ),
+              { resources: [], paginationKey: null },
+            ));
 
-          for (const resource of resources) {
-            if (cond(resource) && !resource.nextVersionId) {
-              return resource.id;
-            }
-          }
-        } while (paginationKey != null);
+          res = res.concat(resources.filter(cond));
+        } while (!stop(res) && paginationKey != null);
 
-        return null;
+        return res;
+      }
+
+      async latestResourcesMetadataBy(did, cond) {
+        return await this.resourcesMetadataBy(
+          did,
+          (meta) => cond(meta) && !meta.nextVersionId,
+        );
+      }
+
+      async latestResourceMetadataBy(did, cond) {
+        const meta = await this.resourcesMetadataBy(
+          did,
+          (item) => cond(item) && !item.nextVersionId,
+          (res) => res.length,
+        );
+
+        return meta[0] ?? null;
       }
 
       get query() {

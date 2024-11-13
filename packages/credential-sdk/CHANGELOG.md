@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.9.0
+
+### Minor Changes
+
+- Implement `OffchainSignatures` module for `cheqd`
+
 ## 0.8.0
 
 ### Minor Changes

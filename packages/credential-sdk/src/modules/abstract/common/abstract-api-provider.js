@@ -1,11 +1,20 @@
 import { withExtendedPrototypeProperties } from '../../../utils';
 
-class ApiProvider {
+class AbstractApiProvider {
   /**
    * Returns array of the methods supported by the given API.
    * @returns {Array<string>}
    */
   methods() {
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * Returns `true` in case the provided identifier is supported by the given API.
+   * @param {*} id
+   * @returns {boolean}
+   */
+  supportsIdentifier(_id) {
     throw new Error('Unimplemented');
   }
 
@@ -48,6 +57,12 @@ class ApiProvider {
  * Base class that must be extended by all API providers.
  */
 export default withExtendedPrototypeProperties(
-  ['methods', 'isInitialized', 'stateChangeBytes', 'signAndSend'],
-  ApiProvider,
+  [
+    'methods',
+    'isInitialized',
+    'supportsIdentifier',
+    'stateChangeBytes',
+    'signAndSend',
+  ],
+  AbstractApiProvider,
 );

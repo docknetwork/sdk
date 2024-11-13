@@ -4,7 +4,7 @@ import { cryptoWaitReady } from '@polkadot/util-crypto';
 import typesBundle from '@docknetwork/node-types';
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 
-import { ApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
+import { AbstractApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
 import {
   DIDRef,
   DockDidOrDidMethodKey,
@@ -39,7 +39,7 @@ import { getAllExtrinsicsFromBlock } from '../utils/chain-ops';
  */
 
 /** Helper class to interact with the Dock chain */
-export default class DockAPI extends ApiProvider {
+export default class DockAPI extends AbstractApiProvider {
   /**
    * Creates a new instance of the DockAPI object, call init to initialize
    * @param {function} [customSignTx] - Optional custom transaction sign method,
@@ -351,8 +351,8 @@ export default class DockAPI extends ApiProvider {
     } else if (id instanceof DIDRef) {
       return this.supportsIdentifier(id[0]);
     } else if (id instanceof TypedEnum) {
-      return this.supportsIdentifier(this.value);
-    } else if (id.Qualifier?.contains('dock:')) {
+      return this.supportsIdentifier(id.value);
+    } else if (id?.constructor?.Qualifier?.includes(':dock:')) {
       return true;
     }
 

@@ -5,7 +5,7 @@ import {
   ensureString,
   ensureURI,
   isObject,
-} from '../utils/type-helpers';
+} from '../utils';
 
 import { getUniqueElementsFromArray } from '../utils/misc';
 import VerifiableCredential from './verifiable-credential';

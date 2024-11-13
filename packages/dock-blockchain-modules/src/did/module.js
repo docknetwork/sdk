@@ -139,59 +139,66 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
       );
     }
 
-    const txs = (
-      await this.dockOnly.apiProvider.withDidNonce(signerDid, (nonce) => Promise.all([
-        newOnChainKeys.length
-            && this.dockOnly.tx.addKeys(
-              [...newOnChainKeys].map(([_, key]) => key),
-              did,
-              didKeypair,
-              nonce.inc(),
-            ),
-        newControllers.length
-            && this.dockOnly.tx.addControllers(
-              newControllers,
-              did,
-              didKeypair,
-              nonce.inc(),
-            ),
-        ...newOffchainKeys.map(([_, key]) => this.offchainSignatures.dockOnly.tx.addPublicKey(
-          key.publicKey,
-          did,
-          didKeypair,
-          nonce.inc(),
-        )),
-        ...[...newServices].map(({ id, type, serviceEndpoint }) => this.dockOnly.tx.addServiceEndpoint(
-          id,
-          type,
-          serviceEndpoint,
-          did,
-          didKeypair,
-          nonce.inc(),
-        )),
-        ...[...removedServices].map(({ id }) => this.dockOnly.tx.removeServiceEndpoint(id, didKeypair, nonce.inc())),
-        ...removedOffchainKeys.map(([{ index }]) => this.offchainSignatures.dockOnly.tx.removePublicKey(
-          index,
-          did,
-          didKeypair,
-          nonce.inc(),
-        )),
-        removedControllers.length
-            && this.dockOnly.tx.removeControllers(
-              removedControllers,
-              did,
-              didKeypair,
-              nonce.inc(),
-            ),
-        removedOnChainKeys.length
-            && this.dockOnly.tx.removeKeys(
-              [...removedOnChainKeys].map(([{ index }]) => index),
-              did,
-              didKeypair,
-              nonce.inc(),
-            ),
-      ]))
-    ).filter(Boolean);
+    const txs = await this.dockOnly.apiProvider.withDidNonce(
+      signerDid,
+      (nonce) => Promise.all(
+        [
+          newOnChainKeys.length
+              && this.dockOnly.tx.addKeys(
+                [...newOnChainKeys].map(([_, key]) => key),
+                did,
+                didKeypair,
+                nonce.inc(),
+              ),
+          newControllers.length
+              && this.dockOnly.tx.addControllers(
+                newControllers,
+                did,
+                didKeypair,
+                nonce.inc(),
+              ),
+          ...newOffchainKeys.map(([_, key]) => this.offchainSignatures.dockOnly.tx.addPublicKey(
+            key.publicKey,
+            did,
+            didKeypair,
+            nonce.inc(),
+          )),
+          ...[...newServices].map(({ id, type, serviceEndpoint }) => this.dockOnly.tx.addServiceEndpoint(
+            id,
+            type,
+            serviceEndpoint,
+            did,
+            didKeypair,
+            nonce.inc(),
+          )),
+          ...[...removedServices].map(({ id }) => this.dockOnly.tx.removeServiceEndpoint(
+            id,
+            didKeypair,
+            nonce.inc(),
+          )),
+          ...removedOffchainKeys.map(([{ index }]) => this.offchainSignatures.dockOnly.tx.removePublicKey(
+            index,
+            did,
+            didKeypair,
+            nonce.inc(),
+          )),
+          removedControllers.length
+              && this.dockOnly.tx.removeControllers(
+                removedControllers,
+                did,
+                didKeypair,
+                nonce.inc(),
+              ),
+          removedOnChainKeys.length
+              && this.dockOnly.tx.removeKeys(
+                [...removedOnChainKeys].map(([{ index }]) => index),
+                did,
+                didKeypair,
+                nonce.inc(),
+              ),
+        ].filter(Boolean),
+      ),
+    );
 
     if (!txs.length) {
       throw new Error(`No changes for ${did}`);
@@ -270,7 +277,7 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
     for (const [
       keyId,
       key,
-    ] of await this.offchainSignatures.getAllPublicKeysByDid(hexDid)) {
+    ] of await this.offchainSignatures.dockOnly.getAllPublicKeysByDid(hexDid)) {
       // The gaps in `keyId` might correspond to removed keys
       keys.push([keyId, key.constructor.VerKeyType, key.value.bytes]);
 

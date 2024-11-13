@@ -1,26 +1,17 @@
 /* eslint-disable camelcase */
 
-import {
-  OffchainSignatureParams,
-  OffchainSignaturePublicKey,
-} from '../../../types';
-import { AbstractWithParamsAndPublicKeys } from '../common';
+import { OffchainSignatureParams } from '../../../types';
+import { AbstractBaseModule, withAbstractParams } from '../common';
 
-/** Class to write offchain signature parameters and keys on chain */
-export default class AbstractOffchainSignaturesModule extends AbstractWithParamsAndPublicKeys {
+/** Class to write offchain signature parameters on chain */
+export default class AbstractOffchainSignaturesModule extends withAbstractParams(
+  AbstractBaseModule,
+) {
   static Params = OffchainSignatureParams;
-
-  static PublicKey = OffchainSignaturePublicKey;
 
   static prepareAddParameters(bytes, label, curveType) {
     return super.prepareAddParameters(
       new this.Params.Class(bytes, label, curveType),
-    );
-  }
-
-  static prepareAddPublicKey(bytes, paramsRef, curveType) {
-    return super.prepareAddPublicKey(
-      new this.PublicKey.Class(bytes, paramsRef, curveType),
     );
   }
 }

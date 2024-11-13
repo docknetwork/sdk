@@ -1,4 +1,4 @@
-import { ApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
+import { AbstractApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
 import {
   maybeToJSON,
   maybeToJSONString,
@@ -24,7 +24,7 @@ import {
 import { DIDRef, NamespaceDid } from '@docknetwork/credential-sdk/types';
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 
-export class CheqdAPI extends ApiProvider {
+export class CheqdAPI extends AbstractApiProvider {
   /**
    * Creates a new instance of the CheqdAPI object, call init to initialize
    * @constructor
@@ -59,6 +59,7 @@ export class CheqdAPI extends ApiProvider {
    * @param {object} configuration
    * @param {string} [configuration.url]
    * @param {string} [configuration.mnemonic]
+   * @param {string} [configuration.network]
    * @returns {this}
    */
   async init({ url, mnemonic, network } = {}) {
@@ -84,6 +85,7 @@ export class CheqdAPI extends ApiProvider {
     const sdk = await createCheqdSDK(options);
 
     this.ensureNotInitialized().sdk = sdk;
+    this.network = network;
 
     return this;
   }
@@ -93,6 +95,7 @@ export class CheqdAPI extends ApiProvider {
    */
   async disconnect() {
     delete this.sdk;
+    delete this.network;
   }
 
   /**
@@ -188,8 +191,8 @@ export class CheqdAPI extends ApiProvider {
     } else if (id instanceof DIDRef) {
       return this.supportsIdentifier(id[0]);
     } else if (id instanceof TypedEnum) {
-      return this.supportsIdentifier(this.value);
-    } else if (id.Qualifier?.contains('cheqd:')) {
+      return this.supportsIdentifier(id.value);
+    } else if (id?.constructor?.Qualifier?.includes('cheqd:')) {
       return true;
     }
 

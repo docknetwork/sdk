@@ -352,7 +352,7 @@ export default class DockAPI extends AbstractApiProvider {
       return this.supportsIdentifier(id[0]);
     } else if (id instanceof TypedEnum) {
       return this.supportsIdentifier(id.value);
-    } else if (id.constructor?.Qualifier?.includes(':dock:')) {
+    } else if (id?.constructor?.Qualifier?.includes(':dock:')) {
       return true;
     }
 

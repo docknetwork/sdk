@@ -59,6 +59,7 @@ export class CheqdAPI extends AbstractApiProvider {
    * @param {object} configuration
    * @param {string} [configuration.url]
    * @param {string} [configuration.mnemonic]
+   * @param {string} [configuration.network]
    * @returns {this}
    */
   async init({ url, mnemonic, network } = {}) {
@@ -191,7 +192,7 @@ export class CheqdAPI extends AbstractApiProvider {
       return this.supportsIdentifier(id[0]);
     } else if (id instanceof TypedEnum) {
       return this.supportsIdentifier(id.value);
-    } else if (id.constructor?.Qualifier?.includes('cheqd:')) {
+    } else if (id?.constructor?.Qualifier?.includes('cheqd:')) {
       return true;
     }
 

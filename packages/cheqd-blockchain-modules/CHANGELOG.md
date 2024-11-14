@@ -1,5 +1,11 @@
 # @docknetwork/cheqd-blockchain-modules
 
+## 0.7.0
+
+### Minor Changes
+
+- Allow to instantiate `CheqdCoreModules`
+
 ## 0.6.0
 
 ### Minor Changes

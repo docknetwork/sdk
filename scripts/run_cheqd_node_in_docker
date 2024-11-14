@@ -1,16 +1,16 @@
 #!/bin/bash
 
-# Starts a dock test node in docker for testing. Automatically deletes the container on exit.
+# Starts a cheqd test node in docker for testing. Automatically deletes the container on exit.
 # Arguments passed to this script are forwarded to the node binary.
 #
 # Example use:
 #
 # ```bash
 # # Start a local test node
-# ./run_dock_node_in_docker --dev
+# ./run_cheqd_node_in_docker --dev
 #
 # # Start a testnet node
-# ./run_dock_node_in_docker --chain=remdev --rpc-external --ws-external --rpc-cors=all
+# ./run_cheqd_node_in_docker --chain=remdev --rpc-external --ws-external --rpc-cors=all
 # ```
 
 set -uexo pipefail

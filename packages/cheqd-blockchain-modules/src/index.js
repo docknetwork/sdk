@@ -14,9 +14,17 @@ import CheqdPSModule from './offchain-signatures/ps';
 // import CheqdTrustRegistryModule from './trust-registry/module';
 
 export class CheqdCoreModules extends AbstractCoreModules {
-  // static AccumulatorModule = CheqdAccumulatorModule;
-
-  // static AnchorModule = CheqdAnchorModule;
+  static get ModuleMap() {
+    return {
+      ...super.ModuleMap,
+      AccumulatorModule: { key: 'accumulator', optional: true },
+      StatusListCredentialModule: {
+        key: 'statusListCredential',
+        optional: true,
+      },
+      TrustRegistryModule: { key: 'trustRegistry', optional: true },
+    };
+  }
 
   static AttestModule = CheqdAttestModule;
 
@@ -43,12 +51,9 @@ export {
   CheqdBlobModule,
   CheqdOffchainSignaturesModule,
   // CheqdAccumulatorModule,
-  // CheqdAnchorModule,
-  // ,
-  // CheqdOffchainSignaturesModule,
-  // CheqdBBSModule,
-  // CheqdBBSPlusModule,
-  // CheqdPSModule,
+  CheqdBBSModule,
+  CheqdBBSPlusModule,
+  CheqdPSModule,
   // CheqdStatusListCredentialModule,
   // CheqdTrustRegistryModule,
 };

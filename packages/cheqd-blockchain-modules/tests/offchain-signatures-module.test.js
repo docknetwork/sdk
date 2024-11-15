@@ -6,7 +6,11 @@ import {
 import { MultiApiOffchainSignaturesModule } from "@docknetwork/credential-sdk/modules";
 import generateOffchainSignaturesModuleTests from "@docknetwork/credential-sdk/modules/tests/offchain-signatures-module";
 import { faucet } from "./constants";
-import { CheqdOffchainSignaturesModule, CheqdDIDModule } from "../src";
+import {
+  CheqdOffchainSignaturesModule,
+  CheqdDIDModule,
+  CheqdCoreModules,
+} from "../src";
 import { MultiApiDIDModule } from "@docknetwork/credential-sdk/modules";
 import CheqdBBSModule from "../src/offchain-signatures/bbs";
 import CheqdBBSPlusModule from "../src/offchain-signatures/bbs-plus";

@@ -16,11 +16,11 @@ import {
   MsgUpdateDidDocPayload,
   MsgDeactivateDidDocPayload,
   protobufPackage as didProtobufPackage,
-} from '@cheqd/ts-proto/cheqd/did/v2/index';
+} from '@cheqd/ts-proto/cheqd/did/v2/index.js';
 import {
   MsgCreateResourcePayload,
   protobufPackage as resourceProtobufPackage,
-} from '@cheqd/ts-proto/cheqd/resource/v2/index';
+} from '@cheqd/ts-proto/cheqd/resource/v2/index.js';
 import { DIDRef, NamespaceDid } from '@docknetwork/credential-sdk/types';
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 
@@ -69,13 +69,14 @@ export class CheqdAPI extends AbstractApiProvider {
           Object.values(CheqdNetwork),
         )}\``,
       );
+    } else if (!mnemonic) {
+      throw new Error('`mnemonic` must be provided');
     }
 
     this.ensureNotInitialized();
-    const wallet = mnemonic
-      && (await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
-        prefix: 'cheqd',
-      }));
+    const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
+      prefix: 'cheqd',
+    });
     const options = {
       modules: [DIDModule, ResourceModule],
       rpcUrl: url,

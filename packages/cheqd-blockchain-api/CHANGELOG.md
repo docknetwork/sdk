@@ -1,5 +1,11 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 0.7.0
+
+### Minor Changes
+
+- Fix `cheqd` import
+
 ## 0.6.0
 
 ### Minor Changes

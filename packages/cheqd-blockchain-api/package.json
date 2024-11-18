@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/cheqd-blockchain-api",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "license": "MIT",
   "main": "./dist/esm/index.js",
   "type": "module",
@@ -86,6 +86,7 @@
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "docs": "rm -rf out && mkdir out && touch out/.nojekyll && jsdoc src -r -c ../../.jsdoc -d out/reference",
-    "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true"
+    "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true",
+    "prepublishOnly": "yarn build"
   }
 }

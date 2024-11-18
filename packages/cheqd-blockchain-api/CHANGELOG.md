@@ -1,5 +1,11 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 0.6.0
+
+### Minor Changes
+
+- Fix `prepublish` for `cheqd-blockchain-api`
+
 ## 0.5.0
 
 ### Minor Changes

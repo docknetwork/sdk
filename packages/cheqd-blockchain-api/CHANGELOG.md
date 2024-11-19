@@ -1,5 +1,11 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 0.8.0
+
+### Minor Changes
+
+- Switch `@cheqd/sdk` to the `cjs` tag
+
 ## 0.7.0
 
 ### Minor Changes

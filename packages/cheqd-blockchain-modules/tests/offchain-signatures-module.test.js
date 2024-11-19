@@ -9,9 +9,9 @@ import { faucet } from "./constants";
 import {
   CheqdOffchainSignaturesModule,
   CheqdDIDModule,
-  CheqdCoreModules,
+  CheqdCoreModules
 } from "../src";
-import { MultiApiDIDModule } from "@docknetwork/credential-sdk/modules";
+import { MultiApiDIDModule, MultiApiCoreModules } from "@docknetwork/credential-sdk/modules";
 import CheqdBBSModule from "../src/offchain-signatures/bbs";
 import CheqdBBSPlusModule from "../src/offchain-signatures/bbs-plus";
 import CheqdPSModule from "../src/offchain-signatures/ps";
@@ -32,13 +32,7 @@ describe("OffchainSignaturesModule", () => {
   });
 
   generateOffchainSignaturesModuleTests(
-    {
-      did: new CheqdDIDModule(cheqd),
-      offchainSignatures: new CheqdOffchainSignaturesModule(cheqd),
-      bbs: new CheqdBBSModule(cheqd),
-      bbsPlus: new CheqdBBSPlusModule(cheqd),
-      ps: new CheqdPSModule(cheqd),
-    },
+    new CheqdCoreModules(cheqd),
     {
       DID: CheqdTestnetDid,
       OffchainSignaturesParamsRef: CheqdOffchainSignatureParamsRef,
@@ -46,17 +40,9 @@ describe("OffchainSignaturesModule", () => {
   );
 
   generateOffchainSignaturesModuleTests(
-    {
-      did: new MultiApiDIDModule([new CheqdDIDModule(cheqd)]),
-      offchainSignatures: new MultiApiOffchainSignaturesModule([
-        new CheqdOffchainSignaturesModule(cheqd),
-      ]),
-      bbs: new MultiApiOffchainSignaturesModule([new CheqdBBSModule(cheqd)]),
-      bbsPlus: new MultiApiOffchainSignaturesModule([
-        new CheqdBBSPlusModule(cheqd),
-      ]),
-      ps: new MultiApiOffchainSignaturesModule([new CheqdPSModule(cheqd)]),
-    },
+    new MultiApiCoreModules([
+      new CheqdCoreModules(cheqd),
+    ]),
     {
       DID: CheqdTestnetDid,
       OffchainSignaturesParamsRef: CheqdOffchainSignatureParamsRef,

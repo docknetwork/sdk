@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.10.0
+
+### Minor Changes
+
+- Allow to use `MultiApiCoreModules` with `CheqdCoreModules`
+
 ## 0.9.0
 
 ### Minor Changes

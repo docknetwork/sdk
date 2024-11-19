@@ -11,6 +11,20 @@ import MultiApiTrustRegistryModule from './trust-registry';
  * Class representing a set of core modules each of which is an instance of its respective abstract module.
  */
 export class MultiApiCoreModules extends AbstractCoreModules {
+  static get ModuleMap() {
+    // Allows to instantiate `MultiApiCoreModules` over `CheqdCoreModules`
+
+    return {
+      ...super.ModuleMap,
+      AccumulatorModule: { key: 'accumulator', optional: true },
+      StatusListCredentialModule: {
+        key: 'statusListCredential',
+        optional: true,
+      },
+      TrustRegistryModule: { key: 'trustRegistry', optional: true },
+    };
+  }
+
   static AccumulatorModule = MultiApiAccumulatorModule;
 
   static AnchorModule = null;
@@ -35,7 +49,13 @@ export class MultiApiCoreModules extends AbstractCoreModules {
 
   attachModule(prop, { key, optional }, [modules]) {
     return super.attachModule(prop, { key, optional }, [
-      modules.map(({ [key]: module }) => module),
+      modules.map(({ [key]: module }) => {
+        if (module == null && !optional) {
+          throw new Error(`\`${prop}\` module is missing`);
+        }
+
+        return module;
+      }).filter(Boolean),
     ]);
   }
 }

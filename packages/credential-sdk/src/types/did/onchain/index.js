@@ -37,14 +37,14 @@ export class StoredOnchainDidDetailsValue extends TypedStruct {
   }
 
   get lastKeyId() {
-    return this.data.lastKeyId;
+    return this.data.lastKeyId.value;
   }
 
   get activeControllerKeys() {
-    return this.data.activeControllerKeys;
+    return this.data.activeControllerKeys.value;
   }
 
   get activeControllers() {
-    return this.data.activeControllers;
+    return this.data.activeControllers.value;
   }
 }

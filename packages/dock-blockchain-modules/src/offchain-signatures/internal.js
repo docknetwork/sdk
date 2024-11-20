@@ -68,11 +68,11 @@ export default class DockInternalOffchainSignaturesModule extends injectParams(
    * @returns Promise<*>
    */
   async keysCounter(did) {
-    return (
+    return TypedNumber.from((
       await new DockDIDModuleInternal(this.apiProvider).getOnchainDidDetail(
         DockDidOrDidMethodKey.from(did),
       )
-    ).lastKeyId;
+    ).lastKeyId);
   }
 
   async lastPublicKeyId(did) {

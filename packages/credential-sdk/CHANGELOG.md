@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.11.0
+
+### Minor Changes
+
+- Tweaks for `lastPublicKeyId` and `nextPublicKeyId`
+
 ## 0.10.0
 
 ### Minor Changes

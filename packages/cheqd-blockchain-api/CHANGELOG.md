@@ -1,5 +1,16 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 0.10.0
+
+### Minor Changes
+
+- Tweaks for `lastPublicKeyId` and `nextPublicKeyId`
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.11.0
+
 ## 0.9.0
 
 - Allow to use `MultiApiCoreModules` with `CheqdCoreModules`

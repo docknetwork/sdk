@@ -73,7 +73,7 @@ describe("Accumulator Module", () => {
     let params = Accumulator.generateParams(hexToU8a(label));
     const bytes1 = u8aToHex(params.bytes);
     const params1 = chainModuleClass.prepareAddParameters(bytes1, label);
-    await chainModule.addParams(null, params1, did1, pair1);
+    await chainModule.addParams(await chainModule.nextParamsId(did1), params1, did1, pair1);
     const paramsWritten1 = await chainModule.getParams(
       did1,
       await chainModule.dockOnly.paramsCounter(did1)
@@ -88,7 +88,7 @@ describe("Accumulator Module", () => {
     params = Accumulator.generateParams(hexToU8a(label));
     const bytes2 = u8aToHex(params.bytes);
     const params2 = chainModuleClass.prepareAddParameters(bytes2);
-    await chainModule.addParams(null, params2, did2, pair2);
+    await chainModule.addParams(await chainModule.nextParamsId(did2), params2, did2, pair2);
     const paramsWritten2 = await chainModule.getParams(
       did2,
       await chainModule.dockOnly.paramsCounter(did2)
@@ -103,7 +103,7 @@ describe("Accumulator Module", () => {
     params = Accumulator.generateParams(hexToU8a(label));
     const bytes3 = u8aToHex(params.bytes);
     const params3 = chainModuleClass.prepareAddParameters(bytes3);
-    await chainModule.addParams(null, params3, did1, pair1);
+    await chainModule.addParams(await chainModule.nextParamsId(did1), params3, did1, pair1);
     const paramsWritten3 = await chainModule.getParams(
       did1,
       await chainModule.dockOnly.paramsCounter(did1)
@@ -131,7 +131,7 @@ describe("Accumulator Module", () => {
     let keypair = Accumulator.generateKeypair(params);
     const bytes1 = u8aToHex(keypair.publicKey.bytes);
     const pk1 = chainModuleClass.prepareAddPublicKey(bytes1);
-    await chainModule.addPublicKey(null, pk1, did1, pair1);
+    await chainModule.addPublicKey(await chainModule.nextPublicKeyId(did2), pk1, did1, pair1);
 
     const queriedPk1 = await chainModule.getPublicKey(did1, 1);
     expect(queriedPk1.bytes).toEqual(pk1.bytes);
@@ -142,7 +142,7 @@ describe("Accumulator Module", () => {
     keypair = Accumulator.generateKeypair(aparams1, hexToU8a(seedAccum));
     const bytes2 = u8aToHex(keypair.publicKey.bytes);
     const pk2 = chainModuleClass.prepareAddPublicKey(bytes2, [did1, 1]);
-    await chainModule.addPublicKey(null, pk2, did2, pair2);
+    await chainModule.addPublicKey(await chainModule.nextPublicKeyId(did2), pk2, did2, pair2);
 
     const queriedPk2 = await chainModule.getPublicKey(did2, 1);
     expect(queriedPk2.bytes).toEqual(pk2.bytes);
@@ -158,7 +158,7 @@ describe("Accumulator Module", () => {
     keypair = Accumulator.generateKeypair(aparams2);
     const bytes3 = u8aToHex(keypair.publicKey.bytes);
     const pk3 = chainModuleClass.prepareAddPublicKey(bytes3, [did1, 2]);
-    await chainModule.addPublicKey(null, pk3, did2, pair2);
+    await chainModule.addPublicKey(await chainModule.nextPublicKeyId(did2), pk3, did2, pair2);
 
     const queriedPk3 = await chainModule.getPublicKey(did2, 2);
     expect(queriedPk3.bytes).toEqual(pk3.bytes);

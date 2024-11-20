@@ -15,7 +15,7 @@ export default {
       "<rootDir>/../cheqd-blockchain-api/dist/esm/index.js",
     "^@docknetwork/dock-blockchain-modules$":
       "<rootDir>/../dock-blockchain-modules/dist/esm/index.js",
-    "^@cheqd/sdk(.*)$": "<rootDir>/../../node_modules/@cheqd/sdk/build/esm/$1",
+    "^@cheqd/sdk(.*)$": "<rootDir>/../../node_modules/@cheqd/sdk/build/cjs/$1",
     "^uint8arrays$": "<rootDir>/../../node_modules/uint8arrays/dist/src",
     "^file-type$": "<rootDir>/../../node_modules/file-type/index.js",
     "^multiformats/(.*)$":

@@ -87,6 +87,14 @@ export default class DockInternalAccumulatorModule extends injectParams(
     return (await this.counters(did)).keyCounter;
   }
 
+  async lastParamsId(did) {
+    return await this.paramsCounter(did);
+  }
+
+  async lastPublicKeyId(did) {
+    return await this.keysCounter(did);
+  }
+
   /**
    * Update given witness by downloading necessary blocks and applying the updates if found. Both start and end are inclusive
    * @param accumulatorId

@@ -58,6 +58,10 @@ export default class DockInternalOffchainSignaturesModule extends injectParams(
     );
   }
 
+  async lastParamsId(did) {
+    return await this.paramsCounter(did);
+  }
+
   /**
    * Returns keys counter corresponding to the supplied DID.
    * @param {*} did
@@ -69,5 +73,9 @@ export default class DockInternalOffchainSignaturesModule extends injectParams(
         DockDidOrDidMethodKey.from(did),
       )
     ).lastKeyId;
+  }
+
+  async lastPublicKeyId(did) {
+    return await this.keysCounter(did);
   }
 }

@@ -1,5 +1,17 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 0.9.0
+
+- Allow to use `MultiApiCoreModules` with `CheqdCoreModules`
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.10.0
+
+## 0.8.0
+
+### Minor Changes
+
+- Switch `@cheqd/sdk` to the `cjs` tag
+
 ## 0.7.0
 
 ### Minor Changes

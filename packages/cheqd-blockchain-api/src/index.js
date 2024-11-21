@@ -60,9 +60,12 @@ export class CheqdAPI extends AbstractApiProvider {
    * @param {string} [configuration.url]
    * @param {string} [configuration.mnemonic]
    * @param {string} [configuration.network]
+   * @param {object} [configuration.walletOptions]
    * @returns {this}
    */
-  async init({ url, mnemonic, network } = {}) {
+  async init({
+    url, mnemonic, walletOptions, network,
+  } = {}) {
     if (network !== CheqdNetwork.Mainnet && network !== CheqdNetwork.Testnet) {
       throw new Error(
         `Invalid network provided: \`${network}\`, expected one of \`${fmtIter(
@@ -75,6 +78,7 @@ export class CheqdAPI extends AbstractApiProvider {
 
     this.ensureNotInitialized();
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
+      ...walletOptions,
       prefix: 'cheqd',
     });
     const options = {

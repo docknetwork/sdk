@@ -1,5 +1,11 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 0.10.0
+
+### Minor Changes
+
+- Support wallet options
+
 ## 0.9.0
 
 - Allow to use `MultiApiCoreModules` with `CheqdCoreModules`

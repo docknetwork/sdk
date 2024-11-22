@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.13.0
+
+### Minor Changes
+
+- Small refactoring of the `did/document`
+
 ## 0.12.0
 
 ### Minor Changes

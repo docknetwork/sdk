@@ -9,7 +9,7 @@ import {
   withQualifier,
 } from '../generic';
 import { CheqdBlobQualifier, DockBlobQualifier } from './const';
-import { CheqdMainnetDid, CheqdTestnetDid, DIDRef } from '../did';
+import { CheqdMainnetDid, CheqdTestnetDid, DidRef } from '../did';
 
 export class BlobId extends withFrom(
   withQualifier(TypedEnum, true),
@@ -29,7 +29,7 @@ export class BlobId extends withFrom(
   }
 }
 
-export class CheqdBlobIdValue extends withQualifier(DIDRef) {
+export class CheqdBlobIdValue extends withQualifier(DidRef) {
   static Qualifier = CheqdBlobQualifier;
 
   static Ident = TypedUUID;

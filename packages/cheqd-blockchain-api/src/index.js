@@ -20,7 +20,7 @@ import {
   MsgCreateResourcePayload,
   protobufPackage as resourceProtobufPackage,
 } from '@cheqd/ts-proto/cheqd/resource/v2/index.js';
-import { DIDRef, NamespaceDid } from '@docknetwork/credential-sdk/types';
+import { DidRef, NamespaceDid } from '@docknetwork/credential-sdk/types';
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 
 export class CheqdAPI extends AbstractApiProvider {
@@ -88,12 +88,14 @@ export class CheqdAPI extends AbstractApiProvider {
   }
 
   /**
-   * @returns {void}
+   * @returns {Promise<this>}
    */
   async disconnect() {
     this.ensureInitialized();
 
     delete this.sdk;
+
+    return this;
   }
 
   /**
@@ -186,7 +188,7 @@ export class CheqdAPI extends AbstractApiProvider {
           return this.sdk.options.network === CheqdNetwork.Mainnet;
         }
       }
-    } else if (id instanceof DIDRef) {
+    } else if (id instanceof DidRef) {
       return this.supportsIdentifier(id[0]);
     } else if (id instanceof TypedEnum) {
       return this.supportsIdentifier(id.value);

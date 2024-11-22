@@ -170,7 +170,7 @@ class CheqdNamespaceDid extends NamespaceDid {
 
 NamespaceDid.bindVariants(DockNamespaceDid, DidNamespaceKey, CheqdNamespaceDid);
 
-export class DIDRef extends withExtendedStaticProperties(
+export class DidRef extends withExtendedStaticProperties(
   ['Ident'],
   withQualifier(TypedTuple),
 ) {

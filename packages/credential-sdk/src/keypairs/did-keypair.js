@@ -1,6 +1,6 @@
 import DockKeypair from './keypair';
 import { DidKey } from '../types/did/onchain/did-key';
-import { VerificationMethodRefOrIdentRef } from '../types/did/document';
+import VerificationMethodRef from '../types/did/document/verification-method-ref';
 import { ensureInstanceOf } from '../utils';
 import { DidMethodKey } from '../types/did/onchain/typed-did';
 
@@ -15,7 +15,7 @@ export default class DidKeypair {
    * @param {DockKeypair} keyPair - Key pair provided.
    */
   constructor(keyRef, keyPair) {
-    const ref = VerificationMethodRefOrIdentRef.from(keyRef);
+    const ref = VerificationMethodRef.from(keyRef);
 
     ensureInstanceOf(keyPair, DockKeypair);
 

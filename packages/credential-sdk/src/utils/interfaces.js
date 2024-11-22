@@ -12,15 +12,7 @@ export const maybeToJSON = (value) => (value && typeof value.toJSON === 'functio
  * @param {T} value
  * @returns {string}
  */
-export const maybeToJSONString = (value) => {
-  const json = maybeToJSON(value);
-
-  try {
-    return JSON.stringify(json);
-  } catch {
-    return String(json);
-  }
-};
+export const maybeToJSONString = (value) => JSON.stringify(maybeToJSON(value));
 
 /**
  * Attempts to compare two values using `value.eq(other)`, returns `boolean`.

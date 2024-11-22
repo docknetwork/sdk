@@ -3,7 +3,7 @@ import { CheqdTestnetDid } from "@docknetwork/credential-sdk/types";
 import { MultiApiDIDModule, MultiApiAttestModule } from "@docknetwork/credential-sdk/modules";
 import generateAttestModuleTests from "@docknetwork/credential-sdk/modules/tests/attest-module";
 import CheqdDIDModule from "../src/did/module";
-import { faucet, url } from "./constants";
+import { faucet, url, network } from "./constants";
 import CheqdAttestModule from "../src/attest/module";
 
 describe("AttestModule", () => {
@@ -12,8 +12,8 @@ describe("AttestModule", () => {
   beforeAll(async () => {
     await cheqd.init({
       url: url,
-      mnemonic: faucet.mnemonic,
-      network: "testnet",
+      wallet: await faucet.wallet(),
+      network,
     });
   });
 

@@ -1,5 +1,16 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 0.11.0
+
+### Minor Changes
+
+- Allow to pass `wallet` to `CheqdAPI`, misc tweaks
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.12.0
+
 ## 0.10.0
 
 ### Minor Changes

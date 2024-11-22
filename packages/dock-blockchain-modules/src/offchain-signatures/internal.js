@@ -19,6 +19,12 @@ import DockDIDModuleInternal from '../did/internal';
 export default class DockInternalOffchainSignaturesModule extends injectParams(
   injectPublicKeys(class OffchainSignatures {}),
 ) {
+  constructor(...args) {
+    super(...args);
+
+    this.didModule = new DockDIDModuleInternal(this.apiProvider);
+  }
+
   static Prop = 'offchainSignatures';
 
   static MethodNameOverrides = {
@@ -50,7 +56,7 @@ export default class DockInternalOffchainSignaturesModule extends injectParams(
   /**
    * Returns params counter corresponding to the supplied DID.
    * @param {*} did
-   * @returns Promise<*>
+   * @returns Promise<DockParamsId>
    */
   async paramsCounter(did) {
     return DockParamsId.from(
@@ -65,12 +71,16 @@ export default class DockInternalOffchainSignaturesModule extends injectParams(
   /**
    * Returns keys counter corresponding to the supplied DID.
    * @param {*} did
-   * @returns Promise<*>
+   * @returns Promise<TypedNumber>
    */
   async keysCounter(did) {
-    return (await new DockDIDModuleInternal(this.apiProvider).getOnchainDidDetail(
-      DockDidOrDidMethodKey.from(did),
-    )).data.lastKeyId;
+    const parsedDid = DockDidOrDidMethodKey.from(did);
+
+    const { data: { lastKeyId } } = await this.didModule.getOnchainDidDetail(
+      parsedDid,
+    );
+
+    return lastKeyId;
   }
 
   async lastPublicKeyId(did) {

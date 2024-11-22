@@ -2,7 +2,7 @@ import { CheqdAPI } from "@docknetwork/cheqd-blockchain-api";
 import { CheqdTestnetDid } from "@docknetwork/credential-sdk/types";
 import didModuleTests from "@docknetwork/credential-sdk/modules/tests/did-module";
 import CheqdDIDModule from "../src/did/module";
-import { faucet, url } from "./constants";
+import { faucet, url, network } from "./constants";
 import { MultiApiDIDModule } from "@docknetwork/credential-sdk/modules";
 
 describe("DIDModule", () => {
@@ -11,8 +11,8 @@ describe("DIDModule", () => {
   beforeAll(async () => {
     await cheqd.init({
       url,
-      mnemonic: faucet.mnemonic,
-      network: "testnet",
+      wallet: await faucet.wallet(),
+      network,
     });
   });
 

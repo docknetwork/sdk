@@ -1,5 +1,16 @@
 # @docknetwork/dock-blockchain-modules
 
+## 0.8.0
+
+### Minor Changes
+
+- Allow to pass `wallet` to `CheqdAPI`, misc tweaks
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.12.0
+
 ## 0.7.0
 
 ### Minor Changes

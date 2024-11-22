@@ -4,7 +4,6 @@ import {
   maybeToJSONString,
   fmtIter,
 } from '@docknetwork/credential-sdk/utils';
-import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import {
   DIDModule,
   ResourceModule,
@@ -55,28 +54,25 @@ export class CheqdAPI extends AbstractApiProvider {
   };
 
   /**
-   * Initializes `CheqdAPI` with the supplied url and mnemonic.
+   * Initializes `CheqdAPI` with the supplied url, wallet and network type.
    * @param {object} configuration
    * @param {string} [configuration.url]
-   * @param {string} [configuration.mnemonic]
+   * @param {*} [configuration.wallet]
    * @param {string} [configuration.network]
    * @returns {this}
    */
-  async init({ url, mnemonic, network } = {}) {
+  async init({ url, wallet, network } = {}) {
     if (network !== CheqdNetwork.Mainnet && network !== CheqdNetwork.Testnet) {
       throw new Error(
         `Invalid network provided: \`${network}\`, expected one of \`${fmtIter(
           Object.values(CheqdNetwork),
         )}\``,
       );
-    } else if (!mnemonic) {
-      throw new Error('`mnemonic` must be provided');
+    } else if (wallet == null) {
+      throw new Error('`wallet` must be provided');
     }
 
     this.ensureNotInitialized();
-    const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
-      prefix: 'cheqd',
-    });
     const options = {
       modules: [DIDModule, ResourceModule],
       rpcUrl: url,
@@ -85,8 +81,8 @@ export class CheqdAPI extends AbstractApiProvider {
     };
     const sdk = await createCheqdSDK(options);
 
-    this.ensureNotInitialized().sdk = sdk;
-    this.network = network;
+    this.ensureNotInitialized();
+    this.sdk = sdk;
 
     return this;
   }
@@ -95,8 +91,9 @@ export class CheqdAPI extends AbstractApiProvider {
    * @returns {void}
    */
   async disconnect() {
+    this.ensureInitialized();
+
     delete this.sdk;
-    delete this.network;
   }
 
   /**
@@ -184,9 +181,9 @@ export class CheqdAPI extends AbstractApiProvider {
     if (id instanceof NamespaceDid) {
       if (id.isCheqd) {
         if (id.asCheqd.isTestnet) {
-          return this.network === CheqdNetwork.Testnet;
+          return this.sdk.options.network === CheqdNetwork.Testnet;
         } else if (id.asCheqd.isMainnet) {
-          return this.network === CheqdNetwork.Mainnet;
+          return this.sdk.options.network === CheqdNetwork.Mainnet;
         }
       }
     } else if (id instanceof DIDRef) {
@@ -200,3 +197,5 @@ export class CheqdAPI extends AbstractApiProvider {
     return false;
   }
 }
+
+export { CheqdNetwork };

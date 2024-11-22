@@ -80,7 +80,7 @@ for (const {
       let params = SignatureParams.generate(10, hexToU8a(label));
       const bytes1 = u8aToHex(params.toBytes());
       const params1 = chainModuleClass.prepareAddParameters(bytes1, label);
-      await chainModule.addParams(null, params1, did1, pair1);
+      await chainModule.addParams(await chainModule.nextParamsId(did1), params1, did1, pair1);
       const paramsWritten1 = await chainModule.getParams(
         did1,
         await chainModule.lastParamsId(did1)
@@ -99,7 +99,7 @@ for (const {
       params = SignatureParams.generate(20);
       const bytes2 = u8aToHex(params.toBytes());
       const params2 = chainModuleClass.prepareAddParameters(bytes2);
-      await chainModule.addParams(null, params2, did2, pair2);
+      await chainModule.addParams(await chainModule.nextParamsId(did2), params2, did2, pair2);
       const paramsWritten2 = await chainModule.getParams(
         did2,
         await chainModule.lastParamsId(did2)
@@ -114,7 +114,7 @@ for (const {
       params = SignatureParams.generate(23, hexToU8a(label));
       const bytes3 = u8aToHex(params.toBytes());
       const params3 = chainModuleClass.prepareAddParameters(bytes3, label);
-      await chainModule.addParams(null, params3, did1, pair1);
+      await chainModule.addParams(await chainModule.nextParamsId(did1), params3, did1, pair1);
       const paramsWritten3 = await chainModule.getParams(
         did1,
         await chainModule.lastParamsId(did1)

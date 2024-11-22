@@ -1,10 +1,10 @@
-import { TypedNumber } from '@docknetwork/credential-sdk/types/generic';
 import {
   DockDidOrDidMethodKey,
   OffchainSignatureParams,
   DockOffchainSignaturePublicKey,
   DockDidValue,
   DockOffchainSignatureParamsRef,
+  DockParamsId,
 } from '@docknetwork/credential-sdk/types';
 import {
   AddOffchainSignatureParams,
@@ -53,9 +53,13 @@ export default class DockInternalOffchainSignaturesModule extends injectParams(
    * @returns Promise<*>
    */
   async paramsCounter(did) {
-    return TypedNumber.from(
+    return DockParamsId.from(
       await this.query.paramsCounter(DockDidOrDidMethodKey.from(did)),
     );
+  }
+
+  async lastParamsId(did) {
+    return await this.paramsCounter(did);
   }
 
   /**
@@ -64,10 +68,12 @@ export default class DockInternalOffchainSignaturesModule extends injectParams(
    * @returns Promise<*>
    */
   async keysCounter(did) {
-    return (
-      await new DockDIDModuleInternal(this.apiProvider).getOnchainDidDetail(
-        DockDidOrDidMethodKey.from(did),
-      )
-    ).lastKeyId;
+    return (await new DockDIDModuleInternal(this.apiProvider).getOnchainDidDetail(
+      DockDidOrDidMethodKey.from(did),
+    )).data.lastKeyId;
+  }
+
+  async lastPublicKeyId(did) {
+    return await this.keysCounter(did);
   }
 }

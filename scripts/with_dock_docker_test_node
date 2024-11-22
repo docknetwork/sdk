@@ -24,6 +24,9 @@ cleanup() {
 try_with_node() {
 	# Wait for nodes to start listening for RPC
 	"$root_dir"/scripts/wait_for_node_rpc_http
+
+	sleep 5
+
 	# Execute the commands, potentially against the nodes
 	$@
 }

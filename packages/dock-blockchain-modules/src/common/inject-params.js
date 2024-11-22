@@ -62,7 +62,7 @@ export default function injectParams(klass) {
         const hexDid = DockDidOrDidMethodKey.from(did);
         const paramsMap = new this.constructor.ParamsMap();
 
-        const paramsCounter = await this.paramsCounter(hexDid);
+        const paramsCounter = await this.lastParamsId(hexDid);
         for (let idx = 1; idx <= paramsCounter; idx++) {
           // eslint-disable-next-line no-await-in-loop
           const params = await this.getParams(hexDid, idx);
@@ -73,6 +73,10 @@ export default function injectParams(klass) {
         }
 
         return paramsMap;
+      }
+
+      async lastParamsId(_did) {
+        throw new Error('Unimplemented');
       }
     },
   };

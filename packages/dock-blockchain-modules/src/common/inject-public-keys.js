@@ -6,7 +6,7 @@ import {
   TypedMap,
   withNullIfNotAVariant,
 } from '@docknetwork/credential-sdk/types/generic';
-import { isEqualToOrPrototypeOf, withExtendedStaticProperties } from '@docknetwork/credential-sdk/utils';
+import { isEqualToOrPrototypeOf, withExtendedStaticProperties, withExtendedPrototypeProperties } from '@docknetwork/credential-sdk/utils';
 import { DockDidOrDidMethodKey } from '@docknetwork/credential-sdk/types';
 import { createInternalDockModule } from './builders';
 
@@ -85,7 +85,7 @@ export default function injectPublicKeys(klass) {
         const hexDid = DockDidOrDidMethodKey.from(did);
         const publicKeysMap = new this.constructor.PublicKeysMap();
 
-        const keysCounter = await this.keysCounter(hexDid);
+        const keysCounter = await this.lastPublicKeyId(hexDid);
         for (let idx = 1; idx <= keysCounter; idx++) {
           // eslint-disable-next-line no-await-in-loop
           const publicKey = await this.getPublicKey(hexDid, idx, includeParams);
@@ -97,14 +97,18 @@ export default function injectPublicKeys(klass) {
 
         return publicKeysMap;
       }
+
+      async lastPublicKeyId(_did) {
+        throw new Error('Unimplemented');
+      }
     },
   };
 
   return createInternalDockModule(
     { didMethods },
-    withExtendedStaticProperties(
+    withExtendedPrototypeProperties(['lastPublicKeyId'], withExtendedStaticProperties(
       ['PublicKey', 'ParamsRef', 'PublicKeyOwner', 'PublicKeyQuery'],
       obj[name],
-    ),
+    )),
   );
 }

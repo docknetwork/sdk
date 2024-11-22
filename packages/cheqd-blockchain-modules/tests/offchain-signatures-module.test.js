@@ -5,7 +5,7 @@ import {
 } from "@docknetwork/credential-sdk/types";
 import { MultiApiOffchainSignaturesModule } from "@docknetwork/credential-sdk/modules";
 import generateOffchainSignaturesModuleTests from "@docknetwork/credential-sdk/modules/tests/offchain-signatures-module";
-import { faucet } from "./constants";
+import { faucet, url } from "./constants";
 import {
   CheqdOffchainSignaturesModule,
   CheqdDIDModule,
@@ -21,7 +21,7 @@ describe("OffchainSignaturesModule", () => {
 
   beforeAll(async () => {
     await cheqd.init({
-      url: process.env.ENDPOINT_URL || "http://localhost:26657",
+      url,
       mnemonic: faucet.mnemonic,
       network: "testnet",
     });

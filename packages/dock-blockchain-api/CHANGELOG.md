@@ -1,5 +1,16 @@
 # @docknetwork/dock-blockchain-api
 
+## 0.6.0
+
+### Minor Changes
+
+- Tweaks for `lastPublicKeyId` and `nextPublicKeyId`
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.11.0
+
 ## 0.5.1
 
 ### Patch Changes

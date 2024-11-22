@@ -6,7 +6,7 @@ import {
 import { MultiApiBlobModule } from "@docknetwork/credential-sdk/modules";
 import generateBlobModuleTests from "@docknetwork/credential-sdk/modules/tests/blob-module";
 import CheqdDIDModule from "../src/did/module";
-import { faucet, url } from "./constants";
+import { faucet, url, network } from "./constants";
 import CheqdBlobModule from "../src/blob/module";
 import { MultiApiDIDModule } from "@docknetwork/credential-sdk/modules";
 
@@ -16,8 +16,8 @@ describe("BlobModule", () => {
   beforeAll(async () => {
     await cheqd.init({
       url,
-      mnemonic: faucet.mnemonic,
-      network: "testnet",
+      wallet: await faucet.wallet(),
+      network,
     });
   });
 

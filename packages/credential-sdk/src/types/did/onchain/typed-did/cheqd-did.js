@@ -34,8 +34,18 @@ export class CheqdDid extends withQualifier(TypedEnum, true) {
     return this.Class?.Qualifier;
   }
 
-  static random() {
-    return new this(this.Class.random());
+  static random(network) {
+    if (this.Class != null) {
+      return new this(this.Class.random());
+    } else if (network === 'testnet') {
+      // eslint-disable-next-line no-use-before-define
+      return CheqdTestnetDid.random();
+    } else if (network === 'mainnet') {
+      // eslint-disable-next-line no-use-before-define
+      return CheqdMainnetDid.random();
+    } else {
+      throw new Error(`Unknown network provided: \`${network}\`, expected \`mainnet\` or \`testnet\``);
+    }
   }
 
   toJSON() {

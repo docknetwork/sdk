@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.12.0
+
+### Minor Changes
+
+- Allow to pass `wallet` to `CheqdAPI`, misc tweaks
+
 ## 0.11.0
 
 ### Minor Changes

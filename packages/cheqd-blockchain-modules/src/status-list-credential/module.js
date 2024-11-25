@@ -1,18 +1,18 @@
-import { AbstractBaseModule } from '../common';
-import { withExtendedPrototypeProperties } from '../../../utils';
-// eslint-disable-next-line
-import { StatusListCredentialId } from "../../../types";
+import { AbstractStatusListCredentialModule } from '@docknetwork/credential-sdk/modules';
+import { CheqdStatusListCredentialId } from '@docknetwork/credential-sdk/types';
+import { injectCheqd } from '../common';
+import CheqdInternalStatusListCredentialModule from './internal';
+import { OwnerWithStatusListCredential } from './types';
 
-/**
- * Module supporting `StatusList2021Credential` and `RevocationList2020Credential`.
- */
-class AbstractStatusListCredentialModule extends AbstractBaseModule {
+export default class CheqdStatusListCredentialModule extends injectCheqd(AbstractStatusListCredentialModule) {
+  static CheqdOnly = CheqdInternalStatusListCredentialModule;
+
   /**
    * Fetches `StatusList2021Credential` with the supplied identifier.
    * @param {*} statusListCredentialId
    * @returns {Promise<StatusList2021Credential | null>}
    */
-  async getStatusListCredential(_statusListCredentialId) {
+  async getStatusListCredential(statusListCredentialId) {
     throw new Error('Unimplemented');
   }
 
@@ -25,22 +25,12 @@ class AbstractStatusListCredentialModule extends AbstractBaseModule {
    * @param params
    * @return {Promise<StatusListCredentialId>} - the extrinsic to sign and send.
    */
-  async createStatusListCredential(
+  async createStatusListCredentialTx(
     id,
     statusListCredential,
     targetDid,
     didKeypair,
-    params,
   ) {
-    return await this.signAndSend(
-      await this.createStatusListCredentialTx(
-        id,
-        statusListCredential,
-        targetDid,
-        didKeypair,
-      ),
-      params,
-    );
   }
 
   /**
@@ -57,16 +47,12 @@ class AbstractStatusListCredentialModule extends AbstractBaseModule {
     statusListCredential,
     targetDid,
     didKeypair,
-    params,
   ) {
-    return await this.signAndSend(
-      await this.updateStatusListCredentialTx(
-        id,
-        statusListCredential,
-        targetDid,
-        didKeypair,
-      ),
-      params,
+    await this.updateStatusListCredentialTx(
+      id,
+      statusListCredential,
+      targetDid,
+      didKeypair,
     );
   }
 
@@ -82,25 +68,11 @@ class AbstractStatusListCredentialModule extends AbstractBaseModule {
     statusListCredentialId,
     targetDid,
     didKeypair,
-    params,
   ) {
-    return await this.signAndSend(
-      await this.removeStatusListCredentialTx(
-        statusListCredentialId,
-        targetDid,
-        didKeypair,
-      ),
-      params,
-    );
+    await this.removeStatusListCredentialTx(
+      statusListCredentialId,
+      targetDid,
+      didKeypair,
+    )
   }
 }
-
-export default withExtendedPrototypeProperties(
-  [
-    'getStatusListCredential',
-    'createStatusListCredentialTx',
-    'updateStatusListCredentialTx',
-    'removeStatusListCredentialTx',
-  ],
-  AbstractStatusListCredentialModule,
-);

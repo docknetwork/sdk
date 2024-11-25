@@ -25,7 +25,6 @@ export default class MultiApiStatusListCredentialModule extends injectModuleRout
   async createStatusListCredentialTx(
     statusListCredentialId,
     statusListCredential,
-    signerDid,
     didKeypair,
   ) {
     const id = StatusListCredentialId.from(statusListCredentialId);
@@ -47,7 +46,6 @@ export default class MultiApiStatusListCredentialModule extends injectModuleRout
   async updateStatusListCredentialTx(
     statusListCredentialId,
     statusListCredential,
-    targetDid,
     didKeypair,
   ) {
     const id = StatusListCredentialId.from(statusListCredentialId);
@@ -68,7 +66,6 @@ export default class MultiApiStatusListCredentialModule extends injectModuleRout
    */
   async removeStatusListCredentialTx(
     statusListCredentialId,
-    targetDid,
     didKeypair,
   ) {
     const id = StatusListCredentialId.from(statusListCredentialId);

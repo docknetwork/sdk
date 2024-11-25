@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Variables (you can modify these)
-CHAIN_ID="/tmp/cheqd-dev"
+CHAIN_ID="cheqd-dev"
 NODE_NAME="cheqd-dev"
 KEY_NAME="my-key"
 MONIKER="local-node"

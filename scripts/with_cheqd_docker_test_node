@@ -17,7 +17,7 @@ cleanup() {
 }
 
 try_with_node() {
-    sleep 10;
+  sleep 10;
 	# Execute the commands, potentially against the nodes
 	$@
 }

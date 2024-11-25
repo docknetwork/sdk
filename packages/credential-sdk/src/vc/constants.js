@@ -5,6 +5,7 @@ export const StatusList2021EntryType = 'StatusList2021Entry';
 export const PrivateStatusList2021EntryType = 'PrivateStatusList2021Entry';
 export const DockRevRegQualifier = 'rev-reg:dock:';
 export const DockStatusList2021Qualifier = 'status-list2021:dock:';
+export const CheqdStatusList2021Qualifier = 'status-list2021:cheqd:';
 export const PrivateStatusList2021Qualifier = 'private-status-list2021:';
 export const DEFAULT_TYPE = 'VerifiableCredential';
 export const DEFAULT_CONTEXT_URL = 'https://www.w3.org/2018/credentials';

@@ -8,6 +8,10 @@ export default function withBase58(klass) {
       toString() {
         return encodeAsBase58(this.bytes);
       }
+
+      toJSON() {
+        return String(this);
+      }
     },
   };
 

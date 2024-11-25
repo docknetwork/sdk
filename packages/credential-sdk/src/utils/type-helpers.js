@@ -119,7 +119,7 @@ export const isBytes = (bytes) => {
 export const ensureInstanceOf = (value, klass) => {
   if (!(value instanceof klass)) {
     throw new Error(
-      `Expected \`${value}\` to be an instance of \`${klass.name}\``,
+      `Expected \`${value}\` with constructor \`${value?.constructor.name}\` to be an instance of \`${klass.name}\``,
     );
   }
 

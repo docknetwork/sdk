@@ -1,7 +1,5 @@
 import { AbstractBaseModule } from '../common';
 import { withExtendedPrototypeProperties } from '../../../utils';
-// eslint-disable-next-line
-import { StatusListCredentialId } from "../../../types";
 
 /**
  * Module supporting `StatusList2021Credential` and `RevocationList2020Credential`.
@@ -20,7 +18,6 @@ class AbstractStatusListCredentialModule extends AbstractBaseModule {
    * Create a transaction to create a new status list credential on-chain.
    * @param id - is the unique id of the status list credential. The function will check whether `id` is already taken or not.
    * @param statusListCredential - the credential to be associated with the given `id`
-   * @param targetDid
    * @param didKeypair
    * @param params
    * @return {Promise<StatusListCredentialId>} - the extrinsic to sign and send.
@@ -28,7 +25,6 @@ class AbstractStatusListCredentialModule extends AbstractBaseModule {
   async createStatusListCredential(
     id,
     statusListCredential,
-    targetDid,
     didKeypair,
     params,
   ) {
@@ -36,7 +32,6 @@ class AbstractStatusListCredentialModule extends AbstractBaseModule {
       await this.createStatusListCredentialTx(
         id,
         statusListCredential,
-        targetDid,
         didKeypair,
       ),
       params,
@@ -47,7 +42,6 @@ class AbstractStatusListCredentialModule extends AbstractBaseModule {
    * Create a transaction to update an existing status list credential on-chain.
    * @param id
    * @param statusListCredentialUpdate - Update for the status list credential.
-   * @param targetDid
    * @param didKeypair - `DID` signatures over an action with a nonce authorizing this action according to the existing policy.
    * @param params
    * @return {Promise<object>} - the extrinsic to sign and send.
@@ -55,7 +49,6 @@ class AbstractStatusListCredentialModule extends AbstractBaseModule {
   async updateStatusListCredential(
     id,
     statusListCredential,
-    targetDid,
     didKeypair,
     params,
   ) {
@@ -63,7 +56,6 @@ class AbstractStatusListCredentialModule extends AbstractBaseModule {
       await this.updateStatusListCredentialTx(
         id,
         statusListCredential,
-        targetDid,
         didKeypair,
       ),
       params,
@@ -73,25 +65,66 @@ class AbstractStatusListCredentialModule extends AbstractBaseModule {
   /**
    * Create a transaction to remove an existing status list credential from the chain.
    * @param statusListCredentialId - is the unique id of the status list credential. The function will check whether `id` is already taken or not.
-   * @param targetDid
    * @param didKeypair - `DID` signatures over an action with a nonce authorizing this action according to the existing policy.
    * @param params
    * @return {Promise<object>} - the extrinsic to sign and send.
    */
   async removeStatusListCredential(
     statusListCredentialId,
-    targetDid,
     didKeypair,
     params,
   ) {
     return await this.signAndSend(
       await this.removeStatusListCredentialTx(
         statusListCredentialId,
-        targetDid,
         didKeypair,
       ),
       params,
     );
+  }
+
+  /**
+   * Create a transaction to create a new status list credential on-chain.
+   * @param id - is the unique id of the status list credential. The function will check whether `id` is already taken or not.
+   * @param statusListCredential - the credential to be associated with the given `id`
+   * @param didKeypair
+   * @return {Promise<*>} - the extrinsic to sign and send.
+   */
+  async createStatusListCredentialTx(
+    id,
+    statusListCredential,
+    didKeypair,
+  ) {
+    throw new Error('Unimplemented')
+  }
+
+  /**
+   * Create a transaction to update an existing status list credential on-chain.
+   * @param id
+   * @param statusListCredentialUpdate - Update for the status list credential.
+   * @param didKeypair - `DID` signatures over an action with a nonce authorizing this action according to the existing policy.
+   * @param params
+   * @return {Promise<*>} - the extrinsic to sign and send.
+   */
+  async updateStatusListCredentialTx(
+    id,
+    statusListCredential,
+    didKeypair,
+  ) {
+    throw new Error('Unimplemented')
+  }
+
+  /**
+   * Create a transaction to remove an existing status list credential from the chain.
+   * @param statusListCredentialId - is the unique id of the status list credential. The function will check whether `id` is already taken or not.
+   * @param didKeypair - `DID` signatures over an action with a nonce authorizing this action according to the existing policy.
+   * @return {Promise<object>} - the extrinsic to sign and send.
+   */
+  async removeStatusListCredentialTx(
+    statusListCredentialId,
+    didKeypair,
+  ) {
+    throw new Error('Unimplemented')
   }
 }
 

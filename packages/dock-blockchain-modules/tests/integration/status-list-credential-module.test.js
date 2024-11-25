@@ -76,8 +76,7 @@ describe("StatusListCredential Module", () => {
   test("Can create a status list with a OneOf policy", async () => {
     const cred = await StatusList2021Credential.create(
       ownerKey,
-      statusListCredId,
-      {}
+      statusListCredId
     );
     await expect(
       modules.statusListCredential.createStatusListCredential(

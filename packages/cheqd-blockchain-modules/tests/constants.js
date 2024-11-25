@@ -7,7 +7,7 @@ export const faucet = {
   mnemonic: process.env.CHEQD_MNEMONIC ||
     "steak come surprise obvious remain black trouble measure design volume retreat float coach amused match album moment radio stuff crack orphan ranch dose endorse",
   async wallet() {
-    return await DirectSecp256k1HdWallet.fromMnemonic(this.mnemonic, { prefix: 'cheqd' })
+    return await DirectSecp256k1HdWallet.fromMnemonic(this.mnemonic, { prefix: this.prefix })
   }
 };
 

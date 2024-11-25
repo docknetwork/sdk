@@ -16,6 +16,10 @@ export default function withBase58btc(klass) {
 
         return encodeAsBase58btc(Prefix, this.bytes);
       }
+
+      toJSON() {
+        return String(this);
+      }
     },
   };
 

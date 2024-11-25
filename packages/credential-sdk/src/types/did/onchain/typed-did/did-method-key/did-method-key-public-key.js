@@ -1,7 +1,6 @@
-import bs58 from 'bs58';
-import { base58btc } from 'multiformats/bases/base58';
-import varint from 'varint';
-import { TypedEnum, TypedStruct, withQualifier } from '../../../../generic';
+import {
+  TypedEnum, TypedStruct, withQualifier,
+} from '../../../../generic';
 import {
   PublicKeyEd25519Value,
   PublicKeySecp256k1Value,
@@ -15,6 +14,9 @@ import {
 } from '../../constants';
 import DidOrDidMethodKeySignature from '../signature';
 import { DidMethodKeySignatureValue } from './did-method-key-signature';
+import {
+  decodeFromBase58btc, encodeAsBase58btc,
+} from '../../../../../utils/base-x';
 
 export class DidMethodKeyPublicKey extends withQualifier(TypedEnum) {
   static Qualifier = DidMethodKeyQualifier;
@@ -27,9 +29,7 @@ export class DidMethodKeyPublicKey extends withQualifier(TypedEnum) {
    * @returns {DidMethodKey}
    */
   static fromUnqualifiedString(id) {
-    const multicodecPubKey = base58btc.decode(id);
-    varint.decode(multicodecPubKey); // NOTE: called to get byte length below
-    const bytes = multicodecPubKey.slice(varint.decode.bytes);
+    const bytes = decodeFromBase58btc(id);
 
     let PublicKey;
     if (id.startsWith(Secp256k1PublicKeyPrefix)) {
@@ -49,16 +49,7 @@ export class DidMethodKeyPublicKey extends withQualifier(TypedEnum) {
    * Returns unqualified public key encoded in `BS58`.
    */
   toEncodedString() {
-    const prefix = this.constructor.Prefix;
-    const publicKeyBytes = this.value.bytes;
-
-    // Concatenate the prefix and the public key bytes
-    const didKeyBytes = new Uint8Array(prefix.length + publicKeyBytes.length);
-    didKeyBytes.set(prefix);
-    didKeyBytes.set(publicKeyBytes, prefix.length);
-
-    // Encode the concatenated bytes to Base58 with z prefix
-    return `z${bs58.encode(didKeyBytes)}`;
+    return encodeAsBase58btc(this.constructor.Prefix, this.value.bytes);
   }
 
   /**

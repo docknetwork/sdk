@@ -8,3 +8,4 @@ export * from './type-helpers';
 export * from './bytes';
 export * from './inheritance';
 export * from './misc';
+export * from './base-x';

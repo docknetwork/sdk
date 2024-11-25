@@ -2,7 +2,7 @@ import bs58 from 'bs58';
 import { base58btc } from 'multiformats/bases/base58';
 import varint from 'varint';
 import { ensureString } from './type-helpers';
-import { normalizeToU8a, stringToU8a } from './bytes';
+import { normalizeToU8a, u8aToU8a } from './bytes';
 
 /**
  * Encodes supplied bytes as base58 string.
@@ -12,21 +12,22 @@ import { normalizeToU8a, stringToU8a } from './bytes';
 export const encodeAsBase58 = (bytes) => bs58.encode(normalizeToU8a(bytes));
 /**
  * Decodes bytes of the supplied base58 string.
+ * @param {string} string
  * @returns {Uint8Array}
  */
 export const decodeFromBase58 = (string) => bs58.decode(ensureString(string));
 
 /**
- * Encodes supplied bytes as multibase string using given prefix.
+ * Encodes supplied bytes as base58btc string using given prefix.
  * @param {Uint8Array} value
  * @param {Uint8Array} prefix
  * @returns {string}
  */
-export const encodeAsMultibase = (value, prefix) => {
-  const bytes = normalizeToU8a(value);
+export const encodeAsBase58btc = (prefix, value) => {
   const prefixBytes = normalizeToU8a(prefix);
+  const bytes = normalizeToU8a(value);
 
-  // Use the static prefix (MULTICODEC_ED25519_HEADER)
+  // Use the supplied prefix
   const multibase = new Uint8Array(prefixBytes.length + bytes.length);
 
   // Add multibase prefix and concatenate with bytes
@@ -38,17 +39,13 @@ export const encodeAsMultibase = (value, prefix) => {
 };
 
 /**
- * Decodes bytes of the supplied multibase string.
+ * Decodes bytes of the supplied base58btc string.
  * @param {string} string
  * @returns {Uint8Array}
  */
-export const decodeFromMultibase = (string) => {
-  if (!ensureString(string).startsWith('z')) {
-    throw new Error(`Invalid multibase string format: ${string}`);
-  }
-
+export const decodeFromBase58btc = (string) => {
   // Decode base58btc multibase string
-  const decoded = base58btc.decode(string);
+  const decoded = base58btc.decode(ensureString(string));
   varint.decode(decoded); // Decode to get byte length
   return decoded.slice(varint.decode.bytes);
 };
@@ -58,9 +55,10 @@ export const decodeFromMultibase = (string) => {
  * @param {Uint8Array} bytes
  * @returns {string}
  */
-export const encodeAsBase64 = (bytes) => btoa(normalizeToU8a(bytes));
+export const encodeAsBase64 = (bytes) => Buffer.from(normalizeToU8a(bytes)).toString('base64');
 /**
  * Decodes bytes of the supplied base64 string.
+ * @param {string} string
  * @returns {Uint8Array}
  */
-export const decodeFromBase64 = (string) => stringToU8a(atob(ensureString(string)));
+export const decodeFromBase64 = (string) => u8aToU8a(Buffer.from(ensureString(string), 'base64'));

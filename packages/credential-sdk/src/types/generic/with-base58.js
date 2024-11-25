@@ -5,10 +5,6 @@ export default function withBase58(klass) {
   const name = `withBase58(${klass.name})`;
   const obj = {
     [name]: class extends klass {
-      get value() {
-        return String(this);
-      }
-
       toString() {
         return encodeAsBase58(this.bytes);
       }

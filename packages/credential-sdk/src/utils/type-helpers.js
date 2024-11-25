@@ -30,6 +30,7 @@ export function ensureString(value, ctx = '') {
   if (!isString(value)) {
     throw new Error(`${value} needs to be a string. ${ctx}`);
   }
+
   return String(value);
 }
 

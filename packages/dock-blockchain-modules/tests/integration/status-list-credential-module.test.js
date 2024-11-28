@@ -16,13 +16,13 @@ import {
 import { DockDid } from "@docknetwork/credential-sdk/types";
 import { registerNewDIDUsingPair } from "./helpers";
 import { getKeyDoc } from "@docknetwork/credential-sdk/vc/helpers";
-import { StatusList2021Credential } from "@docknetwork/credential-sdk/types/status-list-credential";
+import { DockStatusList2021Credential } from "@docknetwork/credential-sdk/types/status-list-credential";
 
 const expectEqualCreds = (cred1, cred2) => {
   expect(cred1.eq(cred2)).toBe(true);
   expect(cred1.toJSON()).toEqual(cred2.toJSON());
-  expect(StatusList2021Credential.fromJSON(cred1.toJSON())).toEqual(
-    StatusList2021Credential.fromJSON(cred2.toJSON())
+  expect(DockStatusList2021Credential.fromJSON(cred1.toJSON())).toEqual(
+    DockStatusList2021Credential.fromJSON(cred2.toJSON())
   );
 };
 
@@ -74,7 +74,7 @@ describe("StatusListCredential Module", () => {
   }, 10000);
 
   test("Can create a status list with a OneOf policy", async () => {
-    const cred = await StatusList2021Credential.create(
+    const cred = await DockStatusList2021Credential.create(
       ownerKey,
       statusListCredId
     );
@@ -134,7 +134,7 @@ describe("StatusListCredential Module", () => {
   }, 40000);
 
   test("Can unsuspend from a status list credential", async () => {
-    const credential = await StatusList2021Credential.create(
+    const credential = await DockStatusList2021Credential.create(
       ownerKey,
       statusListCredId,
       { statusPurpose: "suspension", revokeIndices: revokeIds }
@@ -178,7 +178,7 @@ describe("StatusListCredential Module", () => {
   }, 40000);
 
   test("Can create a status list with multiple owners", async () => {
-    const cred = await StatusList2021Credential.create(
+    const cred = await DockStatusList2021Credential.create(
       ownerKey,
       multipleControllerstatusListCredID,
       { statusPurpose: "suspension" }

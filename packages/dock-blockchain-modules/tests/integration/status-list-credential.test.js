@@ -21,7 +21,7 @@ import { DockCoreModules } from "../../src";
 import { getUnsignedCred, registerNewDIDUsingPair } from "./helpers";
 import { getKeyDoc } from "@docknetwork/credential-sdk/vc/helpers";
 import { DockDid } from "@docknetwork/credential-sdk/types";
-import { StatusList2021Credential } from "@docknetwork/credential-sdk/types";
+import { DockStatusList2021Credential } from "@docknetwork/credential-sdk/types";
 import { addStatusList21EntryToCredential } from "@docknetwork/credential-sdk/vc/credentials";
 import {
   Ed25519Keypair,
@@ -30,7 +30,7 @@ import {
 
 const credId = "A large credential id with size > 32 bytes";
 
-describe("StatusList2021Credential", () => {
+describe("DockStatusList2021Credential", () => {
   const dockAPI = new DockAPI();
   const modules = new DockCoreModules(dockAPI);
   const resolver = new CoreResolver(modules);
@@ -82,7 +82,7 @@ describe("StatusList2021Credential", () => {
       "Ed25519VerificationKey2018"
     );
 
-    const statusListCred = await StatusList2021Credential.create(
+    const statusListCred = await DockStatusList2021Credential.create(
       issuerKey,
       statusListCredentialId,
       { statusPurpose: "suspension" }

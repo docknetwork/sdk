@@ -6,9 +6,9 @@ import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
 import { CheqdPayloadWithTypeUrl } from './payload';
 
 /**
- * Creates DID method transaction builder.
+ * Creates DID transaction constructor.
  */
-export const createDIDMethodTx = (fnName) => {
+const createDIDMethodTx = (fnName) => {
   const obj = {
     async [fnName](...args) {
       const { root } = this;
@@ -43,7 +43,7 @@ export const createDIDMethodTx = (fnName) => {
 /**
  * Creates a call.
  */
-export const createCall = (fnName) => {
+const createCall = (fnName) => {
   const obj = {
     async [fnName](...args) {
       const { root } = this;
@@ -58,19 +58,21 @@ export const createCall = (fnName) => {
   return obj[fnName];
 };
 
-/**
- * Creates a transaction builder for account method with the given name.
- */
-export const createAccountTx = (fnName) => {
-  const obj = {
-    async [fnName](...args) {
-      return await this.root.rawTx[fnName](
-        ...this.root.payload[fnName].apply(this.root, args),
-      );
-    },
-  };
+const filterNoResourceError = async (promise, placeholder) => {
+  try {
+    return await promise;
+  } catch (err) {
+    const strErr = String(err);
 
-  return obj[fnName];
+    if (
+      !strErr.includes('DID Doc not found')
+      && !strErr.includes('not found: unknown request')
+    ) {
+      throw err;
+    }
+  }
+
+  return placeholder;
 };
 
 class Root {
@@ -80,7 +82,7 @@ class Root {
 }
 
 /* eslint-disable sonarjs/cognitive-complexity */
-export function createInternalCheqdModule(
+export default function createInternalCheqdModule(
   methods = Object.create(null),
   baseClass = class CheqdModuleBaseClass {},
 ) {
@@ -89,27 +91,8 @@ export function createInternalCheqdModule(
   class RootModule extends (baseClass.RootModule ?? Root) {}
   class RootSender extends (baseClass.RootSender ?? Root) {}
 
-  const filterNoResourceError = async (promise, placeholder) => {
-    try {
-      return await promise;
-    } catch (err) {
-      const strErr = String(err);
-
-      if (
-        !strErr.includes('DID Doc not found')
-        && !strErr.includes('not found: unknown request')
-      ) {
-        throw err;
-      }
-    }
-
-    return placeholder;
-  };
-
   const obj = {
     [name]: class extends baseClass {
-      static Prop;
-
       static RootPayload = RootPayload;
 
       static RootModule = RootModule;
@@ -183,10 +166,6 @@ export function createInternalCheqdModule(
         );
 
         return meta[0] ?? null;
-      }
-
-      get query() {
-        return this.apiProvider.sdk.querier[this.constructor.Prop];
       }
 
       get tx() {

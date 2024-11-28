@@ -53,8 +53,6 @@ const methods = {
 export default class CheqdInternalStatusListCredentialModule extends createInternalCheqdModule(
   methods,
 ) {
-  static Prop = 'resource';
-
   static MsgNames = {
     create: 'MsgCreateResource',
     update: 'MsgCreateResource',

@@ -22,8 +22,6 @@ const methods = {
 };
 
 export class CheqdDIDModuleInternal extends createInternalCheqdModule(methods) {
-  static Prop = 'did';
-
   static MsgNames = {
     createDidDocument: 'MsgCreateDidDoc',
     updateDidDocument: 'MsgUpdateDidDoc',

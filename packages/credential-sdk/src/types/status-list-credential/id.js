@@ -1,4 +1,3 @@
-import { isHex } from '../../utils/bytes';
 import {
   TypedBytes,
   TypedEnum,

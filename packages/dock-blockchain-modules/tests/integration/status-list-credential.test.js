@@ -92,7 +92,6 @@ describe("StatusList2021Credential", () => {
     await modules.statusListCredential.createStatusListCredential(
       statusListCredentialId,
       statusListCred,
-      issuerDID,
       issuerKeyPair
     );
 
@@ -150,7 +149,6 @@ describe("StatusList2021Credential", () => {
     await modules.statusListCredential.updateStatusListCredential(
       statusListCredentialId,
       fetchedCred,
-      issuerDID,
       issuerKeyPair
     );
 
@@ -180,7 +178,6 @@ describe("StatusList2021Credential", () => {
     await modules.statusListCredential.updateStatusListCredential(
       statusListCredentialId,
       fetchedCred,
-      issuerDID,
       issuerKeyPair
     );
     const holderKey = getKeyDoc(
@@ -222,7 +219,6 @@ describe("StatusList2021Credential", () => {
     await modules.statusListCredential.updateStatusListCredential(
       statusListCredentialId,
       fetchedCred,
-      issuerDID,
       issuerKeyPair
     );
 

@@ -179,20 +179,21 @@ export class CheqdAPI extends AbstractApiProvider {
 
   supportsIdentifier(id) {
     this.ensureInitialized();
+    const { network } = this.sdk.options;
 
     if (id instanceof NamespaceDid) {
       if (id.isCheqd) {
         if (id.asCheqd.isTestnet) {
-          return this.sdk.options.network === CheqdNetwork.Testnet;
+          return network === CheqdNetwork.Testnet;
         } else if (id.asCheqd.isMainnet) {
-          return this.sdk.options.network === CheqdNetwork.Mainnet;
+          return network === CheqdNetwork.Mainnet;
         }
       }
     } else if (id instanceof DidRef) {
       return this.supportsIdentifier(id[0]);
     } else if (id instanceof TypedEnum) {
       return this.supportsIdentifier(id.value);
-    } else if (id?.constructor?.Qualifier?.includes('cheqd:')) {
+    } else if (id?.constructor?.Qualifier?.includes(`cheqd:${network}:`)) {
       return true;
     }
 

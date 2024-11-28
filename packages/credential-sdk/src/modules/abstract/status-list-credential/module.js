@@ -91,11 +91,11 @@ class AbstractStatusListCredentialModule extends AbstractBaseModule {
    * @return {Promise<*>} - the extrinsic to sign and send.
    */
   async createStatusListCredentialTx(
-    id,
-    statusListCredential,
-    didKeypair,
+    _id,
+    _statusListCredential,
+    _didKeypair,
   ) {
-    throw new Error('Unimplemented')
+    throw new Error('Unimplemented');
   }
 
   /**
@@ -107,11 +107,11 @@ class AbstractStatusListCredentialModule extends AbstractBaseModule {
    * @return {Promise<*>} - the extrinsic to sign and send.
    */
   async updateStatusListCredentialTx(
-    id,
-    statusListCredential,
-    didKeypair,
+    _id,
+    _statusListCredential,
+    _didKeypair,
   ) {
-    throw new Error('Unimplemented')
+    throw new Error('Unimplemented');
   }
 
   /**
@@ -121,10 +121,10 @@ class AbstractStatusListCredentialModule extends AbstractBaseModule {
    * @return {Promise<object>} - the extrinsic to sign and send.
    */
   async removeStatusListCredentialTx(
-    statusListCredentialId,
-    didKeypair,
+    _statusListCredentialId,
+    _didKeypair,
   ) {
-    throw new Error('Unimplemented')
+    throw new Error('Unimplemented');
   }
 }
 

@@ -82,7 +82,6 @@ describe("StatusListCredential Module", () => {
       modules.statusListCredential.createStatusListCredential(
         statusListCredId,
         cred,
-        ownerDID,
         pair
       )
     ).resolves.toBeDefined();
@@ -101,7 +100,6 @@ describe("StatusListCredential Module", () => {
     await modules.statusListCredential.updateStatusListCredential(
       statusListCredId,
       cred,
-      ownerDID,
       pair
     );
     const fetchedCred =
@@ -144,7 +142,6 @@ describe("StatusListCredential Module", () => {
     await modules.statusListCredential.updateStatusListCredential(
       statusListCredId,
       credential,
-      ownerDID,
       pair
     );
     let fetchedCred =
@@ -159,7 +156,6 @@ describe("StatusListCredential Module", () => {
     await modules.statusListCredential.updateStatusListCredential(
       statusListCredId,
       fetchedCred,
-      ownerDID,
       pair
     );
 
@@ -172,7 +168,6 @@ describe("StatusListCredential Module", () => {
   test("Can remove a status list", async () => {
     await modules.statusListCredential.removeStatusListCredential(
       statusListCredId,
-      ownerDID,
       pair
     );
     expect(
@@ -193,7 +188,6 @@ describe("StatusListCredential Module", () => {
       modules.statusListCredential.createStatusListCredential(
         multipleControllerstatusListCredID,
         cred,
-        ownerDID,
         pair
       )
     ).resolves.toBeDefined();

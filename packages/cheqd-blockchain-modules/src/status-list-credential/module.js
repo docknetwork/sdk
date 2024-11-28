@@ -1,5 +1,4 @@
 import { AbstractStatusListCredentialModule } from '@docknetwork/credential-sdk/modules';
-import { CheqdStatusListCredentialId } from '@docknetwork/credential-sdk/types';
 import { injectCheqd } from '../common';
 import CheqdInternalStatusListCredentialModule from './internal';
 

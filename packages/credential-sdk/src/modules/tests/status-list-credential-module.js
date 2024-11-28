@@ -2,7 +2,6 @@ import { DidKeypair, Ed25519Keypair } from '../../keypairs';
 import { DIDDocument } from '../../types';
 import { testIf } from './common';
 import { StatusList2021Resolver } from '../../resolver/status-list2021';
-import { stringToU8a, maybeToJSONString } from '../../utils';
 import { getKeyDoc } from '../../vc';
 
 // eslint-disable-next-line jest/no-export
@@ -21,7 +20,7 @@ export default function generateStatusListCredentialModuleTests(
       const didKeypair = new DidKeypair([did, 1], keyPair);
       const keyDoc = getKeyDoc(
         did,
-        didKeypair
+        didKeypair,
       );
 
       const document = DIDDocument.create(did, [didKeypair.didKey()]);
@@ -32,7 +31,7 @@ export default function generateStatusListCredentialModuleTests(
       const statusListCredential1 = await StatusListCredential.create(
         keyDoc,
         id1,
-        { revokeIndices: [1, 10, 100] }
+        { revokeIndices: [1, 10, 100] },
       );
 
       await statusListCredentialModule.createStatusListCredential(id1, statusListCredential1, didKeypair);
@@ -44,7 +43,7 @@ export default function generateStatusListCredentialModuleTests(
       const statusListCredential2 = await StatusListCredential.create(
         keyDoc,
         id2,
-        { revokeIndices: [2, 20, 200] }
+        { revokeIndices: [2, 20, 200] },
       );
 
       await statusListCredentialModule.createStatusListCredential(id2, statusListCredential2, didKeypair);
@@ -60,7 +59,7 @@ export default function generateStatusListCredentialModuleTests(
       const didKeypair = new DidKeypair([did, 1], keyPair);
       const keyDoc = getKeyDoc(
         did,
-        didKeypair
+        didKeypair,
       );
 
       const document = DIDDocument.create(did, [didKeypair.didKey()]);
@@ -71,20 +70,19 @@ export default function generateStatusListCredentialModuleTests(
       const statusListCredential = await StatusListCredential.create(
         keyDoc,
         id,
-        { revokeIndices: [1, 10, 100] }
+        { revokeIndices: [1, 10, 100] },
       );
 
       await statusListCredentialModule.createStatusListCredential(id, statusListCredential, didKeypair);
       let written = await statusListCredentialModule.getStatusListCredential(id);
       expect(written.toJSON()).toEqual(statusListCredential.toJSON());
 
-      await statusListCredential.update(keyDoc, { revokeIndices: [ 2, 3, 4] });
+      await statusListCredential.update(keyDoc, { revokeIndices: [2, 3, 4] });
 
       await statusListCredentialModule.updateStatusListCredential(id, statusListCredential, didKeypair);
       written = await statusListCredentialModule.getStatusListCredential(id);
       expect(written.toJSON()).toEqual(statusListCredential.toJSON());
     });
-
 
     test('Generates a `DIDDocument` and creates and then removes a `StatusListCredential` owned by this DID', async () => {
       const did = DID.random();
@@ -93,7 +91,7 @@ export default function generateStatusListCredentialModuleTests(
       const didKeypair = new DidKeypair([did, 1], keyPair);
       const keyDoc = getKeyDoc(
         did,
-        didKeypair
+        didKeypair,
       );
 
       const document = DIDDocument.create(did, [didKeypair.didKey()]);
@@ -104,7 +102,7 @@ export default function generateStatusListCredentialModuleTests(
       const statusListCredential = await StatusListCredential.create(
         keyDoc,
         id,
-        { revokeIndices: [1, 10, 100] }
+        { revokeIndices: [1, 10, 100] },
       );
 
       await statusListCredentialModule.createStatusListCredential(id, statusListCredential, didKeypair);
@@ -124,7 +122,7 @@ export default function generateStatusListCredentialModuleTests(
       const didKeypair = new DidKeypair([did, 1], keyPair);
       const keyDoc = getKeyDoc(
         did,
-        didKeypair
+        didKeypair,
       );
 
       const document = DIDDocument.create(did, [didKeypair.didKey()]);
@@ -135,7 +133,7 @@ export default function generateStatusListCredentialModuleTests(
       const statusListCredential = await StatusListCredential.create(
         keyDoc,
         id,
-        { revokeIndices: [1, 10, 100] }
+        { revokeIndices: [1, 10, 100] },
       );
 
       await statusListCredentialModule.createStatusListCredential(id, statusListCredential, didKeypair);

@@ -6,7 +6,6 @@ import {
 } from '@digitalcredentials/vc-status-list';
 import { gzip, ungzip } from 'pako';
 import { u8aToU8a } from '../utils/bytes';
-import { DockStatusList2021Qualifier } from './constants';
 import VerifiableCredential from './verifiable-credential';
 import { ensureStatusListId } from '../utils';
 import { KeyDoc } from "./helpers"; // eslint-disable-line

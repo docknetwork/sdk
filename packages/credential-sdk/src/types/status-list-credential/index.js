@@ -1,10 +1,18 @@
 import { maybeFrom } from '../../utils';
 import DockStatusListCredentialValue from './status-list-credential-value';
-import { TypedEnum } from '../generic';
+import { TypedEnum, withFrom } from '../generic';
+import StatusList2021Credential from '../../vc/status-list2021-credential';
 
-export class StatusListOrRevocationListCredential extends TypedEnum {}
+export class DockStatusListOrRevocationListCredential extends withFrom(TypedEnum, (value, from) => {
+  if (value instanceof StatusList2021Credential) {
+    // eslint-disable-next-line no-use-before-define
+    return new DockStatusList2021Credential(new DockStatusListCredentialValue(value));
+  } else {
+    return from(value);
+  }
+}) {}
 
-export class DockStatusList2021Credential extends StatusListOrRevocationListCredential {
+export class DockStatusList2021Credential extends DockStatusListOrRevocationListCredential {
   static Class = DockStatusListCredentialValue;
 
   static Type = 'statusList2021Credential';
@@ -109,6 +117,6 @@ export class DockStatusList2021Credential extends StatusListOrRevocationListCred
   }
 }
 
-StatusListOrRevocationListCredential.bindVariants(DockStatusList2021Credential);
+DockStatusListOrRevocationListCredential.bindVariants(DockStatusList2021Credential);
 
 export * from './id';

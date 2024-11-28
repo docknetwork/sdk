@@ -88,7 +88,7 @@ export default class MultiApiStatusListCredentialModule extends injectModuleRout
     didKeypair,
     params,
   ) {
-        const id = StatusListCredentialId.from(statusListCredentialId);
+    const id = StatusListCredentialId.from(statusListCredentialId);
 
     return await this.moduleById(id).createStatusListCredential(
       id,
@@ -112,7 +112,7 @@ export default class MultiApiStatusListCredentialModule extends injectModuleRout
     didKeypair,
     params,
   ) {
-     const id = StatusListCredentialId.from(statusListCredentialId);
+    const id = StatusListCredentialId.from(statusListCredentialId);
 
     return await this.moduleById(id).updateStatusListCredential(
       id,
@@ -134,7 +134,7 @@ export default class MultiApiStatusListCredentialModule extends injectModuleRout
     didKeypair,
     params,
   ) {
-     const id = StatusListCredentialId.from(statusListCredentialId);
+    const id = StatusListCredentialId.from(statusListCredentialId);
 
     return await this.moduleById(id).removeStatusListCredential(
       id,

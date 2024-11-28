@@ -5,7 +5,7 @@ import { VerificationMethodRef } from '../document';
 
 class BytesSignatureEd25519Value extends SignatureEd25519Value {
   toJSON() {
-    return Array.from(this);
+    return this.bytes;
   }
 }
 

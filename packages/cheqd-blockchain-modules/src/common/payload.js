@@ -4,7 +4,6 @@ import {
 } from '@docknetwork/credential-sdk/types';
 import {
   Any,
-  option,
   TypedArray,
   TypedString,
   TypedStruct,

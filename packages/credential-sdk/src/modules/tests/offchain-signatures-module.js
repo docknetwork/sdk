@@ -15,7 +15,7 @@ import {
   PSPublicKey,
   PSPublicKeyValue,
 } from '../../types';
-import { itIf } from './common';
+import { testIf } from './common';
 import { TypedBytes } from '../../types/generic';
 import { stringToU8a } from '../../utils';
 
@@ -27,7 +27,7 @@ export default function generateOffchainSignatureModuleTests(
   { DID, OffchainSignaturesParamsRef },
   filter = () => true,
 ) {
-  const test = itIf(filter);
+  const test = testIf(filter);
 
   describe(`Checks ${didModule.constructor.name} and ${offchainSignatures.constructor.name} with all public keys and params`, () => {
     test('Generates a `DIDDocument` with `OffchainPublicKey` and creates a `OffchainParameters` owned by this DID', async () => {

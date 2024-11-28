@@ -1,6 +1,6 @@
 import { DidKeypair, Ed25519Keypair } from '../../keypairs';
 import { DIDDocument } from '../../types';
-import { itIf } from './common';
+import { testIf } from './common';
 
 // eslint-disable-next-line jest/no-export
 export default function generateAttestModuleTests(
@@ -8,7 +8,7 @@ export default function generateAttestModuleTests(
   { DID },
   filter = () => true,
 ) {
-  const test = itIf(filter);
+  const test = testIf(filter);
 
   describe(`Using ${didModule.constructor.name} and ${attestModule.constructor.name}`, () => {
     test('Generates a `DIDDocument` and appends an `Attest` to it', async () => {

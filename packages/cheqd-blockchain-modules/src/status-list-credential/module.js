@@ -20,7 +20,6 @@ export default class CheqdStatusListCredentialModule extends injectCheqd(Abstrac
    * @param id - is the unique id of the status list credential. The function will check whether `id` is already taken or not.
    * @param statusListCredential - the credential to be associated with the given `id`
    * @param didKeypair
-   * @param params
    * @return {Promise<StatusListCredentialId>} - the extrinsic to sign and send.
    */
   async createStatusListCredentialTx(
@@ -36,7 +35,6 @@ export default class CheqdStatusListCredentialModule extends injectCheqd(Abstrac
    * @param id
    * @param statusListCredentialUpdate - Update for the status list credential.
    * @param didKeypair - `DID` signatures over an action with a nonce authorizing this action according to the existing policy.
-   * @param params
    * @return {Promise<object>} - the extrinsic to sign and send.
    */
   async updateStatusListCredentialTx(
@@ -44,20 +42,19 @@ export default class CheqdStatusListCredentialModule extends injectCheqd(Abstrac
     statusListCredential,
     didKeypair,
   ) {
-    return await this.cheqdOnly.update(id, statusListCredential, didKeypair);
+    return await this.cheqdOnly.tx.update(id, statusListCredential, didKeypair);
   }
 
   /**
    * Create a transaction to remove an existing status list credential from the chain.
    * @param statusListCredentialId - is the unique id of the status list credential. The function will check whether `id` is already taken or not.
    * @param didKeypair - `DID` signatures over an action with a nonce authorizing this action according to the existing policy.
-   * @param params
    * @return {Promise<object>} - the extrinsic to sign and send.
    */
   async removeStatusListCredentialTx(
-    statusListCredentialId,
+    id,
     didKeypair,
   ) {
-    return await this.cheqdOnly.remove(id, didKeypair);
+    return await this.cheqdOnly.tx.remove(id, didKeypair);
   }
 }

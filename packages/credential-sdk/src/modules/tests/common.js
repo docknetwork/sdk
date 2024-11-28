@@ -1,6 +1,6 @@
 /* eslint-disable */
-export const itIf =
+export const testIf =
   (filter) =>
   (...args) =>
-    filter(...args) ? it(...args) : it.skip(...args);
+    filter(...args) ? test(...args) : test.skip(...args);
 /* eslint-enable */

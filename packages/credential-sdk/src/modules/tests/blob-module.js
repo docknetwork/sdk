@@ -1,7 +1,7 @@
 import { DidKeypair, Ed25519Keypair } from '../../keypairs';
 import { NoBlobError } from '../abstract/blob/errors';
 import { DIDDocument } from '../../types';
-import { itIf } from './common';
+import { testIf } from './common';
 import { BlobResolver } from '../../resolver/blob';
 import { stringToU8a } from '../../utils';
 
@@ -11,7 +11,7 @@ export default function generateBlobModuleTests(
   { DID, BlobId },
   filter = () => true,
 ) {
-  const test = itIf(filter);
+  const test = testIf(filter);
 
   describe(`Using ${didModule.constructor.name} and ${blobModule.constructor.name}`, () => {
     test('Generates a `DIDDocument` and creates a `Blob` owned by this DID', async () => {

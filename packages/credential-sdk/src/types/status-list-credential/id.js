@@ -21,7 +21,7 @@ export class StatusListCredentialId extends withFrom(
     }
   },
 ) {
-  static Qualifier = 'status-list2021:';
+  static Qualifier = 'status-list2021';
 
   toJSON() {
     return String(this);

@@ -4,6 +4,7 @@ import {
 } from '@docknetwork/credential-sdk/types';
 import {
   Any,
+  option,
   TypedArray,
   TypedString,
   TypedStruct,
@@ -22,14 +23,14 @@ export class CheqdPayloadAndSignatures extends TypedStruct {
 
 export class CheqdPayloadWithTypeUrl extends TypedStruct {
   static Classes = {
-    typeUrl: TypedString,
+    typeUrl: class TypeURL extends TypedString {},
     value: CheqdPayloadAndSignatures,
   };
 }
 
 export class CheqdCreateResource extends TypedStruct {
   static Classes = {
-    collectionId: TypedUUID,
+    collectionId: class CollectionID extends TypedUUID {},
     id: class ResourceId extends TypedUUID {},
     version: class Version extends TypedString {},
     alsoKnownAs: class AlsoKnownAs extends TypedArray {

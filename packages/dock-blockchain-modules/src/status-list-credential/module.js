@@ -18,7 +18,7 @@ export default class DockStatusListCredentialModule extends injectDock(
     return (
       option(DockStatusList2021CredentialWithPolicy).from(
         await this.dockOnly.query.statusListCredentials(statusListCredentialId),
-      )?.statusListCredential ?? null
+      )?.statusListCredential?.value?.list ?? null
     );
   }
 

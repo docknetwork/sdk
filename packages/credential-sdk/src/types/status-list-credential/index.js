@@ -1,16 +1,16 @@
 import { maybeFrom } from '../../utils';
-import StatusListCredentialValue from './status-list-credential-value';
+import DockStatusListCredentialValue from './status-list-credential-value';
 import { TypedEnum } from '../generic';
 
 export class StatusListOrRevocationListCredential extends TypedEnum {}
 
-export class StatusList2021Credential extends StatusListOrRevocationListCredential {
-  static Class = StatusListCredentialValue;
+export class DockStatusList2021Credential extends StatusListOrRevocationListCredential {
+  static Class = DockStatusListCredentialValue;
 
   static Type = 'statusList2021Credential';
 
   constructor(value) {
-    super(maybeFrom(StatusListCredentialValue, value));
+    super(maybeFrom(DockStatusListCredentialValue, value));
   }
 
   /**
@@ -109,6 +109,6 @@ export class StatusList2021Credential extends StatusListOrRevocationListCredenti
   }
 }
 
-StatusListOrRevocationListCredential.bindVariants(StatusList2021Credential);
+StatusListOrRevocationListCredential.bindVariants(DockStatusList2021Credential);
 
 export * from './id';

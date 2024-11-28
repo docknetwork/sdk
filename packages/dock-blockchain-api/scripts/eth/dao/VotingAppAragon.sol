@@ -625,7 +625,7 @@ interface IForwarder {
     function forward(bytes evmCallScript) public;
 }
 /*
- * SPDX-License-Identitifer:    GPL-3.0-or-later
+ * SPDX-License-IdenttestIfer:    GPL-3.0-or-later
  */
 
 

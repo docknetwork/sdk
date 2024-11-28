@@ -1,7 +1,7 @@
 import { TypedStruct } from '@docknetwork/credential-sdk/types/generic';
 import {
   DockStatusListCredentialId,
-  StatusList2021Credential,
+  DockStatusList2021Credential,
   OneOfPolicy,
 } from '@docknetwork/credential-sdk/types';
 
@@ -13,7 +13,7 @@ export class DockStatusListCredentialWrappedId extends TypedStruct {
 
 export class DockStatusList2021CredentialWithPolicy extends TypedStruct {
   static Classes = {
-    statusListCredential: StatusList2021Credential,
+    statusListCredential: DockStatusList2021Credential,
     policy: OneOfPolicy,
   };
 }
@@ -28,6 +28,6 @@ export class DockStatusList2021CredentialWithPolicyWithId extends TypedStruct {
 export class DockStatusList2021CredentialWithId extends TypedStruct {
   static Classes = {
     id: DockStatusListCredentialId,
-    credential: StatusList2021Credential,
+    credential: DockStatusList2021Credential,
   };
 }

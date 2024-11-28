@@ -3,7 +3,7 @@ import CheqdAttestModule from './attest/module';
 import CheqdBlobModule from './blob/module';
 import CheqdDIDModule from './did/module';
 import CheqdOffchainSignaturesModule from './offchain-signatures/module';
-import CheqdStatusListCredentialModule from './status-list-credential-module';
+import CheqdStatusListCredentialModule from './status-list-credential/module';
 import CheqdBBSModule from './offchain-signatures/bbs';
 import CheqdBBSPlusModule from './offchain-signatures/bbs-plus';
 import CheqdPSModule from './offchain-signatures/ps';

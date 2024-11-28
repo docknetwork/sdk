@@ -137,7 +137,7 @@ export const ensurePrototypeOf = (proto, value) => {
 };
 
 const STATUS_LIST_ID_MATCHER = new RegExp(
-  `^status-list2021:${METHOD_REG_EXP_PATTERN}:${HEX_ID_REG_EXP_PATTERN}$`,
+  `^status-list2021:${METHOD_REG_EXP_PATTERN}:.*$`,
 );
 
 const PRIVATE_STATUS_LIST_ID_MATCHER = new RegExp(

@@ -11,7 +11,7 @@ import {
 } from '../../types';
 import { TypedBytes } from '../../types/generic';
 import { NoDIDError } from '../abstract/did/errors';
-import { itIf } from './common';
+import { testIf } from './common';
 
 // eslint-disable-next-line jest/no-export
 export default function generateDIDModuleTests(
@@ -19,7 +19,7 @@ export default function generateDIDModuleTests(
   { DID },
   filter = () => true,
 ) {
-  const test = itIf(filter);
+  const test = testIf(filter);
 
   describe(`Using ${module.constructor.name}`, () => {
     test('Creates basic `DIDDocument` with keys', async () => {

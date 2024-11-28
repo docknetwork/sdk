@@ -3,6 +3,7 @@ import {
   CheqdTestnetDid,
   CheqdStatusListCredentialId,
 } from "@docknetwork/credential-sdk/types";
+import { StatusList2021Credential } from "@docknetwork/credential-sdk/vc";
 import { MultiApiStatusListCredentialModule } from "@docknetwork/credential-sdk/modules";
 import generateStatusListCredentialModuleTests from "@docknetwork/credential-sdk/modules/tests/status-list-credential-module";
 import CheqdDIDModule from "../src/did/module";
@@ -33,6 +34,7 @@ describe("StatusListCredentialModule", () => {
     {
       DID: CheqdTestnetDid,
       StatusListCredentialId: CheqdStatusListCredentialId,
+      StatusListCredential: StatusList2021Credential
     }
   );
 
@@ -44,6 +46,7 @@ describe("StatusListCredentialModule", () => {
     {
       DID: CheqdTestnetDid,
       StatusListCredentialId: CheqdStatusListCredentialId,
+      StatusListCredential: StatusList2021Credential
     }
   );
 });

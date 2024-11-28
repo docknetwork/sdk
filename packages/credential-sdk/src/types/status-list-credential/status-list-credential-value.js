@@ -2,7 +2,7 @@ import { normalizeToU8a } from '../../utils';
 import { TypedBytes } from '../generic';
 import StatusList2021Credential from '../../vc/status-list2021-credential';
 
-export default class StatusListCredentialValue extends TypedBytes {
+export default class DockStatusListCredentialValue extends TypedBytes {
   constructor(value) {
     const [bytes, list] = value instanceof StatusList2021Credential
       ? [value.toBytes(), value]

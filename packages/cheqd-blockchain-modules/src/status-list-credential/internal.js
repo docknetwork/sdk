@@ -1,10 +1,10 @@
 import {
-  StatusListCredential,
   CheqdStatusListCredentialId,
-  CheqdStatusListCredentialWithId,
+  CheqdStatusListCredentialWithId
 } from '@docknetwork/credential-sdk/types';
-import { option } from '@docknetwork/credential-sdk/types/generic';
-import { stringToU8a, maybeToJSONString } from '@docknetwork/credential-sdk/utils';
+import { StatusList2021Credential } from '@docknetwork/credential-sdk/vc';
+import { option, TypedUUID } from '@docknetwork/credential-sdk/types/generic';
+import { stringToU8a, maybeToJSONString, u8aToString } from '@docknetwork/credential-sdk/utils';
 import { CheqdCreateResource, createInternalCheqdModule } from '../common';
 
 const methods = {
@@ -16,9 +16,9 @@ const methods = {
       TypedUUID.random(),
       '1.0',
       [],
-      id,
+      String(id),
       'status-list-credential',
-      stringToU8a(maybeToJSONString(StatusListCredential.from(rawStatusListCredential))),
+      stringToU8a(maybeToJSONString(StatusList2021Credential.fromJSON(rawStatusListCredential))),
     );
   },
   update: (statusListCredentialId, statusListCredential) => {
@@ -29,9 +29,9 @@ const methods = {
       TypedUUID.random(),
       '1.0',
       [],
-      id,
+      String(id),
       'status-list-credential',
-      stringToU8a(maybeToJSONString(StatusListCredential.from(rawStatusListCredential))),
+      stringToU8a(maybeToJSONString(StatusList2021Credential.fromJSON(statusListCredential))),
     );
   },
   remove: (statusListCredentialId) => {
@@ -42,9 +42,9 @@ const methods = {
       TypedUUID.random(),
       '1.0',
       [],
-      id,
+      String(id),
       'status-list-credential',
-      null,
+      stringToU8a('null'),
     );
   }
 };
@@ -71,10 +71,11 @@ export default class CheqdInternalStatusListCredentialModule extends createInter
     return res?.id;
   }
 
-  async statusListCredential(id) {
-    const item = await this.resource(...this.lastStatusListCredentialId(id));
+  async statusListCredential(statusListCredentialId) {
+    const [did, id] = CheqdStatusListCredentialId.from(statusListCredentialId).value;
+    const item = await this.resource(did, await this.lastStatusListCredentialId(statusListCredentialId));
 
-    return option(StatusListCredential).from(
+    return option(StatusList2021Credential).fromJSON(
       item && JSON.parse(u8aToString(item.resource.data)),
     );
   }

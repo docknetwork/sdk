@@ -15,10 +15,11 @@ import {
 import { createInternalDockModule } from '../common';
 
 const accountMethods = {
-  create(id, statusListCredential, signerDid) {
+  create(id, statusListCredential) {
+    const [did, id] = DockStatusCredentialId.from(id).value;
     const credentialWithPolicy = new DockStatusList2021CredentialWithPolicy(
       statusListCredential,
-      new OneOfPolicy([signerDid]),
+      new OneOfPolicy([did]),
     );
 
     return [DockStatusListCredentialId.from(id), credentialWithPolicy];

@@ -2,7 +2,6 @@
 
 set -ueo pipefail
 
-root_dir="$(dirname $0)/.."
 entrypoint="$(realpath $(dirname $0)/cheqd_entrypoint)"
 config="$(realpath $(dirname $0)/cheqd_config.toml)"
 

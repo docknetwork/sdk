@@ -1,5 +1,16 @@
 # @docknetwork/dock-blockchain-api
 
+## 0.8.0
+
+### Minor Changes
+
+- `StatusListCredential` module for `cheqd`, misc tweaks
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.14.0
+
 ## 0.7.0
 
 ### Minor Changes

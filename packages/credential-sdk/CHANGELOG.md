@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.14.0
+
+### Minor Changes
+
+- `StatusListCredential` module for `cheqd`, misc tweaks
+
 ## 0.13.0
 
 ### Minor Changes

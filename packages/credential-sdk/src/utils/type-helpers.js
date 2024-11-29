@@ -135,7 +135,7 @@ export const ensurePrototypeOf = (proto, value) => {
   return value;
 };
 
-const STATUS_LIST_ID_MATCHER = /^status-list2021:([a-z]+):([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|0x[0-9a-f]{64}):?(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})?$/;
+const STATUS_LIST_ID_MATCHER = /^status-list2021:([a-z]+):((?:testnet|mainnet):[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|0x[0-9a-f]{64})(?::[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})?$/;
 
 const PRIVATE_STATUS_LIST_ID_MATCHER = new RegExp(
   `^private-status-list2021:${HEX_ID_REG_EXP_PATTERN}$`,

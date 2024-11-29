@@ -6,14 +6,22 @@ export default function withBase64(klass) {
   const obj = {
     [name]: class extends klass {
       toString() {
-        return encodeAsBase64(this.bytes);
+        return this.toBase64();
       }
 
       toJSON() {
         return String(this);
       }
+
+      static fromBase64(str) {
+        return this.from(decodeFromBase64(str));
+      }
+
+      toBase64() {
+        return encodeAsBase64(this.bytes);
+      }
     },
   };
 
-  return withFrom(obj[name], (value, from) => from(typeof value === 'string' ? decodeFromBase64(value) : value));
+  return withFrom(obj[name], (value, from) => (typeof value === 'string' ? this.decodeFromBase64(value) : from(value)));
 }

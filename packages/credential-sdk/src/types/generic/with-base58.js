@@ -6,14 +6,22 @@ export default function withBase58(klass) {
   const obj = {
     [name]: class extends klass {
       toString() {
-        return encodeAsBase58(this.bytes);
+        return this.toBase58();
       }
 
       toJSON() {
         return String(this);
       }
+
+      static fromBase58(str) {
+        return this.from(decodeFromBase58(str));
+      }
+
+      toBase58() {
+        return encodeAsBase58(this.bytes);
+      }
     },
   };
 
-  return withFrom(obj[name], (value, from) => from(typeof value === 'string' ? decodeFromBase58(value) : value));
+  return withFrom(obj[name], (value, from) => (typeof value === 'string' ? this.decodeFromBase58(value) : from(value)));
 }

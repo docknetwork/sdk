@@ -23,5 +23,5 @@ export default function withBase58(klass) {
     },
   };
 
-  return withFrom(obj[name], (value, from) => (typeof value === 'string' ? this.fromBase58(value) : from(value)));
+  return withFrom(obj[name], function from(value, fromFn) { return (typeof value === 'string' ? this.fromBase58(value) : fromFn(value)); });
 }

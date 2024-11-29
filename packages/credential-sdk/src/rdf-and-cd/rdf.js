@@ -66,17 +66,17 @@ export async function queryNextLookup(claimgraph, query, engine) {
 
   // Query the engine, if querying multiple times user should
   // pass engine parameter for optimal performance
-  const result = await engine.query(query, { sources: [store] });
+  const bindingsStream = await engine.queryBindings(query, { sources: [store] });
 
   // Get bindings from query
-  const bindings = await result.bindings();
+  const bindings = await bindingsStream.toArray();
 
   // Convert bindings to claimgraph format using lookupNext variable
   bindings.forEach((b) => assert(
-    b.get('?lookupNext') !== undefined,
-    "Query for next lookup must always bind '?lookupNext'",
+    b.get('lookupNext') !== undefined,
+    "Query for next lookup must always bind 'lookupNext'",
   ));
-  return bindings.map((binding) => fromJsonldjsNode(binding.get('?lookupNext')));
+  return bindings.map((binding) => fromJsonldjsNode(binding.get('lookupNext')));
 }
 
 /**

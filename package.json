@@ -8,13 +8,13 @@
   ],
   "dependencies": {},
   "devDependencies": {
-    "turbo": "2.0.5",
-    "@changesets/cli": "^2.x.x",
     "@babel/cli": "^7.24.1",
     "@babel/core": "^7.24.3",
     "@babel/node": "^7.23.9",
     "@babel/plugin-transform-modules-commonjs": "^7.24.1",
-    "@babel/preset-env": "^7.24.3"
+    "@babel/preset-env": "^7.24.3",
+    "@changesets/cli": "^2.x.x",
+    "turbo": "2.0.5"
   },
   "packageManager": "yarn@1.22.22",
   "scripts": {

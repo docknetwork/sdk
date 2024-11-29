@@ -23,5 +23,5 @@ export default function withBase64(klass) {
     },
   };
 
-  return withFrom(obj[name], (value, from) => (typeof value === 'string' ? this.decodeFromBase64(value) : from(value)));
+  return withFrom(obj[name], (value, from) => (typeof value === 'string' ? this.fromBase64(value) : from(value)));
 }

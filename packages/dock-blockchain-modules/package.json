@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/dock-blockchain-modules",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "license": "MIT",
   "type": "module",
   "main": "./dist/esm/index.js",
@@ -33,7 +33,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@docknetwork/credential-sdk": "0.12.0"
+    "@docknetwork/credential-sdk": "0.13.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.1",
@@ -42,7 +42,7 @@
     "@babel/plugin-syntax-import-attributes": "^7.25.6",
     "@babel/plugin-transform-modules-commonjs": "^7.24.1",
     "@babel/preset-env": "^7.24.3",
-    "@docknetwork/dock-blockchain-api": "0.6.1",
+    "@docknetwork/dock-blockchain-api": "0.6.2",
     "@rollup/plugin-alias": "^4.0.2",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^24.0.0",

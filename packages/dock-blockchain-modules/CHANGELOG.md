@@ -1,5 +1,13 @@
 # @docknetwork/dock-blockchain-modules
 
+## 0.8.1
+
+### Patch Changes
+
+- Audit fixes and RDF lib upgrade
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.13.0
+
 ## 0.8.0
 
 ### Minor Changes

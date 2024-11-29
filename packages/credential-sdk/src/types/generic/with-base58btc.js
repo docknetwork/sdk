@@ -10,18 +10,26 @@ export default function withBase58btc(klass) {
       static Prefix;
 
       toString() {
+        return this.toBase58btc();
+      }
+
+      toJSON() {
+        return String(this);
+      }
+
+      static fromBase58btc(str) {
+        return this.from(decodeFromBase58btc(str));
+      }
+
+      toBase58btc() {
         const {
           constructor: { Prefix },
         } = this;
 
         return encodeAsBase58btc(Prefix, this.bytes);
       }
-
-      toJSON() {
-        return String(this);
-      }
     },
   };
 
-  return withExtendedStaticProperties(['Prefix'], withFrom(obj[name], (value, from) => from(typeof value === 'string' ? decodeFromBase58btc(value) : value)));
+  return withExtendedStaticProperties(['Prefix'], withFrom(obj[name], (value, from) => (typeof value === 'string' ? this.fromBase58btc(value) : from(value))));
 }

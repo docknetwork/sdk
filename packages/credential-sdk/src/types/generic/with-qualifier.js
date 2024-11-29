@@ -28,7 +28,7 @@ export default function withQualifier(klass, wrapper = false) {
 
         static get Qualifiers() {
           return [].concat(
-            this.Qualifier ??
+            this.Qualifier ?? this.Class?.Qualifiers ??
               this.Variants.flatMap((variant) =>
                 [].concat(
                   variant.Qualifier ?? variant !== this

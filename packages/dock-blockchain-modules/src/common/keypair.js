@@ -21,4 +21,6 @@ export const ensureTargetKeypair = (targetDid, didKeypair) => {
   if (!includes) {
     throw new Error(`No keypair provided for ${targetDid}`);
   }
+
+  return didKeypair;
 };

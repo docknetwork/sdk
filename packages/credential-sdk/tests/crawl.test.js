@@ -1,4 +1,4 @@
-import { newEngine } from "@comunica/actor-init-sparql-rdfjs";
+import { QueryEngine } from "@comunica/query-sparql-rdfjs";
 
 import { crawl } from "../src/rdf-and-cd";
 import { ANYCLAIM, MAYCLAIM, MAYCLAIM_DEF_1 } from "../src/rdf-and-cd";
@@ -72,7 +72,7 @@ describe("Crawler unit tests", () => {
       RULES,
       CURIOSITY,
       resolveGraph,
-      newEngine()
+      new QueryEngine()
     );
     expect(allFacts).toEqual([
       [

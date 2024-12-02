@@ -31,11 +31,11 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@comunica/actor-init-sparql-rdfjs": "^1.22.3",
+    "@comunica/query-sparql-rdfjs": "^4.0.2",
     "@digitalcredentials/vc-status-list": "^8.0.0",
     "@docknetwork/crypto-wasm-ts": "^0.63.0",
     "@juanelas/base64": "^1.1.5",
-    "@sphereon/ssi-sdk-ext.did-resolver-jwk": "^0.25.0",
+    "@sphereon/ssi-sdk-ext.did-resolver-jwk": "^0.26.0",
     "@stablelib/ed25519": "^1.0.0",
     "@subsquid/ss58-codec": "latest",
     "@transmute/json-web-signature": "^0.7.0-unstable.82",

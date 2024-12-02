@@ -19,6 +19,11 @@
 
 ### Patch Changes
 
+## 0.6.2
+
+### Patch Changes
+
+- Audit fixes and RDF lib upgrade
 - Updated dependencies
   - @docknetwork/credential-sdk@0.13.0
 

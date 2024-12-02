@@ -11,6 +11,7 @@
 ### Minor Changes
 
 - Small refactoring of the `did/document`
+- Audit fixes and RDF lib upgrade
 
 ## 0.12.0
 

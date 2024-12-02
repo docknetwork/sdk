@@ -24,7 +24,7 @@ export class DidMethodKeyPublicKey extends withQualifier(TypedEnum, true) {
    * @returns {DidMethodKey}
    */
   static fromKeypair(keypair) {
-    return this.from(keypair.publicKey().value);
+    return this.from(keypair.publicKey());
   }
 
   static fromQualifiedString(str) {
@@ -78,6 +78,7 @@ export class DidMethodKeyPublicKeyEd25519 extends DidMethodKeyPublicKey {
 
   static Type = PublicKeyEd25519Value.Type;
 }
+
 export class DidMethodKeyPublicKeySecp256k1 extends DidMethodKeyPublicKey {
   static Class = class extends withQualifier(withBase58btc(PublicKeySecp256k1Value)) {
     static Prefix = DidMethodKeyBytePrefixSecp256k1;

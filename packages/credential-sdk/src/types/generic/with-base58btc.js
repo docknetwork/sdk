@@ -13,10 +13,6 @@ export default function withBase58btc(klass) {
         return this.toBase58btc();
       }
 
-      toJSON() {
-        return String(this);
-      }
-
       static fromBase58btc(str) {
         return this.from(decodeFromBase58btc(str));
       }

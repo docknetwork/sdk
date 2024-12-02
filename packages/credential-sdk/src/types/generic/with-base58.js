@@ -15,10 +15,6 @@ export default function withBase58(klass) {
           return this.toBase58();
         }
 
-        toJSON() {
-          return String(this);
-        }
-
         static fromBase58(str) {
           return this.from(decodeFromBase58(str));
         }

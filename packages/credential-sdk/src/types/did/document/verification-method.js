@@ -29,7 +29,9 @@ import {
 import { Ed25519Verification2018Method, Ed25519Verification2020Method, VerificationMethodType } from './verification-method-type';
 import VerificationMethodRef from './verification-method-ref';
 import { NamespaceDid } from '../onchain/typed-did';
-import { fmtIter, valueBytes } from '../../../utils';
+import {
+  fmtIter, valueBytes,
+} from '../../../utils';
 import { DidKeyValue } from '../onchain/did-key';
 
 export class PublicKeyBase58 extends withBase58(TypedBytes) {}

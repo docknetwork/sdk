@@ -25,7 +25,6 @@ import {
   DEFAULT_CONTEXT_V1_URL,
   credentialContextField,
   PrivateStatusList2021EntryType,
-  DockStatusList2021Qualifier,
   StatusList2021EntryType,
   PrivateStatusList2021Qualifier,
 } from './constants';
@@ -695,13 +694,14 @@ export function addStatusList21EntryToCredential(
   purpose,
 ) {
   validateStatusPurpose(purpose);
+
   return {
     ...cred,
     credentialStatus: {
-      id: `${DockStatusList2021Qualifier}${statusListCredentialId}#${statusListCredentialIndex}`,
+      id: `${statusListCredentialId}#${statusListCredentialIndex}`,
       type: StatusList2021EntryType,
       statusListIndex: String(statusListCredentialIndex),
-      statusListCredential: `${DockStatusList2021Qualifier}${statusListCredentialId}`,
+      statusListCredential: String(statusListCredentialId),
       statusPurpose: purpose,
     },
   };

@@ -309,20 +309,43 @@ export class CheqdDIDDocument extends TypedStruct {
     versionId: option(VersionId),
   };
 
-  constructor(...args) {
-    super(...args);
+  constructor(
+    context,
+    id,
+    alsoKnownAs,
+    controller,
+    rawVerificationMethodWithOffchainKeys,
+    service,
+    authentication,
+    assertionMethodWithOffchainKeys,
+    keyAgreement,
+    capabilityInvocation,
+    capabilityDelegation,
+    versionId = TypedUUID.random(),
+  ) {
+    const verificationMethodWithOffchainKeys = [...rawVerificationMethodWithOffchainKeys].map((verMethod) => CheqdVerificationMethod.from(verMethod));
 
-    const offchainVerMethod = [
-      ...this.verificationMethod.filter((verMethod) => verMethod.isOffchain()),
-    ].map((verMethod) => verMethod.toVerificationMethod());
-    this.verificationMethod = this.verificationMethod.filter(
+    const offchainVerMethod = verificationMethodWithOffchainKeys.filter((verMethod) => verMethod.isOffchain());
+    const verificationMethod = verificationMethodWithOffchainKeys.filter(
       (verMethod) => !verMethod.isOffchain(),
     );
-
-    this.assertionMethod = [
-      ...this.assertionMethod,
-      ...[...offchainVerMethod].map((verMethod) => verMethod.toVerificationMethodRefWithDidKey()),
+    const assertionMethod = [
+      ...AssertionMethod.from(assertionMethodWithOffchainKeys).filter((ref) => !offchainVerMethod.some((verMethod) => verMethod.id.eq(ref))),
+      ...[...offchainVerMethod].map((verMethod) => verMethod.toVerificationMethod().toVerificationMethodRefWithDidKey()),
     ];
+
+    super(context,
+      id,
+      alsoKnownAs,
+      controller,
+      verificationMethod,
+      service,
+      authentication,
+      assertionMethod,
+      keyAgreement,
+      capabilityInvocation,
+      capabilityDelegation,
+      versionId);
   }
 
   toDIDDocument() {
@@ -345,8 +368,8 @@ export class CheqdDIDDocument extends TypedStruct {
         (keyRefOrKey) => keyRefOrKey instanceof VerificationMethodRefWithDidKey,
       ),
     ].map((verMethod) => verMethod.toVerificationMethod());
-    const assertionMethodWithoutOffchainKeys = assertionMethod.filter(
-      (keyRefOrKey) => !(keyRefOrKey instanceof VerificationMethodRefWithDidKey),
+    const assertionMethodWithoutOffchainKeys = [...assertionMethod].map(
+      (keyRefOrKey) => (keyRefOrKey instanceof VerificationMethodRefWithDidKey ? keyRefOrKey.ref : keyRefOrKey),
     );
 
     return new DIDDocument(

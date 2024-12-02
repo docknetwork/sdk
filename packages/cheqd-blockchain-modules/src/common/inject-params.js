@@ -5,7 +5,7 @@ import {
   u8aToString,
 } from '@docknetwork/credential-sdk/utils';
 import { CheqdParamsId } from '@docknetwork/credential-sdk/types';
-import { createInternalCheqdModule } from './builders';
+import createInternalCheqdModule from './create-internal-cheqd-module';
 import { CheqdCreateResource } from './payload';
 
 const methods = {

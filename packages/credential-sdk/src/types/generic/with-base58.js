@@ -1,27 +1,62 @@
 import withFrom from './with-from';
-import { decodeFromBase58, encodeAsBase58 } from '../../utils/base-x';
+import {
+  decodeFromBase58, encodeAsBase58, isEqualToOrPrototypeOf, u8aToString, stringToU8a, maybeToJSONString,
+} from '../../utils';
+import TypedEnum from './typed-enum';
 
 export default function withBase58(klass) {
   const name = `withBase58(${klass.name})`;
-  const obj = {
-    [name]: class extends klass {
-      toString() {
-        return this.toBase58();
-      }
+  let res;
 
-      toJSON() {
-        return String(this);
-      }
+  if (!isEqualToOrPrototypeOf(TypedEnum, klass)) {
+    const obj = {
+      [name]: class extends klass {
+        toString() {
+          return this.toBase58();
+        }
 
-      static fromBase58(str) {
-        return this.from(decodeFromBase58(str));
-      }
+        toJSON() {
+          return String(this);
+        }
 
-      toBase58() {
-        return encodeAsBase58(this.bytes);
-      }
-    },
-  };
+        static fromBase58(str) {
+          return this.from(decodeFromBase58(str));
+        }
 
-  return withFrom(obj[name], function from(value, fromFn) { return (typeof value === 'string' ? this.fromBase58(value) : fromFn(value)); });
+        toBase58() {
+          return encodeAsBase58(this.bytes);
+        }
+      },
+    };
+
+    res = obj[name];
+  } else {
+    const obj = {
+      [name]: class extends klass {
+        static Class = klass.Class;
+
+        static Variants = !klass.Class ? klass.Variants?.map(withBase58) : klass.Variants;
+
+        toString() {
+          return this.toBase58();
+        }
+
+        static fromBase58(str) {
+          return this.fromJSON(JSON.parse(u8aToString(decodeFromBase58(str))));
+        }
+
+        toBase58() {
+          return encodeAsBase58(this.bytes);
+        }
+
+        get bytes() {
+          return stringToU8a(maybeToJSONString(this));
+        }
+      },
+    };
+
+    res = obj[name];
+  }
+
+  return withFrom(res, function from(value, fromFn) { return (typeof value === 'string' ? this.fromBase58(value) : fromFn(value)); });
 }

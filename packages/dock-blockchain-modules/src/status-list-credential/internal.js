@@ -28,13 +28,13 @@ const accountMethods = {
 const didMethodsWithPolicy = {
   update(id, statusListCredential, _, __, nonce) {
     return new UpdateStatusListCredential(
-      new DockStatusList2021CredentialWithId(id, statusListCredential),
+      new DockStatusList2021CredentialWithId(DockStatusListCredentialId.from(id), statusListCredential),
       nonce,
     );
   },
-  remove(statusListCredentialId, _, __, nonce) {
+  remove(id, _, __, nonce) {
     return new RemoveStatusListCredential(
-      new DockStatusListCredentialWrappedId(statusListCredentialId),
+      new DockStatusListCredentialWrappedId(DockStatusListCredentialId.from(id)),
       nonce,
     );
   },

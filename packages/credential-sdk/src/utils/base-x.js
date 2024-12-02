@@ -15,7 +15,15 @@ export const encodeAsBase58 = (bytes) => bs58.encode(normalizeToU8a(bytes));
  * @param {string} string
  * @returns {Uint8Array}
  */
-export const decodeFromBase58 = (string) => bs58.decode(ensureString(string));
+export const decodeFromBase58 = (string) => {
+  try {
+    return bs58.decode(ensureString(string));
+  } catch (err) {
+    err.message = `Failed to decode base58 string \`${string}\`:\n${err.message}`;
+
+    throw err;
+  }
+};
 
 /**
  * Encodes supplied bytes as base58btc string using given prefix.
@@ -44,10 +52,16 @@ export const encodeAsBase58btc = (prefix, value) => {
  * @returns {Uint8Array}
  */
 export const decodeFromBase58btc = (string) => {
+  try {
   // Decode base58btc multibase string
-  const decoded = base58btc.decode(ensureString(string));
-  varint.decode(decoded); // Decode to get byte length
-  return decoded.slice(varint.decode.bytes);
+    const decoded = base58btc.decode(ensureString(string));
+    varint.decode(decoded); // Decode to get byte length
+    return decoded.slice(varint.decode.bytes);
+  } catch (err) {
+    err.message = `Failed to decode base58btc string \`${string}\`:\n${err.message}`;
+
+    throw err;
+  }
 };
 
 /**

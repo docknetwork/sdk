@@ -16,10 +16,10 @@ export default class DockStatusListCredentialModule extends injectDock(
    * @param {*} statusListCredentialId
    * @returns {Promise<StatusList2021Credential | null>}
    */
-  async getStatusListCredential(statusListCredentialId) {
+  async getStatusListCredential(id) {
     return (
       option(DockStatusList2021CredentialWithPolicy).from(
-        await this.dockOnly.query.statusListCredentials(DockStatusListCredentialId.from(statusListCredentialId).value),
+        await this.dockOnly.query.statusListCredentials(DockStatusListCredentialId.from(id).value),
       )?.statusListCredential?.value?.list ?? null
     );
   }

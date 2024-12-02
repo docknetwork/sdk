@@ -14,13 +14,13 @@ export class StatusListCredentialId extends withFrom(
   (value, from) => {
     try {
       // eslint-disable-next-line no-use-before-define
-      return DockStatusListCredentialId.from(value);
+      return from(DockStatusListCredentialIdValue.from(value));
     } catch {
       return from(value);
     }
   },
 ) {
-  static Qualifier = 'status-list2021';
+  static Qualifier = 'status-list2021:';
 
   toJSON() {
     return String(this);
@@ -53,7 +53,8 @@ export class CheqdStatusListCredentialIdValue extends withQualifier(DidRef) {
   }
 }
 
-export class DockStatusListCredentialIdValue extends sized(withQualifier(TypedBytes)) {
+// eslint-disable-next-line no-use-before-define
+export class DockStatusListCredentialIdValue extends withFrom(sized(withQualifier(TypedBytes)), (value, from) => (value instanceof DockStatusListCredentialId ? value[1] : from(value))) {
   static Qualifier = DockStatusList2021Qualifier;
 
   static Size = 32;
@@ -68,8 +69,6 @@ export class DockStatusListCredentialIdValue extends sized(withQualifier(TypedBy
 }
 
 export class CheqdStatusListCredentialId extends StatusListCredentialId {
-  static Qualifier = CheqdStatusList2021Qualifier;
-
   static Class = CheqdStatusListCredentialIdValue;
 
   static Type = 'cheqd';
@@ -80,8 +79,6 @@ export class CheqdStatusListCredentialId extends StatusListCredentialId {
 }
 
 export class DockStatusListCredentialId extends StatusListCredentialId {
-  static Qualifier = DockStatusList2021Qualifier;
-
   static Class = DockStatusListCredentialIdValue;
 
   static Type = 'dock';

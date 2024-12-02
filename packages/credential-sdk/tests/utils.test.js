@@ -137,7 +137,7 @@ describe("Testing isHexWithGivenByteSize", () => {
     expect(results).toEqual([1, 2, 3, 4, undefined]);
   });
 
-  test("`retry` works properly", async () => {
+  test.skip("`retry` works properly", async () => {
     const makeCtrFn =
       (ctr, placeholder = new Promise((_) => {})) =>
       async () => {

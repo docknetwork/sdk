@@ -15,6 +15,10 @@ export default function withBase64(klass) {
           return this.toBase64();
         }
 
+        toJSON() {
+          return String(this);
+        }
+
         static fromBase64(str) {
           return this.from(decodeFromBase64(str));
         }

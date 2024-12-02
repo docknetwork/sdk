@@ -1,6 +1,4 @@
-import {
-  TypedEnum, TypedStruct, withQualifier, withBase58btc,
-} from '../../../../generic';
+import { TypedEnum, TypedStruct, withQualifier } from '../../../../generic';
 import {
   PublicKeyEd25519Value,
   PublicKeySecp256k1Value,
@@ -8,14 +6,50 @@ import {
 import {
   DidMethodKeyBytePrefixEd25519,
   DidMethodKeyBytePrefixSecp256k1,
+  DidMethodKeyQualifier,
   Ed25519PublicKeyPrefix,
   Secp256k1PublicKeyPrefix,
 } from '../../constants';
 import DidOrDidMethodKeySignature from '../signature';
 import { DidMethodKeySignatureValue } from './did-method-key-signature';
+import { decodeFromBase58btc, encodeAsBase58btc } from '../../../../../utils';
 
-export class DidMethodKeyPublicKey extends withQualifier(TypedEnum, true) {
+export class DidMethodKeyPublicKey extends withQualifier(TypedEnum) {
+  static Qualifier = DidMethodKeyQualifier;
+
   static Type = 'didMethodKey';
+
+  /**
+   * Instantiates `DidMethodKey` from a fully qualified did string.
+   * @param {string} did - fully qualified `did:key:*` string
+   * @returns {DidMethodKey}
+   */
+  static fromUnqualifiedString(id) {
+    const bytes = decodeFromBase58btc(id);
+
+    let PublicKey;
+    if (id.startsWith(Secp256k1PublicKeyPrefix)) {
+      // eslint-disable-next-line no-use-before-define
+      PublicKey = DidMethodKeyPublicKeySecp256k1;
+    } else if (id.startsWith(Ed25519PublicKeyPrefix)) {
+      // eslint-disable-next-line no-use-before-define
+      PublicKey = DidMethodKeyPublicKeyEd25519;
+    } else {
+      throw new Error(`Unsupported \`did:key:*\`: \`${id}\``);
+    }
+
+    return new PublicKey(bytes);
+  }
+
+  /**
+   * Returns unqualified public key encoded in `BS58`.
+   */
+  toEncodedString() {
+    const prefix = this.constructor.Prefix;
+    const publicKey = this.value.bytes;
+
+    return encodeAsBase58btc(prefix, publicKey);
+  }
 
   /**
    * Creates a new `DidMethodKey` from the supplied keypair.
@@ -24,11 +58,7 @@ export class DidMethodKeyPublicKey extends withQualifier(TypedEnum, true) {
    * @returns {DidMethodKey}
    */
   static fromKeypair(keypair) {
-    return this.from(keypair.publicKey());
-  }
-
-  static fromQualifiedString(str) {
-    return super.fromQualifiedString(str.startsWith('did:key') ? str : `did:key:${str}`);
+    return this.from(keypair.publicKey().value);
   }
 
   signWith(keyPair, bytes) {
@@ -58,47 +88,19 @@ export class DidMethodKeySignature extends DidOrDidMethodKeySignature {
 }
 
 export class DidMethodKeyPublicKeyEd25519 extends DidMethodKeyPublicKey {
-  static Class = class extends withQualifier(withBase58btc(PublicKeyEd25519Value)) {
-    static Prefix = DidMethodKeyBytePrefixEd25519;
-
-    static Qualifier = `did:key:${Ed25519PublicKeyPrefix}`;
-
-    static fromUnqualifiedString(str) {
-      return this.fromBase58btc(`${Ed25519PublicKeyPrefix}${str}`);
-    }
-
-    toEncodedString() {
-      return this.toBase58btc();
-    }
-
-    toQualifiedEncodedString() {
-      return `did:key:${this.toEncodedString()}`;
-    }
-  };
+  static Class = PublicKeyEd25519Value;
 
   static Type = PublicKeyEd25519Value.Type;
+
+  static Prefix = DidMethodKeyBytePrefixEd25519;
 }
 
 export class DidMethodKeyPublicKeySecp256k1 extends DidMethodKeyPublicKey {
-  static Class = class extends withQualifier(withBase58btc(PublicKeySecp256k1Value)) {
-    static Prefix = DidMethodKeyBytePrefixSecp256k1;
-
-    static Qualifier = `did:key:${Secp256k1PublicKeyPrefix}`;
-
-    static fromUnqualifiedString(str) {
-      return this.fromBase58btc(`${Secp256k1PublicKeyPrefix}${str}`);
-    }
-
-    toEncodedString() {
-      return this.toBase58btc();
-    }
-
-    toQualifiedEncodedString() {
-      return `did:key:${this.toEncodedString()}`;
-    }
-  };
+  static Class = PublicKeySecp256k1Value;
 
   static Type = PublicKeySecp256k1Value.Type;
+
+  static Prefix = DidMethodKeyBytePrefixSecp256k1;
 }
 
 DidMethodKeyPublicKey.bindVariants(

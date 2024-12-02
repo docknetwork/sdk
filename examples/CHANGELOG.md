@@ -1,5 +1,15 @@
 # @docknetwork/sdk-examples
 
+## 0.5.2
+
+### Patch Changes
+
+- Audit fixes and RDF lib upgrade
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.13.0
+  - @docknetwork/dock-blockchain-modules@0.8.1
+  - @docknetwork/dock-blockchain-api@0.6.2
+
 ## 0.5.1
 
 ### Patch Changes

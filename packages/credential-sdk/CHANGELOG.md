@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.13.0
+
+### Minor Changes
+
+- Audit fixes and RDF lib upgrade
+
 ## 0.12.0
 
 ### Minor Changes

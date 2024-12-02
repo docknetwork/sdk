@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "version": "0.6.0",
-  "version": "0.5.2",
   "scripts": {
     "bbs-dock-example": "babel-node ./bbs-dock.js",
     "claim-deduction-example": "babel-node ./claim-deduction.js",

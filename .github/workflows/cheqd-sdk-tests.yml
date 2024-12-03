@@ -15,4 +15,4 @@ jobs:
       - run: yarn install --frozen-lockfile --ignore-scripts
       - run: npm install -g turbo@2.0.5
       - run: turbo telemetry disable
-      - run: CHEQD_MNEMONIC=$CHEQD_MNEMONIC turbo run test-with-node --filter @docknetwork/cheqd-blockchain-modules
+      - run: CHEQD_MNEMONIC=$CHEQD_MNEMONIC IMAGE_TAG=$IMAGE_TAG turbo run test-with-node --filter @docknetwork/cheqd-blockchain-modules

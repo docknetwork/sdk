@@ -5,10 +5,9 @@ CHAIN_ID="cheqd-dev"
 NODE_NAME="cheqd-dev"
 KEY_NAME="my-key"
 MONIKER="local-node"
-STAKE_DENOM="stake"
 CHAIN_DIR="$HOME/.testnode"
-GENESIS_AMOUNT="100000000000000000000000000000ncheq,8246428745600000$STAKE_DENOM"  # Very large amount
-STAKE_AMOUNT="8246428745600000$STAKE_DENOM"  # Ensure this is >= DefaultPowerReduction
+GENESIS_AMOUNT="100000000000000000000000000000ncheq"  # Very large amount
+STAKE_AMOUNT="8246428745600000ncheq"  # Ensure this is >= DefaultPowerReduction
 COMMAND="cheqd-noded"
 
 # Install Cosmos SDK if not installed (replace this with your specific chain's SDK)
@@ -22,7 +21,17 @@ rm -rf $CHAIN_DIR
 
 # Step 1: Initialize the chain
 echo "Initializing chain..."
-$COMMAND init $NODE_NAME --chain-id $CHAIN_ID --home $CHAIN_DIR
+$COMMAND init $NODE_NAME --chain-id $CHAIN_ID --home $CHAIN_DIR --default-denom ncheq
+
+# Step 1.a: Replace the default "stake" with "ncheq" in the genesis file
+echo "Replacing default 'stake' with 'ncheq' in genesis file..."
+sed -i 's/"stake"/"ncheq"/' $CHAIN_DIR/config/genesis.json
+
+# Step 1.b: Configure feemarket
+echo "Configuring feemarket..."
+sed -i 's/"fee_denom": "stake"/"fee_denom": "ncheq"/' $CHAIN_DIR/config/genesis.json
+sed -i 's/"min_base_gas_price": "1.000000000000000000"/"min_base_gas_price": "0.005000000000000000"/' $CHAIN_DIR/config/genesis.json
+sed -i 's/"base_gas_price": "1.000000000000000000"/"base_gas_price": "0.005000000000000000"/' $CHAIN_DIR/config/genesis.json
 
 # Step 2: Generate a keypair (if it doesn't exist already)
 if [ -z "$CHEQD_MNEMONIC" ]; then
@@ -35,7 +44,7 @@ fi
 
 # Step 3: Add the generated key as a genesis account
 echo "Adding genesis account..."
-$COMMAND genesis add-genesis-account $($COMMAND keys show $KEY_NAME -a --keyring-backend test --home $CHAIN_DIR) $GENESIS_AMOUNT --home $CHAIN_DIR
+$COMMAND genesis add-genesis-account $($COMMAND keys show $KEY_NAME -a --keyring-backend test --home $CHAIN_DIR) $GENESIS_AMOUNT --keyring-backend test --home $CHAIN_DIR
 
 # Step 4: Generate a genesis transaction
 echo "Generating genesis transaction..."
@@ -49,9 +58,13 @@ $COMMAND genesis collect-gentxs --home $CHAIN_DIR
 echo "Validating genesis file..."
 $COMMAND genesis validate-genesis --home $CHAIN_DIR
 
+# Step 6.a: Cat genesis file
+echo "Modified genesis file..."
+cat $CHAIN_DIR/config/genesis.json
+
 # Step 7: Copy custom configuration
 cp /tmp/cheqd_config.toml $CHAIN_DIR/config/config.toml
 
 # Step 8: Starting the node
-echo "Starting Cosmos node..."
+echo "Starting cheqd node..."
 $COMMAND start --home $CHAIN_DIR --moniker $MONIKER --log_level info

@@ -6,10 +6,16 @@ entrypoint="$(realpath $(dirname $0)/cheqd_entrypoint)"
 config="$(realpath $(dirname $0)/cheqd_config.toml)"
 
 # pre-pull
-docker pull --platform linux/amd64 ghcr.io/cheqd/cheqd-node:2.0.2
+docker pull --platform linux/amd64 ghcr.io/cheqd/cheqd-node:$IMAGE_TAG
 
 # start a pos alice node
-alice_container_id=$(docker run --platform linux/amd64 -d --rm --name cheqd-dev -p 26656:26656 -p 26657:26657 -p 1317:1317 -p 9090:9090 -e CHEQD_MNEMONIC="$CHEQD_MNEMONIC" -v $entrypoint:/usr/local/bin/entrypoint.sh -v $config:/tmp/cheqd_config.toml --entrypoint /usr/local/bin/entrypoint.sh ghcr.io/cheqd/cheqd-node:2.0.2 start)
+alice_container_id=$(docker run --platform linux/amd64 -d --rm --name cheqd-dev -p 26656:26656 -p 26657:26657 -p 1317:1317 -p 9090:9090 -e CHEQD_MNEMONIC="$CHEQD_MNEMONIC" -v $entrypoint:/usr/local/bin/entrypoint.sh -v $config:/tmp/cheqd_config.toml --entrypoint /usr/local/bin/entrypoint.sh ghcr.io/cheqd/cheqd-node:$IMAGE_TAG start)
+
+# locate the node's home directory
+alice_home=$(docker exec $alice_container_id sh -c 'echo $HOME')
+
+# tail logs, if necessary
+# docker logs -f $alice_container_id
 
 cleanup() {
   docker kill $alice_container_id 2> /dev/null
@@ -17,8 +23,8 @@ cleanup() {
 
 try_with_node() {
   sleep 10;
-	# Execute the commands, potentially against the nodes
-	$@
+  # Execute the commands, potentially against the nodes
+  $@
 }
 
 trap cleanup EXIT SIGINT SIGTERM

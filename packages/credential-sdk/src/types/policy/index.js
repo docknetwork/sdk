@@ -5,8 +5,12 @@ export class Policy extends TypedEnum {}
 export class OneOfPolicy extends Policy {
   static Class = OneOfPolicyValue;
 
+  /**
+   * Add a owner to the policy
+   * @param {*} ownerDID - Owner's DID
+   */
   addOwner(ownerDID) {
-    return this.value.addOwner(ownerDID);
+    return this.value.add(ownerDID);
   }
 }
 

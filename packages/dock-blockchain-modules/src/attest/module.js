@@ -1,5 +1,5 @@
 import { AbstractAttestModule } from '@docknetwork/credential-sdk/modules';
-import { ensureTargetKeypair, injectDock } from '../common';
+import { targetKeypair, injectDock } from '../common';
 import DockInternalAttestModule from './internal';
 
 export default class DockAttestModule extends injectDock(AbstractAttestModule) {
@@ -21,7 +21,7 @@ export default class DockAttestModule extends injectDock(AbstractAttestModule) {
    * @param signingKeyRef
    */
   async setClaimTx(iri, targetDid, didKeypair) {
-    ensureTargetKeypair(targetDid, didKeypair);
+    targetKeypair(targetDid, didKeypair);
     const currentPriority = (await this.dockOnly.attest(targetDid)).priority?.value ?? 0;
 
     return await this.dockOnly.tx.setClaim(

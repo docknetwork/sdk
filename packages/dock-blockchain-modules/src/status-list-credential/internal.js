@@ -15,26 +15,26 @@ import {
 import { createInternalDockModule } from '../common';
 
 const accountMethods = {
-  create(id, statusListCredential, signerDid) {
+  create(statusListCredentialId, statusListCredential, did) {
     const credentialWithPolicy = new DockStatusList2021CredentialWithPolicy(
       statusListCredential,
-      new OneOfPolicy([signerDid]),
+      new OneOfPolicy([did]),
     );
 
-    return [DockStatusListCredentialId.from(id), credentialWithPolicy];
+    return [DockStatusListCredentialId.from(statusListCredentialId).value, credentialWithPolicy];
   },
 };
 
 const didMethodsWithPolicy = {
   update(id, statusListCredential, _, __, nonce) {
     return new UpdateStatusListCredential(
-      new DockStatusList2021CredentialWithId(id, statusListCredential),
+      new DockStatusList2021CredentialWithId(DockStatusListCredentialId.from(id), statusListCredential),
       nonce,
     );
   },
-  remove(statusListCredentialId, _, __, nonce) {
+  remove(id, _, __, nonce) {
     return new RemoveStatusListCredential(
-      new DockStatusListCredentialWrappedId(statusListCredentialId),
+      new DockStatusListCredentialWrappedId(DockStatusListCredentialId.from(id)),
       nonce,
     );
   },

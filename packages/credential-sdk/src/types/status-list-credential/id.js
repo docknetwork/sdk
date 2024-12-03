@@ -1,8 +1,63 @@
-import { DockStatusList2021Qualifier } from '../../vc/constants';
-import { sized, TypedBytes, withQualifier } from '../generic';
+import {
+  TypedBytes,
+  TypedEnum,
+  TypedUUID,
+  sized,
+  withFrom,
+  withQualifier,
+} from '../generic';
+import { CheqdMainnetDid, CheqdTestnetDid, DidRef } from '../did';
+import { DockStatusList2021Qualifier, CheqdStatusList2021Qualifier } from '../../vc/constants';
 
-export class StatusListCredentialId extends withQualifier(TypedBytes) {
+export class StatusListCredentialId extends withFrom(
+  withQualifier(TypedEnum, true),
+  (value, from) => {
+    try {
+      // eslint-disable-next-line no-use-before-define
+      return from(DockStatusListCredentialIdValue.from(value));
+    } catch {
+      return from(value);
+    }
+  },
+) {
+  static Qualifier = 'status-list2021:';
+
+  toJSON() {
+    return String(this);
+  }
+}
+
+export class CheqdStatusListCredentialIdValue extends withQualifier(DidRef) {
+  static Qualifier = CheqdStatusList2021Qualifier;
+
+  static Ident = TypedUUID;
+
+  static fromUnqualifiedString(str) {
+    const lastColon = str.lastIndexOf(':');
+    const did = `did:cheqd:${str.slice(0, lastColon)}`;
+    const id = str.slice(lastColon + 1);
+
+    return new this(did, id);
+  }
+
+  toEncodedString() {
+    const { did, value } = this;
+    let prefix = '';
+    if (did.value instanceof CheqdTestnetDid) {
+      prefix = 'testnet';
+    } else if (did.value instanceof CheqdMainnetDid) {
+      prefix = 'mainnet';
+    }
+
+    return `${prefix}:${did.toEncodedString()}:${value}`;
+  }
+}
+
+// eslint-disable-next-line no-use-before-define
+export class DockStatusListCredentialIdValue extends withFrom(sized(withQualifier(TypedBytes)), (value, from) => (value instanceof DockStatusListCredentialId ? value[1] : from(value))) {
   static Qualifier = DockStatusList2021Qualifier;
+
+  static Size = 32;
 
   static fromUnqualifiedString(bytes) {
     return new this(bytes);
@@ -13,6 +68,24 @@ export class StatusListCredentialId extends withQualifier(TypedBytes) {
   }
 }
 
-export class DockStatusListCredentialId extends sized(StatusListCredentialId) {
-  static Size = 32;
+export class CheqdStatusListCredentialId extends StatusListCredentialId {
+  static Class = CheqdStatusListCredentialIdValue;
+
+  static Type = 'cheqd';
+
+  static random(did) {
+    return new this(this.Class.random(did));
+  }
 }
+
+export class DockStatusListCredentialId extends StatusListCredentialId {
+  static Class = DockStatusListCredentialIdValue;
+
+  static Type = 'dock';
+
+  static random() {
+    return new this(this.Class.random());
+  }
+}
+
+StatusListCredentialId.bindVariants(CheqdStatusListCredentialId, DockStatusListCredentialId);

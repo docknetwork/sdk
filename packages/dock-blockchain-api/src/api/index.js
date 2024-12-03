@@ -6,7 +6,7 @@ import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 
 import { AbstractApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
 import {
-  DIDRef,
+  DidRef,
   DockDidOrDidMethodKey,
   NamespaceDid,
 } from '@docknetwork/credential-sdk/types';
@@ -348,7 +348,7 @@ export default class DockAPI extends AbstractApiProvider {
       return id.isDock || id.isDidMethodKey;
     } else if (id instanceof DockDidOrDidMethodKey) {
       return true;
-    } else if (id instanceof DIDRef) {
+    } else if (id instanceof DidRef) {
       return this.supportsIdentifier(id[0]);
     } else if (id instanceof TypedEnum) {
       return this.supportsIdentifier(id.value);

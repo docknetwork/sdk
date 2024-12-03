@@ -17,10 +17,6 @@ export class MultiApiCoreModules extends AbstractCoreModules {
     return {
       ...super.ModuleMap,
       AccumulatorModule: { key: 'accumulator', optional: true },
-      StatusListCredentialModule: {
-        key: 'statusListCredential',
-        optional: true,
-      },
       TrustRegistryModule: { key: 'trustRegistry', optional: true },
     };
   }

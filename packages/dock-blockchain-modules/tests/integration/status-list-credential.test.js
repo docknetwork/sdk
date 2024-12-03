@@ -21,7 +21,7 @@ import { DockCoreModules } from "../../src";
 import { getUnsignedCred, registerNewDIDUsingPair } from "./helpers";
 import { getKeyDoc } from "@docknetwork/credential-sdk/vc/helpers";
 import { DockDid } from "@docknetwork/credential-sdk/types";
-import { StatusList2021Credential } from "@docknetwork/credential-sdk/types";
+import { DockStatusList2021Credential, DockStatusListCredentialId } from "@docknetwork/credential-sdk/types";
 import { addStatusList21EntryToCredential } from "@docknetwork/credential-sdk/vc/credentials";
 import {
   Ed25519Keypair,
@@ -30,13 +30,13 @@ import {
 
 const credId = "A large credential id with size > 32 bytes";
 
-describe("StatusList2021Credential", () => {
+describe("DockStatusList2021Credential", () => {
   const dockAPI = new DockAPI();
   const modules = new DockCoreModules(dockAPI);
   const resolver = new CoreResolver(modules);
 
   // Create a random status list id
-  const statusListCredentialId = randomAsHex(32);
+  const statusListCredentialId = String(DockStatusListCredentialId.random());
   const statusListCredentialIndex = (Math.random() * 10e3) | 0;
 
   // Register a new DID for issuer
@@ -82,7 +82,7 @@ describe("StatusList2021Credential", () => {
       "Ed25519VerificationKey2018"
     );
 
-    const statusListCred = await StatusList2021Credential.create(
+    const statusListCred = await DockStatusList2021Credential.create(
       issuerKey,
       statusListCredentialId,
       { statusPurpose: "suspension" }
@@ -92,7 +92,6 @@ describe("StatusList2021Credential", () => {
     await modules.statusListCredential.createStatusListCredential(
       statusListCredentialId,
       statusListCred,
-      issuerDID,
       issuerKeyPair
     );
 
@@ -136,6 +135,7 @@ describe("StatusList2021Credential", () => {
       compactProof: true,
     });
 
+    console.log(result.error);
     expect(result.verified).toBe(true);
 
     // Revoke the credential
@@ -150,7 +150,6 @@ describe("StatusList2021Credential", () => {
     await modules.statusListCredential.updateStatusListCredential(
       statusListCredentialId,
       fetchedCred,
-      issuerDID,
       issuerKeyPair
     );
 
@@ -180,7 +179,6 @@ describe("StatusList2021Credential", () => {
     await modules.statusListCredential.updateStatusListCredential(
       statusListCredentialId,
       fetchedCred,
-      issuerDID,
       issuerKeyPair
     );
     const holderKey = getKeyDoc(
@@ -222,7 +220,6 @@ describe("StatusList2021Credential", () => {
     await modules.statusListCredential.updateStatusListCredential(
       statusListCredentialId,
       fetchedCred,
-      issuerDID,
       issuerKeyPair
     );
 

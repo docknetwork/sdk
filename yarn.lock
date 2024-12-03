@@ -1062,6 +1062,11 @@
   resolved "https://registry.yarnpkg.com/@bitauth/libauth/-/libauth-1.19.1.tgz#713751bbc09815b667f8fe00a1cc5b0f3bf45dd1"
   integrity sha512-R524tD5VwOt3QRHr7N518nqTVR/HKgfWL4LypekcGuNQN8R4PWScvuRcRzrY39A28kLztMv+TJdiKuMNbkU1ug==
 
+"@bufbuild/protobuf@^2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@bufbuild/protobuf/-/protobuf-2.2.2.tgz#1a6d89603fb215dc4d4178052d05b30b83c75402"
+  integrity sha512-UNtPCbrwrenpmrXuRwn9jYpPoweNXj8X5sMvYgsqYyaH8jQ6LfUJSk3dJLnBK+6sfYPrF4iAIo5sd5HQ+tg75A==
+
 "@chainsafe/as-chacha20poly1305@^0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@chainsafe/as-chacha20poly1305/-/as-chacha20poly1305-0.1.0.tgz#7da6f8796f9b42dac6e830a086d964f1f9189e09"
@@ -1317,11 +1322,11 @@
     prettier "^2.7.1"
 
 "@cheqd/sdk@cjs":
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/@cheqd/sdk/-/sdk-2.5.1.tgz#7d7fd5ccbe8831e2a0cf0b14d62aa66b2413d581"
-  integrity sha512-Vm9hwFIzgXhK1/ilaciauPnfa2mm8/aGPVRxM/O3LCLUyBdmS+dKIY6G6FKN/ttcsfUJSRmpR50weFY/vMqs3g==
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/@cheqd/sdk/-/sdk-2.6.0.tgz#062c315f0d72029bf0dc438b67efd9f97b3d07a3"
+  integrity sha512-Lx3/0dT7QoKaWfQcc4PzhcaFud5Fkgm1//Q7KfPXakerSLuOkyaVy95VnFnnoLERuWZcE6r3nI1xoKq1GFckDg==
   dependencies:
-    "@cheqd/ts-proto" "~2.3.2"
+    "@cheqd/ts-proto" "^2.4.0"
     "@cosmjs/amino" "~0.30.1"
     "@cosmjs/crypto" "~0.30.1"
     "@cosmjs/encoding" "~0.30.1"
@@ -1341,11 +1346,12 @@
     secp256k1 "^5.0.0"
     uuid "^10.0.0"
 
-"@cheqd/ts-proto@~2.3.2":
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/@cheqd/ts-proto/-/ts-proto-2.3.2.tgz#b9567878f34aebc215b10b913bab2783b22817b0"
-  integrity sha512-WqwthQGyF16tx3LyqwJlLq/4DfTigNsCWtGY3ct9RSfTNTPI/JZ1qLE7eSkcE9Glk4Yk95d+SYbqOeoSNP442Q==
+"@cheqd/ts-proto@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@cheqd/ts-proto/-/ts-proto-2.4.0.tgz#4894314559a3663e4ba556495c0187da55480b43"
+  integrity sha512-+iPJujk1IfeWdcbVzMEjleVXab1leYshiFZNQGpDw6PCOWkRRZ/0BOJgRm6/LQjcj70ceDje4Io/8+CIh+9A5g==
   dependencies:
+    "@bufbuild/protobuf" "^2.2.2"
     long "^5.2.3"
     protobufjs "^7.4.0"
 

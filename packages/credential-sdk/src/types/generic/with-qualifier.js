@@ -28,7 +28,7 @@ export default function withQualifier(klass, wrapper = false) {
 
         static get Qualifiers() {
           return [].concat(
-            this.Qualifier ??
+            this.Qualifier ?? this.Class?.Qualifiers ??
               this.Variants.flatMap((variant) =>
                 [].concat(
                   variant.Qualifier ?? variant !== this
@@ -111,7 +111,7 @@ export default function withQualifier(klass, wrapper = false) {
       } else if (
         value?.constructor?.Qualifier != null &&
         !this.Qualifiers.find((qualifier) =>
-          value.constructor.Qualifier.startsWith(qualifier)
+          value.constructor.Qualifier.startsWith(qualifier) || qualifier.startsWith(value.constructor.Qualifier)
         )
       ) {
         throw new Error(
@@ -201,7 +201,7 @@ export default function withQualifier(klass, wrapper = false) {
           }
         } else if (
           value?.constructor?.Qualifier != null &&
-          !value.constructor.Qualifier.startsWith(this.Qualifier)
+          !value.constructor.Qualifier.startsWith(this.Qualifier) && !this.Qualifier.startsWith(value.constructor.Qualifier)
         ) {
           throw new Error(
             `Value has a different qualifier: \`${value.constructor.Qualifier}\` while expected \`${this.Qualifier}\` by \`${this.name}\``

@@ -1,32 +1,30 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`\`DIDDocument\` \`DIDDocument.create\` works 1`] = `
+exports[`DID document workflow \`CheqdDIDDocument\` 1`] = `
 {
-  "@context": [
-    "https://www.w3.org/ns/did/v1",
-  ],
   "alsoKnownAs": [],
   "assertionMethod": [],
   "authentication": [],
   "capabilityDelegation": [],
   "capabilityInvocation": [],
+  "context": [
+    "https://www.w3.org/ns/did/v1",
+  ],
   "controller": [],
-  "https://rdf.dock.io/alpha/2021#attestsDocumentContents": null,
-  "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+  "id": "did:cheqd:testnet:6ec66297-f55e-4744-b8cd-bd043bc45767",
   "keyAgreement": [],
   "service": [],
   "verificationMethod": [],
+  "versionId": "0557d7da-8dea-45cb-8f30-7370b59eab71",
 }
 `;
 
-exports[`\`DIDDocument\` \`DIDDocument.create\` works 2`] = `
+exports[`DID document workflow \`CheqdDIDDocument\` 2`] = `
 {
-  "@context": [
-    "https://www.w3.org/ns/did/v1",
-  ],
   "alsoKnownAs": [],
   "assertionMethod": [
     "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2=BBXr5GktzTvvVhRsbmYdJw2Tw3LHbkL8GBewX7KoKTZC8cVhbtbm23jCSmkiqnLEs2vwJDQWFFb5FvNJhDuCHPaZkVobYByLv57KQYVriE7CwrzjXPcp61RVq6sChaE3hQ7SvDVyF55zrZ7xZTyXYKDMLvhYKmHwL8kJ1o9KAq5ZNBFJFSqhCJvejjkPXHg5YXPHAvFKS",
   ],
   "authentication": [
     "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
@@ -35,10 +33,12 @@ exports[`\`DIDDocument\` \`DIDDocument.create\` works 2`] = `
   "capabilityInvocation": [
     "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
   ],
+  "context": [
+    "https://www.w3.org/ns/did/v1",
+  ],
   "controller": [
     "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
   ],
-  "https://rdf.dock.io/alpha/2021#attestsDocumentContents": null,
   "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
   "keyAgreement": [],
   "service": [],
@@ -46,148 +46,107 @@ exports[`\`DIDDocument\` \`DIDDocument.create\` works 2`] = `
     {
       "controller": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
       "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
-      "publicKeyBase58": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
-      "publicKeyBase64": null,
-      "publicKeyHex": null,
-      "publicKeyJwk": null,
-      "type": "Ed25519VerificationKey2018",
+      "verificationMaterial": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
+      "verificationMethodType": "Ed25519VerificationKey2018",
     },
   ],
+  "versionId": "28edc043-872b-4ab7-9cb8-b01d1bd677c5",
 }
 `;
 
-exports[`\`DIDDocument\` \`DIDDocument.create\` works 3`] = `
+exports[`DID document workflow \`CheqdDIDDocument\` 3`] = `
 {
-  "@context": [
-    "https://www.w3.org/ns/did/v1",
-  ],
   "alsoKnownAs": [],
   "assertionMethod": [
-    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-2",
-    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-4",
-    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-6",
-    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-7",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-3",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-6",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-8",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-9",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2=BBXr5GktzTvvVhRsbmYdJw2Tw3LHbkL8GBewX7KoKTZC8cVhbtbm23jCSmkiqnLEs2vwJDQWFFb5FvNJhDuCHPaZkVobYByLv57KQYVriE7CwrzjXPcp61RVq6sChaE3hQ7SvDVyF55zrZ7xZTyXYKDMLvhYKmHwL8kJ1o9KAq5ZNBFJFSqhCJvejjkPXHg5YXPHAvFKS",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-5=BBXr5GktzTvvVhRsbmYdJw2Tw3G5BoeByaj9iFtGToMCQHXwjsjRvLUpz94VaiJVAYrs4uyKBmBoMN89tbo4dzX5nizBn6MjwbZXKHEKd2ZBzXaVg4TTdw6VHXT9nWYs5PXBEZBWEncp5mZ4pUMwhLk6XQUgSXgYHN9PHik8vszRLLrN1TkWSKn1D2VAm2aGmHyu6Mtnp",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-11=BBXr5GktzTvvVhRsbmYdJw2Tw3GBAjToki5h3osi8WMS3RF4QLNS1D3atcFAHFFFFbXfETadaeApWKZsx5jF1WTtngunVo67bFhrd3KxFWtoYUoxtxNABmZpYPTP6HWeadskCqZFZeKVmCu2uu9TtuNjgBA5shwVHcc5cbmEsYavv4nq8oenCzMwjQ4cCxDE2KNHyFXL8",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-12=BBXr5GktzTvvVhRsbmYdJw2Tw3LUVjBmqG8HFzgouT6CmR8j6gN1hRg9wg6eBBNoffP4D42hRbzknBxiTSxZAPri5yrWHGKwohGZtirDvLDunXcVA1a4ATw4WdLsfJxK4ayTSqtBhWRJJ8Gcp6yKZBUY96K7242JRcBWP4gzgQsCtdf1AUDEWc5CKsGZ5LfSuTgfKrUQt",
   ],
   "authentication": [
-    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-1",
-    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-4",
-    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-5",
-    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-7",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-6",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-7",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-9",
   ],
   "capabilityDelegation": [],
   "capabilityInvocation": [
-    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-3",
-    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-5",
-    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-6",
-    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-7",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-4",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-7",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-8",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-9",
+  ],
+  "context": [
+    "https://www.w3.org/ns/did/v1",
   ],
   "controller": [
-    "did:key:z6MktvqCyLxTsXUH1tUZncNdVeEZ7hNh7npPRbUU27GTrYb8",
-    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+    "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+    "did:cheqd:testnet:df3ba823-c1e2-46e0-bb54-056f9c506e90",
   ],
-  "https://rdf.dock.io/alpha/2021#attestsDocumentContents": null,
-  "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+  "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
   "keyAgreement": [
-    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-8",
+    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-10",
   ],
   "service": [],
   "verificationMethod": [
     {
-      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
-      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-1",
-      "publicKeyBase58": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
-      "publicKeyBase64": null,
-      "publicKeyHex": null,
-      "publicKeyJwk": null,
-      "type": "Ed25519VerificationKey2018",
+      "controller": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+      "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+      "verificationMaterial": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
+      "verificationMethodType": "Ed25519VerificationKey2018",
     },
     {
-      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
-      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-2",
-      "publicKeyBase58": "GxmaKA52SZGQtZS3Usa6Az48gky2AZRKzRKxsXM6ystc",
-      "publicKeyBase64": null,
-      "publicKeyHex": null,
-      "publicKeyJwk": null,
-      "type": "Ed25519VerificationKey2018",
+      "controller": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+      "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-3",
+      "verificationMaterial": "GxmaKA52SZGQtZS3Usa6Az48gky2AZRKzRKxsXM6ystc",
+      "verificationMethodType": "Ed25519VerificationKey2018",
     },
     {
-      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
-      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-3",
-      "publicKeyBase58": "5FBSa4xAs54osiMs75JcepL695v1XhccQmQePBZQaad9",
-      "publicKeyBase64": null,
-      "publicKeyHex": null,
-      "publicKeyJwk": null,
-      "type": "Ed25519VerificationKey2018",
+      "controller": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+      "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-4",
+      "verificationMaterial": "5FBSa4xAs54osiMs75JcepL695v1XhccQmQePBZQaad9",
+      "verificationMethodType": "Ed25519VerificationKey2018",
     },
     {
-      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
-      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-4",
-      "publicKeyBase58": "EaNp37NGpe8KViTKxAdknyvUP44doH1fHnFpYqEcfUjE",
-      "publicKeyBase64": null,
-      "publicKeyHex": null,
-      "publicKeyJwk": null,
-      "type": "Ed25519VerificationKey2018",
+      "controller": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+      "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-6",
+      "verificationMaterial": "EaNp37NGpe8KViTKxAdknyvUP44doH1fHnFpYqEcfUjE",
+      "verificationMethodType": "Ed25519VerificationKey2018",
     },
     {
-      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
-      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-5",
-      "publicKeyBase58": "A462rFkYENhY6kf9zLVPg6qvtQhXJ6RuL8CNdHTWzNqa",
-      "publicKeyBase64": null,
-      "publicKeyHex": null,
-      "publicKeyJwk": null,
-      "type": "Ed25519VerificationKey2018",
+      "controller": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+      "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-7",
+      "verificationMaterial": "A462rFkYENhY6kf9zLVPg6qvtQhXJ6RuL8CNdHTWzNqa",
+      "verificationMethodType": "Ed25519VerificationKey2018",
     },
     {
-      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
-      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-6",
-      "publicKeyBase58": "Amb3kf4if5Av1sz6UdYtEw2iy6DzufRAtch6hiXEWHcw",
-      "publicKeyBase64": null,
-      "publicKeyHex": null,
-      "publicKeyJwk": null,
-      "type": "Ed25519VerificationKey2018",
+      "controller": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+      "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-8",
+      "verificationMaterial": "Amb3kf4if5Av1sz6UdYtEw2iy6DzufRAtch6hiXEWHcw",
+      "verificationMethodType": "Ed25519VerificationKey2018",
     },
     {
-      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
-      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-7",
-      "publicKeyBase58": "FwUvnTThdnNPv23Rbq2SXtxxYAT21Atvdd1cZBHPYue4",
-      "publicKeyBase64": null,
-      "publicKeyHex": null,
-      "publicKeyJwk": null,
-      "type": "Ed25519VerificationKey2018",
+      "controller": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+      "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-9",
+      "verificationMaterial": "FwUvnTThdnNPv23Rbq2SXtxxYAT21Atvdd1cZBHPYue4",
+      "verificationMethodType": "Ed25519VerificationKey2018",
     },
     {
-      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
-      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-8",
-      "publicKeyBase58": "BaGbEav6KzvWhgBWPyZK2vWX5EDDFc4a8rfUwAZ3x8Jn",
-      "publicKeyBase64": null,
-      "publicKeyHex": null,
-      "publicKeyJwk": null,
-      "type": "Ed25519VerificationKey2018",
+      "controller": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+      "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-10",
+      "verificationMaterial": "BaGbEav6KzvWhgBWPyZK2vWX5EDDFc4a8rfUwAZ3x8Jn",
+      "verificationMethodType": "Ed25519VerificationKey2018",
     },
   ],
+  "versionId": "47b4d97b-1ebe-4d81-a3ed-12eb63baaeb9",
 }
 `;
 
-exports[`\`DIDDocument\` \`DIDDocument.create\` works 4`] = `
-{
-  "@context": [
-    "overriden",
-  ],
-  "alsoKnownAs": [],
-  "assertionMethod": [],
-  "authentication": [],
-  "capabilityDelegation": [],
-  "capabilityInvocation": [],
-  "controller": [],
-  "https://rdf.dock.io/alpha/2021#attestsDocumentContents": null,
-  "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
-  "keyAgreement": [],
-  "service": [],
-  "verificationMethod": [],
-}
-`;
-
-exports[`\`DIDDocument\` \`DIDDocument.from\` works 1`] = `
+exports[`DID document workflow \`DIDDocument.from\` works 1`] = `
 {
   "@context": [
     "test",
@@ -215,5 +174,195 @@ exports[`\`DIDDocument\` \`DIDDocument.from\` works 1`] = `
       "type": "Ed25519VerificationKey2018",
     },
   ],
+}
+`;
+
+exports[`DID document workflow \`DIDDocument\` 1`] = `
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+  ],
+  "alsoKnownAs": [],
+  "assertionMethod": [],
+  "authentication": [],
+  "capabilityDelegation": [],
+  "capabilityInvocation": [],
+  "controller": [],
+  "https://rdf.dock.io/alpha/2021#attestsDocumentContents": null,
+  "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+  "keyAgreement": [],
+  "service": [],
+  "verificationMethod": [],
+}
+`;
+
+exports[`DID document workflow \`DIDDocument\` 2`] = `
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+  ],
+  "alsoKnownAs": [],
+  "assertionMethod": [
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-2",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-3",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-5",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-6",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-8",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-9",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-11",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-12",
+  ],
+  "authentication": [
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-1",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-6",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-7",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-9",
+  ],
+  "capabilityDelegation": [],
+  "capabilityInvocation": [
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-4",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-7",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-8",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-9",
+  ],
+  "controller": [
+    "did:key:z6MktvqCyLxTsXUH1tUZncNdVeEZ7hNh7npPRbUU27GTrYb8",
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+  ],
+  "https://rdf.dock.io/alpha/2021#attestsDocumentContents": null,
+  "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+  "keyAgreement": [
+    "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-10",
+  ],
+  "service": [],
+  "verificationMethod": [
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-1",
+      "publicKeyBase58": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-2",
+      "publicKeyBase58": "CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Bls12381BBSVerificationKeyDock2023",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-3",
+      "publicKeyBase58": "GxmaKA52SZGQtZS3Usa6Az48gky2AZRKzRKxsXM6ystc",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-4",
+      "publicKeyBase58": "5FBSa4xAs54osiMs75JcepL695v1XhccQmQePBZQaad9",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-5",
+      "publicKeyBase58": "9y4gScRXDQJahd1gKbf1pYf9mwcRKnUqzstR3Bn7ydYz",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Bls12381BBSVerificationKeyDock2023",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-6",
+      "publicKeyBase58": "EaNp37NGpe8KViTKxAdknyvUP44doH1fHnFpYqEcfUjE",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-7",
+      "publicKeyBase58": "A462rFkYENhY6kf9zLVPg6qvtQhXJ6RuL8CNdHTWzNqa",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-8",
+      "publicKeyBase58": "Amb3kf4if5Av1sz6UdYtEw2iy6DzufRAtch6hiXEWHcw",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-9",
+      "publicKeyBase58": "FwUvnTThdnNPv23Rbq2SXtxxYAT21Atvdd1cZBHPYue4",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-10",
+      "publicKeyBase58": "BaGbEav6KzvWhgBWPyZK2vWX5EDDFc4a8rfUwAZ3x8Jn",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Ed25519VerificationKey2018",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-11",
+      "publicKeyBase58": "BBF5rtFSaWt4s4PxMEswkothcPJNLhdsQpggZyUozSdZ",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Bls12381BBSVerificationKeyDock2023",
+    },
+    {
+      "controller": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+      "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk#keys-12",
+      "publicKeyBase58": "EaNp37NGpe8KViTKxAdknyvUP44doH1fHnFpYqEcfUjE",
+      "publicKeyBase64": null,
+      "publicKeyHex": null,
+      "publicKeyJwk": null,
+      "type": "Bls12381BBSVerificationKeyDock2023",
+    },
+  ],
+}
+`;
+
+exports[`DID document workflow \`DIDDocument\` 3`] = `
+{
+  "@context": [
+    "overriden",
+  ],
+  "alsoKnownAs": [],
+  "assertionMethod": [],
+  "authentication": [],
+  "capabilityDelegation": [],
+  "capabilityInvocation": [],
+  "controller": [],
+  "https://rdf.dock.io/alpha/2021#attestsDocumentContents": null,
+  "id": "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
+  "keyAgreement": [],
+  "service": [],
+  "verificationMethod": [],
 }
 `;

@@ -6,7 +6,6 @@ import {
 } from '@digitalcredentials/vc-status-list';
 import { gzip, ungzip } from 'pako';
 import { u8aToU8a } from '../utils/bytes';
-import { DockStatusList2021Qualifier } from './constants';
 import VerifiableCredential from './verifiable-credential';
 import { ensureStatusListId } from '../utils';
 import { KeyDoc } from "./helpers"; // eslint-disable-line
@@ -63,7 +62,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
     this.updateStatusList(statusPurpose, statusList, revokeIndices);
 
     const jsonCred = await createCredential({
-      id: `${this.qualifier}${id}`,
+      id: String(id),
       list: statusList,
       statusPurpose,
     });
@@ -275,4 +274,3 @@ export default class StatusList2021Credential extends VerifiableCredential {
  * Allowed status purposes for this credential type.
  */
 StatusList2021Credential.statusPurposes = new Set(['revocation', 'suspension']);
-StatusList2021Credential.qualifier = DockStatusList2021Qualifier;

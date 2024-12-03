@@ -19,3 +19,6 @@ export { default as withProp } from './with-prop';
 export { default as withFrom } from './with-from';
 export { default as withNullIfNotAVariant } from './with-null-if-not-a-variant';
 export { default as Any } from './typed-any';
+export { default as withBase58 } from './with-base58';
+export { default as withBase64 } from './with-base64';
+export { default as withBase58btc } from './with-base58btc';

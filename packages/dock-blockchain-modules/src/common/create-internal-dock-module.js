@@ -1,55 +1,50 @@
 import {
   withExtendedStaticProperties,
-  ensureInstanceOf,
 } from '@docknetwork/credential-sdk/utils';
 import { DockDidOrDidMethodKey } from '@docknetwork/credential-sdk/types/did';
-import { DidKeypair } from '@docknetwork/credential-sdk/keypairs';
+import { TypedNumber } from '@docknetwork/credential-sdk/types/generic';
+import { allSigners, firstSigner } from './keypair';
 
 const fnNameToMethodName = (methodName) => `${methodName[0].toUpperCase()}${methodName.slice(1)}`;
-
-export const ensureTargetKeypair = (targetDid, didKeypair) => {
-  const includes = []
-    .concat(didKeypair)
-    .some(
-      (keyPair) => String(ensureInstanceOf(keyPair, DidKeypair).did) === String(targetDid),
-    );
-
-  if (!includes) {
-    throw new Error(`No keypair provided for ${targetDid}`);
-  }
-};
 
 /**
  * Creates DID method transaction with policy builder.
  */
-export const createDIDMethodWithPolicyTx = (fnName) => {
+const createDIDMethodWithPolicyTx = (fnName) => {
   const obj = {
     async [fnName](...args) {
       const { root } = this;
 
-      const [didKeypair] = args.slice(root.payload[fnName].length - 2);
-      const { did: signer } = ensureInstanceOf(didKeypair, DidKeypair);
-
       const handlePayload = (maybeDidNonce) => {
+        const argsClone = [...args];
         // eslint-disable-next-line no-param-reassign
-        args[root.payload[fnName].length - 1] ??= maybeDidNonce.inc();
+        argsClone[root.payload[fnName].length - 1] ??= maybeDidNonce.inc();
 
-        return root.payload[fnName].apply(this.root, args);
+        return root.payload[fnName].apply(this.root, argsClone);
       };
 
-      const { data, nonce } = args[root.payload[fnName].length - 1] == null
-        ? await root.apiProvider.withDidNonce(didKeypair.did, handlePayload)
-        : handlePayload();
+      const [didKeypair] = args.slice(root.payload[fnName].length - 2);
+      const signers = allSigners(didKeypair);
 
-      const sig = await DockDidOrDidMethodKey.from(signer).signStateChange(
-        root.apiProvider,
-        root.constructor.MethodNameOverrides?.[fnName]
-          ?? fnNameToMethodName(fnName),
-        { data, nonce },
-        didKeypair,
-      );
+      const { data: payload } = handlePayload(TypedNumber.from(0));
 
-      return await root.rawTx[fnName](data, [{ sig, nonce }]);
+      return await root.rawTx[fnName](payload, await Promise.all(signers.map(
+        async (signer) => {
+          const { data, nonce } = args[root.payload[fnName].length - 1] == null
+            ? await root.apiProvider.withDidNonce(signer.did, handlePayload)
+            : handlePayload();
+
+          const sig = await DockDidOrDidMethodKey.from(signer.did).signStateChange(
+            root.apiProvider,
+            root.constructor.MethodNameOverrides?.[fnName]
+              ?? fnNameToMethodName(fnName),
+            { data, nonce },
+            signer,
+          );
+
+          return { sig, nonce };
+        },
+      )));
     },
   };
 
@@ -59,13 +54,13 @@ export const createDIDMethodWithPolicyTx = (fnName) => {
 /**
  * Creates DID method transaction builder.
  */
-export const createDIDMethodTx = (fnName) => {
+const createDIDMethodTx = (fnName) => {
   const obj = {
     async [fnName](...args) {
       const { root } = this;
 
       const [didKeypair] = args.slice(root.payload[fnName].length - 2);
-      ensureInstanceOf(didKeypair, DidKeypair);
+      const signer = firstSigner(didKeypair);
 
       // eslint-disable-next-line
       const handlePayload = (maybeDidNonce) => {
@@ -76,16 +71,16 @@ export const createDIDMethodTx = (fnName) => {
       };
 
       const payload = args[root.payload[fnName].length - 1] == null
-        ? await root.apiProvider.withDidNonce(didKeypair.did, handlePayload)
+        ? await root.apiProvider.withDidNonce(signer.did, handlePayload)
         : handlePayload();
 
-      return await DockDidOrDidMethodKey.from(didKeypair.did).changeState(
+      return await DockDidOrDidMethodKey.from(signer.did).changeState(
         root.apiProvider,
         root.rawTx[fnName],
         root.constructor.MethodNameOverrides?.[fnName]
           ?? fnNameToMethodName(fnName),
         payload,
-        didKeypair,
+        signer,
       );
     },
   };
@@ -96,7 +91,7 @@ export const createDIDMethodTx = (fnName) => {
 /**
  * Creates a call.
  */
-export const createCall = (fnName) => {
+const createCall = (fnName) => {
   const obj = {
     async [fnName](...args) {
       const { root } = this;
@@ -114,7 +109,7 @@ export const createCall = (fnName) => {
 /**
  * Creates a call which accepts nonce as last argument.
  */
-export const createCallWithNonce = (fnName) => {
+const createCallWithNonce = (fnName) => {
   const obj = {
     async [fnName](...args) {
       const { root } = this;
@@ -132,7 +127,7 @@ export const createCallWithNonce = (fnName) => {
 /**
  * Creates a transaction builder for account method with the given name.
  */
-export const createAccountTx = (fnName) => {
+const createAccountTx = (fnName) => {
   const obj = {
     async [fnName](...args) {
       return await this.root.rawTx[fnName](
@@ -150,7 +145,7 @@ class Root {
   }
 }
 
-export function createInternalDockModule(
+export default function createInternalDockModule(
   {
     didMethods = Object.create(null),
     didMethodsWithPolicy = Object.create(null),

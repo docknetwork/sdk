@@ -8,7 +8,7 @@ import {
 } from '@docknetwork/credential-sdk/types/generic';
 import { isEqualToOrPrototypeOf, withExtendedStaticProperties, withExtendedPrototypeProperties } from '@docknetwork/credential-sdk/utils';
 import { DockDidOrDidMethodKey } from '@docknetwork/credential-sdk/types';
-import { createInternalDockModule } from './builders';
+import createInternalDockModule from './create-internal-dock-module';
 
 const didMethods = {
   addPublicKey(publicKey, targetDid, _, nonce) {

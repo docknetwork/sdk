@@ -17,8 +17,6 @@ const methods = {
 export default class CheqdInternalAttestModule extends createInternalCheqdModule(
   methods,
 ) {
-  static Prop = 'resource';
-
   static MsgNames = {
     setClaim: 'MsgCreateResource',
   };

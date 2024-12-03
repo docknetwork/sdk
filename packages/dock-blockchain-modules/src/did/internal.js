@@ -31,7 +31,7 @@ import {
   RemoveServiceEndpoint,
   RemoveOnchainDid,
 } from './actions';
-import { createInternalDockModule } from '../common/builders';
+import createInternalDockModule from '../common/create-internal-dock-module';
 
 const didMethods = {
   addKeys: (keys, targetDid, _, nonce) => {
@@ -129,11 +129,10 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
    * @param didDocRef - Off chain reference for the DID
    * @returns {Promise<*>}
    */
-  async newOffchain(did, didDocRef, params = {}) {
+  async newOffchain(did, didDocRef, params) {
     return await this.send.newOffchain(
       did,
       didDocRef,
-
       params,
     );
   }
@@ -147,13 +146,11 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
   async setOffchainDidDocRef(
     did,
     didDocRef,
-
-    params = {},
+    params,
   ) {
     return await this.send.setOffchainDidDocRef(
       did,
       didDocRef,
-
       params,
     );
   }
@@ -163,7 +160,7 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
    * @param did
    * @returns {Promise<*>}
    */
-  async removeOffchainDid(did, params = {}) {
+  async removeOffchainDid(did, params) {
     return await this.send.removeOffchainDid(did, params);
   }
 
@@ -178,8 +175,7 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
     did,
     didKeys,
     controllers,
-
-    params = {},
+    params,
   ) {
     return await this.send.newOnchain(did, didKeys, controllers, params);
   }
@@ -189,7 +185,7 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
    * @param {{ ed25519: Uint8Array } | { secp256k1: Uint8Array }} did - The new DID. Can be either `PublicKeyEd25519` or `PublicKeySecp256k1`.
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async newDidMethodKey(didMethodKey, params = {}) {
+  async newDidMethodKey(didMethodKey, params) {
     return await this.send.newDidMethodKey(didMethodKey, params);
   }
 
@@ -201,7 +197,7 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
    * @param signingKeyRef - Signer's keypair reference
    * @returns {Promise<*>}
    */
-  async addKeys(didKeys, targetDid, didKeypair, params = {}) {
+  async addKeys(didKeys, targetDid, didKeypair, params) {
     return await this.send.addKeys(didKeys, targetDid, didKeypair, params);
   }
 
@@ -217,8 +213,7 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
     controllers,
     targetDid,
     didKeypair,
-
-    params = {},
+    params,
   ) {
     return await this.send.addControllers(
       controllers,
@@ -244,7 +239,7 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
     origins,
     targetDid,
     didKeypair,
-    params = {},
+    params,
   ) {
     return await this.send.addServiceEndpoint(
       endpointId,
@@ -264,7 +259,7 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
    * @param signingKeyRef - Signer's keypair reference
    * @returns {Promise<*>}
    */
-  async removeKeys(keyIds, targetDid, didKeypair, params = {}) {
+  async removeKeys(keyIds, targetDid, didKeypair, params) {
     return await this.send.removeKeys(keyIds, targetDid, didKeypair, params);
   }
 
@@ -276,7 +271,7 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
    * @param signingKeyRef - Signer's keypair reference
    * @returns {Promise<*>}
    */
-  async removeControllers(controllers, targetDid, didKeypair, params = {}) {
+  async removeControllers(controllers, targetDid, didKeypair, params) {
     return await this.send.removeControllers(
       controllers,
       targetDid,
@@ -293,7 +288,7 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
    * @param signingKeyRef - Signer's keypair reference
    * @returns {Promise<*>}
    */
-  async removeServiceEndpoint(endpointId, didKeypair, params = {}) {
+  async removeServiceEndpoint(endpointId, didKeypair, params) {
     return await this.send.removeServiceEndpoint(
       endpointId,
       didKeypair,
@@ -311,8 +306,7 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
   async removeOnchainDid(
     targetDid,
     didKeypair,
-
-    params = {},
+    params,
   ) {
     return await this.send.removeOnchainDid(targetDid, didKeypair, params);
   }

@@ -1,5 +1,4 @@
 import {
-  METHOD_REG_EXP_PATTERN,
   HEX_ID_REG_EXP_PATTERN,
 } from '../resolver/generic/const';
 import { isPrototypeOf } from './inheritance';
@@ -30,6 +29,7 @@ export function ensureString(value, ctx = '') {
   if (!isString(value)) {
     throw new Error(`${value} needs to be a string. ${ctx}`);
   }
+
   return String(value);
 }
 
@@ -118,7 +118,7 @@ export const isBytes = (bytes) => {
 export const ensureInstanceOf = (value, klass) => {
   if (!(value instanceof klass)) {
     throw new Error(
-      `Expected \`${value}\` to be an instance of \`${klass.name}\``,
+      `Expected \`${value}\` with constructor \`${value?.constructor.name}\` to be an instance of \`${klass.name}\``,
     );
   }
 
@@ -135,9 +135,7 @@ export const ensurePrototypeOf = (proto, value) => {
   return value;
 };
 
-const STATUS_LIST_ID_MATCHER = new RegExp(
-  `^status-list2021:${METHOD_REG_EXP_PATTERN}:${HEX_ID_REG_EXP_PATTERN}$`,
-);
+const STATUS_LIST_ID_MATCHER = /^status-list2021:([a-z]+):((?:testnet|mainnet):[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|0x[0-9a-f]{64})(?::[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})?$/;
 
 const PRIVATE_STATUS_LIST_ID_MATCHER = new RegExp(
   `^private-status-list2021:${HEX_ID_REG_EXP_PATTERN}$`,
@@ -148,8 +146,7 @@ const PRIVATE_STATUS_LIST_ID_MATCHER = new RegExp(
  * @param statusListId
  */
 export function ensureStatusListId(statusListId) {
-  ensureString(statusListId);
-  if (!STATUS_LIST_ID_MATCHER.test(statusListId)) {
+  if (!STATUS_LIST_ID_MATCHER.test(ensureString(statusListId))) {
     throw new Error(
       `\`${statusListId}\` needs to be a valid \`StatusList2021Credential\` identifier.`,
     );

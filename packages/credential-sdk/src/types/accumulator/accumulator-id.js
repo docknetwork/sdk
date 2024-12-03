@@ -1,4 +1,4 @@
-import { CheqdMainnetDid, CheqdTestnetDid, DIDRef } from '../did';
+import { CheqdMainnetDid, CheqdTestnetDid, DidRef } from '../did';
 import {
   TypedBytes,
   TypedEnum,
@@ -26,7 +26,7 @@ export class AccumulatorId extends withFrom(
   }
 }
 
-export class CheqdAccumulatorIdValue extends withQualifier(DIDRef) {
+export class CheqdAccumulatorIdValue extends withQualifier(DidRef) {
   static Qualifier = 'accumulator:cheqd:';
 
   static Ident = TypedUUID;

@@ -79,6 +79,7 @@ testingKeys.forEach((testKey) => {
       expect(credential.proof.verificationMethod).toBe(keyUrl);
 
       const result = await verifyCredential(credential);
+      console.log(result.errors);
       expect(result.verified).toBe(true);
       expect(result.results[0].proof).toBeDefined();
       expect(result.results[0].proof.proofPurpose).toBe("assertionMethod");

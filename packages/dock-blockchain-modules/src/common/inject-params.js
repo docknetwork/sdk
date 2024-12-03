@@ -5,7 +5,7 @@ import {
   TypedNumber,
   option,
 } from '@docknetwork/credential-sdk/types/generic';
-import { createInternalDockModule } from './builders';
+import createInternalDockModule from './create-internal-dock-module';
 
 const didMethods = {
   addParams(params, _, __, nonce) {

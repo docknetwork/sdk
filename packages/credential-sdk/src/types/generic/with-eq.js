@@ -27,7 +27,7 @@ export default function withEq(klass) {
             return false;
           }
 
-          return super.eq(compareWith);
+          return this.eq(compareWith);
         } else {
           return super.eq(other);
         }

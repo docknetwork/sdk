@@ -52,7 +52,7 @@ export default function generateStatusListCredentialModuleTests(
       expect(written2.toJSON()).toEqual(statusListCredential2.toJSON());
     });
 
-    test('Generates a `DIDDocument` and cretes and then updates a `StatusListCredential` owned by this DID', async () => {
+    test('Generates a `DIDDocument` and creates and then updates a `StatusListCredential` owned by this DID', async () => {
       const did = DID.random();
 
       const keyPair = Ed25519Keypair.random();

@@ -24,7 +24,7 @@ exports[`DID document workflow \`CheqdDIDDocument\` 2`] = `
   "alsoKnownAs": [],
   "assertionMethod": [
     "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
-    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2",
+    ""{\\"id\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2\\",\\"controller\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP\\"}"",
   ],
   "authentication": [
     "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
@@ -64,14 +64,14 @@ exports[`DID document workflow \`CheqdDIDDocument\` 3`] = `
 {
   "alsoKnownAs": [],
   "assertionMethod": [
-    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2",
     "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-3",
-    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-5",
     "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-6",
     "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-8",
     "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-9",
-    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-11",
-    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-12",
+    ""{\\"id\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2\\",\\"controller\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP\\"}"",
+    ""{\\"id\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-5\\",\\"controller\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"9y4gScRXDQJahd1gKbf1pYf9mwcRKnUqzstR3Bn7ydYz\\"}"",
+    ""{\\"id\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-11\\",\\"controller\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"BBF5rtFSaWt4s4PxMEswkothcPJNLhdsQpggZyUozSdZ\\"}"",
+    ""{\\"id\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-12\\",\\"controller\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"EaNp37NGpe8KViTKxAdknyvUP44doH1fHnFpYqEcfUjE\\"}"",
   ],
   "authentication": [
     "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",

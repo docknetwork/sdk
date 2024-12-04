@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CHEQD_MNEMONIC: "steak come surprise obvious remain black trouble measure design volume retreat float coach amused match album moment radio stuff crack orphan ranch dose endorse"
-      IMAGE_TAG: 3.0.2
+      IMAGE_TAG: 3.0.1
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1

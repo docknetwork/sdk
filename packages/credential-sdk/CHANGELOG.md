@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.15.0
+
+### Minor Changes
+
+- Modify the `SDK` to be compatible with the most recent `cheqd` node.
+
 ## 0.14.0
 
 ### Minor Changes

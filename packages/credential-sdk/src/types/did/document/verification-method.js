@@ -30,9 +30,8 @@ import { Ed25519Verification2018Method, Ed25519Verification2020Method, Verificat
 import VerificationMethodRef from './verification-method-ref';
 import { NamespaceDid } from '../onchain/typed-did';
 import {
-  fmtIter, valueBytes,
+  fmtIter, valueBytes, filterObj,
 } from '../../../utils';
-import { DidKeyValue } from '../onchain/did-key';
 
 export class PublicKeyBase58 extends withBase58(TypedBytes) {}
 
@@ -119,16 +118,15 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (
     );
   }
 
-  toVerificationMethodRefWithDidKey() {
-    // eslint-disable-next-line no-use-before-define
-    return new VerificationMethodRefWithDidKey(this.id, this.publicKey());
+  toJSON() {
+    return filterObj(super.toJSON(), (_, value) => value != null);
   }
 }
 
 export class CheqdVerificationMethod extends withFrom(
   TypedStruct,
   (value, from) => (value instanceof VerificationMethod
-    ? value.toCheqdVerificationMethod()
+    ? from(value.toCheqdVerificationMethod())
     : from(value)),
 ) {
   static Classes = {
@@ -152,37 +150,5 @@ export class CheqdVerificationMethod extends withFrom(
       this.controller,
       this.verificationMaterial,
     );
-  }
-}
-
-export class VerificationMethodRefWithDidKey extends withFrom(
-  TypedStruct,
-  function from(value, fromFn) {
-    if (typeof value === 'string') {
-      return new this(...value.split('='));
-    } else {
-      return fromFn(value);
-    }
-  },
-) {
-  static Classes = {
-    ref: VerificationMethodRef,
-    key: withBase58(DidKeyValue),
-  };
-
-  toVerificationMethod() {
-    // eslint-disable-next-line no-use-before-define
-    return new VerificationMethod(
-      this.ref,
-      this.key.constructor.VerKeyType,
-      this.ref.did,
-      this.key.value.bytes,
-    );
-  }
-
-  toJSON() {
-    const { ref, key } = this;
-
-    return `${ref}=${key}`;
   }
 }

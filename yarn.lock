@@ -4617,7 +4617,7 @@
     ky "^0.25.1"
     ky-universal "^0.8.2"
 
-"@digitalbazaar/http-client@^4.1.1":
+"@digitalbazaar/http-client@^4.1.0", "@digitalbazaar/http-client@^4.1.1":
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/@digitalbazaar/http-client/-/http-client-4.1.1.tgz#73d31af4782eadd2440cf0cd487ad591f45d137c"
   integrity sha512-PG0r9sAEzAmnCSrwKg+HhM6+GNMU24ttiFMBycqhM1vDi8enipuFpW45vn2lzr8+i7I2yLUzNyfrrkQTlzGLmQ==
@@ -11348,7 +11348,7 @@ jsonld@digitalcredentials/jsonld.js#v10.x:
   version "8.3.3-0"
   resolved "https://codeload.github.com/digitalcredentials/jsonld.js/tar.gz/14357f7a1181ae769ecc50fee9303468f17665ff"
   dependencies:
-    "@digitalbazaar/http-client" "^4.1.1"
+    "@digitalbazaar/http-client" "^4.1.0"
     canonicalize "^1.0.1"
     lru-cache "^6.0.0"
     rdf-canonize "^4.0.1"

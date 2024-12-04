@@ -140,7 +140,7 @@ export function parseDIDUrl(didUrl) {
  * @returns {Object<K, V>}
  */
 export const filterObj = (obj, filter) => {
-  const res = {};
+  const res = Object.create(Object.getPrototypeOf(obj));
   for (const [key, value] of Object.entries(obj)) {
     if (filter(key, value)) {
       res[key] = value;

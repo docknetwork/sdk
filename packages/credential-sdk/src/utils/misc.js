@@ -131,6 +131,26 @@ export function parseDIDUrl(didUrl) {
 }
 
 /**
+ * Filters properties of the object according to the supplied `filter`.
+ *
+ * @template K
+ * @template V
+ * @param {Object<K, V>} obj
+ * @param {function(K, V): boolean} filter
+ * @returns {Object<K, V>}
+ */
+export const filterObj = (obj, filter) => {
+  const res = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (filter(key, value)) {
+      res[key] = value;
+    }
+  }
+
+  return res;
+};
+
+/**
  * Ensures that provided value matches supplied pattern(s), throws an error otherwise.
  *
  * @param pattern

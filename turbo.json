@@ -2,7 +2,7 @@
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
     "build": {
-      "cache": true,
+      "cache": false,
       "dependsOn": ["^build"],
       "outputs": ["packages/**/dist/**"]
     },
@@ -28,7 +28,7 @@
     "test-with-node": {
       "dependsOn": ["^build"],
       "outputs": [],
-      "env": ["CHEQD_MNEMONIC"]
+      "env": ["CHEQD_MNEMONIC", "IMAGE_TAG"]
     },
     "examples-with-node": {
       "dependsOn": ["^build"],

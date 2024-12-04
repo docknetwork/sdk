@@ -17,6 +17,8 @@ COMMAND="cheqd-noded"
 # cd cosmos-sdk
 # make install
 #
+
+# Step 0: Remove the current chain directory (if it exists).
 rm -rf $CHAIN_DIR
 
 # Step 1: Initialize the chain

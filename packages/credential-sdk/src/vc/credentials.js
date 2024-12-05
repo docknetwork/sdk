@@ -180,11 +180,6 @@ export function checkCredentialRequired(credential, isJWT) {
     throw new Error('"type" property is required.');
   }
 
-  // Ensure credential has subject
-  if (!credential.credentialSubject) {
-    throw new Error('"credentialSubject" property is required.');
-  }
-
   // Ensure issuer and issue date is valid, only for non-jwt as that is defined in the header
   if (!isJWT) {
     const issuer = getId(credential.issuer);
@@ -517,6 +512,11 @@ export async function issueCredential(
 
   // Ensure credential is valid
   checkCredential(cred);
+
+  // Ensure credential has subject
+  if (!cred.credentialSubject) {
+    throw new Error('"credentialSubject" property is required.');
+  }
 
   // Should use JWT format?
   if (useJWT) {

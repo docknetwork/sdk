@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.16.0
+
+### Minor Changes
+
+- Dont require credential subject property
+
 ## 0.15.0
 
 ### Minor Changes

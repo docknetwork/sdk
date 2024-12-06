@@ -2,14 +2,14 @@ import {
   VerificationMethodSignature,
   CheqdDid,
   CheqdDIDDocument,
-} from '@docknetwork/credential-sdk/types';
+} from '../did';
 import {
   TypedArray,
   TypedString,
   TypedStruct,
   TypedBytesArray,
   TypedUUID,
-} from '@docknetwork/credential-sdk/types/generic';
+} from '../generic';
 
 const createTypes = (Payload) => {
   const payloadWithSigsName = `CheqdPayloadWithSignatures(${Payload.name})`;
@@ -57,7 +57,7 @@ export class CheqdCreateResource extends TypedStruct {
   };
 }
 
-export class DeactivateDidDocument extends TypedStruct {
+export class CheqdDeactivateDidDocument extends TypedStruct {
   static Classes = {
     id: CheqdDid,
     versionId: TypedUUID,
@@ -75,6 +75,6 @@ export const [
 ] = createTypes(CheqdDIDDocument);
 
 export const [
-  CheqdDeactivateDidDocumentPayloadWithSignatures,
-  CheqdDeactivateDidDocumentPayloadWithTypeUrlAndSignatures,
-] = createTypes(DeactivateDidDocument);
+  CheqdCheqdDeactivateDidDocumentPayloadWithSignatures,
+  CheqdCheqdDeactivateDidDocumentPayloadWithTypeUrlAndSignatures,
+] = createTypes(CheqdDeactivateDidDocument);

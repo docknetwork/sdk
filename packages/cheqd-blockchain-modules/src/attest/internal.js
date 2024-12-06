@@ -1,6 +1,6 @@
-import { CheqdDid, Iri } from '@docknetwork/credential-sdk/types';
+import { CheqdDid, Iri, CheqdCreateResource } from '@docknetwork/credential-sdk/types';
 import { TypedUUID, option } from '@docknetwork/credential-sdk/types/generic';
-import { CheqdCreateResource, createInternalCheqdModule } from '../common';
+import { createInternalCheqdModule } from '../common';
 
 const methods = {
   setClaim: (iri, targetDid) => new CheqdCreateResource(

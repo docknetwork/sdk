@@ -3,10 +3,11 @@ import {
   stringToU8a,
   maybeToJSONString,
   u8aToString,
+  withExtendedStaticProperties,
+  withExtendedPrototypeProperties,
 } from '@docknetwork/credential-sdk/utils';
-import { CheqdParamsId } from '@docknetwork/credential-sdk/types';
+import { CheqdParamsId, CheqdCreateResource } from '@docknetwork/credential-sdk/types';
 import createInternalCheqdModule from './create-internal-cheqd-module';
-import { CheqdCreateResource } from './payload';
 
 const methods = {
   addParams: (id, params, did) => new CheqdCreateResource(
@@ -25,8 +26,6 @@ export default function injectParams(klass) {
 
   const obj = {
     [name]: class extends createInternalCheqdModule(methods, klass) {
-      static Prop = 'resource';
-
       static get MsgNames() {
         const names = super.MsgNames ?? {};
 
@@ -66,7 +65,7 @@ export default function injectParams(klass) {
        * @returns {Promise<Map<CheqdParamsId, Params>>}
        */
       async getAllParamsByDid(did) {
-        const resources = await this.resourcesBy(did, this.filterMetadata);
+        const resources = await this.resourcesBy(did, this.filterParamsMetadata);
 
         return new this.constructor.ParamsMap(
           [...resources].map(([key, item]) => [
@@ -78,5 +77,5 @@ export default function injectParams(klass) {
     },
   };
 
-  return obj[name];
+  return withExtendedStaticProperties(['Params'], withExtendedPrototypeProperties(['filterParamsMetadata'], obj[name]));
 }

@@ -2,9 +2,10 @@ import {
   Blob,
   CheqdBlobId,
   CheqdBlobWithId,
+  CheqdCreateResource,
 } from '@docknetwork/credential-sdk/types';
 import { option } from '@docknetwork/credential-sdk/types/generic';
-import { CheqdCreateResource, createInternalCheqdModule } from '../common';
+import { createInternalCheqdModule } from '../common';
 
 const methods = {
   new: (blobWithId) => {

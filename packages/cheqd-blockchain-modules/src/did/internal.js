@@ -1,16 +1,15 @@
-import { CheqdDid } from '@docknetwork/credential-sdk/types/did/onchain/typed-did';
+import { CheqdDid, DIDDocument, CheqdDeactivateDidDocument } from '@docknetwork/credential-sdk/types';
 import {
   TypedUUID,
 } from '@docknetwork/credential-sdk/types/generic';
-import { DIDDocument } from '@docknetwork/credential-sdk/types/did';
-import { createInternalCheqdModule, DeactivateDidDocument } from '../common';
+import { createInternalCheqdModule } from '../common';
 
 const parseDocument = (document) => DIDDocument.from(document).toCheqd();
 
 const methods = {
   createDidDocument: parseDocument,
   updateDidDocument: parseDocument,
-  deactivateDidDocument: (id) => new DeactivateDidDocument(id, TypedUUID.random()),
+  deactivateDidDocument: (id) => new CheqdDeactivateDidDocument(id, TypedUUID.random()),
 };
 
 export class CheqdDIDModuleInternal extends createInternalCheqdModule(methods) {

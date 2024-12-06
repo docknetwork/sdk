@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.17.0
+
+### Minor Changes
+
+- Fix `toJSON`/`fromJSON` for `cheqd` payloads
+
 ## 0.16.0
 
 ### Minor Changes

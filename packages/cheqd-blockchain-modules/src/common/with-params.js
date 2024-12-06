@@ -50,7 +50,7 @@ export default function withParams(klass) {
           (
             await this.cheqdOnly.latestResourceMetadataBy(
               targetDid,
-              this.cheqdOnly.filterMetadata,
+              this.cheqdOnly.filterParamsMetadata,
             )
           )?.id,
         );

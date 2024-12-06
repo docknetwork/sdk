@@ -1,10 +1,11 @@
 import {
   CheqdStatusListCredentialId,
+  CheqdCreateResource,
 } from '@docknetwork/credential-sdk/types';
 import { StatusList2021Credential } from '@docknetwork/credential-sdk/vc';
 import { option, TypedUUID } from '@docknetwork/credential-sdk/types/generic';
 import { stringToU8a, maybeToJSONString, u8aToString } from '@docknetwork/credential-sdk/utils';
-import { CheqdCreateResource, createInternalCheqdModule } from '../common';
+import { createInternalCheqdModule } from '../common';
 
 const Type = 'status-list-credential';
 

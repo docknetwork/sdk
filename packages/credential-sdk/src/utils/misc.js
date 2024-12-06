@@ -151,6 +151,14 @@ export const filterObj = (obj, filter) => {
 };
 
 /**
+ * Sets prototype of the supplied object to `null`, returns the object.
+ * @template T
+ * @param {T}
+ * @returns {T}
+ */
+export const extendNull = (obj) => Object.setPrototypeOf(obj, null);
+
+/**
  * Ensures that provided value matches supplied pattern(s), throws an error otherwise.
  *
  * @param pattern

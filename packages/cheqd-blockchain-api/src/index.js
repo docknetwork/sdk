@@ -3,6 +3,7 @@ import {
   maybeToJSON,
   maybeToJSONString,
   fmtIter,
+  extendNull,
 } from '@docknetwork/credential-sdk/utils';
 import {
   DIDModule,
@@ -20,7 +21,9 @@ import {
   MsgCreateResourcePayload,
   protobufPackage as resourceProtobufPackage,
 } from '@cheqd/ts-proto/cheqd/resource/v2/index.js';
-import { DidRef, NamespaceDid } from '@docknetwork/credential-sdk/types';
+import {
+  DidRef, NamespaceDid, CheqdSetDidDocumentPayloadWithTypeUrlAndSignatures, CheqdCheqdDeactivateDidDocumentPayloadWithTypeUrlAndSignatures, CheqdCreateResourcePayloadWithTypeUrlAndSignatures,
+} from '@docknetwork/credential-sdk/types';
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 
 export class CheqdAPI extends AbstractApiProvider {
@@ -32,26 +35,33 @@ export class CheqdAPI extends AbstractApiProvider {
     super();
   }
 
-  static Fees = {
+  static Fees = extendNull({
     MsgCreateDidDoc: DIDModule.fees.DefaultCreateDidDocFee,
     MsgUpdateDidDoc: DIDModule.fees.DefaultUpdateDidDocFee,
     MsgDeactivateDidDoc: DIDModule.fees.DefaultDeactivateDidDocFee,
     MsgCreateResource: ResourceModule.fees.DefaultCreateResourceDefaultFee,
-  };
+  });
 
-  static Prefixes = {
+  static Prefixes = extendNull({
     MsgCreateDidDoc: didProtobufPackage,
     MsgUpdateDidDoc: didProtobufPackage,
     MsgDeactivateDidDoc: didProtobufPackage,
     MsgCreateResource: resourceProtobufPackage,
-  };
+  });
 
-  static Payloads = {
+  static Payloads = extendNull({
     MsgCreateDidDoc: MsgCreateDidDocPayload,
     MsgUpdateDidDoc: MsgUpdateDidDocPayload,
     MsgDeactivateDidDoc: MsgDeactivateDidDocPayload,
     MsgCreateResource: MsgCreateResourcePayload,
-  };
+  });
+
+  static PayloadWrappers = extendNull({
+    MsgCreateDidDoc: CheqdSetDidDocumentPayloadWithTypeUrlAndSignatures,
+    MsgUpdateDidDoc: CheqdSetDidDocumentPayloadWithTypeUrlAndSignatures,
+    MsgDeactivateDidDoc: CheqdCheqdDeactivateDidDocumentPayloadWithTypeUrlAndSignatures,
+    MsgCreateResource: CheqdCreateResourcePayloadWithTypeUrlAndSignatures,
+  });
 
   /**
    * Initializes `CheqdAPI` with the supplied url, wallet and network type.
@@ -141,18 +151,25 @@ export class CheqdAPI extends AbstractApiProvider {
    * @returns {Promise<*>}
    */
   async signAndSend(tx, { from, fee, memo } = {}) {
-    const sender = from ?? (await this.sdk.options.wallet.getAccounts())[0].address;
+    const { PayloadWrappers, Prefixes, Fees } = this.constructor;
     const { typeUrl } = tx;
 
-    const prefix = this.constructor.Prefixes[typeUrl];
-    const amount = fee ?? this.constructor.Fees[typeUrl];
+    const PayloadWrapper = PayloadWrappers[typeUrl];
+    const prefix = Prefixes[typeUrl];
+    const amount = fee ?? Fees[typeUrl];
+
+    if (PayloadWrapper == null) {
+      throw new Error(`No payload wrapper found for \`${typeUrl}\``);
+    }
+
+    const sender = from ?? (await this.sdk.options.wallet.getAccounts())[0].address;
     const payment = {
       amount: [amount],
       gas: '3600000', // TODO: dynamically calculate needed amount
       payer: sender,
     };
 
-    const txJSON = tx.toJSON();
+    const txJSON = PayloadWrapper.from(tx).toJSON();
     txJSON.typeUrl = `/${prefix}.${typeUrl}`;
 
     const res = await this.sdk.signer.signAndBroadcast(
@@ -193,7 +210,7 @@ export class CheqdAPI extends AbstractApiProvider {
       return this.supportsIdentifier(id[0]);
     } else if (id instanceof TypedEnum) {
       return this.supportsIdentifier(id.value);
-    } else if (id?.constructor?.Qualifier?.includes(`cheqd:${network}:`)) {
+    } else if (String(id).includes(`:cheqd:${network}:`)) {
       return true;
     }
 

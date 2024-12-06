@@ -1,5 +1,16 @@
 # @docknetwork/cheqd-blockchain-modules
 
+## 0.12.0
+
+### Minor Changes
+
+- Fix `toJSON`/`fromJSON` for `cheqd` payloads
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.17.0
+
 ## 0.11.2
 
 ### Patch Changes

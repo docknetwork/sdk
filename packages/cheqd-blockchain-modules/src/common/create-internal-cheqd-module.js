@@ -3,7 +3,6 @@ import {
   CheqdDid,
 } from '@docknetwork/credential-sdk/types';
 import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
-import { CheqdPayloadWithTypeUrl } from './payload';
 
 /**
  * Creates DID transaction constructor.
@@ -30,7 +29,7 @@ const createDIDMethodTx = (fnName) => {
         signatures,
       };
 
-      return new CheqdPayloadWithTypeUrl(
+      return new payload.constructor.ResourcePayloadWithTypeUrlAndSignatures(
         root.constructor.MsgNames[fnName],
         value,
       );

@@ -1,5 +1,5 @@
 import { applyToValue } from './interfaces';
-import { ensureBytes, ensureString } from './type-helpers';
+import { ensureBytes, ensureString, isBytes } from './type-helpers';
 
 /**
  * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
@@ -125,7 +125,7 @@ export const stringToHex = (str) => u8aToHex(stringToBuffer(str));
 export const normalizeToU8a = (bytes) => {
   if (bytes instanceof Uint8Array) {
     return bytes;
-  } else if (bytes instanceof Buffer || Array.isArray(bytes)) {
+  } else if (isBytes(bytes)) {
     return u8aToU8a(bytes);
   } else if (isHex(bytes)) {
     return hexToU8a(bytes);

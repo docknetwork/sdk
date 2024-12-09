@@ -26,7 +26,6 @@ class TypedBytes extends withBase(ArrayWithoutPrototypeMethods) {
   }
 
   set(bytes) {
-    this.length = 0;
     this.length = bytes.length;
 
     for (let i = 0; i < bytes.length; i++) {

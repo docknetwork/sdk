@@ -1,5 +1,5 @@
 import { TypedStruct, TypedNumber } from '../generic';
-import { DockAccumulatorPublicKeyRef } from './keys';
+import { DockAccumulatorPublicKeyRef, CheqdAccumulatorPublicKeyRef } from './keys';
 import { createAccumulatorVariants } from './variants';
 
 export const [
@@ -37,3 +37,40 @@ export class DockAccumulatorWithUpdateInfo extends TypedStruct {
     return this.accumulator.value.keyRef;
   }
 }
+
+export const [
+  CheqdAccumulatorCommon,
+  CheqdAccumulator,
+  CheqdUniversalAccumulator,
+  CheqdKBUniversalAccumulator,
+  CheqdPositiveAccumulator,
+] = createAccumulatorVariants(CheqdAccumulatorPublicKeyRef);
+
+export class CheqdAccumulatorWithUpdateInfo extends TypedStruct {
+  static Classes = {
+    createdAt: TypedNumber,
+    lastUpdatedAt: TypedNumber,
+    accumulator: CheqdAccumulator,
+  };
+
+  get created() {
+    return this.createdAt;
+  }
+
+  get lastModified() {
+    return this.lastUpdatedAt;
+  }
+
+  get type() {
+    return this.accumulator.type;
+  }
+
+  get accumulated() {
+    return this.accumulator.value.accumulated;
+  }
+
+  get keyRef() {
+    return this.accumulator.value.keyRef;
+  }
+}
+

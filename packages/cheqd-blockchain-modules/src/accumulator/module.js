@@ -9,11 +9,11 @@ import {
   AccumulatorParams,
   CheqdAccumulatorPublicKey,
   CheqdAccumulatorIdIdent,
-} from '@docknetwork/credential-sdk/types';
-import { option, withProp } from '@docknetwork/credential-sdk/types/generic';
-import { AbstractAccumulatorModule } from '@docknetwork/credential-sdk/modules/abstract';
-import CheqdInternalAccumulatorModule from './internal';
-import { injectCheqd, withParams, withPublicKeys } from '../common';
+} from "@docknetwork/credential-sdk/types";
+import { option, withProp } from "@docknetwork/credential-sdk/types/generic";
+import { AbstractAccumulatorModule } from "@docknetwork/credential-sdk/modules/abstract";
+import CheqdInternalAccumulatorModule from "./internal";
+import { injectCheqd, withParams, withPublicKeys } from "../common";
 
 export const AccumulatorType = {
   VBPos: 0,
@@ -23,7 +23,7 @@ export const AccumulatorType = {
 
 /** Class to manage accumulators on chain */
 export default class CheqdAccumulatorModule extends withParams(
-  withPublicKeys(injectCheqd(AbstractAccumulatorModule)),
+  withPublicKeys(injectCheqd(AbstractAccumulatorModule))
 ) {
   static CheqdOnly = CheqdInternalAccumulatorModule;
 
@@ -41,9 +41,9 @@ export default class CheqdAccumulatorModule extends withParams(
     return await this.cheqdOnly.tx.addAccumulator(
       id,
       new CheqdPositiveAccumulator(
-        new CheqdAccumulatorCommon(accumulated, publicKeyRef),
+        new CheqdAccumulatorCommon(accumulated, publicKeyRef)
       ),
-      didKeypair,
+      didKeypair
     );
   }
 
@@ -63,17 +63,17 @@ export default class CheqdAccumulatorModule extends withParams(
     accumulated,
     publicKeyRef,
     maxSize,
-    didKeypair,
+    didKeypair
   ) {
     return await this.cheqdOnly.tx.addAccumulator(
       id,
       new CheqdUniversalAccumulator(
         new CheqdUniversalAccumulator.Class(
           new CheqdAccumulatorCommon(accumulated, publicKeyRef),
-          maxSize,
-        ),
+          maxSize
+        )
       ),
-      didKeypair,
+      didKeypair
     );
   }
 
@@ -91,9 +91,9 @@ export default class CheqdAccumulatorModule extends withParams(
     return await this.cheqdOnly.tx.addAccumulator(
       id,
       new CheqdKBUniversalAccumulator(
-        new CheqdAccumulatorCommon(accumulated, publicKeyRef),
+        new CheqdAccumulatorCommon(accumulated, publicKeyRef)
       ),
-      didKeypair,
+      didKeypair
     );
   }
 
@@ -112,7 +112,7 @@ export default class CheqdAccumulatorModule extends withParams(
     id,
     newAccumulated,
     { additions, removals, witnessUpdateInfo },
-    didKeypair,
+    didKeypair
   ) {
     return await this.cheqdOnly.tx.updateAccumulator(
       id,
@@ -122,7 +122,7 @@ export default class CheqdAccumulatorModule extends withParams(
         removals,
         witnessUpdateInfo,
       },
-      didKeypair,
+      didKeypair
     );
   }
 
@@ -149,14 +149,14 @@ export default class CheqdAccumulatorModule extends withParams(
    */
   async getAccumulator(id, includePublicKey = false, includeParams = false) {
     const PublicKey = includeParams
-      ? withProp(CheqdAccumulatorPublicKey, 'params', option(AccumulatorParams))
+      ? withProp(CheqdAccumulatorPublicKey, "params", option(AccumulatorParams))
       : CheqdAccumulatorPublicKey;
     const Accumulator = includePublicKey
-      ? withProp(CheqdAccumulatorWithUpdateInfo, 'publicKey', option(PublicKey))
+      ? withProp(CheqdAccumulatorWithUpdateInfo, "publicKey", option(PublicKey))
       : CheqdAccumulatorWithUpdateInfo;
 
     const acc = option(Accumulator).from(
-      await this.cheqdOnly.query.accumulators(CheqdAccumulatorIdIdent.from(id)),
+      await this.cheqdOnly.query.accumulators(CheqdAccumulatorIdIdent.from(id))
     );
 
     if (acc == null) {
@@ -177,8 +177,8 @@ export default class CheqdAccumulatorModule extends withParams(
    * @param accumulatorId
    * @param member
    * @param witness - this will be updated to the latest witness
-   * @param startBlock - identifier to start from (block number or collection item id)
-   * @param endBlock - identifier to end in (block number or collection item id)
+   * @param start - identifier to start from (collection item id)
+   * @param end - identifier to end in (collection item id)
    * @returns {Promise<void>}
    */
   async updateWitness(accumulatorId, member, witness, start, end) {
@@ -187,7 +187,7 @@ export default class CheqdAccumulatorModule extends withParams(
       member,
       witness,
       start,
-      end,
+      end
     );
   }
 }

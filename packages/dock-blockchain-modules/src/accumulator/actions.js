@@ -5,14 +5,15 @@ import {
   DockAccumulatorIdIdent,
   DockAccumulatorPublicKeyRef,
   DockDidOrDidMethodKey,
-} from '@docknetwork/credential-sdk/types';
+} from "@docknetwork/credential-sdk/types";
 import {
   TypedBytes,
   TypedStruct,
-  TypedArray,
   option,
   TypedNumber,
-} from '@docknetwork/credential-sdk/types/generic';
+  ArrayOfByteArrays,
+  ByteArray,
+} from "@docknetwork/credential-sdk/types/generic";
 
 export class AddAccumulator extends TypedStruct {
   static Classes = {
@@ -22,18 +23,12 @@ export class AddAccumulator extends TypedStruct {
   };
 }
 
-class ByteArray extends TypedBytes {}
-
-export class ListOfByteArrays extends TypedArray {
-  static Class = ByteArray;
-}
-
 export class UpdateAccumulator extends TypedStruct {
   static Classes = {
     id: DockAccumulatorIdIdent,
     newAccumulated: class Accumulated extends TypedBytes {},
-    additions: option(ListOfByteArrays),
-    removals: option(ListOfByteArrays),
+    additions: option(ArrayOfByteArrays),
+    removals: option(ArrayOfByteArrays),
     witnessUpdateInfo: option(ByteArray),
     nonce: TypedNumber,
   };

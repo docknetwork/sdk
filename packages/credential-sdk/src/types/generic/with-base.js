@@ -1,10 +1,11 @@
+import { stringToU8a } from "../../utils";
 import {
   withExtendedStaticProperties,
   withExtendedPrototypeProperties,
-} from '../../utils/inheritance';
-import { applyToValue, maybeEq } from '../../utils/interfaces';
-import withCatchNull from './with-catch-null';
-import withEq from './with-eq';
+} from "../../utils/inheritance";
+import { applyToValue, maybeEq } from "../../utils/interfaces";
+import withCatchNull from "./with-catch-null";
+import withEq from "./with-eq";
 
 /**
  * Enhances provided class by adding prototype methods `toString`/`eq`, static `from` and requiring
@@ -24,7 +25,7 @@ export default function withBase(klass) {
        * @param {object} json
        */
       static fromJSON(_json) {
-        throw new Error('Unimplemented');
+        throw new Error("Unimplemented");
       }
 
       /**
@@ -32,7 +33,7 @@ export default function withBase(klass) {
        * @param {object} json
        */
       static fromApi(_obj) {
-        throw new Error('Unimplemented');
+        throw new Error("Unimplemented");
       }
 
       /**
@@ -54,7 +55,23 @@ export default function withBase(klass) {
        * @returns {object} The JSON representation of the instance.
        */
       toJSON() {
-        throw new Error('Unimplemented');
+        throw new Error("Unimplemented");
+      }
+
+      /**
+       * Converts the instance to a stringified JSON representation.
+       * @returns {string} The JSON representation of the instance.
+       */
+      toJSONString() {
+        return JSON.stringify(this.toJSON());
+      }
+
+      /**
+       * Converts the instance to bytes of the stringified JSON representation.
+       * @returns {Uint8Array} The JSON representation of the instance.
+       */
+      toJSONStringBytes() {
+        return stringToU8a(this.toJSONString());
       }
 
       /**
@@ -78,7 +95,7 @@ export default function withBase(klass) {
           return fn(this);
         }
         const { value } = this;
-        const hasValue = typeof value !== 'undefined';
+        const hasValue = typeof value !== "undefined";
 
         return applyToValue(check, fn, value ?? this, hasValue);
       }
@@ -96,10 +113,10 @@ export default function withBase(klass) {
   };
 
   return withExtendedStaticProperties(
-    ['fromJSON', 'fromApi'],
+    ["fromJSON", "fromApi"],
     withExtendedPrototypeProperties(
-      ['toJSON'],
-      withEq(withCatchNull(classes[name])),
-    ),
+      ["toJSON"],
+      withEq(withCatchNull(classes[name]))
+    )
   );
 }

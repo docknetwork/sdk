@@ -1,13 +1,11 @@
-import { maybeToJSONString } from '../../utils';
-import {
-  option, TypedBytes, TypedStruct, Any, withProp,
-} from '../generic';
+import { maybeToJSONString } from "../../utils";
+import { option, TypedBytes, TypedStruct, Any, withProp } from "../generic";
 import {
   CurveType,
   CurveTypeBls12381,
-} from '../offchain-signatures/curve-type';
-import { DockAccumulatorParamsRef } from './keys';
-import { AccumulatorParams } from './params';
+} from "../offchain-signatures/curve-type";
+import { CheqdAccumulatorParamsRef, DockAccumulatorParamsRef } from "./keys";
+import { AccumulatorParams } from "./params";
 
 export class AccumulatorPublicKey extends TypedStruct {
   static Params = AccumulatorParams;
@@ -25,8 +23,8 @@ export class AccumulatorPublicKey extends TypedStruct {
   setParams(params) {
     const WithParams = withProp(
       this.constructor,
-      'params',
-      option(this.constructor.Params),
+      "params",
+      option(this.constructor.Params)
     );
 
     const withParams = WithParams.from(this);
@@ -43,8 +41,8 @@ export class AccumulatorPublicKey extends TypedStruct {
       if (params == null) {
         throw new Error(
           `Parameters with reference (${maybeToJSONString(
-            this.paramsRef,
-          )}) not found on chain`,
+            this.paramsRef
+          )}) not found on chain`
         );
       }
     }
@@ -55,6 +53,12 @@ export class AccumulatorPublicKey extends TypedStruct {
 
 export class DockAccumulatorPublicKey extends withProp(
   AccumulatorPublicKey,
-  'paramsRef',
-  option(DockAccumulatorParamsRef),
+  "paramsRef",
+  option(DockAccumulatorParamsRef)
+) {}
+
+export class CheqdAccumulatorPublicKey extends withProp(
+  AccumulatorPublicKey,
+  "paramsRef",
+  option(CheqdAccumulatorParamsRef)
 ) {}

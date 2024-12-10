@@ -7,7 +7,7 @@
 export const maybeToJSON = (value) => (value && typeof value.toJSON === 'function' ? value.toJSON() : JSON.parse(JSON.stringify(value)));
 
 /**
- * Attempts to call `value.toJSON()` and stringify the result, returns `String(value)` in case of failure.
+ * Stringifies the provided value converted to JSON.
  * @template T
  * @param {T} value
  * @returns {string}

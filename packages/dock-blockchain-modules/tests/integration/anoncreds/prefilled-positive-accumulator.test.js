@@ -257,32 +257,23 @@ describe("Prefilled positive accumulator", () => {
 
     // Older witnesses need to be updated
     accum = await modules.accumulator.getAccumulator(accumulatorId);
-    const updates = await modules.accumulator.dockOnly.getUpdatesFromBlock(
+
+    await modules.accumulator.updateWitness(
       accumulatorId,
+      member1,
+      witness1,
+      accum.lastModified,
       accum.lastModified
     );
-    const additions = [];
-    const removals = [];
-    if (updates[0].additions !== null) {
-      for (const a of updates[0].additions) {
-        additions.push(a);
-      }
-    }
-    if (updates[0].removals !== null) {
-      for (const a of updates[0].removals) {
-        removals.push(a);
-      }
-    }
-    const queriedWitnessInfo = new VBWitnessUpdateInfo(
-      updates[0].witnessUpdateInfo.bytes
+
+    await modules.accumulator.updateWitness(
+      accumulatorId,
+      member3,
+      witness3,
+      accum.lastModified,
+      accum.lastModified
     );
 
-    witness1.updateUsingPublicInfoPostBatchUpdate(
-      member1,
-      additions,
-      removals,
-      queriedWitnessInfo
-    );
     expect(
       verifAccumulator.verifyMembershipWitness(
         member1,
@@ -292,12 +283,6 @@ describe("Prefilled positive accumulator", () => {
       )
     ).toEqual(true);
 
-    witness3.updateUsingPublicInfoPostBatchUpdate(
-      member3,
-      additions,
-      removals,
-      queriedWitnessInfo
-    );
     expect(
       verifAccumulator.verifyMembershipWitness(
         member3,
@@ -342,8 +327,6 @@ describe("Prefilled positive accumulator", () => {
       )
     ).toEqual(true);
 
-    await waitForBlocks(dock.api, 2);
-
     // Do some updates to the accumulator
 
     const removals1 = [members[85], members[86]];
@@ -369,8 +352,6 @@ describe("Prefilled positive accumulator", () => {
       pair
     );
 
-    await waitForBlocks(dock.api, 5);
-
     const removals2 = [members[87], members[88]];
     const witnessUpdInfo2 = VBWitnessUpdateInfo.new(
       accumulator.accumulated,
@@ -393,8 +374,6 @@ describe("Prefilled positive accumulator", () => {
       },
       pair
     );
-
-    await waitForBlocks(dock.api, 5);
 
     const removals3 = [members[89], members[90], members[91]];
     const witnessUpdInfo3 = VBWitnessUpdateInfo.new(
@@ -427,9 +406,9 @@ describe("Prefilled positive accumulator", () => {
     );
     // The user should be told the block number from which he is supposed to update the witnesses from. It will be one block
     // ahead from where the last update was posted.
-    const blockNoToUpdateFrom = (await getLastBlockNo(dock.api)) + 1;
-
-    await waitForBlocks(dock.api, 5);
+    const blockNoToUpdateFrom =
+      (await modules.accumulator.getAccumulator(accumulatorId)).lastModified +
+      1;
 
     // Do some more updates to the accumulator
     const removals4 = [members[92], members[93]];
@@ -455,7 +434,6 @@ describe("Prefilled positive accumulator", () => {
       pair
     );
     console.log(`Updated witness at block ${await getLastBlockNo(dock.api)}`);
-    await waitForBlocks(dock.api, 5);
 
     const removals5 = [members[94], members[95], members[96]];
     const witnessUpdInfo5 = VBWitnessUpdateInfo.new(
@@ -480,7 +458,6 @@ describe("Prefilled positive accumulator", () => {
       pair
     );
     console.log(`Updated witness at block ${await getLastBlockNo(dock.api)}`);
-    await waitForBlocks(dock.api, 5);
 
     queriedAccum = await modules.accumulator.getAccumulator(
       accumulatorId,

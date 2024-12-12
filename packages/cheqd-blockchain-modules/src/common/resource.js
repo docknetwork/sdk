@@ -7,7 +7,7 @@ import { maybeToJSONString } from '@docknetwork/credential-sdk/utils';
  */
 export class SortedResourceVersions {
   constructor(items) {
-    const { resourceId, findStartingPoint, resourceNextVersionId } = this.constructor;
+    const { resourceId, resourceNextVersionId } = this.constructor;
 
     let map;
     if (items instanceof Map) {
@@ -22,7 +22,7 @@ export class SortedResourceVersions {
     }
 
     // Find starting point
-    let currentItem = findStartingPoint(map);
+    let currentItem = this.constructor.findStartingPoint(map);
     if (!currentItem) {
       throw new Error(
         `No starting point found for ${maybeToJSONString([

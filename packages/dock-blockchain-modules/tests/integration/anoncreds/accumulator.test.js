@@ -390,13 +390,8 @@ describe("Accumulator Module", () => {
       );
       await (typ === 0
         ? chainModule.updatePositiveAccumulator
-        : chainModule.updateKBUniversalAccumulator)(
-        id,
-        accumulated2,
-        {},
-        [did2, keyId],
-        pair2
-      );
+        : chainModule.updateKBUniversalAccumulator
+      ).call(chainModule, id, accumulated2, {}, [did2, keyId], pair2);
       const accum2 = await chainModule.getAccumulator(id, false);
       expect(accum2.accumulated.value).toEqual(accumulated2);
 
@@ -432,7 +427,9 @@ describe("Accumulator Module", () => {
       );
       await (typ === 0
         ? chainModule.updatePositiveAccumulator
-        : chainModule.updateKBUniversalAccumulator)(
+        : chainModule.updateKBUniversalAccumulator
+      ).call(
+        chainModule,
         id,
         accumulated3,
         {
@@ -470,7 +467,9 @@ describe("Accumulator Module", () => {
       );
       await (typ === 0
         ? chainModule.updatePositiveAccumulator
-        : chainModule.updateKBUniversalAccumulator)(
+        : chainModule.updateKBUniversalAccumulator
+      ).call(
+        chainModule,
         id,
         accumulated4,
         { additions: additions2, witnessUpdateInfo: witUpd2 },
@@ -501,7 +500,9 @@ describe("Accumulator Module", () => {
       );
       await (typ === 0
         ? chainModule.updatePositiveAccumulator
-        : chainModule.updateKBUniversalAccumulator)(
+        : chainModule.updateKBUniversalAccumulator
+      ).call(
+        chainModule,
         id,
         accumulated5,
         { removals: removals3, witnessUpdateInfo: witUpd3 },

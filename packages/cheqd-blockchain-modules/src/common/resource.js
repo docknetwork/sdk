@@ -1,4 +1,4 @@
-import { maybeToJSONString } from "@docknetwork/credential-sdk/utils";
+import { maybeToJSONString } from '@docknetwork/credential-sdk/utils';
 
 /**
  * Stores sorted versions of a single resource.
@@ -27,7 +27,7 @@ export class SortedResourceVersions {
       throw new Error(
         `No starting point found for ${maybeToJSONString([
           ...items,
-        ])} (missing item without \`previousVersionId\`)`
+        ])} (missing item without \`previousVersionId\`)`,
       );
     }
 
@@ -37,7 +37,7 @@ export class SortedResourceVersions {
 
     while (currentItem) {
       if (visited.has(resourceId(currentItem))) {
-        throw new Error("Cycle detected in the version sequence");
+        throw new Error('Cycle detected in the version sequence');
       }
 
       visited.add(resourceId(currentItem));
@@ -47,7 +47,7 @@ export class SortedResourceVersions {
     }
 
     if (visited.size !== map.size) {
-      throw new Error("Disconnected sequence detected");
+      throw new Error('Disconnected sequence detected');
     }
 
     this.items = sortedItems;
@@ -60,34 +60,34 @@ export class SortedResourceVersions {
     for (const item of map.values()) {
       // Find the starting point
       if (
-        !resourcePreviousVersionId(item) ||
-        !map.has(resourcePreviousVersionId(item))
+        !resourcePreviousVersionId(item)
+        || !map.has(resourcePreviousVersionId(item))
       ) {
         if (firstItem == null) {
           firstItem = item;
         } else if (
-          !resourcePreviousVersionId(firstItem) &&
-          !resourcePreviousVersionId(item)
+          !resourcePreviousVersionId(firstItem)
+          && !resourcePreviousVersionId(item)
         ) {
           throw new Error(
             `Two items with nullish \`previousVersionId\` found: ${resourceId(
-              firstItem
-            )} and ${resourceId(item)}`
+              firstItem,
+            )} and ${resourceId(item)}`,
           );
         } else if (
-          resourcePreviousVersionId(firstItem) &&
-          resourcePreviousVersionId(item)
+          resourcePreviousVersionId(firstItem)
+          && resourcePreviousVersionId(item)
         ) {
           throw new Error(
             `Missing previous items for both: ${resourceId(
-              firstItem
-            )} and ${resourceId(item)}`
+              firstItem,
+            )} and ${resourceId(item)}`,
           );
         } else {
           throw new Error(
             `Can't have both element with no \`previousVersionId\` and no previous version for the element with \`previousVersionId\`: ${resourceId(
-              firstItem
-            )} and ${resourceId(item)}`
+              firstItem,
+            )} and ${resourceId(item)}`,
           );
         }
       }
@@ -102,7 +102,7 @@ export class SortedResourceVersions {
 
   toMap() {
     return new Map(
-      this.items.map((item) => [this.constructor.resourceId(item), item])
+      this.items.map((item) => [this.constructor.resourceId(item), item]),
     );
   }
 
@@ -125,7 +125,7 @@ export class SortedResourceVersions {
 
 export class NoResourceError extends Error {
   constructor() {
-    super("Resource not found");
+    super('Resource not found');
   }
 }
 
@@ -142,11 +142,11 @@ export const validateResource = (resource, name, type) => {
     throw new NoResourceError();
   } else if (resource.metadata.resourceType !== type) {
     throw new Error(
-      `Invalid resource type for resource \`${resource.metadata.id}\`: \`${resource.metadata.resourceType}\`, expected \`${type}\``
+      `Invalid resource type for resource \`${resource.metadata.id}\`: \`${resource.metadata.resourceType}\`, expected \`${type}\``,
     );
   } else if (resource.metadata.name !== name) {
     throw new Error(
-      `Invalid name for resource \`${resource.id}\`: \`${resource.metadata.name}\`, expected \`${name}\``
+      `Invalid name for resource \`${resource.id}\`: \`${resource.metadata.name}\`, expected \`${name}\``,
     );
   }
 

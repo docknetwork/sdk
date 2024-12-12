@@ -24,6 +24,7 @@ import {
   TestKeyringOpts,
 } from "../../test-constants";
 import { DockDid, DockAccumulatorId } from "@docknetwork/credential-sdk/types";
+import { ArrayOfByteArrays } from "@docknetwork/credential-sdk/types/generic";
 
 import { AccumulatorType } from "@docknetwork/credential-sdk/modules/abstract/accumulator";
 import { AbstractAccumulatorModule } from "@docknetwork/credential-sdk/modules";
@@ -34,7 +35,6 @@ import {
   DidKeypair,
 } from "@docknetwork/credential-sdk/keypairs";
 import { DockAccumulatorPublicKeyRef } from "@docknetwork/credential-sdk/types";
-import { ArrayOfByteArrays } from "../../../src/accumulator/actions";
 import { DockAccumulatorModule } from "../../../src";
 
 describe("Accumulator Module", () => {

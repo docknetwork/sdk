@@ -5,7 +5,7 @@ import {
   DockAccumulatorIdIdent,
   DockAccumulatorPublicKeyRef,
   DockDidOrDidMethodKey,
-} from "@docknetwork/credential-sdk/types";
+} from '@docknetwork/credential-sdk/types';
 import {
   TypedBytes,
   TypedStruct,
@@ -13,7 +13,7 @@ import {
   TypedNumber,
   ArrayOfByteArrays,
   ByteArray,
-} from "@docknetwork/credential-sdk/types/generic";
+} from '@docknetwork/credential-sdk/types/generic';
 
 export class AddAccumulator extends TypedStruct {
   static Classes = {

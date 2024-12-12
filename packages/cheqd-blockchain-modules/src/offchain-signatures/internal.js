@@ -1,9 +1,9 @@
-import injectParams from "../common/inject-params";
+import injectParams from '../common/inject-params';
 
 export default class CheqdOffchainSignaturesInternalModule extends injectParams(
-  class {}
+  class {},
 ) {
-  static ParamsName = "OffchainParams";
+  static ParamsName = 'OffchainParams';
 
-  static ParamsType = "offchain-signature-params";
+  static ParamsType = 'offchain-signature-params';
 }

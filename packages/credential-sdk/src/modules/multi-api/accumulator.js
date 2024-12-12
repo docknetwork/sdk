@@ -102,28 +102,90 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
   }
 
   /**
-   * Update existing accumulator
-   * @param id
-   * @param newAccumulated - Accumulated value after the update
-   * @param additions
-   * @param removals
-   * @param witnessUpdateInfo
+   * Update existing a positive (add-only) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
    * @param signingKeyRef - Signer's keypair reference
-   * @returns {Promise< object>}
+   * @returns {Promise<*>}
    */
-  async updateAccumulator(
+  async updatePositiveAccumulator(
     id,
-    newAccumulated,
+    accumulated,
     { additions, removals, witnessUpdateInfo },
+    publicKeyRef,
     didKeypair,
     params,
   ) {
     const accId = AccumulatorId.from(id);
 
-    return await this.moduleById(accId).updateAccumulator(
+    return await this.moduleById(accId).updatePositiveAccumulator(
       accId,
-      newAccumulated,
+      accumulated,
       { additions, removals, witnessUpdateInfo },
+      publicKeyRef,
+      didKeypair,
+      params,
+    );
+  }
+
+  /**
+   * Update existing universal (supports add/remove) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
+   * @param maxSize - Maximum size of the accumulator
+   * @param signingKeyRef - Signer's keypair reference
+   * @returns {Promise<*>}
+   */
+  async updateUniversalAccumulator(
+    id,
+    accumulated,
+    { additions, removals, witnessUpdateInfo },
+    publicKeyRef,
+    maxSize,
+    didKeypair,
+    params,
+  ) {
+    const accId = AccumulatorId.from(id);
+
+    return await this.moduleById(accId).updateUniversalAccumulator(
+      accId,
+      accumulated,
+      { additions, removals, witnessUpdateInfo },
+      publicKeyRef,
+      maxSize,
+      didKeypair,
+      params,
+    );
+  }
+
+  /**
+   * Update existing KB universal (supports add/remove) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
+   * @param signingKeyRef - Signer's keypair reference
+   * @returns {Promise<*>}
+   */
+  async updateKBUniversalAccumulator(
+    id,
+    accumulated,
+    { additions, removals, witnessUpdateInfo },
+    publicKeyRef,
+    didKeypair,
+    params,
+  ) {
+    const accId = AccumulatorId.from(id);
+
+    return await this.moduleById(accId).updateKBUniversalAccumulator(
+      accId,
+      accumulated,
+      { additions, removals, witnessUpdateInfo },
+      publicKeyRef,
       didKeypair,
       params,
     );
@@ -341,28 +403,85 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
   }
 
   /**
-   * Update existing accumulator
-   * @param id
-   * @param newAccumulated - Accumulated value after the update
-   * @param additions
-   * @param removals
-   * @param witnessUpdateInfo
-   * @param signerDid - Signer of the transaction payload
+   * Update existing a positive (add-only) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
    * @param signingKeyRef - Signer's keypair reference
-   * @returns {Promise< object>}
+   * @returns {Promise<*>}
    */
-  async updateAccumulatorTx(
+  async updatePositiveAccumulatorTx(
     id,
-    newAccumulated,
+    accumulated,
     { additions, removals, witnessUpdateInfo },
+    publicKeyRef,
     didKeypair,
   ) {
     const accId = AccumulatorId.from(id);
 
-    return await this.moduleById(accId).updateAccumulatorTx(
+    return await this.moduleById(accId).updatePositiveAccumulatorTx(
       accId,
-      newAccumulated,
+      accumulated,
       { additions, removals, witnessUpdateInfo },
+      publicKeyRef,
+      didKeypair,
+    );
+  }
+
+  /**
+   * Update existing universal (supports add/remove) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
+   * @param maxSize - Maximum size of the accumulator
+   * @param signingKeyRef - Signer's keypair reference
+   * @returns {Promise<*>}
+   */
+  async updateUniversalAccumulatorTx(
+    id,
+    accumulated,
+    { additions, removals, witnessUpdateInfo },
+    publicKeyRef,
+    maxSize,
+    didKeypair,
+  ) {
+    const accId = AccumulatorId.from(id);
+
+    return await this.moduleById(accId).updateUniversalAccumulatorTx(
+      accId,
+      accumulated,
+      { additions, removals, witnessUpdateInfo },
+      publicKeyRef,
+      maxSize,
+      didKeypair,
+    );
+  }
+
+  /**
+   * Update existing KB universal (supports add/remove) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
+   * @param signingKeyRef - Signer's keypair reference
+   * @returns {Promise<*>}
+   */
+  async updateKBUniversalAccumulatorTx(
+    id,
+    accumulated,
+    { additions, removals, witnessUpdateInfo },
+    publicKeyRef,
+    didKeypair,
+  ) {
+    const accId = AccumulatorId.from(id);
+
+    return await this.moduleById(accId).updateKBUniversalAccumulatorTx(
+      accId,
+      accumulated,
+      { additions, removals, witnessUpdateInfo },
+      publicKeyRef,
       didKeypair,
     );
   }

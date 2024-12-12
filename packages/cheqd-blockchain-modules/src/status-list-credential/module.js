@@ -2,7 +2,9 @@ import { AbstractStatusListCredentialModule } from '@docknetwork/credential-sdk/
 import { injectCheqd } from '../common';
 import CheqdInternalStatusListCredentialModule from './internal';
 
-export default class CheqdStatusListCredentialModule extends injectCheqd(AbstractStatusListCredentialModule) {
+export default class CheqdStatusListCredentialModule extends injectCheqd(
+  AbstractStatusListCredentialModule,
+) {
   static CheqdOnly = CheqdInternalStatusListCredentialModule;
 
   /**
@@ -21,11 +23,12 @@ export default class CheqdStatusListCredentialModule extends injectCheqd(Abstrac
    * @param didKeypair
    * @return {Promise<StatusListCredentialId>} - the extrinsic to sign and send.
    */
-  async createStatusListCredentialTx(
-    id,
-    statusListCredential,
-    didKeypair,
-  ) {
+  async createStatusListCredentialTx(id, statusListCredential, didKeypair) {
+    if ((await this.cheqdOnly.lastStatusListCredentialId(id)) != null) {
+      throw new Error(
+        `Status List credential with id \`${id}\` already exists`,
+      );
+    }
     return await this.cheqdOnly.tx.create(id, statusListCredential, didKeypair);
   }
 
@@ -36,11 +39,7 @@ export default class CheqdStatusListCredentialModule extends injectCheqd(Abstrac
    * @param didKeypair - `DID` signatures over an action with a nonce authorizing this action according to the existing policy.
    * @return {Promise<object>} - the extrinsic to sign and send.
    */
-  async updateStatusListCredentialTx(
-    id,
-    statusListCredential,
-    didKeypair,
-  ) {
+  async updateStatusListCredentialTx(id, statusListCredential, didKeypair) {
     return await this.cheqdOnly.tx.update(id, statusListCredential, didKeypair);
   }
 
@@ -50,10 +49,7 @@ export default class CheqdStatusListCredentialModule extends injectCheqd(Abstrac
    * @param didKeypair - `DID` signatures over an action with a nonce authorizing this action according to the existing policy.
    * @return {Promise<object>} - the extrinsic to sign and send.
    */
-  async removeStatusListCredentialTx(
-    id,
-    didKeypair,
-  ) {
+  async removeStatusListCredentialTx(id, didKeypair) {
     return await this.cheqdOnly.tx.remove(id, didKeypair);
   }
 }

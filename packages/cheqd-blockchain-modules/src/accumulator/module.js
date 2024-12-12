@@ -8,12 +8,11 @@ import {
   CheqdPositiveAccumulator,
   AccumulatorParams,
   CheqdAccumulatorPublicKey,
-  CheqdAccumulatorIdIdent,
-} from "@docknetwork/credential-sdk/types";
-import { option, withProp } from "@docknetwork/credential-sdk/types/generic";
-import { AbstractAccumulatorModule } from "@docknetwork/credential-sdk/modules/abstract";
-import CheqdInternalAccumulatorModule from "./internal";
-import { injectCheqd, withParams, withPublicKeys } from "../common";
+} from '@docknetwork/credential-sdk/types';
+import { option, withProp } from '@docknetwork/credential-sdk/types/generic';
+import { AbstractAccumulatorModule } from '@docknetwork/credential-sdk/modules/abstract';
+import CheqdInternalAccumulatorModule from './internal';
+import { injectCheqd, withParams, withPublicKeys } from '../common';
 
 export const AccumulatorType = {
   VBPos: 0,
@@ -23,7 +22,7 @@ export const AccumulatorType = {
 
 /** Class to manage accumulators on chain */
 export default class CheqdAccumulatorModule extends withParams(
-  withPublicKeys(injectCheqd(AbstractAccumulatorModule))
+  withPublicKeys(injectCheqd(AbstractAccumulatorModule)),
 ) {
   static CheqdOnly = CheqdInternalAccumulatorModule;
 
@@ -41,9 +40,9 @@ export default class CheqdAccumulatorModule extends withParams(
     return await this.cheqdOnly.tx.addAccumulator(
       id,
       new CheqdPositiveAccumulator(
-        new CheqdAccumulatorCommon(accumulated, publicKeyRef)
+        new CheqdAccumulatorCommon(accumulated, publicKeyRef),
       ),
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -63,17 +62,17 @@ export default class CheqdAccumulatorModule extends withParams(
     accumulated,
     publicKeyRef,
     maxSize,
-    didKeypair
+    didKeypair,
   ) {
     return await this.cheqdOnly.tx.addAccumulator(
       id,
       new CheqdUniversalAccumulator(
         new CheqdUniversalAccumulator.Class(
           new CheqdAccumulatorCommon(accumulated, publicKeyRef),
-          maxSize
-        )
+          maxSize,
+        ),
       ),
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -91,38 +90,95 @@ export default class CheqdAccumulatorModule extends withParams(
     return await this.cheqdOnly.tx.addAccumulator(
       id,
       new CheqdKBUniversalAccumulator(
-        new CheqdAccumulatorCommon(accumulated, publicKeyRef)
+        new CheqdAccumulatorCommon(accumulated, publicKeyRef),
       ),
-      didKeypair
+      didKeypair,
     );
   }
 
   /**
-   * Update existing accumulator
-   * @param id
-   * @param newAccumulated - Accumulated value after the update
-   * @param additions
-   * @param removals
-   * @param witnessUpdateInfo
+   * Update a positive (add-only) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
    * @param signerDid - Signer of the transaction payload
    * @param signingKeyRef - Signer's keypair reference
-   * @returns {Promise< object>}
+   * @returns {Promise<*>}
    */
-  async updateAccumulatorTx(
+  async updatePositiveAccumulatorTx(
     id,
-    newAccumulated,
+    accumulated,
     { additions, removals, witnessUpdateInfo },
-    didKeypair
+    publicKeyRef,
+    didKeypair,
   ) {
     return await this.cheqdOnly.tx.updateAccumulator(
       id,
-      newAccumulated,
-      {
-        additions,
-        removals,
-        witnessUpdateInfo,
-      },
-      didKeypair
+      new CheqdPositiveAccumulator(
+        new CheqdAccumulatorCommon(accumulated, publicKeyRef),
+      ),
+      { additions, removals, witnessUpdateInfo },
+      didKeypair,
+    );
+  }
+
+  /**
+   * Update universal (supports add/remove) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
+   * @param maxSize - Maximum size of the accumulator
+   * @param signerDid - Signer of the transaction payload
+   * @param signingKeyRef - Signer's keypair reference
+   * @returns {Promise<*>}
+   */
+  async updateUniversalAccumulatorTx(
+    id,
+    accumulated,
+    { additions, removals, witnessUpdateInfo },
+    publicKeyRef,
+    maxSize,
+    didKeypair,
+  ) {
+    return await this.cheqdOnly.tx.updateAccumulator(
+      id,
+      new CheqdUniversalAccumulator(
+        new CheqdUniversalAccumulator.Class(
+          new CheqdAccumulatorCommon(accumulated, publicKeyRef),
+          maxSize,
+        ),
+      ),
+      { additions, removals, witnessUpdateInfo },
+      didKeypair,
+    );
+  }
+
+  /**
+   * Update KB universal (supports add/remove) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
+   * @param signerDid - Signer of the transaction payload
+   * @param signingKeyRef - Signer's keypair reference
+   * @returns {Promise<*>}
+   */
+  async updateKBUniversalAccumulatorTx(
+    id,
+    accumulated,
+    { additions, removals, witnessUpdateInfo },
+    publicKeyRef,
+    didKeypair,
+  ) {
+    return await this.cheqdOnly.tx.updateAccumulator(
+      id,
+      new CheqdKBUniversalAccumulator(
+        new CheqdAccumulatorCommon(accumulated, publicKeyRef),
+      ),
+      { additions, removals, witnessUpdateInfo },
+      didKeypair,
     );
   }
 
@@ -149,22 +205,20 @@ export default class CheqdAccumulatorModule extends withParams(
    */
   async getAccumulator(id, includePublicKey = false, includeParams = false) {
     const PublicKey = includeParams
-      ? withProp(CheqdAccumulatorPublicKey, "params", option(AccumulatorParams))
+      ? withProp(CheqdAccumulatorPublicKey, 'params', option(AccumulatorParams))
       : CheqdAccumulatorPublicKey;
     const Accumulator = includePublicKey
-      ? withProp(CheqdAccumulatorWithUpdateInfo, "publicKey", option(PublicKey))
+      ? withProp(CheqdAccumulatorWithUpdateInfo, 'publicKey', option(PublicKey))
       : CheqdAccumulatorWithUpdateInfo;
 
-    const acc = option(Accumulator).from(
-      await this.cheqdOnly.query.accumulators(CheqdAccumulatorIdIdent.from(id))
-    );
-
+    const acc = option(Accumulator).from(await this.cheqdOnly.accumulator(id));
     if (acc == null) {
       return null;
-    }
-
-    if (includePublicKey) {
-      acc.publicKey = await this.getPublicKey(...acc.keyRef, includeParams);
+    } else if (includePublicKey) {
+      acc.publicKey = await this.getPublicKey(
+        ...acc.accumulator.keyRef,
+        includeParams,
+      );
     }
 
     return acc;
@@ -187,7 +241,7 @@ export default class CheqdAccumulatorModule extends withParams(
       member,
       witness,
       start,
-      end
+      end,
     );
   }
 }

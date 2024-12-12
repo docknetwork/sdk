@@ -21,7 +21,10 @@ import { DockCoreModules } from "../../src";
 import { getUnsignedCred, registerNewDIDUsingPair } from "./helpers";
 import { getKeyDoc } from "@docknetwork/credential-sdk/vc/helpers";
 import { DockDid } from "@docknetwork/credential-sdk/types";
-import { DockStatusList2021Credential, DockStatusListCredentialId } from "@docknetwork/credential-sdk/types";
+import {
+  DockStatusList2021Credential,
+  DockStatusListCredentialId,
+} from "@docknetwork/credential-sdk/types";
 import { addStatusList21EntryToCredential } from "@docknetwork/credential-sdk/vc/credentials";
 import {
   Ed25519Keypair,
@@ -135,7 +138,6 @@ describe("DockStatusList2021Credential", () => {
       compactProof: true,
     });
 
-    console.log(result.error);
     expect(result.verified).toBe(true);
 
     // Revoke the credential

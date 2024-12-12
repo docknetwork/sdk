@@ -1,9 +1,14 @@
-import { maybeFrom, maybeToJSON } from '../../utils/interfaces';
+import {
+  maybeFrom,
+  maybeToJSON,
+  maybeToJSONString,
+} from '../../utils/interfaces';
 import { withExtendedStaticProperties } from '../../utils/inheritance';
 import withCatchNull from './with-catch-null';
 import withEq from './with-eq';
+import withBase from './with-base';
 
-class TypedSet extends Set {
+class TypedSet extends withBase(Set) {
   static Class;
 
   constructor(values = []) {
@@ -18,7 +23,7 @@ class TypedSet extends Set {
 
   valueAsClass(value) {
     const valuesAsClass = maybeFrom(this.constructor.Class, value);
-    const valueStr = JSON.stringify(maybeToJSON(valuesAsClass));
+    const valueStr = maybeToJSONString(valuesAsClass);
 
     if (this.valuesAsClass.has(valueStr)) {
       return this.valuesAsClass.get(valueStr);

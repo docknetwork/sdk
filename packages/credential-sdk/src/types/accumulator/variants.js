@@ -27,7 +27,11 @@ export const createAccumulatorVariants = (keyRef) => {
     }
   }
 
-  class Accumulator extends TypedEnum {}
+  class Accumulator extends TypedEnum {
+    get keyRef() {
+      return this.value.keyRef;
+    }
+  }
 
   class UniversalAccumulator extends Accumulator {
     static Type = 'universal';

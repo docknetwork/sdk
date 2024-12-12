@@ -1,11 +1,11 @@
-import { stringToU8a } from "../../utils";
+import { stringToU8a, u8aToString } from '../../utils';
 import {
   withExtendedStaticProperties,
   withExtendedPrototypeProperties,
-} from "../../utils/inheritance";
-import { applyToValue, maybeEq } from "../../utils/interfaces";
-import withCatchNull from "./with-catch-null";
-import withEq from "./with-eq";
+} from '../../utils/inheritance';
+import { applyToValue, maybeEq } from '../../utils/interfaces';
+import withCatchNull from './with-catch-null';
+import withEq from './with-eq';
 
 /**
  * Enhances provided class by adding prototype methods `toString`/`eq`, static `from` and requiring
@@ -25,7 +25,7 @@ export default function withBase(klass) {
        * @param {object} json
        */
       static fromJSON(_json) {
-        throw new Error("Unimplemented");
+        throw new Error('Unimplemented');
       }
 
       /**
@@ -33,7 +33,7 @@ export default function withBase(klass) {
        * @param {object} json
        */
       static fromApi(_obj) {
-        throw new Error("Unimplemented");
+        throw new Error('Unimplemented');
       }
 
       /**
@@ -45,6 +45,8 @@ export default function withBase(klass) {
           return obj;
         } else if (Object.getPrototypeOf(obj) === Object.getPrototypeOf({})) {
           return this.fromJSON(obj);
+        } else if (obj instanceof Uint8Array) {
+          return this.fromJSON(JSON.parse(u8aToString(obj)));
         } else {
           return this.fromApi(obj);
         }
@@ -55,7 +57,7 @@ export default function withBase(klass) {
        * @returns {object} The JSON representation of the instance.
        */
       toJSON() {
-        throw new Error("Unimplemented");
+        throw new Error('Unimplemented');
       }
 
       /**
@@ -95,7 +97,7 @@ export default function withBase(klass) {
           return fn(this);
         }
         const { value } = this;
-        const hasValue = typeof value !== "undefined";
+        const hasValue = typeof value !== 'undefined';
 
         return applyToValue(check, fn, value ?? this, hasValue);
       }
@@ -113,10 +115,10 @@ export default function withBase(klass) {
   };
 
   return withExtendedStaticProperties(
-    ["fromJSON", "fromApi"],
+    ['fromJSON', 'fromApi'],
     withExtendedPrototypeProperties(
-      ["toJSON"],
-      withEq(withCatchNull(classes[name]))
-    )
+      ['toJSON'],
+      withEq(withCatchNull(classes[name])),
+    ),
   );
 }

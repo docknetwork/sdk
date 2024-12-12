@@ -5,12 +5,12 @@ import {
   ArrayOfByteArrays,
   ByteArray,
   TypedUUID,
-} from "../generic";
+} from '../generic';
 import {
   DockAccumulatorPublicKeyRef,
   CheqdAccumulatorPublicKeyRef,
-} from "./keys";
-import { createAccumulatorVariants } from "./variants";
+} from './keys';
+import { createAccumulatorVariants } from './variants';
 
 export const [
   DockAccumulatorCommon,
@@ -58,8 +58,8 @@ export const [
 
 export class CheqdAccumulatorWithUpdateInfo extends TypedStruct {
   static Classes = {
-    created: TypedUUID,
-    lastUpdated: TypedUUID,
+    createdAt: TypedUUID,
+    lastUpdatedAt: TypedUUID,
     accumulator: CheqdAccumulator,
   };
 
@@ -68,7 +68,7 @@ export class CheqdAccumulatorWithUpdateInfo extends TypedStruct {
   }
 
   get lastModified() {
-    return this.lastUpdated;
+    return this.lastUpdatedAt;
   }
 
   get type() {
@@ -86,7 +86,7 @@ export class CheqdAccumulatorWithUpdateInfo extends TypedStruct {
 
 export class CheqdStoredAccumulator extends TypedStruct {
   static Classes = {
-    accumulator: CheqdAccumulatorWithUpdateInfo,
+    accumulator: CheqdAccumulator,
     additions: option(ArrayOfByteArrays),
     removals: option(ArrayOfByteArrays),
     witnessUpdateInfo: option(ByteArray),

@@ -4,8 +4,10 @@ import {
   CheqdBlobWithId,
   CheqdCreateResource,
 } from '@docknetwork/credential-sdk/types';
-import { option } from '@docknetwork/credential-sdk/types/generic';
-import { createInternalCheqdModule } from '../common';
+import { createInternalCheqdModule, validateResource } from '../common';
+
+const Name = 'Blob';
+const Type = 'blob';
 
 const methods = {
   new: (blobWithId) => {
@@ -19,8 +21,8 @@ const methods = {
       uuid,
       '1.0',
       [],
-      'Blob',
-      'blob',
+      Name,
+      Type,
       blob,
     );
   },
@@ -29,15 +31,17 @@ const methods = {
 export default class CheqdInternalBlobModule extends createInternalCheqdModule(
   methods,
 ) {
-  static Prop = 'resource';
-
   static MsgNames = {
     new: 'MsgCreateResource',
   };
 
   async blob(blobId) {
-    return option(Blob).from(
-      (await this.resource(...CheqdBlobId.from(blobId).value))?.resource?.data,
+    return Blob.from(
+      validateResource(
+        await this.resource(...CheqdBlobId.from(blobId).value),
+        Name,
+        Type,
+      ),
     );
   }
 }

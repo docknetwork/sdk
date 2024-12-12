@@ -1,61 +1,63 @@
-import { CheqdDidOrDidMethodKey } from "@docknetwork/credential-sdk/types/did/onchain";
 import {
   CheqdStoredAccumulator,
   AccumulatorParams,
-  AccumulatorPublicKey,
   CheqdAccumulatorId,
   CheqdAccumulatorParamsRef,
   CheqdAccumulatorWithUpdateInfo,
   CheqdCreateResource,
-} from "@docknetwork/credential-sdk/types";
-import { option, TypedUUID } from "@docknetwork/credential-sdk/types/generic";
-import {
-  inclusiveRange,
-  u8aToHex,
-  stringToU8a,
-} from "@docknetwork/credential-sdk/utils";
-import { VBWitnessUpdateInfo } from "@docknetwork/credential-sdk/crypto";
+  CheqdAccumulatorPublicKey,
+} from '@docknetwork/credential-sdk/types';
+import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
+import { stringToU8a } from '@docknetwork/credential-sdk/utils';
+import { VBWitnessUpdateInfo } from '@docknetwork/credential-sdk/crypto';
 import {
   injectParams,
   injectPublicKeys,
   createInternalCheqdModule,
-} from "../common";
-import ResourcesMap from "../common/resources-map";
+  SortedResourceVersions,
+  validateResource,
+} from '../common';
+
+const Type = 'accumulator';
 
 const methods = {
   addAccumulator: (accumulatorId, accumulator) => {
     const [did, id] = CheqdAccumulatorId.from(accumulatorId).value;
+    const storedAcc = new CheqdStoredAccumulator(
+      accumulator,
+    ).toJSONStringBytes();
 
     return new CheqdCreateResource(
       did.value.value,
       TypedUUID.random(),
-      "1.0",
+      '1.0',
       [],
-      id,
-      "accumulator",
-      new CheqdStoredAccumulator(accumulator).toJSONStringBytes()
+      String(id),
+      Type,
+      storedAcc,
     );
   },
   updateAccumulator: (
     accumulatorId,
-    newAccumulated,
-    { additions, removals, witnessUpdateInfo }
+    accumulator,
+    { additions, removals, witnessUpdateInfo },
   ) => {
     const [did, id] = CheqdAccumulatorId.from(accumulatorId).value;
+    const storedAcc = new CheqdStoredAccumulator(
+      accumulator,
+      additions,
+      removals,
+      witnessUpdateInfo,
+    ).toJSONStringBytes();
 
     return new CheqdCreateResource(
       did.value.value,
       TypedUUID.random(),
-      "1.0",
+      '1.0',
       [],
-      id,
-      "accumulator",
-      new CheqdStoredAccumulator(
-        newAccumulated,
-        additions,
-        removals,
-        witnessUpdateInfo
-      ).toJSONStringBytes()
+      String(id),
+      Type,
+      storedAcc,
     );
   },
   removeAccumulator: (accumulatorId) => {
@@ -64,80 +66,79 @@ const methods = {
     return new CheqdCreateResource(
       did.value.value,
       TypedUUID.random(),
-      "1.0",
+      '1.0',
       [],
-      id,
-      "accumulator",
-      stringToU8a("null")
+      String(id),
+      Type,
+      stringToU8a('null'),
     );
   },
 };
 
 export default class CheqdInternalAccumulatorModule extends injectParams(
-  injectPublicKeys(createInternalCheqdModule(methods))
+  injectPublicKeys(createInternalCheqdModule(methods)),
 ) {
-  static MsgNames = {
-    addPublicKey: "MsgCreateResource",
-    removePublicKey: "MsgCreateResource",
-    addParams: "MsgCreateResource",
-    removeParams: "MsgCreateResource",
-  };
+  static get MsgNames() {
+    return {
+      ...super.MsgNames,
+      addAccumulator: 'MsgCreateResource',
+      updateAccumulator: 'MsgCreateResource',
+      removeAccumulator: 'MsgCreateResource',
+    };
+  }
 
-  static PublicKey = AccumulatorPublicKey;
+  static PublicKey = CheqdAccumulatorPublicKey;
 
-  static PublicKeyName = "AccumulatorPublicKey";
+  static PublicKeyName = 'AccumulatorPublicKey';
 
-  static PublicKeyType = "accumulator-public-key";
-
-  static PublicKeyOwner = CheqdDidOrDidMethodKey;
+  static PublicKeyType = 'accumulator-public-key';
 
   static Params = AccumulatorParams;
 
-  static ParamsName = "AccumulatorParams";
+  static ParamsName = 'AccumulatorParams';
 
-  static ParamsType = "accumulator-params";
+  static ParamsType = 'accumulator-params';
 
   static ParamsRef = CheqdAccumulatorParamsRef;
 
   createAccumulatorMetadataFilter(name) {
     const strName = String(name);
 
-    return (meta) =>
-      meta.resourceType === "accumulator" && meta.name === strName;
+    return (meta) => meta.resourceType === 'accumulator' && meta.name === strName;
   }
 
   async accumulator(accumulatorId) {
-    const [did, name] = CheqdAccumulatorId.from(accumulatorId);
-    const ids = ResourcesMap.fromItems(
+    const [did, name] = CheqdAccumulatorId.from(accumulatorId).value;
+    const ids = new SortedResourceVersions(
       await this.resourcesMetadataBy(
         did,
-        this.createAccumulatorMetadataFilter(name)
-      )
-    ).keys();
+        this.createAccumulatorMetadataFilter(name),
+      ),
+    ).ids();
 
     if (!ids.length) {
       return null;
     }
 
-    const acc = option(CheqdStoredAccumulator).from(
-      (await this.resource(did, ids[ids.length - 1]))?.resource?.data
+    const { accumulator } = CheqdStoredAccumulator.from(
+      validateResource(
+        await this.resource(did, ids[ids.length - 1]),
+        String(name),
+        Type,
+      ),
     );
-
-    if (acc == null) {
-      return null;
-    }
 
     return new CheqdAccumulatorWithUpdateInfo(
       ids[0],
       ids[ids.length - 1],
-      acc.accumulator
+      accumulator,
     );
   }
 
   async lastParamsId(did) {
     const res = await this.latestResourceMetadataBy(
       did,
-      this.filterParamsMetadata
+      this.filterParamsMetadata,
     );
 
     return res?.id;
@@ -146,7 +147,7 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
   async lastPublicKeyId(did) {
     const res = await this.latestResourceMetadataBy(
       did,
-      this.filterPublicKeyMetadata
+      this.filterPublicKeyMetadata,
     );
 
     return res?.id;
@@ -167,27 +168,27 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
     member,
     witness,
     start,
-    end
+    end,
   ) {
-    const [did, name] = CheqdAccumulatorId.from(accumulatorId);
+    const [did, name] = CheqdAccumulatorId.from(accumulatorId).value;
+    const startUUID = String(TypedUUID.from(start));
+    const endUUID = String(TypedUUID.from(end));
 
-    const sortedIDs = Array.from(
-      ResourcesMap.fromItems(
-        await this.resourcesMetadataBy(
-          did,
-          this.createAccumulatorMetadataFilter(name)
-        )
-      ).keys()
-    );
+    const sortedIDs = new SortedResourceVersions(
+      await this.resourcesMetadataBy(
+        did,
+        this.createAccumulatorMetadataFilter(name),
+      ),
+    ).ids();
 
-    const startIdx = sortedIDs.findIndex((id) => id === String(start));
+    const startIdx = sortedIDs.findIndex((id) => id === startUUID);
     let endIdx;
     if (end != null) {
-      endIdx = sortedIDs.findIndex((id) => id === String(end));
+      endIdx = sortedIDs.findIndex((id) => id === endUUID);
 
-      if (!~endIdx) {
+      if (endIdx === -1) {
         throw new Error(
-          `Accumulator \`${name}\` with version \`${end}\` doesn't exist`
+          `Accumulator \`${accumulatorId}\` with version \`${end}\` doesn't exist`,
         );
       }
     } else {
@@ -196,21 +197,19 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
 
     const accumulators = await this.resources(
       did,
-      sortedIDs.slice(startIdx, endIdx + 1)
+      sortedIDs.slice(startIdx, endIdx + 1),
     );
 
-    for (const accumulator of accumulators) {
-      const { additions = [], removals = [] } = accumulator.toJSON();
-
-      const queriedWitnessInfo = new VBWitnessUpdateInfo(
-        accumulator.witnessUpdateInfo.bytes
+    for (const accumulator of new SortedResourceVersions(accumulators)) {
+      const { additions, removals, witnessUpdateInfo } = CheqdStoredAccumulator.from(
+        validateResource(accumulator, String(name), Type),
       );
 
       witness.updateUsingPublicInfoPostBatchUpdate(
         member,
-        additions,
-        removals,
-        queriedWitnessInfo
+        additions ? [...additions].map((addition) => addition.bytes) : [],
+        removals ? [...removals].map((removal) => removal.bytes) : [],
+        new VBWitnessUpdateInfo(witnessUpdateInfo?.bytes || new Uint8Array()),
       );
     }
   }

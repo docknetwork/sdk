@@ -1,9 +1,8 @@
 import {
   VerificationMethodSignature,
   CheqdDid,
-} from "@docknetwork/credential-sdk/types";
-import ResourcesMap from "./resources-map";
-import { TypedUUID } from "@docknetwork/credential-sdk/types/generic";
+} from '@docknetwork/credential-sdk/types';
+import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
 
 /**
  * Creates DID transaction constructor.
@@ -18,14 +17,12 @@ const createDIDMethodTx = (fnName) => {
       const payload = root.payload[fnName].apply(this.root, args);
       const bytes = await root.apiProvider.stateChangeBytes(
         root.constructor.MsgNames[fnName],
-        payload
+        payload,
       );
 
       const signatures = []
         .concat(didKeypairs)
-        .map((didKeypair) =>
-          VerificationMethodSignature.fromDidKeypair(didKeypair, bytes)
-        );
+        .map((didKeypair) => VerificationMethodSignature.fromDidKeypair(didKeypair, bytes));
 
       const value = {
         payload,
@@ -34,7 +31,7 @@ const createDIDMethodTx = (fnName) => {
 
       return new payload.constructor.ResourcePayloadWithTypeUrlAndSignatures(
         root.constructor.MsgNames[fnName],
-        value
+        value,
       );
     },
   };
@@ -50,7 +47,7 @@ const createCall = (fnName) => {
     async [fnName](...args) {
       const { root } = this;
       const tx = await root.tx[fnName](
-        ...args.slice(0, root.payload[fnName].length)
+        ...args.slice(0, root.payload[fnName].length),
       );
 
       return await root.signAndSend(tx, args[root.payload[fnName].length]);
@@ -67,8 +64,8 @@ const filterNoResourceError = async (promise, placeholder) => {
     const strErr = String(err);
 
     if (
-      !strErr.includes("DID Doc not found") &&
-      !strErr.includes("not found: unknown request")
+      !strErr.includes('DID Doc not found')
+      && !strErr.includes('not found: unknown request')
     ) {
       throw err;
     }
@@ -86,7 +83,7 @@ class Root {
 /* eslint-disable sonarjs/cognitive-complexity */
 export default function createInternalCheqdModule(
   methods = Object.create(null),
-  baseClass = class CheqdModuleBaseClass {}
+  baseClass = class CheqdModuleBaseClass {},
 ) {
   const name = `internalCheqdModule(${baseClass.name})`;
   class RootPayload extends (baseClass.RootPayload ?? Root) {}
@@ -115,15 +112,13 @@ export default function createInternalCheqdModule(
           await this.apiProvider.sdk.querier.resource.resource(strDid, id),
         ]);
 
-        return new ResourcesMap(
-          await filterNoResourceError(Promise.all(queries))
-        );
+        return new Map(await filterNoResourceError(Promise.all(queries)));
       }
 
       async resourcesBy(did, cond) {
         return await this.resources(
           did,
-          (await this.resourcesMetadataBy(did, cond)).map((meta) => meta.id)
+          (await this.resourcesMetadataBy(did, cond)).map((meta) => meta.id),
         );
       }
 
@@ -133,7 +128,7 @@ export default function createInternalCheqdModule(
 
         return await filterNoResourceError(
           this.apiProvider.sdk.querier.resource.resource(strDid, strID),
-          null
+          null,
         );
       }
 
@@ -150,9 +145,9 @@ export default function createInternalCheqdModule(
             await filterNoResourceError(
               this.apiProvider.sdk.querier.resource.collectionResources(
                 encodedDid,
-                paginationKey
+                paginationKey,
               ),
-              { resources: [], paginationKey: null }
+              { resources: [], paginationKey: null },
             ));
 
           res = res.concat(resources.filter(cond));
@@ -164,7 +159,7 @@ export default function createInternalCheqdModule(
       async latestResourcesMetadataBy(did, cond) {
         return await this.resourcesMetadataBy(
           did,
-          (meta) => cond(meta) && !meta.nextVersionId
+          (meta) => cond(meta) && !meta.nextVersionId,
         );
       }
 
@@ -172,7 +167,7 @@ export default function createInternalCheqdModule(
         const meta = await this.resourcesMetadataBy(
           did,
           (item) => cond(item) && !item.nextVersionId,
-          (res) => res.length
+          (res) => res.length,
         );
 
         return meta[0] ?? null;

@@ -388,7 +388,15 @@ describe("Accumulator Module", () => {
         accumulator.accumulated,
         typ === 0 ? AccumulatorType.VBPos : AccumulatorType.KBUni
       );
-      await chainModule.updateAccumulator(id, accumulated2, {}, pair2);
+      await (typ === 0
+        ? chainModule.updatePositiveAccumulator
+        : chainModule.updateKBUniversalAccumulator)(
+        id,
+        accumulated2,
+        {},
+        [did2, keyId],
+        pair2
+      );
       const accum2 = await chainModule.getAccumulator(id, false);
       expect(accum2.accumulated.value).toEqual(accumulated2);
 
@@ -422,7 +430,9 @@ describe("Accumulator Module", () => {
           keypair.secretKey
         ).value
       );
-      await chainModule.updateAccumulator(
+      await (typ === 0
+        ? chainModule.updatePositiveAccumulator
+        : chainModule.updateKBUniversalAccumulator)(
         id,
         accumulated3,
         {
@@ -430,6 +440,7 @@ describe("Accumulator Module", () => {
           removals: removals1,
           witnessUpdateInfo: witUpd1,
         },
+        [did2, keyId],
         pair2
       );
       const accum3 = await chainModule.getAccumulator(id, false);
@@ -457,10 +468,13 @@ describe("Accumulator Module", () => {
           keypair.secretKey
         ).value
       );
-      await chainModule.updateAccumulator(
+      await (typ === 0
+        ? chainModule.updatePositiveAccumulator
+        : chainModule.updateKBUniversalAccumulator)(
         id,
         accumulated4,
         { additions: additions2, witnessUpdateInfo: witUpd2 },
+        [did2, keyId],
         pair2
       );
       const accum4 = await chainModule.getAccumulator(id, false);
@@ -485,10 +499,13 @@ describe("Accumulator Module", () => {
           keypair.secretKey
         ).value
       );
-      await chainModule.updateAccumulator(
+      await (typ === 0
+        ? chainModule.updatePositiveAccumulator
+        : chainModule.updateKBUniversalAccumulator)(
         id,
         accumulated5,
         { removals: removals3, witnessUpdateInfo: witUpd3 },
+        [did2, keyId],
         pair2
       );
       const accum5 = await chainModule.getAccumulator(id, false);

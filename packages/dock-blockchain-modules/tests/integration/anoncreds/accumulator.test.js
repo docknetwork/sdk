@@ -34,7 +34,7 @@ import {
   DidKeypair,
 } from "@docknetwork/credential-sdk/keypairs";
 import { DockAccumulatorPublicKeyRef } from "@docknetwork/credential-sdk/types";
-import { ListOfByteArrays } from "../../../src/accumulator/actions";
+import { ArrayOfByteArrays } from "../../../src/accumulator/actions";
 import { DockAccumulatorModule } from "../../../src";
 
 describe("Accumulator Module", () => {
@@ -536,10 +536,10 @@ describe("Accumulator Module", () => {
         accum3.lastModified
       );
       expect(updates2[0].newAccumulated.value).toEqual(accumulated3);
-      expect(updates2[0].additions.eq(ListOfByteArrays.from(additions1))).toBe(
+      expect(updates2[0].additions.eq(ArrayOfByteArrays.from(additions1))).toBe(
         true
       );
-      expect(updates2[0].removals.eq(ListOfByteArrays.from(removals1))).toBe(
+      expect(updates2[0].removals.eq(ArrayOfByteArrays.from(removals1))).toBe(
         true
       );
       expect(updates2[0].witnessUpdateInfo.value).toEqual(witUpd1);
@@ -558,7 +558,7 @@ describe("Accumulator Module", () => {
         accum4.lastModified
       );
       expect(updates3[0].newAccumulated.value).toEqual(accumulated4);
-      expect(updates3[0].additions.eq(ListOfByteArrays.from(additions2))).toBe(
+      expect(updates3[0].additions.eq(ArrayOfByteArrays.from(additions2))).toBe(
         true
       );
       expect(updates3[0].removals).toEqual(null);
@@ -570,7 +570,7 @@ describe("Accumulator Module", () => {
       );
       expect(updates4[0].newAccumulated.value).toEqual(accumulated5);
       expect(updates4[0].additions).toEqual(null);
-      expect(updates4[0].removals.eq(ListOfByteArrays.from(removals3))).toBe(
+      expect(updates4[0].removals.eq(ArrayOfByteArrays.from(removals3))).toBe(
         true
       );
       expect(updates4[0].witnessUpdateInfo.value).toEqual(witUpd3);

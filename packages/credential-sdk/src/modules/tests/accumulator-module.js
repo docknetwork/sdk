@@ -162,7 +162,7 @@ export default function generateAccumulatorTests(
         new AccumulatorCommon(hexToU8a('0xfa'), [did, pkId]).toJSON(),
       );
 
-      await accumulatorModule.removeAccumulator(acc3Id);
+      await accumulatorModule.removeAccumulator(acc3Id, pair);
       expect(await accumulatorModule.getAccumulator(acc3Id)).toBe(null);
     }, 60000);
 

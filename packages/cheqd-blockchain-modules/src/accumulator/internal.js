@@ -7,8 +7,8 @@ import {
   CheqdCreateResource,
   CheqdAccumulatorPublicKey,
 } from '@docknetwork/credential-sdk/types';
-import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
-import { stringToU8a } from '@docknetwork/credential-sdk/utils';
+import { TypedUUID, option } from '@docknetwork/credential-sdk/types/generic';
+import { stringToU8a, u8aToString } from '@docknetwork/credential-sdk/utils';
 import { VBWitnessUpdateInfo } from '@docknetwork/credential-sdk/crypto';
 import {
   injectParams,
@@ -120,18 +120,26 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
       return null;
     }
 
-    const { accumulator } = CheqdStoredAccumulator.from(
-      validateResource(
-        await this.resource(did, ids[ids.length - 1]),
-        String(name),
-        Type,
+    const acc = option(CheqdStoredAccumulator).from(
+      JSON.parse(
+        u8aToString(
+          validateResource(
+            await this.resource(did, ids[ids.length - 1]),
+            String(name),
+            Type,
+          ),
+        ),
       ),
     );
+
+    if (acc == null) {
+      return null;
+    }
 
     return new CheqdAccumulatorWithUpdateInfo(
       ids[0],
       ids[ids.length - 1],
-      accumulator,
+      acc.accumulator,
     );
   }
 

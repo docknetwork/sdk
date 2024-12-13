@@ -2,6 +2,7 @@ import { DockAPI } from "@docknetwork/dock-blockchain-api";
 import {
   DockAccumulatorId,
   DockAccumulatorPublicKey,
+  DockAccumulatorCommon,
   DockDid,
 } from "@docknetwork/credential-sdk/types";
 import {
@@ -43,6 +44,7 @@ describe("AccumulatorModule", () => {
       DID: DockDid,
       PublicKey: DockAccumulatorPublicKey,
       AccumulatorId: DockAccumulatorId,
+      AccumulatorCommon: DockAccumulatorCommon,
     }
   );
 
@@ -57,6 +59,7 @@ describe("AccumulatorModule", () => {
       DID: DockDid,
       PublicKey: DockAccumulatorPublicKey,
       AccumulatorId: DockAccumulatorId,
+      AccumulatorCommon: DockAccumulatorCommon,
     }
   );
 });

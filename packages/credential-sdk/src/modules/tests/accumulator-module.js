@@ -52,121 +52,12 @@ export default function generateAccumulatorTests(
     let pk1Id;
     const accumState = new InMemoryState();
 
-    test('Init DID', async () => {
+    test('Prefill', async () => {
       await didModule.createDocument(
         DIDDocument.create(did, [pair.didKey()]),
         pair,
       );
-    });
 
-    test('Can create/update all types of accumulators', async () => {
-      const pkId = await accumulatorModule.nextPublicKeyId(did);
-      const acc1Id = AccumulatorId.random(did);
-
-      await accumulatorModule.addPositiveAccumulator(
-        acc1Id,
-        hexToU8a('0xff'),
-        [did, pkId],
-        pair,
-      );
-
-      let queriedAccum = await accumulatorModule.getAccumulator(acc1Id);
-
-      expect(queriedAccum.accumulator.value.toJSON()).toEqual(
-        new AccumulatorCommon(hexToU8a('0xff'), [did, pkId]).toJSON(),
-      );
-
-      await accumulatorModule.updatePositiveAccumulator(
-        acc1Id,
-        hexToU8a('0xfa'),
-        {
-          additions: [hexToU8a('0xfe')],
-          removals: [hexToU8a('0xde')],
-          witnessUpdateInfo: hexToU8a('0xef'),
-        },
-        [did, pkId],
-        pair,
-      );
-
-      queriedAccum = await accumulatorModule.getAccumulator(acc1Id);
-
-      expect(queriedAccum.accumulator.value.toJSON()).toEqual(
-        new AccumulatorCommon(hexToU8a('0xfa'), [did, pkId]).toJSON(),
-      );
-
-      const acc2Id = AccumulatorId.random(did);
-
-      await accumulatorModule.addKBUniversalAccumulator(
-        acc2Id,
-        hexToU8a('0xff'),
-        [did, pkId],
-        pair,
-      );
-
-      queriedAccum = await accumulatorModule.getAccumulator(acc2Id);
-
-      expect(queriedAccum.accumulator.value.toJSON()).toEqual(
-        new AccumulatorCommon(hexToU8a('0xff'), [did, pkId]).toJSON(),
-      );
-
-      await accumulatorModule.updateKBUniversalAccumulator(
-        acc2Id,
-        hexToU8a('0xfa'),
-        {
-          additions: [hexToU8a('0xfe')],
-          removals: [hexToU8a('0xde')],
-          witnessUpdateInfo: hexToU8a('0xef'),
-        },
-        [did, pkId],
-        pair,
-      );
-
-      queriedAccum = await accumulatorModule.getAccumulator(acc2Id);
-
-      expect(queriedAccum.accumulator.value.toJSON()).toEqual(
-        new AccumulatorCommon(hexToU8a('0xfa'), [did, pkId]).toJSON(),
-      );
-
-      const acc3Id = AccumulatorId.random(did);
-
-      await accumulatorModule.addUniversalAccumulator(
-        acc3Id,
-        hexToU8a('0xff'),
-        [did, pkId],
-        10,
-        pair,
-      );
-
-      queriedAccum = await accumulatorModule.getAccumulator(acc3Id);
-
-      expect(queriedAccum.accumulator.value.common.toJSON()).toEqual(
-        new AccumulatorCommon(hexToU8a('0xff'), [did, pkId]).toJSON(),
-      );
-
-      await accumulatorModule.updateUniversalAccumulator(
-        acc3Id,
-        hexToU8a('0xfa'),
-        {
-          additions: [hexToU8a('0xfe')],
-          removals: [hexToU8a('0xde')],
-          witnessUpdateInfo: hexToU8a('0xef'),
-        },
-        [did, pkId],
-        10,
-        pair,
-      );
-
-      queriedAccum = await accumulatorModule.getAccumulator(acc3Id);
-
-      expect(queriedAccum.accumulator.value.common.toJSON()).toEqual(
-        new AccumulatorCommon(hexToU8a('0xfa'), [did, pkId]).toJSON(),
-      );
-
-      await accumulatorModule.removeAccumulator(acc3Id, pair);
-      expect(await accumulatorModule.getAccumulator(acc3Id)).toBe(null);
-    }, 60000);
-
-    test('Prefill', async () => {
       const label = stringToHex('accumulator-params-label');
       const params = Accumulator.generateParams(hexToU8a(label));
       const bytes1 = u8aToHex(params.bytes);
@@ -209,6 +100,112 @@ export default function generateAccumulatorTests(
 
       expect(queriedAccum.accumulated.value).toEqual(accumulated);
     });
+
+    test('Can create/update all types of accumulators', async () => {
+      const acc1Id = AccumulatorId.random(did);
+
+      await accumulatorModule.addPositiveAccumulator(
+        acc1Id,
+        hexToU8a('0xff'),
+        [did, pk1Id],
+        pair,
+      );
+
+      let queriedAccum = await accumulatorModule.getAccumulator(acc1Id);
+
+      expect(queriedAccum.accumulator.value.toJSON()).toEqual(
+        new AccumulatorCommon(hexToU8a('0xff'), [did, pk1Id]).toJSON(),
+      );
+
+      await accumulatorModule.updatePositiveAccumulator(
+        acc1Id,
+        hexToU8a('0xfa'),
+        {
+          additions: [hexToU8a('0xfe')],
+          removals: [hexToU8a('0xde')],
+          witnessUpdateInfo: hexToU8a('0xef'),
+        },
+        [did, pk1Id],
+        pair,
+      );
+
+      queriedAccum = await accumulatorModule.getAccumulator(acc1Id);
+
+      expect(queriedAccum.accumulator.value.toJSON()).toEqual(
+        new AccumulatorCommon(hexToU8a('0xfa'), [did, pk1Id]).toJSON(),
+      );
+
+      const acc2Id = AccumulatorId.random(did);
+
+      await accumulatorModule.addKBUniversalAccumulator(
+        acc2Id,
+        hexToU8a('0xff'),
+        [did, pk1Id],
+        pair,
+      );
+
+      queriedAccum = await accumulatorModule.getAccumulator(acc2Id);
+
+      expect(queriedAccum.accumulator.value.toJSON()).toEqual(
+        new AccumulatorCommon(hexToU8a('0xff'), [did, pk1Id]).toJSON(),
+      );
+
+      await accumulatorModule.updateKBUniversalAccumulator(
+        acc2Id,
+        hexToU8a('0xfa'),
+        {
+          additions: [hexToU8a('0xfe')],
+          removals: [hexToU8a('0xde')],
+          witnessUpdateInfo: hexToU8a('0xef'),
+        },
+        [did, pk1Id],
+        pair,
+      );
+
+      queriedAccum = await accumulatorModule.getAccumulator(acc2Id);
+
+      expect(queriedAccum.accumulator.value.toJSON()).toEqual(
+        new AccumulatorCommon(hexToU8a('0xfa'), [did, pk1Id]).toJSON(),
+      );
+
+      const acc3Id = AccumulatorId.random(did);
+
+      await accumulatorModule.addUniversalAccumulator(
+        acc3Id,
+        hexToU8a('0xff'),
+        [did, pk1Id],
+        10,
+        pair,
+      );
+
+      queriedAccum = await accumulatorModule.getAccumulator(acc3Id);
+
+      expect(queriedAccum.accumulator.value.common.toJSON()).toEqual(
+        new AccumulatorCommon(hexToU8a('0xff'), [did, pk1Id]).toJSON(),
+      );
+
+      await accumulatorModule.updateUniversalAccumulator(
+        acc3Id,
+        hexToU8a('0xfa'),
+        {
+          additions: [hexToU8a('0xfe')],
+          removals: [hexToU8a('0xde')],
+          witnessUpdateInfo: hexToU8a('0xef'),
+        },
+        [did, pk1Id],
+        10,
+        pair,
+      );
+
+      queriedAccum = await accumulatorModule.getAccumulator(acc3Id);
+
+      expect(queriedAccum.accumulator.value.common.toJSON()).toEqual(
+        new AccumulatorCommon(hexToU8a('0xfa'), [did, pk1Id]).toJSON(),
+      );
+
+      await accumulatorModule.removeAccumulator(acc3Id, pair);
+      expect(await accumulatorModule.getAccumulator(acc3Id)).toBe(null);
+    }, 60000);
 
     test('Witness creation, verification should work', async () => {
       let queriedAccum = await accumulatorModule.getAccumulator(

@@ -1,24 +1,27 @@
-import { TypedMap, option } from '@docknetwork/credential-sdk/types/generic';
+import { TypedMap } from '@docknetwork/credential-sdk/types/generic';
 import {
-  stringToU8a,
-  maybeToJSONString,
-  u8aToString,
   withExtendedStaticProperties,
-  withExtendedPrototypeProperties,
+  u8aToString,
 } from '@docknetwork/credential-sdk/utils';
-import { CheqdParamsId, CheqdCreateResource } from '@docknetwork/credential-sdk/types';
+import {
+  CheqdParamsId,
+  CheqdCreateResource,
+} from '@docknetwork/credential-sdk/types';
 import createInternalCheqdModule from './create-internal-cheqd-module';
+import { validateResource } from './resource';
 
 const methods = {
-  addParams: (id, params, did) => new CheqdCreateResource(
-    did.value.value,
-    id,
-    '1.0',
-    [],
-    'OffchainParams',
-    'offchain-signature-params',
-    stringToU8a(maybeToJSONString(params)),
-  ),
+  addParams(id, params, did) {
+    return new CheqdCreateResource(
+      did.value.value,
+      id,
+      '1.0',
+      [],
+      this.constructor.ParamsName,
+      this.constructor.ParamsType,
+      this.constructor.Params.from(params).toJSONStringBytes(),
+    );
+  },
 };
 
 export default function injectParams(klass) {
@@ -26,6 +29,12 @@ export default function injectParams(klass) {
 
   const obj = {
     [name]: class extends createInternalCheqdModule(methods, klass) {
+      constructor(...args) {
+        super(...args);
+
+        this.filterParamsMetadata = this.filterParamsMetadata.bind(this);
+      }
+
       static get MsgNames() {
         const names = super.MsgNames ?? {};
 
@@ -52,10 +61,16 @@ export default function injectParams(klass) {
        * @returns {Promise<Params>}
        */
       async getParams(did, id) {
+        const { ParamsName, ParamsType } = this.constructor;
         const item = await this.resource(did, id);
+        if (item == null) {
+          return null;
+        }
 
-        return option(this.constructor.Params).from(
-          item && JSON.parse(u8aToString(item.resource.data)),
+        return this.constructor.Params.from(
+          JSON.parse(
+            u8aToString(validateResource(item, ParamsName, ParamsType)),
+          ),
         );
       }
 
@@ -65,17 +80,30 @@ export default function injectParams(klass) {
        * @returns {Promise<Map<CheqdParamsId, Params>>}
        */
       async getAllParamsByDid(did) {
-        const resources = await this.resourcesBy(did, this.filterParamsMetadata);
+        const { ParamsMap, ParamsName, ParamsType } = this.constructor;
+        const resources = await this.resourcesBy(
+          did,
+          this.filterParamsMetadata,
+        );
 
-        return new this.constructor.ParamsMap(
+        return new ParamsMap(
           [...resources].map(([key, item]) => [
             key,
-            JSON.parse(u8aToString(item.resource.data)),
+            JSON.parse(
+              u8aToString(validateResource(item, ParamsName, ParamsType)),
+            ),
           ]),
         );
+      }
+
+      filterParamsMetadata(meta) {
+        return meta.resourceType === this.constructor.ParamsType;
       }
     },
   };
 
-  return withExtendedStaticProperties(['Params'], withExtendedPrototypeProperties(['filterParamsMetadata'], obj[name]));
+  return withExtendedStaticProperties(
+    ['Params', 'ParamsName', 'ParamsType'],
+    obj[name],
+  );
 }

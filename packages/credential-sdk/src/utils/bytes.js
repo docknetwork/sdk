@@ -1,4 +1,4 @@
-import { applyToValue } from './interfaces';
+import { applyToValue, maybeToJSONString } from './interfaces';
 import { ensureBytes, ensureString, isBytes } from './type-helpers';
 
 /**
@@ -132,7 +132,9 @@ export const normalizeToU8a = (bytes) => {
   }
 
   throw new Error(
-    `Can't convert supplied value to \`Uint8Array\`: \`${bytes}\``,
+    `Can't convert supplied value to \`Uint8Array\`: \`${maybeToJSONString(
+      bytes,
+    )}\` ${bytes ? `instance of ${bytes.constructor}` : ''}`,
   );
 };
 

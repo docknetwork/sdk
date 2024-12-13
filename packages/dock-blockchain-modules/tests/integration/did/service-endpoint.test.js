@@ -175,7 +175,6 @@ describe("DID service endpoints", () => {
   });
 
   test("Remove service endpoint", async () => {
-    console.log(spId2);
     // `dockDid1` removes service endpoint of `dockDid2`
     await modules.did.dockOnly.removeServiceEndpoint(spId2, pair1);
     await expect(

@@ -56,16 +56,6 @@ class AbstractAccumulatorModule extends withAbstractParams(
     }
   }
 
-  async addPublicKey(id, publicKey, targetDid, didKeypair, params) {
-    return await super.addPublicKey(
-      id,
-      publicKey,
-      targetDid,
-      didKeypair,
-      params,
-    );
-  }
-
   /**
    * Add a positive (add-only) accumulator
    * @param id - Unique accumulator id
@@ -151,31 +141,89 @@ class AbstractAccumulatorModule extends withAbstractParams(
   }
 
   /**
-   * Update existing accumulator
-   * @param id
-   * @param newAccumulated - Accumulated value after the update
-   * @param additions
-   * @param removals
-   * @param witnessUpdateInfo
+   * Update existing positive (add-only) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
    * @param signingKeyRef - Signer's keypair reference
-   * @returns {Promise< object>}
+   * @returns {Promise<*>}
    */
-  async updateAccumulator(
+  async updatePositiveAccumulator(
     id,
-    newAccumulated,
+    accumulated,
     { additions, removals, witnessUpdateInfo },
+    publicKeyRef,
     didKeypair,
     params,
   ) {
     return await this.signAndSend(
-      await this.updateAccumulatorTx(
+      await this.updatePositiveAccumulatorTx(
         id,
-        newAccumulated,
-        {
-          additions,
-          removals,
-          witnessUpdateInfo,
-        },
+        accumulated,
+        { additions, removals, witnessUpdateInfo },
+        publicKeyRef,
+        didKeypair,
+      ),
+      params,
+    );
+  }
+
+  /**
+   * Update existing universal (supports update/remove) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
+   * @param maxSize - Maximum size of the accumulator
+   * @param signingKeyRef - Signer's keypair reference
+   * @returns {Promise<*>}
+   */
+  async updateUniversalAccumulator(
+    id,
+    accumulated,
+    { additions, removals, witnessUpdateInfo },
+    publicKeyRef,
+    maxSize,
+    didKeypair,
+    params,
+  ) {
+    return await this.signAndSend(
+      await this.updateUniversalAccumulatorTx(
+        id,
+        accumulated,
+        { additions, removals, witnessUpdateInfo },
+        publicKeyRef,
+        maxSize,
+        didKeypair,
+      ),
+      params,
+    );
+  }
+
+  /**
+   * Update existing KB universal (supports update/remove) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
+   * @param signingKeyRef - Signer's keypair reference
+   * @returns {Promise<*>}
+   */
+  async updateKBUniversalAccumulator(
+    id,
+    accumulated,
+    { additions, removals, witnessUpdateInfo },
+    publicKeyRef,
+    didKeypair,
+    params,
+  ) {
+    return await this.signAndSend(
+      await this.updateKBUniversalAccumulatorTx(
+        id,
+        accumulated,
+        { additions, removals, witnessUpdateInfo },
+        publicKeyRef,
         didKeypair,
       ),
       params,
@@ -231,7 +279,9 @@ export default withExtendedPrototypeProperties(
     'addPositiveAccumulatorTx',
     'addUniversalAccumulatorTx',
     'addKBUniversalAccumulatorTx',
-    'updateAccumulatorTx',
+    'updatePositiveAccumulatorTx',
+    'updateUniversalAccumulatorTx',
+    'updateKBUniversalAccumulatorTx',
     'removeAccumulatorTx',
     'updateWitness',
   ],

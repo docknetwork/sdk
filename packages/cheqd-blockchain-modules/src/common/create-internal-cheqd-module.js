@@ -104,16 +104,22 @@ export default function createInternalCheqdModule(
         this.apiProvider = apiProvider;
       }
 
-      async resourcesBy(did, cond) {
+      async resources(did, ids) {
         const strDid = CheqdDid.from(did).toEncodedString();
-        const metas = await this.resourcesMetadataBy(did, cond);
 
-        const queries = metas.map(async (meta) => [
-          meta.id,
-          await this.apiProvider.sdk.querier.resource.resource(strDid, meta.id),
+        const queries = [...ids].map(async (id) => [
+          id,
+          await this.apiProvider.sdk.querier.resource.resource(strDid, id),
         ]);
 
         return new Map(await filterNoResourceError(Promise.all(queries)));
+      }
+
+      async resourcesBy(did, cond) {
+        return await this.resources(
+          did,
+          (await this.resourcesMetadataBy(did, cond)).map((meta) => meta.id),
+        );
       }
 
       async resource(did, id) {

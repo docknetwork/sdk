@@ -1,5 +1,15 @@
-import { TypedStruct, TypedNumber } from '../generic';
-import { DockAccumulatorPublicKeyRef } from './keys';
+import {
+  TypedStruct,
+  TypedNumber,
+  option,
+  ArrayOfByteArrays,
+  ByteArray,
+  TypedUUID,
+} from '../generic';
+import {
+  DockAccumulatorPublicKeyRef,
+  CheqdAccumulatorPublicKeyRef,
+} from './keys';
 import { createAccumulatorVariants } from './variants';
 
 export const [
@@ -36,4 +46,49 @@ export class DockAccumulatorWithUpdateInfo extends TypedStruct {
   get keyRef() {
     return this.accumulator.value.keyRef;
   }
+}
+
+export const [
+  CheqdAccumulatorCommon,
+  CheqdAccumulator,
+  CheqdUniversalAccumulator,
+  CheqdKBUniversalAccumulator,
+  CheqdPositiveAccumulator,
+] = createAccumulatorVariants(CheqdAccumulatorPublicKeyRef);
+
+export class CheqdAccumulatorWithUpdateInfo extends TypedStruct {
+  static Classes = {
+    createdAt: TypedUUID,
+    lastUpdatedAt: TypedUUID,
+    accumulator: CheqdAccumulator,
+  };
+
+  get created() {
+    return this.createdAt;
+  }
+
+  get lastModified() {
+    return this.lastUpdatedAt;
+  }
+
+  get type() {
+    return this.accumulator.type;
+  }
+
+  get accumulated() {
+    return this.accumulator.value.accumulated;
+  }
+
+  get keyRef() {
+    return this.accumulator.value.keyRef;
+  }
+}
+
+export class CheqdStoredAccumulator extends TypedStruct {
+  static Classes = {
+    accumulator: CheqdAccumulator,
+    additions: option(ArrayOfByteArrays),
+    removals: option(ArrayOfByteArrays),
+    witnessUpdateInfo: option(ByteArray),
+  };
 }

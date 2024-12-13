@@ -16,7 +16,6 @@ export class MultiApiCoreModules extends AbstractCoreModules {
 
     return {
       ...super.ModuleMap,
-      AccumulatorModule: { key: 'accumulator', optional: true },
       TrustRegistryModule: { key: 'trustRegistry', optional: true },
     };
   }
@@ -45,13 +44,15 @@ export class MultiApiCoreModules extends AbstractCoreModules {
 
   attachModule(prop, { key, optional }, [modules]) {
     return super.attachModule(prop, { key, optional }, [
-      modules.map(({ [key]: module }) => {
-        if (module == null && !optional) {
-          throw new Error(`\`${prop}\` module is missing`);
-        }
+      modules
+        .map(({ [key]: module }) => {
+          if (module == null && !optional) {
+            throw new Error(`\`${prop}\` module is missing`);
+          }
 
-        return module;
-      }).filter(Boolean),
+          return module;
+        })
+        .filter(Boolean),
     ]);
   }
 }

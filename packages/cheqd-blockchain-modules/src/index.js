@@ -1,4 +1,5 @@
 import { AbstractCoreModules } from '@docknetwork/credential-sdk/modules';
+import CheqdAccumulatorModule from './accumulator/module';
 import CheqdAttestModule from './attest/module';
 import CheqdBlobModule from './blob/module';
 import CheqdDIDModule from './did/module';
@@ -12,10 +13,11 @@ export class CheqdCoreModules extends AbstractCoreModules {
   static get ModuleMap() {
     return {
       ...super.ModuleMap,
-      AccumulatorModule: { key: 'accumulator', optional: true },
       TrustRegistryModule: { key: 'trustRegistry', optional: true },
     };
   }
+
+  static AccumulatorModule = CheqdAccumulatorModule;
 
   static AttestModule = CheqdAttestModule;
 
@@ -37,11 +39,11 @@ export class CheqdCoreModules extends AbstractCoreModules {
 }
 
 export {
+  CheqdAccumulatorModule,
   CheqdAttestModule,
   CheqdDIDModule,
   CheqdBlobModule,
   CheqdOffchainSignaturesModule,
-  // CheqdAccumulatorModule,
   CheqdBBSModule,
   CheqdBBSPlusModule,
   CheqdPSModule,

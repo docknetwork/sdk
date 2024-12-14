@@ -1,7 +1,12 @@
 import { withQualifier, TypedTuple, TypedNumber } from '../../generic';
-import { NamespaceDid } from '../onchain/typed-did';
+import {
+  NamespaceDid,
+  CheqdNamespaceDid,
+  CheqdTestnetDid,
+  CheqdMainnetDid,
+} from '../onchain/typed-did';
 
-export default class VerificationMethodRef extends withQualifier(TypedTuple) {
+export class VerificationMethodRef extends withQualifier(TypedTuple) {
   static Qualifier = '';
 
   static Classes = [NamespaceDid, TypedNumber];
@@ -35,4 +40,16 @@ export default class VerificationMethodRef extends withQualifier(TypedTuple) {
   toJSON() {
     return this.toEncodedString();
   }
+}
+
+export class CheqdVerificationMethodRef extends VerificationMethodRef {
+  static Classes = [CheqdNamespaceDid, TypedNumber];
+}
+
+export class CheqdTestnetVerificationMethodRef extends CheqdVerificationMethodRef {
+  static Classes = [CheqdTestnetDid, TypedNumber];
+}
+
+export class CheqdMainnetVerificationMethodRef extends CheqdVerificationMethodRef {
+  static Classes = [CheqdMainnetDid, TypedNumber];
 }

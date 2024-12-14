@@ -1,0 +1,24 @@
+{
+  "name": "@docknetwork/migration",
+  "private": true,
+  "type": "module",
+  "version": "0.6.3",
+  "scripts": {
+    "migrate": "babel-node index.js"
+  },
+  "dependencies": {
+    "@docknetwork/credential-sdk": "0.17.0",
+    "@docknetwork/dock-blockchain-api": "0.8.3",
+    "@docknetwork/cheqd-blockchain-api": "0.14.2",
+    "@docknetwork/dock-blockchain-modules": "0.9.3"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^8.0.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jest": "^26.0.0",
+    "eslint-plugin-sonarjs": "0.5.0",
+    "eslint-plugin-unused-imports": "^3.0.0"
+  }
+}

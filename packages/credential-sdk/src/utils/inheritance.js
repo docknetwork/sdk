@@ -141,7 +141,7 @@ export const isEqualToOrPrototypeOf = (proto, obj) =>
 export const ensureEqualToOrPrototypeOf = (proto, obj) => {
   if (!isEqualToOrPrototypeOf(proto, obj)) {
     throw new Error(
-      `Expected ${proto.name} to be equal to or a prototype of ${obj.name}`
+      `Expected \`${proto.name}\` to be equal to or a prototype of \`${obj.name}\``
     );
   }
 

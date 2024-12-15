@@ -9,7 +9,9 @@ async function main() {
   await dock.init({ address: "wss://mainnet-node.dock.io" });
   const didMigration = new DIDMigration(dock, cheqd);
 
-  await didMigration.run();
+  for await (const tx of didMigration.txs()) {
+    console.log("Tx");
+  }
 }
 
 main().catch(console.error);

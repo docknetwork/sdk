@@ -6,6 +6,7 @@ import {
   CheqdTestnetDid,
   CheqdTestnetDIDDocument,
 } from "@docknetwork/credential-sdk/types";
+import plimit from "p-limit";
 
 export default class DIDMigration {
   constructor(dock, cheqd) {
@@ -17,7 +18,7 @@ export default class DIDMigration {
     ]);
   }
 
-  async run() {
+  async *txs(concurrent = 10) {
     const { module, dock } = this;
 
     const dids = await dock.api.query.didModule.dids.keys();
@@ -25,14 +26,25 @@ export default class DIDMigration {
 
     console.log(`Total DIDs count: ${parsedDids.length}`);
 
-    for (const did of parsedDids) {
-      const document = await module.getDocument(did);
-      console.log(String(CheqdTestnetDid.from));
-      const cheqdDid = CheqdTestnetDid.from(did);
+    const limit = plimit(concurrent);
 
-      console.log(`${did} => ${cheqdDid}`);
-      document.alsoKnownAs.push(did);
-      console.log(document.toCheqd(void 0, CheqdTestnetDIDDocument).toJSON());
+    const txs = parsedDids.map((did) =>
+      limit(async () => {
+        const document = await module.getDocument(did);
+        const cheqdDid = CheqdTestnetDid.from(did);
+
+        document.alsoKnownAs.push(did);
+        const cheqdDoc = document.toCheqd(void 0, CheqdTestnetDIDDocument);
+
+        console.log(`${did} => ${cheqdDid}`);
+        console.log(cheqdDoc.toJSON());
+
+        return await module.createDocumentTx(cheqdDoc);
+      })
+    );
+
+    for (const tx of txs) {
+      yield await tx;
     }
   }
 }

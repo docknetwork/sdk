@@ -7,10 +7,11 @@
     "migrate": "babel-node index.js"
   },
   "dependencies": {
+    "@docknetwork/cheqd-blockchain-api": "0.14.2",
     "@docknetwork/credential-sdk": "0.17.0",
     "@docknetwork/dock-blockchain-api": "0.8.3",
-    "@docknetwork/cheqd-blockchain-api": "0.14.2",
-    "@docknetwork/dock-blockchain-modules": "0.9.3"
+    "@docknetwork/dock-blockchain-modules": "0.9.3",
+    "p-limit": "^6.1.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",

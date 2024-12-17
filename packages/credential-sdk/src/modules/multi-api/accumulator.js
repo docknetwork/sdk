@@ -250,10 +250,14 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
     );
   }
 
-  async getPublicKey(did, id) {
+  async getPublicKey(did, id, includeParams) {
     const parsedDid = NamespaceDid.from(did);
 
-    return await this.moduleById(parsedDid).getPublicKey(parsedDid, id);
+    return await this.moduleById(parsedDid).getPublicKey(
+      parsedDid,
+      id,
+      includeParams,
+    );
   }
 
   /**
@@ -261,10 +265,10 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
    * @param {*} did
    * @returns {Promise<Map<*, AccumulatorPublicKey>>}
    */
-  async getAllPublicKeysByDid(did) {
+  async getAllPublicKeysByDid(did, includeParams) {
     const id = NamespaceDid.from(did);
 
-    return await this.moduleById(id).getAllPublicKeysByDid(did);
+    return await this.moduleById(id).getAllPublicKeysByDid(did, includeParams);
   }
 
   async addPublicKeyTx(...args) {

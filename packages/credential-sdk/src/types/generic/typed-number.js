@@ -12,6 +12,10 @@ class TypedNumber extends withBase(class NumberBase {}) {
       throw new Error(
         `Invalid number provided: \`${value}\`, parsed as \`${num}\` by \`${this.constructor.name}\``,
       );
+    } else if (!Number.isSafeInteger(num)) {
+      throw new Error(
+        `Number must be a safe integer, received: \`${num}\` by \`${this.constructor.name}\``,
+      );
     }
 
     this.value = num;

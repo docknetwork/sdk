@@ -94,7 +94,10 @@ export default function injectPublicKeys(klass) {
 
         return new PublicKeyMap(
           await Promise.all(
-            metas.map(({ id }) => this.getPublicKey(did, id, includeParams)),
+            metas.map(async ({ id }) => [
+              id,
+              await this.getPublicKey(did, id, includeParams),
+            ]),
           ),
         );
       }

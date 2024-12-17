@@ -5,6 +5,7 @@ import {
   DockDidValue,
   DockOffchainSignatureParamsRef,
   DockParamsId,
+  DockPublicKeyId,
 } from '@docknetwork/credential-sdk/types';
 import {
   AddOffchainSignatureParams,
@@ -76,14 +77,14 @@ export default class DockInternalOffchainSignaturesModule extends injectParams(
   async keysCounter(did) {
     const parsedDid = DockDidOrDidMethodKey.from(did);
 
-    const { data: { lastKeyId } } = await this.didModule.getOnchainDidDetail(
-      parsedDid,
-    );
+    const {
+      data: { lastKeyId },
+    } = await this.didModule.getOnchainDidDetail(parsedDid);
 
     return lastKeyId;
   }
 
   async lastPublicKeyId(did) {
-    return await this.keysCounter(did);
+    return DockPublicKeyId.from(await this.keysCounter(did));
   }
 }

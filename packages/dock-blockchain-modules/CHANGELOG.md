@@ -1,5 +1,16 @@
 # @docknetwork/dock-blockchain-modules
 
+## 0.11.0
+
+### Minor Changes
+
+- Fix unresolved imports
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.19.0
+
 ## 0.10.0
 
 ### Minor Changes

@@ -45,7 +45,7 @@ export const u8aToHex = (bytes) => `0x${Buffer.from(ensureBytes(bytes)).toString
  * @param {number} length
  * @returns {Uint8Array}
  */
-export const randomAsU8a = (length) => Uint8Array.from({ length }, () => (Math.random() * 255) | 0); // eslint-disable-line no-bitwise
+export const randomAsU8a = (length) => Uint8Array.from({ length }, () => Math.floor(Math.random() * 256) | 0); // eslint-disable-line no-bitwise
 
 /**
  * Creates random hex string of supplied byte length.

@@ -129,3 +129,4 @@ export class CheqdOffchainSignaturePublicKey extends withProp(
 
 export * from './value';
 export * from './ref';
+export * from './id';

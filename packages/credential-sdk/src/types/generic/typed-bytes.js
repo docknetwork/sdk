@@ -18,7 +18,7 @@ class TypedBytes extends withBase(ArrayWithoutPrototypeMethods) {
   }
 
   get value() {
-    return u8aToHex(this.bytes);
+    return this.toHex();
   }
 
   get bytes() {
@@ -26,7 +26,6 @@ class TypedBytes extends withBase(ArrayWithoutPrototypeMethods) {
   }
 
   set(bytes) {
-    this.length = 0;
     this.length = bytes.length;
 
     for (let i = 0; i < bytes.length; i++) {
@@ -50,7 +49,7 @@ class TypedBytes extends withBase(ArrayWithoutPrototypeMethods) {
   }
 
   toHex() {
-    return u8aToHex(this.bytes);
+    return u8aToHex(this);
   }
 
   toJSON() {

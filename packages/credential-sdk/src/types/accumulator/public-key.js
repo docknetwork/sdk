@@ -6,7 +6,7 @@ import {
   CurveType,
   CurveTypeBls12381,
 } from '../offchain-signatures/curve-type';
-import { DockAccumulatorParamsRef } from './keys';
+import { CheqdAccumulatorParamsRef, DockAccumulatorParamsRef } from './keys';
 import { AccumulatorParams } from './params';
 
 export class AccumulatorPublicKey extends TypedStruct {
@@ -57,4 +57,10 @@ export class DockAccumulatorPublicKey extends withProp(
   AccumulatorPublicKey,
   'paramsRef',
   option(DockAccumulatorParamsRef),
+) {}
+
+export class CheqdAccumulatorPublicKey extends withProp(
+  AccumulatorPublicKey,
+  'paramsRef',
+  option(CheqdAccumulatorParamsRef),
 ) {}

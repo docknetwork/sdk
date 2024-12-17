@@ -22,3 +22,4 @@ export { default as Any } from './typed-any';
 export { default as withBase58 } from './with-base58';
 export { default as withBase64 } from './with-base64';
 export { default as withBase58btc } from './with-base58btc';
+export * from './utils';

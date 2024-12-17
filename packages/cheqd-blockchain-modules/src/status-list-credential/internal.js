@@ -3,15 +3,21 @@ import {
   CheqdCreateResource,
 } from '@docknetwork/credential-sdk/types';
 import { StatusList2021Credential } from '@docknetwork/credential-sdk/vc';
-import { option, TypedUUID } from '@docknetwork/credential-sdk/types/generic';
-import { stringToU8a, maybeToJSONString, u8aToString } from '@docknetwork/credential-sdk/utils';
-import { createInternalCheqdModule } from '../common';
+import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
+import {
+  stringToU8a,
+  maybeToJSONStringBytes,
+  u8aToString,
+} from '@docknetwork/credential-sdk/utils';
+import { createInternalCheqdModule, validateResource } from '../common';
 
 const Type = 'status-list-credential';
 
 const methods = {
   create: (statusListCredentialId, rawStatusListCredential) => {
-    const [did, id] = CheqdStatusListCredentialId.from(statusListCredentialId).value;
+    const [did, id] = CheqdStatusListCredentialId.from(
+      statusListCredentialId,
+    ).value;
 
     return new CheqdCreateResource(
       did.value.value,
@@ -20,11 +26,15 @@ const methods = {
       [],
       String(id),
       Type,
-      stringToU8a(maybeToJSONString(StatusList2021Credential.fromJSON(rawStatusListCredential))),
+      maybeToJSONStringBytes(
+        StatusList2021Credential.fromJSON(rawStatusListCredential),
+      ),
     );
   },
   update: (statusListCredentialId, statusListCredential) => {
-    const [did, id] = CheqdStatusListCredentialId.from(statusListCredentialId).value;
+    const [did, id] = CheqdStatusListCredentialId.from(
+      statusListCredentialId,
+    ).value;
 
     return new CheqdCreateResource(
       did.value.value,
@@ -33,11 +43,15 @@ const methods = {
       [],
       String(id),
       Type,
-      stringToU8a(maybeToJSONString(StatusList2021Credential.fromJSON(statusListCredential))),
+      maybeToJSONStringBytes(
+        StatusList2021Credential.fromJSON(statusListCredential),
+      ),
     );
   },
   remove: (statusListCredentialId) => {
-    const [did, id] = CheqdStatusListCredentialId.from(statusListCredentialId).value;
+    const [did, id] = CheqdStatusListCredentialId.from(
+      statusListCredentialId,
+    ).value;
 
     return new CheqdCreateResource(
       did.value.value,
@@ -74,11 +88,24 @@ export default class CheqdInternalStatusListCredentialModule extends createInter
   async statusListCredential(statusListCredentialId) {
     const credId = CheqdStatusListCredentialId.from(statusListCredentialId);
 
-    const [did, _] = credId.value;
-    const item = await this.resource(did, await this.lastStatusListCredentialId(credId));
-
-    return option(StatusList2021Credential).fromJSON(
-      item && JSON.parse(u8aToString(item.resource.data)),
+    const [did, name] = credId.value;
+    const versionId = await this.lastStatusListCredentialId(credId);
+    if (versionId == null) {
+      return null;
+    }
+    const json = JSON.parse(
+      u8aToString(
+        validateResource(
+          await this.resource(did, versionId),
+          String(name),
+          Type,
+        ),
+      ),
     );
+    if (json == null) {
+      return null;
+    }
+
+    return StatusList2021Credential.fromJSON(json);
   }
 }

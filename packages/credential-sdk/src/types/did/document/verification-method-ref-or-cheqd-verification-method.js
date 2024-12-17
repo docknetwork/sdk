@@ -1,10 +1,10 @@
-import { VerificationMethodRef } from "./verification-method-ref";
+import { VerificationMethodRef } from './verification-method-ref';
 import {
   CheqdMainnetVerificationMethod,
   CheqdTestnetVerificationMethod,
   CheqdVerificationMethod,
-} from "./verification-method";
-import { withFrom } from "../../generic";
+} from './verification-method';
+import { withFrom } from '../../generic';
 
 export default class VerificationMethodRefOrCheqdVerificationMethod extends withFrom(
   VerificationMethodRef,
@@ -16,7 +16,7 @@ export default class VerificationMethodRefOrCheqdVerificationMethod extends with
         }
 
         static from(obj) {
-          return typeof obj === "string"
+          return typeof obj === 'string'
             ? super.fromJSON(JSON.parse(JSON.parse(obj)))
             : super.from(obj);
         }
@@ -24,7 +24,7 @@ export default class VerificationMethodRefOrCheqdVerificationMethod extends with
     } catch (err) {
       return from(value);
     }
-  }
+  },
 ) {
   static Base = CheqdVerificationMethod;
 }

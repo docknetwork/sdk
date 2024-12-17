@@ -87,8 +87,8 @@ class TypedArray extends withBase(ArrayWithoutPrototypeMethods) {
 
   diff(other) {
     return {
-      added: this.filter((item) => other.every((curItem) => !curItem.eq(item))),
-      removed: other.filter((item) => this.every((nextItem) => !nextItem.eq(item))),
+      added: this.filter((item) => other.every((curItem) => !maybeEq(curItem, item))),
+      removed: other.filter((item) => this.every((nextItem) => !maybeEq(nextItem, item))),
     };
   }
 }

@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.18.0
+
+### Minor Changes
+
+- `Accumulator` module for `cheqd`
+
 ## 0.17.0
 
 ### Minor Changes

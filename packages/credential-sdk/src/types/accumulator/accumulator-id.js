@@ -13,7 +13,7 @@ export class AccumulatorId extends withFrom(
   (value, from) => {
     try {
       // eslint-disable-next-line no-use-before-define
-      return DockAccumulatorId.from(value);
+      return from(DockAccumulatorIdValue.from(value));
     } catch {
       return from(value);
     }

@@ -1,6 +1,13 @@
-import { CheqdDid, Iri, CheqdCreateResource } from '@docknetwork/credential-sdk/types';
-import { TypedUUID, option } from '@docknetwork/credential-sdk/types/generic';
-import { createInternalCheqdModule } from '../common';
+import {
+  CheqdDid,
+  Iri,
+  CheqdCreateResource,
+} from '@docknetwork/credential-sdk/types';
+import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
+import { createInternalCheqdModule, validateResource } from '../common';
+
+const Name = 'Attestation';
+const Type = 'attest';
 
 const methods = {
   setClaim: (iri, targetDid) => new CheqdCreateResource(
@@ -8,8 +15,8 @@ const methods = {
     TypedUUID.random(),
     '1.0',
     [],
-    'Attestation',
-    'attest',
+    Name,
+    Type,
     Iri.from(iri),
   ),
 };
@@ -22,8 +29,8 @@ export default class CheqdInternalAttestModule extends createInternalCheqdModule
   };
 
   async attest(did, attestId) {
-    return option(Iri).from(
-      (await this.resource(did, attestId))?.resource?.data,
+    return Iri.from(
+      validateResource(await this.resource(did, attestId), Name, Type),
     );
   }
 

@@ -4,15 +4,27 @@
  * @param {T} value
  * @returns {object}
  */
-export const maybeToJSON = (value) => (value && typeof value.toJSON === 'function' ? value.toJSON() : JSON.parse(JSON.stringify(value)));
+export const maybeToJSON = (value) => (typeof value?.toJSON === 'function'
+  ? value.toJSON()
+  : JSON.parse(JSON.stringify(value)));
 
 /**
- * Attempts to call `value.toJSON()` and stringify the result, returns `String(value)` in case of failure.
+ * Stringifies the provided value converted to JSON.
  * @template T
  * @param {T} value
  * @returns {string}
  */
 export const maybeToJSONString = (value) => JSON.stringify(maybeToJSON(value));
+
+/**
+ * Returns bytes of the value converted to a stringified JSON.
+ * @template T
+ * @param {T} value
+ * @returns {string}
+ */
+export const maybeToJSONStringBytes = (value) => (typeof value?.maybeToJSONStringBytes === 'function'
+  ? value.toJSONStringBytes()
+  : Uint8Array.from(Buffer.from(maybeToJSONString(value))));
 
 /**
  * Attempts to compare two values using `value.eq(other)`, returns `boolean`.
@@ -21,7 +33,7 @@ export const maybeToJSONString = (value) => JSON.stringify(maybeToJSON(value));
  * @param {T} other
  * @returns {boolean}
  */
-export const maybeEq = (value, other) => (value && typeof value.eq === 'function' ? value.eq(other) : value === other);
+export const maybeEq = (value, other) => (typeof value?.eq === 'function' ? value.eq(other) : value === other);
 
 /**
  * Attempts to call `value.toHuman()` or `value.toJSON`, returns `value` if methods don't exist.
@@ -37,7 +49,7 @@ export const maybeToHuman = (obj) => (obj && typeof obj.toHuman === 'function' ?
  * @param {T} value
  * @returns {number}
  */
-export const maybeToNumber = (value) => (value && typeof value.toNumber === 'function' ? value.toNumber() : +value);
+export const maybeToNumber = (value) => (typeof value?.toNumber === 'function' ? value.toNumber() : +value);
 
 /**
  * Marks function that it can't be used as a constructor.

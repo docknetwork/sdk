@@ -381,10 +381,11 @@ for (const {
         );
 
         const accumulated = u8aToHex(accumulator.accumulated);
-        await modules.accumulator.updateAccumulator(
+        await modules.accumulator.updatePositiveAccumulator(
           accumulatorId,
           accumulated,
           { additions: [u8aToHex(encodedAttrs[attributeCount - 1])] },
+          [accumulatorManagerDid, 1],
           accumulatorManagerKeypair
         );
 
@@ -434,13 +435,14 @@ for (const {
           [],
           accumulatorKeypair.secretKey
         );
-        await modules.accumulator.updateAccumulator(
+        await modules.accumulator.updatePositiveAccumulator(
           accumulatorId,
           u8aToHex(accumulator.accumulated),
           {
             additions: [u8aToHex(member1), u8aToHex(member2)],
             witnessUpdateInfo: u8aToHex(witnessUpdInfo.value),
           },
+          [accumulatorManagerDid, 1],
           accumulatorManagerKeypair
         );
 
@@ -526,7 +528,7 @@ for (const {
           [member1, member2],
           accumulatorKeypair.secretKey
         );
-        await modules.accumulator.updateAccumulator(
+        await modules.accumulator.updatePositiveAccumulator(
           accumulatorId,
           u8aToHex(accumulator.accumulated),
           {
@@ -534,6 +536,7 @@ for (const {
             removals: [u8aToHex(member1), u8aToHex(member2)],
             witnessUpdateInfo: u8aToHex(witnessUpdInfo.value),
           },
+          [accumulatorManagerDid, 1],
           accumulatorManagerKeypair
         );
 
@@ -556,7 +559,7 @@ for (const {
           [member4],
           accumulatorKeypair.secretKey
         );
-        await modules.accumulator.updateAccumulator(
+        await modules.accumulator.updatePositiveAccumulator(
           accumulatorId,
           u8aToHex(accumulator.accumulated),
           {
@@ -564,6 +567,7 @@ for (const {
             removals: [u8aToHex(member4)],
             witnessUpdateInfo: u8aToHex(witnessUpdInfo.value),
           },
+          [accumulatorManagerDid, 1],
           accumulatorManagerKeypair
         );
 
@@ -587,7 +591,7 @@ for (const {
           [],
           accumulatorKeypair.secretKey
         );
-        await modules.accumulator.updateAccumulator(
+        await modules.accumulator.updatePositiveAccumulator(
           accumulatorId,
           u8aToHex(accumulator.accumulated),
           {
@@ -599,6 +603,7 @@ for (const {
             removals: [],
             witnessUpdateInfo: u8aToHex(witnessUpdInfo.value),
           },
+          [accumulatorManagerDid, 1],
           accumulatorManagerKeypair
         );
 
@@ -638,7 +643,7 @@ for (const {
               accumulatorId,
               blockNo
             );
-          console.log("!!!!", updates);
+
           const wi = new VBWitnessUpdateInfo(
             updates[0].witnessUpdateInfo.bytes
           );
@@ -689,7 +694,7 @@ for (const {
           [encodedAttrs[attributeCount - 1]],
           accumulatorKeypair.secretKey
         );
-        await modules.accumulator.updateAccumulator(
+        await modules.accumulator.updatePositiveAccumulator(
           accumulatorId,
           u8aToHex(accumulator.accumulated),
           {
@@ -697,6 +702,7 @@ for (const {
             removals: [u8aToHex(encodedAttrs[attributeCount - 1])],
             witnessUpdateInfo: u8aToHex(witnessUpdInfo.value),
           },
+          [accumulatorManagerDid, 1],
           accumulatorManagerKeypair
         );
       });

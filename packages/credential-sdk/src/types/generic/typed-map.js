@@ -1,4 +1,9 @@
-import { maybeEq, maybeFrom, maybeToJSON } from '../../utils/interfaces';
+import {
+  maybeEq,
+  maybeFrom,
+  maybeToJSON,
+  maybeToJSONString,
+} from '../../utils/interfaces';
 import { withExtendedStaticProperties } from '../../utils/inheritance';
 import withBase from './with-base';
 import withCatchNull from './with-catch-null';
@@ -21,7 +26,7 @@ class TypedMap extends withBase(Map) {
 
   keyAsKeyClass(key) {
     const asKeyClass = maybeFrom(this.constructor.KeyClass, key);
-    const strKey = JSON.stringify(maybeToJSON(asKeyClass));
+    const strKey = maybeToJSONString(asKeyClass);
 
     if (this.keysAsKeyClass.has(strKey)) {
       return this.keysAsKeyClass.get(strKey);

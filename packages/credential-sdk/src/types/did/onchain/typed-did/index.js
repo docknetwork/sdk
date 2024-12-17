@@ -1,15 +1,15 @@
-import { sha256 } from "js-sha256";
-import { DidMethodKeyPublicKey, DidMethodKeySignature } from "./did-method-key";
-import DockDidValue, { DockDidSignature } from "./dock-did-value";
+import { sha256 } from 'js-sha256';
+import { DidMethodKeyPublicKey, DidMethodKeySignature } from './did-method-key';
+import DockDidValue, { DockDidSignature } from './dock-did-value';
 import {
   TypedEnum,
   TypedTuple,
   TypedUUID,
   withQualifier,
-} from "../../../generic";
-import { CheqdMainnetDidValue, CheqdTestnetDidValue } from "./cheqd-did";
-import { valueBytes, withExtendedStaticProperties } from "../../../../utils";
-import DidOrDidMethodKeySignature from "./signature";
+} from '../../../generic';
+import { CheqdMainnetDidValue, CheqdTestnetDidValue } from './cheqd-did';
+import { valueBytes, withExtendedStaticProperties } from '../../../../utils';
+import DidOrDidMethodKeySignature from './signature';
 
 export class DockDidOrDidMethodKey extends withQualifier(TypedEnum, true) {
   /**
@@ -54,7 +54,7 @@ export class DockDidOrDidMethodKey extends withQualifier(TypedEnum, true) {
   async changeState(api, method, name, payload, keyRef) {
     return await method(
       payload,
-      await this.signStateChange(api, name, payload, keyRef)
+      await this.signStateChange(api, name, payload, keyRef),
     );
   }
 
@@ -147,7 +147,7 @@ export class NamespaceDid extends withQualifier(TypedEnum, true) {
     return super.from(
       value instanceof DockDidOrDidMethodKey && value.isDid
         ? { dock: value.asDid }
-        : value
+        : value,
     );
   }
 }
@@ -160,15 +160,15 @@ export class CheqdDid extends withQualifier(TypedEnum, true) {
   static random(network) {
     if (this.Class != null) {
       return new this(this.Class.random());
-    } else if (network === "testnet") {
+    } else if (network === 'testnet') {
       // eslint-disable-next-line no-use-before-define
       return CheqdTestnetDid.random();
-    } else if (network === "mainnet") {
+    } else if (network === 'mainnet') {
       // eslint-disable-next-line no-use-before-define
       return CheqdMainnetDid.random();
     } else {
       throw new Error(
-        `Unknown network provided: \`${network}\`, expected \`mainnet\` or \`testnet\``
+        `Unknown network provided: \`${network}\`, expected \`mainnet\` or \`testnet\``,
       );
     }
   }
@@ -181,34 +181,34 @@ export class CheqdDid extends withQualifier(TypedEnum, true) {
 export class CheqdTestnetDid extends CheqdDid {
   static Class = CheqdTestnetDidValue;
 
-  static Type = "testnet";
+  static Type = 'testnet';
 }
 export class CheqdMainnetDid extends CheqdDid {
   static Class = CheqdMainnetDidValue;
 
-  static Type = "mainnet";
+  static Type = 'mainnet';
 }
 
 CheqdDid.bindVariants(CheqdTestnetDid, CheqdMainnetDid);
 
 export class DockNamespaceDid extends NamespaceDid {
-  static Qualifier = "did:dock:";
+  static Qualifier = 'did:dock:';
 
-  static Type = "dock";
+  static Type = 'dock';
 
   static Class = DockDidValueToString;
 }
 export class DidNamespaceKey extends NamespaceDid {
-  static Qualifier = "did:key:";
+  static Qualifier = 'did:key:';
 
-  static Type = "didMethodKey";
+  static Type = 'didMethodKey';
 
   static Class = DidMethodKeyPublicKeyToString;
 }
 export class CheqdNamespaceDid extends NamespaceDid {
-  static Qualifier = "did:cheqd:";
+  static Qualifier = 'did:cheqd:';
 
-  static Type = "cheqd";
+  static Type = 'cheqd';
 
   static Class = CheqdDid;
 }
@@ -221,7 +221,7 @@ for (const Class of [CheqdTestnetDid, CheqdMainnetDid]) {
   Class.from = function from(value) {
     if (value instanceof DockDid || value instanceof DockNamespaceDid) {
       return new this(
-        TypedUUID.fromBytesAdapt(sha256.digest(valueBytes(value)))
+        TypedUUID.fromBytesAdapt(sha256.digest(valueBytes(value))),
       );
     } else {
       return fromFn.call(this, value);
@@ -230,10 +230,10 @@ for (const Class of [CheqdTestnetDid, CheqdMainnetDid]) {
 }
 
 export class DidRef extends withExtendedStaticProperties(
-  ["Ident"],
-  withQualifier(TypedTuple)
+  ['Ident'],
+  withQualifier(TypedTuple),
 ) {
-  static Qualifier = "";
+  static Qualifier = '';
 
   static get Classes() {
     return [NamespaceDid, this.Ident];
@@ -276,8 +276,8 @@ export class DidRef extends withExtendedStaticProperties(
 
 DidOrDidMethodKeySignature.bindVariants(
   DockDidSignature,
-  DidMethodKeySignature
+  DidMethodKeySignature,
 );
 
 export { DockDidValue, DidMethodKeyPublicKey };
-export * from "./cheqd-did";
+export * from './cheqd-did';

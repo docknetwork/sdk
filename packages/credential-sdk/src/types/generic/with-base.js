@@ -1,3 +1,4 @@
+import { stringToU8a, u8aToString } from '../../utils';
 import {
   withExtendedStaticProperties,
   withExtendedPrototypeProperties,
@@ -44,6 +45,8 @@ export default function withBase(klass) {
           return obj;
         } else if (Object.getPrototypeOf(obj) === Object.getPrototypeOf({})) {
           return this.fromJSON(obj);
+        } else if (obj instanceof Uint8Array) {
+          return this.fromJSON(JSON.parse(u8aToString(obj)));
         } else {
           return this.fromApi(obj);
         }
@@ -55,6 +58,22 @@ export default function withBase(klass) {
        */
       toJSON() {
         throw new Error('Unimplemented');
+      }
+
+      /**
+       * Converts the instance to a stringified JSON representation.
+       * @returns {string} The JSON representation of the instance.
+       */
+      toJSONString() {
+        return JSON.stringify(this.toJSON());
+      }
+
+      /**
+       * Converts the instance to bytes of the stringified JSON representation.
+       * @returns {Uint8Array} The JSON representation of the instance.
+       */
+      toJSONStringBytes() {
+        return stringToU8a(this.toJSONString());
       }
 
       /**

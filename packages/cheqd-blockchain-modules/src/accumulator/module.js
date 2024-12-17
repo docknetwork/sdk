@@ -1,19 +1,18 @@
 /* eslint-disable camelcase */
 
 import {
-  DockAccumulatorWithUpdateInfo,
-  DockAccumulatorCommon,
-  DockKBUniversalAccumulator,
-  DockUniversalAccumulator,
-  DockPositiveAccumulator,
+  CheqdAccumulatorWithUpdateInfo,
+  CheqdAccumulatorCommon,
+  CheqdKBUniversalAccumulator,
+  CheqdUniversalAccumulator,
+  CheqdPositiveAccumulator,
   AccumulatorParams,
-  DockAccumulatorPublicKey,
-  DockAccumulatorIdIdent,
+  CheqdAccumulatorPublicKey,
 } from '@docknetwork/credential-sdk/types';
 import { option, withProp } from '@docknetwork/credential-sdk/types/generic';
 import { AbstractAccumulatorModule } from '@docknetwork/credential-sdk/modules/abstract';
-import DockInternalAccumulatorModule from './internal';
-import { injectDock, withParams, withPublicKeys } from '../common';
+import CheqdInternalAccumulatorModule from './internal';
+import { injectCheqd, withParams, withPublicKeys } from '../common';
 
 export const AccumulatorType = {
   VBPos: 0,
@@ -22,10 +21,10 @@ export const AccumulatorType = {
 };
 
 /** Class to manage accumulators on chain */
-export default class DockAccumulatorModule extends withParams(
-  withPublicKeys(injectDock(AbstractAccumulatorModule)),
+export default class CheqdAccumulatorModule extends withParams(
+  withPublicKeys(injectCheqd(AbstractAccumulatorModule)),
 ) {
-  static DockOnly = DockInternalAccumulatorModule;
+  static CheqdOnly = CheqdInternalAccumulatorModule;
 
   /**
    * Add a positive (add-only) accumulator
@@ -38,10 +37,10 @@ export default class DockAccumulatorModule extends withParams(
    * @returns {Promise<*>}
    */
   async addPositiveAccumulatorTx(id, accumulated, publicKeyRef, didKeypair) {
-    return await this.dockOnly.tx.addAccumulator(
+    return await this.cheqdOnly.tx.addAccumulator(
       id,
-      new DockPositiveAccumulator(
-        new DockAccumulatorCommon(accumulated, publicKeyRef),
+      new CheqdPositiveAccumulator(
+        new CheqdAccumulatorCommon(accumulated, publicKeyRef),
       ),
       didKeypair,
     );
@@ -65,11 +64,11 @@ export default class DockAccumulatorModule extends withParams(
     maxSize,
     didKeypair,
   ) {
-    return await this.dockOnly.tx.addAccumulator(
+    return await this.cheqdOnly.tx.addAccumulator(
       id,
-      new DockUniversalAccumulator(
-        new DockUniversalAccumulator.Class(
-          new DockAccumulatorCommon(accumulated, publicKeyRef),
+      new CheqdUniversalAccumulator(
+        new CheqdUniversalAccumulator.Class(
+          new CheqdAccumulatorCommon(accumulated, publicKeyRef),
           maxSize,
         ),
       ),
@@ -88,10 +87,10 @@ export default class DockAccumulatorModule extends withParams(
    * @returns {Promise<*>}
    */
   async addKBUniversalAccumulatorTx(id, accumulated, publicKeyRef, didKeypair) {
-    return await this.dockOnly.tx.addAccumulator(
+    return await this.cheqdOnly.tx.addAccumulator(
       id,
-      new DockKBUniversalAccumulator(
-        new DockAccumulatorCommon(accumulated, publicKeyRef),
+      new CheqdKBUniversalAccumulator(
+        new CheqdAccumulatorCommon(accumulated, publicKeyRef),
       ),
       didKeypair,
     );
@@ -111,17 +110,15 @@ export default class DockAccumulatorModule extends withParams(
     id,
     accumulated,
     { additions, removals, witnessUpdateInfo },
-    _publicKeyRef,
+    publicKeyRef,
     didKeypair,
   ) {
-    return await this.dockOnly.tx.updateAccumulator(
+    return await this.cheqdOnly.tx.updateAccumulator(
       id,
-      accumulated,
-      {
-        additions,
-        removals,
-        witnessUpdateInfo,
-      },
+      new CheqdPositiveAccumulator(
+        new CheqdAccumulatorCommon(accumulated, publicKeyRef),
+      ),
+      { additions, removals, witnessUpdateInfo },
       didKeypair,
     );
   }
@@ -137,23 +134,23 @@ export default class DockAccumulatorModule extends withParams(
    * @param signingKeyRef - Signer's keypair reference
    * @returns {Promise<*>}
    */
-  // eslint-disable-next-line sonarjs/no-identical-functions
   async updateUniversalAccumulatorTx(
     id,
     accumulated,
     { additions, removals, witnessUpdateInfo },
-    _publicKeyRef,
-    _maxSize,
+    publicKeyRef,
+    maxSize,
     didKeypair,
   ) {
-    return await this.dockOnly.tx.updateAccumulator(
+    return await this.cheqdOnly.tx.updateAccumulator(
       id,
-      accumulated,
-      {
-        additions,
-        removals,
-        witnessUpdateInfo,
-      },
+      new CheqdUniversalAccumulator(
+        new CheqdUniversalAccumulator.Class(
+          new CheqdAccumulatorCommon(accumulated, publicKeyRef),
+          maxSize,
+        ),
+      ),
+      { additions, removals, witnessUpdateInfo },
       didKeypair,
     );
   }
@@ -168,22 +165,19 @@ export default class DockAccumulatorModule extends withParams(
    * @param signingKeyRef - Signer's keypair reference
    * @returns {Promise<*>}
    */
-  // eslint-disable-next-line sonarjs/no-identical-functions
   async updateKBUniversalAccumulatorTx(
     id,
     accumulated,
     { additions, removals, witnessUpdateInfo },
-    _publicKeyRef,
+    publicKeyRef,
     didKeypair,
   ) {
-    return await this.dockOnly.tx.updateAccumulator(
+    return await this.cheqdOnly.tx.updateAccumulator(
       id,
-      accumulated,
-      {
-        additions,
-        removals,
-        witnessUpdateInfo,
-      },
+      new CheqdKBUniversalAccumulator(
+        new CheqdAccumulatorCommon(accumulated, publicKeyRef),
+      ),
+      { additions, removals, witnessUpdateInfo },
       didKeypair,
     );
   }
@@ -196,7 +190,7 @@ export default class DockAccumulatorModule extends withParams(
    * @returns {Promise<*>}
    */
   async removeAccumulatorTx(id, didKeypair) {
-    return await this.dockOnly.tx.removeAccumulator(id, didKeypair);
+    return await this.cheqdOnly.tx.removeAccumulator(id, didKeypair);
   }
 
   /**
@@ -211,22 +205,20 @@ export default class DockAccumulatorModule extends withParams(
    */
   async getAccumulator(id, includePublicKey = false, includeParams = false) {
     const PublicKey = includeParams
-      ? withProp(DockAccumulatorPublicKey, 'params', option(AccumulatorParams))
-      : DockAccumulatorPublicKey;
+      ? withProp(CheqdAccumulatorPublicKey, 'params', option(AccumulatorParams))
+      : CheqdAccumulatorPublicKey;
     const Accumulator = includePublicKey
-      ? withProp(DockAccumulatorWithUpdateInfo, 'publicKey', option(PublicKey))
-      : DockAccumulatorWithUpdateInfo;
+      ? withProp(CheqdAccumulatorWithUpdateInfo, 'publicKey', option(PublicKey))
+      : CheqdAccumulatorWithUpdateInfo;
 
-    const acc = option(Accumulator).from(
-      await this.dockOnly.query.accumulators(DockAccumulatorIdIdent.from(id)),
-    );
-
+    const acc = option(Accumulator).from(await this.cheqdOnly.accumulator(id));
     if (acc == null) {
       return null;
-    }
-
-    if (includePublicKey) {
-      acc.publicKey = await this.getPublicKey(...acc.keyRef, includeParams);
+    } else if (includePublicKey) {
+      acc.publicKey = await this.getPublicKey(
+        ...acc.accumulator.keyRef,
+        includeParams,
+      );
     }
 
     return acc;
@@ -239,12 +231,12 @@ export default class DockAccumulatorModule extends withParams(
    * @param accumulatorId
    * @param member
    * @param witness - this will be updated to the latest witness
-   * @param startBlock - identifier to start from (block number or collection item id)
-   * @param endBlock - identifier to end in (block number or collection item id)
+   * @param start - identifier to start from (collection item id)
+   * @param end - identifier to end in (collection item id)
    * @returns {Promise<void>}
    */
   async updateWitness(accumulatorId, member, witness, start, end) {
-    return await this.dockOnly.updateVbAccumulatorWitnessFromUpdatesInBlocks(
+    return await this.cheqdOnly.updateVbAccumulatorWitnessFromUpdatesInBlocks(
       accumulatorId,
       member,
       witness,

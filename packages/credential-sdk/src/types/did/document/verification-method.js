@@ -5,7 +5,7 @@ import {
   TypedBytes,
   option,
   TypedString,
-} from "../../generic";
+} from '../../generic';
 import {
   BBDT16PublicKey,
   BBDT16PublicKeyValue,
@@ -15,12 +15,12 @@ import {
   BBSPublicKeyValue,
   PSPublicKey,
   PSPublicKeyValue,
-} from "../../offchain-signatures";
+} from '../../offchain-signatures';
 import {
   PublicKeyEd25519,
   PublicKeySecp256k1,
   PublicKeySr25519,
-} from "../../public-keys";
+} from '../../public-keys';
 import {
   EcdsaSecp256k1VerKeyName,
   Ed255192020VerKeyName,
@@ -30,29 +30,27 @@ import {
   Bls12381BBS23DockVerKeyName,
   Bls12381PSDockVerKeyName,
   Bls12381BBDT16DockVerKeyName,
-} from "../../../vc/crypto";
+} from '../../../vc/crypto';
 import {
   Ed25519Verification2018Method,
   Ed25519Verification2020Method,
   VerificationMethodType,
-} from "./verification-method-type";
-import VerificationMethodRef from "./verification-method-ref";
-import { NamespaceDid } from "../onchain/typed-did";
+} from './verification-method-type';
+import VerificationMethodRef from './verification-method-ref';
+import { NamespaceDid } from '../onchain/typed-did';
 import {
   fmtIter,
   valueBytes,
   filterObj,
   maybeToCheqdPayloadOrJSON,
-} from "../../../utils";
+} from '../../../utils';
 
 export class PublicKeyBase58 extends withBase58(TypedBytes) {}
 
 // eslint-disable-next-line no-use-before-define
-export class VerificationMethod extends withFrom(TypedStruct, (value, from) =>
-  value instanceof CheqdVerificationMethod
-    ? value.toVerificationMethod()
-    : from(value)
-) {
+export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (value instanceof CheqdVerificationMethod
+  ? value.toVerificationMethod()
+  : from(value))) {
   static Classes = {
     id: VerificationMethodRef,
     type: VerificationMethodType,
@@ -65,27 +63,27 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) =>
 
   isOffchain() {
     return !(
-      this.type instanceof Ed25519Verification2018Method ||
-      this.type instanceof Ed25519Verification2020Method
+      this.type instanceof Ed25519Verification2018Method
+      || this.type instanceof Ed25519Verification2020Method
     );
   }
 
   publicKey() {
     const bytes = (
-      this.publicKeyBase58 ||
-      this.publicKeyBase64 ||
-      this.publicKeyJwk ||
-      this.publicKeyHex
+      this.publicKeyBase58
+      || this.publicKeyBase64
+      || this.publicKeyJwk
+      || this.publicKeyHex
     )?.bytes;
 
     if (bytes == null) {
       throw new Error(
         `Expected either of ${fmtIter([
-          "publicKeyBase58",
-          "publicKeyBase64",
-          "publicKeyJwk",
-          "publicKeyHex",
-        ])} to be specified`
+          'publicKeyBase58',
+          'publicKeyBase64',
+          'publicKeyJwk',
+          'publicKeyHex',
+        ])} to be specified`,
       );
     }
 
@@ -118,7 +116,7 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) =>
       ref,
       didKey.publicKey.constructor.VerKeyType,
       ref[0],
-      valueBytes(didKey.publicKey)
+      valueBytes(didKey.publicKey),
     );
   }
 
@@ -128,7 +126,7 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) =>
       this.id,
       this.controller,
       this.type,
-      valueBytes(this.publicKey())
+      valueBytes(this.publicKey()),
     );
   }
 
@@ -139,10 +137,9 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) =>
 
 export class CheqdVerificationMethod extends withFrom(
   TypedStruct,
-  (value, from) =>
-    value instanceof VerificationMethod
-      ? from(value.toCheqdVerificationMethod())
-      : from(value)
+  (value, from) => (value instanceof VerificationMethod
+    ? from(value.toCheqdVerificationMethod())
+    : from(value)),
 ) {
   static Classes = {
     id: VerificationMethodRef,
@@ -153,8 +150,8 @@ export class CheqdVerificationMethod extends withFrom(
 
   isOffchain() {
     return !(
-      this.verificationMethodType instanceof Ed25519Verification2018Method ||
-      this.verificationMethodType instanceof Ed25519Verification2020Method
+      this.verificationMethodType instanceof Ed25519Verification2018Method
+      || this.verificationMethodType instanceof Ed25519Verification2020Method
     );
   }
 
@@ -163,7 +160,7 @@ export class CheqdVerificationMethod extends withFrom(
       this.id,
       this.verificationMethodType,
       this.controller,
-      this.verificationMaterial
+      this.verificationMaterial,
     );
   }
 }
@@ -171,12 +168,12 @@ export class CheqdVerificationMethod extends withFrom(
 export class CheqdVerificationMethodAssertion extends CheqdVerificationMethod {
   toCheqdPayload() {
     return JSON.stringify(
-      JSON.stringify(this.apply(maybeToCheqdPayloadOrJSON))
+      JSON.stringify(this.apply(maybeToCheqdPayloadOrJSON)),
     );
   }
 
   static from(obj) {
-    return typeof obj === "string"
+    return typeof obj === 'string'
       ? super.fromJSON(JSON.parse(JSON.parse(obj)))
       : super.from(obj);
   }

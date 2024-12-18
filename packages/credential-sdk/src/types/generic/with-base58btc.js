@@ -1,6 +1,6 @@
-import withFrom from "./with-from";
-import { decodeFromBase58btc, encodeAsBase58btc } from "../../utils/base-x";
-import { withExtendedStaticProperties } from "../../utils/inheritance";
+import withFrom from './with-from';
+import { decodeFromBase58btc, encodeAsBase58btc } from '../../utils/base-x';
+import { withExtendedStaticProperties } from '../../utils/inheritance';
 
 export default function withBase58btc(klass) {
   const name = `withBase58btc(${klass.name})`;
@@ -36,9 +36,7 @@ export default function withBase58btc(klass) {
   };
 
   return withExtendedStaticProperties(
-    ["Prefix"],
-    withFrom(obj[name], (value, from) =>
-      typeof value === "string" ? this.fromBase58btc(value) : from(value)
-    )
+    ['Prefix'],
+    withFrom(obj[name], (value, from) => (typeof value === 'string' ? this.fromBase58btc(value) : from(value))),
   );
 }

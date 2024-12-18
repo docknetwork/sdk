@@ -1,12 +1,12 @@
-import TypedBytes from "./typed-bytes";
+import TypedBytes from './typed-bytes';
 import {
   withExtendedStaticProperties,
   withExtendedPrototypeProperties,
-} from "../../utils/inheritance";
-import { maybeFrom } from "../../utils/interfaces";
-import withFrom from "./with-from";
-import { fmtIter } from "../../utils";
-import TypedString from "./typed-string";
+} from '../../utils/inheritance';
+import { maybeFrom } from '../../utils/interfaces';
+import withFrom from './with-from';
+import { fmtIter } from '../../utils';
+import TypedString from './typed-string';
 
 /**
  * Extends supplied class.

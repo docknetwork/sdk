@@ -1,4 +1,4 @@
-import withFrom from "./with-from";
+import withFrom from './with-from';
 import {
   decodeFromBase58,
   encodeAsBase58,
@@ -6,8 +6,8 @@ import {
   u8aToString,
   stringToU8a,
   maybeToJSONString,
-} from "../../utils";
-import TypedEnum from "./typed-enum";
+} from '../../utils';
+import TypedEnum from './typed-enum';
 
 export default function withBase58(klass) {
   const name = `withBase58(${klass.name})`;
@@ -70,6 +70,6 @@ export default function withBase58(klass) {
   }
 
   return withFrom(res, function from(value, fromFn) {
-    return typeof value === "string" ? this.fromBase58(value) : fromFn(value);
+    return typeof value === 'string' ? this.fromBase58(value) : fromFn(value);
   });
 }

@@ -1,8 +1,8 @@
-import { withQualifier, TypedTuple, TypedNumber } from "../../generic";
-import { NamespaceDid } from "../onchain/typed-did";
+import { withQualifier, TypedTuple, TypedNumber } from '../../generic';
+import { NamespaceDid } from '../onchain/typed-did';
 
 export default class VerificationMethodRef extends withQualifier(TypedTuple) {
-  static Qualifier = "";
+  static Qualifier = '';
 
   static Classes = [NamespaceDid, TypedNumber];
 

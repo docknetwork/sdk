@@ -1,25 +1,25 @@
-import { AbstractApiProvider } from "@docknetwork/credential-sdk/modules/abstract/common";
+import { AbstractApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
 import {
   maybeToJSONString,
   fmtIter,
   extendNull,
-} from "@docknetwork/credential-sdk/utils";
+} from '@docknetwork/credential-sdk/utils';
 import {
   DIDModule,
   ResourceModule,
   createCheqdSDK,
   CheqdNetwork,
-} from "@cheqd/sdk";
+} from '@cheqd/sdk';
 import {
   MsgCreateDidDocPayload,
   MsgUpdateDidDocPayload,
   MsgDeactivateDidDocPayload,
   protobufPackage as didProtobufPackage,
-} from "@cheqd/ts-proto/cheqd/did/v2/index.js";
+} from '@cheqd/ts-proto/cheqd/did/v2/index.js';
 import {
   MsgCreateResourcePayload,
   protobufPackage as resourceProtobufPackage,
-} from "@cheqd/ts-proto/cheqd/resource/v2/index.js";
+} from '@cheqd/ts-proto/cheqd/resource/v2/index.js';
 import {
   DidRef,
   NamespaceDid,
@@ -29,9 +29,9 @@ import {
   CheqdCreateResource,
   CheqdDIDDocument,
   CheqdDeactivateDidDocument,
-} from "@docknetwork/credential-sdk/types";
-import { TypedEnum } from "@docknetwork/credential-sdk/types/generic";
-import { maybeToCheqdPayloadOrJSON } from "../../credential-sdk/src/utils";
+} from '@docknetwork/credential-sdk/types';
+import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
+import { maybeToCheqdPayloadOrJSON } from '../../credential-sdk/src/utils';
 
 export class CheqdAPI extends AbstractApiProvider {
   /**
@@ -86,11 +86,11 @@ export class CheqdAPI extends AbstractApiProvider {
     if (network !== CheqdNetwork.Mainnet && network !== CheqdNetwork.Testnet) {
       throw new Error(
         `Invalid network provided: \`${network}\`, expected one of \`${fmtIter(
-          Object.values(CheqdNetwork)
-        )}\``
+          Object.values(CheqdNetwork),
+        )}\``,
       );
     } else if (wallet == null) {
-      throw new Error("`wallet` must be provided");
+      throw new Error('`wallet` must be provided');
     }
 
     this.ensureNotInitialized();
@@ -137,7 +137,7 @@ export class CheqdAPI extends AbstractApiProvider {
     const { [method]: Payloads } = this.constructor.Payloads;
     if (Payloads == null) {
       throw new Error(
-        `Can't find payload constructor for the provided method \`${method}\``
+        `Can't find payload constructor for the provided method \`${method}\``,
       );
     }
     const [TypedPayload, Payload] = Payloads;
@@ -150,7 +150,7 @@ export class CheqdAPI extends AbstractApiProvider {
       return Payload.encode(sdkPayload).finish();
     } catch (err) {
       throw new Error(
-        `Failed to encode payload \`${maybeToJSONString(sdkPayload)}\`: ${err}`
+        `Failed to encode payload \`${maybeToJSONString(sdkPayload)}\`: ${err}`,
       );
     }
   }
@@ -176,16 +176,15 @@ export class CheqdAPI extends AbstractApiProvider {
       throw new Error(`No payload wrapper found for \`${typeUrl}\``);
     }
 
-    const sender =
-      from ?? (await this.sdk.options.wallet.getAccounts())[0].address;
+    const sender = from ?? (await this.sdk.options.wallet.getAccounts())[0].address;
     const payment = {
       amount: [amount],
-      gas: "3600000", // TODO: dynamically calculate needed amount
+      gas: '3600000', // TODO: dynamically calculate needed amount
       payer: sender,
     };
 
     const txJSON = maybeToCheqdPayloadOrJSON(
-      PayloadWrapper.from(JSON.parse(JSON.stringify(tx.toJSON())))
+      PayloadWrapper.from(JSON.parse(JSON.stringify(tx.toJSON()))),
     );
     txJSON.typeUrl = `/${prefix}.${typeUrl}`;
 
@@ -193,16 +192,14 @@ export class CheqdAPI extends AbstractApiProvider {
       sender,
       [txJSON],
       payment,
-      memo ?? ""
+      memo ?? '',
     );
 
     if (res.code) {
       console.error(res);
 
       throw new Error(
-        JSON.stringify(res, (_, value) =>
-          typeof value === "bigint" ? `${value.toString()}n` : value
-        )
+        JSON.stringify(res, (_, value) => (typeof value === 'bigint' ? `${value.toString()}n` : value)),
       );
     }
 
@@ -210,7 +207,7 @@ export class CheqdAPI extends AbstractApiProvider {
   }
 
   methods() {
-    return ["cheqd"];
+    return ['cheqd'];
   }
 
   supportsIdentifier(id) {

@@ -1,4 +1,4 @@
-import { maybeToJSONString, maybeToNumber } from "../../../utils";
+import { maybeToJSONString, maybeToNumber } from '../../../utils';
 import {
   TypedStruct,
   TypedString,
@@ -7,13 +7,13 @@ import {
   createPlaceholder,
   TypedMap,
   Any,
-} from "../../generic";
+} from '../../generic';
 
 const LinkedDomainsPlaceholder = createPlaceholder((value) => {
   if (
-    +maybeToNumber(value) === 0b0001 ||
-    String(value) === "LinkedDomains" ||
-    value == null
+    +maybeToNumber(value) === 0b0001
+    || String(value) === 'LinkedDomains'
+    || value == null
   ) {
     return 0b0001;
   } else {
@@ -35,9 +35,10 @@ export class ServiceEndpointType extends TypedEnum {
   }
 }
 export class LinkedDomains extends ServiceEndpointType {
-  static Type = "LinkedDomains";
+  static Type = 'LinkedDomains';
 
   static Class = LinkedDomainsPlaceholder;
+
   toJSON() {
     return this.constructor.Type;
   }

@@ -1,5 +1,11 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 0.16.0
+
+### Minor Changes
+
+- Remove debug code
+
 ## 0.15.0
 
 ### Minor Changes

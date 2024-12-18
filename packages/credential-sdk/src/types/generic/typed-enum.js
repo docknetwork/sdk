@@ -1,19 +1,19 @@
 /* eslint-disable  max-classes-per-file */
-import { fmtIter } from '../../utils/generic';
+import { fmtIter } from "../../utils/generic";
 import {
   isEqualToOrPrototypeOf,
   withExtendedStaticProperties,
-} from '../../utils/inheritance';
+} from "../../utils/inheritance";
 import {
   maybeEq,
   maybeFrom,
   maybeNew,
   maybeToJSON,
-} from '../../utils/interfaces';
-import withBase from './with-base';
-import Null from './typed-null';
-import withCatchNull from './with-catch-null';
-import withEq from './with-eq';
+} from "../../utils/interfaces";
+import withBase from "./with-base";
+import Null from "./typed-null";
+import withCatchNull from "./with-catch-null";
+import withEq from "./with-eq";
 
 /**
  * @template V
@@ -176,18 +176,14 @@ class TypedEnum extends withBase(class EnumBase {}) {
     return this[this.type];
   }
 
-  /**
-   * Convert the instance to a JSON representation.
-   * @returns {Object} The JSON representation of the instance.
-   */
-  toJSON() {
+  apply(fn) {
     if (this.constructor.isNullish) {
-      return this.constructor.JsonType;
+      return fn(this.constructor.JsonType);
     } else {
       const { type, value } = this;
 
       return {
-        [type]: maybeToJSON(value),
+        [type]: fn(value),
       };
     }
   }
@@ -196,17 +192,17 @@ class TypedEnum extends withBase(class EnumBase {}) {
   static fromJSON(json) {
     if (json == null) {
       throw new Error(
-        `Received \`null\` while object was expected by \`${this.name}\``,
+        `Received \`null\` while object was expected by \`${this.name}\``
       );
     }
-    if (typeof json === 'string' && this.isNullish) {
+    if (typeof json === "string" && this.isNullish) {
       if (this.Class != null) {
         if (this.JsonType === json || this.Type === json) {
           return maybeNew(this, []);
         }
 
         throw new Error(
-          `Unexpected json in \`${this}\`: \`${json}\`, expected \`${this.JsonType}\``,
+          `Unexpected json in \`${this}\`: \`${json}\`, expected \`${this.JsonType}\``
         );
       } else {
         for (const Variant of this.Variants) {
@@ -217,8 +213,8 @@ class TypedEnum extends withBase(class EnumBase {}) {
 
         throw new Error(
           `Unexpected json in \`${this}\`: \`${json}\`, expected one of ${fmtIter(
-            new Set([...this.Variants].flatMap((v) => [v.JsonType, v.Type])),
-          )}`,
+            new Set([...this.Variants].flatMap((v) => [v.JsonType, v.Type]))
+          )}`
         );
       }
     }
@@ -227,8 +223,8 @@ class TypedEnum extends withBase(class EnumBase {}) {
     if (keys.length !== 1) {
       throw new Error(
         `Expected object with 1 key, received \`${json}\` with keys: ${fmtIter(
-          keys,
-        )} by ${this.name}`,
+          keys
+        )} by ${this.name}`
       );
     }
     const [key] = keys;
@@ -239,7 +235,7 @@ class TypedEnum extends withBase(class EnumBase {}) {
       }
 
       throw new Error(
-        `Unexpected key \`${key}\`, expected \`${this.JsonType}\` by \`${this.name}\``,
+        `Unexpected key \`${key}\`, expected \`${this.JsonType}\` by \`${this.name}\``
       );
     } else {
       for (const Variant of this.Variants) {
@@ -250,8 +246,8 @@ class TypedEnum extends withBase(class EnumBase {}) {
 
       throw new Error(
         `Invalid key \`${key}\`, expected one of ${fmtIter(
-          new Set([...this.Variants].flatMap((v) => [v.JsonType, v.Type])),
-        )} by \`${this.name}\``,
+          new Set([...this.Variants].flatMap((v) => [v.JsonType, v.Type]))
+        )} by \`${this.name}\``
       );
     }
   }
@@ -262,7 +258,7 @@ class TypedEnum extends withBase(class EnumBase {}) {
         return maybeNew(this, [obj[this.asIdentifier]]);
       } else {
         throw new Error(
-          `Incompatible value provided: \`${obj}\` to \`${this}\``,
+          `Incompatible value provided: \`${obj}\` to \`${this}\``
         );
       }
     } else {
@@ -275,19 +271,23 @@ class TypedEnum extends withBase(class EnumBase {}) {
 
     throw new Error(
       `Invalid object received: \`${maybeToJSON(
-        obj,
+        obj
       )}\`, expected to build an instance of ${fmtIter(
-        this.Variants.map((v) => v.Type),
-      )} by \`${this.name}\``,
+        this.Variants.map((v) => v.Type)
+      )} by \`${this.name}\``
     );
   }
 
   static variant(obj) {
-    return this.Variants.find((variant) => isEqualToOrPrototypeOf(variant.Class, obj?.constructor ?? Null));
+    return this.Variants.find((variant) =>
+      isEqualToOrPrototypeOf(variant.Class, obj?.constructor ?? Null)
+    );
   }
 
   static directVariant(obj) {
-    return this.Variants.find((variant) => isEqualToOrPrototypeOf(variant, obj?.constructor ?? Null));
+    return this.Variants.find((variant) =>
+      isEqualToOrPrototypeOf(variant, obj?.constructor ?? Null)
+    );
   }
 
   static get isNullish() {
@@ -299,7 +299,7 @@ class TypedEnum extends withBase(class EnumBase {}) {
   static from(obj) {
     if (obj instanceof this) {
       return obj;
-    } else if (typeof obj === 'string' && this.isNullish) {
+    } else if (typeof obj === "string" && this.isNullish) {
       return this.fromJSON(obj);
     } else if (Object.getPrototypeOf(obj) === Object.getPrototypeOf({})) {
       return this.fromJSON(obj);
@@ -332,5 +332,5 @@ class TypedEnum extends withBase(class EnumBase {}) {
 }
 
 export default withEq(
-  withCatchNull(withExtendedStaticProperties(['Variants'], TypedEnum)),
+  withCatchNull(withExtendedStaticProperties(["Variants"], TypedEnum))
 );

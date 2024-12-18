@@ -1,4 +1,4 @@
-import TypedBytes from './typed-bytes';
+import TypedBytes from "./typed-bytes";
 
 export default class TypedBytesArray extends TypedBytes {
   get value() {
@@ -6,6 +6,10 @@ export default class TypedBytesArray extends TypedBytes {
   }
 
   toJSON() {
+    return Array.from(this);
+  }
+
+  toCheqdPayload() {
     return this.value;
   }
 }

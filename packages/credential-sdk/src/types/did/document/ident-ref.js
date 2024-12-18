@@ -1,8 +1,8 @@
-import { withQualifier, TypedTuple, TypedString } from '../../generic';
-import { NamespaceDid } from '../onchain/typed-did';
+import { withQualifier, TypedTuple, TypedString } from "../../generic";
+import { NamespaceDid } from "../onchain/typed-did";
 
 export default class IdentRef extends withQualifier(TypedTuple) {
-  static Qualifier = '';
+  static Qualifier = "";
 
   static Ident = TypedString;
 
@@ -40,7 +40,7 @@ export default class IdentRef extends withQualifier(TypedTuple) {
     return `${did}#${value}`;
   }
 
-  toJSON() {
+  toCheqdPayload() {
     return this.toString();
   }
 }

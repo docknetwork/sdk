@@ -1,4 +1,4 @@
-import { CheqdMainnetDid, CheqdTestnetDid, DidRef } from '../did';
+import { CheqdMainnetDid, CheqdTestnetDid, DidRef } from "../did";
 import {
   TypedBytes,
   TypedEnum,
@@ -6,33 +6,35 @@ import {
   sized,
   withFrom,
   withQualifier,
-} from '../generic';
+} from "../generic";
 
 export class AccumulatorId extends withFrom(
   withQualifier(TypedEnum, true),
-  (value, from) => {
+  (valueWithUncheckedPrefix, from) => {
+    const value =
+      typeof valueWithUncheckedPrefix === "string" &&
+      valueWithUncheckedPrefix.startsWith("dock:accumulator:")
+        ? `accumulator:dock:${valueWithUncheckedPrefix.slice(17)}`
+        : valueWithUncheckedPrefix;
+
     try {
       // eslint-disable-next-line no-use-before-define
       return from(DockAccumulatorIdValue.from(value));
     } catch {
       return from(value);
     }
-  },
-) {
-  static Qualifier = 'accumulator:';
-
-  toJSON() {
-    return String(this);
   }
+) {
+  static Qualifier = "accumulator:";
 }
 
 export class CheqdAccumulatorIdValue extends withQualifier(DidRef) {
-  static Qualifier = 'accumulator:cheqd:';
+  static Qualifier = "accumulator:cheqd:";
 
   static Ident = TypedUUID;
 
   static fromUnqualifiedString(str) {
-    const lastColon = str.lastIndexOf(':');
+    const lastColon = str.lastIndexOf(":");
     const did = `did:cheqd:${str.slice(0, lastColon)}`;
     const id = str.slice(lastColon + 1);
 
@@ -41,11 +43,11 @@ export class CheqdAccumulatorIdValue extends withQualifier(DidRef) {
 
   toEncodedString() {
     const { did, value } = this;
-    let prefix = '';
+    let prefix = "";
     if (did.value instanceof CheqdTestnetDid) {
-      prefix = 'testnet';
+      prefix = "testnet";
     } else if (did.value instanceof CheqdMainnetDid) {
-      prefix = 'mainnet';
+      prefix = "mainnet";
     }
 
     return `${prefix}:${did.toEncodedString()}:${value}`;
@@ -60,10 +62,11 @@ export class DockAccumulatorIdIdent extends withQualifier(
   withFrom(
     sized(TypedBytes),
     // eslint-disable-next-line no-use-before-define
-    (value, from) => (value instanceof DockAccumulatorId ? value[1] : from(value)),
-  ),
+    (value, from) =>
+      value instanceof DockAccumulatorId ? value[1] : from(value)
+  )
 ) {
-  static Qualifier = 'accumulator:dock:';
+  static Qualifier = "accumulator:dock:";
 
   static Size = 32;
 
@@ -79,7 +82,7 @@ export class DockAccumulatorIdIdent extends withQualifier(
 export class CheqdAccumulatorId extends AccumulatorId {
   static Class = CheqdAccumulatorIdValue;
 
-  static Type = 'cheqd';
+  static Type = "cheqd";
 
   static random(did) {
     return new this(this.Class.random(did));
@@ -89,7 +92,7 @@ export class CheqdAccumulatorId extends AccumulatorId {
 export class DockAccumulatorId extends AccumulatorId {
   static Class = DockAccumulatorIdIdent;
 
-  static Type = 'dock';
+  static Type = "dock";
 
   static random() {
     return new this(this.Class.random());

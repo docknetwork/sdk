@@ -3,7 +3,7 @@ import {
   withExtendedStaticProperties,
   withExtendedPrototypeProperties,
 } from '../../utils/inheritance';
-import { applyToValue, maybeEq } from '../../utils/interfaces';
+import { maybeEq, maybeToJSON } from '../../utils/interfaces';
 import withCatchNull from './with-catch-null';
 import withEq from './with-eq';
 
@@ -57,6 +57,16 @@ export default function withBase(klass) {
        * @returns {object} The JSON representation of the instance.
        */
       toJSON() {
+        return this.apply(maybeToJSON);
+      }
+
+      /**
+       * Recursively applies supplied function to the underlying values.
+       * @template T
+       * @param {function(this): T} _fn
+       * @returns {T}
+       */
+      apply(_fn) {
         throw new Error('Unimplemented');
       }
 
@@ -85,24 +95,6 @@ export default function withBase(klass) {
       }
 
       /**
-       * Applies supplied function to the underlying value if `check` returns `true`.
-       * Otherwise, attempts to do the same on the inner value.
-       *
-       * @template T
-       * @param {function(this): T} fn
-       * @returns {T}
-       */
-      applyToValue(check, fn) {
-        if (check(this)) {
-          return fn(this);
-        }
-        const { value } = this;
-        const hasValue = typeof value !== 'undefined';
-
-        return applyToValue(check, fn, value ?? this, hasValue);
-      }
-
-      /**
        * Performs an equality check against other value.
        *
        * @param {*} other
@@ -117,7 +109,7 @@ export default function withBase(klass) {
   return withExtendedStaticProperties(
     ['fromJSON', 'fromApi'],
     withExtendedPrototypeProperties(
-      ['toJSON'],
+      ['apply'],
       withEq(withCatchNull(classes[name])),
     ),
   );

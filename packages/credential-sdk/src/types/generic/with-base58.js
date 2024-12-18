@@ -1,8 +1,13 @@
-import withFrom from './with-from';
+import withFrom from "./with-from";
 import {
-  decodeFromBase58, encodeAsBase58, isEqualToOrPrototypeOf, u8aToString, stringToU8a, maybeToJSONString,
-} from '../../utils';
-import TypedEnum from './typed-enum';
+  decodeFromBase58,
+  encodeAsBase58,
+  isEqualToOrPrototypeOf,
+  u8aToString,
+  stringToU8a,
+  maybeToJSONString,
+} from "../../utils";
+import TypedEnum from "./typed-enum";
 
 export default function withBase58(klass) {
   const name = `withBase58(${klass.name})`;
@@ -17,6 +22,10 @@ export default function withBase58(klass) {
 
         toJSON() {
           return String(this);
+        }
+
+        get value() {
+          return this.toBase58();
         }
 
         static fromBase58(str) {
@@ -35,7 +44,9 @@ export default function withBase58(klass) {
       [name]: class extends klass {
         static Class = klass.Class;
 
-        static Variants = !klass.Class ? klass.Variants?.map(withBase58) : klass.Variants;
+        static Variants = !klass.Class
+          ? klass.Variants?.map(withBase58)
+          : klass.Variants;
 
         toString() {
           return this.toBase58();
@@ -58,5 +69,7 @@ export default function withBase58(klass) {
     res = obj[name];
   }
 
-  return withFrom(res, function from(value, fromFn) { return (typeof value === 'string' ? this.fromBase58(value) : fromFn(value)); });
+  return withFrom(res, function from(value, fromFn) {
+    return typeof value === "string" ? this.fromBase58(value) : fromFn(value);
+  });
 }

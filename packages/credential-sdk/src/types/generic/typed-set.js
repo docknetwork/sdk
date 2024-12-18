@@ -50,7 +50,11 @@ class TypedSet extends withBase(Set) {
   }
 
   toJSON() {
-    return [...this.values()].map(maybeToJSON).sort();
+    return this.apply(maybeToJSON).sort();
+  }
+
+  apply(fn) {
+    return [...this.values()].map(fn);
   }
 
   clear() {

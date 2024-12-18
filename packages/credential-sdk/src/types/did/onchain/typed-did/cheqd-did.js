@@ -58,6 +58,10 @@ export class CheqdDid extends withQualifier(TypedEnum, true) {
   toJSON() {
     return String(this);
   }
+
+  toCheqdPayload() {
+    return String(this);
+  }
 }
 
 export class CheqdTestnetDid extends CheqdDid {

@@ -3,12 +3,12 @@ import {
   randomAsU8a,
   u8aToHex,
   u8aToU8a,
-} from '../../utils/bytes';
-import { ensureByte } from '../../utils';
-import { ArrayWithoutPrototypeMethods } from '../../utils/generic';
-import withBase from './with-base';
-import withCatchNull from './with-catch-null';
-import withEq from './with-eq';
+} from "../../utils/bytes";
+import { ensureByte } from "../../utils";
+import { ArrayWithoutPrototypeMethods } from "../../utils/generic";
+import withBase from "./with-base";
+import withCatchNull from "./with-catch-null";
+import withEq from "./with-eq";
 
 class TypedBytes extends withBase(ArrayWithoutPrototypeMethods) {
   constructor(value) {
@@ -41,7 +41,7 @@ class TypedBytes extends withBase(ArrayWithoutPrototypeMethods) {
     // eslint-disable-next-line no-bitwise
     if (!Number.isInteger(size) || (size & 65535) !== size || !size) {
       throw new Error(
-        `Expected a natural number between 1 and 65535, received: \`${size}\``,
+        `Expected a natural number between 1 and 65535, received: \`${size}\``
       );
     }
 
@@ -53,7 +53,11 @@ class TypedBytes extends withBase(ArrayWithoutPrototypeMethods) {
   }
 
   toJSON() {
-    return this.value;
+    return this.toHex();
+  }
+
+  apply(fn) {
+    return fn(this.value);
   }
 
   static fromJSON(json) {
@@ -63,7 +67,7 @@ class TypedBytes extends withBase(ArrayWithoutPrototypeMethods) {
   static from(obj) {
     if (obj instanceof this) {
       return obj;
-    } else if (!Array.isArray(obj) && typeof obj !== 'string') {
+    } else if (!Array.isArray(obj) && typeof obj !== "string") {
       return this.fromApi(obj);
     } else {
       return new this(obj);

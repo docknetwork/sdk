@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.21.0
+
+### Minor Changes
+
+- Serialization/deserialization tweaks for `cheqd`
+
 ## 0.20.0
 
 ### Minor Changes

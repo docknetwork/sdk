@@ -5,7 +5,7 @@ import { VerificationMethodRef } from '../document';
 import { DidKeypair } from '../../../keypairs';
 
 class BytesSignatureEd25519Value extends SignatureEd25519Value {
-  toJSON() {
+  toCheqdPayload() {
     return this.bytes;
   }
 }

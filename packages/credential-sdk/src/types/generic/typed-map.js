@@ -65,9 +65,11 @@ class TypedMap extends withBase(Map) {
   }
 
   toJSON() {
-    return [...this.entries()]
-      .map(([key, value]) => [maybeToJSON(key), maybeToJSON(value)])
-      .sort(([k1], [k2]) => String(k1).localeCompare(String(k2)));
+    return this.apply(maybeToJSON).sort(([k1], [k2]) => String(k1).localeCompare(String(k2)));
+  }
+
+  apply(fn) {
+    return [...this.entries()].map(([key, value]) => [fn(key), fn(value)]);
   }
 
   static fromJSON(entries) {

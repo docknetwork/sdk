@@ -183,9 +183,7 @@ export class CheqdAPI extends AbstractApiProvider {
       payer: sender,
     };
 
-    const txJSON = maybeToCheqdPayloadOrJSON(
-      PayloadWrapper.from(JSON.parse(JSON.stringify(tx.toJSON()))),
-    );
+    const txJSON = maybeToCheqdPayloadOrJSON(PayloadWrapper.from(tx));
     txJSON.typeUrl = `/${prefix}.${typeUrl}`;
 
     const res = await this.sdk.signer.signAndBroadcast(

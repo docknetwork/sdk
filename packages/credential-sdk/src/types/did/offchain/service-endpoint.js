@@ -1,4 +1,4 @@
-import { maybeToNumber } from '../../../utils';
+import { maybeToJSONString, maybeToNumber } from '../../../utils';
 import {
   TypedStruct,
   TypedString,
@@ -17,7 +17,7 @@ const LinkedDomainsPlaceholder = createPlaceholder((value) => {
   ) {
     return 0b0001;
   } else {
-    throw new Error(`Unknown value \`${value}\``);
+    throw new Error(`Unknown value \`${maybeToJSONString(value)}\``);
   }
 });
 
@@ -41,6 +41,10 @@ export class LinkedDomains extends ServiceEndpointType {
 
   toJSON() {
     return this.constructor.Type;
+  }
+
+  apply(fn) {
+    return fn(this.constructor.Type);
   }
 }
 

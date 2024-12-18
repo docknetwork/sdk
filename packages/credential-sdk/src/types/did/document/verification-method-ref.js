@@ -32,6 +32,10 @@ export default class VerificationMethodRef extends withQualifier(TypedTuple) {
     return `${did}#keys-${index}`;
   }
 
+  toCheqdPayload() {
+    return this.toEncodedString();
+  }
+
   toJSON() {
     return this.toEncodedString();
   }

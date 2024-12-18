@@ -104,19 +104,11 @@ export class DidMethodKey extends DockDidOrDidMethodKey {
 
 DockDidOrDidMethodKey.bindVariants(DockDid, DidMethodKey);
 
-class DockDidValueToString extends DockDidValue {
-  toJSON() {
-    return String(this);
-  }
-}
-
-class DidMethodKeyPublicKeyToString extends DidMethodKeyPublicKey {
-  toJSON() {
-    return String(this);
-  }
-}
-
 export class NamespaceDid extends withQualifier(TypedEnum, true) {
+  toCheqdPayload() {
+    return String(this);
+  }
+
   toJSON() {
     return String(this);
   }
@@ -151,14 +143,14 @@ class DockNamespaceDid extends NamespaceDid {
 
   static Type = 'dock';
 
-  static Class = DockDidValueToString;
+  static Class = DockDidValue;
 }
 class DidNamespaceKey extends NamespaceDid {
   static Qualifier = 'did:key:';
 
   static Type = 'didMethodKey';
 
-  static Class = DidMethodKeyPublicKeyToString;
+  static Class = DidMethodKeyPublicKey;
 }
 class CheqdNamespaceDid extends NamespaceDid {
   static Qualifier = 'did:cheqd:';

@@ -17,6 +17,19 @@ export const maybeToJSON = (value) => (typeof value?.toJSON === 'function'
 export const maybeToJSONString = (value) => JSON.stringify(maybeToJSON(value));
 
 /**
+ * Attempts to convert provided value to the Cheqd Payload or JSON.
+ * @param {*} value
+ * @returns {object}
+ */
+export const maybeToCheqdPayloadOrJSON = (obj) => (typeof obj?.toCheqdPayload === 'function' // eslint-disable-line no-nested-ternary
+  ? obj.toCheqdPayload()
+  : typeof obj?.apply === 'function' // eslint-disable-line no-nested-ternary
+    ? obj.apply(maybeToCheqdPayloadOrJSON)
+    : typeof value !== 'object' && typeof value !== 'function'
+      ? obj
+      : maybeToJSON(obj));
+
+/**
  * Returns bytes of the value converted to a stringified JSON.
  * @template T
  * @param {T} value
@@ -73,7 +86,46 @@ export const maybeNew = (Class, args) => (!Class[NotAConstructor] ? new Class(..
 export const maybeFrom = (klass, obj) => (typeof klass.from === 'function' ? klass.from(obj) : maybeNew(klass, [obj]));
 
 /**
- * Applies function to the inner value of the provided object.
+ * Error thrown when the provided function was executed more than once or wasn't executed at all.
+ */
+export class MustBeExecutedOnce extends Error {
+  constructor(fn) {
+    super(`Function must be executed exactly once: \`${fn}\``);
+  }
+
+  static ensure(fn, call) {
+    let executed = false;
+    const willExecute = () => {
+      if (executed) {
+        throw new this(fn);
+      }
+
+      executed = true;
+    };
+    const wasExecuted = () => {
+      if (!executed) {
+        throw new this(fn);
+      }
+    };
+
+    const name = `mustBeExecutedOnce(${fn.name})`;
+    const obj = {
+      [name](...args) {
+        willExecute();
+
+        return fn.apply(this, args);
+      },
+    };
+
+    const res = call(obj[name]);
+    wasExecuted();
+
+    return res;
+  }
+}
+
+/**
+ * Applies function to the first value of the provided object that passes the check.
  * @template T
  * @template I
  * @template O
@@ -82,11 +134,18 @@ export const maybeFrom = (klass, obj) => (typeof klass.from === 'function' ? kla
  * @param {T} value
  * @returns {O}
  */
-export const applyToValue = (check, fn, value, rec = true) => {
+export const applyToValue = (check, fn, value) => {
   if (check(value)) {
     return fn(value);
-  } else if (rec && typeof value?.applyToValue === 'function') {
-    return value.applyToValue(check, fn);
+  } else if (typeof value?.apply === 'function') {
+    let res;
+    MustBeExecutedOnce.ensure(
+      (obj) => {
+        res = applyToValue(check, fn, obj);
+      },
+      (wrapped) => value.apply(wrapped),
+    );
+    return res;
   }
 
   throw new Error(

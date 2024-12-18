@@ -33,6 +33,10 @@ class TypedNumber extends withBase(class NumberBase {}) {
     return this.value;
   }
 
+  apply(fn) {
+    return fn(this.value);
+  }
+
   static from(value) {
     if (value instanceof this) {
       return value;

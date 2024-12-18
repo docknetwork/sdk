@@ -176,18 +176,14 @@ class TypedEnum extends withBase(class EnumBase {}) {
     return this[this.type];
   }
 
-  /**
-   * Convert the instance to a JSON representation.
-   * @returns {Object} The JSON representation of the instance.
-   */
-  toJSON() {
+  apply(fn) {
     if (this.constructor.isNullish) {
-      return this.constructor.JsonType;
+      return fn(this.constructor.JsonType);
     } else {
       const { type, value } = this;
 
       return {
-        [type]: maybeToJSON(value),
+        [type]: fn(value),
       };
     }
   }

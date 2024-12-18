@@ -2,7 +2,7 @@ import {
   validateProperties,
   withExtendedStaticProperties,
 } from '../../utils/inheritance';
-import { maybeToJSON, maybeEq, maybeFrom } from '../../utils/interfaces';
+import { maybeEq, maybeFrom } from '../../utils/interfaces';
 import withBase from './with-base';
 import withCatchNull from './with-catch-null';
 import withEq from './with-eq';
@@ -40,9 +40,9 @@ class TypedStruct extends withBase(class StructBase {}) {
     Object.seal(this);
   }
 
-  toJSON() {
+  apply(fn) {
     return Object.fromEntries(
-      Object.entries(this).map(([key, value]) => [key, maybeToJSON(value)]),
+      Object.entries(this).map(([key, value]) => [key, fn(value)]),
     );
   }
 

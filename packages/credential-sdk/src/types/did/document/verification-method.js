@@ -1,5 +1,10 @@
 import {
-  withFrom, TypedStruct, withBase58, TypedBytes, option, TypedString,
+  withFrom,
+  TypedStruct,
+  withBase58,
+  TypedBytes,
+  option,
+  TypedString,
 } from '../../generic';
 import {
   BBDT16PublicKey,
@@ -26,11 +31,18 @@ import {
   Bls12381PSDockVerKeyName,
   Bls12381BBDT16DockVerKeyName,
 } from '../../../vc/crypto';
-import { Ed25519Verification2018Method, Ed25519Verification2020Method, VerificationMethodType } from './verification-method-type';
+import {
+  Ed25519Verification2018Method,
+  Ed25519Verification2020Method,
+  VerificationMethodType,
+} from './verification-method-type';
 import VerificationMethodRef from './verification-method-ref';
 import { NamespaceDid } from '../onchain/typed-did';
 import {
-  fmtIter, valueBytes, filterObj,
+  fmtIter,
+  valueBytes,
+  filterObj,
+  maybeToCheqdPayloadOrJSON,
 } from '../../../utils';
 
 export class PublicKeyBase58 extends withBase58(TypedBytes) {}
@@ -150,5 +162,23 @@ export class CheqdVerificationMethod extends withFrom(
       this.controller,
       this.verificationMaterial,
     );
+  }
+}
+
+export class CheqdVerificationMethodAssertion extends CheqdVerificationMethod {
+  toCheqdPayload() {
+    return JSON.stringify(
+      JSON.stringify(this.apply(maybeToCheqdPayloadOrJSON)),
+    );
+  }
+
+  toJSON() {
+    return this.toCheqdPayload();
+  }
+
+  static from(obj) {
+    return typeof obj === 'string'
+      ? super.fromJSON(JSON.parse(JSON.parse(obj)))
+      : super.from(obj);
   }
 }

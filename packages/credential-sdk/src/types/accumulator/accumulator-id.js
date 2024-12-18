@@ -10,7 +10,12 @@ import {
 
 export class AccumulatorId extends withFrom(
   withQualifier(TypedEnum, true),
-  (value, from) => {
+  (valueWithUncheckedPrefix, from) => {
+    const value = typeof valueWithUncheckedPrefix === 'string'
+      && valueWithUncheckedPrefix.startsWith('dock:accumulator:')
+      ? `accumulator:dock:${valueWithUncheckedPrefix.slice(17)}`
+      : valueWithUncheckedPrefix;
+
     try {
       // eslint-disable-next-line no-use-before-define
       return from(DockAccumulatorIdValue.from(value));
@@ -20,10 +25,6 @@ export class AccumulatorId extends withFrom(
   },
 ) {
   static Qualifier = 'accumulator:';
-
-  toJSON() {
-    return String(this);
-  }
 }
 
 export class CheqdAccumulatorIdValue extends withQualifier(DidRef) {

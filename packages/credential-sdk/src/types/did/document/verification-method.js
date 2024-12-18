@@ -172,6 +172,10 @@ export class CheqdVerificationMethodAssertion extends CheqdVerificationMethod {
     );
   }
 
+  toJSON() {
+    return this.toCheqdPayload();
+  }
+
   static from(obj) {
     return typeof obj === 'string'
       ? super.fromJSON(JSON.parse(JSON.parse(obj)))

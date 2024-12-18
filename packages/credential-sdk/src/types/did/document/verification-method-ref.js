@@ -35,4 +35,8 @@ export default class VerificationMethodRef extends withQualifier(TypedTuple) {
   toCheqdPayload() {
     return this.toEncodedString();
   }
+
+  toJSON() {
+    return this.toEncodedString();
+  }
 }

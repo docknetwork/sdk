@@ -1,38 +1,28 @@
-import { VerificationMethodRef } from './verification-method-ref';
 import {
-  CheqdMainnetVerificationMethod,
-  CheqdTestnetVerificationMethod,
-  CheqdVerificationMethod,
+  CheqdVerificationMethodAssertion,
+  CheqdMainnetVerificationMethodAssertion,
+  CheqdTestnetVerificationMethodAssertion,
 } from './verification-method';
+import { VerificationMethodRef } from './verification-method-ref';
 import { withFrom } from '../../generic';
 
 export default class VerificationMethodRefOrCheqdVerificationMethod extends withFrom(
   VerificationMethodRef,
-  function fromFn(value, from) {
+  function from(value, fromFn) {
     try {
-      return class CheqdVerificationMethodToJSONString extends this.Base {
-        toJSON() {
-          return JSON.stringify(JSON.stringify(super.toJSON()));
-        }
-
-        static from(obj) {
-          return typeof obj === 'string'
-            ? super.fromJSON(JSON.parse(JSON.parse(obj)))
-            : super.from(obj);
-        }
-      }.from(value);
-    } catch (err) {
-      return from(value);
+      return this.Base.from(value);
+    } catch {
+      return fromFn(value);
     }
   },
 ) {
-  static Base = CheqdVerificationMethod;
+  static Base = CheqdVerificationMethodAssertion;
 }
 
 export class VerificationMethodRefOrCheqdTestnetVerificationMethod extends VerificationMethodRefOrCheqdVerificationMethod {
-  static Base = CheqdTestnetVerificationMethod;
+  static Base = CheqdTestnetVerificationMethodAssertion;
 }
 
 export class VerificationMethodRefOrCheqdMainnetVerificationMethod extends VerificationMethodRefOrCheqdVerificationMethod {
-  static Base = CheqdMainnetVerificationMethod;
+  static Base = CheqdMainnetVerificationMethodAssertion;
 }

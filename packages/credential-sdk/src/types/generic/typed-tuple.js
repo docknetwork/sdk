@@ -1,5 +1,5 @@
 import { withExtendedStaticProperties } from '../../utils/inheritance';
-import { maybeEq, maybeFrom, maybeToJSON } from '../../utils/interfaces';
+import { maybeEq, maybeFrom } from '../../utils/interfaces';
 import { ArrayWithoutPrototypeMethods } from '../../utils/generic';
 import withBase from './with-base';
 import withCatchNull from './with-catch-null';
@@ -53,8 +53,8 @@ class TypedTuple extends withBase(ArrayWithoutPrototypeMethods) {
     Object.seal(this);
   }
 
-  toJSON() {
-    return [...Array.prototype.values.call(this)].map(maybeToJSON);
+  apply(fn) {
+    return [...this].map(fn);
   }
 
   static from(value) {

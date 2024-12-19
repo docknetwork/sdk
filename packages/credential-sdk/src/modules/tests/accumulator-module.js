@@ -11,7 +11,10 @@ import {
   VBMembershipWitness,
 } from '../../crypto';
 import { AccumulatorType } from '../abstract/accumulator/module';
-import { DIDDocument } from '../../types';
+import {
+  DIDDocument,
+  AccumulatorParams as AccumulatorParamsType,
+} from '../../types';
 import { Ed25519Keypair, DidKeypair } from '../../keypairs';
 
 // eslint-disable-next-line jest/no-export
@@ -65,11 +68,35 @@ export default function generateAccumulatorTests(
       params1Id = await accumulatorModule.nextParamsId(did);
       await accumulatorModule.addParams(params1Id, params1, did, pair);
 
+      expect(
+        (await accumulatorModule.getParams(did, params1Id)).toJSON(),
+      ).toEqual(AccumulatorParamsType.from(params1).toJSON());
+      expect((await accumulatorModule.getAllParamsByDid(did)).toJSON()).toEqual(
+        [[params1Id.toJSON(), AccumulatorParamsType.from(params1).toJSON()]],
+      );
+
       keypair = Accumulator.generateKeypair(params, seedAccum);
       const bytes2 = u8aToHex(keypair.publicKey.bytes);
       const pk1 = new PublicKey(bytes2, [did, params1Id]);
       pk1Id = await accumulatorModule.nextPublicKeyId(did);
       await accumulatorModule.addPublicKey(pk1Id, pk1, did, pair);
+
+      expect(
+        (await accumulatorModule.getPublicKey(did, pk1Id)).toJSON(),
+      ).toEqual(pk1.toJSON());
+      expect(
+        (await accumulatorModule.getAllPublicKeysByDid(did)).toJSON(),
+      ).toEqual([[pk1Id.toJSON(), pk1.toJSON()]]);
+
+      const pk1WithParams = await pk1.withParams(accumulatorModule);
+      expect(pk1WithParams.params).toBeInstanceOf(AccumulatorParamsType);
+
+      expect(
+        (await accumulatorModule.getPublicKey(did, pk1Id, true)).toJSON(),
+      ).toEqual(pk1WithParams.toJSON());
+      expect(
+        (await accumulatorModule.getAllPublicKeysByDid(did, true)).toJSON(),
+      ).toEqual([[pk1Id.toJSON(), pk1WithParams.toJSON()]]);
 
       accumulator = PositiveAccumulator.initialize(params, keypair.secretKey);
 

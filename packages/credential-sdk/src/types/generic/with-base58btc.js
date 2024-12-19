@@ -17,6 +17,10 @@ export default function withBase58btc(klass) {
         return String(this);
       }
 
+      get value() {
+        return this.toBase58btc();
+      }
+
       static fromBase58btc(str) {
         return this.from(decodeFromBase58btc(str));
       }
@@ -31,5 +35,8 @@ export default function withBase58btc(klass) {
     },
   };
 
-  return withExtendedStaticProperties(['Prefix'], withFrom(obj[name], (value, from) => (typeof value === 'string' ? this.fromBase58btc(value) : from(value))));
+  return withExtendedStaticProperties(
+    ['Prefix'],
+    withFrom(obj[name], (value, from) => (typeof value === 'string' ? this.fromBase58btc(value) : from(value))),
+  );
 }

@@ -53,7 +53,11 @@ class TypedBytes extends withBase(ArrayWithoutPrototypeMethods) {
   }
 
   toJSON() {
-    return this.value;
+    return this.toHex();
+  }
+
+  apply(fn) {
+    return fn(this.value);
   }
 
   static fromJSON(json) {

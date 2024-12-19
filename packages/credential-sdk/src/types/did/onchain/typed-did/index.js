@@ -7,7 +7,7 @@ import {
   TypedUUID,
   withQualifier,
 } from '../../../generic';
-import { CheqdMainnetDidValue, CheqdTestnetDidValue } from './cheqd-did';
+import { CheqdDid, CheqdMainnetDid, CheqdTestnetDid } from './cheqd-did';
 import { valueBytes, withExtendedStaticProperties } from '../../../../utils';
 import DidOrDidMethodKeySignature from './signature';
 
@@ -110,19 +110,11 @@ export class DidMethodKey extends DockDidOrDidMethodKey {
 
 DockDidOrDidMethodKey.bindVariants(DockDid, DidMethodKey);
 
-class DockDidValueToString extends DockDidValue {
-  toJSON() {
-    return String(this);
-  }
-}
-
-class DidMethodKeyPublicKeyToString extends DidMethodKeyPublicKey {
-  toJSON() {
-    return String(this);
-  }
-}
-
 export class NamespaceDid extends withQualifier(TypedEnum, true) {
+  toCheqdPayload() {
+    return String(this);
+  }
+
   toJSON() {
     return String(this);
   }
@@ -152,58 +144,19 @@ export class NamespaceDid extends withQualifier(TypedEnum, true) {
   }
 }
 
-export class CheqdDid extends withQualifier(TypedEnum, true) {
-  get Qualifier() {
-    return this.Class?.Qualifier;
-  }
-
-  static random(network) {
-    if (this.Class != null) {
-      return new this(this.Class.random());
-    } else if (network === 'testnet') {
-      // eslint-disable-next-line no-use-before-define
-      return CheqdTestnetDid.random();
-    } else if (network === 'mainnet') {
-      // eslint-disable-next-line no-use-before-define
-      return CheqdMainnetDid.random();
-    } else {
-      throw new Error(
-        `Unknown network provided: \`${network}\`, expected \`mainnet\` or \`testnet\``,
-      );
-    }
-  }
-
-  toJSON() {
-    return String(this);
-  }
-}
-
-export class CheqdTestnetDid extends CheqdDid {
-  static Class = CheqdTestnetDidValue;
-
-  static Type = 'testnet';
-}
-export class CheqdMainnetDid extends CheqdDid {
-  static Class = CheqdMainnetDidValue;
-
-  static Type = 'mainnet';
-}
-
-CheqdDid.bindVariants(CheqdTestnetDid, CheqdMainnetDid);
-
 export class DockNamespaceDid extends NamespaceDid {
   static Qualifier = 'did:dock:';
 
   static Type = 'dock';
 
-  static Class = DockDidValueToString;
+  static Class = DockDidValue;
 }
 export class DidNamespaceKey extends NamespaceDid {
   static Qualifier = 'did:key:';
 
   static Type = 'didMethodKey';
 
-  static Class = DidMethodKeyPublicKeyToString;
+  static Class = DidMethodKeyPublicKey;
 }
 export class CheqdNamespaceDid extends NamespaceDid {
   static Qualifier = 'did:cheqd:';

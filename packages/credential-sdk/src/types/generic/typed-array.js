@@ -1,6 +1,6 @@
 import { ArrayWithoutPrototypeMethods, ensureArrayLike } from '../../utils';
 import { withExtendedStaticProperties } from '../../utils/inheritance';
-import { maybeEq, maybeFrom, maybeToJSON } from '../../utils/interfaces';
+import { maybeEq, maybeFrom } from '../../utils/interfaces';
 import withBase from './with-base';
 import withCatchNull from './with-catch-null';
 import withEq from './with-eq';
@@ -47,8 +47,8 @@ class TypedArray extends withBase(ArrayWithoutPrototypeMethods) {
     );
   }
 
-  toJSON() {
-    return [...Array.prototype.values.call(this)].map(maybeToJSON);
+  apply(fn) {
+    return [...this].map(fn);
   }
 
   static fromApi(arr) {

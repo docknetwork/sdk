@@ -11,6 +11,10 @@ class TypedString extends TypedBytes {
     return u8aToString(this.bytes);
   }
 
+  toJSON() {
+    return String(this);
+  }
+
   toString() {
     return this.value;
   }

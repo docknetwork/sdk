@@ -21,6 +21,10 @@ export default class TypedUUID extends TypedBytes {
     return this.value;
   }
 
+  toJSON() {
+    return String(this);
+  }
+
   static fromBytesAdapt(bytesOrString) {
     let bytes = normalizeOrConvertStringToU8a(bytesOrString);
     if (bytes.length < 16) {

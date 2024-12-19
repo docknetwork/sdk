@@ -6,6 +6,10 @@ export default class TypedBytesArray extends TypedBytes {
   }
 
   toJSON() {
+    return Array.from(this);
+  }
+
+  toCheqdPayload() {
     return this.value;
   }
 }

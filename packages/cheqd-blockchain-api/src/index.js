@@ -1,6 +1,5 @@
 import { AbstractApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
 import {
-  maybeToJSON,
   maybeToJSONString,
   fmtIter,
   extendNull,
@@ -22,9 +21,17 @@ import {
   protobufPackage as resourceProtobufPackage,
 } from '@cheqd/ts-proto/cheqd/resource/v2/index.js';
 import {
-  DidRef, NamespaceDid, CheqdSetDidDocumentPayloadWithTypeUrlAndSignatures, CheqdCheqdDeactivateDidDocumentPayloadWithTypeUrlAndSignatures, CheqdCreateResourcePayloadWithTypeUrlAndSignatures,
+  DidRef,
+  NamespaceDid,
+  CheqdSetDidDocumentPayloadWithTypeUrlAndSignatures,
+  CheqdCheqdDeactivateDidDocumentPayloadWithTypeUrlAndSignatures,
+  CheqdCreateResourcePayloadWithTypeUrlAndSignatures,
+  CheqdCreateResource,
+  CheqdDIDDocument,
+  CheqdDeactivateDidDocument,
 } from '@docknetwork/credential-sdk/types';
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
+import { maybeToCheqdPayloadOrJSON } from '../../credential-sdk/src/utils';
 
 export class CheqdAPI extends AbstractApiProvider {
   /**
@@ -50,16 +57,20 @@ export class CheqdAPI extends AbstractApiProvider {
   });
 
   static Payloads = extendNull({
-    MsgCreateDidDoc: MsgCreateDidDocPayload,
-    MsgUpdateDidDoc: MsgUpdateDidDocPayload,
-    MsgDeactivateDidDoc: MsgDeactivateDidDocPayload,
-    MsgCreateResource: MsgCreateResourcePayload,
+    MsgCreateDidDoc: [CheqdDIDDocument, MsgCreateDidDocPayload],
+    MsgUpdateDidDoc: [CheqdDIDDocument, MsgUpdateDidDocPayload],
+    MsgDeactivateDidDoc: [
+      CheqdDeactivateDidDocument,
+      MsgDeactivateDidDocPayload,
+    ],
+    MsgCreateResource: [CheqdCreateResource, MsgCreateResourcePayload],
   });
 
   static PayloadWrappers = extendNull({
     MsgCreateDidDoc: CheqdSetDidDocumentPayloadWithTypeUrlAndSignatures,
     MsgUpdateDidDoc: CheqdSetDidDocumentPayloadWithTypeUrlAndSignatures,
-    MsgDeactivateDidDoc: CheqdCheqdDeactivateDidDocumentPayloadWithTypeUrlAndSignatures,
+    MsgDeactivateDidDoc:
+      CheqdCheqdDeactivateDidDocumentPayloadWithTypeUrlAndSignatures,
     MsgCreateResource: CheqdCreateResourcePayloadWithTypeUrlAndSignatures,
   });
 
@@ -123,13 +134,16 @@ export class CheqdAPI extends AbstractApiProvider {
    * @returns {Promise<Uint8Array>}
    */
   async stateChangeBytes(method, payload) {
-    const { [method]: Payload } = this.constructor.Payloads;
-    if (Payload == null) {
+    const { [method]: Payloads } = this.constructor.Payloads;
+    if (Payloads == null) {
       throw new Error(
         `Can't find payload constructor for the provided method \`${method}\``,
       );
     }
-    const jsonPayload = maybeToJSON(payload);
+    const [TypedPayload, Payload] = Payloads;
+
+    const typedPayload = TypedPayload.from(payload);
+    const jsonPayload = maybeToCheqdPayloadOrJSON(typedPayload);
     const sdkPayload = Payload.fromPartial(jsonPayload);
 
     try {
@@ -169,7 +183,7 @@ export class CheqdAPI extends AbstractApiProvider {
       payer: sender,
     };
 
-    const txJSON = PayloadWrapper.from(tx).toJSON();
+    const txJSON = maybeToCheqdPayloadOrJSON(PayloadWrapper.from(tx));
     txJSON.typeUrl = `/${prefix}.${typeUrl}`;
 
     const res = await this.sdk.signer.signAndBroadcast(

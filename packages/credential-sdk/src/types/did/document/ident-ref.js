@@ -40,6 +40,10 @@ export default class IdentRef extends withQualifier(TypedTuple) {
     return `${did}#${value}`;
   }
 
+  toCheqdPayload() {
+    return this.toString();
+  }
+
   toJSON() {
     return this.toString();
   }

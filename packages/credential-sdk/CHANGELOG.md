@@ -1,5 +1,23 @@
 # @docknetwork/credential-sdk
 
+## 0.21.0
+
+### Minor Changes
+
+- Serialization/deserialization tweaks for `cheqd`
+
+## 0.20.0
+
+### Minor Changes
+
+- Fix schema validation with ID only when ID isnt required
+
+## 0.19.0
+
+### Minor Changes
+
+- Fix unresolved imports
+
 ## 0.18.0
 
 ### Minor Changes

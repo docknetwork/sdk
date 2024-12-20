@@ -1,24 +1,15 @@
-import { CheqdDIDModule } from "@docknetwork/cheqd-blockchain-modules";
-import { DockDIDModule } from "@docknetwork/dock-blockchain-modules";
-import { MultiApiDIDModule } from "@docknetwork/credential-sdk/modules/multi-api";
 import {
   DockDid,
   CheqdTestnetDid,
   CheqdTestnetDIDDocument,
 } from "@docknetwork/credential-sdk/types";
-import plimit from "p-limit";
+import { maybeToCheqdPayloadOrJSON } from "@docknetwork/credential-sdk/utils";
+import { Base } from "./common.js";
 
-export default class DIDMigration {
-  constructor(dock, cheqd) {
-    this.dock = dock;
-    this.cheqd = cheqd;
-    this.module = new MultiApiDIDModule([
-      new DockDIDModule(dock),
-      new CheqdDIDModule(cheqd),
-    ]);
-  }
+export default class DIDMigration extends Base {
+  static Prop = "did";
 
-  async *txs(concurrent = 10) {
+  async *txs() {
     const { module, dock } = this;
 
     const dids = await dock.api.query.didModule.dids.keys();
@@ -26,10 +17,8 @@ export default class DIDMigration {
 
     console.log(`Total DIDs count: ${parsedDids.length}`);
 
-    const limit = plimit(concurrent);
-
     const txs = parsedDids.map((did) =>
-      limit(async () => {
+      this.spawn(async () => {
         const document = await module.getDocument(did);
         const cheqdDid = CheqdTestnetDid.from(did);
 
@@ -37,9 +26,10 @@ export default class DIDMigration {
         const cheqdDoc = document.toCheqd(void 0, CheqdTestnetDIDDocument);
 
         console.log(`${did} => ${cheqdDid}`);
-        console.log(cheqdDoc.toJSON());
+        console.log(document.toJSON());
+        console.log(maybeToCheqdPayloadOrJSON(cheqdDoc));
 
-        return await module.createDocumentTx(cheqdDoc);
+        return await module.createDocumentTx(cheqdDoc, []);
       })
     );
 

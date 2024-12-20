@@ -4,6 +4,7 @@ import didModuleTests from "@docknetwork/credential-sdk/modules/tests/did-module
 import CheqdDIDModule from "../src/did/module";
 import { faucet, url, network } from "./constants";
 import { MultiApiDIDModule } from "@docknetwork/credential-sdk/modules";
+import { CheqdOffchainSignatureParamsRef } from "../../credential-sdk/src/types";
 
 describe("DIDModule", () => {
   const cheqd = new CheqdAPI();
@@ -20,9 +21,18 @@ describe("DIDModule", () => {
     await cheqd.disconnect();
   });
 
-  didModuleTests({ did: new CheqdDIDModule(cheqd) }, { DID: CheqdTestnetDid });
+  didModuleTests(
+    { did: new CheqdDIDModule(cheqd) },
+    {
+      DID: CheqdTestnetDid,
+      OffchainSignatureParamsRef: CheqdOffchainSignatureParamsRef,
+    }
+  );
   didModuleTests(
     { did: new MultiApiDIDModule([new CheqdDIDModule(cheqd)]) },
-    { DID: CheqdTestnetDid }
+    {
+      DID: CheqdTestnetDid,
+      OffchainSignatureParamsRef: CheqdOffchainSignatureParamsRef,
+    }
   );
 });

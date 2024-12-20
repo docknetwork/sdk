@@ -33,26 +33,23 @@ const RANDOM_OFFCHAIN_PKS = [
 ];
 
 const DOCK_OFFCHAIN_PKS = RANDOM_OFFCHAIN_PKS.map(
-  (bytes) =>
+  (bytes, idx) =>
     new BBSPublicKey(
       new BBSPublicKeyValue(
         bytes,
-        new DockOffchainSignatureParamsRef(
-          DockDid.random(),
-          (Math.random() * 100) | 0
-        )
+        new DockOffchainSignatureParamsRef(DockDid.random(), idx)
       )
     )
 );
 
 const CHEQD_OFFCHAIN_PKS = RANDOM_OFFCHAIN_PKS.map(
-  (bytes) =>
+  (bytes, idx) =>
     new BBSPublicKey(
       new BBSPublicKeyValue(
         bytes,
         new CheqdOffchainSignatureParamsRef(
           CheqdTestnetDid.random(),
-          TypedUUID.random()
+          TypedUUID.fromBytesAdapt([idx])
         )
       )
     )
@@ -179,6 +176,14 @@ describe("DID document workflow", () => {
       [cheqdDid],
       []
     ).toCheqd("28edc043-872b-4ab7-9cb8-b01d1bd677c5");
+
+    const doc2DIDDocument = DIDDocument.create(
+      cheqdDid,
+      [new DidKey(RANDOM_PKS[0]), new DidKey(CHEQD_OFFCHAIN_PKS[0])],
+      [cheqdDid],
+      []
+    );
+    expect(doc2.toDIDDocument().toJSON()).toEqual(doc2DIDDocument.toJSON());
 
     const doc3 = DIDDocument.create(
       "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",

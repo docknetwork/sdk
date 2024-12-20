@@ -2,9 +2,9 @@ import {
   CheqdVerificationMethodAssertion,
   CheqdMainnetVerificationMethodAssertion,
   CheqdTestnetVerificationMethodAssertion,
-} from "./verification-method";
-import { VerificationMethodRef } from "./verification-method-ref";
-import { withFrom } from "../../generic";
+} from './verification-method';
+import { VerificationMethodRef } from './verification-method-ref';
+import { withFrom } from '../../generic';
 
 export default class VerificationMethodRefOrCheqdVerificationMethod extends withFrom(
   VerificationMethodRef,
@@ -14,7 +14,7 @@ export default class VerificationMethodRefOrCheqdVerificationMethod extends with
     } catch (err) {
       return fromFn(value);
     }
-  }
+  },
 ) {
   static Base = CheqdVerificationMethodAssertion;
 }

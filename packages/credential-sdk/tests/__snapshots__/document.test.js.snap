@@ -24,7 +24,7 @@ exports[`DID document workflow \`CheqdDIDDocument\` 2`] = `
   "alsoKnownAs": [],
   "assertionMethod": [
     "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
-    ""{\\"id\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2\\",\\"controller\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"2bZ1MbLLTaGJijaKCvwZJwJnbZTkWHFZZu7UG61o1hu4AbQ3kzUKQExm1FsWQjxeDkSv43VVzNPHedkKrHSnbFm2wNm9fqJZqKpSt3ZAGunaqce9xzqQgBG3YNpyLRpPhegGN1EKnFgEscivJgmFe1LytPXDxUzeSE3gWsoPxCy5aBNX515Mbm5Hy32V9GRkFxtUNzT49JACbikFKiexq1S9ijQbs2iMVq9mKY8F5u6rStbqotraJwdcLNfePNXLThSwVp9Qtv8QomcNcg2Y1gJxg9yUTTRbKuzUd9deeZJXtK1A5zRp2fU8szvRYUViUbv\\"}"",
+    ""{\\"id\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2\\",\\"controller\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"2bZ1MbLLTaGJijaKCvwZJwJnbZTkWHFZZu7UG61o1hu4AbQ3kzUKQExm1FsWQjxeDkSv43VVzNPHedkKrHSnbFm2wNm9fqJZqKpSt3ZAGunaqce9xzqQgBG3YNpyLRpPhegGN1EKnFgEscivJgmFe1LytPXDxUzeS8ECBSu9cKhMbzKBzpwaZc29TotjS2v2Rz57sieY8AWR23ZxoKnmSArTns234BWmXjEjDeqvEHtKvCzVMJiedTYPe6d5Mjby9U9qVKsdJAFAiCg6CNLRTBBVSryoXDYgV8dNmhjHeQmpCmjNb7cur8aSHiHQeHGLPD6\\"}"",
   ],
   "authentication": [
     "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
@@ -70,10 +70,10 @@ exports[`DID document workflow \`CheqdDIDDocument\` 3`] = `
     "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-6",
     "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-8",
     "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-9",
-    ""{\\"id\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2\\",\\"controller\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"2bZ1MbLLTaGJijaKCvwZJwJnbZTkWHFZZu7UG61o1hu4AbQ3kzUKQExm1FsWQjxeDkSv43VVzNPHedkKrHSnbFm2wNm9fqJZqKpSt3ZAGunaqce9xzqQgBG3YNpyLRpPhegGN1EKnFgEscivJgmFe1LytPXDxUzeSE3gWsoPxCy5aBNX515Mbm5Hy32V9GRkFxtUNzT49JACbikFKiexq1S9ijQbs2iMVq9mKY8F5u6rStbqotraJwdcLNfePNXLThSwVp9Qtv8QomcNcg2Y1gJxg9yUTTRbKuzUd9deeZJXtK1A5zRp2fU8szvRYUViUbv\\"}"",
-    ""{\\"id\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-5\\",\\"controller\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"2bZ1MbLLTaGJijaKCvwZJwJnbZT6CYCz5349s22k9rHVeht4HYzti72yiVk38BabN53ukYqZrpMGuGzGkavQWF3xU3N3STukmPtwnErYAk2GRz2tEGxerPcKpL7rw292dJCWP6QS5XvM5KHbcinjaCEVEJrmVPrho1EgAj1JLZVxkGS1j9K1tfNMsXnXYnpofSoYm33jPDEtLkViJuaz4EYem8NS5YZRFuqPYFzBGatSabXkQw2qix6tkZa4XQaYo7nvNZGqVhpxdT9JGBT326wGe1i8XPjmYvd6Bujdh1KvyFrijzNXABxECzqVMd8f2Zz\\"}"",
-    ""{\\"id\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-11\\",\\"controller\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"2bZ1MbLLTaGJijaKCvwZJwJnbZT78upnQsUcwNFnf7KVTVivhgwrJppCk5DLwXzeDrodD9caVaB7qR9L6NCuP9fR772qFGskk3yfdXgfCAwA7unVXRyHd6VzejPym3tTB9NP9B3pGeNKpKEJ68a1n7mX84zoNBE77D9TrBj9JHdficb4vAFEjmz29kVkW1k1e9RspqJCc1yHTJ6nFpuuDa3dfAeH8ZbvSokbMcTmmM1GjqpLcbG7ayVR2edMxitBPcxGKqTzk3zq9ChDR7BjFSadxt7rATS3m4aKSkvi5GsyGFiynW5eJNKJJuAurXhSGTN\\"}"",
-    ""{\\"id\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-12\\",\\"controller\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"2bZ1MbLLTaGJijaKCvwZJwJnbZTnDL2fD8qkTW9ABDoZxGPXQCX8eScXiVjbfHUuq8VpxhALxfzqgVAf3MQYPRAHnP3gVkQD4kWsPH4WmX78nAaD89tY3mhsfMriFHyhVqVfXA6WE6ctzfp5g8iUQbpZhae2XChkzsgm8V2c5bPM4e4PuEyGZmWEXi6nynUQMYKGDavAk7p4hj8ut8FbuuPEmToy4PEMibCWz5b7HhgoKTMDnQN3RccSoLZsMfSu6oT9q2G61EVxA6XKpDnHfL375bqw4rXYuRKBCRYndoz5Do39n1txgqRkvskTEUYciPv\\"}"",
+    ""{\\"id\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2\\",\\"controller\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"2bZ1MbLLTaGJijaKCvwZJwJnbZTkWHFZZu7UG61o1hu4AbQ3kzUKQExm1FsWQjxeDkSv43VVzNPHedkKrHSnbFm2wNm9fqJZqKpSt3ZAGunaqce9xzqQgBG3YNpyLRpPhegGN1EKnFgEscivJgmFe1LytPXDxUzeS8ECBSu9cKhMbzKBzpwaZc29TotjS2v2Rz57sieY8AWR23ZxoKnmSArTns234BWmXjEjDeqvEHtKvCzVMJiedTYPe6d5Mjby9U9qVKsdJAFAiCg6CNLRTBBVSryoXDYgV8dNmhjHeQmpCmjNb7cur8aSHiHQeHGLPD6\\"}"",
+    ""{\\"id\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-5\\",\\"controller\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"2bZ1MbLLTaGJijaKCvwZJwJnbZT6CYCz5349s22k9rHVeht4HYzti72yiVk38BabN53ukYqZrpMGuGzGkavQWF3xU3N3STukmPtwnErYAk2GRz2tEGxerPcKpL7rw292dJCWP6QS5XvM5KHbcinjaCEVEJrmVPrptLAcC7Eq41q19V2axxQjcdimZyU1oRJ4eYBAKxKdjUZjAuQGuTSYgJjsNnrWmGKfZBL3yN9JqZ82B83umfxRRTwd6v8GZpG5o9rHgHsoVUmhb4M4fpCx9hu3DgY1CyiDeyHkDv7W5k92bfUsFYzRhPKJMMmLp5Ut7dN\\"}"",
+    ""{\\"id\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-11\\",\\"controller\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"2bZ1MbLLTaGJijaKCvwZJwJnbZT78upnQsUcwNFnf7KVTVivhgwrJppCk5DLwXzeDrodD9caVaB7qR9L6NCuP9fR772qFGskk3yfdXgfCAwA7unVXRyHd6VzejPym3tTB9NP9B3pGeNKpKEJ68a1n7mX84zoNBEDLwz5QFtmvdukAa2APZyvrzTRjgNEEbMZzwoWCnLqWzvBuTv5g2SfSj6iJgkKMouuLL1CCKRVFZqmeV7go6HgbvuPKwsJ8ERAcsLyPf1i5Y5zVcW9VTifDWYNdjb1EBqP8VQTkDSZyQiAjYidpKSKLJCd8jbjWwwXAPn\\"}"",
+    ""{\\"id\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-12\\",\\"controller\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"2bZ1MbLLTaGJijaKCvwZJwJnbZTnDL2fD8qkTW9ABDoZxGPXQCX8eScXiVjbfHUuq8VpxhALxfzqgVAf3MQYPRAHnP3gVkQD4kWsPH4WmX78nAaD89tY3mhsfMriFHyhVqVfXA6WE6ctzfp5g8iUQbpZhae2XChmXcnyTHd48SM9qigPLrWCbtdcvoNLGKmxK759Mnhe7qrCzvTbafb8EuNAtN8woM19fzHpssFnbHApLqhXL2mwNrqEeWjkS8ZKkA1E6ckm5ec9rh8UDWAg26Y2CPHMRtoodqeNtxU5hLzhCzFetBjRm4MwixaaNngfZHW\\"}"",
   ],
   "authentication": [
     "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
@@ -290,9 +290,9 @@ exports[`DID document workflow \`DIDDocument\` 2`] = `
         "curveType": "Bls12381",
         "paramsRef": [
           {
-            "did": "0x1d9fb19de09ca50210201c0b980877676f401021d1116789c037beeb6114ca0d",
+            "did": "0x6511a2e6a46fd0cc9b12d5bb92f29e85e2aeaa5d8edb7f2f4aeb0cacb7778a14",
           },
-          57,
+          0,
         ],
         "participantId": null,
       },
@@ -318,9 +318,9 @@ exports[`DID document workflow \`DIDDocument\` 2`] = `
         "curveType": "Bls12381",
         "paramsRef": [
           {
-            "did": "0x25b0ffd045b0428ea7bf5bb3c2cd1aa951e4379152e6c0cd8ea6efa75c9c2716",
+            "did": "0xd247c249701406e15fd038e9f9b2887a36ba3e99bc8fc4345ed19514a5cf26d7",
           },
-          29,
+          1,
         ],
         "participantId": null,
       },
@@ -364,9 +364,9 @@ exports[`DID document workflow \`DIDDocument\` 2`] = `
         "curveType": "Bls12381",
         "paramsRef": [
           {
-            "did": "0xefa586f7c08703efb5c0c69c3d7b7560bbfd207d0a73a97f36bbb4625f2fbca8",
+            "did": "0xe1d157fb36e486543dd4801081e82e59abeae5fc107d72ded6398144957838e8",
           },
-          86,
+          2,
         ],
         "participantId": null,
       },
@@ -380,9 +380,9 @@ exports[`DID document workflow \`DIDDocument\` 2`] = `
         "curveType": "Bls12381",
         "paramsRef": [
           {
-            "did": "0xd7c02715ea20203195f826b438b9dd8a0f22d76456bbd1be1c774c4d033f22d5",
+            "did": "0xbde5b40369beb837b63a17d2a1a463caae902fefb1d2c1ccfdd4315c7080dc07",
           },
-          19,
+          3,
         ],
         "participantId": null,
       },

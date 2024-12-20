@@ -34,22 +34,25 @@ async function main() {
   const withCheqd = async (fn) => {
     const cheqd = await Promise.race(sharedCheqds);
     if (cheqd.busy) {
-      return await new Promise((resolve) =>
+      return new Promise((resolve) =>
         setImmediate(() => resolve(withCheqd(fn)))
       );
     } else {
       const idx = sharedCheqds.indexOf(cheqd);
       cheqd.busy = true;
 
-      sharedCheqds[idx] = new Promise(async (resolve) => {
+      sharedCheqds[idx] = (async () => {
         try {
           await fn(cheqd);
+        } catch (err) {
+          err.message = `Failed to execute transaction:\n${err}`;
+          console.error(err);
         } finally {
           cheqd.busy = false;
-
-          resolve(cheqd);
         }
-      });
+
+        return cheqd;
+      })();
     }
   };
 

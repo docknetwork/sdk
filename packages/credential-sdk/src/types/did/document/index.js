@@ -450,7 +450,6 @@ export class CheqdDIDDocument extends TypedStruct {
       ...VerificationMethods.from(verificationMethod),
     ].map((verMethod) => {
       const offchain = assertionMethodOffchainKeys.get(verMethod.id);
-
       if (offchain != null) {
         return offchain.toVerificationMethod();
       }

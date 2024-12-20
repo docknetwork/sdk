@@ -75,8 +75,6 @@ export default class CheqdDIDModule extends injectCheqd(AbstractDIDModule) {
       throw new NoDIDError(cheqdDid);
     }
 
-    console.log('CHEQD', CheqdDIDDocument.from(doc).toJSON());
-
     return CheqdDIDDocument.from(doc)
       .toDIDDocument()
       .setAttests(await this.attest.getAttests(cheqdDid));

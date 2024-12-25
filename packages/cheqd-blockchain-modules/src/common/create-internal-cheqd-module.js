@@ -2,7 +2,9 @@ import {
   VerificationMethodSignature,
   CheqdDid,
 } from '@docknetwork/credential-sdk/types';
+import { ensureInstanceOf } from '@docknetwork/credential-sdk/utils';
 import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
+import CheqdApiProvider from './cheqd-api-provider';
 
 /**
  * Creates DID transaction constructor.
@@ -101,7 +103,13 @@ export default function createInternalCheqdModule(
       constructor(apiProvider) {
         super(apiProvider);
 
-        this.apiProvider = apiProvider;
+        this.apiProvider = ensureInstanceOf(apiProvider, CheqdApiProvider);
+      }
+
+      get types() {
+        console.log('???', this.constructor.name, this.apiProvider);
+
+        return this.apiProvider.types();
       }
 
       async resources(did, ids) {

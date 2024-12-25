@@ -1,6 +1,5 @@
 import {
   Blob,
-  CheqdBlobId,
   CheqdBlobWithId,
   CheqdCreateResource,
 } from '@docknetwork/credential-sdk/types';
@@ -36,9 +35,11 @@ export default class CheqdInternalBlobModule extends createInternalCheqdModule(
   };
 
   async blob(blobId) {
+    const { BlobId } = this.types;
+
     return Blob.from(
       validateResource(
-        await this.resource(...CheqdBlobId.from(blobId).value),
+        await this.resource(...BlobId.from(blobId).value),
         Name,
         Type,
       ),

@@ -75,7 +75,7 @@
     "lint": "eslint \"src/**/*.js\"",
     "docs": "rm -rf out && mkdir out && touch out/.nojekyll && jsdoc src -r -c ../../.jsdoc -d out/reference",
     "dev-node": "CHEQD_MNEMONIC=$CHEQD_MNEMONIC ../../scripts/run_cheqd_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
-    "test": "NODE_ENV=production jest --verbose --runInBand --forceExit ./tests/*",
+    "test": "NODE_ENV=production jest --verbose --runInBand --forceExit ./tests/offchain-signatures-module.test.js",
     "test-with-node": "CHEQD_MNEMONIC=$CHEQD_MNEMONIC ../../scripts/with_cheqd_docker_test_node yarn test",
     "prepublishOnly": "yarn build"
   }

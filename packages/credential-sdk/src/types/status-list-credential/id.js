@@ -7,7 +7,10 @@ import {
   withQualifier,
 } from '../generic';
 import { CheqdMainnetDid, CheqdTestnetDid, DidRef } from '../did';
-import { DockStatusList2021Qualifier, CheqdStatusList2021Qualifier } from '../../vc/constants';
+import {
+  DockStatusList2021Qualifier,
+  CheqdStatusList2021Qualifier,
+} from '../../vc/constants';
 
 export class StatusListCredentialId extends withFrom(
   withQualifier(TypedEnum, true),
@@ -53,8 +56,21 @@ export class CheqdStatusListCredentialIdValue extends withQualifier(DidRef) {
   }
 }
 
-// eslint-disable-next-line no-use-before-define
-export class DockStatusListCredentialIdValue extends withFrom(sized(withQualifier(TypedBytes)), (value, from) => (value instanceof DockStatusListCredentialId ? value[1] : from(value))) {
+class CheqdTestnetStatusListCredentialIdValue extends CheqdStatusListCredentialIdValue {
+  static Did = CheqdTestnetDid;
+}
+
+class CheqdMainnetStatusListCredentialIdValue extends CheqdStatusListCredentialIdValue {
+  static Did = CheqdMainnetDid;
+}
+
+export class DockStatusListCredentialIdValue extends withFrom(
+  sized(withQualifier(TypedBytes)),
+  (
+    value,
+    from, // eslint-disable-next-line no-use-before-define
+  ) => (value instanceof DockStatusListCredentialId ? value[1] : from(value)),
+) {
   static Qualifier = DockStatusList2021Qualifier;
 
   static Size = 32;
@@ -78,6 +94,14 @@ export class CheqdStatusListCredentialId extends StatusListCredentialId {
   }
 }
 
+export class CheqdTestnetStatusListCredentialId extends CheqdStatusListCredentialId {
+  static Class = CheqdTestnetStatusListCredentialIdValue;
+}
+
+export class CheqdMainnetStatusListCredentialId extends CheqdStatusListCredentialId {
+  static Class = CheqdMainnetStatusListCredentialIdValue;
+}
+
 export class DockStatusListCredentialId extends StatusListCredentialId {
   static Class = DockStatusListCredentialIdValue;
 
@@ -88,4 +112,7 @@ export class DockStatusListCredentialId extends StatusListCredentialId {
   }
 }
 
-StatusListCredentialId.bindVariants(CheqdStatusListCredentialId, DockStatusListCredentialId);
+StatusListCredentialId.bindVariants(
+  CheqdStatusListCredentialId,
+  DockStatusListCredentialId,
+);

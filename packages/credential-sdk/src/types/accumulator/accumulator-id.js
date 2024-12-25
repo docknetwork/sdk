@@ -53,6 +53,14 @@ export class CheqdAccumulatorIdValue extends withQualifier(DidRef) {
   }
 }
 
+export class CheqdTestnetAccumulatorIdValue extends CheqdAccumulatorIdValue {
+  static Did = CheqdTestnetDid;
+}
+
+export class CheqdMainnetAccumulatorIdValue extends CheqdAccumulatorIdValue {
+  static Did = CheqdMainnetDid;
+}
+
 export class DockAccumulatorIdValue extends sized(TypedBytes) {
   static Size = 32;
 }
@@ -85,6 +93,14 @@ export class CheqdAccumulatorId extends AccumulatorId {
   static random(did) {
     return new this(this.Class.random(did));
   }
+}
+
+export class CheqdTestnetAccumulatorId extends CheqdAccumulatorId {
+  static Class = CheqdTestnetAccumulatorId;
+}
+
+export class CheqdMainnetAccumulatorId extends CheqdAccumulatorId {
+  static Class = CheqdMainnetAccumulatorId;
 }
 
 export class DockAccumulatorId extends AccumulatorId {

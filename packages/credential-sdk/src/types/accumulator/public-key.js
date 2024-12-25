@@ -1,12 +1,22 @@
 import { maybeToJSONString } from '../../utils';
 import {
-  option, TypedBytes, TypedStruct, Any, withProp,
+  option,
+  TypedBytes,
+  TypedStruct,
+  Any,
+  withProp,
+  withFrom,
 } from '../generic';
 import {
   CurveType,
   CurveTypeBls12381,
 } from '../offchain-signatures/curve-type';
-import { CheqdAccumulatorParamsRef, DockAccumulatorParamsRef } from './keys';
+import {
+  CheqdAccumulatorParamsRef,
+  CheqdMainnetAccumulatorParamsRef,
+  CheqdTestnetAccumulatorParamsRef,
+  DockAccumulatorParamsRef,
+} from './keys';
 import { AccumulatorParams } from './params';
 
 export class AccumulatorPublicKey extends TypedStruct {
@@ -59,8 +69,18 @@ export class DockAccumulatorPublicKey extends withProp(
   option(DockAccumulatorParamsRef),
 ) {}
 
-export class CheqdAccumulatorPublicKey extends withProp(
-  AccumulatorPublicKey,
+export class CheqdAccumulatorPublicKey extends withFrom(
+  withProp(AccumulatorPublicKey, 'paramsRef', option(CheqdAccumulatorParamsRef)),
+) {}
+
+export class CheqdTestnetAccumulatorPublicKey extends withProp(
+  CheqdAccumulatorPublicKey,
   'paramsRef',
-  option(CheqdAccumulatorParamsRef),
+  option(CheqdTestnetAccumulatorParamsRef),
+) {}
+
+export class CheqdMainnetAccumulatorPublicKey extends withProp(
+  CheqdAccumulatorPublicKey,
+  'paramsRef',
+  option(CheqdMainnetAccumulatorParamsRef),
 ) {}

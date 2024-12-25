@@ -69,7 +69,7 @@ export class PublicKeyBase58 extends withBase58(TypedBytes) {}
 export class PublicKeyMetadata extends withFrom(TypedStruct, (value, from) => {
   const self = from(value);
 
-  if (self.paramsRef == null && self.participantId == null) {
+  if (self?.paramsRef == null && self?.participantId == null) {
     return null;
   } else {
     return self;

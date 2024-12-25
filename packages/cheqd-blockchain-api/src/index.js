@@ -3,6 +3,7 @@ import {
   maybeToJSONString,
   fmtIter,
   extendNull,
+  maybeToCheqdPayloadOrJSON,
 } from '@docknetwork/credential-sdk/utils';
 import {
   DIDModule,
@@ -29,9 +30,20 @@ import {
   CheqdCreateResource,
   CheqdDIDDocument,
   CheqdDeactivateDidDocument,
+  CheqdTestnetAccumulatorId,
+  CheqdTestnetAccumulatorPublicKey,
+  CheqdTestnetBlobId,
+  CheqdTestnetDid,
+  CheqdTestnetStatusListCredentialId,
+  CheqdTestnetDIDDocument,
+  CheqdMainnetAccumulatorId,
+  CheqdMainnetAccumulatorPublicKey,
+  CheqdMainnetBlobId,
+  CheqdMainnetDid,
+  CheqdMainnetStatusListCredentialId,
+  CheqdMainnetDIDDocument,
 } from '@docknetwork/credential-sdk/types';
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
-import { maybeToCheqdPayloadOrJSON } from '../../credential-sdk/src/utils';
 
 export class CheqdAPI extends AbstractApiProvider {
   /**
@@ -72,6 +84,25 @@ export class CheqdAPI extends AbstractApiProvider {
     MsgDeactivateDidDoc:
       CheqdCheqdDeactivateDidDocumentPayloadWithTypeUrlAndSignatures,
     MsgCreateResource: CheqdCreateResourcePayloadWithTypeUrlAndSignatures,
+  });
+
+  static Types = extendNull({
+    [CheqdNetwork.Testnet]: extendNull({
+      Did: CheqdTestnetDid,
+      DidDocument: CheqdTestnetDIDDocument,
+      AccumulatorId: CheqdTestnetAccumulatorId,
+      AccumulatorPublicKey: CheqdTestnetAccumulatorPublicKey,
+      BlobId: CheqdTestnetBlobId,
+      StatusListCredentialId: CheqdTestnetStatusListCredentialId,
+    }),
+    [CheqdNetwork.Mainnet]: extendNull({
+      Did: CheqdMainnetDid,
+      DidDocument: CheqdMainnetDIDDocument,
+      AccumulatorId: CheqdMainnetAccumulatorId,
+      AccumulatorPublicKey: CheqdMainnetAccumulatorPublicKey,
+      BlobId: CheqdMainnetBlobId,
+      StatusListCredentialId: CheqdMainnetStatusListCredentialId,
+    }),
   });
 
   /**
@@ -202,6 +233,13 @@ export class CheqdAPI extends AbstractApiProvider {
     }
 
     return res;
+  }
+
+  types() {
+    const { Types } = this.constructor;
+    const { network } = this.ensureInitialized().sdk.options;
+
+    return Types[network];
   }
 
   methods() {

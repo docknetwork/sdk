@@ -89,7 +89,13 @@ export class CheqdDLRRef extends withFrom(
     }
   },
 ) {
-  static Classes = [CheqdDid, TypedUUID];
+  static Did = CheqdDid;
+
+  static Id = TypedUUID;
+
+  static get Classes() {
+    return [this.Did, this.Id];
+  }
 
   toString() {
     return `${this[0]}:${this[1]}`;

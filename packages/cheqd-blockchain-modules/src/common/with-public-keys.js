@@ -12,15 +12,15 @@ export default function withPublicKeys(klass) {
       /**
        * Add new signature public key.
        * @param id - Unique identifier of the public key.
-       * @param param - The signature public key to add.
+       * @param publicKey - The signature public key to add.
        * @param targetDid - Target DID to attach key to.
        * @param didKeypair - The signer DID's keypair.
        * @returns {Promise<*>}
        */
-      async addPublicKeyTx(id, param, targetDid, didKeypair) {
+      async addPublicKeyTx(id, publicKey, targetDid, didKeypair) {
         return await this.cheqdOnly.tx.addPublicKey(
           id,
-          param,
+          publicKey,
           targetDid,
           didKeypair,
         );
@@ -48,14 +48,12 @@ export default function withPublicKeys(klass) {
       }
 
       async lastPublicKeyId(targetDid) {
-        return option(TypedUUID).from(
-          (
-            await this.cheqdOnly.latestResourceMetadataBy(
-              targetDid,
-              this.cheqdOnly.filterPublicKeyMetadata,
-            )
-          )?.id,
+        const meta = await this.cheqdOnly.latestResourceMetadataBy(
+          targetDid,
+          this.cheqdOnly.filterPublicKeyMetadata,
         );
+
+        return option(TypedUUID).from(meta?.id);
       }
 
       async nextPublicKeyId(_) {

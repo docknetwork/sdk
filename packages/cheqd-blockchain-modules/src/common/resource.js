@@ -9,39 +9,32 @@ export class SortedResourceVersions {
   constructor(items) {
     const { resourceId, resourceNextVersionId } = this.constructor;
 
-    let map;
-    if (items instanceof Map) {
-      map = items;
-    } else {
-      map = new Map([...items].map((item) => [resourceId(item), item]));
-    }
-    if (!map.size) {
-      this.items = [];
+    this.items = [];
 
+    const map = items instanceof Map
+      ? items
+      : new Map([...items].map((item) => [resourceId(item), item]));
+    if (!map.size) {
       return;
     }
 
     // Find starting point
     let currentItem = this.constructor.findStartingPoint(map);
-    if (!currentItem) {
-      throw new Error(
-        `No starting point found for ${maybeToJSONString([
-          ...items,
-        ])} (missing item without \`previousVersionId\`)`,
-      );
-    }
 
     // Validate items and create sorted sequence
-    const sortedItems = [];
     const visited = new Set();
 
     while (currentItem) {
       if (visited.has(resourceId(currentItem))) {
-        throw new Error('Cycle detected in the version sequence');
+        throw new Error(
+          `Cycle detected in the version sequence: \`${resourceId(
+            currentItem,
+          )}\` was met twice`,
+        );
       }
 
       visited.add(resourceId(currentItem));
-      sortedItems.push(currentItem);
+      this.items.push(currentItem);
 
       currentItem = map.get(resourceNextVersionId(currentItem)) ?? null;
     }
@@ -49,8 +42,6 @@ export class SortedResourceVersions {
     if (visited.size !== map.size) {
       throw new Error('Disconnected sequence detected');
     }
-
-    this.items = sortedItems;
   }
 
   static findStartingPoint(map) {
@@ -91,6 +82,13 @@ export class SortedResourceVersions {
           );
         }
       }
+    }
+    if (!firstItem) {
+      throw new Error(
+        `No starting point found for ${maybeToJSONString([
+          ...map,
+        ])} (missing item without \`previousVersionId\`)`,
+      );
     }
 
     return firstItem;

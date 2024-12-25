@@ -42,16 +42,42 @@ export class CheqdBlobIdValue extends withQualifier(DidRef) {
     return new this(did, id);
   }
 
+  static cheqdDid(did) {
+    return did.value;
+  }
+
   toEncodedString() {
-    const { did, value } = this;
+    const { did, value, constructor } = this;
+    const cheqdDid = constructor.cheqdDid(did);
+
     let prefix = '';
-    if (did.value instanceof CheqdTestnetDid) {
+    if (cheqdDid instanceof CheqdTestnetDid) {
       prefix = 'testnet';
-    } else if (did.value instanceof CheqdMainnetDid) {
+    } else if (cheqdDid instanceof CheqdMainnetDid) {
       prefix = 'mainnet';
+    } else {
+      throw new Error(
+        `Can't determine DID type: \`${cheqdDid}\`, instance of \`${cheqdDid.constructor.name}\``,
+      );
     }
 
     return `${prefix}:${did.toEncodedString()}:${value}`;
+  }
+}
+
+export class CheqdTestnetBlobIdValue extends CheqdBlobIdValue {
+  static Did = CheqdTestnetDid;
+
+  static cheqdDid(did) {
+    return did;
+  }
+}
+
+export class CheqdMainnetBlobIdValue extends CheqdBlobIdValue {
+  static Did = CheqdMainnetDid;
+
+  static cheqdDid(did) {
+    return did;
   }
 }
 
@@ -79,6 +105,14 @@ export class CheqdBlobId extends BlobId {
   static random(did) {
     return new this(this.Class.random(did));
   }
+}
+
+export class CheqdTestnetBlobId extends CheqdBlobId {
+  static Class = CheqdTestnetBlobIdValue;
+}
+
+export class CheqdMainnetBlobId extends CheqdBlobId {
+  static Class = CheqdMainnetBlobIdValue;
 }
 
 export class DockBlobId extends BlobId {

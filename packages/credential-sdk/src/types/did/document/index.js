@@ -24,9 +24,10 @@ import {
   CheqdTestnetVerificationMethod,
   CheqdMainnetVerificationMethod,
 } from './verification-method';
-import VerificationMethodRefOrCheqdVerificationMethod, {
-  VerificationMethodRefOrCheqdMainnetVerificationMethod,
-  VerificationMethodRefOrCheqdTestnetVerificationMethod,
+import {
+  CheqdVerificationMethodRefOrCheqdVerificationMethod,
+  CheqdVerificationMethodRefOrCheqdMainnetVerificationMethod,
+  CheqdVerificationMethodRefOrCheqdTestnetVerificationMethod,
 } from './verification-method-ref-or-cheqd-verification-method';
 import { Ed25519Verification2018Method } from './verification-method-type';
 import {
@@ -113,15 +114,15 @@ export class CheqdMainnetVerificationMethodReferences extends TypedArray {
 export class VersionId extends TypedUUID {}
 
 class CheqdAssertionMethod extends TypedArray {
-  static Class = VerificationMethodRefOrCheqdVerificationMethod;
+  static Class = CheqdVerificationMethodRefOrCheqdVerificationMethod;
 }
 
 class CheqdTestnetAssertionMethod extends TypedArray {
-  static Class = VerificationMethodRefOrCheqdTestnetVerificationMethod;
+  static Class = CheqdVerificationMethodRefOrCheqdTestnetVerificationMethod;
 }
 
 class CheqdMainnetAssertionMethod extends TypedArray {
-  static Class = VerificationMethodRefOrCheqdMainnetVerificationMethod;
+  static Class = CheqdVerificationMethodRefOrCheqdMainnetVerificationMethod;
 }
 
 export class DIDDocument extends withFrom(
@@ -305,20 +306,20 @@ export class DIDDocument extends withFrom(
       capabilityInvocation,
     } = this;
 
-    class VerificationMethodRefOrCheqdVerificationMethodSet extends TypedSet {
-      static Class = VerificationMethodRefOrCheqdVerificationMethod;
+    class CheqdVerificationMethodRefOrCheqdVerificationMethodSet extends TypedSet {
+      static Class = CheqdVerificationMethodRefOrCheqdVerificationMethod;
     }
 
-    const auth = new VerificationMethodRefOrCheqdVerificationMethodSet(
+    const auth = new CheqdVerificationMethodRefOrCheqdVerificationMethodSet(
       authentication,
     );
-    const assertion = new VerificationMethodRefOrCheqdVerificationMethodSet(
+    const assertion = new CheqdVerificationMethodRefOrCheqdVerificationMethodSet(
       assertionMethod,
     );
-    const keyAgr = new VerificationMethodRefOrCheqdVerificationMethodSet(
+    const keyAgr = new CheqdVerificationMethodRefOrCheqdVerificationMethodSet(
       keyAgreement,
     );
-    const capInv = new VerificationMethodRefOrCheqdVerificationMethodSet(
+    const capInv = new CheqdVerificationMethodRefOrCheqdVerificationMethodSet(
       capabilityInvocation,
     );
 

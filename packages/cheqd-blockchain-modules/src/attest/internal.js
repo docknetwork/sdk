@@ -10,15 +10,17 @@ const Name = 'Attestation';
 const Type = 'attest';
 
 const methods = {
-  setClaim: (iri, targetDid) => new CheqdCreateResource(
-    CheqdDid.from(targetDid).value,
-    TypedUUID.random(),
-    '1.0',
-    [],
-    Name,
-    Type,
-    Iri.from(iri),
-  ),
+  setClaim(iri, targetDid) {
+    return new CheqdCreateResource(
+      CheqdDid.from(targetDid).value,
+      TypedUUID.random(),
+      '1.0',
+      [],
+      Name,
+      Type,
+      Iri.from(iri),
+    );
+  },
 };
 
 export default class CheqdInternalAttestModule extends createInternalCheqdModule(

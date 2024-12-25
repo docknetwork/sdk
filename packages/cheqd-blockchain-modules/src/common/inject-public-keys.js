@@ -2,6 +2,7 @@ import { TypedMap } from '@docknetwork/credential-sdk/types/generic';
 import {
   u8aToString,
   withExtendedStaticProperties,
+  withExtendedPrototypeProperties,
 } from '@docknetwork/credential-sdk/utils';
 import {
   CheqdPublicKeyId,
@@ -19,7 +20,7 @@ const methods = {
       [],
       this.constructor.PublicKeyName,
       this.constructor.PublicKeyType,
-      this.constructor.PublicKey.from(publicKey).toJSONStringBytes(),
+      this.PublicKey.from(publicKey).toJSONStringBytes(),
     );
   },
 };
@@ -35,6 +36,16 @@ export default function injectPublicKeys(klass) {
         this.filterPublicKeyMetadata = this.filterPublicKeyMetadata.bind(this);
       }
 
+      get PublicKeysMap() {
+        const { PublicKey } = this;
+
+        return class PublicKeysMap extends TypedMap {
+          static KeyClass = CheqdPublicKeyId;
+
+          static ValueClass = PublicKey;
+        };
+      }
+
       static get MsgNames() {
         const names = super.MsgNames ?? {};
 
@@ -44,24 +55,17 @@ export default function injectPublicKeys(klass) {
         };
       }
 
-      static get PublicKeyMap() {
-        const { PublicKey } = this;
-
-        return class PublicKeyMap extends TypedMap {
-          static KeyClass = CheqdPublicKeyId;
-
-          static ValueClass = PublicKey;
-        };
-      }
-
       /**
-       * Retrieves params by DID and counter.
+       * Retrieves params by DID and identifier.
        * @param {*} did
-       * @param {*} counter
+       * @param {*} id
+       * @param {boolean} [includeParams=false]
        * @returns {Promise<PublicKey>}
        */
       async getPublicKey(did, id, includeParams = false) {
-        const { PublicKey, PublicKeyType, PublicKeyName } = this.constructor;
+        const { PublicKey, constructor } = this;
+        const { PublicKeyType, PublicKeyName } = constructor;
+
         const item = await this.resource(did, id);
         if (item == null) {
           return null;
@@ -80,19 +84,20 @@ export default function injectPublicKeys(klass) {
       }
 
       /**
-       * Retrieves all params by a DID.
+       * Retrieves all public keys by a DID.
        * @param {*} did
+       * @param {boolean} [includeParams=false]
        * @returns {Promise<Map<CheqdPublicKeyId, PublicKey>>}
        */
       async getAllPublicKeysByDid(did, includeParams = false) {
-        const { PublicKeyMap } = this.constructor;
+        const { PublicKeysMap } = this;
 
         const metas = await this.resourcesMetadataBy(
           did,
           this.filterPublicKeyMetadata,
         );
 
-        return new PublicKeyMap(
+        return new PublicKeysMap(
           await Promise.all(
             metas.map(async ({ id }) => [
               id,
@@ -108,8 +113,8 @@ export default function injectPublicKeys(klass) {
     },
   };
 
-  return withExtendedStaticProperties(
-    ['PublicKey', 'PublicKeyName', 'PublicKeyType'],
-    obj[name],
+  return withExtendedPrototypeProperties(
+    ['PublicKey'],
+    withExtendedStaticProperties(['PublicKeyName', 'PublicKeyType'], obj[name]),
   );
 }

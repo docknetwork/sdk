@@ -5,7 +5,6 @@ import {
   CheqdAccumulatorParamsRef,
   CheqdAccumulatorWithUpdateInfo,
   CheqdCreateResource,
-  CheqdAccumulatorPublicKey,
 } from '@docknetwork/credential-sdk/types';
 import { TypedUUID, option } from '@docknetwork/credential-sdk/types/generic';
 import { stringToU8a, u8aToString } from '@docknetwork/credential-sdk/utils';
@@ -21,8 +20,10 @@ import {
 const Type = 'accumulator';
 
 const methods = {
-  addAccumulator: (accumulatorId, accumulator) => {
-    const [did, id] = CheqdAccumulatorId.from(accumulatorId).value;
+  addAccumulator(accumulatorId, accumulator) {
+    const { AccumulatorId } = this.types;
+
+    const [did, id] = AccumulatorId.from(accumulatorId).value;
     const storedAcc = new CheqdStoredAccumulator(
       accumulator,
     ).toJSONStringBytes();
@@ -37,12 +38,14 @@ const methods = {
       storedAcc,
     );
   },
-  updateAccumulator: (
+  updateAccumulator(
     accumulatorId,
     accumulator,
     { additions, removals, witnessUpdateInfo },
-  ) => {
-    const [did, id] = CheqdAccumulatorId.from(accumulatorId).value;
+  ) {
+    const { AccumulatorId } = this.types;
+
+    const [did, id] = AccumulatorId.from(accumulatorId).value;
     const storedAcc = new CheqdStoredAccumulator(
       accumulator,
       additions,
@@ -60,8 +63,10 @@ const methods = {
       storedAcc,
     );
   },
-  removeAccumulator: (accumulatorId) => {
-    const [did, id] = CheqdAccumulatorId.from(accumulatorId).value;
+  removeAccumulator(accumulatorId) {
+    const { AccumulatorId } = this.types;
+
+    const [did, id] = AccumulatorId.from(accumulatorId).value;
 
     return new CheqdCreateResource(
       did.value.value,
@@ -87,7 +92,9 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
     };
   }
 
-  static PublicKey = CheqdAccumulatorPublicKey;
+  get PublicKey() {
+    return this.types.AccumulatorPublicKey;
+  }
 
   static PublicKeyName = 'AccumulatorPublicKey';
 

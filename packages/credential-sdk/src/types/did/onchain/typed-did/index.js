@@ -1,4 +1,3 @@
-import { sha256 } from 'js-sha256';
 import { DidMethodKeyPublicKey, DidMethodKeySignature } from './did-method-key';
 import DockDidValue, { DockDidSignature } from './dock-did-value';
 import {
@@ -8,7 +7,7 @@ import {
   withQualifier,
 } from '../../../generic';
 import { CheqdDid, CheqdMainnetDid, CheqdTestnetDid } from './cheqd-did';
-import { valueBytes, withExtendedStaticProperties } from '../../../../utils';
+import { withExtendedStaticProperties } from '../../../../utils';
 import DidOrDidMethodKeySignature from './signature';
 
 export class DockDidOrDidMethodKey extends withQualifier(TypedEnum, true) {
@@ -173,9 +172,7 @@ for (const Class of [CheqdTestnetDid, CheqdMainnetDid]) {
 
   Class.from = function from(value) {
     if (value instanceof DockDid || value instanceof DockNamespaceDid) {
-      return new this(
-        TypedUUID.fromBytesAdapt(sha256.digest(valueBytes(value))),
-      );
+      return new this(TypedUUID.fromDockIdent(value));
     } else {
       return fromFn.call(this, value);
     }
@@ -188,8 +185,10 @@ export class DidRef extends withExtendedStaticProperties(
 ) {
   static Qualifier = '';
 
+  static Did = NamespaceDid;
+
   static get Classes() {
-    return [NamespaceDid, this.Ident];
+    return [this.Did, this.Ident];
   }
 
   static random(did) {

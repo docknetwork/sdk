@@ -269,6 +269,7 @@ export default class DIDMigration extends Base {
     } else {
       document = await this.modules.did.getDocument(did);
       document.alsoKnownAs.push(did);
+      document.removeController(cheqdDid);
       keypair = this.findKeypairOrAddTemporary(document);
 
       const cheqdDoc = document
@@ -294,16 +295,14 @@ export default class DIDMigration extends Base {
     const document = await this.modules.did.getDocument(cheqdDid);
 
     const kp = this.keyPairs.TEMPORARY;
-    const idx = document.verificationMethod.find(
-      (verMethod) =>
-        verMethod.publicKey().eq(kp.publicKey()) &&
-        verMethod.id.did.eq(cheqdDid)
-    )?.id?.index;
+    const ref = document.verificationMethod.find((verMethod) =>
+      verMethod.publicKey().eq(kp.publicKey())
+    )?.id;
     const didKp = this.findKeypair(document);
 
-    if (idx != null) {
+    if (ref != null) {
       console.log(`Removing temporary key from ${cheqdDid}`);
-      document.removeKey([cheqdDid, idx]);
+      document.removeKey(ref);
 
       yield await this.modules.did.updateDocumentTx(document, didKp);
     }

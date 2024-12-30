@@ -72,9 +72,8 @@ export class Base {
     const cheqdDid = CheqdTestnetDid.from(did);
 
     for (const kp of this.keyPairs) {
-      const idx = document.verificationMethod.find(
-        (verMethod) =>
-          verMethod.publicKey().eq(kp.publicKey()) && verMethod.id.did.eq(did)
+      const idx = document.verificationMethod.find((verMethod) =>
+        verMethod.publicKey().eq(kp.publicKey())
       )?.id?.index;
 
       if (idx != null) {

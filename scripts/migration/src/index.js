@@ -6,8 +6,13 @@ import {
   randomAsHex,
   maybeToJSONString,
 } from "@docknetwork/credential-sdk/utils";
+import { DidKeypair } from "@docknetwork/credential-sdk/keypairs";
+import { DIDDocument } from "@docknetwork/credential-sdk/types";
 import { DockCoreModules } from "@docknetwork/dock-blockchain-modules";
-import { CheqdCoreModules } from "@docknetwork/cheqd-blockchain-modules";
+import {
+  CheqdCoreModules,
+  CheqdDIDModule,
+} from "@docknetwork/cheqd-blockchain-modules";
 import pLimit from "p-limit";
 import { DirectSecp256k1HdWallet } from "@docknetwork/cheqd-blockchain-api/wallet";
 import DIDMigration from "./modules/did.js";
@@ -67,12 +72,14 @@ const transfer = async (cheqdAPI, from, to) => {
 };
 
 async function main() {
+  const controllerDid =
+    "did:cheqd:testnet:6c520492-813e-4433-8cbc-7ebe49df8343";
   const dock = new DockAPI();
 
   await dock.init({ address: DOCK_ENDPOINT });
 
   const generated = await Promise.all(
-    Array.from({ length: 1 }, generateRandomWallet)
+    Array.from({ length: 0 }, generateRandomWallet)
   );
   const wallets = await Promise.all(
     [...mnemonics, ...generated].map((mnemonic) =>
@@ -87,6 +94,17 @@ async function main() {
     network: CheqdNetwork.Testnet,
     wallet: wallets[0],
   });
+
+  try {
+    const kp = new DidKeypair([controllerDid, 1], keys.TEMPORARY);
+
+    await new CheqdDIDModule(defaultCheqd).createDocument(
+      DIDDocument.create(controllerDid, [kp.didKey()]),
+      new DidKeypair([controllerDid, 1], keys.TEMPORARY)
+    );
+  } catch (err) {
+    console.error(err);
+  }
 
   for (const wallet of wallets.slice(1)) {
     await transfer(
@@ -107,7 +125,22 @@ async function main() {
   const limit = pLimit(10);
   const didMigration = new DIDMigration(dock, modules, keys, limit);
 
-  const txs = didMigration.txs();
+  async function* takeFirstTwo(...iterators) {
+    for (const iterator of iterators) {
+      let count = 0;
+
+      for await (const item of iterator) {
+        if (count < 1) {
+          yield item;
+          count++;
+        } else {
+          break;
+        }
+      }
+    }
+  }
+
+  const txs = takeFirstTwo(didMigration.txs(), didMigration.postTxs());
 
   let idx = 0;
   return await Promise.all(

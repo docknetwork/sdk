@@ -1,5 +1,5 @@
-import { applyToValue, maybeToJSONString } from './interfaces';
-import { ensureBytes, ensureString, isBytes } from './type-helpers';
+import { applyToValue, maybeToJSONString } from "./interfaces";
+import { ensureBytes, ensureString, isBytes } from "./type-helpers";
 
 /**
  * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars
@@ -8,7 +8,7 @@ import { ensureBytes, ensureString, isBytes } from './type-helpers';
  * @return {boolean} True if hex (with given size) else false
  */
 export const isHexWithGivenByteSize = (value, byteSize) => {
-  if (typeof value !== 'string') {
+  if (typeof value !== "string") {
     return false;
   }
   const match = value.match(/^0x([0-9a-f]+$)/i);
@@ -38,14 +38,16 @@ export const isHex = (value) => isHexWithGivenByteSize(value);
  * @param {Iterable<number>} bytes
  * @returns {string}
  */
-export const u8aToHex = (bytes) => `0x${Buffer.from(ensureBytes(bytes)).toString('hex')}`;
+export const u8aToHex = (bytes) =>
+  `0x${Buffer.from(ensureBytes(bytes)).toString("hex")}`;
 
 /**
  * Creates random `Uint8Array` array of supplied byte length.
  * @param {number} length
  * @returns {Uint8Array}
  */
-export const randomAsU8a = (length) => Uint8Array.from({ length }, () => Math.floor(Math.random() * 256));
+export const randomAsU8a = (length) =>
+  Uint8Array.from({ length }, () => Math.floor(Math.random() * 256));
 
 /**
  * Creates random hex string of supplied byte length.
@@ -62,11 +64,11 @@ export const randomAsHex = (length) => u8aToHex(randomAsU8a(length));
 export const hexToU8a = (str) => {
   if (!isHex(str)) {
     throw new Error(
-      `Expected valid hex string, received: \`${str}\` with type \`${typeof str}\``,
+      `Expected valid hex string, received: \`${str}\` with type \`${typeof str}\``
     );
   }
 
-  return Uint8Array.from(Buffer.from(str.slice(2), 'hex'));
+  return Uint8Array.from(Buffer.from(str.slice(2), "hex"));
 };
 
 /**
@@ -108,7 +110,8 @@ export const u8aToU8a = (bytes) => bufferToU8a(Buffer.from(ensureBytes(bytes)));
  * @param {Iterable<number>} bytes
  * @returns {string}
  */
-export const u8aToString = (bytes) => Buffer.from(ensureBytes(bytes)).toString();
+export const u8aToString = (bytes) =>
+  Buffer.from(ensureBytes(bytes)).toString();
 
 /**
  * Converts supplied string containing any characters to its hex string representation.
@@ -132,9 +135,9 @@ export const normalizeToU8a = (bytes) => {
   }
 
   throw new Error(
-    `Can't convert supplied value to \`Uint8Array\`: \`${maybeToJSONString(
-      bytes,
-    )}\` ${bytes ? `instance of ${bytes.constructor}` : ''}`,
+    `Can't convert supplied value to \`Uint8Array\`: \`${bytes}\` ${
+      bytes ? `instance of \`${bytes.constructor.name}\`` : ""
+    }`
   );
 };
 
@@ -143,9 +146,10 @@ export const normalizeToU8a = (bytes) => {
  * @param {Uint8Array | string} bytesOrString
  * @returns {Uint8Array}
  */
-export const normalizeOrConvertStringToU8a = (bytesOrString) => (typeof bytesOrString === 'string' && !isHex(bytesOrString)
-  ? stringToU8a(bytesOrString)
-  : normalizeToU8a(bytesOrString));
+export const normalizeOrConvertStringToU8a = (bytesOrString) =>
+  typeof bytesOrString === "string" && !isHex(bytesOrString)
+    ? stringToU8a(bytesOrString)
+    : normalizeToU8a(bytesOrString);
 
 /**
  * Attempts to get byte representation of the supplied object.
@@ -153,11 +157,15 @@ export const normalizeOrConvertStringToU8a = (bytesOrString) => (typeof bytesOrS
  * @param {*} obj
  * @returns {Uint8Array}
  */
-export const valueBytes = (value) => applyToValue(
-  (inner) => Array.isArray(inner) || inner instanceof Uint8Array || 'bytes' in inner,
-  (inner) => normalizeToU8a(inner.bytes ?? inner),
-  value,
-);
+export const valueBytes = (value) =>
+  applyToValue(
+    (inner) =>
+      Array.isArray(inner) ||
+      inner instanceof Uint8Array ||
+      (inner && typeof inner === "object" && "bytes" in inner),
+    (inner) => normalizeToU8a(inner.bytes ?? inner),
+    value
+  );
 
 /**
  * Converts a number to bytes.
@@ -166,14 +174,14 @@ export const valueBytes = (value) => applyToValue(
  */
 export const numToBytes = (num) => {
   // Check if the input is a number
-  if (typeof num !== 'number') {
-    throw new TypeError('Input must be a number');
+  if (typeof num !== "number") {
+    throw new TypeError("Input must be a number");
   }
 
   // Convert the number to its byte representation using DataView and ArrayBuffer
   const buf = Buffer.alloc(4);
   buf.writeUint32BE(num);
-  return u8aToHex(buf);
+  return u8aToU8a(buf);
 };
 
 /**
@@ -182,16 +190,19 @@ export const numToBytes = (num) => {
  * @param {*} obj
  * @returns {Uint8Array}
  */
-export const valueNumberOrBytes = (value) => applyToValue(
-  (inner) => Array.isArray(inner)
-      || inner instanceof Uint8Array
-      || 'bytes' in inner
-      || typeof inner === 'number',
-  (inner) => (typeof inner === 'number'
-    ? numToBytes(inner)
-    : normalizeToU8a(inner.bytes ?? inner)),
-  value,
-);
+export const valueNumberOrBytes = (value) =>
+  applyToValue(
+    (inner) =>
+      Array.isArray(inner) ||
+      inner instanceof Uint8Array ||
+      (inner && typeof inner === "object" && "bytes" in inner) ||
+      typeof inner === "number",
+    (inner) =>
+      typeof inner === "number"
+        ? numToBytes(inner)
+        : normalizeToU8a(inner.bytes ?? inner),
+    value
+  );
 
 /**
  * Normalizes the given input to hex. Expects a Uint8Array or a hex string
@@ -200,9 +211,9 @@ export const valueNumberOrBytes = (value) => applyToValue(
  */
 export function normalizeToHex(data) {
   if (
-    data instanceof Uint8Array
-    || data instanceof Buffer
-    || Array.isArray(data)
+    data instanceof Uint8Array ||
+    data instanceof Buffer ||
+    Array.isArray(data)
   ) {
     return u8aToHex(data);
   } else if (isHex(data)) {
@@ -210,6 +221,6 @@ export function normalizeToHex(data) {
   }
 
   throw new Error(
-    `Expected a hex string or a byte array, received \`${data}\` with type \`${typeof data}\``,
+    `Expected a hex string or a byte array, received \`${data}\` with type \`${typeof data}\``
   );
 }

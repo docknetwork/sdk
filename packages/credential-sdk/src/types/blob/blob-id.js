@@ -1,15 +1,18 @@
-import { encodeAsSS58, decodeFromSS58 } from '../../utils/ss58';
-import { isHex } from '../../utils/bytes';
+import { encodeAsSS58, decodeFromSS58 } from "../../utils/ss58";
+import { isHex } from "../../utils/bytes";
 import {
   TypedBytes,
   TypedEnum,
   TypedUUID,
+  patchWithFromDock,
   sized,
   withFrom,
+  withFromDockId,
   withQualifier,
-} from '../generic';
-import { CheqdBlobQualifier, DockBlobQualifier } from './const';
-import { CheqdMainnetDid, CheqdTestnetDid, DidRef } from '../did';
+} from "../generic";
+import { CheqdBlobQualifier, DockBlobQualifier } from "./const";
+import { CheqdMainnetDid, CheqdTestnetDid, DidRef } from "../did";
+import dockDidById from "../../utils/dock-did-by-id.json";
 
 export class BlobId extends withFrom(
   withQualifier(TypedEnum, true),
@@ -20,22 +23,48 @@ export class BlobId extends withFrom(
     } catch {
       return from(value);
     }
-  },
+  }
 ) {
-  static Qualifier = 'blob:';
+  static Qualifier = "blob:";
 
   toJSON() {
     return String(this);
   }
 }
 
+export class DockBlobIdValue extends sized(withQualifier(TypedBytes)) {
+  static Qualifier = DockBlobQualifier;
+
+  static Size = 32;
+
+  static fromUnqualifiedString(bytes) {
+    return new this(isHex(bytes) ? bytes : decodeFromSS58(bytes));
+  }
+
+  toEncodedString() {
+    return encodeAsSS58(this.value);
+  }
+}
+
+export class DockBlobId extends BlobId {
+  static Qualifier = DockBlobQualifier;
+
+  static Class = DockBlobIdValue;
+
+  static Type = "dock";
+
+  static random() {
+    return new this(this.Class.random());
+  }
+}
+
 export class CheqdBlobIdValue extends withQualifier(DidRef) {
   static Qualifier = CheqdBlobQualifier;
 
-  static Ident = TypedUUID;
+  static Ident = withFromDockId(TypedUUID, DockBlobId, "blob:cheqd:");
 
   static fromUnqualifiedString(str) {
-    const lastColon = str.lastIndexOf(':');
+    const lastColon = str.lastIndexOf(":");
     const did = `did:cheqd:${str.slice(0, lastColon)}`;
     const id = str.slice(lastColon + 1);
 
@@ -50,14 +79,14 @@ export class CheqdBlobIdValue extends withQualifier(DidRef) {
     const { did, value, constructor } = this;
     const cheqdDid = constructor.cheqdDid(did);
 
-    let prefix = '';
+    let prefix = "";
     if (cheqdDid instanceof CheqdTestnetDid) {
-      prefix = 'testnet';
+      prefix = "testnet";
     } else if (cheqdDid instanceof CheqdMainnetDid) {
-      prefix = 'mainnet';
+      prefix = "mainnet";
     } else {
       throw new Error(
-        `Can't determine DID type: \`${cheqdDid}\`, instance of \`${cheqdDid.constructor.name}\``,
+        `Can't determine DID type: \`${cheqdDid}\`, instance of \`${cheqdDid.constructor.name}\``
       );
     }
 
@@ -81,26 +110,12 @@ export class CheqdMainnetBlobIdValue extends CheqdBlobIdValue {
   }
 }
 
-export class DockBlobIdValue extends sized(withQualifier(TypedBytes)) {
-  static Qualifier = DockBlobQualifier;
-
-  static Size = 32;
-
-  static fromUnqualifiedString(bytes) {
-    return new this(isHex(bytes) ? bytes : decodeFromSS58(bytes));
-  }
-
-  toEncodedString() {
-    return encodeAsSS58(this.value);
-  }
-}
-
 export class CheqdBlobId extends BlobId {
   static Qualifier = CheqdBlobQualifier;
 
   static Class = CheqdBlobIdValue;
 
-  static Type = 'cheqd';
+  static Type = "cheqd";
 
   static random(did) {
     return new this(this.Class.random(did));
@@ -115,16 +130,6 @@ export class CheqdMainnetBlobId extends CheqdBlobId {
   static Class = CheqdMainnetBlobIdValue;
 }
 
-export class DockBlobId extends BlobId {
-  static Qualifier = DockBlobQualifier;
-
-  static Class = DockBlobIdValue;
-
-  static Type = 'dock';
-
-  static random() {
-    return new this(this.Class.random());
-  }
-}
-
 BlobId.bindVariants(CheqdBlobId, DockBlobId);
+
+patchWithFromDock(CheqdBlobId, DockBlobId, dockDidById.blobs);

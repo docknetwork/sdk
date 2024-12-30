@@ -1,17 +1,47 @@
 import { AccumulatorId } from "@docknetwork/credential-sdk/types";
 import { Base } from "./common.js";
-import { dockIdentToCheqd } from "@docknetwork/credential-sdk/utils/misc";
-import {
-  CheqdAccumulatorId,
-  CheqdTestnetDid,
-} from "@docknetwork/credential-sdk/types";
-import { TypedUUID } from "@docknetwork/credential-sdk/types/generic";
+import { CheqdTestnetDid } from "@docknetwork/credential-sdk/types";
+
+export class AccumulatorParamsMigration extends Base {
+  static Prop = "accumulator";
+
+  async existsOnCheqd() {
+    return false;
+    // return (await this.module.getParams(CheqdTestnetDid.from(did), id)) != null;
+  }
+
+  async keys() {
+    return Object.keys(this.dids);
+  }
+
+  async fetchEntry(did) {
+    return [did, await this.module.getAlParamsByDid(did)];
+  }
+
+  async *txs() {
+    const { module } = this;
+
+    for await (const [did, params] of this.fetchAndFilter()) {
+      const keypair = this.findKeypair(await this.cheqdDocument(did));
+      const keys = [...params].sort((a, b) => +a[0] - +b[0]);
+
+      for (const [id, key] of keys) {
+        yield await module.adParamsTx(
+          id,
+          key,
+          CheqdTestnetDid.from(did),
+          keypair
+        );
+      }
+    }
+  }
+}
 
 export class AccumulatorPublicKeysMigration extends Base {
   static Prop = "accumulator";
 
-  async existsOnCheqd([did, id]) {
-    return (await this.module.getPublicKey(did, id)) != null;
+  async existsOnCheqd(_) {
+    return false;
   }
 
   async keys() {
@@ -22,18 +52,24 @@ export class AccumulatorPublicKeysMigration extends Base {
     return [did, await this.module.getAllPublicKeysByDid(did)];
   }
 
+  keyDid(key) {
+    return key[0];
+  }
+
   async *txs() {
     const { module } = this;
 
-    for await (const [did, publicKeys] of this.fetchAndFilter()) {
-      const keypair = this.findKeypair(await this.cheqdDocument(did));
+    for await (const {
+      keypair,
+      item: [did, publicKeys],
+    } of this.fetchAndFilterWithKeypair()) {
       const keys = [...publicKeys].sort((a, b) => +a[0] - +b[0]);
 
       for (const [id, key] of keys) {
         yield await module.addPublicKeyTx(
-          TypedUUID.fromDockIdent(id),
+          id,
           key,
-          did,
+          CheqdTestnetDid.from(did),
           keypair
         );
       }
@@ -41,7 +77,7 @@ export class AccumulatorPublicKeysMigration extends Base {
   }
 }
 
-export default class AccumulatorMigration extends Base {
+export class AccumulatorMigration extends Base {
   static Prop = "accumulator";
 
   async existsOnCheqd([did, _]) {
@@ -63,9 +99,10 @@ export default class AccumulatorMigration extends Base {
   async *txs() {
     const { module } = this;
 
-    for await (const [id, accumulator] of this.fetchAndFilter()) {
-      const didKeypair = this.findKeypair(document);
-
+    for await (const {
+      item: [id, accumulator],
+      keypair,
+    } of this.fetchAndFilterWithKeypair()) {
       if (!accumulator.keyRef) {
         console.log(`Skipping accumulator ${id}`);
         continue;
@@ -75,19 +112,10 @@ export default class AccumulatorMigration extends Base {
       } = accumulator;
 
       yield await module.modules[1].tx.addAccumulator(
-        [CheqdTestnetDid.from(did), TypedUUID.fromDockIdent(id)],
+        [CheqdTestnetDid.from(did), id],
         accumulator,
-        didKeypair
+        keypair
       );
-
-      if (accumulator.publicKey != null) {
-        yield await module.addPublicKeyTx(
-          TypedUUID.random(),
-          accumulator.publicKey,
-          targetDid,
-          didKeypair
-        );
-      }
     }
   }
 }

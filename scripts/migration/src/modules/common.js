@@ -3,20 +3,15 @@ import { CheqdTestnetDid } from "@docknetwork/credential-sdk/types";
 import { maybeToJSONString } from "@docknetwork/credential-sdk/utils";
 
 export class Base {
-  constructor(dock, modules, keyPairs, dids, spawn) {
+  constructor(dock, modules, keyPairs, spawn) {
     this.dock = dock;
     this.spawn = spawn;
     this.keyPairs = keyPairs;
     this.modules = modules;
-    this.dids = dids;
   }
 
   parse(entry) {
     return entry;
-  }
-
-  get module() {
-    return this.modules[this.constructor.Prop];
   }
 
   async cheqdDocument(did) {
@@ -36,19 +31,7 @@ export class Base {
     );
     const parsedEntries = entries.map((entry) => this.parse(entry));
     const onlyNonExistent = parsedEntries.map((entry) =>
-      this.spawn(async () => {
-        if (await this.existsOnCheqd(entry)) {
-          console.log(
-            `Skipping ${maybeToJSONString(
-              entry
-            )}' as it already exists on cheqd chain`
-          );
-
-          return null;
-        }
-
-        return await this.fetchEntry(entry);
-      })
+      this.spawn(async () => {})
     );
 
     let migrated = 0;
@@ -62,6 +45,28 @@ export class Base {
     console.log(`Migrated ${migrated} items by ${this.constructor.name}`);
   }
 
+  async *fetchAndFilterWithKeypair() {
+    for (const item of this.fetchAndFilter()) {
+      const did = this.keyDid(item);
+      const doc = await this.cheqdDocument(did);
+      if (doc == null) {
+        console.log(
+          `Skipping ${maybeToJSONString(
+            item
+          )} because ${did} doesn't exist on cheqd`
+        );
+        continue;
+      }
+
+      const keypair = this.findKeypair(doc);
+      if (keypair == null) {
+        throw new Error(`No keypair for ${did}`);
+      }
+
+      yield { item, keypair };
+    }
+  }
+
   findKeypair(document) {
     const { id: did } = document;
     const cheqdDid = CheqdTestnetDid.from(did);
@@ -69,10 +74,8 @@ export class Base {
     for (const kp of this.keyPairs) {
       const idx = document.verificationMethod.find(
         (verMethod) =>
-          verMethod.publicKey().eq(kp.publicKey()) && verMethod.ref.did.eq(did)
+          verMethod.publicKey().eq(kp.publicKey()) && verMethod.id.did.eq(did)
       )?.id?.index;
-
-      console.log("Index", idx);
 
       if (idx != null) {
         return new DidKeypair([cheqdDid, idx], kp);

@@ -1,8 +1,15 @@
-import { option, TypedBytes, TypedStruct } from '../generic';
+import {
+  option,
+  TypedBytes,
+  TypedNumber,
+  TypedStruct,
+  TypedUUID,
+  withFromDockId,
+} from "../generic";
 import {
   CurveType,
   CurveTypeBls12381,
-} from '../offchain-signatures/curve-type';
+} from "../offchain-signatures/curve-type";
 
 export class AccumulatorParams extends TypedStruct {
   static Classes = {
@@ -15,3 +22,11 @@ export class AccumulatorParams extends TypedStruct {
     super(bytes, label, curveType);
   }
 }
+
+export class DockAccumulatorParamsId extends TypedNumber {}
+
+export class CheqdAccumulatorParamsId extends withFromDockId(
+  TypedUUID,
+  DockAccumulatorParamsId,
+  "accumulator-params"
+) {}

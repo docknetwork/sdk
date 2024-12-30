@@ -1,23 +1,19 @@
-import { DockDidOrDidMethodKey } from '@docknetwork/credential-sdk/types';
-import { withExtendedStaticProperties } from '@docknetwork/credential-sdk/utils';
-import {
-  TypedMap,
-  TypedNumber,
-  option,
-} from '@docknetwork/credential-sdk/types/generic';
-import createInternalDockModule from './create-internal-dock-module';
+import { DockDidOrDidMethodKey } from "@docknetwork/credential-sdk/types";
+import { withExtendedStaticProperties } from "@docknetwork/credential-sdk/utils";
+import { TypedMap, option } from "@docknetwork/credential-sdk/types/generic";
+import createInternalDockModule from "./create-internal-dock-module";
 
 const didMethods = {
   addParams(params, _, __, nonce) {
     return new this.constructor.PublicKeyAndParamsActions.AddParams(
       this.constructor.Params.from(params),
-      nonce,
+      nonce
     );
   },
   removeParams(paramsId, did, __, nonce) {
     return new this.constructor.PublicKeyAndParamsActions.RemoveParams(
       [did, paramsId],
-      nonce,
+      nonce
     );
   },
 };
@@ -28,10 +24,10 @@ export default function injectParams(klass) {
   const obj = {
     [name]: class extends createInternalDockModule({ didMethods }, klass) {
       static get ParamsMap() {
-        const { Params } = this;
+        const { Params, ParamsId } = this;
 
         return class ParamsMap extends TypedMap {
-          static KeyClass = TypedNumber;
+          static KeyClass = ParamsId;
 
           static ValueClass = Params;
         };
@@ -44,18 +40,20 @@ export default function injectParams(klass) {
        * @returns {Promise<Params>}
        */
       async getParams(did, id) {
-        return option(this.constructor.Params).from(
-          await this.query[this.constructor.ParamsQuery](
+        const { Params, ParamsId, ParamsQuery } = this.constructor;
+
+        return option(Params).from(
+          await this.query[ParamsQuery](
             DockDidOrDidMethodKey.from(did),
-            TypedNumber.from(id),
-          ),
+            ParamsId.from(id)
+          )
         );
       }
 
       /**
        * Retrieves all params by a DID.
        * @param {*} did
-       * @returns {Promise<Map<TypedNumber, Params>>}
+       * @returns {Promise<Map<ParamsId, Params>>}
        */
       async getAllParamsByDid(did) {
         // TODO: use `multi`
@@ -76,10 +74,13 @@ export default function injectParams(klass) {
       }
 
       async lastParamsId(_did) {
-        throw new Error('Unimplemented');
+        throw new Error("Unimplemented");
       }
     },
   };
 
-  return withExtendedStaticProperties(['Params', 'ParamsQuery'], obj[name]);
+  return withExtendedStaticProperties(
+    ["Params", "ParamsId", "ParamsQuery"],
+    obj[name]
+  );
 }

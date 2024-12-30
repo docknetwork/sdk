@@ -1,4 +1,4 @@
-import { fmtIter } from './generic';
+import { fmtIter } from "./generic";
 
 /**
  * Enhances the provided class with the given list of static properties to require
@@ -24,10 +24,16 @@ export function withExtendedStaticProperties(properties, parentClass) {
          * Ensures that properties are extended properly.
          */
         for (const property of properties) {
-          if (this.constructor[property] === parentClass[property]) {
-            throw new Error(
-              `Static property \`${property}\` of \`${this.constructor.name}\` isn't extended properly`,
-            );
+          try {
+            if (this.constructor[property] === parentClass[property]) {
+              throw new Error(
+                `Static property \`${property}\` of \`${this.constructor.name}\` isn't extended properly`
+              );
+            }
+          } catch (err) {
+            err.message = `Failed to check the prototype property: \n${err.message}`;
+
+            throw err;
           }
         }
       }
@@ -40,11 +46,11 @@ export function withExtendedStaticProperties(properties, parentClass) {
     Object.defineProperty(extendedClass[name], property, {
       get() {
         if (
-          this !== extendedClass[name]
-          && this[propertySymbol] === parentClass[property]
+          this !== extendedClass[name] &&
+          this[propertySymbol] === parentClass[property]
         ) {
           throw new Error(
-            `Property \`${property}\` of \`${this.name}\` isn't extended properly`,
+            `Property \`${property}\` of \`${this.name}\` isn't extended properly`
           );
         }
         return this[propertySymbol];
@@ -52,7 +58,7 @@ export function withExtendedStaticProperties(properties, parentClass) {
       set(newValue) {
         if (Object.hasOwnProperty.call(this, propertySymbol)) {
           throw new Error(
-            `Can't override the property \`${property}\` of \`${this.name}\``,
+            `Can't override the property \`${property}\` of \`${this.name}\``
           );
         }
 
@@ -88,10 +94,16 @@ export function withExtendedPrototypeProperties(properties, parentClass) {
          * Ensures that properties are extended properly.
          */
         for (const property of properties) {
-          if (proto[property] === parentClass.prototype[property]) {
-            throw new Error(
-              `Property \`${property}\` of the object prototype of \`${this.constructor.name}\` isn't extended properly`,
-            );
+          try {
+            if (proto[property] === parentClass.prototype[property]) {
+              throw new Error(
+                `Property \`${property}\` of the object prototype of \`${this.constructor.name}\` isn't extended properly`
+              );
+            }
+          } catch (err) {
+            err.message = `Failed to check the static property: \n${err.message}`;
+
+            throw err;
           }
         }
       }
@@ -126,19 +138,22 @@ export const allProperties = (obj) => {
   return props;
 };
 
-export const validateProperties = (obj) => ensurePropertiesAreUnique(
-  new Set(Object.getOwnPropertyNames(obj)),
-  allProperties(Object.getPrototypeOf(obj)),
-);
+export const validateProperties = (obj) =>
+  ensurePropertiesAreUnique(
+    new Set(Object.getOwnPropertyNames(obj)),
+    allProperties(Object.getPrototypeOf(obj))
+  );
 
-export const isPrototypeOf = (proto, obj) => Object.isPrototypeOf.call(proto, obj);
+export const isPrototypeOf = (proto, obj) =>
+  Object.isPrototypeOf.call(proto, obj);
 
-export const isEqualToOrPrototypeOf = (proto, obj) => Object.is(proto, obj) || isPrototypeOf(proto, obj);
+export const isEqualToOrPrototypeOf = (proto, obj) =>
+  Object.is(proto, obj) || isPrototypeOf(proto, obj);
 
 export const ensureEqualToOrPrototypeOf = (proto, obj) => {
   if (!isEqualToOrPrototypeOf(proto, obj)) {
     throw new Error(
-      `Expected \`${proto.name}\` to be equal to or a prototype of \`${obj.name}\``,
+      `Expected \`${proto.name}\` to be equal to or a prototype of \`${obj.name}\``
     );
   }
 

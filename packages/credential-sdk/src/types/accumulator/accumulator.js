@@ -5,12 +5,15 @@ import {
   ArrayOfByteArrays,
   ByteArray,
   TypedUUID,
-} from '../generic';
+  withProp,
+} from "../generic";
 import {
   DockAccumulatorPublicKeyRef,
   CheqdAccumulatorPublicKeyRef,
-} from './keys';
-import { createAccumulatorVariants } from './variants';
+  CheqdTestnetAccumulatorPublicKeyRef,
+  CheqdMainnetAccumulatorPublicKeyRef,
+} from "./keys";
+import { createAccumulatorVariants } from "./variants";
 
 export const [
   DockAccumulatorCommon,
@@ -84,6 +87,22 @@ export class CheqdAccumulatorWithUpdateInfo extends TypedStruct {
   }
 }
 
+export const [
+  CheqdTestnetAccumulatorCommon,
+  CheqdTestnetAccumulator,
+  CheqdTestnetUniversalAccumulator,
+  CheqdTestnetKBUniversalAccumulator,
+  CheqdTestnetPositiveAccumulator,
+] = createAccumulatorVariants(CheqdTestnetAccumulatorPublicKeyRef);
+
+export const [
+  CheqdMainnetAccumulatorCommon,
+  CheqdMainnetAccumulator,
+  CheqdMainnetUniversalAccumulator,
+  CheqdMainnetKBUniversalAccumulator,
+  CheqdMainnetPositiveAccumulator,
+] = createAccumulatorVariants(CheqdMainnetAccumulatorPublicKeyRef);
+
 export class CheqdStoredAccumulator extends TypedStruct {
   static Classes = {
     accumulator: CheqdAccumulator,
@@ -92,3 +111,15 @@ export class CheqdStoredAccumulator extends TypedStruct {
     witnessUpdateInfo: option(ByteArray),
   };
 }
+
+export class CheqdTestnetStoredAccumulator extends withProp(
+  CheqdStoredAccumulator,
+  "accumulator",
+  CheqdTestnetAccumulator
+) {}
+
+export class CheqdMainnetStoredAccumulator extends withProp(
+  CheqdStoredAccumulator,
+  "accumulator",
+  CheqdMainnetAccumulator
+) {}

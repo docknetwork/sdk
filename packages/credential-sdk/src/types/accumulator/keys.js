@@ -1,12 +1,10 @@
-import {
-  TypedTuple, TypedNumber, TypedUUID, withFrom,
-} from '../generic';
+import { TypedTuple, TypedNumber, TypedUUID, withFromDockId } from "../generic";
 import {
   CheqdDLRRef,
   CheqdMainnetDid,
   CheqdTestnetDid,
   DockDidOrDidMethodKey,
-} from '../did';
+} from "../did";
 
 export class DockAccumulatorPublicKeyId extends TypedNumber {}
 
@@ -18,13 +16,10 @@ export class DockAccumulatorParamsRef extends TypedTuple {
   static Classes = [DockDidOrDidMethodKey, DockAccumulatorPublicKeyId];
 }
 
-export class CheqdAccumulatorPublicKeyId extends withFrom(
+export class CheqdAccumulatorPublicKeyId extends withFromDockId(
   TypedUUID,
-  (value, from) => from(
-    value instanceof DockAccumulatorPublicKeyId
-      ? TypedUUID.fromDockIdent(value, 'accumulator-public-key')
-      : value,
-  ),
+  DockAccumulatorPublicKeyId,
+  "accumulator-public-key"
 ) {}
 
 export class CheqdAccumulatorPublicKeyRef extends CheqdDLRRef {

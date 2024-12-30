@@ -13,11 +13,11 @@ import {
   CheqdTestnetAccumulatorIdValue,
   CheqdParamsId,
 } from "@docknetwork/credential-sdk/types";
+import { DidKeypair } from "@docknetwork/credential-sdk/keypairs";
 import { NoDIDError } from "@docknetwork/credential-sdk/modules/abstract/did";
 import { NoBlobError } from "@docknetwork/credential-sdk/modules/abstract/blob";
-import { Base } from "./common.js";
 
-const exists = async (fn, Err) => {
+const nullIfThrows = async (fn, Err) => {
   try {
     await fn();
 
@@ -31,7 +31,45 @@ const exists = async (fn, Err) => {
   }
 };
 
-export default class DIDMigration extends Base {
+export default class Migration {
+  constructor(dock, modules, keyPairs, spawn) {
+    this.dock = dock;
+    this.spawn = spawn;
+    this.keyPairs = keyPairs;
+    this.modules = modules;
+  }
+
+  findKeypair(document) {
+    for (const kp of this.keyPairs) {
+      const ref = document.verificationMethod.find((verMethod) =>
+        verMethod.publicKey().eq(kp.publicKey())
+      )?.id;
+
+      if (ref != null) {
+        return new DidKeypair(ref, kp);
+      }
+    }
+
+    return null;
+  }
+
+  findKeypairOrAddTemporary(document) {
+    const { id: did } = document;
+    const cheqdDid = CheqdTestnetDid.from(did);
+    let didKeypair = this.findKeypair(document);
+
+    if (didKeypair == null) {
+      const keyRef = [cheqdDid, document.nextKeyIndex()];
+
+      didKeypair = new DidKeypair(keyRef, this.keyPairs.TEMPORARY);
+      document.addKey(keyRef, didKeypair.didKey());
+
+      console.log(`Temporary keypair used for ${document.id}`);
+    }
+
+    return didKeypair;
+  }
+
   async *migrateAccumulatorPublicKeys(did, keypair) {
     const {
       modules: { accumulator },
@@ -238,7 +276,9 @@ export default class DIDMigration extends Base {
     for (const { id, blob } of blobs[did] || []) {
       const cheqdId = CheqdTestnetBlobId.from(id);
 
-      if (await exists(() => this.modules.blob.get(cheqdId), NoBlobError)) {
+      if (
+        await nullIfThrows(() => this.modules.blob.get(cheqdId), NoBlobError)
+      ) {
         console.log(`Blob ${cheqdId} already exists`);
       } else {
         yield await this.modules.blob.newTx(
@@ -253,7 +293,7 @@ export default class DIDMigration extends Base {
     const did = DockDid.from(rawDid.toHuman()[0]);
     const cheqdDid = CheqdTestnetDid.from(did);
 
-    let document = await exists(
+    let document = await nullIfThrows(
       () => this.modules.did.getDocument(cheqdDid),
       NoDIDError
     );
@@ -269,7 +309,7 @@ export default class DIDMigration extends Base {
     } else {
       document = await this.modules.did.getDocument(did);
       document.alsoKnownAs.push(did);
-      document.removeController(cheqdDid);
+      document.removeController(did);
       keypair = this.findKeypairOrAddTemporary(document);
 
       const cheqdDoc = document

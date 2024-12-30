@@ -1,10 +1,11 @@
-import { TypedTuple, TypedNumber, TypedUUID, withFromDockId } from "../generic";
+import { TypedTuple, TypedNumber, TypedUUID } from '../generic';
+import withFromDockId from '../generic/with-from-dock-id';
 import {
   CheqdDLRRef,
   CheqdMainnetDid,
   CheqdTestnetDid,
   DockDidOrDidMethodKey,
-} from "../did";
+} from '../did';
 
 export class DockAccumulatorPublicKeyId extends TypedNumber {}
 
@@ -19,7 +20,7 @@ export class DockAccumulatorParamsRef extends TypedTuple {
 export class CheqdAccumulatorPublicKeyId extends withFromDockId(
   TypedUUID,
   DockAccumulatorPublicKeyId,
-  "accumulator-public-key"
+  'accumulator-public-key',
 ) {}
 
 export class CheqdAccumulatorPublicKeyRef extends CheqdDLRRef {

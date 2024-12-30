@@ -1,19 +1,19 @@
-import { DockDidOrDidMethodKey } from "@docknetwork/credential-sdk/types";
-import { withExtendedStaticProperties } from "@docknetwork/credential-sdk/utils";
-import { TypedMap, option } from "@docknetwork/credential-sdk/types/generic";
-import createInternalDockModule from "./create-internal-dock-module";
+import { DockDidOrDidMethodKey } from '@docknetwork/credential-sdk/types';
+import { withExtendedStaticProperties } from '@docknetwork/credential-sdk/utils';
+import { TypedMap, option } from '@docknetwork/credential-sdk/types/generic';
+import createInternalDockModule from './create-internal-dock-module';
 
 const didMethods = {
   addParams(params, _, __, nonce) {
     return new this.constructor.PublicKeyAndParamsActions.AddParams(
       this.constructor.Params.from(params),
-      nonce
+      nonce,
     );
   },
   removeParams(paramsId, did, __, nonce) {
     return new this.constructor.PublicKeyAndParamsActions.RemoveParams(
       [did, paramsId],
-      nonce
+      nonce,
     );
   },
 };
@@ -45,8 +45,8 @@ export default function injectParams(klass) {
         return option(Params).from(
           await this.query[ParamsQuery](
             DockDidOrDidMethodKey.from(did),
-            ParamsId.from(id)
-          )
+            ParamsId.from(id),
+          ),
         );
       }
 
@@ -74,13 +74,13 @@ export default function injectParams(klass) {
       }
 
       async lastParamsId(_did) {
-        throw new Error("Unimplemented");
+        throw new Error('Unimplemented');
       }
     },
   };
 
   return withExtendedStaticProperties(
-    ["Params", "ParamsId", "ParamsQuery"],
-    obj[name]
+    ['Params', 'ParamsId', 'ParamsQuery'],
+    obj[name],
   );
 }

@@ -1,16 +1,17 @@
-import { valueBytes } from "../../utils";
-import { CheqdMainnetDid, CheqdTestnetDid, DidRef, DockDid } from "../did";
+import { valueBytes } from '../../utils';
+import { CheqdMainnetDid, CheqdTestnetDid, DidRef } from '../did';
 import {
   TypedBytes,
   TypedEnum,
   TypedUUID,
-  patchWithFromDock,
   sized,
   withFrom,
-  withFromDockId,
   withQualifier,
-} from "../generic";
-import dockDidById from "../../utils/dock-did-by-id.json";
+} from '../generic';
+import withFromDockId, {
+  patchWithFromDock,
+} from '../generic/with-from-dock-id';
+import dockDidById from '../../utils/dock-did-by-id.json';
 
 export class DockAccumulatorIdValue extends sized(TypedBytes) {
   static Size = 32;
@@ -19,11 +20,10 @@ export class DockAccumulatorIdValue extends sized(TypedBytes) {
 export class AccumulatorId extends withFrom(
   withQualifier(TypedEnum, true),
   (valueWithUncheckedPrefix, from) => {
-    const value =
-      typeof valueWithUncheckedPrefix === "string" &&
-      valueWithUncheckedPrefix.startsWith("dock:accumulator:")
-        ? `accumulator:dock:${valueWithUncheckedPrefix.slice(17)}`
-        : valueWithUncheckedPrefix;
+    const value = typeof valueWithUncheckedPrefix === 'string'
+      && valueWithUncheckedPrefix.startsWith('dock:accumulator:')
+      ? `accumulator:dock:${valueWithUncheckedPrefix.slice(17)}`
+      : valueWithUncheckedPrefix;
 
     try {
       // eslint-disable-next-line no-use-before-define
@@ -31,20 +31,19 @@ export class AccumulatorId extends withFrom(
     } catch {
       return from(value);
     }
-  }
+  },
 ) {
-  static Qualifier = "accumulator:";
+  static Qualifier = 'accumulator:';
 }
 
 export class DockAccumulatorIdIdent extends withQualifier(
   withFrom(
     sized(TypedBytes),
     // eslint-disable-next-line no-use-before-define
-    (value, from) =>
-      value instanceof DockAccumulatorId ? valueBytes(value) : from(value)
-  )
+    (value, from) => (value instanceof DockAccumulatorId ? valueBytes(value) : from(value)),
+  ),
 ) {
-  static Qualifier = "accumulator:dock:";
+  static Qualifier = 'accumulator:dock:';
 
   static Size = 32;
 
@@ -60,7 +59,7 @@ export class DockAccumulatorIdIdent extends withQualifier(
 export class DockAccumulatorId extends AccumulatorId {
   static Class = DockAccumulatorIdIdent;
 
-  static Type = "dock";
+  static Type = 'dock';
 
   static random() {
     return new this(this.Class.random());
@@ -68,12 +67,12 @@ export class DockAccumulatorId extends AccumulatorId {
 }
 
 export class CheqdAccumulatorIdValue extends withQualifier(DidRef) {
-  static Qualifier = "accumulator:cheqd:";
+  static Qualifier = 'accumulator:cheqd:';
 
   static Ident = withFromDockId(
     TypedUUID,
     DockAccumulatorId,
-    "accumulator:cheqd:"
+    'accumulator:cheqd:',
   );
 
   static cheqdDid(did) {
@@ -81,7 +80,7 @@ export class CheqdAccumulatorIdValue extends withQualifier(DidRef) {
   }
 
   static fromUnqualifiedString(str) {
-    const lastColon = str.lastIndexOf(":");
+    const lastColon = str.lastIndexOf(':');
     const did = `did:cheqd:${str.slice(0, lastColon)}`;
     const id = str.slice(lastColon + 1);
 
@@ -96,14 +95,14 @@ export class CheqdAccumulatorIdValue extends withQualifier(DidRef) {
     const { did, value, constructor } = this;
     const { cheqdDid } = constructor;
 
-    let prefix = "";
+    let prefix = '';
     if (cheqdDid(did) instanceof CheqdTestnetDid) {
-      prefix = "testnet";
+      prefix = 'testnet';
     } else if (cheqdDid(did) instanceof CheqdMainnetDid) {
-      prefix = "mainnet";
+      prefix = 'mainnet';
     } else {
       throw new Error(
-        `Can't determine DID type: \`${cheqdDid}\`, instance of \`${cheqdDid.constructor.name}\``
+        `Can't determine DID type: \`${cheqdDid}\`, instance of \`${cheqdDid.constructor.name}\``,
       );
     }
 
@@ -130,7 +129,7 @@ export class CheqdMainnetAccumulatorIdValue extends CheqdAccumulatorIdValue {
 export class CheqdAccumulatorId extends AccumulatorId {
   static Class = CheqdAccumulatorIdValue;
 
-  static Type = "cheqd";
+  static Type = 'cheqd';
 
   toJSON() {
     return String(this);
@@ -154,5 +153,5 @@ AccumulatorId.bindVariants(CheqdAccumulatorId, DockAccumulatorId);
 patchWithFromDock(
   CheqdAccumulatorId,
   DockAccumulatorId,
-  dockDidById.accumulators
+  dockDidById.accumulators,
 );

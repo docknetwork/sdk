@@ -4,21 +4,21 @@ import {
   TypedEnum,
   TypedMap,
   withNullIfNotAVariant,
-} from "@docknetwork/credential-sdk/types/generic";
+} from '@docknetwork/credential-sdk/types/generic';
 import {
   isEqualToOrPrototypeOf,
   withExtendedStaticProperties,
   withExtendedPrototypeProperties,
-} from "@docknetwork/credential-sdk/utils";
-import { DockDidOrDidMethodKey } from "@docknetwork/credential-sdk/types";
-import createInternalDockModule from "./create-internal-dock-module";
+} from '@docknetwork/credential-sdk/utils';
+import { DockDidOrDidMethodKey } from '@docknetwork/credential-sdk/types';
+import createInternalDockModule from './create-internal-dock-module';
 
 const didMethods = {
   addPublicKey(publicKey, targetDid, _, nonce) {
     return new this.constructor.PublicKeyAndParamsActions.AddPublicKey(
       this.constructor.PublicKey.from(publicKey),
       targetDid,
-      nonce
+      nonce,
     );
   },
   removePublicKey(keyId, targetDid, _, nonce) {
@@ -27,7 +27,7 @@ const didMethods = {
     return new this.constructor.PublicKeyAndParamsActions.RemovePublicKey(
       [did, keyId],
       did,
-      nonce
+      nonce,
     );
   },
 };
@@ -58,18 +58,17 @@ export default function injectPublicKeys(klass) {
 
         const PublicKeyWithParamsRef = withProp(
           PublicKey,
-          "paramsRef",
-          option(ParamsRef)
+          'paramsRef',
+          option(ParamsRef),
         );
-        const MaybeNotAVariantPublicKey =
-          isEqualToOrPrototypeOf(TypedEnum, PublicKeyWithParamsRef) &&
-          PublicKeyWithParamsRef.Class != null
-            ? withNullIfNotAVariant(PublicKeyWithParamsRef)
-            : PublicKeyWithParamsRef;
+        const MaybeNotAVariantPublicKey = isEqualToOrPrototypeOf(TypedEnum, PublicKeyWithParamsRef)
+          && PublicKeyWithParamsRef.Class != null
+          ? withNullIfNotAVariant(PublicKeyWithParamsRef)
+          : PublicKeyWithParamsRef;
 
         const owner = PublicKeyOwner.from(did);
         const publicKey = option(MaybeNotAVariantPublicKey).from(
-          await this.query[PublicKeyQuery](owner, PublicKeyId.from(keyId))
+          await this.query[PublicKeyQuery](owner, PublicKeyId.from(keyId)),
         );
 
         if (publicKey == null) {
@@ -107,7 +106,7 @@ export default function injectPublicKeys(klass) {
       }
 
       async lastPublicKeyId(_did) {
-        throw new Error("Unimplemented");
+        throw new Error('Unimplemented');
       }
     },
   };
@@ -115,17 +114,17 @@ export default function injectPublicKeys(klass) {
   return createInternalDockModule(
     { didMethods },
     withExtendedPrototypeProperties(
-      ["lastPublicKeyId"],
+      ['lastPublicKeyId'],
       withExtendedStaticProperties(
         [
-          "PublicKey",
-          "PublicKeyId",
-          "ParamsRef",
-          "PublicKeyOwner",
-          "PublicKeyQuery",
+          'PublicKey',
+          'PublicKeyId',
+          'ParamsRef',
+          'PublicKeyOwner',
+          'PublicKeyQuery',
         ],
-        obj[name]
-      )
-    )
+        obj[name],
+      ),
+    ),
   );
 }

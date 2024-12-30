@@ -1,11 +1,11 @@
-import { TypedMap } from "@docknetwork/credential-sdk/types/generic";
+import { TypedMap } from '@docknetwork/credential-sdk/types/generic';
 import {
   withExtendedStaticProperties,
   u8aToString,
-} from "@docknetwork/credential-sdk/utils";
-import { CheqdCreateResource } from "@docknetwork/credential-sdk/types";
-import createInternalCheqdModule from "./create-internal-cheqd-module";
-import { validateResource } from "./resource";
+} from '@docknetwork/credential-sdk/utils';
+import { CheqdCreateResource } from '@docknetwork/credential-sdk/types';
+import createInternalCheqdModule from './create-internal-cheqd-module';
+import { validateResource } from './resource';
 
 const methods = {
   addParams(id, params, did) {
@@ -14,11 +14,11 @@ const methods = {
     return new CheqdCreateResource(
       did.value.value,
       id,
-      "1.0",
+      '1.0',
       [],
       ParamsName,
       ParamsType,
-      Params.from(params).toJSONStringBytes()
+      Params.from(params).toJSONStringBytes(),
     );
   },
 };
@@ -39,7 +39,7 @@ export default function injectParams(klass) {
 
         return {
           ...names,
-          addParams: "MsgCreateResource",
+          addParams: 'MsgCreateResource',
         };
       }
 
@@ -60,7 +60,9 @@ export default function injectParams(klass) {
        * @returns {Promise<Params>}
        */
       async getParams(did, id) {
-        const { ParamsName, ParamsType, Params, ParamsId } = this.constructor;
+        const {
+          ParamsName, ParamsType, Params, ParamsId,
+        } = this.constructor;
         const item = await this.resource(did, ParamsId.from(id));
         if (item == null) {
           return null;
@@ -68,8 +70,8 @@ export default function injectParams(klass) {
 
         return Params.from(
           JSON.parse(
-            u8aToString(validateResource(item, ParamsName, ParamsType))
-          )
+            u8aToString(validateResource(item, ParamsName, ParamsType)),
+          ),
         );
       }
 
@@ -83,16 +85,16 @@ export default function injectParams(klass) {
 
         const resources = await this.resourcesBy(
           did,
-          this.filterParamsMetadata
+          this.filterParamsMetadata,
         );
 
         return new ParamsMap(
           [...resources].map(([key, item]) => [
             key,
             JSON.parse(
-              u8aToString(validateResource(item, ParamsName, ParamsType))
+              u8aToString(validateResource(item, ParamsName, ParamsType)),
             ),
-          ])
+          ]),
         );
       }
 
@@ -103,7 +105,7 @@ export default function injectParams(klass) {
   };
 
   return withExtendedStaticProperties(
-    ["Params", "ParamsName", "ParamsType"],
-    obj[name]
+    ['Params', 'ParamsName', 'ParamsType'],
+    obj[name],
   );
 }

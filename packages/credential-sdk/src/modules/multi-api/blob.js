@@ -1,9 +1,9 @@
-import { AbstractBlobModule } from "../abstract";
-import { BlobId, BlobWithId } from "../../types";
-import { injectModuleRouter } from "./common";
+import { AbstractBlobModule } from '../abstract';
+import { BlobId, BlobWithId } from '../../types';
+import { injectModuleRouter } from './common';
 
 export default class MultiApiBlobModule extends injectModuleRouter(
-  AbstractBlobModule
+  AbstractBlobModule,
 ) {
   /**
    * Write a new blob on chain.
@@ -18,7 +18,7 @@ export default class MultiApiBlobModule extends injectModuleRouter(
     return await this.moduleById(parsedBlobWithId.id).new(
       parsedBlobWithId,
       didKeypair,
-      params
+      params,
     );
   }
 
@@ -34,7 +34,7 @@ export default class MultiApiBlobModule extends injectModuleRouter(
 
     return await this.moduleById(parsedBlobWithId.id).newTx(
       parsedBlobWithId,
-      didKeypair
+      didKeypair,
     );
   }
 

@@ -1,12 +1,12 @@
-import { CheqdParamsId } from "@docknetwork/credential-sdk/types";
-import { createInternalCheqdModule, injectParams } from "../common";
+import { CheqdParamsId } from '@docknetwork/credential-sdk/types';
+import { createInternalCheqdModule, injectParams } from '../common';
 
 export default class CheqdOffchainSignaturesInternalModule extends injectParams(
-  createInternalCheqdModule()
+  createInternalCheqdModule(),
 ) {
   static ParamsId = CheqdParamsId;
 
-  static ParamsName = "OffchainParams";
+  static ParamsName = 'OffchainParams';
 
-  static ParamsType = "offchain-signature-params";
+  static ParamsType = 'offchain-signature-params';
 }

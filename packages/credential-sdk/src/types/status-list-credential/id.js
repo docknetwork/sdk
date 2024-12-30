@@ -2,18 +2,19 @@ import {
   TypedBytes,
   TypedEnum,
   TypedUUID,
-  patchWithFromDock,
   sized,
   withFrom,
-  withFromDockId,
   withQualifier,
-} from "../generic";
-import { CheqdMainnetDid, CheqdTestnetDid, DidRef } from "../did";
+} from '../generic';
+import withFromDockId, {
+  patchWithFromDock,
+} from '../generic/with-from-dock-id';
+import { CheqdMainnetDid, CheqdTestnetDid, DidRef } from '../did';
 import {
   DockStatusList2021Qualifier,
   CheqdStatusList2021Qualifier,
-} from "../../vc/constants";
-import dockDidById from "../../utils/dock-did-by-id.json";
+} from '../../vc/constants';
+import dockDidById from '../../utils/dock-did-by-id.json';
 
 export class StatusListCredentialId extends withFrom(
   withQualifier(TypedEnum, true),
@@ -24,9 +25,9 @@ export class StatusListCredentialId extends withFrom(
     } catch {
       return from(value);
     }
-  }
+  },
 ) {
-  static Qualifier = "status-list2021:";
+  static Qualifier = 'status-list2021:';
 
   toJSON() {
     return String(this);
@@ -37,8 +38,8 @@ export class DockStatusListCredentialIdValue extends withFrom(
   sized(withQualifier(TypedBytes)),
   (
     value,
-    from // eslint-disable-next-line no-use-before-define
-  ) => (value instanceof DockStatusListCredentialId ? value[1] : from(value))
+    from, // eslint-disable-next-line no-use-before-define
+  ) => (value instanceof DockStatusListCredentialId ? value[1] : from(value)),
 ) {
   static Qualifier = DockStatusList2021Qualifier;
 
@@ -56,7 +57,7 @@ export class DockStatusListCredentialIdValue extends withFrom(
 export class DockStatusListCredentialId extends StatusListCredentialId {
   static Class = DockStatusListCredentialIdValue;
 
-  static Type = "dock";
+  static Type = 'dock';
 
   static random() {
     return new this(this.Class.random());
@@ -69,11 +70,11 @@ export class CheqdStatusListCredentialIdValue extends withQualifier(DidRef) {
   static Ident = withFromDockId(
     TypedUUID,
     DockStatusListCredentialId,
-    "status-list2021:cheqd:"
+    'status-list2021:cheqd:',
   );
 
   static fromUnqualifiedString(str) {
-    const lastColon = str.lastIndexOf(":");
+    const lastColon = str.lastIndexOf(':');
     const did = `did:cheqd:${str.slice(0, lastColon)}`;
     const id = str.slice(lastColon + 1);
 
@@ -88,16 +89,16 @@ export class CheqdStatusListCredentialIdValue extends withQualifier(DidRef) {
     const { did, value, constructor } = this;
     const { cheqdDid } = constructor;
 
-    let prefix = "";
+    let prefix = '';
     if (cheqdDid(did) instanceof CheqdTestnetDid) {
-      prefix = "testnet";
+      prefix = 'testnet';
     } else if (cheqdDid(did) instanceof CheqdMainnetDid) {
-      prefix = "mainnet";
+      prefix = 'mainnet';
     } else {
       throw new Error(
         `Can't determine DID type: \`${cheqdDid(did)}\`, instance of \`${
           cheqdDid(did).constructor.name
-        }\``
+        }\``,
       );
     }
 
@@ -124,7 +125,7 @@ class CheqdMainnetStatusListCredentialIdValue extends CheqdStatusListCredentialI
 export class CheqdStatusListCredentialId extends StatusListCredentialId {
   static Class = CheqdStatusListCredentialIdValue;
 
-  static Type = "cheqd";
+  static Type = 'cheqd';
 
   static random(did) {
     return new this(this.Class.random(did));
@@ -141,11 +142,11 @@ export class CheqdMainnetStatusListCredentialId extends CheqdStatusListCredentia
 
 StatusListCredentialId.bindVariants(
   CheqdStatusListCredentialId,
-  DockStatusListCredentialId
+  DockStatusListCredentialId,
 );
 
 patchWithFromDock(
   CheqdStatusListCredentialId,
   DockStatusListCredentialId,
-  dockDidById.statusLists
+  dockDidById.statusLists,
 );

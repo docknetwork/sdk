@@ -1,7 +1,9 @@
-import { parse, validate, stringify, v4 } from "uuid";
-import { sha256 } from "js-sha256";
-import TypedBytes from "./typed-bytes";
-import { normalizeOrConvertStringToU8a, valueNumberOrBytes } from "../../utils";
+import {
+  parse, validate, stringify, v4,
+} from 'uuid';
+import { sha256 } from 'js-sha256';
+import TypedBytes from './typed-bytes';
+import { normalizeOrConvertStringToU8a, valueNumberOrBytes } from '../../utils';
 
 export default class TypedUUID extends TypedBytes {
   constructor(id) {

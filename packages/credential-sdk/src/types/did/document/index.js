@@ -256,7 +256,7 @@ export class DIDDocument extends withFrom(
   removeController(controller) {
     const idx = this.controller.findIndex((ctrl) => ctrl.eq(controller));
     // eslint-disable-next-line
-    if (~idx) {
+    if (!~idx) {
       throw new Error(`Controller \`${controller}\` doesn't exists`);
     }
     this.controller.splice(idx, 1);
@@ -265,7 +265,12 @@ export class DIDDocument extends withFrom(
   }
 
   removeServiceEndpoint(id) {
-    this.service = this.service.filter((service) => !service.id.eq(id));
+    const idx = this.service.findIndex((service) => service.id.eq(id));
+    // eslint-disable-next-line
+    if (!~idx) {
+      throw new Error(`Service endpoint \`${id}\` doesnt exist`);
+    }
+    this.service.splice(idx, 1);
 
     return this;
   }

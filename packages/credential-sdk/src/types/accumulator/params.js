@@ -4,12 +4,12 @@ import {
   TypedNumber,
   TypedStruct,
   TypedUUID,
-  withFromDockId,
-} from "../generic";
+} from '../generic';
+import withFromDockId from '../generic/with-from-dock-id';
 import {
   CurveType,
   CurveTypeBls12381,
-} from "../offchain-signatures/curve-type";
+} from '../offchain-signatures/curve-type';
 
 export class AccumulatorParams extends TypedStruct {
   static Classes = {
@@ -28,5 +28,5 @@ export class DockAccumulatorParamsId extends TypedNumber {}
 export class CheqdAccumulatorParamsId extends withFromDockId(
   TypedUUID,
   DockAccumulatorParamsId,
-  "accumulator-params"
+  'accumulator-params',
 ) {}

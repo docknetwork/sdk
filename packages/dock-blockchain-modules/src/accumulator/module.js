@@ -1,16 +1,11 @@
 /* eslint-disable camelcase */
 
 import {
-  DockAccumulatorWithUpdateInfo,
   DockAccumulatorCommon,
   DockKBUniversalAccumulator,
   DockUniversalAccumulator,
   DockPositiveAccumulator,
-  AccumulatorParams,
-  DockAccumulatorPublicKey,
-  DockAccumulatorIdIdent,
 } from '@docknetwork/credential-sdk/types';
-import { option, withProp } from '@docknetwork/credential-sdk/types/generic';
 import { AbstractAccumulatorModule } from '@docknetwork/credential-sdk/modules/abstract';
 import DockInternalAccumulatorModule from './internal';
 import { injectDock, withParams, withPublicKeys } from '../common';
@@ -210,26 +205,11 @@ export default class DockAccumulatorModule extends withParams(
    * @returns {Promise<{created: *, lastModified: *}|null>}
    */
   async getAccumulator(id, includePublicKey = false, includeParams = false) {
-    const PublicKey = includeParams
-      ? withProp(DockAccumulatorPublicKey, 'params', option(AccumulatorParams))
-      : DockAccumulatorPublicKey;
-    const Accumulator = includePublicKey
-      ? withProp(DockAccumulatorWithUpdateInfo, 'publicKey', option(PublicKey))
-      : DockAccumulatorWithUpdateInfo;
-
-    const acc = option(Accumulator).from(
-      await this.dockOnly.query.accumulators(DockAccumulatorIdIdent.from(id)),
+    return await this.dockOnly.getAccumulator(
+      id,
+      includePublicKey,
+      includeParams,
     );
-
-    if (acc == null) {
-      return null;
-    }
-
-    if (includePublicKey) {
-      acc.publicKey = await this.getPublicKey(...acc.keyRef, includeParams);
-    }
-
-    return acc;
   }
 
   /**

@@ -6,14 +6,14 @@ import {
   ByteArray,
   TypedUUID,
   withProp,
-} from '../generic';
+} from "../generic";
 import {
   DockAccumulatorPublicKeyRef,
   CheqdAccumulatorPublicKeyRef,
   CheqdTestnetAccumulatorPublicKeyRef,
   CheqdMainnetAccumulatorPublicKeyRef,
-} from './keys';
-import { createAccumulatorVariants } from './variants';
+} from "./keys";
+import { createAccumulatorVariants } from "./variants";
 
 export const [
   DockAccumulatorCommon,
@@ -114,12 +114,12 @@ export class CheqdStoredAccumulator extends TypedStruct {
 
 export class CheqdTestnetStoredAccumulator extends withProp(
   CheqdStoredAccumulator,
-  'accumulator',
-  CheqdTestnetAccumulator,
+  "accumulator",
+  CheqdTestnetAccumulator
 ) {}
 
 export class CheqdMainnetStoredAccumulator extends withProp(
   CheqdStoredAccumulator,
-  'accumulator',
-  CheqdMainnetAccumulator,
+  "accumulator",
+  CheqdMainnetAccumulator
 ) {}

@@ -1,14 +1,18 @@
-import { DidMethodKeyPublicKey, DidMethodKeySignature } from './did-method-key';
-import DockDidValue, { DockDidSignature } from './dock-did-value';
+import { DidMethodKeyPublicKey, DidMethodKeySignature } from "./did-method-key";
+import DockDidValue, { DockDidSignature } from "./dock-did-value";
 import {
   TypedEnum,
   TypedTuple,
   TypedUUID,
   withQualifier,
-} from '../../../generic';
-import { CheqdDid, CheqdMainnetDid, CheqdTestnetDid } from './cheqd-did';
-import { withExtendedStaticProperties } from '../../../../utils';
-import DidOrDidMethodKeySignature from './signature';
+} from "../../../generic";
+import { CheqdDid, CheqdMainnetDid, CheqdTestnetDid } from "./cheqd-did";
+import {
+  withExtendedStaticProperties,
+  maybeToJSONString,
+  isHexWithGivenByteSize,
+} from "../../../../utils";
+import DidOrDidMethodKeySignature from "./signature";
 
 export class DockDidOrDidMethodKey extends withQualifier(TypedEnum, true) {
   /**
@@ -53,7 +57,7 @@ export class DockDidOrDidMethodKey extends withQualifier(TypedEnum, true) {
   async changeState(api, method, name, payload, keyRef) {
     return await method(
       payload,
-      await this.signStateChange(api, name, payload, keyRef),
+      await this.signStateChange(api, name, payload, keyRef)
     );
   }
 
@@ -78,6 +82,11 @@ export class DockDidOrDidMethodKey extends withQualifier(TypedEnum, true) {
   }
 
   static from(value) {
+    if (isHexWithGivenByteSize(String(value), 32)) {
+      // eslint-disable-next-line no-use-before-define
+      return new DockDid(value);
+    }
+
     // eslint-disable-next-line no-use-before-define
     if (value instanceof NamespaceDid) {
       return super.from(value.isDock ? { did: value.asDock } : value);
@@ -138,29 +147,29 @@ export class NamespaceDid extends withQualifier(TypedEnum, true) {
     return super.from(
       value instanceof DockDidOrDidMethodKey && value.isDid
         ? { dock: value.asDid }
-        : value,
+        : value
     );
   }
 }
 
 export class DockNamespaceDid extends NamespaceDid {
-  static Qualifier = 'did:dock:';
+  static Qualifier = "did:dock:";
 
-  static Type = 'dock';
+  static Type = "dock";
 
   static Class = DockDidValue;
 }
 export class DidNamespaceKey extends NamespaceDid {
-  static Qualifier = 'did:key:';
+  static Qualifier = "did:key:";
 
-  static Type = 'didMethodKey';
+  static Type = "didMethodKey";
 
   static Class = DidMethodKeyPublicKey;
 }
 export class CheqdNamespaceDid extends NamespaceDid {
-  static Qualifier = 'did:cheqd:';
+  static Qualifier = "did:cheqd:";
 
-  static Type = 'cheqd';
+  static Type = "cheqd";
 
   static Class = CheqdDid;
 }
@@ -180,10 +189,10 @@ for (const Class of [CheqdTestnetDid, CheqdMainnetDid]) {
 }
 
 export class DidRef extends withExtendedStaticProperties(
-  ['Ident'],
-  withQualifier(TypedTuple),
+  ["Ident"],
+  withQualifier(TypedTuple)
 ) {
-  static Qualifier = '';
+  static Qualifier = "";
 
   static Did = NamespaceDid;
 
@@ -228,8 +237,8 @@ export class DidRef extends withExtendedStaticProperties(
 
 DidOrDidMethodKeySignature.bindVariants(
   DockDidSignature,
-  DidMethodKeySignature,
+  DidMethodKeySignature
 );
 
 export { DockDidValue, DidMethodKeyPublicKey };
-export * from './cheqd-did';
+export * from "./cheqd-did";

@@ -1,21 +1,17 @@
 import {
   DockDid,
-  CheqdTestnetDIDDocument,
   CheqdAccumulatorPublicKeyId,
-  CheqdTestnetDid,
-  CheqdTestnetBlobId,
-  CheqdTestnetStatusListCredentialId,
-  DockAccumulatorId,
   CheqdAccumulatorParamsId,
   DockBlobId,
+  DockAccumulatorId,
   DockStatusListCredentialId,
-  CheqdTestnetAccumulatorPublicKey,
-  CheqdTestnetAccumulatorIdValue,
   CheqdParamsId,
 } from "@docknetwork/credential-sdk/types";
+import { maybeToJSONString } from "@docknetwork/credential-sdk/utils";
 import { DidKeypair } from "@docknetwork/credential-sdk/keypairs";
 import { NoDIDError } from "@docknetwork/credential-sdk/modules/abstract/did";
 import { NoBlobError } from "@docknetwork/credential-sdk/modules/abstract/blob";
+import { DockAccumulatorModule } from "@docknetwork/dock-blockchain-modules";
 
 const nullIfThrows = async (fn, Err) => {
   try {
@@ -32,11 +28,16 @@ const nullIfThrows = async (fn, Err) => {
 };
 
 export default class Migration {
-  constructor(dock, modules, keyPairs, spawn) {
+  constructor(dock, cheqd, modules, keyPairs, spawn) {
     this.dock = dock;
+    this.cheqd = cheqd;
     this.spawn = spawn;
     this.keyPairs = keyPairs;
     this.modules = modules;
+  }
+
+  get types() {
+    return this.cheqd.types();
   }
 
   findKeypair(document) {
@@ -55,7 +56,7 @@ export default class Migration {
 
   findKeypairOrAddTemporary(document) {
     const { id: did } = document;
-    const cheqdDid = CheqdTestnetDid.from(did);
+    const cheqdDid = this.types.Did.from(did);
     let didKeypair = this.findKeypair(document);
 
     if (didKeypair == null) {
@@ -74,7 +75,7 @@ export default class Migration {
     const {
       modules: { accumulator },
     } = this;
-    const cheqdDid = CheqdTestnetDid.from(did);
+    const cheqdDid = this.types.Did.from(did);
 
     const publicKeys = [...(await accumulator.getAllPublicKeysByDid(did))].sort(
       (a, b) => +a[0] - +b[0]
@@ -92,8 +93,6 @@ export default class Migration {
       }
 
       yield await accumulator.addPublicKeyTx(id, publicKey, cheqdDid, keypair);
-      console.log(publicKey);
-      console.log(CheqdTestnetAccumulatorPublicKey.from(publicKey));
     }
   }
 
@@ -101,7 +100,7 @@ export default class Migration {
     const {
       modules: { accumulator },
     } = this;
-    const cheqdDid = CheqdTestnetDid.from(did);
+    const cheqdDid = this.types.Did.from(did);
 
     const params = [...(await accumulator.getAllParamsByDid(did))].sort(
       (a, b) => +a[0] - +b[0]
@@ -126,7 +125,7 @@ export default class Migration {
     const {
       modules: { offchainSignatures },
     } = this;
-    const cheqdDid = CheqdTestnetDid.from(did);
+    const cheqdDid = this.types.Did.from(did);
 
     const params = [...(await offchainSignatures.getAllParamsByDid(did))].sort(
       (a, b) => +a[0] - +b[0]
@@ -154,12 +153,20 @@ export default class Migration {
     ].map((rawId) =>
       this.spawn(async () => {
         const id = DockAccumulatorId.from(rawId.toHuman()[0]);
+        const acc = await this.modules.accumulator.getAccumulator(
+          id,
+          true,
+          true
+        );
+        const history = await new DockAccumulatorModule(
+          this.dock
+        ).dockOnly.accumulatorHistory(id);
 
-        return [id, await this.modules.accumulator.getAccumulator(id)];
+        return [id, { acc, history }];
       })
     );
 
-    for await (const [id, acc] of ids) {
+    for await (const [id, { acc, history }] of ids) {
       if (acc.keyRef == null) {
         console.log(
           `Accumulator ${id} doesn't have a key reference, thus will be skipped`
@@ -168,7 +175,7 @@ export default class Migration {
       }
 
       accs[acc.keyRef[0]] ??= [];
-      accs[acc.keyRef[0]].push({ id, acc });
+      accs[acc.keyRef[0]].push({ id, acc, history });
     }
 
     return accs;
@@ -222,49 +229,145 @@ export default class Migration {
   }
 
   async *migrateAccumulators(did, accs, keypair) {
-    for (const { id, acc } of accs[did] || []) {
-      const cheqdId = new CheqdTestnetAccumulatorIdValue(did, id);
+    const newHistory = async (cheqdId, history) => {
+      const cheqdHistory =
+        await this.modules.accumulator.modules[1].cheqdOnly.accumulatorHistory(
+          cheqdId
+        );
+
+      for (
+        let i = 0;
+        i < Math.min(history.updates.length, cheqdHistory.updates.length);
+        i++
+      ) {
+        for (const attr of [
+          "additions",
+          "removals",
+          "witnessUpdateInfo",
+          "newAccumulated",
+        ]) {
+          console.log(history.updates, cheqdHistory.updates);
+          if (!history.updates[i][attr].eq(cheqdHistory.updates[i][attr])) {
+            throw new Error(`Inconsistent history for ${cheqdId} in ${attr}`);
+          }
+        }
+      }
+
+      return {
+        created: cheqdHistory.created,
+        updates: cheqdHistory.updates.slice(history.updates.length),
+      };
+    };
+
+    for (const { id, history } of accs[did] || []) {
+      const cheqdId = new this.types.AccumulatorId.Class(did, id);
       if (await this.modules.accumulator.getAccumulator(cheqdId)) {
         console.log(`Accumulator ${cheqdId} already exists`);
       } else {
         yield await this.modules.accumulator.modules[1].cheqdOnly.tx.addAccumulator(
-          new CheqdTestnetAccumulatorIdValue(did, id),
-          acc.accumulator,
+          new this.types.AccumulatorId.Class(did, id),
+          history.created,
           keypair
         );
+      }
+
+      let cheqdHistory = await newHistory(cheqdId, history);
+      if (
+        maybeToJSONString(cheqdHistory.created.accumulator) !==
+        maybeToJSONString(
+          new this.types.StoredAccumulator(history.created.accumulator)
+            .accumulator
+        )
+      ) {
+        throw new Error(
+          `Accumulator migration failed for ${cheqdId} - new: ${maybeToJSONString(
+            cheqdHistory.created.accumulator
+          )}, before: ${maybeToJSONString(history.created.accumulator)}`
+        );
+      }
+
+      const last = history.created;
+      for (
+        let i = 0;
+        i < Math.min(history.updates.length, cheqdHistory.length);
+        i++
+      ) {
+        last.accumulated = history.updates[i].newAccumulated;
+
+        await this.modules.accumulator.modules[1].cheqdOnly.tx.updateAccumulator(
+          new this.types.AccumulatorId.Class(did, id),
+          last,
+          history.updates[i],
+          didKeypair
+        );
+      }
+
+      cheqdHistory = await newHistory(cheqdId, history);
+
+      if (cheqdHistory.length) {
+        throw new Error(`Failed to migrate history for ${cheqdId}`);
       }
     }
   }
 
   async *migrateStatusLists(did, statusLists, keypair) {
     for (const { id, statusListCredential } of statusLists[did] || []) {
-      const cheqdId = CheqdTestnetStatusListCredentialId.from(id);
+      const cheqdId = this.types.StatusListCredentialId.from(id);
 
       if (
         await this.modules.statusListCredential.getStatusListCredential(cheqdId)
       ) {
         console.log(`Status list credential ${cheqdId} already exists`);
-      } else {
-        yield await this.modules.statusListCredential.createStatusListCredentialTx(
-          cheqdId,
-          statusListCredential,
-          keypair
+
+        continue;
+      }
+
+      yield await this.modules.statusListCredential.createStatusListCredentialTx(
+        cheqdId,
+        statusListCredential,
+        keypair
+      );
+
+      const created =
+        await this.modules.statusListCredential.getStatusListCredential(
+          cheqdId
+        );
+
+      if (
+        maybeToJSONString(created) !== maybeToJSONString(statusListCredential)
+      ) {
+        throw new Error(
+          `StatusListCredential migration failed for ${cheqdId} - new: ${maybeToJSONString(
+            created
+          )}, before: ${maybeToJSONString(statusListCredential)}`
         );
       }
     }
   }
 
   async *migrateAttests(did, document, keypair) {
-    const cheqdDid = CheqdTestnetDid.from(did);
+    const cheqdDid = this.types.Did.from(did);
 
     if (document.attest != null) {
       if (await this.module.attest.getAttests(cheqdDid)) {
         console.log(`Attests for ${cheqdDid} already exist`);
-      } else {
-        yield await this.module.attest.setClaimTx(
-          cheqdDid,
-          document.attest,
-          keypair
+
+        return;
+      }
+
+      yield await this.module.attest.setClaimTx(
+        cheqdDid,
+        document.attest,
+        keypair
+      );
+
+      const created = await this.module.attest.getAttests(cheqdDid);
+
+      if (!created.eq(document.attest)) {
+        throw new Error(
+          `Attests migration failed for ${cheqdDid} - new: ${maybeToJSONString(
+            created
+          )}, before: ${maybeToJSONString(document.attest)}`
         );
       }
     } else {
@@ -274,7 +377,7 @@ export default class Migration {
 
   async *migrateBlobs(did, blobs, keypair) {
     for (const { id, blob } of blobs[did] || []) {
-      const cheqdId = CheqdTestnetBlobId.from(id);
+      const cheqdId = this.types.BlobId.from(id);
 
       if (
         await nullIfThrows(() => this.modules.blob.get(cheqdId), NoBlobError)
@@ -282,16 +385,26 @@ export default class Migration {
         console.log(`Blob ${cheqdId} already exists`);
       } else {
         yield await this.modules.blob.newTx(
-          { id: CheqdTestnetBlobId.from(id), blob },
+          { id: this.types.BlobId.from(id), blob },
           keypair
         );
+
+        const [_, created] = await this.modules.blob.get(cheqdId);
+
+        if (!created.eq(blob)) {
+          throw new Error(
+            `Blob migration failed for ${cheqdId} - new: ${maybeToJSONString(
+              created
+            )}, before: ${maybeToJSONString(blob)}`
+          );
+        }
       }
     }
   }
 
   async *handleDid(rawDid, accs, blobs, statusLists) {
     const did = DockDid.from(rawDid.toHuman()[0]);
-    const cheqdDid = CheqdTestnetDid.from(did);
+    const cheqdDid = this.types.Did.from(did);
 
     let document = await nullIfThrows(
       () => this.modules.did.getDocument(cheqdDid),
@@ -314,7 +427,7 @@ export default class Migration {
 
       const cheqdDoc = document
         .setAttests(null)
-        .toCheqd(void 0, CheqdTestnetDIDDocument);
+        .toCheqd(void 0, this.types.DidDocument);
 
       yield await this.modules.did.createDocumentTx(cheqdDoc, keypair);
     }
@@ -330,7 +443,7 @@ export default class Migration {
 
   async *removeDidKey(rawDid) {
     const did = DockDid.from(rawDid.toHuman()[0]);
-    const cheqdDid = CheqdTestnetDid.from(did);
+    const cheqdDid = this.types.Did.from(did);
 
     const document = await this.modules.did.getDocument(cheqdDid);
 

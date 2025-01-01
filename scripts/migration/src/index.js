@@ -9,34 +9,26 @@ import {
 import { DockCoreModules } from "@docknetwork/dock-blockchain-modules";
 import { CheqdCoreModules } from "@docknetwork/cheqd-blockchain-modules";
 import pLimit from "p-limit";
+import { checkBalance } from "@cheqd/sdk";
 import { DirectSecp256k1HdWallet } from "@docknetwork/cheqd-blockchain-api/wallet";
 import Migration from "./migration.js";
-import { checkBalance } from "@cheqd/sdk";
-
-const mnemonics = [
-  "steak come surprise obvious remain black trouble measure design volume retreat float coach amused match album moment radio stuff crack orphan ranch dose endorse",
-];
 
 const TEMPORARY_SEED = process.env.TEMPORARY_SEED_HEX || randomAsHex(32);
+const DOCK_ENDPOINT = process.env.DOCK_ENDPOINT || "wss://mainnet-node.dock.io";
+const CHEQD_ENDPOINT = process.env.CHEQD_ENDPOINT || "http://localhost:26657";
+const ACCOUNT_COUNT = process.env.CHEQD_ACCOUNTS || 1;
+const MNEMONIC = process.env.CHEQD_MNEMONIC;
 
 const keys = [];
 keys.TEMPORARY = new Ed25519Keypair(TEMPORARY_SEED);
 keys.push(keys.TEMPORARY);
 
 console.log(`Temporary seed is ${TEMPORARY_SEED}`);
-const DOCK_ENDPOINT = "wss://knox-1.dock.io";
-const CHEQD_ENDPOINT = "http://localhost:26657";
 
-const transferCheqd = async (cheqdAPI, from, to, amount) => {
+const transferCheqd = (from, to, amount) => {
   console.log(`Transfer ${fmtCheqdBalance(amount)} from ${from} to ${to}`);
 
-  const fee = {
-    amount: [{ denom: "ncheq", amount: "10000000" }], // Fee amount in ncheq
-    gas: "200000", // Gas limit
-    payer: from,
-  };
-
-  const msgSend = {
+  return {
     typeUrl: "/cosmos.bank.v1beta1.MsgSend",
     value: {
       fromAddress: from,
@@ -49,23 +41,17 @@ const transferCheqd = async (cheqdAPI, from, to, amount) => {
       ],
     },
   };
-
-  return await cheqdAPI.sdk.signer.signAndBroadcast(
-    from,
-    [msgSend],
-    fee,
-    "Migration"
-  );
 };
 
 const initCheqd = async (walletsCount = 0) => {
   async function generateRandomWallet() {
     // Generate a random wallet
-    const { mnemonic } = await DirectSecp256k1HdWallet.generate(24); // 24-word mnemonic for high security
+    const wallet = await DirectSecp256k1HdWallet.generate(24); // 24-word mnemonic for high security
+    const [{ address }] = await wallet.getAccounts();
 
-    console.log("Generated:", mnemonic);
+    console.log(address, ":", wallet.mnemonic);
 
-    return mnemonic;
+    return wallet.mnemonic;
   }
 
   const generated = await Promise.all(
@@ -73,7 +59,7 @@ const initCheqd = async (walletsCount = 0) => {
   );
 
   const wallets = await Promise.all(
-    [...mnemonics, ...generated].map((mnemonic) =>
+    [MNEMONIC, ...generated].map((mnemonic) =>
       DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
         prefix: "cheqd",
       })
@@ -95,11 +81,29 @@ const initCheqd = async (walletsCount = 0) => {
 async function shareBalance({ apis, wallets }) {
   const [{ address: from }] = await wallets[0].getAccounts();
   const initBalance = await getBalanceCheqd(from);
+  const txs = [];
 
   for (const wallet of wallets.slice(1)) {
     const [{ address: to }] = await wallet.getAccounts();
 
-    await transferCheqd(apis[0], from, to, 1e20);
+    txs.push(transferCheqd(from, to, 1e18));
+  }
+
+  const fee = {
+    amount: [
+      { denom: "ncheq", amount: String(10000000 * (wallets.length - 1)) },
+    ], // Fee amount in ncheq
+    gas: String(200000 * (wallets.length - 1)), // Gas limit
+    payer: from,
+  };
+
+  if (txs.length) {
+    await apis[0].sdk.signer.signAndBroadcast(
+      from,
+      txs,
+      fee,
+      "Migration balance share"
+    );
   }
 
   return initBalance;
@@ -108,13 +112,27 @@ async function shareBalance({ apis, wallets }) {
 async function payback({ apis, wallets }) {
   const [{ address: to }] = await wallets[0].getAccounts();
 
-  for (let idx = 1; idx < wallets.length; idx++) {
-    const wallet = wallets[idx];
-    const [{ address: from }] = await wallet.getAccounts();
-    const amount = await getBalanceCheqd(from);
+  await Promise.all(
+    wallets.slice(1).map(async (wallet, idx) => {
+      const [{ address: from }] = await wallet.getAccounts();
+      const amount = await getBalanceCheqd(from);
 
-    await transferCheqd(apis[idx], from, to, amount);
-  }
+      const transfer = transferCheqd(from, to, amount);
+
+      const fee = {
+        amount: [{ denom: "ncheq", amount: "10000000" }], // Fee amount in ncheq
+        gas: "200000", // Gas limit
+        payer: from,
+      };
+
+      await apis[idx + 1].sdk.signer.signAndBroadcast(
+        from,
+        [transfer],
+        fee,
+        "Migration balance payback"
+      );
+    })
+  );
 
   return await getBalanceCheqd(to);
 }
@@ -132,10 +150,12 @@ async function main() {
   const dock = new DockAPI();
 
   await dock.init({ address: DOCK_ENDPOINT });
-  const cheqds = await initCheqd(25);
+  const cheqds = await initCheqd(+ACCOUNT_COUNT);
 
   const initBalance = await shareBalance(cheqds);
-  console.log(`Main account balance is ${fmtCheqdBalance(initBalance)}`);
+  console.log(
+    `Initial main account balance was ${fmtCheqdBalance(initBalance)}`
+  );
 
   const modules = new MultiApiCoreModules([
     new DockCoreModules(dock),
@@ -143,7 +163,7 @@ async function main() {
   ]);
   const spawn = pLimit(10);
 
-  const txs = new Migration(dock, modules, keys, spawn).txs();
+  const txs = new Migration(dock, cheqds.apis[0], modules, keys, spawn).txs();
 
   let globalTxIdx = 0;
   const loopCheqd = async (cheqd) => {
@@ -170,10 +190,23 @@ async function main() {
     }
   };
 
-  await Promise.all(cheqds.apis.map(loopCheqd));
+  let err;
+  try {
+    await Promise.all(cheqds.apis.map(loopCheqd));
+  } catch (error) {
+    err = error;
+  } finally {
+    const endBalance = await payback(cheqds);
+    console.log(
+      `Final main account balance is ${fmtCheqdBalance(
+        endBalance
+      )}. Totally spent ${fmtCheqdBalance(initBalance - endBalance)}.`
+    );
+  }
 
-  const endBalance = await payback(cheqds);
-  console.log(`Totally spent ${fmtCheqdBalance(initBalance - endBalance)}`);
+  if (err != null) {
+    throw err;
+  }
 }
 
 main()

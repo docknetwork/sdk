@@ -1,21 +1,21 @@
-import { AbstractApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
-import { ensureInstanceOf } from '@docknetwork/credential-sdk/utils';
-import DockDIDModuleInternal from '../did/internal';
+import { AbstractApiProvider } from "@docknetwork/credential-sdk/modules/abstract/common";
+import { ensureInstanceOf } from "@docknetwork/credential-sdk/utils";
+import DockDIDModuleInternal from "../did/internal";
 
 class DockApiProvider extends AbstractApiProvider {
   constructor(dock) {
     super();
     this.dock = ensureInstanceOf(dock, AbstractApiProvider);
 
-    if (typeof dock.getAllExtrinsicsFromBlock !== 'function') {
-      throw new Error('`getAllExtrinsicsFromBlock` must be a function');
+    if (typeof dock.getAllExtrinsicsFromBlock !== "function") {
+      throw new Error("`getAllExtrinsicsFromBlock` must be a function");
     }
   }
 
   get api() {
     const { api } = this.dock;
     if (!api.isConnected) {
-      throw new Error('API is not connected');
+      throw new Error("API is not connected");
     }
 
     return api;
@@ -44,12 +44,16 @@ class DockApiProvider extends AbstractApiProvider {
   async getAllExtrinsicsFromBlock(numberOrHash, includeFailedExtrinsics) {
     return await this.dock.getAllExtrinsicsFromBlock(
       numberOrHash,
-      includeFailedExtrinsics,
+      includeFailedExtrinsics
     );
   }
 
+  async numberToHash(number) {
+    return await this.dock.blockNumberToHash(number);
+  }
+
   async withDidNonce(did, fn) {
-    if (typeof this.dock.withDidNonce === 'function') {
+    if (typeof this.dock.withDidNonce === "function") {
       return await this.dock.withDidNonce(did, fn);
     } else {
       return fn(await new DockDIDModuleInternal(this).nonce(did));

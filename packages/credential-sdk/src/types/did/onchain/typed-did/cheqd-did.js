@@ -2,14 +2,14 @@ import {
   CheqdDIDQualifier,
   CheqdDIDTestnetQualifier,
   CheqdDIDMainnetQualifier,
-} from "../constants";
+} from '../constants';
 import {
   TypedEnum,
   TypedTuple,
   withFrom,
   withQualifier,
-} from "../../../generic";
-import TypedUUID from "../../../generic/typed-uuid";
+} from '../../../generic';
+import TypedUUID from '../../../generic/typed-uuid';
 
 /**
  * `did:cheqd:*`
@@ -42,15 +42,15 @@ export class CheqdDid extends withQualifier(TypedEnum, true) {
   static random(network) {
     if (this.Class != null) {
       return new this(this.Class.random());
-    } else if (network === "testnet") {
+    } else if (network === 'testnet') {
       // eslint-disable-next-line no-use-before-define
       return CheqdTestnetDid.random();
-    } else if (network === "mainnet") {
+    } else if (network === 'mainnet') {
       // eslint-disable-next-line no-use-before-define
       return CheqdMainnetDid.random();
     } else {
       throw new Error(
-        `Unknown network provided: \`${network}\`, expected \`mainnet\` or \`testnet\``
+        `Unknown network provided: \`${network}\`, expected \`mainnet\` or \`testnet\``,
       );
     }
   }
@@ -67,12 +67,12 @@ export class CheqdDid extends withQualifier(TypedEnum, true) {
 export class CheqdTestnetDid extends CheqdDid {
   static Class = CheqdTestnetDidValue;
 
-  static Type = "testnet";
+  static Type = 'testnet';
 }
 export class CheqdMainnetDid extends CheqdDid {
   static Class = CheqdMainnetDidValue;
 
-  static Type = "mainnet";
+  static Type = 'mainnet';
 }
 
 CheqdDid.bindVariants(CheqdTestnetDid, CheqdMainnetDid);
@@ -80,23 +80,23 @@ CheqdDid.bindVariants(CheqdTestnetDid, CheqdMainnetDid);
 export class CheqdDLRRef extends withFrom(
   TypedTuple,
   function from(value, fromFn) {
-    if (typeof value === "string") {
-      const resources = value.lastIndexOf("/resources/");
+    if (typeof value === 'string') {
+      const resources = value.lastIndexOf('/resources/');
 
       if (resources === -1) {
-        const lastColon = value.lastIndexOf(":");
+        const lastColon = value.lastIndexOf(':');
 
         return new this(value.slice(0, lastColon), value.slice(lastColon + 1));
       }
 
       return new this(
         value.slice(0, resources),
-        value.slice(resources + "/resources/".length)
+        value.slice(resources + '/resources/'.length),
       );
     } else {
       return fromFn(value);
     }
-  }
+  },
 ) {
   static Did = CheqdDid;
 

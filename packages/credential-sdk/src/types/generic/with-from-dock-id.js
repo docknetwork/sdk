@@ -1,15 +1,13 @@
-import { DockDid } from "../did/onchain/typed-did";
-import TypedUUID from "./typed-uuid";
-import withFrom from "./with-from";
+import { DockDid } from '../did/onchain/typed-did';
+import TypedUUID from './typed-uuid';
+import withFrom from './with-from';
 
 export default function withFromDockId(klass, fromClass, prefix) {
-  return withFrom(klass, (value, from) =>
-    from(
-      value instanceof fromClass
-        ? TypedUUID.fromDockIdent(value, prefix)
-        : value
-    )
-  );
+  return withFrom(klass, (value, from) => from(
+    value instanceof fromClass
+      ? TypedUUID.fromDockIdent(value, prefix)
+      : value,
+  ));
 }
 
 export function patchWithFromDock(klass, Type, mapping) {

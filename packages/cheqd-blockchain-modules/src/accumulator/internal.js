@@ -8,19 +8,19 @@ import {
   DockAccumulatorWithUpdateInfo,
   CheqdAccumulatorPublicKeyId,
   CheqdAccumulatorParamsId,
-} from "@docknetwork/credential-sdk/types";
-import { TypedUUID, option } from "@docknetwork/credential-sdk/types/generic";
-import { stringToU8a, u8aToString } from "@docknetwork/credential-sdk/utils";
-import { VBWitnessUpdateInfo } from "@docknetwork/credential-sdk/crypto";
+} from '@docknetwork/credential-sdk/types';
+import { TypedUUID, option } from '@docknetwork/credential-sdk/types/generic';
+import { stringToU8a, u8aToString } from '@docknetwork/credential-sdk/utils';
+import { VBWitnessUpdateInfo } from '@docknetwork/credential-sdk/crypto';
 import {
   injectParams,
   injectPublicKeys,
   createInternalCheqdModule,
   SortedResourceVersions,
   validateResource,
-} from "../common";
+} from '../common';
 
-const Type = "accumulator";
+const Type = 'accumulator';
 
 const methods = {
   addAccumulator(accumulatorId, accumulator) {
@@ -32,7 +32,7 @@ const methods = {
 
     if (accumulator instanceof DockAccumulatorWithUpdateInfo) {
       storedAcc = new StoredAccumulator(
-        accumulator.accumulator
+        accumulator.accumulator,
       ).toJSONStringBytes();
       versionId = TypedUUID.fromDockIdent(id, String(accumulator.lastModified));
     } else {
@@ -43,17 +43,17 @@ const methods = {
     return new CheqdCreateResource(
       did.value.value,
       versionId,
-      "1.0",
+      '1.0',
       [],
       String(id),
       Type,
-      storedAcc
+      storedAcc,
     );
   },
   updateAccumulator(
     accumulatorId,
     accumulator,
-    { additions, removals, witnessUpdateInfo }
+    { additions, removals, witnessUpdateInfo },
   ) {
     const { AccumulatorId, StoredAccumulator } = this.types;
 
@@ -63,7 +63,7 @@ const methods = {
     let versionId;
     if (accumulator instanceof DockAccumulatorWithUpdateInfo) {
       storedAcc = new StoredAccumulator(
-        accumulator.accumulator
+        accumulator.accumulator,
       ).toJSONStringBytes();
       versionId = TypedUUID.fromDockIdent(id, String(accumulator.lastModified));
     } else {
@@ -71,7 +71,7 @@ const methods = {
         accumulator,
         additions,
         removals,
-        witnessUpdateInfo
+        witnessUpdateInfo,
       ).toJSONStringBytes();
       versionId = TypedUUID.random();
     }
@@ -79,11 +79,11 @@ const methods = {
     return new CheqdCreateResource(
       did.value.value,
       versionId,
-      "1.0",
+      '1.0',
       [],
       String(id),
       Type,
-      storedAcc
+      storedAcc,
     );
   },
   removeAccumulator(accumulatorId) {
@@ -94,24 +94,24 @@ const methods = {
     return new CheqdCreateResource(
       did.value.value,
       TypedUUID.random(),
-      "1.0",
+      '1.0',
       [],
       String(id),
       Type,
-      stringToU8a("null")
+      stringToU8a('null'),
     );
   },
 };
 
 export default class CheqdInternalAccumulatorModule extends injectParams(
-  injectPublicKeys(createInternalCheqdModule(methods))
+  injectPublicKeys(createInternalCheqdModule(methods)),
 ) {
   static get MsgNames() {
     return {
       ...super.MsgNames,
-      addAccumulator: "MsgCreateResource",
-      updateAccumulator: "MsgCreateResource",
-      removeAccumulator: "MsgCreateResource",
+      addAccumulator: 'MsgCreateResource',
+      updateAccumulator: 'MsgCreateResource',
+      removeAccumulator: 'MsgCreateResource',
     };
   }
 
@@ -121,25 +121,24 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
 
   static PublicKeyId = CheqdAccumulatorPublicKeyId;
 
-  static PublicKeyName = "AccumulatorPublicKey";
+  static PublicKeyName = 'AccumulatorPublicKey';
 
-  static PublicKeyType = "accumulator-public-key";
+  static PublicKeyType = 'accumulator-public-key';
 
   static ParamsId = CheqdAccumulatorParamsId;
 
   static Params = AccumulatorParams;
 
-  static ParamsName = "AccumulatorParams";
+  static ParamsName = 'AccumulatorParams';
 
-  static ParamsType = "accumulator-params";
+  static ParamsType = 'accumulator-params';
 
   static ParamsRef = CheqdAccumulatorParamsRef;
 
   createAccumulatorMetadataFilter(name) {
     const strName = String(name);
 
-    return (meta) =>
-      meta.resourceType === "accumulator" && meta.name === strName;
+    return (meta) => meta.resourceType === 'accumulator' && meta.name === strName;
   }
 
   async accumulatorHistory(accumulatorId) {
@@ -148,23 +147,21 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
     const ids = new SortedResourceVersions(
       await this.resourcesMetadataBy(
         did,
-        this.createAccumulatorMetadataFilter(name)
-      )
+        this.createAccumulatorMetadataFilter(name),
+      ),
     ).ids();
 
     const accumulators = [
       ...new SortedResourceVersions(await this.resources(did, ids)),
-    ].map((acc) =>
-      CheqdStoredAccumulator.from(
-        JSON.parse(u8aToString(validateResource(acc, String(name), Type)))
-      )
-    );
+    ].map((acc) => CheqdStoredAccumulator.from(
+      JSON.parse(u8aToString(validateResource(acc, String(name), Type))),
+    ));
 
     return {
       created: new CheqdAccumulatorWithUpdateInfo(
         ids[0],
         ids[0],
-        accumulators[0].accumulator
+        accumulators[0].accumulator,
       ),
       updates: accumulators.slice(1).map((acc) => ({
         newAccumulated: acc.accumulated,
@@ -183,7 +180,7 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
     const [did, name] = CheqdAccumulatorId.from(accumulatorId).value;
     const lastMeta = await this.latestResourceMetadataBy(
       did,
-      this.createAccumulatorMetadataFilter(name)
+      this.createAccumulatorMetadataFilter(name),
     );
 
     return lastMeta?.id;
@@ -194,8 +191,8 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
     const ids = new SortedResourceVersions(
       await this.resourcesMetadataBy(
         did,
-        this.createAccumulatorMetadataFilter(name)
-      )
+        this.createAccumulatorMetadataFilter(name),
+      ),
     ).ids();
 
     if (!ids.length) {
@@ -208,10 +205,10 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
           validateResource(
             await this.resource(did, ids[ids.length - 1]),
             String(name),
-            Type
-          )
-        )
-      )
+            Type,
+          ),
+        ),
+      ),
     );
 
     if (acc == null) {
@@ -221,14 +218,14 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
     return new CheqdAccumulatorWithUpdateInfo(
       ids[0],
       ids[ids.length - 1],
-      acc.accumulator
+      acc.accumulator,
     );
   }
 
   async lastParamsId(did) {
     const res = await this.latestResourceMetadataBy(
       did,
-      this.filterParamsMetadata
+      this.filterParamsMetadata,
     );
 
     return res?.id;
@@ -237,7 +234,7 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
   async lastPublicKeyId(did) {
     const res = await this.latestResourceMetadataBy(
       did,
-      this.filterPublicKeyMetadata
+      this.filterPublicKeyMetadata,
     );
 
     return res?.id;
@@ -258,7 +255,7 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
     member,
     witness,
     start,
-    end
+    end,
   ) {
     const [did, name] = CheqdAccumulatorId.from(accumulatorId).value;
     const startUUID = String(TypedUUID.from(start));
@@ -267,8 +264,8 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
     const sortedIDs = new SortedResourceVersions(
       await this.resourcesMetadataBy(
         did,
-        this.createAccumulatorMetadataFilter(name)
-      )
+        this.createAccumulatorMetadataFilter(name),
+      ),
     ).ids();
 
     const startIdx = sortedIDs.findIndex((id) => id === startUUID);
@@ -278,7 +275,7 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
 
       if (endIdx === -1) {
         throw new Error(
-          `Accumulator \`${accumulatorId}\` with version \`${end}\` doesn't exist`
+          `Accumulator \`${accumulatorId}\` with version \`${end}\` doesn't exist`,
         );
       }
     } else {
@@ -287,20 +284,19 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
 
     const accumulators = await this.resources(
       did,
-      sortedIDs.slice(startIdx, endIdx + 1)
+      sortedIDs.slice(startIdx, endIdx + 1),
     );
 
     for (const accumulator of new SortedResourceVersions(accumulators)) {
-      const { additions, removals, witnessUpdateInfo } =
-        CheqdStoredAccumulator.from(
-          validateResource(accumulator, String(name), Type)
-        );
+      const { additions, removals, witnessUpdateInfo } = CheqdStoredAccumulator.from(
+        validateResource(accumulator, String(name), Type),
+      );
 
       witness.updateUsingPublicInfoPostBatchUpdate(
         member,
         additions ? [...additions].map((addition) => addition.bytes) : [],
         removals ? [...removals].map((removal) => removal.bytes) : [],
-        new VBWitnessUpdateInfo(witnessUpdateInfo?.bytes || new Uint8Array())
+        new VBWitnessUpdateInfo(witnessUpdateInfo?.bytes || new Uint8Array()),
       );
     }
   }

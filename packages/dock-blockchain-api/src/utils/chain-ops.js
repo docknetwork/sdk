@@ -105,6 +105,7 @@ export async function getBlock(api, numberOrHash, withAuthor = false) {
   const hash = isHexWithGivenByteSize(numberOrHash, 32)
     ? numberOrHash
     : await blockNumberToHash(api, numberOrHash);
+
   if (withAuthor) {
     const { block, author } = await api.derive.chain.getBlock(hash);
     return { block, author };

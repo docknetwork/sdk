@@ -7,7 +7,6 @@ import {
   DockDid,
 } from "@docknetwork/credential-sdk/types";
 import pLimit from "p-limit";
-import { DockAccumulatorModule } from "@docknetwork/dock-blockchain-modules";
 
 const mergeAwait = async (objectPromises) => {
   const acc = {};

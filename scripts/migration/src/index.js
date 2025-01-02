@@ -1,13 +1,11 @@
 import { DockAPI } from "@docknetwork/dock-blockchain-api";
 import { Ed25519Keypair } from "@docknetwork/credential-sdk/keypairs";
 import { CheqdAPI, CheqdNetwork } from "@docknetwork/cheqd-blockchain-api";
-import { MultiApiCoreModules } from "@docknetwork/credential-sdk/modules";
 import {
   randomAsHex,
   maybeToJSONString,
 } from "@docknetwork/credential-sdk/utils";
-import { DockCoreModules } from "@docknetwork/dock-blockchain-modules";
-import { CheqdCoreModules } from "@docknetwork/cheqd-blockchain-modules";
+
 import pLimit from "p-limit";
 import { checkBalance } from "@cheqd/sdk";
 import { DirectSecp256k1HdWallet } from "@docknetwork/cheqd-blockchain-api/wallet";
@@ -17,16 +15,18 @@ const TEMPORARY_SEED = process.env.TEMPORARY_SEED_HEX || randomAsHex(32);
 const DOCK_ENDPOINT = process.env.DOCK_ENDPOINT || "wss://mainnet-node.dock.io";
 const CHEQD_ENDPOINT = process.env.CHEQD_ENDPOINT || "http://localhost:26657";
 const ACCOUNT_COUNT = process.env.CHEQD_ACCOUNTS || 1;
+const BALANCE_SHARE = Number(process.env.BALANCE_SHARE || 1000);
 const MNEMONIC = process.env.CHEQD_MNEMONIC;
+const TRANSFER_FEE = Number(process.env.TRANSFER_FEE || 10000000);
 
-const keys = [];
-keys.TEMPORARY = new Ed25519Keypair(TEMPORARY_SEED);
-keys.push(keys.TEMPORARY);
+const keyPairs = [];
+keyPairs.TEMPORARY = new Ed25519Keypair(TEMPORARY_SEED);
+keyPairs.push(keyPairs.TEMPORARY);
 
 console.log(`Temporary seed is ${TEMPORARY_SEED}`);
 
-const transferCheqd = (from, to, amount) => {
-  console.log(`Transfer ${fmtCheqdBalance(amount)} from ${from} to ${to}`);
+const transferNCHEQ = (from, to, ncheq) => {
+  console.log(`Transfer ${fmtNCHEQBalance(ncheq)} from ${from} to ${to}`);
 
   return {
     typeUrl: "/cosmos.bank.v1beta1.MsgSend",
@@ -36,7 +36,7 @@ const transferCheqd = (from, to, amount) => {
       amount: [
         {
           denom: "ncheq", // cheqd's native token
-          amount: String(amount), // Amount in base units (e.g., 1 CHEQ = 1,000,000 ncheq)
+          amount: String(ncheq), // Amount in base units (e.g., 1 CHEQ = 1,000,000 ncheq)
         },
       ],
     },
@@ -46,7 +46,9 @@ const transferCheqd = (from, to, amount) => {
 const initCheqd = async (walletsCount = 0) => {
   async function generateRandomWallet() {
     // Generate a random wallet
-    const wallet = await DirectSecp256k1HdWallet.generate(24); // 24-word mnemonic for high security
+    const wallet = await DirectSecp256k1HdWallet.generate(24, {
+      prefix: "cheqd",
+    }); // 24-word mnemonic for high security
     const [{ address }] = await wallet.getAccounts();
 
     console.log(address, ":", wallet.mnemonic);
@@ -86,12 +88,12 @@ async function shareBalance({ apis, wallets }) {
   for (const wallet of wallets.slice(1)) {
     const [{ address: to }] = await wallet.getAccounts();
 
-    txs.push(transferCheqd(from, to, 1e18));
+    txs.push(transferNCHEQ(from, to, BALANCE_SHARE * 1e9));
   }
 
   const fee = {
     amount: [
-      { denom: "ncheq", amount: String(10000000 * (wallets.length - 1)) },
+      { denom: "ncheq", amount: String(TRANSFER_FEE * (wallets.length - 1)) },
     ], // Fee amount in ncheq
     gas: String(200000 * (wallets.length - 1)), // Gas limit
     payer: from,
@@ -115,12 +117,12 @@ async function payback({ apis, wallets }) {
   await Promise.all(
     wallets.slice(1).map(async (wallet, idx) => {
       const [{ address: from }] = await wallet.getAccounts();
-      const amount = await getBalanceCheqd(from);
+      const balance = await getBalanceCheqd(from);
 
-      const transfer = transferCheqd(from, to, amount);
+      const transfer = transferNCHEQ(from, to, balance - BigInt(TRANSFER_FEE));
 
       const fee = {
-        amount: [{ denom: "ncheq", amount: "10000000" }], // Fee amount in ncheq
+        amount: [{ denom: "ncheq", amount: String(TRANSFER_FEE) }], // Fee amount in ncheq
         gas: "200000", // Gas limit
         payer: from,
       };
@@ -144,29 +146,27 @@ const getBalanceCheqd = async (account) =>
     ).amount
   );
 
-const fmtCheqdBalance = (balance) => `${Number(balance) / 1e18} cheqd`;
+const fmtNCHEQBalance = (ncheq) => `${(Number(ncheq) / 1e9).toFixed(9)} CHEQD`;
 
 async function main() {
   const dock = new DockAPI();
 
   await dock.init({ address: DOCK_ENDPOINT });
+  dock.params = { address: DOCK_ENDPOINT };
+
   const cheqds = await initCheqd(+ACCOUNT_COUNT);
 
   const initBalance = await shareBalance(cheqds);
   console.log(
-    `Initial main account balance was ${fmtCheqdBalance(initBalance)}`
+    `Initial main account balance was ${fmtNCHEQBalance(initBalance)}`
   );
 
-  const modules = new MultiApiCoreModules([
-    new DockCoreModules(dock),
-    new CheqdCoreModules(cheqds.apis[0]),
-  ]);
   const spawn = pLimit(10);
 
-  const txs = new Migration(dock, cheqds.apis[0], modules, keys, spawn).txs();
+  const txs = new Migration(dock, cheqds.apis[0], keyPairs, spawn).txs();
 
   let globalTxIdx = 0;
-  const loopCheqd = async (cheqd) => {
+  const loopSender = async (cheqd) => {
     let localTxIdx = 0;
     const [{ address }] = await cheqd.sdk.options.wallet.getAccounts();
 
@@ -192,15 +192,25 @@ async function main() {
 
   let err;
   try {
-    await Promise.all(cheqds.apis.map(loopCheqd));
+    await Promise.all(cheqds.apis.map(loopSender));
   } catch (error) {
     err = error;
   } finally {
     const endBalance = await payback(cheqds);
     console.log(
-      `Final main account balance is ${fmtCheqdBalance(
+      `Final main account balance is ${fmtNCHEQBalance(
         endBalance
-      )}. Totally spent ${fmtCheqdBalance(initBalance - endBalance)}.`
+      )}. Totally spent ${fmtNCHEQBalance(
+        initBalance - endBalance
+      )}. Average per sender is ${fmtNCHEQBalance(
+        (initBalance - endBalance) / BigInt(ACCOUNT_COUNT)
+      )}.`
+    );
+
+    console.log(
+      `Total transactions sent: ${globalTxIdx}, average per sender: ${
+        globalTxIdx / +ACCOUNT_COUNT
+      }`
     );
   }
 

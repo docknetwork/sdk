@@ -159,9 +159,11 @@ export default class DockAPI extends AbstractApiProvider {
   }
 
   async disconnect() {
-    if (this.isConnected) {
-      await this.api.disconnect();
-    }
+    this.ensureNotInitialized();
+    await this.api.disconnect();
+    delete this.api;
+
+    return this;
   }
 
   isInitialized() {

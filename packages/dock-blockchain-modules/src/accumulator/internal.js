@@ -259,6 +259,8 @@ export default class DockInternalAccumulatorModule extends injectParams(
       );
     }
 
+    acc.lastUpdatedAt = acc.createdAt;
+
     return { created: acc, updates };
   }
 

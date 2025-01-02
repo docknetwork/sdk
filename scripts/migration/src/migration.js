@@ -11,7 +11,15 @@ import { maybeToJSONString } from "@docknetwork/credential-sdk/utils";
 import { DidKeypair } from "@docknetwork/credential-sdk/keypairs";
 import { NoDIDError } from "@docknetwork/credential-sdk/modules/abstract/did";
 import { NoBlobError } from "@docknetwork/credential-sdk/modules/abstract/blob";
-import { DockAccumulatorModule } from "@docknetwork/dock-blockchain-modules";
+import {
+  DockAccumulatorModule,
+  DockStatusListCredentialModule,
+} from "@docknetwork/dock-blockchain-modules";
+import { CheqdAccumulatorModule } from "@docknetwork/cheqd-blockchain-modules";
+import { DockCoreModules } from "@docknetwork/dock-blockchain-modules";
+import { CheqdCoreModules } from "@docknetwork/cheqd-blockchain-modules";
+import { MultiApiCoreModules } from "@docknetwork/credential-sdk/modules";
+import pLimit from "p-limit";
 
 const nullIfThrows = async (fn, Err) => {
   try {
@@ -28,12 +36,16 @@ const nullIfThrows = async (fn, Err) => {
 };
 
 export default class Migration {
-  constructor(dock, cheqd, modules, keyPairs, spawn) {
+  constructor(dock, cheqd, keyPairs, spawn) {
     this.dock = dock;
     this.cheqd = cheqd;
     this.spawn = spawn;
     this.keyPairs = keyPairs;
-    this.modules = modules;
+
+    this.modules = new MultiApiCoreModules([
+      new DockCoreModules(dock),
+      new CheqdCoreModules(cheqd),
+    ]);
   }
 
   get types() {
@@ -69,6 +81,113 @@ export default class Migration {
     }
 
     return didKeypair;
+  }
+
+  async fetchAccumulators() {
+    console.log("Fetching accumulators");
+
+    const accs = Object.create(null);
+
+    const ids = [
+      ...(await this.dock.api.query.accumulator.accumulators.keys()),
+    ].map((rawId) =>
+      this.spawn(async () => {
+        const id = DockAccumulatorId.from(rawId.toHuman()[0]);
+        try {
+          const acc = await this.modules.accumulator.getAccumulator(
+            id,
+            true,
+            true
+          );
+          const history = await new DockAccumulatorModule(
+            this.dock
+          ).dockOnly.accumulatorHistory(id);
+
+          return [id, { acc, history }];
+        } catch (error) {
+          error.message = `Failed to fetch accumulator ${id}: ${error.message}`;
+
+          throw error;
+        }
+      })
+    );
+
+    let total = 0;
+    for await (const [id, { acc, history }] of ids) {
+      if (acc.keyRef == null) {
+        console.log(
+          `Accumulator ${id} doesn't have a key reference, thus will be skipped`
+        );
+        continue;
+      }
+
+      accs[acc.keyRef[0]] ??= [];
+      accs[acc.keyRef[0]].push({ id, acc, history });
+      total++;
+    }
+
+    console.log(`Totally found ${total} accumulators`);
+
+    return accs;
+  }
+
+  async fetchBlobs() {
+    console.log("Fetching blobs");
+
+    const blobs = Object.create(null);
+    const ids = [...(await this.dock.api.query.blobStore.blobs.keys())].map(
+      (rawId) =>
+        this.spawn(async () => {
+          const id = DockBlobId.from(rawId.toHuman()[0]);
+
+          return [id, await this.modules.blob.get(id)];
+        })
+    );
+
+    let total = 0;
+    for await (const [id, [owner, blob]] of ids) {
+      blobs[owner] ??= [];
+      blobs[owner].push({ id, blob });
+      total++;
+    }
+
+    console.log(`Totally found ${total} blobs`);
+
+    return blobs;
+  }
+
+  async fetchStatusLists() {
+    console.log("Fetching status list credentials");
+
+    const lists = Object.create(null);
+    const ids = [
+      ...(await this.dock.api.query.statusListCredential.statusListCredentials.keys()),
+    ].map((rawId) =>
+      this.spawn(async () => {
+        const id = DockStatusListCredentialId.from(rawId.toHuman()[0]);
+
+        return [
+          id,
+          await new DockStatusListCredentialModule(
+            this.dock
+          ).dockOnly.statusListCredential(id),
+        ];
+      })
+    );
+
+    let total = 0;
+    for await (const [id, { policy, statusListCredential }] of ids) {
+      lists[[...policy.value][0]] ??= [];
+      lists[[...policy.value][0]].push({
+        id,
+        statusListCredential: statusListCredential?.value?.list,
+      });
+      total++;
+    }
+
+    console.log(`Totally found ${total} status list credentials`);
+
+    return lists;
   }
 
   async *migrateAccumulatorPublicKeys(did, keypair) {
@@ -146,94 +265,11 @@ export default class Migration {
     }
   }
 
-  async fetchAccumulators() {
-    const accs = Object.create(null);
-    const ids = [
-      ...(await this.dock.api.query.accumulator.accumulators.keys()),
-    ].map((rawId) =>
-      this.spawn(async () => {
-        const id = DockAccumulatorId.from(rawId.toHuman()[0]);
-        const acc = await this.modules.accumulator.getAccumulator(
-          id,
-          true,
-          true
-        );
-        const history = await new DockAccumulatorModule(
-          this.dock
-        ).dockOnly.accumulatorHistory(id);
-
-        return [id, { acc, history }];
-      })
-    );
-
-    for await (const [id, { acc, history }] of ids) {
-      if (acc.keyRef == null) {
-        console.log(
-          `Accumulator ${id} doesn't have a key reference, thus will be skipped`
-        );
-        continue;
-      }
-
-      accs[acc.keyRef[0]] ??= [];
-      accs[acc.keyRef[0]].push({ id, acc, history });
-    }
-
-    return accs;
-  }
-
-  async fetchBlobs() {
-    const blobs = Object.create(null);
-    const ids = [...(await this.dock.api.query.blobStore.blobs.keys())].map(
-      (rawId) =>
-        this.spawn(async () => {
-          const id = DockBlobId.from(rawId.toHuman()[0]);
-
-          return [id, await this.modules.blob.get(id)];
-        })
-    );
-
-    for await (const [id, [owner, blob]] of ids) {
-      blobs[owner] ??= [];
-      blobs[owner].push({ id, blob });
-    }
-
-    return blobs;
-  }
-
-  async fetchStatusLists() {
-    const lists = Object.create(null);
-    const ids = [
-      ...(await this.dock.api.query.statusListCredential.statusListCredentials.keys()),
-    ].map((rawId) =>
-      this.spawn(async () => {
-        const id = DockStatusListCredentialId.from(rawId.toHuman()[0]);
-
-        return [
-          id,
-          await this.modules.statusListCredential.modules[0].dockOnly.statusListCredential(
-            id
-          ),
-        ];
-      })
-    );
-
-    for await (const [id, { policy, statusListCredential }] of ids) {
-      lists[[...policy.value][0]] ??= [];
-      lists[[...policy.value][0]].push({
-        id,
-        statusListCredential: statusListCredential?.value?.list,
-      });
-    }
-
-    return lists;
-  }
-
   async *migrateAccumulators(did, accs, keypair) {
     const newHistory = async (cheqdId, history) => {
-      const cheqdHistory =
-        await this.modules.accumulator.modules[1].cheqdOnly.accumulatorHistory(
-          cheqdId
-        );
+      const cheqdHistory = await new CheqdAccumulatorModule(
+        this.cheqd
+      ).cheqdOnly.accumulatorHistory(cheqdId);
 
       for (
         let i = 0;
@@ -246,7 +282,6 @@ export default class Migration {
           "witnessUpdateInfo",
           "newAccumulated",
         ]) {
-          console.log(history.updates, cheqdHistory.updates);
           if (!history.updates[i][attr].eq(cheqdHistory.updates[i][attr])) {
             throw new Error(`Inconsistent history for ${cheqdId} in ${attr}`);
           }
@@ -264,16 +299,18 @@ export default class Migration {
       if (await this.modules.accumulator.getAccumulator(cheqdId)) {
         console.log(`Accumulator ${cheqdId} already exists`);
       } else {
-        yield await this.modules.accumulator.modules[1].cheqdOnly.tx.addAccumulator(
+        yield await new CheqdAccumulatorModule(
+          this.cheqd
+        ).cheqdOnly.tx.addAccumulator(
           new this.types.AccumulatorId.Class(did, id),
           history.created,
           keypair
         );
       }
 
-      let cheqdHistory = await newHistory(cheqdId, history);
+      let nextHistory = await newHistory(cheqdId, history);
       if (
-        maybeToJSONString(cheqdHistory.created.accumulator) !==
+        maybeToJSONString(nextHistory.created.accumulator) !==
         maybeToJSONString(
           new this.types.StoredAccumulator(history.created.accumulator)
             .accumulator
@@ -281,7 +318,7 @@ export default class Migration {
       ) {
         throw new Error(
           `Accumulator migration failed for ${cheqdId} - new: ${maybeToJSONString(
-            cheqdHistory.created.accumulator
+            nextHistory.created.accumulator
           )}, before: ${maybeToJSONString(history.created.accumulator)}`
         );
       }
@@ -289,12 +326,14 @@ export default class Migration {
       const last = history.created;
       for (
         let i = 0;
-        i < Math.min(history.updates.length, cheqdHistory.length);
+        i < Math.min(history.updates.length, nextHistory.updates.length);
         i++
       ) {
         last.accumulated = history.updates[i].newAccumulated;
 
-        await this.modules.accumulator.modules[1].cheqdOnly.tx.updateAccumulator(
+        await new CheqdAccumulatorModule(
+          this.cheqd
+        ).cheqdOnly.tx.updateAccumulator(
           new this.types.AccumulatorId.Class(did, id),
           last,
           history.updates[i],
@@ -302,9 +341,9 @@ export default class Migration {
         );
       }
 
-      cheqdHistory = await newHistory(cheqdId, history);
+      nextHistory = await newHistory(cheqdId, history);
 
-      if (cheqdHistory.length) {
+      if (nextHistory.updates.length) {
         throw new Error(`Failed to migrate history for ${cheqdId}`);
       }
     }

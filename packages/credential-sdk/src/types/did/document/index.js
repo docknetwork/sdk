@@ -28,7 +28,6 @@ import {
   CheqdVerificationMethodRefOrCheqdVerificationMethod,
   CheqdVerificationMethodRefOrCheqdMainnetVerificationMethod,
   CheqdVerificationMethodRefOrCheqdTestnetVerificationMethod,
-  VerificationMethodRefOrCheqdVerificationMethod,
 } from './verification-method-ref-or-cheqd-verification-method';
 import { Ed25519Verification2018Method } from './verification-method-type';
 import {
@@ -312,25 +311,18 @@ export class DIDDocument extends withFrom(
       capabilityInvocation,
     } = this;
 
-    class VerificationMethodRefOrCheqdVerificationMethodSet extends TypedSet {
-      static Class = VerificationMethodRefOrCheqdVerificationMethod;
+    class VerMethodRefSet extends TypedSet {
+      static Class = VerificationMethodRef;
     }
 
-    const auth = new VerificationMethodRefOrCheqdVerificationMethodSet(
-      authentication,
-    );
-    const assertion = new VerificationMethodRefOrCheqdVerificationMethodSet(
-      assertionMethod,
-    );
-    const keyAgr = new VerificationMethodRefOrCheqdVerificationMethodSet(
-      keyAgreement,
-    );
-    const capInv = new VerificationMethodRefOrCheqdVerificationMethodSet(
-      capabilityInvocation,
-    );
+    const auth = new VerMethodRefSet(authentication);
+    const assertion = new VerMethodRefSet(assertionMethod);
+    const keyAgr = new VerMethodRefSet(keyAgreement);
+    const capInv = new VerMethodRefSet(capabilityInvocation);
 
     const keys = [...verificationMethod].map((method) => {
       const verRels = new VerificationRelationship();
+
       if (auth.has(method.id)) {
         verRels.setAuthentication();
       }

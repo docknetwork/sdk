@@ -7,20 +7,8 @@ import {
   CheqdMainnetVerificationMethodRef,
   CheqdTestnetVerificationMethodRef,
   CheqdVerificationMethodRef,
-  VerificationMethodRef,
 } from './verification-method-ref';
 import { withFrom } from '../../generic';
-
-export class VerificationMethodRefOrCheqdVerificationMethod extends withFrom(
-  VerificationMethodRef,
-  (value, from) => {
-    try {
-      return CheqdVerificationMethodRef.from(value);
-    } catch (err) {
-      return from(value);
-    }
-  },
-) {}
 
 export class CheqdVerificationMethodRefOrCheqdVerificationMethod extends withFrom(
   CheqdVerificationMethodRef,

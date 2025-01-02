@@ -6,6 +6,8 @@ import {
   ByteArray,
   TypedUUID,
   withProp,
+  withFrom,
+  TypedArray,
 } from '../generic';
 import {
   DockAccumulatorPublicKeyRef,
@@ -14,6 +16,24 @@ import {
   CheqdMainnetAccumulatorPublicKeyRef,
 } from './keys';
 import { createAccumulatorVariants } from './variants';
+
+class TypedUUIDOrTypedNumber extends withFrom(TypedUUID, (value, from) => {
+  try {
+    return TypedNumber.from(value);
+  } catch {
+    return from(value);
+  }
+}) {}
+
+export class AccumulatorUpdate extends TypedStruct {
+  static Classes = {
+    id: TypedUUIDOrTypedNumber,
+    accumulated: ByteArray,
+    additions: option(ArrayOfByteArrays),
+    removals: option(ArrayOfByteArrays),
+    witnessUpdateInfo: option(ByteArray),
+  };
+}
 
 export const [
   DockAccumulatorCommon,
@@ -46,9 +66,22 @@ export class DockAccumulatorWithUpdateInfo extends TypedStruct {
     return this.accumulator.value.accumulated;
   }
 
+  set accumulated(newAccumulated) {
+    this.accumulator.accumulated = newAccumulated;
+  }
+
   get keyRef() {
     return this.accumulator.value.keyRef;
   }
+}
+
+export class DockAccumulatorHistory extends TypedStruct {
+  static Classes = {
+    created: DockAccumulatorWithUpdateInfo,
+    updates: class AccumulatorUpdates extends TypedArray {
+      static Class = AccumulatorUpdate;
+    },
+  };
 }
 
 export const [
@@ -82,6 +115,10 @@ export class CheqdAccumulatorWithUpdateInfo extends TypedStruct {
     return this.accumulator.value.accumulated;
   }
 
+  set accumulated(newAccumulated) {
+    this.accumulator.value.accumulated = newAccumulated;
+  }
+
   get keyRef() {
     return this.accumulator.value.keyRef;
   }
@@ -110,6 +147,14 @@ export class CheqdStoredAccumulator extends TypedStruct {
     removals: option(ArrayOfByteArrays),
     witnessUpdateInfo: option(ByteArray),
   };
+
+  set accumulated(newAccumulated) {
+    this.accumulator.accumulated = newAccumulated;
+  }
+
+  get accumulated() {
+    return this.accumulator.accumulated;
+  }
 }
 
 export class CheqdTestnetStoredAccumulator extends withProp(
@@ -123,3 +168,12 @@ export class CheqdMainnetStoredAccumulator extends withProp(
   'accumulator',
   CheqdMainnetAccumulator,
 ) {}
+
+export class CheqdAccumulatorHistory extends TypedStruct {
+  static Classes = {
+    created: CheqdAccumulatorWithUpdateInfo,
+    updates: class AccumulatorUpdates extends TypedArray {
+      static Class = AccumulatorUpdate;
+    },
+  };
+}

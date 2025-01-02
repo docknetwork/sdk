@@ -10,6 +10,8 @@ import {
   DockAccumulatorParamsId,
   DockAccumulatorIdIdent,
   DockAccumulatorPublicKeyId,
+  AccumulatorUpdate,
+  DockAccumulatorHistory,
 } from '@docknetwork/credential-sdk/types';
 import { option, withProp } from '@docknetwork/credential-sdk/types/generic';
 import { inclusiveRange, u8aToHex } from '@docknetwork/credential-sdk/utils';
@@ -244,11 +246,26 @@ export default class DockInternalAccumulatorModule extends injectParams(
     let acc = await this.getAccumulator(accumulatorId);
     let updates = [];
 
+    const mapUpdates = ({
+      newAccumulated,
+      additions,
+      removals,
+      witnessUpdateInfo,
+    }) => new AccumulatorUpdate(
+      acc.lastModified,
+      newAccumulated,
+      additions,
+      removals,
+      witnessUpdateInfo,
+    );
+
     while (!acc.lastModified.eq(acc.createdAt)) {
-      updates = updates.concat(
-        // eslint-disable-next-line no-await-in-loop
-        await this.getUpdatesFromBlock(accumulatorId, acc.lastModified),
+      // eslint-disable-next-line no-await-in-loop
+      const prevUpdates = await this.getUpdatesFromBlock(
+        accumulatorId,
+        acc.lastModified,
       );
+      updates = updates.concat(prevUpdates.map(mapUpdates));
 
       // eslint-disable-next-line no-await-in-loop
       acc = await this.getAccumulator(
@@ -259,9 +276,7 @@ export default class DockInternalAccumulatorModule extends injectParams(
       );
     }
 
-    acc.lastUpdatedAt = acc.createdAt;
-
-    return { created: acc, updates };
+    return new DockAccumulatorHistory(acc, updates.reverse());
   }
 
   /**

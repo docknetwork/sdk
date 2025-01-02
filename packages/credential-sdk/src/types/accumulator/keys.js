@@ -20,7 +20,7 @@ export class DockAccumulatorParamsRef extends TypedTuple {
 export class CheqdAccumulatorPublicKeyId extends withFromDockId(
   TypedUUID,
   DockAccumulatorPublicKeyId,
-  'accumulator-public-key',
+  'cheqd:accumulator:public-key:',
 ) {}
 
 export class CheqdAccumulatorPublicKeyRef extends CheqdDLRRef {

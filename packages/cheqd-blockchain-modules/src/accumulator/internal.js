@@ -8,6 +8,8 @@ import {
   DockAccumulatorWithUpdateInfo,
   CheqdAccumulatorPublicKeyId,
   CheqdAccumulatorParamsId,
+  AccumulatorUpdate,
+  CheqdAccumulatorHistory,
 } from '@docknetwork/credential-sdk/types';
 import { TypedUUID, option } from '@docknetwork/credential-sdk/types/generic';
 import { stringToU8a, u8aToString } from '@docknetwork/credential-sdk/utils';
@@ -64,6 +66,9 @@ const methods = {
     if (accumulator instanceof DockAccumulatorWithUpdateInfo) {
       storedAcc = new StoredAccumulator(
         accumulator.accumulator,
+        additions,
+        removals,
+        witnessUpdateInfo,
       ).toJSONStringBytes();
       versionId = TypedUUID.fromDockIdent(id, String(accumulator.lastModified));
     } else {
@@ -151,29 +156,40 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
       ),
     ).ids();
 
-    const accumulators = [
+    const resources = [
       ...new SortedResourceVersions(await this.resources(did, ids)),
-    ].map((acc) => CheqdStoredAccumulator.from(
+    ];
+    const accumulators = resources.map((acc) => CheqdStoredAccumulator.from(
       JSON.parse(u8aToString(validateResource(acc, String(name), Type))),
     ));
+    const updates = accumulators
+      .slice(1)
+      .map(
+        (
+          {
+            accumulator,
+            additions,
+            removals,
+            witnessUpdateInfo = new Uint8Array(),
+          },
+          idx,
+        ) => new AccumulatorUpdate(
+          resources[idx + 1].metadata.id,
+          accumulator.accumulated,
+          additions,
+          removals,
+          witnessUpdateInfo,
+        ),
+      );
 
-    return {
-      created: new CheqdAccumulatorWithUpdateInfo(
+    return new CheqdAccumulatorHistory(
+      new CheqdAccumulatorWithUpdateInfo(
         ids[0],
         ids[0],
         accumulators[0].accumulator,
       ),
-      updates: accumulators.slice(1).map((acc) => ({
-        newAccumulated: acc.accumulated,
-        additions: acc.additions
-          ? acc.additions.map((addition) => addition.bytes)
-          : [],
-        removals: acc.removals
-          ? acc.removals.map((removal) => removal.bytes)
-          : [],
-        witnessUpdateInfo: acc.witnessUpdateInfo ?? new Uint8Array(),
-      })),
-    };
+      updates,
+    );
   }
 
   async lastAccumulatorId(accumulatorId) {

@@ -6,6 +6,7 @@ import {
   DockAccumulatorId,
   DockStatusListCredentialId,
   CheqdParamsId,
+  DockAccumulatorWithUpdateInfo,
 } from "@docknetwork/credential-sdk/types";
 import { maybeToJSONString } from "@docknetwork/credential-sdk/utils";
 import { DidKeypair } from "@docknetwork/credential-sdk/keypairs";
@@ -19,7 +20,7 @@ import { CheqdAccumulatorModule } from "@docknetwork/cheqd-blockchain-modules";
 import { DockCoreModules } from "@docknetwork/dock-blockchain-modules";
 import { CheqdCoreModules } from "@docknetwork/cheqd-blockchain-modules";
 import { MultiApiCoreModules } from "@docknetwork/credential-sdk/modules";
-import pLimit from "p-limit";
+import { TypedUUID } from "@docknetwork/credential-sdk/types/generic";
 
 const nullIfThrows = async (fn, Err) => {
   try {
@@ -207,7 +208,7 @@ export default class Migration {
       const id = CheqdAccumulatorPublicKeyId.from(dockId);
 
       if (await accumulator.getPublicKey(cheqdDid, id)) {
-        console.log(`Params ${cheqdDid} ${id} already exist`);
+        console.log(`Params ${cheqdDid} ${id} already exists`);
         continue;
       }
 
@@ -232,7 +233,7 @@ export default class Migration {
       const id = CheqdAccumulatorParamsId.from(dockId);
 
       if (await accumulator.getParams(cheqdDid, id)) {
-        console.log(`Params ${did} ${id} already exist`);
+        console.log(`Params ${did} ${id} already exists`);
         continue;
       }
 
@@ -257,7 +258,7 @@ export default class Migration {
       const id = CheqdParamsId.from(dockId);
 
       if (await offchainSignatures.getParams(cheqdDid, id)) {
-        console.log(`Params ${did} ${id} already exist`);
+        console.log(`Params ${did} ${id} already exists`);
         continue;
       }
 
@@ -271,6 +272,24 @@ export default class Migration {
         this.cheqd
       ).cheqdOnly.accumulatorHistory(cheqdId);
 
+      if (
+        !cheqdHistory.created.accumulator.eq(
+          new this.types.StoredAccumulator(history.created.accumulator)
+            .accumulator
+        )
+      ) {
+        throw new Error(
+          `Accumulator migration failed for ${cheqdId} - new: ${maybeToJSONString(
+            cheqdHistory.created.accumulator
+          )}, before: ${maybeToJSONString(
+            history.created.accumulator
+          )}; ${maybeToJSONString(
+            new this.types.StoredAccumulator(history.created.accumulator)
+              .accumulator
+          )}`
+        );
+      }
+
       for (
         let i = 0;
         i < Math.min(history.updates.length, cheqdHistory.updates.length);
@@ -280,66 +299,65 @@ export default class Migration {
           "additions",
           "removals",
           "witnessUpdateInfo",
-          "newAccumulated",
+          "accumulated",
         ]) {
           if (!history.updates[i][attr].eq(cheqdHistory.updates[i][attr])) {
-            throw new Error(`Inconsistent history for ${cheqdId} in ${attr}`);
+            throw new Error(
+              `Inconsistent history for ${cheqdId} in ${attr}: ${JSON.stringify(
+                history.updates[i]
+              )} and ${JSON.stringify(cheqdHistory.updates[i])}`
+            );
           }
+        }
+
+        const dockUpdateId = String(
+          TypedUUID.fromDockIdent(cheqdId[1], String(history.updates.id))
+        );
+        const cheqdUpdateId = cheqdHistory.updates[i].id;
+        if (dockUpdateId !== cheqdUpdateId) {
+          console.log(
+            `Accumulator Id don't match: ${dockUpdateId} - ${cheqdUpdateId}`
+          );
         }
       }
 
-      return {
-        created: cheqdHistory.created,
-        updates: cheqdHistory.updates.slice(history.updates.length),
-      };
+      return new history.constructor(
+        history.created,
+        [...history.updates].slice(cheqdHistory.updates.length)
+      );
     };
 
     for (const { id, history } of accs[did] || []) {
       const cheqdId = new this.types.AccumulatorId.Class(did, id);
+
       if (await this.modules.accumulator.getAccumulator(cheqdId)) {
         console.log(`Accumulator ${cheqdId} already exists`);
       } else {
+        console.log(`Adding ${cheqdId}`);
+
         yield await new CheqdAccumulatorModule(
           this.cheqd
-        ).cheqdOnly.tx.addAccumulator(
-          new this.types.AccumulatorId.Class(did, id),
-          history.created,
-          keypair
-        );
+        ).cheqdOnly.tx.addAccumulator(cheqdId, history.created, keypair);
       }
 
       let nextHistory = await newHistory(cheqdId, history);
-      if (
-        maybeToJSONString(nextHistory.created.accumulator) !==
-        maybeToJSONString(
-          new this.types.StoredAccumulator(history.created.accumulator)
-            .accumulator
-        )
-      ) {
-        throw new Error(
-          `Accumulator migration failed for ${cheqdId} - new: ${maybeToJSONString(
-            nextHistory.created.accumulator
-          )}, before: ${maybeToJSONString(history.created.accumulator)}`
-        );
-      }
 
-      const last = history.created;
-      for (
-        let i = 0;
-        i < Math.min(history.updates.length, nextHistory.updates.length);
-        i++
-      ) {
-        last.accumulated = history.updates[i].newAccumulated;
+      const last = nextHistory.created;
+      const initialAccumulated = last.accumulated;
+      for (const chunk of nextHistory.updates) {
+        last.accumulated = chunk.accumulated;
+        last.lastUpdatedAt = chunk.id;
 
-        await new CheqdAccumulatorModule(
+        if (String(last.accumulated) !== String(chunk.accumulated)) {
+          throw new Error("Failed to update accumulator");
+        }
+
+        yield await new CheqdAccumulatorModule(
           this.cheqd
-        ).cheqdOnly.tx.updateAccumulator(
-          new this.types.AccumulatorId.Class(did, id),
-          last,
-          history.updates[i],
-          didKeypair
-        );
+        ).cheqdOnly.tx.updateAccumulator(cheqdId, last, chunk, keypair);
       }
+      last.accumulated = initialAccumulated;
+      last.lastUpdatedAt = last.createdAt;
 
       nextHistory = await newHistory(cheqdId, history);
 

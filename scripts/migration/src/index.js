@@ -4,6 +4,7 @@ import { CheqdAPI, CheqdNetwork } from "@docknetwork/cheqd-blockchain-api";
 import {
   randomAsHex,
   maybeToJSONString,
+  timeout,
 } from "@docknetwork/credential-sdk/utils";
 
 import pLimit from "p-limit";
@@ -196,22 +197,30 @@ async function main() {
   } catch (error) {
     err = error;
   } finally {
-    const endBalance = await payback(cheqds);
-    console.log(
-      `Final main account balance is ${fmtNCHEQBalance(
-        endBalance
-      )}. Totally spent ${fmtNCHEQBalance(
-        initBalance - endBalance
-      )}. Average per sender is ${fmtNCHEQBalance(
-        (initBalance - endBalance) / BigInt(ACCOUNT_COUNT)
-      )}.`
-    );
+    try {
+      await timeout(3e3);
+      const endBalance = await payback(cheqds);
 
-    console.log(
-      `Total transactions sent: ${globalTxIdx}, average per sender: ${
-        globalTxIdx / +ACCOUNT_COUNT
-      }`
-    );
+      console.log(
+        `Final main account balance is ${fmtNCHEQBalance(
+          endBalance
+        )}. Totally spent ${fmtNCHEQBalance(
+          initBalance - endBalance
+        )}. Average per sender is ${fmtNCHEQBalance(
+          (initBalance - endBalance) / BigInt(ACCOUNT_COUNT)
+        )}.`
+      );
+
+      console.log(
+        `Total transactions sent: ${globalTxIdx}, average per sender: ${
+          globalTxIdx / +ACCOUNT_COUNT
+        }`
+      );
+    } catch (error) {
+      error.message = `Payback failed: ${error.message}`;
+
+      err ||= error;
+    }
   }
 
   if (err != null) {

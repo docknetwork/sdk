@@ -2,12 +2,7 @@
 
 ## 0.17.0
 
-### Minor Changes
-
 - Implementation of the `cheqd` migration and the associated identifier mappers.
-
-### Patch Changes
-
 - Updated dependencies
   - @docknetwork/credential-sdk@0.22.0
 

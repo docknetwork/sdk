@@ -33,7 +33,8 @@ export default function injectPublicKeys(klass) {
       }
 
       get PublicKeysMap() {
-        const { PublicKey, PublicKeyId } = this;
+        const { PublicKey } = this;
+        const { PublicKeyId } = this.constructor;
 
         return class PublicKeysMap extends TypedMap {
           static KeyClass = PublicKeyId;

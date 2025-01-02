@@ -44,7 +44,8 @@ export default function injectParams(klass) {
       }
 
       static get ParamsMap() {
-        const { Params, ParamsId } = this;
+        const { Params } = this;
+        const { ParamsId } = this.constructor;
 
         return class ParamsMap extends TypedMap {
           static KeyClass = ParamsId;

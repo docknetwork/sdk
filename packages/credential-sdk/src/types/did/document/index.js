@@ -28,6 +28,7 @@ import {
   CheqdVerificationMethodRefOrCheqdVerificationMethod,
   CheqdVerificationMethodRefOrCheqdMainnetVerificationMethod,
   CheqdVerificationMethodRefOrCheqdTestnetVerificationMethod,
+  VerificationMethodRefOrCheqdVerificationMethod,
 } from './verification-method-ref-or-cheqd-verification-method';
 import { Ed25519Verification2018Method } from './verification-method-type';
 import {
@@ -311,20 +312,20 @@ export class DIDDocument extends withFrom(
       capabilityInvocation,
     } = this;
 
-    class CheqdVerificationMethodRefOrCheqdVerificationMethodSet extends TypedSet {
-      static Class = CheqdVerificationMethodRefOrCheqdVerificationMethod;
+    class VerificationMethodRefOrCheqdVerificationMethodSet extends TypedSet {
+      static Class = VerificationMethodRefOrCheqdVerificationMethod;
     }
 
-    const auth = new CheqdVerificationMethodRefOrCheqdVerificationMethodSet(
+    const auth = new VerificationMethodRefOrCheqdVerificationMethodSet(
       authentication,
     );
-    const assertion = new CheqdVerificationMethodRefOrCheqdVerificationMethodSet(
+    const assertion = new VerificationMethodRefOrCheqdVerificationMethodSet(
       assertionMethod,
     );
-    const keyAgr = new CheqdVerificationMethodRefOrCheqdVerificationMethodSet(
+    const keyAgr = new VerificationMethodRefOrCheqdVerificationMethodSet(
       keyAgreement,
     );
-    const capInv = new CheqdVerificationMethodRefOrCheqdVerificationMethodSet(
+    const capInv = new VerificationMethodRefOrCheqdVerificationMethodSet(
       capabilityInvocation,
     );
 

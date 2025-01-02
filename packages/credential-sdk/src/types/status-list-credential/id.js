@@ -81,7 +81,7 @@ export class CheqdStatusListCredentialIdValue extends withQualifier(DidRef) {
     return new this(did, id);
   }
 
-  cheqdDid(did) {
+  static cheqdDid(did) {
     return did.value;
   }
 

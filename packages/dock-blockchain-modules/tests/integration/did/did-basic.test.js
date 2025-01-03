@@ -87,7 +87,7 @@ describe("Basic DID tests", () => {
     ]);
 
     doc
-      .removeServiceEndpoint("service1")
+      .removeServiceEndpoint([did, "service1"])
       .addServiceEndpoint([did, "service2"], service2);
     await modules.did.updateDocument(doc, didPair2);
 

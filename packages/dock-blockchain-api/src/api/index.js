@@ -151,21 +151,37 @@ export default class DockAPI extends AbstractApiProvider {
   }
   /* eslint-enable sonarjs/cognitive-complexity */
 
+  /**
+   * Initializes keyring.
+   * @param {*} keyring
+   * @returns {Promise<this>}
+   */
   async initKeyring(keyring = null) {
     if (!this.keyring || keyring) {
       await cryptoWaitReady();
       this.keyring = new Keyring(keyring || { type: 'sr25519' });
     }
+
+    return this;
   }
 
+  /**
+   * Disconnect from the underlying provider, halting all network traffic.
+   * Throws an error if SDK is not initialized.
+   * @returns {Promise<this>}
+   */
   async disconnect() {
-    this.ensureNotInitialized();
+    this.ensureInitialized();
     await this.api.disconnect();
     delete this.api;
 
     return this;
   }
 
+  /**
+   * Returns `true` if SDK was initialized.
+   * @returns {boolean}
+   */
   isInitialized() {
     return this.api != null;
   }
@@ -228,6 +244,11 @@ export default class DockAPI extends AbstractApiProvider {
     );
   }
 
+  /**
+   * Retrieves corresponding hash for the supplied block number.
+   * @param {*} number
+   * @returns {Promise<*>}
+   */
   async blockNumberToHash(number) {
     return await blockNumberToHash(this.api, number);
   }

@@ -44,8 +44,7 @@ export default function injectParams(klass) {
       }
 
       static get ParamsMap() {
-        const { Params } = this;
-        const { ParamsId } = this.constructor;
+        const { Params, ParamsId } = this;
 
         return class ParamsMap extends TypedMap {
           static KeyClass = ParamsId;
@@ -82,14 +81,14 @@ export default function injectParams(klass) {
        * @returns {Promise<Map<ParamsId, Params>>}
        */
       async getAllParamsByDid(did) {
-        const { ParamsMap, ParamsName, ParamsType } = this.constructor;
+        const { ParamsName, ParamsType } = this.constructor;
 
         const resources = await this.resourcesBy(
           did,
           this.filterParamsMetadata,
         );
 
-        return new ParamsMap(
+        return new this.constructor.ParamsMap(
           [...resources].map(([key, item]) => [
             key,
             JSON.parse(

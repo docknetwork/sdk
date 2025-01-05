@@ -3,6 +3,8 @@ import {
   DidKey,
   CheqdTestnetDid,
   DockDid,
+  DockDidValue,
+  CheqdTestnetDidValue,
 } from "../src/types/did";
 import { DIDDocument } from "../src/types/did/document";
 import {
@@ -13,6 +15,7 @@ import {
   CheqdOffchainSignatureParamsRef,
 } from "../src/types";
 import { TypedUUID } from "../src/types/generic";
+import { hexToU8a } from "../src/utils";
 
 const RANDOM_PKS = [
   "0xa1aa6a2058dd190e284a64e72adaf4e16a9ae9fbf0673d7575924e6aca3b21dc",
@@ -32,12 +35,16 @@ const RANDOM_OFFCHAIN_PKS = [
   "0xc9b4c22c2f5738b0adaf605a8233cdc2451c5ece045c25a3bc2b4c840fe9b11d",
 ];
 
+const DOCK_DID = new DockDidValue(
+  "0xc9b4c22c2f5738b0adaf605a8233cdc2451c5ece045c25a3bc2b4c840fe9b11d"
+);
+
 const DOCK_OFFCHAIN_PKS = RANDOM_OFFCHAIN_PKS.map(
   (bytes, idx) =>
     new BBSPublicKey(
       new BBSPublicKeyValue(
         bytes,
-        new DockOffchainSignatureParamsRef(DockDid.random(), idx)
+        new DockOffchainSignatureParamsRef(DOCK_DID, idx)
       )
     )
 );
@@ -48,7 +55,7 @@ const CHEQD_OFFCHAIN_PKS = RANDOM_OFFCHAIN_PKS.map(
       new BBSPublicKeyValue(
         bytes,
         new CheqdOffchainSignatureParamsRef(
-          CheqdTestnetDid.random(),
+          CheqdTestnetDidValue.fromBytesAdapt([idx, ...hexToU8a(bytes)]),
           TypedUUID.fromBytesAdapt([idx])
         )
       )

@@ -11,15 +11,11 @@ import {
 } from '../../generic';
 import {
   BBDT16PublicKey,
-  BBDT16PublicKeyValue,
   BBSPlusPublicKey,
-  BBSPlusPublicKeyValue,
   BBSPublicKey,
-  BBSPublicKeyValue,
   CheqdOffchainSignatureParamsRef,
   DockOffchainSignatureParamsRef,
   PSPublicKey,
-  PSPublicKeyValue,
   CurveType,
   CurveTypeBls12381,
 } from '../../offchain-signatures';
@@ -120,16 +116,29 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (
     );
   }
 
-  get publicKeyBytes() {
-    return (
+  publicKeyBytes() {
+    const bytes = (
       this.publicKeyBase58
       || this.publicKeyBase64
       || this.publicKeyJwk
       || this.publicKeyHex
     )?.bytes;
+
+    if (bytes == null) {
+      throw new Error(
+        `Expected either of ${fmtIter([
+          'publicKeyBase58',
+          'publicKeyBase64',
+          'publicKeyJwk',
+          'publicKeyHex',
+        ])} to be specified`,
+      );
+    }
+
+    return bytes;
   }
 
-  get publicKeyClass() {
+  publicKeyClass() {
     switch (this.type.type) {
       case Ed25519VerKeyName:
         return PublicKeyEd25519;
@@ -153,19 +162,9 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (
   }
 
   publicKey() {
-    const bytes = this.publicKeyBytes;
-
-    if (bytes == null) {
-      throw new Error(
-        `Expected either of ${fmtIter([
-          'publicKeyBase58',
-          'publicKeyBase64',
-          'publicKeyJwk',
-          'publicKeyHex',
-        ])} to be specified`,
-      );
-    }
-    const metadataArgs = this.metadata
+    const PublicKey = this.publicKeyClass();
+    const bytes = this.publicKeyBytes();
+    const metaArgs = this.metadata
       ? [
         this.metadata.paramsRef,
         this.metadata.curveType,
@@ -173,30 +172,7 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (
       ]
       : [];
 
-    switch (this.type.type) {
-      case Ed25519VerKeyName:
-        return new PublicKeyEd25519(bytes);
-      case Sr25519VerKeyName:
-        return new PublicKeySr25519(bytes);
-      case Ed255192020VerKeyName:
-        return new PublicKeyEd25519(bytes);
-      case EcdsaSecp256k1VerKeyName:
-        return new PublicKeySecp256k1(bytes);
-      case Bls12381BBSDockVerKeyName:
-        return new BBSPlusPublicKey(
-          new BBSPlusPublicKeyValue(bytes, ...metadataArgs),
-        );
-      case Bls12381BBS23DockVerKeyName:
-        return new BBSPublicKey(new BBSPublicKeyValue(bytes, ...metadataArgs));
-      case Bls12381PSDockVerKeyName:
-        return new PSPublicKey(new PSPublicKeyValue(bytes, ...metadataArgs));
-      case Bls12381BBDT16DockVerKeyName:
-        return new BBDT16PublicKey(
-          new BBDT16PublicKeyValue(bytes, ...metadataArgs),
-        );
-      default:
-        throw new Error(`Unknown key type ${this.type.type}`);
-    }
+    return new PublicKey(new PublicKey.Class(bytes, ...metaArgs));
   }
 
   static fromDidKey(keyRef, didKey) {
@@ -298,12 +274,12 @@ export class CheqdVerificationMethodAssertion extends withFrom(
     if (verMethod.isOffchain()) {
       let json;
       try {
-        json = JSON.parse(u8aToString(verMethod.publicKeyBytes));
+        json = JSON.parse(u8aToString(verMethod.publicKeyBytes()));
       } catch {
         return self;
       }
 
-      const pk = verMethod.publicKeyClass.from(json);
+      const pk = verMethod.publicKeyClass().from(json);
       self.verificationMaterial = valueBytes(pk.bytes);
       self.metadata = pk.value;
     }

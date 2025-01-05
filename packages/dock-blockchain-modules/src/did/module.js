@@ -1,8 +1,9 @@
-import bs58 from 'bs58';
 import { AbstractDIDModule } from '@docknetwork/credential-sdk/modules/abstract/did';
 import {
   DockDid,
   DockDidOrDidMethodKey,
+  DidKey,
+  VerificationMethod,
 } from '@docknetwork/credential-sdk/types';
 import {
   DIDDocument,
@@ -252,23 +253,19 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
     if (didDetails.lastKeyId > 0) {
       const dks = await this.dockOnly.keys(hexDid);
 
-      [...dks.entries()].forEach(([index, { publicKey, verRels }]) => {
-        keys.push([
-          index,
-          publicKey.constructor.Class.VerKeyType,
-          publicKey.value.bytes,
-        ]);
+      [...dks.entries()].forEach(([index, didKey]) => {
+        keys.push([index, didKey]);
 
-        if (verRels.isAuthentication()) {
+        if (didKey.verRels.isAuthentication()) {
           authn.push(index);
         }
-        if (verRels.isAssertion()) {
+        if (didKey.verRels.isAssertion()) {
           assert.push(index);
         }
-        if (verRels.isCapabilityInvocation()) {
+        if (didKey.verRels.isCapabilityInvocation()) {
           capInv.push(index);
         }
-        if (verRels.isKeyAgreement()) {
+        if (didKey.verRels.isKeyAgreement()) {
           keyAgr.push(index);
         }
       });
@@ -279,7 +276,7 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
       key,
     ] of await this.offchainSignatures.dockOnly.getAllPublicKeysByDid(hexDid)) {
       // The gaps in `keyId` might correspond to removed keys
-      keys.push([keyId, key.constructor.VerKeyType, key.value.bytes]);
+      keys.push([keyId, new DidKey(key)]);
 
       assert.push(keyId);
     }
@@ -290,12 +287,7 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
     capInv.sort();
     keyAgr.sort();
 
-    const verificationMethod = keys.map(([index, type, pk]) => ({
-      id: `${id}#keys-${index}`,
-      type,
-      controller: id,
-      publicKeyBase58: bs58.encode(pk),
-    }));
+    const verificationMethod = keys.map(([index, pk]) => VerificationMethod.fromDidKey([id, index], pk));
     const assertion = assert.map((i) => `${id}#keys-${i}`);
     const authentication = authn.map((i) => `${id}#keys-${i}`);
     const capabilityInvocation = capInv.map((i) => `${id}#keys-${i}`);

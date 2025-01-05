@@ -162,23 +162,6 @@ export const valueBytes = (value) => applyToValue(
 );
 
 /**
- * Converts a number to bytes.
- * @param {number} num - The number to be converted.
- * @returns {Uint8Array} The number in bytes representation.
- */
-export const numToBytes = (num) => {
-  // Check if the input is a number
-  if (typeof num !== 'number') {
-    throw new TypeError('Input must be a number');
-  }
-
-  // Convert the number to its byte representation using DataView and ArrayBuffer
-  const buf = Buffer.alloc(4);
-  buf.writeUint32BE(num);
-  return u8aToU8a(buf);
-};
-
-/**
  * Attempts to get byte representation of the supplied object.
  * Throws an error in case if it's not possible.
  * @param {*} value

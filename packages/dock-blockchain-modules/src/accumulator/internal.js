@@ -246,7 +246,7 @@ export default class DockInternalAccumulatorModule extends injectParams(
     let acc = await this.getAccumulator(accumulatorId);
     let updates = [];
 
-    const mapUpdates = ({
+    const mapUpdate = ({
       newAccumulated,
       additions,
       removals,
@@ -265,7 +265,7 @@ export default class DockInternalAccumulatorModule extends injectParams(
         accumulatorId,
         acc.lastModified,
       );
-      updates = updates.concat(prevUpdates.map(mapUpdates));
+      updates = prevUpdates.map(mapUpdate).concat(updates);
 
       // eslint-disable-next-line no-await-in-loop
       acc = await this.getAccumulator(
@@ -276,7 +276,7 @@ export default class DockInternalAccumulatorModule extends injectParams(
       );
     }
 
-    return new DockAccumulatorHistory(acc, updates.reverse());
+    return new DockAccumulatorHistory(acc, updates);
   }
 
   /**

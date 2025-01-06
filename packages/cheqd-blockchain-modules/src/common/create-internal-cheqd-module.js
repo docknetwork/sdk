@@ -118,13 +118,15 @@ export default function createInternalCheqdModule(
           await this.apiProvider.sdk.querier.resource.resource(strDid, id),
         ]);
 
-        return new Map(await filterNoResourceError(Promise.all(queries)));
+        return new Map(await Promise.all(queries));
       }
 
       async resourcesBy(did, cond) {
+        const metas = await this.resourcesMetadataBy(did, cond);
+
         return await this.resources(
           did,
-          (await this.resourcesMetadataBy(did, cond)).map((meta) => meta.id),
+          metas.map((meta) => meta.id),
         );
       }
 

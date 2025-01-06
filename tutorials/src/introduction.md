@@ -15,7 +15,7 @@ Overall, there're five packages located in the [GitHub repository](https://githu
 - [`@docknetwork/cheqd-blockchain-api`](https://github.com/docknetwork/sdk/tree/master/packages/cheqd-blockchain-api) - A Javascript library built atop of `@cheqd/sdk` that allows to interact with the `Cheqd` blockchain.
 - [`@docknetwork/cheqd-blockchain-modules`](https://github.com/docknetwork/sdk/tree/master/packages/cheqd-blockchain-modules) - A JavaScript library created for managing credential SDK components such as DIDs, accumulators etc on the Cheqd blockchain.
 
-# Dock
+# Truvera Credential SDK
 
 ## Installation
 
@@ -43,10 +43,10 @@ bash scripts/run_dock_node_in_docker
 
 ## Importing
 
-In this tutorial series, we will use Node.js with Babel for ES6 support. This code will also work in browsers once transpiled. To start, import the Dock SDK. You can import the `DockAPI` class and instantiate your object:
+In this tutorial series, we will use Node.js with Babel for ES6 support. This code will also work in browsers once transpiled. To start, import the Truvera Credential SDK. You can import the `DockAPI` class and instantiate your object:
 
 ```javascript
-// Import the Dock SDK
+// Import the Truvera Credential SDK
 import { DockAPI } from "@docknetwork/dock-blockchain-api";
 
 const dock = new DockAPI();
@@ -68,7 +68,7 @@ export const secretUri = "//Alice"; // Account secret in URI format, for local t
 
 ## Connecting to a Node
 
-With the required packages and variables imported, we can connect to our node. If you don't have a local testnet running, go to [Docker Substrate](https://github.com/docknetwork/dock-substrate) for setup instructions. You could also use the Dock testnet if you have an account with sufficient funds. Begin by creating the following method:
+With the required packages and variables imported, we can connect to our node. If you don't have a local testnet running, go to [Docker Substrate](https://github.com/docknetwork/dock-substrate) for setup instructions. You could also use the Truvera testnet if you have an account with sufficient funds. Begin by creating the following method:
 
 ```javascript
 export async function connectToNode() {}
@@ -132,7 +132,7 @@ Send a transaction using `signAndSend`:
 const res = await dock.signAndSend(transaction);
 ```
 
-Instantiate Dock modules with `DockCoreModules`:
+Instantiate Truvera modules with `DockCoreModules`:
 
 ```js
 import { DockCoreModules } from "@docknetwork/dock-blockchain-modules";
@@ -155,7 +155,7 @@ const accumulator = dockModules.accumulator;
 
 ## Installation
 
-As with Dock, the process is simple. Use NPM to install:
+As with Truvera, the process is simple. Use NPM to install:
 
 ```bash
 npm install @docknetwork/credential-sdk @docknetwork/cheqd-blockchain-modules @docknetwork/cheqd-blockchain-api

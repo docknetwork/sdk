@@ -212,14 +212,6 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
     return await this.dockOnly.tx.removeOnchainDid(did, didKeypair);
   }
 
-  /**
-   * Gets a DID from the Dock chain and create a DID document according to W3C spec.
-   * Throws NoDID if the DID does not exist on chain.
-   * @param {string} did - The DID can be passed as fully qualified DID like `did:dock:<SS58 string>` or
-   * a 32 byte hex string
-   * @param getOffchainSigKeys
-   * @return {Promise<object>} The DID document.
-   */
   // eslint-disable-next-line sonarjs/cognitive-complexity
   async getDocument(did) {
     const typedDid = DockDid.from(did);

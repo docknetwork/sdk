@@ -168,7 +168,7 @@
 <li><a href="https://github.com/docknetwork/sdk/tree/master/packages/cheqd-blockchain-api"><code>@docknetwork/cheqd-blockchain-api</code></a> - A Javascript library built atop of <code>@cheqd/sdk</code> that allows to interact with the <code>Cheqd</code> blockchain.</li>
 <li><a href="https://github.com/docknetwork/sdk/tree/master/packages/cheqd-blockchain-modules"><code>@docknetwork/cheqd-blockchain-modules</code></a> - A JavaScript library created for managing credential SDK components such as DIDs, accumulators etc on the Cheqd blockchain.</li>
 </ul>
-<h1 id="dock"><a class="header" href="#dock">Dock</a></h1>
+<h1 id="truvera-credential-sdk"><a class="header" href="#truvera-credential-sdk">Truvera Credential SDK</a></h1>
 <h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
 <p>Installing the SDK is straightforward. We use NPM, and the source is also available on GitHub (links below). To install via NPM or Yarn, run:</p>
 <pre><code class="language-bash">npm install @docknetwork/credential-sdk @docknetwork/dock-blockchain-modules @docknetwork/dock-blockchain-api
@@ -182,8 +182,8 @@
 <pre><code class="language-bash">bash scripts/run_dock_node_in_docker
 </code></pre>
 <h2 id="importing"><a class="header" href="#importing">Importing</a></h2>
-<p>In this tutorial series, we will use Node.js with Babel for ES6 support. This code will also work in browsers once transpiled. To start, import the Dock SDK. You can import the <code>DockAPI</code> class and instantiate your object:</p>
-<pre><code class="language-javascript">// Import the Dock SDK
+<p>In this tutorial series, we will use Node.js with Babel for ES6 support. This code will also work in browsers once transpiled. To start, import the Truvera Credential SDK. You can import the <code>DockAPI</code> class and instantiate your object:</p>
+<pre><code class="language-javascript">// Import the Truvera Credential SDK
 import { DockAPI } from "@docknetwork/dock-blockchain-api";
 
 const dock = new DockAPI();
@@ -197,7 +197,7 @@ import { address, secretUri } from "./shared-constants";
 export const secretUri = "//Alice"; // Account secret in URI format, for local testing
 </code></pre>
 <h2 id="connecting-to-a-node"><a class="header" href="#connecting-to-a-node">Connecting to a Node</a></h2>
-<p>With the required packages and variables imported, we can connect to our node. If you don't have a local testnet running, go to <a href="https://github.com/docknetwork/dock-substrate">Docker Substrate</a> for setup instructions. You could also use the Dock testnet if you have an account with sufficient funds. Begin by creating the following method:</p>
+<p>With the required packages and variables imported, we can connect to our node. If you don't have a local testnet running, go to <a href="https://github.com/docknetwork/dock-substrate">Docker Substrate</a> for setup instructions. You could also use the Truvera testnet if you have an account with sufficient funds. Begin by creating the following method:</p>
 <pre><code class="language-javascript">export async function connectToNode() {}
 </code></pre>
 <p>Initialize the SDK to connect to the node with the supplied address and create a keyring to manage accounts:</p>
@@ -234,7 +234,7 @@ dock.setAccount(account);
 <p>Send a transaction using <code>signAndSend</code>:</p>
 <pre><code class="language-js">const res = await dock.signAndSend(transaction);
 </code></pre>
-<p>Instantiate Dock modules with <code>DockCoreModules</code>:</p>
+<p>Instantiate Truvera modules with <code>DockCoreModules</code>:</p>
 <pre><code class="language-js">import { DockCoreModules } from "@docknetwork/dock-blockchain-modules";
 const dockModules = new DockCoreModules(dock);
 </code></pre>
@@ -246,7 +246,7 @@ const dockModules = new DockCoreModules(dock);
 </code></pre>
 <h1 id="cheqd"><a class="header" href="#cheqd">Cheqd</a></h1>
 <h2 id="installation-1"><a class="header" href="#installation-1">Installation</a></h2>
-<p>As with Dock, the process is simple. Use NPM to install:</p>
+<p>As with Truvera, the process is simple. Use NPM to install:</p>
 <pre><code class="language-bash">npm install @docknetwork/credential-sdk @docknetwork/cheqd-blockchain-modules @docknetwork/cheqd-blockchain-api
 </code></pre>
 <p>or Yarn:</p>
@@ -548,7 +548,7 @@ status if the credential is revocable. It then checks whether the presentation c
 </ul>
 <h2 id="issuing"><a class="header" href="#issuing">Issuing</a></h2>
 <p>To issue a verifiable credential, the issuer needs to have a public key that is accessible by the holder and verifier to verify the
-signature (in <code>proof</code>) in the credential. Though the VCDM spec does not mandate it, an issuer in Dock must have a DID on chain.
+signature (in <code>proof</code>) in the credential. Though the VCDM spec does not mandate it, an issuer using Truvera Credential SDK must have a DID on chain.
 This DID is present in the credential in the <code>issuer</code> field. An example credential where both the issuer and holder have Dock DIDs</p>
 <pre><code class="language-js">{
     '@context': [
@@ -621,10 +621,10 @@ on chain and learn the public key. An example presentation signed by the holder<
 </code></pre>
 <h2 id="revocation"><a class="header" href="#revocation">Revocation</a></h2>
 <p>If the credential is revocable, the issuer must specify how the revocation check must be done in the <code>credentialStatus</code> field.
-On Dock, credential revocation is managed with a revocation registry. There can be multiple registries on chain and each
+With Truvera Credential SDK, credential revocation is managed with a revocation registry. There can be multiple registries on chain and each
 registry has a unique id. It is recommended that the revocation authority creates a new registry for each credential type.
 While issuing the credential, issuer embeds the revocation registry's id in the credential in the <code>credentialStatus</code> field.
-An example credential with Dock revocation registry</p>
+An example credential with Truvera revocation registry</p>
 <pre><code class="language-js">{
     '@context': [
       'https://www.w3.org/2018/credentials/v1',
@@ -654,7 +654,7 @@ An example credential with Dock revocation registry</p>
 <p>To revoke a credential, the revocation authority (might be same as the issuer), puts a hash of the credential id in the revocation registry.
 To check the revocation status of a credential, hash the credential id and query the registry id specified in the credential.
 The revocation of a credential can be undone if the revocation registry supports undoing. Moreover, currently, each registry is
-owned by a single DID so that DID can revoke a credential or undo the revocation. In future, Dock will support ownership of
+owned by a single DID so that DID can revoke a credential or undo the revocation. In future, Truvera will support ownership of
 the registry with mulitple DIDs and in different fashions, like any one of the owner DIDs could revoke or a threshold is needed,
 etc. To learn more about revocation registries, refer the <a href="./tutorial_revocation.html">revocation section</a> of the documentation.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="schemas"><a class="header" href="#schemas">Schemas</a></h1>
@@ -819,7 +819,7 @@ subject does not specify the fields <code>emailAddress</code> and <code>alumniOf
 <div style="break-before: page; page-break-before: always;"></div><h1 id="claim-deduction"><a class="header" href="#claim-deduction">Claim Deduction</a></h1>
 <p>The <a href="https://www.w3.org/TR/vc-data-model/">verifiable credentials data model</a> is based on a machine comprehensible language called <a href="https://www.w3.org/TR/rdf-primer/">RDF</a>. RDF represents arbitrary semantic knowledge as <a href="https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)">graph</a>s. Computers can perform automatic deductive reasoning over RDF; given assumptions (represented as an RDF graph) and axioms (represented as logical rules), a computer can infer new conclusions and even prove them to other computers using deductive derivations (proofs).</p>
 <p>Every VCDM credential is representable as an RDF graph. So computers can reason about them, deriving new conclusions that weren't explicitly stated by the issuer.</p>
-<p>The Dock SDK exposes utilities for primitive deductive reasoning over verified credentials. The Verifier has a choice to perform deduction themself (expensive), or offload that responsibility to the Presenter of the credential[s] by accepting deductive proofs of composite claims.</p>
+<p>The Truvera Credential SDK exposes utilities for primitive deductive reasoning over verified credentials. The Verifier has a choice to perform deduction themself (expensive), or offload that responsibility to the Presenter of the credential[s] by accepting deductive proofs of composite claims.</p>
 <p>In RDF, if graph A is true and graph B is true, then the <a href="https://en.wikipedia.org/wiki/Union_(set_theory)">union</a> of those graphs, is also true <code>A∧B-&gt;A∪B</code> <sup class="footnote-reference"><a href="#1">1</a></sup>. Using this property we can combine multiple credentials and reason over their union.</p>
 <h2 id="explicit-ethos"><a class="header" href="#explicit-ethos">Explicit Ethos</a></h2>
 <p>Imagine a signed credential issued by <strong>Alice</strong> claiming that <strong>Joe</strong> is a <strong>Member</strong>.</p>
@@ -955,9 +955,9 @@ const defaultGraph = { DefaultGraph: true };
 </div>
 <div style="break-before: page; page-break-before: always;"></div><p>The Dock Blockchain includes a module explicitly intended for proof of existence. Aside from being explicitly supported by the on-chain runtime, it works the same way you would expect. You post the hash of a document on-chain at a specific block. Later you can use that hash to prove the document existed at or before that block.</p>
 <p>The PoE module accepts arbitrary bytes as an anchor but in order to keep anchor size constant the chain stores only the blake2b256 hash of those bytes.</p>
-<p>Developers are free to use the anchoring module however they want, taloring their software to their own use case. An anchoring example can be found in the sdk examples directory. Dock provides a <a href="https://fe.dock.io/#/anchor/batch">fully functioning reference client</a> for anchoring. The client even implements batching anchors into a merkle tree so you can anchor multiple documents in a single transaction.</p>
+<p>Developers are free to use the anchoring module however they want, taloring their software to their own use case. An anchoring example can be found in the sdk examples directory. Dock Labs provides a <a href="https://fe.dock.io/#/anchor/batch">fully functioning reference client</a> for anchoring. The client even implements batching anchors into a merkle tree so you can anchor multiple documents in a single transaction.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="private-delegation"><a class="header" href="#private-delegation">Private Delegation</a></h1>
-<p>Claim Deduction rules can express delegation of authority to issue credentials! It's expected to be a common enough use case that Dock has declared some rdf vocabulary and associated claim deduction rules aid potential delegators.</p>
+<p>Claim Deduction rules can express delegation of authority to issue credentials! It's expected to be a common enough use case that Dock Labs has declared some rdf vocabulary and associated claim deduction rules aid potential delegators.</p>
 <p>An issuer may grant delegation authority to another issuer simply by issuing them a vcdm credential. Let's say <code>did:ex:a</code> wants to grant delegation authority to <code>did:ex:b</code>. <code>did:ex:a</code> simply issues the credential saying that <code>did:ex:b</code> may make any claim.</p>
 <pre><code class="language-json">{
   "@context": [ "https://www.w3.org/2018/credentials/v1" ],
@@ -974,11 +974,11 @@ const defaultGraph = { DefaultGraph: true };
 </code></pre>
 <p>When <code>did:ex:b</code> wishes to issue a credential on behalf of <code>did:ex:a</code>, they should bundle it (e.g. in a presentation) with it this "delegation" credential. A delegation credential constitutes a proof of delegation. A proof of delegation bundled with a credential issued by the delegate can be prove that some statement[s] were made by authority of some root delegator.</p>
 <p>In order to process delegated credentials a verifier accepts a bundle. The bundle includes both delegations and credentials issued by delegates. After verifying every credential within the bundle (including the delegations) the verifier uses <a href="concepts_claim_deduction.html">Claim Deduction</a> to determine which statements are proven by the delegated credential.</p>
-<p>Dock's delegation ontology (i.e. rdf vocabulary) and ruleset are currently in alpha. See <a href="tutorial_private_delegation.html">Private Delegation</a> for an example of their use.</p>
+<p>Dock Labs' delegation ontology (i.e. rdf vocabulary) and ruleset are currently in alpha. See <a href="tutorial_private_delegation.html">Private Delegation</a> for an example of their use.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="public-attestation"><a class="header" href="#public-attestation">Public Attestation</a></h1>
 <p>This feature should be considered <em>Alpha</em>.</p>
 <p><a href="https://github.com/docknetwork/planning/blob/master/rfc/0014-public-attestation.md">RFC</a></p>
-<p>VCDM Verifiable credentials are a way to prove an <em>attestation</em>. Valid credentials prove statements of the form <code>Issuer claims X</code>, where <code>X</code> is itself a statement. One property of verifiable credentials is that the holder may keep them private simply by not sharing them with other parties. That property will be sometimes useful, sometimes not. VCDM crededentials are private and therefore not automatically discoverable but Public Attestations give a decentralized identity the ability to post claims that <em>are</em> discoverable by any party. For Dock DIDs, attestations are linked on-chain but Public Attestations are not specicfic to Dock. Other DID methods can implement public attestations by including them in DID documents.</p>
+<p>VCDM Verifiable credentials are a way to prove an <em>attestation</em>. Valid credentials prove statements of the form <code>Issuer claims X</code>, where <code>X</code> is itself a statement. One property of verifiable credentials is that the holder may keep them private simply by not sharing them with other parties. That property will be sometimes useful, sometimes not. VCDM crededentials are private and therefore not automatically discoverable but Public Attestations give a decentralized identity the ability to post claims that <em>are</em> discoverable by any party. For Dock DIDs, attestations are linked on-chain but Public Attestations are not specicfic to Dock Labs. Other DID methods can implement public attestations by including them in DID documents.</p>
 <p>Public Attestations are posted as RDF documents. Since RDF can represent, or link to, arbitrary types of data, Public Attestations can be used to publish arbitrary content.</p>
 <h2 id="data-model"><a class="header" href="#data-model">Data Model</a></h2>
 <p>Public Attestaions live in the DID document of their poster. A DID with a public attestation will have an extra property, "https://rdf.dock.io/alpha/2021#attestsDocumentContent". The value of that property is an IRI that is expected to point to an RDF document. Any statement contained in that document is considered to be a claim made by the DID.</p>
@@ -1012,7 +1012,7 @@ const defaultGraph = { DefaultGraph: true };
 &lt;wd:Q25769&gt; &lt;wd:Property:P171&gt; &lt;wd:Q648422&gt; &lt;did:ex:ex&gt; .
 </code></pre>
 <h3 id="example-of-a-did-attesting-to-multiple-documents"><a class="header" href="#example-of-a-did-attesting-to-multiple-documents">Example of A DID attesting to multiple documents</a></h3>
-<p>While it is valid DIDs to include multiple attested IRIs in a single DID document, Dock artificially limits the number of attestation to one per Dock DID. This is to encourage off-chain (ipfs) data storage. If a DID wishes to attests to multiple documents, there are two suggested options: 1) merge the two documents into a single document or 2) attest to a single document which in turn notes an <code>attestsDocumentContents</code> for each of it's children. The following is an example of option "2)".</p>
+<p>While it is valid DIDs to include multiple attested IRIs in a single DID document, Dock Labs artificially limits the number of attestation to one per Dock DID. This is to encourage off-chain (ipfs) data storage. If a DID wishes to attests to multiple documents, there are two suggested options: 1) merge the two documents into a single document or 2) attest to a single document which in turn notes an <code>attestsDocumentContents</code> for each of it's children. The following is an example of option "2)".</p>
 <p><code>did:ex:ex</code>:</p>
 <pre><code class="language-json">{
   "@context": "https://www.w3.org/ns/did/v1",
@@ -1084,7 +1084,7 @@ const defaultGraph = { DefaultGraph: true };
 <div style="break-before: page; page-break-before: always;"></div><h1 id="did"><a class="header" href="#did">DID</a></h1>
 <p>If you are not familiar with DIDs, you can get a conceptual overview <a href="./concepts_did.html">here</a>.</p>
 <h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
-<p>DIDs in Dock are created by choosing a 32 byte unique (on Dock chain) identifier along with 1 ore more public keys or controllers.
+<p>DIDs in Truvera are created by choosing a 32 byte unique (on Dock chain) identifier along with 1 ore more public keys or controllers.
 The public key can be added or removed by the DID's controller (which the DID maybe itself) signature with a key having
 <code>capabilityInvocation</code> verification relationship.</p>
 <p>The DID can also be removed by providing a signature from the DID's controller.</p>
@@ -1192,9 +1192,9 @@ DID document.</p>
 <p>There is another class called <code>ResolverRouter</code> that can accept several types of resolvers (objects of subclasses
 of <code>DIDResolver</code>) and once the <code>ResolverRouter</code> is initialized with the resolvers of different DID methods, it can resolve
 DIDs of those methods.</p>
-<h2 id="dock-resolver"><a class="header" href="#dock-resolver">Dock resolver</a></h2>
+<h2 id="did-dock-resolver"><a class="header" href="#did-dock-resolver">DID Dock resolver</a></h2>
 <p>The resolver for Dock DIDs <code>CoreResolver</code> connects to the Dock blockchain to get the DID details.</p>
-<p>The resolver is constructed by passing it a Dock API object so that it can connect to a Dock node.
+<p>The resolver is constructed by passing it a Truvera API object so that it can connect to a Dock node.
 This is how you resolve a Dock DID:</p>
 <pre><code class="language-js">import { CoreResolver } from "@docknetwork/credential-sdk/resolver";
 
@@ -1204,7 +1204,7 @@ const dockResolver = new CoreResolver(modules);
 const didDocument = await dockResolver.resolve("did:dock:5D.....");
 </code></pre>
 <h2 id="creating-a-resolver-class-for-a-different-method"><a class="header" href="#creating-a-resolver-class-for-a-different-method">Creating a resolver class for a different method</a></h2>
-<p>If you want to resolve DIDs other than Dock and do not have/want access to the universal resolver, you can extend the
+<p>If you want to resolve DIDs other than did:dock and do not have/want access to the universal resolver, you can extend the
 <code>DIDResolver</code> class to derive a custom resolver.</p>
 <p>Following is an example to build a custom Ethereum resolver. It uses the library
 <a href="https://github.com/decentralized-identity/ethr-did-resolver">ethr-did-resolver</a> and accepts a provider information
@@ -1716,8 +1716,8 @@ supported 'Sr25519VerificationKey2020', 'Ed25519VerificationKey2018' or
 <p>This guide provides instructions for managing credential revocation using <code>StatusList2021Credential</code>.</p>
 <h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
 <ul>
-<li>Ensure you have access to Dock's Credential SDK and Blockchain API.</li>
-<li>The Dock API is initialized and connected to the blockchain.</li>
+<li>Ensure you have access to Truvera's Credential SDK and Blockchain API.</li>
+<li>The Truvera API is initialized and connected to the blockchain.</li>
 <li>You have a valid issuer DID registered on the Dock network.</li>
 </ul>
 <h2 id="steps-to-manage-revocation"><a class="header" href="#steps-to-manage-revocation">Steps to Manage Revocation</a></h2>

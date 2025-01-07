@@ -164,9 +164,9 @@ DID document.</p>
 <p>There is another class called <code>ResolverRouter</code> that can accept several types of resolvers (objects of subclasses
 of <code>DIDResolver</code>) and once the <code>ResolverRouter</code> is initialized with the resolvers of different DID methods, it can resolve
 DIDs of those methods.</p>
-<h2 id="dock-resolver"><a class="header" href="#dock-resolver">Dock resolver</a></h2>
+<h2 id="did-dock-resolver"><a class="header" href="#did-dock-resolver">DID Dock resolver</a></h2>
 <p>The resolver for Dock DIDs <code>CoreResolver</code> connects to the Dock blockchain to get the DID details.</p>
-<p>The resolver is constructed by passing it a Dock API object so that it can connect to a Dock node.
+<p>The resolver is constructed by passing it a Truvera API object so that it can connect to a Dock node.
 This is how you resolve a Dock DID:</p>
 <pre><code class="language-js">import { CoreResolver } from "@docknetwork/credential-sdk/resolver";
 
@@ -176,7 +176,7 @@ const dockResolver = new CoreResolver(modules);
 const didDocument = await dockResolver.resolve("did:dock:5D.....");
 </code></pre>
 <h2 id="creating-a-resolver-class-for-a-different-method"><a class="header" href="#creating-a-resolver-class-for-a-different-method">Creating a resolver class for a different method</a></h2>
-<p>If you want to resolve DIDs other than Dock and do not have/want access to the universal resolver, you can extend the
+<p>If you want to resolve DIDs other than did:dock and do not have/want access to the universal resolver, you can extend the
 <code>DIDResolver</code> class to derive a custom resolver.</p>
 <p>Following is an example to build a custom Ethereum resolver. It uses the library
 <a href="https://github.com/decentralized-identity/ethr-did-resolver">ethr-did-resolver</a> and accepts a provider information

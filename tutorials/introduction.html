@@ -167,7 +167,7 @@
 <li><a href="https://github.com/docknetwork/sdk/tree/master/packages/cheqd-blockchain-api"><code>@docknetwork/cheqd-blockchain-api</code></a> - A Javascript library built atop of <code>@cheqd/sdk</code> that allows to interact with the <code>Cheqd</code> blockchain.</li>
 <li><a href="https://github.com/docknetwork/sdk/tree/master/packages/cheqd-blockchain-modules"><code>@docknetwork/cheqd-blockchain-modules</code></a> - A JavaScript library created for managing credential SDK components such as DIDs, accumulators etc on the Cheqd blockchain.</li>
 </ul>
-<h1 id="dock"><a class="header" href="#dock">Dock</a></h1>
+<h1 id="truvera-credential-sdk"><a class="header" href="#truvera-credential-sdk">Truvera Credential SDK</a></h1>
 <h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
 <p>Installing the SDK is straightforward. We use NPM, and the source is also available on GitHub (links below). To install via NPM or Yarn, run:</p>
 <pre><code class="language-bash">npm install @docknetwork/credential-sdk @docknetwork/dock-blockchain-modules @docknetwork/dock-blockchain-api
@@ -181,8 +181,8 @@
 <pre><code class="language-bash">bash scripts/run_dock_node_in_docker
 </code></pre>
 <h2 id="importing"><a class="header" href="#importing">Importing</a></h2>
-<p>In this tutorial series, we will use Node.js with Babel for ES6 support. This code will also work in browsers once transpiled. To start, import the Dock SDK. You can import the <code>DockAPI</code> class and instantiate your object:</p>
-<pre><code class="language-javascript">// Import the Dock SDK
+<p>In this tutorial series, we will use Node.js with Babel for ES6 support. This code will also work in browsers once transpiled. To start, import the Truvera Credential SDK. You can import the <code>DockAPI</code> class and instantiate your object:</p>
+<pre><code class="language-javascript">// Import the Truvera Credential SDK
 import { DockAPI } from "@docknetwork/dock-blockchain-api";
 
 const dock = new DockAPI();
@@ -196,7 +196,7 @@ import { address, secretUri } from "./shared-constants";
 export const secretUri = "//Alice"; // Account secret in URI format, for local testing
 </code></pre>
 <h2 id="connecting-to-a-node"><a class="header" href="#connecting-to-a-node">Connecting to a Node</a></h2>
-<p>With the required packages and variables imported, we can connect to our node. If you don't have a local testnet running, go to <a href="https://github.com/docknetwork/dock-substrate">Docker Substrate</a> for setup instructions. You could also use the Dock testnet if you have an account with sufficient funds. Begin by creating the following method:</p>
+<p>With the required packages and variables imported, we can connect to our node. If you don't have a local testnet running, go to <a href="https://github.com/docknetwork/dock-substrate">Docker Substrate</a> for setup instructions. You could also use the Truvera testnet if you have an account with sufficient funds. Begin by creating the following method:</p>
 <pre><code class="language-javascript">export async function connectToNode() {}
 </code></pre>
 <p>Initialize the SDK to connect to the node with the supplied address and create a keyring to manage accounts:</p>
@@ -233,7 +233,7 @@ dock.setAccount(account);
 <p>Send a transaction using <code>signAndSend</code>:</p>
 <pre><code class="language-js">const res = await dock.signAndSend(transaction);
 </code></pre>
-<p>Instantiate Dock modules with <code>DockCoreModules</code>:</p>
+<p>Instantiate Truvera modules with <code>DockCoreModules</code>:</p>
 <pre><code class="language-js">import { DockCoreModules } from "@docknetwork/dock-blockchain-modules";
 const dockModules = new DockCoreModules(dock);
 </code></pre>
@@ -245,7 +245,7 @@ const dockModules = new DockCoreModules(dock);
 </code></pre>
 <h1 id="cheqd"><a class="header" href="#cheqd">Cheqd</a></h1>
 <h2 id="installation-1"><a class="header" href="#installation-1">Installation</a></h2>
-<p>As with Dock, the process is simple. Use NPM to install:</p>
+<p>As with Truvera, the process is simple. Use NPM to install:</p>
 <pre><code class="language-bash">npm install @docknetwork/credential-sdk @docknetwork/cheqd-blockchain-modules @docknetwork/cheqd-blockchain-api
 </code></pre>
 <p>or Yarn:</p>

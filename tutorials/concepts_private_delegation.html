@@ -153,7 +153,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="private-delegation"><a class="header" href="#private-delegation">Private Delegation</a></h1>
-<p>Claim Deduction rules can express delegation of authority to issue credentials! It's expected to be a common enough use case that Dock has declared some rdf vocabulary and associated claim deduction rules aid potential delegators.</p>
+<p>Claim Deduction rules can express delegation of authority to issue credentials! It's expected to be a common enough use case that Dock Labs has declared some rdf vocabulary and associated claim deduction rules aid potential delegators.</p>
 <p>An issuer may grant delegation authority to another issuer simply by issuing them a vcdm credential. Let's say <code>did:ex:a</code> wants to grant delegation authority to <code>did:ex:b</code>. <code>did:ex:a</code> simply issues the credential saying that <code>did:ex:b</code> may make any claim.</p>
 <pre><code class="language-json">{
   "@context": [ "https://www.w3.org/2018/credentials/v1" ],
@@ -170,7 +170,7 @@
 </code></pre>
 <p>When <code>did:ex:b</code> wishes to issue a credential on behalf of <code>did:ex:a</code>, they should bundle it (e.g. in a presentation) with it this "delegation" credential. A delegation credential constitutes a proof of delegation. A proof of delegation bundled with a credential issued by the delegate can be prove that some statement[s] were made by authority of some root delegator.</p>
 <p>In order to process delegated credentials a verifier accepts a bundle. The bundle includes both delegations and credentials issued by delegates. After verifying every credential within the bundle (including the delegations) the verifier uses <a href="concepts_claim_deduction.html">Claim Deduction</a> to determine which statements are proven by the delegated credential.</p>
-<p>Dock's delegation ontology (i.e. rdf vocabulary) and ruleset are currently in alpha. See <a href="tutorial_private_delegation.html">Private Delegation</a> for an example of their use.</p>
+<p>Dock Labs' delegation ontology (i.e. rdf vocabulary) and ruleset are currently in alpha. See <a href="tutorial_private_delegation.html">Private Delegation</a> for an example of their use.</p>
 
                     </main>
 

@@ -4,7 +4,7 @@ If you are not familiar with DIDs, you can get a conceptual overview [here](./co
 
 ## Overview
 
-DIDs in Dock are created by choosing a 32 byte unique (on Dock chain) identifier along with 1 ore more public keys or controllers.
+DIDs in Truvera are created by choosing a 32 byte unique (on Dock chain) identifier along with 1 ore more public keys or controllers.
 The public key can be added or removed by the DID's controller (which the DID maybe itself) signature with a key having
 `capabilityInvocation` verification relationship.
 

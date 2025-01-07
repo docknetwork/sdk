@@ -4,7 +4,7 @@ The [verifiable credentials data model](https://www.w3.org/TR/vc-data-model/) is
 
 Every VCDM credential is representable as an RDF graph. So computers can reason about them, deriving new conclusions that weren't explicitly stated by the issuer.
 
-The Dock SDK exposes utilities for primitive deductive reasoning over verified credentials. The Verifier has a choice to perform deduction themself (expensive), or offload that responsibility to the Presenter of the credential[s] by accepting deductive proofs of composite claims.
+The Truvera Credential SDK exposes utilities for primitive deductive reasoning over verified credentials. The Verifier has a choice to perform deduction themself (expensive), or offload that responsibility to the Presenter of the credential[s] by accepting deductive proofs of composite claims.
 
 In RDF, if graph A is true and graph B is true, then the [union](<https://en.wikipedia.org/wiki/Union_(set_theory)>) of those graphs, is also true `A∧B->A∪B` [^1]. Using this property we can combine multiple credentials and reason over their union.
 

@@ -1,6 +1,6 @@
 # Private Delegation
 
-Claim Deduction rules can express delegation of authority to issue credentials! It's expected to be a common enough use case that Dock has declared some rdf vocabulary and associated claim deduction rules aid potential delegators.
+Claim Deduction rules can express delegation of authority to issue credentials! It's expected to be a common enough use case that Dock Labs has declared some rdf vocabulary and associated claim deduction rules aid potential delegators.
 
 An issuer may grant delegation authority to another issuer simply by issuing them a vcdm credential. Let's say `did:ex:a` wants to grant delegation authority to `did:ex:b`. `did:ex:a` simply issues the credential saying that `did:ex:b` may make any claim.
 
@@ -23,4 +23,4 @@ When `did:ex:b` wishes to issue a credential on behalf of `did:ex:a`, they shoul
 
 In order to process delegated credentials a verifier accepts a bundle. The bundle includes both delegations and credentials issued by delegates. After verifying every credential within the bundle (including the delegations) the verifier uses [Claim Deduction](concepts_claim_deduction.md) to determine which statements are proven by the delegated credential.
 
-Dock's delegation ontology (i.e. rdf vocabulary) and ruleset are currently in alpha. See [Private Delegation](tutorial_private_delegation.md) for an example of their use.
+Dock Labs' delegation ontology (i.e. rdf vocabulary) and ruleset are currently in alpha. See [Private Delegation](tutorial_private_delegation.md) for an example of their use.

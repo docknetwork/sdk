@@ -16,11 +16,11 @@ There is another class called `ResolverRouter` that can accept several types of 
 of `DIDResolver`) and once the `ResolverRouter` is initialized with the resolvers of different DID methods, it can resolve
 DIDs of those methods.
 
-## Dock resolver
+## DID Dock resolver
 
 The resolver for Dock DIDs `CoreResolver` connects to the Dock blockchain to get the DID details.
 
-The resolver is constructed by passing it a Dock API object so that it can connect to a Dock node.
+The resolver is constructed by passing it a Truvera API object so that it can connect to a Dock node.
 This is how you resolve a Dock DID:
 
 ```js
@@ -34,7 +34,7 @@ const didDocument = await dockResolver.resolve("did:dock:5D.....");
 
 ## Creating a resolver class for a different method
 
-If you want to resolve DIDs other than Dock and do not have/want access to the universal resolver, you can extend the
+If you want to resolve DIDs other than did:dock and do not have/want access to the universal resolver, you can extend the
 `DIDResolver` class to derive a custom resolver.
 
 Following is an example to build a custom Ethereum resolver. It uses the library

@@ -155,32 +155,33 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
         this.createAccumulatorMetadataFilter(name),
       ),
     ).ids();
+    if (!ids.length) {
+      return null;
+    }
 
     const resources = [
       ...new SortedResourceVersions(await this.resources(did, ids)),
     ];
+    const mapUpdate = (
+      {
+        accumulator,
+        additions,
+        removals,
+        witnessUpdateInfo = new Uint8Array(),
+      },
+      idx,
+    ) => new AccumulatorUpdate(
+      resources[idx + 1].metadata.id,
+      accumulator.accumulated,
+      additions,
+      removals,
+      witnessUpdateInfo,
+    );
+
     const accumulators = resources.map((acc) => CheqdStoredAccumulator.from(
       JSON.parse(u8aToString(validateResource(acc, String(name), Type))),
     ));
-    const updates = accumulators
-      .slice(1)
-      .map(
-        (
-          {
-            accumulator,
-            additions,
-            removals,
-            witnessUpdateInfo = new Uint8Array(),
-          },
-          idx,
-        ) => new AccumulatorUpdate(
-          resources[idx + 1].metadata.id,
-          accumulator.accumulated,
-          additions,
-          removals,
-          witnessUpdateInfo,
-        ),
-      );
+    const updates = accumulators.slice(1).map(mapUpdate);
 
     return new CheqdAccumulatorHistory(
       new CheqdAccumulatorWithUpdateInfo(

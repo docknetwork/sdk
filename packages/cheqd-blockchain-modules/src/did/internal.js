@@ -7,7 +7,7 @@ import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
 import { createInternalCheqdModule } from '../common';
 
 function parseDocument(document) {
-  return DIDDocument.from(document).toCheqd(void 0, this.types.DidDocument);
+  return DIDDocument.from(document).toCheqd(this.types.DidDocument);
 }
 
 const methods = {

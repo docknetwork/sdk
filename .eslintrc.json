@@ -37,6 +37,7 @@
     ],
     "import/no-extraneous-dependencies": "off",
     "class-methods-use-this": "off",
+    "generator-star-spacing": ["error", { "before": true, "after": false }],
     "no-return-await": "off",
     "no-plusplus": "off",
     "no-void": "off",

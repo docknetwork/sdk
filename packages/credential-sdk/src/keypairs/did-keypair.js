@@ -15,12 +15,8 @@ export default class DidKeypair {
    * @param {DockKeypair} keyPair - Key pair provided.
    */
   constructor(keyRef, keyPair) {
-    const ref = VerificationMethodRefOrIdentRef.from(keyRef);
-
-    ensureInstanceOf(keyPair, DockKeypair);
-
-    this.verificationMethodId = ref;
-    this.keyPair = keyPair;
+    this.verificationMethodId = VerificationMethodRefOrIdentRef.from(keyRef);
+    this.keyPair = ensureInstanceOf(keyPair, DockKeypair);
   }
 
   /**

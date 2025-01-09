@@ -48,6 +48,8 @@ import {
   CheqdTestnetOffchainSignatureKeyRef,
   CheqdMainnetOffchainSignatureParamsRef,
   CheqdMainnetOffchainSignatureKeyRef,
+  CheqdTestnetAccumulator,
+  CheqdMainnetAccumulator,
 } from '@docknetwork/credential-sdk/types';
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 
@@ -96,6 +98,7 @@ export class CheqdAPI extends AbstractApiProvider {
     [CheqdNetwork.Testnet]: extendNull({
       Did: CheqdTestnetDid,
       DidDocument: CheqdTestnetDIDDocument,
+      Accumulator: CheqdTestnetAccumulator,
       AccumulatorId: CheqdTestnetAccumulatorId,
       AccumulatorPublicKey: CheqdTestnetAccumulatorPublicKey,
       StoredAccumulator: CheqdTestnetStoredAccumulator,
@@ -109,6 +112,7 @@ export class CheqdAPI extends AbstractApiProvider {
       DidDocument: CheqdMainnetDIDDocument,
       AccumulatorId: CheqdMainnetAccumulatorId,
       AccumulatorPublicKey: CheqdMainnetAccumulatorPublicKey,
+      Accumulator: CheqdMainnetAccumulator,
       StoredAccumulator: CheqdMainnetStoredAccumulator,
       OffchainSignatureParamsRef: CheqdMainnetOffchainSignatureParamsRef,
       OffchainSignatureKeyRef: CheqdMainnetOffchainSignatureKeyRef,
@@ -123,7 +127,7 @@ export class CheqdAPI extends AbstractApiProvider {
    * @param {string} [configuration.url]
    * @param {*} [configuration.wallet]
    * @param {string} [configuration.network]
-   * @returns {this}
+   * @returns {Promise<this>}
    */
   async init({ url, wallet, network } = {}) {
     if (network !== CheqdNetwork.Mainnet && network !== CheqdNetwork.Testnet) {

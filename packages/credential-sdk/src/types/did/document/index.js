@@ -343,7 +343,7 @@ export class DIDDocument extends withFrom(
   }
 
   // eslint-disable-next-line no-use-before-define
-  toCheqd(versionId = TypedUUID.random(), Class = CheqdDIDDocument) {
+  toCheqd(Class = CheqdDIDDocument, versionId = TypedUUID.random()) {
     const {
       '@context': context,
       id,

@@ -175,14 +175,14 @@ describe("DID document workflow", () => {
       [],
       [],
       []
-    ).toCheqd("0557d7da-8dea-45cb-8f30-7370b59eab71");
+    ).toCheqd(void 0, "0557d7da-8dea-45cb-8f30-7370b59eab71");
 
     const doc2 = DIDDocument.create(
       cheqdDid,
       [new DidKey(RANDOM_PKS[0]), new DidKey(CHEQD_OFFCHAIN_PKS[0])],
       [cheqdDid],
       []
-    ).toCheqd("28edc043-872b-4ab7-9cb8-b01d1bd677c5");
+    ).toCheqd(void 0, "28edc043-872b-4ab7-9cb8-b01d1bd677c5");
 
     const doc2DIDDocument = DIDDocument.create(
       cheqdDid,
@@ -213,7 +213,7 @@ describe("DID document workflow", () => {
         "did:cheqd:testnet:df3ba823-c1e2-46e0-bb54-056f9c506e90",
       ],
       []
-    ).toCheqd("47b4d97b-1ebe-4d81-a3ed-12eb63baaeb9");
+    ).toCheqd(void 0, "47b4d97b-1ebe-4d81-a3ed-12eb63baaeb9");
 
     checkDocs(doc1, doc2, doc3);
   });

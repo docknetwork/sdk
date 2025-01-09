@@ -1,12 +1,12 @@
-import { CheqdAPI } from "@docknetwork/cheqd-blockchain-api";
-import { DockAPI } from "@docknetwork/dock-blockchain-api";
+import { CheqdAPI } from '@docknetwork/cheqd-blockchain-api';
+import { DockAPI } from '@docknetwork/dock-blockchain-api';
 import {
   DockAccumulatorId,
   DockBlobId,
   DockStatusListCredentialId,
   DockDid,
-} from "@docknetwork/credential-sdk/types";
-import pLimit from "p-limit";
+} from '@docknetwork/credential-sdk/types';
+import pLimit from 'p-limit';
 
 const mergeAwait = async (objectPromises) => {
   const acc = {};
@@ -30,9 +30,9 @@ export default class Mappings {
       StatusListCredentialId: DockStatusListCredentialId,
     };
     this.paths = {
-      "accumulator.accumulators": "AccumulatorId",
-      "blobStore.blobs": "BlobId",
-      "statusListCredential.statusListCredentials": "StatusListCredentialId",
+      'accumulator.accumulators': 'AccumulatorId',
+      'blobStore.blobs': 'BlobId',
+      'statusListCredential.statusListCredentials': 'StatusListCredentialId',
     };
     this.spawn = pLimit(10);
   }
@@ -40,7 +40,7 @@ export default class Mappings {
   async mapIds(target, path) {
     const result = Object.create(null);
 
-    const [module, entity] = path.split(".");
+    const [module, entity] = path.split('.');
     const type = this.paths[path];
     if (!type) {
       throw new Error(`No type for ${path}`);
@@ -57,17 +57,17 @@ export default class Mappings {
 
   async run() {
     await Promise.all([
-      this.apis.mainnet.init({ address: "wss://mainnet-node.dock.io" }),
-      this.apis.testnet.init({ address: "wss://knox-1.dock.io" }),
+      this.apis.mainnet.init({ address: 'wss://mainnet-node.dock.io' }),
+      this.apis.testnet.init({ address: 'wss://knox-1.dock.io' }),
     ]);
     const data = await mergeAwait(
       Object.keys(this.paths).map(async (path) => ({
-        [path.split(".")[1]]: await mergeAwait(
-          ["mainnet", "testnet"].map(async (target) => ({
+        [path.split('.')[1]]: await mergeAwait(
+          ['mainnet', 'testnet'].map(async (target) => ({
             [target]: await this.mapIds(target, path),
-          }))
+          })),
         ),
-      }))
+      })),
     );
 
     await Promise.all([

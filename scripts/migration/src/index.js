@@ -1,42 +1,61 @@
-import { DockAPI } from "@docknetwork/dock-blockchain-api";
-import { Ed25519Keypair } from "@docknetwork/credential-sdk/keypairs";
-import { CheqdAPI, CheqdNetwork } from "@docknetwork/cheqd-blockchain-api";
-import {
-  randomAsHex,
-  maybeToJSONString,
-  timeout,
-} from "@docknetwork/credential-sdk/utils";
+import { DockAPI } from '@docknetwork/dock-blockchain-api';
+import { Ed25519Keypair } from '@docknetwork/credential-sdk/keypairs';
+import { CheqdAPI, CheqdNetwork } from '@docknetwork/cheqd-blockchain-api';
+import { maybeToJSONString, timeout } from '@docknetwork/credential-sdk/utils';
 
-import pLimit from "p-limit";
-import { checkBalance } from "@cheqd/sdk";
-import { DirectSecp256k1HdWallet } from "@docknetwork/cheqd-blockchain-api/wallet";
-import Migration from "./migration.js";
+import pLimit from 'p-limit';
+import { checkBalance } from '@cheqd/sdk';
+import { DirectSecp256k1HdWallet } from '@docknetwork/cheqd-blockchain-api/wallet';
+import Migration from './migration.js';
 
-const TEMPORARY_SEED = process.env.TEMPORARY_SEED_HEX || randomAsHex(32);
-const DOCK_ENDPOINT = process.env.DOCK_ENDPOINT || "wss://mainnet-node.dock.io";
-const CHEQD_ENDPOINT = process.env.CHEQD_ENDPOINT || "http://localhost:26657";
+const DOCK_ENDPOINT = process.env.DOCK_ENDPOINT || 'wss://mainnet-node.dock.io';
+const CHEQD_ENDPOINT = process.env.CHEQD_ENDPOINT || 'http://localhost:26657';
 const ACCOUNT_COUNT = process.env.CHEQD_ACCOUNTS || 1;
-const BALANCE_SHARE = Number(process.env.BALANCE_SHARE || 1000);
+const BALANCE_SHARE = Number(process.env.BALANCE_SHARE || 1e6);
 const MNEMONIC = process.env.CHEQD_MNEMONIC;
 const TRANSFER_FEE = Number(process.env.TRANSFER_FEE || 10000000);
 
-const keyPairs = [];
-keyPairs.TEMPORARY = new Ed25519Keypair(TEMPORARY_SEED);
-keyPairs.push(keyPairs.TEMPORARY);
+const keyPairs = (process.env.SEEDS || '')
+  .split(',')
+  .filter(Boolean)
+  .map((seed) => new Ed25519Keypair(seed))
+  .reduce(
+    (acc, cur) => ({ ...acc, [cur.publicKey()]: cur }),
+    Object.create(null),
+  );
 
-console.log(`Temporary seed is ${TEMPORARY_SEED}`);
+const BREAK = Symbol('BREAK');
+
+const loopWithCatch = async (fn, catchFn) => {
+  for (;;) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (catchFn(err) === BREAK) break;
+    }
+  }
+};
+
+const loopStreamWithCatch = async (stream, fn, catchFn) => {
+  for await (const item of stream) {
+    await loopWithCatch(
+      () => fn(item),
+      (err) => catchFn(err, item),
+    );
+  }
+};
 
 const transferNCHEQ = (from, to, ncheq) => {
   console.log(`Transfer ${fmtNCHEQBalance(ncheq)} from ${from} to ${to}`);
 
   return {
-    typeUrl: "/cosmos.bank.v1beta1.MsgSend",
+    typeUrl: '/cosmos.bank.v1beta1.MsgSend',
     value: {
       fromAddress: from,
       toAddress: to,
       amount: [
         {
-          denom: "ncheq", // cheqd's native token
+          denom: 'ncheq', // cheqd's native token
           amount: String(ncheq), // Amount in base units (e.g., 1 CHEQ = 1,000,000 ncheq)
         },
       ],
@@ -48,34 +67,30 @@ const initCheqd = async (walletsCount = 0) => {
   async function generateRandomWallet() {
     // Generate a random wallet
     const wallet = await DirectSecp256k1HdWallet.generate(24, {
-      prefix: "cheqd",
+      prefix: 'cheqd',
     }); // 24-word mnemonic for high security
     const [{ address }] = await wallet.getAccounts();
 
-    console.log(address, ":", wallet.mnemonic);
+    console.log(address, ':', wallet.mnemonic);
 
     return wallet.mnemonic;
   }
 
   const generated = await Promise.all(
-    Array.from({ length: walletsCount }, generateRandomWallet)
+    Array.from({ length: walletsCount }, generateRandomWallet),
   );
 
   const wallets = await Promise.all(
-    [MNEMONIC, ...generated].map((mnemonic) =>
-      DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
-        prefix: "cheqd",
-      })
-    )
+    [MNEMONIC, ...generated].map((mnemonic) => DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
+      prefix: 'cheqd',
+    })),
   );
   const apis = await Promise.all(
-    wallets.map((wallet) =>
-      new CheqdAPI().init({
-        url: CHEQD_ENDPOINT,
-        network: CheqdNetwork.Testnet,
-        wallet,
-      })
-    )
+    wallets.map((wallet) => new CheqdAPI().init({
+      url: CHEQD_ENDPOINT,
+      network: CheqdNetwork.Testnet,
+      wallet,
+    })),
   );
 
   return { wallets, apis };
@@ -94,7 +109,7 @@ async function shareBalance({ apis, wallets }) {
 
   const fee = {
     amount: [
-      { denom: "ncheq", amount: String(TRANSFER_FEE * (wallets.length - 1)) },
+      { denom: 'ncheq', amount: String(TRANSFER_FEE * (wallets.length - 1)) },
     ], // Fee amount in ncheq
     gas: String(200000 * (wallets.length - 1)), // Gas limit
     payer: from,
@@ -105,7 +120,7 @@ async function shareBalance({ apis, wallets }) {
       from,
       txs,
       fee,
-      "Migration balance share"
+      'Migration balance share',
     );
   }
 
@@ -123,8 +138,8 @@ async function payback({ apis, wallets }) {
       const transfer = transferNCHEQ(from, to, balance - BigInt(TRANSFER_FEE));
 
       const fee = {
-        amount: [{ denom: "ncheq", amount: String(TRANSFER_FEE) }], // Fee amount in ncheq
-        gas: "200000", // Gas limit
+        amount: [{ denom: 'ncheq', amount: String(TRANSFER_FEE) }], // Fee amount in ncheq
+        gas: '200000', // Gas limit
         payer: from,
       };
 
@@ -132,20 +147,19 @@ async function payback({ apis, wallets }) {
         from,
         [transfer],
         fee,
-        "Migration balance payback"
+        'Migration balance payback',
       );
-    })
+    }),
   );
 
   return await getBalanceCheqd(to);
 }
 
-const getBalanceCheqd = async (account) =>
-  BigInt(
-    (await checkBalance(account, CHEQD_ENDPOINT)).find(
-      (balance) => balance.denom === "ncheq"
-    ).amount
-  );
+const getBalanceCheqd = async (account) => BigInt(
+  (await checkBalance(account, CHEQD_ENDPOINT)).find(
+    (balance) => balance.denom === 'ncheq',
+  ).amount,
+);
 
 const fmtNCHEQBalance = (ncheq) => `${(Number(ncheq) / 1e9).toFixed(9)} CHEQD`;
 
@@ -159,7 +173,7 @@ async function main() {
 
   const initBalance = await shareBalance(cheqds);
   console.log(
-    `Initial main account balance was ${fmtNCHEQBalance(initBalance)}`
+    `Initial main account balance was ${fmtNCHEQBalance(initBalance)}`,
   );
 
   const spawn = pLimit(10);
@@ -167,28 +181,74 @@ async function main() {
   const txs = new Migration(dock, cheqds.apis[0], keyPairs, spawn).txs();
 
   let globalTxIdx = 0;
-  const loopSender = async (cheqd) => {
+  const loopSender = async (cheqd, idx) => {
     let localTxIdx = 0;
     const [{ address }] = await cheqd.sdk.options.wallet.getAccounts();
 
-    for await (const didTxs of txs) {
-      for await (const tx of didTxs) {
-        console.log(
-          `Transaction #${++globalTxIdx} (#${++localTxIdx} from ${address}): ${maybeToJSONString(
-            tx
-          )}`
-        );
+    const sendTx = async (tx) => {
+      ++globalTxIdx;
+      ++localTxIdx;
 
-        try {
-          await cheqd.signAndSend(tx);
-        } catch (err) {
-          err.message = `Failed to execute transaction ${maybeToJSONString(
-            tx
-          )}: \n${err}`;
-          console.error(err);
-        }
+      console.log(
+        `Transaction #${globalTxIdx} (#${localTxIdx} from ${address}): ${maybeToJSONString(
+          tx,
+        )}`,
+      );
+
+      return await cheqd.signAndSend(tx);
+    };
+    const handleTxError = async (err, tx) => {
+      err.message = `Failed to execute transaction ${maybeToJSONString(tx)}: ${
+        err.message
+      }`;
+
+      if (err.message.includes('account sequence mismatch')) {
+      } else if (err.message.includes('fetch failed')) {
+        cheqd = await new CheqdAPI().init({
+          url: CHEQD_ENDPOINT,
+          network: CheqdNetwork.Testnet,
+          wallet: cheqds.wallets[idx],
+        });
+      } else if (
+        err.message.includes('DID Doc exists')
+        || err.message.includes('Resource exists')
+        || err.message.includes('tx already exists in cache')
+        || err.message.includes('DID Doc not found')
+        || err.message.includes('provided')
+      ) {
+        console.error(err);
+
+        return BREAK;
+      } else {
+        throw err;
       }
-    }
+
+      console.error(err);
+    };
+
+    const handleDidTxs = (didTxs) => loopStreamWithCatch(didTxs, sendTx, handleTxError);
+    const handleDidTxsError = async (err) => {
+      err.message = `Failed to send transaction from ${
+        (await cheqds.wallets[idx].getAccounts())[0].address
+      }: \n${err.message}`;
+
+      if (
+        err.message.includes('No keypair')
+        || err.message.includes('Dock DID not found for')
+      ) {
+        console.error(err);
+      } else if (err.message.includes('fetch failed')) {
+        cheqd = await new CheqdAPI().init({
+          url: CHEQD_ENDPOINT,
+          network: CheqdNetwork.Testnet,
+          wallet: cheqds.wallets[idx],
+        });
+      } else {
+        throw err;
+      }
+    };
+
+    await loopStreamWithCatch(txs, handleDidTxs, handleDidTxsError);
   };
 
   let err;
@@ -203,18 +263,18 @@ async function main() {
 
       console.log(
         `Final main account balance is ${fmtNCHEQBalance(
-          endBalance
+          endBalance,
         )}. Totally spent ${fmtNCHEQBalance(
-          initBalance - endBalance
+          initBalance - endBalance,
         )}. Average per sender is ${fmtNCHEQBalance(
-          (initBalance - endBalance) / BigInt(ACCOUNT_COUNT)
-        )}.`
+          (initBalance - endBalance) / (BigInt(ACCOUNT_COUNT) + BigInt(1)),
+        )}.`,
       );
 
       console.log(
         `Total transactions sent: ${globalTxIdx}, average per sender: ${
-          globalTxIdx / +ACCOUNT_COUNT
-        }`
+          globalTxIdx / (+ACCOUNT_COUNT + 1)
+        }`,
       );
     } catch (error) {
       error.message = `Payback failed: ${error.message}`;

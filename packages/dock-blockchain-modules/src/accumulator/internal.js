@@ -244,6 +244,9 @@ export default class DockInternalAccumulatorModule extends injectParams(
 
   async accumulatorHistory(accumulatorId) {
     let acc = await this.getAccumulator(accumulatorId);
+    if (acc == null) {
+      return null;
+    }
     let updates = [];
 
     const mapUpdate = ({
@@ -308,21 +311,47 @@ export default class DockInternalAccumulatorModule extends injectParams(
    * @returns {Promise<object|undefined>} - Resolves to an `update` object with keys `newAccumulated`, `additions`, `removals` and `witnessUpdateInfo`.
    * The last keys have value null if they were not provided in the extrinsic.
    */
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   getUpdatesFromExtrinsic(ext, accumulatorId) {
     const accId = DockAccumulatorId.from(accumulatorId);
 
+    // Helper function to process individual calls
+    const processCall = (call) => {
+      if (
+        call.section === 'accumulator'
+        && call.method === 'updateAccumulator'
+      ) {
+        const update = UpdateAccumulator.from(
+          this.apiProvider.api.createType('UpdateAccumulator', call.args[0]),
+        );
+
+        if (update.id.eq(accId.asDock)) {
+          return update;
+        }
+      }
+      return null;
+    };
+
+    // Check if the extrinsic is a batch or batchAll
     if (
       ext.method
-      && ext.method.section === 'accumulator'
-      && ext.method.method === 'updateAccumulator'
+      && ext.method.section === 'utility'
+      && (ext.method.method === 'batch' || ext.method.method === 'batchAll')
     ) {
-      const update = UpdateAccumulator.from(
-        this.apiProvider.api.createType('UpdateAccumulator', ext.method.args[0]),
-      );
-
-      if (update.id.eq(accId.asDock)) {
-        return update;
+      const calls = ext.method.args[0]; // Array of calls
+      if (calls && Array.isArray(calls)) {
+        for (const call of calls) {
+          const result = processCall(call);
+          if (result) {
+            return result; // Return the first matching update
+          }
+        }
+      } else {
+        console.error('Failed to parse batch calls:', calls);
       }
+    } else {
+      // Process as a single call
+      return processCall(ext.method);
     }
 
     return null;

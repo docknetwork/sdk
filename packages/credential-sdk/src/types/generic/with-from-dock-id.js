@@ -31,7 +31,9 @@ export function patchWithFromDock(klass, Type, mapping) {
       const hexId = value.toEncodedString();
       const dockDid = mapping.testnet[hexId] ?? mapping.mainnet[hexId];
       if (dockDid == null) {
-        throw new Error(`Dock DID not found for ${hexId}`);
+        throw new Error(
+          `Dock DID not found for ${hexId} - can't create ${this.name}`,
+        );
       }
 
       id = [DockDid.from(dockDid), value];

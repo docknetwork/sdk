@@ -87,7 +87,9 @@ export class CheqdBlobIdValue extends withQualifier(DidRef) {
       prefix = 'mainnet';
     } else {
       throw new Error(
-        `Can't determine DID type: \`${cheqdDid}\`, instance of \`${cheqdDid.constructor.name}\``,
+        `Can't determine DID type: \`${cheqdDid(did)}\`, instance of \`${
+          cheqdDid(did).constructor.name
+        }\``,
       );
     }
 

@@ -19,7 +19,10 @@ import {
   DockStatusListCredentialModule,
   DockCoreModules,
 } from '@docknetwork/dock-blockchain-modules';
-import { CheqdAccumulatorModule, CheqdCoreModules } from '@docknetwork/cheqd-blockchain-modules';
+import {
+  CheqdAccumulatorModule,
+  CheqdCoreModules,
+} from '@docknetwork/cheqd-blockchain-modules';
 import { MultiApiCoreModules } from '@docknetwork/credential-sdk/modules';
 import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
 
@@ -45,61 +48,6 @@ const nullIfThrows = async (fn, Err) => {
 
     throw err;
   }
-};
-
-const detectAllCycles = (documents) => {
-  const graph = new Map();
-
-  // Build the dependency graph
-  for (const [did, { controller: controllers }] of documents) {
-    if (!graph.has(String(did))) graph.set(String(did), []);
-    for (const controller of controllers) {
-      if (!graph.has(String(controller))) graph.set(String(controller), []);
-      graph.get(String(controller)).push(String(did));
-    }
-  }
-
-  const visited = new Set();
-  const recStack = new Set();
-  const allCycles = new Set(); // Store unique cycles as strings
-
-  const dfs = (node, path) => {
-    if (!graph.has(node)) return;
-
-    // Mark as visited and add to the recursive stack
-    visited.add(node);
-    recStack.add(node);
-    path.push(node);
-
-    for (const neighbor of graph.get(node)) {
-      if (!visited.has(neighbor)) {
-        dfs(neighbor, path);
-      } else if (recStack.has(neighbor)) {
-        // Cycle detected
-        const cycle = [];
-        for (let i = path.length - 1; i >= 0; i--) {
-          cycle.push(path[i]);
-          if (path[i] === neighbor) break;
-        }
-        cycle.reverse();
-        allCycles.add(JSON.stringify(cycle)); // Store cycle as a string for uniqueness
-      }
-    }
-
-    // Remove from the recursive stack after exploring
-    recStack.delete(node);
-    path.pop();
-  };
-
-  // Start DFS for all nodes
-  for (const node of graph.keys()) {
-    if (!visited.has(node)) {
-      dfs(node, []);
-    }
-  }
-
-  // Convert cycles back to arrays
-  return Array.from(allCycles).map((cycle) => JSON.parse(cycle));
 };
 
 const topologicalSort = (documents) => {

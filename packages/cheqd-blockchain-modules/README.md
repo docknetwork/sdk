@@ -71,9 +71,4 @@ expect((await attestModule.getDocument(did)).attests.toJSON()).toEqual(iri);
 
 ## TODO:
 
-- Accumulator
-- Anchor
-- Blob
-- OffchainSignatures params (BBS/BBSPlus/PS)
-- StatusListCredential
 - TrustRegistry

@@ -1,5 +1,16 @@
 # @docknetwork/cheqd-blockchain-modules
 
+## 0.14.0
+
+### Minor Changes
+
+- Implementation of the `cheqd` migration and the associated identifier mappers.
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.22.0
+
 ## 0.13.3
 
 ### Patch Changes

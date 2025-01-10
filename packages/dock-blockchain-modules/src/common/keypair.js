@@ -5,18 +5,15 @@ export const allSigners = (didKeypair) => [].concat(didKeypair).map((keyPair) =>
 
 export const firstSigner = (didKeypair) => {
   const signers = allSigners(didKeypair);
-  if (signers.length !== 1) {
-    throw new Error(`Must provide 1 valid DID keypair, received ${signers.length}`);
+  if (!signers.length) {
+    throw new Error('Must provide at least 1 DID keypair');
   }
 
   return signers[0];
 };
 
 export const targetKeypair = (targetDid, didKeypair) => {
-  const signerKp = allSigners(didKeypair)
-    .find(
-      (keyPair) => keyPair.did.eq(targetDid),
-    );
+  const signerKp = allSigners(didKeypair).find((keyPair) => keyPair.did.eq(targetDid));
 
   if (signerKp == null) {
     throw new Error(`No keypair provided for ${targetDid}`);

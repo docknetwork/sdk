@@ -10,6 +10,7 @@ import {
 
 export * from './params';
 export * from './public-keys';
+export * from './curve-type';
 
 export class OffchainSignaturePublicKeyWithParams extends TypedTuple {
   static Classes = [OffchainSignaturePublicKey, OffchainSignatureParams];

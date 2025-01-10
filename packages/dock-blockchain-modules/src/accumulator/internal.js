@@ -4,8 +4,16 @@ import {
   AccumulatorParams,
   AccumulatorPublicKey,
   DockAccumulatorId,
+  DockAccumulatorPublicKey,
+  DockAccumulatorWithUpdateInfo,
   DockAccumulatorParamsRef,
+  DockAccumulatorParamsId,
+  DockAccumulatorIdIdent,
+  DockAccumulatorPublicKeyId,
+  AccumulatorUpdate,
+  DockAccumulatorHistory,
 } from '@docknetwork/credential-sdk/types';
+import { option, withProp } from '@docknetwork/credential-sdk/types/generic';
 import { inclusiveRange, u8aToHex } from '@docknetwork/credential-sdk/utils';
 import { VBWitnessUpdateInfo } from '@docknetwork/credential-sdk/crypto';
 import {
@@ -58,9 +66,13 @@ export default class DockInternalAccumulatorModule extends injectParams(
 
   static PublicKeyQuery = 'accumulatorKeys';
 
+  static PublicKeyId = DockAccumulatorPublicKeyId;
+
   static PublicKey = AccumulatorPublicKey;
 
   static PublicKeyOwner = DockDidOrDidMethodKey;
+
+  static ParamsId = DockAccumulatorParamsId;
 
   static Params = AccumulatorParams;
 
@@ -72,6 +84,40 @@ export default class DockInternalAccumulatorModule extends injectParams(
     AddParams: AddAccumulatorParams,
     RemoveParams: RemoveAccumulatorParams,
   };
+
+  async getAccumulator(
+    id,
+    includePublicKey = false,
+    includeParams = false,
+    at,
+  ) {
+    const accId = DockAccumulatorIdIdent.from(id);
+    const PublicKey = includeParams
+      ? withProp(DockAccumulatorPublicKey, 'params', option(AccumulatorParams))
+      : DockAccumulatorPublicKey;
+    const Accumulator = includePublicKey
+      ? withProp(DockAccumulatorWithUpdateInfo, 'publicKey', option(PublicKey))
+      : DockAccumulatorWithUpdateInfo;
+
+    const acc = option(Accumulator).from(
+      at == null
+        ? await this.query.accumulators(accId)
+        : await this.query.accumulators.at(
+          await this.apiProvider.numberToHash(+at),
+          accId,
+        ),
+    );
+
+    if (acc == null) {
+      return null;
+    }
+
+    if (includePublicKey) {
+      acc.publicKey = await this.getPublicKey(...acc.keyRef, includeParams);
+    }
+
+    return acc;
+  }
 
   async counters(did) {
     return DockAccumulatorCounters.from(
@@ -111,7 +157,7 @@ export default class DockInternalAccumulatorModule extends injectParams(
     member,
     witness,
     startBlock,
-    endBlock = undefined,
+    endBlock,
     batchSize = 10,
   ) {
     if (endBlock === undefined) {
@@ -196,6 +242,46 @@ export default class DockInternalAccumulatorModule extends injectParams(
       .filter(Boolean);
   }
 
+  async accumulatorHistory(accumulatorId) {
+    let acc = await this.getAccumulator(accumulatorId);
+    if (acc == null) {
+      return null;
+    }
+    let updates = [];
+
+    const mapUpdate = ({
+      newAccumulated,
+      additions,
+      removals,
+      witnessUpdateInfo,
+    }) => new AccumulatorUpdate(
+      acc.lastModified,
+      newAccumulated,
+      additions,
+      removals,
+      witnessUpdateInfo,
+    );
+
+    while (!acc.lastModified.eq(acc.createdAt)) {
+      // eslint-disable-next-line no-await-in-loop
+      const prevUpdates = await this.getUpdatesFromBlock(
+        accumulatorId,
+        acc.lastModified,
+      );
+      updates = prevUpdates.map(mapUpdate).concat(updates);
+
+      // eslint-disable-next-line no-await-in-loop
+      acc = await this.getAccumulator(
+        accumulatorId,
+        false,
+        false,
+        acc.lastModified - 1,
+      );
+    }
+
+    return new DockAccumulatorHistory(acc, updates);
+  }
+
   /**
    * Fetch blocks corresponding to the given block numbers or hashes and get all accumulator updates made in those blocks' extrinsics corresponding to accumulator id `accumulatorId`
    * @param accumulatorId
@@ -225,21 +311,47 @@ export default class DockInternalAccumulatorModule extends injectParams(
    * @returns {Promise<object|undefined>} - Resolves to an `update` object with keys `newAccumulated`, `additions`, `removals` and `witnessUpdateInfo`.
    * The last keys have value null if they were not provided in the extrinsic.
    */
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   getUpdatesFromExtrinsic(ext, accumulatorId) {
     const accId = DockAccumulatorId.from(accumulatorId);
 
+    // Helper function to process individual calls
+    const processCall = (call) => {
+      if (
+        call.section === 'accumulator'
+        && call.method === 'updateAccumulator'
+      ) {
+        const update = UpdateAccumulator.from(
+          this.apiProvider.api.createType('UpdateAccumulator', call.args[0]),
+        );
+
+        if (update.id.eq(accId.asDock)) {
+          return update;
+        }
+      }
+      return null;
+    };
+
+    // Check if the extrinsic is a batch or batchAll
     if (
       ext.method
-      && ext.method.section === 'accumulator'
-      && ext.method.method === 'updateAccumulator'
+      && ext.method.section === 'utility'
+      && (ext.method.method === 'batch' || ext.method.method === 'batchAll')
     ) {
-      const update = UpdateAccumulator.from(
-        this.apiProvider.api.createType('UpdateAccumulator', ext.method.args[0]),
-      );
-
-      if (update.id.eq(accId.asDock)) {
-        return update;
+      const calls = ext.method.args[0]; // Array of calls
+      if (calls && Array.isArray(calls)) {
+        for (const call of calls) {
+          const result = processCall(call);
+          if (result) {
+            return result; // Return the first matching update
+          }
+        }
+      } else {
+        console.error('Failed to parse batch calls:', calls);
       }
+    } else {
+      // Process as a single call
+      return processCall(ext.method);
     }
 
     return null;

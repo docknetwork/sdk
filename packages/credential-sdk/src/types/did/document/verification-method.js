@@ -5,16 +5,19 @@ import {
   TypedBytes,
   option,
   TypedString,
+  withProp,
+  TypedNumber,
+  Any,
 } from '../../generic';
 import {
   BBDT16PublicKey,
-  BBDT16PublicKeyValue,
   BBSPlusPublicKey,
-  BBSPlusPublicKeyValue,
   BBSPublicKey,
-  BBSPublicKeyValue,
+  CheqdOffchainSignatureParamsRef,
+  DockOffchainSignatureParamsRef,
   PSPublicKey,
-  PSPublicKeyValue,
+  CurveType,
+  CurveTypeBls12381,
 } from '../../offchain-signatures';
 import {
   PublicKeyEd25519,
@@ -36,16 +39,60 @@ import {
   Ed25519Verification2020Method,
   VerificationMethodType,
 } from './verification-method-type';
-import VerificationMethodRef from './verification-method-ref';
-import { NamespaceDid } from '../onchain/typed-did';
+import {
+  CheqdMainnetVerificationMethodRef,
+  CheqdTestnetVerificationMethodRef,
+  CheqdVerificationMethodRef,
+  VerificationMethodRef,
+} from './verification-method-ref';
+import {
+  CheqdMainnetDid,
+  CheqdTestnetDid,
+  NamespaceDid,
+} from '../onchain/typed-did';
 import {
   fmtIter,
   valueBytes,
   filterObj,
+  ensureEqualToOrPrototypeOf,
   maybeToCheqdPayloadOrJSON,
+  u8aToString,
+  encodeAsBase58,
 } from '../../../utils';
 
 export class PublicKeyBase58 extends withBase58(TypedBytes) {}
+
+export class PublicKeyMetadata extends withFrom(TypedStruct, (value, from) => {
+  const self = from(value);
+
+  if (self?.paramsRef == null && self?.participantId == null) {
+    return null;
+  } else {
+    return self;
+  }
+}) {
+  static Classes = {
+    paramsRef: option(Any),
+    curveType: CurveType,
+    participantId: option(TypedNumber),
+  };
+
+  constructor(paramsRef, curveType = new CurveTypeBls12381(), ...args) {
+    super(paramsRef, curveType, ...args);
+  }
+}
+
+export class DockPublicKeyMetadata extends withProp(
+  PublicKeyMetadata,
+  'paramsRef',
+  DockOffchainSignatureParamsRef,
+) {}
+
+export class CheqdPublicKeyMetadata extends withProp(
+  PublicKeyMetadata,
+  'paramsRef',
+  CheqdOffchainSignatureParamsRef,
+) {}
 
 // eslint-disable-next-line no-use-before-define
 export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (value instanceof CheqdVerificationMethod
@@ -59,6 +106,7 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (
     publicKeyBase64: option(TypedBytes),
     publicKeyJwk: option(TypedString),
     publicKeyHex: option(TypedBytes),
+    metadata: option(PublicKeyMetadata),
   };
 
   isOffchain() {
@@ -68,7 +116,7 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (
     );
   }
 
-  publicKey() {
+  publicKeyBytes() {
     const bytes = (
       this.publicKeyBase58
       || this.publicKeyBase64
@@ -87,26 +135,44 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (
       );
     }
 
+    return bytes;
+  }
+
+  publicKeyClass() {
     switch (this.type.type) {
       case Ed25519VerKeyName:
-        return new PublicKeyEd25519(bytes);
+        return PublicKeyEd25519;
       case Sr25519VerKeyName:
-        return new PublicKeySr25519(bytes);
+        return PublicKeySr25519;
       case Ed255192020VerKeyName:
-        return new PublicKeyEd25519(bytes);
+        return PublicKeyEd25519;
       case EcdsaSecp256k1VerKeyName:
-        return new PublicKeySecp256k1(bytes);
+        return PublicKeySecp256k1;
       case Bls12381BBSDockVerKeyName:
-        return new BBSPlusPublicKey(new BBSPlusPublicKeyValue(bytes));
+        return BBSPlusPublicKey;
       case Bls12381BBS23DockVerKeyName:
-        return new BBSPublicKey(new BBSPublicKeyValue(bytes));
+        return BBSPublicKey;
       case Bls12381PSDockVerKeyName:
-        return new PSPublicKey(new PSPublicKeyValue(bytes));
+        return PSPublicKey;
       case Bls12381BBDT16DockVerKeyName:
-        return new BBDT16PublicKey(new BBDT16PublicKeyValue(bytes));
+        return BBDT16PublicKey;
       default:
         throw new Error(`Unknown key type ${this.type.type}`);
     }
+  }
+
+  publicKey() {
+    const PublicKey = this.publicKeyClass();
+    const bytes = this.publicKeyBytes();
+    const metaArgs = this.metadata
+      ? [
+        this.metadata.paramsRef,
+        this.metadata.curveType,
+        this.metadata.participantId,
+      ]
+      : [];
+
+    return new PublicKey(new PublicKey.Class(bytes, ...metaArgs));
   }
 
   static fromDidKey(keyRef, didKey) {
@@ -117,16 +183,22 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (
       didKey.publicKey.constructor.VerKeyType,
       ref[0],
       valueBytes(didKey.publicKey),
+      void 0,
+      void 0,
+      void 0,
+      didKey.isOffchain() ? didKey.publicKey.value : null,
     );
   }
 
-  toCheqdVerificationMethod() {
+  // eslint-disable-next-line no-use-before-define
+  toCheqd(Class = CheqdVerificationMethod) {
     // eslint-disable-next-line no-use-before-define
-    return new CheqdVerificationMethod(
+    return new (ensureEqualToOrPrototypeOf(CheqdVerificationMethod, Class))(
       this.id,
       this.controller,
       this.type,
       valueBytes(this.publicKey()),
+      this.metadata,
     );
   }
 
@@ -137,15 +209,20 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (
 
 export class CheqdVerificationMethod extends withFrom(
   TypedStruct,
-  (value, from) => (value instanceof VerificationMethod
-    ? from(value.toCheqdVerificationMethod())
-    : from(value)),
+  function fromFn(value, from) {
+    if (value instanceof VerificationMethod) {
+      return from(value.toCheqd(this));
+    } else {
+      return from(value);
+    }
+  },
 ) {
   static Classes = {
-    id: VerificationMethodRef,
+    id: CheqdVerificationMethodRef,
     controller: NamespaceDid,
     verificationMethodType: VerificationMethodType,
     verificationMaterial: PublicKeyBase58,
+    metadata: option(PublicKeyMetadata),
   };
 
   isOffchain() {
@@ -161,15 +238,57 @@ export class CheqdVerificationMethod extends withFrom(
       this.verificationMethodType,
       this.controller,
       this.verificationMaterial,
+      void 0,
+      void 0,
+      void 0,
+      this.metadata,
     );
+  }
+
+  toCheqdPayload() {
+    const payload = filterObj(
+      this.apply(maybeToCheqdPayloadOrJSON),
+      (key, value) => key !== 'metadata' && value != null,
+    );
+
+    const verMethod = this.toVerificationMethod();
+
+    if (verMethod.isOffchain()) {
+      const pk = verMethod.publicKey();
+
+      if (pk.value.paramsRef != null || pk.value.participantId != null) {
+        payload.verificationMaterial = encodeAsBase58(pk.toJSONStringBytes());
+      }
+    }
+
+    return payload;
   }
 }
 
-export class CheqdVerificationMethodAssertion extends CheqdVerificationMethod {
+export class CheqdVerificationMethodAssertion extends withFrom(
+  CheqdVerificationMethod,
+  (value, from) => {
+    const self = from(value);
+    const verMethod = self.toVerificationMethod();
+
+    if (verMethod.isOffchain()) {
+      let json;
+      try {
+        json = JSON.parse(u8aToString(verMethod.publicKeyBytes()));
+      } catch {
+        return self;
+      }
+
+      const pk = verMethod.publicKeyClass().from(json);
+      self.verificationMaterial = valueBytes(pk.bytes);
+      self.metadata = pk.value;
+    }
+
+    return self;
+  },
+) {
   toCheqdPayload() {
-    return JSON.stringify(
-      JSON.stringify(this.apply(maybeToCheqdPayloadOrJSON)),
-    );
+    return JSON.stringify(JSON.stringify(super.toCheqdPayload()));
   }
 
   toJSON() {
@@ -182,3 +301,35 @@ export class CheqdVerificationMethodAssertion extends CheqdVerificationMethod {
       : super.from(obj);
   }
 }
+
+export class CheqdTestnetVerificationMethod extends withProp(
+  withProp(CheqdVerificationMethod, 'id', CheqdTestnetVerificationMethodRef),
+  'controller',
+  CheqdTestnetDid,
+) {}
+
+export class CheqdMainnetVerificationMethod extends withProp(
+  withProp(CheqdVerificationMethod, 'id', CheqdMainnetVerificationMethodRef),
+  'controller',
+  CheqdMainnetDid,
+) {}
+
+export class CheqdTestnetVerificationMethodAssertion extends withProp(
+  withProp(
+    CheqdVerificationMethodAssertion,
+    'id',
+    CheqdTestnetVerificationMethodRef,
+  ),
+  'controller',
+  CheqdTestnetDid,
+) {}
+
+export class CheqdMainnetVerificationMethodAssertion extends withProp(
+  withProp(
+    CheqdVerificationMethodAssertion,
+    'id',
+    CheqdMainnetVerificationMethodRef,
+  ),
+  'controller',
+  CheqdMainnetDid,
+) {}

@@ -3,23 +3,22 @@ import {
   withExtendedStaticProperties,
   u8aToString,
 } from '@docknetwork/credential-sdk/utils';
-import {
-  CheqdParamsId,
-  CheqdCreateResource,
-} from '@docknetwork/credential-sdk/types';
+import { CheqdCreateResource } from '@docknetwork/credential-sdk/types';
 import createInternalCheqdModule from './create-internal-cheqd-module';
 import { validateResource } from './resource';
 
 const methods = {
   addParams(id, params, did) {
+    const { ParamsName, ParamsType, Params } = this.constructor;
+
     return new CheqdCreateResource(
       did.value.value,
       id,
       '1.0',
       [],
-      this.constructor.ParamsName,
-      this.constructor.ParamsType,
-      this.constructor.Params.from(params).toJSONStringBytes(),
+      ParamsName,
+      ParamsType,
+      Params.from(params).toJSONStringBytes(),
     );
   },
 };
@@ -45,10 +44,10 @@ export default function injectParams(klass) {
       }
 
       static get ParamsMap() {
-        const { Params } = this;
+        const { Params, ParamsId } = this;
 
         return class ParamsMap extends TypedMap {
-          static KeyClass = CheqdParamsId;
+          static KeyClass = ParamsId;
 
           static ValueClass = Params;
         };
@@ -61,13 +60,15 @@ export default function injectParams(klass) {
        * @returns {Promise<Params>}
        */
       async getParams(did, id) {
-        const { ParamsName, ParamsType } = this.constructor;
-        const item = await this.resource(did, id);
+        const {
+          ParamsName, ParamsType, Params, ParamsId,
+        } = this.constructor;
+        const item = await this.resource(did, ParamsId.from(id));
         if (item == null) {
           return null;
         }
 
-        return this.constructor.Params.from(
+        return Params.from(
           JSON.parse(
             u8aToString(validateResource(item, ParamsName, ParamsType)),
           ),
@@ -77,16 +78,17 @@ export default function injectParams(klass) {
       /**
        * Retrieves all params by a DID.
        * @param {*} did
-       * @returns {Promise<Map<CheqdParamsId, Params>>}
+       * @returns {Promise<Map<ParamsId, Params>>}
        */
       async getAllParamsByDid(did) {
-        const { ParamsMap, ParamsName, ParamsType } = this.constructor;
+        const { ParamsName, ParamsType } = this.constructor;
+
         const resources = await this.resourcesBy(
           did,
           this.filterParamsMetadata,
         );
 
-        return new ParamsMap(
+        return new this.constructor.ParamsMap(
           [...resources].map(([key, item]) => [
             key,
             JSON.parse(

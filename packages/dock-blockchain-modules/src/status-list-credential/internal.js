@@ -2,6 +2,7 @@ import {
   DockStatusListCredentialId,
   OneOfPolicy,
 } from '@docknetwork/credential-sdk/types';
+import { option } from '@docknetwork/credential-sdk/types/generic';
 import {
   DockStatusList2021CredentialWithPolicy,
   DockStatusList2021CredentialWithId,
@@ -21,20 +22,28 @@ const accountMethods = {
       new OneOfPolicy([did]),
     );
 
-    return [DockStatusListCredentialId.from(statusListCredentialId).value, credentialWithPolicy];
+    return [
+      DockStatusListCredentialId.from(statusListCredentialId).value,
+      credentialWithPolicy,
+    ];
   },
 };
 
 const didMethodsWithPolicy = {
   update(id, statusListCredential, _, __, nonce) {
     return new UpdateStatusListCredential(
-      new DockStatusList2021CredentialWithId(DockStatusListCredentialId.from(id), statusListCredential),
+      new DockStatusList2021CredentialWithId(
+        DockStatusListCredentialId.from(id),
+        statusListCredential,
+      ),
       nonce,
     );
   },
   remove(id, _, __, nonce) {
     return new RemoveStatusListCredential(
-      new DockStatusListCredentialWrappedId(DockStatusListCredentialId.from(id)),
+      new DockStatusListCredentialWrappedId(
+        DockStatusListCredentialId.from(id),
+      ),
       nonce,
     );
   },
@@ -52,4 +61,12 @@ export default class DockInternalStatusListCredentialModule extends createIntern
     update: 'UpdateStatusListCredential',
     remove: 'RemoveStatusListCredential',
   };
+
+  async statusListCredential(id) {
+    return option(DockStatusList2021CredentialWithPolicy).from(
+      await this.query.statusListCredentials(
+        DockStatusListCredentialId.from(id).value,
+      ),
+    );
+  }
 }

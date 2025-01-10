@@ -32,7 +32,7 @@ export default class MultiApiBlobModule extends injectModuleRouter(
   async newTx(blobWithId, didKeypair) {
     const parsedBlobWithId = BlobWithId.from(blobWithId);
 
-    return await this.moduleById(parsedBlobWithId.id).new(
+    return await this.moduleById(parsedBlobWithId.id).newTx(
       parsedBlobWithId,
       didKeypair,
     );

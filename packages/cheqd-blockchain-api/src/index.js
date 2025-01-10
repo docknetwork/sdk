@@ -3,6 +3,7 @@ import {
   maybeToJSONString,
   fmtIter,
   extendNull,
+  maybeToCheqdPayloadOrJSON,
 } from '@docknetwork/credential-sdk/utils';
 import {
   DIDModule,
@@ -29,9 +30,28 @@ import {
   CheqdCreateResource,
   CheqdDIDDocument,
   CheqdDeactivateDidDocument,
+  CheqdTestnetAccumulatorId,
+  CheqdTestnetAccumulatorPublicKey,
+  CheqdTestnetBlobId,
+  CheqdTestnetDid,
+  CheqdTestnetStatusListCredentialId,
+  CheqdTestnetDIDDocument,
+  CheqdMainnetAccumulatorId,
+  CheqdMainnetAccumulatorPublicKey,
+  CheqdMainnetBlobId,
+  CheqdMainnetDid,
+  CheqdMainnetStatusListCredentialId,
+  CheqdMainnetDIDDocument,
+  CheqdMainnetStoredAccumulator,
+  CheqdTestnetStoredAccumulator,
+  CheqdTestnetOffchainSignatureParamsRef,
+  CheqdTestnetOffchainSignatureKeyRef,
+  CheqdMainnetOffchainSignatureParamsRef,
+  CheqdMainnetOffchainSignatureKeyRef,
+  CheqdTestnetAccumulator,
+  CheqdMainnetAccumulator,
 } from '@docknetwork/credential-sdk/types';
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
-import { maybeToCheqdPayloadOrJSON } from '../../credential-sdk/src/utils';
 
 export class CheqdAPI extends AbstractApiProvider {
   /**
@@ -74,13 +94,40 @@ export class CheqdAPI extends AbstractApiProvider {
     MsgCreateResource: CheqdCreateResourcePayloadWithTypeUrlAndSignatures,
   });
 
+  static Types = extendNull({
+    [CheqdNetwork.Testnet]: extendNull({
+      Did: CheqdTestnetDid,
+      DidDocument: CheqdTestnetDIDDocument,
+      Accumulator: CheqdTestnetAccumulator,
+      AccumulatorId: CheqdTestnetAccumulatorId,
+      AccumulatorPublicKey: CheqdTestnetAccumulatorPublicKey,
+      StoredAccumulator: CheqdTestnetStoredAccumulator,
+      OffchainSignatureParamsRef: CheqdTestnetOffchainSignatureParamsRef,
+      OffchainSignatureKeyRef: CheqdTestnetOffchainSignatureKeyRef,
+      BlobId: CheqdTestnetBlobId,
+      StatusListCredentialId: CheqdTestnetStatusListCredentialId,
+    }),
+    [CheqdNetwork.Mainnet]: extendNull({
+      Did: CheqdMainnetDid,
+      DidDocument: CheqdMainnetDIDDocument,
+      AccumulatorId: CheqdMainnetAccumulatorId,
+      AccumulatorPublicKey: CheqdMainnetAccumulatorPublicKey,
+      Accumulator: CheqdMainnetAccumulator,
+      StoredAccumulator: CheqdMainnetStoredAccumulator,
+      OffchainSignatureParamsRef: CheqdMainnetOffchainSignatureParamsRef,
+      OffchainSignatureKeyRef: CheqdMainnetOffchainSignatureKeyRef,
+      BlobId: CheqdMainnetBlobId,
+      StatusListCredentialId: CheqdMainnetStatusListCredentialId,
+    }),
+  });
+
   /**
    * Initializes `CheqdAPI` with the supplied url, wallet and network type.
    * @param {object} configuration
    * @param {string} [configuration.url]
    * @param {*} [configuration.wallet]
    * @param {string} [configuration.network]
-   * @returns {this}
+   * @returns {Promise<this>}
    */
   async init({ url, wallet, network } = {}) {
     if (network !== CheqdNetwork.Mainnet && network !== CheqdNetwork.Testnet) {
@@ -202,6 +249,13 @@ export class CheqdAPI extends AbstractApiProvider {
     }
 
     return res;
+  }
+
+  types() {
+    const { Types } = this.constructor;
+    const { network } = this.ensureInitialized().sdk.options;
+
+    return Types[network];
   }
 
   methods() {

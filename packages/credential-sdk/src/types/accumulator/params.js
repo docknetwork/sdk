@@ -1,4 +1,11 @@
-import { option, TypedBytes, TypedStruct } from '../generic';
+import {
+  option,
+  TypedBytes,
+  TypedNumber,
+  TypedStruct,
+  TypedUUID,
+} from '../generic';
+import withFromDockId from '../generic/with-from-dock-id';
 import {
   CurveType,
   CurveTypeBls12381,
@@ -15,3 +22,11 @@ export class AccumulatorParams extends TypedStruct {
     super(bytes, label, curveType);
   }
 }
+
+export class DockAccumulatorParamsId extends TypedNumber {}
+
+export class CheqdAccumulatorParamsId extends withFromDockId(
+  TypedUUID,
+  DockAccumulatorParamsId,
+  'accumulator-params',
+) {}

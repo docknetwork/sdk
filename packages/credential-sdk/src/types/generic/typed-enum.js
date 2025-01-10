@@ -8,7 +8,7 @@ import {
   maybeEq,
   maybeFrom,
   maybeNew,
-  maybeToJSON,
+  maybeToJSONString,
 } from '../../utils/interfaces';
 import withBase from './with-base';
 import Null from './typed-null';
@@ -270,7 +270,7 @@ class TypedEnum extends withBase(class EnumBase {}) {
     }
 
     throw new Error(
-      `Invalid object received: \`${maybeToJSON(
+      `Invalid object received: \`${maybeToJSONString(
         obj,
       )}\`, expected to build an instance of ${fmtIter(
         this.Variants.map((v) => v.Type),

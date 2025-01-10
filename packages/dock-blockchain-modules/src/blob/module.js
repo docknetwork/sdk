@@ -1,4 +1,7 @@
-import { NoBlobError, AbstractBlobModule } from '@docknetwork/credential-sdk/modules/abstract/blob';
+import {
+  NoBlobError,
+  AbstractBlobModule,
+} from '@docknetwork/credential-sdk/modules/abstract/blob';
 import { option } from '@docknetwork/credential-sdk/types/generic';
 import { DockBlobId } from '@docknetwork/credential-sdk/types';
 import { injectDock } from '../common';
@@ -12,8 +15,7 @@ export default class DockBlobModule extends injectDock(AbstractBlobModule) {
   /**
    * Write a new blob on chain.
    * @param blob
-   * @param signerDid - Signer of the blob
-   * @param signingKeyRef - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @param didKeypair - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
    * @returns {Promise<*>}
    */
   async newTx(blobWithId, didKeypair) {

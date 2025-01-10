@@ -96,7 +96,7 @@ const wrapFnWithRetries = (obj, prop, path = []) => {
           const wrappedFn = () => value.apply(this, args);
           wrappedFn.toString = () => value.toString();
 
-          return await retry(wrappedFn, 8e3, {
+          return await retry(wrappedFn, 32e3, {
             maxAttempts: 2,
             delay: 5e2,
             onTimeoutExceeded: (retrySym) => {

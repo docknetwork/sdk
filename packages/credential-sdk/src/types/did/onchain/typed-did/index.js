@@ -1,8 +1,16 @@
 import { DidMethodKeyPublicKey, DidMethodKeySignature } from './did-method-key';
 import DockDidValue, { DockDidSignature } from './dock-did-value';
-import { TypedEnum, TypedTuple, withQualifier } from '../../../generic';
-import { CheqdDid } from './cheqd-did';
-import { withExtendedStaticProperties } from '../../../../utils';
+import {
+  TypedEnum,
+  TypedTuple,
+  TypedUUID,
+  withQualifier,
+} from '../../../generic';
+import { CheqdDid, CheqdMainnetDid, CheqdTestnetDid } from './cheqd-did';
+import {
+  withExtendedStaticProperties,
+  isHexWithGivenByteSize,
+} from '../../../../utils';
 import DidOrDidMethodKeySignature from './signature';
 
 export class DockDidOrDidMethodKey extends withQualifier(TypedEnum, true) {
@@ -73,6 +81,11 @@ export class DockDidOrDidMethodKey extends withQualifier(TypedEnum, true) {
   }
 
   static from(value) {
+    if (isHexWithGivenByteSize(String(value), 32)) {
+      // eslint-disable-next-line no-use-before-define
+      return new DockDid(value);
+    }
+
     // eslint-disable-next-line no-use-before-define
     if (value instanceof NamespaceDid) {
       return super.from(value.isDock ? { did: value.asDock } : value);
@@ -138,21 +151,21 @@ export class NamespaceDid extends withQualifier(TypedEnum, true) {
   }
 }
 
-class DockNamespaceDid extends NamespaceDid {
+export class DockNamespaceDid extends NamespaceDid {
   static Qualifier = 'did:dock:';
 
   static Type = 'dock';
 
   static Class = DockDidValue;
 }
-class DidNamespaceKey extends NamespaceDid {
+export class DidNamespaceKey extends NamespaceDid {
   static Qualifier = 'did:key:';
 
   static Type = 'didMethodKey';
 
   static Class = DidMethodKeyPublicKey;
 }
-class CheqdNamespaceDid extends NamespaceDid {
+export class CheqdNamespaceDid extends NamespaceDid {
   static Qualifier = 'did:cheqd:';
 
   static Type = 'cheqd';
@@ -162,14 +175,28 @@ class CheqdNamespaceDid extends NamespaceDid {
 
 NamespaceDid.bindVariants(DockNamespaceDid, DidNamespaceKey, CheqdNamespaceDid);
 
+for (const Class of [CheqdTestnetDid, CheqdMainnetDid]) {
+  const fromFn = Class.from;
+
+  Class.from = function from(value) {
+    if (value instanceof DockDid || value instanceof DockNamespaceDid) {
+      return new this(TypedUUID.fromDockIdent(value));
+    } else {
+      return fromFn.call(this, value);
+    }
+  };
+}
+
 export class DidRef extends withExtendedStaticProperties(
   ['Ident'],
   withQualifier(TypedTuple),
 ) {
   static Qualifier = '';
 
+  static Did = NamespaceDid;
+
   static get Classes() {
-    return [NamespaceDid, this.Ident];
+    return [this.Did, this.Ident];
   }
 
   static random(did) {

@@ -1,16 +1,11 @@
 /* eslint-disable camelcase */
 
 import {
-  DockAccumulatorWithUpdateInfo,
   DockAccumulatorCommon,
   DockKBUniversalAccumulator,
   DockUniversalAccumulator,
   DockPositiveAccumulator,
-  AccumulatorParams,
-  DockAccumulatorPublicKey,
-  DockAccumulatorIdIdent,
 } from '@docknetwork/credential-sdk/types';
-import { option, withProp } from '@docknetwork/credential-sdk/types/generic';
 import { AbstractAccumulatorModule } from '@docknetwork/credential-sdk/modules/abstract';
 import DockInternalAccumulatorModule from './internal';
 import { injectDock, withParams, withPublicKeys } from '../common';
@@ -33,8 +28,7 @@ export default class DockAccumulatorModule extends withParams(
    * @param accumulated - Current accumulated value.
    * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
    * have any public key on the chain. This is useful for KVAC.
-   * @param signerDid - Signer of the transaction payload
-   * @param signingKeyRef - Signer's keypair reference
+   * @param didKeypair - Signer's keypair reference
    * @returns {Promise<*>}
    */
   async addPositiveAccumulatorTx(id, accumulated, publicKeyRef, didKeypair) {
@@ -54,8 +48,7 @@ export default class DockAccumulatorModule extends withParams(
    * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
    * have any public key on the chain. This is useful for KVAC.
    * @param maxSize - Maximum size of the accumulator
-   * @param signerDid - Signer of the transaction payload
-   * @param signingKeyRef - Signer's keypair reference
+   * @param didKeypair - Signer's keypair reference
    * @returns {Promise<*>}
    */
   async addUniversalAccumulatorTx(
@@ -83,8 +76,7 @@ export default class DockAccumulatorModule extends withParams(
    * @param accumulated - Current accumulated value.
    * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
    * have any public key on the chain. This is useful for KVAC.
-   * @param signerDid - Signer of the transaction payload
-   * @param signingKeyRef - Signer's keypair reference
+   * @param didKeypair - Signer's keypair reference
    * @returns {Promise<*>}
    */
   async addKBUniversalAccumulatorTx(id, accumulated, publicKeyRef, didKeypair) {
@@ -103,8 +95,7 @@ export default class DockAccumulatorModule extends withParams(
    * @param accumulated - Current accumulated value.
    * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
    * have any public key on the chain. This is useful for KVAC.
-   * @param signerDid - Signer of the transaction payload
-   * @param signingKeyRef - Signer's keypair reference
+   * @param didKeypair - Signer's keypair reference
    * @returns {Promise<*>}
    */
   async updatePositiveAccumulatorTx(
@@ -133,8 +124,7 @@ export default class DockAccumulatorModule extends withParams(
    * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
    * have any public key on the chain. This is useful for KVAC.
    * @param maxSize - Maximum size of the accumulator
-   * @param signerDid - Signer of the transaction payload
-   * @param signingKeyRef - Signer's keypair reference
+   * @param didKeypair - Signer's keypair reference
    * @returns {Promise<*>}
    */
   // eslint-disable-next-line sonarjs/no-identical-functions
@@ -164,8 +154,7 @@ export default class DockAccumulatorModule extends withParams(
    * @param accumulated - Current accumulated value.
    * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
    * have any public key on the chain. This is useful for KVAC.
-   * @param signerDid - Signer of the transaction payload
-   * @param signingKeyRef - Signer's keypair reference
+   * @param didKeypair - Signer's keypair reference
    * @returns {Promise<*>}
    */
   // eslint-disable-next-line sonarjs/no-identical-functions
@@ -191,8 +180,7 @@ export default class DockAccumulatorModule extends withParams(
   /**
    * Remove the accumulator from chain. This frees up the id for reuse.
    * @param id - id to remove
-   * @param signerDid - Signer of the transaction payload
-   * @param signingKeyRef - Signer's keypair reference
+   * @param didKeypair - Signer's keypair reference
    * @returns {Promise<*>}
    */
   async removeAccumulatorTx(id, didKeypair) {
@@ -207,29 +195,14 @@ export default class DockAccumulatorModule extends withParams(
    * @param id
    * @param includePublicKey - Fetch public key
    * @param includeParams - Fetch params for the publicKey
-   * @returns {Promise<{created: *, lastModified: *}|null>}
+   * @returns {Promise<DockAccumulatorWithUpdateInfo>}
    */
   async getAccumulator(id, includePublicKey = false, includeParams = false) {
-    const PublicKey = includeParams
-      ? withProp(DockAccumulatorPublicKey, 'params', option(AccumulatorParams))
-      : DockAccumulatorPublicKey;
-    const Accumulator = includePublicKey
-      ? withProp(DockAccumulatorWithUpdateInfo, 'publicKey', option(PublicKey))
-      : DockAccumulatorWithUpdateInfo;
-
-    const acc = option(Accumulator).from(
-      await this.dockOnly.query.accumulators(DockAccumulatorIdIdent.from(id)),
+    return await this.dockOnly.getAccumulator(
+      id,
+      includePublicKey,
+      includeParams,
     );
-
-    if (acc == null) {
-      return null;
-    }
-
-    if (includePublicKey) {
-      acc.publicKey = await this.getPublicKey(...acc.keyRef, includeParams);
-    }
-
-    return acc;
   }
 
   /**

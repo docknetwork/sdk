@@ -12,6 +12,7 @@ import { fmtIter } from './generic';
  * @param {T} parentClass
  * @returns {T}
  */
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export function withExtendedStaticProperties(properties, parentClass) {
   const name = `withExtStatics(${parentClass.name}, ${fmtIter(properties)})`;
 
@@ -24,10 +25,16 @@ export function withExtendedStaticProperties(properties, parentClass) {
          * Ensures that properties are extended properly.
          */
         for (const property of properties) {
-          if (this.constructor[property] === parentClass[property]) {
-            throw new Error(
-              `Static property \`${property}\` of \`${this.constructor.name}\` isn't extended properly`,
-            );
+          try {
+            if (this.constructor[property] === parentClass[property]) {
+              throw new Error(
+                `Static property \`${property}\` of \`${this.constructor.name}\` isn't extended properly`,
+              );
+            }
+          } catch (err) {
+            err.message = `Failed to check the prototype property: \n${err.message}`;
+
+            throw err;
           }
         }
       }
@@ -88,10 +95,16 @@ export function withExtendedPrototypeProperties(properties, parentClass) {
          * Ensures that properties are extended properly.
          */
         for (const property of properties) {
-          if (proto[property] === parentClass.prototype[property]) {
-            throw new Error(
-              `Property \`${property}\` of the object prototype of \`${this.constructor.name}\` isn't extended properly`,
-            );
+          try {
+            if (proto[property] === parentClass.prototype[property]) {
+              throw new Error(
+                `Property \`${property}\` of the object prototype of \`${this.constructor.name}\` isn't extended properly`,
+              );
+            }
+          } catch (err) {
+            err.message = `Failed to check the static property: \n${err.message}`;
+
+            throw err;
           }
         }
       }
@@ -134,3 +147,13 @@ export const validateProperties = (obj) => ensurePropertiesAreUnique(
 export const isPrototypeOf = (proto, obj) => Object.isPrototypeOf.call(proto, obj);
 
 export const isEqualToOrPrototypeOf = (proto, obj) => Object.is(proto, obj) || isPrototypeOf(proto, obj);
+
+export const ensureEqualToOrPrototypeOf = (proto, obj) => {
+  if (!isEqualToOrPrototypeOf(proto, obj)) {
+    throw new Error(
+      `Expected \`${proto.name}\` to be equal to or a prototype of \`${obj.name}\``,
+    );
+  }
+
+  return obj;
+};

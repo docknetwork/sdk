@@ -22,6 +22,10 @@ export const createAccumulatorVariants = (keyRef) => {
       return this.common.accumulated;
     }
 
+    set accumulated(newAccumulated) {
+      this.common.accumulated = newAccumulated;
+    }
+
     get keyRef() {
       return this.common.keyRef;
     }
@@ -30,6 +34,14 @@ export const createAccumulatorVariants = (keyRef) => {
   class Accumulator extends TypedEnum {
     get keyRef() {
       return this.value.keyRef;
+    }
+
+    get accumulated() {
+      return this.value.accumulated;
+    }
+
+    set accumulated(newAccumulated) {
+      this.value.accumulated = newAccumulated;
     }
   }
 

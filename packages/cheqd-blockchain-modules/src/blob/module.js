@@ -1,6 +1,5 @@
 import { AbstractBlobModule } from '@docknetwork/credential-sdk/modules';
 import { NoBlobError } from '@docknetwork/credential-sdk/modules/abstract/blob';
-import { CheqdBlobId } from '@docknetwork/credential-sdk/types';
 import { NoResourceError, injectCheqd } from '../common';
 import CheqdInternalBlobModule from './internal';
 import { OwnerWithBlob } from './types';
@@ -25,7 +24,9 @@ export default class CheqdBlobModule extends injectCheqd(AbstractBlobModule) {
    * @returns {OwnerWithBlob}
    */
   async get(blobId) {
-    const id = CheqdBlobId.from(blobId);
+    const { BlobId } = this.types;
+
+    const id = BlobId.from(blobId);
 
     try {
       return new OwnerWithBlob(id.value[0], await this.cheqdOnly.blob(id));

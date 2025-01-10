@@ -1,7 +1,4 @@
-import {
-  CheqdStatusListCredentialId,
-  CheqdCreateResource,
-} from '@docknetwork/credential-sdk/types';
+import { CheqdCreateResource } from '@docknetwork/credential-sdk/types';
 import { StatusList2021Credential } from '@docknetwork/credential-sdk/vc';
 import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
 import {
@@ -14,10 +11,10 @@ import { createInternalCheqdModule, validateResource } from '../common';
 const Type = 'status-list-credential';
 
 const methods = {
-  create: (statusListCredentialId, rawStatusListCredential) => {
-    const [did, id] = CheqdStatusListCredentialId.from(
-      statusListCredentialId,
-    ).value;
+  create(statusListCredentialId, rawStatusListCredential) {
+    const { StatusListCredentialId } = this.types;
+
+    const [did, id] = StatusListCredentialId.from(statusListCredentialId).value;
 
     return new CheqdCreateResource(
       did.value.value,
@@ -31,10 +28,10 @@ const methods = {
       ),
     );
   },
-  update: (statusListCredentialId, statusListCredential) => {
-    const [did, id] = CheqdStatusListCredentialId.from(
-      statusListCredentialId,
-    ).value;
+  update(statusListCredentialId, statusListCredential) {
+    const { StatusListCredentialId } = this.types;
+
+    const [did, id] = StatusListCredentialId.from(statusListCredentialId).value;
 
     return new CheqdCreateResource(
       did.value.value,
@@ -48,10 +45,10 @@ const methods = {
       ),
     );
   },
-  remove: (statusListCredentialId) => {
-    const [did, id] = CheqdStatusListCredentialId.from(
-      statusListCredentialId,
-    ).value;
+  remove(statusListCredentialId) {
+    const { StatusListCredentialId } = this.types;
+
+    const [did, id] = StatusListCredentialId.from(statusListCredentialId).value;
 
     return new CheqdCreateResource(
       did.value.value,
@@ -75,7 +72,9 @@ export default class CheqdInternalStatusListCredentialModule extends createInter
   };
 
   async lastStatusListCredentialId(id) {
-    const [did, name] = CheqdStatusListCredentialId.from(id).value;
+    const { StatusListCredentialId } = this.types;
+
+    const [did, name] = StatusListCredentialId.from(id).value;
 
     const res = await this.latestResourceMetadataBy(
       did,
@@ -86,7 +85,9 @@ export default class CheqdInternalStatusListCredentialModule extends createInter
   }
 
   async statusListCredential(statusListCredentialId) {
-    const credId = CheqdStatusListCredentialId.from(statusListCredentialId);
+    const { StatusListCredentialId } = this.types;
+
+    const credId = StatusListCredentialId.from(statusListCredentialId);
 
     const [did, name] = credId.value;
     const versionId = await this.lastStatusListCredentialId(credId);

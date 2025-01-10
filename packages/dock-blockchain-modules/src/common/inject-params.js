@@ -1,10 +1,6 @@
 import { DockDidOrDidMethodKey } from '@docknetwork/credential-sdk/types';
 import { withExtendedStaticProperties } from '@docknetwork/credential-sdk/utils';
-import {
-  TypedMap,
-  TypedNumber,
-  option,
-} from '@docknetwork/credential-sdk/types/generic';
+import { TypedMap, option } from '@docknetwork/credential-sdk/types/generic';
 import createInternalDockModule from './create-internal-dock-module';
 
 const didMethods = {
@@ -28,10 +24,10 @@ export default function injectParams(klass) {
   const obj = {
     [name]: class extends createInternalDockModule({ didMethods }, klass) {
       static get ParamsMap() {
-        const { Params } = this;
+        const { Params, ParamsId } = this;
 
         return class ParamsMap extends TypedMap {
-          static KeyClass = TypedNumber;
+          static KeyClass = ParamsId;
 
           static ValueClass = Params;
         };
@@ -44,10 +40,12 @@ export default function injectParams(klass) {
        * @returns {Promise<Params>}
        */
       async getParams(did, id) {
-        return option(this.constructor.Params).from(
-          await this.query[this.constructor.ParamsQuery](
+        const { Params, ParamsId, ParamsQuery } = this.constructor;
+
+        return option(Params).from(
+          await this.query[ParamsQuery](
             DockDidOrDidMethodKey.from(did),
-            TypedNumber.from(id),
+            ParamsId.from(id),
           ),
         );
       }
@@ -55,7 +53,7 @@ export default function injectParams(klass) {
       /**
        * Retrieves all params by a DID.
        * @param {*} did
-       * @returns {Promise<Map<TypedNumber, Params>>}
+       * @returns {Promise<Map<ParamsId, Params>>}
        */
       async getAllParamsByDid(did) {
         // TODO: use `multi`
@@ -81,5 +79,8 @@ export default function injectParams(klass) {
     },
   };
 
-  return withExtendedStaticProperties(['Params', 'ParamsQuery'], obj[name]);
+  return withExtendedStaticProperties(
+    ['Params', 'ParamsId', 'ParamsQuery'],
+    obj[name],
+  );
 }

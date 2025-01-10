@@ -26,6 +26,10 @@ export default function injectCheqd(klass) {
       methods() {
         return this.apiProvider.methods();
       }
+
+      get types() {
+        return this.apiProvider.types();
+      }
     },
   };
 

@@ -1,10 +1,14 @@
-import { CheqdDid, DIDDocument, CheqdDeactivateDidDocument } from '@docknetwork/credential-sdk/types';
 import {
-  TypedUUID,
-} from '@docknetwork/credential-sdk/types/generic';
+  CheqdDid,
+  DIDDocument,
+  CheqdDeactivateDidDocument,
+} from '@docknetwork/credential-sdk/types';
+import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
 import { createInternalCheqdModule } from '../common';
 
-const parseDocument = (document) => DIDDocument.from(document).toCheqd();
+function parseDocument(document) {
+  return DIDDocument.from(document).toCheqd(this.types.DidDocument);
+}
 
 const methods = {
   createDidDocument: parseDocument,
@@ -20,6 +24,8 @@ export class CheqdDIDModuleInternal extends createInternalCheqdModule(methods) {
   };
 
   async getDidDocumentWithMetadata(did) {
-    return await this.apiProvider.sdk.querier.did.didDoc(String(CheqdDid.from(did)));
+    return await this.apiProvider.sdk.querier.did.didDoc(
+      String(CheqdDid.from(did)),
+    );
   }
 }

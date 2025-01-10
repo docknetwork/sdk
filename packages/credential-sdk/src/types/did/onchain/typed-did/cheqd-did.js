@@ -81,21 +81,40 @@ export class CheqdDLRRef extends withFrom(
   TypedTuple,
   function from(value, fromFn) {
     if (typeof value === 'string') {
-      const lastColon = value.lastIndexOf(':');
+      const resources = value.lastIndexOf('/resources/');
 
-      return new this(value.slice(0, lastColon), value.slice(lastColon + 1));
+      if (resources === -1) {
+        const lastColon = value.lastIndexOf(':');
+
+        return new this(value.slice(0, lastColon), value.slice(lastColon + 1));
+      }
+
+      return new this(
+        value.slice(0, resources),
+        value.slice(resources + '/resources/'.length),
+      );
     } else {
       return fromFn(value);
     }
   },
 ) {
-  static Classes = [CheqdDid, TypedUUID];
+  static Did = CheqdDid;
+
+  static Id = TypedUUID;
+
+  static get Classes() {
+    return [this.Did, this.Id];
+  }
 
   toString() {
-    return `${this[0]}:${this[1]}`;
+    return `${this[0]}/resources/${this[1]}`;
   }
 
   toJSON() {
+    return String(this);
+  }
+
+  toCheqdPayload() {
     return String(this);
   }
 }

@@ -1,8 +1,8 @@
 import { valueBytes, ensureInstanceOf } from '../../../utils';
 import { TypedStruct } from '../../generic';
 import { SignatureEd25519Value } from '../../signatures';
-import { VerificationMethodRef } from '../document';
 import { DidKeypair } from '../../../keypairs';
+import { CheqdVerificationMethodRef } from '../document/verification-method-ref';
 
 class BytesSignatureEd25519Value extends SignatureEd25519Value {
   toCheqdPayload() {
@@ -12,7 +12,7 @@ class BytesSignatureEd25519Value extends SignatureEd25519Value {
 
 export class VerificationMethodSignature extends TypedStruct {
   static Classes = {
-    verificationMethodId: VerificationMethodRef,
+    verificationMethodId: CheqdVerificationMethodRef,
     signature: BytesSignatureEd25519Value,
   };
 

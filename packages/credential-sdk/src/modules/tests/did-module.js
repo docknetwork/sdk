@@ -16,7 +16,7 @@ import { testIf } from './common';
 // eslint-disable-next-line jest/no-export
 export default function generateDIDModuleTests(
   { did: module },
-  { DID },
+  { DID, OffchainSignatureParamsRef },
   filter = () => true,
 ) {
   const test = testIf(filter);
@@ -43,9 +43,14 @@ export default function generateDIDModuleTests(
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
 
-      const bbsKey = new BBSPublicKeyValue(TypedBytes.random(100));
-      const bbsPlusKey = new BBSPlusPublicKeyValue(TypedBytes.random(100));
-      const psKey = new PSPublicKeyValue(TypedBytes.random(1000));
+      const ref = new OffchainSignatureParamsRef(
+        did,
+        OffchainSignatureParamsRef.Classes[1].random(),
+      );
+
+      const bbsKey = new BBSPublicKeyValue(TypedBytes.random(100), ref);
+      const bbsPlusKey = new BBSPlusPublicKeyValue(TypedBytes.random(100), ref);
+      const psKey = new PSPublicKeyValue(TypedBytes.random(1000), ref);
 
       const document = DIDDocument.create(did, [
         didKeypair.didKey(),

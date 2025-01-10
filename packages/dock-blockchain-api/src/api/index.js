@@ -27,7 +27,10 @@ import {
   ensureExtrinsicSucceeded,
   errorMsgFromEventData,
 } from '../utils/extrinsic';
-import { getAllExtrinsicsFromBlock } from '../utils/chain-ops';
+import {
+  blockNumberToHash,
+  getAllExtrinsicsFromBlock,
+} from '../utils/chain-ops';
 
 /**
  * @typedef {object} Options The Options to use in the function DockAPI.
@@ -144,23 +147,41 @@ export default class DockAPI extends AbstractApiProvider {
     patchQueryApi(this.api.query);
     patchQueryApi(this.api.queryMulti);
 
-    return this.api;
+    return this;
   }
   /* eslint-enable sonarjs/cognitive-complexity */
 
+  /**
+   * Initializes keyring.
+   * @param {*} keyring
+   * @returns {Promise<this>}
+   */
   async initKeyring(keyring = null) {
     if (!this.keyring || keyring) {
       await cryptoWaitReady();
       this.keyring = new Keyring(keyring || { type: 'sr25519' });
     }
+
+    return this;
   }
 
+  /**
+   * Disconnect from the underlying provider, halting all network traffic.
+   * Throws an error if SDK is not initialized.
+   * @returns {Promise<this>}
+   */
   async disconnect() {
-    if (this.isConnected) {
-      await this.api.disconnect();
-    }
+    this.ensureInitialized();
+    await this.api.disconnect();
+    delete this.api;
+
+    return this;
   }
 
+  /**
+   * Returns `true` if SDK was initialized.
+   * @returns {boolean}
+   */
   isInitialized() {
     return this.api != null;
   }
@@ -221,6 +242,15 @@ export default class DockAPI extends AbstractApiProvider {
       blockNumberOrHash,
       includeAllExtrinsics,
     );
+  }
+
+  /**
+   * Retrieves corresponding hash for the supplied block number.
+   * @param {*} number
+   * @returns {Promise<*>}
+   */
+  async blockNumberToHash(number) {
+    return await blockNumberToHash(this.api, number);
   }
 
   /**

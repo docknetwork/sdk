@@ -1,4 +1,4 @@
-import { applyToValue, maybeToJSONString } from './interfaces';
+import { applyToValue } from './interfaces';
 import { ensureBytes, ensureString, isBytes } from './type-helpers';
 
 /**
@@ -132,9 +132,9 @@ export const normalizeToU8a = (bytes) => {
   }
 
   throw new Error(
-    `Can't convert supplied value to \`Uint8Array\`: \`${maybeToJSONString(
-      bytes,
-    )}\` ${bytes ? `instance of ${bytes.constructor}` : ''}`,
+    `Can't convert supplied value to \`Uint8Array\`: \`${bytes}\` ${
+      bytes ? `instance of \`${bytes.constructor.name}\`` : ''
+    }`,
   );
 };
 
@@ -154,8 +154,27 @@ export const normalizeOrConvertStringToU8a = (bytesOrString) => (typeof bytesOrS
  * @returns {Uint8Array}
  */
 export const valueBytes = (value) => applyToValue(
-  (inner) => Array.isArray(inner) || inner instanceof Uint8Array || 'bytes' in inner,
+  (inner) => Array.isArray(inner)
+      || inner instanceof Uint8Array
+      || (inner && typeof inner === 'object' && 'bytes' in inner),
   (inner) => normalizeToU8a(inner.bytes ?? inner),
+  value,
+);
+
+/**
+ * Attempts to get byte representation of the supplied object.
+ * Throws an error in case if it's not possible.
+ * @param {*} value
+ * @returns {Uint8Array}
+ */
+export const valueNumberOrBytes = (value) => applyToValue(
+  (inner) => Array.isArray(inner)
+      || inner instanceof Uint8Array
+      || (inner && typeof inner === 'object' && 'bytes' in inner)
+      || typeof inner === 'number',
+  (inner) => (typeof inner === 'number'
+    ? stringToU8a(String(inner))
+    : normalizeToU8a(inner.bytes ?? inner)),
   value,
 );
 

@@ -1,5 +1,14 @@
 # @docknetwork/sdk-examples
 
+## 0.6.8
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/dock-blockchain-modules@0.12.0
+  - @docknetwork/dock-blockchain-api@0.9.0
+  - @docknetwork/credential-sdk@0.22.0
+
 ## 0.6.7
 
 ### Patch Changes

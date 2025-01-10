@@ -5,7 +5,11 @@ import {
   CheqdAccumulatorParamsRef,
   CheqdAccumulatorWithUpdateInfo,
   CheqdCreateResource,
-  CheqdAccumulatorPublicKey,
+  DockAccumulatorWithUpdateInfo,
+  CheqdAccumulatorPublicKeyId,
+  CheqdAccumulatorParamsId,
+  AccumulatorUpdate,
+  CheqdAccumulatorHistory,
 } from '@docknetwork/credential-sdk/types';
 import { TypedUUID, option } from '@docknetwork/credential-sdk/types/generic';
 import { stringToU8a, u8aToString } from '@docknetwork/credential-sdk/utils';
@@ -21,15 +25,26 @@ import {
 const Type = 'accumulator';
 
 const methods = {
-  addAccumulator: (accumulatorId, accumulator) => {
-    const [did, id] = CheqdAccumulatorId.from(accumulatorId).value;
-    const storedAcc = new CheqdStoredAccumulator(
-      accumulator,
-    ).toJSONStringBytes();
+  addAccumulator(accumulatorId, accumulator) {
+    const { AccumulatorId, StoredAccumulator } = this.types;
+
+    const [did, id] = AccumulatorId.from(accumulatorId).value;
+    let storedAcc;
+    let versionId;
+
+    if (accumulator instanceof DockAccumulatorWithUpdateInfo) {
+      storedAcc = new StoredAccumulator(
+        accumulator.accumulator,
+      ).toJSONStringBytes();
+      versionId = TypedUUID.fromDockIdent(id, String(accumulator.lastModified));
+    } else {
+      storedAcc = new StoredAccumulator(accumulator).toJSONStringBytes();
+      versionId = TypedUUID.random();
+    }
 
     return new CheqdCreateResource(
       did.value.value,
-      TypedUUID.random(),
+      versionId,
       '1.0',
       [],
       String(id),
@@ -37,22 +52,38 @@ const methods = {
       storedAcc,
     );
   },
-  updateAccumulator: (
+  updateAccumulator(
     accumulatorId,
     accumulator,
     { additions, removals, witnessUpdateInfo },
-  ) => {
-    const [did, id] = CheqdAccumulatorId.from(accumulatorId).value;
-    const storedAcc = new CheqdStoredAccumulator(
-      accumulator,
-      additions,
-      removals,
-      witnessUpdateInfo,
-    ).toJSONStringBytes();
+  ) {
+    const { AccumulatorId, StoredAccumulator } = this.types;
+
+    const [did, id] = AccumulatorId.from(accumulatorId).value;
+
+    let storedAcc;
+    let versionId;
+    if (accumulator instanceof DockAccumulatorWithUpdateInfo) {
+      storedAcc = new StoredAccumulator(
+        accumulator.accumulator,
+        additions,
+        removals,
+        witnessUpdateInfo,
+      ).toJSONStringBytes();
+      versionId = TypedUUID.fromDockIdent(id, String(accumulator.lastModified));
+    } else {
+      storedAcc = new StoredAccumulator(
+        accumulator,
+        additions,
+        removals,
+        witnessUpdateInfo,
+      ).toJSONStringBytes();
+      versionId = TypedUUID.random();
+    }
 
     return new CheqdCreateResource(
       did.value.value,
-      TypedUUID.random(),
+      versionId,
       '1.0',
       [],
       String(id),
@@ -60,8 +91,10 @@ const methods = {
       storedAcc,
     );
   },
-  removeAccumulator: (accumulatorId) => {
-    const [did, id] = CheqdAccumulatorId.from(accumulatorId).value;
+  removeAccumulator(accumulatorId) {
+    const { AccumulatorId } = this.types;
+
+    const [did, id] = AccumulatorId.from(accumulatorId).value;
 
     return new CheqdCreateResource(
       did.value.value,
@@ -87,11 +120,17 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
     };
   }
 
-  static PublicKey = CheqdAccumulatorPublicKey;
+  get PublicKey() {
+    return this.types.AccumulatorPublicKey;
+  }
+
+  static PublicKeyId = CheqdAccumulatorPublicKeyId;
 
   static PublicKeyName = 'AccumulatorPublicKey';
 
   static PublicKeyType = 'accumulator-public-key';
+
+  static ParamsId = CheqdAccumulatorParamsId;
 
   static Params = AccumulatorParams;
 
@@ -105,6 +144,63 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
     const strName = String(name);
 
     return (meta) => meta.resourceType === 'accumulator' && meta.name === strName;
+  }
+
+  async accumulatorHistory(accumulatorId) {
+    const [did, name] = CheqdAccumulatorId.from(accumulatorId).value;
+
+    const ids = new SortedResourceVersions(
+      await this.resourcesMetadataBy(
+        did,
+        this.createAccumulatorMetadataFilter(name),
+      ),
+    ).ids();
+    if (!ids.length) {
+      return null;
+    }
+
+    const resources = [
+      ...new SortedResourceVersions(await this.resources(did, ids)),
+    ];
+    const mapUpdate = (
+      {
+        accumulator,
+        additions,
+        removals,
+        witnessUpdateInfo = new Uint8Array(),
+      },
+      idx,
+    ) => new AccumulatorUpdate(
+      resources[idx + 1].metadata.id,
+      accumulator.accumulated,
+      additions,
+      removals,
+      witnessUpdateInfo,
+    );
+
+    const accumulators = resources.map((acc) => CheqdStoredAccumulator.from(
+      JSON.parse(u8aToString(validateResource(acc, String(name), Type))),
+    ));
+    const updates = accumulators.slice(1).map(mapUpdate);
+
+    return new CheqdAccumulatorHistory(
+      new CheqdAccumulatorWithUpdateInfo(
+        ids[0],
+        ids[0],
+        accumulators[0].accumulator,
+      ),
+      updates,
+    );
+  }
+
+  async lastAccumulatorId(accumulatorId) {
+    const [did, name] = CheqdAccumulatorId.from(accumulatorId).value;
+    const lastMeta = await this.latestResourceMetadataBy(
+      did,
+      this.createAccumulatorMetadataFilter(name),
+    );
+
+    return lastMeta?.id;
   }
 
   async accumulator(accumulatorId) {

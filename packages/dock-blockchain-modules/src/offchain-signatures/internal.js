@@ -44,6 +44,10 @@ export default class DockInternalOffchainSignaturesModule extends injectParams(
 
   static PublicKey = DockOffchainSignaturePublicKey;
 
+  static PublicKeyId = DockPublicKeyId;
+
+  static ParamsId = DockParamsId;
+
   static Params = OffchainSignatureParams;
 
   static ParamsQuery = 'signatureParams';

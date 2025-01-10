@@ -1,8 +1,9 @@
 import {
   parse, validate, stringify, v4,
 } from 'uuid';
+import { sha256 } from 'js-sha256';
 import TypedBytes from './typed-bytes';
-import { normalizeOrConvertStringToU8a } from '../../utils';
+import { normalizeOrConvertStringToU8a, valueNumberOrBytes } from '../../utils';
 
 export default class TypedUUID extends TypedBytes {
   constructor(id) {
@@ -23,6 +24,14 @@ export default class TypedUUID extends TypedBytes {
 
   toJSON() {
     return String(this);
+  }
+
+  static fromDockIdent(dockIdent, prefix = []) {
+    const prefixBytes = normalizeOrConvertStringToU8a(prefix);
+    const identBytes = valueNumberOrBytes(dockIdent);
+    const hash = sha256.digest([...prefixBytes, ...identBytes]);
+
+    return this.fromBytesAdapt(hash);
   }
 
   static fromBytesAdapt(bytesOrString) {

@@ -48,6 +48,10 @@ class DockApiProvider extends AbstractApiProvider {
     );
   }
 
+  async numberToHash(number) {
+    return await this.dock.blockNumberToHash(number);
+  }
+
   async withDidNonce(did, fn) {
     if (typeof this.dock.withDidNonce === 'function') {
       return await this.dock.withDidNonce(did, fn);

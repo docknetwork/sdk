@@ -102,7 +102,7 @@ export const BBS = {
       Bls12381BBSSignatureProofDock2023
     ),
   SigType: "Bls12381BBSSignatureDock2023",
-  Context: "https://ld.dock.io/security/bbs23/v1",
+  Context: "https://ld.truvera.io/security/bbs23/v1",
   VerKey: "Bls12381BBSVerificationKeyDock2023",
   getParamsByDid: (api, did) => api.rpc.core_mods.bbsParamsByDid(did),
   getPublicKeyWithParamsByStorageKey: (api, storageKey) =>
@@ -127,7 +127,7 @@ export const BBSPlus = {
     Bls12381BBSSignatureProofDock2022.derivedToAnoncredsPresentation.bind(
       Bls12381BBSSignatureProofDock2022
     ),
-  Context: "https://ld.dock.io/security/bbs/v1",
+  Context: "https://ld.truvera.io/security/bbs/v1",
   VerKey: "Bls12381G2VerificationKeyDock2022",
   SigType: "Bls12381BBS+SignatureDock2022",
   getParamsByDid: (api, did) => api.rpc.core_mods.bbsPlusParamsByDid(did),
@@ -154,7 +154,7 @@ export const PS = {
       Bls12381PSSignatureProofDock2023
     ),
   SigType: "Bls12381PSSignatureDock2023",
-  Context: "https://ld.dock.io/security/ps/v1",
+  Context: "https://ld.truvera.io/security/ps/v1",
   VerKey: "Bls12381PSVerificationKeyDock2023",
   getParamsByDid: (api, did) => api.rpc.core_mods.psParamsByDid(did),
   getPublicKeyWithParamsByStorageKey: (api, storageKey) =>
@@ -181,7 +181,7 @@ export const BBDT16 = {
       Bls12381BBDT16MACProofDock2024
     ),
   SigType: "Bls12381BBDT16MACDock2024",
-  Context: "https://ld.dock.io/security/bbdt16/v1",
+  Context: "https://ld.truvera.io/security/bbdt16/v1",
   VerKey: undefined,
   getParamsByDid: (_, __) => undefined,
   getPublicKeyWithParamsByStorageKey: (_, __) => undefined,

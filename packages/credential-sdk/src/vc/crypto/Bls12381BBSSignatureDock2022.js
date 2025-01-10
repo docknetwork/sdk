@@ -29,7 +29,7 @@ export default class Bls12381BBSSignatureDock2022 extends DockCryptoSignature {
       },
       Bls12381BBSSigDockSigName,
       Bls12381G2KeyPairDock2022,
-      'https://ld.dock.io/security/bbs/v1',
+      'https://ld.truvera.io/security/bbs/v1',
     );
   }
 }

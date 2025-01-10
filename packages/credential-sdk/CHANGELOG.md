@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.23.0
+
+### Minor Changes
+
+- ld.dock.io -> ld.truvera.io
+
 ## 0.22.0
 
 ### Minor Changes

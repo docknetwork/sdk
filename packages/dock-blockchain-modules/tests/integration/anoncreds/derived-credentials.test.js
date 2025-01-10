@@ -55,7 +55,7 @@ import {
 import { DockCoreModules } from "../../../src";
 
 // TODO: move to fixtures
-const id = "https://ld.dock.io/examples/resident-card-schema.json";
+const id = "https://ld.truvera.io/examples/resident-card-schema.json";
 const residentCardSchema = {
   $schema: "http://json-schema.org/draft-07/schema#",
   $id: id,

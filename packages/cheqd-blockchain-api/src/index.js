@@ -160,7 +160,6 @@ export class CheqdAPI extends AbstractApiProvider {
    */
   async disconnect() {
     this.ensureInitialized();
-
     delete this.sdk;
 
     return this;
@@ -181,6 +180,7 @@ export class CheqdAPI extends AbstractApiProvider {
    * @returns {Promise<Uint8Array>}
    */
   async stateChangeBytes(method, payload) {
+    this.ensureInitialized();
     const { [method]: Payloads } = this.constructor.Payloads;
     if (Payloads == null) {
       throw new Error(
@@ -212,6 +212,7 @@ export class CheqdAPI extends AbstractApiProvider {
    * @returns {Promise<*>}
    */
   async signAndSend(tx, { from, fee, memo } = {}) {
+    this.ensureInitialized();
     const { PayloadWrappers, Prefixes, Fees } = this.constructor;
     const { typeUrl } = tx;
 

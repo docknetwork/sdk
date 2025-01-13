@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.23.0
+
+### Minor Changes
+
+- Align with the latest `cheqd` node version (`3.1.1`)
+
 ## 0.22.0
 
 ### Minor Changes

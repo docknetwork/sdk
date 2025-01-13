@@ -1,4 +1,4 @@
-import { DidKeypair, Ed25519Keypair } from '../../keypairs';
+import { DidKeypair, Ed25519Keypair } from "../../keypairs";
 import {
   BBSParams,
   BBSParamsValue,
@@ -14,23 +14,21 @@ import {
   PSParamsValue,
   PSPublicKey,
   PSPublicKeyValue,
-} from '../../types';
-import { testIf } from './common';
-import { TypedBytes } from '../../types/generic';
-import { stringToU8a } from '../../utils';
+} from "../../types";
+import { testIf } from "./common";
+import { TypedBytes } from "../../types/generic";
+import { stringToU8a } from "../../utils";
 
 // eslint-disable-next-line jest/no-export
 export default function generateOffchainSignatureModuleTests(
-  {
-    did: didModule, offchainSignatures, bbs, bbsPlus, ps,
-  },
+  { did: didModule, offchainSignatures, bbs, bbsPlus, ps },
   { DID, OffchainSignaturesParamsRef },
-  filter = () => true,
+  filter = () => true
 ) {
   const test = testIf(filter);
 
   describe(`Checks ${didModule.constructor.name} and ${offchainSignatures.constructor.name} with all public keys and params`, () => {
-    test('Generates a `DIDDocument` with `OffchainPublicKey` and creates a `OffchainParameters` owned by this DID', async () => {
+    test("Generates a `DIDDocument` with `OffchainPublicKey` and creates a `OffchainParameters` owned by this DID", async () => {
       const did = DID.random();
 
       const keyPair = Ed25519Keypair.random();
@@ -38,51 +36,51 @@ export default function generateOffchainSignatureModuleTests(
 
       await didModule.createDocument(
         DIDDocument.create(did, [didKeypair.didKey()]),
-        didKeypair,
+        didKeypair
       );
 
       const bbsParamsId = await offchainSignatures.nextParamsId(did);
       const bbsParamsRef = new OffchainSignaturesParamsRef(did, bbsParamsId);
       const bbsParams = new BBSParams(
-        new BBSParamsValue(TypedBytes.random(100), stringToU8a('bbs')),
+        new BBSParamsValue(TypedBytes.random(100), stringToU8a("bbs"))
       );
       await offchainSignatures.addParams(
         bbsParamsId,
         bbsParams,
         did,
-        didKeypair,
+        didKeypair
       );
 
       const bbsPlusParamsId = await offchainSignatures.nextParamsId(did);
       const bbsPlusParamsRef = new OffchainSignaturesParamsRef(
         did,
-        bbsPlusParamsId,
+        bbsPlusParamsId
       );
       const bbsPlusParams = new BBSPlusParams(
-        new BBSPlusParamsValue(TypedBytes.random(100), stringToU8a('bbs+')),
+        new BBSPlusParamsValue(TypedBytes.random(100), stringToU8a("bbs+"))
       );
       await offchainSignatures.addParams(
         bbsPlusParamsId,
         bbsPlusParams,
         did,
-        didKeypair,
+        didKeypair
       );
 
       const psParamsId = await offchainSignatures.nextParamsId(did);
       const psParamsRef = new OffchainSignaturesParamsRef(did, psParamsId);
       const psParams = new PSParams(
-        new PSParamsValue(TypedBytes.random(100), stringToU8a('ps')),
+        new PSParamsValue(TypedBytes.random(100), stringToU8a("ps"))
       );
       await offchainSignatures.addParams(psParamsId, psParams, did, didKeypair);
 
       const bbsKey = new BBSPublicKey(
-        new BBSPublicKeyValue(TypedBytes.random(100), bbsParamsRef),
+        new BBSPublicKeyValue(TypedBytes.random(100), bbsParamsRef)
       );
       const bbsPlusKey = new BBSPlusPublicKey(
-        new BBSPlusPublicKeyValue(TypedBytes.random(100), bbsPlusParamsRef),
+        new BBSPlusPublicKeyValue(TypedBytes.random(100), bbsPlusParamsRef)
       );
       const psKey = new PSPublicKey(
-        new PSPublicKeyValue(TypedBytes.random(1000), psParamsRef),
+        new PSPublicKeyValue(TypedBytes.random(1000), psParamsRef)
       );
 
       const document = DIDDocument.create(did, [
@@ -92,30 +90,32 @@ export default function generateOffchainSignatureModuleTests(
         new DidKey(psKey),
       ]);
 
+      console.log(JSON.stringify(document.toCheqd().toJSON(), null, 2));
+
       await didModule.updateDocument(document, didKeypair);
 
       expect((await didModule.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
+        document.toJSON()
       );
 
       expect(
-        (await offchainSignatures.getParams(did, bbsParamsId)).toJSON(),
+        (await offchainSignatures.getParams(did, bbsParamsId)).toJSON()
       ).toEqual(bbsParams.toJSON());
       expect(
-        (await offchainSignatures.getParams(did, bbsPlusParamsId)).toJSON(),
+        (await offchainSignatures.getParams(did, bbsPlusParamsId)).toJSON()
       ).toEqual(bbsPlusParams.toJSON());
       expect(
-        (await offchainSignatures.getParams(did, psParamsId)).toJSON(),
+        (await offchainSignatures.getParams(did, psParamsId)).toJSON()
       ).toEqual(psParams.toJSON());
 
       expect(
-        (await offchainSignatures.getAllParamsByDid(did)).toJSON().sort(),
+        (await offchainSignatures.getAllParamsByDid(did)).toJSON().sort()
       ).toEqual(
         [
           [bbsParamsId.toJSON(), bbsParams.toJSON()],
           [bbsPlusParamsId.toJSON(), bbsPlusParams.toJSON()],
           [psParamsId.toJSON(), psParams.toJSON()],
-        ].sort(),
+        ].sort()
       );
 
       expect((await bbsKey.withParams(offchainSignatures)).toJSON()).toEqual({
@@ -123,7 +123,7 @@ export default function generateOffchainSignatureModuleTests(
       });
 
       expect(
-        (await bbsPlusKey.withParams(offchainSignatures)).toJSON(),
+        (await bbsPlusKey.withParams(offchainSignatures)).toJSON()
       ).toEqual({
         bbsPlus: {
           ...bbsPlusKey.toJSON().bbsPlus,
@@ -139,7 +139,7 @@ export default function generateOffchainSignatureModuleTests(
       });
     });
 
-    test('Returns `null` in case of missing params', async () => {
+    test("Returns `null` in case of missing params", async () => {
       const did = DID.random();
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
@@ -151,17 +151,19 @@ export default function generateOffchainSignatureModuleTests(
 
       await didModule.createDocument(document, didKeypair);
       const psKey = new PSPublicKey(
-        new PSPublicKeyValue(TypedBytes.random(1000), psParamsRef),
+        new PSPublicKeyValue(TypedBytes.random(1000), psParamsRef)
       );
 
       expect(
         await offchainSignatures.getParams(
           did,
-          await offchainSignatures.nextParamsId(did),
-        ),
+          await offchainSignatures.nextParamsId(did)
+        )
       ).toBe(null);
 
-      await expect(() => psKey.withParams(offchainSignatures)).rejects.toThrow();
+      await expect(() =>
+        psKey.withParams(offchainSignatures)
+      ).rejects.toThrow();
     });
   });
 
@@ -184,7 +186,7 @@ export default function generateOffchainSignatureModuleTests(
   ];
 
   describe.each(cases)(
-    'Checks basic workflow for each module',
+    "Checks basic workflow for each module",
     ({ module, PublicKey, Params }) => {
       test(`Generates a \`DIDDocument\` with \`OffchainPublicKey\` and creates a \`OffchainParameters\` owned by this DID using ${module.constructor.name} with ${PublicKey.name} and ${Params.name}`, async () => {
         const did = DID.random();
@@ -194,7 +196,7 @@ export default function generateOffchainSignatureModuleTests(
 
         await didModule.createDocument(
           DIDDocument.create(did, [didKeypair.didKey()]),
-          didKeypair,
+          didKeypair
         );
 
         const id = await offchainSignatures.nextParamsId(did);
@@ -202,8 +204,8 @@ export default function generateOffchainSignatureModuleTests(
         const params = new Params(
           new Params.Class(
             TypedBytes.random(100),
-            stringToU8a(module.constructor.name),
-          ),
+            stringToU8a(module.constructor.name)
+          )
         );
 
         expect(await module.getParams(did, id)).toEqual(null);
@@ -211,7 +213,7 @@ export default function generateOffchainSignatureModuleTests(
         await module.addParams(id, params, did, didKeypair);
 
         const key = new PublicKey(
-          new PublicKey.Class(TypedBytes.random(100), ref),
+          new PublicKey.Class(TypedBytes.random(100), ref)
         );
 
         const document = DIDDocument.create(did, [
@@ -222,13 +224,13 @@ export default function generateOffchainSignatureModuleTests(
         await didModule.updateDocument(document, didKeypair);
 
         expect((await didModule.getDocument(did)).toJSON()).toEqual(
-          document.toJSON(),
+          document.toJSON()
         );
 
         expect((await module.getParams(did, id)).toJSON()).toEqual(
-          params.toJSON(),
+          params.toJSON()
         );
       });
-    },
+    }
   );
 }

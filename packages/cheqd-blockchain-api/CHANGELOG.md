@@ -1,5 +1,16 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 0.18.0
+
+### Minor Changes
+
+- Align with the latest `cheqd` node version (`3.1.1`)
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.23.0
+
 ## 0.17.0
 
 - Implementation of the `cheqd` migration and the associated identifier mappers.

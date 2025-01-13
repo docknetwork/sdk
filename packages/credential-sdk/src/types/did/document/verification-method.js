@@ -8,6 +8,7 @@ import {
   withProp,
   TypedNumber,
   Any,
+  withBase58btc,
 } from '../../generic';
 import {
   BBDT16PublicKey,
@@ -56,11 +57,11 @@ import {
   filterObj,
   ensureEqualToOrPrototypeOf,
   maybeToCheqdPayloadOrJSON,
-  u8aToString,
-  encodeAsBase58,
 } from '../../../utils';
 
 export class PublicKeyBase58 extends withBase58(TypedBytes) {}
+
+export class PublicKeyBase64 extends withBase58btc(TypedBytes) {}
 
 export class PublicKeyMetadata extends withFrom(TypedStruct, (value, from) => {
   const self = from(value);
@@ -103,7 +104,7 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (
     type: VerificationMethodType,
     controller: NamespaceDid,
     publicKeyBase58: option(PublicKeyBase58),
-    publicKeyBase64: option(TypedBytes),
+    publicKeyBase64: option(PublicKeyBase64),
     publicKeyJwk: option(TypedString),
     publicKeyHex: option(TypedBytes),
     metadata: option(PublicKeyMetadata),
@@ -246,47 +247,14 @@ export class CheqdVerificationMethod extends withFrom(
   }
 
   toCheqdPayload() {
-    const payload = filterObj(
+    return filterObj(
       this.apply(maybeToCheqdPayloadOrJSON),
-      (key, value) => key !== 'metadata' && value != null,
+      (_, value) => value != null,
     );
-
-    const verMethod = this.toVerificationMethod();
-
-    if (verMethod.isOffchain()) {
-      const pk = verMethod.publicKey();
-
-      if (pk.value.paramsRef != null || pk.value.participantId != null) {
-        payload.verificationMaterial = encodeAsBase58(pk.toJSONStringBytes());
-      }
-    }
-
-    return payload;
   }
 }
 
-export class CheqdVerificationMethodAssertion extends withFrom(
-  CheqdVerificationMethod,
-  (value, from) => {
-    const self = from(value);
-    const verMethod = self.toVerificationMethod();
-
-    if (verMethod.isOffchain()) {
-      let json;
-      try {
-        json = JSON.parse(u8aToString(verMethod.publicKeyBytes()));
-      } catch {
-        return self;
-      }
-
-      const pk = verMethod.publicKeyClass().from(json);
-      self.verificationMaterial = valueBytes(pk.bytes);
-      self.metadata = pk.value;
-    }
-
-    return self;
-  },
-) {
+export class CheqdVerificationMethodAssertion extends CheqdVerificationMethod {
   toCheqdPayload() {
     return JSON.stringify(JSON.stringify(super.toCheqdPayload()));
   }

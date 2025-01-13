@@ -646,10 +646,9 @@ export default class Migration {
       const cheqdDoc = document
         .setAttests(null)
         .toCheqd(this.types.DidDocument);
+      document.setAttests(attests);
 
       yield await this.modules.did.createDocumentTx(cheqdDoc, keypair);
-
-      document.setAttests(attests);
 
       const created = await this.modules.did.getDocument(cheqdDid);
       if (

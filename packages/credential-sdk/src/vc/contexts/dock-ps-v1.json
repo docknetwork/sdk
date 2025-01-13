@@ -3,7 +3,7 @@
     "@version": 1.1,
     "id": "@id",
     "type": "@type",
-    "dockPS": "https://ld.dock.io/dock-ps",
+    "dockPS": "https://ld.truvera.io/dock-ps",
     "parsingOptions": {
       "@id": "dockPS:parsingOptions",
       "@type": "@id",
@@ -50,65 +50,65 @@
       "@container": "@graph"
     },
     "DockVBAccumulator2022": {
-      "@id": "https://ld.dock.io/security#DockVBAccumulator2022",
+      "@id": "https://ld.truvera.io/security#DockVBAccumulator2022",
       "@context": {
         "@version": 1.1,
         "@protected": true,
         "id": "@id",
         "type": "@type",
-        "accumulated": "https://ld.dock.io/security#accumulated",
-        "revocationCheck": "https://ld.dock.io/security#revocationCheck",
-        "revocationId": "https://ld.dock.io/security#revocationId",
+        "accumulated": "https://ld.truvera.io/security#accumulated",
+        "revocationCheck": "https://ld.truvera.io/security#revocationCheck",
+        "revocationId": "https://ld.truvera.io/security#revocationId",
         "extra": {
-          "@id": "https://ld.dock.io/security#extra",
-          "@context": { "@vocab": "https://ld.dock.io/security/extra" }
+          "@id": "https://ld.truvera.io/security#extra",
+          "@context": { "@vocab": "https://ld.truvera.io/security/extra" }
         }
       }
     },
     "DockKBUniversalAccumulator2024": {
-      "@id": "https://ld.dock.io/security#DockKBUniversalAccumulator2024",
+      "@id": "https://ld.truvera.io/security#DockKBUniversalAccumulator2024",
       "@context": {
         "@version": 1.1,
         "@protected": true,
         "id": "@id",
         "type": "@type",
-        "accumulated": "https://ld.dock.io/security#accumulated",
-        "revocationCheck": "https://ld.dock.io/security#revocationCheck",
-        "revocationId": "https://ld.dock.io/security#revocationId",
+        "accumulated": "https://ld.truvera.io/security#accumulated",
+        "revocationCheck": "https://ld.truvera.io/security#revocationCheck",
+        "revocationId": "https://ld.truvera.io/security#revocationId",
         "extra": {
-          "@id": "https://ld.dock.io/security#extra",
-          "@context": { "@vocab": "https://ld.dock.io/security/extra" }
+          "@id": "https://ld.truvera.io/security#extra",
+          "@context": { "@vocab": "https://ld.truvera.io/security/extra" }
         }
       }
     },
     "Bls12381PSSignatureProofDock2023": {
-      "@id": "https://ld.dock.io/security#Bls12381PSSignatureDock2023",
+      "@id": "https://ld.truvera.io/security#Bls12381PSSignatureDock2023",
       "@context": {
         "@version": 1.1,
         "@protected": true,
         "id": "@id",
         "type": "@type",
-        "challenge": "https://ld.dock.io/security#challenge",
+        "challenge": "https://ld.truvera.io/security#challenge",
         "created": {
           "@id": "http://purl.org/dc/terms/created",
           "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
         },
-        "domain": "https://ld.dock.io/security#domain",
-        "context": "https://ld.dock.io/security#context",
+        "domain": "https://ld.truvera.io/security#domain",
+        "context": "https://ld.truvera.io/security#context",
         "bounds": {
-          "@id": "https://ld.dock.io/security#bounds",
-          "@context": { "@vocab": "https://ld.dock.io/security/bounds" }
+          "@id": "https://ld.truvera.io/security#bounds",
+          "@context": { "@vocab": "https://ld.truvera.io/security/bounds" }
         },
-        "sigType": "https://ld.dock.io/security#sigType",
-        "boundedPseudonyms": "https://ld.dock.io/security#boundedPseudonyms",
-        "unboundedPseudonyms": "https://ld.dock.io/security#unboundedPseudonyms",
-        "attributeCiphertexts": "https://ld.dock.io/security#attributeCiphertexts",
-        "attributeEqualities": "https://ld.dock.io/security#attributeEqualities",
-        "accumulated": "https://ld.dock.io/security#accumulated",
-        "proofValue": "https://ld.dock.io/security#proofValue",
-        "nonce": "https://ld.dock.io/security#nonce",
+        "sigType": "https://ld.truvera.io/security#sigType",
+        "boundedPseudonyms": "https://ld.truvera.io/security#boundedPseudonyms",
+        "unboundedPseudonyms": "https://ld.truvera.io/security#unboundedPseudonyms",
+        "attributeCiphertexts": "https://ld.truvera.io/security#attributeCiphertexts",
+        "attributeEqualities": "https://ld.truvera.io/security#attributeEqualities",
+        "accumulated": "https://ld.truvera.io/security#accumulated",
+        "proofValue": "https://ld.truvera.io/security#proofValue",
+        "nonce": "https://ld.truvera.io/security#nonce",
         "proofPurpose": {
-          "@id": "https://ld.dock.io/security#proofPurpose",
+          "@id": "https://ld.truvera.io/security#proofPurpose",
           "@type": "@vocab",
           "@context": {
             "@version": 1.1,
@@ -116,40 +116,40 @@
             "id": "@id",
             "type": "@type",
             "assertionMethod": {
-              "@id": "https://ld.dock.io/security#assertionMethod",
+              "@id": "https://ld.truvera.io/security#assertionMethod",
               "@type": "@id",
               "@container": "@set"
             },
             "authentication": {
-              "@id": "https://ld.dock.io/security#authenticationMethod",
+              "@id": "https://ld.truvera.io/security#authenticationMethod",
               "@type": "@id",
               "@container": "@set"
             }
           }
         },
         "verificationMethod": {
-          "@id": "https://ld.dock.io/security#verificationMethod",
+          "@id": "https://ld.truvera.io/security#verificationMethod",
           "@type": "@id"
         }
       }
     },
     "Bls12381PSSignatureDock2023": {
-      "@id": "https://ld.dock.io/security#Bls12381PSSignatureDock2023",
+      "@id": "https://ld.truvera.io/security#Bls12381PSSignatureDock2023",
       "@context": {
         "@version": 1.1,
         "@protected": true,
         "id": "@id",
         "type": "@type",
-        "challenge": "https://ld.dock.io/security#challenge",
+        "challenge": "https://ld.truvera.io/security#challenge",
         "created": {
           "@id": "http://purl.org/dc/terms/created",
           "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
         },
-        "domain": "https://ld.dock.io/security#domain",
-        "proofValue": "https://ld.dock.io/security#proofValue",
-        "nonce": "https://ld.dock.io/security#nonce",
+        "domain": "https://ld.truvera.io/security#domain",
+        "proofValue": "https://ld.truvera.io/security#proofValue",
+        "nonce": "https://ld.truvera.io/security#nonce",
         "proofPurpose": {
-          "@id": "https://ld.dock.io/security#proofPurpose",
+          "@id": "https://ld.truvera.io/security#proofPurpose",
           "@type": "@vocab",
           "@context": {
             "@version": 1.1,
@@ -157,58 +157,58 @@
             "id": "@id",
             "type": "@type",
             "assertionMethod": {
-              "@id": "https://ld.dock.io/security#assertionMethod",
+              "@id": "https://ld.truvera.io/security#assertionMethod",
               "@type": "@id",
               "@container": "@set"
             },
             "authentication": {
-              "@id": "https://ld.dock.io/security#authenticationMethod",
+              "@id": "https://ld.truvera.io/security#authenticationMethod",
               "@type": "@id",
               "@container": "@set"
             }
           }
         },
         "verificationMethod": {
-          "@id": "https://ld.dock.io/security#verificationMethod",
+          "@id": "https://ld.truvera.io/security#verificationMethod",
           "@type": "@id"
         }
       }
     },
     "Bls12381PSKey2023": {
-      "@id": "https://ld.dock.io/security#Bls12381PSKey2023",
+      "@id": "https://ld.truvera.io/security#Bls12381PSKey2023",
       "@context": {
         "@protected": true,
         "id": "@id",
         "type": "@type",
         "controller": {
-          "@id": "https://ld.dock.io/security#controller",
+          "@id": "https://ld.truvera.io/security#controller",
           "@type": "@id"
         },
         "revoked": {
-          "@id": "https://ld.dock.io/security#revoked",
+          "@id": "https://ld.truvera.io/security#revoked",
           "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
         },
         "publicKeyBase58": {
-          "@id": "https://ld.dock.io/security#publicKeyBase58"
+          "@id": "https://ld.truvera.io/security#publicKeyBase58"
         }
       }
     },
     "Bls12381PSKeyPairDock2023": {
-      "@id": "https://ld.dock.io/security#Bls12381PSKeyPairDock2023",
+      "@id": "https://ld.truvera.io/security#Bls12381PSKeyPairDock2023",
       "@context": {
         "@protected": true,
         "id": "@id",
         "type": "@type",
         "controller": {
-          "@id": "https://ld.dock.io/security#controller",
+          "@id": "https://ld.truvera.io/security#controller",
           "@type": "@id"
         },
         "revoked": {
-          "@id": "https://ld.dock.io/security#revoked",
+          "@id": "https://ld.truvera.io/security#revoked",
           "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
         },
         "publicKeyBase58": {
-          "@id": "https://ld.dock.io/security#publicKeyBase58"
+          "@id": "https://ld.truvera.io/security#publicKeyBase58"
         }
       }
     }

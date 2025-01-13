@@ -26,6 +26,13 @@ export default new Map([
   ['https://ld.dock.io/security/bbs23/v1', dockBBS23V1Context],
   ['https://ld.dock.io/security/ps/v1', dockPSV1Context],
   ['https://ld.dock.io/security/bbdt16/v1', dockBBDT16V1Context],
+  ['https://ld.dock.io/private-status-list-21', privateStatusList21Context],
+  ['https://ld.truvera.io/credentials/prettyvc', dockPrettyVCContext],
+  ['https://ld.truvera.io/security/bbs/v1', dockBBSV1Context],
+  ['https://ld.truvera.io/security/bbs23/v1', dockBBS23V1Context],
+  ['https://ld.truvera.io/security/ps/v1', dockPSV1Context],
+  ['https://ld.truvera.io/security/bbdt16/v1', dockBBDT16V1Context],
+  ['https://ld.truvera.io/private-status-list-21', privateStatusList21Context],
   ['https://w3id.org/security/bbs/v1', bbsV1Context],
   ['https://w3c-ccg.github.io/ldp-bbs2020/contexts/v1/', bbsV1Context],
   ['https://www.w3.org/2018/credentials/v1', credV1Context],
@@ -42,7 +49,6 @@ export default new Map([
   ['https://w3id.org/security/suites/jws-2020/v1', jws2020V1Context],
   // This is overridden because the URL is 404 now, likely because domain name change. But the status-list library still uses the old domain name
   ['https://w3id.org/vc/status-list/2021/v1', statusList21Context],
-  ['https://ld.dock.io/private-status-list-21', privateStatusList21Context],
   // Overriden due to 404ing
   [
     'https://sphereon-opensource.github.io/ssi-mobile-wallet/context/sphereon-wallet-identity-v1.jsonld',

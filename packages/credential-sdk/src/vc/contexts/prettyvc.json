@@ -4,7 +4,7 @@
     "id": "@id",
     "type": "@type",
     "PrettyVerifiableCredential": {
-      "@id": "https://ld.dock.io/credentials#PrettyVerifiableCredential",
+      "@id": "https://ld.truvera.io/credentials#PrettyVerifiableCredential",
       "@context": {
         "@version": 1.1,
         "@protected": true,
@@ -19,7 +19,7 @@
             "@protected": true,
             "id": "@id",
             "type": "@type",
-            "prettyCred": "https://ld.dock.io/credentials/prettyvc#",
+            "prettyCred": "https://ld.truvera.io/credentials/prettyvc#",
             "liquid": "prettyCred:liquid",
             "orientation": "prettyCred:orientation",
             "size": "prettyCred:size",

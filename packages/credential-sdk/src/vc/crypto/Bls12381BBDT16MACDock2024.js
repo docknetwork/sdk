@@ -26,7 +26,7 @@ export default class Bls12381BBDT16MACDock2024 extends DockCryptoSignature {
       },
       Bls12381BBDT16MacDockName,
       Bls12381BBDT16KeyPairDock2024,
-      'https://ld.dock.io/security/bbdt16/v1',
+      'https://ld.truvera.io/security/bbdt16/v1',
     );
   }
 

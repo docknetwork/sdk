@@ -1,5 +1,16 @@
 # @docknetwork/dock-blockchain-modules
 
+## 0.13.0
+
+### Minor Changes
+
+- ld.dock.io -> ld.truvera.io
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.23.0
+
 ## 0.12.0
 
 ### Minor Changes

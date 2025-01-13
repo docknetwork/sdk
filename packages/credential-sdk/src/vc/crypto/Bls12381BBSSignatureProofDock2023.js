@@ -20,7 +20,7 @@ export default class Bls12381BBSSignatureProofDock2023 extends DockCryptoSignatu
       options,
       Bls12381BBS23SigProofDockSigName,
       Bls12381BBSKeyPairDock2023,
-      'https://ld.dock.io/security/bbs23/v1',
+      'https://ld.truvera.io/security/bbs23/v1',
     );
   }
 }

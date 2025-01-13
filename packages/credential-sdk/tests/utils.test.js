@@ -293,7 +293,7 @@ describe("Detecting accumulator status", () => {
       "@context": [
         "https://www.w3.org/2018/credentials/v1",
         {
-          dk: "https://ld.dock.io/credentials#",
+          dk: "https://ld.truvera.io/credentials#",
           PermanentResidentCard: "dk:PermanentResidentCard",
           PermanentResident: "dk:PermanentResident",
           Person: "dk:Person",

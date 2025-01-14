@@ -246,6 +246,10 @@ export class CheqdVerificationMethod extends withFrom(
     );
   }
 
+  toJSON() {
+    return filterObj(super.toJSON(), (_, value) => value != null);
+  }
+
   toCheqdPayload() {
     return filterObj(
       this.apply(maybeToCheqdPayloadOrJSON),

@@ -4,7 +4,7 @@
 
 ### Minor Changes
 
-- Align with the latest `cheqd` node version (`3.1.1`)
+- Align with the latest `cheqd` node version (`3.1.3`)
 
 ### Patch Changes
 

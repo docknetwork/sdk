@@ -19,6 +19,8 @@ import {
   PSPublicKey,
   CurveType,
   CurveTypeBls12381,
+  CheqdTestnetOffchainSignatureParamsRef,
+  CheqdMainnetOffchainSignatureParamsRef,
 } from '../../offchain-signatures';
 import {
   PublicKeyEd25519,
@@ -95,8 +97,29 @@ export class CheqdPublicKeyMetadata extends withProp(
   CheqdOffchainSignatureParamsRef,
 ) {}
 
-// eslint-disable-next-line no-use-before-define
-export class VerificationMethod extends withFrom(TypedStruct, function (value, from) { return from(value instanceof CheqdVerificationMethod ? value.toVerificationMethod(this) : value); }) {
+export class CheqdTestnetPublicKeyMetadata extends withProp(
+  PublicKeyMetadata,
+  'paramsRef',
+  CheqdTestnetOffchainSignatureParamsRef,
+) {}
+
+export class CheqdMainnetPublicKeyMetadata extends withProp(
+  PublicKeyMetadata,
+  'paramsRef',
+  CheqdMainnetOffchainSignatureParamsRef,
+) {}
+
+export class VerificationMethod extends withFrom(
+  TypedStruct,
+  function (value, from) {
+    return from(
+      // eslint-disable-next-line no-use-before-define
+      value instanceof CheqdVerificationMethod
+        ? value.toVerificationMethod(this)
+        : value,
+    );
+  },
+) {
   static Classes = {
     id: VerificationMethodRef,
     type: VerificationMethodType,
@@ -215,7 +238,11 @@ export class VerificationMethod extends withFrom(TypedStruct, function (value, f
 
 export class CheqdVerificationMethod extends withFrom(
   TypedStruct,
-  function (value, from) { return from(value instanceof VerificationMethod ? value.toCheqd(this) : value); },
+  function (value, from) {
+    return from(
+      value instanceof VerificationMethod ? value.toCheqd(this) : value,
+    );
+  },
 ) {
   static Classes = {
     id: CheqdVerificationMethodRef,
@@ -258,13 +285,13 @@ export class CheqdVerificationMethod extends withFrom(
   }
 }
 
-export class CheqdVerificationMethodAssertion extends VerificationMethod {
+export class CheqdVerificationMethodAssertion extends withProp(
+  VerificationMethod,
+  'metadata',
+  option(CheqdPublicKeyMetadata),
+) {
   toCheqdPayload() {
     return JSON.stringify(JSON.stringify(super.toCheqdPayload()));
-  }
-
-  toJSON() {
-    return this.toCheqdPayload();
   }
 
   static from(obj) {
@@ -275,15 +302,23 @@ export class CheqdVerificationMethodAssertion extends VerificationMethod {
 }
 
 export class CheqdTestnetVerificationMethod extends withProp(
-  withProp(CheqdVerificationMethod, 'id', CheqdTestnetVerificationMethodRef),
-  'controller',
-  CheqdTestnetDid,
+  withProp(
+    withProp(CheqdVerificationMethod, 'id', CheqdTestnetVerificationMethodRef),
+    'controller',
+    CheqdTestnetDid,
+  ),
+  'metadata',
+  option(CheqdTestnetPublicKeyMetadata),
 ) {}
 
 export class CheqdMainnetVerificationMethod extends withProp(
-  withProp(CheqdVerificationMethod, 'id', CheqdMainnetVerificationMethodRef),
-  'controller',
-  CheqdMainnetDid,
+  withProp(
+    withProp(CheqdVerificationMethod, 'id', CheqdMainnetVerificationMethodRef),
+    'controller',
+    CheqdMainnetDid,
+  ),
+  'metadata',
+  option(CheqdMainnetPublicKeyMetadata),
 ) {}
 
 export class CheqdTestnetVerificationMethodAssertion extends withProp(

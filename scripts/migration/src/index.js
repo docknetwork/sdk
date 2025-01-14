@@ -1,7 +1,11 @@
 import { DockAPI } from '@docknetwork/dock-blockchain-api';
 import { Ed25519Keypair } from '@docknetwork/credential-sdk/keypairs';
 import { CheqdAPI, CheqdNetwork } from '@docknetwork/cheqd-blockchain-api';
-import { maybeToJSONString, timeout } from '@docknetwork/credential-sdk/utils';
+import {
+  maybeToJSONString,
+  timeout,
+  maybeToCheqdPayloadOrJSON,
+} from '@docknetwork/credential-sdk/utils';
 
 import pLimit from 'p-limit';
 import { checkBalance } from '@cheqd/sdk';
@@ -198,17 +202,19 @@ async function main() {
       return await cheqd.signAndSend(tx);
     };
     const handleTxError = async (err, tx) => {
-      err.message = `Failed to execute transaction ${maybeToJSONString(tx)}: ${
-        err.message
-      }`;
+      err.message = `Failed to execute transaction ${JSON.stringify(
+        maybeToCheqdPayloadOrJSON(tx),
+      )}: ${err.message}`;
 
       if (err.message.includes('account sequence mismatch')) {
       } else if (err.message.includes('fetch failed')) {
-        cheqd = await new CheqdAPI().init({
-          url: CHEQD_ENDPOINT,
-          network: CheqdNetwork.Testnet,
-          wallet: cheqds.wallets[idx],
-        });
+        await loopWithCatch(async () => {
+          cheqd = await new CheqdAPI().init({
+            url: CHEQD_ENDPOINT,
+            network: CheqdNetwork.Testnet,
+            wallet: cheqds.wallets[idx],
+          });
+        }, console.error);
       } else if (
         err.message.includes('DID Doc exists')
         || err.message.includes('Resource exists')
@@ -244,7 +250,7 @@ async function main() {
             network: CheqdNetwork.Testnet,
             wallet: cheqds.wallets[idx],
           });
-        }, console.error)
+        }, console.error);
       } else {
         throw err;
       }

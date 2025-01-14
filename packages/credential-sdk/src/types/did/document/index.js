@@ -424,19 +424,13 @@ export class CheqdDIDDocument extends TypedStruct {
     } = this;
 
     const assertionMethodOffchainKeys = [...assertionMethod]
-      .map((keyRefOrKey) => (keyRefOrKey instanceof CheqdVerificationMethod
-        ? keyRefOrKey.toVerificationMethod()
-        : null))
-      .filter(Boolean);
+      .filter((keyRefOrKey) => keyRefOrKey.id);
     const verificationMethodWithOffchainKeys = [
       ...verificationMethod,
       ...assertionMethodOffchainKeys,
     ];
     const assertionMethodOnlyRefs = [...assertionMethod]
-      .map((keyRefOrKey) => (keyRefOrKey instanceof CheqdVerificationMethod
-        ? keyRefOrKey.id
-        : keyRefOrKey))
-      .filter(Boolean);
+      .map((keyRefOrKey) => keyRefOrKey.id ?? keyRefOrKey);
 
     return new DIDDocument(
       context,

@@ -96,9 +96,7 @@ export class CheqdPublicKeyMetadata extends withProp(
 ) {}
 
 // eslint-disable-next-line no-use-before-define
-export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (value instanceof CheqdVerificationMethod
-  ? value.toVerificationMethod()
-  : from(value))) {
+export class VerificationMethod extends withFrom(TypedStruct, function (value, from) { return from(value instanceof CheqdVerificationMethod ? value.toVerificationMethod(this) : value); }) {
   static Classes = {
     id: VerificationMethodRef,
     type: VerificationMethodType,
@@ -206,17 +204,18 @@ export class VerificationMethod extends withFrom(TypedStruct, (value, from) => (
   toJSON() {
     return filterObj(super.toJSON(), (_, value) => value != null);
   }
+
+  toCheqdPayload() {
+    return filterObj(
+      this.apply(maybeToCheqdPayloadOrJSON),
+      (_, value) => value != null,
+    );
+  }
 }
 
 export class CheqdVerificationMethod extends withFrom(
   TypedStruct,
-  function fromFn(value, from) {
-    if (value instanceof VerificationMethod) {
-      return from(value.toCheqd(this));
-    } else {
-      return from(value);
-    }
-  },
+  function (value, from) { return from(value instanceof VerificationMethod ? value.toCheqd(this) : value); },
 ) {
   static Classes = {
     id: CheqdVerificationMethodRef,
@@ -233,8 +232,8 @@ export class CheqdVerificationMethod extends withFrom(
     );
   }
 
-  toVerificationMethod() {
-    return new VerificationMethod(
+  toVerificationMethod(VerMethod = VerificationMethod) {
+    return new (ensureEqualToOrPrototypeOf(VerificationMethod, VerMethod))(
       this.id,
       this.verificationMethodType,
       this.controller,
@@ -250,6 +249,7 @@ export class CheqdVerificationMethod extends withFrom(
     return filterObj(super.toJSON(), (_, value) => value != null);
   }
 
+  // eslint-disable-next-line sonarjs/no-identical-functions
   toCheqdPayload() {
     return filterObj(
       this.apply(maybeToCheqdPayloadOrJSON),
@@ -258,7 +258,7 @@ export class CheqdVerificationMethod extends withFrom(
   }
 }
 
-export class CheqdVerificationMethodAssertion extends CheqdVerificationMethod {
+export class CheqdVerificationMethodAssertion extends VerificationMethod {
   toCheqdPayload() {
     return JSON.stringify(JSON.stringify(super.toCheqdPayload()));
   }

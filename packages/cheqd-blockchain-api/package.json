@@ -33,7 +33,7 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
-    "@cheqd/sdk": "cjs",
+    "@cheqd/sdk": "5.0.1",
     "@docknetwork/credential-sdk": "0.23.0"
   },
   "devDependencies": {

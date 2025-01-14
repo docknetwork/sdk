@@ -238,11 +238,13 @@ async function main() {
       ) {
         console.error(err);
       } else if (err.message.includes('fetch failed')) {
-        cheqd = await new CheqdAPI().init({
-          url: CHEQD_ENDPOINT,
-          network: CheqdNetwork.Testnet,
-          wallet: cheqds.wallets[idx],
-        });
+        await loopWithCatch(async () => {
+          cheqd = await new CheqdAPI().init({
+            url: CHEQD_ENDPOINT,
+            network: CheqdNetwork.Testnet,
+            wallet: cheqds.wallets[idx],
+          });
+        }, console.error)
       } else {
         throw err;
       }

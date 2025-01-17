@@ -206,7 +206,7 @@ export const withTimeout = async (
  * `onError` callback will be called once an error is encountered, and it can be
  * - resolved to some value, so the underlying promise will be resolved
  * - rejected, so then underlying promise will be rejected
- * - resolved to `RETRY_SYM` (second argument), so the retries will be continued
+ * - resolved to `CONTINUE_SYM` (second argument), so the retries will be continued
  *
  * @template T
  * @param {function(): Promise<T>} fn
@@ -214,8 +214,8 @@ export const withTimeout = async (
  * @param {object} [params={}]
  * @param {number} [params.delay=null]
  * @param {number} [params.maxAttempts=Infinity]
- * @param {function(RETRY_SYM): Promise<T | RETRY_SYM>} [params.onTimeoutExceeded=null]
- * @param {function(Error, RETRY_SYM): Promise<T | RETRY_SYM>} [params.onError=null]
+ * @param {function(CONTINUE_SYM): Promise<T | CONTINUE_SYM>} [params.onTimeoutExceeded=null]
+ * @param {function(Error, CONTINUE_SYM): Promise<T | CONTINUE_SYM>} [params.onError=null]
  * @returns {Promise<T>}
  */
 /* eslint-disable sonarjs/cognitive-complexity */
@@ -229,14 +229,14 @@ export const retry = async (
     onError = null,
   } = {},
 ) => {
-  const RETRY_SYM = Symbol('retry');
+  const CONTINUE_SYM = Symbol('continue');
 
   for (let i = 0; i <= maxAttempts; i++) {
     let timeoutExceeded = false;
     const timerFn = () => {
       timeoutExceeded = true;
 
-      return RETRY_SYM;
+      return CONTINUE_SYM;
     };
 
     let res;
@@ -245,16 +245,16 @@ export const retry = async (
       try {
         res = await withTimeout(fn(), timeLimit, timerFn);
       } catch (error) {
-        res = await onError(error, RETRY_SYM);
+        res = await onError(error, CONTINUE_SYM);
       }
     } else {
       res = await withTimeout(fn(), timeLimit, timerFn);
     }
 
     if (timeoutExceeded && onTimeoutExceeded != null) {
-      res = await onTimeoutExceeded(RETRY_SYM);
+      res = await onTimeoutExceeded(CONTINUE_SYM);
     }
-    if (res !== RETRY_SYM) {
+    if (res !== CONTINUE_SYM) {
       return res;
     } else if (delay != null) {
       await timeout(delay);

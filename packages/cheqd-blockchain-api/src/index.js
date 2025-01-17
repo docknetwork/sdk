@@ -227,7 +227,7 @@ export class CheqdAPI extends AbstractApiProvider {
     const sender = from ?? (await this.sdk.options.wallet.getAccounts())[0].address;
     const payment = {
       amount: [amount],
-      gas: '3600000', // TODO: dynamically calculate needed amount
+      gas: '1200000', // TODO: dynamically calculate needed amount
       payer: sender,
     };
 

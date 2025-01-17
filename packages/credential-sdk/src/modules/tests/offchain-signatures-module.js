@@ -82,7 +82,7 @@ export default function generateOffchainSignatureModuleTests(
         new BBSPlusPublicKeyValue(TypedBytes.random(100), bbsPlusParamsRef),
       );
       const psKey = new PSPublicKey(
-        new PSPublicKeyValue(TypedBytes.random(1000), psParamsRef),
+        new PSPublicKeyValue(TypedBytes.random(100), psParamsRef),
       );
 
       const document = DIDDocument.create(did, [

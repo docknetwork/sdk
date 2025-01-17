@@ -1,14 +1,20 @@
 # @docknetwork/migration
 
+## 0.8.0
+
+### Minor Changes
+
+- Align with the latest `cheqd` node version (`3.1.3`)
+
 ## 0.7.1
 
 ### Patch Changes
 
 - Updated dependencies
-  - @docknetwork/dock-blockchain-modules@0.13.0
+  - @docknetwork/cheqd-blockchain-api@0.18.0
   - @docknetwork/credential-sdk@0.23.0
-  - @docknetwork/cheqd-blockchain-api@0.17.1
   - @docknetwork/dock-blockchain-api@0.9.1
+  - @docknetwork/dock-blockchain-modules@0.12.1
 
 ## 0.7.0
 

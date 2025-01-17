@@ -50,6 +50,7 @@ import {
   CheqdMainnetOffchainSignatureKeyRef,
   CheqdTestnetAccumulator,
   CheqdMainnetAccumulator,
+  DockDidOrDidMethodKey,
 } from '@docknetwork/credential-sdk/types';
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 
@@ -160,7 +161,6 @@ export class CheqdAPI extends AbstractApiProvider {
    */
   async disconnect() {
     this.ensureInitialized();
-
     delete this.sdk;
 
     return this;
@@ -181,6 +181,7 @@ export class CheqdAPI extends AbstractApiProvider {
    * @returns {Promise<Uint8Array>}
    */
   async stateChangeBytes(method, payload) {
+    this.ensureInitialized();
     const { [method]: Payloads } = this.constructor.Payloads;
     if (Payloads == null) {
       throw new Error(
@@ -212,6 +213,7 @@ export class CheqdAPI extends AbstractApiProvider {
    * @returns {Promise<*>}
    */
   async signAndSend(tx, { from, fee, memo } = {}) {
+    this.ensureInitialized();
     const { PayloadWrappers, Prefixes, Fees } = this.constructor;
     const { typeUrl } = tx;
 
@@ -226,7 +228,7 @@ export class CheqdAPI extends AbstractApiProvider {
     const sender = from ?? (await this.sdk.options.wallet.getAccounts())[0].address;
     const payment = {
       amount: [amount],
-      gas: '3600000', // TODO: dynamically calculate needed amount
+      gas: '1200000', // TODO: dynamically calculate needed amount
       payer: sender,
     };
 
@@ -262,6 +264,7 @@ export class CheqdAPI extends AbstractApiProvider {
     return ['cheqd'];
   }
 
+  // eslint-disable-next-line
   supportsIdentifier(id) {
     this.ensureInitialized();
     const { network } = this.sdk.options;
@@ -279,6 +282,19 @@ export class CheqdAPI extends AbstractApiProvider {
     } else if (id instanceof TypedEnum) {
       return this.supportsIdentifier(id.value);
     } else if (String(id).includes(`:cheqd:${network}:`)) {
+      return true;
+    }
+
+    // Dock identifiers
+    if (id instanceof NamespaceDid) {
+      return id.isDock || id.isDidMethodKey;
+    } else if (id instanceof DockDidOrDidMethodKey) {
+      return true;
+    } else if (id instanceof DidRef) {
+      return this.supportsIdentifier(id[0]);
+    } else if (id instanceof TypedEnum) {
+      return this.supportsIdentifier(id.value);
+    } else if (String(id).includes(':dock:')) {
       return true;
     }
 

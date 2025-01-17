@@ -1,5 +1,11 @@
 # @docknetwork/cheqd-blockchain-modules
 
+## 0.15.0
+
+### Minor Changes
+
+- Align with the latest `cheqd` node version (`3.1.3`)
+
 ## 0.14.1
 
 ### Patch Changes

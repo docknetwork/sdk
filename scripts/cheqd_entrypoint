@@ -32,8 +32,8 @@ sed -i 's/"stake"/"ncheq"/' $CHAIN_DIR/config/genesis.json
 # Step 1.b: Configure feemarket
 echo "Configuring feemarket..."
 sed -i 's/"fee_denom": "stake"/"fee_denom": "ncheq"/' $CHAIN_DIR/config/genesis.json
-sed -i 's/"min_base_gas_price": "1.000000000000000000"/"min_base_gas_price": "0.005000000000000000"/' $CHAIN_DIR/config/genesis.json
-sed -i 's/"base_gas_price": "1.000000000000000000"/"base_gas_price": "0.005000000000000000"/' $CHAIN_DIR/config/genesis.json
+sed -i 's/"min_base_gas_price": "1.000000000000000000"/"min_base_gas_price": "0.500000000000000000"/' $CHAIN_DIR/config/genesis.json
+sed -i 's/"base_gas_price": "1.000000000000000000"/"base_gas_price": "0.500000000000000000"/' $CHAIN_DIR/config/genesis.json
 
 # Step 2: Generate a keypair (if it doesn't exist already)
 if [ -z "$CHEQD_MNEMONIC" ]; then

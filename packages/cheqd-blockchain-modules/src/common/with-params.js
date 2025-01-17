@@ -17,10 +17,10 @@ export default function withParams(klass) {
        * @param didKeypair - The signer DID's keypair.
        * @returns {Promise<*>}
        */
-      async addParamsTx(id, param, targetDid, didKeypair) {
+      async addParamsTx(id, params, targetDid, didKeypair) {
         return await this.cheqdOnly.tx.addParams(
           id,
-          param,
+          params,
           targetDid,
           didKeypair,
         );

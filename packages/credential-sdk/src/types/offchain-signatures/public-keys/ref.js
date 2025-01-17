@@ -6,7 +6,7 @@ import {
   CheqdTestnetDid,
   CheqdMainnetDid,
 } from '../../did/onchain/typed-did';
-import { DockParamsId } from '../params/id';
+import { CheqdParamsId, DockParamsId } from '../params/id';
 
 export class DockOffchainSignatureKeyRef extends TypedTuple {
   static Classes = [DockDidValue, DockParamsId];
@@ -30,8 +30,12 @@ export class CheqdOffchainSignatureParamsRef extends CheqdDLRRef {}
 
 export class CheqdTestnetOffchainSignatureParamsRef extends CheqdDLRRef {
   static Did = CheqdTestnetDid;
+
+  static Id = CheqdParamsId;
 }
 
 export class CheqdMainnetOffchainSignatureParamsRef extends CheqdDLRRef {
   static Did = CheqdMainnetDid;
+
+  static Id = CheqdParamsId;
 }

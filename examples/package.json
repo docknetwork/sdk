@@ -19,9 +19,9 @@
     "lint": "eslint \"*.js\""
   },
   "dependencies": {
-    "@docknetwork/credential-sdk": "0.23.0",
-    "@docknetwork/dock-blockchain-api": "0.9.1",
-    "@docknetwork/dock-blockchain-modules": "0.13.0"
+    "@docknetwork/credential-sdk": "0.24.0",
+    "@docknetwork/dock-blockchain-api": "0.9.2",
+    "@docknetwork/dock-blockchain-modules": "0.13.1"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",

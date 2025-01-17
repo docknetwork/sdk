@@ -1,6 +1,5 @@
 import {
   TypedArray,
-  TypedMap,
   TypedNumber,
   TypedSet,
   TypedString,
@@ -29,7 +28,6 @@ import {
   CheqdVerificationMethodRefOrCheqdMainnetVerificationMethod,
   CheqdVerificationMethodRefOrCheqdTestnetVerificationMethod,
 } from './verification-method-ref-or-cheqd-verification-method';
-import { Ed25519Verification2018Method } from './verification-method-type';
 import {
   VerificationMethodRef,
   CheqdVerificationMethodRef,
@@ -153,7 +151,7 @@ export class DIDDocument extends withFrom(
       context = [CONTEXT_URI],
       alsoKnownAs = [],
       capabilityDelegation = [],
-      [ATTESTS_IRI]: attests = null,
+      attests = null,
     } = {},
   ) {
     const doc = new this(
@@ -397,18 +395,10 @@ export class CheqdDIDDocument extends TypedStruct {
 
     const { verificationMethod } = this;
 
-    this.verificationMethod = [...verificationMethod].map((verMethod) => {
-      if (verMethod.isOffchain()) {
-        return new verMethod.constructor(
-          verMethod.id,
-          verMethod.controller,
-          new Ed25519Verification2018Method(),
-          Array(32).fill(0),
-        );
-      }
-
-      return verMethod;
-    });
+    this.verificationMethod = verificationMethod.filter(
+      (verMethod) => !verMethod.isOffchain()
+        && !verMethod.verificationMaterial.bytes.every((item) => !item),
+    );
     const offchainVerMethod = verificationMethod.filter((verMethod) => verMethod.isOffchain());
 
     this.assertionMethod = [
@@ -434,32 +424,16 @@ export class CheqdDIDDocument extends TypedStruct {
       service,
     } = this;
 
-    const assertionMethodOffchainKeys = new (class extends TypedMap {
-      static KeyClass = VerificationMethodRef;
-
-      static ValueClass = CheqdVerificationMethod;
-    })(
-      [...assertionMethod]
-        .map((keyRefOrKey) => (keyRefOrKey instanceof CheqdVerificationMethod
-          ? [keyRefOrKey.id, keyRefOrKey]
-          : null))
-        .filter(Boolean),
+    const assertionMethodOffchainKeys = [...assertionMethod].filter(
+      (keyRefOrKey) => keyRefOrKey.id,
     );
     const verificationMethodWithOffchainKeys = [
-      ...VerificationMethods.from(verificationMethod),
-    ].map((verMethod) => {
-      const offchain = assertionMethodOffchainKeys.get(verMethod.id);
-      if (offchain != null) {
-        return offchain.toVerificationMethod();
-      }
-
-      return verMethod;
-    });
-    const assertionMethodOnlyRefs = [...assertionMethod]
-      .map((keyRefOrKey) => (keyRefOrKey instanceof CheqdVerificationMethod
-        ? keyRefOrKey.id
-        : keyRefOrKey))
-      .filter(Boolean);
+      ...verificationMethod,
+      ...assertionMethodOffchainKeys,
+    ];
+    const assertionMethodOnlyRefs = [...assertionMethod].map(
+      (keyRefOrKey) => keyRefOrKey.id ?? keyRefOrKey,
+    );
 
     return new DIDDocument(
       context,

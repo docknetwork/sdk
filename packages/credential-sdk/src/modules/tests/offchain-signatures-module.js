@@ -88,6 +88,8 @@ export default function generateOffchainSignatureModuleTests(
       const document = DIDDocument.create(did, [
         didKeypair.didKey(),
         new DidKey(bbsKey),
+        new DidKey(bbsPlusKey),
+        new DidKey(psKey),
       ]);
 
       await didModule.updateDocument(document, didKeypair);

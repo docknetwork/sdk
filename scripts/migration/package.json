@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@docknetwork/cheqd-blockchain-api": "0.18.0",
-    "@docknetwork/credential-sdk": "0.23.0",
-    "@docknetwork/dock-blockchain-api": "0.9.1",
+    "@docknetwork/credential-sdk": "0.24.0",
+    "@docknetwork/dock-blockchain-api": "0.9.2",
     "@docknetwork/dock-blockchain-modules": "0.12.1",
     "p-limit": "^6.1.0"
   },

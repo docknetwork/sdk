@@ -1,7 +1,7 @@
 export default {
   '@context': {
     PrivateStatusList2021Credential: {
-      '@id': 'https://ld.dock.io/security#PrivateStatusList2021Credential',
+      '@id': 'https://ld.truvera.io/security#PrivateStatusList2021Credential',
       '@context': {
         id: '@id',
         type: '@type',
@@ -29,7 +29,7 @@ export default {
         statusPurpose: 'https://w3id.org/vc/status-list#statusPurpose',
         statusListIndex: 'https://w3id.org/vc/status-list#statusListIndex',
         statusListCredential: {
-          '@id': 'https://ld.dock.io/security#PrivateStatusListCredential',
+          '@id': 'https://ld.truvera.io/security#PrivateStatusListCredential',
           '@type': '@id',
         },
       },

@@ -20,7 +20,7 @@ export const RevRegIdByteSize = 32;
 // Each entry in revocation registry has byte size `RevEntryByteSize`
 export const RevEntryByteSize = 32;
 
-const LD_SEC_TERM = 'https://ld.dock.io/security#';
+const LD_SEC_TERM = 'https://ld.truvera.io/security#';
 
 /**
  * Return `credentialStatus` according to W3C spec when the revocation status is checked on Dock

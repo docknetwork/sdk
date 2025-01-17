@@ -1,10 +1,14 @@
 # @docknetwork/credential-sdk
 
-## 0.23.0
+## 0.24.0
 
 ### Minor Changes
 
 - Align with the latest `cheqd` node version (`3.1.3`)
+
+## 0.23.0
+
+- ld.dock.io -> ld.truvera.io
 
 ## 0.22.0
 

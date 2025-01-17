@@ -6,6 +6,8 @@
 
 - Align with the latest `cheqd` node version (`3.1.3`)
 
+## 0.7.1
+
 ### Patch Changes
 
 - Updated dependencies

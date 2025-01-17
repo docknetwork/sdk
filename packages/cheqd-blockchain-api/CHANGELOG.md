@@ -6,12 +6,16 @@
 
 - Align with the latest `cheqd` node version (`3.1.3`)
 
+## 0.17.1
+
 ### Patch Changes
 
 - Updated dependencies
   - @docknetwork/credential-sdk@0.23.0
 
 ## 0.17.0
+
+### Minor Changes
 
 - Implementation of the `cheqd` migration and the associated identifier mappers.
 - Updated dependencies

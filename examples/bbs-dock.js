@@ -41,7 +41,7 @@ class ExampleDIDResolver extends Resolver {
 
 const resolver = new ExampleDIDResolver();
 
-const id = 'https://ld.dock.io/examples/resident-card-schema.json';
+const id = 'https://ld.truvera.io/examples/resident-card-schema.json';
 const residentCardSchema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   $id: id,
@@ -81,10 +81,10 @@ const example = {
   '@context': [
     'https://www.w3.org/2018/credentials/v1',
     'https://w3id.org/citizenship/v1',
-    'https://ld.dock.io/security/bbs/v1',
+    'https://ld.truvera.io/security/bbs/v1',
     {
       // You can also use any embedded context
-      dk: 'https://ld.dock.io/credentials#',
+      dk: 'https://ld.truvera.io/credentials#',
       numberField: 'dk:numberField',
       numberFieldNegative: 'dk:numberFieldNegative',
       numberFieldOneDecimal: 'dk:numberFieldOneDecimal',

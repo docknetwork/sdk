@@ -50,6 +50,7 @@ import {
   CheqdMainnetOffchainSignatureKeyRef,
   CheqdTestnetAccumulator,
   CheqdMainnetAccumulator,
+  DockDidOrDidMethodKey,
 } from '@docknetwork/credential-sdk/types';
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 
@@ -263,6 +264,7 @@ export class CheqdAPI extends AbstractApiProvider {
     return ['cheqd'];
   }
 
+  // eslint-disable-next-line
   supportsIdentifier(id) {
     this.ensureInitialized();
     const { network } = this.sdk.options;
@@ -280,6 +282,19 @@ export class CheqdAPI extends AbstractApiProvider {
     } else if (id instanceof TypedEnum) {
       return this.supportsIdentifier(id.value);
     } else if (String(id).includes(`:cheqd:${network}:`)) {
+      return true;
+    }
+
+    // Dock identifiers
+    if (id instanceof NamespaceDid) {
+      return id.isDock || id.isDidMethodKey;
+    } else if (id instanceof DockDidOrDidMethodKey) {
+      return true;
+    } else if (id instanceof DidRef) {
+      return this.supportsIdentifier(id[0]);
+    } else if (id instanceof TypedEnum) {
+      return this.supportsIdentifier(id.value);
+    } else if (String(id).includes(':dock:')) {
       return true;
     }
 

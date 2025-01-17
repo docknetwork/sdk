@@ -396,7 +396,8 @@ export class CheqdDIDDocument extends TypedStruct {
     const { verificationMethod } = this;
 
     this.verificationMethod = verificationMethod.filter(
-      (verMethod) => !verMethod.isOffchain(),
+      (verMethod) => !verMethod.isOffchain()
+        && !verMethod.verificationMaterial.bytes.every((item) => !item),
     );
     const offchainVerMethod = verificationMethod.filter((verMethod) => verMethod.isOffchain());
 
@@ -423,14 +424,16 @@ export class CheqdDIDDocument extends TypedStruct {
       service,
     } = this;
 
-    const assertionMethodOffchainKeys = [...assertionMethod]
-      .filter((keyRefOrKey) => keyRefOrKey.id);
+    const assertionMethodOffchainKeys = [...assertionMethod].filter(
+      (keyRefOrKey) => keyRefOrKey.id,
+    );
     const verificationMethodWithOffchainKeys = [
       ...verificationMethod,
       ...assertionMethodOffchainKeys,
     ];
-    const assertionMethodOnlyRefs = [...assertionMethod]
-      .map((keyRefOrKey) => keyRefOrKey.id ?? keyRefOrKey);
+    const assertionMethodOnlyRefs = [...assertionMethod].map(
+      (keyRefOrKey) => keyRefOrKey.id ?? keyRefOrKey,
+    );
 
     return new DIDDocument(
       context,

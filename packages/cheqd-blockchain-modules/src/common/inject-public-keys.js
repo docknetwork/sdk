@@ -1,22 +1,22 @@
-import { TypedMap, TypedUUID } from "@docknetwork/credential-sdk/types/generic";
+import { TypedMap, TypedUUID } from '@docknetwork/credential-sdk/types/generic';
 import {
   u8aToString,
   withExtendedStaticProperties,
-} from "@docknetwork/credential-sdk/utils";
-import { CheqdCreateResource } from "@docknetwork/credential-sdk/types";
-import createInternalCheqdModule from "./create-internal-cheqd-module";
-import { validateResource } from "./resource";
+} from '@docknetwork/credential-sdk/utils';
+import { CheqdCreateResource } from '@docknetwork/credential-sdk/types';
+import createInternalCheqdModule from './create-internal-cheqd-module';
+import { validateResource } from './resource';
 
 const methods = {
   addPublicKey(id, publicKey, did) {
     return new CheqdCreateResource(
       this.types.Did.from(did).value.value,
       TypedUUID.from(id),
-      "1.0",
+      '1.0',
       [],
       this.constructor.PublicKeyName,
       this.constructor.PublicKeyType,
-      this.PublicKey.from(publicKey).toJSONStringBytes()
+      this.PublicKey.from(publicKey).toJSONStringBytes(),
     );
   },
 };
@@ -48,7 +48,7 @@ export default function injectPublicKeys(klass) {
 
         return {
           ...names,
-          addPublicKey: "MsgCreateResource",
+          addPublicKey: 'MsgCreateResource',
         };
       }
 
@@ -70,8 +70,8 @@ export default function injectPublicKeys(klass) {
 
         const publicKey = PublicKey.from(
           JSON.parse(
-            u8aToString(validateResource(item, PublicKeyName, PublicKeyType))
-          )
+            u8aToString(validateResource(item, PublicKeyName, PublicKeyType)),
+          ),
         );
         if (includeParams) {
           return await publicKey.withParams(this);
@@ -91,7 +91,7 @@ export default function injectPublicKeys(klass) {
 
         const metas = await this.resourcesMetadataBy(
           did,
-          this.filterPublicKeyMetadata
+          this.filterPublicKeyMetadata,
         );
 
         return new PublicKeysMap(
@@ -99,8 +99,8 @@ export default function injectPublicKeys(klass) {
             metas.map(async ({ id }) => [
               id,
               await this.getPublicKey(did, id, includeParams),
-            ])
-          )
+            ]),
+          ),
         );
       }
 
@@ -111,7 +111,7 @@ export default function injectPublicKeys(klass) {
   };
 
   return withExtendedStaticProperties(
-    ["PublicKeyName", "PublicKeyType"],
-    obj[name]
+    ['PublicKeyName', 'PublicKeyType'],
+    obj[name],
   );
 }

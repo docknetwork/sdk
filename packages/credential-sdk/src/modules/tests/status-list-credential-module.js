@@ -1,22 +1,22 @@
-import { DidKeypair, Ed25519Keypair } from "../../keypairs";
-import { DIDDocument } from "../../types";
-import { testIf } from "./common";
-import { StatusList2021Resolver } from "../../resolver/status-list2021";
+import { DidKeypair, Ed25519Keypair } from '../../keypairs';
+import { DIDDocument } from '../../types';
+import { testIf } from './common';
+import { StatusList2021Resolver } from '../../resolver/status-list2021';
 import {
   getKeyDoc,
   StatusList2021Credential as StatusListCredential,
-} from "../../vc";
+} from '../../vc';
 
 // eslint-disable-next-line jest/no-export
 export default function generateStatusListCredentialModuleTests(
   { did: didModule, statusListCredential: statusListCredentialModule },
   { Did, StatusListCredentialId },
-  filter = () => true
+  filter = () => true,
 ) {
   const test = testIf(filter);
 
   describe(`Using ${didModule.constructor.name} and ${statusListCredentialModule.constructor.name}`, () => {
-    test("Generates a `DIDDocument` and creates a `StatusListCredential` owned by this DID", async () => {
+    test('Generates a `DIDDocument` and creates a `StatusListCredential` owned by this DID', async () => {
       const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
@@ -31,17 +31,17 @@ export default function generateStatusListCredentialModuleTests(
       const statusListCredential1 = await StatusListCredential.create(
         keyDoc,
         id1,
-        { revokeIndices: [1, 10, 100] }
+        { revokeIndices: [1, 10, 100] },
       );
 
       await statusListCredentialModule.createStatusListCredential(
         id1,
         statusListCredential1,
-        didKeypair
+        didKeypair,
       );
 
       const written1 = await statusListCredentialModule.getStatusListCredential(
-        id1
+        id1,
       );
       expect(written1.toJSON()).toEqual(statusListCredential1.toJSON());
 
@@ -49,22 +49,22 @@ export default function generateStatusListCredentialModuleTests(
       const statusListCredential2 = await StatusListCredential.create(
         keyDoc,
         id2,
-        { revokeIndices: [2, 20, 200] }
+        { revokeIndices: [2, 20, 200] },
       );
 
       await statusListCredentialModule.createStatusListCredential(
         id2,
         statusListCredential2,
-        didKeypair
+        didKeypair,
       );
 
       const written2 = await statusListCredentialModule.getStatusListCredential(
-        id2
+        id2,
       );
       expect(written2.toJSON()).toEqual(statusListCredential2.toJSON());
     });
 
-    test("Generates a `DIDDocument` and creates and then updates a `StatusListCredential` owned by this DID", async () => {
+    test('Generates a `DIDDocument` and creates and then updates a `StatusListCredential` owned by this DID', async () => {
       const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
@@ -79,16 +79,16 @@ export default function generateStatusListCredentialModuleTests(
       const statusListCredential = await StatusListCredential.create(
         keyDoc,
         id,
-        { revokeIndices: [1, 10, 100] }
+        { revokeIndices: [1, 10, 100] },
       );
 
       await statusListCredentialModule.createStatusListCredential(
         id,
         statusListCredential,
-        didKeypair
+        didKeypair,
       );
       let written = await statusListCredentialModule.getStatusListCredential(
-        id
+        id,
       );
       expect(written.toJSON()).toEqual(statusListCredential.toJSON());
 
@@ -97,13 +97,13 @@ export default function generateStatusListCredentialModuleTests(
       await statusListCredentialModule.updateStatusListCredential(
         id,
         statusListCredential,
-        didKeypair
+        didKeypair,
       );
       written = await statusListCredentialModule.getStatusListCredential(id);
       expect(written.toJSON()).toEqual(statusListCredential.toJSON());
     });
 
-    test("Generates a `DIDDocument` and creates and then removes a `StatusListCredential` owned by this DID", async () => {
+    test('Generates a `DIDDocument` and creates and then removes a `StatusListCredential` owned by this DID', async () => {
       const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
@@ -118,28 +118,28 @@ export default function generateStatusListCredentialModuleTests(
       const statusListCredential = await StatusListCredential.create(
         keyDoc,
         id,
-        { revokeIndices: [1, 10, 100] }
+        { revokeIndices: [1, 10, 100] },
       );
 
       await statusListCredentialModule.createStatusListCredential(
         id,
         statusListCredential,
-        didKeypair
+        didKeypair,
       );
       let written = await statusListCredentialModule.getStatusListCredential(
-        id
+        id,
       );
       expect(written.toJSON()).toEqual(statusListCredential.toJSON());
 
       await statusListCredentialModule.removeStatusListCredential(
         id,
-        didKeypair
+        didKeypair,
       );
       written = await statusListCredentialModule.getStatusListCredential(id);
       expect(written).toEqual(null);
     });
 
-    test("`StatusList2021Resolver`", async () => {
+    test('`StatusList2021Resolver`', async () => {
       const resolver = new StatusList2021Resolver(statusListCredentialModule);
       const did = Did.random();
 
@@ -155,16 +155,16 @@ export default function generateStatusListCredentialModuleTests(
       const statusListCredential = await StatusListCredential.create(
         keyDoc,
         id,
-        { revokeIndices: [1, 10, 100] }
+        { revokeIndices: [1, 10, 100] },
       );
 
       await statusListCredentialModule.createStatusListCredential(
         id,
         statusListCredential,
-        didKeypair
+        didKeypair,
       );
       expect(await resolver.resolve(String(id))).toEqual(
-        statusListCredential.toJSON()
+        statusListCredential.toJSON(),
       );
     });
   });

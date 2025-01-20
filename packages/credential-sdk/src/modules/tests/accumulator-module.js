@@ -1,24 +1,27 @@
-import { InMemoryState } from "@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence";
-import { hexToU8a, stringToHex, u8aToHex, randomAsHex } from "../../utils";
+import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
+import {
+  hexToU8a, stringToHex, u8aToHex, randomAsHex,
+} from '../../utils';
 import {
   Accumulator,
   AccumulatorParams,
-  AccumulatorPublicKey,
   PositiveAccumulator,
   VBWitnessUpdateInfo,
   VBMembershipWitness,
-} from "../../crypto";
-import { AccumulatorType } from "../abstract/accumulator/module";
+} from '../../crypto';
+import { AccumulatorType } from '../abstract/accumulator/module';
 import {
   DIDDocument,
   AccumulatorParams as AccumulatorParamsType,
-} from "../../types";
-import { Ed25519Keypair, DidKeypair } from "../../keypairs";
+} from '../../types';
+import { Ed25519Keypair, DidKeypair } from '../../keypairs';
 
 // eslint-disable-next-line jest/no-export
 export default function generateAccumulatorTests(
   { did: didModule, accumulator: accumulatorModule },
-  { Did, AccumulatorPublicKey, AccumulatorId, AccumulatorCommon }
+  {
+    Did, AccumulatorPublicKey, AccumulatorId, AccumulatorCommon,
+  },
 ) {
   describe(`Using ${didModule.constructor.name} and ${accumulatorModule.constructor.name}`, () => {
     // Incase updating an accumulator is expensive like making a blockchain txn, a cheaper strategy
@@ -51,13 +54,13 @@ export default function generateAccumulatorTests(
     let pk1Id;
     const accumState = new InMemoryState();
 
-    test("Prefill", async () => {
+    test('Prefill', async () => {
       await didModule.createDocument(
         DIDDocument.create(did, [pair.didKey()]),
-        pair
+        pair,
       );
 
-      const label = stringToHex("accumulator-params-label");
+      const label = stringToHex('accumulator-params-label');
       const params = Accumulator.generateParams(hexToU8a(label));
       const bytes1 = u8aToHex(params.bytes);
       const params1 = new AccumulatorParams(bytes1, label);
@@ -65,10 +68,10 @@ export default function generateAccumulatorTests(
       await accumulatorModule.addParams(params1Id, params1, did, pair);
 
       expect(
-        (await accumulatorModule.getParams(did, params1Id)).toJSON()
+        (await accumulatorModule.getParams(did, params1Id)).toJSON(),
       ).toEqual(AccumulatorParamsType.from(params1).toJSON());
       expect((await accumulatorModule.getAllParamsByDid(did)).toJSON()).toEqual(
-        [[params1Id.toJSON(), AccumulatorParamsType.from(params1).toJSON()]]
+        [[params1Id.toJSON(), AccumulatorParamsType.from(params1).toJSON()]],
       );
 
       keypair = Accumulator.generateKeypair(params, seedAccum);
@@ -78,20 +81,20 @@ export default function generateAccumulatorTests(
       await accumulatorModule.addPublicKey(pk1Id, pk1, did, pair);
 
       expect(
-        (await accumulatorModule.getPublicKey(did, pk1Id)).toJSON()
+        (await accumulatorModule.getPublicKey(did, pk1Id)).toJSON(),
       ).toEqual(pk1.toJSON());
       expect(
-        (await accumulatorModule.getAllPublicKeysByDid(did)).toJSON()
+        (await accumulatorModule.getAllPublicKeysByDid(did)).toJSON(),
       ).toEqual([[pk1Id.toJSON(), pk1.toJSON()]]);
 
       const pk1WithParams = await pk1.withParams(accumulatorModule);
       expect(pk1WithParams.params).toBeInstanceOf(AccumulatorParamsType);
 
       expect(
-        (await accumulatorModule.getPublicKey(did, pk1Id, true)).toJSON()
+        (await accumulatorModule.getPublicKey(did, pk1Id, true)).toJSON(),
       ).toEqual(pk1WithParams.toJSON());
       expect(
-        (await accumulatorModule.getAllPublicKeysByDid(did, true)).toJSON()
+        (await accumulatorModule.getAllPublicKeysByDid(did, true)).toJSON(),
       ).toEqual([[pk1Id.toJSON(), pk1WithParams.toJSON()]]);
 
       accumulator = PositiveAccumulator.initialize(params, keypair.secretKey);
@@ -105,142 +108,142 @@ export default function generateAccumulatorTests(
       accumulatorId = AccumulatorId.random(did);
       const accumulated = accumulatorModuleClass.accumulatedAsHex(
         accumulator.accumulated,
-        AccumulatorType.VBPos
+        AccumulatorType.VBPos,
       );
 
       await accumulatorModule.addPositiveAccumulator(
         accumulatorId,
         accumulated,
         [did, pk1Id],
-        pair
+        pair,
       );
 
       const queriedAccum = await accumulatorModule.getAccumulator(
         accumulatorId,
         true,
-        true
+        true,
       );
 
       expect(queriedAccum.accumulated.value).toEqual(accumulated);
     });
 
-    test("Can create/update all types of accumulators", async () => {
+    test('Can create/update all types of accumulators', async () => {
       const acc1Id = AccumulatorId.random(did);
 
       await accumulatorModule.addPositiveAccumulator(
         acc1Id,
-        hexToU8a("0xff"),
+        hexToU8a('0xff'),
         [did, pk1Id],
-        pair
+        pair,
       );
 
       let queriedAccum = await accumulatorModule.getAccumulator(acc1Id);
 
       expect(queriedAccum.accumulator.value.toJSON()).toEqual(
-        new AccumulatorCommon(hexToU8a("0xff"), [did, pk1Id]).toJSON()
+        new AccumulatorCommon(hexToU8a('0xff'), [did, pk1Id]).toJSON(),
       );
 
       await accumulatorModule.updatePositiveAccumulator(
         acc1Id,
-        hexToU8a("0xfa"),
+        hexToU8a('0xfa'),
         {
-          additions: [hexToU8a("0xfe")],
-          removals: [hexToU8a("0xde")],
-          witnessUpdateInfo: hexToU8a("0xef"),
+          additions: [hexToU8a('0xfe')],
+          removals: [hexToU8a('0xde')],
+          witnessUpdateInfo: hexToU8a('0xef'),
         },
         [did, pk1Id],
-        pair
+        pair,
       );
 
       queriedAccum = await accumulatorModule.getAccumulator(acc1Id);
 
       expect(queriedAccum.accumulator.value.toJSON()).toEqual(
-        new AccumulatorCommon(hexToU8a("0xfa"), [did, pk1Id]).toJSON()
+        new AccumulatorCommon(hexToU8a('0xfa'), [did, pk1Id]).toJSON(),
       );
 
       const acc2Id = AccumulatorId.random(did);
 
       await accumulatorModule.addKBUniversalAccumulator(
         acc2Id,
-        hexToU8a("0xff"),
+        hexToU8a('0xff'),
         [did, pk1Id],
-        pair
+        pair,
       );
 
       queriedAccum = await accumulatorModule.getAccumulator(acc2Id);
 
       expect(queriedAccum.accumulator.value.toJSON()).toEqual(
-        new AccumulatorCommon(hexToU8a("0xff"), [did, pk1Id]).toJSON()
+        new AccumulatorCommon(hexToU8a('0xff'), [did, pk1Id]).toJSON(),
       );
 
       await accumulatorModule.updateKBUniversalAccumulator(
         acc2Id,
-        hexToU8a("0xfa"),
+        hexToU8a('0xfa'),
         {
-          additions: [hexToU8a("0xfe")],
-          removals: [hexToU8a("0xde")],
-          witnessUpdateInfo: hexToU8a("0xef"),
+          additions: [hexToU8a('0xfe')],
+          removals: [hexToU8a('0xde')],
+          witnessUpdateInfo: hexToU8a('0xef'),
         },
         [did, pk1Id],
-        pair
+        pair,
       );
 
       queriedAccum = await accumulatorModule.getAccumulator(acc2Id);
 
       expect(queriedAccum.accumulator.value.toJSON()).toEqual(
-        new AccumulatorCommon(hexToU8a("0xfa"), [did, pk1Id]).toJSON()
+        new AccumulatorCommon(hexToU8a('0xfa'), [did, pk1Id]).toJSON(),
       );
 
       const acc3Id = AccumulatorId.random(did);
 
       await accumulatorModule.addUniversalAccumulator(
         acc3Id,
-        hexToU8a("0xff"),
+        hexToU8a('0xff'),
         [did, pk1Id],
         10,
-        pair
+        pair,
       );
 
       queriedAccum = await accumulatorModule.getAccumulator(acc3Id);
 
       expect(queriedAccum.accumulator.value.common.toJSON()).toEqual(
-        new AccumulatorCommon(hexToU8a("0xff"), [did, pk1Id]).toJSON()
+        new AccumulatorCommon(hexToU8a('0xff'), [did, pk1Id]).toJSON(),
       );
 
       await accumulatorModule.updateUniversalAccumulator(
         acc3Id,
-        hexToU8a("0xfa"),
+        hexToU8a('0xfa'),
         {
-          additions: [hexToU8a("0xfe")],
-          removals: [hexToU8a("0xde")],
-          witnessUpdateInfo: hexToU8a("0xef"),
+          additions: [hexToU8a('0xfe')],
+          removals: [hexToU8a('0xde')],
+          witnessUpdateInfo: hexToU8a('0xef'),
         },
         [did, pk1Id],
         10,
-        pair
+        pair,
       );
 
       queriedAccum = await accumulatorModule.getAccumulator(acc3Id);
 
       expect(queriedAccum.accumulator.value.common.toJSON()).toEqual(
-        new AccumulatorCommon(hexToU8a("0xfa"), [did, pk1Id]).toJSON()
+        new AccumulatorCommon(hexToU8a('0xfa'), [did, pk1Id]).toJSON(),
       );
 
       await accumulatorModule.removeAccumulator(acc3Id, pair);
       expect(await accumulatorModule.getAccumulator(acc3Id)).toBe(null);
     }, 60000);
 
-    test("Witness creation, verification should work", async () => {
+    test('Witness creation, verification should work', async () => {
       let queriedAccum = await accumulatorModule.getAccumulator(
         accumulatorId,
         true,
-        true
+        true,
       );
       let verifAccumulator = PositiveAccumulator.fromAccumulated(
         accumulatorModuleClass.accumulatedFromHex(
           queriedAccum.accumulated,
-          AccumulatorType.VBPos
-        )
+          AccumulatorType.VBPos,
+        ),
       );
 
       // Witness created for member 1
@@ -248,23 +251,23 @@ export default function generateAccumulatorTests(
       const witness1 = await accumulator.membershipWitness(
         member1,
         keypair.secretKey,
-        accumState
+        accumState,
       );
 
       let accumPk = new AccumulatorPublicKey(
-        queriedAccum.publicKey.bytes.bytes
+        queriedAccum.publicKey.bytes.bytes,
       );
 
       let accumParams = new AccumulatorParams(
-        queriedAccum.publicKey.params.bytes.bytes
+        queriedAccum.publicKey.params.bytes.bytes,
       );
       expect(
         verifAccumulator.verifyMembershipWitness(
           member1,
           witness1,
           accumPk,
-          accumParams
-        )
+          accumParams,
+        ),
       ).toEqual(true);
 
       // Witness created for member 2
@@ -272,15 +275,15 @@ export default function generateAccumulatorTests(
       const witness2 = await accumulator.membershipWitness(
         member2,
         keypair.secretKey,
-        accumState
+        accumState,
       );
       expect(
         verifAccumulator.verifyMembershipWitness(
           member2,
           witness2,
           accumPk,
-          accumParams
-        )
+          accumParams,
+        ),
       ).toEqual(true);
 
       // Witness created for member 3
@@ -288,15 +291,15 @@ export default function generateAccumulatorTests(
       const witness3 = await accumulator.membershipWitness(
         member3,
         keypair.secretKey,
-        accumState
+        accumState,
       );
       expect(
         verifAccumulator.verifyMembershipWitness(
           member3,
           witness3,
           accumPk,
-          accumParams
-        )
+          accumParams,
+        ),
       ).toEqual(true);
 
       // Previous users' witness still works
@@ -305,16 +308,16 @@ export default function generateAccumulatorTests(
           member1,
           witness1,
           accumPk,
-          accumParams
-        )
+          accumParams,
+        ),
       ).toEqual(true);
       expect(
         verifAccumulator.verifyMembershipWitness(
           member2,
           witness2,
           accumPk,
-          accumParams
-        )
+          accumParams,
+        ),
       ).toEqual(true);
 
       // Manager decides to remove a member, the new accumulated value will be published along with witness update info
@@ -322,14 +325,14 @@ export default function generateAccumulatorTests(
         accumulator.accumulated,
         [],
         [member2],
-        keypair.secretKey
+        keypair.secretKey,
       );
       await accumulator.remove(member2, keypair.secretKey, accumState);
 
       let accum = await accumulatorModule.getAccumulator(accumulatorId, false);
       const accumulated = accumulatorModuleClass.accumulatedAsHex(
         accumulator.accumulated,
-        AccumulatorType.VBPos
+        AccumulatorType.VBPos,
       );
       const witUpdBytes = u8aToHex(witnessUpdInfo.value);
       await accumulatorModule.updatePositiveAccumulator(
@@ -337,26 +340,26 @@ export default function generateAccumulatorTests(
         accumulated,
         { removals: [u8aToHex(member2)], witnessUpdateInfo: witUpdBytes },
         [did, pk1Id],
-        pair
+        pair,
       );
 
       queriedAccum = await accumulatorModule.getAccumulator(
         accumulatorId,
         true,
-        true
+        true,
       );
       expect(queriedAccum.accumulated.value).toEqual(accumulated);
 
       verifAccumulator = PositiveAccumulator.fromAccumulated(
         accumulatorModuleClass.accumulatedFromHex(
           queriedAccum.accumulated,
-          AccumulatorType.VBPos
-        )
+          AccumulatorType.VBPos,
+        ),
       );
 
       accumPk = new AccumulatorPublicKey(queriedAccum.publicKey.bytes.bytes);
       accumParams = new AccumulatorParams(
-        queriedAccum.publicKey.params.bytes.bytes
+        queriedAccum.publicKey.params.bytes.bytes,
       );
 
       // Witness created for member 3
@@ -364,15 +367,15 @@ export default function generateAccumulatorTests(
       const witness4 = await accumulator.membershipWitness(
         member4,
         keypair.secretKey,
-        accumState
+        accumState,
       );
       expect(
         verifAccumulator.verifyMembershipWitness(
           member4,
           witness4,
           accumPk,
-          accumParams
-        )
+          accumParams,
+        ),
       ).toEqual(true);
 
       // Older witnesses need to be updated
@@ -383,7 +386,7 @@ export default function generateAccumulatorTests(
         member1,
         witness1,
         accum.lastModified,
-        accum.lastModified
+        accum.lastModified,
       );
 
       await accumulatorModule.updateWitness(
@@ -391,7 +394,7 @@ export default function generateAccumulatorTests(
         member3,
         witness3,
         accum.lastModified,
-        accum.lastModified
+        accum.lastModified,
       );
 
       expect(
@@ -399,8 +402,8 @@ export default function generateAccumulatorTests(
           member1,
           witness1,
           accumPk,
-          accumParams
-        )
+          accumParams,
+        ),
       ).toEqual(true);
 
       expect(
@@ -408,43 +411,43 @@ export default function generateAccumulatorTests(
           member3,
           witness3,
           accumPk,
-          accumParams
-        )
+          accumParams,
+        ),
       ).toEqual(true);
     });
 
-    test("Witness update after several batch upgrades", async () => {
+    test('Witness update after several batch upgrades', async () => {
       let queriedAccum = await accumulatorModule.getAccumulator(
         accumulatorId,
         true,
-        true
+        true,
       );
       let verifAccumulator = PositiveAccumulator.fromAccumulated(
         accumulatorModuleClass.accumulatedFromHex(
           queriedAccum.accumulated,
-          AccumulatorType.VBPos
-        )
+          AccumulatorType.VBPos,
+        ),
       );
       const member = members[10];
       let witness = await accumulator.membershipWitness(
         member,
         keypair.secretKey,
-        accumState
+        accumState,
       );
 
       const accumPk = new AccumulatorPublicKey(
-        queriedAccum.publicKey.bytes.bytes
+        queriedAccum.publicKey.bytes.bytes,
       );
       const accumParams = new AccumulatorParams(
-        queriedAccum.publicKey.params.bytes.bytes
+        queriedAccum.publicKey.params.bytes.bytes,
       );
       expect(
         verifAccumulator.verifyMembershipWitness(
           member,
           witness,
           accumPk,
-          accumParams
-        )
+          accumParams,
+        ),
       ).toEqual(true);
 
       // Do some updates to the accumulator
@@ -454,12 +457,12 @@ export default function generateAccumulatorTests(
         accumulator.accumulated,
         [],
         removals1,
-        keypair.secretKey
+        keypair.secretKey,
       );
       await accumulator.removeBatch(removals1, keypair.secretKey, accumState);
       const accumulated1 = accumulatorModuleClass.accumulatedAsHex(
         accumulator.accumulated,
-        AccumulatorType.VBPos
+        AccumulatorType.VBPos,
       );
       const witUpdBytes1 = u8aToHex(witnessUpdInfo1.value);
       await accumulatorModule.updatePositiveAccumulator(
@@ -470,7 +473,7 @@ export default function generateAccumulatorTests(
           witnessUpdateInfo: witUpdBytes1,
         },
         [did, pk1Id],
-        pair
+        pair,
       );
 
       const removals2 = [members[87], members[88]];
@@ -478,12 +481,12 @@ export default function generateAccumulatorTests(
         accumulator.accumulated,
         [],
         removals2,
-        keypair.secretKey
+        keypair.secretKey,
       );
       await accumulator.removeBatch(removals2, keypair.secretKey, accumState);
       const accumulated2 = accumulatorModuleClass.accumulatedAsHex(
         accumulator.accumulated,
-        AccumulatorType.VBPos
+        AccumulatorType.VBPos,
       );
       const witUpdBytes2 = u8aToHex(witnessUpdInfo2.value);
       await accumulatorModule.updatePositiveAccumulator(
@@ -494,7 +497,7 @@ export default function generateAccumulatorTests(
           witnessUpdateInfo: witUpdBytes2,
         },
         [did, pk1Id],
-        pair
+        pair,
       );
 
       const removals3 = [members[89], members[90], members[91]];
@@ -502,12 +505,12 @@ export default function generateAccumulatorTests(
         accumulator.accumulated,
         [],
         removals3,
-        keypair.secretKey
+        keypair.secretKey,
       );
       await accumulator.removeBatch(removals3, keypair.secretKey, accumState);
       const accumulated3 = accumulatorModuleClass.accumulatedAsHex(
         accumulator.accumulated,
-        AccumulatorType.VBPos
+        AccumulatorType.VBPos,
       );
       const witUpdBytes3 = u8aToHex(witnessUpdInfo3.value);
       await accumulatorModule.updatePositiveAccumulator(
@@ -518,14 +521,14 @@ export default function generateAccumulatorTests(
           witnessUpdateInfo: witUpdBytes3,
         },
         [did, pk1Id],
-        pair
+        pair,
       );
 
       // Get a witness from the accumulator manager. This will be updated after the following updates.
       witness = await accumulator.membershipWitness(
         member,
         keypair.secretKey,
-        accumState
+        accumState,
       );
 
       // Do some more updates to the accumulator
@@ -534,12 +537,12 @@ export default function generateAccumulatorTests(
         accumulator.accumulated,
         [],
         removals4,
-        keypair.secretKey
+        keypair.secretKey,
       );
       await accumulator.removeBatch(removals4, keypair.secretKey, accumState);
       const accumulated4 = accumulatorModuleClass.accumulatedAsHex(
         accumulator.accumulated,
-        AccumulatorType.VBPos
+        AccumulatorType.VBPos,
       );
       const witUpdBytes4 = u8aToHex(witnessUpdInfo4.value);
       await accumulatorModule.updatePositiveAccumulator(
@@ -550,23 +553,22 @@ export default function generateAccumulatorTests(
           witnessUpdateInfo: witUpdBytes4,
         },
         [did, pk1Id],
-        pair
+        pair,
       );
 
-      const { lastModified: startFrom } =
-        await accumulatorModule.getAccumulator(accumulatorId);
+      const { lastModified: startFrom } = await accumulatorModule.getAccumulator(accumulatorId);
 
       const removals5 = [members[94], members[95], members[96]];
       const witnessUpdInfo5 = VBWitnessUpdateInfo.new(
         accumulator.accumulated,
         [],
         removals5,
-        keypair.secretKey
+        keypair.secretKey,
       );
       await accumulator.removeBatch(removals5, keypair.secretKey, accumState);
       const accumulated5 = accumulatorModuleClass.accumulatedAsHex(
         accumulator.accumulated,
-        AccumulatorType.VBPos
+        AccumulatorType.VBPos,
       );
       const witUpdBytes5 = u8aToHex(witnessUpdInfo5.value);
       await accumulatorModule.updatePositiveAccumulator(
@@ -577,19 +579,19 @@ export default function generateAccumulatorTests(
           witnessUpdateInfo: witUpdBytes5,
         },
         [did, pk1Id],
-        pair
+        pair,
       );
 
       queriedAccum = await accumulatorModule.getAccumulator(
         accumulatorId,
         true,
-        true
+        true,
       );
       verifAccumulator = PositiveAccumulator.fromAccumulated(
         accumulatorModuleClass.accumulatedFromHex(
           queriedAccum.accumulated,
-          AccumulatorType.VBPos
-        )
+          AccumulatorType.VBPos,
+        ),
       );
       // Old witness doesn't verify with new accumulator
       expect(
@@ -597,8 +599,8 @@ export default function generateAccumulatorTests(
           member,
           witness,
           accumPk,
-          accumParams
-        )
+          accumParams,
+        ),
       ).toEqual(false);
 
       const oldWitness1 = new VBMembershipWitness(witness.value);
@@ -611,7 +613,7 @@ export default function generateAccumulatorTests(
         member,
         witness,
         startFrom,
-        queriedAccum.lastModified
+        queriedAccum.lastModified,
       );
 
       // Updated witness verifies with new accumulator
@@ -620,8 +622,8 @@ export default function generateAccumulatorTests(
           member,
           witness,
           accumPk,
-          accumParams
-        )
+          accumParams,
+        ),
       ).toEqual(true);
 
       // Test again with a batch size bigger than the total number of blocks
@@ -631,15 +633,15 @@ export default function generateAccumulatorTests(
         oldWitness1,
         startFrom,
         queriedAccum.lastModified,
-        queriedAccum.lastModified - startFrom + 10
+        queriedAccum.lastModified - startFrom + 10,
       );
       expect(
         verifAccumulator.verifyMembershipWitness(
           member,
           oldWitness1,
           accumPk,
-          accumParams
-        )
+          accumParams,
+        ),
       ).toEqual(true);
 
       // Test again with few other batch sizes
@@ -649,15 +651,15 @@ export default function generateAccumulatorTests(
         oldWitness2,
         startFrom,
         queriedAccum.lastModified,
-        3
+        3,
       );
       expect(
         verifAccumulator.verifyMembershipWitness(
           member,
           oldWitness2,
           accumPk,
-          accumParams
-        )
+          accumParams,
+        ),
       ).toEqual(true);
 
       await accumulatorModule.updateWitness(
@@ -666,15 +668,15 @@ export default function generateAccumulatorTests(
         oldWitness3,
         startFrom,
         queriedAccum.lastModified,
-        4
+        4,
       );
       expect(
         verifAccumulator.verifyMembershipWitness(
           member,
           oldWitness3,
           accumPk,
-          accumParams
-        )
+          accumParams,
+        ),
       ).toEqual(true);
     }, 60000);
   });

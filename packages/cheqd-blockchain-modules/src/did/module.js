@@ -1,11 +1,11 @@
 import {
   AbstractDIDModule,
   NoDIDError,
-} from "@docknetwork/credential-sdk/modules/abstract/did";
-import { DIDDocument } from "@docknetwork/credential-sdk/types";
-import { CheqdDIDModuleInternal } from "./internal";
-import injectCheqd from "../common/inject-cheqd";
-import CheqdAttestModule from "../attest/module";
+} from '@docknetwork/credential-sdk/modules/abstract/did';
+import { DIDDocument } from '@docknetwork/credential-sdk/types';
+import { CheqdDIDModuleInternal } from './internal';
+import injectCheqd from '../common/inject-cheqd';
+import CheqdAttestModule from '../attest/module';
 
 export default class CheqdDIDModule extends injectCheqd(AbstractDIDModule) {
   static CheqdOnly = CheqdDIDModuleInternal;
@@ -20,7 +20,7 @@ export default class CheqdDIDModule extends injectCheqd(AbstractDIDModule) {
     const didDocument = DIDDocument.from(document);
     if (didDocument.attests != null) {
       throw new Error(
-        `Non-null \`attest\` was provided for DID document \`${didDocument.id}\`. Use \`attest\` module to set attestations.`
+        `Non-null \`attest\` was provided for DID document \`${didDocument.id}\`. Use \`attest\` module to set attestations.`,
       );
     }
 
@@ -34,7 +34,7 @@ export default class CheqdDIDModule extends injectCheqd(AbstractDIDModule) {
 
       if (!didDocument.attests.eq(currentDocument.attests)) {
         throw new Error(
-          "`attests` modifications are not supported in the `updateDocument` transaction."
+          '`attests` modifications are not supported in the `updateDocument` transaction.',
         );
       }
     }
@@ -57,8 +57,7 @@ export default class CheqdDIDModule extends injectCheqd(AbstractDIDModule) {
 
     let doc = null;
     try {
-      const { didDoc, metadata } =
-        await this.cheqdOnly.getDidDocumentWithMetadata(cheqdDid);
+      const { didDoc, metadata } = await this.cheqdOnly.getDidDocumentWithMetadata(cheqdDid);
 
       if (!metadata.deactivated) {
         doc = didDoc;

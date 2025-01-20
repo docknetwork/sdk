@@ -1,20 +1,20 @@
-import { DidKeypair, Ed25519Keypair } from "../../keypairs";
-import { NoBlobError } from "../abstract/blob/errors";
-import { DIDDocument } from "../../types";
-import { testIf } from "./common";
-import { BlobResolver } from "../../resolver/blob";
-import { stringToU8a } from "../../utils";
+import { DidKeypair, Ed25519Keypair } from '../../keypairs';
+import { NoBlobError } from '../abstract/blob/errors';
+import { DIDDocument } from '../../types';
+import { testIf } from './common';
+import { BlobResolver } from '../../resolver/blob';
+import { stringToU8a } from '../../utils';
 
 // eslint-disable-next-line jest/no-export
 export default function generateBlobModuleTests(
   { did: didModule, blob: blobModule },
   { Did, BlobId },
-  filter = () => true
+  filter = () => true,
 ) {
   const test = testIf(filter);
 
   describe(`Using ${didModule.constructor.name} and ${blobModule.constructor.name}`, () => {
-    test("Generates a `DIDDocument` and creates a `Blob` owned by this DID", async () => {
+    test('Generates a `DIDDocument` and creates a `Blob` owned by this DID', async () => {
       const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
@@ -26,7 +26,7 @@ export default function generateBlobModuleTests(
 
       const blob1 = {
         id: BlobId.random(did),
-        blob: "abcdef",
+        blob: 'abcdef',
       };
 
       await blobModule.new(blob1, didKeypair);
@@ -39,7 +39,7 @@ export default function generateBlobModuleTests(
       const blob2 = {
         id: BlobId.random(did),
         blob: {
-          example: "content",
+          example: 'content',
         },
       };
       await blobModule.new(blob2, didKeypair);
@@ -51,15 +51,15 @@ export default function generateBlobModuleTests(
       await expect(() => blobModule.new(blob2, didKeypair)).rejects.toThrow();
     });
 
-    test("Throws an error on missing `Blob`", async () => {
+    test('Throws an error on missing `Blob`', async () => {
       const id = BlobId.random(Did.random());
 
       await expect(() => blobModule.get(id)).rejects.toThrow(
-        new NoBlobError(id)
+        new NoBlobError(id),
       );
     });
 
-    test("`BlobResolver`", async () => {
+    test('`BlobResolver`', async () => {
       const resolver = new BlobResolver(blobModule);
       const did = Did.random();
 
@@ -72,7 +72,7 @@ export default function generateBlobModuleTests(
 
       const blob1 = {
         id: BlobId.random(did),
-        blob: "abcdef",
+        blob: 'abcdef',
       };
 
       await blobModule.new(blob1, didKeypair);

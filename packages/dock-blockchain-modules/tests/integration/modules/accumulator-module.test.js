@@ -42,7 +42,7 @@ describe("AccumulatorModule", () => {
     },
     {
       Did: DockDid,
-      PublicKey: DockAccumulatorPublicKey,
+      AccumulatorPublicKey: DockAccumulatorPublicKey,
       AccumulatorId: DockAccumulatorId,
       AccumulatorCommon: DockAccumulatorCommon,
     }
@@ -57,7 +57,7 @@ describe("AccumulatorModule", () => {
     },
     {
       Did: DockDid,
-      PublicKey: DockAccumulatorPublicKey,
+      AccumulatorPublicKey: DockAccumulatorPublicKey,
       AccumulatorId: DockAccumulatorId,
       AccumulatorCommon: DockAccumulatorCommon,
     }

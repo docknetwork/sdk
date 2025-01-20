@@ -35,7 +35,7 @@ describe("DIDModule", () => {
   didModuleTests(
     { did: new DockDIDModule(dock) },
     {
-      DID: DockDid,
+      Did: DockDid,
       OffchainSignatureParamsRef: DockOffchainSignatureParamsRef,
     },
     filter
@@ -44,7 +44,7 @@ describe("DIDModule", () => {
   didModuleTests(
     { did: new MultiApiDIDModule([new DockDIDModule(dock)]) },
     {
-      DID: DockDid,
+      Did: DockDid,
       OffchainSignatureParamsRef: DockOffchainSignatureParamsRef,
     },
     filter

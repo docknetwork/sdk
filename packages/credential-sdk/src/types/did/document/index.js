@@ -474,7 +474,7 @@ export class CheqdTestnetDIDDocument extends CheqdDIDDocument {
     super(...args);
     const { verificationMethod } = this;
 
-    this.verificationMethdod = verificationMethod.filter(
+    this.verificationMethod = verificationMethod.filter(
       (verMethod) => !verMethod.verificationMaterial.bytes.every((item) => !item),
     );
   }

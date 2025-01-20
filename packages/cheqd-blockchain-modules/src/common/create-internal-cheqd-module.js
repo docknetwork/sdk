@@ -1,7 +1,4 @@
-import {
-  VerificationMethodSignature,
-  CheqdDid,
-} from '@docknetwork/credential-sdk/types';
+import { VerificationMethodSignature } from '@docknetwork/credential-sdk/types';
 import { ensureInstanceOf } from '@docknetwork/credential-sdk/utils';
 import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
 import CheqdApiProvider from './cheqd-api-provider';
@@ -111,7 +108,7 @@ export default function createInternalCheqdModule(
       }
 
       async resources(did, ids) {
-        const strDid = CheqdDid.from(did).toEncodedString();
+        const strDid = this.types.Did.from(did).toEncodedString();
 
         const queries = [...ids].map(async (id) => [
           id,
@@ -131,7 +128,7 @@ export default function createInternalCheqdModule(
       }
 
       async resource(did, id) {
-        const strDid = CheqdDid.from(did).toEncodedString();
+        const strDid = this.types.Did.from(did).toEncodedString();
         const strID = String(TypedUUID.from(id));
 
         return await filterNoResourceError(
@@ -144,7 +141,7 @@ export default function createInternalCheqdModule(
         let res = [];
         let resources;
         let paginationKey;
-        const encodedDid = CheqdDid.from(did).toEncodedString();
+        const encodedDid = this.types.Did.from(did).toEncodedString();
 
         do {
           // eslint-disable-next-line operator-linebreak

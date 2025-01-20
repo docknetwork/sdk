@@ -111,16 +111,26 @@ export class MustBeExecutedOnce extends Error {
     const name = `mustBeExecutedOnce(${fn.name})`;
     const obj = {
       [name](...args) {
-        willExecute();
+        let res; let
+          err;
 
-        return fn.apply(this, args);
+        willExecute();
+        try {
+          res = fn.apply(this, args);
+        } catch (e) {
+          err = e;
+        } finally {
+          wasExecuted();
+        }
+
+        if (err != null) {
+          throw err;
+        }
+        return res;
       },
     };
 
-    const res = call(obj[name]);
-    wasExecuted();
-
-    return res;
+    return call(obj[name]);
   }
 }
 

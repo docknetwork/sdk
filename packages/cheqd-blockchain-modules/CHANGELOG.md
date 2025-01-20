@@ -1,5 +1,16 @@
 # @docknetwork/cheqd-blockchain-modules
 
+## 0.16.0
+
+### Minor Changes
+
+- Support legacy DidDocuments on `cheqd` mainnet
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.25.0
+
 ## 0.15.0
 
 ### Minor Changes

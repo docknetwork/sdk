@@ -59,6 +59,8 @@ import {
   filterObj,
   ensureEqualToOrPrototypeOf,
   maybeToCheqdPayloadOrJSON,
+  encodeAsBase58,
+  u8aToString,
 } from '../../../utils';
 
 export class PublicKeyBase58 extends withBase58(TypedBytes) {}
@@ -323,20 +325,75 @@ export class CheqdMainnetVerificationMethod extends withProp(
 
 export class CheqdTestnetVerificationMethodAssertion extends withProp(
   withProp(
-    CheqdVerificationMethodAssertion,
-    'id',
-    CheqdTestnetVerificationMethodRef,
+    withProp(
+      CheqdVerificationMethodAssertion,
+      'id',
+      CheqdTestnetVerificationMethodRef,
+    ),
+    'controller',
+    CheqdTestnetDid,
   ),
-  'controller',
-  CheqdTestnetDid,
+  'metadata',
+  option(CheqdTestnetPublicKeyMetadata),
 ) {}
 
-export class CheqdMainnetVerificationMethodAssertion extends withProp(
+export class CheqdMainnetVerificationMethodAssertion extends withFrom(
   withProp(
-    CheqdVerificationMethodAssertion,
-    'id',
-    CheqdMainnetVerificationMethodRef,
+    withProp(
+      withProp(
+        CheqdVerificationMethod,
+        'id',
+        CheqdMainnetVerificationMethodRef,
+      ),
+      'controller',
+      CheqdMainnetDid,
+    ),
+    'metadata',
+    option(CheqdMainnetPublicKeyMetadata),
   ),
-  'controller',
-  CheqdMainnetDid,
-) {}
+  (value, from) => {
+    const self = from(value);
+    const verMethod = self.toVerificationMethod();
+
+    if (verMethod.isOffchain()) {
+      let json;
+      try {
+        json = JSON.parse(u8aToString(verMethod.publicKeyBytes()));
+      } catch {
+        return self;
+      }
+
+      const pk = verMethod.publicKeyClass().from(json);
+      self.verificationMaterial = valueBytes(pk.bytes);
+      self.metadata = pk.value;
+    }
+
+    return self;
+  },
+) {
+  toCheqdPayload() {
+    const payload = filterObj(
+      this.apply(maybeToCheqdPayloadOrJSON),
+      (key, value) => key !== 'metadata' && value != null,
+    );
+
+    const verMethod = this.toVerificationMethod();
+
+    if (verMethod.isOffchain()) {
+      const pk = verMethod.publicKey();
+
+      if (pk.value.paramsRef != null || pk.value.participantId != null) {
+        payload.verificationMaterial = encodeAsBase58(pk.toJSONStringBytes());
+      }
+    }
+
+    return JSON.stringify(JSON.stringify(payload));
+  }
+
+  // eslint-disable-next-line sonarjs/no-identical-functions
+  static from(obj) {
+    return typeof obj === 'string'
+      ? super.fromJSON(JSON.parse(JSON.parse(obj)))
+      : super.from(obj);
+  }
+}

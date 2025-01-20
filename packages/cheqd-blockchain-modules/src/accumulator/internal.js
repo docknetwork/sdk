@@ -1,7 +1,6 @@
 import {
   CheqdStoredAccumulator,
   AccumulatorParams,
-  CheqdAccumulatorId,
   CheqdAccumulatorParamsRef,
   CheqdAccumulatorWithUpdateInfo,
   CheqdCreateResource,
@@ -147,7 +146,7 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
   }
 
   async accumulatorHistory(accumulatorId) {
-    const [did, name] = CheqdAccumulatorId.from(accumulatorId).value;
+    const [did, name] = this.types.AccumulatorId.from(accumulatorId).value;
 
     const ids = new SortedResourceVersions(
       await this.resourcesMetadataBy(
@@ -194,7 +193,7 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
   }
 
   async lastAccumulatorId(accumulatorId) {
-    const [did, name] = CheqdAccumulatorId.from(accumulatorId).value;
+    const [did, name] = this.types.AccumulatorId.from(accumulatorId).value;
     const lastMeta = await this.latestResourceMetadataBy(
       did,
       this.createAccumulatorMetadataFilter(name),
@@ -204,7 +203,7 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
   }
 
   async accumulator(accumulatorId) {
-    const [did, name] = CheqdAccumulatorId.from(accumulatorId).value;
+    const [did, name] = this.types.AccumulatorId.from(accumulatorId).value;
     const ids = new SortedResourceVersions(
       await this.resourcesMetadataBy(
         did,
@@ -274,7 +273,7 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
     start,
     end,
   ) {
-    const [did, name] = CheqdAccumulatorId.from(accumulatorId).value;
+    const [did, name] = this.types.AccumulatorId.from(accumulatorId).value;
     const startUUID = String(TypedUUID.from(start));
     const endUUID = String(TypedUUID.from(end));
 

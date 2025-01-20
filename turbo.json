@@ -18,6 +18,7 @@
       "outputs": []
     },
     "test": {
+      "cache": false,
       "dependsOn": ["^build"],
       "outputs": []
     },
@@ -26,11 +27,13 @@
       "outputs": []
     },
     "test-with-node": {
+      "cache": false,
       "dependsOn": ["^build"],
       "outputs": [],
-      "env": ["CHEQD_MNEMONIC", "IMAGE_TAG"]
+      "env": ["CHEQD_MNEMONIC", "CHEQD_IMAGE_TAG", "CHEQD_NETWORK"]
     },
     "examples-with-node": {
+      "cache": false,
       "dependsOn": ["^build"],
       "outputs": []
     },

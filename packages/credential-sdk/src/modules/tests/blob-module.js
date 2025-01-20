@@ -8,14 +8,14 @@ import { stringToU8a } from '../../utils';
 // eslint-disable-next-line jest/no-export
 export default function generateBlobModuleTests(
   { did: didModule, blob: blobModule },
-  { DID, BlobId },
+  { Did, BlobId },
   filter = () => true,
 ) {
   const test = testIf(filter);
 
   describe(`Using ${didModule.constructor.name} and ${blobModule.constructor.name}`, () => {
     test('Generates a `DIDDocument` and creates a `Blob` owned by this DID', async () => {
-      const did = DID.random();
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
@@ -52,7 +52,7 @@ export default function generateBlobModuleTests(
     });
 
     test('Throws an error on missing `Blob`', async () => {
-      const id = BlobId.random(DID.random());
+      const id = BlobId.random(Did.random());
 
       await expect(() => blobModule.get(id)).rejects.toThrow(
         new NoBlobError(id),
@@ -61,7 +61,7 @@ export default function generateBlobModuleTests(
 
     test('`BlobResolver`', async () => {
       const resolver = new BlobResolver(blobModule);
-      const did = DID.random();
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);

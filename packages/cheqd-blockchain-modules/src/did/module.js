@@ -2,10 +2,6 @@ import {
   AbstractDIDModule,
   NoDIDError,
 } from '@docknetwork/credential-sdk/modules/abstract/did';
-import {
-  CheqdDIDDocument,
-  CheqdDid,
-} from '@docknetwork/credential-sdk/types/did';
 import { DIDDocument } from '@docknetwork/credential-sdk/types';
 import { CheqdDIDModuleInternal } from './internal';
 import injectCheqd from '../common/inject-cheqd';
@@ -57,7 +53,7 @@ export default class CheqdDIDModule extends injectCheqd(AbstractDIDModule) {
    * @return {Promise<DIDDocument>} The DID document.
    */
   async getDocument(did) {
-    const cheqdDid = CheqdDid.from(did);
+    const cheqdDid = this.types.Did.from(did);
 
     let doc = null;
     try {
@@ -75,7 +71,7 @@ export default class CheqdDIDModule extends injectCheqd(AbstractDIDModule) {
       throw new NoDIDError(cheqdDid);
     }
 
-    return CheqdDIDDocument.from(doc)
+    return this.types.DidDocument.from(doc)
       .toDIDDocument()
       .setAttests(await this.attest.getAttests(cheqdDid));
   }

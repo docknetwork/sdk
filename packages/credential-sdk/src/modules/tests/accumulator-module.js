@@ -5,10 +5,10 @@ import {
 import {
   Accumulator,
   AccumulatorParams,
-  AccumulatorPublicKey,
   PositiveAccumulator,
   VBWitnessUpdateInfo,
   VBMembershipWitness,
+  AccumulatorPublicKey,
 } from '../../crypto';
 import { AccumulatorType } from '../abstract/accumulator/module';
 import {
@@ -21,7 +21,10 @@ import { Ed25519Keypair, DidKeypair } from '../../keypairs';
 export default function generateAccumulatorTests(
   { did: didModule, accumulator: accumulatorModule },
   {
-    DID, PublicKey, AccumulatorId, AccumulatorCommon,
+    Did,
+    AccumulatorId,
+    AccumulatorCommon,
+    AccumulatorPublicKey: StoredAccumulatorPublicKey,
   },
 ) {
   describe(`Using ${didModule.constructor.name} and ${accumulatorModule.constructor.name}`, () => {
@@ -43,7 +46,7 @@ export default function generateAccumulatorTests(
     const members = [];
     const seedAccum = randomAsHex(32);
 
-    const did = DID.random();
+    const did = Did.random();
     const pair = new DidKeypair([did, 1], Ed25519Keypair.random());
 
     const accumulatorModuleClass = accumulatorModule.constructor;
@@ -77,7 +80,7 @@ export default function generateAccumulatorTests(
 
       keypair = Accumulator.generateKeypair(params, seedAccum);
       const bytes2 = u8aToHex(keypair.publicKey.bytes);
-      const pk1 = new PublicKey(bytes2, [did, params1Id]);
+      const pk1 = new StoredAccumulatorPublicKey(bytes2, [did, params1Id]);
       pk1Id = await accumulatorModule.nextPublicKeyId(did);
       await accumulatorModule.addPublicKey(pk1Id, pk1, did, pair);
 
@@ -262,6 +265,7 @@ export default function generateAccumulatorTests(
       let accumParams = new AccumulatorParams(
         queriedAccum.publicKey.params.bytes.bytes,
       );
+
       expect(
         verifAccumulator.verifyMembershipWitness(
           member1,

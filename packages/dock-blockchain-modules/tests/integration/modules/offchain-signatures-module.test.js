@@ -46,8 +46,8 @@ describe("BlobModule", () => {
       ps: new DockPSModule(dock),
     },
     {
-      DID: DockDid,
-      OffchainSignaturesParamsRef: DockOffchainSignatureParamsRef,
+      Did: DockDid,
+      OffchainSignatureParamsRef: DockOffchainSignatureParamsRef,
     }
   );
 
@@ -64,8 +64,8 @@ describe("BlobModule", () => {
       ps: new MultiApiOffchainSignaturesModule([new DockPSModule(dock)]),
     },
     {
-      DID: DockDid,
-      OffchainSignaturesParamsRef: DockOffchainSignatureParamsRef,
+      Did: DockDid,
+      OffchainSignatureParamsRef: DockOffchainSignatureParamsRef,
     }
   );
 });

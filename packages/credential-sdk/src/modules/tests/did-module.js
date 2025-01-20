@@ -16,14 +16,14 @@ import { testIf } from './common';
 // eslint-disable-next-line jest/no-export
 export default function generateDIDModuleTests(
   { did: module },
-  { DID, OffchainSignatureParamsRef },
+  { Did, OffchainSignatureParamsRef },
   filter = () => true,
 ) {
   const test = testIf(filter);
 
   describe(`Using ${module.constructor.name}`, () => {
     test('Creates basic `DIDDocument` with keys', async () => {
-      const did = DID.random();
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
@@ -38,7 +38,7 @@ export default function generateDIDModuleTests(
     });
 
     test('Creates `DIDDocument` containing BBS/BBSPlus/PS keys', async () => {
-      const did = DID.random();
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
@@ -67,7 +67,7 @@ export default function generateDIDModuleTests(
     });
 
     test('Updates `DIDDocument` containing BBS/BBSPlus/PS keys', async () => {
-      const did = DID.random();
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
@@ -108,7 +108,7 @@ export default function generateDIDModuleTests(
     });
 
     test('Creates `DIDDocument` containing services', async () => {
-      const did = DID.random();
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
@@ -133,7 +133,7 @@ export default function generateDIDModuleTests(
     });
 
     test('Updates `DIDDocument` containing services', async () => {
-      const did = DID.random();
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
@@ -174,7 +174,7 @@ export default function generateDIDModuleTests(
     });
 
     test("Updates `DIDDocument`'s keys", async () => {
-      const did = DID.random();
+      const did = Did.random();
 
       const keyPair1 = Ed25519Keypair.random();
       const keyPair2 = Ed25519Keypair.random();
@@ -210,7 +210,7 @@ export default function generateDIDModuleTests(
     });
 
     test('Removes (deactivates) `DIDDocument`', async () => {
-      const did = DID.random();
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
@@ -229,7 +229,7 @@ export default function generateDIDModuleTests(
     });
 
     test("Throws an error if `DIDDocument` doesn't exist", async () => {
-      const did = DID.random();
+      const did = Did.random();
 
       await expect(() => module.getDocument(did)).rejects.toThrow(
         new NoDIDError(did),
@@ -238,7 +238,7 @@ export default function generateDIDModuleTests(
 
     test('`DIDResolver`', async () => {
       const resolver = new DIDResolver(module);
-      const did = DID.random();
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);

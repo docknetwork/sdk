@@ -24,14 +24,14 @@ export default function generateOffchainSignatureModuleTests(
   {
     did: didModule, offchainSignatures, bbs, bbsPlus, ps,
   },
-  { DID, OffchainSignaturesParamsRef },
+  { Did, OffchainSignatureParamsRef },
   filter = () => true,
 ) {
   const test = testIf(filter);
 
   describe(`Checks ${didModule.constructor.name} and ${offchainSignatures.constructor.name} with all public keys and params`, () => {
     test('Generates a `DIDDocument` with `OffchainPublicKey` and creates a `OffchainParameters` owned by this DID', async () => {
-      const did = DID.random();
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
@@ -42,7 +42,7 @@ export default function generateOffchainSignatureModuleTests(
       );
 
       const bbsParamsId = await offchainSignatures.nextParamsId(did);
-      const bbsParamsRef = new OffchainSignaturesParamsRef(did, bbsParamsId);
+      const bbsParamsRef = new OffchainSignatureParamsRef(did, bbsParamsId);
       const bbsParams = new BBSParams(
         new BBSParamsValue(TypedBytes.random(100), stringToU8a('bbs')),
       );
@@ -54,7 +54,7 @@ export default function generateOffchainSignatureModuleTests(
       );
 
       const bbsPlusParamsId = await offchainSignatures.nextParamsId(did);
-      const bbsPlusParamsRef = new OffchainSignaturesParamsRef(
+      const bbsPlusParamsRef = new OffchainSignatureParamsRef(
         did,
         bbsPlusParamsId,
       );
@@ -69,7 +69,7 @@ export default function generateOffchainSignatureModuleTests(
       );
 
       const psParamsId = await offchainSignatures.nextParamsId(did);
-      const psParamsRef = new OffchainSignaturesParamsRef(did, psParamsId);
+      const psParamsRef = new OffchainSignatureParamsRef(did, psParamsId);
       const psParams = new PSParams(
         new PSParamsValue(TypedBytes.random(100), stringToU8a('ps')),
       );
@@ -140,14 +140,14 @@ export default function generateOffchainSignatureModuleTests(
     });
 
     test('Returns `null` in case of missing params', async () => {
-      const did = DID.random();
+      const did = Did.random();
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
 
       const document = DIDDocument.create(did, [didKeypair.didKey()]);
 
       const psParamsId = await offchainSignatures.nextParamsId(did);
-      const psParamsRef = new OffchainSignaturesParamsRef(did, psParamsId);
+      const psParamsRef = new OffchainSignatureParamsRef(did, psParamsId);
 
       await didModule.createDocument(document, didKeypair);
       const psKey = new PSPublicKey(
@@ -187,7 +187,7 @@ export default function generateOffchainSignatureModuleTests(
     'Checks basic workflow for each module',
     ({ module, PublicKey, Params }) => {
       test(`Generates a \`DIDDocument\` with \`OffchainPublicKey\` and creates a \`OffchainParameters\` owned by this DID using ${module.constructor.name} with ${PublicKey.name} and ${Params.name}`, async () => {
-        const did = DID.random();
+        const did = Did.random();
 
         const keyPair = Ed25519Keypair.random();
         const didKeypair = new DidKeypair([did, 1], keyPair);
@@ -198,7 +198,7 @@ export default function generateOffchainSignatureModuleTests(
         );
 
         const id = await offchainSignatures.nextParamsId(did);
-        const ref = new OffchainSignaturesParamsRef(did, id);
+        const ref = new OffchainSignatureParamsRef(did, id);
         const params = new Params(
           new Params.Class(
             TypedBytes.random(100),

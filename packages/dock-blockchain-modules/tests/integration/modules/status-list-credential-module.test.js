@@ -9,18 +9,18 @@ import { MultiApiDIDModule } from "@docknetwork/credential-sdk/modules";
 import generateStatusListCredentialModuleTests from "@docknetwork/credential-sdk/modules/tests/status-list-credential-module";
 import { DockDIDModule, DockStatusListCredentialModule } from "../../../src";
 import {
-    FullNodeEndpoint,
-    TestAccountURI,
-    TestKeyringOpts,
-  } from "../../test-constants";
+  FullNodeEndpoint,
+  TestAccountURI,
+  TestKeyringOpts,
+} from "../../test-constants";
 
 describe("StatusListCredentialModule", () => {
   const dock = new DockAPI();
 
   beforeAll(async () => {
     await dock.init({
-        keyring: TestKeyringOpts,
-        address: FullNodeEndpoint,
+      keyring: TestKeyringOpts,
+      address: FullNodeEndpoint,
     });
     const account = dock.keyring.addFromUri(TestAccountURI);
     dock.setAccount(account);
@@ -36,21 +36,23 @@ describe("StatusListCredentialModule", () => {
       statusListCredential: new DockStatusListCredentialModule(dock),
     },
     {
-      DID: DockDid,
+      Did: DockDid,
       StatusListCredentialId: DockStatusListCredentialId,
-      StatusListCredential: StatusList2021Credential
+      StatusListCredential: StatusList2021Credential,
     }
   );
 
   generateStatusListCredentialModuleTests(
     {
       did: new MultiApiDIDModule([new DockDIDModule(dock)]),
-      statusListCredential: new MultiApiStatusListCredentialModule([new DockStatusListCredentialModule(dock)]),
+      statusListCredential: new MultiApiStatusListCredentialModule([
+        new DockStatusListCredentialModule(dock),
+      ]),
     },
     {
-      DID: DockDid,
+      Did: DockDid,
       StatusListCredentialId: DockStatusListCredentialId,
-      StatusListCredential: StatusList2021Credential
+      StatusListCredential: StatusList2021Credential,
     }
   );
 });

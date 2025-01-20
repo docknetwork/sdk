@@ -5,14 +5,14 @@ import { testIf } from './common';
 // eslint-disable-next-line jest/no-export
 export default function generateAttestModuleTests(
   { did: didModule, attest: attestModule },
-  { DID },
+  { Did },
   filter = () => true,
 ) {
   const test = testIf(filter);
 
   describe(`Using ${didModule.constructor.name} and ${attestModule.constructor.name}`, () => {
     test('Generates a `DIDDocument` and appends an `Attest` to it', async () => {
-      const did = DID.random();
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
@@ -45,7 +45,7 @@ export default function generateAttestModuleTests(
     });
 
     test('Returns `null` on missing attest', async () => {
-      expect(await attestModule.getAttests(DID.random())).toBe(null);
+      expect(await attestModule.getAttests(Did.random())).toBe(null);
     });
   });
 }

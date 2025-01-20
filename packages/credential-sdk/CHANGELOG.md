@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.25.0
+
+### Minor Changes
+
+- Support legacy DidDocuments on `cheqd` mainnet
+
 ## 0.24.0
 
 ### Minor Changes

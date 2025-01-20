@@ -3,10 +3,7 @@ import {
   withExtendedStaticProperties,
   u8aToString,
 } from '@docknetwork/credential-sdk/utils';
-import {
-  CheqdCreateResource,
-  CheqdDid,
-} from '@docknetwork/credential-sdk/types';
+import { CheqdCreateResource } from '@docknetwork/credential-sdk/types';
 import createInternalCheqdModule from './create-internal-cheqd-module';
 import { validateResource } from './resource';
 
@@ -15,7 +12,7 @@ const methods = {
     const { ParamsName, ParamsType, Params } = this.constructor;
 
     return new CheqdCreateResource(
-      CheqdDid.from(did).value.value,
+      this.types.Did.from(did).value.value,
       TypedUUID.from(id),
       '1.0',
       [],

@@ -1,10 +1,5 @@
 import { CheqdAPI } from "@docknetwork/cheqd-blockchain-api";
-import {
-  CheqdAccumulatorId,
-  CheqdAccumulatorPublicKey,
-  CheqdAccumulatorCommon,
-  CheqdTestnetDid,
-} from "@docknetwork/credential-sdk/types";
+import { CheqdAccumulatorCommon } from "@docknetwork/credential-sdk/types";
 import {
   MultiApiDIDModule,
   MultiApiAccumulatorModule,
@@ -38,9 +33,7 @@ describe("AccumulatorModule", () => {
       accumulator: new CheqdAccumulatorModule(cheqd),
     },
     {
-      DID: CheqdTestnetDid,
-      AccumulatorId: CheqdAccumulatorId,
-      PublicKey: CheqdAccumulatorPublicKey,
+      ...cheqd.constructor.Types[network],
       AccumulatorCommon: CheqdAccumulatorCommon,
     }
   );
@@ -53,9 +46,7 @@ describe("AccumulatorModule", () => {
       ]),
     },
     {
-      DID: CheqdTestnetDid,
-      AccumulatorId: CheqdAccumulatorId,
-      PublicKey: CheqdAccumulatorPublicKey,
+      ...cheqd.constructor.Types[network],
       AccumulatorCommon: CheqdAccumulatorCommon,
     }
   );

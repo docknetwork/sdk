@@ -1,6 +1,9 @@
 import { DockAPI } from "@docknetwork/dock-blockchain-api";
 import { DockDid } from "@docknetwork/credential-sdk/types";
-import { MultiApiDIDModule, MultiApiAttestModule } from '@docknetwork/credential-sdk/modules';
+import {
+  MultiApiDIDModule,
+  MultiApiAttestModule,
+} from "@docknetwork/credential-sdk/modules";
 import generateAttestModuleTests from "@docknetwork/credential-sdk/modules/tests/attest-module";
 import { DockDIDModule, DockAttestModule } from "../../../src";
 import {
@@ -27,11 +30,14 @@ describe("AttestModule", () => {
 
   generateAttestModuleTests(
     { did: new DockDIDModule(dock), attest: new DockAttestModule(dock) },
-    { DID: DockDid }
+    { Did: DockDid }
   );
 
   generateAttestModuleTests(
-    { did: new MultiApiDIDModule([new DockDIDModule(dock)]), attest: new MultiApiAttestModule([new DockAttestModule(dock)]) },
-    { DID: DockDid }
+    {
+      did: new MultiApiDIDModule([new DockDIDModule(dock)]),
+      attest: new MultiApiAttestModule([new DockAttestModule(dock)]),
+    },
+    { Did: DockDid }
   );
 });

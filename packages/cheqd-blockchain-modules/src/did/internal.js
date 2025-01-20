@@ -1,5 +1,4 @@
 import {
-  CheqdDid,
   DIDDocument,
   CheqdDeactivateDidDocument,
 } from '@docknetwork/credential-sdk/types';
@@ -25,7 +24,7 @@ export class CheqdDIDModuleInternal extends createInternalCheqdModule(methods) {
 
   async getDidDocumentWithMetadata(did) {
     return await this.apiProvider.sdk.querier.did.didDoc(
-      String(CheqdDid.from(did)),
+      String(this.types.Did.from(did)),
     );
   }
 }

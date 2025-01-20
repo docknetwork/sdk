@@ -334,7 +334,7 @@ export class CheqdTestnetVerificationMethodAssertion extends withProp(
     CheqdTestnetDid,
   ),
   'metadata',
-  option(CheqdMainnetPublicKeyMetadata),
+  option(CheqdTestnetPublicKeyMetadata),
 ) {}
 
 export class CheqdMainnetVerificationMethodAssertion extends withFrom(

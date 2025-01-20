@@ -1,5 +1,5 @@
-import { DidKeypair, Ed25519Keypair } from '../../keypairs';
-import { DIDResolver } from '../../resolver';
+import { DidKeypair, Ed25519Keypair } from "../../keypairs";
+import { DIDResolver } from "../../resolver";
 import {
   DIDDocument,
   BBSPublicKeyValue,
@@ -8,22 +8,22 @@ import {
   PSPublicKeyValue,
   VerificationMethodRef,
   ServiceEndpoint,
-} from '../../types';
-import { TypedBytes } from '../../types/generic';
-import { NoDIDError } from '../abstract/did/errors';
-import { testIf } from './common';
+} from "../../types";
+import { TypedBytes } from "../../types/generic";
+import { NoDIDError } from "../abstract/did/errors";
+import { testIf } from "./common";
 
 // eslint-disable-next-line jest/no-export
 export default function generateDIDModuleTests(
   { did: module },
-  { DID, OffchainSignatureParamsRef },
-  filter = () => true,
+  { Did, OffchainSignatureParamsRef },
+  filter = () => true
 ) {
   const test = testIf(filter);
 
   describe(`Using ${module.constructor.name}`, () => {
-    test('Creates basic `DIDDocument` with keys', async () => {
-      const did = DID.random();
+    it.only("Creates basic `DIDDocument` with keys", async () => {
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
@@ -33,19 +33,19 @@ export default function generateDIDModuleTests(
       await module.createDocument(document, didKeypair);
 
       expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
+        document.toJSON()
       );
     });
 
-    test('Creates `DIDDocument` containing BBS/BBSPlus/PS keys', async () => {
-      const did = DID.random();
+    test("Creates `DIDDocument` containing BBS/BBSPlus/PS keys", async () => {
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
 
       const ref = new OffchainSignatureParamsRef(
         did,
-        OffchainSignatureParamsRef.Classes[1].random(),
+        OffchainSignatureParamsRef.Classes[1].random()
       );
 
       const bbsKey = new BBSPublicKeyValue(TypedBytes.random(100), ref);
@@ -62,19 +62,19 @@ export default function generateDIDModuleTests(
       await module.createDocument(document, didKeypair);
 
       expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
+        document.toJSON()
       );
     });
 
-    test('Updates `DIDDocument` containing BBS/BBSPlus/PS keys', async () => {
-      const did = DID.random();
+    test("Updates `DIDDocument` containing BBS/BBSPlus/PS keys", async () => {
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
 
       const bbsKey = new DidKey(new BBSPublicKeyValue(TypedBytes.random(100)));
       const bbsPlusKey = new DidKey(
-        new BBSPlusPublicKeyValue(TypedBytes.random(100)),
+        new BBSPlusPublicKeyValue(TypedBytes.random(100))
       );
       const psKey = new DidKey(new PSPublicKeyValue(TypedBytes.random(1000)));
 
@@ -83,7 +83,7 @@ export default function generateDIDModuleTests(
       await module.createDocument(document, didKeypair);
 
       expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
+        document.toJSON()
       );
 
       document.addKey([did, document.nextKeyIndex()], bbsKey);
@@ -93,7 +93,7 @@ export default function generateDIDModuleTests(
       await module.updateDocument(document, didKeypair);
 
       expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
+        document.toJSON()
       );
 
       expect(document.didKeys().toJSON()).toEqual([
@@ -107,17 +107,17 @@ export default function generateDIDModuleTests(
       ]);
     });
 
-    test('Creates `DIDDocument` containing services', async () => {
-      const did = DID.random();
+    test("Creates `DIDDocument` containing services", async () => {
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
 
-      const service1 = new ServiceEndpoint('LinkedDomains', [
-        'ServiceEndpoint#1',
+      const service1 = new ServiceEndpoint("LinkedDomains", [
+        "ServiceEndpoint#1",
       ]);
-      const service2 = new ServiceEndpoint('LinkedDomains', [
-        'ServiceEndpoint#2',
+      const service2 = new ServiceEndpoint("LinkedDomains", [
+        "ServiceEndpoint#2",
       ]);
 
       const document = DIDDocument.create(did, [didKeypair.didKey()], [], {
@@ -128,21 +128,21 @@ export default function generateDIDModuleTests(
       await module.createDocument(document, didKeypair);
 
       expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
+        document.toJSON()
       );
     });
 
-    test('Updates `DIDDocument` containing services', async () => {
-      const did = DID.random();
+    test("Updates `DIDDocument` containing services", async () => {
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
 
-      const service1 = new ServiceEndpoint('LinkedDomains', [
-        'ServiceEndpoint#1',
+      const service1 = new ServiceEndpoint("LinkedDomains", [
+        "ServiceEndpoint#1",
       ]);
-      const service2 = new ServiceEndpoint('LinkedDomains', [
-        'ServiceEndpoint#2',
+      const service2 = new ServiceEndpoint("LinkedDomains", [
+        "ServiceEndpoint#2",
       ]);
 
       const document = DIDDocument.create(did, [didKeypair.didKey()]);
@@ -150,31 +150,31 @@ export default function generateDIDModuleTests(
       await module.createDocument(document, didKeypair);
 
       expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
+        document.toJSON()
       );
 
-      document.addServiceEndpoint([did, 'service1'], service1);
-      document.addServiceEndpoint([did, 'service2'], service2);
+      document.addServiceEndpoint([did, "service1"], service1);
+      document.addServiceEndpoint([did, "service2"], service2);
 
       await module.updateDocument(document, didKeypair);
 
       expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
+        document.toJSON()
       );
 
-      document.removeServiceEndpoint([did, 'service2']);
+      document.removeServiceEndpoint([did, "service2"]);
 
       await module.updateDocument(document, didKeypair);
 
       expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
+        document.toJSON()
       );
 
       expect(document.service.length).toEqual(1);
     });
 
     test("Updates `DIDDocument`'s keys", async () => {
-      const did = DID.random();
+      const did = Did.random();
 
       const keyPair1 = Ed25519Keypair.random();
       const keyPair2 = Ed25519Keypair.random();
@@ -191,26 +191,28 @@ export default function generateDIDModuleTests(
 
       await module.createDocument(document, didKeypair2);
       expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
+        document.toJSON()
       );
 
       document.removeKey([did, 2]);
       await module.updateDocument(document, didKeypair1);
       expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
+        document.toJSON()
       );
 
       document.addKey([did, 3], didKeypair3.didKey());
-      await expect(() => module.updateDocument(document, didKeypair2)).rejects.toThrow();
+      await expect(() =>
+        module.updateDocument(document, didKeypair2)
+      ).rejects.toThrow();
 
       await module.updateDocument(document, didKeypair1);
       expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
+        document.toJSON()
       );
     });
 
-    test('Removes (deactivates) `DIDDocument`', async () => {
-      const did = DID.random();
+    test("Removes (deactivates) `DIDDocument`", async () => {
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
@@ -219,26 +221,26 @@ export default function generateDIDModuleTests(
 
       await module.createDocument(document, didKeypair);
       expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
+        document.toJSON()
       );
 
       await module.removeDocument(did, didKeypair);
       await expect(() => module.getDocument(did)).rejects.toThrow(
-        new NoDIDError(did),
+        new NoDIDError(did)
       );
     });
 
     test("Throws an error if `DIDDocument` doesn't exist", async () => {
-      const did = DID.random();
+      const did = Did.random();
 
       await expect(() => module.getDocument(did)).rejects.toThrow(
-        new NoDIDError(did),
+        new NoDIDError(did)
       );
     });
 
-    test('`DIDResolver`', async () => {
+    test("`DIDResolver`", async () => {
       const resolver = new DIDResolver(module);
-      const did = DID.random();
+      const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);

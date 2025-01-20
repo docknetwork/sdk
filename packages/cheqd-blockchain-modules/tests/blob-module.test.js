@@ -1,8 +1,4 @@
 import { CheqdAPI } from "@docknetwork/cheqd-blockchain-api";
-import {
-  CheqdTestnetDid,
-  CheqdBlobId,
-} from "@docknetwork/credential-sdk/types";
 import { MultiApiBlobModule } from "@docknetwork/credential-sdk/modules";
 import generateBlobModuleTests from "@docknetwork/credential-sdk/modules/tests/blob-module";
 import CheqdDIDModule from "../src/did/module";
@@ -30,10 +26,7 @@ describe("BlobModule", () => {
       did: new CheqdDIDModule(cheqd),
       blob: new CheqdBlobModule(cheqd),
     },
-    {
-      DID: CheqdTestnetDid,
-      BlobId: CheqdBlobId,
-    }
+    cheqd.constructor.Types[network]
   );
 
   generateBlobModuleTests(
@@ -41,9 +34,6 @@ describe("BlobModule", () => {
       did: new MultiApiDIDModule([new CheqdDIDModule(cheqd)]),
       blob: new MultiApiBlobModule([new CheqdBlobModule(cheqd)]),
     },
-    {
-      DID: CheqdTestnetDid,
-      BlobId: CheqdBlobId,
-    }
+    cheqd.constructor.Types[network]
   );
 });

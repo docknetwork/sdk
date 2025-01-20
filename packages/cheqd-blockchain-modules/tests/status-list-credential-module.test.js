@@ -31,22 +31,16 @@ describe("StatusListCredentialModule", () => {
       did: new CheqdDIDModule(cheqd),
       statusListCredential: new CheqdStatusListCredentialModule(cheqd),
     },
-    {
-      DID: CheqdTestnetDid,
-      StatusListCredentialId: CheqdStatusListCredentialId,
-      StatusListCredential: StatusList2021Credential
-    }
+    cheqd.constructor.Types[network]
   );
 
   generateStatusListCredentialModuleTests(
     {
       did: new MultiApiDIDModule([new CheqdDIDModule(cheqd)]),
-      statusListCredential: new MultiApiStatusListCredentialModule([new CheqdStatusListCredentialModule(cheqd)]),
+      statusListCredential: new MultiApiStatusListCredentialModule([
+        new CheqdStatusListCredentialModule(cheqd),
+      ]),
     },
-    {
-      DID: CheqdTestnetDid,
-      StatusListCredentialId: CheqdStatusListCredentialId,
-      StatusListCredential: StatusList2021Credential
-    }
+    cheqd.constructor.Types[network]
   );
 });

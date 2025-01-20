@@ -1,5 +1,16 @@
 # @docknetwork/dock-blockchain-modules
 
+## 0.14.0
+
+### Minor Changes
+
+- Support legacy DidDocuments on `cheqd` mainnet
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.25.0
+
 ## 0.13.1
 
 - Updated dependencies

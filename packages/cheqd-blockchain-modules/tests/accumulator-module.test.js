@@ -37,12 +37,7 @@ describe("AccumulatorModule", () => {
       did: new CheqdDIDModule(cheqd),
       accumulator: new CheqdAccumulatorModule(cheqd),
     },
-    {
-      DID: CheqdTestnetDid,
-      AccumulatorId: CheqdAccumulatorId,
-      PublicKey: CheqdAccumulatorPublicKey,
-      AccumulatorCommon: CheqdAccumulatorCommon,
-    }
+    cheqd.constructor.Types[network]
   );
 
   generateAccumulatorModuleTests(
@@ -52,11 +47,6 @@ describe("AccumulatorModule", () => {
         new CheqdAccumulatorModule(cheqd),
       ]),
     },
-    {
-      DID: CheqdTestnetDid,
-      AccumulatorId: CheqdAccumulatorId,
-      PublicKey: CheqdAccumulatorPublicKey,
-      AccumulatorCommon: CheqdAccumulatorCommon,
-    }
+    cheqd.constructor.Types[network]
   );
 });

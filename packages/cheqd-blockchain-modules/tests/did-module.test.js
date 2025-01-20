@@ -1,8 +1,4 @@
 import { CheqdAPI } from "@docknetwork/cheqd-blockchain-api";
-import {
-  CheqdTestnetDid,
-  CheqdOffchainSignatureParamsRef,
-} from "@docknetwork/credential-sdk/types";
 import didModuleTests from "@docknetwork/credential-sdk/modules/tests/did-module";
 import CheqdDIDModule from "../src/did/module";
 import { faucet, url, network } from "./constants";
@@ -25,16 +21,10 @@ describe("DIDModule", () => {
 
   didModuleTests(
     { did: new CheqdDIDModule(cheqd) },
-    {
-      DID: CheqdTestnetDid,
-      OffchainSignatureParamsRef: CheqdOffchainSignatureParamsRef,
-    }
+    cheqd.constructor.Types[network]
   );
   didModuleTests(
     { did: new MultiApiDIDModule([new CheqdDIDModule(cheqd)]) },
-    {
-      DID: CheqdTestnetDid,
-      OffchainSignatureParamsRef: CheqdOffchainSignatureParamsRef,
-    }
+    cheqd.constructor.Types[network]
   );
 });

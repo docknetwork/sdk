@@ -4,9 +4,10 @@
  * @param {T} value
  * @returns {object}
  */
-export const maybeToJSON = (value) => (typeof value?.toJSON === 'function'
-  ? value.toJSON()
-  : JSON.parse(JSON.stringify(value)));
+export const maybeToJSON = (value) =>
+  typeof value?.toJSON === "function"
+    ? value.toJSON()
+    : JSON.parse(JSON.stringify(value));
 
 /**
  * Stringifies the provided value converted to JSON.
@@ -21,13 +22,14 @@ export const maybeToJSONString = (value) => JSON.stringify(maybeToJSON(value));
  * @param {*} value
  * @returns {object}
  */
-export const maybeToCheqdPayloadOrJSON = (obj) => (typeof obj?.toCheqdPayload === 'function' // eslint-disable-line no-nested-ternary
-  ? obj.toCheqdPayload()
-  : typeof obj?.apply === 'function' // eslint-disable-line no-nested-ternary
+export const maybeToCheqdPayloadOrJSON = (obj) =>
+  typeof obj?.toCheqdPayload === "function" // eslint-disable-line no-nested-ternary
+    ? obj.toCheqdPayload()
+    : typeof obj?.apply === "function" // eslint-disable-line no-nested-ternary
     ? obj.apply(maybeToCheqdPayloadOrJSON)
-    : typeof value !== 'object' && typeof value !== 'function'
-      ? obj
-      : maybeToJSON(obj));
+    : typeof value !== "object" && typeof value !== "function"
+    ? obj
+    : maybeToJSON(obj);
 
 /**
  * Returns bytes of the value converted to a stringified JSON.
@@ -35,9 +37,10 @@ export const maybeToCheqdPayloadOrJSON = (obj) => (typeof obj?.toCheqdPayload ==
  * @param {T} value
  * @returns {string}
  */
-export const maybeToJSONStringBytes = (value) => (typeof value?.maybeToJSONStringBytes === 'function'
-  ? value.toJSONStringBytes()
-  : Uint8Array.from(Buffer.from(maybeToJSONString(value))));
+export const maybeToJSONStringBytes = (value) =>
+  typeof value?.maybeToJSONStringBytes === "function"
+    ? value.toJSONStringBytes()
+    : Uint8Array.from(Buffer.from(maybeToJSONString(value)));
 
 /**
  * Attempts to compare two values using `value.eq(other)`, returns `boolean`.
@@ -46,7 +49,8 @@ export const maybeToJSONStringBytes = (value) => (typeof value?.maybeToJSONStrin
  * @param {T} other
  * @returns {boolean}
  */
-export const maybeEq = (value, other) => (typeof value?.eq === 'function' ? value.eq(other) : value === other);
+export const maybeEq = (value, other) =>
+  typeof value?.eq === "function" ? value.eq(other) : value === other;
 
 /**
  * Attempts to call `value.toHuman()` or `value.toJSON`, returns `value` if methods don't exist.
@@ -54,7 +58,8 @@ export const maybeEq = (value, other) => (typeof value?.eq === 'function' ? valu
  * @param {T} value
  * @returns {object}
  */
-export const maybeToHuman = (obj) => (obj && typeof obj.toHuman === 'function' ? obj.toHuman() : maybeToJSON(obj));
+export const maybeToHuman = (obj) =>
+  obj && typeof obj.toHuman === "function" ? obj.toHuman() : maybeToJSON(obj);
 
 /**
  * Attempts to call `value.toNumber()`, returns `+value` if method doesn't exist.
@@ -62,13 +67,14 @@ export const maybeToHuman = (obj) => (obj && typeof obj.toHuman === 'function' ?
  * @param {T} value
  * @returns {number}
  */
-export const maybeToNumber = (value) => (typeof value?.toNumber === 'function' ? value.toNumber() : +value);
+export const maybeToNumber = (value) =>
+  typeof value?.toNumber === "function" ? value.toNumber() : +value;
 
 /**
  * Marks function that it can't be used as a constructor.
  */
 export const NotAConstructor = Symbol.for(
-  '@docknetwork/credential-sdk/NotAConstructor',
+  "@docknetwork/credential-sdk/NotAConstructor"
 );
 
 /**
@@ -76,14 +82,16 @@ export const NotAConstructor = Symbol.for(
  * @param Class
  * @param args
  */
-export const maybeNew = (Class, args) => (!Class[NotAConstructor] ? new Class(...args) : Class.apply(Class, args));
+export const maybeNew = (Class, args) =>
+  !Class[NotAConstructor] ? new Class(...args) : Class.apply(Class, args);
 
 /**
  * Attempts to create new instance of the supplied class using `Class.from(obj)`, instantiates class if `from` doesn't exist.
  * @param Class
  * @param args
  */
-export const maybeFrom = (klass, obj) => (typeof klass.from === 'function' ? klass.from(obj) : maybeNew(klass, [obj]));
+export const maybeFrom = (klass, obj) =>
+  typeof klass.from === "function" ? klass.from(obj) : maybeNew(klass, [obj]);
 
 /**
  * Error thrown when the provided function was executed more than once or wasn't executed at all.
@@ -111,16 +119,20 @@ export class MustBeExecutedOnce extends Error {
     const name = `mustBeExecutedOnce(${fn.name})`;
     const obj = {
       [name](...args) {
-        willExecute();
+        let res;
 
-        return fn.apply(this, args);
+        willExecute();
+        try {
+          res = fn.apply(this, args);
+        } finally {
+          wasExecuted();
+        }
+
+        return res;
       },
     };
 
-    const res = call(obj[name]);
-    wasExecuted();
-
-    return res;
+    return call(obj[name]);
   }
 }
 
@@ -137,18 +149,18 @@ export class MustBeExecutedOnce extends Error {
 export const applyToValue = (check, fn, value) => {
   if (check(value)) {
     return fn(value);
-  } else if (typeof value?.apply === 'function') {
+  } else if (typeof value?.apply === "function") {
     let res;
     MustBeExecutedOnce.ensure(
       (obj) => {
         res = applyToValue(check, fn, obj);
       },
-      (wrapped) => value.apply(wrapped),
+      (wrapped) => value.apply(wrapped)
     );
     return res;
   }
 
   throw new Error(
-    `\`fn\` can't be applied because value \`${value}\` didn't pass the check \`${check}\``,
+    `\`fn\` can't be applied because value \`${value}\` didn't pass the check \`${check}\``
   );
 };

@@ -2,13 +2,13 @@ import {
   CheqdVerificationMethodAssertion,
   CheqdMainnetVerificationMethodAssertion,
   CheqdTestnetVerificationMethodAssertion,
-} from './verification-method';
+} from "./verification-method";
 import {
   CheqdMainnetVerificationMethodRef,
   CheqdTestnetVerificationMethodRef,
   CheqdVerificationMethodRef,
-} from './verification-method-ref';
-import { withFrom } from '../../generic';
+} from "./verification-method-ref";
+import { withFrom } from "../../generic";
 
 export class CheqdVerificationMethodRefOrCheqdVerificationMethod extends withFrom(
   CheqdVerificationMethodRef,
@@ -18,7 +18,7 @@ export class CheqdVerificationMethodRefOrCheqdVerificationMethod extends withFro
     } catch (err) {
       return this.Or.from(value);
     }
-  },
+  }
 ) {
   static Base = CheqdVerificationMethodAssertion;
 

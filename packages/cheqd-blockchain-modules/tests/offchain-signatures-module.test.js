@@ -23,16 +23,13 @@ describe("OffchainSignaturesModule", () => {
     await cheqd.disconnect();
   });
 
-  generateOffchainSignaturesModuleTests(new CheqdCoreModules(cheqd), {
-    DID: CheqdTestnetDid,
-    OffchainSignaturesParamsRef: CheqdOffchainSignatureParamsRef,
-  });
+  generateOffchainSignaturesModuleTests(
+    new CheqdCoreModules(cheqd),
+    cheqd.constructor.Types[network]
+  );
 
   generateOffchainSignaturesModuleTests(
     new MultiApiCoreModules([new CheqdCoreModules(cheqd)]),
-    {
-      DID: CheqdTestnetDid,
-      OffchainSignaturesParamsRef: CheqdOffchainSignatureParamsRef,
-    }
+    cheqd.constructor.Types[network]
   );
 });

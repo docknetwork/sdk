@@ -47,7 +47,7 @@ describe("BlobModule", () => {
     },
     {
       DID: DockDid,
-      OffchainSignaturesParamsRef: DockOffchainSignatureParamsRef,
+      OffchainSignatureParamsRef: DockOffchainSignatureParamsRef,
     }
   );
 
@@ -65,7 +65,7 @@ describe("BlobModule", () => {
     },
     {
       DID: DockDid,
-      OffchainSignaturesParamsRef: DockOffchainSignatureParamsRef,
+      OffchainSignatureParamsRef: DockOffchainSignatureParamsRef,
     }
   );
 });

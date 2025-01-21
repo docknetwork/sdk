@@ -1,5 +1,18 @@
 # @docknetwork/sdk-examples
 
+## 0.9.0
+
+### Minor Changes
+
+- Fix `JSON` import + misc tweaks
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/dock-blockchain-modules@0.15.0
+  - @docknetwork/dock-blockchain-api@0.11.0
+  - @docknetwork/credential-sdk@0.26.0
+
 ## 0.8.0
 
 ### Minor Changes

@@ -212,7 +212,9 @@ export class CheqdAPI extends AbstractApiProvider {
    * @param {object} configuration.fee
    * @returns {Promise<*>}
    */
-  async signAndSend(tx, { from, fee, memo } = {}) {
+  async signAndSend(tx, {
+    from, fee, memo, gas,
+  } = {}) {
     this.ensureInitialized();
     const { PayloadWrappers, Prefixes, Fees } = this.constructor;
     const { typeUrl } = tx;
@@ -228,7 +230,7 @@ export class CheqdAPI extends AbstractApiProvider {
     const sender = from ?? (await this.sdk.options.wallet.getAccounts())[0].address;
     const payment = {
       amount: [amount],
-      gas: '1400000', // TODO: dynamically calculate needed amount
+      gas: String(gas ?? 2e6), // TODO: dynamically calculate needed amount
       payer: sender,
     };
 

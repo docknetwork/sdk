@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.26.0
+
+### Minor Changes
+
+- Fix `JSON` import + misc tweaks
+
 ## 0.25.0
 
 ### Minor Changes

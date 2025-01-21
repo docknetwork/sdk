@@ -258,7 +258,7 @@ export class DIDDocument extends withFrom(
     const idx = this.controller.findIndex((ctrl) => ctrl.eq(controller));
     // eslint-disable-next-line
     if (!~idx) {
-      throw new Error(`Controller \`${controller}\` doesn't exists`);
+      throw new Error(`Controller \`${controller}\` doesn't exist`);
     }
     this.controller.splice(idx, 1);
 

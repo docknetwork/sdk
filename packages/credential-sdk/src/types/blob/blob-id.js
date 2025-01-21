@@ -13,7 +13,7 @@ import withFromDockId, {
 } from '../generic/with-from-dock-id';
 import { CheqdBlobQualifier, DockBlobQualifier } from './const';
 import { CheqdMainnetDid, CheqdTestnetDid, DidRef } from '../did';
-import dockDidById from '../../utils/dock-did-by-id.json';
+import dockDidById from '../../utils/dock-did-by-id';
 
 export class BlobId extends withFrom(
   withQualifier(TypedEnum, true),

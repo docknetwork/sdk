@@ -2,11 +2,15 @@ import {
   VerificationRelationship,
   DidKey,
   CheqdTestnetDid,
-  DockDid,
   DockDidValue,
   CheqdTestnetDidValue,
+  CheqdMainnetDidValue,
 } from "../src/types/did";
-import { DIDDocument } from "../src/types/did/document";
+import {
+  CheqdMainnetDIDDocument,
+  CheqdTestnetDIDDocument,
+  DIDDocument,
+} from "../src/types/did/document";
 import {
   PublicKeyEd25519,
   BBSPublicKey,
@@ -15,7 +19,7 @@ import {
   CheqdOffchainSignatureParamsRef,
 } from "../src/types";
 import { TypedUUID } from "../src/types/generic";
-import { hexToU8a } from "../src/utils";
+import { hexToU8a, maybeToCheqdPayloadOrJSON } from "../src/utils";
 
 const RANDOM_PKS = [
   "0xa1aa6a2058dd190e284a64e72adaf4e16a9ae9fbf0673d7575924e6aca3b21dc",
@@ -49,13 +53,26 @@ const DOCK_OFFCHAIN_PKS = RANDOM_OFFCHAIN_PKS.map(
     )
 );
 
-const CHEQD_OFFCHAIN_PKS = RANDOM_OFFCHAIN_PKS.map(
+const CHEQD_TESTNET_OFFCHAIN_PKS = RANDOM_OFFCHAIN_PKS.map(
   (bytes, idx) =>
     new BBSPublicKey(
       new BBSPublicKeyValue(
         bytes,
         new CheqdOffchainSignatureParamsRef(
           CheqdTestnetDidValue.fromBytesAdapt([idx, ...hexToU8a(bytes)]),
+          TypedUUID.fromBytesAdapt([idx])
+        )
+      )
+    )
+);
+
+const CHEQD_MAINNET_OFFCHAIN_PKS = RANDOM_OFFCHAIN_PKS.map(
+  (bytes, idx) =>
+    new BBSPublicKey(
+      new BBSPublicKeyValue(
+        bytes,
+        new CheqdOffchainSignatureParamsRef(
+          CheqdMainnetDidValue.fromBytesAdapt([idx, ...hexToU8a(bytes)]),
           TypedUUID.fromBytesAdapt([idx])
         )
       )
@@ -179,14 +196,14 @@ describe("DID document workflow", () => {
 
     const doc2 = DIDDocument.create(
       cheqdDid,
-      [new DidKey(RANDOM_PKS[0]), new DidKey(CHEQD_OFFCHAIN_PKS[0])],
+      [new DidKey(RANDOM_PKS[0]), new DidKey(CHEQD_TESTNET_OFFCHAIN_PKS[0])],
       [cheqdDid],
       []
     ).toCheqd(void 0, "28edc043-872b-4ab7-9cb8-b01d1bd677c5");
 
     const doc2DIDDocument = DIDDocument.create(
       cheqdDid,
-      [new DidKey(RANDOM_PKS[0]), new DidKey(CHEQD_OFFCHAIN_PKS[0])],
+      [new DidKey(RANDOM_PKS[0]), new DidKey(CHEQD_TESTNET_OFFCHAIN_PKS[0])],
       [cheqdDid],
       []
     );
@@ -196,17 +213,17 @@ describe("DID document workflow", () => {
       "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
       [
         new DidKey(RANDOM_PKS[0], AUTH),
-        new DidKey(CHEQD_OFFCHAIN_PKS[0]),
+        new DidKey(CHEQD_TESTNET_OFFCHAIN_PKS[0]),
         new DidKey(RANDOM_PKS[1], ASSERT),
         new DidKey(RANDOM_PKS[2], CAP_INV),
-        new DidKey(CHEQD_OFFCHAIN_PKS[1]),
+        new DidKey(CHEQD_MAINNET_OFFCHAIN_PKS[1]),
         new DidKey(RANDOM_PKS[3], AUTH | ASSERT),
         new DidKey(RANDOM_PKS[4], AUTH | CAP_INV),
         new DidKey(RANDOM_PKS[5], ASSERT | CAP_INV),
         new DidKey(RANDOM_PKS[6], AUTH | ASSERT | CAP_INV),
         new DidKey(RANDOM_PKS[7], KEY_AGR),
-        new DidKey(CHEQD_OFFCHAIN_PKS[2]),
-        new DidKey(CHEQD_OFFCHAIN_PKS[3]),
+        new DidKey(CHEQD_TESTNET_OFFCHAIN_PKS[2]),
+        new DidKey(CHEQD_MAINNET_OFFCHAIN_PKS[3]),
       ],
       [
         "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
@@ -216,5 +233,44 @@ describe("DID document workflow", () => {
     ).toCheqd(void 0, "47b4d97b-1ebe-4d81-a3ed-12eb63baaeb9");
 
     checkDocs(doc1, doc2, doc3);
+  });
+
+  test(`\`CheqdTestnetDIDDocument\``, () => {
+    const testnetDoc = DIDDocument.create(
+      "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+      [
+        new DidKey(RANDOM_PKS[0], AUTH),
+        new DidKey(CHEQD_TESTNET_OFFCHAIN_PKS[0]),
+      ]
+    ).toCheqd(CheqdTestnetDIDDocument, "0557d7da-8dea-45cb-8f30-7370b59eab71");
+
+    const legacyDoc = DIDDocument.create(
+      "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+      [
+        new DidKey(RANDOM_PKS[0], AUTH),
+        new DidKey(
+          new BBSPublicKey(new BBSPublicKeyValue(RANDOM_OFFCHAIN_PKS[0]))
+        ),
+      ]
+    ).toCheqd(CheqdMainnetDIDDocument, "0557d7da-8dea-45cb-8f30-7370b59eab71");
+    const strLegacyDoc = JSON.stringify(
+      maybeToCheqdPayloadOrJSON(legacyDoc)
+    ).replace(/mainnet/g, "testnet");
+
+    const fromLegacy = CheqdTestnetDIDDocument.from(JSON.parse(strLegacyDoc));
+
+    checkDocs(testnetDoc, fromLegacy, legacyDoc);
+  });
+
+  test(`\`CheqdMainnetDIDDocument\``, () => {
+    const mainnetDoc = DIDDocument.create(
+      "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+      [
+        new DidKey(RANDOM_PKS[0], AUTH),
+        new DidKey(CHEQD_MAINNET_OFFCHAIN_PKS[0]),
+      ]
+    ).toCheqd(CheqdMainnetDIDDocument, "0557d7da-8dea-45cb-8f30-7370b59eab71");
+
+    checkDoc(mainnetDoc);
   });
 });

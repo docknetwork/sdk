@@ -27,7 +27,14 @@ export default class TypedUUID extends TypedBytes {
   }
 
   static fromDockIdent(dockIdent, prefix = []) {
-    const prefixBytes = normalizeOrConvertStringToU8a(prefix);
+    const { CHEQD_MIGRATION_PREFIX } = process.env;
+
+    let prefixBytes = normalizeOrConvertStringToU8a(prefix);
+    if (CHEQD_MIGRATION_PREFIX) {
+      prefixBytes = prefixBytes.concat(
+        normalizeOrConvertStringToU8a(CHEQD_MIGRATION_PREFIX),
+      );
+    }
     const identBytes = valueNumberOrBytes(dockIdent);
     const hash = sha256.digest([...prefixBytes, ...identBytes]);
 

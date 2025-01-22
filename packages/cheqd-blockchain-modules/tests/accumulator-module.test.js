@@ -15,7 +15,7 @@ describe("AccumulatorModule", () => {
 
   beforeAll(async () => {
     await cheqd.init({
-      url: url,
+      url,
       wallet: await faucet.wallet(),
       network,
     });

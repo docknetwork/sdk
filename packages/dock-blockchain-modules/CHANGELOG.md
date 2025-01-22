@@ -1,5 +1,16 @@
 # @docknetwork/dock-blockchain-modules
 
+## 0.17.0
+
+### Minor Changes
+
+- Allow to create keypairs from private keys, conversion tweaks
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.28.0
+
 ## 0.16.0
 
 ### Minor Changes

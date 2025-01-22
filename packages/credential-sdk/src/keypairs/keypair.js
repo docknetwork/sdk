@@ -5,21 +5,52 @@ import {
 import { randomAsHex } from '../utils/bytes';
 
 /**
- * Wrapped keypair used to sign byte sequences of arbitrary size.
+ * Abstract keypair used to sign byte sequences of arbitrary size.
  */
 class DockKeypair {
   /**
-   * Wraps supplied keypair into a `DockKeypair`.
+   * Instantiates new `DockKeypair` from the provided source.
+   * It can have one of two types: "seed" or "secret".
    *
-   * @param {*} keyPair
+   * @param {Uint8Array} source
+   * @param {"seed"|"privateKey"} seed
    */
-  constructor(keyPair) {
-    this.keyPair = keyPair;
+  constructor(source, sourceType = 'seed') {
+    switch (sourceType) {
+      case 'seed':
+        // eslint-disable-next-line no-underscore-dangle
+        this.keyPair = this.constructor._fromSeed(source);
+        break;
+      case 'private':
+        // eslint-disable-next-line no-underscore-dangle
+        this.keyPair = this.constructor._fromPrivateKey(source);
+        break;
+      default:
+        throw new Error(`Unknown source type: \`${sourceType}\``);
+    }
+  }
+
+  /**
+   * Generates `DockKeypair` from the supplied seed.
+   * @param {Uint8Array} seed
+   * @returns {DockKeypair}
+   */
+  static fromSeed(seed) {
+    return new this(seed, 'seed');
+  }
+
+  /**
+   * Generates `DockKeypair` from the supplied private key.
+   * @param {Uint8Array} privateKey
+   * @returns {DockKeypair}
+   */
+  static fromPrivateKey(privateKey) {
+    return new this(privateKey, 'private');
   }
 
   /**
    * Generates random `DockKeypair`.
-   * @returns {}
+   * @returns {DockKeypair}
    */
   static random() {
     return new this(randomAsHex(this.SeedSize));
@@ -87,7 +118,14 @@ class DockKeypair {
 export default withExtendedPrototypeProperties(
   ['privateKey', '_publicKey', '_sign'],
   withExtendedStaticProperties(
-    ['Signature', 'VerKeyType', 'SeedSize', 'verify'],
+    [
+      'Signature',
+      'VerKeyType',
+      'SeedSize',
+      'verify',
+      '_fromPrivateKey',
+      '_fromSeed',
+    ],
     DockKeypair,
   ),
 );

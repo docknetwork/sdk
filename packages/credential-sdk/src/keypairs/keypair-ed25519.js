@@ -1,4 +1,9 @@
-import { generateKeyPairFromSeed, sign, verify } from '@stablelib/ed25519';
+import {
+  generateKeyPairFromSeed,
+  sign,
+  verify,
+  extractPublicKeyFromSecretKey,
+} from '@stablelib/ed25519';
 import { SignatureEd25519 } from '../types/signatures';
 import { Ed25519VerKeyName } from '../vc/crypto/constants';
 import { normalizeToU8a, valueBytes } from '../utils';
@@ -11,9 +16,12 @@ export default class Ed25519Keypair extends DockKeypair {
 
   static SeedSize = 32;
 
-  constructor(seed) {
-    super(generateKeyPairFromSeed(normalizeToU8a(seed)));
-  }
+  static _fromSeed = (seed) => generateKeyPairFromSeed(normalizeToU8a(seed));
+
+  static _fromPrivateKey = (secretKey) => ({
+    secretKey: normalizeToU8a(secretKey),
+    publicKey: extractPublicKeyFromSecretKey(normalizeToU8a(secretKey)),
+  });
 
   _publicKey() {
     return this.keyPair.publicKey;

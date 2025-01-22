@@ -16,17 +16,11 @@ export default class Secp256k1Keypair extends DockKeypair {
 
   static SeedSize = 32;
 
-  constructor(entropy) {
-    if (entropy == null) {
-      throw new Error('Entropy must be provided');
-    }
+  static _fromSeed = (entropy) => secp256k1Curve.genKeyPair({
+    entropy,
+  });
 
-    super(
-      secp256k1Curve.genKeyPair({
-        entropy,
-      }),
-    );
-  }
+  static _fromPrivateKey = (secretKey) => secp256k1Curve.keyFromPrivate(secretKey);
 
   _publicKey() {
     // public key is in hex but doesn't contain a leading zero

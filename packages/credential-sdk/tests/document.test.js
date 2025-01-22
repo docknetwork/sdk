@@ -245,7 +245,7 @@ describe("DID document workflow", () => {
 
   test(`\`CheqdTestnetDIDDocument\``, () => {
     const testnetDoc = DIDDocument.create(
-      "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+      "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
       [
         new DidKey(RANDOM_PKS[0], AUTH),
         new DidKey(CHEQD_TESTNET_OFFCHAIN_PKS[0]),
@@ -253,7 +253,7 @@ describe("DID document workflow", () => {
     ).toCheqd(CheqdTestnetDIDDocument, "0557d7da-8dea-45cb-8f30-7370b59eab71");
 
     const legacyDoc = DIDDocument.create(
-      "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+      "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
       [
         new DidKey(RANDOM_PKS[0], AUTH),
         new DidKey(
@@ -272,7 +272,7 @@ describe("DID document workflow", () => {
 
   test(`\`CheqdMainnetDIDDocument\``, () => {
     const mainnetDoc = DIDDocument.create(
-      "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+      "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
       [
         new DidKey(RANDOM_PKS[0], AUTH),
         new DidKey(CHEQD_MAINNET_OFFCHAIN_PKS[0]),

@@ -1,4 +1,3 @@
-import { VerificationMethodSignature } from '@docknetwork/credential-sdk/types';
 import { ensureInstanceOf } from '@docknetwork/credential-sdk/utils';
 import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
 import CheqdApiProvider from './cheqd-api-provider';
@@ -21,7 +20,10 @@ const createDIDMethodTx = (fnName) => {
 
       const signatures = []
         .concat(didKeypairs)
-        .map((didKeypair) => VerificationMethodSignature.fromDidKeypair(didKeypair, bytes));
+        .map((didKeypair) => root.types.VerificationMethodSignature.fromDidKeypair(
+          didKeypair,
+          bytes,
+        ));
 
       const value = {
         payload,

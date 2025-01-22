@@ -5,7 +5,11 @@ import {
   CheqdVerificationMethodAssertionLegacy,
   CheqdTestnetVerificationMethodAssertionLegacy,
 } from './verification-method';
-import { CheqdVerificationMethodRef } from './verification-method-ref';
+import {
+  CheqdMainnetVerificationMethodRef,
+  CheqdTestnetVerificationMethodRef,
+  CheqdVerificationMethodRef,
+} from './verification-method-ref';
 import { withFrom } from '../../generic';
 
 export class CheqdVerificationMethodRefOrCheqdVerificationMethod extends withFrom(
@@ -45,11 +49,11 @@ export class CheqdVerificationMethodRefOrCheqdTestnetVerificationMethod extends 
 
   static Second = CheqdTestnetVerificationMethodAssertionLegacy;
 
-  static Third = CheqdVerificationMethodRef;
+  static Third = CheqdTestnetVerificationMethodRef;
 }
 
 export class CheqdVerificationMethodRefOrCheqdMainnetVerificationMethod extends CheqdVerificationMethodRefOrCheqdVerificationMethod {
   static First = CheqdMainnetVerificationMethodAssertion;
 
-  static Second = CheqdVerificationMethodRef;
+  static Second = CheqdMainnetVerificationMethodRef;
 }

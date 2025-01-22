@@ -1,8 +1,4 @@
 import { CheqdAPI } from "@docknetwork/cheqd-blockchain-api";
-import {
-  CheqdTestnetDid,
-  CheqdOffchainSignatureParamsRef,
-} from "@docknetwork/credential-sdk/types";
 import generateOffchainSignaturesModuleTests from "@docknetwork/credential-sdk/modules/tests/offchain-signatures-module";
 import { MultiApiCoreModules } from "@docknetwork/credential-sdk/modules";
 import { faucet, url, network } from "./constants";

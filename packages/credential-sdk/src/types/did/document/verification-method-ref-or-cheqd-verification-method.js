@@ -2,37 +2,54 @@ import {
   CheqdVerificationMethodAssertion,
   CheqdMainnetVerificationMethodAssertion,
   CheqdTestnetVerificationMethodAssertion,
+  CheqdVerificationMethodAssertionLegacy,
+  CheqdTestnetVerificationMethodAssertionLegacy,
 } from './verification-method';
-import {
-  CheqdMainnetVerificationMethodRef,
-  CheqdTestnetVerificationMethodRef,
-  CheqdVerificationMethodRef,
-} from './verification-method-ref';
+import { CheqdVerificationMethodRef } from './verification-method-ref';
 import { withFrom } from '../../generic';
 
 export class CheqdVerificationMethodRefOrCheqdVerificationMethod extends withFrom(
   CheqdVerificationMethodRef,
   function from(value) {
     try {
-      return this.Base.from(value);
-    } catch (err) {
-      return this.Or.from(value);
+      return this.First.from(value);
+    } catch (firstErr) {
+      try {
+        return this.Second.from(value);
+      } catch (secondErr) {
+        secondErr.message = `${firstErr.message}; ${secondErr.message}`;
+
+        if (this.Third == null) {
+          throw secondErr;
+        }
+        try {
+          return this.Third.from(value);
+        } catch (thirdErr) {
+          thirdErr.message = `${secondErr.message}; ${thirdErr.message}`;
+
+          throw thirdErr;
+        }
+      }
     }
   },
 ) {
-  static Base = CheqdVerificationMethodAssertion;
+  static First = CheqdVerificationMethodAssertion;
 
-  static Or = CheqdVerificationMethodRef;
+  static Second = CheqdVerificationMethodAssertionLegacy;
+
+  static Third = CheqdVerificationMethodRef;
 }
 
 export class CheqdVerificationMethodRefOrCheqdTestnetVerificationMethod extends CheqdVerificationMethodRefOrCheqdVerificationMethod {
-  static Base = CheqdTestnetVerificationMethodAssertion;
+  static First = CheqdTestnetVerificationMethodAssertion;
 
-  static Or = CheqdTestnetVerificationMethodRef;
+  static Second = CheqdTestnetVerificationMethodAssertionLegacy;
+
+  static Third = CheqdVerificationMethodRef;
 }
 
 export class CheqdVerificationMethodRefOrCheqdMainnetVerificationMethod extends CheqdVerificationMethodRefOrCheqdVerificationMethod {
-  static Base = CheqdMainnetVerificationMethodAssertion;
+  static First = CheqdMainnetVerificationMethodAssertion;
 
-  static Or = CheqdMainnetVerificationMethodRef;
+  static Second = CheqdVerificationMethodRef;
 }

@@ -1,9 +1,4 @@
 import { CheqdAPI } from "@docknetwork/cheqd-blockchain-api";
-import {
-  CheqdTestnetDid,
-  CheqdStatusListCredentialId,
-} from "@docknetwork/credential-sdk/types";
-import { StatusList2021Credential } from "@docknetwork/credential-sdk/vc";
 import { MultiApiStatusListCredentialModule } from "@docknetwork/credential-sdk/modules";
 import generateStatusListCredentialModuleTests from "@docknetwork/credential-sdk/modules/tests/status-list-credential-module";
 import CheqdDIDModule from "../src/did/module";

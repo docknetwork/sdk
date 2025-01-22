@@ -1,5 +1,16 @@
 # @docknetwork/cheqd-blockchain-modules
 
+## 0.18.0
+
+### Minor Changes
+
+- Legacy documents support for `testnet`
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.27.0
+
 ## 0.17.0
 
 ### Minor Changes

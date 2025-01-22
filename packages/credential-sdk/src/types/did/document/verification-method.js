@@ -337,20 +337,8 @@ export class CheqdTestnetVerificationMethodAssertion extends withProp(
   option(CheqdTestnetPublicKeyMetadata),
 ) {}
 
-export class CheqdMainnetVerificationMethodAssertion extends withFrom(
-  withProp(
-    withProp(
-      withProp(
-        CheqdVerificationMethod,
-        'id',
-        CheqdMainnetVerificationMethodRef,
-      ),
-      'controller',
-      CheqdMainnetDid,
-    ),
-    'metadata',
-    option(CheqdMainnetPublicKeyMetadata),
-  ),
+export class CheqdVerificationMethodAssertionLegacy extends withFrom(
+  CheqdVerificationMethod,
   (value, from) => {
     const self = from(value);
     const verMethod = self.toVerificationMethod();
@@ -397,3 +385,31 @@ export class CheqdMainnetVerificationMethodAssertion extends withFrom(
       : super.from(obj);
   }
 }
+
+export class CheqdMainnetVerificationMethodAssertion extends withProp(
+  withProp(
+    withProp(
+      CheqdVerificationMethodAssertionLegacy,
+      'id',
+      CheqdMainnetVerificationMethodRef,
+    ),
+    'controller',
+    CheqdMainnetDid,
+  ),
+  'metadata',
+  option(CheqdMainnetPublicKeyMetadata),
+) {}
+
+export class CheqdTestnetVerificationMethodAssertionLegacy extends withProp(
+  withProp(
+    withProp(
+      CheqdVerificationMethodAssertionLegacy,
+      'id',
+      CheqdTestnetVerificationMethodRef,
+    ),
+    'controller',
+    CheqdTestnetDid,
+  ),
+  'metadata',
+  option(CheqdTestnetPublicKeyMetadata),
+) {}

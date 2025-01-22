@@ -103,6 +103,14 @@ const checkDoc = (doc) => {
     () => expect(newDoc.toJSON()).toEqual(jsonDoc),
     "Failed equality check"
   );
+  const cheqdPayloadDoc = catchErrorWith(
+    () => maybeToCheqdPayloadOrJSON(doc),
+    "Failed `toCheqdPayload` conversion"
+  );
+  catchErrorWith(
+    () => expect(cheqdPayloadDoc).toMatchSnapshot(),
+    "Failed cheqd payload snapshot check"
+  );
 };
 
 const checkDocs = (...docs) => {

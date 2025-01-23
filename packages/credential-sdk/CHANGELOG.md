@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.28.0
+
+### Minor Changes
+
+- Allow to create keypairs from private keys, conversion tweaks
+
 ## 0.27.0
 
 ### Minor Changes

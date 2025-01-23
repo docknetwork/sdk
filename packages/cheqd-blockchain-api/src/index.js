@@ -51,6 +51,8 @@ import {
   CheqdTestnetAccumulator,
   CheqdMainnetAccumulator,
   DockDidOrDidMethodKey,
+  CheqdMainnetVerificationMethodSignature,
+  CheqdTestnetVerificationMethodSignature,
 } from '@docknetwork/credential-sdk/types';
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 
@@ -107,6 +109,7 @@ export class CheqdAPI extends AbstractApiProvider {
       OffchainSignatureKeyRef: CheqdTestnetOffchainSignatureKeyRef,
       BlobId: CheqdTestnetBlobId,
       StatusListCredentialId: CheqdTestnetStatusListCredentialId,
+      VerificationMethodSignature: CheqdTestnetVerificationMethodSignature,
     }),
     [CheqdNetwork.Mainnet]: extendNull({
       Did: CheqdMainnetDid,
@@ -119,6 +122,7 @@ export class CheqdAPI extends AbstractApiProvider {
       OffchainSignatureKeyRef: CheqdMainnetOffchainSignatureKeyRef,
       BlobId: CheqdMainnetBlobId,
       StatusListCredentialId: CheqdMainnetStatusListCredentialId,
+      VerificationMethodSignature: CheqdMainnetVerificationMethodSignature,
     }),
   });
 
@@ -263,7 +267,7 @@ export class CheqdAPI extends AbstractApiProvider {
   }
 
   methods() {
-    return ['cheqd'];
+    return ['cheqd', 'dock'];
   }
 
   // eslint-disable-next-line

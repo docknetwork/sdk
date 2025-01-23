@@ -347,8 +347,8 @@ exports[`DID document workflow \`CheqdMainnetDIDDocument\` 1`] = `
   "alsoKnownAs": [],
   "assertionMethod": [
     {
-      "controller": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
-      "id": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2",
+      "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
+      "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2",
       "metadata": {
         "curveType": "Bls12381",
         "paramsRef": "did:cheqd:mainnet:00acfa7c-ba73-4e6d-89d2-80c157b5e25c/resources/00000000-0000-4000-8000-000000000000",
@@ -359,7 +359,7 @@ exports[`DID document workflow \`CheqdMainnetDIDDocument\` 1`] = `
     },
   ],
   "authentication": [
-    "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+    "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
   ],
   "capabilityDelegation": [],
   "capabilityInvocation": [],
@@ -367,19 +367,19 @@ exports[`DID document workflow \`CheqdMainnetDIDDocument\` 1`] = `
     "https://www.w3.org/ns/did/v1",
   ],
   "controller": [],
-  "id": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+  "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
   "keyAgreement": [],
   "service": [],
   "verificationMethod": [
     {
-      "controller": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
-      "id": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+      "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
+      "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
       "verificationMaterial": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
       "verificationMethodType": "Ed25519VerificationKey2018",
     },
     {
-      "controller": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
-      "id": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2",
+      "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
+      "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2",
       "verificationMaterial": "11111111111111111111111111111111",
       "verificationMethodType": "Ed25519VerificationKey2018",
     },
@@ -392,10 +392,10 @@ exports[`DID document workflow \`CheqdMainnetDIDDocument\` 2`] = `
 {
   "alsoKnownAs": [],
   "assertionMethod": [
-    ""{\\"id\\":\\"did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2\\",\\"controller\\":\\"did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"Px8b9bKxU5BC8RxPofE4eUMze5uUMnYg4ib1QLw7oPKTDX9nFeVE9tmHLNCfneuzWFoTB5kfy2YpC8tmNY9AQxwsGujLwE3Rb39pkXCYp6e8jMANnNTmzMQBvhr4wxcwrTcAHUGH1PX8tYoqZbQhMvvC1PrevPqV7MbKaGvhm5mL3WJVMYQkNNhzxeo1wVBZmwH3DzGgGoJ9CfWFVwVLFZ7HT45siEAWpiNGdue3MkuYeM2tW2h2HCXex8SdBBKrbvhFqJtnH6c1z26Hte47kWELTJVmKEoTKLgjLATeeoXnF7TvRh3RSQPNASEQJMAKPiXHyYsgey1yL2np\\"}"",
+    ""{\\"id\\":\\"did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2\\",\\"controller\\":\\"did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"Px8b9bKxU5BC8RxPofE4eUMze5uUMnYg4ib1QLw7oPKTDX9nFeVE9tmHLNCfneuzWFoTB5kfy2YpC8tmNY9AQxwsGujLwE3Rb39pkXCYp6e8jMANnNTmzMQBvhr4wxcwrTcAHUGH1PX8tYoqZbQhMvvC1PrevPqV7MbKaGvhm5mL3WJVMYQkNNhzxeo1wVBZmwH3DzGgGoJ9CfWFVwVLFZ7HT45siEAWpiNGdue3MkuYeM2tW2h2HCXex8SdBBKrbvhFqJtnH6c1z26Hte47kWELTJVmKEoTKLgjLATeeoXnF7TvRh3RSQPNASEQJMAKPiXHyYsgey1yL2np\\"}"",
   ],
   "authentication": [
-    "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+    "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
   ],
   "capabilityDelegation": [],
   "capabilityInvocation": [],
@@ -403,19 +403,19 @@ exports[`DID document workflow \`CheqdMainnetDIDDocument\` 2`] = `
     "https://www.w3.org/ns/did/v1",
   ],
   "controller": [],
-  "id": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+  "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
   "keyAgreement": [],
   "service": [],
   "verificationMethod": [
     {
-      "controller": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
-      "id": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+      "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
+      "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
       "verificationMaterial": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
       "verificationMethodType": "Ed25519VerificationKey2018",
     },
     {
-      "controller": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
-      "id": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2",
+      "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
+      "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2",
       "verificationMaterial": "11111111111111111111111111111111",
       "verificationMethodType": "Ed25519VerificationKey2018",
     },
@@ -429,8 +429,8 @@ exports[`DID document workflow \`CheqdTestnetDIDDocument\` 1`] = `
   "alsoKnownAs": [],
   "assertionMethod": [
     {
-      "controller": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
-      "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2",
+      "controller": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165",
+      "id": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2",
       "metadata": {
         "curveType": "Bls12381",
         "paramsRef": "did:cheqd:testnet:00acfa7c-ba73-4e6d-89d2-80c157b5e25c/resources/00000000-0000-4000-8000-000000000000",
@@ -441,7 +441,7 @@ exports[`DID document workflow \`CheqdTestnetDIDDocument\` 1`] = `
     },
   ],
   "authentication": [
-    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+    "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
   ],
   "capabilityDelegation": [],
   "capabilityInvocation": [],
@@ -449,13 +449,13 @@ exports[`DID document workflow \`CheqdTestnetDIDDocument\` 1`] = `
     "https://www.w3.org/ns/did/v1",
   ],
   "controller": [],
-  "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+  "id": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165",
   "keyAgreement": [],
   "service": [],
   "verificationMethod": [
     {
-      "controller": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
-      "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+      "controller": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165",
+      "id": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
       "verificationMaterial": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
       "verificationMethodType": "Ed25519VerificationKey2018",
     },
@@ -468,10 +468,10 @@ exports[`DID document workflow \`CheqdTestnetDIDDocument\` 2`] = `
 {
   "alsoKnownAs": [],
   "assertionMethod": [
-    ""{\\"id\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2\\",\\"type\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"controller\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"publicKeyBase58\\":\\"CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP\\",\\"metadata\\":{\\"paramsRef\\":\\"did:cheqd:testnet:00acfa7c-ba73-4e6d-89d2-80c157b5e25c/resources/00000000-0000-4000-8000-000000000000\\",\\"curveType\\":\\"Bls12381\\",\\"participantId\\":null}}"",
+    ""{\\"id\\":\\"did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2\\",\\"type\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"controller\\":\\"did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165\\",\\"publicKeyBase58\\":\\"CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP\\",\\"metadata\\":{\\"paramsRef\\":\\"did:cheqd:testnet:00acfa7c-ba73-4e6d-89d2-80c157b5e25c/resources/00000000-0000-4000-8000-000000000000\\",\\"curveType\\":\\"Bls12381\\",\\"participantId\\":null}}"",
   ],
   "authentication": [
-    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+    "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
   ],
   "capabilityDelegation": [],
   "capabilityInvocation": [],
@@ -479,13 +479,13 @@ exports[`DID document workflow \`CheqdTestnetDIDDocument\` 2`] = `
     "https://www.w3.org/ns/did/v1",
   ],
   "controller": [],
-  "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+  "id": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165",
   "keyAgreement": [],
   "service": [],
   "verificationMethod": [
     {
-      "controller": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
-      "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+      "controller": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165",
+      "id": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
       "verificationMaterial": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
       "verificationMethodType": "Ed25519VerificationKey2018",
     },
@@ -499,14 +499,14 @@ exports[`DID document workflow \`CheqdTestnetDIDDocument\` 3`] = `
   "alsoKnownAs": [],
   "assertionMethod": [
     {
-      "controller": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
-      "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2",
+      "controller": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165",
+      "id": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2",
       "publicKeyBase58": "CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP",
       "type": "Bls12381BBSVerificationKeyDock2023",
     },
   ],
   "authentication": [
-    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+    "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
   ],
   "capabilityDelegation": [],
   "capabilityInvocation": [],
@@ -514,13 +514,13 @@ exports[`DID document workflow \`CheqdTestnetDIDDocument\` 3`] = `
     "https://www.w3.org/ns/did/v1",
   ],
   "controller": [],
-  "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+  "id": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165",
   "keyAgreement": [],
   "service": [],
   "verificationMethod": [
     {
-      "controller": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
-      "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+      "controller": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165",
+      "id": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
       "verificationMaterial": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
       "verificationMethodType": "Ed25519VerificationKey2018",
     },
@@ -533,10 +533,10 @@ exports[`DID document workflow \`CheqdTestnetDIDDocument\` 4`] = `
 {
   "alsoKnownAs": [],
   "assertionMethod": [
-    ""{\\"id\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2\\",\\"type\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"controller\\":\\"did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"publicKeyBase58\\":\\"CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP\\"}"",
+    ""{\\"id\\":\\"did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2\\",\\"type\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"controller\\":\\"did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165\\",\\"publicKeyBase58\\":\\"CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP\\"}"",
   ],
   "authentication": [
-    "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+    "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
   ],
   "capabilityDelegation": [],
   "capabilityInvocation": [],
@@ -544,13 +544,13 @@ exports[`DID document workflow \`CheqdTestnetDIDDocument\` 4`] = `
     "https://www.w3.org/ns/did/v1",
   ],
   "controller": [],
-  "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+  "id": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165",
   "keyAgreement": [],
   "service": [],
   "verificationMethod": [
     {
-      "controller": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
-      "id": "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+      "controller": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165",
+      "id": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
       "verificationMaterial": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
       "verificationMethodType": "Ed25519VerificationKey2018",
     },
@@ -564,14 +564,14 @@ exports[`DID document workflow \`CheqdTestnetDIDDocument\` 5`] = `
   "alsoKnownAs": [],
   "assertionMethod": [
     {
-      "controller": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
-      "id": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2",
+      "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
+      "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2",
       "verificationMaterial": "CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP",
       "verificationMethodType": "Bls12381BBSVerificationKeyDock2023",
     },
   ],
   "authentication": [
-    "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+    "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
   ],
   "capabilityDelegation": [],
   "capabilityInvocation": [],
@@ -579,19 +579,19 @@ exports[`DID document workflow \`CheqdTestnetDIDDocument\` 5`] = `
     "https://www.w3.org/ns/did/v1",
   ],
   "controller": [],
-  "id": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+  "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
   "keyAgreement": [],
   "service": [],
   "verificationMethod": [
     {
-      "controller": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
-      "id": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+      "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
+      "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
       "verificationMaterial": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
       "verificationMethodType": "Ed25519VerificationKey2018",
     },
     {
-      "controller": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
-      "id": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2",
+      "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
+      "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2",
       "verificationMaterial": "11111111111111111111111111111111",
       "verificationMethodType": "Ed25519VerificationKey2018",
     },
@@ -604,10 +604,10 @@ exports[`DID document workflow \`CheqdTestnetDIDDocument\` 6`] = `
 {
   "alsoKnownAs": [],
   "assertionMethod": [
-    ""{\\"id\\":\\"did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2\\",\\"controller\\":\\"did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP\\"}"",
+    ""{\\"id\\":\\"did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2\\",\\"controller\\":\\"did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP\\"}"",
   ],
   "authentication": [
-    "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+    "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
   ],
   "capabilityDelegation": [],
   "capabilityInvocation": [],
@@ -615,19 +615,19 @@ exports[`DID document workflow \`CheqdTestnetDIDDocument\` 6`] = `
     "https://www.w3.org/ns/did/v1",
   ],
   "controller": [],
-  "id": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
+  "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
   "keyAgreement": [],
   "service": [],
   "verificationMethod": [
     {
-      "controller": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
-      "id": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-1",
+      "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
+      "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
       "verificationMaterial": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
       "verificationMethodType": "Ed25519VerificationKey2018",
     },
     {
-      "controller": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",
-      "id": "did:cheqd:mainnet:f1749383-d9dd-479f-82aa-e52fe8f59c54#keys-2",
+      "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
+      "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2",
       "verificationMaterial": "11111111111111111111111111111111",
       "verificationMethodType": "Ed25519VerificationKey2018",
     },

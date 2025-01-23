@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { applyToValue } from './interfaces';
 import { ensureBytes, ensureString, isBytes } from './type-helpers';
 
@@ -39,20 +40,6 @@ export const isHex = (value) => isHexWithGivenByteSize(value);
  * @returns {string}
  */
 export const u8aToHex = (bytes) => `0x${Buffer.from(ensureBytes(bytes)).toString('hex')}`;
-
-/**
- * Creates random `Uint8Array` array of supplied byte length.
- * @param {number} length
- * @returns {Uint8Array}
- */
-export const randomAsU8a = (length) => Uint8Array.from({ length }, () => Math.floor(Math.random() * 256));
-
-/**
- * Creates random hex string of supplied byte length.
- * @param {number} length
- * @returns {string}
- */
-export const randomAsHex = (length) => u8aToHex(randomAsU8a(length));
 
 /**
  * Creates `Uint8Array` from the supplied hex string.
@@ -146,6 +133,20 @@ export const normalizeToU8a = (bytes) => {
 export const normalizeOrConvertStringToU8a = (bytesOrString) => (typeof bytesOrString === 'string' && !isHex(bytesOrString)
   ? stringToU8a(bytesOrString)
   : normalizeToU8a(bytesOrString));
+
+/**
+ * Creates random `Uint8Array` array of supplied byte length.
+ * @param {number} length
+ * @returns {Uint8Array}
+ */
+export const randomAsU8a = (length) => u8aToU8a(crypto.randomBytes(length));
+
+/**
+ * Creates random hex string of supplied byte length.
+ * @param {number} length
+ * @returns {string}
+ */
+export const randomAsHex = (length) => u8aToHex(randomAsU8a(length));
 
 /**
  * Attempts to get byte representation of the supplied object.

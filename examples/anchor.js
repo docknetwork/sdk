@@ -51,7 +51,7 @@ async function main() {
   const docHashes = [
     utf8('{"example": "document"}'),
     utf8('{"example": 2}'),
-    randomAsU8a(),
+    randomAsU8a(Math.floor(Math.random() * 64)),
     utf8('{"example": 4}'),
   ].map((bytes) => Anchor.hash(bytes).bytes);
   const proofs = await anchorBatched(anchor, docHashes);
@@ -59,7 +59,7 @@ async function main() {
   assert((await checkBatched(anchor, docHashes[0], proofs[1])) === null);
 
   // single
-  const single = Anchor.hash(randomAsU8a()).bytes;
+  const single = Anchor.hash(randomAsU8a(Math.floor(Math.random() * 64))).bytes;
   assert((await checkBatched(anchor, single, [])) === null);
   await anchorBatched(anchor, [single]);
   assert((await checkBatched(anchor, single, [])) !== null);
@@ -96,7 +96,7 @@ function benchSingleProofCreation(count) {
   /* eslint-disable no-unused-vars */
   const data = Array(count)
     .fill(undefined)
-    .map((_, __) => randomAsU8a());
+    .map((_, __) => randomAsU8a(Math.floor(Math.random() * 64)));
   const start = new Date().getTime();
   const hashes = data.map((bytes) => Anchor.hash(bytes).bytes);
   const pl = pack32(hashes);
@@ -118,7 +118,7 @@ function timeProofGeneration(count) {
   /* eslint-disable no-unused-vars */
   const data = Array(count)
     .fill(undefined)
-    .map((_, __) => randomAsU8a());
+    .map((_, __) => randomAsU8a(Math.floor(Math.random() * 64)));
   const start = new Date().getTime();
   const hashes = data.map((bytes) => Anchor.hash(bytes).bytes);
   const [root, proofs] = buildMerkleTreeAndProofs(hashes);

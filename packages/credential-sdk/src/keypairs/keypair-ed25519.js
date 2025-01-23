@@ -1,8 +1,13 @@
-import { generateKeyPairFromSeed, sign, verify } from '@stablelib/ed25519';
+import {
+  generateKeyPairFromSeed,
+  sign,
+  verify,
+  extractPublicKeyFromSecretKey,
+} from '@stablelib/ed25519';
 import { SignatureEd25519 } from '../types/signatures';
 import { Ed25519VerKeyName } from '../vc/crypto/constants';
 import { normalizeToU8a, valueBytes } from '../utils';
-import DockKeypair from './keypair';
+import DockKeypair from './dock-keypair';
 
 export default class Ed25519Keypair extends DockKeypair {
   static Signature = SignatureEd25519;
@@ -11,8 +16,35 @@ export default class Ed25519Keypair extends DockKeypair {
 
   static SeedSize = 32;
 
-  constructor(seed) {
-    super(generateKeyPairFromSeed(normalizeToU8a(seed)));
+  /**
+   *
+   * Instantiates new `Ed25519Keypair` from the provided source.
+   * It can have one of two types: "seed" or "private".
+   *
+   * @param {Uint8Array} seedOrPrivate
+   * @param {"seed"|"private"} sourceType
+   */
+  constructor(seedOrPrivate, sourceType = 'seed') {
+    let kp;
+    switch (sourceType) {
+      case 'seed':
+        kp = generateKeyPairFromSeed(normalizeToU8a(seedOrPrivate));
+        break;
+      case 'private': {
+        const secretKey = normalizeToU8a(seedOrPrivate);
+        kp = {
+          secretKey,
+          publicKey: extractPublicKeyFromSecretKey(secretKey),
+        };
+        break;
+      }
+      default:
+        throw new Error(
+          `Unsupported source type: \`${sourceType}\`, it must be either "seed" or "private"`,
+        );
+    }
+
+    super(kp);
   }
 
   _publicKey() {

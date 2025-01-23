@@ -5,11 +5,11 @@ import {
 import { randomAsHex } from '../utils/bytes';
 
 /**
- * Wrapped keypair used to sign byte sequences of arbitrary size.
+ * Abstract keypair used to sign byte sequences of arbitrary size.
  */
 class DockKeypair {
   /**
-   * Wraps supplied keypair into a `DockKeypair`.
+   * Instantiates new `DockKeypair` with the provided underlying keypair.
    *
    * @param {*} keyPair
    */
@@ -18,8 +18,38 @@ class DockKeypair {
   }
 
   /**
+   * Generates `DockKeypair` from the supplied entropy.
+   * @param {Uint8Array} entropy
+   * @returns {DockKeypair}
+   */
+  static fromEntropy(entropy) {
+    // eslint-disable-next-line no-underscore-dangle
+    return new this(entropy, 'entropy');
+  }
+
+  /**
+   * Generates `DockKeypair` from the supplied seed.
+   * @param {Uint8Array} seed
+   * @returns {DockKeypair}
+   */
+  static fromSeed(seed) {
+    // eslint-disable-next-line no-underscore-dangle
+    return new this(seed, 'seed');
+  }
+
+  /**
+   * Generates `DockKeypair` from the supplied private key.
+   * @param {Uint8Array} privateKey
+   * @returns {DockKeypair}
+   */
+  static fromPrivateKey(privateKey) {
+    // eslint-disable-next-line no-underscore-dangle
+    return new this(privateKey, 'private');
+  }
+
+  /**
    * Generates random `DockKeypair`.
-   * @returns {}
+   * @returns {DockKeypair}
    */
   static random() {
     return new this(randomAsHex(this.SeedSize));
@@ -87,7 +117,7 @@ class DockKeypair {
 export default withExtendedPrototypeProperties(
   ['privateKey', '_publicKey', '_sign'],
   withExtendedStaticProperties(
-    ['Signature', 'VerKeyType', 'SeedSize', 'verify'],
+    ['Signature', 'VerKeyType', 'SeedSize', 'verify', 'constructor'],
     DockKeypair,
   ),
 );

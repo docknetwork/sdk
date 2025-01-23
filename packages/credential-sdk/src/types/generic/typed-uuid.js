@@ -31,9 +31,10 @@ export default class TypedUUID extends TypedBytes {
 
     let prefixBytes = normalizeOrConvertStringToU8a(prefix);
     if (CHEQD_MIGRATION_PREFIX) {
-      prefixBytes = prefixBytes.concat(
-        normalizeOrConvertStringToU8a(CHEQD_MIGRATION_PREFIX),
-      );
+      prefixBytes = [
+        ...prefixBytes,
+        ...normalizeOrConvertStringToU8a(CHEQD_MIGRATION_PREFIX),
+      ];
     }
     const identBytes = valueNumberOrBytes(dockIdent);
     const hash = sha256.digest([...prefixBytes, ...identBytes]);

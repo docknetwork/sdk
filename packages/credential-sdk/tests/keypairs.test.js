@@ -6,11 +6,7 @@ describe.each([Ed25519Keypair, Secp256k1Keypair])("Keypairs", (Keypair) => {
     const seed = randomAsHex(Keypair.SeedSize);
     const kp = Keypair.fromSeed(seed);
     expect(kp.keyPair).toBeTruthy();
-  });
-
-  it(`${Keypair.name} random method`, async () => {
-    const kp = Keypair.random();
-    expect(kp.keyPair).toBeTruthy();
+    expect(Keypair.fromSeed(seed)).toEqual(kp);
   });
 
   it(`${Keypair.name} fromPrivateKey method`, async () => {
@@ -19,7 +15,13 @@ describe.each([Ed25519Keypair, Secp256k1Keypair])("Keypairs", (Keypair) => {
     const privateKey = randKp.privateKey();
     const kp = Keypair.fromPrivateKey(privateKey);
     expect(kp.keyPair).toBeTruthy();
-    expect(randKp).toEqual(kp);
+    expect(Keypair.fromPrivateKey(privateKey)).toEqual(kp);
+  });
+
+  it(`${Keypair.name} random method`, async () => {
+    const kp = Keypair.random();
+    expect(kp.keyPair).toBeTruthy();
+    expect(Keypair.random()).not.toEqual(kp);
   });
 
   it(`${Keypair.name} getPublicKey method`, async () => {

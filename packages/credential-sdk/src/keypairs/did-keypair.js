@@ -1,4 +1,4 @@
-import DockKeypair from './keypair';
+import DockKeypair from './dock-keypair';
 import { DidKey } from '../types/did/onchain/did-key';
 import VerificationMethodRefOrIdentRef from '../types/did/document/verification-method-ref-or-ident-ref';
 import { ensureInstanceOf } from '../utils';

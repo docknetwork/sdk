@@ -3,7 +3,7 @@ import { sha256 } from 'js-sha256';
 
 import { SignatureSecp256k1 } from '../types/signatures';
 import { EcdsaSecp256k1VerKeyName } from '../vc/crypto/constants';
-import DockKeypair from './keypair';
+import DockKeypair from './dock-keypair';
 import { hexToU8a, valueBytes } from '../utils';
 
 const EC = elliptic.ec;
@@ -69,7 +69,7 @@ export default class Secp256k1Keypair extends DockKeypair {
     const sigBytes = valueBytes(signature);
     if (sigBytes.length !== 65) {
       throw new Error(
-        `Invalid signature length. Expected is 65 bytes, received ${signature.length}`,
+        `Invalid signature length. Expected is 65 bytes, received ${sigBytes.length}`,
       );
     }
     // Extract R, S components
@@ -101,10 +101,10 @@ export default class Secp256k1Keypair extends DockKeypair {
 
   static verify(message, signature, publicKey) {
     let bytes = valueBytes(signature);
-
     if (bytes.length === 65) {
       bytes = this.signatureToDER(bytes);
     }
+
     return secp256k1Curve.verify(
       this.hash(message),
       bytes,

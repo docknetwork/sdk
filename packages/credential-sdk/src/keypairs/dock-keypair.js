@@ -13,7 +13,7 @@ class DockKeypair {
    * It can have one of two types: "seed" or "secret".
    *
    * @param {Uint8Array} source
-   * @param {"seed"|"private"} seed
+   * @param {"seed"|"private"} sourceType
    */
   constructor(source, sourceType = 'seed') {
     switch (sourceType) {

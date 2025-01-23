@@ -7,7 +7,7 @@ import {
 import { SignatureEd25519 } from '../types/signatures';
 import { Ed25519VerKeyName } from '../vc/crypto/constants';
 import { normalizeToU8a, valueBytes } from '../utils';
-import DockKeypair from './keypair';
+import DockKeypair from './dock-keypair';
 
 export default class Ed25519Keypair extends DockKeypair {
   static Signature = SignatureEd25519;

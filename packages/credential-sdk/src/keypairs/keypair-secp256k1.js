@@ -37,8 +37,9 @@ export default class Secp256k1Keypair extends DockKeypair {
 
   /**
    *
-   * Instantiates new `DockKeypair` from the provided source.
+   * Instantiates new `Secp256k1Keypair` from the provided source.
    * It can have one of two types: "entropy" or "private".
+   *
    * @param {Uint8Array} entropyOrPrivate
    * @param {"entropy"|"private"} sourceType
    */

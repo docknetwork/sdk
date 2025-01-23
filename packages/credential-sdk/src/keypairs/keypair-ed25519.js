@@ -18,8 +18,9 @@ export default class Ed25519Keypair extends DockKeypair {
 
   /**
    *
-   * Instantiates new `DockKeypair` from the provided source.
+   * Instantiates new `Ed25519Keypair` from the provided source.
    * It can have one of two types: "seed" or "private".
+   *
    * @param {Uint8Array} seedOrPrivate
    * @param {"seed"|"private"} sourceType
    */

@@ -9,6 +9,25 @@ import { hexToU8a, valueBytes } from '../utils';
 const EC = elliptic.ec;
 const secp256k1Curve = new EC('secp256k1');
 
+function encodeDERInt(intBytes) {
+  // Remove leading zeros
+  let i = 0;
+  while (i < intBytes.length && intBytes[i] === 0) {
+    i++;
+  }
+
+  let trimmedBytes = intBytes.slice(i);
+
+  // Ensure the integer is positive by adding a leading zero if needed
+  // eslint-disable-next-line no-bitwise
+  if (trimmedBytes[0] & 0x80) {
+    trimmedBytes = Uint8Array.of(0, ...trimmedBytes);
+  }
+
+  const { length } = trimmedBytes;
+  return [0x02, length, ...trimmedBytes];
+}
+
 export default class Secp256k1Keypair extends DockKeypair {
   static Signature = SignatureSecp256k1;
 
@@ -28,7 +47,7 @@ export default class Secp256k1Keypair extends DockKeypair {
   }
 
   privateKey() {
-    return hexToU8a(`0x${this.keyPair.getPrivate(true, 'hex')}`);
+    return hexToU8a(`0x${this.keyPair.getPrivate('hex')}`);
   }
 
   _sign(message) {
@@ -46,14 +65,49 @@ export default class Secp256k1Keypair extends DockKeypair {
     return hexToU8a(`0x${r}${s}${i}`);
   }
 
+  static signatureToDER(signature) {
+    const sigBytes = valueBytes(signature);
+    if (sigBytes.length !== 65) {
+      throw new Error(
+        `Invalid signature length. Expected is 65 bytes, received ${signature.length}`,
+      );
+    }
+    // Extract R, S components
+    const r = sigBytes.slice(0, 32); // First 32 bytes
+    const s = sigBytes.slice(32, 64); // Next 32 bytes
+
+    // Encode R and S into DER format
+    const rEncoded = encodeDERInt(r);
+    const sEncoded = encodeDERInt(s);
+
+    // Calculate total length
+    const totalLength = rEncoded.length + sEncoded.length;
+
+    // Create Uint8Array for DER encoding
+    const der = new Uint8Array(2 + totalLength); // 2 bytes for tag and length + total payload
+    der[0] = 0x30; // DER sequence tag
+    der[1] = totalLength; // Total length of R + S encoded
+
+    // Copy encoded R and S into DER array
+    der.set(rEncoded, 2);
+    der.set(sEncoded, 2 + rEncoded.length);
+
+    return der;
+  }
+
   static hash(message) {
     return sha256.digest(message);
   }
 
   static verify(message, signature, publicKey) {
+    let bytes = valueBytes(signature);
+
+    if (bytes.length === 65) {
+      bytes = this.signatureToDER(bytes);
+    }
     return secp256k1Curve.verify(
       this.hash(message),
-      valueBytes(signature),
+      bytes,
       valueBytes(publicKey),
     );
   }

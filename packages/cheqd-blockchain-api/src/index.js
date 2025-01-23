@@ -267,7 +267,7 @@ export class CheqdAPI extends AbstractApiProvider {
   }
 
   methods() {
-    return ['cheqd'];
+    return ['cheqd', 'dock'];
   }
 
   // eslint-disable-next-line

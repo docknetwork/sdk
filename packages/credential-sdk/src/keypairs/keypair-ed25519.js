@@ -16,12 +16,35 @@ export default class Ed25519Keypair extends DockKeypair {
 
   static SeedSize = 32;
 
-  static _fromSeed = (seed) => generateKeyPairFromSeed(normalizeToU8a(seed));
+  /**
+   *
+   * Instantiates new `DockKeypair` from the provided source.
+   * It can have one of two types: "seed" or "private".
+   * @param {Uint8Array} seedOrPrivate
+   * @param {"seed"|"private"} sourceType
+   */
+  constructor(seedOrPrivate, sourceType = 'seed') {
+    let kp;
+    switch (sourceType) {
+      case 'seed':
+        kp = generateKeyPairFromSeed(normalizeToU8a(seedOrPrivate));
+        break;
+      case 'private': {
+        const secretKey = normalizeToU8a(seedOrPrivate);
+        kp = {
+          secretKey,
+          publicKey: extractPublicKeyFromSecretKey(secretKey),
+        };
+        break;
+      }
+      default:
+        throw new Error(
+          `Unsupported source type: \`${sourceType}\`, it must be either "seed" or "private"`,
+        );
+    }
 
-  static _fromPrivateKey = (secretKey) => ({
-    secretKey: normalizeToU8a(secretKey),
-    publicKey: extractPublicKeyFromSecretKey(normalizeToU8a(secretKey)),
-  });
+    super(kp);
+  }
 
   _publicKey() {
     return this.keyPair.publicKey;

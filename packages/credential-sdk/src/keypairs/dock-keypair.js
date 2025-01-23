@@ -9,25 +9,22 @@ import { randomAsHex } from '../utils/bytes';
  */
 class DockKeypair {
   /**
-   * Instantiates new `DockKeypair` from the provided source.
-   * It can have one of two types: "seed" or "secret".
+   * Instantiates new `DockKeypair` with the provided underlying keypair.
    *
-   * @param {Uint8Array} source
-   * @param {"seed"|"private"} sourceType
+   * @param {*} keyPair
    */
-  constructor(source, sourceType = 'seed') {
-    switch (sourceType) {
-      case 'seed':
-        // eslint-disable-next-line no-underscore-dangle
-        this.keyPair = this.constructor._fromSeed(source);
-        break;
-      case 'private':
-        // eslint-disable-next-line no-underscore-dangle
-        this.keyPair = this.constructor._fromPrivateKey(source);
-        break;
-      default:
-        throw new Error(`Unknown source type: \`${sourceType}\``);
-    }
+  constructor(keyPair) {
+    this.keyPair = keyPair;
+  }
+
+  /**
+   * Generates `DockKeypair` from the supplied entropy.
+   * @param {Uint8Array} entropy
+   * @returns {DockKeypair}
+   */
+  static fromEntropy(entropy) {
+    // eslint-disable-next-line no-underscore-dangle
+    return new this(entropy, 'entropy');
   }
 
   /**
@@ -36,6 +33,7 @@ class DockKeypair {
    * @returns {DockKeypair}
    */
   static fromSeed(seed) {
+    // eslint-disable-next-line no-underscore-dangle
     return new this(seed, 'seed');
   }
 
@@ -45,6 +43,7 @@ class DockKeypair {
    * @returns {DockKeypair}
    */
   static fromPrivateKey(privateKey) {
+    // eslint-disable-next-line no-underscore-dangle
     return new this(privateKey, 'private');
   }
 
@@ -118,14 +117,7 @@ class DockKeypair {
 export default withExtendedPrototypeProperties(
   ['privateKey', '_publicKey', '_sign'],
   withExtendedStaticProperties(
-    [
-      'Signature',
-      'VerKeyType',
-      'SeedSize',
-      'verify',
-      '_fromPrivateKey',
-      '_fromSeed',
-    ],
+    ['Signature', 'VerKeyType', 'SeedSize', 'verify', 'constructor'],
     DockKeypair,
   ),
 );

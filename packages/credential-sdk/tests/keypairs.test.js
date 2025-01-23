@@ -2,11 +2,16 @@ import { Ed25519Keypair, Secp256k1Keypair } from "../src/keypairs";
 import { randomAsHex } from "../src/utils";
 
 describe.each([Ed25519Keypair, Secp256k1Keypair])("Keypairs", (Keypair) => {
-  it(`${Keypair.name} fromSeed method`, async () => {
+  const createKp = (source) =>
+    Keypair === Ed25519Keypair
+      ? Keypair.fromSeed(source)
+      : Keypair.fromEntropy(source);
+
+  it(`${Keypair.name} fromSeed/fromEntropy method`, async () => {
     const seed = randomAsHex(Keypair.SeedSize);
-    const kp = Keypair.fromSeed(seed);
+    const kp = createKp(seed);
     expect(kp.keyPair).toBeTruthy();
-    expect(Keypair.fromSeed(seed)).toEqual(kp);
+    expect(createKp(seed)).toEqual(kp);
   });
 
   it(`${Keypair.name} fromPrivateKey method`, async () => {
@@ -26,21 +31,21 @@ describe.each([Ed25519Keypair, Secp256k1Keypair])("Keypairs", (Keypair) => {
 
   it(`${Keypair.name} getPublicKey method`, async () => {
     const seed = randomAsHex(Keypair.SeedSize);
-    const kp = Keypair.fromSeed(seed);
+    const kp = createKp(seed);
     const publicKey = kp.publicKey();
     expect(publicKey).toBeInstanceOf(Keypair.Signature.PublicKey);
   });
 
   it(`${Keypair.name} getPrivateKey method`, async () => {
     const seed = randomAsHex(Keypair.SeedSize);
-    const kp = Keypair.fromSeed(seed);
+    const kp = createKp(seed);
     const privateKey = kp.privateKey();
     expect(privateKey).toBeInstanceOf(Uint8Array);
   });
 
   it(`${Keypair.name} sign method`, async () => {
     const seed = randomAsHex(Keypair.SeedSize);
-    const kp = Keypair.fromSeed(seed);
+    const kp = createKp(seed);
     const message = "Hello, World!";
     const signature = kp.sign(message);
     expect(signature).toBeInstanceOf(Keypair.Signature);
@@ -48,7 +53,7 @@ describe.each([Ed25519Keypair, Secp256k1Keypair])("Keypairs", (Keypair) => {
 
   it(`${Keypair.name} static verify method`, async () => {
     const seed = randomAsHex(Keypair.SeedSize);
-    const kp = Keypair.fromSeed(seed);
+    const kp = createKp(seed);
     const message = "Hello, World!";
     const signature = kp.sign(message);
     const publicKey = kp.publicKey();
@@ -57,20 +62,20 @@ describe.each([Ed25519Keypair, Secp256k1Keypair])("Keypairs", (Keypair) => {
 
   it(`${Keypair.name} privateKey method`, async () => {
     const seed = randomAsHex(Keypair.SeedSize);
-    const kp = Keypair.fromSeed(seed);
+    const kp = createKp(seed);
     const privateKey = kp.privateKey();
     expect(privateKey).toBeInstanceOf(Uint8Array);
   });
 
   it(`${Keypair.name} publicKey method`, async () => {
     const seed = randomAsHex(Keypair.SeedSize);
-    const kp = Keypair.fromSeed(seed);
+    const kp = createKp(seed);
     const publicKey = kp.publicKey();
     expect(publicKey).toBeInstanceOf(Keypair.Signature.PublicKey);
   });
 
   it(`${Keypair.name} constructor`, async () => {
-    const kp = new Keypair(randomAsHex(Keypair.SeedSize), "seed");
+    const kp = createKp(randomAsHex(Keypair.SeedSize));
     expect(kp.keyPair).toBeTruthy();
     expect(new Keypair(kp.privateKey(), "private").keyPair).toBeTruthy();
   });

@@ -4,7 +4,7 @@ import { sha256 } from 'js-sha256';
 import { SignatureSecp256k1 } from '../types/signatures';
 import { EcdsaSecp256k1VerKeyName } from '../vc/crypto/constants';
 import DockKeypair from './dock-keypair';
-import { hexToU8a, valueBytes } from '../utils';
+import { hexToU8a, normalizeToU8a, valueBytes } from '../utils';
 
 const EC = elliptic.ec;
 const secp256k1Curve = new EC('secp256k1');
@@ -35,11 +35,36 @@ export default class Secp256k1Keypair extends DockKeypair {
 
   static SeedSize = 32;
 
-  static _fromSeed = (entropy) => secp256k1Curve.genKeyPair({
-    entropy,
-  });
+  /**
+   *
+   * Instantiates new `DockKeypair` from the provided source.
+   * It can have one of two types: "entropy" or "private".
+   * @param {Uint8Array} entropyOrPrivate
+   * @param {"entropy"|"private"} sourceType
+   */
+  constructor(entropyOrPrivate, sourceType = 'entropy') {
+    let kp;
+    switch (sourceType) {
+      case 'entropy':
+        if (entropyOrPrivate == null) {
+          throw new Error('Entropy must be provided');
+        }
 
-  static _fromPrivateKey = (secretKey) => secp256k1Curve.keyFromPrivate(secretKey);
+        kp = secp256k1Curve.genKeyPair({
+          entropy: entropyOrPrivate,
+        });
+        break;
+      case 'private':
+        kp = secp256k1Curve.keyFromPrivate(normalizeToU8a(entropyOrPrivate));
+        break;
+      default:
+        throw new Error(
+          `Unknown source type: \`${sourceType}\`, it must be either "entropy" or "private"`,
+        );
+    }
+
+    super(kp);
+  }
 
   _publicKey() {
     // public key is in hex but doesn't contain a leading zero

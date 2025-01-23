@@ -1,5 +1,16 @@
 # @docknetwork/dock-blockchain-modules
 
+## 0.18.0
+
+### Minor Changes
+
+- Deduplicate prefixes/methods for the `Resolver`s
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.29.0
+
 ## 0.17.0
 
 ### Minor Changes

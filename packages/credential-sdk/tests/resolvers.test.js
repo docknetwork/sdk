@@ -187,6 +187,15 @@ describe("Resolvers", () => {
     expect(discreteWrappedInWildcard.matchingResolver("e:a:")).toBe(null);
   });
 
+  it(`Initializes \`ResolverRouter\` with duplicate items`, () => {
+    new ResolverRouter([
+      new (class extends Resolver {
+        prefix = ["b", "b"];
+        method = ["a", "a"];
+      })(),
+    ]);
+  });
+
   it("checks `createResolver`", async () => {
     const resolve = async () => 1;
 

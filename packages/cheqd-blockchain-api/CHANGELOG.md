@@ -1,5 +1,16 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 0.23.0
+
+### Minor Changes
+
+- Deduplicate prefixes/methods for the `Resolver`s
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.29.0
+
 ## 0.22.0
 
 ### Minor Changes

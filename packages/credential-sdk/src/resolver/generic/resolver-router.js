@@ -126,8 +126,8 @@ export default class ResolverRouter extends Resolver {
       const prefixArr = [].concat(resolver.prefix);
       const methodArr = [].concat(resolver.method);
 
-      for (const prefix of prefixArr) {
-        for (const method of methodArr) {
+      for (const prefix of new Set(prefixArr)) {
+        for (const method of new Set(methodArr)) {
           acc[prefix] ||= Object.create(null);
           if (acc[prefix][method] != null) {
             throw new Error(

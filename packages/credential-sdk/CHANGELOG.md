@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.29.0
+
+### Minor Changes
+
+- Deduplicate prefixes/methods for the `Resolver`s
+
 ## 0.28.0
 
 ### Minor Changes

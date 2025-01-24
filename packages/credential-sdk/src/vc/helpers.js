@@ -202,7 +202,7 @@ export function getKeyFromDIDDocument(didDocument, didUrl) {
     ...potentialToArray(didDocument.publicKey),
   ];
 
-  return possibleKeys.filter((key) => verMethodRefsEqual(didUrl, key.id))[0];
+  return possibleKeys.find((key) => verMethodRefsEqual(didUrl, key.id));
 }
 
 /**

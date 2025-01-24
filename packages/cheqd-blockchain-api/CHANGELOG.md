@@ -1,5 +1,16 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 0.24.0
+
+### Minor Changes
+
+- Enable auto-conversion on verification method comparison
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.30.0
+
 ## 0.23.0
 
 ### Minor Changes

@@ -1,5 +1,18 @@
 # @docknetwork/sdk-examples
 
+## 0.13.0
+
+### Minor Changes
+
+- Enable auto-conversion on verification method comparison
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/dock-blockchain-modules@0.19.0
+  - @docknetwork/dock-blockchain-api@0.15.0
+  - @docknetwork/credential-sdk@0.30.0
+
 ## 0.12.0
 
 ### Minor Changes

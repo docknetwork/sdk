@@ -5,11 +5,13 @@ import {
   DockDidValue,
   CheqdTestnetDidValue,
   CheqdMainnetDidValue,
+  DockDid,
 } from "../src/types/did";
 import {
   CheqdMainnetDIDDocument,
   CheqdTestnetDIDDocument,
   DIDDocument,
+  VerificationMethodRef,
 } from "../src/types/did/document";
 import {
   PublicKeyEd25519,
@@ -20,6 +22,8 @@ import {
 } from "../src/types";
 import { TypedUUID } from "../src/types/generic";
 import { hexToU8a, maybeToCheqdPayloadOrJSON } from "../src/utils";
+import { verMethodRefsEqual } from "../src/vc";
+import { CheqdTestnetVerificationMethodRef } from "../src/types/did/document/verification-method-ref";
 
 const RANDOM_PKS = [
   "0xa1aa6a2058dd190e284a64e72adaf4e16a9ae9fbf0673d7575924e6aca3b21dc",
@@ -128,6 +132,25 @@ describe("DID document workflow", () => {
   const ASSERT = new VerificationRelationship().setAssertion();
   const CAP_INV = new VerificationRelationship().setCapabilityInvocation();
   const KEY_AGR = new VerificationRelationship().setKeyAgreement();
+
+  test(`\`verMethodRefsEqual\` method conversion works`, () => {
+    const dockVerMethod = new VerificationMethodRef(DockDid.random(), 3);
+    const cheqdVerMethod =
+      CheqdTestnetVerificationMethodRef.from(dockVerMethod);
+
+    expect(
+      verMethodRefsEqual(String(dockVerMethod), String(cheqdVerMethod))
+    ).toBe(true);
+    expect(
+      verMethodRefsEqual(
+        String(dockVerMethod),
+        String(new VerificationMethodRef(CheqdTestnetDid.random(), 3))
+      )
+    ).toBe(false);
+    expect(
+      verMethodRefsEqual(String(dockVerMethod), String(dockVerMethod))
+    ).toBe(true);
+  });
 
   test(`\`DIDDocument.from\` works`, () => {
     const doc = {

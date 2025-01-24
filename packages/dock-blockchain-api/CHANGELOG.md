@@ -1,5 +1,16 @@
 # @docknetwork/dock-blockchain-api
 
+## 0.15.0
+
+### Minor Changes
+
+- Enable auto-conversion on verification method comparison
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.30.0
+
 ## 0.14.0
 
 ### Minor Changes

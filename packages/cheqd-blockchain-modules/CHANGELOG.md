@@ -1,5 +1,16 @@
 # @docknetwork/cheqd-blockchain-modules
 
+## 0.22.0
+
+### Minor Changes
+
+- Refine the search algorithm for locating verification method references.
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.31.0
+
 ## 0.21.0
 
 ### Minor Changes

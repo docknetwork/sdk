@@ -4,6 +4,7 @@ import {
   TypedEnum,
   TypedTuple,
   TypedUUID,
+  createConverter,
   withQualifier,
 } from '../../../generic';
 import { CheqdDid, CheqdMainnetDid, CheqdTestnetDid } from './cheqd-did';
@@ -237,6 +238,19 @@ export class DidRef extends withExtendedStaticProperties(
 DidOrDidMethodKeySignature.bindVariants(
   DockDidSignature,
   DidMethodKeySignature,
+);
+
+/**
+ * Retrieve all possible stringified representations of DIDs that can be derived from the provided Dock DID.
+ *
+ * @param {*} did
+ * @returns {Array<string>}
+ */
+export const possibleDids = createConverter(
+  String,
+  DockDid,
+  CheqdTestnetDid,
+  CheqdMainnetDid,
 );
 
 export { DockDidValue, DidMethodKeyPublicKey };

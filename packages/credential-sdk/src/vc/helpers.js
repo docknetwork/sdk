@@ -24,16 +24,7 @@ import {
 } from './crypto/constants';
 import Bls12381BBDT16MACDock2024 from './crypto/Bls12381BBDT16MACDock2024';
 import { DidKeypair } from '../keypairs';
-import {
-  CheqdMainnetVerificationMethodRef,
-  CheqdTestnetVerificationMethodRef,
-  CheqdVerificationMethodRef,
-  VerificationMethodRef,
-} from '../types/did/document/verification-method-ref';
-import {
-  CheqdMainnetDid,
-  CheqdTestnetDid,
-} from '../types/did/onchain/typed-did';
+import { possibleVerificationMethodRefs } from '../types/did/document/verification-method-ref';
 
 /**
  * @typedef {object} KeyDoc The Options to use in the function createUser.
@@ -87,9 +78,6 @@ export async function getSuiteFromKeyDoc(keyDoc, useProofValue, options) {
     case Ed255192020VerKeyName:
       Cls = Ed25519Signature2020;
       break;
-    /* case Sr25519VerKeyName:
-      Cls = Sr25519Signature2020;
-      break; */
     case Bls12381BBSDockVerKeyName:
       Cls = Bls12381BBSSignatureDock2022;
       break;
@@ -147,43 +135,14 @@ export function potentialToArray(a) {
 
 /**
  * Compares a verification method reference with a key ID to determine if they are equivalent.
- * The function checks if the reference might start with `did:dock:`, and converts it to a `did:cheqd` format for comparison.
+ * The function checks if the reference might start with `did:dock:`, and converts it to a `did:cheqd:` format for comparison.
  *
  * @param {string} ref - The verification method reference to compare.
  * @param {string} keyId - The key ID to compare against.
  * @returns {boolean} - Returns `true` if the references are equivalent, `false` otherwise.
  */
-export const verMethodRefsEqual = (ref, keyId) => {
-  // If the reference matches the key ID directly, return true.
-  if (ref === keyId) {
-    return true;
-  }
-
-  try {
-    // Parse the key ID into a Cheqd verification method reference object.
-    let parsedKeyId = CheqdVerificationMethodRef.from(keyId);
-    const {
-      did: {
-        value: { constructor: CheqdDid },
-      },
-    } = parsedKeyId;
-
-    // Check if the parsed key ID corresponds to the Cheqd Testnet or Mainnet and convert accordingly.
-    if (CheqdDid === CheqdTestnetDid) {
-      parsedKeyId = CheqdTestnetVerificationMethodRef.from(keyId);
-    } else if (CheqdDid === CheqdMainnetDid) {
-      parsedKeyId = CheqdMainnetVerificationMethodRef.from(keyId);
-    } else {
-      throw new Error(`Unknown DID type: \`${CheqdDid.name}\``);
-    }
-
-    // Compare the parsed reference with the provided reference using `eq`.
-    return parsedKeyId.eq(VerificationMethodRef.from(ref));
-  } catch (err) {
-    // If an error occurs during parsing or comparison, assume the references are not equivalent.
-    return false;
-  }
-};
+export const verMethodRefsEqual = (ref, keyId) => ref === keyId
+  || possibleVerificationMethodRefs(ref).some((id) => id === keyId);
 
 export function getKeyFromDIDDocument(didDocument, didUrl) {
   // Ensure not already a key doc

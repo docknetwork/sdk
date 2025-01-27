@@ -1,9 +1,15 @@
-import { withQualifier, TypedTuple, TypedNumber } from '../../generic';
+import {
+  withQualifier,
+  TypedTuple,
+  TypedNumber,
+  createConverter,
+} from '../../generic';
 import {
   NamespaceDid,
   CheqdNamespaceDid,
   CheqdTestnetDid,
   CheqdMainnetDid,
+  DockNamespaceDid,
 } from '../onchain/typed-did';
 
 export class VerificationMethodRef extends withQualifier(TypedTuple) {
@@ -50,6 +56,10 @@ export class CheqdVerificationMethodRef extends VerificationMethodRef {
   static Classes = [CheqdNamespaceDid, TypedNumber];
 }
 
+export class DockVerificartionMethodRef extends VerificationMethodRef {
+  static Classes = [DockNamespaceDid, TypedNumber];
+}
+
 export class CheqdTestnetVerificationMethodRef extends CheqdVerificationMethodRef {
   static Classes = [CheqdTestnetDid, TypedNumber];
 }
@@ -57,3 +67,16 @@ export class CheqdTestnetVerificationMethodRef extends CheqdVerificationMethodRe
 export class CheqdMainnetVerificationMethodRef extends CheqdVerificationMethodRef {
   static Classes = [CheqdMainnetDid, TypedNumber];
 }
+
+/**
+ * Retrieve all possible stringified representations of DIDs that can be derived from the provided Dock verification method reference.
+ *
+ * @param {*} verMethodRef
+ * @returns {Array<string>}
+ */
+export const possibleVerificationMethodRefs = createConverter(
+  String,
+  DockVerificartionMethodRef,
+  CheqdTestnetVerificationMethodRef,
+  CheqdMainnetVerificationMethodRef,
+);

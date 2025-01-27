@@ -1,5 +1,18 @@
 # @docknetwork/sdk-examples
 
+## 0.14.0
+
+### Minor Changes
+
+- Refine the search algorithm for locating verification method references.
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/dock-blockchain-modules@0.20.0
+  - @docknetwork/dock-blockchain-api@0.16.0
+  - @docknetwork/credential-sdk@0.31.0
+
 ## 0.13.0
 
 ### Minor Changes

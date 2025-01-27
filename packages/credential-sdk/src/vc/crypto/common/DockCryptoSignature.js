@@ -13,6 +13,7 @@ import { u8aToU8a } from '../../../utils/bytes';
 import { withExtendedStaticProperties } from '../../../utils/inheritance';
 import CustomLinkedDataSignature from './CustomLinkedDataSignature';
 import { deepClone } from '../../../utils/misc';
+import { possibleVerificationMethodRefs } from '../../../types/did/document/verification-method-ref';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
@@ -543,6 +544,7 @@ export default withExtendedStaticProperties(
       if (!verificationMethod) {
         throw new Error('No "verificationMethod" found in proof.');
       }
+
       // Note: `expansionMap` is intentionally not passed; we can safely drop
       // properties here and must allow for it
       const result = await jsonld.frame(
@@ -550,7 +552,7 @@ export default withExtendedStaticProperties(
         {
           '@context': jsigs.SECURITY_CONTEXT_URL,
           '@embed': '@always',
-          id: verificationMethod,
+          id: possibleVerificationMethodRefs(verificationMethod),
         },
         {
           documentLoader,
@@ -558,6 +560,7 @@ export default withExtendedStaticProperties(
           expandContext: jsigs.SECURITY_CONTEXT_URL,
         },
       );
+
       if (!result) {
         throw new Error(`Verification method ${verificationMethod} not found.`);
       }

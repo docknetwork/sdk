@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.31.0
+
+### Minor Changes
+
+- Refine the search algorithm for locating verification method references.
+
 ## 0.30.0
 
 ### Minor Changes

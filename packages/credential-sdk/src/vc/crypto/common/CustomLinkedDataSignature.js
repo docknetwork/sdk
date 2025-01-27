@@ -1,6 +1,8 @@
 import jsigs from 'jsonld-signatures';
 import base58btc from 'bs58';
 import base64url from 'base64url';
+import jsonld from 'jsonld';
+import { possibleVerificationMethodRefs } from '../../../types/did/document/verification-method-ref';
 import { createJws } from '../../jws';
 
 const MULTIBASE_BASE58BTC_HEADER = 'z';
@@ -25,6 +27,58 @@ export default class CustomLinkedDataSignature extends jsigs.suites
     super(config);
     this.alg = config.alg;
     this.useProofValue = config.useProofValue || false;
+  }
+
+  /**
+   * @param document {object} to be signed.
+   * @param proof {object}
+   * @param documentLoader {function}
+   */
+  static async getVerificationMethod({ proof, documentLoader }) {
+    let { verificationMethod } = proof;
+    if (typeof verificationMethod === 'object') {
+      verificationMethod = verificationMethod.id;
+    }
+    if (!verificationMethod) {
+      throw new Error('No "verificationMethod" found in proof.');
+    }
+
+    // Note: `expansionMap` is intentionally not passed; we can safely drop
+    // properties here and must allow for it
+    const result = await jsonld.frame(
+      verificationMethod,
+      {
+        '@context': jsigs.SECURITY_CONTEXT_URL,
+        '@embed': '@always',
+        id: possibleVerificationMethodRefs(verificationMethod),
+      },
+      {
+        documentLoader,
+        compactToRelative: false,
+        expandContext: jsigs.SECURITY_CONTEXT_URL,
+      },
+    );
+
+    if (!result) {
+      throw new Error(`Verification method ${verificationMethod} not found.`);
+    }
+    // ensure verification method has not been revoked
+    if (result.revoked !== undefined) {
+      throw new Error('The verification method has been revoked.');
+    }
+    return result;
+  }
+
+  /**
+   * @param document {object} to be signed.
+   * @param proof {object}
+   * @param documentLoader {function}
+   */
+  async getVerificationMethod({ proof, documentLoader }) {
+    return this.constructor.getVerificationMethod({
+      proof,
+      documentLoader,
+    });
   }
 
   /**

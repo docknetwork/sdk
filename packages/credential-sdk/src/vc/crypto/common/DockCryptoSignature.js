@@ -4,7 +4,6 @@ import {
   DefaultSchemaParsingOpts,
 } from '@docknetwork/crypto-wasm-ts';
 
-import jsonld from 'jsonld';
 import jsigs from 'jsonld-signatures';
 
 import stringify from 'json-stringify-deterministic';
@@ -13,7 +12,6 @@ import { u8aToU8a } from '../../../utils/bytes';
 import { withExtendedStaticProperties } from '../../../utils/inheritance';
 import CustomLinkedDataSignature from './CustomLinkedDataSignature';
 import { deepClone } from '../../../utils/misc';
-import { possibleVerificationMethodRefs } from '../../../types/did/document/verification-method-ref';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 
@@ -529,58 +527,6 @@ export default withExtendedStaticProperties(
         newSchemaJson.details = stringify(details);
       }
       return newSchemaJson;
-    }
-
-    /**
-     * @param document {object} to be signed.
-     * @param proof {object}
-     * @param documentLoader {function}
-     */
-    static async getVerificationMethod({ proof, documentLoader }) {
-      let { verificationMethod } = proof;
-      if (typeof verificationMethod === 'object') {
-        verificationMethod = verificationMethod.id;
-      }
-      if (!verificationMethod) {
-        throw new Error('No "verificationMethod" found in proof.');
-      }
-
-      // Note: `expansionMap` is intentionally not passed; we can safely drop
-      // properties here and must allow for it
-      const result = await jsonld.frame(
-        verificationMethod,
-        {
-          '@context': jsigs.SECURITY_CONTEXT_URL,
-          '@embed': '@always',
-          id: possibleVerificationMethodRefs(verificationMethod),
-        },
-        {
-          documentLoader,
-          compactToRelative: false,
-          expandContext: jsigs.SECURITY_CONTEXT_URL,
-        },
-      );
-
-      if (!result) {
-        throw new Error(`Verification method ${verificationMethod} not found.`);
-      }
-      // ensure verification method has not been revoked
-      if (result.revoked !== undefined) {
-        throw new Error('The verification method has been revoked.');
-      }
-      return result;
-    }
-
-    /**
-     * @param document {object} to be signed.
-     * @param proof {object}
-     * @param documentLoader {function}
-     */
-    async getVerificationMethod({ proof, documentLoader }) {
-      return this.constructor.getVerificationMethod({
-        proof,
-        documentLoader,
-      });
     }
 
     /**

@@ -3,17 +3,17 @@ import {
   TypedTuple,
   TypedNumber,
   createConverter,
-} from "../../generic";
+} from '../../generic';
 import {
   NamespaceDid,
   CheqdNamespaceDid,
   CheqdTestnetDid,
   CheqdMainnetDid,
   DockNamespaceDid,
-} from "../onchain/typed-did";
+} from '../onchain/typed-did';
 
 export class VerificationMethodRef extends withQualifier(TypedTuple) {
-  static Qualifier = "";
+  static Qualifier = '';
 
   static Classes = [NamespaceDid, TypedNumber];
 
@@ -78,5 +78,5 @@ export const possibleVerificationMethodRefs = createConverter(
   String,
   DockVerificartionMethodRef,
   CheqdTestnetVerificationMethodRef,
-  CheqdMainnetVerificationMethodRef
+  CheqdMainnetVerificationMethodRef,
 );

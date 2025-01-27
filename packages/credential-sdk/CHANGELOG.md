@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.32.0
+
+### Minor Changes
+
+- Move `getVerificationMethod` logic to the `CustomLinkedDataSignature`
+
 ## 0.31.0
 
 ### Minor Changes

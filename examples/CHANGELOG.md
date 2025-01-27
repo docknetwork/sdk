@@ -1,5 +1,18 @@
 # @docknetwork/sdk-examples
 
+## 0.15.0
+
+### Minor Changes
+
+- Move `getVerificationMethod` logic to the `CustomLinkedDataSignature`
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/dock-blockchain-modules@0.21.0
+  - @docknetwork/dock-blockchain-api@0.17.0
+  - @docknetwork/credential-sdk@0.32.0
+
 ## 0.14.0
 
 ### Minor Changes

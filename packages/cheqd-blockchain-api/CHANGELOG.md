@@ -1,5 +1,16 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 0.26.0
+
+### Minor Changes
+
+- Move `getVerificationMethod` logic to the `CustomLinkedDataSignature`
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.32.0
+
 ## 0.25.0
 
 ### Minor Changes

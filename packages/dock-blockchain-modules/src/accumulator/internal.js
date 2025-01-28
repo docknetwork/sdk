@@ -237,9 +237,12 @@ export default class DockInternalAccumulatorModule extends injectParams(
       false,
     );
 
-    const api = await this.apiProvider.api.at(
-      '0x2e5ae7fdf8d17ddf37de1012d055ac8440dbd2ea57d0dd5a7af5b6dce2e485d6',
-    );
+    let { api } = this.apiProvider;
+    if (!api.registry.hasType('UpdateAccumulator')) {
+      api = await api.at(
+        '0x2e5ae7fdf8d17ddf37de1012d055ac8440dbd2ea57d0dd5a7af5b6dce2e485d6',
+      );
+    }
 
     return extrinsics
       .map((e) => this.getUpdatesFromExtrinsic(api, e, accumulatorId))
@@ -301,9 +304,12 @@ export default class DockInternalAccumulatorModule extends injectParams(
         async (b) => await this.apiProvider.getAllExtrinsicsFromBlock(b, false),
       ),
     );
-    const api = await this.apiProvider.api.at(
-      '0x2e5ae7fdf8d17ddf37de1012d055ac8440dbd2ea57d0dd5a7af5b6dce2e485d6',
-    );
+    let { api } = this.apiProvider;
+    if (!api.registry.hasType('UpdateAccumulator')) {
+      api = await api.at(
+        '0x2e5ae7fdf8d17ddf37de1012d055ac8440dbd2ea57d0dd5a7af5b6dce2e485d6',
+      );
+    }
 
     return extrinsics
       .flat()

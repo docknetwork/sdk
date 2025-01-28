@@ -1,11 +1,10 @@
 // Script to send runtime upgrade using sudo account
 
-import dock from "../src/index";
-import { sendTxnWithAccount } from "./helpers";
+import { DockAPI } from "../dist/esm/index.js";
+import { sendTxnWithAccount } from "./helpers.js";
+import fs from "fs";
 
-require("dotenv").config();
-
-const fs = require("fs");
+const dock = new DockAPI();
 
 const { FullNodeEndpoint, SudoSecretURI } = process.env;
 

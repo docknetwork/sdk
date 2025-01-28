@@ -390,6 +390,8 @@ export default {
         "did:dock:5CKsfvaE68mvRhdn3dDXG4KpWzuvaUNdBbiu6sFUuPK9rw66",
       "0x7375b3c183a9f761530786b86ea412ea3da97bf82a29562f3ded73c901fc3435":
         "did:dock:5HLbQLSmirNuZVRsdWKbsgdajw9QTGzSFJABSVzMT5EBj5sb",
+      "0x0a4f97dba091a98c8ff1796bae97ca1a36f77437499cd566b06a0f0dfdf6b68d":
+        "did:dock:5EUKaBFdfdULksWRDseGxcojp1kzhTzAVFFqNsVVzuQRGdsP",
       "0xba69c0862878521fa774783ef208e2b359368b7241d83f6a5d6236bd26747c05":
         "did:dock:5HKkVpaciu1RArV13E7ig3i84JtiMTcwoXoHPZ8VMrBUYJ4w",
       "0xdd90c3bdbe316aa392b28d97a853e25ca4e6e1616fd8451338887b805e9ba885":
@@ -518,6 +520,8 @@ export default {
         "did:dock:5HLbQLSmirNuZVRsdWKbsgdajw9QTGzSFJABSVzMT5EBj5sb",
       "0xf17ab5341cdbd0634214a381e8d6a106abf4b40c875db318c54f2981710000e8":
         "did:dock:5HKkVpaciu1RArV13E7ig3i84JtiMTcwoXoHPZ8VMrBUYJ4w",
+      "0x74b5ad6e41b77a61b04e2813c556b60c976ff9dffe1c9b3daaf7b464c60ac8d2":
+        "did:dock:5GA1iDueqirfdCS4SsNexd2jTLgigp7V79VvHV3ZeiY3Jgiq",
       "0x1dc5a036f715ec43bddedbb61abc85b2ee82175148e76956f6ba486cde0ad804":
         "did:dock:5DXyk2xEYgvFgcLzCL7ckvtsRetUaYi1WwjhnJJgbmHh6xk4",
       "0x726987542276e40fd66f8f39d1c4800232fcf46e3846810b9d7aed0f5096bfb5":
@@ -604,6 +608,8 @@ export default {
         "did:dock:5EPYrkZs8i8sAY43UASxjkPfyQ1LiUxyeoLJHojwPNkEjF4Q",
       "0x148b13b51d2b3b0c2d4a6c6aa1a8477ee649182e29c4401c71fe8ec73f7d4f03":
         "did:dock:5H8aKg4A5rCAXwEaD9biYUZjD1GA9nEx5dBC66ikWibWhVGx",
+      "0xe7111d182986e3c44eb5d94c4f3e6512043bec2ffdf34ddda85cf23430c879c9":
+        "did:dock:5D42BNZgzaotEQeT2ST6iQs7MWPpCRrrFNkXe9sXnfC6asAh",
       "0xf7e1837cbadbbac0bced7c0f00c42a91cd57d1bf0838554fbf4642487614027e":
         "did:dock:5CKsfvaE68mvRhdn3dDXG4KpWzuvaUNdBbiu6sFUuPK9rw66",
       "0x99dd9403a7ec2819143e7616ff8456fc3a0319927c051f6e231f5a8a77d6baa9":
@@ -734,6 +740,8 @@ export default {
         "did:dock:5CeS9ht8oVrc5YT2HLUzLvuoUuHEZtYZxoQmYYaSWZDF5hRF",
       "0x72ee36602095ded216a1a9b608b320c7cb236bf0be96c15cae64c7ad9e5b5a0d":
         "did:dock:5EVS1QccxfTj9pcy7fMFYeAf83ZPkMBmvi2jkKiNQBrCbagn",
+      "0xf7bc1fcbb2df8749413d439c413fafc9469c3320163b2eddd53485f5add79b64":
+        "did:dock:5Ds2PBPbPsDBke7KUwXKsoRg5FCNr6o4Qp7B56CynHjktWLT",
       "0x4fe08c4cdda8c6f00be2bc5d7c28935ec460dcf8ccb11820507d7224630cad5c":
         "did:dock:5EDizB9u2vLqLy36gWYcUxNWEcosLuNQekChAjkNBdMPBjLd",
       "0x308a2d2c819f66ca3d5197a8b4caa79efbe25b2f20ce9d87b5fa6e4c5f40afb7":
@@ -802,6 +810,8 @@ export default {
         "did:dock:5CKsfvaE68mvRhdn3dDXG4KpWzuvaUNdBbiu6sFUuPK9rw66",
       "0x32d3ddb6f82bd791df4e8c1fef8a89137b986840b3ef6ca01e0481d795a75fd2":
         "did:dock:5GZr7ErtgG4vvmfMXGwh94pvdVEH9MyokCBgbP5C8xTLqFRx",
+      "0x856bb11b289b209dee260031a86336a949ccbd6d5101a99af628a3e969ca4256":
+        "did:dock:5FxthU7NwGnbDXh2tXYbrFARDnrPygerYXntbJyrCCDr5DMT",
       "0xa7e2746ddb68cb036f8d0c7822a441590410f6a4a5f125dd8ca4e58329521b05":
         "did:dock:5GzbjEmkzQYpv4QC88Fcmzydxgev4tbtepFqN5HX5TbWicAr",
       "0xa6d213d27eee7c345112d3fb153ece204a753b8dc5a2ee7fea0d678a447b8509":
@@ -1174,6 +1184,8 @@ export default {
         "did:dock:5HLbQLSmirNuZVRsdWKbsgdajw9QTGzSFJABSVzMT5EBj5sb",
       "0xee2f30a927cc412347e3db7d455de235b4d1d7bf7e2c0536fb1de6fe284898b5":
         "did:dock:5CKsfvaE68mvRhdn3dDXG4KpWzuvaUNdBbiu6sFUuPK9rw66",
+      "0x09877bdd44579fd95a0685fcd3b7c6613bd8519f6b5574c659406e10bed2f6c3":
+        "did:dock:5HbmcdZ1Ddrrp4jC9RbLXNmPF4BjiQoiD3yMzubA6F5n7oX6",
       "0xaf48bd796cc2c753fe3a075de9ef398e3ad96e9567479aa04cc3cffa81a52e88":
         "did:dock:5CsAhcHCpVM6uA4kTKHFtJtrqDWutBKBoWauD5oTEENeryda",
       "0x0b6297a61dcccc960004245eb26b2d4e8727408d1a8099990c43a50b1b5125a8":
@@ -1591,6 +1603,8 @@ export default {
         "did:dock:5FTmeBP5U987QKqtKwYJT7AG1Cv3Dfd7XY5eG8t4P69JTHNk",
       "0xe702c78b63fb1410d0b298f5cbe47745a3fc5baa3c9db0cc4a1d22d4000b0a2b":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
+      "0xc6383be278a2a727d7ce5eb0cc167f171649dfc8487b341bc5d4006771018156":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x3355e1165f3515a249dcc62bbf06fe92f18e65eef097ce079cd4d01205675db6":
         "did:dock:5FiyjWBxwS16YCeLWuFGA5va8PoTvXQGxTWQSXYYEPWjbYDS",
       "0x91246d3a271388a49aaf0e5956e2bae840af685a897269a25f3f5b3dacfc013d":
@@ -1787,6 +1801,8 @@ export default {
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x1f09a2d8cb7e1b00ce4fd514b73a94e44d55129c06806e7dd045af6a4181dd82":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
+      "0xc45535c3ca754bbf7aed68574e75abcd33620c6567c241492da7d04f0c5ddbbd":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x8cfe5caa73d736b6822e3e5e515fdc43bae5c502b8402e1082ec46b5a2601d8b":
         "did:dock:5CYjsSrTtyPvqdHTnsExQn8RnWFAsrkUjWX3ru9AStukRJyE",
       "0xd44f134fe9c762068f0b6a31e42f2bcf12ede37702f856b7e5d1d3fec61a0ccf":
@@ -1805,6 +1821,8 @@ export default {
         "did:dock:5CKsfvaE68mvRhdn3dDXG4KpWzuvaUNdBbiu6sFUuPK9rw66",
       "0x89b842c5aebea3dd7d8318ba0f8a9811227d3e6d8db59c5fdb5d02ae252f6480":
         "did:dock:5FiyjWBxwS16YCeLWuFGA5va8PoTvXQGxTWQSXYYEPWjbYDS",
+      "0x7111953cd85324a823d3229b9ddd8301fb9d194a4eb3839edc6fffc0d76aa9e7":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x0a576c95e60ae6d5f9bef2fa3a84828361a960651808e8805bf737db601ea479":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x658126da17cb622c031701ea45f3a80bc7d3f43e3363a40e0777a9957688b74b":
@@ -2147,6 +2165,8 @@ export default {
         "did:dock:5DYw7TdnqD4gupLDgKwR3XHZb4xGQgDxA9A5u3krAoknsgEn",
       "0x47c8cfe60621e142d2605a8dbce397593eb9f4e61b5dac55186a93b8809d9c92":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
+      "0x49dc9d7c427aa5ed25098485ea363fb2520b5128ae27cf0909773523f0dfd245":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x838e730640ec3373815153c84f7c1a297db17ee3083f8b2495e3d7fc8e64edd6":
         "did:dock:5GbfQzGCmHL8oHVGWhqyo5zaoBQkY7dMox4ppFqSmpbnNjZn",
       "0x7f2129bc5fb6291e4c6d09d7984141d775f9b17bd8154bfc37396c171902e5d2":
@@ -2435,6 +2455,8 @@ export default {
         "did:dock:5E4DJqsJcw1yzM22dEEGQDeE38iXd62SCfAbJgooWLEuAJ8N",
       "0x39c2c5156d6019356afdb783383ebbeffd0291efa527077108efae263c71cef3":
         "did:dock:5D5A93CaBa2E4AFZgr5BLYBYhQxKWbM8bwhKnQNdsWoNVikn",
+      "0xcdcd44261d96c7e975551e4ad660635ef41795e2dcc27cb05154c261b530c923":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x7da03c485350726d03cfda7c8d4ca54595db4d34025923139c6ad6e66b2a61b6":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x59ecf4ba69b62c0524d70757b19f0379dcc030247f758eb7ea413a6a40cd9263":
@@ -2709,6 +2731,8 @@ export default {
         "did:dock:5GbfQzGCmHL8oHVGWhqyo5zaoBQkY7dMox4ppFqSmpbnNjZn",
       "0x4171e0bf905f3fad08c7673c55a9cfa48420ce67283a87d67a21608b708a5aeb":
         "did:dock:5GhHKUauqgVcLBmmoYQN9BANPaVwdRmXKb5uUFUNPobhHtjt",
+      "0x18d792564c81793af7944bd2bdf042fea24930a8b17cc562045c4d8a7f797e2d":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x49075c6c98d2771bb7a54cdf4b36d413a46fe37d2c8213e2d19beac73e0ad4e5":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0xf47dc49ad6f260b4a842135174ea40739a3e36c8d511246f6997b9b70557ba35":
@@ -2833,6 +2857,8 @@ export default {
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x94ed7300bf800fcae3e41ee5b4f6010ce710216b3e3a2d13edcc1df2ace16f4e":
         "did:dock:5CHtjVdn78Y7SxB4Si9qTMGsHyJ61k9Zyz1jp2yWJfqTsMgM",
+      "0x5373be0f210ec093e23d5de2f222ad0ecade82fdbd9a1bd3da2afc2272afec3a":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0xcdf22cd96c03399dbbc63227e23c4e1f2a0d0ebf802833e02d6030eac2437ccb":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0xdd0bd9a9eff72b7dcd4e948d1cdde0852b5f0a4761d91627657d9aefea5d3cd6":
@@ -3201,6 +3227,8 @@ export default {
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0xa5160d432f096985d3dd25b745281ed5e50c75827990594adc92d8a859384c13":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
+      "0xc6473a82f677329978ad6e296931099ef30e9bcbbc0f12394ff6986e96cadd47":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x837d61628bbacaca226d293a413239aed8edd4e219413c09bf044373a036e6b6":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0xae23de832eebc3a0a035d5f482cdda59a620a91b37f0901a7fe00fbf951eb9bc":
@@ -3559,6 +3587,8 @@ export default {
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x4030483eb57777876dc5379443dfeae1a0abe4fcd37cbef1dc2a339132d8988d":
         "did:dock:5Dkx5bXL8UDhx1aoQBjhEtzGA1yHTd4MsdLyWnKbyGNVuqhx",
+      "0x4049fedfd83cfcdd35b4a7c552125bfae90d46e0c2d03f32fd88ebbe1dec6341":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0xed59407138bdaef89ee4f953eac8993b0748746c98ac6748366d3bd184eed633":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0xdbf40b9a5c751b3b5d044de490f88b850387b0f99d2a9633af85097e6ce0d5b3":
@@ -3573,6 +3603,8 @@ export default {
         "did:dock:5Hp44Vw4ubibbqejFw8d6BXeoBGNe37EhQxuDsLLL7pYVWRM",
       "0x0d9bc43de81ba628928ca7b4495270d068748164b78f1fda5ec3830086b41548":
         "did:dock:5CKsfvaE68mvRhdn3dDXG4KpWzuvaUNdBbiu6sFUuPK9rw66",
+      "0x8adc79a7df05b1a3a2d933c51f5263f174c1eaa378d0f8a3226d0b1b7fe434ec":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x8af5f1552f90675d9b37b09a4a993d6f13819a3c4301b7d9875649c513255084":
         "did:dock:5C83BPpc7EFJcUDzMXettD4K6tTnAi7MqZCsQCfYf3uqAtsL",
       "0x75bc556fe9491dd1925c4937fd388c7df01acb13e05c733302d61b6fe3b14631":
@@ -3703,6 +3735,8 @@ export default {
         "did:dock:5H6uiRJWhneZS5F6hVpJvmDLpYZuiag841kcRUFdT2ZAVRRu",
       "0xf0131a716a73d0cd32c59b4c1957bd5a77df7bb21d81097ad3783e2e8f9a264f":
         "did:dock:5DDtWbr9C5HmK3mcz5HRXKbmf5sSCvAycqzWffVbvg9nq9fk",
+      "0xad3ab6c0fa227a742f90af11faa14f6010cd0aee2c458309d7b9297c2d6f1c46":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x6bac4f72613007d5fd7b27155f479d51e237aef6a350a675bfa9b0841c87cfb2":
         "did:dock:5GqSVkyBXGFbHvidYH2sLJSAHCSYe7F9oCEnxHLANXkSiy1d",
       "0xdb342e36c82d2b9488ef603022afe5b4edf809993b360d339994a979dca3cfda":
@@ -4173,6 +4207,8 @@ export default {
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x3355469dd1024f3cfe9b21f804ef869df9f15eaa18939a8a8803f187ea7c25e1":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
+      "0x918397a07f170da30316c045002eb978783a7b5c353556081dcc8d0becf9e8f8":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0xcb6100ba7ad0ee1632554d8232cd0b48c0b2500b3458830cdfaba5f527aa444c":
         "did:dock:5CefFqFGh6NrKL7RNHej38peUyErxszUHgUdsLTy2NWbev92",
       "0xe1226e2360f2f63dd5eeab2467efd9e537bb5f4cb8648d493c282dd911682794":
@@ -4457,6 +4493,8 @@ export default {
         "did:dock:5FiyjWBxwS16YCeLWuFGA5va8PoTvXQGxTWQSXYYEPWjbYDS",
       "0x57be0a3c9689cbec2cb056cb72c8883d9dac13fd5178361265951c1890a8a35a":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
+      "0xe2a763b73fa7211b23ef1ea1e0525150ea4f3ca8bcc45966a8ca982fdc49d321":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0xa065420acee2fac840571807b933228c4b486c219ba951234e78a84fc697cb98":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x8201a8ddcae478db488cb1820d5b75291b692e688ee80c828a9d92e18b65d137":
@@ -4529,6 +4567,8 @@ export default {
         "did:dock:5GbfQzGCmHL8oHVGWhqyo5zaoBQkY7dMox4ppFqSmpbnNjZn",
       "0xd7b61731b087c2fa21bce38975b2d262d69dda10557a9d921fdc12a77d51b2e6":
         "did:dock:5CKsfvaE68mvRhdn3dDXG4KpWzuvaUNdBbiu6sFUuPK9rw66",
+      "0x4d0a0d066d4b6a2111b1aedc3f83ee7cce7e4b8f9e92aed8e9d603db3df524ad":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0xa93383c7434d7a4d61aa2a7352383f23e54ef97f3820e2005f610fef14700d06":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x70c6f33a22dfed2d0dbb7d09f99bb147a25b4e49b5bfa63ea980e67679c5f0f9":
@@ -4703,6 +4743,8 @@ export default {
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0xa745b4076b79c8891ba08f116b59a5b829578c3cacc2b3c95e580ac92e6a928a":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
+      "0x9e64fa0551c4e16e576838b5f4e82b4b8ad02b7de5e126d5c9e3dd612b20ddaa":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x32cd05662cf413dc29811deaf51c4cf7346cd6a93296259f5ecd9cf66a2dde0e":
         "did:dock:5CYjsSrTtyPvqdHTnsExQn8RnWFAsrkUjWX3ru9AStukRJyE",
       "0xb6aa4c3800366323523fdfd232cc7d256054d81eeca56035477ae9651c188f10":
@@ -4725,6 +4767,8 @@ export default {
         "did:dock:5GowuwPi84tAidsJp8CBbmYShLrpXbehHcVm784VA78yurjH",
       "0x9139a00938813403f37cbcff0f65d04bf6184b4881fa45a02c4690af7d7e5220":
         "did:dock:5HPb8aoNXNQv5XxbupZRorHyc7CdBUYWFFxeczHxqVgeGPjT",
+      "0xd5b25c7096361aaa0b2b10ed79cb6eea1cfa9873ed647ae68e06c969e5406351":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x67467a02c5c909bbd51ce2149fd76601f982238f61bfcb8915aaf0423b653aca":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0xd38c804c8943479275db311958bd5d3764354d27af9f311f292357707533ca56":
@@ -4917,6 +4961,8 @@ export default {
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x9a059028cd37d1e3d6e4b7280bcacbe72d700ef4041634264d23f65e86a5a8cb":
         "did:dock:5CKsfvaE68mvRhdn3dDXG4KpWzuvaUNdBbiu6sFUuPK9rw66",
+      "0x8af6581f141ec12daf8207e5113f2d759121e927a84bbff485b2f67f344c3077":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0xbeb528ef145c0851cc97cf8a4c9ec53297d702c4a2f6ab3035b7e2b6cfc31eee":
         "did:dock:5Fn3s3KL3CEDwwfkip46dHssFdBRpEgBDEZ1eMB2PPgDxFbX",
       "0x4fcb7590ea2cfc8958db21b4dd374aacd546d364dc7ff2d864784aac9963059f":
@@ -5070,6 +5116,8 @@ export default {
       "0x1cf69edd6afb40fe012cc2cc8fbf06c7de2d3134d31892e4769eaa8d170f9d5e":
         "did:dock:5Cu3mNE4kWDcX8ZGxagxznX2PDcHfsTh4YHyUEEGeRWR1ijk",
       "0xac4606c423ba796c8d7f7c62b3eaf90f70d9bf10c877b4d41b199f94cd04a3b4":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
+      "0xe2ac351492d30699345aacea7f93b07e5cc8028ac7b8d583f05e8de359628fc4":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0x247467ad1cd3962d09bc1d206468471f09816cec582d1470b0771b1183ba67e0":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
@@ -5594,6 +5642,8 @@ export default {
       "0x60ec508c8e20a9cee437c29aa2407f4995bf4386f56a34fd9e510a4b9297c845":
         "did:dock:5CYjsSrTtyPvqdHTnsExQn8RnWFAsrkUjWX3ru9AStukRJyE",
       "0xe28d68cebdf4102a24db15152e383c6ed45492f65515e51571ee6e3c4a8a5437":
+        "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
+      "0x4e53cd99e049e36bfbf57382cb40e17baf6a1482a9f6c13ca56b1c1ceca2645e":
         "did:dock:5FgoGVWJVyqFa9tcWQbfbSCfmPcKet8fqtU1dtE15jx7UeVP",
       "0xdbaf64744a608cb1b21f8ead8c25ec3c0a71fd1185b44af806fae7a7e26391d0":
         "did:dock:5CvuMepTbexFtonLdwRftSQDv7NWPtapRhQshmNqKj8sx2FL",

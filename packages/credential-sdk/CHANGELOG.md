@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.33.0
+
+### Minor Changes
+
+- Update id mapping to reflect latest `testnet` state, misc tweaks
+
 ## 0.32.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # @docknetwork/dock-blockchain-api
 
+## 0.18.0
+
+### Minor Changes
+
+- Update id mapping to reflect latest `testnet` state, misc tweaks
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.33.0
+
 ## 0.17.0
 
 ### Minor Changes

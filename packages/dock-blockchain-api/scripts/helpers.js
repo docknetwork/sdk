@@ -22,7 +22,7 @@ import {
   fromPairs,
 } from "ramda";
 import { of, concatMap, from } from "rxjs";
-import { DockAPI } from "../src";
+import { DockAPI } from "../dist/esm/index.js";
 
 /**
  * Retrieves a block associated with the given number.

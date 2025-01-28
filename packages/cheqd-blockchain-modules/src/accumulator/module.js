@@ -2,7 +2,6 @@
 
 import {
   CheqdAccumulatorWithUpdateInfo,
-  CheqdAccumulatorCommon,
   CheqdKBUniversalAccumulator,
   CheqdUniversalAccumulator,
   CheqdPositiveAccumulator,
@@ -40,7 +39,7 @@ export default class CheqdAccumulatorModule extends withParams(
     return await this.cheqdOnly.tx.addAccumulator(
       id,
       new CheqdPositiveAccumulator(
-        new CheqdAccumulatorCommon(accumulated, publicKeyRef),
+        new this.types.AccumulatorCommon(accumulated, publicKeyRef),
       ),
       didKeypair,
     );
@@ -68,7 +67,7 @@ export default class CheqdAccumulatorModule extends withParams(
       id,
       new CheqdUniversalAccumulator(
         new CheqdUniversalAccumulator.Class(
-          new CheqdAccumulatorCommon(accumulated, publicKeyRef),
+          new this.types.AccumulatorCommon(accumulated, publicKeyRef),
           maxSize,
         ),
       ),
@@ -90,7 +89,7 @@ export default class CheqdAccumulatorModule extends withParams(
     return await this.cheqdOnly.tx.addAccumulator(
       id,
       new CheqdKBUniversalAccumulator(
-        new CheqdAccumulatorCommon(accumulated, publicKeyRef),
+        new this.types.AccumulatorCommon(accumulated, publicKeyRef),
       ),
       didKeypair,
     );
@@ -116,7 +115,7 @@ export default class CheqdAccumulatorModule extends withParams(
     return await this.cheqdOnly.tx.updateAccumulator(
       id,
       new CheqdPositiveAccumulator(
-        new CheqdAccumulatorCommon(accumulated, publicKeyRef),
+        new this.types.AccumulatorCommon(accumulated, publicKeyRef),
       ),
       { additions, removals, witnessUpdateInfo },
       didKeypair,
@@ -146,7 +145,7 @@ export default class CheqdAccumulatorModule extends withParams(
       id,
       new CheqdUniversalAccumulator(
         new CheqdUniversalAccumulator.Class(
-          new CheqdAccumulatorCommon(accumulated, publicKeyRef),
+          new this.types.AccumulatorCommon(accumulated, publicKeyRef),
           maxSize,
         ),
       ),
@@ -175,7 +174,7 @@ export default class CheqdAccumulatorModule extends withParams(
     return await this.cheqdOnly.tx.updateAccumulator(
       id,
       new CheqdKBUniversalAccumulator(
-        new CheqdAccumulatorCommon(accumulated, publicKeyRef),
+        new this.types.AccumulatorCommon(accumulated, publicKeyRef),
       ),
       { additions, removals, witnessUpdateInfo },
       didKeypair,

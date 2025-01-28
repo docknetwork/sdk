@@ -1,5 +1,18 @@
 # @docknetwork/sdk-examples
 
+## 0.16.0
+
+### Minor Changes
+
+- Update id mapping to reflect latest `testnet` state, misc tweaks
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/dock-blockchain-modules@0.22.0
+  - @docknetwork/dock-blockchain-api@0.18.0
+  - @docknetwork/credential-sdk@0.33.0
+
 ## 0.15.0
 
 ### Minor Changes

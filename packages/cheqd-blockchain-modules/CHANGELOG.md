@@ -1,5 +1,16 @@
 # @docknetwork/cheqd-blockchain-modules
 
+## 0.24.0
+
+### Minor Changes
+
+- Update id mapping to reflect latest `testnet` state, misc tweaks
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.33.0
+
 ## 0.23.0
 
 ### Minor Changes

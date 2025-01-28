@@ -12,7 +12,7 @@ import {
   AccumulatorParams,
   KBUniversalAccumulator,
   KBUniversalMembershipWitnessUpdateInfo,
-} from "@docknetwork/crypto-wasm-ts";
+} from "@docknetwork/credential-sdk/crypto";
 import {
   InMemoryKBUniversalState,
   InMemoryState,

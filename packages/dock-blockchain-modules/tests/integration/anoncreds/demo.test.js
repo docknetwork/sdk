@@ -21,7 +21,7 @@ import {
   AccumulatorParams,
   AccumulatorPublicKey,
   initializeWasm,
-} from "@docknetwork/crypto-wasm-ts";
+} from "@docknetwork/credential-sdk/crypto";
 import { InMemoryState } from "@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence";
 import { DockAPI } from "@docknetwork/dock-blockchain-api";
 import {

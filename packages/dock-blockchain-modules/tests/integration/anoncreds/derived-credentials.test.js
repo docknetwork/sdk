@@ -17,7 +17,7 @@ import {
   KBUniversalAccumulator,
   MEM_CHECK_KV_STR,
   RevocationStatusProtocol,
-} from "@docknetwork/crypto-wasm-ts";
+} from "@docknetwork/credential-sdk/crypto";
 import {
   InMemoryState,
   InMemoryKBUniversalState,

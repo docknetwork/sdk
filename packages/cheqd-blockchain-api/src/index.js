@@ -53,6 +53,8 @@ import {
   DockDidOrDidMethodKey,
   CheqdMainnetVerificationMethodSignature,
   CheqdTestnetVerificationMethodSignature,
+  CheqdTestnetAccumulatorCommon,
+  CheqdMainnetAccumulatorCommon,
 } from '@docknetwork/credential-sdk/types';
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 
@@ -102,6 +104,7 @@ export class CheqdAPI extends AbstractApiProvider {
       Did: CheqdTestnetDid,
       DidDocument: CheqdTestnetDIDDocument,
       Accumulator: CheqdTestnetAccumulator,
+      AccumulatorCommon: CheqdTestnetAccumulatorCommon,
       AccumulatorId: CheqdTestnetAccumulatorId,
       AccumulatorPublicKey: CheqdTestnetAccumulatorPublicKey,
       StoredAccumulator: CheqdTestnetStoredAccumulator,
@@ -114,6 +117,7 @@ export class CheqdAPI extends AbstractApiProvider {
     [CheqdNetwork.Mainnet]: extendNull({
       Did: CheqdMainnetDid,
       DidDocument: CheqdMainnetDIDDocument,
+      AccumulatorCommon: CheqdMainnetAccumulatorCommon,
       AccumulatorId: CheqdMainnetAccumulatorId,
       AccumulatorPublicKey: CheqdMainnetAccumulatorPublicKey,
       Accumulator: CheqdMainnetAccumulator,

@@ -1,14 +1,21 @@
 /* eslint-disable camelcase */
 
-import { KBUniversalAccumulatorValue } from '@docknetwork/crypto-wasm-ts';
-import { normalizeToHex, normalizeToU8a } from '../../../utils/bytes';
+import { KBUniversalAccumulatorValue } from "@docknetwork/crypto-wasm-ts";
+import { normalizeToHex, normalizeToU8a } from "../../../utils/bytes";
 import {
   AbstractBaseModule,
   withAbstractParams,
   withAbstractPublicKeys,
-} from '../common';
-import { AccumulatorParams, AccumulatorPublicKey } from '../../../types';
-import { withExtendedPrototypeProperties } from '../../../utils';
+} from "../common";
+import {
+  AccumulatorCommon,
+  AccumulatorParams,
+  AccumulatorPublicKey,
+  KBUniversalAccumulator,
+  PositiveAccumulator,
+  UniversalAccumulator,
+} from "../../../types";
+import { withExtendedPrototypeProperties } from "../../../utils";
 
 export const AccumulatorType = {
   VBPos: 0,
@@ -18,7 +25,7 @@ export const AccumulatorType = {
 
 /** Class to manage accumulators on chain */
 class AbstractAccumulatorModule extends withAbstractParams(
-  withAbstractPublicKeys(AbstractBaseModule),
+  withAbstractPublicKeys(AbstractBaseModule)
 ) {
   static Params = AccumulatorParams;
 
@@ -71,16 +78,16 @@ class AbstractAccumulatorModule extends withAbstractParams(
     accumulated,
     publicKeyRef,
     didKeypair,
-    params,
+    params
   ) {
     return await this.signAndSend(
       await this.addPositiveAccumulatorTx(
         id,
         accumulated,
         publicKeyRef,
-        didKeypair,
+        didKeypair
       ),
-      params,
+      params
     );
   }
 
@@ -101,7 +108,7 @@ class AbstractAccumulatorModule extends withAbstractParams(
     publicKeyRef,
     maxSize,
     didKeypair,
-    params,
+    params
   ) {
     return await this.signAndSend(
       await this.addUniversalAccumulatorTx(
@@ -109,9 +116,9 @@ class AbstractAccumulatorModule extends withAbstractParams(
         accumulated,
         publicKeyRef,
         maxSize,
-        didKeypair,
+        didKeypair
       ),
-      params,
+      params
     );
   }
 
@@ -130,16 +137,16 @@ class AbstractAccumulatorModule extends withAbstractParams(
     accumulated,
     publicKeyRef,
     didKeypair,
-    params,
+    params
   ) {
     return await this.signAndSend(
       await this.addKBUniversalAccumulatorTx(
         id,
         accumulated,
         publicKeyRef,
-        didKeypair,
+        didKeypair
       ),
-      params,
+      params
     );
   }
 
@@ -159,7 +166,7 @@ class AbstractAccumulatorModule extends withAbstractParams(
     { additions, removals, witnessUpdateInfo },
     publicKeyRef,
     didKeypair,
-    params,
+    params
   ) {
     return await this.signAndSend(
       await this.updatePositiveAccumulatorTx(
@@ -167,9 +174,9 @@ class AbstractAccumulatorModule extends withAbstractParams(
         accumulated,
         { additions, removals, witnessUpdateInfo },
         publicKeyRef,
-        didKeypair,
+        didKeypair
       ),
-      params,
+      params
     );
   }
 
@@ -191,7 +198,7 @@ class AbstractAccumulatorModule extends withAbstractParams(
     publicKeyRef,
     maxSize,
     didKeypair,
-    params,
+    params
   ) {
     return await this.signAndSend(
       await this.updateUniversalAccumulatorTx(
@@ -200,9 +207,9 @@ class AbstractAccumulatorModule extends withAbstractParams(
         { additions, removals, witnessUpdateInfo },
         publicKeyRef,
         maxSize,
-        didKeypair,
+        didKeypair
       ),
-      params,
+      params
     );
   }
 
@@ -221,7 +228,7 @@ class AbstractAccumulatorModule extends withAbstractParams(
     { additions, removals, witnessUpdateInfo },
     publicKeyRef,
     didKeypair,
-    params,
+    params
   ) {
     return await this.signAndSend(
       await this.updateKBUniversalAccumulatorTx(
@@ -229,9 +236,162 @@ class AbstractAccumulatorModule extends withAbstractParams(
         accumulated,
         { additions, removals, witnessUpdateInfo },
         publicKeyRef,
-        didKeypair,
+        didKeypair
       ),
-      params,
+      params
+    );
+  }
+
+  /**
+   * Add a positive (add-only) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
+   * @param didKeypair - Signer's keypair reference
+   * @returns {Promise<*>}
+   */
+  async addPositiveAccumulatorTx(id, accumulated, publicKeyRef, didKeypair) {
+    return await this.addAccumulatorTx(
+      id,
+      new PositiveAccumulator(new AccumulatorCommon(accumulated, publicKeyRef)),
+      didKeypair
+    );
+  }
+
+  /**
+   * Add universal (supports add/remove) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
+   * @param maxSize - Maximum size of the accumulator
+   * @param didKeypair - Signer's keypair reference
+   * @returns {Promise<*>}
+   */
+  async addUniversalAccumulatorTx(
+    id,
+    accumulated,
+    publicKeyRef,
+    maxSize,
+    didKeypair
+  ) {
+    return await this.addAccumulatorTx(
+      id,
+      new UniversalAccumulator(
+        new UniversalAccumulator.Class(
+          new AccumulatorCommon(accumulated, publicKeyRef),
+          maxSize
+        )
+      ),
+      didKeypair
+    );
+  }
+
+  /**
+   * Add KB universal (supports add/remove) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
+   * @param didKeypair - Signer's keypair reference
+   * @returns {Promise<*>}
+   */
+  async addKBUniversalAccumulatorTx(id, accumulated, publicKeyRef, didKeypair) {
+    return await this.dockOnly.tx.addAccumulator(
+      id,
+      new KBUniversalAccumulator(
+        new AccumulatorCommon(accumulated, publicKeyRef)
+      ),
+      didKeypair
+    );
+  }
+
+  /**
+   * Update a positive (add-only) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
+   * @param didKeypair - Signer's keypair reference
+   * @returns {Promise<*>}
+   */
+  async updatePositiveAccumulatorTx(
+    id,
+    accumulated,
+    { additions, removals, witnessUpdateInfo },
+    publicKeyRef,
+    didKeypair
+  ) {
+    return await this.updateAccumulator(
+      id,
+      new PositiveAccumulator(new AccumulatorCommon(accumulated, publicKeyRef)),
+      {
+        additions,
+        removals,
+        witnessUpdateInfo,
+      },
+      didKeypair
+    );
+  }
+
+  /**
+   * Update universal (supports add/remove) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
+   * @param maxSize - Maximum size of the accumulator
+   * @param didKeypair - Signer's keypair reference
+   * @returns {Promise<*>}
+   */
+  // eslint-disable-next-line sonarjs/no-identical-functions
+  async updateUniversalAccumulatorTx(
+    id,
+    accumulated,
+    { additions, removals, witnessUpdateInfo },
+    _publicKeyRef,
+    _maxSize,
+    didKeypair
+  ) {
+    return await this.dockOnly.tx.updateAccumulator(
+      id,
+      accumulated,
+      {
+        additions,
+        removals,
+        witnessUpdateInfo,
+      },
+      didKeypair
+    );
+  }
+
+  /**
+   * Update KB universal (supports add/remove) accumulator
+   * @param id - Unique accumulator id
+   * @param accumulated - Current accumulated value.
+   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
+   * have any public key on the chain. This is useful for KVAC.
+   * @param didKeypair - Signer's keypair reference
+   * @returns {Promise<*>}
+   */
+  // eslint-disable-next-line sonarjs/no-identical-functions
+  async updateKBUniversalAccumulatorTx(
+    id,
+    accumulated,
+    { additions, removals, witnessUpdateInfo },
+    _publicKeyRef,
+    didKeypair
+  ) {
+    return await this.dockOnly.tx.updateAccumulator(
+      id,
+      accumulated,
+      {
+        additions,
+        removals,
+        witnessUpdateInfo,
+      },
+      didKeypair
     );
   }
 
@@ -245,8 +405,81 @@ class AbstractAccumulatorModule extends withAbstractParams(
   async removeAccumulator(id, didKeypair, params) {
     return await this.signAndSend(
       await this.removeAccumulatorTx(id, didKeypair),
-      params,
+      params
     );
+  }
+
+  /**
+   * Add an accumulator to the chain.
+   *
+   * @param id - Unique accumulator id
+   * @param accumulator - Accumulator value.
+   * @param signingKeyRef - Signer's keypair reference
+   * @param {object} params
+   * @returns {Promise<*>}
+   */
+  async addAccumulator(id, accumulator, didKeypair, params) {
+    return await this.signAndSend(
+      await this.addAccumulatorTx(id, accumulator, didKeypair),
+      params
+    );
+  }
+
+  /**
+   * Update existing accumulator on the chain.
+   *
+   * @param id - Unique accumulator id
+   * @param accumulator - Accumulator value.
+   * @param signingKeyRef - Signer's keypair reference
+   * @param {object} params
+   * @returns {Promise<*>}
+   */
+  async updateAccumulator(
+    id,
+    accumulator,
+    { additions, removals, witnessUpdateInfo },
+    didKeypair,
+    params
+  ) {
+    return await this.signAndSend(
+      await this.updateAccumulatorTx(
+        id,
+        accumulator,
+        { additions, removals, witnessUpdateInfo },
+        didKeypair
+      ),
+      params
+    );
+  }
+
+  /**
+   * Add an accumulator to the chain.
+   *
+   * @param id - Unique accumulator id
+   * @param accumulator - Accumulator value.
+   * @param signingKeyRef - Signer's keypair reference
+   * @returns {Promise<*>}
+   */
+  async addAccumulatorTx(_id, _accumulator, _didKeypair) {
+    throw new Error("Unimplemented");
+  }
+
+  /**
+   * Update existing accumulator on the chain.
+   *
+   * @param id - Unique accumulator id
+   * @param accumulator - Accumulator value.
+   * @param {object} changes
+   * @param signingKeyRef - Signer's keypair reference
+   * @returns {Promise<*>}
+   */
+  async updateAccumulatorTx(
+    _id,
+    _accumulator,
+    { additions: _, removals: __, witnessUpdateInfo: ___ },
+    _didKeypair
+  ) {
+    throw new Error("Unimplemented");
   }
 
   /**
@@ -258,8 +491,8 @@ class AbstractAccumulatorModule extends withAbstractParams(
    * @param includeKeyParams - Fetch public key params.
    * @returns {Promise<Accumulator|null>}
    */
-  async getAccumulator(id, _includeKey = false, _includeKeyParams = false) {
-    throw new Error('Unimplemented');
+  async getAccumulator(_id, _includeKey = false, _includeKeyParams = false) {
+    throw new Error("Unimplemented");
   }
 
   /**
@@ -274,21 +507,17 @@ class AbstractAccumulatorModule extends withAbstractParams(
    * @returns {Promise<void>}
    */
   async updateWitness(_accumulatorId, _member, _witness, _from, _to) {
-    throw new Error('Unimplemented');
+    throw new Error("Unimplemented");
   }
 }
 
 export default withExtendedPrototypeProperties(
   [
-    'getAccumulator',
-    'addPositiveAccumulatorTx',
-    'addUniversalAccumulatorTx',
-    'addKBUniversalAccumulatorTx',
-    'updatePositiveAccumulatorTx',
-    'updateUniversalAccumulatorTx',
-    'updateKBUniversalAccumulatorTx',
-    'removeAccumulatorTx',
-    'updateWitness',
+    "getAccumulator",
+    "addAccumulatorTx",
+    "updateAccumulatorTx",
+    "removeAccumulatorTx",
+    "updateWitness",
   ],
-  AbstractAccumulatorModule,
+  AbstractAccumulatorModule
 );

@@ -8,14 +8,14 @@ import {
   withProp,
   withFrom,
   TypedArray,
-} from '../generic';
+} from "../generic";
 import {
   DockAccumulatorPublicKeyRef,
   CheqdAccumulatorPublicKeyRef,
   CheqdTestnetAccumulatorPublicKeyRef,
   CheqdMainnetAccumulatorPublicKeyRef,
-} from './keys';
-import { createAccumulatorVariants } from './variants';
+} from "./keys";
+import { createAccumulatorVariants } from "./variants";
 
 class TypedUUIDOrTypedNumber extends withFrom(TypedUUID, (value, from) => {
   try {
@@ -159,14 +159,14 @@ export class CheqdStoredAccumulator extends TypedStruct {
 
 export class CheqdTestnetStoredAccumulator extends withProp(
   CheqdStoredAccumulator,
-  'accumulator',
-  CheqdTestnetAccumulator,
+  "accumulator",
+  CheqdTestnetAccumulator
 ) {}
 
 export class CheqdMainnetStoredAccumulator extends withProp(
   CheqdStoredAccumulator,
-  'accumulator',
-  CheqdMainnetAccumulator,
+  "accumulator",
+  CheqdMainnetAccumulator
 ) {}
 
 export class CheqdAccumulatorHistory extends TypedStruct {
@@ -177,3 +177,24 @@ export class CheqdAccumulatorHistory extends TypedStruct {
     },
   };
 }
+
+class CheqdAccumulatorPublicKeyRefOrDockAccumulatorPublicKeyRef extends withFrom(
+  CheqdAccumulatorPublicKeyRef,
+  (value, from) => {
+    try {
+      return from(value);
+    } catch {
+      return DockAccumulatorPublicKeyRef.from(value);
+    }
+  }
+) {}
+
+export const [
+  AccumulatorCommon,
+  Accumulator,
+  UniversalAccumulator,
+  KBUniversalAccumulator,
+  PositiveAccumulator,
+] = createAccumulatorVariants(
+  CheqdAccumulatorPublicKeyRefOrDockAccumulatorPublicKeyRef
+);

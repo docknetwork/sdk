@@ -1,5 +1,16 @@
 # @docknetwork/cheqd-blockchain-modules
 
+## 0.26.0
+
+### Minor Changes
+
+- Expose `accumulatorHistory`
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.34.0
+
 ## 0.25.0
 
 ### Minor Changes

@@ -1,4 +1,4 @@
-import { DockDidOrDidMethodKey } from '@docknetwork/credential-sdk/types/did/onchain';
+import { DockDidOrDidMethodKey } from "@docknetwork/credential-sdk/types/did/onchain";
 import {
   DockAccumulatorCounters,
   AccumulatorParams,
@@ -12,15 +12,15 @@ import {
   DockAccumulatorPublicKeyId,
   AccumulatorUpdate,
   DockAccumulatorHistory,
-} from '@docknetwork/credential-sdk/types';
-import { option, withProp } from '@docknetwork/credential-sdk/types/generic';
-import { inclusiveRange, u8aToHex } from '@docknetwork/credential-sdk/utils';
-import { VBWitnessUpdateInfo } from '@docknetwork/credential-sdk/crypto';
+} from "@docknetwork/credential-sdk/types";
+import { option, withProp } from "@docknetwork/credential-sdk/types/generic";
+import { inclusiveRange, u8aToHex } from "@docknetwork/credential-sdk/utils";
+import { VBWitnessUpdateInfo } from "@docknetwork/credential-sdk/crypto";
 import {
   injectParams,
   injectPublicKeys,
   createInternalDockModule,
-} from '../common';
+} from "../common";
 import {
   AddAccumulator,
   AddAccumulatorParams,
@@ -29,42 +29,44 @@ import {
   RemoveAccumulatorParams,
   RemoveAccumulatorPublicKey,
   UpdateAccumulator,
-} from './actions';
+} from "./actions";
 
 const didMethods = {
-  addAccumulator: (id, accumulator, _, nonce) => new AddAccumulator(id, accumulator, nonce),
+  addAccumulator: (id, accumulator, _, nonce) =>
+    new AddAccumulator(id, accumulator, nonce),
   updateAccumulator: (
     id,
     newAccumulated,
     { additions, removals, witnessUpdateInfo },
     _,
-    nonce,
-  ) => new UpdateAccumulator(
-    id,
-    newAccumulated,
-    additions,
-    removals,
-    witnessUpdateInfo,
-    nonce,
-  ),
+    nonce
+  ) =>
+    new UpdateAccumulator(
+      id,
+      newAccumulated,
+      additions,
+      removals,
+      witnessUpdateInfo,
+      nonce
+    ),
   removeAccumulator: (id, _, nonce) => new RemoveAccumulator(id, nonce),
 };
 
 export default class DockInternalAccumulatorModule extends injectParams(
-  injectPublicKeys(createInternalDockModule({ didMethods })),
+  injectPublicKeys(createInternalDockModule({ didMethods }))
 ) {
-  static Prop = 'accumulator';
+  static Prop = "accumulator";
 
   static MethodNameOverrides = {
-    addPublicKey: 'AddAccumulatorPublicKey',
-    removePublicKey: 'RemoveAccumulatorPublicKey',
-    addParams: 'AddAccumulatorParams',
-    removeParams: 'RemoveAccumulatorParams',
+    addPublicKey: "AddAccumulatorPublicKey",
+    removePublicKey: "RemoveAccumulatorPublicKey",
+    addParams: "AddAccumulatorParams",
+    removeParams: "RemoveAccumulatorParams",
   };
 
-  static ParamsQuery = 'accumulatorParams';
+  static ParamsQuery = "accumulatorParams";
 
-  static PublicKeyQuery = 'accumulatorKeys';
+  static PublicKeyQuery = "accumulatorKeys";
 
   static PublicKeyId = DockAccumulatorPublicKeyId;
 
@@ -89,23 +91,23 @@ export default class DockInternalAccumulatorModule extends injectParams(
     id,
     includePublicKey = false,
     includeParams = false,
-    at,
+    at
   ) {
     const accId = DockAccumulatorIdIdent.from(id);
     const PublicKey = includeParams
-      ? withProp(DockAccumulatorPublicKey, 'params', option(AccumulatorParams))
+      ? withProp(DockAccumulatorPublicKey, "params", option(AccumulatorParams))
       : DockAccumulatorPublicKey;
     const Accumulator = includePublicKey
-      ? withProp(DockAccumulatorWithUpdateInfo, 'publicKey', option(PublicKey))
+      ? withProp(DockAccumulatorWithUpdateInfo, "publicKey", option(PublicKey))
       : DockAccumulatorWithUpdateInfo;
 
     const acc = option(Accumulator).from(
       at == null
         ? await this.query.accumulators(accId)
         : await this.query.accumulators.at(
-          await this.apiProvider.numberToHash(+at),
-          accId,
-        ),
+            await this.apiProvider.numberToHash(+at),
+            accId
+          )
     );
 
     if (acc == null) {
@@ -121,7 +123,7 @@ export default class DockInternalAccumulatorModule extends injectParams(
 
   async counters(did) {
     return DockAccumulatorCounters.from(
-      await this.query.accumulatorOwnerCounters(DockDidOrDidMethodKey.from(did)),
+      await this.query.accumulatorOwnerCounters(DockDidOrDidMethodKey.from(did))
     );
   }
 
@@ -158,7 +160,7 @@ export default class DockInternalAccumulatorModule extends injectParams(
     witness,
     startBlock,
     endBlock,
-    batchSize = 10,
+    batchSize = 10
   ) {
     if (endBlock === undefined) {
       const accum = await this.getAccumulator(accumulatorId, false);
@@ -168,38 +170,39 @@ export default class DockInternalAccumulatorModule extends injectParams(
     }
     // If endBlock < startBlock, it won't throw an error but won't fetch any updates and witness won't be updated.
     console.debug(
-      `Will start updating witness from block ${startBlock} to ${endBlock}`,
+      `Will start updating witness from block ${startBlock} to ${endBlock}`
     );
     let current = startBlock;
     while (current <= endBlock) {
-      const till = current + batchSize <= endBlock ? current + batchSize : endBlock;
+      const till =
+        current + batchSize <= endBlock ? current + batchSize : endBlock;
       // Get updates from blocks [current, current + 1, current + 2, ..., till]
       // eslint-disable-next-line no-await-in-loop
       const updates = await this.getUpdatesFromBlocks(
         accumulatorId,
-        inclusiveRange(current, till, 1),
+        inclusiveRange(current, till, 1)
       );
       for (const update of updates) {
         const additions = [...(update.additions ?? [])].map(
-          (value) => value.bytes,
+          (value) => value.bytes
         );
         const removals = [...(update.removals ?? [])].map(
-          (value) => value.bytes,
+          (value) => value.bytes
         );
 
         console.debug(
-          `Found ${additions?.length} additions and ${removals?.length} removals in block no ${current}`,
+          `Found ${additions?.length} additions and ${removals?.length} removals in block no ${current}`
         );
 
         const queriedWitnessInfo = new VBWitnessUpdateInfo(
-          update.witnessUpdateInfo.bytes,
+          update.witnessUpdateInfo.bytes
         );
 
         witness.updateUsingPublicInfoPostBatchUpdate(
           member,
           additions,
           removals,
-          queriedWitnessInfo,
+          queriedWitnessInfo
         );
       }
       current = till + 1;
@@ -215,8 +218,8 @@ export default class DockInternalAccumulatorModule extends injectParams(
    */
   static parseEventAsAccumulatorUpdate(event) {
     if (
-      event.section === 'accumulator'
-      && event.method === 'AccumulatorUpdated'
+      event.section === "accumulator" &&
+      event.method === "AccumulatorUpdated"
     ) {
       return [u8aToHex(event.data[0]), u8aToHex(event.data[1])];
     }
@@ -234,18 +237,13 @@ export default class DockInternalAccumulatorModule extends injectParams(
   async getUpdatesFromBlock(accumulatorId, blockNoOrBlockHash) {
     const extrinsics = await this.apiProvider.getAllExtrinsicsFromBlock(
       blockNoOrBlockHash,
-      false,
+      false
     );
 
-    let { api } = this.apiProvider;
-    if (!api.registry.hasType('UpdateAccumulator')) {
-      api = await api.at(
-        '0x2e5ae7fdf8d17ddf37de1012d055ac8440dbd2ea57d0dd5a7af5b6dce2e485d6',
-      );
-    }
-
     return extrinsics
-      .map((e) => this.getUpdatesFromExtrinsic(api, e, accumulatorId))
+      .map((e) =>
+        this.getUpdatesFromExtrinsic(this.apiProvider.api, e, accumulatorId)
+      )
       .filter(Boolean);
   }
 
@@ -261,19 +259,20 @@ export default class DockInternalAccumulatorModule extends injectParams(
       additions,
       removals,
       witnessUpdateInfo,
-    }) => new AccumulatorUpdate(
-      acc.lastModified,
-      newAccumulated,
-      additions,
-      removals,
-      witnessUpdateInfo,
-    );
+    }) =>
+      new AccumulatorUpdate(
+        acc.lastModified,
+        newAccumulated,
+        additions,
+        removals,
+        witnessUpdateInfo
+      );
 
     while (!acc.lastModified.eq(acc.createdAt)) {
       // eslint-disable-next-line no-await-in-loop
       const prevUpdates = await this.getUpdatesFromBlock(
         accumulatorId,
-        acc.lastModified,
+        acc.lastModified
       );
       updates = prevUpdates.map(mapUpdate).concat(updates);
 
@@ -282,7 +281,7 @@ export default class DockInternalAccumulatorModule extends injectParams(
         accumulatorId,
         false,
         false,
-        acc.lastModified - 1,
+        acc.lastModified - 1
       );
     }
 
@@ -301,19 +300,15 @@ export default class DockInternalAccumulatorModule extends injectParams(
     // NOTE: polkadot-js doesn't allow to fetch more than one block in 1 RPC call.
     const extrinsics = await Promise.all(
       blockNosOrBlockHashes.map(
-        async (b) => await this.apiProvider.getAllExtrinsicsFromBlock(b, false),
-      ),
+        async (b) => await this.apiProvider.getAllExtrinsicsFromBlock(b, false)
+      )
     );
-    let { api } = this.apiProvider;
-    if (!api.registry.hasType('UpdateAccumulator')) {
-      api = await api.at(
-        '0x2e5ae7fdf8d17ddf37de1012d055ac8440dbd2ea57d0dd5a7af5b6dce2e485d6',
-      );
-    }
 
     return extrinsics
       .flat()
-      .map((e) => this.getUpdatesFromExtrinsic(api, e, accumulatorId))
+      .map((e) =>
+        this.getUpdatesFromExtrinsic(this.apiProvider.api, e, accumulatorId)
+      )
       .filter(Boolean);
   }
 
@@ -331,11 +326,11 @@ export default class DockInternalAccumulatorModule extends injectParams(
     // Helper function to process individual calls
     const processCall = (call) => {
       if (
-        call.section === 'accumulator'
-        && call.method === 'updateAccumulator'
+        call.section === "accumulator" &&
+        call.method === "updateAccumulator"
       ) {
         const update = UpdateAccumulator.from(
-          api.registry.createType('UpdateAccumulator', call.args[0]),
+          api.registry.createType("UpdateAccumulator", call.args[0])
         );
 
         if (update.id.eq(accId.asDock)) {
@@ -347,9 +342,9 @@ export default class DockInternalAccumulatorModule extends injectParams(
 
     // Check if the extrinsic is a batch or batchAll
     if (
-      ext.method
-      && ext.method.section === 'utility'
-      && (ext.method.method === 'batch' || ext.method.method === 'batchAll')
+      ext.method &&
+      ext.method.section === "utility" &&
+      (ext.method.method === "batch" || ext.method.method === "batchAll")
     ) {
       const calls = ext.method.args[0]; // Array of calls
       if (calls && Array.isArray(calls)) {
@@ -360,7 +355,7 @@ export default class DockInternalAccumulatorModule extends injectParams(
           }
         }
       } else {
-        console.error('Failed to parse batch calls:', calls);
+        console.error("Failed to parse batch calls:", calls);
       }
     } else {
       // Process as a single call

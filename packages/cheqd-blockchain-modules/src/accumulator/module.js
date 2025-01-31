@@ -7,11 +7,11 @@ import {
   CheqdPositiveAccumulator,
   AccumulatorParams,
   CheqdAccumulatorPublicKey,
-} from '@docknetwork/credential-sdk/types';
-import { option, withProp } from '@docknetwork/credential-sdk/types/generic';
-import { AbstractAccumulatorModule } from '@docknetwork/credential-sdk/modules/abstract';
-import CheqdInternalAccumulatorModule from './internal';
-import { injectCheqd, withParams, withPublicKeys } from '../common';
+} from "@docknetwork/credential-sdk/types";
+import { option, withProp } from "@docknetwork/credential-sdk/types/generic";
+import { AbstractAccumulatorModule } from "@docknetwork/credential-sdk/modules/abstract";
+import CheqdInternalAccumulatorModule from "./internal";
+import { injectCheqd, withParams, withPublicKeys } from "../common";
 
 export const AccumulatorType = {
   VBPos: 0,
@@ -21,7 +21,7 @@ export const AccumulatorType = {
 
 /** Class to manage accumulators on chain */
 export default class CheqdAccumulatorModule extends withParams(
-  withPublicKeys(injectCheqd(AbstractAccumulatorModule)),
+  withPublicKeys(injectCheqd(AbstractAccumulatorModule))
 ) {
   static CheqdOnly = CheqdInternalAccumulatorModule;
 
@@ -39,9 +39,9 @@ export default class CheqdAccumulatorModule extends withParams(
     return await this.cheqdOnly.tx.addAccumulator(
       id,
       new CheqdPositiveAccumulator(
-        new this.types.AccumulatorCommon(accumulated, publicKeyRef),
+        new this.types.AccumulatorCommon(accumulated, publicKeyRef)
       ),
-      didKeypair,
+      didKeypair
     );
   }
 
@@ -61,17 +61,17 @@ export default class CheqdAccumulatorModule extends withParams(
     accumulated,
     publicKeyRef,
     maxSize,
-    didKeypair,
+    didKeypair
   ) {
     return await this.cheqdOnly.tx.addAccumulator(
       id,
       new CheqdUniversalAccumulator(
         new CheqdUniversalAccumulator.Class(
           new this.types.AccumulatorCommon(accumulated, publicKeyRef),
-          maxSize,
-        ),
+          maxSize
+        )
       ),
-      didKeypair,
+      didKeypair
     );
   }
 
@@ -89,9 +89,9 @@ export default class CheqdAccumulatorModule extends withParams(
     return await this.cheqdOnly.tx.addAccumulator(
       id,
       new CheqdKBUniversalAccumulator(
-        new this.types.AccumulatorCommon(accumulated, publicKeyRef),
+        new this.types.AccumulatorCommon(accumulated, publicKeyRef)
       ),
-      didKeypair,
+      didKeypair
     );
   }
 
@@ -110,15 +110,15 @@ export default class CheqdAccumulatorModule extends withParams(
     accumulated,
     { additions, removals, witnessUpdateInfo },
     publicKeyRef,
-    didKeypair,
+    didKeypair
   ) {
     return await this.cheqdOnly.tx.updateAccumulator(
       id,
       new CheqdPositiveAccumulator(
-        new this.types.AccumulatorCommon(accumulated, publicKeyRef),
+        new this.types.AccumulatorCommon(accumulated, publicKeyRef)
       ),
       { additions, removals, witnessUpdateInfo },
-      didKeypair,
+      didKeypair
     );
   }
 
@@ -139,18 +139,18 @@ export default class CheqdAccumulatorModule extends withParams(
     { additions, removals, witnessUpdateInfo },
     publicKeyRef,
     maxSize,
-    didKeypair,
+    didKeypair
   ) {
     return await this.cheqdOnly.tx.updateAccumulator(
       id,
       new CheqdUniversalAccumulator(
         new CheqdUniversalAccumulator.Class(
           new this.types.AccumulatorCommon(accumulated, publicKeyRef),
-          maxSize,
-        ),
+          maxSize
+        )
       ),
       { additions, removals, witnessUpdateInfo },
-      didKeypair,
+      didKeypair
     );
   }
 
@@ -169,15 +169,15 @@ export default class CheqdAccumulatorModule extends withParams(
     accumulated,
     { additions, removals, witnessUpdateInfo },
     publicKeyRef,
-    didKeypair,
+    didKeypair
   ) {
     return await this.cheqdOnly.tx.updateAccumulator(
       id,
       new CheqdKBUniversalAccumulator(
-        new this.types.AccumulatorCommon(accumulated, publicKeyRef),
+        new this.types.AccumulatorCommon(accumulated, publicKeyRef)
       ),
       { additions, removals, witnessUpdateInfo },
-      didKeypair,
+      didKeypair
     );
   }
 
@@ -204,10 +204,10 @@ export default class CheqdAccumulatorModule extends withParams(
    */
   async getAccumulator(id, includePublicKey = false, includeParams = false) {
     const PublicKey = includeParams
-      ? withProp(this.cheqdOnly.PublicKey, 'params', option(AccumulatorParams))
+      ? withProp(this.cheqdOnly.PublicKey, "params", option(AccumulatorParams))
       : CheqdAccumulatorPublicKey;
     const Accumulator = includePublicKey
-      ? withProp(CheqdAccumulatorWithUpdateInfo, 'publicKey', option(PublicKey))
+      ? withProp(CheqdAccumulatorWithUpdateInfo, "publicKey", option(PublicKey))
       : CheqdAccumulatorWithUpdateInfo;
 
     const acc = option(Accumulator).from(await this.cheqdOnly.accumulator(id));
@@ -216,7 +216,7 @@ export default class CheqdAccumulatorModule extends withParams(
     } else if (includePublicKey) {
       acc.publicKey = await this.getPublicKey(
         ...acc.accumulator.keyRef,
-        includeParams,
+        includeParams
       );
     }
 
@@ -240,7 +240,11 @@ export default class CheqdAccumulatorModule extends withParams(
       member,
       witness,
       start,
-      end,
+      end
     );
+  }
+
+  async accumulatorHistory(accumulatorId) {
+    return await this.cheqdOnly.accumulatorHistory(accumulatorId);
   }
 }

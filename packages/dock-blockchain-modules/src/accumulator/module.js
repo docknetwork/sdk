@@ -5,10 +5,10 @@ import {
   DockKBUniversalAccumulator,
   DockUniversalAccumulator,
   DockPositiveAccumulator,
-} from "@docknetwork/credential-sdk/types";
-import { AbstractAccumulatorModule } from "@docknetwork/credential-sdk/modules/abstract";
-import DockInternalAccumulatorModule from "./internal";
-import { injectDock, withParams, withPublicKeys } from "../common";
+} from '@docknetwork/credential-sdk/types';
+import { AbstractAccumulatorModule } from '@docknetwork/credential-sdk/modules/abstract';
+import DockInternalAccumulatorModule from './internal';
+import { injectDock, withParams, withPublicKeys } from '../common';
 
 export const AccumulatorType = {
   VBPos: 0,
@@ -18,7 +18,7 @@ export const AccumulatorType = {
 
 /** Class to manage accumulators on chain */
 export default class DockAccumulatorModule extends withParams(
-  withPublicKeys(injectDock(AbstractAccumulatorModule))
+  withPublicKeys(injectDock(AbstractAccumulatorModule)),
 ) {
   static DockOnly = DockInternalAccumulatorModule;
 
@@ -35,9 +35,9 @@ export default class DockAccumulatorModule extends withParams(
     return await this.dockOnly.tx.addAccumulator(
       id,
       new DockPositiveAccumulator(
-        new DockAccumulatorCommon(accumulated, publicKeyRef)
+        new DockAccumulatorCommon(accumulated, publicKeyRef),
       ),
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -56,17 +56,17 @@ export default class DockAccumulatorModule extends withParams(
     accumulated,
     publicKeyRef,
     maxSize,
-    didKeypair
+    didKeypair,
   ) {
     return await this.dockOnly.tx.addAccumulator(
       id,
       new DockUniversalAccumulator(
         new DockUniversalAccumulator.Class(
           new DockAccumulatorCommon(accumulated, publicKeyRef),
-          maxSize
-        )
+          maxSize,
+        ),
       ),
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -83,9 +83,9 @@ export default class DockAccumulatorModule extends withParams(
     return await this.dockOnly.tx.addAccumulator(
       id,
       new DockKBUniversalAccumulator(
-        new DockAccumulatorCommon(accumulated, publicKeyRef)
+        new DockAccumulatorCommon(accumulated, publicKeyRef),
       ),
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -103,7 +103,7 @@ export default class DockAccumulatorModule extends withParams(
     accumulated,
     { additions, removals, witnessUpdateInfo },
     _publicKeyRef,
-    didKeypair
+    didKeypair,
   ) {
     return await this.dockOnly.tx.updateAccumulator(
       id,
@@ -113,7 +113,7 @@ export default class DockAccumulatorModule extends withParams(
         removals,
         witnessUpdateInfo,
       },
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -134,7 +134,7 @@ export default class DockAccumulatorModule extends withParams(
     { additions, removals, witnessUpdateInfo },
     _publicKeyRef,
     _maxSize,
-    didKeypair
+    didKeypair,
   ) {
     return await this.dockOnly.tx.updateAccumulator(
       id,
@@ -144,7 +144,7 @@ export default class DockAccumulatorModule extends withParams(
         removals,
         witnessUpdateInfo,
       },
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -163,7 +163,7 @@ export default class DockAccumulatorModule extends withParams(
     accumulated,
     { additions, removals, witnessUpdateInfo },
     _publicKeyRef,
-    didKeypair
+    didKeypair,
   ) {
     return await this.dockOnly.tx.updateAccumulator(
       id,
@@ -173,7 +173,7 @@ export default class DockAccumulatorModule extends withParams(
         removals,
         witnessUpdateInfo,
       },
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -201,7 +201,7 @@ export default class DockAccumulatorModule extends withParams(
     return await this.dockOnly.getAccumulator(
       id,
       includePublicKey,
-      includeParams
+      includeParams,
     );
   }
 
@@ -222,7 +222,7 @@ export default class DockAccumulatorModule extends withParams(
       member,
       witness,
       start,
-      end
+      end,
     );
   }
 

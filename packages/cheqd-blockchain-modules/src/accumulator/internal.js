@@ -285,6 +285,11 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
     ).ids();
 
     const startIdx = sortedIDs.findIndex((id) => id === startUUID);
+    if (startIdx === -1) {
+      throw new Error(
+        `Accumulator \`${accumulatorId}\` with version \`${startUUID}\` doesn't exist`,
+      );
+    }
     let endIdx;
     if (end != null) {
       endIdx = sortedIDs.findIndex((id) => id === endUUID);
@@ -307,6 +312,10 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
       const { additions, removals, witnessUpdateInfo } = CheqdStoredAccumulator.from(
         validateResource(accumulator, String(name), Type),
       );
+      if (witnessUpdateInfo == null) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
 
       witness.updateUsingPublicInfoPostBatchUpdate(
         member,

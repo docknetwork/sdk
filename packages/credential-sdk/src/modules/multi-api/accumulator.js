@@ -18,6 +18,18 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
   }
 
   /**
+   * Add an accumulator accumulator
+   * @param id - Unique accumulator id
+   * @param accumulator - Accumulator value.
+   * @param signingKeyRef - Signer's keypair reference
+   * @param {object} params
+   * @returns {Promise<*>}
+   */
+  async addAccumulator(_id, _accumulator, _didKeypair, _params) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
    * Add a positive (add-only) accumulator
    * @param id - Unique accumulator id
    * @param accumulated - Current accumulated value.
@@ -525,5 +537,11 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
     const did = NamespaceDid.from(targetDid);
 
     return await this.moduleById(did).nextParamsId(did);
+  }
+
+  async accumulatorHistory(id) {
+    const accId = AccumulatorId.from(id);
+
+    return await this.moduleById(accId).accumulatorHistory(accId);
   }
 }

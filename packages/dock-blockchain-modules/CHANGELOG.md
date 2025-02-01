@@ -1,5 +1,16 @@
 # @docknetwork/dock-blockchain-modules
 
+## 0.23.0
+
+### Minor Changes
+
+- Expose `accumulatorHistory`
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.34.0
+
 ## 0.22.0
 
 ### Minor Changes

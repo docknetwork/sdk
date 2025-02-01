@@ -225,4 +225,8 @@ export default class DockAccumulatorModule extends withParams(
       end,
     );
   }
+
+  async accumulatorHistory(accumulatorId) {
+    return await this.dockOnly.accumulatorHistory(accumulatorId);
+  }
 }

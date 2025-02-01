@@ -243,4 +243,8 @@ export default class CheqdAccumulatorModule extends withParams(
       end,
     );
   }
+
+  async accumulatorHistory(accumulatorId) {
+    return await this.cheqdOnly.accumulatorHistory(accumulatorId);
+  }
 }

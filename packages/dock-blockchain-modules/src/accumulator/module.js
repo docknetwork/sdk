@@ -108,7 +108,9 @@ export default class DockAccumulatorModule extends withParams(
   }
 
   async accumulatorHistory(accumulatorId) {
-    const { acc, updates } = this.accumulatorUpdates(accumulatorId);
+    const { acc, updates } = await this.dockOnly.accumulatorUpdates(
+      accumulatorId,
+    );
 
     return new DockAccumulatorHistory(acc, updates);
   }

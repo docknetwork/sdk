@@ -139,6 +139,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
    * Update existing a positive (add-only) accumulator
    * @param id - Unique accumulator id
    * @param accumulated - Current accumulated value.
+   * @param {{ additions: Array<Uint8Array>, removals: Array<Uint8Array>, witnessUpdateInfo: Uint8Array }} updates
    * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
    * have any public key on the chain. This is useful for KVAC.
    * @param signingKeyRef - Signer's keypair reference

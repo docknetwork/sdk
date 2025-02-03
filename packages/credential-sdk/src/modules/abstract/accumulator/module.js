@@ -531,6 +531,16 @@ class AbstractAccumulatorModule extends withAbstractParams(
   async accumulatorHistory(_accumulatorId) {
     throw new Error('Unimplemented');
   }
+
+  /**
+   * Retrieves `Array` containing all versions of the accumulator with supplied identifier.
+   *
+   * @param {*} _accumulatorId
+   * @returns {Array<*>}
+   */
+  async accumulatorVersions(_accumulatorId) {
+    throw new Error('Unimplemented');
+  }
 }
 
 export default withExtendedPrototypeProperties(

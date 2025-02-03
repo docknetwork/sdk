@@ -458,4 +458,10 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
 
     return await this.moduleById(accId).accumulatorHistory(accId);
   }
+
+  async accumulatorVersions(id) {
+    const accId = AccumulatorId.from(id);
+
+    return await this.moduleById(accId).accumulatorVersions(accId);
+  }
 }

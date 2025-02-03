@@ -183,9 +183,7 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
       witnessUpdateInfo,
     );
 
-    const accumulators = resources.map((acc) => CheqdStoredAccumulator.from(
-      JSON.parse(u8aToString(validateResource(acc, String(name), Type))),
-    ));
+    const accumulators = resources.map((acc) => CheqdStoredAccumulator.from(validateResource(acc, String(name), Type)));
     const updates = accumulators.slice(1).map(mapUpdate);
 
     return new CheqdAccumulatorHistory(

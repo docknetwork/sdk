@@ -140,7 +140,7 @@ export default class DockInternalAccumulatorModule extends injectParams(
     return await this.keysCounter(did);
   }
 
-  async accumulatorUpdates(accumulatorId, from) {
+  async accumulatorUpdates(accumulatorId, from = 0) {
     let acc = await this.getAccumulator(accumulatorId);
     if (acc == null) {
       return null;

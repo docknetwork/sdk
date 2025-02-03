@@ -93,11 +93,13 @@ export default class CheqdAccumulatorModule extends withParams(
     const PublicKey = includeParams
       ? withProp(this.cheqdOnly.PublicKey, 'params', option(AccumulatorParams))
       : CheqdAccumulatorPublicKey;
-    const Accumulator = includePublicKey
+    const CheqdAccumulator = includePublicKey
       ? withProp(CheqdAccumulatorWithUpdateInfo, 'publicKey', option(PublicKey))
       : CheqdAccumulatorWithUpdateInfo;
 
-    const acc = option(Accumulator).from(await this.cheqdOnly.accumulator(id));
+    const acc = option(CheqdAccumulator).from(
+      await this.cheqdOnly.accumulator(id),
+    );
     if (acc == null) {
       return null;
     } else if (includePublicKey) {

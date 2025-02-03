@@ -313,10 +313,6 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
       const { additions, removals, witnessUpdateInfo } = CheqdStoredAccumulator.from(
         validateResource(accumulator, String(name), Type),
       );
-      if (witnessUpdateInfo == null) {
-        // eslint-disable-next-line no-continue
-        continue;
-      }
 
       witness.updateUsingPublicInfoPostBatchUpdate(
         member,

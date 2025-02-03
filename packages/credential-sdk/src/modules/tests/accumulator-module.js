@@ -693,7 +693,7 @@ export default function generateAccumulatorTests(
 
     test('Accumulator versions', async () => {
       const accId = AccumulatorId.random(did);
-      const pkId = await accumulatorModule.nextPublicKeyId(did);
+      const pkId = await accumulatorModule.lastPublicKeyId(did);
 
       await accumulatorModule.addUniversalAccumulator(
         accId,

@@ -75,7 +75,7 @@
     "docs": "rm -rf out && mkdir out && touch out/.nojekyll && jsdoc src -r -c ../../.jsdoc -d out/reference",
     "prepublishOnly": "yarn build",
     "dev-node": "../../scripts/run_dock_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
-    "test": "LOG_STATE_CHANGE=1 NODE_ENV=production jest --verbose --runInBand --forceExit ./tests/integration/accumulator-module.test.js",
+    "test": "LOG_STATE_CHANGE=1 NODE_ENV=production jest --verbose --runInBand --forceExit ./tests/*",
     "test-with-node": "../../scripts/with_dock_docker_test_node yarn test",
     "test-with-all-nodes": "../../scripts/with_all_dock_docker_test_nodes yarn test-integration"
   }

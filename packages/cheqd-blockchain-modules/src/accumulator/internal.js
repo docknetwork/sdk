@@ -209,13 +209,11 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
   }
 
   async accumulator(accumulatorId) {
-    const [did, name] = this.types.AccumulatorId.from(accumulatorId).value;
-    const ids = new SortedResourceVersions(
-      await this.resourcesMetadataBy(
-        did,
-        this.createAccumulatorMetadataFilter(name),
-      ),
-    ).ids();
+    const accId = this.types.AccumulatorId.from(accumulatorId);
+    const ids = await this.accumulatorVersions(accId);
+    const {
+      value: [did, name],
+    } = accId;
 
     if (!ids.length) {
       return null;

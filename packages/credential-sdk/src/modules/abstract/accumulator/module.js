@@ -1,12 +1,12 @@
 /* eslint-disable camelcase */
 
-import { KBUniversalAccumulatorValue } from "@docknetwork/crypto-wasm-ts";
-import { normalizeToHex, normalizeToU8a } from "../../../utils/bytes";
+import { KBUniversalAccumulatorValue } from '@docknetwork/crypto-wasm-ts';
+import { normalizeToHex, normalizeToU8a } from '../../../utils/bytes';
 import {
   AbstractBaseModule,
   withAbstractParams,
   withAbstractPublicKeys,
-} from "../common";
+} from '../common';
 import {
   AccumulatorCommon,
   AccumulatorParams,
@@ -14,8 +14,8 @@ import {
   KBUniversalAccumulator,
   PositiveAccumulator,
   UniversalAccumulator,
-} from "../../../types";
-import { withExtendedPrototypeProperties } from "../../../utils";
+} from '../../../types';
+import { withExtendedPrototypeProperties } from '../../../utils';
 
 export const AccumulatorType = {
   VBPos: 0,
@@ -25,7 +25,7 @@ export const AccumulatorType = {
 
 /** Class to manage accumulators on chain */
 class AbstractAccumulatorModule extends withAbstractParams(
-  withAbstractPublicKeys(AbstractBaseModule)
+  withAbstractPublicKeys(AbstractBaseModule),
 ) {
   static Params = AccumulatorParams;
 
@@ -64,6 +64,68 @@ class AbstractAccumulatorModule extends withAbstractParams(
   }
 
   /**
+   * Creates and stores a new accumulator on the blockchain
+   *
+   * An accumulator is a cryptographic data structure used to maintain an aggregate value that can be updated incrementally.
+   * This method creates a new accumulator instance with the given ID and initial state.
+   *
+   * @param {string} id - Unique identifier for the accumulator
+   * @param {Accumulator} accumulator - Initial accumulator value to store
+   * @param {DidKeypair} didKeypair - Keypair used to sign the transaction
+   * @returns {Promise<*>} Promise resolving to the transaction result
+   */
+  async addAccumulator(id, accumulator, didKeypair, params) {
+    return await this.signAndSend(
+      await this.addAccumulatorTx(id, accumulator, didKeypair),
+      params,
+    );
+  }
+
+  /**
+   * Updates an existing accumulator on the blockchain
+   *
+   * This method replaces the current state of an accumulator with a new value.
+   * The accumulator must already exist (be previously created) to be updated.
+   *
+   * @param {string} id - Unique identifier of the accumulator to update
+   * @param {AccumulatorValue} accumulator - New accumulator value to set
+   * @param {DidKeypair} didKeypair - Keypair used to sign the transaction
+   * @returns {Promise<*>} Promise resolving to the transaction result
+   */
+  async updateAccumulator(
+    id,
+    accumulator,
+    { additions, removals, witnessUpdateInfo },
+    didKeypair,
+    params,
+  ) {
+    return await this.signAndSend(
+      await this.updateAccumulatorTx(
+        id,
+        accumulator,
+        { additions, removals, witnessUpdateInfo },
+        didKeypair,
+      ),
+      params,
+    );
+  }
+
+  /**
+   * Remove the accumulator from chain. This frees up the id for reuse.
+   *
+   * @param id - id to remove
+   * @param didKeypair - Signer's keypair reference
+   * @param params - Transaction parameters.
+   * @returns {Promise<*>}
+   */
+  async removeAccumulator(id, didKeypair, params) {
+    return await this.signAndSend(
+      await this.removeAccumulatorTx(id, didKeypair),
+      params,
+    );
+  }
+
+  /**
    * Add a positive (add-only) accumulator
    * @param id - Unique accumulator id
    * @param accumulated - Current accumulated value.
@@ -78,16 +140,16 @@ class AbstractAccumulatorModule extends withAbstractParams(
     accumulated,
     publicKeyRef,
     didKeypair,
-    params
+    params,
   ) {
     return await this.signAndSend(
       await this.addPositiveAccumulatorTx(
         id,
         accumulated,
         publicKeyRef,
-        didKeypair
+        didKeypair,
       ),
-      params
+      params,
     );
   }
 
@@ -108,7 +170,7 @@ class AbstractAccumulatorModule extends withAbstractParams(
     publicKeyRef,
     maxSize,
     didKeypair,
-    params
+    params,
   ) {
     return await this.signAndSend(
       await this.addUniversalAccumulatorTx(
@@ -116,9 +178,9 @@ class AbstractAccumulatorModule extends withAbstractParams(
         accumulated,
         publicKeyRef,
         maxSize,
-        didKeypair
+        didKeypair,
       ),
-      params
+      params,
     );
   }
 
@@ -137,16 +199,16 @@ class AbstractAccumulatorModule extends withAbstractParams(
     accumulated,
     publicKeyRef,
     didKeypair,
-    params
+    params,
   ) {
     return await this.signAndSend(
       await this.addKBUniversalAccumulatorTx(
         id,
         accumulated,
         publicKeyRef,
-        didKeypair
+        didKeypair,
       ),
-      params
+      params,
     );
   }
 
@@ -166,7 +228,7 @@ class AbstractAccumulatorModule extends withAbstractParams(
     { additions, removals, witnessUpdateInfo },
     publicKeyRef,
     didKeypair,
-    params
+    params,
   ) {
     return await this.signAndSend(
       await this.updatePositiveAccumulatorTx(
@@ -174,9 +236,9 @@ class AbstractAccumulatorModule extends withAbstractParams(
         accumulated,
         { additions, removals, witnessUpdateInfo },
         publicKeyRef,
-        didKeypair
+        didKeypair,
       ),
-      params
+      params,
     );
   }
 
@@ -198,7 +260,7 @@ class AbstractAccumulatorModule extends withAbstractParams(
     publicKeyRef,
     maxSize,
     didKeypair,
-    params
+    params,
   ) {
     return await this.signAndSend(
       await this.updateUniversalAccumulatorTx(
@@ -207,9 +269,9 @@ class AbstractAccumulatorModule extends withAbstractParams(
         { additions, removals, witnessUpdateInfo },
         publicKeyRef,
         maxSize,
-        didKeypair
+        didKeypair,
       ),
-      params
+      params,
     );
   }
 
@@ -228,7 +290,7 @@ class AbstractAccumulatorModule extends withAbstractParams(
     { additions, removals, witnessUpdateInfo },
     publicKeyRef,
     didKeypair,
-    params
+    params,
   ) {
     return await this.signAndSend(
       await this.updateKBUniversalAccumulatorTx(
@@ -236,9 +298,9 @@ class AbstractAccumulatorModule extends withAbstractParams(
         accumulated,
         { additions, removals, witnessUpdateInfo },
         publicKeyRef,
-        didKeypair
+        didKeypair,
       ),
-      params
+      params,
     );
   }
 
@@ -255,7 +317,7 @@ class AbstractAccumulatorModule extends withAbstractParams(
     return await this.addAccumulatorTx(
       id,
       new PositiveAccumulator(new AccumulatorCommon(accumulated, publicKeyRef)),
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -274,17 +336,17 @@ class AbstractAccumulatorModule extends withAbstractParams(
     accumulated,
     publicKeyRef,
     maxSize,
-    didKeypair
+    didKeypair,
   ) {
     return await this.addAccumulatorTx(
       id,
       new UniversalAccumulator(
         new UniversalAccumulator.Class(
           new AccumulatorCommon(accumulated, publicKeyRef),
-          maxSize
-        )
+          maxSize,
+        ),
       ),
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -298,12 +360,12 @@ class AbstractAccumulatorModule extends withAbstractParams(
    * @returns {Promise<*>}
    */
   async addKBUniversalAccumulatorTx(id, accumulated, publicKeyRef, didKeypair) {
-    return await this.dockOnly.tx.addAccumulator(
+    return await this.addAccumulatorTx(
       id,
       new KBUniversalAccumulator(
-        new AccumulatorCommon(accumulated, publicKeyRef)
+        new AccumulatorCommon(accumulated, publicKeyRef),
       ),
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -321,9 +383,9 @@ class AbstractAccumulatorModule extends withAbstractParams(
     accumulated,
     { additions, removals, witnessUpdateInfo },
     publicKeyRef,
-    didKeypair
+    didKeypair,
   ) {
-    return await this.updateAccumulator(
+    return await this.updateAccumulatorTx(
       id,
       new PositiveAccumulator(new AccumulatorCommon(accumulated, publicKeyRef)),
       {
@@ -331,7 +393,7 @@ class AbstractAccumulatorModule extends withAbstractParams(
         removals,
         witnessUpdateInfo,
       },
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -350,19 +412,24 @@ class AbstractAccumulatorModule extends withAbstractParams(
     id,
     accumulated,
     { additions, removals, witnessUpdateInfo },
-    _publicKeyRef,
-    _maxSize,
-    didKeypair
+    publicKeyRef,
+    maxSize,
+    didKeypair,
   ) {
-    return await this.dockOnly.tx.updateAccumulator(
+    return await this.updateAccumulatorTx(
       id,
-      accumulated,
+      new UniversalAccumulator(
+        new UniversalAccumulator.Class(
+          new AccumulatorCommon(accumulated, publicKeyRef),
+          maxSize,
+        ),
+      ),
       {
         additions,
         removals,
         witnessUpdateInfo,
       },
-      didKeypair
+      didKeypair,
     );
   }
 
@@ -380,75 +447,20 @@ class AbstractAccumulatorModule extends withAbstractParams(
     id,
     accumulated,
     { additions, removals, witnessUpdateInfo },
-    _publicKeyRef,
-    didKeypair
+    publicKeyRef,
+    didKeypair,
   ) {
-    return await this.dockOnly.tx.updateAccumulator(
+    return await this.updateAccumulatorTx(
       id,
-      accumulated,
+      new KBUniversalAccumulator(
+        new AccumulatorCommon(accumulated, publicKeyRef),
+      ),
       {
         additions,
         removals,
         witnessUpdateInfo,
       },
-      didKeypair
-    );
-  }
-
-  /**
-   * Remove the accumulator from chain. This frees up the id for reuse.
-   * @param id - id to remove
-   * @param didKeypair - Signer's keypair reference
-   * @param params - Transaction parameters.
-   * @returns {Promise<*>}
-   */
-  async removeAccumulator(id, didKeypair, params) {
-    return await this.signAndSend(
-      await this.removeAccumulatorTx(id, didKeypair),
-      params
-    );
-  }
-
-  /**
-   * Add an accumulator to the chain.
-   *
-   * @param id - Unique accumulator id
-   * @param accumulator - Accumulator value.
-   * @param signingKeyRef - Signer's keypair reference
-   * @param {object} params
-   * @returns {Promise<*>}
-   */
-  async addAccumulator(id, accumulator, didKeypair, params) {
-    return await this.signAndSend(
-      await this.addAccumulatorTx(id, accumulator, didKeypair),
-      params
-    );
-  }
-
-  /**
-   * Update existing accumulator on the chain.
-   *
-   * @param id - Unique accumulator id
-   * @param accumulator - Accumulator value.
-   * @param signingKeyRef - Signer's keypair reference
-   * @param {object} params
-   * @returns {Promise<*>}
-   */
-  async updateAccumulator(
-    id,
-    accumulator,
-    { additions, removals, witnessUpdateInfo },
-    didKeypair,
-    params
-  ) {
-    return await this.signAndSend(
-      await this.updateAccumulatorTx(
-        id,
-        accumulator,
-        { additions, removals, witnessUpdateInfo },
-        didKeypair
-      ),
-      params
+      didKeypair,
     );
   }
 
@@ -461,7 +473,7 @@ class AbstractAccumulatorModule extends withAbstractParams(
    * @returns {Promise<*>}
    */
   async addAccumulatorTx(_id, _accumulator, _didKeypair) {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 
   /**
@@ -477,9 +489,9 @@ class AbstractAccumulatorModule extends withAbstractParams(
     _id,
     _accumulator,
     { additions: _, removals: __, witnessUpdateInfo: ___ },
-    _didKeypair
+    _didKeypair,
   ) {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 
   /**
@@ -492,7 +504,7 @@ class AbstractAccumulatorModule extends withAbstractParams(
    * @returns {Promise<Accumulator|null>}
    */
   async getAccumulator(_id, _includeKey = false, _includeKeyParams = false) {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 
   /**
@@ -507,17 +519,17 @@ class AbstractAccumulatorModule extends withAbstractParams(
    * @returns {Promise<void>}
    */
   async updateWitness(_accumulatorId, _member, _witness, _from, _to) {
-    throw new Error("Unimplemented");
+    throw new Error('Unimplemented');
   }
 }
 
 export default withExtendedPrototypeProperties(
   [
-    "getAccumulator",
-    "addAccumulatorTx",
-    "updateAccumulatorTx",
-    "removeAccumulatorTx",
-    "updateWitness",
+    'getAccumulator',
+    'addAccumulatorTx',
+    'updateAccumulatorTx',
+    'removeAccumulatorTx',
+    'updateWitness',
   ],
-  AbstractAccumulatorModule
+  AbstractAccumulatorModule,
 );

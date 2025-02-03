@@ -11,10 +11,9 @@ import {
   DockAccumulatorIdIdent,
   DockAccumulatorPublicKeyId,
   AccumulatorUpdate,
-  DockAccumulatorHistory,
 } from '@docknetwork/credential-sdk/types';
 import { option, withProp } from '@docknetwork/credential-sdk/types/generic';
-import { inclusiveRange, u8aToHex } from '@docknetwork/credential-sdk/utils';
+import { u8aToHex } from '@docknetwork/credential-sdk/utils';
 import { VBWitnessUpdateInfo } from '@docknetwork/credential-sdk/crypto';
 import {
   injectParams,
@@ -141,6 +140,46 @@ export default class DockInternalAccumulatorModule extends injectParams(
     return await this.keysCounter(did);
   }
 
+  async accumulatorUpdates(accumulatorId, from) {
+    let acc = await this.getAccumulator(accumulatorId);
+    if (acc == null) {
+      return null;
+    }
+    let updates = [];
+
+    const mapUpdate = ({
+      newAccumulated,
+      additions,
+      removals,
+      witnessUpdateInfo,
+    }) => new AccumulatorUpdate(
+      acc.lastModified,
+      newAccumulated,
+      additions,
+      removals,
+      witnessUpdateInfo,
+    );
+
+    while (!acc.lastModified.eq(acc.createdAt) && +from <= +acc.lastModified) {
+      // eslint-disable-next-line no-await-in-loop
+      const prevUpdates = await this.getUpdatesFromBlock(
+        accumulatorId,
+        acc.lastModified,
+      );
+      updates = prevUpdates.map(mapUpdate).concat(updates);
+
+      // eslint-disable-next-line no-await-in-loop
+      acc = await this.getAccumulator(
+        accumulatorId,
+        false,
+        false,
+        acc.lastModified - 1,
+      );
+    }
+
+    return { acc, updates };
+  }
+
   /**
    * Update given witness by downloading necessary blocks and applying the updates if found. Both start and end are inclusive
    * @param accumulatorId
@@ -158,51 +197,29 @@ export default class DockInternalAccumulatorModule extends injectParams(
     witness,
     startBlock,
     endBlock,
-    batchSize = 10,
   ) {
-    if (endBlock === undefined) {
-      const accum = await this.getAccumulator(accumulatorId, false);
-
-      // eslint-disable-next-line no-param-reassign
-      endBlock = accum.lastModified;
-    }
     // If endBlock < startBlock, it won't throw an error but won't fetch any updates and witness won't be updated.
     console.debug(
       `Will start updating witness from block ${startBlock} to ${endBlock}`,
     );
-    let current = startBlock;
-    while (current <= endBlock) {
-      const till = current + batchSize <= endBlock ? current + batchSize : endBlock;
-      // Get updates from blocks [current, current + 1, current + 2, ..., till]
-      // eslint-disable-next-line no-await-in-loop
-      const updates = await this.getUpdatesFromBlocks(
-        accumulatorId,
-        inclusiveRange(current, till, 1),
-      );
-      for (const update of updates) {
-        const additions = [...(update.additions ?? [])].map(
-          (value) => value.bytes,
-        );
-        const removals = [...(update.removals ?? [])].map(
-          (value) => value.bytes,
-        );
+    const { updates } = await this.accumulatorUpdates(
+      accumulatorId,
+      startBlock,
+    );
 
-        console.debug(
-          `Found ${additions?.length} additions and ${removals?.length} removals in block no ${current}`,
-        );
-
-        const queriedWitnessInfo = new VBWitnessUpdateInfo(
-          update.witnessUpdateInfo.bytes,
-        );
-
-        witness.updateUsingPublicInfoPostBatchUpdate(
-          member,
-          additions,
-          removals,
-          queriedWitnessInfo,
-        );
+    for (const {
+      id, witnessUpdateInfo, additions, removals,
+    } of updates) {
+      if (id > endBlock) {
+        break;
       }
-      current = till + 1;
+
+      witness.updateUsingPublicInfoPostBatchUpdate(
+        member,
+        additions ? [...additions].map((addition) => addition.bytes) : [],
+        removals ? [...removals].map((removal) => removal.bytes) : [],
+        new VBWitnessUpdateInfo(witnessUpdateInfo.bytes),
+      );
     }
   }
 
@@ -247,46 +264,6 @@ export default class DockInternalAccumulatorModule extends injectParams(
     return extrinsics
       .map((e) => this.getUpdatesFromExtrinsic(api, e, accumulatorId))
       .filter(Boolean);
-  }
-
-  async accumulatorHistory(accumulatorId) {
-    let acc = await this.getAccumulator(accumulatorId);
-    if (acc == null) {
-      return null;
-    }
-    let updates = [];
-
-    const mapUpdate = ({
-      newAccumulated,
-      additions,
-      removals,
-      witnessUpdateInfo,
-    }) => new AccumulatorUpdate(
-      acc.lastModified,
-      newAccumulated,
-      additions,
-      removals,
-      witnessUpdateInfo,
-    );
-
-    while (!acc.lastModified.eq(acc.createdAt)) {
-      // eslint-disable-next-line no-await-in-loop
-      const prevUpdates = await this.getUpdatesFromBlock(
-        accumulatorId,
-        acc.lastModified,
-      );
-      updates = prevUpdates.map(mapUpdate).concat(updates);
-
-      // eslint-disable-next-line no-await-in-loop
-      acc = await this.getAccumulator(
-        accumulatorId,
-        false,
-        false,
-        acc.lastModified - 1,
-      );
-    }
-
-    return new DockAccumulatorHistory(acc, updates);
   }
 
   /**

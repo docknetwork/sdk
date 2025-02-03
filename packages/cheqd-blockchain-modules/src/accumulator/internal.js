@@ -145,15 +145,21 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
     return (meta) => meta.resourceType === 'accumulator' && meta.name === strName;
   }
 
-  async accumulatorHistory(accumulatorId) {
+  async accumulatorVersions(accumulatorId) {
     const [did, name] = this.types.AccumulatorId.from(accumulatorId).value;
 
-    const ids = new SortedResourceVersions(
+    return new SortedResourceVersions(
       await this.resourcesMetadataBy(
         did,
         this.createAccumulatorMetadataFilter(name),
       ),
     ).ids();
+  }
+
+  async accumulatorHistory(accumulatorId) {
+    const [did, name] = this.types.AccumulatorId.from(accumulatorId).value;
+
+    const ids = await this.accumulatorVersions(accumulatorId);
     if (!ids.length) {
       return null;
     }
@@ -277,21 +283,23 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
     const startUUID = String(TypedUUID.from(start));
     const endUUID = String(TypedUUID.from(end));
 
-    const sortedIDs = new SortedResourceVersions(
-      await this.resourcesMetadataBy(
-        did,
-        this.createAccumulatorMetadataFilter(name),
-      ),
-    ).ids();
+    const sortedIDs = await this.accumulatorVersions(accumulatorId);
 
-    const startIdx = sortedIDs.findIndex((id) => id === startUUID);
+    let startIdx = sortedIDs.findIndex((id) => id === startUUID);
+    if (startIdx === -1) {
+      throw new Error(
+        `Accumulator \`${accumulatorId}\` with version \`${startUUID}\` doesn't exist`,
+      );
+    } else if (startIdx === 0) {
+      startIdx = 1;
+    }
     let endIdx;
     if (end != null) {
       endIdx = sortedIDs.findIndex((id) => id === endUUID);
 
       if (endIdx === -1) {
         throw new Error(
-          `Accumulator \`${accumulatorId}\` with version \`${end}\` doesn't exist`,
+          `Accumulator \`${accumulatorId}\` with version \`${endUUID}\` doesn't exist`,
         );
       }
     } else {

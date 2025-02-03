@@ -1,11 +1,6 @@
 /* eslint-disable camelcase */
 
-import {
-  DockAccumulatorCommon,
-  DockKBUniversalAccumulator,
-  DockUniversalAccumulator,
-  DockPositiveAccumulator,
-} from '@docknetwork/credential-sdk/types';
+import { DockAccumulatorHistory } from '@docknetwork/credential-sdk/types';
 import { AbstractAccumulatorModule } from '@docknetwork/credential-sdk/modules/abstract';
 import DockInternalAccumulatorModule from './internal';
 import { injectDock, withParams, withPublicKeys } from '../common';
@@ -23,156 +18,35 @@ export default class DockAccumulatorModule extends withParams(
   static DockOnly = DockInternalAccumulatorModule;
 
   /**
-   * Add a positive (add-only) accumulator
-   * @param id - Unique accumulator id
-   * @param accumulated - Current accumulated value.
-   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
-   * have any public key on the chain. This is useful for KVAC.
-   * @param didKeypair - Signer's keypair reference
-   * @returns {Promise<*>}
+   * Creates and stores a new accumulator on the blockchain
+   *
+   * An accumulator is a cryptographic data structure used to maintain an aggregate value that can be updated incrementally.
+   * This method creates a new accumulator instance with the given ID and initial state.
+   *
+   * @param {string} id - Unique identifier for the accumulator
+   * @param {Accumulator} accumulator - Initial accumulator value to store
+   * @param {DidKeypair} didKeypair - Keypair used to sign the transaction
+   * @returns {Promise<*>} Promise resolving to the transaction result
    */
-  async addPositiveAccumulatorTx(id, accumulated, publicKeyRef, didKeypair) {
-    return await this.dockOnly.tx.addAccumulator(
-      id,
-      new DockPositiveAccumulator(
-        new DockAccumulatorCommon(accumulated, publicKeyRef),
-      ),
-      didKeypair,
-    );
+  async addAccumulatorTx(id, accumulator, didKeypair) {
+    return await this.dockOnly.tx.addAccumulator(id, accumulator, didKeypair);
   }
 
   /**
-   * Add universal (supports add/remove) accumulator
-   * @param id - Unique accumulator id
-   * @param accumulated - Current accumulated value.
-   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
-   * have any public key on the chain. This is useful for KVAC.
-   * @param maxSize - Maximum size of the accumulator
-   * @param didKeypair - Signer's keypair reference
-   * @returns {Promise<*>}
+   * Updates an existing accumulator on the blockchain
+   *
+   * This method replaces the current state of an accumulator with a new value.
+   * The accumulator must already exist (be previously created) to be updated.
+   *
+   * @param {string} id - Unique identifier of the accumulator to update
+   * @param {AccumulatorValue} accumulator - New accumulator value to set
+   * @param {DidKeypair} didKeypair - Keypair used to sign the transaction
+   * @returns {Promise<*>} Promise resolving to the transaction result
    */
-  async addUniversalAccumulatorTx(
-    id,
-    accumulated,
-    publicKeyRef,
-    maxSize,
-    didKeypair,
-  ) {
-    return await this.dockOnly.tx.addAccumulator(
-      id,
-      new DockUniversalAccumulator(
-        new DockUniversalAccumulator.Class(
-          new DockAccumulatorCommon(accumulated, publicKeyRef),
-          maxSize,
-        ),
-      ),
-      didKeypair,
-    );
-  }
-
-  /**
-   * Add KB universal (supports add/remove) accumulator
-   * @param id - Unique accumulator id
-   * @param accumulated - Current accumulated value.
-   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
-   * have any public key on the chain. This is useful for KVAC.
-   * @param didKeypair - Signer's keypair reference
-   * @returns {Promise<*>}
-   */
-  async addKBUniversalAccumulatorTx(id, accumulated, publicKeyRef, didKeypair) {
-    return await this.dockOnly.tx.addAccumulator(
-      id,
-      new DockKBUniversalAccumulator(
-        new DockAccumulatorCommon(accumulated, publicKeyRef),
-      ),
-      didKeypair,
-    );
-  }
-
-  /**
-   * Update a positive (add-only) accumulator
-   * @param id - Unique accumulator id
-   * @param accumulated - Current accumulated value.
-   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
-   * have any public key on the chain. This is useful for KVAC.
-   * @param didKeypair - Signer's keypair reference
-   * @returns {Promise<*>}
-   */
-  async updatePositiveAccumulatorTx(
-    id,
-    accumulated,
-    { additions, removals, witnessUpdateInfo },
-    _publicKeyRef,
-    didKeypair,
-  ) {
+  async updateAccumulatorTx(id, accumulator, didKeypair) {
     return await this.dockOnly.tx.updateAccumulator(
       id,
-      accumulated,
-      {
-        additions,
-        removals,
-        witnessUpdateInfo,
-      },
-      didKeypair,
-    );
-  }
-
-  /**
-   * Update universal (supports add/remove) accumulator
-   * @param id - Unique accumulator id
-   * @param accumulated - Current accumulated value.
-   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
-   * have any public key on the chain. This is useful for KVAC.
-   * @param maxSize - Maximum size of the accumulator
-   * @param didKeypair - Signer's keypair reference
-   * @returns {Promise<*>}
-   */
-  // eslint-disable-next-line sonarjs/no-identical-functions
-  async updateUniversalAccumulatorTx(
-    id,
-    accumulated,
-    { additions, removals, witnessUpdateInfo },
-    _publicKeyRef,
-    _maxSize,
-    didKeypair,
-  ) {
-    return await this.dockOnly.tx.updateAccumulator(
-      id,
-      accumulated,
-      {
-        additions,
-        removals,
-        witnessUpdateInfo,
-      },
-      didKeypair,
-    );
-  }
-
-  /**
-   * Update KB universal (supports add/remove) accumulator
-   * @param id - Unique accumulator id
-   * @param accumulated - Current accumulated value.
-   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
-   * have any public key on the chain. This is useful for KVAC.
-   * @param didKeypair - Signer's keypair reference
-   * @returns {Promise<*>}
-   */
-  // eslint-disable-next-line sonarjs/no-identical-functions
-  async updateKBUniversalAccumulatorTx(
-    id,
-    accumulated,
-    { additions, removals, witnessUpdateInfo },
-    _publicKeyRef,
-    didKeypair,
-  ) {
-    return await this.dockOnly.tx.updateAccumulator(
-      id,
-      accumulated,
-      {
-        additions,
-        removals,
-        witnessUpdateInfo,
-      },
+      accumulator,
       didKeypair,
     );
   }
@@ -224,5 +98,17 @@ export default class DockAccumulatorModule extends withParams(
       start,
       end,
     );
+  }
+
+  async accumulatorHistory(accumulatorId) {
+    const { acc, updates } = this.accumulatorUpdates(accumulatorId);
+
+    return new DockAccumulatorHistory(acc, updates);
+  }
+
+  async accumulatorVersions(accumulatorId) {
+    const { updates } = await this.dockOnly.accumulatorHistory(accumulatorId);
+
+    return [...updates].map(({ id }) => String(id));
   }
 }

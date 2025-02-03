@@ -45,13 +45,20 @@ export default class CheqdAccumulatorModule extends withParams(
    *
    * @param {string} id - Unique identifier of the accumulator to update
    * @param {AccumulatorValue} accumulator - New accumulator value to set
+   * @param {{ additions: Array<Uint8Array>, removals: Array<Uint8Array>, witnessUpdateInfo: Uint8Array }} updates
    * @param {DidKeypair} didKeypair - Keypair used to sign the transaction
    * @returns {Promise<*>} Promise resolving to the transaction result
    */
-  async updateAccumulatorTx(id, accumulator, didKeypair) {
+  async updateAccumulatorTx(
+    id,
+    accumulator,
+    { additions, removals, witnessUpdateInfo },
+    didKeypair,
+  ) {
     return await this.cheqdOnly.tx.updateAccumulator(
       id,
       accumulator,
+      { additions, removals, witnessUpdateInfo },
       didKeypair,
     );
   }

@@ -183,8 +183,14 @@ class CheqdAccumulatorPublicKeyRefOrDockAccumulatorPublicKeyRef extends withFrom
   (value, from) => {
     try {
       return from(value);
-    } catch {
-      return DockAccumulatorPublicKeyRef.from(value);
+    } catch (cheqdErr) {
+      try {
+        return DockAccumulatorPublicKeyRef.from(value);
+      } catch (dockErr) {
+        dockErr.message = `${cheqdErr.message}; ${dockErr.message}`;
+
+        throw dockErr;
+      }
     }
   },
 ) {}

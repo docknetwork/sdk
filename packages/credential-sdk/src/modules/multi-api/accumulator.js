@@ -18,6 +18,28 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
   }
 
   /**
+   * Creates and stores a new accumulator on the blockchain
+   *
+   * An accumulator is a cryptographic data structure used to maintain an aggregate value that can be updated incrementally.
+   * This method creates a new accumulator instance with the given ID and initial state.
+   *
+   * @param {string} id - Unique identifier for the accumulator
+   * @param {Accumulator} accumulator - Initial accumulator value to store
+   * @param {DidKeypair} didKeypair - Keypair used to sign the transaction
+   * @returns {Promise<*>} Promise resolving to the transaction result
+   */
+  async addAccumulator(id, accumulator, didKeypair, params) {
+    const accId = AccumulatorId.from(id);
+
+    return await this.moduleById(accId).addAccumulator(
+      id,
+      accumulator,
+      didKeypair,
+      params,
+    );
+  }
+
+  /**
    * Add a positive (add-only) accumulator
    * @param id - Unique accumulator id
    * @param accumulated - Current accumulated value.
@@ -336,156 +358,41 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
   }
 
   /**
-   * Add a positive (add-only) accumulator
-   * @param id - Unique accumulator id
-   * @param accumulated - Current accumulated value.
-   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
-   * have any public key on the chain. This is useful for KVAC.
-   * @param signerDid - Signer of the transaction payload
-   * @param signingKeyRef - Signer's keypair reference
-   * @returns {Promise<*>}
+   * Creates and stores a new accumulator on the blockchain
+   *
+   * An accumulator is a cryptographic data structure used to maintain an aggregate value that can be updated incrementally.
+   * This method creates a new accumulator instance with the given ID and initial state.
+   *
+   * @param {string} id - Unique identifier for the accumulator
+   * @param {Accumulator} accumulator - Initial accumulator value to store
+   * @param {DidKeypair} didKeypair - Keypair used to sign the transaction
+   * @returns {Promise<*>} Promise resolving to the transaction result
    */
-  async addPositiveAccumulatorTx(id, accumulated, publicKeyRef, didKeypair) {
+  async addAccumulatorTx(id, accumulator, didKeypair) {
     const accId = AccumulatorId.from(id);
 
-    return await this.moduleById(accId).addPositiveAccumulatorTx(
-      accId,
-      accumulated,
-      publicKeyRef,
+    return await this.moduleById(accId).addAccumulatorTx(
+      id,
+      accumulator,
       didKeypair,
     );
   }
 
   /**
-   * Add universal (supports add/remove) accumulator
-   * @param id - Unique accumulator id
-   * @param accumulated - Current accumulated value.
-   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
-   * have any public key on the chain. This is useful for KVAC.
-   * @param maxSize - Maximum size of the accumulator
-   * @param signerDid - Signer of the transaction payload
-   * @param signingKeyRef - Signer's keypair reference
-   * @returns {Promise<*>}
+   * Updates an existing accumulator on the blockchain
+   *
+   * This method replaces the current state of an accumulator with a new value.
+   * The accumulator must already exist (be previously created) to be updated.
+   *
+   * @param {string} id - Unique identifier of the accumulator to update
+   * @param {AccumulatorValue} accumulator - New accumulator value to set
+   * @param {DidKeypair} didKeypair - Keypair used to sign the transaction
+   * @returns {Promise<*>} Promise resolving to the transaction result
    */
-  async addUniversalAccumulatorTx(
-    id,
-    accumulated,
-    publicKeyRef,
-    maxSize,
-    didKeypair,
-  ) {
-    const accId = AccumulatorId.from(id);
-
-    return await this.moduleById(accId).addUniversalAccumulatorTx(
-      accId,
-      accumulated,
-      publicKeyRef,
-      maxSize,
-      didKeypair,
-    );
-  }
-
-  /**
-   * Add KB universal (supports add/remove) accumulator
-   * @param id - Unique accumulator id
-   * @param accumulated - Current accumulated value.
-   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
-   * have any public key on the chain. This is useful for KVAC.
-   * @param signerDid - Signer of the transaction payload
-   * @param signingKeyRef - Signer's keypair reference
-   * @returns {Promise<*>}
-   */
-  async addKBUniversalAccumulatorTx(id, accumulated, publicKeyRef, didKeypair) {
-    const accId = AccumulatorId.from(id);
-
-    return await this.moduleById(accId).addKBUniversalAccumulatorTx(
-      accId,
-      accumulated,
-      publicKeyRef,
-      didKeypair,
-    );
-  }
-
-  /**
-   * Update existing a positive (add-only) accumulator
-   * @param id - Unique accumulator id
-   * @param accumulated - Current accumulated value.
-   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
-   * have any public key on the chain. This is useful for KVAC.
-   * @param signingKeyRef - Signer's keypair reference
-   * @returns {Promise<*>}
-   */
-  async updatePositiveAccumulatorTx(
-    id,
-    accumulated,
-    { additions, removals, witnessUpdateInfo },
-    publicKeyRef,
-    didKeypair,
-  ) {
-    const accId = AccumulatorId.from(id);
-
-    return await this.moduleById(accId).updatePositiveAccumulatorTx(
-      accId,
-      accumulated,
-      { additions, removals, witnessUpdateInfo },
-      publicKeyRef,
-      didKeypair,
-    );
-  }
-
-  /**
-   * Update existing universal (supports add/remove) accumulator
-   * @param id - Unique accumulator id
-   * @param accumulated - Current accumulated value.
-   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
-   * have any public key on the chain. This is useful for KVAC.
-   * @param maxSize - Maximum size of the accumulator
-   * @param signingKeyRef - Signer's keypair reference
-   * @returns {Promise<*>}
-   */
-  async updateUniversalAccumulatorTx(
-    id,
-    accumulated,
-    { additions, removals, witnessUpdateInfo },
-    publicKeyRef,
-    maxSize,
-    didKeypair,
-  ) {
-    const accId = AccumulatorId.from(id);
-
-    return await this.moduleById(accId).updateUniversalAccumulatorTx(
-      accId,
-      accumulated,
-      { additions, removals, witnessUpdateInfo },
-      publicKeyRef,
-      maxSize,
-      didKeypair,
-    );
-  }
-
-  /**
-   * Update existing KB universal (supports add/remove) accumulator
-   * @param id - Unique accumulator id
-   * @param accumulated - Current accumulated value.
-   * @param publicKeyRef - Reference to accumulator public key. If the reference contains the key id 0, it means the accumulator does not
-   * have any public key on the chain. This is useful for KVAC.
-   * @param signingKeyRef - Signer's keypair reference
-   * @returns {Promise<*>}
-   */
-  async updateKBUniversalAccumulatorTx(
-    id,
-    accumulated,
-    { additions, removals, witnessUpdateInfo },
-    publicKeyRef,
-    didKeypair,
-  ) {
-    const accId = AccumulatorId.from(id);
-
-    return await this.moduleById(accId).updateKBUniversalAccumulatorTx(
-      accId,
-      accumulated,
-      { additions, removals, witnessUpdateInfo },
-      publicKeyRef,
+  async updateAccumulatorTx(id, accumulator, didKeypair) {
+    return await this.cheqdOnly.tx.updateAccumulator(
+      id,
+      accumulator,
       didKeypair,
     );
   }

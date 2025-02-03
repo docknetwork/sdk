@@ -52,7 +52,7 @@ export default class DockAccumulatorModule extends withParams(
   ) {
     return await this.dockOnly.tx.updateAccumulator(
       id,
-      accumulator,
+      accumulator.accumulated,
       { additions, removals, witnessUpdateInfo },
       didKeypair,
     );

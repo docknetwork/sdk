@@ -521,6 +521,16 @@ class AbstractAccumulatorModule extends withAbstractParams(
   async updateWitness(_accumulatorId, _member, _witness, _from, _to) {
     throw new Error('Unimplemented');
   }
+
+  /**
+   * Retrieves history for the accumulator with supplied identifier.
+   *
+   * @param {*} _accumulatorId
+   * @returns {?{ created: *, updates: Array<*> }}
+   */
+  async accumulatorHistory(_accumulatorId) {
+    throw new Error('Unimplemented');
+  }
 }
 
 export default withExtendedPrototypeProperties(

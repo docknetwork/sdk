@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
 
-import { DockAccumulatorHistory } from '@docknetwork/credential-sdk/types';
-import { AbstractAccumulatorModule } from '@docknetwork/credential-sdk/modules/abstract';
-import DockInternalAccumulatorModule from './internal';
-import { injectDock, withParams, withPublicKeys } from '../common';
+import { DockAccumulatorHistory } from "@docknetwork/credential-sdk/types";
+import { AbstractAccumulatorModule } from "@docknetwork/credential-sdk/modules/abstract";
+import DockInternalAccumulatorModule from "./internal";
+import { injectDock, withParams, withPublicKeys } from "../common";
 
 export const AccumulatorType = {
   VBPos: 0,
@@ -13,7 +13,7 @@ export const AccumulatorType = {
 
 /** Class to manage accumulators on chain */
 export default class DockAccumulatorModule extends withParams(
-  withPublicKeys(injectDock(AbstractAccumulatorModule)),
+  withPublicKeys(injectDock(AbstractAccumulatorModule))
 ) {
   static DockOnly = DockInternalAccumulatorModule;
 
@@ -47,7 +47,7 @@ export default class DockAccumulatorModule extends withParams(
     return await this.dockOnly.tx.updateAccumulator(
       id,
       accumulator,
-      didKeypair,
+      didKeypair
     );
   }
 
@@ -75,7 +75,7 @@ export default class DockAccumulatorModule extends withParams(
     return await this.dockOnly.getAccumulator(
       id,
       includePublicKey,
-      includeParams,
+      includeParams
     );
   }
 
@@ -96,7 +96,7 @@ export default class DockAccumulatorModule extends withParams(
       member,
       witness,
       start,
-      end,
+      end
     );
   }
 
@@ -109,6 +109,6 @@ export default class DockAccumulatorModule extends withParams(
   async accumulatorVersions(accumulatorId) {
     const { updates } = await this.dockOnly.accumulatorHistory(accumulatorId);
 
-    return [...updates].map(({ id }) => String(id));
+    return [...updates].map(({ id }) => Number(id));
   }
 }

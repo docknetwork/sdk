@@ -1,5 +1,17 @@
 # @docknetwork/credential-sdk
 
+## 0.35.0
+
+### Minor Changes
+
+- Introduce `accumulatorVersions`, add unified `addAccumulator` and `updateAccumulator` methods'
+
+## 0.34.0
+
+### Minor Changes
+
+- Expose `accumulatorHistory`
+
 ## 0.33.0
 
 ### Minor Changes

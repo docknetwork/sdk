@@ -5,6 +5,18 @@ import { injectModuleRouter } from './common';
 export default class MultiApiAccumulatorModule extends injectModuleRouter(
   AbstractAccumulatorModule,
 ) {
+  /**
+   * Adds a public key associated with a target DID for cryptographic operations.
+   * This method allows you to store or update a public key within an accumulator module,
+   * which can be used in various cryptographic accumulations and verifications.
+   *
+   * @param {*} id - Unique identifier for the public key entry
+   * @param {*} publicKey - The public key value being added/updated
+   * @param {*} targetDid - DID that will control this public key
+   * @param {DidKeypair} didKeypair - Keypair used to sign the transaction
+   * @param {object} [params] - Optional parameters for additional configuration
+   * @returns {Promise<*>} Promise resolving to the transaction result
+   */
   async addPublicKey(id, publicKey, targetDid, didKeypair, params) {
     const did = NamespaceDid.from(targetDid);
 
@@ -432,5 +444,11 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
     const did = NamespaceDid.from(targetDid);
 
     return await this.moduleById(did).nextParamsId(did);
+  }
+
+  async accumulatorHistory(id) {
+    const accId = AccumulatorId.from(id);
+
+    return await this.moduleById(accId).accumulatorHistory(accId);
   }
 }

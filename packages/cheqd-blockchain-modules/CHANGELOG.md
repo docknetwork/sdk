@@ -1,5 +1,33 @@
 # @docknetwork/cheqd-blockchain-modules
 
+## 0.27.0
+
+### Minor Changes
+
+- Introduce `accumulatorVersions`, add unified `addAccumulator` and `updateAccumulator` methods'
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.35.0
+
+## 0.26.0
+
+### Minor Changes
+
+- Expose `accumulatorHistory`
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.34.0
+
+## 0.25.0
+
+### Minor Changes
+
+- Tweak for accumulator witness updates
+
 ## 0.24.0
 
 ### Minor Changes

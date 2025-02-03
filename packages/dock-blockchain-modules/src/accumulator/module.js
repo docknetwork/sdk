@@ -107,8 +107,10 @@ export default class DockAccumulatorModule extends withParams(
   }
 
   async accumulatorVersions(accumulatorId) {
-    const { updates } = await this.dockOnly.accumulatorHistory(accumulatorId);
+    const { acc, updates } = await this.dockOnly.accumulatorUpdates(
+      accumulatorId,
+    );
 
-    return [...updates].map(({ id }) => Number(id));
+    return [acc.created, ...updates.map(({ id }) => id)].map(Number);
   }
 }

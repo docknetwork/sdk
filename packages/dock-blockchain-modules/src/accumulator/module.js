@@ -1,6 +1,9 @@
 /* eslint-disable camelcase */
 
-import { DockAccumulatorHistory } from '@docknetwork/credential-sdk/types';
+import {
+  DockAccumulatorHistory,
+  Accumulator,
+} from '@docknetwork/credential-sdk/types';
 import { AbstractAccumulatorModule } from '@docknetwork/credential-sdk/modules/abstract';
 import DockInternalAccumulatorModule from './internal';
 import { injectDock, withParams, withPublicKeys } from '../common';
@@ -29,7 +32,11 @@ export default class DockAccumulatorModule extends withParams(
    * @returns {Promise<*>} Promise resolving to the transaction result
    */
   async addAccumulatorTx(id, accumulator, didKeypair) {
-    return await this.dockOnly.tx.addAccumulator(id, accumulator, didKeypair);
+    return await this.dockOnly.tx.addAccumulator(
+      id,
+      Accumulator.from(accumulator),
+      didKeypair,
+    );
   }
 
   /**
@@ -52,7 +59,7 @@ export default class DockAccumulatorModule extends withParams(
   ) {
     return await this.dockOnly.tx.updateAccumulator(
       id,
-      accumulator.accumulated,
+      Accumulator.from(accumulator).accumulated,
       { additions, removals, witnessUpdateInfo },
       didKeypair,
     );

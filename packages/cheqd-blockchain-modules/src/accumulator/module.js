@@ -4,6 +4,7 @@ import {
   CheqdAccumulatorWithUpdateInfo,
   AccumulatorParams,
   CheqdAccumulatorPublicKey,
+  Accumulator,
 } from '@docknetwork/credential-sdk/types';
 import { option, withProp } from '@docknetwork/credential-sdk/types/generic';
 import { AbstractAccumulatorModule } from '@docknetwork/credential-sdk/modules/abstract';
@@ -34,7 +35,11 @@ export default class CheqdAccumulatorModule extends withParams(
    * @returns {Promise<*>} Promise resolving to the transaction result
    */
   async addAccumulatorTx(id, accumulator, didKeypair) {
-    return await this.cheqdOnly.tx.addAccumulator(id, accumulator, didKeypair);
+    return await this.cheqdOnly.tx.addAccumulator(
+      id,
+      Accumulator.from(accumulator),
+      didKeypair,
+    );
   }
 
   /**
@@ -57,7 +62,7 @@ export default class CheqdAccumulatorModule extends withParams(
   ) {
     return await this.cheqdOnly.tx.updateAccumulator(
       id,
-      accumulator,
+      Accumulator.from(accumulator),
       { additions, removals, witnessUpdateInfo },
       didKeypair,
     );
@@ -145,8 +150,6 @@ export default class CheqdAccumulatorModule extends withParams(
    * @returns {Promise<Array<string>>} Promise resolving to array of version numbers as strings
    */
   async accumulatorVersions(accumulatorId) {
-    return [...(await this.cheqdOnly.accumulatorVersions(accumulatorId))].map(
-      String,
-    );
+    return await this.cheqdOnly.accumulatorVersions(accumulatorId);
   }
 }

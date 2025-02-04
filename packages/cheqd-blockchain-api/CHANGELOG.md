@@ -1,5 +1,16 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 0.28.0
+
+### Minor Changes
+
+- Introduce `accumulatorVersions`, add unified `addAccumulator` and `updateAccumulator` methods'
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.35.0
+
 ## 0.27.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/cheqd-blockchain-api",
-  "version": "0.27.1",
+  "version": "0.28.0",
   "license": "MIT",
   "main": "./dist/esm/index.js",
   "type": "module",
@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@cheqd/sdk": "cjs",
-    "@docknetwork/credential-sdk": "0.34.0"
+    "@docknetwork/credential-sdk": "0.35.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.1",

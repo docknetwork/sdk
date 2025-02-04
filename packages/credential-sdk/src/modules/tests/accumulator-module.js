@@ -1,6 +1,10 @@
 import { InMemoryState } from '@docknetwork/crypto-wasm-ts/lib/accumulator/in-memory-persistence';
 import {
-  hexToU8a, stringToHex, u8aToHex, randomAsHex,
+  hexToU8a,
+  stringToHex,
+  u8aToHex,
+  randomAsHex,
+  valueBytes,
 } from '../../utils';
 import {
   Accumulator,
@@ -58,12 +62,14 @@ export default function generateAccumulatorTests(
     let pk1Id;
     const accumState = new InMemoryState();
 
-    test('Prefill', async () => {
+    beforeAll(async () => {
       await didModule.createDocument(
         DIDDocument.create(did, [pair.didKey()]),
         pair,
       );
+    });
 
+    test('Prefill', async () => {
       const label = stringToHex('accumulator-params-label');
       const params = Accumulator.generateParams(hexToU8a(label));
       const bytes1 = u8aToHex(params.bytes);
@@ -684,5 +690,46 @@ export default function generateAccumulatorTests(
         ),
       ).toEqual(true);
     }, 60000);
+
+    test('Accumulator versions', async () => {
+      const accId = AccumulatorId.random(did);
+      const pkId = await accumulatorModule.lastPublicKeyId(did);
+
+      await accumulatorModule.addUniversalAccumulator(
+        accId,
+        hexToU8a('0xff'),
+        [did, pkId],
+        10,
+        pair,
+      );
+
+      await accumulatorModule.updateUniversalAccumulator(
+        accId,
+        hexToU8a('0xfa'),
+        { additions: [hexToU8a('0xfa')], witnessUpdateInfo: hexToU8a('0xfa') },
+        [did, pkId],
+        10,
+        pair,
+      );
+
+      await accumulatorModule.updateUniversalAccumulator(
+        accId,
+        hexToU8a('0xfe'),
+        { removals: [hexToU8a('0xfa')], witnessUpdateInfo: hexToU8a('0xfa') },
+        [did, pkId],
+        10,
+        pair,
+      );
+
+      const versions = await accumulatorModule.accumulatorVersions(accId);
+      expect(versions.length).toBe(3);
+      const { created, updates } = await accumulatorModule.accumulatorHistory(
+        accId,
+      );
+      expect(valueBytes(created.accumulated)).toEqual(hexToU8a('0xff'));
+      expect(valueBytes(updates[0].accumulated)).toEqual(hexToU8a('0xfa'));
+      expect(valueBytes(updates[1].accumulated)).toEqual(hexToU8a('0xfe'));
+      expect(updates.length).toBe(2);
+    });
   });
 }

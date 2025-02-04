@@ -1,5 +1,16 @@
 # @docknetwork/dock-blockchain-api
 
+## 0.19.0
+
+### Minor Changes
+
+- Introduce `accumulatorVersions`, add unified `addAccumulator` and `updateAccumulator` methods'
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.35.0
+
 ## 0.18.1
 
 ### Patch Changes

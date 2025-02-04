@@ -177,3 +177,30 @@ export class CheqdAccumulatorHistory extends TypedStruct {
     },
   };
 }
+
+class CheqdAccumulatorPublicKeyRefOrDockAccumulatorPublicKeyRef extends withFrom(
+  CheqdAccumulatorPublicKeyRef,
+  (value, from) => {
+    try {
+      return from(value);
+    } catch (cheqdErr) {
+      try {
+        return DockAccumulatorPublicKeyRef.from(value);
+      } catch (dockErr) {
+        dockErr.message = `${cheqdErr.message}; ${dockErr.message}`;
+
+        throw dockErr;
+      }
+    }
+  },
+) {}
+
+export const [
+  AccumulatorCommon,
+  Accumulator,
+  UniversalAccumulator,
+  KBUniversalAccumulator,
+  PositiveAccumulator,
+] = createAccumulatorVariants(
+  CheqdAccumulatorPublicKeyRefOrDockAccumulatorPublicKeyRef,
+);

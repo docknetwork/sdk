@@ -145,15 +145,21 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
     return (meta) => meta.resourceType === 'accumulator' && meta.name === strName;
   }
 
-  async accumulatorHistory(accumulatorId) {
+  async accumulatorVersions(accumulatorId) {
     const [did, name] = this.types.AccumulatorId.from(accumulatorId).value;
 
-    const ids = new SortedResourceVersions(
+    return new SortedResourceVersions(
       await this.resourcesMetadataBy(
         did,
         this.createAccumulatorMetadataFilter(name),
       ),
     ).ids();
+  }
+
+  async accumulatorHistory(accumulatorId) {
+    const [did, name] = this.types.AccumulatorId.from(accumulatorId).value;
+
+    const ids = await this.accumulatorVersions(accumulatorId);
     if (!ids.length) {
       return null;
     }
@@ -177,9 +183,7 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
       witnessUpdateInfo,
     );
 
-    const accumulators = resources.map((acc) => CheqdStoredAccumulator.from(
-      JSON.parse(u8aToString(validateResource(acc, String(name), Type))),
-    ));
+    const accumulators = resources.map((acc) => CheqdStoredAccumulator.from(validateResource(acc, String(name), Type)));
     const updates = accumulators.slice(1).map(mapUpdate);
 
     return new CheqdAccumulatorHistory(
@@ -203,13 +207,11 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
   }
 
   async accumulator(accumulatorId) {
-    const [did, name] = this.types.AccumulatorId.from(accumulatorId).value;
-    const ids = new SortedResourceVersions(
-      await this.resourcesMetadataBy(
-        did,
-        this.createAccumulatorMetadataFilter(name),
-      ),
-    ).ids();
+    const accId = this.types.AccumulatorId.from(accumulatorId);
+    const ids = await this.accumulatorVersions(accId);
+    const {
+      value: [did, name],
+    } = accId;
 
     if (!ids.length) {
       return null;
@@ -277,18 +279,15 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
     const startUUID = String(TypedUUID.from(start));
     const endUUID = String(TypedUUID.from(end));
 
-    const sortedIDs = new SortedResourceVersions(
-      await this.resourcesMetadataBy(
-        did,
-        this.createAccumulatorMetadataFilter(name),
-      ),
-    ).ids();
+    const sortedIDs = await this.accumulatorVersions(accumulatorId);
 
-    const startIdx = sortedIDs.findIndex((id) => id === startUUID);
+    let startIdx = sortedIDs.findIndex((id) => id === startUUID);
     if (startIdx === -1) {
       throw new Error(
         `Accumulator \`${accumulatorId}\` with version \`${startUUID}\` doesn't exist`,
       );
+    } else if (startIdx === 0) {
+      startIdx = 1;
     }
     let endIdx;
     if (end != null) {
@@ -296,7 +295,7 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
 
       if (endIdx === -1) {
         throw new Error(
-          `Accumulator \`${accumulatorId}\` with version \`${end}\` doesn't exist`,
+          `Accumulator \`${accumulatorId}\` with version \`${endUUID}\` doesn't exist`,
         );
       }
     } else {
@@ -312,10 +311,6 @@ export default class CheqdInternalAccumulatorModule extends injectParams(
       const { additions, removals, witnessUpdateInfo } = CheqdStoredAccumulator.from(
         validateResource(accumulator, String(name), Type),
       );
-      if (witnessUpdateInfo == null) {
-        // eslint-disable-next-line no-continue
-        continue;
-      }
 
       witness.updateUsingPublicInfoPostBatchUpdate(
         member,

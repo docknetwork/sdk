@@ -297,9 +297,9 @@ export class CheqdAPI extends AbstractApiProvider {
 
     // Dock identifiers
     if (id instanceof NamespaceDid) {
-      return id.isDock || id.isDidMethodKey;
+      return id.isDock;
     } else if (id instanceof DockDidOrDidMethodKey) {
-      return true;
+      return id.isDock;
     } else if (id instanceof DidRef) {
       return this.supportsIdentifier(id[0]);
     } else if (id instanceof TypedEnum) {

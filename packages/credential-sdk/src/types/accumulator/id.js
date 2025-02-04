@@ -1,5 +1,5 @@
 import { valueBytes } from '../../utils';
-import { CheqdMainnetDid, CheqdTestnetDid, DidRef } from '../did';
+import { CheqdDidRef, CheqdMainnetDid, CheqdTestnetDid } from '../did';
 import {
   TypedBytes,
   TypedEnum,
@@ -66,7 +66,7 @@ export class DockAccumulatorId extends AccumulatorId {
   }
 }
 
-export class CheqdAccumulatorIdValue extends withQualifier(DidRef) {
+export class CheqdAccumulatorIdValue extends CheqdDidRef {
   static Qualifier = 'accumulator:cheqd:';
 
   static Ident = withFromDockId(
@@ -74,58 +74,14 @@ export class CheqdAccumulatorIdValue extends withQualifier(DidRef) {
     DockAccumulatorId,
     'accumulator:cheqd:',
   );
-
-  static cheqdDid(did) {
-    return did.value;
-  }
-
-  static fromUnqualifiedString(str) {
-    const lastColon = str.lastIndexOf(':');
-    const did = `did:cheqd:${str.slice(0, lastColon)}`;
-    const id = str.slice(lastColon + 1);
-
-    return new this(did, id);
-  }
-
-  toJSON() {
-    return String(this);
-  }
-
-  toEncodedString() {
-    const { did, value, constructor } = this;
-    const { cheqdDid } = constructor;
-
-    let prefix = '';
-    if (cheqdDid(did) instanceof CheqdTestnetDid) {
-      prefix = 'testnet';
-    } else if (cheqdDid(did) instanceof CheqdMainnetDid) {
-      prefix = 'mainnet';
-    } else {
-      throw new Error(
-        `Can't determine DID type: \`${cheqdDid(did)}\`, instance of \`${
-          cheqdDid(did).constructor.name
-        }\``,
-      );
-    }
-
-    return `${prefix}:${did.toEncodedString()}:${value}`;
-  }
 }
 
 export class CheqdTestnetAccumulatorIdValue extends CheqdAccumulatorIdValue {
   static Did = CheqdTestnetDid;
-
-  static cheqdDid(did) {
-    return did;
-  }
 }
 
 export class CheqdMainnetAccumulatorIdValue extends CheqdAccumulatorIdValue {
   static Did = CheqdMainnetDid;
-
-  static cheqdDid(did) {
-    return did;
-  }
 }
 
 export class CheqdAccumulatorId extends AccumulatorId {
